@@ -225,6 +225,9 @@ int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, cons
 
 int gnutls_certificate_set_openpgp_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
 
+void gnutls_certificate_set_openpgp_key_server(GNUTLS_CERTIFICATE_CREDENTIALS res,
+     char* keyserver, int port);
+
 int gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS res,
                                    const char *data, size_t len);
 

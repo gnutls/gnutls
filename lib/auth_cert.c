@@ -869,7 +869,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	int i, x;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size = 0;
-	gnutls_datum tmp;
+	gnutls_datum tmp, akey = { NULL, 0 };
 
 	cred =
 	    _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE,
@@ -904,12 +904,27 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	/* Read PGPKeyDescriptor */
 	DECR_LEN(dsize, 1);
 	if (*p == PGP_KEY_FINGERPRINT) { /* the fingerprint */
-	
-		/* FIXME: Add stuff here to retrieve, and probably
-		 * cache fingerprints and keys.
+		p++;
+		
+		DECR_LEN(dsize, 1);
+		len = (uint8) *p;
+		
+		if (len != 20) {
+			gnutls_assert();
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		}
+		
+		DECR_LEN( dsize, 20);
+		
+		/* request the actual key from our database, or
+		 * a key server or anything.
 		 */
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		if ( (ret=_gnutls_openpgp_request_key( &akey, cred, p, 20)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		tmp = akey;
+		peer_certificate_list_size++;
 
 	} else if (*p == PGP_KEY) { /* the whole key */
 
@@ -929,20 +944,6 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		DECR_LEN(dsize, len);
 		peer_certificate_list_size++;
 
-		if (peer_certificate_list_size == 0) {
-			gnutls_assert();
-			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-		}
-
-		peer_certificate_list =
-		    gnutls_calloc(1, sizeof(gnutls_cert) *
-				  (peer_certificate_list_size));
-
-		if (peer_certificate_list == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-
 		tmp.size = len;
 		tmp.data = p;
 
@@ -951,14 +952,34 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
+	/* ok we now have the peer's key in tmp datum
+	 */
+
+	if (peer_certificate_list_size == 0) {
+		gnutls_assert();
+		gnutls_free_datum( &akey);
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+
+	peer_certificate_list =
+	    gnutls_calloc(1, sizeof(gnutls_cert) *
+			  (peer_certificate_list_size));
+		if (peer_certificate_list == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+
 	if ((ret =
 	     _gnutls_openpgp_cert2gnutls_cert(&peer_certificate_list[0],
 					      tmp)) < 0) {
 		gnutls_assert();
+		gnutls_free_datum( &akey);
 		CLEAR_CERTS;
 		gnutls_free(peer_certificate_list);
 		return ret;
 	}
+	gnutls_free_datum( &akey);
 
 	/* keep the PK algorithm */
 	state->gnutls_internals.peer_pk_algorithm =

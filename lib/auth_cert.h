@@ -31,7 +31,9 @@ typedef struct {
 	/* OpenPGP specific stuff */
 
 	gnutls_datum keyring;
-    
+	char *	     pgp_key_server;
+	int	     pgp_key_server_port;
+	    
 	/* X509 specific stuff */
 
 	gnutls_cert * x509_ca_list;
