@@ -7,9 +7,14 @@ See the end for copying conditions.
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA.
  */
 
+N: Simon Josefsson
+A: jas
+E: jas@gnutls.org
+S: Maintainer
+
 N: Nikos Mavroyanopoulos 
 A: nmav
-E: nmav@hellug.gr
+E: nmav@gnutls.org
 S: Core library.
 
 N: Fabio Fiorina 
