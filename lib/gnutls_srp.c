@@ -21,6 +21,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <auth_srp.h>
+#include <gnutls_state.h>
 
 #ifdef ENABLE_SRP
 

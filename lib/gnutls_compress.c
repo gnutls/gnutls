@@ -23,7 +23,9 @@
 #include "gnutls_errors.h"
 #include "gnutls_compress_int.h"
 
-int _gnutls_plaintext2TLSCompressed(GNUTLS_STATE state,
+/* These functions allocate the return value internally
+ */
+int _gnutls_m_plaintext2compressed(GNUTLS_STATE state,
 						     gnutls_datum*
 						     compress,
 						     gnutls_datum plaintext)
@@ -45,7 +47,7 @@ int _gnutls_plaintext2TLSCompressed(GNUTLS_STATE state,
 	return 0;
 }
 
-int _gnutls_TLSCompressed2plaintext(GNUTLS_STATE state,
+int _gnutls_m_compressed2plaintext(GNUTLS_STATE state,
 						     gnutls_datum* plain,
 						     gnutls_datum
 						     compressed)

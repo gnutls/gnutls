@@ -18,9 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_encrypt( GNUTLS_STATE state, const char* headers, int headers_size, const char* data, size_t data_size, uint8** ciphertext, ContentType type, int random_pad);
+int _gnutls_encrypt( GNUTLS_STATE state, const char* headers, int headers_size, const char* data, size_t data_size, 
+	uint8* ciphertext, int ciphertext_size, ContentType type, int random_pad);
+
 int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
-		    size_t ciphertext_size, uint8 ** data,
+		    size_t ciphertext_size, uint8 * data, int data_size,
 		    ContentType type);
-int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state, gnutls_datum* cipher, gnutls_datum compressed, ContentType _type, int headers_size, int random_pad);
-int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state, gnutls_datum * compress, gnutls_datum ciphertext, uint8 type);
+int _gnutls_compressed2ciphertext(GNUTLS_STATE state, opaque* cipher_data, int cipher_size, gnutls_datum compressed, 
+	ContentType _type, int random_pad);
+int _gnutls_ciphertext2compressed(GNUTLS_STATE state, opaque * compress_data, int compress_size, 
+	gnutls_datum ciphertext, uint8 type);

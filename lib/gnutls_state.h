@@ -10,6 +10,8 @@ KXAlgorithm gnutls_kx_get( GNUTLS_STATE state);
 GNUTLS_BulkCipherAlgorithm	gnutls_cipher_get( GNUTLS_STATE state);
 CertificateType gnutls_cert_type_get( GNUTLS_STATE state);
 
+#include <gnutls_auth_int.h>
+
 #define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \
 	gnutls_assert(); \
 	return ret; \

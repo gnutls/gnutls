@@ -157,7 +157,7 @@ uLongf size;
 z_stream* zhandle;
 #endif
 
-	if (compressed_size > max_record_size+1024) {
+	if (compressed_size > max_record_size+EXTRA_COMP_SIZE) {
 		gnutls_assert();
 		return GNUTLS_E_DECOMPRESSION_FAILED;
 	}

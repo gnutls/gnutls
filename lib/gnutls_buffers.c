@@ -316,7 +316,8 @@ void _gnutls_io_clear_read_buffer( GNUTLS_STATE state) {
  *
  * sizeOfPtr should be unsigned.
  *
- * This is not a general purpose function. It returns EXACTLY the data requested.
+ * This is not a general purpose function. It returns EXACTLY the data requested,
+ * which are stored in a local (in the state) buffer. A pointer (iptr) to this buffer is returned.
  *
  */
 ssize_t _gnutls_io_read_buffered( GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)

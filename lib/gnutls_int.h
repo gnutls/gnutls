@@ -49,7 +49,7 @@ typedef const int* GNUTLS_LIST;
 #define MAX24 16777215
 #define MAX16 65535
 
-/* The sequence of handshake messages should not
+/* The size of a handshake message should not
  * be larger than this value.
  */
 #define MAX_HANDSHAKE_PACKET_SIZE 16*1024
@@ -83,7 +83,8 @@ typedef const int* GNUTLS_LIST;
 #define MAX_RECORD_SIZE state->security_parameters.max_record_size
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
-#define MAX_RECV_SIZE EXTRA_COMP_SIZE+MAX_PAD_SIZE+MAX_RECORD_SIZE+RECORD_HEADER_SIZE
+#define MAX_RECORD_OVERHEAD MAX_PAD_SIZE+EXTRA_COMP_SIZE
+#define MAX_RECV_SIZE MAX_RECORD_OVERHEAD+MAX_RECORD_SIZE+RECORD_HEADER_SIZE
 
 #define HANDSHAKE_HEADER_SIZE 4
 
