@@ -280,20 +280,6 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 		return GNUTLS_E_SRP_PWD_ERROR;
 	}
 	
-	/* use the callback to select a password file. If set.
-	 */
-	if (state->internals.server_srp_callback!=NULL) {
-		pwd_index = state->internals.server_srp_callback(
-			state, (const char**)cred->password_file, 
-				(const char**)cred->password_conf_file,
-				cred->password_files);
-
-		if (pwd_index < 0) {
-			gnutls_assert();
-			return GNUTLS_E_SRP_PWD_ERROR;
-		}
-	}
-
 	/* Open the selected password file.
 	 */
 	fd = fopen( cred->password_file[pwd_index], "r");

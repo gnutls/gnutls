@@ -424,13 +424,6 @@ typedef struct {
 	unsigned int algorithms;
 } GNUTLS_Priority;
 
-typedef int certificate_client_select_func(struct gnutls_session_int*, 
-	const gnutls_datum *, unsigned int, const gnutls_datum *, unsigned int);
-typedef int certificate_server_select_func(struct gnutls_session_int*, 
-	const gnutls_datum *, unsigned int);
-typedef int srp_server_select_func(struct gnutls_session_int*, 
-	const char**, const char**, unsigned int);
-
 /* DH and RSA parameters types.
  */
 typedef struct {
@@ -575,16 +568,6 @@ typedef struct {
 	 * supports it.
 	 */
 	int				send_cert_req;
-
-	/* this is a callback function to call if no appropriate
-	 * client certificates were found.
-	 */
-	certificate_client_select_func*	client_cert_callback;
-	certificate_server_select_func*	server_cert_callback;
-
-	/* Callback to select the proper password file
-	 */
-	srp_server_select_func*		server_srp_callback;
 
 	/* bits to use for DHE and DHA 
 	 * use _gnutls_dh_get_prime_bits() and gnutls_dh_set_prime_bits() 

@@ -513,40 +513,6 @@ int i;
 	return 0;
 }
 
-#define gnutls_srp_server_select_function srp_server_select_func
-
-/**
-  * gnutls_srp_server_set_select_function - Used to set a callback to assist in selecting the proper password file
-  * @session: is a &gnutls_session structure.
-  * @func: is the callback function
-  *
-  * This function sets a callback to assist in selecting the proper password file,
-  * in case there are more than one. The callback's function form is:
-  * int (*callback)(gnutls_session, const char** pfiles, const char** pconffiles, int npfiles);
-  *
-  * @pfiles contains @npfiles char* structures which hold
-  * the password file name. @pconffiles contain the corresponding
-  * conf files.
-  *
-  * This function specifies what we, in case of a server, are going
-  * to do when we have to use a password file. If this callback
-  * function is not provided then gnutls will automatically select the
-  * first password file
-  *
-  * In case the callback returned a negative number then gnutls will
-  * terminate this handshake.
-  *
-  * The callback function will only be called once per handshake.
-  * The callback function should return the index of the password file
-  * that will be used by the server. -1 indicates an error.
-  *
-  **/
-void gnutls_srp_server_set_select_function(gnutls_session session,
-					     gnutls_srp_server_select_function
-					     * func)
-{
-	session->internals.server_srp_callback = func;
-}
 
 /**
   * gnutls_srp_set_server_credentials_function - Used to set a callback to retrieve the user's SRP credentials

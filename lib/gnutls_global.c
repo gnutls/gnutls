@@ -168,8 +168,14 @@ int gnutls_global_init( void)
 	_gnutls_init++;
 
 	if (gcry_control( GCRYCTL_ANY_INITIALIZATION_P) == 0) {
-		if (gcry_check_version(GNUTLS_GCRYPT_VERSION)==NULL) {
+		const char* p;
+		p = strchr( GNUTLS_GCRYPT_VERSION, ':');
+		if (p==NULL) p = GNUTLS_GCRYPT_VERSION;
+		else p++;
+
+		if (gcry_check_version(p)==NULL) {
 			gnutls_assert();
+			_gnutls_debug_log("Checking for libgcrypt failed '%s'\n", p);
 			return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
 		}
 

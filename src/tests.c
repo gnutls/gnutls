@@ -809,8 +809,10 @@ int ret;
 
 /* A callback function to be used at the certificate selection time.
  */
-static int cert_callback( gnutls_session session, const gnutls_datum* client_certs,
-	int client_certs_num, const gnutls_datum * req_ca_rdn, int nreqs)
+static int cert_callback(gnutls_session session,
+			 const gnutls_datum * req_ca_rdn, int nreqs,
+			 const gnutls_pk_algorithm * sign_algos,
+			 int sign_algos_length, gnutls_retr_st * st)
 {
 char issuer_dn[256];
 int i, ret;
@@ -853,7 +855,7 @@ int ret;
 	ADD_ALL_KX(session);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-        gnutls_certificate_client_set_select_function( session, cert_callback);
+        gnutls_certificate_client_set_retrieve_function( session, cert_callback);
 
 	ret = do_handshake( session);
 	if (ret ==GFAILED) return ret;

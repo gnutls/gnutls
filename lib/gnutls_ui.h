@@ -8,16 +8,6 @@ typedef enum gnutls_x509_subject_alt_name {
 
 # ifdef LIBGNUTLS_VERSION	/* These are defined only in gnutls.h */
 
-/* Callback prototypes for the certificate authentication
- * callbacks.
- */
-typedef int gnutls_certificate_client_select_function(gnutls_session,
-      const gnutls_datum * client_cert, int ncerts,
-      const gnutls_datum * req_ca_cert, int nreqs);
-typedef int gnutls_certificate_server_select_function(gnutls_session,
-      const gnutls_datum * server_certs, int ncerts);
-
-
 struct gnutls_openpgp_key_int;
 typedef struct gnutls_openpgp_key_int *gnutls_openpgp_key;
 
@@ -64,11 +54,6 @@ int gnutls_dh_get_peers_public_bits(gnutls_session);
 int gnutls_rsa_export_get_modulus_bits(gnutls_session session);
 
 /* X509PKI */
-
-void gnutls_certificate_client_set_select_function(gnutls_session,
-	gnutls_certificate_client_select_function *);
-void gnutls_certificate_server_set_select_function(gnutls_session,
-	gnutls_certificate_server_select_function *);
 
 /* These are set on the credentials structure.
  */

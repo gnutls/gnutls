@@ -310,93 +310,6 @@ uint size;
 }
 
 
-/* Calls the client_cert_callback() to select an index for the
- * certificate to use.
- */
-static int call_client_cert_callback(gnutls_session session,
-       const gnutls_certificate_credentials cred, gnutls_pk_algorithm * pk_algos,
-       int pk_algos_length, gnutls_datum * issuers_dn, uint issuers_dn_len)
-{
-	uint i, j;
-	int indx, result;
-	int *ij_map = NULL;
-	gnutls_datum *my_certs = NULL;
-
-	if (cred->ncerts != 0) {
-		my_certs =
-		    gnutls_alloca(cred->ncerts *
-				  sizeof(gnutls_datum));
-		if (my_certs == NULL) {
-			result = GNUTLS_E_MEMORY_ERROR;
-			gnutls_assert();
-			goto error;
-		}
-
-
-		/* maps j -> i 
-		 */
-		ij_map = gnutls_alloca(sizeof(int) * cred->ncerts);
-		if (ij_map == NULL) {
-			result = GNUTLS_E_MEMORY_ERROR;
-			gnutls_assert();
-			goto error;
-		}
-	}
-
-	/* put our certificate's issuer and dn into cdn, idn
-	 * Note that the certificates we provide to the callback
-	 * are not all the certificates we have. Only the certificates
-	 * that are requested by the server (certificate type - and sign
-	 * algorithm matches), are provided.
-	 */
-	for (j = i = 0; i < cred->ncerts; i++) {
-		if ((cred->cert_list[i][0].cert_type ==
-		     gnutls_certificate_type_get(session)) &&
-		    (_gnutls_check_pk_algo_in_list(pk_algos,
-						   pk_algos_length,
-						   cred->
-						   cert_list[i][0].
-						   subject_pk_algorithm)
-		     == 0)) {
-			/* Add a certificate ONLY if it is allowed
-			 * by the peer.
-			 */
-			ij_map[j] = i;
-			my_certs[j++] = cred->cert_list[i][0].raw;
-		}
-	}
-
-	indx =
-	    session->internals.client_cert_callback(session,
-						    my_certs,
-						    j,
-						    issuers_dn,
-						    issuers_dn_len);
-
-	/* the indx returned by the user is relative
-	 * to the certificates we provided him.
-	 * This will make it relative to the certificates
-	 * we've got.
-	 */
-	if (indx != -1 && cred->ncerts != 0)
-		indx = ij_map[indx];
-	else
-		indx = -1;
-
-	
-	result = indx;
-
-      error:
-	if (my_certs != NULL) {
-		gnutls_afree(my_certs);
-	}
-	if (ij_map != NULL) {
-		gnutls_afree(ij_map);
-	}
-	return result;
-
-}
-
 OPENPGP_KEY_DEINIT _E_gnutls_openpgp_key_deinit;
 OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
 
@@ -522,8 +435,7 @@ static int _select_client_cert(gnutls_session session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if (cred->client_get_cert_callback != NULL ||
-		session->internals.client_cert_callback != NULL) {
+	if (cred->client_get_cert_callback != NULL) {
 
 		/* use a callback to get certificate 
 		 */
@@ -547,16 +459,9 @@ static int _select_client_cert(gnutls_session session,
 			}
 		}
 
-		if (cred->client_get_cert_callback) {
-			result = call_get_cert_callback( session, issuers_dn, issuers_dn_length,
-				pk_algos, pk_algos_length);
-			goto cleanup;
-		}
-
-		/* in case of the callback that returns an index:
-		 */
-		indx = call_client_cert_callback(session, cred, pk_algos, 
-			pk_algos_length, issuers_dn, issuers_dn_length);
+		result = call_get_cert_callback( session, issuers_dn, issuers_dn_length,
+			pk_algos, pk_algos_length);
+		goto cleanup;
 
 	} else {
 		/* If we have no callbacks, try to guess.
@@ -581,18 +486,18 @@ static int _select_client_cert(gnutls_session session,
 			gnutls_assert();
 			return result;
 		}
-	}
 
-	if (indx >= 0) {
-		_gnutls_selected_certs_set(session,
+		if (indx >= 0) {
+			_gnutls_selected_certs_set(session,
 					   &cred->cert_list[indx][0],
 					   cred->cert_list_length[indx],
 					   &cred->pkey[indx], 0);
-	} else {
-		_gnutls_selected_certs_set(session, NULL, 0, NULL, 0);
-	}
+		} else {
+			_gnutls_selected_certs_set(session, NULL, 0, NULL, 0);
+		}
 
-	result = 0;
+		result = 0;
+	}
 
 cleanup:
 	gnutls_free( issuers_dn);
@@ -1587,10 +1492,9 @@ void _gnutls_selected_certs_set(gnutls_session session,
 int _gnutls_server_select_cert(gnutls_session session,
 			       gnutls_pk_algorithm requested_algo)
 {
-	uint i, j;
+	uint i;
 	int index, ret;
 	const gnutls_certificate_credentials cred;
-	int my_certs_length;
 
 	cred =
 	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -1598,6 +1502,16 @@ int _gnutls_server_select_cert(gnutls_session session,
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
+
+	/* If the callback which retrieves certificate has been
+	 * set use it and leave.
+	 */
+	if (cred->server_get_cert_callback != NULL) {
+
+		return call_get_cert_callback( session, NULL, 0, NULL, 0);
+	}
+
+	/* Otherwise... */
 
 	ret = 0;
 	index = -1;		/* default is use no certificate */
@@ -1615,75 +1529,8 @@ int _gnutls_server_select_cert(gnutls_session session,
 				break;
 			}
 		}
-
 	}
-
-	/* If the callback which retrieves certificate has been
-	 * set use it.
-	 */
-	if (cred->server_get_cert_callback != NULL) {
-
-		return call_get_cert_callback( session, NULL, 0, NULL, 0);
-
-	} else if (session->internals.server_cert_callback != NULL
-		   && cred->ncerts > 0) {
-		/* use the callback to get certificate 
-		 */
-		gnutls_datum *my_certs;
-		int *ij_map;
-
-		my_certs_length = cred->ncerts;
-		my_certs =
-		    gnutls_malloc(my_certs_length * sizeof(gnutls_datum));
-		if (my_certs == NULL) {
-			ret = GNUTLS_E_MEMORY_ERROR;
-			goto out;
-		}
-
-		/* put our certificate's issuer and dn into cdn, idn
-		 */
-		ij_map = gnutls_malloc(my_certs_length * sizeof(int));
-		if (ij_map == NULL) {
-			ret = GNUTLS_E_MEMORY_ERROR;
-			goto cleanup_certs;
-		}
-
-		j = 0;
-		for (i = 0; i < cred->ncerts; i++) {
-			/* Add compatible certificates */
-			if (requested_algo == (gnutls_pk_algorithm) - 1 ||
-			    requested_algo ==
-			    cred->cert_list[i][0].subject_pk_algorithm) {
-
-				/* if cert type matches */
-				if (session->security_parameters.
-				    cert_type ==
-				    cred->cert_list[i][0].cert_type) {
-
-					ij_map[j] = i;
-					my_certs[j++] =
-					    cred->cert_list[i][0].raw;
-				}
-			}
-		}
-		my_certs_length = j;
-
-		index =
-		    session->internals.server_cert_callback(session,
-							    my_certs,
-							    my_certs_length);
-
-		if (index != -1)
-			index = ij_map[index];
-		ret = 0;
-
-		gnutls_free(ij_map);
-	      cleanup_certs:
-		gnutls_free(my_certs);
-
-	}
-
-      out:
+	
 	/* store the index for future use, in the handshake.
 	 * (This will allow not calling this callback again.)
 	 */

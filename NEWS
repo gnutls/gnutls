@@ -6,6 +6,8 @@ Version 1.1.7
   and gnutls_x509_privkey_cpy().
 - Corrected a compilation issue when opencdk was installed in a
   non standard directory.
+- Deprecated: gnutls_srp_server_set_select_function(), 
+  gnutls_certificate_client_set_select_function(), gnutls_srp_server_set_select_function().
 
 Version 1.1.6 (24/02/2004)
 - Several bug fixes, by Arne Thomassen.

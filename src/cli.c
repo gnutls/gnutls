@@ -26,10 +26,17 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <string.h>
+#include <sys/time.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
-#include <sys/time.h>
+#include <gnutls/openpgp.h>
+
 #include "common.h"
 #include "cli-gaa.h"
 
@@ -70,11 +77,13 @@ static int x509ctype;
 static int disable_extensions;
 static int debug;
 
+
 static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
 static gnutls_certificate_credentials xcred;
 
-int protocol_priority[PRI_MAX] = { GNUTLS_TLS1_1, GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
+int protocol_priority[PRI_MAX] =
+    { GNUTLS_TLS1_1, GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
 	/* Do not use anonymous authentication, unless you know what that means */
@@ -86,9 +95,10 @@ int cipher_priority[PRI_MAX] =
 	GNUTLS_CIPHER_ARCFOUR_40, 0
 };
 int comp_priority[PRI_MAX] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
-int mac_priority[PRI_MAX] = 
-	{ GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
-int cert_type_priority[PRI_MAX] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
+int mac_priority[PRI_MAX] =
+    { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, GNUTLS_MAC_RMD160, 0 };
+int cert_type_priority[PRI_MAX] =
+    { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 /* end of global stuff */
 
@@ -97,7 +107,7 @@ typedef struct {
 	int fd;
 	gnutls_session session;
 	int secure;
-	const char* hostname;
+	const char *hostname;
 } socket_st;
 
 ssize_t socket_recv(socket_st socket, void *buffer, int buffer_size);
@@ -111,21 +121,157 @@ static void init_global_tls_stuff(void);
 #undef MAX
 #define MAX(X,Y) (X >= Y ? X : Y);
 
-/* A callback function to be used at the certificate selection time.
+
+/* Helper functions to load a certificate and key
+ * files into memory. They use mmap for simplicity.
  */
+static gnutls_datum mmap_file(const char *file)
+{
+	int fd;
+	gnutls_datum mmaped_file = { NULL, 0 };
+	struct stat stat_st;
+	void *ptr;
+
+	fd = open(file, 0);
+	if (fd == -1)
+		return mmaped_file;
+
+	fstat(fd, &stat_st);
+
+	if ((ptr =
+	     mmap(NULL, stat_st.st_size, PROT_READ, MAP_SHARED, fd,
+		  0)) == MAP_FAILED)
+		return mmaped_file;
+
+	mmaped_file.data = ptr;
+	mmaped_file.size = stat_st.st_size;
+
+	return mmaped_file;
+}
+
+static void munmap_file(gnutls_datum data)
+{
+	munmap(data.data, data.size);
+}
+
+static gnutls_x509_crt x509_crt;
+static gnutls_x509_privkey x509_key;
+
+static gnutls_openpgp_key pgp_crt;
+static gnutls_openpgp_privkey pgp_key;
+
+/* Load the certificate and the private key.
+ */
+static void load_keys(void)
+{
+	int ret;
+	gnutls_datum data;
+
+	if (x509_certfile != NULL && x509_keyfile != NULL) {
+		data = mmap_file(x509_certfile);
+		if (data.data == NULL) {
+			fprintf(stderr, "*** Error loading cert file.\n");
+			exit(1);
+		}
+		gnutls_x509_crt_init(&x509_crt);
+
+		ret =
+		    gnutls_x509_crt_import(x509_crt, &data,
+					   GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr,
+				"*** Error loading cert file: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		munmap_file(data);
+
+		data = mmap_file(x509_keyfile);
+		if (data.data == NULL) {
+			fprintf(stderr, "*** Error loading key file.\n");
+			exit(1);
+		}
+
+		gnutls_x509_privkey_init(&x509_key);
+
+		ret =
+		    gnutls_x509_privkey_import(x509_key, &data,
+					       GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "*** Error loading key file: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		munmap_file(data);
+	}
+
+#ifdef HAVE_LIBOPENCDK
+	if (pgp_certfile != NULL && pgp_keyfile != NULL) {
+		data = mmap_file(pgp_certfile);
+		if (data.data == NULL) {
+			fprintf(stderr, "*** Error loading PGP cert file.\n");
+			exit(1);
+		}
+		gnutls_openpgp_key_init(&pgp_crt);
+
+		ret =
+		    gnutls_openpgp_key_import(pgp_crt, &data,
+					   GNUTLS_OPENPGP_FMT_BASE64);
+		if (ret < 0) {
+			fprintf(stderr,
+				"*** Error loading PGP cert file: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		munmap_file(data);
+
+		data = mmap_file(x509_keyfile);
+		if (data.data == NULL) {
+			fprintf(stderr, "*** Error loading PGP key file.\n");
+			exit(1);
+		}
+
+		gnutls_openpgp_privkey_init(&pgp_key);
+
+		ret =
+		    gnutls_openpgp_privkey_import(pgp_key, &data,
+					       GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
+		if (ret < 0) {
+			fprintf(stderr, "*** Error loading PGP key file: %s\n",
+				gnutls_strerror(ret));
+			exit(1);
+		}
+
+		munmap_file(data);
+	}
+#endif
+
+}
+
+
+
+/* This callback should be associated with a session by calling
+ * gnutls_certificate_client_set_retrieve_function( session, cert_callback),
+ * before a handshake.
+ */
+
 static int cert_callback(gnutls_session session,
-			 const gnutls_datum * client_certs,
-			 int client_certs_num,
-			 const gnutls_datum * req_ca_rdn, int nreqs)
+			 const gnutls_datum * req_ca_rdn, int nreqs,
+			 const gnutls_pk_algorithm * sign_algos,
+			 int sign_algos_length, gnutls_retr_st * st)
 {
 	char issuer_dn[256];
 	int i, ret;
 	size_t len;
+	gnutls_certificate_type type;
 
 	/* Print the server's trusted CAs
 	 */
 	if (nreqs > 0)
-		printf("- Server's trusted authorities (%d):\n", nreqs);
+		printf("- Server's trusted authorities:\n");
 	else
 		printf
 		    ("- Server did not send us any trusted authorities names.\n");
@@ -140,12 +286,34 @@ static int cert_callback(gnutls_session session,
 		}
 	}
 
-	if (client_certs_num > 0)
-		return 0;	/* use the first one */
+	/* Select a certificate and return it.
+	 * The certificate must be of any of the "sign algorithms"
+	 * supported by the server.
+	 */
 
-	return -1;
+	type = gnutls_certificate_type_get(session);
+	if (type == GNUTLS_CRT_X509) {
+		st->type = type;
+		st->ncerts = 1;
+
+		st->cert.x509 = &x509_crt;
+		st->key.x509 = x509_key;
+
+		st->deinit_all = 0;
+	} else {
+		st->type = type;
+		st->ncerts = 1;
+
+		st->cert.pgp = pgp_crt;
+		st->key.pgp = pgp_key;
+
+		st->deinit_all = 0;
+	}
+
+	return 0;
 
 }
+
 
 
 /* initializes a gnutls_session with some defaults.
@@ -162,7 +330,8 @@ static gnutls_session init_tls_session(const char *hostname)
 		gnutls_handshake_set_private_extensions(session, 1);
 		gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname,
 				       strlen(hostname));
-		gnutls_certificate_type_set_priority(session, cert_type_priority);
+		gnutls_certificate_type_set_priority(session,
+						     cert_type_priority);
 	}
 
 	gnutls_cipher_set_priority(session, cipher_priority);
@@ -178,8 +347,8 @@ static gnutls_session init_tls_session(const char *hostname)
 	gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	gnutls_certificate_client_set_select_function(session,
-						      cert_callback);
+	gnutls_certificate_client_set_retrieve_function(xcred,
+							cert_callback);
 
 	/* send the fingerprint */
 	if (fingerprint != 0)
@@ -211,7 +380,8 @@ static int handle_error(socket_st hd, int err)
 	int alert, ret;
 	const char *err_type, *str;
 
-	if (err >= 0) return 0;
+	if (err >= 0)
+		return 0;
 
 	if (gnutls_error_is_fatal(err) == 0) {
 		ret = 0;
@@ -222,15 +392,16 @@ static int handle_error(socket_st hd, int err)
 	}
 
 	str = gnutls_strerror(err);
-	if (str == NULL) str = str_unknown;
-	fprintf(stderr,
-		"*** %s error: %s\n", err_type, str);
+	if (str == NULL)
+		str = str_unknown;
+	fprintf(stderr, "*** %s error: %s\n", err_type, str);
 
 	if (err == GNUTLS_E_WARNING_ALERT_RECEIVED
 	    || err == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 		alert = gnutls_alert_get(hd.session);
 		str = gnutls_alert_get_name(alert);
-		if (str == NULL) str = str_unknown;
+		if (str == NULL)
+			str = str_unknown;
 		printf("*** Received alert [%d]: %s\n", alert, str);
 
 		/* In SRP if the alert is MISSING_SRP_USERNAME,
@@ -247,9 +418,9 @@ static int handle_error(socket_st hd, int err)
 
 int starttls_alarmed = 0;
 
-void starttls_alarm (int signum)
+void starttls_alarm(int signum)
 {
-  starttls_alarmed = 1;
+	starttls_alarmed = 1;
 }
 
 int main(int argc, char **argv)
@@ -274,7 +445,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "No hostname given\n");
 		exit(1);
 	}
-	
+
 	sockets_init();
 
 #ifndef _WIN32
@@ -303,7 +474,7 @@ int main(int argc, char **argv)
 
 	if (inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF) == NULL) {
 		perror("inet_ntop()");
-		return(1);
+		return (1);
 	}
 	fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port);
 
@@ -385,7 +556,7 @@ int main(int argc, char **argv)
 	printf("\n- Simple Client Mode:\n\n");
 
 #ifndef _WIN32
-	signal (SIGALRM, &starttls_alarm);
+	signal(SIGALRM, &starttls_alarm);
 #endif
 
 	/* do not buffer */
@@ -404,22 +575,22 @@ int main(int argc, char **argv)
 		err = select(maxfd + 1, &rset, NULL, NULL, &tv);
 
 		if (err < 0) {
-		  if (errno == EINTR && starttls_alarmed) {
-		    if (hd.secure == 0) {
-		      fprintf(stderr,
-			      "*** Starting TLS handshake\n");
-		      ret = do_handshake(&hd);
-		      if (ret < 0) {
-			fprintf(stderr,
-				"*** Handshake has failed\n");
-			socket_bye(&hd);
-			user_term = 1;
-		      }
-		    } else {
-		      user_term = 1;
-		    }
-		  }
-		  continue;
+			if (errno == EINTR && starttls_alarmed) {
+				if (hd.secure == 0) {
+					fprintf(stderr,
+						"*** Starting TLS handshake\n");
+					ret = do_handshake(&hd);
+					if (ret < 0) {
+						fprintf(stderr,
+							"*** Handshake has failed\n");
+						socket_bye(&hd);
+						user_term = 1;
+					}
+				} else {
+					user_term = 1;
+				}
+			}
+			continue;
 		}
 
 		if (FD_ISSET(sd, &rset)) {
@@ -604,7 +775,8 @@ ssize_t socket_send(socket_st socket, const void *buffer, int buffer_size)
 
 	if (ret > 0 && ret != buffer_size && quiet)
 		fprintf(stderr,
-			"*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
+			"*** Only sent %d bytes instead of %d.\n", ret,
+			buffer_size);
 
 	return ret;
 }
@@ -619,7 +791,8 @@ void socket_bye(socket_st * socket)
 		while (ret == GNUTLS_E_INTERRUPTED
 		       || ret == GNUTLS_E_AGAIN);
 		if (ret < 0)
-			fprintf(stderr, "*** gnutls_bye() error: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "*** gnutls_bye() error: %s\n",
+				gnutls_strerror(ret));
 		gnutls_deinit(socket->session);
 		socket->session = NULL;
 	}
@@ -674,10 +847,11 @@ static int do_handshake(socket_st * socket)
 	return ret;
 }
 
-static int srp_username_callback( gnutls_session session, unsigned int times,
-	char** username, char** password)
+static int srp_username_callback(gnutls_session session,
+				 unsigned int times, char **username,
+				 char **password)
 {
-	if (srp_username == NULL || srp_passwd ==NULL) {
+	if (srp_username == NULL || srp_passwd == NULL) {
 		return -1;
 	}
 
@@ -685,24 +859,26 @@ static int srp_username_callback( gnutls_session session, unsigned int times,
 	 * and password.
 	 */
 	if (times == 1) {
-		*username = gnutls_strdup( srp_username);
-		*password = gnutls_strdup( srp_passwd);
-		
+		*username = gnutls_strdup(srp_username);
+		*password = gnutls_strdup(srp_passwd);
+
 		return 0;
 	} else
 		/* At the first time return username and password, if
 		 * the kx_priority[0] is an SRP method.
 		 */
-		if (times == 0 && (kx_priority[0] == GNUTLS_KX_SRP ||
-			kx_priority[0] == GNUTLS_KX_SRP_RSA ||
-			kx_priority[0] == GNUTLS_KX_SRP_DSS)) {
+	if (times == 0 && (kx_priority[0] == GNUTLS_KX_SRP ||
+				   kx_priority[0] ==
+				   GNUTLS_KX_SRP_RSA
+				   || kx_priority[0] ==
+				   GNUTLS_KX_SRP_DSS)) {
 
-			*username = gnutls_strdup( srp_username);
-			*password = gnutls_strdup( srp_passwd);
-		
-			return 0;
-		}
-	
+		*username = gnutls_strdup(srp_username);
+		*password = gnutls_strdup(srp_passwd);
+
+		return 0;
+	}
+
 	return -1;
 }
 
@@ -715,7 +891,7 @@ static void init_global_tls_stuff(void)
 {
 	int ret;
 
-	if ((ret=gnutls_global_init()) < 0) {
+	if ((ret = gnutls_global_init()) < 0) {
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
@@ -723,7 +899,7 @@ static void init_global_tls_stuff(void)
 	gnutls_global_set_log_function(tls_log_func);
 	gnutls_global_set_log_level(debug);
 
-	if ((ret=gnutls_global_init_extra()) < 0) {
+	if ((ret = gnutls_global_init_extra()) < 0) {
 		fprintf(stderr,
 			"global_init_extra: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -767,32 +943,9 @@ static void init_global_tls_stuff(void)
 	}
 #endif
 
-	if (x509_certfile != NULL) {
-		ret =
-		    gnutls_certificate_set_x509_key_file(xcred,
-							 x509_certfile,
-							 x509_keyfile,
-							 x509ctype);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error setting the x509 key files ('%s', '%s')\n",
-				x509_certfile, x509_keyfile);
-		}
-	}
+	load_keys();
 
 #ifdef HAVE_LIBOPENCDK
-	if (pgp_certfile != NULL) {
-		ret =
-		    gnutls_certificate_set_openpgp_key_file(xcred,
-							    pgp_certfile,
-							    pgp_keyfile);
-		if (ret < 0) {
-			fprintf(stderr,
-				"Error setting the x509 key files ('%s', '%s')\n",
-				pgp_certfile, pgp_keyfile);
-		}
-	}
-
 	if (pgp_keyring != NULL) {
 		ret =
 		    gnutls_certificate_set_openpgp_keyring_file(xcred,
@@ -822,7 +975,7 @@ static void init_global_tls_stuff(void)
 
 
 	gnutls_srp_set_client_credentials_function(srp_cred,
-				srp_username_callback);
+						   srp_username_callback);
 #endif
 
 
