@@ -4,6 +4,7 @@
 *.o
 *.la
 Makefile.in
+gnutls.h.in
 Makefile
 .cvsignore
 *.da
