@@ -25,8 +25,13 @@ CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
+libgnu_la_SOURCES += exit.h
+
+
 libgnu_la_SOURCES += getline.h
 EXTRA_DIST += getndelim2.h getndelim2.c
+
+libgnu_la_SOURCES += gettext.h
 
 libgnu_la_SOURCES += unlocked-io.h
 

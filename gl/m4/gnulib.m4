@@ -17,8 +17,10 @@ AC_DEFUN([gl_EARLY],
 
 AC_DEFUN([gl_INIT],
 [
+  gl_ERROR
   dnl gl_USE_SYSTEM_EXTENSIONS must be added quite early to configure.ac.
   AM_FUNC_GETLINE
+  dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   gl_FUNC_GLIBC_UNLOCKED_IO
 ])
 
