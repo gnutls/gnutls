@@ -112,6 +112,16 @@ int gnutls_handshake_get_direction(gnutls_session session) {
 	return gnutls_record_get_direction( session);
 }
 
-/* nothing here */
+
+/* This was included in gnutls-extra
+ */
+#undef gnutls_certificate_set_openpgp_keyserver
+int
+gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
+                                         char* keyserver,
+                                         int port)
+{
+	return 0;
+}
 
 #endif /* GNUTLS_BACKWARDS_COMPATIBLE */
