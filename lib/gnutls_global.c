@@ -201,6 +201,11 @@ int gnutls_global_init( void)
 	 * This should not deal with files in the final
 	 * version.
 	 */
+
+	if (asn1_check_version(GNUTLS_LIBTASN1_VERSION)==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
+	}
 	
 	res=asn1_array2tree( pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
 	if (res != ASN1_SUCCESS) {

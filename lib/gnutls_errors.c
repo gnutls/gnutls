@@ -125,6 +125,9 @@ static gnutls_error_entry error_algorithms[] = {
 		GNUTLS_E_LIBRARY_VERSION_MISMATCH, 1 ), 
 	ERROR_ENTRY("The gcrypt library version is too old.", 
 		GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY, 1 ), 
+
+	ERROR_ENTRY("The tasn1 library version is too old.", 
+		GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY, 1 ), 
 	ERROR_ENTRY("The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported.", 
 		GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED, 1 ),
 	ERROR_ENTRY("The initialization of LZO has failed.", GNUTLS_E_LZO_INIT_FAILED, 1 ), 
