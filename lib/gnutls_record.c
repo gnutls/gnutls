@@ -722,6 +722,8 @@ static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 
 }
 
+#define MAX_EMPTY_PACKETS_SEQUENCE 4
+
 /* This function behave exactly like read(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is Userdata only)
@@ -739,8 +741,15 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	uint8 *recv_data;
 	int ret, ret2;
 	uint16 header_size;
+	int empty_packet = 0;
 
 	begin:
+	
+	if (empty_packet > MAX_EMPTY_PACKETS_SEQUENCE) {
+		gnutls_assert();
+		return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
+	}
+	
 	/* default headers for TLS 1.0
 	 */
 	header_size = RECORD_HEADER_SIZE;
@@ -905,8 +914,11 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	/* TLS 1.0 CBC protection. Read the next fragment.
 	 */
-	if (ret==0) goto begin;
-
+	if (ret==0) {
+		empty_packet++;
+		goto begin;
+	}
+	
 	return ret;
 }
 
