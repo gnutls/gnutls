@@ -130,7 +130,7 @@ void gaa_help(void)
 	__gaa_helpsingle('r', "resume", "", "Connect, establish a session. Connect again and resume this session.");
 	__gaa_helpsingle('s', "starttls", "", "Connect, establish a plain session and start TLS when EOF is sent from the keyboard.");
 	__gaa_helpsingle(0, "crlf", "", "Send CR LF instead of LF.");
-	__gaa_helpsingle(0, "x509fmtder", "", "Use DER format for certificates");
+	__gaa_helpsingle(0, "x509fmtder", "", "Use DER format for certificates to read from.");
 	__gaa_helpsingle('f', "fingerprint", "", "Send the openpgp fingerprint, instead of the key.");
 	__gaa_helpsingle(0, "disable-extensions", "", "Disable all the TLS extensions.");
 	__gaa_helpsingle(0, "xml", "", "Print the certificate information in XML format.");

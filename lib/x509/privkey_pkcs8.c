@@ -75,17 +75,19 @@ static int encrypt_data( const gnutls_datum* plain,
 	gnutls_datum* key, gnutls_datum* encrypted);
 
 #define PEM_PKCS8 "ENCRYPTED PRIVATE KEY"
+#define PEM_UNENCRYPTED_PKCS8 "PRIVATE KEY"
 
 
 /* 
  * Encodes a PKCS #1 private key to a PKCS #8 private key
- * info. The output will be allocated and stored into der.
+ * info. The output will be allocated and stored into der. Also
+ * the ASN1_TYPE of private key info will be returned.
  */
-static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* der)
+static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* der, 
+	ASN1_TYPE *pkey_info)
 {
 	int result, size;
 	opaque *data = NULL;
-	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
 	opaque null = 0;
 
 	if (pkey->pk_algorithm != GNUTLS_PK_RSA) {
@@ -95,7 +97,7 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				   "PKIX1.PrivateKeyInfo", &pkcs8_asn
+				   "PKIX1.PrivateKeyInfo", pkey_info
 				   )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -104,7 +106,7 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 
 	/* Write the version.
 	 */
-	result = asn1_write_value( pkcs8_asn, "version", &null, 1);
+	result = asn1_write_value( *pkey_info, "version", &null, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -114,14 +116,14 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 	/* write the privateKeyAlgorithm
 	 * fields. (OID+NULL data)
 	 */
-	result = asn1_write_value( pkcs8_asn, "privateKeyAlgorithm.algorithm", PKIX1_RSA_OID, 1);
+	result = asn1_write_value( *pkey_info, "privateKeyAlgorithm.algorithm", PKIX1_RSA_OID, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
-	result = asn1_write_value( pkcs8_asn, "privateKeyAlgorithm.parameters", NULL, 0);
+	result = asn1_write_value( *pkey_info, "privateKeyAlgorithm.parameters", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -150,7 +152,7 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 		goto error;
 	}
 
-	result = asn1_write_value( pkcs8_asn, "privateKey", data, size);
+	result = asn1_write_value( *pkey_info, "privateKey", data, size);
 	
 	gnutls_afree( data);
 	data = NULL;
@@ -163,7 +165,7 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 
 	/* Append an empty Attributes field.
 	 */
-	result = asn1_write_value( pkcs8_asn, "attributes", NULL, 0);
+	result = asn1_write_value( *pkey_info, "attributes", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -173,7 +175,7 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 	/* DER Encode the generated private key info.
 	 */
 	size = 0;
-	result = asn1_der_coding( pkcs8_asn, "", NULL, &size, NULL);
+	result = asn1_der_coding( *pkey_info, "", NULL, &size, NULL);
 	if (result != ASN1_MEM_ERROR) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -189,19 +191,17 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	result = asn1_der_coding( pkcs8_asn, "", der->data, &size, NULL);
+	result = asn1_der_coding( *pkey_info, "", der->data, &size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto error;
 	}
 
-	asn1_delete_structure( &pkcs8_asn);
-
 	return 0;
 
 	error:
-		asn1_delete_structure( &pkcs8_asn);
+		asn1_delete_structure( pkey_info);
 		if (data != NULL) { gnutls_afree(data); }
 		return result;
 
@@ -286,7 +286,7 @@ static ASN1_TYPE encode_to_pkcs8_key( const gnutls_datum *raw_key,
   * @key: Holds the key
   * @format: the format of output params. One of PEM or DER.
   * @password: the password that will be used to encrypt the key
-  * @flags: reserved for future use
+  * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
   * @output_data: will contain a private key PEM or DER encoded
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
@@ -296,7 +296,8 @@ static ASN1_TYPE encode_to_pkcs8_key( const gnutls_datum *raw_key,
   * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
-  * of "BEGIN ENCRYPTED PRIVATE KEY".
+  * of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if
+  * encryption is not used.
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.
@@ -306,31 +307,44 @@ int gnutls_x509_privkey_export_pkcs8( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, char* password, unsigned int flags,
 	unsigned char* output_data, int* output_data_size)
 {
-ASN1_TYPE pkcs8_asn;
+ASN1_TYPE pkcs8_asn, pkey_info;
 int ret;
 gnutls_datum tmp;
 
 	/* Get the private key info
 	 */
-	ret = encode_to_private_key_info( key, &tmp);
+	ret = encode_to_private_key_info( key, &tmp, &pkey_info);
 	if ( ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
+	if (!(flags & GNUTLS_PKCS8_PLAIN) || password == NULL) {
 
-	pkcs8_asn = encode_to_pkcs8_key( &tmp, password, flags);
-	_gnutls_free_datum( &tmp);
+		asn1_delete_structure( &pkey_info); /* we don't need it */
 
-	if (pkcs8_asn == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_ASN1_GENERIC_ERROR;
+		pkcs8_asn = encode_to_pkcs8_key( &tmp, password, flags);
+		_gnutls_free_datum( &tmp);
+
+		if (pkcs8_asn == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_ASN1_GENERIC_ERROR;
+		}
+		
+		ret = _gnutls_x509_export_int( pkcs8_asn, format, PEM_PKCS8, *output_data_size,
+			output_data, output_data_size);
+
+		asn1_delete_structure( &pkcs8_asn);
+
+	} else {
+		_gnutls_free_datum( &tmp);
+
+		ret = _gnutls_x509_export_int( pkey_info, format, PEM_UNENCRYPTED_PKCS8, 
+			*output_data_size, output_data, output_data_size);
+		
+		asn1_delete_structure( &pkey_info);
 	}
 
-	ret = _gnutls_x509_export_int( pkcs8_asn, format, PEM_PKCS8, *output_data_size,
-		output_data, output_data_size);
-	
-	asn1_delete_structure( &pkcs8_asn);
 	return ret;
 }
 
@@ -545,21 +559,24 @@ static ASN1_TYPE decode_private_key_info( const gnutls_datum* der, gnutls_x509_p
   * @key: The structure to store the parsed key
   * @data: The DER or PEM encoded certificate.
   * @format: One of DER or PEM
-  * @password: the password to decrypt the key
+  * @password: the password to decrypt the key (if it is encrypted)
+  * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
   *
   * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
   * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
   *
-  * If the Certificate is PEM encoded it should have a header of "ENCRYPTED PRIVATE KEY".
+  * If the Certificate is PEM encoded it should have a header of "ENCRYPTED PRIVATE KEY",
+  * or "PRIVATE KEY". You only need to specify the flags if the key is DER encoded.
   *
   * Returns 0 on success.
   *
   **/
 int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key, const gnutls_datum * data,
-	gnutls_x509_crt_fmt format, char * password)
+	gnutls_x509_crt_fmt format, char * password, unsigned int flags)
 {
 	int result = 0, need_free = 0;
 	gnutls_datum _data = { data->data, data->size };
+	int encrypted;
 
 	key->pk_algorithm = GNUTLS_PK_UNKNOWN;
 
@@ -567,25 +584,39 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key, const gnutls_datum
 	 */
 	if (format == GNUTLS_X509_FMT_PEM) {
 		opaque *out;
-		
-		/* Try the first header */
-		result = _gnutls_fbase64_decode(PEM_PKCS8, data->data, data->size,
-			&out);
 
-		if (result <= 0) {
-			if (result==0) result = GNUTLS_E_INTERNAL_ERROR;
-			gnutls_assert();
-			return result;
-		}
+		/* Try the first header 
+		 */
+		result = _gnutls_fbase64_decode(PEM_UNENCRYPTED_PKCS8, data->data, data->size,
+			&out);
+		encrypted = 0;
 		
+		if (result < 0) { /* Try the encrypted header 
+		 		   */
+			result = _gnutls_fbase64_decode(PEM_PKCS8, data->data, data->size,
+				&out);
+
+			if (result <= 0) {
+				if (result==0) result = GNUTLS_E_INTERNAL_ERROR;
+				gnutls_assert();
+				return result;
+			}
+			
+			encrypted = 1;
+		}
+
 		_data.data = out;
 		_data.size = result;
 		
 		need_free = 1;
 	}
 
+	if (flags & GNUTLS_PKCS8_PLAIN || password == NULL) {
+		key->key = decode_private_key_info( &_data, key);
+	} else { /* encrypted. */
+		key->key = decode_pkcs8_key( &_data, password, key);
+	}
 
-	key->key = decode_pkcs8_key( &_data, password, key);
 	if (key->key == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_ASN1_DER_ERROR;
@@ -1060,6 +1091,10 @@ static int generate_key( const char* password, unsigned int flags,
 {
 opaque rnd[2];
 int ret;
+
+	/* We should use the flags here to use different
+	 * encryption algorithms etc. 
+	 */
 
 	_gnutls_get_random( rnd, 2, GNUTLS_STRONG_RANDOM);
 

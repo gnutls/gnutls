@@ -21,7 +21,7 @@ option (s, starttls) { $starttls = 1 } "Connect, establish a plain session and s
 option (crlf) { $crlf = 1 } "Send CR LF instead of LF."
 
 #int fmtder;
-option (x509fmtder) { $fmtder = 1 } "Use DER format for certificates"
+option (x509fmtder) { $fmtder = 1 } "Use DER format for certificates to read from."
 
 #int fingerprint;
 option (f, fingerprint) { $fingerprint = 1 } "Send the openpgp fingerprint, instead of the key."
