@@ -2861,6 +2861,82 @@ int str_length, j, i;
 	return buffer;
 }
 
+/* defines needed in *dn_string functions
+ */
+#define STR_APPEND(y) if (_gnutls_string_append_str( &str, y) < 0) { \
+		_gnutls_string_clear( &str); \
+		gnutls_assert(); \
+		return GNUTLS_E_MEMORY_ERROR; \
+	}
+#define PRINTX( x, y) \
+   if (y[0]!=0) { \
+      if (i==0) i=1; else { STR_APPEND( ","); } \
+      STR_APPEND( x); \
+      STR_APPEND( "="); \
+      STR_APPEND( str_escape(y, str_buffer, sizeof(str_buffer))); \
+   }
+
+
+
+/**
+  * gnutls_x509_extract_dn_string - This function parses an RDN sequence and returns a string
+  * @idn: should contain a DER encoded RDN sequence
+  * @buf: a pointer to a structure to hold the peer's name
+  * @sizeof_buf: holds the size of 'buf'
+  *
+  * This function will return the name of the given RDN sequence.
+  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described 
+  * in RFC2253.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
+  * and 0 on success.
+  *
+  **/
+int gnutls_x509_extract_dn_string(const gnutls_datum * idn, 
+	char *buf, unsigned int sizeof_buf)
+{
+gnutls_x509_dn dn;
+int ret, i;
+gnutls_string str;
+char str_buffer[256];
+
+   if (buf == NULL || sizeof_buf == 0) {
+      return GNUTLS_E_INVALID_REQUEST;
+   }
+   
+   buf[0] = 0;
+
+  ret = gnutls_x509_extract_certificate_dn(idn, &dn);
+  if (ret < 0) {
+  	gnutls_assert();
+  	return ret;
+  }
+
+   _gnutls_string_init( &str, gnutls_malloc, gnutls_realloc, gnutls_free);
+
+   i = 0;
+   PRINTX( "CN", dn.common_name);
+   PRINTX( "E", dn.email);
+   PRINTX( "OU", dn.organizational_unit_name);
+   PRINTX( "O", dn.organization);
+   PRINTX( "L", dn.locality_name);
+   PRINTX( "ST", dn.state_or_province_name);
+   PRINTX( "C", dn.country);
+ 
+   if (str.length >= sizeof_buf) {
+        _gnutls_string_clear( &str);
+	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+   }
+   
+   memcpy( buf, str.data, str.length);
+   buf[str.length] = 0;
+
+   _gnutls_string_clear( &str);
+
+   return 0;
+
+}
+
 /**
   * gnutls_x509_extract_certificate_dn_string - This function returns the certificate's distinguished name
   * @cert: should contain an X.509 DER encoded certificate
@@ -2890,19 +2966,6 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    buf[0] = 0;
 
    _gnutls_string_init( &str, gnutls_malloc, gnutls_realloc, gnutls_free);
-
-#define STR_APPEND(y) if (_gnutls_string_append_str( &str, y) < 0) { \
-		_gnutls_string_clear( &str); \
-		gnutls_assert(); \
-		return GNUTLS_E_MEMORY_ERROR; \
-	}
-#define PRINTX( x, y) \
-   if (y[0]!=0) { \
-      if (i==0) i=1; else { STR_APPEND( ","); } \
-      STR_APPEND( x); \
-      STR_APPEND( "="); \
-      STR_APPEND( str_escape(y, str_buffer, sizeof(str_buffer))); \
-   }
 
    if (!issuer)
       ret = gnutls_x509_extract_certificate_dn(cert, &dn);

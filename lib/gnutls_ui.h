@@ -65,6 +65,8 @@ void gnutls_certificate_server_set_request( gnutls_session, gnutls_certificate_r
 int gnutls_x509_certificate_to_xml(const gnutls_datum * cert, gnutls_datum* res, int detail);
 
 int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_x509_dn*);
+int gnutls_x509_extract_dn_string(const gnutls_datum * idn,
+        char *buf, unsigned int sizeof_buf);
 int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);
 int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf,
    const gnutls_datum * cert, int issuer);
