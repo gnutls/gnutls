@@ -1,6 +1,7 @@
 Makefile.in
 Makefile
 .cvsignore
+error_codes.texi
 gnutls.aux
 gnutls.cp
 gnutls.cps
