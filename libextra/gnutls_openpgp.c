@@ -29,6 +29,7 @@
 
 #ifdef HAVE_LIBOPENCDK
 #include <gnutls/compat8.h>
+#include <strfile.h>
 #include <gnutls_str.h>
 #include <stdio.h>
 #include <gcrypt.h>
@@ -239,34 +240,6 @@ search_packet( const gnutls_datum *buf, int pkttype )
 
     return pkt;
 }
-
-
-static int
-stream_to_datum( cdk_stream_t inp, gnutls_datum *raw )
-{
-    uint8 buf[4096];
-    int rc = 0, nread, nbytes = 0;
-  
-    if( !buf || !raw ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    cdk_stream_seek( inp, 0 );
-    while( !cdk_stream_eof( inp ) ) {
-        nread = cdk_stream_read( inp, buf, sizeof buf-1 );
-        if( nread == EOF )
-            break;
-        datum_append( raw, buf, nread );
-        nbytes += nread;
-    }
-    cdk_stream_seek( inp, 0 );
-    if( !nbytes )
-        rc = GNUTLS_E_INTERNAL_ERROR;
-
-    return rc;
-}
-
 
 static int
 openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdk_pkt_pubkey_t pk )
@@ -510,6 +483,16 @@ leave:
 }
 
 
+/**
+ * gnutls_certificate_set_openpgp_key_mem - Used to set OpenPGP keys
+ * @res: the destination context to save the data.
+ * @cert: the datum that contains the public key.
+ * @key: the datum that contains the secret key.
+ *
+ * This funtion is used to load OpenPGP keys into the GnuTLS credential structure.
+ * It doesn't matter whether the keys are armored or but, but the files
+ * should only contain one key which should not be encrypted.
+ **/
 int
 gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
                                         gnutls_datum *cert,
@@ -527,10 +510,12 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     }
 
     rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
-    if( (rc = _gnutls_map_cdk_rc( rc )) )
+fprintf(stderr,"ERR: %s\n", cdk_strerror( rc));
+    if( (rc = _gnutls_map_cdk_rc( rc )) ) {
+      gnutls_assert();
       goto leave;
+    }
 
-    /* fixme: too much duplicated code from (set_openpgp_key_file) */
     res->cert_list = gnutls_realloc_fast(res->cert_list,
                                     (1+res->ncerts)*sizeof(gnutls_cert*));
     if (res->cert_list == NULL) {
@@ -554,8 +539,10 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     i = 1;
     while( (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
         pkt = cdk_kbnode_get_packet( p );
-        if( i > MAX_PUBLIC_PARAMS_SIZE )
+        if( i > MAX_PUBLIC_PARAMS_SIZE ) {
+            gnutls_assert();
             break;
+        }
         if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
             int n = res->ncerts;
             cdk_pkt_pubkey_t pk = pkt->pkt.public_key;
@@ -584,6 +571,10 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     	return rc;
     }
     rc = _gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], &raw );
+    if (rc) {
+    	gnutls_assert();
+    }
+
     _gnutls_free_datum(&raw);
 
 leave:
@@ -596,17 +587,17 @@ leave:
 /**
  * gnutls_certificate_set_openpgp_key_file - Used to set OpenPGP keys
  * @res: the destination context to save the data.
- * @CERTFILE: the file that contains the public key.
- * @KEYFILE: the file that contains the secret key.
+ * @certfile: the file that contains the public key.
+ * @keyfile: the file that contains the secret key.
  *
- * This funtion is used to load OpenPGP keys into the GnuTLS structure.
+ * This funtion is used to load OpenPGP keys into the GnuTLS credentials structure.
  * It doesn't matter whether the keys are armored or but, but the files
  * should only contain one key which should not be encrypted.
  **/
 int
 gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
-                                         char* CERTFILE,
-                                         char* KEYFILE )
+                                         char* certfile,
+                                         char* keyfile )
 {
     struct stat statbuf;
     cdk_stream_t inp = NULL;
@@ -615,100 +606,48 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
     gnutls_datum raw;
     int i = 0, n;
     int rc = 0;
-  
-    if( !res || !KEYFILE || !CERTFILE ) {
+    gnutls_datum key, cert;
+    strfile xcert, xkey;
+
+    if( !res || !keyfile || !certfile ) {
     	gnutls_assert();
         return GNUTLS_E_INVALID_REQUEST;
     }
 
-    if( stat( CERTFILE, &statbuf ) || stat( KEYFILE, &statbuf ) ) {
+    if( stat( certfile, &statbuf ) || stat( keyfile, &statbuf ) ) {
         gnutls_assert();
         return GNUTLS_E_FILE_ERROR;
     }
 
-    rc = cdk_stream_open( CERTFILE, &inp );
-    if( rc ) {
-        gnutls_assert();
-        return _gnutls_map_cdk_rc( rc );
+    xcert = _gnutls_file_to_str( certfile);
+    if (xcert.data == NULL) {
+    	gnutls_assert();
+    	return GNUTLS_E_FILE_ERROR;
     }
 
-    if( cdk_armor_filter_use( inp ) )
-        cdk_stream_set_armor_flag( inp, 0 );
-
-    n = (1 + res->ncerts) * sizeof (gnutls_cert*);
-    res->cert_list = gnutls_realloc_fast( res->cert_list, n );
-    if( !res->cert_list ) {
-        gnutls_assert();
-        return GNUTLS_E_MEMORY_ERROR;
-    }
-
-    n = (1 + res->ncerts) * sizeof (int);
-    res->cert_list_length = gnutls_realloc_fast( res->cert_list_length, n );
-    if( !res->cert_list_length ) {
-        gnutls_assert();
-        return GNUTLS_E_MEMORY_ERROR;
-    }
-
-    res->cert_list[res->ncerts] = gnutls_calloc( 1,  sizeof(gnutls_cert) );
-    if( !res->cert_list[res->ncerts] ) {
-        gnutls_assert();
-        return GNUTLS_E_MEMORY_ERROR;
+    xkey = _gnutls_file_to_str( keyfile);
+    if (xkey.data == NULL) {
+    	gnutls_assert();
+    	_gnutls_strfile_free(&xcert);
+    	return GNUTLS_E_FILE_ERROR;
     }
     
-    while( !rc ) {
-        i = 1;
-        rc = cdk_keydb_get_keyblock( inp, &knode );
-        while( knode && (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
-            if( i > MAX_PUBLIC_PARAMS_SIZE )
-                break;
-            pkt = cdk_kbnode_get_packet( p );
-            if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
-                int n = res->ncerts;
-                cdk_pkt_pubkey_t pk = pkt->pkt.public_key;
-                res->cert_list_length[n] = 1;
-                stream_to_datum( inp, &res->cert_list[n][0].raw );
-                openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
-                i++;
-            }
-        }
-    }
-    if( rc == CDK_EOF && i > 1 )
-        rc = 0;
-    cdk_stream_close( inp );
-    if( rc ) {
-        cdk_kbnode_release( knode );
-
-        gnutls_assert();
-        rc = _gnutls_map_cdk_rc( rc );
-        goto leave;
-    }
-    cdk_kbnode_release( knode );
-
-    rc = cdk_stream_open( KEYFILE, &inp );
-    if( rc ) {
-        gnutls_assert();
-        return _gnutls_map_cdk_rc( rc );
-    }
-    if( cdk_armor_filter_use( inp ) )
-        cdk_stream_set_armor_flag( inp, 0 );
-
-    memset( &raw, 0, sizeof raw );
-    stream_to_datum( inp, &raw );
-    cdk_stream_close( inp );
-
-    n = (res->ncerts + 1) * sizeof (gnutls_privkey);
-    res->pkey = gnutls_realloc_fast( res->pkey, n );
-    if( !res->pkey ) {
-        gnutls_assert();
-        return GNUTLS_E_MEMORY_ERROR;
-    }
+    key.data = xkey.data;
+    key.size = xkey.size;
     
-    res->ncerts++;
-    /* ncerts has been incremented before */
-    rc = _gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], &raw );
+    cert.data = xcert.data;
+    cert.size = xcert.size;
+
+    rc = gnutls_certificate_set_openpgp_key_mem( res,
+         &cert, &key);
+
+    _gnutls_strfile_free(&xcert);
+    _gnutls_strfile_free(&xkey);
     
- leave:
-    return rc;
+    if (rc < 0) {
+    	gnutls_assert();
+    	return rc;
+    }
 }
 
 

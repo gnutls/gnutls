@@ -1126,7 +1126,7 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
    static const char hostname[] = "hkp://wwwkeys.pgp.net";
    static const int port = 11371;
    int rc;
-   CDK_KBNODE knode = NULL;
+   cdk_kbnode_t knode = NULL;
    unsigned int i;
 
    fprintf(stderr, "must recv: ");

@@ -34,7 +34,7 @@ gnutls_openpgp_key_get_name( gnutls_openpgp_key key,
         char *buf, size_t *sizeof_buf);
 int gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key key, 
                             unsigned char *fpr, size_t *fprlen);
-int gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, int *r_bits);
+int gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, unsigned int *bits);
 int gnutls_openpgp_key_get_version( gnutls_openpgp_key key);
 time_t gnutls_openpgp_key_get_creation_time( gnutls_openpgp_key key);
 time_t gnutls_openpgp_key_get_expiration_time( gnutls_openpgp_key key);

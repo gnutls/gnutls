@@ -619,13 +619,9 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 # include <sys/mman.h>
 #endif
 
-typedef struct {
-	opaque * data;
-	size_t size;
-	int mmaped;
-} strfile;
+#include <strfile.h>
 
-inline static void _strfile_free( strfile *x)
+void _gnutls_strfile_free( strfile *x)
 {
 #ifdef HAVE_MMAP
 	if (x->mmaped) {
@@ -725,7 +721,7 @@ static int read_cert_file(gnutls_certificate_credentials res, const char *certfi
 	}
 
 	ret = read_cert_mem( res, x.data, x.size, type);
-	_strfile_free(&x);
+	_gnutls_strfile_free(&x);
 	
 	return ret;
 
@@ -749,7 +745,7 @@ static int read_key_file(gnutls_certificate_credentials res, const char *keyfile
 	}
 
 	ret = read_key_mem( res, x.data, x.size, type);
-	_strfile_free(&x);
+	_gnutls_strfile_free(&x);
 	
 	return ret;
 }
@@ -1256,7 +1252,7 @@ int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res,
 		ret = parse_pem_ca_mem( &res->x509_ca_list, &res->x509_ncas,
 			x.data, x.size);
 
-	_strfile_free(&x);
+	_gnutls_strfile_free(&x);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1509,7 +1505,7 @@ int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res,
 		ret = parse_pem_crl_mem( &res->x509_crl_list, &res->x509_ncrls,
 			x.data, x.size);
 	
-	_strfile_free(&x);
+	_gnutls_strfile_free(&x);
 
 	if (ret < 0) {
 		gnutls_assert();
