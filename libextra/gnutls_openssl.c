@@ -20,7 +20,7 @@
 #include <gcrypt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "gnutls-openssl.h"
+#include "openssl.h"
 
 static int last_error = 0;
 
@@ -135,7 +135,7 @@ SSL *SSL_new(SSL_CTX *ctx)
     if (ctx->keyfile)
         gnutls_certificate_set_x509_key_file(ssl->gnutls_cred, ctx->certfile,
                                              ctx->keyfile, ctx->keyfile_type);
-
+    ssl->ctx = ctx;
     ssl->verify_mode = ctx->verify_mode;
     ssl->verify_callback = ctx->verify_callback;
 
@@ -197,6 +197,26 @@ int SSL_connect(SSL *ssl)
     X509_STORE_CTX *store;
     int cert_list_size = 0;
     int err;
+    int i, j;
+    int x_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    /* take options into account before connecting */
+
+    if (ssl->options & SSL_OP_NO_TLSv1)
+    {
+        for (i=0, j=0;
+             i < GNUTLS_MAX_ALGORITHM_NUM && x_priority[i] != 0;
+             i++, j++)
+        {
+            if (ssl->ctx->method->protocol_priority[j] == GNUTLS_TLS1)
+                j++;
+            else
+                x_priority[i] = ssl->ctx->method->protocol_priority[j];
+        }
+        if (i < GNUTLS_MAX_ALGORITHM_NUM)
+            x_priority[i] = 0;
+        gnutls_protocol_set_priority (ssl->gnutls_state,
+                                      ssl->ctx->method->protocol_priority);
+    }
 
     err = gnutls_handshake(ssl->gnutls_state);
     ssl->last_error = err;
@@ -314,20 +334,17 @@ SSL_METHOD *SSLv23_client_method(void)
 
 SSL_CIPHER *SSL_get_current_cipher(SSL *ssl)
 {
-    SSL_CIPHER *sslc;
-
-    sslc = (SSL_CIPHER *)calloc(1, sizeof(SSL_CIPHER));
-    if (!sslc)
+    if (!ssl)
         return NULL;
 
-    sslc->version = gnutls_protocol_get_version(ssl->gnutls_state);
-    sslc->cipher = gnutls_cipher_get(ssl->gnutls_state);
-    sslc->kx = gnutls_kx_get(ssl->gnutls_state);
-    sslc->mac = gnutls_mac_get(ssl->gnutls_state);
-    sslc->compression = gnutls_compression_get(ssl->gnutls_state);
-    sslc->cert = gnutls_cert_type_get(ssl->gnutls_state);
+    ssl->ciphersuite.version = gnutls_protocol_get_version(ssl->gnutls_state);
+    ssl->ciphersuite.cipher = gnutls_cipher_get(ssl->gnutls_state);
+    ssl->ciphersuite.kx = gnutls_kx_get(ssl->gnutls_state);
+    ssl->ciphersuite.mac = gnutls_mac_get(ssl->gnutls_state);
+    ssl->ciphersuite.compression = gnutls_compression_get(ssl->gnutls_state);
+    ssl->ciphersuite.cert = gnutls_cert_type_get(ssl->gnutls_state);
 
-    return sslc;
+    return &(ssl->ciphersuite);
 }
 
 const char *SSL_CIPHER_get_name(SSL_CIPHER *cipher)

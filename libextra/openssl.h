@@ -30,7 +30,7 @@
 
 #define OPENSSL_VERSION_NUMBER (0x0090604F)
 #define SSLEAY_VERSION_NUMBER OPENSSL_VERSION_NUMBER
-#define OPENSSL_VERSION_TEXT ("GNUTLS " LIBGNUTLS_VERSION)
+#define OPENSSL_VERSION_TEXT ("GNUTLS " LIBGNUTLS_VERSION " ")
 
 #define SSL_ERROR_NONE        (0)
 #define SSL_ERROR_SSL         (1)
@@ -69,6 +69,16 @@ typedef struct
 
 typedef struct
 {
+    GNUTLS_Version version;
+    GNUTLS_BulkCipherAlgorithm cipher;
+    GNUTLS_KXAlgorithm kx;
+    GNUTLS_MACAlgorithm mac;
+    GNUTLS_CompressionMethod compression;
+    GNUTLS_CertificateType cert;
+} SSL_CIPHER;
+
+typedef struct
+{
     struct _SSL *ssl;
     int error;
     gnutls_datum *cert_list;
@@ -94,6 +104,10 @@ typedef struct _SSL
     GNUTLS_STATE gnutls_state;
 #define rbio gnutls_state
     GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS gnutls_cred;
+
+    SSL_CTX *ctx;
+    SSL_CIPHER ciphersuite;
+
     int last_error;
     int shutdown;
     int state;
@@ -102,16 +116,6 @@ typedef struct _SSL
     int (*verify_callback)(int, X509_STORE_CTX *);
     int verify_mode;
 } SSL;
-
-typedef struct
-{
-    GNUTLS_Version version;
-    GNUTLS_BulkCipherAlgorithm cipher;
-    GNUTLS_KXAlgorithm kx;
-    GNUTLS_MACAlgorithm mac;
-    GNUTLS_CompressionMethod compression;
-    GNUTLS_CertificateType cert;
-} SSL_CIPHER;
 
 typedef struct
 {
