@@ -185,7 +185,7 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 /* CRL is ignored for now */
 
 	gnutls_x509_crt issuer;
-	int ret;
+	int ret, issuer_version;
 
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
@@ -202,7 +202,14 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 		return 0;
 	}
 
-	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN)) {
+	issuer_version = gnutls_x509_crt_get_version( issuer);
+	if (issuer_version < 0) {
+		gnutls_assert();
+		return issuer_version;
+	}
+
+	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
+		!((flags & GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT) && issuer_version == 1)) {
 		if (check_if_ca(cert, issuer)==0) {
 			gnutls_assert();
 			return 0;
@@ -568,7 +575,6 @@ int ret, issuer_params_size, i;
   * GNUTLS_CERT_REVOKED\: the certificate has been revoked.
   *
   * GNUTLS_CERT_CORRUPTED\: the certificate is corrupted.
-  *
   *
   * Returns 0 on success and a negative value in case of an error.
   *

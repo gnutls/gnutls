@@ -131,7 +131,8 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 	    gnutls_x509_crt_list_verify(peer_certificate_list,
 				      peer_certificate_list_size,
 				      cred->x509_ca_list, cred->x509_ncas, 
-				      cred->x509_crl_list, cred->x509_ncrls, 0, &verify);
+				      cred->x509_crl_list, cred->x509_ncrls, 
+				      cred->verify_flags, &verify);
 
 	CLEAR_CERTS;
 

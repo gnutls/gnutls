@@ -334,9 +334,22 @@ void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutl
   * cipher suites.
   *
   **/
-int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params dh_params) {
+void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params dh_params) {
 	res->dh_params = dh_params;
-	return 0;
+}
+
+/**
+  * gnutls_certificate_set_verify_flags - This function will set the flags to be used at certificate verification
+  * @res: is a gnutls_certificate_credentials structure
+  * @flags: are the flagsis a structure that holds diffie hellman parameters.
+  *
+  * This function will set the flags to be used at verification of the certificates.
+  * Flags must be OR of the gnutls_certificate_verify_flags enumerations.
+  *
+  **/
+void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, unsigned int flags) 
+{
+	res->verify_flags = flags;
 }
 
 /**
@@ -349,7 +362,7 @@ int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_
   * cipher suites.
   *
   **/
-int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params) {
+void gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params) 
+{
 	res->rsa_params = rsa_params;
-	return 0;
 }

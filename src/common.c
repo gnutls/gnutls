@@ -241,7 +241,7 @@ void print_cert_vrfy(gnutls_session session)
 	}
 
 	if (status & GNUTLS_CERT_INVALID)
-		printf("- Peer's certificate is invalid\n");
+		printf("- Peer's certificate chain is broken\n");
 	if (status & GNUTLS_CERT_NOT_TRUSTED)
 		printf("- Peer's certificate is NOT trusted\n");
 	else

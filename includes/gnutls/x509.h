@@ -157,9 +157,13 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx,
  */
 
 typedef enum gnutls_certificate_verify_flags {
-	GNUTLS_VERIFY_DISABLE_CA_SIGN=1 /* if set a signer does not have to be
+	GNUTLS_VERIFY_DISABLE_CA_SIGN=1, /* if set a signer does not have to be
 					 * a certificate authority.
 					 */
+	GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT=2 /* Allow CA certificates that have version 1.
+					      * This might be dangerous since those haven't
+					      * the basicConstraints extension.
+					      */
 } gnutls_certificate_verify_flags;
 
 int gnutls_x509_crt_check_issuer( gnutls_x509_crt cert,

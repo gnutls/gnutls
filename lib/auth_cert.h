@@ -48,6 +48,10 @@ typedef struct {
 	gnutls_x509_crl * x509_crl_list;
 	uint x509_ncrls;/* number of CRLs in the crl_list 
 			 */
+			 
+	unsigned int    verify_flags; /* flags to be used at 
+				       * certificate verification.
+				       */
 
 			/* holds a sequence of the
 			 * RDNs of the CAs above.

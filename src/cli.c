@@ -585,6 +585,10 @@ int ret;
       exit(1);
    }
 
+   /* there are some intermediate CAs that have a v1 certificate *%&@#*%&
+    */
+   gnutls_certificate_set_verify_flags( xcred, GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+
    if (x509_cafile != NULL) {
       ret =
 	  gnutls_certificate_set_x509_trust_file(xcred,
