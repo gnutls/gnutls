@@ -1,3 +1,9 @@
+2004-04-19 20:22  nmav <nmav@gnutls.org>
+
+	* src/Makefile.am:
+
+	srptool is now linked to gnutls-srpcrypt 
+
 2004-04-18 19:41  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex-serv-srp.tex, doc/tex/programs.tex,
