@@ -1634,7 +1634,9 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 		_gnutls_cipher_suite_get_kx_algo(
 			&session->security_parameters.current_cipher_suite)))
 	{
-		if (session->security_parameters.extensions.srp_username[0] == 0) {
+		if (session->internals.resumed == RESUME_FALSE &&
+			session->security_parameters.extensions.srp_username[0] == 0) 
+		{
 			/* The peer didn't send a valid SRP extension with the
 			 * SRP username. The draft requires that we send an
 			 * alert and start the handshake again.
