@@ -305,7 +305,7 @@ int main(int argc, char **argv)
 	 if (ret == 0) {
 	    printf("- Peer has closed the GNUTLS connection\n");
 	    break;
-	 } else if (ret < 0) {
+	 } else if (ret < 0 && user_term == 0) {
 	    fprintf(stderr,
 		    "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
 		    ret);
@@ -586,10 +586,14 @@ void socket_bye(socket_st socket)
 	 ret = gnutls_bye(socket.session, GNUTLS_SHUT_RDWR);
       while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
       gnutls_deinit(socket.session);
+      socket.session = NULL;
    }
 
    shutdown(socket.fd, SHUT_RDWR);	/* no more receptions */
    close(socket.fd);
+   
+   socket.fd = -1;
+   socket.secure = 0;
 }
 
 void check_rehandshake(socket_st socket, int ret)
