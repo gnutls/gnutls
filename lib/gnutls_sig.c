@@ -33,6 +33,7 @@
 #include <debug.h>
 #include <gnutls_buffers.h>
 #include <gnutls_sig.h>
+#include <gnutls_kx.h>
 
 static
 int _gnutls_tls_sign( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature);
@@ -105,16 +106,14 @@ gnutls_protocol_version ver = gnutls_protocol_get_version( session);
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_tls_sign_params( gnutls_session session, 
-	gnutls_cert* cert, gnutls_privkey* pkey, 
-	gnutls_datum* params, gnutls_datum *signature) 
+int _gnutls_tls_sign_params( gnutls_session session, gnutls_cert* cert, gnutls_privkey* pkey, gnutls_datum* params, gnutls_datum *signature) 
 {
 gnutls_datum dconcat;
 int ret;
 GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 opaque concat[36];
-gnutls_protocol_version ver = gnutls_protocol_get_version( session);
+
 
 	td_sha = _gnutls_hash_init( GNUTLS_MAC_SHA);
 	if (td_sha == NULL) {
@@ -126,16 +125,7 @@ gnutls_protocol_version ver = gnutls_protocol_get_version( session);
 	_gnutls_hash( td_sha, session->security_parameters.server_random, TLS_RANDOM_SIZE);
 	_gnutls_hash( td_sha, params->data, params->size);
 
-	if (ver == GNUTLS_SSL3) {
-		ret = _gnutls_generate_master( session, 1);
-		if  (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
-		_gnutls_mac_deinit_ssl3_handshake( td_sha, &concat[16], session->security_parameters.master_secret, TLS_MASTER_SIZE);
-	} else
-		_gnutls_hash_deinit(td_sha, &concat[16]);
+	_gnutls_hash_deinit(td_sha, &concat[16]);
 
 	switch (cert->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
@@ -344,8 +334,8 @@ gnutls_protocol_version ver = gnutls_protocol_get_version( session);
 	}
 
 	return ret;
-}
 
+}
 
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.

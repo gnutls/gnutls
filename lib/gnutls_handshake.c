@@ -1339,7 +1339,7 @@ static int _gnutls_read_server_hello(gnutls_session session, opaque *data,
  * Needed in client hello messages. Returns the new data length.
  */
 static int _gnutls_copy_ciphersuites(gnutls_session session,
-				     opaque ** ret_data)
+				     opaque * ret_data, size_t ret_data_size)
 {
 	int ret, i;
 	GNUTLS_CipherSuite *cipher_suites;
@@ -1381,21 +1381,18 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 
 	datalen += sizeof(uint16) + cipher_num;
 
-	*ret_data = gnutls_malloc(datalen);
-	if (*ret_data == NULL) {
+	if ((size_t)datalen > ret_data_size) {
 		gnutls_assert();
-		gnutls_free(cipher_suites);
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
-
-	_gnutls_write_uint16(cipher_num, *ret_data);
+	
+	_gnutls_write_uint16(cipher_num, ret_data);
 	pos += 2;
 
 	for (i = 0; i < (cipher_num / 2); i++) {
-		memcpy( &(*ret_data)[pos], cipher_suites[i].CipherSuite, 2);
+		memcpy( &ret_data[pos], cipher_suites[i].CipherSuite, 2);
 		pos += 2;
 	}
-
 	gnutls_free(cipher_suites);
 
 	return datalen;
@@ -1406,7 +1403,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
  * Needed in hello messages. Returns the new data length.
  */
 static int _gnutls_copy_comp_methods(gnutls_session session,
-				     opaque ** ret_data)
+				     opaque * ret_data, size_t ret_data_size)
 {
 	int ret, i;
 	uint8 *compression_methods, comp_num;
@@ -1425,17 +1422,15 @@ static int _gnutls_copy_comp_methods(gnutls_session session,
 	datalen = pos = 0;
 	datalen += comp_num + 1;
 
-	*ret_data = gnutls_malloc(datalen);
-	if (*ret_data == NULL) {
+	if ((size_t)datalen > ret_data_size) {
 		gnutls_assert();
-		gnutls_free(compression_methods);
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	(*ret_data)[pos++] = comp_num; /* put the number of compression methods */
+	ret_data[pos++] = comp_num; /* put the number of compression methods */
 
 	for (i = 0; i < comp_num; i++) {
-		(*ret_data)[pos++] = compression_methods[i];
+		ret_data[pos++] = compression_methods[i];
 	}
 
 	gnutls_free(compression_methods);
@@ -1443,17 +1438,22 @@ static int _gnutls_copy_comp_methods(gnutls_session session,
 	return datalen;
 }
 
+/* This should be sufficient by now. It should hold all the extensions
+ * plus the headers in a hello message.
+ */
+#define MAX_EXT_DATA_LENGTH 1024
+
 /* This function sends the client hello handshake message.
  */
 static int _gnutls_send_client_hello(gnutls_session session, int again)
 {
 	opaque *data = NULL;
-	opaque *extdata = NULL;
 	int extdatalen;
 	int pos = 0;
 	int datalen = 0, ret = 0;
 	opaque random[TLS_RANDOM_SIZE];
 	gnutls_protocol_version hver;
+	opaque extdata[MAX_EXT_DATA_LENGTH];
 
 	opaque *SessionID =
 	    session->internals.resumed_security_parameters.session_id;
@@ -1535,18 +1535,16 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 		/* Copy the ciphersuites.
 		 */
-		extdatalen = _gnutls_copy_ciphersuites(session, &extdata);
+		extdatalen = _gnutls_copy_ciphersuites(session, extdata, sizeof(extdata));
 		if (extdatalen > 0) {
 			datalen += extdatalen;
 			data = gnutls_realloc_fast(data, datalen);
 			if (data == NULL) {
 				gnutls_assert();
-				gnutls_free(extdata);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
 			memcpy(&data[pos], extdata, extdatalen);
-			gnutls_free(extdata);
 			pos += extdatalen;
 
 		} else {
@@ -1560,18 +1558,16 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 		/* Copy the compression methods.
 		 */
-		extdatalen = _gnutls_copy_comp_methods(session, &extdata);
+		extdatalen = _gnutls_copy_comp_methods(session, extdata, sizeof(extdata));
 		if (extdatalen > 0) {
 			datalen += extdatalen;
 			data = gnutls_realloc_fast(data, datalen);
 			if (data == NULL) {
 				gnutls_assert();
-				gnutls_free(extdata);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
 			memcpy(&data[pos], extdata, extdatalen);
-			gnutls_free(extdata);
 			pos += extdatalen;
 
 		} else {
@@ -1585,19 +1581,17 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 		/* Generate and copy TLS extensions.
 		 */
 		if (hver >= GNUTLS_TLS1) {
-			extdatalen = _gnutls_gen_extensions(session, &extdata);
+			extdatalen = _gnutls_gen_extensions(session, extdata, sizeof(extdata));
 
 			if (extdatalen > 0) {
 				datalen += extdatalen;
 				data = gnutls_realloc_fast(data, datalen);
 				if (data == NULL) {
 					gnutls_assert();
-					gnutls_free(extdata);
 					return GNUTLS_E_MEMORY_ERROR;
 				}
 
 				memcpy(&data[pos], extdata, extdatalen);
-				gnutls_free(extdata);
 			} else if (extdatalen < 0) {
 				gnutls_assert();
 				gnutls_free(data);
@@ -1617,7 +1611,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 static int _gnutls_send_server_hello(gnutls_session session, int again)
 {
 	opaque *data = NULL;
-	opaque *extdata = NULL;
+	opaque extdata[MAX_EXT_DATA_LENGTH];
 	int extdatalen;
 	int pos = 0;
 	int datalen, ret = 0;
@@ -1654,7 +1648,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 
 	if (again == 0) {
 		datalen = 2 + session_id_len + 1 + TLS_RANDOM_SIZE + 3;
-		extdatalen = _gnutls_gen_extensions(session, &extdata);
+		extdatalen = _gnutls_gen_extensions(session, extdata, sizeof(extdata));
 
 		if (extdatalen < 0) {
 			gnutls_assert();
@@ -1664,7 +1658,6 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 		data = gnutls_alloca(datalen + extdatalen);
 		if (data == NULL) {
 			gnutls_assert();
-			gnutls_free(extdata);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
@@ -1705,7 +1698,6 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 			datalen += extdatalen;
 
 			memcpy(&data[pos], extdata, extdatalen);
-			gnutls_free(extdata);
 		}
 	}
 
@@ -1823,7 +1815,9 @@ int gnutls_rehandshake(gnutls_session session)
 	return 0;
 }
 
-static int _gnutls_abort_handshake( gnutls_session session, int ret) {
+inline 
+static int _gnutls_abort_handshake( gnutls_session session, int ret) 
+{
 	if ( ((ret==GNUTLS_E_WARNING_ALERT_RECEIVED) && 
 		( gnutls_alert_get(session) == GNUTLS_A_NO_RENEGOTIATION))
 		|| ret==GNUTLS_E_GOT_APPLICATION_DATA)
@@ -1900,10 +1894,11 @@ int gnutls_handshake(gnutls_session session)
 	}
 	if (ret < 0) {
 		/* In the case of a rehandshake abort
-		 * we should reset the handshake's session
+		 * we should reset the handshake's internal state.
 		 */
 		if (_gnutls_abort_handshake( session, ret) == 0)
 			STATE = STATE0;
+
 		return ret;
 	}
 	
@@ -1912,6 +1907,7 @@ int gnutls_handshake(gnutls_session session)
 	if (ret < 0) {
 		if (_gnutls_abort_handshake( session, ret) == 0)
 			STATE = STATE0;
+		
 		return ret;
 	}
 	
@@ -2359,8 +2355,8 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		    _gnutls_get_cred(session->key, cred_type, NULL);
 	
 		if (x509_cred != NULL) {
-			dh_params = x509_cred->dh_params;
-			rsa_params = x509_cred->rsa_params;
+			dh_params = _gnutls_certificate_get_dh_params(x509_cred, session);
+			rsa_params = _gnutls_certificate_get_rsa_params(x509_cred, session);
 		}
 
 		/* Check also if the certificate supports the
@@ -2382,7 +2378,7 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		    _gnutls_get_cred(session->key, cred_type, NULL);
 	
 		if (anon_cred != NULL) {
-			dh_params = anon_cred->dh_params;
+			dh_params = _gnutls_anon_get_dh_params(anon_cred, session);
 		}
 	} else return 0; /* no need for params */
 

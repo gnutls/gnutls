@@ -86,8 +86,6 @@ int _gnutls_x509_raw_cert_to_gcert(gnutls_cert * gcert, const gnutls_datum *derC
 int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt cert,
 	unsigned int flags);
 
-int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn);
-
 void _gnutls_gkey_deinit(gnutls_privkey *key);
 void _gnutls_gcert_deinit(gnutls_cert *cert);
 

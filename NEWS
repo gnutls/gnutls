@@ -1,6 +1,7 @@
 Version 1.0.10
 - Corrected bug in RSA parameters handling which could cause
   unexpected crashes.
+- Corrected bug in SSL 3.0 authentication.
 
 Version 1.0.9 (29/03/2004)
 - Added gnutls_certificate_set_params_function() and 
