@@ -7,16 +7,16 @@ following software:
 * cvs (http://www.gnu.org/software/cvs/)
 * autoconf 2.57 or newer (http://www.gnu.org/software/autoconf/)
 * libtool (http://www.gnu.org/software/libtoool/)
-* automake (http://www.gnu.org/software/automake/)
+* automake 1.8 or newer (http://www.gnu.org/software/automake/)
 * libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
 * texinfo (http://www.gnu.org/software/texinfo/)
+* gtk-doc CVS (to generate reference HTML manual in doc/reference/)
+  with patch from <http://bugs.debian.org/267789>
 
 Those are optional:
 * latex/dvips (in order to create gnutls.ps)
 * cvs2cl (in order to create ChangeLog) (http://www.red-bean.com/cvs2cl/)
 * gaa (to handle example programs' parameters) (http://gaa.sf.net)
-* gtk-doc (to generate reference HTML manual in doc/reference/)
-  with patch from <http://bugs.debian.org/267789>
 
 1. Download the cvs tree
 $ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls login
