@@ -1,3 +1,26 @@
+2003-11-17 17:23  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, ex-client-resume.tex, ex-client-srp.tex,
+	ex-client2.tex, examples.tex:
+
+	Simplified a bit the client examples.  
+
+2003-11-17 15:40  nmav <nmav@gnutls.org>
+
+	* src/certtool.c:
+
+	some changes in password reading.  
+
+2003-11-17 09:32  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/auth_cert.c, lib/defines.h,
+	lib/ext_server_name.c, lib/gnutls.h.in.in, lib/gnutls_cert.c,
+	lib/gnutls_record.c, lib/gnutls_session.c, lib/gnutls_state.c,
+	lib/gnutls_str.c, lib/gnutls_ui.c, lib/gnutls_ui.h, lib/x509_b64.c,
+	src/certtool.c, src/common.c, src/serv.c:
+
+	Several minor fixes in code and function documentation.  
+
 2003-11-16 09:55  nmav <nmav@gnutls.org>
 
 	* NEWS, src/certtool.c (tags: gnutls_0_9_98):
