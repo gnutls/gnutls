@@ -371,7 +371,10 @@ int main(int argc, char **argv)
    }
 
    if (pgp_trustdb != NULL) {
-      gnutls_certificate_set_openpgp_trustdb(cert_cred, pgp_trustdb);
+      ret = gnutls_certificate_set_openpgp_trustdb(cert_cred, pgp_trustdb);
+      if (ret < 0) {
+	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
+      }
    }
 
    if (pgp_certfile != NULL)

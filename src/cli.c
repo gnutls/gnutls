@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 	  gnutls_certificate_set_openpgp_key_file(xcred, pgp_certfile,
 						  pgp_keyfile);
       if (ret < 0) {
-	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s'\n",
+	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s')\n",
 		 pgp_certfile, pgp_keyfile);
       }
    }
@@ -214,7 +214,10 @@ int main(int argc, char **argv)
    }
 
    if (pgp_trustdb != NULL) {
-      gnutls_certificate_set_openpgp_trustdb(xcred, pgp_trustdb);
+      ret = gnutls_certificate_set_openpgp_trustdb(xcred, pgp_trustdb);
+      if (ret < 0) {
+	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
+      }
    }
 /*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 

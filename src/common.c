@@ -125,7 +125,11 @@ void print_openpgp_info(GNUTLS_STATE state)
 		int algo, bits;
 
 		printf(" # Key was created at: %s", my_ctime( &activet));
-		printf(" # Key expires: %s", my_ctime( &expiret));
+		printf(" # Key expires: ");
+		if (expiret != 0)
+			printf("%s", my_ctime( &expiret));
+		else
+			printf("Never\n");
 		
 		if (gnutls_openpgp_fingerprint
 		    (&cert_list[0], digest, &digest_size) >= 0) {
