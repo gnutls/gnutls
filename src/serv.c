@@ -424,7 +424,7 @@ static void get_response(gnutls_session session, char *request, char **response,
 	    if (strncmp (request, "GET ", 4))
 		goto unimplemented;
 
-	    if (!(h = strchr (request, '\r')))
+	    if (!(h = strchr (request, '\n')))
 		goto unimplemented;
 
 	    *h++ = '\0';
@@ -742,7 +742,9 @@ int main(int argc, char **argv)
 
  	            j->http_response = NULL;
 		    if (j->http_request!=NULL) {
-		        if ( (http==0 && strchr(j->http_request, '\n')) || strstr (j->http_request, "\r\n\r\n")) {
+		        if ( (http==0 && strchr(j->http_request, '\n')) || strstr (j->http_request, "\r\n\r\n")
+		          || strstr (j->http_request, "\n\n")) 
+		        {
 			  get_response (j->tls_session, j->http_request, &j->http_response, &j->response_length);
 			  j->http_state = HTTP_STATE_RESPONSE;
 			  j->response_written = 0;
