@@ -112,16 +112,16 @@ static int
 iobuf_to_datum(IOBUF buf, gnutls_datum *raw)
 {
   byte *data = NULL;
-  size_t n = 0;
+  size_t nbytes = 0;
   int rc = 0;
   
   if (!buf || !raw)
     return GNUTLS_E_INVALID_PARAMETERS;
   
-  data = cdk_iobuf_get_data_as_buffer(buf, &n);
-  if (data && n)
+  data = cdk_iobuf_get_data_as_buffer(buf, &nbytes);
+  if (data && nbytes)
     {
-      if ( gnutls_set_datum(raw, data, n) < 0 )
+      if ( gnutls_set_datum(raw, data, nbytes) < 0 )
         return GNUTLS_E_MEMORY_ERROR;
       cdk_free(data); data = NULL;
     }
@@ -186,7 +186,7 @@ static int
 openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
 {
   int algo, i, rc = 0;
-  size_t n = 0;
+  size_t nbytes = 0;
   
   if (!cert || !pk)
     return GNUTLS_E_INVALID_PARAMETERS;
@@ -209,9 +209,9 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
   cert->params_size = cdk_key_pk_get_nmpis(pk->pke_algo, 0);
   for (i=0; i<cert->params_size; i++)
     {      
-      n = pk->mpi[i].bytes+2;
+      nbytes = pk->mpi[i].bytes+2;
       if (gcry_mpi_scan(&cert->params[i], GCRYMPI_FMT_PGP,
-                        pk->mpi[i].data, &n))
+                        pk->mpi[i].data, &nbytes))
         {
           rc = GNUTLS_E_MPI_SCAN_FAILED;
           goto leave;
@@ -232,7 +232,7 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
 {
   IOBUF buf = NULL;
   int rc = 0;
-  size_t n = 0;
+  size_t nbytes = 0;
   byte *data = NULL;
   
   if (!cert || !sig)
@@ -241,10 +241,10 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
   cdk_iobuf_new(&buf, 9216); /* enough to hold the biggest signature */
   if ( (rc=cdk_pkt_write_signature(buf, sig)) )
     goto leave;
-  data = cdk_iobuf_get_data_as_buffer(buf, &n);
-  if (data && n)
+  data = cdk_iobuf_get_data_as_buffer(buf, &nbytes);
+  if (data && nbytes)
     {
-      if ( gnutls_datum_append( &cert->signature, data, n) < 0 )
+      if ( gnutls_datum_append( &cert->signature, data, nbytes) < 0 )
         {
           gnutls_assert();
           return GNUTLS_E_MEMORY_ERROR;
@@ -278,7 +278,7 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
   PKT pkt = NULL;
   IOBUF buf;
   int pke_algo, i, j, rc = 0, eof = 0;
-  size_t n = 0;
+  size_t nbytes = 0;
 
   if (!pkey)
     return GNUTLS_E_INVALID_PARAMETERS;
@@ -313,9 +313,9 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
   pkey->params_size = cdk_key_pk_get_nmpis(pke_algo, 0);
   for (i=0; i<pkey->params_size; i++)
     {
-      n = sk->pk->mpi[i].bytes+2;
+      nbytes = sk->pk->mpi[i].bytes+2;
       if (gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
-                        sk->pk->mpi[i].data, &n))
+                        sk->pk->mpi[i].data, &nbytes))
         {
           rc = GNUTLS_E_MPI_SCAN_FAILED;
           release_mpi_array(pkey->params, i-1);
@@ -325,9 +325,9 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
   pkey->params_size += cdk_key_sk_get_nmpis(pke_algo);
   for (j=0; j<cdk_key_sk_get_nmpis(pke_algo); j++, i++)
     {
-      n = sk->mpi[j]->bytes+2;
+      nbytes = sk->mpi[j]->bytes+2;
       if (gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
-                        sk->mpi[j]->data, &n))
+                        sk->mpi[j]->data, &nbytes))
         {
           rc = GNUTLS_E_MPI_SCAN_FAILED;
           release_mpi_array(pkey->params, i-1);
@@ -887,15 +887,15 @@ int
 gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
 {
   byte *blob;
-  size_t n;
+  size_t nbytes;
   
   if (!keyring || !name)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  blob = conv_data_to_keyring(0x00, name, strlen(name), &n);
-  if (blob && n)
+  blob = conv_data_to_keyring(0x00, name, strlen(name), &nbytes);
+  if (blob && nbytes)
     { 
-      if ( gnutls_datum_append( keyring, blob, n ) < 0 )
+      if ( gnutls_datum_append( keyring, blob, nbytes ) < 0 )
         {
           gnutls_assert();
           return GNUTLS_E_MEMORY_ERROR;
@@ -921,15 +921,15 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
                                const char *data, size_t len)
 {
   byte *blob;
-  size_t n = 0;
+  size_t nbytes = 0;
   
   if (!keyring || !data || !len)
     return GNUTLS_E_INVALID_PARAMETERS;
   
-  blob = conv_data_to_keyring(0x01, data, len, &n);
-  if (blob && n)
+  blob = conv_data_to_keyring(0x01, data, len, &nbytes);
+  if (blob && nbytes)
     {
-      if ( gnutls_datum_append( keyring, blob, n ) < 0 )
+      if ( gnutls_datum_append( keyring, blob, nbytes ) < 0 )
         {
           gnutls_assert();
           return GNUTLS_E_MEMORY_ERROR;
@@ -940,6 +940,48 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
   return 0;
 }
 
+int
+gnutls_certificate_set_openpgp_keyring_file(GNUTLS_CERTIFICATE_CREDENTIALS c,
+                                            const char *file)
+{
+  if (!c || !file)
+    return GNUTLS_E_INVALID_PARAMETERS;
+
+  return gnutls_openpgp_add_keyring_file(&c->keyring, file);
+}
+
+int
+gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
+                                           const char *file)
+{
+  IOBUF a;
+  byte *data;
+  size_t nbytes = 0;
+  int rc = 0;
+  
+  if (!c || !file)
+    return GNUTLS_E_INVALID_PARAMETERS;
+
+  if (cdk_iobuf_open(&a, file, IOBUF_MODE_RD) == -1)
+    return GNUTLS_E_UNKNOWN_ERROR;
+  data = cdk_iobuf_get_data_as_buffer(a, &nbytes);
+  if (data && nbytes)
+    {
+      rc = gnutls_openpgp_add_keyring_mem(&c->keyring, data, nbytes);
+      cdk_free(data);
+    }
+  else
+    rc = GNUTLS_E_UNKNOWN_ERROR;
+  cdk_iobuf_close(a);
+  
+  return rc;
+}
+
 #endif /* HAVE_LIBOPENCDK */
+
+
+
+
+
 
 
