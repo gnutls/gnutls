@@ -5,4 +5,4 @@
 * Make server work (we need certificate API for that!)
 * Add support for v2.0 init packet
 * Resume old sessions
-* Move algorithm priority to state (now is global)
+* Add support for compression algorithms (zlib)
