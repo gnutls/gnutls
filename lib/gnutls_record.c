@@ -146,7 +146,10 @@ int gnutls_bye( GNUTLS_STATE state, GNUTLS_CloseRequest how)
 
 			if (ret2 < 0)
 				return ret2;
-
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	STATE = STATE0;

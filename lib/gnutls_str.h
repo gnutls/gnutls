@@ -15,7 +15,12 @@ typedef struct {
 
 void _gnutls_string_init( gnutls_string*, ALLOC_FUNC, REALLOC_FUNC, FREE_FUNC);
 void _gnutls_string_clear( gnutls_string*);
+
+/* Beware, do not clear the string, after calling this
+ * function
+ */
 gnutls_datum _gnutls_string2datum( gnutls_string* str);
+
 int _gnutls_string_copy_str( gnutls_string* dest, const char* src);
 int _gnutls_string_append_str( gnutls_string*, const char* str);
 int _gnutls_string_append_data( gnutls_string*, const void* data, size_t data_size);

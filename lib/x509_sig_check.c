@@ -225,6 +225,10 @@ gnutls_datum tbs;
 			gnutls_free_datum(&tbs);
 			return 0;
 			break;
+		default:
+			gnutls_assert();
+			gnutls_free_datum(&tbs);
+			return GNUTLS_E_INTERNAL_ERROR;
 
 	}
 

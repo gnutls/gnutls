@@ -114,9 +114,13 @@ static int _extract_basicConstraints(int *CA, opaque * extnValue,
 }
 
 
+/*
+ * If no_critical_ext is non zero, then unsupported critical extensions
+ * do not lead into a fatal error.
+ */
 static int _parse_extension(gnutls_cert * cert, char *extnID,
 			    char *critical, char *extnValue,
-			    int extnValueLen)
+			    int extnValueLen, int no_critical_ext)
 {
 
 	if (strcmp(extnID, "2 5 29 14") == 0) {	/* subject Key ID */
@@ -139,7 +143,7 @@ static int _parse_extension(gnutls_cert * cert, char *extnID,
 	_gnutls_x509_log("X509_EXT: CERT[%s]: Unsupported Extension: %s, %s\n",
 		    GET_CN(cert->raw), extnID, critical);
 
-	if (strcmp(critical, "TRUE") == 0) {
+	if (strcmp(critical, "TRUE") == 0 && no_critical_ext == 0) {
 		gnutls_assert();
 		return GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION;
 	}
@@ -149,8 +153,12 @@ static int _parse_extension(gnutls_cert * cert, char *extnID,
 
 /* This function will attempt to parse Extensions in
  * an X509v3 certificate
+ *
+ * If no_critical_ext is non zero, then unsupported critical extensions
+ * do not lead into a fatal error.
  */
-int _gnutls_get_ext_type(ASN1_TYPE rasn, char *root, gnutls_cert * cert)
+int _gnutls_get_ext_type(ASN1_TYPE rasn, char *root, gnutls_cert * cert,
+	int no_critical_ext)
 {
 	int k, result, len;
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
@@ -235,7 +243,7 @@ int _gnutls_get_ext_type(ASN1_TYPE rasn, char *root, gnutls_cert * cert)
 			/* Handle Extension */
 			if ((result =
 			     _parse_extension(cert, extnID, critical,
-					      extnValue, len)) < 0) {
+					      extnValue, len, no_critical_ext)) < 0) {
 				gnutls_assert();
 				return result;
 			}

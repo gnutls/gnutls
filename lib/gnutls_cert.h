@@ -47,9 +47,6 @@ typedef struct gnutls_cert {
  	uint16	   keyUsage; /* bits from X509KEY_* 
  	                      */
  	
-	int        valid; /* 0 if the certificate looks good.
-	                   */
-
 	int        CA;    /* 0 if the certificate does not belong to
 	                   * a certificate authority. 1 otherwise.
 	                   */

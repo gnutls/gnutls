@@ -864,7 +864,7 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
 		if ((ret =
 		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list[i],
 					     info->
-					     raw_certificate_list[i])) <
+					     raw_certificate_list[i], 0)) <
 		    0) {
 			gnutls_assert();
 			CLEAR_CERTS;
@@ -968,7 +968,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	for (i = 0; i < peer_certificate_list_size; i++) {
 		if ((ret =
 		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list[i],
-					     cert_list[i])) < 0) {
+					     cert_list[i], 0)) < 0) {
 			gnutls_assert();
 			CLEAR_CERTS_CA;
 			gnutls_free( peer_certificate_list);
@@ -982,7 +982,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	for (i = 0; i < ca_certificate_list_size; i++) {
 		if ((ret =
 		     _gnutls_x509_cert2gnutls_cert(&ca_certificate_list[i],
-					     CA_list[i])) < 0) {
+					     CA_list[i], 0)) < 0) {
 			gnutls_assert();
 			CLEAR_CERTS_CA;
 			gnutls_free( peer_certificate_list);
@@ -1107,7 +1107,7 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	if ((ret =
 	     _gnutls_x509_cert2gnutls_cert(
 				     &cert_list[0][i - 1],
-				     tmp)) < 0) {
+				     tmp, 0)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -1179,7 +1179,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 			if ((ret =
 			     _gnutls_x509_cert2gnutls_cert(
 						     &cert_list[0][i - 1],
-						     tmp2)) < 0) {
+						     tmp2, 0)) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -1252,7 +1252,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		if ((ret =
 		     _gnutls_x509_cert2gnutls_cert(
 					     &cert_list[0][i - 1],
-					     tmp)) < 0) {
+					     tmp, 0)) < 0) {
 			gnutls_free(b64);
 			gnutls_assert();
 			return ret;
@@ -1969,8 +1969,13 @@ int len, result;
  * (structure) that gnutls can understand and use. Actually the
  * important thing on this function is that it extracts the 
  * certificate's (public key) parameters.
+ *
+ * The noext flag is used to complete the handshake even if the
+ * extensions found in the certificate are unsupported and critical. 
+ * The critical extensions will be catched by the verification functions.
  */
-int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
+int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
+	int no_critical_ext /* if non zero do not parse X.509 extensions */)
 {
 	int result;
 	ASN1_TYPE c2;
@@ -1980,7 +1985,6 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 
 	memset(gCert, 0, sizeof(gnutls_cert));
 
-	gCert->valid = 1;
 	gCert->cert_type = GNUTLS_CRT_X509;
 
 	if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
@@ -2069,7 +2073,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	if ((result =
 	     _gnutls_get_ext_type(c2,
 				  "certificate2.tbsCertificate.extensions",
-				  gCert)) < 0) {
+				  gCert, no_critical_ext)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		gnutls_free_datum( &gCert->raw);
@@ -2077,11 +2081,6 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	}
 
 	asn1_delete_structure(&c2);
-
-
-	gCert->valid = 0;	/* if we got until here
-				 * the certificate is valid.
-				 */
 
 	return 0;
 
