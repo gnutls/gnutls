@@ -1,3 +1,9 @@
+2003-01-24 12:13  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_global.c:
+
+	The gcrypt log handler is only set when we are in debugging mode.  
+
 2003-01-23 20:55  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/auth_rsa.c, lib/debug.c, lib/gnutls_algorithms.c,
