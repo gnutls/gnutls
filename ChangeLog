@@ -1,3 +1,9 @@
+2002-11-15 21:13  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/Makefile.am, doc/tex/Makefile.am:
+
+	example programs are now located in doc/examples directory.  
+
 2002-11-14 13:48  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls.h.in.in, gnutls_alert.c, gnutls_alert.h:
