@@ -1,3 +1,22 @@
+2002-03-26 19:50  nmav <nmav@gnutls.org>
+
+	* ChangeLog, lib/gnutls_x509.c, src/common.c:
+
+	changed semantics of gnutls_x509_extract_certificate_pk_algorithm() 
+
+2002-03-26 19:33  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_algorithms.c, gnutls_algorithms.h, gnutls_buffers.c,
+	gnutls_global.c, gnutls_record.c:
+
+	Several optimizations 
+
+2002-03-26 17:35  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Now the pk algorithm is returned and not only the key size in bits.  
+
 2002-03-26 09:51  twoaday <twoaday@gnutls.org>
 
 	* lib/: gnutls_openpgp.c, gnutls_openpgp.h:

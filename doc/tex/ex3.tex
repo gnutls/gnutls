@@ -79,6 +79,7 @@ int print_info(GNUTLS_STATE state)
          int serial_size = sizeof(serial);
          char printable[120];
          char *print;
+         int algo, bits;
 
          printf(" - Certificate info:\n");
 
@@ -104,6 +105,21 @@ int print_info(GNUTLS_STATE state)
             printf(" - Certificate serial number: %s\n", printable);
          }
 
+         /* Extract some of the public key algorithm's parameters
+          */
+         algo = gnutls_x509_extract_certificate_pk_algorithm( &cert_list[0], &bits);
+         printf("Certificate public key: ");
+
+         if (algo==GNUTLS_PK_RSA) {
+            printf("RSA\n");
+            printf(" Modulus: %d bits\n", bits);
+         } else if (algo==GNUTLS_PK_DSA) {
+            printf("DSA\n");
+            printf(" Exponent: %d bits\n", bits);
+         } else {
+            printf("UNKNOWN\n");
+         }
+
          /* Print the version of the X.509 
           * certificate.
           */
@@ -115,6 +131,7 @@ int print_info(GNUTLS_STATE state)
          gnutls_x509_extract_certificate_issuer_dn(&cert_list[0], &dn);
          printf(" - Certificate Issuer's info:\n");
          PRINT_DN(dn);
+
       }
    }
 
