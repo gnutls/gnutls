@@ -164,8 +164,8 @@ int gnutls_dh_get_pubkey(gnutls_session_t session,
 /**
   * gnutls_rsa_export_get_pubkey - This function returns the peer's public key used in RSA-EXPORT authentication
   * @session: is a gnutls session
-  * @exp: will hold the exponent.
-  * @mod: will hold the modulus.
+  * @exponent: will hold the exponent.
+  * @modulus: will hold the modulus.
   *
   * This function will return the peer's public key exponent and
   * modulus used in the last RSA-EXPORT authentication.  The output
@@ -175,8 +175,8 @@ int gnutls_dh_get_pubkey(gnutls_session_t session,
   *
   **/
 int gnutls_rsa_export_get_pubkey(gnutls_session_t session,
-				 gnutls_datum_t * exp,
-				 gnutls_datum_t * mod)
+				 gnutls_datum_t * exponent,
+				 gnutls_datum_t * modulus)
 {
     cert_auth_info_t info;
     int ret;
@@ -186,18 +186,18 @@ int gnutls_rsa_export_get_pubkey(gnutls_session_t session,
 	if (info == NULL)
 	    return GNUTLS_E_INTERNAL_ERROR;
 
-	ret = _gnutls_set_datum(mod, info->rsa_export.modulus.data,
+	ret = _gnutls_set_datum(modulus, info->rsa_export.modulus.data,
 				info->rsa_export.modulus.size);
 	if (ret < 0) {
 	    gnutls_assert();
 	    return ret;
 	}
 
-	ret = _gnutls_set_datum(exp, info->rsa_export.exponent.data,
+	ret = _gnutls_set_datum(exponent, info->rsa_export.exponent.data,
 				info->rsa_export.exponent.size);
 	if (ret < 0) {
 	    gnutls_assert();
-	    _gnutls_free_datum(mod);
+	    _gnutls_free_datum(modulus);
 	    return ret;
 	}
 

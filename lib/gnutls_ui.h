@@ -92,8 +92,8 @@ int gnutls_dh_get_pubkey(gnutls_session_t session,
 
 /* RSA */
 int gnutls_rsa_export_get_pubkey(gnutls_session_t session,
-				 gnutls_datum_t * exp,
-				 gnutls_datum_t * mod);
+				 gnutls_datum_t * exponent,
+				 gnutls_datum_t * modulus);
 int gnutls_rsa_export_get_modulus_bits(gnutls_session_t session);
 
 /* X509PKI */
