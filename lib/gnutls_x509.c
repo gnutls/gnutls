@@ -576,7 +576,7 @@ static gnutls_x509_subject_alt_name _find_type( char* str_type) {
 }
 
 /**
-  * gnutls_x509_extract_certificate_subject_alt_name - This function returns the peer's alt name, if any
+  * gnutls_x509_extract_certificate_subject_alt_name - This function returns the certificate's alternative name, if any
   * @cert: should contain an X.509 DER encoded certificate
   * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
   * @ret: is the place where the alternative name will be copied to
@@ -685,6 +685,73 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 	}
 
 	return type;
+}
+
+/**
+  * gnutls_x509_extract_certificate_ca_status - This function returns the certificate CA status
+  * @cert: should contain an X.509 DER encoded certificate
+  *
+  * This function will return certificates CA status, by reading the 
+  * basicConstraints X.509 extension. If the certificate is a CA a positive
+  * value will be returned, or zero if the certificate does not have
+  * CA flag set. 
+  *
+  * A negative value may be returned in case of parsing error.
+  *
+  **/
+int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
+{
+	int result;
+	gnutls_datum basicConstraints;
+	ASN1_TYPE c2;
+	char str[128];
+	char ext_data[256];
+	int len;
+
+	if ((result =
+	     _gnutls_get_extension(cert, "2 5 29 19", &basicConstraints)) < 0) {
+	     	gnutls_assert();
+		return result;
+	}
+
+	if (basicConstraints.size == 0 || basicConstraints.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if ((result=_gnutls_asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &c2, "bc"))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_free_datum( &basicConstraints);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, basicConstraints.data, basicConstraints.size, NULL);
+	_gnutls_free_datum( &basicConstraints);
+
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	len = sizeof(str) - 1;
+	result = asn1_read_value(c2, "bc.cA", str, &len);
+	asn1_delete_structure(&c2);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}        
+
+	if (strcmp(str, "TRUE") == 0)
+		return 1; /* CA */
+	else
+		return 0; /* not a CA */
 }
 
 /**
