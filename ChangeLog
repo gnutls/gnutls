@@ -1,3 +1,17 @@
+2003-09-01 13:52  nmav <nmav@gnutls.org>
+
+	* src/: tests.c, tls_test.c:
+
+	corrected bug which made some tests now to be compiled.  
+
+2003-09-01 13:39  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_errors.c, lib/gnutls_extensions.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_priority.c,
+	lib/x509_b64.c, src/retcodes.c:
+
+	More more fixes by Arne.  
+
 2003-08-27 15:24  nmav <nmav@gnutls.org>
 
 	* src/: serv.c, tests.c, tls_test-gaa.c, tls_test-gaa.h,
