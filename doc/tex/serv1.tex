@@ -108,6 +108,8 @@ void print_info(GNUTLS_STATE state)
 
 }
 
+GNUTLS_DH_PARAMS dh_params;
+
 static int generate_dh_primes(void) {
 gnutls_datum prime, generator;
 
@@ -116,8 +118,9 @@ gnutls_datum prime, generator;
     * once a day, once a week or once a month. Depends on the
     * security requirements.
     */
-   gnutls_dh_generate_params( &prime, &generator, DH_BITS);
-   gnutls_dh_replace_params( prime, generator);
+   gnutls_dh_params_init( &dh_params);
+   gnutls_dh_params_generate( &prime, &generator, DH_BITS);
+   gnutls_dh_params_set( dh_params, prime, generator);
 
    free( prime.data);
    free( generator.data);
@@ -164,6 +167,8 @@ int main()
    gnutls_srp_set_server_cred_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
    generate_dh_params();
+   
+   gnutls_certificate_set_dh_params( x509_cred, dh_params);
 
    /* Socket operations
     */

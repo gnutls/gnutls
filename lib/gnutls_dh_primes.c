@@ -222,19 +222,37 @@ static uint8 diffie_hellman_prime_2048[] = { 0x00,
 	0xc8, 0x9b, 0xa8, 0x8f
 };
 
-typedef struct {
-	int bits;
-	MPI _prime;
-	MPI _generator;
-	gnutls_datum generator;
-	gnutls_datum prime;
-	int local;		/* indicates if it is not malloced, !=0 indicated malloced */
-} PRIME;
-
 /* Holds the prime to be used in DH authentication.
  * Initialy the MPIs are not calculated (must call global_init, or _gnutls_dh_calc_mpis()).
  */
-static PRIME dh_primes[] = {
+_GNUTLS_DH_PARAMS _gnutls_dh_default_params[] = {
+	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
+	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , 0}
+	,
+	{1024, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
+	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , 0}
+	,
+	{2048, NULL, NULL, {DH_G_2048, sizeof(DH_G_2048)}
+	 , {diffie_hellman_prime_2048, sizeof diffie_hellman_prime_2048}
+	 , 0}
+	,
+	{3072, NULL, NULL, {DH_G_3072, sizeof(DH_G_3072)}
+	 , {diffie_hellman_prime_3072, sizeof diffie_hellman_prime_3072}
+	 , 0}
+	,
+	{4096, NULL, NULL, {DH_G_4096, sizeof(DH_G_4096)}
+	 , {diffie_hellman_prime_4096, sizeof diffie_hellman_prime_4096}
+	 , 0}
+	,
+	{0, NULL, NULL, {NULL, 0}
+	 , {NULL, 0}
+	 , 0}
+};
+
+const 
+static _GNUTLS_DH_PARAMS _gnutls_dh_copy_params[] = {
 	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
 	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
 	 , 0}
@@ -288,16 +306,18 @@ static int normalize_bits(int bits)
 void _gnutls_dh_clear_mpis(void) {
 int i;
 
+	if (_gnutls_dh_default_params==NULL) return;
+
 	i = 0;
 	do {
-		_gnutls_mpi_release( &dh_primes[i]._prime);
-		_gnutls_mpi_release( &dh_primes[i]._generator);
-		if (dh_primes[i].local != 0) {
-			gnutls_free( dh_primes[i].prime.data);
-			gnutls_free( dh_primes[i].generator.data);
+		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._prime);
+		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._generator);
+		if (_gnutls_dh_default_params[i].local != 0) {
+			gnutls_free( _gnutls_dh_default_params[i].prime.data);
+			gnutls_free( _gnutls_dh_default_params[i].generator.data);
 		}
 		i++;
-	} while (dh_primes[i].bits != 0);
+	} while (_gnutls_dh_default_params[i].bits != 0);
 
 }
 
@@ -308,29 +328,34 @@ int _gnutls_dh_calc_mpis(void)
 {
 int i, n;
 
+	if (_gnutls_dh_default_params==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	i = 0;
 	do {
- 		n = dh_primes[i].prime.size;
-		_gnutls_mpi_release( &dh_primes[i]._prime);
+ 		n = _gnutls_dh_default_params[i].prime.size;
+		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._prime);
 
-		if (_gnutls_mpi_scan(&dh_primes[i]._prime, dh_primes[i].prime.data, &n)
-		    || dh_primes[i]._prime == NULL) {
+		if (_gnutls_mpi_scan(&_gnutls_dh_default_params[i]._prime, _gnutls_dh_default_params[i].prime.data, &n)
+		    || _gnutls_dh_default_params[i]._prime == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 
 
-		n = dh_primes[i].generator.size;
-		_gnutls_mpi_release( &dh_primes[i]._generator);
+		n = _gnutls_dh_default_params[i].generator.size;
+		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._generator);
 
-		if (_gnutls_mpi_scan(&dh_primes[i]._generator, dh_primes[i].generator.data, &n)
-		    || dh_primes[i]._generator == NULL) {
+		if (_gnutls_mpi_scan(&_gnutls_dh_default_params[i]._generator, _gnutls_dh_default_params[i].generator.data, &n)
+		    || _gnutls_dh_default_params[i]._generator == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 
 		i++;
-	} while (dh_primes[i].bits != 0);
+	} while (_gnutls_dh_default_params[i].bits != 0);
 
 	return 0;
 }
@@ -338,10 +363,15 @@ int i, n;
 /* returns g and p, depends on the requested bits.
  * We only support limited key sizes.
  */
-MPI gnutls_get_dh_params(MPI * ret_p, int bits)
+MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, MPI * ret_p, int bits)
 {
 	MPI g=NULL, prime=NULL;
 	int i;
+
+	if (dh_primes==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 
 	bits = normalize_bits(bits);
 
@@ -354,6 +384,44 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		}
 		i++;
 	} while (dh_primes[i].bits != 0);
+
+	if (prime==NULL || g==NULL) { /* if not prime was found */
+		gnutls_assert();
+		_gnutls_mpi_release( &g);
+		_gnutls_mpi_release( &prime);
+		*ret_p = NULL;
+		return NULL;
+	}
+
+	if (ret_p)
+		*ret_p = prime;
+	return g;
+}
+
+/* returns g and p, depends on the requested bits.
+ * We only support limited key sizes.
+ */
+MPI _gnutls_get_rnd_srp_params( MPI * ret_p, int bits)
+{
+	MPI g=NULL, prime=NULL;
+	int i;
+
+	if (_gnutls_dh_default_params==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	bits = normalize_bits(bits);
+
+	i = 0;
+	do {
+		if (_gnutls_dh_default_params[i].bits == bits) {
+			prime = gcry_mpi_copy(_gnutls_dh_default_params[i]._prime);
+			g = gcry_mpi_copy(_gnutls_dh_default_params[i]._generator);
+			break;
+		}
+		i++;
+	} while (_gnutls_dh_default_params[i].bits != 0);
 
 	if (prime==NULL || g==NULL) { /* if not prime was found */
 		gnutls_assert();
@@ -426,38 +494,37 @@ int i=0;
  * generated one.
  */
 /**
-  * gnutls_dh_replace_params - This function will replace the old DH parameters
+  * gnutls_dh_params_set - This function will replace the old DH parameters
+  * @dh_params: Is a structure will hold the prime numbers
   * @prime: holds the new prime
   * @generator: holds the new generator
   * @bits: is the prime's number of bits
   *
   * This function will replace the pair of prime and generator for use in 
   * the Diffie-Hellman key exchange. The new parameters should be stored in the
-  * appropriate gnutls_datum. This function should not be called while a key 
-  * exchange is in progress. 
+  * appropriate gnutls_datum. 
   * 
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
   *
   **/
-int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits)
+int gnutls_dh_params_set( GNUTLS_DH_PARAMS dh_params, gnutls_datum prime, gnutls_datum generator, int bits)
 {
-
 	MPI tmp_prime, tmp_g;
-	int siz, i;
-	PRIME* sprime;
+	int siz=0, i=0;
+	GNUTLS_DH_PARAMS sprime;
 
 	if (check_bits(bits)<0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
-	
+
 	i = 0;
 	do {
-		if (dh_primes[i].bits==bits) {
-			sprime = &dh_primes[i];
+		if (dh_params[i].bits==bits) {
+			sprime = &dh_params[i];
 			break;
 		}
-	} while(dh_primes[++i].bits!=0);
+	} while(dh_params[++i].bits!=0);
 		
 	siz = prime.size;
 	if (_gnutls_mpi_scan(&tmp_prime, prime.data, &siz)) {
@@ -481,8 +548,12 @@ int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bi
 		_gnutls_mpi_release(&sprime->_generator);
 	}
 	sprime->local = 1;
-	sprime->_prime = gcry_mpi_copy(tmp_prime);
+	sprime->_prime = tmp_prime;
+	sprime->_generator = tmp_g;
+
+/*	sprime->_prime = gcry_mpi_copy(tmp_prime);
 	sprime->_generator = gcry_mpi_copy(tmp_g);
+*/
 	if (gnutls_set_datum( &sprime->prime, prime.data, prime.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -492,10 +563,56 @@ int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bi
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_mpi_release(&tmp_g);
-	_gnutls_mpi_release(&tmp_prime);
+	return 0;
+
+}
+
+/**
+  * gnutls_dh_params_init - This function will initialize the DH parameters
+  * @dh_params: Is a structure that will hold the prime numbers
+  *
+  * This function will initialize the DH parameters structure.
+  *
+  **/
+int gnutls_dh_params_init( GNUTLS_DH_PARAMS* dh_params)
+{
+
+	(*dh_params) = gnutls_calloc( 1, sizeof( _gnutls_dh_copy_params));
+	if (*dh_params==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	memcpy( (*dh_params), _gnutls_dh_copy_params, sizeof(_gnutls_dh_copy_params));
 
 	return 0;
+
+}
+
+/**
+  * gnutls_dh_params_deinit - This function will initialize the DH parameters
+  * @dh_params: Is a structure that will hold the prime numbers
+  *
+  * This function will initialize the DH parameters structure.
+  *
+  **/
+void gnutls_dh_params_deinit( GNUTLS_DH_PARAMS dh_params)
+{
+int i;
+	if (dh_params==NULL) return;
+
+	i = 0;
+	do {
+		_gnutls_mpi_release( &dh_params[i]._prime);
+		_gnutls_mpi_release( &dh_params[i]._generator);
+		if (dh_params[i].local != 0) {
+			gnutls_free( dh_params[i].prime.data);
+			gnutls_free( dh_params[i].generator.data);
+		}
+		i++;
+	} while (dh_params[i].bits != 0);
+
+	gnutls_free( dh_params);
 
 }
 
@@ -503,7 +620,7 @@ int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bi
  * numbers.
  */
 /**
-  * gnutls_dh_generate_params - This function will generate new DH parameters
+  * gnutls_dh_params_generate - This function will generate new DH parameters
   * @prime: will hold the new prime
   * @generator: will hold the new generator
   * @bits: is the prime's number of bits
@@ -521,7 +638,7 @@ int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bi
   * no use calling this in client side.
   *
   **/
-int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int bits)
+int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits)
 {
 
 	MPI tmp_prime, tmp_g;

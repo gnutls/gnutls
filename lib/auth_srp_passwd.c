@@ -319,7 +319,7 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 		return NULL;
 	}
 	
-	pwd_entry->g = gnutls_get_dh_params( &pwd_entry->n, 1024);
+	pwd_entry->g = _gnutls_get_rnd_srp_params( &pwd_entry->n, 1024);
 	if (pwd_entry->g==NULL || pwd_entry->n==NULL) {
 		gnutls_assert();
 		_gnutls_srp_clear_pwd_entry( pwd_entry);

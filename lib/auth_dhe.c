@@ -92,6 +92,13 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 	int apr_cert_list_length;
 	gnutls_datum signature, ddata;
 	CERTIFICATE_AUTH_INFO info;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+	        gnutls_assert();
+	        return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
 	bits = _gnutls_dh_get_prime_bits( state);
 
@@ -104,7 +111,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 		return ret;
 	}
 
-	g = gnutls_get_dh_params(&p, bits);
+	g = gnutls_get_dh_params( cred->dh_params, &p, bits);
 	if (g == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -364,8 +371,6 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 		return ret;
 	}
 
-//	info->dh_bits = gcry_mpi_get_nbits( state->gnutls_key->client_p);
-
 	/* VERIFY SIGNATURE */
 
 	vparams.size = n_Y + n_p + n_g + 6;
@@ -423,6 +428,13 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 	size_t _n_Y;
 	MPI g, p;
 	int bits, ret;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+	        gnutls_assert();
+	        return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
 	bits = _gnutls_dh_get_prime_bits( state);
 
@@ -443,7 +455,7 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 		return ret;
 	}
 
-	g = gnutls_get_dh_params(&p, bits);
+	g = gnutls_get_dh_params( cred->dh_params, &p, bits);
 	if (g == NULL || p == NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release(&g);

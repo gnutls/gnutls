@@ -290,3 +290,31 @@ int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* dat
 	return 0;
 }
 
+/**
+  * gnutls_anon_set_server_dh_params - This function will set the DH parameters for a server to use
+  * @res: is a GNUTLS_ANON_SERVER_CREDENTIALS structure
+  * @dh_params: is a structure that holds diffie hellman parameters.
+  *
+  * This function will set the diffie hellman parameters for an anonymous
+  * server to use. These parameters will be used in Anonymous Diffie Hellman 
+  * cipher suites.
+  *
+  **/
+void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTLS_DH_PARAMS dh_params) {
+	res->dh_params = dh_params;
+}
+
+/**
+  * gnutls_certificate_set_server_dh_params - This function will set the DH parameters for a server to use
+  * @res: is a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @dh_params: is a structure that holds diffie hellman parameters.
+  *
+  * This function will set the diffie hellman parameters for a certificate
+  * server to use. These parameters will be used in Ephemeral Diffie Hellman 
+  * cipher suites.
+  *
+  **/
+int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS dh_params) {
+	res->dh_params = dh_params;
+	return 0;
+}

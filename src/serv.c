@@ -92,10 +92,17 @@ GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
  */
 static int prime_nums[] = { 768, 1024, 0 };
 
+GNUTLS_DH_PARAMS dh_params;
+
 static int generate_dh_primes(void)
 {
 	gnutls_datum prime, generator;
 	int i = 0;
+
+	if (gnutls_dh_params_init( &dh_params) < 0) {
+		fprintf(stderr, "Error in dh parameter initialization\n");
+		exit(1);
+	}
 
 	do {
 		/* Generate Diffie Hellman parameters - for use with DHE
@@ -107,13 +114,15 @@ static int generate_dh_primes(void)
 		    ("Generating Diffie Hellman parameters [%d]. Please wait...",
 		     prime_nums[i]);
 		fflush(stdout);
-		if (gnutls_dh_generate_params
+
+		if (gnutls_dh_params_generate
 		    (&prime, &generator, prime_nums[i]) < 0) {
 			fprintf(stderr, "Error in prime generation\n");
 			exit(1);
 		}
-		if (gnutls_dh_replace_params
-		    (prime, generator, prime_nums[i]) < 0) {
+
+		if (gnutls_dh_params_set
+		    (dh_params, prime, generator, prime_nums[i]) < 0) {
 			fprintf(stderr, "Error in prime replacement\n");
 			exit(1);
 		}
@@ -326,14 +335,14 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	/* Remember that servers must generate parameters for
-	 * Diffie Hellman. See gnutls_dh_generate_params(), and
-	 * gnutls_dh_replace_params().
+	/* Note that servers must generate parameters for
+	 * Diffie Hellman. See gnutls_dh_params_generate(), and
+	 * gnutls_dh_params_set().
 	 */
 	if (generate != 0)
 		generate_dh_primes();
 
-	if (gnutls_certificate_allocate_server_sc(&cert_cred) < 0) {
+	if (gnutls_certificate_allocate_sc(&cert_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
@@ -367,6 +376,13 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	if (generate!=0)
+	if (gnutls_certificate_set_dh_params(cert_cred, dh_params) < 0) {
+		fprintf(stderr,
+			"Error while setting DH parameters\n");
+		exit(1);
+	}
+
 	/* this is a password file (created with the included srpcrypt utility) 
 	 * Read README.crypt prior to using SRP.
 	 */
@@ -375,6 +391,8 @@ int main(int argc, char **argv)
 					SRP_PASSWD_CONF);
 
 	gnutls_anon_allocate_server_sc(&dh_cred);
+	if (generate!=0)
+	gnutls_anon_set_server_dh_params( dh_cred, dh_params);
 
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
@@ -521,7 +539,7 @@ int main(int argc, char **argv)
 	}
 	close(listen_sd);
 
-	gnutls_certificate_free_server_sc(cert_cred);
+	gnutls_certificate_free_sc(cert_cred);
 	gnutls_srp_free_server_sc(srp_cred);
 	gnutls_anon_free_server_sc(dh_cred);
 

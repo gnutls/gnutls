@@ -144,6 +144,8 @@ int gnutls_certificate_allocate_sc(GNUTLS_CERTIFICATE_CREDENTIALS * res)
 	if (*res == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
+	(*res)->dh_params = &_gnutls_dh_default_params;
+
 	return 0;
 }
 

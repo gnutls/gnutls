@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 	}
 
 	/* X509 stuff */
-	if (gnutls_certificate_allocate_client_sc(&xcred) < 0) {	/* space for 2 certificates */
+	if (gnutls_certificate_allocate_sc(&xcred) < 0) {	/* space for 2 certificates */
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
@@ -453,7 +453,7 @@ int main(int argc, char **argv)
 	gnutls_deinit(state);
 
 	gnutls_srp_free_client_sc(cred);
-	gnutls_certificate_free_client_sc(xcred);
+	gnutls_certificate_free_sc(xcred);
 	gnutls_anon_free_client_sc(anon_cred);
 
 	gnutls_global_deinit();

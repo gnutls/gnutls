@@ -32,8 +32,9 @@
 #define READ_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
 #define X509_DEBUG
-#define RECORD_DEBUG*/
+#define RECORD_DEBUG
 #define DEBUG
+*/
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -553,8 +554,18 @@ struct GNUTLS_STATE_INT {
 
 typedef struct GNUTLS_STATE_INT *GNUTLS_STATE;
 
+typedef struct {
+	int bits;
+	MPI _prime;
+        MPI _generator;
+        gnutls_datum generator;
+       	gnutls_datum prime;
+        int local;              /* indicates if it is 
+                                 * not malloced, !=0 indicates malloced
+                                 */
+} _GNUTLS_DH_PARAMS;
 
-
+#define GNUTLS_DH_PARAMS _GNUTLS_DH_PARAMS*
 
 /* functions */
 int gnutls_PRF( opaque * secret, int secret_size, uint8 * label,

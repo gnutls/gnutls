@@ -1,6 +1,6 @@
 EXTRA_DIST = gnutls.tex gnutls.ps gnutls.html  \
 	ex1.tex ex2.tex ex3.tex srp1.tex serv1.tex gnutls.css \
-	nx_grp_g.png  prev_g.png  up_g.png fdl.tex macros.tex \
+	fdl.tex macros.tex \
 	cover.tex.in img1.png  img3.png  img5.png img2.png img4.png \
 	img6.png img7.png gnutls-logo.ps layers.ps
 

@@ -74,10 +74,17 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	uint8 *data_g;
 	uint8 *data_X;
 	ANON_SERVER_AUTH_INFO info;
+	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
+	
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_ANON, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
 	bits = _gnutls_dh_get_prime_bits( state);
 
-	g = gnutls_get_dh_params(&p, bits);
+	g = gnutls_get_dh_params( cred->dh_params, &p, bits);
 	if (g==NULL || p==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -282,6 +289,13 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	size_t _n_Y;
 	MPI g, p;
 	int bits, ret;
+	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
+	
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_ANON, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
 	bits = _gnutls_dh_get_prime_bits( state);
 
@@ -295,7 +309,7 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	g = gnutls_get_dh_params(&p, bits);
+	g = gnutls_get_dh_params( cred->dh_params, &p, bits);
 	if (g==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

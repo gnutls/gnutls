@@ -89,6 +89,9 @@ typedef const int* GNUTLS_LIST;
 struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
+struct GNUTLS_DH_PARAMS_INT;
+typedef struct GNUTLS_DH_PARAMS_INT* GNUTLS_DH_PARAMS;
+
 typedef struct {
 	unsigned char * data;
 	int size;
@@ -204,6 +207,7 @@ int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *pa
 void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
 int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
 int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
+void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTLS_DH_PARAMS);
 
 void gnutls_anon_free_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
 int gnutls_anon_allocate_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
@@ -215,6 +219,8 @@ int gnutls_anon_set_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
  */
 void gnutls_certificate_free_sc( GNUTLS_CERTIFICATE_CREDENTIALS sc);
 int gnutls_certificate_allocate_sc( GNUTLS_CERTIFICATE_CREDENTIALS *sc);
+
+int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS);
 
 int gnutls_certificate_set_x509_trust_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char* CAFILE, char* CRLFILE);
 int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum *CA, const gnutls_datum *CRL);
@@ -238,16 +244,6 @@ int gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS r
 
 int gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS res, const char *name);
 
-#define gnutls_certificate_free_server_sc gnutls_certificate_free_sc
-#define gnutls_certificate_allocate_server_sc gnutls_certificate_allocate_sc
-#define gnutls_certificate_set_server_x509_key_file gnutls_certificate_set_x509_key_file
-#define gnutls_certificate_set_server_x509_trust_file gnutls_certificate_set_x509_trust_file
-
-#define gnutls_certificate_free_client_sc gnutls_certificate_free_sc
-#define gnutls_certificate_allocate_client_sc gnutls_certificate_allocate_sc
-#define gnutls_certificate_set_client_x509_key_file gnutls_certificate_set_x509_key_file
-#define gnutls_certificate_set_client_x509_trust_file gnutls_certificate_set_x509_trust_file
-
 
 /* global state functions 
  */
@@ -258,8 +254,10 @@ int gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS 
 int gnutls_global_init(void);
 void gnutls_global_deinit(void);
 
-int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits);
-int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int bits);
+int gnutls_dh_params_set( GNUTLS_DH_PARAMS, gnutls_datum prime, gnutls_datum generator, int bits);
+int gnutls_dh_params_init( GNUTLS_DH_PARAMS*);
+void gnutls_dh_params_deinit( GNUTLS_DH_PARAMS);
+int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits);
 
 typedef ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_TRANSPORT_PTR, void*, size_t);
 typedef ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);

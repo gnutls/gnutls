@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -18,10 +18,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-MPI gnutls_get_dh_params(MPI *ret_p, int bits);
+MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS, MPI *ret_p, int bits);
 MPI gnutls_calc_dh_secret( MPI *ret_x, MPI g, MPI prime );
 MPI gnutls_calc_dh_key( MPI f, MPI x, MPI prime );
 int _gnutls_dh_generate_prime(MPI *ret_g, MPI* ret_n, int bits);
 void _gnutls_dh_clear_mpis(void);
 int _gnutls_dh_calc_mpis(void);
+MPI _gnutls_get_rnd_srp_params( MPI * ret_p, int bits);
 
+extern _GNUTLS_DH_PARAMS _gnutls_dh_default_params;

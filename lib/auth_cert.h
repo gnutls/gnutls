@@ -7,6 +7,7 @@
  * support a server that has multiple certificates
  */
 typedef struct {
+	GNUTLS_DH_PARAMS dh_params;
 
 	gnutls_cert ** cert_list; 
 			/* contains a list of a list of certificates.
