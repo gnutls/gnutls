@@ -149,8 +149,10 @@ int _gnutls_base64_encode(uint8 * data, int data_size, uint8 ** result)
 
 	for (i = j = 0; i < data_size; i += 3, j += 4) {
 		tmp = encode(tmpres, &data[i], data_size - i);
-		if (tmp == -1)
+		if (tmp == -1) {
+			gnutls_free( (*result));
 			return -1;
+		}
 		memcpy(&(*result)[j], tmpres, tmp);
 	}
 	(*result)[ret] = 0;	/* null terminated */
@@ -206,8 +208,10 @@ int _gnutls_fbase64_encode(char *msg, uint8 * data, int data_size,
 
 	for (i = j = 0; i < data_size; i += 3, j += 4) {
 		tmp = encode(tmpres, &data[i], data_size - i);
-		if (tmp == -1)
+		if (tmp == -1) {
+			gnutls_free( (*result));
 			return -1;
+		}
 		ptr = &(*result)[j + pos];
 
 		if ((j) % 64 == 0) {
@@ -258,8 +262,10 @@ int _gnutls_base64_decode(uint8 * data, int data_size, uint8 ** result)
 
 	for (i = j = 0; i < data_size; i += 4) {
 		tmp = decode(tmpres, &data[i]);
-		if (tmp < 0)
+		if (tmp < 0) {
+			gnutls_free( *result);
 			return tmp;
+		}
 		memcpy(&(*result)[j], tmpres, tmp);
 		if (tmp < 3)
 			ret -= (3 - tmp);
@@ -348,8 +354,10 @@ int _gnutls_fbase64_decode(char *msg, uint8 * data, int data_size,
 
 	for (i = j = 0; i < kdata_size; i += 4) {
 		tmp = decode(tmpres, &kdata[i]);
-		if (tmp < 0)
+		if (tmp < 0) {
+			gnutls_free( *result);
 			return tmp;
+		}
 		memcpy(&(*result)[j], tmpres, tmp);
 		if (tmp < 3)
 			ret -= (3 - tmp);
