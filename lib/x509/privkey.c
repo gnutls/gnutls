@@ -628,10 +628,10 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 {
 	int result, i;
-	size_t size[8], total, tmp_size;
+	size_t size[8], total;
 	opaque * m_data, *pube_data, *prie_data;
 	opaque* p1_data, *p2_data, *u_data, *exp1_data, *exp2_data;
-	opaque * all_data = NULL;
+	opaque * all_data = NULL, *p;
 	GNUTLS_MPI exp1 = NULL, exp2 = NULL, q1 = NULL, p1 = NULL;
 	opaque null = '\0';
 
@@ -695,24 +695,25 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
-	
-	m_data = &all_data[0];
-	pube_data = &all_data[size[0]];
-	prie_data = &all_data[size[1]];
-	p1_data = &all_data[size[2]];
-	p2_data = &all_data[size[3]];
-	u_data = &all_data[size[4]];
-	exp1_data = &all_data[size[5]];
-	exp2_data = &all_data[size[6]];
 
-	_gnutls_mpi_print_lz( m_data, &tmp_size, params[0]);
-	_gnutls_mpi_print_lz( pube_data, &tmp_size, params[1]);
-	_gnutls_mpi_print_lz( prie_data, &tmp_size, params[2]);
-	_gnutls_mpi_print_lz( p1_data, &tmp_size, params[3]);
-	_gnutls_mpi_print_lz( p2_data, &tmp_size, params[4]);
-	_gnutls_mpi_print_lz( u_data, &tmp_size, params[5]);
-	_gnutls_mpi_print_lz( exp1_data, &tmp_size, exp1);
-	_gnutls_mpi_print_lz( exp2_data, &tmp_size, exp2);
+	p = all_data;
+	m_data = p; p+= size[0];
+	pube_data = p; p+= size[1];
+	prie_data = p; p+= size[2];
+	p1_data = p; p+= size[3];
+	p2_data = p; p+= size[4];
+	u_data = p; p+= size[5];
+	exp1_data = p; p+= size[6];
+        exp2_data = p;
+
+	_gnutls_mpi_print_lz( m_data, &size[0], params[0]);
+	_gnutls_mpi_print_lz( pube_data, &size[1], params[1]);
+	_gnutls_mpi_print_lz( prie_data, &size[2], params[2]);
+	_gnutls_mpi_print_lz( p1_data, &size[3], params[3]);
+	_gnutls_mpi_print_lz( p2_data, &size[4], params[4]);
+	_gnutls_mpi_print_lz( u_data, &size[5], params[5]);
+	_gnutls_mpi_print_lz( exp1_data, &size[6], exp1);
+	_gnutls_mpi_print_lz( exp2_data, &size[7], exp2);
 
 	/* Ok. Now we have the data. Create the asn1 structures
 	 */	
