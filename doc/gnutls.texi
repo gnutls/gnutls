@@ -1590,14 +1590,25 @@ This section contains examples of @acronym{TLS} and @acronym{SSL}
 clients, using @acronym{GnuTLS}.  Note that these examples contain
 little or no error checking.
 
+@subsection Simple client example with anonymous authentication
+
+The simplest client using TLS is the one that doesn't do any
+authentication.  This means no external certificates or passwords are
+needed to set up the connection.  As could be expected, the connection
+is vulnerable to man-in-the-middle (active or redirection) attacks.
+However, the data is integrity and privacy protected.
+
+@verbatiminclude examples/ex-client1.c
+
 @subsection Simple client example with @acronym{X.509} certificate support
 
 Let's assume now that we want to create a TCP client which
-communicates with servers that use @acronym{X.509} or @acronym{OpenPGP} certificate
-authentication. The following client is a very simple @acronym{TLS}
-client, it does not support session resuming, not even certificate
-verification. The TCP functions defined in this example are used in
-most of the other examples below, without redefining them.
+communicates with servers that use @acronym{X.509} or
+@acronym{OpenPGP} certificate authentication. The following client is
+a very simple @acronym{TLS} client, it does not support session
+resuming, not even certificate verification. The TCP functions defined
+in this example are used in most of the other examples below, without
+redefining them.
 
 @verbatiminclude examples/ex-client2.c
 
@@ -1678,10 +1689,10 @@ the DHE ciphersuites and session resuming.
 @cindex @acronym{OpenPGP} Server
 
 The following example is an echo server which supports
-@acronym{@acronym{OpenPGP}} key authentication. You can easily combine this
-functionality --that is have a server that supports both @acronym{X.509} and
-@acronym{OpenPGP} certificates-- but we separated them to keep these examples as
-simple as possible.
+@acronym{@acronym{OpenPGP}} key authentication. You can easily combine
+this functionality --that is have a server that supports both
+@acronym{X.509} and @acronym{OpenPGP} certificates-- but we separated
+them to keep these examples as simple as possible.
 
 @verbatiminclude examples/ex-serv-pgp.c
 
@@ -1692,6 +1703,13 @@ also possible to combine this functionality with a certificate
 server. Here it is separate for simplicity.
 
 @verbatiminclude examples/ex-serv-srp.c
+
+@subsection Echo Server with anonymous authentication
+
+This example server support anonymous authentication, and could be
+used to serve the example client for anonymous authentication.
+
+@verbatiminclude examples/ex-serv-anon.c
 
 @section Miscellaneous examples
 
