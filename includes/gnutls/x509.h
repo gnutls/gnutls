@@ -64,7 +64,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert,
 
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
-int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt,
+int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
 	unsigned char* output_data, int* output_data_size);
 
 
@@ -224,7 +224,7 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey privkey,
 	const gnutls_datum *d, const gnutls_datum *p, const gnutls_datum *q, 
 	const gnutls_datum *u);
 int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key);
-int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key,
+int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key, unsigned int flags,
 	unsigned char* output_data, int* output_data_size);
 
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
