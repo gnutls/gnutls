@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,4 +81,3 @@ int print_info(gnutls_session_t session)
    return 0;
 }
 
-\end{verbatim}

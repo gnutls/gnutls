@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -323,4 +322,3 @@ static int wrap_db_delete(void *dbf, gnutls_datum_t key)
 
 }
 
-\end{verbatim}

@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,49 +9,32 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+/* Must be linked against gnutls-extra.
+ */
 #include <gnutls/extra.h>
 
-#define SRP_PASSWD "tpasswd"
-#define SRP_PASSWD_CONF "tpasswd.conf"
+#define KEYFILE "secret.asc"
+#define CERTFILE "public.asc"
+#define RINGFILE "ring.gpg"
 
-#define KEYFILE "key.pem"
-#define CERTFILE "cert.pem"
-#define CAFILE "ca.pem"
-
-/* This is a sample TLS-SRP echo server.
+/* This is a sample TLS 1.0-OpenPGP echo server.
  */
+
 
 #define SA struct sockaddr
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
+#define DH_BITS 1024
 
 /* These are global */
-gnutls_srp_server_credentials_t srp_cred;
-gnutls_certificate_credentials_t cert_cred;
+gnutls_certificate_credentials_t cred;
+const int cert_type_priority[2] = { GNUTLS_CRT_OPENPGP, 0 };
+gnutls_dh_params_t dh_params;
 
-gnutls_session_t initialize_tls_session()
-{
-   gnutls_session_t session;
-   const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
-      GNUTLS_KX_SRP_RSA, 0 };
-
-   gnutls_init(&session, GNUTLS_SERVER);
-
-   gnutls_set_default_priority(session);
-   gnutls_kx_set_priority(session, kx_priority);
-
-   gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
-   /* for the certificate authenticated ciphersuites.
-    */
-   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
-
-   /* request client certificate if any.
-    */
-   gnutls_certificate_server_set_request( session, GNUTLS_CERT_IGNORE);
-
-   return session;
-}
+/* Defined in a previous example */
+extern int generate_dh_params( void);
+extern gnutls_session_t initialize_tls_session( void);
 
 int main()
 {
@@ -69,22 +51,20 @@ int main()
 
    strcpy(name, "Echo Server");
 
-   /* these must be called once in the program
+   /* this must be called once in the program
     */
    gnutls_global_init();
-   gnutls_global_init_extra(); /* for SRP */
 
-   /* SRP_PASSWD a password file (created with the included srptool utility) 
-    */
-   gnutls_srp_allocate_server_credentials(&srp_cred);
-   gnutls_srp_set_server_credentials_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
+   gnutls_certificate_allocate_credentials( &cred);
+   gnutls_certificate_set_openpgp_keyring_file( cred, RINGFILE);
 
-   gnutls_certificate_allocate_credentials(&cert_cred);
-   gnutls_certificate_set_x509_trust_file(cert_cred, CAFILE, GNUTLS_X509_FMT_PEM);
-   gnutls_certificate_set_x509_key_file(cert_cred, CERTFILE, KEYFILE,
-                                        GNUTLS_X509_FMT_PEM);
+   gnutls_certificate_set_openpgp_key_file( cred, CERTFILE, KEYFILE);
 
-   /* TCP socket operations
+   generate_dh_params();
+   
+   gnutls_certificate_set_dh_params( cred, dh_params);
+
+   /* Socket operations
     */
    listen_sd = socket(AF_INET, SOCK_STREAM, 0);
    SOCKET_ERR(listen_sd, "socket");
@@ -106,6 +86,7 @@ int main()
    client_len = sizeof(sa_cli);
    for (;;) {
       session = initialize_tls_session();
+      gnutls_certificate_type_set_priority(session, cert_type_priority);
 
       sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
@@ -124,6 +105,7 @@ int main()
       }
       printf("- Handshake was completed\n");
 
+      /* see the Getting peer's information example */
       /* print_info(session); */
 
       i = 0;
@@ -158,8 +140,7 @@ int main()
    }
    close(listen_sd);
 
-   gnutls_srp_free_server_credentials(srp_cred);
-   gnutls_certificate_free_credentials(cert_cred);
+   gnutls_certificate_free_credentials( cred);
 
    gnutls_global_deinit();
 
@@ -167,4 +148,3 @@ int main()
 
 }
 
-\end{verbatim}

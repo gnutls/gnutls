@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -240,4 +239,3 @@ static int cert_callback(gnutls_session_t session,
 
 }
 
-\end{verbatim}

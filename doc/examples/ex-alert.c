@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,4 +28,3 @@ void check_alert(gnutls_session_t session, int ret)
    }
 }
 
-\end{verbatim}

@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,4 +96,3 @@ static void print_x509_certificate_info(gnutls_session_t session)
    }
 }
 
-\end{verbatim}

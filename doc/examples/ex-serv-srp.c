@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,60 +9,48 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
+
+#define SRP_PASSWD "tpasswd"
+#define SRP_PASSWD_CONF "tpasswd.conf"
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
 #define CAFILE "ca.pem"
-#define CRLFILE "crl.pem"
 
-/* This is a sample TLS 1.0 echo server.
+/* This is a sample TLS-SRP echo server.
  */
-
 
 #define SA struct sockaddr
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
-#define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials_t x509_cred;
+gnutls_srp_server_credentials_t srp_cred;
+gnutls_certificate_credentials_t cert_cred;
 
 gnutls_session_t initialize_tls_session()
 {
    gnutls_session_t session;
+   const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
+      GNUTLS_KX_SRP_RSA, 0 };
 
    gnutls_init(&session, GNUTLS_SERVER);
 
-   /* avoid calling all the priority functions, since the defaults
-    * are adequate.
-    */
-   gnutls_set_default_priority( session);   
+   gnutls_set_default_priority(session);
+   gnutls_kx_set_priority(session, kx_priority);
 
-   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+   gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
+   /* for the certificate authenticated ciphersuites.
+    */
+   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
    /* request client certificate if any.
     */
-   gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUEST);
-
-   gnutls_dh_set_prime_bits( session, DH_BITS);
+   gnutls_certificate_server_set_request( session, GNUTLS_CERT_IGNORE);
 
    return session;
-}
-
-static gnutls_dh_params_t dh_params;
-
-static int generate_dh_params(void) {
-
-   /* Generate Diffie Hellman parameters - for use with DHE
-    * kx algorithms. These should be discarded and regenerated
-    * once a day, once a week or once a month. Depending on the
-    * security requirements.
-    */
-   gnutls_dh_params_init( &dh_params);
-   gnutls_dh_params_generate2( dh_params, DH_BITS);
-   
-   return 0;
 }
 
 int main()
@@ -77,26 +64,26 @@ int main()
    gnutls_session_t session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
+   char name[256];
 
-   /* this must be called once in the program
+   strcpy(name, "Echo Server");
+
+   /* these must be called once in the program
     */
    gnutls_global_init();
+   gnutls_global_init_extra(); /* for SRP */
 
-   gnutls_certificate_allocate_credentials(&x509_cred);
-   gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, 
-      GNUTLS_X509_FMT_PEM);
+   /* SRP_PASSWD a password file (created with the included srptool utility) 
+    */
+   gnutls_srp_allocate_server_credentials(&srp_cred);
+   gnutls_srp_set_server_credentials_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
-   gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE, 
-      GNUTLS_X509_FMT_PEM);
+   gnutls_certificate_allocate_credentials(&cert_cred);
+   gnutls_certificate_set_x509_trust_file(cert_cred, CAFILE, GNUTLS_X509_FMT_PEM);
+   gnutls_certificate_set_x509_key_file(cert_cred, CERTFILE, KEYFILE,
+                                        GNUTLS_X509_FMT_PEM);
 
-   gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 
-      GNUTLS_X509_FMT_PEM);
-
-   generate_dh_params();
-   
-   gnutls_certificate_set_dh_params( x509_cred, dh_params);
-
-   /* Socket operations
+   /* TCP socket operations
     */
    listen_sd = socket(AF_INET, SOCK_STREAM, 0);
    SOCKET_ERR(listen_sd, "socket");
@@ -113,7 +100,7 @@ int main()
    err = listen(listen_sd, 1024);
    SOCKET_ERR(err, "listen");
 
-   printf("Server ready. Listening to port '%d'.\n\n", PORT);
+   printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
 
    client_len = sizeof(sa_cli);
    for (;;) {
@@ -136,7 +123,6 @@ int main()
       }
       printf("- Handshake was completed\n");
 
-      /* see the Getting peer's information example */
       /* print_info(session); */
 
       i = 0;
@@ -171,7 +157,8 @@ int main()
    }
    close(listen_sd);
 
-   gnutls_certificate_free_credentials(x509_cred);
+   gnutls_srp_free_server_credentials(srp_cred);
+   gnutls_certificate_free_credentials(cert_cred);
 
    gnutls_global_deinit();
 
@@ -179,4 +166,3 @@ int main()
 
 }
 
-\end{verbatim}

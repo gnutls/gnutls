@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,15 +9,13 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-/* Must be linked against gnutls-extra.
- */
-#include <gnutls/extra.h>
 
-#define KEYFILE "secret.asc"
-#define CERTFILE "public.asc"
-#define RINGFILE "ring.gpg"
+#define KEYFILE "key.pem"
+#define CERTFILE "cert.pem"
+#define CAFILE "ca.pem"
+#define CRLFILE "crl.pem"
 
-/* This is a sample TLS 1.0-OpenPGP echo server.
+/* This is a sample TLS 1.0 echo server.
  */
 
 
@@ -29,13 +26,44 @@
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials_t cred;
-const int cert_type_priority[2] = { GNUTLS_CRT_OPENPGP, 0 };
-gnutls_dh_params_t dh_params;
+gnutls_certificate_credentials_t x509_cred;
 
-/* Defined in a previous example */
-extern int generate_dh_params( void);
-extern gnutls_session_t initialize_tls_session( void);
+gnutls_session_t initialize_tls_session()
+{
+   gnutls_session_t session;
+
+   gnutls_init(&session, GNUTLS_SERVER);
+
+   /* avoid calling all the priority functions, since the defaults
+    * are adequate.
+    */
+   gnutls_set_default_priority( session);   
+
+   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+
+   /* request client certificate if any.
+    */
+   gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUEST);
+
+   gnutls_dh_set_prime_bits( session, DH_BITS);
+
+   return session;
+}
+
+static gnutls_dh_params_t dh_params;
+
+static int generate_dh_params(void) {
+
+   /* Generate Diffie Hellman parameters - for use with DHE
+    * kx algorithms. These should be discarded and regenerated
+    * once a day, once a week or once a month. Depending on the
+    * security requirements.
+    */
+   gnutls_dh_params_init( &dh_params);
+   gnutls_dh_params_generate2( dh_params, DH_BITS);
+   
+   return 0;
+}
 
 int main()
 {
@@ -48,22 +76,24 @@ int main()
    gnutls_session_t session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
-   char name[256];
-
-   strcpy(name, "Echo Server");
 
    /* this must be called once in the program
     */
    gnutls_global_init();
 
-   gnutls_certificate_allocate_credentials( &cred);
-   gnutls_certificate_set_openpgp_keyring_file( cred, RINGFILE);
+   gnutls_certificate_allocate_credentials(&x509_cred);
+   gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, 
+      GNUTLS_X509_FMT_PEM);
 
-   gnutls_certificate_set_openpgp_key_file( cred, CERTFILE, KEYFILE);
+   gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE, 
+      GNUTLS_X509_FMT_PEM);
+
+   gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 
+      GNUTLS_X509_FMT_PEM);
 
    generate_dh_params();
    
-   gnutls_certificate_set_dh_params( cred, dh_params);
+   gnutls_certificate_set_dh_params( x509_cred, dh_params);
 
    /* Socket operations
     */
@@ -82,12 +112,11 @@ int main()
    err = listen(listen_sd, 1024);
    SOCKET_ERR(err, "listen");
 
-   printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
+   printf("Server ready. Listening to port '%d'.\n\n", PORT);
 
    client_len = sizeof(sa_cli);
    for (;;) {
       session = initialize_tls_session();
-      gnutls_certificate_type_set_priority(session, cert_type_priority);
 
       sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
@@ -141,7 +170,7 @@ int main()
    }
    close(listen_sd);
 
-   gnutls_certificate_free_credentials( cred);
+   gnutls_certificate_free_credentials(x509_cred);
 
    gnutls_global_deinit();
 
@@ -149,4 +178,3 @@ int main()
 
 }
 
-\end{verbatim}

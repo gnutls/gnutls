@@ -1,4 +1,3 @@
-\begin{verbatim}
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -121,4 +120,3 @@ int write_pkcs12(const gnutls_datum_t * cert, const gnutls_datum_t * pkcs8_key,
 
 }
 
-\end{verbatim}

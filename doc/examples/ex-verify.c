@@ -1,7 +1,4 @@
-\index{Verifying certificate chains}
-\label{ex:verify-chain}
 
-\begin{verbatim}
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
@@ -191,4 +188,3 @@ static void verify_last_cert(gnutls_x509_crt_t crt,
    }
 }
 
-\end{verbatim}
