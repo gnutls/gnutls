@@ -53,7 +53,7 @@ char *_gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 	char *pointerTo_;
 
 	/* avoid prefix */
-	GNUTLS_ALG_LOOP(ret = strdup(p->name + sizeof("CIPHER_") - 1));
+	GNUTLS_ALG_LOOP(ret = strdup(p->name + sizeof("GNUTLS_") - 1));
 
 
 	if (ret != NULL) {
@@ -159,3 +159,84 @@ int _gnutls_kx_algo_is_ok(KX_Algorithm algorithm)
 	}
 
 }
+
+
+BulkCipherAlgorithm _gnutls_cipher_suite_get_cipher_algo(GNUTLS_CipherSuite suite)
+{
+	size_t ret = 0;
+	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->cipher_algorithm);
+	return ret;
+}
+
+KX_Algorithm _gnutls_cipher_suite_get_kx_algo(GNUTLS_CipherSuite suite)
+{
+	size_t ret = 0;
+
+	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->kx_algorithm);
+	return ret;
+
+}
+
+MACAlgorithm _gnutls_cipher_suite_get_mac_algo(GNUTLS_CipherSuite suite)
+{				/* In bytes */
+	size_t ret = 0;
+	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm);
+	return ret;
+
+}
+
+char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
+{
+	char *ret = NULL;
+	char *pointerTo_;
+
+	/* avoid prefix */
+	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = strdup(p->name + sizeof("GNUTLS_") - 1));
+
+
+	if (ret != NULL) {
+		tolow(ret, strlen(ret));
+		pointerTo_ = strchr(ret, '_');
+
+		while (pointerTo_ != NULL) {
+			*pointerTo_ = '-';
+			pointerTo_ = strchr(ret, '_');
+		}
+	}
+	return ret;
+}
+
+
+int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
+{
+	char *y = _gnutls_cipher_suite_get_name(suite);
+
+	if (y != NULL) {
+		free(y);
+		return 0;
+	} else {
+		return 1;
+	}
+
+}
+
+int _gnutls_cipher_suite_count()
+{
+GNUTLS_CipherSuite suite;
+uint8 i, counter=0;
+char* y;
+	suite.CipherSuite[0] = 0x00;
+	
+	for (i=0;i<255;i++) {
+		suite.CipherSuite[1] = i;
+		y = _gnutls_cipher_suite_get_name(suite);
+
+		if (y != NULL) {
+			free(y);
+			counter++;
+		}
+	}
+
+	return counter;
+}
+

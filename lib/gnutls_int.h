@@ -65,8 +65,9 @@ typedef struct {
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
-enum BulkCipherAlgorithm { CIPHER_NULL, CIPHER_3DES = 4 };
+enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_3DES = 4 };
 enum KX_Algorithm { KX_RSA, KX_DHE_DSS, KX_DHE_RSA, KX_DH_DSS, KX_DH_RSA, KX_ANON_DH };
+enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
 enum IsExportable { EXPORTABLE_TRUE, EXPORTABLE_FALSE };
 enum MACAlgorithm { MAC_NULL, MAC_MD5, MAC_SHA };
@@ -75,6 +76,7 @@ enum CompressionMethod { COMPRESSION_NULL };
 enum ValidSession { VALID_TRUE, VALID_FALSE };
 enum ResumableSession { RESUME_TRUE, RESUME_FALSE };
 
+typedef enum KeyExchangeAlgorithm KeyExchangeAlgorithm;
 typedef enum KX_Algorithm KX_Algorithm;
 typedef enum ValidSession ValidSession;
 typedef enum ResumableSession ResumableSession;
@@ -242,8 +244,6 @@ typedef struct {
 	GNUTLS_CipherSuite	cipher_suite;
 	CompressionMethod	compression_method;
 } GNUTLS_ServerHello;
-
-#define GNUTLS_DH_anon_WITH_3DES_EDE_CBC_SHA { 0x00, 0x1B }
 
 /* functions */
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);

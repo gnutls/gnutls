@@ -135,11 +135,11 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	}
 
 	switch (state->security_parameters.bulk_cipher_algorithm) {
-	case CIPHER_NULL:
+	case GNUTLS_NULL:
 		state->connection_state.read_cipher_state = NULL;
 		state->connection_state.write_cipher_state = NULL;
 		break;
-	case CIPHER_3DES:
+	case GNUTLS_3DES:
 		state->connection_state.read_cipher_state =
 		    gcry_cipher_open(GCRY_CIPHER_3DES,
 				     GCRY_CIPHER_MODE_CBC, 0);
@@ -325,7 +325,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	switch (state->security_parameters.cipher_type) {
 	case CIPHER_STREAM:
 		switch (state->security_parameters.bulk_cipher_algorithm) {
-		case CIPHER_NULL:
+		case GNUTLS_NULL:
 			length =
 			    compressed->length +
 			    state->connection_state.mac_secret_size;
@@ -350,7 +350,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		break;
 	case CIPHER_BLOCK:
 		switch (state->security_parameters.bulk_cipher_algorithm) {
-		case CIPHER_3DES:
+		case GNUTLS_3DES:
 
 			rand = gcry_random_bytes(1, GCRY_STRONG_RANDOM);
 			length =
@@ -359,8 +359,8 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			    rand[0] + 1;
 			length =
 			    (length /
-			     _gnutls_cipher_get_block_size(CIPHER_3DES)) *
-			    _gnutls_cipher_get_block_size(CIPHER_3DES);
+			     _gnutls_cipher_get_block_size(GNUTLS_3DES)) *
+			    _gnutls_cipher_get_block_size(GNUTLS_3DES);
 			pad =
 			    length - compressed->length -
 			    state->connection_state.mac_secret_size - 1;
@@ -493,7 +493,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	switch (state->security_parameters.cipher_type) {
 	case CIPHER_STREAM:
 		switch (state->security_parameters.bulk_cipher_algorithm) {
-		case CIPHER_NULL:
+		case GNUTLS_NULL:
 			length =
 			    ciphertext->length -
 			    state->connection_state.mac_secret_size;
@@ -523,7 +523,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 		break;
 	case CIPHER_BLOCK:
 		switch (state->security_parameters.bulk_cipher_algorithm) {
-		case CIPHER_3DES:
+		case GNUTLS_3DES:
 
 			gcry_cipher_decrypt(state->connection_state.
 					    read_cipher_state, content,
