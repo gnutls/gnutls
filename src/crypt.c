@@ -24,10 +24,10 @@
 #include <unistd.h>
 #include "../lib/defines.h"
 #include "../lib/gnutls_int.h"
-#include "../lib/gnutls_srp.h"
-#include "../lib/crypt.h"
+#include "../libextra/gnutls_srp.h"
+#include "../libextra/crypt.h"
 #include "../lib/gnutls_mem.h"
-#include "../lib/auth_srp_passwd.h"
+#include "../libextra/auth_srp_passwd.h"
 #include "crypt-gaa.h"
 #include <pwd.h>
 #include <sys/types.h>

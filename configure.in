@@ -292,10 +292,18 @@ AC_MSG_RESULT([***
 ])
 AM_PROG_LIBTOOL
 
-LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBGCRYPT_LIBS $LIBOPENCDK_LIBS"
-LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS $LIBOPENCDK_CFLAGS -I${includedir}"
+LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBGCRYPT_LIBS"
+LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
+
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
+
+
+LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LIBOPENCDK_LIBS"
+LIBGNUTLS_EXTRA_CFLAGS="$LIBOPENCDK_CFLAGS -I${includedir}"
+
+AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
+AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 
 if test $ac_cv_c_compiler_gnu != no; then
 
@@ -329,11 +337,13 @@ AC_CONFIG_COMMANDS([lib/gnutls.h],[[
  echo "#endif /* GNUTLS_H */" >> lib/gnutls.h
  echo "" >> lib/gnutls.h
  chmod +x lib/libgnutls-config
+ chmod +x libextra/libgnutls-extra-config
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
-lib/libgnutls-config doc/Makefile src/x509/Makefile src/srp/Makefile \
-doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile src/openpgp/Makefile])
+lib/libgnutls-config libextra/libgnutls-extra-config \
+doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
+doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile ])
 
 
 AC_OUTPUT

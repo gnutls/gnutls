@@ -19,7 +19,7 @@
  */
 
 #include "../lib/gnutls.h"
-#include "../lib/gnutls-extra.h"
+#include "../libextra/gnutls-extra.h"
 #include <tests.h>
 #include <unistd.h>
 #include <signal.h>

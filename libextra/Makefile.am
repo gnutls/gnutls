@@ -1,9 +1,14 @@
 INCLUDES = -I../lib
 include_HEADERS = gnutls-extra.h
+bin_SCRIPTS = libgnutls-extra-config
+
+m4datadir = $(datadir)/aclocal
+m4data_DATA = libgnutls-extra.m4
 
 EXTRA_DIST = ext_srp.h crypt_bcrypt.h crypt_srpsha1.h gnutls_srp.h \
 	auth_srp.h auth_srp_passwd.h crypt.h gnutls_openpgp.h \
-	gnutls-extra-api.tex gnutls_extra.h
+	gnutls-extra-api.tex gnutls_extra.h libgnutls-extra-config.in \
+	libgnutls-extra.m4
 
 lib_LTLIBRARIES = libgnutls-extra.la
 

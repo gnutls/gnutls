@@ -5,11 +5,23 @@ aclocal.m4:
  include(libgnutls.m4)
 
 configure.in:
- AM_PATH_LIBGNUTLS( 0.4.1,, AC_MSG_ERROR([[
+ AM_PATH_LIBGNUTLS( 0.4.2,, AC_MSG_ERROR([[
 ***
 *** libgnutls was not found. You may want to get it from
 *** ftp://ftp.gnutls.org/pub/gnutls/
 ]]))
 
+these macros define LIBGNUTLS_LIBS and LIBGNUTLS_CFLAGS. If you want to
+use the GPL gnutls parts then also add:
 
-these macros define LIBGNUTLS_LIBS and LIBGNUTLS_CFLAGS.
+aclocal.m4:
+ include(libgnutls-extra.m4)
+
+configure.in:
+ AM_PATH_LIBGNUTLS_EXTRA( 0.4.2,, AC_MSG_ERROR([[
+***
+*** libgnutls-extra was not found. You may want to get it from
+*** ftp://ftp.gnutls.org/pub/gnutls/
+]]))
+
+which define LIBGNUTLS_EXTRA_LIBS and LIBGNUTLS_EXTRA_CFLAGS.
