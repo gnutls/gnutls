@@ -113,11 +113,6 @@ GNUTLS_MPI r = _gnutls_mpi_alloc_like(a);
 
 	_gnutls_mpi_mod( r, a, n);
 	ret = _gnutls_mpi_cmp_ui(r, 0);
-	if (ret != 0) ret = _gnutls_mpi_cmp_ui(r, 1);
-	if (ret != 0) {
-		_gnutls_mpi_sub_ui( r, n, 1);
-		ret = _gnutls_mpi_cmp(a, r);
-	}
 	
 	_gnutls_mpi_release( &r);
 
@@ -181,7 +176,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session session, opaque ** data)
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	/* Calculate:  B = (3v + g^b) % N 
+	/* Calculate:  B = (k*v + g^b) % N 
 	 */
 	B = _gnutls_calc_srp_B( &_b, G, N, V);
 	if (B==NULL) {
@@ -361,8 +356,7 @@ int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _da
 	_gnutls_dump_mpi( "SRP A: ", A);
 	_gnutls_dump_mpi( "SRP B: ", B);
 
-	/* Checks if A % n == 0 or
-	 * A % n == +-1.
+	/* Checks if A % n == 0.
 	 */
 	if ( (ret = check_a_mod_n( A, N)) < 0) {
 		gnutls_assert();
@@ -532,6 +526,97 @@ static int check_g_n( const opaque* g, size_t n_g,
 	return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 }
 
+/* Check if N is a prime and G a generator of the
+ * group.
+ */
+static int group_check_g_n( GNUTLS_MPI g, GNUTLS_MPI n) 
+{
+GNUTLS_MPI q = NULL, two = NULL, w = NULL;
+int ret;
+
+	/* N must be of the form N=2q+1
+	 * where q is also a prime.
+	 */
+	if (_gnutls_prime_check( n, 0) != 0) {
+		_gnutls_dump_mpi( "no prime N: ", n);
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
+
+	two = _gnutls_mpi_new( 4);
+	if (two == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	q = _gnutls_mpi_alloc_like( n);
+	if (q==NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto error;
+	}
+	
+	/* q = n-1 
+	 */
+	_gnutls_mpi_sub_ui( q, n, 1);
+	
+	/* q = q/2, remember that q is divisible by 2 (prime - 1)
+	 */
+	_gnutls_mpi_set_ui( two, 2);
+	_gnutls_mpi_div( q, NULL, q, two, 0);
+
+	if (_gnutls_prime_check( q, 0) != 0) {
+		/* N was not on the form N=2q+1, where q = prime
+		 */
+		_gnutls_dump_mpi( "no prime Q: ", q);
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
+	
+	/* We also check whether g is a generator,
+	 */
+	 
+	/* check if g < q < N
+	 */
+	if (_gnutls_mpi_cmp( g, q) >= 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		goto error;
+	}
+
+	w = _gnutls_mpi_alloc_like( q);
+	if (w==NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto error;
+	}
+	
+	/* check if g^q mod N == N-1
+	 * w = g^q mod N
+	 */
+	_gnutls_mpi_powm( w, g, q, n);
+	
+	/* w++
+	 */
+	_gnutls_mpi_add_ui( w, w, 1);
+	
+	if (_gnutls_mpi_cmp( w, n)!=0) {
+		gnutls_assert();
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		goto error;
+	}
+
+	ret = 0;
+
+error:
+	_gnutls_mpi_release( &q);
+	_gnutls_mpi_release( &two);
+	_gnutls_mpi_release( &w);
+	
+	return ret;
+	
+}
+
 /* receive the key exchange message ( n, g, s, B) 
  */
 int _gnutls_proc_srp_server_kx(gnutls_session session, opaque * data, size_t _data_size)
@@ -637,8 +722,11 @@ int _gnutls_proc_srp_server_kx(gnutls_session session, opaque * data, size_t _da
 	 * a generator.
 	 */
 	if ( (ret = check_g_n( data_g, _n_g, data_n, _n_n)) < 0) {
-		gnutls_assert();
-		return ret;
+		_gnutls_x509_log("Checking the SRP group parameters.\n");
+		if ( (ret = group_check_g_n( G, N)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 
 	/* Checks if b % n == 0

@@ -155,8 +155,8 @@ A certificate request is a structure, which
 contain information about an applicant of a certificate service.
 It usually contains a private key, a distinguished name and secondary
 data such as a challenge password. \gnutls{} supports the requests
-defined in PKCS \#10. Other certificate request's format such as
-PKIX's RFC2511 are not currently supported.
+defined in PKCS \#10 \cite{RFC2986}. Other certificate request's format such as
+PKIX's RFC2511 \cite{RFC2511} are not currently supported.
 
 In \gnutls{} the PKCS \#10 structures are handled using the
 \emph{gnutls\_x509\_crq} type. 
@@ -164,7 +164,7 @@ An example of a certificate request generation can be found at section \ref{ex:c
 on page \pageref{ex:crq}.
 
 \subsection{PKCS \#12 structures\index{PKCS \#12}}
-A PKCS \#12 structure usually contains a user's private keys and
+A PKCS \#12 structure \cite{PKCS12} usually contains a user's private keys and
 certificates. It is commonly used in browsers to export and import
 the user's identities.
 \par
@@ -210,7 +210,7 @@ signs other people's keys without being sure that they belong to the
 actual owner.
 
 \subsection*{OpenPGP keys}
-In \gnutls{} the OpenPGP key structures are handled using the
+In \gnutls{} the OpenPGP key structures \cite{RFC2440} are handled using the
 \emph{gnutls\_openpgp\_key} type and the corresponding private keys with
 the \emph{gnutls\_openpgp\_privkey} type. All the prototypes for the key handling
 functions can be found at \emph{gnutls/openpgp.h}.

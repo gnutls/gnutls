@@ -46,52 +46,45 @@ $ srptool --passwd /etc/tpasswd \
 This program was created to assist in debugging \gnutls{}, but it
 might be useful to extract a \tls{} server's capabilities. 
 It's purpose is to connect onto a \tls{} server, perform
-some tests and print the server's capabilities. An example output is:
+some tests and print the server's capabilities. If called with the
+`-v' parameter a more checks will be performed. An example output is:
 
 \begin{verbatim}
 crystal:/cvs/gnutls/src$ ./gnutls-cli-debug localhost -p 5556
 Resolving 'localhost'...
 Connecting to '127.0.0.1:5556'...
+Checking for TLS 1.1 support... yes
+Checking fallback from TLS 1.1 to... N/A
 Checking for TLS 1.0 support... yes
 Checking for SSL 3.0 support... yes
 Checking for version rollback bug in RSA PMS... no
 Checking for version rollback bug in Client Hello... no
-Checking whether we need to disable TLS 1.0... no
+Checking whether we need to disable TLS 1.0... N/A
 Checking whether the server ignores the RSA PMS version... no
 Checking whether the server can accept Hello Extensions... yes
 Checking whether the server can accept cipher suites not in SSL 3.0 spec... yes
 Checking whether the server can accept a bogus TLS record version in the client hello... yes
-Checking for certificate information...
-- Certificate type: X.509
- - Got a certificate list of 1 certificates.
-
- - Certificate[0] info:
- # valid since: Sat Jul  7 13:18:00 EEST 2001
- # expires at: Sun Jul  7 13:18:00 EEST 2002
- # serial number: 01 
- # fingerprint: 43 ab a2 a7 d3 6a 28 02 60 73 b4 a5 c3 84 0a 3f 
- # version: #3
- # public key algorithm: RSA
- #   Modulus: 1024 bits
- # Subject's DN: C=GR,ST=Attiki,L=Athina,O=GNUTLS,OU=GNUTLS dev.,CN=localhost,EMAIL=root@localhost
- # Issuer's DN: C=GR,ST=Attiki,L=Athina,O=GNUTLS,OU=GNUTLS dev.,CN=GNUTLS TEST CA,EMAIL=gnutls-dev@gnupg.org
-
- 
-Checking for trusted CAs...
-- Server's trusted authorities:
-   [0]: C=GR,ST=Attiki,L=Athina,O=GNUTLS,OU=GNUTLS dev.,CN=GNUTLS TEST CA,EMAIL=gnutls-dev@gnupg.org
- 
+Checking for certificate information... N/A
+Checking for trusted CAs... N/A
 Checking whether the server understands TLS closure alerts... yes
-Checking whether the server supports session resumption... no
+Checking whether the server supports session resumption... yes
 Checking for export-grade ciphersuite support... no
+Checking RSA-export ciphersuite info... N/A
+Checking for anonymous authentication support... no
+Checking anonymous Diffie Hellman group info... N/A
 Checking for ephemeral Diffie Hellman support... no
-Checking for ephemeral Diffie Hellman prime size... N/A
-Checking for AES cipher support... yes
+Checking ephemeral Diffie Hellman group info... N/A
+Checking for AES cipher support (TLS extension)... yes
 Checking for 3DES cipher support... yes
-Checking for ARCFOUR cipher support... yes
+Checking for ARCFOUR 128 cipher support... yes
+Checking for ARCFOUR 40 cipher support... no
 Checking for MD5 MAC support... yes
 Checking for SHA1 MAC support... yes
+Checking for RIPEMD160 MAC support (TLS extension)... yes
+Checking for ZLIB compression support (TLS extension)... yes
+Checking for LZO compression support (GnuTLS extension)... yes
 Checking for max record size (TLS extension)... yes
+Checking for SRP authentication support (TLS extension)... yes
 Checking for OpenPGP authentication support (TLS extension)... no
 
 \end{verbatim}

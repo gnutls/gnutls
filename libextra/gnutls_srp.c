@@ -74,16 +74,17 @@ int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result, GNUTLS_MPI 
 
 
 /****************
- * Choose a random value b and calculate B = (v + g^b) % N.
+ * Choose a random value b and calculate B = (k*v + g^b) % N.
+ * where k == SHA1(N|g)
  * Return: B and if ret_b is not NULL b.
  */
 GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GNUTLS_MPI v)
 {
-	GNUTLS_MPI tmpB, tmpV;
-	GNUTLS_MPI b, B;
+	GNUTLS_MPI tmpB = NULL, tmpV = NULL;
+	GNUTLS_MPI b = NULL, B = NULL, k = NULL;
 	int bits;
 
-	/* calculate:  B = (3v + g^b) % N 
+	/* calculate:  B = (k*v + g^b) % N 
 	 */
 	bits = _gnutls_mpi_get_nbits(n);
 	b = _gnutls_mpi_snew(bits);
@@ -95,8 +96,8 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 	tmpV = _gnutls_mpi_alloc_like(n);
 
 	if (tmpV == NULL) {
-		_gnutls_mpi_release(&b);
-		return NULL;
+		gnutls_assert();
+		goto error;
 	}
 	
 	_gnutls_mpi_randomize(b, bits, GCRY_STRONG_RANDOM);
@@ -104,25 +105,26 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 	tmpB = _gnutls_mpi_snew(bits);
 	if (tmpB==NULL) {
 		gnutls_assert();
-		_gnutls_mpi_release( &b);
-		_gnutls_mpi_release(&tmpV);
-		return NULL;
+		goto error;
 	}
 
 	B = _gnutls_mpi_snew(bits);
-	if (tmpB==NULL) {
+	if (B==NULL) {
 		gnutls_assert();
-		_gnutls_mpi_release( &b);
-		_gnutls_mpi_release( &tmpB);
-		_gnutls_mpi_release(&tmpV);
-		return NULL;
+		goto error;
 	}
 
-	_gnutls_mpi_mul_ui(tmpV, v, 3);
+	k = _gnutls_calc_srp_u( n, g);
+	if (k == NULL) {
+		gnutls_assert();
+		goto error;
+	}
 
+	_gnutls_mpi_mulm(tmpV, k, v, n);
 	_gnutls_mpi_powm(tmpB, g, b, n);
 	_gnutls_mpi_addm(B, tmpV, tmpB, n);
 
+	_gnutls_mpi_release( &k);
 	_gnutls_mpi_release(&tmpB);
 	_gnutls_mpi_release(&tmpV);
 
@@ -132,8 +134,18 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 		_gnutls_mpi_release(&b);
 
 	return B;
+
+error:
+	_gnutls_mpi_release( &b);
+	_gnutls_mpi_release( &B);
+	_gnutls_mpi_release( &k);
+	_gnutls_mpi_release( &tmpB);
+	_gnutls_mpi_release(&tmpV);
+	return NULL;
 }
 
+/* This calculates the SHA1(A | B)
+ */
 GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 {
 	size_t b_size, a_size;
@@ -293,7 +305,7 @@ int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
 GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_MPI a, GNUTLS_MPI u, GNUTLS_MPI n)
 {
 	GNUTLS_MPI S=NULL, tmp1=NULL, tmp2=NULL;
-	GNUTLS_MPI tmp4=NULL, tmp3=NULL;
+	GNUTLS_MPI tmp4=NULL, tmp3=NULL, k = NULL;
 
 	S = _gnutls_mpi_alloc_like(n);
 	if (S==NULL)
@@ -305,9 +317,15 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 	if (tmp1 == NULL || tmp2 == NULL || tmp3 == NULL) {
 		goto freeall;
 	}
+	
+	k = _gnutls_calc_srp_u( n, g);
+	if (k==NULL) {
+		gnutls_assert();
+		goto freeall;
+	}
 
 	_gnutls_mpi_powm(tmp1, g, x, n); /* g^x */
-	_gnutls_mpi_mul_ui(tmp3, tmp1, 3); /* 3*g^x */
+	_gnutls_mpi_mulm(tmp3, tmp1, k, n); /* k*g^x mod n */
 	_gnutls_mpi_subm(tmp2, B, tmp3, n);
 
 	tmp4 = _gnutls_mpi_alloc_like(n);
@@ -322,6 +340,7 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 	_gnutls_mpi_release(&tmp2);
 	_gnutls_mpi_release(&tmp3);
 	_gnutls_mpi_release(&tmp4);
+	_gnutls_mpi_release(&k);
 	
 	return S;
 
@@ -331,6 +350,7 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 		_gnutls_mpi_release(&tmp3);
 		_gnutls_mpi_release(&tmp4);
 		_gnutls_mpi_release(&S);
+		_gnutls_mpi_release(&k);
 		return NULL;
 }
 

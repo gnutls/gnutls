@@ -7,6 +7,7 @@ Version 1.0.14
 - Opencdk library is being included if not found.
 - Corrected a serious bug in the included libtasn1 library.
 - Corrected session resuming in SRP ciphersuites.
+- Updated to conform to the latest srp draft (draft-ietf-tls-srp-07)
 
 Version 1.0.13 (29/04/2004)
 - Some complilation fixes.
