@@ -189,8 +189,8 @@ CertificateStatus gnutls_x509_verify_signature(gnutls_cert* cert, gnutls_cert* i
 gnutls_datum signature;
 gnutls_datum tbs;
 
-	signature.data = cert->signature;
-	signature.size = cert->signature_size;
+	signature.data = cert->signature.data;
+	signature.size = cert->signature.size;
 		
 	tbs = _gnutls_get_tbs( cert);
 	if (tbs.data==NULL) {

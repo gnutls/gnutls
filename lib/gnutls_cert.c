@@ -78,7 +78,10 @@ void gnutls_free_cert(gnutls_cert cert)
 
 	switch (cert.subject_pk_algorithm) {
 	case GNUTLS_PK_RSA:
-		n = 2;		/* the number of parameters in MPI* */
+		n = RSA_PARAMS;		/* the number of parameters in MPI* */
+		break;
+	case GNUTLS_PK_DSA:
+		n = DSA_PARAMS;		/* the number of parameters in MPI* */
 		break;
 	default:
 		n = 0;
@@ -88,6 +91,7 @@ void gnutls_free_cert(gnutls_cert cert)
 		_gnutls_mpi_release(&cert.params[i]);
 	}
 
+	gnutls_free_datum(&cert.signature);
 	gnutls_free_datum(&cert.raw);
 
 	return;
@@ -1154,6 +1158,8 @@ int len, result;
 }
 
 
+#define X509_SIG_SIZE 1024
+
 /* This function will convert a der certificate, to a format
  * (structure) that gnutls can understand and use. Actually the
  * important thing on this function is that it extracts the 
@@ -1218,19 +1224,27 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 		return result;
 	}
 
-	len = sizeof(gCert->signature);
+	len = gCert->signature.size = X509_SIG_SIZE;
+	gCert->signature.data = gnutls_malloc( gCert->signature.size);
+	if (gCert->signature.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	result =
 	    asn1_read_value
-	    (c2, "certificate2.signature", gCert->signature, &len);
+	    (c2, "certificate2.signature", gCert->signature.data, &len);
 
 	if ((len % 8) != 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		gnutls_free_datum( &gCert->raw);
+		gnutls_free_datum( &gCert->signature);
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
+
 	len /= 8;		/* convert to bytes */
-	gCert->signature_size = len;
+	gCert->signature.size = len; /* put the actual sig size */
 
 
 	gCert->expiration_time =
