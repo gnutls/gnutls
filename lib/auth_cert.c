@@ -1340,7 +1340,9 @@ static int _gnutls_server_find_cert_list_index(gnutls_session session,
 
 	}
 
-	if (session->internals.server_cert_callback != NULL && cred->ncerts > 0) {	/* use the callback to get certificate */
+	if (session->internals.server_cert_callback != NULL && cred->ncerts > 0) {	
+		/* use the callback to get certificate 
+		 */
 		gnutls_datum *my_certs = NULL;
 
 		my_certs =
@@ -1378,7 +1380,8 @@ static int _gnutls_server_find_cert_list_index(gnutls_session session,
 							    my_certs,
 							    my_certs_length);
 
-		index = ij_map[index];
+		if (index != -1)
+			index = ij_map[index];
 
 	      clear:
 		gnutls_free(my_certs);
