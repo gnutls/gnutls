@@ -1,3 +1,14 @@
+2003-01-13 19:37  nmav <nmav@gnutls.org>
+
+	* doc/tex/patents.tex, doc/tex/srp.tex, lib/Makefile.am,
+	lib/gnutls_errors.c, lib/gnutls_errors_int.h, lib/gnutls_x509.c,
+	lib/x509_b64.c:
+
+	GNUTLS_E_PARSING_ERROR error code was replaced by
+	GNUTLS_E_BASE64_DECODING_ER and GNUTLS_E_SRP_PWD_PARSING_ERROR.
+	GNUTLS_E_ASCII_ARMOR_ERROR was also replaced by
+	GNUTLS_E_BASE64_DECODING_ERROR.  
+
 2003-01-11 14:02  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/Makefile.am, doc/tex/Makefile.am, doc/tex/appendix.tex,
