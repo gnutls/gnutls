@@ -22,7 +22,7 @@
 #define SA struct sockaddr
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
-#define PORT 5556               /* listen to 5556 port */
+#define PORT 5556		/* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -30,151 +30,148 @@ gnutls_certificate_credentials_t x509_cred;
 
 gnutls_session_t initialize_tls_session()
 {
-   gnutls_session_t session;
+    gnutls_session_t session;
 
-   gnutls_init(&session, GNUTLS_SERVER);
+    gnutls_init(&session, GNUTLS_SERVER);
 
-   /* avoid calling all the priority functions, since the defaults
-    * are adequate.
-    */
-   gnutls_set_default_priority( session);   
+    /* avoid calling all the priority functions, since the defaults
+     * are adequate.
+     */
+    gnutls_set_default_priority(session);
 
-   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
+    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
-   /* request client certificate if any.
-    */
-   gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUEST);
+    /* request client certificate if any.
+     */
+    gnutls_certificate_server_set_request(session, GNUTLS_CERT_REQUEST);
 
-   gnutls_dh_set_prime_bits( session, DH_BITS);
+    gnutls_dh_set_prime_bits(session, DH_BITS);
 
-   return session;
+    return session;
 }
 
 static gnutls_dh_params_t dh_params;
 
-static int generate_dh_params(void) {
+static int generate_dh_params(void)
+{
 
-   /* Generate Diffie Hellman parameters - for use with DHE
-    * kx algorithms. These should be discarded and regenerated
-    * once a day, once a week or once a month. Depending on the
-    * security requirements.
-    */
-   gnutls_dh_params_init( &dh_params);
-   gnutls_dh_params_generate2( dh_params, DH_BITS);
-   
-   return 0;
+    /* Generate Diffie Hellman parameters - for use with DHE
+     * kx algorithms. These should be discarded and regenerated
+     * once a day, once a week or once a month. Depending on the
+     * security requirements.
+     */
+    gnutls_dh_params_init(&dh_params);
+    gnutls_dh_params_generate2(dh_params, DH_BITS);
+
+    return 0;
 }
 
 int main()
 {
-   int err, listen_sd, i;
-   int sd, ret;
-   struct sockaddr_in sa_serv;
-   struct sockaddr_in sa_cli;
-   int client_len;
-   char topbuf[512];
-   gnutls_session_t session;
-   char buffer[MAX_BUF + 1];
-   int optval = 1;
+    int err, listen_sd, i;
+    int sd, ret;
+    struct sockaddr_in sa_serv;
+    struct sockaddr_in sa_cli;
+    int client_len;
+    char topbuf[512];
+    gnutls_session_t session;
+    char buffer[MAX_BUF + 1];
+    int optval = 1;
 
-   /* this must be called once in the program
-    */
-   gnutls_global_init();
+    /* this must be called once in the program
+     */
+    gnutls_global_init();
 
-   gnutls_certificate_allocate_credentials(&x509_cred);
-   gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, 
-      GNUTLS_X509_FMT_PEM);
+    gnutls_certificate_allocate_credentials(&x509_cred);
+    gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE,
+					   GNUTLS_X509_FMT_PEM);
 
-   gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE, 
-      GNUTLS_X509_FMT_PEM);
+    gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE,
+					 GNUTLS_X509_FMT_PEM);
 
-   gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 
-      GNUTLS_X509_FMT_PEM);
+    gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE,
+					 GNUTLS_X509_FMT_PEM);
 
-   generate_dh_params();
-   
-   gnutls_certificate_set_dh_params( x509_cred, dh_params);
+    generate_dh_params();
 
-   /* Socket operations
-    */
-   listen_sd = socket(AF_INET, SOCK_STREAM, 0);
-   SOCKET_ERR(listen_sd, "socket");
+    gnutls_certificate_set_dh_params(x509_cred, dh_params);
 
-   memset(&sa_serv, '\0', sizeof(sa_serv));
-   sa_serv.sin_family = AF_INET;
-   sa_serv.sin_addr.s_addr = INADDR_ANY;
-   sa_serv.sin_port = htons(PORT);  /* Server Port number */
+    /* Socket operations
+     */
+    listen_sd = socket(AF_INET, SOCK_STREAM, 0);
+    SOCKET_ERR(listen_sd, "socket");
 
-   setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
+    memset(&sa_serv, '\0', sizeof(sa_serv));
+    sa_serv.sin_family = AF_INET;
+    sa_serv.sin_addr.s_addr = INADDR_ANY;
+    sa_serv.sin_port = htons(PORT);	/* Server Port number */
 
-   err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
-   SOCKET_ERR(err, "bind");
-   err = listen(listen_sd, 1024);
-   SOCKET_ERR(err, "listen");
+    setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
 
-   printf("Server ready. Listening to port '%d'.\n\n", PORT);
+    err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
+    SOCKET_ERR(err, "bind");
+    err = listen(listen_sd, 1024);
+    SOCKET_ERR(err, "listen");
 
-   client_len = sizeof(sa_cli);
-   for (;;) {
-      session = initialize_tls_session();
+    printf("Server ready. Listening to port '%d'.\n\n", PORT);
 
-      sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
+    client_len = sizeof(sa_cli);
+    for (;;) {
+	session = initialize_tls_session();
 
-      printf("- connection from %s, port %d\n",
-             inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
-                       sizeof(topbuf)), ntohs(sa_cli.sin_port));
+	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
-      gnutls_transport_set_ptr( session, (gnutls_transport_ptr_t)sd);
-      ret = gnutls_handshake( session);
-      if (ret < 0) {
-         close(sd);
-         gnutls_deinit(session);
-         fprintf(stderr, "*** Handshake has failed (%s)\n\n",
-                 gnutls_strerror(ret));
-         continue;
-      }
-      printf("- Handshake was completed\n");
+	printf("- connection from %s, port %d\n",
+	       inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
+			 sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-      /* see the Getting peer's information example */
-      /* print_info(session); */
+	gnutls_transport_set_ptr(session, (gnutls_transport_ptr_t) sd);
+	ret = gnutls_handshake(session);
+	if (ret < 0) {
+	    close(sd);
+	    gnutls_deinit(session);
+	    fprintf(stderr, "*** Handshake has failed (%s)\n\n",
+		    gnutls_strerror(ret));
+	    continue;
+	}
+	printf("- Handshake was completed\n");
 
-      i = 0;
-      for (;;) {
-         bzero(buffer, MAX_BUF + 1);
-         ret = gnutls_record_recv( session, buffer, MAX_BUF);
+	/* see the Getting peer's information example */
+	/* print_info(session); */
 
-         if (ret == 0) {
-            printf
-                ("\n- Peer has closed the GNUTLS connection\n");
-            break;
-         } else if (ret < 0) {
-            fprintf(stderr,
-                    "\n*** Received corrupted data(%d). Closing the connection.\n\n",
-                    ret);
-            break;
-         } else if (ret > 0) {
-            /* echo data back to the client
-             */
-            gnutls_record_send( session, buffer,
-                         strlen(buffer));
-         }
-      }
-      printf("\n");
-      gnutls_bye( session, GNUTLS_SHUT_WR); /* do not wait for
-                                 * the peer to close the connection.
-                                 */
+	i = 0;
+	for (;;) {
+	    bzero(buffer, MAX_BUF + 1);
+	    ret = gnutls_record_recv(session, buffer, MAX_BUF);
 
-      close(sd);
-      gnutls_deinit(session);
+	    if (ret == 0) {
+		printf("\n- Peer has closed the GNUTLS connection\n");
+		break;
+	    } else if (ret < 0) {
+		fprintf(stderr, "\n*** Received corrupted "
+			"data(%d). Closing the connection.\n\n", ret);
+		break;
+	    } else if (ret > 0) {
+		/* echo data back to the client
+		 */
+		gnutls_record_send(session, buffer, strlen(buffer));
+	    }
+	}
+	printf("\n");
+	/* do not wait for the peer to close the connection.
+	 */
+	gnutls_bye(session, GNUTLS_SHUT_WR);
 
-   }
-   close(listen_sd);
+	close(sd);
+	gnutls_deinit(session);
 
-   gnutls_certificate_free_credentials(x509_cred);
+    }
+    close(listen_sd);
 
-   gnutls_global_deinit();
+    gnutls_certificate_free_credentials(x509_cred);
 
-   return 0;
+    gnutls_global_deinit();
+
+    return 0;
 
 }
-

@@ -11,73 +11,73 @@ extern void print_x509_certificate_info(gnutls_session_t);
  */
 int print_info(gnutls_session_t session)
 {
-   const char *tmp;
-   gnutls_credentials_type_t cred;
-   gnutls_kx_algorithm_t kx;
+    const char *tmp;
+    gnutls_credentials_type_t cred;
+    gnutls_kx_algorithm_t kx;
 
-   /* print the key exchange's algorithm name
-    */
-   kx = gnutls_kx_get(session);
-   tmp = gnutls_kx_get_name(kx);
-   printf("- Key Exchange: %s\n", tmp);
+    /* print the key exchange's algorithm name
+     */
+    kx = gnutls_kx_get(session);
+    tmp = gnutls_kx_get_name(kx);
+    printf("- Key Exchange: %s\n", tmp);
 
-   /* Check the authentication type used and switch
-    * to the appropriate.
-    */
-   cred = gnutls_auth_get_type(session);
-   switch (cred) {
-   case GNUTLS_CRD_ANON:       /* anonymous authentication */
+    /* Check the authentication type used and switch
+     * to the appropriate.
+     */
+    cred = gnutls_auth_get_type(session);
+    switch (cred) {
+    case GNUTLS_CRD_ANON:	/* anonymous authentication */
 
-      printf("- Anonymous DH using prime of %d bits\n",
-             gnutls_dh_get_prime_bits(session));
-      break;
+	printf("- Anonymous DH using prime of %d bits\n",
+	       gnutls_dh_get_prime_bits(session));
+	break;
 
-   case GNUTLS_CRD_CERTIFICATE:        /* certificate authentication */
-      
-      /* Check if we have been using ephemeral Diffie Hellman.
-       */
-      if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
-         printf("\n- Ephemeral DH using prime of %d bits\n",
-                gnutls_dh_get_prime_bits(session));
-      }
+    case GNUTLS_CRD_CERTIFICATE:	/* certificate authentication */
 
-      /* if the certificate list is available, then
-       * print some information about it.
-       */
-      print_x509_certificate_info(session);
+	/* Check if we have been using ephemeral Diffie Hellman.
+	 */
+	if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
+	    printf("\n- Ephemeral DH using prime of %d bits\n",
+		   gnutls_dh_get_prime_bits(session));
+	}
 
-   } /* switch */
+	/* if the certificate list is available, then
+	 * print some information about it.
+	 */
+	print_x509_certificate_info(session);
 
-   /* print the protocol's name (ie TLS 1.0) 
-    */
-   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
-   printf("- Protocol: %s\n", tmp);
+    }				/* switch */
 
-   /* print the certificate type of the peer.
-    * ie X.509
-    */
-   tmp = gnutls_certificate_type_get_name(
-      gnutls_certificate_type_get(session));
+    /* print the protocol's name (ie TLS 1.0) 
+     */
+    tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
+    printf("- Protocol: %s\n", tmp);
 
-   printf("- Certificate Type: %s\n", tmp);
+    /* print the certificate type of the peer.
+     * ie X.509
+     */
+    tmp =
+	gnutls_certificate_type_get_name(gnutls_certificate_type_get
+					 (session));
 
-   /* print the compression algorithm (if any)
-    */
-   tmp = gnutls_compression_get_name( gnutls_compression_get(session));
-   printf("- Compression: %s\n", tmp);
+    printf("- Certificate Type: %s\n", tmp);
 
-   /* print the name of the cipher used.
-    * ie 3DES.
-    */
-   tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
-   printf("- Cipher: %s\n", tmp);
+    /* print the compression algorithm (if any)
+     */
+    tmp = gnutls_compression_get_name(gnutls_compression_get(session));
+    printf("- Compression: %s\n", tmp);
 
-   /* Print the MAC algorithms name.
-    * ie SHA1
-    */
-   tmp = gnutls_mac_get_name(gnutls_mac_get(session));
-   printf("- MAC: %s\n", tmp);
+    /* print the name of the cipher used.
+     * ie 3DES.
+     */
+    tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
+    printf("- Cipher: %s\n", tmp);
 
-   return 0;
+    /* Print the MAC algorithms name.
+     * ie SHA1
+     */
+    tmp = gnutls_mac_get_name(gnutls_mac_get(session));
+    printf("- MAC: %s\n", tmp);
+
+    return 0;
 }
-

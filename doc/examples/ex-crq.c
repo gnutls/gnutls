@@ -11,71 +11,70 @@
 
 int main()
 {
-   gnutls_x509_crq_t crq;
-   gnutls_x509_privkey_t key;
-   unsigned char buffer[10*1024];
-   int buffer_size = sizeof(buffer);
-   int ret;
+    gnutls_x509_crq_t crq;
+    gnutls_x509_privkey_t key;
+    unsigned char buffer[10 * 1024];
+    int buffer_size = sizeof(buffer);
+    int ret;
 
-   gnutls_global_init();
+    gnutls_global_init();
 
-   /* Initialize an empty certificate request, and
-    * an empty private key.
-    */
-   gnutls_x509_crq_init(&crq);
+    /* Initialize an empty certificate request, and
+     * an empty private key.
+     */
+    gnutls_x509_crq_init(&crq);
 
-   gnutls_x509_privkey_init(&key);
+    gnutls_x509_privkey_init(&key);
 
-   /* Generate a 1024 bit RSA private key.
-    */
-   gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 1024, 0);
+    /* Generate a 1024 bit RSA private key.
+     */
+    gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 1024, 0);
 
-   /* Add stuff to the distinguished name
-    */
-   gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COUNTRY_NAME,
-				     0, "GR", 2);
+    /* Add stuff to the distinguished name
+     */
+    gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COUNTRY_NAME,
+				  0, "GR", 2);
 
-   gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COMMON_NAME,
-				     0, "Nikos", strlen("Nikos"));
+    gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COMMON_NAME,
+				  0, "Nikos", strlen("Nikos"));
 
-   /* Set the request version.
-    */
-   gnutls_x509_crq_set_version(crq, 1);
+    /* Set the request version.
+     */
+    gnutls_x509_crq_set_version(crq, 1);
 
-   /* Set a challenge password.
-    */
-   gnutls_x509_crq_set_challenge_password(crq, "something to remember here");
+    /* Set a challenge password.
+     */
+    gnutls_x509_crq_set_challenge_password(crq,
+					   "something to remember here");
 
-   /* Associate the request with the private key
-    */
-   gnutls_x509_crq_set_key(crq, key);
+    /* Associate the request with the private key
+     */
+    gnutls_x509_crq_set_key(crq, key);
 
-   /* Self sign the certificate request.
-    */
-   gnutls_x509_crq_sign(crq, key);
+    /* Self sign the certificate request.
+     */
+    gnutls_x509_crq_sign(crq, key);
 
-   /* Export the PEM encoded certificate request, and
-    * display it.
-    */
-   gnutls_x509_crq_export(crq, GNUTLS_X509_FMT_PEM, buffer,
-			      &buffer_size);
+    /* Export the PEM encoded certificate request, and
+     * display it.
+     */
+    gnutls_x509_crq_export(crq, GNUTLS_X509_FMT_PEM, buffer, &buffer_size);
 
-   printf("Certificate Request: \n%s", buffer);
+    printf("Certificate Request: \n%s", buffer);
 
 
-   /* Export the PEM encoded private key, and
-    * display it.
-    */
-   buffer_size = sizeof(buffer);
-   gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM, buffer,
-				  &buffer_size);
+    /* Export the PEM encoded private key, and
+     * display it.
+     */
+    buffer_size = sizeof(buffer);
+    gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM, buffer,
+			       &buffer_size);
 
-   printf("\n\nPrivate key: \n%s", buffer);
+    printf("\n\nPrivate key: \n%s", buffer);
 
-   gnutls_x509_crq_deinit(crq);
-   gnutls_x509_privkey_deinit(key);
+    gnutls_x509_crq_deinit(crq);
+    gnutls_x509_privkey_deinit(key);
 
-   return 0;
+    return 0;
 
 }
-
