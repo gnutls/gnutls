@@ -16,7 +16,10 @@
 
 /* for big numbers support */ /* FIXME */
 #include <gcrypt.h>
+
+#ifdef USE_DMALLOC
 #include <dmalloc.h>
+#endif
 
 #define GNUTLS_MPI MPI
 #define gnutls_mpi_release mpi_release

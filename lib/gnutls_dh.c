@@ -23,8 +23,6 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 
-#include <dmalloc.h>
-
 /* Taken from gsti */
 
 static const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,

@@ -13,7 +13,9 @@
 #undef T_VENDOR
 #undef T_OS
 
-LT_CURRENT
-LT_REVISION
-LT_AGE
+#undef LT_CURRENT
+#undef LT_REVISION
+#undef LT_AGE
+#undef USE_DMALLOC
+
  
