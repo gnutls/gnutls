@@ -173,6 +173,7 @@ int main(int argc, char** argv)
 	struct timeval tv;
 	int user_term = 0;
 	SRP_CLIENT_CREDENTIALS cred;
+	ANON_CLIENT_CREDENTIALS anon_cred;
 	X509PKI_CLIENT_CREDENTIALS xcred;
 	struct hostent* server_host;
 	
@@ -210,6 +211,12 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 	gnutls_srp_set_client_cred( cred, "test", "test");
+
+	/* ANON stuff */
+	if (gnutls_anon_allocate_client_sc( &anon_cred)<0) {
+		fprintf(stderr, "memory error\n");
+		exit(1);
+	}
 	
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
@@ -235,9 +242,9 @@ int main(int argc, char** argv)
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 
-	gnutls_set_cred( state, GNUTLS_ANON, NULL);
-	gnutls_set_cred( state, GNUTLS_SRP, cred);
-	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
+	gnutls_set_cred( state, GNUTLS_ANON, anon_cred);
+//	gnutls_set_cred( state, GNUTLS_SRP, cred);
+//	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
 
 /* This TLS extension may break old implementations.
  */
@@ -413,6 +420,7 @@ int main(int argc, char** argv)
 
 	gnutls_srp_free_client_sc( cred);
 	gnutls_x509pki_free_client_sc( xcred);
+	gnutls_anon_free_client_sc( anon_cred);
 
 	gnutls_global_deinit();
 	

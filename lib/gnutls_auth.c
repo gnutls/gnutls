@@ -67,7 +67,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
   * structure. Thus you will have to keep the structure allocated until   
   * you call gnutls_deinit(). ]
   *
-  * For GNUTLS_ANON cred should be NULL in case of a client.
+  * For GNUTLS_ANON cred should be ANON_CLIENT_CREDENTIALS in case of a client.
   * In case of a server it should be ANON_SERVER_CREDENTIALS.
   * 
   * For GNUTLS_SRP cred should be SRP_CLIENT_CREDENTIALS

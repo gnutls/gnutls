@@ -19,16 +19,16 @@ in order to use the TLS ciphersuites which require X.509 certificates.
 \begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
 \hline
-RSA & The RSA algorithm is used to encrypt a key and send it to the peer.
+X509PKI\_RSA & The RSA algorithm is used to encrypt a key and send it to the peer.
 The certificate must allow the key to be used for encryption.
 \\
 \hline
-DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
+X509PKI\_DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
 parameters which are send to the peer. The key in the certificate must allow
 the key to be used for signing 
 \\
 \hline
-DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
+X509PKI\_DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
 parameters which are send to the peer. Currently \gnutls does not support this ciphersuite.
 \\
 \hline

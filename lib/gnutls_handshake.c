@@ -376,7 +376,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 					      compression_method,
 					      &data[pos], z);
 #ifdef HANDSHAKE_DEBUG
-	_gnutls_log("Selected Compression Method: %s\n",
+	_gnutls_log("*** Selected Compression Method: %s\n",
 		    gnutls_compression_get_name(state->gnutls_internals.
 						compression_method));
 #endif
@@ -518,7 +518,7 @@ static int _gnutls_server_SelectSuite(GNUTLS_STATE state, opaque ret[2],
 			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
 			    0) {
 #ifdef HANDSHAKE_DEBUG
-				_gnutls_log("Selected cipher suite: ");
+				_gnutls_log("*** Selected cipher suite: ");
 				_gnutls_log("%s\n",
 					    _gnutls_cipher_suite_get_name(*
 									  ((GNUTLS_CipherSuite *) & data[j])));
@@ -996,7 +996,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	       cipher_suite.CipherSuite, 2);
 
 #ifdef HANDSHAKE_DEBUG
-	_gnutls_log("Selected cipher suite: ");
+	_gnutls_log("Hnadshake: Selected cipher suite: ");
 	_gnutls_log("%s\n",
 		    _gnutls_cipher_suite_get_name(state->
 						  security_parameters.
@@ -1139,11 +1139,23 @@ static int _gnutls_send_client_hello( GNUTLS_STATE state, int again)
 		pos += session_id_len;
 
 		ret = _gnutls_supported_ciphersuites_sorted(state, &cipher_suites);
-		if (ret<0) {
+		if (ret < 0) {
 			gnutls_free(data);
 			gnutls_assert();
 			return ret;
 		}
+
+		/* Here we remove any ciphersuite that does not conform
+		 * the certificate requested, or to the
+		 * authentication requested (eg SRP).
+		 */
+		ret = _gnutls_remove_unwanted_ciphersuites(state, &cipher_suites, ret);
+		if (ret < 0) {
+			gnutls_free(data);
+			gnutls_assert();
+			return ret;
+		}
+
 
 		x = ret;
 		x *= sizeof(uint16);	/* in order to get bytes */
@@ -1253,7 +1265,7 @@ static int _gnutls_send_server_hello( GNUTLS_STATE state, int again)
 		pos += session_id_len;
 
 #ifdef HANDSHAKE_DEBUG
-		_gnutls_log("Handshake: SessionID: %s\n",
+		_gnutls_log("*** SessionID: %s\n",
 			    _gnutls_bin2hex(SessionID, session_id_len));
 #endif
 
@@ -1873,11 +1885,6 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	int alg_size;
 	KXAlgorithm kx;
 
-	/* ONLY USED IN CASE OF A SERVER.
-	 */
-	 
-	if (state->security_parameters.entity == GNUTLS_CLIENT)
-		return 0;
 
 	/* if we should use a specific certificate, 
 	 * we should remove all algorithms that are not supported
@@ -1893,8 +1900,9 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 
 	cert = NULL;
 
-	cert =
-	    _gnutls_server_find_x509_cert(state);
+	if (state->security_parameters.entity == GNUTLS_SERVER) 
+		cert =
+		    _gnutls_server_find_x509_cert(state);
 
 	if (cert == NULL) {
 		/* No certificate was found 
@@ -1934,16 +1942,19 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 		 */
 		if (_gnutls_map_kx_get_cred(kx) == GNUTLS_X509PKI) {
 			keep = 1;	/* do not keep */
-			if (x509_cred != NULL)
-				/* here we check if the KX algorithm 
-				 * is compatible with the X.509 certificate.
-				 */
-				for (j = 0; j < alg_size; j++) {
-					if (alg[j] == kx) {
-						keep = 0;
-						break;
+			if (x509_cred != NULL) {
+				if (state->security_parameters.entity == GNUTLS_SERVER) {
+					/* here we check if the KX algorithm 
+					 * is compatible with the X.509 certificate.
+					 */
+					for (j = 0; j < alg_size; j++) {
+						if (alg[j] == kx) {
+							keep = 0;
+							break;
+						}
 					}
-				}
+				} else 	/* CLIENT */ keep = 0;
+			}
 		} else {
 
 		/* if it is defined but had no credentials 
@@ -1954,9 +1965,23 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 		}
 				
 		if (keep == 0) {
+#ifdef HANDSHAKE_DEBUG
+			_gnutls_log("*** Keeping ciphersuite: ");
+			_gnutls_log("%s\n",
+					    _gnutls_cipher_suite_get_name(*
+									  ((GNUTLS_CipherSuite *) & (*cipherSuites)[i].CipherSuite)));
+#endif
 			memcpy(newSuite[newSuiteSize].CipherSuite,
 			       (*cipherSuites)[i].CipherSuite, 2);
 			newSuiteSize++;
+#ifdef HANDSHAKE_DEBUG
+		} else {
+			_gnutls_log("*** Removing ciphersuite: ");
+			_gnutls_log("%s\n",
+					    _gnutls_cipher_suite_get_name(*
+									  ((GNUTLS_CipherSuite *) & (*cipherSuites)[i].CipherSuite)));
+
+#endif
 		}
 	}
 

@@ -27,7 +27,7 @@
 #include "gnutls_gcry.h"
 
 /**
-  * gnutls_free_anon_server_sc - Used to free an allocated ANON_SERVER_CREDENTIALS structure
+  * gnutls_anon_free_server_sc - Used to free an allocated ANON_SERVER_CREDENTIALS structure
   * @sc: is an &ANON_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
@@ -39,7 +39,7 @@ void gnutls_anon_free_server_sc( ANON_SERVER_CREDENTIALS sc) {
 }
 
 /**
-  * gnutls_allocate_anon_server_sc - Used to allocate an ANON_SERVER CREDENTIALS structure
+  * gnutls_anon_allocate_server_sc - Used to allocate an ANON_SERVER CREDENTIALS structure
   * @sc: is a pointer to an &ANON_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
@@ -68,3 +68,34 @@ int gnutls_anon_set_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits) {
 	return 0;
 }
 
+/**
+  * gnutls_anon_free_client_sc - Used to free an allocated ANON_CLIENT_CREDENTIALS structure
+  * @sc: is an &ANON_CLIENT_CREDENTIALS structure.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to free (deallocate)
+  * the structure.
+  **/
+void gnutls_anon_free_client_sc( ANON_CLIENT_CREDENTIALS sc) {
+	gnutls_free(sc);
+}
+
+const static int anon_tmp;
+
+/**
+  * gnutls_allocate_anon_client_sc - Used to allocate an ANON_CLIENT CREDENTIALS structure
+  * @sc: is a pointer to an &ANON_CLIENT_CREDENTIALS structure.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to allocate
+  * the structure.
+  **/
+int gnutls_anon_allocate_client_sc( ANON_CLIENT_CREDENTIALS *sc) {
+	/* anon_tmp is only there for *sc not to be null.
+	 * it is not used at all;
+	 */
+	*sc = (void*) &anon_tmp;
+	
+	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
+	return 0;
+}
