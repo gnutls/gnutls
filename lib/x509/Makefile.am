@@ -6,23 +6,21 @@ EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
 noinst_LTLIBRARIES = libx509.la
 #lib_LTLIBRARIES = libgnutls-x509.la
 
-COBJECTS1 = crl.c dn.c common.c x509.c extensions.c \
-	rfc2818_hostname.c verify.c mpi.c privkey.c pkcs7.c
-
-# Extra stuff that will only be put in gnutls-x509 library.
-COBJECTS2 = crq.c xml.c sign.c pkcs5.c privkey_pkcs8.c
+COBJECTS = crl.c dn.c common.c x509.c extensions.c \
+	rfc2818_hostname.c verify.c mpi.c privkey.c pkcs7.c \
+	crq.c xml.c sign.c pkcs5.c privkey_pkcs8.c
 
 COMPAT_OBJECTS = compat.c
 
 
-libx509_la_SOURCES = $(COBJECTS1) $(COMPAT_OBJECTS) $(COBJECTS2)
+libx509_la_SOURCES = $(COBJECTS) $(COMPAT_OBJECTS)
 
 #libgnutls_x509_la_SOURCES = $(COBJECTS2)
 
 #libgnutls_x509_la_LIBADD = ../libgnutls.la
 #libgnutls_x509_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-x509-api.tex: $(COBJECTS1) $(COBJECTS2)
+x509-api.tex: $(COBJECTS)
 	@echo "" > x509-api.tex
 	@for i in $(COBJECTS); \
 	do echo -n "Creating documentation for file $$i... " && ../../doc/scripts/gdoc -tex $$i >> x509-api.tex \

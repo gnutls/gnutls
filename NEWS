@@ -1,4 +1,4 @@
-Version 0.9.3
+Version 0.9.3 (24/03/2003)
 - Support for MD2 was dropped. 
 - Improved the error logging functions, by adding a level, and
   by allowing debugging messages just by increasing the level.
