@@ -617,12 +617,12 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag)
 		}
 	} else {
 		result = _gnutls_x509_der_encode_and_copy( safe_cont, "", c2, "?LAST.content", 1);
-		if (result != ASN1_SUCCESS) {
+		if (result < 0) {
 			gnutls_assert();
-			result = _gnutls_asn2err(result);
 			goto cleanup;
 		}
 	}
+
 	asn1_delete_structure(&safe_cont);
 
 	

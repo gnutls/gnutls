@@ -1230,7 +1230,11 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn, const char *root,
 	}
 
 	decrypted_data->data = data;
-	decrypted_data->size = data_size - data[data_size - 1];
+
+	if ( _gnutls_cipher_get_block_size(enc_params->cipher) != 1) 
+		decrypted_data->size = data_size - data[data_size - 1];
+	else
+		decrypted_data->size = data_size;
 
 	_gnutls_cipher_deinit(ch);
 
@@ -1579,20 +1583,27 @@ static int encrypt_data( const gnutls_datum * plain,
 	opaque *data = NULL;
 	gnutls_datum div;
 	GNUTLS_CIPHER_HANDLE ch = NULL;
-	opaque pad;
+	opaque pad, pad_size;
 
-	data = gnutls_malloc(plain->size + 8);
+	pad_size = _gnutls_cipher_get_block_size(enc_params->cipher);
+	
+	if (pad_size == 1) /* stream */ pad_size = 0;
+
+	data = gnutls_malloc(plain->size + pad_size);
 	if (data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	memcpy(data, plain->data, plain->size);
-	pad = 8 - (plain->size % 8);
-	if (pad == 0)
-		pad = 8;
 
-	memset(&data[plain->size], pad, pad);
+	if (pad_size > 0) {
+		pad = pad_size - (plain->size % pad_size);
+		if (pad == 0)
+			pad = pad_size;
+		memset(&data[plain->size], pad, pad);
+	} else pad = 0;
+
 	data_size = plain->size + pad;
 
 	div.data = (opaque *) enc_params->iv;
@@ -1820,7 +1831,7 @@ int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,
 	/* Now write the rest of the pkcs-7 stuff.
 	 */
 
-	result = _gnutls_x509_write_uint32( pkcs7_asn, "version", 4);
+	result = _gnutls_x509_write_uint32( pkcs7_asn, "version", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -1828,6 +1839,14 @@ int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,
 
 	result =
 	    asn1_write_value(pkcs7_asn, "encryptedContentInfo.contentType", DATA_OID, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	result =
+	    asn1_write_value(pkcs7_asn, "unprotectedAttrs", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
