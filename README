@@ -12,6 +12,10 @@ real world programs)
 
 BUGS:
 
-There should be plenty, but if you think you found any 
-report it to bug-gnutls@gnu.org
+Currently gnuTLS needs a lot of testing. By notifying the developers
+about a possible bug you may help a lot, since testing is really
+important (and expensive). If you think you found a bug,
+report it to bug-gnutls@gnu.org, together with the needed information,
+in order for developers to reproduce it.
+
 

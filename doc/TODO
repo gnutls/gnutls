@@ -9,10 +9,10 @@ Current list:
 * Add support for PKCS12
 * Add support for certificates with DSS parameters
 * Add function to return the certificate verification path
+* Add TLS more extensions
 * Tools for processing/generating certificates
 * OpenPGP certificate support (through libgcrypt)
 - Add Kerberos support
-- Add WTLS support
 
 (+) Means high priority 
 (*) Means medium priority
