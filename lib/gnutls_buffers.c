@@ -274,7 +274,7 @@ static ssize_t _gnutls_read( GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, i
  */
 int _gnutls_io_clear_peeked_data( GNUTLS_STATE state) {
 char peekdata1[10];
-char *peekdata2;
+char *peekdata2 = NULL;
 char * peek;
 int ret, sum;
 
@@ -301,6 +301,9 @@ int ret, sum;
         	if (ret > 0) sum+=ret;
        	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN || sum < RCVLOWAT);
 
+	/* This check is here to see if peekdata2 is malloced or
+	 * not. This is not clean I know.
+	 */
 	if (peek==peekdata2) {
 		gnutls_free(peekdata2);
 	}
