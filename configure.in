@@ -97,7 +97,7 @@ fi
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h pwd.h locale.h strings.h stdarg.h)
-AC_CHECK_HEADERS(sys/stat.h sys/types.h fcntl.h sys/wait.h)
+AC_CHECK_HEADERS(sys/stat.h sys/types.h fcntl.h sys/wait.h sys/socket.h)
 AC_CHECK_HEADERS(utime.h signal.h zlib.h)
 AC_CHECK_HEADERS(termios.h termio.h sgtty.h)
 AC_CHECK_FUNCS(bzero signal sigaction memset fcntl fsync siglongjmp,,)

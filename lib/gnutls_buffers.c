@@ -108,7 +108,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 	return length;
 }
 
-ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr)
+ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 {
 	size_t left;
 	ssize_t i=0;
@@ -120,7 +120,7 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr)
 
 	left = sizeOfPtr;
 	while (left > 0) {
-		i = read(fd, &ptr[i], left);
+		i = recv(fd, &ptr[i], left, flag);
 		if (i < 0) {
 			return -1;
 		} else {

@@ -6,3 +6,9 @@
 * Add support for v2.0 init packet
 * Resume old sessions
 * Add support for compression algorithms (zlib)
+
+- functions needed:
+* gnutls_get_current_cipher();
+* gnutls_get_current_kx_method();
+* gnutls_get_current_compression_method();
+* gnutls_check_pending(); - if data exist in the buffer

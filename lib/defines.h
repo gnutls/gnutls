@@ -30,6 +30,9 @@
 # include <unistd.h>
 #endif
 
+#ifdef HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif
 
 #if SIZEOF_UNSIGNED_LONG_INT == 8
  typedef unsigned long int uint64;

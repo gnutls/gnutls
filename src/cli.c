@@ -33,14 +33,14 @@
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
-#define MAX_BUF 100
+#define MAX_BUF 50
 
 #define MAX(X,Y) (X >= Y ? X : Y);
 
 int main()
 {
 	int err, ret;
-	int sd;
+	int sd, ii;
 	struct sockaddr_in sa;
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF];
@@ -149,7 +149,11 @@ int main()
 					break;
 				}
 			} else {
-				fprintf(stdout, "Received: %s\n", buffer);
+				fprintf(stdout, "Received: ");
+				for (ii=0;ii<MAX_BUF;ii++) {
+					fputc(buffer[ii], stdout);
+				}
+				fputs("\n", stdout);
 			}
 			if (user_term!=0) break;
 		}

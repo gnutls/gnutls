@@ -114,6 +114,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->security_parameters.session_id_size = 0;
 	(*state)->gnutls_internals.resumed_security_parameters.session_id_size = 0;
 	(*state)->gnutls_internals.resumed = RESUME_FALSE;
+
+	(*state)->gnutls_internals.peek_data_size = 0;
 	return 0;
 }
 
@@ -498,7 +500,7 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 #define MAX_RECV_SIZE 18432 	/* 2^14+2048 */
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata)
 {
-	uint8 *tmpdata;
+	uint8 *tmpdata, *peekdata;
 	int tmplen;
 	GNUTLS_Version version;
 	uint8 recv_type;
@@ -511,6 +513,18 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	 */
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && gnutls_getDataBufferSize(type, state) > 0) {
 		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
+
+		if (type==GNUTLS_APPLICATION_DATA) {
+			if (gnutls_getDataBufferSize(type, state)==0) {
+				sizeofdata = state->gnutls_internals.peek_data_size;
+			}
+			peekdata = gnutls_malloc(sizeofdata);
+			/* these were already read by using MSG_PEEK - so it shouldn't fail */
+			_gnutls_Read( cd, peekdata, sizeofdata, 0); 
+			gnutls_free(peekdata);			
+
+			state->gnutls_internals.peek_data_size -= sizeofdata;
+		}
 		return ret;
 	}
 
@@ -518,7 +532,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
-	if ( _gnutls_Read(cd, &recv_type, 1) != 1) {
+	if ( _gnutls_Read(cd, &recv_type, 1, 0) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) return 0; /* we were expecting close notify */
 		state->gnutls_internals.resumable = RESUME_FALSE;
@@ -527,14 +541,14 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	}
 	version.local = 0; /* TLS/SSL 3.0 */
 	
-	if (_gnutls_Read(cd, &version.major, 1) != 1) {
+	if (_gnutls_Read(cd, &version.major, 1, 0) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	if (_gnutls_Read(cd, &version.minor, 1) != 1) {
+	if (_gnutls_Read(cd, &version.minor, 1, 0) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -553,7 +567,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		gnutls_set_current_version(state, version);
 	}
 
-	if (_gnutls_Read(cd, &length, 2) != 2) {
+	if (_gnutls_Read(cd, &length, 2, 0) != 2) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -585,7 +599,12 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 	/* read ciphertext */
 
-	ret = _gnutls_Read(cd, ciphertext, length);
+	if ( type==GNUTLS_APPLICATION_DATA) {
+		state->gnutls_internals.peek_data_size = _gnutls_Read(cd, ciphertext, length, MSG_PEEK);
+		ret = state->gnutls_internals.peek_data_size;
+	} else {
+		ret = _gnutls_Read(cd, ciphertext, length, 0);
+	}
 
 	if (ret != length) {
 #ifdef DEBUG
@@ -683,6 +702,17 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	/* Get Application data from buffer */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
 		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
+		if (type==GNUTLS_APPLICATION_DATA) {
+			if (gnutls_getDataBufferSize(type, state)==0) {
+				sizeofdata = state->gnutls_internals.peek_data_size;
+			}				
+			peekdata = gnutls_malloc(sizeofdata);
+			/* these were already read by using MSG_PEEK - so it shouldn't fail */
+			_gnutls_Read( cd, peekdata, sizeofdata, 0); 
+			gnutls_free(peekdata);			
+
+			state->gnutls_internals.peek_data_size -= sizeofdata;
+		}
 		gnutls_free(tmpdata);
 	} else {
 		if (recv_type != type) {
