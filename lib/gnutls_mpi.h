@@ -1,5 +1,5 @@
-#ifndef GNUTLS_GCRY_H
-# define GNUTLS_GCRY_H
+#ifndef GNUTLS_MPI_H
+# define GNUTLS_MPI_H
 
 # include <gcrypt.h>
 # include <x509_asn1.h>

@@ -97,9 +97,7 @@ typedef const int* GNUTLS_LIST;
 typedef unsigned char opaque;
 typedef struct { opaque pint[3]; } uint24;
 
-#ifdef USE_GCRYPT
-# include <gnutls_gcry.h>
-#endif
+# include <gnutls_mpi.h>
 
 typedef enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 } crypt_algo;
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;

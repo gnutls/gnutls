@@ -13,7 +13,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_auth_int.h crypt_bcrypt.h gnutls_random.h crypt_srpsha1.h \
 	x509_b64.h gnutls_srp.h auth_srp.h auth_srp_passwd.h gnutls_v2_compat.h \
 	crypt.h libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
-	x509_asn1.h x509_der.h gnutls_datum.h auth_cert.h gnutls_gcry.h \
+	x509_asn1.h x509_der.h gnutls_datum.h auth_cert.h gnutls_mpi.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
@@ -33,7 +33,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	crypt_bcrypt.c crypt.c gnutls_random.c crypt_srpsha1.c gnutls_srp.c \
 	auth_srp.c auth_srp_passwd.c gnutls_v2_compat.c auth_srp_sb64.c \
 	gnutls_datum.c auth_rsa.c gnutls_session_pack.c \
-	gnutls_gcry.c gnutls_pk.c gnutls_cert.c x509_verify.c\
+	gnutls_mpi.c gnutls_pk.c gnutls_cert.c x509_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
 	x509_sig_check.c pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c \
 	x509_extensions.c auth_cert.c gnutls_ui.c gnutls_sig.c auth_dhe.c \
