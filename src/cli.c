@@ -30,14 +30,15 @@
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
+#define MAX_BUF 100
 
 int main()
 {
 	int err, ret;
-	int sd;
+	int sd, pid;
 	struct sockaddr_in sa;
 	GNUTLS_STATE state;
-	char buffer[100];
+	char buffer[MAX_BUF];
 
 //      signal(SIGPIPE, SIG_IGN);
 
@@ -60,42 +61,40 @@ int main()
 		gnutls_perror(ret);
 		return 1;
 	} else {
-		fprintf(stderr, "Handshake was finished\n");
+		fprintf(stderr, "Handshake was completed\n\n");
 	}
 
-	bzero(buffer, sizeof(buffer));
-	ret = gnutls_recv(sd, state, buffer, 5);
-	if (gnutls_is_fatal_error(ret) == 1) {
-		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
-			fprintf(stderr,
-				"Peer has closed the GNUTLS connection\n");
-			return 0;
-		} else {
-			fprintf(stderr, "Received corrupted data(%d)\n",
-				ret);
-			return 1;
+	if ( pid = fork() == 0) {
+		for(;;) {
+			bzero(buffer, MAX_BUF);
+			ret=gnutls_recv(sd, state, buffer, MAX_BUF);
+			if (gnutls_is_fatal_error(ret) == 1) {
+				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
+					fprintf(stderr,
+						"Peer has closed the GNUTLS connection\n");
+					break;
+				} else {
+					fprintf(stderr, "Received corrupted data(%d)\n",
+						ret);
+					break;
+				}
+			} else {
+				fprintf(stdout, "Received: %s\n", buffer);
+			}
 		}
-	} else {
-		fprintf(stdout, "Received: %s\n", buffer);
+		kill(getppid(), SIGTERM);
+		return 0;
 	}
-
-	ret = gnutls_recv(sd, state, buffer, 10);
-	if (gnutls_is_fatal_error(ret) == 1) {
-		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
-			fprintf(stderr,
-				"Peer has closed the GNUTLS connection\n");
-			return 0;
-		} else {
-			fprintf(stderr, "Received corrupted data(%d)\n",
-				ret);
-			return 1;
-		}
-	} else {
-		fprintf(stdout, "Received: %s\n", buffer);
+	/* parent */
+	
+	while( fgets(buffer, MAX_BUF, stdin) != NULL) {
+		buffer[strlen(buffer)-1] = '\0';
+		gnutls_send( sd, state, buffer, strlen(buffer));
 	}
 	gnutls_close(sd, state);
 
-	close(sd);
+	shutdown( sd, SHUT_WR);
+
 	gnutls_deinit(&state);
 	return 0;
 }

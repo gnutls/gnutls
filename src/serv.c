@@ -29,71 +29,88 @@
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
+#define MAX_BUF 100
 
 int main()
 {
-	int err, listen_sd;
-	int sd, ret;
-	struct sockaddr_in sa_serv;
-	struct sockaddr_in sa_cli;
-	int client_len, i;
-	char topbuf[512];
-	GNUTLS_STATE state;
-	char *str;
-	char buf[4096];
+    int err, listen_sd;
+    int sd, ret;
+    struct sockaddr_in sa_serv;
+    struct sockaddr_in sa_cli;
+    int client_len, i;
+    char topbuf[512];
+    GNUTLS_STATE state;
+    char *str;
+    char buf[4096];
+    char buffer[MAX_BUF];
 
 
-	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
-	ERR(listen_sd, "socket");
+    listen_sd = socket(AF_INET, SOCK_STREAM, 0);
+    ERR(listen_sd, "socket");
 
-	memset(&sa_serv, '\0', sizeof(sa_serv));
-	sa_serv.sin_family = AF_INET;
-	sa_serv.sin_addr.s_addr = INADDR_ANY;
-	sa_serv.sin_port = htons(PORT);	/* Server Port number */
+    memset(&sa_serv, '\0', sizeof(sa_serv));
+    sa_serv.sin_family = AF_INET;
+    sa_serv.sin_addr.s_addr = INADDR_ANY;
+    sa_serv.sin_port = htons(PORT);	/* Server Port number */
 
-	err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
-	ERR(err, "bind");
-	err = listen(listen_sd, 1024);
-	ERR(err, "listen");
+    err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
+    ERR(err, "bind");
+    err = listen(listen_sd, 1024);
+    ERR(err, "listen");
 
-	client_len = sizeof(sa_cli);
-	for (;;) {
-		gnutls_init(&state, GNUTLS_SERVER);
-		sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
-
-
-		fprintf(stderr, "connection from %s, port %d\n",
-			inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
-				  sizeof(topbuf)), ntohs(sa_cli.sin_port));
+    client_len = sizeof(sa_cli);
+    for (;;) {
+	gnutls_init(&state, GNUTLS_SERVER);
+	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
 
+	fprintf(stderr, "connection from %s, port %d\n",
+		inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
+			  sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-		ret = gnutls_handshake(sd, state);
-		if (ret < 0) {
-			close(sd);
-			gnutls_deinit(&state);
-			fprintf(stderr, "Handshake has failed\n", ret);
-			gnutls_perror(ret);
-			continue;
-		}
-		fprintf(stderr, "Handshake was completed\n");
 
-		ret =
-		    gnutls_send(sd, state, "hello world\n",
-				sizeof("hello world\n"));
-		if (ret < 0) {
-			close(sd);
-			gnutls_deinit(&state);
-			gnutls_perror(ret);
-			continue;
-		}
-		fprintf(stderr, "Data was send (%d)\n", ret);
-		fprintf(stderr, "\n");
-		gnutls_close(sd, state);
-		close(sd);
-		gnutls_deinit(&state);
+
+	ret = gnutls_handshake(sd, state);
+	if (ret < 0) {
+	    close(sd);
+	    gnutls_deinit(&state);
+	    fprintf(stderr, "Handshake has failed\n", ret);
+	    gnutls_perror(ret);
+	    continue;
 	}
-	close(listen_sd);
-	return 0;
+	fprintf(stderr, "Handshake was completed\n");
+	fprintf(stderr, "Acting as echo server...");
+	ret =
+	    gnutls_send(sd, state, "hello client",
+			sizeof("hello client"));
+	if (ret < 0) {
+	    close(sd);
+	    gnutls_deinit(&state);
+	    gnutls_perror(ret);
+	    continue;
+	}
+	for (;;) {
+	    bzero( buffer, MAX_BUF);
+	    ret = gnutls_recv(sd, state, buffer, MAX_BUF);
+	    if (gnutls_is_fatal_error(ret) == 1) {
+		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
+		    fprintf(stderr,
+			    "\nPeer has closed the GNUTLS connection\n");
+		    break;
+		} else {
+		    fprintf(stderr, "\nReceived corrupted data\n");
+		    break;
+		}
+
+	    }
+	    gnutls_send(sd, state, buffer, strlen(buffer));
+	}
+	fprintf(stderr, "\n");
+	gnutls_close(sd, state);
+	close(sd);
+	gnutls_deinit(&state);
+    }
+    close(listen_sd);
+    return 0;
 
 }

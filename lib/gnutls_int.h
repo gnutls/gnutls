@@ -1,8 +1,8 @@
 #include <gcrypt.h>
 #include <mhash.h>
 
-#define HARD_DEBUG
-#define DEBUG
+#undef HARD_DEBUG
+#undef DEBUG
 
 #define svoid void /* for functions that allocate using secure_free */
 #define secure_free(x) if (x!=NULL) free(x)
