@@ -500,9 +500,11 @@ int _gnutls_server_find_pk_algos_in_ciphersuites( opaque* data, int datalen) {
 int j;
 gnutls_pk_algorithm algo=-1, prev_algo = 0;
 gnutls_kx_algorithm kx;
+GNUTLS_CipherSuite cs;
 
 	for (j = 0; j < datalen; j += 2) {
-		kx = _gnutls_cipher_suite_get_kx_algo(*((GNUTLS_CipherSuite *) & data[j]));
+		memcpy( &cs.CipherSuite, &data[j], 2);
+		kx = _gnutls_cipher_suite_get_kx_algo( cs);
 		
 		if ( _gnutls_map_kx_get_cred( kx, 1) == GNUTLS_CRD_CERTIFICATE) {
 			algo = _gnutls_map_pk_get_pk( kx);
@@ -522,7 +524,7 @@ gnutls_kx_algorithm kx;
 int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datalen)
 {
 	int x, i, j;
-	GNUTLS_CipherSuite *ciphers;
+	GNUTLS_CipherSuite *ciphers, cs;
 	int retval, err;
 	gnutls_pk_algorithm pk_algo; /* will hold the pk algorithms
 			      * supported by the peer.
@@ -549,11 +551,12 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	}
 
 #ifdef HANDSHAKE_DEBUG
+	memcpy( &cs.CipherSuite, &data[j], 2);
+
 	_gnutls_handshake_log("HSK[%x]: Requested cipher suites: \n", session);
 	for (j = 0; j < datalen; j += 2)
 		_gnutls_handshake_log("\t%s\n",
-			    _gnutls_cipher_suite_get_name(*
-							  ((GNUTLS_CipherSuite *) & data[j])));
+			    _gnutls_cipher_suite_get_name(cs));
 	_gnutls_handshake_log("HSK[%x]: Supported cipher suites: \n", session);
 	for (j = 0; j < x; j++)
 		_gnutls_handshake_log("\t%s\n",
@@ -567,9 +570,10 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		for (i = 0; i < x; i++) {
 			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
 			    0) {
+				memcpy( &cs.CipherSuite, &data[j], 2);
+
 				_gnutls_handshake_log("HSK[%x]: Selected cipher suite: %s\n",
-					    session, _gnutls_cipher_suite_get_name(*
-									  ((GNUTLS_CipherSuite *) & data[j])));
+					    session, _gnutls_cipher_suite_get_name(cs));
 				memcpy(session->security_parameters.current_cipher_suite.CipherSuite, ciphers[i].CipherSuite, 2);
 				retval = 0;
 				goto finish;
@@ -2289,7 +2293,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 {
 
 	int ret = 0;
-	GNUTLS_CipherSuite *newSuite;
+	GNUTLS_CipherSuite *newSuite, cs;
 	int newSuiteSize = 0, i, j, keep;
 	const gnutls_certificate_credentials x509_cred;
 	const gnutls_cert* cert = NULL;
@@ -2376,19 +2380,19 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 			}
 		}
 
+		memcpy( &cs.CipherSuite, &(*cipherSuites)[i].CipherSuite, 2);
+
 		if (keep == 0) {
 
 			_gnutls_handshake_log("HSK[%x]: Keeping ciphersuite: %s\n", session,
-				    _gnutls_cipher_suite_get_name(*
-								  ((GNUTLS_CipherSuite *) & (*cipherSuites)[i].CipherSuite)));
+				    _gnutls_cipher_suite_get_name(cs));
 
 			memcpy(newSuite[newSuiteSize].CipherSuite,
 			       (*cipherSuites)[i].CipherSuite, 2);
 			newSuiteSize++;
 		} else {
 			_gnutls_handshake_log("HSK[%x]: Removing ciphersuite: %s\n", session, 
-				    _gnutls_cipher_suite_get_name(*
-								  ((GNUTLS_CipherSuite *) & (*cipherSuites)[i].CipherSuite)));
+				    _gnutls_cipher_suite_get_name(cs));
 
 		}
 	}
