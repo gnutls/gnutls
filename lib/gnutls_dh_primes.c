@@ -373,10 +373,10 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
   **/
 int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	   gnutls_x509_crt_fmt format, unsigned char* params_data, 
-	   unsigned int* params_data_size)
+	   size_t* params_data_size)
 {
 	ASN1_TYPE c2;
-	int result;
+	int result, _params_data_size;
 	size_t g_size, p_size;
 	opaque * p_data, *g_data;
 	opaque * all_data;
@@ -440,17 +440,18 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	if (format == GNUTLS_X509_FMT_DER) {
 		if (params_data == NULL) *params_data_size = 0;
 
-		if ((result=asn1_der_coding( c2, "", params_data, params_data_size, NULL)) != ASN1_SUCCESS) {
+		_params_data_size = *params_data_size;
+		result=asn1_der_coding( c2, "", params_data, &_params_data_size, NULL);
+		*params_data_size = _params_data_size;
+		asn1_delete_structure(&c2);
+		
+		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
-			asn1_delete_structure(&c2);
-			
 			if (result == ASN1_MEM_ERROR)
 				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
 			return _gnutls_asn2err(result);
 		}
-
-		asn1_delete_structure(&c2);
 
 	} else { /* PEM */
 		opaque *tmp;

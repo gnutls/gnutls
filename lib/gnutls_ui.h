@@ -62,11 +62,15 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session);
 int gnutls_certificate_client_get_request_status(  gnutls_session);
 int gnutls_certificate_verify_peers( gnutls_session);
 
-int gnutls_pem_base64_encode( const char* header, const gnutls_datum *data, char* result, int* result_size);
-int gnutls_pem_base64_decode( const char* header, const gnutls_datum *b64_data, char* result, int* result_size);
+int gnutls_pem_base64_encode( const char* header, const gnutls_datum *data, 
+	char* result, size_t* result_size);
+int gnutls_pem_base64_decode( const char* header, const gnutls_datum *b64_data, 
+	unsigned char* result, size_t* result_size);
 
-int gnutls_pem_base64_encode_alloc( const char* header, const gnutls_datum *data, gnutls_datum * result);
-int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, gnutls_datum* result);
+int gnutls_pem_base64_encode_alloc( const char* header, const gnutls_datum *data, 
+	gnutls_datum * result);
+int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, 
+	gnutls_datum* result);
 
 # endif /* LIBGNUTLS_VERSION */
 

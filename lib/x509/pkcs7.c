@@ -188,6 +188,9 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 {
 	int result = 0, need_free = 0;
 	gnutls_datum _data;
+
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
 	
 	_data.data = data->data;
 	_data.size = data->size;
@@ -254,7 +257,8 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	char counter[MAX_INT_DIGITS];
 	gnutls_datum tmp = {NULL, 0};
 
-	if (certificate_size == NULL) return GNUTLS_E_INVALID_REQUEST;
+	if (certificate_size == NULL || pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
 
 	/* Step 1. decode the signed data.
 	 */
@@ -340,6 +344,9 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, count;
 
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
 	/* Step 1. decode the signed data.
 	 */
 	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
@@ -385,6 +392,9 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
 	return _gnutls_x509_export_int( pkcs7->pkcs7, format, PEM_PKCS7, *output_data_size,
 		output_data, output_data_size);
 }
@@ -474,6 +484,9 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
 
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
 	/* Step 1. decode the signed data.
 	 */
 	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
@@ -538,6 +551,45 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 }
 
 /**
+  * gnutls_pkcs7_set_certificate2 - This function adds a parsed certificate in a PKCS7 certificate set
+  * @pkcs7_struct: should contain a gnutls_pkcs7 structure
+  * @crt: the certificate to be copied.
+  *
+  * This function will add a parsed certificate to the PKCS7 or RFC2630 certificate set.
+  * This is a wrapper function over gnutls_pkcs7_set_certificate() .
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7, 
+	gnutls_x509_crt crt)
+{
+	int ret;
+	gnutls_datum data;
+
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
+	ret = _gnutls_x509_der_encode( crt->cert, "", &data, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	
+	ret = gnutls_pkcs7_set_certificate( pkcs7, &data);
+
+	_gnutls_free_datum( &data);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+
+/**
   * gnutls_pkcs7_delete_certificate - This function deletes a certificate from a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @indx: the index of the certificate to delete
@@ -553,9 +605,11 @@ int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
 	char counter[MAX_INT_DIGITS];
 	char root2[64];
 
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
 	/* Step 1. Decode the signed data.
 	 */
-
 	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
 	if (result < 0) {
 		gnutls_assert();
@@ -621,7 +675,8 @@ int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7,
 	gnutls_datum tmp = {NULL, 0};
 	int start, end;
 
-	if (crl_size == NULL) return GNUTLS_E_INVALID_REQUEST;
+	if (pkcs7==NULL || crl_size == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
 
 	/* Step 1. decode the signed data.
 	 */
@@ -686,6 +741,9 @@ int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7)
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, count;
 
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
 	/* Step 1. decode the signed data.
 	 */
 	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
@@ -712,17 +770,20 @@ int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7)
 /**
   * gnutls_pkcs7_set_crl - This function adds a crl in a PKCS7 crl set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
-  * @crt: the DER encoded crl to be added
+  * @crl: the DER encoded crl to be added
   *
   * This function will add a crl to the PKCS7 or RFC2630 crl set.
   * Returns 0 on success.
   *
   **/
 int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, 
-	const gnutls_datum* crt)
+	const gnutls_datum* crl)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
+
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
 
 	/* Step 1. decode the signed data.
 	 */
@@ -756,7 +817,7 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7,
 		goto cleanup;	
 	}
 
-	result = asn1_write_value(c2, "crls.?LAST", crt->data, crt->size);
+	result = asn1_write_value(c2, "crls.?LAST", crl->data, crl->size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -781,6 +842,42 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7,
 }
 
 /**
+  * gnutls_pkcs7_set_crl2 - This function adds a parsed crl in a PKCS7 crl set
+  * @pkcs7_struct: should contain a gnutls_pkcs7 structure
+  * @crl: the DER encoded crl to be added
+  *
+  * This function will add a parsed crl to the PKCS7 or RFC2630 crl set.
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs7_set_crl2(gnutls_pkcs7 pkcs7, 
+	gnutls_x509_crl crl)
+{
+	int ret;
+	gnutls_datum data;
+
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
+	ret = _gnutls_x509_der_encode( crl->crl, "", &data, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = gnutls_pkcs7_set_crl( pkcs7, &data);
+	
+	_gnutls_free_datum( &data);
+	
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
+
+/**
   * gnutls_pkcs7_delete_crl - This function deletes a crl from a PKCS7 crl set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @indx: the index of the crl to delete
@@ -796,9 +893,11 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx)
 	char counter[MAX_INT_DIGITS];
 	char root2[64];
 
+	if (pkcs7 == NULL) 
+		return GNUTLS_E_INVALID_REQUEST;
+
 	/* Step 1. Decode the signed data.
 	 */
-
 	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
 	if (result < 0) {
 		gnutls_assert();

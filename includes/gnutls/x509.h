@@ -179,14 +179,14 @@ int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
 
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx, 
 	unsigned char* certificate, size_t* certificate_size);
-int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, 
-	const gnutls_datum* crt);
+int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, const gnutls_datum* crt);
+int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7, gnutls_x509_crt crt);
 
 int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
 	int indx, unsigned char* crl, size_t* crl_size);
 int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7);
-int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, 
-	const gnutls_datum* crt);
+int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, const gnutls_datum* crt);
+int gnutls_pkcs7_set_crl2(gnutls_pkcs7 pkcs7, gnutls_x509_crl crl);
 int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx);
 
 

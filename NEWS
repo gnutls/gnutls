@@ -1,6 +1,8 @@
 Version 0.9.97
 - The certtool utility can now generate PKCS #12 structures
   without specifying a certificate.
+- Corrected some functions which return GNUTLS_E_SHORT_MEMORY_BUFFER
+  to properly set the required buffer size.
 
 Version 0.9.96 (09/11/2003)
 - Some changes to allow compilation with mingw32.

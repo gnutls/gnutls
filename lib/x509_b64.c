@@ -281,7 +281,8 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
   * the terminating null.
   * 
   **/
-int gnutls_pem_base64_encode( const char* msg, const gnutls_datum *data, char* result, int* result_size) {
+int gnutls_pem_base64_encode( const char* msg, const gnutls_datum *data, char* result, 
+	size_t* result_size) {
 opaque* ret;
 int size;
 
@@ -488,7 +489,8 @@ int _gnutls_fbase64_decode( const char* header, const opaque * data, size_t data
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
   * or 0 on success.
   **/
-int gnutls_pem_base64_decode( const char* header, const gnutls_datum *b64_data, char* result, int* result_size) 
+int gnutls_pem_base64_decode( const char* header, const gnutls_datum *b64_data, 
+	unsigned char* result, size_t* result_size) 
 {
 opaque* ret;
 int size;

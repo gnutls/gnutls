@@ -410,9 +410,9 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
 	const gnutls_datum * pkcs3_params, gnutls_x509_crt_fmt format);
 int gnutls_dh_params_generate2(gnutls_dh_params params, int bits);
 int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
-	   gnutls_x509_crt_fmt format, unsigned char* params_data, int* params_data_size);
+	   gnutls_x509_crt_fmt format, unsigned char* params_data, size_t* params_data_size);
 int gnutls_dh_params_export_raw(gnutls_dh_params params,
-	gnutls_datum * prime, gnutls_datum * generator, int *bits);
+	gnutls_datum * prime, gnutls_datum * generator, unsigned int *bits);
 
 
 /* RSA params 
