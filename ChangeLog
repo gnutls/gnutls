@@ -1,3 +1,10 @@
+2003-01-01 11:12  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls_compress_int.c:
+
+	If liblzo is found in the system then libgnutls-extra will depend on
+	it, instead of including minilzo.  
+
 2002-12-30 10:04  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_mpi.c:
