@@ -357,6 +357,11 @@ static int check_b_mod_n( GNUTLS_MPI b, GNUTLS_MPI n)
 int ret;
 GNUTLS_MPI r = _gnutls_mpi_alloc_like(b);
 
+	if (r == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	_gnutls_mpi_mod( r, b, n);
 	ret = _gnutls_mpi_cmp_ui(r, 0);
 	
@@ -379,6 +384,11 @@ static int check_a_mod_n( GNUTLS_MPI a, GNUTLS_MPI n)
 {
 int ret;
 GNUTLS_MPI r = _gnutls_mpi_alloc_like(a);
+
+	if (r == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	_gnutls_mpi_mod( r, a, n);
 	ret = _gnutls_mpi_cmp_ui(r, 0);
