@@ -84,19 +84,19 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 
 	for (i = 0; i < times; i++) {
 		td2 =
-		    hmac_mhash_init(algorithm, secret, secret_size,
+		    mhash_hmac_init(algorithm, secret, secret_size,
 				    mhash_get_hash_pblock(algorithm));
 
 		td1 =
-		    hmac_mhash_init(algorithm, secret, secret_size,
+		    mhash_hmac_init(algorithm, secret, secret_size,
 				    mhash_get_hash_pblock(algorithm));
 		mhash(td1, A, seed_size);
 
-		A = hmac_mhash_end(td1);
+		A = mhash_hmac_end(td1);
 
 		mhash(td2, A, mhash_get_block_size(algorithm));
 		mhash(td2, seed, seed_size);
-		final = hmac_mhash_end(td2);
+		final = mhash_hmac_end(td2);
 
 		copy_bytes = mhash_get_block_size(algorithm);
 		if ((i + 1) * copy_bytes < total_bytes) {

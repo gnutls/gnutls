@@ -38,6 +38,14 @@ int _gnutls_get_key_size(BulkCipherAlgorithm algorithm)
 
 }
 
+int _gnutls_get_iv_size(BulkCipherAlgorithm algorithm)
+{				/* In bytes */
+	size_t ret = 0;
+	GNUTLS_ALG_LOOP(ret = p->iv);
+	return ret;
+
+}
+
 char *_gnutls_get_algorithms_name(BulkCipherAlgorithm algorithm)
 {
 	char *ret = NULL;
