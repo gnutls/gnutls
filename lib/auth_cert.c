@@ -485,23 +485,27 @@ static int _select_client_cert(gnutls_session session,
 
 		/* use a callback to get certificate 
 		 */
-		issuers_dn_length = get_issuers_num( session, data, data_size);
-		if (issuers_dn_length < 0) {
-			gnutls_assert();
-			return issuers_dn_length;
-		}
-
-		if (issuers_dn_length > 0) {
-			issuers_dn = gnutls_malloc( sizeof(gnutls_datum)*issuers_dn_length);
-			if (issuers_dn == NULL) {
+		if (session->security_parameters.cert_type != GNUTLS_CRT_X509)
+			issuers_dn_length = 0;
+		else {
+			issuers_dn_length = get_issuers_num( session, data, data_size);
+			if (issuers_dn_length < 0) {
 				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				return issuers_dn_length;
 			}
+
+			if (issuers_dn_length > 0) {
+				issuers_dn = gnutls_malloc( sizeof(gnutls_datum)*issuers_dn_length);
+				if (issuers_dn == NULL) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
 		
-			result = get_issuers( session, issuers_dn, issuers_dn_length, data, data_size);
-			if (result < 0) {
-				gnutls_assert();
-				goto cleanup;
+				result = get_issuers( session, issuers_dn, issuers_dn_length, data, data_size);
+				if (result < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
 			}
 		}
 
@@ -1097,10 +1101,10 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 			       size_t data_size)
 {
 	int size, ret;
-	opaque *p = data;
+	opaque *p;
 	const gnutls_certificate_credentials cred;
 	CERTIFICATE_AUTH_INFO info;
-	ssize_t dsize = data_size;
+	ssize_t dsize;
 	int i, j;
 	gnutls_pk_algorithm pk_algos[MAX_SIGN_ALGOS];
 	int pk_algos_length;
@@ -1121,6 +1125,9 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 	}
 
 	info = _gnutls_get_auth_info(session);
+
+	p = data;
+	dsize = data_size;
 
 	DECR_LEN(dsize, 1);
 	size = p[0];
@@ -1370,6 +1377,8 @@ static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
 	int ret = 0;
 	uint i, j;
 
+	if (certs == NULL) return NULL;
+
 	local_certs = gnutls_malloc(sizeof(gnutls_cert) * ncerts);
 	if (local_certs == NULL) {
 		gnutls_assert();
@@ -1403,6 +1412,8 @@ static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key)
 	gnutls_privkey *local_key;
 	int ret = 0;
 
+	if (key == NULL) return NULL;
+
 	local_key = gnutls_malloc(sizeof(gnutls_privkey));
 	if (local_key == NULL) {
 		gnutls_assert();
@@ -1430,7 +1441,8 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 {
 	gnutls_cert *local_certs;
 	int ret = 0;
-	uint i, j;
+	
+	if (cert == NULL) return NULL;
 
 	local_certs = gnutls_malloc(sizeof(gnutls_cert));
 	if (local_certs == NULL) {
@@ -1443,7 +1455,7 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 		return NULL;
 	}
 
-	ret = _E_gnutls_openpgp_key_to_gcert(&local_certs[i], cert);
+	ret = _E_gnutls_openpgp_key_to_gcert(local_certs, cert);
 	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
@@ -1451,9 +1463,7 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 
 	if (ret < 0) {
 		gnutls_assert();
-		for (j = 0; j < i; j++) {
-			_gnutls_gcert_deinit(&local_certs[j]);
-		}
+		_gnutls_gcert_deinit(local_certs);
 		gnutls_free(local_certs);
 		return NULL;
 	}
@@ -1468,6 +1478,8 @@ static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey key)
 {
 	gnutls_privkey *local_key;
 	int ret = 0;
+
+	if (key == NULL) return NULL;
 
 	local_key = gnutls_malloc(sizeof(gnutls_privkey));
 	if (local_key == NULL) {
