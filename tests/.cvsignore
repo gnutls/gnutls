@@ -2,6 +2,7 @@
 .libs
 Makefile
 Makefile.in
+anonself
 simple
 *.lo
 *.la
