@@ -1,3 +1,18 @@
+2003-02-15 21:48  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, gnutls_x509.c:
+
+	Added a primitive function to load a file into memory, so that no
+	certificate files are truncated. Also fixed a bug in the client
+	certificate callback function.  
+
+2003-02-15 17:13  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_ui.c:
+
+	Null, as the data value, is now an acceptable value in functions
+	that may return the size of the data.  
+
 2003-02-14 15:48  nmav <nmav@gnutls.org>
 
 	* lib/auth_cert.c, lib/gnutls.h.in.in, lib/gnutls_cert.c,
