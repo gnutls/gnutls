@@ -243,8 +243,8 @@ int main(int argc, char** argv)
 	gnutls_mac_set_priority(state, mac_priority);
 
 	gnutls_set_cred( state, GNUTLS_ANON, anon_cred);
-//	gnutls_set_cred( state, GNUTLS_SRP, cred);
-//	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
+	gnutls_set_cred( state, GNUTLS_SRP, cred);
+	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
 
 /* This TLS extension may break old implementations.
  */
