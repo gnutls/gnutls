@@ -121,6 +121,21 @@ void *gnutls_realloc_fast(void *ptr, size_t size)
 	return gnutls_realloc(ptr, size);
 }
 
+inline
+static void _gnutls_free(void *_ptr)
+{
+opaque *ptr = _ptr;
+
+
+	ptr -= EXTRA_SIZE;
+
+#ifdef MALLOC_DEBUG
+	_gnutls_log("Freed: %x with %d bytes\n", _ptr,
+	    _gnutls_malloc_ptr_size(_ptr));
+#endif
+	free(ptr);
+}
+
 void gnutls_free(void *_ptr)
 {
 	if (_ptr == NULL)
@@ -129,18 +144,11 @@ void gnutls_free(void *_ptr)
 	if ( _gnutls_is_secure_memory( _ptr) != 0) {
 		return gnutls_secure_free( _ptr);
 	} else {
-		opaque *ptr = _ptr;
-
-
-		ptr -= EXTRA_SIZE;
-
-#ifdef MALLOC_DEBUG
-		_gnutls_log("Freed: %x with %d bytes\n", _ptr,
-		    _gnutls_malloc_ptr_size(_ptr));
-#endif
-		free(ptr);
+		_gnutls_free( _ptr);
 	}
 }
+
+
 
 svoid *gnutls_secure_malloc(size_t size)
 {
@@ -200,7 +208,7 @@ opaque* _ptr = ptr;
 	memset(ptr, 0, _gnutls_secure_ptr_size(ptr));
 	*((opaque *) _ptr - 1) = 0;	/* not secure mem */
 
-	gnutls_free(ptr);
+	_gnutls_free(ptr);
 }
 
 char *gnutls_strdup(const char *s)
