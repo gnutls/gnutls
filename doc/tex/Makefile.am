@@ -1,6 +1,6 @@
 EXTRA_DIST = gnutls.tex gnutls.ps \
 	fdl.tex cover.tex.in gnutls-logo.ps layers.eps pgp-fig1.eps \
-	x509-1.eps internals.eps examples
+	x509-1.eps internals.eps examples gnutls.bib
 
 # If you add any examples here, also change the ../examples/Makefile.am
 # to include the C source.
@@ -35,6 +35,7 @@ DOC_OBJECTS = gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
 gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 	-latex gnutls.tex
+	-bibtex gnutls
 	-makeindex gnutls.idx
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps
 
