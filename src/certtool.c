@@ -827,14 +827,28 @@ void certificate_info( void)
 	
 	print_certificate_info( crt, outfile, 1);
 
-	size = sizeof(buffer);
-	ret = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buffer, &size);
-	if (ret < 0) {
-		fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
-		exit(1);
+	if (!info.xml) {
+		size = sizeof(buffer);
+		ret = gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buffer, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+		fprintf(outfile, "\n%s\n", buffer);
+
+	} else {
+		gnutls_datum xml;
+
+		ret = gnutls_x509_crt_to_xml( crt, &xml, GNUTLS_XML_SHOW_ALL);
+		if (ret < 0) {
+			fprintf(stderr, "XML encoding error: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\n%s\n", xml.data);
+		gnutls_free( xml.data);
 	}
 	
-	fprintf(outfile, "\n%s\n", buffer);
 }
 
 static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int all)
