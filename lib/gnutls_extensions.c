@@ -122,7 +122,7 @@ int i;
 	DECR_LENGTH_RET( data_size, next, 0);
 	
 	do {
-		DECR_LENGTH_RET( next, 1, 0);
+		DECR_LENGTH_RET( next, 2, 0);
 		type = _gnutls_read_uint16( &data[pos]);
 		pos+=2;
 		
