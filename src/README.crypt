@@ -19,7 +19,9 @@ SRP protocol (generator and a large prime).
 Run: crypt --passwd /etc/tpasswd --passwd_conf /etc/tpasswd.conf -u test
 
 * This will create /etc/tpasswd and will add user 'test' (you will also
-be prompted for a password).
+be prompted for a password). Verifiers are stored by default in the
+way libsrp expects (using a modified SHA()). However using this tool you 
+may also specify blowfish crypt instead of SHA (see --crypt parameter).
 
 Run: crypt --passwd /etc/tpasswd --passwd_conf /etc/tpasswd.conf --verify -u test
 
