@@ -753,7 +753,6 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
     if( rc ) {
         cdk_kbnode_release( knode );
 
-fprintf(stderr, "rc: %d\n", rc);
         gnutls_assert();
         rc = map_cdk_rc( rc );
         goto leave;

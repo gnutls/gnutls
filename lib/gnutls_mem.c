@@ -107,7 +107,9 @@ char* ret;
   * The allocation function used is the one set by gnutls_global_set_mem_functions().
   *
   **/
-void* gnutls_malloc( size_t s);
+void* gnutls_malloc( size_t s)
+{
+}
 
 /**
   * gnutls_free - Returns a free() like function
@@ -118,7 +120,9 @@ void* gnutls_malloc( size_t s);
   * The deallocation function used is the one set by gnutls_global_set_mem_functions().
   *
   **/
-void gnutls_free( void* ptr);
+void gnutls_free( void* ptr)
+{
+}
 
 #endif
 
