@@ -1070,6 +1070,12 @@ leave:
  *
  * Verify all signatures in the certificate list. When the key
  * is not available, the signature is skipped.
+ *
+ * When the trustdb parameter is used, the function checks the
+ * ownertrust of the key before the signatures are checked. It
+ * is possible that the key was disabled or the owner is not trusted
+ * at all. Then we don't check the signatures because it makes no sense.
+ *
  * The return value is one of the CertificateStatus entries.
  **/
 int
@@ -1259,7 +1265,7 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
  -*/
 int
 gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
-                               const char *data, size_t len)
+                               const opaque *data, size_t len)
 {
     uint8 *blob;
     size_t nbytes = 0;

@@ -54,7 +54,7 @@ int gnutls_openpgp_keyid(
 
 int gnutls_openpgp_add_keyring_mem(
     gnutls_datum *keyring,
-    const char *data,
+    const opaque *data,
     size_t len );
 
 int gnutls_openpgp_add_keyring_file(
