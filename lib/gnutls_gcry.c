@@ -61,7 +61,7 @@ int len, result;
 	result = asn1_read_value(node, value, tmpstr, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	if (_gnutls_mpi_scan( ret_mpi, tmpstr, &len) != 0) {

@@ -20,6 +20,7 @@
 
 #include <gnutls_int.h>
 #include "gnutls_errors.h"
+#include <x509_asn1.h>
 #ifdef STDC_HEADERS
 # include <stdarg.h>
 #endif
@@ -181,6 +182,39 @@ const char* gnutls_strerror(int error)
 			      p->name + sizeof("GNUTLS_E_") - 1);
 
 	return ret;
+}
+
+int _gnutls_asn2err( int asn_err) {
+	switch( asn_err) {
+		case ASN_FILE_NOT_FOUND:
+			return GNUTLS_E_FILE_ERROR;
+		case ASN_ELEMENT_NOT_FOUND:
+			return GNUTLS_E_ASN1_ELEMENT_NOT_FOUND;
+		case ASN_IDENTIFIER_NOT_FOUND:
+			return GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND;
+		case ASN_DER_ERROR:
+			return GNUTLS_E_ASN1_DER_ERROR;
+		case ASN_VALUE_NOT_FOUND:
+			return GNUTLS_E_ASN1_VALUE_NOT_FOUND;
+		case ASN_GENERIC_ERROR:
+			return GNUTLS_E_ASN1_GENERIC_ERROR;
+		case ASN_VALUE_NOT_VALID:
+			return GNUTLS_E_ASN1_VALUE_NOT_VALID;
+		case ASN_TAG_ERROR:
+			return GNUTLS_E_ASN1_TAG_ERROR;
+		case ASN_TAG_IMPLICIT:
+			return GNUTLS_E_ASN1_TAG_IMPLICIT;
+		case ASN_ERROR_TYPE_ANY:
+			return GNUTLS_E_ASN1_TYPE_ANY_ERROR;
+		case ASN_SYNTAX_ERROR:
+			return GNUTLS_E_ASN1_SYNTAX_ERROR;
+		case ASN_MEM_ERROR:
+			return GNUTLS_E_MEMORY_ERROR;
+		case ASN_DER_OVERFLOW:
+			return GNUTLS_E_ASN1_DER_OVERFLOW;
+		default:
+			return GNUTLS_E_ASN1_GENERIC_ERROR;
+	}
 }
 
 /* this function will output a message using the

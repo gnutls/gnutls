@@ -44,7 +44,7 @@ static int _extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext,
 	     "ku")) != ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_get_der(ext, extnValue, extnValueLen);
@@ -83,7 +83,7 @@ static int _extract_basicConstraints(int *CA, opaque * extnValue,
 	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext,
 	     "bc")) != ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_get_der(ext, extnValue, extnValueLen);
@@ -190,7 +190,7 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 				break;
 			else if (result != ASN_OK) {
 				gnutls_assert();
-				return result;
+				return _gnutls_asn2err(result);
 			}
 
 			_gnutls_str_cpy(name2, sizeof(name2), name);
@@ -204,7 +204,7 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 				break;
 			else if (result != ASN_OK) {
 				gnutls_assert();
-				return result;
+				return _gnutls_asn2err(result);
 			}
 
 			_gnutls_str_cpy(name2, sizeof(name2), name);
@@ -228,7 +228,7 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 				}
 				if (result != ASN_OK) {
 					gnutls_assert();
-					return result;
+					return _gnutls_asn2err(result);
 				}
 			}
 
@@ -247,7 +247,7 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 	if (result == ASN_ELEMENT_NOT_FOUND)
 		return 0;
 	else
-		return result;
+		return _gnutls_asn2err(result);
 }
 
 /* This function will attempt to return the requested extension found in
@@ -272,7 +272,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result =
@@ -284,7 +284,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 
 		gnutls_assert();
 		asn1_delete_structure(rasn);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	k = 0;
@@ -321,7 +321,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 				break;
 			} else if (result != ASN_OK) {
 				gnutls_assert();
-				return result;
+				return _gnutls_asn2err(result);
 			}
 
 			_gnutls_str_cpy(name2, sizeof(name2), name);
@@ -337,7 +337,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 			} else if (result != ASN_OK) {
 				gnutls_assert();
 				asn1_delete_structure(rasn);
-				return result;
+				return _gnutls_asn2err(result);
 			}
 
 			_gnutls_str_cpy(name2, sizeof(name2), name);
@@ -362,7 +362,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 				if (result != ASN_OK) {
 					gnutls_assert();
 					asn1_delete_structure(rasn);
-					return result;
+					return _gnutls_asn2err(result);
 				}
 			}
 
@@ -391,6 +391,6 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	} else {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 }

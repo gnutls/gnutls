@@ -35,6 +35,7 @@
 # define gnutls_assert() 
 #endif
 
+int _gnutls_asn2err( int asn_err);
 const char* gnutls_strerror(int error);
 void gnutls_perror(int error);
 int gnutls_error_is_fatal( int error);

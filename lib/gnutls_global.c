@@ -105,13 +105,13 @@ int gnutls_global_init( void)
 	
 	result=asn1_create_tree( (void*)pkix_asn1_tab, &PKIX1_ASN);
 	if (result != ASN_OK) {
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result=asn1_create_tree( (void*)gnutls_asn1_tab, &GNUTLS_ASN);
 	if (result != ASN_OK) {
 		asn1_delete_structure( PKIX1_ASN);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result = _gnutls_dh_calc_mpis();

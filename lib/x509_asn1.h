@@ -74,19 +74,19 @@
 
 
 #define ASN_OK                    0
-#define ASN_FILE_NOT_FOUND        GNUTLS_E_FILE_ERROR
-#define ASN_ELEMENT_NOT_FOUND     GNUTLS_E_ASN1_ELEMENT_NOT_FOUND
-#define ASN_IDENTIFIER_NOT_FOUND  GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND
-#define ASN_DER_ERROR             GNUTLS_E_ASN1_DER_ERROR
-#define ASN_VALUE_NOT_FOUND       GNUTLS_E_ASN1_VALUE_NOT_FOUND
-#define ASN_GENERIC_ERROR         GNUTLS_E_ASN1_GENERIC_ERROR
-#define ASN_VALUE_NOT_VALID       GNUTLS_E_ASN1_VALUE_NOT_VALID
-#define ASN_TAG_ERROR             GNUTLS_E_ASN1_TAG_ERROR
-#define ASN_TAG_IMPLICIT          GNUTLS_E_ASN1_TAG_IMPLICIT
-#define ASN_ERROR_TYPE_ANY        GNUTLS_E_ASN1_TYPE_ANY_ERROR
-#define ASN_SYNTAX_ERROR          GNUTLS_E_ASN1_SYNTAX_ERROR
-#define ASN_MEM_ERROR		  GNUTLS_E_MEMORY_ERROR
-#define ASN_DER_OVERFLOW          GNUTLS_E_ASN1_DER_OVERFLOW
+#define ASN_FILE_NOT_FOUND        1
+#define ASN_ELEMENT_NOT_FOUND     2
+#define ASN_IDENTIFIER_NOT_FOUND  3
+#define ASN_DER_ERROR             4
+#define ASN_VALUE_NOT_FOUND       5
+#define ASN_GENERIC_ERROR         6
+#define ASN_VALUE_NOT_VALID       7
+#define ASN_TAG_ERROR             8
+#define ASN_TAG_IMPLICIT          9
+#define ASN_ERROR_TYPE_ANY        10
+#define ASN_SYNTAX_ERROR          11
+#define ASN_MEM_ERROR		  12
+#define ASN_DER_OVERFLOW          13
 
 
 /******************************************************/

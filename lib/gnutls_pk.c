@@ -304,7 +304,7 @@ int tot_len = 0;
 	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", 
 		&sig, "sig"))!=ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	if ( _gnutls_mpi_print_lz( str, &len, r) < 0) {
@@ -319,7 +319,7 @@ int tot_len = 0;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	len = sizeof(str) - 1;
@@ -335,7 +335,7 @@ int tot_len = 0;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	sig_value->size = tot_len + 100;
@@ -349,7 +349,7 @@ int tot_len = 0;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	asn1_delete_structure(sig);
@@ -410,14 +410,14 @@ opaque str[MAX_PARAMETER_SIZE];
 
 	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", &sig, "sig"))!=ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_get_der( sig, sig_value->data, sig_value->size);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 	
 	result =
@@ -425,7 +425,7 @@ opaque str[MAX_PARAMETER_SIZE];
 	if (result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result =
@@ -434,7 +434,7 @@ opaque str[MAX_PARAMETER_SIZE];
 		gnutls_assert();
 		_gnutls_mpi_release( s);
 		asn1_delete_structure(sig);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	asn1_delete_structure(sig);

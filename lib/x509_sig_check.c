@@ -85,14 +85,14 @@ int len;
 
 	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DigestInfo", &dinfo, "digest_info"))!=ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_get_der( dinfo, info->data, info->size);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(dinfo);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 	
 	len = sizeof(str)-1;
@@ -101,7 +101,7 @@ int len;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(dinfo);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	*hash = -1;
@@ -126,7 +126,7 @@ int len;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(dinfo);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	asn1_delete_structure(dinfo);

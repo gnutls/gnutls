@@ -108,7 +108,7 @@ int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn,
 	     "dn")) != ASN_OK) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_get_der(dn, cert->raw.data, cert->raw.size);
@@ -116,7 +116,7 @@ int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(dn);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 
 	result = asn1_get_start_end_der(dn, cert->raw.data, cert->raw.size,
@@ -127,7 +127,7 @@ int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(dn);
-		return result;
+		return _gnutls_asn2err(result);
 	}
 	asn1_delete_structure(dn);
 
