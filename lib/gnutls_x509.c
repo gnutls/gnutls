@@ -2236,16 +2236,15 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 /**
   * gnutls_x509_extract_certificate_pk_algorithm - This function returns the certificate's PublicKey algorithm
   * @cert: is a DER encoded X.509 certificate
-  * @bits: if bits is non null it should have enough space to hold the
-  * parameters size in bits.
+  * @bits: if bits is non null it will hold the size of the parameters' in bits
   *
   * This function will return the public key algorithm of an X.509 
   * certificate.
   *
   * If bits is non null, it should have enough size to hold the parameters
-  * size in bits. For RSA the bits returned is the modulus and the public
-  * exponent (in this order). For DSA the bits returned are of p, q, g,
-  * and the public exponent in this order.
+  * size in bits. For RSA the bits returned is the modulus. 
+  * For DSA the bits returned are of the public
+  * exponent.
   *
   * Returns a member of the GNUTLS_PKAlgorithm enumeration on success,
   * or a negative value on error.
@@ -2328,7 +2327,6 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 		}
 
 		bits[0] = gcry_mpi_get_nbits( params[0]);
-		bits[1] = gcry_mpi_get_nbits( params[1]);
 	
 		_gnutls_mpi_release( &params[0]);
 		_gnutls_mpi_release( &params[1]);
@@ -2343,34 +2341,8 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 			return result;
 		}
 
-		/* Now read the parameters
-		 */
-		len = sizeof(str) - 1;
-		result =
-		    asn1_read_value
-		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
-		     str, &len);
+		bits[0] = gcry_mpi_get_nbits( params[3]);
 
-		if (result != ASN_OK) {
-			gnutls_assert();
-			asn1_delete_structure(c2);
-			return result;
-		}
-
-		if ((result=_read_dsa_params( str, len, params)) < 0) {
-			gnutls_assert();
-			asn1_delete_structure(c2);
-			return result;
-		}
-
-		bits[0] = gcry_mpi_get_nbits( params[0]);
-		bits[1] = gcry_mpi_get_nbits( params[1]);
-		bits[2] = gcry_mpi_get_nbits( params[2]);
-		bits[3] = gcry_mpi_get_nbits( params[3]);
-
-		_gnutls_mpi_release( &params[0]);
-		_gnutls_mpi_release( &params[1]);
-		_gnutls_mpi_release( &params[2]);
 		_gnutls_mpi_release( &params[3]);
 	}
 

@@ -24,7 +24,7 @@ void print_x509_info(GNUTLS_STATE state)
 	int serial_size = sizeof(serial);
 	char printable[120];
 	char *print;
-	int bits[5], algo;
+	int bits, algo;
 
 	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
@@ -65,19 +65,15 @@ void print_x509_info(GNUTLS_STATE state)
 	printf(" # Certificate version: #%d\n",
 	       gnutls_x509_extract_certificate_version(&cert_list[0]));
 
-	algo = gnutls_x509_extract_certificate_pk_algorithm( &cert_list[0], bits);
+	algo = gnutls_x509_extract_certificate_pk_algorithm( &cert_list[0], &bits);
 	printf(" # Certificate public key: ");
 
 	if (algo==GNUTLS_PK_RSA) {
 		printf("RSA\n");
-		printf(" #   Modulus: %d bits\n", bits[0]);
-		printf(" #   Exponent: %d bits\n", bits[1]);
+		printf(" #   Modulus: %d bits\n", bits);
 	} else if (algo==GNUTLS_PK_DSA) {
 		printf("DSA\n");
-		printf(" #   p: %d bits\n", bits[0]);
-		printf(" #   q: %d bits\n", bits[1]);
-		printf(" #   g: %d bits\n", bits[2]);
-		printf(" #   Exponent: %d bits\n", bits[3]);
+		printf(" #   Exponent: %d bits\n", bits);
 	} else {
 		printf("UNKNOWN\n");
 	}
