@@ -1,3 +1,9 @@
+2004-10-04 21:13  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-SP800-52.pdf:
+
+	Add.  
+
 2004-09-30 21:37  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in, lib/defines.h, lib/gnutls_x509.c, lib/x509_b64.c:
