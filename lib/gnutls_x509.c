@@ -2838,6 +2838,29 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
 
 }
 
+static char* str_escape( char* str, char* buffer, unsigned int buffer_size)
+{
+int str_length, j, i;
+
+	if (str==NULL || buffer == NULL) return NULL;
+
+	str_length = GMIN( strlen( str), buffer_size - 1);
+	
+	for (i=j=0;i<str_length;i++) {
+		if (str[i]==',' || str[i] == '+' || str[i] == '"'
+			 || str[i] == '\\' || str[i] == '<' || str[i] == '>'
+			 || str[i] == ';')
+			buffer[j++] = '\\';
+		
+		buffer[j++] = str[i];
+	}
+	
+	/* null terminate the string */
+	buffer[j] = 0;
+
+	return buffer;
+}
+
 /**
   * gnutls_x509_extract_certificate_dn_string - This function returns the certificate's distinguished name
   * @cert: should contain an X.509 DER encoded certificate
@@ -2846,7 +2869,7 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
   * @issuer: if non zero, then extract the name of the issuer, instead of the holder
   *
   * This function will copy the name of the certificate holder in the provided buffer. The name 
-  * will be in the form "/C=xxxx/O=yyyy/CN=zzzz".
+  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
   * and 0 on success.
@@ -2858,6 +2881,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    gnutls_x509_dn dn;
    gnutls_string str;
    int ret;
+   char str_buffer[256];
 
    if (buf == NULL || sizeof_buf == 0) {
       return GNUTLS_E_INVALID_REQUEST;
@@ -2872,12 +2896,12 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
 		gnutls_assert(); \
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
-#define PRINTX( x, y) \
+#define PRINTX( x, y, i) \
    if (y[0]!=0) { \
-      STR_APPEND( "/"); \
+      if (i!=0) STR_APPEND( ","); \
       STR_APPEND( x); \
       STR_APPEND( "="); \
-      STR_APPEND( y); \
+      STR_APPEND( str_escape(y, str_buffer, sizeof(str_buffer))); \
    }
 
    if (!issuer)
@@ -2887,13 +2911,14 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
       
    if (ret < 0) return ret;
 
-   PRINTX( "C", dn.country);
-   PRINTX( "ST", dn.state_or_province_name);
-   PRINTX( "L", dn.locality_name);
-   PRINTX( "O", dn.organization);
-   PRINTX( "OU", dn.organizational_unit_name);
-   PRINTX( "E", dn.email);
-
+   PRINTX( "CN", dn.common_name, 0);
+   PRINTX( "E", dn.email, 1);
+   PRINTX( "OU", dn.organizational_unit_name, 1);
+   PRINTX( "O", dn.organization, 1);
+   PRINTX( "L", dn.locality_name, 1);
+   PRINTX( "ST", dn.state_or_province_name, 1);
+   PRINTX( "C", dn.country, 1);
+ 
    if (str.length >= sizeof_buf) {
         _gnutls_string_clear( &str);
 	return GNUTLS_E_SHORT_MEMORY_BUFFER;
