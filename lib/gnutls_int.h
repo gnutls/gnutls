@@ -1,7 +1,5 @@
 #ifndef GNUTLS_INT_H
 
-#include <gcrypt.h>
-
 #define GNUTLS_INT_H
 
 #undef HARD_DEBUG
@@ -13,17 +11,6 @@
 #define MAX24 16777215
 #define MAX16 65535
 
-/* for message digests */
-#ifndef USE_MHASH
-#define GNUTLS_HASH_HANDLE GCRY_MD_HD
-#define GNUTLS_MAC_HANDLE GCRY_MD_HD
-#else
-#define GNUTLS_HASH_HANDLE MHASH
-#define GNUTLS_MAC_HANDLE MHASH
-#endif
-
-#define GNUTLS_HASH_FAILED NULL
-#define GNUTLS_MAC_FAILED NULL
 
 /* for symmetric ciphers */
 #define GNUTLS_CIPHER_HANDLE GCRY_CIPHER_HD
@@ -119,6 +106,8 @@ typedef enum CipherType CipherType;
 typedef enum IsExportable IsExportable;
 typedef enum MACAlgorithm MACAlgorithm;
 typedef enum CompressionMethod CompressionMethod;
+
+#include <gnutls_hash_int.h>
 
 typedef struct {
 	ConnectionEnd entity;
@@ -305,5 +294,6 @@ int _gnutls_set_keys(GNUTLS_STATE state);
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
+
 
 #endif /* GNUTLS_INT_H */
