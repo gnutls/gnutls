@@ -339,21 +339,19 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		 * using realloc().
 		 */
 		do {
-			dataptr_size -= 2;
-			if (dataptr_size <= 0)
-				goto clear;
+			/* This works like DECR_LEN() */
+			DECR_LENGTH_COM( dataptr_size, 2, goto clear);
 			size = _gnutls_read_uint16(data);
 
-			dataptr_size -= size;
-			if (dataptr_size < 0)
-				goto clear;
+			DECR_LENGTH_COM( dataptr_size, size, goto clear);
 
 			dataptr += 2;
 
-			issuers_dn_len++;
-
-			dataptr += size;
-
+			if (size > 0) {
+				issuers_dn_len++;
+				dataptr += size;
+			}
+			
 			if (dataptr_size == 0)
 				break;
 

@@ -477,6 +477,8 @@ static int _gnutls_check_record_headers( GNUTLS_STATE state, uint8 headers[RECOR
 		*version = _gnutls_version_get( headers[1], headers[2]);
 #endif
 
+		/* No DECR_LEN, since headers has enough size. 
+		 */
 		*length = _gnutls_read_uint16( &headers[3]);
 	}
 

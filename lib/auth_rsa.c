@@ -166,10 +166,11 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		ciphertext.data = data;
 		ciphertext.size = data_size;
 	} else {		/* TLS 1 */
+		DECR_LEN( data_size, 2);
 		ciphertext.data = &data[2];
 		dsize = _gnutls_read_uint16(data);
 
-		if (dsize != data_size - 2) {
+		if (dsize != data_size) {
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}

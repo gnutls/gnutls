@@ -94,6 +94,7 @@ typedef const int* GNUTLS_LIST;
 
 #define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
 #define DECR_LENGTH_RET(len, x, RET) len-=x; if (len<0) {gnutls_assert(); return RET;}
+#define DECR_LENGTH_COM(len, x, COM) len-=x; if (len<0) {gnutls_assert(); COM;}
 
 typedef unsigned char opaque;
 typedef struct { opaque pint[3]; } uint24;

@@ -300,7 +300,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	const uint8 *data_g;
 	const uint8 *data_s;
 	uint8 pwd_algo;
-	int i, xx, ret;
+	int i, ret;
 	opaque hd[SRP_MAX_HASH_SIZE];
 	char *username;
 	char *password;
@@ -370,11 +370,10 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
 	 */
-	if ( ( ret =_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &xx, hd)) < 0) {
+	if ( ( ret =_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g, hd)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
-	_n_g = xx;
 
 	if (_gnutls_mpi_scan(&state->gnutls_key->x, hd, &_n_g) != 0 || state->gnutls_key->x==NULL) {
 		gnutls_assert();

@@ -36,17 +36,16 @@
  */
 
 
-int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, GNUTLS_MPI g,
+int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result, GNUTLS_MPI g,
 		   GNUTLS_MPI prime)
 {
 	GNUTLS_MPI x, e;
 	size_t result_size;
 
-	if (_gnutls_mpi_scan(&x, text, &result_size)) {
+	if (_gnutls_mpi_scan(&x, text, &textsize)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	textsize = result_size;
 
 	e = _gnutls_mpi_alloc_like(prime);
 	if (e==NULL) {
@@ -259,7 +258,7 @@ int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 }
 
 int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
-			 int salt_size, uint8 crypt_algo, int *size, void* digest)
+			 size_t salt_size, uint8 crypt_algo, size_t *size, void* digest)
 {
 
 	switch (crypt_algo) {

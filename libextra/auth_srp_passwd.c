@@ -40,11 +40,10 @@
  */
 static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
 char * p, *p2;
-int len;
+int len, ret;
 opaque *verifier;
-int verifier_size;
+size_t verifier_size;
 int indx;
-size_t xx;
 
 	p = rindex( str, ':'); /* we have index */
 	if (p==NULL) {
@@ -106,19 +105,19 @@ size_t xx;
 	}
 
 	len = strlen(p);
-	verifier_size = _gnutls_sbase64_decode( p, len, &verifier);
-	if (verifier_size <= 0) {
+	ret = _gnutls_sbase64_decode( p, len, &verifier);
+	if (ret <= 0) {
 		gnutls_assert();
 		gnutls_free(entry->salt);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	if (_gnutls_mpi_scan(&entry->v, verifier, &xx)) {
+	verifier_size = ret;
+	if (_gnutls_mpi_scan(&entry->v, verifier, &verifier_size)) {
 		gnutls_assert();
 		gnutls_free( entry->salt);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	verifier_size = xx;
 
 	gnutls_free( verifier);
 
