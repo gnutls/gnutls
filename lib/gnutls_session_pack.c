@@ -145,7 +145,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 
 /* Returns the size needed to hold the current session.
  */
-int _gnutls_session_size( gnutls_session session)
+uint _gnutls_session_size( gnutls_session session)
 {
 	uint32 pack_size;
 
