@@ -2,14 +2,6 @@
 
 This authentication method is part of the certificate authentication
 method in \gnutls{}.
-The X.509 protocols rely on a hierarchical trust model. In this trust model
-Certification Authorities (CAs) are used to certify entities.
-Usually more than one certification authorities exist, and certification
-authorities may certify other authorities to issue certificates as well,
-following a hierachical model. 
-One needs to trust one or more CAs for his secure
-communications. In that case only the certificates issued by the trusted
-authorities are acceptable. 
 \par
 X.509 certificates contain the public parameters, 
 of a public key algorithm, and the authority's signature, which proves the
@@ -18,32 +10,5 @@ authenticity of the parameters.
 The key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
 available in X.509 authentication. 
 
-\par The use of X.509 certificates requires some functions which will 
-assist in parsing them. \gnutls{} includes functions which extract 
-parameters from given X.509 certificates. Some of them are:
-\begin{itemize}
-\item \printfunc{gnutls_x509_extract_certificate_dn}{gnutls\_x509\_extract\_certificate\_dn}
-\item \printfunc{gnutls_x509_extract_certificate_serial}{gnutls\_x509\_extract\_certificate\_serial}
-\item \printfunc{gnutls_x509_extract_certificate_subject_alt_name}{gnutls\_x509\_extract\_certificate\_subject\_alt\_name}
-\end{itemize}
-
-Given the complexity of the X.509 protocols we do not expect these limited 
-functions to cover every need. Thus a function which converts X.509 DER certificates
-to an XML form is provided. See appendix \ref{xml} on page \pageref{xml} for
-more information.
-
-\par
-Verifying certificate\index{Verifying certificate paths} paths is also important in X.509 authentication.
-For this purpose you can use the
-\printfunc{gnutls_x509_verify_certificate}{gnutls\_x509\_verify\_certificate}
-function. A more generic one is also provided and can be used with all
-of the certificate authentication methods, but is limited to a session. See the
-\printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}
-function.
-
-\par
-Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit. See 
-\htmladdnormallink{http://www.gnupg.org/aegypten/}{http://www.gnupg.org/aegypten/}}. 
-\gnutls{} only includes the required,
-in order to use the TLS ciphersuites which depend on X.509 certificates.
-
+See \ref{x509:trust} on page \pageref{x509:trust} for more information
+on X.509 protocols.
