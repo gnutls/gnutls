@@ -195,7 +195,8 @@ int gnutls_x509pki_extract_dn(const gnutls_datum * idn, gnutls_DN * rdn)
 
 
 /* Finds the appropriate certificate depending on the cA Distinguished name
- * advertized by the server. If none matches then returns -1 as index.
+ * advertized by the server. If none matches then returns 0 and -1 as index.
+ * In case of an error a negative value, is returned.
  */
 static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 					       opaque * _data,
@@ -265,7 +266,6 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 				break;
 
 			/* move to next record */
-			data_size -= size;
 			if (data_size <= 0)
 				break;
 

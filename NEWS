@@ -1,3 +1,6 @@
+Version ?.?.?
+- Corrected bug which did not allow a client to accept multiple CA names
+
 Version 0.3.1 (21/12/2001)
 - Corrections in the configuration files
 - Fixes a bug in anonymous authentication
