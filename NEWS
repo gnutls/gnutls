@@ -1,3 +1,7 @@
+Version 0.?.?
+- Added gnutls/compat.h which must be included if the 0.4.x API is
+  used.
+
 Version 0.5.11 (5/11/2002)
 - Some fixes in 'gnutls-cli' client program to prevent some segmentation 
   faults at exit.

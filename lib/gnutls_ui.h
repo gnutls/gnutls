@@ -52,8 +52,6 @@ typedef enum gnutls_x509_subject_alt_name {
 
 typedef int gnutls_certificate_client_select_function(gnutls_session, const gnutls_datum *, int, const gnutls_datum *, int);
 typedef int gnutls_certificate_server_select_function(gnutls_session, const gnutls_datum *, int);
-#define gnutls_certificate_client_select_func gnutls_certificate_client_select_function
-#define gnutls_certificate_server_select_func gnutls_certificate_server_select_function
 
 /* Functions that allow AUTH_INFO structures handling
  */
@@ -74,8 +72,6 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session session);
 
 void gnutls_certificate_client_set_select_function( gnutls_session, gnutls_certificate_client_select_function *);
 void gnutls_certificate_server_set_select_function( gnutls_session, gnutls_certificate_server_select_function *);
-#define gnutls_certificate_client_set_select_func gnutls_certificate_client_set_select_function
-#define gnutls_certificate_server_set_select_func gnutls_certificate_server_set_select_function
 
 void gnutls_certificate_server_set_request( gnutls_session, gnutls_certificate_request);
 
