@@ -115,11 +115,11 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			if (ps[i] == 0) {
 				/* If the first one is zero then set it to rnd[0].
 				 * If the second one is zero then set it to rnd[1].
-				 * Otherwise add (mod 256) the two previous ones plus rnd[3], or use
+				 * Otherwise add (mod 256) the two previous ones plus rnd[2], or use
 				 * rnd[1] if the value == 0.
 				 */
 				if (i<2) ps[i] = rnd[i];
-				else ps[i] = GMAX( rnd[3] + ps[i-1] + ps[i-2], rnd[1]);
+				else ps[i] = GMAX( rnd[2] + ps[i-1] + ps[i-2], rnd[1]);
 			}
 		}
 		break;
