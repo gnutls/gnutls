@@ -142,8 +142,6 @@ int gnutls_ext_set_dnsname( GNUTLS_STATE, const char* dnsname);
  * authentication. This will be used while verifying the
  * certificate
  */
-int gnutls_x509_set_cn( GNUTLS_STATE, const char* cn);
-
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 
@@ -185,15 +183,22 @@ typedef struct {
 	char username[256];
 } SRP_SERVER_AUTH_INFO;
 
-typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_WRONG_CN, GNUTLS_CERT_INVALID } CertificateStatus;
+typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
+
+#define X509_CN_SIZE 256
+#define X509_C_SIZE 3
+#define X509_O_SIZE 256
+#define X509_OU_SIZE 256
+#define X509_L_SIZE 256
+#define X509_S_SIZE 256
 
 typedef struct {
-	char common_name[256];
-	char country[3];
-	char organization[256];
-	char organizational_unit_name[256];
-	char locality_name[256];
-	char state_or_province_name[256];
+	char common_name[X509_CN_SIZE];
+	char country[X509_C_SIZE];
+	char organization[X509_O_SIZE];
+	char organizational_unit_name[X509_OU_SIZE];
+	char locality_name[X509_L_SIZE];
+	char state_or_province_name[X509_S_SIZE];
 } gnutls_DN;
 
 typedef struct {
@@ -203,6 +208,7 @@ typedef struct {
 	int		  peer_certificate_version;
 	time_t		  peer_certificate_activation_time;
 	time_t		  peer_certificate_expiration_time;
+        char              subjectAltName[X509_CN_SIZE];
 } X509PKI_CLIENT_AUTH_INFO;
 
 

@@ -359,6 +359,10 @@ int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDes
   * have been initiated using gnutls_handshake() or similar function.
   * If 'wait' is non-zero then we will not wait for the other peer to 
   * close the TLS connection.
+  *
+  * This function actually sends the peer a closure alert, and if 'wait'
+  * is zero, will wait for the peer to reply (with a closure alert too).
+  *
   **/
 int gnutls_bye(SOCKET cd, GNUTLS_STATE state, int wait)
 {

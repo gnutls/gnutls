@@ -21,6 +21,7 @@ typedef struct {
 
 	gnutls_DN  cert_info;
 	gnutls_DN  issuer_info;
+	opaque	   subjectAltName[X509_CN_SIZE];
 
 	opaque	   signature[1024];
 	int	   signature_size;

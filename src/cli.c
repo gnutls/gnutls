@@ -46,8 +46,9 @@
 	PRINTX( "O:", x509_info->X.organization); \
 	PRINTX( "L:", x509_info->X.locality_name); \
 	PRINTX( "S:", x509_info->X.state_or_province_name); \
-	PRINTX( "C:", x509_info->X.country);
-
+	PRINTX( "C:", x509_info->X.country); \
+	PRINTX( "SAN:", x509_info->subjectAltName);
+	
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
 const ANON_CLIENT_AUTH_INFO *dh_info;
@@ -74,9 +75,6 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 				break;
 			case GNUTLS_CERT_TRUSTED:
 				printf("- Peer's X509 Certificate was verified\n");
-				break;
-			case GNUTLS_CERT_WRONG_CN:
-				printf("- Peer's X509 Certificate was verified but it does not match the server's name\n");
 				break;
 			case GNUTLS_CERT_INVALID:
 			default:
@@ -172,7 +170,7 @@ int main(int argc, char** argv)
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL_CBC, 0);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
@@ -181,8 +179,7 @@ int main(int argc, char** argv)
 	gnutls_set_cred( state, GNUTLS_SRP, cred);
 	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
 
-	gnutls_ext_set_dnsname( state, "localhost");
-	gnutls_x509_set_cn( state, "localhost");
+//	gnutls_ext_set_dnsname( state, "localhost");
 
 	ret = gnutls_handshake(sd, state);
 
@@ -225,7 +222,7 @@ int main(int argc, char** argv)
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_ARCFOUR, 0);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 

@@ -182,20 +182,3 @@ const void* gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;
 }
 
-/**
-  * gnutls_x509_set_cn - Used to set the CN for X509 authentication
-  * @state: is a &GNUTLS_STATE structure.
-  * @cn: is a null terminated string that contains the peer's CN.
-  *
-  * This function is to be used by clients that want to verify
-  * also the peer's Common Name (ie. the certificate may be verified,
-  * but it may have been issued for someone else). 
-  **/
-int gnutls_x509_set_cn( GNUTLS_STATE state, const char* cn) {
-
-	if (strlen( cn) >= X509_CN_SIZE) return GNUTLS_E_MEMORY_ERROR;
-
-	strcpy( state->gnutls_key->x509_cn, cn);
-
-	return 0;
-}

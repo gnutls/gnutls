@@ -499,6 +499,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 /* this function will convert up to 3 digit
  * numbers to characters.
  */
+#define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data) {
     if (k > 999) data[0] = 0;
     else sprintf( data, "%d", k);
@@ -506,12 +507,14 @@ void _gnutls_int2str(int k, char* data) {
 
 /* This function will attempt to read a Name
  * ASN.1 structure. (Taken from Fabio's samples!)
+ *
+ * FIXME: These functions need carefull auditing
  * --nmav
  */
 static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 {
 	int k, k2, result, len;
-	char name[128], str[1024], name2[128], counter[5], name3[128];
+	char name[128], str[1024], name2[128], counter[MAX_INT_DIGITS], name3[128];
 
 	k = 0;
 	do {
@@ -585,6 +588,121 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 	else 
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 }
+
+
+static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, char* extnValue, int extnValueLen) {
+	fprintf(stderr, "Extension: %s, %s\n", extnID, critical);
+
+	if (strcmp( extnID, "2 5 29 14")==0) { /* subject Key ID */
+		/* we don't use it */
+		return 0;
+	}
+
+	if (strcmp( extnID, "2 5 29 19")==0) { /* Basic Constraints */
+		/* we don't use it */
+		return 0;
+	}
+
+	if (strcmp( extnID, "2 5 29 17")==0) { /* subjectAltName */
+		strncpy( cert->subjectAltName, extnValue, sizeof( cert->subjectAltName)-1);
+		return 0;
+	}
+	
+	
+	if (strcmp( critical, "TRUE")==0) {
+		gnutls_assert();
+		return GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION;
+	}
+	return 0;
+
+}
+
+/* This function will attempt to parse Extensions in
+ * an X509v3 certificate
+ */
+static int _get_Ext_type( node_asn *rasn, char *root, gnutls_cert *cert)
+{
+	int k, result, len;
+	char name[128], name2[128], counter[MAX_INT_DIGITS];
+	char str[1024];
+	char critical[10];
+	char extnID[128];
+	char extnValue[128];
+
+	k = 0;
+	do {
+		k++;
+		
+		strcpy(name, root);
+		strcat(name, ".?");
+		_gnutls_int2str(k, counter);
+		strcat(name, counter);
+
+		len = sizeof(str) - 1;
+		result = asn1_read_value( rasn, name, str, &len);
+		
+		/* move to next
+		 */
+
+		if (result==ASN_ELEMENT_NOT_FOUND) break;
+
+		do {
+
+			strcpy(name2, name);
+			strcat(name2, ".extnID");
+
+			len = sizeof(extnID) - 1;
+			result = asn1_read_value( rasn, name2, extnID, &len);
+
+			if (result==ASN_ELEMENT_NOT_FOUND) break;
+			else
+				if (result != ASN_OK) {
+					gnutls_assert();
+					return GNUTLS_E_ASN1_PARSING_ERROR;
+				}
+
+			strcpy(name2, name);
+			strcat(name2, ".critical");
+			
+			len = sizeof(critical) - 1;
+			result = asn1_read_value( rasn, name2, critical, &len);
+
+			if (result==ASN_ELEMENT_NOT_FOUND) break;
+			else
+				if (result != ASN_OK) {
+					gnutls_assert();
+					return GNUTLS_E_ASN1_PARSING_ERROR;
+				}
+				
+			strcpy(name2, name);
+			strcat(name2, ".extnValue");
+
+			len = sizeof( extnValue) - 1;
+			result = asn1_read_value( rasn, name2, extnValue, &len);
+
+			if (result==ASN_ELEMENT_NOT_FOUND) break;
+			else
+				if (result != ASN_OK) {
+					gnutls_assert();
+					return GNUTLS_E_ASN1_PARSING_ERROR;
+				}
+
+			/* Handle Extension */
+			if ( (result=_parse_extension( cert, extnID, critical, extnValue, len)) < 0) {
+				gnutls_assert();
+				return result;
+			}
+			
+			
+		} while (0);
+	} while (1);
+
+	if (result==ASN_ELEMENT_NOT_FOUND)
+		return 0;
+	else 
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+}
+
 
 #define MAX_TIME 1024
 static time_t _gnutls_get_time( node_asn* c2, char* root, char* when) {
@@ -754,11 +872,19 @@ return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
 	if ((result =
+	     _get_Ext_type( c2, "certificate2.tbsCertificate.extensions", gCert)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+
+	if ((result =
 	     _get_Name_type( c2, "certificate2.tbsCertificate.issuer", &gCert->issuer_info)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
 	}
+
 
 	gCert->expiration_time = _gnutls_get_time( c2, "certificate2", "notAfter");
 	gCert->activation_time = _gnutls_get_time( c2, "certificate2", "notBefore");
