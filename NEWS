@@ -1,4 +1,4 @@
-Version 0.3.5
+Version 0.3.5 (20/01/2002)
 - Corrected the RSA key exchange method, to avoid attacks against
   PKCS-1 formating.
 
