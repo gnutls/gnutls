@@ -10,7 +10,7 @@ option (p, port) INT "integer" { $port = $1 } "The port to connect to."
 option (http) { $http = 1 } "Act as an HTTP Server."
 
 #char *x509_cafile;
-option (cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
+option (x509cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
 
 #char *pgp_keyring;
 option (pgpkeyring) STR "FILE" { $pgp_keyring = $1 } "PGP Key ring file to use."

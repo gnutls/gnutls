@@ -177,7 +177,7 @@ int main(int argc, char **argv)
    if (x509_cafile != NULL) {
       ret =
 	  gnutls_certificate_set_x509_trust_file(xcred, x509_cafile,
-						 x509_crlfile);
+					 x509_crlfile, GNUTLS_X509_FMT_PEM);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 trust file\n");
       }
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
    if (x509_certfile != NULL) {
       ret =
 	  gnutls_certificate_set_x509_key_file(xcred, x509_certfile,
-					       x509_keyfile);
+				       x509_keyfile, GNUTLS_X509_FMT_PEM);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s')\n",
 		 x509_certfile, x509_keyfile);

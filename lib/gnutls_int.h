@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -188,6 +188,9 @@ typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
 typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, 
 	GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA 
 } ContentType;
+
+typedef enum GNUTLS_X509_CertificateFmt { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } GNUTLS_X509_CertificateFmt;
 
 /* STATE (stop) */
 

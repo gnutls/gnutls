@@ -112,7 +112,7 @@ void gaa_help(void)
 	__gaa_helpsingle('g', "generate", "", "Generate Diffie Hellman Parameters.");
 	__gaa_helpsingle('p', "port", """integer"" ", "The port to connect to.");
 	__gaa_helpsingle(0, "http", "", "Act as an HTTP Server.");
-	__gaa_helpsingle(0, "cafile", """FILE"" ", "Certificate file to use.");
+	__gaa_helpsingle(0, "x509cafile", """FILE"" ", "Certificate file to use.");
 	__gaa_helpsingle(0, "pgpkeyring", """FILE"" ", "PGP Key ring file to use.");
 	__gaa_helpsingle(0, "pgptrustdb", """FILE"" ", "PGP trustdb file to use.");
 	__gaa_helpsingle(0, "pgpkeyfile", """FILE"" ", "PGP Key file to use.");
@@ -266,7 +266,7 @@ int gaa_error = 0;
 #define GAAOPTID_pgpkeyfile	15
 #define GAAOPTID_pgptrustdb	16
 #define GAAOPTID_pgpkeyring	17
-#define GAAOPTID_cafile	18
+#define GAAOPTID_x509cafile	18
 #define GAAOPTID_http	19
 #define GAAOPTID_port	20
 #define GAAOPTID_generate	21
@@ -546,7 +546,7 @@ struct GAAOPTION_pgpkeyring
 	int size1;
 };
 
-struct GAAOPTION_cafile 
+struct GAAOPTION_x509cafile 
 {
 	char* arg1;
 	int size1;
@@ -602,7 +602,7 @@ int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("", GAAOPTID_pgpkeyfile);
 			GAA_CHECK1STR("", GAAOPTID_pgptrustdb);
 			GAA_CHECK1STR("", GAAOPTID_pgpkeyring);
-			GAA_CHECK1STR("", GAAOPTID_cafile);
+			GAA_CHECK1STR("", GAAOPTID_x509cafile);
 			GAA_CHECK1STR("p", GAAOPTID_port);
         case GAA_MULTIPLE_OPTION:
 #line 375 "gaa.skel"
@@ -631,7 +631,7 @@ int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("pgpkeyfile", GAAOPTID_pgpkeyfile);
 			GAA_CHECKSTR("pgptrustdb", GAAOPTID_pgptrustdb);
 			GAA_CHECKSTR("pgpkeyring", GAAOPTID_pgpkeyring);
-			GAA_CHECKSTR("cafile", GAAOPTID_cafile);
+			GAA_CHECKSTR("x509cafile", GAAOPTID_x509cafile);
 			GAA_CHECKSTR("http", GAAOPTID_http);
 			GAA_CHECKSTR("port", GAAOPTID_port);
 			GAA_CHECKSTR("generate", GAAOPTID_generate);
@@ -662,7 +662,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	struct GAAOPTION_pgpkeyfile GAATMP_pgpkeyfile;
 	struct GAAOPTION_pgptrustdb GAATMP_pgptrustdb;
 	struct GAAOPTION_pgpkeyring GAATMP_pgpkeyring;
-	struct GAAOPTION_cafile GAATMP_cafile;
+	struct GAAOPTION_x509cafile GAATMP_x509cafile;
 	struct GAAOPTION_port GAATMP_port;
 
 #line 393 "gaa.skel"
@@ -836,13 +836,13 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 
 		return GAA_OK;
 		break;
-	case GAAOPTID_cafile:
+	case GAAOPTID_x509cafile:
 	OK = 0;
 		GAA_TESTMOREARGS;
-		GAA_FILL(GAATMP_cafile.arg1, gaa_getstr, GAATMP_cafile.size1);
+		GAA_FILL(GAATMP_x509cafile.arg1, gaa_getstr, GAATMP_x509cafile.size1);
 		gaa_index++;
 #line 13 "serv.gaa"
-{ gaaval->x509_cafile = GAATMP_cafile.arg1 ;};
+{ gaaval->x509_cafile = GAATMP_x509cafile.arg1 ;};
 
 		return GAA_OK;
 		break;

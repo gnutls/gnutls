@@ -347,7 +347,7 @@ int main(int argc, char **argv)
 
    if (x509_cafile != NULL)
       if (gnutls_certificate_set_x509_trust_file
-	  (cert_cred, x509_cafile, x509_crlfile) < 0) {
+	  (cert_cred, x509_cafile, x509_crlfile, GNUTLS_X509_FMT_DER) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_cafile);
 	 exit(1);
       }
@@ -376,7 +376,7 @@ int main(int argc, char **argv)
 
    if (x509_certfile != NULL)
       if (gnutls_certificate_set_x509_key_file
-	  (cert_cred, x509_certfile, x509_keyfile) < 0) {
+	  (cert_cred, x509_certfile, x509_keyfile, GNUTLS_X509_FMT_DER) < 0) {
 	 fprintf(stderr,
 		 "Error reading '%s' or '%s'\n", x509_certfile,
 		 x509_keyfile);

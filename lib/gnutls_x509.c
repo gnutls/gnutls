@@ -957,34 +957,67 @@ static int _gnutls_check_key_cert_match( GNUTLS_CERTIFICATE_CREDENTIALS res) {
 #define MAX_FILE_SIZE 100*1024
 #define CERT_SEP "-----BEGIN"
 
+/* Reads a DER encoded certificate list from memory and stores it to
+ * a gnutls_cert structure. This is only called if PKCS7 read fails.
+ */
+static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts, 
+	const char *input_cert, int input_cert_size)
+{
+	int i;
+	gnutls_datum tmp;
+	int ret;
+
+	i = *ncerts + 1;
+
+	*cert_list =
+	    (gnutls_cert *) gnutls_realloc( *cert_list,
+					   i *
+					   sizeof(gnutls_cert));
+
+	if ( *cert_list == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	/* set defaults to zero 
+	 */
+	memset( &cert_list[0][i - 1], 0,
+	       sizeof(gnutls_cert));
+
+	tmp.data = (void*) input_cert;
+	tmp.size = input_cert_size;
+
+	if ((ret =
+	     _gnutls_x509_cert2gnutls_cert(
+				     &cert_list[0][i - 1],
+				     tmp)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	*ncerts = i;
+
+	return 0;
+}
+
+
 /* Reads a PKCS7 base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure.
  */
 static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
 {
-	int siz, i, j;
-	opaque *b64;
-	const char *ptr;
+	int i, j;
 	gnutls_datum tmp, tmp2;
 	int ret;
 	opaque pcert[MAX_X509_CERT_SIZE];
 	int pcert_size;
 
-	ptr = input_cert;
-	siz = input_cert_size;
 	i = *ncerts + 1;
 
-	ret = _gnutls_fbase64_decode(ptr, siz, &b64);
-
-	if (ret < 0) {
-		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
-	}
-	
 	/* tmp now contains the decoded certificate list */
-	tmp.data = b64;
-	tmp.size = ret;
+	tmp.data = (void*)input_cert;
+	tmp.size = input_cert_size;
 
 	j = 0;
 	do {
@@ -994,6 +1027,14 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		/* if the current certificate is too long, just ignore
 		 * it. */
 		if (ret==GNUTLS_E_MEMORY_ERROR) continue;
+		if (ret < 0 && j==0) {
+			/* if we failed to read it in the first attempt,
+			 * then just try to decode a plain DER
+			 * certificate.
+			 */
+			return parse_der_cert_mem( cert_list, ncerts,
+				input_cert, input_cert_size);
+		}
 		
 		if (ret >= 0) {
 			*cert_list =
@@ -1002,7 +1043,6 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 			if ( *cert_list == NULL) {
 				gnutls_assert();
-				gnutls_free(b64);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
@@ -1017,7 +1057,6 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 			     _gnutls_x509_cert2gnutls_cert(
 						     &cert_list[0][i - 1],
 						     tmp2)) < 0) {
-				gnutls_free(b64);
 				gnutls_assert();
 				return ret;
 			}
@@ -1028,59 +1067,11 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 	} while (ret >= 0);
 	
-	gnutls_free(b64);
-
 	*ncerts = i - 1;
 
 	return 0;
 }
 
-
-/* Reads a DER certificate from memory and stores it to
- * a gnutls_cert structure.
- */
-static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts, 
-	const char *input_cert, int input_cert_size)
-{
-	int siz, i;
-	const char *ptr;
-	gnutls_datum tmp;
-	int ret;
-
-	ptr = input_cert;
-	siz = input_cert_size;
-	i = *ncerts + 1;
-
-	*cert_list =
-	    (gnutls_cert *) gnutls_realloc( *cert_list,
-					   i *
-					   sizeof(gnutls_cert));
-
-	if ( *cert_list == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	/* set defaults to zero 
-	 */
-
-	memset( &cert_list[0][i - 1], 0, sizeof(gnutls_cert));
-
-	tmp.data = (opaque*)ptr;
-	tmp.size = siz;
-
-	if ((ret =
-	     _gnutls_x509_cert2gnutls_cert(
-				     &cert_list[0][i - 1],
-				     tmp)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	i++;
-
-	*ncerts = i - 1;
-
-	return 0;
-}
 
 /* Reads a base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure.
@@ -1095,8 +1086,14 @@ static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	int ret;
 
 	if (strstr( input_cert, "-----BEGIN PKCS7")!=NULL) {
-		return parse_pkcs7_cert_mem( cert_list, ncerts, input_cert,
-			input_cert_size);
+		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
+
+		ret = parse_pkcs7_cert_mem( cert_list, ncerts, b64,
+			siz2);
+
+		gnutls_free(b64);
+		
+		return ret;
 	}
 
 	
@@ -1159,10 +1156,9 @@ static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 
 /* Reads a base64 encoded certificate from memory
- * type==0 -> PEM
- * else -> DER
  */
-static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size, int type)
+static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size, 
+	GNUTLS_X509_CertificateFmt type)
 {
 	int ret;
 
@@ -1184,11 +1180,11 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 	res->cert_list[res->ncerts] = NULL; /* for realloc */
 	res->cert_list_length[res->ncerts] = 0;
 
-	if (type==0)
-		ret = parse_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
+	if (type==GNUTLS_X509_FMT_DER)
+		ret = parse_pkcs7_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
 		cert, cert_size);
 	else
-		ret = parse_der_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
+		ret = parse_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
 		cert, cert_size);
 
 	if (ret < 0) {
@@ -1202,21 +1198,26 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 /* Reads a base64 encoded CA list from memory 
  * This is to be called once.
  */
-static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int ca_size)
+static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int ca_size,
+	GNUTLS_X509_CertificateFmt type)
 {
 
-	return parse_cert_mem( &res->x509_ca_list, &res->x509_ncas,
-		ca, ca_size);
+	if (type==GNUTLS_X509_FMT_DER)
+		return parse_pkcs7_cert_mem( &res->x509_ca_list, &res->x509_ncas,
+			ca, ca_size);
+	else
+		return parse_cert_mem( &res->x509_ca_list, &res->x509_ncas,
+			ca, ca_size);
 
 }
 
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
- * type==0 -> PEM
- * else -> DER
+ * type==0 then certificate is DER formatted, else -> DER
  */
-static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size, int type)
+static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size, 
+	GNUTLS_X509_CertificateFmt type)
 {
 	int siz, ret;
 	opaque *b64;
@@ -1234,7 +1235,22 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 	/* read PKCS-1 private key */
 	siz = key_size;
 
-	if (type==0) { /* PEM */
+	if (type==GNUTLS_X509_FMT_DER) { /* DER */
+
+		/* FIXME: only RSA keys supported 
+		 */
+		tmp.data = (opaque*)key;
+		tmp.size = key_size;
+		
+		if ((ret =
+		     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
+					tmp)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		
+	} else { /* PEM */
+
 		/* If we find the "DSA PRIVATE" string in the
 		 * pem encoded certificate then it's a DSA key.
 		 */
@@ -1275,34 +1291,22 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 		}
 	
 		gnutls_free(b64);
-	} else { /* DER */
-
-		/* FIXME: only RSA keys supported 
-		 */
-		tmp.data = (opaque*)key;
-		tmp.size = key_size;
-		
-		if ((ret =
-		     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
-					tmp)) < 0) {
-			gnutls_assert();
-			return ret;
-		}
 	}
 	
 	return 0;
 }
 
 
-/* Reads a base64 encoded certificate file
+/* Reads a certificate file
  */
-static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile)
+static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile,
+	GNUTLS_X509_CertificateFmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
 	FILE *fd1;
 
-	fd1 = fopen(certfile, "r");
+	fd1 = fopen(certfile, "rb");
 	if (fd1 == NULL)
 		return GNUTLS_E_FILE_ERROR;
 
@@ -1311,20 +1315,21 @@ static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile)
 
 	x[siz-1] = 0;
 
-	return read_cert_mem( res, x, siz, 0);
+	return read_cert_mem( res, x, siz, type);
 
 }
 
 /* Reads a base64 encoded CA file (file contains multiple certificate
  * authorities). This is to be called once.
  */
-static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile)
+static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile, 
+	GNUTLS_X509_CertificateFmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
 	FILE *fd1;
 
-	fd1 = fopen(cafile, "r");
+	fd1 = fopen(cafile, "rb");
 	if (fd1 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
@@ -1335,19 +1340,21 @@ static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile)
 
 	x[siz-1] = 0;
 
-	return read_ca_mem( res, x, siz);
+	return read_ca_mem( res, x, siz, type);
 }
 
 
-/* Reads a PEM encoded PKCS-1 RSA private key file
+/* Reads PKCS-1 RSA private key file or a DSA file (in the format openssl
+ * stores it).
  */
-static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
+static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile,
+	GNUTLS_X509_CertificateFmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
 	FILE *fd2;
 
-	fd2 = fopen(keyfile, "r");
+	fd2 = fopen(keyfile, "rb");
 	if (fd2 == NULL)
 		return GNUTLS_E_FILE_ERROR;
 
@@ -1356,37 +1363,38 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
 
 	x[siz-1] = 0;
 
-	return read_key_mem( res, x, siz, 0);
+	return read_key_mem( res, x, siz, type);
 }
 
 
 /**
   * gnutls_certificate_set_x509_key_file - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CERTFILE: is a PEM encoded file containing the certificate list (path) for
-  * the specified private key or a PEM encoded PKCS7 file
-  * @KEYFILE: is a PEM encoded file containing a private key
+  * @CERTFILE: is a file that containing the certificate list (path) for
+  * the specified private key, in PKCS7 format, or a list of certificates
+  * @KEYFILE: is a file that contains the private key
+  * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
   * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
-  * Currently only PKCS-1 PEM encoded RSA and DSA private keys are accepted by
+  * Currently only PKCS-1 encoded RSA and DSA private keys are accepted by
   * this function.
   *
   **/
 int gnutls_certificate_set_x509_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE,
-			   char *KEYFILE)
+			   char *KEYFILE, GNUTLS_X509_CertificateFmt type)
 {
 	int ret;
 
 	/* this should be first 
 	 */
-	if ((ret = read_key_file(res, KEYFILE)) < 0)
+	if ((ret = read_key_file(res, KEYFILE, type)) < 0)
 		return ret;
 
-	if ((ret = read_cert_file(res, CERTFILE)) < 0)
+	if ((ret = read_cert_file(res, CERTFILE, type)) < 0)
 		return ret;
 
 	res->ncerts++;
@@ -1454,19 +1462,20 @@ opaque *pdata;
 /**
   * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CA: is a PEM encoded list of trusted CAs or a PKCS7 pem encoded list
-  * @CRL: is a PEM encoded list of CRLs (ignored for now)
+  * @CA: is a list of trusted CAs or a PKCS7 encoded list
+  * @CRL: is a list of CRLs (ignored for now)
+  * @type: is DER or PEM
   *
   * This function adds the trusted CAs in order to verify client
   * certificates. This function may be called multiple times.
   *
   **/
 int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum *CA,
-			     const gnutls_datum *CRL)
+			     const gnutls_datum *CRL, GNUTLS_X509_CertificateFmt type)
 {
 	int ret;
 
-	if ((ret = read_ca_mem(res, CA->data, CA->size)) < 0)
+	if ((ret = read_ca_mem(res, CA->data, CA->size, type)) < 0)
 		return ret;
 
 	if ((ret = generate_rdn_seq(res)) < 0)
@@ -1478,19 +1487,20 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, co
 /**
   * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CAFILE: is a PEM encoded file containing trusted CAs
-  * @CRLFILE: is a PEM encoded file containing CRLs (ignored for now)
+  * @CAFILE: is a file containing the list of trusted CAs (PKCS7 or PEM list)
+  * @CRLFILE: is a file containing CRLs (ignored for now)
+  * @type: is PEM or DER
   *
   * This function sets the trusted CAs in order to verify client
   * certificates. This function may be called multiple times.
   *
   **/
 int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *CAFILE,
-			     char *CRLFILE)
+			     char *CRLFILE, GNUTLS_X509_CertificateFmt type)
 {
 	int ret;
 
-	if ((ret = read_ca_file(res, CAFILE)) < 0)
+	if ((ret = read_ca_file(res, CAFILE, type)) < 0)
 		return ret;
 
 	if ((ret = generate_rdn_seq(res)) < 0)
@@ -1503,67 +1513,33 @@ int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, c
 /**
   * gnutls_certificate_set_x509_key_mem - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CERT: contains a PEM encoded certificate list (path) for
-  * the specified private key
-  * @KEY: is a PEM encoded private key
+  * @CERT: contains a certificate list (path) for the specified private key
+  * @KEY: is the private key
+  * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
   * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
-  * Currently are supported: RSA PKCS-1 PEM encoded private keys, 
-  * pem encoded DSA private keys.
+  * Currently are supported: RSA PKCS-1 encoded private keys, 
+  * DSA private keys.
+  *
+  * DSA private keys are encoded the OpenSSL way, which is an ASN.1
+  * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
   *
   **/
 int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
-			   const gnutls_datum* KEY)
+			   const gnutls_datum* KEY, GNUTLS_X509_CertificateFmt type)
 {
 	int ret;
 
 	/* this should be first 
 	 */
-	if ((ret = read_key_mem( res, KEY->data, KEY->size, 0)) < 0)
+	if ((ret = read_key_mem( res, KEY->data, KEY->size, type)) < 0)
 		return ret;
 
-	if ((ret = read_cert_mem( res, CERT->data, CERT->size, 0)) < 0)
-		return ret;
-
-	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return 0;
-}
-
-/**
-  * gnutls_certificate_set_x509_raw_key_mem - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
-  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CERT: contains a DER encoded certificate for
-  * the specified private key
-  * @KEY: is a DER encoded private key
-  *
-  * This function sets a certificate/private key pair in the 
-  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
-  * more than once (in case multiple keys/certificates exist for the
-  * server).
-  *
-  * Currently are supported: RSA PKCS-1 DER encoded private keys, 
-  * DER encoded DSA private keys.
-  *
-  **/
-int gnutls_certificate_set_x509_der_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
-			   const gnutls_datum* KEY)
-{
-	int ret;
-
-	/* this should be first 
-	 */
-	if ((ret = read_key_mem( res, KEY->data, KEY->size, 1)) < 0)
-		return ret;
-
-	if ((ret = read_cert_mem( res, CERT->data, CERT->size, 1)) < 0)
+	if ((ret = read_cert_mem( res, CERT->data, CERT->size, type)) < 0)
 		return ret;
 
 	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
@@ -2082,7 +2058,7 @@ int _gnutls_verify_x509_file( char *cafile)
 	char x[MAX_FILE_SIZE];
 	FILE *fd1;
 
-	fd1 = fopen(cafile, "r");
+	fd1 = fopen(cafile, "rb");
 	if (fd1 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;

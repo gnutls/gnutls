@@ -50,7 +50,7 @@ int main()
       fprintf(stderr, "memory error\n");
       exit(1);
    }
-   gnutls_certificate_set_x509_trust_file(xcred, CAFILE, CRLFILE);
+   gnutls_certificate_set_x509_trust_file(xcred, CAFILE, CRLFILE, GNUTLS_X509_FMT_PEM);
 
    for (t = 0; t < 2; t++) {    /* connect 2 times to the server */
 

@@ -42,7 +42,7 @@ int main()
    }
    /* set's the trusted cas file
     */
-   gnutls_certificate_set_x509_trust_file(xcred, CAFILE, CRLFILE);
+   gnutls_certificate_set_x509_trust_file(xcred, CAFILE, CRLFILE, GNUTLS_X509_FMT_PEM);
 
    /* connects to server 
     */

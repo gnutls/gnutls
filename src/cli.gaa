@@ -38,7 +38,7 @@ option (kx) *STR "kx1 kx2..." { $kx = $1; $nkx = @1 } "Key exchange methods to e
 option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Certificate types to enable."
 
 #char *x509_cafile;
-option (cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
+option (x509cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
 
 #char *pgp_keyfile;
 option (pgpkeyfile) STR "FILE" { $pgp_keyfile = $1 } "PGP Key file to use."
