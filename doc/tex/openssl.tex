@@ -4,7 +4,19 @@ To ease \gnutls{}' integration with existing applications, a compatibility
 layer with the widely used OpenSSL library is included in the \emph{gnutls-extra}
 library. This compatibility layer is not complete and it is not 
 intended to completely reimplement the OpenSSL API with \gnutls{}.
+It only provides source-level compatibility. There is currently no
+attempt to make it binary-compatible with OpenSSL.
 
 Prototypes for the compatibility functions are found in the 
 ``gnutls/openssl.h'' header file.
+
+Current limitations imposed by the compatibility layer include:
+
+\begin{itemize}
+
+\item Error handling is not thread safe.
+
+\item The same network socket must be used for both reading and writing.
+
+\end{itemize}
 
