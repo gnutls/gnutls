@@ -1,8 +1,9 @@
-Version 0.8.5
-- Allow larger MPI parameters.
+Version 0.8.5 (22/03/2003)
+- Allow larger MPI parameters in certificates.
 - Implemented the counter measure discussed in the paper "Attacking
-  RSA-based Sessions in SSL/TLS", against the attack discussed in the
+  RSA-based Sessions in SSL/TLS", against the attack discribed in the
   same paper.
+- The RSA premaster secret version check can no longer be disabled.
 
 Version 0.8.4 (10/03/2003)
 - Corrected a broken buffer check in _gnutls_io_read_buffered(),
