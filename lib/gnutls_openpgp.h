@@ -14,7 +14,10 @@ int gnutls_certificate_set_openpgp_key_file(
                                             char* CERTFILE,
                                             char* KEYFILE);
 
+int gnutls_openpgp_count_key_names( const gnutls_datum *cert );
+     
 int gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
+                                     int idx,
                                      gnutls_openpgp_name *dn );
 
 int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );

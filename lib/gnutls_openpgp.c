@@ -494,7 +494,7 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
         }
     }
   pkey->params_size += cdk_pk_get_nskey( pke_algo );
-  for (j=0; j< cdk_pk_get_nskey( pke_algo ); j++, i++)
+  for (j=0; j<cdk_pk_get_nskey( pke_algo ); j++, i++)
     {
       nbytes = sk->mpi[j]->bytes+2;
       rc = gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
@@ -506,11 +506,11 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
           goto leave;
         }
     }
-  if (is_ELG(pke_algo))
+  if ( is_ELG(pke_algo) )
     return GNUTLS_E_UNWANTED_ALGORITHM;
-  else if (is_DSA(pke_algo))
+  else if ( is_DSA(pke_algo) )
     pkey->pk_algorithm = GNUTLS_PK_DSA;
-  else if (is_RSA(pke_algo))
+  else if ( is_RSA(pke_algo) )
     pkey->pk_algorithm = GNUTLS_PK_RSA;
   rc = gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size);
   if (rc < 0)
@@ -647,7 +647,7 @@ gnutls_certificate_set_openpgp_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                        gnutls_datum *key)
 {
   gnutls_datum raw;
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   int rc = 0;
   int i;
   
@@ -682,23 +682,23 @@ gnutls_certificate_set_openpgp_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
       return GNUTLS_E_MEMORY_ERROR; 
     }
 
-  for (i=1, p=kb_pk; p && p->pkt->pkttype; p=p->next)
+  for (i=1, pkt=kb_pk; pkt && pkt->pkt->pkttype; pkt=pkt->next)
     {
       if (i > MAX_PARAMS_SIZE)
         break;
-      if (p->pkt->pkttype == PKT_PUBLIC_KEY)
+      if (pkt->pkt->pkttype == PKT_PUBLIC_KEY)
         {
           int n = res->ncerts;
-          PKT_public_key *pk = p->pkt->pkt.public_key;
+          PKT_public_key *pk = pkt->pkt->pkt.public_key;
           res->cert_list_length[n] = 1;
           gnutls_set_datum(&res->cert_list[n][0].raw, cert->data, cert->size);
           openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
           i++;
         }
-      else if (p->pkt->pkttype == PKT_SIGNATURE)
+      else if (pkt->pkt->pkttype == PKT_SIGNATURE)
         {
           int n = res->ncerts;
-          PKT_signature *sig = p->pkt->pkt.signature;
+          PKT_signature *sig = pkt->pkt->pkt.signature;
           openpgp_sig_to_gnutls_cert( &res->cert_list[n][0], sig ); 
         }
     }
@@ -738,7 +738,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                         char* KEYFILE)
 {
   IOBUF buf = NULL;
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   gnutls_datum raw;
   armor_filter_s afx;
   int eof = 0, i;
@@ -798,23 +798,23 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     rc = cdk_keydb_get_keyblock( buf, &kb_pk, &eof );
     if ( !kb_pk || rc )
       break;
-    for (i=1, p=kb_pk; p && p->pkt->pkttype; p=p->next)
+    for (i=1, pkt=kb_pk; pkt && pkt->pkt->pkttype; pkt=pkt->next)
       {
         if (i > MAX_PARAMS_SIZE)
           break;
-        if (p->pkt->pkttype == PKT_PUBLIC_KEY)
+        if (pkt->pkt->pkttype == PKT_PUBLIC_KEY)
           {
             int n = res->ncerts;
-            PKT_public_key *pk = p->pkt->pkt.public_key;
+            PKT_public_key *pk = pkt->pkt->pkt.public_key;
             res->cert_list_length[n] = 1;
             iobuf_to_datum(buf, &res->cert_list[n][0].raw);
             openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
             i++;
           }
-        else if (p->pkt->pkttype == PKT_SIGNATURE)
+        else if (pkt->pkt->pkttype == PKT_SIGNATURE)
           {
             int n = res->ncerts;
-            PKT_signature *sig = p->pkt->pkt.signature;
+            PKT_signature *sig = pkt->pkt->pkt.signature;
             openpgp_sig_to_gnutls_cert( &res->cert_list[n][0], sig );
           }
       }
@@ -871,6 +871,25 @@ leave:
   return rc;
 }
 
+int
+gnutls_openpgp_count_key_names( const gnutls_datum *cert )
+{
+  KBNODE kb_pk = NULL, pkt;
+  int nuids = 0;
+  
+  if ( !cert )
+    return 0;
+
+  if ( datum_to_kbnode( cert, &kb_pk ) )
+    return 0;
+  for ( pkt=kb_pk; pkt; pkt=pkt->next )
+    {
+      if ( pkt->pkt->pkttype == PKT_USER_ID )
+        nuids++;
+    }
+  return nuids;
+} /* gnutls_openpgp_count_key_names */
+
 /**
  * gnutls_openpgp_extract_key_name - Extracts the userID
  * @cert: the raw data that contains the OpenPGP public key.
@@ -880,24 +899,38 @@ leave:
  **/
 int
 gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
+                                 int idx,
                                  gnutls_openpgp_name *dn )
 {
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   PKT_user_id *uid = NULL;
   char *email;
   int rc = 0;
   int pos1 = 0, pos2 = 0;
   size_t size = 0;
+  int pos = 0;
 
   if (!cert || !dn)
     return GNUTLS_E_INVALID_PARAMETERS;
 
+  if ( idx < 0 || idx > gnutls_openpgp_count_key_names( cert ) )
+    return GNUTLS_E_UNKNOWN_ERROR;
+    
   rc = datum_to_kbnode( cert, &kb_pk );
-  if (rc)
+  if ( rc )
     return rc;
-  p = cdk_kbnode_find( kb_pk, PKT_USER_ID );
-  if ( p )
-    uid = p->pkt->pkt.user_id;
+  if ( !idx )
+    pkt = cdk_kbnode_find( kb_pk, PKT_USER_ID );
+  else
+    {
+      for ( pos=0, pkt=kb_pk; pkt; pkt=pkt->next )
+        {
+          if ( pkt->pkt->pkttype == PKT_USER_ID && pos == idx )
+            break;
+        }
+    }
+  if ( pkt )
+    uid = pkt->pkt->pkt.user_id;
   if (!uid)
     {
       rc = GNUTLS_E_UNKNOWN_ERROR;
@@ -941,7 +974,7 @@ leave:
 int
 gnutls_openpgp_extract_key_version( const gnutls_datum *cert )
 {
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   int version = 0;
 
   if (!cert)
@@ -949,9 +982,9 @@ gnutls_openpgp_extract_key_version( const gnutls_datum *cert )
 
   if ( datum_to_kbnode( cert, &kb_pk ) )
     return 0;
-  p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( p )
-    version = p->pkt->pkt.public_key->version;
+  pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
+  if ( pkt )
+    version = pkt->pkt->pkt.public_key->version;
   cdk_kbnode_release( kb_pk );
 
   return version;
@@ -966,7 +999,7 @@ gnutls_openpgp_extract_key_version( const gnutls_datum *cert )
 time_t
 gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert )
 {
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   time_t timestamp = 0;
 
   if (!cert)
@@ -974,9 +1007,9 @@ gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert )
   
   if ( datum_to_kbnode( cert, &kb_pk ) )
     return 0;
-  p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( p )
-    timestamp = p->pkt->pkt.public_key->timestamp;
+  pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
+  if ( pkt )
+    timestamp = pkt->pkt->pkt.public_key->timestamp;
   cdk_kbnode_release( kb_pk );
   
   return timestamp;
@@ -992,7 +1025,7 @@ gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert )
 time_t
 gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
 {
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   time_t expiredate = 0;
 
   if (!cert)
@@ -1000,9 +1033,9 @@ gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
   
   if ( datum_to_kbnode( cert, &kb_pk ) )
     return 0;
-  p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( p )
-    expiredate = p->pkt->pkt.public_key->expiredate;
+  pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
+  if ( pkt )
+    expiredate = pkt->pkt->pkt.public_key->expiredate;
   cdk_kbnode_release( kb_pk );
   
   return expiredate;
@@ -1016,7 +1049,7 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
   int flags = 0;
   int ot = 0, trustval = 0;
   int rc = 0;
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   PKT_public_key *pk = NULL;
   IOBUF buf;
 
@@ -1028,10 +1061,10 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
   if ( rc )
     return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-  p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( p )
-    pk = p->pkt->pkt.public_key;
-  if (!pk)
+  pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
+  if ( pkt )
+    pk = pkt->pkt->pkt.public_key;
+  if ( !pk )
     return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
   rc = cdk_iobuf_open( &buf, trustdb, IOBUF_MODE_RD );
@@ -1171,7 +1204,7 @@ leave:
 int
 gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr, size_t *fprlen)
 {
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   PKT_public_key *pk = NULL;
   int rc = 0;
   
@@ -1182,9 +1215,9 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr, size_t *fprlen)
   rc = datum_to_kbnode( cert, &kb_pk );
   if (rc)
     return rc;
-  p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( p )
-    pk = p->pkt->pkt.public_key;
+  pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
+  if ( pkt )
+    pk = pkt->pkt->pkt.public_key;
   if ( !pk )
     return GNUTLS_E_UNKNOWN_ERROR;
 
@@ -1193,7 +1226,7 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr, size_t *fprlen)
     *fprlen = 16;
   cdk_pk_get_fingerprint( pk, fpr );
   
-  return 0;  
+  return 0;
 }
 
 /**
@@ -1206,7 +1239,7 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr, size_t *fprlen)
 int
 gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid )
 {
-  KBNODE kb_pk = NULL, p;
+  KBNODE kb_pk = NULL, pkt;
   PKT_public_key *pk = NULL;
   int rc = 0;
   
@@ -1217,9 +1250,9 @@ gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid )
   if (rc)
     return rc;
 
-  p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( p )
-    pk = p->pkt->pkt.public_key;
+  pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
+  if ( pkt )
+    pk = pkt->pkt->pkt.public_key;
   if ( !pk )
     return GNUTLS_E_UNKNOWN_ERROR;
   cdk_pk_get_keyid( pk, (u32 *)keyid );
