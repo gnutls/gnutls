@@ -70,7 +70,7 @@ int main()
       gnutls_set_cred(state, GNUTLS_X509PKI, xcred);
 
       if (t > 0) { /* if this is not the first time we connect */
-         gnutls_set_current_session(state, session, session_size);
+         gnutls_session_set_data(state, session, session_size);
          free(session);
       }
       
@@ -90,26 +90,26 @@ int main()
 
       if (t == 0) { /* the first time we connect */
          /* get the session data size */
-         gnutls_get_current_session(state, NULL, &session_size);
+         gnutls_session_get_data(state, NULL, &session_size);
          session = malloc(session_size);
 
          /* put session data to the session variable */
-         gnutls_get_current_session(state, session, &session_size);
+         gnutls_session_get_data(state, session, &session_size);
 
          /* keep the current session ID. This is only needed
           * in order to check if the server actually resumed this
           * connection.
           */
-         gnutls_get_current_session_id(state, NULL, &session_id_size);
+         gnutls_session_get_id(state, NULL, &session_id_size);
          session_id = malloc(session_id_size);
-         gnutls_get_current_session_id(state, session_id, &session_id_size);
+         gnutls_session_get_id(state, session_id, &session_id_size);
 
       } else { /* the second time we connect */
 
          /* check if we actually resumed the previous session */
-         gnutls_get_current_session_id(state, NULL, &tmp_session_id_size);
+         gnutls_session_get_id(state, NULL, &tmp_session_id_size);
          tmp_session_id = malloc(tmp_session_id_size);
-         gnutls_get_current_session_id(state, tmp_session_id, &tmp_session_id_size);
+         gnutls_session_get_id(state, tmp_session_id, &tmp_session_id_size);
 
          if (memcmp(tmp_session_id, session_id, session_id_size) == 0) {
             printf("- Previous session was resumed\n");

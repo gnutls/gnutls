@@ -38,7 +38,7 @@
 #endif
 
 /**
-  * gnutls_set_db_retrieve_function - Sets the function that will be used to get data
+  * gnutls_db_set_retrieve_function - Sets the function that will be used to get data
   * @state: is a &GNUTLS_STATE structure.
   * @retr_func: is the function.
   *
@@ -48,16 +48,16 @@
   * This function should only be used if you do
   * not plan to use the included gdbm backend.
   *
-  * The first argument to store_func() will be null unless gnutls_set_db_ptr() 
+  * The first argument to store_func() will be null unless gnutls_db_set_ptr() 
   * has been called.
   *
   **/
-void gnutls_set_db_retrieve_function( GNUTLS_STATE state, DB_RETR_FUNC retr_func) {
+void gnutls_db_set_retrieve_function( GNUTLS_STATE state, DB_RETR_FUNC retr_func) {
 	state->gnutls_internals.db_retrieve_func = retr_func;
 }
 
 /**
-  * gnutls_set_db_remove_function - Sets the function that will be used to remove data
+  * gnutls_db_set_remove_function - Sets the function that will be used to remove data
   * @state: is a &GNUTLS_STATE structure.
   * @rem_func: is the function.
   *
@@ -66,16 +66,16 @@ void gnutls_set_db_retrieve_function( GNUTLS_STATE state, DB_RETR_FUNC retr_func
   * This function should only be used if you do
   * not plan to use the included gdbm backend.
   *
-  * The first argument to rem_func() will be null unless gnutls_set_db_ptr() 
+  * The first argument to rem_func() will be null unless gnutls_db_set_ptr() 
   * has been called.
   *
   **/
-void gnutls_set_db_remove_function( GNUTLS_STATE state, DB_REMOVE_FUNC rem_func) {
+void gnutls_db_set_remove_function( GNUTLS_STATE state, DB_REMOVE_FUNC rem_func) {
 	state->gnutls_internals.db_remove_func = rem_func;
 }
 
 /**
-  * gnutls_set_db_store_function - Sets the function that will be used to put data
+  * gnutls_db_set_store_function - Sets the function that will be used to put data
   * @state: is a &GNUTLS_STATE structure.
   * @store_func: is the function
   *
@@ -84,16 +84,16 @@ void gnutls_set_db_remove_function( GNUTLS_STATE state, DB_REMOVE_FUNC rem_func)
   * This function should only be used if you do
   * not plan to use the included gdbm backend.
   *
-  * The first argument to store_func() will be null unless gnutls_set_db_ptr() 
+  * The first argument to store_func() will be null unless gnutls_db_set_ptr() 
   * has been called.
   *
   **/
-void gnutls_set_db_store_function( GNUTLS_STATE state, DB_STORE_FUNC store_func) {
+void gnutls_db_set_store_function( GNUTLS_STATE state, DB_STORE_FUNC store_func) {
 	state->gnutls_internals.db_store_func = store_func;
 }
 
 /**
-  * gnutls_set_db_ptr - Sets a pointer to be sent to db functions
+  * gnutls_db_set_ptr - Sets a pointer to be sent to db functions
   * @state: is a &GNUTLS_STATE structure.
   * @ptr: is the pointer
   *
@@ -101,7 +101,7 @@ void gnutls_set_db_store_function( GNUTLS_STATE state, DB_STORE_FUNC store_func)
   * the first argument. Should only be called if not using the gdbm backend.
   *
   **/
-void gnutls_set_db_ptr( GNUTLS_STATE state, void* ptr) {
+void gnutls_db_set_ptr( GNUTLS_STATE state, void* ptr) {
 	state->gnutls_internals.db_ptr = ptr;
 }
 
@@ -118,7 +118,7 @@ void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds) {
 }
 
 /**
-  * gnutls_set_db_name - Sets the name of the database that holds TLS sessions.
+  * gnutls_db_set_name - Sets the name of the database that holds TLS sessions.
   * @state: is a &GNUTLS_STATE structure.
   * @filename: is the filename for the database
   *
@@ -126,10 +126,10 @@ void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds) {
   * the sessions to be resumed. This function also creates the database
   * - if it does not exist - and opens it for reading.
   * You should not call this function if using an other backend
-  * than gdbm (ie. called function gnutls_set_db_store_func() etc.)
+  * than gdbm (ie. called function gnutls_db_set_store_func() etc.)
   *
   **/
-int gnutls_set_db_name( GNUTLS_STATE state, char* filename) {
+int gnutls_db_set_name( GNUTLS_STATE state, char* filename) {
 #ifdef HAVE_LIBGDBM
 GDBM_FILE dbf;
 
@@ -166,7 +166,7 @@ GDBM_FILE dbf;
 }
 
 /**
-  * gnutls_check_db_entry - checks if the given db entry has expired
+  * gnutls_db_check_entry - checks if the given db entry has expired
   * @state: is a &GNUTLS_STATE structure.
   * @session_entry: is the session data (not key)
   *
@@ -177,7 +177,7 @@ GDBM_FILE dbf;
   * backend.
   *
   **/
-int gnutls_check_db_entry( GNUTLS_STATE state, gnutls_datum session_entry) {
+int gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry) {
 time_t timestamp;
 
 	timestamp = time(0);
@@ -190,7 +190,7 @@ time_t timestamp;
 }
 
 /**
-  * gnutls_clean_db - removes expired and invalid sessions from the database
+  * gnutls_db_clean - removes expired and invalid sessions from the database
   * @state: is a &GNUTLS_STATE structure.
   *
   * This function Deletes all expired records in the resumed sessions' database. 
@@ -199,7 +199,7 @@ time_t timestamp;
   * be called if using the gdbm backend.
   *
   **/
-int gnutls_clean_db( GNUTLS_STATE state) {
+int gnutls_db_clean( GNUTLS_STATE state) {
 #ifdef HAVE_LIBGDBM
 GDBM_FILE dbf;
 int ret;
@@ -220,7 +220,7 @@ gnutls_datum _key;
 	_key.size = key.dsize;
 	while( _key.data != NULL) {
 
-		if ( gnutls_check_db_entry( state, _key)==GNUTLS_E_EXPIRED) {
+		if ( gnutls_db_check_entry( state, _key)==GNUTLS_E_EXPIRED) {
 		    /* delete expired entry */
 		    gdbm_delete( dbf, key);
 		}
@@ -290,7 +290,7 @@ int ret;
 	}
 
 	/* expiration check is performed inside */
-	ret = gnutls_set_current_session( state, data.data, data.size);
+	ret = gnutls_session_set_data( state, data.data, data.size);
 
 	/* Note: Data is not allocated with gnutls_malloc
 	 */

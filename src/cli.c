@@ -253,13 +253,13 @@ int main(int argc, char** argv)
 		printf("- Handshake was completed\n");
 	}
 	
-	gnutls_get_current_session( state, NULL, &session_size);
+	gnutls_session_get_data( state, NULL, &session_size);
 	session = malloc(session_size);
-	gnutls_get_current_session( state, session, &session_size);
+	gnutls_session_get_data( state, session, &session_size);
 
-	gnutls_get_current_session_id( state, NULL, &session_id_size);
+	gnutls_session_get_id( state, NULL, &session_id_size);
 	session_id = malloc(session_id_size);
-	gnutls_get_current_session_id( state, session_id, &session_id_size);
+	gnutls_session_get_id( state, session_id, &session_id_size);
 
 /* print some information */
  	print_info( state);
@@ -299,7 +299,7 @@ int main(int argc, char** argv)
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
 #ifdef RESUME
-	gnutls_set_current_session( state, session, session_size);
+	gnutls_session_set_data( state, session, session_size);
 	free(session);
 #endif
 
@@ -320,9 +320,9 @@ int main(int argc, char** argv)
 	}
 
 	/* check if we actually resumed the previous session */
-	gnutls_get_current_session_id( state, NULL, &tmp_session_id_size);
+	gnutls_session_get_id( state, NULL, &tmp_session_id_size);
 	tmp_session_id = malloc(tmp_session_id_size);
-	gnutls_get_current_session_id( state, tmp_session_id, &tmp_session_id_size);
+	gnutls_session_get_id( state, tmp_session_id, &tmp_session_id_size);
 
 	if (memcmp( tmp_session_id, session_id, session_id_size)==0) {
 		printf("- Previous session was resumed\n");

@@ -77,7 +77,7 @@ GNUTLS_STATE initialize_state()
 	int ret;
 
 	gnutls_init(&state, GNUTLS_SERVER);
-	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
+	if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
 		fprintf(stderr, "*** DB error (%d). Resuming will not be possible.\n\n", ret);
 
 	/* null cipher is here only for debuging 
@@ -113,7 +113,7 @@ void print_info(GNUTLS_STATE state)
 	int cert_list_size = 0;
 	
 	/* print session_id specific data */
-	gnutls_get_current_session_id( state, sesid, &sesid_size);
+	gnutls_session_get_id( state, sesid, &sesid_size);
 	printf("\n- Session ID: ");
 	for(i=0;i<sesid_size;i++)
 		printf("%.2X", sesid[i]);
@@ -215,7 +215,7 @@ void peer_print_info( GNUTLS_STATE state)
 	int sesid_size, i;
 	
 	/* print session_id */
-	gnutls_get_current_session_id( state, sesid, &sesid_size);
+	gnutls_session_get_id( state, sesid, &sesid_size);
 	sprintf(tmp2, "\n<p>Session ID: <i>");
 	for(i=0;i<sesid_size;i++)
 		sprintf(tmp2, "%.2X", sesid[i]);

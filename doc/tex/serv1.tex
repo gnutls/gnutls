@@ -42,7 +42,7 @@ GNUTLS_STATE initialize_state()
 
    /* in order to support session resuming:
     */
-   if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
+   if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
       fprintf(stderr, "*** DB error (%d)\n\n", ret);
 
    gnutls_set_cipher_priority(state, GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
@@ -68,7 +68,7 @@ void print_info(GNUTLS_STATE state)
    int sesid_size, i;
 
    /* print session_id specific data */
-   gnutls_get_current_session_id(state, sesid, &sesid_size);
+   gnutls_get_session_get_id(state, sesid, &sesid_size);
    printf("\n- Session ID: ");
    for (i = 0; i < sesid_size; i++)
       printf("%.2X", sesid[i]);

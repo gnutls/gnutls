@@ -127,14 +127,15 @@ int gnutls_set_protocol_priority( GNUTLS_STATE state, GNUTLS_LIST);
 
 /* set our version - 0 for TLS 1.0 and 1 for SSL3 */
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
+
 const char *gnutls_version_get_name(GNUTLS_Version version);
 
 
 /* get/set session */
-int gnutls_set_current_session( GNUTLS_STATE state, void* session, int session_size);
-int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_size);
+int gnutls_session_set_data( GNUTLS_STATE state, void* session, int session_size);
+int gnutls_session_get_data( GNUTLS_STATE state, void* session, int *session_size);
 /* returns the session ID */
-int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size);
+int gnutls_session_get_id( GNUTLS_STATE state, void* session, int *session_size);
 
 typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
 typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
@@ -142,13 +143,14 @@ typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
 
 void gnutls_set_lowat( GNUTLS_STATE state, int num);
 void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
-int gnutls_set_db_name( GNUTLS_STATE state, char* filename);	
-int gnutls_clean_db( GNUTLS_STATE state);
-void gnutls_set_db_retrieve_func( GNUTLS_STATE, DB_RETR_FUNC);
-void gnutls_set_db_remove_func( GNUTLS_STATE, DB_REMOVE_FUNC);
-void gnutls_set_db_store_func( GNUTLS_STATE, DB_STORE_FUNC);
-void gnutls_set_db_ptr( GNUTLS_STATE, void* db_ptr);
-int gnutls_check_db_entry( GNUTLS_STATE state, gnutls_datum session_entry);
+
+int  gnutls_db_set_name( GNUTLS_STATE state, char* filename);	
+int  gnutls_db_clean( GNUTLS_STATE state);
+void gnutls_db_set_retrieve_func( GNUTLS_STATE, DB_RETR_FUNC);
+void gnutls_db_set_remove_func( GNUTLS_STATE, DB_REMOVE_FUNC);
+void gnutls_db_set_store_func( GNUTLS_STATE, DB_STORE_FUNC);
+void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
+int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
 
 void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
 
@@ -165,7 +167,7 @@ int gnutls_set_cred( GNUTLS_STATE, CredType type, void* cred);
  * TLS extension. (draft-ietf-tls-extensions)
  */
 const void* gnutls_ext_get_name_ind( GNUTLS_STATE state, GNUTLS_NAME_IND ind);
-int gnutls_ext_set_name_ind( GNUTLS_STATE state, GNUTLS_NAME_IND ind, const void* name);
+        int gnutls_ext_set_name_ind( GNUTLS_STATE state, GNUTLS_NAME_IND ind, const void* name);
 
 /* This will set the Common Name field in case of X509PKI
  * authentication. This will be used while verifying the
