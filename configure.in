@@ -118,8 +118,6 @@ return 0;
 if test $ac_cv_c_compiler_gnu != no; then
 	if test x$opt_developer_mode = xyes; then
 	  CFLAGS="${CFLAGS} -g -Wno-format-y2k -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wmissing-braces -Winline -Wstrict-prototypes -Wshadow"
-	else
-	  CFLAGS="${CFLAGS} -O2 -finline-functions"
 	fi
 
 	if test x$opt_dmalloc_mode = xyes; then
