@@ -2005,12 +2005,16 @@ signing_key
 The prototypes for the following functions lie in
 @file{gnutls/gnutls.h}.
 
+@include gnutls-api.texi
+
 @section X.509 certificate functions
 @anchor{sec:x509api}
 @cindex X.509 Functions
 
 The following functions are to be used for X.509 certificate handling.
 Their prototypes lie in @file{gnutls/x509.h}.
+
+@include x509-api.texi
 
 @section @acronym{GnuTLS-extra} functions
 @cindex @acronym{GnuTLS-extra} functions
@@ -2019,12 +2023,16 @@ These functions are only available in the GPL version of the library
 called @code{gnutls-extra}. The prototypes for this library lie in
 @file{gnutls/extra.h}.
 
+@include gnutls-extra-api.texi
+
 @section OpenPGP functions
 @cindex OpenPGP functions
 @anchor{sec:openpgpapi}
 
 The following functions are to be used for OpenPGP certificate
 handling.  Their prototypes lie in @file{gnutls/openpgp.h}.
+
+@include pgp-api.texi
 
 @chapter Certificate to XML convertion functions
 @cindex Certificate to XML convertion
