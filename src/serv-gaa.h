@@ -8,50 +8,52 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 64 "serv.gaa"
+#line 67 "serv.gaa"
 	char **ctype;
-#line 63 "serv.gaa"
+#line 66 "serv.gaa"
 	int nctype;
-#line 60 "serv.gaa"
+#line 63 "serv.gaa"
 	char **kx;
-#line 59 "serv.gaa"
+#line 62 "serv.gaa"
 	int nkx;
-#line 56 "serv.gaa"
+#line 59 "serv.gaa"
 	char **macs;
-#line 55 "serv.gaa"
+#line 58 "serv.gaa"
 	int nmacs;
-#line 52 "serv.gaa"
+#line 55 "serv.gaa"
 	char **comp;
-#line 51 "serv.gaa"
+#line 54 "serv.gaa"
 	int ncomp;
-#line 48 "serv.gaa"
+#line 51 "serv.gaa"
 	char **proto;
-#line 47 "serv.gaa"
+#line 50 "serv.gaa"
 	int nproto;
-#line 44 "serv.gaa"
+#line 47 "serv.gaa"
 	char **ciphers;
-#line 43 "serv.gaa"
+#line 46 "serv.gaa"
 	int nciphers;
-#line 39 "serv.gaa"
+#line 42 "serv.gaa"
 	char *srp_passwd_conf;
-#line 36 "serv.gaa"
+#line 39 "serv.gaa"
 	char *srp_passwd;
-#line 33 "serv.gaa"
+#line 36 "serv.gaa"
 	char *pgp_keyserver;
-#line 30 "serv.gaa"
+#line 33 "serv.gaa"
 	char *x509_certfile;
-#line 27 "serv.gaa"
+#line 30 "serv.gaa"
 	char *x509_keyfile;
-#line 24 "serv.gaa"
+#line 27 "serv.gaa"
 	char *pgp_certfile;
-#line 21 "serv.gaa"
+#line 24 "serv.gaa"
 	char *pgp_keyfile;
-#line 18 "serv.gaa"
+#line 21 "serv.gaa"
 	char *pgp_trustdb;
-#line 15 "serv.gaa"
+#line 18 "serv.gaa"
 	char *pgp_keyring;
-#line 12 "serv.gaa"
+#line 15 "serv.gaa"
 	char *x509_cafile;
+#line 12 "serv.gaa"
+	int fmtder;
 #line 9 "serv.gaa"
 	int http;
 #line 6 "serv.gaa"

@@ -41,6 +41,7 @@ static char http_buffer[16 * 1024];
 static int generate = 0;
 static int http = 0;
 static int port = 0;
+static int x509ctype;
 
 char *srp_passwd;
 char *srp_passwd_conf;
@@ -345,12 +346,15 @@ int main(int argc, char **argv)
       exit(1);
    }
 
-   if (x509_cafile != NULL)
-      if (gnutls_certificate_set_x509_trust_file
-	  (cert_cred, x509_cafile, x509_crlfile, GNUTLS_X509_FMT_PEM) < 0) {
+   if (x509_cafile != NULL) {
+      if ((ret=gnutls_certificate_set_x509_trust_file
+	  (cert_cred, x509_cafile, x509_crlfile, x509ctype)) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_cafile);
 	 exit(1);
+      } else {
+      	 printf("Processed %d CA certificate(s).\n", ret);
       }
+   }
 
    if (pgp_keyring != NULL) {
       ret =
@@ -376,7 +380,7 @@ int main(int argc, char **argv)
 
    if (x509_certfile != NULL)
       if (gnutls_certificate_set_x509_key_file
-	  (cert_cred, x509_certfile, x509_keyfile, GNUTLS_X509_FMT_PEM) < 0) {
+	  (cert_cred, x509_certfile, x509_keyfile, x509ctype) < 0) {
 	 fprintf(stderr,
 		 "Error reading '%s' or '%s'\n", x509_certfile,
 		 x509_keyfile);
@@ -565,6 +569,11 @@ void gaa_parser(int argc, char **argv)
       http = 0;
    else
       http = 1;
+
+   if (info.fmtder == 0)
+      x509ctype = GNUTLS_X509_FMT_PEM;
+   else
+      x509ctype = GNUTLS_X509_FMT_DER;
 
    if (info.generate == 0)
       generate = 0;

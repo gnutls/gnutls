@@ -9,6 +9,9 @@ option (p, port) INT "integer" { $port = $1 } "The port to connect to."
 #int http;
 option (http) { $http = 1 } "Act as an HTTP Server."
 
+#int fmtder;
+option (x509fmtder) { $fmtder = 1 } "Use DER format for certificates"
+
 #char *x509_cafile;
 option (x509cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
 
@@ -74,7 +77,7 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $pgp_keyserver=NULL; 
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; 
-	$pgp_trustdb=NULL; $pgp_keyring=NULL; }
+	$pgp_trustdb=NULL; $pgp_keyring=NULL; $fmtder = 0; }
 
 ##
 

@@ -64,6 +64,7 @@ char *x509_keyfile;
 char *x509_certfile;
 char *x509_cafile;
 char *x509_crlfile = NULL;
+static int x509ctype;
 
 
 int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
@@ -177,7 +178,7 @@ int main(int argc, char **argv)
    if (x509_cafile != NULL) {
       ret =
 	  gnutls_certificate_set_x509_trust_file(xcred, x509_cafile,
-					 x509_crlfile, GNUTLS_X509_FMT_PEM);
+					 x509_crlfile, x509ctype);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 trust file\n");
       }
@@ -186,7 +187,7 @@ int main(int argc, char **argv)
    if (x509_certfile != NULL) {
       ret =
 	  gnutls_certificate_set_x509_key_file(xcred, x509_certfile,
-				       x509_keyfile, GNUTLS_X509_FMT_PEM);
+				       x509_keyfile, x509ctype);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s')\n",
 		 x509_certfile, x509_keyfile);
@@ -481,6 +482,11 @@ void gaa_parser(int argc, char **argv)
    port = info.port;
    record_max_size = info.record_size;
    fingerprint = info.fingerprint;
+
+   if (info.fmtder == 0)
+      x509ctype = GNUTLS_X509_FMT_PEM;
+   else
+      x509ctype = GNUTLS_X509_FMT_DER;
 
 #ifdef DEBUG
    if (info.x509_certfile != NULL)
