@@ -287,8 +287,8 @@ int main(int argc, char** argv)
 			ret = gnutls_read(sd, state, buffer, MAX_BUF);
 			/* remove new line */
 
-			if (gnutls_is_fatal_error(ret) == 1) {
-				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED || ret == GNUTLS_E_INVALID_SESSION) {
+			if (gnutls_is_fatal_error(ret) == 1 || ret==0) {
+				if (ret == 0) {
 					printf("- Peer has closed the GNUTLS connection\n");
 					break;
 				} else {

@@ -94,6 +94,8 @@ GNUTLS_STATE initialize_state()
 	 */
 	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, 
 				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, 0);
+	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, 
+				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
 	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority(state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
 			       GNUTLS_KX_DH_ANON, 0);
@@ -186,8 +188,8 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 	 * print the hostname he connected to.
 	 */
 	if (gnutls_ext_get_dnsname(state)!=NULL) {
-		printf("\n<p>DNSNAME: ");
-		printf("<b>%s</b></p>\n", gnutls_ext_get_dnsname(state));
+		sprintf(tmp2, "\n<p>DNSNAME: ");
+		sprintf(tmp2, "<b>%s</b></p>\n", gnutls_ext_get_dnsname(state));
 	}
 
 	/* print srp specific data */
@@ -362,8 +364,8 @@ int main(int argc, char **argv)
 			bzero(buffer, MAX_BUF + 1);
 			ret = read_request(sd, state, buffer, MAX_BUF, (http==0)?1:2);
 
-			if (gnutls_is_fatal_error(ret) == 1) {
-				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
+			if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
+				if (ret == 0) {
 					printf
 					    ("\n- Peer has closed the GNUTLS connection\n");
 					break;

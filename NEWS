@@ -7,6 +7,7 @@ Version 0.1.9
 - (Error) message handling has changed
 - Better Protocol Version handling
 - Added x509 Certificate Verification
+- gnutls_read() semantics are now closer to read(2)
 
 Version 0.1.4 (22/06/2001)
 - Corrected (srp) base64 encoding.

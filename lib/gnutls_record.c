@@ -560,9 +560,9 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		return ret;
 	}
 
-	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
+	if (state->gnutls_internals.valid_connection == VALID_FALSE || sizeofdata==0) {
+		return 0; /* EOF */
+/*		return GNUTLS_E_INVALID_SESSION; */
 	}
 
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
@@ -774,7 +774,8 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 				
 				gnutls_free(tmpdata);
 				
-				return GNUTLS_E_CLOSURE_ALERT_RECEIVED;
+				return 0; /* EOF */
+/*				return GNUTLS_E_CLOSURE_ALERT_RECEIVED; */
 			} else {
 			
 				/* if the alert is FATAL or WARNING
@@ -1011,6 +1012,8 @@ ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, const void *data, size_t size
   * The only acceptable flag is currently MSG_DONTWAIT. In that case,
   * if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
   * if there are no data in the socket. 
+  * Returns the number of bytes received, zero on EOF, or
+  * a negative error code.
   **/
 ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags) {
 	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, flags);
@@ -1039,6 +1042,8 @@ ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t siz
   *
   * This function has the same semantics as read() has. The only
   * difference is that is accepts a GNUTLS state. 
+  * Returns the number of bytes received, zero on EOF, or
+  * a negative error code.
   **/
 ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
 	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, 0);

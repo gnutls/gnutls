@@ -30,8 +30,8 @@ extern const static_asn pkcs1_asn1_tab[];
 extern const static_asn pkix_asn1_tab[];
 
 static void* old_sig_handler;
-ssize_t (*recv_func)( SOCKET, void*, size_t, int);
-ssize_t (*send_func)( SOCKET,const void*, size_t, int);
+ssize_t (*_gnutls_recv_func)( SOCKET, void*, size_t, int);
+ssize_t (*_gnutls_send_func)( SOCKET,const void*, size_t, int);
 
 static node_asn *PKIX1_ASN;
 static node_asn *PKCS1_ASN;
@@ -42,6 +42,37 @@ node_asn* _gnutls_get_pkix() {
 
 node_asn* _gnutls_get_pkcs() {
 	return PKCS1_ASN;
+}
+
+/**
+  * gnutls_set_recv_func - This function sets the recv() function
+  * @(*recv_func): it's a recv(2) like function
+  *
+  * This is the function were you set the recv() function gnutls
+  * is going to use. Normaly you may not use this function since
+  * the default (recv(2)) will probably be ok, unless you use
+  * some external library (like gnu pthreads), which provide
+  * a front end to this function. This function should be
+  * called once and after gnutls_global_init().
+  *
+  **/
+void gnutls_set_recv_func( ssize_t (*recv_func)(SOCKET,void*,size_t,int)) {
+	_gnutls_recv_func = recv_func;
+}
+
+/**
+  * gnutls_set_send_func - This function sets the send() function
+  * @(*send_func): it's a send(2) like function
+  *
+  * This is the function were you set the send() function gnutls
+  * is going to use. Normaly you may not use this function since
+  * the default (send(2)) will probably be ok, unless you use
+  * some external library (like gnu pthreads), which provide
+  * a front end to this function. This function should be
+  * called once and after gnutls_global_init().
+  **/
+void gnutls_set_send_func( ssize_t (*send_func)(SOCKET, const void*,size_t,int)) {
+	_gnutls_send_func = send_func;
 }
 
 int gnutls_is_secure_memory(const void* mem) {
@@ -71,8 +102,8 @@ int gnutls_global_init()
 
 	/* set default recv/send functions
 	 */
-	recv_func = recv;
-	send_func = send;
+	_gnutls_recv_func = recv;
+	_gnutls_send_func = send;
 
 	/* initialize parser 
 	 * This should not deal with files in the final
