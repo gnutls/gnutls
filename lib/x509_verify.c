@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Nikos Mavroyanopoulos <nmav@hellug.gr>
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos <nmav@hellug.gr>
  *
  * This file is part of GNUTLS.
  *
@@ -273,7 +273,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 /* CRL is ignored for now */
 
 	gnutls_cert *issuer;
-	CertificateStatus ret = GNUTLS_CERT_NOT_TRUSTED;
+	CertificateStatus ret = GNUTLS_CERT_INVALID;
 
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
@@ -287,7 +287,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	 */
 	if (issuer == NULL) {
 		gnutls_assert();
-		return GNUTLS_CERT_NOT_TRUSTED;
+		return GNUTLS_CERT_INVALID;
 	}
 	
         ret = gnutls_x509_verify_signature(cert, issuer);
@@ -325,7 +325,7 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 {
 	int i = 0;
 	int expired = 0;
-	CertificateStatus ret=GNUTLS_CERT_NOT_TRUSTED;
+	CertificateStatus ret=GNUTLS_CERT_INVALID;
 
 	if (tcas_size == 0) {
 		return ret;
@@ -340,14 +340,14 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 			 /*
 			 * We only accept the given certificate to be
 			 * expired. If any of the certificates in the
-			 * certificate list is expired then the certificate
-			 * is not trusted.
+			 * certificate chain is expired then the certificate
+			 * is not valid.
 			 */
 			if (ret == GNUTLS_CERT_EXPIRED) {
 				if (i==0) expired = 1;
-				else return GNUTLS_CERT_NOT_TRUSTED;
+				else return GNUTLS_CERT_INVALID;
 			} else
-				return GNUTLS_CERT_NOT_TRUSTED;
+				return GNUTLS_CERT_INVALID;
 		}
 	}
 
@@ -361,7 +361,7 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 		 * list is expired, then the certificate is not
 		 * trusted.
 		 */
-		return GNUTLS_CERT_NOT_TRUSTED;
+		return GNUTLS_CERT_INVALID;
 	} else
 		if (ret != GNUTLS_CERT_TRUSTED)
 			return ret;

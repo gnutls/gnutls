@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -207,7 +207,7 @@ gnutls_datum tbs;
 			if (_pkcs1_rsa_verify_sig( &signature, &tbs, issuer->params)!=0) {
 				gnutls_assert();
 				gnutls_free_datum( &tbs);
-				return GNUTLS_CERT_NOT_TRUSTED;
+				return GNUTLS_CERT_INVALID;
 			}
 
 			gnutls_free_datum(&tbs);
@@ -218,7 +218,7 @@ gnutls_datum tbs;
 			if (_gnutls_dsa_verify( &tbs, &signature, issuer->params)!=0) {
 				gnutls_assert();
 				gnutls_free_datum( &tbs);
-				return GNUTLS_CERT_NOT_TRUSTED;
+				return GNUTLS_CERT_INVALID;
 			}
 
 			gnutls_free_datum(&tbs);
