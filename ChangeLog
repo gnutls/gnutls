@@ -1,3 +1,57 @@
+2003-02-07 22:20  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, gnutls_cert.c, gnutls_cert.h,
+	gnutls_privkey.c:
+
+	removed the raw part in the gnutls_privkey internal structure..  
+
+2003-02-07 20:46  nmav <nmav@gnutls.org>
+
+	* lib/x509_extensions.c:
+
+	Added function to extract the key usage extension from an X.509
+	certificate, and combined some code.  
+
+2003-02-07 19:01  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/Makefile.am, doc/tex/certificate.tex,
+	doc/tex/ex-info.tex, doc/tex/ex-rfc2818.tex, doc/tex/funcs.tex,
+	lib/Makefile.am, lib/gnutls_dh_primes.c, lib/gnutls_ui.h,
+	lib/gnutls_x509.h, lib/rfc2818_hostname.c, lib/x509_xml.c:
+
+	More stuff for the new certificate API.  
+
+2003-02-07 14:48  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/Makefile.am, lib/gnutls_cert.c, lib/gnutls_errors.h,
+	lib/gnutls_errors_int.h, lib/gnutls_x509.c:
+
+	The old certificate parsing API was reimplemented over the new one.
+	It will stay in the 1.0.0 release for compatibility reasons.  
+
+2003-02-07 13:33  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, gnutls_x509.h:
+
+	Added the new PKCS7 parsing functions.  
+
+2003-02-07 10:15  nmav <nmav@gnutls.org>
+
+	* doc/tex/ex-client-resume.tex, doc/tex/ex-client1.tex,
+	doc/tex/ex-client2.tex, doc/tex/ex-serv-export.tex,
+	doc/tex/ex-serv-pgp.tex, doc/tex/ex-serv1.tex, lib/Makefile.am,
+	lib/gnutls_x509.c, lib/gnutls_x509.h, lib/x509_xml.c:
+
+	Added the new certificate handling functions.  
+
+2003-02-07 09:06  nmav <nmav@gnutls.org>
+
+	* THANKS, lib/Makefile.am, lib/gnutls_x509.c, lib/gnutls_x509.h,
+	lib/x509_extensions.c, lib/x509_xml.c:
+
+	More improvements in the CRL support, and the X.509 backend. Added a
+	function to get some parts of the DN using an OID.  
+
 2003-02-06 16:49  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls.h.in.in, gnutls_x509.c, gnutls_x509.h:
