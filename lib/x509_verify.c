@@ -231,7 +231,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert,
 
 /* The algorithm used is:
  * 1. Check the certificate chain given by the peer, if it is ok.
- * 2. If any certificate in the chain are expired, revoked, not
+ * 2. If any certificate in the chain are revoked, not
  *    valid, or they are not CAs then the certificate is invalid.
  * 3. If 1 is ok, then find a certificate in the trusted CAs file
  *    that has the DN of the issuer field in the last certificate
@@ -282,7 +282,13 @@ int _gnutls_x509_verify_certificate(gnutls_cert * certificate_list,
 		}
 	}
 
-
+	if (status > 0) { /* If there is any problem in the
+			   * certificate chain then mark as not trusted
+			   * and return immediately.
+			   */
+		return (status | GNUTLS_CERT_NOT_TRUSTED);
+	}
+	
 	/* Now verify the last certificate in the certificate path
 	 * against the trusted CA certificate list.
 	 *
@@ -296,7 +302,7 @@ int _gnutls_x509_verify_certificate(gnutls_cert * certificate_list,
 
 	if (ret > 0) {
 		/* if the last certificate in the certificate
-		 * list is expired, then the certificate is not
+		 * list is invalid, then the certificate is not
 		 * trusted.
 		 */
 		gnutls_assert();
