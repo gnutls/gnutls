@@ -12,14 +12,14 @@ typedef struct MOD_AUTH_STRUCT_INT {
 	int (*gnutls_generate_client_cert_vrfy) ( gnutls_session, opaque**);
 	int (*gnutls_generate_server_certificate_request) ( gnutls_session, opaque**);
 	
-	int (*gnutls_process_server_certificate)( gnutls_session, opaque*, int);
-	int (*gnutls_process_client_certificate)( gnutls_session, opaque*, int);
-	int (*gnutls_process_server_kx)( gnutls_session, opaque*, int);
-	int (*gnutls_process_server_kx2)( gnutls_session, opaque*, int);
-	int (*gnutls_process_client_kx0)( gnutls_session, opaque*, int);
-	int (*gnutls_process_client_kx)( gnutls_session, opaque*, int);
-	int (*gnutls_process_client_cert_vrfy) ( gnutls_session, opaque*, int);
-	int (*gnutls_process_server_certificate_request) ( gnutls_session, opaque*, int);
+	int (*gnutls_process_server_certificate)( gnutls_session, opaque*, size_t);
+	int (*gnutls_process_client_certificate)( gnutls_session, opaque*, size_t);
+	int (*gnutls_process_server_kx)( gnutls_session, opaque*, size_t);
+	int (*gnutls_process_server_kx2)( gnutls_session, opaque*, size_t);
+	int (*gnutls_process_client_kx0)( gnutls_session, opaque*, size_t);
+	int (*gnutls_process_client_kx)( gnutls_session, opaque*, size_t);
+	int (*gnutls_process_client_cert_vrfy) ( gnutls_session, opaque*, size_t);
+	int (*gnutls_process_server_certificate_request) ( gnutls_session, opaque*, size_t);
 } MOD_AUTH_STRUCT;
 
 #endif

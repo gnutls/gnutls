@@ -100,7 +100,7 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm)
 
 }
 
-int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text, int textlen)
+int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text, size_t textlen)
 {
 	if (textlen > 0)
 #ifdef USE_MHASH
@@ -251,7 +251,7 @@ int _gnutls_hmac_get_algo_len(gnutls_mac_algorithm algorithm)
 
 }
 
-int _gnutls_hmac(GNUTLS_MAC_HANDLE handle, const void *text, int textlen)
+int _gnutls_hmac(GNUTLS_MAC_HANDLE handle, const void *text, size_t textlen)
 {
 
 #ifdef USE_MHASH

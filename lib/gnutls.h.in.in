@@ -121,7 +121,7 @@ typedef struct gnutls_rsa_params_int* gnutls_rsa_params;
 
 typedef struct {
 	unsigned char * data;
-	int size;
+	unsigned int size;
 } gnutls_datum;
 
 /* internal functions */
@@ -137,7 +137,7 @@ int gnutls_rehandshake( gnutls_session session);
 gnutls_alert_description gnutls_alert_get( gnutls_session session);
 int 		 gnutls_alert_send( gnutls_session, gnutls_alert_level, gnutls_alert_description);
 int 		 gnutls_alert_send_appropriate(  gnutls_session session, int err);
-const char*	 gnutls_alert_get_name( int alert);
+const char*	 gnutls_alert_get_name( gnutls_alert_description alert);
 
 /* get information on the current session */
 gnutls_cipher_algorithm		gnutls_cipher_get( gnutls_session session);

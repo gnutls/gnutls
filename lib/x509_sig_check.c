@@ -107,7 +107,7 @@ int len;
 		return _gnutls_asn2err(result);
 	}
 
-	*hash = -1;
+	*hash = (gnutls_mac_algorithm)-1;
 	
 	if ( strcmp(str, "1 2 840 113549 2 5")==0) { /* MD5 */
 		*hash = GNUTLS_MAC_MD5;
@@ -116,7 +116,7 @@ int len;
 		*hash = GNUTLS_MAC_SHA;
 	}
 
-	if (*hash==-1) {
+	if (*hash==(gnutls_mac_algorithm)-1) {
 
 		_gnutls_x509_log( "X509_SIG: HASH OID: %s\n", str);
 

@@ -102,7 +102,7 @@ gnutls_compression_method gnutls_compression_get( gnutls_session session) {
 }
 
 int _gnutls_session_cert_type_supported( gnutls_session session, gnutls_certificate_type cert_type) {
-int i;
+uint i;
 
 	if (session->internals.cert_type_priority.algorithms==0 && cert_type ==
 		DEFAULT_CERT_TYPE) return 0;

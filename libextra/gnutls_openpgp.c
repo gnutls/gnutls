@@ -1392,7 +1392,8 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
     char buffer[4096];
     int fd = -1;
     int rc = 0, state = 0;
-    ssize_t nbytes = 0, n = 0;
+    size_t nbytes = 0;
+    ssize_t n = 0;
   
     if ( !host || !key )
         return GNUTLS_E_INVALID_PARAMETERS;

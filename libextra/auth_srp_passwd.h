@@ -15,7 +15,7 @@ typedef struct {
 GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username, int* err);
 void _gnutls_srp_clear_pwd_entry( GNUTLS_SRP_PWD_ENTRY * entry);
 GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry(void);
-int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result);
-int _gnutls_sbase64_decode(uint8 * data, int data_size, uint8 ** result);
+int _gnutls_sbase64_encode(uint8 * data, size_t data_size, uint8 ** result);
+int _gnutls_sbase64_decode(uint8 * data, size_t data_size, uint8 ** result);
 
 #endif /* ENABLE_SRP */

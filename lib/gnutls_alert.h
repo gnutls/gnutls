@@ -1,6 +1,5 @@
-typedef enum AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL 
-} AlertLevel;
-#define GNUTLS_AlertLevel AlertLevel
+typedef enum gnutls_alert_level { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL 
+} gnutls_alert_level;
 
 typedef enum AlertDescription { 
 	GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE=10, 
@@ -15,8 +14,7 @@ typedef enum AlertDescription {
 	GNUTLS_A_PROTOCOL_VERSION=70, GNUTLS_A_INSUFFICIENT_SECURITY, 
 	GNUTLS_A_INTERNAL_ERROR=80, GNUTLS_A_USER_CANCELED=90,
 	GNUTLS_A_NO_RENEGOTIATION=100
-} AlertDescription;
-#define GNUTLS_AlertDescription AlertDescription
+} gnutls_alert_description;
 
-AlertDescription gnutls_alert_get( gnutls_session session);
-int gnutls_alert_send( gnutls_session session, AlertLevel level, AlertDescription desc);
+gnutls_alert_description gnutls_alert_get( gnutls_session session);
+int gnutls_alert_send( gnutls_session session, gnutls_alert_level level, gnutls_alert_description desc);

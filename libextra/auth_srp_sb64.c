@@ -25,10 +25,10 @@
 /* this a modified base64 for srp !!! 
  * It seems that everybody makes it's own base64 convertion.
  */
-const static uint8 b64table[64] =
+static const uint8 b64table[64] =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./";
 
-const static uint8 asciitable[128] = {
+static const uint8 asciitable[128] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -132,9 +132,10 @@ inline static int encode(uint8 * result, const uint8 * rdata, int left)
 /* encodes data and puts the result into result (localy alocated)
  * The result_size is the return value
  */
-int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
+int _gnutls_sbase64_encode(uint8 * data, size_t data_size, uint8 ** result)
 {
-	int ret, tmp, j, i;
+	uint i,j;
+	int ret, tmp;
 	char tmpres[4];
 	int mod = data_size % 3;
 
@@ -217,9 +218,10 @@ inline static int decode(uint8 * result, const uint8 * data)
  * That function does not ignore newlines tabs etc. You should remove them
  * before calling it.
  */
-int _gnutls_sbase64_decode(uint8 * data, int idata_size, uint8 ** result)
+int _gnutls_sbase64_decode(uint8 * data, size_t idata_size, uint8 ** result)
 {
-	int i, ret, j, left;
+	uint i,j;
+	int ret, left;
 	int data_size, tmp;
 	uint8 datrev[4];
 	uint8 tmpres[3];

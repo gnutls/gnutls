@@ -93,6 +93,11 @@ typedef long ptrdiff_t;
 # define USE_MCRYPT
 #endif
 
+#ifndef HAVE_UINT
+typedef unsigned int uint;
+typedef signed int sint;
+#endif
+
 #if SIZEOF_UNSIGNED_LONG == 8
 # define HAVE_UINT64
 /* only used native uint64 in 64 bit machines */

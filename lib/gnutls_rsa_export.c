@@ -325,7 +325,8 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 
 	GNUTLS_MPI rsa_params[RSA_PRIVATE_PARAMS];
 	size_t siz;
-	int i, ret;
+	uint i;
+	int ret;
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();

@@ -280,7 +280,7 @@ int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* dat
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = _gnutls_hash_get_algo_len(algo);
 	
-	if (hash_len > *result_size || hash_len < 0) {
+	if (hash_len < 0 || (size_t)hash_len > *result_size) {
 		*result_size = hash_len;
 		return GNUTLS_E_INVALID_REQUEST;
 	}

@@ -86,8 +86,8 @@ typedef int gnutls_transport_ptr;
 /* the maximum size of encrypted packets */
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define RECORD_HEADER_SIZE 5
-#define MAX_RECORD_SEND_SIZE session->security_parameters.max_record_send_size
-#define MAX_RECORD_RECV_SIZE session->security_parameters.max_record_recv_size
+#define MAX_RECORD_SEND_SIZE (size_t)session->security_parameters.max_record_send_size
+#define MAX_RECORD_RECV_SIZE (size_t)session->security_parameters.max_record_recv_size
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
 #define MAX_RECORD_OVERHEAD MAX_PAD_SIZE+EXTRA_COMP_SIZE
@@ -136,7 +136,7 @@ typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_S
 
 typedef struct {
 	opaque * data;
-	int size;
+	unsigned int size;
 } gnutls_datum;
 typedef gnutls_datum gnutls_sdatum;
 
@@ -388,8 +388,8 @@ typedef struct {
 
 
 typedef struct {
-	int priority[MAX_ALGOS];
-	int algorithms;
+	unsigned int priority[MAX_ALGOS];
+	unsigned int algorithms;
 } GNUTLS_Priority;
 
 typedef int certificate_client_select_func(struct gnutls_session_int*, const gnutls_datum *, int, const gnutls_datum *, int);
@@ -399,9 +399,9 @@ typedef int srp_server_select_func(struct gnutls_session_int*, char**, char**, i
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
 	/* this holds the number of bytes in the handshake_header[] */
-	int				header_size;
+	size_t				header_size;
 	/* this holds the length of the handshake packet */
-	int				packet_length;
+	size_t				packet_length;
 	HandshakeType			recv_type;
 } HANDSHAKE_HEADER_BUFFER;
 
@@ -512,9 +512,9 @@ typedef struct {
 	 * use _gnutls_dh_get_prime_bits() and gnutls_dh_set_prime_bits() 
 	 * to access it.
 	 */
-	int				dh_prime_bits;
-	
-	int				max_handshake_data_buffer_size;
+	uint16				dh_prime_bits;
+
+	size_t				max_handshake_data_buffer_size;
 
 	/* PUSH & PULL functions.
 	 */

@@ -258,10 +258,10 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 
 
 /* Verifies a TLS signature (like the one in the client certificate
- * verify message). ubuffer_size is a buffer to remove from the hash buffer
- * in order to avoid hashing the last message.
+ * verify message). 
  */
-int _gnutls_verify_sig_hdata( gnutls_session session, gnutls_cert *cert, gnutls_datum* signature, int ubuffer_size) {
+int _gnutls_verify_sig_hdata( gnutls_session session, gnutls_cert *cert, gnutls_datum* signature) 
+{
 int ret;
 opaque concat[36];
 GNUTLS_MAC_HANDLE td_md5;

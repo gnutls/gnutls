@@ -35,7 +35,7 @@ typedef struct GNUTLS_COMP_HANDLE_STRUCT {
 GNUTLS_COMP_HANDLE _gnutls_comp_init( gnutls_compression_method, int d);
 void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d);
 
-int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size);
-int _gnutls_compress( GNUTLS_COMP_HANDLE, const char* plain, int plain_size, char** compressed, int max_comp_size);
+int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, size_t compressed_size, char** plain, size_t max_record_size);
+int _gnutls_compress( GNUTLS_COMP_HANDLE, const char* plain, size_t plain_size, char** compressed, size_t max_comp_size);
 
 #endif

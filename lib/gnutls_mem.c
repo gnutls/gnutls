@@ -39,7 +39,7 @@ int (*_gnutls_is_secure_memory)(const void*) = _gnutls_is_secure_mem_null;
 void *_gnutls_calloc(size_t nmemb, size_t size)
 {
 	void *ret;
-	ret = gnutls_malloc(size);
+	ret = gnutls_malloc(size*nmemb);
 	if (ret == NULL)
 		return ret;
 
@@ -51,7 +51,7 @@ void *_gnutls_calloc(size_t nmemb, size_t size)
 svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 {
 	svoid *ret;
-	ret = gnutls_secure_malloc(size);
+	ret = gnutls_secure_malloc(size*nmemb);
 	if (ret == NULL)
 		return ret;
 

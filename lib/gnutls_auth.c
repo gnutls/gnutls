@@ -209,7 +209,7 @@ void _gnutls_free_auth_info( gnutls_session session) {
 		
 		break;
 	case GNUTLS_CRD_CERTIFICATE: {
-		int i;
+		unsigned int i;
 		CERTIFICATE_AUTH_INFO info =
 		            _gnutls_get_auth_info(session);
 

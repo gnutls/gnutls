@@ -103,6 +103,7 @@ int err;
 		break;
 
 	    default:
+	    	break;
 	}
 #endif
 	return ret;
@@ -124,6 +125,7 @@ int err;
 				break;
 #endif
 			default:
+				break;
 		}
 		gnutls_free( handle->handle);
 		gnutls_free( handle);
@@ -136,7 +138,8 @@ int err;
 /* These functions are memory consuming 
  */
 
-int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const char* plain, int plain_size, char** compressed, int max_comp_size) 
+int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const char* plain, size_t plain_size, 
+	char** compressed, size_t max_comp_size) 
 {
 int compressed_size=GNUTLS_E_COMPRESSION_FAILED;
 int err;
@@ -215,7 +218,7 @@ int err;
 	_gnutls_log("Compression ratio: %f\n", (float)((float)compressed_size / (float)plain_size));
 #endif
 
-	if (compressed_size > max_comp_size) {
+	if ((size_t)compressed_size > max_comp_size) {
 		gnutls_free(*compressed);
 		return GNUTLS_E_COMPRESSION_FAILED;
 	}
@@ -225,8 +228,8 @@ int err;
 
 
 
-int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, 
-	char** plain, int max_record_size) 
+int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, size_t compressed_size, 
+	char** plain, size_t max_record_size) 
 {
 int plain_size=GNUTLS_E_DECOMPRESSION_FAILED, err;
 int cur_pos;
@@ -324,7 +327,7 @@ int cur_pos;
 			return GNUTLS_E_INTERNAL_ERROR;
 	} /* switch */
 
-	if (plain_size > max_record_size) {
+	if ((size_t)plain_size > max_record_size) {
 		gnutls_assert();
 		gnutls_free( *plain);
 		return GNUTLS_E_DECOMPRESSION_FAILED;

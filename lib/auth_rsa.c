@@ -42,7 +42,7 @@
 #include <gnutls_extra.h>
 
 int _gnutls_gen_rsa_client_kx(gnutls_session, opaque **);
-int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, int);
+int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT rsa_auth_struct = {
 	"RSA",
@@ -211,13 +211,14 @@ const gnutls_certificate_credentials cred;
 			return GNUTLS_E_MEMORY_ERROR; \
 		}
 
-int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, int data_size)
+int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _data_size)
 {
 	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
 	GNUTLS_MPI *params;
 	int params_len;
+	ssize_t data_size = _data_size;
 
 	if (gnutls_protocol_get_version(session) == GNUTLS_SSL3) {
 		/* SSL 3.0 */

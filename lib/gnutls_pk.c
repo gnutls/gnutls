@@ -43,10 +43,11 @@ static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
  */
 int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			      gnutls_datum plaintext, GNUTLS_MPI* params,
-			      int params_len,
-			      int btype)
+			      uint params_len,
+			      uint btype)
 {
-	int i, ret, pad;
+	unsigned int i, pad;
+	int ret;
 	GNUTLS_MPI m, res;
 	opaque *edata, *ps;
 	size_t k, psize;
@@ -167,10 +168,11 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
  * Can decrypt block type 1 and type 2 packets.
  */
 int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
-			      gnutls_datum ciphertext, GNUTLS_MPI* params, int params_len,
-			      int btype)
+			      gnutls_datum ciphertext, GNUTLS_MPI* params, uint params_len,
+			      uint btype)
 {
-	int k, i, ret;
+	uint k, i;
+	int ret;
 	GNUTLS_MPI c, res;
 	opaque *edata;
 	size_t esize, mod_bits;
@@ -375,7 +377,7 @@ size_t tot_len = 0;
 /* Do DSA signature calculation. params is p, q, g, y, x in that order.
  */
 int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
-		     GNUTLS_MPI * params, int params_len)
+		     GNUTLS_MPI * params, uint params_len)
 {
 	GNUTLS_MPI rs[2], mdata;
 	int ret;

@@ -165,11 +165,12 @@ int ret = 0;
 	}
 	
 /* allocate space for data */
-	content.size = _gnutls_session_size( session);
-	if (content.size < 0) {
+	ret = _gnutls_session_size( session);
+	if (ret < 0) {
 		gnutls_assert();
-		return content.size;
+		return ret;
 	}
+	content.size = ret;
 
 	content.data = gnutls_malloc( content.size);
 	if (content.data==NULL) {

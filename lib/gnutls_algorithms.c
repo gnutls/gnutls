@@ -77,10 +77,10 @@ static const gnutls_version_entry sup_versions[] = {
 struct gnutls_cipher_entry {
 	const char *name;
 	gnutls_cipher_algorithm id;
-	size_t blocksize;
-	size_t keysize;
+	uint16 blocksize;
+	uint16 keysize;
 	CipherType block;
-	size_t iv;
+	uint16 iv;
 	int export_flag; /* 0 non export */
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;
@@ -399,7 +399,7 @@ int _gnutls_mac_get_digest_size(gnutls_mac_algorithm algorithm)
 
 inline int _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm algorithm)
 {				/* actually returns the priority */
-	int i;
+	unsigned int i;
 	for (i = 0;
 	     i < session->internals.mac_algorithm_priority.algorithms;
 	     i++) {
@@ -431,7 +431,7 @@ const char *gnutls_mac_get_name( gnutls_mac_algorithm algorithm)
 
 int _gnutls_mac_is_ok(gnutls_mac_algorithm algorithm)
 {
-	size_t ret = -1;
+	ssize_t ret = -1;
 	GNUTLS_HASH_ALG_LOOP(ret = p->id);
 	if (ret >= 0)
 		ret = 0;
@@ -445,7 +445,7 @@ inline
     int _gnutls_compression_priority(gnutls_session session,
 				     gnutls_compression_method algorithm)
 {				/* actually returns the priority */
-	int i;
+	unsigned int i;
 	for (i = 0;
 	     i <
 	     session->internals.compression_method_priority.algorithms;
@@ -527,7 +527,7 @@ gnutls_compression_method _gnutls_compression_get_id(int num)
 
 int _gnutls_compression_is_ok(gnutls_compression_method algorithm)
 {
-	size_t ret = -1;
+	ssize_t ret = -1;
 	GNUTLS_COMPRESSION_ALG_LOOP(ret = p->id);
 	if (ret >= 0)
 		ret = 0;
@@ -552,7 +552,7 @@ inline
     int
 _gnutls_cipher_priority(gnutls_session session, gnutls_cipher_algorithm algorithm)
 {
-	int i;
+	unsigned int i;
 	for (i = 0;
 	     i <
 	     session->internals.
@@ -626,7 +626,7 @@ const char *gnutls_cipher_get_name( gnutls_cipher_algorithm algorithm)
 
 int _gnutls_cipher_is_ok(gnutls_cipher_algorithm algorithm)
 {
-	size_t ret = -1;
+	ssize_t ret = -1;
 	GNUTLS_ALG_LOOP(ret = p->id);
 	if (ret >= 0)
 		ret = 0;
@@ -647,7 +647,7 @@ MOD_AUTH_STRUCT *_gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm)
 
 inline int _gnutls_kx_priority(gnutls_session session, gnutls_kx_algorithm algorithm)
 {
-	int i;
+	unsigned int i;
 	for (i = 0;
 	     i < session->internals.kx_algorithm_priority.algorithms;
 	     i++) {
@@ -677,7 +677,7 @@ const char *gnutls_kx_get_name( gnutls_kx_algorithm algorithm)
 
 int _gnutls_kx_is_ok(gnutls_kx_algorithm algorithm)
 {
-	size_t ret = -1;
+	ssize_t ret = -1;
 	GNUTLS_KX_ALG_LOOP(ret = p->algorithm);
 	if (ret >= 0)
 		ret = 0;
@@ -690,7 +690,7 @@ int _gnutls_kx_is_ok(gnutls_kx_algorithm algorithm)
 int _gnutls_version_priority(gnutls_session session,
 				     gnutls_protocol_version version)
 {				/* actually returns the priority */
-	int i;
+	unsigned int i;
 
 	if (session->internals.protocol_priority.priority==NULL) {
 		gnutls_assert();
@@ -711,7 +711,7 @@ int _gnutls_version_priority(gnutls_session session,
 
 gnutls_protocol_version _gnutls_version_lowest(gnutls_session session)
 {				/* returns the lowest version supported */
-	int i, min = 0xff;
+	unsigned int i, min = 0xff;
 	
 	if (session->internals.protocol_priority.priority==NULL) {
 		return GNUTLS_VERSION_UNKNOWN;
@@ -728,7 +728,7 @@ gnutls_protocol_version _gnutls_version_lowest(gnutls_session session)
 
 gnutls_protocol_version _gnutls_version_max(gnutls_session session)
 {				/* returns the maximum version supported */
-	int i, max=0x00;
+	unsigned int i, max=0x00;
 
 	if (session->internals.protocol_priority.priority==NULL) {
 		return GNUTLS_VERSION_UNKNOWN;
@@ -926,9 +926,9 @@ inline
 	uint8 *base = _base;
 	uint8 tmp[MAX_ELEM_SIZE];
 	uint8 ptmp[MAX_ELEM_SIZE];
-	int pivot;
-	int i, j;
-	int full;
+	unsigned int pivot;
+	unsigned int i, j;
+	unsigned int full;
 
 	i = pivot = 0;
 	j = full = (nmemb - 1) * size;
@@ -961,9 +961,9 @@ static void
 _gnutls_qsort(gnutls_session session, void *_base, size_t nmemb, size_t size,
 	      int (*compar) (gnutls_session, const void *, const void *))
 {
-	int pivot;
+	unsigned int pivot;
 	char *base = _base;
-	int snmemb = nmemb;
+	size_t snmemb = nmemb;
 
 #ifdef DEBUG
 	if (size > MAX_ELEM_SIZE) {
@@ -1031,7 +1031,7 @@ _gnutls_bsort(gnutls_session session, void *_base, size_t nmemb,
 	      size_t size, int (*compar) (gnutls_session, const void *,
 					  const void *))
 {
-	int i, j;
+	unsigned int i, j;
 	int full = nmemb * size;
 	char *base = _base;
 	char tmp[MAX_ELEM_SIZE];
@@ -1053,7 +1053,7 @@ _gnutls_supported_ciphersuites_sorted(gnutls_session session,
 {
 
 #ifdef SORT_DEBUG
-	int i;
+	unsigned int i;
 #endif
 	int count;
 		
@@ -1088,8 +1088,8 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 			       GNUTLS_CipherSuite ** _ciphers)
 {
 
-	int i, ret_count, j;
-	int count = CIPHER_SUITES_COUNT;
+	unsigned int i, ret_count, j;
+	unsigned int count = CIPHER_SUITES_COUNT;
 	GNUTLS_CipherSuite *tmp_ciphers;
 	GNUTLS_CipherSuite* ciphers;
 	gnutls_protocol_version version;
@@ -1192,7 +1192,8 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 int
 _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 {
-	int i, tmp, j=0;
+	unsigned int i, j=0;
+	int tmp;
 
 	*comp = gnutls_malloc( sizeof(uint8) * SUPPORTED_COMPRESSION_METHODS);
 	if (*comp == NULL)

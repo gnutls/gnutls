@@ -25,10 +25,11 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include <gnutls_datum.h>
+#include <x509_b64.h>
 
-const static uint8 b64table[64] =
+static const uint8 b64table[64] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-const static uint8 asciitable[128] = {
+static const uint8 asciitable[128] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -135,9 +136,10 @@ inline static int decode(uint8 * result, const uint8 * data)
 /* encodes data and puts the result into result (localy alocated)
  * The result_size is the return value
  */
-int _gnutls_base64_encode(const uint8 * data, int data_size, uint8 ** result)
+int _gnutls_base64_encode(const uint8 * data, size_t data_size, uint8 ** result)
 {
-	int i, ret, tmp, j;
+	unsigned int i, j;
+	int ret, tmp;
 	char tmpres[4];
 
 	ret = data_size % 3;
@@ -327,9 +329,10 @@ int size, res;
 /* decodes data and puts the result into result (localy alocated)
  * The result_size is the return value
  */
-int _gnutls_base64_decode(const uint8 * data, int data_size, uint8 ** result)
+int _gnutls_base64_decode(const uint8 * data, size_t data_size, uint8 ** result)
 {
-	int i, ret, tmp, j;
+	unsigned int i, j;
+	int ret, tmp;
 	uint8 tmpres[3];
 
 	data_size /= 4;
@@ -380,7 +383,7 @@ inline static int cpydata(const uint8 * data, int data_size, uint8 ** result)
  * The result_size is the return value
  */
 #define ENDSTR "-----\n"
-int _gnutls_fbase64_decode( const char* header, const uint8 * data, int data_size,
+int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t data_size,
 			   uint8 ** result)
 {
 	int ret;

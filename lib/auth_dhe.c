@@ -38,8 +38,8 @@
 
 static int gen_dhe_server_kx(gnutls_session, opaque **);
 static int gen_dhe_client_kx(gnutls_session, opaque **);
-static int proc_dhe_server_kx(gnutls_session, opaque *, int);
-static int proc_dhe_client_kx(gnutls_session, opaque *, int);
+static int proc_dhe_server_kx(gnutls_session, opaque *, size_t);
+static int proc_dhe_client_kx(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT dhe_rsa_auth_struct = {
 	"DHE_RSA",
@@ -286,7 +286,7 @@ static int gen_dhe_client_kx(gnutls_session session, opaque ** data)
 OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert = NULL;
 
 static int proc_dhe_server_kx(gnutls_session session, opaque * data,
-				  int data_size)
+				  size_t _data_size)
 {
 	uint16 n_Y, n_g, n_p;
 	size_t _n_Y, _n_g, _n_p;
@@ -295,8 +295,9 @@ static int proc_dhe_server_kx(gnutls_session session, opaque * data,
 	uint8 *data_Y;
 	int i, sigsize;
 	gnutls_datum vparams, signature;
-	int ret;
+	int ret, bits;
 	CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
+	ssize_t data_size = _data_size;
 	gnutls_cert peer_cert;
 
 	if (info == NULL || info->ncerts==0) {
@@ -364,7 +365,12 @@ static int proc_dhe_server_kx(gnutls_session session, opaque * data,
 		return ret;
 	}
 
-	if ( _gnutls_mpi_get_nbits( session->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( session)) {
+	bits = _gnutls_dh_get_prime_bits( session);
+	if (bits < 0) {
+		gnutls_assert();
+		return bits;
+	}
+	if ( _gnutls_mpi_get_nbits( session->gnutls_key->client_p) < (size_t)bits) {
 		/* the prime used by the peer is not acceptable
 		 */
 		gnutls_assert();
@@ -433,12 +439,13 @@ static int proc_dhe_server_kx(gnutls_session session, opaque * data,
 }
 
 static int proc_dhe_client_kx(gnutls_session session, opaque * data,
-				  int data_size)
+				  size_t _data_size)
 {
 	uint16 n_Y;
 	size_t _n_Y;
 	GNUTLS_MPI g, p;
 	int bits, ret;
+	ssize_t data_size = _data_size;
 	const gnutls_certificate_credentials cred;
 
 	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);

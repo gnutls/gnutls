@@ -64,7 +64,7 @@ void gnutls_global_set_log_function( GNUTLS_LOG_FUNC log_func) {
 /* default logging function */
 static void dlog( const char* str) {
 #ifdef DEBUG
-	fprintf( stderr, "%s", str);
+	fputs( str, stderr);
 #endif
 }
 

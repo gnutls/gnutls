@@ -178,7 +178,7 @@ int _gnutls_session_unpack(gnutls_session session,
 {
 	uint32 pack_size;
 	int ret;
-	uint32 timestamp = time(0);
+	time_t timestamp = time(0);
 	SecurityParameters sp;
 
 	if (packed_session==NULL || packed_session->size == 0) {
@@ -325,7 +325,7 @@ int _gnutls_session_unpack(gnutls_session session,
 int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
 				   gnutls_datum * packed_session)
 {
-	uint32 pos, i;
+	unsigned int pos, i;
 	int info_size;
 
 	packed_session->size = _gnutls_pack_certificate_auth_info_size( info);
@@ -359,7 +359,7 @@ int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
 static int _gnutls_pack_certificate_auth_info_size( CERTIFICATE_AUTH_INFO info)
 {
 	uint32 pack_size = sizeof(CERTIFICATE_AUTH_INFO_INT);
-	int i;
+	unsigned int i;
 
 	if (info == NULL)
 		return sizeof(uint32) + PACK_HEADER_SIZE;
@@ -375,7 +375,8 @@ static int _gnutls_pack_certificate_auth_info_size( CERTIFICATE_AUTH_INFO info)
 int _gnutls_unpack_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
 				     const gnutls_datum * packed_session)
 {
-int ret, i, pos, j;
+unsigned int i,j, pos;
+int ret;
 uint32 size;
 
 	memcpy(info,

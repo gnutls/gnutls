@@ -24,6 +24,7 @@
 
 #include "crypt_srpsha1.h"
 #include "gnutls_random.h"
+#include <crypt.h>
 
 char * _gnutls_srp_crypt(const char* username, const char *passwd, int salt, GNUTLS_MPI g, GNUTLS_MPI n) {
 	

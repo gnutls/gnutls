@@ -224,7 +224,7 @@ static int _gnutls_session_is_valid( gnutls_session session) {
 
 static
 ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
-	opaque* erecord, int erecord_size)
+	opaque* erecord, unsigned int erecord_size)
 {
 	int cipher_size;
 	int retval;
@@ -804,7 +804,7 @@ ssize_t gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType
 
 		_gnutls_record_log( "REC: ChangeCipherSpec Packet was received\n");
 
-		if (tmplen!=sizeofdata) { /* sizeofdata should be 1 */
+		if ((size_t)tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
 			gnutls_afree(tmpdata);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;

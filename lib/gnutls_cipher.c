@@ -60,9 +60,9 @@ is_read_comp_null( gnutls_session session) {
  * 
  * If random pad != 0 then the random pad data will be appended.
  */
-int _gnutls_encrypt(gnutls_session session, const char* headers, int headers_size,
+int _gnutls_encrypt(gnutls_session session, const char* headers, size_t headers_size,
 		const char *data, size_t data_size,
-		opaque * ciphertext, int ciphertext_size, ContentType type, int random_pad)
+		opaque * ciphertext, size_t ciphertext_size, ContentType type, int random_pad)
 {
 	const gnutls_datum plain = { (opaque*) data, data_size };
 	gnutls_datum comp;
@@ -104,7 +104,7 @@ int _gnutls_encrypt(gnutls_session session, const char* headers, int headers_siz
 
 
 int _gnutls_decrypt(gnutls_session session, char *ciphertext,
-		    size_t ciphertext_size, uint8 * data, int data_size,
+		    size_t ciphertext_size, uint8 * data, size_t data_size,
 		    ContentType type)
 {
 	gnutls_datum gtxt;
@@ -180,7 +180,7 @@ static void mac_deinit( GNUTLS_MAC_HANDLE td, opaque* res, int ver) {
 
 inline
 static int calc_enc_length( gnutls_session session, int data_size, int hash_size, uint8* pad, int random_pad, 
-	CipherType block_algo, int blocksize) 
+	CipherType block_algo, uint16 blocksize) 
 {
 uint8 rand;
 int length;
@@ -335,7 +335,8 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 	uint64 seq_num;
 	uint16 length;
 	GNUTLS_MAC_HANDLE td;
-	int blocksize, ret, i;
+	uint16 blocksize;
+	int ret, i;
 	uint8 major, minor;
 	gnutls_protocol_version ver;
 	int hash_size = _gnutls_mac_get_digest_size(session->security_parameters.read_mac_algorithm);

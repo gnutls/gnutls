@@ -26,7 +26,7 @@
 #include <debug.h>
 
 typedef struct {
-	AlertDescription alert;
+	gnutls_alert_description alert;
 	const char *desc;
 } gnutls_alert_entry;
 
@@ -72,7 +72,7 @@ static const gnutls_alert_entry sup_alerts[] = {
   * See. gnutls_alert_get().
   *
   **/
-const char* gnutls_alert_get_name( int alert) {
+const char* gnutls_alert_get_name( gnutls_alert_level alert) {
 const char* ret = NULL;
 
 	GNUTLS_ALERT_ID_LOOP( ret = p->desc);
@@ -93,7 +93,7 @@ const char* ret = NULL;
   * Returns 0 on success.
   *
   **/
-int gnutls_alert_send( gnutls_session session, GNUTLS_AlertLevel level, GNUTLS_AlertDescription desc)
+int gnutls_alert_send( gnutls_session session, gnutls_alert_level level, gnutls_alert_description desc)
 {
 	uint8 data[2];
 	int ret;
@@ -238,7 +238,7 @@ int level;
   * The peer may send alerts if he thinks some things were not 
   * right. Check gnutls.h for the available alert descriptions.
   **/
-GNUTLS_AlertDescription gnutls_alert_get( gnutls_session session) {
+gnutls_alert_description gnutls_alert_get( gnutls_session session) {
 	return session->internals.last_alert;
 }
 

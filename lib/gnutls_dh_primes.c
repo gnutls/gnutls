@@ -258,8 +258,8 @@ _gnutls_dh_params _gnutls_dh_default_params[] = {
 	 , 0}
 };
 
-const
-static _gnutls_dh_params _gnutls_dh_copy_params[] = {
+static const
+     _gnutls_dh_params _gnutls_dh_copy_params[] = {
 	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
 	 , {diffie_hellman_prime_1024, sizeof diffie_hellman_prime_1024}
 	 , 0}
@@ -289,7 +289,7 @@ static _gnutls_dh_params _gnutls_dh_copy_params[] = {
  * number of bits. Ie a number of bits that we have a prime in the
  * dh_primes structure.
  */
-static int supported_bits[] = { 768, 1024, 2048, 3072, 4096, 0 };
+static const int supported_bits[] = { 768, 1024, 2048, 3072, 4096, 0 };
 static int normalize_bits(int bits)
 {
 	if (bits >= 4096)

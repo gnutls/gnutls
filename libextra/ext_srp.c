@@ -19,6 +19,7 @@
  */
 
 #include "gnutls_int.h"
+#include <ext_srp.h>
 
 #ifdef ENABLE_SRP
 
@@ -27,8 +28,9 @@
 #include "gnutls_errors.h"
 #include "gnutls_algorithms.h"
 
-int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, int data_size) {
+int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _data_size) {
 	uint8 len;
+	ssize_t data_size = _data_size;
 
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
 		/* algorithm was not allowed in this state
@@ -62,8 +64,8 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, int data_
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_srp_send_params( gnutls_session state, opaque* data, int data_size) {
-	uint8 len;
+int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_size) {
+	uint len;
 
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
 		/* algorithm was not allowed in this state
@@ -78,7 +80,7 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, int data_size) 
 		if (cred==NULL) return 0;
 
 		if (cred->username!=NULL) { /* send username */
-			len = strlen(cred->username);
+			len = strlen(cred->username) % 256;
 			if (data_size < len+1) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;

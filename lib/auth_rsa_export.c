@@ -44,9 +44,9 @@
 #include <gnutls_state.h>
 
 int _gnutls_gen_rsa_client_kx(gnutls_session, opaque **);
-int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, int);
+int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, size_t);
 static int gen_rsa_export_server_kx(gnutls_session, opaque **);
-static int proc_rsa_export_server_kx(gnutls_session, opaque *, int);
+static int proc_rsa_export_server_kx(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT rsa_export_auth_struct = {
 	"RSA EXPORT",
@@ -239,7 +239,7 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 }
 
 static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
-				  int data_size)
+				size_t _data_size)
 {
 	uint16 n_m, n_e;
 	size_t _n_m, _n_e;
@@ -248,6 +248,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	int i, sigsize;
 	gnutls_datum vparams, signature;
 	int ret;
+	ssize_t data_size = _data_size;
 	CERTIFICATE_AUTH_INFO info;
 	gnutls_cert peer_cert;
 

@@ -35,8 +35,8 @@
 int gen_srp_server_kx2(gnutls_session, opaque **);
 int gen_srp_client_kx0(gnutls_session, opaque **);
 
-int proc_srp_server_kx2(gnutls_session, opaque *, int);
-int proc_srp_client_kx0(gnutls_session, opaque *, int);
+int proc_srp_server_kx2(gnutls_session, opaque *, size_t);
+int proc_srp_client_kx0(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
@@ -72,15 +72,16 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
  */
-int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
+int gen_srp_server_hello(gnutls_session state, opaque * data, size_t _data_size)
 {
 	size_t n_g, n_n, n_s;
-	size_t ret;
+	int ret;
 	uint8 *data_n, *data_s;
 	uint8 *data_g, *username;
 	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
 	int err;
 	SRP_SERVER_AUTH_INFO info;
+	ssize_t data_size = _data_size;
 	
 	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT), 1)) < 0) {
 		gnutls_assert();
@@ -127,7 +128,7 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 	_gnutls_mpi_set(N, pwd_entry->n);
 	_gnutls_mpi_set(V, pwd_entry->v);
 
-	if (data_size < n_n + n_g + pwd_entry->salt_size + 5) {
+	if ((size_t)data_size < n_n + n_g + pwd_entry->salt_size + 5) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -285,7 +286,7 @@ int gen_srp_client_kx0(gnutls_session state, opaque ** data)
 }
 
 /* receive the first key exchange message ( g, n, s) */
-int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_size)
+int proc_srp_server_hello(gnutls_session state, const opaque * data, size_t _data_size)
 {
 	uint8 n_s;
 	uint16 n_g, n_n;
@@ -295,8 +296,9 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_si
 	const uint8 *data_s;
 	int i, ret;
 	opaque hd[SRP_MAX_HASH_SIZE];
-	char *username;
-	char *password;
+	char *username, *password;
+	ssize_t data_size = _data_size;
+
 	const gnutls_srp_client_credentials cred =
 	    _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_SRP, NULL);
 
@@ -370,9 +372,10 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_si
 }
 
 /* just read A and put it to state */
-int proc_srp_client_kx0(gnutls_session state, opaque * data, int data_size)
+int proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _data_size)
 {
 	size_t _n_A;
+	ssize_t data_size = _data_size;
 
 	DECR_LEN( data_size, 2);
 	_n_A = _gnutls_read_uint16( &data[0]);
@@ -387,9 +390,10 @@ int proc_srp_client_kx0(gnutls_session state, opaque * data, int data_size)
 }
 
 
-int proc_srp_server_kx2(gnutls_session state, opaque * data, int data_size)
+int proc_srp_server_kx2(gnutls_session state, opaque * data, size_t _data_size)
 {
 	size_t _n_B;
+	ssize_t data_size = _data_size;
 	int ret;
 	
 	DECR_LEN( data_size, 2);

@@ -39,10 +39,11 @@
  *
  */
 
-int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, int data_size) 
+int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, size_t _data_size) 
 {
 	int new_type = -1, ret, i;
-	
+	ssize_t data_size = _data_size;
+
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		if (data_size > 0) {
 			if ( data_size != 1) {
@@ -108,8 +109,8 @@ int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, i
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, int data_size) {
-	uint16 len, i;
+int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, size_t data_size) {
+	uint len, i;
 	
 	/* this function sends the client extension data (dnsname) */
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {

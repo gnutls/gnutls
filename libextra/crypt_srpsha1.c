@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -27,6 +27,7 @@
 #include "auth_srp_passwd.h"
 #include "gnutls_srp.h"
 #include <gnutls_errors.h>
+#include <crypt_srpsha1.h>
 
 /*
  * x = SHA(<salt> | SHA(<username> | ":" | <raw password>)) 
@@ -40,16 +41,16 @@ char *_gnutls_crypt_srpsha1(const char *username, const char *passwd,
 		    const char *salt, GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	unsigned char *sp, *spe, r1[MAX_HASH_SIZE];
-	int salt_size = strlen(salt);
+	uint salt_size, passwd_len;
 	unsigned char *local_salt, *v;
-	int passwd_len;
 	GNUTLS_HASH_HANDLE h1;
 	int vsize, hash_len = _gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
 	opaque *tmp;
 	uint8 *rtext, *csalt;
-	int rsalt_size, tmpsize;
+	int tmpsize, rsalt_size;
 	size_t len;
 
+	salt_size = strlen(salt);
 	passwd_len = strlen(passwd);	/* we do not want the null */
 
 	h1 = _gnutls_hash_init(GNUTLS_MAC_SHA);

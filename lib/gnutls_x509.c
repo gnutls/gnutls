@@ -72,7 +72,7 @@ static oid2string OID2STR[] = {
 	{"1 2 840 113549 1 1 5", "sha1WithRSAEncryption", 0, 0},
 	{"1 2 840 10040 4 3", "id-dsa-with-sha1", 0, 0},
 	{"1 2 840 10040 4 1", "id-dsa", 0, 0},
-	{NULL}
+	{NULL, NULL, 0, 0}
 };
 
 /* Returns 1 if the data defined by the OID are printable.
@@ -605,7 +605,7 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 	char ext_data[256];
 	int len;
 	char num[MAX_INT_DIGITS];
-	GNUTLS_X509_SUBJECT_ALT_NAME type;
+	gnutls_x509_subject_alt_name type;
 
 	memset(ret, 0, *ret_size);
 
@@ -662,7 +662,7 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 
 
 	type = _find_type( ext_data);
-	if (type == -1) {
+	if (type == (gnutls_x509_subject_alt_name)-1) {
 		gnutls_assert();
 		return GNUTLS_E_X509_UNKNOWN_SAN;
 	}
@@ -826,7 +826,7 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 	const gnutls_certificate_credentials cred;
-	gnutls_certificate_status verify;
+	int verify;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size, i, x, ret;
 
@@ -934,7 +934,7 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
   **/
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length)
 {
-	gnutls_certificate_status verify;
+	int verify;
 	gnutls_cert *peer_certificate_list;
 	gnutls_cert *ca_certificate_list;
 	int peer_certificate_list_size, i, x, ret, ca_certificate_list_size;
@@ -1690,7 +1690,8 @@ int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials res, con
 
 static int generate_rdn_seq( gnutls_certificate_credentials res) {
 gnutls_datum tmp;
-int ret, size, i;
+int ret;
+uint size, i;
 opaque *pdata;
 
 	/* Generate the RDN sequence 
@@ -2841,7 +2842,7 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
   * Returns GNUTLS_E_INVALID_REQUEST if the provided buffer is not long enough.
   *
   **/
-int gnutls_x509_extract_certificate_dn_string(char *buf, int sizeof_buf, 
+int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf, 
    const gnutls_datum * cert, int issuer)
 {
    gnutls_x509_dn dn;

@@ -365,7 +365,8 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
  */
 inline static int
 _gnutls_handshake_hash_pending( gnutls_session session) {
-int siz, ret;
+size_t siz;
+int ret;
 char * data;
 
 	if (session->internals.handshake_mac_handle_sha==NULL ||
@@ -788,7 +789,7 @@ static int _gnutls_recv_handshake_header(gnutls_session session,
 	int ret;
 	uint32 length32 = 0;
 	uint8 *dataptr = NULL;	/* for realloc */
-	int handshake_header_size = HANDSHAKE_HEADER_SIZE;
+	size_t handshake_header_size = HANDSHAKE_HEADER_SIZE;
 
 	/* if we have data into the buffer then return them, do not read the next packet.
 	 * In order to return we need a full TLS handshake header, or in case of a version 2
@@ -855,7 +856,7 @@ static int _gnutls_recv_handshake_header(gnutls_session session,
 				0) ? ret :
 			    GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
-		if (ret !=
+		if ((size_t)ret !=
 		    HANDSHAKE_HEADER_SIZE -
 		    session->internals.handshake_header_buffer.
 		    header_size) {
@@ -2004,6 +2005,7 @@ int gnutls_handshake_client(gnutls_session session)
 
 		STATE = STATE0;
 	default:
+		break;
 	}
 
 
@@ -2058,6 +2060,7 @@ static int _gnutls_send_handshake_final(gnutls_session session, int init)
 
 		STATE = STATE0;
 	default:
+		break;
 	}
 
 	return 0;
@@ -2112,6 +2115,7 @@ static int _gnutls_recv_handshake_final(gnutls_session session, int init)
 		}
 		STATE = STATE0;
 	default:
+		break;
 	}
 
 
@@ -2227,6 +2231,7 @@ int gnutls_handshake_server(gnutls_session session)
 
 		STATE = STATE0;	/* finished thus clear session */
 	default:
+		break;
 	}
 
 	return 0;

@@ -34,3 +34,5 @@ int _gnutls_x509_oid_data2string( const char* OID, void* value,
 const char* _gnutls_x509_oid2string( const char* OID);
 int _gnutls_x509_oid_data_printable( const char* OID);
 
+int gnutls_x509_extract_certificate_subject_alt_name( const gnutls_datum*, int seq, char*, int*);
+int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);

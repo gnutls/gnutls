@@ -108,7 +108,7 @@ void _gnutls_free_cert(gnutls_cert cert)
   **/
 void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 {
-	int i, j;
+	uint i, j;
 
 	for (i = 0; i < sc->ncerts; i++) {
 		for (j = 0; j < sc->cert_list_length[i]; j++) {
@@ -329,7 +329,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 	const gnutls_certificate_credentials cred;
-	gnutls_certificate_status verify;
+	int verify;
 	int peer_certificate_list_size;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);

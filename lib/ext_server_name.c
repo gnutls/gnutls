@@ -254,7 +254,6 @@ int gnutls_set_server_name(gnutls_session session,
 			   gnutls_server_name_type type,
 			   const void *name, int name_length)
 {
-   const char *dnsname;
    int server_names;
 
    if (session->security_parameters.entity == GNUTLS_SERVER)

@@ -29,6 +29,6 @@ int _gnutls_gen_extensions( gnutls_session session, opaque** data);
 typedef struct {
 	const char *name;
 	uint16 type;
-	int (*gnutls_ext_func_recv)( gnutls_session, const opaque*, int); /* recv data */
-	int (*gnutls_ext_func_send)( gnutls_session, opaque*, int); /* send data */
+	int (*gnutls_ext_func_recv)( gnutls_session, const opaque*, size_t); /* recv data */
+	int (*gnutls_ext_func_send)( gnutls_session, opaque*, size_t); /* send data */
 } gnutls_extension_entry;

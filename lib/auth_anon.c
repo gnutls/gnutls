@@ -38,8 +38,8 @@
 
 int gen_anon_server_kx( gnutls_session, opaque**);
 int gen_anon_client_kx( gnutls_session, opaque**);
-int proc_anon_server_kx( gnutls_session, opaque*, int);
-int proc_anon_client_kx( gnutls_session, opaque*, int);
+int proc_anon_server_kx( gnutls_session, opaque*, size_t);
+int proc_anon_client_kx( gnutls_session, opaque*, size_t);
 
 const MOD_AUTH_STRUCT anon_auth_struct = {
 	"ANON",
@@ -194,13 +194,14 @@ int ret;
 	return n_X+2;
 }
 
-int proc_anon_server_kx( gnutls_session session, opaque* data, int data_size) {
+int proc_anon_server_kx( gnutls_session session, opaque* data, size_t _data_size) {
 	uint16 n_Y, n_g, n_p;
 	size_t _n_Y, _n_g, _n_p;
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_Y;
-	int i, ret;
+	int i, ret, bits;
+	ssize_t data_size = _data_size;
 
 	i = 0;
 	DECR_LEN( data_size, 2);
@@ -255,7 +256,13 @@ int proc_anon_server_kx( gnutls_session session, opaque* data, int data_size) {
 		return ret;
 	}
 
-	if ( _gnutls_mpi_get_nbits( session->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( session)) {
+	bits = _gnutls_dh_get_prime_bits( session);
+	if (bits < 0) {
+		gnutls_assert();
+		return bits;
+	}
+
+	if ( _gnutls_mpi_get_nbits( session->gnutls_key->client_p) < (size_t)bits) {
 		/* the prime used by the peer is not acceptable
 		 */
 		gnutls_assert();
@@ -280,12 +287,14 @@ int proc_anon_server_kx( gnutls_session session, opaque* data, int data_size) {
 	return 0;
 }
 
-int proc_anon_client_kx( gnutls_session session, opaque* data, int data_size) {
+int proc_anon_client_kx( gnutls_session session, opaque* data, size_t _data_size) 
+{
 	uint16 n_Y;
 	size_t _n_Y;
 	GNUTLS_MPI g, p;
 	int bits, ret;
 	const gnutls_anon_server_credentials cred;
+	ssize_t data_size = _data_size;
 	
 	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_ANON, NULL);
 	if (cred == NULL) {

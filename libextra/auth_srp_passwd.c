@@ -38,7 +38,7 @@
 /* this function parses tpasswd.conf file. Format is:
  * string(username):base64(v):base64(salt):int(index)
  */
-static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
+static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str) {
 char * p;
 int len, ret;
 opaque *verifier;
@@ -124,7 +124,8 @@ int indx;
 /* this function parses tpasswd.conf file. Format is:
  * int(index):base64(n):int(g)
  */
-static int pwd_put_values2( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
+static int pwd_put_values2( GNUTLS_SRP_PWD_ENTRY *entry, char *str) 
+{
 char * p;
 int len;
 opaque * tmp;
@@ -198,7 +199,7 @@ size_t tmp_size;
 static int pwd_read_conf( const char* pconf_file, GNUTLS_SRP_PWD_ENTRY* entry, int index) {
 	FILE * fd;
 	char line[2*1024];
-	int i;
+	uint i;
 	char indexstr[10];
 
 	sprintf( indexstr, "%d", index); /* Flawfinder: ignore */
@@ -216,7 +217,7 @@ static int pwd_read_conf( const char* pconf_file, GNUTLS_SRP_PWD_ENTRY* entry, i
 	            i++;
 	    }
 	    if (strncmp( indexstr, line, strlen(indexstr)) == 0) {
-			if ((index = pwd_put_values2( entry, line, strlen(line))) >= 0)
+			if ((index = pwd_put_values2( entry, line)) >= 0)
 				return 0;
 			else {
 				return GNUTLS_E_PWD_ERROR;
@@ -232,7 +233,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* us
 	const gnutls_srp_server_credentials cred;
 	FILE * fd;
 	char line[2*1024];
-	int i, len;
+	uint i, len;
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	int index;
 	int pwd_index = 0;
@@ -286,7 +287,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* us
 	    }
 	    len = strlen(username);
 	    if (strncmp( username, line, (i>len)?i:len) == 0) {
-			if ((index = pwd_put_values( entry, line, strlen(line))) >= 0)
+			if ((index = pwd_put_values( entry, line)) >= 0)
 				if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, index)==0) {
 					return entry;
 				} else {
