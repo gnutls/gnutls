@@ -65,6 +65,10 @@ time_t gnutls_x509pki_get_peer_certificate_activation_time(  X509PKI_CLIENT_AUTH
 time_t gnutls_x509pki_get_peer_certificate_expiration_time(  X509PKI_CLIENT_AUTH_INFO info);
 unsigned char gnutls_x509pki_get_key_usage(  X509PKI_CLIENT_AUTH_INFO info);
 const char* gnutls_x509pki_get_subject_dns_name(  X509PKI_CLIENT_AUTH_INFO info);
+int gnutls_x509pki_get_dh_bits(  X509PKI_CLIENT_AUTH_INFO info);
+
+#define gnutls_x509pki_server_get_dh_bits gnutls_x509pki_get_dh_bits
+#define gnutls_x509pki_client_get_dh_bits gnutls_x509pki_get_dh_bits
 
 #define gnutls_x509pki_server_get_peer_dn gnutls_x509pki_get_peer_dn
 #define gnutls_x509pki_server_get_issuer_dn gnutls_x509pki_get_issuer_dn

@@ -772,6 +772,13 @@ static int _gnutls_get_version(node_asn * c2, char *root)
 	return (int) gversion[0] + 1;
 }
 
+#ifdef DEBUG
+# warning FIX THIS FOR DSS
+#endif
+
+/* This function will convert a der certificate, to a format
+ * (structure) that gnutls can understand and use.
+ */
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 {
 	int result;

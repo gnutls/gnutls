@@ -21,6 +21,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_gcry.h>
+#include <gnutls_datum.h>
 
 static uint8 DH_G_1024[] = { 0x02 };
 static uint8 DH_G_4096[] = { 0x05 };
@@ -258,6 +259,7 @@ static PRIME dh_primes[] = {
  * number of bits. Ie a number of bits that we have a prime in the
  * dh_primes structure.
  */
+static int supported_bits[] = { 1024, 2048, 3072, 4096, 0 };
 static int normalize_bits(int bits)
 {
 	if (bits >= 4096)
@@ -402,48 +404,69 @@ int _gnutls_dh_generate_prime(MPI * ret_g, MPI * ret_n, int bits)
 
 }
 
+/* returns a negative value if the bits is not supported 
+ */
+static int check_bits(int bits) {
+int i=0;
+	do {
+		if (supported_bits[i]==bits) return 0;
+		i++;
+	} while(supported_bits[i]!=0);
+
+	return GNUTLS_E_INVALID_PARAMETERS;
+}
+
 /* Replaces the prime in the static DH parameters, with a randomly
  * generated one.
  */
-static int _gnutls_dh_replace_prime(PRIME * sprime, int bits)
+/**
+  * gnutls_dh_replace_params - This function will replace the old DH parameters
+  * @prime: holds the new prime
+  * @generator: holds the new generator
+  * @bits: is the prime's number of bits
+  *
+  * This function will replace the pair of prime and generator for use in 
+  * the Diffie-Hellman key exchange. The new parameters should be stored in the
+  * appropriate gnutls_datum. This function should not be called while a key 
+  * exchange is in progress. 
+  * 
+  * Note that the bits value should be one of 1024, 2048, 3072 or 4096.
+  *
+  **/
+int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits)
 {
 
 	MPI tmp_prime, tmp_g;
-	int siz;
-	gnutls_datum raw_prime, raw_g;
+	int siz, i;
+	PRIME* sprime;
 
-
-	if (_gnutls_dh_generate_prime(&tmp_g, &tmp_prime, bits) < 0) {
+	if (check_bits(bits)<0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+	
+	i = 0;
+	do {
+		if (dh_primes[i].bits==bits) {
+			sprime = &dh_primes[i];
+			break;
+		}
+	} while(dh_primes[i].bits!=0);
+		
+	siz = prime.size;
+	if (gcry_mpi_scan(&tmp_prime, GCRYMPI_FMT_USG,
+			  prime.data, &siz)) {
+		gnutls_assert();
+		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, tmp_g);
-
-	raw_g.data = gnutls_malloc(siz);
-	if (raw_g.data == NULL) {
-		_gnutls_mpi_release(&tmp_g);
-		_gnutls_mpi_release(&tmp_prime);
-		return GNUTLS_E_MEMORY_ERROR;
+	siz = generator.size;
+	if (gcry_mpi_scan(&tmp_g, GCRYMPI_FMT_USG,
+			  generator.data, &siz)) {
+		_gnutls_mpi_release( &tmp_prime);
+		gnutls_assert();
+		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-
-	raw_g.size = siz;
-	gcry_mpi_print(GCRYMPI_FMT_USG, raw_g.data, &siz, tmp_g);
-
-
-	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, tmp_prime);
-
-	raw_prime.data = gnutls_malloc(siz);
-	if (raw_prime.data == NULL) {
-		_gnutls_mpi_release(&tmp_g);
-		_gnutls_mpi_release(&tmp_prime);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	raw_prime.size = siz;
-	gcry_mpi_print(GCRYMPI_FMT_USG, raw_prime.data, &siz, tmp_prime);
-
 
 	/* copy the generated values to the structure
 	 */
@@ -456,10 +479,14 @@ static int _gnutls_dh_replace_prime(PRIME * sprime, int bits)
 	sprime->local = 1;
 	sprime->_prime = gcry_mpi_copy(tmp_prime);
 	sprime->_generator = gcry_mpi_copy(tmp_g);
-	sprime->prime.data = raw_prime.data;
-	sprime->prime.size = raw_prime.size;
-	sprime->generator.data = raw_g.data;
-	sprime->generator.size = raw_g.size;
+	if (gnutls_set_datum( &sprime->prime, prime.data, prime.size) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	if (gnutls_set_datum( &sprime->prime, generator.data, generator.size) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	_gnutls_mpi_release(&tmp_g);
 	_gnutls_mpi_release(&tmp_prime);
@@ -468,38 +495,71 @@ static int _gnutls_dh_replace_prime(PRIME * sprime, int bits)
 
 }
 
+/* Generates a prime number and a generator, and returns 2 gnutls_datums that contain these
+ * numbers.
+ */
 /**
-  * gnutls_dh_generate_new_primes - This function will generate new primes
+  * gnutls_dh_generate_params - This function will generate new DH parameters
+  * @prime: will hold the new prime
+  * @generator: will hold the new generator
+  * @bits: is the prime's number of bits
   *
-  * This function will generate new primes for use in the Diffie-Hellman
-  * key exchange. This function should not be called when a key exchange
-  * is in progress, and is normally very slow. This function should be
-  * called in order to replace the included DH primes in the gnutls
-  * library.
+  * This function will generate a new pair of prime and generator for use in 
+  * the Diffie-Hellman key exchange. The new parameters will be stored in the
+  * appropriate gnutls_datum. This function is normally very slow. An other function
+  * (gnutls_dh_replace_params()) should be called in order to replace the included 
+  * DH primes in the gnutls library.
+  * 
+  * Note that the bits value should be one of 1024, 2048, 3072 or 4096.
+  * Also note that the generation of new DH parameters is only usefull
+  * to servers. Clients use the parameters sent by the server, thus it's
+  * no use calling this in client side.
+  *
   **/
-int gnutls_dh_generate_new_primes()
+int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int bits)
 {
-	int ret, i;
 
-	i = 0;
-	do {
-#ifdef DEBUG
-		_gnutls_log("Generating prime with %d bits\n",
-			    dh_primes[i].bits);
-#endif
-		ret =
-		    _gnutls_dh_replace_prime(&dh_primes[i],
-					      dh_primes[i].bits);
-		if (ret < 0) {
-			gnutls_assert();
-#ifdef DEBUG
-			_gnutls_log("Error generating prime %d\n",
-				    dh_primes[i].bits);
-#endif
-			return ret;
-		}
-		i++;
-	} while (dh_primes[i].bits != 0);
-	
+	MPI tmp_prime, tmp_g;
+	int siz;
+
+	if (check_bits(bits)<0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+
+	if (_gnutls_dh_generate_prime(&tmp_g, &tmp_prime, bits) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	siz = 0;
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, tmp_g);
+
+	generator->data = gnutls_malloc(siz);
+	if (generator->data == NULL) {
+		_gnutls_mpi_release(&tmp_g);
+		_gnutls_mpi_release(&tmp_prime);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	generator->size = siz;
+	gcry_mpi_print(GCRYMPI_FMT_USG, generator->data, &siz, tmp_g);
+
+
+	siz = 0;
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, tmp_prime);
+
+	prime->data = gnutls_malloc(siz);
+	if (prime->data == NULL) {
+		gnutls_free( generator->data);
+		_gnutls_mpi_release(&tmp_g);
+		_gnutls_mpi_release(&tmp_prime);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	prime->size = siz;
+	gcry_mpi_print(GCRYMPI_FMT_USG, prime->data, &siz, tmp_prime);
+
 	return 0;
+
 }
+

@@ -216,7 +216,8 @@ int gnutls_set_x509_trust( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE)
 int gnutls_global_init();
 void gnutls_global_deinit();
 
-int gnutls_dh_generate_new_primes();
+int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits);
+int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int bits);
 
 typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
 typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);

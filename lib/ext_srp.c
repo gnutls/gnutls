@@ -30,7 +30,6 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
 		/* algorithm was not allowed in this state
 		 */
-		gnutls_assert();
 		return 0;
 	}
 	
