@@ -2222,7 +2222,7 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 				    (cert->
 				     keyUsage & GNUTLS_X509KEY_KEY_ENCIPHERMENT))
 					return
-					    GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+					    GNUTLS_E_KEY_USAGE_VIOLATION;
 				else
 					return 0;
 			}
@@ -2235,14 +2235,14 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 				    (cert->
 				     keyUsage & GNUTLS_X509KEY_DIGITAL_SIGNATURE))
 					return
-					    GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+					    GNUTLS_E_KEY_USAGE_VIOLATION;
 				else
 					return 0;
 			}
 			return 0;
 		default:
 			gnutls_assert();
-			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 	}
 	return 0;

@@ -91,7 +91,7 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("Unknown Subject Alternative name in X.509 certificate.", GNUTLS_E_X509_UNKNOWN_SAN, 1 ), 
 
 	ERROR_ENTRY("Unsupported critical extension in X.509 certificate.", GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION, 1 ), 
-	ERROR_ENTRY("Key usage violation in X.509 certificate, has been detected.", GNUTLS_E_X509_KEY_USAGE_VIOLATION, 1 ), 
+	ERROR_ENTRY("Key usage violation in certificate, has been detected.", GNUTLS_E_KEY_USAGE_VIOLATION, 1 ), 
 	ERROR_ENTRY("Function was interrupted.", GNUTLS_E_AGAIN, 0 ), 
 	ERROR_ENTRY("Function was interrupted.", GNUTLS_E_INTERRUPTED, 0 ), 
 	ERROR_ENTRY("Rehandshake was requested by the peer.", GNUTLS_E_REHANDSHAKE, 0 ),
