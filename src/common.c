@@ -25,10 +25,10 @@ void print_x509_info(GNUTLS_STATE state)
 	char printable[120];
 	char *print;
 
+	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
+
 	if (cert_list_size <= 0)
 		return;
-
-	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
 
 	printf(" - Certificate info:\n");
