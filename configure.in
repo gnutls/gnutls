@@ -128,7 +128,7 @@ AC_CHECK_HEADERS(termios.h termio.h sgtty.h)
 AC_CHECK_FUNCS(bzero signal sigaction memset fcntl fsync siglongjmp,,)
 AC_CHECK_FUNCS(lstat stat umask utime memmove bcopy getpwuid waitpid,,)
 
-AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN("GDBM was not found. You will not be able to use Server side Session Resuming."))
+AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN("GDBM was not found. You will not be able to use Server side session resuming."))
 AC_CHECK_LIB(z, compress,,AC_MSG_WARN("ZLIB was not found. You will not be able to use ZLIB compression."))
 
 dnl Checks for libraries.
