@@ -1,5 +1,5 @@
 * Add Client Certificate support in X509 authentication
-* Add certificate extensions support (x509v3)
+* Use the KeyUsage X509v3 extension to disable algorithms 
 * Add DHE_* ciphersuites
 * Tools for processing/generating certificates (fabio.fiorina@alcatel.it is working on that)
 * Documentation (of existing functions + Manual)

@@ -1,4 +1,4 @@
-If you want to find the gnutls library in other projects
+If you want to use the gnutls library in other projects
 using autoconf/aclocal, put in your 
 
 aclocal.m4:
