@@ -397,7 +397,7 @@ AM_CONDITIONAL(ENABLE_MINITASN1, test "$minitasn1_enabled" = "yes")
 dnl Check for libcfg+
 
 AC_ARG_WITH(included-libcfg,
-	[  --with-included-libcfg   Use the included libcfg+],
+	[  --with-included-libcfg   Use the included libcfg+ (certtool only)],
 libcfg_enabled=$withval, 
 libcfg_enabled=no
 
