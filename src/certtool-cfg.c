@@ -46,6 +46,7 @@ typedef struct _cfg_ctx
 	char *dns_name;
 	char* ip_addr;
 	char *email;
+	char **dn_oid;
 	char *crl_dist_points;
 	char *password;
 	char *pkcs12_key_name;
@@ -96,6 +97,9 @@ int template_parse(const char *template)
 		{NULL,    '\0', "dns_name",      CFG_STR,          (void *) &cfg.dns_name,     0},
 		{NULL,    '\0', "ip_address",      CFG_STR,          (void *) &cfg.ip_addr,     0},
 		{NULL,    '\0', "email",      CFG_STR,          (void *) &cfg.email,     0},
+
+		{NULL,    '\0', "dn_oid",      CFG_STR+CFG_MULTI_SEPARATED, (void *) &cfg.dn_oid,     0},
+
 		{NULL, '\0', "crl_dist_points", CFG_STR, (void *) &cfg.crl_dist_points, 0},
 		{NULL, '\0', "pkcs12_key_name", CFG_STR, (void *) &cfg.pkcs12_key_name, 0},
 
@@ -365,6 +369,30 @@ int ret;
 		}
 	} else {
 		read_crt_set( crt, "UID: ", GNUTLS_OID_LDAP_UID);
+	}
+
+}
+
+void get_oid_crt_set( gnutls_x509_crt crt)
+{
+int ret, i;
+
+	if (batch) {
+		if (!cfg.dn_oid) return;
+		for( i = 0; cfg.dn_oid[i] != NULL; i+=2) {
+			if (cfg.dn_oid[i+1]==NULL) {
+				fprintf(stderr, "dn_oid: %s does not have an argument.\n", 
+					cfg.dn_oid[i]);
+				exit(1);
+			}
+			ret = gnutls_x509_crt_set_dn_by_oid(crt, cfg.dn_oid[i], 0, 
+				cfg.dn_oid[i+1], strlen(cfg.dn_oid[i+1]));
+
+			if (ret < 0) {
+				fprintf(stderr, "set_dn_oid: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
 	}
 
 }
@@ -697,5 +725,30 @@ int ret;
 	}
 
 }
+
+void get_oid_crq_set( gnutls_x509_crq crq)
+{
+int ret, i;
+
+	if (batch) {
+		if (!cfg.dn_oid) return;
+		for( i = 0; cfg.dn_oid[i] != NULL; i+=2) {
+			if (cfg.dn_oid[i+1]==NULL) {
+				fprintf(stderr, "dn_oid: %s does not have an argument.\n", 
+					cfg.dn_oid[i]);
+				exit(1);
+			}
+			ret = gnutls_x509_crq_set_dn_by_oid(crq, cfg.dn_oid[i], 0, 
+				cfg.dn_oid[i+1], strlen(cfg.dn_oid[i+1]));
+
+			if (ret < 0) {
+				fprintf(stderr, "set_dn_oid: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+		}
+	}
+
+}
+
 
 #endif

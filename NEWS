@@ -10,6 +10,7 @@ Version 1.1.10
 - Opencdk library is being included if not found.
 - certtool can now add ip address SAN extension.
 - Fixes in openpgp signature verification.
+- certtool has now support for more X.520 DN attribute types.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage

@@ -47,9 +47,6 @@ if ENABLE_INCLUDED_LZO
 LZO_OBJECTS = minilzo.c
 else
 
-if USE_LZO
-LZO_LIBS = -llzo
-endif
 LZO_OBJECTS = 
 endif
 

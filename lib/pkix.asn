@@ -434,14 +434,29 @@ X520OrganizationalUnitName ::= DirectoryString
 id-at-title     AttributeType   ::=     {id-at 12}
 X520Title ::=   DirectoryString
 
+id-at-description     AttributeType   ::=     {id-at 13}
+X520Description ::=   DirectoryString
+
 id-at-dnQualifier       AttributeType   ::=     {id-at 46}
 X520dnQualifier ::=     PrintableString
 
 id-at-countryName       AttributeType   ::=     {id-at 6}
 X520countryName ::=     PrintableString (SIZE (2)) -- IS 3166 codes
 
+id-at-serialNumber       AttributeType   ::=     {id-at 5}
+X520serialNumber ::=     PrintableString
+
+id-at-telephoneNumber       AttributeType   ::=     {id-at 20}
+X520telephoneNumber ::=     PrintableString
+
+id-at-facsimileTelephoneNumber       AttributeType   ::=     {id-at 23}
+X520facsimileTelephoneNumber ::=     PrintableString
+
 id-at-pseudonym 	AttributeType   ::=     {id-at 65}
 X520pseudonym ::=	DirectoryString
+
+id-at-name 	AttributeType   ::=     {id-at 41}
+X520name ::=	DirectoryString
 
 id-at-streetAddress 	AttributeType   ::=     {id-at 9}
 X520streetAddress ::=	DirectoryString

@@ -481,6 +481,7 @@ if test x"$minilzo_enabled" = xyes; then
 AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
 else
 LZO_LIBS=-llzo
+AC_SUBST(LZO_LIBS)
 fi
 
 dnl use lzo
