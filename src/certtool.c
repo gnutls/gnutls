@@ -6,9 +6,14 @@
 #include <time.h>
 #include "certtool-gaa.h"
 
+gnutls_x509_privkey load_private_key(void);
+gnutls_x509_privkey load_ca_private_key(void);
+gnutls_x509_crt load_ca_cert(void);
 void certificate_info( void);
 static void gaa_parser(int argc, char **argv);
 void generate_self_signed( void);
+void generate_request(void);
+
 static gaainfo info;
 
 static unsigned char buffer[10*1024];
@@ -32,7 +37,7 @@ int main(int argc, char** argv)
 
 
 
-static void read_set( gnutls_x509_crt crt, const char* input_str, const char* oid)
+static void read_crt_set( gnutls_x509_crt crt, const char* input_str, const char* oid)
 {
 char input[128];
 int ret;
@@ -43,6 +48,23 @@ int ret;
 	if (strlen(input)==1) /* only newline */ return;
 
 	ret = gnutls_x509_crt_set_dn_by_oid(crt, oid, input, strlen(input)-1);
+	if (ret < 0) {
+		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+}
+
+static void read_crq_set( gnutls_x509_crq crq, const char* input_str, const char* oid)
+{
+char input[128];
+int ret;
+
+	fputs( input_str, stderr);
+	fgets( input, sizeof(input), stdin);
+	
+	if (strlen(input)==1) /* only newline */ return;
+
+	ret = gnutls_x509_crq_set_dn_by_oid(crq, oid, input, strlen(input)-1);
 	if (ret < 0) {
 		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -94,6 +116,9 @@ static gnutls_x509_privkey generate_private_key_int( void)
 gnutls_x509_privkey key;
 int ret;
 
+	if (info.privkey)
+		return load_private_key();
+
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
 		fprintf(stderr, "privkey_init: %s\n", gnutls_strerror(ret));
@@ -138,6 +163,8 @@ void generate_private_key( void)
 {
 gnutls_x509_privkey key;
 	
+	fprintf(stderr, "Generating a private key...\n");
+	
 	key = generate_private_key_int();
 	
 	print_private_key( key);
@@ -146,7 +173,7 @@ gnutls_x509_privkey key;
 }
 
 
-void generate_self_signed( void)
+gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 {
 	gnutls_x509_crt crt;
 	gnutls_x509_privkey key;
@@ -165,15 +192,15 @@ void generate_self_signed( void)
 	fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
 	"Just press enter to ignore a field.\n");
 
-	read_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
-	read_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
-	read_set( crt, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
-	read_set( crt, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-	read_set( crt, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-	read_set( crt, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+	read_crt_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
+	read_crt_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
+	read_crt_set( crt, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
+	read_crt_set( crt, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+	read_crt_set( crt, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+	read_crt_set( crt, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
 	
 	fprintf(stderr, "This field should not be used in new certificates.\n");
-	read_set( crt, "E-mail: ", GNUTLS_OID_PKCS9_EMAIL);
+	read_crt_set( crt, "E-mail: ", GNUTLS_OID_PKCS9_EMAIL);
 
 	size = gnutls_x509_crt_set_version( crt, 2);
 	if (size < 0) {
@@ -191,7 +218,6 @@ void generate_self_signed( void)
 		fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
-
 
 	size = gnutls_x509_crt_set_key( crt, key);
 	if (size < 0) {
@@ -246,6 +272,22 @@ void generate_self_signed( void)
 		}
 	}
 
+	*ret_key = key;
+	return crt;
+
+}
+
+void generate_self_signed( void)
+{
+	gnutls_x509_crt crt;
+	gnutls_x509_privkey key;
+	int size;
+	int result;
+
+	fprintf(stderr, "Generating a self signed certificate...\n");
+
+	crt = generate_certificate( &key);
+
 	fprintf(stderr, "\n\nSigning certificate...\n");
 
 	result = gnutls_x509_crt_sign( crt, crt, key);
@@ -256,7 +298,6 @@ void generate_self_signed( void)
 
 	print_private_key( key);
 
-
 	size = sizeof(buffer);
 	result = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);	
 	if (result < 0) {
@@ -266,6 +307,45 @@ void generate_self_signed( void)
 
 	printf("Certificate: \n%s", buffer);
 
+
+	gnutls_x509_crt_deinit(crt);
+	gnutls_x509_privkey_deinit(key);
+
+}
+
+void generate_signed_certificate( void)
+{
+	gnutls_x509_crt crt;
+	gnutls_x509_privkey key;
+	int size, result;
+	gnutls_x509_privkey ca_key;
+	gnutls_x509_crt ca_crt;
+
+	fprintf(stderr, "Generating a signed certificate...\n");
+
+	ca_key = load_ca_private_key();
+	ca_crt = load_ca_cert();
+
+	crt = generate_certificate( &key);
+	
+	fprintf(stderr, "\n\nSigning certificate...\n");
+
+	result = gnutls_x509_crt_sign( crt, ca_crt, ca_key);
+	if (result < 0) {
+		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	print_private_key( key);
+
+	size = sizeof(buffer);
+	result = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);	
+	if (result < 0) {
+		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	printf("Certificate: \n%s", buffer);
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
@@ -289,6 +369,12 @@ void gaa_parser(int argc, char **argv)
 			return;
 		case 2:
 			certificate_info();
+			return;
+		case 3:
+			generate_request();
+			return;
+		case 4:
+			generate_signed_certificate();
 			return;
 	}
 }
@@ -396,5 +482,217 @@ void certificate_info( void)
 			printf("UNKNOWN\n");
 			break;
 	}
+
+}
+
+gnutls_x509_privkey load_private_key()
+{
+FILE* fd;
+gnutls_x509_privkey key;
+int ret;
+gnutls_datum dat;
+size_t size;
+
+	fd = fopen(info.privkey, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "File %s does not exist.\n", info.privkey);
+		exit(1);
+	}
+
+	size = fread(buffer, 1, sizeof(buffer)-1, fd);
+	buffer[size] = 0;
+
+	fclose(fd);
+
+	ret = gnutls_x509_privkey_init(&key);
+	if (ret < 0) {
+		fprintf(stderr, "privkey_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	dat.data = buffer;
+	dat.size = size;
+	
+	if (!info.pkcs8)
+		ret = gnutls_x509_privkey_import( key, &dat, GNUTLS_X509_FMT_PEM);
+	else
+		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, GNUTLS_X509_FMT_PEM,
+			NULL, 0);
+	
+	if (ret < 0) {
+		fprintf(stderr, "privkey_import: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}	
+
+	return key;
+}
+
+gnutls_x509_privkey load_ca_private_key()
+{
+FILE* fd;
+gnutls_x509_privkey key;
+int ret;
+gnutls_datum dat;
+size_t size;
+
+	fprintf(stderr, "Loading CA's private key...\n");
+
+	if (info.ca_privkey==NULL) {
+		fprintf(stderr, "You must specify a private key of the CA.\n");
+		exit(1);
+	}
+
+	fd = fopen(info.ca_privkey, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "File %s does not exist.\n", info.ca_privkey);
+		exit(1);
+	}
+
+	size = fread(buffer, 1, sizeof(buffer)-1, fd);
+	buffer[size] = 0;
+
+	fclose(fd);
+
+	ret = gnutls_x509_privkey_init(&key);
+	if (ret < 0) {
+		fprintf(stderr, "privkey_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	dat.data = buffer;
+	dat.size = size;
+	
+	if (!info.pkcs8)
+		ret = gnutls_x509_privkey_import( key, &dat, GNUTLS_X509_FMT_PEM);
+	else
+		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, GNUTLS_X509_FMT_PEM,
+			NULL, 0);
+	
+	if (ret < 0) {
+		fprintf(stderr, "privkey_import: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}	
+
+	return key;
+}
+
+/* Loads the CA's certificate
+ */
+gnutls_x509_crt load_ca_cert()
+{
+FILE* fd;
+gnutls_x509_crt crt;
+int ret;
+gnutls_datum dat;
+size_t size;
+
+	fprintf(stderr, "Loading CA's certificate...\n");
+
+	if (info.ca==NULL) {
+		fprintf(stderr, "You must specify a certificate of the CA.\n");
+		exit(1);
+	}
+
+	fd = fopen(info.ca, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "File %s does not exist.\n", info.ca);
+		exit(1);
+	}
+
+	size = fread(buffer, 1, sizeof(buffer)-1, fd);
+	buffer[size] = 0;
+
+	fclose(fd);
+
+	ret = gnutls_x509_crt_init(&crt);
+	if (ret < 0) {
+		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	dat.data = buffer;
+	dat.size = size;
+	
+	ret = gnutls_x509_crt_import( crt, &dat, GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fprintf(stderr, "crt_import: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}	
+
+	return crt;
+}
+
+
+/* Generate a PKCS #10 certificate request.
+ */
+void generate_request(void)
+{
+	gnutls_x509_crq crq;
+	gnutls_x509_privkey key;
+	int ret;
+	const char* pass;
+	size_t size;
+
+	fprintf(stderr, "Generating a PKCS #10 certificate request...\n");
+
+	ret = gnutls_x509_crq_init(&crq);
+	if (ret < 0) {
+		fprintf(stderr, "crq_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	/* Load the private key.
+	 */
+	key = generate_private_key_int();
+
+	read_crq_set( crq, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
+	read_crq_set( crq, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
+	read_crq_set( crq, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
+	read_crq_set( crq, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+	read_crq_set( crq, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+	read_crq_set( crq, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+
+	ret = gnutls_x509_crq_set_version( crq, 0);
+	if (ret < 0) {
+		fprintf(stderr, "set_version: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	pass = read_str("Enter a challenge password: ");
+	
+	if (pass != NULL) {
+		ret = gnutls_x509_crq_set_challenge_password( crq, pass);
+		if (ret < 0) {
+			fprintf(stderr, "set_pass: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	}
+
+	ret = gnutls_x509_crq_set_key( crq, key);
+	if (ret < 0) {
+		fprintf(stderr, "set_key: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_x509_crq_sign( crq, key);
+	if (ret < 0) {
+		fprintf(stderr, "sign: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+
+	print_private_key( key);
+
+	size = sizeof(buffer);	
+	ret = gnutls_x509_crq_export( crq, GNUTLS_X509_FMT_PEM, buffer, &size);	
+	if (ret < 0) {
+		fprintf(stderr, "export: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	printf("Request: \n%s", buffer);
+
+	gnutls_x509_crq_deinit(crq);
+	gnutls_x509_privkey_deinit(key);
 
 }

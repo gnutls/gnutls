@@ -179,6 +179,7 @@ static int encode_to_private_key_info(gnutls_x509_privkey pkey,
 
 	/* Write the raw private key
 	 */
+	size = 0;
 	result =
 	    gnutls_x509_privkey_export(pkey, GNUTLS_X509_FMT_DER, NULL,
 				       &size);

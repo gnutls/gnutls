@@ -920,7 +920,7 @@ const ASN1_ARRAY_TYPE pkix_asn1_tab[]={
   {"pkcs-9-crlTypes",1879048204,0},
   {0,1073741825,"pkcs-9"},
   {0,1,"23"},
-  {"pkcs-9-challengePassword",1880096780,"AttributeType"},
+  {"pkcs-9-at-challengePassword",1879048204,0},
   {0,1073741825,"pkcs-9"},
   {0,1,"7"},
   {"pkcs-9-challengePassword",1610612754,0},

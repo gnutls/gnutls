@@ -500,13 +500,14 @@ int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key)
 {
 int result;
 gnutls_datum signature;
+const char* pk;
 
 	if (key->pk_algorithm != GNUTLS_PK_RSA) {
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
-	/* Step 3. Self sign the request.
+	/* Step 1. Self sign the request.
 	 */
 	result = _gnutls_x509_sign_tbs( crq->crq, "certificationRequestInfo", GNUTLS_MAC_SHA,
 		key, &signature);
@@ -516,12 +517,36 @@ gnutls_datum signature;
 		return result;
 	}
 
-	/* write the signature (bits)
+	/* Step 2. write the signature (bits)
 	 */
 	result = asn1_write_value( crq->crq, "signature", signature.data, signature.size*8);
 
 	_gnutls_free_datum( &signature);
 
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* Step 3. Write the signatureAlgorithm field.
+	 */
+	pk = _gnutls_x509_sign2oid( key->pk_algorithm, GNUTLS_MAC_SHA);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* write the RSA OID
+	 */
+	result = asn1_write_value( crq->crq, "signatureAlgorithm.algorithm", pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* disable parameters, which are not used in RSA.
+	 */
+	result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);

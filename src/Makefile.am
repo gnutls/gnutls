@@ -14,8 +14,6 @@ gnutls_cli_SOURCES = cli-gaa.c cli.c common.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
 gnutls_cli_debug_SOURCES = tls_test-gaa.c tls_test.c tests.c common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
-certtool_SOURCES = certtool-gaa.c certtool.c
-certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
 
 noinst_PROGRAMS = prime retcodes
@@ -23,6 +21,9 @@ prime_SOURCES = prime-gaa.c prime.c
 prime_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 retcodes_SOURCES = retcodes.c
 retcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+
+certtool_SOURCES = certtool-gaa.c certtool.c
+certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
 
 crypt-gaa.c: crypt.gaa

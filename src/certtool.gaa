@@ -3,9 +3,23 @@ helpnode "Certtool help\nUsage : certtool [options]"
 #int action;
 option (s, generate-self-signed) { $action=0; } "Generate a self-signed certificate."
 
+option (c, generate-certificate) { $action=4; } "Generate a signed certificate."
+
 option (p, generate-privkey) { $action=1; } "Generate a private key."
 
+option (q, generate-request) { $action=3; } "Generate a PKCS #10 certificate request."
+
+#char *privkey;
+option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."
+
+#char *ca_privkey;
+option (load-ca-privkey) STR "FILE" { $ca_privkey = $1 } "Certificate authority's private key file to use."
+
+#char *ca;
+option (load-ca-cert) STR "FILE" { $ca = $1 } "Certificate authority's certificate file to use."
+
 option (i, cert-info) { $action = 2; } "Print information on a certificate."
+
 
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
@@ -17,5 +31,5 @@ option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
 option (v, version) { certtool_version(); exit(0); } "shows the program version"
 
-init { $bits = 1024; $pkcs8 = 0;}
+init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; }
 

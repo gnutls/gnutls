@@ -591,9 +591,10 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	if (tmp_buf_size == 0) tmp_buf_size = 16*1024;
 	
 	if (format == GNUTLS_X509_FMT_DER) {
-		len = *output_data_size;
 
 		if (output_data == NULL) *output_data_size = 0;
+
+		len = *output_data_size;
 	
 		if ((result=asn1_der_coding( asn1_data, "", output_data, &len, NULL)) != ASN1_SUCCESS) 
 		{
@@ -618,8 +619,10 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
+{char err[1024];
+		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, err)) != ASN1_SUCCESS) {
 			gnutls_assert();
+fprintf(stderr, "re: %s\n", err);
 			if (result == ASN1_MEM_ERROR) {
 				_gnutls_x509_log("Length required for der coding: %d\n", len);
 				*output_data_size = B64FSIZE(strlen(pem_header),len);
@@ -627,7 +630,7 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 			gnutls_afree(tmp);
 			return _gnutls_asn2err(result);
 		}
-
+}
 		result = _gnutls_fbase64_encode( pem_header,
 						tmp, len, &out);
 

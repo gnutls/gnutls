@@ -1022,7 +1022,7 @@ pkcs-9-ub-challengePassword   INTEGER ::= 255
 pkcs-9-certTypes OBJECT IDENTIFIER ::= {pkcs-9 22}
 pkcs-9-crlTypes OBJECT IDENTIFIER ::= {pkcs-9 23}
 
-pkcs-9-challengePassword AttributeType	   ::= {pkcs-9 7}
+pkcs-9-at-challengePassword OBJECT IDENTIFIER   ::= {pkcs-9 7}
 
 pkcs-9-challengePassword        ::= CHOICE {
       printableString       PrintableString (SIZE (1..pkcs-9-ub-challengePassword)),
