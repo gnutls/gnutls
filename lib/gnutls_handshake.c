@@ -39,6 +39,7 @@
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
 #include <ext_dnsname.h>
+#include <gnutls_record.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_log( "GNUTLS Error: %s (%d)\n", x,y)
@@ -569,8 +570,8 @@ int _gnutls_send_empty_handshake(SOCKET cd, GNUTLS_STATE state, HandshakeType ty
 opaque data=0;
 opaque * ptr;
 
-if (again==0) ptr = &data;
-else ptr = NULL;
+	if (again==0) ptr = &data;
+	else ptr = NULL;
 
 	return _gnutls_send_handshake( cd, state, ptr, 0, type);
 }
@@ -587,9 +588,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 		/* we are resuming a previously interrupted
 		 * send.
 		 */
-		return
-		    _gnutls_handshake_send_int(cd, state, GNUTLS_HANDSHAKE, type,
-				       i_data, i_datasize);
+		return _gnutls_flush( cd, state);
 	}
 
 	if (i_data==NULL && i_datasize > 0) {
@@ -655,8 +654,8 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 
 	/* if we have data into the buffer then return them, do not read the next packet
 	 */
-	if (state->gnutls_internals.handshake_header_buffer.header_size >
-	    0) {
+	if (state->gnutls_internals.handshake_header_buffer.header_size ==
+	    handshake_header_size) {
 		*recv_type =
 		    state->gnutls_internals.handshake_header_buffer.
 		    recv_type;
@@ -666,36 +665,43 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 		    packet_length;
 	}
 
+	/* Note: SSL2_HEADERS == 1 */
+
 	dataptr = state->gnutls_internals.handshake_header_buffer.header;
 
-	ret =
-	    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE, type,
+	/* If we haven't already read the handshake headers.
+	 */
+	if (state->gnutls_internals.handshake_header_buffer.header_size < SSL2_HEADERS) {
+		ret =
+		    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE, type,
 				       dataptr, SSL2_HEADERS);
-	if (ret <= 0) {
-		gnutls_assert();
-		return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	
+		if (ret <= 0) {
+			gnutls_assert();
+			return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+
+		if (ret != SSL2_HEADERS) {
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+		state->gnutls_internals.handshake_header_buffer.header_size += SSL2_HEADERS;
 	}
 
-	if (ret != SSL2_HEADERS) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
-	if (state->gnutls_internals.v2_hello == 0
-	    || type != GNUTLS_CLIENT_HELLO) {
+	if (state->gnutls_internals.v2_hello == 0 || type != GNUTLS_CLIENT_HELLO) {
 		ret =
 		    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE,
 					       type,
-					       &dataptr[SSL2_HEADERS],
+					       &dataptr[state->gnutls_internals.handshake_header_buffer.header_size],
 					       HANDSHAKE_HEADER_SIZE -
-					       SSL2_HEADERS);
+					       state->gnutls_internals.handshake_header_buffer.header_size);
 		if (ret <= 0) {
 			gnutls_assert();
 			return (ret <
 				0) ? ret :
 			    GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
-		if (ret != HANDSHAKE_HEADER_SIZE - SSL2_HEADERS) {
+		if (ret != HANDSHAKE_HEADER_SIZE - state->gnutls_internals.handshake_header_buffer.header_size) {
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
@@ -1155,8 +1161,6 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
 				   GNUTLS_CLIENT_HELLO);
 	gnutls_free(data);
 
-
-
 	return ret;
 }
 
@@ -1319,13 +1323,6 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
  *
  */
 
-
-#define STATE state->gnutls_internals.handshake_state
-/* This returns true if we have got there
- * before (and not finished due to an interrupt).
- */
-#define AGAIN(target) STATE==target?1:0
-
 /**
   * gnutls_rehandshake - This function will renegotiate security parameters
   * @cd: is a connection descriptor, as returned by socket().
@@ -1405,9 +1402,9 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 
 #define IMED_RET( str, ret) \
 	if (ret < 0) { \
+		if (gnutls_is_fatal_error(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
-		if (gnutls_is_fatal_error(ret)==0) return ret; \
 		gnutls_clearHashDataBuffer(state); \
 		return ret; \
 	}
@@ -1435,11 +1432,10 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 					    session_id_size));
 #endif
 
-	if (STATE==STATE0) STATE = STATE1;
-
 	switch( STATE) {
+	case STATE0:
 	case STATE1:
-		ret = _gnutls_send_hello(cd, state, 0);
+		ret = _gnutls_send_hello(cd, state, AGAIN(STATE1));
 		STATE = STATE1;
 		IMED_RET("send hello", ret);
 
@@ -1539,11 +1535,11 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	int ret = 0;
 
 	/* Send the CHANGE CIPHER SPEC PACKET */
-	if (STATE==STATE0) STATE = STATE20;
 
 	switch( STATE) {
+	case STATE0:
 	case STATE20:
-		ret = _gnutls_send_change_cipher_spec(cd, state);
+		ret = _gnutls_send_change_cipher_spec(cd, state, AGAIN(STATE20));
 		STATE = STATE20;
 		if (ret < 0) {
 			ERR("send ChangeCipherSpec", ret);
@@ -1592,11 +1588,10 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 					int init)
 {
 	int ret = 0;
-	char ch;
-
-	if (STATE==STATE0) STATE = STATE30;
+	uint8 ch;
 
 	switch(STATE) {
+	case STATE0:
 	case STATE30:
 		ret =
 		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
@@ -1648,9 +1643,8 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 {
 	int ret = 0;
 
-	if (STATE==STATE0) STATE = STATE1;
-
 	switch( STATE) {
+	case STATE0:
 	case STATE1:
 		ret =
 		    _gnutls_recv_handshake(cd, state, NULL, NULL,
@@ -1840,9 +1834,8 @@ int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
 
 /* This function will remove algorithms that are not supported by
  * the requested authentication method. We only remove algorithm if
- * we receive client hello extensions (dnsname).
- *
- * or if we have a certificate with keyUsage bits (not ready yet)
+ * we receive client hello extensions (dnsname),
+ * or if we have a certificate with keyUsage bits set.
  */
 int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 					 GNUTLS_CipherSuite **

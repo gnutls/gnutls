@@ -67,7 +67,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
   * you call gnutls_deinit(). ]
   *
   * For GNUTLS_ANON cred should be NULL in case of a client.
-  * In case of a server it should be ANON_SERVER_CREDENTIALS.   
+  * In case of a server it should be ANON_SERVER_CREDENTIALS.
   * 
   * For GNUTLS_SRP cred should be SRP_CLIENT_CREDENTIALS
   * in case of a client, and SRP_SERVER_CREDENTIALS, in case

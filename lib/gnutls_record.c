@@ -35,7 +35,6 @@
 #include "gnutls_record.h"
 #include "gnutls_datum.h"
 
-
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
 	ver = state->connection_state.version;
@@ -413,20 +412,42 @@ int ret;
   * further sends will be disallowed. In order to reuse the TCP connection
   * you should wait for an EOF from the peer.
   *
+  * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
+  *
   **/
 int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 {
 	int ret = 0, ret2 = 0;
 
-	ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+	switch (STATE) {
+		case STATE0:
+		case STATE60:
+			if (STATE==STATE60) {
+				ret = _gnutls_flush( cd, state);
+			} else {
+				ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+				STATE = STATE60;
+			}
 
-	if ( how == GNUTLS_SHUT_RDWR && ret == 0) {
-		ret2 = gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0); 
-		state->gnutls_internals.may_read = 1;
+			if (ret < 0)
+				return ret;
+		case STATE61:
+			if ( how == GNUTLS_SHUT_RDWR && ret >= 0) {
+				ret2 = gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0); 
+				if (ret2 >= 0) state->gnutls_internals.may_read = 1;
+			}
+			STATE = STATE61;
+
+			if (ret2 < 0)
+				return ret2;
+
+		default:
 	}
-	state->gnutls_internals.may_write = 1;
+
+	STATE = STATE0;
 	
-	return GMIN(ret, ret2);
+	state->gnutls_internals.may_write = 1;
+	return 0;
 }
 
 /* This function behave exactly like write(). The only difference is 
@@ -503,6 +524,16 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		retval = data2send;
 		state->gnutls_internals.send_buffer_user_size =	data2send;
 
+		/* increase sequence number
+		 */
+		if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
+			state->gnutls_internals.valid_connection = VALID_FALSE;
+			gnutls_assert();
+			/* FIXME: Somebody has to do rehandshake before that.
+			 */
+			return GNUTLS_E_RECORD_LIMIT_REACHED;
+		}
+
 	} else {
 		/* order write buffered to write
 		 * the buffered data.
@@ -510,11 +541,14 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		cipher = NULL;
 		cipher_size = state->gnutls_internals.send_buffer.size +
 			state->gnutls_internals.send_buffer_prev_size;
-		
+
 		retval = state->gnutls_internals.send_buffer_user_size;
 	}
 
-	if ( (ret = _gnutls_write_buffered(cd, state, cipher, cipher_size)) != cipher_size) {
+	if (cipher!=NULL) ret = _gnutls_write_buffered(cd, state, cipher, cipher_size);
+	else ret = _gnutls_flush(cd, state);
+	
+	if ( ret != cipher_size) {
 		gnutls_free( cipher);
 		if ( ret < 0 && gnutls_is_fatal_error(ret)==0) {
 			/* If we have sent any data then return
@@ -538,13 +572,6 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 #endif
 
-	/* increase sequence number
-	 */
-	if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_RECORD_LIMIT_REACHED;
-	}
 
 	return retval;
 }
@@ -552,16 +579,18 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 /* This function is to be called if the handshake was successfully 
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
-ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
+ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state, int again)
 {
 	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
 #ifdef HANDSHAKE_DEBUG
 	_gnutls_log( "Record: Sent ChangeCipherSpec\n");
 #endif
-
-	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
-
+	if (again==0)
+		return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
+	else {
+		return _gnutls_flush( cd, state);
+	}
 }
 
 static int _gnutls_check_recv_type( ContentType recv_type) {
@@ -599,7 +628,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	int header_size;
 
 	begin:
-	
+
 	header_size = RECORD_HEADER_SIZE;
 	ret = 0;
 
@@ -799,9 +828,9 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 				/* If we have been expecting for an alert do 
 				 * not call close().
 				 */
-				if (type != GNUTLS_ALERT)
-					gnutls_bye( cd, state, GNUTLS_SHUT_WR);
-
+				if (type != GNUTLS_ALERT) 
+					do ret=gnutls_bye( cd, state, GNUTLS_SHUT_WR);
+					while(ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 				gnutls_free(tmpdata);
 
 				return 0; /* EOF */
@@ -834,7 +863,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
 			/* even if data is unexpected put it into the buffer */
-			gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen);
+			if ( (ret=gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen)) < 0) {
+				gnutls_assert();
+				return ret;
+			}
 
 			gnutls_assert();
 			gnutls_free(tmpdata);

@@ -199,7 +199,7 @@ char *gnutls_strdup(const char *s)
 	if (ret == NULL)
 		return ret;
 
-	strcpy(ret, s);
+	strcpy(ret, s); /* Flawfinder: ignore */
 
 	return ret;
 }

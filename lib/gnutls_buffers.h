@@ -34,5 +34,6 @@ int gnutls_readHashDataFromBuffer( GNUTLS_STATE state, char *data, int length);
 int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length);
 int gnutls_clearHashDataBuffer( GNUTLS_STATE state);
 
-ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
-ssize_t _gnutls_handshake_send_int(int fd, GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
+ssize_t _gnutls_handshake_recv_int(SOCKET fd, GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
+ssize_t _gnutls_handshake_send_int(SOCKET fd, GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
+ssize_t _gnutls_flush(SOCKET fd, GNUTLS_STATE state);

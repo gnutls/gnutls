@@ -228,7 +228,9 @@ int main(int argc, char** argv)
  */
 	gnutls_ext_set_name_ind( state, GNUTLS_DNSNAME, "localhost"); 
 
-	ret = gnutls_handshake(sd, state);
+	do {
+		ret = gnutls_handshake(sd, state);
+	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake has failed\n");
@@ -250,7 +252,9 @@ int main(int argc, char** argv)
 	print_info( state);
 
 	printf("- Disconnecting\n");
-	gnutls_bye(sd, state, GNUTLS_SHUT_RDWR);
+	do {
+		ret = gnutls_bye(sd, state, GNUTLS_SHUT_RDWR);
+	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 	shutdown( sd, SHUT_WR);
 	close(sd);
 	gnutls_deinit( state);	
@@ -284,8 +288,9 @@ int main(int argc, char** argv)
 	gnutls_set_current_session( state, session, session_size);
 	free(session);
 #endif
-
-	ret = gnutls_handshake(sd, state);
+	do {
+		ret = gnutls_handshake(sd, state);
+	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake failed\n");
@@ -326,8 +331,9 @@ int main(int argc, char** argv)
 
 		if (FD_ISSET(sd, &rset)) {
 			bzero(buffer, MAX_BUF+1);
-			ret = gnutls_read(sd, state, buffer, MAX_BUF);
-
+			do {
+				ret = gnutls_read(sd, state, buffer, MAX_BUF);
+			} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 			/* remove new line */
 
 			if (gnutls_is_fatal_error(ret) == 1 || ret==0) {
@@ -358,17 +364,22 @@ int main(int argc, char** argv)
 		if (FD_ISSET(fileno(stdin), &rset)) {
 	
 			if( fgets(buffer, MAX_BUF, stdin) == NULL) {
-				gnutls_bye(sd, state, GNUTLS_SHUT_WR);
+				do {
+					ret = gnutls_bye(sd, state, GNUTLS_SHUT_WR);
+				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 				user_term = 1;
 				continue;
 			}
-			gnutls_write( sd, state, buffer, strlen(buffer));
-			printf("- Sent: %d bytes\n", strlen(buffer));
+			do {
+				ret = gnutls_write( sd, state, buffer, strlen(buffer));
+			} while(ret==GNUTLS_E_AGAIN || ret==GNUTLS_E_INTERRUPTED);
+			printf("- Sent: %d bytes\n", ret);
 
 		}
 	}
-	if (user_term!=0) gnutls_bye(sd, state, GNUTLS_SHUT_RDWR);
-	
+	if (user_term!=0) do ret = gnutls_bye(sd, state, GNUTLS_SHUT_RDWR);
+	while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+
 	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);
 	

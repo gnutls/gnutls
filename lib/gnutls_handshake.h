@@ -40,3 +40,10 @@ void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
 #define set_adv_version( state, major, minor) \
 	state->gnutls_internals.adv_version_major = data[pos]; \
 	state->gnutls_internals.adv_version_minor = data[pos+1]
+
+
+#define STATE state->gnutls_internals.handshake_state
+/* This returns true if we have got there
+ * before (and not finished due to an interrupt).
+ */
+#define AGAIN(target) STATE==target?1:0

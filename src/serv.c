@@ -289,8 +289,11 @@ int read_request(int cd, GNUTLS_STATE state, char *data, int data_size, int rnl)
 
 	ptr = data;
 	for (n = 1; n < data_size; n++) {
-		if ((rc = gnutls_read(cd, state, &c, 1)) == 1) {
+		do {
+			rc = gnutls_read(cd, state, &c, 1);
+		} while( rc==GNUTLS_E_INTERRUPTED || rc==GNUTLS_E_AGAIN);
 
+		if ( rc == 1) {
 			*ptr++ = c;
 			if (c == '\n' && rnl==1) break;
 
@@ -410,7 +413,10 @@ int main(int argc, char **argv)
 				 sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
 
-		ret = gnutls_handshake(sd, state);
+		do {
+			ret = gnutls_handshake(sd, state);
+		} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(state);
@@ -444,31 +450,50 @@ int main(int argc, char **argv)
 
 			if (ret > 0) {
 				if (http == 0) {
+					printf( "* Read %d bytes from client.\n", strlen(buffer));
 					do {
-						ret = gnutls_write(sd, state, buffer,
-						     strlen(buffer));
+						ret = gnutls_write(sd, state, buffer, strlen(buffer));
 					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+					printf( "* Wrote %d bytes to client.\n", ret);
 				} else {
 					strcpy( http_buffer, HTTP_BEGIN);
 					peer_print_info(sd, state);
 					strcat( http_buffer, HTTP_END);
-					gnutls_write(sd, state, http_buffer, strlen(http_buffer));
+					do {
+						ret = gnutls_write(sd, state, http_buffer, strlen(http_buffer));
+					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+
 					printf("- Served request. Closing connection.\n");
 					break;
 				}
 			}
 			i++;
 #ifdef RENEGOTIATE
-			if (i == 10)
-				ret = gnutls_rehandshake(sd, state);
+			if (i == 10) {
+				do {
+					ret = gnutls_rehandshake(sd, state);
+				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+
+				if (gnutls_get_last_alert(state)!=GNUTLS_NO_RENEGOTIATION) {
+					/* continue handshake proccess */
+					do {
+						ret = gnutls_handshake(sd, state);
+					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+				}
+			}
 #endif
+			
 			check_alert( state, ret);
+
 			if (http != 0) {
 				break;	/* close the connection */
 			}
 		}
 		printf("\n");
-		gnutls_bye(sd, state, GNUTLS_SHUT_WR); /* do not wait for
+		do {
+			ret = gnutls_bye(sd, state, GNUTLS_SHUT_WR); 
+		} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+		/* do not wait for
 		 * the peer to close the connection.
 		 */
 		close(sd);

@@ -21,6 +21,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
+#include <gnutls_record.h>
 
 /* This is the only file that uses the berkeley sockets API.
  */
@@ -165,9 +166,9 @@ static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
 	while (left > 0) {
 		
 		if (_gnutls_pull_func==NULL)
-			i = recv(fd, &ptr[i], left, flags);
+			i = recv(fd, &ptr[sizeOfPtr-left], left, flags);
 		else
-			i = _gnutls_pull_func(fd, &ptr[i], left);
+			i = _gnutls_pull_func(fd, &ptr[sizeOfPtr-left], left);
 				
 		if (i < 0) {
 #ifdef READ_DEBUG
@@ -191,7 +192,6 @@ static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
 #ifdef READ_DEBUG
 			_gnutls_log( "READ: Got %d bytes from %d\n", i, fd);
 #endif
-
 			if (i == 0)
 				break;	/* EOF */
 		}
@@ -408,6 +408,8 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	}
 }
 
+
+
 /* This function is like write. But it does not return -1 on error.
  * It does return gnutls_errno instead.
  *
@@ -419,7 +421,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
  * to decrypt and verify the integrity. 
  *
  */
-ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE state, const void *iptr, size_t n)
+ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, size_t n)
 {
 	size_t left;
 #ifdef WRITE_DEBUG
@@ -445,16 +447,23 @@ ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE state, const void *iptr, siz
 		/* checking is handled above */
 		ptr = state->gnutls_internals.send_buffer.data;
 		n = state->gnutls_internals.send_buffer.size;
+#ifdef WRITE_DEBUG
+		_gnutls_log( "WRITE: Restoring old write. (%d data to send)\n", n);
+#endif
 	}
+
+#ifdef WRITE_DEBUG
+	_gnutls_log( "WRITE: Will write %d bytes to %d.\n", n, fd);
+#endif
 
 	i = 0;
 	left = n;
 	while (left > 0) {
 		
 		if (_gnutls_push_func==NULL) 
-			i = send(fd, &ptr[i], left, 0);
+			i = send(fd, &ptr[n-left], left, 0);
 		else
-			i = _gnutls_push_func(fd, &ptr[i], left);
+			i = _gnutls_push_func(fd, &ptr[n-left], left);
 
 		if (i == -1) {
 			if (errno == EAGAIN || errno == EINTR) {
@@ -466,20 +475,37 @@ ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE state, const void *iptr, siz
 					return GNUTLS_E_MEMORY_ERROR;
 				}
 				state->gnutls_internals.send_buffer.size = left;
-				memcpy( state->gnutls_internals.send_buffer.data, &ptr[n-left], left);
+				/* use memmove since they may overlap 
+				 */
+				memmove( state->gnutls_internals.send_buffer.data, &ptr[n-left], left);
 #ifdef WRITE_DEBUG
-				_gnutls_log( "WRITE: Interrupted. wrote %d bytes to %d. Left %d\n", n-left, fd, left);
+				_gnutls_log( "WRITE: Interrupted.\n");
 #endif
 				gnutls_assert();
-				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
-				else return GNUTLS_E_INTERRUPTED;
+				if (errno==EAGAIN) retval = GNUTLS_E_AGAIN;
+				else retval = GNUTLS_E_INTERRUPTED;
 
+				return retval;
 			} else {
 				gnutls_assert();
 				return GNUTLS_E_PUSH_ERROR;
 			}
 		}
 		left -= i;
+
+#ifdef WRITE_DEBUG
+		_gnutls_log( "WRITE: wrote %d bytes to %d. Left %d bytes\n", i, fd, left);
+		for (x=0;x<((n-left)/16)+1;x++) {
+			_gnutls_log( "%.4x - ",x);
+			for (j=0;j<16;j++) {
+				if (sum<n-left) {
+					_gnutls_log( "%.2x ", ((unsigned char*)ptr)[sum++]);
+				}
+			}
+			_gnutls_log( "\n");
+		}
+#endif
+
 	}
 
 	retval = n + state->gnutls_internals.send_buffer_prev_size;
@@ -487,38 +513,44 @@ ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE state, const void *iptr, siz
 	state->gnutls_internals.send_buffer.size = 0;
 	state->gnutls_internals.send_buffer_prev_size = 0;
 
-#ifdef WRITE_DEBUG
-	_gnutls_log( "WRITE: wrote %d bytes to %d\n", n, fd);
-	for (x=0;x<(n/16)+1;x++) {
-		_gnutls_log( "%.4x - ",x);
-		for (j=0;j<16;j++) {
-			if (sum<n) {
-				_gnutls_log( "%.2x ", ((unsigned char*)ptr)[sum++]);
-			}
-		}
-		_gnutls_log( "\n");
-	
-	}
-#endif
 	return retval;
 
 }
 
+/* This function writes the data that are left in the
+ * TLS write buffer (ie. because the previous write was
+ * interrupted.
+ */
+ssize_t _gnutls_flush(SOCKET fd, GNUTLS_STATE state)
+{
+    ssize_t ret;
+
+    if (state->gnutls_internals.send_buffer.size == 0)
+        return 0; /* done */
+
+    ret = _gnutls_write_buffered(fd, state, NULL, 0);
+#ifdef WRITE_DEBUG 
+    _gnutls_log("WRITE FLUSH: %d\n", ret);
+#endif
+    return ret;
+}
+
+
 /* This is a send function for the gnutls handshake 
  * protocol. Just makes sure that all data have been sent.
  */
-ssize_t _gnutls_handshake_send_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t n)
+ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t n)
 {
 	size_t left;
 	ssize_t i = 0;
 	char *ptr = iptr;
 
 	if (iptr==NULL && n == 0) {
-		uint8 sdata = 0;
 		/* resuming interrupted write. Put some random data into
 		 * the data field so send_int() will proceed normally.
 		 */
-		return gnutls_send_int( fd, state, type, htype, &sdata, 1);
+		return _gnutls_flush( fd, state);
+//		return gnutls_send_int( fd, state, type, htype, &sdata, 1);
 	}
 
 	left = n;

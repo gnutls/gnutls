@@ -200,7 +200,7 @@ static int pwd_read_conf( const SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_PWD_ENTR
 	int i;
 	char indexstr[10];
 
-	sprintf( indexstr, "%d", index);
+	sprintf( indexstr, "%d", index); /* Flawfinder: ignore */
 
 	fd = fopen( cred->password_conf_file, "r");
 	if (fd==NULL) {
@@ -307,7 +307,7 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 		_gnutls_srp_clear_pwd_entry( pwd_entry);
 		return NULL;
 	}
-	strcpy( pwd_entry->username, RNDUSER);
+	strcpy( pwd_entry->username, RNDUSER); /* Flawfinder: ignore */
 	
 	pwd_entry->v = gcry_mpi_new(160);
 	if (pwd_entry->v==NULL) {

@@ -496,7 +496,7 @@ int _gnutls_send_server_certificate(SOCKET cd, GNUTLS_STATE state, int again)
 	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE);
 	gnutls_free(data);
 	
-	if (ret<0) {
+	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}

@@ -25,15 +25,16 @@
 #include <defines.h>
 
 /*
-#define IO_DEBUG 
+#define IO_DEBUG 5 // define this to check non blocking behaviour 
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
 #define READ_DEBUG
 #define WRITE_DEBUG
-#define HANDSHAKE_DEBUG
-#define RECORD_DEBUG*/
+#define READ_DEBUG 
+#define HANDSHAKE_DEBUG // Prints some information on handshake 
+#define RECORD_DEBUG
 #define DEBUG
-
+*/
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -106,7 +107,7 @@ typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
 
 typedef enum HandshakeState { STATE0=0, STATE1, STATE2, STATE3, STATE4, STATE5,
 	STATE6, STATE7, STATE8, STATE9, STATE10, STATE11, STATE20=20, STATE21,
-	STATE30=30, STATE31, STATE50 } HandshakeState;
+	STATE30=30, STATE31, STATE50=50, STATE60=60, STATE61 } HandshakeState;
 
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
@@ -441,9 +442,6 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int total_bytes);
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
-ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void* data, size_t sizeofdata);
-ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType, char* data, size_t sizeofdata);
-ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
 
 /* These macros return the advertized TLS version of
  * the peer.
