@@ -1,3 +1,9 @@
+2004-06-11 12:22  nmav <nmav@gnutls.org>
+
+	* doc/protocol/draft-rescorla-dtls-00.txt:
+
+	added datagram tls draft.  
+
 2004-06-10 10:03  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_handshake.c, gnutls_state.c, gnutls_handshake.c,
