@@ -630,7 +630,8 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 }
 
 /* This is the main function in the handshake protocol. This does actually
-everything. (exchange hello messages etc).
+ * everything. (exchange hello messages etc).
+ */
 
 #define HASH(x) state->gnutls_internals.x=HASH_TRUE
 #define NOT_HASH(x) state->gnutls_internals.x=HASH_FALSE

@@ -95,12 +95,12 @@ struct gnutls_kx_algo_entry {
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static gnutls_kx_algo_entry kx_algorithms[] = {
-	GNUTLS_KX_ALGO_ENTRY(KX_ANON_DH, 0, 1, 0, 0, 1, 5),
-	GNUTLS_KX_ALGO_ENTRY(KX_RSA, 1, 0, 1, 1, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(KX_DHE_DSS, 1, 1, 1, 0, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(KX_DHE_RSA, 1, 1, 1, 0, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(KX_DH_DSS, 1, 0, 1, 0, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(KX_DH_RSA, 1, 0, 1, 0, 0, -1),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 1, 0, 0, 1, 5),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 0, 1, 1, 0, -1),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 1, 0, 0, -1),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0, -1),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 0, 1, 0, 0, -1),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 0, 1, 0, 0, -1),
 	{0}
 };
 
@@ -114,8 +114,8 @@ static gnutls_kx_algo_entry kx_algorithms[] = {
 
 
 /* Cipher SUITES */
-#define GNUTLS_CIPHER_SUITE_ENTRY(name, block_algorithm, kx_algorithm, mac_algorithm) \
-	{ #name, name, block_algorithm, kx_algorithm, mac_algorithm }
+#define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm) \
+	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm }
 
 typedef struct {
 	char *name;
@@ -129,8 +129,8 @@ typedef struct {
 #define GNUTLS_DH_anon_WITH_ARCFOUR_MD5 { 0x00, 0x18 }
 
 static gnutls_cipher_suite_entry cs_algorithms[] = {
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_WITH_ARCFOUR_MD5,   GNUTLS_ARCFOUR, KX_ANON_DH, GNUTLS_MAC_MD5),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_WITH_3DES_EDE_CBC_SHA, GNUTLS_3DES, KX_ANON_DH, GNUTLS_MAC_SHA),
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_WITH_ARCFOUR_MD5,   GNUTLS_ARCFOUR, GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5),
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_WITH_3DES_EDE_CBC_SHA, GNUTLS_3DES, GNUTLS_KX_ANON_DH, GNUTLS_MAC_SHA),
 	{0}
 };
 

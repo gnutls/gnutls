@@ -53,7 +53,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 	/* Do key exchange only if the algorithm permits it */
 	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
 
-		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
 			X = _gnutls_calc_dh_secret(&x);
 
 			state->gnutls_internals.dh_secret = x;
@@ -145,7 +145,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	    _gnutls_cipher_suite_get_kx_algo(state->
 					     gnutls_internals.current_cipher_suite);
 
-	if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+	if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
 
 
 			X = __gnutls_calc_dh_secret(&x, state->gnutls_internals.client_g, state->gnutls_internals.client_p);
@@ -235,7 +235,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 	/* Do key exchange only if the algorithm permits it */
 	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
 
-		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
 
 			ret = _gnutls_recv_handshake(cd, state, &data, &datasize, GNUTLS_SERVER_KEY_EXCHANGE);
 
@@ -310,7 +310,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	/* Do key exchange only if the algorithm permits it */
 	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
 
-		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
 
 			ret = _gnutls_recv_handshake(cd, state, &data, &datasize, GNUTLS_CLIENT_KEY_EXCHANGE);
 			if (ret < 0) return ret;

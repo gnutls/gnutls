@@ -38,7 +38,7 @@ int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor) {
 	return 1;
 }
 
-/* This function initializes the state to null (null encryption etc...)
+/* This function initializes the state to null (null encryption etc...) */
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
 	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
