@@ -40,6 +40,8 @@
 
 #define MAX(X,Y) (X >= Y ? X : Y);
 
+#include "pk.h"
+
 static int print_info( GNUTLS_STATE state) {
 char *tmp;
 const ANON_AUTH_INFO *dh_info;
@@ -87,11 +89,14 @@ int main()
 	struct timeval tv;
 	int user_term = 0;
 	SRP_CLIENT_CREDENTIALS cred;
-	
+	X509PKI_CLIENT_CREDENTIALS xcred;
+
+	PARSE();
+		
 	cred.username = "test";
 	cred.password = "test";
 	
-//	signal(SIGPIPE, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
@@ -110,9 +115,10 @@ int main()
 
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 	gnutls_set_cred( state, GNUTLS_SRP, &cred);
+	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);
 
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 	ret = gnutls_handshake(sd, state);
@@ -158,9 +164,10 @@ int main()
 
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 	gnutls_set_cred( state, GNUTLS_SRP, &cred);
+	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);
 
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 

@@ -174,30 +174,20 @@ static const gnutls_compression_entry compression_algorithms[] = {
 
 
 /* Key Exchange Section */
-#define GNUTLS_KX_ALGO_ENTRY(name, server_cert, client_cert, RSA_premaster, DH_public_value, auth_struct) \
-	{ #name, name, server_cert, client_cert, RSA_premaster, DH_public_value, auth_struct }
+#define GNUTLS_KX_ALGO_ENTRY(name, auth_struct) \
+	{ #name, name, auth_struct }
 
 struct gnutls_kx_algo_entry {
 	char *name;
 	KXAlgorithm algorithm;
-	int server_cert;
-	int client_cert;
-	int RSA_premaster;
-	int DH_public_value;
 	MOD_AUTH_STRUCT *auth_struct;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static const gnutls_kx_algo_entry kx_algorithms[] = {
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_ANON, 0, 0, 0, 1,
-			     &anon_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, &rsa_auth_struct),
-/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 0,
-			     &dhe_dss_auth_struct),*/
-/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 0, NULL),*/
-/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 1, 0, 0, NULL),*/
-/*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 1, 0, 0, NULL),*/
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP, 0, 0, 0, 0, &srp_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_ANON, &anon_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, &rsa_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP, &srp_auth_struct),
 	{0}
 };
 
@@ -688,14 +678,6 @@ int _gnutls_cipher_is_ok(BulkCipherAlgorithm algorithm)
 
 
 /* Key EXCHANGE functions */
-int _gnutls_kx_server_certificate(KXAlgorithm algorithm)
-{
-	size_t ret = 0;
-	GNUTLS_KX_ALG_LOOP(ret = p->server_cert);
-	return ret;
-
-}
-
 MOD_AUTH_STRUCT *_gnutls_kx_auth_struct(KXAlgorithm algorithm)
 {
 	MOD_AUTH_STRUCT *ret = NULL;
@@ -715,134 +697,6 @@ inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
 			return i;
 	}
 	return -1;
-}
-
-int _gnutls_kx_server_key_exchange(KXAlgorithm algorithm)
-{
-	size_t ret = 0;
-	void *ret2 = NULL;
-
-	/* if the auth algorithm does not have a null value 
-	 * for the kx2 generation then it supports it!
-	 */
-	GNUTLS_KX_ALG_LOOP(ret2 =
-			   p->auth_struct->gnutls_generate_server_kx);
-	if (ret2 != NULL)
-		ret = 1;
-
-	return ret;
-
-}
-
-int _gnutls_kx_server_key_exchange2(KXAlgorithm algorithm)
-{
-	size_t ret = 0;
-	void *ret2 = NULL;
-
-	/* if the auth algorithm does not have a null value 
-	 * for the kx2 generation then it supports it!
-	 */
-	GNUTLS_KX_ALG_LOOP(ret2 =
-			   p->auth_struct->gnutls_generate_server_kx2);
-	if (ret2 != NULL)
-		ret = 1;
-
-	return ret;
-
-}
-
-int _gnutls_kx_client_key_exchange0(KXAlgorithm algorithm)
-{
-	size_t ret = 0;
-	void *ret2 = NULL;
-
-	/* if the auth algorithm does not have a null value 
-	 * for the kx0 generation then it supports it!
-	 */
-	GNUTLS_KX_ALG_LOOP(ret2 =
-			   p->auth_struct->gnutls_process_client_kx0);
-	if (ret2 != NULL)
-		ret = 1;
-
-	return ret;
-
-}
-
-int _gnutls_kx_client_key_exchange(KXAlgorithm algorithm)
-{
-	size_t ret = 0;
-	void *ret2 = NULL;
-
-	/* if the auth algorithm does not have a null value 
-	 * for the kx0 generation then it supports it!
-	 */
-	GNUTLS_KX_ALG_LOOP(ret2 =
-			   p->auth_struct->gnutls_process_client_kx);
-	if (ret2 != NULL)
-		ret = 1;
-	return ret;
-
-}
-
-
-int _gnutls_kx_client_cert_vrfy(KXAlgorithm algorithm)
-{
-	size_t ret = 0;
-	void *ret2 = NULL;
-
-	/* if the auth algorithm does not have a null value 
-	 * for the cert_vrfy function then it supports it!
-	 */
-	GNUTLS_KX_ALG_LOOP(ret2 =
-			   p->auth_struct->
-			   gnutls_generate_client_cert_vrfy);
-	if (ret2 != NULL)
-		ret = 1;
-
-	return ret;
-
-}
-
-int _gnutls_kx_server_cert_vrfy(KXAlgorithm algorithm)
-{
-	size_t ret = 0;
-	void *ret2 = NULL;
-
-	/* if the auth algorithm does not have a null value 
-	 * for the cert_vrfy function then it supports it!
-	 */
-	GNUTLS_KX_ALG_LOOP(ret2 =
-			   p->auth_struct->
-			   gnutls_generate_server_cert_vrfy);
-	if (ret2 != NULL)
-		ret = 1;
-
-	return ret;
-
-}
-
-int _gnutls_kx_client_certificate(KXAlgorithm algorithm)
-{				/* In bytes */
-	size_t ret = 0;
-	GNUTLS_KX_ALG_LOOP(ret = p->client_cert);
-	return ret;
-
-}
-
-int _gnutls_kx_RSA_premaster(KXAlgorithm algorithm)
-{				/* In bytes */
-	size_t ret = 0;
-	GNUTLS_KX_ALG_LOOP(ret = p->RSA_premaster);
-	return ret;
-
-}
-
-int _gnutls_kx_DH_public_value(KXAlgorithm algorithm)
-{				/* In bytes */
-	size_t ret = 0;
-	GNUTLS_KX_ALG_LOOP(ret = p->DH_public_value);
-	return ret;
-
 }
 
 /**

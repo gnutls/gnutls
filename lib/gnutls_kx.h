@@ -29,3 +29,4 @@ int _gnutls_recv_client_kx_message0(int cd, GNUTLS_STATE state);
 int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state);
 int _gnutls_send_certificate(int cd, GNUTLS_STATE state);
 int _gnutls_generate_master( GNUTLS_STATE state);
+int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state);

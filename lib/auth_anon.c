@@ -43,6 +43,7 @@ MOD_AUTH_STRUCT anon_auth_struct = {
 	gen_anon_client_kx,
 	NULL,
 	NULL,
+	NULL, /* certificate */
 	proc_anon_server_kx,
 	NULL,
 	NULL,
@@ -65,7 +66,7 @@ int _gnutls_generate_key(GNUTLS_KEY key) {
 }
 
 int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
-	GNUTLS_MPI x, X, g, p;
+	MPI x, X, g, p;
 	int bits;
 	size_t n_X, n_g, n_p;
 	uint8 *data_p;
@@ -115,7 +116,7 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 }
 
 int gen_anon_client_kx( GNUTLS_KEY key, opaque** data) {
-GNUTLS_MPI x, X;
+MPI x, X;
 size_t n_X;
 int ret;
 

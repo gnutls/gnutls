@@ -30,9 +30,8 @@
 #include "../lib/gnutls.h"
 #include <port.h>
 #include <signal.h>
+#include "pk.h"
 
-#define PKIX "pkix.asn"
-#define PKCS "pkcs1.asn"
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
 
@@ -46,32 +45,6 @@ static char http_buffer[16*1024];
  * command line is present
  */
 
-void PARSE()
-{
-	/* this is to be moved to gnutls */
-	int result = parser_asn1(PKIX);
-
-	signal( SIGPIPE, SIG_IGN);
-
-	if (result == ASN_SYNTAX_ERROR) {
-		printf("%s: PARSE ERROR\n", PKIX);
-		return;
-	} else if (result == ASN_IDENTIFIER_NOT_FOUND) {
-		printf("%s: IDENTIFIER NOT FOUND\n", PKIX);
-		return;
-	}
-
-	result = parser_asn1(PKCS);
-
-	if (result == ASN_SYNTAX_ERROR) {
-		printf("%s: PARSE ERROR\n", PKCS);
-		return;
-	} else if (result == ASN_IDENTIFIER_NOT_FOUND) {
-		printf("%s: IDENTIFIER NOT FOUND\n", PKCS);
-		return;
-	}
-
-}
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
@@ -114,12 +87,12 @@ GNUTLS_STATE initialize_state()
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
-		fprintf(stderr, "*** DB error (%d)\n", ret);
+		fprintf(stderr, "*** DB error (%d)\n\n", ret);
 
 	/* null cipher is here only for debuging 
 	 * purposes.
 	 */
-	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR,
+	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, 
 				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
 	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
@@ -349,7 +322,7 @@ int main(int argc, char **argv)
 			close(sd);
 			gnutls_deinit(state);
 			tmp = gnutls_strerror(ret);
-			fprintf(stderr, "*** Handshake has failed (%s)\n",
+			fprintf(stderr, "*** Handshake has failed (%s)\n\n",
 				tmp);
 			free(tmp);
 			continue;
@@ -370,7 +343,7 @@ int main(int argc, char **argv)
 					break;
 				} else {
 					fprintf(stderr,
-						"\n*** Received corrupted data(%d). Closing the connection.\n",
+						"\n*** Received corrupted data(%d). Closing the connection.\n\n",
 						ret);
 					break;
 				}

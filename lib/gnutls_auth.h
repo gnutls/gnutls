@@ -10,6 +10,7 @@ typedef struct {
 	int (*gnutls_generate_client_cert_vrfy) ( GNUTLS_KEY, opaque**);
 	int (*gnutls_generate_server_cert_vrfy) ( GNUTLS_KEY, opaque**);
 	
+	int (*gnutls_process_certificate)( GNUTLS_KEY, opaque*, int);
 	int (*gnutls_process_server_kx)( GNUTLS_KEY, opaque*, int);
 	int (*gnutls_process_server_kx2)( GNUTLS_KEY, opaque*, int);
 	int (*gnutls_process_client_kx0)( GNUTLS_KEY, opaque*, int);

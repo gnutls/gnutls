@@ -145,6 +145,18 @@ typedef struct {
 	int dh_bits;
 } ANON_AUTH_INFO;
 
+typedef enum verified { GNUTLS_VERIFIED, GNUTLS_NOT_VERIFIED, GNUTLS_EXPIRED, GNUTLS_INVALID } CertificateStatus;
+
+typedef struct {
+	gnutls_datum *peer_certificate_list; /* In DER format */
+	int peer_certificate_list_size;
+	CertificateStatus peer_certificate_status;
+} X509PKI_AUTH_INFO;
+
+typedef struct {
+	int ne; /* nothing of interest here */
+} X509PKI_CLIENT_CREDENTIALS;
+
 typedef struct {
 	gnutls_datum ** cert_list; 
 		       /* contains a list of a list of certificates.

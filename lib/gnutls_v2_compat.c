@@ -94,8 +94,6 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 }
 
 
-#define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
-
 /* Read a v2 client hello. Some browsers still use that beast!
  * However they set their version to 3.0 or 3.1.
  */

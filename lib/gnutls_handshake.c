@@ -227,8 +227,6 @@ int _gnutls_create_random(opaque * dst)
  * since SSL version 2.0 is not supported).
  */
 
-#define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
-
 int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 			      int datalen)
 {
@@ -600,23 +598,6 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	int handshake_headers = HANDSHAKE_HEADERS_SIZE;
 	HandshakeType recv_type;
 
-	if (type == GNUTLS_CERTIFICATE) {
-		/* If the ciphersuite does not support certificate just quit */
-		if (state->security_parameters.entity == GNUTLS_CLIENT) {
-			if (_gnutls_kx_server_certificate
-			    (_gnutls_cipher_suite_get_kx_algo
-			     (state->security_parameters.
-			      current_cipher_suite)) == 0)
-				return 0;
-		} else {	/* server */
-			if (_gnutls_kx_client_certificate
-			    (_gnutls_cipher_suite_get_kx_algo
-			     (state->security_parameters.
-			      current_cipher_suite)) == 0)
-				return 0;
-		}
-	}
-
 	dataptr = gnutls_malloc(HANDSHAKE_HEADERS_SIZE);
 
 	ret =
@@ -728,11 +709,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 				       length32);
 		break;
 	case GNUTLS_CERTIFICATE:
-		ret =
-		    _gnutls_recv_certificate(cd, state,
-					     &dataptr
-					     [HANDSHAKE_HEADERS_SIZE],
-					     length32);
+		ret = length32;
 		break;
 	case GNUTLS_SERVER_HELLO_DONE:
 		ret = 0;
@@ -929,7 +906,8 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 					      current_cipher_suite));
 #endif
 
-	/* check if the credentials (username, public key etc. are ok - actually check if they exist)
+	/* check if the credentials (username, public key etc. are ok). 
+	 * Actually checks if they exist.
 	 */
 	if (_gnutls_get_kx_cred
 	    (state->gnutls_key,
@@ -1202,48 +1180,6 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 	return ret;
 }
 
-int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state, char *data,
-			     int datalen)
-{
-	int pos = 0;
-	char *certificate_list;
-	int ret = 0;
-	uint32 sizeOfCert;
-
-	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		if (datalen < 2) {
-			gnutls_assert();
-			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-		}
-
-		sizeOfCert = READuint24(&data[pos]);
-		pos += 3;
-
-		if (sizeOfCert > MAX24) {
-			gnutls_assert();
-			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-		}
-		certificate_list = gnutls_malloc(sizeOfCert);
-
-		memcpy(certificate_list, &data[pos], sizeOfCert);
-
-		/* Verify certificates !!! */
-
-		gnutls_free(certificate_list);	/* oooops! */
-
-	} else {		/* Server side reading a client certificate */
-		/* actually this is not complete */
-		if (datalen < 1) {
-			gnutls_assert();
-			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-		}
-
-		ret = 0;
-	}
-
-	return ret;
-}
-
 
 /**
   * gnutls_handshake - This the main function in the handshake protocol.
@@ -1322,10 +1258,9 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state)
 
 		/* RECV CERTIFICATE */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret =
-			    _gnutls_recv_handshake(cd, state, NULL, NULL,
-						   GNUTLS_CERTIFICATE);
+			ret = _gnutls_recv_certificate( cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("recv server certificate", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;

@@ -45,6 +45,7 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 	NULL,
 	NULL,
 	NULL,
+	NULL, /* certificate */
 	proc_srp_server_kx,
 	proc_srp_server_kx2,
 	proc_srp_client_kx0,

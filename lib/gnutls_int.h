@@ -27,11 +27,11 @@
 #define READ_DEBUG
 #define WRITE_DEBUG
 #define BUFFERS_DEBUG
-#define HANDSHAKE_DEBUG
 #define RECORD_DEBUG
 #define HARD_DEBUG
-#define DEBUG
+#define HANDSHAKE_DEBUG
 */
+#define DEBUG
 
 #define SOCKET int
 #define LIST ...
@@ -63,9 +63,6 @@
 # include <gnutls_gcry.h>
 #endif
 
-#define GNUTLS_MPI MPI
-#define gnutls_mpi_release mpi_release
-
 #define svoid void /* for functions that allocate using secure_free */
 #define secure_free gnutls_free
 #define secure_malloc malloc
@@ -75,6 +72,8 @@
 #define gnutls_realloc realloc
 #define gnutls_calloc calloc
 #define gnutls_free free
+
+#define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
 
 typedef unsigned char opaque;
 typedef struct { opaque pint[3]; } uint24;
@@ -91,7 +90,8 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_INSUFFICIENT_SECURITY, GNUTLS_INTERNAL_ERROR=80, GNUTLS_USER_CANCELED=90,
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
-			
+typedef enum CertificateStatus { GNUTLS_VERIFIED, GNUTLS_NOT_VERIFIED, GNUTLS_EXPIRED, GNUTLS_INVALID } CertificateStatus;
+		
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
 		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,

@@ -30,7 +30,6 @@
 
 #define MASTER_SECRET "master secret"
 static int generate_normal_master( GNUTLS_STATE state);
-static int generate_resumed_master( GNUTLS_STATE state);
 
 int _gnutls_generate_master( GNUTLS_STATE state) {
 	if (state->gnutls_internals.resumed==RESUME_FALSE)
@@ -85,50 +84,6 @@ char random[2*TLS_RANDOM_SIZE];
 	return ret;
 }
 
-static int generate_resumed_master( GNUTLS_STATE state) {
-int premaster_size;
-#ifdef HARD_DEBUG
-int i;
-#endif
-opaque* premaster, *master;
-int ret = 0;
-char random[2*TLS_RANDOM_SIZE];
-
-	memmove(random, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
-
-	/* generate premaster */
-        premaster_size = sizeof(state->security_parameters.master_secret);
-	premaster = state->security_parameters.master_secret;
-
-#ifdef HARD_DEBUG
-	fprintf(stderr, "RESUME...\n");
-	fprintf(stderr, "PREMASTER SECRET[%d]: %s\n", premaster_size, _gnutls_bin2hex(premaster, premaster_size));
-	fprintf(stderr, "CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
-	fprintf(stderr, "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
-#endif
-
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-		master =
-		    gnutls_ssl3_generate_random( premaster, premaster_size,
-			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE);
-
-	} else {
-		master =
-		    gnutls_PRF( premaster, premaster_size,
-			       MASTER_SECRET, strlen(MASTER_SECRET),
-			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE); 
-	}
-	
-#ifdef HARD_DEBUG
-	fprintf(stderr, "MASTER SECRET: %s\n", _gnutls_bin2hex(master, TLS_MASTER_SIZE));
-#endif
-	if (master==NULL) return GNUTLS_E_MEMORY_ERROR;
-
-	memmove(state->security_parameters.master_secret, master, TLS_MASTER_SIZE);
-	secure_free(master);
-	return ret;
-}
 
 /* This is called when we want to receive the key exchange message of the
  * server. It does nothing if this type of message is not required
@@ -171,12 +126,8 @@ int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 	uint8 *data = NULL;
 	int data_size = 0;
 	int ret = 0;
-	KXAlgorithm algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
 
-
-	if (_gnutls_kx_server_key_exchange2(algorithm) != 0) {
+	if (state->gnutls_internals.auth_struct->gnutls_generate_server_kx2 != NULL) {
 		data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx2( state->gnutls_key, &data);
 
 #ifdef HARD_DEBUG
@@ -207,11 +158,9 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	uint8 *data;
 	int data_size;
 	int ret = 0;
-	KXAlgorithm algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
 
-	if (_gnutls_kx_client_key_exchange(algorithm) == 0) return 0;
+	if (state->gnutls_internals.auth_struct->gnutls_generate_client_kx==NULL) 
+		return 0;
 
 #ifdef HARD_DEBUG
 	{
@@ -219,7 +168,6 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	fprintf(stderr, "Sending client KX message\n");
 	}
 #endif
-
 
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_kx( state->gnutls_key, &data);
 	if (data_size < 0) {
@@ -245,11 +193,9 @@ int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 	uint8 *data;
 	int data_size;
 	int ret = 0;
-	KXAlgorithm algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
 
-	if (_gnutls_kx_client_key_exchange0(algorithm) == 0) return 0;
+	if ( state->gnutls_internals.auth_struct->gnutls_generate_client_kx0 == NULL)
+		return 0;
 
 #ifdef HARD_DEBUG
 	{
@@ -281,14 +227,11 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 	uint8 *data;
 	int ret = 0;
 	int data_size;
-	KXAlgorithm algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
 
 	/* if certificate verify is not needed just exit */
 	if (state->gnutls_internals.certificate_verify_needed==0) return 0;
 
-	if (_gnutls_kx_client_cert_vrfy(algorithm)==0) {
+	if (state->gnutls_internals.auth_struct->gnutls_generate_client_cert_vrfy==NULL) {
 		return 0; /* this algorithm does not support cli_cert_vrfy */
 	}
 	
@@ -310,7 +253,6 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 
 int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 {
-	KXAlgorithm algorithm;
 	uint8 *data;
 	int datasize;
 	int ret = 0;
@@ -318,11 +260,8 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Receiving Server KX message\n");
 #endif
-	algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
 
-	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
+	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx!=NULL) {
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
@@ -342,7 +281,6 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 
 int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 {
-	KXAlgorithm algorithm;
 	uint8 *data;
 	int datasize;
 	int ret = 0;
@@ -350,11 +288,8 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Receiving Server KX message2\n");
 #endif
-	algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
 
-	if (_gnutls_kx_server_key_exchange2(algorithm) != 0) {
+	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx2 != NULL) {
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
@@ -374,7 +309,6 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 
 int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 {
-	KXAlgorithm algorithm;
 	uint8 *data;
 #ifdef HARD_DEBUG
 	int i;
@@ -386,12 +320,8 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	fprintf(stderr, "Receiving client KX message\n");
 #endif
 
-	algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
-
 	/* Do key exchange only if the algorithm permits it */
-	if (_gnutls_kx_client_key_exchange(algorithm) != 0) {
+	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx != NULL) {
 
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
@@ -413,7 +343,6 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 /* only used in SRP */
 int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 {
-	KXAlgorithm algorithm;
 	uint8 *data;
 #ifdef HARD_DEBUG
 	int i;
@@ -425,12 +354,8 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 	fprintf(stderr, "Receiving client KX message0\n");
 #endif
 
-	algorithm =
-	    _gnutls_cipher_suite_get_kx_algo
-	    (state->security_parameters.current_cipher_suite);
-
 	/* Do key exchange only if the algorithm permits it */
-	if (_gnutls_kx_client_key_exchange0(algorithm) != 0) {
+	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx0 != NULL) {
 
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
@@ -480,4 +405,32 @@ int _gnutls_send_certificate(SOCKET cd, GNUTLS_STATE state)
 	}
 
 	return data_size;
+}
+
+int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state)
+{
+	int datasize;
+	opaque * data;
+	int ret = 0;
+
+	if (state->gnutls_internals.auth_struct->gnutls_process_certificate!=NULL) {
+
+		ret =
+		    _gnutls_recv_handshake(cd, state, &data,
+					   &datasize,
+					   GNUTLS_CERTIFICATE);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		ret = state->gnutls_internals.auth_struct->gnutls_process_certificate( state->gnutls_key, data, datasize);
+		gnutls_free(data);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+
+	return ret;
 }

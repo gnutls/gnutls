@@ -36,23 +36,26 @@
 int gen_rsa_server_kx(GNUTLS_KEY, opaque **);
 #endif
 int gen_rsa_certificate(GNUTLS_KEY, opaque **);
+int gen_rsa_client_kx(GNUTLS_KEY, opaque **);
 int proc_rsa_client_kx( GNUTLS_KEY, opaque*, int);
+int proc_rsa_certificate( GNUTLS_KEY, opaque*, int);
 
 MOD_AUTH_STRUCT rsa_auth_struct = {
 	"RSA",
 	gen_rsa_certificate,
-/*	not needed!!! gen_rsa_server_kx, */ NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	proc_rsa_client_kx,
-	NULL,
-	NULL
+	NULL, /* gen server kx */
+	NULL, /* gen server kx2 */
+	NULL, /* gen client kx0 */
+	gen_rsa_client_kx,
+	NULL, /* gen client cert vrfy */
+	NULL, /* gen server cert vrfy */
+	proc_rsa_certificate,
+	NULL, /* proc server kx */
+	NULL, /* proc server kx2 */
+	NULL, /* proc client kx0 */
+	proc_rsa_client_kx, /* proc client kx */
+	NULL, /* proc client cert vrfy */
+	NULL /* proc server cert vrfy */
 };
 
 typedef struct {
@@ -60,6 +63,7 @@ typedef struct {
 	gnutls_datum rsa_exponent;
 } RSA_Params;
 
+#if 0
 /* This function will calculate the SHA/MD5 signature in server kx.
  * This is needed by the protocol.
  */
@@ -107,45 +111,47 @@ int _gnutls_calc_rsa_signature( GNUTLS_KEY key, const opaque* data, int data_siz
 	
 	return ret;
 }
+#endif
 
-#if 0
-/* This function reads the RSA parameters from the given(?) certificate.
+/* This function extracts the RSA parameters from the given(?) certificate.
  */
-static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, gnutls_datum cert)
+static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, MPI* mod, MPI* exp, gnutls_datum cert)
 {
 	int ret = 0, result;
 	opaque str[5*1024];
 	int len = sizeof(str);
 
-	if (create_structure("certificate2", "PKIX1Explicit88.Certificate")!=ASN_OK) {
+	if (create_structure("rsa_params", "PKIX1Explicit88.Certificate")!=ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	result = get_der("certificate2", cert.data, cert.size);
+	result = get_der("rsa_params", cert.data, cert.size);
 	if (result != ASN_OK) {
+		/* couldn't decode DER */
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	/* Verify sign */
+
 	result =
-	    read_value("certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm", str, &len);
+	    read_value("rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm", str, &len);
 	if (result != ASN_OK) {
+fprintf(stderr, "resut: %d\n", result);
 		gnutls_assert();
-		delete_structure("certificate2");
+		delete_structure("rsa_params");
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
 	if (!strcmp(str, "1 2 840 113549 1 1 1")) { /* pkix-1 1 - RSA */
 		len = sizeof(str);
 		result =
-		    read_value("certificate2.tbsCertificate.subjectPublicKeyInfo.parameters", str, &len);
-		delete_structure("certificate2");
+		    read_value("rsa_params.tbsCertificate.subjectPublicKeyInfo.parameters", str, &len);
+		delete_structure("rsa_params");
 
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("certificate2");
+			delete_structure("rsa_params");
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
@@ -169,17 +175,19 @@ static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, gnutls_d
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
-		if (gcry_mpi_scan(&key->A,
+		if (gcry_mpi_scan(mod,
 			  GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
 			delete_structure("rsapublickey");
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
-		if (gnutls_set_datum(&params->rsa_modulus, str, len) < 0) {
-			gnutls_assert();
-			delete_structure("rsapublickey");
-			return GNUTLS_E_MEMORY_ERROR;
-		}
+		
+		if (params!=NULL)
+			if (gnutls_set_datum(&params->rsa_modulus, str, len) < 0) {
+				gnutls_assert();
+				delete_structure("rsapublickey");
+				return GNUTLS_E_MEMORY_ERROR;
+			}
 
 		len = sizeof(str);
 		result =
@@ -187,22 +195,23 @@ static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, gnutls_d
 		if (result != ASN_OK) {
 			gnutls_assert();
 			delete_structure("rsapublickey");
-			gnutls_free_datum(&params->rsa_modulus);
-			_gnutls_mpi_release(&key->A);
+			if (params!=NULL) gnutls_free_datum(&params->rsa_modulus);
+			_gnutls_mpi_release(mod);
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
-		if (gcry_mpi_scan(&key->B,
+		if (gcry_mpi_scan(exp,
 			  GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
-			_gnutls_mpi_release(&key->A);
-			gnutls_free_datum(&params->rsa_modulus);
+			_gnutls_mpi_release(mod);
+			if (params!=NULL) gnutls_free_datum(&params->rsa_modulus);
 			delete_structure("rsapublickey");
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 		if (gnutls_set_datum(&params->rsa_exponent, str, len) < 0) {
-			_gnutls_mpi_release(&key->A);
-			gnutls_free_datum(&params->rsa_modulus);
+			_gnutls_mpi_release(mod);
+			_gnutls_mpi_release(exp);
+			if (params!=NULL) gnutls_free_datum(&params->rsa_modulus);
 			delete_structure("rsapublickey");
 			return GNUTLS_E_MEMORY_ERROR;	
 		}
@@ -211,11 +220,10 @@ static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, gnutls_d
 
 	}
 
-	delete_structure("certificate2");
+	delete_structure("rsa_params");
 
 	return ret;
 }
-#endif
 
 /* This function reads the RSA parameters from the given private key
  * cert is not a certificate but a der structure containing the private
@@ -442,3 +450,126 @@ int proc_rsa_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	return 0;
 }
 
+int proc_rsa_certificate( GNUTLS_KEY key, opaque* data, int data_size) {
+int size, len;
+opaque* p = data;
+X509PKI_AUTH_INFO* info;
+int dsize = data_size;
+int i, j;
+
+	key->auth_info = gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO));
+	if (key->auth_info==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	key->auth_info_size = sizeof(X509PKI_AUTH_INFO);
+	
+	DECR_LEN( dsize, 3);
+	size = READuint24( p);
+	p+=3;
+
+	if (size==0) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+	
+	info = key->auth_info;
+	i = dsize;
+	
+	len=READuint24(p); p+=3;
+
+	for(; i > 0; len=READuint24(p),p+=3)  {
+		DECR_LEN(dsize, (len+3));
+		info->peer_certificate_list_size++;
+		p+=len;
+		i-=len+3;
+	}
+
+	if (info->peer_certificate_list_size==0) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+	
+	dsize = data_size;
+	i = dsize;	
+	info->peer_certificate_list = gnutls_malloc(sizeof(gnutls_datum)*(info->peer_certificate_list_size));
+	if (info->peer_certificate_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+			
+	p = data+3;
+	i = data_size - 3;
+	j = 0;
+	
+	len=READuint24(p); p+=3;
+	for(; i > 0; len=READuint24(p), p+=3) {
+		if ( j >= info->peer_certificate_list_size) break;
+
+		info->peer_certificate_list[j].size = len;
+		info->peer_certificate_list[j].data = gnutls_malloc(len);
+		if (info->peer_certificate_list[j].data==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+			
+		memcpy( info->peer_certificate_list[j].data, p, len);
+		p+=len;
+		i-=len+3;
+		j++;
+	}
+	
+	
+#warning "WE DO NOT VERIFY RSA CERTIFICATES"
+	/* FIXME: Verify certificate 
+	 */
+	info->peer_certificate_status = GNUTLS_NOT_VERIFIED;
+	
+	return 0;
+}
+
+/* return RSA(random) using the peers public key 
+ */
+int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
+{
+	X509PKI_AUTH_INFO *auth = key->auth_info;
+	svoid *rand;
+	gnutls_datum sdata; /* data to send */
+	gnutls_datum edata; /* data to encrypt */
+	MPI pkey, n;
+	int ret;
+		
+	if (auth == NULL) {
+		/* this shouldn't have happened. The proc_certificate
+		 * function should have detected that.
+		 */
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	rand = secure_malloc( TLS_MASTER_SIZE);
+	if (rand==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+			
+	_gnutls_get_random( rand, TLS_MASTER_SIZE, GNUTLS_STRONG_RANDOM);
+	
+	key->key.data = rand;
+	key->key.size = TLS_MASTER_SIZE;
+
+	edata.data = rand;
+	edata.size = TLS_MASTER_SIZE;
+
+	if ( (ret=_gnutls_get_rsa_params( key, NULL, &n, &pkey, auth->peer_certificate_list[0])) < 0 ) {
+		gnutls_assert();
+		return ret;
+	}
+
+	_gnutls_pkcs1_rsa_encrypt( &sdata, edata, pkey, n);
+
+	secure_free(rand);
+	_gnutls_mpi_release(&pkey);
+	_gnutls_mpi_release(&n);
+	
+	*data = sdata.data;
+	return sdata.size;
+}
