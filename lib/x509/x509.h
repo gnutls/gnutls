@@ -31,7 +31,7 @@ typedef struct gnutls_x509_crt_int {
 #endif
 
 typedef struct gnutls_x509_privkey_int {
-	GNUTLS_MPI params[MAX_PRIV_PARAMS_SIZE];/* the size of params depends on the public 
+	mpi_t params[MAX_PRIV_PARAMS_SIZE];/* the size of params depends on the public 
 				 * key algorithm 
 				 */
 				/*

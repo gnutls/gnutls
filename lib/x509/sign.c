@@ -118,7 +118,7 @@ const char* algo;
  */
 static int
 pkcs1_rsa_sign( gnutls_mac_algorithm hash, const gnutls_datum* text,  
-	GNUTLS_MPI *params, int params_len, gnutls_datum* signature)
+	mpi_t *params, int params_len, gnutls_datum* signature)
 {
 	int ret;
 	opaque _digest[MAX_HASH_SIZE];
@@ -157,7 +157,7 @@ pkcs1_rsa_sign( gnutls_mac_algorithm hash, const gnutls_datum* text,
 
 static int
 dsa_sign( const gnutls_datum* text,  
-	GNUTLS_MPI *params, int params_len, gnutls_datum* signature)
+	mpi_t *params, int params_len, gnutls_datum* signature)
 {
 	int ret;
 	opaque _digest[MAX_HASH_SIZE];

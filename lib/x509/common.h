@@ -67,7 +67,7 @@ int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct, const char* wh
 int _gnutls_x509_get_pk_algorithm( ASN1_TYPE src, const char* src_name, unsigned int* bits);
 
 int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name,
-	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size);
+	gnutls_pk_algorithm pk_algorithm, mpi_t* params, int params_size);
 int _gnutls_asn1_copy_node( ASN1_TYPE *dst, const char* dst_name,
 	ASN1_TYPE src, const char* src_name);
 

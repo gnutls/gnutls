@@ -36,8 +36,8 @@
 #include <dsa.h>
 #include <verify.h>
 
-static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params);
-static int _encode_dsa( ASN1_TYPE* c2, GNUTLS_MPI* params);
+static int _encode_rsa( ASN1_TYPE* c2, mpi_t* params);
+static int _encode_dsa( ASN1_TYPE* c2, mpi_t* params);
 
 /**
   * gnutls_x509_privkey_init - This function initializes a gnutls_crl structure
@@ -147,9 +147,9 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key( const gnutls_datum *raw_key,
 		return NULL;
 	}
 
-	if ((sizeof(pkey->params) / sizeof(GNUTLS_MPI)) < RSA_PRIVATE_PARAMS) {
+	if ((sizeof(pkey->params) / sizeof(mpi_t)) < RSA_PRIVATE_PARAMS) {
 		gnutls_assert();
-		/* internal error. Increase the GNUTLS_MPIs in params */
+		/* internal error. Increase the mpi_ts in params */
 		return NULL;
 	}
 
@@ -242,9 +242,9 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
 		return NULL;
 	}
 
-	if ((sizeof(pkey->params) / sizeof(GNUTLS_MPI)) < DSA_PRIVATE_PARAMS) {
+	if ((sizeof(pkey->params) / sizeof(mpi_t)) < DSA_PRIVATE_PARAMS) {
 		gnutls_assert();
-		/* internal error. Increase the GNUTLS_MPIs in params */
+		/* internal error. Increase the mpi_ts in params */
 		return NULL;
 	}
 
@@ -682,101 +682,70 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
 	gnutls_datum* u)
 {
-	size_t siz;
+int ret;
 
 	if (key == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[0]);
-
-	m->data = gnutls_malloc(siz);
-	if (m->data == NULL) {
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = _gnutls_mpi_dprint(m, key->params[0]);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
-
-	m->size = siz;
-	_gnutls_mpi_print( m->data, &siz, key->params[0]);
 
 	/* E */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[1]);
-
-	e->data = gnutls_malloc(siz);
-	if (e->data == NULL) {
+	ret = _gnutls_mpi_dprint(e, key->params[1]);
+	if (ret < 0) {
 		_gnutls_free_datum( m);
-		return GNUTLS_E_MEMORY_ERROR;
+		gnutls_assert();
+		return ret;
 	}
-
-	e->size = siz;
-	_gnutls_mpi_print( e->data, &siz, key->params[1]);
 
 	/* D */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[2]);
-
-	d->data = gnutls_malloc(siz);
-	if (d->data == NULL) {
+	ret = _gnutls_mpi_dprint(d, key->params[2]);
+	if (ret < 0) {
 		_gnutls_free_datum( m);
 		_gnutls_free_datum( e);
-		return GNUTLS_E_MEMORY_ERROR;
+		gnutls_assert();
+		return ret;
 	}
-
-	d->size = siz;
-	_gnutls_mpi_print( d->data, &siz, key->params[2]);
 
 	/* P */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[3]);
-
-	p->data = gnutls_malloc(siz);
-	if (p->data == NULL) {
+	ret = _gnutls_mpi_dprint(p, key->params[3]);
+	if (ret < 0) {
 		_gnutls_free_datum( m);
-		_gnutls_free_datum( e);
 		_gnutls_free_datum( d);
-		return GNUTLS_E_MEMORY_ERROR;
+		_gnutls_free_datum( e);
+		gnutls_assert();
+		return ret;
 	}
-
-	p->size = siz;
-	_gnutls_mpi_print(p->data, &siz, key->params[3]);
 
 	/* Q */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[4]);
-
-	q->data = gnutls_malloc(siz);
-	if (q->data == NULL) {
+	ret = _gnutls_mpi_dprint(q, key->params[4]);
+	if (ret < 0) {
 		_gnutls_free_datum( m);
-		_gnutls_free_datum( e);
 		_gnutls_free_datum( d);
+		_gnutls_free_datum( e);
 		_gnutls_free_datum( p);
-		return GNUTLS_E_MEMORY_ERROR;
+		gnutls_assert();
+		return ret;
 	}
-
-	q->size = siz;
-	_gnutls_mpi_print(q->data, &siz, key->params[4]);
 
 	/* U */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[5]);
-
-	u->data = gnutls_malloc(siz);
-	if (u->data == NULL) {
+	ret = _gnutls_mpi_dprint(u, key->params[5]);
+	if (ret < 0) {
 		_gnutls_free_datum( m);
-		_gnutls_free_datum( e);
 		_gnutls_free_datum( d);
+		_gnutls_free_datum( e);
 		_gnutls_free_datum( p);
 		_gnutls_free_datum( q);
-		return GNUTLS_E_MEMORY_ERROR;
+		gnutls_assert();
+		return ret;
 	}
 
-	u->size = siz;
-	_gnutls_mpi_print(u->data, &siz, key->params[5]);
-	
 	return 0;
-
 }
 
 /**
@@ -797,7 +766,7 @@ int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey key,
 	gnutls_datum * p, gnutls_datum *q,
 	gnutls_datum *g, gnutls_datum *y, gnutls_datum* x) 
 {
-	size_t siz;
+int ret;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -805,90 +774,66 @@ int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey key,
 	}
 
 	/* P */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[0]);
-
-	p->data = gnutls_malloc(siz);
-	if (p->data == NULL) {
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = _gnutls_mpi_dprint(p, key->params[0]);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
-
-	p->size = siz;
-	_gnutls_mpi_print( p->data, &siz, key->params[0]);
 
 	/* Q */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[1]);
-
-	q->data = gnutls_malloc(siz);
-	if (q->data == NULL) {
-		_gnutls_free_datum( p);
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = _gnutls_mpi_dprint(q, key->params[1]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(p);
+		return ret;
 	}
 
-	q->size = siz;
-	_gnutls_mpi_print( q->data, &siz, key->params[1]);
 
 	/* G */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[2]);
-
-	g->data = gnutls_malloc(siz);
-	if (g->data == NULL) {
-		_gnutls_free_datum( q);
-		_gnutls_free_datum( p);
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = _gnutls_mpi_dprint(g, key->params[2]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(p);
+		_gnutls_free_datum(q);
+		return ret;
 	}
 
-	g->size = siz;
-	_gnutls_mpi_print( g->data, &siz, key->params[2]);
 
 	/* Y */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[3]);
-
-	y->data = gnutls_malloc(siz);
-	if (y->data == NULL) {
-		_gnutls_free_datum( g);
-		_gnutls_free_datum( q);
-		_gnutls_free_datum( p);
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = _gnutls_mpi_dprint(y, key->params[3]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(p);
+		_gnutls_free_datum(g);
+		_gnutls_free_datum(q);
+		return ret;
 	}
-
-	y->size = siz;
-	_gnutls_mpi_print(y->data, &siz, key->params[3]);
 
 	/* X */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, key->params[4]);
-
-	x->data = gnutls_malloc(siz);
-	if (x->data == NULL) {
-		_gnutls_free_datum( p);
-		_gnutls_free_datum( q);
-		_gnutls_free_datum( g);
-		_gnutls_free_datum( y);
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = _gnutls_mpi_dprint(x, key->params[4]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(y);
+		_gnutls_free_datum(p);
+		_gnutls_free_datum(g);
+		_gnutls_free_datum(q);
+		return ret;
 	}
 
-	x->size = siz;
-	_gnutls_mpi_print(x->data, &siz, key->params[4]);
-
 	return 0;
-
 }
 
 
 /* Encodes the RSA parameters into an ASN.1 RSA private key structure.
  */
-static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
+static int _encode_rsa( ASN1_TYPE* c2, mpi_t* params)
 {
 	int result, i;
 	size_t size[8], total;
 	opaque * m_data, *pube_data, *prie_data;
 	opaque* p1_data, *p2_data, *u_data, *exp1_data, *exp2_data;
 	opaque * all_data = NULL, *p;
-	GNUTLS_MPI exp1 = NULL, exp2 = NULL, q1 = NULL, p1 = NULL;
+	mpi_t exp1 = NULL, exp2 = NULL, q1 = NULL, p1 = NULL;
 	opaque null = '\0';
 
 	/* Read all the sizes */
@@ -1079,7 +1024,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 
 /* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
  */
-static int _encode_dsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
+static int _encode_dsa( ASN1_TYPE* c2, mpi_t* params)
 {
 	int result, i;
 	size_t size[DSA_PRIVATE_PARAMS], total;
@@ -1427,3 +1372,4 @@ int result;
 }
 
 #endif
+

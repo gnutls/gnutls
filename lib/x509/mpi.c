@@ -35,7 +35,7 @@
  * extraction. This reads the BIT STRING subjectPublicKey.
  * Returns 2 parameters (m,e).
  */
-int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
+int _gnutls_x509_read_rsa_params(opaque * der, int dersize, mpi_t * params)
 {
 	int result;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -82,7 +82,7 @@ int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
  * from the certificate (subjectPublicKey BIT STRING).
  * params[0-2]
  */
-int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
+int _gnutls_x509_read_dsa_params(opaque * der, int dersize, mpi_t * params)
 {
 	int result;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -144,7 +144,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
  * from the certificate 
  * only sets params[3]
  */
-int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
+int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, mpi_t * params)
 {
 	int result;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -182,7 +182,7 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int _gnutls_x509_crt_get_mpis( gnutls_x509_crt cert,
-	GNUTLS_MPI* params, int *params_size) 
+	mpi_t* params, int *params_size) 
 {
 int len, result;
 opaque str[5*1024];
@@ -211,7 +211,7 @@ int pk_algorithm;
 		 */
 		if ( *params_size < RSA_PUBLIC_PARAMS) {
 			gnutls_assert();
-			/* internal error. Increase the GNUTLS_MPIs in params */
+			/* internal error. Increase the mpi_ts in params */
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
@@ -233,7 +233,7 @@ int pk_algorithm;
 
 		if ( *params_size < DSA_PUBLIC_PARAMS) {
 			gnutls_assert();
-			/* internal error. Increase the GNUTLS_MPIs in params */
+			/* internal error. Increase the mpi_ts in params */
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
@@ -282,7 +282,7 @@ int pk_algorithm;
  *
  * Allocates the space used to store the DER data.
  */
-int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
+int _gnutls_x509_write_rsa_params( mpi_t * params, int params_size,
 	gnutls_datum* der)
 {
 	int result;
@@ -336,7 +336,7 @@ cleanup:
  * This is the "signatureAlgorithm" fields.
  */
 int _gnutls_x509_write_sig_params( ASN1_TYPE dst, const char* dst_name,
-	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI * params, int params_size)
+	gnutls_pk_algorithm pk_algorithm, mpi_t * params, int params_size)
 {
 gnutls_datum der;
 int result;
@@ -399,7 +399,7 @@ const char* pk;
  *
  * Allocates the space used to store the DER data.
  */
-int _gnutls_x509_write_dsa_params( GNUTLS_MPI * params, int params_size,
+int _gnutls_x509_write_dsa_params( mpi_t * params, int params_size,
 	gnutls_datum* der)
 {
 	int result;
@@ -459,7 +459,7 @@ cleanup:
  *
  * Allocates the space used to store the DER data.
  */
-int _gnutls_x509_write_dsa_public_key( GNUTLS_MPI * params, int params_size,
+int _gnutls_x509_write_dsa_public_key( mpi_t * params, int params_size,
 	gnutls_datum* der)
 {
 	int result;

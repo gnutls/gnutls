@@ -30,7 +30,7 @@
 
 /* resarr will contain: p(0), q(1), g(2), y(3), x(4).
  */
-int _gnutls_dsa_generate_params(GNUTLS_MPI* resarr, int* resarr_len, int bits)
+int _gnutls_dsa_generate_params(mpi_t* resarr, int* resarr_len, int bits)
 {
 
 	int ret;

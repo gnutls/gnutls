@@ -57,7 +57,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
   gcry_error_t err;
   unsigned int i, j;
   gcry_md_hd_t md;
-  GNUTLS_MPI num_b1 = NULL;
+  mpi_t num_b1 = NULL;
   unsigned int pwlen;
   opaque hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
@@ -124,7 +124,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
       gcry_mpi_add_ui (num_b1, num_b1, 1);
       for (i=0; i < 128; i += 64)
         {
-          GNUTLS_MPI num_ij;
+          mpi_t num_ij;
 
           n = 64;
           rc = _gnutls_mpi_scan (&num_ij, buf_i + i, &n);

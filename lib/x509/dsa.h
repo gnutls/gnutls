@@ -1,1 +1,1 @@
-int _gnutls_dsa_generate_params(GNUTLS_MPI* resarr, int* resarr_len, int bits);
+int _gnutls_dsa_generate_params(mpi_t* resarr, int* resarr_len, int bits);

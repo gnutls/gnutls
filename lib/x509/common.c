@@ -979,7 +979,7 @@ gnutls_datum val;
  *
  */
 int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name,
-	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size)
+	gnutls_pk_algorithm pk_algorithm, mpi_t* params, int params_size)
 {
 const char* pk;
 gnutls_datum der = {NULL, 0};
@@ -1084,7 +1084,7 @@ opaque *str = NULL;
 int algo;
 char oid[64];
 int len;
-GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
+mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
 char name[128];
 
 	_gnutls_str_cpy( name, sizeof(name), src_name);

@@ -412,7 +412,7 @@ int len;
  */
 static int
 _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature, 
-	GNUTLS_MPI *params, int params_len)
+	mpi_t *params, int params_len)
 {
 	gnutls_mac_algorithm hash;
 	int ret;
@@ -465,7 +465,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
  */
 static int
 dsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature, 
-	GNUTLS_MPI *params, int params_len)
+	mpi_t *params, int params_len)
 {
 	int ret;
 	opaque _digest[MAX_HASH_SIZE];
@@ -493,7 +493,7 @@ dsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
  * or 1 otherwise.
  */
 static int verify_sig( const gnutls_datum* tbs, const gnutls_datum* signature,
-	gnutls_pk_algorithm pk, GNUTLS_MPI* issuer_params, int issuer_params_size)
+	gnutls_pk_algorithm pk, mpi_t* issuer_params, int issuer_params_size)
 {
 
 	switch( pk ) 
@@ -532,7 +532,7 @@ static int verify_sig( const gnutls_datum* tbs, const gnutls_datum* signature,
 int _gnutls_x509_verify_signature( const gnutls_datum* tbs,
 	const gnutls_datum* signature, gnutls_x509_crt issuer) 
 {
-GNUTLS_MPI issuer_params[MAX_PUBLIC_PARAMS_SIZE];
+mpi_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
 int ret, issuer_params_size, i;
 
 	/* Read the MPI parameters from the issuer's certificate.

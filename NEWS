@@ -17,6 +17,11 @@ Version 1.1.10
 - Updated to conform to the latest srp draft (draft-ietf-tls-srp-07)
 - Added new functions to allow access to the ephemeral
   Diffie Hellman parameters.
+- Added the functions gnutls_x509_crt_get_pk_rsa_raw() and
+  gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from certificates.
+- Added the functions gnutls_dh_get_group(), gnutls_dh_get_pubkey() and
+  gnutls_rsa_export_get_pubkey() to retrieve parameters of the DH or
+  RSA-EXPORT key exchange.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage

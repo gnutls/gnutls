@@ -264,7 +264,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	_gnutls_rsa_export_set_modulus( session, session->key->rsa[1], session->key->rsa[0]);
+	_gnutls_rsa_export_set_pubkey( session, session->key->rsa[1], session->key->rsa[0]);
 
 	/* VERIFY SIGNATURE */
 

@@ -43,6 +43,6 @@ int _gnutls_mpi_print( void *buffer, size_t *nbytes, const mpi_t a );
 int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const mpi_t a );
 
 int _gnutls_mpi_dprint_lz( gnutls_datum* dest, const mpi_t a );
-#define _gnutls_mpi_dprint_lz _gnutls_mpi_dprint
+#define _gnutls_mpi_dprint _gnutls_mpi_dprint_lz
 
 #endif
