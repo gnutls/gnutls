@@ -502,7 +502,7 @@ int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
 
 /**
   * gnutls_pkcs12_get_bag - This function returns a Bag from a PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
+  * @pkcs12: should contain a gnutls_pkcs12_t structure
   * @indx: contains the index of the bag to extract
   * @bag: An initialized bag, where the contents of the bag will be copied
   *
@@ -649,7 +649,7 @@ static int create_empty_pfx(ASN1_TYPE pkcs12)
 
 /**
   * gnutls_pkcs12_set_bag - This function inserts a Bag into a PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
+  * @pkcs12: should contain a gnutls_pkcs12_t structure
   * @bag: An initialized bag
   *
   * This function will insert a Bag into the PKCS12 structure.
@@ -768,7 +768,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t  bag)
 
 /**
   * gnutls_pkcs12_generate_mac - This function generates the MAC of the PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
+  * @pkcs12: should contain a gnutls_pkcs12_t structure
   * @pass: The password for the MAC
   *
   * This function will generate a MAC for the PKCS12 structure.
@@ -887,7 +887,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 /**
   * gnutls_pkcs12_verify_mac - This function verifies the MAC of the PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
+  * @pkcs12: should contain a gnutls_pkcs12_t structure
   * @pass: The password for the MAC
   *
   * This function will verify the MAC for the PKCS12 structure.

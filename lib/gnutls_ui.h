@@ -70,8 +70,8 @@ gnutls_certificate_client_set_retrieve_function( gnutls_certificate_credentials_
 void gnutls_certificate_server_set_retrieve_function(gnutls_certificate_credentials_t,
     gnutls_certificate_server_retrieve_function *);
 
-void gnutls_certificate_server_set_request(gnutls_session_t,
-    gnutls_certificate_request_t);
+void gnutls_certificate_server_set_request(gnutls_session_t session,
+    gnutls_certificate_request_t req);
 
 /* X.509 certificate handling functions 
  */

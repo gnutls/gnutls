@@ -267,12 +267,13 @@ int gnutls_server_name_get(gnutls_session_t session,
 
 /* functions to set priority of cipher suites 
  */
-int gnutls_cipher_set_priority( gnutls_session_t session, const int*);
-int gnutls_mac_set_priority( gnutls_session_t session, const int*);
-int gnutls_compression_set_priority( gnutls_session_t session, const int*);
-int gnutls_kx_set_priority( gnutls_session_t session, const int*);
-int gnutls_protocol_set_priority( gnutls_session_t session, const int*);
-int gnutls_certificate_type_set_priority( gnutls_session_t session, const int*);
+int gnutls_cipher_set_priority( gnutls_session_t session, const int *list);
+int gnutls_mac_set_priority( gnutls_session_t session, const int *list);
+int gnutls_compression_set_priority( gnutls_session_t session, const int *list);
+int gnutls_kx_set_priority( gnutls_session_t session, const int *list);
+int gnutls_protocol_set_priority( gnutls_session_t session, const int*list);
+int gnutls_certificate_type_set_priority( gnutls_session_t session,
+					  const int *list);
 
 /* if you just want some defaults, use the following.
  */
@@ -366,9 +367,9 @@ void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res, 
     unsigned int max_depth);
 
 int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials_t res, const char* CAFILE, 
-    gnutls_x509_crt_fmt_t);
+    gnutls_x509_crt_fmt_t type);
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t res, 
-    const gnutls_datum_t *CA, gnutls_x509_crt_fmt_t);
+    const gnutls_datum_t *CA, gnutls_x509_crt_fmt_t type);
 
 int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t res, 
     const char *crlfile, gnutls_x509_crt_fmt_t type);
@@ -376,10 +377,10 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t res,
     const gnutls_datum_t *CRL, gnutls_x509_crt_fmt_t type);
 
 int gnutls_certificate_set_x509_key_file( gnutls_certificate_credentials_t res, 
-    const char *CERTFILE, const char* KEYFILE, gnutls_x509_crt_fmt_t);
+    const char *CERTFILE, const char* KEYFILE, gnutls_x509_crt_fmt_t type);
 int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res, 
     const gnutls_datum_t* CERT, const gnutls_datum_t* KEY,
-    gnutls_x509_crt_fmt_t);
+    gnutls_x509_crt_fmt_t type);
 
 
 /* New functions to allow setting already parsed X.509 stuff.

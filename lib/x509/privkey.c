@@ -685,7 +685,7 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
 
 /**
   * gnutls_x509_privkey_export_rsa_raw - This function will export the RSA private key
-  * @params: a structure that holds the rsa parameters
+  * @key: a structure that holds the rsa parameters
   * @m: will hold the modulus
   * @e: will hold the public exponent
   * @d: will hold the private exponent

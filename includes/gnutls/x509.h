@@ -349,7 +349,7 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey_t key, const gnutls_datum_t *
     gnutls_x509_crt_fmt_t format);
 int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key, const gnutls_datum_t * data,
     gnutls_x509_crt_fmt_t format, const char * pass, unsigned int flags);
-int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t privkey, 
+int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
     const gnutls_datum_t *m, const gnutls_datum_t *e,
     const gnutls_datum_t *d, const gnutls_datum_t *p, const gnutls_datum_t *q, 
     const gnutls_datum_t *u);
