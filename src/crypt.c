@@ -27,7 +27,7 @@
 #include "../lib/gnutls_srp.h"
 #include "../lib/crypt.h"
 #include "../lib/cert_b64.h"
-#include "gaa.h"
+#include "crypt-gaa.h"
 #include <pwd.h>
 #include <sys/types.h>
 #include <unistd.h>
