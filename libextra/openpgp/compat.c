@@ -57,9 +57,9 @@ int gnutls_openpgp_verify_key(const char *trustdb,
 	gnutls_openpgp_key key = NULL;
 	gnutls_openpgp_keyring ring = NULL;
 	gnutls_openpgp_trustdb tdb = NULL;
-	unsigned int verify;
+	unsigned int verify_ring, verify_db, verify_self;
 
-	if (!cert_list || cert_list_length != 1 || !keyring) {
+	if (!cert_list || cert_list_length != 1) {
 		gnutls_assert();
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
@@ -76,6 +76,28 @@ int gnutls_openpgp_verify_key(const char *trustdb,
 		goto leave;
 	}
 
+	if (keyring && keyring->data && keyring->size != 0) {
+
+		/* use the keyring
+		 */
+		ret = gnutls_openpgp_keyring_init( &ring);
+		if (ret < 0) {
+			gnutls_assert();
+			goto leave;
+		}
+
+		ret = gnutls_openpgp_keyring_import( ring, keyring, 0);
+		if (ret < 0) {
+			gnutls_assert();
+			goto leave;
+		}
+		
+		ret = gnutls_openpgp_key_verify_ring( key, ring, 0, &verify_ring);
+		if (ret < 0) {
+			gnutls_assert();
+			goto leave;
+		}
+	}
 
 	if (trustdb) { /* Use the trustDB */
 		ret = gnutls_openpgp_trustdb_init( &tdb);
@@ -90,44 +112,23 @@ int gnutls_openpgp_verify_key(const char *trustdb,
 			goto leave;
 		}
 		
-		ret = gnutls_openpgp_key_verify_trustdb( key, tdb, 0, &verify);
-		if (ret < 0) {
-			gnutls_assert();
-			goto leave;
-		}
-		
-		ret = verify;
-		goto leave;
-	}
-	
-	if (!keyring || !keyring->data || keyring->size == 0) {
-		ret = GNUTLS_CERT_INVALID |
-			GNUTLS_CERT_SIGNER_NOT_FOUND;
-#warning CHECK SELF SIGNATURE HERE
-		goto leave;
+		ret = gnutls_openpgp_key_verify_trustdb( key, tdb, 0, &verify_db);
 	}
 
-	/* use the keyring
+	/* now try the self signature.
 	 */
-	ret = gnutls_openpgp_keyring_init( &ring);
+	ret = gnutls_openpgp_key_verify_self( key, 0, &verify_self);
 	if (ret < 0) {
 		gnutls_assert();
 		goto leave;
 	}
 
-	ret = gnutls_openpgp_keyring_import( ring, keyring, 0);
-	if (ret < 0) {
-		gnutls_assert();
-		goto leave;
-	}
-		
-	ret = gnutls_openpgp_key_verify_ring( key, ring, 0, &verify);
-	if (ret < 0) {
-		gnutls_assert();
-		goto leave;
-	}
-		
-	ret = verify;
+	ret = verify_self | verify_ring | verify_db;
+
+	/* If we only checked the self signature.
+	 */
+	if (!trustdb && (!keyring || !keyring->data))
+		ret |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 	goto leave;
 
 leave:

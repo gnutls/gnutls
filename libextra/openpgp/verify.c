@@ -132,6 +132,33 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
 }
 
 /**
+ * gnutls_openpgp_key_verify_self - Verify the self signature on the key
+ * @key: the structure that holds the key.
+ * @flags: unused (should be 0)
+ * @verify: will hold the key verification output.
+ *
+ * Verify the self signature in the key.
+ *
+ * The certificate verification output will be put in 'verify' and will be
+ * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
+ *
+ * GNUTLS_CERT_INVALID\: The signature on the key is invalid.
+ *
+ * GNUTLS_CERT_REVOKED\: The key has been revoked.
+ *
+ * Returns 0 on success.
+ **/
+int gnutls_openpgp_key_verify_self( gnutls_openpgp_key key,
+                           unsigned int flags, unsigned int *verify)
+{
+    *verify = 0;
+
+#warning PUT SOME ACTUAL CODE
+
+    return 0;
+}
+
+/**
  * gnutls_openpgp_key_verify_trustdb - Verify all signatures on the key
  * @key: the structure that holds the key.
  * @trustdb: holds the trustdb to check against

@@ -60,11 +60,14 @@ int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb trustdb,
 	const char * file);
 
 int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
-                           gnutls_openpgp_keyring keyring,
-                           unsigned int flags, unsigned int *verify);
+        gnutls_openpgp_keyring keyring,
+        unsigned int flags, unsigned int *verify);
 
 int gnutls_openpgp_key_verify_trustdb( gnutls_openpgp_key key, 
 	gnutls_openpgp_trustdb trustdb,
+        unsigned int flags, unsigned int *verify);
+
+int gnutls_openpgp_key_verify_self( gnutls_openpgp_key key,
         unsigned int flags, unsigned int *verify);
 
 #endif
