@@ -1,4 +1,4 @@
-Version 0.1.0 (?)
+Version 0.1.0 (09/05/2001)
 - Added SSL 2.0 client hello support
 - GNUTLS is a gnu library
 - Added support for TLS extensions.
