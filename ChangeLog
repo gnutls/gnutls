@@ -1,3 +1,18 @@
+2003-02-16 09:52  nmav <nmav@gnutls.org>
+
+	* src/: tests.c, tls_test.c:
+
+	works better in buggy servers.  
+
+2003-02-16 09:17  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex-serv-export.tex, doc/tex/ex-serv1.tex,
+	lib/Makefile.am, lib/dh_compat.c, lib/gnutls.h.in.in,
+	lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_rsa_export.c,
+	lib/gnutls_rsa_export.h, lib/rsa_compat.c, src/prime.c, src/serv.c:
+
+	The RSA and DH parameter handling has been updated.  
+
 2003-02-15 21:48  nmav <nmav@gnutls.org>
 
 	* lib/: auth_cert.c, gnutls_x509.c:
