@@ -187,9 +187,6 @@ ssize_t _gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
 
 	*erecord = NULL;
 
-	/* if this protection has been disabled
-	 */
-	if (state->gnutls_internals.cbc_protection_hack==0) return 0;
 
 	if (type!=GNUTLS_APPLICATION_DATA ||
 		_gnutls_cipher_is_block( gnutls_cipher_get(state))!=CIPHER_BLOCK) 
@@ -252,7 +249,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	const uint8 *data=_data;
 	GNUTLS_Version lver;
 	int erecord_size = 0;
-	opaque* erecord;
+	opaque* erecord = NULL;
 
 	if (sizeofdata == 0 || _data==NULL) {
 		gnutls_assert();
@@ -301,11 +298,15 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		/* Prepend our packet with an empty record. This is to
 		 * avoid the recent CBC attacks.
 		 */
-		erecord_size = 
-			_gnutls_create_empty_record( state, type, &erecord);
-		if (erecord_size < 0) {
-			gnutls_assert();
-			return erecord_size;
+		/* if this protection has been disabled
+		 */
+		if (state->gnutls_internals.cbc_protection_hack!=0) {
+			erecord_size = 
+				_gnutls_create_empty_record( state, type, &erecord);
+			if (erecord_size < 0) {
+				gnutls_assert();
+				return erecord_size;
+			}
 		}
 
 		/* now proceed to packet encryption
@@ -326,8 +327,6 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
 			_gnutls_session_invalidate( state);
 			gnutls_assert();
-			/* FIXME: Somebody has to do rehandshake before that.
-			 */
 			gnutls_free( erecord);
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}

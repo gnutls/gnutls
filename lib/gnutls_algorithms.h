@@ -42,7 +42,6 @@ int   _gnutls_supported_ciphersuites(GNUTLS_STATE state, GNUTLS_CipherSuite **ci
 int   _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state, GNUTLS_CipherSuite **ciphers);
 int   _gnutls_supported_compression_methods(GNUTLS_STATE state, uint8 **comp);
 
-int   _gnutls_cipher_suite_count(void);
 const char* _gnutls_cipher_suite_get_name(GNUTLS_CipherSuite algorithm);
 BulkCipherAlgorithm _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite algorithm);
 KXAlgorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite algorithm);

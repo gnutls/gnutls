@@ -538,7 +538,7 @@ ssize_t _gnutls_io_write_buffered( GNUTLS_STATE state, const void *iptr, size_t 
 	GNUTLS_TRANSPORT_PTR fd = state->gnutls_internals.transport_ptr;
 	
 	ptr = iptr;
-	
+
 	/* In case the previous write was interrupted, check if the
 	 * iptr != NULL and we have data in the buffer.
 	 * If this is true then return an error.

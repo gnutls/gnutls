@@ -71,6 +71,8 @@ static void dlog( const char* str) {
 
 static int _gnutls_init = 0;
 
+void _gnutls_cipher_suite_count_int(void);
+
 /**
   * gnutls_global_init - This function initializes the global state to defaults.
   *
@@ -90,6 +92,10 @@ int gnutls_global_init( void)
 	if (_gnutls_init!=1) {
 		return 0;
 	}
+	
+	/* precalculate the cipher suite count.
+	 */
+	_gnutls_cipher_suite_count_int();
 
 	/* for gcrypt in order to be able to allocate memory */
 	gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);

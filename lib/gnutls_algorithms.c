@@ -896,8 +896,15 @@ static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
 
 }
 
-/* quite expensive */
-int _gnutls_cipher_suite_count(void)
+int _gnutls_cipher_suite_counter = 0;
+
+/* quite expensive 
+ *
+ * 20020326: This is now only called once by gnutls_global_init()
+ *
+ * The return value is stored at _gnutls_cipher_suite_counter;
+ */
+void _gnutls_cipher_suite_count_int(void)
 {
 	GNUTLS_CipherSuite suite;
 	int i, counter = 0, j;
@@ -915,8 +922,9 @@ int _gnutls_cipher_suite_count(void)
 		}
 
 	}
-	return counter;
+	_gnutls_cipher_suite_counter = counter;
 }
+
 
 #define SWAP(x, y) memcpy(tmp,x,size); \
 		   memcpy(x,y,size); \
@@ -1093,7 +1101,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 {
 
 	int i, ret_count, j;
-	int count = _gnutls_cipher_suite_count();
+	int count = _gnutls_cipher_suite_counter;
 	GNUTLS_CipherSuite *tmp_ciphers;
 	GNUTLS_CipherSuite* ciphers;
 	GNUTLS_Version version;
@@ -1118,10 +1126,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 	}
 	
 	for (i = 0; i < count; i++) {
-		tmp_ciphers[i].CipherSuite[0] =
-		    cs_algorithms[i].id.CipherSuite[0];
-		tmp_ciphers[i].CipherSuite[1] =
-		    cs_algorithms[i].id.CipherSuite[1];
+		memcpy( &tmp_ciphers[i], &cs_algorithms[i].id, sizeof( GNUTLS_CipherSuite));
 	}
 
 	for (i = j = 0; i < count; i++) {
@@ -1146,13 +1151,13 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 		    < 0)
 			continue;
 
-		ciphers[j].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
-		ciphers[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
+		memcpy( &ciphers[j], &tmp_ciphers[i], sizeof( GNUTLS_CipherSuite));
 		j++;
 	}
 
 	ret_count = j;
 
+#if 0 /* expensive */
 	if (ret_count > 0 && ret_count != count) {
 		ciphers =
 		    gnutls_realloc(ciphers,
@@ -1162,6 +1167,11 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 			gnutls_free(ciphers);
 			ciphers = NULL;
 		}
+	}
+#endif
+	if (ret_count == 0) {
+		gnutls_free(ciphers);
+		ciphers = NULL;
 	}
 
 	*_ciphers = ciphers;
