@@ -449,9 +449,9 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		memmove(&data[pos], &x, sizeof(uint16));
 		x = byteswap16(x);
 #endif
-		pos += 2;
+		pos += sizeof(uint16);
 
-		datalen += 2 * x;
+		datalen += x;
 		data = gnutls_realloc(data, datalen);
 
 		for (i = 0; i < x; i++) {
@@ -656,7 +656,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #endif
 		ret = SelectSuite(state->gnutls_internals.
 			    current_cipher_suite.CipherSuite, &data[pos],
-			    sizeOfSuites); /* *2 because it's 2 bytes each */
+			    sizeOfSuites); 
 
 		if (ret<0) return ret;
 		
