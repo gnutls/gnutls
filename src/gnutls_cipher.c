@@ -3,37 +3,29 @@
 #include "gnutls_errors.h"
 #include "gnutls_compress.h"
 #include "gnutls_cipher.h"
+#include "gnutls_algorithms.h"
 #include <mhash.h>
 
-#define TDES_BLOCKLEN 8
-#define TDES_KEYLEN 24
 #define MD5_DIGEST 16
 #define SHA_DIGEST 20
 
 /* Sets the specified cipher into the pending state */
 int _gnutls_set_cipher( GNUTLS_STATE state, BulkCipherAlgorithm algo) {
 
-	switch (algo) {
-		case CIPHER_NULL:
-			state->security_parameters.bulk_cipher_algorithm=CIPHER_NULL;
-			state->security_parameters.cipher_type=CIPHER_STREAM;
-			state->security_parameters.is_exportable=EXPORTABLE_TRUE;
+		if (_gnutls_is_algorithm(algo) == 0) {
+			state->security_parameters.bulk_cipher_algorithm = algo;
+			if (_gnutls_is_block_algorithm(algo)==0) {
+				state->security_parameters.cipher_type = CIPHER_BLOCK;
+			} else {
+				state->security_parameters.cipher_type=CIPHER_STREAM;
+			}
+			state->security_parameters.is_exportable = EXPORTABLE_FALSE;
 			state->security_parameters.key_material_length =
-			state->security_parameters.key_size = 0;
-			break;
-
-		case CIPHER_3DES:
-			state->security_parameters.bulk_cipher_algorithm=CIPHER_3DES;
-			state->security_parameters.cipher_type=CIPHER_BLOCK;
-			state->security_parameters.is_exportable=EXPORTABLE_FALSE;
-			state->security_parameters.key_material_length =
-			state->security_parameters.key_size = TDES_KEYLEN;
-			state->security_parameters.IV_size = TDES_BLOCKLEN;
-			break;
-		default:
+			state->security_parameters.key_size = _gnutls_get_key_size(algo);
+			state->security_parameters.IV_size = _gnutls_get_block_size(algo);
+		} else {
 			return GNUTLS_E_UNKNOWN_CIPHER;
-	}
-
+		}
 
 	return 0;
 	
@@ -274,7 +266,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			rand = gcry_random_bytes(1, GCRY_STRONG_RANDOM);
 			length = compressed->length + state->connection_state.mac_secret_size
 						+ rand[0] + 1;
-			length = (length / TDES_BLOCKLEN) * TDES_BLOCKLEN;
+			length = (length / _gnutls_get_block_size(CIPHER_3DES)) * _gnutls_get_block_size(CIPHER_3DES);
 			pad = length - compressed->length - state->connection_state.mac_secret_size - 1;
 
 			/* set pad bytes pad */
