@@ -25,7 +25,7 @@ on page \pageref{sec:x509api}. Some examples are listed below.
 
 
 
-\subsection{X.509 certificates}
+\subsection*{X.509 certificates}
 An X.509 certificate usually contains information about the certificate
 holder, the signer, a unique serial number, expiration dates etc. Some
 functions of \gnutls{}' API for certificate parsing are:
@@ -45,7 +45,7 @@ is listed below.
 \input{ex-x509-info}
 
 
-\subsection{Verifying X.509 certificate paths}
+\subsection*{Verifying X.509 certificate paths}
 Verifying certificate\index{Verifying certificate paths} paths is important 
 in X.509 authentication. For this purpose the function
 \printfunc{gnutls_x509_crt_verify}{gnutls\_x509\_crt\_verify} is provided. The
@@ -82,7 +82,7 @@ owner is the one you expect. See section \ref{ex:rfc2818} on page \pageref{ex:rf
 for an example.
 
 
-\subsection{PKCS \#10 certificate requests\index{Certificate requests}\index
+\subsection*{PKCS \#10 certificate requests\index{Certificate requests}\index
 {PKCS \#10}}
 A certificate request is a structure, which
 is contains information about an applicant of a certificate service.
@@ -97,7 +97,7 @@ which should return a signed certificate.
 
 \input{ex-crq}
 
-\subsection{PKCS \#12 structures\index{PKCS \#12}}
+\subsection*{PKCS \#12 structures\index{PKCS \#12}}
 A PKCS \#12 structure usually contains a user's private keys and
 certificates. It is commonly used in browsers to export and import
 the user's identities.
@@ -139,7 +139,7 @@ Kevin, for some reason. A reason could be that Bob is lazy enough, and
 signs other people's keys without being sure that they belong to the 
 actual owner.
 
-\subsection{Verifying an OpenPGP key}
+\subsection*{Verifying an OpenPGP key}
 The verification functions of OpenPGP keys, included in \gnutls{}, 
 are simple ones, and do not use the features of the ``web of trust''.
 For that reason, if the verification needs are complex, 
