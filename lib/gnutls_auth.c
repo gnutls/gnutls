@@ -205,13 +205,21 @@ void _gnutls_free_auth_info( GNUTLS_STATE state) {
 		
 		break;
 	case GNUTLS_X509PKI: {
+		int i;
 		X509PKI_AUTH_INFO info =
 		            _gnutls_get_auth_info(state);
 
-		if (info==NULL) break;
-		gnutls_free( info->raw_certificate.data);
-
+			if (info==NULL) break;
+			for (i=0;i<info->ncerts;i++) {
+				gnutls_free( info->raw_certificate_list[0].data);
+			}
+	
+			gnutls_free( info->raw_certificate_list);
+			info->raw_certificate_list = NULL;
+			info->ncerts = 0;
 		}
+
+
 		break;
 	default:
 		return;

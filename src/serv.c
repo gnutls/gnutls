@@ -28,7 +28,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "../lib/gnutls.h"
-#include <port.h>
+#include <common.h>
 #include <signal.h>
 
 #define KEYFILE "x509/key.pem"
@@ -100,15 +100,6 @@ GNUTLS_STATE initialize_state()
 	return state;
 }
 
-#define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
-#define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
-	PRINTX( "OU:", X.organizational_unit_name); \
-	PRINTX( "O:", X.organization); \
-	PRINTX( "L:", X.locality_name); \
-	PRINTX( "S:", X.state_or_province_name); \
-	PRINTX( "C:", X.country); \
-	PRINTX( "E:", X.email); \
-	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(state))
 
 void print_info(GNUTLS_STATE state)
 {
@@ -118,6 +109,8 @@ void print_info(GNUTLS_STATE state)
 	gnutls_DN dn;
 	CredType cred;
 	CertificateStatus status;
+	char dnsname[512];
+	int dnsname_size;
 	
 	/* print session_id specific data */
 	gnutls_get_current_session_id( state, sesid, &sesid_size);

@@ -61,14 +61,14 @@ int gnutls_x509pki_set_cert_request( GNUTLS_STATE, CertificateRequest);
 
 int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE);
 int gnutls_x509pki_get_peer_dn( GNUTLS_STATE, gnutls_DN*);
-const gnutls_datum* gnutls_x509pki_get_peer_certificate( GNUTLS_STATE);
+const gnutls_datum* gnutls_x509pki_get_peer_certificate_list( GNUTLS_STATE, int* list_size);
 int gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE, gnutls_DN *);
 CertificateStatus gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
 int gnutls_x509pki_get_peer_certificate_version( GNUTLS_STATE);
 time_t gnutls_x509pki_get_peer_certificate_activation_time( GNUTLS_STATE);
 time_t gnutls_x509pki_get_peer_certificate_expiration_time( GNUTLS_STATE);
 unsigned char gnutls_x509pki_get_key_usage( GNUTLS_STATE);
-const char* gnutls_x509pki_get_subject_dns_name( GNUTLS_STATE);
+int gnutls_x509pki_get_subject_dns_name( GNUTLS_STATE, char*, int*);
 int gnutls_x509pki_get_dh_bits( GNUTLS_STATE);
 
 #define gnutls_x509pki_server_get_dh_bits gnutls_x509pki_get_dh_bits

@@ -25,88 +25,33 @@
 #include <gnutls_cert.h>
 #include <gnutls_errors.h>
 #include <gnutls_global.h>
+#include "debug.h"
 
-/* Here we only read subjectAltDNSName, in case of
- * dnsName. Otherwise we read nothing.
- */
-static int _extract_subjectAltDNSName( char* subjectAltDNSName, opaque* extnValue, int extnValueLen) {
-node_asn* ext;
-char counter[MAX_INT_DIGITS];
-char name[1024];
-char str[1024];
-int len, k, result;
-
-	subjectAltDNSName[0] = 0;
-	
-	if (asn1_create_structure
-	    ( _gnutls_get_pkix(), "PKIX1Implicit88.GeneralNames", &ext, 
-	    	"san") != ASN_OK) {
-		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	result = asn1_get_der ( ext, extnValue, extnValueLen);
-
-	if (result != ASN_OK) {
-		gnutls_assert();
-		asn1_delete_structure(ext);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	k = 1;
-	for (;;) {
-		strcpy(name, "san.?");
-		_gnutls_int2str(k, counter);
-		strcat(name, counter);
-
-		len = sizeof(str) - 1;
-		result = asn1_read_value(ext, name, str, &len);
-		if (result == ASN_ELEMENT_NOT_FOUND) break;
-		
-		if (strcmp( str, "dNSName") == 0) {
-			strcat( name, "dNSName");
-			len = sizeof( str) -1;
-			result = asn1_read_value(ext, name, str, &len);
-
-			if (result != ASN_OK) {
-				gnutls_assert();
-				asn1_delete_structure(ext);
-				return GNUTLS_E_ASN1_PARSING_ERROR;
-			}
-			
-			strncpy( subjectAltDNSName, str, GMIN( len, X509_CN_SIZE-1));
-			subjectAltDNSName[X509_CN_SIZE-1] = 0;
-			
-			break;
-		}
-		k++;
-	}
-
-	asn1_delete_structure(ext);
-	return 0;
-}
 
 /* Here we only extract the KeyUsage field
  */
-static int _extract_keyUsage( char* keyUsage, opaque* extnValue, int extnValueLen) {
-node_asn* ext;
-char str[128];
-int len, result;
+static int _extract_keyUsage(char *keyUsage, opaque * extnValue,
+			     int extnValueLen)
+{
+	node_asn *ext;
+	char str[10];
+	int len, result;
 
+	keyUsage[0] = 0;
 	
 	if (asn1_create_structure
-	    ( _gnutls_get_pkix(), "PKIX1Implicit88.KeyUsage", &ext, 
-	    	"ku") != ASN_OK) {
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.KeyUsage", &ext,
+	     "ku") != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	result = asn1_get_der ( ext, extnValue, extnValueLen);
+	result = asn1_get_der(ext, extnValue, extnValueLen);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(ext);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return 0;
 	}
 
 	len = sizeof(str) - 1;
@@ -114,7 +59,7 @@ int len, result;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(ext);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return 0;
 	}
 
 	keyUsage[0] = str[0];
@@ -124,29 +69,28 @@ int len, result;
 	return 0;
 }
 
-static int _extract_basicConstraints( int* CA, opaque* extnValue, int extnValueLen) {
-node_asn* ext;
-char str[128];
-int len, result;
+static int _extract_basicConstraints(int *CA, opaque * extnValue,
+				     int extnValueLen)
+{
+	node_asn *ext;
+	char str[128];
+	int len, result;
 
 	*CA = 0;
-		
+
 	if (asn1_create_structure
-	    ( _gnutls_get_pkix(), "PKIX1Implicit88.BasicConstraints", &ext, 
-	    	"bc") != ASN_OK) {
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.BasicConstraints", &ext,
+	     "bc") != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	result = asn1_get_der ( ext, extnValue, extnValueLen);
+	result = asn1_get_der(ext, extnValue, extnValueLen);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(ext);
-		return 0; /* GNUTLS_E_ASN1_PARSING_ERROR may be better
-			   * but we want to continue even if the
-			   * certificate is badly formated.
-			   */
+		return 0;
 	}
 
 	len = sizeof(str) - 1;
@@ -154,47 +98,50 @@ int len, result;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(ext);
-		return 0; /* see above.
-			   */
+		return 0;
 	}
 
 	asn1_delete_structure(ext);
 
-	if ( strcmp(str, "TRUE")==0) *CA = 1;
-	else *CA = 0;
+	if (strcmp(str, "TRUE") == 0)
+		*CA = 1;
+	else
+		*CA = 0;
 
 
 	return 0;
 }
 
 
-static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, char* extnValue, int extnValueLen) {
+static int _parse_extension(gnutls_cert * cert, char *extnID,
+			    char *critical, char *extnValue,
+			    int extnValueLen)
+{
 
-	if (strcmp( extnID, "2 5 29 14")==0) { /* subject Key ID */
+	if (strcmp(extnID, "2 5 29 14") == 0) {	/* subject Key ID */
 		/* we don't use it */
 		return 0;
 	}
 
-	if (strcmp( extnID, "2 5 29 15")==0) { /* Key Usage */
-		return _extract_keyUsage( &cert->keyUsage, extnValue, extnValueLen);
+	if (strcmp(extnID, "2 5 29 15") == 0) {	/* Key Usage */
+fprintf(stderr, "key USAGE FOUND\n");
+		return _extract_keyUsage(&cert->keyUsage, extnValue, extnValueLen);
 	}
 
-	if (strcmp( extnID, "2 5 29 19")==0) { /* Basic Constraints */
+	if (strcmp(extnID, "2 5 29 19") == 0) {	/* Basic Constraints */
 		/* actually checks if a certificate belongs to
 		 * a Certificate Authority.
 		 */
-		return _extract_basicConstraints( &cert->CA, extnValue, extnValueLen);
-	}
-
-	if (strcmp( extnID, "2 5 29 17")==0) { /* subjectAltDNSName */
-		return _extract_subjectAltDNSName( cert->subjectAltDNSName, extnValue, extnValueLen);
+		return _extract_basicConstraints(&cert->CA, extnValue,
+						 extnValueLen);
 	}
 
 #ifdef DEBUG
-	_gnutls_log("CERT[%s]: Unsupported Extension: %s, %s\n", GET_CN(cert->raw), extnID, critical);
+	_gnutls_log("CERT[%s]: Unsupported Extension: %s, %s\n",
+		    GET_CN(cert->raw), extnID, critical);
 #endif
-	
-	if (strcmp( critical, "TRUE")==0) {
+
+	if (strcmp(critical, "TRUE") == 0) {
 		gnutls_assert();
 		return GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION;
 	}
@@ -205,7 +152,7 @@ static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, ch
 /* This function will attempt to parse Extensions in
  * an X509v3 certificate
  */
-int _gnutls_get_ext_type( node_asn *rasn, char *root, gnutls_cert *cert)
+int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 {
 	int k, result, len;
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
@@ -217,19 +164,20 @@ int _gnutls_get_ext_type( node_asn *rasn, char *root, gnutls_cert *cert)
 	k = 0;
 	do {
 		k++;
-		
+
 		strcpy(name, root);
 		strcat(name, ".?");
 		_gnutls_int2str(k, counter);
 		strcat(name, counter);
 
 		len = sizeof(str) - 1;
-		result = asn1_read_value( rasn, name, str, &len);
-		
+		result = asn1_read_value(rasn, name, str, &len);
+
 		/* move to next
 		 */
 
-		if (result==ASN_ELEMENT_NOT_FOUND) break;
+		if (result == ASN_ELEMENT_NOT_FOUND)
+			break;
 
 		do {
 
@@ -237,39 +185,46 @@ int _gnutls_get_ext_type( node_asn *rasn, char *root, gnutls_cert *cert)
 			strcat(name2, ".extnID");
 
 			len = sizeof(extnID) - 1;
-			result = asn1_read_value( rasn, name2, extnID, &len);
+			result =
+			    asn1_read_value(rasn, name2, extnID, &len);
 
-			if (result==ASN_ELEMENT_NOT_FOUND) break;
-			else
-				if (result != ASN_OK) {
-					gnutls_assert();
-					return GNUTLS_E_ASN1_PARSING_ERROR;
-				}
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
+			else if (result != ASN_OK) {
+				gnutls_assert();
+				return GNUTLS_E_ASN1_PARSING_ERROR;
+			}
 
 			strcpy(name2, name);
 			strcat(name2, ".critical");
-			
-			len = sizeof(critical) - 1;
-			result = asn1_read_value( rasn, name2, critical, &len);
 
-			if (result==ASN_ELEMENT_NOT_FOUND) break;
-			else
-				if (result != ASN_OK) {
-					gnutls_assert();
-					return GNUTLS_E_ASN1_PARSING_ERROR;
-				}
-				
+			len = sizeof(critical) - 1;
+			result =
+			    asn1_read_value(rasn, name2, critical, &len);
+
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
+			else if (result != ASN_OK) {
+				gnutls_assert();
+				return GNUTLS_E_ASN1_PARSING_ERROR;
+			}
+
 			strcpy(name2, name);
 			strcat(name2, ".extnValue");
 
-			len = sizeof( extnValue) - 1;
-			result = asn1_read_value( rasn, name2, extnValue, &len);
+			len = sizeof(extnValue) - 1;
+			result =
+			    asn1_read_value(rasn, name2, extnValue, &len);
 
-			if (result==ASN_ELEMENT_NOT_FOUND) break;
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
 			else {
-				if (result==ASN_MEM_ERROR && strcmp(critical, "FALSE")==0) {
+				if (result == ASN_MEM_ERROR
+				    && strcmp(critical, "FALSE") == 0) {
 #ifdef DEBUG
-					_gnutls_log("Cannot parse extension: %s. Too small buffer.", extnID);
+					_gnutls_log
+					    ("Cannot parse extension: %s. Too small buffer.",
+					     extnID);
 #endif
 					continue;
 				}
@@ -278,19 +233,159 @@ int _gnutls_get_ext_type( node_asn *rasn, char *root, gnutls_cert *cert)
 					return GNUTLS_E_ASN1_PARSING_ERROR;
 				}
 			}
-			
+
 			/* Handle Extension */
-			if ( (result=_parse_extension( cert, extnID, critical, extnValue, len)) < 0) {
+			if ((result =
+			     _parse_extension(cert, extnID, critical,
+					      extnValue, len)) < 0) {
 				gnutls_assert();
 				return result;
 			}
-			
-			
+
+
 		} while (0);
 	} while (1);
 
-	if (result==ASN_ELEMENT_NOT_FOUND)
+	if (result == ASN_ELEMENT_NOT_FOUND)
 		return 0;
-	else 
+	else
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+}
+
+/* This function will attempt to return the requested extension found in
+ * the given X509v3 certificate. The return value is allocated and stored into
+ * ret.
+ */
+int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, gnutls_datum* ret)
+{
+	int k, result, len;
+	char name[128], name2[128], counter[MAX_INT_DIGITS];
+	char str[1024];
+	char critical[10];
+	char extnID[128];
+	char extnValue[256];
+	node_asn* rasn;
+
+	ret->data = NULL;
+	ret->size = 0;
+	
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &rasn,
+	     "certificate2")
+	    != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result =
+	    asn1_get_der(rasn, cert->data, cert->size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+#ifdef DEBUG
+		_gnutls_log("Decoding error %d\n", result);
+#endif
+		gnutls_assert();
+		asn1_delete_structure(rasn);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	k = 0;
+	do {
+		k++;
+
+		strcpy(name, "certificate2");
+		strcat(name, ".?");
+		_gnutls_int2str(k, counter);
+		strcat(name, counter);
+
+		len = sizeof(str) - 1;
+		result = asn1_read_value(rasn, name, str, &len);
+
+		/* move to next
+		 */
+
+		if (result == ASN_ELEMENT_NOT_FOUND)
+			break;
+
+		do {
+
+			strcpy(name2, name);
+			strcat(name2, ".extnID");
+
+			len = sizeof(extnID) - 1;
+			result =
+			    asn1_read_value(rasn, name2, extnID, &len);
+
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
+			else if (result != ASN_OK) {
+				gnutls_assert();
+				return GNUTLS_E_ASN1_PARSING_ERROR;
+			}
+
+			strcpy(name2, name);
+			strcat(name2, ".critical");
+
+			len = sizeof(critical) - 1;
+			result =
+			    asn1_read_value(rasn, name2, critical, &len);
+
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
+			else if (result != ASN_OK) {
+				gnutls_assert();
+				asn1_delete_structure(rasn);
+				return GNUTLS_E_ASN1_PARSING_ERROR;
+			}
+
+			strcpy(name2, name);
+			strcat(name2, ".extnValue");
+
+			len = sizeof(extnValue) - 1;
+			result =
+			    asn1_read_value(rasn, name2, extnValue, &len);
+
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
+			else {
+				if (result == ASN_MEM_ERROR
+				    && strcmp(critical, "FALSE") == 0) {
+#ifdef DEBUG
+					_gnutls_log
+					    ("Cannot parse extension: %s. Too small buffer.",
+					     extnID);
+#endif
+					continue;
+				}
+				if (result != ASN_OK) {
+					gnutls_assert();
+					asn1_delete_structure(rasn);
+					return GNUTLS_E_ASN1_PARSING_ERROR;
+				}
+			}
+
+			/* Handle Extension */
+			if ( strcmp(extnID, extension_id)==0) { /* extension was found */
+				asn1_delete_structure(rasn);
+				ret->data = gnutls_malloc( len);
+				if (ret->data==NULL)
+					return GNUTLS_E_MEMORY_ERROR;	
+
+				ret->size = len;
+				memcpy( ret->data, extnValue, len);
+				
+				return 0;
+			}
+
+
+		} while (0);
+	} while (1);
+
+	asn1_delete_structure(rasn);
+
+
+	if (result == ASN_ELEMENT_NOT_FOUND)
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	else
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 }

@@ -751,7 +751,7 @@ int _gnutls_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 
 
 #define MAX_TIME 1024
-static time_t _gnutls_get_time(node_asn * c2, char *root, char *when)
+time_t _gnutls_get_time(node_asn * c2, char *root, char *when)
 {
 	opaque ttime[MAX_TIME];
 	char name[1024];
@@ -798,7 +798,7 @@ static time_t _gnutls_get_time(node_asn * c2, char *root, char *when)
 	return ctime;
 }
 
-static int _gnutls_get_version(node_asn * c2, char *root)
+int _gnutls_get_version(node_asn * c2, char *root)
 {
 	opaque gversion[5];
 	char name[1024];
@@ -831,6 +831,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	opaque str[MAX_X509_CERT_SIZE];
 	int len = sizeof(str);
 
+	memset( gCert, 0, sizeof(gnutls_cert));
+	
 	gCert->valid = 1;
 
 	if (asn1_create_structure
@@ -911,7 +913,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 
 	}
-
+	
 	len = sizeof(gCert->signature);
 	result =
 	    asn1_read_value
@@ -926,8 +928,12 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	gCert->signature_size = len;
 
 
-	memset(&gCert->subjectAltDNSName, 0,
-	       sizeof(gCert->subjectAltDNSName));
+	gCert->expiration_time =
+	    _gnutls_get_time(c2, "certificate2", "notAfter");
+	gCert->activation_time =
+	    _gnutls_get_time(c2, "certificate2", "notBefore");
+	gCert->version = _gnutls_get_version(c2, "certificate2");
+
 	if ((result =
 	     _gnutls_get_ext_type(c2,
 				  "certificate2.tbsCertificate.extensions",
@@ -936,13 +942,6 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		asn1_delete_structure(c2);
 		return result;
 	}
-
-	gCert->expiration_time =
-	    _gnutls_get_time(c2, "certificate2", "notAfter");
-	gCert->activation_time =
-	    _gnutls_get_time(c2, "certificate2", "notBefore");
-
-	gCert->version = _gnutls_get_version(c2, "certificate2");
 
 	asn1_delete_structure(c2);
 

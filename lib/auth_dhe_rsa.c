@@ -79,7 +79,10 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 	}
 
 	/* find the appropriate certificate */
-	if ((ret=_gnutls_find_apr_cert( state, &apr_cert_list, &apr_cert_list_length, &apr_pkey))<0) {
+	if ((ret =
+	     _gnutls_find_apr_cert(state, &apr_cert_list,
+				   &apr_cert_list_length,
+				   &apr_pkey)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -90,7 +93,7 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if ( state->gnutls_key->auth_info==NULL) {
+	if (state->gnutls_key->auth_info == NULL) {
 		state->gnutls_key->auth_info =
 		    gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
 		if (state->gnutls_key->auth_info == NULL)
@@ -105,13 +108,14 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 		state->gnutls_key->auth_info_type = GNUTLS_X509PKI;
 
 	} else
-		if (gnutls_get_auth_type( state) != state->gnutls_key->auth_info_type) {
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
-		}
+	    if (gnutls_get_auth_type(state) !=
+		state->gnutls_key->auth_info_type) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	info = state->gnutls_key->auth_info;
-	
+
 	X = gnutls_calc_dh_secret(&x, g, p);
 	if (X == NULL) {
 		_gnutls_mpi_release(&g);
@@ -160,28 +164,29 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 
 	if (apr_pkey != NULL) {
 		if ((ret =
-		     _gnutls_generate_sig_params(
-		     	state, &apr_cert_list[0], apr_pkey, &ddata, &signature)) < 0) {
+		     _gnutls_generate_sig_params(state, &apr_cert_list[0],
+						 apr_pkey, &ddata,
+						 &signature)) < 0) {
 			gnutls_assert();
-			gnutls_free( *data);
+			gnutls_free(*data);
 			return ret;
 		}
 	} else {
 		gnutls_assert();
-		return data_size; /* do not put a signature - ILLEGAL! */
+		return data_size;	/* do not put a signature - ILLEGAL! */
 	}
 
-	*data = gnutls_realloc( *data, data_size+signature.size+2);
-	if (*data==NULL) {
-		gnutls_free_datum( &signature);
+	*data = gnutls_realloc(*data, data_size + signature.size + 2);
+	if (*data == NULL) {
+		gnutls_free_datum(&signature);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
-	WRITEdatum16( &(*data)[data_size], signature);
-	data_size += signature.size+2;
 
-	gnutls_free_datum( &signature);
+	WRITEdatum16(&(*data)[data_size], signature);
+	data_size += signature.size + 2;
+
+	gnutls_free_datum(&signature);
 
 	return data_size;
 }
@@ -194,21 +199,21 @@ static int gen_dhe_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 
 	X = gnutls_calc_dh_secret(&x, state->gnutls_key->client_g,
 				  state->gnutls_key->client_p);
-	if (X==NULL || x==NULL) {
+	if (X == NULL || x == NULL) {
 		gnutls_assert();
-		_gnutls_mpi_release( &x);
-		_gnutls_mpi_release( &X);
+		_gnutls_mpi_release(&x);
+		_gnutls_mpi_release(&X);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
+
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_X + 2);
 	if (*data == NULL) {
-		_gnutls_mpi_release( &x);
-		_gnutls_mpi_release( &X);
+		_gnutls_mpi_release(&x);
+		_gnutls_mpi_release(&X);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
+
 	gcry_mpi_print(GCRYMPI_FMT_USG, &(*data)[2], &n_X, X);
 	_gnutls_mpi_release(&X);
 
@@ -220,7 +225,7 @@ static int gen_dhe_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 			       state->gnutls_key->client_p);
 
 	_gnutls_mpi_release(&x);
-	if (state->gnutls_key->KEY==NULL) {
+	if (state->gnutls_key->KEY == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -230,7 +235,7 @@ static int gen_dhe_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	_gnutls_mpi_release(&state->gnutls_key->client_p);
 	_gnutls_mpi_release(&state->gnutls_key->client_g);
 
-	ret = _gnutls_generate_key( state->gnutls_key);
+	ret = _gnutls_generate_key(state->gnutls_key);
 	_gnutls_mpi_release(&state->gnutls_key->KEY);
 
 	if (ret < 0) {
@@ -251,6 +256,14 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	int i, sigsize;
 	gnutls_datum vparams, signature;
 	int ret;
+	X509PKI_AUTH_INFO info = state->gnutls_key->auth_info;
+	gnutls_cert peer_cert;
+
+	if (info == NULL || info->ncerts==0) {
+		gnutls_assert();
+		/* we need this in order to get peer's certificate */
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
 
 	i = 0;
 	n_p = READuint16(&data[i]);
@@ -287,39 +300,51 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	_n_p = n_p;
 
 	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y,
-			  GCRYMPI_FMT_USG, data_Y, &_n_Y) != 0) {
+			     GCRYMPI_FMT_USG, data_Y, &_n_Y) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	if (_gnutls_mpi_scan(&state->gnutls_key->client_g,
-			  GCRYMPI_FMT_USG, data_g, &_n_g) != 0) {
+			     GCRYMPI_FMT_USG, data_g, &_n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 	if (_gnutls_mpi_scan(&state->gnutls_key->client_p,
-			  GCRYMPI_FMT_USG, data_p, &_n_p) != 0) {
+			     GCRYMPI_FMT_USG, data_p, &_n_p) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 
 	/* VERIFY SIGNATURE */
-	
+
 	vparams.size = n_Y + n_p + n_g + 6;
 	vparams.data = data;
 
-	if (data_size-vparams.size-2 <= 0) { /* check if the peer sent enough data */
+	if (data_size - vparams.size - 2 <= 0) {	/* check if the peer sent enough data */
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-	
-	sigsize = READuint16( &data[vparams.size]);
-	signature.data = &data[vparams.size+2];
-	signature.size = GMIN(data_size-vparams.size-2, sigsize);
 
-	ret = _gnutls_verify_sig_params( state, &state->gnutls_internals.peer_cert, &vparams, &signature);
-	if (ret<0) {
+	sigsize = READuint16(&data[vparams.size]);
+	signature.data = &data[vparams.size + 2];
+	signature.size = GMIN(data_size - vparams.size - 2, sigsize);
+
+	if ((ret =
+	     _gnutls_cert2gnutlsCert( &peer_cert,
+				     info->raw_certificate_list[0])) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret =
+	    _gnutls_verify_sig_params(state,
+				      &peer_cert,
+				      &vparams, &signature);
+	
+	gnutls_free_cert( peer_cert);
+	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -349,16 +374,16 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	_n_Y = n_Y;
 
 	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y,
-			  GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
+			     GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	g = gnutls_get_dh_params(&p, bits);
-	if (g==NULL || p==NULL) {
+	if (g == NULL || p == NULL) {
 		gnutls_assert();
-		_gnutls_mpi_release( &g);
-		_gnutls_mpi_release( &p);
+		_gnutls_mpi_release(&g);
+		_gnutls_mpi_release(&p);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -368,7 +393,7 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	_gnutls_mpi_release(&g);
 	_gnutls_mpi_release(&p);
 
-	if (state->gnutls_key->KEY==NULL) {
+	if (state->gnutls_key->KEY == NULL) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -376,7 +401,7 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);
 	_gnutls_mpi_release(&state->gnutls_key->dh_secret);
 
-	ret = _gnutls_generate_key( state->gnutls_key);
+	ret = _gnutls_generate_key(state->gnutls_key);
 	_gnutls_mpi_release(&state->gnutls_key->KEY);
 
 	if (ret < 0) {

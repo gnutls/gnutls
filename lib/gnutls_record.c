@@ -217,7 +217,6 @@ int gnutls_deinit(GNUTLS_STATE state)
 	_gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);
 
 	_gnutls_free(state->gnutls_internals.db_name);
-	gnutls_free_cert( state->gnutls_internals.peer_cert);
 
 	memset( state, 0, sizeof(struct GNUTLS_STATE_INT));
 	gnutls_free(state);
@@ -433,6 +432,7 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
                         ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
                         break;
 		case GNUTLS_E_ASN1_PARSING_ERROR:
+		case GNUTLS_E_NO_CERTIFICATE_FOUND:
                         ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:

@@ -100,38 +100,16 @@ int gnutls_anon_client_get_dh_bits(GNUTLS_STATE state)
 /* X509PKI */
 
 /**
-  * gnutls_x509pki_get_peer_certificate_status - This function returns the peer's certificate status
+  * gnutls_x509pki_get_peer_certificate_list - This function returns the peer's raw (DER encoded) certificate
   * @state: is a gnutls state
+  * @list_size: is the length of the certificate list
   *
-  * This function will return the peer's certificate status (TRUSTED, EXPIRED etc.). This is the output
-  * of the certificate verification function. However you must also check the peer's name in order
-  * to check if the verified certificate belongs to the actual peer.
-  * Returns GNUTLS_CERT_NONE in case of an error, or if no certificate was sent.
-  *
-  **/
-CertificateStatus gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE
-							     state)
-{
-	X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_CERT_NONE);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_CERT_NONE;
-	return info->peer_certificate_status;
-}
-
-/**
-  * gnutls_x509pki_get_peer_certificate - This function returns the peer's raw (DER encoded) certificate
-  * @state: is a gnutls state
-  *
-  * This function will return the peer's raw certificate as sent by the peer.
-  * This certificate is DER encoded.
+  * This function will return the peer's raw certificate list as sent by the peer.
+  * These certificates are DER encoded. 
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/
-const gnutls_datum *gnutls_x509pki_get_peer_certificate(GNUTLS_STATE state)
+const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state, int *list_size)
 {
 	X509PKI_AUTH_INFO info;
 
@@ -140,29 +118,11 @@ const gnutls_datum *gnutls_x509pki_get_peer_certificate(GNUTLS_STATE state)
 	info = _gnutls_get_auth_info(state);
 	if (info == NULL)
 		return NULL;
-	return &info->raw_certificate;
+
+	*list_size = info->ncerts;
+	return info->raw_certificate_list;
 }
 
-/**
-  * gnutls_x509pki_get_peer_certificate_version - This function returns the peer's certificate version
-  * @state: is a gnutls state
-  *
-  * This function will return the peer's certificate version (1, 2, 3). This is obtained by the X509 Certificate
-  * Version field. If the certificate is invalid then version will be zero.
-  * Returns a negative value in case of an error.
-  *
-  **/
-int gnutls_x509pki_get_peer_certificate_version(GNUTLS_STATE state)
-{
-	X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
-	return info->peer_certificate_version;
-}
 
 /**
   * gnutls_x509pki_get_dh_bits - This function returns the number of bits used in a DHE handshake
@@ -186,71 +146,7 @@ int gnutls_x509pki_get_dh_bits(GNUTLS_STATE state)
 	return info->dh_bits;
 }
 
-/**
-  * gnutls_x509pki_get_peer_certificate_activation_time - This function returns the peer's certificate activation time
-  * @state: is a gnutls state
-  *
-  * This function will return the peer's certificate activation time in UNIX time 
-  * (ie seconds since 00:00:00 UTC January 1, 1970).
-  * Returns a (time_t) -1 in case of an error.
-  *
-  **/
-time_t gnutls_x509pki_get_peer_certificate_activation_time(GNUTLS_STATE
-							   state)
-{
-	X509PKI_AUTH_INFO info;
 
-	CHECK_AUTH(GNUTLS_X509PKI, -1);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return -1;
-	return info->peer_certificate_activation_time;
-}
-
-/**
-  * gnutls_x509pki_get_peer_certificate_expiration_time - This function returns the peer's certificate expiration time
-  * @state: is a gnutls state
-  *
-  * This function will return the peer's certificate expiration time in UNIX time 
-  * (ie seconds since 00:00:00 UTC January 1, 1970).
-  * Returns a (time_t) -1 in case of an error.
-  *
-  **/
-time_t gnutls_x509pki_get_peer_certificate_expiration_time(GNUTLS_STATE
-							   state)
-{
-	X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, -1);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return -1;
-	return info->peer_certificate_expiration_time;
-}
-
-
-/**
-  * gnutls_x509pki_get_key_usage - This function returns the peer's certificate key usage
-  * @state: is a gnutls state
-  *
-  * This function will return the peer's certificate key usage. This is specified in X509v3 Certificate
-  * Extensions and is an 8bit string.
-  * Returns zero in case of an error.
-  *
-  **/
-unsigned char gnutls_x509pki_get_key_usage(GNUTLS_STATE state)
-{
-	X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, 0);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return 0;
-	return info->keyUsage;
-}
 
 /**
   * gnutls_x509pki_get_certificate_request_status - This function returns the certificate request status
@@ -274,25 +170,3 @@ int gnutls_x509pki_get_certificate_request_status(GNUTLS_STATE state)
 }
 
 
-/**
-  * gnutls_x509pki_get_subject_dns_name - This function returns the peer's dns name, if any
-  * @state: is a gnutls state
-  *
-  * This function will return the peer's alternative name (the dns part of it). 
-  * This is specified in X509v3 Certificate Extensions. 
-  * GNUTLS will only return the dnsName of the Alternative name, or a null 
-  * string.
-  * Returns NULL in case of an error.
-  *
-  **/
-const char *gnutls_x509pki_get_subject_dns_name(GNUTLS_STATE state)
-{
-	X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, NULL);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return NULL;
-	return info->subjectAltDNSName;
-}

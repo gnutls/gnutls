@@ -261,17 +261,27 @@ AC_SUBST( DEFINE_SIZE_T)
 ])
 
 
-AC_CHECK_TYPE(time_t,,
-AC_DEFINE(NO_TIME_T),
+AC_CHECK_TYPE(time_t,
+ DEFINE_TIME_T="#include <time.h>"
+ AC_SUBST( DEFINE_TIME_T)
+ ,
+  AC_CHECK_TYPE(time_t,
+   DEFINE_TIME_T="#include <sys/time.h>"
+   AC_SUBST( DEFINE_TIME_T)
+   ,
+    DEFINE_TIME_T="typedef unsigned int time_t;"
+    AC_SUBST( DEFINE_TIME_T)
+    AC_DEFINE(NO_TIME_T),
+  [
+   #include <sys/time.h>
+  ]
+  )
+,
 [
-#ifdef HAVE_TIME_H
-# include <time.h>
-#endif
-#ifdef HAVE_SYS_TIME_H
-# include <sys/time.h>
-#endif
+ #include <time.h>
 ]
 )
+
 
 
 AC_C_BIGENDIAN

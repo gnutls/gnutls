@@ -7,14 +7,11 @@
 
 #define MAX_PARAMS_SIZE 2 /* ok for RSA */
 typedef struct gnutls_cert {
-	MPI params[MAX_PARAMS_SIZE];		/* the size of params depends on the public 
+	MPI params[MAX_PARAMS_SIZE];	/* the size of params depends on the public 
 				 * key algorithm 
 				 */
 	PKAlgorithm subject_pk_algorithm;
 
-	opaque	   subjectAltDNSName[X509_CN_SIZE]; 
-	int 	   subjectAltDNSName_size;
-	
 	opaque	   signature[1024];
 	int	   signature_size;
 	
@@ -58,5 +55,7 @@ void _gnutls_int2str(int k, char* data);
 int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_DN * dn);
 void gnutls_free_cert(gnutls_cert cert);
 int _gnutls_check_x509_key_usage( const gnutls_cert * cert, KXAlgorithm alg);
+int _gnutls_get_version(node_asn * c2, char *root);
+time_t _gnutls_get_time(node_asn * c2, char *root, char *when);
 
 #endif

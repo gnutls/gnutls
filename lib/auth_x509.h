@@ -45,18 +45,14 @@ typedef struct {
 
 typedef struct X509PKI_AUTH_INFO_INT {
 	CertificateStatus peer_certificate_status;
-	int		  peer_certificate_version;
-	time_t		  peer_certificate_activation_time;
-	time_t		  peer_certificate_expiration_time;
-	char		  subjectAltDNSName[X509_CN_SIZE];
-	unsigned char	  keyUsage;
 	int		  certificate_requested; /* if the peer requested certificate
 						  * this is non zero;
 						  */
 	int		  dh_bits; /* bits of the DH (if DHE_RSA is used) */
-	gnutls_datum	  raw_certificate; /* holds the raw certificate of the
+	gnutls_datum*	  raw_certificate_list; /* holds the raw certificate of the
 					    * peer.
 					    */
+	int 		  ncerts; /* holds the size of the list above */
 } *X509PKI_AUTH_INFO;
 
 typedef struct X509PKI_AUTH_INFO_INT X509PKI_AUTH_INFO_INT;

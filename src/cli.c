@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <netdb.h>
+#include <common.h>
 
 #ifndef SHUT_WR
 # define SHUT_WR 1
@@ -52,22 +53,13 @@
 #define CLIKEYFILE "x509/clikey.pem"
 #define CLICERTFILE "x509/clicert.pem"
 
-#define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
-#define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
-	PRINTX( "OU:", X.organizational_unit_name); \
-	PRINTX( "O:", X.organization); \
-	PRINTX( "L:", X.locality_name); \
-	PRINTX( "S:", X.state_or_province_name); \
-	PRINTX( "C:", X.country); \
-	PRINTX( "E:", X.email); \
-	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(state))
-
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
 CredType cred;
 gnutls_DN dn;
 CertificateStatus status;
-
+char dnsname[512];
+int dnsname_size;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp);

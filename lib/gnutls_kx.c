@@ -542,10 +542,6 @@ int _gnutls_recv_client_certificate( GNUTLS_STATE state)
 			}
 			/* certificate was required */
 			if (optional==MANDATORY_PACKET) {
-#ifdef DEBUG
-# warning FIX THIS ALERT
-				gnutls_send_alert(  state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
-#endif
 				gnutls_assert();
 			}
 			return ret;
@@ -634,10 +630,6 @@ int _gnutls_recv_client_certificate_verify_message( GNUTLS_STATE state)
 
 		if (ret==0 && datasize == 0 && state->gnutls_internals.send_cert_req == GNUTLS_CERT_REQUIRE) {
 			/* certificate was required */
-#ifdef DEBUG
-# warning FIX THIS ALERT
-			gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
-#endif
 			gnutls_assert();
 			return GNUTLS_E_NO_CERTIFICATE_FOUND;
 		} 

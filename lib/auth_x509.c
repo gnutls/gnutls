@@ -36,36 +36,52 @@
 #include <x509_verify.h>
 #include <gnutls_sig.h>
 #include <ext_dnsname.h>
+#include <x509_extensions.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (X509PKI_AUTH_INFO)
  */
-int _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify) {
+int _gnutls_copy_x509_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, int ncerts, CertificateStatus verify) {
  /* Copy peer's information to AUTH_INFO
   */
-int ret;
+int ret, i, j;
 
 	info->peer_certificate_status = verify;
 
-	info->peer_certificate_version = cert->version;
-	
-	if ( cert->subjectAltDNSName[0]!=0)
-		strcpy( info->subjectAltDNSName, cert->subjectAltDNSName);
-
-	info->keyUsage = cert->keyUsage;
-
-	info->peer_certificate_expiration_time = cert->expiration_time;
-	info->peer_certificate_activation_time = cert->activation_time;
-
-	if (cert->raw.size > 0) {
-		ret = gnutls_set_datum( &info->raw_certificate, cert->raw.data, cert->raw.size);
-		if ( ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
+	if (ncerts==0) {
+		info->raw_certificate_list = NULL;
+		info->ncerts = 0;
+		return 0;
 	}
 	
+	info->raw_certificate_list = gnutls_calloc( 1, sizeof(gnutls_datum)*ncerts);
+	if (info->raw_certificate_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	for (i=0;i<ncerts;i++) {
+		if (cert->raw.size > 0) {
+			ret = gnutls_set_datum( &info->raw_certificate_list[i], cert[i].raw.data, cert[i].raw.size);
+			if ( ret < 0) {
+				gnutls_assert();
+				goto clear;
+			}
+		}
+	}
+	info->ncerts = ncerts;
+		
 	return 0;
+	
+	clear:
+	
+	for (j=0;j<i;j++)
+		gnutls_free_datum( &info->raw_certificate_list[j]);
+
+	gnutls_free( info->raw_certificate_list);
+	info->raw_certificate_list = NULL;
+		
+	return ret;
 }
 
 typedef struct {
@@ -615,17 +631,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 			gnutls_free(peer_certificate_list);
 			return ret;
 		}
-		if (j==0) { /* Copy the first certificate in the chain - peer's certificate 
-			     * into the peer_cert. This is needed in order to access these
-			     * parameters later.
-			     */
-			if ((ret = _gnutls_cert2gnutlsCert(&state->gnutls_internals.peer_cert, tmp)) < 0) {
-				gnutls_assert();
-				CLEAR_CERTS;
-				gnutls_free(peer_certificate_list);
-				return ret;
-			}
-		}
 		
 		p += len;
 		i -= len + 3;
@@ -656,7 +661,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	/* keep the PK algorithm */
 	state->gnutls_internals.peer_pk_algorithm = peer_certificate_list[0].subject_pk_algorithm;
 
-	if ( (ret = _gnutls_copy_x509_client_auth_info(info, &peer_certificate_list[0], verify)) < 0) {
+	if ( (ret = _gnutls_copy_x509_auth_info(info, peer_certificate_list, peer_certificate_list_size, verify)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -804,6 +809,14 @@ int size, ret;
 int dsize = data_size;
 opaque* pdata = data;
 gnutls_datum sig;
+X509PKI_AUTH_INFO info = state->gnutls_key->auth_info;
+gnutls_cert peer_cert;
+
+	if (info == NULL || info->ncerts==0) {
+		gnutls_assert();
+		/* we need this in order to get peer's certificate */
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
 
 	DECR_LEN(dsize, 2);
 	size = READuint16( pdata);
@@ -817,10 +830,19 @@ gnutls_datum sig;
 	sig.data = pdata;
 	sig.size = size;
 
-	if ( (ret=_gnutls_verify_sig_hdata( state, &state->gnutls_internals.peer_cert, &sig, data_size+HANDSHAKE_HEADER_SIZE))<0) {
+	if ((ret =
+	     _gnutls_cert2gnutlsCert( &peer_cert,
+				     info->raw_certificate_list[0])) < 0) {
 		gnutls_assert();
 		return ret;
 	}
+
+	if ( (ret=_gnutls_verify_sig_hdata( state, &peer_cert, &sig, data_size+HANDSHAKE_HEADER_SIZE))<0) {
+		gnutls_assert();
+		gnutls_free_cert( peer_cert);
+		return ret;
+	}
+	gnutls_free_cert( peer_cert);
 
 	return 0;
 }
@@ -974,7 +996,7 @@ int gnutls_x509pki_get_peer_dn(GNUTLS_STATE state, gnutls_DN * ret)
 	}
 
 
-	result = asn1_get_der(c2, info->raw_certificate.data, info->raw_certificate.size);
+	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
@@ -1031,7 +1053,7 @@ int gnutls_x509pki_get_issuer_dn(GNUTLS_STATE state, gnutls_DN * ret)
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = asn1_get_der(c2, info->raw_certificate.data, info->raw_certificate.size);
+	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
@@ -1053,4 +1075,225 @@ int gnutls_x509pki_get_issuer_dn(GNUTLS_STATE state, gnutls_DN * ret)
 	asn1_delete_structure(c2);
 
 	return 0;
+}
+
+/**
+  * gnutls_x509pki_get_subject_dns_name - This function returns the peer's dns name, if any
+  * @state: is a gnutls state
+  * @ret: is the place where dns name will be copied to
+  * @ret_size: holds the size of ret.
+  *
+  * This function will return the peer's alternative name (the dns part of it). 
+  * This is specified in X509v3 Certificate Extensions. 
+  * GNUTLS will only return the dnsName of the Alternative name, or a negative
+  * error code.
+  * Returns GNUTLS_E_MEMORY_ERROR if ret_size is not enough to hold dns name,
+  * or the size of dns name if everything was ok.
+  *
+  * If the certificate does not have a DNS name then returns GNUTLS_E_DATA_NOT_AVAILABLE;
+  *
+  **/
+int gnutls_x509pki_get_subject_dns_name(GNUTLS_STATE state, char* ret, int *ret_size)
+{
+	X509PKI_AUTH_INFO info;
+	int result;
+	gnutls_datum dnsname;
+
+	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+
+	memset(ret, 0, *ret_size);
+
+	if ((result =
+	     _gnutls_get_extension( &info->raw_certificate_list[0], "2 5 29 17", &dnsname)) < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	if (dnsname.size==0) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+	
+	if ( *ret_size > dnsname.size) {
+		*ret_size = dnsname.size;
+		strcpy( ret, dnsname.data);
+		gnutls_free_datum( &dnsname);
+	} else {
+		*ret_size = dnsname.size;
+		gnutls_free_datum( &dnsname);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	return *ret_size;
+}
+
+/**
+  * gnutls_x509pki_get_peer_certificate_activation_time - This function returns the peer's certificate activation time
+  * @state: is a gnutls state
+  *
+  * This function will return the peer's certificate activation time in UNIX time 
+  * (ie seconds since 00:00:00 UTC January 1, 1970).
+  * Returns a (time_t) -1 in case of an error.
+  *
+  **/
+time_t gnutls_x509pki_get_peer_certificate_activation_time(GNUTLS_STATE
+							   state)
+{
+	X509PKI_AUTH_INFO info;
+	node_asn *c2;
+	int result;
+	time_t ret;
+
+	CHECK_AUTH(GNUTLS_X509PKI, -1);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return -1;
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	     "certificate2")
+	    != ASN_OK) {
+		gnutls_assert();
+		return -1;
+	}
+
+	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+#ifdef DEBUG
+		_gnutls_log("Decoding error %d\n", result);
+#endif
+		gnutls_assert();
+		return -1;
+	}
+
+	ret = _gnutls_get_time(c2, "certificate2", "notBefore");
+
+	asn1_delete_structure(c2);
+
+	return ret;	
+}
+
+/**
+  * gnutls_x509pki_get_peer_certificate_expiration_time - This function returns the peer's certificate expiration time
+  * @state: is a gnutls state
+  *
+  * This function will return the peer's certificate expiration time in UNIX time 
+  * (ie seconds since 00:00:00 UTC January 1, 1970).
+  * Returns a (time_t) -1 in case of an error.
+  *
+  **/
+time_t gnutls_x509pki_get_peer_certificate_expiration_time(GNUTLS_STATE
+							   state)
+{
+	X509PKI_AUTH_INFO info;
+	node_asn *c2;
+	int result;
+	time_t ret;
+
+	CHECK_AUTH(GNUTLS_X509PKI, -1);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return -1;
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	     "certificate2")
+	    != ASN_OK) {
+		gnutls_assert();
+		return -1;
+	}
+
+	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+#ifdef DEBUG
+		_gnutls_log("Decoding error %d\n", result);
+#endif
+		gnutls_assert();
+		return -1;
+	}
+
+	ret = _gnutls_get_time(c2, "certificate2", "notAfter");
+
+	asn1_delete_structure(c2);
+
+	return ret;	
+}
+
+/**
+  * gnutls_x509pki_get_peer_certificate_version - This function returns the peer's certificate version
+  * @state: is a gnutls state
+  *
+  * This function will return the peer's certificate version (1, 2, 3). This is obtained by the X509 Certificate
+  * Version field. If the certificate is invalid then version will be zero.
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_x509pki_get_peer_certificate_version(GNUTLS_STATE state)
+{
+	X509PKI_AUTH_INFO info;
+	node_asn *c2;
+	int result;
+
+	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	     "certificate2")
+	    != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+#ifdef DEBUG
+		_gnutls_log("Decoding error %d\n", result);
+#endif
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	result = _gnutls_get_version(c2, "certificate2");
+
+	asn1_delete_structure(c2);
+
+	return result;
+
+}
+
+/**
+  * gnutls_x509pki_get_peer_certificate_status - This function returns the peer's certificate status
+  * @state: is a gnutls state
+  *
+  * This function will return the peer's certificate status (TRUSTED, EXPIRED etc.). This is the output
+  * of the certificate verification function. However you must also check the peer's name in order
+  * to check if the verified certificate belongs to the actual peer.
+  * Returns GNUTLS_CERT_NONE in case of an error, or if no certificate was sent.
+  *
+  **/
+CertificateStatus gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE
+							     state)
+{
+	X509PKI_AUTH_INFO info;
+
+	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_CERT_NONE);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_CERT_NONE;
+
+	return info->peer_certificate_status;
 }

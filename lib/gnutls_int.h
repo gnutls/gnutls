@@ -452,7 +452,6 @@ typedef struct {
 	 * client certificates were found.
 	 */
 	x509_cert_callback_func*	x509_client_cert_callback;
-	gnutls_cert			peer_cert;
 	int				max_handshake_data_buffer_size;
 
 	/* PUSH & PULL functions.
