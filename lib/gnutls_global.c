@@ -23,7 +23,7 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_dh.h>
-#include "rc2.h"
+#include "x509/rc2.h"
 
 typedef void (*LOG_FUNC)( int, const char*);
 #define gnutls_log_func LOG_FUNC

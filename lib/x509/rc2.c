@@ -26,6 +26,13 @@
  */
 
 #include <gnutls_int.h>
+
+#ifdef ENABLE_PKI
+
+/* RC2-40 is only used in PKCS #12 stuff, so do not include it
+ * if this is not enabled.
+ */
+
 #include <gnutls_errors.h>
 #include <gcrypt.h>
 
@@ -364,3 +371,17 @@ void _gnutls_unregister_rc2_cipher(void)
 {
 	gcry_cipher_unregister(rc2_40_mod);
 }
+
+#else /* ENABLE_PKI */
+
+/* dummy functions.
+ */
+
+int _gnutls_register_rc2_cipher(void)
+{ return 0; }
+
+void _gnutls_unregister_rc2_cipher(void)
+{
+}
+
+#endif
