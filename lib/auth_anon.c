@@ -88,7 +88,8 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 		return ret;
 	}
 
-	if ((ret=_gnutls_dh_set_prime_bits( session, _gnutls_mpi_get_nbits(p))) < 0) {
+	ret=_gnutls_dh_set_prime( session, g, p);
+	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -111,7 +112,7 @@ GNUTLS_MPI p, g;
 gnutls_dh_params dh_params;
 const GNUTLS_MPI *mpis;
   	
-	bits = _gnutls_dh_get_prime_bits( session);
+	bits = _gnutls_dh_get_allowed_prime_bits( session);
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
 	if (cred == NULL) {

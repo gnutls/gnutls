@@ -73,7 +73,7 @@ int gnutls_dh_get_prime_bits(gnutls_session session)
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
-			return info->dh_prime_bits;
+			return info->dh.prime_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
 			CERTIFICATE_AUTH_INFO info;
@@ -82,12 +82,99 @@ int gnutls_dh_get_prime_bits(gnutls_session session)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			return info->dh_prime_bits;
+			return info->dh.prime_bits;
 		}
 		default:
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
 	}
+}
+
+/**
+  * gnutls_dh_get_prime - This function returns the prime used in DH authentication
+  * @session: is a gnutls session
+  * @raw_prime: will hold the prime. To be treated as constant.
+  *
+  * This function will return the prime used in the last Diffie Hellman authentication
+  * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_dh_get_prime(gnutls_session session, gnutls_datum* raw_prime)
+{
+dh_info_st dh;
+ANON_SERVER_AUTH_INFO anon_info;
+CERTIFICATE_AUTH_INFO cert_info;
+
+	switch( gnutls_auth_get_type( session)) {
+		case GNUTLS_CRD_ANON: {
+			anon_info = _gnutls_get_auth_info(session);
+			if (anon_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = anon_info->dh;
+			break;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+
+			cert_info = _gnutls_get_auth_info(session);
+			if (cert_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = cert_info->dh;
+			break;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	raw_prime->data = dh.prime;
+	raw_prime->size = dh.prime_size;
+	
+	return 0;
+}
+
+
+/**
+  * gnutls_dh_get_generator - This function returns the generator used in DH authentication
+  * @session: is a gnutls session
+  * @raw_gen: will hold the generator. To be treated as constant.
+  *
+  * This function will return the generator used in the last Diffie Hellman authentication
+  * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_dh_get_generator(gnutls_session session, gnutls_datum* raw_gen)
+{
+dh_info_st dh;
+ANON_SERVER_AUTH_INFO anon_info;
+CERTIFICATE_AUTH_INFO cert_info;
+
+	switch( gnutls_auth_get_type( session)) {
+		case GNUTLS_CRD_ANON: {
+			anon_info = _gnutls_get_auth_info(session);
+			if (anon_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = anon_info->dh;
+			break;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+
+			cert_info = _gnutls_get_auth_info(session);
+			if (cert_info == NULL)
+				return GNUTLS_E_INTERNAL_ERROR;
+			dh = cert_info->dh;
+			break;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	raw_gen->data = dh.generator;
+	raw_gen->size = dh.generator_size;
+	
+	return 0;
 }
 
 /**
@@ -108,7 +195,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
-			return info->dh_secret_bits;
+			return info->dh.secret_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
 			CERTIFICATE_AUTH_INFO info;
@@ -117,7 +204,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			return info->dh_secret_bits;
+			return info->dh.secret_bits;
 		}
 		default:
 			gnutls_assert();
@@ -164,7 +251,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
-			return info->dh_peer_public_bits;
+			return info->dh.peer_public_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
 			CERTIFICATE_AUTH_INFO info;
@@ -173,7 +260,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			return info->dh_peer_public_bits;
+			return info->dh.peer_public_bits;
 		}
 		default:
 			gnutls_assert();

@@ -385,7 +385,9 @@ void gnutls_deinit(gnutls_session session)
 	gnutls_free(session);
 }
 
-int _gnutls_dh_get_prime_bits( gnutls_session session) 
+/* Returns the minimum prime bits that are acceptable.
+ */
+int _gnutls_dh_get_allowed_prime_bits( gnutls_session session) 
 {
 	return session->internals.dh_prime_bits;
 }
@@ -398,7 +400,7 @@ int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits)
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
-			info->dh_peer_public_bits = bits;
+			info->dh.peer_public_bits = bits;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -408,7 +410,7 @@ int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			info->dh_peer_public_bits = bits;
+			info->dh.peer_public_bits = bits;
 			break;
 		}
 		default:
@@ -427,7 +429,7 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits)
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
-			info->dh_secret_bits = bits;
+			info->dh.secret_bits = bits;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -437,7 +439,7 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			info->dh_secret_bits = bits;
+			info->dh.secret_bits = bits;
 			break;
 		default:
 			gnutls_assert();
@@ -462,7 +464,9 @@ int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits)
 }
 
 
-int _gnutls_dh_set_prime_bits( gnutls_session session, uint bits) 
+/* Sets the prime and the generator in the auth info structure.
+ */
+int _gnutls_dh_set_prime( gnutls_session session, mpi_t gen, mpi_t prime)
 {
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
@@ -470,7 +474,10 @@ int _gnutls_dh_set_prime_bits( gnutls_session session, uint bits)
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
-			info->dh_prime_bits = bits;
+
+			 _gnutls_mpi_print_lz( info->dh.prime, &info->dh.prime_size, prime);
+			 _gnutls_mpi_print_lz( info->dh.generator, &info->dh.generator_size, gen);
+			info->dh.prime_bits = _gnutls_mpi_get_nbits(prime);
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -480,7 +487,9 @@ int _gnutls_dh_set_prime_bits( gnutls_session session, uint bits)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			info->dh_prime_bits = bits;
+			 _gnutls_mpi_print_lz( info->dh.prime, &info->dh.prime_size, prime);
+			 _gnutls_mpi_print_lz( info->dh.generator, &info->dh.generator_size, gen);
+			info->dh.prime_bits = _gnutls_mpi_get_nbits(prime);
 			break;
 		}
 		default:

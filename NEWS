@@ -15,6 +15,8 @@ Version 1.1.10
   automatically removed any more, on abnormal termination.
 - Corrected session resuming in SRP ciphersuites.
 - Updated to conform to the latest srp draft (draft-ietf-tls-srp-07)
+- Added new functions to allow access to the ephemeral
+  Diffie Hellman parameters.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage

@@ -52,6 +52,8 @@ gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
 	case GNUTLS_CIPHER_RC2_40_CBC:
 		err = gcry_cipher_open(&ret, GCRY_CIPHER_RFC2268_40, GCRY_CIPHER_MODE_CBC, 0);
 		break;
+	default:
+		return NULL;
 	}
 
 	if (err == 0) {

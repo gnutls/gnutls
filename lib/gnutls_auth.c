@@ -291,7 +291,9 @@ void _gnutls_free_auth_info( gnutls_session session) {
  * If allow change is !=0 then this will allow changing the auth
  * info structure to a different type.
  */
-int _gnutls_auth_info_set( gnutls_session session, gnutls_credentials_type type, int size, int allow_change) {
+int _gnutls_auth_info_set( gnutls_session session, 
+	gnutls_credentials_type type, int size, int allow_change) 
+{
 	if ( session->key->auth_info == NULL) {
 		session->key->auth_info = gnutls_calloc( 1, size);
 		if (session->key->auth_info == NULL) {

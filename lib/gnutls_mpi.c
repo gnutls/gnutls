@@ -79,7 +79,7 @@ int ret;
 	if (nbytes == NULL || a == NULL) return GNUTLS_E_INVALID_REQUEST;
 
 	ret = gcry_mpi_print( GCRYMPI_FMT_USG, buffer, *nbytes, nbytes, a);
-	if (!ret) return ret;
+	if (!ret) return 0;
 	
 	return GNUTLS_E_MPI_PRINT_FAILED;
 }
@@ -92,8 +92,35 @@ int ret;
 	if (nbytes == NULL || a == NULL) return GNUTLS_E_INVALID_REQUEST;
 
 	ret = gcry_mpi_print( GCRYMPI_FMT_STD, buffer, *nbytes, nbytes, a);
-	if (!ret) return ret;
+	if (!ret) return 0;
 	
+	return GNUTLS_E_MPI_PRINT_FAILED;
+}
+
+/* Always has the first bit zero */
+int _gnutls_mpi_dprint_lz( gnutls_datum* dest, const GNUTLS_MPI a ) 
+{
+int ret;
+opaque* buf = NULL;
+size_t bytes = 0;
+
+	if (dest == NULL || a == NULL) return GNUTLS_E_INVALID_REQUEST;
+
+	gcry_mpi_print( GCRYMPI_FMT_STD, NULL, 0, &bytes, a);
+	
+	if (bytes != 0)
+		buf = gnutls_malloc( bytes);
+	if (buf == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+
+	ret = gcry_mpi_print( GCRYMPI_FMT_STD, buf, bytes, &bytes, a);
+	if (!ret) {
+		dest->data = buf;
+		dest->size = bytes;
+		return 0;
+	}
+	
+	gnutls_free(buf);
 	return GNUTLS_E_MPI_PRINT_FAILED;
 }
 

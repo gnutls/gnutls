@@ -1,5 +1,6 @@
 /* this is not to be included by gnutls_anon.c */
 #include <gnutls_auth.h>
+#include <auth_dh_common.h>
 
 typedef struct {
 	gnutls_dh_params dh_params;
@@ -13,9 +14,7 @@ typedef struct {
 #define gnutls_anon_client_credentials void*
 
 typedef struct ANON_CLIENT_AUTH_INFO_INT {
-	int dh_prime_bits;
-	int dh_secret_bits;
-	int dh_peer_public_bits;
+	dh_info_st dh;
 } *ANON_CLIENT_AUTH_INFO;
 
 typedef ANON_CLIENT_AUTH_INFO ANON_SERVER_AUTH_INFO;

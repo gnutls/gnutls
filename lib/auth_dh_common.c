@@ -199,21 +199,21 @@ int _gnutls_proc_dh_common_server_kx( gnutls_session session, opaque* data, size
 	_n_g = n_g;
 	_n_p = n_p;
 
-	if (_gnutls_mpi_scan(&session->key->client_Y, data_Y, &_n_Y) != 0 || session->key->client_Y==NULL) {
+	if (_gnutls_mpi_scan(&session->key->client_Y, data_Y, &_n_Y) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan(&session->key->client_g, data_g, &_n_g) != 0 || session->key->client_g==NULL) {
+	if (_gnutls_mpi_scan(&session->key->client_g, data_g, &_n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	if (_gnutls_mpi_scan(&session->key->client_p, data_p, &_n_p) != 0 || session->key->client_p==NULL) {
+	if (_gnutls_mpi_scan(&session->key->client_p, data_p, &_n_p) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	bits = _gnutls_dh_get_prime_bits( session);
+	bits = _gnutls_dh_get_allowed_prime_bits( session);
 	if (bits < 0) {
 		gnutls_assert();
 		return bits;
@@ -225,9 +225,8 @@ int _gnutls_proc_dh_common_server_kx( gnutls_session session, opaque* data, size
 		gnutls_assert();
 		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 	}
-	
-	ret=_gnutls_dh_set_prime_bits( session, _gnutls_mpi_get_nbits(
-		session->key->client_p));
+
+	ret=_gnutls_dh_set_prime( session, session->key->client_g, session->key->client_p);
 	if (ret<0) {
 		gnutls_assert();
 		return ret;

@@ -97,7 +97,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	bits = _gnutls_dh_get_prime_bits( session);
+	bits = _gnutls_dh_get_allowed_prime_bits( session);
 
 	/* find the appropriate certificate */
 	if ((ret =
@@ -126,7 +126,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	}
 
 	info = _gnutls_get_auth_info( session);
-	ret=_gnutls_dh_set_prime_bits( session, _gnutls_mpi_get_nbits(p));
+	ret=_gnutls_dh_set_prime( session, g, p);
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -234,14 +234,11 @@ static int proc_dhe_server_kx(gnutls_session session, opaque * data,
 static int proc_dhe_client_kx(gnutls_session session, opaque * data,
 				  size_t _data_size)
 {
-int bits;
 const gnutls_certificate_credentials cred;
 int ret;
 GNUTLS_MPI p, g;
 const GNUTLS_MPI *mpis;
 gnutls_dh_params dh_params;
-
-	bits = _gnutls_dh_get_prime_bits( session);
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
