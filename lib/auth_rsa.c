@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -152,9 +152,9 @@ const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 
 
 
-#define RANDOMIZE_KEY(x, galloc) x.size=TLS_MASTER_SIZE; x.data=galloc(x.size); \
+#define RANDOMIZE_KEY(x, galloc, rand) x.size=TLS_MASTER_SIZE; x.data=galloc(x.size); \
 		if (x.data==NULL) return GNUTLS_E_MEMORY_ERROR; \
-		if (_gnutls_get_random( x.data, x.size, GNUTLS_WEAK_RANDOM) < 0) { \
+		if (_gnutls_get_random( x.data, x.size, rand) < 0) { \
 			gnutls_assert(); \
 			return GNUTLS_E_MEMORY_ERROR; \
 		}
@@ -202,12 +202,12 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		_gnutls_log("RSA_AUTH: Possible PKCS-1 format attack\n");
 
 		RANDOMIZE_KEY(state->gnutls_key->key,
-			      gnutls_secure_malloc);
+			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
 	} else {
 		ret = 0;
 		if (plaintext.size != TLS_MASTER_SIZE) {	/* WOW */
 			RANDOMIZE_KEY(state->gnutls_key->key,
-				      gnutls_secure_malloc);
+				      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
 		} else {
 			if (_gnutls_get_adv_version_major(state) !=
 			    plaintext.data[0]
@@ -253,7 +253,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
-	RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
+	RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
 
 	ver = _gnutls_get_adv_version(state);
 
@@ -280,7 +280,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	_gnutls_mpi_release(&state->gnutls_key->x);
 
 
-	if (ver == GNUTLS_SSL3) {
+	if (gnutls_protocol_get_version( state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		*data = sdata.data;
 		return sdata.size;
