@@ -4,15 +4,13 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
-+ Add support for temporary RSA keys (needed in EXPORT ciphersuites)
 * Add option to read the SRP parameters using a callback (server side)
-* Add support for the certificate authenticated SRP cipher suites
-* Add function to return cipher suite names
 * Convert documentation to texinfo format
 * Merge common stuff in DHE and DHA key exchange
-* Add GPGSM certificate manager support
-* Add support for certificate CRLs
+* Add support for certificate CRLs in certificate verification
 * Audit the code
+* Add GPGSM certificate manager support
+- Add support for the certificate authenticated SRP cipher suites
 - Add Kerberos support
 
 (+) Means high priority 
