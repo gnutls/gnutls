@@ -151,6 +151,9 @@ AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(unsigned short int, 2)
 AC_CHECK_SIZEOF(unsigned char, 1)
 
+AC_CHECK_TYPE( ptrdiff_t, long)
+AC_CHECK_SIZEOF(ptrdiff_t)
+
 AC_CHECK_TYPE(size_t,
 DEFINE_SIZE_T="#include <sys/types.h>"
 AC_SUBST( DEFINE_SIZE_T)

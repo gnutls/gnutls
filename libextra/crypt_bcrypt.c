@@ -641,7 +641,7 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, G
 	if (spe == NULL) { /* no ':' was found */
 		len = strlen(sp);
 	} else
-		len = (unsigned long int)spe - (unsigned long int)sp;
+		len = (ptrdiff_t)spe - (ptrdiff_t)sp;
 
 	if (_gnutls_sbase64_decode(sp, len, &csalt) < 0) {
 		gnutls_assert();
