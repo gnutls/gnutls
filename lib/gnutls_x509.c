@@ -1930,11 +1930,12 @@ char name1[128];
 
 		/* Now read the parameters
 		 */
+		_gnutls_str_cpy( name1, sizeof(name1), name);
+		_gnutls_str_cat( name1, sizeof(name1), ".tbsCertificate.subjectPublicKeyInfo.algorithm.parameters");
+
 		len = tmpstr_size - 1;
 		result =
-		    asn1_read_value
-		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
-		     tmpstr, &len);
+		    asn1_read_value(c2, name1, tmpstr, &len);
 
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
