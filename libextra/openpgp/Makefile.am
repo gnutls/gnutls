@@ -7,7 +7,7 @@ EXTRA_DIST = openpgp.h gnutls_openpgp.h $(COBJECTS) pgp-api.texi
 
 pgp-api.texi: $(COBJECTS)
 	@echo "" > pgp-api.texi
-	@for i in $(COBJECTS); do \
+	@for i in ../gnutls_openpgp.c $(COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
 		../../doc/scripts/gdoc -texinfo $$i >> pgp-api.texi && \
 		echo "ok"; \
