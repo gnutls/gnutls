@@ -39,8 +39,8 @@
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_cipher_set_priority( gnutls_session session, gnutls_list list) {
-gnutls_list _list = list;
+int gnutls_cipher_set_priority( gnutls_session session, const int* list) {
+const int* _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -70,8 +70,8 @@ int num=0, i;
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
  **/
-int gnutls_kx_set_priority( gnutls_session session, gnutls_list list) {
-gnutls_list _list = list;
+int gnutls_kx_set_priority( gnutls_session session, const int* list) {
+const int* _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -102,8 +102,8 @@ int num=0, i;
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_mac_set_priority( gnutls_session session, gnutls_list list) {
-gnutls_list _list = list;
+int gnutls_mac_set_priority( gnutls_session session, const int* list) {
+const int* _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -139,8 +139,8 @@ int num=0, i;
   * as gnutls extensions.
   *
   **/
-int gnutls_compression_set_priority( gnutls_session session, gnutls_list list) {
-gnutls_list _list = list;
+int gnutls_compression_set_priority( gnutls_session session, const int* list) {
+const int* _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -167,8 +167,8 @@ int num=0, i;
   * versions always have highest priority.
   *
   **/
-int gnutls_protocol_set_priority( gnutls_session session, gnutls_list list) {
-gnutls_list _list = list;
+int gnutls_protocol_set_priority( gnutls_session session, const int* list) {
+const int* _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -205,9 +205,9 @@ int num=0, i;
   * The server does not use the cert type priority except for disabling
   * types that were not specified.
   **/
-int gnutls_certificate_type_set_priority( gnutls_session session, gnutls_list list) {
+int gnutls_certificate_type_set_priority( gnutls_session session, const int* list) {
 #ifdef HAVE_LIBOPENCDK
-gnutls_list _list = list;
+const int* _list = list;
 int num=0, i;
 
 
