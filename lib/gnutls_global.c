@@ -21,15 +21,27 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <x509_asn1.h>
-#ifdef HAVE_SIGNAL_H
-# include <signal.h>
+
+#ifdef USE_SIGNALS
+
+# ifdef HAVE_SIGNAL_H
+#  include <signal.h>
+# endif
+
+# ifndef SIGFUNC
+#  define SIGFUNC
+ typedef void Sigfunc(int);
+# endif
+static Sigfunc *Signal( int signo, Sigfunc *func);
+
 #endif
+
 
 /* created by asn1c */
 extern const static_asn pkcs1_asn1_tab[];
 extern const static_asn pkix_asn1_tab[];
 
-static void* old_sig_handler;
+static Sigfunc *old_sig_handler;
 
 typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
 typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
@@ -115,6 +127,11 @@ static void dlog( const char* str) {
   * shared by gnutls state structures.
   * You must call gnutls_global_deinit() when gnutls usage is no longer needed
   * Returns zero on success.
+  *
+  * If signals are supported in your system, this function sets SIGPIPE,
+  * to SIG_IGN. The old signal handler will be restored when calling
+  * gnutls_global_deinit().
+  *
   **/
 int gnutls_global_init()
 {
@@ -124,8 +141,8 @@ int gnutls_global_init()
 	gcry_set_allocation_handler(gnutls_malloc, secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
 
 	/* we need this */
-#ifdef HAVE_SIGNAL
-	old_sig_handler = signal( SIGPIPE, SIG_IGN);
+#ifdef USE_SIGNALS
+	old_sig_handler = Signal( SIGPIPE, SIG_IGN);
 #endif
 
 	/* set default recv/send functions
@@ -162,10 +179,49 @@ int gnutls_global_init()
 void gnutls_global_deinit() {
 
 	/* restore signal handler  */
-#ifdef HAVE_SIGNAL
-	signal( SIGPIPE, old_sig_handler);
+#ifdef USE_SIGNALS
+	Signal( SIGPIPE, old_sig_handler);
 #endif
 	asn1_delete_structure( PKCS1_ASN);
 	asn1_delete_structure( PKIX1_ASN);
 
 }
+
+#ifdef USE_SIGNALS
+
+/* This is an emulation of the signal() function, using the
+ * POSIX sigaction() (if present).
+ */
+static Sigfunc *
+ Signal(int signo, Sigfunc * func)
+{
+#ifdef HAVE_SIGACTION
+
+	struct sigaction act, oact;
+
+	act.sa_handler = func;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	if (signo == SIGALRM) {
+#ifdef SA_INTERRUPT
+		act.sa_flags |= SA_INTERRUPT;	/* SunOs 4.x */
+#endif
+	} else {
+#ifdef SA_RESTART
+		act.sa_flags |= SA_RESTART;	/* SVR4, 4.4BSD */
+#endif
+	}
+
+	if (sigaction(signo, &act, &oact) < 0)
+		return (SIG_ERR);
+	return (oact.sa_handler);
+
+#else /* ifdef HAVE_SIGACTION */
+#ifdef HAVE_SIGNAL
+	return signal(signo, func);
+#else
+	return (Sigfunc *) 0;	/* Do nothing */
+#endif /* HAVE_SIGNAL */
+#endif /* HAVE_SIGACTION */
+}
+#endif /* USE_SIGNALS */
