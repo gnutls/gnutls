@@ -55,7 +55,7 @@ int gnutls_x509_crq_init(gnutls_x509_crq * crq)
 
 	if (*crq) {
 		int result = asn1_create_element(_gnutls_get_pkix(),
-				     "PKIX1.CertificationRequest",
+				     "PKIX1.pkcs-10-CertificationRequest",
 				     &((*crq)->crq));
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();

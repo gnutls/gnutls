@@ -948,52 +948,52 @@ ub-x121-address-length INTEGER ::= 16
 
 -- Cryptographic Message Syntax
 
-ContentInfo ::= SEQUENCE {
-  contentType ContentType,
+pkcs-7-ContentInfo ::= SEQUENCE {
+  contentType pkcs-7-ContentType,
   content [0] EXPLICIT ANY DEFINED BY contentType }
 
-ContentType ::= OBJECT IDENTIFIER
+pkcs-7-ContentType ::= OBJECT IDENTIFIER
 
-SignedData ::= SEQUENCE {
-  version CMSVersion,
-  digestAlgorithms DigestAlgorithmIdentifiers,
-  encapContentInfo EncapsulatedContentInfo,
-  certificates [0] IMPLICIT CertificateSet OPTIONAL,
-  crls [1] IMPLICIT CertificateRevocationLists OPTIONAL,
-  signerInfos SignerInfos 
+pkcs-7-SignedData ::= SEQUENCE {
+  version pkcs-7-CMSVersion,
+  digestAlgorithms pkcs-7-DigestAlgorithmIdentifiers,
+  encapContentInfo pkcs-7-EncapsulatedContentInfo,
+  certificates [0] IMPLICIT pkcs-7-CertificateSet OPTIONAL,
+  crls [1] IMPLICIT pkcs-7-CertificateRevocationLists OPTIONAL,
+  signerInfos pkcs-7-SignerInfos 
 }
 
-CMSVersion ::= INTEGER  { v0(0), v1(1), v2(2), v3(3), v4(4) }
+pkcs-7-CMSVersion ::= INTEGER  { v0(0), v1(1), v2(2), v3(3), v4(4) }
 
-DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+pkcs-7-DigestAlgorithmIdentifiers ::= SET OF pkcs-7-DigestAlgorithmIdentifier
 
-DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+pkcs-7-DigestAlgorithmIdentifier ::= AlgorithmIdentifier
 
-EncapsulatedContentInfo ::= SEQUENCE {
-  eContentType ContentType,
+pkcs-7-EncapsulatedContentInfo ::= SEQUENCE {
+  eContentType pkcs-7-ContentType,
   eContent [0] EXPLICIT OCTET STRING OPTIONAL }
 
 -- We don't use CertificateList here since we only want
 -- to read the raw data.
-CertificateRevocationLists ::= SET OF ANY
+pkcs-7-CertificateRevocationLists ::= SET OF ANY
 
-CertificateChoices ::= CHOICE {
+pkcs-7-CertificateChoices ::= CHOICE {
 -- Although the paper uses Certificate type, we
 -- don't use it since, we don't need to parse it.
 -- We only need to read and store it.
   certificate ANY
 }
 
-CertificateSet ::= SET OF CertificateChoices
+pkcs-7-CertificateSet ::= SET OF pkcs-7-CertificateChoices
 
-SignerInfos ::= SET OF ANY -- this is not correct but we don't use it
+pkcs-7-SignerInfos ::= SET OF ANY -- this is not correct but we don't use it
  -- anyway
 
 
 -- BEGIN of RFC2986
 
 -- Certificate requests
-CertificationRequestInfo ::= SEQUENCE {
+pkcs-10-CertificationRequestInfo ::= SEQUENCE {
      version       INTEGER { v1(0) },
      subject       Name,
      subjectPKInfo SubjectPublicKeyInfo,
@@ -1002,8 +1002,8 @@ CertificationRequestInfo ::= SEQUENCE {
 
 Attributes ::= SET OF Attribute
 
-CertificationRequest ::= SEQUENCE {
-     certificationRequestInfo CertificationRequestInfo,
+pkcs-10-CertificationRequest ::= SEQUENCE {
+     certificationRequestInfo pkcs-10-CertificationRequestInfo,
      signatureAlgorithm AlgorithmIdentifier,
      signature          BIT STRING
 }
@@ -1015,9 +1015,9 @@ pkcs-9-ub-challengePassword   INTEGER ::= 255
 pkcs-9-certTypes OBJECT IDENTIFIER ::= {pkcs-9 22}
 pkcs-9-crlTypes OBJECT IDENTIFIER ::= {pkcs-9 23}
 
-challengePassword AttributeType	   ::= {pkcs-9 7}
+pkcs-9-challengePassword AttributeType	   ::= {pkcs-9 7}
 
-Pkcs9challengePassword        ::= CHOICE {
+pkcs-9-challengePassword        ::= CHOICE {
       printableString       PrintableString (SIZE (1..pkcs-9-ub-challengePassword)),
       utf8String            UTF8String (SIZE (1..pkcs-9-ub-challengePassword)) }
 
@@ -1090,7 +1090,7 @@ pkcs-12	OBJECT IDENTIFIER ::= {pkcs 12}
 
 pkcs-12-PFX ::= SEQUENCE {
     	version		INTEGER {v3(3)},
-    	authSafe	ContentInfo,
+    	authSafe	pkcs-7-ContentInfo,
     	macData    	pkcs-12-MacData OPTIONAL
 }
 
@@ -1104,7 +1104,7 @@ pkcs-12-MacData ::= ANY
 -- deprecated. A higher value, like 1024 is recommended.
 --}
 
-pkcs-12-AuthenticatedSafe ::= SEQUENCE OF ContentInfo
+pkcs-12-AuthenticatedSafe ::= SEQUENCE OF pkcs-7-ContentInfo
 	-- Data if unencrypted
 	-- EncryptedData if password-encrypted
 	-- EnvelopedData if public key-encrypted
@@ -1171,12 +1171,12 @@ pkcs-7-encryptedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
 pkcs-7-Data ::= OCTET STRING
 
 pkcs-7-EncryptedData ::= SEQUENCE {
-    version CMSVersion,
+    version pkcs-7-CMSVersion,
     encryptedContentInfo pkcs-7-EncryptedContentInfo,
     unprotectedAttrs [1] IMPLICIT pkcs-7-UnprotectedAttributes OPTIONAL }
 
 pkcs-7-EncryptedContentInfo ::= SEQUENCE {
-    contentType ContentType,
+    contentType pkcs-7-ContentType,
     contentEncryptionAlgorithm pkcs-7-ContentEncryptionAlgorithmIdentifier,
     encryptedContent [0] IMPLICIT pkcs-7-EncryptedContent OPTIONAL }
 

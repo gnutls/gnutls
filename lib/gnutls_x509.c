@@ -1032,7 +1032,7 @@ static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
 		
 		tmp.data = (char*)ptr;
 		tmp.size = size;
-	
+
 		ret =
 		     gnutls_x509_crt_import(
 				     cert_list[0][i - 1],

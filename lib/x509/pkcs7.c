@@ -63,7 +63,7 @@ int tmp_size, len, result;
 	}
 
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.pkcs-7-SignedData", &c2)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -141,7 +141,7 @@ int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7)
 
 	if (*pkcs7) {
 		int result = asn1_create_element(_gnutls_get_pkix(),
-				     "PKIX1.ContentInfo",
+				     "PKIX1.pkcs-7-ContentInfo",
 				     &(*pkcs7)->pkcs7);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
@@ -395,7 +395,7 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 	*sdata = ASN1_TYPE_EMPTY;
 
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", sdata)) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.pkcs-7-SignedData", sdata)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
