@@ -92,7 +92,7 @@ int main()
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake has failed\n");
 		gnutls_perror(ret);
-		gnutls_deinit(&state);
+		gnutls_deinit(state);
 		return 1;
 	} else {
 		printf("- Handshake was completed\n");
@@ -123,7 +123,7 @@ int main()
 	gnutls_close(sd, state);
 	shutdown( sd, SHUT_WR);
 	close(sd);	
-	gnutls_deinit( &state);	
+	gnutls_deinit( state);	
 	
 	printf("\n\n- Connecting again- trying to resume previous session\n");
 	sd = socket(AF_INET, SOCK_STREAM, 0);
@@ -157,7 +157,7 @@ int main()
 	if (ret < 0) {
 		fprintf(stderr, "*** Handshake failed\n");
 		gnutls_perror(ret);
-		gnutls_deinit(&state);
+		gnutls_deinit(state);
 		return 1;
 	} else {
 		printf("- Handshake was completed\n");
@@ -216,11 +216,17 @@ int main()
 					break;
 				}
 			} else {
-				printf("- Received[%d]: ", ret);
-				for (ii=0;ii<ret;ii++) {
-					fputc(buffer[ii], stdout);
+				if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
+					printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
+				else {
+					if (ret > 0) {
+						printf("- Received[%d]: ", ret);
+						for (ii=0;ii<ret;ii++) {
+							fputc(buffer[ii], stdout);
+						}
+						fputs("\n", stdout);
+					}
 				}
-				fputs("\n", stdout);
 			}
 			if (user_term!=0) break;
 		}
@@ -240,6 +246,6 @@ int main()
 	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);
 	
-	gnutls_deinit(&state);
+	gnutls_deinit( state);
 	return 0;
 }

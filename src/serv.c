@@ -36,7 +36,7 @@
 
 int main()
 {
-    int err, listen_sd;
+    int err, listen_sd, i;
     int sd, ret;
     struct sockaddr_in sa_serv;
     struct sockaddr_in sa_cli;
@@ -95,7 +95,7 @@ int main()
 	ret = gnutls_handshake(sd, state);
 	if (ret < 0) {
 	    close(sd);
-	    gnutls_deinit(&state);
+	    gnutls_deinit( state);
 	    fprintf(stderr, "*** Handshake has failed (%d)\n", ret);
 	    gnutls_perror(ret);
 	    continue;
@@ -125,11 +125,12 @@ int main()
 			sizeof("hello client"));
 	if (ret < 0) {
 	    close(sd);
-	    gnutls_deinit(&state);
+	    gnutls_deinit( state);
 	    gnutls_perror(ret);
 	    continue;
 	}
 */
+	i = 0;
 	for (;;) {
 	    bzero( buffer, MAX_BUF+1);
 	    ret = gnutls_read(sd, state, buffer, MAX_BUF);
@@ -143,12 +144,21 @@ int main()
 		}
 
 	    }
-	    gnutls_write(sd, state, buffer, strlen(buffer));
+		if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED) {
+			ret = gnutls_get_last_alert(state);
+			if (ret==GNUTLS_NO_RENEGOTIATION)
+				printf("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
+		} else
+			 if (ret > 0)
+			    gnutls_write(sd, state, buffer, strlen(buffer));
+
+	    i++;
+	    if (i==10) gnutls_send_hello_request(sd ,state);
 	}
 	fprintf(stderr, "\n");
 	gnutls_close(sd, state);
 	close(sd);
-	gnutls_deinit(&state);
+	gnutls_deinit( state);
     }
     close(listen_sd);
     return 0;
