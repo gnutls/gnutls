@@ -447,6 +447,15 @@ int proc_rsa_certificate(GNUTLS_STATE state, opaque * data, int data_size)
 
 	_gnutls_copy_x509_client_auth_info(info, &peer_certificate_list[0], verify);
 
+	/* This works for the client
+	 */
+	if ( peer_certificate_list[0].keyUsage != 0)
+		if ( !(peer_certificate_list[0].keyUsage & X509KEY_KEY_ENCIPHERMENT)) {
+			gnutls_assert();
+			gnutls_free(peer_certificate_list);
+			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+		}
+
 	gnutls_free(peer_certificate_list);
 
 	return 0;
@@ -677,6 +686,14 @@ int gen_rsa_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 		}
 	}
 
+	/* If our certificate supports signing
+	 */
+	if ( apr_cert_list[0].keyUsage != 0)
+		if ( !(apr_cert_list[0].keyUsage & X509KEY_DIGITAL_SIGNATURE)) {
+			gnutls_assert();
+			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+		}
+	
 	if (apr_pkey != NULL) {
 		if ( (ret=_gnutls_generate_sig( state, apr_pkey, &signature)) < 0) {
 			gnutls_assert();

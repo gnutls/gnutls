@@ -31,6 +31,7 @@
 #include <gnutls_global.h>
 #include <x509_verify.h>
 #include <x509_extensions.h>
+#include <gnutls_algorithms.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -794,9 +795,40 @@ return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
 }
 
+/* Returns 0 if it's ok to use the KXAlgorithm with this cert
+ * (using KeyUsage field). 1 otherwise.
+ */
+static int _gnutls_check_x509_key_usage( gnutls_cert* cert, KXAlgorithm alg) {
+	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
+		switch(alg) {
+			case GNUTLS_KX_RSA:
+				if (cert->keyUsage!=0) {
+					if ( !(cert->keyUsage & X509KEY_KEY_ENCIPHERMENT))
+						return 1;
+					else
+						return 0;
+				}
+				return 0;
+			case GNUTLS_KX_DHE_RSA:
+				if (cert->keyUsage!=0) {
+					if ( !(cert->keyUsage & X509KEY_DIGITAL_SIGNATURE))
+						return 1;
+					else
+						return 0;
+				}
+				return 0;
+			default:
+				return 1;
+		}
+	}
+	return 0;
+}
+
 /* returns the KX algorithms that are supported by a
  * certificate. (Eg a certificate with RSA params, supports
  * GNUTLS_KX_RSA algorithm).
+ * This function also uses the KeyUsage field of the certificate
+ * extensions in order to disable unneded algorithms.
  */
 int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
 			      int *alg_size)
@@ -810,8 +842,10 @@ int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
 	for (kx = 0; kx < 255; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
-			kxlist[i] = kx;
-			i++;
+			if ( _gnutls_check_x509_key_usage( cert, kx) == 0) {
+				kxlist[i] = kx;
+				i++;
+			}
 		}
 	}
 

@@ -1232,7 +1232,6 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state) {
 	int ret;
 
 	ret = gnutls_handshake_begin(cd, state);
-	/* FIXME: check certificate */
 
 	if (ret == 0)
 		ret = gnutls_handshake_finish(cd, state);
@@ -1361,7 +1360,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
-		/* FIXME: request - and get - a client certificate */
+
 		return 0;
 	}
 }
@@ -1496,7 +1495,6 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
-		/* FIXME: receive certificate request */
 
 		/* receive the server hello done */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */

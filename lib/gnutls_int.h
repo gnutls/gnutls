@@ -29,8 +29,8 @@
 #define WRITE_DEBUG
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
-#define RECORD_DEBUG*/
-#define HANDSHAKE_DEBUG
+#define RECORD_DEBUG
+#define HANDSHAKE_DEBUG*/
 #define DEBUG
 
 
