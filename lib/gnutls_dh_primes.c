@@ -24,24 +24,31 @@
 #include <gnutls_datum.h>
 #include "debug.h"
 
-static uint8 DH_G_1024[] = { 0x02 };
+static uint8 DH_G_1024[] = { 0x05 };
 static uint8 DH_G_4096[] = { 0x05 };
 static uint8 DH_G_2048[] = { 0x05 };
 static uint8 DH_G_3072[] = { 0x0D };
 
-static uint8 diffie_hellman_group1_prime[] = { 0x00, 0x04,
-	0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F,
-	0xDA, 0xA2, 0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80,
-	0xDC, 0x1C, 0xD1, 0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74,
-	0x02, 0x0B, 0xBE, 0xA6, 0x3B, 0x13, 0x9B, 0x22, 0x51, 0x4A, 0x08,
-	0x79, 0x8E, 0x34, 0x04, 0xDD, 0xEF, 0x95, 0x19, 0xB3, 0xCD, 0x3A,
-	0x43, 0x1B, 0x30, 0x2B, 0x0A, 0x6D, 0xF2, 0x5F, 0x14, 0x37, 0x4F,
-	0xE1, 0x35, 0x6D, 0x6D, 0x51, 0xC2, 0x45, 0xE4, 0x85, 0xB5, 0x76,
-	0x62, 0x5E, 0x7E, 0xC6, 0xF4, 0x4C, 0x42, 0xE9, 0xA6, 0x37, 0xED,
-	0x6B, 0x0B, 0xFF, 0x5C, 0xB6, 0xF4, 0x06, 0xB7, 0xED, 0xEE, 0x38,
-	0x6B, 0xFB, 0x5A, 0x89, 0x9F, 0xA5, 0xAE, 0x9F, 0x24, 0x11, 0x7C,
-	0x4B, 0x1F, 0xE6, 0x49, 0x28, 0x66, 0x51, 0xEC, 0xE6, 0x53, 0x81,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+static uint8 diffie_hellman_prime_1024[128] = {
+	0xe3, 0x79, 0xb5, 0xa7, 0x47, 0x4c, 0xfd,
+	0x9c, 0x78, 0xfe, 0x17, 0x87, 0x44, 0xc4,
+	0x86, 0x2b, 0x92, 0x13, 0x43, 0xf5, 0xac,
+	0x72, 0xd2, 0xf1, 0x2a, 0xf5, 0x39, 0xa2,
+	0x79, 0x01, 0xdd, 0x4c, 0x7e, 0x5b, 0xa0,
+	0x19, 0x11, 0xd4, 0x2f, 0x0a, 0x92, 0x8d,
+	0xfd, 0xde, 0x85, 0x93, 0x99, 0xad, 0xe0,
+	0xd4, 0x0b, 0x62, 0xaa, 0x86, 0xa7, 0xd7,
+	0x63, 0x2e, 0x35, 0x96, 0x88, 0xbe, 0x52,
+	0x2e, 0x8c, 0x27, 0xf0, 0xe0, 0xa1, 0x0e,
+	0xb7, 0xb9, 0xc8, 0xbd, 0x5d, 0xe8, 0xdb,
+	0x63, 0xd8, 0xb4, 0xe7, 0x0d, 0xff, 0x0f,
+	0x55, 0xe7, 0x27, 0x0d, 0xb7, 0x57, 0x33,
+	0x30, 0xd6, 0xeb, 0x51, 0x99, 0x86, 0x17,
+	0x5b, 0x48, 0xb3, 0x0c, 0xae, 0xbd, 0xa1,
+	0x83, 0x6b, 0xbd, 0x9f, 0x83, 0x83, 0x2b,
+	0x46, 0x3e, 0x18, 0xa4, 0x4d, 0x82, 0x95,
+	0xa4, 0x08, 0xdd, 0x28, 0x0c, 0x4f, 0x93,
+	0xfd, 0xd7
 };
 
 /* prime - 4096 bits */
@@ -123,7 +130,7 @@ static uint8 diffie_hellman_prime_4096[] = { 0x00,
 };
 
 /* prime - 3072 bits */
-static uint8 diffie_hellman_prime_3072[] = { 0x00, 
+static uint8 diffie_hellman_prime_3072[] = { 0x00,
 	0xd5, 0x6e, 0xc8, 0x1f, 0xe9, 0x80, 0x9e,
 	0x56, 0x35, 0x6d, 0x6d, 0xdb, 0xfa, 0x47,
 	0x75, 0xcd, 0xfa, 0x32, 0x52, 0x1a, 0xc8,
@@ -227,11 +234,11 @@ static uint8 diffie_hellman_prime_2048[] = { 0x00,
  */
 _GNUTLS_DH_PARAMS _gnutls_dh_default_params[] = {
 	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
-	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , {diffie_hellman_prime_1024, sizeof diffie_hellman_prime_1024}
 	 , 0}
 	,
 	{1024, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
-	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , {diffie_hellman_prime_1024, sizeof diffie_hellman_prime_1024}
 	 , 0}
 	,
 	{2048, NULL, NULL, {DH_G_2048, sizeof(DH_G_2048)}
@@ -251,14 +258,14 @@ _GNUTLS_DH_PARAMS _gnutls_dh_default_params[] = {
 	 , 0}
 };
 
-const 
+const
 static _GNUTLS_DH_PARAMS _gnutls_dh_copy_params[] = {
 	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
-	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , {diffie_hellman_prime_1024, sizeof diffie_hellman_prime_1024}
 	 , 0}
 	,
 	{1024, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
-	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , {diffie_hellman_prime_1024, sizeof diffie_hellman_prime_1024}
 	 , 0}
 	,
 	{2048, NULL, NULL, {DH_G_2048, sizeof(DH_G_2048)}
@@ -303,18 +310,23 @@ static int normalize_bits(int bits)
 
 /* Clears allocated GNUTLS_MPIs and data. Only to be called at exit.
  */
-void _gnutls_dh_clear_mpis(void) {
-int i;
+void _gnutls_dh_clear_mpis(void)
+{
+	int i;
 
-	if (_gnutls_dh_default_params==NULL) return;
+	if (_gnutls_dh_default_params == NULL)
+		return;
 
 	i = 0;
 	do {
-		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._prime);
-		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._generator);
+		_gnutls_mpi_release(&_gnutls_dh_default_params[i]._prime);
+		_gnutls_mpi_release(&_gnutls_dh_default_params[i].
+				    _generator);
 		if (_gnutls_dh_default_params[i].local != 0) {
-			gnutls_free( _gnutls_dh_default_params[i].prime.data);
-			gnutls_free( _gnutls_dh_default_params[i].generator.data);
+			gnutls_free(_gnutls_dh_default_params[i].prime.
+				    data);
+			gnutls_free(_gnutls_dh_default_params[i].generator.
+				    data);
 		}
 		i++;
 	} while (_gnutls_dh_default_params[i].bits != 0);
@@ -326,19 +338,21 @@ int i;
  */
 int _gnutls_dh_calc_mpis(void)
 {
-int i, n;
+	int i, n;
 
-	if (_gnutls_dh_default_params==NULL) {
+	if (_gnutls_dh_default_params == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	i = 0;
 	do {
- 		n = _gnutls_dh_default_params[i].prime.size;
-		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._prime);
+		n = _gnutls_dh_default_params[i].prime.size;
+		_gnutls_mpi_release(&_gnutls_dh_default_params[i]._prime);
 
-		if (_gnutls_mpi_scan(&_gnutls_dh_default_params[i]._prime, _gnutls_dh_default_params[i].prime.data, &n)
+		if (_gnutls_mpi_scan
+		    (&_gnutls_dh_default_params[i]._prime,
+		     _gnutls_dh_default_params[i].prime.data, &n)
 		    || _gnutls_dh_default_params[i]._prime == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MPI_SCAN_FAILED;
@@ -346,9 +360,12 @@ int i, n;
 
 
 		n = _gnutls_dh_default_params[i].generator.size;
-		_gnutls_mpi_release( &_gnutls_dh_default_params[i]._generator);
+		_gnutls_mpi_release(&_gnutls_dh_default_params[i].
+				    _generator);
 
-		if (_gnutls_mpi_scan(&_gnutls_dh_default_params[i]._generator, _gnutls_dh_default_params[i].generator.data, &n)
+		if (_gnutls_mpi_scan
+		    (&_gnutls_dh_default_params[i]._generator,
+		     _gnutls_dh_default_params[i].generator.data, &n)
 		    || _gnutls_dh_default_params[i]._generator == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MPI_SCAN_FAILED;
@@ -363,12 +380,13 @@ int i, n;
 /* returns g and p, depends on the requested bits.
  * We only support limited key sizes.
  */
-GNUTLS_MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, GNUTLS_MPI * ret_p, int bits)
+GNUTLS_MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes,
+				GNUTLS_MPI * ret_p, int bits)
 {
-	GNUTLS_MPI g=NULL, prime=NULL;
+	GNUTLS_MPI g = NULL, prime = NULL;
 	int i;
 
-	if (dh_primes==NULL) {
+	if (dh_primes == NULL) {
 		gnutls_assert();
 		return NULL;
 	}
@@ -385,10 +403,10 @@ GNUTLS_MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, GNUTLS_MPI * ret_p, 
 		i++;
 	} while (dh_primes[i].bits != 0);
 
-	if (prime==NULL || g==NULL) { /* if not prime was found */
+	if (prime == NULL || g == NULL) {	/* if not prime was found */
 		gnutls_assert();
-		_gnutls_mpi_release( &g);
-		_gnutls_mpi_release( &prime);
+		_gnutls_mpi_release(&g);
+		_gnutls_mpi_release(&prime);
 		*ret_p = NULL;
 		return NULL;
 	}
@@ -401,12 +419,12 @@ GNUTLS_MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, GNUTLS_MPI * ret_p, 
 /* returns g and p, depends on the requested bits.
  * We only support limited key sizes.
  */
-GNUTLS_MPI _gnutls_get_rnd_srp_params( GNUTLS_MPI * ret_p, int bits)
+GNUTLS_MPI _gnutls_get_rnd_srp_params(GNUTLS_MPI * ret_p, int bits)
 {
-	GNUTLS_MPI g=NULL, prime=NULL;
+	GNUTLS_MPI g = NULL, prime = NULL;
 	int i;
 
-	if (_gnutls_dh_default_params==NULL) {
+	if (_gnutls_dh_default_params == NULL) {
 		gnutls_assert();
 		return NULL;
 	}
@@ -416,17 +434,20 @@ GNUTLS_MPI _gnutls_get_rnd_srp_params( GNUTLS_MPI * ret_p, int bits)
 	i = 0;
 	do {
 		if (_gnutls_dh_default_params[i].bits == bits) {
-			prime = _gnutls_mpi_copy(_gnutls_dh_default_params[i]._prime);
-			g = _gnutls_mpi_copy(_gnutls_dh_default_params[i]._generator);
+			prime =
+			    _gnutls_mpi_copy(_gnutls_dh_default_params[i].
+					     _prime);
+			g = _gnutls_mpi_copy(_gnutls_dh_default_params[i].
+					     _generator);
 			break;
 		}
 		i++;
 	} while (_gnutls_dh_default_params[i].bits != 0);
 
-	if (prime==NULL || g==NULL) { /* if not prime was found */
+	if (prime == NULL || g == NULL) {	/* if not prime was found */
 		gnutls_assert();
-		_gnutls_mpi_release( &g);
-		_gnutls_mpi_release( &prime);
+		_gnutls_mpi_release(&g);
+		_gnutls_mpi_release(&prime);
 		*ret_p = NULL;
 		return NULL;
 	}
@@ -438,9 +459,11 @@ GNUTLS_MPI _gnutls_get_rnd_srp_params( GNUTLS_MPI * ret_p, int bits)
 
 /* These should be added in gcrypt.h */
 GNUTLS_MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
-			     unsigned qbits, GNUTLS_MPI g, GNUTLS_MPI ** ret_factors);
+				    unsigned qbits, GNUTLS_MPI g,
+				    GNUTLS_MPI ** ret_factors);
 
-int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n, int bits)
+int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
+			      int bits)
 {
 
 	GNUTLS_MPI g, prime;
@@ -479,12 +502,14 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n, int bits)
 
 /* returns a negative value if the bits is not supported 
  */
-static int check_bits(int bits) {
-int i=0;
+static int check_bits(int bits)
+{
+	int i = 0;
 	do {
-		if (supported_bits[i]==bits) return 0;
+		if (supported_bits[i] == bits)
+			return 0;
 		i++;
-	} while(supported_bits[i]!=0);
+	} while (supported_bits[i] != 0);
 
 	gnutls_assert();
 	return GNUTLS_E_INVALID_PARAMETERS;
@@ -507,25 +532,26 @@ int i=0;
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
   *
   **/
-int gnutls_dh_params_set( GNUTLS_DH_PARAMS dh_params, gnutls_datum prime, gnutls_datum generator, int bits)
+int gnutls_dh_params_set(GNUTLS_DH_PARAMS dh_params, gnutls_datum prime,
+			 gnutls_datum generator, int bits)
 {
 	GNUTLS_MPI tmp_prime, tmp_g;
-	int siz=0, i=0;
+	int siz = 0, i = 0;
 	GNUTLS_DH_PARAMS sprime;
 
-	if (check_bits(bits)<0) {
+	if (check_bits(bits) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 
 	i = 0;
 	do {
-		if (dh_params[i].bits==bits) {
+		if (dh_params[i].bits == bits) {
 			sprime = &dh_params[i];
 			break;
 		}
-	} while(dh_params[++i].bits!=0);
-		
+	} while (dh_params[++i].bits != 0);
+
 	siz = prime.size;
 	if (_gnutls_mpi_scan(&tmp_prime, prime.data, &siz)) {
 		gnutls_assert();
@@ -534,7 +560,7 @@ int gnutls_dh_params_set( GNUTLS_DH_PARAMS dh_params, gnutls_datum prime, gnutls
 
 	siz = generator.size;
 	if (_gnutls_mpi_scan(&tmp_g, generator.data, &siz)) {
-		_gnutls_mpi_release( &tmp_prime);
+		_gnutls_mpi_release(&tmp_prime);
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -554,11 +580,12 @@ int gnutls_dh_params_set( GNUTLS_DH_PARAMS dh_params, gnutls_datum prime, gnutls
 /*	sprime->_prime = _gnutls_mpi_copy(tmp_prime);
 	sprime->_generator = _gnutls_mpi_copy(tmp_g);
 */
-	if (gnutls_set_datum( &sprime->prime, prime.data, prime.size) < 0) {
+	if (gnutls_set_datum(&sprime->prime, prime.data, prime.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	if (gnutls_set_datum( &sprime->prime, generator.data, generator.size) < 0) {
+	if (gnutls_set_datum
+	    (&sprime->prime, generator.data, generator.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -574,16 +601,17 @@ int gnutls_dh_params_set( GNUTLS_DH_PARAMS dh_params, gnutls_datum prime, gnutls
   * This function will initialize the DH parameters structure.
   *
   **/
-int gnutls_dh_params_init( GNUTLS_DH_PARAMS* dh_params)
+int gnutls_dh_params_init(GNUTLS_DH_PARAMS * dh_params)
 {
 
-	(*dh_params) = gnutls_calloc( 1, sizeof( _gnutls_dh_copy_params));
-	if (*dh_params==NULL) {
+	(*dh_params) = gnutls_calloc(1, sizeof(_gnutls_dh_copy_params));
+	if (*dh_params == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
-	memcpy( (*dh_params), _gnutls_dh_copy_params, sizeof(_gnutls_dh_copy_params));
+
+	memcpy((*dh_params), _gnutls_dh_copy_params,
+	       sizeof(_gnutls_dh_copy_params));
 
 	return 0;
 
@@ -596,23 +624,24 @@ int gnutls_dh_params_init( GNUTLS_DH_PARAMS* dh_params)
   * This function will initialize the DH parameters structure.
   *
   **/
-void gnutls_dh_params_deinit( GNUTLS_DH_PARAMS dh_params)
+void gnutls_dh_params_deinit(GNUTLS_DH_PARAMS dh_params)
 {
-int i;
-	if (dh_params==NULL) return;
+	int i;
+	if (dh_params == NULL)
+		return;
 
 	i = 0;
 	do {
-		_gnutls_mpi_release( &dh_params[i]._prime);
-		_gnutls_mpi_release( &dh_params[i]._generator);
+		_gnutls_mpi_release(&dh_params[i]._prime);
+		_gnutls_mpi_release(&dh_params[i]._generator);
 		if (dh_params[i].local != 0) {
-			gnutls_free( dh_params[i].prime.data);
-			gnutls_free( dh_params[i].generator.data);
+			gnutls_free(dh_params[i].prime.data);
+			gnutls_free(dh_params[i].generator.data);
 		}
 		i++;
 	} while (dh_params[i].bits != 0);
 
-	gnutls_free( dh_params);
+	gnutls_free(dh_params);
 
 }
 
@@ -638,7 +667,8 @@ int i;
   * no use calling this in client side.
   *
   **/
-int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits)
+int gnutls_dh_params_generate(gnutls_datum * prime,
+			      gnutls_datum * generator, int bits)
 {
 
 	GNUTLS_MPI tmp_prime, tmp_g;
@@ -655,7 +685,7 @@ int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int
 	}
 
 	siz = 0;
-	_gnutls_mpi_print( NULL, &siz, tmp_g);
+	_gnutls_mpi_print(NULL, &siz, tmp_g);
 
 	generator->data = malloc(siz);
 	if (generator->data == NULL) {
@@ -665,27 +695,26 @@ int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int
 	}
 
 	generator->size = siz;
-	_gnutls_mpi_print( generator->data, &siz, tmp_g);
+	_gnutls_mpi_print(generator->data, &siz, tmp_g);
 
 
 	siz = 0;
-	_gnutls_mpi_print( NULL, &siz, tmp_prime);
+	_gnutls_mpi_print(NULL, &siz, tmp_prime);
 
 	prime->data = malloc(siz);
 	if (prime->data == NULL) {
-		gnutls_free( generator->data);
+		gnutls_free(generator->data);
 		_gnutls_mpi_release(&tmp_g);
 		_gnutls_mpi_release(&tmp_prime);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	prime->size = siz;
-	_gnutls_mpi_print( prime->data, &siz, tmp_prime);
+	_gnutls_mpi_print(prime->data, &siz, tmp_prime);
 
-	_gnutls_log( "Generated %d bits prime %s, generator %s.\n", 
-		bits, _gnutls_bin2hex( prime->data, prime->size),
-		_gnutls_bin2hex( generator->data, generator->size));
+	_gnutls_log("Generated %d bits prime %s, generator %s.\n",
+		    bits, _gnutls_bin2hex(prime->data, prime->size),
+		    _gnutls_bin2hex(generator->data, generator->size));
 
 	return 0;
 
 }
-
