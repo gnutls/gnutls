@@ -258,6 +258,9 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 			return rc;
 	} else {
 		 memcpy( &state->security_parameters, &state->gnutls_internals.resumed_security_parameters, sizeof(SecurityParameters));
+
+		/* clear the resumed security parameters */
+		 memset( &state->gnutls_internals.resumed_security_parameters, 0, sizeof(SecurityParameters));
 #ifdef HARD_DEBUG
 		 fprintf(stderr, "Master Secret: %s\n", _gnutls_bin2hex(state->security_parameters.master_secret, 48));
 #endif
