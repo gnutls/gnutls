@@ -6,6 +6,9 @@ Version 0.9.6
 - Corrected a bug in the record layer buffering, which affected
   the case where external pull function was used. Report and patch
   by Sergey Poznyakoff <gray@Mirddin.farlep.net>.
+- Corrected a bug in gnutls-srpcrypt where a non allocated value
+  was freed.
+- SRP programs are now built by default.
 
 Version 0.9.5 (06/04/2003)
 - Several improvements in the PKCS #7 handling

@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#include <config.h>
+
 #ifndef ENABLE_SRP
 
 #include <stdio.h>
@@ -507,7 +509,6 @@ int crypt_int(char *username, char *passwd, int salt_size,
 		if (put==0) {
 			fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
 		}
-		free(cr);
 		
 		fclose(fd);
 		fclose(fd2);
