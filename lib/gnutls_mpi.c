@@ -36,12 +36,38 @@ void _gnutls_mpi_release( GNUTLS_MPI* x) {
 	*x=NULL;
 }
 
+/* returns zero on success
+ */
 int _gnutls_mpi_scan( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes ) {
-	return gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_USG, buffer, nbytes);
+	int ret;
+	
+	ret = gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_USG, buffer, nbytes);
+	if (ret) return ret;
+	
+	/* MPIs with 0 bits are illegal
+	 */
+	if (_gnutls_mpi_get_nbits( *ret_mpi) == 0) {
+		_gnutls_mpi_release( ret_mpi);
+		return 1;
+	}
+
+	return 0;
 }
 
 int _gnutls_mpi_scan_pgp( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes ) {
-	return gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_PGP, buffer, nbytes);
+int ret;
+	ret = gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_PGP, buffer, nbytes);
+
+	if (ret) return ret;
+
+	/* MPIs with 0 bits are illegal
+	 */
+	if (_gnutls_mpi_get_nbits( *ret_mpi) == 0) {
+		_gnutls_mpi_release( ret_mpi);
+		return 1;
+	}
+
+	return 0;
 }
 
 int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a ) {
