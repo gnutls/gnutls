@@ -1,4 +1,4 @@
-Version 0.5.8
+Version 0.5.8 (25/09/2002)
 - Updated documentation.
 - Added gnutls_record_get_direction() which replaces the obsolete
   gnutls_handshake_get_direction().

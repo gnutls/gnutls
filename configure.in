@@ -341,9 +341,9 @@ AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 if test $ac_cv_c_compiler_gnu != no; then
 
 	if test x$opt_profiler_mode = xyes; then
-	  CFLAGS="${CFLAGS} `fc-config --cflags`"
 	  AC_CHECK_PROG(FC_OK, fc-config, yes, no)
 	  if test x$FC_OK = xyes; then
+   	        CFLAGS="${CFLAGS} `fc-config --cflags`"
 		LIBS="$LIBS `fc-config --libs`"
 	  else
 AC_MSG_WARN(***

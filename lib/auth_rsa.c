@@ -183,7 +183,11 @@ const gnutls_certificate_credentials cred;
 			gnutls_assert();
 			return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
 		}
-
+		
+		/* In the export case, we do use temporary RSA params
+		 * of 512 bits size. The params in the certificate are
+		 * used to sign this temporary stuff.
+		 */
 		*params_size = RSA_PRIVATE_PARAMS;
 		*params = cred->rsa_params->params;
 

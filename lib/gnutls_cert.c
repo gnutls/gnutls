@@ -101,6 +101,10 @@ void _gnutls_free_cert(gnutls_cert cert)
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
+  *
+  * This function does not free any temporary parameters associated
+  * with this structure (ie RSA and DH parameters are not freed by
+  * this function).
   **/
 void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 {
