@@ -73,4 +73,5 @@ gnutls_cert* _gnutls_find_cert( gnutls_cert** cert_list, int cert_list_length, c
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data);
 
+
 #endif

@@ -844,3 +844,4 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 	}
 	return cert;
 }
+

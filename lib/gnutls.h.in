@@ -224,6 +224,9 @@ typedef struct {
         char              subjectAltName[X509_CN_SIZE]; /* this only contains dnsName if present,
                                                          * nothing else 
                                                          */
+	int		  CA;       /* 1 if the certificate belongs
+                                     * to a CA. 0 otherwise.
+                                     */
 	unsigned char	  keyUsage; /* 8 bits */
 } X509PKI_CLIENT_AUTH_INFO;
 
