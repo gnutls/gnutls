@@ -1,4 +1,5 @@
 \chapter{More on certificate authentication}
+\index{Certificate authentication}
 
 \section{The X.509\index{X.509 certificates} trust model}
 \label{x509:trust}
@@ -33,13 +34,16 @@ more information.
 
 
 \par
-Verifying certificate\index{Verifying certificate paths} paths is also important in X.509 authentication.
-For this purpose you can use the
-\printfunc{gnutls_x509_verify_certificate}{gnutls\_x509\_verify\_certificate}
-function. A more generic one is also provided and can be used with all
+Verifying certificate\index{Verifying certificate paths} paths is important 
+in X.509 authentication. For this purpose you should use functions like
+\printfunc{gnutls_x509_verify_certificate}{gnutls\_x509\_verify\_certificate}.
+A more generic one is also provided and can be used with all
 of the certificate authentication methods, but is limited to a session. See the
 \printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}
-function.
+function. The above functions verify if the given certificate path leads
+to a trusted CA certificate. You should also verify if the certificate's
+owner is the one you expect. See \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
+for an example.
 
 \par
 Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit. See 

@@ -1,14 +1,15 @@
-\section{Symmetric encryption algorithms}
-\par
-Confidentiality is provided by using block encryption algorithms like {\bf 3DES}, 
-{\bf AES\footnote{AES or Advanced Encryption Standard is actually the RIJNDAEL algorithm. This is the
-algorithm that will replace DES.}}, or
+\subsection{Encryption algorithms used in the record layer}
+\index{Symmetric encryption algorithms}
+Confidentiality in the record layer is achieved by using symmetric block 
+encryption algorithms like {\bf 3DES}, {\bf AES\footnote{AES or Advanced 
+Encryption Standard is actually the RIJNDAEL algorithm. This is the
+algorithm that replaced DES.}}, or
 stream algorithms like {\bf ARCFOUR\_128\footnote{ARCFOUR\_128 is a compatible
 algorithm with RSA's RC4 algorithm, which is considered to be a trade secret.}} See \hyperref{fig:ciphers}{figure }{}{fig:ciphers} for a complete list. 
 Ciphers are encryption algorithms that use a single (secret) key
 to encrypt and decrypt data. Block algorithms in TLS also provide protection
 against statistical analysis of the data. \gnutls{} makes use of this property
-thus, if you're operating in \tlsI{} mode, a random number of blocks will be
+thus, if you're using the \tlsI{} protocol, a random number of blocks will be
 appended to the data. This will prevent eavesdroppers from guessing the 
 actual data size.
 
@@ -59,6 +60,7 @@ MAC\_SHA & SHA is a hash algorithm by NSA. Outputs 160 bits of data.
 \hline
 \end{tabular}
 \caption{Supported MAC algorithms}
+\index{MAC algorithms}
 \label{fig:mac}
 \end{figure}
 
