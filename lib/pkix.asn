@@ -999,4 +999,15 @@ CertificationRequest ::= SEQUENCE {
      signature          BIT STRING
 }
 
+-- stuff from PKCS#9
+
+pkcs-9-ub-challengePassword   INTEGER ::= 255
+
+challengePassword AttributeType	   ::= {pkcs-9 7}
+
+Pkcs9challengePassword        ::= CHOICE {
+      printableString       PrintableString (SIZE (1..pkcs-9-ub-challengePassword)),
+      utf8String            UTF8String (SIZE (1..pkcs-9-ub-challengePassword)) }
+
+
 END

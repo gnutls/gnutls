@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -108,7 +108,7 @@ int apr_cert_list_length;
 	}
 
 	if ((ret =
-	     _gnutls_generate_sig_params(session, &apr_cert_list[0],
+	     _gnutls_tls_sign_params(session, &apr_cert_list[0],
 			 apr_pkey, &ddata, &signature)) < 0) 
 	{
 		gnutls_assert();

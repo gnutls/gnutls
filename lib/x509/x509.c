@@ -1031,7 +1031,8 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		
+
+asn1_print_structure( stderr, asn1_data, "", ASN1_PRINT_ALL);
 		len = tmp_buf_size - 1;
 		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();

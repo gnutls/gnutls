@@ -223,7 +223,7 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
-	return _gnutls_x509_set_dn_oid( crq->crq, "certificationRequestInfo.subject.rdnSequence", oid,
+	return _gnutls_x509_set_dn_oid( crq->crq, "certificationRequestInfo.subject", oid,
 		name, sizeof_name);
 }
 
@@ -326,6 +326,12 @@ int der_size, result;
 	 * the same. Note that requests are self signed.
 	 */
 
+	pk = _gnutls_x509_sign2oid( key->pk_algorithm, GNUTLS_MAC_SHA);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	/* write the RSA OID
 	 */
 	result = asn1_write_value( crq->crq, "signatureAlgorithm.algorithm", pk, 1);
@@ -342,12 +348,37 @@ int der_size, result;
 		return _gnutls_asn2err(result);
 	}
 
-	/* FIXME: disable attributes.
+	return 0;
+}
+
+/**
+  * gnutls_x509_crq_set_challenge_password - This function will set a challenge password 
+  * @crq: should contain a gnutls_x509_crq structure
+  * @pass: holds a null terminated password
+  *
+  * This function will set a challenge password to be used when revoking the request.
+  *
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq, const char* pass)
+{
+int result;
+
+	/* Add the attribute.
 	 */
-	result = asn1_write_value( crq->crq, "certificationRequestInfo.attributes", NULL, 0);
+	result = asn1_write_value( crq->crq, "certificationRequestInfo.attributes", "NEW", 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_encode_and_write_attribute( "1.2.840.113549.1.9.7", crq->crq,
+		"certificationRequestInfo.attributes.?LAST", pass, strlen(pass), 1);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
 	}
 
 	return 0;

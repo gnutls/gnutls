@@ -25,4 +25,7 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
 	const char* asn1_rdn_name, const char* oid, const char *name,
 	int sizeof_name);
 
+int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
+	const char* where, const unsigned char* data, int sizeof_data, int multi);
+
 #endif

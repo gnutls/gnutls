@@ -481,25 +481,160 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 	return result;
 }
 
+/* This will encode and write the AttributeTypeAndValue field.
+ * multi must be zero if writing an AttributeTypeAndValue, and 1 if Attribute.
+ */
+int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
+	const char* where, const unsigned char* data, int sizeof_data, int multi) 
+{
+char val_name[MAX_NAME_SIZE], tmp[128];
+ASN1_TYPE c2;
+opaque *der;
+int der_len, result;
+
+
+	/* Find how to encode the data.
+	 */
+	result = asn1_find_structure_from_oid( _gnutls_get_pkix(), given_oid, val_name);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	_gnutls_str_cpy( tmp, sizeof(tmp), "PKIX1.");
+	_gnutls_str_cat( tmp, sizeof(tmp), val_name);
+
+	result = asn1_create_element( _gnutls_get_pkix(), tmp, &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	tmp[0] = 0;
+
+	if (_gnutls_x509_oid_data_choice( given_oid) == 1) {
+		char* string_type;
+		int i;
+
+		string_type = "printableString";
+
+		/* Check if the data is plain ascii, and use
+		 * the UTF8 string type if not.
+		 */
+		for (i=0;i<sizeof_data;i++) {
+			if (!isascii(data[i])) {
+				string_type = "utf8String";
+				break;
+			}
+		}
+
+		/* if the type is a CHOICE then write the
+		 * type we'll use.
+		 */
+		result = asn1_write_value( c2, "", string_type, 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			asn1_delete_structure( &c2);
+			return _gnutls_asn2err(result);
+		}
+
+		_gnutls_str_cpy( tmp, sizeof(tmp), string_type);
+	}
+
+	result = asn1_write_value( c2, tmp, data, sizeof_data);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure( &c2);
+		return _gnutls_asn2err(result);
+	}
+
+	der_len = sizeof_data + 64;
+	der = gnutls_alloca( der_len);
+
+	result = asn1_der_coding( c2, "", der, &der_len, NULL);
+	
+	asn1_delete_structure( &c2);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		gnutls_afree(der);
+		return _gnutls_asn2err(result);
+	}
+	
+	/* write the data (value)
+	 */
+
+	_gnutls_str_cpy(tmp, sizeof(tmp), where);
+	_gnutls_str_cat(tmp, sizeof(tmp), ".value");
+
+	if (multi != 0) { /* if not writing an AttributeTypeAndValue, but an Attribute */
+		_gnutls_str_cat(tmp, sizeof(tmp), "s"); /* values */
+
+		result = asn1_write_value( asn1_struct, tmp, "NEW", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			gnutls_afree(der);
+			return _gnutls_asn2err(result);
+		}
+
+		_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST");
+	
+	}
+
+	result = asn1_write_value( asn1_struct, tmp, der, der_len);
+
+	gnutls_afree(der);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* write the type
+	 */
+	_gnutls_str_cpy(tmp, sizeof(tmp), where);
+	_gnutls_str_cat(tmp, sizeof(tmp), ".type");
+
+	result = asn1_write_value( asn1_struct, tmp, given_oid, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+
 /* Sets an X509 DN in the asn1_struct, and puts the given OID in the DN.
  * The input is assumed to be raw data.
  *
- * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
- * That is to point in the rndSequence.
+ * asn1_rdn_name must be a string in the form "tbsCertificate.issuer".
+ * That is to point before the rndSequence.
  *
  */
 int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
-			      const char *asn1_rdn_name,
+			      const char *asn1_name,
 			      const char *given_oid, const char *name,
 			      int sizeof_name)
 {
 	int result;
-	char tmp[64];
+	char tmp[64], asn1_rdn_name[64];
 
 	if (sizeof_name == 0 || name == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
+
+	/* create the rdnSequence
+	 */
+	result = asn1_write_value( asn1_struct, asn1_name, "rdnSequence", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	_gnutls_str_cpy(asn1_rdn_name, sizeof(asn1_rdn_name), asn1_name);
+	_gnutls_str_cat(asn1_rdn_name, sizeof(asn1_rdn_name), ".rdnSequence");
 
 	/* create a new element 
 	 */
@@ -521,28 +656,18 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
 	}
 
 
-	_gnutls_str_cpy(tmp, sizeof(tmp), asn1_rdn_name);
-	_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST.?1.type");
-
-	/* write the type
+	/* Encode and write the data
 	 */
-	result = asn1_write_value( asn1_struct, tmp, given_oid, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
 	_gnutls_str_cpy(tmp, sizeof(tmp), asn1_rdn_name);
-	_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST.?1.value");
+	_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST.?LAST");
 
-	/* write the data 
-	 */
-	result = asn1_write_value( asn1_struct, tmp, name, sizeof_name);
-	if (result != ASN1_SUCCESS) {
+	result = _gnutls_x509_encode_and_write_attribute( given_oid, asn1_struct, tmp,
+		name, sizeof_name, 0);
+	if (result < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return result;
 	}
-
+	
 	return 0;
 }
 

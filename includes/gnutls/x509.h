@@ -214,6 +214,30 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
 	gnutls_datum* u);
 
+/* Certificate request stuff
+ */
+struct gnutls_x509_crq_int;
+typedef struct gnutls_x509_crq_int* gnutls_x509_crq;
+
+int gnutls_x509_crq_init(gnutls_x509_crq * crq);
+void gnutls_x509_crq_deinit(gnutls_x509_crq crq);
+int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
+	gnutls_x509_crt_fmt format);
+int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
+					 int *sizeof_buf);
+int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
+	int indx, char *buf, int *sizeof_buf);
+int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
+	const char *name, int sizeof_name);
+int gnutls_x509_crq_set_version(gnutls_x509_crq crq, int version);
+int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key);
+int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key);
+
+int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq, const char* pass);
+
+int gnutls_x509_crq_export( gnutls_x509_crq crq,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+
 
 #ifdef __cplusplus
 }

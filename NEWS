@@ -1,4 +1,7 @@
 Version 0.9.2
+- Some corrections in the memory mapping code (file is unmapped after 
+  it is read).
+- Added support for PKCS#10 certificate requests generation.
 
 Version 0.9.1 (12/03/2003)
 - Corrected a bug in 64 bit architectures, which affected the

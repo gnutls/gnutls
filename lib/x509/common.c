@@ -40,6 +40,11 @@ typedef struct _oid2string {
 #define PKIX1_RSA_OID "1.2.840.113549.1.1.1"
 #define DSA_OID "1.2.840.10040.4.1"
 
+#define DSA_SHA1_OID "1.2.840.10040.4.3"
+#define RSA_MD2_OID "1.2.840.113549.1.1.2"
+#define RSA_MD5_OID "1.2.840.113549.1.1.4"
+#define RSA_SHA1_OID "1.2.840.113549.1.1.5"
+
 static const oid2string OID2STR[] = {
 	{"2.5.4.6", "X520countryName", "C", 0, 1},
 	{"2.5.4.12", "X520title", "T", 1, 1},
@@ -54,12 +59,13 @@ static const oid2string OID2STR[] = {
 	{"0.9.2342.19200300.100.1.25", "dc", "DC", 0, 1}, /* FIXME: CHOICE? */
 	{"0.9.2342.19200300.100.1.1", "uid", "UID", 0, 1}, /* FIXME: CHOICE? */
 	{"1.2.840.113549.1.9.1", "Pkcs9email", "EMAIL", 0, 1},
+	{"1.2.840.113549.1.9.7", "Pkcs9challengePassword", NULL, 1, 1},
 	{PKIX1_RSA_OID, "rsaEncryption", NULL, 0, 0},
-	{"1.2.840.113549.1.1.2", "md2WithRSAEncryption", NULL, 0, 0},
+	{RSA_MD2_OID, "md2WithRSAEncryption", NULL, 0, 0},
 
-	{"1.2.840.113549.1.1.4", "md5WithRSAEncryption", NULL, 0, 0},
-	{"1.2.840.113549.1.1.5", "sha1WithRSAEncryption", NULL, 0, 0},
-	{"1.2.840.10040.4.3", "id-dsa-with-sha1", NULL, 0, 0},
+	{RSA_MD5_OID, "md5WithRSAEncryption", NULL, 0, 0},
+	{RSA_SHA1_OID, "sha1WithRSAEncryption", NULL, 0, 0},
+	{DSA_SHA1_OID, "id-dsa-with-sha1", NULL, 0, 0},
 	{DSA_OID, "id-dsa", NULL, 0, 0},
 	{NULL, NULL, NULL, 0, 0}
 };
@@ -235,6 +241,19 @@ const char* _gnutls_x509_pk2oid( gnutls_pk_algorithm pk)
 	if (pk == GNUTLS_PK_RSA) return PKIX1_RSA_OID;
 	else if (pk == GNUTLS_PK_DSA) return DSA_OID;
 	else return NULL;
+}
+
+const char* _gnutls_x509_sign2oid( gnutls_pk_algorithm pk, gnutls_mac_algorithm mac)
+{
+	if (pk == GNUTLS_PK_RSA) {
+		if (mac == GNUTLS_MAC_SHA) return RSA_SHA1_OID;
+		else if (mac == GNUTLS_MAC_MD5) return RSA_MD5_OID;
+		else if (mac == GNUTLS_MAC_MD2) return RSA_MD2_OID;
+	} else if (pk == GNUTLS_PK_DSA) {
+		if (mac == GNUTLS_MAC_SHA) return DSA_SHA1_OID;
+	}
+	
+	return NULL;
 }
 
 
