@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "gnutls_num.h"
 #include "auth_srp.h"
+#include <gnutls_str.h>
 
 int gen_srp_server_kx2(GNUTLS_STATE, opaque **);
 int gen_srp_client_kx0(GNUTLS_STATE, opaque **);
@@ -85,8 +86,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	info = _gnutls_get_auth_info( state);
 	username = info->username;
 	
-	strncpy( username, state->security_parameters.extensions.srp_username, MAX_SRP_USERNAME);
-	username[ MAX_SRP_USERNAME - 1] = 0;
+	_gnutls_str_cpy( username, MAX_SRP_USERNAME, state->security_parameters.extensions.srp_username);
 
 	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, username, &err);
 

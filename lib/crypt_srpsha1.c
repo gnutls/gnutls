@@ -40,7 +40,7 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	int vsize, hash_len = gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
 	opaque *tmp;
 	uint8 *rtext, *csalt;
-	int rsalt_size, len;
+	int rsalt_size, len, tmpsize;
 
 	passwd_len = strlen(passwd);	/* we do not want the null */
 

@@ -33,6 +33,7 @@
 #include <x509_extensions.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_dh.h>
+#include <gnutls_str.h>
 
 #ifdef DEBUG
 # warning MAX ALGORITHM PARAMS == 2, ok for RSA
@@ -638,12 +639,12 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 }
 
 #define _READ(a, aa, b, c, d, e, res, f) \
-	result = _IREAD(a, aa, b, c, d, e, res, sizeof(res)-1, f); \
+	result = _IREAD(a, aa, sizeof(aa), b, c, d, e, res, sizeof(res)-1, f); \
 	if (result<0) return result; \
 	if (result==1) continue
 
 
-int _IREAD(node_asn * rasn, char *name3, char *rstr, char *OID,
+int _IREAD(node_asn * rasn, char *name3, int name3_size, char *rstr, char *OID,
 	   char *ANAME, char *TYPE, char *res, int res_size, int CHOICE)
 {
 	char name2[256];
@@ -653,10 +654,10 @@ int _IREAD(node_asn * rasn, char *name3, char *rstr, char *OID,
 
 	if (strcmp(rstr, OID) == 0) {
 
-		strcpy(str, "PKIX1Implicit88."); /* Flawfinder: ignore */
-		strcat(str, ANAME); /* Flawfinder: ignore */
-		strcpy(name2, "temp-structure-"); /* Flawfinder: ignore */
-		strcat(name2, TYPE); 
+		_gnutls_str_cpy(str, sizeof(str), "PKIX1Implicit88."); 
+		_gnutls_str_cat(str, sizeof(str), ANAME); 
+		_gnutls_str_cpy(name2, sizeof(name2), "temp-structure-"); 
+		_gnutls_str_cat(name2, sizeof(name2), TYPE); 
 
 		if ((result =
 		     asn1_create_structure(_gnutls_get_pkix(), str,
@@ -665,7 +666,7 @@ int _IREAD(node_asn * rasn, char *name3, char *rstr, char *OID,
 			return GNUTLS_E_ASN1_ERROR;
 		}
 
-		len = sizeof(str) - 1;
+		len = sizeof(str) -1;
 		if ((result =
 		     asn1_read_value(rasn, name3, str, &len)) != ASN_OK) {
 			asn1_delete_structure(tmpasn);
@@ -676,7 +677,7 @@ int _IREAD(node_asn * rasn, char *name3, char *rstr, char *OID,
 			asn1_delete_structure(tmpasn);
 			return 1;
 		}
-		strcpy(name3, name2); /* Flawfinder: ignore */
+		_gnutls_str_cpy(name3, name3_size, name2);
 
 		len = sizeof(str) - 1;
 		if ((result = asn1_read_value(tmpasn, name3, str, &len)) != ASN_OK) {	/* CHOICE */
@@ -687,12 +688,12 @@ int _IREAD(node_asn * rasn, char *name3, char *rstr, char *OID,
 		if (CHOICE == 0) {
 			str[len] = 0;
 			/* strlen(str) < res_size, checked above */
-			strcpy(res, str); /* Flawfinder: ignore */
+			_gnutls_str_cpy(res, res_size, str); 
 			
 		} else {	/* CHOICE */
 			str[len] = 0;
-			strcat(name3, "."); /* Flawfinder: ignore */
-			strcat(name3, str); 
+			_gnutls_str_cat(name3, name3_size, "."); 
+			_gnutls_str_cat(name3, name3_size, str); 
 			len = sizeof(str) - 1;
 
 			if ((result =
@@ -703,7 +704,7 @@ int _IREAD(node_asn * rasn, char *name3, char *rstr, char *OID,
 			}
 			str[len] = 0;
 			if ( len < res_size)
-				strcpy(res, str); /* Flawfinder: ignore */
+				_gnutls_str_cpy(res, res_size, str); 
 		}
 		asn1_delete_structure(tmpasn);
 
@@ -719,7 +720,7 @@ void _gnutls_int2str(int k, char *data)
 	if (k > 999)
 		data[0] = 0;
 	else
-		sprintf(data, "%d", k); /* Flawfinder: ignore */
+		sprintf(data, "%d", k); 
 }
 
 /* This function will attempt to read a Name
@@ -739,10 +740,10 @@ int _gnutls_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 	do {
 		k++;
 
-		strcpy(name, root); /* Flawfinder: ignore */
-		strcat(name, ".rdnSequence.?"); /* Flawfinder: ignore */
+		_gnutls_str_cpy(name, sizeof(name), root); 
+		_gnutls_str_cat(name, sizeof(name), ".rdnSequence.?"); 
 		_gnutls_int2str(k, counter);
-		strcat(name, counter); /* Flawfinder: ignore */
+		_gnutls_str_cat(name, sizeof(name), counter); 
 
 		len = sizeof(str) - 1;
 
@@ -761,10 +762,10 @@ int _gnutls_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 		do {
 			k2++;
 
-			strcpy(name2, name); /* Flawfinder: ignore */
-			strcat(name2, ".?"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name2, sizeof(name2), name); 
+			_gnutls_str_cat(name2, sizeof(name2), ".?"); 
 			_gnutls_int2str(k2, counter);
-			strcat(name2, counter); /* Flawfinder: ignore */
+			_gnutls_str_cat(name2, sizeof(name2), counter); 
 
 			len = sizeof(str) - 1;
 			result = asn1_read_value(rasn, name2, str, &len);
@@ -776,8 +777,8 @@ int _gnutls_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 
-			strcpy(name3, name2);
-			strcat(name3, ".type"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name3, sizeof(name3), name2);
+			_gnutls_str_cat(name3, sizeof(name3), ".type"); 
 
 			len = sizeof(str) - 1;
 			result = asn1_read_value(rasn, name3, str, &len);
@@ -789,8 +790,8 @@ int _gnutls_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 
-			strcpy(name3, name2);
-			strcat(name3, ".value"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name3, sizeof(name3), name2);
+			_gnutls_str_cat(name3, sizeof(name3), ".value"); 
 
 			if (result == ASN_OK) {
 #ifdef DEBUG
@@ -840,9 +841,9 @@ time_t _gnutls_get_time(node_asn * c2, char *root, char *when)
 	time_t ctime;
 	int len, result;
 
-	strcpy(name, root);
-	strcat(name, ".tbsCertificate.validity."); /* Flawfinder: ignore */
-	strcat(name, when);
+	_gnutls_str_cpy(name, sizeof(name), root);
+	_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.validity."); 
+	_gnutls_str_cat(name, sizeof(name), when);
 
 	len = sizeof(ttime) - 1;
 	if ((result = asn1_read_value(c2, name, ttime, &len)) < 0) {
@@ -851,22 +852,22 @@ time_t _gnutls_get_time(node_asn * c2, char *root, char *when)
 	}
 
 	/* CHOICE */
-	strcpy(name, root);
+	_gnutls_str_cpy(name, sizeof(name), root);
 
 	if (strcmp(ttime, "GeneralizedTime") == 0) {
 
-		strcat(name, ".tbsCertificate.validity."); /* Flawfinder: ignore */
-		strcat(name, when);
-		strcat(name, ".generalTime"); /* Flawfinder: ignore */
+		_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.validity."); 
+		_gnutls_str_cat(name, sizeof(name), when);
+		_gnutls_str_cat(name, sizeof(name), ".generalTime"); 
 		len = sizeof(ttime) - 1;
 		result = asn1_read_value(c2, name, ttime, &len);
 		if (result == ASN_OK)
 			ctime = _gnutls_generalTime2gtime(ttime);
 	} else {		/* UTCTIME */
 
-		strcat(name, ".tbsCertificate.validity."); /* Flawfinder: ignore */
-		strcat(name, when);
-		strcat(name, ".utcTime"); /* Flawfinder: ignore */
+		_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.validity."); 
+		_gnutls_str_cat(name, sizeof(name), when);
+		_gnutls_str_cat(name, sizeof(name), ".utcTime"); 
 		len = sizeof(ttime) - 1;
 		result = asn1_read_value(c2, name, ttime, &len);
 		if (result == ASN_OK)
@@ -886,8 +887,8 @@ int _gnutls_get_version(node_asn * c2, char *root)
 	char name[1024];
 	int len, result;
 
-	strcpy(name, root);
-	strcat(name, ".tbsCertificate.version"); /* Flawfinder: ignore */
+	_gnutls_str_cpy(name, sizeof(name), root);
+	_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.version"); 
 
 	len = sizeof(gversion) - 1;
 	if ((result = asn1_read_value(c2, name, gversion, &len)) < 0) {

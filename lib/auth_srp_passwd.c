@@ -30,6 +30,7 @@
 #include "gnutls_random.h"
 #include "gnutls_dh.h"
 #include "debug.h"
+#include <gnutls_str.h>
 
 /* this function parses tpasswd.conf file. Format is:
  * string(username):base64(v):base64(salt):int(index)
@@ -307,7 +308,7 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 		_gnutls_srp_clear_pwd_entry( pwd_entry);
 		return NULL;
 	}
-	strcpy( pwd_entry->username, RNDUSER); /* Flawfinder: ignore */
+	_gnutls_str_cpy( pwd_entry->username, MAX_SRP_USERNAME, RNDUSER); /* Flawfinder: ignore */
 	
 	pwd_entry->v = _gnutls_mpi_new(160);
 	if (pwd_entry->v==NULL) {

@@ -26,6 +26,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_global.h>
 #include "debug.h"
+#include <gnutls_str.h>
 
 
 /* Here we only extract the KeyUsage field
@@ -162,10 +163,10 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 	do {
 		k++;
 
-		strcpy(name, root);
-		strcat(name, ".?"); /* Flawfinder: ignore */
+		_gnutls_str_cpy(name, sizeof(name), root);
+		_gnutls_str_cat(name, sizeof(name), ".?"); 
 		_gnutls_int2str(k, counter);
-		strcat(name, counter); /* Flawfinder: ignore */
+		_gnutls_str_cat(name, sizeof(name), counter); 
 
 		len = sizeof(str) - 1;
 		result = asn1_read_value(rasn, name, str, &len);
@@ -178,8 +179,8 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 
 		do {
 
-			strcpy(name2, name);
-			strcat(name2, ".extnID"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnID");
 
 			len = sizeof(extnID) - 1;
 			result =
@@ -192,8 +193,8 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 
-			strcpy(name2, name);
-			strcat(name2, ".critical"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
 
 			len = sizeof(critical) - 1;
 			result =
@@ -206,8 +207,8 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 
-			strcpy(name2, name);
-			strcat(name2, ".extnValue"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
 
 			len = sizeof(extnValue) - 1;
 			result =
@@ -290,10 +291,10 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	do {
 		k++;
 
-		strcpy(name, "certificate2"); /* Flawfinder: ignore */
-		strcat(name, ".?"); /* Flawfinder: ignore */
+		_gnutls_str_cpy(name, sizeof(name), "certificate2"); 
+		_gnutls_str_cat(name, sizeof(name), ".?"); 
 		_gnutls_int2str(k, counter); 
-		strcat(name, counter); /* Flawfinder: ignore */
+		_gnutls_str_cat(name, sizeof(name), counter); 
 
 		len = sizeof(str) - 1;
 		result = asn1_read_value(rasn, name, str, &len);
@@ -306,8 +307,8 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 
 		do {
 
-			strcpy(name2, name);
-			strcat(name2, ".extnID"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnID"); 
 
 			len = sizeof(extnID) - 1;
 			result =
@@ -320,8 +321,8 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 
-			strcpy(name2, name);
-			strcat(name2, ".critical"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
 
 			len = sizeof(critical) - 1;
 			result =
@@ -335,8 +336,8 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 
-			strcpy(name2, name);
-			strcat(name2, ".extnValue"); /* Flawfinder: ignore */
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
 
 			len = sizeof(extnValue) - 1;
 			result =
