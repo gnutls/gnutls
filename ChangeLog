@@ -1,3 +1,10 @@
+2003-02-27 23:40  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_hash_int.c, lib/gnutls_int.h:
+
+	Added support for MD2 signature verification in X.509 certificates.  
+
 2003-02-25 21:39  nmav <nmav@gnutls.org>
 
 	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa, tests.c, tls_test.c:
