@@ -1,4 +1,4 @@
-INCLUDES = -I../libextra -Iminitasn1/ -I../includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
+INCLUDES = -I../libextra -Iminitasn1/ -Ix509/ -I../includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
@@ -13,10 +13,12 @@ endif
 DIST_SUBDIRS = minitasn1 x509
 if ENABLE_MINITASN1
 SUBDIRS = minitasn1 x509
-MINITASN1_OBJECTS = minitasn1/libminitasn1.la
+MINITASN1_COBJECTS = minitasn1/decoding.c minitasn1/gstr.c minitasn1/errors.c \
+	minitasn1/parser_aux.c minitasn1/structure.c minitasn1/element.c \
+	minitasn1/coding.c
 else
 SUBDIRS = x509
-MINITASN1_OBJECTS = 
+MINITASN1_COBJECTS = 
 endif
 
 EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
@@ -36,6 +38,11 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h auth_dh_common.h
 lib_LTLIBRARIES = libgnutls.la
 
+X509_COBJECTS = x509/crl.c x509/dn.c x509/common.c x509/x509.c x509/extensions.c \
+	x509/dsa.c x509/rfc2818_hostname.c x509/verify.c x509/mpi.c \
+	x509/privkey.c x509/pkcs7.c x509/crq.c x509/xml.c x509/sign.c x509/pkcs5.c \
+	x509/privkey_pkcs8.c x509/pkcs12.c x509/pkcs12_bag.c x509/pkcs12_encr.c \
+	x509/x509_write.c x509/crl_write.c x509/compat.c
 
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
@@ -52,13 +59,11 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_str.c gnutls_state.c gnutls_x509.c ext_cert_type.c \
 	gnutls_rsa_export.c auth_rsa_export.c \
 	ext_server_name.c auth_dh_common.c \
-	strnstr.c
+	strnstr.c 
 
 # Separate so we can create the documentation
 
-libgnutls_la_SOURCES = $(COBJECTS) 
-
-libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/libx509.la
+libgnutls_la_SOURCES = $(COBJECTS) $(X509_COBJECTS) $(MINITASN1_COBJECTS)
 
 libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
 	$(libgnutls_version_script_cmd) \
