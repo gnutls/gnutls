@@ -23,6 +23,9 @@
 # include <config.h>
 #endif
 #include <stdio.h>
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
 #ifdef HAVE_NETDB_H
 # include <sys/socket.h>
 # include <netinet/in.h>
