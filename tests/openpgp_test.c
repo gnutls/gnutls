@@ -55,14 +55,14 @@ main( int argc, char ** argv )
     gnutls_certificate_credentials ctx;
     gnutls_datum dat, xml, pk;
     gnutls_openpgp_name uid;
-    gnutls_private_key * pkey;
+    gnutls_privkey * pkey;
     gnutls_cert * cert;
     unsigned char fpr[20], keyid[8];
     char *s, *t;
     size_t fprlen = 0;
     int rc, nbits = 0, i;
 
-    rc = gnutls_certificate_allocate_cred( &ctx );
+    rc = gnutls_certificate_allocate_credentials( &ctx );
     assert( rc == 0 );
 
     s = "../src/openpgp/cli_ring.gpg";
@@ -152,7 +152,7 @@ main( int argc, char ** argv )
     #endif
 
     _gnutls_free_datum( &dat );
-    gnutls_certificate_free_cred( ctx );
+    gnutls_certificate_free_credentials( ctx );
 
     return 0;
 }

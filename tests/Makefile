@@ -1,7 +1,7 @@
 LIBS=`../lib/libgnutls-config --libs`  -lgcrypt
 LIBS2=`../lib/libgnutls-config --libs` `../libextra/libgnutls-extra-config --libs` -lgcrypt -lopencdk
 CC=gcc
-CFLAGS=-O2 -I../libextra/ -I../ -I../lib/ `../lib/libgnutls-config --cflags`
+CFLAGS=-O2 -I../libextra/ -I../ -I../lib/ `../lib/libgnutls-config --cflags` -I../lib/minitasn1/
 
 all: x509test opgptest
 
