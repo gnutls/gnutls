@@ -68,7 +68,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 			    PACK_HEADER_SIZE + pack_size + sizeof(uint32);
 
 			packed_session->data[0] = GNUTLS_CRD_SRP;
-			WRITEuint32(pack_size,
+			_gnutls_write_uint32(pack_size,
 				    &packed_session->
 				    data[PACK_HEADER_SIZE]);
 			
@@ -93,7 +93,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 			    PACK_HEADER_SIZE + state->gnutls_key->auth_info_size + sizeof(uint32);
 
 			packed_session->data[0] = GNUTLS_CRD_ANON;
-			WRITEuint32(state->gnutls_key->auth_info_size,
+			_gnutls_write_uint32(state->gnutls_key->auth_info_size,
 				    &packed_session->
 				    data[PACK_HEADER_SIZE]);
 			
@@ -130,7 +130,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 	 */
 	packed_session->size += sizeof(SecurityParameters)+sizeof(uint32);
 
-	WRITEuint32( sizeof(SecurityParameters), &packed_session->data[packed_session->size - sizeof(SecurityParameters) - sizeof(uint32)]);
+	_gnutls_write_uint32( sizeof(SecurityParameters), &packed_session->data[packed_session->size - sizeof(SecurityParameters) - sizeof(uint32)]);
 	memcpy(&packed_session->
 	       data[packed_session->size - sizeof(SecurityParameters)],
 	       &state->security_parameters, sizeof(SecurityParameters));
@@ -190,7 +190,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 	case GNUTLS_CRD_SRP:{
 
 			pack_size =
-			    READuint32(&packed_session->
+			    _gnutls_read_uint32(&packed_session->
 				       data[PACK_HEADER_SIZE]);
 			
 			if (pack_size == 0) break;
@@ -219,7 +219,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 #endif
 	case GNUTLS_CRD_ANON:{
 			pack_size =
-			    READuint32(&packed_session->
+			    _gnutls_read_uint32(&packed_session->
 				       data[PACK_HEADER_SIZE]);
 
 			if (pack_size == 0) break;
@@ -245,7 +245,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 		break;
 	case GNUTLS_CRD_CERTIFICATE:{
 			pack_size =
-			    READuint32(&packed_session->
+			    _gnutls_read_uint32(&packed_session->
 				       data[PACK_HEADER_SIZE]);
 			
 			if (pack_size == 0) {
@@ -291,7 +291,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 	/* Auth_info structures copied. Now copy SecurityParameters. 
 	 */
 	ret =
-	    READuint32(&packed_session->
+	    _gnutls_read_uint32(&packed_session->
 		       data[PACK_HEADER_SIZE + sizeof(uint32) +
 			    pack_size]);
 
@@ -329,7 +329,7 @@ int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
 	else info_size = sizeof(CERTIFICATE_AUTH_INFO_INT);
 
 	packed_session->data[0] = GNUTLS_CRD_CERTIFICATE;
-	WRITEuint32( packed_session->size-PACK_HEADER_SIZE-sizeof(uint32), &packed_session->data[PACK_HEADER_SIZE]);
+	_gnutls_write_uint32( packed_session->size-PACK_HEADER_SIZE-sizeof(uint32), &packed_session->data[PACK_HEADER_SIZE]);
 
 	if (info!=NULL) {
 		memcpy(&packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
@@ -340,7 +340,7 @@ int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
 
 	if (info!=NULL) {
 		for (i=0;i<info->ncerts;i++) {
-			WRITEuint32( info->raw_certificate_list[i].size, &packed_session->data[pos]);
+			_gnutls_write_uint32( info->raw_certificate_list[i].size, &packed_session->data[pos]);
 			pos += sizeof(uint32);
 		
 			memcpy(&packed_session->data[pos], info->raw_certificate_list[i].data, info->raw_certificate_list[i].size);
@@ -386,7 +386,7 @@ uint32 size;
 		}
 		
 		for (i=0;i<info->ncerts;i++) {
-			size = READuint32( &packed_session->data[ pos]);
+			size = _gnutls_read_uint32( &packed_session->data[ pos]);
 			pos += sizeof(uint32);
 
 			ret = gnutls_set_datum( &info->raw_certificate_list[i], &packed_session->data[ pos], size);

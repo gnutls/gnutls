@@ -117,12 +117,12 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* Read uint16 cipher_spec_length */
 	DECR_LEN(len, 2);
-	sizeOfSuites = READuint16( &data[pos]);
+	sizeOfSuites = _gnutls_read_uint16( &data[pos]);
 	pos += 2;
 	
 	/* read session id length */
 	DECR_LEN(len, 2);
-	session_id_len = READuint16( &data[pos]);
+	session_id_len = _gnutls_read_uint16( &data[pos]);
 	pos += 2;
 
 	if (session_id_len > TLS_MAX_SESSION_ID_SIZE) { 
@@ -132,7 +132,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* read challenge length */
 	DECR_LEN(len, 2);
-	challenge = READuint16( &data[pos]);
+	challenge = _gnutls_read_uint16( &data[pos]);
 	pos += 2;
 
 	if ( challenge < 16 || challenge > TLS_RANDOM_SIZE) {

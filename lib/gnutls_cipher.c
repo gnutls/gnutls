@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -90,7 +90,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 
 	/* copy the headers */
 	memcpy( ciphertext, headers, headers_size);
-	WRITEuint16( ret, &ciphertext[3]);
+	_gnutls_write_uint16( ret, &ciphertext[3]);
 
 	return ret+headers_size;
 }
@@ -263,9 +263,9 @@ int _gnutls_compressed2ciphertext(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
 
-	c_length = CONVuint16(compressed.size);
+	c_length = _gnutls_conv_uint16(compressed.size);
 	seq_num =
-	    CONVuint64(&state->connection_state.write_sequence_number);
+	    _gnutls_conv_uint64(&state->connection_state.write_sequence_number);
 
 	if (td != GNUTLS_MAC_FAILED) {	/* actually when the algorithm in not the NULL one */
 		_gnutls_hmac(td, UINT64DATA(seq_num), 8);
@@ -419,8 +419,8 @@ int _gnutls_ciphertext2compressed(GNUTLS_STATE state,
 	memcpy( compress_data, ciphertext.data, length);
 
 
-	c_length = CONVuint16((uint16) length);
-	seq_num = CONVuint64( &state->connection_state.read_sequence_number);
+	c_length = _gnutls_conv_uint16((uint16) length);
+	seq_num = _gnutls_conv_uint64( &state->connection_state.read_sequence_number);
 
 	/* Pass the type, version, length and compressed through
 	 * MAC.

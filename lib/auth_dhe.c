@@ -159,19 +159,19 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 	_gnutls_mpi_print( &data_p[2], &n_p, p);
 	_gnutls_mpi_release(&p);
 
-	WRITEuint16(n_p, data_p);
+	_gnutls_write_uint16(n_p, data_p);
 
 	data_g = &data_p[2 + n_p];
 	_gnutls_mpi_print( &data_g[2], &n_g, g);
 	_gnutls_mpi_release(&g);
 
-	WRITEuint16(n_g, data_g);
+	_gnutls_write_uint16(n_g, data_g);
 
 	data_X = &data_g[2 + n_g];
 	_gnutls_mpi_print( &data_X[2], &n_X, X);
 	_gnutls_mpi_release(&X);
 
-	WRITEuint16(n_X, data_X);
+	_gnutls_write_uint16(n_X, data_X);
 
 	data_size = n_p + n_g + n_X + 6;
 
@@ -202,7 +202,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	WRITEdatum16(&(*data)[data_size], signature);
+	_gnutls_write_datum16(&(*data)[data_size], signature);
 	data_size += signature.size + 2;
 
 	gnutls_free_datum(&signature);
@@ -242,7 +242,7 @@ static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 	_gnutls_mpi_print( &(*data)[2], &n_X, X);
 	_gnutls_mpi_release(&X);
 
-	WRITEuint16(n_X, &(*data)[0]);
+	_gnutls_write_uint16(n_X, &(*data)[0]);
 
 	/* calculate the key after calculating the message */
 	state->gnutls_key->KEY =
@@ -303,7 +303,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 	i = 0;
 	
 	DECR_LEN( data_size, 2);
-	n_p = READuint16(&data[i]);
+	n_p = _gnutls_read_uint16(&data[i]);
 	i += 2;
 
 	DECR_LEN( data_size, n_p);
@@ -315,7 +315,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 	}
 
 	DECR_LEN( data_size, 2);
-	n_g = READuint16(&data[i]);
+	n_g = _gnutls_read_uint16(&data[i]);
 	i += 2;
 
 	DECR_LEN( data_size, n_g);
@@ -327,7 +327,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 	}
 
 	DECR_LEN( data_size, 2);
-	n_Y = READuint16(&data[i]);
+	n_Y = _gnutls_read_uint16(&data[i]);
 	i += 2;
 
 	DECR_LEN( data_size, n_Y);
@@ -379,7 +379,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 	vparams.data = data;
 
 	DECR_LEN( data_size, 2);
-	sigsize = READuint16(&data[vparams.size]);
+	sigsize = _gnutls_read_uint16(&data[vparams.size]);
 
 	DECR_LEN( data_size, sigsize);
 	signature.data = &data[vparams.size + 2];
@@ -445,7 +445,7 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 	bits = _gnutls_dh_get_prime_bits( state);
 
 	DECR_LEN( data_size, 2);
-	n_Y = READuint16(&data[0]);
+	n_Y = _gnutls_read_uint16(&data[0]);
 	_n_Y = n_Y;
 
 	DECR_LEN( data_size, n_Y);

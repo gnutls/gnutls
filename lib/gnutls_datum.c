@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -29,19 +29,19 @@
  * should be preallocated (datum.size+(bits/8))
  */
 
-void WRITEdatum16( opaque* dest, gnutls_datum dat) {
-	WRITEuint16( dat.size, dest);
+void _gnutls_write_datum16( opaque* dest, gnutls_datum dat) {
+	_gnutls_write_uint16( dat.size, dest);
 	memcpy( &dest[2], dat.data, dat.size);
 }
-void WRITEdatum24( opaque* dest, gnutls_datum dat) {
-	WRITEuint24( dat.size, dest);
+void _gnutls_write_datum24( opaque* dest, gnutls_datum dat) {
+	_gnutls_write_uint24( dat.size, dest);
 	memcpy( &dest[3], dat.data, dat.size);
 }
-void WRITEdatum32( opaque* dest, gnutls_datum dat) {
-	WRITEuint32( dat.size, dest);
+void _gnutls_write_datum32( opaque* dest, gnutls_datum dat) {
+	_gnutls_write_uint32( dat.size, dest);
 	memcpy( &dest[4], dat.data, dat.size);
 }
-void WRITEdatum8( opaque* dest, gnutls_datum dat) {
+void _gnutls_write_datum8( opaque* dest, gnutls_datum dat) {
 	dest[0] = (uint8) dat.size;
 	memcpy( &dest[1], dat.data, dat.size);
 }

@@ -1516,7 +1516,7 @@ opaque *pdata;
 			gnutls_assert();
 			return ret;
 		}
-		WRITEdatum16(pdata, tmp);
+		_gnutls_write_datum16(pdata, tmp);
 		pdata += (2 + tmp.size);
 	}
 

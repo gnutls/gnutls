@@ -109,14 +109,14 @@ int i;
 #endif
 
 	DECR_LENGTH_RET( data_size, 2, 0);
-	next = READuint16( data);
+	next = _gnutls_read_uint16( data);
 	pos+=2;
 
 	DECR_LENGTH_RET( data_size, next, 0);
 	
 	do {
 		DECR_LENGTH_RET( next, 1, 0);
-		type = READuint16( &data[pos]);
+		type = _gnutls_read_uint16( &data[pos]);
 		pos+=2;
 		
 		if ( (ret=_gnutls_extension_list_check( state, type)) < 0) {
@@ -125,7 +125,7 @@ int i;
 		}
 
 		DECR_LENGTH_RET( next, 2, 0);
-		size = READuint16(&data[pos]);
+		size = _gnutls_read_uint16(&data[pos]);
 		pos+=2;
 				
 		DECR_LENGTH_RET( next, size, 0);
@@ -198,11 +198,11 @@ int (*ext_func_send)( GNUTLS_STATE, opaque*, int);
 			}
 
 			/* write extension type */
-			WRITEuint16( next, &(*data)[pos]);
+			_gnutls_write_uint16( next, &(*data)[pos]);
 			pos+=2;
 			
 			/* write size */
-			WRITEuint16( size, &(*data)[pos]);
+			_gnutls_write_uint16( size, &(*data)[pos]);
 			pos+=2;
 			
 			memcpy( &(*data)[pos], sdata, size);
@@ -218,7 +218,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque*, int);
 	size = pos;
 	pos-=2; /* remove the size of the size header! */
 
-	WRITEuint16( pos, (*data));
+	_gnutls_write_uint16( pos, (*data));
 
 	if (size==2) { /* empty */
 		size = 0;

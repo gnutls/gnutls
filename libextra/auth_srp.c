@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -150,7 +150,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
 	
-	WRITEuint16( n_g, data_g);
+	_gnutls_write_uint16( n_g, data_g);
 
 	/* copy N (mod n) */
 	data_n = &data_g[2 + n_g];
@@ -160,14 +160,14 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
 	
-	WRITEuint16( n_n, data_n);
+	_gnutls_write_uint16( n_n, data_n);
 
 	/* copy the salt */
 	data_s = &data_n[2 + n_n];
 	n_s = pwd_entry->salt_size;
 	memcpy(&data_s[2], pwd_entry->salt, n_s);
 
-	WRITEuint16( n_s, data_s);
+	_gnutls_write_uint16( n_s, data_s);
 
 	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
 	_gnutls_srp_clear_pwd_entry( pwd_entry);
@@ -203,7 +203,7 @@ int gen_srp_server_kx2(GNUTLS_STATE state, opaque ** data)
 	if (_gnutls_mpi_print( &data_b[2], &n_b, B)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 
-	WRITEuint16( n_b, data_b);
+	_gnutls_write_uint16( n_b, data_b);
 
 	/* calculate u */
 	state->gnutls_key->u = _gnutls_calc_srp_u(B);
@@ -286,7 +286,7 @@ int gen_srp_client_kx0(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
 	
-	WRITEuint16( n_a, data_a);
+	_gnutls_write_uint16( n_a, data_a);
 
 	return n_a + 2;
 }
@@ -326,7 +326,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	i++;
 
 	DECR_LEN( data_size, 2);
-	n_g = READuint16( &data[i]);
+	n_g = _gnutls_read_uint16( &data[i]);
 	i += 2;
 
 	DECR_LEN( data_size, n_g);
@@ -338,7 +338,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	}
 
 	DECR_LEN( data_size, 2);
-	n_n = READuint16( &data[i]);
+	n_n = _gnutls_read_uint16( &data[i]);
 	i += 2;
 
 	DECR_LEN( data_size, n_n);
@@ -346,7 +346,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	i += n_n;
 	
 	DECR_LEN( data_size, 2);
-	n_s = READuint16( &data[i]);
+	n_s = _gnutls_read_uint16( &data[i]);
 	i += 2;
 
 	DECR_LEN( data_size, n_s);
@@ -389,7 +389,7 @@ int proc_srp_client_kx0(GNUTLS_STATE state, opaque * data, int data_size)
 	size_t _n_A;
 
 	DECR_LEN( data_size, 2);
-	_n_A = READuint16( &data[0]);
+	_n_A = _gnutls_read_uint16( &data[0]);
 
 	DECR_LEN( data_size, _n_A);
 	if (_gnutls_mpi_scan(&A, &data[2], &_n_A) || A == NULL) {
@@ -407,7 +407,7 @@ int proc_srp_server_kx2(GNUTLS_STATE state, opaque * data, int data_size)
 	int ret;
 	
 	DECR_LEN( data_size, 2);
-	_n_B = READuint16( &data[0]);
+	_n_B = _gnutls_read_uint16( &data[0]);
 
 	DECR_LEN( data_size, _n_B);
 	if (_gnutls_mpi_scan(&B, &data[2], &_n_B) || B==NULL) {

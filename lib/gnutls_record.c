@@ -217,7 +217,7 @@ ssize_t _gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
 
 	/* increase sequence number
 	 */
-	if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
+	if (_gnutls_uint64pp( &state->connection_state.write_sequence_number) != 0) {
 		_gnutls_session_invalidate( state);
 		gnutls_assert();
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
@@ -273,7 +273,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	headers[2]=_gnutls_version_get_minor( lver);
 
 	_gnutls_record_log( "REC: Sending Packet[%d] %s(%d) with length: %d\n",
-		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
+		(int) _gnutls_uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 
 	if ( sizeofdata > MAX_RECORD_SIZE)
 		data2send_size = MAX_RECORD_SIZE;
@@ -338,7 +338,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 		/* increase sequence number
 		 */
-		if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
+		if (_gnutls_uint64pp( &state->connection_state.write_sequence_number) != 0) {
 			_gnutls_session_invalidate( state);
 			gnutls_assert();
 			gnutls_afree( erecord);
@@ -374,7 +374,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	state->gnutls_internals.record_send_buffer_user_size = 0;
 
 	_gnutls_record_log( "REC: Sent Packet[%d] %s(%d) with length: %d\n",
-	(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
+	(int) _gnutls_uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 
 	return retval;
 }
@@ -477,7 +477,7 @@ static int _gnutls_check_record_headers( GNUTLS_STATE state, uint8 headers[RECOR
 		*version = _gnutls_version_get( headers[1], headers[2]);
 #endif
 
-		*length = READuint16( &headers[3]);
+		*length = _gnutls_read_uint16( &headers[3]);
 	}
 
 	return 0;
@@ -683,9 +683,9 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	}
 
 	_gnutls_record_log( "REC: Expected Packet[%d] %s(%d) with length: %d\n",
-		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
+		(int) _gnutls_uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 	_gnutls_record_log( "REC: Received Packet[%d] %s(%d) with length: %d\n",
-		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, length);
+		(int) _gnutls_uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, length);
 
 	if (length > MAX_RECV_SIZE) {
 
@@ -750,10 +750,10 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	}
 
 	_gnutls_record_log( "REC: Decrypted Packet[%d] %s(%d) with length: %d\n",
-		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
+		(int) _gnutls_uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
 
 	/* increase sequence number */
-	if (uint64pp( &state->connection_state.read_sequence_number)!=0) {
+	if (_gnutls_uint64pp( &state->connection_state.read_sequence_number)!=0) {
 		_gnutls_session_invalidate( state);
 		gnutls_afree(tmpdata);
 		gnutls_assert();

@@ -176,7 +176,7 @@ static int _find_x509_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 	do {
 
 		DECR_LENGTH_RET(data_size, 2, 0);
-		size = READuint16(data);
+		size = _gnutls_read_uint16(data);
 		DECR_LENGTH_RET(data_size, size, 0);
 		data += 2;
 
@@ -343,7 +343,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 			dataptr_size -= 2;
 			if (dataptr_size <= 0)
 				goto clear;
-			size = READuint16(data);
+			size = _gnutls_read_uint16(data);
 
 			dataptr_size -= size;
 			if (dataptr_size < 0)
@@ -384,7 +384,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 				 */
 				data_size -= 2;
 
-				size = READuint16(data);
+				size = _gnutls_read_uint16(data);
 
 				data += 2;
 
@@ -497,10 +497,10 @@ int _gnutls_gen_x509_certificate(GNUTLS_STATE state, opaque ** data)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	WRITEuint24(ret - 3, pdata);
+	_gnutls_write_uint24(ret - 3, pdata);
 	pdata += 3;
 	for (i = 0; i < apr_cert_list_length; i++) {
-		WRITEdatum24(pdata, apr_cert_list[i].raw);
+		_gnutls_write_datum24(pdata, apr_cert_list[i].raw);
 		pdata += (3 + apr_cert_list[i].raw.size);
 	}
 
@@ -540,17 +540,17 @@ int _gnutls_gen_openpgp_certificate(GNUTLS_STATE state,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	WRITEuint24(ret - 3, pdata);
+	_gnutls_write_uint24(ret - 3, pdata);
 	pdata += 3;
 
 	*pdata = PGP_KEY;	/* whole key */
 	pdata++;
 
 	if (apr_cert_list_length > 0) {
-		WRITEdatum24(pdata, apr_cert_list[0].raw);
+		_gnutls_write_datum24(pdata, apr_cert_list[0].raw);
 		pdata += (3 + apr_cert_list[0].raw.size);
 	} else			/* empty - no certificate */
-		WRITEuint24(0, pdata);
+		_gnutls_write_uint24(0, pdata);
 
 	return ret;
 }
@@ -594,7 +594,7 @@ int _gnutls_gen_openpgp_certificate_fpr(GNUTLS_STATE state,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	WRITEuint24(packet_size - 3, pdata);
+	_gnutls_write_uint24(packet_size - 3, pdata);
 	pdata += 3;
 
 	*pdata = PGP_KEY_FINGERPRINT;	/* key fingerprint */
@@ -698,7 +698,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	}
 
 	DECR_LEN(dsize, 3);
-	size = READuint24(p);
+	size = _gnutls_read_uint24(p);
 	p += 3;
 
 	if (size == 0) {
@@ -710,7 +710,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	i = dsize;
 	while(i > 0) {
 		DECR_LEN(dsize, 3);
-		len = READuint24(p);
+		len = _gnutls_read_uint24(p);
 		p += 3;
 		DECR_LEN(dsize, len);
 		peer_certificate_list_size++;
@@ -746,7 +746,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	 */
 
 	for (j=0;j<peer_certificate_list_size;j++) {
-		len = READuint24(p);
+		len = _gnutls_read_uint24(p);
 		p += 3;
 
 		tmp.size = len;
@@ -830,7 +830,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	}
 
 	DECR_LEN(dsize, 3);
-	size = READuint24(p);
+	size = _gnutls_read_uint24(p);
 	p += 3;
 
 	if (size == 0) {
@@ -875,7 +875,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 
 		/* Read the actual certificate */
 		DECR_LEN(dsize, 3);
-		len = READuint24(p);
+		len = _gnutls_read_uint24(p);
 		p += 3;
 
 		if (size == 0) {
@@ -1050,7 +1050,7 @@ int _gnutls_proc_cert_cert_req(GNUTLS_STATE state, opaque * data,
 
 	if (state->security_parameters.cert_type == GNUTLS_CRT_X509) {
 		DECR_LEN(dsize, 2);
-		size = READuint16(p);
+		size = _gnutls_read_uint16(p);
 		p += 2;
 	} else {
 		p = NULL;
@@ -1118,7 +1118,7 @@ int _gnutls_gen_cert_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	size = signature.size;
-	WRITEuint16(size, *data);
+	_gnutls_write_uint16(size, *data);
 
 	memcpy(&(*data)[2], signature.data, size);
 
@@ -1144,7 +1144,7 @@ int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 	}
 
 	DECR_LEN(dsize, 2);
-	size = READuint16(pdata);
+	size = _gnutls_read_uint16(pdata);
 	pdata += 2;
 
 	DECR_LEN(dsize, size);
@@ -1234,7 +1234,7 @@ int _gnutls_gen_cert_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	pdata += CERTTYPE_SIZE;
 
 	if (state->security_parameters.cert_type == GNUTLS_CRT_X509) {
-		WRITEdatum16(pdata, cred->x509_rdn_sequence);
+		_gnutls_write_datum16(pdata, cred->x509_rdn_sequence);
 		pdata += cred->x509_rdn_sequence.size + 2;
 	}
 

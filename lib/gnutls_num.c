@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -28,7 +28,7 @@
 
 /* This function will set the uint64 x to zero 
  */
-int uint64zero( uint64 *x) {
+int _gnutls_uint64zero( uint64 *x) {
 
 	memset( x->i, 0, 8);
 	return 0;
@@ -38,7 +38,7 @@ int uint64zero( uint64 *x) {
  * Returns 0 on success, or -1 if the uint64 max limit
  * has been reached.
  */
-int uint64pp( uint64 *x) {
+int _gnutls_uint64pp( uint64 *x) {
 register int i, y=0;
 
 	for (i=7;i>=0;i--) {
@@ -57,7 +57,7 @@ register int i, y=0;
 
 #endif /* HAVE_UINT64 */
 
-uint32 uint24touint32( uint24 num) {
+uint32 _gnutls_uint24touint32( uint24 num) {
 uint32 ret=0;
 
 	((uint8*)&ret)[1] = num.pint[0];
@@ -66,7 +66,7 @@ uint32 ret=0;
 	return ret;
 }
 
-uint24 uint32touint24( uint32 num) {
+uint24 _gnutls_uint32touint24( uint32 num) {
 uint24 ret;
 
 	ret.pint[0] = ((uint8*)&num)[1];
@@ -77,7 +77,7 @@ uint24 ret;
 }
 
 /* data should be at least 3 bytes */
-uint32 READuint24( const opaque* data) {
+uint32 _gnutls_read_uint24( const opaque* data) {
 uint32 res;
 uint24 num;
 	
@@ -85,20 +85,20 @@ uint24 num;
 	num.pint[1] = data[1];
 	num.pint[2] = data[2];
 
-	res = uint24touint32( num);
+	res = _gnutls_uint24touint32( num);
 #ifndef WORDS_BIGENDIAN
 	res = byteswap32( res);
 #endif
 return res;
 }
 
-void WRITEuint24( uint32 num, opaque* data) {
+void _gnutls_write_uint24( uint32 num, opaque* data) {
 uint24 tmp;
 	
 #ifndef WORDS_BIGENDIAN
 	num = byteswap32( num);
 #endif
-	tmp = uint32touint24( num);
+	tmp = _gnutls_uint32touint24( num);
 
 	data[0] = tmp.pint[0];
 	data[1] = tmp.pint[1];
@@ -106,7 +106,7 @@ uint24 tmp;
 	return;
 }
 
-uint32 READuint32( const opaque* data) {
+uint32 _gnutls_read_uint32( const opaque* data) {
 uint32 res;
 
 	memcpy( &res, data, sizeof(uint32));
@@ -116,7 +116,7 @@ uint32 res;
 return res;
 }
 
-void WRITEuint32( uint32 num, opaque* data) {
+void _gnutls_write_uint32( uint32 num, opaque* data) {
 
 #ifndef WORDS_BIGENDIAN
 	num = byteswap32( num);
@@ -125,7 +125,7 @@ void WRITEuint32( uint32 num, opaque* data) {
 	return;
 }
 
-uint16 READuint16( const opaque* data) {
+uint16 _gnutls_read_uint16( const opaque* data) {
 uint16 res;
 	memcpy( &res, data, sizeof(uint16));
 #ifndef WORDS_BIGENDIAN
@@ -134,7 +134,7 @@ uint16 res;
 return res;
 }
 
-void WRITEuint16( uint16 num, opaque* data) {
+void _gnutls_write_uint16( uint16 num, opaque* data) {
 
 #ifndef WORDS_BIGENDIAN
 	num = byteswap16( num);
@@ -143,7 +143,7 @@ void WRITEuint16( uint16 num, opaque* data) {
 	return;
 }
 
-uint32 CONVuint32( uint32 data) {
+uint32 _gnutls_conv_uint32( uint32 data) {
 #ifndef WORDS_BIGENDIAN
 	return byteswap32( data);
 #else
@@ -151,7 +151,7 @@ uint32 CONVuint32( uint32 data) {
 #endif
 }
 
-uint16 CONVuint16( uint16 data) {
+uint16 _gnutls_conv_uint16( uint16 data) {
 #ifndef WORDS_BIGENDIAN
 	return byteswap16( data);
 #else
@@ -159,7 +159,7 @@ uint16 CONVuint16( uint16 data) {
 #endif
 }
 
-uint64 CONVuint64( const uint64* data) {
+uint64 _gnutls_conv_uint64( const uint64* data) {
 #ifdef HAVE_UINT64
 # ifndef WORDS_BIGENDIAN
 	return byteswap64(*data);
@@ -174,7 +174,7 @@ uint64 CONVuint64( const uint64* data) {
 #endif /* HAVE_UINT64 */
 }
 
-uint32 uint64touint32( const uint64* num) {
+uint32 _gnutls_uint64touint32( const uint64* num) {
 uint32 ret;
 
 #ifdef HAVE_UINT64
@@ -188,10 +188,6 @@ uint32 ret;
 # endif
 #endif /* HAVE_UINT64 */
 
- 
-
  return ret;
 }
-
-
 

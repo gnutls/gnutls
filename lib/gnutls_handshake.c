@@ -214,7 +214,7 @@ int _gnutls_create_random(opaque * dst)
 
 	tim = time(NULL);
 	/* generate server random value */
-	WRITEuint32(tim, dst);
+	_gnutls_write_uint32(tim, dst);
 
 	if (_gnutls_get_random
 	    (rand, TLS_RANDOM_SIZE - 4, GNUTLS_STRONG_RANDOM) < 0) {
@@ -315,7 +315,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	/* Select a ciphersuite 
 	 */
 	DECR_LEN(len, 2);
-	sizeOfSuites = READuint16(&data[pos]);
+	sizeOfSuites = _gnutls_read_uint16(&data[pos]);
 	pos += 2;
 
 	DECR_LEN(len, sizeOfSuites);
@@ -735,7 +735,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 	}
 
 	data[pos++] = (uint8) type;
-	WRITEuint24(i_datasize, &data[pos]);
+	_gnutls_write_uint24(i_datasize, &data[pos]);
 	pos += 3;
 
 	if (i_datasize > 0)
@@ -857,7 +857,7 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 		/* we do not use DECR_LEN because we know
 		 * that the packet has enough data.
 		 */
-		length32 = READuint24(&dataptr[1]);
+		length32 = _gnutls_read_uint24(&dataptr[1]);
 		handshake_header_size = HANDSHAKE_HEADER_SIZE;
 
 		_gnutls_handshake_log("HSK: %s was received [%ld bytes]\n",
@@ -1351,7 +1351,7 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 	}
 
 
-	WRITEuint16(x, *ret_data);
+	_gnutls_write_uint16(x, *ret_data);
 	pos += 2;
 
 	for (i = 0; i < x / 2; i++) {
