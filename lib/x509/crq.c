@@ -82,6 +82,7 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq crq)
 }
 
 #define PEM_CRQ "NEW CERTIFICATE REQUEST"
+#define PEM_CRQ2 "CERTIFICATE REQUEST"
 
 /**
   * gnutls_x509_crq_import - This function will import a DER or PEM encoded Certificate request
@@ -111,6 +112,10 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 		/* Try the first header */
 		result = _gnutls_fbase64_decode(PEM_CRQ, data->data, data->size,
 			&out);
+
+		if (result <= 0) /* Go for the second header */
+			result = _gnutls_fbase64_decode(PEM_CRQ2, data->data, data->size,
+				&out);
 
 		if (result <= 0) {
 			if (result==0) result = GNUTLS_E_INTERNAL_ERROR;
