@@ -134,19 +134,26 @@ static char input[128];
 
 static const char* read_pass( const char* input_str)
 {
-#ifdef _WIN32
 static char input[128];
+const char* pass;
+
+	if (info.pass) return info.pass;
+
+#ifdef _WIN32
 
 	fputs( input_str, stderr);
 	fgets( input, sizeof(input), stdin);
 	
 	input[strlen(input)-1] = 0;
 
-	if (strlen(input)==0) return NULL;
+	if (strlen(input)==0 || input[0]=='\n') return NULL;
 
 	return input;
 #else
-	return getpass(input_str);
+	pass = getpass(input_str);
+	if (pass == NULL || strlen(pass)==0 || pass[0]=='\n') return NULL;
+
+	return pass;
 #endif
 }
 
@@ -227,13 +234,14 @@ size_t size;
 		}
 	} else {
 		unsigned int flags;
+		const char* pass;
 		
 		if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
 		else flags = GNUTLS_PKCS_USE_PKCS12_3DES;
-		if (info.pass == NULL) flags = GNUTLS_PKCS_PLAIN;
+		if ((pass=read_pass("Enter password: ")) == NULL) flags = GNUTLS_PKCS_PLAIN;
 
 		size = sizeof(buffer);
-		ret = gnutls_x509_privkey_export_pkcs8( key, out_cert_format, info.pass, flags, buffer, &size);
+		ret = gnutls_x509_privkey_export_pkcs8( key, out_cert_format, pass, flags, buffer, &size);
 		if (ret < 0) {
 			fprintf(stderr, "privkey_export_pkcs8: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -628,7 +636,8 @@ static inline int known_oid( const char* oid)
 void certificate_info( void)
 {
 	gnutls_x509_crt crt;
-	int ret, i, indx, j;
+	int ret;
+	unsigned int i, indx, j;
 	unsigned int critical, key_usage;
 	time_t tim;
 	gnutls_datum pem;
@@ -851,7 +860,8 @@ void certificate_info( void)
 
 static void print_certificate_info( gnutls_x509_crt crt)
 {
-	int ret, i;
+	int ret;
+	unsigned int i;
 	unsigned int critical, key_usage;
 	time_t tim;
 	char serial[40];
@@ -970,16 +980,16 @@ static void print_certificate_info( gnutls_x509_crt crt)
 void crl_info(void)
 {
 	gnutls_x509_crl crl;
-	int ret, i, rc;
+	int ret, rc;
 	size_t size;
 	time_t tim;
+	unsigned int i;
 	gnutls_datum pem;
 	unsigned char serial[40];
 	size_t serial_size = sizeof(serial), dn_size;
 	char printable[256];
-	char *print;
+	char *print, dn[256];
 	const char* cprint;
-	char dn[256];
 		
 	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 	buffer[size] = 0;
@@ -1029,7 +1039,7 @@ void crl_info(void)
 	rc = gnutls_x509_crl_get_crt_count( crl);
 	fprintf(outfile, "Revoked certificates: %d\n", rc);
 
-	for (i=0;i<rc;i++) {
+	for (i=0;i<(unsigned int)rc;i++) {
 		/* serial number
 		 */
 		serial_size = sizeof(serial);
@@ -1051,11 +1061,13 @@ void privkey_info( void)
 {
 	gnutls_x509_privkey key;
 	size_t size;
-	int ret, i;
+	int ret;
+	unsigned int i;
 	gnutls_datum pem;
 	char printable[256];
 	char *print;
 	const char* cprint;
+	const char* pass;
 		
 	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 	buffer[size] = 0;
@@ -1065,10 +1077,12 @@ void privkey_info( void)
 	pem.data = buffer;
 	pem.size = size;
 	
+	pass = read_pass("Enter password: ");
+
 	if (!info.pkcs8) {
 		ret = gnutls_x509_privkey_import(key, &pem, in_cert_format);
 	} else {
-		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, in_cert_format, info.pass, 0);
+		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, in_cert_format, pass, 0);
 	}
 
 	if (ret < 0) {
@@ -1113,6 +1127,7 @@ gnutls_x509_privkey key;
 int ret;
 gnutls_datum dat;
 size_t size;
+const char* pass;
 
 	if (!info.privkey && !mand) return NULL;
 
@@ -1140,12 +1155,14 @@ size_t size;
 	
 	dat.data = buffer;
 	dat.size = size;
-	
+		
 	if (!info.pkcs8)
 		ret = gnutls_x509_privkey_import( key, &dat, in_cert_format);
-	else
+	else {
+		pass = read_pass("Enter password: ");
 		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, in_cert_format,
-			info.pass, 0);
+			pass, 0);
+	}
 	
 	if (ret < 0) {
 		fprintf(stderr, "privkey_import: %s\n", gnutls_strerror(ret));
@@ -1200,6 +1217,7 @@ gnutls_x509_privkey load_ca_private_key()
 FILE* fd;
 gnutls_x509_privkey key;
 int ret;
+const char* pass;
 gnutls_datum dat;
 size_t size;
 
@@ -1232,9 +1250,11 @@ size_t size;
 	
 	if (!info.pkcs8)
 		ret = gnutls_x509_privkey_import( key, &dat, in_cert_format);
-	else
+	else {
+		pass = read_pass("Enter password: ");
 		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, in_cert_format,
-			info.pass, 0);
+			pass, 0);
+	}
 	
 	if (ret < 0) {
 		fprintf(stderr, "privkey_import: %s\n", gnutls_strerror(ret));
@@ -1722,8 +1742,7 @@ void generate_pkcs12( void)
 		name = read_str("Enter a name for the key: ");
 	} while( name == NULL);
 
-	if (info.pass) password = info.pass;
-	else password = read_pass( "Enter password: ");
+	password = read_pass( "Enter password: ");
 
 	result = gnutls_pkcs12_bag_init( &bag);
 	if (result < 0) {
@@ -1956,8 +1975,7 @@ void pkcs12_info( void)
 	data.data = buffer;
 	data.size = size;
 
-	if (info.pass) password = info.pass;
-	else password = read_pass( "Enter password: ");
+	password = read_pass( "Enter password: ");
 	
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {
