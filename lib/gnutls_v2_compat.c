@@ -98,7 +98,8 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 
 #define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
 
-/* Read a v2 client hello 
+/* Read a v2 client hello. Some browsers still use that beast!!!
+ * However they set their version to 3.0 or 3.1 --- that's cool!
  */
 int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 			      int datalen)
@@ -126,8 +127,14 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 #endif
 
 	version = _gnutls_version_get(data[pos], data[pos + 1]);
-	/* fallback to SSL 3.0 */
-	gnutls_set_current_version(state, GNUTLS_SSL3);
+
+	/* if we do not support that version  */
+	if (_gnutls_version_is_supported(state, version) == 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+	} else {
+		gnutls_set_current_version(state, version);
+	}
 
 	pos += 2;
 
