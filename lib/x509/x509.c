@@ -548,7 +548,7 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 	result =
 	     asn1_read_value(c2, nptr, ext_data, &len);
 
-	if (result == ASN1_VALUE_NOT_FOUND) {
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
 		asn1_delete_structure(&c2);
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
