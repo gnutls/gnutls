@@ -17,6 +17,9 @@ See the end for copying conditions.
   tiny patch by Aleix Conchillo Flaque <aleix@member.fsf.org>.
 - Add self test of PKCS#12 functionality in "certtool", based on test
   vectors from Joe Orton <joe@manyfish.co.uk>.
+- Fix library order in libgnutls*-config --libs output, to permit
+  static linking, reported by Yoann Vandoorselaere
+  <yoann@prelude-ids.org>.
 
 * Version 1.1.20 (2004-10-12)
 - Fix compile problem in gl/getpass.c on some systems.
