@@ -14,6 +14,8 @@ Current list:
 * Verify added CRLs
 * Add functions to import certificates, private keys, etc. from
   files similar to gnutls_x509_crt_import().
+* Print information about the certificate's public key in certtool 
+  output.
 * Document the format for the supported DN attributes.
 * Add support for Certificate Extensions Profile for Qualified 
   Certificates (rfc3039)

@@ -94,7 +94,7 @@ typedef void *gnutls_transport_ptr_t;
 
 /* defaults for verification functions
  */
-#define DEFAULT_VERIFY_DEPTH 5
+#define DEFAULT_VERIFY_DEPTH 6
 #define DEFAULT_VERIFY_BITS 8200
 
 #include <gnutls_mem.h>
