@@ -18,10 +18,11 @@
 {\Large{GNUTLS}}
 &
 \vspace{-.6cm}
-\begin{verbatim}
-a Transport Layer Security Library
-This document applies to GnuTLS @VERSION@
-\end{verbatim}
+\begin{flushright}
+a Transport Layer Security Library\\
+This is a Draft document\\
+Applies to GnuTLS @VERSION@
+\end{flushright}
 \end{tabular}
 
 \vspace*{\stretch{2}}
@@ -35,7 +36,8 @@ This document applies to GnuTLS @VERSION@
 {\Large{GNUTLS}}
 \begin{flushright}
 a Transport Layer Security Library\\
-This document applies to GnuTLS 0.3.2
+This is a Draft document\\
+Applies to GnuTLS @VERSION@
 \end{flushright}
 
 \end{htmlonly}
