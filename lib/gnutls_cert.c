@@ -386,7 +386,11 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS * res, int ncerts)
   * This function sets a certificate/private key pair in the 
   * X509PKI_CREDENTIALS structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
-  * server)
+  * server).
+  *
+  * Currently only PKCS-1 PEM encoded RSA private keys are accepted by
+  * this function.
+  *
   **/
 int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char *CERTFILE,
 			char *KEYFILE)
