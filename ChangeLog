@@ -1,3 +1,40 @@
+2004-06-06 16:24  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/cover.tex.in, lib/gnutls_int.h, lib/gnutls_mpi.c,
+	lib/gnutls_mpi.h:
+
+	Added the functions gnutls_x509_crt_get_pk_rsa_raw() and 
+	gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from
+	certificates.  
+
+2004-06-06 14:33  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/certificate.tex, doc/tex/compression.tex,
+	doc/tex/gnutls.bib, doc/tex/howto.tex, doc/tex/programs.tex,
+	lib/gnutls_mpi.h:
+
+	Updated to conform to the latest srp draft (draft-ietf-tls-srp-07).  
+	Some documentation updates.  
+
+2004-06-06 13:50  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_datum.c, lib/gnutls_ui.c, src/cli-gaa.c,
+	src/cli-gaa.h, src/cli.c, src/cli.gaa, src/common.c,
+	src/gnutls-http-serv, src/serv-gaa.c, src/serv-gaa.h, src/serv.c,
+	src/serv.gaa, src/tests.c, src/tests.h, src/tls_test.c:
+
+	several improvements 
+
+2004-06-06 08:59  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/auth_cert.h, lib/auth_dh_common.h,
+	lib/gnutls_compress_int.c, lib/gnutls_state.c, src/cli.c,
+	src/common.c, src/common.h, src/tests.c, src/tests.h,
+	src/tls_test.c:
+
+	updated gnutls-cli-debug to print DHE and RSA-EXPORT information if
+	verbose is set. Some other minor fixes.  
+
 2004-06-05 20:16  nmav <nmav@gnutls.org>
 
 	* doc/README.CODING_STYLE, lib/auth_anon.c, lib/auth_anon.h,
