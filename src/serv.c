@@ -94,7 +94,7 @@ char *x509_crlfile = NULL;
 		"\n" \
 		"<HTML><BODY>\n" \
 		"<CENTER><H1>This is <a href=\"http://www.gnu.org/software/gnutls\">" \
-		"GNUTLS</a></H1>\n\n"
+		"GNUTLS</a></H1></CENTER>\n\n"
 
 #define RENEGOTIATE
 
@@ -292,7 +292,7 @@ static char DEFAULT_DATA[] = "This is the default message reported "
 /* Creates html with the current state information.
  */
 #define tmp2 &http_buffer[strlen(http_buffer)]
-char* peer_print_info(GNUTLS_STATE state, int *ret_length)
+char* peer_print_info(GNUTLS_STATE state, int *ret_length, const char* header)
 {
    const char *tmp;
    unsigned char sesid[32];
@@ -336,20 +336,6 @@ char* peer_print_info(GNUTLS_STATE state, int *ret_length)
 	      gnutls_dh_get_prime_bits(state));
    }
 
-   /* print state information */
-   strcat(http_buffer, "<P>\n");
-
-   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
-   sprintf(tmp2, "Protocol version: <b>%s</b><br>\n", tmp);
-
-   if (gnutls_auth_get_type(state) == GNUTLS_CRD_CERTIFICATE) {
-      tmp = gnutls_cert_type_get_name(gnutls_cert_type_get(state));
-      sprintf(tmp2, "Certificate Type: <b>%s</b><br>\n", tmp);
-   }
-
-   tmp = gnutls_kx_get_name(gnutls_kx_get(state));
-   sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
-
    if (gnutls_kx_get(state) == GNUTLS_KX_DHE_RSA
        || gnutls_kx_get(state) == GNUTLS_KX_DHE_DSS) {
       sprintf(tmp2,
@@ -357,14 +343,36 @@ char* peer_print_info(GNUTLS_STATE state, int *ret_length)
 	      gnutls_dh_get_prime_bits(state));
    }
 
+   /* print state information */
+   strcat(http_buffer, "<P>\n");
+
+   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
+   sprintf(tmp2, "<TABLE border=1><TR><TD>Protocol version:</TD><TD>%s</TD></TR>\n", tmp);
+
+   if (gnutls_auth_get_type(state) == GNUTLS_CRD_CERTIFICATE) {
+      tmp = gnutls_cert_type_get_name(gnutls_cert_type_get(state));
+      sprintf(tmp2, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n", tmp);
+   }
+
+   tmp = gnutls_kx_get_name(gnutls_kx_get(state));
+   sprintf(tmp2, "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
+
    tmp = gnutls_compression_get_name(gnutls_compression_get(state));
-   sprintf(tmp2, "Compression: <b>%s</b><br>\n", tmp);
+   sprintf(tmp2, "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
 
    tmp = gnutls_cipher_get_name(gnutls_cipher_get(state));
-   sprintf(tmp2, "Cipher: <b>%s</b><br>\n", tmp);
+   sprintf(tmp2, "<TR><TD>Cipher</TD><TD>%s</TD></TR>\n", tmp);
 
    tmp = gnutls_mac_get_name(gnutls_mac_get(state));
-   sprintf(tmp2, "MAC: <b>%s</b><br>\n", tmp);
+   sprintf(tmp2, "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
+
+   tmp = gnutls_cipher_suite_get_name( gnutls_kx_get(state),
+   	gnutls_cipher_get(state), gnutls_mac_get(state));
+   sprintf(tmp2, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n", tmp);
+
+   strcat( http_buffer, "<hr><P>Your header was:<PRE>");
+   strcat( http_buffer, header);
+   strcat( http_buffer, "</PRE></P>");
 
    strcat(http_buffer, "</P>\n"HTTP_END);
 
@@ -426,7 +434,7 @@ static void get_response(GNUTLS_STATE state, char *request, char **response, int
     
 //    *response = peer_print_info(state, request+4, h, response_length);
     if (http!=0) {
-	*response = peer_print_info(state, response_length);
+	*response = peer_print_info(state, response_length, h);
     } else {
     	*response = strdup( request);
     	*response_length = strlen( *response);

@@ -82,9 +82,10 @@ int ret, alert;
 
 static int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 const static int kx_priority[16] =
-    { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, 0 };
+    { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, 
+    GNUTLS_KX_RSA_EXPORT, 0 };
 const static int cipher_priority[16] =
-    { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0 };
+    { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_ARCFOUR_EXPORT, 0 };
 const static int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
 const static int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 const static int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
@@ -158,6 +159,19 @@ int test_srp( GNUTLS_STATE state) {
 
 		ADD_KX(state, GNUTLS_KX_SRP);
 		gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
+
+		return do_handshake( state);
+}
+
+int test_export( GNUTLS_STATE state) {
+		ADD_ALL_CIPHERS(state);
+		ADD_ALL_COMP(state);
+		ADD_ALL_CERTTYPES(state);
+		ADD_ALL_PROTOCOLS(state);
+		ADD_ALL_MACS(state);
+
+		ADD_KX(state, GNUTLS_KX_RSA_EXPORT);
+		gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
 
 		return do_handshake( state);
 }

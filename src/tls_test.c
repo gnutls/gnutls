@@ -88,6 +88,7 @@ static const TLS_TEST tls_tests[] = {
 	{ "whether the server can accept cipher suites not in SSL 3.0 spec", test_unknown_ciphersuites, "yes", "no", "dunno"},
 	{ "whether the server understands TLS closure alerts", test_bye, "yes", "no", "partially"},
 	{ "whether the server supports session resumption", test_session_resume2, "yes", "no", "dunno"},
+	{ "for export-grade ciphersuite support", test_export, "yes", "no", "dunno" },
 	{ "for anonymous authentication support", test_anonymous, "yes", "no", "dunno"},
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
 	{ "for AES cipher support", test_aes, "yes", "no", "dunno"},

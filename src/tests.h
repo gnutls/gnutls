@@ -5,6 +5,7 @@
 #define UNSURE -1
 
 int test_srp( GNUTLS_STATE state);
+int test_export( GNUTLS_STATE state);
 int test_hello_extension( GNUTLS_STATE state);
 int test_dhe( GNUTLS_STATE state);
 int test_ssl3( GNUTLS_STATE state);
