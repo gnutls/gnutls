@@ -84,6 +84,7 @@ static const TLS_TEST tls_tests[] = {
 	 * buggy */
 	{ "whether we need disable TLS 1.0", test_tls1_2, "no", "yes", "dunno" },
 	{ "whether the server can accept Hello Extensions", test_hello_extension, "yes", "no", "dunno"},
+	{ "whether the server can accept cipher suites not in SSL 3.0 spec", test_unknown_ciphersuites, "yes", "no", "dunno"},
 	{ "for anonymous authentication support", test_anonymous, "yes", "no", "dunno"},
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
 	{ "for AES cipher support", test_aes, "yes", "no", "dunno"},
@@ -93,6 +94,7 @@ static const TLS_TEST tls_tests[] = {
 	{ "for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 	{ "for max record size TLS extension", test_max_record_size, "yes", "no", "dunno" },
 	{ "for SRP authentication support (gnutls extension)", test_srp, "yes", "no", "dunno" },
+	{ "for OpenPGP authentication support (gnutls extension)", test_openpgp1, "yes", "no", "dunno" },
 	{ NULL }
 };
 

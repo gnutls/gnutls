@@ -92,11 +92,27 @@ static void ADD_CIPHER(GNUTLS_STATE state, int cipher) {
 	gnutls_cipher_set_priority(state, _cipher_priority);
 }
 
+static void ADD_CIPHER3(GNUTLS_STATE state, int cipher1, int cipher2, int cipher3) {
+	static int _cipher_priority[] = { 0, 0, 0, 0 };
+	_cipher_priority[0] = cipher1;
+	_cipher_priority[1] = cipher2;
+	_cipher_priority[2] = cipher3;
+
+	gnutls_cipher_set_priority(state, _cipher_priority);
+}
+
 static void ADD_MAC(GNUTLS_STATE state, int mac) {
 	static int _mac_priority[] = { 0, 0 };
 	_mac_priority[0] = mac;
 
 	gnutls_mac_set_priority(state, _mac_priority);
+}
+
+static void ADD_CERTTYPE(GNUTLS_STATE state, int ctype) {
+	static int _ct_priority[] = { 0, 0 };
+	_ct_priority[0] = ctype;
+
+	gnutls_cert_type_set_priority(state, _ct_priority);
 }
 
 static void ADD_PROTOCOL(GNUTLS_STATE state, int protocol) {
@@ -153,6 +169,35 @@ int ret;
 int test_aes( GNUTLS_STATE state) {
 int ret;
 	ADD_CIPHER(state, GNUTLS_CIPHER_RIJNDAEL_128_CBC);
+	ADD_ALL_COMP(state);
+	ADD_ALL_CERTTYPES(state);
+	ADD_ALL_PROTOCOLS(state);
+	ADD_ALL_MACS(state);
+	ADD_ALL_KX(state);
+	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( state);
+	return ret;
+}
+
+int test_openpgp1( GNUTLS_STATE state) {
+int ret;
+	ADD_ALL_CIPHERS(state);
+	ADD_ALL_COMP(state);
+	ADD_CERTTYPE(state, GNUTLS_CRT_OPENPGP);
+	ADD_ALL_PROTOCOLS(state);
+	ADD_ALL_MACS(state);
+	ADD_ALL_KX(state);
+	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( state);
+	return ret;
+}
+
+int test_unknown_ciphersuites( GNUTLS_STATE state) {
+int ret;
+	ADD_CIPHER3(state, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
+		GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR);
 	ADD_ALL_COMP(state);
 	ADD_ALL_CERTTYPES(state);
 	ADD_ALL_PROTOCOLS(state);
@@ -264,7 +309,7 @@ int ret;
 
 	/* here we enable both SSL 3.0 and TLS 1.0
 	 * and try to connect and use rsa authentication.
-	 * If the server is an old buggy than only supports
+	 * If the server is old, buggy and only supports
 	 * SSL 3.0 then the handshake will fail.
 	 */
 	ADD_ALL_CIPHERS(state);
