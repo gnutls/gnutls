@@ -171,6 +171,7 @@ int gnutls_x509pki_get_certificate_request_status(GNUTLS_STATE state)
 }
 
 
+typedef MACAlgorithm DigestAlgorithm;
 /**
   * gnutls_fingerprint - This function calculates the fingerprint of the given data
   * @algo: is a digest algorithm

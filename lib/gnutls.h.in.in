@@ -38,7 +38,7 @@ typedef enum GNUTLS_CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } GNUTL
 #define CredType GNUTLS_CredType
 
 typedef enum GNUTLS_MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } GNUTLS_MACAlgorithm;
-typedef enum GNUTLS_DigestAlgorithm { GNUTLS_DIG_MD5=1, GNUTLS_DIG_SHA } GNUTLS_DigestAlgorithm;
+typedef enum GNUTLS_DigestAlgorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } GNUTLS_DigestAlgorithm;
 typedef enum GNUTLS_CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } GNUTLS_CompressionMethod;
 typedef enum GNUTLS_ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } GNUTLS_ConnectionEnd;
 typedef enum GNUTLS_AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } GNUTLS_AlertLevel;

@@ -121,7 +121,7 @@ GNUTLS_HASH_HANDLE td;
 	switch(pkey->pk_algorithm) {
 		case GNUTLS_PK_RSA:
 			
-			td = gnutls_hash_init( GNUTLS_DIG_MD5);
+			td = gnutls_hash_init( GNUTLS_MAC_MD5);
 			if (td==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
@@ -129,7 +129,7 @@ GNUTLS_HASH_HANDLE td;
 			gnutls_hash( td, data->data, data->size);
 			gnutls_hash_deinit( td, digest);
 
-			td = gnutls_hash_init( GNUTLS_DIG_SHA);
+			td = gnutls_hash_init( GNUTLS_MAC_SHA);
 			if (td==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
@@ -183,7 +183,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, g
 	switch(cert->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
 			
-			td = gnutls_hash_init( GNUTLS_DIG_MD5);
+			td = gnutls_hash_init( GNUTLS_MAC_MD5);
 			if (td==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
@@ -191,7 +191,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, g
 			gnutls_hash( td, data->data, data->size);
 			gnutls_hash_deinit( td, digest);
 
-			td = gnutls_hash_init( GNUTLS_DIG_SHA);
+			td = gnutls_hash_init( GNUTLS_MAC_SHA);
 			if (td==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;

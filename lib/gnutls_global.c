@@ -132,7 +132,7 @@ int gnutls_global_init( void)
 void gnutls_global_deinit( void) {
 
 	_gnutls_init--;
-	
+
 	if (_gnutls_init==0) {
 		asn1_delete_structure( PKCS1_ASN);
 		asn1_delete_structure( PKIX1_ASN);

@@ -27,12 +27,12 @@
  * the gcrypt library that this can be easily changed.
  */
 
-GNUTLS_HASH_HANDLE gnutls_hash_init(DigestAlgorithm algorithm)
+GNUTLS_HASH_HANDLE gnutls_hash_init(MACAlgorithm algorithm)
 {
 	GNUTLS_MAC_HANDLE ret;
 
 	switch (algorithm) {
-	case GNUTLS_DIG_SHA:
+	case GNUTLS_MAC_SHA:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 		if (ret==NULL) return GNUTLS_HASH_FAILED;
 #ifdef USE_MHASH
@@ -46,7 +46,7 @@ GNUTLS_HASH_HANDLE gnutls_hash_init(DigestAlgorithm algorithm)
 		}
 		break;
 
-	case GNUTLS_DIG_MD5:
+	case GNUTLS_MAC_MD5:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 		if (ret==NULL) return GNUTLS_HASH_FAILED;
 #ifdef USE_MHASH
@@ -69,19 +69,19 @@ GNUTLS_HASH_HANDLE gnutls_hash_init(DigestAlgorithm algorithm)
 	return ret;
 }
 
-int gnutls_hash_get_algo_len(DigestAlgorithm algorithm)
+int gnutls_hash_get_algo_len(MACAlgorithm algorithm)
 {
 	int ret;
 
 	switch (algorithm) {
-	case GNUTLS_DIG_SHA:
+	case GNUTLS_MAC_SHA:
 #ifdef USE_MHASH
 		ret = mhash_get_block_size(MHASH_SHA1);
 #else
 		ret = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
 #endif
 		break;
-	case GNUTLS_DIG_MD5:
+	case GNUTLS_MAC_MD5:
 #ifdef USE_MHASH
 		ret = mhash_get_block_size(MHASH_MD5);
 #else
@@ -263,8 +263,8 @@ GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3(MACAlgorithm algorithm, void *key,
 	if (padsize>0) {
 		memset(ipad, 0x36, padsize);
 	}
-	ret = gnutls_hash_init(algorithm);
-	if (ret!=GNUTLS_MAC_FAILED) {
+	ret = gnutls_hash_init( algorithm);
+	if (ret!=GNUTLS_HASH_FAILED) {
 		ret->key = key;
 		ret->keysize = keylen;
 
@@ -280,8 +280,8 @@ GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3_handshake(MACAlgorithm algorithm, void *k
 {
 	GNUTLS_MAC_HANDLE ret;
 
-	ret = gnutls_hash_init(algorithm);
-	if (ret!=GNUTLS_MAC_FAILED) {
+	ret = gnutls_hash_init( algorithm);
+	if (ret!=GNUTLS_HASH_FAILED) {
 		ret->key = key;
 		ret->keysize = keylen;
 	}
@@ -311,7 +311,7 @@ void gnutls_mac_deinit_ssl3(GNUTLS_MAC_HANDLE handle, void* digest)
 		memset(opad, 0x5C, padsize);
 	}
 
-	td = gnutls_hash_init(handle->algorithm);
+	td = gnutls_hash_init( handle->algorithm);
 	if (td!=GNUTLS_MAC_FAILED) {
 		if (handle->keysize > 0) gnutls_hash(td, handle->key, handle->keysize);
 
@@ -349,8 +349,8 @@ void gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle, void* digest)
 		memset(ipad, 0x36, padsize);
 	}
 
-	td = gnutls_hash_init(handle->algorithm);
-	if (td!=GNUTLS_MAC_FAILED) {
+	td = gnutls_hash_init( handle->algorithm);
+	if (td!=GNUTLS_HASH_FAILED) {
 		if (handle->keysize > 0) gnutls_hash(td, handle->key, handle->keysize);
 
 		gnutls_hash(td, opad, padsize);
@@ -373,7 +373,7 @@ static int ssl3_sha(int i, char *secret, int secret_len, char *random,
 	int j;
 	char text1[26];
 
-	GNUTLS_MAC_HANDLE td;
+	GNUTLS_HASH_HANDLE td;
 
 	for (j = 0; j < i + 1; j++) {
 		text1[j] = 65 + i;	/* A==65 */

@@ -30,10 +30,10 @@
 #define HARD_DEBUG
 #define WRITE_DEBUG
 #define READ_DEBUG
+#define RECORD_DEBUG*/
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define RECORD_DEBUG
 #define DEBUG
-*/
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -147,9 +147,8 @@ typedef enum Extensions { GNUTLS_EXTENSION_DNSNAME=0, GNUTLS_EXTENSION_MAX_RECOR
 typedef enum KXAlgorithm { GNUTLS_KX_X509PKI_RSA=1, GNUTLS_KX_X509PKI_DHE_DSS, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
 typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
-typedef enum MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
-typedef enum DigestAlgorithm { GNUTLS_DIG_MD5=1, GNUTLS_DIG_SHA } DigestAlgorithm;
 typedef enum CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } CompressionMethod;
+typedef enum MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
 
 typedef enum ValidSession { VALID_TRUE, VALID_FALSE } ValidSession;
 typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;

@@ -184,13 +184,13 @@ int _gnutls_finished(GNUTLS_STATE state, int type, int skip, void *ret)
 	opaque concat[36];
 	opaque *mesg, *data;
 
-	td = gnutls_hash_init(GNUTLS_DIG_MD5);
+	td = gnutls_hash_init(GNUTLS_MAC_MD5);
 	if (td == GNUTLS_HASH_FAILED) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td2 = gnutls_hash_init(GNUTLS_DIG_SHA);
+	td2 = gnutls_hash_init(GNUTLS_MAC_SHA);
 	if (td2 == GNUTLS_HASH_FAILED) {
 		gnutls_assert();
 		gnutls_hash_deinit(td2, tmp);

@@ -44,7 +44,7 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 
 	passwd_len = strlen(passwd);	/* we do not want the null */
 
-	h1 = gnutls_hash_init(GNUTLS_DIG_SHA);
+	h1 = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(h1, (char *) username, strlen(username));
 	gnutls_hash(h1, ":", 1);
 	gnutls_hash(h1, (char *) passwd, passwd_len);
@@ -73,7 +73,7 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 		return NULL;
 	}
 
-	h1 = gnutls_hash_init(GNUTLS_DIG_SHA);
+	h1 = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(h1, csalt, rsalt_size);
 	gnutls_free(csalt);
 

@@ -211,7 +211,7 @@ void _gnutls_free_auth_info( GNUTLS_STATE state) {
 
 			if (info==NULL) break;
 			for (i=0;i<info->ncerts;i++) {
-				gnutls_free( info->raw_certificate_list[0].data);
+				gnutls_free_datum( &info->raw_certificate_list[i]);
 			}
 	
 			gnutls_free( info->raw_certificate_list);
