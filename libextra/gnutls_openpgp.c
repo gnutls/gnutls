@@ -510,7 +510,6 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     }
 
     rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
-fprintf(stderr,"ERR: %s\n", cdk_strerror( rc));
     if( (rc = _gnutls_map_cdk_rc( rc )) ) {
       gnutls_assert();
       goto leave;
