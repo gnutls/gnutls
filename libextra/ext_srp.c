@@ -117,7 +117,13 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_siz
 
 		if ( !is_srp(state->security_parameters.current_cipher_suite))
 			return 0; /* no data to send */
-		
+
+		/* Even if we are resuming, the username in the parameters
+		 * should be non null.
+		 */
+		if (state->security_parameters.extensions.srp_username[0]==0)
+			return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+
 		if (state->internals.resumed==RESUME_FALSE)
 			return _gnutls_gen_srp_server_hello( state, data, data_size);
 		else

@@ -349,7 +349,7 @@ int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
-	
+
 	res->username = gnutls_strdup( username);
 	if (res->username == NULL) return GNUTLS_E_MEMORY_ERROR;
 
