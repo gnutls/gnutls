@@ -1,3 +1,12 @@
+2003-11-06 19:57  nmav <nmav@gnutls.org>
+
+	* configure.in, libgcrypt.m4, lib/gnutls_buffers.c,
+	src/Makefile.am, src/certtool.c, src/cli-gaa.c, src/cli.c,
+	src/crypt.c, src/serv.c, src/tests.c, src/tests.h,
+	src/tls_test-gaa.c, src/tls_test.c:
+
+	some changes to compile in mingw32.  
+
 2003-11-04 13:22  nmav <nmav@gnutls.org>
 
 	* doc/scripts/gdoc:
