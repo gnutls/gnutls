@@ -1,4 +1,4 @@
-Version 0.8.11
+Version 0.8.11 (04/10/2003)
 - Updated to use opencdk 0.5.1 (patch by Mikhail 
   Teterin <mi+mx@aldan.algebra.com>)
 - Corrected some alignment problems in IA64 (patch by
