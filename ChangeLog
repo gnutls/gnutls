@@ -1,3 +1,10 @@
+2003-08-04 17:37  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/tex/Makefile.am:
+
+	* Added the new libtasn1.  
+	* the tex files are included in the distribution.  
+
 2003-07-09 16:33  nmav <nmav@gnutls.org>
 
 	* lib/Makefile.am:
