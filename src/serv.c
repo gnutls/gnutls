@@ -59,7 +59,7 @@ static int generate = 0;
 static int http = 0;
 static int port = 0;
 static int x509ctype;
-static int prime_bits = 1024;
+static int debug;
 
 static int quiet;
 static int nodb;
@@ -511,6 +511,11 @@ void check_alert(gnutls_session session, int ret)
    }
 }
 
+static void tls_log_func( int level, const char* str)
+{
+	fprintf(stderr, "|<%d>| %s", level, str);
+}
+
 static void gaa_parser(int argc, char **argv);
 
 int main(int argc, char **argv)
@@ -542,6 +547,8 @@ int main(int argc, char **argv)
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
+   gnutls_global_set_log_function( tls_log_func);
+   gnutls_global_set_log_level(debug);
 
    if (gnutls_global_init_extra() < 0) {
       fprintf(stderr, "global state (extra) initialization error\n");
@@ -913,6 +920,7 @@ void gaa_parser(int argc, char **argv)
       exit(1);
    }
 
+   debug = info.debug;
    quiet = info.quiet;
    nodb = info.nodb;
 
