@@ -1354,7 +1354,6 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 			hver =
 			    state->gnutls_internals.
 			    resumed_security_parameters.version;
-			_gnutls_set_current_version(state, hver);
 		}
 
 		if (hver <= 0) {
@@ -1366,6 +1365,12 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 
 		data[pos++] = _gnutls_version_get_major(hver);
 		data[pos++] = _gnutls_version_get_minor(hver);
+
+		/* Set the version we advertized as maximum 
+		 * (RSA uses it).
+		 */
+		_gnutls_set_current_version(state, hver);
+		_gnutls_set_adv_version( state, hver);
 
 		/* In order to know when this session was initiated.
 		 */
@@ -2272,3 +2277,13 @@ void gnutls_handshake_set_max_data_buffer_size(GNUTLS_STATE state, int max)
 {
 	state->gnutls_internals.max_handshake_data_buffer_size = max;
 }
+
+void _gnutls_set_adv_version( GNUTLS_STATE state, GNUTLS_Version ver) {
+	set_adv_version( state, _gnutls_version_get_major(ver), _gnutls_version_get_minor(ver));
+}
+
+GNUTLS_Version _gnutls_get_adv_version( GNUTLS_STATE state) {
+	return _gnutls_version_get( _gnutls_get_adv_version_major( state), 
+		_gnutls_get_adv_version_minor( state));
+}
+

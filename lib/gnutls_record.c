@@ -565,15 +565,10 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	headers[0]=type;
 	
-	if (htype==GNUTLS_CLIENT_HELLO) { /* then send the lowest 
-			  		   * protocol we support 
-					   */
-		lver = _gnutls_version_lowest(state);
-		if (lver==GNUTLS_VERSION_UNKNOWN) {
-			gnutls_assert();
-		}
-	} else { /* send the current */
-		lver = gnutls_protocol_get_version( state);
+	lver = gnutls_protocol_get_version(state);
+	if (lver==GNUTLS_VERSION_UNKNOWN) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL;
 	}
 
 	headers[1]=_gnutls_version_get_major( lver);

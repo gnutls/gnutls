@@ -159,13 +159,11 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	}
 	RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
 
-	ver = _gnutls_version_max(state);
-#ifdef DEBUG
-# warning CHECK THIS BUG
-/* Some implementations do not interoperate if we send the
- * latest version (the one send in the client hello).
- */
-#endif
+	ver = _gnutls_get_adv_version( state);
+	/* Some implementations do not interoperate if we send the
+	 * latest version (the one send in the client hello). They'd
+	 * rather use the one in the client hello record header.
+	 */
 
 	state->gnutls_key->key.data[0] = _gnutls_version_get_major(ver);
 	state->gnutls_key->key.data[1] = _gnutls_version_get_minor(ver);

@@ -37,11 +37,6 @@ int _gnutls_create_random( opaque* dst);
 int _gnutls_remove_unwanted_ciphersuites( GNUTLS_STATE state, GNUTLS_CipherSuite ** cipherSuites, int numCipherSuites);
 void gnutls_handshake_set_max_data_buffer_size( GNUTLS_STATE state, int max);
 
-#define set_adv_version( state, major, minor) \
-	state->gnutls_internals.adv_version_major = major; \
-	state->gnutls_internals.adv_version_minor = minor
-
-
 #define STATE state->gnutls_internals.handshake_state
 /* This returns true if we have got there
  * before (and not finished due to an interrupt).

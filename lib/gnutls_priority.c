@@ -205,9 +205,9 @@ GNUTLS_Version ver;
 		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = list[i];
 	}
 
-	/* set the current version to the first chosen by the peer.
+	/* set the current version to the latest supported
 	 */
-	ver = _gnutls_version_lowest( state);
+	ver = _gnutls_version_max( state);
 	if (ver < 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;

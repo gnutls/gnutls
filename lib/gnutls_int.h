@@ -177,11 +177,6 @@ typedef struct {
 } AUTH_CRED;
 
 
-typedef struct {
-	uint8 major;
-	uint8 minor;
-} ProtocolVersion;
-
 struct GNUTLS_KEY_INT {
 	/* For DH KX */
 	gnutls_sdatum			key;
@@ -521,5 +516,12 @@ void _gnutls_free_auth_info( GNUTLS_STATE state);
         state->gnutls_internals.handshake_send_buffer.size = 0; \
         state->gnutls_internals.handshake_recv_buffer.size = 0; \
         state->gnutls_internals.handshake_send_buffer_prev_size = 0
+
+#define set_adv_version( state, major, minor) \
+	state->gnutls_internals.adv_version_major = major; \
+	state->gnutls_internals.adv_version_minor = minor
+
+void _gnutls_set_adv_version( GNUTLS_STATE, GNUTLS_Version);
+GNUTLS_Version _gnutls_get_adv_version( GNUTLS_STATE);
 
 #endif /* GNUTLS_INT_H */
