@@ -127,12 +127,13 @@ static int _IREAD(node_asn * rasn, char *name3, int name3_size, char *rstr, char
 }
 
 /* this function will convert up to 3 digit
- * numbers to characters.
+ * numbers to characters. Use a character string of MAX_INT_DIGITS, in
+ * order to have enough space for it.
  */
-void _gnutls_int2str(int k, char *data)
+void _gnutls_int2str(unsigned int k, char *data)
 {
 	if (k > 999)
-		data[0] = 0;
+		sprintf(data, "%d", 999);
 	else
 		sprintf(data, "%d", k); 
 }
