@@ -450,8 +450,8 @@ int _gnutls_get_rnd_srp_params(gnutls_datum *g, gnutls_datum* p, int bits)
 
 	if (g->data == NULL || p->data == NULL) {
 		gnutls_assert();
-		gnutls_free_datum(&g);
-		gnutls_free_datum(&p);
+		gnutls_free_datum(g);
+		gnutls_free_datum(p);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 

@@ -4,8 +4,6 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
-* Add more functions to parse DER encoded private keys
-* Add option to read the SRP parameters using a callback (server side)
 * Convert documentation to texinfo format
 * Add support for certificate CRLs in certificate verification
 * Audit the code
