@@ -62,6 +62,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 	char rrandom[2 * TLS_RANDOM_SIZE];
 	int pos, ret;
 	int block_size;
+	char buf[64];
 
 	if (session->cipher_specs.generated_keys != 0) {
 		/* keys have already been generated.
@@ -114,7 +115,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 	}
 
 	_gnutls_hard_log("INT: KEY BLOCK[%d]: %s\n", block_size,
-			 _gnutls_bin2hex(key_block, block_size));
+			 _gnutls_bin2hex(key_block, block_size, buf, sizeof(buf)));
 
 	pos = 0;
 	if (hash_size > 0) {
@@ -240,7 +241,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 		_gnutls_hard_log("INT: CLIENT WRITE KEY [%d]: %s\n",
 				 client_write_key_size,
 				 _gnutls_bin2hex(client_write_key,
-						 client_write_key_size));
+						 client_write_key_size, buf, sizeof(buf)));
 
 		if (_gnutls_sset_datum
 		    (&session->cipher_specs.server_write_key,
@@ -254,7 +255,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 		_gnutls_hard_log("INT: SERVER WRITE KEY [%d]: %s\n",
 				 server_write_key_size,
 				 _gnutls_bin2hex(server_write_key,
-						 server_write_key_size));
+						 server_write_key_size, buf, sizeof(buf)));
 
 		if (free_keys != 0) {
 			gnutls_free(server_write_key);

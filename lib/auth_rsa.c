@@ -248,7 +248,7 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 		 */
 		ret = 0;
 		gnutls_assert();
-		_gnutls_log("auth_rsa: Possible PKCS-1 format attack\n");
+		_gnutls_x509_log("auth_rsa: Possible PKCS-1 format attack\n");
 
 		RANDOMIZE_KEY(session->key->key,
 			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);

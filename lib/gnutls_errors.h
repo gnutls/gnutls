@@ -18,19 +18,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#include <defines.h>
 #include "gnutls_errors_int.h"
 
-#ifdef DEBUG
-# ifdef __FILE__
-#  ifdef __LINE__
-#   define gnutls_assert() _gnutls_debug_log( "GNUTLS_ASSERT: %s:%d\n", __FILE__,__LINE__);
-#  else
-#   define gnutls_assert() 
-#  endif
-# else /* __FILE__ defined */
+#ifdef __FILE__
+# ifdef __LINE__
+#  define gnutls_assert() _gnutls_debug_log( "ASSERT: %s:%d\n", __FILE__,__LINE__);
+# else
 #  define gnutls_assert() 
 # endif
-#else /* no debug */
+#else /* __FILE__ not defined */
 # define gnutls_assert() 
 #endif
 
@@ -39,87 +36,38 @@ const char* gnutls_strerror(int error);
 void gnutls_perror(int error);
 int gnutls_error_is_fatal( int error);
 
-void _gnutls_log( const char *fmt, ...);
+void _gnutls_log( int, const char *fmt, ...);
 
-#ifdef DEBUG
-# define _gnutls_debug_log _gnutls_log
+extern int _gnutls_log_level;
 
-# ifdef HANDSHAKE_DEBUG
-#  define _gnutls_handshake_log _gnutls_log
-# else
-#  define _gnutls_handshake_log( ...)
-# endif
+#ifdef C99_MACROS
+#define LEVEL(l, ...) if (_gnutls_log_level >= l || _gnutls_log_level > 9) \
+	_gnutls_log( l, __VA_ARGS__)
 
-# ifdef IO_DEBUG
-#  define _gnutls_io_log _gnutls_log
-# else
-#  define _gnutls_io_log( ...)
-# endif
+#define LEVEL_EQ(l, ...) if (_gnutls_log_level == l || _gnutls_log_level > 9) \
+	_gnutls_log( l, __VA_ARGS__)
 
-# ifdef BUFFERS_DEBUG
-#  define _gnutls_buffers_log _gnutls_log
-# else
-#  define _gnutls_buffers_log( ...)
-# endif
-
-# ifdef HARD_DEBUG
-#  define _gnutls_hard_log _gnutls_log
-# else
-#  define _gnutls_hard_log( ...)
-# endif
-
-# ifdef RECORD_DEBUG
-#  define _gnutls_record_log _gnutls_log
-# else
-#  define _gnutls_record_log( ...)
-# endif
-
-# ifdef READ_DEBUG
-#  define _gnutls_read_log _gnutls_log
-# else
-#  define _gnutls_read_log( ...)
-# endif
-
-# ifdef WRITE_DEBUG
-#  define _gnutls_write_log _gnutls_log
-# else
-#  define _gnutls_write_log( ...)
-# endif
-
-# ifdef X509_DEBUG
-#  define _gnutls_x509_log _gnutls_log
-# else
-#  define _gnutls_x509_log( ...)
-# endif
-
+# define _gnutls_debug_log(...) LEVEL(2, __VA_ARGS__)
+# define _gnutls_handshake_log(...) LEVEL(3, __VA_ARGS__)
+# define _gnutls_io_log(...) LEVEL_EQ(5, __VA_ARGS__)
+# define _gnutls_buffers_log(...) LEVEL_EQ(6, __VA_ARGS__)
+# define _gnutls_hard_log(...) LEVEL(9, __VA_ARGS__)
+# define _gnutls_record_log(...) LEVEL(4, __VA_ARGS__)
+# define _gnutls_read_log(...) LEVEL_EQ(7, __VA_ARGS__)
+# define _gnutls_write_log(...) LEVEL_EQ(7, __VA_ARGS__)
+# define _gnutls_x509_log(...) LEVEL(1, __VA_ARGS__)
 #else
-
-/* FIXME: These macros only work with C99 compliant compilers
- */
-# ifdef C99_MACROS
-#  define _gnutls_debug_log(...)
-#  define _gnutls_handshake_log( ...)
-#  define _gnutls_io_log( ...)
-#  define _gnutls_buffers_log( ...)
-#  define _gnutls_hard_log( ...)
-#  define _gnutls_record_log( ...)
-#  define _gnutls_read_log( ...)
-#  define _gnutls_write_log( ...)
-#  define _gnutls_x509_log( ...)
-# else
-#  define _gnutls_debug_log _gnutls_null_log
-#  define _gnutls_handshake_log _gnutls_null_log
-#  define _gnutls_io_log _gnutls_null_log
-#  define _gnutls_buffers_log _gnutls_null_log
-#  define _gnutls_hard_log _gnutls_null_log
-#  define _gnutls_record_log _gnutls_null_log
-#  define _gnutls_read_log _gnutls_null_log
-#  define _gnutls_write_log _gnutls_null_log
-#  define _gnutls_x509_log _gnutls_null_log
+# define _gnutls_debug_log _gnutls_null_log
+# define _gnutls_handshake_log _gnutls_null_log
+# define _gnutls_io_log _gnutls_null_log
+# define _gnutls_buffers_log _gnutls_null_log
+# define _gnutls_hard_log _gnutls_null_log
+# define _gnutls_record_log _gnutls_null_log
+# define _gnutls_read_log _gnutls_null_log
+# define _gnutls_write_log _gnutls_null_log
+# define _gnutls_x509_log _gnutls_null_log
 
 void _gnutls_null_log( void*, ...);
 
-# endif /* C99_MACROS */
-
-#endif /* DEBUG */
+#endif /* C99_MACROS */
 

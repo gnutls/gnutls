@@ -642,7 +642,9 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 				     "(private-key(dsa(p%m)(q%m)(g%m)(y%m)(x%m)))",
 				     pkey[0], pkey[1], pkey[2],
 				     pkey[3], pkey[4]);
-		else gnutls_assert(); 
+		else {
+			gnutls_assert(); 
+		}
 
 		break;
 	case GCRY_PK_RSA:
@@ -650,8 +652,9 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 			rc = gcry_sexp_build(&s_key, NULL,
 				     "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
 				     pkey[0], pkey[1], pkey[2], pkey[3], pkey[4], pkey[5]);
-		else gnutls_assert();
-
+		else {
+			gnutls_assert();
+		}
 		break;
 
 	default:

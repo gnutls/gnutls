@@ -136,7 +136,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
 	{
 		opaque buffer[512];
 
-		_gnutls_log
+		_gnutls_debug_log
 		    ("dh_params_generate: Generated %d bits prime %s, generator %s.\n",
 	     	bits, _gnutls_bin2hex(prime->data, prime->size, buffer, sizeof(buffer)),
 	     	_gnutls_bin2hex(generator->data, generator->size, buffer, sizeof(buffer)));

@@ -582,7 +582,7 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509 certificate: Decoding error %d\n", result);
+		_gnutls_x509_log("X509 certificate: Decoding error %d\n", result);
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);

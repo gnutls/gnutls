@@ -78,6 +78,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 	SRP_SERVER_AUTH_INFO info;
 	ssize_t data_size;
 	size_t n_b, tmp_size;
+	char buf[64];
 	uint8 *data_b;
 
 	if (state->security_parameters.extensions.srp_username[0] == 0) {
@@ -175,7 +176,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	_gnutls_write_uint16( n_b, data_b);
 
-	_gnutls_hard_log( "INT: SRP B[%d]: %s\n", n_b, _gnutls_bin2hex(&data_b[2], n_b));
+	_gnutls_hard_log( "INT: SRP B[%d]: %s\n", n_b, _gnutls_bin2hex(&data_b[2], n_b, buf, sizeof(buf)));
 
 	_gnutls_srp_entry_free( pwd_entry);
 
@@ -189,6 +190,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 	int ret;
 	uint8 *data_a;
 	char *username;
+	char buf[64];
 	char *password;
 	const gnutls_srp_client_credentials cred =
 	    _gnutls_get_cred(state->key, GNUTLS_CRD_SRP, NULL);
@@ -229,9 +231,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-#ifdef HARD_DEBUG
 	_gnutls_dump_mpi( "SRP U: ", state->key->u);
-#endif
 
 	/* S = (B - g^x) ^ (a + u * x) % N */
 	S = _gnutls_calc_srp_S2( B, G, state->key->x, _a, state->key->u, N);
@@ -240,9 +240,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-#ifdef HARD_DEBUG
 	_gnutls_dump_mpi( "SRP B: ", B);
-#endif
 	
 	_gnutls_mpi_release(&_b);
 	_gnutls_mpi_release(&V);
@@ -272,7 +270,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 		gnutls_free( *data);
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
-	_gnutls_hard_log( "INT: SRP A[%d]: %s\n", n_a, _gnutls_bin2hex(&data_a[2], n_a));
+	_gnutls_hard_log( "INT: SRP A[%d]: %s\n", n_a, _gnutls_bin2hex(&data_a[2], n_a, buf, sizeof(buf)));
 
 	_gnutls_mpi_release(&A);
 
@@ -298,12 +296,8 @@ int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-#ifdef HARD_DEBUG
 	_gnutls_dump_mpi( "SRP A: ", A);
-#endif
-#ifdef HARD_DEBUG
 	_gnutls_dump_mpi( "SRP B: ", B);
-#endif
 
 	/* Start the SRP calculations.
 	 * - Calculate u 
@@ -314,9 +308,7 @@ int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-#ifdef HARD_DEBUG
 	_gnutls_dump_mpi( "SRP U: ", state->key->u);
-#endif
 
 	/* S = (A * v^u) ^ b % N 
 	 */
@@ -326,9 +318,7 @@ int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-#ifdef HARD_DEBUG
 	_gnutls_dump_mpi( "SRP S: ", S);
-#endif
 
 	_gnutls_mpi_release(&A);
 	_gnutls_mpi_release(&_b);

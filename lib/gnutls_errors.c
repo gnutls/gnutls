@@ -26,7 +26,7 @@
 # include <stdarg.h>
 #endif
 
-extern void (*_gnutls_log_func)( const char*);
+extern void (*_gnutls_log_func)( int, const char*);
 
 #define ERROR_ENTRY(desc, name, fatal) \
 	{ desc, #name, name, fatal}
@@ -251,18 +251,18 @@ int _gnutls_asn2err( int asn_err) {
 /* this function will output a message using the
  * caller provided function 
  */
-void _gnutls_log( const char *fmt, ...) {
+void _gnutls_log( int level, const char *fmt, ...) {
  va_list args;
  char str[MAX_LOG_SIZE];
- void (*log_func)(const char*) = _gnutls_log_func;
+ void (*log_func)(int, const char*) = _gnutls_log_func;
 
  if (_gnutls_log_func==NULL) return;
 
  va_start(args,fmt);
- vsprintf( str,fmt,args); /* Flawfinder: ignore */
+ vsnprintf( str, MAX_LOG_SIZE - 1, fmt, args); /* Flawfinder: ignore */
  va_end(args);   
 
- log_func( str);
+ log_func( level, str);
 
  return;
 }

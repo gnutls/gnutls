@@ -54,13 +54,14 @@ int _gnutls_generate_master( gnutls_session session) {
 static int generate_normal_master( gnutls_session session) {
 int ret = 0;
 char random[2*TLS_RANDOM_SIZE];
+char buf[64];
 
 	memcpy(random, session->security_parameters.client_random, TLS_RANDOM_SIZE);
 	memcpy(&random[TLS_RANDOM_SIZE], session->security_parameters.server_random, TLS_RANDOM_SIZE);
 
-	_gnutls_hard_log( "INT: PREMASTER SECRET[%d]: %s\n", PREMASTER.size, _gnutls_bin2hex(PREMASTER.data, PREMASTER.size));
-	_gnutls_hard_log( "INT: CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(session->security_parameters.client_random,32));
-	_gnutls_hard_log( "INT: SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(session->security_parameters.server_random,32));
+	_gnutls_hard_log( "INT: PREMASTER SECRET[%d]: %s\n", PREMASTER.size, _gnutls_bin2hex(PREMASTER.data, PREMASTER.size, buf, sizeof(buf)));
+	_gnutls_hard_log( "INT: CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(session->security_parameters.client_random,32, buf, sizeof(buf)));
+	_gnutls_hard_log( "INT: SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(session->security_parameters.server_random,32, buf, sizeof(buf)));
 
 	if ( gnutls_protocol_get_version( session) == GNUTLS_SSL3) {
 		ret =
@@ -78,8 +79,8 @@ char random[2*TLS_RANDOM_SIZE];
 	_gnutls_free_datum(&PREMASTER);
 	
 	if (ret<0) return ret;
-	
-	_gnutls_hard_log( "INT: MASTER SECRET: %s\n", _gnutls_bin2hex(session->security_parameters.master_secret, TLS_MASTER_SIZE));
+
+	_gnutls_hard_log( "INT: MASTER SECRET: %s\n", _gnutls_bin2hex(session->security_parameters.master_secret, TLS_MASTER_SIZE, buf, sizeof(buf)));
 
 	return ret;
 }

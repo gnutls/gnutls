@@ -1184,8 +1184,9 @@ leave:
     kbx_blob_release( blob );
     cdk_free( hd );
     cdk_kbnode_release( knode );
-    if( rc )
+    if( rc ) {
         gnutls_assert();
+    }
     return rc;
 }
 

@@ -20,7 +20,7 @@
 
 #ifdef DEBUG
 void _gnutls_print_state(gnutls_session session);
-void _gnutls_dump_mpi(char* prefix,MPI a);
+#endif
 const char* _gnutls_packet2str( int packet);
 const char* _gnutls_handshake2str( int handshake);
-#endif
+void _gnutls_dump_mpi(char* prefix, GNUTLS_MPI a);

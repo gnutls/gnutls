@@ -26,15 +26,6 @@
 
 #ifdef DEBUG
 
-void _gnutls_dump_mpi(char* prefix, GNUTLS_MPI a)
-{
-	char buf[1024];
-	size_t n = sizeof buf;
-	
-	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, &n, a))
-		strcpy(buf, "[can't print value]"); /* Flawfinder: ignore */
-	_gnutls_debug_log( "GNUTLS_MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
-}
 
 void _gnutls_print_state(gnutls_session session)
 {
@@ -52,72 +43,69 @@ void _gnutls_print_state(gnutls_session session)
 
 }
 
+#endif
 
 const char* _gnutls_packet2str( int packet) {
-static char str[512];
-
 	switch(packet) {
 		case GNUTLS_CHANGE_CIPHER_SPEC:
-			strcpy(str, "Change Cipher Spec");
-			break;		
+			return "Change Cipher Spec";
 		case GNUTLS_ALERT:
-			strcpy(str, "Alert");
-			break;		
+			return "Alert";
 		case GNUTLS_HANDSHAKE:
-			strcpy(str, "Handshake");
-			break;
+			return "Handshake";
 		case GNUTLS_APPLICATION_DATA:
-			strcpy(str, "Application Data");
-			break;
+			return "Application Data";
 
 		default:
-			strcpy(str, "Unknown Packet");
-			
+			return "Unknown Packet";
 	}	
-	return str;	
-	
 }
 
 const char* _gnutls_handshake2str( int handshake) {
-static char str[512];
 
 	switch(handshake) {
 		case GNUTLS_HELLO_REQUEST:
-			strcpy(str, "HELLO REQUEST");
-			break;		
+			return "HELLO REQUEST";
+			break;
 		case GNUTLS_CLIENT_HELLO:
-			strcpy(str, "CLIENT HELLO");
+			return "CLIENT HELLO";
 			break;		
 		case GNUTLS_SERVER_HELLO:
-			strcpy(str, "SERVER HELLO");
+			return "SERVER HELLO";
 			break;
 		case GNUTLS_CERTIFICATE_PKT:
-			strcpy(str, "CERTIFICATE");
+			return "CERTIFICATE";
 			break;
 		case GNUTLS_SERVER_KEY_EXCHANGE:
-			strcpy(str, "SERVER KEY EXCHANGE");
+			return "SERVER KEY EXCHANGE";
 			break;
 		case GNUTLS_CERTIFICATE_REQUEST:
-			strcpy(str, "CERTIFICATE REQUEST");
+			return "CERTIFICATE REQUEST";
 			break;
 		case GNUTLS_SERVER_HELLO_DONE:
-			strcpy(str, "SERVER HELLO DONE");
+			return "SERVER HELLO DONE";
 			break;
 		case GNUTLS_CERTIFICATE_VERIFY:
-			strcpy(str, "CERTIFICATE VERIFY");
+			return "CERTIFICATE VERIFY";
 			break;
 		case GNUTLS_CLIENT_KEY_EXCHANGE:
-			strcpy(str, "CLIENT KEY EXCHANGE");
+			return "CLIENT KEY EXCHANGE";
 			break;
 		case GNUTLS_FINISHED:
-			strcpy(str, "FINISHED");
+			return "FINISHED";
 			break;
 		default:
-			strcpy(str, "Unknown Handshake");
+			return "Unknown Handshake packet";
 			
 	}	
-	return str;	
-	
 }
-#endif
 
+void _gnutls_dump_mpi(char* prefix, GNUTLS_MPI a)
+{
+	char buf[1024];
+	size_t n = sizeof buf;
+	
+	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, &n, a))
+		strcpy(buf, "[can't print value]"); /* Flawfinder: ignore */
+	_gnutls_hard_log( "GNUTLS_MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
+}

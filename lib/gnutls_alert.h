@@ -19,3 +19,4 @@ typedef enum AlertDescription {
 
 gnutls_alert_description gnutls_alert_get( gnutls_session session);
 int gnutls_alert_send( gnutls_session session, gnutls_alert_level level, gnutls_alert_description desc);
+const char* gnutls_alert_get_name( gnutls_alert_level alert);

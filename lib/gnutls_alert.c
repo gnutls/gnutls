@@ -76,7 +76,8 @@ static const gnutls_alert_entry sup_alerts[] = {
   * See. gnutls_alert_get().
   *
   **/
-const char* gnutls_alert_get_name( gnutls_alert_level alert) {
+const char* gnutls_alert_get_name( gnutls_alert_level alert) 
+{
 const char* ret = NULL;
 
 	GNUTLS_ALERT_ID_LOOP( ret = p->desc);

@@ -24,14 +24,15 @@
 #include <libtasn1.h>
 #include <gnutls_dh.h>
 
-typedef void (*LOG_FUNC)( const char*);
-#define GNUTLS_LOG_FUNC LOG_FUNC
+typedef void (*LOG_FUNC)( int, const char*);
+#define gnutls_log_func LOG_FUNC
 
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 
 LOG_FUNC _gnutls_log_func;
+int _gnutls_log_level = 2; /* default log level */
 
 static ASN1_TYPE PKIX1_ASN;
 static ASN1_TYPE GNUTLS_ASN;
@@ -49,21 +50,40 @@ ASN1_TYPE _gnutls_get_gnutls_asn(void) {
   * gnutls_global_set_log_function - This function sets the logging function
   * @log_func: it's a log function
   *
-  * This is the function were you set the logging function gnutls
+  * This is the function where you set the logging function gnutls
   * is going to use. This function only accepts a character array.
-  * Normaly you may not use this function since
-  * it is only used for debugging reasons.
-  * LOG_FUNC is of the form, 
-  * void (*LOG_FUNC)( const char*);
+  * Normaly you may not use this function since it is only used 
+  * for debugging purposes.
+  *
+  * gnutls_log_func is of the form, 
+  * void (*gnutls_log_func)( int level, const char*);
   **/
-void gnutls_global_set_log_function( GNUTLS_LOG_FUNC log_func) {
+void gnutls_global_set_log_function( gnutls_log_func log_func) 
+{
 	_gnutls_log_func = log_func;
+}
+
+/**
+  * gnutls_global_set_log_level - This function sets the logging level
+  * @level: it's an integer from 0 to 9. 
+  *
+  * This is the function that allows you to set the log level.
+  * The level is an integer between 0 and 9. Higher values mean
+  * more verbosity. The default value is 2. Larger values should
+  * only be used with care, since they may reveal sensitive information.
+  *
+  * Use the log level '0' to disable logging.
+  *
+  **/
+void gnutls_global_set_log_level( int level)
+{
+	_gnutls_log_level = level;
 }
 
 
 #ifdef DEBUG
 /* default logging function */
-static void dlog( const char* str) {
+static void dlog( int level, const char* str) {
 	fputs( str, stderr);
 }
 #endif

@@ -562,9 +562,9 @@ int do_handshake(socket_st* socket)
 }
 
 
-static void tls_log_func( const char* str)
+static void tls_log_func( int level, const char* str)
 {
-	fprintf(stderr, "|** %s", str);
+	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
 void init_global_tls_stuff()

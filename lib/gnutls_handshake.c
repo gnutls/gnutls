@@ -1181,10 +1181,11 @@ static int _gnutls_client_check_if_resuming(gnutls_session session,
 					    opaque * session_id,
 					    int session_id_len)
 {
+char buf[64];
 
 	_gnutls_handshake_log("HSK: SessionID length: %d\n", session_id_len);
 	_gnutls_handshake_log("HSK: SessionID: %s\n",
-		    _gnutls_bin2hex(session_id, session_id_len));
+		    _gnutls_bin2hex(session_id, session_id_len, buf, sizeof(buf)));
 
 	if ((session->internals.resumed_security_parameters.
 	     session_id_size > 0)
@@ -1605,6 +1606,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 	uint8 comp;
 	opaque *SessionID = session->security_parameters.session_id;
 	uint8 session_id_len = session->security_parameters.session_id_size;
+	char buf[64];
 
 	if (SessionID == NULL)
 		session_id_len = 0;
@@ -1647,7 +1649,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 		pos += session_id_len;
 
 		_gnutls_handshake_log("HSK: SessionID: %s\n",
-			    _gnutls_bin2hex(SessionID, session_id_len));
+			    _gnutls_bin2hex(SessionID, session_id_len, buf, sizeof(buf)));
 
 		memcpy(&data[pos],
 		       session->security_parameters.
@@ -1902,6 +1904,8 @@ int _gnutls_handshake_client(gnutls_session session)
 	int ret = 0;
 
 #ifdef HANDSHAKE_DEBUG
+	char buf[64];
+
 	if (session->internals.resumed_security_parameters.
 	    session_id_size > 0)
 		_gnutls_handshake_log("HSK: Ask to resume: %s\n",
@@ -1910,7 +1914,7 @@ int _gnutls_handshake_client(gnutls_session session)
 					    session_id,
 					    session->internals.
 					    resumed_security_parameters.
-					    session_id_size));
+					    session_id_size, buf, sizeof(buf)));
 #endif
 
 	switch (STATE) {
@@ -2246,7 +2250,9 @@ int _gnutls_handshake_common(gnutls_session session)
 
 int _gnutls_generate_session_id(char *session_id, uint8 * len)
 {
+	char buf[64];
 	opaque rand[TLS_RANDOM_SIZE];
+
 	if (_gnutls_get_random(rand, TLS_RANDOM_SIZE, GNUTLS_WEAK_RANDOM) <
 	    0) {
 		gnutls_assert();
@@ -2256,7 +2262,7 @@ int _gnutls_generate_session_id(char *session_id, uint8 * len)
 	*len = TLS_RANDOM_SIZE;
 
 	_gnutls_handshake_log("HSK: Generated SessionID: %s\n",
-		    _gnutls_bin2hex(session_id, TLS_RANDOM_SIZE));
+		    _gnutls_bin2hex(session_id, TLS_RANDOM_SIZE, buf, sizeof(buf)));
 
 	return 0;
 }

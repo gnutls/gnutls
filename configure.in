@@ -76,7 +76,11 @@ AC_MSG_RESULT([***
 *** Checking for compilation programs...
 ])
 
+SAVED_CFLAGS="${CFLAGS}"
+
 AC_PROG_CC
+
+CFLAGS="${SAVED_CFLAGS}"
 
 AC_PROG_LN_S
 
@@ -114,7 +118,7 @@ affect compiling.])
 if test $ac_cv_c_compiler_gnu != no; then
 
 	if test x$opt_developer_mode = xyes; then
-	  CFLAGS="${CFLAGS} -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wmissing-braces -Wsign-compare -Winline -Wstrict-prototypes"
+	  CFLAGS="${CFLAGS} -g -Wall -Wcast-align -W -Wpointer-arith -Wchar-subscripts -Wformat-security -Wmissing-braces -Wsign-compare -Winline -Wstrict-prototypes"
 	else
 	  CFLAGS="${CFLAGS} -O2 -finline-functions"
 	fi

@@ -401,7 +401,8 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 	/* copy fresh data to our buffer.
 	 */
 	if (ret > 0) {
-		_gnutls_read_log("RB: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", session->internals.record_recv_buffer.length, ret, sizeOfPtr);
+		_gnutls_read_log("RB: Have %d bytes into buffer. Adding %d bytes.\n", session->internals.record_recv_buffer.length, ret);
+		_gnutls_read_log("RB: Requested %d bytes\n", sizeOfPtr);
 		session->internals.record_recv_buffer.length += ret;
 	}
 
@@ -937,7 +938,7 @@ int _gnutls_handshake_buffer_get_ptr( gnutls_session session, char **data_ptr, s
 	if (length!=NULL)
 		*length = session->internals.handshake_hash_buffer.length;
 
-	_gnutls_buffers_log( "BUF[HSK]: Peeded %d bytes of Data\n", length);
+	_gnutls_buffers_log( "BUF[HSK]: Peeked %d bytes of Data\n", *length);
 
 	if (data_ptr!=NULL)
 		*data_ptr = session->internals.handshake_hash_buffer.data;
