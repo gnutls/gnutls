@@ -62,10 +62,9 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_global.c gnutls_constate.c gnutls_anon_cred.c		\
 	pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c auth_cert.c	\
 	gnutls_ui.c gnutls_sig.c auth_dhe.c gnutls_dh_primes.c		\
-	ext_max_record.c gnutls_alert.c gnutls_int_compat.c		\
-	gnutls_str.c gnutls_state.c gnutls_x509.c ext_cert_type.c	\
-	gnutls_rsa_export.c auth_rsa_export.c ext_server_name.c		\
-	auth_dh_common.c memmem.c
+	ext_max_record.c gnutls_alert.c gnutls_str.c gnutls_state.c	\
+	gnutls_x509.c ext_cert_type.c gnutls_rsa_export.c		\
+	auth_rsa_export.c ext_server_name.c auth_dh_common.c memmem.c
 
 HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
