@@ -1,3 +1,37 @@
+2003-08-13 15:45  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, gnutls_global.c, rc2.c, rc2.h:
+
+	RC2 is not included when PKCS#12 is disabled.  
+
+2003-08-13 10:25  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/defines.h, lib/rc2.c:
+
+	RC2 was made reentrant. The stddef.h is now included if found.  
+
+2003-08-13 08:26  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_global.c:
+
+	added better check for gcrypt library.  
+
+2003-08-13 08:13  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_global.c, lib/gnutls_handshake.c,
+	lib/gnutls_record.c, lib/gnutls_state.c, lib/gnutls_v2_compat.c:
+
+	Arne: 
+	- gcry_check_version() _must_ be called nowadays, says 
+	libgcrypt-1.1.42/NEWS.  
+	- configure.in: the respective test in configure.in included
+	<sys/stddef.h> (which doesn't exist) instead of the usual
+	<stddef.h>.  
+	- lib/gnutls_errors.c: declaration of function _gnutls_bin2hex() 
+	doesn't match prototype from file lib/gnutls_str.h, causing
+	compilation failure 
+	- configure.in: -Wsign-compare removed.  
+
 2003-08-12 12:00  nmav <nmav@gnutls.org>
 
 	* lib/: auth_anon.c, dh_compat.c, gnutls_cipher_int.c,
