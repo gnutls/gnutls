@@ -1,3 +1,27 @@
+2002-09-17 17:57  nmav <nmav@gnutls.org>
+
+	* lib/Makefile.am, lib/defines.h, lib/gnutls.h.in.in,
+	lib/gnutls_algorithms.c, lib/gnutls_algorithms.h, src/cli.c,
+	src/serv.c, lib/gnutls_compress_int.c, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, lib/gnutls_handshake.c, lib/gnutls_int.h:
+
+	Added support for the LZO compression library in gnutls-extra. Some
+	fixes in the hello message parsing.  
+
+2002-09-16 17:03  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_buffers.c, gnutls_handshake.c,
+	gnutls_int.h, gnutls_int_compat.c, gnutls_state.c:
+
+	replaced gnutls_handshake_get_direction() with
+	gnutls_record_get_direction().  
+
+2002-09-16 17:03  nmav <nmav@gnutls.org>
+
+	* doc/tex/: appendix.tex, certificate.tex, library.tex:
+
+	updated documentation 
+
 2002-09-13 09:09  nmav <nmav@gnutls.org>
 
 	* README, lib/gnutls.h.in.in, lib/gnutls_alert.c:
