@@ -1,0 +1,443 @@
+
+
+
+    Network Working Group                                                
+    Internet Draft                                         N. Cam-Winget 
+                                                               D. McGrew 
+                                                              J. Salowey 
+                                                                 H. Zhou 
+    Document: draft-salowey-tls-ticket-00.txt              Cisco Systems 
+    Expires: October 2004                                       May 2004 
+     
+     
+           A TLS Hello Extension for Ticket Based Pre-Shared Keys  
+     
+     
+Status of this Memo 
+     
+    This document is an Internet-Draft and is in full conformance with 
+    all provisions of Section 10 of RFC2026.  
+     
+    Internet-Drafts are working documents of the Internet Engineering 
+    Task Force (IETF), its areas, and its working groups.  Note that      
+    other groups may also distribute working documents as Internet-
+    Drafts. 
+     
+    Internet-Drafts are draft documents valid for a maximum of six months 
+    and may be updated, replaced, or obsoleted by other documents at any 
+    time.  It is inappropriate to use Internet-Drafts as reference 
+    material or to cite them other than as "work in progress." 
+     
+    The list of current Internet-Drafts can be accessed at 
+         http://www.ietf.org/ietf/1id-abstracts.txt 
+    The list of Internet-Draft Shadow Directories can be accessed at 
+         http://www.ietf.org/shadow.html. 
+     
+     
+     
+Abstract 
+     
+    This document describes a TLS extension that makes use of a pre-
+    established ticket to distribute the shared secret for establishing a 
+    TLS session.  The mechanism uses extensions to the TLS session resume 
+    hello exchange.  In particular the ticket enables the client to 
+    maintain state so the server does not have to maintain per-client 
+    session state.  The use of a hello extension allows fallback to a 
+    full ciphersuite handshake. Considerations for the initial 
+    establishment of the ticket material are discussed.  
+     
+     
+Table of Contents 
+     
+    1. Introduction........................................... 2 
+    2. Basic operation........................................ 2 
+  
+  
+Cam-Winget, et. al.    Expires - November 2004               [Page 1] =0C
+                    TLS Hello Extension for Tickets           May 2004 
+  
+  
+       2.1 TLS Hello Ticket Extension......................... 3 
+       2.2 Generating the master secret ...................... 4 
+       2.3 TLS Hello Ticket extension format.................. 4 
+    3. Ticket Considerations.................................. 5 
+       3.1 Ticket Contents.................................... 5 
+       3.2 Ticket Issuance.................................... 5 
+       3.3 Ticket Format...................................... 6 
+    4. Security Considerations................................ 7 
+    Normative References...................................... 7 
+    Informative References.................................... 7 
+    Acknowledgments........................................... 8 
+    Author's Addresses........................................ 8 
+     
+     
+1. Introduction 
+     
+    This document describes an extension to TLS that allows shared keys 
+    to be used similar to [TLS-SHARED-KEY] but enables one of the peers 
+    to be stateless.  The extension is modeled after [RFC 3546] and 
+    employs the session resume logic. The proposal allows for the session 
+    state to be stored on the client in a ticket issued by the server or 
+    some central authority.   This relieves the server from maintaining 
+    per-client session state.  This mechanism is based on work done for 
+    [EAP-FAST] which discusses this extension as well as a method for 
+    distributing the initial ticket. 
+     
+    An extension to the TLS resume functionality instead of a new cipher 
+    suite was chosen because it allows the protocol to fall back to full 
+    authentication cipher suite if the ticket provided in the hello 
+    message is not valid. This extension can be used in conjunction with 
+    any TLS cipher suite including those specified in [TLS-PSK].  
+     
+     
+2. Basic operation 
+     
+    The basic operation assumes that a ticket has been previously issued 
+    to the client.  The ticket consists of a ticket key which is known to 
+    the client, an opaque portion which contains information for the 
+    server and optional informational section which describes information 
+    in the ticket to the client.  A suggested format for the distribution 
+    of the ticket is described in section 3.3. Since the ticket contains 
+    secret key material it MUST be distributed by a mechanism that 
+    protects the integrity and the confidentiality of the ticket.  In 
+    addition the distribution mechanism SHOULD authenticate and authorize 
+    the issuer. The exact means for distributing this ticket is not 
+    specified in this document; however suggestions and considerations 
+    are discussed in section 3.2 and in [EAP-FAST].  In EAP-FAST this 
+    ticket is called the PAC. 
+     
+  
+  
+Cam-Winget, et. Al.    Expires - November 2004               [Page 2] =0C
+                    TLS Hello Extension for Tickets           May 2004 
+  
+  
+    The exchange for establishing a session is the same as that used by 
+    TLS abbreviated handshake for session resume from [RFC 2246]: 
+     
+          Client                                                Server 
+     
+          ClientHello                   --------> 
+                                                           ServerHello 
+                                                    [ChangeCipherSpec] 
+                                        <--------             Finished 
+          [ChangeCipherSpec] 
+          Finished                      --------> 
+          Application Data              <------->     Application Data 
+  
+    A new extension to the client hello is defined to contain the opaque 
+    part of the ticket held by the client.   
+     
+2.1 TLS Hello Ticket Extension 
+  
+    The TLS Hello ticket extension is an extension to the client hello 
+    message and is included in the client_hello_extension_list defined in 
+    [RFC 3546].  The extension is used as follows.  
+     
+    When then client wants to establish a session with the server, it 
+    creates a TLS client hello record.  It includes the appropriate 
+    protocol version, new random value, acceptable cipher suites and 
+    compression methods just as in standard TLS [RFC 2246].  Since the 
+    session state is not stored on the server the Session ID SHOULD be 
+    set to 0.  The client includes a client hello extension which 
+    contains only the opaque part of the client=92s ticket.  For the 
+    remainder of this section the word ticket indicates only the opaque 
+    portion of the ticket held by the client.  It MUST NOT be feasible 
+    for an eavesdropper to extract valuable information, such as the 
+    ticket key, from the opaque portion of the ticket.    
+     
+    When the server receives a client hello containing a ticket extension 
+    it extracts the ticket information and attempts to decode it.  The 
+    opaque portion of the ticket is opaque to the client, not the server. =
+  
+    If the server cannot process the ticket or the ticket is not usable 
+    for any reason (for example it may have expired) then it may initiate 
+    the normal full TLS handshake with the client.  Alternatively, if the 
+    server is unable to process the ticket it may send a TLS-Alert 
+    indicating handshake_failure.  
+  
+    If it can decode the ticket then it uses the information in the 
+    ticket to re-generate the ticket key (this will typically require the 
+    server to decrypt the ticket). The server derives the TLS master 
+    secret from the ticket key as described in the section 2.2.  The 
+    server then continues with the abbreviated handshake for TLS session 
+    Resume. It chooses appropriate ciphersuite and compression data based 
+  
+  
+Cam-Winget, et. Al.    Expires - November 2004               [Page 3] =0C
+                    TLS Hello Extension for Tickets           May 2004 
+  
+  
+    on the client request and any additional data in the ticket if any 
+    exists.   
+  
+    The server may return a session-id in the server hello message.  The 
+    client may then store this session-id along with the required 
+    cryptographic state so that session resume can be performed as in 
+    standard TLS.  In the case that the client wants to use the standard 
+    session resume it includes the session-id issued by the server in the 
+    client hello. 
+     
+2.2 Generating the master secret 
+  
+    A 48 byte TLS master secret is generated from the ticket key (TK) in 
+    the TLS Hello ticket as follows. 
+  
+    master_secret =3D T-PRF (TK, "PAC to master secret label hash",  
+        server_random + client_random, 48)  
+  
+    T-PRF is defined in [EAP-FAST] as   
+     
+    T-PRF (Key, label, seed, OutputLength) =3D T1 + T2 + T3 + T4 + ...  
+     
+    Where + denote concatenation;  
+    S =3D label + 0x00 + seed;   
+        
+       and  
+          
+    T1 =3D HMAC-SHA1 (Key, S + OutputLength + 0x01)  
+    T2 =3D HMAC-SHA1 (Key, T1 + S + OutputLength + 0x02)  
+    T3 =3D HMAC-SHA1 (Key, T2 + S + OutputLength + 0x03)  
+    T4 =3D HMAC-SHA1 (Key, T3 + S + OutputLength + 0x04)  
+     
+    The master secret is then used to generate the key block as described 
+    in [RFC 2246]. 
+     
+     
+2.3 TLS Hello Ticket extension format 
+     
+    The format of the TLS Hello ticket extension can be described as 
+    follows. 
+     
+    The extension type number for TLS ticket extension is 35.  
+     
+    The TLS ticket extension format is defined as: 
+     
+    struct { 
+              opaque _Hello ticket<1..2^16-1> 
+          } HelloTicket; 
+    
+  
+  
+Cam-Winget, et. Al.    Expires - November 2004               [Page 4] =0C
+                    TLS Hello Extension for Tickets           May 2004 
+  
+  
+     
+     
+3. Ticket Considerations 
+     
+3.1 Ticket Contents 
+     
+    The TLS Hello ticket consists of three discreet components: the 
+    ticket key, the ticket opaque data and the ticket informational data. 
+     
+    The ticket key is a symmetric key of at least 16 bytes in length.  
+    This is the key that is used to derive the TLS master secret.   
+     
+    The ticket opaque data is data to be processed by the server and its 
+    contents must be completely opaque to the client or any eavesdropper. =
+  
+    At the very least it MUST contain enough information for the TLS 
+    server to derive the TLS master secret.  The ticket should also 
+    contain information restricting its validity in time.   The ticket 
+    opaque data may contain additional data such as identity information, 
+    ciphersuite information, capabilities and authorization attributes.  
+    How this information is processed is up to the entities that issue 
+    and process the ticket. 
+     
+    Ticket informational data consists of data for the client which 
+    provides information about the usage of the ticket.  The ticket 
+    information data may contain validity data such as an expiry time or 
+    information on which ciphersuite to use.  This information is 
+    optional.  If the client cannot interpret any of the data it should 
+    ignore the data it does not understand.   
+     
+    The ticket MUST be transmitted and stored in a manner that maintains 
+    its confidentiality and authenticity.   
+     
+    The client may maintain a cache of tickets it shares with respective 
+    servers.  Since these tickets contain keys access to this cache must 
+    be restricted to authorized entities.  
+     
+     
+3.2 Ticket Issuance 
+     
+    The client may obtain a ticket in many different ways.  It may be 
+    issued by the same server that processes the ticket or it may be 
+    issued by a trusted third party.  How this is done is beyond the 
+    scope of this document.  In [EAP-FAST] the TLS Hello ticket is 
+    distributed within an established TLS tunnel after user 
+    authentication is performed.   
+     
+    As stated above the ticket MUST be transmitted in a manner that 
+    maintains its confidentiality and authenticity.  In addition if the 
+    ticket is meant to convey identity or authorization then the system 
+  
+  
+Cam-Winget, et. Al.    Expires - November 2004               [Page 5] =0C
+                    TLS Hello Extension for Tickets           May 2004 
+  
+  
+    must ensure that only the intended party can obtain the ticket.  In 
+    this case the ticket must only be issued after appropriate 
+    authentication and authorization has taken place.   
+     
+     
+3.3 Ticket Format 
+     
+    In order to promote interoperable implementation the PAC format from 
+    EAP-FAST is used when transporting the ticket.  The format MUST be 
+    used with a security mechanism to protect the ticket key.   
+     
+    The basic format consists of a series type-length-value (TLV) 
+    structures.  A TLV is defined as follows: 
+     
+      0                   1                   2                   3  
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1  
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  
+     |R|R|            TLV Type       |            Length             |  
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  
+     |                              Value...                           
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  
+       
+       R  Reserved 
+             The first two bytes are reserved and set to 0 
+           
+       TLV Type 
+          Enumerated type value 
+     
+       Length 
+          Two byte length value in network byte order 
+     
+       Value 
+          Variable length value 
+        
+     
+    The ticket key (PAC-key) has a TLV type of 1 and a length of at least 
+    16 bytes.  The value contains the key used to derive the TLS Master 
+    Secret. 
+  
+    The ticket opaque data (PAC-Opaque) has a TLV type of 2 and a length 
+    of at least 16 bytes.  The value contains the opaque data which is 
+    treated as opaque data by the client. 
+  
+    The ticket lifetime (CRED_LIFETIME) has a TLV type of 3 and a length 
+    of 4 bytes.  The value contains the expiration time of the credential 
+    in UNIX UTC time.  
+    The ticket issuer ID (A-ID) has a TLV type of 4 and a variable 
+    length. The value contains a name used to identify the issuer of the 
+    ticket.   
+  
+  
+Cam-Winget, et. Al.    Expires - November 2004               [Page 6] =0C
+                    TLS Hello Extension for Tickets           May 2004 
+  
+  
+     
+    Values 5-9 are defined in [EAP-FAST]. 
+     
+     
+4. Security Considerations 
+  
+    The ticket opaque is transmitted in the clear during the TLS 
+    handshake; therefore it MUST NOT reveal sensitive information to an 
+    eavesdropper.  
+     
+    The master secret key in the ticket is used to derive the TLS master 
+    secret.  It should be generated in a way that ensures that it has 
+    sufficient entropy.  It SHOULD NOT be derived directly from a 
+    password, however the ticket may be issued as a result of password 
+    based authentication. 
+     
+    When the ticket is cached it MUST be stored so that access to the 
+    cache is restricted to only allow authorized parties.   
+     
+    If the ticket contains authorization information then it should only 
+    be issued after successful authentication and authorization have 
+    occurred.  Various aspects of credentials management such as 
+    revocation, expiry and renewal need to be considered when placing 
+    identity and authorization information in a ticket. 
+     
+      
+     
+     
+Normative References 
+     
+    [RFC 2246]  
+            Dierks, Tim and Allen, Christopher, "The TLS Protocol", RFC 
+            2246, January 1999. 
+  
+  
+    [RFC 3546]  
+            Blake-Wilson, S., Nystrom, M., Hopwwod, D., Mikkelsen, J. 
+            and Wright, T., "Transport Layer Security (TLS) Extensions",  
+            RFC 3546, June 2003 
+  
+  
+  
+Informative References 
+  
+    [EAP-FAST]  
+            Cam-Winget, N., McGrew, D., Salowey, J., Zhou, H., "EAP 
+            Flexible Authentication via Secure Tunneling (EAP-FAST)", 
+            draft-cam-winget-eap-fast-00 (work in progress), February 
+            2004 
+  
+  
+Cam-Winget, et. Al.    Expires - November 2004               [Page 7] =0C
+                    TLS Hello Extension for Tickets           May 2004 
+  
+  
+  
+    [TLS-SHARED-KEY] 
+            Gutmann, P., "Use of Shared Keys in the TLS Protocol", 
+            draft-ietf-tls-sharedkeys-02 (work in progress), October 
+            2003. 
+     
+    [TLS-PSK] 
+            Eronen, P., and Tschofenig, H. "Pre-Shared Key Ciphersuites 
+            for Transport Layer Security (TLS)", draft-eronen-tls-psk-
+            00.txt (work in progress), February 2004 
+             
+     
+     
+Acknowledgments 
+     
+     
+     
+Author's Addresses 
+     
+       
+        Nancy Cam-Winget  
+        Cisco Systems  
+        3625 Cisco Way  
+        San Jose, CA 95134  
+        US  
+        Phone: +1 408 853 0532  
+        Email: ncamwing@cisco.com  
+          
+        David McGrew  
+        Cisco Systems  
+        San Jose, CA 95134  
+        US  
+        Email: mcgrew@cisco.com  
+          
+        Joseph Salowey  
+        Cisco Systems  
+        2901 3rd Ave  
+        Seattle, WA 98121  
+        US  
+        Email: jsalowey@cisco.com  
+           
+        Hao Zhou  
+        Cisco Systems  
+        4125 Highlander Parkway  
+        Richfield, OH 44286  
+        US  
+        Phone : +1 330 523 2132  
+        Email: hzhou@cisco.com  
+      
+  
+  
+Cam-Winget, et. Al.    Expires - November 2004               [Page 8] =0C

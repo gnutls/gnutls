@@ -38,6 +38,7 @@ Current list:
   - Support critical key usage KeyCertSign and cRLSign.
   - Support path length constraints.
 - RFC 3280 compliant certificate path validation.
+- Add Pre-Shared-Key support.
 
 (+) Means high priority 
 (*) Means medium priority
