@@ -93,7 +93,7 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_LN_S
 dnl AC_PROG_MAKE_SET
-
+GTK_DOC_CHECK(1.1)
 
 AC_MSG_RESULT([***
 *** Detecting compiler options...
@@ -546,7 +546,7 @@ AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
-libextra/openpgp/Makefile libextra/opencdk/Makefile \
+libextra/openpgp/Makefile libextra/opencdk/Makefile doc/reference/Makefile \
 lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \

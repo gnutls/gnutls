@@ -1,6 +1,6 @@
 EXTRA_DIST = TODO README.CVS README.autoconf certtool.cfg \
 	gnutls.ps gnutls.pdf gnutls.html
-SUBDIRS = scripts manpages
+SUBDIRS = scripts manpages reference
 
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi fdl.texi error_codes.texi			\

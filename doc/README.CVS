@@ -15,6 +15,7 @@ Those are optional:
 * latex/dvips (in order to create gnutls.ps)
 * cvs2cl (in order to create ChangeLog) (http://www.red-bean.com/cvs2cl/)
 * gaa (to handle example programs' parameters) (http://gaa.sf.net)
+* gtk-doc (to generate reference HTML manual in doc/reference/)
 
 1. Download the cvs tree
 $ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls login
