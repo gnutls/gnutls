@@ -199,21 +199,22 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   * a client has sent. The name indication may be any of the enumeration
   * gnutls_server_name_type.
   *
-  * If 'type' is GNUTLS_NAME_DNS, then this function is to be used by servers
+  * If @type is GNUTLS_NAME_DNS, then this function is to be used by servers
   * that support virtual hosting, and the data will be null terminated.
   * The client may give the server the dnsname they connected to.
   *
-  * If data has not enough size to hold the server name GNUTLS_E_SHORT_MEMORY_BUFFER
-  * is returned, and data_length will hold the required size.
+  * If @data has not enough size to hold the server name GNUTLS_E_SHORT_MEMORY_BUFFER
+  * is returned, and @data_length will hold the required size.
   *
-  * 'index' is used to retrieve more than one server names (if sent by the client).
+  * @index is used to retrieve more than one server names (if sent by the client).
   * The first server name has an index of 0, the second 1 and so on. If no name with the given
   * index exists GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
   *
   **/
 int gnutls_server_name_get(gnutls_session session, void *data,
-			   int *data_length,
-			   int * type, int indx)
+			   size_t *data_length,
+			   gnutls_server_name_type * type, 
+			   unsigned int indx)
 {
    char *_data = data;
    
@@ -256,22 +257,22 @@ int gnutls_server_name_get(gnutls_session session, void *data,
 /**
   * gnutls_server_name_set - Used to set a name indicator to be sent as an extension
   * @session: is a &gnutls_session structure.
+  * @type: specifies the indicator type
   * @name: is a string that contains the server name.
   * @name_length: holds the length of name
-  * @type: specifies the indicator type
   *
   * This function is to be used by clients that want to inform 
   * ( via a TLS extension mechanism) the server of the name they
   * connected to. This should be used by clients that connect
   * to servers that do virtual hosting.
   *
-  * The value of 'name' depends on the 'ind' type. In case of GNUTLS_NAME_DNS,
+  * The value of @name depends on the @ind type. In case of GNUTLS_NAME_DNS,
   * a null terminated string is expected. 
   *
   **/
 int gnutls_server_name_set(gnutls_session session,
 			   gnutls_server_name_type type,
-			   const void *name, int name_length)
+			   const void *name, size_t name_length)
 {
    int server_names;
 

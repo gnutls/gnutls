@@ -52,8 +52,8 @@ static int _gnutls_server_find_cert_list_index(gnutls_session session,
  * exported certificate struct (CERTIFICATE_AUTH_INFO)
  */
 static
-int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info, gnutls_certificate_type type,
-				       gnutls_cert * cert, int ncerts)
+int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info, 
+       gnutls_cert * cert, int ncerts)
 {
 	/* Copy peer's information to AUTH_INFO
 	 */
@@ -738,7 +738,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 
 
 	if ((ret =
-	     _gnutls_copy_certificate_auth_info(info, gnutls_certificate_type_get(session),
+	     _gnutls_copy_certificate_auth_info(info, 
 						peer_certificate_list,
 						peer_certificate_list_size)) < 0) {
 		gnutls_assert();
@@ -901,7 +901,6 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 	if ((ret =
 	     _gnutls_copy_certificate_auth_info(info,
-						gnutls_certificate_type_get(session),
 						peer_certificate_list, 
 						peer_certificate_list_size)) < 0) {
 		gnutls_assert();

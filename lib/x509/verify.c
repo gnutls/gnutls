@@ -546,7 +546,7 @@ int ret, issuer_params_size, i;
   * You must also check the peer's name in order to check if the verified 
   * certificate belongs to the actual peer. 
   *
-  * The certificate verification output will be put in 'verify' and will be
+  * The certificate verification output will be put in @verify and will be
   * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
   * For a more detailed verification status use gnutls_x509_crt_verify() per list
   * element.

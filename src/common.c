@@ -44,7 +44,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	char dn[256];
 	size_t dn_size;
 	size_t digest_size = sizeof(digest);
-	int i, j;
+	unsigned int i, j;
 	size_t serial_size = sizeof(serial);
 	char printable[256];
 	char *print;
@@ -54,7 +54,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
 
-	if (cert_list_size <= 0) {
+	if (cert_list_size == 0) {
 		fprintf(stderr, "No certificates found!\n");
 		return;
 	}
@@ -62,7 +62,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	printf(" - Got a certificate list of %d certificates.\n\n",
 	       cert_list_size);
 
-	for (j = 0; j < cert_list_size; j++) {
+	for (j = 0; j < (uint)cert_list_size; j++) {
 
 		gnutls_x509_crt_init(&crt);
 		ret =
@@ -204,7 +204,8 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 
 	char digest[20];
 	size_t digest_size = sizeof(digest);
-	int i, ret;
+	unsigned int i;
+	int ret;
 	char printable[120];
 	char *print;
 	char name[256];
@@ -397,8 +398,8 @@ int print_info(gnutls_session session, const char* hostname)
 	case GNUTLS_CRD_CERTIFICATE:
 		{
 			char dns[256];
-			int dns_size = sizeof(dns);
-			int type;
+			size_t dns_size = sizeof(dns);
+			gnutls_server_name_type type;
 
 			/* This fails in client side */
 			if (gnutls_server_name_get

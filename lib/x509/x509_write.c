@@ -48,10 +48,10 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
   * @oid: holds an Object Identifier in a null terminated string
   * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @name: a pointer to the name
-  * @sizeof_name: holds the size of 'name'
+  * @sizeof_name: holds the size of @name
   *
   * This function will set the part of the name of the Certificate subject, specified
-  * by the given OID. 
+  * by the given OID. The input string should be ASCII or UTF-8 encoded.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test
@@ -79,16 +79,19 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid,
   * @oid: holds an Object Identifier in a null terminated string
   * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @name: a pointer to the name
-  * @sizeof_name: holds the size of 'name'
+  * @sizeof_name: holds the size of @name
   *
   * This function will set the part of the name of the Certificate issuer, specified
-  * by the given OID. 
+  * by the given OID. The input string should be ASCII or UTF-8 encoded.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test
   * for known OIDs using gnutls_x509_dn_oid_known(). For OIDs that are
   * not known (by gnutls) you should properly DER encode your data, and
   * call this function with raw_flag set.
+  *
+  * Normally you do not need to call this function, since the signing
+  * operation will copy the signer's name as the issuer of the certificate.
   *
   * Returns 0 on success.
   *

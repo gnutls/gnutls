@@ -189,7 +189,7 @@ char *_gnutls_bin2hex(const void *_old, size_t oldlen,
 	char *buffer, size_t buffer_size)
 {
 	unsigned int i, j;
-	opaque *old = _old;
+	const opaque *old = _old;
 
 	if ((oldlen * 2) + 1 > buffer_size) return NULL;
 

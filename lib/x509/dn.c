@@ -33,13 +33,6 @@
  * Name (you need a parser just to read a name in the X.509 protoocols!!!)
  */
 
-#ifndef HAVE_ISASCII
-# ifndef isascii
-#  define isascii(x) (x<128?1:0)
-# endif
-#endif
-
-
 /* Converts the given OID to an ldap acceptable string or
  * a dotted OID. 
  */
@@ -477,7 +470,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 				}
 
 				if (raw_flag != 0) {
-					if (len > *sizeof_buf) {
+					if ((uint)len > *sizeof_buf) {
 						*sizeof_buf = len;
 						return
 						    GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -665,7 +658,7 @@ int _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
 
 				len = strlen( oid) + 1;
 
-				if ( *sizeof_oid < len) {
+				if ( *sizeof_oid < (uint)len) {
 					*sizeof_oid = len;
 					gnutls_assert();
 					return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -983,7 +976,7 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
   * gnutls_x509_rdn_get - This function parses an RDN sequence and returns a string
   * @idn: should contain a DER encoded RDN sequence
   * @buf: a pointer to a structure to hold the peer's name
-  * @sizeof_buf: holds the size of 'buf'
+  * @sizeof_buf: holds the size of @buf
   *
   * This function will return the name of the given RDN sequence.
   * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described 
@@ -1037,7 +1030,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
   * @indx: In case multiple same OIDs exist in the RDN indicates which to send. Use 0 for the first one.
   * @raw_flag: If non zero then the raw DER data are returned.
   * @buf: a pointer to a structure to hold the peer's name
-  * @sizeof_buf: holds the size of 'buf'
+  * @sizeof_buf: holds the size of @buf
   *
   * This function will return the name of the given Object identifier, 
   * of the RDN sequence.
@@ -1087,7 +1080,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char *oid,
   * @idn: should contain a DER encoded RDN sequence
   * @indx: Indicates which OID to return. Use 0 for the first one.
   * @oid: a pointer to a structure to hold the peer's name OID
-  * @sizeof_oid: holds the size of 'oid'
+  * @sizeof_oid: holds the size of @oid
   *
   * This function will return the specified Object identifier, 
   * of the RDN sequence.

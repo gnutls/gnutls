@@ -76,7 +76,6 @@ int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,
 					      const char *password,
 					      gnutls_datum * enc);
 int _pkcs12_decode_safe_contents( const gnutls_datum* content, gnutls_pkcs12_bag bag);
-int _pkcs12_check_pass( const char* pass, size_t plen);
 
 int
 _pkcs12_encode_safe_contents( gnutls_pkcs12_bag bag, ASN1_TYPE* content, int *enc);

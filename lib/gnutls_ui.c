@@ -231,7 +231,8 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/
-const gnutls_datum *gnutls_certificate_get_peers(gnutls_session session, int *list_size)
+const gnutls_datum *gnutls_certificate_get_peers(gnutls_session session, 
+	unsigned int *list_size)
 {
 	CERTIFICATE_AUTH_INFO info;
 
@@ -288,7 +289,7 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
   *
   **/
 int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
-	unsigned char* result, size_t* result_size)
+	void* result, size_t* result_size)
 {
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = _gnutls_hash_get_algo_len(algo);

@@ -53,7 +53,7 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 
 /* get data from the session 
  */
-const gnutls_datum* gnutls_certificate_get_peers( gnutls_session, int* list_size);
+const gnutls_datum* gnutls_certificate_get_peers( gnutls_session, unsigned int* list_size);
 const gnutls_datum *gnutls_certificate_get_ours( gnutls_session session);
 
 time_t gnutls_certificate_activation_time_peers(gnutls_session session);

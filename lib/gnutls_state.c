@@ -530,7 +530,7 @@ void gnutls_record_set_cbc_protection(gnutls_session session, int prot)
   *
   * This function will enable or disable the use of private
   * cipher suites (the ones that start with 0xFF). By default 
-  * or if 'allow' is 0 then these cipher suites will not be
+  * or if @allow is 0 then these cipher suites will not be
   * advertized nor used.
   *
   * Unless this function is called with the option to allow (1), then

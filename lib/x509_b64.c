@@ -290,7 +290,7 @@ int size;
 	if (size < 0)
 		return size;
 
-	if (result==NULL || *result_size < size) {
+	if (result==NULL || *result_size < (uint)size) {
 		gnutls_free(ret);
 		*result_size = size;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -499,7 +499,7 @@ int size;
 	if (size < 0)
 		return size;
 
-	if (result==NULL || *result_size < size) {
+	if (result==NULL || *result_size < (uint)size) {
 		gnutls_free(ret);
 		*result_size = size;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;

@@ -150,7 +150,7 @@ void gnutls_transport_get_ptr2(gnutls_session session,
   *
   * Terminates the current TLS/SSL connection. The connection should
   * have been initiated using gnutls_handshake().
-  * 'how' should be one of GNUTLS_SHUT_RDWR, GNUTLS_SHUT_WR.
+  * @how should be one of GNUTLS_SHUT_RDWR, GNUTLS_SHUT_WR.
   *
   * In case of GNUTLS_SHUT_RDWR then the TLS connection gets terminated and
   * further receives and sends will be disallowed. If the return

@@ -164,9 +164,10 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
   * @sizeof_buf: initialy holds the size of 'buf'
   *
   * This function will copy the name of the Certificate request subject in the provided buffer. The name 
-  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253.
+  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
+  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
   *
-  * If buf is null then only the size will be filled.
+  * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
@@ -195,14 +196,15 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   * @sizeof_buf: initialy holds the size of 'buf'
   *
   * This function will extract the part of the name of the Certificate request subject, specified
-  * by the given OID. The output will be encoded as described in RFC2253.
+  * by the given OID. The output will be encoded as described in RFC2253. The output
+  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * If raw flag is zero, this function will only return known OIDs as text. Other OIDs
-  * will be DER encoded, as described in RFC2253 -- in hex format with a '#' prefix.
+  * will be DER encoded, as described in RFC2253 -- in hex format with a '\#' prefix.
   * You can check about known OIDs using gnutls_x509_dn_oid_known().
   *
-  * If buf is null then only the size will be filled.
+  * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
@@ -422,7 +424,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
   * @sizeof_data: holds the size of 'data'
   *
   * This function will set the part of the name of the Certificate request subject, specified
-  * by the given OID. 
+  * by the given OID. The input string should be ASCII or UTF-8 encoded.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test

@@ -43,7 +43,7 @@
  *                             denotes the length in octets of the
  *                             pseudorandom function output)
  *
- *  Input:          P          password, an octet string
+ *  Input:          P          password, an octet string (ASCII or UTF-8)
  *                  S          salt, an octet string
  *                  c          iteration count, a positive integer
  *                  dkLen      intended length in octets of the derived
@@ -83,10 +83,6 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 
   if (dkLen == 0)
     return PKCS5_INVALID_DERIVED_KEY_LENGTH;
-
-  if ((rc=_pkcs12_check_pass( P, Plen)) < 0) {
-  	return rc;
-  }
 
   /*
    *

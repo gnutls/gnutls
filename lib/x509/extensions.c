@@ -262,7 +262,7 @@ int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
 			if ( indx == indx_counter++) { 
 				len = strlen( extnID) + 1;
 
-				if ( *sizeof_oid < len) {
+				if ( *sizeof_oid < (uint)len) {
 					*sizeof_oid = len;
 					gnutls_assert();
 					return GNUTLS_E_SHORT_MEMORY_BUFFER;

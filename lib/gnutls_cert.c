@@ -200,7 +200,7 @@ int _gnutls_cert_supported_kx(const gnutls_cert* cert, gnutls_kx_algorithm ** al
   * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
   *
   * This function specifies if we (in case of a server) are going
-  * to send a certificate request message to the client. If 'req'
+  * to send a certificate request message to the client. If @req
   * is GNUTLS_CERT_REQUIRE then the server will return an error if
   * the peer does not provide a certificate. If you do not
   * call this function then the client will not be asked to
@@ -223,11 +223,11 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * The callback's function prototype is:
   * int (*callback)(gnutls_session, const gnutls_datum *client_cert, int ncerts, const gnutls_datum* req_ca_dn, int nreqs);
   *
-  * 'client_cert' contains 'ncerts' gnutls_datum structures which hold
+  * @client_cert contains @ncerts gnutls_datum structures which hold
   * the raw certificates (DER for X.509 or binary for OpenPGP), of the
   * client.
   *
-  * 'req_ca_cert', is only used in X.509 certificates. 
+  * @req_ca_cert, is only used in X.509 certificates. 
   * Contains a list with the CA names that the server considers trusted. 
   * Normally we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
@@ -264,7 +264,7 @@ void gnutls_certificate_client_set_select_function(gnutls_session session,
   * The callback's function form is:
   * int (*callback)(gnutls_session, gnutls_datum *server_cert, int ncerts);
   *
-  * 'server_cert' contains 'ncerts' gnutls_datum structures which hold
+  * @server_cert contains @ncerts gnutls_datum structures which hold
   * the raw certificate (DER encoded in X.509) of the server. 
   *
   * This function specifies what we, in case of a server, are going

@@ -549,9 +549,9 @@ int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag bag, int indx,
 /**
   * gnutls_pkcs12_bag_decrypt - This function will decrypt an encrypted bag
   * @bag: The bag
-  * @pass: The password used for encryption
+  * @pass: The password used for encryption. This can only be ASCII.
   *
-  * This function will return 0 on success.
+  * This function will decrypt the given encrypted bag and return 0 on success.
   *
   **/
 int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass)
@@ -598,7 +598,7 @@ gnutls_datum dec;
 /**
   * gnutls_pkcs12_bag_encrypt - This function will encrypt a bag
   * @bag: The bag
-  * @pass: The password used for encryption
+  * @pass: The password used for encryption. This can only be ASCII.
   * @flags: should be one of gnutls_pkcs_encrypt_flags elements bitwise or'd
   *
   * This function will encrypt the given bag and return 0 on success.

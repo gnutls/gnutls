@@ -38,7 +38,9 @@
   *
   * Resuming sessions is really useful and speedups connections after a succesful one.
   **/
-int gnutls_session_get_data( gnutls_session session, opaque* session_data, int *session_data_size) {
+int gnutls_session_get_data( gnutls_session session, 
+	void* session_data, size_t *session_data_size) 
+{
 
 	gnutls_datum psession;
 	int ret;
@@ -81,7 +83,9 @@ int gnutls_session_get_data( gnutls_session session, opaque* session_data, int *
   * Session id is some data set by the server, that identify the current session. 
   * In TLS 1.0 and SSL 3.0 session id is always less than 32 bytes.
   **/
-int gnutls_session_get_id( gnutls_session session, void* session_id, int *session_id_size) {
+int gnutls_session_get_id( gnutls_session session, 
+	void* session_id, size_t *session_id_size) 
+{
 
 	*session_id_size = session->security_parameters.session_id_size;
 	
@@ -111,8 +115,8 @@ int gnutls_session_get_id( gnutls_session session, void* session_id, int *sessio
   * Returns a negative value on error.
   *
   **/
-int gnutls_session_set_data( gnutls_session session, const opaque* session_data, 
-	int session_data_size) 
+int gnutls_session_set_data( gnutls_session session, const void* session_data, 
+	size_t session_data_size) 
 {
 	int ret;
 	gnutls_datum psession = { (opaque*)session_data, session_data_size };

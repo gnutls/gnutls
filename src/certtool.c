@@ -789,7 +789,7 @@ void certificate_info( void)
 				indx = 0;
 			}
 
-			fprintf( outfile, "\n\t%s: ", oid);
+			fprintf( outfile, "\t%s: ", oid);
 			
 			size = sizeof(buffer);
 			ret = gnutls_x509_crt_get_extension_by_oid( crt, oid, indx, buffer, &size, &critical);

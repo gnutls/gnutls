@@ -256,7 +256,7 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
   * @format: One of DER or PEM
   *
   * This function will convert the given DER or PEM encoded key
-  * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
+  * to the native gnutls_x509_privkey format. The output will be stored in @key .
   *
   * If the key is PEM encoded it should have a header of "RSA PRIVATE KEY", or
   * "DSA PRIVATE KEY".
@@ -368,7 +368,7 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
   * @u: holds the coefficient
   *
   * This function will convert the given RSA raw parameters
-  * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
+  * to the native gnutls_x509_privkey format. The output will be stored in @key.
   * 
   **/
 int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key, 

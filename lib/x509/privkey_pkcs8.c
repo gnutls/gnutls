@@ -374,7 +374,7 @@ int encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der_key,
   * gnutls_x509_privkey_export_pkcs8 - This function will export the private key to PKCS8 format
   * @key: Holds the key
   * @format: the format of output params. One of PEM or DER.
-  * @password: the password that will be used to encrypt the key
+  * @password: the password that will be used to encrypt the key. 
   * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags
   * @output_data: will contain a private key PEM or DER encoded
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
@@ -383,6 +383,9 @@ int encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der_key,
   * Currently only RSA keys can be exported. If the flags do not
   * specify the encryption cipher, then the default 3DES (PBES2) will
   * be used.
+  *
+  * The @password can be either ASCII or UTF-8 in the default PBES2
+  * encryption schemas, or ASCII for the PKCS12 schemas.
   *
   * If the buffer provided is not long enough to hold the output, then
   * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
@@ -805,13 +808,16 @@ int decode_private_key_info(const gnutls_datum * der,
   * @key: The structure to store the parsed key
   * @data: The DER or PEM encoded key.
   * @format: One of DER or PEM
-  * @password: the password to decrypt the key (if it is encrypted)
+  * @password: the password to decrypt the key (if it is encrypted).
   * @flags: use 0.
   *
   * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
-  * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
+  * to the native gnutls_x509_privkey format. The output will be stored in @key.
   * Currently only RSA keys can be imported, and flags can only be used to indicate
   * an unencrypted key.
+  *
+  * The @password can be either ASCII or UTF-8 in the default PBES2
+  * encryption schemas, or ASCII for the PKCS12 schemas.
   *
   * If the Certificate is PEM encoded it should have a header of "ENCRYPTED PRIVATE KEY",
   * or "PRIVATE KEY". You only need to specify the flags if the key is DER encoded.

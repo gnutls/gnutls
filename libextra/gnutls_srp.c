@@ -507,8 +507,8 @@ int i;
   * The callback's function form is:
   * int (*callback)(gnutls_session, const char** pfiles, const char** pconffiles, int npfiles);
   *
-  * 'pfiles' contains 'npfiles' char* structures which hold
-  * the password file name. 'pconffiles' contain the corresponding
+  * @pfiles contains @npfiles char* structures which hold
+  * the password file name. @pconffiles contain the corresponding
   * conf files.
   *
   * This function specifies what we, in case of a server, are going
@@ -541,8 +541,8 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
   *  gnutls_datum* salt, gnutls_datum *verifier, gnutls_datum* g,
   *  gnutls_datum* n);
   *
-  * 'username' contains the actual username. 
-  * The 'salt', 'verifier', 'generator' and 'prime' must be filled
+  * @username contains the actual username. 
+  * The @salt, @verifier, @generator and @prime must be filled
   * in using the gnutls_malloc().
   *
   * In case the callback returned a negative number then gnutls will
@@ -598,7 +598,7 @@ const char *gnutls_srp_server_get_username(gnutls_session session)
   *
   * This function will create an SRP verifier, as specified in RFC2945.
   * The prime and generator may be generated using the gnutls_dh_params_generate()
-  * function. The verifier will be allocated with 'malloc' and will be stored in 'res' in binary format.
+  * function. The verifier will be allocated with @malloc and will be stored in @res using binary format.
   *
   **/
 int gnutls_srp_verifier( char* username, char* password, const gnutls_datum *salt, 

@@ -249,12 +249,13 @@ size_t gnutls_record_check_pending(gnutls_session session);
 typedef enum gnutls_server_name_type { GNUTLS_NAME_DNS=1 
 } gnutls_server_name_type;
 
-int gnutls_get_server_name(gnutls_session session, void* data, int* data_length,
-				       int *type, int indx);
+int gnutls_server_name_set(gnutls_session session,
+	gnutls_server_name_type type,
+	const void *name, size_t name_length);
 
-int gnutls_set_server_name(gnutls_session session,
-			       gnutls_server_name_type type,
-			       const void *name, int name_length);
+int gnutls_server_name_get(gnutls_session session, 
+	void *data, size_t *data_length,
+	gnutls_server_name_type * type, int unsigned indx);
 
 /* functions to set priority of cipher suites 
  */
@@ -282,11 +283,11 @@ const char *gnutls_protocol_get_name(gnutls_protocol_version version);
 
 /* get/set session 
  */
-int gnutls_session_set_data( gnutls_session session, const void* session_data, int session_data_size);
-int gnutls_session_get_data( gnutls_session session, void* session_data, int *session_data_size);
+int gnutls_session_set_data( gnutls_session session, const void* session_data, size_t session_data_size);
+int gnutls_session_get_data( gnutls_session session, void* session_data, size_t *session_data_size);
 /* returns the session ID */
 #define GNUTLS_MAX_SESSION_ID 32
-int gnutls_session_get_id( gnutls_session session, void* session_id, int *session_id_size);
+int gnutls_session_get_id( gnutls_session session, void* session_id, size_t *session_id_size);
 
 /* checks if this session is a resumed one 
  */
@@ -441,7 +442,7 @@ int gnutls_rsa_params_generate2(gnutls_rsa_params params, int bits);
 int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
 	gnutls_datum * m, gnutls_datum *e,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
-	gnutls_datum* u, int *bits);
+	gnutls_datum* u, unsigned int *bits);
 
 /* Session stuff
  */
@@ -473,5 +474,5 @@ void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status s
  * Actually this function returns the hash of the given data.
  */
 int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
-	unsigned char* result, int* result_size);
+	void* result, size_t* result_size);
 

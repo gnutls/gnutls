@@ -102,6 +102,12 @@ typedef struct {
 	unsigned char i[8];
 } uint64;
 
+#ifndef HAVE_ISASCII
+# ifndef isascii
+#  define isascii(x) (x<128?1:0)
+# endif
+#endif
+
 #if SIZEOF_UNSIGNED_LONG == 4
 typedef unsigned long int uint32;
 typedef signed long int sint32;

@@ -29,18 +29,17 @@
 
 #include <gcrypt.h>
 #include <gnutls_errors.h>
-#include <ctype.h>
 
 /* Returns 0 if the password is ok, or a negative error
  * code instead.
  */
-int _pkcs12_check_pass( const char* pass, size_t plen) 
+static int _pkcs12_check_pass( const char* pass, size_t plen) 
 {
 const unsigned char* p = pass;
 unsigned int i;
 
 	for (i=0;i<plen;i++) {
-		if ( p[i] < 128) continue;
+		if ( isascii(p[i])) continue;
 		return GNUTLS_E_INVALID_PASSWORD;
 	}
 	
