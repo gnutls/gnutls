@@ -31,9 +31,9 @@ libgnutls_x509_la_SOURCES = crl.c dn.c common.c x509.c extensions.c	\
 
 EXTRA_DIST = x509-api.texi
 
-x509-api.texi: $(COBJECTS)
+x509-api.texi: $(libgnutls_x509_la_SOURCES)
 	@echo "" > x509-api.texi
-	@for i in $(COBJECTS); do \
+	@for i in $(libgnutls_x509_la_SOURCES); do \
 		echo -n "Creating documentation for file $$i... " && \
 		../../doc/scripts/gdoc -texinfo $$i >> x509-api.texi && \
 		echo "ok"; \
