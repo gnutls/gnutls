@@ -24,7 +24,6 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_dh.h>
-#include <gnutls_random.h>
 
 #define gnutls_log_func LOG_FUNC
 
@@ -222,11 +221,6 @@ int gnutls_global_init( void)
 		goto out;
 	}
 	
-	/* initialize the random functions.
-	 */
-	_gnutls_get_random( &c, 1, GNUTLS_WEAK_RANDOM);
-	_gnutls_get_random( &c, 1, GNUTLS_STRONG_RANDOM);
-
 	out:
 	return result;
 }
