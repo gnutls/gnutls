@@ -168,6 +168,8 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 	}
 
 	if (ret != GNUTLS_MAC_FAILED) {
+		gcry_md_setkey(ret->handle, key, keylen);
+
 		ret->algorithm = algorithm;
 		ret->key = key;
 		ret->keysize = keylen;
