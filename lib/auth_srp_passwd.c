@@ -108,7 +108,7 @@ int indx;
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	if (_gnutls_mpi_scan(&entry->v, GCRYMPI_FMT_USG, verifier, &verifier_size) || entry->v == NULL) {
+	if (_gnutls_mpi_scan(&entry->v, verifier, &verifier_size) || entry->v == NULL) {
 		gnutls_assert();
 		gnutls_free(entry->salt);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -151,7 +151,7 @@ int tmp_size;
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
-	if (_gnutls_mpi_scan(&entry->g, GCRYMPI_FMT_USG, tmp, &tmp_size) || entry->g==NULL) {
+	if (_gnutls_mpi_scan(&entry->g, tmp, &tmp_size) || entry->g==NULL) {
 		gnutls_assert();
 		gnutls_free(tmp);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -179,7 +179,7 @@ int tmp_size;
 		_gnutls_mpi_release(&entry->g);
 		return GNUTLS_E_PARSING_ERROR;
 	}
-	if (_gnutls_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size) || entry->n==NULL) {
+	if (_gnutls_mpi_scan(&entry->n, tmp, &tmp_size) || entry->n==NULL) {
 		gnutls_assert();
 		gnutls_free(tmp);
 		_gnutls_mpi_release(&entry->g);
@@ -367,12 +367,12 @@ int _gnutls_srp_generate_prime(opaque ** ret_g, opaque ** ret_n, int bits)
 	}
 
 	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, g);
+	_gnutls_mpi_print( NULL, &siz, g);
 	if (ret_g != NULL) {
 		tmp = gnutls_malloc(siz);
 		if (tmp==NULL) return GNUTLS_E_MEMORY_ERROR;
 		
-		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, g);
+		_gnutls_mpi_print( tmp, &siz, g);
 
 		if (_gnutls_sbase64_encode(tmp, siz, ret_g) < 0) {
 			gnutls_free(tmp);
@@ -382,12 +382,12 @@ int _gnutls_srp_generate_prime(opaque ** ret_g, opaque ** ret_n, int bits)
 	}
 
 	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, prime);
+	_gnutls_mpi_print( NULL, &siz, prime);
 	if (ret_n != NULL) {
 		tmp = gnutls_malloc(siz);
 		if (tmp==NULL) return GNUTLS_E_MEMORY_ERROR;
 
-		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, prime);
+		_gnutls_mpi_print( tmp, &siz, prime);
 		if (_gnutls_sbase64_encode(tmp, siz, ret_n) < 0) {
 			gnutls_free(tmp);
 			return GNUTLS_E_UNKNOWN_ERROR;

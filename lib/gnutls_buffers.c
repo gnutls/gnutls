@@ -27,6 +27,23 @@
 /* This is the only file that uses the berkeley sockets API.
  * 
  * Also holds all the buffering code used in gnutls.
+ * The buffering code works as:
+ *
+ * RECORD LAYER: 
+ *  1. uses a buffer to hold data (application/handshake),
+ *    we got but they were not requested, yet.
+ *  (see gnutls_insert_to_data_buffer(), gnutls_get_data_buffer_size() etc.)
+ *
+ *  2. uses a buffer to hold data that were incomplete (ie the read/write
+ *    was interrupted)
+ *  (see _gnutls_read_buffered(), _gnutls_write_buffered() etc.)
+ * 
+ * HANDSHAKE LAYER:
+ *  Uses a buffer to hold data that was not sent or received
+ *  complete. (Ie. sent 10 bytes of a handshake packet that is 20 bytes
+ *  long).
+ * (see _gnutls_handshake_send_int(), _gnutls_handshake_recv_int())
+ *
  */
 
 #ifdef HAVE_ERRNO_H

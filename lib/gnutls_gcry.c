@@ -33,8 +33,20 @@ MPI _gnutls_mpi_new( int bits) {
 	return gcry_mpi_new( bits);
 }
 
-int _gnutls_mpi_scan( GCRY_MPI *ret_mpi, enum gcry_mpi_format format,
-                                       const char *buffer, size_t *nbytes ) {
-	return gcry_mpi_scan( ret_mpi, format, buffer, nbytes);
+int _gnutls_mpi_scan( GCRY_MPI *ret_mpi, const opaque *buffer, size_t *nbytes ) {
+	return gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_STD, buffer, nbytes);
 
+}
+
+int _gnutls_mpi_scan_raw( GCRY_MPI *ret_mpi, const opaque *buffer, size_t *nbytes ) {
+	return gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_USG, buffer, nbytes);
+
+}
+
+int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GCRY_MPI a ) {
+	return gcry_mpi_print( GCRYMPI_FMT_STD, buffer, nbytes, a);
+}
+
+int _gnutls_mpi_print_raw( opaque *buffer, size_t *nbytes, const GCRY_MPI a ) {
+	return gcry_mpi_print( GCRYMPI_FMT_USG, buffer, nbytes, a);
 }

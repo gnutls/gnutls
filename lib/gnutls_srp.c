@@ -39,7 +39,7 @@ int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
 	MPI x, e;
 	int result_size;
 
-	if (_gnutls_mpi_scan(&x, GCRYMPI_FMT_USG, text, &textsize)) {
+	if (_gnutls_mpi_scan(&x, text, &textsize)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -55,12 +55,12 @@ int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
 	gcry_mpi_powm(e, g, x, prime);
 	_gnutls_mpi_release(&x);
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
+	_gnutls_mpi_print( NULL, &result_size, e);
 	if (result != NULL) {
 		*result = gnutls_malloc(result_size);
 		if ((*result)==NULL) return GNUTLS_E_MEMORY_ERROR;
 
-		gcry_mpi_print(GCRYMPI_FMT_USG, *result, &result_size, e);
+		_gnutls_mpi_print( *result, &result_size, e);
 	}
 
 	_gnutls_mpi_release(&e);
@@ -126,11 +126,11 @@ MPI _gnutls_calc_srp_u(MPI B)
 	uint32 u;
 	MPI ret;
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &b_size, B);
+	_gnutls_mpi_print( NULL, &b_size, B);
 	b_holder = gnutls_malloc(b_size);
 	if (b_holder==NULL) return NULL;
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, b_holder, &b_size, B);
+	_gnutls_mpi_print( b_holder, &b_size, B);
 
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);

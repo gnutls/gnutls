@@ -67,7 +67,7 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	if (_gnutls_mpi_scan( &pkey->params[0], /* u */
-		  GCRYMPI_FMT_USG, str, &len) != 0 || pkey->params[0]==NULL) {
+		  str, &len) != 0 || pkey->params[0]==NULL) {
 		gnutls_assert();
 		asn1_delete_structure(pkcs_asn);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -85,7 +85,7 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 	}
 
 	if (_gnutls_mpi_scan( &pkey->params[1], /* A */
-		  GCRYMPI_FMT_USG, str, &len) != 0 || pkey->params[1] == NULL) {
+		  str, &len) != 0 || pkey->params[1] == NULL) {
 		gnutls_assert();
 		asn1_delete_structure(pkcs_asn);
 		_gnutls_mpi_release( &pkey->params[0]);

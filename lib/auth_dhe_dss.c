@@ -85,24 +85,24 @@ int gen_dhe_dss_server_kx( GNUTLS_KEY key, opaque** data) {
 
 	key->dh_secret = x;
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, g);
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_p, p);
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
+	_gnutls_mpi_print( NULL, &n_g, g);
+	_gnutls_mpi_print( NULL, &n_p, p);
+	_gnutls_mpi_print( NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_g + n_p + n_X + 6);
 	data_p = &(*data)[0];
-	gcry_mpi_print(GCRYMPI_FMT_USG, &data_p[2], &n_p, p);
+	_gnutls_mpi_print( &data_p[2], &n_p, p);
 	_gnutls_mpi_release(p);
 
 	WRITEuint16( n_p, data_p);
 
 	data_g = &data_p[2 + n_p];
-	gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, g);
+	_gnutls_mpi_print( &data_g[2], &n_g, g);
 	_gnutls_mpi_release(g);
 
 	WRITEuint16( n_g, data_g);
 
 	data_X = &data_g[2 + n_g];
-	gcry_mpi_print(GCRYMPI_FMT_USG, &data_X[2], &n_X, X);
+	_gnutls_mpi_print( &data_X[2], &n_X, X);
 	_gnutls_mpi_release(X);
 
 	WRITEuint16( n_X, data_X);
@@ -119,10 +119,10 @@ size_t n_X;
 	X =  _gnutls_calc_dh_secret(&x, key->client_g,
 		   key->client_p);
 		   
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
+	_gnutls_mpi_print( NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_X + 2);
 	
-	gcry_mpi_print(GCRYMPI_FMT_USG, &(*data)[2], &n_X, X);
+	_gnutls_mpi_print( &(*data)[2], &n_X, X);
 	(*data)[0] = 1;	/* extern - explicit since we do not have
 				   certificate */
 	_gnutls_mpi_release(X);
@@ -186,19 +186,16 @@ int proc_dhe_dss_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	_n_g = n_g;
 	_n_p = n_p;
 
-	if (gcry_mpi_scan(&key->client_Y,
-			      GCRYMPI_FMT_USG, data_Y, &_n_Y) != 0) {
+	if (gcry_mpi_scan(&key->client_Y, data_Y, &_n_Y) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (gcry_mpi_scan(&key->client_g,
-			      GCRYMPI_FMT_USG, data_g, &_n_g) != 0) {
+	if (gcry_mpi_scan(&key->client_g,, data_g, &_n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	if (gcry_mpi_scan(&key->client_p,
-				      GCRYMPI_FMT_USG, data_p, &_n_p) != 0) {
+	if (gcry_mpi_scan(&key->client_p, data_p, &_n_p) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -235,8 +232,7 @@ int proc_dhe_dss_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	n_Y = READuint16( &data[0]);
 	_n_Y = n_Y;
 
-	if (gcry_mpi_scan(&key->client_Y,
-		      GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
+	if (gcry_mpi_scan(&key->client_Y, &data[2], &_n_Y)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}

@@ -124,7 +124,6 @@ static int _parse_extension(gnutls_cert * cert, char *extnID,
 	}
 
 	if (strcmp(extnID, "2 5 29 15") == 0) {	/* Key Usage */
-fprintf(stderr, "key USAGE FOUND\n");
 		return _extract_keyUsage(&cert->keyUsage, extnValue, extnValueLen);
 	}
 

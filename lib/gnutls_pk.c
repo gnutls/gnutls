@@ -91,7 +91,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 	ps[psize] = 0;
 	memcpy(&ps[psize + 1], plaintext.data, plaintext.size);
 
-	if (_gnutls_mpi_scan(&m, GCRYMPI_FMT_USG, edata, &k) != 0) {
+	if (_gnutls_mpi_scan(&m, edata, &k) != 0) {
 		gnutls_assert();
 		gnutls_free(edata);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -108,7 +108,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 		return ret;
 	}
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &psize, res);
+	_gnutls_mpi_print_raw( NULL, &psize, res);
 
 	ciphertext->data = gnutls_malloc(psize);
 	if (ciphertext->data == NULL) {
@@ -116,7 +116,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 		_gnutls_mpi_release(&res);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	gcry_mpi_print(GCRYMPI_FMT_USG, ciphertext->data, &psize, res);
+	_gnutls_mpi_print_raw( ciphertext->data, &psize, res);
 	ciphertext->size = psize;
 
 	_gnutls_mpi_release(&res);
@@ -140,15 +140,19 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext, gnutls_datum ciphertext
 	k = gcry_mpi_get_nbits(n) / 8;
 	esize = ciphertext.size;
 
-	if (esize!=k) {
+	/* here we have a problem if the integer has leading zeros.
+	 * However this is STRICT PKCS1.
+	 */
+	if (esize != k) {
 		gnutls_assert();
 		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}
-	
-	if (_gnutls_mpi_scan(&c, GCRYMPI_FMT_USG, ciphertext.data, &esize) != 0) {
+
+	if (_gnutls_mpi_scan_raw(&c, ciphertext.data, &esize) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+
 
 	_pkey[0] = &n;
 	_pkey[1] = &pkey;
@@ -161,14 +165,14 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext, gnutls_datum ciphertext
 		return ret;
 	}
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &esize, res);
+	_gnutls_mpi_print( NULL, &esize, res);
 	edata = gnutls_malloc(esize+1);
 	if (edata == NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release(&res);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	gcry_mpi_print(GCRYMPI_FMT_USG, &edata[1], &esize, res);
+	_gnutls_mpi_print( &edata[1], &esize, res);
 
 	_gnutls_mpi_release(&res);
 
