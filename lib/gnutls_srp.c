@@ -69,9 +69,16 @@ int _gnutls_srp_gn(opaque ** ret_g, opaque ** ret_n, int bits)
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 		g = gcry_mpi_set_ui(NULL, SRP_G);
-
+		if (g==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 	} else {
 		g = mpi_new(16); /* this should be ok */
+		if (g==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 
 		/* generate a random prime */
 		/* this is an emulation of Michael Wiener's table
@@ -137,6 +144,11 @@ int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
 	}
 
 	e = gcry_mpi_alloc_like(prime);
+	if (e==NULL) {
+		gnutls_assert();
+		_gnutls_mpi_release(&x);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	/* e = g^x mod prime (n) */
 	gcry_mpi_powm(e, g, x, prime);
@@ -170,10 +182,28 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 	/* calculate:  B = (v + g^b) % N */
 	bits = gcry_mpi_get_nbits(n);
 	b = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	if (b==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	
 	gcry_mpi_randomize(b, bits, GCRY_STRONG_RANDOM);
 
 	tmpB = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	if (tmpB==NULL) {
+		gnutls_assert();
+		_gnutls_mpi_release( &b);
+		return NULL;
+	}
+
 	B = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	if (tmpB==NULL) {
+		gnutls_assert();
+		_gnutls_mpi_release( &b);
+		_gnutls_mpi_release( &tmpB);
+		return NULL;
+	}
+
 	gcry_mpi_powm(tmpB, g, b, n);
 	gcry_mpi_addm(B, v, tmpB, n);
 
@@ -216,6 +246,10 @@ MPI _gnutls_calc_srp_u(MPI B)
 	gnutls_free(b_holder);
 
 	ret = gcry_mpi_set_ui(NULL, u);
+	if (ret==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 
 	return ret;
 }
@@ -229,8 +263,17 @@ MPI _gnutls_calc_srp_S1(MPI A, MPI b, MPI u, MPI v, MPI n)
 	MPI S;
 
 	S = gcry_mpi_alloc_like(n);
+	if (S==NULL)
+		return NULL;
+
 	tmp1 = gcry_mpi_alloc_like(n);
 	tmp2 = gcry_mpi_alloc_like(n);
+
+	if (tmp1 == NULL || tmp2 == NULL) {
+		_gnutls_mpi_release(&tmp1);
+		_gnutls_mpi_release(&tmp2);
+		return NULL;
+	}
 
 	gcry_mpi_powm(tmp1, v, u, n);
 	gcry_mpi_mulm(tmp2, A, tmp1, n);
@@ -253,9 +296,19 @@ MPI _gnutls_calc_srp_A(MPI * a, MPI g, MPI n)
 
 	bits = gcry_mpi_get_nbits(n);
 	tmpa = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	if (tmpa==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	
 	gcry_mpi_randomize(tmpa, bits, GCRY_STRONG_RANDOM);
 
 	A = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	if (A==NULL) {
+		gnutls_assert();
+		_gnutls_mpi_release( &tmpa);
+		return NULL;
+	}
 	gcry_mpi_powm(A, g, tmpa, n);
 
 	if (a != NULL)
@@ -278,6 +331,9 @@ int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 	*size = 20;
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	if (td==NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 	gnutls_hash(td, username, strlen(username));
 	gnutls_hash(td, ":", 1);
 	gnutls_hash(td, password, strlen(password));
@@ -285,6 +341,10 @@ int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 	gnutls_hash_deinit(td, res);
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	if (td==NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	gnutls_hash(td, salt, salt_size);
 	gnutls_hash(td, res, 20);	/* 20 bytes is the output of sha1 */
 	gnutls_free(res);
@@ -318,14 +378,24 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
 	MPI S, tmp1, tmp2, tmp4;
 
 	S = gcry_mpi_alloc_like(n);
+	if (S==NULL)
+		return NULL;
+		
 	tmp1 = gcry_mpi_alloc_like(n);
 	tmp2 = gcry_mpi_alloc_like(n);
+	if (tmp1 == NULL || tmp2 == NULL) {
+		_gnutls_mpi_release(&tmp1);
+		_gnutls_mpi_release(&tmp2);
+		return NULL;
+	}
 
 	gcry_mpi_powm(tmp1, g, x, n);
 
 	gcry_mpi_subm(tmp2, B, tmp1, n);
 
 	tmp4 = gcry_mpi_alloc_like(n);
+	if (tmp4==NULL)
+		return NULL;
 
 	gcry_mpi_mul(tmp1, u, x);
 	gcry_mpi_add(tmp4, a, tmp1);

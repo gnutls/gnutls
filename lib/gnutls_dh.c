@@ -255,10 +255,19 @@ MPI gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 	int x_size = get_x_size( gcry_mpi_get_nbits(prime));
 	
 	x = gcry_mpi_new(x_size);	/* FIXME: allocate in secure memory */
+	if ( x == NULL) {
+		if (ret_x) *ret_x = NULL;
+		return NULL;
+	}
+			
 	gcry_mpi_randomize(x, x_size, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
 	e = gcry_mpi_alloc_like(prime);
+	if (e==NULL) {
+		if (ret_x) *ret_x = NULL;
+		return NULL;
+	}
 	gcry_mpi_powm(e, g, x, prime);
 
 	if (ret_x)
@@ -293,6 +302,8 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_1024);
+		if (g==NULL)
+			return NULL;
 
 		if (ret_p)
 			*ret_p = prime;
@@ -309,7 +320,9 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_2048);
-
+		if (g==NULL)
+			return NULL;
+			
 		if (ret_p)
 			*ret_p = prime;
 		else
@@ -325,6 +338,8 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_3072);
+		if (g==NULL)
+			return NULL;
 
 		if (ret_p)
 			*ret_p = prime;
@@ -341,6 +356,8 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_4096);
+		if (g==NULL)
+			return NULL;
 
 		if (ret_p)
 			*ret_p = prime;
@@ -359,6 +376,8 @@ MPI gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 	MPI k;
 
 	k = gcry_mpi_alloc_like(prime);
+	if (k==NULL)
+		return NULL;
 	gcry_mpi_powm(k, f, x, prime);
 	return k;
 }

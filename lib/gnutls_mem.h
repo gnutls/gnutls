@@ -7,6 +7,7 @@ typedef void svoid; /* for functions that allocate using secure_free */
 #ifdef USE_DMALLOC
 # define gnutls_malloc malloc
 # define gnutls_realloc realloc
+# define gnutls_realloc_fast realloc
 # define gnutls_free free
 # define gnutls_calloc calloc
 # define secure_malloc malloc
@@ -29,6 +30,7 @@ void* gnutls_malloc( size_t size);
 void* gnutls_calloc( size_t nmemb, size_t size);
 size_t _gnutls_malloc_ptr_size( void* ptr);
 void* gnutls_realloc( void* ptr, size_t size);
+void* gnutls_realloc_fast( void* ptr, size_t size);
 void gnutls_free( void* ptr);
 char* gnutls_strdup( const char* s);
 

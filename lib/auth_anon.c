@@ -95,11 +95,17 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO_INT);
 
 	X = gnutls_calc_dh_secret(&x, g, p);
+	if (X==NULL) 
+		return GNUTLS_E_MEMORY_ERROR;
+
 	state->gnutls_key->dh_secret = x;
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, g);
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_p, p);
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_g + n_p + n_X + 6);
+	if (*data==NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 	data_p = &(*data)[0];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_p[2], &n_p, p);
 	_gnutls_mpi_release(&p);
@@ -128,9 +134,14 @@ int ret;
 
 	X =  gnutls_calc_dh_secret(&x, state->gnutls_key->client_g,
 		   state->gnutls_key->client_p);
-		   
+
+	if (X==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+				   
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_X + 2);
+	if (*data==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
 	
 	gcry_mpi_print(GCRYMPI_FMT_USG, &(*data)[2], &n_X, X);
 	(*data)[0] = 1;	/* extern - explicit since we do not have
@@ -141,6 +152,8 @@ int ret;
 	
 	/* calculate the key after calculating the message */
 	state->gnutls_key->KEY = gnutls_calc_dh_key(state->gnutls_key->client_Y, x, state->gnutls_key->client_p);
+	if (state->gnutls_key->KEY==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
 
 	/* THESE SHOULD BE DISCARDED */
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);
@@ -267,7 +280,9 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	}
 	
 	state->gnutls_key->KEY = gnutls_calc_dh_key( state->gnutls_key->client_Y, state->gnutls_key->dh_secret, p);
-
+	if (state->gnutls_key->KEY==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+	
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);
 	_gnutls_mpi_release(&state->gnutls_key->dh_secret);
 	_gnutls_mpi_release(&p);

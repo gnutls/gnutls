@@ -43,7 +43,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 	_gnutls_log( "RECORD BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer.data =
-		    gnutls_realloc(state->gnutls_internals.buffer.data,
+		    gnutls_realloc_fast(state->gnutls_internals.buffer.data,
 			   state->gnutls_internals.buffer.size);
 		memcpy(&state->gnutls_internals.buffer.data[old_buffer], data, length);
 	}
@@ -55,7 +55,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 	_gnutls_log( "HANDSHAKE BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer_handshake.data =
-		    gnutls_realloc(state->gnutls_internals.buffer_handshake.data,
+		    gnutls_realloc_fast(state->gnutls_internals.buffer_handshake.data,
 			   state->gnutls_internals.buffer_handshake.size);
 		memcpy(&state->gnutls_internals.buffer_handshake.data[old_buffer], data, length);
 	}
@@ -106,7 +106,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 			&state->gnutls_internals.buffer.data[length],
 			state->gnutls_internals.buffer.size);
 		state->gnutls_internals.buffer.data =
-		    gnutls_realloc(state->gnutls_internals.buffer.data,
+		    gnutls_realloc_fast(state->gnutls_internals.buffer.data,
 				   state->gnutls_internals.buffer.size);
 	}
 	if (type == GNUTLS_HANDSHAKE) {
@@ -124,7 +124,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 			&state->gnutls_internals.buffer_handshake.data[length],
 			state->gnutls_internals.buffer_handshake.size);
 		state->gnutls_internals.buffer_handshake.data =
-		    gnutls_realloc(state->gnutls_internals.buffer_handshake.data,
+		    gnutls_realloc_fast(state->gnutls_internals.buffer_handshake.data,
 				   state->gnutls_internals.buffer_handshake.size);
 	}
 
@@ -272,7 +272,7 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 	_gnutls_log( "HASH BUFFER: Inserted %d bytes of Data\n", length);
 #endif
 	state->gnutls_internals.hash_buffer.data =
-		    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
+		    gnutls_realloc_fast(state->gnutls_internals.hash_buffer.data,
 			   state->gnutls_internals.hash_buffer.size);
 			   
 	if (state->gnutls_internals.hash_buffer.data == NULL) {
@@ -305,7 +305,7 @@ int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 		&state->gnutls_internals.hash_buffer.data[length],
 		state->gnutls_internals.hash_buffer.size);
 	state->gnutls_internals.hash_buffer.data =
-	    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
+	    gnutls_realloc_fast(state->gnutls_internals.hash_buffer.data,
 			   state->gnutls_internals.hash_buffer.size);
 
 	if (state->gnutls_internals.hash_buffer.data == NULL) {

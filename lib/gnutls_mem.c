@@ -77,6 +77,19 @@ opaque* ptr = _ptr;
 
 void* gnutls_realloc( void* ptr, size_t size) {
 void* ret;
+	ret = gnutls_malloc( size);
+	if (ret==NULL) return ret;
+	
+	if (ptr!=NULL) {
+		memcpy( ret, ptr, GMIN( _gnutls_malloc_ptr_size(ptr), size));
+		gnutls_free(ptr);
+	}
+	
+	return ret;
+}
+
+void* gnutls_realloc_fast( void* ptr, size_t size) {
+void* ret;
 	if ( ptr != NULL && size <= _gnutls_malloc_ptr_size(ptr)) {
 		/* do nothing, just return the pointer.
 		 * It's much faster.

@@ -162,7 +162,7 @@ int tmp_size;
 	/* now go for n - modulo */
 	p = rindex( str, ':'); /* we have n */
 	if (p==NULL) {
-		mpi_release(entry->g);
+		_gnutls_mpi_release(&entry->g);
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
@@ -175,13 +175,13 @@ int tmp_size;
 
 	if (tmp_size < 0) {
 		gnutls_assert();
-		mpi_release(entry->g);
+		_gnutls_mpi_release(&entry->g);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size) || entry->n==NULL) {
 		gnutls_assert();
 		gnutls_free(tmp);
-		mpi_release(entry->g);
+		_gnutls_mpi_release(&entry->g);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
@@ -235,6 +235,12 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	int index;
 
+	if (entry==NULL) {
+		gnutls_assert();
+		*err = 1;
+		return NULL;
+	}
+
 	*err = 0; /* normal exit */
 	
 	cred = _gnutls_get_cred( key, GNUTLS_SRP, NULL);
@@ -283,11 +289,30 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	GNUTLS_SRP_PWD_ENTRY * pwd_entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	size_t n = sizeof diffie_hellman_group1_prime;
 	
+	if (pwd_entry == NULL) {
+		gnutls_assert(); 
+		return NULL;
+	}
+	
 	pwd_entry->username = gnutls_malloc(strlen(RNDUSER)+1);
+	if (pwd_entry->username == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 	strcpy( pwd_entry->username, RNDUSER);
 	
 	pwd_entry->g = gcry_mpi_set_ui(NULL, SRP_G);
+	if (pwd_entry->g==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	
 	pwd_entry->v = gcry_mpi_new(160);
+	if (pwd_entry->v==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
         gcry_mpi_randomize( pwd_entry->v, 160, GCRY_WEAK_RANDOM);
 
 	if (gcry_mpi_scan(&pwd_entry->n, GCRYMPI_FMT_USG,
@@ -299,6 +324,11 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	pwd_entry->salt_size = RND_SALT_SIZE;
 	
 	pwd_entry->salt = gnutls_malloc(RND_SALT_SIZE);
+	if (pwd_entry->salt==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	
 	if (_gnutls_get_random(pwd_entry->salt, RND_SALT_SIZE, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
 		return NULL;
@@ -310,9 +340,9 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 }
 
 void _gnutls_srp_clear_pwd_entry( GNUTLS_SRP_PWD_ENTRY * entry) {
-	mpi_release(entry->v);
-	mpi_release(entry->g);
-	mpi_release(entry->n);
+	_gnutls_mpi_release(&entry->v);
+	_gnutls_mpi_release(&entry->g);
+	_gnutls_mpi_release(&entry->n);
 	
 	gnutls_free(entry->salt);
 	gnutls_free(entry->username);

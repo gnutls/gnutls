@@ -1739,8 +1739,6 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	int alg_size;
 	KXAlgorithm kx;
 
-#warning "make this function work to the client side too"
-
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
 		 return 0;
 

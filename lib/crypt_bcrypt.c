@@ -578,6 +578,9 @@ static blf_ctx *_blf_init(uint8 * salt, const char *key, int key_len,
 	blf_ctx *state = gnutls_malloc(sizeof(blf_ctx));
 	uint32 i, rcost;
 
+	if (state==NULL)
+		return NULL;
+		
 	rcost = (uint32) 1 << cost;	/* 2^cost */
 
 	initialize_blowfish(state);
@@ -644,6 +647,10 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, M
 	cost = (int) csalt[0];
 	ctx = _blf_init(&csalt[1], passwd, passwd_len, cost);
 	gnutls_free(csalt);
+
+	if (ctx==NULL) {
+		return NULL;
+	}
 
 	for (i = 0; i < 64; i++) {
 		_blf_encrypt(ctx, (uint8 *) text);
@@ -740,7 +747,10 @@ int _gnutls_calc_srp_bcrypt(const char* username, const char *passwd, opaque * s
 		passwd_len = 56;
 
 	ctx = _blf_init(&salt[1], passwd, passwd_len, (int)(salt[0]));
-
+	if (ctx==NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 	for (i = 0; i < 64; i++) {
 		_blf_encrypt(ctx, (uint8 *) text);
 		_blf_encrypt(ctx, (uint8 *) & text[8]);

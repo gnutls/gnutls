@@ -180,6 +180,10 @@ int gen_srp_server_kx2(GNUTLS_STATE state, opaque ** data)
 	
 	/* calculate:  B = (v + g^b) % N */
 	B = _gnutls_calc_srp_B( &_b, G, N, V);
+	if (B==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_b, B)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
@@ -199,15 +203,25 @@ int gen_srp_server_kx2(GNUTLS_STATE state, opaque ** data)
 
 	/* calculate u */
 	state->gnutls_key->u = _gnutls_calc_srp_u(B);
+	if (state->gnutls_key->u==NULL) {
+		gnutls_assert();
+		gnutls_free( *data);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	/* S = (A * v^u) ^ b % N */
 	S = _gnutls_calc_srp_S1( A, _b, state->gnutls_key->u, V, N);
+	if ( S==NULL) {
+		gnutls_assert();
+		gnutls_free( *data);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-	mpi_release(A);
-	mpi_release(_b);
-	mpi_release(V);
-	mpi_release(state->gnutls_key->u);
-	mpi_release(B);
+	_gnutls_mpi_release(&A);
+	_gnutls_mpi_release(&_b);
+	_gnutls_mpi_release(&V);
+	_gnutls_mpi_release(&state->gnutls_key->u);
+	_gnutls_mpi_release(&B);
 
 	ret = _gnutls_generate_key( state->gnutls_key);
 	_gnutls_mpi_release( &S);
@@ -245,6 +259,10 @@ int gen_srp_client_kx0(GNUTLS_STATE state, opaque ** data)
 	}
 	
 	A = _gnutls_calc_srp_A( &_a, G, N);
+	if (A==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_a, A)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
@@ -276,7 +294,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	const uint8 *data_g;
 	const uint8 *data_s;
 	uint8 pwd_algo;
-	int i;
+	int i, ret;
 	opaque hd[SRP_MAX_HASH_SIZE];
 	char *username;
 	char *password;
@@ -344,7 +362,10 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
 	 */
-	_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g, hd);
+	if ( ( ret =_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g, hd)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	if (gcry_mpi_scan(&state->gnutls_key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0 || state->gnutls_key->x==NULL) {
 		gnutls_assert();
@@ -384,15 +405,24 @@ int proc_srp_server_kx2(GNUTLS_STATE state, opaque * data, int data_size)
 
 	/* calculate u */
 	state->gnutls_key->u = _gnutls_calc_srp_u( B);
+	if ( state->gnutls_key->u == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	/* S = (B - g^x) ^ (a + u * x) % N */
 	S = _gnutls_calc_srp_S2( B, G, state->gnutls_key->x, _a, state->gnutls_key->u, N);
+	if (S==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 
-	mpi_release(A);
-	mpi_release(_b);
-	mpi_release(V);
-	mpi_release(state->gnutls_key->u);
-	mpi_release(B);
+	_gnutls_mpi_release(&A);
+	_gnutls_mpi_release(&_b);
+	_gnutls_mpi_release(&V);
+	_gnutls_mpi_release(&state->gnutls_key->u);
+	_gnutls_mpi_release(&B);
 
 	ret = _gnutls_generate_key( state->gnutls_key);
 	_gnutls_mpi_release(&S);
