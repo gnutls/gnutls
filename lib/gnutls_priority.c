@@ -207,12 +207,13 @@ int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
 GNUTLS_LIST _list = list;
 int num=0, i;
 
+#ifdef HAVE_LIBOPENCDK
+
 	while( *_list != 0) {
 		num++;
 		++_list;
 	} 
 
-	
 	num = GMIN( MAX_ALGOS, num);
 	state->gnutls_internals.cert_type_priority.algorithms = num;
 
@@ -221,4 +222,9 @@ int num=0, i;
 	}
 
 	return 0;
+
+#endif
+
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
 }
