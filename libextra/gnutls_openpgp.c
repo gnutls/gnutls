@@ -395,12 +395,12 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
 
     if( !pkey || raw_key->size <= 0 ) {
         gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
+        return GNUTLS_E_CERTIFICATE_ERROR;
     }
 
     out = cdk_stream_tmp( );
     if( !out )
-        return GNUTLS_E_INTERNAL_ERROR;
+        return GNUTLS_E_CERTIFICATE_ERROR;
     cdk_stream_write( out, raw_key->data, raw_key->size );
     cdk_stream_seek( out, 0 );
 
@@ -752,6 +752,8 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
     cdk_stream_close( inp );
     if( rc ) {
         cdk_kbnode_release( knode );
+
+fprintf(stderr, "rc: %d\n", rc);
         gnutls_assert();
         rc = map_cdk_rc( rc );
         goto leave;
@@ -1123,7 +1125,7 @@ gnutls_openpgp_verify_key( const char *trustdb,
 
     if( !keyring->size && !trustdb ) {
         gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
+        return GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
     }
 
     blob = kbx_read_blob( keyring, 0 );
