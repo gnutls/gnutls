@@ -316,7 +316,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	 */
 	if (issuer == NULL) {
 		gnutls_assert();
-		return GNUTLS_CERT_INVALID;
+		return GNUTLS_CERT_NOT_TRUSTED;
 	}
 
 	ret = check_if_ca( cert, issuer);
