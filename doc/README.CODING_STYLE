@@ -44,6 +44,8 @@ The rules here are not always used, although we try to stick to them.
   1. Input parameters.
   2. Output parameters
 
+  When data and size is expected, a gnutls_datum structure should be
+  used.
 
 *** Callback function parameters:
   Callback functions should be avoided, if this is possible. 
