@@ -60,7 +60,7 @@ typedef void * gnutls_transport_ptr;
  */
 #define MAX_HASH_SIZE 20
 
-#define MAX_LOG_SIZE 1024 /* maximum number of log message */
+#define MAX_LOG_SIZE 1024 /* maximum size of log message */
 #define MAX_SRP_USERNAME 128
 #define MAX_SERVER_NAME_SIZE 128
 

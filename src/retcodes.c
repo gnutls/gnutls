@@ -5,7 +5,7 @@
 
 const char* _gnutls_strerror(int);
 
-const char headers[] = "\\tablefirsthead{%\n"
+static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
 	"\\multicolumn{1}{|c}{Error code} &\n"
 	"\\multicolumn{1}{c|}{Description} \\\\\n"
@@ -42,7 +42,7 @@ static char buffer[500];
 int i = 0, j = 0;
 
 
-while( str[i] != 0 && j < sizeof(buffer)) {
+while( str[i] != 0 && j < sizeof(buffer) - 1) {
    if (str[i]=='_') {
       buffer[j++] = '\\';
       buffer[j++] = '_';

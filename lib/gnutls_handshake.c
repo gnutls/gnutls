@@ -1503,8 +1503,8 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 		if (session_id_len > 0) {
 			memcpy(&data[pos], SessionID, session_id_len);
+			pos += session_id_len;
 		}
-		pos += session_id_len;
 
 
 		/* Copy the ciphersuites.

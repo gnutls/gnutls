@@ -358,8 +358,8 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 			   uint8 ** result)
 {
 	int ret;
-	const char top[] = "-----BEGIN ";
-	const char bottom[] = "\n-----END ";
+	static const char top[] = "-----BEGIN ";
+	static const char bottom[] = "\n-----END ";
 	uint8 *rdata;
 	int rdata_size;
 	uint8 *kdata;

@@ -86,8 +86,8 @@ const char *_gnutls_extension_get_name(uint16 type)
  * requested ones. Otherwise it's a fatal error.
  */
 static int _gnutls_extension_list_check( gnutls_session session, uint16 type) {
-int i;
 	if (session->security_parameters.entity==GNUTLS_CLIENT) {
+		int i;
 		for(i=0;i<session->internals.extensions_sent_size;i++) {
 			if (type==session->internals.extensions_sent[i])
 				return 0; /* ok found */
@@ -177,13 +177,12 @@ int (*ext_func_send)( gnutls_session, opaque*, int);
 
 
 	(*data) = gnutls_malloc(2); /* allocate size for size */
-	pos+=2;
-	
 	if ((*data)==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
+
+	pos+=2;
 	next = MAX_EXT_TYPES; /* maximum supported extensions */
 	do {
 		next--;

@@ -87,22 +87,22 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("Base64 decoding error.", GNUTLS_E_BASE64_DECODING_ERROR, 1 ), 
 	ERROR_ENTRY("Base64 encoding error.", GNUTLS_E_BASE64_ENCODING_ERROR, 1 ), 
 	ERROR_ENTRY("Parsing error in SRP password file.", GNUTLS_E_SRP_PWD_PARSING_ERROR, 1 ), 
-	ERROR_ENTRY("The requested data, were not available.", GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 0 ), 
+	ERROR_ENTRY("The requested data were not available.", GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 0 ), 
 	ERROR_ENTRY("Error in the pull function.", GNUTLS_E_PULL_ERROR, 1 ), 
 	ERROR_ENTRY("Error in the push function.", GNUTLS_E_PUSH_ERROR, 1 ), 
-	ERROR_ENTRY("The upper limit in record packet sequence number has been reached. Wow!", GNUTLS_E_RECORD_LIMIT_REACHED, 1 ), 
+	ERROR_ENTRY("The upper limit of record packet sequence numbers has been reached. Wow!", GNUTLS_E_RECORD_LIMIT_REACHED, 1 ),
 	ERROR_ENTRY("Error in the certificate.", GNUTLS_E_CERTIFICATE_ERROR, 1 ), 
 	ERROR_ENTRY("Unknown Subject Alternative name in X.509 certificate.", GNUTLS_E_X509_UNKNOWN_SAN, 1 ), 
 
 	ERROR_ENTRY("Unsupported critical extension in X.509 certificate.", GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION, 1 ), 
-	ERROR_ENTRY("Key usage violation in certificate, has been detected.", GNUTLS_E_KEY_USAGE_VIOLATION, 1 ), 
+	ERROR_ENTRY("Key usage violation in certificate has been detected.", GNUTLS_E_KEY_USAGE_VIOLATION, 1 ), 
 	ERROR_ENTRY("Function was interrupted.", GNUTLS_E_AGAIN, 0 ), 
 	ERROR_ENTRY("Function was interrupted.", GNUTLS_E_INTERRUPTED, 0 ), 
 	ERROR_ENTRY("Rehandshake was requested by the peer.", GNUTLS_E_REHANDSHAKE, 0 ),
 	ERROR_ENTRY("TLS Application data were received, while expected handshake data.", GNUTLS_E_GOT_APPLICATION_DATA, 1 ), 
 	ERROR_ENTRY("Error in Database backend.", GNUTLS_E_DB_ERROR, 1 ), 
 	ERROR_ENTRY("The certificate type is not supported.", GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE, 1 ), 
-	ERROR_ENTRY("The memory buffer given, is too short to hold parameters.", GNUTLS_E_SHORT_MEMORY_BUFFER, 1 ), 
+	ERROR_ENTRY("The given memory buffer is too short to hold parameters.", GNUTLS_E_SHORT_MEMORY_BUFFER, 1 ),
 	ERROR_ENTRY("The request is invalid.", GNUTLS_E_INVALID_REQUEST, 1 ), 
 	ERROR_ENTRY("An illegal parameter has been received.", GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1 ), 
 	ERROR_ENTRY("Error while reading file.", GNUTLS_E_FILE_ERROR, 1 ), 
@@ -139,10 +139,10 @@ static gnutls_error_entry error_algorithms[] = {
         ERROR_ENTRY("The certificate has unsupported attributes.", GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE, 1),
         ERROR_ENTRY("The hash algorithm is unknown.", GNUTLS_E_UNKNOWN_HASH_ALGORITHM, 1),
         ERROR_ENTRY("The PKCS structure's content type is unknown.", GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE, 1),
-        ERROR_ENTRY("The PKCS structure's Bag type is unknown.", GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE, 1),
-        ERROR_ENTRY("The password given contains invalid characters.", GNUTLS_E_INVALID_PASSWORD, 1),
+        ERROR_ENTRY("The PKCS structure's bag type is unknown.", GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE, 1),
+        ERROR_ENTRY("The given password contains invalid characters.", GNUTLS_E_INVALID_PASSWORD, 1),
         ERROR_ENTRY("The Message Authentication Code verification failed.", GNUTLS_E_MAC_VERIFY_FAILED, 1),
-	{0, 0, 0, 0}
+	{NULL, NULL, 0, 0}
 };
 
 #define GNUTLS_ERROR_LOOP(b) \
@@ -165,7 +165,7 @@ static gnutls_error_entry error_algorithms[] = {
   * may be fatal for you (your program).
   *
   * This is only useful if you are dealing with errors from the
-  * record layer, or the handshake layer.
+  * record layer or the handshake layer.
   *
   **/
 int gnutls_error_is_fatal(int error)
@@ -181,7 +181,7 @@ int gnutls_error_is_fatal(int error)
   * @error: is an error returned by a gnutls function. Error is always a negative value.
   *
   * This function is like perror(). The only difference is that it accepts an 
-  * error returned by a gnutls function. 
+  * error number returned by a gnutls function.
   **/
 void gnutls_perror(int error)
 {
@@ -198,8 +198,9 @@ void gnutls_perror(int error)
   * gnutls_strerror - Returns a string with a description of an error
   * @error: is an error returned by a gnutls function. Error is always a negative value.
   *
-  * This function is similar to strerror(). The only difference is that it 
-  * accepts an error (number) returned by a gnutls function. 
+  * This function is similar to strerror(). Differences: it accepts an error
+  * number returned by a gnutls function; it might return NULL in the case of
+  * an unknown error number.
   **/
 const char* gnutls_strerror(int error)
 {
