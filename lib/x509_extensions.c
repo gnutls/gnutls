@@ -129,7 +129,8 @@ node_asn* ext;
 char str[128];
 int len, result;
 
-	
+	*CA = 0;
+		
 	if (asn1_create_structure
 	    ( _gnutls_get_pkix(), "PKIX1Implicit88.BasicConstraints", &ext, 
 	    	"bc") != ASN_OK) {
@@ -142,7 +143,10 @@ int len, result;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(ext);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return 0; /* GNUTLS_E_ASN1_PARSING_ERROR may be better
+			   * but we want to continue even if the
+			   * certificate is badly formated.
+			   */
 	}
 
 	len = sizeof(str) - 1;
@@ -150,7 +154,8 @@ int len, result;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(ext);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return 0; /* see above.
+			   */
 	}
 
 	asn1_delete_structure(ext);

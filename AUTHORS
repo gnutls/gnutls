@@ -2,6 +2,6 @@ Nikos Mavroyanopoulos <nmav@hellug.gr>
 	Everything except the files stated below.
 
 Fabio Fiorina <Fabio.Fiorina@alcatel.it>
-	All of the ASN.1 parsing functions (x509_ASN.y, x509_der.c
-	and x509_asn1.c)
+	All of the ASN.1 parsing functions (x509_ASN.y, x509_der.c,
+	x509_asn1.c and the corresponding header files)
 

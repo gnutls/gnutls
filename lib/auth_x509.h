@@ -32,6 +32,12 @@ typedef struct {
 	 */
 	x509_cert_callback_func*	client_cert_callback;
 	int 				dh_bits;
+					/* holds a sequence of the
+					 * RDNs of the CAs above.
+					 * This is better than
+					 * generating it every time.
+					 */
+	gnutls_datum			rdn_sequence;
 } X509PKI_CREDENTIALS_INT;
 
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
@@ -68,6 +74,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE, opaque *, int);
 int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE, opaque *, int);
 int _gnutls_proc_x509_server_certificate(GNUTLS_STATE, opaque *, int);
 int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_private_key** apr_pkey);
+int _gnutls_find_dn( gnutls_datum* odn, gnutls_cert* cert);
 
 #define _gnutls_proc_x509_client_certificate _gnutls_proc_x509_server_certificate
 

@@ -839,9 +839,13 @@ gnutls_datum sig;
 int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 {
 	const X509PKI_CREDENTIALS cred;
-	int ret, i, size;
+	int size;
 	opaque *pdata;
-	gnutls_datum dn;
+
+	/* Now we need to generate the RDN sequence. This is
+	 * already in the X509PKI_CRED structure, to improve
+	 * performance.
+	 */
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
@@ -849,15 +853,12 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 	
-	size = CERTTYPE_SIZE+2; /* 2 for CertType + 2 for size */
-	
-	for (i = 0; i < cred->ncas; i++) {
-		size += cred->ca_list[i].raw.size + 2;
-		/* hold size
-		 * for uint16 */
-	}
+	size = CERTTYPE_SIZE + 2; /* 2 for CertType + 2 for size of rdn_seq 
+				   */
 
-	(*data) = gnutls_malloc(size);
+	size += cred->rdn_sequence.size;
+
+	(*data) = gnutls_malloc( size);
 	pdata = (*data);
 
 	if (pdata == NULL) {
@@ -871,26 +872,12 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 #endif
 	pdata[1] = RSA_SIGN; /* only this for now */
 	pdata += CERTTYPE_SIZE;
-	size = CERTTYPE_SIZE;
 
-	/* leave space to write the actual size */
-	pdata += 2;
-	size += 2;
-
-	for (i = 0; i < cred->ncas; i++) {
-		if ( (ret=_gnutls_find_dn( &dn, &cred->ca_list[i])) < 0) {
-			gnutls_free( (*data));
-			gnutls_assert();
-			return ret;
-		}
-		WRITEdatum16(pdata, dn);
-		pdata += (2 + dn.size);
-		size += (2 + dn.size);
-	}
+	WRITEdatum16( pdata, cred->rdn_sequence);
+	pdata += cred->rdn_sequence.size + 2;
 
 	/* write the recalculated size */
-	WRITEuint16( size-CERTTYPE_SIZE-2, &(*data)[CERTTYPE_SIZE]);
-	
+
 	return size;
 }
 

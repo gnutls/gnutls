@@ -99,7 +99,6 @@ CertificateStatus status;
 			}
 			
 			if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
-				
 				printf(" - Certificate info:\n");
 				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version( state));
 
@@ -249,6 +248,9 @@ int main(int argc, char** argv)
 	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 	if (ret < 0) {
+		if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
+			printf("*** Received alert [%d]\n", gnutls_get_last_alert(state));
+
 		fprintf(stderr, "*** Handshake has failed\n");
 		gnutls_perror(ret);
 		gnutls_deinit(state);
@@ -313,6 +315,8 @@ int main(int argc, char** argv)
 	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 	if (ret < 0) {
+		if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
+			printf("*** Received alert [%d]\n", gnutls_get_last_alert(state));
 		fprintf(stderr, "*** Handshake failed\n");
 		gnutls_perror(ret);
 		gnutls_deinit(state);

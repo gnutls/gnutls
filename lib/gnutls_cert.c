@@ -51,7 +51,7 @@ typedef struct {
  */
 static const gnutls_pk_map pk_mappings[] = {
 	{GNUTLS_KX_RSA, GNUTLS_PK_RSA},
-	{ GNUTLS_KX_DHE_RSA,     GNUTLS_PK_RSA }, 
+	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA},
 	{0}
 };
 
@@ -89,7 +89,7 @@ void gnutls_free_cert(gnutls_cert cert)
 	for (i = 0; i < n; i++) {
 		_gnutls_mpi_release(&cert.params[i]);
 	}
-	
+
 	gnutls_free_datum(&cert.raw);
 
 	return;
@@ -114,22 +114,21 @@ void gnutls_free_x509_sc(X509PKI_CREDENTIALS sc)
 		gnutls_free(sc->cert_list[i]);
 	}
 
-	if (sc->cert_list_length != NULL)
-		gnutls_free(sc->cert_list_length);
-	if (sc->cert_list != NULL)
-		gnutls_free(sc->cert_list);
+	gnutls_free(sc->cert_list_length);
+	gnutls_free(sc->cert_list);
 
 	for (j = 0; j < sc->ncas; j++) {
 		gnutls_free_cert(sc->ca_list[j]);
 	}
-	if (sc->ca_list != NULL)
-		gnutls_free(sc->ca_list);
+
+	gnutls_free(sc->ca_list);
 
 	for (i = 0; i < sc->ncerts; i++) {
 		_gnutls_free_private_key(sc->pkey[i]);
 	}
-	if (sc->pkey != NULL)
-		gnutls_free(sc->pkey);
+
+	gnutls_free(sc->pkey);
+	gnutls_free(sc->rdn_sequence.data);
 
 	gnutls_free(sc);
 }
@@ -281,6 +280,9 @@ static int read_ca_file(X509PKI_CREDENTIALS res, char *cafile)
 	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
 
 	res->ncas = i - 1;
+
+
+
 	return 0;
 }
 
@@ -347,7 +349,7 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS * res, int ncerts)
 
 
 	(*res)->dh_bits = DEFAULT_BITS;
-	
+
 	(*res)->ncerts = 0;	/* this is right - set_key() increments it */
 
 	if (ncerts > 0) {
@@ -425,10 +427,57 @@ int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char *CERTFILE,
 int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
 			  char *CRLFILE)
 {
-	int ret;
+	int ret, size, i;
+	opaque *pdata;
+	gnutls_datum tmp;
 
 	if ((ret = read_ca_file(res, CAFILE)) < 0)
 		return ret;
+
+	/* Generate the RDN sequence 
+	 * This will be sent to clients when a certificate
+	 * request message is sent.
+	 */
+	
+	/* FIXME: in case of a client it is not needed
+	 * to do that. This would save time and memory.
+	 * However we don't have that information available
+	 * here.
+	 */
+
+	size = 0;
+	for (i = 0; i < res->ncas; i++) {
+		if ((ret =
+		     _gnutls_find_dn(&tmp,
+				     &res->ca_list[i])) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		size += (2 + tmp.size);
+	}
+
+	res->rdn_sequence.data = gnutls_malloc( size);
+	if (res->rdn_sequence.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	res->rdn_sequence.size = size;
+
+	pdata = res->rdn_sequence.data;
+
+	for (i = 0; i < res->ncas; i++) {
+		if ((ret =
+		     _gnutls_find_dn(&tmp,
+				     &res->ca_list[i])) < 0) {
+			gnutls_free(res->rdn_sequence.data);
+			res->rdn_sequence.size = 0;
+			res->rdn_sequence.data = NULL;
+			gnutls_assert();
+			return ret;
+		}
+		WRITEdatum16( pdata, tmp);
+		pdata += (2 + tmp.size);
+	}
 
 	return 0;
 }
@@ -514,8 +563,8 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 	if (result==1) continue
 
 
-int _IREAD(node_asn * rasn, char* name3, char *rstr, char *OID, char *ANAME, char *TYPE,
-	   char *res, int res_size, int CHOICE)
+int _IREAD(node_asn * rasn, char *name3, char *rstr, char *OID,
+	   char *ANAME, char *TYPE, char *res, int res_size, int CHOICE)
 {
 	char name2[256];
 	int result, len;
@@ -686,9 +735,9 @@ int _gnutls_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 				      "X520StateOrProvinceName",
 				      "StateOrProvinceName",
 				      dn->state_or_province_name, 1);
-				_READ(rasn, name3, str, "1 2 840 113549 1 9 1",
-				      "Pkcs9email", "emailAddress",
-				      dn->email, 0);
+				_READ(rasn, name3, str,
+				      "1 2 840 113549 1 9 1", "Pkcs9email",
+				      "emailAddress", dn->email, 0);
 			}
 		} while (1);
 	} while (1);
@@ -833,7 +882,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
-		if ((sizeof( gCert->params)/sizeof(MPI)) < 2) {
+		if ((sizeof(gCert->params) / sizeof(MPI)) < 2) {
 			gnutls_assert();
 			/* internal error. Increase the MPIs in params */
 			asn1_delete_structure(c2);
@@ -887,7 +936,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		return result;
 	}
 
-	memset(&gCert->subjectAltDNSName, 0, sizeof(gCert->subjectAltDNSName));
+	memset(&gCert->subjectAltDNSName, 0,
+	       sizeof(gCert->subjectAltDNSName));
 	if ((result =
 	     _gnutls_get_ext_type(c2,
 				  "certificate2.tbsCertificate.extensions",
@@ -932,8 +982,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 /* Returns 0 if it's ok to use the KXAlgorithm with this cert
  * (using KeyUsage field). 
  */
-int _gnutls_check_x509_key_usage(gnutls_cert * cert,
-					KXAlgorithm alg)
+int _gnutls_check_x509_key_usage(gnutls_cert * cert, KXAlgorithm alg)
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
 		switch (alg) {
@@ -942,7 +991,8 @@ int _gnutls_check_x509_key_usage(gnutls_cert * cert,
 				if (!
 				    (cert->
 				     keyUsage & X509KEY_KEY_ENCIPHERMENT))
-					return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+					return
+					    GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 				else
 					return 0;
 			}
@@ -952,7 +1002,8 @@ int _gnutls_check_x509_key_usage(gnutls_cert * cert,
 				if (!
 				    (cert->
 				     keyUsage & X509KEY_DIGITAL_SIGNATURE))
-					return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+					return
+					    GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 				else
 					return 0;
 			}
@@ -1016,8 +1067,8 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 			if (strcasecmp
 			    (cert_list[i][0].cert_info.common_name,
 			     name) == 0
-			    || strcasecmp(cert_list[i][0].subjectAltDNSName,
-					  name) == 0) {
+			    || strcasecmp(cert_list[i][0].
+					  subjectAltDNSName, name) == 0) {
 				cert = &cert_list[i][0];
 				break;
 			}
@@ -1041,8 +1092,8 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
 			if (strcasecmp
 			    (cert_list[i][0].cert_info.common_name,
 			     name) == 0
-			    || strcasecmp(cert_list[i][0].subjectAltDNSName,
-					  name) == 0) {
+			    || strcasecmp(cert_list[i][0].
+					  subjectAltDNSName, name) == 0) {
 				index = i;
 				break;
 			}
@@ -1110,7 +1161,8 @@ int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
   *
   * This function returns 0 on success.
   **/
-int gnutls_set_x509_cert_callback(X509PKI_CREDENTIALS cred, x509_cert_callback_func* func)
+int gnutls_set_x509_cert_callback(X509PKI_CREDENTIALS cred,
+				  x509_cert_callback_func * func)
 {
 	cred->client_cert_callback = func;
 	return 0;
