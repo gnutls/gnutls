@@ -1,3 +1,14 @@
+#{
+
+/* C declarations */
+
+#include <common.h>
+
+void print_license(void);
+void cli_version(void);
+
+#}
+
 helpnode "GNU TLS test client\nUsage:  gnutls-cli [options] hostname\n\n"
 
 #int resume;
@@ -90,8 +101,3 @@ init { $resume=0; $port=443; $rest_args=NULL; $nrest_args=0; $ciphers=NULL;
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; }
 
 
-##
-
-/* C declarations */
-
-#include <common.h>

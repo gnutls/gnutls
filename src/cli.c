@@ -100,37 +100,6 @@ int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 #define DEFAULT_SRP_PASSWD "test"
 
 
-static int cert_callback(GNUTLS_STATE state,
-			 const gnutls_datum * client_certs, int ncerts,
-			 const gnutls_datum * req_ca_cert, int nreqs)
-{
-
-   if (client_certs == NULL) {
-      return 0;			/* means the we will only be called again
-				 * if the library cannot determine which
-				 * certificate to send
-				 */
-   }
-#if 0
-   /* here we should prompt the user and ask him
-    * which certificate to choose. Too bored to 
-    * implement that. --nmav
-    */
-   for (i = 0; i < ncerts; i++) {
-      fprintf(stderr, "%s.", client_cert->common_name);
-      fprintf(stderr, "%s\n", issuer_cert->common_name);
-   }
-   for (i = 0; i < nreqs; i++) {
-      fprintf(stderr, "%s.", req_ca_cert->common_name);
-   }
-   fprintf(stderr, "\n");
-   return 0;
-#endif
-
-   return -1;			/* send no certificate to the peer */
-}
-
-
 static void gaa_parser(int argc, char **argv);
 
 int main(int argc, char **argv)
@@ -140,8 +109,8 @@ int main(int argc, char **argv)
    struct sockaddr_in sa;
    GNUTLS_STATE state;
    char buffer[MAX_BUF + 1];
-   char *session;
-   char *session_id;
+   char *session = NULL;
+   char *session_id = NULL;
    int session_size, alert;
    int session_id_size;
    char *tmp_session_id;
