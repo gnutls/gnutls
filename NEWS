@@ -4,14 +4,15 @@ Version 0.5.5
   for other hash algorithms except for the srpsha. 
 - Renamed all the constructed types in order to have more consistent
   names. 
-- Improved the certificate and key read functions.
+- Improved the certificate and key read functions. Now they can read 
+  the certificate and the private key from the same file.
 
 Version 0.5.4 (27/08/2002)
 - Fixes in TLS 1.0 PRF and SSL3 random functions.
 - gnutls_handshake_set_exportable_detection() was obsoleted.
 - Added gnutls_openpgp_extract_key_id() which returns the key ID.
 - Corrected bug in DHE key exchange
-- Added support temporary RSA keys which is needed for the
+- Added support for temporary RSA keys which are needed for the
   export cipher suites.
 - Added the TLS_RSA_EXPORT_ARCFOUR_40_MD5 ciphersuite.
 

@@ -498,6 +498,9 @@ void gnutls_record_set_cbc_protection(gnutls_session session, int prot)
   * like TWOFISH, will be available. This is because these algorithms
   * are not yet defined in any RFC or even internet draft.
   *
+  * Enabling the private ciphersuites when talking to other than gnutls
+  * servers and clients, may cause interoperability problems.
+  *
   **/
 void gnutls_handshake_set_private_extensions(gnutls_session session, int allow)
 {
