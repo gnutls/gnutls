@@ -2,7 +2,7 @@
 
 #define GNUTLS_INT_H
 
-//#define HARD_DEBUG
+#define HARD_DEBUG
 //#define READ_DEBUG
 //#define WRITE_DEBUG
 #define DEBUG
@@ -82,7 +82,7 @@ typedef struct {
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
-enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_DES=3, GNUTLS_3DES = 4, GNUTLS_AES };
+enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_DES=3, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
@@ -291,11 +291,10 @@ int gnutls_close(int cd, GNUTLS_STATE state);
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);
-int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor);
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 int _gnutls_set_keys(GNUTLS_STATE state);
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
+ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata);
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
 int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);

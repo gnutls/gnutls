@@ -1,5 +1,5 @@
 /* functions for version */
-int _gnutls_version_is_supported(const GNUTLS_Version version);
+int _gnutls_version_is_supported(GNUTLS_STATE state, const GNUTLS_Version version);
 
 /* functions for macs */
 int   _gnutls_mac_get_digest_size(MACAlgorithm algorithm);

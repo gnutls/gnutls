@@ -20,7 +20,7 @@
 
 enum ContentType { GNUTLS_APPLICATION_DATA=23 };
 typedef enum ContentType ContentType;
-enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_DES=3, GNUTLS_3DES = 4, GNUTLS_AES };
+enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_DES=3, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
 typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 typedef enum KXAlgorithm KXAlgorithm;
@@ -45,7 +45,7 @@ typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE * state);
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
+ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata);
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 int gnutls_close(int cd, GNUTLS_STATE state);
 int gnutls_handshake(int cd, GNUTLS_STATE state);

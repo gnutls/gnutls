@@ -593,6 +593,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 	CompressionMethod compression_method, *compression_methods;
 	int i, ret=0;
 	uint16 x, sizeOfSuites;
+	GNUTLS_Version version;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		if (datalen < 38) {
@@ -603,8 +604,14 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifdef DEBUG
 		fprintf(stderr, "Server's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
-		if ( _gnutls_valid_version( state, data[pos], data[pos+1]) != 0) {
+		version.local = 0; /* TLS 1.0 / SSL 3.0 */
+		version.major = data[pos];
+		version.minor = data[pos+1];
+		if ( _gnutls_version_is_supported( state, version) == 0) {
+			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+		} else {
+			gnutls_set_current_version(state, version);
 		}
 		pos+=2;
 		
@@ -679,9 +686,14 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifdef DEBUG
 		fprintf(stderr, "Client's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
-		if ( _gnutls_valid_version( state, data[pos], data[pos+1]) != 0) {
+		version.local = 0; /* TLS 1.0 / SSL 3.0 */
+		version.major = data[pos];
+		version.minor = data[pos+1];
+		if ( _gnutls_version_is_supported( state, version) == 0) {
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+		} else {
+			gnutls_set_current_version(state, version);
 		}
 		pos+=2;
 		

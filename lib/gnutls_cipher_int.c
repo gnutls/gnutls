@@ -38,7 +38,7 @@ GNUTLS_CIPHER_HANDLE ret;
 		ret = GNUTLS_CIPHER_FAILED;
 #endif
 		break;
-	case GNUTLS_AES:
+	case GNUTLS_RIJNDAEL:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else

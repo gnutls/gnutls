@@ -27,6 +27,96 @@
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
 
+int _gnutls_encrypt( GNUTLS_STATE state, char* data, size_t data_size, uint8** ciphertext, ContentType type)
+{
+	GNUTLSPlaintext *gtxt;
+	GNUTLSCompressed *gcomp;
+	GNUTLSCiphertext *gcipher;
+	int total_length=0, err, i;
+	
+	if (data_size == 0)
+		return 0;
+
+	err = _gnutls_text2TLSPlaintext(state, type, &gtxt, data, data_size);
+	if (err < 0) {
+		gnutls_assert();
+		return err;
+	}
+
+	err = _gnutls_TLSPlaintext2TLSCompressed(state, &gcomp, gtxt);
+	if (err < 0) {
+		gnutls_assert();
+		return err;
+	}
+
+	_gnutls_freeTLSPlaintext(gtxt);
+
+	err = _gnutls_TLSCompressed2TLSCiphertext(state, &gcipher, gcomp);
+	if (err < 0) {
+		gnutls_assert();
+		return err;
+	}
+
+	_gnutls_freeTLSCompressed(gcomp);
+
+	*ciphertext = gnutls_malloc( gcipher->length);
+	if ( *ciphertext == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	memmove( (*ciphertext), gcipher->fragment, gcipher->length);
+
+	total_length += gcipher->length;
+	_gnutls_freeTLSCiphertext(gcipher);
+
+	return total_length;
+}
+
+int _gnutls_decrypt( GNUTLS_STATE state, char* ciphertext, size_t ciphertext_size, uint8** data, ContentType type)
+{
+	GNUTLSPlaintext *gtxt;
+	GNUTLSCompressed *gcomp;
+	GNUTLSCiphertext gcipher;
+	int iterations, i;
+	int err, ret;
+	int total_length=0;
+	
+	if (ciphertext_size == 0)
+		return 0;
+
+	gcipher.type = type;
+	gcipher.length = ciphertext_size;
+	gcipher.version.major = state->connection_state.version.major;
+	gcipher.version.minor = state->connection_state.version.minor;
+	gcipher.fragment = gnutls_malloc(ciphertext_size);
+	memmove( gcipher.fragment, ciphertext, ciphertext_size);
+	
+	ret = _gnutls_TLSCiphertext2TLSCompressed(state, &gcomp, &gcipher);
+	if (ret < 0) {
+		gnutls_free(gcipher.fragment);
+		return ret;
+	}
+	gnutls_free(gcipher.fragment);	
+
+	ret = _gnutls_TLSCompressed2TLSPlaintext(state, &gtxt, gcomp);
+	if (ret < 0) {
+		return ret;
+	}
+
+	_gnutls_freeTLSCompressed(gcomp);
+
+	ret = _gnutls_TLSPlaintext2text((void *) data, gtxt);
+	if (ret < 0) {
+		return ret;
+	}
+	ret = gtxt->length;
+
+	_gnutls_freeTLSPlaintext(gtxt);
+
+	return ret;
+}
+
+
 /* Sets the specified cipher into the pending state */
 int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 {

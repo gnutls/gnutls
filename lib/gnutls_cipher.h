@@ -1,3 +1,4 @@
+int _gnutls_encrypt( GNUTLS_STATE state, char* data, size_t data_size, uint8** ciphertext, ContentType type);
 int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 						      GNUTLSCiphertext**
 						      cipher,
