@@ -27,7 +27,7 @@
 #include "gnutls_global.h"
 #include <openpgp/gnutls_openpgp.h>
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 #include <strfile.h>
 #include <gnutls_str.h>
 #include <stdio.h>
@@ -1144,5 +1144,5 @@ int gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials res,
 }
 
 
-#endif /* HAVE_LIBOPENCDK */
+#endif /* USE_OPENPGP */
 

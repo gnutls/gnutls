@@ -780,7 +780,7 @@ static void init_global_tls_stuff(void)
 		}
 	}
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 	if (pgp_certfile != NULL) {
 		ret =
 		    gnutls_certificate_set_openpgp_key_file(xcred,

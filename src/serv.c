@@ -38,15 +38,6 @@
 #include <config.h>
 #include <list.h>
 
-#ifdef HAVE_LIBOPENCDK
-# include <opencdk.h>
-
-static int
-recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
-		 unsigned int keyfpr_length, gnutls_datum * key);
-#endif
-
-
 /* konqueror cannot handle sending the page in multiple
  * pieces.
  */
@@ -293,10 +284,6 @@ gnutls_session initialize_session(void)
    /* allow the use of private ciphersuites.
     */
    gnutls_handshake_set_private_extensions(session, 1);
-
-#if HAVE_LIBOPENCDK
-   gnutls_openpgp_set_recv_key_function(session, recv_openpgp_key);
-#endif
 
    if (nodb == 0) {
       gnutls_db_set_retrieve_function(session, wrap_db_fetch);
@@ -642,7 +629,7 @@ int main(int argc, char **argv)
    }
 #endif
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
    if (pgp_keyring != NULL) {
       ret =
 	  gnutls_certificate_set_openpgp_keyring_file(cert_cred,
@@ -1165,58 +1152,3 @@ void print_serv_license(void)
 		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n", stdout);
 }
 
-#ifdef HAVE_LIBOPENCDK
-
-static int
-recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
-		 unsigned int keyfpr_length, gnutls_datum * key)
-{
-   static const char hostname[] = "hkp://wwwkeys.pgp.net";
-   static const int port = 11371;
-   int rc;
-   cdk_kbnode_t knode = NULL;
-   unsigned int i;
-
-   fprintf(stderr, "must recv: ");
-   for (i = 0; i < keyfpr_length; i++) {
-      fprintf(stderr, "%x", (unsigned char)keyfpr[i]);
-   }
-   fprintf(stderr, "\n");
-
-   /* The key fingerprint should be 20 bytes
-    * in v4 keys.
-    */
-   if (keyfpr_length != 20)
-      return -1;
-
-   rc = cdk_keyserver_recv_key(hostname, port, keyfpr,
-			       CDK_DBSEARCH_FPR, &knode);
-
-   if (!rc) {
-      size_t len;
-
-      cdk_kbnode_write_to_mem(knode, NULL, &len);
-
-      key->data = gnutls_malloc(len);
-      if (key->data == NULL) {
-	 rc = -1;
-	 goto finish;
-      }
-
-      key->size = len;
-      cdk_kbnode_write_to_mem(knode, key->data, &len);
-
-      rc = 0;			/* success */
-
-   } else {
-      rc = -1;
-   }
-
- finish:
-
-   cdk_kbnode_release(knode);
-   return rc;
-
-}
-
-#endif

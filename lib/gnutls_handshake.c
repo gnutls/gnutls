@@ -2382,9 +2382,11 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		anon_cred =
 		    _gnutls_get_cred(session->key, cred_type, NULL);
 	
+#ifdef ENABLE_ANON
 		if (anon_cred != NULL) {
 			dh_params = _gnutls_anon_get_dh_params(anon_cred, session);
 		}
+#endif
 	} else return 0; /* no need for params */
 
 

@@ -21,9 +21,6 @@
  */
 
 #include <gnutls_int.h>
-
-#ifdef HAVE_LIBOPENCDK
-
 #include <gnutls_str.h>
 #include <gnutls_errors.h>
 #include <opencdk.h>
@@ -404,4 +401,3 @@ gnutls_openpgp_key_to_xml( gnutls_openpgp_key key,
     return rc;
 }
 
-#endif

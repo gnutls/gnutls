@@ -29,7 +29,6 @@
 #include <gnutls_openpgp.h>
 #include <openpgp.h>
 
-#ifdef HAVE_LIBOPENCDK
 
 static int
 openpgp_get_key_trust( gnutls_openpgp_trustdb trustdb, 
@@ -274,4 +273,3 @@ leave:
     return rc;
 }
 
-#endif

@@ -24,9 +24,6 @@
  */
 
 #include <gnutls_int.h>
-
-#ifdef HAVE_LIBOPENCDK
-
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -551,4 +548,3 @@ int algo = 0;
 	return 0;
 }
 
-#endif

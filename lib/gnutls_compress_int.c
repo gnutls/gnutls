@@ -24,19 +24,22 @@
 #include <gnutls_compress.h>
 #include <gnutls_algorithms.h>
 #include "gnutls_errors.h"
-#ifdef USE_MINILZO
-# include "../libextra/minilzo.h" /* get the prototypes only.
+
+#ifdef USE_LZO
+# ifdef USE_MINILZO
+#  include "../libextra/minilzo.h" /* get the prototypes only.
       *	Since LZO is a GPLed library, the gnutls_global_init_extra() has
       *	to be called, before LZO compression can be used.
       */
-#else
-# include <lzo1x.h>
-#endif
+# else
+#  include <lzo1x.h>
+# endif
 
 typedef int (*LZO_FUNC)();
 
 LZO_FUNC _gnutls_lzo1x_decompress_safe = NULL;
 LZO_FUNC _gnutls_lzo1x_1_compress = NULL;
+#endif
 
 /* The flag d is the direction (compress, decompress). Non zero is
  * decompress.
@@ -93,6 +96,7 @@ int err;
 		break;
 	    }
 #endif
+#ifdef USE_LZO
 	    case GNUTLS_COMP_LZO:
 	        if (d) /* LZO does not use memory on decompressor */
 	        { /* ret->handle = NULL; */ }
@@ -108,6 +112,7 @@ int err;
 		}
 		
 		break;
+#endif
 	}
 	return ret;
 }
@@ -147,6 +152,7 @@ int err;
 	 */
 	
 	switch( handle->algo) {
+#ifdef USE_LZO
 		case GNUTLS_COMP_LZO: {
 			lzo_uint out_len;
 			size_t size;
@@ -173,6 +179,7 @@ int err;
 			compressed_size = out_len;
 			break;
 		}		
+#endif
 #ifdef HAVE_LIBZ
 		case GNUTLS_COMP_DEFLATE: {
 			uLongf size;
@@ -238,6 +245,7 @@ int cur_pos;
 	 */
 	
 	switch(handle->algo) {
+#ifdef USE_LZO
 		case GNUTLS_COMP_LZO: {
 			lzo_uint out_size;
 			lzo_uint new_size;
@@ -272,7 +280,7 @@ int cur_pos;
 			plain_size = new_size;
 			break;
 		}
-
+#endif
 #ifdef HAVE_LIBZ
 		case GNUTLS_COMP_DEFLATE: {
 			uLongf out_size;

@@ -191,7 +191,7 @@ int gnutls_protocol_set_priority(gnutls_session session, const int *list)
 int gnutls_certificate_type_set_priority(gnutls_session session,
 					 const int *list)
 {
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 
 	int num = 0, i;
 

@@ -31,6 +31,7 @@ lib_LTLIBRARIES = libgnutls-extra.la
 endif
 
 if ENABLE_OPENPGP
+PGP_SOURCES = gnutls_openpgp.c
 if ENABLE_INCLUDED_OPENCDK
 SUBDIRS = openpgp opencdk
 PGP_OBJECTS = openpgp/libpgp.la opencdk/libopencdk.la
@@ -53,7 +54,7 @@ endif
 
 COBJECTS_EXTRA = ext_srp.c \
 	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
-	gnutls_extra.c auth_srp_rsa.c gnutls_openpgp.c
+	gnutls_extra.c auth_srp_rsa.c $(PGP_SOURCES)
 
 
 libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
