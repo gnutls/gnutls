@@ -236,6 +236,7 @@ static int get_params( gnutls_session session, gnutls_params_type type,
 	else return -1;
 
 	st->type = type;
+	st->deinit = 0;
 
 	return 0;
 }
