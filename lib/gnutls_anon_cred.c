@@ -105,14 +105,13 @@ void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t sc)
 }
 
 /**
-  * gnutls_allocate_anon_client_credentials - Used to allocate a credentials structure
-  * @sc: is a pointer to an &gnutls_anon_client_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate it.
-  **/
-int gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t
-					    * sc)
+ * gnutls_anon_allocate_client_credentials - Used to allocate a credentials structure
+ * @sc: is a pointer to an &gnutls_anon_client_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus
+ * this helper function is provided in order to allocate it.
+ **/
+int gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t * sc)
 {
     /* anon_dummy is only there for *sc not to be null.
      * it is not used at all;

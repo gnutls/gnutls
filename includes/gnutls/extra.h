@@ -74,7 +74,7 @@ int gnutls_global_init_extra(void);
 
 /* returns libgnutls-extra version (call it with a NULL argument) 
  */
-const char* gnutls_extra_check_version( const char*);
+const char* gnutls_extra_check_version( const char *req_version);
 
 /* base64 */
 int gnutls_srp_base64_encode( const gnutls_datum_t *data, char* result, int* result_size);

@@ -73,16 +73,6 @@ void gnutls_certificate_server_set_retrieve_function(gnutls_certificate_credenti
 void gnutls_certificate_server_set_request(gnutls_session_t session,
     gnutls_certificate_request_t req);
 
-/* X.509 certificate handling functions 
- */
-
-int gnutls_pkcs3_extract_dh_params(const gnutls_datum_t * params,
-    gnutls_x509_crt_fmt_t format,
-    gnutls_datum_t * prime, gnutls_datum_t * generator, int *prime_bits);
-int gnutls_pkcs3_export_dh_params(const gnutls_datum_t * prime,
-    const gnutls_datum_t * generator, gnutls_x509_crt_fmt_t format,
-    unsigned char *params_data, int *params_data_size);
-
 /* get data from the session 
  */
 const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t session,

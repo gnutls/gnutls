@@ -156,13 +156,14 @@ int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 }
 
 /**
-  * gnutls_rsa_export_get_modulus - This function returns the peer's modulus used in RSA-EXPORT authentication
+  * gnutls_rsa_export_get_pubkey - This function returns the peer's public key used in RSA-EXPORT authentication
   * @session: is a gnutls session
   * @exp: will hold the exponent.
   * @mod: will hold the modulus.
   *
-  * This function will return the peer's modulus used in the last RSA-EXPORT authentication.
-  * The output parameters must be freed with gnutls_free().
+  * This function will return the peer's public key exponent and
+  * modulus used in the last RSA-EXPORT authentication.  The output
+  * parameters must be freed with gnutls_free().
   *
   * Returns a negative value in case of an error.
   *

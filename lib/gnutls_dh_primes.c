@@ -128,16 +128,16 @@ int _gnutls_dh_generate_prime(mpi_t * ret_g, mpi_t * ret_n,
  * generated one.
  */
 /**
-  * gnutls_dh_import_raw - This function will import DH parameters
-  * @dh_params: Is a structure that will hold the prime numbers
-  * @prime: holds the new prime
-  * @generator: holds the new generator
-  *
-  * This function will replace the pair of prime and generator for use in 
-  * the Diffie-Hellman key exchange. The new parameters should be stored in the
-  * appropriate gnutls_datum. 
-  * 
-  **/
+ * gnutls_dh_params_import_raw - This function will import DH parameters
+ * @dh_params: Is a structure that will hold the prime numbers
+ * @prime: holds the new prime
+ * @generator: holds the new generator
+ *
+ * This function will replace the pair of prime and generator for use in
+ * the Diffie-Hellman key exchange. The new parameters should be stored in the
+ * appropriate gnutls_datum.
+ *
+ **/
 int gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
 				const gnutls_datum_t * prime,
 				const gnutls_datum_t * generator)

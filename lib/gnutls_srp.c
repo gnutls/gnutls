@@ -374,7 +374,7 @@ mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
 }
 
 /**
-  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_client_credentials_t structure
+  * gnutls_srp_free_client_credentials - Used to free an allocated gnutls_srp_client_credentials_t structure
   * @sc: is an &gnutls_srp_client_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
@@ -389,7 +389,7 @@ void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
 }
 
 /**
-  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
+  * gnutls_srp_allocate_client_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
   * @sc: is a pointer to an &gnutls_srp_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
