@@ -2,6 +2,8 @@ If you want to contribute (implement something from the current list, or
 anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
+
+
 Current list:
 * test
 * Convert the current sexp stuff to the gcrypt ac API. 
