@@ -236,7 +236,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 	int result, size;
 	int indx = -1;
 	uint i, j;
-	int try = 0, *ij_map = NULL;
+	int *ij_map = NULL;
 	const gnutls_certificate_credentials cred;
 	opaque *data = _data;
 	ssize_t data_size = _data_size;
@@ -248,19 +248,9 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
-	if (session->internals.client_cert_callback != NULL) {
-		/* if try>=0 then the client wants automatic
-		 * choose of certificate, otherwise (-1), he
-		 * will be prompted to choose one.
-		 */
-		try =
-		    session->internals.client_cert_callback(session,
-							    NULL, 0,
-							    NULL, 0);
-	}
-
-
-	if (try >= 0) {
+	/* If we have no callback.
+	 */
+	if (session->internals.client_cert_callback == NULL) {
 		result = 0;
 
 		if (session->security_parameters.cert_type ==
@@ -281,12 +271,8 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 			gnutls_assert();
 			return result;
 		}
-	}
-
-
-	/* use the callback 
-	 */
-	if (indx == -1 && session->internals.client_cert_callback != NULL && try == -1) {
+	} else /* If the callback is set, then use it. */
+	if (session->internals.client_cert_callback != NULL) {
 		/* use a callback to get certificate 
 		 */
 		gnutls_datum *my_certs = NULL;

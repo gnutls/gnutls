@@ -177,8 +177,8 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * @session: is a &gnutls_session structure.
   * @func: is the callback function
   *
-  * The callback's function form is:
-  * int (*callback)(gnutls_session, gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_dn, int nreqs);
+  * The callback's function prototype is:
+  * int (*callback)(gnutls_session, const gnutls_datum *client_cert, int ncerts, const gnutls_datum* req_ca_dn, int nreqs);
   *
   * 'client_cert' contains 'ncerts' gnutls_datum structures which hold
   * the raw certificates (DER for X.509 or binary for OpenPGP), of the
@@ -197,17 +197,8 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * is chosen based on the CAs sent by the server, and the requested
   * public key algorithms.
   *
-  * If the callback function is provided then gnutls will call it
-  * once with NULL parameters (except for the sesion). If the callback function returns
-  * a positive or zero number then gnutls will attempt to automaticaly
-  * choose the appropriate certificate. If gnutls fails to find an appropriate
-  * certificate, then it will call the callback function again with the
-  * appropriate parameters.
-  *
-  * In case the callback returned a negative number then gnutls will
-  * not attempt to choose the appropriate certificate and will call again
-  * the callback function with the appropriate parameters, and rely
-  * only to the return value of the callback function.
+  * If the callback function is provided then gnutls will call it, in the
+  * handshake, after the certificate request message has been received.
   *
   * The callback function should return the index of the certificate
   * choosen by the user. The index is relative to the certificates in the

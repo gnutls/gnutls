@@ -597,8 +597,6 @@ static int cert_callback( gnutls_session session, const gnutls_datum* client_cer
 char issuer_dn[256];
 int len, i, ret;
 
-	if (client_certs == NULL && req_ca_rdn == NULL) return -1;
-
 	/* Print the server's trusted CAs
 	 */
 	printf("\n");
