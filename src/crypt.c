@@ -62,12 +62,11 @@ int main(int argc, char **argv)
  */
 
 int crypt_int(const char *username, const char *passwd, int salt,
-	      char *tpasswd_conf, char *tpasswd, int uindex);
+    char *tpasswd_conf, char *tpasswd, int uindex);
 static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str);
 static int _verify_passwd_int(const char *username, const char *passwd,
-			      char *verifier, char *salt,
-			      const gnutls_datum * g,
-			      const gnutls_datum * n);
+    char *verifier, char *salt,
+    const gnutls_datum * g, const gnutls_datum * n);
 
 
 static void print_num(const char *msg, const gnutls_datum * num)
@@ -413,6 +412,10 @@ int main(int argc, char **argv)
     salt = 16;
 
     passwd = getpass("Enter password: ");
+    if (passwd==NULL) {
+       fprintf(stderr, "Please specify a password\n");
+       return -1;
+    }
 
 /* not ready yet */
     if (info.verify != 0) {
