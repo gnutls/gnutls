@@ -1,3 +1,10 @@
+2003-01-08 22:58  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_ui.h, lib/gnutls_x509.c:
+
+	Added gnutls_x509_extract_certificate_ca_status() which returns the
+	CA status of the given certificate.  
+
 2003-01-01 11:12  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/gnutls_compress_int.c:
