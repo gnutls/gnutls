@@ -278,10 +278,9 @@ cleanup:
  */
 static
 unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
-				    int clist_size,
-				    gnutls_x509_crt * trusted_cas,
-				    int tcas_size, gnutls_x509_crl *CRLs,
-				    int crls_size, unsigned int flags)
+	int clist_size, gnutls_x509_crt * trusted_cas,
+	int tcas_size, gnutls_x509_crl *CRLs,
+	int crls_size, unsigned int flags)
 {
 	int i = 0, ret;
 	unsigned int status = 0, output;
@@ -306,7 +305,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 
 		if ((ret =
 		     _gnutls_verify_certificate2(certificate_list[i],
-						 &certificate_list[i + 1], 1, flags, NULL)) != 1) 
+				&certificate_list[i + 1], 1, flags, NULL)) != 1) 
 		{
 			status |= GNUTLS_CERT_INVALID;
 		}

@@ -99,9 +99,7 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 	 */
 	peer_certificate_list_size = info->ncerts;
 	peer_certificate_list =
-	    gnutls_calloc(1,
-			  peer_certificate_list_size *
-			  sizeof(gnutls_x509_crt));
+	    gnutls_calloc(1, peer_certificate_list_size * sizeof(gnutls_x509_crt));
 	if (peer_certificate_list == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -117,8 +115,8 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 		
 		ret =
 		     gnutls_x509_crt_import(peer_certificate_list[i],
-					     &info->
-					     raw_certificate_list[i], GNUTLS_X509_FMT_DER);
+				&info->raw_certificate_list[i], 
+				GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
 			CLEAR_CERTS;
@@ -130,10 +128,10 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 	 */
 	ret =
 	    gnutls_x509_crt_list_verify(peer_certificate_list,
-				      peer_certificate_list_size,
-				      cred->x509_ca_list, cred->x509_ncas, 
-				      cred->x509_crl_list, cred->x509_ncrls, 
-				      cred->verify_flags, &verify);
+		peer_certificate_list_size,
+		cred->x509_ca_list, cred->x509_ncas, 
+		cred->x509_crl_list, cred->x509_ncrls, 
+		cred->verify_flags, &verify);
 
 	CLEAR_CERTS;
 
@@ -431,8 +429,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, uint* ncerts,
 
 		*cert_list =
 		    (gnutls_cert *) gnutls_realloc_fast( *cert_list,
-						   i *
-						   sizeof(gnutls_cert));
+			i * sizeof(gnutls_cert));
 
 		if ( *cert_list == NULL) {
 			gnutls_assert();
@@ -448,6 +445,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, uint* ncerts,
 			gnutls_assert();
 			return ret;
 		}
+		gnutls_free( ptr2);
 		
 		/* now we move ptr after the pem header 
 		 */
@@ -925,7 +923,6 @@ int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials res, con
 static int generate_rdn_seq( gnutls_certificate_credentials res) 
 {
 gnutls_datum tmp;
-gnutls_datum _tmp;
 int ret;
 uint size, i;
 opaque *pdata;
@@ -943,12 +940,13 @@ opaque *pdata;
 
 	size = 0;
 	for (i = 0; i < res->x509_ncas; i++) {
-		if ((ret = _gnutls_x509_crt_get_raw_issuer_dn( 
-			res->x509_ca_list[i], &tmp)) < 0) {
+		ret = _gnutls_x509_crt_get_raw_issuer_dn( res->x509_ca_list[i], &tmp);
+		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 		size += (2 + tmp.size);
+		_gnutls_free_datum( &tmp);
 	}
 
 	if (res->x509_rdn_sequence.data != NULL)
@@ -964,8 +962,8 @@ opaque *pdata;
 	pdata = res->x509_rdn_sequence.data;
 
 	for (i = 0; i < res->x509_ncas; i++) {
-		if ((ret = _gnutls_x509_crt_get_raw_issuer_dn( 
-			res->x509_ca_list[i], &tmp)) < 0) {
+		ret = _gnutls_x509_crt_get_raw_issuer_dn( res->x509_ca_list[i], &tmp);
+		if (ret < 0) {
 			gnutls_free(res->x509_rdn_sequence.data);
 			res->x509_rdn_sequence.size = 0;
 			res->x509_rdn_sequence.data = NULL;
@@ -973,10 +971,9 @@ opaque *pdata;
 			return ret;
 		}
 
-		_tmp.data = (opaque*) tmp.data;
-		_tmp.size = tmp.size;
-		_gnutls_write_datum16(pdata, _tmp);
+		_gnutls_write_datum16(pdata, tmp);
 		pdata += (2 + tmp.size);
+		_gnutls_free_datum( &tmp);
 	}
 
 	return 0;
@@ -1065,8 +1062,7 @@ static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, uint* ncerts,
 
 		*cert_list =
 		    (gnutls_x509_crt *) gnutls_realloc_fast( *cert_list,
-						   i *
-						   sizeof(gnutls_x509_crt));
+			i * sizeof(gnutls_x509_crt));
 
 		if ( *cert_list == NULL) {
 			gnutls_assert();

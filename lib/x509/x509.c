@@ -1075,7 +1075,7 @@ int _gnutls_x509_crt_get_raw_dn2( gnutls_x509_crt cert,
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len1;
 	int start1, end1;
-	gnutls_datum signed_data;
+	gnutls_datum signed_data = { NULL, 0 };
 
 	/* get the issuer of 'cert'
 	 */
@@ -1125,35 +1125,33 @@ cleanup:
 /*-
   * _gnutls_x509_crt_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
   * @cert: should contain a gnutls_x509_crt structure
-  * @start: will hold the starting point of the DN
+  * @dn: will hold the allocated data with the DN
   *
-  * This function will return a pointer to the DER encoded DN structure and
-  * the length.
+  * This function will allocate data and return the DER encoded DN structure.
   *
   * Returns 0 on success or a negative value on error.
   *
   -*/
 int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
-	gnutls_datum* start)
+	gnutls_datum* dn)
 {
-	return _gnutls_x509_crt_get_raw_dn2( cert, "issuer", start);
+	return _gnutls_x509_crt_get_raw_dn2( cert, "issuer", dn);
 }
 
 /*-
   * _gnutls_x509_crt_get_raw_dn - This function returns the subject's DN DER encoded
   * @cert: should contain a gnutls_x509_crt structure
-  * @start: will hold the starting point of the DN
+  * @dn: will hold the allocated data with the DN
   *
-  * This function will return a pointer to the DER encoded DN structure and
-  * the length.
+  * This function will allocate data and return the DER encoded DN structure.
   *
   * Returns 0 on success, or a negative value on error.
   *
   -*/
 int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
-	gnutls_datum * start)
+	gnutls_datum * dn)
 {
-	return _gnutls_x509_crt_get_raw_dn2( cert, "subject", start);
+	return _gnutls_x509_crt_get_raw_dn2( cert, "subject", dn);
 }
 
 
