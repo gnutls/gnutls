@@ -2,6 +2,7 @@ Version 1.0.14
 - Automatically disable certificate types that do not have corresponding
   certificates.
 - Updates in the documentation.
+- certtool can now add ip address SAN extension.
 
 Version 1.0.13 (29/04/2004)
 - Some complilation fixes.
