@@ -210,7 +210,8 @@ int ret;
 
 	ret = do_handshake( session);
 	dh_bits = gnutls_dh_get_prime_bits( session);
-	
+	if (dh_bits < 0) dh_bits = 0;
+
 	return ret;
 }
 
@@ -525,7 +526,8 @@ int ret;
 
 	ret = do_handshake( session);
 	dh_bits = gnutls_dh_get_prime_bits( session);
-	
+	if (dh_bits < 0) dh_bits = 0;
+
 	return ret;
 }
 
