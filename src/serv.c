@@ -133,7 +133,7 @@ void peer_print_info( GNUTLS_STATE state)
 
 	if (gnutls_kx_get_algo(state) == GNUTLS_KX_ANON_DH) {
 		sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
-		       gnutls_anon_server_get_dh_bits( state));
+		       gnutls_dh_get_dha_bits( state));
 	}
 
 	/* print state information */
@@ -147,7 +147,7 @@ void peer_print_info( GNUTLS_STATE state)
 
 	if (gnutls_kx_get_algo(state) == GNUTLS_KX_X509PKI_DHE_RSA || gnutls_kx_get_algo(state) == GNUTLS_KX_X509PKI_DHE_DSS) {
 		sprintf(tmp2, "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
-			        gnutls_x509pki_server_get_dh_bits( state));
+			        gnutls_dh_get_dhe_bits( state));
 	}
 			
 	tmp =

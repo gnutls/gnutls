@@ -943,7 +943,8 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 		ret = length32;
 		break;
 	case GNUTLS_SERVER_HELLO_DONE:
-		ret = 0;
+		if (length32==0) ret = 0;
+		else ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		break;
 	case GNUTLS_FINISHED:
 		ret = length32;

@@ -127,10 +127,6 @@ typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_S
 		     GNUTLS_FINISHED=20 } HandshakeType;
 
 typedef struct {
-	ChangeCipherSpecType type;
-} ChangeCipherSpec;
-
-typedef struct {
 	opaque * data;
 	int size;
 } gnutls_datum;
@@ -141,6 +137,12 @@ typedef struct {
 	AlertDescription description;
 } Alert;
 
+#define MAX_KX_ALGOS 16
+#define MAX_CIPHER_ALGOS 16
+#define MAX_MAC_ALGOS 16
+#define MAX_CIPHERSUITES 256
+#define MAX_COMPRESSION_ALGOS 4
+#define MAX_VERSIONS 4
 
 /* STATE */
 typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
@@ -172,10 +174,11 @@ typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
 typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
 typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
 
-typedef struct {
+typedef struct AUTH_CRED {
 	KXAlgorithm algorithm;
+	/* the type of credentials depends on algorithm */
 	void* credentials;
-	void* next;
+	struct AUTH_CRED* next;
 } AUTH_CRED;
 
 
@@ -251,7 +254,7 @@ typedef struct {
 	opaque 		srp_username[MAX_SRP_USERNAME];
 } TLSExtensions;
 
-/* AUTH_INFO structures MUST NOT contain malloced 
+/* AUTH_INFO structures now MAY contain malloced 
  * elements.
  */
  
@@ -412,7 +415,7 @@ typedef struct {
 
 	/* gdbm */
 	char*				db_name;
-	int				expire_time;
+	int				expire_time; /* after expire_time seconds this session will expire */
 	struct MOD_AUTH_STRUCT_INT*	auth_struct; /* used in handshake packets and KX algorithms */
 	int				v2_hello; /* 0 if the client hello is v3+.
 						   * non-zero if we got a v2 hello.
@@ -429,7 +432,9 @@ typedef struct {
 						* if none.
 						*/
 	/* this is the highest version available
-	 * to the peer. (advertized version)
+	 * to the peer. (advertized version).
+	 * This is obtained by the Handshake Client Hello 
+	 * message. (some implementations read the Record version)
 	 */
 	uint8				adv_version_major;
 	uint8				adv_version_minor;
@@ -448,7 +453,9 @@ typedef struct {
 	 */
 	x509pki_client_cert_callback_func*	client_cert_callback;
 	x509pki_server_cert_callback_func*	server_cert_callback;
-	int				x509pki_dhe_bits;
+
+	/* how may bits to use for DHE? */
+	int				dhe_bits;
 	
 	int				max_handshake_data_buffer_size;
 

@@ -55,15 +55,14 @@ const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
 /* ANON */
 
 /**
-  * gnutls_anon_server_get_dh_bits - This function returns the bits used in DH authentication
+  * gnutls_dh_get_dha_bits - This function returns the bits used in anonymous DH authentication
   * @state: is a gnutls state
   *
-  * This function will return the bits used in the Diffie Hellman authentication
-  * with the peer. This should only be called in case of a server.
-  * Returns a negative value in case of an error.
+  * This function will return the bits used in the anonymous Diffie Hellman authentication
+  * with the peer. Returns a negative value in case of an error.
   *
   **/
-int gnutls_anon_server_get_dh_bits(GNUTLS_STATE state)
+int gnutls_dh_get_dha_bits(GNUTLS_STATE state)
 {
 	ANON_SERVER_AUTH_INFO info;
 
@@ -75,25 +74,16 @@ int gnutls_anon_server_get_dh_bits(GNUTLS_STATE state)
 	return info->dh_bits;
 }
 
-/**
-  * gnutls_anon_client_get_dh_bits - This function returns the bits used in DH authentication
-  * @state: is a gnutls state
-  *
-  * This function will return the bits used in the Diffie Hellman authentication
-  * with the peer. This should only be called in case of a client.
-  * Returns a negative value in case of an error.
-  *
-  **/
+#ifdef DEBUG
+# warning REMOVE THESE ON LIBRARY UPGRADE
+#endif
+int gnutls_anon_server_get_dh_bits(GNUTLS_STATE state)
+{
+	return gnutls_dh_get_dha_bits( state);
+}
 int gnutls_anon_client_get_dh_bits(GNUTLS_STATE state)
 {
-	ANON_CLIENT_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_ANON, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
-	return info->dh_bits;
+	return gnutls_dh_get_dha_bits( state);
 }
 
 
@@ -126,7 +116,7 @@ const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state,
 
 
 /**
-  * gnutls_x509pki_get_dh_bits - This function returns the number of bits used in a DHE handshake
+  * gnutls_dh_get_dhe_bits - This function returns the number of bits used in a DHE handshake
   * @state: is a gnutls state
   *
   * This function will return the number of bits used in a Diffie Hellman Handshake. This will only
@@ -135,7 +125,7 @@ const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state,
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509pki_get_dh_bits(GNUTLS_STATE state)
+int gnutls_dh_get_dhe_bits(GNUTLS_STATE state)
 {
 	X509PKI_AUTH_INFO info;
 

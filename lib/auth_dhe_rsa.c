@@ -69,7 +69,7 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 	gnutls_datum signature, ddata;
 	X509PKI_AUTH_INFO info;
 
-	bits = state->gnutls_internals.x509pki_dhe_bits;
+	bits = state->gnutls_internals.dhe_bits;
 	if (bits < MIN_BITS)
 		bits = DEFAULT_BITS;	/* default */
 
@@ -361,7 +361,7 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	MPI g, p;
 	int bits, ret;
 
-	bits = state->gnutls_internals.x509pki_dhe_bits;
+	bits = state->gnutls_internals.dhe_bits;
 	if (bits < MIN_BITS)
 		bits = DEFAULT_BITS;	/* default */
 

@@ -23,13 +23,6 @@
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"
 
-#define MAX_CIPHER 256
-#define MAX_MAC 256
-#define MAX_KX 256
-#define MAX_CIPHERSUITE 256
-#define MAX_COMPRESSION 256
-#define MAX_VERSION 256
-
 
 /* Cred type mappings to KX algorithms */
 typedef struct {
@@ -401,7 +394,7 @@ const char *gnutls_mac_get_name(MACAlgorithm algorithm)
 int _gnutls_mac_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_MAC; i++) {
+	for (i = 0; i < MAX_MAC_ALGOS; i++) {
 		if (_gnutls_mac_is_ok(i) == 0)
 			counter++;
 	}
@@ -483,7 +476,7 @@ CompressionMethod _gnutls_compression_get_id(int num)
 int _gnutls_compression_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_COMPRESSION; i++) {
+	for (i = 0; i < MAX_COMPRESSION_ALGOS; i++) {
 		if (_gnutls_compression_is_ok(i) == 0)
 			counter++;
 	}
@@ -576,7 +569,7 @@ const char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 int _gnutls_cipher_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_CIPHER; i++) {
+	for (i = 0; i < MAX_CIPHER_ALGOS; i++) {
 		if (_gnutls_cipher_is_ok(i) == 0)
 			counter++;
 	}
@@ -638,7 +631,7 @@ const char *gnutls_kx_get_name(KXAlgorithm algorithm)
 int _gnutls_kx_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_KX; i++) {
+	for (i = 0; i < MAX_KX_ALGOS; i++) {
 		if (_gnutls_kx_is_ok(i) == 0)
 			counter++;
 	}
@@ -853,7 +846,7 @@ int _gnutls_cipher_suite_count()
 	GNUTLS_CipherSuite suite;
 	int i, counter = 0, j;
 
-	for (j = 0; j < MAX_CIPHERSUITE; j++) {
+	for (j = 0; j < MAX_CIPHERSUITES; j++) {
 		suite.CipherSuite[0] = j;
 #ifdef DEBUG
 # warning CHECK SUPPORTED CIPHER SUITES HERE
@@ -861,7 +854,7 @@ int _gnutls_cipher_suite_count()
 		if (j != 0x00 && j != 0xF6)
 			continue;
 
-		for (i = 0; i < MAX_CIPHERSUITE; i++) {
+		for (i = 0; i < MAX_CIPHERSUITES; i++) {
 			suite.CipherSuite[1] = i;
 			if (_gnutls_cipher_suite_is_ok(suite) == 0)
 				counter++;

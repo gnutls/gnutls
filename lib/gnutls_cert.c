@@ -47,11 +47,11 @@ typedef struct {
 /* This table maps the Key exchange algorithms to
  * the certificate algorithms. Eg. if we have
  * RSA algorithm in the certificate then we can
- * use GNUTLS_KX_X509PKI_RSA or GNUTLS_KX_X509PKI_DHE_RSA.
+ * use GNUTLS_KX_RSA or GNUTLS_KX_DHE_RSA.
  */
 static const gnutls_pk_map pk_mappings[] = {
-	{GNUTLS_KX_X509PKI_RSA, GNUTLS_PK_RSA},
-	{GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_PK_RSA},
+	{GNUTLS_KX_RSA, GNUTLS_PK_RSA},
+	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA},
 	{0}
 };
 
@@ -605,7 +605,7 @@ int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_da
 }
 
 /**
-  * gnutls_x509pki_set_dh_bits - Used to set the bits for a DHE_* ciphersuite
+  * gnutls_dh_set_dhe_bits - Used to set the bits for a DHE_* ciphersuite
   * @state: is a &GNUTLS_STATE structure.
   * @bits: is the number of bits
   *
@@ -613,11 +613,17 @@ int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_da
   * This value will only be used in case of DHE ciphersuite.
   *
   **/
-void gnutls_x509pki_set_dh_bits(GNUTLS_STATE state, int bits)
+void gnutls_dh_set_dhe_bits(GNUTLS_STATE state, int bits)
 {
-	state->gnutls_internals.x509pki_dhe_bits = bits;
+	state->gnutls_internals.dhe_bits = bits;
 }
 
+#ifdef DEBUG
+# warning REMOVE THIS ON LIBRARY VERSION CHANGE
+#endif
+void gnutls_x509pki_set_dh_bits(GNUTLS_STATE state, int bits) {
+	gnutls_dh_set_dhe_bits( state, bits);
+}
 
 static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 {
@@ -1096,7 +1102,7 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
 		switch (alg) {
-		case GNUTLS_KX_X509PKI_RSA:
+		case GNUTLS_KX_RSA:
 			if (cert->keyUsage != 0) {
 				if (!
 				    (cert->
@@ -1107,7 +1113,8 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 					return 0;
 			}
 			return 0;
-		case GNUTLS_KX_X509PKI_DHE_RSA:
+		case GNUTLS_KX_DHE_RSA:
+		case GNUTLS_KX_DHE_DSS:
 			if (cert->keyUsage != 0) {
 				if (!
 				    (cert->
@@ -1128,7 +1135,7 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 
 /* returns the KX algorithms that are supported by a
  * certificate. (Eg a certificate with RSA params, supports
- * GNUTLS_KX_X509PKI_RSA algorithm).
+ * GNUTLS_KX_RSA algorithm).
  * This function also uses the KeyUsage field of the certificate
  * extensions in order to disable unneded algorithms.
  */
@@ -1138,10 +1145,10 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 	KXAlgorithm kx;
 	int i;
 	PKAlgorithm pk;
-	KXAlgorithm kxlist[255];
+	KXAlgorithm kxlist[MAX_KX_ALGOS];
 
 	i = 0;
-	for (kx = 0; kx < 255; kx++) {
+	for (kx = 0; kx < MAX_KX_ALGOS; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
 			if (_gnutls_check_x509pki_key_usage(cert, kx) == 0) {
@@ -1149,6 +1156,11 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 				i++;
 			}
 		}
+	}
+
+	if (i==0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 
 	*alg = gnutls_calloc(1, sizeof(KXAlgorithm) * i);

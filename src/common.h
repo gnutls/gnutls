@@ -60,7 +60,7 @@ GNUTLS_KXAlgorithm kx;
 			 */
 		        if (kx == GNUTLS_KX_X509PKI_DHE_RSA || kx == GNUTLS_KX_X509PKI_DHE_DSS) {
 		         printf("\n- Ephemeral DH using prime of %d bits\n",
-        		    gnutls_x509pki_server_get_dh_bits( state));
+        		    gnutls_dh_get_dhe_bits( state));
       			}
 
 			if (cert_list_size > 0) {

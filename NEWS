@@ -6,6 +6,8 @@ Version ?.?.?
 - gnutls_check_pending() was renamed to gnutls_record_check_pending()
 - Key exchange methods changed so they do not depend on the Certificate
   type (GNUTLS_KX_X509PKI_* renamed to GNUTLS_KX_*)
+- Renamed gnutls_x509pki_s/get_dh_bits() to gnutls_dh_s/get_dhe_bits()
+- Renamed gnutls_anon_server/client_get_dh_bits() to gnutls_dh_get_dha_bits()
 
 Version 0.3.2 (5/01/2002)
 - Corrected bug which did not allow a client to accept multiple CA names
