@@ -35,6 +35,8 @@ EXTRA_DIST = gnutls-extra-api.texi
 
 lib_LTLIBRARIES = libgnutls-extra.la
 
+COBJECTS = gnutls_extra.c
+
 # OpenSSL
 
 libgnutls_openssl_la_LDFLAGS =
@@ -60,6 +62,8 @@ endif
 libgnutls_extra_la_LIBADD =
 libgnutls_extra_la_LDFLAGS =
 if ENABLE_OPENPGP
+COBJECTS += gnutls_openpgp.c
+libgnutls_extra_la_LIBADD += openpgp/libgnutls_openpgp.la
 if ENABLE_INCLUDED_OPENCDK
 libgnutls_extra_la_LIBADD += opencdk/libminiopencdk.la
 else
@@ -74,19 +78,16 @@ if ENABLE_INCLUDED_LZO
 LZO_OBJECTS += lzoconf.h minilzo.h minilzo.c
 endif
 
-COBJECTS_EXTRA = gnutls_extra.c
-
 libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^gnutls.*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS)	\
-	gnutls_extra.h
+libgnutls_extra_la_SOURCES = $(COBJECTS) $(LZO_OBJECTS) gnutls_extra.h
 
 libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
 
 
-gnutls-extra-api.texi: $(COBJECTS_EXTRA)
+gnutls-extra-api.texi: $(COBJECTS)
 	@echo "" > gnutls-extra-api.texi
 	@for i in $(COBJECTS_EXTRA); do \
 		echo -n "Creating documentation for file $$i... " && \
