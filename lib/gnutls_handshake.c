@@ -473,7 +473,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	char *rand;
 	char *data = NULL;
 	uint8 session_id_len, z;
-	time_t cur_time;
+	uint32 cur_time;
 	int pos = 0;
 	GNUTLS_CipherSuite *cipher_suites;
 	uint8 *compression_methods;
