@@ -26,7 +26,9 @@ libutils_la_SOURCES = utils.h utils.c
 
 EXTRA_DIST = client.p12 noclient.p12 unclient.p12
 
-ctests = simple anonself
+openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
+
+ctests = simple anonself openssl
 TESTS = pkcs12_neon $(ctests)	
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon
