@@ -574,7 +574,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	int tmplen;
 	GNUTLS_Version version;
 	uint8 headers[HEADER_SIZE];
-	uint8 recv_type;
+	ContentType recv_type;
 	uint16 length;
 	uint8 *ciphertext;
 	int ret = 0;
@@ -630,7 +630,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	} else {
 		/* version 3.x 
 		 */
-		memcpy( &recv_type, &headers[0], 1);
+		recv_type = headers[0];
 		version = _gnutls_version_get( headers[1], headers[2]);
 
 		memcpy( &length, &headers[3], 2);
@@ -639,7 +639,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 #endif
 	}
 	
-	if (type != GNUTLS_HANDSHAKE && gnutls_get_current_version(state) != version) {
+	if ( gnutls_get_current_version(state) != version) {
 #ifdef DEBUG
 		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d) %d.%d\n", headers[0], headers[1], headers[2]);
 #endif
@@ -694,8 +694,11 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 
-/* Read the whole packet - again? */	
-	if ( type==GNUTLS_APPLICATION_DATA) {
+/* Read the whole packet - again? 
+ * Here we keep RCVLOWAT bytes in the TCP buffers, only for
+ * APPLICATION_DATA data.
+ */	
+	if ( type==GNUTLS_APPLICATION_DATA && type==recv_type) {
 		/* get the data - but do not free the buffer in the kernel */
 		ret = _gnutls_Read(cd, ciphertext, length-RCVLOWAT, 0);
 		if (ret>=0)
@@ -751,6 +754,11 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return tmplen;
 	}
 
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Record: Decrypted Packet[%d] %s(%d) with length: %d\n",
+		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(recv_type), recv_type, tmplen);
+#endif
+
 	gnutls_free(ciphertext);
 
 	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
@@ -780,6 +788,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 					gnutls_close_nowait(cd, state);
 				
 				gnutls_free(tmpdata);
+				
 				return GNUTLS_E_CLOSURE_ALERT_RECEIVED;
 			} else {
 			
@@ -796,7 +805,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 				}
 
 				gnutls_free(tmpdata);
-				_gnutls_clear_peeked_data( cd, state);
 
 				return ret;
 			}
@@ -805,17 +813,18 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		case GNUTLS_CHANGE_CIPHER_SPEC:
 			/* this packet is now handled above */
 			gnutls_assert();
+	
 			gnutls_free(tmpdata);
+			
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
 			/* even if data is unexpected put it into the buffer */
 			gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen);
-			_gnutls_clear_peeked_data( cd, state);
+			/* no peeked data to clear since this packet was unexpected */
 
 			break;
 		case GNUTLS_HANDSHAKE:
 			/* This is only legal if HELLO_REQUEST is received */
-			_gnutls_clear_peeked_data( cd, state);
 
 			break;
 		default:
@@ -847,17 +856,18 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		if (recv_type == GNUTLS_HANDSHAKE) {
 			/* we may get a hello request */
 			ret = _gnutls_recv_hello_request( cd, state, tmpdata, tmplen);
-			if (ret < 0) gnutls_assert();
-			else /* inform the caller */
-			return GNUTLS_E_GOT_HELLO_REQUEST;
-		} else
-			if (recv_type != GNUTLS_APPLICATION_DATA) {
+			if (ret < 0) {
 				gnutls_assert();
-				ret = GNUTLS_E_RECEIVED_BAD_MESSAGE;
-			} else {
-				ret = 0; /* ok */
-			}
-		
+			} else /* inform the caller */
+				ret = GNUTLS_E_GOT_HELLO_REQUEST;
+		} else {
+			gnutls_assert();
+			ret = GNUTLS_E_UNEXPECTED_PACKET; 
+				/* we didn't get what we wanted to 
+				 */
+			if (recv_type == GNUTLS_APPLICATION_DATA)
+				ret = GNUTLS_E_GOT_APPLICATION_DATA;
+		}
 		gnutls_free(tmpdata);
 	}
 

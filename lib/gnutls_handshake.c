@@ -556,6 +556,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 	ret =
 	    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, dataptr, SSL2_HEADERS);
 	if (ret < 0) {
+		gnutls_assert();
 		gnutls_free(dataptr);
 		return ret;
 	}
@@ -571,6 +572,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 		    _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, &dataptr[SSL2_HEADERS],
 			     HANDSHAKE_HEADERS_SIZE-SSL2_HEADERS);
 		if (ret < 0) {
+			gnutls_assert();
 			gnutls_free(dataptr);
 			return ret;
 		}
@@ -710,9 +712,10 @@ int 	ret;
 		return ret;
 	}
 
-return 0;
 	/* begin handshake procedure again */
-	return gnutls_handshake(cd, state);
+	ret = gnutls_handshake(cd, state);
+
+	return ret;
 }
 
 int _gnutls_send_client_certificate(int cd, GNUTLS_STATE state)
@@ -1162,6 +1165,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 
 	ret = gnutls_handshake_begin(cd, state);
 	/* FIXME: check certificate */
+
 	if (ret == 0)
 		ret = gnutls_handshake_finish(cd, state);
 
@@ -1224,6 +1228,7 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 					   GNUTLS_CLIENT_HELLO);
 		if (ret < 0) {
 			ERR("recv hello", ret);
+			gnutls_assert();
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
@@ -1232,6 +1237,7 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 		    _gnutls_send_hello(cd, state);
 		if (ret < 0) {
 			ERR("send hello", ret);
+			gnutls_assert();
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
@@ -1246,6 +1252,7 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 			ret = _gnutls_send_server_kx_message(cd, state);
 		if (ret < 0) {
 			ERR("send server kx", ret);
+			gnutls_assert();
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
@@ -1545,16 +1552,22 @@ int ret;
 #if 0 /* this does not work - yet */
 uint8 type;
 
-	if (state->security_parameters.entity == GNUTLS_SERVER)
+	if (state->security_parameters.entity == GNUTLS_SERVER) {
+		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET;
-
-	if (data_size < 1)
+	}
+	
+	if (data_size < 1) {
+		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-
+	}
+	
 	type = ((uint8*)data)[0];
 	if (type==GNUTLS_HELLO_REQUEST)
 		return gnutls_handshake( cd, state);
-	else
+	else {
+		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET;
+	}
 #endif
 }

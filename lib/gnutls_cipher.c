@@ -530,6 +530,10 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			rand[0] = 0;
 		} else {
 			rand[0] = (rand[0] / blocksize) * blocksize;
+			/* added to avoid the case of pad calculated 0
+			 * seen below for pad calculation.
+			 */
+			if (rand[0] > blocksize) rand[0]-=blocksize;
 		}
 
 		length =
