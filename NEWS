@@ -13,7 +13,7 @@ See the end for copying conditions.
   <gp@familiehaase.de>.
 - Fixes faulty getpass implementation in libextra/opencdk/, reported
   by Yoann Vandoorselaere <yoann@prelude-ids.org>.
-- Started using GNULib for portability files, although not yet inside lib/.
+- Using more GNULib portability files, although not yet inside lib/.
 - Added gnutls_certificate_verify_peers to gnutls/compat.h.
 - Improvements to the manual.
 - Known bug: the library require snprintf.  This has not yet been
