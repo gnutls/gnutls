@@ -2839,14 +2839,15 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
   * This function will copy the name of the certificate holder in the provided buffer. The name 
   * will be in the form "/C=xxxx/O=yyyy/CN=zzzz".
   *
-  * Returns GNUTLS_E_INVALID_REQUEST if the provided buffer is not long enough.
+  * Returns GNUTLS_E_INVALID_REQUEST if the provided buffer is not long enough,
+  * and 0 on success.
   *
   **/
 int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf, 
    const gnutls_datum * cert, int issuer)
 {
    gnutls_x509_dn dn;
-   int len = 0;
+   int len = 0, ret;
 
    buf[0] = 0;
 
@@ -2858,9 +2859,11 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    }
 
    if (!issuer)
-      gnutls_x509_extract_certificate_dn(cert, &dn);
+      ret = gnutls_x509_extract_certificate_dn(cert, &dn);
    else
-      gnutls_x509_extract_certificate_issuer_dn( cert, &dn);
+      ret = gnutls_x509_extract_certificate_issuer_dn( cert, &dn);
+      
+   if (ret < 0) return ret;
 
    PRINTX(buf, sizeof_buf, "C", dn.country);
    len = strlen(buf);
