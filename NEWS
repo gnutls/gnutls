@@ -1,13 +1,15 @@
-Version ?.?.?
+Version 0.4.2
 - Separated ASN.1 structures parser documentation and TLS library
   documentation.
 - Added gnutls_handshake_set_rsa_pms() function, which disables the
   version check in RSA premaster secret.
 - Added gnutls_session_is_resumed() function, which reports if a session
-  is a resumpted one.
+  is a resumed one.
 - Added gnutls_state_set_ptr() and gnutls_state_get_ptr() functions, to
   assist in callback functions.
-- Relicensed under the GNU Lesser General Public License
+- Replaced the included 1024 bit prime for Diffie Hellman, with a new
+  random one.
+- Relicensed the library under the GNU Lesser General Public License
 
 Version 0.4.1 (7/04/2002)
 - Now uses alloca() for temporary variables
