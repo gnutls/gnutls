@@ -48,7 +48,7 @@ static int port = 0;
 static int x509ctype;
 static int debug;
 
-static int quiet;
+int verbose;
 static int nodb;
 
 char *srp_passwd;
@@ -59,6 +59,8 @@ char *pgp_keyfile;
 char *pgp_certfile;
 char *x509_keyfile;
 char *x509_certfile;
+char *x509_dsakeyfile;
+char *x509_dsacertfile;
 char *x509_cafile;
 char *dh_params_file;
 char *x509_crlfile = NULL;
@@ -331,7 +333,7 @@ char *peer_print_info(gnutls_session session, int *ret_length,
 
    if (http_buffer == NULL)
       return NULL;
-   if (quiet != 0) {
+   if (verbose != 0) {
 
       strcpy(http_buffer, HTTP_BEGIN);
       strcpy(&http_buffer[sizeof(HTTP_BEGIN) - 1], DEFAULT_DATA);
@@ -668,6 +670,16 @@ int main(int argc, char **argv)
 	 exit(1);
       }
 
+   if (x509_dsacertfile != NULL)
+      if ((ret = gnutls_certificate_set_x509_key_file
+	  (cert_cred, x509_dsacertfile, x509_dsakeyfile, x509ctype)) < 0) {
+	 fprintf(stderr,
+		 "Error reading '%s' or '%s'\n", x509_dsacertfile,
+		 x509_dsakeyfile);
+	 GERR(ret);
+	 exit(1);
+      }
+
    if (generate != 0 || read_dh_params != NULL) {
       gnutls_certificate_set_params_function( cert_cred, get_params);
 /*     gnutls_certificate_set_dh_params(cert_cred, dh_params);
@@ -777,7 +789,7 @@ int main(int argc, char **argv)
 	    gnutls_transport_set_ptr(tls_session, (gnutls_transport_ptr)accept_fd);
 	    j->handshake_ok = 0;
 
-	    if (quiet == 0) {
+	    if (verbose == 0) {
 	       tt = time(0);
 	       ctt = ctime(&tt);
 	       ctt[strlen(ctt) - 1] = 0;
@@ -815,10 +827,10 @@ int main(int argc, char **argv)
 		  j->http_state = HTTP_STATE_CLOSING;
 	       } else if (r == 0) {
 		  if (gnutls_session_is_resumed(j->tls_session) != 0
-		      && quiet == 0)
+		      && verbose == 0)
 		     printf("*** This is a resumed session\n");
 
-		  if (quiet == 0) {
+		  if (verbose == 0) {
 		     printf("\n* connection from %s, port %d\n",
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
@@ -890,9 +902,9 @@ int main(int argc, char **argv)
 		  } while (ret == GNUTLS_E_AGAIN);
 	       } else if (r == 0) {
 		  if (gnutls_session_is_resumed(j->tls_session) != 0
-		      && quiet == 0)
+		      && verbose == 0)
 		     printf("*** This is a resumed session\n");
-		  if (quiet == 0) {
+		  if (verbose == 0) {
 		     printf("- connection from %s, port %d\n",
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
@@ -988,7 +1000,7 @@ void gaa_parser(int argc, char **argv)
    }
 
    debug = info.debug;
-   quiet = info.quiet;
+   verbose = info.quiet;
    nodb = info.nodb;
 
    if (info.http == 0)
@@ -1012,6 +1024,8 @@ void gaa_parser(int argc, char **argv)
 
    x509_certfile = info.x509_certfile;
    x509_keyfile = info.x509_keyfile;
+   x509_dsacertfile = info.x509_dsacertfile;
+   x509_dsakeyfile = info.x509_dsakeyfile;
    x509_cafile = info.x509_cafile;
    x509_crlfile = info.x509_crlfile;
    pgp_certfile = info.pgp_certfile;
@@ -1039,7 +1053,7 @@ void serv_version(void)
 /* session resuming support */
 
 #define SESSION_ID_SIZE 32
-#define SESSION_DATA_SIZE 2048
+#define SESSION_DATA_SIZE 3*1024
 
 typedef struct {
    char session_id[SESSION_ID_SIZE];

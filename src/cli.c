@@ -59,7 +59,7 @@ int port;
 int record_max_size;
 int fingerprint;
 int crlf;
-int quiet = 0;
+int verbose = 0;
 extern int xml;
 extern int print_cert;
 
@@ -86,9 +86,9 @@ int protocol_priority[PRI_MAX] =
     { GNUTLS_TLS1_1, GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
     { GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA,
-    GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS, GNUTLS_KX_SRP,
-    /* Do not use anonymous authentication, unless you know what that means */
-    GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_ANON_DH, 0
+	GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS, GNUTLS_KX_SRP,
+	/* Do not use anonymous authentication, unless you know what that means */
+	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_ANON_DH, 0
 };
 int cipher_priority[PRI_MAX] =
     { GNUTLS_CIPHER_AES_256_CBC, GNUTLS_CIPHER_AES_128_CBC,
@@ -207,19 +207,19 @@ static void load_keys(void)
 
 		munmap_file(data);
 	}
-
 #ifdef USE_OPENPGP
 	if (pgp_certfile != NULL && pgp_keyfile != NULL) {
 		data = mmap_file(pgp_certfile);
 		if (data.data == NULL) {
-			fprintf(stderr, "*** Error loading PGP cert file.\n");
+			fprintf(stderr,
+				"*** Error loading PGP cert file.\n");
 			exit(1);
 		}
 		gnutls_openpgp_key_init(&pgp_crt);
 
 		ret =
 		    gnutls_openpgp_key_import(pgp_crt, &data,
-					   GNUTLS_OPENPGP_FMT_BASE64);
+					      GNUTLS_OPENPGP_FMT_BASE64);
 		if (ret < 0) {
 			fprintf(stderr,
 				"*** Error loading PGP cert file: %s\n",
@@ -231,7 +231,8 @@ static void load_keys(void)
 
 		data = mmap_file(x509_keyfile);
 		if (data.data == NULL) {
-			fprintf(stderr, "*** Error loading PGP key file.\n");
+			fprintf(stderr,
+				"*** Error loading PGP key file.\n");
 			exit(1);
 		}
 
@@ -239,9 +240,11 @@ static void load_keys(void)
 
 		ret =
 		    gnutls_openpgp_privkey_import(pgp_key, &data,
-					       GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
+						  GNUTLS_OPENPGP_FMT_BASE64,
+						  NULL, 0);
 		if (ret < 0) {
-			fprintf(stderr, "*** Error loading PGP key file: %s\n",
+			fprintf(stderr,
+				"*** Error loading PGP key file: %s\n",
 				gnutls_strerror(ret));
 			exit(1);
 		}
@@ -269,21 +272,26 @@ static int cert_callback(gnutls_session session,
 	size_t len;
 	gnutls_certificate_type type;
 
-	/* Print the server's trusted CAs
-	 */
-	if (nreqs > 0)
-		printf("- Server's trusted authorities:\n");
-	else
-		printf
-		    ("- Server did not send us any trusted authorities names.\n");
+	if (verbose) {
 
-	/* print the names (if any) */
-	for (i = 0; i < nreqs; i++) {
-		len = sizeof(issuer_dn);
-		ret = gnutls_x509_rdn_get(&req_ca_rdn[i], issuer_dn, &len);
-		if (ret >= 0) {
-			printf("   [%d]: ", i);
-			printf("%s\n", issuer_dn);
+		/* Print the server's trusted CAs
+		 */
+		if (nreqs > 0)
+			printf("- Server's trusted authorities:\n");
+		else
+			printf
+			    ("- Server did not send us any trusted authorities names.\n");
+
+		/* print the names (if any) */
+		for (i = 0; i < nreqs; i++) {
+			len = sizeof(issuer_dn);
+			ret =
+			    gnutls_x509_rdn_get(&req_ca_rdn[i], issuer_dn,
+						&len);
+			if (ret >= 0) {
+				printf("   [%d]: ", i);
+				printf("%s\n", issuer_dn);
+			}
 		}
 	}
 
@@ -314,7 +322,7 @@ static int cert_callback(gnutls_session session,
 			st->key.pgp = pgp_key;
 
 			st->deinit_all = 0;
-			
+
 			return 0;
 		}
 	}
@@ -616,7 +624,7 @@ int main(int argc, char **argv)
 					"*** Server has terminated the connection abnormally.\n");
 				break;
 			} else if (ret > 0) {
-				if (quiet != 0)
+				if (verbose != 0)
 					printf("- Received[%d]: ", ret);
 				for (ii = 0; ii < ret; ii++) {
 					fputc(buffer[ii], stdout);
@@ -655,7 +663,7 @@ int main(int argc, char **argv)
 			ret = socket_send(hd, buffer, strlen(buffer));
 
 			if (ret > 0) {
-				if (quiet != 0)
+				if (verbose != 0)
 					printf("- Sent: %d bytes\n", ret);
 			} else
 				handle_error(hd, ret);
@@ -692,6 +700,7 @@ void gaa_parser(int argc, char **argv)
 	}
 
 	debug = info.debug;
+	verbose = info.verbose;
 	disable_extensions = info.disable_extensions;
 	xml = info.xml;
 	print_cert = info.print_cert;
@@ -782,7 +791,7 @@ ssize_t socket_send(socket_st socket, const void *buffer, int buffer_size)
 			ret = send(socket.fd, buffer, buffer_size, 0);
 		} while (ret == -1 && errno == EINTR);
 
-	if (ret > 0 && ret != buffer_size && quiet)
+	if (ret > 0 && ret != buffer_size && verbose)
 		fprintf(stderr,
 			"*** Only sent %d bytes instead of %d.\n", ret,
 			buffer_size);

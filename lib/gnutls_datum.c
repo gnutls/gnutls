@@ -50,7 +50,14 @@ void _gnutls_write_datum8( opaque* dest, gnutls_datum dat) {
 
 
 int _gnutls_set_datum_m( gnutls_datum* dat, const void* data, int data_size, 
-	gnutls_alloc_function galloc_func) {
+	gnutls_alloc_function galloc_func) 
+{
+	if (data_size == 0) {
+		dat->data = NULL;
+		dat->size = 0;
+		return 0;
+	}
+
 	dat->data = galloc_func(data_size);
 	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
 

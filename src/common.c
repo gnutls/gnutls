@@ -36,8 +36,9 @@
 
 int xml = 0;
 int print_cert;
+extern int verbose;
 
-static char buffer[5*1024];
+static char buffer[5 * 1024];
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", name)
@@ -50,13 +51,15 @@ const char *raw_to_string(const unsigned char *raw, size_t raw_size)
 {
 	static char buf[1024];
 	size_t i;
-	if (raw_size == 0) return NULL;
+	if (raw_size == 0)
+		return NULL;
 
 	if (raw_size * 3 + 1 >= sizeof(buf))
 		return NULL;
 
 	for (i = 0; i < raw_size; i++) {
-		sprintf(&(buf[i * 3]), "%02X%s", raw[i], (i==raw_size-1)?"":":");
+		sprintf(&(buf[i * 3]), "%02X%s", raw[i],
+			(i == raw_size - 1) ? "" : ":");
 	}
 	buf[sizeof(buf) - 1] = '\0';
 
@@ -68,15 +71,16 @@ static const char *my_ctime(const time_t * tv)
 	static char buf[256];
 	struct tm *tp;
 
-	if ( ( (tp = localtime(tv)) == NULL ) ||
-	     (!strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp)) )
-		strcpy(buf, str_unknown);/* make sure buf text isn't garbage */
+	if (((tp = localtime(tv)) == NULL) ||
+	    (!strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp)))
+		strcpy(buf, str_unknown);	/* make sure buf text isn't garbage */
 
 	return buf;
 
 }
 
-void print_x509_info(gnutls_session session, const char* hostname)
+
+void print_x509_info(gnutls_session session, const char *hostname)
 {
 	gnutls_x509_crt crt;
 	const gnutls_datum *cert_list;
@@ -89,7 +93,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	unsigned int j;
 	size_t serial_size = sizeof(serial);
 	const char *print;
-	const char* cstr;
+	const char *cstr;
 	unsigned int bits, algo;
 	time_t expiret, activet;
 
@@ -104,14 +108,15 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	printf(" - Got a certificate list of %d certificates.\n\n",
 	       cert_list_size);
 
-	for (j = 0; j < (unsigned int)cert_list_size; j++) {
+	for (j = 0; j < (unsigned int) cert_list_size; j++) {
 
 		gnutls_x509_crt_init(&crt);
 		ret =
 		    gnutls_x509_crt_import(crt, &cert_list[j],
 					   GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
-			fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "Decoding error: %s\n",
+				gnutls_strerror(ret));
 			return;
 		}
 
@@ -119,28 +124,37 @@ void print_x509_info(gnutls_session session, const char* hostname)
 
 		if (print_cert) {
 			size_t size;
-			
+
 			size = sizeof(buffer);
-			
-			ret = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);
+
+			ret =
+			    gnutls_x509_crt_export(crt,
+						   GNUTLS_X509_FMT_PEM,
+						   buffer, &size);
 			if (ret < 0) {
-				fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+				fprintf(stderr, "Encoding error: %s\n",
+					gnutls_strerror(ret));
 				return;
 			}
-			fputs( "\n", stdout);
-			fputs( buffer, stdout);
-			fputs( "\n", stdout);
+			fputs("\n", stdout);
+			fputs(buffer, stdout);
+			fputs("\n", stdout);
 		}
-		
-		if (j==0 && hostname != NULL) { /* Check the hostname of the first certificate
-		             * if it matches the name of the host we
-		             * connected to.
-		             */
-		             if (gnutls_x509_crt_check_hostname( crt, hostname)==0) {
-		             	printf(" # The hostname in the certificate does NOT match '%s'.\n", hostname);
-		             } else {
-		             	printf(" # The hostname in the certificate matches '%s'.\n", hostname);
-		             }
+
+		if (j == 0 && hostname != NULL) {	/* Check the hostname of the first certificate
+							   * if it matches the name of the host we
+							   * connected to.
+							 */
+			if (gnutls_x509_crt_check_hostname(crt, hostname)
+			    == 0) {
+				printf
+				    (" # The hostname in the certificate does NOT match '%s'.\n",
+				     hostname);
+			} else {
+				printf
+				    (" # The hostname in the certificate matches '%s'.\n",
+				     hostname);
+			}
 		}
 
 
@@ -148,15 +162,15 @@ void print_x509_info(gnutls_session session, const char* hostname)
 #ifdef ENABLE_PKI
 			gnutls_datum xml_data;
 
-			ret = gnutls_x509_crt_to_xml( crt, &xml_data, 0);
+			ret = gnutls_x509_crt_to_xml(crt, &xml_data, 0);
 			if (ret < 0) {
 				fprintf(stderr, "XML encoding error: %s\n",
 					gnutls_strerror(ret));
 				return;
 			}
-			
+
 			printf("%s", xml_data.data);
-			gnutls_free( xml_data.data);
+			gnutls_free(xml_data.data);
 #endif
 		} else {
 
@@ -169,51 +183,128 @@ void print_x509_info(gnutls_session session, const char* hostname)
 
 			/* Print the serial number of the certificate.
 			 */
-			if (gnutls_x509_crt_get_serial(crt, serial, &serial_size)
+			if (verbose
+			    && gnutls_x509_crt_get_serial(crt, serial,
+							  &serial_size)
 			    >= 0) {
-				print = raw_to_string( serial, serial_size);
-				if (print!=NULL)
-					printf(" # serial number: %s\n", print);
+				print = raw_to_string(serial, serial_size);
+				if (print != NULL)
+					printf(" # serial number: %s\n",
+					       print);
 			}
 
 			/* Print the fingerprint of the certificate
 			 */
 			digest_size = sizeof(digest);
-			if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, digest, &digest_size))
+			if ((ret =
+			     gnutls_x509_crt_get_fingerprint(crt,
+							     GNUTLS_DIG_MD5,
+							     digest,
+							     &digest_size))
 			    < 0) {
-			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
+				fprintf(stderr,
+					"Error in fingerprint calculation: %s\n",
+					gnutls_strerror(ret));
 			} else {
-				print = raw_to_string( digest, digest_size);
+				print = raw_to_string(digest, digest_size);
 				if (print != NULL)
-					printf(" # fingerprint: %s\n", print);
+					printf(" # fingerprint: %s\n",
+					       print);
 			}
 
 			/* Print the version of the X.509 
 			 * certificate.
 			 */
-			printf(" # version: #%d\n",
-			       gnutls_x509_crt_get_version(crt));
+			if (verbose) {
+				printf(" # version: #%d\n",
+				       gnutls_x509_crt_get_version(crt));
 
-			bits = 0;
-			algo = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
-			printf(" # public key algorithm: ");
+				bits = 0;
+				algo =
+				    gnutls_x509_crt_get_pk_algorithm(crt,
+								     &bits);
+				printf(" # public key algorithm: ");
 
-			cstr = SU(gnutls_pk_algorithm_get_name( algo));
-			printf("%s (%d bits)\n", cstr, bits);
+				cstr =
+				    SU(gnutls_pk_algorithm_get_name(algo));
+				printf("%s (%d bits)\n", cstr, bits);
+
+				if (algo == GNUTLS_PK_RSA) {
+					gnutls_datum e, m;
+
+					ret =
+					    gnutls_x509_crt_get_pk_rsa_raw
+					    (crt, &m, &e);
+					if (ret >= 0) {
+						print =
+						    SU(raw_to_string
+						       (e.data, e.size));
+						printf(" # e [%d bits]: %s\n",
+						       e.size*8, print);
+
+						print =
+						    SU(raw_to_string
+						       (m.data, m.size));
+						printf(" # m [%d bits]: %s\n",
+						       m.size*8, print);
+
+						gnutls_free(e.data);
+						gnutls_free(m.data);
+					}
+				} else if (algo == GNUTLS_PK_DSA) {
+					gnutls_datum p, q, g, y;
+
+					ret =
+					    gnutls_x509_crt_get_pk_dsa_raw
+					    (crt, &p, &q, &g, &y);
+					if (ret >= 0) {
+						print =
+						    SU(raw_to_string
+						       (p.data, p.size));
+						printf(" # p [%d bits]: %s\n",
+						       p.size*8, print);
+
+						print =
+						    SU(raw_to_string
+						       (q.data, q.size));
+						printf(" # q [%d bits]: %s\n",
+						       q.size*8, print);
+
+						print =
+						    SU(raw_to_string
+						       (g.data, g.size));
+						printf(" # g [%d bits]: %s\n",
+						       g.size*8, print);
+
+						print =
+						    SU(raw_to_string
+						       (y.data, y.size));
+						printf(" # y [%d bits]: %s\n",
+						       y.size*8, print);
+
+						gnutls_free(p.data);
+						gnutls_free(q.data);
+						gnutls_free(g.data);
+						gnutls_free(y.data);
+					}
+				}
+			}
 
 			dn_size = sizeof(dn);
 			ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
 			if (ret >= 0)
 				printf(" # Subject's DN: %s\n", dn);
-	
+
 			dn_size = sizeof(dn);
-			ret = gnutls_x509_crt_get_issuer_dn(crt, dn, &dn_size);
+			ret =
+			    gnutls_x509_crt_get_issuer_dn(crt, dn,
+							  &dn_size);
 			if (ret >= 0)
 				printf(" # Issuer's DN: %s\n", dn);
 		}
 
 		gnutls_x509_crt_deinit(crt);
-		
+
 		printf("\n");
 
 	}
@@ -222,14 +313,14 @@ void print_x509_info(gnutls_session session, const char* hostname)
 
 #ifdef USE_OPENPGP
 
-void print_openpgp_info(gnutls_session session, const char* hostname)
+void print_openpgp_info(gnutls_session session, const char *hostname)
 {
 
 	char digest[20];
 	size_t digest_size = sizeof(digest);
 	int ret;
 	const char *print;
-	const char* cstr;
+	const char *cstr;
 	char name[256];
 	size_t name_len = sizeof(name);
 	gnutls_openpgp_key crt;
@@ -237,7 +328,7 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 	int cert_list_size = 0;
 	time_t expiret;
 	time_t activet;
-	
+
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
 	if (cert_list_size > 0) {
@@ -245,56 +336,67 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 
 		gnutls_openpgp_key_init(&crt);
 		ret =
-		    gnutls_openpgp_key_import(crt, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
+		    gnutls_openpgp_key_import(crt, &cert_list[0],
+					      GNUTLS_OPENPGP_FMT_RAW);
 		if (ret < 0) {
-			fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
+			fprintf(stderr, "Decoding error: %s\n",
+				gnutls_strerror(ret));
 			return;
 		}
 
 		if (print_cert) {
 			size_t size;
-			
+
 			size = sizeof(buffer);
 
-			ret = gnutls_openpgp_key_export( crt, GNUTLS_OPENPGP_FMT_BASE64, buffer, &size);
+			ret =
+			    gnutls_openpgp_key_export(crt,
+						      GNUTLS_OPENPGP_FMT_BASE64,
+						      buffer, &size);
 			if (ret < 0) {
-				fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+				fprintf(stderr, "Encoding error: %s\n",
+					gnutls_strerror(ret));
 				return;
 			}
-			fputs( "\n", stdout);
-			fputs( buffer, stdout);
-			fputs( "\n", stdout);
+			fputs("\n", stdout);
+			fputs(buffer, stdout);
+			fputs("\n", stdout);
 		}
 
-		if (hostname != NULL) { /* Check the hostname of the first certificate
-		             * if it matches the name of the host we
-		             * connected to.
-		             */
-		             if (gnutls_openpgp_key_check_hostname( crt, hostname)==0) {
-		             	printf(" # The hostname in the key does NOT match '%s'.\n", hostname);
-		             } else {
-		             	printf(" # The hostname in the key matches '%s'.\n", hostname);
-		             }
+		if (hostname != NULL) {	/* Check the hostname of the first certificate
+					   * if it matches the name of the host we
+					   * connected to.
+					 */
+			if (gnutls_openpgp_key_check_hostname
+			    (crt, hostname) == 0) {
+				printf
+				    (" # The hostname in the key does NOT match '%s'.\n",
+				     hostname);
+			} else {
+				printf
+				    (" # The hostname in the key matches '%s'.\n",
+				     hostname);
+			}
 		}
 
 		if (xml) {
 			gnutls_datum xml_data;
 
-			ret = gnutls_openpgp_key_to_xml( crt, &xml_data, 0);
+			ret = gnutls_openpgp_key_to_xml(crt, &xml_data, 0);
 			if (ret < 0) {
 				fprintf(stderr, "XML encoding error: %s\n",
 					gnutls_strerror(ret));
 				return;
 			}
-			
+
 			printf("%s", xml_data.data);
-			gnutls_free( xml_data.data);
+			gnutls_free(xml_data.data);
 
 			return;
 		}
 
-		activet = gnutls_openpgp_key_get_creation_time( crt);
-		expiret = gnutls_openpgp_key_get_expiration_time( crt);
+		activet = gnutls_openpgp_key_get_creation_time(crt);
+		expiret = gnutls_openpgp_key_get_expiration_time(crt);
 
 		printf(" # Key was created at: %s", my_ctime(&activet));
 		printf(" # Key expires: ");
@@ -303,26 +405,29 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 		else
 			printf("Never\n");
 
-		if (gnutls_openpgp_key_get_fingerprint(crt, digest, &digest_size) >= 0) 
-		{
-			print = raw_to_string( digest, digest_size);
+		if (gnutls_openpgp_key_get_fingerprint
+		    (crt, digest, &digest_size) >= 0) {
+			print = raw_to_string(digest, digest_size);
 
 			printf(" # PGP Key version: %d\n",
 			       gnutls_openpgp_key_get_version(crt));
 
 			bits = 0;
 			algo =
-			    gnutls_openpgp_key_get_pk_algorithm(crt, &bits);
+			    gnutls_openpgp_key_get_pk_algorithm(crt,
+								&bits);
 
 			printf(" # PGP Key public key algorithm: ");
-			cstr = SU(gnutls_pk_algorithm_get_name( algo));
+			cstr = SU(gnutls_pk_algorithm_get_name(algo));
 			printf("%s (%d bits)\n", cstr, bits);
 
 			if (print != NULL)
-				printf(" # PGP Key fingerprint: %s\n", print);
+				printf(" # PGP Key fingerprint: %s\n",
+				       print);
 
 			name_len = sizeof(name);
-			if (gnutls_openpgp_key_get_name(crt, 0, name, &name_len) < 0) {
+			if (gnutls_openpgp_key_get_name
+			    (crt, 0, name, &name_len) < 0) {
 				fprintf(stderr,
 					"Could not extract name\n");
 			} else {
@@ -330,8 +435,8 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 			}
 
 		}
-		
-		gnutls_openpgp_key_deinit( crt);
+
+		gnutls_openpgp_key_deinit(crt);
 
 	}
 }
@@ -355,7 +460,7 @@ void print_cert_vrfy(gnutls_session session)
 		return;
 	}
 
-	if (gnutls_certificate_type_get(session)==GNUTLS_CRT_X509) {
+	if (gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
 		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
 			printf("- Peer's certificate issuer is unknown\n");
 		if (status & GNUTLS_CERT_INVALID)
@@ -368,11 +473,12 @@ void print_cert_vrfy(gnutls_session session)
 		else
 			printf("- Peer's key is valid\n");
 		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
-			printf("- Could not find a signer of the peer's key\n");
+			printf
+			    ("- Could not find a signer of the peer's key\n");
 	}
 }
 
-int print_info(gnutls_session session, const char* hostname)
+int print_info(gnutls_session session, const char *hostname)
 {
 	const char *tmp;
 	gnutls_credentials_type cred;
@@ -421,11 +527,12 @@ int print_info(gnutls_session session, const char* hostname)
 		print_cert_info(session, hostname);
 
 		print_cert_vrfy(session);
- 
+
 	}
 
 	tmp =
-	    SU(gnutls_protocol_get_name(gnutls_protocol_get_version(session)));
+	    SU(gnutls_protocol_get_name
+	       (gnutls_protocol_get_version(session)));
 	printf("- Version: %s\n", tmp);
 
 	tmp = SU(gnutls_kx_get_name(kx));
@@ -437,15 +544,17 @@ int print_info(gnutls_session session, const char* hostname)
 	tmp = SU(gnutls_mac_get_name(gnutls_mac_get(session)));
 	printf("- MAC: %s\n", tmp);
 
-	tmp = SU(gnutls_compression_get_name(gnutls_compression_get(session)));
+	tmp =
+	    SU(gnutls_compression_get_name
+	       (gnutls_compression_get(session)));
 	printf("- Compression: %s\n", tmp);
 
-	fflush (stdout);
+	fflush(stdout);
 
 	return 0;
 }
 
-void print_cert_info(gnutls_session session, const char* hostname)
+void print_cert_info(gnutls_session session, const char *hostname)
 {
 
 	printf("- Certificate type: ");
@@ -508,19 +617,19 @@ void print_list(void)
 
 void print_license(void)
 {
-fputs(	"\nCopyright (C) 2004 Free Software Foundation\n"
-	"This program is free software; you can redistribute it and/or modify \n"
-	"it under the terms of the GNU General Public License as published by \n"
-	"the Free Software Foundation; either version 2 of the License, or \n"
-	"(at your option) any later version. \n" "\n"
-	"This program is distributed in the hope that it will be useful, \n"
-	"but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
-	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
-	"GNU General Public License for more details. \n" "\n"
-	"You should have received a copy of the GNU General Public License \n"
-	"along with this program; if not, write to the Free Software \n"
-	"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n",
-	stdout);
+	fputs("\nCopyright (C) 2004 Free Software Foundation\n"
+	      "This program is free software; you can redistribute it and/or modify \n"
+	      "it under the terms of the GNU General Public License as published by \n"
+	      "the Free Software Foundation; either version 2 of the License, or \n"
+	      "(at your option) any later version. \n" "\n"
+	      "This program is distributed in the hope that it will be useful, \n"
+	      "but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
+	      "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
+	      "GNU General Public License for more details. \n" "\n"
+	      "You should have received a copy of the GNU General Public License \n"
+	      "along with this program; if not, write to the Free Software \n"
+	      "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n",
+	      stdout);
 }
 
 void parse_protocols(char **protocols, int protocols_size,
@@ -532,11 +641,14 @@ void parse_protocols(char **protocols, int protocols_size,
 		for (j = i = 0; i < protocols_size; i++) {
 			if (strncasecmp(protocols[i], "SSL", 3) == 0)
 				protocol_priority[j++] = GNUTLS_SSL3;
-			else if (strncasecmp(protocols[i], "TLS1.1", 6) == 0)
+			else if (strncasecmp(protocols[i], "TLS1.1", 6) ==
+				 0)
 				protocol_priority[j++] = GNUTLS_TLS1_1;
 			else if (strncasecmp(protocols[i], "TLS", 3) == 0)
 				protocol_priority[j++] = GNUTLS_TLS1_0;
-			else fprintf(stderr, "Unknown protocol: '%s'\n", protocols[i]);
+			else
+				fprintf(stderr, "Unknown protocol: '%s'\n",
+					protocols[i]);
 		}
 		protocol_priority[j] = 0;
 	}
@@ -562,7 +674,9 @@ void parse_ciphers(char **ciphers, int nciphers, int *cipher_priority)
 				    GNUTLS_CIPHER_ARCFOUR_128;
 			else if (strncasecmp(ciphers[i], "NUL", 3) == 0)
 				cipher_priority[j++] = GNUTLS_CIPHER_NULL;
-			else fprintf(stderr, "Unknown cipher: '%s'\n", ciphers[i]);
+			else
+				fprintf(stderr, "Unknown cipher: '%s'\n",
+					ciphers[i]);
 		}
 		cipher_priority[j] = 0;
 	}
@@ -579,7 +693,9 @@ void parse_macs(char **macs, int nmacs, int *mac_priority)
 				mac_priority[j++] = GNUTLS_MAC_RMD160;
 			else if (strncasecmp(macs[i], "SHA", 3) == 0)
 				mac_priority[j++] = GNUTLS_MAC_SHA;
-			else fprintf(stderr, "Unknown MAC: '%s'\n", macs[i]);
+			else
+				fprintf(stderr, "Unknown MAC: '%s'\n",
+					macs[i]);
 		}
 		mac_priority[j] = 0;
 	}
@@ -595,7 +711,10 @@ void parse_ctypes(char **ctype, int nctype, int *cert_type_priority)
 				    GNUTLS_CRT_OPENPGP;
 			else if (strncasecmp(ctype[i], "X", 1) == 0)
 				cert_type_priority[j++] = GNUTLS_CRT_X509;
-			else fprintf(stderr, "Unknown certificate type: '%s'\n", ctype[i]);
+			else
+				fprintf(stderr,
+					"Unknown certificate type: '%s'\n",
+					ctype[i]);
 		}
 		cert_type_priority[j] = 0;
 	}
@@ -622,7 +741,10 @@ void parse_kx(char **kx, int nkx, int *kx_priority)
 				kx_priority[j++] = GNUTLS_KX_DHE_DSS;
 			else if (strncasecmp(kx[i], "ANON", 4) == 0)
 				kx_priority[j++] = GNUTLS_KX_ANON_DH;
-			else fprintf(stderr, "Unknown key exchange: '%s'\n", kx[i]);
+			else
+				fprintf(stderr,
+					"Unknown key exchange: '%s'\n",
+					kx[i]);
 		}
 		kx_priority[j] = 0;
 	}
@@ -641,7 +763,10 @@ void parse_comp(char **comp, int ncomp, int *comp_priority)
 				comp_priority[j++] = GNUTLS_COMP_DEFLATE;
 			else if (strncasecmp(comp[i], "LZO", 3) == 0)
 				comp_priority[j++] = GNUTLS_COMP_LZO;
-			else fprintf(stderr, "Unknown compression: '%s'\n", comp[i]);
+			else
+				fprintf(stderr,
+					"Unknown compression: '%s'\n",
+					comp[i]);
 		}
 		comp_priority[j] = 0;
 	}
@@ -658,31 +783,30 @@ void parse_comp(char **comp, int ncomp, int *comp_priority)
 # include <arpa/inet.h>
 #endif
 
-const char *inet_ntop(int af, const void *src,
-                             char *dst, size_t cnt) 
+const char *inet_ntop(int af, const void *src, char *dst, size_t cnt)
 {
-char* ret;
+	char *ret;
 
-	ret = inet_ntoa( *((struct in_addr*)src));
-	
+	ret = inet_ntoa(*((struct in_addr *) src));
+
 	if (ret == NULL || strlen(ret) > cnt) {
 		return NULL;
 	}
-	strcpy( dst, ret);
+	strcpy(dst, ret);
 
 	return dst;
 }
 #endif
 
-void sockets_init( void)
+void sockets_init(void)
 {
 #ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
 
-        wVersionRequested = MAKEWORD(1, 1);
-        if (WSAStartup(wVersionRequested, &wsaData) != 0) {
-              perror("WSA_STARTUP_ERROR");
-        }
+	wVersionRequested = MAKEWORD(1, 1);
+	if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+		perror("WSA_STARTUP_ERROR");
+	}
 #endif
 }

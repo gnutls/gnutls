@@ -31,6 +31,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_auth_int.h>
 #include <gnutls_state.h>
+#include <gnutls_datum.h>
 
 /* ANON & DHE */
 
@@ -59,12 +60,13 @@ void gnutls_dh_set_prime_bits(gnutls_session session, unsigned int bits)
 /**
   * gnutls_dh_get_group - This function returns the group of the DH authentication
   * @session: is a gnutls session
-  * @raw_gen: will hold the generator. To be treated as constant.
-  * @raw_prime: will hold the prime. To be treated as constant.
+  * @raw_gen: will hold the generator.
+  * @raw_prime: will hold the prime.
   *
   * This function will return the group parameters used in the last Diffie Hellman 
   * authentication with the peer. These are the prime and the generator used.
   * This function should be used for both anonymous and ephemeral diffie Hellman.
+  * The output parameters must be freed with gnutls_free().
   *
   * Returns a negative value in case of an error.
   *
@@ -73,6 +75,7 @@ int gnutls_dh_get_group(gnutls_session session,
 	gnutls_datum* raw_gen, gnutls_datum* raw_prime)
 {
 dh_info_t *dh;
+int ret;
 anon_server_auth_info_t anon_info;
 cert_auth_info_t cert_info;
 
@@ -94,11 +97,18 @@ cert_auth_info_t cert_info;
 			return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	raw_prime->data = dh->prime;
-	raw_prime->size = dh->prime_size;
+	ret = _gnutls_set_datum( raw_prime, dh->prime, dh->prime_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-	raw_gen->data = dh->generator;
-	raw_gen->size = dh->generator_size;
+	ret = _gnutls_set_datum( raw_gen, dh->generator, dh->generator_size);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum( raw_prime);
+		return ret;
+	}
 
 	return 0;
 }
@@ -106,15 +116,16 @@ cert_auth_info_t cert_info;
 /**
   * gnutls_dh_get_pubkey - This function returns the peer's public key used in DH authentication
   * @session: is a gnutls session
-  * @raw_key: will hold the public key. To be treated as constant.
+  * @raw_key: will hold the public key.
   *
   * This function will return the peer's public key used in the last Diffie Hellman authentication.
   * This function should be used for both anonymous and ephemeral diffie Hellman.
+  * The output parameters must be freed with gnutls_free().
   *
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_pubkey(gnutls_session session, gnutls_datum* key)
+int gnutls_dh_get_pubkey(gnutls_session session, gnutls_datum* raw_key)
 {
 dh_info_t* dh;
 anon_server_auth_info_t anon_info;
@@ -141,38 +152,46 @@ cert_auth_info_t cert_info;
 			return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	key->data = dh->public_key;
-	key->size = dh->public_key_size;
-	
-	return 0;
+	return _gnutls_set_datum( raw_key, dh->public_key, dh->public_key_size);
 }
 
 /**
   * gnutls_rsa_export_get_modulus - This function returns the peer's modulus used in RSA-EXPORT authentication
   * @session: is a gnutls session
-  * @exp: will hold the exponent. To be treated as constant.
-  * @mod: will hold the modulus. To be treated as constant.
+  * @exp: will hold the exponent.
+  * @mod: will hold the modulus.
   *
   * This function will return the peer's modulus used in the last RSA-EXPORT authentication.
+  * The output parameters must be freed with gnutls_free().
   *
   * Returns a negative value in case of an error.
   *
   **/
 int gnutls_rsa_export_get_pubkey(gnutls_session session, gnutls_datum* exp, gnutls_datum* mod)
 {
-cert_auth_info_t cert_info;
+cert_auth_info_t info;
+int ret;
 
 	if ( gnutls_auth_get_type( session) == GNUTLS_CRD_CERTIFICATE) {
-		cert_info = _gnutls_get_auth_info(session);
-		if (cert_info == NULL)
+		info = _gnutls_get_auth_info(session);
+		if (info == NULL)
 			return GNUTLS_E_INTERNAL_ERROR;
-			
-		mod->data = cert_info->rsa_export.modulus;
-		mod->size = cert_info->rsa_export.modulus_size;
 
-		exp->data = cert_info->rsa_export.exponent;
-		exp->size = cert_info->rsa_export.exponent_size;
-		
+		ret = _gnutls_set_datum( mod, info->rsa_export.modulus, 
+			info->rsa_export.modulus_size);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		ret = _gnutls_set_datum( exp, info->rsa_export.exponent,
+			info->rsa_export.exponent_size);
+		if (ret < 0) {
+			gnutls_assert();
+			_gnutls_free_datum( mod);
+			return ret;
+		}
+			
 		return 0;
 	}
 

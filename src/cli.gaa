@@ -44,6 +44,8 @@ option (p, port) INT "integer" { $port = $1 } "The port to connect to."
 #int record_size;
 option (recordsize) INT "integer" { $record_size = $1 } "The maximum record size to advertize."
 
+#int verbose;
+option (V, verbose) { $verbose = 1 } "More verbose output."
 
 #int nciphers;
 #char **ciphers;
@@ -116,6 +118,6 @@ init { $resume=0; $port=443; $rest_args=NULL; $ciphers=NULL;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL; $disable_extensions = 0;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $crlf = 0; $xml = 0;
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 
-	$debug = 0; $print_cert = 0; }
+	$debug = 0; $print_cert = 0; $verbose = 0; }
 
 

@@ -131,7 +131,11 @@ int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag)
   * @indx: The element of the bag to get the data from
   * @data: where the bag's data will be. Should be treated as constant.
   *
-  * This function will return the bag's data. 
+  * This function will return the bag's data. The data is a constant
+  * that is stored into the bag. Should not be accessed after the bag
+  * is deleted.
+  *
+  * Returns 0 on success and a negative error code on error.
   *
   **/
 int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum * data)

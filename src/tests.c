@@ -41,8 +41,7 @@ extern gnutls_srp_client_credentials srp_cred;
 extern gnutls_anon_client_credentials anon_cred;
 extern gnutls_certificate_credentials xcred;
 
-extern int more_info;
-static int dh_bits;
+extern int verbose;
 
 int tls1_ok = 0;
 int ssl3_ok = 0;
@@ -65,7 +64,7 @@ int ret, alert;
 	
 		handshake_output = ret;
 
-		if (ret < 0 && more_info > 1) {
+		if (ret < 0 && verbose > 1) {
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 				alert = gnutls_alert_get( session);
@@ -75,7 +74,7 @@ int ret, alert;
 			}
 		}
 
-		if (ret < 0) return GFAILED;
+		if (ret < 0) return TEST_FAILED;
 
 		gnutls_session_get_data(session, NULL, &session_data_size);
 		
@@ -94,7 +93,7 @@ int ret, alert;
 		session_id_size = sizeof( session_id);
 		gnutls_session_get_id(session, session_id, &session_id_size);
 
-		return SUCCEED;
+		return TEST_SUCCEED;
 }
 
 static int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
@@ -197,7 +196,7 @@ int _test_srp_username_callback( gnutls_session session, unsigned int times,
 	return -1;
 }
 
-int test_srp( gnutls_session session) {
+test_code_t test_srp( gnutls_session session) {
 int ret;
 
 		ADD_ALL_CIPHERS(session);
@@ -208,20 +207,25 @@ int ret;
 
 		ADD_KX(session, GNUTLS_KX_SRP);
 		srp_detected = 0;
+	
+		gnutls_srp_set_client_credentials_function(srp_cred,
+			_test_srp_username_callback);
 
 		gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 
 		ret = do_handshake( session);
 		
-		if (srp_detected != 0) return SUCCEED;
-		else return GFAILED;
+		gnutls_srp_set_client_credentials_function(srp_cred, NULL);
+		
+		if (srp_detected != 0) return TEST_SUCCEED;
+		else return TEST_FAILED;
 }
 #endif
 
 static int export_true = 0;
 static gnutls_datum exp = { NULL, 0 }, mod = {NULL, 0};
 
-int test_export( gnutls_session session) 
+test_code_t test_export( gnutls_session session) 
 {
 int ret;
 
@@ -236,7 +240,7 @@ int ret;
 
 	ret = do_handshake( session);
 	
-	if (ret == SUCCEED) {
+	if (ret == TEST_SUCCEED) {
 		export_true = 1;
 		gnutls_rsa_export_get_pubkey( session, &exp, &mod);
 	}
@@ -244,15 +248,14 @@ int ret;
 	return ret;
 }
 
-int test_export_info( gnutls_session session) 
+test_code_t test_export_info( gnutls_session session) 
 {
 int ret2, ret;
 gnutls_datum exp2, mod2;
 const char* print;
 
-	if (more_info == 0) return SUCCEED;
-	if (export_true == 0) return GFAILED;
-
+	if (verbose == 0 || export_true==0) return TEST_IGNORE;
+	
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
 	ADD_ALL_PROTOCOLS(session);
@@ -264,7 +267,7 @@ const char* print;
 
 	ret = do_handshake( session);
 
-	if (ret == SUCCEED) {
+	if (ret == TEST_SUCCEED) {
 		ret2 = gnutls_rsa_export_get_pubkey( session, &exp2, &mod2);
 		if (ret2 >= 0) {
 			printf("\n");
@@ -291,7 +294,7 @@ const char* print;
 
 static gnutls_datum pubkey = { NULL , 0 };
 
-int test_dhe( gnutls_session session) 
+test_code_t test_dhe( gnutls_session session) 
 {
 int ret;
 
@@ -305,21 +308,19 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	dh_bits = gnutls_dh_get_prime_bits( session);
-	if (dh_bits < 0) dh_bits = 0;
 	
 	gnutls_dh_get_pubkey( session, &pubkey);
 
 	return ret;
 }
 
-int test_dhe_group( gnutls_session session) 
+test_code_t test_dhe_group( gnutls_session session) 
 {
 int ret, ret2;
 gnutls_datum gen, prime, pubkey2;
 const char* print;
 
-	if (more_info == 0) return SUCCEED;
+	if (verbose == 0 || pubkey.data==NULL) return TEST_IGNORE;
 
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -357,7 +358,7 @@ const char* print;
 	return ret;
 }
 
-int test_ssl3( gnutls_session session) 
+test_code_t test_ssl3( gnutls_session session) 
 {
 int ret;
 	ADD_ALL_CIPHERS(session);
@@ -369,7 +370,7 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret==SUCCEED) ssl3_ok = 1;
+	if (ret==TEST_SUCCEED) ssl3_ok = 1;
 	
 	return ret;
 }
@@ -380,7 +381,7 @@ void got_alarm(int k)
 	alrm = 1;
 }
 	
-int test_bye( gnutls_session session) {
+test_code_t test_bye( gnutls_session session) {
 int ret;
 char data[20];
 int old, secs = 6;
@@ -398,10 +399,10 @@ int old, secs = 6;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret==GFAILED) return ret;
+	if (ret==TEST_FAILED) return ret;
 	
 	ret = gnutls_bye( session, GNUTLS_SHUT_WR);
-	if (ret<0) return GFAILED;
+	if (ret<0) return TEST_FAILED;
 	
 #ifndef _WIN32
 	old = siginterrupt( SIGALRM, 1);
@@ -421,16 +422,16 @@ int old, secs = 6;
 		WSAGetLastError() == WSAECONNABORTED)
 		alrm = 1;
 #endif
-	if (ret==0) return SUCCEED;
+	if (ret==0) return TEST_SUCCEED;
 
-	if (alrm == 0) return UNSURE;
+	if (alrm == 0) return TEST_UNSURE;
 	
-	return GFAILED;
+	return TEST_FAILED;
 }
 
 
 
-int test_aes( gnutls_session session) {
+test_code_t test_aes( gnutls_session session) {
 int ret;
 	ADD_CIPHER(session, GNUTLS_CIPHER_AES_128_CBC);
 	ADD_ALL_COMP(session);
@@ -444,7 +445,7 @@ int ret;
 	return ret;
 }
 
-int test_openpgp1( gnutls_session session) {
+test_code_t test_openpgp1( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -455,15 +456,15 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret==GFAILED) return ret;
+	if (ret==TEST_FAILED) return ret;
 
 	if ( gnutls_certificate_type_get(session) == GNUTLS_CRT_OPENPGP)
-		return SUCCEED;
+		return TEST_SUCCEED;
 
-	return GFAILED;
+	return TEST_FAILED;
 }
 
-int test_unknown_ciphersuites( gnutls_session session) {
+test_code_t test_unknown_ciphersuites( gnutls_session session) {
 int ret;
 	ADD_CIPHER3(session, GNUTLS_CIPHER_AES_128_CBC,
 		GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128);
@@ -478,7 +479,7 @@ int ret;
 	return ret;
 }
 
-int test_md5( gnutls_session session) {
+test_code_t test_md5( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -493,7 +494,7 @@ int ret;
 }
 
 #ifdef HAVE_LIBZ
-int test_zlib( gnutls_session session) {
+test_code_t test_zlib( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_COMP(session, GNUTLS_COMP_ZLIB);
@@ -508,7 +509,7 @@ int ret;
 }
 #endif
 
-int test_lzo( gnutls_session session) {
+test_code_t test_lzo( gnutls_session session) {
 int ret;
 	gnutls_handshake_set_private_extensions( session, 1);
 
@@ -525,7 +526,7 @@ int ret;
 	return ret;
 }
 
-int test_sha( gnutls_session session) 
+test_code_t test_sha( gnutls_session session) 
 {
 int ret;
 	ADD_ALL_CIPHERS(session);
@@ -540,7 +541,7 @@ int ret;
 	return ret;
 }
 
-int test_rmd( gnutls_session session) 
+test_code_t test_rmd( gnutls_session session) 
 {
 int ret;
 	ADD_ALL_CIPHERS(session);
@@ -555,7 +556,7 @@ int ret;
 	return ret;
 }
 
-int test_3des( gnutls_session session) 
+test_code_t test_3des( gnutls_session session) 
 {
 int ret;
 	ADD_CIPHER(session, GNUTLS_CIPHER_3DES_CBC);
@@ -570,7 +571,7 @@ int ret;
 	return ret;
 }
 
-int test_arcfour( gnutls_session session) {
+test_code_t test_arcfour( gnutls_session session) {
 int ret;
 	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_128);
 	ADD_ALL_COMP(session);
@@ -584,7 +585,7 @@ int ret;
 	return ret;
 }
 
-int test_arcfour_40( gnutls_session session) {
+test_code_t test_arcfour_40( gnutls_session session) {
 int ret;
 	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
 	ADD_ALL_COMP(session);
@@ -598,7 +599,7 @@ int ret;
 	return ret;
 }
 
-int test_tls1( gnutls_session session) 
+test_code_t test_tls1( gnutls_session session) 
 {
 int ret;
 	ADD_ALL_CIPHERS(session);
@@ -610,13 +611,13 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret==SUCCEED) tls1_ok = 1;
+	if (ret==TEST_SUCCEED) tls1_ok = 1;
 
 	return ret;
 
 }
 
-int test_tls1_1( gnutls_session session) 
+test_code_t test_tls1_1( gnutls_session session) 
 {
 int ret;
 	ADD_ALL_CIPHERS(session);
@@ -628,15 +629,17 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret==SUCCEED) tls1_1_ok = 1;
+	if (ret==TEST_SUCCEED) tls1_1_ok = 1;
 
 	return ret;
 
 }
 
-int test_tls1_1_fallback( gnutls_session session) 
+test_code_t test_tls1_1_fallback( gnutls_session session) 
 {
 int ret;
+	if (tls1_1_ok) return TEST_IGNORE;
+
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
@@ -645,25 +648,25 @@ int ret;
 	ADD_ALL_KX(session);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	if (tls1_1_ok) return UNSURE;
-
 	ret = do_handshake( session);
-	if (ret!=SUCCEED) return GFAILED;
+	if (ret!=TEST_SUCCEED) return TEST_FAILED;
 
 	if (gnutls_protocol_get_version( session)==GNUTLS_TLS1)
-		return SUCCEED;
+		return TEST_SUCCEED;
 	else if (gnutls_protocol_get_version( session)==GNUTLS_SSL3)
-		return UNSURE;
+		return TEST_UNSURE;
 
-	return GFAILED;
+	return TEST_FAILED;
 
 }
 
 /* Advertize both TLS 1.0 and SSL 3.0. If the connection fails,
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
-int test_tls_disable( gnutls_session session) {
+test_code_t test_tls_disable( gnutls_session session) {
 int ret;
+	if (tls1_ok!=0) return TEST_IGNORE;	
+
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
@@ -673,7 +676,7 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret==GFAILED) {
+	if (ret==TEST_FAILED) {
 		/* disable TLS 1.0 */
 		if (ssl3_ok!=0) {
 			protocol_priority[0] = GNUTLS_SSL3;
@@ -684,7 +687,7 @@ int ret;
 
 }
 
-int test_rsa_pms( gnutls_session session) {
+test_code_t test_rsa_pms( gnutls_session session) {
 int ret;
 
 	/* here we enable both SSL 3.0 and TLS 1.0
@@ -701,13 +704,13 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret == GFAILED) return GFAILED;
+	if (ret == TEST_FAILED) return TEST_FAILED;
 
-	if (gnutls_protocol_get_version(session)==GNUTLS_TLS1) return SUCCEED;
-	return UNSURE;
+	if (gnutls_protocol_get_version(session)==GNUTLS_TLS1) return TEST_SUCCEED;
+	return TEST_UNSURE;
 }
 
-int test_max_record_size( gnutls_session session) {
+test_code_t test_max_record_size( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -719,15 +722,15 @@ int ret;
 	gnutls_record_set_max_size( session, 512);
 
 	ret = do_handshake( session);
-	if (ret == GFAILED) return ret;
+	if (ret == TEST_FAILED) return ret;
 
 	ret = gnutls_record_get_max_size(session);
-	if (ret==512) return SUCCEED;
+	if (ret==512) return TEST_SUCCEED;
 	
-	return GFAILED;
+	return TEST_FAILED;
 }
 
-int test_hello_extension( gnutls_session session) {
+test_code_t test_hello_extension( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -745,9 +748,10 @@ int ret;
 void _gnutls_record_set_default_version(gnutls_session session, unsigned char major,
 	unsigned char minor);
 
-int test_version_rollback( gnutls_session session) {
+test_code_t test_version_rollback( gnutls_session session) 
+{
 int ret;
-	if (tls1_ok==0) return UNSURE;
+	if (tls1_ok==0) return TEST_IGNORE;
 
 	/* here we enable both SSL 3.0 and TLS 1.0
 	 * and we connect using a 3.1 client hello version,
@@ -766,19 +770,19 @@ int ret;
 	_gnutls_record_set_default_version( session, 3, 0);
 
 	ret = do_handshake( session);
-	if (ret!=SUCCEED) return ret;
+	if (ret!=TEST_SUCCEED) return ret;
 
 	if (tls1_ok!=0 && gnutls_protocol_get_version( session)==GNUTLS_SSL3)
-		return GFAILED;
+		return TEST_FAILED;
 	
-	return SUCCEED;
+	return TEST_SUCCEED;
 }
 
 /* See if the server tolerates out of bounds
  * record layer versions in the first client hello
  * message.
  */
-int test_version_oob( gnutls_session session) {
+test_code_t test_version_oob( gnutls_session session) {
 int ret;
 	/* here we enable both SSL 3.0 and TLS 1.0
 	 * and we connect using a 5.5 record version.
@@ -799,7 +803,7 @@ int ret;
 void _gnutls_rsa_pms_set_version(gnutls_session session, unsigned char major,
         unsigned char minor);
 
-int test_rsa_pms_version_check( gnutls_session session) 
+test_code_t test_rsa_pms_version_check( gnutls_session session) 
 {
 int ret;
 	/* here we use an arbitary version in the RSA PMS
@@ -822,7 +826,7 @@ int ret;
 }
 
 #ifdef ENABLE_ANON
-int test_anonymous( gnutls_session session) {
+test_code_t test_anonymous( gnutls_session session) {
 int ret;
 
 	ADD_ALL_CIPHERS(session);
@@ -834,20 +838,21 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
 
 	ret = do_handshake( session);
-	dh_bits = gnutls_dh_get_prime_bits( session);
-	if (dh_bits < 0) dh_bits = 0;
+
+	if (ret == TEST_SUCCEED)
+	gnutls_dh_get_pubkey( session, &pubkey);
 
 	return ret;
 }
 #endif
 
-int test_session_resume2( gnutls_session session) 
+test_code_t test_session_resume2( gnutls_session session) 
 {
 int ret;
 char tmp_session_id[32];
 int tmp_session_id_size;
 
-	if (session == NULL) return UNSURE;
+	if (session == NULL) return TEST_IGNORE;
 	
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -865,28 +870,29 @@ int tmp_session_id_size;
 	tmp_session_id_size = session_id_size;
 
 	ret = do_handshake( session);
-	if (ret == GFAILED) return ret;
+	if (ret == TEST_FAILED) return ret;
 
 	/* check if we actually resumed the previous session */
 
 	session_id_size = sizeof(session_id);
 	gnutls_session_get_id(session, session_id, &session_id_size);
 
-	if (gnutls_session_is_resumed( session)) return SUCCEED;
+	if (gnutls_session_is_resumed( session)) return TEST_SUCCEED;
 
 	if (memcmp(tmp_session_id, session_id, tmp_session_id_size) == 0)
-		return SUCCEED;
+		return TEST_SUCCEED;
 	else
-		return GFAILED;
+		return TEST_FAILED;
 
 }
 
 extern char* hostname;
 
-int test_certificate( gnutls_session session) {
+test_code_t test_certificate( gnutls_session session) 
+{
 int ret;
 
-	if (more_info == 0) return SUCCEED;
+	if (verbose == 0) return TEST_IGNORE;
 
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -898,12 +904,12 @@ int ret;
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( session);
-	if (ret == GFAILED) return ret;
+	if (ret == TEST_FAILED) return ret;
 
 	printf("\n");
 	print_cert_info( session, hostname);
 
-	return SUCCEED;
+	return TEST_SUCCEED;
 }
 
 /* A callback function to be used at the certificate selection time.
@@ -917,7 +923,7 @@ char issuer_dn[256];
 int i, ret;
 size_t len;
 
-	if (more_info == 0) return -1;
+	if (verbose == 0) return -1;
 
 	/* Print the server's trusted CAs
 	 */
@@ -944,11 +950,11 @@ size_t len;
 /* Prints the trusted server's CAs. This is only
  * if the server sends a certificate request packet.
  */
-int test_server_cas( gnutls_session session) 
+test_code_t test_server_cas( gnutls_session session) 
 {
 int ret;
 
-	if (more_info == 0) return SUCCEED;
+	if (verbose == 0) return TEST_IGNORE;
 
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -963,8 +969,8 @@ int ret;
 	ret = do_handshake( session);
         gnutls_certificate_client_set_retrieve_function( xcred, NULL);
 
-	if (ret ==GFAILED) return ret;
-	return SUCCEED;
+	if (ret ==TEST_FAILED) return ret;
+	return TEST_SUCCEED;
 }
 
 

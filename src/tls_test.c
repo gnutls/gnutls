@@ -59,7 +59,7 @@ gnutls_certificate_credentials xcred;
 /* end of global stuff */
 
 
-int more_info = 0;
+int verbose = 0;
 
 extern int tls1_ok;
 extern int tls1_1_ok;
@@ -70,7 +70,7 @@ static void tls_log_func( int level, const char* str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-typedef int (*TEST_FUNC)( gnutls_session);
+typedef test_code_t (*TEST_FUNC)( gnutls_session);
 
 typedef struct {
 	char* test_name;
@@ -103,13 +103,13 @@ static const TLS_TEST tls_tests[] = {
 	 */
 	{ "whether the server supports session resumption", test_session_resume2, "yes", "no", "dunno"},
 	{ "for export-grade ciphersuite support", test_export, "yes", "no", "dunno" },
-	{ "for export-grade ciphersuite info", test_export_info, "", "N/A", "N/A" },
+	{ "RSA-export ciphersuite info", test_export_info, "", "N/A", "N/A" },
 #ifdef ENABLE_ANON
 	{ "for anonymous authentication support", test_anonymous, "yes", "no", "dunno"},
-	{ "for anonymous Diffie Hellman group info", test_dhe_group, "", "N/A", "N/A" },
+	{ "anonymous Diffie Hellman group info", test_dhe_group, "", "N/A", "N/A" },
 #endif
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
-	{ "for ephemeral Diffie Hellman group info", test_dhe_group, "", "N/A", "N/A" },
+	{ "ephemeral Diffie Hellman group info", test_dhe_group, "", "N/A", "N/A" },
 	{ "for AES cipher support (TLS extension)", test_aes, "yes", "no", "dunno"},
 	{ "for 3DES cipher support", test_3des, "yes", "no", "dunno"},
 	{ "for ARCFOUR 128 cipher support", test_arcfour, "yes", "no", "dunno"},
@@ -196,8 +196,6 @@ int main(int argc, char **argv)
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_srp_set_client_credentials_function(srp_cred,
-		_test_srp_username_callback);
 #endif
 
 #ifdef ENABLE_ANON
@@ -225,15 +223,21 @@ int main(int argc, char **argv)
 		gnutls_init(&state, GNUTLS_CLIENT);
 		gnutls_transport_set_ptr(state, (gnutls_transport_ptr)sd);
 
-		printf("Checking %s...", tls_tests[i].test_name);
+		do {
+			printf("Checking %s...", tls_tests[i].test_name);
 
-		if ((ret=tls_tests[i].func( state)) == SUCCEED) {
-			printf(" %s\n", tls_tests[i].suc_str);
-			if (i==0) tls1_ok = 1;
-			if (i==1) ssl3_ok = 1;
-		} else if (ret==GFAILED)
-			printf(" %s\n", tls_tests[i].fail_str);
-		else printf(" %s\n", tls_tests[i].unsure_str);
+			ret = tls_tests[i].func( state);
+
+			if (ret == TEST_SUCCEED)
+				printf(" %s\n", tls_tests[i].suc_str);
+			else if (ret==TEST_FAILED)
+				printf(" %s\n", tls_tests[i].fail_str);
+			else if (ret == TEST_UNSURE) printf(" %s\n", tls_tests[i].unsure_str);
+			else if (ret == TEST_IGNORE) {
+				printf(" N/A\n");
+				i++;
+			}
+		} while( ret == TEST_IGNORE && tls_tests[i].test_name != NULL);
 
 		gnutls_deinit(state);
 
@@ -269,7 +273,7 @@ void gaa_parser(int argc, char **argv)
 
 	debug = info.debug;
 
-	more_info = info.more_info;
+	verbose = info.more_info;
 	
 }
 
