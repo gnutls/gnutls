@@ -36,6 +36,9 @@ typedef struct _oid2string {
 	int printable;
 } oid2string;
 
+/* This list contains all the OIDs that may be
+ * contained in a rdnSequence and are printable.
+ */
 static const oid2string _oid2str[] = {
 	{"2.5.4.6", "C", 0, 1},
 	{"2.5.4.12", "T", 1, 1},
@@ -51,12 +54,6 @@ static const oid2string _oid2str[] = {
 	{"0.9.2342.19200300.100.1.1", "UID", 0, 1}, /* FIXME: CHOICE? */
 	{"1.2.840.113549.1.9.1", "EMAIL", 0, 1},
 	{"1.2.840.113549.1.9.7", NULL, 1, 1},
-	{PKIX1_RSA_OID, NULL, 0, 0},
-
-	{RSA_MD5_OID, NULL, 0, 0},
-	{RSA_SHA1_OID, NULL, 0, 0},
-	{DSA_SHA1_OID, NULL, 0, 0},
-	{DSA_OID, NULL, 0, 0},
 	{NULL, NULL, 0, 0}
 };
 
