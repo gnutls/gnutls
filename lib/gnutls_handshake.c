@@ -516,7 +516,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		}
 		pos += session_id_len;
 
-		x = _gnutls_supported_ciphersuites(state, &cipher_suites);
+		x = _gnutls_supported_ciphersuites_sorted(state, &cipher_suites);
 		x *= sizeof(uint16); /* in order to get bytes */
 #ifdef WORDS_BIGENDIAN
 		memmove(&data[pos], &x, sizeof(uint16));

@@ -377,7 +377,9 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	uint16 n_Y;
 	size_t _n_Y;
 	uint8 *data;
+#ifdef HARD_DEBUG
 	int i;
+#endif
 	int datasize;
 	int ret = 0;
 	uint8 *premaster = NULL;

@@ -11,6 +11,7 @@ int   _gnutls_mac_count();
 /* functions for cipher suites */
 int   _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite algorithm);
 int   _gnutls_supported_ciphersuites(GNUTLS_STATE state, GNUTLS_CipherSuite **ciphers);
+int   _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state, GNUTLS_CipherSuite **ciphers);
 int   _gnutls_supported_compression_methods(GNUTLS_STATE state, CompressionMethod **comp);
 
 int   _gnutls_cipher_suite_count();
