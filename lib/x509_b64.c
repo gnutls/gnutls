@@ -251,7 +251,9 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
   * @result_size: holds the size of the result
   *
   * This function will convert the given data to printable data, using the base64 
-  * encoding. This is the encoding used in PEM messages.
+  * encoding. This is the encoding used in PEM messages. If the provided
+  * buffer is not long enough GNUTLS_E_INVALID_REQUEST is returned.
+  * 
   * 
   **/
 int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size) {

@@ -487,7 +487,7 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * This is specified in X509v3 Certificate Extensions. 
   * GNUTLS will return the Alternative name, or a negative
   * error code.
-  * Returns GNUTLS_E_MEMORY_ERROR if ret_size is not enough to hold the alternative name,
+  * Returns GNUTLS_E_INVALID_REQUEST if ret_size is not enough to hold the alternative name,
   * or the type of alternative name if everything was ok. The type is one of the
   * enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
   *
@@ -570,14 +570,18 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 	_gnutls_str_cat( nptr, sizeof(nptr), ext_data);
 
 	len = sizeof(ext_data);
-	if ((result =
-	     asn1_read_value(c2, nptr, ret, ret_size)) != ASN_OK) {
+
+	result =
+	     asn1_read_value(c2, nptr, ret, ret_size);
+	asn1_delete_structure(c2);
+	
+	if (result==ASN_MEM_ERROR)
+		return GNUTLS_E_INVALID_REQUEST;
+	
+	if (result != ASN_OK) {
 		gnutls_assert();
-		asn1_delete_structure(c2);
 		return result;
 	}
-
-	asn1_delete_structure(c2);
 
 	return type;
 }
@@ -960,6 +964,7 @@ static int _gnutls_check_key_cert_match( GNUTLS_CERTIFICATE_CREDENTIALS res) {
 
 /* Reads a DER encoded certificate list from memory and stores it to
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
+ * returns the number of certificates parsed (1)
  */
 static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
@@ -998,12 +1003,13 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 	*ncerts = i;
 
-	return 0;
+	return 1; /* one certificate parsed */
 }
 
 
 /* Reads a PKCS7 base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure.
+ * returns the number of certificate parsed
  */
 static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
@@ -1040,7 +1046,10 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 		/* if the current certificate is too long, just ignore
 		 * it. */
-		if (ret==GNUTLS_E_MEMORY_ERROR) continue;
+		if (ret==GNUTLS_E_MEMORY_ERROR) {
+			count--;
+			continue;
+		}
 		
 		if (ret >= 0) {
 			*cert_list =
@@ -1074,12 +1083,12 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	
 	*ncerts = i - 1;
 
-	return 0;
+	return count;
 }
 
 
 /* Reads a base64 encoded certificate list from memory and stores it to
- * a gnutls_cert structure.
+ * a gnutls_cert structure. Returns the number of certificate parsed.
  */
 static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
@@ -1088,7 +1097,7 @@ static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	opaque *b64;
 	const char *ptr;
 	gnutls_datum tmp;
-	int ret;
+	int ret, count;
 
 	if (strstr( input_cert, "-----BEGIN PKCS7")!=NULL) {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
@@ -1105,6 +1114,7 @@ static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	ptr = input_cert;
 	siz = input_cert_size;
 	i = *ncerts + 1;
+	count = 0;
 
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
@@ -1151,11 +1161,12 @@ static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts,
 			ptr++;
 
 		i++;
+		count++;
 	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
 
 	*ncerts = i - 1;
 
-	return 0;
+	return count;
 }
 
 
@@ -1197,7 +1208,7 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 		return ret;
 	}
 
-	return 0;
+	return ret;
 }
 
 /* Reads a base64 encoded CA list from memory 
@@ -1478,15 +1489,15 @@ opaque *pdata;
 int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum *CA,
 			     const gnutls_datum *CRL, GNUTLS_X509_CertificateFmt type)
 {
-	int ret;
+	int ret, ret2;
 
 	if ((ret = read_ca_mem(res, CA->data, CA->size, type)) < 0)
 		return ret;
 
-	if ((ret = generate_rdn_seq(res)) < 0)
-		return ret;
+	if ((ret2 = generate_rdn_seq(res)) < 0)
+		return ret2;
 
-	return 0;
+	return ret;
 }
 
 /**
@@ -1498,20 +1509,21 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, co
   *
   * This function sets the trusted CAs in order to verify client
   * certificates. This function may be called multiple times.
+  * Returns the number of certificate processed.
   *
   **/
 int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *CAFILE,
 			     char *CRLFILE, GNUTLS_X509_CertificateFmt type)
 {
-	int ret;
+	int ret, ret2;
 
 	if ((ret = read_ca_file(res, CAFILE, type)) < 0)
 		return ret;
 
-	if ((ret = generate_rdn_seq(res)) < 0)
-		return ret;
+	if ((ret2 = generate_rdn_seq(res)) < 0)
+		return ret2;
 
-	return 0;
+	return ret;
 }
 
 
@@ -2080,7 +2092,8 @@ int _gnutls_verify_x509_file( char *cafile)
   * @certificate_size: should hold the size of the certificate
   *
   * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
-  * Returns 0 on success.
+  * Returns 0 on success. If the provided buffer is not long enough,
+  * then GNUTLS_E_INVALID_REQUEST is returned.
   *
   **/
 int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size)
@@ -2222,7 +2235,7 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 			memcpy( certificate, &pcert[start], end);
 		else {
 			*certificate_size = end;
-			return GNUTLS_E_MEMORY_ERROR;
+			return GNUTLS_E_INVALID_REQUEST;
 		}
 
 		*certificate_size = end;
