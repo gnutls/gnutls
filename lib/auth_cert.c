@@ -466,6 +466,7 @@ cleanup:
 			for (i = 0; i < st.ncerts; i++) {
 				gnutls_x509_crt_deinit(st.cert.x509[i]);
 			}
+			gnutls_free( st.cert.x509);
 			gnutls_x509_privkey_deinit(st.key.x509);
 		}
 	} else {
