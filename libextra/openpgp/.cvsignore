@@ -8,3 +8,4 @@ gnutls.h.in
 Makefile
 .cvsignore
 pgp-api.tex
+pgp-api.texi

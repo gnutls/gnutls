@@ -3,6 +3,7 @@
 Makefile
 Makefile.in
 gnutls-extra-api.tex
+gnutls-extra-api.texi
 libgnutls-extra-config
 libgnutls-extra.la
 libgnutls-openssl.la

@@ -19,3 +19,7 @@ mdate-sh
 texinfo.tex
 version.texi
 stamp-*
+gnutls-api.texi
+gnutls-extra-api.texi
+pgp-api.texi
+x509-api.texi

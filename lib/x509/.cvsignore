@@ -12,3 +12,4 @@ Makefile
 *.bb
 *.bbg
 *.tex
+*.texi
