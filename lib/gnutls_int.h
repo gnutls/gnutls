@@ -245,7 +245,7 @@ typedef enum gnutls_pk_algorithm {
 
 typedef enum gnutls_sign_algorithm {
     GNUTLS_SIGN_RSA_SHA = 1, GNUTLS_SIGN_DSA_SHA,
-    GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2,
+    GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2, GNUTLS_SIGN_RSA_RMD160,
     GNUTLS_SIGN_UNKNOWN = 0xff
 } gnutls_sign_algorithm_t;
 
@@ -255,16 +255,14 @@ typedef void (*LOG_FUNC) (int, const char *);
 
 /* Pull & Push functions defines: 
  */
-typedef ssize_t(*gnutls_pull_func) (gnutls_transport_ptr_t, void *,
-				    size_t);
-typedef ssize_t(*gnutls_push_func) (gnutls_transport_ptr_t, const void *,
-				    size_t);
+typedef ssize_t(*gnutls_pull_func)(gnutls_transport_ptr_t, void *, size_t);
+typedef ssize_t(*gnutls_push_func)(gnutls_transport_ptr_t, const void *,size_t);
 
 
 /* Store & Retrieve functions defines: 
  */
 typedef int (*gnutls_db_store_func) (void *, gnutls_datum_t key,
-				     gnutls_datum_t data);
+     gnutls_datum_t data);
 typedef int (*gnutls_db_remove_func) (void *, gnutls_datum_t key);
 typedef gnutls_datum_t(*gnutls_db_retr_func) (void *, gnutls_datum_t key);
 

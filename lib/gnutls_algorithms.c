@@ -24,7 +24,7 @@
 #include "gnutls_algorithms.h"
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"
-
+#include <x509/common.h>
 
 /* Cred type mappings to KX algorithms 
  * FIXME: The mappings are not 1-1. Some KX such as SRP_RSA require
@@ -161,16 +161,18 @@ static const gnutls_cipher_entry algorithms[] = {
 
 struct gnutls_hash_entry {
     const char *name;
+    const char* oid;
     gnutls_mac_algorithm_t id;
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-    {"SHA", GNUTLS_MAC_SHA},
-    {"MD5", GNUTLS_MAC_MD5},
-    {"RIPEMD160", GNUTLS_MAC_RMD160},
-    {"NULL", GNUTLS_MAC_NULL},
-    {0, 0}
+    {"SHA", OID_SHA1, GNUTLS_MAC_SHA},
+    {"MD5", OID_MD5, GNUTLS_MAC_MD5},
+    {"MD2", OID_MD2, 0/*GNUTLS_MAC_MD2*/},
+    {"RIPEMD160", OID_RMD160, GNUTLS_MAC_RMD160},
+    {"NULL", "", GNUTLS_MAC_NULL},
+    {0, 0, 0}
 };
 
 #define GNUTLS_HASH_LOOP(b) \
@@ -521,6 +523,27 @@ const char *gnutls_mac_get_name(gnutls_mac_algorithm_t algorithm)
 
     return ret;
 }
+
+const char *_gnutls_x509_mac_to_oid(gnutls_mac_algorithm_t algorithm)
+{
+    const char *ret = NULL;
+
+    /* avoid prefix */
+    GNUTLS_HASH_ALG_LOOP(ret = p->oid);
+
+    return ret;
+}
+
+gnutls_mac_algorithm_t _gnutls_x509_oid2mac_algorithm(const char *oid)
+{
+gnutls_mac_algorithm_t ret = 0;
+
+    GNUTLS_HASH_LOOP(if (strcmp(oid, p->oid)==0) {ret = p->id;break;});
+
+    if (ret == 0) return GNUTLS_MAC_UNKNOWN;
+    return ret;
+}
+
 
 int _gnutls_mac_is_ok(gnutls_mac_algorithm_t algorithm)
 {
@@ -1390,16 +1413,20 @@ enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm_t
  */
 struct gnutls_sign_entry {
     const char *name;
+    const char* oid;
     gnutls_sign_algorithm_t id;
+    gnutls_pk_algorithm_t pk;
+    gnutls_mac_algorithm_t mac;
 };
 typedef struct gnutls_sign_entry gnutls_sign_entry;
 
 static const gnutls_sign_entry sign_algorithms[] = {
-    {"RSA-SHA", GNUTLS_SIGN_RSA_SHA},
-    {"DSA-SHA", GNUTLS_SIGN_DSA_SHA},
-    {"RSA-MD5", GNUTLS_SIGN_RSA_MD5},
-    {"RSA-MD2", GNUTLS_SIGN_RSA_MD2},
-    {0, 0}
+    {"RSA-SHA", RSA_SHA1_OID, GNUTLS_SIGN_RSA_SHA, GNUTLS_PK_RSA, GNUTLS_MAC_SHA},
+    {"RSA-RMD160", RSA_RMD160_OID, GNUTLS_SIGN_RSA_RMD160, GNUTLS_PK_RSA, GNUTLS_MAC_RMD160},
+    {"DSA-SHA", DSA_SHA1_OID, GNUTLS_SIGN_DSA_SHA, GNUTLS_PK_DSA, GNUTLS_MAC_SHA},
+    {"RSA-MD5", RSA_MD5_OID, GNUTLS_SIGN_RSA_MD5, GNUTLS_PK_RSA, GNUTLS_MAC_MD5},
+    {"RSA-MD2", RSA_MD2_OID, GNUTLS_SIGN_RSA_MD2, GNUTLS_PK_RSA, 0/*GNUTLS_MAC_MD2*/},
+    {0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_SIGN_LOOP(b) \
@@ -1407,7 +1434,7 @@ static const gnutls_sign_entry sign_algorithms[] = {
                 for(p = sign_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_SIGN_ALG_LOOP(a) \
-                        GNUTLS_SIGN_LOOP( if(p->id == algorithm) { a; break; } )
+                        GNUTLS_SIGN_LOOP( if(p->id == sign) { a; break; } )
 
 
 
@@ -1419,7 +1446,7 @@ static const gnutls_sign_entry sign_algorithms[] = {
   * of the specified sign algorithm or NULL.
   **/
 const char *gnutls_sign_algorithm_get_name(gnutls_sign_algorithm_t
-					   algorithm)
+    sign)
 {
     const char *ret = NULL;
 
@@ -1429,18 +1456,56 @@ const char *gnutls_sign_algorithm_get_name(gnutls_sign_algorithm_t
     return ret;
 }
 
+gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid)
+{
+    gnutls_sign_algorithm_t ret = 0;
+
+    GNUTLS_SIGN_LOOP(if(strcmp(oid, p->oid)==0) {ret=p->id;break;});
+
+    if (ret == 0) {
+        _gnutls_x509_log("Unknown SIGN OID: '%s'\n", oid);
+        return GNUTLS_SIGN_UNKNOWN;
+    }
+    return ret;
+}
+
+gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign(gnutls_pk_algorithm_t pk,
+    gnutls_mac_algorithm_t mac)
+{
+gnutls_sign_algorithm_t ret = 0;
+
+    GNUTLS_SIGN_LOOP(if(pk==p->pk && mac==p->mac) {ret=p->id;break;});
+    
+    if (ret==0) return GNUTLS_SIGN_UNKNOWN;
+    return ret;
+}
+
+const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t pk,
+    gnutls_mac_algorithm_t mac)
+{
+gnutls_sign_algorithm_t sign;
+const char* ret;
+
+    sign = _gnutls_x509_pk_to_sign(pk, mac);
+
+    GNUTLS_SIGN_ALG_LOOP(ret=p->oid);
+    return ret;
+}
+
+
 /* pk algorithms;
  */
 struct gnutls_pk_entry {
     const char *name;
+    const char* oid;
     gnutls_pk_algorithm_t id;
 };
 typedef struct gnutls_pk_entry gnutls_pk_entry;
 
 static const gnutls_pk_entry pk_algorithms[] = {
-    {"RSA", GNUTLS_PK_RSA},
-    {"DSA", GNUTLS_PK_DSA},
-    {0, 0}
+    {"RSA", PKIX1_RSA_OID, GNUTLS_PK_RSA},
+    {"DSA", DSA_OID, GNUTLS_PK_DSA},
+    {0, 0, 0}
 };
 
 #define GNUTLS_PK_LOOP(b) \
@@ -1466,5 +1531,21 @@ const char *gnutls_pk_algorithm_get_name(gnutls_pk_algorithm_t algorithm)
     /* avoid prefix */
     GNUTLS_PK_ALG_LOOP(ret = p->name);
 
+    return ret;
+}
+
+gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm(const char *oid)
+{
+gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
+
+    GNUTLS_PK_LOOP(if (strcmp(p->oid,oid)==0) {ret = p->id; break;});
+    return ret;
+}
+
+const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm_t algorithm)
+{
+    const char *ret = NULL;
+
+    GNUTLS_PK_ALG_LOOP(ret = p->oid);
     return ret;
 }

@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#ifndef ALGORITHMS_H
+# define ALGORITHMS_H
+
 #include "gnutls_auth.h"
 
 /* functions for version */
@@ -37,6 +40,8 @@ const char *gnutls_mac_get_name(gnutls_mac_algorithm_t algorithm);
 int _gnutls_mac_is_ok(gnutls_mac_algorithm_t algorithm);
 int _gnutls_mac_priority(gnutls_session_t session,
 			 gnutls_mac_algorithm_t algorithm);
+gnutls_mac_algorithm_t _gnutls_x509_oid2mac_algorithm(const char *oid);
+const char *_gnutls_x509_mac_to_oid(gnutls_mac_algorithm_t mac);
 
 /* functions for cipher suites */
 int _gnutls_supported_ciphersuites(gnutls_session_t session,
@@ -48,15 +53,11 @@ int _gnutls_supported_compression_methods(gnutls_session_t session,
 
 const char *_gnutls_cipher_suite_get_name(cipher_suite_st * algorithm);
 gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo(const
-							       cipher_suite_st
-							       *
-							       algorithm);
+    cipher_suite_st* algorithm);
 gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo(const
-						       cipher_suite_st *
-						       algorithm);
+    cipher_suite_st * algorithm);
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo(const
-							 cipher_suite_st *
-							 algorithm);
+    cipher_suite_st *algorithm);
 gnutls_protocol_t _gnutls_cipher_suite_get_version(const cipher_suite_st *
 						   algorithm);
 cipher_suite_st _gnutls_cipher_suite_get_suite_name(cipher_suite_st *
@@ -64,7 +65,7 @@ cipher_suite_st _gnutls_cipher_suite_get_suite_name(cipher_suite_st *
 
 /* functions for ciphers */
 int _gnutls_cipher_priority(gnutls_session_t session,
-			    gnutls_cipher_algorithm_t algorithm);
+     gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_get_block_size(gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_block(gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_ok(gnutls_cipher_algorithm_t algorithm);
@@ -107,7 +108,9 @@ gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
 
 /* KX to PK mapping */
 gnutls_pk_algorithm_t _gnutls_map_pk_get_pk(gnutls_kx_algorithm_t
-					    kx_algorithm);
+    kx_algorithm);
+gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm(const char *oid);
+const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm_t pk);
 
 enum encipher_type { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };
 
@@ -134,3 +137,15 @@ struct gnutls_compression_entry {
     int comp_level;
 };
 typedef struct gnutls_compression_entry gnutls_compression_entry;
+
+/* sign algorithms stuff
+ */
+gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid);
+gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid);
+gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign(gnutls_pk_algorithm_t pk,
+    gnutls_mac_algorithm_t mac);
+const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t,
+    gnutls_mac_algorithm_t mac);
+
+
+#endif
