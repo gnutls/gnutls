@@ -8,7 +8,7 @@ Version 0.9.3
   the plain RSA.
 - The RSA premaster secret version check can no longer be disabled.
 - Implemented the counter measure discussed in the paper "Attacking
-  RSA-based Sessions in SSL/TLS", against the attack discussed in the
+  RSA-based Sessions in SSL/TLS", against the attack described in the
   same paper.
 - Added the functions: gnutls_handshake_get_last_in(), 
   gnutls_handshake_get_last_out().

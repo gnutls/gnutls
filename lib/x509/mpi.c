@@ -25,6 +25,7 @@
 #include <libtasn1.h>
 #include "common.h"
 #include "x509.h"
+#include <gnutls_num.h>
 #include "mpi.h"
 
 /*
@@ -321,4 +322,35 @@ int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
 
 	return 0;
 
+}
+
+/* this function reads a (small) unsigned integer
+ * from asn1 structs. Combines the read and the convertion
+ * steps.
+ */
+int _gnutls_x509_read_ui( ASN1_TYPE node, const char* value, 
+	opaque* tmpstr, int tmpstr_size, unsigned int* ret)
+{
+int len, result;
+
+	len = tmpstr_size;
+	result = asn1_read_value( node, value, tmpstr, &len);
+	if (result != ASN1_SUCCESS) {
+		return _gnutls_asn2err(result);
+	}
+
+	if (len == 1)
+		*ret = tmpstr[0];
+	else if (len == 2)
+		*ret = _gnutls_read_uint16(tmpstr);
+	else if (len == 3)
+		*ret = _gnutls_read_uint24(tmpstr);
+	else if (len == 4)
+		*ret = _gnutls_read_uint32(tmpstr);
+	else {
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	return 0;
 }

@@ -32,6 +32,7 @@
 #include <pkcs5.h>
 #include <privkey.h>
 #include <extensions.h>
+#include <mpi.h>
 #include <gnutls_algorithms.h>
 
 struct pbkdf2_params {
@@ -301,7 +302,7 @@ static ASN1_TYPE decode_private_key_info( const gnutls_datum* der, gnutls_x509_p
   * @format: One of DER or PEM
   * @pass: the password to decode
   *
-  * This function will convert the given DER or PEM encoded PKCS8 encrypted key
+  * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
   * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
   *
   * If the Certificate is PEM encoded it should have a header of "ENCRYPTED PRIVATE KEY".

@@ -9,3 +9,5 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
 	opaque * der, int* dersize);
 
+int _gnutls_x509_read_ui( ASN1_TYPE node, const char* value, 
+	opaque* tmpstr, int tmpstr_size, unsigned int* ret);
