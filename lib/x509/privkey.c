@@ -660,6 +660,7 @@ static int _encode_rsa( ASN1_TYPE* c2, MPI* params)
   * @key: should contain a gnutls_x509_privkey structure
   * @algo: is one of RSA or DSA.
   * @bits: the size of the modulus
+  * @flags: unused for now
   *
   * This function will generate a random private key. Note that
   * this function must be called on an empty private key.
@@ -668,7 +669,7 @@ static int _encode_rsa( ASN1_TYPE* c2, MPI* params)
   *
   **/
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
-	int bits)
+	int bits, unsigned int flags)
 {
 int ret;
 
