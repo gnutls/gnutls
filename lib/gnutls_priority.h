@@ -23,3 +23,4 @@ int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST);

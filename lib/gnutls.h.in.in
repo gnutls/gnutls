@@ -129,6 +129,7 @@ int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 
 /* set our version - 0 for TLS 1.0 and 1 for SSL3 */
 GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
@@ -208,6 +209,8 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, co
 
 int gnutls_certificate_set_x509_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
 int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT, const gnutls_datum* KEY);
+
+int gnutls_certificate_set_openpgp_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
 
 #define gnutls_certificate_free_server_sc gnutls_certificate_free_sc
 #define gnutls_certificate_allocate_server_sc gnutls_certificate_allocate_sc

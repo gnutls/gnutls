@@ -21,8 +21,7 @@
 #include "gnutls_int.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_errors.h"
-
-/* the prototypes for these are in gnutls.h */
+#include <gnutls_num.h>
 
 /**
   * gnutls_cipher_set_priority - Sets the priority on the ciphers supported by gnutls.
@@ -45,13 +44,7 @@ int num=0, i;
 		++_list;
 	} 
 
-	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
-		gnutls_free(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
-
-	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
-	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-		
+	num = GMIN( MAX_ALGOS, num);
 	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithms = num;
 	
 	for (i=0;i<num;i++) {
@@ -83,11 +76,7 @@ int num=0, i;
 	} 
 
 
-	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
-		gnutls_free(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
-	state->gnutls_internals.KXAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
-	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority==NULL)
-		return GNUTLS_E_MEMORY_ERROR;
+	num = GMIN( MAX_ALGOS, num);
 	state->gnutls_internals.KXAlgorithmPriority.algorithms = num;
 
 	for (i=0;i<num;i++) {
@@ -119,11 +108,7 @@ int num=0, i;
 	} 
 
 	
-	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
-		gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);	
-	state->gnutls_internals.MACAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
-	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority ==NULL)
-		return GNUTLS_E_MEMORY_ERROR;
+	num = GMIN( MAX_ALGOS, num);
 	state->gnutls_internals.MACAlgorithmPriority.algorithms = num;
 
 	for (i=0;i<num;i++) {
@@ -154,13 +139,9 @@ int num=0, i;
 		++_list;
 	} 
 	
-	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority!=NULL)
-		gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);	
-	state->gnutls_internals.CompressionMethodPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
-	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
+	num = GMIN( MAX_ALGOS, num);
 	state->gnutls_internals.CompressionMethodPriority.algorithms = num;
+
 	for (i=0;i<num;i++) {
 		state->gnutls_internals.CompressionMethodPriority.algorithm_priority[i] = list[i];
 	}
@@ -189,17 +170,9 @@ int num=0, i;
 	} 
 
 	
-	if (state->gnutls_internals.ProtocolPriority.algorithm_priority!=NULL)
-		gnutls_free(state->gnutls_internals.ProtocolPriority.algorithm_priority);
-
-	state->gnutls_internals.ProtocolPriority.algorithm_priority = gnutls_malloc(sizeof(int)*num);
-
-	if (state->gnutls_internals.ProtocolPriority.algorithm_priority == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	
+	num = GMIN( MAX_ALGOS, num);
 	state->gnutls_internals.ProtocolPriority.algorithms = num;
+
 	for (i=0;i<num;i++) {
 		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = list[i];
 	}
@@ -209,6 +182,38 @@ int num=0, i;
 	 */
 	if (num > 0)
 		_gnutls_set_current_version( state, state->gnutls_internals.ProtocolPriority.algorithm_priority[0]);
+
+	return 0;
+}
+
+/**
+  * gnutls_cert_type_set_priority - Sets the priority on the certificate types supported by gnutls.
+  * @state: is a &GNUTLS_STATE structure.
+  * @list: is a 0 terminated list of GNUTLS_CertificateType elements.
+  *
+  * Sets the priority on the certificate types supported by gnutls.
+  * Priority is higher for types specified before others.
+  * After specifying the types you want, you should add 0.
+  * Note that the certificate type priority is set on the client. 
+  * The server does not use the cert type priority except for disabling
+  * types that were not specified.
+  **/
+int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+GNUTLS_LIST _list = list;
+int num=0, i;
+
+	while( *_list != 0) {
+		num++;
+		++_list;
+	} 
+
+	
+	num = GMIN( MAX_ALGOS, num);
+	state->gnutls_internals.cert_type_priority.algorithms = num;
+
+	for (i=0;i<num;i++) {
+		state->gnutls_internals.cert_type_priority.algorithm_priority[i] = list[i];
+	}
 
 	return 0;
 }
