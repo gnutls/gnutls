@@ -99,21 +99,4 @@ int gnutls_global_init_extra(void);
  */
 const char* gnutls_extra_check_version( const char*);
 
-/* Defines for compatibility with previous versions.
- */
-#define GNUTLS_SRP_SERVER_CREDENTIALS gnutls_srp_server_credentials
-#define GNUTLS_SRP_CLIENT_CREDENTIALS gnutls_srp_client_credentials
-
-#define gnutls_srp_free_client_sc gnutls_srp_free_client_credentials
-#define gnutls_srp_allocate_client_sc gnutls_srp_allocate_client_credentials
-#define gnutls_srp_free_client_cred gnutls_srp_free_client_credentials
-#define gnutls_srp_allocate_client_cred gnutls_srp_allocate_client_credentials
-#define gnutls_srp_set_client_cred gnutls_srp_set_client_credentials
-
-#define gnutls_srp_free_server_sc gnutls_srp_free_server_credentials
-#define gnutls_srp_allocate_server_sc gnutls_srp_allocate_server_credentials
-#define gnutls_srp_free_server_cred gnutls_srp_free_server_credentials
-#define gnutls_srp_allocate_server_cred gnutls_srp_allocate_server_credentials
-#define gnutls_srp_set_server_cred_file gnutls_srp_set_server_credentials_file
-
 #endif
