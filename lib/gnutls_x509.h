@@ -17,3 +17,7 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime);
 
 int _gnutls_x509_attribute_type2string( const char* OID, void* value, 
 	int value_size, char * res, int res_size);
+
+const char* _gnutls_x509_oid2string( const char* OID);
+int _gnutls_x509_oid_data_printable( const char* OID);
+

@@ -106,9 +106,6 @@ static const gnutls_cipher_entry algorithms[] = {
                         GNUTLS_LOOP( if(p->id == algorithm) { a; break; } )
 
 
-#define GNUTLS_HASH_ENTRY(strname, name, hashsize) \
-	{ strname, name, hashsize }
-
 struct gnutls_hash_entry {
 	char *name;
 	MACAlgorithm id;
@@ -117,9 +114,9 @@ struct gnutls_hash_entry {
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-	GNUTLS_HASH_ENTRY("SHA", GNUTLS_MAC_SHA, 20),
-	GNUTLS_HASH_ENTRY("MD5", GNUTLS_MAC_MD5, 16),
-	GNUTLS_HASH_ENTRY("NULL", GNUTLS_MAC_NULL, 0),
+	{"SHA", GNUTLS_MAC_SHA, 20},
+	{"MD5", GNUTLS_MAC_MD5, 16},
+	{"NULL", GNUTLS_MAC_NULL, 0},
 	{0}
 };
 
@@ -431,7 +428,7 @@ const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm algorithm)
 
 	/* avoid prefix */
 	GNUTLS_HASH_ALG_LOOP(ret =
-			     p->name + sizeof("GNUTLS_MAC_") - 1);
+			     p->name);
 
 	return ret;
 }

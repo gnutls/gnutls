@@ -42,17 +42,17 @@ void print_x509_info(GNUTLS_STATE state)
 	time_t expiret = gnutls_certificate_expiration_time_peers(state);
 	time_t activet = gnutls_certificate_activation_time_peers(state);
 
- gnutls_datum xml; 
+/* gnutls_datum xml; */
 
 	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
 	if (cert_list_size <= 0)
 		return;
 
-
+/*
 gnutls_x509_get_certificate_xml( &cert_list[0], 0, &xml);
 fprintf(stderr, "%s\n", xml.data);
-//return 0;
+return 0;*/
 
 
 	printf(" - Certificate info:\n");
