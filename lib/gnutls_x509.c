@@ -115,12 +115,9 @@ ASN1_TYPE tmpasn;
 	res[0] = 0;
 
 	if (strcmp( OID, "2 5 4 6") == 0) {
-#ifdef DEBUG
-# warning " FIX COUNTRY HERE"
-#endif
-		ANAME = "X520OrganizationName";
+		ANAME = "X520countryName";
 		TYPE = "countryName";
-		CHOICE = 1;
+		CHOICE = 0;
 	} else 	if (strcmp( OID, "2 5 4 10") == 0) {
 		ANAME = "X520OrganizationName";
 		TYPE = "OrganizationName";
