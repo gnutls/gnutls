@@ -245,7 +245,7 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data, int datale
 static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque *data, int datalen)
 {
 	int x, i, j;
-	CompressionMethod *ciphers;
+	uint8 *ciphers;
 
 	x = _gnutls_supported_compression_methods(state, &ciphers);
 	memset(ret, '\0', sizeof(CompressionMethod));
@@ -476,7 +476,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	uint32 cur_time;
 	int pos = 0;
 	GNUTLS_CipherSuite *cipher_suites;
-	CompressionMethod *compression_methods;
+	uint8 *compression_methods;
 	int i, datalen, ret = 0;
 	uint16 x;
 
@@ -535,9 +535,11 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 				2);
 			pos += 2;
 		}
+		gnutls_free(cipher_suites);
 
 		z = _gnutls_supported_compression_methods
 		    (state, &compression_methods);
+
 		memmove(&data[pos++], &z, 1); /* put the number of compression methods */
 
 		datalen += z; 
@@ -547,7 +549,6 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 			memmove(&data[pos++], &compression_methods[i], 1);
 		}
 
-		gnutls_free(cipher_suites);
 		gnutls_free(compression_methods);
 
 		ret =
@@ -617,7 +618,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 	uint8 session_id_len = 0, z;
 	int pos = 0;
 	GNUTLS_CipherSuite cipher_suite, *cipher_suites;
-	CompressionMethod compression_method, *compression_methods;
+	uint8 compression_method, *compression_methods;
 	int i, ret=0;
 	uint16 x, sizeOfSuites;
 	GNUTLS_Version version;

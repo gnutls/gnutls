@@ -4,9 +4,9 @@
 
 /*
 #define HANDSHAKE_DEBUG
-#define HARD_DEBUG
 #define READ_DEBUG
 #define WRITE_DEBUG
+#define HARD_DEBUG
 #define DEBUG
 */
 
@@ -16,19 +16,19 @@
 
 /* for big numbers support */ /* FIXME */
 #include <gcrypt.h>
+#include <dmalloc.h>
 
 #define GNUTLS_MPI MPI
 #define gnutls_mpi_release mpi_release
 
 #define svoid void /* for functions that allocate using secure_free */
-#define secure_free free
+#define secure_free gnutls_free
 #define secure_malloc malloc
 #define secure_realloc realloc
 #define secure_calloc calloc
 #define gnutls_malloc malloc
 #define gnutls_realloc realloc
 #define gnutls_calloc calloc
-#define gnutls_free free
 
 typedef struct {
 	uint8	pint[3];
@@ -85,7 +85,7 @@ typedef struct {
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
-enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
+enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH };
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
@@ -296,6 +296,7 @@ typedef struct {
 } GNUTLS_ServerHello;
 
 /* functions */
+void gnutls_free(void* ptr);
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
 int gnutls_close(int cd, GNUTLS_STATE state);
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,

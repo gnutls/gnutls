@@ -70,6 +70,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 	}
 	memmove((*ciphertext), gcipher->fragment, gcipher->length);
 
+
 	total_length += gcipher->length;
 	_gnutls_freeTLSCiphertext(gcipher);
 
@@ -495,13 +496,13 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
 			rand[0] = 0;
 		} else {
-			rand[0] =
-			    (rand[0] % (255 / blocksize)) * blocksize;
+			rand[0] = (rand[0] / blocksize) * blocksize;
 		}
 
 		length =
 		    compressed->length +
 		    state->security_parameters.hash_size;
+
 		pad = (uint8) (blocksize - (length % blocksize)) + rand[0];
 
 		length += pad;
@@ -509,9 +510,9 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 
 		memset(&data[length - pad], pad - 1, pad);
 		memmove(data, content, compressed->length);
-
 		memmove(&data[compressed->length], MAC,
 			state->security_parameters.hash_size);
+
 		gnutls_cipher_encrypt(state->connection_state.
 				      write_cipher_state, data, length);
 

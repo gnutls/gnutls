@@ -38,6 +38,13 @@ GNUTLS_CIPHER_HANDLE ret;
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
+	case GNUTLS_TWOFISH:
+#ifdef USE_MCRYPT
+		ret = mcrypt_module_open( "twofish", NULL, "cbc", NULL);
+#else
+		ret = gcry_cipher_open(GCRY_CIPHER_TWOFISH, GCRY_CIPHER_MODE_CBC, 0);
+#endif
+		break;
 	case GNUTLS_3DES:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "tripledes", NULL, "cbc", NULL);
@@ -75,7 +82,10 @@ int gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) 
 #ifdef USE_MCRYPT
 		mcrypt_generic( handle, text, textlen);
 #else
-		gcry_cipher_encrypt( handle, text, textlen, text, textlen);
+		if (gcry_cipher_encrypt( handle, text, textlen, NULL, textlen)!=0) {
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
 #endif
 	}
 	return 0;
@@ -86,7 +96,10 @@ int gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int cip
 #ifdef USE_MCRYPT
 		mdecrypt_generic( handle, ciphertext, ciphertextlen);
 #else
-		gcry_cipher_decrypt( handle, ciphertext, ciphertextlen, ciphertext, ciphertextlen);
+		if (gcry_cipher_decrypt( handle, ciphertext, ciphertextlen, NULL, ciphertextlen)!=0) {
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
 #endif
 	}
 	return 0;

@@ -39,6 +39,11 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
+void gnutls_free(void *ptr) {
+	if (ptr!=NULL) free(ptr);
+}
+
+
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
 	ver.local = state->connection_state.version.local;

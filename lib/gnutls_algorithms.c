@@ -64,11 +64,8 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 static gnutls_cipher_entry algorithms[] = {
 	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES, 8, 24, 1, 8),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL, 16, 16, 1, 16),
-#ifdef USE_MCRYPT
+	GNUTLS_CIPHER_ENTRY(GNUTLS_TWOFISH, 16, 16, 1, 16),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0),
-#else
-	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0),
-#endif
 	GNUTLS_CIPHER_ENTRY(GNUTLS_NULL_CIPHER, 1, 0, 0, 0),
 	{0}
 };
@@ -166,8 +163,8 @@ static gnutls_kx_algo_entry kx_algorithms[] = {
 
 
 /* Cipher SUITES */
-#define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, compression_algorithm) \
-	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, compression_algorithm }
+#define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm ) \
+	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm }
 
 typedef struct {
 	char *name;
@@ -175,12 +172,12 @@ typedef struct {
 	BulkCipherAlgorithm block_algorithm;
 	KXAlgorithm kx_algorithm;
 	MACAlgorithm mac_algorithm;
-	CompressionMethod compression_algorithm;
 } gnutls_cipher_suite_entry;
 
 #define GNUTLS_DH_anon_3DES_EDE_CBC_SHA { 0x00, 0x1B }
 #define GNUTLS_DH_anon_ARCFOUR_MD5 { 0x00, 0x18 }
 #define GNUTLS_DH_anon_RIJNDAEL_128_CBC_SHA { 0x00, 0x34 }
+#define GNUTLS_DH_anon_TWOFISH_128_CBC_SHA { 0xFF, 0x50 }
 
 #define GNUTLS_DH_DSS_3DES_EDE_CBC_SHA { 0x00, 0x0D }
 #define GNUTLS_DH_RSA_3DES_EDE_CBC_SHA { 0x00, 0x10 }
@@ -205,59 +202,52 @@ typedef struct {
 static gnutls_cipher_suite_entry cs_algorithms[] = {
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_ARCFOUR_MD5,
 				  GNUTLS_ARCFOUR,
-				  GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES, GNUTLS_KX_ANON_DH,
-				  GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_DSS_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES,
-				  GNUTLS_KX_DH_DSS, GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_KX_DH_DSS, GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES,
-				  GNUTLS_KX_DH_RSA, GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_KX_DH_RSA, GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES, GNUTLS_KX_DHE_DSS,
-				  GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES, GNUTLS_KX_DHE_RSA,
-				  GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_SHA,
 				  GNUTLS_ARCFOUR,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_MD5,
 				  GNUTLS_ARCFOUR,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_RSA,
-				  GNUTLS_MAC_SHA,
-				  GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_DSS_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DH_DSS,
-				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DH_RSA,
-				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DHE_DSS,
-				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DHE_RSA,
-				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_ANON_DH,
-				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
+				  GNUTLS_MAC_SHA),
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_TWOFISH_128_CBC_SHA,
+				  GNUTLS_TWOFISH, GNUTLS_KX_ANON_DH,
+				  GNUTLS_MAC_SHA),
 	{0}
 };
 
@@ -329,7 +319,7 @@ char *_gnutls_mac_get_name(MACAlgorithm algorithm)
 int _gnutls_mac_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 255; i++) {
+	for (i = 0; i < 256; i++) {
 		if (_gnutls_mac_is_ok(i) == 0)
 			counter++;
 	}
@@ -390,7 +380,7 @@ char *_gnutls_compression_get_name(CompressionMethod algorithm)
 int _gnutls_compression_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 255; i++) {
+	for (i = 0; i < 256; i++) {
 		if (_gnutls_compression_is_ok(i) == 0)
 			counter++;
 	}
@@ -486,7 +476,7 @@ char *_gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 int _gnutls_cipher_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 255; i++) {
+	for (i = 0; i < 256; i++) {
 		if (_gnutls_cipher_is_ok(i) == 0)
 			counter++;
 	}
@@ -585,7 +575,7 @@ char *_gnutls_kx_get_name(KXAlgorithm algorithm)
 int _gnutls_kx_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 255; i++) {
+	for (i = 0; i < 256; i++) {
 		if (_gnutls_kx_is_ok(i) == 0)
 			counter++;
 	}
@@ -656,15 +646,6 @@ _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite suite)
 
 }
 
-CompressionMethod
-_gnutls_cipher_suite_get_compression_algo(const GNUTLS_CipherSuite suite)
-{
-	size_t ret = 0;
-	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->compression_algorithm);
-	return ret;
-
-}
-
 char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
 {
 	char *ret = NULL;
@@ -707,16 +688,18 @@ int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
 int _gnutls_cipher_suite_count()
 {
 	GNUTLS_CipherSuite suite;
-	uint8 i, counter = 0, j;
-	for (j = 0; j < 255; j++) {
+	int i, counter = 0, j;
+
+	for (j = 0; j < 256; j++) {
 		suite.CipherSuite[0] = j;
-		if (j != 0 && j != 255)
-			continue;	/* these are the only suites we support */
-		for (i = 0; i < 255; i++) {
+		if (j!=0x00 && j!=0xFF) continue;
+
+		for (i = 0; i < 256; i++) {
 			suite.CipherSuite[1] = i;
 			if (_gnutls_cipher_suite_is_ok(suite) == 0)
 				counter++;
 		}
+
 	}
 	return counter;
 }
@@ -952,7 +935,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 		tmp_ciphers[i].CipherSuite[1] =
 		    cs_algorithms[i].id.CipherSuite[1];
 	}
-
+fprintf(stderr, "COUNT: %d\n",count);
 	for (i = 0; i < count; i++) {
 		if (_gnutls_kx_priority
 		    (state,
@@ -995,14 +978,15 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 #define SUPPORTED_COMPRESSION_METHODS state->gnutls_internals.CompressionMethodPriority.algorithms
 int
 _gnutls_supported_compression_methods(GNUTLS_STATE state,
-				      CompressionMethod ** comp)
+				      uint8** comp)
 {
 	int i;
-	*comp = gnutls_malloc(SUPPORTED_COMPRESSION_METHODS * 1);
+	
+	*comp = gnutls_malloc(SUPPORTED_COMPRESSION_METHODS);
+	if (*comp==NULL) return GNUTLS_E_MEMORY_ERROR;
 
 	for (i = 0; i < SUPPORTED_COMPRESSION_METHODS; i++) {
-
-		(*comp)[i] =
+		(*comp)[i] = (uint8)
 		    state->gnutls_internals.
 		    CompressionMethodPriority.algorithm_priority[i];
 	}
