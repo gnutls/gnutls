@@ -110,7 +110,10 @@ int gnutls_session_set_data( GNUTLS_STATE state, opaque* session, int session_si
 	int ret;
 	gnutls_datum psession = { session, session_size };
 
-	
+	if (session==NULL || session_size == 0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 	ret = _gnutls_session_unpack( state, &psession);
 	if (ret < 0) {
 		gnutls_assert();
