@@ -107,13 +107,11 @@ int _gnutls_is_secure_mem_null(const void *);
   * This function must be called before gnutls_global_init() is called.
   *
   **/
-void gnutls_global_set_mem_functions(void *(*gnutls_alloc_func) (size_t), void
-				     *(*gnutls_secure_alloc_func) (size_t),
-				     int (*gnutls_is_secure_func) (const
-								   void *),
-				     void *(*gnutls_realloc_func) (void *,
-								   size_t),
-				     void (*gnutls_free_func) (void *))
+void gnutls_global_set_mem_functions(gnutls_alloc_function gnutls_alloc_func,
+				     gnutls_alloc_function gnutls_secure_alloc_func,
+				     gnutls_is_secure_function gnutls_is_secure_func,
+				     gnutls_realloc_function gnutls_realloc_func,
+				     gnutls_free_function gnutls_free_func)
 {
     gnutls_secure_malloc = gnutls_secure_alloc_func;
     gnutls_malloc = gnutls_alloc_func;
