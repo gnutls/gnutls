@@ -42,8 +42,6 @@
  */
 typedef int gnutls_transport_ptr;
 
-typedef const int* gnutls_list;
-
 #define MIN_BITS 767
 
 #define MAX32 4294967295
@@ -58,6 +56,9 @@ typedef const int* gnutls_list;
 #define TLS_RANDOM_SIZE 32
 #define TLS_MAX_SESSION_ID_SIZE 32
 #define TLS_MASTER_SIZE 48
+
+/* The maximum digest size of hash algorithms. 
+ */
 #define MAX_HASH_SIZE 20
 
 #define MAX_X509_CERT_SIZE 10*1024

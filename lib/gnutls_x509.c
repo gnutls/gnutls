@@ -2172,8 +2172,8 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 
 }
 
-/* Returns 0 if it's ok to use the gnutls_kx_algorithm with this cert
- * (using KeyUsage field). 
+/* Returns 0 if it's ok to use the gnutls_kx_algorithm with this 
+ * certificate (uses the KeyUsage field). 
  */
 int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 				    gnutls_kx_algorithm alg)
@@ -2193,6 +2193,7 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 			return 0;
 		case GNUTLS_KX_DHE_RSA:
 		case GNUTLS_KX_DHE_DSS:
+		case GNUTLS_KX_RSA_EXPORT:
 			if (cert->keyUsage != 0) {
 				if (!
 				    (cert->
@@ -2203,10 +2204,6 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 					return 0;
 			}
 			return 0;
-
-		case GNUTLS_KX_RSA_EXPORT:
-			return 0;
-
 		default:
 			gnutls_assert();
 			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;

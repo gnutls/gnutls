@@ -28,6 +28,7 @@
 #include "gnutls_num.h"
 #include "ext_cert_type.h"
 #include <gnutls_state.h>
+#include <gnutls_num.h>
 
 /* 
  * In case of a server: if a CERT_TYPE extension type is received then it stores
@@ -65,15 +66,14 @@ int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, i
 		}
 	} else { /* SERVER SIDE - we must check if the sent cert type is the right one 
 	          */
-		if (data_size > 0) {
+		if (data_size > 1) {
+			uint8 len;
 
-			if ( data_size <= 0) {
-				gnutls_assert();
-				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			}
+			len = data[0];
+			DECR_LEN( data_size, len);
 
-			for (i=0;i<data_size;i++) {
-				new_type = _gnutls_num2cert_type(data[i]);
+			for (i=0;i<len;i++) {
+				new_type = _gnutls_num2cert_type(data[i+1]);
 
 				if (new_type < 0) continue;
 				
@@ -126,16 +126,20 @@ int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, int dat
 				return 0;
 			}
 			
-			if (data_size < len) {
+			if (data_size < len + 1) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
+			
+			/* this is a vector!
+			 */
+			data[0] = (uint8) len;
 
 			for (i=0;i<len;i++) {
-				data[i] = _gnutls_cert_type2num( session->internals.
+				data[i+1] = _gnutls_cert_type2num( session->internals.
 					cert_type_priority.priority[i]);
 			}
-			return len;
+			return len + 1;
 		}
 
 	} else { /* server side */
