@@ -1,6 +1,6 @@
 EXTRA_DIST = common.h prime.gaa crypt.gaa crypt-gaa.h README.srpcrypt prime-gaa.h \
 		README cli.gaa cli-gaa.h serv-gaa.h serv.gaa tls_test.gaa \
-		tls_test-gaa.h tests.h
+		tls_test-gaa.h tests.h gnutls-http-serv
 SUBDIRS = srp x509 openpgp
 
 INCLUDES = -I../lib
