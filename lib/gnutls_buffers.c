@@ -145,7 +145,7 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 	
 	switch(type) {
 	case GNUTLS_APPLICATION_DATA:
-	
+
 		if (length > state->gnutls_internals.application_data_buffer.size) {
 			length = state->gnutls_internals.application_data_buffer.size;
 		}
@@ -160,10 +160,10 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 			&state->gnutls_internals.application_data_buffer.data[length],
 			state->gnutls_internals.application_data_buffer.size);
 
-		/* this does not fail */
-		state->gnutls_internals.application_data_buffer.data =
-		    gnutls_realloc_fast(state->gnutls_internals.application_data_buffer.data,
-				   state->gnutls_internals.application_data_buffer.size);
+		/* we do no longer realloc the application_data_buffer.data,
+		 * since it serves no practical reason. It also decreases
+		 * performance.
+		 */
 		break;
 		
 	case GNUTLS_HANDSHAKE:
@@ -181,10 +181,6 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 			&state->gnutls_internals.handshake_data_buffer.data[length],
 			state->gnutls_internals.handshake_data_buffer.size);
 
-		/* does not fail */
-		state->gnutls_internals.handshake_data_buffer.data =
-		    gnutls_realloc_fast(state->gnutls_internals.handshake_data_buffer.data,
-				   state->gnutls_internals.handshake_data_buffer.size);
 		break;
 	default:
 		gnutls_assert();
