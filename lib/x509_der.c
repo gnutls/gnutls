@@ -1264,8 +1264,6 @@ asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_elem
   p=node;
   while(1){
     ris=ASN_OK;
-
-    if((p==node_to_find) && (move!=UP)) *start=counter;
  
     if(move!=UP){
       if(p->type&CONST_SET){
@@ -1315,7 +1313,10 @@ asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_elem
 	  return ASN_TAG_ERROR;
 	}
       } 
-      else counter+=len2;
+      else{
+	if(p==node_to_find) *start=counter;
+	counter+=len2;
+      }
     }
 
     if(ris==ASN_OK){
