@@ -563,7 +563,6 @@ typedef struct {
 	GNUTLS_Version		default_record_version;
 
 	int			cbc_protection_hack;
-	int			exportable_detection_hack;
 
 	int			rsa_pms_check; /* 0 means enabled */
 
