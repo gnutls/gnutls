@@ -30,4 +30,6 @@
 
 #undef NO_SIZE_T
 #undef NO_TIME_T
+
+#undef DEFINE_SIZE_T
  

@@ -27,7 +27,7 @@ extern "C" {
 
 #define LIBGNUTLS_VERSION "@VERSION@"
 
-#include <sys/types.h>
+@DEFINE_SIZE_T@
 
 #define GNUTLS_AES GNUTLS_RIJNDAEL
 
@@ -114,8 +114,6 @@ int gnutls_is_fatal_error( int error);
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
 
-#define gnutls_send(a,b,c,d,e) gnutls_write(a,b,c,d)
-#define gnutls_recv(a,b,c,d,e) gnutls_read(a,b,c,d)
 ssize_t gnutls_write( GNUTLS_STATE state, void *data, size_t sizeofdata);
 ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata);
 

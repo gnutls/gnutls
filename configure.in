@@ -64,7 +64,7 @@ opt_profiler_mode=$enableval)
 AC_MSG_RESULT($opt_profiler_mode)
 
 AC_MSG_RESULT([***
-*** Checking for required for compilation programs...
+*** Checking for compilation programs...
 ])
 
 AC_PROG_CC
@@ -173,7 +173,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 fi
 
 AC_MSG_RESULT([***
-*** Detecting library capabilities...
+*** Detecting C library capabilities...
 ])
 
 AC_HEADER_STDC
@@ -244,14 +244,19 @@ AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(unsigned short int, 2)
 AC_CHECK_SIZEOF(unsigned char, 1)
 
-AC_CHECK_TYPE(size_t,,
+AC_CHECK_TYPE(size_t,
+DEFINE_SIZE_T="#include <sys/types.h>"
+AC_SUBST( DEFINE_SIZE_T)
+,
 AC_DEFINE(NO_SIZE_T)
+DEFINE_SIZE_T="typedef unsigned int size_t; typedef int ssize_t;"
+AC_SUBST( DEFINE_SIZE_T)
 ,[
-#ifdef HAVE_TIME_H
-# include <time.h>
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>
 #endif
-#ifdef HAVE_SYS_TIME_H
-# include <sys/time.h>
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
 #endif
 ])
 
@@ -259,11 +264,11 @@ AC_DEFINE(NO_SIZE_T)
 AC_CHECK_TYPE(time_t,,
 AC_DEFINE(NO_TIME_T),
 [
-#ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>
+#ifdef HAVE_TIME_H
+# include <time.h>
 #endif
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
+#ifdef HAVE_SYS_TIME_H
+# include <sys/time.h>
 #endif
 ]
 )

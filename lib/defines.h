@@ -51,8 +51,6 @@
 # include <time.h>
 #endif
 
-
-/* for open */
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
@@ -82,6 +80,9 @@
 /* only used native uint64 in 64 bit machines */
  typedef unsigned long int uint64;
 #else
+/* some systems had problems with long long int, thus,
+ * it is not used.
+ */
  typedef struct { unsigned char i[8]; } uint64;
 #endif
 
