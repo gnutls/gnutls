@@ -100,26 +100,14 @@ int main()
       gnutls_record_send( session, MSG, strlen(MSG));
 
       ret = gnutls_record_recv( session, buffer, MAX_BUF);
-      if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
-         if (ret == 0) {
-            printf("- Peer has closed the GNUTLS connection\n");
-            goto end;
-         } else {
-            fprintf(stderr, "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
-                    ret);
-            goto end;
-         }
-      } else {
-         if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-            alert = gnutls_alert_get(session);
-            printf("* Received alert [%d]: %s\n", alert, gnutls_alert_get_name(alert));
-         if (ret == GNUTLS_E_REHANDSHAKE) {
-            printf("* Received HelloRequest message (server asked to rehandshake)\n");
-            gnutls_alert_send_appropriate( session, ret); /* we don't want rehandshake */
-         }
-      }
-
-      if (ret > 0) {
+      if (ret == 0) {
+         printf("- Peer has closed the TLS connection\n");
+         goto end;
+      } else if (ret < 0) {
+         fprintf(stderr, "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
+                 ret);
+         goto end;
+      } else if (ret > 0) {
          printf("- Received %d bytes: ", ret);
          for (ii = 0; ii < ret; ii++) {
             fputc(buffer[ii], stdout);

@@ -460,7 +460,8 @@ void check_alert(gnutls_session session, int ret)
 	 printf
 	     ("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
       else
-	 printf("* Received alert '%d'.\n", ret);
+	 printf("* Received alert '%d': %s.\n", last_alert, 
+	    gnutls_alert_get_name( last_alert));
    }
 }
 

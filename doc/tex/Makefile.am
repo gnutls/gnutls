@@ -10,7 +10,7 @@ TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.
 	memory.tex openpgp.tex x509.tex howto.tex openssl.tex \
 	ex-rfc2818.tex appendix.tex x509cert.xml.tex pgpcert.xml.tex \
 	serv-export.tex serv-srp.tex programs.tex library.tex certificate.tex \
-	tlsintro.tex
+	tlsintro.tex ex-alert.tex
 
 gnutls.html: $(TEX_OBJECTS)            
 	-latex2html gnutls.tex -no_navigation -split 0 \

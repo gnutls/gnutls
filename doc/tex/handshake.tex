@@ -19,6 +19,10 @@ to set the priority of compression methods.
 to set the priority of certificate types (ie. OpenPGP, X.509).
 \item \printfunc{gnutls_protocol_set_priority}{gnutls\_protocol\_set\_priority}:
 to set the priority of protocol versions (ie. \sslIII{}, \tlsI).
+\item \printfunc{gnutls_set_default_priority}{gnutls\_set\_default\_priority}:
+to set some defaults in the current session. That way you don't have to call each
+priority function, independently, but you have to live with the defaults.
+
 \item \printfunc{gnutls_credentials_set}{gnutls\_credentials\_set}: to set the
 appropriate credentials structures.
 \item \printfunc{gnutls_certificate_server_set_request}
