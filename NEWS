@@ -1,4 +1,4 @@
-Version 1.0.5
+Version 1.0.5 (11/02/2004)
 - Fixed a bug where 'server name' extension was always sent.
 - Backported several things from the development branch:
  - Added CRL verification functionality to certtool.

@@ -107,6 +107,15 @@ PolicyMappings ::= SEQUENCE SIZE (1..MAX) OF SEQUENCE {
 
 -- subject alternative name extension OID and syntax
 
+-- Directory string type --
+
+DirectoryString ::= CHOICE {
+      teletexString             TeletexString (SIZE (1..MAX)),
+      printableString           PrintableString (SIZE (1..MAX)),
+      universalString           UniversalString (SIZE (1..MAX)),
+      utf8String              UTF8String (SIZE (1..MAX)),
+      bmpString               BMPString (SIZE(1..MAX))   }
+
 id-ce-subjectAltName OBJECT IDENTIFIER ::=  { id-ce 17 }
 
 SubjectAltName ::= GeneralNames
@@ -184,18 +193,25 @@ SkipCerts ::= INTEGER (0..MAX)
 
 id-ce-cRLDistributionPoints     OBJECT IDENTIFIER  ::=  {id-ce 31}
 
-CRLDistPointsSyntax ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
+CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
 
 DistributionPoint ::= SEQUENCE {
      distributionPoint       [0]     DistributionPointName OPTIONAL,
      reasons                 [1]     ReasonFlags OPTIONAL,
-     cRLIssuer               [2]     GeneralNames OPTIONAL }
+     cRLIssuer               [2]     GeneralNames OPTIONAL
+}
 
-DistributionPointName ::= CHOICE {
-     fullName                [0]     GeneralNames,
-     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
+-- original definition:
+-- DistributionPointName ::= CHOICE {
+--     fullName                [0]     GeneralNames,
+--     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
+--}
+-- This does not work since it does not tag elements.
 
-
+DistributionPointName ::= SEQUENCE {
+     fullName                [0]     GeneralNames OPTIONAL,
+     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName OPTIONAL
+}
 
 ReasonFlags ::= BIT STRING {
      unused                  (0),
@@ -204,7 +220,9 @@ ReasonFlags ::= BIT STRING {
      affiliationChanged      (3),
      superseded              (4),
      cessationOfOperation    (5),
-     certificateHold         (6) }
+     certificateHold         (6),
+     privilegeWithdrawn      (7),
+     aACompromise            (8) }
 
 -- extended key usage extension OID and syntax
 
@@ -390,94 +408,56 @@ AttributeTypeAndValue           ::=     SEQUENCE {
 id-at           OBJECT IDENTIFIER ::= {joint-iso-ccitt(2) ds(5) 4}
 
 -- Attributes of type NameDirectoryString
-id-at-name              AttributeType   ::=     {id-at 41}
-id-at-surname           AttributeType   ::=     {id-at 4}
-id-at-givenName         AttributeType   ::=     {id-at 42}
-id-at-initials          AttributeType   ::=     {id-at 43}
-id-at-generationQualifier       AttributeType   ::=     {id-at 44}
+id-at-initials          AttributeType ::= { id-at 43 }
+X520initials ::= DirectoryString
 
-X520name        ::= CHOICE {
-      teletexString         TeletexString (SIZE (1..ub-name)),
-      printableString       PrintableString (SIZE (1..ub-name)),
-      universalString       UniversalString (SIZE (1..ub-name)),
-      utf8String            UTF8String (SIZE (1..ub-name)),
-      bmpString             BMPString (SIZE(1..ub-name))   }
+id-at-generationQualifier AttributeType ::= { id-at 44 }
+X520generationQualifier ::= DirectoryString
 
---
+id-at-surname           AttributeType ::= { id-at 4 }
+X520surName ::= DirectoryString
+
+id-at-givenName         AttributeType ::= { id-at 42 }
+X520givenName ::= DirectoryString
+
+id-at-name              AttributeType ::= { id-at 41 }
+X520name        ::= DirectoryString
 
 id-at-commonName        AttributeType   ::=     {id-at 3}
-
-X520CommonName  ::=      CHOICE {
-      teletexString         TeletexString (SIZE (1..ub-common-name)),
-      printableString       PrintableString (SIZE (1..ub-common-name)),
-      universalString       UniversalString (SIZE (1..ub-common-name)),
-      utf8String            UTF8String (SIZE (1..ub-common-name)),
-      bmpString             BMPString (SIZE(1..ub-common-name))   }
-
---
+X520CommonName  ::=      DirectoryString
 
 id-at-localityName      AttributeType   ::=     {id-at 7}
-
-X520LocalityName ::= CHOICE {
-      teletexString       TeletexString (SIZE (1..ub-locality-name)),
-      printableString     PrintableString (SIZE (1..ub-locality-name)),
-      universalString     UniversalString (SIZE (1..ub-locality-name)),
-      utf8String          UTF8String (SIZE (1..ub-locality-name)),
-      bmpString           BMPString (SIZE(1..ub-locality-name))   }
-
---
+X520LocalityName ::= DirectoryString
 
 id-at-stateOrProvinceName       AttributeType   ::=     {id-at 8}
-
-X520StateOrProvinceName         ::= CHOICE {
-      teletexString       TeletexString (SIZE (1..ub-state-name)),
-      printableString     PrintableString (SIZE (1..ub-state-name)),
-      universalString     UniversalString (SIZE (1..ub-state-name)),
-      utf8String          UTF8String (SIZE (1..ub-state-name)),
-      bmpString           BMPString (SIZE(1..ub-state-name))   }
-
---
+X520StateOrProvinceName         ::= DirectoryString
 
 id-at-organizationName          AttributeType   ::=     {id-at 10}
-
-X520OrganizationName ::= CHOICE {
-  teletexString     TeletexString (SIZE (1..ub-organization-name)),
-  printableString   PrintableString (SIZE (1..ub-organization-name)),
-  universalString   UniversalString (SIZE (1..ub-organization-name)),
-  utf8String        UTF8String (SIZE (1..ub-organization-name)),
-  bmpString         BMPString (SIZE(1..ub-organization-name))   }
-
---
+X520OrganizationName ::= DirectoryString
 
 id-at-organizationalUnitName    AttributeType   ::=     {id-at 11}
-
-X520OrganizationalUnitName ::= CHOICE {
- teletexString    TeletexString (SIZE (1..ub-organizational-unit-name)),
- printableString        PrintableString
-                      (SIZE (1..ub-organizational-unit-name)),
- universalString        UniversalString
-                      (SIZE (1..ub-organizational-unit-name)),
- utf8String       UTF8String (SIZE (1..ub-organizational-unit-name)),
- bmpString        BMPString (SIZE(1..ub-organizational-unit-name))   }
-
---
+X520OrganizationalUnitName ::= DirectoryString
 
 id-at-title     AttributeType   ::=     {id-at 12}
-
-X520Title ::=   CHOICE {
-      teletexString         TeletexString (SIZE (1..ub-title)),
-      printableString       PrintableString (SIZE (1..ub-title)),
-      universalString       UniversalString (SIZE (1..ub-title)),
-      utf8String            UTF8String (SIZE (1..ub-title)),
-      bmpString             BMPString (SIZE(1..ub-title))   }
-
---
+X520Title ::=   DirectoryString
 
 id-at-dnQualifier       AttributeType   ::=     {id-at 46}
 X520dnQualifier ::=     PrintableString
 
 id-at-countryName       AttributeType   ::=     {id-at 6}
 X520countryName ::=     PrintableString (SIZE (2)) -- IS 3166 codes
+
+id-at-pseudonym 	AttributeType   ::=     {id-at 65}
+X520pseudonym ::=	DirectoryString
+
+id-at-streetAddress 	AttributeType   ::=     {id-at 9}
+X520streetAddress ::=	DirectoryString
+
+id-at-postalAddress	AttributeType	::=	{id-at 16}
+X520postalAddress ::= PostalAddress
+
+PostalAddress ::= SEQUENCE OF DirectoryString
+
 
  -- Legacy attributes
 
@@ -504,14 +484,6 @@ DistinguishedName       ::=   RDNSequence
 RelativeDistinguishedName  ::=
                     SET SIZE (1 .. MAX) OF AttributeTypeAndValue
 
--- Directory string type --
-
-DirectoryString ::= CHOICE {
-      teletexString             TeletexString (SIZE (1..MAX)),
-      printableString           PrintableString (SIZE (1..MAX)),
-      universalString           UniversalString (SIZE (1..MAX)),
-      utf8String              UTF8String (SIZE (1..MAX)),
-      bmpString               BMPString (SIZE(1..MAX))   }
 
 
 -- --------------------------------------------------------
@@ -1196,5 +1168,38 @@ pkcs-7-ContentEncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
 pkcs-7-EncryptedContent ::= OCTET STRING
 
 pkcs-7-UnprotectedAttributes ::= SET SIZE (1..MAX) OF Attribute
+
+-- LDAP stuff
+-- may not be correct
+
+id-at-ldap-DC AttributeType ::= { 0 9 2342 19200300 100 1 25 }
+
+ldap-DC ::= IA5String
+
+id-at-ldap-UID AttributeType ::= { 0 9 2342 19200300 100 1 1 }
+
+ldap-UID ::= IA5String
+
+-- rfc3039
+
+id-pda  OBJECT IDENTIFIER ::= { id-pkix 9 }
+
+id-pda-dateOfBirth          AttributeType ::= { id-pda 1 }
+DateOfBirth ::=             GeneralizedTime
+
+id-pda-placeOfBirth         AttributeType ::= { id-pda 2 }
+PlaceOfBirth ::=            DirectoryString
+
+id-pda-gender               AttributeType ::= { id-pda 3 }
+Gender ::=                  PrintableString (SIZE(1))
+                            -- "M", "F", "m" or "f"
+
+id-pda-countryOfCitizenship AttributeType ::= { id-pda 4 }
+CountryOfCitizenship ::=    PrintableString (SIZE (2))
+                            -- ISO 3166 Country Code
+
+id-pda-countryOfResidence   AttributeType ::= { id-pda 5 }
+CountryOfResidence ::=      PrintableString (SIZE (2))
+                            -- ISO 3166 Country Code
 
 END
