@@ -266,6 +266,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 	ret =
 		_gnutls_Send_int(cd, state, GNUTLS_HANDSHAKE, data, i_datasize);
 
+	gnutls_free(data);
 	return ret;
 }
 
@@ -299,9 +300,13 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	dataptr = gnutls_malloc(4);
 	
 	ret = _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, dataptr, 4);
-	if (ret < 0) return ret;
+	if (ret < 0) {
+		gnutls_free(dataptr);
+		return ret;
+	}
 	if (ret!=4) {
 		gnutls_assert();
+		gnutls_free(dataptr);
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
@@ -311,6 +316,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 
 	if (dataptr[0]!=type) {
 		gnutls_assert();
+		gnutls_free(dataptr);
 		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	}
 	
@@ -335,7 +341,11 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 		sum += ret;
 	} while( ( (sum-4) < length32) && (ret > 0) );
 
-	if (ret < 0) return ret;
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_free(dataptr);
+		return ret;
+	}
 	ret = GNUTLS_E_UNKNOWN_ERROR;
 
 	if (length32 > 0 && data!=NULL)
@@ -441,7 +451,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		}
 		pos += session_id_len;
 
-		x = _gnutls_supported_ciphersuites(&cipher_suites)*sizeof(uint16);
+		x = _gnutls_supported_ciphersuites(&cipher_suites);
+		x *= sizeof(uint16); /* in order to get bytes */
 #ifdef WORDS_BIGENDIAN
 		memmove(&data[pos], &x, sizeof(uint16));
 #else
@@ -454,7 +465,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		datalen += x;
 		data = gnutls_realloc(data, datalen);
 
-		for (i = 0; i < x; i++) {
+		for (i = 0; i < x/2; i++) {
 			memmove(&data[pos], &cipher_suites[i].CipherSuite,
 				2);
 			pos += 2;
@@ -463,8 +474,10 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		z = _gnutls_supported_compression_methods
 		    (&compression_methods);
 		memmove(&data[pos++], &z, 1); /* put the number of compression methods */
+
 		datalen += z; 
 		data = gnutls_realloc(data, datalen);
+		
 		for (i = 0; i < z; i++) {
 			memmove(&data[pos++], &compression_methods[i], 1);
 		}
