@@ -60,8 +60,8 @@ const MOD_AUTH_STRUCT anon_auth_struct = {
 };
 
 static int gen_anon_server_kx( gnutls_session session, opaque** data) {
-	GNUTLS_MPI g, p;
-	const GNUTLS_MPI *mpis;
+	mpi_t g, p;
+	const mpi_t *mpis;
 	int ret;
 	gnutls_dh_params dh_params;
 	const gnutls_anon_server_credentials cred;
@@ -82,7 +82,7 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 	p = mpis[0];
 	g = mpis[1];
 
-	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT), 1)) < 0) 
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( anon_server_auth_info_st), 1)) < 0) 
 	{
 		gnutls_assert();
 		return ret;
@@ -104,9 +104,9 @@ static int proc_anon_client_kx( gnutls_session session, opaque* data, size_t _da
 const gnutls_anon_server_credentials cred;
 int bits;
 int ret;
-GNUTLS_MPI p, g;
+mpi_t p, g;
 gnutls_dh_params dh_params;
-const GNUTLS_MPI *mpis;
+const mpi_t *mpis;
   	
 	bits = _gnutls_dh_get_allowed_prime_bits( session);
 
@@ -138,7 +138,7 @@ int proc_anon_server_kx( gnutls_session session, opaque* data, size_t _data_size
 int ret;
 
 	/* set auth_info */
-	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_CLIENT_AUTH_INFO_INT), 1)) < 0) {
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( anon_client_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}

@@ -103,7 +103,7 @@ const char* _gnutls_handshake2str( HandshakeType handshake)
 	}	
 }
 
-void _gnutls_dump_mpi(const char* prefix, GNUTLS_MPI a)
+void _gnutls_dump_mpi(const char* prefix, mpi_t a)
 {
 	opaque buf[1024];
 	size_t n = sizeof buf;

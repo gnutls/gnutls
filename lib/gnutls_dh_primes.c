@@ -32,7 +32,7 @@
 
 /* returns the prime and the generator of DH params.
  */
-const GNUTLS_MPI* _gnutls_get_dh_params(gnutls_dh_params dh_primes)
+const mpi_t* _gnutls_get_dh_params(gnutls_dh_params dh_primes)
 {
 	if (dh_primes == NULL || dh_primes->params[1] == NULL ||
 		dh_primes->params[0] == NULL) 
@@ -43,13 +43,13 @@ const GNUTLS_MPI* _gnutls_get_dh_params(gnutls_dh_params dh_primes)
 	return dh_primes->params;
 }
 
-int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
+int _gnutls_dh_generate_prime(mpi_t * ret_g, mpi_t * ret_n,
 			      unsigned int bits)
 {
-	GNUTLS_MPI g=NULL, prime=NULL;
+	mpi_t g=NULL, prime=NULL;
 	gcry_error_t err;
 	int result, times = 0, qbits;
-	GNUTLS_MPI *factors = NULL;
+	mpi_t *factors = NULL;
 	
 	/* Calculate the size of a prime factor of (prime-1)/2.
 	 * This is a bad emulation of Michael Wiener's table
@@ -140,7 +140,7 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *prime,
 			const gnutls_datum* generator)
 {
-	GNUTLS_MPI tmp_prime, tmp_g;
+	mpi_t tmp_prime, tmp_g;
 	size_t siz;
 
 	siz = prime->size;

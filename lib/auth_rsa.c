@@ -64,10 +64,10 @@ const MOD_AUTH_STRUCT rsa_auth_struct = {
 /* This function reads the RSA parameters from peer's certificate;
  */
 int _gnutls_get_public_rsa_params(gnutls_session session, 
-	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE], int* params_len)
+	mpi_t params[MAX_PUBLIC_PARAMS_SIZE], int* params_len)
 {
 int ret;
-CERTIFICATE_AUTH_INFO info;
+cert_auth_info_t info;
 gnutls_cert peer_cert;
 int i;
 
@@ -133,7 +133,7 @@ int i;
 
 /* This function reads the RSA parameters from the private key
  */
-int _gnutls_get_private_rsa_params(gnutls_session session, GNUTLS_MPI **params, int* params_size)
+int _gnutls_get_private_rsa_params(gnutls_session session, mpi_t **params, int* params_size)
 {
 int bits;
 const gnutls_certificate_credentials cred;
@@ -195,7 +195,7 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 	gnutls_datum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
-	GNUTLS_MPI *params;
+	mpi_t *params;
 	int params_len;
 	int randomize_key = 0;
 	ssize_t data_size = _data_size;
@@ -280,9 +280,9 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
  */
 int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 {
-	CERTIFICATE_AUTH_INFO auth = session->key->auth_info;
+	cert_auth_info_t auth = session->key->auth_info;
 	gnutls_datum sdata;	/* data to send */
-	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
+	mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
 	int params_len = MAX_PUBLIC_PARAMS_SIZE;
 	int ret, i;
 	gnutls_protocol_version ver;

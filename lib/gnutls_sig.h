@@ -7,7 +7,7 @@ int _gnutls_tls_sign_hdata( gnutls_session session, gnutls_cert* cert, gnutls_pr
 int _gnutls_tls_sign_params( gnutls_session session, gnutls_cert* cert, gnutls_privkey *pkey, gnutls_datum* params, gnutls_datum *signature);
 int _gnutls_verify_sig_hdata( gnutls_session session, gnutls_cert *cert, gnutls_datum* signature);
 int _gnutls_verify_sig_params( gnutls_session session, gnutls_cert *cert, const gnutls_datum* params, gnutls_datum* signature);
-int _gnutls_sign( gnutls_pk_algorithm algo, GNUTLS_MPI* params, int params_size, 
+int _gnutls_sign( gnutls_pk_algorithm algo, mpi_t* params, int params_size, 
 	const gnutls_datum* data, gnutls_datum *signature);
 
 #endif

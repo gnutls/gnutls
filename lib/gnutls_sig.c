@@ -166,7 +166,7 @@ opaque concat[36];
 /* This will create a PKCS1 or DSA signature, using the given parameters, and the
  * given data. The output will be allocated and be put in signature.
  */
-int _gnutls_sign( gnutls_pk_algorithm algo, GNUTLS_MPI* params, int params_size, 
+int _gnutls_sign( gnutls_pk_algorithm algo, mpi_t* params, int params_size, 
 	const gnutls_datum* data, gnutls_datum *signature)
 {
 int ret;

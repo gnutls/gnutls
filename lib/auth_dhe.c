@@ -79,8 +79,8 @@ const MOD_AUTH_STRUCT dhe_dss_auth_struct = {
 
 static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 {
-	GNUTLS_MPI g, p;
-	const GNUTLS_MPI *mpis;
+	mpi_t g, p;
+	const mpi_t *mpis;
 	int ret = 0, data_size;
 	int bits;
 	gnutls_cert *apr_cert_list;
@@ -118,7 +118,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	g = mpis[1];
 
 	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_CERTIFICATE, 
-		sizeof( CERTIFICATE_AUTH_INFO_INT), 0)) < 0) 
+		sizeof( cert_auth_info_st), 0)) < 0) 
 	{
 		gnutls_assert();
 		return ret;
@@ -173,7 +173,7 @@ static int proc_dhe_server_kx(gnutls_session session, opaque * data,
 	int sigsize;
 	gnutls_datum vparams, signature;
 	int ret;
-	CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
+	cert_auth_info_t info = _gnutls_get_auth_info( session);
 	ssize_t data_size = _data_size;
 	gnutls_cert peer_cert;
 
@@ -229,8 +229,8 @@ static int proc_dhe_client_kx(gnutls_session session, opaque * data,
 {
 const gnutls_certificate_credentials cred;
 int ret;
-GNUTLS_MPI p, g;
-const GNUTLS_MPI *mpis;
+mpi_t p, g;
+const mpi_t *mpis;
 gnutls_dh_params dh_params;
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);

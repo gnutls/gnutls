@@ -16,9 +16,9 @@ typedef struct {
    char *username;
    char *password;
    gnutls_srp_client_credentials_function *get_function;
-} SRP_CLIENT_CREDENTIALS_INT;
+} srp_client_credentials_st;
 
-#define gnutls_srp_client_credentials SRP_CLIENT_CREDENTIALS_INT*
+#define gnutls_srp_client_credentials srp_client_credentials_st*
 
 typedef struct {
    char *password_file;
@@ -27,14 +27,14 @@ typedef struct {
     * password files.
     */
    gnutls_srp_server_credentials_function *pwd_callback;
-} SRP_SERVER_CREDENTIALS_INT;
+} srp_server_cred_st;
 
-#define gnutls_srp_server_credentials SRP_SERVER_CREDENTIALS_INT*
+#define gnutls_srp_server_credentials srp_server_cred_st*
 
 /* these structures should not use allocated data */
-typedef struct SRP_SERVER_AUTH_INFO_INT {
+typedef struct srp_server_auth_info_st {
    char username[MAX_SRP_USERNAME];
-} *SRP_SERVER_AUTH_INFO;
+} *srp_server_auth_info_t;
 
 #ifdef ENABLE_SRP
 
@@ -49,7 +49,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session, opaque **);
 int _gnutls_proc_srp_server_kx(gnutls_session, opaque *, size_t);
 int _gnutls_proc_srp_client_kx(gnutls_session, opaque *, size_t);
 
-typedef struct SRP_SERVER_AUTH_INFO_INT SRP_SERVER_AUTH_INFO_INT;
+typedef struct srp_server_auth_info_st srp_server_auth_info_st;
 
 #endif				/* ENABLE_SRP */
 

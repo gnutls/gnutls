@@ -223,7 +223,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
   **/
 int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res)
 {
-	*res = gnutls_calloc(1, sizeof(CERTIFICATE_CREDENTIALS_INT));
+	*res = gnutls_calloc(1, sizeof(certificate_credentials_st));
 
 	if (*res == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
@@ -382,7 +382,7 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
   -*/
 int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 {
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 	const gnutls_certificate_credentials cred;
 	int verify;
 	int peer_certificate_list_size;
@@ -446,7 +446,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
   **/
 int gnutls_certificate_verify_peers(gnutls_session session)
 {
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -479,7 +479,7 @@ int gnutls_certificate_verify_peers(gnutls_session session)
   **/
 time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
 {
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -519,7 +519,7 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
   **/
 time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 {
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 

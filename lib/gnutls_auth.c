@@ -43,7 +43,7 @@
   **/
 void gnutls_credentials_clear( gnutls_session session) {
 	if (session->key && session->key->cred) { /* beginning of the list */
-		AUTH_CRED * ccred, *ncred;
+		auth_cred_t * ccred, *ncred;
 		ccred = session->key->cred;
 		while(ccred!=NULL) {
 			ncred = ccred->next;
@@ -84,12 +84,12 @@ void gnutls_credentials_clear( gnutls_session session) {
   *
   **/
 int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type, void* cred) {
-	AUTH_CRED * ccred=NULL, *pcred=NULL;
+	auth_cred_t * ccred=NULL, *pcred=NULL;
 	int exists=0;	
 	
 	if (session->key->cred==NULL) { /* beginning of the list */
 		
-		session->key->cred = gnutls_malloc(sizeof(AUTH_CRED));
+		session->key->cred = gnutls_malloc(sizeof(auth_cred_t));
 		if (session->key->cred == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
 		/* copy credentials locally */
@@ -111,7 +111,7 @@ int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type
 		 */
 
 		if (exists==0) { /* new entry */
-			pcred->next = gnutls_malloc(sizeof(AUTH_CRED));
+			pcred->next = gnutls_malloc(sizeof(auth_cred_t));
 			if (pcred->next == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
 			ccred = pcred->next;
@@ -200,7 +200,7 @@ int server = session->security_parameters.entity==GNUTLS_SERVER?1:0;
 const void *_gnutls_get_cred( GNUTLS_KEY key, gnutls_credentials_type type, int *err) {
 	const void *retval = NULL;
 	int _err = -1;
-	AUTH_CRED * ccred;
+	auth_cred_t * ccred;
 
 	if (key == NULL) goto out;
 
@@ -230,9 +230,9 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, gnutls_credentials_type type, int 
   * is data obtained by the handshake protocol, the key exchange algorithm,
   * and the TLS extensions messages.
   *
-  * In case of GNUTLS_CRD_ANON returns a pointer to &ANON_(SERVER/CLIENT)_AUTH_INFO;
-  * In case of GNUTLS_CRD_CERTIFICATE returns a pointer to structure &CERTIFICATE_(SERVER/CLIENT)_AUTH_INFO;
-  * In case of GNUTLS_CRD_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
+  * In case of GNUTLS_CRD_ANON returns a type of &anon_(server/client)_auth_info_t;
+  * In case of GNUTLS_CRD_CERTIFICATE returns a type of &cert_auth_info_t;
+  * In case of GNUTLS_CRD_SRP returns a type of &srp_(server/client)_auth_info_t;
   -*/
 void* _gnutls_get_auth_info( gnutls_session session) {
 	return session->key->auth_info;
@@ -259,7 +259,7 @@ void _gnutls_free_auth_info( gnutls_session session) {
 		break;
 	case GNUTLS_CRD_CERTIFICATE: {
 		unsigned int i;
-		CERTIFICATE_AUTH_INFO info =
+		cert_auth_info_t info =
 		            _gnutls_get_auth_info(session);
 
 			if (info==NULL) break;
@@ -337,7 +337,7 @@ int _gnutls_auth_info_set( gnutls_session session,
 	return 0;
 }
 
-/* this function will copy an GNUTLS_MPI key to 
+/* this function will copy an mpi_t key to 
  * opaque data.
  */
 int _gnutls_generate_session_key(GNUTLS_KEY key) {

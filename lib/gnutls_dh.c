@@ -45,9 +45,9 @@
 
 /* returns the public value (X), and the secret (ret_x).
  */
-GNUTLS_MPI gnutls_calc_dh_secret(GNUTLS_MPI * ret_x, GNUTLS_MPI g, GNUTLS_MPI prime)
+mpi_t gnutls_calc_dh_secret(mpi_t * ret_x, mpi_t g, mpi_t prime)
 {
-	GNUTLS_MPI e, x;
+	mpi_t e, x;
 	int x_size = _gnutls_mpi_get_nbits(prime) - 1;
 	/* The size of the secret key is less than
 	 * prime/2
@@ -92,9 +92,9 @@ GNUTLS_MPI gnutls_calc_dh_secret(GNUTLS_MPI * ret_x, GNUTLS_MPI g, GNUTLS_MPI pr
 }
 
 
-GNUTLS_MPI gnutls_calc_dh_key(GNUTLS_MPI f, GNUTLS_MPI x, GNUTLS_MPI prime)
+mpi_t gnutls_calc_dh_key(mpi_t f, mpi_t x, mpi_t prime)
 {
-	GNUTLS_MPI k;
+	mpi_t k;
 	int bits;
 	
 	bits = _gnutls_mpi_get_nbits(prime);

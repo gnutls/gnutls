@@ -38,7 +38,7 @@ typedef int gnutls_certificate_server_retrieve_function(gnutls_session,
 	gnutls_retr_st *);
 
 
-/* Functions that allow AUTH_INFO structures handling
+/* Functions that allow auth_info_t structures handling
  */
 
 gnutls_credentials_type gnutls_auth_get_type(gnutls_session session);

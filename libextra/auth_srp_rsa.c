@@ -139,7 +139,7 @@ ssize_t ret;
 int sigsize;
 gnutls_datum vparams, signature;
 ssize_t data_size;
-CERTIFICATE_AUTH_INFO info;
+cert_auth_info_t info;
 gnutls_cert peer_cert;
 opaque* p;
 

@@ -38,7 +38,7 @@
 #include <auth_dh_common.h>
 
 int _gnutls_proc_dh_common_client_kx(gnutls_session session, opaque * data,
-				  size_t _data_size, GNUTLS_MPI g, GNUTLS_MPI p)
+				  size_t _data_size, mpi_t g, mpi_t p)
 {
 	uint16 n_Y;
 	size_t _n_Y;
@@ -82,7 +82,7 @@ int _gnutls_proc_dh_common_client_kx(gnutls_session session, opaque * data,
 
 int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
 {
-	GNUTLS_MPI x = NULL, X = NULL;
+	mpi_t x = NULL, X = NULL;
 	size_t n_X;
 	int ret;
 
@@ -222,9 +222,9 @@ int _gnutls_proc_dh_common_server_kx( gnutls_session session, opaque* data, size
 }
 
 int _gnutls_dh_common_print_server_kx( gnutls_session session,
-	GNUTLS_MPI g, GNUTLS_MPI p, opaque** data)
+	mpi_t g, mpi_t p, opaque** data)
 {
-	GNUTLS_MPI x, X;
+	mpi_t x, X;
 	size_t n_X, n_g, n_p;
 	int ret;
 	uint8 *data_p;

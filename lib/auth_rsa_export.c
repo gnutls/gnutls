@@ -68,7 +68,7 @@ const MOD_AUTH_STRUCT rsa_export_auth_struct = {
 static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 {
 	gnutls_rsa_params rsa_params;
-	const GNUTLS_MPI *rsa_mpis;
+	const mpi_t *rsa_mpis;
 	size_t n_e, n_m;
 	uint8 *data_e, *data_m;
 	int ret = 0, data_size;
@@ -76,7 +76,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	gnutls_privkey* apr_pkey;
 	int apr_cert_list_length;
 	gnutls_datum signature, ddata;
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 	const gnutls_certificate_credentials cred;
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -110,7 +110,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	}
 
 	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_CERTIFICATE, 
-		sizeof( CERTIFICATE_AUTH_INFO_INT), 0)) < 0) {
+		sizeof( cert_auth_info_st), 0)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -179,7 +179,7 @@ int _gnutls_peers_cert_less_512( gnutls_session session)
 {
 gnutls_cert peer_cert;
 int ret;
-CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
+cert_auth_info_t info = _gnutls_get_auth_info( session);
 
 	if (info == NULL || info->ncerts==0) {
 		gnutls_assert();
@@ -222,7 +222,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	gnutls_datum vparams, signature;
 	int ret;
 	ssize_t data_size = _data_size;
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 	gnutls_cert peer_cert;
 
 	info = _gnutls_get_auth_info( session);

@@ -234,38 +234,38 @@ typedef int (*gnutls_db_store_func)(void*, gnutls_datum key, gnutls_datum data);
 typedef int (*gnutls_db_remove_func)(void*, gnutls_datum key);
 typedef gnutls_datum (*gnutls_db_retr_func)(void*, gnutls_datum key);
 
-typedef struct AUTH_CRED {
+typedef struct auth_cred_t {
 	gnutls_credentials_type algorithm;
 
 	/* the type of credentials depends on algorithm 
 	 */
 	void* credentials;
-	struct AUTH_CRED* next;
-} AUTH_CRED;
+	struct auth_cred_t* next;
+} auth_cred_t;
 
 
 struct GNUTLS_KEY_INT {
 	/* For DH KX */
 	gnutls_datum			key;
-	GNUTLS_MPI				KEY;
-	GNUTLS_MPI				client_Y;
-	GNUTLS_MPI				client_g;
-	GNUTLS_MPI				client_p;
-	GNUTLS_MPI				dh_secret;
+	mpi_t				KEY;
+	mpi_t				client_Y;
+	mpi_t				client_g;
+	mpi_t				client_p;
+	mpi_t				dh_secret;
 	/* for SRP */
-	GNUTLS_MPI				A;
-	GNUTLS_MPI				B;
-	GNUTLS_MPI				u;
-	GNUTLS_MPI				b;
-	GNUTLS_MPI				a;
-	GNUTLS_MPI				x;
+	mpi_t				A;
+	mpi_t				B;
+	mpi_t				u;
+	mpi_t				b;
+	mpi_t				a;
+	mpi_t				x;
 	/* RSA: e, m
 	 */
-	GNUTLS_MPI 				rsa[2];
+	mpi_t 				rsa[2];
 	
 	/* this is used to hold the peers authentication data 
 	 */
-	/* AUTH_INFO structures MAY contain malloced 
+	/* auth_info_t structures SHOULD NOT contain malloced 
 	 * elements. Check gnutls_session_pack.c, and gnutls_auth.c.
 	 * Rememember that this should be calloced!
 	 */
@@ -275,7 +275,7 @@ struct GNUTLS_KEY_INT {
 							 */
 	uint8				crypt_algo;
 
-	AUTH_CRED*			cred; /* used to specify keys/certificates etc */
+	auth_cred_t*			cred; /* used to specify keys/certificates etc */
 	
 	int				certificate_requested;
 					/* some ciphersuites use this
@@ -310,7 +310,7 @@ typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1_0,
 gnutls_protocol_version;
 
 /* This structure holds parameters got from TLS extension
- * mechanism. (some extensions may hold parameters in AUTH_INFO
+ * mechanism. (some extensions may hold parameters in auth_info_t
  * structures also - see SRP).
  */
 
@@ -332,11 +332,11 @@ typedef struct {
 	opaque 		srp_username[MAX_SRP_USERNAME];
 } TLSExtensions;
 
-/* AUTH_INFO structures now MAY contain malloced 
+/* auth_info_t structures now MAY contain malloced 
  * elements.
  */
  
-/* This structure and AUTH_INFO, are stored in the resume database,
+/* This structure and auth_info_t, are stored in the resume database,
  * and are restored, in case of resume.
  * Holds all the required parameters to resume the current 
  * session.
@@ -426,7 +426,7 @@ typedef struct {
 typedef struct {
 	/* [0] is the prime, [1] is the generator.
 	 */
-	GNUTLS_MPI params[2];
+	mpi_t params[2];
 } _gnutls_dh_params;
 
 #define gnutls_dh_params _gnutls_dh_params*

@@ -399,7 +399,7 @@ int ret;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
-			ANON_SERVER_AUTH_INFO info;
+			anon_server_auth_info_t info;
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
@@ -408,7 +408,7 @@ int ret;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
-			CERTIFICATE_AUTH_INFO info;
+			cert_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -437,7 +437,7 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits)
 {
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
-			ANON_SERVER_AUTH_INFO info;
+			anon_server_auth_info_t info;
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
@@ -445,7 +445,7 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits)
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
-			CERTIFICATE_AUTH_INFO info;
+			cert_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -467,7 +467,7 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits)
  */
 int _gnutls_rsa_export_set_pubkey( gnutls_session session, mpi_t exp, mpi_t mod) 
 {
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 	int ret;
 	
 	info = _gnutls_get_auth_info(session);
@@ -503,7 +503,7 @@ int ret;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
-			ANON_SERVER_AUTH_INFO info;
+			anon_server_auth_info_t info;
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
@@ -512,7 +512,7 @@ int ret;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
-			CERTIFICATE_AUTH_INFO info;
+			cert_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)

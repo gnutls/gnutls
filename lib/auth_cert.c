@@ -52,13 +52,13 @@ static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey key);
 
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
- * exported certificate struct (CERTIFICATE_AUTH_INFO)
+ * exported certificate struct (cert_auth_info_t)
  */
 static
-int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
+int _gnutls_copy_certificate_auth_info(cert_auth_info_t info,
 				       gnutls_cert * cert, int ncerts)
 {
-	/* Copy peer's information to AUTH_INFO
+	/* Copy peer's information to auth_info_t
 	 */
 	int ret, i, j;
 
@@ -772,7 +772,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 {
 	int size, len, ret;
 	opaque *p = data;
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 	const gnutls_certificate_credentials cred;
 	ssize_t dsize = data_size;
 	int i, j, x;
@@ -790,7 +790,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 
 	if ((ret =
 	     _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
-				   sizeof(CERTIFICATE_AUTH_INFO_INT), 1)) <
+				   sizeof(cert_auth_info_st), 1)) <
 	    0) {
 		gnutls_assert();
 		return ret;
@@ -904,7 +904,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 {
 	int size, ret, len;
 	opaque *p = data;
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 	const gnutls_certificate_credentials cred;
 	ssize_t dsize = data_size;
 	int i, x;
@@ -921,7 +921,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 	if ((ret =
 	     _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
-				   sizeof(CERTIFICATE_AUTH_INFO_INT), 1)) <
+				   sizeof(cert_auth_info_st), 1)) <
 	    0) {
 		gnutls_assert();
 		return ret;
@@ -1106,7 +1106,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 	int size, ret;
 	opaque *p;
 	const gnutls_certificate_credentials cred;
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 	ssize_t dsize;
 	int i, j;
 	gnutls_pk_algorithm pk_algos[MAX_SIGN_ALGOS];
@@ -1121,7 +1121,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 
 	if ((ret =
 	     _gnutls_auth_info_set(session, GNUTLS_CRD_CERTIFICATE,
-				   sizeof(CERTIFICATE_AUTH_INFO_INT), 0)) <
+				   sizeof(cert_auth_info_st), 0)) <
 	    0) {
 		gnutls_assert();
 		return ret;
@@ -1237,7 +1237,7 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session,
 	ssize_t dsize = data_size;
 	opaque *pdata = data;
 	gnutls_datum sig;
-	CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info(session);
+	cert_auth_info_t info = _gnutls_get_auth_info(session);
 	gnutls_cert peer_cert;
 
 	if (info == NULL || info->ncerts == 0) {

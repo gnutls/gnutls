@@ -23,4 +23,4 @@ void _gnutls_print_state(gnutls_session session);
 #endif
 const char* _gnutls_packet2str( ContentType packet);
 const char* _gnutls_handshake2str( HandshakeType handshake);
-void _gnutls_dump_mpi(const char* prefix, GNUTLS_MPI a);
+void _gnutls_dump_mpi(const char* prefix, mpi_t a);

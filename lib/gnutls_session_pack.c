@@ -35,11 +35,11 @@
 #include <gnutls_num.h>
 
 #define PACK_HEADER_SIZE 1
-int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
+int _gnutls_pack_certificate_auth_info( cert_auth_info_t info,
 				   gnutls_datum * packed_session);
-int _gnutls_unpack_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
+int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
 				     const gnutls_datum * packed_session);
-static int _gnutls_pack_certificate_auth_info_size( CERTIFICATE_AUTH_INFO info);
+static int _gnutls_pack_certificate_auth_info_size( cert_auth_info_t info);
 
 
 /* Since auth_info structures contain malloced data, this function
@@ -60,7 +60,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 	switch (gnutls_auth_get_type(session)) {
 #ifdef ENABLE_SRP
 	case GNUTLS_CRD_SRP:{
-			SRP_SERVER_AUTH_INFO info =
+			srp_server_auth_info_t info =
 			    _gnutls_get_auth_info(session);
 
 			
@@ -88,7 +88,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 		break;
 #endif
 	case GNUTLS_CRD_ANON:{
-			ANON_CLIENT_AUTH_INFO info =
+			anon_client_auth_info_t info =
 			    _gnutls_get_auth_info(session);
 			if (info == NULL && session->key->auth_info_size!=0) {
 				gnutls_assert();
@@ -111,7 +111,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 		}
 		break;
 	case GNUTLS_CRD_CERTIFICATE:{
-			CERTIFICATE_AUTH_INFO info =
+			cert_auth_info_t info =
 			    _gnutls_get_auth_info(session);
 			if (info == NULL && session->key->auth_info_size!=0) {
 				gnutls_assert();
@@ -158,7 +158,7 @@ uint _gnutls_session_size( gnutls_session session)
 		pack_size += session->key->auth_info_size;
 		break;
 	case GNUTLS_CRD_CERTIFICATE: {
-		CERTIFICATE_AUTH_INFO info =
+		cert_auth_info_t info =
 		    _gnutls_get_auth_info(session);
 	
 			pack_size += _gnutls_pack_certificate_auth_info_size( info);
@@ -199,7 +199,7 @@ int _gnutls_session_unpack(gnutls_session session,
 				       data[PACK_HEADER_SIZE]);
 			
 			if (pack_size == 0) break;
-			if (pack_size != sizeof(SRP_SERVER_AUTH_INFO_INT)) {
+			if (pack_size != sizeof(srp_server_auth_info_st)) {
 				gnutls_assert();
 				return GNUTLS_E_DB_ERROR;
 			}
@@ -212,7 +212,7 @@ int _gnutls_session_unpack(gnutls_session session,
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 			session->key->auth_info_size =
-			    sizeof(SRP_SERVER_AUTH_INFO_INT);
+			    sizeof(srp_server_auth_info_st);
 
 
 			memcpy(session->key->auth_info,
@@ -229,7 +229,7 @@ int _gnutls_session_unpack(gnutls_session session,
 
 			if (pack_size == 0) break;
 			
-			if (pack_size != sizeof(ANON_CLIENT_AUTH_INFO_INT)) {
+			if (pack_size != sizeof(anon_client_auth_info_st)) {
 				gnutls_assert();
 				return GNUTLS_E_DB_ERROR;
 			}
@@ -258,20 +258,20 @@ int _gnutls_session_unpack(gnutls_session session,
 				session->key->auth_info_size = 0;
 				break;
 			}
-			if (pack_size < sizeof(CERTIFICATE_AUTH_INFO_INT)) {
+			if (pack_size < sizeof(cert_auth_info_st)) {
 				gnutls_assert();
 				return GNUTLS_E_DB_ERROR;
 			}
 
 			session->key->auth_info =
-			    gnutls_malloc( sizeof(CERTIFICATE_AUTH_INFO_INT));
+			    gnutls_malloc( sizeof(cert_auth_info_st));
 			    
 			if (session->key->auth_info == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 			session->key->auth_info_size =
-			    sizeof(CERTIFICATE_AUTH_INFO_INT);
+			    sizeof(cert_auth_info_st);
 
 			ret =
 			    _gnutls_unpack_certificate_auth_info(session->
@@ -322,7 +322,7 @@ int _gnutls_session_unpack(gnutls_session session,
 	return 0;
 }
 
-int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
+int _gnutls_pack_certificate_auth_info( cert_auth_info_t info,
 				   gnutls_datum * packed_session)
 {
 	unsigned int pos, i;
@@ -331,14 +331,14 @@ int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
 	packed_session->size = _gnutls_pack_certificate_auth_info_size( info);
 
 	if (info==NULL) info_size = 0;
-	else info_size = sizeof(CERTIFICATE_AUTH_INFO_INT);
+	else info_size = sizeof(cert_auth_info_st);
 
 	packed_session->data[0] = GNUTLS_CRD_CERTIFICATE;
 	_gnutls_write_uint32( packed_session->size-PACK_HEADER_SIZE-sizeof(uint32), &packed_session->data[PACK_HEADER_SIZE]);
 
 	if (info!=NULL) {
 		memcpy(&packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
-		       info, sizeof(CERTIFICATE_AUTH_INFO_INT));
+		       info, sizeof(cert_auth_info_st));
 	}
 
 	pos = PACK_HEADER_SIZE + sizeof(uint32) + info_size;
@@ -356,9 +356,9 @@ int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
 	return 0;
 }
 
-static int _gnutls_pack_certificate_auth_info_size( CERTIFICATE_AUTH_INFO info)
+static int _gnutls_pack_certificate_auth_info_size( cert_auth_info_t info)
 {
-	uint32 pack_size = sizeof(CERTIFICATE_AUTH_INFO_INT);
+	uint32 pack_size = sizeof(cert_auth_info_st);
 	unsigned int i;
 
 	if (info == NULL)
@@ -372,7 +372,7 @@ static int _gnutls_pack_certificate_auth_info_size( CERTIFICATE_AUTH_INFO info)
 }
 
 
-int _gnutls_unpack_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
+int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
 				     const gnutls_datum * packed_session)
 {
 unsigned int i,j, pos;
@@ -381,9 +381,9 @@ uint32 size;
 
 	memcpy(info,
 	       &packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
-	       sizeof(CERTIFICATE_AUTH_INFO_INT));
+	       sizeof(cert_auth_info_st));
 
-	pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(CERTIFICATE_AUTH_INFO_INT);
+	pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(cert_auth_info_st);
 	if (info->ncerts > 0) {
 		info->raw_certificate_list = gnutls_calloc( 1, info->ncerts * sizeof( gnutls_datum));
 		if (info->raw_certificate_list == NULL) {

@@ -380,7 +380,7 @@ void gnutls_srp_free_client_credentials( gnutls_srp_client_credentials sc) {
   * Returns 0 on success.
   **/
 int gnutls_srp_allocate_client_credentials( gnutls_srp_client_credentials *sc) {
-	*sc = gnutls_calloc( 1, sizeof(SRP_CLIENT_CREDENTIALS_INT));
+	*sc = gnutls_calloc( 1, sizeof(srp_client_credentials_st));
   
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 
@@ -444,7 +444,7 @@ void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials sc) {
   * Returns 0 on success.
   **/
 int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials *sc) {
-	*sc = gnutls_calloc( 1, sizeof(SRP_SERVER_CREDENTIALS_INT));
+	*sc = gnutls_calloc( 1, sizeof(srp_server_cred_st));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
@@ -597,7 +597,7 @@ void gnutls_srp_set_client_credentials_function(
   **/
 const char *gnutls_srp_server_get_username(gnutls_session session)
 {
-	SRP_SERVER_AUTH_INFO info;
+	srp_server_auth_info_t info;
 
 	CHECK_AUTH(GNUTLS_CRD_SRP, NULL);
 

@@ -26,7 +26,7 @@
 #define KEY_DECIPHER_ONLY		32768
 
 typedef struct gnutls_cert {
-	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 
+	mpi_t params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 
 				 * key algorithm 
 				 * RSA: [0] is modulus
 				 *      [1] is public exponent
@@ -52,7 +52,7 @@ typedef struct gnutls_cert {
 } gnutls_cert;
 
 typedef struct gnutls_privkey_int {
-	GNUTLS_MPI params[MAX_PRIV_PARAMS_SIZE];/* the size of params depends on the public 
+	mpi_t params[MAX_PRIV_PARAMS_SIZE];/* the size of params depends on the public 
 				 * key algorithm 
 				 */
 				/*

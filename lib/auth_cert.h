@@ -92,10 +92,9 @@ typedef struct {
 
 	gnutls_certificate_client_retrieve_function*	client_get_cert_callback;
 	gnutls_certificate_server_retrieve_function*	server_get_cert_callback;
-} CERTIFICATE_CREDENTIALS_INT;
+} certificate_credentials_st;
 
-/* typedef CERTIFICATE_CREDENTIALS_INT * CERTIFICATE_CREDENTIALS; */
-#define gnutls_certificate_credentials CERTIFICATE_CREDENTIALS_INT*
+#define gnutls_certificate_credentials certificate_credentials_st*
 
 typedef struct rsa_info_st_int {
 	opaque	modulus[64];
@@ -104,7 +103,7 @@ typedef struct rsa_info_st_int {
 	size_t	exponent_size;
 } rsa_info_st;
 
-typedef struct CERTIFICATE_AUTH_INFO_INT {
+typedef struct cert_auth_info_st {
 	int		  certificate_requested; /* if the peer requested certificate
 						  * this is non zero;
 						  */
@@ -115,9 +114,9 @@ typedef struct CERTIFICATE_AUTH_INFO_INT {
 					         * peer.
 					         */
 	unsigned int	  ncerts; /* holds the size of the list above */
-} *CERTIFICATE_AUTH_INFO;
+} *cert_auth_info_t;
 
-typedef struct CERTIFICATE_AUTH_INFO_INT CERTIFICATE_AUTH_INFO_INT;
+typedef struct cert_auth_info_st cert_auth_info_st;
 
 /* AUTH X509 functions */
 int _gnutls_gen_cert_server_certificate(gnutls_session, opaque **);

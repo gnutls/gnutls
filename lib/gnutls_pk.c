@@ -36,23 +36,23 @@
 #include <x509/mpi.h>
 #include <x509/common.h>
 
-static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len);
-static int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pkey, int);
-static int _gnutls_pk_verify(int algo, GNUTLS_MPI hash, GNUTLS_MPI* data, GNUTLS_MPI *pkey, int);
-static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int);
+static int _gnutls_pk_encrypt(int algo, mpi_t * resarr, mpi_t data, mpi_t * pkey, int pkey_len);
+static int _gnutls_pk_sign(int algo, mpi_t* data, mpi_t hash, mpi_t * pkey, int);
+static int _gnutls_pk_verify(int algo, mpi_t hash, mpi_t* data, mpi_t *pkey, int);
+static int _gnutls_pk_decrypt(int algo, mpi_t * resarr, mpi_t data, mpi_t * pkey, int);
 
 
 /* Do PKCS-1 RSA encryption. 
  * params is modulus, public exp.
  */
 int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
-			      const gnutls_datum *plaintext, GNUTLS_MPI* params,
+			      const gnutls_datum *plaintext, mpi_t* params,
 			      uint params_len,
 			      uint btype)
 {
 	unsigned int i, pad;
 	int ret;
-	GNUTLS_MPI m, res;
+	mpi_t m, res;
 	opaque *edata, *ps;
 	size_t k, psize;
 	size_t mod_bits;
@@ -200,12 +200,12 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
  * Can decrypt block type 1 and type 2 packets.
  */
 int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
-	const gnutls_datum *ciphertext, GNUTLS_MPI* params, uint params_len,
+	const gnutls_datum *ciphertext, mpi_t* params, uint params_len,
 	uint btype)
 {
 	uint k, i;
 	int ret;
-	GNUTLS_MPI c, res;
+	mpi_t c, res;
 	opaque *edata;
 	size_t esize, mod_bits;
 
@@ -314,7 +314,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 
 
 int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertext, 
-	GNUTLS_MPI *params, int params_len, int btype) {
+	mpi_t *params, int params_len, int btype) {
 
 	gnutls_datum plain;
 	int ret;
@@ -344,7 +344,7 @@ int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertex
 
 /* encodes the Dss-Sig-Value structure
  */
-static int encode_ber_rs( gnutls_datum* sig_value, GNUTLS_MPI r, GNUTLS_MPI s) {
+static int encode_ber_rs( gnutls_datum* sig_value, mpi_t r, mpi_t s) {
 ASN1_TYPE sig;
 int result, tot_len;
 
@@ -386,9 +386,9 @@ int result, tot_len;
 /* Do DSA signature calculation. params is p, q, g, y, x in that order.
  */
 int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
-		     GNUTLS_MPI * params, uint params_len)
+		     mpi_t * params, uint params_len)
 {
-	GNUTLS_MPI rs[2], mdata;
+	mpi_t rs[2], mdata;
 	int ret;
 	size_t k;
 
@@ -428,7 +428,7 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
 
 /* decodes the Dss-Sig-Value structure
  */
-static int decode_ber_rs( const gnutls_datum* sig_value, GNUTLS_MPI* r, GNUTLS_MPI* s) {
+static int decode_ber_rs( const gnutls_datum* sig_value, mpi_t* r, mpi_t* s) {
 ASN1_TYPE sig;
 int result;
 
@@ -469,12 +469,12 @@ int result;
 /* params is p, q, g, y in that order
  */
 int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value, 
-	GNUTLS_MPI * params, int params_len) {
+	mpi_t * params, int params_len) {
 
-	GNUTLS_MPI mdata;
+	mpi_t mdata;
 	int ret;
 	size_t k;
-	GNUTLS_MPI rs[2];
+	mpi_t rs[2];
 
 	if (vdata->size != 20) { /* sha-1 only */
 		gnutls_assert();
@@ -513,7 +513,7 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
  * Emulate our old PK interface here - sometime in the future we might
  * change the internal design to directly fit to libgcrypt.
  */
-static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len)
+static int _gnutls_pk_encrypt(int algo, mpi_t * resarr, mpi_t data, mpi_t * pkey, int pkey_len)
 {
 	gcry_sexp_t s_ciph, s_data, s_pkey;
 	int rc=-1;
@@ -576,7 +576,7 @@ static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 }
 
 static 
-int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len)
+int _gnutls_pk_decrypt(int algo, mpi_t * resarr, mpi_t data, mpi_t * pkey, int pkey_len)
 {
 	gcry_sexp_t s_plain, s_data, s_pkey;
 	int rc=-1;
@@ -635,7 +635,7 @@ int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MP
 /* in case of DSA puts into data, r,s
  */
 static 
-int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pkey, int pkey_len)
+int _gnutls_pk_sign(int algo, mpi_t* data, mpi_t hash, mpi_t * pkey, int pkey_len)
 {
 	gcry_sexp_t s_hash, s_key, s_sig;
 	int rc=-1;
@@ -729,7 +729,7 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 }
 
 
-static int _gnutls_pk_verify(int algo, GNUTLS_MPI hash, GNUTLS_MPI* data, GNUTLS_MPI *pkey, int pkey_len)
+static int _gnutls_pk_verify(int algo, mpi_t hash, mpi_t* data, mpi_t *pkey, int pkey_len)
 {
 	gcry_sexp_t s_sig, s_hash, s_pkey;
 	int rc=-1;

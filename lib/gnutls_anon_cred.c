@@ -84,7 +84,7 @@ int ret;
   **/
 int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc) {
 
-	*sc = gnutls_calloc( 1, sizeof(ANON_SERVER_CREDENTIALS_INT));
+	*sc = gnutls_calloc( 1, sizeof(anon_server_credentials_st));
 
 	return 0;
 }
@@ -101,7 +101,7 @@ void gnutls_anon_free_client_credentials( gnutls_anon_client_credentials sc) {
 }
 
 /**
-  * gnutls_allocate_anon_client_credentials - Used to allocate an GNUTLS_ANON_CLIENT CREDENTIALS structure
+  * gnutls_allocate_anon_client_credentials - Used to allocate a credentials structure
   * @sc: is a pointer to an &gnutls_anon_client_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus

@@ -73,8 +73,8 @@ int gnutls_dh_get_group(gnutls_session session,
 	gnutls_datum* raw_gen, gnutls_datum* raw_prime)
 {
 dh_info_st *dh;
-ANON_SERVER_AUTH_INFO anon_info;
-CERTIFICATE_AUTH_INFO cert_info;
+anon_server_auth_info_t anon_info;
+cert_auth_info_t cert_info;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON:
@@ -117,8 +117,8 @@ CERTIFICATE_AUTH_INFO cert_info;
 int gnutls_dh_get_pubkey(gnutls_session session, gnutls_datum* key)
 {
 dh_info_st* dh;
-ANON_SERVER_AUTH_INFO anon_info;
-CERTIFICATE_AUTH_INFO cert_info;
+anon_server_auth_info_t anon_info;
+cert_auth_info_t cert_info;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
@@ -160,7 +160,7 @@ CERTIFICATE_AUTH_INFO cert_info;
   **/
 int gnutls_rsa_export_get_pubkey(gnutls_session session, gnutls_datum* exp, gnutls_datum* mod)
 {
-CERTIFICATE_AUTH_INFO cert_info;
+cert_auth_info_t cert_info;
 
 	if ( gnutls_auth_get_type( session) == GNUTLS_CRD_CERTIFICATE) {
 		cert_info = _gnutls_get_auth_info(session);
@@ -193,7 +193,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
 {
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
-			ANON_SERVER_AUTH_INFO info;
+			anon_server_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -201,7 +201,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
 			return info->dh.secret_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
-			CERTIFICATE_AUTH_INFO info;
+			cert_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -231,7 +231,7 @@ dh_info_st *dh;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
-			ANON_SERVER_AUTH_INFO info;
+			anon_server_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -240,7 +240,7 @@ dh_info_st *dh;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
-			CERTIFICATE_AUTH_INFO info;
+			cert_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -269,7 +269,7 @@ dh_info_st *dh;
   **/
 int gnutls_rsa_export_get_modulus_bits(gnutls_session session)
 {
-CERTIFICATE_AUTH_INFO info;
+cert_auth_info_t info;
 
 	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
@@ -293,7 +293,7 @@ dh_info_st * dh;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
-			ANON_SERVER_AUTH_INFO info;
+			anon_server_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -303,7 +303,7 @@ dh_info_st * dh;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
-			CERTIFICATE_AUTH_INFO info;
+			cert_auth_info_t info;
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
@@ -369,7 +369,7 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 const gnutls_datum *gnutls_certificate_get_peers(gnutls_session session, 
 	unsigned int *list_size)
 {
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
@@ -393,7 +393,7 @@ const gnutls_datum *gnutls_certificate_get_peers(gnutls_session session,
   **/
 int gnutls_certificate_client_get_request_status(gnutls_session session)
 {
-	CERTIFICATE_AUTH_INFO info;
+	cert_auth_info_t info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, 0);
 

@@ -135,13 +135,13 @@ int _gnutls_gen_srp_server_kx(gnutls_session session, opaque ** data)
 	uint8 *data_g;
 	char *username;
 	SRP_PWD_ENTRY *pwd_entry;
-	SRP_SERVER_AUTH_INFO info;
+	srp_server_auth_info_t info;
 	ssize_t data_size;
 	size_t n_b, tmp_size;
 	char buf[64];
 	uint8 *data_b;
 
-	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT), 1)) < 0) {
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_SRP, sizeof( srp_server_auth_info_st), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
