@@ -482,7 +482,7 @@ int main(int argc, char **argv)
 	perror("inet_ntop()");
 	return (1);
     }
-    fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port);
+    printf("Connecting to '%s:%d'...\n", buffer, port);
 
     err = connect(sd, (SA *) & sa, sizeof(sa));
     ERR(err, "connect");
