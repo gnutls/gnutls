@@ -191,6 +191,8 @@ static gnutls_session init_tls_session(const char *hostname)
 			fprintf(stderr,
 				"Cannot set the maximum record size to %d.\n",
 				record_max_size);
+			fprintf(stderr,
+				"Possible values: 512, 1024, 2048, 4096.\n");
 			exit(1);
 		}
 	}
