@@ -35,12 +35,6 @@ extern const char *program_name;
 /* Set program_name, based on argv[0].  */
 extern void set_program_name (const char *argv0);
 
-/* Return short program name of the current executable, based on the
-   earlier call to set_program_name.  Return NULL if unknown.  The
-   short program name is computed by removing all directory names and
-   path separators. */
-extern const char *get_short_program_name (void);
-
 #if ENABLE_RELOCATABLE
 
 /* Set program_name, based on argv[0], and original installation prefix and

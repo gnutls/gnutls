@@ -1,5 +1,5 @@
 /* Program name management.
-   Copyright (C) 2001-2004 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software; you can redistribute it and/or modify
@@ -50,17 +50,4 @@ set_program_name (const char *argv0)
   if (strncmp (base, "lt-", 3) == 0)
     argv0 = base + 3;
   program_name = argv0;
-}
-
-/* Return short program name of the current executable, based on the
-   earlier call to set_program_name.  Return NULL if unknown.  The
-   short program name is computed by removing all directory names and
-   path separators. */
-const char *
-get_short_program_name (void)
-{
-  const char *slash = NULL;
-  if (program_name)
-    slash = strrchr (program_name, '/');
-  return slash != NULL ? slash + 1 : program_name;
 }
