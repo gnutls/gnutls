@@ -154,16 +154,11 @@ small library, with the required features, can be generated.
 
 @section General Idea
 
-@c explain how it works
-
 A brief description of how @acronym{GnuTLS} works internally is shown
 at the figure below. This section may be easier to understand after
 having seen the examples (@pxref{examples}).
 
-@c \begin{figure}[htp]
-@c \includegraphics[height=8cm,width=12cm]{internals}
-@c \label{fig:internals}
-@c \end{figure}
+@image{internals}
 
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
@@ -313,11 +308,7 @@ negotiation, the initial key exchange and authentication.
 @xref{handshake}, for more information about the handshake protocol.
 The protocol layering in TLS is shown in the figure below.
 
-@c \begin{figure}[hbtp]
-@c \includegraphics[height=8cm,width=12cm]{layers}
-@c \label{fig:layers}
-@c \caption{Layers in the TLS protocol}
-@c \end{figure}
+@image{layers}
 
 @section The transport layer
 @cindex Transport protocol
@@ -1078,11 +1069,7 @@ Usually more than one certification authorities exist, and
 certification authorities may certify other authorities to issue
 certificates as well, following a hierarchical model.
 
-@c \begin{figure}[tbp]
-@c \caption{X.509 certification}
-@c \includegraphics[height=9.5cm,width=7cm]{x509-1}
-@c \label{fig:x509-1}
-@c \end{figure}
+@image{x509-1}
 
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
@@ -1248,10 +1235,7 @@ key, she is introducing Bob's key to anyone who trusts Alice. If
 someone trusts Alice to introduce keys, then Alice is a trusted
 introducer in the mind of that observer.
 
-@c \begin{figure}[hbtp]
-@c \includegraphics[height=9cm,width=11cm]{pgp-fig1}
-@c \label{fig:pgp1}
-@c \end{figure}
+@image{pgp1}
 
 For example: If David trusts Alice to be an introducer, and Alice
 signed Bob's key, Dave also trusts Bob's key to be the real one.
