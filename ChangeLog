@@ -1,3 +1,31 @@
+2003-03-26 13:53  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_algorithms.c, gnutls_handshake.c,
+	gnutls_v2_compat.c:
+
+	Some improvements in the version detection in the client hello.  
+
+2003-03-26 13:42  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_errors.c, lib/gnutls_errors_int.h:
+
+	Added functionality to generate PKCS #7 structures. Currently only
+	certificates can be put there. (untested) 
+
+2003-03-26 12:46  nmav <nmav@gnutls.org>
+
+	* src/: serv-gaa.c, serv-gaa.h, serv.c, serv.gaa:
+
+	Added the --debug option to the gnutls-serv.  
+
+2003-03-26 12:43  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_record.c, lib/gnutls_state.c, lib/gnutls_state.h,
+	lib/pkix.asn, src/tests.c, src/tests.h, src/tls_test.c:
+
+	Added bogus TLS record version check in the gnutls-cli-debug tool.  
+
 2003-03-25 18:01  nmav <nmav@gnutls.org>
 
 	* lib/: auth_cert.c, ext_server_name.c, gnutls_errors.c,
