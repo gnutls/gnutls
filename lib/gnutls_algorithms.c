@@ -28,25 +28,31 @@
 /* Cred type mappings to KX algorithms */
 typedef struct {
 	gnutls_kx_algorithm algorithm;
-	gnutls_credentials_type type;
+	gnutls_credentials_type client_type;
+	gnutls_credentials_type server_type; /* The type of credentials a server
+					      * needs to set */
 } gnutls_cred_map;
 
 static const gnutls_cred_map cred_mappings[] = {
-	{ GNUTLS_KX_ANON_DH, GNUTLS_CRD_ANON    },
-	{ GNUTLS_KX_RSA,     GNUTLS_CRD_CERTIFICATE },
-	{ GNUTLS_KX_RSA_EXPORT,     GNUTLS_CRD_CERTIFICATE },
-	{ GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE },
-	{ GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE },
-	{ GNUTLS_KX_SRP,     GNUTLS_CRD_SRP     },
+	{ GNUTLS_KX_ANON_DH, 	GNUTLS_CRD_ANON, 	GNUTLS_CRD_ANON    },
+	{ GNUTLS_KX_RSA,	GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
+	{ GNUTLS_KX_RSA_EXPORT, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
+	{ GNUTLS_KX_DHE_DSS, 	GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
+	{ GNUTLS_KX_DHE_RSA, 	GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
+	{ GNUTLS_KX_SRP,     	GNUTLS_CRD_SRP,		GNUTLS_CRD_SRP     },
+	{ GNUTLS_KX_SRP_RSA,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE     },
 	{ 0 }
 };
 
 #define GNUTLS_KX_MAP_LOOP(b) \
         const gnutls_cred_map *p; \
-                for(p = cred_mappings; p->type != 0; p++) { b ; }
+                for(p = cred_mappings; p->algorithm != 0; p++) { b ; }
 
-#define GNUTLS_KX_MAP_ALG_LOOP(a) \
-                        GNUTLS_KX_MAP_LOOP( if(p->type == type) { a; break; })
+#define GNUTLS_KX_MAP_ALG_LOOP_SERVER(a) \
+                        GNUTLS_KX_MAP_LOOP( if(p->server_type == type) { a; break; })
+
+#define GNUTLS_KX_MAP_ALG_LOOP_CLIENT(a) \
+                        GNUTLS_KX_MAP_LOOP( if(p->client_type == type) { a; break; })
 
 
 /* TLS Versions */
@@ -234,6 +240,7 @@ typedef struct {
 #define GNUTLS_SRP_SHA_RIJNDAEL_128_CBC_SHA { 0x00, 0x53 }
 #define GNUTLS_SRP_SHA_RIJNDAEL_256_CBC_SHA { 0x00, 0x56 }
 
+#define GNUTLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA { 0x00, 0x51 }
 
 /** RSA 
  **/
@@ -314,6 +321,10 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_SHA_RIJNDAEL_256_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_KX_SRP,
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
+
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA,
+				  GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_SRP_RSA,
 				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 
 	/* DHE_DSS */
@@ -805,18 +816,26 @@ int ret=0;
 }
 
 /* Type to KX mappings */
-gnutls_kx_algorithm _gnutls_map_kx_get_kx(gnutls_credentials_type type)
+gnutls_kx_algorithm _gnutls_map_kx_get_kx(gnutls_credentials_type type, int server)
 {
 	gnutls_kx_algorithm ret = -1;
 
-	GNUTLS_KX_MAP_ALG_LOOP(ret = p->algorithm);
+	if (server) {
+		GNUTLS_KX_MAP_ALG_LOOP_SERVER(ret = p->algorithm);
+	} else {
+		GNUTLS_KX_MAP_ALG_LOOP_SERVER(ret = p->algorithm);
+	}
 	return ret;
 }
 
-gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm algorithm)
+gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm algorithm, int server)
 {
 	gnutls_credentials_type ret = -1;
-	GNUTLS_KX_MAP_LOOP(if (p->algorithm==algorithm) ret = p->type);
+	if (server) {
+		GNUTLS_KX_MAP_LOOP(if (p->algorithm==algorithm) ret = p->server_type);
+	} else {
+		GNUTLS_KX_MAP_LOOP(if (p->algorithm==algorithm) ret = p->client_type);
+	}
 
 	return ret;
 }

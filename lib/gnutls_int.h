@@ -159,7 +159,7 @@ typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL=1,
 
 typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
 	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
-	GNUTLS_KX_RSA_EXPORT
+	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA
 } gnutls_kx_algorithm;
 
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } gnutls_mac_algorithm;

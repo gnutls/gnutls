@@ -1255,7 +1255,7 @@ int _gnutls_find_apr_cert(gnutls_session session, gnutls_cert ** apr_cert_list,
 	int ind;
 
 	cred =
-	    _gnutls_get_kx_cred(session->key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_kx_cred(session, GNUTLS_CRD_CERTIFICATE,
 				NULL);
 
 	if (cred == NULL) {

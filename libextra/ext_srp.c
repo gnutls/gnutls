@@ -32,8 +32,9 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _d
 	uint8 len;
 	ssize_t data_size = _data_size;
 
-	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
-		/* algorithm was not allowed in this state
+	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0 && 
+		_gnutls_kx_priority( state, GNUTLS_KX_SRP_RSA) < 0) {
+		/* algorithm was not allowed in this session
 		 */
 		return 0;
 	}
@@ -52,12 +53,22 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _d
 		}
 	} else { /* client side reading server hello extensions */
 		if (state->internals.resumed==RESUME_FALSE)
-			return proc_srp_server_hello( state, data, data_size);
+			return _gnutls_proc_srp_server_hello( state, data, data_size);
 		else /* we do not need to process this if
 		      * we are resuming.
 		      */
 			return 0;
 	}
+	return 0;
+}
+
+/* Checks if the given cipher suite is an SRP one
+ */
+inline static int is_srp( GNUTLS_CipherSuite suite) {
+	int kx = _gnutls_cipher_suite_get_kx_algo( suite);
+	
+	if (kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA)) return 1;
+	
 	return 0;
 }
 
@@ -67,8 +78,9 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _d
 int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_size) {
 	uint len;
 
-	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
-		/* algorithm was not allowed in this state
+	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0 && 
+		_gnutls_kx_priority( state, GNUTLS_KX_SRP_RSA) < 0) {
+		/* algorithm was not allowed in this session
 		 */
 		return 0;
 	}
@@ -97,11 +109,12 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_siz
 		
 		/* note that security parameters are not fully established
 		 */
-		if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite) != GNUTLS_KX_SRP)
+
+		if ( !is_srp(state->security_parameters.current_cipher_suite))
 			return 0; /* no data to send */
 		
 		if (state->internals.resumed==RESUME_FALSE)
-			return gen_srp_server_hello( state, data, data_size);
+			return _gnutls_gen_srp_server_hello( state, data, data_size);
 		else
 			return 0;
 	}

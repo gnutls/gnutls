@@ -373,6 +373,7 @@ void print_list(void)
 	printf(", DHE-DSS");
 	printf(", DHE-RSA");
 	printf(", SRP");
+	printf(", SRP-RSA");
 	printf(", ANON-DH\n");
 
 	printf("Compression methods:");

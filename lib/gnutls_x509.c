@@ -2212,10 +2212,14 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 /* Returns 0 if it's ok to use the gnutls_kx_algorithm with this 
  * certificate (uses the KeyUsage field). 
  */
-int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
+int _gnutls_check_x509_key_usage( const gnutls_cert * cert,
 				    gnutls_kx_algorithm alg)
 {
-	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_CRD_CERTIFICATE) {
+
+	/* FIXME: check here */
+	if (_gnutls_map_kx_get_cred(alg, 1) == GNUTLS_CRD_CERTIFICATE ||
+		_gnutls_map_kx_get_cred(alg, 0) == GNUTLS_CRD_CERTIFICATE) 
+	{
 		switch (alg) {
 		case GNUTLS_KX_RSA:
 			if (cert->keyUsage != 0) {
@@ -2228,6 +2232,7 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 					return 0;
 			}
 			return 0;
+		case GNUTLS_KX_SRP_RSA:
 		case GNUTLS_KX_DHE_RSA:
 		case GNUTLS_KX_DHE_DSS:
 		case GNUTLS_KX_RSA_EXPORT:

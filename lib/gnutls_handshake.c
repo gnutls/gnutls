@@ -505,7 +505,7 @@ int _gnutls_recv_finished(gnutls_session session)
 /* returns PK_RSA if the given cipher suite list only supports,
  * RSA algorithms, PK_DSA if DSS, and -1 if both or none.
  */
-int _gnutls_find_pk_algos_in_ciphersuites( opaque* data, int datalen) {
+int _gnutls_server_find_pk_algos_in_ciphersuites( opaque* data, int datalen) {
 int j;
 gnutls_pk_algorithm algo=-1, prev_algo = 0;
 gnutls_kx_algorithm kx;
@@ -513,7 +513,7 @@ gnutls_kx_algorithm kx;
 	for (j = 0; j < datalen; j += 2) {
 		kx = _gnutls_cipher_suite_get_kx_algo(*((GNUTLS_CipherSuite *) & data[j]));
 		
-		if ( _gnutls_map_kx_get_cred( kx) == GNUTLS_CRD_CERTIFICATE) {
+		if ( _gnutls_map_kx_get_cred( kx, 1) == GNUTLS_CRD_CERTIFICATE) {
 			algo = _gnutls_map_pk_get_pk( kx);
 	
 			if (algo!=prev_algo && prev_algo!=0) return -1;
@@ -537,7 +537,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 			      * supported by the peer.
 			      */
 
-	pk_algo = _gnutls_find_pk_algos_in_ciphersuites( data, datalen);
+	pk_algo = _gnutls_server_find_pk_algos_in_ciphersuites( data, datalen);
 
 	x = _gnutls_supported_ciphersuites(session, &ciphers);
 	if (x < 0) { /* the case x==0 is handled within the function. */
@@ -597,8 +597,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	/* check if the credentials (username, public key etc. are ok)
 	 */
 	if (_gnutls_get_kx_cred
-	    (session->key,
-	     _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
+	    (session, _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
@@ -1108,8 +1107,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	 * Actually checks if they exist.
 	 */
 	if (_gnutls_get_kx_cred
-	    (session->key,
-	     _gnutls_cipher_suite_get_kx_algo(session->
+	    (session, _gnutls_cipher_suite_get_kx_algo(session->
 					      security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
@@ -2335,7 +2333,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	gnutls_kx_algorithm *alg;
 	int alg_size;
 	gnutls_kx_algorithm kx;
-
+	int server = session->security_parameters.entity==GNUTLS_SERVER?1:0;
 
 	/* if we should use a specific certificate, 
 	 * we should remove all algorithms that are not supported
@@ -2390,22 +2388,22 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 
 		/* if it is defined but had no credentials 
 		 */
-		if (_gnutls_get_kx_cred
-		    (session->key, kx, NULL) == NULL) {
+		if (_gnutls_get_kx_cred(session, kx, NULL) == NULL) {
 			keep = 1;
 		} else
 		/* If there was no credentials to use with the specified
 		 * key exchange method, then just remove it.
 		 */
-		if (_gnutls_map_kx_get_cred(kx) == GNUTLS_CRD_CERTIFICATE) {
+		if (_gnutls_map_kx_get_cred(kx, server) == GNUTLS_CRD_CERTIFICATE) {
 			keep = 1;	/* do not keep */
 			if (x509_cred != NULL) {
-				if (session->security_parameters.entity ==
-				    GNUTLS_SERVER) {
+				if (server) {
 					/* here we check if the KX algorithm 
 					 * is compatible with the certificate.
 					 */
+fprintf(stderr, "KX: %d\n", kx);
 					for (j = 0; j < alg_size; j++) {
+fprintf(stderr, "ALG: %d\n", alg[j]);
 						if (alg[j] == kx) {
 							keep = 0;
 							break;

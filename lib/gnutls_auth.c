@@ -137,20 +137,29 @@ int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type
   * Eg. for CERTIFICATE ciphersuites (key exchange algorithms: KX_RSA, KX_DHE_RSA),
   * the same function are to be used to access the authentication data.
   **/
-gnutls_credentials_type gnutls_auth_get_type( gnutls_session session) {
+gnutls_credentials_type gnutls_auth_get_type( gnutls_session session) 
+{
+/* This is not the credentials we must set, but the authentication data
+ * we get by the peer, so it should be reversed.
+ */
+int server = session->security_parameters.entity==GNUTLS_SERVER?0:1;
 
 	return _gnutls_map_kx_get_cred(
 		 _gnutls_cipher_suite_get_kx_algo
-                         (session->security_parameters.current_cipher_suite));
+                         (session->security_parameters.current_cipher_suite), server);
 }
 
 /* 
  * This returns an pointer to the linked list. Don't
  * free that!!!
  */
-const void *_gnutls_get_kx_cred( GNUTLS_KEY key, gnutls_kx_algorithm algo, int *err) {
-	return _gnutls_get_cred( key, _gnutls_map_kx_get_cred(algo), err);
+const void *_gnutls_get_kx_cred( gnutls_session session, gnutls_kx_algorithm algo, int *err) 
+{
+int server = session->security_parameters.entity==GNUTLS_SERVER?1:0;
+
+	return _gnutls_get_cred( session->key, _gnutls_map_kx_get_cred(algo, server), err);
 }
+
 const void *_gnutls_get_cred( GNUTLS_KEY key, gnutls_credentials_type type, int *err) {
 	AUTH_CRED * ccred;
 

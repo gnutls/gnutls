@@ -1,5 +1,7 @@
-#include <gnutls_auth.h>
+#ifndef AUTH_SRP_H
+# define AUTH_SRP_H
 
+#include <gnutls_auth.h>
 
 typedef struct {
 	char* username;
@@ -23,9 +25,17 @@ typedef struct SRP_SERVER_AUTH_INFO_INT {
 
 #ifdef ENABLE_SRP
 
-int proc_srp_server_hello(gnutls_session state, const opaque * data, size_t data_size);
-int gen_srp_server_hello(gnutls_session state, opaque * data, size_t data_size);
+int _gnutls_proc_srp_server_hello(gnutls_session state, const opaque * data, size_t data_size);
+int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data, size_t data_size);
+
+int _gnutls_gen_srp_server_kx2(gnutls_session, opaque **);
+int _gnutls_gen_srp_client_kx0(gnutls_session, opaque **);
+
+int _gnutls_proc_srp_server_kx2(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_client_kx0(gnutls_session, opaque *, size_t);
 
 typedef struct  SRP_SERVER_AUTH_INFO_INT  SRP_SERVER_AUTH_INFO_INT;
 
 #endif /* ENABLE_SRP */
+
+#endif

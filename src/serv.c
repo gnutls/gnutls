@@ -986,8 +986,10 @@ void gaa_parser(int argc, char **argv)
 
    if (info.kx != NULL && info.nkx > 0) {
       for (j = i = 0; i < info.nkx; i++) {
-	 if (strncasecmp(info.kx[i], "SRP", 3) == 0)
+	 if (strcasecmp(info.kx[i], "SRP") == 0)
 	    kx_priority[j++] = GNUTLS_KX_SRP;
+	 if (strcasecmp(info.kx[i], "SRP-RSA") == 0)
+	    kx_priority[j++] = GNUTLS_KX_SRP_RSA;
 	 if (strcasecmp(info.kx[i], "RSA") == 0)
 	    kx_priority[j++] = GNUTLS_KX_RSA;
 	 if (strcasecmp(info.kx[i], "RSA-EXPORT") == 0)

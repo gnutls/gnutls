@@ -32,19 +32,19 @@
 #include "auth_srp.h"
 #include <gnutls_str.h>
 
-int gen_srp_server_kx2(gnutls_session, opaque **);
-int gen_srp_client_kx0(gnutls_session, opaque **);
+int _gnutls_gen_srp_server_kx2(gnutls_session, opaque **);
+int _gnutls_gen_srp_client_kx0(gnutls_session, opaque **);
 
-int proc_srp_server_kx2(gnutls_session, opaque *, size_t);
-int proc_srp_client_kx0(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_server_kx2(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_client_kx0(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
 	NULL,
 	NULL,
 	NULL,
-	gen_srp_server_kx2,
-	gen_srp_client_kx0,
+	_gnutls_gen_srp_server_kx2,
+	_gnutls_gen_srp_client_kx0,
 	NULL,
 	NULL,
 	NULL,
@@ -52,8 +52,8 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 	NULL,
 	NULL, /* certificate */
 	NULL,
-	proc_srp_server_kx2,
-	proc_srp_client_kx0,
+	_gnutls_proc_srp_server_kx2,
+	_gnutls_proc_srp_client_kx0,
 	NULL,
 	NULL,
 	NULL
@@ -72,7 +72,7 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
  */
-int gen_srp_server_hello(gnutls_session state, opaque * data, size_t _data_size)
+int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data, size_t _data_size)
 {
 	size_t n_g, n_n, n_s;
 	int ret;
@@ -170,7 +170,7 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, size_t _data_size)
 }
 
 /* send the second key exchange message  */
-int gen_srp_server_kx2(gnutls_session state, opaque ** data)
+int _gnutls_gen_srp_server_kx2(gnutls_session state, opaque ** data)
 {
 	int ret;
 	size_t n_b;
@@ -232,7 +232,7 @@ int gen_srp_server_kx2(gnutls_session state, opaque ** data)
 
 
 /* return A = g^a % N */
-int gen_srp_client_kx0(gnutls_session state, opaque ** data)
+int _gnutls_gen_srp_client_kx0(gnutls_session state, opaque ** data)
 {
 	size_t n_a;
 	uint8 *data_a;
@@ -249,10 +249,13 @@ int gen_srp_client_kx0(gnutls_session state, opaque ** data)
 	username = cred->username;
 	password = cred->password;
 
-	if (username == NULL || password == NULL)
+	if (username == NULL || password == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
-	/* calc A = g^a % N */
+	/* calc A = g^a % N 
+	 */
 	if (G == NULL || N == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
@@ -264,8 +267,10 @@ int gen_srp_client_kx0(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (_gnutls_mpi_print( NULL, &n_a, A)!=0)
+	if (_gnutls_mpi_print( NULL, &n_a, A)!=0) {
+		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
+	}
 
 	(*data) = gnutls_malloc(n_a + 2);
 	if ( (*data) == NULL) {
@@ -286,7 +291,7 @@ int gen_srp_client_kx0(gnutls_session state, opaque ** data)
 }
 
 /* receive the first key exchange message ( g, n, s) */
-int proc_srp_server_hello(gnutls_session state, const opaque * data, size_t _data_size)
+int _gnutls_proc_srp_server_hello(gnutls_session state, const opaque * data, size_t _data_size)
 {
 	uint8 n_s;
 	uint16 n_g, n_n;
@@ -372,7 +377,7 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, size_t _dat
 }
 
 /* just read A and put it to state */
-int proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _data_size)
+int _gnutls_proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _data_size)
 {
 	size_t _n_A;
 	ssize_t data_size = _data_size;
@@ -390,7 +395,7 @@ int proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _data_size)
 }
 
 
-int proc_srp_server_kx2(gnutls_session state, opaque * data, size_t _data_size)
+int _gnutls_proc_srp_server_kx2(gnutls_session state, opaque * data, size_t _data_size)
 {
 	size_t _n_B;
 	ssize_t data_size = _data_size;
@@ -432,7 +437,9 @@ int proc_srp_server_kx2(gnutls_session state, opaque * data, size_t _data_size)
 	if (ret < 0)
 		return ret;
 
-	return 0;
+	return _data_size - data_size; /* return the remaining data 
+					* needed in auth_srp_rsa.
+					*/
 }
 
 #endif /* ENABLE_SRP */
