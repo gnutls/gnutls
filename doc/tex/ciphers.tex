@@ -4,7 +4,7 @@ Confidentiality is provided by using block encryption algorithms like {\bf 3DES}
 {\bf AES\footnote{AES or Advanced Encryption Standard is actually the RIJNDAEL algorithm. This is the
 algorithm that will replace DES.}}, or
 stream algorithms like {\bf ARCFOUR\footnote{ARCFOUR is a compatible
-algorithm with RSA's RC4 algorithm.}} See \hyperref{fig:ciphers}{figure }{}{fig:ciphers} for a complete list. 
+algorithm with RSA's RC4 algorithm, which is considered as a trade secret.}} See \hyperref{fig:ciphers}{figure }{}{fig:ciphers} for a complete list. 
 Ciphers are encryption algorithms that use a single (secret) key
 to encrypt and decrypt data. Block algorithms in TLS also provide protection
 against statistical analysis of the data. \gnutls{} makes use of this property
@@ -23,8 +23,8 @@ encryption (EDE). Has 64 bits block size and is used in CBC mode.
 ARCFOUR & ARCFOUR is a fast stream cipher.
 \\
 \hline
-AES\_CBC & AES or RIJNDAEL is the block cipher algorithm that replaces the old 
-(and insecure\footnote{due to small key length}) DES algorithm. Has
+AES\_CBC & AES or RIJNDAEL is the block cipher algorithm that replaces 
+the old DES algorithm. Has
 128 bits block size and is used in CBC mode. This is not officially
 supported in TLS.
 \\

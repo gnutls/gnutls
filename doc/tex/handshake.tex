@@ -39,6 +39,7 @@ feature of the {\bf TLS} protocol which allows a client to connect to a server,
 after a successful handshake, without the expensive calculations (by using the previously
 established keys). \gnutls{} supports this feature, and the
 example \hyperref{resume client}{resume client (see Section }{)}{resume-example} illustrates a typical use of it (This is a modification of the simple client example).
+\par
 Servers only need to use the
 \hyperref{gnutls\_db\_set\_name()}{gnutls\_db\_set\_name() (see Section }{)}{gnutls_db_set_name} function if they want to use the gdbm
 backend to store sessions. 
@@ -53,12 +54,16 @@ The resuming capability (mostly in the server side) is one of the problems of a 
 implementations. The problem is that all threads must share information in
 order to be able to resume sessions. The gnutls approach is, in case of a
 client, to leave all the burden of resuming to the client (ie. copy and keep the
-nesessary parameters). See \hyperref{gnutls\_session\_get\_data()}
-{gnutls\_session\_get\_data() on section }{}{gnutls_session_get_data},
-\hyperref{gnutls\_session\_get\_id()}
-{gnutls\_session\_get\_id() on section }{}{gnutls_session_get_id} and
-\hyperref{gnutls\_session\_set\_data()}
-{gnutls\_session\_set\_data() on section }{}{gnutls_session_set_data}.
+nesessary parameters). See the functions:
+\begin{itemize}
+\item \hyperref{gnutls\_session\_get\_data()}
+{gnutls\_session\_get\_data() on section }{}{gnutls_session_get_data}
+\item \hyperref{gnutls\_session\_get\_id()}
+{gnutls\_session\_get\_id() on section }{}{gnutls_session_get_id}
+\item \hyperref{gnutls\_session\_set\_data()}
+{gnutls\_session\_set\_data() on section }{}{gnutls_session_set_data}
+\end{itemize}
+
 \par
 The server side is different.
 Here the server only specifies a DB file, using 
@@ -71,15 +76,20 @@ only one thread can write at a time. The current behaviour of gnutls is
 not to block to wait for the DB to be ready for writing, but continue the
 process normally (and do not save the parameters).  
 \par
- \gnutls{} also provides callback functions such as:
-\hyperref{gnutls\_db\_set\_remove\_function()}{gnutls\_db\_set\_remove\_function() (see Section }{)}
-{gnutls_db_set_remove_function}, 
-\hyperref{gnutls\_db\_set\_store\_function()}{gnutls\_db\_set\_store\_function() (see Section }{)}
-{gnutls_db_set_store_function}, \\
-\hyperref{gnutls\_db\_set\_retrieve\_function()}{gnutls\_db\_set\_retrieve\_function() (see Section }{)
-}{gnutls_db_set_retrieve_function} and 
-\hyperref{gnutls\_db\_set\_ptr()}{gnutls\_db\_set\_ptr() (see Section }{)}
-{gnutls_db_set_ptr}.
+The default behaviour is not efficient in servers where many connections
+per second arrive. Thus
+ \gnutls{} provides the following callback functions:
+\begin{itemize}
+\item \hyperref{gnutls\_db\_set\_remove\_function()}{gnutls\_db\_set\_remove\_function() (see Section }{)}
+{gnutls_db_set_remove_function}
+\item \hyperref{gnutls\_db\_set\_store\_function()}{gnutls\_db\_set\_store\_function() (see Section }{)}
+{gnutls_db_set_store_function}
+\item \hyperref{gnutls\_db\_set\_retrieve\_function()}{gnutls\_db\_set\_retrieve\_function() (see Section }{)
+}{gnutls_db_set_retrieve_function}
+\item \hyperref{gnutls\_db\_set\_ptr()}{gnutls\_db\_set\_ptr() (see Section }{)}
+{gnutls_db_set_ptr}
+\end{itemize}
+
 These callback functions are required in order to use a session
 storage method, other than the default gdbm backend. 
 \par

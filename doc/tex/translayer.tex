@@ -6,7 +6,7 @@ use the functions:
 \item \printfunc{gnutls_transport_set_push_func}{gnutls\_transport\_set\_push\_func()}
 \item \printfunc{gnutls_transport_set_pull_func}{gnutls\_transport\_set\_pull\_func()}
 \end{itemize}
-These functions accept a functions as a parameter. The given functions will 
+These functions accept a function as a parameter. The given functions will 
 be used by gnutls to send and receive data.
 These functions should return -1 on error and should set errno appropriately.
 \gnutls{} supports EINTR and EAGAIN errno values. These values are
