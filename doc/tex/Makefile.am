@@ -7,7 +7,7 @@ TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex \
 	auth.tex ciphers.tex errors.tex layers.tex alert.tex record.tex \
 	funcs.tex examples.tex ex4.tex ../../libextra/gnutls-extra-api.tex \
-	memory.tex intro.tex openpgp.tex x509.tex howto.tex openssl.tex \
+	memory.tex openpgp.tex x509.tex howto.tex openssl.tex \
 	ex-rfc2818.tex appendix.tex x509cert.xml.tex pgpcert.xml.tex \
 	serv-export.tex serv-srp.tex programs.tex library.tex certificate.tex \
 	tlsintro.tex
