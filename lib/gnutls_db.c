@@ -165,6 +165,29 @@ GDBM_FILE dbf;
 #endif
 }
 
+/**
+  * gnutls_check_db_entry - checks if the given db entry has expired
+  * @state: is a &GNUTLS_STATE structure.
+  * @session_entry: is the session data (not key)
+  *
+  * This function should only be used if not using the gdbm backend.
+  * This function returns GNUTLS_E_EXPIRED, if the database entry
+  * has expired or 0 otherwise. This function is to be used when
+  * you want to clear unnesessary session which occupy space in your
+  * backend.
+  *
+  **/
+int gnutls_check_db_entry( GNUTLS_STATE state, gnutls_datum session_entry) {
+time_t timestamp;
+
+	timestamp = time(0);
+
+	if (session_entry.data != NULL)
+		if ( timestamp - ((SecurityParameters*)(session_entry.data))->timestamp <= state->gnutls_internals.expire_time || ((SecurityParameters*)(session_entry.data))->timestamp > timestamp|| ((SecurityParameters*)(session_entry.data))->timestamp == 0)
+			return GNUTLS_E_EXPIRED;
+	
+	return 0;
+}
 
 /**
   * gnutls_clean_db - removes expired and invalid sessions from the database
@@ -182,6 +205,7 @@ GDBM_FILE dbf;
 int ret;
 datum key;
 time_t timestamp;
+gnutls_datum _key;
 
 	if (GNUTLS_DBF==NULL) return GNUTLS_E_DB_ERROR;
 	if (GNUTLS_DBNAME==NULL) return GNUTLS_E_DB_ERROR;
@@ -192,9 +216,11 @@ time_t timestamp;
 
 	timestamp = time(0);
 
-	while( key.dptr != NULL) {
+	_key.data = key.dptr;
+	_key.size = key.dsize;
+	while( _key.data != NULL) {
 
-		if ( timestamp - ((SecurityParameters*)(key.dptr))->timestamp <= state->gnutls_internals.expire_time || ((SecurityParameters*)(key.dptr))->timestamp > timestamp|| ((SecurityParameters*)(key.dptr))->timestamp == 0) {
+		if ( gnutls_check_db_entry( state, _key)==GNUTLS_E_EXPIRED) {
 		    /* delete expired entry */
 		    gdbm_delete( dbf, key);
 		}

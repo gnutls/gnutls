@@ -148,6 +148,7 @@ void gnutls_set_db_retrieve_func( GNUTLS_STATE, DB_RETR_FUNC);
 void gnutls_set_db_remove_func( GNUTLS_STATE, DB_REMOVE_FUNC);
 void gnutls_set_db_store_func( GNUTLS_STATE, DB_STORE_FUNC);
 void gnutls_set_db_ptr( GNUTLS_STATE, void* db_ptr);
+int gnutls_check_db_entry( GNUTLS_STATE state, gnutls_datum session_entry);
 
 void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
 
