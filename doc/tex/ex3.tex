@@ -1,5 +1,9 @@
 \begin{verbatim}
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gnutls/gnutls.h>
+
 #define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
         PRINTX( "OU:", X.organizational_unit_name); \
@@ -18,7 +22,6 @@ int print_info(gnutls_session session)
 {
    const char *tmp;
    gnutls_credentials_type cred;
-   gnutls_x509_dn dn;
    int status;
    gnutls_kx_algorithm kx;
 
@@ -36,7 +39,7 @@ int print_info(gnutls_session session)
    case GNUTLS_CRD_ANON:       /* anonymous authentication */
 
       printf("- Anonymous DH using prime of %d bits\n",
-             gnutls_dh_get_bits(session));
+             gnutls_dh_get_prime_bits(session));
       break;
 
    case GNUTLS_CRD_CERTIFICATE:        /* certificate authentication */
@@ -68,15 +71,15 @@ int print_info(gnutls_session session)
        */
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
          printf("\n- Ephemeral DH using prime of %d bits\n",
-                gnutls_dh_get_bits(session));
+                gnutls_dh_get_prime_bits(session));
       }
 
       /* if the certificate list is available, then
        * print some information about it.
        */
-      print_x509_certificate_info(session)
+      print_x509_certificate_info(session);
 
-   }                            /* switch */
+   } /* switch */
 
    /* print the protocol's name (ie TLS 1.0) 
     */
@@ -127,6 +130,7 @@ static void print_x509_certificate_info(gnutls_session session)
    time_t activet = gnutls_certificate_activation_time_peers(session);
    const gnutls_datum *cert_list;
    int cert_list_size = 0;
+   gnutls_x509_dn dn;
 
    cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 

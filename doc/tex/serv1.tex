@@ -32,7 +32,6 @@ gnutls_certificate_server_credentials x509_cred;
 gnutls_session initialize_tls_session()
 {
    gnutls_session session;
-   int ret;
    const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
    const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, 0 };
    const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_CBC, 
@@ -67,7 +66,7 @@ gnutls_session initialize_tls_session()
 
 gnutls_dh_params dh_params;
 
-static int generate_dh_primes(void) {
+static int generate_dh_params(void) {
 gnutls_datum prime, generator;
 
    /* Generate Diffie Hellman parameters - for use with DHE
@@ -77,10 +76,12 @@ gnutls_datum prime, generator;
     */
    gnutls_dh_params_init( &dh_params);
    gnutls_dh_params_generate( &prime, &generator, DH_BITS);
-   gnutls_dh_params_set( dh_params, prime, generator);
+   gnutls_dh_params_set( dh_params, prime, generator, DH_BITS);
 
    free( prime.data);
    free( generator.data);
+   
+   return 0;
 }
 
 int main()
@@ -94,7 +95,6 @@ int main()
    gnutls_session session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
-   int http = 0;
    char name[256];
 
    strcpy(name, "Echo Server");
@@ -103,11 +103,11 @@ int main()
     */
    gnutls_global_init();
 
-   gnutls_certificate_allocate_server_credentials(&x509_cred);
+   gnutls_certificate_allocate_credentials(&x509_cred);
    gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, 
       GNUTLS_X509_FMT_PEM);
 
-   if (gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 
+   gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 
       GNUTLS_X509_FMT_PEM);
 
    generate_dh_params();
@@ -197,7 +197,7 @@ int main()
    }
    close(listen_sd);
 
-   gnutls_certificate_free_server_credentials(x509_cred);
+   gnutls_certificate_free_credentials(x509_cred);
 
    gnutls_global_deinit();
 

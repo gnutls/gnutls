@@ -6,7 +6,11 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include <gnutls/gnutls.h>
+
+/* A very basic TLS client.
+ */
 
 #define MAX_BUF 1024
 #define CRLFILE "crl.pem"
@@ -26,20 +30,16 @@ int main()
    gnutls_certificate_client_credentials xcred;
    const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
    const int kx_priority[] = { GNUTLS_KX_RSA, 0 };
-   const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR\_128, 0};
-   const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+   const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, 0};
+   const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };
    const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
 
-   if (gnutls_global_init() < 0) {
-      fprintf(stderr, "global state initialization error\n");
-      exit(1);
-   }
+   gnutls_global_init();
+
    /* X509 stuff */
-   if (gnutls_certificate_allocate_client_credentials(&xcred) < 0) {  
-      fprintf(stderr, "memory error\n");
-      exit(1);
-   }
+   gnutls_certificate_allocate_credentials(&xcred);
+
    /* set's the trusted cas file
     */
    gnutls_certificate_set_x509_trust_file(xcred, CAFILE, GNUTLS_X509_FMT_PEM);
@@ -138,7 +138,7 @@ int main()
 
    gnutls_session_deinit(session);
 
-   gnutls_certificate_free_client_credentials(xcred);
+   gnutls_certificate_free_credentials(xcred);
 
    gnutls_global_deinit();
 

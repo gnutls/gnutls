@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #include <gnutls/gnutls.h>
 
 #define MAX_BUF 1024
@@ -16,8 +17,8 @@
 
 const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, 0 };
-const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR\_128, 0};
-const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, 0};
+const int comp_priority[] = { GNUTLS_COMP_NULL, 0 };
 const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
 int main()
@@ -32,18 +33,14 @@ int main()
    gnutls_certificate_client_credentials xcred;
    /* variables used in session resuming */
    int t;
-   char *session;
-   int session_size;
+   char *session_data;
+   int session_data_size;
 
-   if (gnutls_global_init() < 0) {
-      fprintf(stderr, "global state initialization error\n");
-      exit(1);
-   }
+   gnutls_global_init();
+
    /* X509 stuff */
-   if (gnutls_certificate_allocate_client_credentials(&xcred) < 0) {
-      fprintf(stderr, "memory error\n");
-      exit(1);
-   }
+   gnutls_certificate_allocate_credentials(&xcred);
+
    gnutls_certificate_set_x509_trust_file(xcred, CAFILE, GNUTLS_X509_FMT_PEM);
 
    for (t = 0; t < 2; t++) {    /* connect 2 times to the server */
@@ -70,8 +67,8 @@ int main()
       gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
       if (t > 0) { /* if this is not the first time we connect */
-         gnutls_session_set_data(session, session, session_size);
-         free(session);
+         gnutls_session_set_data(session, session_data, session_data_size);
+         free(session_data);
       }
       
       gnutls_transport_set_ptr( session, sd);
@@ -90,11 +87,11 @@ int main()
 
       if (t == 0) { /* the first time we connect */
          /* get the session data size */
-         gnutls_session_get_data(session, NULL, &session_size);
-         session = malloc(session_size);
+         gnutls_session_get_data(session, NULL, &session_data_size);
+         session_data = malloc(session_data_size);
 
          /* put session data to the session variable */
-         gnutls_session_get_data(session, session, &session_size);
+         gnutls_session_get_data(session, session_data, &session_data_size);
 
       } else { /* the second time we connect */
 
@@ -108,7 +105,7 @@ int main()
 
       /* This function was defined in a previous example
        */
-      print_info(session);
+      /* print_info(session); */
 
       gnutls_record_send( session, MSG, strlen(MSG));
 
@@ -150,7 +147,7 @@ int main()
 
    }  /* for() */
 
-   gnutls_certificate_free_client_credentials(xcred);
+   gnutls_certificate_free_credentials(xcred);
 
    gnutls_global_deinit();
 
