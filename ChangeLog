@@ -1,3 +1,24 @@
+2002-03-11 12:45  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Added missing stub for one function.  
+
+2002-03-10 00:09  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	New error codes.  
+
+2002-03-10 00:01  nmav <nmav@gnutls.org>
+
+	* ChangeLog, lib/gnutls_constate.c, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, lib/gnutls_handshake.c, lib/gnutls_pk.c,
+	lib/gnutls_privkey.c, lib/gnutls_record.c, lib/gnutls_sig.c,
+	lib/gnutls_state.c, lib/gnutls_x509.c, lib/x509_asn1.h:
+
+	some error codes were renamed to more appropriate names 
+
 2002-03-09 21:06  twoaday <twoaday@gnutls.org>
 
 	* lib/: gnutls_openpgp.c, x509_ASN.c:

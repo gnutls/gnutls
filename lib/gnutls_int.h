@@ -543,6 +543,8 @@ typedef struct {
 	 * record packet will have. */
 	GNUTLS_Version		default_record_version;
 
+	int			cbc_protection_hack;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } GNUTLS_INTERNALS;

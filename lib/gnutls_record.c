@@ -176,7 +176,7 @@ static int _gnutls_session_is_valid( GNUTLS_STATE state) {
 }
 
 static
-ssize_t gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
+ssize_t _gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
 	opaque** erecord)
 {
 	int cipher_size;
@@ -186,6 +186,11 @@ ssize_t gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
 	GNUTLS_Version lver;
 
 	*erecord = NULL;
+
+	/* if this protection has been disabled
+	 */
+	if (state->gnutls_internals.cbc_protection_hack!=0) return 0;
+	
 	if (type!=GNUTLS_APPLICATION_DATA ||
 		_gnutls_cipher_is_block( gnutls_cipher_get(state))!=CIPHER_BLOCK) 
 		/* alert messages and stream ciphers
@@ -225,7 +230,6 @@ ssize_t gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
 
 	return retval;
 }
-
 
 /* This function behave exactly like write(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
@@ -298,7 +302,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		 * avoid the recent CBC attacks.
 		 */
 		erecord_size = 
-			gnutls_create_empty_record( state, type, &erecord);
+			_gnutls_create_empty_record( state, type, &erecord);
 		if (erecord_size < 0) {
 			gnutls_assert();
 			return erecord_size;

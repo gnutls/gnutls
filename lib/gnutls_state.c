@@ -398,6 +398,30 @@ void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version versi
 	state->gnutls_internals.default_record_version = version;
 }
 
+/**
+  * gnutls_record_set_cbc_protection - Used to disable the CBC protection
+  * @state: is a &GNUTLS_STATE structure.
+  * @prot: is an integer (0 or 1)
+  *
+  * A newly discovered attack against the record protocol requires some
+  * counter-measures to be taken. GnuTLS will enable them by default
+  * thus, sends an empty record packet, before each actual record packet,
+  * in order to assure that the IV is not known to potential attackers.
+  *
+  * This function will enable or disable the chosen plaintext protection
+  * in the TLS record protocol (used with ciphers in CBC mode).
+  * if prot == 0 then protection is enabled (default), otherwise it
+  * is disabled.
+  *
+  * The protection used will slightly decrease performance, and add 
+  * 20 or more bytes per record packet.
+  *
+  **/
+void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
+{
+	state->gnutls_internals.cbc_protection_hack = prot;
+}
+
 inline
 static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size, void* result)
 {
