@@ -1,3 +1,28 @@
+2004-08-23 15:52  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Check for ctype.h to shut up Sun CC warnings in src/cfg/shared.c.  
+	Reported by Dimitri Papadopoulos-Orfanos <papadopo@shfj.cea.fr>.  
+
+2004-08-23 10:51  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	ISO certify.  
+
+2004-08-23 10:48  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-23 08:35  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Move /dev/*random stuff to separate m4 file.  
+
 2004-08-22 21:48  Simon Josefsson <simon@josefsson.org>
 
 	* AUTHORS:
