@@ -1,3 +1,24 @@
+2002-06-30 15:18  nmav <nmav@gnutls.org>
+
+	* src/common.c, lib/auth_cert.c, lib/gnutls_cipher.c,
+	lib/gnutls_handshake.c, lib/gnutls_mpi.c, lib/gnutls_mpi.h,
+	lib/gnutls_ui.h, lib/x509_xml.c:
+
+	Made the xml convertion functions more mnemonic. Several other fixes
+	in the core library.  
+
+2002-06-30 11:09  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_alert.c, gnutls_algorithms.c, gnutls_algorithms.h,
+	gnutls_auth.h, gnutls_cipher.c, gnutls_compress_int.c,
+	gnutls_compress_int.h, gnutls_errors.c, gnutls_extensions.c,
+	gnutls_extensions.h, gnutls_handshake.c, gnutls_hash_int.c,
+	gnutls_hash_int.h, gnutls_int.h, gnutls_mpi.c, gnutls_mpi.h,
+	gnutls_state.c, gnutls_state.h, gnutls_x509.c, x509_extensions.c,
+	x509_extensions.h, x509_xml.c:
+
+	Several (internal) cleanups. Const flags are better used now.  
+
 2002-06-29 08:42  nmav <nmav@gnutls.org>
 
 	* lib/: auth_cert.c, gnutls_x509.c:
