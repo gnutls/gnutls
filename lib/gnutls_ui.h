@@ -86,6 +86,10 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
                                 const char *hostname);
 
+int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
+	gnutls_x509_certificate_format format, gnutls_datum * prime,
+	gnutls_datum * generator, int* prime_bits);
+
 /* get data from the session */
 const gnutls_datum* gnutls_certificate_get_peers( gnutls_session, int* list_size);
 const gnutls_datum *gnutls_certificate_get_ours( gnutls_session session);

@@ -194,13 +194,6 @@ int gnutls_global_init( void)
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_dh_calc_mpis();
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	
 	return 0;
 }
 
@@ -219,8 +212,6 @@ void gnutls_global_deinit( void) {
 	if (_gnutls_init==0) {
 		asn1_delete_structure(& GNUTLS_ASN);
 		asn1_delete_structure(& PKIX1_ASN);
-	
-		_gnutls_dh_clear_mpis();
 	}
 	
 }

@@ -4,6 +4,14 @@ Version 0.9.0
 - Added ability to send some messages back to the application using
   the gnutls_global_set_log_function().
 - This version is not binary compatible with the previous ones.
+- gnutls_dh_params_generate() and gnutls_rsa_params_generate() now use 
+  gnutls_malloc() to allocate the output parameters.
+- Added gnutls_pkcs3_extract_dh_params() which extracts parameters from
+  PKCS#3 encoded structures. This was in order to read parameters generated
+  using the openssl dhparam tool.
+- Several changes in the temporary (DH/RSA) parameter codebase. No DH 
+  parameters are now included in the library. Also a credentials structure 
+  can now hold only one temporary parameter.
 
 Version 0.8.1 (22/01/2003)
 - Improved the SRP support, to prevent attackers guessing the

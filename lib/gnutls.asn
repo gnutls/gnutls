@@ -82,4 +82,12 @@ DSAPrivateKey ::= SEQUENCE {
 	priv           		INTEGER
 }
 
+-- from PKCS#3
+DHParameter ::= SEQUENCE {
+	prime INTEGER, -- p
+	base INTEGER, -- g
+	privateValueLength INTEGER OPTIONAL 
+}
+
+
 END

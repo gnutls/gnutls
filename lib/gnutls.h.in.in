@@ -316,10 +316,6 @@ int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res,
 
 /* global state functions 
  */
-/* In this version global_init accepts two files (pkix.asn, pkcs1.asn).
- * This will not be the case in the final version. These files 
- * are located in the src/ directory of gnutls distribution.
- */
 int gnutls_global_init(void);
 void gnutls_global_deinit(void);
 

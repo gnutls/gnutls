@@ -139,7 +139,7 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 
 }
 
-
+#define MIN_DH_BITS 511
 #define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_init - This function initializes the session to null (null encryption etc...).
@@ -193,7 +193,7 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 
 	(*session)->internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
-	gnutls_dh_set_prime_bits( (*session), MIN_BITS);
+	gnutls_dh_set_prime_bits( (*session), MIN_DH_BITS);
 
 	gnutls_transport_set_lowat((*session), DEFAULT_LOWAT); /* the default for tcp */
 

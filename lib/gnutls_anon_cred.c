@@ -56,7 +56,6 @@ void gnutls_anon_free_server_credentials( gnutls_anon_server_credentials sc) {
 int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc) {
 
 	*sc = gnutls_calloc( 1, sizeof(ANON_SERVER_CREDENTIALS_INT));
-	(*sc)->dh_params = &_gnutls_dh_default_params;
 
 	return 0;
 }

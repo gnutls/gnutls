@@ -45,12 +45,16 @@ const ASN1_ARRAY_TYPE gnutls_asn1_tab[]={
   {"DSASignatureValue",1610612741,0},
   {"r",1073741827,0},
   {"s",3,0},
-  {"DSAPrivateKey",536870917,0},
+  {"DSAPrivateKey",1610612741,0},
   {"version",1073741827,0},
   {"p",1073741827,0},
   {"q",1073741827,0},
   {"g",1073741827,0},
   {"Y",1073741827,0},
   {"priv",3,0},
+  {"DHParameter",536870917,0},
+  {"prime",1073741827,0},
+  {"base",1073741827,0},
+  {"privateValueLength",16387,0},
   {0,0,0}
 };

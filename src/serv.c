@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001,2002 Paul Sheer
- * Portions Copyright (C) 2002 Nikos Mavroyanopoulos
+ * Portions Copyright (C) 2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -59,6 +59,7 @@ static int generate = 0;
 static int http = 0;
 static int port = 0;
 static int x509ctype;
+static int prime_bits = 1024;
 
 static int quiet;
 static int nodb;
@@ -72,6 +73,7 @@ char *pgp_certfile;
 char *x509_keyfile;
 char *x509_certfile;
 char *x509_cafile;
+char *dh_params_file;
 char *x509_crlfile = NULL;
 
 /* end of globals */
@@ -147,9 +149,6 @@ static void listener_free(listener_item * j)
 }
 
 
-
-#define DEFAULT_PRIME_BITS 1024
-
 /* we use primes up to 1024 in this server.
  * otherwise we should add them here.
  */
@@ -189,12 +188,64 @@ static int generate_dh_primes(void)
 	 fprintf(stderr, "Error in prime replacement\n");
 	 exit(1);
       }
-      free(prime.data);
-      free(generator.data);
+      gnutls_free(prime.data);
+      gnutls_free(generator.data);
 
    } while (prime_nums[++i] != 0);
 
    return 0;
+}
+
+static void read_dh_params(void)
+{
+   gnutls_datum prime, generator;
+   char tmpdata[2048];
+   int size, bits;
+   gnutls_datum params;
+   FILE* fd;
+   
+   if (gnutls_dh_params_init(&dh_params) < 0) {
+      fprintf(stderr, "Error in dh parameter initialization\n");
+      exit(1);
+   }
+
+   /* read the params file
+    */
+   fd = fopen(dh_params_file, "r");
+   if (fd==NULL) {
+   	fprintf(stderr, "Could not open %s\n", dh_params_file);
+   	exit(1);
+   }
+
+   size = fread( tmpdata, 1, sizeof(tmpdata)-1, fd);
+   tmpdata[size] = 0;
+   fclose(fd);
+
+   params.data = tmpdata;
+   params.size = size;
+
+   size = gnutls_pkcs3_extract_dh_params( &params, GNUTLS_X509_FMT_PEM,
+   	&prime, &generator, &bits);
+
+   if (size < 0) {
+   	fprintf(stderr, "Error parsing dh params: %s\n", gnutls_strerror(size));
+   	exit(1);
+   }
+
+   printf("Read Diffie Hellman parameters [%d].\n", bits);
+   fflush(stdout);
+   
+   if (gnutls_dh_params_set
+	(dh_params, prime, generator, bits) < 0) {
+	fprintf(stderr, "Error in prime replacement\n");
+	exit(1);
+   }
+   
+   prime_bits = bits;
+
+   gnutls_free(prime.data);
+   gnutls_free(generator.data);
+
 }
 
 static int generate_rsa_params(void)
@@ -224,12 +275,12 @@ static int generate_rsa_params(void)
       exit(1);
    }
 
-   free(m.data);
-   free(e.data);
-   free(d.data);
-   free(p.data);
-   free(q.data);
-   free(u.data);
+   gnutls_free(m.data);
+   gnutls_free(e.data);
+   gnutls_free(d.data);
+   gnutls_free(p.data);
+   gnutls_free(q.data);
+   gnutls_free(u.data);
 
    return 0;
 }
@@ -273,6 +324,7 @@ gnutls_session initialize_session(void)
       gnutls_db_set_ptr(session, NULL);
    }
 
+   gnutls_dh_set_prime_bits( session, prime_bits);
    gnutls_cipher_set_priority(session, cipher_priority);
    gnutls_compression_set_priority(session, comp_priority);
    gnutls_kx_set_priority(session, kx_priority);
@@ -544,6 +596,10 @@ int main(int argc, char **argv)
       generate_rsa_params();
       generate_dh_primes();
    }
+   
+   if (dh_params_file) {
+      read_dh_params();
+   }
 
    if (gnutls_certificate_allocate_credentials(&cert_cred) < 0) {
       fprintf(stderr, "memory error\n");
@@ -593,7 +649,7 @@ int main(int argc, char **argv)
 	 exit(1);
       }
 
-   if (generate != 0) {
+   if (generate != 0 || read_dh_params != NULL) {
       if (gnutls_certificate_set_dh_params(cert_cred, dh_params) < 0) {
 	 fprintf(stderr, "Error while setting DH parameters\n");
 	 exit(1);
@@ -927,6 +983,8 @@ void gaa_parser(int argc, char **argv)
       generate = 0;
    else
       generate = 1;
+   
+   dh_params_file = info.dh_params_file;
 
    port = info.port;
 

@@ -32,11 +32,13 @@
  * number of bits. Ie a number of bits that we have a prime in the
  * dh_primes structure.
  */
-static int supported_bits[] = { 512, 0 };
+
+#define MAX_SUPPORTED_BITS 512
+
 static int normalize_bits(int bits)
 {
-	if (bits >= 512)
-		bits = 512;
+	if (bits >= MAX_SUPPORTED_BITS)
+		bits = MAX_SUPPORTED_BITS;
 
 	return bits;
 }
@@ -154,15 +156,10 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
  */
 static int check_bits(int bits)
 {
-	int i = 0;
-	do {
-		if (supported_bits[i] == bits)
-			return 0;
-		i++;
-	} while (supported_bits[i] != 0);
-
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
+	if (bits > MAX_SUPPORTED_BITS)
+		return GNUTLS_E_INVALID_REQUEST;
+		
+	return 0;
 }
 
 #define FREE_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
@@ -184,8 +181,9 @@ static int check_bits(int bits)
   * exchange. The new parameters should be stored in the
   * appropriate gnutls_datum. 
   * 
-  * Note that the bits value should only be 512. That is because the
-  * RSA-EXPORT ciphersuites are only allowed to sign a modulus of 512 bits.
+  * Note that the bits value should only be less than 512. That is because 
+  * the RSA-EXPORT ciphersuites are only allowed to sign a modulus of 512 
+  * bits.
   *
   **/
 int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
@@ -307,7 +305,7 @@ int i;
   *
   * This function will generate new temporary RSA parameters for use in 
   * RSA-EXPORT ciphersuites. The new parameters will be allocated using
-  * malloc and will be stored in the appropriate datum.
+  * gnutls_malloc() and will be stored in the appropriate datum.
   * This function is normally slow. An other function
   * (gnutls_rsa_params_set()) should be called in order to use the 
   * generated RSA parameters.
@@ -342,7 +340,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	siz = 0;
 	_gnutls_mpi_print(NULL, &siz, rsa_params[0]);
 
-	m->data = malloc(siz);
+	m->data = gnutls_malloc(siz);
 	if (m->data == NULL) {
 		FREE_ALL_MPIS;
 		return GNUTLS_E_MEMORY_ERROR;
@@ -355,7 +353,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	siz = 0;
 	_gnutls_mpi_print(NULL, &siz, rsa_params[1]);
 
-	e->data = malloc(siz);
+	e->data = gnutls_malloc(siz);
 	if (e->data == NULL) {
 		FREE_ALL_MPIS;
 		_gnutls_free_datum( m);
@@ -369,7 +367,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	siz = 0;
 	_gnutls_mpi_print(NULL, &siz, rsa_params[2]);
 
-	d->data = malloc(siz);
+	d->data = gnutls_malloc(siz);
 	if (d->data == NULL) {
 		FREE_ALL_MPIS;
 		_gnutls_free_datum( m);
@@ -384,7 +382,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	siz = 0;
 	_gnutls_mpi_print(NULL, &siz, rsa_params[3]);
 
-	p->data = malloc(siz);
+	p->data = gnutls_malloc(siz);
 	if (p->data == NULL) {
 		FREE_ALL_MPIS;
 		_gnutls_free_datum( m);
@@ -400,7 +398,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	siz = 0;
 	_gnutls_mpi_print(NULL, &siz, rsa_params[4]);
 
-	q->data = malloc(siz);
+	q->data = gnutls_malloc(siz);
 	if (q->data == NULL) {
 		FREE_ALL_MPIS;
 		_gnutls_free_datum( m);
@@ -417,7 +415,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	siz = 0;
 	_gnutls_mpi_print(NULL, &siz, rsa_params[5]);
 
-	u->data = malloc(siz);
+	u->data = gnutls_malloc(siz);
 	if (u->data == NULL) {
 		FREE_ALL_MPIS;
 		_gnutls_free_datum( m);
@@ -433,9 +431,11 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 
 	FREE_ALL_MPIS;
 
+#ifdef DEBUG
 	_gnutls_log("rsa_params_generate: Generated %d bits modulus %s, exponent %s.\n",
 		    bits, _gnutls_bin2hex(m->data, m->size),
 		    _gnutls_bin2hex( e->data, e->size));
+#endif
 
 	return 0;
 

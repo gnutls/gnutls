@@ -63,6 +63,7 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("The peer did not send any certificate.", GNUTLS_E_NO_CERTIFICATE_FOUND, 1 ), 
 
 	ERROR_ENTRY("No temporary RSA parameters were found.", GNUTLS_E_NO_TEMPORARY_RSA_PARAMS, 1 ), 
+	ERROR_ENTRY("No temporary DH parameters were found.", GNUTLS_E_NO_TEMPORARY_DH_PARAMS, 1 ), 
 	ERROR_ENTRY("An unexpected TLS handshake packet was received.", GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET, 1 ), 
 	ERROR_ENTRY("The scanning of a large integer has failed.", GNUTLS_E_MPI_SCAN_FAILED, 1 ), 
 	ERROR_ENTRY("Could not export a large integer.", GNUTLS_E_MPI_PRINT_FAILED, 1 ), 

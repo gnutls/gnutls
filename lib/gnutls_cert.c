@@ -115,8 +115,6 @@ int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res
 	if (*res == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	(*res)->dh_params = &_gnutls_dh_default_params;
-
 	return 0;
 }
 

@@ -53,10 +53,10 @@ libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
 	-export-symbols gnutls.sym
 
 pkix_asn1_tab.c: pkix.asn
-	-../libtasn1/src/asn1c pkix.asn pkix_asn1_tab.c
+	-asn1Parser pkix.asn pkix_asn1_tab.c
 
 gnutls_asn1_tab.c: gnutls.asn
-	-../libtasn1/src/asn1c gnutls.asn gnutls_asn1_tab.c
+	-asn1Parser gnutls.asn gnutls_asn1_tab.c
 
 gnutls-api.tex: $(COBJECTS)
 	@echo "" > gnutls-api.tex

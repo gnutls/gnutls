@@ -72,10 +72,9 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 
 	bits = _gnutls_dh_get_prime_bits( session);
 
-	g = gnutls_get_dh_params( cred->dh_params, &p, bits);
-	if (g==NULL || p==NULL) {
+	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return ret;
 	}
 
 	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT), 1)) < 0) {
@@ -117,10 +116,9 @@ GNUTLS_MPI p, g;
 	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
-	g = gnutls_get_dh_params( cred->dh_params, &p, bits);
-	if (g == NULL || p == NULL) {
+	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return ret;
 	}
 
 	ret = _gnutls_proc_dh_common_client_kx( session, data, _data_size, g, p);

@@ -52,6 +52,7 @@ static const gnutls_alert_entry sup_alerts[] = {
 	{ GNUTLS_A_PROTOCOL_VERSION,	 "Error in protocol version" },
 	{ GNUTLS_A_INSUFFICIENT_SECURITY,"Insufficient security" },
 	{ GNUTLS_A_USER_CANCELED,	 "User canceled" },
+	{ GNUTLS_A_INTERNAL_ERROR,	 "Internal error" },
 	{ GNUTLS_A_NO_RENEGOTIATION,	 "No renegotiation is allowed" },
 	{ GNUTLS_A_CERTIFICATE_UNOBTAINABLE, "Could not retrieve the specified certificate" },
 	{ GNUTLS_A_UNSUPPORTED_EXTENSION, "An unsupported extension was sent" },
@@ -203,6 +204,8 @@ int _level = -1;
 			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_INTERNAL_ERROR:
+		case GNUTLS_E_NO_TEMPORARY_DH_PARAMS:
+		case GNUTLS_E_NO_TEMPORARY_RSA_PARAMS:
 			ret = GNUTLS_A_INTERNAL_ERROR;
 			_level = GNUTLS_AL_FATAL;
 			break;

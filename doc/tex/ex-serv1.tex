@@ -71,8 +71,8 @@ gnutls_datum prime, generator;
    gnutls_dh_params_generate( &prime, &generator, DH_BITS);
    gnutls_dh_params_set( dh_params, prime, generator, DH_BITS);
 
-   free( prime.data);
-   free( generator.data);
+   gnutls_free( prime.data);
+   gnutls_free( generator.data);
    
    return 0;
 }
