@@ -105,6 +105,8 @@ GNUTLS_STATE initialize_state()
 
 	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
+	gnutls_set_certificate_request( state, GNUTLS_CERT_REQUIRE);
+
 	return state;
 }
 
@@ -269,6 +271,16 @@ fprintf(stderr, "\n");
 	return n;
 }
 
+void check_alert( GNUTLS_STATE state, int ret) {
+	if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
+		ret = gnutls_get_last_alert(state);
+		if (ret == GNUTLS_NO_RENEGOTIATION)
+			printf("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
+		else
+			printf("* Received alert '%d'.\n", ret);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int err, listen_sd, i;
@@ -351,6 +363,7 @@ int main(int argc, char **argv)
 			gnutls_deinit(state);
 			fprintf(stderr, "*** Handshake has failed (%s)\n\n",
 				gnutls_strerror(ret));
+			check_alert( state, ret);
 			continue;
 		}
 		printf("- Handshake was completed\n");
@@ -394,17 +407,7 @@ int main(int argc, char **argv)
 			if (i == 10)
 				ret = gnutls_rehandshake(sd, state);
 #endif
-			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
-			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-				ret = gnutls_get_last_alert(state);
-				if (ret == GNUTLS_NO_RENEGOTIATION)
-					printf
-					    ("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
-				else
-					printf("* Received alert '%d'.\n",
-					       ret);
-			}
-
+			check_alert( state, ret);
 			if (http != 0) {
 				break;	/* close the connection */
 			}

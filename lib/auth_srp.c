@@ -38,12 +38,14 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
 	NULL,
 	NULL,
+	NULL,
 	gen_srp_server_kx2,
 	gen_srp_client_kx0,
 	NULL,
 	NULL,
 	NULL,
 
+	NULL,
 	NULL, /* certificate */
 	NULL,
 	proc_srp_server_kx2,

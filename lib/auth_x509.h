@@ -44,6 +44,7 @@ typedef struct X509PKI_CLIENT_AUTH_INFO_INT {
 } *X509PKI_CLIENT_AUTH_INFO;
 
 typedef struct X509PKI_CLIENT_AUTH_INFO_INT X509PKI_CLIENT_AUTH_INFO_INT;
+typedef X509PKI_CLIENT_AUTH_INFO X509PKI_SERVER_AUTH_INFO;
 
 void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
 

@@ -900,3 +900,19 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
 	return index;
 }
 
+/**
+  * gnutls_set_certificate_request - Used to set whether to request a client certificate
+  * @state: is an &GNUTLS_STATE structure.
+  * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
+  *
+  * This function specifies if we (in case of a server) are going
+  * to send a certificate request message to the client. If 'req'
+  * is GNUTLS_CERT_REQUIRE then the server will return an error if
+  * the peer does not provide a certificate. If you do not
+  * call this function then the client will not be asked to
+  * send a certificate.
+  **/
+int gnutls_set_certificate_request( GNUTLS_STATE state, CertificateRequest req) {
+	state->gnutls_internals.send_cert_req = req;
+	return 0;
+}

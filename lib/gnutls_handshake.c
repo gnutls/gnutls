@@ -712,6 +712,8 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	if (ret < 0) {
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET && optional==OPTIONAL_PACKET) {
 			gnutls_assert();
+			*datalen = 0;
+			*data = NULL;
 			return 0; /* ok just ignore the packet */
 		}
 		gnutls_assert();
@@ -722,7 +724,8 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 
 	if (length32 > 0)
 		dataptr = gnutls_malloc(length32);
-
+	else
+fprintf(stderr, "recv_type: %d\nLenght: %d\n", recv_type, length32);
 		
 	if (dataptr == NULL) {
 		gnutls_assert();
@@ -1292,7 +1295,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state) {
 
 		/* RECV CERTIFICATE */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_certificate(cd, state);
+			ret = _gnutls_recv_server_certificate(cd, state);
 		if (ret < 0) {
 			gnutls_assert();
 			ERR("recv server certificate", ret);
@@ -1323,7 +1326,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state) {
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
 
 		if (state->gnutls_internals.resumed == RESUME_FALSE)
-			ret = _gnutls_send_certificate(cd, state);
+			ret = _gnutls_send_server_certificate(cd, state);
 		if (ret < 0) {
 			ERR("send server certificate", ret);
 			gnutls_assert();
@@ -1339,7 +1342,16 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
-		/* FIXME: Send certificate request */
+
+		/* Send certificate request - if requested to */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)
+			ret = _gnutls_send_server_certificate_request(cd, state);
+		if (ret < 0) {
+			ERR("send server cert request", ret);
+			gnutls_assert();
+			gnutls_clearHashDataBuffer(state);
+			return ret;
+		}
 
 /* Added for SRP which uses a different handshake */
 		/* receive the client key exchange message */
@@ -1351,6 +1363,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
+
 		/* send server key exchange (B) */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)
 			ret = _gnutls_send_server_kx_message2(cd, state);
@@ -1554,12 +1567,32 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 		}
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
 
+		/* receive the client certificate message */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_client_certificate(cd, state);
+		if (ret < 0) {
+			gnutls_assert();
+			ERR("recv client certificate", ret);
+			gnutls_clearHashDataBuffer(state);
+			return ret;
+		}
+
 		/* receive the client key exchange message */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_client_kx_message(cd, state);
 		if (ret < 0) {
 			gnutls_assert();
 			ERR("recv client kx", ret);
+			gnutls_clearHashDataBuffer(state);
+			return ret;
+		}
+
+		/* receive the client certificate verify message */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_client_certificate_verify_message(cd, state);
+		if (ret < 0) {
+			gnutls_assert();
+			ERR("recv client certificate verify", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}

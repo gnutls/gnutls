@@ -26,6 +26,10 @@
 #include "gnutls_algorithms.h"
 #include "debug.h"
 #include "gnutls_gcry.h"
+#include <gnutls_record.h>
+
+/* This file contains important thing for the TLS handshake procedure.
+ */
 
 #define MASTER_SECRET "master secret"
 static int generate_normal_master( GNUTLS_STATE state);
@@ -107,6 +111,43 @@ int _gnutls_send_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 	}
 
 	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_SERVER_KEY_EXCHANGE);
+	gnutls_free(data);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	return data_size;
+}
+
+/* This function sends a certificate request message to the
+ * client.
+ */
+int _gnutls_send_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
+{
+	uint8 *data = NULL;
+	int data_size = 0;
+	int ret = 0;
+
+	if (state->gnutls_internals.auth_struct->gnutls_generate_server_certificate_request==NULL) 
+		return 0;
+
+	if (state->gnutls_internals.send_cert_req <= 0)
+		return 0;
+		
+#ifdef HANDSHAKE_DEBUG
+	_gnutls_log( "Sending server Certificate request message\n");
+#endif
+
+
+	data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_certificate_request( state, &data);
+
+	if (data_size < 0) {
+		gnutls_assert();
+		return data_size;
+	}
+
+	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE_REQUEST);
 	gnutls_free(data);
 
 	if (ret < 0) {
@@ -298,9 +339,11 @@ int _gnutls_recv_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
 				   GNUTLS_CERTIFICATE_REQUEST, OPTIONAL_PACKET);
-		if (ret <= 0)
+		if (ret < 0)
 			return ret;
 
+		if (ret==0 && datasize == 0)
+			return 0; /* ignored */
 		
 		ret = state->gnutls_internals.auth_struct->gnutls_process_server_certificate_request( state, data, datasize);
 		gnutls_free(data);
@@ -404,21 +447,24 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 
 /* This is called when we want send our certificate
  */
-int _gnutls_send_certificate(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
 	int ret = 0;
 
 
-	if (state->gnutls_internals.auth_struct->gnutls_generate_certificate==NULL) 
+	if (state->gnutls_key->certificate_requested == 0)
+		return 0;
+
+	if (state->gnutls_internals.auth_struct->gnutls_generate_client_certificate==NULL) 
 		return 0;
 
 #ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending certificate message\n");
+	_gnutls_log( "Sending client certificate message\n");
 #endif
 
-	data_size = state->gnutls_internals.auth_struct->gnutls_generate_certificate( state, &data);
+	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_certificate( state, &data);
 
 	if (data_size < 0) {
 		gnutls_assert();
@@ -436,13 +482,118 @@ int _gnutls_send_certificate(SOCKET cd, GNUTLS_STATE state)
 	return data_size;
 }
 
-int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state)
+
+/* This is called when we want send our certificate
+ */
+int _gnutls_send_server_certificate(SOCKET cd, GNUTLS_STATE state)
+{
+	uint8 *data = NULL;
+	int data_size = 0;
+	int ret = 0;
+
+
+	if (state->gnutls_internals.auth_struct->gnutls_generate_server_certificate==NULL) 
+		return 0;
+
+#ifdef HANDSHAKE_DEBUG
+	_gnutls_log( "Sending certificate message\n");
+#endif
+
+	data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_certificate( state, &data);
+
+	if (data_size < 0) {
+		gnutls_assert();
+		return data_size;
+	}
+
+	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE);
+	gnutls_free(data);
+	
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return data_size;
+}
+
+
+int _gnutls_recv_client_certificate(SOCKET cd, GNUTLS_STATE state)
+{
+	int datasize;
+	opaque * data;
+	int ret = 0;
+	int optional;
+
+	if (state->gnutls_internals.auth_struct->gnutls_process_client_certificate!=NULL) {
+
+		/* if we have not requested a certificate then just return
+		 */
+		if ( state->gnutls_internals.send_cert_req == 0) {
+			return 0;
+		}
+
+		if ( state->gnutls_internals.send_cert_req == GNUTLS_CERT_REQUIRE)
+			optional = MANDATORY_PACKET;
+		else 
+			optional = OPTIONAL_PACKET;
+
+		ret =
+		    _gnutls_recv_handshake(cd, state, &data,
+					   &datasize,
+					   GNUTLS_CERTIFICATE, optional);
+		if (ret < 0) {
+			if (optional == OPTIONAL_PACKET &&
+			        ret==GNUTLS_E_WARNING_ALERT_RECEIVED && 
+				gnutls_get_last_alert(state)==GNUTLS_NETSCAPE_NO_CLIENT_CERTIFICATE) {
+
+				/* netscape does not send an empty certificate,
+				 * but this alert. So we just ignore it.
+				 */
+				gnutls_assert();
+				return 0;
+			}
+			/* certificate was required */
+			gnutls_send_alert( cd, state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+			gnutls_assert();
+			return ret;
+		}
+
+		if (ret == 0 && datasize == 0 && optional == OPTIONAL_PACKET) {
+			/* well I'm not sure we should accept this
+			 * behaviour.
+			 */
+			gnutls_assert();
+			return 0;
+		}
+
+
+		ret = state->gnutls_internals.auth_struct->gnutls_process_client_certificate( state, data, datasize);
+		gnutls_free(data);
+		if (ret < 0 && ret != GNUTLS_E_NO_CERTIFICATE_FOUND) {
+			gnutls_assert();
+			return ret;
+		}
+
+		/* ok we should expect a certificate verify message now 
+		 */
+		if (ret==GNUTLS_E_NO_CERTIFICATE_FOUND && optional == OPTIONAL_PACKET)
+			ret = 0;
+		else
+			state->gnutls_key->certificate_requested = 1;
+
+	}
+
+	return ret;
+}
+
+int _gnutls_recv_server_certificate(SOCKET cd, GNUTLS_STATE state)
 {
 	int datasize;
 	opaque * data;
 	int ret = 0;
 
-	if (state->gnutls_internals.auth_struct->gnutls_process_certificate!=NULL) {
+	if (state->gnutls_internals.auth_struct->gnutls_process_server_certificate!=NULL) {
 
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
@@ -453,7 +604,7 @@ int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		ret = state->gnutls_internals.auth_struct->gnutls_process_certificate( state, data, datasize);
+		ret = state->gnutls_internals.auth_struct->gnutls_process_server_certificate( state, data, datasize);
 		gnutls_free(data);
 		if (ret < 0) {
 			gnutls_assert();
@@ -464,15 +615,48 @@ int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state)
-{
 
-	if (state->gnutls_key->certificate_requested == 0)
-		return 0;
+/* Recv the client certificate verify. This packet may not
+ * arrive if the peer did not send us a certificate.
+ */
+int _gnutls_recv_client_certificate_verify_message(SOCKET cd, GNUTLS_STATE state)
+{
+	uint8 *data;
+	int datasize;
+	int ret = 0;
+
+
+	if (state->gnutls_internals.auth_struct->gnutls_process_client_cert_vrfy != NULL) {
 
 #ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending Client Certificate\n");
+		_gnutls_log( "Receiving client certificate verify message\n");
 #endif
 
-	return _gnutls_send_certificate(cd, state);
+		if ( state->gnutls_internals.send_cert_req == 0 ||
+			state->gnutls_key->certificate_requested == 0) {
+			return 0;
+		}
+
+		ret =
+		    _gnutls_recv_handshake(cd, state, &data,
+					   &datasize,
+					   GNUTLS_CLIENT_KEY_EXCHANGE, OPTIONAL_PACKET);
+		if (ret < 0)
+			return ret;
+
+		if (ret==0 && datasize == 0 && state->gnutls_internals.send_cert_req == GNUTLS_CERT_REQUIRE) {
+			/* certificate was required */
+			gnutls_send_alert( cd, state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+			gnutls_assert();
+			return GNUTLS_E_NO_CERTIFICATE_FOUND;
+		} 
+		
+		ret = state->gnutls_internals.auth_struct->gnutls_process_client_cert_vrfy( state, data, datasize);
+		gnutls_free(data);
+		if (ret < 0)
+			return ret;
+
+	}
+
+	return ret;
 }

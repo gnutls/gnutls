@@ -81,7 +81,8 @@ typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCip
 typedef enum AlertLevel { GNUTLS_WARNING=1, GNUTLS_FATAL } AlertLevel;
 typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTLS_BAD_RECORD_MAC=20,
 			GNUTLS_DECRYPTION_FAILED, GNUTLS_RECORD_OVERFLOW,  GNUTLS_DECOMPRESSION_FAILURE=30,
-			GNUTLS_HANDSHAKE_FAILURE=40, GNUTLS_BAD_CERTIFICATE=42, GNUTLS_UNSUPPORTED_CERTIFICATE,
+			GNUTLS_HANDSHAKE_FAILURE=40, GNUTLS_NETSCAPE_NO_CLIENT_CERTIFICATE=41,
+			GNUTLS_BAD_CERTIFICATE=42, GNUTLS_UNSUPPORTED_CERTIFICATE,
 			GNUTLS_CERTIFICATE_REVOKED, GNUTLS_CERTIFICATE_EXPIRED, GNUTLS_CERTIFICATE_UNKNOWN,
 			GNUTLS_ILLEGAL_PARAMETER, GNUTLS_UNKNOWN_CA, GNUTLS_ACCESS_DENIED, GNUTLS_DECODE_ERROR=50,
 			GNUTLS_DECRYPT_ERROR, GNUTLS_EXPORT_RESTRICTION=60, GNUTLS_PROTOCOL_VERSION=70,
@@ -89,6 +90,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
 typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
+typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
 
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
@@ -178,6 +180,9 @@ struct GNUTLS_KEY_INT {
 					 * to provide client authentication.
 					 * 1 if client auth was requested
 					 * by the peer, 0 otherwise
+					 *** In case of a server this
+					 * holds 1 if we should wait
+					 * for a client certificate verify
 					 */
 };
 typedef struct GNUTLS_KEY_INT* GNUTLS_KEY;
@@ -315,10 +320,11 @@ typedef struct {
 
 	/* sockets internals */
 	int				lowat;
+
 	/* gdbm */
 	char*				db_name;
 	int				expire_time;
-	struct MOD_AUTH_STRUCT_INT*		auth_struct; /* used in handshake packets and KX algorithms */
+	struct MOD_AUTH_STRUCT_INT*	auth_struct; /* used in handshake packets and KX algorithms */
 	int				v2_hello; /* set 0 normally - 1 if v2 hello was received - server side only */
 #ifdef HAVE_LIBGDBM
 	GDBM_FILE			db_reader;
@@ -336,6 +342,12 @@ typedef struct {
 	 */
 	uint8				adv_version_major;
 	uint8				adv_version_minor;
+
+	/* if this is non zero a certificate request message
+	 * will be sent to the client. - only if the ciphersuite
+	 * supports it.
+	 */
+	int				send_cert_req;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

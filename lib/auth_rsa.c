@@ -35,30 +35,37 @@
 #include "debug.h"
 #include <gnutls_sig.h>
 
-int gen_rsa_certificate(GNUTLS_STATE, opaque **);
+int gen_rsa_server_certificate(GNUTLS_STATE, opaque **);
+int gen_rsa_client_certificate(GNUTLS_STATE, opaque **);
 int gen_rsa_client_cert_vrfy(GNUTLS_STATE, opaque **);
 int proc_rsa_cert_req(GNUTLS_STATE, opaque *, int);
 int gen_rsa_client_kx(GNUTLS_STATE, opaque **);
+int gen_rsa_server_cert_req(GNUTLS_STATE, opaque **);
 int proc_rsa_client_kx(GNUTLS_STATE, opaque *, int);
-int proc_rsa_certificate(GNUTLS_STATE, opaque *, int);
+int proc_rsa_client_cert_vrfy(GNUTLS_STATE, opaque *, int);
+
+int proc_rsa_server_certificate(GNUTLS_STATE, opaque *, int);
+#define proc_rsa_client_certificate proc_rsa_server_certificate
 
 MOD_AUTH_STRUCT rsa_auth_struct =
 {
 	"RSA",
-	gen_rsa_certificate,
+	gen_rsa_server_certificate,
+	gen_rsa_client_certificate,
 	NULL,			/* gen server kx */
 	NULL,			/* gen server kx2 */
 	NULL,			/* gen client kx0 */
 	gen_rsa_client_kx,
 	gen_rsa_client_cert_vrfy, /* gen client cert vrfy */
-	NULL,
+	gen_rsa_server_cert_req, /* server cert request */
 
-	proc_rsa_certificate,
+	proc_rsa_server_certificate,
+	proc_rsa_client_certificate,
 	NULL,			/* proc server kx */
 	NULL,			/* proc server kx2 */
 	NULL,			/* proc client kx0 */
 	proc_rsa_client_kx,	/* proc client kx */
-	NULL,			/* proc client cert vrfy */
+	proc_rsa_client_cert_vrfy, /* proc client cert vrfy */
 	proc_rsa_cert_req	/* proc server cert request */
 };
 
@@ -214,7 +221,7 @@ static int _gnutls_get_private_rsa_params(GNUTLS_KEY key,
 }
 
 
-int gen_rsa_certificate(GNUTLS_STATE state, opaque ** data)
+int gen_rsa_client_certificate(GNUTLS_STATE state, opaque ** data)
 {
 	const X509PKI_CREDENTIALS cred;
 	int ret, i, ind, pdatasize;
@@ -233,10 +240,76 @@ int gen_rsa_certificate(GNUTLS_STATE state, opaque ** data)
 		apr_cert_list_length = 0;
 		apr_pkey = NULL;
 	} else {
-		if (state->security_parameters.entity == GNUTLS_CLIENT)
-			ind = state->gnutls_internals.client_certificate_index;
-		else /* server */
-			ind = _gnutls_find_cert_list_index(cred->cert_list, cred->ncerts, state->security_parameters.extensions.dnsname);
+		ind = state->gnutls_internals.client_certificate_index;
+
+		if (ind < 0) {
+			apr_cert_list = NULL;
+			apr_cert_list_length = 0;
+			apr_pkey = NULL;
+		} else {
+			apr_cert_list = cred->cert_list[ind];
+			apr_cert_list_length = cred->cert_list_length[ind];
+			apr_pkey = &cred->pkey[ind];
+		}
+	}
+
+	ret = 3;
+	for (i = 0; i < apr_cert_list_length; i++) {
+		ret += apr_cert_list[i].raw.size + 3;
+		/* hold size
+		 * for uint24 */
+	}
+
+	(*data) = gnutls_malloc(ret);
+	pdata = (*data);
+
+	if (pdata == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	WRITEuint24(ret - 3, pdata);
+	pdata += 3;
+	for (i = 0; i < apr_cert_list_length; i++) {
+		WRITEdatum24(pdata, apr_cert_list[i].raw);
+		pdata += (3 + apr_cert_list[i].raw.size);
+	}
+	pdatasize = ret;
+
+	/* read the rsa parameters now, since later we will
+	 * not know which certificate we used!
+	 */
+	if (i != 0)		/* if we parsed at least one certificate */
+		ret = _gnutls_get_private_rsa_params(state->gnutls_key, apr_pkey);
+	else
+		ret = 0;
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	return pdatasize;
+}
+
+int gen_rsa_server_certificate(GNUTLS_STATE state, opaque ** data)
+{
+	const X509PKI_CREDENTIALS cred;
+	int ret, i, ind, pdatasize;
+	opaque *pdata;
+	gnutls_cert *apr_cert_list;
+	gnutls_private_key *apr_pkey;
+	int apr_cert_list_length;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+	if (cred->ncerts == 0) {
+		apr_cert_list = NULL;
+		apr_cert_list_length = 0;
+		apr_pkey = NULL;
+	} else {
+		ind = _gnutls_find_cert_list_index(cred->cert_list, cred->ncerts, state->security_parameters.extensions.dnsname);
 
 		if (ind < 0) {
 			apr_cert_list = NULL;
@@ -356,7 +429,7 @@ return ret;
 }
 
 
-int proc_rsa_certificate(GNUTLS_STATE state, opaque * data, int data_size)
+int proc_rsa_server_certificate(GNUTLS_STATE state, opaque * data, int data_size)
 {
 	int size, len, ret;
 	opaque *p = data;
@@ -369,7 +442,6 @@ int proc_rsa_certificate(GNUTLS_STATE state, opaque * data, int data_size)
 	gnutls_datum tmp;
 	CertificateStatus verify;
 
-#warning "NO SERVER SIDE YET"
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
@@ -389,7 +461,7 @@ int proc_rsa_certificate(GNUTLS_STATE state, opaque * data, int data_size)
 
 	if (size == 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 	info = state->gnutls_key->auth_info;
 	i = dsize;
@@ -471,6 +543,7 @@ int proc_rsa_certificate(GNUTLS_STATE state, opaque * data, int data_size)
 	return 0;
 }
 
+
 /* return RSA(random) using the peers public key 
  */
 int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
@@ -524,16 +597,52 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 
 }
 
+int _gnutls_find_dn( gnutls_datum* odn, gnutls_cert* cert) {
+node_asn* dn;
+int len, result;
+int start, end;
+
+	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &dn, "dn") != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der( dn, cert->raw.data, cert->raw.size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure( dn);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+				
+	result = asn1_get_start_end_der( dn, cert->raw.data, cert->raw.size,
+		"dn.tbsCertificate.issuer", &start, &end);
+						
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure( dn);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	asn1_delete_structure( dn);
+
+	len = end - start + 1;
+
+	odn->size = len;
+	odn->data = &cert->raw.data[start];
+
+	return 0;
+}
+
 /* Finds the appropriate certificate depending on the cA Distinguished name
  * advertized by the server
  */
 static int _gnutls_find_acceptable_client_cert( const X509PKI_CREDENTIALS cred, const opaque* data, 
 	int data_size, int *ind) {
-node_asn *dn;
 int result, size;
 int indx = -1;
-int start, end, len, i, j;
-
+int i, j;
+gnutls_datum odn;
 
 	do {
 
@@ -544,37 +653,16 @@ int start, end, len, i, j;
 		for(i=0;i<cred->ncerts;i++) {
 			
 			for (j=0;j<cred->cert_list_length[i];j++) {
-				if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &dn, "dn") != ASN_OK) {
+				if ( (result=_gnutls_find_dn( &odn, &cred->cert_list[i][j])) < 0) {
 					gnutls_assert();
-					return GNUTLS_E_ASN1_ERROR;
-				}
-
-				result = asn1_get_der( dn, cred->cert_list[i][j].raw.data, cred->cert_list[i][j].raw.size);
-				if (result != ASN_OK) {
-					/* couldn't decode DER */
-					gnutls_assert();
-					asn1_delete_structure( dn);
-					return GNUTLS_E_ASN1_PARSING_ERROR;
+					return result;
 				}
 				
-				result = asn1_get_start_end_der( dn, cred->cert_list[i][j].raw.data, cred->cert_list[i][j].raw.size,
-						"dn.tbsCertificate.issuer", &start, &end);
-						
-				if (result != ASN_OK) {
-					/* couldn't decode DER */
-					gnutls_assert();
-					asn1_delete_structure( dn);
-					return GNUTLS_E_ASN1_PARSING_ERROR;
-				}
-				asn1_delete_structure( dn);
-
-				len = end - start + 1;
-
-				if ( len != size) continue;
+				if ( odn.size != size) continue;
 			
 				if (memcmp( 
-					&cred->cert_list[i][j].raw.data[start],
-					data, len) == 0 ) {
+					odn.data,
+					data, size) == 0 ) {
 					indx = i;
 					break;
 				}
@@ -727,4 +815,67 @@ int gen_rsa_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 	gnutls_free_datum( &signature);
 
 	return size+2;
+}
+
+int proc_rsa_client_cert_vrfy(GNUTLS_STATE state, opaque * data, int data_size)
+{
+	#warning "CHECK THE CERT VERIFY MESSAGE"
+	
+	return 0;
+}
+
+#define CERTTYPE_SIZE 2
+int gen_rsa_server_cert_req(GNUTLS_STATE state, opaque ** data)
+{
+	const X509PKI_CREDENTIALS cred;
+	int ret, i, size;
+	opaque *pdata;
+	gnutls_datum dn;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+	
+	size = CERTTYPE_SIZE+2; /* 2 for CertType + 2 for size */
+	
+	for (i = 0; i < cred->ncas; i++) {
+		size += cred->ca_list[i].raw.size + 2;
+		/* hold size
+		 * for uint16 */
+	}
+
+	(*data) = gnutls_malloc(size);
+	pdata = (*data);
+
+	if (pdata == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	pdata[0] = CERTTYPE_SIZE - 1;
+	pdata[1] = RSA_SIGN; /* only this for now */
+	pdata += CERTTYPE_SIZE;
+	size = CERTTYPE_SIZE;
+
+	/* leave space to write the actual size */
+	pdata += 2;
+	size += 2;
+
+	for (i = 0; i < cred->ncas; i++) {
+		if ( (ret=_gnutls_find_dn( &dn, &cred->ca_list[i])) < 0) {
+			gnutls_free( (*data));
+			gnutls_assert();
+			return ret;
+		}
+		WRITEdatum16(pdata, dn);
+		pdata += (2 + dn.size);
+		size += (2 + dn.size);
+	}
+
+	/* write the recalculated size */
+	WRITEuint16( size-CERTTYPE_SIZE-2, &(*data)[CERTTYPE_SIZE]);
+	
+	return size;
 }
