@@ -33,6 +33,8 @@ typedef struct {
 	gnutls_datum keyring;
 	char *	     pgp_key_server;
 	int	     pgp_key_server_port;
+
+	char *	     pgp_trustdb;
 	    
 	/* X509 specific stuff */
 
