@@ -104,20 +104,20 @@ int gnutls_dh_get_bits(GNUTLS_STATE state)
 	}
 }
 
-/* X509PKI */
+/* CERTIFICATE STUFF */
 
 /**
-  * gnutls_x509pki_get_our_certificate - This function returns the raw (DER encoded) certificate sent in the last handshake
+  * gnutls_certificate_get_ours - This function returns the raw certificate sent in the last handshake
   * @state: is a gnutls state
   *
   * This function will return the raw certificate list as sent to the peer,
-  * in the last handshake. These certificates are DER encoded. 
-  * The first certificate in the list is the peer's certificate,
-  * following the issuer's certificate, then the issuer's issuer etc.
-  * Returns NULL in case of an error, or if no certificate was sent.
+  * in the last handshake. These certificates are in raw format. 
+  * In X.509 this is a certificate list. In OpenPGP this is a single
+  * certificate.
+  * Returns NULL in case of an error, or if no certificate was used.
   *
   **/
-const gnutls_datum *gnutls_x509pki_get_our_certificate(GNUTLS_STATE state)
+const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state)
 {
 	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int index;
@@ -137,16 +137,16 @@ const gnutls_datum *gnutls_x509pki_get_our_certificate(GNUTLS_STATE state)
 }
 
 /**
-  * gnutls_x509pki_get_our_certificate_index - This function returns the index of the certificate sent in the last handshake
+  * gnutls_certificate_get_ours_index - This function returns the index of the certificate sent in the last handshake
   * @state: is a gnutls state
   *
-  * This function will return the index of the certificate list sent to 
+  * This function will return the index of the certificate sent to 
   * the peer, in the last handshake. The index depends on the sequence
   * that the certificates were added, and the first certificate is assigned 0. 
   * Returns a negative value in case of an error, or if no certificate was sent.
   *
   **/
-int gnutls_x509pki_get_our_certificate_index(GNUTLS_STATE state)
+int gnutls_certificate_get_ours_index(GNUTLS_STATE state)
 {
 	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int index;
@@ -166,17 +166,19 @@ int gnutls_x509pki_get_our_certificate_index(GNUTLS_STATE state)
 }
 
 /**
-  * gnutls_x509pki_get_peer_certificate_list - This function returns the peer's raw (DER encoded) certificate
+  * gnutls_certificate_get_peers - This function returns the peer's raw certificate
   * @state: is a gnutls state
   * @list_size: is the length of the certificate list
   *
-  * This function will return the peer's raw certificate list as sent by the peer.
-  * These certificates are DER encoded. The first certificate in the list is the peer's certificate,
+  * This function will return the peer's raw certificate (list) as sent by the peer.
+  * These certificates are in raw format (DER encoded for X509). 
+  * In case of a X509 then a certificate list may be present. 
+  * The first certificate in the list is the peer's certificate,
   * following the issuer's certificate, then the issuer's issuer etc.
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/
-const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state, int *list_size)
+const gnutls_datum *gnutls_certificate_get_peers(GNUTLS_STATE state, int *list_size)
 {
 	CERTIFICATE_AUTH_INFO info;
 
