@@ -267,14 +267,14 @@ typedef struct {
 					 */
 } gnutls_cipher_suite_entry;
 
-/** RSA with NULL cipher and MD5 MAC
- ** for test purposes.
- **/
+/* RSA with NULL cipher and MD5 MAC
+ * for test purposes.
+ */
 #define GNUTLS_RSA_NULL_MD5 { 0x00, 0x01 }
 
 
-/** ANONymous cipher suites.
- **/
+/* ANONymous cipher suites.
+ */
 
 #define GNUTLS_ANON_DH_3DES_EDE_CBC_SHA { 0x00, 0x1B }
 #define GNUTLS_ANON_DH_ARCFOUR_MD5 { 0x00, 0x18 }
@@ -283,9 +283,9 @@ typedef struct {
 #define GNUTLS_ANON_DH_AES_128_CBC_SHA { 0x00, 0x34 }
 #define GNUTLS_ANON_DH_AES_256_CBC_SHA { 0x00, 0x3A }
 
-/** SRP (not in TLS 1.0)
- ** draft-ietf-tls-srp-02:
- **/
+/* SRP (not in TLS 1.0)
+ * draft-ietf-tls-srp-02:
+ */
 #define GNUTLS_SRP_SHA_3DES_EDE_CBC_SHA { 0x00, 0x50 }
 #define GNUTLS_SRP_SHA_AES_128_CBC_SHA { 0x00, 0x53 }
 #define GNUTLS_SRP_SHA_AES_256_CBC_SHA { 0x00, 0x56 }
@@ -299,21 +299,21 @@ typedef struct {
 #define GNUTLS_SRP_SHA_RSA_AES_256_CBC_SHA { 0x00, 0x57 }
 #define GNUTLS_SRP_SHA_DSS_AES_256_CBC_SHA { 0x00, 0x58 }
 
-/** RSA 
- **/
+/* RSA
+ */
 #define GNUTLS_RSA_ARCFOUR_SHA { 0x00, 0x05 }
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
 
 #define GNUTLS_RSA_EXPORT_ARCFOUR_40_MD5 { 0x00, 0x03 }
 
-/* rfc3268: 
+/* rfc3268:
  */
 #define GNUTLS_RSA_AES_128_CBC_SHA { 0x00, 0x2F }
 #define GNUTLS_RSA_AES_256_CBC_SHA { 0x00, 0x35 }
 
-/** DHE DSS 
- **/
+/* DHE DSS
+ */
 
 #define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA { 0x00, 0x13 }
 
@@ -336,16 +336,16 @@ typedef struct {
 #define GNUTLS_DHE_DSS_ARCFOUR_SHA { 0x00, 0x66 }
 
 
-/* rfc3268: 
+/* rfc3268:
  */
 #define GNUTLS_DHE_DSS_AES_256_CBC_SHA { 0x00, 0x38 }
 #define GNUTLS_DHE_DSS_AES_128_CBC_SHA { 0x00, 0x32 }
 
-/** DHE RSA 
- **/
+/* DHE RSA
+ */
 #define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
 
-/* rfc3268: 
+/* rfc3268:
  */
 #define GNUTLS_DHE_RSA_AES_128_CBC_SHA { 0x00, 0x33 }
 #define GNUTLS_DHE_RSA_AES_256_CBC_SHA { 0x00, 0x39 }
