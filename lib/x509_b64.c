@@ -395,9 +395,9 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 		}
 		strcpy( pem_header, top);
 		strcpy( pem_header, header);
-		rdata = strstr( data, pem_header);
+		rdata = strnstr( data, pem_header, data_size);
 	} else {
-		rdata = strstr( data, top);
+		rdata = strnstr( data, top, data_size);
 	}
 
 	if (rdata==NULL) {
@@ -412,7 +412,7 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 
-	kdata = strstr( rdata, ENDSTR);
+	kdata = strnstr( rdata, ENDSTR, data_size);
 	if (kdata==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_BASE64_DECODING_ERROR;
@@ -424,7 +424,7 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 	
 	/* position is now after the ---BEGIN--- headers */
 
-	kdata = strstr( rdata, bottom);
+	kdata = strnstr( rdata, bottom, data_size);
 	if (kdata==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_BASE64_DECODING_ERROR;
@@ -467,8 +467,6 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
   * is non null this function will search for "-----BEGIN header" and decode
   * only this part. Otherwise it will decode the first PEM packet found.
   *
-  * Note that b64_data should be null terminated.
-  * 
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
   * or 0 on success.
   **/
@@ -509,8 +507,6 @@ int size;
   * You should use the function gnutls_free() to
   * free the returned data.
   *
-  * Note that b64_data should be null terminated.
-  * 
   **/
 int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, 
    gnutls_datum* result) 

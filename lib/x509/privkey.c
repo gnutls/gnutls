@@ -266,7 +266,7 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
   * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
   *
   * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
-  * "CERTIFICATE" and must be a null terminated string.
+  * "CERTIFICATE".
   *
   * Returns 0 on success.
   *

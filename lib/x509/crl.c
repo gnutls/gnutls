@@ -76,8 +76,7 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl crl)
   * This function will convert the given DER or PEM encoded CRL
   * to the native gnutls_x509_crl format. The output will be stored in 'crl'.
   *
-  * If the CRL is PEM encoded it should have a header of "X509 CRL", and
-  * it must be a null terminated string.
+  * If the CRL is PEM encoded it should have a header of "X509 CRL".
   *
   * Returns 0 on success.
   *

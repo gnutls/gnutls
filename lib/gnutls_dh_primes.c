@@ -227,7 +227,7 @@ int gnutls_dh_params_generate2(gnutls_dh_params params, int bits)
   * in prime and generator structures.
   *
   * If the structure is PEM encoded, it should have a header
-  * of "BEGIN DH PARAMETERS", and must be null terminated.
+  * of "BEGIN DH PARAMETERS".
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.

@@ -74,8 +74,7 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7)
   * This function will convert the given DER or PEM encoded PKCS7
   * to the native gnutls_pkcs7 format. The output will be stored in 'pkcs7'.
   *
-  * If the PKCS7 is PEM encoded it should have a header of "X509 PKCS7", and
-  * it must be a null terminated string.
+  * If the PKCS7 is PEM encoded it should have a header of "X509 PKCS7".
   *
   * Returns 0 on success.
   *

@@ -62,6 +62,10 @@ typedef long ptrdiff_t;
 # include <strings.h>
 #endif
 
+#ifndef HAVE_STRNSTR
+char *strnstr(const char *haystack, const char *needle, size_t haystacklen);
+#endif
+
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif

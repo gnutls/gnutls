@@ -307,40 +307,39 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
 {
-	int siz, siz2, i;
+	int size, siz2, i;
 	const char *ptr;
 	opaque *ptr2;
 	gnutls_datum tmp;
 	int ret, count;
 
-	if ( (ptr = strstr( input_cert, PEM_PKCS7_SEP)) != NULL) 
+	if ( (ptr = strnstr( input_cert, PEM_PKCS7_SEP, input_cert_size)) != NULL) 
 	{
-		siz = strlen( ptr);
+		size = strlen( ptr);
 
 		ret = parse_pkcs7_cert_mem( cert_list, ncerts, ptr,
-			siz, CERT_PEM);
+			size, CERT_PEM);
 
 		return ret;
 	}
 
 	/* move to the certificate
 	 */
-	ptr = strstr( input_cert, PEM_CERT_SEP);
-	if (ptr == NULL) ptr = strstr( input_cert, PEM_CERT_SEP2);
+	ptr = strnstr( input_cert, PEM_CERT_SEP, input_cert_size);
+	if (ptr == NULL) ptr = strnstr( input_cert, PEM_CERT_SEP2, input_cert_size);
 
 	if (ptr == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
-	siz = strlen( ptr);
+	size = input_cert_size - (ptr - input_cert);
 
 	i = *ncerts + 1;
 	count = 0;
 
 	do {
 
-		siz2 = _gnutls_fbase64_decode(NULL, ptr, siz, &ptr2);
-		siz -= siz2;
+		siz2 = _gnutls_fbase64_decode(NULL, ptr, size, &ptr2);
 
 		if (siz2 < 0) {
 			gnutls_assert();
@@ -372,8 +371,16 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		ptr++;
 		/* find the next certificate (if any)
 		 */
-		ptr = strstr(ptr, PEM_CERT_SEP);
-		if (ptr == NULL) ptr = strstr( input_cert, PEM_CERT_SEP2);
+		size = input_cert_size - (ptr - input_cert);
+		
+		if (size > 0) {
+			char* ptr2;
+			
+			ptr2 = strnstr(ptr, PEM_CERT_SEP, size);
+			if (ptr2 == NULL) ptr2 = strnstr( ptr, PEM_CERT_SEP2, size);
+			
+			ptr = ptr2;
+		} else ptr = NULL;
 
 		i++;
 		count++;
@@ -863,21 +870,21 @@ int _gnutls_check_key_usage( const gnutls_cert* cert,
 static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
 {
-	int siz, i;
+	int i, size;
 	const char *ptr;
 	gnutls_datum tmp;
 	int ret, count;
 
 	/* move to the certificate
 	 */
-	ptr = strstr( input_cert, PEM_CERT_SEP);
-	if (ptr == NULL) ptr = strstr( input_cert, PEM_CERT_SEP2);
+	ptr = strnstr( input_cert, PEM_CERT_SEP, input_cert_size);
+	if (ptr == NULL) ptr = strnstr( input_cert, PEM_CERT_SEP2, input_cert_size);
 
 	if (ptr == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
-	siz = strlen( ptr);
+	size = input_cert_size - (ptr - input_cert);
 
 	i = *ncerts + 1;
 	count = 0;
@@ -901,7 +908,7 @@ static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
 		}
 		
 		tmp.data = (char*)ptr;
-		tmp.size = siz;
+		tmp.size = size;
 	
 		ret =
 		     gnutls_x509_crt_import(
@@ -917,8 +924,17 @@ static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
 		ptr++;
 		/* find the next certificate (if any)
 		 */
-		ptr = strstr(ptr, PEM_CERT_SEP);
-		if (ptr == NULL) ptr = strstr( input_cert, PEM_CERT_SEP2);
+
+		size = input_cert_size - (ptr - input_cert);
+		
+		if (size > 0) {
+			char* ptr2;
+			
+			ptr2 = strnstr(ptr, PEM_CERT_SEP, size);
+			if (ptr2 == NULL) ptr = strnstr( ptr, PEM_CERT_SEP2, size);
+			
+			ptr = ptr2;
+		} else ptr = NULL;
 
 		i++;
 		count++;
@@ -1057,20 +1073,20 @@ int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res,
 static int parse_pem_crl_mem( gnutls_x509_crl** crl_list, int* ncrls, 
 	const char *input_crl, int input_crl_size)
 {
-	int siz, i;
+	int size, i;
 	const char *ptr;
 	gnutls_datum tmp;
 	int ret, count;
 
 	/* move to the certificate
 	 */
-	ptr = strstr( input_crl, PEM_CRL_SEP);
+	ptr = strnstr( input_crl, PEM_CRL_SEP, input_crl_size);
 	if (ptr == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 
-	siz = strlen( ptr);
+	size = input_crl_size - (ptr - input_crl);
 
 	i = *ncrls + 1;
 	count = 0;
@@ -1094,7 +1110,7 @@ static int parse_pem_crl_mem( gnutls_x509_crl** crl_list, int* ncrls,
 		}
 		
 		tmp.data = (char*)ptr;
-		tmp.size = siz;
+		tmp.size = size;
 	
 		ret =
 		     gnutls_x509_crl_import(
@@ -1110,7 +1126,12 @@ static int parse_pem_crl_mem( gnutls_x509_crl** crl_list, int* ncrls,
 		ptr++;
 		/* find the next certificate (if any)
 		 */
-		ptr = strstr(ptr, PEM_CRL_SEP);
+
+		size = input_crl_size - (ptr - input_crl);
+
+		if (size > 0)
+			ptr = strnstr(ptr, PEM_CRL_SEP, size);
+		else ptr = NULL;
 		i++;
 		count++;
 
