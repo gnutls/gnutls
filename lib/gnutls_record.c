@@ -449,6 +449,27 @@ int gnutls_bye( GNUTLS_STATE state, GNUTLS_CloseRequest how)
 	return 0;
 }
 
+inline
+static void _gnutls_session_invalidate( GNUTLS_STATE state) {
+	state->gnutls_internals.valid_connection = VALID_FALSE;
+}
+
+
+inline
+static void _gnutls_session_unresumable( GNUTLS_STATE state) {
+	state->gnutls_internals.resumable = RESUME_FALSE;
+}
+
+/* returns 0 if session is valid
+ */
+inline
+static int _gnutls_session_is_valid( GNUTLS_STATE state) {
+	if (state->gnutls_internals.valid_connection==VALID_FALSE)
+		return GNUTLS_E_INVALID_SESSION;
+	
+	return 0;
+}
+
 /* This function behave exactly like write(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is specific)
@@ -475,7 +496,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 
-	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_write != 0) {
+	if ( _gnutls_session_is_valid( state) || state->gnutls_internals.may_write != 0) {
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
@@ -526,7 +547,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		/* increase sequence number
 		 */
 		if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
-			state->gnutls_internals.valid_connection = VALID_FALSE;
+			_gnutls_session_invalidate( state);
 			gnutls_assert();
 			/* FIXME: Somebody has to do rehandshake before that.
 			 */
@@ -551,8 +572,8 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			ret = GNUTLS_E_UNKNOWN_ERROR;
 		}
 
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
+		_gnutls_session_unresumable( state);
+		_gnutls_session_invalidate( state);
 		gnutls_assert();
 		return ret;
 	}
@@ -601,41 +622,12 @@ static int _gnutls_check_recv_type( ContentType recv_type) {
 
 }
 
-#define CHECK_RECORD_VERSION
 
-/* This function behave exactly like read(). The only difference is 
- * that it accepts, the gnutls_state and the ContentType of data to
- * send (if called by the user the Content is Userdata only)
- * It is intended to receive data, under the current state.
+/* Checks if there are pending data into the record buffers. If there are
+ * then it copies the data.
  */
-ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
-{
-	uint8 *tmpdata;
-	int tmplen;
-	GNUTLS_Version version;
-	uint8 *headers;
-	ContentType recv_type;
-	uint16 length;
-	uint8 *ciphertext;
-	uint8 *recv_data;
-	int ret, ret2;
-	int header_size;
-
-	header_size = RECORD_HEADER_SIZE;
-	ret = 0;
-
-	if (sizeofdata == 0 || data == NULL) {
-		return GNUTLS_E_INVALID_PARAMETERS;
-	}
-
-	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_read!=0) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-	
-	/* If we have enough data in the cache do not bother receiving
-	 * a new packet. (in order to flush the cache)
-	 */
+static int _gnutls_check_buffers( GNUTLS_STATE state, ContentType type, opaque* data, int sizeofdata) {
+	int ret = 0, ret2=0;
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && _gnutls_record_buffer_get_size(type, state) > 0) {
 		ret = _gnutls_record_buffer_get(type, state, data, sizeofdata);
 		if (ret < 0) {
@@ -654,37 +646,40 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		return ret;
 	}
 	
-	/* in order for GNUTLS_E_AGAIN to be returned the socket
-	 * must be set to non blocking mode
-	 */
-	if ( (ret = _gnutls_io_read_buffered( state, &headers, header_size, -1)) != header_size) {
-		if (ret < 0 && gnutls_error_is_fatal(ret)==0) return ret;
+	return 0;
+}
 
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		if (type==GNUTLS_ALERT) {
-			gnutls_assert();
-			return 0; /* we were expecting close notify */
-		}
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+
+#define CHECK_RECORD_VERSION
+
+/* Checks the record headers and returns the length, version and
+ * content type.
+ */
+static int _gnutls_check_record_headers( GNUTLS_STATE state, uint8 headers[RECORD_HEADER_SIZE], ContentType type, 
+	HandshakeType htype, /*output*/ ContentType *recv_type, GNUTLS_Version *version, uint16 *length, uint16* header_size) {
 
 	/* Read the first two bytes to determine if this is a 
 	 * version 2 message 
 	 */
+
 	if ( htype == GNUTLS_CLIENT_HELLO && type==GNUTLS_HANDSHAKE && headers[0] > 127) { 
 
-	/* if msb set and expecting handshake message
-	 * it should be SSL 2 hello 
-	 */
-		version = GNUTLS_VERSION_UNKNOWN; /* assume unknown version */
-		length = (((headers[0] & 0x7f) << 8)) | headers[1];
+		/* if msb set and expecting handshake message
+		 * it should be SSL 2 hello 
+		 */
+		*version = GNUTLS_VERSION_UNKNOWN; /* assume unknown version */
+		*length = (((headers[0] & 0x7f) << 8)) | headers[1];
 
-		header_size = 2;
-		recv_type = GNUTLS_HANDSHAKE; /* we accept only v2 client hello
+		/* SSL 2.0 headers */
+		*header_size = 2;
+		*recv_type = GNUTLS_HANDSHAKE; /* we accept only v2 client hello
 					       */
-		state->gnutls_internals.v2_hello = length;
+		
+		/* in order to assist the handshake protocol.
+		 * V2 compatibility is a mess.
+		 */
+		state->gnutls_internals.v2_hello = *length;
+
 #ifdef RECORD_DEBUG
 		_gnutls_log( "Record: V2 packet received. Length: %d\n", length);
 #endif
@@ -692,12 +687,75 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	} else {
 		/* version 3.x 
 		 */
-		recv_type = headers[0];
+		*recv_type = headers[0];
 #ifdef CHECK_RECORD_VERSION
-		version = _gnutls_version_get( headers[1], headers[2]);
+		*version = _gnutls_version_get( headers[1], headers[2]);
 #endif
 
-		length = READuint16( &headers[3]);
+		*length = READuint16( &headers[3]);
+	}
+
+	return 0;
+}
+
+
+
+/* This function behave exactly like read(). The only difference is 
+ * that it accepts, the gnutls_state and the ContentType of data to
+ * send (if called by the user the Content is Userdata only)
+ * It is intended to receive data, under the current state.
+ */
+ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
+{
+	uint8 *tmpdata;
+	int tmplen;
+	GNUTLS_Version version;
+	uint8 *headers;
+	ContentType recv_type;
+	uint16 length;
+	uint8 *ciphertext;
+	uint8 *recv_data;
+	int ret, ret2;
+	uint16 header_size;
+
+	/* default headers for TLS 1.0
+	 */
+	header_size = RECORD_HEADER_SIZE;
+	ret = 0;
+
+	if (sizeofdata == 0 || data == NULL) {
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+
+	if ( _gnutls_session_is_valid(state)!=0 || state->gnutls_internals.may_read!=0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_SESSION;
+	}
+	
+	/* If we have enough data in the cache do not bother receiving
+	 * a new packet. (in order to flush the cache)
+	 */
+	ret = _gnutls_check_buffers( state, type, data, sizeofdata);
+	if (ret != 0)
+		return ret;
+
+
+	if ( (ret = _gnutls_io_read_buffered( state, &headers, header_size, -1)) != header_size) {
+		if (ret < 0 && gnutls_error_is_fatal(ret)==0) return ret;
+
+		_gnutls_session_invalidate( state);
+		if (type==GNUTLS_ALERT) {
+			gnutls_assert();
+			return 0; /* we were expecting close notify */
+		}
+		_gnutls_session_unresumable( state);
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+
+	if ( (ret=_gnutls_check_record_headers( state, headers, type, htype, &recv_type, &version, &length, &header_size)) < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	/* Here we check if the Type of the received packet is
@@ -717,7 +775,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 # ifdef RECORD_DEBUG
 		_gnutls_log( "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
 # endif
-		state->gnutls_internals.resumable = RESUME_FALSE;
+		_gnutls_session_invalidate( state);
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
 #endif
@@ -733,8 +791,8 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 #ifdef RECORD_DEBUG
 		_gnutls_log( "Record: FATAL ERROR: Received packet with length: %d\n", length);
 #endif
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
+		_gnutls_session_unresumable( state);
+		_gnutls_session_invalidate( state);
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
@@ -744,8 +802,8 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	if ( (ret = _gnutls_io_read_buffered( state, &recv_data, header_size+length, recv_type)) != length+header_size) {
 		if (ret<0 && gnutls_error_is_fatal(ret)==0) return ret;
 
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
+		_gnutls_session_unresumable( state);
+		_gnutls_session_invalidate( state);
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;		
 	}
@@ -760,8 +818,8 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	 */
 	tmplen = _gnutls_decrypt( state, ciphertext, length, &tmpdata, recv_type);
 	if (tmplen < 0) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
+		_gnutls_session_unresumable( state);
+		_gnutls_session_invalidate( state);
 		gnutls_assert();
 		return tmplen;
 	}
@@ -791,7 +849,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	/* increase sequence number */
 	if (uint64pp( &state->connection_state.read_sequence_number)!=0) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
+		_gnutls_session_invalidate( state);
 		gnutls_free(tmpdata);
 		gnutls_assert();
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
@@ -828,9 +886,9 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
 				if (tmpdata[0] == GNUTLS_AL_FATAL) {
-					state->gnutls_internals.valid_connection = VALID_FALSE;
-					state->gnutls_internals.resumable = RESUME_FALSE;
-					
+					_gnutls_session_unresumable( state);
+					_gnutls_session_invalidate( state);
+
 					ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
 				}
 
@@ -857,7 +915,13 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			gnutls_assert();
 			gnutls_free(tmpdata);
 			
-			return GNUTLS_E_GOT_APPLICATION_DATA;
+			/* the got_application data is only returned
+			 * if expecting client hello (for rehandshake
+			 * reasons). Otherwise it is an unexpected packet
+			 */
+			if (htype == GNUTLS_CLIENT_HELLO && type==GNUTLS_HANDSHAKE)
+				return GNUTLS_E_GOT_APPLICATION_DATA;
+			else return GNUTLS_E_UNEXPECTED_PACKET;
 			
 			break;
 		case GNUTLS_HANDSHAKE:
