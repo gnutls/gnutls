@@ -1,3 +1,9 @@
+2002-12-30 10:04  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_mpi.c:
+
+	Added a test for null (zero) integers in MPI scanning.  
+
 2002-12-29 20:42  nmav <nmav@gnutls.org>
 
 	* src/: tests.c, tls_test.c:
