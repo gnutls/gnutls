@@ -134,7 +134,7 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 		sizeof(HANDSHAKE_HEADER_BUFFER));
 	session->internals.adv_version_minor = 0;
 	session->internals.adv_version_minor = 0;
-	session->internals.handshake_direction = 0;
+	session->internals.direction = 0;
 
 	session->internals.resumable = RESUME_TRUE;
 

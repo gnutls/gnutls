@@ -133,8 +133,6 @@ int gnutls_bye( gnutls_session session, gnutls_close_request how);
 int gnutls_handshake( gnutls_session session);
 int gnutls_rehandshake( gnutls_session session);
 
-int gnutls_record_get_direction(gnutls_session session);
-
 gnutls_alert_description gnutls_alert_get( gnutls_session session);
 int 		 gnutls_alert_send( gnutls_session, gnutls_alert_level, gnutls_alert_description);
 int 		 gnutls_alert_send_appropriate(  gnutls_session session, int err);
@@ -176,6 +174,9 @@ ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t siz
 ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdata);
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send
+
+#define gnutls_handshake_get_direction gnutls_record_get_direction
+int gnutls_record_get_direction(gnutls_session session);
 
 size_t gnutls_record_get_max_size( gnutls_session session);
 ssize_t gnutls_record_set_max_size( gnutls_session session, size_t size);

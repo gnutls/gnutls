@@ -1,3 +1,9 @@
+Version 0.5.8
+- Updated documentation.
+- Added gnutls_record_get_direction() which replaces the obsolete
+  gnutls_handshake_get_direction().
+- Added function to convert error codes to alert descriptions
+
 Version 0.5.7 (11/09/2002)
 - Some fixes in the memory allocation functions (realloc).
 - Improved the string functions used in XML certificate generation.
