@@ -504,7 +504,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
  */
 ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 {
-	char data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
+	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
 #ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Record: Sending ChangeCipherSpec\n");
@@ -726,14 +726,16 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 #ifdef RECORD_DEBUG
 		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
 #endif
+
 		gnutls_free(ciphertext);
-		gnutls_free(tmpdata);
 
 		if (tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
+			gnutls_free(tmpdata);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 		memcpy( data, tmpdata, sizeofdata);
+		gnutls_free(tmpdata);
 
 		return tmplen;
 	}

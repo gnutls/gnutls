@@ -91,6 +91,12 @@ $type_env = "(\\\$\\w+)";
 		     $type_param, "<tt><b>\$1</b></tt>" );
 $blankline_html = "<p>";
 
+%highlights_tex = ( $type_constant, "{\\it \$1}",
+		     $type_func, "{\\bf \$1}",
+		     $type_struct, "{\\it \$1}",
+		     $type_param, "{\\bf \$1}" );
+$blankline_tex = "\\par";
+
 # sgml, docbook format
 %highlights_sgml = ( $type_constant, "<replaceable class=\"option\">\$1</replaceable>",
 		     $type_func, "<function>\$1</function>",
@@ -115,7 +121,7 @@ $blankline_text = "";
 
 
 sub usage {
-    print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man ]\n";
+    print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man | -tex ]\n";
     print "         [ -function funcname [ -function funcname ...] ]\n";
     print "         c source file(s) > outputfile\n";
     exit 1;
@@ -142,6 +148,10 @@ while ($ARGV[0] =~ m/^-(.*)/) {
 	$output_mode = "man";
 	%highlights = %highlights_man;
 	$blankline = $blankline_man;
+    } elsif ($cmd eq "-tex") {
+	$output_mode = "tex";
+	%highlights = %highlights_tex;
+	$blankline = $blankline_tex;
     } elsif ($cmd eq "-text") {
 	$output_mode = "text";
 	%highlights = %highlights_text;
@@ -256,6 +266,43 @@ sub output_html {
 	print "</ul>\n";
     }
     print "<hr>\n";
+}
+
+# output in tex
+sub output_tex {
+    my %args = %{$_[0]};
+    my ($parameter, $section);
+    my $count;
+    print "\n\n\\subsection{". $args{'function'} . "}\n";
+
+    print "{\\it ".$args{'functiontype'}."}\n";
+    print "{\\bf ".$args{'function'}."}\n";
+    print "(\n";
+    $count = 0;
+    foreach $parameter (@{$args{'parameterlist'}}) {
+	print "{\\it ".$args{'parametertypes'}{$parameter}."} {\\bf ".$parameter."}\n";
+	if ($count != $#{$args{'parameterlist'}}) {
+	    $count++;
+	    print ", ";
+	}
+    }
+    print ")\n";
+
+    print "\n\\large{Arguments}\n";
+    print "\\begin{itemize}\n";
+    foreach $parameter (@{$args{'parameterlist'}}) {
+	print "\\item {\\it ".$args{'parametertypes'}{$parameter}."} {\\bf ".$parameter."}\n";
+	print "\n";
+	output_highlight($args{'parameters'}{$parameter});
+    }
+    print "\\end{itemize}\n";
+    foreach $section (@{$args{'sectionlist'}}) {
+	print "\\large{$section}\n";
+	print "\\begin{rmfamily}\n";
+	output_highlight($args{'sections'}{$section});
+	print "\\end{rmfamily}\n";
+    }
+    print "\n";
 }
 
 

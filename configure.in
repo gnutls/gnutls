@@ -154,5 +154,5 @@ AC_CONFIG_COMMANDS([default],[[
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config \
-lib/gnutls.h doc/Makefile src/x509/Makefile src/srp/Makefile ])
+lib/gnutls.h doc/Makefile src/x509/Makefile src/srp/Makefile doc/tex/Makefile])
 AC_OUTPUT
