@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002 Timo Schulz <twoaday@freakmail.de>
+ * Copyright (C) 2002,2003 Timo Schulz <twoaday@freakmail.de>
  *
  * This file is part of GNUTLS.
  *
@@ -482,6 +482,33 @@ leave:
     return rc;
 }
 
+static int
+stream_to_datum( cdk_stream_t inp, gnutls_datum *raw )
+{
+    uint8 buf[4096];
+    int rc = 0, nread, nbytes = 0;
+  
+    if( !buf || !raw ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
+
+    cdk_stream_seek( inp, 0 );
+    while( !cdk_stream_eof( inp ) ) {
+        nread = cdk_stream_read( inp, buf, sizeof buf-1 );
+        if( nread == EOF )
+            break;
+        datum_append( raw, buf, nread );
+        nbytes += nread;
+    }
+    cdk_stream_seek( inp, 0 );
+    if( !nbytes )
+        rc = GNUTLS_E_INTERNAL_ERROR;
+
+    return rc;
+}
+
+
 
 /**
  * gnutls_certificate_set_openpgp_key_mem - Used to set OpenPGP keys
@@ -503,17 +530,21 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     CDK_PACKET *pkt;
     int i = 0;
     int rc = 0;
+    cdk_stream_t inp = NULL;
     
     if ( !res || !key || !cert ) {
         gnutls_assert( );
         return GNUTLS_E_INVALID_REQUEST;
     }
 
-    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
-    if( (rc = _gnutls_map_cdk_rc( rc )) ) {
-      gnutls_assert();
-      goto leave;
+    inp = cdk_stream_tmp_from_mem( cert->data, cert->size);
+    if (inp == NULL) {
+    	gnutls_assert();
+    	return GNUTLS_E_INTERNAL_ERROR;
     }
+    
+    if( cdk_armor_filter_use( inp ) )
+    	cdk_stream_set_armor_flag( inp, 0 );
 
     res->cert_list = gnutls_realloc_fast(res->cert_list,
                                     (1+res->ncerts)*sizeof(gnutls_cert*));
@@ -536,25 +567,41 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     }
 
     i = 1;
-    while( (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
-        pkt = cdk_kbnode_get_packet( p );
+    rc = cdk_keydb_get_keyblock( inp, &knode );
+#warning FIX THIS
+
+    while( knode && (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
+	pkt = cdk_kbnode_get_packet( p );
         if( i > MAX_PUBLIC_PARAMS_SIZE ) {
             gnutls_assert();
             break;
         }
-        if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
+	if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
             int n = res->ncerts;
+            
             cdk_pkt_pubkey_t pk = pkt->pkt.public_key;
             res->cert_list_length[n] = 1;
-            if (_gnutls_set_datum( &res->cert_list[n][0].raw,
-                              cert->data, cert->size ) < 0) {
-                 gnutls_assert();
-                 return GNUTLS_E_MEMORY_ERROR;
+               
+            if (stream_to_datum( inp, &res->cert_list[n][0].raw )) {
+                gnutls_assert();
+                return GNUTLS_E_MEMORY_ERROR;
             }
             openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
             i++;
         }
     }
+    
+    if( rc == CDK_EOF && i > 1)
+       rc = 0;
+       
+    cdk_stream_close( inp );
+    
+    if (rc) {
+        cdk_kbnode_release( knode );
+        gnutls_assert();
+        rc = _gnutls_map_cdk_rc( rc );
+        goto leave;
+    }       
   
     res->ncerts++;
     res->pkey = gnutls_realloc_fast(res->pkey,
@@ -563,12 +610,26 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;   
     }
+
     /* ncerts has been incremented before */
-    rc = _gnutls_set_datum( &raw, key->data, key->size );
-    if (rc < 0) {
+
+    inp = cdk_stream_tmp_from_mem( key->data, key->size);
+    if (inp == NULL) {
     	gnutls_assert();
-    	return rc;
+    	return GNUTLS_E_INTERNAL_ERROR;
     }
+    
+    if( cdk_armor_filter_use( inp ) )
+    	cdk_stream_set_armor_flag( inp, 0 );
+
+    memset( &raw, 0, sizeof raw );
+    
+    if (stream_to_datum( inp, &raw )) {
+    	gnutls_assert();
+    	return GNUTLS_E_INTERNAL_ERROR;
+    }
+    cdk_stream_close( inp );
+    
     rc = _gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], &raw );
     if (rc) {
     	gnutls_assert();
@@ -599,11 +660,6 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
                                          char* keyfile )
 {
     struct stat statbuf;
-    cdk_stream_t inp = NULL;
-    cdk_kbnode_t knode = NULL, ctx = NULL, p;
-    CDK_PACKET *pkt = NULL;
-    gnutls_datum raw;
-    int i = 0, n;
     int rc = 0;
     gnutls_datum key, cert;
     strfile xcert, xkey;
@@ -647,6 +703,8 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
     	gnutls_assert();
     	return rc;
     }
+
+    return 0;
 }
 
 

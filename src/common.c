@@ -1,3 +1,4 @@
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -227,7 +228,7 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 			fprintf(stderr, "Decoding error: %s\n", str);
 			return;
 		}
-
+#if 0
 		if (print_cert) {
 			size_t size;
 			
@@ -242,6 +243,7 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 			fputs( buffer, stdout);
 			fputs( "\n", stdout);
 		}
+#endif
 
 		if (hostname != NULL) { /* Check the hostname of the first certificate
 		             * if it matches the name of the host we

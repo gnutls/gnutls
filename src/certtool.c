@@ -1437,21 +1437,12 @@ void generate_pkcs12( void)
 	key_id.data = _key_id;
 	key_id.size = size;
 		
-	size = sizeof(buffer);
-	result = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_DER, buffer, &size);
+	result = gnutls_pkcs12_bag_set_crt( bag, crt);
 	if (result < 0) {
-		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
+		fprintf(stderr, "set_crt: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
-	data.data = buffer;
-	data.size = size;
-	result = gnutls_pkcs12_bag_set_data( bag, GNUTLS_BAG_CERTIFICATE, &data);
-	if (result < 0) {
-		fprintf(stderr, "bag_set_data: %s\n", gnutls_strerror(result));
-		exit(1);
-	}
-	
 	index = result;
 
 	result = gnutls_pkcs12_bag_set_friendly_name( bag, index, name);
