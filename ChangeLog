@@ -1,3 +1,36 @@
+2002-04-13 19:59  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Some modifications for the new OpenCDK code.  
+
+2002-04-13 15:58  nmav <nmav@gnutls.org>
+
+	* doc/tex/auth.tex, doc/tex/ciphersuites.tex, doc/tex/errors.tex,
+	doc/tex/ex1.tex, doc/tex/examples.tex, doc/tex/gnutls.tex,
+	doc/tex/handshake.tex, doc/tex/serv1.tex, src/crypt.c:
+
+	Documentation fixes 
+
+2002-04-12 19:06  nmav <nmav@gnutls.org>
+
+	* acconfig.h, configure.in:
+
+	fixed opencdk detection problem 
+
+2002-04-12 11:34  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_x509.c, gnutls_x509.h:
+
+	better doc (internal) for _gnutls_int2str() 
+
+2002-04-10 19:01  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_rsa.c, lib/gnutls_int.h, lib/gnutls_state.c:
+
+	Added function which disables the version check in the RSA premaster
+	secret -only needed in server side 
+
 2002-04-08 18:16  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/Makefile.am, doc/tex/asn1.tex,
