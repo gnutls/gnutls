@@ -17,6 +17,9 @@ GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
 AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION", [version of gnutls])
 
+GNUTLS_GCRYPT_VERSION=1.1.43
+AC_DEFINE_UNQUOTED(GNUTLS_GCRYPT_VERSION, "$GNUTLS_GCRYPT_VERSION", [version of gnutls])
+
 AM_INIT_AUTOMAKE(gnutls, $GNUTLS_VERSION, [version of gnutls])
 AM_CONFIG_HEADER(config.h)
 
@@ -152,10 +155,10 @@ AC_MSG_RESULT([***
 
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS(unistd.h pwd.h strings.h stdarg.h)
+AC_CHECK_HEADERS(unistd.h strings.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
 AC_CHECK_HEADERS(errno.h sys/time.h time.h)
-AC_CHECK_FUNCS(bzero memset memmove bcopy strnstr memcmp memcpy mmap,,)
+AC_CHECK_FUNCS(memset memmove strnstr memcmp memcpy mmap,,)
 AC_FUNC_ALLOCA
 
 
@@ -222,7 +225,7 @@ AC_MSG_RESULT([***
 *** Checking for external libraries...
 ])
 
-AM_PATH_LIBGCRYPT(1.1.42,,
+AM_PATH_LIBGCRYPT($GNUTLS_GCRYPT_VERSION,,
  	AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from

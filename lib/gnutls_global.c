@@ -183,7 +183,7 @@ int gnutls_global_init( void)
 #endif
 	}
 
-	if (gcry_check_version("1.1.43")==NULL) {
+	if (gcry_check_version(GNUTLS_GCRYPT_VERSION)==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
 	}
