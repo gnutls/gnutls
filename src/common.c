@@ -661,3 +661,16 @@ char* ret;
 	return dst;
 }
 #endif
+
+void sockets_init( void)
+{
+#ifdef _WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+
+        wVersionRequested = MAKEWORD(1, 1);
+        if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+              perror("WSA_STARTUP_ERROR");
+        }
+#endif
+}

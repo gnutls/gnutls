@@ -27,21 +27,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
-
-#ifdef _WIN32
-# include <winsock.h>
-# include <io.h>
-# include <winbase.h>
-# define socklen_t int
-# define close closesocket
-#else
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-#endif
-
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
@@ -556,10 +541,6 @@ int main(int argc, char **argv)
    char name[256];
    int accept_fd;
    struct sockaddr_in client_address;
-#ifdef _WIN32
-   WORD wVersionRequested;
-   WSADATA wsaData;
-#endif
 
 #ifndef _WIN32
    signal(SIGPIPE, SIG_IGN);
@@ -567,12 +548,9 @@ int main(int argc, char **argv)
    signal(SIGTERM, terminate);
    if (signal(SIGINT, terminate) == SIG_IGN)
       signal(SIGINT, SIG_IGN); /* e.g. background process */
-#else
-   wVersionRequested = MAKEWORD(1, 1);
-   if (WSAStartup(wVersionRequested, &wsaData) != 0) {
-       perror("WSA_STARTUP_ERROR");
-   }
 #endif
+
+   sockets_init();
 
    gaa_parser(argc, argv);
 

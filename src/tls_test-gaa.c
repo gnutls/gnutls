@@ -8,7 +8,8 @@
 
 #include <config.h>
 #ifdef _WIN32
-# include <windows.h>
+# include <io.h>
+# include <winbase.h>
 #endif
 
 #include <stdio.h>
@@ -145,13 +146,13 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 26 "tls_test.gaa"
+#line 27 "tls_test.gaa"
 	char *rest_args;
-#line 20 "tls_test.gaa"
+#line 21 "tls_test.gaa"
 	int more_info;
-#line 17 "tls_test.gaa"
+#line 18 "tls_test.gaa"
 	int debug;
-#line 14 "tls_test.gaa"
+#line 15 "tls_test.gaa"
 	int pp;
 
 #line 114 "gaa.skel"
@@ -496,14 +497,14 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 23 "tls_test.gaa"
+#line 24 "tls_test.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_verbose:
 	OK = 0;
-#line 21 "tls_test.gaa"
+#line 22 "tls_test.gaa"
 { gaaval->more_info = 1 ;};
 
 		return GAA_OK;
@@ -513,7 +514,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_debug.arg1, gaa_getint, GAATMP_debug.size1);
 		gaa_index++;
-#line 18 "tls_test.gaa"
+#line 19 "tls_test.gaa"
 { gaaval->debug = GAATMP_debug.arg1 ;};
 
 		return GAA_OK;
@@ -523,7 +524,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_port.arg1, gaa_getint, GAATMP_port.size1);
 		gaa_index++;
-#line 15 "tls_test.gaa"
+#line 16 "tls_test.gaa"
 { gaaval->pp = GAATMP_port.arg1 ;};
 
 		return GAA_OK;
@@ -532,7 +533,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAAREST_tmp.arg1, gaa_getstr, GAAREST_tmp.size1);
 		gaa_index++;
-#line 27 "tls_test.gaa"
+#line 28 "tls_test.gaa"
 { gaaval->rest_args = GAAREST_tmp.arg1; ;};
 
 		return GAA_OK;
@@ -561,7 +562,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 29 "tls_test.gaa"
+#line 30 "tls_test.gaa"
 { gaaval->rest_args=NULL; gaaval->pp = 443; gaaval->more_info = 0; ;};
 
     }

@@ -23,27 +23,12 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/types.h>
-
-#ifdef _WIN32
-# include <winsock.h>
-# include <io.h>
-# include <winbase.h>
-# define socklen_t int
-# define close closesocket
-#else
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <unistd.h>
-# include <signal.h>
-# include <netdb.h>
-#endif
-
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <sys/time.h>
 #include <tests.h>
+#include <common.h>
 #include <tls_test-gaa.h>
 
 #ifndef SHUT_WR
@@ -134,7 +119,7 @@ static const TLS_TEST tls_tests[] = {
 };
 
 static int tt = 0;
-char* ip;
+const char* ip;
 
 #define CONNECT() \
 		sd = socket(AF_INET, SOCK_STREAM, 0); \
@@ -160,21 +145,14 @@ int main(int argc, char **argv)
 	struct hostent *server_host;
 	int ssl3_ok = 0;
 	int tls1_ok = 0;
-#ifdef _WIN32
-	WORD wVersionRequested;
-	WSADATA wsaData;
-#endif
 
 	gaa_parser(argc, argv);
 
 #ifndef _WIN32
 	signal(SIGPIPE, SIG_IGN);
-#else
-        wVersionRequested = MAKEWORD(1, 1);
-        if (WSAStartup(wVersionRequested, &wsaData) != 0) {
-              perror("WSA_STARTUP_ERROR");
-        }
 #endif
+
+        sockets_init();
 
 	if (gnutls_global_init() < 0) {
 		fprintf(stderr, "global state initialization error\n");

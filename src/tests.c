@@ -27,7 +27,6 @@
 # include <unistd.h>
 # include <signal.h>
 #else
-# include <winsock.h>
 # include <errno.h>
 #endif
 

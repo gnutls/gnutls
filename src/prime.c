@@ -25,6 +25,10 @@
 #include <gnutls/gnutls.h>
 #include "../lib/defines.h"
 
+/* Generates Diffie Hellman parameters (a prime and a generator
+ * of the group). Exports them in PKCS #3 format. Used by certtool.
+ */
+
 extern FILE* outfile;
 extern FILE* infile;
 extern unsigned char buffer[];
