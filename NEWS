@@ -1,4 +1,4 @@
-Version 0.4.2
+Version 0.4.2 (21/05/2002)
 - Separated ASN.1 structures parser documentation and TLS library
   documentation.
 - Added gnutls_handshake_set_rsa_pms() function, which disables the
