@@ -35,14 +35,12 @@
  * string(username):base64(v):base64(salt):int(index)
  */
 static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
-char * p;
+char * p, *p2;
 int len;
 opaque *verifier;
 int verifier_size;
-int index;
+int indx;
 
-	entry->algorithm = SRPSHA1_CRYPT;
-	
 	p = rindex( str, ':'); /* we have index */
 	if (p==NULL) {
 		gnutls_assert();
@@ -53,8 +51,8 @@ int index;
 	p++;
 
 	len = strlen(p);
-	index = atoi(p);
-	if (index==0) {
+	indx = atoi(p);
+	if (indx==0) {
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
@@ -86,7 +84,21 @@ int index;
 	
 	*p='\0';
 	p++;
-	
+
+	if ( (p2 = index(p, '$')) == NULL) {
+		entry->algorithm = SRPSHA1_CRYPT;
+	} else {
+		p++;
+		entry->algorithm = atoi(p);
+		p2 = index(p, '$'); /* find the last $ */
+		if (p2==NULL) {
+			gnutls_assert();
+			gnutls_free(entry->salt);
+			return GNUTLS_E_PARSING_ERROR;
+		}
+		p = p2+1;
+	}
+
 	len = strlen(p);
 	verifier_size = _gnutls_sbase64_decode( p, len, &verifier);
 	if (verifier_size <= 0) {
@@ -107,7 +119,7 @@ int index;
 
 	entry->username = strdup(str);
 
-	return index;
+	return indx;
 }
 
 
@@ -203,7 +215,7 @@ static int pwd_read_conf( SRP_SERVER_CREDENTIALS* cred, GNUTLS_SRP_PWD_ENTRY* en
 	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
 	            i++;
 	    }
-	    if (strncmp( indexstr, line, i) == 0) {
+	    if (strncmp( indexstr, line, strlen(indexstr)) == 0) {
 			if ((index = pwd_put_values2( entry, line, strlen(line))) >= 0)
 				return 0;
 			else {
@@ -216,7 +228,7 @@ static int pwd_read_conf( SRP_SERVER_CREDENTIALS* cred, GNUTLS_SRP_PWD_ENTRY* en
 }
 
 
-GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username) {
+GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username, int *err) {
 	SRP_SERVER_CREDENTIALS* cred;
 	FILE * fd;
 	char line[5*1024];
@@ -224,8 +236,11 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	int index;
 
+	*err = 0; /* normal exit */
+	
 	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_SRP, NULL);
 	if (cred==NULL) {
+		*err = 1;
 		gnutls_assert();
 		gnutls_free(entry);
 		return NULL;
@@ -233,18 +248,19 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 
 	fd = fopen( cred->password_file, "r");
 	if (fd==NULL) {
+		*err = 1; /* failed due to critical error */
 		gnutls_assert();
 		gnutls_free(entry);
 		return NULL;
 	}
 
 	while( fgets( line, sizeof(line), fd) != NULL) {
-    /* move to first ':' */
+	    /* move to first ':' */
 	    i=0;
 	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
 	            i++;
 	    }
-	    if (strncmp( username, line, i) == 0) {
+	    if (strncmp( username, line, strlen(username)) == 0) {
 			if ((index = pwd_put_values( entry, line, strlen(line))) >= 0)
 				if (pwd_read_conf( cred, entry, index)==0) {
 					return entry;
@@ -262,7 +278,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	
 }
 #define RNDUSER "rnd"
-#define RND_SALT_SIZE 16
+#define RND_SALT_SIZE 17
 GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	GNUTLS_SRP_PWD_ENTRY * pwd_entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	size_t n = sizeof diffie_hellman_group1_prime;

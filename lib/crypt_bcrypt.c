@@ -74,12 +74,12 @@ static void _blf_encrypt(blf_ctx * c, uint8 * x)
 
 	x[0] = (Xl >> 24) & 0xff;
 	x[1] = (Xl >> 16) & 0xff;
-	x[2] = (Xl >>  8) & 0xff;
-	x[3] = (Xl      ) & 0xff;
+	x[2] = (Xl >> 8) & 0xff;
+	x[3] = (Xl) & 0xff;
 	x[4] = (Xr >> 24) & 0xff;
 	x[5] = (Xr >> 16) & 0xff;
-	x[6] = (Xr >>  8) & 0xff;
-	x[7] = (Xr      ) & 0xff;
+	x[6] = (Xr >> 8) & 0xff;
+	x[7] = (Xr) & 0xff;
 }
 
 /* x should be a 64 bit integer */
@@ -118,8 +118,7 @@ static short initialize_blowfish(blf_ctx * c)
 {
 	short i;
 
-	uint32 ks0[] =
-	{
+	uint32 ks0[] = {
 		0xd1310ba6UL, 0x98dfb5acUL, 0x2ffd72dbUL, 0xd01adfb7UL,
 		0xb8e1afedUL, 0x6a267e96UL,
 		0xba7c9045UL, 0xf12c7f99UL, 0x24a19947UL, 0xb3916cf7UL,
@@ -207,8 +206,7 @@ static short initialize_blowfish(blf_ctx * c)
 		0x53b02d5dUL, 0xa99f8fa1UL, 0x08ba4799UL, 0x6e85076aUL
 	};
 
-	uint32 ks1[] =
-	{
+	uint32 ks1[] = {
 		0x4b7a70e9UL, 0xb5b32944UL, 0xdb75092eUL, 0xc4192623UL,
 		0xad6ea6b0UL, 0x49a7df7dUL,
 		0x9cee60b8UL, 0x8fedb266UL, 0xecaa8c71UL, 0x699a17ffUL,
@@ -296,8 +294,7 @@ static short initialize_blowfish(blf_ctx * c)
 		0x153e21e7UL, 0x8fb03d4aUL, 0xe6e39f2bUL, 0xdb83adf7UL
 	};
 
-	uint32 ks2[] =
-	{
+	uint32 ks2[] = {
 		0xe93d5a68UL, 0x948140f7UL, 0xf64c261cUL, 0x94692934UL,
 		0x411520f7UL, 0x7602d4f7UL,
 		0xbcf46b2eUL, 0xd4a20068UL, 0xd4082471UL, 0x3320f46aUL,
@@ -385,8 +382,7 @@ static short initialize_blowfish(blf_ctx * c)
 		0xd79a3234UL, 0x92638212UL, 0x670efa8eUL, 0x406000e0UL
 	};
 
-	uint32 ks3[] =
-	{
+	uint32 ks3[] = {
 		0x3a39ce37UL, 0xd3faf5cfUL, 0xabc27737UL, 0x5ac52d1bUL,
 		0x5cb0679eUL, 0x4fa33742UL,
 		0xd3822740UL, 0x99bc9bbeUL, 0xd5118e9dUL, 0xbf0f7315UL,
@@ -475,8 +471,7 @@ static short initialize_blowfish(blf_ctx * c)
 	};
 
 
-	uint32 pi[] =
-	{
+	uint32 pi[] = {
 		0x243f6a88UL, 0x85a308d3UL, 0x13198a2eUL, 0x03707344UL,
 		0xa4093822UL, 0x299f31d0UL,
 		0x082efa98UL, 0xec4e6c89UL, 0x452821e6UL, 0x38d01377UL,
@@ -501,23 +496,24 @@ static short initialize_blowfish(blf_ctx * c)
 	return 0;
 }
 
-static short _blf_ExpandKey(blf_ctx * c, const uint8 * key, short keybytes, const uint8* bsalt)
+static short _blf_ExpandKey(blf_ctx * c, const uint8 * key, short keybytes,
+			    const uint8 * bsalt)
 {
 	short i, j;
 	int k;
 	uint32 data, temp[2];
 	uint32 wsalt[4];
 
-	if (bsalt!=NULL) {
+	if (bsalt != NULL) {
 		wsalt[0] = 0x00000000;
 		wsalt[1] = 0x00000000;
 		wsalt[2] = 0x00000000;
 		wsalt[3] = 0x00000000;
-		for (i=0;i<4;i++) {
+		for (i = 0; i < 4; i++) {
 			wsalt[0] = (wsalt[0] << 8) | bsalt[i];
-			wsalt[1] = (wsalt[1] << 8) | bsalt[i+4];
-			wsalt[2] = (wsalt[2] << 8) | bsalt[i+8];
-			wsalt[3] = (wsalt[3] << 8) | bsalt[i+12];
+			wsalt[1] = (wsalt[1] << 8) | bsalt[i + 4];
+			wsalt[2] = (wsalt[2] << 8) | bsalt[i + 8];
+			wsalt[3] = (wsalt[3] << 8) | bsalt[i + 12];
 		}
 	}
 
@@ -527,16 +523,16 @@ static short _blf_ExpandKey(blf_ctx * c, const uint8 * key, short keybytes, cons
 	/* Step 1: XOR the Pbox with the key */
 	for (i = 0; i < BF_N + 2; i++) {
 		data = 0x00000000;
-		data = (data << 8) | key[(j)   % keybytes];
-		data = (data << 8) | key[(j+1) % keybytes];
-		data = (data << 8) | key[(j+2) % keybytes];
-		data = (data << 8) | key[(j+3) % keybytes];
+		data = (data << 8) | key[(j) % keybytes];
+		data = (data << 8) | key[(j + 1) % keybytes];
+		data = (data << 8) | key[(j + 2) % keybytes];
+		data = (data << 8) | key[(j + 3) % keybytes];
 
 		c->P[i] ^= data;
 		j = (j + 4) % keybytes;
 	}
 
-	k = 2; /* This should be 0 ??? */
+	k = 2;			/* This should be 0 ??? */
 	/* Step 2: Use the salt on Pbox */
 	for (i = 0; i < BF_N + 2; i += 2) {
 		if (bsalt != NULL) {
@@ -568,8 +564,8 @@ static short _blf_ExpandKey(blf_ctx * c, const uint8 * key, short keybytes, cons
 
 
 
-static blf_ctx *
- _blf_init( uint8 *salt, const char *key, int key_len, int cost)
+static blf_ctx *_blf_init(uint8 * salt, const char *key, int key_len,
+			  int cost)
 {
 	blf_ctx *state = malloc(sizeof(blf_ctx));
 	uint32 i, rcost;
@@ -586,16 +582,15 @@ static blf_ctx *
 	return state;
 }
 
-static void _blf_deinit(blf_ctx *ctx)
+static void _blf_deinit(blf_ctx * ctx)
 {
 	free(ctx);
 }
 static const char magic[] = "$2$";
 
-char *
- crypt_bcrypt(const char *passwd, const char *salt)
+char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 {
-	unsigned char *sp, *tsp;
+	unsigned char *sp;
 	blf_ctx *ctx;
 	unsigned char text[24] = "OrpheanBeholderScryDoubt";
 	uint8 *csalt;
@@ -604,7 +599,7 @@ char *
 	int i, salt_size = strlen(salt);
 	unsigned char *local_salt, *v;
 	int passwd_len, vsize;
-	opaque *tmp, *g, *n;
+	opaque *tmp;
 
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
 	if (passwd_len > 56)
@@ -612,105 +607,110 @@ char *
 
 	local_salt = malloc(salt_size + 1);
 	strcpy((char *) local_salt, salt);
-	sp = local_salt;
 
-	/* If it starts with the magic string, then skip that */
-	if (!strncmp((char *) sp, magic, strlen(magic)))
-		sp += strlen(magic);
-
-	tsp = sp;
-	while((*tsp)!='$') tsp++;
-	*tsp = '\0';		/* put a null after the end of salt */
-
-	_gnutls_base64_decode( sp, strlen(sp), &csalt);
-
-	cost = (uint8) csalt[0];
-	ctx = _blf_init( &csalt[1], passwd, passwd_len, cost);
-	gnutls_free(csalt);
-	
-	for (i = 0; i < 64; i++) {
-		_blf_encrypt(ctx, (uint8 *) text);
-		_blf_encrypt(ctx, (uint8 *) &text[8]);
-		_blf_encrypt(ctx, (uint8 *) &text[16]);
-	}
-
-	/* v = g^x mod n */
-	vsize = _gnutls_srp_gx(text, 8*3, &v, &g, &n);
-	if (vsize==-1 || v==NULL) {
+	sp = index( local_salt, ':'); /* move to salt - after verifier */
+	if (sp==NULL) {
 		gnutls_assert();
 		return NULL;
 	}
-	
-	_gnutls_base64_encode(v, vsize, &rtext);
+	sp++;
+
+	_gnutls_sbase64_decode(sp, strlen(sp), &csalt);
+
+	cost = (uint8) csalt[0];
+	ctx = _blf_init(&csalt[1], passwd, passwd_len, cost);
+	gnutls_free(csalt);
+
+	for (i = 0; i < 64; i++) {
+		_blf_encrypt(ctx, (uint8 *) text);
+		_blf_encrypt(ctx, (uint8 *) & text[8]);
+		_blf_encrypt(ctx, (uint8 *) & text[16]);
+	}
+
+	/* v = g^x mod n */
+	vsize = _gnutls_srp_gx(text, 8 * 3, &v, g, n);
+	if (vsize == -1 || v == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	_gnutls_sbase64_encode(v, vsize, &rtext);
 	gnutls_free(v);
 
-	tmp = gnutls_malloc( strlen(magic)+3+strlen(sp)+1+strlen(rtext)+strlen(g)+2+strlen(n)+1);
+	tmp =
+	    gnutls_malloc(strlen(magic) + 3 + strlen(sp) + 1 +
+			  strlen(rtext) + 1);
 
-	sprintf( tmp, "%s%.2u$%s$%s$%s$%s", magic, (unsigned int) cost, sp, rtext, g, n);
-	gnutls_free(g);
-	gnutls_free(n);
+	sprintf(tmp, "%s%s:%s", magic, rtext, sp);
 
 	gnutls_free(local_salt);
 	gnutls_free(rtext);
-	
+
 	_blf_deinit(ctx);
 	return tmp;
 }
 
-char *crypt_bcrypt_wrapper(const char *pass_new, int cost)
+/* cost is stored as the first byte in salt (thus < 255) which is fine! */
+char *crypt_bcrypt_wrapper(const char *pass_new, int cost, MPI g, MPI n)
 {
-       unsigned char *result;
-       char* tcp;
-       unsigned char* rand;
-       char *e = NULL;
-	   int result_size;
-	   
-       rand = _gnutls_get_random( 17, GNUTLS_WEAK_RANDOM);
-       /* cost should be <32 and >6 */
-       if (cost >=32) cost=31;
-       if (cost < 1) cost = 1;
+	unsigned char *result;
+	char *tcp;
+	unsigned char *rand;
+	char *e = NULL;
+	int result_size;
 
-	   rand[0] = (uint8) cost;
-	   result_size = _gnutls_base64_encode( rand, 17, &result);
-	   if (result_size < 0) {
-	   	gnutls_assert();
-	   	return NULL;
-	   }
+	rand = _gnutls_get_random(17, GNUTLS_WEAK_RANDOM);
+	/* cost should be <32 and >6 */
+	if (cost >= 32)
+		cost = 31;
+	if (cost < 1)
+		cost = 1;
 
-	   tcp = gnutls_calloc( 1, strlen(magic)+ 3 + result_size +1+1);
-       sprintf(tcp, "%s$%s$", magic, result);
+	rand[0] = (uint8) cost;
+	result_size = _gnutls_sbase64_encode(rand, 17, &result);
+	if (result_size < 0) {
+		gnutls_assert();
+		return NULL;
+	}
 
-	   gnutls_free(result);
+	tcp = gnutls_calloc(1, 1 + result_size + 1);
+	sprintf(tcp, ":%s", result);
 
-	   _gnutls_free_rand(rand);
-	   
-       e = crypt_bcrypt(pass_new, (const char *) tcp);
-	   gnutls_free(tcp);
-	   	   
-       return e;
+	gnutls_free(result);
+
+	_gnutls_free_rand(rand);
+
+	e = crypt_bcrypt(pass_new, (const char *) tcp, g, n);
+	gnutls_free(tcp);
+
+	return e;
 }
 
-void *
- _gnutls_calc_srp_bcrypt( char *passwd, opaque *salt, int salt_size)
+void *_gnutls_calc_srp_bcrypt(char *passwd, opaque * salt, int salt_size, int* size)
 {
 	blf_ctx *ctx;
 	opaque text[24] = "OrpheanBeholderScryDoubt";
 	int passwd_len, i;
 	opaque *tmp;
 
+	*size = sizeof(text);
+	
+	/* we need 16 + cost */
+	if (salt_size < 17) return NULL;
+	
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
 	if (passwd_len > 56)
 		passwd_len = 56;
 
-	ctx = _blf_init( &salt[1], passwd, passwd_len, salt[0]);
+	ctx = _blf_init(&salt[1], passwd, passwd_len, (uint32)salt[0]);
 
 	tmp = malloc(sizeof(text));
-	memcpy( tmp, text, sizeof(text));
-		
+	memcpy(tmp, text, sizeof(text));
+
 	for (i = 0; i < 64; i++) {
 		_blf_encrypt(ctx, (uint8 *) tmp);
-		_blf_encrypt(ctx, (uint8 *) &tmp[8]);
-		_blf_encrypt(ctx, (uint8 *) &tmp[16]);
+		_blf_encrypt(ctx, (uint8 *) & tmp[8]);
+		_blf_encrypt(ctx, (uint8 *) & tmp[16]);
 	}
 
 	_blf_deinit(ctx);

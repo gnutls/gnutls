@@ -48,8 +48,8 @@ int main()
     
     /* this is a password file (created with the included crypt utility) 
      */
-    cred.password_file="/etc/tpasswd";
-    cred.password_conf_file="/etc/tpasswd.conf";
+    cred.password_file="tpasswd";
+    cred.password_conf_file="tpasswd.conf";
     
     listen_sd = socket(AF_INET, SOCK_STREAM, 0);
     ERR(listen_sd, "socket");

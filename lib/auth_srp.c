@@ -71,16 +71,19 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	uint8 *data_g;
 	uint8 pwd_algo;
 	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
+	int err;
 
 	if (key->username == NULL) {
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	pwd_entry = _gnutls_srp_pwd_read_entry( key, key->username);
+	pwd_entry = _gnutls_srp_pwd_read_entry( key, key->username, &err);
 
 	if (pwd_entry == NULL) {
-		pwd_entry = _gnutls_randomize_pwd_entry();
-		/* return GNUTLS_E_PWD_ERROR; */
+		if (err==0)
+			pwd_entry = _gnutls_randomize_pwd_entry();
+		else 
+		        return GNUTLS_E_PWD_ERROR;
 	}
 
 	pwd_algo = (uint8) pwd_entry->algorithm;
@@ -319,12 +322,12 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
 	 */
-	hd = _gnutls_calc_srp_x( username, password, data_s, n_s, pwd_algo);
+	hd = _gnutls_calc_srp_x( username, password, data_s, n_s, pwd_algo, &_n_g);
 	if (hd==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
-	_n_g = 20;
+
 	if (gcry_mpi_scan(&key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;

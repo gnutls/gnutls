@@ -8,9 +8,15 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 12 "crypt.gaa"
+#line 22 "crypt.gaa"
+	char *create_conf;
+#line 19 "crypt.gaa"
+	char *passwd_conf;
+#line 16 "crypt.gaa"
+	int verify;
+#line 13 "crypt.gaa"
 	int salt;
-#line 9 "crypt.gaa"
+#line 10 "crypt.gaa"
 	char *crypt;
 #line 6 "crypt.gaa"
 	char *passwd;

@@ -60,8 +60,8 @@ int main()
 	char *tmp;
 	SRP_CLIENT_CREDENTIALS cred;
 	
-	cred.username = "test";
-	cred.password = "test";
+	cred.username = "test2";
+	cred.password = "test2";
 	
 //	signal(SIGPIPE, SIG_IGN);
 

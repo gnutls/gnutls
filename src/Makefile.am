@@ -1,4 +1,5 @@
-EXTRA_DIST = port.h crypt.gaa gaa.h
+EXTRA_DIST = port.h crypt.gaa gaa.h README.crypt
+INCLUDES = -I../lib
 noinst_PROGRAMS = serv cli crypt
 serv_SOURCES = serv.c
 serv_LDADD = ../lib/libgnutls.la $(GCRYPT_LIBS)

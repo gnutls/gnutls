@@ -94,13 +94,6 @@ int gnutls_set_db_name( GNUTLS_STATE state, char* filename);
 int gnutls_clean_db( GNUTLS_STATE state);
 
 
-/* crypt functions */
-enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 };
-typedef enum crypt_algo crypt_algo;
-
-char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt);
-int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt);
-
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */

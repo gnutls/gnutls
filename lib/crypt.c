@@ -24,34 +24,34 @@
 #include "crypt_srpsha1.h"
 #include "gnutls_random.h"
 
-char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt) {
+char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt, MPI g, MPI n) {
 	
 	switch(algo) {
 	case BLOWFISH_CRYPT: /* bcrypt */
 		/* salt in bcrypt is actually the cost */
-		return crypt_bcrypt_wrapper(passwd, salt);
+		return crypt_bcrypt_wrapper(passwd, salt, g, n);
 	case SRPSHA1_CRYPT: /* bcrypt */
 		/* salt in bcrypt is the salt size */
-		return crypt_srpsha1_wrapper(username, passwd, salt);
+		return crypt_srpsha1_wrapper(username, passwd, salt, g, n);
 	}
 	return NULL;
 }
 
-int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt) {
+int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt, MPI g, MPI n) {
 	char* cr;
-	
+
 	switch(salt[0]) {
 	case '$':
 		switch(salt[1]) {
 		case '2':
-			cr = crypt_bcrypt(passwd, salt);
-			if (strncmp(cr, salt, strlen(cr))==0) return 0;
-			break;
-		case '4':
-			cr = crypt_srpsha1(username, passwd, salt);
+			cr = crypt_bcrypt(passwd, salt, g, n);
 			if (strncmp(cr, salt, strlen(cr))==0) return 0;
 			break;
 		}
+	default:
+		cr = crypt_srpsha1(username, passwd, salt, g, n);
+		if (strncmp(cr, salt, strlen(cr))==0) return 0;
+		break;
 	}
 	return 1;
 }

@@ -53,11 +53,11 @@ const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, opaque** ret_g, opaque** ret_n) {
+int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n) {
 
-	MPI g, prime, x, e;
+	MPI g, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;
-	int result_size, siz;
+	int siz;
 	char* tmp;
 
 	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
@@ -65,14 +65,54 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, opaque** ret_g, 
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+
+	g = gcry_mpi_set_ui(NULL, SRP_G);
+
+
+	siz = 0;
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, g);
+	if (ret_g!=NULL) {
+		tmp = gnutls_malloc(siz);
+		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, g);
+
+		if (_gnutls_sbase64_encode( tmp, siz, ret_g) < 0)  {
+			gnutls_free(tmp);
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+		gnutls_free(tmp);
+	}
+
+	siz = 0;
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, prime);
+	if (ret_n!=NULL) {
+		tmp = gnutls_malloc(siz);
+		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, prime);
+		if (_gnutls_sbase64_encode( tmp, siz, ret_n) < 0) {
+			gnutls_free(tmp);
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+
+		gnutls_free(tmp);
+	}
+	
+	gcry_mpi_release(g);
+	gcry_mpi_release(prime);
+
+	return 0;
+
+}
+
+
+int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, MPI g, MPI prime) {
+
+	MPI x, e;
+	int result_size;
+
 	if (gcry_mpi_scan(&x, GCRYMPI_FMT_USG,
 			  text, &textsize)) {
 		gnutls_assert();
-		gcry_mpi_release(prime);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-
-	g = gcry_mpi_set_ui(NULL, SRP_G);
 
 	e = gcry_mpi_alloc_like(prime);
 
@@ -87,35 +127,7 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, opaque** ret_g, 
 		gcry_mpi_print(GCRYMPI_FMT_USG, *result, &result_size, e);	
 	}
 
-	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, g);
-	if (ret_g!=NULL) {
-		tmp = gnutls_malloc(siz);
-		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, g);
-
-		if (_gnutls_base64_encode( tmp, siz, ret_g) < 0)  {
-			gnutls_free(tmp);
-			return GNUTLS_E_UNKNOWN_ERROR;
-		}
-		gnutls_free(tmp);
-	}
-
-	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, prime);
-	if (ret_n!=NULL) {
-		tmp = gnutls_malloc(siz);
-		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, prime);
-		if (_gnutls_base64_encode( tmp, siz, ret_n) < 0) {
-			gnutls_free(tmp);
-			return GNUTLS_E_UNKNOWN_ERROR;
-		}
-
-		gnutls_free(tmp);
-	}
-	
 	gcry_mpi_release(e);
-	gcry_mpi_release(g);
-	gcry_mpi_release(prime);
 
 	return result_size;
 
@@ -226,10 +238,12 @@ int bits;
 /* generate x = SHA(s | SHA(U | ":" | p))
  * The output is exactly 20 bytes
  */
-void* _gnutls_calc_srp_sha( char* username, char* password, opaque* salt, int salt_size) {
+void* _gnutls_calc_srp_sha( char* username, char* password, opaque* salt, int salt_size, int* size) {
 GNUTLS_MAC_HANDLE td;
 opaque* res;
 
+	*size = 20;
+	
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(td, username, strlen(username));
 	gnutls_hash(td, ":", 1);
@@ -244,13 +258,13 @@ opaque* res;
 	return gnutls_hash_deinit(td);
 }
 
-void* _gnutls_calc_srp_x( char* username, char* password, opaque* salt, int salt_size, uint8 crypt_algo) {
+void* _gnutls_calc_srp_x( char* username, char* password, opaque* salt, int salt_size, uint8 crypt_algo, int* size) {
 	
 	switch(crypt_algo) {
 		case SRPSHA1_CRYPT:
-			return _gnutls_calc_srp_sha( username, password, salt, salt_size);
+			return _gnutls_calc_srp_sha( username, password, salt, salt_size, size);
 		case BLOWFISH_CRYPT:
-			return _gnutls_calc_srp_bcrypt( password, salt, salt_size);
+			return _gnutls_calc_srp_bcrypt( password, salt, salt_size, size);
 	}
 	return NULL;	
 }

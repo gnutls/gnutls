@@ -1,10 +1,11 @@
-helpnode "Crypt help\nUsage : crypt [-u user] [-p password file]"
+helpnode "Crypt help\nUsage : crypt [options]"
 
 #char *username;
 option (u,username) STR "username" { $username = $1 } "specify username."
 
 #char *passwd;
-option (p, passwd) STR "passwd" { $passwd = $1 } "specify a password file."
+option (p, passwd) STR "FILE" { $passwd = $1 } "specify a password file."
+
 
 #char *crypt;
 option (c, crypt) STR "crypt" { $crypt = $1 } "specify crypt algorithm (bcrypt/srpsha)."
@@ -12,8 +13,17 @@ option (c, crypt) STR "crypt" { $crypt = $1 } "specify crypt algorithm (bcrypt/s
 #int salt;
 option (s, salt) INT "salt" { $salt = $1 } "specify salt/cost size for crypt algorithm."
 
+#int verify;
+option (verify) { $verify = 1 } "just verify password."
+
+#char *passwd_conf;
+option ( passwd_conf) STR "FILE" { $passwd_conf = $1 } "specify a password conf file."
+
+#char *create_conf;
+option ( create_conf) STR "FILE" { $create_conf = $1 } "Generate a tpasswd.conf file."
+
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
-init { $username=NULL; $passwd=NULL; $crypt=NULL; $salt=0; }
+init { $username=NULL; $passwd=NULL; $crypt=NULL; $salt=0;
+       $create_conf=NULL; $passwd_conf=NULL; $verify = 0; }
 
-OBLIGAT u
