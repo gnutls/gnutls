@@ -70,6 +70,8 @@ int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert );
 
+int gnutls_openpgp_extract_key_id( const gnutls_datum *cert, unsigned char keyid[8]);
+
 int gnutls_openpgp_verify_key( const gnutls_datum* keyring, 
 	const gnutls_datum* key_list, 
 	int key_list_length);

@@ -1193,15 +1193,15 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, char *fpr, size_t *fprlen)
     return 0;
 }
 
-/*-
- * gnutls_openpgp_keyid - Gets the keyID
+/**
+ * gnutls_openpgp_extract_key_id - Gets the keyID
  * @cert: the raw data that contains the OpenPGP public key.
  * @keyid: the buffer to save the keyid.
  *
  * Returns the 64-bit keyID of the OpenPGP key.
- -*/
+ **/
 int
-gnutls_openpgp_keyid( const gnutls_datum *cert, unsigned char keyid[8] )
+gnutls_openpgp_extract_key_id( const gnutls_datum *cert, unsigned char keyid[8] )
 {
     CDK_KBNODE kb_pk = NULL, pkt;
     cdkPKT_public_key *pk = NULL;

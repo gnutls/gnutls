@@ -48,7 +48,7 @@ int gnutls_openpgp_fingerprint(
     char *fpr,
     size_t *fprlen );
 
-int gnutls_openpgp_keyid(
+int gnutls_openpgp_extract_key_id(
     const gnutls_datum *cert,
     unsigned char keyid[8] );
 
