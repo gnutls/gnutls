@@ -210,15 +210,15 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
 	asn1_delete_structure(&tmpasn);
 	return _gnutls_asn2err(result);
     }
-
+        
     if (CHOICE == 0) {
-	str[len] = 0;
-	if (res)
+        str[len] = 0;
+	
+        if (res)
 	    _gnutls_str_cpy(res, *res_size, str);
 	*res_size = len;
-
     } else { /* CHOICE */
-	str[len] = 0;
+        str[len] = 0;
         int non_printable = 0;
 
         /* Note that we do not support strings other than
@@ -275,8 +275,6 @@ int _gnutls_x509_data2hex(const opaque * data, size_t data_size,
     if (res) {
         unsigned int size = strlen(res) + 1;
         if (size + 1 > *sizeof_out) {
-            fprintf(stderr, "size: %d\nreq: %d\n", *sizeof_out, size+1
-            );
             *sizeof_out = size;
             return GNUTLS_E_SHORT_MEMORY_BUFFER;
         }
