@@ -172,7 +172,7 @@ typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1,
 } BulkCipherAlgorithm;
 #define GNUTLS_BulkCipherAlgorithm BulkCipherAlgorithm
 	
-typedef enum Extensions { GNUTLS_EXTENSION_DNSNAME=0, GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6 } Extensions;
+typedef enum Extensions { GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6 } Extensions;
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
 	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP 
 } KXAlgorithm;

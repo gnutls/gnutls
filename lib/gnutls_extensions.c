@@ -36,7 +36,6 @@ typedef struct {
 	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque**); /* send data */
 } gnutls_extension_entry;
 
-#define MAX_EXT 20 /* maximum supported extension */
 static gnutls_extension_entry extensions[] = {
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_MAX_RECORD_SIZE, _gnutls_max_record_recv_params, _gnutls_max_record_send_params),
@@ -185,7 +184,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	next = MAX_EXT; /* maximum supported extensions */
+	next = MAX_EXT_TYPES; /* maximum supported extensions */
 	do {
 		next--;
 		ext_func_send = _gnutls_ext_func_send(next);
