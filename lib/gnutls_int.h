@@ -67,7 +67,7 @@ typedef int gnutls_transport_ptr;
 
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
-#define MAX_EXT_TYPES 16
+#define MAX_EXT_TYPES 64
 
 /* The initial size of the receive
  * buffer size. This will grow if larger
