@@ -67,7 +67,7 @@ GDBM_FILE dbf;
 		gnutls_free(GNUTLS_DBNAME);
 
 	/* set name */
-	GNUTLS_DBNAME = strdup(filename);
+	GNUTLS_DBNAME = gnutls_strdup(filename);
 	if (GNUTLS_DBNAME==NULL) return GNUTLS_E_MEMORY_ERROR;
 
 

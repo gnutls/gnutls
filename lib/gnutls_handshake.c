@@ -797,30 +797,6 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state)
-{
-	char data[1];
-	int ret;
-
-	if (state->gnutls_internals.certificate_requested == 0)
-		return 0;
-
-	/* we do not have that functionality yet */
-	state->gnutls_internals.certificate_verify_needed = 0;
-#ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Sending Client Certificate\n");
-#endif
-
-/* Here since we do not support certificates yet we
- * do not have that functionality.
- */
-	data[0] = 0;
-	ret = _gnutls_send_handshake(cd, state, &data, 1,
-				     GNUTLS_CERTIFICATE);
-
-	return ret;
-}
-
 static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 				     int datalen)
 {
@@ -1531,7 +1507,8 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		/* send our certificate - if any */
+		/* send our certificate - if any 
+		 */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_send_client_certificate(cd, state);
 		if (ret < 0) {

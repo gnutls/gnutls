@@ -140,8 +140,9 @@ int main(int argc, char** argv)
 
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_RSA, GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
+
 	gnutls_set_cred( state, GNUTLS_SRP, &cred);
 	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);
 	gnutls_ext_set_dnsname( state, "hello.server.org");
@@ -192,6 +193,7 @@ int main(int argc, char** argv)
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 	gnutls_set_cred( state, GNUTLS_SRP, &cred);
 	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);

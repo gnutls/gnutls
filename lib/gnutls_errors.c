@@ -122,7 +122,7 @@ void gnutls_perror(int error)
 
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret =
-			      strdup(p->name + sizeof("GNUTLS_E_") - 1));
+			      gnutls_strdup(p->name + sizeof("GNUTLS_E_") - 1));
 
 
 	if (ret != NULL) {
@@ -155,7 +155,7 @@ char* gnutls_strerror(int error)
 
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret =
-			      strdup(p->name + sizeof("GNUTLS_E_") - 1));
+			      gnutls_strdup(p->name + sizeof("GNUTLS_E_") - 1));
 
 
 	if (ret != NULL) {

@@ -222,6 +222,8 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 	gnutls_private_key apr_pkey;
 	int apr_cert_list_length;
 
+	/* FIXME: This does not work for clients - yet
+	 */
 	cred = _gnutls_get_cred(key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
 		gnutls_assert();

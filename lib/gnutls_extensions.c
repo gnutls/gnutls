@@ -75,7 +75,7 @@ char *_gnutls_extension_get_name(int type)
 	char *pointerTo_;
 
 	/* avoid prefix */
-	GNUTLS_EXTENSION_LOOP(ret = strdup(p->name + sizeof("EXTENSION_") - 1));
+	GNUTLS_EXTENSION_LOOP(ret = gnutls_strdup(p->name + sizeof("EXTENSION_") - 1));
 
 	if (ret != NULL) {
 		_gnutls_tolow(ret, strlen(ret));
@@ -184,7 +184,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 const char* gnutls_ext_get_dnsname( GNUTLS_STATE state) {
 	if (state->security_parameters.entity==GNUTLS_CLIENT) return NULL;
 
-	if (strlen( state->security_parameters.extensions.dnsname) == 0) return NULL;
+	if ( state->security_parameters.extensions.dnsname[0] == 0) return NULL;
 
 	return state->security_parameters.extensions.dnsname;
 }
@@ -199,7 +199,7 @@ const char* gnutls_ext_get_dnsname( GNUTLS_STATE state) {
   * connected to. This should be used by clients that connect
   * to servers that do virtual hosting.
   **/
-int gnutls_ext_set_dnsname( GNUTLS_STATE state, char* dnsname) {
+int gnutls_ext_set_dnsname( GNUTLS_STATE state, const char* dnsname) {
 
 	if (state->security_parameters.entity==GNUTLS_SERVER) return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	

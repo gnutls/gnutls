@@ -135,6 +135,7 @@ const void* gnutls_get_auth_info( GNUTLS_STATE);
  * TLS extension. (draft-ietf-tls-extensions)
  */
 const char* gnutls_ext_get_dnsname( GNUTLS_STATE);
+int gnutls_ext_set_dnsname( GNUTLS_STATE, const char* dnsname);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 typedef struct {

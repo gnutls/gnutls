@@ -443,7 +443,7 @@ char *gnutls_mac_get_name(MACAlgorithm algorithm)
 
 	/* avoid prefix */
 	GNUTLS_HASH_ALG_LOOP(ret =
-			     strdup(p->name + sizeof("GNUTLS_") - 1));
+			     gnutls_strdup(p->name + sizeof("GNUTLS_") - 1));
 
 
 	if (ret != NULL) {
@@ -511,7 +511,7 @@ char *gnutls_compression_get_name(CompressionMethod algorithm)
 
 	/* avoid prefix */
 	GNUTLS_COMPRESSION_ALG_LOOP(ret =
-				    strdup(p->name + sizeof("GNUTLS_") -
+				    gnutls_strdup(p->name + sizeof("GNUTLS_") -
 					   1));
 
 
@@ -640,7 +640,7 @@ char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 	char *pointerTo_;
 
 	/* avoid prefix */
-	GNUTLS_ALG_LOOP(ret = strdup(p->name + sizeof("GNUTLS_") - 1));
+	GNUTLS_ALG_LOOP(ret = gnutls_strdup(p->name + sizeof("GNUTLS_") - 1));
 
 
 	if (ret != NULL) {
@@ -713,7 +713,7 @@ char *gnutls_kx_get_name(KXAlgorithm algorithm)
 	char *pointerTo_;
 
 	/* avoid prefix */
-	GNUTLS_KX_ALG_LOOP(ret = strdup(p->name + sizeof("KX_") - 1));
+	GNUTLS_KX_ALG_LOOP(ret = gnutls_strdup(p->name + sizeof("KX_") - 1));
 
 
 	if (ret != NULL) {
@@ -763,7 +763,7 @@ char *gnutls_version_get_name(GNUTLS_Version version)
 
 	/* avoid prefix */
 	GNUTLS_VERSION_ALG_LOOP(ret =
-			     strdup(p->name));
+			     gnutls_strdup(p->name));
 	return ret;
 }
 
@@ -863,7 +863,7 @@ char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
 
 	/* avoid prefix */
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret =
-				     strdup(p->name + sizeof("GNUTLS_") -
+				     gnutls_strdup(p->name + sizeof("GNUTLS_") -
 					    1));
 
 

@@ -115,9 +115,11 @@ void print_info(GNUTLS_STATE state)
 		printf("%.2X", sesid[i]);
 	printf("\n");
 
-	printf("- DNSNAME: ");
-	printf("%s\n", gnutls_ext_get_dnsname(state));
-
+	if ( gnutls_ext_get_dnsname(state) != NULL) {
+		printf("- DNSNAME: ");
+		printf("%s\n", gnutls_ext_get_dnsname(state));
+	}
+	
 	/* print srp specific data */
 	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
 		srp_info = gnutls_get_auth_info(state);

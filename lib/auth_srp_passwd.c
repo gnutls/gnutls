@@ -117,7 +117,7 @@ int indx;
 	/* now go for username */
 	*p='\0';
 
-	entry->username = strdup(str);
+	entry->username = gnutls_strdup(str);
 
 	return indx;
 }

@@ -48,7 +48,12 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 			}
 		}
 	} else { /* client side reading server hello extensions */
-		return proc_srp_server_hello( state->gnutls_key, data, data_size);
+		if (state->gnutls_internals.resumed==RESUME_FALSE)
+			return proc_srp_server_hello( state->gnutls_key, data, data_size);
+		else /* we do not need to process this if
+		      * we are resuming.
+		      */
+			return 0;
 	}
 	return 0;
 }
@@ -74,7 +79,13 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 			return len + 1;
 		}
 	} else { /* SERVER SIDE sending (g,n,s) */
-		return gen_srp_server_hello( state->gnutls_key, data);
+		/* We only send the packet if we are NOT
+		 * resuming
+		 */
+		if (state->gnutls_internals.resumed==RESUME_FALSE)
+			return gen_srp_server_hello( state->gnutls_key, data);
+		else
+			return 0;
 	}
 	return 0;
 }

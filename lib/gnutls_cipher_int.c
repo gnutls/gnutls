@@ -77,7 +77,7 @@ GNUTLS_CIPHER_HANDLE ret;
 		}; 
 #else
 		gcry_cipher_setkey(ret, key.data, key.size);
-		if (iv!=NULL && ivsize>0) gcry_cipher_setiv(ret, iv.data, iv.size);
+		if (iv.data!=NULL && iv.size>0) gcry_cipher_setiv(ret, iv.data, iv.size);
 #endif
 	}
 

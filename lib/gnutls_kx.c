@@ -221,11 +221,17 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 	int ret = 0;
 	int data_size;
 
-	/* if certificate verify is not needed just exit */
-	if (state->gnutls_internals.certificate_verify_needed==0) return 0;
+	/* This is a packet that is only sent by the client
+	 */
+	if (state->security_parameters.entity==GNUTLS_SERVER) return 0;
+	
+	/* if certificate verify is not needed just exit 
+	 */
+	if (state->gnutls_internals.certificate_requested==0) return 0;
 
 	if (state->gnutls_internals.auth_struct->gnutls_generate_client_cert_vrfy==NULL) {
-		return 0; /* this algorithm does not support cli_cert_vrfy */
+		return 0; /* this algorithm does not support cli_cert_vrfy 
+		           */
 	}
 	
 #ifdef HANDSHAKE_DEBUG
@@ -425,4 +431,17 @@ int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state)
 	}
 
 	return ret;
+}
+
+int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state)
+{
+
+	if (state->gnutls_internals.certificate_requested == 0)
+		return 0;
+
+#ifdef HANDSHAKE_DEBUG
+	fprintf(stderr, "Sending Client Certificate\n");
+#endif
+
+	return _gnutls_send_certificate(cd, state);
 }

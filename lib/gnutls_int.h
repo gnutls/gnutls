@@ -66,6 +66,8 @@
 # include <gnutls_gcry.h>
 #endif
 
+/* these are to be implemented
+ */
 #define svoid void /* for functions that allocate using secure_free */
 #define secure_free gnutls_free
 #define secure_malloc malloc
@@ -75,6 +77,7 @@
 #define gnutls_realloc realloc
 #define gnutls_calloc calloc
 #define gnutls_free free
+#define gnutls_strdup strdup
 
 #define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
 
@@ -293,7 +296,6 @@ typedef struct {
 	SecurityParameters		resumed_security_parameters;
 
 	int				certificate_requested; /* non zero if client certificate was requested */
-	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
 	/* sockets internals */
 	int				lowat;
 	/* gdbm */
