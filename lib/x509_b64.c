@@ -371,20 +371,15 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 	int kdata_size;
 	char pem_header[128];
 
-	if (header != NULL) {
-		if (strlen(header) > sizeof(pem_header) - sizeof(top) - 1) {
-			gnutls_assert();
-			return GNUTLS_E_BASE64_DECODING_ERROR;
-		}
-		strcpy( pem_header, top);
-		strcpy( pem_header, header);
-		rdata = strnstr( data, pem_header, data_size);
-	} else {
-		rdata = strnstr( data, top, data_size);
-	}
+	_gnutls_str_cpy( pem_header, sizeof(pem_header), top);
+	if (header != NULL)
+		_gnutls_str_cat( pem_header, sizeof(pem_header), header);
+
+	rdata = strnstr( data, pem_header, data_size);
 
 	if (rdata==NULL) {
 		gnutls_assert();
+		_gnutls_x509_log( "Could not find '%s'\n", pem_header);
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 
@@ -398,6 +393,7 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 	kdata = strnstr( rdata, ENDSTR, data_size);
 	if (kdata==NULL) {
 		gnutls_assert();
+		_gnutls_x509_log( "Could not find '%s'\n", ENDSTR);
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 	data_size -= strlen(ENDSTR);
