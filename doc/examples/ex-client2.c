@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
-/* A very basic TLS client.
+/* A very basic TLS client, with X.509 authentication.
  */
 
 #define MAX_BUF 1024

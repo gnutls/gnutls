@@ -15,7 +15,7 @@
 #define CAFILE "ca.pem"
 #define CRLFILE "crl.pem"
 
-/* This is a sample TLS 1.0 echo server.
+/* This is a sample TLS 1.0 echo server, using X.509 authentication.
  */
 
 
