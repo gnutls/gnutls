@@ -345,6 +345,28 @@ int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data
 	return 0;
 }
 
+/* Checks if b%n==0 which is a fatal srp error.
+ * Returns a proper error code in that case, and 0 when
+ * all are ok.
+ */
+static int check_b_mod_n( GNUTLS_MPI b, GNUTLS_MPI n)
+{
+int ret;
+GNUTLS_MPI r = _gnutls_mpi_alloc_like(b);
+
+	_gnutls_mpi_mod( r, b, n);
+	ret = _gnutls_mpi_cmp_ui(r, 0);
+	
+	_gnutls_mpi_release( &r);
+
+	if (ret == 0) {
+		gnutls_assert();
+		return GNUTLS_E_SRP_PROTOCOL_FAILURE;
+	}
+	
+	return 0;
+}
+
 /* receive the key exchange message ( n, g, s, B) 
  */
 int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data_size)
@@ -438,6 +460,12 @@ int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+	
+	if ( (ret = check_b_mod_n( B, N)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
