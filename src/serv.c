@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <gnutls.h>
+#include "../lib/gnutls.h"
 #include <port.h>
 
 #define SA struct sockaddr

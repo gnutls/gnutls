@@ -87,4 +87,4 @@ AC_CHECK_SIZEOF(unsigned char, 1)
 
 AM_PROG_LIBTOOL
 
-AC_OUTPUT([Makefile src/Makefile])
+AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile])
