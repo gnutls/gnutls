@@ -97,9 +97,9 @@ static const TLS_TEST tls_tests[] = {
 	{ "for ARCFOUR cipher support", test_arcfour, "yes", "no", "dunno"},
 	{ "for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{ "for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
-	{ "for max record size TLS extension", test_max_record_size, "yes", "no", "dunno" },
-	{ "for SRP authentication support (gnutls extension)", test_srp, "yes", "no", "dunno" },
-	{ "for OpenPGP authentication support (gnutls extension)", test_openpgp1, "yes", "no", "dunno" },
+	{ "for max record size (TLS extension)", test_max_record_size, "yes", "no", "dunno" },
+	{ "for SRP authentication support (TLS extension)", test_srp, "yes", "no", "dunno" },
+	{ "for OpenPGP authentication support (TLS extension)", test_openpgp1, "yes", "no", "dunno" },
 	{ NULL }
 };
 
