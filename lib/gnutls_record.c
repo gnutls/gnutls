@@ -433,14 +433,19 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current state.    
+ *
+ * Oct 30 2001: Removed capability to send data more than MAX_ENC_SIZE.
+ * This makes the function much easier to read, and more error resistant
+ * (there were cases were the old function could mess everything up).
+ * --nmav
+ *
  */
 ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
-	const uint8 *ptr;
 	int cipher_size;
-	int ret = 0, retval = 0;
-	int Size, data2send;
+	int retval, ret;
+	int data2send;
 	uint8 headers[5];
 	const uint8 *data=_data;
 	GNUTLS_Version lver;
@@ -449,7 +454,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
-	
+
 	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_write != 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
@@ -478,76 +483,67 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
-	data2send = sizeofdata;
-	ptr = data;
-	retval = 0;
+	if ( sizeofdata > MAX_ENC_LEN)
+		data2send = MAX_ENC_LEN;
+	else 
+		data2send = sizeofdata;
 
-	while( data2send > 0) {
-	
-		if (data2send - MAX_ENC_LEN >= 0) {
-			data2send -= MAX_ENC_LEN;
-			Size = MAX_ENC_LEN;
-		} else {
-			Size = data2send;
-			data2send = 0;
+	/* Only encrypt if we don't have data to send 
+	 * from the previous run. - probably interrupted.
+	 */
+	if (state->gnutls_internals.send_buffer.size == 0) {
+
+		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, data, data2send, &cipher, type);
+		if (cipher_size <= 0) {
+			gnutls_assert();
+			if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
+			return cipher_size; /* error */
 		}
 
-		/* Only encrypt if we don't have data to send 
-		 * from the previous run. - probably interrupted.
+		retval = data2send;
+		state->gnutls_internals.send_buffer_user_size =	data2send;
+
+	} else {
+		/* order write buffered to write
+		 * the buffered data.
 		 */
-		if (state->gnutls_internals.send_buffer.size == 0) {
-			cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, ptr, Size, &cipher, type);
-			if (cipher_size <= 0) {
-				gnutls_assert();
-				if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-				return cipher_size; /* error */
-			}
-		} else {
-			/* order write buffered to write
-			 * the buffered data.
+		cipher = NULL;
+		cipher_size = state->gnutls_internals.send_buffer.size +
+			state->gnutls_internals.send_buffer_prev_size;
+		
+		retval = state->gnutls_internals.send_buffer_user_size;
+	}
+
+	if ( (ret = _gnutls_write_buffered(cd, state, cipher, cipher_size)) != cipher_size) {
+		gnutls_free( cipher);
+		if ( ret < 0 && gnutls_is_fatal_error(ret)==0) {
+			/* If we have sent any data then return
+			 * that value.
 			 */
-			cipher = NULL;
-			cipher_size = state->gnutls_internals.send_buffer.size +
-				state->gnutls_internals.send_buffer_prev_size;
-		}
-
-		ptr += Size;
-
-		if ( (ret=_gnutls_write_buffered(cd, state, cipher, cipher_size)) != cipher_size) {
-			gnutls_free( cipher);
-			if ( ret<0 && gnutls_is_fatal_error(ret)==0) {
-				/* If we have sent any data then return
-				 * that value.
-				 */
-				gnutls_assert();
-				if (retval > 0) {
-					gnutls_assert();
-					return retval;
-				}
-				return ret;
-			}
-			state->gnutls_internals.valid_connection = VALID_FALSE;
-			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
 			return ret;
 		}
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return ret;
+	}
 
-		retval += Size;
-		gnutls_free(cipher);
+	state->gnutls_internals.send_buffer_user_size = 0;
+
+	gnutls_free(cipher);
 
 #ifdef RECORD_DEBUG
-		_gnutls_log( "Record: Sent Packet[%d] %s(%d) with length: %d\n",
-		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
+	_gnutls_log( "Record: Sent Packet[%d] %s(%d) with length: %d\n",
+	(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 #endif
 
-		/* increase sequence number
-		 */
-		if (uint64pp( &state->connection_state.write_sequence_number) !=0) {
-			state->gnutls_internals.valid_connection = VALID_FALSE;
-			gnutls_assert();
-			return GNUTLS_E_RECORD_LIMIT_REACHED;
-		}
-
+	/* increase sequence number
+	 */
+	if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
 	return retval;
@@ -1043,7 +1039,7 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * If the EINTR is returned by the internal push function (write())
   * then GNUTLS_E_INTERRUPTED, will be returned. If GNUTLS_E_INTERRUPTED or
   * GNUTLS_E_AGAIN is returned you must call this function again, with the 
-  * same (exactly) parameters. Otherwise the write operation will be 
+  * same parameters. Otherwise the write operation will be 
   * corrupted and the connection will be terminated.
   *
   * Returns the number of bytes received, zero on EOF, or

@@ -442,13 +442,9 @@ ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE state, const void *iptr, siz
 	/* If data in the buffer exist
 	 */
 	if (iptr == NULL) {
-		if ( state->gnutls_internals.send_buffer.size == 0) {
-			gnutls_assert();
-			return GNUTLS_E_INVALID_PARAMETERS;
-		} else {
-			ptr = state->gnutls_internals.send_buffer.data;
-			n = state->gnutls_internals.send_buffer.size;
-		}
+		/* checking is handled above */
+		ptr = state->gnutls_internals.send_buffer.data;
+		n = state->gnutls_internals.send_buffer.size;
 	}
 
 	i = 0;
