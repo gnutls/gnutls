@@ -49,8 +49,6 @@ const MOD_AUTH_STRUCT rsa_auth_struct = {
 	_gnutls_gen_cert_server_certificate,
 	_gnutls_gen_cert_client_certificate,
 	NULL,			/* gen server kx */
-	NULL,			/* gen server kx2 */
-	NULL,			/* gen client kx0 */
 	_gnutls_gen_rsa_client_kx,
 	_gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
 	_gnutls_gen_cert_server_cert_req,	/* server cert request */
@@ -58,8 +56,6 @@ const MOD_AUTH_STRUCT rsa_auth_struct = {
 	_gnutls_proc_cert_server_certificate,
 	_gnutls_proc_cert_client_certificate,
 	NULL,			/* proc server kx */
-	NULL,			/* proc server kx2 */
-	NULL,			/* proc client kx0 */
 	_gnutls_proc_rsa_client_kx,	/* proc client kx */
 	_gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
 	_gnutls_proc_cert_cert_req	/* proc server cert request */

@@ -44,11 +44,11 @@ int _gnutls_proc_srp_server_hello(gnutls_session state,
 int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data,
 				 size_t data_size);
 
-int _gnutls_gen_srp_server_kx2(gnutls_session, opaque **);
-int _gnutls_gen_srp_client_kx0(gnutls_session, opaque **);
+int _gnutls_gen_srp_server_kx(gnutls_session, opaque **);
+int _gnutls_gen_srp_client_kx(gnutls_session, opaque **);
 
-int _gnutls_proc_srp_server_kx2(gnutls_session, opaque *, size_t);
-int _gnutls_proc_srp_client_kx0(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_server_kx(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_client_kx(gnutls_session, opaque *, size_t);
 
 typedef struct SRP_SERVER_AUTH_INFO_INT SRP_SERVER_AUTH_INFO_INT;
 

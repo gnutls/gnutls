@@ -46,8 +46,6 @@ const MOD_AUTH_STRUCT anon_auth_struct = {
 	NULL,
 	NULL,
 	gen_anon_server_kx,
-	NULL,
-	NULL,
 	_gnutls_gen_dh_common_client_kx, /* this can be shared */
 	NULL,
 	NULL,
@@ -55,8 +53,6 @@ const MOD_AUTH_STRUCT anon_auth_struct = {
 	NULL,
 	NULL, /* certificate */
 	proc_anon_server_kx,
-	NULL,
-	NULL,
 	proc_anon_client_kx,
 	NULL,
 	NULL

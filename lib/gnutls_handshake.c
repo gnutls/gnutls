@@ -1726,10 +1726,8 @@ int _gnutls_recv_hello(gnutls_session session, char *data, int datalen)
  *
  *                                                    Certificate*
  *                                              ServerKeyExchange*
- *     Client Key Exchange0         -------->
  *                                  <--------   CertificateRequest*
  *
- *                                  <--------   Server Key Exchange2
  *                                  <--------      ServerHelloDone
  *     Certificate*
  *     ClientKeyExchange
@@ -1946,71 +1944,51 @@ int gnutls_handshake_client(gnutls_session session)
 		IMED_RET("recv server kx message", ret);
 
 	case STATE5:
-		/* Added for SRP, 
-		 * send the client key exchange for SRP 
-		 */
-		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret =
-			    _gnutls_send_client_kx_message0(session,
-							    AGAIN(STATE5));
-		STATE = STATE5;
-		IMED_RET("send client kx0", ret);
-
-	case STATE6:
 		/* receive the server certificate request - if any 
 		 */
 
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_recv_server_certificate_request(session);
-		STATE = STATE6;
+		STATE = STATE5;
 		IMED_RET("recv server certificate request message", ret);
 
-	case STATE7:
-		/* receive the server key exchange (B) (SRP only) 
-		 */
-
-		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_server_kx_message2(session);
-		STATE = STATE7;
-		IMED_RET("recv server kx message2", ret);
-
-	case STATE8:
+	case STATE6:
 		/* receive the server hello done */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_recv_handshake(session, NULL, NULL,
 						   GNUTLS_SERVER_HELLO_DONE,
 						   MANDATORY_PACKET);
-		STATE = STATE8;
+		STATE = STATE6;
 		IMED_RET("recv server hello done", ret);
 
-	case STATE9:
+	case STATE7:
 		/* send our certificate - if any and if requested
 		 */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_client_certificate(session,
-							    AGAIN(STATE9));
-		STATE = STATE9;
+							    AGAIN(STATE7));
+		STATE = STATE7;
 		IMED_RET("send client certificate", ret);
 
-	case STATE10:
+	case STATE8:
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_client_kx_message(session,
-							   AGAIN(STATE10));
-		STATE = STATE10;
+							   AGAIN(STATE8));
+		STATE = STATE8;
 		IMED_RET("send client kx", ret);
 
-	case STATE11:
+	case STATE9:
 		/* send client certificate verify */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_client_certificate_verify(session,
 								   AGAIN
-								   (STATE11));
-		STATE = STATE11;
+								   (STATE9));
+		STATE = STATE9;
 		IMED_RET("send client certificate verify", ret);
 
 		STATE = STATE0;
@@ -2187,56 +2165,38 @@ int gnutls_handshake_server(gnutls_session session)
 		IMED_RET("send server cert request", ret);
 
 	case STATE6:
-		/* Added for SRP which uses a different handshake */
-		/* receive the client key exchange message */
-
-		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_client_kx_message0(session);
-		STATE = STATE6;
-		IMED_RET("recv client kx0", ret);
-
-	case STATE7:
-		/* send server key exchange (B) */
-		if (session->internals.resumed == RESUME_FALSE)
-			ret =
-			    _gnutls_send_server_kx_message2(session,
-							    AGAIN(STATE7));
-		STATE = STATE7;
-		IMED_RET("send server kx2", ret);
-
-	case STATE8:
 		/* send the server hello done */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_send_empty_handshake(session,
 							 GNUTLS_SERVER_HELLO_DONE,
-							 AGAIN(STATE8));
-		STATE = STATE8;
+							 AGAIN(STATE6));
+		STATE = STATE6;
 		IMED_RET("send server hello done", ret);
 
 
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
-	case STATE9:
+	case STATE7:
 		/* receive the client certificate message */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_client_certificate(session);
-		STATE = STATE9;
+		STATE = STATE7;
 		IMED_RET("recv client certificate", ret);
 
-	case STATE10:
+	case STATE8:
 		/* receive the client key exchange message */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_client_kx_message(session);
-		STATE = STATE10;
+		STATE = STATE8;
 		IMED_RET("recv client kx", ret);
 
-	case STATE11:
+	case STATE9:
 		/* receive the client certificate verify message */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
 			    _gnutls_recv_client_certificate_verify_message
 			    (session);
-		STATE = STATE11;
+		STATE = STATE9;
 		IMED_RET("recv client certificate verify", ret);
 
 		STATE = STATE0;	/* finished thus clear session */

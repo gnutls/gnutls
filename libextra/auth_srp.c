@@ -33,29 +33,25 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 
-int _gnutls_gen_srp_server_kx0(gnutls_session, opaque **);
-int _gnutls_gen_srp_client_kx0(gnutls_session, opaque **);
+int _gnutls_gen_srp_server_kx(gnutls_session, opaque **);
+int _gnutls_gen_srp_client_kx(gnutls_session, opaque **);
 
-int _gnutls_proc_srp_server_kx0(gnutls_session, opaque *, size_t);
-int _gnutls_proc_srp_client_kx0(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_server_kx(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_client_kx(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
 	NULL,
 	NULL,
-	_gnutls_gen_srp_server_kx0,
-	NULL,
-	_gnutls_gen_srp_client_kx0,
-	NULL,
+	_gnutls_gen_srp_server_kx,
+	_gnutls_gen_srp_client_kx,
 	NULL,
 	NULL,
 
 	NULL,
 	NULL, /* certificate */
-	_gnutls_proc_srp_server_kx0,
-	NULL,
-	_gnutls_proc_srp_client_kx0,
-	NULL,
+	_gnutls_proc_srp_server_kx,
+	_gnutls_proc_srp_client_kx,
 	NULL,
 	NULL
 };
@@ -73,7 +69,7 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
  */
-int _gnutls_gen_srp_server_kx0(gnutls_session state, opaque ** data)
+int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 {
 	int ret;
 	uint8 *data_n, *data_s;
@@ -185,7 +181,7 @@ int _gnutls_gen_srp_server_kx0(gnutls_session state, opaque ** data)
 }
 
 /* return A = g^a % N */
-int _gnutls_gen_srp_client_kx0(gnutls_session state, opaque ** data)
+int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 {
 	size_t n_a;
 	int ret;
@@ -285,7 +281,7 @@ int _gnutls_gen_srp_client_kx0(gnutls_session state, opaque ** data)
 
 
 /* just read A and put it to state */
-int _gnutls_proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _data_size)
+int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data_size)
 {
 	size_t _n_A;
 	ssize_t data_size = _data_size;
@@ -351,7 +347,7 @@ int _gnutls_proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _dat
 
 /* receive the key exchange message ( n, g, s, B) 
  */
-int _gnutls_proc_srp_server_kx0(gnutls_session state, opaque * data, size_t _data_size)
+int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data_size)
 {
 	uint8 n_s;
 	uint16 n_g, n_n, n_b;

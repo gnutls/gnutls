@@ -161,38 +161,6 @@ int _gnutls_send_server_certificate_request( gnutls_session session, int again)
 	return data_size;
 }
 
-/* Currently only used in SRP */
-int _gnutls_send_server_kx_message2( gnutls_session session, int again)
-{
-	uint8 *data = NULL;
-	int data_size = 0;
-	int ret = 0;
-
-	if (session->internals.auth_struct->gnutls_generate_server_kx2 == NULL)
-		return 0;
-
-	data = NULL;
-	data_size = 0;
-
-	if (again == 0) {
-		data_size = session->internals.auth_struct->gnutls_generate_server_kx2( session, &data);
-
-		if (data_size<0) {
-			gnutls_assert();
-			return data_size;
-		}
-	}
-
-	ret = _gnutls_send_handshake( session, data, data_size, GNUTLS_SERVER_KEY_EXCHANGE);
-		
-	gnutls_free(data);
-	if (ret<0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return data_size;
-}
 
 /* This is the function for the client to send the key
  * exchange message 
@@ -224,35 +192,6 @@ int _gnutls_send_client_kx_message( gnutls_session session, int again)
 		gnutls_assert();
 		return ret;
 	}
-
-	return ret;
-}
-
-/* Only used in SRP currently
- */
-int _gnutls_send_client_kx_message0( gnutls_session session, int again)
-{
-	uint8 *data;
-	int data_size;
-	int ret = 0;
-
-	if ( session->internals.auth_struct->gnutls_generate_client_kx0 == NULL)
-		return 0;
-
-
-	data = NULL;
-	data_size = 0;
-
-	if (again == 0) {
-		data_size = session->internals.auth_struct->gnutls_generate_client_kx0( session, &data);
-
-		if (data_size < 0) {
-			gnutls_assert();
-			return data_size;
-		}
-	}
-	ret = _gnutls_send_handshake( session, data, data_size, GNUTLS_CLIENT_KEY_EXCHANGE);
-	gnutls_free(data);
 
 	return ret;
 }
@@ -370,32 +309,6 @@ int _gnutls_recv_server_certificate_request( gnutls_session session)
 	return ret;
 }
 
-int _gnutls_recv_server_kx_message2( gnutls_session session)
-{
-	uint8 *data;
-	int datasize;
-	int ret = 0;
-
-
-	if (session->internals.auth_struct->gnutls_process_server_kx2 != NULL) {
-
-		ret =
-		    _gnutls_recv_handshake( session, &data,
-				   &datasize,
-				   GNUTLS_SERVER_KEY_EXCHANGE, MANDATORY_PACKET);
-		if (ret < 0)
-			return ret;
-
-
-		ret = session->internals.auth_struct->gnutls_process_server_kx2( session, data, datasize);
-		gnutls_free(data);
-		if (ret < 0)
-			return ret;
-
-	}
-	return ret;
-}
-
 int _gnutls_recv_client_kx_message( gnutls_session session)
 {
 	uint8 *data;
@@ -423,31 +336,6 @@ int _gnutls_recv_client_kx_message( gnutls_session session)
 	return ret;
 }
 
-/* only used in SRP */
-int _gnutls_recv_client_kx_message0( gnutls_session session)
-{
-	uint8 *data;
-	int datasize;
-	int ret = 0;
-
-	/* Do key exchange only if the algorithm permits it */
-	if (session->internals.auth_struct->gnutls_process_client_kx0 != NULL) {
-
-		ret =
-		    _gnutls_recv_handshake( session, &data,
-					   &datasize,
-					   GNUTLS_CLIENT_KEY_EXCHANGE, MANDATORY_PACKET);
-		if (ret < 0)
-			return ret;
-
-		ret = session->internals.auth_struct->gnutls_process_client_kx0( session, data, datasize);
-		gnutls_free(data);
-		if (ret < 0)
-			return ret;
-
-	}
-	return ret;
-}
 
 /* This is called when we want send our certificate
  */
