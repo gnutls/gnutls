@@ -1615,8 +1615,8 @@ redefining them.
 @subsection Obtaining session information
 
 Most of the times it is desirable to know the security properties of
-the current established session. This includes the underlying ciphers
-and the protocols involved. That is the purpose of the following
+the current established session.  This includes the underlying ciphers
+and the protocols involved.  That is the purpose of the following
 function.  Note that this function will print meaningful values only
 if called after a successful @code{gnutls_handshake}.
 
@@ -1630,10 +1630,12 @@ procedure has finished.  It must be considered secure, only after the
 peer's certificate and identity have been verified. That is, you have
 to verify the signature in peer's certificate, the hostname in the
 certificate, and expiration dates.  Just after this step you should
-treat the connection as being a secure one.  The following function is
-an example on how to verify the peer's certificate chain.  This is an
-advanced case. Things in a TLS session may be simplified by using
-@code{gnutls_certificate_verify_peers2}.
+treat the connection as being a secure one.
+
+@verbatiminclude examples/ex-rfc2818.c
+
+An other example is listed below which provides a more detailed
+verification output.
 
 @verbatiminclude examples/ex-verify.c
 
