@@ -285,70 +285,73 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		 * This is used to allocate the issuers_dn without
 		 * using realloc().
 		 */
-		do {
-			/* This works like DECR_LEN() 
-			 */
-			result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			DECR_LENGTH_COM(dataptr_size, 2, goto error);
-			size = _gnutls_read_uint16(dataptr);
 
-			result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			DECR_LENGTH_COM(dataptr_size, size, goto error);
+		if (gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
 
-			dataptr += 2;
+			do {
+				/* This works like DECR_LEN() 
+				 */
+				result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+				DECR_LENGTH_COM(dataptr_size, 2, goto error);
+				size = _gnutls_read_uint16(dataptr);
 
-			if (size > 0) {
-				issuers_dn_len++;
-				dataptr += size;
-			}
+				result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+				DECR_LENGTH_COM(dataptr_size, size, goto error);
 
-			if (dataptr_size == 0)
-				break;
+				dataptr += 2;
+		
+				if (size > 0) {
+					issuers_dn_len++;
+					dataptr += size;
+				}
 
-		} while (1);
+				if (dataptr_size == 0)
+					break;
+
+			} while (1);
 
 
-		my_certs =
-		    gnutls_alloca(cred->ncerts * sizeof(gnutls_datum));
-		if (my_certs == NULL) {
-			result = GNUTLS_E_MEMORY_ERROR;
-			gnutls_assert();
-			goto error;
-		}
-
-		/* put the requested DNs to req_dn, only in case
-		 * of X509 certificates.
-		 */
-		if (gnutls_certificate_type_get(session) ==
-		    GNUTLS_CRT_X509 && issuers_dn_len > 0) {
-			data = _data;
-			data_size = _data_size;
-
-			issuers_dn =
-			    gnutls_alloca(issuers_dn_len *
-					  sizeof(gnutls_datum));
-			if (issuers_dn == NULL) {
+			my_certs =
+			    gnutls_alloca(cred->ncerts * sizeof(gnutls_datum));
+			if (my_certs == NULL) {
 				result = GNUTLS_E_MEMORY_ERROR;
 				gnutls_assert();
 				goto error;
 			}
 
-			for (i = 0; i < issuers_dn_len; i++) {
-				/* The checks here for the buffer boundaries
-				 * are not needed since the buffer has been
-				 * parsed above.
-				 */
-				data_size -= 2;
+			/* put the requested DNs to req_dn, only in case
+			 * of X509 certificates.
+			 */
+			if (issuers_dn_len > 0) {
+				data = _data;
+				data_size = _data_size;
 
-				size = _gnutls_read_uint16(data);
+				issuers_dn =
+				    gnutls_alloca(issuers_dn_len *
+						  sizeof(gnutls_datum));
+				if (issuers_dn == NULL) {
+					result = GNUTLS_E_MEMORY_ERROR;
+					gnutls_assert();
+					goto error;
+				}
 
-				data += 2;
+				for (i = 0; i < issuers_dn_len; i++) {
+					/* The checks here for the buffer boundaries
+					 * are not needed since the buffer has been
+					 * parsed above.
+					 */
+					data_size -= 2;
 
-				issuers_dn[i].data = data;
-				issuers_dn[i].size = size;
+					size = _gnutls_read_uint16(data);
 
-				data += size;
+					data += 2;
 
+					issuers_dn[i].data = data;
+					issuers_dn[i].size = size;
+	
+					data += size;
+
+				}
 			}
 
 		} else { /* Other certificate types */
@@ -849,7 +852,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 		len = _gnutls_read_uint24(p);
 		p += 3;
 
-		if (size == 0) {
+		if (len == 0) {
 			gnutls_assert();
 			/* no certificate was sent */
 			return GNUTLS_E_NO_CERTIFICATE_FOUND;
