@@ -3,6 +3,8 @@
 #include <gnutls/extra.h>
 #include <time.h>
 
+void print_cert_info(GNUTLS_STATE state);
+
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
 	PRINTX( "OU:", X.organizational_unit_name); \
@@ -223,23 +225,7 @@ int print_info(GNUTLS_STATE state)
 			       gnutls_srp_server_get_username(state));
 		break;
 	case GNUTLS_CRD_CERTIFICATE:
-		switch (gnutls_cert_type_get(state)) {
-		case GNUTLS_CRT_X509:
-			printf
-			    ("- Peer requested X.509 certificate authentication.\n");
-
-			print_x509_info(state);
-
-			break;
-		case GNUTLS_CRT_OPENPGP:{
-				printf
-				    ("- Peer requested OpenPGP certificate authentication.\n");
-
-				print_openpgp_info(state);
-
-				break;
-			}
-		}
+		print_cert_info( state);
 
 		print_cert_vrfy(state);
 
@@ -271,6 +257,23 @@ int print_info(GNUTLS_STATE state)
 	return 0;
 }
 
+void print_cert_info(GNUTLS_STATE state)
+{
+
+	printf( " - Certificate type: ");
+	switch (gnutls_cert_type_get(state)) {
+	case GNUTLS_CRT_X509:
+		printf("X.509\n");
+		print_x509_info(state);
+		break;
+	case GNUTLS_CRT_OPENPGP:
+		printf("OpenPGP\n");
+		print_openpgp_info(state);
+		break;
+	}
+
+}
+
 void print_list(void)
 {
 	/* FIXME: This is hard coded. Make it print all the supported
@@ -286,10 +289,11 @@ void print_list(void)
 	printf(", SSL3.0\n");
 
 	printf("Ciphers:");
-	printf(" RIJNDAEL_128_CBC");
-	printf(", TWOFISH_128_CBC");
-	printf(", 3DES_CBC");
+	printf(" RIJNDAEL-128-CBC");
+	printf(", TWOFISH-128-CBC");
+	printf(", 3DES-CBC");
 	printf(", ARCFOUR\n");
+	printf(", ARCFOUR-40\n");
 
 	printf("MACs:");
 	printf(" MD5");
@@ -297,10 +301,11 @@ void print_list(void)
 
 	printf("Key exchange algorithms:");
 	printf(" RSA");
-	printf(", DHE_DSS");
-	printf(", DHE_RSA");
+	printf(", RSA-EXPORT");
+	printf(", DHE-DSS");
+	printf(", DHE-RSA");
 	printf(", SRP");
-	printf(", ANON_DH\n");
+	printf(", ANON-DH\n");
 
 	printf("Compression methods:");
 	printf(" ZLIB");

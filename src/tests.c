@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <common.h>
 
 extern GNUTLS_SRP_CLIENT_CREDENTIALS srp_cred;
 extern GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
@@ -525,4 +526,25 @@ int tmp_session_id_size;
 	else
 		return FAILED;
 
+}
+
+int test_certificate( GNUTLS_STATE state) {
+int ret;
+
+	ADD_ALL_CIPHERS(state);
+	ADD_ALL_COMP(state);
+	ADD_ALL_CERTTYPES(state);
+	ADD_ALL_PROTOCOLS(state);
+	ADD_ALL_MACS(state);
+	ADD_ALL_KX(state);
+
+	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( state);
+	if (ret < 0) return FAILED;
+
+	printf("\n");
+	print_cert_info( state);
+
+	return SUCCEED;
 }
