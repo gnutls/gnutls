@@ -1,6 +1,182 @@
+2005-03-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_handshake.c, lib/gnutls_hash_int.c, lib/gnutls_int.h,
+	lib/gnutls_priority.c, lib/gnutls_sig.c, lib/gnutls_srp.c,
+	lib/gnutls_state.c, lib/x509/crl_write.c, lib/x509/crq.c,
+	lib/x509/pkcs12.c, lib/x509/privkey.c, lib/x509/sign.c,
+	lib/x509/verify.c, lib/x509/x509.c, lib/x509/x509_write.c,
+	libextra/gnutls_openssl.c, src/certtool.c, src/cli.c, src/common.c,
+	src/serv.c, src/tests.c: renamed all instances of _SHA to _SHA1 to
+	make naming more consistent and clear.
+
+2005-03-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2005-03-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS: Add.
+
+2005-03-05  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Don't force -O2 -finline-functions.
+
+2005-03-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/certtool-gaa.c, src/certtool-gaa.h, src/certtool.c,
+	src/certtool.gaa, src/prime.c: Added the option --get-dh-params to
+	certtool, in order to get the included primes and generators
+
+2005-03-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/certtool.c: added warning when MD5 is being used.
+
+2005-03-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c: [no log message]
+
+2005-03-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_srp.c, NEWS: added more strict checks for g,n
+
+2005-03-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/protocol/draft-salowey-tls-ticket-00.txt,
+	doc/protocol/draft-salowey-tls-ticket-02.txt: new ticket
+
+2005-02-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/TODO: [no log message]
+
+2005-02-24  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-psk-06.txt: Add.
+
+2005-02-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: [no log message]
+
+2005-02-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_record.c: some modifications for gnutls_bye()
+	semantics.
+
+2005-02-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-rescorla-dtls-03.txt: Add.
+
+2005-02-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/srptool.1: updated documentation for srptool.1
+
+2005-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in: Add -Wshadow for --enable-developer-mode.
+
+2005-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.h, lib/gnutls_ui.c:
+	(gnutls_rsa_export_get_pubkey): Don't use reserved word "exp",
+	reported by Neil Spring <nspring@cs.washington.edu>.
+
+2005-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/x509.h, lib/x509/crl.c:
+	(gnutls_x509_crl_get_crt_serial): Don't use reserved word "time",
+	reported by Neil Spring <nspring@cs.washington.edu>.
+
+2005-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/x509.h: Fix last commit.
+
+2005-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crl.c:
+	(gnutls_x509_crl_get_crt_serial): Don't use reserved word "index",
+	reported by Neil Spring <nspring@cs.washington.edu>.
+
+2005-02-12  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/x509.h:
+	(gnutls_x509_crl_get_crt_serial): Don't use reserved word "index" in
+	prototype, reported by Neil Spring <nspring@cs.washington.edu>.
+
+2005-02-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/serv.c: [no log message]
+
+2005-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2005-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* includes/gnutls/extra.h: Protect for C++, tiny patch from Daniel
+	Black <dragonheart@gentoo.org>.
+
+2005-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Scan in lib/x509/ too, sources now
+	fixed.
+
+2005-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c, lib/x509/dn.c, lib/x509/x509.c,
+	lib/x509/privkey.c: Doc fix.
+
+2005-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c, lib/x509/pkcs12.c, lib/x509/pkcs7.c,
+	lib/x509/privkey.c, lib/x509/privkey_pkcs8.c, lib/x509/x509.c: Doc
+	fix.
+
+2005-02-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Markup fixes.
+
+2005-02-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2005-02-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/protocol/draft-ietf-tls-openpgp-keys-04.txt,
+	doc/protocol/draft-ietf-tls-srp-07.txt: [no log message]
+
+2005-01-31  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-lee-tls-seed-01.txt: Add.
+
+2005-01-30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/README.CVS: Fix gtk-doc.
+
+2005-01-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/privkey_pkcs8.c, lib/x509/x509.c, lib/x509/xml.c: some
+	changes for 64bit machines.
+
+2005-01-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_ui.c: [no log message]
+
+2005-01-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/compat.c: these functions are not exported in the API
+	documentation.
+
 2005-01-27  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Version 1.2.0.
+	* Makefile.am: Don't use "devel" directory.
+
+2005-01-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in: Bump versions.
+
+2005-01-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS (tags: gnutls_1_2_0): Version 1.2.0.
 
 2005-01-27  Simon Josefsson <simon@josefsson.org>
 
@@ -85,7 +261,7 @@
 
 2005-01-26  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS (tags: gnutls_1_2_0): Add.
+	* NEWS: Add.
 
 2005-01-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -18302,7 +18478,29 @@
 
 2002-04-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS: [no log message]
+	* CVSROOT/loginfo.pl, NEWS, CVSROOT/loginfo.pl (tags:
+	gnutls_1_1_12, gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16,
+	gnutls_1_0_13, gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11,
+	gnutls_1_1_9, gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9,
+	gnutls_1_1_7, gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7,
+	gnutls_1_1_6, gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4,
+	gnutls_1_1_4, gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1,
+	gnutls_1_1_0, gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0,
+	gnutls_0_9_99, gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96,
+	gnutls_0_9_95, gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92,
+	gnutls_0_8_12, gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11,
+	gnutls_0_9_8, gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9,
+	gnutls_0_9_6, gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4,
+	gnutls_0_8_6, gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): [no log
+	message]
 
 2002-04-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -18313,6 +18511,110 @@
 	* NEWS, lib/auth_rsa.c, lib/gnutls_int.h, lib/gnutls_state.c: Added
 	function which disables the version check in the RSA premaster
 	secret -only needed in server side
+
+2002-04-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo (tags: gnutls_1_1_12, gnutls_1_0_17,
+	gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12,
+	gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8,
+	gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0,
+	gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5,
+	gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3,
+	gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3,
+	gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98,
+	gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94,
+	gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91,
+	gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7,
+	gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7,
+	gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3,
+	gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): [no log
+	message]
+
+2002-04-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/commitinfo (tags: gnutls_1_1_12, gnutls_1_0_17,
+	gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12,
+	gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8,
+	gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0,
+	gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5,
+	gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3,
+	gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3,
+	gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98,
+	gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94,
+	gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91,
+	gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7,
+	gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7,
+	gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3,
+	gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): [no log
+	message]
+
+2002-04-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/commitinfo: [no log message]
+
+2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl: [no log message]
+
+2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl: [no log message]
+
+2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl: [no log message]
+
+2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl: [no log message]
+
+2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl: [no log message]
+
+2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl: [no log message]
+
+2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl, CVSROOT/passwd (tags: gnutls_1_1_12,
+	gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13,
+	gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9,
+	gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7,
+	gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6,
+	gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4,
+	gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0,
+	gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99,
+	gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95,
+	gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12,
+	gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8,
+	gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6,
+	gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6,
+	gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): [no log
+	message]
 
 2002-04-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -21979,6 +22281,36 @@
 
 2001-11-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
+	* CVSROOT/checkoutlist, CVSROOT/log.pl, CVSROOT/checkoutlist (tags:
+	gnutls_1_1_12, gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16,
+	gnutls_1_0_13, gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11,
+	gnutls_1_1_9, gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9,
+	gnutls_1_1_7, gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7,
+	gnutls_1_1_6, gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4,
+	gnutls_1_1_4, gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1,
+	gnutls_1_1_0, gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0,
+	gnutls_0_9_99, gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96,
+	gnutls_0_9_95, gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92,
+	gnutls_0_8_12, gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11,
+	gnutls_0_9_8, gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9,
+	gnutls_0_9_6, gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4,
+	gnutls_0_8_6, gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): [no log
+	message]
+
+2001-11-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/checkoutlist: [no log message]
+
+2001-11-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
 	* AUTHORS, lib/auth_x509.c, lib/auth_x509.h, lib/gnutls_cert.c,
 	lib/gnutls_int.h, lib/x509_extensions.c, src/cli.c: The RDN
 	sequence needed in the certificate request message is now generated
@@ -22086,6 +22418,10 @@
 
 2001-11-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
+	* CVSROOT/loginfo, CVSROOT/loginfo.pl: [no log message]
+
+2001-11-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
 	* lib/gnutls_algorithms.c: fixed gnutls_kx_get_name()
 
 2001-11-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
@@ -22130,23 +22466,57 @@
 
 2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
+	* CVSROOT/loginfo: [no log message]
+
+2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
 	* lib/gnutls_int.h (tags: gnutls_0_2_11): removed debugging stuff
 
 2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS: [no log message]
+	* CVSROOT/loginfo: [no log message]
 
 2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS: [no log message]
+	* NEWS, CVSROOT/loginfo: [no log message]
 
 2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* NEWS: [no log message]
+	* CVSROOT/commitinfo, CVSROOT/commitinfo.pl (tags: gnutls_1_1_12,
+	gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13,
+	gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9,
+	gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7,
+	gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6,
+	gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4,
+	gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0,
+	gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99,
+	gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95,
+	gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12,
+	gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8,
+	gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6,
+	gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6,
+	gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2), NEWS: [no
+	log message]
+
+2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo.pl, NEWS: [no log message]
 
 2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* THANKS (tags: gnutls_0_2_11), NEWS: [no log message]
+
+2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* CVSROOT/loginfo, CVSROOT/loginfo.pl: new loginfo script
 
 2001-11-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -22190,6 +22560,34 @@
 2001-11-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* configure.in: now requires autoconf 2.50
+
+2001-11-11  werner
+
+	* CVSROOT/notify (tags: gnutls_1_1_12, gnutls_1_0_17,
+	gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12,
+	gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8,
+	gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0,
+	gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5,
+	gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3,
+	gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3,
+	gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98,
+	gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94,
+	gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91,
+	gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7,
+	gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7,
+	gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3,
+	gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): test
+
+2001-11-11  werner
+
+	* CVSROOT/commitinfo, CVSROOT/loginfo: Changed log script
 
 2001-11-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -22464,6 +22862,10 @@
 	* lib/gnutls_buffers.c, lib/gnutls_buffers.h (tags: gnutls_0_2_9),
 	lib/gnutls_int.h, lib/gnutls_record.c, src/serv.c (tags:
 	gnutls_0_2_9): updated/fixed the handling of interrupted writes
+
+2001-10-22  werner
+
+	* CVSROOT/loginfo: Changed to new log script
 
 2001-10-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -25087,6 +25489,57 @@
 
 	* buildconf (tags: gnutls-0_1_2, gnutls-0-1-0-srp): updated
 
+2001-04-12  werner
+
+	* CVSROOT/passwd, CVSROOT/readers (tags: gnutls_1_1_12,
+	gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13,
+	gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9,
+	gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7,
+	gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6,
+	gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4,
+	gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0,
+	gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99,
+	gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95,
+	gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12,
+	gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8,
+	gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6,
+	gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6,
+	gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2),
+	CVSROOT/writers (tags: gnutls_1_1_12, gnutls_1_0_17, gnutls_1_1_11,
+	gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12, gnutls_1_1_10,
+	gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8, gnutls_1_0_10,
+	gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0, gnutls_1_0_8,
+	gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5, gnutls_1_1_5,
+	gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3, gnutls_1_1_2,
+	gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3, gnutls_1_0_2,
+	gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98, gnutls_0_9_97,
+	gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94, gnutls_0_9_93,
+	gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91, gnutls_0_9_90,
+	gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7, gnutls_0_8_10,
+	gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7, gnutls_0_9_5,
+	gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3, gnutls_0_8_5,
+	gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): [no log
+	message]
+
+2001-04-12  werner
+
+	* CVSROOT/loginfo: [no log message]
+
 2001-03-25  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* doc/protocol/ssl-2.txt (tags: gnutls_0_3_5, gnutls_0_3_2,
@@ -25480,6 +25933,31 @@
 2001-01-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* README (tags: gnutls-0_1_2, gnutls-0-1-0-srp): updated
+
+2001-01-29  Werner Koch <wk@gnupg.org>
+
+	* CVSROOT/config (tags: gnutls_1_1_12, gnutls_1_0_17,
+	gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12,
+	gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8,
+	gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0,
+	gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5,
+	gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3,
+	gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3,
+	gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98,
+	gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94,
+	gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91,
+	gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7,
+	gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7,
+	gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3,
+	gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): initial
+	checkin
 
 2001-01-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
@@ -25936,6 +26414,10 @@
 
 	* doc/TODO: updated todo
 
+2000-11-17  Werner Koch <wk@gnupg.org>
+
+	* CVSROOT/loginfo: add geam and gpgme to the log script
+
 2000-11-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_cipher_int.c: added ARCFOUR support when using gcrypt
@@ -26341,6 +26823,10 @@
 	lib/gnutls_kx.c: Added some kind of priorities for algorithms.
 	Still experimental.
 
+2000-07-25  Werner Koch <wk@gnupg.org>
+
+	* CVSROOT/loginfo: Send mail for all modules
+
 2000-05-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/gnutls_int.h, src/cli.c, src/port.h, src/serv.c:
@@ -26679,6 +27165,11 @@
 	Added gnutls_recv... Works only for application data, and it is not
 	tested.
 
+2000-03-13  Werner Koch <wk@gnupg.org>
+
+	* CVSROOT/log.pl: Fixed stupid Y2K bug (The second in the programs
+	I maintain)
+
 2000-03-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* Makefile.am, acconfig.h, buildconf, configure.in,
@@ -26693,6 +27184,159 @@
 	* Makefile.am, NEWS, README, THANKS, acconfig.h, acinclude.m4,
 	configure.in, lib/Makefile.am, src/Makefile.am: Initialized
 	repository for GNU TLS
+
+1999-07-13  Werner Koch <wk@gnupg.org>
+
+	* CVSROOT/loginfo: loginfo
+
+1999-02-10  koch
+
+	* CVSROOT/loginfo: [no log message]
+
+1998-11-27  koch
+
+	* CVSROOT/log.pl: new ChangeLog feature
+
+1998-10-16  koch
+
+	* CVSROOT/log.pl, CVSROOT/loginfo, CVSROOT/passwd, CVSROOT/readers:
+	[no log message]
+
+1998-10-16  koch
+
+	* CVSROOT/val-tags (tags: gnutls_1_1_12, gnutls_1_0_17,
+	gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12,
+	gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8,
+	gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0,
+	gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5,
+	gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3,
+	gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3,
+	gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98,
+	gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94,
+	gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91,
+	gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7,
+	gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7,
+	gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3,
+	gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): :
+
+1998-10-16  koch
+
+	* CVSROOT/checkoutlist, CVSROOT/commitinfo, CVSROOT/editinfo (tags:
+	gnutls_1_1_12, gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16,
+	gnutls_1_0_13, gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11,
+	gnutls_1_1_9, gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9,
+	gnutls_1_1_7, gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7,
+	gnutls_1_1_6, gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4,
+	gnutls_1_1_4, gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1,
+	gnutls_1_1_0, gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0,
+	gnutls_0_9_99, gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96,
+	gnutls_0_9_95, gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92,
+	gnutls_0_8_12, gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11,
+	gnutls_0_9_8, gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9,
+	gnutls_0_9_6, gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4,
+	gnutls_0_8_6, gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2),
+	CVSROOT/loginfo, CVSROOT/modules (tags: gnutls_1_1_12,
+	gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13,
+	gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9,
+	gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7,
+	gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6,
+	gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4,
+	gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0,
+	gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99,
+	gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95,
+	gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12,
+	gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8,
+	gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6,
+	gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6,
+	gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2),
+	CVSROOT/notify, CVSROOT/rcsinfo (tags: gnutls_1_1_12,
+	gnutls_1_0_17, gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13,
+	gnutls_1_0_12, gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9,
+	gnutls_1_1_8, gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7,
+	gnutls_1_1_7_pre0, gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6,
+	gnutls_1_0_5, gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4,
+	gnutls_1_1_3, gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0,
+	gnutls_1_0_3, gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99,
+	gnutls_0_9_98, gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95,
+	gnutls_0_9_94, gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12,
+	gnutls_0_9_91, gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8,
+	gnutls_0_9_7, gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6,
+	gnutls_0_8_7, gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6,
+	gnutls_0_9_3, gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2),
+	CVSROOT/taginfo (tags: gnutls_1_1_12, gnutls_1_0_17, gnutls_1_1_11,
+	gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12, gnutls_1_1_10,
+	gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8, gnutls_1_0_10,
+	gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0, gnutls_1_0_8,
+	gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5, gnutls_1_1_5,
+	gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3, gnutls_1_1_2,
+	gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3, gnutls_1_0_2,
+	gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98, gnutls_0_9_97,
+	gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94, gnutls_0_9_93,
+	gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91, gnutls_0_9_90,
+	gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7, gnutls_0_8_10,
+	gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7, gnutls_0_9_5,
+	gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3, gnutls_0_8_5,
+	gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2),
+	CVSROOT/verifymsg (tags: gnutls_1_1_12, gnutls_1_0_17,
+	gnutls_1_1_11, gnutls_1_0_16, gnutls_1_0_13, gnutls_1_0_12,
+	gnutls_1_1_10, gnutls_1_0_11, gnutls_1_1_9, gnutls_1_1_8,
+	gnutls_1_0_10, gnutls_1_0_9, gnutls_1_1_7, gnutls_1_1_7_pre0,
+	gnutls_1_0_8, gnutls_1_0_7, gnutls_1_1_6, gnutls_1_0_5,
+	gnutls_1_1_5, gnutls_1_0_4, gnutls_1_1_4, gnutls_1_1_3,
+	gnutls_1_1_2, gnutls_1_1_1, gnutls_1_1_0, gnutls_1_0_3,
+	gnutls_1_0_2, gnutls_1_0_0, gnutls_0_9_99, gnutls_0_9_98,
+	gnutls_0_9_97, gnutls_0_9_96, gnutls_0_9_95, gnutls_0_9_94,
+	gnutls_0_9_93, gnutls_0_9_92, gnutls_0_8_12, gnutls_0_9_91,
+	gnutls_0_9_90, gnutls_0_8_11, gnutls_0_9_8, gnutls_0_9_7,
+	gnutls_0_8_10, gnutls_0_8_9, gnutls_0_9_6, gnutls_0_8_7,
+	gnutls_0_9_5, gnutls_0_9_4, gnutls_0_8_6, gnutls_0_9_3,
+	gnutls_0_8_5, gnutls_0_9_2, gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2): initial
+	checkin
 
 ----------------------------------------------------------------------
   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
