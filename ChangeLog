@@ -1,3 +1,256 @@
+2004-06-24 19:02  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/certificate.tex, doc/tex/gnutls.bib,
+	doc/tex/tlsintro.tex:
+
+	Corrected a bug in certificate verification. Pointed out by Yoann
+	Vandoorselaere <yoann@prelude-ids.org> 
+
+2004-06-24 19:01  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO:
+
+	* Corrected a bug in certificate verification. Pointed out by 
+	  Yoann Vandoorselaere <yoann@prelude-ids.org> 
+	* Added the GNUTLS_VERIFY_DO_NOT_ALLOW_SAME flags to the 
+	  verification functions.  
+
+2004-06-17 19:21  nmav <nmav@gnutls.org>
+
+	* doc/tex/: certificate.tex, gnutls.bib, tlsintro.tex:
+
+	added links to gpgme and to Rescola's book.  
+
+2004-06-16 13:22  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_pk.c, gnutls_pk.c:
+
+	Corrected bug in PKCS #1 encryption.  
+
+2004-06-13 21:32  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/TODO, doc/tex/auth.tex,
+	doc/tex/certificate.tex, doc/tex/ex-alert.tex,
+	doc/tex/ex-cert-select.tex, doc/tex/ex-client-resume.tex,
+	doc/tex/ex-client-srp.tex, doc/tex/ex-client2.tex,
+	doc/tex/ex-crq.tex, doc/tex/ex-pkcs12.tex,
+	doc/tex/ex-serv-export.tex, doc/tex/ex-serv-pgp.tex,
+	doc/tex/ex-serv-srp.tex, doc/tex/ex-serv1.tex,
+	doc/tex/ex-session-info.tex, doc/tex/ex-verify.tex,
+	doc/tex/ex-x509-info.tex, lib/auth_anon.c, lib/auth_anon.h,
+	lib/auth_cert.c, lib/auth_cert.h, lib/auth_dh_common.c,
+	lib/auth_dh_common.h, lib/auth_dhe.c, lib/auth_rsa.c,
+	lib/auth_rsa_export.c, lib/debug.c, lib/debug.h,
+	lib/ext_cert_type.c, lib/ext_cert_type.h, lib/ext_max_record.c,
+	lib/ext_max_record.h, lib/ext_server_name.c, lib/ext_server_name.h,
+	lib/gnutls.h.in.in, lib/gnutls_alert.c, lib/gnutls_alert.h,
+	lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_anon_cred.c, lib/gnutls_auth.c, lib/gnutls_auth.h,
+	lib/gnutls_auth_int.h, lib/gnutls_buffers.c, lib/gnutls_buffers.h,
+	lib/gnutls_cert.c, lib/gnutls_cert.h, lib/gnutls_cipher.c,
+	lib/gnutls_cipher.h, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_compress.c,
+	lib/gnutls_compress.h, lib/gnutls_compress_int.c,
+	lib/gnutls_compress_int.h, lib/gnutls_constate.c,
+	lib/gnutls_constate.h, lib/gnutls_datum.c, lib/gnutls_datum.h,
+	lib/gnutls_db.c, lib/gnutls_db.h, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_extensions.c,
+	lib/gnutls_extensions.h, lib/gnutls_global.c,
+	lib/gnutls_handshake.c, lib/gnutls_handshake.h,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_int.h,
+	lib/gnutls_kx.c, lib/gnutls_kx.h, lib/gnutls_mpi.c,
+	lib/gnutls_mpi.h, lib/gnutls_pk.c, lib/gnutls_pk.h,
+	lib/gnutls_priority.c, lib/gnutls_priority.h, lib/gnutls_record.c,
+	lib/gnutls_record.h, lib/gnutls_rsa_export.c,
+	lib/gnutls_rsa_export.h, lib/gnutls_session.c,
+	lib/gnutls_session.h, lib/gnutls_session_pack.c,
+	lib/gnutls_session_pack.h, lib/gnutls_sig.c, lib/gnutls_sig.h,
+	lib/gnutls_state.c, lib/gnutls_state.h, lib/gnutls_str.c,
+	lib/gnutls_str.h, lib/gnutls_ui.c, lib/gnutls_ui.h,
+	lib/gnutls_v2_compat.c, lib/gnutls_v2_compat.h, lib/gnutls_x509.c,
+	lib/gnutls_x509.h, lib/x509_b64.c:
+
+	Added the '_t' suffix to all exported symbols.  
+
+2004-06-13 14:49  nmav <nmav@gnutls.org>
+
+	* doc/protocol/: draft-ietf-tls-srp-06.txt,
+	draft-ietf-tls-srp-07.txt:
+
+	added new srp draft 
+
+2004-06-12 08:55  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/Makefile.am, doc/tex/certificate.tex,
+	doc/tex/ex-rfc2818.tex, doc/tex/ex-verify.tex,
+	doc/tex/examples.tex, doc/tex/Makefile.am, doc/tex/ex-rfc2818.tex,
+	doc/tex/ex-verify.tex, doc/tex/examples.tex:
+
+	added an improved verification example.  
+
+2004-06-11 12:22  nmav <nmav@gnutls.org>
+
+	* doc/protocol/draft-rescorla-dtls-00.txt:
+
+	added datagram tls draft.  
+
+2004-06-10 10:03  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_handshake.c, gnutls_state.c, gnutls_handshake.c,
+	gnutls_record.c, gnutls_state.c:
+
+	some fixes in the session resuming code.  
+
+2004-06-07 10:05  nmav <nmav@gnutls.org>
+
+	* lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.c,
+	lib/auth_cert.h, lib/auth_dh_common.c, lib/auth_dh_common.h,
+	lib/auth_dhe.c, lib/auth_rsa.c, lib/auth_rsa_export.c, lib/debug.c,
+	lib/debug.h, lib/defines.h, lib/ext_cert_type.c,
+	lib/ext_cert_type.h, lib/ext_max_record.c, lib/ext_max_record.h,
+	lib/ext_server_name.c, lib/ext_server_name.h, lib/gnutls.h.in.in,
+	lib/gnutls_alert.c, lib/gnutls_alert.h, lib/gnutls_algorithms.c,
+	lib/gnutls_algorithms.h, lib/gnutls_anon_cred.c,
+	lib/gnutls_asn1_tab.c, lib/gnutls_auth.c, lib/gnutls_auth.h,
+	lib/gnutls_auth_int.h, lib/gnutls_buffer.h, lib/gnutls_buffers.c,
+	lib/gnutls_buffers.h, lib/gnutls_cert.c, lib/gnutls_cert.h,
+	lib/gnutls_cipher.c, lib/gnutls_cipher.h, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_compress.c,
+	lib/gnutls_compress.h, lib/gnutls_compress_int.c,
+	lib/gnutls_compress_int.h, lib/gnutls_constate.c,
+	lib/gnutls_constate.h, lib/gnutls_datum.c, lib/gnutls_datum.h,
+	lib/gnutls_db.c, lib/gnutls_db.h, lib/gnutls_dh.c, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_errors.c, lib/gnutls_errors.h,
+	lib/gnutls_errors_int.h, lib/gnutls_extensions.c,
+	lib/gnutls_extensions.h, lib/gnutls_global.c, lib/gnutls_global.h,
+	lib/gnutls_handshake.c, lib/gnutls_handshake.h,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_int.h,
+	lib/gnutls_int_compat.c, lib/gnutls_kx.c, lib/gnutls_kx.h,
+	lib/gnutls_mem.c, lib/gnutls_mem.h, lib/gnutls_mpi.c,
+	lib/gnutls_mpi.h, lib/gnutls_num.c, lib/gnutls_num.h,
+	lib/gnutls_pk.c, lib/gnutls_pk.h, lib/gnutls_priority.c,
+	lib/gnutls_priority.h, lib/gnutls_random.c, lib/gnutls_random.h,
+	lib/gnutls_record.c, lib/gnutls_record.h, lib/gnutls_rsa_export.c,
+	lib/gnutls_rsa_export.h, lib/gnutls_session.c,
+	lib/gnutls_session.h, lib/gnutls_session_pack.c,
+	lib/gnutls_session_pack.h, lib/gnutls_sig.c, lib/gnutls_sig.h,
+	lib/gnutls_state.c, lib/gnutls_state.h, lib/gnutls_str.c,
+	lib/gnutls_str.h, lib/gnutls_ui.c, lib/gnutls_ui.h,
+	lib/gnutls_v2_compat.c, lib/gnutls_v2_compat.h, lib/gnutls_x509.c,
+	lib/gnutls_x509.h, lib/io_debug.h, lib/pkix_asn1_tab.c,
+	lib/strfile.h, lib/strnstr.c, lib/x509_b64.c, lib/x509_b64.h,
+	src/certtool-cfg.c, src/certtool-gaa.c, src/certtool.c,
+	src/cli-gaa.c, src/cli.c, src/common.c, src/crypt-gaa.c,
+	src/crypt.c, src/getpass.c, src/prime.c, src/retcodes.c,
+	src/serv-gaa.c, src/serv.c, src/tests.c, src/tls_test-gaa.c,
+	src/tls_test.c:
+
+	changed indentation to 4 spaces instead of tabs.  
+
+2004-06-06 16:24  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/cover.tex.in, lib/gnutls_int.h, lib/gnutls_mpi.c,
+	lib/gnutls_mpi.h:
+
+	Added the functions gnutls_x509_crt_get_pk_rsa_raw() and 
+	gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from
+	certificates.  
+
+2004-06-06 14:33  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/certificate.tex, doc/tex/compression.tex,
+	doc/tex/gnutls.bib, doc/tex/howto.tex, doc/tex/programs.tex,
+	lib/gnutls_mpi.h:
+
+	Updated to conform to the latest srp draft (draft-ietf-tls-srp-07).  
+	Some documentation updates.  
+
+2004-06-06 13:50  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_datum.c, lib/gnutls_ui.c, src/cli-gaa.c,
+	src/cli-gaa.h, src/cli.c, src/cli.gaa, src/common.c,
+	src/gnutls-http-serv, src/serv-gaa.c, src/serv-gaa.h, src/serv.c,
+	src/serv.gaa, src/tests.c, src/tests.h, src/tls_test.c:
+
+	several improvements 
+
+2004-06-06 08:59  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/auth_cert.h, lib/auth_dh_common.h,
+	lib/gnutls_compress_int.c, lib/gnutls_state.c, src/cli.c,
+	src/common.c, src/common.h, src/tests.c, src/tests.h,
+	src/tls_test.c:
+
+	updated gnutls-cli-debug to print DHE and RSA-EXPORT information if
+	verbose is set. Some other minor fixes.  
+
+2004-06-05 20:16  nmav <nmav@gnutls.org>
+
+	* doc/README.CODING_STYLE, lib/auth_anon.c, lib/auth_anon.h,
+	lib/auth_cert.h, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/auth_rsa.c, lib/auth_rsa_export.c, lib/debug.c, lib/debug.h,
+	lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_auth.c, lib/gnutls_auth.h, lib/gnutls_auth_int.h,
+	lib/gnutls_buffers.c, lib/gnutls_buffers.h, lib/gnutls_cipher.c,
+	lib/gnutls_cipher.h, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_compress_int.c,
+	lib/gnutls_compress_int.h, lib/gnutls_constate.c, lib/gnutls_db.c,
+	lib/gnutls_dh_primes.c, lib/gnutls_handshake.c,
+	lib/gnutls_handshake.h, lib/gnutls_hash_int.c,
+	lib/gnutls_hash_int.h, lib/gnutls_int.h, lib/gnutls_record.c,
+	lib/gnutls_record.h, lib/gnutls_session_pack.c, lib/gnutls_sig.c,
+	lib/gnutls_state.c, lib/gnutls_ui.c, lib/gnutls_v2_compat.c:
+
+	some other changes to the internal types names.  
+
+2004-06-05 18:10  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_anon.h, auth_cert.c, auth_cert.h,
+	auth_dh_common.c, auth_dh_common.h, auth_dhe.c, auth_rsa.c,
+	auth_rsa_export.c, debug.c, debug.h, gnutls_anon_cred.c,
+	gnutls_auth.c, gnutls_cert.c, gnutls_cert.h, gnutls_dh.c,
+	gnutls_dh.h, gnutls_dh_primes.c, gnutls_int.h, gnutls_pk.c,
+	gnutls_pk.h, gnutls_rsa_export.c, gnutls_rsa_export.h,
+	gnutls_session_pack.c, gnutls_sig.c, gnutls_sig.h, gnutls_state.c,
+	gnutls_ui.c, gnutls_ui.h, gnutls_x509.c, gnutls_x509.h:
+
+	several internal types fix.  
+
+2004-06-05 17:37  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_rsa_export.c, lib/gnutls_mpi.h:
+
+	Added the functions gnutls_x509_crt_get_pk_rsa_raw() and 
+	gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from
+	certificates.  
+
+2004-06-05 17:07  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_cert.h, auth_dh_common.c,
+	auth_dh_common.h, auth_dhe.c, auth_rsa_export.c, gnutls_state.c,
+	gnutls_state.h, gnutls_ui.c, gnutls_ui.h:
+
+	Allow access to the RSA-EXPORT parameters.  
+
+2004-06-04 13:24  nmav <nmav@gnutls.org>
+
+	* lib/: auth_dh_common.c, auth_dh_common.h, gnutls_compress_int.c,
+	gnutls_mpi.c, gnutls_state.c, gnutls_state.h, gnutls_ui.c,
+	gnutls_ui.h:
+
+	added function to access the DH (peer's) public key.  
+
+2004-06-04 12:03  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.h,
+	lib/auth_dh_common.c, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/gnutls_auth.c, lib/gnutls_cipher_int.c, lib/gnutls_int.h,
+	lib/gnutls_mpi.c, lib/gnutls_mpi.h, lib/gnutls_state.c,
+	lib/gnutls_state.h, lib/gnutls_ui.c, lib/gnutls_ui.h, src/serv.c:
+
+	Added news functions to allow access to the ephemeral Diffie Hellman
+	parameters.  
+
 2004-05-31 20:05  nmav <nmav@gnutls.org>
 
 	* src/: cli.c, cli.c:

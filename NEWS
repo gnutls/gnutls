@@ -1,4 +1,4 @@
-Version 1.0.15
+Version 1.0.15 (29/06/2004)
 - Fixed bug in RSA encryption, report and patch by Martijn Koster 
   <mak@greenhills.co.uk>.
 - Corrected a bug in certificate verification. Pointed out by
