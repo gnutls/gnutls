@@ -268,6 +268,10 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 		 * then we send him the highest we support.
 		 */
 		ver = _gnutls_version_max(session);
+		if (ver==GNUTLS_VERSION_UNKNOWN) {
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
+		}
 	} else {
 		ver = version;
 	}
