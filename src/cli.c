@@ -154,11 +154,11 @@ static void munmap_file(gnutls_datum data)
 	munmap(data.data, data.size);
 }
 
-static gnutls_x509_crt x509_crt;
-static gnutls_x509_privkey x509_key;
+static gnutls_x509_crt x509_crt = NULL;
+static gnutls_x509_privkey x509_key = NULL;
 
-static gnutls_openpgp_key pgp_crt;
-static gnutls_openpgp_privkey pgp_key;
+static gnutls_openpgp_key pgp_crt = NULL;
+static gnutls_openpgp_privkey pgp_key = NULL;
 
 /* Load the certificate and the private key.
  */
@@ -290,24 +290,32 @@ static int cert_callback(gnutls_session session,
 	 * The certificate must be of any of the "sign algorithms"
 	 * supported by the server.
 	 */
+	st->type = type;
+	st->ncerts = 0;
 
 	type = gnutls_certificate_type_get(session);
 	if (type == GNUTLS_CRT_X509) {
-		st->type = type;
-		st->ncerts = 1;
+		if (x509_crt != NULL && x509_key != NULL) {
+			st->ncerts = 1;
 
-		st->cert.x509 = &x509_crt;
-		st->key.x509 = x509_key;
+			st->cert.x509 = &x509_crt;
+			st->key.x509 = x509_key;
 
-		st->deinit_all = 0;
-	} else {
-		st->type = type;
-		st->ncerts = 1;
+			st->deinit_all = 0;
 
-		st->cert.pgp = pgp_crt;
-		st->key.pgp = pgp_key;
+			return 0;
+		}
+	} else if (type == GNUTLS_CRT_OPENPGP) {
+		if (pgp_key != NULL && pgp_crt != NULL) {
+			st->ncerts = 1;
 
-		st->deinit_all = 0;
+			st->cert.pgp = pgp_crt;
+			st->key.pgp = pgp_key;
+
+			st->deinit_all = 0;
+			
+			return 0;
+		}
 	}
 
 	return 0;
