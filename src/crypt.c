@@ -35,7 +35,6 @@ int main (int argc, char **argv)
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include "crypt-gaa.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
@@ -47,6 +46,25 @@ int main (int argc, char **argv)
 #ifndef _WIN32
 # include <pwd.h>
 # include <unistd.h>
+#endif
+
+#ifdef _WIN32
+
+# define getpass read_str
+
+static const char* read_str( const char* input_str)
+{
+static char input[128];
+
+	fputs( input_str, stderr);
+	fgets( input, sizeof(input), stdin);
+	
+	input[strlen(input)-1] = 0;
+
+	if (strlen(input)==0) return NULL;
+
+	return input;
+}
 #endif
 
 #define _MAX(x,y) (x>y?x:y)

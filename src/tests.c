@@ -22,17 +22,20 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
-#include <tests.h>
 
 #ifndef _WIN32
 # include <unistd.h>
 # include <signal.h>
+#else
+# include <winsock.h>
+# include <errno.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <common.h>
+#include <tests.h>
 
 extern gnutls_srp_client_credentials srp_cred;
 extern gnutls_anon_client_credentials anon_cred;
@@ -258,7 +261,7 @@ void got_alarm(int k) {
 int test_bye( gnutls_session session) {
 int ret;
 char data[20];
-int old;
+int old, secs = 6;
 
 #ifndef _WIN32
 	signal( SIGALRM, got_alarm);
@@ -280,7 +283,9 @@ int old;
 	
 #ifndef _WIN32
 	old = siginterrupt( SIGALRM, 1);
-	alarm(6);
+	alarm(secs);
+#else
+	setsockopt( gnutls_transport_get_ptr(session), SOL_SOCKET, SO_RCVTIMEO, (char*) &secs, sizeof(int));
 #endif
 	
 	do {
@@ -289,9 +294,12 @@ int old;
 
 #ifndef _WIN32
 	siginterrupt( SIGALRM, old);
+#else
+	/* we cannot distinguish timeouts */
+	alrm = 1;
 #endif
 	if (ret==0) return SUCCEED;
-	
+
 	if (alrm == 0) return UNSURE;
 	
 	return FAILED;

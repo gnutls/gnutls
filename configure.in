@@ -51,7 +51,7 @@ AC_SUBST(LT_AGE)
 
 case "${target}" in
     *-*-mingw32*)
-        SERV_LIBS="$SERV_LIBS -lwsock32"
+        LIBS="$LIBS -lwsock32"
         ;;
     *)
       ;;

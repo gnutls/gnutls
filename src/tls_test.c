@@ -110,7 +110,7 @@ static const TLS_TEST tls_tests[] = {
 	{ "for certificate information", test_certificate, "", "", "" },
 	{ "for trusted CAs", test_server_cas, "", "", "" },
 	{ "whether the server understands TLS closure alerts", test_bye, "yes", "no", "partially"},
-	/* the fact that is after the closure alert test matter.
+	/* the fact that is after the closure alert test does matter.
 	 */
 	{ "whether the server supports session resumption", test_session_resume2, "yes", "no", "dunno"},
 	{ "for export-grade ciphersuite support", test_export, "yes", "no", "dunno" },
