@@ -427,7 +427,7 @@ inline int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
   * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
   * @algorithm: is a MAC algorithm
   *
-  * Returns an allocated (with malloc) string that contains the name 
+  * Returns a string that contains the name 
   * of the specified MAC algorithm.
   **/
 const char *gnutls_mac_get_name(MACAlgorithm algorithm)
@@ -484,7 +484,7 @@ inline
   * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
   * @algorithm: is a Compression algorithm
   *
-  * Returns a localy allocated (with malloc) pointer to a string that contains the name 
+  * Returns a pointer to a string that contains the name 
   * of the specified compression algorithm.
   **/
 const char *gnutls_compression_get_name(CompressionMethod algorithm)
@@ -603,7 +603,7 @@ int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm)
   * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
   * @algorithm: is an encryption algorithm
   *
-  * Returns a localy allocated (with malloc) pointer to a string that contains the name 
+  * Returns a pointer to a string that contains the name 
   * of the specified cipher.
   **/
 const char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
@@ -665,7 +665,7 @@ inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
   * gnutls_kx_get_name - Returns a string with the name of the specified key exchange algorithm
   * @algorithm: is a key exchange algorithm
   *
-  * Returns a localy allocated (with malloc) pointer to a string that contains the name 
+  * Returns a pointer to a string that contains the name 
   * of the specified key exchange algorithm.
   **/
 const char *gnutls_kx_get_name(KXAlgorithm algorithm)
@@ -746,7 +746,7 @@ GNUTLS_Version _gnutls_version_max(GNUTLS_STATE state)
   * gnutls_version_get_name - Returns a string with the name of the specified SSL/TLS version
   * @version: is a (gnutls) version number
   *
-  * Returns an allocated (with malloc) string that contains the name 
+  * Returns a string that contains the name 
   * of the specified TLS version.
   **/
 const char *gnutls_version_get_name(GNUTLS_Version version)
