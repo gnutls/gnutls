@@ -484,9 +484,10 @@ typedef struct {
 	
 	ValidSession			valid_connection; /* true or FALSE - if this session is valid */
 
-	int				may_read; /* if it's 0 then we can read/write, otherwise it's forbiden to read/write
+	int				may_not_read; /* if it's 0 then we can read/write, otherwise it's forbiden to read/write
 	                                           */
-	int				may_write;
+	int				may_not_write;
+	int				read_eof; /* non-zero if we have received a closure alert. */
 
 	int				last_alert; /* last alert received */
 

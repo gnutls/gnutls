@@ -195,7 +195,7 @@ int gnutls_bye( gnutls_session session, gnutls_close_request how)
 		case STATE62:
 			if ( how == GNUTLS_SHUT_RDWR) {
 				ret = _gnutls_recv_int( session, GNUTLS_ALERT, -1, NULL, 0); 
-				if (ret >= 0) session->internals.may_read = 1;
+				if (ret >= 0) session->internals.may_not_read = 1;
 			}
 			STATE = STATE62;
 
@@ -211,7 +211,7 @@ int gnutls_bye( gnutls_session session, gnutls_close_request how)
 
 	STATE = STATE0;
 	
-	session->internals.may_write = 1;
+	session->internals.may_not_write = 1;
 	return 0;
 }
 
@@ -292,7 +292,7 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type,
 	}
 
 	if (type!=GNUTLS_ALERT) /* alert messages are sent anyway */
-		if ( _gnutls_session_is_valid( session) || session->internals.may_write != 0) {
+		if ( _gnutls_session_is_valid( session) || session->internals.may_not_write != 0) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_SESSION;
 		}
@@ -547,7 +547,7 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 			if (data[1] == GNUTLS_A_CLOSE_NOTIFY && data[0] != GNUTLS_AL_FATAL) {
 				/* If we have been expecting for an alert do 
 				 */
-
+				session->internals.read_eof = 1;
 				return GNUTLS_E_INT_RET_0; /* EOF */
 			} else {
 			
@@ -696,7 +696,11 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type,
 		return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
 	}
 	
-	if ( _gnutls_session_is_valid(session)!=0 || session->internals.may_read!=0) {
+	if (session->internals.read_eof != 0) {
+		/* if we have already read an EOF
+		 */
+		return 0;
+	} else if ( _gnutls_session_is_valid(session)!=0 || session->internals.may_not_read!=0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
