@@ -1,8 +1,8 @@
 
 /*************************************************/
-/* File: cert_asn1.h                             */
+/* File: x509_asn1.h                             */
 /* Description: list of exported object by       */
-/*   "cert_asn1.c"                               */
+/*   "x509_asn1.c"                               */
 /*************************************************/
 
 #ifndef _GNUTLS_ASN1_H

@@ -12,4 +12,4 @@ Makefile
 *.bbg
 libgnutls-config
 gnutls.h
-cert_ASN.c
+x509_ASN.c

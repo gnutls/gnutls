@@ -1,7 +1,7 @@
 /*************************************************/
-/* File: cert_der.h                              */
+/* File: x509_der.h                              */
 /* Description: list of exported object by       */
-/*   "cert_der.c"                                */
+/*   "x509_der.c"                                */
 /*************************************************/
 
 #ifndef _GNUTLS_DER_H
