@@ -136,7 +136,28 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 }
 
 
+static GNUTLS_MAC_HANDLE mac_init( MACAlgorithm mac, opaque* secret, int secret_size, int ver) {
+GNUTLS_MAC_HANDLE td;
 
+	if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
+		td =
+		    _gnutls_mac_init_ssl3( mac, secret,
+		    		secret_size);
+	} else { /* TLS 1 */
+		td =
+		    _gnutls_hmac_init( mac, secret, secret_size);
+	}
+
+	return td;
+}
+
+void mac_deinit( GNUTLS_MAC_HANDLE td, opaque* res, int ver) {
+	if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
+		_gnutls_mac_deinit_ssl3(td, res);
+	} else {
+		_gnutls_hmac_deinit(td, res);
+	}
+}
 
 /* This is the actual encryption 
  * (and also keeps some space for headers (RECORD_HEADER_SIZE) in the 
@@ -169,23 +190,12 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 	minor = _gnutls_version_get_minor( ver);
 	major = _gnutls_version_get_major( ver);
 
-	if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
-		td =
-		    _gnutls_mac_init_ssl3(state->security_parameters.
-					  write_mac_algorithm,
-					  state->connection_state.
-					  write_mac_secret.data,
-					  state->connection_state.
-					  write_mac_secret.size);
-	} else { /* TLS 1 */
-		td =
-		    _gnutls_hmac_init(state->security_parameters.
-				     write_mac_algorithm,
-				     state->connection_state.
-				     write_mac_secret.data,
-				     state->connection_state.
-				     write_mac_secret.size);
-	}
+
+	/* Initialize MAC */
+	td = mac_init(state->security_parameters.write_mac_algorithm,
+		  state->connection_state.write_mac_secret.data,
+		  state->connection_state.write_mac_secret.size, ver);
+
 	if (td == GNUTLS_MAC_FAILED
 	    && state->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL) {
 		gnutls_assert();
@@ -206,11 +216,7 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		}
 		_gnutls_hmac(td, &c_length, 2);
 		_gnutls_hmac(td, compressed.data, compressed.size);
-		if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
-			_gnutls_mac_deinit_ssl3(td, MAC);
-		} else {
-			_gnutls_hmac_deinit(td, MAC);
-		}
+		mac_deinit( td, MAC, ver);
 	}
 	switch (_gnutls_cipher_is_block(state->security_parameters.write_bulk_cipher_algorithm)) {
 	case CIPHER_STREAM:
@@ -304,30 +310,20 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	blocksize = _gnutls_cipher_get_block_size(state->security_parameters.
 					  read_bulk_cipher_algorithm);
 
-	if ( ver == GNUTLS_SSL3) {
-		td =
-		    _gnutls_mac_init_ssl3(state->security_parameters.
-					  read_mac_algorithm,
-					  state->connection_state.
-					  read_mac_secret.data,
-					  state->connection_state.
-					  read_mac_secret.size);
-	} else {
-		td =
-		    _gnutls_hmac_init(state->security_parameters.
-				     read_mac_algorithm,
-				     state->connection_state.
-				     read_mac_secret.data,
-				     state->connection_state.
-				     read_mac_secret.size);
-	}
-
+	/* initialize MAC 
+	 */
+	td = mac_init( state->security_parameters.read_mac_algorithm,
+	  state->connection_state.read_mac_secret.data,
+	  state->connection_state.read_mac_secret.size, ver); 
+	
 	if (td == GNUTLS_MAC_FAILED
 	    && state->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
 
+	/* actual encryption 
+	 */
 	switch (_gnutls_cipher_is_block(state->security_parameters.read_bulk_cipher_algorithm)) {
 	case CIPHER_STREAM:
 		if ( (ret = _gnutls_cipher_decrypt(state->connection_state.
@@ -412,13 +408,11 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 		if (data!=NULL)
 			_gnutls_hmac(td, data, compress->size);
 
-		if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
-			_gnutls_mac_deinit_ssl3(td, MAC);
-		} else {
-			_gnutls_hmac_deinit(td, MAC);
-		}
+		mac_deinit( td, MAC, ver);
 	}
-	/* HMAC was not the same. */
+
+	/* HMAC was not the same. 
+	 */
 	if (memcmp
 	    (MAC, &ciphertext.data[compress->size], hash_size) != 0) {
 		gnutls_free( data);
