@@ -287,6 +287,11 @@ typedef void (*GNUTLS_LOG_FUNC)( const char*);
 void gnutls_transport_set_push_func( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
 void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 
+/* state specific */
+void gnutls_state_set_ptr(GNUTLS_STATE state, void* ptr);
+void* gnutls_state_get_ptr(GNUTLS_STATE state);
+
+/* record layer */
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
 ssize_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
 

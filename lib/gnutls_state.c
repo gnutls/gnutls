@@ -619,3 +619,30 @@ int gnutls_session_is_resumed(GNUTLS_STATE state)
 
 	return 0;
 }
+
+/**
+  * gnutls_state_get_ptr - Used to get the user pointer from the state structure
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function will return the user given pointer from the state structure.
+  * This is the pointer set with gnutls_state_set_ptr().
+  *
+  **/
+void* gnutls_state_get_ptr(GNUTLS_STATE state)
+{
+	return state->gnutls_internals.user_ptr;
+}
+
+/**
+  * gnutls_state_set_ptr - Used to set the user pointer to the state structure
+  * @state: is a &GNUTLS_STATE structure.
+  * @ptr: is the user pointer
+  *
+  * This function will set (assosiate) the user given pointer to the state structure.
+  * This is pointer can be accessed with gnutls_state_get_ptr().
+  *
+  **/
+void gnutls_state_set_ptr(GNUTLS_STATE state, void* ptr)
+{
+	state->gnutls_internals.user_ptr = ptr;
+}
