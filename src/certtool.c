@@ -140,14 +140,14 @@ int len;
 
 static const char* read_pass( const char* input_str)
 {
-#ifdef _WIN32
+#ifndef HAVE_GETPASS
 static char input[128];
 #endif
 const char* pass;
 
 	if (info.pass) return info.pass;
 
-#ifdef _WIN32
+#ifndef HAVE_GETPASS
 
 	fputs( input_str, stderr);
 	fgets( input, sizeof(input), stdin);
