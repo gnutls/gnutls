@@ -645,7 +645,9 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 		memcpy(*data, &dataptr[handshake_headers], length32);
 
 	/* here we buffer the handshake messages - needed at Finished message */
-	gnutls_insertHashDataBuffer(state, dataptr, length32 + handshake_headers);
+	
+	if (recv_type!=GNUTLS_HELLO_REQUEST)
+		gnutls_insertHashDataBuffer(state, dataptr, length32 + handshake_headers);
 
 	switch (recv_type) {
 	case GNUTLS_CLIENT_HELLO:
@@ -692,10 +694,25 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 	return ret;
 }
 
-int _gnutls_send_hello_request(int cd, GNUTLS_STATE state)
+int gnutls_send_hello_request(int cd, GNUTLS_STATE state)
 {
-	return _gnutls_send_handshake(cd, state, NULL, 0,
+int 	ret;
+
+	/* only server sends that handshake packet */
+	if (state->security_parameters.entity == GNUTLS_CLIENT)
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+	ret = _gnutls_send_handshake(cd, state, NULL, 0,
 				      GNUTLS_HELLO_REQUEST);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+return 0;
+	/* begin handshake procedure again */
+	return gnutls_handshake(cd, state);
 }
 
 int _gnutls_send_client_certificate(int cd, GNUTLS_STATE state)
@@ -1507,4 +1524,36 @@ int _gnutls_generate_session_id(char *session_id, uint8 * len)
 		_gnutls_bin2hex(session_id, 32));
 #endif
 	return 0;
+}
+
+int _gnutls_recv_hello_request(int cd, GNUTLS_STATE state, void* data, uint32 data_size) {
+int ret;
+
+	/* only client should receive that */
+	if (state->security_parameters.entity == GNUTLS_SERVER)
+		return GNUTLS_E_UNEXPECTED_PACKET;
+
+	/* just return an alert that we don't like that */
+	ret = _gnutls_send_alert( cd, state, GNUTLS_WARNING, GNUTLS_NO_RENEGOTIATION);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	return 0;
+
+#if 0 /* this does not work - yet */
+uint8 type;
+
+	if (state->security_parameters.entity == GNUTLS_SERVER)
+		return GNUTLS_E_UNEXPECTED_PACKET;
+
+	if (data_size < 1)
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+
+	type = ((uint8*)data)[0];
+	if (type==GNUTLS_HELLO_REQUEST)
+		return gnutls_handshake( cd, state);
+	else
+		return GNUTLS_E_UNEXPECTED_PACKET;
+#endif
 }

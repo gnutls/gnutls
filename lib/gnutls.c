@@ -60,167 +60,108 @@ int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	return 0;
 }
 
-/* This function initializes the state to null (null encryption etc...) */
+/* This function initializes the state to null (null encryption etc...).
+ * If you add anything here that needs allocation also add
+ * entries in gnutls_deinit().
+ */
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
 	/* for gcrypt in order to be able to allocate memory */
-	gcry_set_allocation_handler(gnutls_malloc, secure_malloc,  gnutls_is_secure_memory, gnutls_realloc, free);
+	gcry_set_allocation_handler(gnutls_malloc, secure_malloc, gnutls_is_secure_memory, gnutls_realloc, free);
 
 	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
-	memset(*state, 0, sizeof(GNUTLS_STATE));
+	
 	(*state)->security_parameters.entity = con_end;
 
-	(*state)->gnutls_internals.db_reader = NULL;
-
-/* Set the defaults (only to remind me that they should be allocated ) */
+/* Set the defaults for initial handshake */
 	(*state)->security_parameters.bulk_cipher_algorithm = GNUTLS_NULL_CIPHER;
 	(*state)->security_parameters.mac_algorithm = GNUTLS_NULL_MAC;
 	(*state)->security_parameters.compression_algorithm = GNUTLS_NULL_COMPRESSION;
 
-	(*state)->connection_state.read_compression_state = NULL;
-	(*state)->connection_state.read_mac_secret = NULL;
-	(*state)->connection_state.write_compression_state = NULL;
-	(*state)->connection_state.write_mac_secret = NULL;
-
-	(*state)->cipher_specs.server_write_mac_secret = NULL;
-	(*state)->cipher_specs.client_write_mac_secret = NULL;
-	(*state)->cipher_specs.server_write_IV = NULL;
-	(*state)->cipher_specs.client_write_IV = NULL;
-	(*state)->cipher_specs.server_write_key = NULL;
-	(*state)->cipher_specs.client_write_key = NULL;
-
-	(*state)->gnutls_internals.v2_hello = 0;
-	
-	(*state)->gnutls_internals.buffer = NULL;
-	/* SSL3 stuff */
-	(*state)->gnutls_internals.hash_buffer = NULL;
-	
-	(*state)->gnutls_internals.buffer_handshake = NULL;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
 	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */
 
-	(*state)->gnutls_key = gnutls_malloc(sizeof(GNUTLS_KEY_A));
+	(*state)->gnutls_key = gnutls_calloc(1, sizeof(GNUTLS_KEY_A));
 
-	(*state)->gnutls_key->auth_info = NULL; /* no default auth_info */
-	(*state)->gnutls_key->auth_info_size = 0; /* no default auth_info */
-	(*state)->gnutls_key->cred = NULL; /* no credentials by default */
-	
-	(*state)->gnutls_key->KEY = NULL;
-	(*state)->gnutls_key->client_Y = NULL;
-	(*state)->gnutls_key->client_p = NULL;
-	(*state)->gnutls_key->client_g = NULL;
-	(*state)->gnutls_key->dh_secret = NULL;
-
-	(*state)->gnutls_key->A = NULL;
-	(*state)->gnutls_key->a = NULL;	
-	(*state)->gnutls_key->x = NULL;
-	(*state)->gnutls_key->u = NULL;
-	(*state)->gnutls_key->B = NULL;
-	(*state)->gnutls_key->b = NULL;	
-
-	(*state)->gnutls_internals.certificate_requested = 0;
-	(*state)->gnutls_internals.certificate_verify_needed = 0;
-
-	(*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority=NULL;
-	(*state)->gnutls_internals.MACAlgorithmPriority.algorithms=0;
-
-	(*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority=NULL;
-	(*state)->gnutls_internals.KXAlgorithmPriority.algorithms=0;
-
-	(*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority=NULL;
-	(*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithms=0;
-
-	(*state)->gnutls_internals.CompressionMethodPriority.algorithm_priority=NULL;
-	(*state)->gnutls_internals.CompressionMethodPriority.algorithms=0;
-
-	/* Set default priorities */
-	gnutls_set_cipher_priority( (*state), GNUTLS_RIJNDAEL, GNUTLS_3DES, 0);
-	gnutls_set_compression_priority( (*state), GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( (*state), GNUTLS_KX_ANON_DH, 0);
-	gnutls_set_mac_priority( (*state), GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
-
-	(*state)->security_parameters.session_id_size = 0;
-	(*state)->gnutls_internals.resumed_security_parameters.session_id_size = 0;
 	(*state)->gnutls_internals.resumed = RESUME_FALSE;
-	
-	(*state)->gnutls_internals.expire_time = 3600; /* one hour default */
 
-	(*state)->security_parameters.timestamp = 0;
+	(*state)->gnutls_internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
-	/* gdbm db */
-	(*state)->gnutls_internals.db_name = NULL;
+	gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 
-	gnutls_set_lowat((*state), 1); /* the default for tcp */
+	/* everything else not initialized here is initialized
+	 * as NULL or 0. This is why calloc is used.
+	 */
 	
 	return 0;
 }
 
 #define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
 /* This function clears all buffers associated with the state. */
-int gnutls_deinit(GNUTLS_STATE * state)
+int gnutls_deinit(GNUTLS_STATE state)
 {
 	/* if the session has failed abnormally it has to be removed from the db */
-	if ( (*state)->gnutls_internals.resumable==RESUME_FALSE) {
-		_gnutls_db_remove_session( (*state), (*state)->security_parameters.session_id, (*state)->security_parameters.session_id_size);
+	if ( state->gnutls_internals.resumable==RESUME_FALSE) {
+		_gnutls_db_remove_session( state, state->security_parameters.session_id, state->security_parameters.session_id_size);
 	}
 
 	/* remove auth info firstly */
-	GNUTLS_FREE((*state)->gnutls_key->auth_info);
+	GNUTLS_FREE(state->gnutls_key->auth_info);
 
 #ifdef HAVE_LIBGDBM
 	/* close the database - resuming sessions */
-	if ( (*state)->gnutls_internals.db_reader != NULL)
-		gdbm_close((*state)->gnutls_internals.db_reader);
+	if ( state->gnutls_internals.db_reader != NULL)
+		gdbm_close(state->gnutls_internals.db_reader);
 #endif
 
-	GNUTLS_FREE((*state)->connection_state.read_compression_state);
-	GNUTLS_FREE((*state)->connection_state.read_mac_secret);
-	GNUTLS_FREE((*state)->connection_state.write_compression_state);
-	GNUTLS_FREE((*state)->connection_state.write_mac_secret);
+	GNUTLS_FREE(state->connection_state.read_compression_state);
+	GNUTLS_FREE(state->connection_state.read_mac_secret);
+	GNUTLS_FREE(state->connection_state.write_compression_state);
+	GNUTLS_FREE(state->connection_state.write_mac_secret);
 
-	GNUTLS_FREE((*state)->gnutls_internals.buffer);
-	GNUTLS_FREE((*state)->gnutls_internals.buffer_handshake);
+	GNUTLS_FREE(state->gnutls_internals.buffer);
+	GNUTLS_FREE(state->gnutls_internals.buffer_handshake);
 
-	gnutls_clear_creds( *state);
+	gnutls_clear_creds( state);
 
-	if ((*state)->connection_state.read_cipher_state != NULL)
-		gnutls_cipher_deinit((*state)->connection_state.read_cipher_state);
-	if ((*state)->connection_state.write_cipher_state != NULL)
-		gnutls_cipher_deinit((*state)->connection_state.write_cipher_state);
+	if (state->connection_state.read_cipher_state != NULL)
+		gnutls_cipher_deinit(state->connection_state.read_cipher_state);
+	if (state->connection_state.write_cipher_state != NULL)
+		gnutls_cipher_deinit(state->connection_state.write_cipher_state);
 
-	secure_free((*state)->cipher_specs.server_write_mac_secret);
-	secure_free((*state)->cipher_specs.client_write_mac_secret);
-	secure_free((*state)->cipher_specs.server_write_IV);
-	secure_free((*state)->cipher_specs.client_write_IV);
-	secure_free((*state)->cipher_specs.server_write_key);
-	secure_free((*state)->cipher_specs.client_write_key);
+	secure_free(state->cipher_specs.server_write_mac_secret);
+	secure_free(state->cipher_specs.client_write_mac_secret);
+	secure_free(state->cipher_specs.server_write_IV);
+	secure_free(state->cipher_specs.client_write_IV);
+	secure_free(state->cipher_specs.server_write_key);
+	secure_free(state->cipher_specs.client_write_key);
 
-	mpi_release((*state)->gnutls_key->KEY);
-	mpi_release((*state)->gnutls_key->client_Y);
-	mpi_release((*state)->gnutls_key->client_p);
-	mpi_release((*state)->gnutls_key->client_g);
+	mpi_release(state->gnutls_key->KEY);
+	mpi_release(state->gnutls_key->client_Y);
+	mpi_release(state->gnutls_key->client_p);
+	mpi_release(state->gnutls_key->client_g);
 
-	mpi_release((*state)->gnutls_key->u);
-	mpi_release((*state)->gnutls_key->a);
-	mpi_release((*state)->gnutls_key->x);
-	mpi_release((*state)->gnutls_key->A);
-	mpi_release((*state)->gnutls_key->B);
-	mpi_release((*state)->gnutls_key->b);
+	mpi_release(state->gnutls_key->u);
+	mpi_release(state->gnutls_key->a);
+	mpi_release(state->gnutls_key->x);
+	mpi_release(state->gnutls_key->A);
+	mpi_release(state->gnutls_key->B);
+	mpi_release(state->gnutls_key->b);
 
-	mpi_release((*state)->gnutls_key->dh_secret);
-	GNUTLS_FREE((*state)->gnutls_key);
+	mpi_release(state->gnutls_key->dh_secret);
+	GNUTLS_FREE(state->gnutls_key);
 
 
 	/* free priorities */
-	GNUTLS_FREE((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
-	GNUTLS_FREE((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
-	GNUTLS_FREE((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
-	GNUTLS_FREE((*state)->gnutls_internals.CompressionMethodPriority.algorithm_priority);
+	GNUTLS_FREE(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
+	GNUTLS_FREE(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
+	GNUTLS_FREE(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
+	GNUTLS_FREE(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);
 
-	GNUTLS_FREE((*state)->gnutls_internals.db_name);
+	GNUTLS_FREE(state->gnutls_internals.db_name);
 
-	GNUTLS_FREE(*state);
+	GNUTLS_FREE(state);
 	return 0;
 }
 
@@ -434,7 +375,6 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescri
 	memmove(&data[1], &desc, 1);
 
 	return gnutls_send_int(cd, state, GNUTLS_ALERT, data, 2, 0);
-
 }
 
 int gnutls_close(int cd, GNUTLS_STATE state)
@@ -495,7 +435,12 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 	headers[0]=type;
 	headers[1]=_gnutls_version_get_major(state->connection_state.version);
 	headers[2]=_gnutls_version_get_minor(state->connection_state.version);
-	
+
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Record: Sending Packet[%d] %s(%d) with length: %d\n",
+		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(type), type, sizeofdata);
+#endif
+
 	for (i = 0; i < iterations; i++) {
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
 		if (cipher_size <= 0) return cipher_size; /* error */
@@ -518,6 +463,11 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
+#ifdef HARD_DEBUG
+		fprintf(stderr, "Record: Sended Packet[%d] %s(%d) with length: %d\n",
+		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(type), type, cipher_size);
+#endif
+
 		state->connection_state.write_sequence_number++;
 	}
 		/* rest data */
@@ -540,6 +490,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
+
 		state->connection_state.write_sequence_number++;
 	}
 
@@ -688,7 +639,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 #endif
 	}
 	
-
 	if (type != GNUTLS_HANDSHAKE && gnutls_get_current_version(state) != version) {
 #ifdef DEBUG
 		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d) %d.%d\n", headers[0], headers[1], headers[2]);
@@ -732,6 +682,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;		
 	}
+	
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
@@ -742,6 +693,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
+
 /* Read the whole packet - again? */	
 	if ( type==GNUTLS_APPLICATION_DATA) {
 		/* get the data - but do not free the buffer in the kernel */
@@ -811,6 +763,14 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];
 
+			/* Increase sequence number 
+			 * this is needed only here because we return immediately
+			 */
+			state->connection_state.read_sequence_number++;
+
+			/* if close notify is received and
+			 * the alert is not fatal
+			 */
 			if (tmpdata[1] == GNUTLS_CLOSE_NOTIFY && tmpdata[0] != GNUTLS_FATAL) {
 
 				/* If we have been expecting for an alert do 
@@ -818,26 +778,45 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 				 */
 				if (type != GNUTLS_ALERT)
 					gnutls_close_nowait(cd, state);
-
+				
+				gnutls_free(tmpdata);
 				return GNUTLS_E_CLOSURE_ALERT_RECEIVED;
 			} else {
+			
+				/* if the alert is FATAL or WARNING
+				 * return the apropriate message
+				 */
+			
+				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
 				if (tmpdata[0] == GNUTLS_FATAL) {
 					state->gnutls_internals.valid_connection = VALID_FALSE;
 					state->gnutls_internals.resumable = RESUME_FALSE;
 					
-					return GNUTLS_E_FATAL_ALERT_RECEIVED;
+					ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
 				}
-				return GNUTLS_E_WARNING_ALERT_RECEIVED;
+
+				gnutls_free(tmpdata);
+				_gnutls_clear_peeked_data( cd, state);
+
+				return ret;
 			}
 			break;
 
 		case GNUTLS_CHANGE_CIPHER_SPEC:
 			/* this packet is now handled above */
 			gnutls_assert();
+			gnutls_free(tmpdata);
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
 			/* even if data is unexpected put it into the buffer */
 			gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen);
+			_gnutls_clear_peeked_data( cd, state);
+
+			break;
+		case GNUTLS_HANDSHAKE:
+			/* This is only legal if HELLO_REQUEST is received */
+			_gnutls_clear_peeked_data( cd, state);
+
 			break;
 		default:
 #ifdef DEBUG
@@ -847,7 +826,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			return GNUTLS_E_UNKNOWN_ERROR;
 		}
 	}
-
 
 
 	/* Increase sequence number */
@@ -866,12 +844,19 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		}
 		gnutls_free(tmpdata);
 	} else {
-		if (recv_type != GNUTLS_APPLICATION_DATA) {
-			gnutls_assert();
-			return GNUTLS_E_RECEIVED_BAD_MESSAGE;
-		} else {
-			ret = 0; /* ok */
-		}
+		if (recv_type == GNUTLS_HANDSHAKE) {
+			/* we may get a hello request */
+			ret = _gnutls_recv_hello_request( cd, state, tmpdata, tmplen);
+			if (ret < 0) gnutls_assert();
+		} else
+			if (recv_type != GNUTLS_APPLICATION_DATA) {
+				gnutls_assert();
+				ret = GNUTLS_E_RECEIVED_BAD_MESSAGE;
+			} else {
+				ret = 0; /* ok */
+			}
+		
+		gnutls_free(tmpdata);
 	}
 
 	return ret;
@@ -962,3 +947,6 @@ gnutls_check_version( const char *req_version )
     return NULL;
 }
 
+AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
+	return state->gnutls_internals.last_alert;
+}

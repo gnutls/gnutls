@@ -30,7 +30,7 @@
 #ifdef HAVE_LIBGDBM
 # define GNUTLS_DBF state->gnutls_internals.db_reader
 # define GNUTLS_DBNAME state->gnutls_internals.db_name
-# define REOPEN_DB() if (GNUTLS_DBF!=NULL) \
+# define GNUTLS_REOPEN_DB() if (GNUTLS_DBF!=NULL) \
 	gdbm_close( GNUTLS_DBF); \
 	GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
 #endif
@@ -57,15 +57,22 @@ GDBM_FILE dbf;
 	GNUTLS_DBNAME = strdup(filename);
 	if (GNUTLS_DBNAME==NULL) return GNUTLS_E_MEMORY_ERROR;
 
-	/* create if it does not exist 
-	 */
-	dbf = gdbm_open( filename, 0, GDBM_WRCREAT, 0600, NULL);
-	if (dbf==NULL) return GNUTLS_E_DB_ERROR;
-	gdbm_close(dbf);
 
 	/* open for reader */
 	GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
-	if (GNUTLS_DBF==NULL) return GNUTLS_E_DB_ERROR;
+	if (GNUTLS_DBF==NULL) {
+		/* maybe it does not exist - so try to
+		 * create it.
+		 */
+		dbf = gdbm_open( filename, 0, GDBM_WRCREAT, 0600, NULL);
+		if (dbf==NULL) return GNUTLS_E_DB_ERROR;
+		gdbm_close(dbf);
+
+		/* try to open again */
+		GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
+	}
+	if (GNUTLS_DBF==NULL)
+		return GNUTLS_E_DB_ERROR;
 
 	return 0;
 #else
@@ -84,6 +91,9 @@ int ret;
 datum key;
 time_t timestamp;
 
+	if (GNUTLS_DBF==NULL) return GNUTLS_E_DB_ERROR;
+	if (GNUTLS_DBNAME==NULL) return GNUTLS_E_DB_ERROR;
+	
 	dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
 	if (dbf==NULL) return GNUTLS_E_AGAIN;
 	key = gdbm_firstkey(dbf);
@@ -103,7 +113,7 @@ time_t timestamp;
 	ret = gdbm_reorganize(dbf);
 	
 	gdbm_close(dbf);
-	REOPEN_DB();
+	GNUTLS_REOPEN_DB();
 	
 	if (ret!=0) return GNUTLS_E_DB_ERROR;
 		
@@ -131,6 +141,9 @@ int ret = 0;
 	if (state->security_parameters.session_id==NULL || state->security_parameters.session_id_size==0)
 		return GNUTLS_E_INVALID_SESSION;
 
+	/* if we can't read why bother writing? */
+	if (GNUTLS_DBF==NULL)
+		return GNUTLS_E_DB_ERROR;
 
 /* allocate space for data */
 	content.dsize = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size;

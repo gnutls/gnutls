@@ -35,6 +35,12 @@
 #define MAX24 16777215
 #define MAX16 65535
 
+/* the default for TCP */
+#define DEFAULT_LOWAT 1
+
+/* expire time for resuming sessions */
+#define DEFAULT_EXPIRE_TIME 3600
+
 /* the maximum size of encrypted packets */
 #define MAX_ENC_LEN 16384
 #define HEADER_SIZE 5
