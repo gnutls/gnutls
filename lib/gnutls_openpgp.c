@@ -968,6 +968,25 @@ leave:
   return rc;
 }
 
+int
+gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert, int *r_bits)
+{
+  KBNODE kb_pk = NULL, pkt;
+  
+  if ( !cert || !r_bits )
+    return GNUTLS_E_INVALID_PARAMETERS;
+
+  if ( datum_to_kbnode( cert, &kb_pk ) )
+    return 0;
+  pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
+  if ( pkt )
+    *r_bits = cdk_pk_get_nbits( pkt->pkt->pkt.public_key );
+  cdk_kbnode_release( kb_pk );
+  
+  return 0;
+}
+  
+
 /**
  * gnutls_openpgp_extract_key_version - Extracts the version of the key.
  * @cert: the raw data that contains the OpenPGP public key.
@@ -1605,6 +1624,12 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert, int idx,
                                  gnutls_openpgp_name *dn )
 {
   return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
+}
+
+int
+gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert, int *r_bits)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 int

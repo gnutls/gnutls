@@ -20,6 +20,9 @@ int gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
                                      int idx,
                                      gnutls_openpgp_name *dn );
 
+int gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert,
+                                            int *r_bits);
+
 int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );
 
 time_t gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert );
