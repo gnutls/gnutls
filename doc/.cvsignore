@@ -1,5 +1,3 @@
 Makefile.in
 Makefile
 .cvsignore
-gnutls-api*
-gnutls.3

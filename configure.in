@@ -260,7 +260,7 @@ else
 fi
 
 AC_MSG_CHECKING([whether to disable extra PKI stuff])
-AC_ARG_ENABLE( extra-pki, [  --disable-extra-pki              only enable the required PKI stuff],
+AC_ARG_ENABLE( extra-pki, [  --disable-extra-pki              only enable the basic PKI stuff],
  ac_enable_pki=no
 )
 if test x$ac_enable_pki != xno; then

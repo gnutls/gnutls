@@ -45,7 +45,8 @@ void _gnutls_print_state(gnutls_session session)
 
 #endif
 
-const char* _gnutls_packet2str( int packet) {
+const char* _gnutls_packet2str( ContentType packet) 
+{
 	switch(packet) {
 		case GNUTLS_CHANGE_CIPHER_SPEC:
 			return "Change Cipher Spec";
@@ -61,7 +62,8 @@ const char* _gnutls_packet2str( int packet) {
 	}	
 }
 
-const char* _gnutls_handshake2str( int handshake) {
+const char* _gnutls_handshake2str( HandshakeType handshake) 
+{
 
 	switch(handshake) {
 		case GNUTLS_HELLO_REQUEST:
@@ -100,12 +102,12 @@ const char* _gnutls_handshake2str( int handshake) {
 	}	
 }
 
-void _gnutls_dump_mpi(char* prefix, GNUTLS_MPI a)
+void _gnutls_dump_mpi(const char* prefix, GNUTLS_MPI a)
 {
 	char buf[1024];
 	size_t n = sizeof buf;
 	
 	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, n, &n, a))
 		strcpy(buf, "[can't print value]"); /* Flawfinder: ignore */
-	_gnutls_hard_log( "GNUTLS_MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
+	_gnutls_hard_log( "MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
 }

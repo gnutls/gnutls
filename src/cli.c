@@ -198,7 +198,7 @@ static void gaa_parser(int argc, char **argv);
 
 /* Returns zero if the error code was successfully handled.
  */
-static int handle_error( socket_st * hd, int err) 
+static int handle_error( socket_st hd, int err) 
 {
 int alert, ret;
 const char* err_type;
@@ -216,7 +216,7 @@ const char* err_type;
 
 	 if (err == GNUTLS_E_WARNING_ALERT_RECEIVED
 	     || err == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-	    alert = gnutls_alert_get(hd->session);
+	    alert = gnutls_alert_get(hd.session);
 	    printf("*** Received alert [%d]: %s\n",
 		   alert, gnutls_alert_get_name(alert));
 	 }
@@ -291,7 +291,7 @@ int main(int argc, char **argv)
 
       ret = do_handshake(&hd);
 
-      if (ret < 0 && handle_error(&hd, ret) < 0) {
+      if (ret < 0 && handle_error(hd, ret) < 0) {
 	 fprintf(stderr, "*** Handshake has failed\n");
 	 gnutls_perror(ret);
 	 gnutls_deinit(hd.session);
@@ -359,7 +359,7 @@ int main(int argc, char **argv)
 	 if (ret == 0) {
 	    printf("- Peer has closed the GNUTLS connection\n");
 	    break;
-	 } else if (ret < 0 && user_term == 0 && handle_error(&hd, ret) < 0) {
+	 } else if (ret < 0 && user_term == 0 && handle_error(hd, ret) < 0) {
 	    fprintf(stderr,
 		    "*** Server has terminated the connection abnormally.\n");
 	    break;
@@ -381,7 +381,7 @@ int main(int argc, char **argv)
   	    if (hd.secure == 0) {
   	       fprintf(stderr, "*** Starting TLS handshake\n");
 	       ret = do_handshake(&hd);
-	       if (ret < 0 && handle_error(&hd, ret) < 0) {
+	       if (ret < 0 && handle_error(hd, ret) < 0) {
  		 fprintf(stderr, "*** Handshake has failed\n");
 		 socket_bye(&hd);
 		 user_term = 1;
@@ -405,7 +405,7 @@ int main(int argc, char **argv)
 	    if (quiet != 0)
 	       printf("- Sent: %d bytes\n", ret);
 	 } else
-	    handle_error(&hd, ret);
+	    handle_error(hd, ret);
 
       }
    }
