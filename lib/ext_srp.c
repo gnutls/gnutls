@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -63,6 +63,13 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
  */
 int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 	uint8 len;
+
+	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
+		/* algorithm was not allowed in this state
+		 */
+		return 0;
+	}
+
 	/* this function sends the client extension data (username) */
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		const GNUTLS_SRP_CLIENT_CREDENTIALS cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_CRD_SRP, NULL);
