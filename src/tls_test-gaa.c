@@ -118,6 +118,7 @@ void gaa_help(void)
 {
 	printf("GNU TLS debug client\nUsage: gnutls-cli-debug [options] hostname\n\n\n");
 	__gaa_helpsingle('p', "port", "integer ", "The port to connect to.");
+	__gaa_helpsingle('d', "debug", "integer ", "Enable debugging");
 	__gaa_helpsingle('v', "verbose", "", "More verbose output");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 
@@ -134,10 +135,12 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 12 "tls_test.gaa"
+#line 15 "tls_test.gaa"
 	char *rest_args;
-#line 6 "tls_test.gaa"
+#line 9 "tls_test.gaa"
 	int more_info;
+#line 6 "tls_test.gaa"
+	int debug;
 #line 3 "tls_test.gaa"
 	int pp;
 
@@ -194,10 +197,11 @@ int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           3
+#define GAA_NB_OPTION           4
 #define GAAOPTID_help	1
 #define GAAOPTID_verbose	2
-#define GAAOPTID_port	3
+#define GAAOPTID_debug	3
+#define GAAOPTID_port	4
 
 #line 168 "gaa.skel"
 
@@ -384,6 +388,12 @@ float gaa_getfloat(char *arg)
 }
 /* option structures */
 
+struct GAAOPTION_debug 
+{
+	int arg1;
+	int size1;
+};
+
 struct GAAOPTION_port 
 {
 	int arg1;
@@ -426,6 +436,7 @@ int gaa_get_option_num(char *str, int status)
     switch(status)
         {
         case GAA_LETTER_OPTION:
+			GAA_CHECK1STR("d", GAAOPTID_debug);
 			GAA_CHECK1STR("p", GAAOPTID_port);
         case GAA_MULTIPLE_OPTION:
 #line 375 "gaa.skel"
@@ -437,6 +448,7 @@ int gaa_get_option_num(char *str, int status)
         case GAA_WORD_OPTION:
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("verbose", GAAOPTID_verbose);
+			GAA_CHECKSTR("debug", GAAOPTID_debug);
 			GAA_CHECKSTR("port", GAAOPTID_port);
 
 #line 281 "gaa.skel"
@@ -450,6 +462,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 {
     int OK = 0;
     int gaa_last_non_option;
+	struct GAAOPTION_debug GAATMP_debug;
 	struct GAAOPTION_port GAATMP_port;
 
 #line 393 "gaa.skel"
@@ -473,15 +486,25 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 9 "tls_test.gaa"
+#line 12 "tls_test.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_verbose:
 	OK = 0;
-#line 7 "tls_test.gaa"
+#line 10 "tls_test.gaa"
 { gaaval->more_info = 1 ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_debug:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_debug.arg1, gaa_getint, GAATMP_debug.size1);
+		gaa_index++;
+#line 7 "tls_test.gaa"
+{ gaaval->debug = GAATMP_debug.arg1 ;};
 
 		return GAA_OK;
 		break;
@@ -499,7 +522,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAAREST_tmp.arg1, gaa_getstr, GAAREST_tmp.size1);
 		gaa_index++;
-#line 13 "tls_test.gaa"
+#line 16 "tls_test.gaa"
 { gaaval->rest_args = GAAREST_tmp.arg1; ;};
 
 		return GAA_OK;
@@ -528,7 +551,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 15 "tls_test.gaa"
+#line 18 "tls_test.gaa"
 { gaaval->rest_args=NULL; gaaval->pp = 443; gaaval->more_info = 0; ;};
 
     }

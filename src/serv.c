@@ -114,7 +114,7 @@ gnutls_srp_server_credentials srp_cred;
 gnutls_anon_server_credentials dh_cred;
 gnutls_certificate_credentials cert_cred;
 
-const int ssl_session_cache = 40;
+const int ssl_session_cache = 128;
 
 static void wrap_db_init(void);
 static void wrap_db_deinit(void);

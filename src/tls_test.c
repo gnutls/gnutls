@@ -53,6 +53,7 @@ char *hostname=NULL;
 int port;
 int record_max_size;
 int fingerprint;
+static int debug;
 
 gnutls_srp_client_credentials srp_cred;
 gnutls_anon_client_credentials anon_cred;
@@ -65,6 +66,11 @@ int more_info = 0;
 
 int tls1_ok = 0;
 int ssl3_ok = 0;
+
+static void tls_log_func( int level, const char* str)
+{
+	fprintf(stderr, "|<%d>| %s", level, str);
+}
 
 typedef int (*TEST_FUNC)( gnutls_session);
 
@@ -93,6 +99,8 @@ static const TLS_TEST tls_tests[] = {
 	{ "for certificate information", test_certificate, "", "", "" },
 	{ "for trusted CAs", test_server_cas, "", "", "" },
 	{ "whether the server understands TLS closure alerts", test_bye, "yes", "no", "partially"},
+	/* the fact that is after the closure alert test matter.
+	 */
 	{ "whether the server supports session resumption", test_session_resume2, "yes", "no", "dunno"},
 	{ "for export-grade ciphersuite support", test_export, "yes", "no", "dunno" },
 #ifdef ENABLE_ANON
@@ -149,6 +157,9 @@ int main(int argc, char **argv)
 		fprintf(stderr, "global state initialization error\n");
 		exit(1);
 	}
+
+	gnutls_global_set_log_function( tls_log_func);
+	gnutls_global_set_log_level(debug);
 
 	if (gnutls_global_init_extra() < 0) {
 		fprintf(stderr, "global state initialization error\n");
@@ -241,6 +252,8 @@ void gaa_parser(int argc, char **argv)
 	port = info.pp;
 	if (info.rest_args==NULL) hostname="localhost";
 	else hostname = info.rest_args;
+
+	debug = info.debug;
 
 	more_info = info.more_info;
 	

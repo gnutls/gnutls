@@ -589,7 +589,8 @@ int ret;
 }
 #endif
 
-int test_session_resume2( gnutls_session session) {
+int test_session_resume2( gnutls_session session) 
+{
 int ret;
 char tmp_session_id[32];
 int tmp_session_id_size;
@@ -602,6 +603,8 @@ int tmp_session_id_size;
 	ADD_ALL_PROTOCOLS(session);
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
 
 	gnutls_session_set_data(session, session_data, session_data_size);
@@ -611,11 +614,13 @@ int tmp_session_id_size;
 
 	ret = do_handshake( session);
 	if (ret == FAILED) return ret;
-	
+
 	/* check if we actually resumed the previous session */
 
 	session_id_size = sizeof(session_id);
 	gnutls_session_get_id(session, session_id, &session_id_size);
+
+	if (gnutls_session_is_resumed( session)) return SUCCEED;
 
 	if (memcmp(tmp_session_id, session_id, tmp_session_id_size) == 0)
 		return SUCCEED;
