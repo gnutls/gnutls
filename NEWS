@@ -10,7 +10,9 @@ Version 0.8.0
   the main gnutls library.
 - If liblzo is present in the system, then the included minilzo
   will not be used, and libgnutls-extra will depend on liblzo.
-- Added some information about the SRP patents in the documentation.
+- GNUTLS_E_PARSING_ERROR error code was replaced by GNUTLS_E_BASE64_DECODING_ERROR, 
+  and GNUTLS_E_SRP_PWD_PARSING_ERROR. GNUTLS_E_ASCII_ARMOR_ERROR was also 
+  replaced by GNUTLS_E_BASE64_DECODING_ERROR.
 
 Version 0.6.0 (8/12/2002)
 - Added "gnutls/compat4.h" header. This is included in gnutls.h
