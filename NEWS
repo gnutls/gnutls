@@ -1,7 +1,7 @@
-Version 0.5.5
+Version 0.5.5 (3/09/2002)
 - Updated the SRP implementation to the latest draft. The blowfish
   crypt implementation was removed, since the new draft does not allow
-  for other hash algorithms except for the srpsha. 
+  other hash algorithms except for the srpsha. 
 - Renamed all the constructed types in order to have more consistent
   names. 
 - Improved the certificate and key read functions. Now they can read 
