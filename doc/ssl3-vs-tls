@@ -1,0 +1,5 @@
+Differences in SSL 3.0:
+
+- HMAC function is different (concatenate ipad/opad instead of xor)
+- Does not HASH version numbers
+- Does use an other PRF function
