@@ -45,7 +45,7 @@ int uint64zero( uint64 *x) {
  * has been reached.
  */
 int uint64pp( uint64 *x) {
-register int i, y;
+register int i, y=0;
 
 	for (i=7;i>=0;i--) {
 		y = 0;
