@@ -4,22 +4,27 @@ This section contains examples of \tls{} and \ssl{} clients, using \gnutls{}.
 
 \subsection{Simple client example with X.509 certificate support}
 Let's assume now that we want to create a client which communicates
-with servers using the X509 authentication schema. The following client
+with servers using the X.509 authentication schema. The following client
 is a very simple \tls{} client, it does not support session resuming nor
 any other fancy features.
 \input{ex2}
 
 \subsection{Getting peer's information}
 \par The above example was the simplest form of a client, it didn't even check
-the result of the peer's certificate verification function (ie. if we have
-an authenticated connection). The following function does check the peer's X509
-Certificate, and prints some information about the current state.
+the result of the peer's certificate verification function. The lack of
+this check may result to an unauthenticated connection.
+The following function does check the peer's
+X.509 certificate, and prints some information about the current state.
 \par
 This function should be called after a successful
 \hyperref{gnutls\_handshake()}{gnutls\_handshake() (see Section }{)}{gnutls_handshake}
 
 \input{ex3}
 
+\subsection{Client with Resume capability example}
+\label{resume-example}
+This is the same client as above, but here we add support for session
+resumption.
 \input{ex1}
 
 \subsection{Simple client example with SRP authentication}
@@ -35,6 +40,6 @@ and authenticates using {\it username} and {\it password}.
 This section contains examples of \tls{} and \ssl{} servers, using \gnutls{}.
 
 \subsection{Echo Server with X.509 and SRP authentication}
-The following example is a server which supports both {\bf SRP} and {\bf X509} authentication.
+The following example is a server which supports both {\bf SRP} and {\bf X.509} authentication.
 This server also supports {\it session resuming}.
 \input{serv1}

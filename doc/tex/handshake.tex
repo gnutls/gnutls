@@ -36,25 +36,26 @@ The
  function, is expensive since a lot of calculations are performed. In order to support many fast connections to
 the same server a client may use session resuming. {\bf Session resuming} is a
 feature of the {\bf TLS} protocol which allows a client to connect to a server,
-after a successful handshake, without the expensive calculations (by using the previously
-established keys). \gnutls{} supports this feature, and the
-example \hyperref{resume client}{resume client (see Section }{)}{resume-example} illustrates a typical use of it (This is a modification of the simple client example).
+after a successful handshake, without the expensive calculations. This is
+achieved by using the previously
+established keys. \gnutls{} supports this feature, and the
+example \hyperref{resume client}{resume client (see Section }{)}{resume-example} illustrates a typical use of it.
 \par
 Servers only need to use the
 \hyperref{gnutls\_db\_set\_name()}{gnutls\_db\_set\_name() (see Section }{)}{gnutls_db_set_name} function if they want to use the gdbm
 backend to store sessions. 
 \par
-Keep in mind that sessions are expired after some time (for security reasons), thus
+Keep in mind that sessions are expired after some time, for security reasons, thus
 it may be normal for a server not to resume a session even if you requested that.
-Also note that you must enable (using the priority functions), at least the
+Also note that you must enable, using the priority functions, at least the
 algorithms used in the last session.
 
 \subsection{Resuming internals}
-The resuming capability (mostly in the server side) is one of the problems of a thread-safe TLS
+The resuming capability, mostly in the server side, is one of the problems of a thread-safe TLS
 implementations. The problem is that all threads must share information in
 order to be able to resume sessions. The gnutls approach is, in case of a
-client, to leave all the burden of resuming to the client (ie. copy and keep the
-nesessary parameters). See the functions:
+client, to leave all the burden of resuming to the client. Ie. copy and keep the
+nesessary parameters. See the functions:
 \begin{itemize}
 \item \hyperref{gnutls\_session\_get\_data()}
 {gnutls\_session\_get\_data() on section }{}{gnutls_session_get_data}

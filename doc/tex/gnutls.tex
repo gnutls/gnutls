@@ -1,6 +1,6 @@
 \documentclass{book}
 \usepackage{html}
-\usepackage{fancyheadings}
+\usepackage{fancyhdr}
 \usepackage{graphicx}
 
 \input{macros}
@@ -15,6 +15,10 @@
 \newpage
 \pagenumbering{arabic}
 \pagestyle{fancy}
+\fancyhead[RE]{\slshape \rightmark}
+\fancyhead[LO]{\slshape \leftmark}
+\fancyhead[RO,LE]{\empty}
+\fancyfoot[C]{\thepage}
 
 \chapter{The Library}
 \section{Introduction}

@@ -35,6 +35,10 @@
 
 #define _MAX(x,y) x>y?x:y
 
+/* This may need some rewrite. A lot of stuff which should be here
+ * are in the library, which is not good.
+ */
+
 int crypt_int(char *username, char *passwd, int crypt, int salt,
 	      char *tpasswd_conf, char *tpasswd, int uindex);
 static int read_conf_values(MPI * g, MPI * n, char *str, int str_size);
@@ -397,7 +401,7 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 
 
 /* this function parses tpasswd.conf file. Format is:
- * int(index):base64(n):int(g)
+ * int(index):base64(n):base64(g)
  */
 static int read_conf_values(MPI * g, MPI * n, char *str, int str_size)
 {

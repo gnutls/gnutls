@@ -6,9 +6,9 @@ of the form \\
 {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
 The usual cipher suites contain these parameters:
 \begin{itemize}
-\item The key exchange algorithm (DHE\_RSA in the example)
-\item The Symmetric encryption algorithm and mode (3DES\_CBC in this
-example)
+\item The key exchange algorithm ---DHE\_RSA in the example.
+\item The Symmetric encryption algorithm and mode ---3DES\_CBC in this
+example.
 \item The MAC\footnote{MAC stands for Message Authentication Code. It can
 be described as a keyed hash algorithm. See RFC2104.} algorithm used for authentication.
 MAC\_SHA is used in the above example.
@@ -16,10 +16,8 @@ MAC\_SHA is used in the above example.
 
 The ciphersuite negotiated in the handshake protocol, will affect 
 the Record Protocol, by enabling encryption and data authentication.
-Note that \tlsI{} does not always
-negotiate the strongest available cipher suite. There are cases where
-a man in the middle attacker could make the two entities negotiate
-the least secure method they support. For that reason do not enable
+Note that you should not overrely on \tls{} to negotiate the strongest 
+available cipher suite. Do not enable
 ciphers and algorithms that you consider weak.
 
 \addvspace{1.5cm}

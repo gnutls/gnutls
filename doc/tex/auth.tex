@@ -94,9 +94,10 @@ ANON\_DH & This algorithm exchanges Diffie Hellman parameters.
 
 \subsection{Authentication using SRP}
 Authentication using the SRP\footnote{SRP stands for Secure Password Protocol and 
-is described in RFC2945. The SRP key exchange is not a part of the \tlsI protocol}
+is described in RFC2945. The SRP key exchange is not a part of the \tlsI{} protocol}
 is actually password authentication, since the two peers are identified by the knowledge of a password. 
-This protocol also offers protection against off-line attacks (password file stealing etc). 
+This protocol also offers protection against off-line attacks, such as password 
+file stealing. 
 This is achieved since SRP does not use the plain password to perform authentication, but something called a 
 verifier. The verifier is $g^{x}mod(n)$ and $x$ is a value calculated
 from the username and the password. 
@@ -105,11 +106,11 @@ the value of $x$. In \gnutls{} in addition to original SHA hash function,
 a hash function based on blowfish crypt is also supported. The blowfish
 crypt function has the property of variable complexity, thus the
 verifier may resist future attacks based on computational power, by just increasing
-the complexity of the function (sometimes called 'the cost').
+the complexity of the function ---also called ``the cost''.
 \par The advantage of SRP authentication, over other proposed secure password 
 authentication schemas, is that SRP does not require the server to hold
 the user's password. This kind of protection is similar to the one used traditionaly
-in the \emph{UNIX} 'passwd' file, where the contents of this file did not cause
+in the \emph{UNIX} ``passwd'' file, where the contents of this file did not cause
 harm to the system security if they were revealed.
 \par
 Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp}.
@@ -127,3 +128,42 @@ SRP & Authentication using the SRP protocol.
 \label{fig:srp}
 
 \end{figure}
+
+\subsubsection{The included ``srpcrypt'' program}
+The ``gnutls-srpcrypt'' is a very simple program that emulates the programs in the libsrp 
+found in \htmladdnormallink{http://srp.stanford.edu}{http://srp.stanford.edu}.
+It is intended for use in places where you don't expect srp
+authentication to be the performed to system users.
+
+Traditionaly libsrp used two files. One called 'tpasswd' which holds usernames 
+and verifiers, and 'tpasswd.conf' which holds generators and primes.
+\par
+How to use srpcrypt:
+
+\begin{itemize}
+
+
+\item To create tpasswd.conf which holds the g and n values for
+SRP protocol (generator and a large prime), run:
+\begin{verbatim}
+$ gnutls-srpcrypt --create_conf /etc/tpasswd.conf
+\end{verbatim}
+
+
+\item This command will create /etc/tpasswd and will add user 'test' (you will also
+be prompted for a password). Verifiers are stored by default in the
+way libsrp expects (using a modified SHA()). However using this tool you 
+may also specify blowfish srpcrypt instead of SHA (see --crypt parameter).
+\begin{verbatim}
+$ gnutls-srpcrypt --passwd /etc/tpasswd \ 
+    --passwd_conf /etc/tpasswd.conf -u test
+\end{verbatim}
+
+\item This command will check against a password. If the password matches 
+the one in /etc/tpasswd you will get an ok.
+\begin{verbatim}
+$ gnutls-srpcrypt --passwd /etc/tpasswd \ 
+    --passwd_conf /etc/tpasswd.conf --verify -u test
+\end{verbatim}
+
+\end{itemize}

@@ -160,16 +160,15 @@ int main()
    }
    if (gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, 
       GNUTLS_X509_FMT_PEM) < 0) {
-      fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
+      fprintf(stderr, "X509 PARSE ERROR\nDo you have ca.pem?\n");
       exit(1);
    }
    if (gnutls_certificate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE, 
       GNUTLS_X509_FMT_PEM) < 0) {
-      fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
+      fprintf(stderr, "X509 PARSE ERROR\nDo you have key.pem and cert.pem?\n");
       exit(1);
    }
-   /* SRP_PASSWD a password file (created with the included crypt utility) 
-    * Read README.crypt prior to using SRP.
+   /* SRP_PASSWD a password file (created with the included srpcrypt utility) 
     */
    gnutls_srp_allocate_server_sc(&srp_cred);
    gnutls_srp_set_server_cred_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
