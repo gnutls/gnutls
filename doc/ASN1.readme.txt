@@ -7,6 +7,9 @@
 --                fiorinaf@bgonline.it        --
 ------------------------------------------------
 
+** Most of the documentation here has been moved to inline comments and
+** the tex documentation --nmav
+
 
 
 INTRODUCTION

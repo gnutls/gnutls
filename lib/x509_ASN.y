@@ -447,14 +447,25 @@ yylex()
 }
 
 
-/*************************************************************/
-/*  Function: parser_asn1                                    */
-/*  Description: function used to start the parse algorithm. */
-/*  Parameters:                                              */
-/*    char *file_name : file name to parse                   */
-/*  Return: int                                              */
-/*                                                           */
-/*************************************************************/
+/**
+  * asn1_parser_asn1 - function used to start the parse algorithm.
+  * @file_name: file name to parse
+  * @pointer: return the pointer to the structure
+  *
+  * Creates the structures needed to manage the definitions included in *FILE_NAME file.
+  *
+  * Input Parameter: 
+  *   char *file_name: specify the path and the name of file that contains ASN.1 declarations.
+  * Output Parameter:
+  *   node_asn **pointer : return the pointer to the structure created from 
+  *   "file_name" ASN.1 declarations.  
+  *
+  * Return Value:
+  * ASN_OK: the file has a correct syntax and every identifier is known. 
+  * ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
+  * ASN_SYNTAX_ERROR: the syntax is not correct.
+  * ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
+  **/
 int 
 asn1_parser_asn1(char *file_name,node_asn **pointer)
 {
@@ -491,17 +502,23 @@ asn1_parser_asn1(char *file_name,node_asn **pointer)
   return result_parse;
 }
 
-
-
-/*************************************************************/
-/*  Function: parser_asn1_file_c                             */
-/*  Description: function that generates a C structure from  */
-/*               an ASN1 file                                */
-/*  Parameters:                                              */
-/*    char *file_name : file name to parse                   */
-/*  Return: int                                              */
-/*                                                           */
-/*************************************************************/
+/**
+  * asn1_parser_asn1_file_c - function that generates a C structure from an ASN1 file
+  * @file_name : file name to parse
+  *
+  * Creates a file containing a C vector to use to manage the definitions included in
+  * *FILE_NAME file. If *FILE_NAME is "/aa/bb/xx.yy" the file created is "/aa/bb/xx_asn1_tab.c",
+  * and the vector is "xx_asn1_tab".
+  *
+  * Input Parameter: 
+  *  char *file_name: specify the path and the name of file that contains ASN.1 declarations.
+  *
+  * Return Value:
+  *  ASN_OK: the file has a correct syntax and every identifier is known. 
+  *  ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
+  *  ASN_SYNTAX_ERROR: the syntax is not correct.
+  *  ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
+  **/
 int 
 asn1_parser_asn1_file_c(char *file_name)
 {

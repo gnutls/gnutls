@@ -30,14 +30,16 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	auth_anon.c auth_dhe_dss.c gnutls_extensions.c ext_srp.c gnutls_auth.c \
 	crypt_bcrypt.c crypt.c gnutls_random.c crypt_srpsha1.c gnutls_srp.c \
 	auth_srp.c auth_srp_passwd.c gnutls_v2_compat.c auth_srp_sb64.c \
-	x509_ASN.y x509_asn1.c x509_der.c gnutls_datum.c auth_rsa.c \
+	 gnutls_datum.c auth_rsa.c \
 	gnutls_gcry.c ext_dnsname.c gnutls_pk.c gnutls_cert.c x509_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
 	x509_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c gnutls_mem.c \
 	x509_extensions.c auth_x509.c gnutls_ui.c gnutls_sig.c auth_dhe_rsa.c \
 	gnutls_dh_primes.c ext_max_record.c
+# Separate so we can create the documentation
+COBJECTS2 = x509_ASN.y x509_asn1.c x509_der.c
 
-libgnutls_la_SOURCES = $(COBJECTS)
+libgnutls_la_SOURCES = $(COBJECTS) $(COBJECTS2) 
 
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
@@ -55,4 +57,12 @@ gnutls-api.tex: $(COBJECTS)
 	&& echo "ok"; \
 	done
 
-all-local: gnutls-api.tex
+asn1-api.tex: $(COBJECTS2)
+	@echo "\\newpage" > asn1-api.tex
+	@echo "\\section{Function Reference}" >> asn1-api.tex
+	@for i in $(COBJECTS2); \
+	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> asn1-api.tex \
+	&& echo "ok"; \
+	done
+
+all-local: gnutls-api.tex asn1-api.tex

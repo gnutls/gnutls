@@ -4,10 +4,11 @@ EXTRA_DIST = gnutls.tex gnutls.ps gnutls.html  \
 	cover.tex.in
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
-	macros.tex cover.tex ciphersuites.tex resumedb.tex translayer.tex
+	macros.tex cover.tex ciphersuites.tex resumedb.tex translayer.tex asn1.tex ../../lib/asn1-api.tex
 
 gnutls.ps: $(TEX_OBJECTS)
 	-$(LN_S) ../../lib/gnutls-api.tex .
+	-$(LN_S) ../../lib/asn1-api.tex .
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps
 
 gnutls.html: $(TEX_OBJECTS)
