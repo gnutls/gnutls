@@ -33,6 +33,7 @@
 #include <debug.h>
 #include <gnutls_buffers.h>
 #include <gnutls_sig.h>
+#include <gnutls_kx.h>
 
 static
 int _gnutls_tls_sign( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature);

@@ -129,6 +129,23 @@ int gnutls_pem_base64_decode_alloc(const char *header,
 #define GNUTLS_KEY_ENCIPHER_ONLY                1
 #define GNUTLS_KEY_DECIPHER_ONLY                32768
 
+typedef struct gnutls_params_st {
+	gnutls_params_type type;
+	union params {
+		gnutls_dh_params dh;
+		gnutls_rsa_params rsa_export;
+	} params;
+} gnutls_params_st;
+
+typedef int gnutls_params_function(gnutls_session, gnutls_params_type,
+	gnutls_params_st*);
+
+void gnutls_certificate_set_params_function(gnutls_certificate_credentials res, 
+	gnutls_params_function* func);
+void gnutls_anon_set_params_function(gnutls_certificate_credentials res, 
+	gnutls_params_function* func);
+
+
 
 # endif				/* LIBGNUTLS_VERSION */
 

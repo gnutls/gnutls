@@ -156,8 +156,8 @@ static void listener_free(listener_item * j)
  * otherwise we should add them here.
  */
 
-gnutls_dh_params dh_params;
-gnutls_rsa_params rsa_params;
+gnutls_dh_params dh_params = NULL;
+gnutls_rsa_params rsa_params = NULL;
 
 static int generate_dh_primes(void)
 {
@@ -223,6 +223,21 @@ static void read_dh_params(void)
    printf("Read Diffie Hellman parameters.\n");
    fflush(stdout);
    
+}
+
+static int get_params( gnutls_session session, gnutls_params_type type,
+	gnutls_params_st *st)
+{
+	
+	if (type == GNUTLS_PARAMS_RSA_EXPORT)
+		st->params.rsa_export = rsa_params;
+	else if (type == GNUTLS_PARAMS_DH)
+		st->params.dh = dh_params;
+	else return -1;
+
+	st->type = type;
+
+	return 0;
 }
 
 static int generate_rsa_params(void)
@@ -666,8 +681,10 @@ int main(int argc, char **argv)
       }
 
    if (generate != 0 || read_dh_params != NULL) {
-      gnutls_certificate_set_dh_params(cert_cred, dh_params);
-      gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
+      gnutls_certificate_set_params_function( cert_cred, get_params);
+/*     gnutls_certificate_set_dh_params(cert_cred, dh_params);
+ *     gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
+ */
    }
 
    /* this is a password file (created with the included srpcrypt utility) 
@@ -691,7 +708,9 @@ int main(int argc, char **argv)
 #ifdef ENABLE_ANON
    gnutls_anon_allocate_server_credentials(&dh_cred);
    if (generate != 0)
-      gnutls_anon_set_server_dh_params(dh_cred, dh_params);
+      gnutls_anon_set_params_function( dh_cred, get_params);
+
+/*      gnutls_anon_set_server_dh_params(dh_cred, dh_params); */
 #endif
 
    h = listen_socket(name, port);

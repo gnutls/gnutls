@@ -2359,8 +2359,8 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		    _gnutls_get_cred(session->key, cred_type, NULL);
 	
 		if (x509_cred != NULL) {
-			dh_params = x509_cred->dh_params;
-			rsa_params = x509_cred->rsa_params;
+			dh_params = _gnutls_certificate_get_dh_params(x509_cred, session);
+			rsa_params = _gnutls_certificate_get_rsa_params(x509_cred, session);
 		}
 
 		/* Check also if the certificate supports the
@@ -2382,7 +2382,7 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		    _gnutls_get_cred(session->key, cred_type, NULL);
 	
 		if (anon_cred != NULL) {
-			dh_params = anon_cred->dh_params;
+			dh_params = _gnutls_anon_get_dh_params(anon_cred, session);
 		}
 	} else return 0; /* no need for params */
 

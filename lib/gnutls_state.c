@@ -122,7 +122,8 @@ uint i;
  * structure within the session, which depend on the current handshake.
  * This is used to allow further handshakes.
  */
-void _gnutls_handshake_internal_state_clear( gnutls_session session) {
+void _gnutls_handshake_internal_state_clear( gnutls_session session) 
+{
 	session->internals.extensions_sent_size = 0;
 
 	/* by default no selected certificate */
@@ -145,6 +146,10 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 	session->internals.handshake_restarted = 0;
 
 	session->internals.resumable = RESUME_TRUE;
+	
+	session->internals.anon_dh_params = NULL;
+	session->internals.cert_dh_params = NULL;
+	session->internals.rsa_params = NULL;
 
 }
 

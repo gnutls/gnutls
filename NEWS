@@ -1,3 +1,8 @@
+Version 1.1.7
+- Added gnutls_certificate_set_params_function() and 
+  gnutls_anon_set_params_function() that set the RSA or DH
+  parameters using a callback.
+
 Version 1.1.6 (24/02/2004)
 - Several bug fixes, by Arne Thomassen.
 - Fixed a bug where 'server name' extension was always sent.

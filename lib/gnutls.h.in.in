@@ -70,6 +70,10 @@ typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS,
 	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS
 } gnutls_kx_algorithm;
 
+typedef enum gnutls_params_type { GNUTLS_PARAMS_RSA_EXPORT=1,
+	GNUTLS_PARAMS_DH 
+} gnutls_params_type;
+
 typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type;
 
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, 
