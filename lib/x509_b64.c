@@ -291,7 +291,10 @@ int size;
   *
   * This function will convert the given data to printable data, using the base64 
   * encoding. This is the encoding used in PEM messages. This function will
-  * allocate (using malloc) the required memory to hold the encoded data.
+  * allocate the required memory to hold the encoded data.
+  *
+  * You should use the function returned by gnutls_global_get_free_function() to
+  * free the returned data.
   * 
   **/
 int gnutls_pem_base64_encode_alloc( const char* msg, const gnutls_datum *data, 
@@ -308,18 +311,8 @@ int size, res;
 		gnutls_free(ret);
 		return GNUTLS_E_INVALID_REQUEST;
 	} else {
-		if (gnutls_malloc==malloc) {
-		   result->data = ret;
-		   result->size = size;
-		} else {
-		   res = _gnutls_set_datum_m( result, ret, size, malloc);
-		   gnutls_free(ret);
-		
-		   if (res < 0) {
-		   	gnutls_assert();
-		   	return res;
-		   }
-		}
+		result->data = ret;
+	        result->size = size;
 	}
 
 	return 0;
@@ -508,10 +501,13 @@ int size;
   * @result: the place where decoded data lie
   *
   * This function will decode the given encoded data. The decoded data
-  * will be allocated, using malloc, and stored into result.
+  * will be allocated, and stored into result.
   * If the header given is non null this function will search for 
   * "-----BEGIN header" and decode only this part. Otherwise it will decode the 
   * first PEM packet found.
+  *
+  * You should use the function returned by gnutls_global_get_free_function() to
+  * free the returned data.
   *
   * Note that b64_data should be null terminated.
   * 
@@ -530,18 +526,8 @@ int size, res;
 		gnutls_free(ret);
 		return GNUTLS_E_INVALID_REQUEST;
 	} else {
-		if (gnutls_malloc==malloc) {
-			result->data = ret;
-			result->size = size;
-		} else {
-			res = _gnutls_set_datum_m( result, ret, size, malloc);
-			gnutls_free( ret);
-			
-			if (res < 0) {
-				gnutls_assert();
-				return res;
-			}
-		}
+		result->data = ret;
+		result->size = size;
 	}
 
 	return 0;

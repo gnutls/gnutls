@@ -18,6 +18,10 @@ Version 0.5.12
    gnutls_get_malloc_function()
    gnutls_get_free_function()
   to be used in callbacks.
+- Changed the semantics of gnutls_pem_base64_encode_alloc()
+  and gnutls_pem_base64_decode_alloc(). In the default case
+  were the gnutls library is used with malloc/realloc/free,
+  these are binary compatible.
 
 Version 0.5.11 (5/11/2002)
 - Some fixes in 'gnutls-cli' client program to prevent some segmentation 
