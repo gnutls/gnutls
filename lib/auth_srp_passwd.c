@@ -31,37 +31,97 @@
 #include "gnutls_random.h"
 #include "debug.h"
 
+/* this function parses tpasswd.conf file. Format is:
+ * string(username):base64(v):base64(salt):int(index)
+ */
 static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
 char * p;
 int len;
 opaque *verifier;
 int verifier_size;
+int index;
+
+	entry->algorithm = SRPSHA1_CRYPT;
+	
+	p = rindex( str, ':'); /* we have index */
+	if (p==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+	
+	*p='\0';
+	p++;
+
+	len = strlen(p);
+	index = atoi(p);
+	if (index==0) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+	
+	/* now go for salt */
+	p = rindex( str, ':'); /* we have salt */
+	if (p==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+	
+	*p='\0';
+	p++;
+	
+	len = strlen(p);
+	entry->salt_size = _gnutls_sbase64_decode( p, len, &entry->salt);
+
+	if (entry->salt_size <= 0) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	/* now go for verifier */
+	p = rindex( str, ':'); /* we have verifier */
+	if (p==NULL) {
+		gnutls_free(entry->salt);
+		return GNUTLS_E_PARSING_ERROR;
+	}
+	
+	*p='\0';
+	p++;
+	
+	len = strlen(p);
+	verifier_size = _gnutls_sbase64_decode( p, len, &verifier);
+	if (verifier_size <= 0) {
+		gnutls_assert();
+		gnutls_free(entry->salt);
+		return GNUTLS_E_PARSING_ERROR;
+	}
+
+	if (gcry_mpi_scan(&entry->v, GCRYMPI_FMT_USG, verifier, &verifier_size)) {
+		gnutls_assert();
+		gnutls_free(entry->salt);
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+
+	/* now go for username */
+	*p='\0';
+
+	entry->username = strdup(str);
+
+	return index;
+}
+
+
+/* this function parses tpasswd.conf file. Format is:
+ * int(index):base64(n):int(g)
+ */
+static int pwd_put_values2( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
+char * p;
+int len;
 opaque * tmp;
 int tmp_size;
 
-	p = rindex( str, '$'); /* we have n */
-	if (p==NULL) return -1;
-	
-	*p='\0';
-	p++;
-	
-	len = strlen(p);
-	tmp_size = _gnutls_base64_decode( p, len, &tmp);
-	if (tmp_size < 0) {
-		gnutls_free(tmp);
-		return GNUTLS_E_PARSING_ERROR;
-	}
-	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
-		gnutls_assert();
-		gnutls_free(tmp);
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-	gnutls_free(tmp);
-
-	/* now go for g */
-	p = rindex( str, '$'); /* we have g */
+	p = rindex( str, ':'); /* we have g */
 	if (p==NULL) {
-		mpi_release(entry->n);
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
@@ -69,29 +129,29 @@ int tmp_size;
 	*p='\0';
 	p++;
 	
+	/* read the generator */
 	len = strlen(p);
-	tmp_size = _gnutls_base64_decode( p, len, &tmp);
+	tmp_size = _gnutls_sbase64_decode( p, len, &tmp);
 
 	if (tmp_size < 0) {
 		gnutls_assert();
-		mpi_release(entry->n);
 		gnutls_free(tmp);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	if (gcry_mpi_scan(&entry->g, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
 		gnutls_assert();
 		gnutls_free(tmp);
-		mpi_release(entry->n);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	gnutls_free(tmp);
 
-	/* now go for verifier */
-	p = rindex( str, '$'); /* we have verifier */
+
+	/* now go for n - modulo */
+	p = rindex( str, ':'); /* we have n */
 	if (p==NULL) {
-		mpi_release(entry->n);
 		mpi_release(entry->g);
+		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	
@@ -99,73 +159,62 @@ int tmp_size;
 	p++;
 	
 	len = strlen(p);
-	verifier_size = _gnutls_base64_decode( p, len, &verifier);
-	if (verifier_size < 0) {
+	tmp_size = _gnutls_sbase64_decode( p, len, &tmp);
+
+	if (tmp_size < 0) {
 		gnutls_assert();
-		mpi_release(entry->n);
 		mpi_release(entry->g);
+		gnutls_free(tmp);
 		return GNUTLS_E_PARSING_ERROR;
 	}
-
-	if (gcry_mpi_scan(&entry->v, GCRYMPI_FMT_USG, verifier, &verifier_size)) {
+	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
 		gnutls_assert();
-		mpi_release(entry->n);
+		gnutls_free(tmp);
 		mpi_release(entry->g);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-
-	/* now go for salt */
-	p = rindex( str, '$'); /* we have salt */
-	if (p==NULL) {
-		mpi_release(entry->n);
-		mpi_release(entry->g);
-		mpi_release(entry->v);
-		return -1;
-	}
-	
-	*p='\0';
-	p++;
-
-	len = strlen(p);
-	entry->salt_size = _gnutls_base64_decode( p, len, &entry->salt);
-	if (entry->salt_size < 0) {
-		gnutls_assert();
-		mpi_release(entry->n);
-		mpi_release(entry->v);
-		mpi_release(entry->g);
-	}
-
-	/* now go for algorithm */
-	p = rindex( str, '$'); /* we have algorithm */
-	if (p==NULL) {
-		mpi_release(entry->n);
-		mpi_release(entry->g);
-		mpi_release(entry->v);
-		gnutls_free(entry->salt);
-		return -1;
-	}
-	
-	*p='\0';
-	p++;
-
-	entry->algorithm = atoi(p);
-
-	/* now go for username */
-	p = index( str, ':'); /* we have algorithm */
-	if (p==NULL) {
-		mpi_release(entry->n);
-		mpi_release(entry->g);
-		mpi_release(entry->v);
-		gnutls_free(entry->salt);
-		return GNUTLS_E_PARSING_ERROR;
-	}
-	*p='\0';
-
-	entry->username = strdup(p);
+	gnutls_free(tmp);
 
 	return 0;
 }
+
+
+/* this function opens the tpasswd.conf file
+ */
+static int pwd_read_conf( SRP_SERVER_CREDENTIALS* cred, GNUTLS_SRP_PWD_ENTRY* entry, int index) {
+	FILE * fd;
+	char line[5*1024];
+	int i;
+	char indexstr[10];
+
+	sprintf( indexstr, "%d", index);
+
+	fd = fopen( cred->password_conf_file, "r");
+	if (fd==NULL) {
+		gnutls_assert();
+		gnutls_free(entry);
+		return GNUTLS_E_PWD_ERROR;
+	}
+
+	while( fgets( line, sizeof(line), fd) != NULL) {
+    /* move to first ':' */
+	    i=0;
+	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
+	            i++;
+	    }
+	    if (strncmp( indexstr, line, i) == 0) {
+			if ((index = pwd_put_values2( entry, line, strlen(line))) >= 0)
+				return 0;
+			else {
+				return GNUTLS_E_PWD_ERROR;
+			}
+	    }
+    }
+    return GNUTLS_E_PWD_ERROR;
+	
+}
+
 
 GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username) {
 	SRP_SERVER_CREDENTIALS* cred;
@@ -173,6 +222,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	char line[5*1024];
 	int i;
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
+	int index;
 
 	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_SRP, NULL);
 	if (cred==NULL) {
@@ -195,8 +245,13 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	            i++;
 	    }
 	    if (strncmp( username, line, i) == 0) {
-			if (pwd_put_values( entry, line, strlen(line))==0)
-				return entry;
+			if ((index = pwd_put_values( entry, line, strlen(line))) >= 0)
+				if (pwd_read_conf( cred, entry, index)==0) {
+					return entry;
+				} else {
+					gnutls_free(entry);
+					return NULL;
+				}
 			else {
 				gnutls_free(entry);
 				return NULL;

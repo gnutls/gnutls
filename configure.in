@@ -109,13 +109,14 @@ if test $ac_cv_prog_gcc != no; then
 
 	if test $opt_profiler_mode = yes; then
 	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -ftest-coverage -pg"
-	else
-	  CFLAGS="${CFLAGS} -O2 -ffast-math"
 	fi
-		
+
 	if test $opt_maintainer_mode = yes; then
-	  CFLAGS="${CFLAGS} -ggdb3 -Wall -Wpointer-arith"
+	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith"
+	else
+	  CFLAGS="${CFLAGS} -O2"
 	fi
+
 	if test $opt_dmalloc_mode = yes; then
 	  AC_CHECK_LIB( dmalloc, main)
 	  AC_DEFINE(USE_DMALLOC)

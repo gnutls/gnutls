@@ -30,10 +30,10 @@ void _gnutls_dump_mpi(char* prefix, MPI a)
 {
 	char buf[400];
 	size_t n = sizeof buf;
-
+	
 	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, &n, a))
 		strcpy(buf, "[can't print value]");
-	fprintf(stderr, "MPI: %s%s\n", prefix, buf);
+	fprintf(stderr, "MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
 }
 
 

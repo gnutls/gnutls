@@ -15,5 +15,5 @@ libgnutls_la_SOURCES = gnutls.c gnutls_compress.c debug.c gnutls_plaintext.c \
 	gnutls_compress_int.c gnutls_session.c gnutls_db.c cert_b64.c \
 	auth_anon.c auth_dhe_dss.c gnutls_extensions.c ext_srp.c gnutls_auth.c \
 	crypt_bcrypt.c crypt.c gnutls_random.c crypt_srpsha1.c gnutls_srp.c \
-	auth_srp.c auth_srp_passwd.c gnutls_v2_compat.c
+	auth_srp.c auth_srp_passwd.c gnutls_v2_compat.c cert_sb64.c
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)

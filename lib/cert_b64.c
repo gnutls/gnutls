@@ -20,7 +20,6 @@
 
 #include "defines.h"
 #include "gnutls_int.h"
-#define gnutls_free free
 
 const static uint8 b64table[64] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

@@ -331,7 +331,7 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	}
 
 	gnutls_free(hd);
-	
+
 	return 0;
 }
 

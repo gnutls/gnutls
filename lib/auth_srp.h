@@ -8,4 +8,5 @@ typedef struct {
 
 typedef struct {
 	char* password_file;
+	char* password_conf_file;
 } SRP_SERVER_CREDENTIALS;

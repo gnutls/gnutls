@@ -63,13 +63,13 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, opaque** ret_g, 
 	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
 			  diffie_hellman_group1_prime, &n)) {
 		gnutls_assert();
-		return -1;
+		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 	if (gcry_mpi_scan(&x, GCRYMPI_FMT_USG,
 			  text, &textsize)) {
 		gnutls_assert();
 		gcry_mpi_release(prime);
-		return -1;
+		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	g = gcry_mpi_set_ui(NULL, SRP_G);
@@ -80,6 +80,7 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, opaque** ret_g, 
 	gcry_mpi_powm(e, g, x, prime);
 	gcry_mpi_release(x);
 
+	
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
 	if (result!=NULL) {
 		*result = gnutls_malloc(result_size);
@@ -227,22 +228,20 @@ int bits;
  */
 void* _gnutls_calc_srp_sha( char* username, char* password, opaque* salt, int salt_size) {
 GNUTLS_MAC_HANDLE td;
-opaque* hd;
+opaque* res;
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(td, username, strlen(username));
 	gnutls_hash(td, ":", 1);
 	gnutls_hash(td, password, strlen(password));
-	hd = gnutls_hash_deinit(td);
+	res = gnutls_hash_deinit(td);
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(td, salt, salt_size);
-	gnutls_hash(td, hd, 20);
-	gnutls_free(hd);
+	gnutls_hash(td, res, 20); /* 20 bytes is the output of sha1 */
+	gnutls_free(res);
 
-	hd = gnutls_hash_deinit(td);
-
-	return hd;	
+	return gnutls_hash_deinit(td);
 }
 
 void* _gnutls_calc_srp_x( char* username, char* password, opaque* salt, int salt_size, uint8 crypt_algo) {
@@ -269,6 +268,7 @@ MPI S, tmp1, tmp2, tmp4;
 	tmp2 = gcry_mpi_alloc_like(n);
 
 	gcry_mpi_powm(tmp1, g, x, n);
+
 	gcry_mpi_subm(tmp2, B, tmp1, n);
 
 	tmp4 = gcry_mpi_alloc_like(n);
