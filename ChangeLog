@@ -1,3 +1,23 @@
+2004-10-29 12:15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, lib/Makefile.am:
+
+	Replace GNU LD version script with Libtool -export-symbols-regex, 
+	tiny patch from Joe Orton <joe@manyfish.co.uk>.  
+
+2004-10-29 12:08  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO:
+
+	Add.  
+
+2004-10-29 12:04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.in, lib/Makefile.am, lib/libgnutls.vers:
+
+	Replace GNU LD version script with Libtool -export-symbols-regex, 
+	tiny patch from Joe Orton <joe@manyfish.co.uk>.  
+
 2004-10-28 21:38  Simon Josefsson <simon@josefsson.org>
 
 	* THANKS, THANKS:
