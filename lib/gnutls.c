@@ -161,8 +161,9 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 	} while (i < total_bytes);
 
 	/* calculate A(0) */
-	A = _gnutls_cal_PRF_A(algorithm, secret, secret_size, seed, seed_size);
-	A_size = blocksize;
+	A = gnutls_malloc(seed_size);
+	memmove( A, seed, seed_size);
+	A_size = seed_size;
 
 	times = i / blocksize;
 	for (i = 0; i < times; i++) {
@@ -170,6 +171,7 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 
 		/* here we calculate A(i+1) */
 		Atmp = _gnutls_cal_PRF_A(algorithm, secret, secret_size, A, A_size);
+		A_size = blocksize;
 		gnutls_free(A);
 		A = Atmp;
 
@@ -195,15 +197,12 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 
 /* The PRF function expands a given secret 
  * needed by the TLS specification
- * Nov 8 2000: This seems to be BROKEN! We do not return the same values
- * as openssl is... #^$@#$% the protocol which didn't use test vectors!
  */
 svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
 {
-	int l_s1, l_s2, i, s_seed_size;
+	int l_s, i, s_seed_size;
 	char *o1, *o2;
 	char *s1, *s2;
-	char *ret;
 	char *s_seed;
 
 	/* label+seed = s_seed */
@@ -212,30 +211,26 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label, int label_siz
 	memmove(s_seed, label, label_size);
 	memmove(&s_seed[label_size], seed, seed_size);
 
+	l_s = secret_size / 2;
+	s1 = &secret[0];
+	s2 = &secret[l_s];
 
-	if (secret_size % 2 == 0) {
-		l_s1 = l_s2 = secret_size / 2;
-		s1 = &secret[0];
-		s2 = &secret[l_s1];
-	} else {
-		l_s1 = l_s2 = (secret_size / 2) + 1;
-		s1 = &secret[0];
-		s2 = &secret[l_s1 - 1];
+	if (secret_size % 2 != 0) {
+		l_s++;
 	}
 
-	o1 = gnutls_P_hash(GNUTLS_MAC_MD5, s1, l_s1, s_seed, s_seed_size, total_bytes);
-	o2 = gnutls_P_hash(GNUTLS_MAC_SHA, s2, l_s2, s_seed, s_seed_size, total_bytes);
+	o1 = gnutls_P_hash(GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes);
+	o2 = gnutls_P_hash(GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes);
 
-	ret = secure_calloc(1, total_bytes);
 	gnutls_free(s_seed);
+
 	for (i = 0; i < total_bytes; i++) {
-		ret[i] = o1[i] ^ o2[i];
+		o1[i] ^= o2[i];
 	}
 
-	secure_free(o1);
 	secure_free(o2);
 
-	return ret;
+	return o1;
 
 }
 
