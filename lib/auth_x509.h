@@ -44,14 +44,13 @@ typedef struct {
 #define X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
 
 typedef struct X509PKI_AUTH_INFO_INT {
-	CertificateStatus peer_certificate_status;
 	int		  certificate_requested; /* if the peer requested certificate
 						  * this is non zero;
 						  */
 	int		  dh_bits; /* bits of the DH (if DHE_RSA is used) */
 	gnutls_datum*	  raw_certificate_list; /* holds the raw certificate of the
-					    * peer.
-					    */
+					         * peer.
+					         */
 	int 		  ncerts; /* holds the size of the list above */
 } *X509PKI_AUTH_INFO;
 

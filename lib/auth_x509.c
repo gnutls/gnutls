@@ -41,12 +41,10 @@
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (X509PKI_AUTH_INFO)
  */
-int _gnutls_copy_x509_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, int ncerts, CertificateStatus verify) {
+int _gnutls_copy_x509_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, int ncerts) {
  /* Copy peer's information to AUTH_INFO
   */
 int ret, i, j;
-
-	info->peer_certificate_status = verify;
 
 	if (ncerts==0) {
 		info->raw_certificate_list = NULL;
@@ -81,140 +79,6 @@ int ret, i, j;
 	gnutls_free( info->raw_certificate_list);
 	info->raw_certificate_list = NULL;
 		
-	return ret;
-}
-
-typedef struct {
-	gnutls_datum rsa_modulus;
-	gnutls_datum rsa_exponent;
-} RSA_Params;
-
-/* This function extracts the RSA parameters from the given(?) certificate.
- */
-static int _gnutls_get_rsa_params(RSA_Params * params,
-				  MPI * mod, MPI * exp, gnutls_datum cert)
-{
-	int ret = 0, result;
-	opaque str[5 * 1024];
-	int len = sizeof(str);
-	node_asn *srsa, *spk;
-
-	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &srsa, "rsa_params")
-	    != ASN_OK) {
-		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
-	}
-	result = asn1_get_der(srsa, cert.data, cert.size);
-	if (result != ASN_OK) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-	len = sizeof(str) - 1;
-	result =
-	    asn1_read_value
-	    (srsa, "rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
-	     str, &len);
-
-	if (result != ASN_OK) {
-		gnutls_assert();
-		asn1_delete_structure(srsa);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-	if (!strcmp(str, "1 2 840 113549 1 1 1")) {	/* pkix-1 1 - RSA */
-		len = sizeof(str) - 1;
-		result =
-		    asn1_read_value
-		    (srsa, "rsa_params.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-		     str, &len);
-		asn1_delete_structure(srsa);
-
-		if (result != ASN_OK) {
-			gnutls_assert();
-			return GNUTLS_E_ASN1_PARSING_ERROR;
-		}
-		if (asn1_create_structure
-		    (_gnutls_get_pkcs(),
-		     "PKCS-1.RSAPublicKey", &spk, "rsa_public_key") != ASN_OK) {
-			gnutls_assert();
-			return GNUTLS_E_ASN1_ERROR;
-		}
-		if (len % 8 != 0) {
-			gnutls_assert();
-			asn1_delete_structure(spk);
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-		}
-		result = asn1_get_der(spk, str, len / 8);
-
-		if (result != ASN_OK) {
-			gnutls_assert();
-			asn1_delete_structure(spk);
-			return GNUTLS_E_ASN1_PARSING_ERROR;
-		}
-		len = sizeof(str) - 1;
-		result = asn1_read_value(spk, "rsa_public_key.modulus", str, &len);
-		if (result != ASN_OK) {
-			gnutls_assert();
-			asn1_delete_structure(spk);
-			return GNUTLS_E_ASN1_PARSING_ERROR;
-		}
-		if (_gnutls_mpi_scan(mod, GCRYMPI_FMT_USG, str, &len) != 0) {
-			gnutls_assert();
-			asn1_delete_structure(spk);
-			return GNUTLS_E_MPI_SCAN_FAILED;
-		}
-		if (params != NULL)
-			if (gnutls_set_datum
-			    (&params->rsa_modulus, str, len) < 0) {
-				gnutls_assert();
-				asn1_delete_structure(spk);
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-		len = sizeof(str) - 1;
-		result =
-		    asn1_read_value(spk, "rsa_public_key.publicExponent", str, &len);
-		if (result != ASN_OK) {
-			gnutls_assert();
-			asn1_delete_structure(spk);
-			if (params != NULL)
-				gnutls_free_datum(&params->rsa_modulus);
-			_gnutls_mpi_release(mod);
-			return GNUTLS_E_ASN1_PARSING_ERROR;
-		}
-		if (_gnutls_mpi_scan(exp, GCRYMPI_FMT_USG, str, &len) != 0) {
-			gnutls_assert();
-			_gnutls_mpi_release(mod);
-			if (params != NULL)
-				gnutls_free_datum(&params->rsa_modulus);
-			asn1_delete_structure(spk);
-			return GNUTLS_E_MPI_SCAN_FAILED;
-		}
-		if (params != NULL)
-			if (gnutls_set_datum
-			    (&params->rsa_exponent, str, len) < 0) {
-				_gnutls_mpi_release(mod);
-				_gnutls_mpi_release(exp);
-				if (params != NULL)
-					gnutls_free_datum(&params->
-							  rsa_modulus);
-				asn1_delete_structure(spk);
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-		asn1_delete_structure(spk);
-
-		ret = 0;
-
-	} else {
-		/* The certificate that was sent was not
-		 * supported by the ciphersuite
-		 */
-		gnutls_assert();
-		ret = GNUTLS_E_X509_CERTIFICATE_ERROR;
-
-		asn1_delete_structure(srsa);
-	}
-
-
 	return ret;
 }
 
@@ -545,7 +409,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size = 0;
 	gnutls_datum tmp;
-	CertificateStatus verify;
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
@@ -563,7 +426,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 		state->gnutls_key->auth_info_size = sizeof(X509PKI_AUTH_INFO_INT);
 
 		info = state->gnutls_key->auth_info;
-		info->peer_certificate_status = GNUTLS_CERT_NONE;
 
 		state->gnutls_key->auth_info_type = GNUTLS_X509PKI;
 	} else
@@ -582,7 +444,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	if (size == 0) {
 		gnutls_assert();
 		/* no certificate was sent */
-		info->peer_certificate_status = GNUTLS_CERT_NONE;
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 	i = dsize;
@@ -637,32 +498,27 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 		j++;
 	}
 
-	/* store the required parameters for the handshake
+	/* move RSA parameters to gnutls_key (state).
 	 */
-	if ((ret =
-	     _gnutls_get_rsa_params(NULL, &state->gnutls_key->a, &state->gnutls_key->x,
-				    peer_certificate_list[0].raw)) < 0) {
+	state->gnutls_key->a = gcry_mpi_copy(peer_certificate_list[0].params[0]);
+	state->gnutls_key->x = gcry_mpi_copy(peer_certificate_list[0].params[1]);
+
+	if (state->gnutls_key->a==NULL || state->gnutls_key->x==NULL) {
+	     	_gnutls_mpi_release( &state->gnutls_key->a);
+		_gnutls_mpi_release( &state->gnutls_key->x);
 		gnutls_assert();
 		CLEAR_CERTS;
 		gnutls_free(peer_certificate_list);
-		return ret;
-	}
-	/* Verify certificate 
-	 */
-	verify = gnutls_verify_certificate(peer_certificate_list, peer_certificate_list_size,
-				     cred->ca_list, cred->ncas, NULL, 0);
-	if (verify < 0) {
-		gnutls_assert();
-		CLEAR_CERTS;
-		gnutls_free(peer_certificate_list);
-		return verify;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	/* keep the PK algorithm */
 	state->gnutls_internals.peer_pk_algorithm = peer_certificate_list[0].subject_pk_algorithm;
 
-	if ( (ret = _gnutls_copy_x509_auth_info(info, peer_certificate_list, peer_certificate_list_size, verify)) < 0) {
+	if ( (ret = _gnutls_copy_x509_auth_info(info, peer_certificate_list, peer_certificate_list_size)) < 0) {
 		gnutls_assert();
+		CLEAR_CERTS;
+		gnutls_free(peer_certificate_list);
 		return ret;
 	}
 
@@ -721,7 +577,6 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 		state->gnutls_key->auth_info_size = sizeof(X509PKI_AUTH_INFO_INT);
 
 		info = state->gnutls_key->auth_info;
-		info->peer_certificate_status = GNUTLS_CERT_NONE;
 	}
 	info = state->gnutls_key->auth_info;
 	
@@ -1110,7 +965,6 @@ int gnutls_x509pki_get_subject_dns_name(GNUTLS_STATE state, char* ret, int *ret_
 
 	if ((result =
 	     _gnutls_get_extension( &info->raw_certificate_list[0], "2 5 29 17", &dnsname)) < 0) {
-		gnutls_assert();
 		return result;
 	}
 
@@ -1278,22 +1132,66 @@ int gnutls_x509pki_get_peer_certificate_version(GNUTLS_STATE state)
   * gnutls_x509pki_get_peer_certificate_status - This function returns the peer's certificate status
   * @state: is a gnutls state
   *
-  * This function will return the peer's certificate status (TRUSTED, EXPIRED etc.). This is the output
-  * of the certificate verification function. However you must also check the peer's name in order
-  * to check if the verified certificate belongs to the actual peer.
-  * Returns GNUTLS_CERT_NONE in case of an error, or if no certificate was sent.
+  * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
+  * Status should be one of the CertificateStatus enumerated elements.
+  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
+  * actual peer. Returns a negative error code in case of an error, or GNUTLS_CERT_NONE if no certificate was sent.
   *
   **/
-CertificateStatus gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE
-							     state)
+int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 {
 	X509PKI_AUTH_INFO info;
+	const X509PKI_CREDENTIALS cred;
+	CertificateStatus verify;
+	gnutls_cert* peer_certificate_list;
+	int peer_certificate_list_size, i, x, ret;
 
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_CERT_NONE);
+	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(state);
 	if (info == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	if (info->raw_certificate_list==NULL || info->ncerts==0)
 		return GNUTLS_CERT_NONE;
 
-	return info->peer_certificate_status;
+	/* generate a list of gnutls_certs based on the auth info
+	 * raw certs.
+	 */
+	peer_certificate_list_size = info->ncerts;
+	peer_certificate_list = gnutls_calloc( 1, peer_certificate_list_size*sizeof(gnutls_cert));
+	if (peer_certificate_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	for (i=0;i<peer_certificate_list_size;i++) {
+		if ( (ret=_gnutls_cert2gnutlsCert( &peer_certificate_list[i], info->raw_certificate_list[i])) < 0) {
+			gnutls_assert();
+			CLEAR_CERTS;
+			gnutls_free( peer_certificate_list);
+			return ret;
+		}
+	}
+	
+	/* Verify certificate 
+	 */
+	verify = gnutls_verify_certificate( peer_certificate_list, peer_certificate_list_size, cred->ca_list, cred->ncas, NULL, 0);
+
+	CLEAR_CERTS;
+	gnutls_free( peer_certificate_list);
+
+	if (verify < 0) {
+		gnutls_assert();
+		return GNUTLS_CERT_INVALID;
+	}
+
+
+	return verify;
 }

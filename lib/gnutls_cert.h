@@ -9,6 +9,8 @@
 typedef struct gnutls_cert {
 	MPI params[MAX_PARAMS_SIZE];	/* the size of params depends on the public 
 				 * key algorithm 
+				 * RSA: [0] is modulus
+				 *      [1] is public exponent
 				 */
 	PKAlgorithm subject_pk_algorithm;
 

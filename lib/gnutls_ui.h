@@ -63,7 +63,7 @@ int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE);
 int gnutls_x509pki_get_peer_dn( GNUTLS_STATE, gnutls_DN*);
 const gnutls_datum* gnutls_x509pki_get_peer_certificate_list( GNUTLS_STATE, int* list_size);
 int gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE, gnutls_DN *);
-CertificateStatus gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
+int gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
 int gnutls_x509pki_get_peer_certificate_version( GNUTLS_STATE);
 time_t gnutls_x509pki_get_peer_certificate_activation_time( GNUTLS_STATE);
 time_t gnutls_x509pki_get_peer_certificate_expiration_time( GNUTLS_STATE);
