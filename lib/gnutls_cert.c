@@ -393,7 +393,7 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 	info = _gnutls_get_auth_info(state);
 	if (info == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 	
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)

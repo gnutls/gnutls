@@ -716,9 +716,11 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
+	if (info == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
-
+	}
+	
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
