@@ -25,6 +25,7 @@
 #include "gnutls_compress_int.h"
 #include <zlib.h>
 
+#define MAX_COMP_SIZE 17408 /* 2^14+1024 */
 int gnutls_compress( CompressionMethod algorithm, char* plain, int plain_size, char** compressed) {
 int compressed_size;
 uLongf size;
@@ -39,8 +40,13 @@ int err;
 #ifdef HAVE_LIBZ
 	case GNUTLS_ZLIB:
 		size = (plain_size*1.2)+12;
-		*compressed = gnutls_malloc(size);
-		err = compress( *compressed, &size, plain, plain_size);
+		*compressed=NULL;
+		do {
+			size += size;
+			if (*compressed!=NULL) gnutls_free(*compressed);
+			*compressed = gnutls_malloc(size);
+			err = compress( *compressed, &size, plain, plain_size);
+		} while(err==Z_BUF_ERROR && size <= MAX_COMP_SIZE);
 		if (err!=Z_OK) {
 			gnutls_free(*compressed);
 			return GNUTLS_E_COMPRESSION_FAILED;
@@ -52,6 +58,11 @@ int err;
 		*compressed=NULL;
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
+
+	if (compressed_size > MAX_COMP_SIZE) {
+		gnutls_free(*compressed);
+		return GNUTLS_E_COMPRESSION_FAILED;
+	}
 	return compressed_size;
 }
 
@@ -59,6 +70,7 @@ int gnutls_decompress( CompressionMethod algorithm, char* compressed, int compre
 int plain_size, err;
 uLongf size;
 
+	if (compressed_size > MAX_COMP_SIZE) return GNUTLS_E_DECOMPRESSION_FAILED;
 	switch (algorithm) {
 	case GNUTLS_COMPRESSION_NULL:
 		*plain = gnutls_malloc(compressed_size);
@@ -73,7 +85,7 @@ uLongf size;
 			size += compressed_size;
 			*plain = gnutls_realloc(*plain, size);
 			err = uncompress( *plain, &size, compressed, compressed_size);
-		} while( err==Z_BUF_ERROR && size < 50000); /* quite strange limit */
+		} while( err==Z_BUF_ERROR && size <= MAX_COMP_SIZE);
 		if (err!=Z_OK) {
 			gnutls_free(*plain);
 			return GNUTLS_E_DECOMPRESSION_FAILED;
