@@ -1,3 +1,16 @@
+2004-03-11 11:32  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.h,
+	lib/auth_dhe.c, lib/auth_rsa.c, lib/auth_rsa_export.c,
+	lib/gnutls.h.in.in, lib/gnutls_anon_cred.c, lib/gnutls_cert.c,
+	lib/gnutls_cert.h, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_sig.c, lib/gnutls_state.c, lib/gnutls_ui.c,
+	lib/gnutls_ui.h, src/serv.c:
+
+	Added gnutls_certificate_set_params_function() and 
+	gnutls_anon_set_params_function() that set the RSA or DH parameters
+	using a callback.  
+
 2004-02-28 00:01  nmav <nmav@gnutls.org>
 
 	* configure.in (tags: gnutls_1_0_8), lib/gnutls_handshake.c (tags:
