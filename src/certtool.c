@@ -1336,6 +1336,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 	    fprintf(out, "\tMD5 Fingerprint: %s\n", printable);
 	}
 
+	size = sizeof(buffer);
 	if ((ret =
 	     gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_SHA1, buffer,
 					     &size)) < 0) {
