@@ -44,7 +44,7 @@
 const char*  asn1_find_structure_from_oid(ASN1_TYPE definitions,
 		    const char *oidValue);
 
-static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root);
+static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn);
 
 static const void *find_default_value(ASN1_TYPE x)
 {
@@ -75,7 +75,6 @@ static const void *find_default_value(ASN1_TYPE x)
 
 static int is_node_printable(ASN1_TYPE x)
 {
-
 	switch (type_field(x->type)) {
 	case TYPE_TAG:
 	case TYPE_SIZE:
@@ -89,7 +88,7 @@ static int is_node_printable(ASN1_TYPE x)
 		}
 		return 1;
 	}
-	if (x->name == NULL)
+	if (x->name == NULL && _asn1_find_up( x) != NULL)
 		return 0;
 	if (x->value == NULL && x->down == NULL)
 		return 0;
@@ -102,7 +101,6 @@ static int is_node_printable(ASN1_TYPE x)
 static int is_leaf(ASN1_TYPE p)
 {
 	ASN1_TYPE x;
-
 
 	if (p == NULL)
 		return 1;
@@ -135,15 +133,21 @@ static int is_leaf(ASN1_TYPE p)
 	}
 
 #define UNNAMED "unnamed"
+#define ROOT "certificate"
 /* This function removes the '?' character from ASN.1 names
  */
 static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 {
+const char* name;
+
 	if (output_size > 0)
 		output[0] = 0;
 	else return GNUTLS_E_INTERNAL_ERROR;
 
 	if (p==NULL) return GNUTLS_E_INTERNAL_ERROR;
+	
+	name = p->name;
+	if (name == NULL) name = ROOT;
 
 	if ( type_field(p->type)==TYPE_CONSTANT) {
 		ASN1_TYPE up = _asn1_find_up(p);
@@ -159,23 +163,23 @@ static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 				 _gnutls_str_cpy( output, output_size, tmp);
 			 else {
 			 	_gnutls_str_cpy( output, output_size, "DEFINED_BY_");
-			 	_gnutls_str_cat( output, output_size, p->name);
+			 	_gnutls_str_cat( output, output_size, name);
 			 }
 		} else {
 			 _gnutls_str_cpy( output, output_size, "DEFINED_BY_");
-			 _gnutls_str_cat( output, output_size, p->name);
+			 _gnutls_str_cat( output, output_size, name);
 		}
 		
 		
 		return 0;
 	}
 
-	if ( p->name[0]=='?') {
+	if ( name[0]=='?') {
 		_gnutls_str_cpy( output, output_size, UNNAMED);
-		if (strlen(p->name) > 1)
-			_gnutls_str_cat( output, output_size, &p->name[1]);
+		if (strlen(name) > 1)
+			_gnutls_str_cat( output, output_size, &name[1]);
 	} else {
-		_gnutls_str_cpy( output, output_size, p->name);
+		_gnutls_str_cpy( output, output_size, name);
 	}
 	return 0;
 }
@@ -186,8 +190,8 @@ static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 #define XML_FOOTER "</gnutls:x509:certificate>\n"
 
 static int
-_gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
-			 gnutls_datum * res)
+_gnutls_asn1_get_structure_xml(ASN1_TYPE structure, 
+			 gnutls_datum * res, int detail)
 {
 	node_asn *p, *root;
 	int k, indent = 0, len, len2, len3;
@@ -206,21 +210,32 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 	STR_APPEND(XML_HEADER);
 	indent = 1;
 
-	root = _asn1_find_node(structure, name);
+	root = _asn1_find_node(structure, "");
 
 	if (root == NULL) {
+		gnutls_assert();
 		_gnutls_string_clear( &str);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
+	if (detail == GNUTLS_XML_SHOW_ALL)
 	ret = asn1_expand_any_defined_by( _gnutls_get_pkix(),
 					&structure);
-	ret = _gnutls_x509_expand_extensions( &structure, name);
+	/* we don't need to check the error value
+	 * here.
+	 */
+
+	if (detail == GNUTLS_XML_SHOW_ALL) {
+		ret = _gnutls_x509_expand_extensions( &structure);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
 
 	p = root;
 	while (p) {
-
-		if (is_node_printable(p) && p->name) {
+		if (is_node_printable(p)) {
 			for (k = 0; k < indent; k++)
 				APPEND(" ", 1);
 
@@ -581,7 +596,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
   * gnutls_x509_crt_to_xml - This function parses an RDN sequence
   * @cert: should contain a gnutls_x509_crt structure
   * @res: The datum that will hold the result
-  * @detail: The detail level (must be 0 for now)
+  * @detail: The detail level (must be GNUTLS_XML_SHOW_ALL or GNUTLS_XML_NORMAL)
   *
   * This function will return the XML structures of the given X.509 certificate.
   * The XML structures are allocated internaly (with malloc) and stored into res.
@@ -595,7 +610,7 @@ int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail)
 	res->data = NULL;
 	res->size = 0;
 	
-	result = _gnutls_asn1_get_structure_xml( cert->cert, "", res);
+	result = _gnutls_asn1_get_structure_xml( cert->cert, res, detail);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -610,7 +625,7 @@ int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail)
  * If no_critical_ext is non zero, then unsupported critical extensions
  * do not lead into a fatal error.
  */
-static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root)
+static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn)
 {
 	int k, result, len;
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
@@ -621,8 +636,7 @@ static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root)
 	do {
 		k++;
 
-		_gnutls_str_cpy(name, sizeof(name), root);
-		_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.extensions.?"); 
+		_gnutls_str_cpy(name, sizeof(name), "tbsCertificate.extensions.?"); 
 		_gnutls_int2str(k, counter);
 		_gnutls_str_cat(name, sizeof(name), counter); 
 

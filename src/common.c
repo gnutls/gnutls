@@ -67,71 +67,88 @@ void print_x509_info(gnutls_session session)
 			return;
 		}
 
+
 		printf(" - Certificate[%d] info:\n", j);
 
-		expiret = gnutls_x509_crt_get_expiration_time(crt);
-		activet = gnutls_x509_crt_get_activation_time(crt);
+		if (xml) {
+			gnutls_datum xml_data;
 
-		printf(" # valid since: %s", my_ctime(&activet));
-		printf(" # expires at: %s", my_ctime(&expiret));
-
-
-		/* Print the serial number of the certificate.
-		 */
-		if (gnutls_x509_crt_get_serial(crt, serial, &serial_size)
-		    >= 0) {
-			print = printable;
-			for (i = 0; i < serial_size; i++) {
-				sprintf(print, "%.2x ",
-					(unsigned char) serial[i]);
-				print += 3;
+			ret = gnutls_x509_crt_to_xml( crt, &xml_data, 0);
+			if (ret < 0) {
+				fprintf(stderr, "XML encoding error: %s\n",
+					gnutls_strerror(ret));
+				return;
 			}
-			printf(" # serial number: %s\n", printable);
-		}
+			
+			printf("%s", xml_data.data);
+			gnutls_free( xml_data.data);
 
-		/* Print the fingerprint of the certificate
-		 */
-		digest_size = sizeof(digest);
-		if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, digest, &digest_size))
-		    < 0) {
-		    	fprintf(stderr, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
 		} else {
-			print = printable;
-			for (i = 0; i < digest_size; i++) {
-				sprintf(print, "%.2x ",
-					(unsigned char) digest[i]);
-				print += 3;
+
+			expiret = gnutls_x509_crt_get_expiration_time(crt);
+			activet = gnutls_x509_crt_get_activation_time(crt);
+
+			printf(" # valid since: %s", my_ctime(&activet));
+			printf(" # expires at: %s", my_ctime(&expiret));
+
+
+			/* Print the serial number of the certificate.
+			 */
+			if (gnutls_x509_crt_get_serial(crt, serial, &serial_size)
+			    >= 0) {
+				print = printable;
+				for (i = 0; i < serial_size; i++) {
+					sprintf(print, "%.2x ",
+						(unsigned char) serial[i]);
+					print += 3;
+				}
+				printf(" # serial number: %s\n", printable);
 			}
-			printf(" # fingerprint: %s\n", printable);
+
+			/* Print the fingerprint of the certificate
+			 */
+			digest_size = sizeof(digest);
+			if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, digest, &digest_size))
+			    < 0) {
+			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
+			} else {
+				print = printable;
+				for (i = 0; i < digest_size; i++) {
+					sprintf(print, "%.2x ",
+						(unsigned char) digest[i]);
+					print += 3;
+				}
+				printf(" # fingerprint: %s\n", printable);
+			}
+
+			/* Print the version of the X.509 
+			 * certificate.
+			 */
+			printf(" # version: #%d\n",
+			       gnutls_x509_crt_get_version(crt));
+
+			algo = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
+			printf(" # public key algorithm: ");
+			if (algo == GNUTLS_PK_RSA) {
+				printf("RSA\n");
+				printf(" #   Modulus: %d bits\n", bits);
+			} else if (algo == GNUTLS_PK_DSA) {
+				printf("DSA\n");
+				printf(" #   Exponent: %d bits\n", bits);
+			} else {
+				printf("UNKNOWN\n");
+			}
+
+			dn_size = sizeof(dn);
+			ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
+			if (ret >= 0)
+				printf(" # Subject's DN: %s\n", dn);
+	
+			dn_size = sizeof(dn);
+			ret = gnutls_x509_crt_get_issuer_dn(crt, dn, &dn_size);
+			if (ret >= 0)
+				printf(" # Issuer's DN: %s\n", dn);
 		}
-
-		/* Print the version of the X.509 
-		 * certificate.
-		 */
-		printf(" # version: #%d\n",
-		       gnutls_x509_crt_get_version(crt));
-
-		algo = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
-		printf(" # public key algorithm: ");
-		if (algo == GNUTLS_PK_RSA) {
-			printf("RSA\n");
-			printf(" #   Modulus: %d bits\n", bits);
-		} else if (algo == GNUTLS_PK_DSA) {
-			printf("DSA\n");
-			printf(" #   Exponent: %d bits\n", bits);
-		} else {
-			printf("UNKNOWN\n");
-		}
-
-		dn_size = sizeof(dn);
-		ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
-		if (ret >= 0)
-			printf(" # Subject's DN: %s\n", dn);
-
-		dn_size = sizeof(dn);
-		ret = gnutls_x509_crt_get_issuer_dn(crt, dn, &dn_size);
-		if (ret >= 0)
-			printf(" # Issuer's DN: %s\n", dn);
 
 		gnutls_x509_crt_deinit(crt);
 		

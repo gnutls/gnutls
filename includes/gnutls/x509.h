@@ -95,7 +95,10 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert,
 
 int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail);
 
-
+/* possible values for detail.
+ */
+#define GNUTLS_XML_SHOW_ALL 1
+#define GNUTLS_XML_NORMAL 0
 
 /* RDN handling */
 int gnutls_x509_rdn_get(const gnutls_datum * idn,

@@ -2,6 +2,8 @@
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(unsigned int k, char *data);
 
+#define GNUTLS_XML_SHOW_ALL 1
+
 #define PEM_CRL "X509 CRL"
 #define PEM_X509_CERT "X509 CERTIFICATE"
 #define PEM_X509_CERT2 "CERTIFICATE"
