@@ -922,6 +922,17 @@ int _gnutls_handshake_buffer_get_ptr( GNUTLS_STATE state, char **data_ptr, int *
 	return 0;	
 }
 
+/* Does not free the buffer
+ */
+int _gnutls_handshake_buffer_empty( GNUTLS_STATE state)
+{
+
+	_gnutls_buffers_log( "BUF[HSK]: Emptied buffer\n");
+
+	state->gnutls_internals.handshake_hash_buffer.size = 0;
+	
+	return 0;
+}
 
 
 int _gnutls_handshake_buffer_clear( GNUTLS_STATE state)

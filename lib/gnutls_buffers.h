@@ -31,6 +31,7 @@ int _gnutls_handshake_buffer_get_size( GNUTLS_STATE state);
 int _gnutls_handshake_buffer_peek( GNUTLS_STATE state, char *data, int length);
 int _gnutls_handshake_buffer_put( GNUTLS_STATE state, char *data, int length);
 int _gnutls_handshake_buffer_clear( GNUTLS_STATE state);
+int _gnutls_handshake_buffer_empty( GNUTLS_STATE state);
 int _gnutls_handshake_buffer_get_ptr( GNUTLS_STATE state, char **data_ptr, int *length);
 
 #define _gnutls_handshake_io_buffer_clear( state) \

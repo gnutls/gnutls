@@ -352,26 +352,28 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
  */
 inline static int
 _gnutls_handshake_hash_pending( GNUTLS_STATE state) {
-int siz;
+int siz, ret;
 char * data;
+
+	if (state->gnutls_internals.handshake_mac_handle_sha==NULL ||
+		state->gnutls_internals.handshake_mac_handle_md5==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL;
+	}
 
 	/* We check if there are pending data to hash.
 	 */
-	siz = _gnutls_handshake_buffer_get_size(state);
-	if (siz < 0) {
+	if ((ret=_gnutls_handshake_buffer_get_ptr(state, &data, &siz)) < 0) {
 		gnutls_assert();
-		return siz;
+		return ret;
 	}
 
-	if (siz > 0) { /* if there are data to hash */
-
-		_gnutls_handshake_buffer_get_ptr(state, &data, &siz);
-
+	if (siz > 0) {
 		gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, data, siz);
 		gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, data, siz);
-
 	}
-	_gnutls_handshake_buffer_clear( state);
+	
+	_gnutls_handshake_buffer_empty( state);
 	
 	return 0;
 }
@@ -726,11 +728,12 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 
 	/* Here we keep the handshake messages in order to hash them...
 	 */
-	if ( (ret= _gnutls_handshake_hash_add_sent( state, type, data, datasize)) < 0) {
-			gnutls_assert();
-			gnutls_free(data);
-			return ret;
-	}
+	if ( type != GNUTLS_HELLO_REQUEST)
+		if ( (ret= _gnutls_handshake_hash_add_sent( state, type, data, datasize)) < 0) {
+				gnutls_assert();
+				gnutls_free(data);
+				return ret;
+		}
 
 	ret =
 	    _gnutls_handshake_io_send_int(state, GNUTLS_HANDSHAKE, type,
