@@ -41,7 +41,7 @@
  */
 #define SOCKET int
 
-#define LIST ...
+#define GNUTLS_LIST ...
 
 #define MAX32 4294967295
 #define MAX24 16777215

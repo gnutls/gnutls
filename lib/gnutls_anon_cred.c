@@ -58,6 +58,9 @@ int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS *sc) {
   * @res: is an &ANON_SERVER_CREDENTIALS structure.
   * @dh_bits: is the number of bits in DH key exchange
   *
+  * Used to set the number of bits to use in an anonymous Diffie-Hellman, 
+  * key exchange.
+  *
   **/
 
 int gnutls_set_anon_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits) {
