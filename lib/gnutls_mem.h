@@ -19,11 +19,11 @@ typedef void svoid; /* for functions that allocate using gnutls_secure_malloc */
 # define gnutls_afree gnutls_free
 #endif /* HAVE_ALLOCA */
 
-void* (*gnutls_secure_malloc)(size_t);
-void* (*gnutls_malloc)(size_t);
-void (*gnutls_free)(void*);
-int (*_gnutls_is_secure_memory)(const void*);
-void* (*gnutls_realloc)(void*, size_t);
+extern void* (*gnutls_secure_malloc)(size_t);
+extern void* (*gnutls_malloc)(size_t);
+extern void (*gnutls_free)(void*);
+extern int (*_gnutls_is_secure_memory)(const void*);
+extern void* (*gnutls_realloc)(void*, size_t);
 
 #define gnutls_realloc_fast(x, y) (y==0?x:realloc(x, y))
 
