@@ -81,6 +81,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
 
 	*state = gnutls_calloc(1, sizeof(struct GNUTLS_STATE_INT));
+	if (*state==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
 	(*state)->security_parameters.entity = con_end;
 
@@ -99,6 +100,10 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	gnutls_set_protocol_priority( *state, GNUTLS_TLS1, 0); /* default */
 
 	(*state)->gnutls_key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
+	if ( (*state)->gnutls_key == NULL) {
+		gnutls_free( *state);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	(*state)->gnutls_internals.resumed = RESUME_FALSE;
 
@@ -225,6 +230,10 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 	}
 	
 	ret = secure_calloc(1, total_bytes);
+	if (ret==NULL) {
+		gnutls_assert();
+		return ret;
+	}
 
 	blocksize = gnutls_hmac_get_algo_len(algorithm);
 	do {
@@ -436,14 +445,16 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	const uint8 *data=_data;
 	GNUTLS_Version lver;
 
-	if (sizeofdata == 0)
-		return 0;
-
+	if (sizeofdata == 0 || _data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+	
 	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_write != 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
-	
+
 	headers[0]=type;
 	
 	if (htype==GNUTLS_CLIENT_HELLO) { /* then send the lowest 
@@ -467,14 +478,11 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
-	/* in this loop we encrypt all data that are a multiple
-	 * of the MAC_ENC_LEN;
-	 */
 	data2send = sizeofdata;
 	ptr = data;
 	retval = 0;
 
-	while( data2send != 0) {
+	while( data2send > 0) {
 	
 		if (data2send - MAX_ENC_LEN >= 0) {
 			data2send -= MAX_ENC_LEN;
@@ -512,7 +520,10 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 				 * that value.
 				 */
 				gnutls_assert();
-				if (retval > 0) return retval;
+				if (retval > 0) {
+					gnutls_assert();
+					return retval;
+				}
 				return ret;
 			}
 			state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -588,7 +599,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	uint16 length;
 	uint8 *ciphertext;
 	uint8 *recv_data;
-	int ret;
+	int ret, ret2;
 	int header_size;
 
 	begin:
@@ -596,8 +607,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	header_size = RECORD_HEADER_SIZE;
 	ret = 0;
 
-	if (sizeofdata == 0)
-		return 0;
+	if (sizeofdata == 0 || data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
 
 	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_read!=0) {
 		gnutls_assert();
@@ -612,7 +625,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 		/* if the buffer just got empty */
 		if (gnutls_getDataBufferSize(type, state)==0) {
-			_gnutls_clear_peeked_data( cd, state);
+			if ( (ret2=_gnutls_clear_peeked_data( cd, state)) < 0) {
+				gnutls_assert();
+				return ret2;
+			}
 		}
 
 		return ret;
@@ -622,7 +638,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 * must be set to non blocking mode
 	 */
 	if ( (ret = _gnutls_read_buffered(cd, state, &headers, header_size, -1)) != header_size) {
-		if (ret<0 && gnutls_is_fatal_error(ret)==0) return ret;
+		if (ret < 0 && gnutls_is_fatal_error(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) {
@@ -859,7 +875,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 		/* if the buffer just got empty */
 		if (gnutls_getDataBufferSize(type, state)==0) {
-			_gnutls_clear_peeked_data( cd, state);
+			if ( (ret2 = _gnutls_clear_peeked_data( cd, state)) < 0) {
+				gnutls_assert();
+				return ret2;
+			}
 		}
 
 		gnutls_free(tmpdata);

@@ -26,12 +26,13 @@
 
 /*
 #define BUFFERS_DEBUG
-#define WRITE_DEBUG
 #define HARD_DEBUG
+#define READ_DEBUG
+#define WRITE_DEBUG
 #define HANDSHAKE_DEBUG
 #define RECORD_DEBUG
-#define READ_DEBUG*/
 #define DEBUG
+*/
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -104,7 +105,7 @@ typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
 
 typedef enum HandshakeState { STATE0=0, STATE1, STATE2, STATE3, STATE4, STATE5,
 	STATE6, STATE7, STATE8, STATE9, STATE10, STATE11, STATE20=20, STATE21,
-	STATE30=30, STATE31 } HandshakeState;
+	STATE30=30, STATE31, STATE50 } HandshakeState;
 
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,

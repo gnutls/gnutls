@@ -176,10 +176,13 @@ static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
 #endif
 					goto finish;
 				}
+				gnutls_assert();
 				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 				else return GNUTLS_E_INTERRUPTED;
-			} else 
+			} else {
+				gnutls_assert();
 				return GNUTLS_E_PULL_ERROR;
+			}
 		} else {
 #ifdef READ_DEBUG
 			_gnutls_log( "READ: Got %d bytes from %d\n", i, fd);
@@ -273,6 +276,7 @@ void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
  *
  * This is not a general purpose function. It returns EXACTLY the data requested.
  *
+ * FIXME: make the buffer, be dynamically allocated.
  */
 ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)
 {
@@ -466,6 +470,7 @@ ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE state, const void *iptr, siz
 #ifdef WRITE_DEBUG
 				_gnutls_log( "WRITE: Interrupted. wrote %d bytes to %d. Left %d\n", n-left, fd, left);
 #endif
+				gnutls_assert();
 				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 				else return GNUTLS_E_INTERRUPTED;
 
@@ -508,10 +513,23 @@ ssize_t _gnutls_handshake_send_int(int fd, GNUTLS_STATE state, ContentType type,
 	ssize_t i = 0;
 	char *ptr = iptr;
 
+	if (iptr==NULL && n == 0) {
+		uint8 sdata = 0;
+		/* resuming interrupted write. Put some random data into
+		 * the data field so send_int() will proceed normally.
+		 */
+		return gnutls_send_int( fd, state, type, htype, &sdata, 1);
+	}
+
 	left = n;
 	while (left > 0) {
 		i = gnutls_send_int(fd, state, type, htype, &ptr[i], left);
 		if (i <= 0) {
+			gnutls_assert();
+			if (n-left > 0)  {
+				gnutls_assert();
+				return n-left;
+			}
 			return i;
 		}
 		left -= i;
@@ -534,6 +552,11 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 	while (left > 0) {
 		i = gnutls_recv_int(fd, state, type, htype, &ptr[i], left);
 		if (i < 0) {
+			if (sizeOfPtr - left > 0) {
+				gnutls_assert();
+				goto finish;
+			}
+			gnutls_assert();
 			return i;
 		} else {
 			if (i == 0)
@@ -544,6 +567,7 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 
 	}
 
+	finish:
 	return (sizeOfPtr - left);
 }
 

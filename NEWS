@@ -5,6 +5,7 @@ Version 0.3.0
 - Introduced GNUTLS_E_INTERRUPTED
 - Added support for non blocking IO
 - gnutls_recv() and gnutls_send() are now obsolete
+- Changed semantics of gnutls_rehandshake()
 
 Version 0.2.4 (12/10/2001)
 - Better handling of X.509 certificate extensions
