@@ -39,7 +39,7 @@ static int compar( const void* _n1, const void* _n2)
 static char* escape_string( const char* str)
 {
 static char buffer[500];
-int i = 0, j = 0;
+unsigned int i = 0, j = 0;
 
 
 while( str[i] != 0 && j < sizeof(buffer) - 1) {
