@@ -534,8 +534,7 @@ void gnutls_record_set_cbc_protection(gnutls_session session, int prot)
   * advertized nor used.
   *
   * Unless this function is called with the option to allow (1), then
-  * no compression algorithms, like ZLIB, and encryption algorithms,
-  * like TWOFISH, will be available. This is because these algorithms
+  * no compression algorithms, like LZO. That is because these algorithms
   * are not yet defined in any RFC or even internet draft.
   *
   * Enabling the private ciphersuites when talking to other than gnutls

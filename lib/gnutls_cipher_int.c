@@ -40,9 +40,6 @@ gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
 	case GNUTLS_CIPHER_AES_256_CBC:
 		err = gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
 		break;
-	case GNUTLS_CIPHER_TWOFISH_128_CBC:
-		err = gcry_cipher_open(&ret, GCRY_CIPHER_TWOFISH, GCRY_CIPHER_MODE_CBC, 0);
-		break;
 	case GNUTLS_CIPHER_3DES_CBC:
 		err = gcry_cipher_open(&ret, GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC, 0);
 		break;
