@@ -15,6 +15,8 @@ int xml = 0;
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
 	PRINTX( "EMAIL:", X.email)
 
+const char str_unknown[] = "(unknown)";
+
 static const char *my_ctime(const time_t * tv)
 {
 	static char buf[256];
@@ -22,7 +24,7 @@ static const char *my_ctime(const time_t * tv)
 
 	if ( ( (tp = localtime(tv)) == NULL ) ||
 	     (!strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp)) )
-		strcpy(buf, "unknown"); /* make sure buf text isn't garbage */
+		strcpy(buf, str_unknown);/* make sure buf text isn't garbage */
 
 	return buf;
 
@@ -64,7 +66,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 					   GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			const char* str = gnutls_strerror(ret);
-			if (str == NULL) str = "(unknown)";
+			if (str == NULL) str = str_unknown;
 			fprintf(stderr, "Decoding error: %s\n", str);
 			return;
 		}
@@ -90,7 +92,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 			ret = gnutls_x509_crt_to_xml( crt, &xml_data, 0);
 			if (ret < 0) {
 				const char* str = gnutls_strerror(ret);
-				if (str == NULL) str = "(unknown)";
+				if (str == NULL) str = str_unknown;
 				fprintf(stderr, "XML encoding error: %s\n",
 					str);
 				return;
@@ -127,7 +129,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 			if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, digest, &digest_size))
 			    < 0) {
 				const char* str = gnutls_strerror(ret);
-				if (str == NULL) str = "(unknown)";
+				if (str == NULL) str = str_unknown;
 			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", str);
 			} else {
 				print = printable;
@@ -354,19 +356,19 @@ int print_info(gnutls_session session, const char* hostname)
 
 	tmp =
 	    gnutls_protocol_get_name(gnutls_protocol_get_version(session));
-	printf("- Version: %s\n", tmp);
+	if (tmp != NULL) printf("- Version: %s\n", tmp);
 
 	tmp = gnutls_kx_get_name(kx);
-	printf("- Key Exchange: %s\n", tmp);
+	if (tmp != NULL) printf("- Key Exchange: %s\n", tmp);
 
 	tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
-	printf("- Cipher: %s\n", tmp);
+	if (tmp != NULL) printf("- Cipher: %s\n", tmp);
 
 	tmp = gnutls_mac_get_name(gnutls_mac_get(session));
-	printf("- MAC: %s\n", tmp);
+	if (tmp != NULL) printf("- MAC: %s\n", tmp);
 
 	tmp = gnutls_compression_get_name(gnutls_compression_get(session));
-	printf("- Compression: %s\n", tmp);
+	if (tmp != NULL) printf("- Compression: %s\n", tmp);
 
 	fflush (stdout);
 

@@ -1,7 +1,7 @@
 INCLUDES = -I../ -I../minitasn1/ -I../../includes/
 EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
 	x509-api.tex compat.h verify.h mpi.h crq.h sign.h pkcs5.h \
-	privkey.h pkcs12.h rc2.h
+	privkey.h pkcs12.h rc2.h rfc2818.h
 
 noinst_LTLIBRARIES = libx509.la
 #lib_LTLIBRARIES = libgnutls-x509.la

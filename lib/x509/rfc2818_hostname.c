@@ -26,8 +26,7 @@
 #include <dn.h>
 #include <common.h>
 #include <gnutls/compat8.h>
-
-static int hostname_compare(const char *certname, const char *hostname);
+#include <rfc2818.h>
 
 /*-
   * gnutls_x509_check_certificates_hostname - This function compares the given hostname with the hostname in the certificate
@@ -44,7 +43,6 @@ static int hostname_compare(const char *certname, const char *hostname);
 int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
                                 const char *hostname)
 {
-#define MAX_CN 256
    char dnsname[MAX_CN];
    int dnsnamesize;
    int found_dnsname = 0;
@@ -76,7 +74,7 @@ int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
 
       if (ret == GNUTLS_SAN_DNSNAME) {
          found_dnsname = 1;
-         if (hostname_compare(dnsname, hostname)) {
+         if (_gnutls_hostname_compare(dnsname, hostname)) {
             return 1;
          }
       }
@@ -92,7 +90,7 @@ int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
          return 0;
       }
 
-      if (hostname_compare(dn.common_name, hostname)) {
+      if (_gnutls_hostname_compare(dn.common_name, hostname)) {
          return 1;
       }
    }
@@ -105,7 +103,7 @@ int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
 /* compare hostname against certificate, taking account of wildcards
  * return 1 on success or 0 on error 
  */
-static int hostname_compare(const char *certname, const char *hostname)
+int _gnutls_hostname_compare(const char *certname, const char *hostname)
 {
    const char *cmpstr1, *cmpstr2;
 
@@ -184,7 +182,7 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
 
       if (ret == GNUTLS_SAN_DNSNAME) {
          found_dnsname = 1;
-         if (hostname_compare(dnsname, hostname)) {
+         if (_gnutls_hostname_compare(dnsname, hostname)) {
             return 1;
          }
       }
@@ -202,7 +200,7 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
          return 0;
       }
 
-      if (hostname_compare(dnsname, hostname)) {
+      if (_gnutls_hostname_compare(dnsname, hostname)) {
          return 1;
       }
    }

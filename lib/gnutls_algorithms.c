@@ -495,8 +495,8 @@ inline int _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm alg
   * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
   * @algorithm: is a MAC algorithm
   *
-  * Returns a string that contains the name 
-  * of the specified MAC algorithm.
+  * Returns a string that contains the name
+  * of the specified MAC algorithm or NULL.
   **/
 const char *gnutls_mac_get_name( gnutls_mac_algorithm algorithm)
 {
@@ -542,8 +542,8 @@ inline
   * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
   * @algorithm: is a Compression algorithm
   *
-  * Returns a pointer to a string that contains the name 
-  * of the specified compression algorithm.
+  * Returns a pointer to a string that contains the name
+  * of the specified compression algorithm or NULL.
   **/
 const char *gnutls_compression_get_name( gnutls_compression_method algorithm)
 {
@@ -691,8 +691,8 @@ int _gnutls_cipher_get_export_flag(gnutls_cipher_algorithm algorithm)
   * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
   * @algorithm: is an encryption algorithm
   *
-  * Returns a pointer to a string that contains the name 
-  * of the specified cipher.
+  * Returns a pointer to a string that contains the name
+  * of the specified cipher or NULL.
   **/
 const char *gnutls_cipher_get_name( gnutls_cipher_algorithm algorithm)
 {
@@ -744,7 +744,7 @@ inline int _gnutls_kx_priority(gnutls_session session, gnutls_kx_algorithm algor
   * @algorithm: is a key exchange algorithm
   *
   * Returns a pointer to a string that contains the name 
-  * of the specified key exchange algorithm.
+  * of the specified key exchange algorithm or NULL.
   **/
 const char *gnutls_kx_get_name( gnutls_kx_algorithm algorithm)
 {
@@ -829,8 +829,8 @@ gnutls_protocol_version _gnutls_version_max(gnutls_session session)
   * gnutls_protocol_get_name - Returns a string with the name of the specified SSL/TLS version
   * @version: is a (gnutls) version number
   *
-  * Returns a string that contains the name 
-  * of the specified TLS version.
+  * Returns a string that contains the name
+  * of the specified TLS version or NULL.
   **/
 const char *gnutls_protocol_get_name( gnutls_protocol_version version)
 {
@@ -965,7 +965,7 @@ const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
   * @mac_algorithm: is a MAC algorithm
   *
   * Returns a string that contains the name of a TLS
-  * cipher suite, specified by the given algorithms.
+  * cipher suite, specified by the given algorithms, or NULL.
   *
   * Note that the full cipher suite name must be prepended
   * by TLS or SSL depending of the protocol in use.

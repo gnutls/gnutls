@@ -87,7 +87,7 @@ char *x509_crlfile = NULL;
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
-#define GERR(ret) fprintf(stdout, "Error: %s\n", gnutls_strerror(ret))
+#define GERR(ret) fprintf(stdout, "Error: %s\n", safe_strerror(ret))
 #define MAX_BUF 1024
 
 #undef max
@@ -133,6 +133,12 @@ LIST_TYPE_DECLARE(listener_item, char *http_request;
 		  int response_written;
 		  int http_state;
 		  int fd; gnutls_session tls_session; int handshake_ok;);
+
+static const char *safe_strerror(int value)
+{ const char *ret = gnutls_strerror(value);
+  if (ret == NULL) ret = str_unknown;
+  return ret;
+}
 
 static void listener_free(listener_item * j)
 {
@@ -213,7 +219,7 @@ static void read_dh_params(void)
    size = gnutls_dh_params_import_pkcs3( dh_params, &params, GNUTLS_X509_FMT_PEM);
 
    if (size < 0) {
-   	fprintf(stderr, "Error parsing dh params: %s\n", gnutls_strerror(size));
+   	fprintf(stderr, "Error parsing dh params: %s\n", safe_strerror(size));
    	exit(1);
    }
 
@@ -385,6 +391,7 @@ char *peer_print_info(gnutls_session session, int *ret_length,
    strcat(http_buffer, "<P>\n");
 
    tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
+   if (tmp == NULL) tmp = str_unknown;
    sprintf(tmp2,
 	   "<TABLE border=1><TR><TD>Protocol version:</TD><TD>%s</TD></TR>\n",
 	   tmp);
@@ -393,25 +400,31 @@ char *peer_print_info(gnutls_session session, int *ret_length,
       tmp =
 	  gnutls_certificate_type_get_name(gnutls_certificate_type_get
 					   (session));
+      if (tmp == NULL) tmp = str_unknown;
       sprintf(tmp2, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n",
 	      tmp);
    }
 
    tmp = gnutls_kx_get_name(kx_alg);
+   if (tmp == NULL) tmp = str_unknown;
    sprintf(tmp2, "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
 
    tmp = gnutls_compression_get_name(gnutls_compression_get(session));
+   if (tmp == NULL) tmp = str_unknown;
    sprintf(tmp2, "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
 
    tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
+   if (tmp == NULL) tmp = str_unknown;
    sprintf(tmp2, "<TR><TD>Cipher</TD><TD>%s</TD></TR>\n", tmp);
 
    tmp = gnutls_mac_get_name(gnutls_mac_get(session));
+   if (tmp == NULL) tmp = str_unknown;
    sprintf(tmp2, "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
 
    tmp = gnutls_cipher_suite_get_name(kx_alg,
 				      gnutls_cipher_get(session),
 				      gnutls_mac_get(session));
+   if (tmp == NULL) tmp = str_unknown;
    sprintf(tmp2, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
 	   tmp);
 
@@ -537,8 +550,8 @@ int main(int argc, char **argv)
    signal(SIGPIPE, SIG_IGN);
    signal(SIGHUP, SIG_IGN);
    signal(SIGTERM, terminate);
-   signal(SIGINT, terminate);
-   /* CHECKME: background processes shouldn't handle SIGINT! */
+   if (signal(SIGINT, terminate) == SIG_IGN)
+      signal(SIGINT, SIG_IGN); /* e.g. background process */
 
    gaa_parser(argc, argv);
 
@@ -1108,7 +1121,7 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
 		 unsigned int keyfpr_length, gnutls_datum * key)
 {
    static const char hostname[] = "hkp://wwwkeys.pgp.net";
-   static const short port = 11371;
+   static const int port = 11371;
    int rc;
    CDK_KBNODE knode = NULL;
    unsigned int i;

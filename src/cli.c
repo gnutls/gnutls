@@ -35,7 +35,7 @@
 #include <sys/time.h>
 #include <signal.h>
 #include <netdb.h>
-#include <common.h>
+#include "common.h"
 #include "cli-gaa.h"
 
 #ifndef SHUT_WR
@@ -222,7 +222,7 @@ static int handle_error(socket_st hd, int err)
 	}
 
 	str = gnutls_strerror(err);
-	if (str == NULL) str = "(unknown)";
+	if (str == NULL) str = str_unknown;
 	fprintf(stderr,
 		"*** %s error: %s\n", err_type, str);
 
@@ -230,7 +230,7 @@ static int handle_error(socket_st hd, int err)
 	    || err == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 		alert = gnutls_alert_get(hd.session);
 		str = gnutls_alert_get_name(alert);
-		if (str == NULL) str = "(unknown)";
+		if (str == NULL) str = str_unknown;
 		printf("*** Received alert [%d]: %s\n", alert, str);
 
 	}
@@ -240,7 +240,7 @@ static int handle_error(socket_st hd, int err)
 	return ret;
 }
 
-int starttls_alarmed;
+int starttls_alarmed = 0;
 
 void starttls_alarm (int signum)
 {

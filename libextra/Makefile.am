@@ -28,12 +28,12 @@ COBJECTS_EXTRA = ext_srp.c \
 libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LIBOPENCDK_LIBS) $(LZO_LINK)
-libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) ../lib/libgnutls.la
 libgnutls_extra_la_DEPENDENCIES = $(LZO_OBJECTS)
 
 libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) 
 
-libgnutls_extra_la_LIBADD = openpgp/openpgp.lo openpgp/xml.lo openpgp/gnutls_openpgp.lo
+libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) ../lib/libgnutls.la \
+	openpgp/openpgp.lo openpgp/xml.lo openpgp/gnutls_openpgp.lo
 
 EXTRA_libgnutls_extra_la_SOURCES = minilzo.c
 

@@ -7,6 +7,8 @@
  */
 #define PRI_MAX 16
 
+extern const char str_unknown[];
+
 int print_info( gnutls_session state, const char* hostname);
 void print_cert_info( gnutls_session state, const char* hostname);
 void print_list(void);

@@ -108,11 +108,14 @@ int gnutls_alert_send( gnutls_session session, gnutls_alert_level level, gnutls_
 {
 	uint8 data[2];
 	int ret;
-	
+	const char *name;
+
 	data[0] = (uint8) level;
 	data[1] = (uint8) desc;
 
-	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], gnutls_alert_get_name((int)data[1]));
+	name = gnutls_alert_get_name((int)data[1]);
+	if (name == NULL) name = "(unknown)";
+	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], name);
 
 	if ( (ret = _gnutls_send_int( session, GNUTLS_ALERT, -1, data, 2)) >= 0)
 		return 0;
