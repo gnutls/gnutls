@@ -47,7 +47,7 @@
 #include <gnutls_state.h>
 
 #ifdef HANDSHAKE_DEBUG
-#define ERR(x, y) _gnutls_handshake_log( "HSK: %s (%d)\n", x,y)
+#define ERR(x, y) _gnutls_handshake_log( "HSK[%x]: %s (%d)\n", session, x,y)
 #else
 #define ERR(x, y)
 #endif
@@ -252,7 +252,7 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 	}
 	DECR_LEN(len, 2);
 
-	_gnutls_handshake_log("HSK: Client's version: %d.%d\n", data[pos], data[pos + 1]);
+	_gnutls_handshake_log("HSK[%x]: Client's version: %d.%d\n", session, data[pos], data[pos + 1]);
 
 	version = _gnutls_version_get(data[pos], data[pos + 1]);
 	set_adv_version(session, data[pos], data[pos + 1]);
@@ -549,12 +549,12 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	}
 
 #ifdef HANDSHAKE_DEBUG
-	_gnutls_handshake_log("HSK: Requested cipher suites: \n");
+	_gnutls_handshake_log("HSK[%x]: Requested cipher suites: \n", session);
 	for (j = 0; j < datalen; j += 2)
 		_gnutls_handshake_log("\t%s\n",
 			    _gnutls_cipher_suite_get_name(*
 							  ((GNUTLS_CipherSuite *) & data[j])));
-	_gnutls_handshake_log("HSK: Supported cipher suites: \n");
+	_gnutls_handshake_log("HSK[%x]: Supported cipher suites: \n", session);
 	for (j = 0; j < x; j++)
 		_gnutls_handshake_log("\t%s\n",
 			    _gnutls_cipher_suite_get_name(ciphers[j]));
@@ -567,8 +567,8 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		for (i = 0; i < x; i++) {
 			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
 			    0) {
-				_gnutls_handshake_log("HSK: Selected cipher suite: %s\n",
-					    _gnutls_cipher_suite_get_name(*
+				_gnutls_handshake_log("HSK[%x]: Selected cipher suite: %s\n",
+					    session, _gnutls_cipher_suite_get_name(*
 									  ((GNUTLS_CipherSuite *) & data[j])));
 				memcpy(session->security_parameters.current_cipher_suite.CipherSuite, ciphers[i].CipherSuite, 2);
 				retval = 0;
@@ -607,7 +607,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	if (session->internals.auth_struct == NULL) {
 
 		_gnutls_handshake_log
-		    ("HSK: Cannot find the appropriate handler for the KX algorithm\n");
+		    ("HSK[%x]: Cannot find the appropriate handler for the KX algorithm\n", session);
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -642,8 +642,8 @@ int _gnutls_server_select_comp_method(gnutls_session session, opaque * data,
 				session->internals.compression_method = method;
 				gnutls_free(comps);
 
-				_gnutls_handshake_log("HSK: Selected Compression Method: %s\n",
-				    gnutls_compression_get_name(session->internals.
+				_gnutls_handshake_log("HSK[%x]: Selected Compression Method: %s\n",
+				    session, gnutls_compression_get_name(session->internals.
 							compression_method));
 
 
@@ -744,8 +744,8 @@ int _gnutls_send_handshake(gnutls_session session, void *i_data,
 	if (i_datasize > 0)
 		memcpy(&data[pos], i_data, i_datasize);
 
-	_gnutls_handshake_log("HSK: %s was send [%ld bytes]\n",
-		    _gnutls_handshake2str(type), datasize);
+	_gnutls_handshake_log("HSK[%x]: %s was send [%ld bytes]\n",
+		    session, _gnutls_handshake2str(type), datasize);
 
 
 	/* Here we keep the handshake messages in order to hash them...
@@ -865,8 +865,8 @@ static int _gnutls_recv_handshake_header(gnutls_session session,
 		length32 = _gnutls_read_uint24(&dataptr[1]);
 		handshake_header_size = HANDSHAKE_HEADER_SIZE;
 
-		_gnutls_handshake_log("HSK: %s was received [%ld bytes]\n",
-			    _gnutls_handshake2str(dataptr[0]),
+		_gnutls_handshake_log("HSK[%x]: %s was received [%ld bytes]\n",
+			    session, _gnutls_handshake2str(dataptr[0]),
 			    length32 + HANDSHAKE_HEADER_SIZE);
 
 	} else {		/* v2 hello */
@@ -876,8 +876,8 @@ static int _gnutls_recv_handshake_header(gnutls_session session,
 
 		*recv_type = dataptr[0];
 
-		_gnutls_handshake_log("HSK: %s(v2) was received [%ld bytes]\n",
-			    _gnutls_handshake2str(*recv_type),
+		_gnutls_handshake_log("HSK[%x]: %s(v2) was received [%ld bytes]\n",
+			    session, _gnutls_handshake2str(*recv_type),
 			    length32 + handshake_header_size);
 
 		if (*recv_type != GNUTLS_CLIENT_HELLO) {	/* it should be one or nothing */
@@ -1091,7 +1091,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	memcpy(session->security_parameters.
 	       current_cipher_suite.CipherSuite, suite, 2);
 
-	_gnutls_handshake_log("HSK: Selected cipher suite: ");
+	_gnutls_handshake_log("HSK[%x]: Selected cipher suite: ", session);
 	_gnutls_handshake_log("%s\n",
 		    _gnutls_cipher_suite_get_name(session->
 						  security_parameters.
@@ -1123,7 +1123,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	if (session->internals.auth_struct == NULL) {
 
 		_gnutls_handshake_log
-		    ("HSK: Cannot find the appropriate handler for the KX algorithm\n");
+		    ("HSK[%x]: Cannot find the appropriate handler for the KX algorithm\n", session);
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -1176,10 +1176,10 @@ static int _gnutls_client_check_if_resuming(gnutls_session session,
 					    opaque * session_id,
 					    int session_id_len)
 {
-char buf[64];
+char buf[2*TLS_MAX_SESSION_ID_SIZE+1];
 
-	_gnutls_handshake_log("HSK: SessionID length: %d\n", session_id_len);
-	_gnutls_handshake_log("HSK: SessionID: %s\n",
+	_gnutls_handshake_log("HSK[%x]: SessionID length: %d\n", session, session_id_len);
+	_gnutls_handshake_log("HSK[%x]: SessionID: %s\n", session,
 		    _gnutls_bin2hex(session_id, session_id_len, buf, sizeof(buf)));
 
 	if ((session->internals.resumed_security_parameters.
@@ -1231,7 +1231,8 @@ static int _gnutls_read_server_hello(gnutls_session session, char *data,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	_gnutls_handshake_log("HSK: Server's version: %d.%d\n", data[pos], data[pos + 1]);
+	_gnutls_handshake_log("HSK[%x]: Server's version: %d.%d\n", 
+		session, data[pos], data[pos + 1]);
 
 	DECR_LEN(len, 2);
 	version = _gnutls_version_get(data[pos], data[pos + 1]);
@@ -1598,7 +1599,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 	uint8 comp;
 	opaque *SessionID = session->security_parameters.session_id;
 	uint8 session_id_len = session->security_parameters.session_id_size;
-	char buf[64];
+	char buf[2*TLS_MAX_SESSION_ID_SIZE+1];
 
 	if (SessionID == NULL)
 		session_id_len = 0;
@@ -1639,7 +1640,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 		}
 		pos += session_id_len;
 
-		_gnutls_handshake_log("HSK: SessionID: %s\n",
+		_gnutls_handshake_log("HSK[%x]: SessionID: %s\n", session,
 			    _gnutls_bin2hex(SessionID, session_id_len, buf, sizeof(buf)));
 
 		memcpy(&data[pos],
@@ -1825,10 +1826,9 @@ static int _gnutls_handshake_hash_init( gnutls_session session) {
   * if the client has asked to resume a session, but the server couldn't, 
   * then a full handshake will be performed.
   *
-  * In a handshake all kind of errors should be considered as fatal
-  * except for the non-fatal errors GNUTLS_E_AGAIN and
-  * GNUTLS_E_INTERRUPTED; in that case you may resume the handshake
-  * (call this function again, until it returns ok); cf.
+  * The non-fatal errors such as GNUTLS_E_AGAIN and GNUTLS_E_INTERRUPTED
+  * interrupt the handshake procedure, which should be later be resumed.
+  * (call this function again, until it returns 0); cf.
   * gnutls_record_get_direction().
   *
   * If this function is called by a server after a rehandshake request then
@@ -1901,7 +1901,7 @@ int _gnutls_handshake_client(gnutls_session session)
 
 	if (session->internals.resumed_security_parameters.
 	    session_id_size > 0)
-		_gnutls_handshake_log("HSK: Ask to resume: %s\n",
+		_gnutls_handshake_log("HSK[%x]: Ask to resume: %s\n", session,
 			    _gnutls_bin2hex(session->internals.
 					    resumed_security_parameters.
 					    session_id,
@@ -2243,18 +2243,13 @@ int _gnutls_handshake_common(gnutls_session session)
 
 int _gnutls_generate_session_id(char *session_id, uint8 * len)
 {
-	char buf[64];
-
-	*len = TLS_RANDOM_SIZE;
+	*len = TLS_MAX_SESSION_ID_SIZE;
 
 	if (_gnutls_get_random(session_id, *len, GNUTLS_WEAK_RANDOM) <
 	    0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
-	_gnutls_handshake_log("HSK: Generated SessionID: %s\n",
-		    _gnutls_bin2hex(session_id, *len, buf, sizeof(buf)));
 
 	return 0;
 }
@@ -2384,8 +2379,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 
 		if (keep == 0) {
 
-			_gnutls_handshake_log("HSK: Keeping ciphersuite: ");
-			_gnutls_handshake_log("%s\n",
+			_gnutls_handshake_log("HSK[%x]: Keeping ciphersuite: %s\n", session,
 				    _gnutls_cipher_suite_get_name(*
 								  ((GNUTLS_CipherSuite *) & (*cipherSuites)[i].CipherSuite)));
 
@@ -2393,8 +2387,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 			       (*cipherSuites)[i].CipherSuite, 2);
 			newSuiteSize++;
 		} else {
-			_gnutls_handshake_log("HSK: Removing ciphersuite: ");
-			_gnutls_handshake_log("%s\n",
+			_gnutls_handshake_log("HSK[%x]: Removing ciphersuite: %s\n", session, 
 				    _gnutls_cipher_suite_get_name(*
 								  ((GNUTLS_CipherSuite *) & (*cipherSuites)[i].CipherSuite)));
 

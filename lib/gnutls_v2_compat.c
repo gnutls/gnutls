@@ -52,7 +52,7 @@ static int _gnutls_handshake_select_v2_suite(gnutls_session session, char *data,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_handshake_log( "HSK: Parsing a version 2.0 client hello.\n");
+	_gnutls_handshake_log( "HSK[%x]: Parsing a version 2.0 client hello.\n", session);
 
 	i = _datalen = 0;
 	for (j = 0; j < datalen; j += 3) {
@@ -94,8 +94,8 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 
 	DECR_LEN(len, 2);
 
-	_gnutls_handshake_log( "HSK: SSL 2.0 Hello: Client's version: %d.%d\n", data[pos],
-		data[pos + 1]);
+	_gnutls_handshake_log( "HSK[%x]: SSL 2.0 Hello: Client's version: %d.%d\n", 
+		session, data[pos], data[pos + 1]);
 
 	set_adv_version( session, data[pos], data[pos+1]);
 	
@@ -168,7 +168,8 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 	if (session->internals.auth_struct == NULL) {
 
 		_gnutls_handshake_log(
-			"HSK: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n");
+			"HSK[%x]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
+				session);
 
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;

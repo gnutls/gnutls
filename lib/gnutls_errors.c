@@ -99,7 +99,7 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("Function was interrupted.", GNUTLS_E_AGAIN, 0 ), 
 	ERROR_ENTRY("Function was interrupted.", GNUTLS_E_INTERRUPTED, 0 ), 
 	ERROR_ENTRY("Rehandshake was requested by the peer.", GNUTLS_E_REHANDSHAKE, 0 ),
-	ERROR_ENTRY("TLS Application data were received, while expected handshake data.", GNUTLS_E_GOT_APPLICATION_DATA, 1 ), 
+	ERROR_ENTRY("TLS Application data were received, while expecting handshake data.", GNUTLS_E_GOT_APPLICATION_DATA, 1 ), 
 	ERROR_ENTRY("Error in Database backend.", GNUTLS_E_DB_ERROR, 1 ), 
 	ERROR_ENTRY("The certificate type is not supported.", GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE, 1 ), 
 	ERROR_ENTRY("The given memory buffer is too short to hold parameters.", GNUTLS_E_SHORT_MEMORY_BUFFER, 1 ),

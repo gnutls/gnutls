@@ -43,7 +43,7 @@
 #include <list.h>
 
 #ifdef HAVE_LIBOPENCDK
-#include <opencdk.h>
+# include <opencdk.h>
 
 static int
 recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
@@ -762,8 +762,7 @@ int main(int argc, char **argv)
 	    int r, ret;
 
 	    if (j->handshake_ok == 0) {
-r=gnutls_alert_send( j->tls_session, GNUTLS_AL_WARNING, GNUTLS_A_EXPORT_RESTRICTION);
-//	       r = gnutls_handshake(j->tls_session);
+	       r = gnutls_handshake(j->tls_session);
 	       if (r < 0 && gnutls_error_is_fatal(r) == 0) {
 		  check_alert(j->tls_session, r);
 		  /* nothing */
@@ -836,8 +835,7 @@ r=gnutls_alert_send( j->tls_session, GNUTLS_AL_WARNING, GNUTLS_A_EXPORT_RESTRICT
 	    int r;
 
 	    if (j->handshake_ok == 0) {
-r=gnutls_alert_send( j->tls_session, GNUTLS_AL_WARNING, GNUTLS_A_EXPORT_RESTRICTION);
-//	       r = gnutls_handshake(j->tls_session);
+	       r = gnutls_handshake(j->tls_session);
 	       if (r < 0 && gnutls_error_is_fatal(r) == 0) {
 		  check_alert(j->tls_session, r);
 		  /* nothing */

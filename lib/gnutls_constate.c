@@ -495,8 +495,8 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 	if (rc < 0)
 		return rc;
 
-	_gnutls_handshake_log("HSK: Cipher Suite: %s\n",
-			      _gnutls_cipher_suite_get_name(session->
+	_gnutls_handshake_log("HSK[%x]: Cipher Suite: %s\n",
+			      session, _gnutls_cipher_suite_get_name(session->
 							    security_parameters.
 							    current_cipher_suite));
 
@@ -532,7 +532,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 					read_mac_algorithm);
 
 	_gnutls_handshake_log
-	    ("HSK: Initializing internal [read] cipher sessions\n");
+	    ("HSK[%x]: Initializing internal [read] cipher sessions\n", session);
 
 	switch (session->security_parameters.entity) {
 	case GNUTLS_SERVER:
@@ -676,7 +676,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 	if (rc < 0)
 		return rc;
 
-	_gnutls_handshake_log("HSK: Cipher Suite: %s\n",
+	_gnutls_handshake_log("HSK[%x]: Cipher Suite: %s\n", session,
 			      _gnutls_cipher_suite_get_name(session->
 							    security_parameters.
 							    current_cipher_suite));
@@ -715,7 +715,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 					write_mac_algorithm);
 
 	_gnutls_handshake_log
-	    ("HSK: Initializing internal [write] cipher sessions\n");
+	    ("HSK[%x]: Initializing internal [write] cipher sessions\n", session);
 
 	switch (session->security_parameters.entity) {
 	case GNUTLS_SERVER:
