@@ -1,3 +1,9 @@
+2003-03-29 10:59  nmav <nmav@gnutls.org>
+
+	* src/common.c:
+
+	Some fixes in the gnutls_x509_crt_to_xml() function.  
+
 2003-03-28 22:28  nmav <nmav@gnutls.org>
 
 	* lib/x509_b64.c:
