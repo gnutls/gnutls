@@ -1,6 +1,17 @@
 SUBDIRS = x509
 
-INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl -I$(top_srcdir)/libextra -I$(srcdir)/minitasn1 -I$(top_srcdir)/libextra/openpgp/ -I$(top_srcdir)/libextra/opencdk -I$(srcdir)/x509 -I$(top_srcdir)/includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl			\
+	-I$(top_srcdir)/includes -I$(srcdir)/x509			\
+	-I$(top_srcdir)/libextra -I$(top_srcdir)/libextra/openpgp/	\
+	-I$(top_srcdir)/libextra/opencdk 				\
+	$(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
+
+if ENABLE_MINITASN1
+AM_CPPFLAGS += -I$(srcdir)/minitasn1
+else
+AM_CPPFLAGS += $(LIBTASN1_CFLAGS)
+endif
+
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
@@ -10,15 +21,6 @@ dist_m4data_DATA = libgnutls.m4
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
-
-if ENABLE_MINITASN1
-SUBDIRS += minitasn1
-MINITASN1_COBJECTS = minitasn1/decoding.c minitasn1/gstr.c minitasn1/errors.c \
-	minitasn1/parser_aux.c minitasn1/structure.c minitasn1/element.c \
-	minitasn1/coding.c
-else
-MINITASN1_COBJECTS = 
-endif
 
 EXTRA_DIST = libgnutls.vers gnutls-api.texi
 lib_LTLIBRARIES = libgnutls.la
@@ -61,14 +63,20 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 
 # Separate so we can create the documentation
 
-libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(MINITASN1_COBJECTS)	\
-	$(SRP_COBJECTS) gnutls.asn pkix.asn
+libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
+	gnutls.asn pkix.asn
 
 libgnutls_la_LDFLAGS = -export-symbols-regex '^(_gnutls|gnutls|_E_).*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_la_LIBADD = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS)	\
-	../crypto/libgc.la x509/libgnutls_x509.la
+libgnutls_la_LIBADD = ../crypto/libgc.la x509/libgnutls_x509.la	\
+	$(LIBGCRYPT_LIBS)
+
+if ENABLE_MINITASN1
+libgnutls_la_LIBADD += minitasn1/libminitasn1.la
+else
+libgnutls_la_LIBADD += $(LIBTASN1_LIBS) 
+endif
 
 pkix_asn1_tab.c: pkix.asn
 	-asn1Parser pkix.asn pkix_asn1_tab.c
