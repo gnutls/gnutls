@@ -41,6 +41,8 @@ GNUTLS_KXAlgorithm kx;
 				       gnutls_srp_server_get_username(state));
 			break;
 		case GNUTLS_CRD_CERTIFICATE:
+			cert_list = gnutls_certificate_get_peers( state, &cert_list_size);
+
 			switch( gnutls_cert_type_get( state)) {
 				case GNUTLS_CRT_X509:
 
@@ -48,7 +50,6 @@ GNUTLS_KXAlgorithm kx;
 
 					   /* in case of X509 PKI
 					    */
-					cert_list = gnutls_certificate_get_peers( state, &cert_list_size);
 
 					if (cert_list_size > 0) {
 						char digest[20];
