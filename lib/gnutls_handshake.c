@@ -24,17 +24,17 @@
 int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KX_Algorithm algorithm;
-	MPI x, Y, g, p;
-	int n_Y, n_g, n_p;
-	uint16 _n_Y, _n_g, _n_p;
+	MPI x, X, g, p;
+	int n_X, n_g, n_p;
+	uint16 _n_X, _n_g, _n_p;
 	uint8 data[1536];	/* 3*512 */
 	uint8 *data_p;
 	uint8 *data_g;
-	uint8 *data_Y;
+	uint8 *data_X;
 	int ret=0;
 
 
-	n_Y = n_g = n_p = 512 - 2;
+	n_X = n_g = n_p = 512 - 2;
 
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo(state->
@@ -44,8 +44,10 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
 
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
-			Y = _gnutls_calc_dh_secret(&x);
+			X = _gnutls_calc_dh_secret(&x);
+
 			state->gnutls_internals.dh_secret = x;
+
 			g = _gnutls_get_dh_params(&p);
 
 
@@ -74,21 +76,20 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			memmove(data_g, &_n_g, 2);
 #endif
 
-			data_Y = &data_g[2+n_g];
-			gcry_mpi_print(GCRYMPI_FMT_STD, &data_Y[2],
-				       &n_Y, Y);
-			_n_Y = n_Y;
+			data_X = &data_g[2+n_g];
+			gcry_mpi_print(GCRYMPI_FMT_STD, &data_X[2],
+				       &n_X, X);
+			_n_X = n_X;
 #ifndef WORDS_BIGENDIAN
-			_n_Y = byteswap16(_n_Y);
-			memmove(data_Y, &_n_Y, 2);
+			_n_X = byteswap16(_n_X);
+			memmove(data_X, &_n_X, 2);
 #else
-			memmove(data_Y, &_n_Y, 2);
+			memmove(data_X, &_n_X, 2);
 #endif
-
 
 			ret =
 			    _gnutls_send_handshake(cd, state, data,
-						   n_p + n_g + n_Y + 6,
+						   n_p + n_g + n_X + 6,
 						   GNUTLS_SERVER_KEY_EXCHANGE);
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
@@ -130,6 +131,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 				       &n_X, X);
 
 
+			
 			_n_X = n_X;
 #ifndef WORDS_BIGENDIAN
 			_n_X = byteswap16(_n_X);
@@ -145,11 +147,11 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 			/* calculate the key after sending the message */
 			state->gnutls_internals.KEY = __gnutls_calc_dh_key( state->gnutls_internals.client_Y, x, state->gnutls_internals.client_p);
-
 			gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
 				       &premaster_size, state->gnutls_internals.KEY);
-			fprintf(stderr, "premaster: %s || %d\n", bin2hex(premaster, premaster_size), premaster_size);
 
+			/* THIS SHOULD BE DISCARDED */
+			mpi_release(state->gnutls_internals.KEY);
 			
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
@@ -157,7 +159,9 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 	master = gnutls_PRF( premaster, premaster_size, "master secret", strlen("master secret"),
 						random, 64 ,48);
+	fprintf(stderr, "master: %s\n", bin2hex(master, 48));
 	memmove( state->security_parameters.master_secret, master, 48);
+
 	secure_free(master);
 	gnutls_free(random);
 	
@@ -198,7 +202,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 			n_p = byteswap16(n_p);
 #endif
 			data_p = &data[i];
-			i+=n_p;			
+			i+=n_p;	
 			
 			memmove( &n_g, &data[i], 2);
 #ifndef WORDS_BIGENDIAN
@@ -213,9 +217,9 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 #ifndef WORDS_BIGENDIAN
 			n_Y = byteswap16(n_Y);
 #endif
-			i+=n_Y;
 			data_Y = &data[i];
-
+			i+=n_Y;
+			
 			_n_Y = n_Y;
 			_n_g = n_g;
 			_n_p = n_p;
@@ -276,7 +280,8 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 
 			gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
 				       &premaster_size, state->gnutls_internals.KEY);
-			fprintf(stderr, "premaster: %s\n", bin2hex(premaster, premaster_size));
+			/* THIS SHOULD BE DISCARDED */
+			mpi_release(state->gnutls_internals.KEY);
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 		}
@@ -284,10 +289,12 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 
 	master = gnutls_PRF( premaster, premaster_size, "master secret", strlen("master secret"),
 						random, 64 ,48);
+	fprintf(stderr, "master: %s\n", bin2hex(master, 48));
+
 	memmove( state->security_parameters.master_secret, master, 48);
+
 	secure_free(master);
 	gnutls_free(random);
-
 
 	return ret;
 

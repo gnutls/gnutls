@@ -7,7 +7,18 @@
 
 static char hexconvtab[] = "0123456789abcdef";
 
-char * bin2hex(const unsigned char *old, const size_t oldlen)
+void dump_mpi(char* prefix, MPI a)
+{
+	char buf[400];
+	size_t n = sizeof buf;
+
+	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, &n, a))
+		strcpy(buf, "[can't print value]");
+	fprintf(stderr, "MPI: %s%s\n", prefix, buf);
+}
+
+
+char *bin2hex(const unsigned char *old, const size_t oldlen)
 {
 	unsigned char *new = NULL;
 	int i, j;
@@ -59,7 +70,8 @@ void _print_TLSCompressed(GNUTLSCompressed * compressed)
 	fprintf(stderr, "version: %d,%d\n", compressed->version.major,
 		compressed->version.minor);
 	fprintf(stderr, "length: %d\n", compressed->length);
-	fprintf(stderr, "fragment: %s\n", bin2hex(compressed->fragment, compressed->length));
+	fprintf(stderr, "fragment: %s\n",
+		bin2hex(compressed->fragment, compressed->length));
 	fprintf(stderr, "\n");
 }
 
@@ -71,12 +83,13 @@ void _print_TLSPlaintext(GNUTLSPlaintext * plaintext)
 	fprintf(stderr, "version: %d,%d\n", plaintext->version.major,
 		plaintext->version.minor);
 	fprintf(stderr, "length: %d\n", plaintext->length);
-	fprintf(stderr, "fragment: %s\n", bin2hex(plaintext->fragment, plaintext->length));
+	fprintf(stderr, "fragment: %s\n",
+		bin2hex(plaintext->fragment, plaintext->length));
 	fprintf(stderr, "\n");
 }
 
 
-void _print_TLSCiphertext( GNUTLSCiphertext * ciphertext)
+void _print_TLSCiphertext(GNUTLSCiphertext * ciphertext)
 {
 
 	fprintf(stderr, "TLSCiphertext packet:\n");
@@ -85,6 +98,7 @@ void _print_TLSCiphertext( GNUTLSCiphertext * ciphertext)
 		ciphertext->version.minor);
 	fprintf(stderr, "length: %d\n", ciphertext->length);
 
-	fprintf(stderr, "fragment: %s\n", bin2hex(ciphertext->fragment, ciphertext->length));
+	fprintf(stderr, "fragment: %s\n",
+		bin2hex(ciphertext->fragment, ciphertext->length));
 	fprintf(stderr, "\n");
 }
