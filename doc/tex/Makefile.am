@@ -1,12 +1,12 @@
 EXTRA_DIST = gnutls.tex gnutls.ps \
 	ex1.tex ex2.tex ex3.tex srp1.tex serv1.tex ex4.tex \
-	fdl.tex cover.tex.in gnutls-logo.ps layers.ps
+	fdl.tex cover.tex.in gnutls-logo.ps layers.ps pgp-fix1.eps
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex \
 	auth.tex ciphers.tex errors.tex layers.tex alert.tex record.tex \
 	funcs.tex examples.tex ex4.tex ../../libextra/gnutls-extra-api.tex \
-	memory.tex
+	memory.tex intro.tex openpgp.tex
 
 gnutls.html: $(TEX_OBJECTS)            
 	-latex2html gnutls.tex -no_navigation -no_subdir 1 -split 0 \

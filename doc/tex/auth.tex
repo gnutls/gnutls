@@ -1,4 +1,4 @@
-\section{Authentication methods}
+\chapter{Authentication methods}
 \par
 The following authentication schemas are supported in \gnutls:
 \begin{enumerate}
@@ -7,7 +7,7 @@ The following authentication schemas are supported in \gnutls:
  \item SRP authentication
 \end{enumerate}
 
-\subsection{Authentication using X.509 certificates}
+\section{Authentication using X.509 certificates}
 This authentication method is part of the certificate authentication
 method in \gnutls{}.
 The X.509 protocols rely on a hierarchical trust model. In this trust model
@@ -56,22 +56,16 @@ parameters which are send to the peer.
 
 \end{figure}
 
-\subsection{Authentication using OpenPGP keys}
+\section{Authentication using OpenPGP keys}
 This authentication method is part of the certificate authentication
-method in \gnutls{}.
-OpenPGP authentication relies on a distributed trust model, called the "web
-of trust". The "web of trust" uses a decentralized system of trusted
-introducers, which are the same as a CA. OpenPGP allows anyone to sign
-anyone's else public key. When Alice signs Bob's key, she is introducing 
-Bob's key to anyone who trusts Alice. If someone trusts Alice to introduce
-keys, then Alice is a trusted introducer in the mind of that observer.
-\par
-
-The key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
+method in \gnutls{}. All the key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
 available in OpenPGP authentication. 
 
+\input{openpgp}
 
-\subsection{Anonymous authentication}
+
+
+\section{Anonymous authentication}
 The anonymous key exchange perform encryption but there is no indication of the 
 identity of the peer. This kind of authentication is vulnerable to man in the middle attack, 
 but this protocol can be used even if there is no prior communication or common trusted
@@ -92,7 +86,7 @@ ANON\_DH & This algorithm exchanges Diffie Hellman parameters.
 
 \end{figure}
 
-\subsection{Authentication using SRP}
+\section{Authentication using SRP}
 Authentication using the SRP\footnote{SRP stands for Secure Password Protocol and 
 is described in RFC2945. The SRP key exchange is not a part of the \tlsI{} protocol}
 is actually password authentication, since the two peers are identified by the knowledge of a password. 
@@ -129,7 +123,7 @@ SRP & Authentication using the SRP protocol.
 
 \end{figure}
 
-\subsubsection{The included ``srpcrypt'' program}
+\subsection{The included ``srpcrypt'' program}
 The ``gnutls-srpcrypt'' is a very simple program that emulates the programs in the libsrp 
 found in \htmladdnormallink{http://srp.stanford.edu}{http://srp.stanford.edu}.
 It is intended for use in places where you don't expect srp
