@@ -113,6 +113,8 @@ static int is_leaf(ASN1_TYPE p)
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
 
+#define XML_HEADER "<?xml version='1.0' encoding='UTF-8'?>\n"
+
 static int
 _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			 gnutls_datum * res)
@@ -128,6 +130,8 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 
 	res->data = NULL;
 	res->size = 0;
+
+	STR_APPEND(XML_HEADER);
 
 	root = _asn1_find_node(structure, name);
 

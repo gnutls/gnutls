@@ -2599,5 +2599,3 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
 	return _gnutls_x509_time2gtime( ttime, year);
 
 }
-
-                                 
