@@ -5,3 +5,5 @@ libtoolize -c --force && \
 autoheader  && \
 automake -a -c || automake -a -c
 autoconf 
+
+echo "You can now run \"./configure\" and \"make\""
