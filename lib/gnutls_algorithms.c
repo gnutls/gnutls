@@ -923,7 +923,9 @@ _gnutls_qsort(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
 }
 
 
-/* a compare function for KX algorithms (using priorities). For use with qsort */
+/* a compare function for KX algorithms (using priorities). 
+ * For use with qsort 
+ */
 static int
 _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 		     const void *i_A2)
@@ -945,10 +947,10 @@ _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
 					      i_A2);
 
-	int p1 = (_gnutls_kx_priority(state, kA1) + 1) * 100;
-	int p2 = (_gnutls_kx_priority(state, kA2) + 1) * 100;
-	p1 += (_gnutls_cipher_priority(state, cA1) + 1) * 10;
-	p2 += (_gnutls_cipher_priority(state, cA2) + 1) * 10;
+	int p1 = (_gnutls_kx_priority(state, kA1) + 1) * 64;
+	int p2 = (_gnutls_kx_priority(state, kA2) + 1) * 64;
+	p1 += (_gnutls_cipher_priority(state, cA1) + 1) * 8;
+	p2 += (_gnutls_cipher_priority(state, cA2) + 1) * 8;
 	p1 += _gnutls_mac_priority(state, mA1);
 	p2 += _gnutls_mac_priority(state, mA2);
 

@@ -256,6 +256,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	if (type!=GNUTLS_ALERT) /* alert messages are sent anyway */
 		if ( _gnutls_session_is_valid( state) || state->gnutls_internals.may_write != 0) {
+			gnutls_assert();
 			return GNUTLS_E_INVALID_SESSION;
 		}
 

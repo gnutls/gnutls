@@ -215,6 +215,8 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 void gnutls_deinit(GNUTLS_STATE state)
 {
 
+	if (state==NULL) return;
+
 	/* remove auth info firstly */
 	_gnutls_free_auth_info(state );
 

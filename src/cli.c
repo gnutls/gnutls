@@ -140,7 +140,7 @@ int main(int argc, char **argv)
    }
 
    /* X509 stuff */
-   if (gnutls_certificate_allocate_sc(&xcred) < 0) {	/* space for 2 certificates */
+   if (gnutls_certificate_allocate_sc(&xcred) < 0) {
       fprintf(stderr, "Certificate allocation memory error\n");
       exit(1);
    }
