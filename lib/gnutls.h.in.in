@@ -193,6 +193,11 @@ int gnutls_kx_set_priority( gnutls_session session, const int*);
 int gnutls_protocol_set_priority( gnutls_session session, const int*);
 int gnutls_certificate_type_set_priority( gnutls_session session, const int*);
 
+/* if you just want some defaults, use the following.
+ */
+int gnutls_set_default_priority(gnutls_session session);
+int gnutls_set_default_export_priority(gnutls_session session);
+
 /* Returns the name of a cipher suite */
 const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm kx_algorithm,
 	gnutls_cipher_algorithm cipher_algorithm, gnutls_mac_algorithm mac_algorithm);

@@ -39,22 +39,24 @@
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_cipher_set_priority( gnutls_session session, const int* list) {
-const int* _list = list;
-int num=0, i;
+int gnutls_cipher_set_priority(gnutls_session session, const int *list)
+{
+	const int *_list = list;
+	int num = 0, i;
 
-	while( *_list != 0) {
+	while (*_list != 0) {
 		num++;
 		++_list;
-	} 
-
-	num = GMIN( MAX_ALGOS, num);
-	session->internals.cipher_algorithm_priority.algorithms = num;
-	
-	for (i=0;i<num;i++) {
-		session->internals.cipher_algorithm_priority.priority[i] = list[i];
 	}
-	
+
+	num = GMIN(MAX_ALGOS, num);
+	session->internals.cipher_algorithm_priority.algorithms = num;
+
+	for (i = 0; i < num; i++) {
+		session->internals.cipher_algorithm_priority.priority[i] =
+		    list[i];
+	}
+
 	return 0;
 }
 
@@ -70,21 +72,23 @@ int num=0, i;
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
  **/
-int gnutls_kx_set_priority( gnutls_session session, const int* list) {
-const int* _list = list;
-int num=0, i;
+int gnutls_kx_set_priority(gnutls_session session, const int *list)
+{
+	const int *_list = list;
+	int num = 0, i;
 
-	while( *_list != 0) {
+	while (*_list != 0) {
 		num++;
 		++_list;
-	} 
+	}
 
 
-	num = GMIN( MAX_ALGOS, num);
+	num = GMIN(MAX_ALGOS, num);
 	session->internals.kx_algorithm_priority.algorithms = num;
 
-	for (i=0;i<num;i++) {
-		session->internals.kx_algorithm_priority.priority[i] = list[i];
+	for (i = 0; i < num; i++) {
+		session->internals.kx_algorithm_priority.priority[i] =
+		    list[i];
 	}
 
 	return 0;
@@ -102,21 +106,23 @@ int num=0, i;
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_mac_set_priority( gnutls_session session, const int* list) {
-const int* _list = list;
-int num=0, i;
+int gnutls_mac_set_priority(gnutls_session session, const int *list)
+{
+	const int *_list = list;
+	int num = 0, i;
 
-	while( *_list != 0) {
+	while (*_list != 0) {
 		num++;
 		++_list;
-	} 
+	}
 
-	
-	num = GMIN( MAX_ALGOS, num);
+
+	num = GMIN(MAX_ALGOS, num);
 	session->internals.mac_algorithm_priority.algorithms = num;
 
-	for (i=0;i<num;i++) {
-		session->internals.mac_algorithm_priority.priority[i] = list[i];
+	for (i = 0; i < num; i++) {
+		session->internals.mac_algorithm_priority.priority[i] =
+		    list[i];
 	}
 
 	return 0;
@@ -139,20 +145,23 @@ int num=0, i;
   * as gnutls extensions.
   *
   **/
-int gnutls_compression_set_priority( gnutls_session session, const int* list) {
-const int* _list = list;
-int num=0, i;
+int gnutls_compression_set_priority(gnutls_session session,
+				    const int *list)
+{
+	const int *_list = list;
+	int num = 0, i;
 
-	while( *_list != 0) {
+	while (*_list != 0) {
 		num++;
 		++_list;
-	} 
-	
-	num = GMIN( MAX_ALGOS, num);
+	}
+
+	num = GMIN(MAX_ALGOS, num);
 	session->internals.compression_method_priority.algorithms = num;
 
-	for (i=0;i<num;i++) {
-		session->internals.compression_method_priority.priority[i] = list[i];
+	for (i = 0; i < num; i++) {
+		session->internals.compression_method_priority.
+		    priority[i] = list[i];
 	}
 	return 0;
 }
@@ -167,20 +176,21 @@ int num=0, i;
   * versions always have highest priority.
   *
   **/
-int gnutls_protocol_set_priority( gnutls_session session, const int* list) {
-const int* _list = list;
-int num=0, i;
+int gnutls_protocol_set_priority(gnutls_session session, const int *list)
+{
+	const int *_list = list;
+	int num = 0, i;
 
-	while( *_list != 0) {
+	while (*_list != 0) {
 		num++;
 		++_list;
-	} 
+	}
 
-	
-	num = GMIN( MAX_ALGOS, num);
+
+	num = GMIN(MAX_ALGOS, num);
 	session->internals.protocol_priority.algorithms = num;
 
-	for (i=0;i<num;i++) {
+	for (i = 0; i < num; i++) {
 		session->internals.protocol_priority.priority[i] = list[i];
 	}
 
@@ -188,7 +198,9 @@ int num=0, i;
 	 * This will be overriden later.
 	 */
 	if (num > 0)
-		_gnutls_set_current_version( session, session->internals.protocol_priority.priority[0]);
+		_gnutls_set_current_version(session,
+					    session->internals.
+					    protocol_priority.priority[0]);
 
 	return 0;
 }
@@ -205,22 +217,25 @@ int num=0, i;
   * The server does not use the cert type priority except for disabling
   * types that were not specified.
   **/
-int gnutls_certificate_type_set_priority( gnutls_session session, const int* list) {
+int gnutls_certificate_type_set_priority(gnutls_session session,
+					 const int *list)
+{
 #ifdef HAVE_LIBOPENCDK
-const int* _list = list;
-int num=0, i;
+	const int *_list = list;
+	int num = 0, i;
 
 
-	while( *_list != 0) {
+	while (*_list != 0) {
 		num++;
 		++_list;
-	} 
+	}
 
-	num = GMIN( MAX_ALGOS, num);
+	num = GMIN(MAX_ALGOS, num);
 	session->internals.cert_type_priority.algorithms = num;
 
-	for (i=0;i<num;i++) {
-		session->internals.cert_type_priority.priority[i] = list[i];
+	for (i = 0; i < num; i++) {
+		session->internals.cert_type_priority.priority[i] =
+		    list[i];
 	}
 
 	return 0;
@@ -229,4 +244,81 @@ int num=0, i;
 
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
+}
+
+/**
+  * gnutls_set_default_priority - Sets some default priority on the cipher suites supported by gnutls.
+  * @session: is a &gnutls_session structure.
+  *
+  * Sets some default priority on the ciphers, key exchange methods, macs
+  * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
+  * these defaults are ok.
+  * The order is:
+  * - TLS1, SSL3 for protocols.
+  * - GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA for key exchange algorithms.
+  * - GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms.
+  * - GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC,
+  *   GNUTLS_CIPHER_3DES_CBC for ciphers.
+  *
+  **/
+int gnutls_set_default_priority(gnutls_session session)
+{
+	static const int protocol_priority[16] =
+	    { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+	static const int kx_priority[16] =
+	    { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, 0 };
+	static const int cipher_priority[16] =
+	    { GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
+		GNUTLS_CIPHER_3DES_CBC, 0
+	};
+	static const int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
+	static const int mac_priority[16] =
+	    { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+
+	gnutls_cipher_set_priority(session, cipher_priority);
+	gnutls_compression_set_priority(session, comp_priority);
+	gnutls_kx_set_priority(session, kx_priority);
+	gnutls_protocol_set_priority(session, protocol_priority);
+	gnutls_mac_set_priority(session, mac_priority);
+        
+        return 0;
+}
+
+/**
+  * gnutls_set_default_export_priority - Sets some default priority on the cipher suites supported by gnutls.
+  * @session: is a &gnutls_session structure.
+  *
+  * Sets some default priority on the ciphers, key exchange methods, macs
+  * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
+  * these defaults are ok. This function also includes weak algorithms.
+  * The order is:
+  * - TLS1, SSL3 for protocols.
+  * - GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA_EXPORT for key exchange algorithms.
+  * - GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms.
+  * - GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC,
+  *   GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_40 for ciphers.
+  *
+  **/
+int gnutls_set_default_export_priority(gnutls_session session)
+{
+	static const int protocol_priority[16] =
+	    { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+	static const int kx_priority[16] =
+	    { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA,
+GNUTLS_KX_RSA_EXPORT, 0 };
+	static const int cipher_priority[16] =
+	    { GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
+		GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_40, 0
+	};
+	static const int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
+	static const int mac_priority[16] =
+	    { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+
+	gnutls_cipher_set_priority(session, cipher_priority);
+	gnutls_compression_set_priority(session, comp_priority);
+	gnutls_kx_set_priority(session, kx_priority);
+	gnutls_protocol_set_priority(session, protocol_priority);
+	gnutls_mac_set_priority(session, mac_priority);
+
+        return 0;
 }

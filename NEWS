@@ -7,6 +7,9 @@ Version 0.5.9
   starttls implementations.
 - Added gnutls_x509_extract_certificate_dn_string() which returns the peer's
   Distinguished name in a single string.
+- Added gnutls_set_default_priority() and gnutls_set_default_export_priority()
+  functions, to avoid calling all the *_priority() functions if the defaults
+  are ok.
 
 Version 0.5.8 (25/09/2002)
 - Updated documentation.
