@@ -445,7 +445,7 @@ gnutls_openpgp_extract_certificate_issuer_dn( const gnutls_datum *cert,
   PKT pkt = NULL;
   PKT_userid *uid = NULL;
   char *p;
-  int rc = 0, pos1, pos2;
+  int rc = 0, pos1 = 0, pos2 = 0;
 
   if (!cert || !dn)
     return GNUTLS_E_UNKNOWN_ERROR;
