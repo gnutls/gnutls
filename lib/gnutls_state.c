@@ -363,8 +363,8 @@ int _gnutls_openpgp_send_fingerprint(GNUTLS_STATE state) {
 	return state->gnutls_internals.pgp_fingerprint;
 }
 
-/**
-  * gnutls_record_set_default_version - Used to set the default version for the first record packet
+/*-
+  * _gnutls_record_set_default_version - Used to set the default version for the first record packet
   * @state: is a &GNUTLS_STATE structure.
   * @version: is a tls version
   *
@@ -372,8 +372,8 @@ int _gnutls_openpgp_send_fingerprint(GNUTLS_STATE state) {
   * record packet (client hello). This function is only useful to people
   * that know TLS internals and want to debug other implementations.
   *
-  **/
-void gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version version)
+  -*/
+void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version version)
 {
 	state->gnutls_internals.default_record_version = version;
 }

@@ -410,6 +410,7 @@ int ret;
 	return ret;
 }
 
+void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version version);
 
 int test_version_rollback( GNUTLS_STATE state) {
 int ret;
@@ -428,7 +429,7 @@ int ret;
 	ADD_ALL_MACS(state);
 	ADD_ALL_KX(state);
 	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
-	gnutls_record_set_default_version( state, GNUTLS_SSL3);
+	_gnutls_record_set_default_version( state, GNUTLS_SSL3);
 
 	ret = do_handshake( state);
 	if (ret!=SUCCEED) return ret;

@@ -3,6 +3,8 @@
 
 #include <gnutls_int.h>
 
+void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version version);
+
 void _gnutls_state_cert_type_set( GNUTLS_STATE state, CertificateType);
 KXAlgorithm gnutls_kx_get( GNUTLS_STATE state);
 CertificateType gnutls_cert_type_get( GNUTLS_STATE state);
