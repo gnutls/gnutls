@@ -211,6 +211,8 @@ typedef enum gnutls_privkey_pkcs8_flags {
 	GNUTLS_PKCS8_PLAIN=1,  /* if set the private key will not
 			        * be encrypted.
 				*/
+	GNUTLS_PKCS8_USE_PKCS12_3DES,
+	GNUTLS_PKCS8_USE_PKCS12_ARCFOUR
 } gnutls_privkey_pkcs8_flags;
 
 int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
@@ -285,6 +287,7 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag);
 int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass);
 
 int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass);
+int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag bag, const char* pass, unsigned int flags);
 
 typedef enum gnutls_pkcs12_bag_type {
 	GNUTLS_BAG_EMPTY = 0,

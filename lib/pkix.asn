@@ -1028,6 +1028,7 @@ pkcs-9-challengePassword        ::= CHOICE {
       printableString       PrintableString (SIZE (1..pkcs-9-ub-challengePassword)),
       utf8String            UTF8String (SIZE (1..pkcs-9-ub-challengePassword)) }
 
+pkcs-9-localKeyId ::= OCTET STRING
 
 -- PKCS #8 stuff
 
@@ -1162,7 +1163,7 @@ pkcs-12-CRLBag ::= SEQUENCE {
 --	{OCTET STRING IDENTIFIED BY {pkcs-9-crlTypes 1}}
 -- DER-encoded X.509 CRL stored in OCTET STRING
 
-pkcs-12-PKCS12Attribute ::= ANY
+pkcs-12-PKCS12Attribute ::= Attribute
 
 -- PKCS #7 stuff (needed in PKCS 12)
 

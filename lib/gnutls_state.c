@@ -213,8 +213,8 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 
 	/* set the socket pointers to -1;
 	 */
-	(*session)->internals.transport_recv_ptr = -1;
-	(*session)->internals.transport_send_ptr = -1;
+	(*session)->internals.transport_recv_ptr = (gnutls_transport_ptr)-1;
+	(*session)->internals.transport_send_ptr = (gnutls_transport_ptr)-1;
 	
 	/* set the default maximum record size for TLS
 	 */

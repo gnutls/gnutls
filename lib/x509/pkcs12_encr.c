@@ -46,7 +46,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
 
   cur_keylen = 0;
   pwlen = strlen (pw);
-  if (pwlen > 63/2 || salt_size > 8) {
+  if (pwlen > 63/2 || (salt_size % 8) != 0) {
       gnutls_assert();
       return GNUTLS_E_INVALID_REQUEST;
   }
@@ -59,7 +59,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
   /* Store salt and password in BUF_I */
   p = buf_i;
   for(i=0; i < 64; i++)
-    *p++ = salt [i%8];
+    *p++ = salt [i % salt_size];
   for(i=j=0; i < 64; i += 2)
     {
       *p++ = 0;
@@ -73,6 +73,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
       md = gcry_md_open (GCRY_MD_SHA1, 0);
       if (!md)
         {
+          gnutls_assert();
           return GNUTLS_E_DECRYPTION_FAILED;
         }
       for(i=0; i < 64; i++)
@@ -98,6 +99,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
       rc = gcry_mpi_scan (&num_b1, GCRYMPI_FMT_USG, buf_b, &n);
       if (rc)
         {
+          gnutls_assert();
           return GNUTLS_E_DECRYPTION_FAILED;
         }
       gcry_mpi_add_ui (num_b1, num_b1, 1);
@@ -109,6 +111,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
           rc = gcry_mpi_scan (&num_ij, GCRYMPI_FMT_USG, buf_i + i, &n);
           if (rc)
             {
+              gnutls_assert();
               return GNUTLS_E_DECRYPTION_FAILED;
             }
           gcry_mpi_add (num_ij, num_ij, num_b1);
@@ -117,6 +120,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
           rc = gcry_mpi_print (GCRYMPI_FMT_USG, buf_i + i, &n, num_ij);
           if (rc)
             {
+              gnutls_assert();
               return GNUTLS_E_DECRYPTION_FAILED;
             }
           gcry_mpi_release (num_ij);

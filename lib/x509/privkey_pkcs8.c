@@ -826,7 +826,7 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key,
 
 	if (key->key == NULL) {
 		gnutls_assert();
-		result = GNUTLS_E_ASN1_DER_ERROR;
+		result = GNUTLS_E_DECRYPTION_FAILED;
 		goto cleanup;
 	}
 
