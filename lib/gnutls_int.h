@@ -408,8 +408,8 @@ typedef struct {
 } HANDSHAKE_HEADER_BUFFER;
 
 /* Openpgp key retrieval callback */
-typedef int (*gnutls_openpgp_recv_key_func)(unsigned char keyfpr[20], 
-	gnutls_datum *key);
+typedef int (*gnutls_openpgp_recv_key_func)(const unsigned char *keyfpr, 
+	unsigned int keyfpr_length, gnutls_datum *key);
 
 typedef struct {
 	gnutls_buffer			application_data_buffer; /* holds data to be delivered to application layer */

@@ -1,0 +1,124 @@
+\begin {verbatim}
+
+/* This file is actually an example of using the OpenCDK library
+ * to retrieve an OpenPGP key from a key server.
+ */
+
+#include <opencdk.h>
+
+/* A callback function that tries to connect
+ * to a public keyserver to get the specified key.
+ */
+
+static const char *hostname = "keyserver.somewhere.com";
+static const short port = 11371;
+
+int
+recv_openpgp_key(const unsigned char *keyfpr, unsigned int
+                 keyfpr_length, gnutls_datum * key)
+{
+   CDK_STREAM buf = NULL;
+   struct hostent *hp;
+   struct sockaddr_in sock;
+   char *request = NULL;
+   char buffer[4096];
+   int fd = -1;
+   int rc = 0, state = 0, nread = 0;
+   size_t nbytes = 0, n = 0;
+   const unsigned char *keyid;
+
+   /* The key fingerprint should be 20 bytes
+    */
+   if (keyfpr_length != 20)
+      return -1;
+
+   /* The key id is the last 4 bytes of the key fingerprint
+    */
+   keyid = keyfpr[16];
+
+   if (key == NULL) {
+      return -1;
+   }
+
+   /* Connect to the key server 
+    */
+   hp = gethostbyname(hostname);
+   if (hp == NULL)
+      return -1;
+
+   memset(&sock, 0, sizeof sock);
+   memcpy(&sock.sin_addr, hp->h_addr, hp->h_length);
+   sock.sin_family = hp->h_addrtype;
+   sock.sin_port = htons(port);
+
+   fd = socket(AF_INET, SOCK_STREAM, 0);
+   if (fd == -1)
+      return -1;
+
+   setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *) 1, 1);
+   if (connect(fd, (struct sockaddr *) &sock, sizeof sock) == -1) {
+      close(fd);
+      return -1;
+   }
+
+   n = strlen(hostname) + 100;
+   request = cdk_calloc(1, n + 1);
+   if (!request) {
+      close(fd);
+      return -1;
+   }
+   snprintf(request, n,
+            "GET /pks/lookup?op=get&search=0x%08lX HTTP/1.0\r\n"
+            "Host: %s:%d\r\n\r\n", *((unsigned int *) keyid), host, port);
+
+   if (write(fd, request, strlen(request)) == -1) {
+      cdk_free(request);
+      close(fd);
+      return -1;
+   }
+   cdk_free(request);
+
+   buf = cdk_stream_tmp();
+   if (!buf) {
+      rc = GNUTLS_E_MEMORY_ERROR;
+      goto leave;
+   }
+
+   while ((n = read(fd, buffer, sizeof buffer - 1)) > 0) {
+      buffer[n] = '\0';
+      nbytes += n;
+      cdk_stream_write(buf, buffer, n);
+      if (strstr(buffer, "<pre>") || strstr(buffer, "</pre>"))
+         state++;
+   }
+
+   if (state != 2) {
+      rc = -1;
+      goto leave;
+   }
+
+   key->data = NULL;
+   key->size = 0;
+
+   cdk_stream_set_armor_flag(buf, 0);
+   cdk_stream_seek(buf, 0);
+   while (!cdk_stream_eof(buf)) {
+      nread = cdk_stream_read(buf, buf, sizeof buf - 1);
+      if (nread == EOF)
+         break;
+      key->data = realloc(key->data, key->size + nread);
+      if (key->data == NULL)
+         return -1;
+
+      memcpy(&key->data[key->size], buf, nread);
+      key->size += nread;
+   }
+
+ leave:
+   cdk_stream_close(buf);
+   close(fd);
+   return 0;
+}
+
+
+\end{verbatim}
