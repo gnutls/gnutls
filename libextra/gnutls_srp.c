@@ -371,7 +371,8 @@ int gnutls_srp_allocate_client_credentials( gnutls_srp_client_credentials *sc) {
   * @password: is the user's password
   *
   * This function sets the username and password, in a gnutls_srp_client_credentials structure.
-  * Those will be used in SRP authentication.
+  * Those will be used in SRP authentication. @username and @password should be ASCII
+  * strings or UTF-8 strings prepared using the "SASLprep" profile of "stringprep".
   *
   * Returns 0 on success.
   **/
@@ -594,6 +595,8 @@ void gnutls_srp_set_server_credentials_function(
   *
   * The @username and @password must be allocated using gnutls_malloc().
   * @times will be 0 the first time called, and 1 the second.
+  * @username and @password should be ASCII strings or UTF-8 strings 
+  * prepared using the "SASLprep" profile of "stringprep".
   *
   * The callback function will be called once or twice per handshake.
   * The first time called, is before the ciphersuite is negotiated.
