@@ -39,6 +39,7 @@ typedef struct _cfg_ctx
 	char *pkcs9_email;
 	char *country;
 	char *dns_name;
+	char* ip_addr;
 	char *email;
 	char *crl_dist_points;
 	char *password;
@@ -87,6 +88,7 @@ int template_parse(const char *template)
 		{NULL, '\0', "pkcs9_email", CFG_STR, (void *) &cfg.pkcs9_email, 0},
 		{NULL, '\0', "country", CFG_STR, (void *) &cfg.country, 0},
 		{NULL,    '\0', "dns_name",      CFG_STR,          (void *) &cfg.dns_name,     0},
+		{NULL,    '\0', "ip_address",      CFG_STR,          (void *) &cfg.ip_addr,     0},
 		{NULL,    '\0', "email",      CFG_STR,          (void *) &cfg.email,     0},
 		{NULL, '\0', "crl_dist_points", CFG_STR, (void *) &cfg.crl_dist_points, 0},
 		{NULL, '\0', "pkcs12_key_name", CFG_STR, (void *) &cfg.pkcs12_key_name, 0},
@@ -434,6 +436,15 @@ const char* get_dns_name( void)
 		return cfg.dns_name;
 	} else {
 		return read_str( "Enter the dnsName of the subject of the certificate: ");
+	}
+}
+
+const char* get_ip_addr( void)
+{
+	if (batch) {
+		return cfg.ip_addr;
+	} else {
+		return read_str( "Enter the IP address of the subject of the certificate: ");
 	}
 }
 

@@ -42,6 +42,7 @@ int get_encrypt_status( int server);
 int get_sign_status( int server);
 const char* get_email( void);
 const char* get_dns_name( void);
+const char* get_ip_addr( void);
 
 
 void get_cn_crq_set( gnutls_x509_crq crq);

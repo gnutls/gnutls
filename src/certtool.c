@@ -319,13 +319,21 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 
 	server = get_tls_server_status();
 	if (server != 0) {
+		result = 0;
+
 		str = get_dns_name();
 		if (str != NULL) {
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_DNSNAME, str);
-			if (result < 0) {
-				fprintf(stderr, "subject_alt_name: %s\n", gnutls_strerror(result));
-				exit(1);
+		} else {
+			str = get_ip_addr();
+			if (str != NULL) {
+				result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_IPADDRESS, str);
 			}
+		}
+
+		if (result < 0) {
+			fprintf(stderr, "subject_alt_name: %s\n", gnutls_strerror(result));
+			exit(1);
 		}
 
 		result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
