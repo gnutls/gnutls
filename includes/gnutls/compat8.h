@@ -83,4 +83,6 @@ int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int
 
 #define gnutls_certificate_set_rsa_params gnutls_certificate_set_rsa_export_params
 
+#define GNUTLS_CERT_NOT_TRUSTED GNUTLS_CERT_INVALID
+
 #endif

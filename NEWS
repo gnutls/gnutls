@@ -1,3 +1,6 @@
+Version 1.0.8
+- Corrected bug in mutual certificate authentication in SSL 3.0.
+
 Version 1.0.7 (25/02/2004)
 - Implemented TLS 1.1 (and also obsoleted the TLS 1.0 CBC protection
   hack).

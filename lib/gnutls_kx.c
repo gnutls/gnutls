@@ -41,18 +41,20 @@
  */
 
 #define MASTER_SECRET "master secret"
-static int generate_normal_master( gnutls_session session);
+static int generate_normal_master( gnutls_session session, int);
 
-int _gnutls_generate_master( gnutls_session session) {
+int _gnutls_generate_master( gnutls_session session, int keep_premaster) 
+{
 	if (session->internals.resumed==RESUME_FALSE)
-		return generate_normal_master(session);
+		return generate_normal_master(session, keep_premaster);
 	return 0;
 }
 
 /* here we generate the TLS Master secret.
  */
 #define PREMASTER session->key->key
-static int generate_normal_master( gnutls_session session) {
+static int generate_normal_master( gnutls_session session, int keep_premaster) 
+{
 int ret = 0;
 opaque random[2*TLS_RANDOM_SIZE];
 char buf[64];
@@ -77,7 +79,8 @@ char buf[64];
 			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE, 
 			       session->security_parameters.master_secret); 
 	}
-	_gnutls_free_datum(&PREMASTER);
+	
+	if (!keep_premaster) _gnutls_free_datum(&PREMASTER);
 	
 	if (ret<0) return ret;
 

@@ -242,7 +242,7 @@ uint size;
 	if (gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
 		return 0;
 
-	do {
+	if (data_size > 0) do {
 		/* This works like DECR_LEN() 
 		 */
 		result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;

@@ -60,7 +60,9 @@
 #define FALSE 0
 
 int _gnutls_server_select_comp_method(gnutls_session session,
-				    opaque * data, int datalen);
+	opaque * data, int datalen);
+inline static
+void _gnutls_ssl3_hash_extra_data( gnutls_session session, int type, GNUTLS_MAC_HANDLE td);
 
 
 /* Clears the handshake hash buffers and handles.
@@ -132,15 +134,11 @@ void _gnutls_set_client_random(gnutls_session session, uint8 * random)
 
 /* Calculate The SSL3 Finished message 
  */
-#define SSL3_CLIENT_MSG "CLNT"
-#define SSL3_SERVER_MSG "SRVR"
-#define SSL_MSG_LEN 4
+
 static int _gnutls_ssl3_finished(gnutls_session session, int type, opaque * ret)
 {
-	const int siz = SSL_MSG_LEN;
 	GNUTLS_MAC_HANDLE td_md5;
 	GNUTLS_MAC_HANDLE td_sha;
-	const char *mesg;
 
 	td_md5 = _gnutls_hash_copy( session->internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
@@ -155,14 +153,8 @@ static int _gnutls_ssl3_finished(gnutls_session session, int type, opaque * ret)
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	if (type == GNUTLS_SERVER) {
-		mesg = SSL3_SERVER_MSG;
-	} else {
-		mesg = SSL3_CLIENT_MSG;
-	}
-
-	_gnutls_hash(td_md5, mesg, siz);
-	_gnutls_hash(td_sha, mesg, siz);
+	_gnutls_ssl3_hash_extra_data( session, type, td_md5);
+	_gnutls_ssl3_hash_extra_data( session, type, td_sha);
 
 	_gnutls_mac_deinit_ssl3_handshake(td_md5, ret, session->security_parameters.master_secret, TLS_MASTER_SIZE);
 	_gnutls_mac_deinit_ssl3_handshake(td_sha, &ret[16], session->security_parameters.master_secret, TLS_MASTER_SIZE);
@@ -709,7 +701,8 @@ int ret;
 		return ret;
 	}
 
-	if ( type != GNUTLS_HELLO_REQUEST) {
+	if ( type != GNUTLS_HELLO_REQUEST) 
+	{
 		_gnutls_hash( session->internals.handshake_mac_handle_sha, dataptr, datalen);
 		_gnutls_hash( session->internals.handshake_mac_handle_md5, dataptr, datalen);
 	}
@@ -2572,3 +2565,21 @@ gnutls_handshake_description gnutls_handshake_get_last_out( gnutls_session sessi
 	return session->internals.last_handshake_out;
 }
 
+/* Appends to a hash handle the data required by the SSL 3.0
+ * handshake hash.
+ */
+#define SSL3_CLIENT_MSG "CLNT"
+#define SSL3_SERVER_MSG "SRVR"
+#define SSL_MSG_LEN 4
+inline static
+void _gnutls_ssl3_hash_extra_data( gnutls_session session, int type, GNUTLS_MAC_HANDLE td)
+{
+const char* mesg;
+
+	if (type==GNUTLS_CLIENT)
+		mesg = SSL3_CLIENT_MSG;
+        else
+        	mesg = SSL3_SERVER_MSG;
+
+	_gnutls_hash(td, mesg, SSL_MSG_LEN);
+}
