@@ -444,6 +444,11 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 		return ret;
 	}
  
+ /* Copy peer's information to AUTH_INFO
+  */
+  	memcpy( &info->peer_dn, &peer_certificate_list[0].cert_info, sizeof(gnutls_DN));
+  	memcpy( &info->issuer_dn, &peer_certificate_list[0].issuer_info, sizeof(gnutls_DN));
+  	
 	gnutls_free( peer_certificate_list);
 
 

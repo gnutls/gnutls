@@ -1,6 +1,15 @@
 #ifndef GNUTLS_CERT_H
 # define GNUTLS_CERT_H
 
+typedef struct {
+	char common_name[256];
+	char country[3];
+	char organization[256];
+	char organizational_unit_name[256];
+	char locality_name[256];
+	char state_or_province_name[256];
+} gnutls_DN;
+
 typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
 	GNUTLS_PK_DH
 } PKAlgorithm;
@@ -11,12 +20,8 @@ typedef struct {
 				 */
 	PKAlgorithm subject_pk_algorithm;
 
-	char *common_name;
-	char *country;
-	char *organization;
-	char *organizational_unit_name;
-	char *locality_name;
-	char *state_or_province_name;
+	gnutls_DN  cert_info;
+	gnutls_DN  issuer_info;
 
 	gnutls_datum raw; /* the raw certificate */
 } gnutls_cert;

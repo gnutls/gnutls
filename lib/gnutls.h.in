@@ -180,9 +180,18 @@ typedef struct {
 typedef enum verified { GNUTLS_VERIFIED, GNUTLS_NOT_VERIFIED, GNUTLS_EXPIRED, GNUTLS_INVALID } CertificateStatus;
 
 typedef struct {
-	gnutls_datum 		*peer_certificate_list; /* In DER format */
-	int 			peer_certificate_list_size;
-	CertificateStatus 	peer_certificate_status;
+	char common_name[256];
+	char country[3];
+	char organization[256];
+	char organizational_unit_name[256];
+	char locality_name[256];
+	char state_or_province_name[256];
+} gnutls_DN;
+
+typedef struct {
+	gnutls_DN	  peer_dn;
+	gnutls_DN	  issuer_dn;
+	CertificateStatus peer_certificate_status;
 } X509PKI_CLIENT_AUTH_INFO;
 
 

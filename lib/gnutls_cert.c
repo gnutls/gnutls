@@ -83,12 +83,12 @@ int n,i;
 	}
 	gnutls_free( cert.params);
 	
-	GNUTLS_FREE( cert.common_name);
-	GNUTLS_FREE( cert.country);
-	GNUTLS_FREE( cert.organization);
-	GNUTLS_FREE( cert.organizational_unit_name);
-	GNUTLS_FREE( cert.locality_name);
-	GNUTLS_FREE( cert.state_or_province_name);
+//	GNUTLS_FREE( cert.common_name);
+//	GNUTLS_FREE( cert.country);
+//	GNUTLS_FREE( cert.organization);
+//	GNUTLS_FREE( cert.organizational_unit_name);
+//	GNUTLS_FREE( cert.locality_name);
+//	GNUTLS_FREE( cert.state_or_province_name);
 
 	gnutls_free_datum( &cert.raw);
 
@@ -437,6 +437,8 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 
 }
 
+/* res is not malloced 
+ */
 #define _READ( str, OID, NAME, res) \
 	if(strcmp(str, OID)==0){ \
 	  strcpy( str, "PKIX1Implicit88.X520"); \
@@ -471,7 +473,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	  	continue; \
 	  } \
 	  str[len]=0; \
-	  res = strdup(str); \
+	  if (strlen(str) < sizeof(res)) strcpy( res, str); \
 	  asn1_delete_structure( tmpasn); \
 	}
 
@@ -488,7 +490,7 @@ static void int2str(int k, char* data) {
  * ASN.1 structure. (Taken from Fabio's samples!)
  * --nmav
  */
-static int _get_Name_type( node_asn *rasn, char *root, gnutls_cert * gCert)
+static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 {
 	int k, k2, result, len;
 	char name[128], str[1024], name2[128], counter[5], name3[128];
@@ -543,19 +545,19 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_cert * gCert)
 				node_asn *tmpasn;
 
 				_READ(str, "2 5 4 6", "countryName",
- 				      gCert->country);
+ 				      dn->country);
 				_READ(str, "2 5 4 10", "OrganizationName",
-				      gCert->organization);
+				      dn->organization);
 				_READ(str, "2 5 4 11",
 				      "OrganizationalUnitName",
-				      gCert->organizational_unit_name);
+				      dn->organizational_unit_name);
 				_READ(str, "2 5 4 3", "CommonName",
-				      gCert->common_name);
+				      dn->common_name);
 				_READ(str, "2 5 4 7", "LocalityName",
-				      gCert->locality_name);
+				      dn->locality_name);
 				_READ(str, "2 5 4 8",
 				      "StateOrProvinceName",
-				      gCert->state_or_province_name);
+				      dn->state_or_province_name);
 			}
 		} while (1);
 	} while (1);
@@ -633,15 +635,18 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	}
 
 
-	gCert->country = NULL;
-	gCert->common_name = NULL;
-	gCert->organization = NULL;
-	gCert->organizational_unit_name = NULL;
-	gCert->locality_name = NULL;
-	gCert->state_or_province_name = NULL;
+	memset( &gCert->cert_info, 0, sizeof(gCert->cert_info));
+	memset( &gCert->issuer_info, 0, sizeof(gCert->issuer_info));
 
 	if ((result =
-	     _get_Name_type( c2, "certificate2.tbsCertificate.subject", gCert)) < 0) {
+	     _get_Name_type( c2, "certificate2.tbsCertificate.subject", &gCert->cert_info)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+
+	if ((result =
+	     _get_Name_type( c2, "certificate2.tbsCertificate.issuer", &gCert->issuer_info)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
@@ -700,8 +705,8 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 	int i;
 
 	for (i = 0; i < cert_list_length; i++) {
-		if (cert_list[i][0].common_name != NULL) {
-			if (strcmp(cert_list[i][0].common_name, name) == 0) {
+		if (cert_list[i][0].cert_info.common_name[0] != 0) {
+			if (strcmp(cert_list[i][0].cert_info.common_name, name) == 0) {
 				cert = &cert_list[i][0];
 				break;
 			}

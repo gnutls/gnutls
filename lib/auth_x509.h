@@ -30,8 +30,9 @@ typedef struct {
 			 */
 } X509PKI_CREDENTIALS;
 
-
 typedef struct {
+	gnutls_DN	  peer_dn;
+	gnutls_DN	  issuer_dn;
 	CertificateStatus peer_certificate_status;
 } X509PKI_CLIENT_AUTH_INFO;
 

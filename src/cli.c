@@ -76,6 +76,22 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 		}
 	}
 
+	printf(" - Certificate info:\n");
+	printf(" -   CN: %s\n", x509_info->peer_dn.common_name);
+	printf(" -   OU: %s\n", x509_info->peer_dn.organizational_unit_name);
+	printf(" -   O: %s\n", x509_info->peer_dn.organization);
+	printf(" -   L: %s\n", x509_info->peer_dn.locality_name);
+	printf(" -   S: %s\n", x509_info->peer_dn.state_or_province_name);
+	printf(" -   C: %s\n", x509_info->peer_dn.country);
+
+	printf(" - Certificate Issuer's info:\n");
+	printf(" -   CN: %s\n", x509_info->issuer_dn.common_name);
+	printf(" -   OU: %s\n", x509_info->issuer_dn.organizational_unit_name);
+	printf(" -   O: %s\n", x509_info->issuer_dn.organization);
+	printf(" -   L: %s\n", x509_info->issuer_dn.locality_name);
+	printf(" -   S: %s\n", x509_info->issuer_dn.state_or_province_name);
+	printf(" -   C: %s\n", x509_info->issuer_dn.country);
+
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
 	printf("- Version: %s\n", tmp);
 	free(tmp);
