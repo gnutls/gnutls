@@ -2,7 +2,7 @@ If you want to use the gnutls library in other projects
 using autoconf/aclocal, put in your 
 
 aclocal.m4:
- include(gnutls.m4)
+ include(libgnutls.m4)
 
 configure.in:
  AM_PATH_GNUTLS( 0.2.3,, AC_MSG_ERROR[[*** gnutls was not found]]))
