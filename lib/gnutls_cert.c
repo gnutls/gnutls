@@ -154,9 +154,11 @@ int ret;
 		res->cert_list[res->ncerts] =
 		    (gnutls_cert *) gnutls_realloc( res->cert_list[res->ncerts], i * sizeof(gnutls_cert));
 
-		if (res->cert_list[res->ncerts] == NULL)
+		if (res->cert_list[res->ncerts] == NULL) {
+			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
-
+		}
+		
 		tmp.data = b64;
 		tmp.size = siz2;
 		if ((ret =
@@ -193,9 +195,11 @@ int ret;
 gnutls_datum tmp;
 
 	fd1 = fopen(cafile, "r");
-	if (fd1 == NULL)
+	if (fd1 == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
-
+	}
+	
 	siz = fread(x, 1, sizeof(x), fd1);
 	fclose(fd1);
 
@@ -217,10 +221,12 @@ gnutls_datum tmp;
 		ptr = strstr( ptr, CERT_SEP)+1;
 
 		res->ca_list =
-		    (gnutls_cert *) gnutls_realloc(res->ca_list, i * sizeof(gnutls_cert));
-		if (res->ca_list == NULL)
+		    (gnutls_cert *) gnutls_realloc( res->ca_list, i * sizeof(gnutls_cert));
+		if (res->ca_list == NULL) {
+			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
-
+		}
+		
 		tmp.data = b64;
 		tmp.size = siz2;
 		if ((ret =
@@ -369,7 +375,7 @@ int ret;
 
 static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 {
-	opaque str[5 * 1024];
+	opaque str[MAX_X509_CERT_SIZE];
 	int len, result;
 	node_asn *spk;
 
@@ -474,7 +480,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 /* this function will convert up to 3 digit
  * numbers to characters.
  */
-static void int2str(int k, char* data) {
+void _gnutls_int2str(int k, char* data) {
     if (k > 999) data[0] = 0;
     else sprintf( data, "%d", k);
 }
@@ -494,7 +500,7 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 		
 		strcpy(name, root);
 		strcat(name, ".rdnSequence.?");
-		int2str(k, counter);
+		_gnutls_int2str(k, counter);
 		strcat(name, counter);
 
 		len = sizeof(str) - 1;
@@ -511,7 +517,7 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 
 			strcpy(name2, name);
 			strcat(name2, ".?");
-			int2str(k2, counter);
+			_gnutls_int2str(k2, counter);
 			strcat(name2, counter);
 
 			len = sizeof(str) - 1;
@@ -633,7 +639,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 {
 	int result;
 	node_asn *c2;
-	opaque str[5 * 1024];
+	opaque str[MAX_X509_CERT_SIZE];
 	int len = sizeof(str);
 
 	gCert->valid = 1;
@@ -647,6 +653,9 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	result = asn1_get_der( c2, derCert.data, derCert.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
+#ifdef DEBUG
+		fprintf(stderr, "Decoding error %d\n", result);
+#endif		
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
@@ -691,21 +700,26 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 * currently not supported
 		 */
 		gnutls_assert();
+fprintf(stderr, "ALGORITHM: %s\n", str);
+return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 		gCert->params = NULL;
 		
 	}
 
 	len = sizeof( gCert->signature);
+
 	result =
 	    asn1_read_value
 		    (c2, "certificate2.signature",
 		     gCert->signature, &len);
+
 	if ((len % 8) !=0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;		
 	}
+	len /= 8; /* convert to bytes */
 	gCert->signature_size = len;
 
 

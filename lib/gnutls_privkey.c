@@ -35,7 +35,7 @@
  */
 int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 	int result;
-	opaque str[5*1024];
+	opaque str[MAX_X509_CERT_SIZE];
 	int len = sizeof(str);
 	node_asn *pkcs_asn;
 	

@@ -155,22 +155,25 @@ static int check_if_expired(gnutls_cert * cert)
 
 
 
+void _gnutls_int2str(int k, char* data);
 
-#define MAX_DN 10*1024
+#define MAX_DN_ELEM 1024
 
 /* This function checks if 'certs' issuer is 'issuer_cert'.
- * This does a straight compare of the DER rdnSequence. 
+ * This does a compare of every element of the rdnSequence
  */
 static
 int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 {
-	node_asn *c2;
+	node_asn *c2, *c3;
 	int result, len;
 	int issuer_len;
-	opaque issuer_dn[MAX_DN];
-	opaque dn[MAX_DN];
+	int i, ok, finish;
+	opaque issuer_dn[MAX_DN_ELEM];
+	opaque issuer_own_dn[MAX_DN_ELEM];
 
-fprintf(stderr, "XXX: %s\nIII: %s\n", cert->issuer_info.common_name, issuer_cert->cert_info.common_name);
+fprintf(stderr, "XXX: %s - III: %s\n", cert->issuer_info.common_name, issuer_cert->issuer_info.common_name);
+fprintf(stderr, "XXX: %s - III: %s\n", cert->cert_info.common_name, issuer_cert->cert_info.common_name);
 	/* get the issuer of 'cert'
 	 */
 	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {
@@ -186,45 +189,77 @@ fprintf(stderr, "XXX: %s\nIII: %s\n", cert->issuer_info.common_name, issuer_cert
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	
-	issuer_len = sizeof(issuer_dn) - 1;
-	if ((result =
-	     asn1_read_value(c2, "certificate2.tbsCertificate.issuer.rdnSequence", issuer_dn, &issuer_len)) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-	asn1_delete_structure(c2);
 
 
 	/* get the 'subject' info of 'issuer_cert'
 	 */
-	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {
+	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c3, "certificate2") != ASN_OK) {
 		gnutls_assert();
+		asn1_delete_structure(c2);
 		return GNUTLS_E_ASN1_ERROR;
 	}
 	
-	result = asn1_get_der(c2, issuer_cert->raw.data, issuer_cert->raw.size);
+	result = asn1_get_der(c3, issuer_cert->raw.data, issuer_cert->raw.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
+
+	i=1;
+	ok=finish=0;
+	for (;;) {
+		char tmpstr[512];
+		char intstr[4];
+
+		strcpy( tmpstr, "certificate2.tbsCertificate.issuer.rdnSequence");
+		_gnutls_int2str( i, intstr);
+		strcat( tmpstr, intstr);
+		
+		issuer_len = sizeof(issuer_dn) - 1;
+		if ((result =
+		     asn1_read_value(c2, tmpstr, issuer_dn, &issuer_len)) != ASN_OK) {
+			if (result!=ASN_ELEMENT_NOT_FOUND) {
+				gnutls_assert();
+				ok = 1;
+				break;
+			}
+			finish = 1;
+		}
 	
-	len = sizeof(dn) - 1;
-	if ((result =
-	     asn1_read_value(c2, "certificate2.tbsCertificate.subject.rdnSequence", dn, &len)) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		len = sizeof(issuer_own_dn) - 1;
+		if ((result =
+		     asn1_read_value(c3, tmpstr, issuer_own_dn, &len)) != ASN_OK) {
+			if (result!=ASN_ELEMENT_NOT_FOUND) {
+				gnutls_assert();
+				ok = 1;
+				break;
+			}
+		}
+
+		if (finish!=0 && result==ASN_ELEMENT_NOT_FOUND)
+			break; /* finished comparing */
+				
+		if (memcmp(issuer_own_dn, issuer_dn, GMAX(len, issuer_len)) != 0) {
+			gnutls_assert();
+			ok = 1;
+			break;
+		}
+		
+		i++;
+		if (i>999) {
+			gnutls_assert();
+			ok=1;
+			break;
+		}
 	}
+	
 	asn1_delete_structure(c2);
+	asn1_delete_structure(c3);
 
-fprintf(stderr, "len: %d\nisslen: %d\n", len,issuer_len);
-
-	if (memcmp(dn, issuer_dn, GMAX(len, issuer_len)) == 0)
-		return 0;
-
+	if (ok==0) return 0;
+	
 	gnutls_assert();
 	return GNUTLS_E_UNKNOWN_ERROR;	/* do not match */
 
@@ -269,7 +304,6 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 		gnutls_assert();
 		return GNUTLS_CERT_NOT_TRUSTED;
 	}
-fprintf(stderr, "XXXissuer: %d\n", issuer->subject_pk_algorithm);
 	
         ret = gnutls_verify_signature(cert, issuer);
         if (ret != GNUTLS_CERT_TRUSTED)

@@ -8,4 +8,5 @@ Makefile.in
 .deps
 .libs
 crypt
+asn1c
 CertificateExample

@@ -179,15 +179,3 @@ asn1_create_tree(static_asn *root,node_asn **pointer);
 
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-

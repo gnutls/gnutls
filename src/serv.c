@@ -302,15 +302,17 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	if (gnutls_set_x509_server_trust( x509_cred, CAFILE, CRLFILE) < 0) {
+		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
+		exit(1);
+	}
+
 	if (gnutls_set_x509_server_key( x509_cred, CERTFILE, KEYFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_set_x509_server_trust( x509_cred, CAFILE, CRLFILE) < 0) {
-		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
-		exit(1);
-	}
+
 
 
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
@@ -406,7 +408,9 @@ int main(int argc, char **argv)
 			}
 		}
 		printf("\n");
-		gnutls_bye_nowait(sd, state);
+		gnutls_bye(sd, state, 1); /* do not wait for
+		 * the peer to close the connection.
+		 */
 		close(sd);
 		gnutls_deinit(state);
 	}

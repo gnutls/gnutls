@@ -37,7 +37,7 @@
 #define RESUME
 
 #define MAX(X,Y) (X >= Y ? X : Y);
-#define CAFILE "ca.pem"
+#define CAFILE "x509/ca.pem"
 #define CRLFILE NULL
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
@@ -202,7 +202,7 @@ int main(int argc, char** argv)
 	print_info( state);
 
 	printf("- Disconnecting\n");
-	gnutls_bye(sd, state);
+	gnutls_bye(sd, state, 0);
 	shutdown( sd, SHUT_WR);
 	close(sd);	
 	gnutls_deinit( state);	
@@ -312,7 +312,7 @@ int main(int argc, char** argv)
 		if (FD_ISSET(fileno(stdin), &rset)) {
 	
 			if( fgets(buffer, MAX_BUF, stdin) == NULL) {
-				gnutls_bye(sd, state);
+				gnutls_bye(sd, state, 0);
 				user_term = 1;
 				continue;
 			}
@@ -320,7 +320,7 @@ int main(int argc, char** argv)
 			printf("- Sent: %d bytes\n", strlen(buffer));
 		}
 	}
-	if (user_term!=0) gnutls_bye(sd, state);
+	if (user_term!=0) gnutls_bye(sd, state, 0);
 	
 	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);

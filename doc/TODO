@@ -2,4 +2,5 @@
 * Add Kerberos support (who wants that?)
 * Audit the code (volunteers?)
 * Tools for processing/generating certificates
+* Add certificate extensions support (x509v3)
 * Documentation (of existing functions + Manual)

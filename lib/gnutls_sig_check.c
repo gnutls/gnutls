@@ -34,10 +34,10 @@
 static gnutls_datum* _gnutls_get_tbs( gnutls_cert* cert) {
 node_asn *c2;
 gnutls_datum * ret;
-opaque str[10*1024];
+opaque str[MAX_X509_CERT_SIZE];
 int result, len;
 
-	if (asn1_create_structure( _gnutls_get_pkix(), "Certificate", &c2, "certificate")!=ASN_OK) {
+	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate")!=ASN_OK) {
 		gnutls_assert();
 		return NULL;
 	}
@@ -53,6 +53,9 @@ int result, len;
 	result =
 	    asn1_read_value( c2, "certificate.tbsCertificate", str, &len);
 	if (result != ASN_OK) {
+#ifdef DEBUG
+		fprintf(stderr, "ASN.1 failure number %d\n", result);
+#endif
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return NULL;

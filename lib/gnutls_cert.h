@@ -22,7 +22,7 @@ typedef struct {
 	gnutls_DN  cert_info;
 	gnutls_DN  issuer_info;
 
-	opaque	   signature[MAX_HASH_SIZE];
+	opaque	   signature[1024];
 	int	   signature_size;
 	
 	time_t	   expiration_time;

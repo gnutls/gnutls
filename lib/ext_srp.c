@@ -22,9 +22,18 @@
 #include "gnutls_auth_int.h"
 #include "auth_srp.h"
 #include "gnutls_errors.h"
+#include "gnutls_algorithms.h"
 
 int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_size) {
 	uint8 len;
+
+	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
+		/* algorithm was not allowed in this state
+		 */
+		gnutls_assert();
+		return 0;
+	}
+	
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
 			state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(SRP_SERVER_AUTH_INFO));
@@ -80,8 +89,11 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 		}
 	} else { /* SERVER SIDE sending (g,n,s) */
 		/* We only send the packet if we are NOT
-		 * resuming
+		 * resuming AND we are using SRP
 		 */
+		if (state->security_parameters.kx_algorithm!=GNUTLS_KX_SRP)
+			return 0; /* no data to send */
+		
 		if (state->gnutls_internals.resumed==RESUME_FALSE)
 			return gen_srp_server_hello( state->gnutls_key, data);
 		else

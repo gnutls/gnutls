@@ -352,51 +352,22 @@ int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDes
   * gnutls_bye - This function terminates the current TLS/SSL connection.
   * @cd: is a connection descriptor.
   * @state: is a &GNUTLS_STATE structure.
+  * @wait: is an integer
   *
   * Terminates the current TLS/SSL connection. If the return value is 0
   * you may continue using the TCP connection. The connection should
   * have been initiated using gnutls_handshake() or similar function.
+  * If 'wait' is non-zero then we will not wait for the other peer to 
+  * close the TLS connection.
   **/
-int gnutls_bye(SOCKET cd, GNUTLS_STATE state)
+int gnutls_bye(SOCKET cd, GNUTLS_STATE state, int wait)
 {
 	int ret;
 
 	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
 	/* receive the closure alert */
-	gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0, 0); 
-
-	state->gnutls_internals.valid_connection = VALID_FALSE;
-
-	return ret;
-}
-
-/**
-  * gnutls_bye_nowait - This function terminates the current TLS/SSL connection.
-  * @cd: is a connection descriptor.
-  * @state: is a &GNUTLS_STATE structure.
-  *
-  * Terminates the current TLS/SSL connection. The connection should
-  * have been initiated using gnutls_handshake() or similar function.
-  * This function does not wait for the other peer to close the TLS
-  * connection.
-  **/
-int gnutls_bye_nowait(SOCKET cd, GNUTLS_STATE state)
-{
-	int ret;
-
-	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
-
-	state->gnutls_internals.valid_connection = VALID_FALSE;
-
-	return ret;
-}
-
-int gnutls_close_nowait(SOCKET cd, GNUTLS_STATE state)
-{
-	int ret;
-
-	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+	if (wait==0) gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0, 0); 
 
 	state->gnutls_internals.valid_connection = VALID_FALSE;
 
@@ -778,7 +749,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 				 * not call close().
 				 */
 				if (type != GNUTLS_ALERT)
-					gnutls_close_nowait(cd, state);
+					gnutls_bye(cd, state, 1);
 				
 				gnutls_free(tmpdata);
 				

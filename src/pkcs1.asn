@@ -1,10 +1,5 @@
 PKCS-1 {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-1(1)  modules(0) pkcs-1(1)}
 
--- $Revision$
-
--- This module has been checked for conformance with the ASN.1 
--- standard by the OSS ASN.1 Tools
-
 DEFINITIONS EXPLICIT TAGS ::=
 
 BEGIN
@@ -45,11 +40,13 @@ OtherPrimeInfo ::= SEQUENCE {
 	coefficient INTEGER -- ti 
 }
 
--- for signature calculation -nmav
+-- for signature calculation
+-- added by nmav
 
-AlgorithmIdentifier  ::=  SEQUENCE  {
+AlgorithmIdentifier ::= SEQUENCE  {
      algorithm               OBJECT IDENTIFIER,
-     parameters              ANY DEFINED BY algorithm OPTIONAL  }
+     parameters              ANY DEFINED BY algorithm OPTIONAL  
+}
                                 -- contains a value of the type
                                 -- registered for use with the
                                 -- algorithm object identifier value
