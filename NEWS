@@ -1,4 +1,4 @@
-Version 0.9.98
+Version 0.9.98 (16/11/2003)
 - The openssl compatibility layer was moved to gnutls-openssl
   library instead of being included in the gnutls-extra library.
 - Added the RIPEMD ciphersuites defined in draft-ietf-tls-openpgp-keys-04.
