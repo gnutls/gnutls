@@ -24,7 +24,6 @@
 #endif
 #include <stdio.h>
 #include <errno.h>
-#include <malloc.h>
 #ifdef HAVE_PWD_H
 # include <pwd.h>
 #endif
