@@ -568,7 +568,7 @@ static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 		switch (recv_type) {
 		case GNUTLS_ALERT:
 
-			_gnutls_record_log( "REC: Alert[%d|%d] - %s - was received\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
+			_gnutls_record_log( "REC: Alert[%d|%d] - %s - was received\n", data[0], data[1], _gnutls_alert_get_name((int)data[1]));
 
 			state->gnutls_internals.last_alert = data[1];
 

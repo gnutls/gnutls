@@ -286,7 +286,7 @@ void check_alert(GNUTLS_STATE state, int ret)
 
 	if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 	    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-		last_alert = gnutls_alert_get_last(state);
+		last_alert = gnutls_alert_get(state);
 		if (last_alert == GNUTLS_A_NO_RENEGOTIATION &&
 		    ret == GNUTLS_E_WARNING_ALERT_RECEIVED)
 			printf
@@ -349,6 +349,13 @@ int main(int argc, char **argv)
 	    (cert_cred, PGP_CERTFILE, PGP_KEYFILE) < 0) {
 		fprintf(stderr,
 			"PGP PARSE ERROR\nDid you have key.pem and cert.pem?\n");
+		exit(1);
+	}
+
+	if (gnutls_certificate_set_openpgp_keyserver
+	    (cert_cred, "wwwkeys.pgp.net", 0) < 0) {
+		fprintf(stderr,
+			"PGP ERROR\n");
 		exit(1);
 	}
 

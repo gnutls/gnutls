@@ -269,9 +269,9 @@ int main(int argc, char **argv)
 		if (ret < 0) {
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-				alert = gnutls_alert_get_last( state);
+				alert = gnutls_alert_get( state);
 				printf("*** Received alert [%d]: %s\n",
-				       alert, gnutls_alert_str( alert));
+				       alert, gnutls_alert_get_name( alert));
 
 			fprintf(stderr, "*** Handshake has failed\n");
 			gnutls_perror(ret);
@@ -377,7 +377,7 @@ int main(int argc, char **argv)
 				    || ret ==
 				    GNUTLS_E_FATAL_ALERT_RECEIVED)
 					printf("* Received alert [%d]\n",
-					       gnutls_alert_get_last
+					       gnutls_alert_get
 					       (state));
 				if (ret == GNUTLS_E_REHANDSHAKE) {
 

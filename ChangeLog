@@ -1,3 +1,28 @@
+2002-02-21 20:57  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_openpgp.c:
+
+	set_key_server renamed to set_keyserver 
+
+2002-02-21 20:42  nmav <nmav@gnutls.org>
+
+	* ChangeLog, NEWS, doc/tex/ex1.tex, doc/tex/serv1.tex, lib/debug.c,
+	lib/debug.h, lib/gnutls.h.in.in, lib/gnutls_alert.c, src/cli.c:
+
+	Added gnutls_alert_str (allows printing alert number descriptions) 
+
+2002-02-21 13:49  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Fixed a segfault in the OpenPGP code.  
+
+2002-02-21 09:55  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.c:
+
+	Updated the openpgp certificate message, fingerprint handling.  
+
 2002-02-20 20:53  nmav <nmav@gnutls.org>
 
 	* lib/x509_verify.c:

@@ -525,7 +525,7 @@ int _gnutls_recv_client_certificate( GNUTLS_STATE state)
 			if (optional == OPTIONAL_PACKET &&
 			        ret==GNUTLS_E_WARNING_ALERT_RECEIVED && 
 			        gnutls_protocol_get_version(state) == GNUTLS_SSL3 &&
-				gnutls_alert_get_last(state)==GNUTLS_A_SSL3_NO_CERTIFICATE) {
+				gnutls_alert_get(state)==GNUTLS_A_SSL3_NO_CERTIFICATE) {
 
 				/* SSL3 does not send an empty certificate,
 				 * but this alert. So we just ignore it.

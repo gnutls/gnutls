@@ -232,8 +232,8 @@ int main()
                          strlen(buffer));
          }
          if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-            ret = gnutls_alert_get_last(state);
-            printf("* Received alert '%d' - '%s'.\n", ret, gnutls_alert_str( ret));
+            ret = gnutls_alert_get(state);
+            printf("* Received alert '%d' - '%s'.\n", ret, gnutls_alert_get_name( ret));
          }
       }
       printf("\n");

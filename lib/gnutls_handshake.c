@@ -1759,7 +1759,7 @@ int gnutls_rehandshake(GNUTLS_STATE state)
 
 static int _gnutls_abort_handshake( GNUTLS_STATE state, int ret) {
 	if ( ((ret==GNUTLS_E_WARNING_ALERT_RECEIVED) && 
-		( gnutls_alert_get_last(state) == GNUTLS_A_NO_RENEGOTIATION))
+		( gnutls_alert_get(state) == GNUTLS_A_NO_RENEGOTIATION))
 		|| ret==GNUTLS_E_GOT_APPLICATION_DATA)
 			return 0;
 

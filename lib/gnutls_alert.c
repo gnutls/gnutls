@@ -24,6 +24,46 @@
 #include <gnutls_record.h>
 #include <debug.h>
 
+typedef struct {
+	AlertDescription alert;
+	char *desc;
+} gnutls_alert_entry;
+
+static const gnutls_alert_entry sup_alerts[] = {
+	{ GNUTLS_A_CLOSE_NOTIFY, "Close notify" },
+	{ GNUTLS_A_UNEXPECTED_MESSAGE,	 "Unexpected message" },
+	{ GNUTLS_A_BAD_RECORD_MAC,	 "Bad record MAC" },
+	{ GNUTLS_A_DECRYPTION_FAILED,	 "Decryption failed" },
+	{ GNUTLS_A_RECORD_OVERFLOW,	 "Record overflow" }, 
+	{ GNUTLS_A_DECOMPRESSION_FAILURE, "Decompression failed" },
+	{ GNUTLS_A_HANDSHAKE_FAILURE,	 "Handshake failed" },
+	{ GNUTLS_A_BAD_CERTIFICATE,	 "Certificate is bad" },
+	{ GNUTLS_A_UNSUPPORTED_CERTIFICATE,	 "Certificate is not supported" },
+	{ GNUTLS_A_CERTIFICATE_REVOKED,	 "Certificate was revoked" },
+	{ GNUTLS_A_CERTIFICATE_EXPIRED,	 "Certificate is expired" },
+	{ GNUTLS_A_CERTIFICATE_UNKNOWN,	 "Unknown certificate" },
+	{ GNUTLS_A_ILLEGAL_PARAMETER,	 "Illegal parameter" },
+	{ GNUTLS_A_UNKNOWN_CA,	 	 "CA is unknown" },
+	{ GNUTLS_A_ACCESS_DENIED,	 "Access was denied" },
+	{ GNUTLS_A_DECODE_ERROR,	 "Decode error" },
+	{ GNUTLS_A_DECRYPT_ERROR,	 "Decrypt error" },
+	{ GNUTLS_A_EXPORT_RESTRICTION,	 "Export restriction" },
+	{ GNUTLS_A_PROTOCOL_VERSION,	 "Error in protocol version" },
+	{ GNUTLS_A_INSUFFICIENT_SECURITY,"Insufficient security" },
+	{ GNUTLS_A_USER_CANCELED,	 "User canceled" },
+	{ GNUTLS_A_NO_RENEGOTIATION,	 "No renegotiation is allowed" },
+	{0, NULL}
+};
+
+#define GNUTLS_ALERT_LOOP(b) \
+        const gnutls_alert_entry *p; \
+                for(p = sup_alerts; p->desc != NULL; p++) { b ; }
+
+#define GNUTLS_ALERT_ID_LOOP(a) \
+                        GNUTLS_ALERT_LOOP( if(p->alert == alert) { a; break; })
+
+
+
 /**
   * gnutls_alert_send - This function sends an alert message to the peer
   * @state: is a &GNUTLS_STATE structure.
@@ -45,7 +85,7 @@ int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_Alert
 	data[0] = (uint8) level;
 	data[1] = (uint8) desc;
 
-	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
+	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert_get_name((int)data[1]));
 
 	if ( (ret = gnutls_send_int( state, GNUTLS_ALERT, -1, data, 2)) >= 0)
 		return 0;
@@ -115,7 +155,7 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 /**
-  * gnutls_alert_get_last - Returns the last alert number received.
+  * gnutls_alert_get - Returns the last alert number received.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the last alert number received. This function
@@ -124,92 +164,22 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   * The peer may send alerts if he thinks some things were not 
   * right. Check gnutls.h for the available alert descriptions.
   **/
-GNUTLS_AlertDescription gnutls_alert_get_last( GNUTLS_STATE state) {
+GNUTLS_AlertDescription gnutls_alert_get( GNUTLS_STATE state) {
 	return state->gnutls_internals.last_alert;
 }
 
 /**
-  * gnutls_alert_str - Returns a string describing the alert number given
+  * gnutls_alert_get_name - Returns a string describing the alert number given
   * @alert: is an alert number &GNUTLS_STATE structure.
   *
   * Returns a string that describes the given alert number.
-  * See. gnutls_alert_get_last().
+  * See. gnutls_alert_get().
   *
   **/
-const char* gnutls_alert_str( int alert) {
+const char* gnutls_alert_get_name( int alert) {
+char* ret = NULL;
 
-	switch(alert) {
-		case GNUTLS_A_CLOSE_NOTIFY:
-			return "Close notify";
-			break;
-		case GNUTLS_A_UNEXPECTED_MESSAGE:
-			return "Unexpected message";
-			break;
-		case GNUTLS_A_BAD_RECORD_MAC:
-			return "Bad record MAC";
-			break;
+	GNUTLS_ALERT_ID_LOOP( ret = p->desc);
 
-		case GNUTLS_A_DECRYPTION_FAILED:
-			return "Decryption failed";
-			break;
-		case GNUTLS_A_RECORD_OVERFLOW:
-			return "Record overflow"; 
-			break;
-
-		case GNUTLS_A_DECOMPRESSION_FAILURE:
-			return "Decompression failed";
-			break;
-
-		case GNUTLS_A_HANDSHAKE_FAILURE:
-			return "Handshake failed";
-			break;
-		case GNUTLS_A_BAD_CERTIFICATE:
-			return "Certificate is bad";
-			break;
-		case GNUTLS_A_UNSUPPORTED_CERTIFICATE:
-			return "Certificate is not supported";
-			break;
-		case GNUTLS_A_CERTIFICATE_REVOKED:
-			return "Certificate was revoked";
-			break;
-		case GNUTLS_A_CERTIFICATE_EXPIRED:
-			return "Certificate is expired";
-			break;
-		case GNUTLS_A_CERTIFICATE_UNKNOWN:
-			return "Unknown certificate";
-			break;
-		case GNUTLS_A_ILLEGAL_PARAMETER:
-			return "Illegal parameter";
-			break;
-		case GNUTLS_A_UNKNOWN_CA:
-			return "CA is not known";
-			break;
-		case GNUTLS_A_ACCESS_DENIED:
-			return "Access was denied";
-			break;
-		case GNUTLS_A_DECODE_ERROR:
-			return "Decode error";
-			break;
-		case GNUTLS_A_DECRYPT_ERROR:
-			return "Decrypt error";
-			break;
-		case GNUTLS_A_EXPORT_RESTRICTION:
-			return "Export restriction";
-			break;
-		case GNUTLS_A_PROTOCOL_VERSION:
-			return "Error in protocol version";
-			break;
-		case GNUTLS_A_INSUFFICIENT_SECURITY:
-			return "Insufficient security";
-			break;
-		case GNUTLS_A_USER_CANCELED:
-			return "User canceled";
-			break;
-		case GNUTLS_A_NO_RENEGOTIATION:
-			return "No renegotiation is allowed";
-			break;
-		default:
-			return "Unknown Alert";
-			
-	}	
+	return ret;
 }
