@@ -1,1 +1,1 @@
-EXTRA_DIST = extra.h openssl.h gnutls.h compat.h
+EXTRA_DIST = extra.h openssl.h gnutls.h compat4.h
