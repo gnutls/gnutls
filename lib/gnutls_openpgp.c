@@ -239,9 +239,13 @@ leave:
 } 
 
 /**
- * _gnutls_openpgp_key2gnutls_key:
+ * _gnutls_openpgp_key2gnutls_key - Converts an OpenPGP secret key to GnuTLS
  *
- * Converts an OpenPGP secret key into the GnuTLS format.
+ * @pkey: the GnuTLS private key context to store the key.
+ * @raw_key: the raw data which contains the whole key packets.
+ *
+ * The RFC2440 (OpenPGP Message Format) data is converted into the
+ * GnuTLS specific data which is need to perform secret key operations.
  **/
 int
 _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
@@ -331,10 +335,15 @@ leave:
 }
 
 /**
- * gnutls_openpgp_set_key_file:
+ * gnutls_openpgp_set_key_file - Used to set OpenPGP keys in the structure
  *
- * We assume that the CERTFILE contains the public key, while
- * the KEYFILE contains the secret key.
+ * @res: the destination context to save the data.
+ * @CERTFILE: the file that contains the public key.
+ * @KEYFILE: the file that contains the secret key.
+ *
+ * This funtion is used to load OpenPGP keys into the GnuTLS structure.
+ * It doesn't matter whether the keys are armored or but, but the files
+ * should only contain one key.
  **/
 int
 gnutls_openpgp_set_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res,
@@ -441,7 +450,10 @@ leave:
 }
 
 /**
- * gnutls_openpgp_extract_certificate_issuer_dn:
+ * gnutls_openpgp_extract_certificate_issuer_dn - Extracts the userID
+ *
+ * @cert: the raw data that contains the OpenPGP public key.
+ * @dn: the structure to store the userID specific data in.
  *
  * Extracts the userID from the raw OpenPGP key.
  **/
@@ -489,7 +501,9 @@ leave:
 }
 
 /**
- * gnutls_openpgp_extract_certificate_version:
+ * gnutls_openpgp_extract_certificate_version- Extracts the version
+ *
+ * @cert: the raw data that contains the OpenPGP public key.
  *
  * Extract the version of the OpenPGP key.
  **/
@@ -513,7 +527,9 @@ gnutls_openpgp_extract_certificate_version( const gnutls_datum *cert )
 }
 
 /**
- * gnutls_openpgp_extract_certificate_activation_time:
+ * gnutls_openpgp_extract_certificate_activation_time - Extract the timestamp
+ *
+ * @cert: the raw data that contains the OpenPGP public key.
  *
  * Returns the timestamp when the OpenPGP key was created.
  **/
@@ -537,7 +553,9 @@ gnutls_openpgp_extract_certificate_activation_time( const gnutls_datum *cert )
 }
 
 /**
- * gnutls_openpgp_extract_certificate_expiration_time:
+ * gnutls_openpgp_extract_certificate_expiration_time - Extract the expire date
+ *
+ * @cert: the raw data that contains the OpenPGP public key.
  *
  * Returns the time when the OpenPGP key expires. A value of '0' means
  * that the key doesn't expire at all.
@@ -562,12 +580,14 @@ gnutls_openpgp_extract_certificate_expiration_time( const gnutls_datum *cert )
 }
 
 /**
- * gnutls_openpgp_verify_certificate:
+ * gnutls_openpgp_verify_certificate - Verify all signatures on the key
+ *
+ * @cert_list: the structure that holds the certificates.
+ * @cert_list_lenght: the items in the cert_list.
  *
  * Verify all signatures in the certificate list. When the key
  * is not available, the signature is skipped.
  * A return value of '0' means that all checked signatures are good.
- *
  **/
 int
 gnutls_openpgp_verify_certificate( const gnutls_datum* cert_list,
@@ -581,7 +601,11 @@ gnutls_openpgp_verify_certificate( const gnutls_datum* cert_list,
 }
 
 /**
- * gnutls_openpgp_fingerprint:
+ * gnutls_openpgp_fingerprint - Gets the fingerprint
+ *
+ * @cert: the raw data that contains the OpenPGP public key.
+ * @fpr: the buffer to save the fingerprint.
+ * @fprlen: the integer to save the length of the fingerprint.
  *
  * Returns the fingerprint of the OpenPGP key. Depence on the algorithm,
  * the fingerprint can be 16 oder 20 bytes.
@@ -607,7 +631,10 @@ gnutls_openpgp_fingerprint( const gnutls_cert *cert, byte *fpr,size_t *fprlen )
 }
 
 /**
- * gnutls_openpgp_keyid:
+ * gnutls_openpgp_keyid - Gets the keyID
+ *
+ * @cert: the raw data that contains the OpenPGP public key.
+ * @keyid: the buffer to save the keyid.
  *
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
@@ -628,6 +655,26 @@ gnutls_openpgp_keyid( const gnutls_cert *cert, u32 *keyid )
   fpr = cert->fingerprint;
   keyid[0] = (fpr[12] << 24) | (fpr[13] << 16) | (fpr[14] << 8) | fpr[15];
   keyid[1] = (fpr[16] << 24) | (fpr[17] << 16) | (fpr[18] << 8) | fpr[19];
+
+  return 0;
+}
+
+/**
+ * gnutls_openpgp_add_keyring - Adds a global keyring for OpenPGP
+ *
+ * @fname: the filename of the keyring.
+ * @is_secret: if the keyring contains secret keys or not.
+ *
+ * The function is used to set keyrings that will be used internally
+ * by various OpenCDK functions. For example to find a key when it
+ * is need for an operations.
+ **/
+int
+gnutls_openpgp_add_keyring(const char *fname, int is_secret)
+{
+  
+  if ( cdk_keydb_add_resource(fname, is_secret) )
+    return GNUTLS_E_UNKNOWN_ERROR;
 
   return 0;
 }
