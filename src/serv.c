@@ -32,6 +32,8 @@
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
+#define CAFILE "ca.pem"
+#define CRLFILE NULL
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -93,7 +95,7 @@ GNUTLS_STATE initialize_state()
 			       GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);
 	gnutls_set_cred(state, GNUTLS_SRP, &srp_cred);
-	gnutls_set_cred(state, GNUTLS_X509PKI, &x509_cred);
+	gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
 
 	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
@@ -299,8 +301,17 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_allocate_x509_sc(&x509_cred, CERTFILE, KEYFILE) < 0) {
+	if (gnutls_allocate_x509_sc(&x509_cred, 1) < 0) {
+		exit(1);
+	}
+
+	if (gnutls_set_x509_key( x509_cred, CERTFILE, KEYFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
+		exit(1);
+	}
+
+	if (gnutls_set_x509_trust( x509_cred, CAFILE, CRLFILE) < 0) {
+		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
 		exit(1);
 	}
 
