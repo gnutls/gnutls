@@ -298,7 +298,7 @@ datum_to_openpgp_pkt( const gnutls_datum *raw, PKT *r_pkt )
   rc = cdk_pkt_parse(buf, &pkt);
   if ( rc != CDKERR_EOF )
     {
-      rc = GNUTLS_E_NO_CERTIFICATE_FOUND_FOUND;
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
   else
@@ -517,7 +517,7 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
     }
   if (sk == NULL)
     {
-      rc = GNUTLS_E_NO_CERTIFICATE_FOUND_FOUND;
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
   
@@ -601,7 +601,7 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
     }
   if (pk == NULL)
     {
-      rc = GNUTLS_E_NO_CERTIFICATE_FOUND_FOUND;
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
 
@@ -667,13 +667,13 @@ gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
   rc = cdk_keydb_search_key(khd, &pk, &ks);
   if (rc)
     {
-      rc = GNUTLS_E_NO_CERTIFICATE_FOUND_FOUND; 
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND; 
       goto leave;
     }    
 
   if ( !pkt_find_type(pk, PKT_PUBKEY) )
     {
-      rc = GNUTLS_E_NO_CERTIFICATE_FOUND_FOUND;
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
 
@@ -1202,10 +1202,6 @@ gnutls_openpgp_verify_key( const char *trustdb,
       
     case CDK_KEY_EXPIRED:
       rc = GNUTLS_CERT_EXPIRED;
-      break;
-      
-    case CDK_KEY_VALID:
-      rc = GNUTLS_CERT_VALID;
       break;
     }
 
