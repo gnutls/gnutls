@@ -33,10 +33,12 @@
 #include "gnutls_record.h"
 #include "gnutls_constate.h"
 
-/* returns ciphertext which contains RECORD_HEADER_SIZE unused bytes
+/* returns ciphertext which contains the headers too. This also
+ * calculates the size in the header field.
  */
-int _gnutls_encrypt(GNUTLS_STATE state, const char *data, size_t data_size,
-		    uint8 ** ciphertext, ContentType type)
+int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
+		const char *data, size_t data_size,
+		uint8 ** ciphertext, ContentType type)
 {
 	gnutls_datum plain = { (char*)data, data_size };
 	gnutls_datum comp, ciph;
@@ -51,7 +53,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char *data, size_t data_size,
 		return err;
 	}
 
-	err = _gnutls_compressed2TLSCiphertext(state, &ciph, comp, type);
+	err = _gnutls_compressed2TLSCiphertext(state, &ciph, comp, type, headers_size);
 	if (err < 0) {
 		gnutls_assert();
 		return err;
@@ -59,6 +61,10 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char *data, size_t data_size,
 
 	gnutls_free_datum(&comp);
 
+	/* copy the headers */
+	memcpy( ciph.data, headers, headers_size);
+	WRITEuint16( ciph.size - headers_size, &ciph.data[3]);
+	
 	*ciphertext = ciph.data;
 
 	return ciph.size;
@@ -109,7 +115,7 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 					gnutls_datum*
 					cipher,
-					gnutls_datum compressed, ContentType _type)
+					gnutls_datum compressed, ContentType _type, int headers_size)
 {
 	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
@@ -177,7 +183,7 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		length =
 		    compressed.size + hash_size;
 
-		data = gnutls_malloc(length+RECORD_HEADER_SIZE);
+		data = gnutls_malloc(length+headers_size);
 		if (data==NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
@@ -208,12 +214,12 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		pad = (uint8) (blocksize - (length % blocksize)) + rand;
 
 		length += pad;
-		data = gnutls_malloc(length+RECORD_HEADER_SIZE);
+		data = gnutls_malloc(length+headers_size);
 		if (data==NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		memset(&data[RECORD_HEADER_SIZE + length - pad], pad - 1, pad);
+		memset(&data[headers_size + length - pad], pad - 1, pad);
 
 		break;
 	default:
@@ -221,14 +227,14 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
-	memcpy(&data[RECORD_HEADER_SIZE], compressed.data, compressed.size);
-	memcpy(&data[compressed.size+RECORD_HEADER_SIZE], MAC, hash_size);
+	memcpy(&data[headers_size], compressed.data, compressed.size);
+	memcpy(&data[compressed.size+headers_size], MAC, hash_size);
 
 	gnutls_cipher_encrypt(state->connection_state.
-			      write_cipher_state, &data[RECORD_HEADER_SIZE], 
+			      write_cipher_state, &data[headers_size], 
 			      length);
 	cipher->data = data;
-	cipher->size = length + RECORD_HEADER_SIZE;
+	cipher->size = length + headers_size;
 
 	return 0;
 }

@@ -445,15 +445,12 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 #endif
 
 	for (i = 0; i < iterations; i++) {
-		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
+		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, &data[i*Size], Size, &cipher, type);
 		if (cipher_size <= 0) {
 			gnutls_assert();
 			return cipher_size; /* error */
 		}
 		
-		WRITEuint16( cipher_size-RECORD_HEADER_SIZE, &headers[3]);
-		memcpy( cipher, headers, RECORD_HEADER_SIZE);
-
 		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -478,11 +475,8 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 */
 	if (iterations > 1) {
 		Size = sizeofdata % MAX_ENC_LEN;
-		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
+		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, &data[i*Size], Size, &cipher, type);
 		if (cipher_size<=0) return cipher_size;
-
-		WRITEuint16( cipher_size-RECORD_HEADER_SIZE, &headers[3]);
-		memcpy( cipher, headers, RECORD_HEADER_SIZE);
 
 		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
