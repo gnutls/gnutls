@@ -84,6 +84,18 @@ void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr) {
 	state->gnutls_internals.transport_ptr = ptr;
 }
 
+/**
+  * gnutls_transport_get_ptr - Used to return the first argument of the transport functions
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Used to get the first argument of the transport function (like PUSH and
+  * PULL). This must have been set using gnutls_transport_set_ptr().
+  *
+  **/
+GNUTLS_SOCKET_PTR gnutls_transport_get_ptr(GNUTLS_STATE state) {
+	return state->gnutls_internals.transport_ptr;
+}
+
 #define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_init - This function initializes the state to null (null encryption etc...).

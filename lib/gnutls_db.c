@@ -106,6 +106,18 @@ void gnutls_db_set_ptr( GNUTLS_STATE state, void* ptr) {
 }
 
 /**
+  * gnutls_db_get_ptr - Returns the pointer which is sent to db functions
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the pointer that will be sent to db store, retrieve and delete functions, as
+  * the first argument. Should only be used if not using the default (gdbm) backend.
+  *
+  **/
+void* gnutls_db_get_ptr( GNUTLS_STATE state) {
+	return state->gnutls_internals.db_ptr;
+}
+
+/**
   * gnutls_set_cache_expiration - Sets the expiration time for resumed sessions.
   * @state: is a &GNUTLS_STATE structure.
   * @seconds: is the number of seconds.

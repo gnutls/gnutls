@@ -150,6 +150,7 @@ void gnutls_db_set_retrieve_func( GNUTLS_STATE, DB_RETR_FUNC);
 void gnutls_db_set_remove_func( GNUTLS_STATE, DB_REMOVE_FUNC);
 void gnutls_db_set_store_func( GNUTLS_STATE, DB_STORE_FUNC);
 void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
+void* gnutls_db_get_ptr( GNUTLS_STATE);
 int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
 
 void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
@@ -227,6 +228,7 @@ int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int
 typedef ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_SOCKET_PTR, void*, size_t);
 typedef ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
 void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr);
+GNUTLS_SOCKET_PTR gnutls_transport_get_ptr(GNUTLS_STATE state);
 
 typedef void (*LOG_FUNC)( const char*);
 
