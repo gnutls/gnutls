@@ -48,7 +48,7 @@
 #define FALSE 0
 
 static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data, int datalen);
-static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque * data, int datalen);
+int _gnutls_SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque * data, int datalen);
 
 void _gnutls_set_server_random( GNUTLS_STATE state, uint8* random) {
 	memcpy( state->security_parameters.server_random, random, 32);
@@ -289,7 +289,6 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-
 	/* set the MOD_AUTH_STRUCT to the appropriate struct
 	 * according to the KX algorithm. This is needed since all the
 	 * handshake functions are read from there;
@@ -311,9 +310,12 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	memcpy(&z, &data[pos++], 1);	/* z is the number of compression methods */
 
 	DECR_LEN(len, z);
-	ret = SelectCompMethod(state, &state->
+	ret = _gnutls_SelectCompMethod(state, &state->
 			       gnutls_internals.compression_method,
 			       &data[pos], z);
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Selected Compression Method: %s\n", gnutls_compression_get_name(state->gnutls_internals.compression_method));
+#endif
 	pos += z;
 
 	if (ret < 0) {
@@ -473,7 +475,7 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
 
 
 /* This selects the best supported compression method from the ones provided */
-static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret,
+int _gnutls_SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret,
 			    opaque * data, int datalen)
 {
 	int x, i, j;

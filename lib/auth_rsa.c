@@ -30,6 +30,7 @@
 #include "auth_x509.h"
 #include <gnutls_random.h>
 #include <gnutls_pk.h>
+#include <gnutls_algorithms.h>
 
 #if 0
 int gen_rsa_server_kx(GNUTLS_KEY, opaque **);
@@ -398,11 +399,17 @@ int proc_rsa_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	gnutls_datum ciphertext;
 	int ret, dsize;
 
-	ciphertext.data = &data[2];
-	dsize = READuint16(data);
-	ciphertext.size = GMIN(dsize, data_size);
-
+	if ( _gnutls_version_ssl3(_gnutls_version_get(key->version.major, key->version.minor)) == 0 ) {
+		/* SSL 3.0 */
+		ciphertext.data = data;
+		ciphertext.size = data_size;
+	} else { /* TLS 1 */
+		ciphertext.data = &data[2];
+		dsize = READuint16(data);
+		ciphertext.size = GMIN(dsize, data_size);
+	}
 	ret = _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, key->u, key->A);
+
 	if ( ret < 0) {
 		/* in case decryption fails then don't inform
 		 * the peer. Just use a random key. (in order to avoid
@@ -411,9 +418,19 @@ int proc_rsa_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 		gnutls_assert();
 		RANDOMIZE_X(key->key);
 	} else {
+		ret = 0;
 		if (plaintext.size != 48) { /* WOW */
 			RANDOMIZE_X(key->key);
 		} else {
+			if (key->version.major != plaintext.data[0]) ret = GNUTLS_E_DECRYPTION_FAILED;
+			if (key->version.minor != plaintext.data[1]) ret = GNUTLS_E_DECRYPTION_FAILED;
+			if (ret != 0) {
+				_gnutls_mpi_release( &key->B);
+				_gnutls_mpi_release( &key->u);
+				_gnutls_mpi_release( &key->A);
+				gnutls_assert();
+				return ret;
+			}
 			key->key.data = plaintext.data;
 			key->key.size = plaintext.size;
 		}

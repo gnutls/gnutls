@@ -28,7 +28,7 @@ GNUTLS_Version _gnutls_version_get( int major, int minor);
 
 /* functions for macs */
 int   _gnutls_mac_get_digest_size(MACAlgorithm algorithm);
-char* _gnutls_mac_get_name(MACAlgorithm algorithm);
+char* gnutls_mac_get_name(MACAlgorithm algorithm);
 int   _gnutls_mac_is_ok(MACAlgorithm algorithm);
 int   _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm);
 int   _gnutls_mac_count();
@@ -54,7 +54,7 @@ int _gnutls_cipher_count();
 int _gnutls_cipher_is_ok(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm);
-char *_gnutls_cipher_get_name(BulkCipherAlgorithm algorithm);
+char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm);
 
 /* functions for key exchange */
 int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm);
@@ -75,7 +75,7 @@ int _gnutls_kx_client_cert_vrfy(KXAlgorithm algorithm);
 int _gnutls_kx_server_cert_vrfy(KXAlgorithm algorithm);
 
 MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(KXAlgorithm algorithm);
-char *_gnutls_kx_get_name(KXAlgorithm algorithm);
+char *gnutls_kx_get_name(KXAlgorithm algorithm);
 int _gnutls_kx_is_ok(KXAlgorithm algorithm);
 int _gnutls_kx_count();
 
@@ -85,7 +85,7 @@ int _gnutls_compression_is_ok(CompressionMethod algorithm);
 int _gnutls_compression_count();
 int _gnutls_compression_get_num(CompressionMethod algorithm);
 CompressionMethod _gnutls_compression_get_id(int num);
-char *_gnutls_compression_get_name(CompressionMethod algorithm);
+char *gnutls_compression_get_name(CompressionMethod algorithm);
 
 /* Type to KX mappings */
 KXAlgorithm _gnutls_map_kx_get_kx(CredType type);

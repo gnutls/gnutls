@@ -30,6 +30,35 @@
 #include "../lib/gnutls.h"
 #include <port.h>
 
+#define PKIX "pkix.asn"
+#define PKCS "pkcs1.asn"
+#define KEYFILE "key.pem"
+#define CERTFILE "cert.pem"
+void PARSE() {
+  int result=parser_asn1(PKIX);
+
+  if(result==ASN_SYNTAX_ERROR){
+    printf("%s: PARSE ERROR\n", PKIX);
+    return;
+  }
+  else if(result==ASN_IDENTIFIER_NOT_FOUND){
+    printf("%s: IDENTIFIER NOT FOUND\n", PKIX);
+    return;
+  }
+
+  result=parser_asn1(PKCS);
+
+  if(result==ASN_SYNTAX_ERROR){
+    printf("%s: PARSE ERROR\n", PKCS);
+    return;
+  }
+  else if(result==ASN_IDENTIFIER_NOT_FOUND){
+    printf("%s: IDENTIFIER NOT FOUND\n", PKCS);
+    return;
+  }
+
+}
+
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 100
@@ -51,7 +80,15 @@ int main()
 	const SRP_AUTH_INFO *srp_info;
 	ANON_SERVER_CREDENTIALS dh_cred;
 	const ANON_AUTH_INFO *dh_info;
+	X509PKI_SERVER_CREDENTIALS x509_cred;
 
+	PARSE();
+
+	if ( gnutls_read_certs( &x509_cred, CERTFILE, KEYFILE) < 0 ) {
+		fprintf(stderr, "X509 PARSE ERROR\n");
+		return -1;
+	}
+	
 	/* this is a password file (created with the included crypt utility) 
 	 * Read README.crypt prior to using SRP.
 	 */
@@ -75,7 +112,7 @@ int main()
 	err = listen(listen_sd, 1024);
 	ERR(err, "listen");
 
-
+	printf("Echo server ready. Listening to port '%d'.\n\n", PORT);
 
 	client_len = sizeof(sa_cli);
 	for (;;) {
@@ -85,15 +122,15 @@ int main()
 		
 		gnutls_set_cipher_priority(state, GNUTLS_TWOFISH,
 					   GNUTLS_RIJNDAEL, GNUTLS_3DES,
-					   GNUTLS_ARCFOUR, 0);
-		gnutls_set_compression_priority(state, GNUTLS_ZLIB,
-						GNUTLS_NULL_COMPRESSION,
+					   0);
+		gnutls_set_compression_priority(state, GNUTLS_NULL_COMPRESSION,
 						0);
-		gnutls_set_kx_priority(state, GNUTLS_KX_SRP,
+		gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
 				       GNUTLS_KX_DH_ANON, 0);
 
 		gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);
 		gnutls_set_cred(state, GNUTLS_SRP, &srp_cred);
+		gnutls_set_cred(state, GNUTLS_X509PKI, &x509_cred);
 
 		gnutls_set_mac_priority(state, GNUTLS_MAC_SHA,
 					GNUTLS_MAC_MD5, 0);

@@ -147,6 +147,8 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 AC_CONFIG_COMMANDS([default],[[
  cat lib/gnutls_errors_int.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
+ cat lib/cert_asn1.h >> lib/gnutls.h
+ echo "" >> lib/gnutls.h
  chmod -w lib/gnutls.h 
  chmod +x lib/libgnutls-config
 ]],[[]])

@@ -37,6 +37,7 @@
 #include "gnutls_random.h"
 #include "gnutls_auth_int.h"
 
+int _gnutls_SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque * data, int datalen);
 
 /* This selects the best supported ciphersuite from the ones provided */
 static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
@@ -111,7 +112,6 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	int len = datalen;
 	int err;
 	uint16 challenge;
-
 
 	/* we only want to get here once - only in client hello */
 	state->gnutls_internals.v2_hello = 0;
@@ -248,6 +248,8 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 					    session_id_size);
 		state->gnutls_internals.resumed = RESUME_FALSE;
 	}
+
+	state->gnutls_internals.compression_method = GNUTLS_NULL_COMPRESSION;
 
 	return 0;
 }

@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+/* This file contains function for RSA/DSA etc. 
+ */
+
 #include <defines.h>
 #include <gnutls_int.h>
 #include <gnutls_gcry.h>
@@ -25,6 +28,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_random.h>
 #include <gnutls_datum.h>
+#include "debug.h"
 
 /* Do PKCS-1 RSA encryption. 
  * pkey is the public key and n the modulus.
@@ -114,7 +118,6 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 	MPI *_pkey[2];
 
 	k = gcry_mpi_get_nbits(n) / 8;
-	
 	esize = ciphertext.size;
 
 	if (esize!=k) {
@@ -124,7 +127,6 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 	
 	if (gcry_mpi_scan(&c, GCRYMPI_FMT_USG, ciphertext.data, &esize) != 0) {
 		gnutls_assert();
-		gnutls_free(edata);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
@@ -140,19 +142,22 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 	}
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &esize, res);
-	edata = gnutls_malloc(esize);
+	edata = gnutls_malloc(esize+1);
 	if (edata == NULL) {
 		gnutls_assert();
 		gcry_mpi_release(res);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	gcry_mpi_print(GCRYMPI_FMT_USG, edata, &esize, res);
+	gcry_mpi_print(GCRYMPI_FMT_USG, &edata[1], &esize, res);
 
 	gcry_mpi_release(res);
 
 	/* EB = 00||BT||PS||00||D 
 	 * (use block type 2)
 	 */
+
+	edata[0] = 0;
+	esize++;
 
 	if (edata[0] != 0 || edata[1] != 2) {
 		gnutls_assert();
@@ -201,7 +206,7 @@ int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI **pkey)
 	/* make a sexp from pkey */
 	if (algo == GCRY_PK_RSA) {
 		rc = gcry_sexp_build(&s_pkey, NULL,
-				     "(public-key(rsa(p%m)(e%m)))",
+				     "(public-key(rsa(n%m)(e%m)))",
 				     *pkey[0], *pkey[1]);
 	} else {
 		gnutls_assert();
