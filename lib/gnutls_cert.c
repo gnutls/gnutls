@@ -1059,7 +1059,7 @@ void gnutls_x509pki_server_set_cert_request(GNUTLS_STATE state,
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_cert, int nreqs);
+  * int (*callback)(GNUTLS_STATE, gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_cert, int nreqs);
   *
   * 'client_cert' contains 'ncerts' gnutls_datum structures which hold
   * the DER encoded X.509 certificates of the client. 
@@ -1105,7 +1105,7 @@ void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(gnutls_datum *server_cert, int ncerts);
+  * int (*callback)(GNUTLS_STATE, gnutls_datum *server_cert, int ncerts);
   *
   * 'server_cert' contains 'ncerts' gnutls_datum structures which hold
   * the DER encoded X.509 certificates of the server. 
