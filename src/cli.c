@@ -207,7 +207,7 @@ static void load_keys(void)
 		munmap_file(data);
 	}
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 	if (pgp_certfile != NULL && pgp_keyfile != NULL) {
 		data = mmap_file(pgp_certfile);
 		if (data.data == NULL) {
@@ -953,7 +953,7 @@ static void init_global_tls_stuff(void)
 
 	load_keys();
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 	if (pgp_keyring != NULL) {
 		ret =
 		    gnutls_certificate_set_openpgp_keyring_file(xcred,

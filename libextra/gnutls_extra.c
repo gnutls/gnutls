@@ -168,7 +168,7 @@ extern OPENPGP_KEY_DEINIT _E_gnutls_openpgp_key_deinit;
 extern OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
 
 static void _gnutls_add_openpgp_functions(void) {
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 	_E_gnutls_openpgp_verify_key = _gnutls_openpgp_verify_key;
 	_E_gnutls_openpgp_get_raw_key_expiration_time = _gnutls_openpgp_get_raw_key_expiration_time;
 	_E_gnutls_openpgp_get_raw_key_creation_time = _gnutls_openpgp_get_raw_key_creation_time;

@@ -210,7 +210,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 
 }
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 
 void print_openpgp_info(gnutls_session session, const char* hostname)
 {
@@ -460,7 +460,7 @@ void print_cert_info(gnutls_session session, const char* hostname)
 		printf("X.509\n");
 		print_x509_info(session, hostname);
 		break;
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 	case GNUTLS_CRT_OPENPGP:
 		printf("OpenPGP\n");
 		print_openpgp_info(session, hostname);

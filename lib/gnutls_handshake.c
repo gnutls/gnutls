@@ -2377,7 +2377,7 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		
 		if (remove == 1) return 1;
 
-
+#ifdef ENABLE_ANON
 	} else if ( cred_type == GNUTLS_CRD_ANON) {
 		anon_cred =
 		    _gnutls_get_cred(session->key, cred_type, NULL);
@@ -2385,6 +2385,7 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		if (anon_cred != NULL) {
 			dh_params = _gnutls_anon_get_dh_params(anon_cred, session);
 		}
+#endif
 	} else return 0; /* no need for params */
 
 
