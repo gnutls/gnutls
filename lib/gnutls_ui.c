@@ -265,8 +265,6 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
 	return info->certificate_requested;
 }
 
-
-typedef gnutls_mac_algorithm gnutls_digest_algorithm;
 /**
   * gnutls_fingerprint - This function calculates the fingerprint of the given data
   * @algo: is a digest algorithm
@@ -278,6 +276,12 @@ typedef gnutls_mac_algorithm gnutls_digest_algorithm;
   * This function will calculate a fingerprint (actually a hash), of the
   * given data. The result is not printable data. You should convert it
   * to hex, or to something else printable.
+  *
+  * This is the usual way to calculate a fingerprint of an X.509 
+  * DER encoded certificate. Note however that the fingerprint 
+  * of an OpenPGP is not just a hash and cannot be calculated with
+  * this function.
+  *
   * Returns a negative value in case of an error.
   *
   **/
@@ -286,7 +290,9 @@ int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, c
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = _gnutls_hash_get_algo_len(algo);
 	
-	if (hash_len < 0 || (size_t)hash_len > *result_size) {
+	if (hash_len < 0 || (size_t)hash_len > *result_size ||
+		result==NULL) 
+	{
 		*result_size = hash_len;
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}

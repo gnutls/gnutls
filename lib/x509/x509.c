@@ -30,6 +30,7 @@
 #include <dn.h>
 #include <extensions.h>
 #include <libtasn1.h>
+#include <gnutls_ui.h>
 
 /**
   * gnutls_x509_certificate_init - This function initializes a gnutls_crl structure
@@ -996,3 +997,45 @@ int gnutls_x509_certificate_check_revocation(gnutls_x509_certificate cert,
 	return 0;		/* not revoked. */
 }
 
+/**
+  * gnutls_x509_certificate_get_fingerprint - This function returns the Certificate's fingerprint
+  * @cert: should contain a gnutls_x509_certificate structure
+  * @algo: is a digest algorithm
+  * @buf: a pointer to a structure to hold the fingerprint (may be null)
+  * @sizeof_buf: initialy holds the size of 'buf'
+  *
+  * This function will calculate and copy the certificate's fingerprint
+  * in the provided buffer.
+  *
+  * If the buffer is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_buf will be updated with the required size.
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_certificate_get_fingerprint(gnutls_x509_certificate cert, 
+	gnutls_digest_algorithm algo, char *buf,
+	 int *sizeof_buf)
+{
+opaque cert_buf[MAX_X509_CERT_SIZE];
+int cert_buf_size = sizeof( cert_buf);
+int result;
+gnutls_datum tmp;
+
+	if (sizeof_buf == 0 || cert == NULL) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result = asn1_der_coding( cert->cert, "cert2",
+		cert_buf, &cert_buf_size, NULL);
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+	
+	tmp.data = cert_buf;
+	tmp.size = cert_buf_size;
+	return gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
+}

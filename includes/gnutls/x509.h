@@ -187,6 +187,9 @@ int gnutls_x509_certificate_check_revocation(gnutls_x509_certificate cert,
 					     gnutls_x509_crl * crl_list,
 					     int crl_list_length);
 
+int gnutls_x509_certificate_get_fingerprint(gnutls_x509_certificate cert, 
+	gnutls_digest_algorithm algo, char *buf,
+	 int *sizeof_buf);
 
 #ifdef __cplusplus
 }

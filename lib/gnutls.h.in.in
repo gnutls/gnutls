@@ -390,4 +390,6 @@ void* gnutls_session_get_ptr(gnutls_session session);
 
 void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status);
 
-int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size);
+/* fingerprint */
+int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
+	char* result, size_t* result_size);
