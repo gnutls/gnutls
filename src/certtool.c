@@ -21,6 +21,7 @@ void generate_request(void);
 static gaainfo info;
 FILE* outfile;
 FILE* infile;
+int cert_format;
 
 static unsigned char buffer[40*1024];
 static const int buffer_size = sizeof(buffer);
@@ -167,14 +168,14 @@ int size, ret;
 
 	if (!info.pkcs8) {
 		size = sizeof(buffer);
-		ret = gnutls_x509_privkey_export( key, GNUTLS_X509_FMT_PEM, buffer, &size);	
+		ret = gnutls_x509_privkey_export( key, cert_format, buffer, &size);	
 		if (ret < 0) {
 			fprintf(stderr, "privkey_export: %s\n", gnutls_strerror(ret));
 			exit(1);
 		}
 	} else {
 		size = sizeof(buffer);
-		ret = gnutls_x509_privkey_export_pkcs8( key, GNUTLS_X509_FMT_PEM, NULL, GNUTLS_PKCS8_PLAIN, buffer, &size);
+		ret = gnutls_x509_privkey_export_pkcs8( key, cert_format, NULL, GNUTLS_PKCS8_PLAIN, buffer, &size);
 		if (ret < 0) {
 			fprintf(stderr, "privkey_export_pkcs8: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -370,7 +371,7 @@ void generate_self_signed( void)
 	print_private_key( key);
 
 	size = sizeof(buffer);
-	result = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);	
+	result = gnutls_x509_crt_export( crt, cert_format, buffer, &size);	
 	if (result < 0) {
 		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		exit(1);
@@ -410,7 +411,7 @@ void generate_signed_certificate( void)
 	print_private_key( key);
 
 	size = sizeof(buffer);
-	result = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);	
+	result = gnutls_x509_crt_export( crt, cert_format, buffer, &size);	
 	if (result < 0) {
 		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		exit(1);
@@ -445,7 +446,7 @@ void update_signed_certificate( void)
 	}
 
 	size = sizeof(buffer);
-	result = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);	
+	result = gnutls_x509_crt_export( crt, cert_format, buffer, &size);	
 	if (result < 0) {
 		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
 		exit(1);
@@ -479,6 +480,9 @@ void gaa_parser(int argc, char **argv)
 			exit(1);
 		}
 	} else infile = stdin;
+	
+	if (info.cert_format) cert_format = GNUTLS_X509_FMT_DER;
+	else cert_format = GNUTLS_X509_FMT_PEM;
 
 	gnutls_global_init();
 	gnutls_global_set_log_function( tls_log_func);
@@ -555,7 +559,7 @@ void certificate_info( void)
 	pem.data = buffer;
 	pem.size = size;
 	
-	ret = gnutls_x509_crt_import(crt, &pem, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import(crt, &pem, cert_format);
 	if (ret < 0) {
 		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -728,9 +732,9 @@ void privkey_info( void)
 	pem.size = size;
 	
 	if (!info.pkcs8) {
-		ret = gnutls_x509_privkey_import(key, &pem, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_privkey_import(key, &pem, cert_format);
 	} else {
-		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, GNUTLS_X509_FMT_PEM, NULL, GNUTLS_PKCS8_PLAIN);
+		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, cert_format, NULL, GNUTLS_PKCS8_PLAIN);
 	}
 
 	if (ret < 0) {
@@ -796,9 +800,9 @@ size_t size;
 	dat.size = size;
 	
 	if (!info.pkcs8)
-		ret = gnutls_x509_privkey_import( key, &dat, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_privkey_import( key, &dat, cert_format);
 	else
-		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, GNUTLS_X509_FMT_PEM,
+		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, cert_format,
 			NULL, 0);
 	
 	if (ret < 0) {
@@ -839,7 +843,7 @@ size_t size;
 	dat.data = buffer;
 	dat.size = size;
 	
-	ret = gnutls_x509_crq_import( crq, &dat, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crq_import( crq, &dat, cert_format);
 	
 	if (ret < 0) {
 		fprintf(stderr, "crq_import: %s\n", gnutls_strerror(ret));
@@ -885,9 +889,9 @@ size_t size;
 	dat.size = size;
 	
 	if (!info.pkcs8)
-		ret = gnutls_x509_privkey_import( key, &dat, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_privkey_import( key, &dat, cert_format);
 	else
-		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, GNUTLS_X509_FMT_PEM,
+		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, cert_format,
 			NULL, 0);
 	
 	if (ret < 0) {
@@ -935,7 +939,7 @@ size_t size;
 	dat.data = buffer;
 	dat.size = size;
 	
-	ret = gnutls_x509_crt_import( crt, &dat, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import( crt, &dat, cert_format);
 	if (ret < 0) {
 		fprintf(stderr, "crt_import: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -981,7 +985,7 @@ size_t size;
 	dat.data = buffer;
 	dat.size = size;
 	
-	ret = gnutls_x509_crt_import( crt, &dat, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import( crt, &dat, cert_format);
 	if (ret < 0) {
 		fprintf(stderr, "crt_import: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -1052,7 +1056,7 @@ void generate_request(void)
 	print_private_key( key);
 
 	size = sizeof(buffer);	
-	ret = gnutls_x509_crq_export( crq, GNUTLS_X509_FMT_PEM, buffer, &size);	
+	ret = gnutls_x509_crq_export( crq, cert_format, buffer, &size);	
 	if (ret < 0) {
 		fprintf(stderr, "export: %s\n", gnutls_strerror(ret));
 		exit(1);
