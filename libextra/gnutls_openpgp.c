@@ -1486,6 +1486,7 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
     if ( rc >= 0 )
         goto leave;
 
+    /* fixme: we can't use the code for old V3 RSA keys! */
     keyid = buffer_to_u32( key_fpr + (key_fpr_size-4) );
     rc = gnutls_openpgp_recv_key( cred->pgp_key_server,
                                   cred->pgp_key_server_port,
@@ -1766,6 +1767,9 @@ gnutls_openpgp_get_key_xml( const gnutls_datum *cert, int ext,
         case PKT_SIGNATURE:
             xml_add_sig( xmlkey, ext, pkt->pkt.signature );
             break;
+            
+        default:
+            break;
         }
     }
     s = "</OPENPGPKEY>\n";
@@ -1828,9 +1832,9 @@ gnutls_certificate_set_openpgp_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 int
-gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
-                                        char* CERTFILE,
-                                        char* KEYFILE)
+gnutls_certificate_set_openpgp_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res,
+                                         char* CERTFILE,
+                                         char* KEYFILE )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
@@ -1881,28 +1885,28 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, char *fpr, size_t *fprlen)
 }
 
 int
-gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
+gnutls_openpgp_add_keyring_file( gnutls_datum *keyring, const char *name )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
 }
 
 int
-gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
-                               const char *data, size_t len)
+gnutls_openpgp_add_keyring_mem( gnutls_datum *keyring,
+                                const char *data, size_t len )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
 }
 
 int
-gnutls_certificate_set_openpgp_keyring_file(GNUTLS_CERTIFICATE_CREDENTIALS c,
-                                            const char *file)
+gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS c,
+                                             const char *file )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 int
-gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
-                                           const char *file)
+gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
+                                            const char *file )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
 }
@@ -1911,26 +1915,32 @@ int
 _gnutls_openpgp_request_key( gnutls_datum* ret,
                              const GNUTLS_CERTIFICATE_CREDENTIALS cred,
                              opaque* key_fpr,
-                             int key_fpr_size)
+                             int key_fpr_size )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
 }
 
 int
-gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
-                                         char* keyserver,
-                                         int port)
+gnutls_certificate_set_openpgp_keyserver( GNUTLS_CERTIFICATE_CREDENTIALS res,
+                                          char* keyserver,
+                                          int port )
 {
-    return;
+    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 int
-gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
-                                       char* trustdb)
+gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
+                                        char* trustdb )
 {
-    return;
-}     
+    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
 
+int
+gnutls_openpgp_get_key_xml( const gnutls_datum *cert, int ext,
+                            gnutls_datum *xmlkey )
+{
+    return GNUTLS_E_UNIMPLEMENTED_FEATURE;   
+}
 #endif /* HAVE_LIBOPENCDK */
 
 
