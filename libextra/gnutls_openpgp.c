@@ -1509,7 +1509,7 @@ gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
     if ( cdk_trustdb_check( trustdb, 3 ) ) {
         /* The trustdb version is less then 3 and this mean the old
            format is still used. We don't support this format. */
-        return GNUTLS_E_UNKNOWN_ERROR;
+        return GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED;
     }
     res->pgp_trustdb = gnutls_strdup( trustdb );
     if ( res->pgp_trustdb==NULL )
