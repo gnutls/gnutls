@@ -1,3 +1,99 @@
+2004-10-05 20:46  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Fix.  
+
+2004-10-05 20:43  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-10-05 20:42  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Fix.  
+
+2004-10-05 20:41  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Look for memmem, for lib/memmem.c test.  
+
+2004-10-05 20:09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, NEWS:
+
+	Add.  
+
+2004-10-05 20:07  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Check for getpass, for opencdk, reported by Yoann Vandoorselaere 
+	<yoann@prelude-ids.org>.  
+
+2004-10-05 19:54  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Typo.  
+
+2004-10-05 19:53  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, NEWS:
+
+	Add.  
+
+2004-10-05 19:50  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Add GNULib module, for missing snprintf on OSF1 V4.0, reported by 
+	Yoann Vandoorselaere <yoann@prelude-ids.org>.  Note that lib/ does
+	not yet use it.  
+
+2004-10-05 19:41  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_ui.h:
+
+	(gnutls_certificate_verify_peers): Fix prototype.  
+
+2004-10-05 19:39  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	Don't use exit.h (not needed, EXIT_* is C89).  
+
+2004-10-05 19:37  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-10-05 19:34  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/memmem.c, lib/memmem.h:
+
+	Don't link to gnulib in lib/ until issues are solved (see
+	bug-gnulib).  Move memmem from gl/ to lib/, since it is the only
+	gnulib module lib/ needs.  
+
+2004-10-05 19:27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, NEWS:
+
+	Add.  
+
+2004-10-05 19:23  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/defines.h, lib/gnutls_x509.c, lib/x509_b64.c:
+
+	Update Gnulib.  Replace memstr with memmem, see continued discussion
+	on bug-gnulib.  
+
 2004-10-04 21:13  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-SP800-52.pdf:
