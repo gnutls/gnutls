@@ -85,24 +85,17 @@ AC_PROG_INSTALL
 dnl AC_PROG_MAKE_SET
 
 
-AC_ARG_WITH( mcrypt, [  --with-mcrypt           enable mcrypt support],
- [  AC_CHECK_LIB(dl, dlopen)
-  AC_CHECK_LIB(mcrypt, mcrypt_module_open,
-  LIBS="${LIBS} -lmcrypt"
-  AC_DEFINE(USE_MCRYPT),
-  [
-    AC_CHECK_LIB(dld, dld_init)
-    AC_CHECK_LIB(ltdl, lt_dlinit)
-    AC_CHECK_LIB(mcrypt, mcrypt_enc_get_key_size,
-    LIBS="${LIBS} -lmcrypt"
-    AC_DEFINE(USE_MCRYPT),
-    AC_MSG_ERROR("You need libmcrypt 2.4.x to compile this program. http://mcrypt.hellug.gr"))
-  ])
+AC_ARG_WITH( mcrypt, [  --with-mcrypt           enable libmcrypt support],
+ [AM_PATH_LIBMCRYPT( 2.4.0,, 
+ 	AC_MSG_ERROR([[*** libmcrypt was not found]])
+    AC_MSG_ERROR([[*** You need libmcrypt 2.4.x to compile this program. http://mcrypt.hellug.gr]])
+ )
  ]
-
 )
 
-AC_ARG_WITH( mhash, [  --with-mhash            enable mhash support],
+LIBS="${LIBS} ${LIBMCRYPT_LIBS}"
+
+AC_ARG_WITH( mhash, [  --with-mhash            enable libmhash support],
  [AC_CHECK_LIB(mhash, mhash_init, AC_DEFINE(USE_MHASH) 
 LIBS="${LIBS} -lmhash")])
 

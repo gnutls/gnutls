@@ -20,4 +20,7 @@
 
 #undef USE_GCRYPT
 #undef GNUTLS_VERSION
+
+#undef LIBMCRYPT22
+#undef LIBMCRYPT24
  
