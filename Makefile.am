@@ -12,11 +12,11 @@ tag = $(PACKAGE)-`echo $(VERSION) | sed 's/\./_/g'`
 htmldir = ../www-$(PACKAGE)
 
 release:
-	cvs rtag gnutls_1_1_15 gnutls
+	cvs rtag $(tag) gnutls
 	rm -f ChangeLog
 	make ChangeLog
 	cvs commit -m "" ChangeLog
-	cvs rtag -F gnutls_1_1_15 gnutls
+	cvs rtag -F $(tag) gnutls
 	make dist
 	gpg -b $(distdir).tar.gz
 	gpg --verify $(distdir).tar.gz.sig
