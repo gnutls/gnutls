@@ -99,13 +99,7 @@ CertificateStatus status;
 			}
 			
 			if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
-				#warning REM
-				gnutls_datum* cert;
 				
-				cert = gnutls_x509pki_get_peer_certificate( state);
-				printf(" - Raw certificate size: %d\n", cert->size);
-				printf(" - Raw certificate data: %x\n", cert->data);
-		
 				printf(" - Certificate info:\n");
 				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version( state));
 
