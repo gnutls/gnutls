@@ -5,7 +5,7 @@ dnl $id$
 # Shamelessly stolen from the one of XDELTA by Owen Taylor
 # Werner Koch   99-12-09
 # Modified for OpenCDK
-# Timo Schulz   02-02-22
+# Timo Schulz   02-04-06
 
 dnl AM_PATH_LIBOPENCDK([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
 dnl Test for libopencdk, and define CDK_CFLAGS and CDK_LIBS
@@ -72,9 +72,9 @@ main ()
       printf("*** to point to the correct copy of opencdk-config, and remove the file config.cache\n");
       printf("*** before re-running configure\n");
     }
-    else if ( strcmp(cdk_check_version(NULL), VERSION ) )
+    else if ( strcmp(cdk_check_version(NULL), OPENCDK_VERSION ) )
     {
-      printf("\n*** LIBOPENCDK header file (version %s) does not match\n", VERSION);
+      printf("\n*** LIBOPENCDK header file (version %s) does not match\n", OPENCDK_VERSION);
       printf("*** library (version %s)\n", cdk_check_version(NULL) );
     }
     else
@@ -163,4 +163,3 @@ main ()
 ])
 
 dnl *-*wedit:notab*-*  Please keep this as the last line.
-
