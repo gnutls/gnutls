@@ -23,13 +23,13 @@ GNUTLS_MOST_RECENT_INTERFACE=$GNUTLS_MINOR_VERSION
 GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER=$GNUTLS_MICRO_VERSION
 GNUTLS_OLDEST_INTERFACE=0
 
-dnl AM_PATH_GCRYPT(1.1.2,,
-dnl 	AC_MSG_ERROR([[
-dnl ***  
-dnl *** libgcrypt was not found. You may want to get it from
-dnl *** ftp://ftp.gnupg.org/gcrypt/devel/
-dnl ***
-dnl	]]))
+AM_PATH_GCRYPT(1.1.1a,,
+ 	AC_MSG_ERROR([[
+***  
+*** libgcrypt was not found. You may want to get it from
+*** ftp://ftp.gnupg.org/gcrypt/devel/
+***
+]]))
 
 AC_SUBST(GNUTLS_MAJOR_VERSION)
 AC_SUBST(GNUTLS_MINOR_VERSION)
@@ -46,8 +46,6 @@ LT_AGE=`expr $GNUTLS_MOST_RECENT_INTERFACE - $GNUTLS_OLDEST_INTERFACE`
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
-
-
 
 
 AC_PROG_CC
