@@ -38,5 +38,5 @@ doit (void)
   if (gnutls_check_version (LIBGNUTLS_VERSION))
     success ("gnutls_check_version OK\n");
   else
-    fail ("gnutls_check_version OK\n");
+    fail ("gnutls_check_version ERROR\n");
 }
