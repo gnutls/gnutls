@@ -161,9 +161,7 @@ int result;
   **/
 int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq)
 {
-const char* pk;
-opaque * der;
-int der_size, result;
+int result;
 int pk_algorithm;
 
 	pk_algorithm = gnutls_x509_crq_get_pk_algorithm( crq, NULL);
@@ -172,8 +170,20 @@ int pk_algorithm;
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
+	
+	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.subject",
+		crq->crq, "subject");
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
-#warning PUT SOME CODE HERE
+	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.subjectPublicKeyInfo",
+		crq->crq, "subjectPKInfo");
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
 	return 0;
 }
@@ -247,11 +257,37 @@ const char* pk;
 	
 	/* Step 1. Copy the issuer's name into the certificate.
 	 */
-	result = _gnutls_x509_copy_cert_dn( &crt->cert, issuer->cert);
+	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.issuer",
+		issuer->cert, "tbsCertificate.subject");
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
+
+	/* Step 1.5. Write the signature stuff in the tbsCertificate.
+	 */
+	/* write the RSA OID
+	 */
+	pk = _gnutls_x509_sign2oid( issuer_key->pk_algorithm, GNUTLS_MAC_SHA);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result = asn1_write_value( crt->cert, "tbsCertificate.signature.algorithm", pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* disable parameters, which are not used in RSA.
+	 */
+	result = asn1_write_value( crt->cert, "tbsCertificate.signature.parameters", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
 
 	/* Step 2. Sign the certificate.
 	 */
@@ -278,11 +314,6 @@ const char* pk;
 	 * the same. 
 	 */
 
-	pk = _gnutls_x509_sign2oid( issuer_key->pk_algorithm, GNUTLS_MAC_SHA);
-	if (pk == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
 
 	/* write the RSA OID
 	 */

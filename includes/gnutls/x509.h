@@ -120,7 +120,6 @@ int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time);
 int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time);
 int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial, 
 	size_t serial_size);
-int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq);
 
 
 /* RDN handling 
@@ -293,6 +292,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
 int gnutls_x509_crq_export( gnutls_x509_crq crq,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 
+int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq);
 
 
 #ifdef __cplusplus

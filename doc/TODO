@@ -5,7 +5,6 @@ in order to avoid having people working on the same thing.
 Current list:
 * Add a callback function in certificate authentication, to receive
   the certificate and the private key.
-* Add support for writing to X.509 certificates
 * Add support for generating and handling DSA keys
 * Convert documentation to texinfo format
 * Audit the code

@@ -219,7 +219,7 @@ gnutls_datum tbs;
 	}
 
 	result = asn1_der_coding( cert, tbs_name, buf, &buf_size, NULL);
-	
+
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		gnutls_afree(buf);

@@ -1,5 +1,6 @@
 Version 0.9.92
 - The RFC2818 hostname verification is now case insensitive.
+- Added support for generating X.509 certificates.
 
 Version 0.9.91 (17/10/2003)
 - Fixed a compilation issue in the openpgp authentication part.

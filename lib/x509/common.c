@@ -549,7 +549,7 @@ int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim)
 
 	_gnutls_str_cpy(name, sizeof(name), where);
 
-	if ((result = asn1_write_value(c2, name, "UTCTime", 1)) < 0) {
+	if ((result = asn1_write_value(c2, name, "utcTime", 1)) < 0) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -1086,4 +1086,43 @@ char name[128];
 
 	gnutls_free(str);
 	return algo;
+}
+
+ASN1_TYPE _asn1_find_node(ASN1_TYPE pointer,const char *name);
+
+int _gnutls_asn1_copy_node( ASN1_TYPE *dst, const char* dst_name,
+	ASN1_TYPE src, const char* src_name)
+{
+
+	int result;
+	gnutls_datum der;
+	ASN1_TYPE dst_node;
+
+	result = _gnutls_x509_der_encode( src, src_name, &der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	dst_node=_asn1_find_node(*dst, dst_name);
+	if(dst_node==NULL) {
+		gnutls_assert();
+		return _gnutls_asn2err(ASN1_ELEMENT_NOT_FOUND);
+	}
+
+	result = asn1_der_decoding( &dst_node, der.data, der.size, NULL);
+    
+#if 0
+	result = asn1_der_decoding_element( dst, dst_name, der.data,
+		der.size, NULL);
+#endif
+
+	_gnutls_free_datum( &der);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+	
+	return 0;
 }
