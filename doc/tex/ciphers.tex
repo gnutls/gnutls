@@ -3,7 +3,7 @@
 Confidentiality is provided by using block encryption algorithms like {\bf 3DES}, 
 {\bf AES\footnote{AES or Advanced Encryption Standard is actually the RIJNDAEL algorithm. This is the
 algorithm that will replace DES.}}, or
-stream algorithms like {\bf ARCFOUR\footnote{ARCFOUR is a compatible
+stream algorithms like {\bf ARCFOUR\_128\footnote{ARCFOUR\_128 is a compatible
 algorithm with RSA's RC4 algorithm, which is considered to be a trade secret.}} See \hyperref{fig:ciphers}{figure }{}{fig:ciphers} for a complete list. 
 Ciphers are encryption algorithms that use a single (secret) key
 to encrypt and decrypt data. Block algorithms in TLS also provide protection
@@ -20,7 +20,7 @@ actual data size.
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 \\
 \hline
-ARCFOUR & ARCFOUR is a fast stream cipher.
+ARCFOUR\_128 & ARCFOUR is a fast stream cipher.
 \\
 \hline
 ARCFOUR\_40 & This is the ARCFOUR cipher that is fed with a 40 bit key,

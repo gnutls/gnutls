@@ -60,7 +60,7 @@ GNUTLS_CIPHER_HANDLE ret;
 		ret = gcry_cipher_open(GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_CIPHER_ARCFOUR:
+	case GNUTLS_CIPHER_ARCFOUR_128:
 	case GNUTLS_CIPHER_ARCFOUR_40:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "arcfour", NULL, "stream", NULL);

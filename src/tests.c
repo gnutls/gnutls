@@ -86,7 +86,7 @@ const static int kx_priority[16] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, 
     GNUTLS_KX_RSA_EXPORT, 0 };
 const static int cipher_priority[16] =
-    { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_ARCFOUR_40, 0 };
+    { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_ARCFOUR_40, 0 };
 const static int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
 const static int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 const static int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
@@ -283,7 +283,7 @@ int ret;
 int test_unknown_ciphersuites( GNUTLS_STATE state) {
 int ret;
 	ADD_CIPHER3(state, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
-		GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR);
+		GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128);
 	ADD_ALL_COMP(state);
 	ADD_ALL_CERTTYPES(state);
 	ADD_ALL_PROTOCOLS(state);
@@ -339,7 +339,7 @@ int ret;
 
 int test_arcfour( GNUTLS_STATE state) {
 int ret;
-	ADD_CIPHER(state, GNUTLS_CIPHER_ARCFOUR);
+	ADD_CIPHER(state, GNUTLS_CIPHER_ARCFOUR_128);
 	ADD_ALL_COMP(state);
 	ADD_ALL_CERTTYPES(state);
 	ADD_ALL_PROTOCOLS(state);

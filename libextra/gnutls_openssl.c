@@ -483,7 +483,7 @@ SSL_METHOD *SSLv23_client_method(void)
     m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
     m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
-    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
@@ -518,7 +518,7 @@ SSL_METHOD *SSLv23_server_method(void)
     m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
     m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
-    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
@@ -550,7 +550,7 @@ SSL_METHOD *SSLv3_client_method(void)
     m->protocol_priority[2] = 0;
 
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
-    m->cipher_priority[2] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[2] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[3] = 0;
 
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
@@ -582,7 +582,7 @@ SSL_METHOD *SSLv3_server_method(void)
     m->protocol_priority[2] = 0;
 
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
-    m->cipher_priority[2] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[2] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[3] = 0;
 
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
@@ -616,7 +616,7 @@ SSL_METHOD *TLSv1_client_method(void)
     m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
     m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
-    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
@@ -650,7 +650,7 @@ SSL_METHOD *TLSv1_server_method(void)
     m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
     m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
     m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
-    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR_128;
     m->cipher_priority[4] = 0;
 
     m->comp_priority[0] = GNUTLS_COMP_ZLIB;
