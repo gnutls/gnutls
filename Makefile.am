@@ -9,7 +9,7 @@ SUBDIRS += crypto includes lib libextra src doc tests
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
 ChangeLog:
-	cvs2cl --utc --fsf --FSF --usermap .cvsusers -I ChangeLog -I .cvs
+	cvs2cl --tags --utc --fsf --FSF --usermap .cvsusers -I ChangeLog -I .cvs
 	cat .cvscopying >> ChangeLog
 
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
