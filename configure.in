@@ -331,9 +331,9 @@ AC_CONFIG_COMMANDS([lib/gnutls.h],[[
  chmod +x lib/libgnutls-config
 ]],[[]])
 
-AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config \
-doc/Makefile src/x509/Makefile src/srp/Makefile doc/tex/Makefile \
-doc/tex/cover.tex doc/scripts/Makefile src/openpgp/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
+lib/libgnutls-config doc/Makefile src/x509/Makefile src/srp/Makefile \
+doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile src/openpgp/Makefile])
 
 
 AC_OUTPUT

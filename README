@@ -27,8 +27,8 @@ our help, since they refuse to share with us).  For more explanation,
 see http://www.gnu.org/philosophy/why-not-lgpl.html.
 
 The GNU Lesser GPL license applies to the main gnutls library, while the
-gnutls-extra library is under the GPL.
-
+gnutls-extra library is under the GPL. The gnutls library is found in
+the lib/ directory, while the gnutls-extra library is found at libextra/.
 
 
 ****************************
