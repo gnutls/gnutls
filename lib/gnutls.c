@@ -41,8 +41,6 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
-const char* _gnutls_version = GNUTLS_VERSION;
-
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
 	ver = state->connection_state.version;
@@ -926,9 +924,9 @@ parse_version_string( const char *s, int *major, int *minor, int *micro )
  * but the version string is simply returned.
  */
 const char *
-gcry_check_version( const char *req_version )
+gnutls_check_version( const char *req_version )
 {
-    const char *ver = _gnutls_version;
+    const char *ver = GNUTLS_VERSION;
     int my_major, my_minor, my_micro;
     int rq_major, rq_minor, rq_micro;
     const char *my_plvl, *rq_plvl;

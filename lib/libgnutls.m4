@@ -7,7 +7,7 @@ dnl $id$
 # Werner Koch   99-12-09
 
 dnl AM_PATH_LIBGNUTLS([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
-dnl Test for libgnutls, and define GCRYPT_CFLAGS and GCRYPT_LIBS
+dnl Test for libgnutls, and define LIBGNUTLS_CFLAGS and LIBGNUTLS_LIBS
 dnl
 AC_DEFUN(AM_PATH_LIBGNUTLS,
 [dnl
@@ -48,7 +48,7 @@ dnl
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gcrypt.h>
+#include <gnutls.h>
 
 int
 main ()
@@ -58,7 +58,7 @@ main ()
     if( strcmp( gnutls_check_version(NULL), "$libgnutls_config_version" ) )
     {
       printf("\n*** 'libgnutls-config --version' returned %s, but LIBGNUTLS (%s)\n",
-             "$libgnutls_config_version", gcry_check_version(NULL) );
+             "$libgnutls_config_version", gnutls_check_version(NULL) );
       printf("*** was found! If libgnutls-config was correct, then it is best\n");
       printf("*** to remove the old version of LIBGNUTLS. You may also be able to fix the error\n");
       printf("*** by modifying your LD_LIBRARY_PATH enviroment variable, or by editing\n");
@@ -71,22 +71,22 @@ main ()
     else if ( strcmp(gnutls_check_version(NULL), LIBGNUTLS_VERSION ) )
     {
       printf("\n*** LIBGNUTLS header file (version %s) does not match\n", LIBGNUTLS_VERSION);
-      printf("*** library (version %s)\n", gcry_check_version(NULL) );
+      printf("*** library (version %s)\n", gnutls_check_version(NULL) );
     }
     else
     {
       if ( gnutls_check_version( "$min_libgnutls_version" ) )
       {
+fprintf(stderr, "Found: %s\n", $min_libgnutls_version);
         return 0;
       }
      else
       {
         printf("no\n*** An old version of LIBGNUTLS (%s) was found.\n",
-                gcry_check_version(NULL) );
+                gnutls_check_version(NULL) );
         printf("*** You need a version of LIBGNUTLS newer than %s. The latest version of\n",
                "$min_libgnutls_version" );
-        printf("*** LIBGNUTLS is always available from ftp://ftp.gnupg.org/pub/libgnutls/gnupg.\n");
-        printf("*** (It is distributed along with GnuPG).\n");
+        printf("*** LIBGNUTLS is always available from ftp://gnutls.hellug.gr/pub/gnutls.\n");
         printf("*** \n");
         printf("*** If you have already installed a sufficiently new version, this error\n");
         printf("*** probably means that the wrong copy of the libgnutls-config shell script is\n");
@@ -129,8 +129,8 @@ main ()
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gcrypt.h>
-],      [ return !!gcry_check_version(NULL); ],
+#include <gnutls.h>
+],      [ return !!gnutls_check_version(NULL); ],
         [ echo "*** The test program compiled, but did not run. This usually means"
           echo "*** that the run-time linker is not finding LIBGNUTLS or finding the wrong"
           echo "*** version of LIBGNUTLS. If it is not finding LIBGNUTLS, you'll need to set your"
