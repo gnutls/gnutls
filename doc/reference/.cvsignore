@@ -44,6 +44,7 @@ scan.stamp
 sgml.stamp
 stream.sgml
 structure.sgml
+style.css
 tmpl.stamp
 types.sgml
 up.png
