@@ -1,3 +1,16 @@
+2003-12-01 14:07  nmav <nmav@gnutls.org>
+
+	* src/common.c:
+
+	removed twofish 
+
+2003-12-01 08:50  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_hash_int.c, lib/gnutls_random.c,
+	src/common.c:
+
+	eliminated some memory leaks and other fixes.  
+
 2003-11-30 22:27  nmav <nmav@gnutls.org>
 
 	* src/: tests.c, tests.h, tls_test.c:
