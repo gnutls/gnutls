@@ -1,3 +1,20 @@
+2002-05-03 10:46  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_dhe.c, gnutls_dh.c, gnutls_dh.h:
+
+	DH Public keys now have a more reasonable (smaller) size.  
+
+2002-05-02 13:15  nmav <nmav@gnutls.org>
+
+	* lib/auth_anon.c, lib/auth_dhe.c, lib/auth_srp_passwd.c,
+	lib/gnutls.h.in.in, lib/gnutls_dh.c, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_int.h, src/prime.c, src/serv.c:
+
+	The Diffie Hellman method was optimized. Now the number of bits of q
+	is used (q is used to generate p), and the server DH secret key is 
+	less than the number of bits of q (see RFC2631 2.2). All these 
+	changes are experimental and may be totaly wrong.  
+
 2002-05-01 09:05  nmav <nmav@gnutls.org>
 
 	* lib/: auth_anon.c, auth_dhe.c, auth_rsa.c, auth_srp.c,
