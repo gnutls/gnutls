@@ -60,7 +60,7 @@ int main()
    }
    /* Initialize TLS session 
     */
-   gnutls_session_init(&session, GNUTLS_CLIENT);
+   gnutls_init(&session, GNUTLS_CLIENT);
 
    /* allow both SSL3 and TLS1
     */
@@ -136,7 +136,7 @@ int main()
    shutdown(sd, SHUT_RDWR);     /* no more receptions */
    close(sd);
 
-   gnutls_session_deinit(session);
+   gnutls_deinit(session);
 
    gnutls_certificate_free_credentials(xcred);
 

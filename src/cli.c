@@ -230,7 +230,7 @@ int main(int argc, char **argv)
    ERR(err, "connect");
 
    for (i = 0; i < 2; i++) {
-      gnutls_session_init(&session, GNUTLS_CLIENT);
+      gnutls_init(&session, GNUTLS_CLIENT);
 
       /* allow the use of private ciphersuites.
        */
@@ -284,7 +284,7 @@ int main(int argc, char **argv)
 	 }
 	 fprintf(stderr, "*** Handshake has failed\n");
 	 gnutls_perror(ret);
-	 gnutls_session_deinit(session);
+	 gnutls_deinit(session);
 	 return 1;
       } else {
 	 printf("- Handshake was completed\n");
@@ -332,7 +332,7 @@ int main(int argc, char **argv)
 	 shutdown(sd, SHUT_WR);
 	 close(sd);
 
-	 gnutls_session_deinit(session);
+	 gnutls_deinit(session);
 
 	 printf
 	     ("\n\n- Connecting again- trying to resume previous session\n");
@@ -447,7 +447,7 @@ int main(int argc, char **argv)
    shutdown(sd, SHUT_RDWR);	/* no more receptions */
    close(sd);
 
-   gnutls_session_deinit(session);
+   gnutls_deinit(session);
 
    if (srp_username!=NULL) 
       gnutls_srp_free_client_cred(cred);

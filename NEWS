@@ -6,6 +6,7 @@ Version 0.5.5
   names. 
 - Improved the certificate and key read functions. Now they can read 
   the certificate and the private key from the same file.
+- Updated and corrected documentation.
 
 Version 0.5.4 (27/08/2002)
 - Fixes in TLS 1.0 PRF and SSL3 random functions.

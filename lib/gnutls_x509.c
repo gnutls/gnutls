@@ -908,6 +908,9 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
   * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
   * by this function, you should check them using the appropriate functions.
   *
+  * This function understands the basicConstraints (2 5 29 19) PKIX extension.
+  * This means that only a certificate authority can sign a certificate.
+  *
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
@@ -1563,6 +1566,52 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *keyfile
 	return read_key_mem( res, x, siz, type);
 }
 
+/**
+  * gnutls_certificate_set_x509_key_mem - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * @CERT: contains a certificate list (path) for the specified private key
+  * @KEY: is the private key
+  * @type: is PEM or DER
+  *
+  * This function sets a certificate/private key pair in the 
+  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
+  * more than once (in case multiple keys/certificates exist for the
+  * server).
+  *
+  * Currently are supported: RSA PKCS-1 encoded private keys, 
+  * DSA private keys.
+  *
+  * DSA private keys are encoded the OpenSSL way, which is an ASN.1
+  * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
+  *
+  * Note that the keyUsage (2 5 29 15) PKIX extension in X.509 certificates 
+  * is supported. This means that certificates intended for signing cannot
+  * be used for ciphersuites that require encryption.
+  *
+  * If the certificate and the private key are given in PEM encoding
+  * then the strings that hold their values must be null terminated.
+  *
+  **/
+int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
+			   const gnutls_datum* KEY, gnutls_x509_certificate_format type)
+{
+	int ret;
+
+	/* this should be first 
+	 */
+	if ((ret = read_key_mem( res, KEY->data, KEY->size, type)) < 0)
+		return ret;
+
+	if ((ret = read_cert_mem( res, CERT->data, CERT->size, type)) < 0)
+		return ret;
+
+	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
+}
 
 /**
   * gnutls_certificate_set_x509_key_file - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
@@ -1704,52 +1753,6 @@ int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
 
 	return ret;
 }
-
-
-/**
-  * gnutls_certificate_set_x509_key_mem - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
-  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CERT: contains a certificate list (path) for the specified private key
-  * @KEY: is the private key
-  * @type: is PEM or DER
-  *
-  * This function sets a certificate/private key pair in the 
-  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
-  * more than once (in case multiple keys/certificates exist for the
-  * server).
-  *
-  * Currently are supported: RSA PKCS-1 encoded private keys, 
-  * DSA private keys.
-  *
-  * DSA private keys are encoded the OpenSSL way, which is an ASN.1
-  * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
-  *
-  * If the certificate and the private key are given in PEM encoding
-  * then the strings that hold their values must be null terminated.
-  *
-  **/
-int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
-			   const gnutls_datum* KEY, gnutls_x509_certificate_format type)
-{
-	int ret;
-
-	/* this should be first 
-	 */
-	if ((ret = read_key_mem( res, KEY->data, KEY->size, type)) < 0)
-		return ret;
-
-	if ((ret = read_cert_mem( res, CERT->data, CERT->size, type)) < 0)
-		return ret;
-
-	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return 0;
-}
-
-
 
 static int _read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 {

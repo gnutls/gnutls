@@ -193,7 +193,7 @@ SSL *SSL_new(SSL_CTX *ctx)
         return NULL;
     }
 
-    gnutls_session_init(&ssl->gnutls_state, ctx->method->connend);
+    gnutls_init(&ssl->gnutls_state, ctx->method->connend);
 
     gnutls_protocol_set_priority (ssl->gnutls_state, ctx->method->protocol_priority);
     gnutls_cipher_set_priority (ssl->gnutls_state, ctx->method->cipher_priority);
@@ -223,7 +223,7 @@ SSL *SSL_new(SSL_CTX *ctx)
 void SSL_free(SSL *ssl)
 {
     gnutls_certificate_free_cred(ssl->gnutls_cred);
-    gnutls_session_deinit(ssl->gnutls_state);
+    gnutls_deinit(ssl->gnutls_state);
     free(ssl);
     return;
 }

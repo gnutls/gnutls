@@ -143,7 +143,7 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 
 #define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
-  * gnutls_session_init - This function initializes the session to null (null encryption etc...).
+  * gnutls_init - This function initializes the session to null (null encryption etc...).
   * @con_end: is used to indicate if this session is to be used for server or 
   * client. Can be one of GNUTLS_CLIENT and GNUTLS_SERVER. 
   * @session: is a pointer to a &gnutls_session structure.
@@ -151,9 +151,9 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
   * This function initializes the current session to null. Every session
   * must be initialized before use, so internal structures can be allocated.
   * This function allocates structures which can only be free'd
-  * by calling gnutls_session_deinit(). Returns zero on success.
+  * by calling gnutls_deinit(). Returns zero on success.
   **/
-int gnutls_session_init(gnutls_session * session, gnutls_connection_end con_end)
+int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 {
 	*session = gnutls_calloc(1, sizeof(struct gnutls_session_int));
 	if (*session==NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -223,15 +223,15 @@ int _gnutls_session_is_resumable( gnutls_session session)
 
 
 /**
-  * _gnutls_session_deinit - This function clears all buffers associated with the &session
+  * _gnutls_deinit - This function clears all buffers associated with the &session
   * @session: is a &gnutls_session structure.
   *
   * This function clears all buffers associated with the &session.
-  * The difference with gnutls_session_deinit() is that this function will not
+  * The difference with gnutls_deinit() is that this function will not
   * interfere with the session database.
   *
   **/
-void _gnutls_session_deinit(gnutls_session session)
+void _gnutls_deinit(gnutls_session session)
 {
 
 	if (session==NULL) return;
@@ -299,7 +299,7 @@ void _gnutls_session_deinit(gnutls_session session)
 }
 
 /**
-  * gnutls_session_deinit - This function clears all buffers associated with the &session
+  * gnutls_deinit - This function clears all buffers associated with the &session
   * @session: is a &gnutls_session structure.
   *
   * This function clears all buffers associated with the &session.
@@ -307,7 +307,7 @@ void _gnutls_session_deinit(gnutls_session session)
   * if the session was terminated abnormally.
   *
   **/
-void gnutls_session_deinit(gnutls_session session)
+void gnutls_deinit(gnutls_session session)
 {
 
 	if (session==NULL) return;
@@ -319,7 +319,7 @@ void gnutls_session_deinit(gnutls_session session)
 		gnutls_db_remove_session( session);
 	}
 
-	_gnutls_session_deinit( session);
+	_gnutls_deinit( session);
 }
 
 

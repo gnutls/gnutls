@@ -32,6 +32,10 @@
 #include <gnutls_str.h>
 #include <gnutls_x509.h>
 
+/* This file contains code to parse the X.509 certificate
+ * extensions. Not all the PKIX extensions are supported.
+ */
+
 /* Here we only extract the KeyUsage field
  */
 static int _extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
@@ -42,7 +46,7 @@ static int _extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 	int len, result;
 
 	keyUsage[0] = 0;
-	
+
 	if ((result=_gnutls_asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext,
 	     "ku")) != ASN1_SUCCESS) {

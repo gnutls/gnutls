@@ -122,9 +122,9 @@ typedef struct {
 
 /* internal functions */
 
-int gnutls_session_init(gnutls_session * session, gnutls_connection_end con_end);
-void gnutls_session_deinit(gnutls_session session);
-void _gnutls_session_deinit(gnutls_session session);
+int gnutls_init(gnutls_session * session, gnutls_connection_end con_end);
+void gnutls_deinit(gnutls_session session);
+void _gnutls_deinit(gnutls_session session);
 int gnutls_bye( gnutls_session session, gnutls_close_request how);
 
 int gnutls_handshake( gnutls_session session);
@@ -383,9 +383,6 @@ int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* da
 
 #define gnutls_state_get_ptr gnutls_session_get_ptr
 #define gnutls_state_set_ptr gnutls_session_set_ptr
-#define gnutls_init gnutls_session_init
-#define gnutls_deinit gnutls_session_deinit
-#define _gnutls_deinit _gnutls_session_deinit
 #define gnutls_handshake_set_exportable_detection(x,y) 0
 #define gnutls_cert_type_get gnutls_certificate_type_get
 #define gnutls_cert_type_set_priority gnutls_certificate_type_set_priority

@@ -140,7 +140,7 @@ static void listener_free (listener_item * j)
 	gnutls_bye ( j->tls_session, GNUTLS_SHUT_WR);
 	shutdown (j->fd, 2);
 	close (j->fd);
-	gnutls_session_deinit (j->tls_session);
+	gnutls_deinit (j->tls_session);
     }
 }
 
@@ -255,7 +255,7 @@ gnutls_session initialize_session (void)
 {
     gnutls_session session;
 
-    gnutls_session_init (&session, GNUTLS_SERVER);
+    gnutls_init (&session, GNUTLS_SERVER);
 
    /* allow the use of private ciphersuites.
     */

@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 		if (i > 1 && tls1_ok == 0 && ssl3_ok == 0) break;
 
 		CONNECT();
-		gnutls_session_init(&state, GNUTLS_CLIENT);
+		gnutls_init(&state, GNUTLS_CLIENT);
 		gnutls_transport_set_ptr(state, sd);
 
 		printf("Checking %s...", tls_tests[i].test_name);
@@ -191,7 +191,7 @@ int main(int argc, char **argv)
 			printf(" %s\n", tls_tests[i].fail_str);
 		else printf(" %s\n", tls_tests[i].unsure_str);
 
-		gnutls_session_deinit(state);
+		gnutls_deinit(state);
 
 		shutdown(sd, SHUT_RDWR);	/* no more receptions */
 		close(sd);

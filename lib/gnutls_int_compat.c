@@ -25,24 +25,6 @@ void gnutls_state_set_ptr(gnutls_session session, void* ptr)
 	return gnutls_state_set_ptr( session, ptr);
 }
 
-#undef gnutls_init
-int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
-{
-	return gnutls_session_init( session, con_end);
-}
-
-#undef _gnutls_deinit
-void _gnutls_deinit(gnutls_session session)
-{
-	_gnutls_session_deinit( session);
-}
-
-#undef gnutls_deinit
-void gnutls_deinit(gnutls_session session)
-{
-	gnutls_session_deinit( session);
-}
-
 #undef gnutls_cert_type_get
 gnutls_certificate_type gnutls_cert_type_get( gnutls_session session) {
 	return gnutls_certificate_type_get( session);
