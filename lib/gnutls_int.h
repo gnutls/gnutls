@@ -108,9 +108,10 @@ typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCip
 
 typedef enum gnutls_certificate_status { 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
-	GNUTLS_CERT_INVALID=4, 
-	GNUTLS_CERT_CORRUPTED=16,
-	GNUTLS_CERT_REVOKED=32
+	GNUTLS_CERT_INVALID=4, /* refers to certificate chain */
+	GNUTLS_CERT_REVOKED=32, /* will be present only if crls are checked */
+	GNUTLS_CERT_ISSUER_NOT_FOUND=64,
+	GNUTLS_CERT_ISSUER_NOT_CA=128
 } gnutls_certificate_status;
 
 typedef enum gnutls_certificate_request { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } gnutls_certificate_request;

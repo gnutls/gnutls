@@ -1,3 +1,8 @@
+Version 0.9.95
+- Improved the verification functions. Added the GNUTLS_CERT_ISSUER_NOT_CA,
+  GNUTLS_CERT_ISSUER_NOT_FOUND verification output flags, and removed
+  the unused GNUTLS_CERT_CORRUPTED.
+
 Version 0.9.94 (30/10/2003)
 - Added manpages for the included programs.
 - Documented and improved the certtool utility. 

@@ -522,8 +522,6 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
   * GNUTLS_CERT_REVOKED\: the certificate has been revoked
   *  (not implemented yet).
   *
-  * GNUTLS_CERT_CORRUPTED\: the certificate is corrupted.
-  *
   * A negative error code is returned in case of an error.
   * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that
   * no certificate was sent by the peer.

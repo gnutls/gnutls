@@ -1099,22 +1099,26 @@ void generate_request(void)
 
 }
 
-
+static void print_verification_res( gnutls_x509_crt crt, gnutls_x509_crt issuer,
+	gnutls_x509_crl *crl_list, int crl_list_size);
 
 #define CERT_SEP "-----BEGIN CERT"
 #define CRL_SEP "-----BEGIN X509 CRL"
-
 int _verify_x509_mem( const char* cert, int cert_size)
 {
 	int siz, i;
 	const char *ptr;
 	int ret;
 	unsigned int output;
+	char name[256];
+	char issuer_name[256];
+	size_t name_size;
+	size_t issuer_name_size;
 	gnutls_datum tmp;
 	gnutls_x509_crt *x509_cert_list = NULL;
 	gnutls_x509_crl *x509_crl_list = NULL;
 	int x509_ncerts, x509_ncrls;
-	time_t now = time(0);
+	
 
 	/* Decode the CA certificate
 	 */
@@ -1195,14 +1199,58 @@ int _verify_x509_mem( const char* cert, int cert_size)
 			exit(1);
 		}
 		
-		/* Check expiration dates.
-		 */
-		if (gnutls_x509_crt_get_activation_time(x509_cert_list[i-1]) > now)
-			fprintf(stderr, "Warning: certificate %d has not been activated yet.\n", i);
-		if (gnutls_x509_crt_get_expiration_time(x509_cert_list[i-1]) < now)
-			fprintf(stderr, "Warning: certificate %d has been expired.\n", i);
 
-		/* now we move ptr after the pem header */
+		if (i-1 != 0) {
+			/* verify the previous certificate using this one 
+			 * as CA.
+			 */
+
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_dn( x509_cert_list[i-2], name, &name_size);
+			if (ret < 0) {
+				fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+
+			fprintf( outfile, "Certificate[%d]: %s\n", i-2, name);
+
+			/* print issuer 
+			 */
+			issuer_name_size = sizeof(issuer_name);
+			ret = gnutls_x509_crt_get_issuer_dn( x509_cert_list[i-2], issuer_name, &issuer_name_size);
+			if (ret < 0) {
+				fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+
+			fprintf( outfile, "\tIssued by: %s\n", name);
+			
+			/* Get the Issuer's name
+			 */
+			name_size = sizeof(name);
+			ret = gnutls_x509_crt_get_dn( x509_cert_list[i-1], name, &name_size);
+			if (ret < 0) {
+				fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
+				exit(1);
+			}
+			
+			fprintf( outfile, "\tVerifying against certificate[%d]: %s\n", i-1, name);
+
+			if (strcmp( issuer_name, name) != 0) {
+				fprintf(stderr, "Error: Issuer's name does not match the next certificate.\n");
+				exit(1);
+			}
+
+			fprintf( outfile, "\tVerification output: ");
+			print_verification_res( x509_cert_list[i-2], x509_cert_list[i-1], 
+				x509_crl_list, x509_ncrls);
+			fprintf( outfile, "\n\n");
+
+		}
+
+
+		/* now we move ptr after the pem header 
+		 */
 		ptr = strstr(ptr, CERT_SEP);
 		if (ptr!=NULL)
 			ptr++;
@@ -1215,8 +1263,36 @@ int _verify_x509_mem( const char* cert, int cert_size)
 	/* The last certificate in the list will be used as
 	 * a CA (should be self signed).
 	 */
-	ret  = gnutls_x509_crt_list_verify( x509_cert_list, x509_ncerts,
-		&x509_cert_list[x509_ncerts-1], 1, x509_crl_list, x509_ncrls, 0, &output);
+	name_size = sizeof(name);
+	ret = gnutls_x509_crt_get_dn( x509_cert_list[x509_ncerts-1], name, &name_size);
+	if (ret < 0) {
+		fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf( outfile, "Certificate[%d]: %s\n", x509_ncerts-1, name);
+
+	/* print issuer 
+	 */
+	issuer_name_size = sizeof(issuer_name);
+	ret = gnutls_x509_crt_get_issuer_dn( x509_cert_list[x509_ncerts-1], issuer_name, &issuer_name_size);
+	if (ret < 0) {
+		fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	fprintf( outfile, "\tIssued by: %s\n", name);
+			
+	if (strcmp( issuer_name, name) != 0) {
+		fprintf(stderr, "Error: The last certificate is not self signed.\n");
+		exit(1);
+	}
+
+	fprintf( outfile, "\tVerification output: ");
+	print_verification_res( x509_cert_list[x509_ncerts-1], x509_cert_list[x509_ncerts-1], 
+				x509_crl_list, x509_ncrls);
+
+	fprintf( outfile, "\n\n");
 
 	for (i=0;i<x509_ncerts;i++) {
 		gnutls_x509_crt_deinit( x509_cert_list[i]);
@@ -1237,36 +1313,66 @@ int _verify_x509_mem( const char* cert, int cert_size)
 	return output;
 }
 
-static void print_verification_res( unsigned int x) 
+static void print_verification_res( gnutls_x509_crt crt, gnutls_x509_crt issuer,
+	gnutls_x509_crl *crl_list, int crl_list_size)
 {
-	fprintf(outfile,  "Verification output:\n");
-	if (x&GNUTLS_CERT_INVALID)
-		fprintf(outfile, "\tcertificate chain is invalid.\n");
-	else
-	 	fprintf(outfile, "\tcertificate chain is valid.\n");
+unsigned int output;
+int comma=0;
+int ret;
+time_t now = time(0);
 
-	if (x&GNUTLS_CERT_NOT_TRUSTED)
-		fprintf(outfile, "\tThe certificate chain was NOT verified.\n");
-	else
-		fprintf(outfile, "\tThe certificate chain was verified.\n");
+	ret = gnutls_x509_crt_verify( crt, &issuer, 1, 0, &output);
+	if (ret < 0) {
+		fprintf(stderr, "Error in verification: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
 
-	if (x&GNUTLS_CERT_CORRUPTED)
-		fprintf(outfile, "\tA certificate is corrupt.\n");
+	if (output&GNUTLS_CERT_NOT_TRUSTED) {
+		fprintf(outfile, "Not verified");
+		comma = 1;
+	} else {
+		fprintf(outfile, "Verified");
+		comma = 1;
+	}
 
-	if (x&GNUTLS_CERT_REVOKED)
-		fprintf(outfile, "\tA certificate has been revoked.\n");
+	/* Check expiration dates.
+	 */
+	
+	if (gnutls_x509_crt_get_activation_time(crt) > now) {
+		if (comma) fprintf(outfile, ", ");
+		comma = 1;
+		fprintf(outfile, "Not activated");
+	}
+	
+	if (gnutls_x509_crt_get_expiration_time(crt) < now) {
+		if (comma) fprintf(outfile, ", ");
+		comma = 1;
+		fprintf(outfile, "Expired");
+	}
+	
+	ret = gnutls_x509_crt_check_revocation( crt, crl_list, crl_list_size);
+	if (ret < 0) {
+		fprintf(stderr, "Error in verification: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	if (ret == 1) { /* revoked */
+		if (comma) fprintf(outfile, ", ");
+		comma = 1;
+		fprintf(outfile, "Revoked");
+	}
+	
+
 }
 
 void verify_chain( void)
 {
-unsigned int output;
 size_t size;
 
 	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 
-	output = _verify_x509_mem( buffer, size);
+	_verify_x509_mem( buffer, size);
 	
-	print_verification_res( output);
 }
 
 #include <gnutls/pkcs12.h>
@@ -1286,7 +1392,7 @@ void generate_pkcs12( void)
 	gnutls_datum key_id;
 	unsigned char _key_id[20];
 	int index;
-	
+
 	fprintf(stderr, "Generating a PKCS #12 structure...\n");
 	
 	key = load_private_key();

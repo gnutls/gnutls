@@ -40,7 +40,7 @@
 
 static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 			       gnutls_x509_crt *trusted_cas, int tcas_size, 
-			       unsigned int flags);
+			       unsigned int flags, unsigned int* output);
 static
 int _gnutls_x509_verify_signature(const gnutls_datum* signed_data,
 	const gnutls_datum* signature, gnutls_x509_crt issuer);
@@ -184,10 +184,13 @@ gnutls_x509_crt find_issuer(gnutls_x509_crt cert,
  * was successfuly verified.
  *
  * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
+ *
+ * Output will hold some extra information about the verification
+ * procedure.
  */
 static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 			       gnutls_x509_crt *trusted_cas, int tcas_size, 
-			       unsigned int flags)
+			       unsigned int flags, unsigned int *output)
 {
 gnutls_datum cert_signed_data = { NULL, 0 };
 gnutls_datum cert_signature = { NULL, 0 };
@@ -198,6 +201,7 @@ int ret, issuer_version, result;
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
 	else {
 		gnutls_assert();
+		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
 		return 0;
 	}
 
@@ -205,6 +209,7 @@ int ret, issuer_version, result;
 	 * authorities.
 	 */
 	if (issuer == NULL) {
+		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
 		gnutls_assert();
 		return 0;
 	}
@@ -219,6 +224,7 @@ int ret, issuer_version, result;
 		!((flags & GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT) && issuer_version == 1)) {
 		if (check_if_ca(cert, issuer)==0) {
 			gnutls_assert();
+			if (output) *output |= GNUTLS_CERT_ISSUER_NOT_CA | GNUTLS_CERT_NOT_TRUSTED;
 			return 0;
 		}
 	}
@@ -240,6 +246,7 @@ int ret, issuer_version, result;
 	if (ret < 0) {
 		gnutls_assert();
 		/* error. ignore it */
+		if (output) *output |= GNUTLS_CERT_NOT_TRUSTED;
 		ret = 0;
 	}
 
@@ -296,7 +303,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 
 		if ((ret =
 		     _gnutls_verify_certificate2(certificate_list[i],
-						 &certificate_list[i + 1], 1, flags)) != 1) 
+						 &certificate_list[i + 1], 1, flags, NULL)) != 1) 
 		{
 			status |= GNUTLS_CERT_INVALID;
 		}
@@ -319,7 +326,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 	 */
 	ret =
 	    _gnutls_verify_certificate2(certificate_list[i], trusted_cas,
-				       tcas_size, flags);
+				       tcas_size, flags, NULL);
 
 	if (ret == 0) {
 		/* if the last certificate in the certificate
@@ -544,8 +551,6 @@ int ret, issuer_params_size, i;
   *
   * GNUTLS_CERT_REVOKED\: the certificate has been revoked.
   *
-  * GNUTLS_CERT_CORRUPTED\: the certificate is corrupted.
-  *
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
@@ -575,8 +580,7 @@ int gnutls_x509_crt_list_verify( gnutls_x509_crt* cert_list, int cert_list_lengt
   * @verify: will hold the certificate verification output.
   *
   * This function will try to verify the given certificate and return its status. 
-  * See gnutls_x509_crt_list_verify() for a detailed description of
-  * return values.
+  * The verification output in this functions cannot be GNUTLS_CERT_NOT_VALID.
   *
   * Returns 0 on success and a negative value in case of an error.
   *
@@ -588,7 +592,7 @@ int gnutls_x509_crt_verify( gnutls_x509_crt cert,
 	/* Verify certificate 
 	 */
 	*verify =
-	    _gnutls_verify_certificate2( cert, CA_list, CA_list_length, flags);
+	    _gnutls_verify_certificate2( cert, CA_list, CA_list_length, flags, verify);
 
 	return 0;
 }
