@@ -4,12 +4,12 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls_plaintext.h \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
 	gnutls_compress_int.h gnutls_session.h gnutls_priority.h gnutls_auth.h \
-	gnutls_anon.h gnutls_dhe_dss.h
+	auth_anon.h auth_dhe_dss.h
 lib_LTLIBRARIES = libgnutls.la
 libgnutls_la_SOURCES = gnutls.c gnutls_compress.c debug.c gnutls_plaintext.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c \
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c \
 	gnutls_compress_int.c gnutls_session.c gnutls_db.c cert_b64.c \
-	gnutls_anon.c gnutls_dhe_dss.c
+	auth_anon.c auth_dhe_dss.c
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
