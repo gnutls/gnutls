@@ -909,10 +909,13 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
   * This function may accept a NULL pointer for data, and 0 for size, if
   * and only if the previous send was interrupted for some reason.
   *
-  * Returns the number of bytes sent, or a negative error code.
+  * Returns the number of bytes sent, or a negative error code. The number
+  * of bytes sent might be less than @sizeofdata. The maximum number of bytes
+  * this function can send in a single call depends on the maximum record size.
   *
   **/
-ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t sizeofdata) {
+ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t sizeofdata) 
+{
 	return _gnutls_send_int( session, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
@@ -932,7 +935,8 @@ ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t siz
   * or perform a handshake again. (only a client may receive this message)
   *
   **/
-ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdata) {
+ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdata) 
+{
 	return _gnutls_recv_int( session, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
