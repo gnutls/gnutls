@@ -3,6 +3,8 @@ Copyright (C) 2004 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.1.23
+
 * Version 1.1.22 (2004-11-04)
 - Replace GNU LD version script with Libtool -export-symbols-regex,
   from Joe Orton <joe@manyfish.co.uk>.
