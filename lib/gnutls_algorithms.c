@@ -291,6 +291,8 @@ typedef struct {
 #define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 } /* draft-ietf-tls-ciphersuite-05 */
 #define GNUTLS_DHE_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x39 }
 
+#define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
+
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* ANON_DH */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_ANON_DH_ARCFOUR_MD5,
@@ -439,16 +441,6 @@ const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm algorithm)
 	return ret;
 }
 
-int _gnutls_mac_count(void)
-{
-	uint8 i, counter = 0;
-	for (i = 0; i < MAX_ALGOS; i++) {
-		if (_gnutls_mac_is_ok(i) == 0)
-			counter++;
-	}
-	return counter;
-}
-
 int _gnutls_mac_is_ok(MACAlgorithm algorithm)
 {
 	size_t ret = -1;
@@ -519,16 +511,6 @@ CompressionMethod _gnutls_compression_get_id(int num)
 	GNUTLS_COMPRESSION_ALG_LOOP_NUM(ret = p->id);
 
 	return ret;
-}
-
-int _gnutls_compression_count(void)
-{
-	uint8 i, counter = 0;
-	for (i = 0; i < MAX_ALGOS; i++) {
-		if (_gnutls_compression_is_ok(i) == 0)
-			counter++;
-	}
-	return counter;
 }
 
 int _gnutls_compression_is_ok(CompressionMethod algorithm)
@@ -614,17 +596,6 @@ const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm algorithm)
 	return ret;
 }
 
-int _gnutls_cipher_count(void)
-{
-	uint8 i, counter = 0;
-	for (i = 0; i < MAX_ALGOS; i++) {
-		if (_gnutls_cipher_is_ok(i) == 0)
-			counter++;
-	}
-	return counter;
-}
-
-
 int _gnutls_cipher_is_ok(BulkCipherAlgorithm algorithm)
 {
 	size_t ret = -1;
@@ -675,17 +646,6 @@ const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm)
 
 	return ret;
 }
-
-int _gnutls_kx_count(void)
-{
-	uint8 i, counter = 0;
-	for (i = 0; i < MAX_ALGOS; i++) {
-		if (_gnutls_kx_is_ok(i) == 0)
-			counter++;
-	}
-	return counter;
-}
-
 
 int _gnutls_kx_is_ok(KXAlgorithm algorithm)
 {
@@ -896,36 +856,6 @@ static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
 
 }
 
-int _gnutls_cipher_suite_counter = 0;
-
-/* quite expensive 
- *
- * 20020326: This is now only called once by gnutls_global_init()
- *
- * The return value is stored at _gnutls_cipher_suite_counter;
- */
-void _gnutls_cipher_suite_count_int(void)
-{
-	GNUTLS_CipherSuite suite;
-	int i, counter = 0, j;
-
-	for (j = 0; j < MAX_CIPHERSUITES; j++) {
-		suite.CipherSuite[0] = j;
-
-		if (j != 0x00 && j != 0xFF)
-			continue;
-
-		for (i = 0; i < MAX_CIPHERSUITES; i++) {
-			suite.CipherSuite[1] = i;
-			if (_gnutls_cipher_suite_is_ok(suite) == 0)
-				counter++;
-		}
-
-	}
-	_gnutls_cipher_suite_counter = counter;
-}
-
-
 #define SWAP(x, y) memcpy(tmp,x,size); \
 		   memcpy(x,y,size); \
 		   memcpy(y,tmp,size);
@@ -1101,7 +1031,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 {
 
 	int i, ret_count, j;
-	int count = _gnutls_cipher_suite_counter;
+	int count = CIPHER_SUITES_COUNT;
 	GNUTLS_CipherSuite *tmp_ciphers;
 	GNUTLS_CipherSuite* ciphers;
 	GNUTLS_Version version;

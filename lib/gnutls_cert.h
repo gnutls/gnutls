@@ -89,6 +89,6 @@ struct GNUTLS_STATE_INT; /* because GNUTLS_STATE is not defined when this file i
 int _gnutls_cert_supported_kx( const gnutls_cert* cert, KXAlgorithm **alg, int *alg_size);
 PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm);
 
-void gnutls_free_cert(gnutls_cert cert);
+void _gnutls_free_cert(gnutls_cert cert);
 
 #endif

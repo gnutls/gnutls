@@ -110,7 +110,7 @@ int i;
 	for (i=0;i<*params_len;i++) {
 		params[i] = gcry_mpi_copy(peer_cert.params[i]);
 	}
-	gnutls_free_cert( peer_cert);
+	_gnutls_free_cert( peer_cert);
 
 	return 0;
 }

@@ -75,7 +75,7 @@ PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
 	return ret;
 }
 
-void gnutls_free_cert(gnutls_cert cert)
+void _gnutls_free_cert(gnutls_cert cert)
 {
 	int i;
 
@@ -103,7 +103,7 @@ void gnutls_certificate_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 
 	for (i = 0; i < sc->ncerts; i++) {
 		for (j = 0; j < sc->cert_list_length[i]; j++) {
-			gnutls_free_cert(sc->cert_list[i][j]);
+			_gnutls_free_cert(sc->cert_list[i][j]);
 		}
 		gnutls_free( sc->cert_list[i]);
 	}
@@ -112,7 +112,7 @@ void gnutls_certificate_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 	gnutls_free(sc->cert_list);
 
 	for (j = 0; j < sc->x509_ncas; j++) {
-		gnutls_free_cert( sc->x509_ca_list[j]);
+		_gnutls_free_cert( sc->x509_ca_list[j]);
 	}
 
 	gnutls_free( sc->x509_ca_list);

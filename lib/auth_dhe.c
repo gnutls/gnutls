@@ -412,7 +412,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 				      &peer_cert,
 				      &vparams, &signature);
 	
-	gnutls_free_cert( peer_cert);
+	_gnutls_free_cert( peer_cert);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

@@ -35,7 +35,6 @@ int   _gnutls_mac_get_digest_size(MACAlgorithm algorithm);
 const char* gnutls_mac_get_name(MACAlgorithm algorithm);
 int   _gnutls_mac_is_ok(MACAlgorithm algorithm);
 int   _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm);
-int   _gnutls_mac_count(void);
 
 /* functions for cipher suites */
 int   _gnutls_supported_ciphersuites(GNUTLS_STATE state, GNUTLS_CipherSuite **ciphers);
@@ -53,7 +52,6 @@ GNUTLS_CipherSuite  _gnutls_cipher_suite_get_suite_name(GNUTLS_CipherSuite algor
 int _gnutls_cipher_priority(GNUTLS_STATE state, BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_get_block_size(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_is_block(BulkCipherAlgorithm algorithm);
-int _gnutls_cipher_count(void);
 int _gnutls_cipher_is_ok(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm);
@@ -65,12 +63,10 @@ int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm);
 MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(KXAlgorithm algorithm);
 const char *gnutls_kx_get_name(KXAlgorithm algorithm);
 int _gnutls_kx_is_ok(KXAlgorithm algorithm);
-int _gnutls_kx_count(void);
 
 /* functions for compression */
 int _gnutls_compression_priority(GNUTLS_STATE state, CompressionMethod algorithm);
 int _gnutls_compression_is_ok(CompressionMethod algorithm);
-int _gnutls_compression_count(void);
 int _gnutls_compression_get_num(CompressionMethod algorithm);
 CompressionMethod _gnutls_compression_get_id(int num);
 const char *gnutls_compression_get_name(CompressionMethod algorithm);

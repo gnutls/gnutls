@@ -709,7 +709,7 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 
 }
 
-#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x])
+#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_free_cert(peer_certificate_list[x])
 
 /*-
   * _gnutls_x509_cert_verify_peers - This function returns the peer's certificate status
@@ -791,8 +791,8 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
 	return verify;
 }
 
-#define CLEAR_CERTS_CA for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x]); \
-		for(x=0;x<ca_certificate_list_size;x++) gnutls_free_cert(ca_certificate_list[x])
+#define CLEAR_CERTS_CA for(x=0;x<peer_certificate_list_size;x++) _gnutls_free_cert(peer_certificate_list[x]); \
+		for(x=0;x<ca_certificate_list_size;x++) _gnutls_free_cert(ca_certificate_list[x])
 /**
   * gnutls_x509_verify_certificate - This function verifies given certificate list
   * @cert_list: is the certificate list to be verified

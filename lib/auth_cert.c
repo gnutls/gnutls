@@ -617,7 +617,7 @@ int _gnutls_gen_cert_server_certificate(GNUTLS_STATE state, opaque ** data)
 /* Process server certificate
  */
 
-#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x])
+#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_free_cert(peer_certificate_list[x])
 int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 					 int data_size)
 {
@@ -749,7 +749,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	return 0;
 }
 
-#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x])
+#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_free_cert(peer_certificate_list[x])
 int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 					    opaque * data, int data_size)
 {
@@ -1125,10 +1125,10 @@ int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 				      data_size + HANDSHAKE_HEADER_SIZE)) <
 	    0) {
 		gnutls_assert();
-		gnutls_free_cert(peer_cert);
+		_gnutls_free_cert(peer_cert);
 		return ret;
 	}
-	gnutls_free_cert(peer_cert);
+	_gnutls_free_cert(peer_cert);
 
 	return 0;
 }
