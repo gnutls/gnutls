@@ -1,3 +1,7 @@
+
+#ifndef GNUTLS_ERRORS_IH
+# define GNUTLS_ERRORS_IH
+
 /* Gnutls error codes. The mapping to a TLS alert is also shown in
  * comments.
  */
@@ -105,3 +109,5 @@
 /* _INT_ internal errors. Not exported */
 
 #define GNUTLS_E_INT_RET_0 -251
+
+#endif /* GNUTLS_ERRORS_IH */

@@ -52,10 +52,11 @@ static void dot_spaces(char *str)
  */
 static const char *oid2ldap_string(char *oid)
 {
-	const char* ret;
+	const char *ret;
 
-	ret =  _gnutls_x509_oid2ldap_string( oid);
-	if (ret) return ret;
+	ret = _gnutls_x509_oid2ldap_string(oid);
+	if (ret)
+		return ret;
 
 	/* else return the OID in dotted format */
 	dot_spaces(oid);
@@ -215,7 +216,6 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 				goto cleanup;
 			}
 
-
 #define STR_APPEND(y) if ((result=_gnutls_string_append_str( &out_str, y)) < 0) { \
 	gnutls_assert(); \
 	goto cleanup; \
@@ -233,32 +233,42 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			}
 			first = 1;
 
-			if (printable==1) {
+			if (printable == 1) {
 				char string[256];
 				int sizeof_string = sizeof(string);
-				
+
 				STR_APPEND(ldap_desc);
 				STR_APPEND("=");
-				if ( (result=_gnutls_x509_oid_data2string( oid, value, len, string, &sizeof_string)) < 0) {
+				if ((result =
+				     _gnutls_x509_oid_data2string(oid,
+								  value,
+								  len,
+								  string,
+								  &sizeof_string))
+				    < 0) {
 					gnutls_assert();
 					goto cleanup;
 				}
-				STR_APPEND(str_escape(string, escaped, sizeof(escaped)));
+				STR_APPEND(str_escape
+					   (string, escaped,
+					    sizeof(escaped)));
 			} else {
-				char * res;
-				
-				res = _gnutls_bin2hex( value, len, escaped, sizeof(escaped));
+				char *res;
+
+				res =
+				    _gnutls_bin2hex(value, len, escaped,
+						    sizeof(escaped));
 				if (res) {
 					STR_APPEND(ldap_desc);
 					STR_APPEND("=#");
-					STR_APPEND( res);
+					STR_APPEND(res);
 				}
 			}
 		} while (1);
 
 	} while (1);
 
-	if (out_str.length >= (unsigned int)*sizeof_buf) {
+	if (out_str.length >= (unsigned int) *sizeof_buf) {
 		gnutls_assert();
 		*sizeof_buf = out_str.length;
 		result = GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -286,9 +296,9 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
  * That is to point in the rndSequence.
  */
 int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
-			  const char *asn1_rdn_name, const char * given_oid,
-			  char *buf,
-			  int *sizeof_buf)
+			      const char *asn1_rdn_name,
+			      const char *given_oid, char *buf,
+			      int *sizeof_buf)
 {
 	int k2, k1, result;
 	char tmpbuffer1[64];
@@ -357,7 +367,6 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 					    &len);
 
 			if (result == ASN1_ELEMENT_NOT_FOUND) {
-				gnutls_assert();
 				break;
 			}
 			if (result != ASN1_VALUE_NOT_FOUND) {
@@ -386,18 +395,21 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 				goto cleanup;
 			}
 
-			if (strcmp( oid, given_oid) == 0) {
+			if (strcmp(oid, given_oid) == 0) {
 
 				/* Read the Value 
 				 */
-				_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
+				_gnutls_str_cpy(tmpbuffer3,
+						sizeof(tmpbuffer3),
 						tmpbuffer2);
-				_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3),
+				_gnutls_str_cat(tmpbuffer3,
+						sizeof(tmpbuffer3),
 						".value");
 
 				len = sizeof(value) - 1;
 				result =
-				    asn1_read_value(asn1_struct, tmpbuffer3, value,
+				    asn1_read_value(asn1_struct,
+						    tmpbuffer3, value,
 						    &len);
 
 				if (result != ASN1_SUCCESS) {
@@ -407,32 +419,42 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 				}
 
 
-				printable = _gnutls_x509_oid_data_printable(oid);
+				printable =
+				    _gnutls_x509_oid_data_printable(oid);
 
-				if (printable==1) {
-					if ( (result=_gnutls_x509_oid_data2string( oid, value, len, buf, sizeof_buf)) < 0) {
+				if (printable == 1) {
+					if ((result =
+					     _gnutls_x509_oid_data2string
+					     (oid, value, len, buf,
+					      sizeof_buf)) < 0) {
 						gnutls_assert();
 						goto cleanup;
 					}
-					
+
 					return 0;
 				} else {
-					char * res;
-				
-					res = _gnutls_bin2hex( value, len, escaped, sizeof(escaped));
+					char *res;
+
+					res =
+					    _gnutls_bin2hex(value, len,
+							    escaped,
+							    sizeof
+							    (escaped));
 					if (res) {
 						int size = strlen(res) + 1;
-						if ( size > *sizeof_buf) {
+						if (size > *sizeof_buf) {
 							*sizeof_buf = size;
-							return GNUTLS_E_SHORT_MEMORY_BUFFER;
+							return
+							    GNUTLS_E_SHORT_MEMORY_BUFFER;
 						}
 						*sizeof_buf = size - 1;
-						strcpy( buf, res);
-						
+						strcpy(buf, res);
+
 						return 0;
 					} else {
 						gnutls_assert();
-						return GNUTLS_E_INTERNAL_ERROR;
+						return
+						    GNUTLS_E_INTERNAL_ERROR;
 					}
 				}
 			}
@@ -446,4 +468,56 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 
       cleanup:
 	return result;
+}
+
+
+/**
+  * gnutls_x509_rdn_to_dn - This function parses an RDN sequence and returns a string
+  * @idn: should contain a DER encoded RDN sequence
+  * @buf: a pointer to a structure to hold the peer's name
+  * @sizeof_buf: holds the size of 'buf'
+  *
+  * This function will return the name of the given RDN sequence.
+  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described 
+  * in RFC2253.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
+  * and 0 on success.
+  *
+  **/
+int gnutls_x509_rdn_to_dn(const gnutls_datum * idn,
+				  char *buf, unsigned int *sizeof_buf)
+{
+	int result;
+	ASN1_TYPE dn;
+
+	if (sizeof_buf == 0) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (buf)
+		buf[0] = 0;
+
+
+	if ((result =
+	     _gnutls_asn1_create_element(_gnutls_get_pkix(),
+					 "PKIX1.Name", &dn,
+					 "dn")) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&dn, idn->data, idn->size, NULL);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_parse_dn(dn, "dn", buf, sizeof_buf);
+
+	asn1_delete_structure(&dn);
+	return result;
+
 }

@@ -117,13 +117,18 @@ int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index, unsigned cha
 struct gnutls_pkcs7_int;
 typedef struct gnutls_pkcs7_int* gnutls_pkcs7;
 
+
 int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7);
+
 void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7);
+
+int gnutls_pkcs7_get_certificate_count( gnutls_pkcs7 pkcs7);
+
 int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	gnutls_x509_certificate_format format);
-int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, 
-	int indx, char* certificate, int* certificate_size);
-int gnutls_pkcs7_extract_certificate_count(gnutls_pkcs7 pkcs7);
+
+int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx, 
+	char* certificate, int* certificate_size);
 
 
 #ifdef __cplusplus
