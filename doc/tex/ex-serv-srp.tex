@@ -15,6 +15,10 @@
 #define SRP_PASSWD "tpasswd"
 #define SRP_PASSWD_CONF "tpasswd.conf"
 
+#define KEYFILE "key.pem"
+#define CERTFILE "cert.pem"
+#define CAFILE "ca.pem"
+
 /* This is a sample TLS-SRP echo server.
  */
 
@@ -25,11 +29,13 @@
 
 /* These are global */
 gnutls_srp_server_credentials srp_cred;
+gnutls_certificate_credentials cert_cred;
 
 gnutls_session initialize_tls_session()
 {
    gnutls_session session;
-   const int kx_priority[] = { GNUTLS_KX_SRP, 0 };
+   const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
+      GNUTLS_KX_SRP_RSA, 0 };
 
    gnutls_init(&session, GNUTLS_SERVER);
 
@@ -37,6 +43,9 @@ gnutls_session initialize_tls_session()
    gnutls_kx_set_priority(session, kx_priority);
 
    gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
+   /* for the certificate authenticated ciphersuites.
+    */
+   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
    /* request client certificate if any.
     */
@@ -70,6 +79,10 @@ int main()
    gnutls_srp_allocate_server_credentials(&srp_cred);
    gnutls_srp_set_server_credentials_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
+   gnutls_certificate_allocate_credentials(&cert_cred);
+   gnutls_certificate_set_x509_trust_file(cert_cred, CAFILE, GNUTLS_X509_FMT_PEM);
+   gnutls_certificate_set_x509_key_file(cert_cred, CERTFILE, KEYFILE,
+                                        GNUTLS_X509_FMT_PEM);
 
    /* TCP socket operations
     */
@@ -146,6 +159,7 @@ int main()
    close(listen_sd);
 
    gnutls_srp_free_server_credentials(srp_cred);
+   gnutls_certificate_free_credentials(cert_cred);
 
    gnutls_global_deinit();
 
