@@ -36,11 +36,11 @@ int generate_prime(int bits);
 void pkcs12_info( void);
 void generate_pkcs12( void);
 void verify_chain(void);
-gnutls_x509_privkey load_private_key(void);
+gnutls_x509_privkey load_private_key(int mand);
 gnutls_x509_crq load_request(void);
 gnutls_x509_privkey load_ca_private_key(void);
 gnutls_x509_crt load_ca_cert(void);
-gnutls_x509_crt load_cert(void);
+gnutls_x509_crt load_cert(int mand);
 void certificate_info( void);
 void privkey_info( void);
 static void gaa_parser(int argc, char **argv);
@@ -154,7 +154,7 @@ gnutls_x509_privkey key;
 int ret;
 
 	if (info.privkey)
-		return load_private_key();
+		return load_private_key(1);
 
 	ret = gnutls_x509_privkey_init(&key);
 	if (ret < 0) {
@@ -259,11 +259,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 
 	if (crq == NULL) {
 
-		key = load_private_key();
-		if (key==NULL) {
-			fprintf(stderr, "Could not load private key.\n");
-			exit(1);
-		}
+		key = load_private_key(1);
 
 		fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
 		"Just press enter to ignore a field.\n");
@@ -374,7 +370,7 @@ gnutls_x509_crt update_certificate( void)
 		exit(1);
 	}
 
-	crt = load_cert();
+	crt = load_cert(1);
 
 	fprintf(stderr, "Activation/Expiration time.\n");	
 	gnutls_x509_crt_set_activation_time( crt, time(NULL));
@@ -509,7 +505,7 @@ int ret;
 	if (info.outfile) {
 		outfile = fopen(info.outfile, "w");
 		if (outfile == NULL) {
-			fprintf(stderr, "error: could not open %s.\n", info.outfile);
+			fprintf(stderr, "error: could not open '%s'.\n", info.outfile);
 			exit(1);
 		}
 	} else outfile = stdout;
@@ -517,7 +513,7 @@ int ret;
 	if (info.infile) {
 		infile = fopen(info.infile, "r");
 		if (infile == NULL) {
-			fprintf(stderr, "error: could not open %s.\n", info.infile);
+			fprintf(stderr, "error: could not open '%s'.\n", info.infile);
 			exit(1);
 		}
 	} else infile = stdin;
@@ -825,8 +821,9 @@ void privkey_info( void)
 	fprintf(outfile, "\n");
 }
 
-
-gnutls_x509_privkey load_private_key()
+/* mand should be non zero if it is required to read a private key.
+ */
+gnutls_x509_privkey load_private_key(int mand)
 {
 FILE* fd;
 gnutls_x509_privkey key;
@@ -834,11 +831,16 @@ int ret;
 gnutls_datum dat;
 size_t size;
 
-	if (!info.privkey) return NULL;
+	if (!info.privkey && !mand) return NULL;
+
+	if (!info.privkey) {
+		fprintf(stderr, "error: a private key was not specified\n");
+		exit(1);
+	}
 
 	fd = fopen(info.privkey, "r");
 	if (fd == NULL) {
-		fprintf(stderr, "File %s does not exist.\n", info.privkey);
+		fprintf(stderr, "error: could not load key file '%s'.\n", info.privkey);
 		exit(1);
 	}
 
@@ -1006,8 +1008,10 @@ size_t size;
 }
 
 /* Loads the certificate
+ * If mand is non zero then a certificate is mandatory. Otherwise
+ * null will be returned if the certificate loading fails.
  */
-gnutls_x509_crt load_cert()
+gnutls_x509_crt load_cert(int mand)
 {
 FILE* fd;
 gnutls_x509_crt crt;
@@ -1019,7 +1023,8 @@ size_t size;
 
 	if (info.cert==NULL) {
 		fprintf(stderr, "You must specify a certificate.\n");
-		exit(1);
+		if (mand) exit(1);
+		else return NULL;
 	}
 
 	fd = fopen(info.cert, "r");
@@ -1427,8 +1432,8 @@ void generate_pkcs12( void)
 
 	fprintf(stderr, "Generating a PKCS #12 structure...\n");
 	
-	key = load_private_key();
-	crt = load_cert();
+	key = load_private_key(1);
+	crt = load_cert(0);
 	
 	do {
 		name = read_str("Enter a name for the key: ");
@@ -1453,34 +1458,37 @@ void generate_pkcs12( void)
 	key_id.data = _key_id;
 	key_id.size = size;
 		
-	result = gnutls_pkcs12_bag_set_crt( bag, crt);
-	if (result < 0) {
-		fprintf(stderr, "set_crt: %s\n", gnutls_strerror(result));
-		exit(1);
-	}
+	if (crt) { /* add the certificate only if it was specified.
+		    */
+		result = gnutls_pkcs12_bag_set_crt( bag, crt);
+		if (result < 0) {
+			fprintf(stderr, "set_crt: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
 
-	index = result;
+		index = result;
 
-	result = gnutls_pkcs12_bag_set_friendly_name( bag, index, name);
-	if (result < 0) {
-		fprintf(stderr, "bag_set_key_id: %s\n", gnutls_strerror(result));
-		exit(1);
-	}
+		result = gnutls_pkcs12_bag_set_friendly_name( bag, index, name);
+		if (result < 0) {
+			fprintf(stderr, "bag_set_key_id: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
 	
 
-	result = gnutls_pkcs12_bag_set_key_id( bag, index, &key_id);
-	if (result < 0) {
-		fprintf(stderr, "bag_set_key_id: %s\n", gnutls_strerror(result));
-		exit(1);
-	}
+		result = gnutls_pkcs12_bag_set_key_id( bag, index, &key_id);
+		if (result < 0) {
+			fprintf(stderr, "bag_set_key_id: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
 
-	if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
-	else flags = GNUTLS_PKCS8_USE_PKCS12_3DES;
+		if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+		else flags = GNUTLS_PKCS8_USE_PKCS12_3DES;
 
-	result = gnutls_pkcs12_bag_encrypt( bag, password, flags);
-	if (result < 0) {
-		fprintf(stderr, "bag_encrypt: %s\n", gnutls_strerror(result));
-		exit(1);
+		result = gnutls_pkcs12_bag_encrypt( bag, password, flags);
+		if (result < 0) {
+			fprintf(stderr, "bag_encrypt: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
 	}
 	
 	/* Key BAG */
@@ -1532,10 +1540,12 @@ void generate_pkcs12( void)
 		exit(1);
 	}
 
-	result = gnutls_pkcs12_set_bag( pkcs12, bag);
-	if (result < 0) {
-		fprintf(stderr, "set_bag: %s\n", gnutls_strerror(result));
-		exit(1);
+	if (crt) {
+		result = gnutls_pkcs12_set_bag( pkcs12, bag);
+		if (result < 0) {
+			fprintf(stderr, "set_bag: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
 	}
 
 	result = gnutls_pkcs12_set_bag( pkcs12, kbag);
