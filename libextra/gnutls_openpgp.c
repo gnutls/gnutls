@@ -1180,17 +1180,18 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, char *fpr, size_t *fprlen)
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_keyid( const gnutls_datum *cert, unsigned char keyid[8] )
+gnutls_openpgp_keyid( const gnutls_datum *cert, opaque keyid[8] )
 {
     CDK_KBNODE kb_pk = NULL, pkt;
     PKT_public_key *pk = NULL;
+    u32 kid[2];
     int rc = 0;
   
     if (!cert || !keyid)
         return GNUTLS_E_UNKNOWN_ERROR;
 
     rc = datum_to_kbnode( cert, &kb_pk );
-    if (rc)
+    if ( rc )
         return rc;
 
     pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
@@ -1198,7 +1199,11 @@ gnutls_openpgp_keyid( const gnutls_datum *cert, unsigned char keyid[8] )
         pk = pkt->pkt->pkt.public_key;
     if ( !pk )
         return GNUTLS_E_UNKNOWN_ERROR;
-    cdk_pk_get_keyid( pk, (u32 *)keyid );
+    cdk_pk_get_keyid( pk, kid );
+    keyid[0] = kid[0] >> 24; keyid[1] = kid[0] >> 16;
+    keyid[2] = kid[0] >>  8; keyid[3] = kid[0];
+    keyid[4] = kid[1] >> 24; keyid[5] = kid[1] >> 16;
+    keyid[6] = kid[1] >>  8; keyid[7] = kid[1];
   
     return 0;
 }
@@ -1298,40 +1303,45 @@ gnutls_certificate_set_openpgp_keyring_file(GNUTLS_CERTIFICATE_CREDENTIALS c,
 }
 
 int
-gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
-                                           const char *file)
+gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
+                                            const opaque *data, size_t dlen )
 {
-    CDK_IOBUF inp = NULL;
+    CDK_IOBUF out = NULL;
     CDK_BSTRING a = NULL;
     armor_filter_s afx;
     int rc = 0;
   
-    if (!c || !file)
+    if ( !c || !data || !dlen )
         return GNUTLS_E_INVALID_PARAMETERS;
 
-    if ( !file_exist(file) )
-        return GNUTLS_E_FILE_ERROR;
-
-    rc = cdk_iobuf_open( &inp, file, IOBUF_MODE_RD );
+    rc = cdk_iobuf_create( &out, NULL );
     if ( rc )
         return GNUTLS_E_FILE_ERROR;
-    if ( cdk_armor_filter_use( inp ) ) {
+    rc = cdk_iobuf_write( out, data, dlen );
+    if ( rc ) {
+        cdk_iobuf_close( out );
+        return GNUTLS_E_FILE_ERROR;
+    }
+    /* Maybe it's a little confusing that we check the output..
+       but it's possible, that the data we want to add, is armored
+       and we only want to store plaintext keyring data. */
+    if ( cdk_armor_filter_use( out ) ) {
         memset( &afx, 0, sizeof afx );
-        rc = cdk_armor_filter( &afx, IOBUF_CTRL_UNDERFLOW, inp );
+        rc = cdk_armor_filter( &afx, IOBUF_CTRL_UNDERFLOW, out );
         if ( rc ) {
-            cdk_iobuf_close( inp );
+            cdk_iobuf_close( out );
             return GNUTLS_E_ASCII_ARMOR_ERROR;
         }
     }
 
-    a = cdk_iobuf_read_mem( inp, 0 );
+    a = cdk_iobuf_read_mem( out, 0 );
     if ( a ) {
         rc = gnutls_openpgp_add_keyring_mem( &c->keyring, a->d, a->len );
         cdk_free( a );
     }
     else
         rc = GNUTLS_E_UNKNOWN_ERROR;
-    cdk_iobuf_close( inp );
+    cdk_iobuf_close( out );
   
     return rc;
 }

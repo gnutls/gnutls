@@ -67,7 +67,8 @@ int gnutls_certificate_set_openpgp_keyring_file(
 
 int gnutls_certificate_set_openpgp_keyring_mem(
     GNUTLS_CERTIFICATE_CREDENTIALS c,
-    const char *file );
+    const opaque *data,
+    size_t dlen );    
 
 int gnutls_openpgp_get_key(
     gnutls_datum *key,
@@ -93,8 +94,8 @@ int _gnutls_openpgp_cert2gnutls_cert(
 int
 _gnutls_openpgp_request_key(
     gnutls_datum* ret, 
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+    const GNUTLS_CERTIFICATE_CREDENTIALS cred,
     opaque* key_fpr,
-	int key_fpr_size );
+    int key_fpr_size );
 
 #endif /*GNUTLS_OPENPGP_H*/
