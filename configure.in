@@ -219,7 +219,7 @@ AC_MSG_RESULT([***
 *** Checking for external libraries...
 ])
 
-AM_PATH_LIBGCRYPT(1.1.8,,
+AM_PATH_LIBGCRYPT(1.1.11,,
  	AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from
