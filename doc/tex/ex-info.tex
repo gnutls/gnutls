@@ -89,8 +89,8 @@ static void print_x509_certificate_info(gnutls_session session)
 {
    char digest[20];
    char serial[40];
-   int digest_size = sizeof(digest), i;
-   int serial_size = sizeof(serial);
+   int digest_size, i;
+   int serial_size;
    char printable[120];
    int printable_size;
    char *print;
@@ -121,6 +121,7 @@ static void print_x509_certificate_info(gnutls_session session)
 
       /* Print the fingerprint of the certificate
        */
+      digest_size = sizeof(digest);
       if (gnutls_x509_fingerprint
           (GNUTLS_DIG_MD5, &cert_list[0], digest, &digest_size) >= 0) {
          print = printable;
@@ -133,6 +134,7 @@ static void print_x509_certificate_info(gnutls_session session)
 
       /* Print the serial number of the certificate.
        */
+      serial_size = sizeof(serial);
       if (gnutls_x509_crt_get_serial(cert, serial, &serial_size) >= 0) 
       {
          print = printable;

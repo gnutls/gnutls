@@ -75,23 +75,9 @@ void print_x509_info(gnutls_session session)
 		printf(" # valid since: %s", my_ctime(&activet));
 		printf(" # expires at: %s", my_ctime(&expiret));
 
-		/* Print the fingerprint of the certificate
-		 */
-		if (gnutls_fingerprint
-		    (GNUTLS_DIG_MD5, &cert_list[j], digest,
-		     &digest_size) >= 0) {
-			print = printable;
-			for (i = 0; i < digest_size; i++) {
-				sprintf(print, "%.2x ",
-					(unsigned char) digest[i]);
-				print += 3;
-			}
-			printf(" # fingerprint: %s\n", printable);
-		}
 
 		/* Print the serial number of the certificate.
 		 */
-
 		if (gnutls_x509_crt_get_serial(crt, serial, &serial_size)
 		    >= 0) {
 			print = printable;
@@ -101,6 +87,22 @@ void print_x509_info(gnutls_session session)
 				print += 3;
 			}
 			printf(" # serial number: %s\n", printable);
+		}
+
+		/* Print the fingerprint of the certificate
+		 */
+		digest_size = sizeof(digest);
+		if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, digest, &digest_size))
+		    < 0) {
+		    	fprintf(stderr, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
+		} else {
+			print = printable;
+			for (i = 0; i < digest_size; i++) {
+				sprintf(print, "%.2x ",
+					(unsigned char) digest[i]);
+				print += 3;
+			}
+			printf(" # fingerprint: %s\n", printable);
 		}
 
 		/* Print the version of the X.509 
