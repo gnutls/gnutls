@@ -1,4 +1,4 @@
-helpnode "Crypt help\nUsage : crypt [options]"
+helpnode "Srpcrypt help\nUsage : srpcrypt [options]"
 
 #char *username;
 option (u,username) STR "username" { $username = $1 } "specify username."

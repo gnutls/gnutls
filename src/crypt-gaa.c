@@ -102,7 +102,7 @@ void __gaa_helpsingle(char short_name, char *name,
 
 void gaa_help()
 {
-	printf("Crypt help\nUsage : crypt [options]""\n");
+	printf("Srpcrypt help\nUsage : srpcrypt [options]""\n");
 	__gaa_helpsingle('u', "username", """username"" ", "specify username.");
 	__gaa_helpsingle('p', "passwd", """FILE"" ", "specify a password file.");
 	__gaa_helpsingle('i', "index", """INDEX"" ", "specify the index of the parameters in tpasswd.conf to use.");
