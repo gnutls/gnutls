@@ -1373,7 +1373,7 @@ int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
- * type==0 then certificate is DER formatted, else -> DER
+ * type indicates the certificate format.
  */
 static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size, 
 	GNUTLS_X509_CertificateFmt type)

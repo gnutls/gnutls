@@ -618,7 +618,7 @@ int main(int argc, char **argv)
 			ctt[strlen(ctt)-1] = 0;
 
 /*
-		        printf("- connection from %s, port %d\n",
+		        printf("\n* connection from %s, port %d\n",
 			     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
 			       sizeof(topbuf)), ntohs(client_address.sin_port));
       */
@@ -651,7 +651,7 @@ int main(int argc, char **argv)
         	 	  printf("*** This is a resumed session\n");
 
 			if (quiet == 0) {
-			      printf("- connection from %s, port %d\n",
+			      printf("\n* connection from %s, port %d\n",
 				     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
 				       sizeof(topbuf)), ntohs(client_address.sin_port));
 			      print_info( j->tstate);
