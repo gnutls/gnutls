@@ -2236,7 +2236,7 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 /**
   * gnutls_x509_extract_certificate_pk_algorithm - This function returns the certificate's PublicKey algorithm
   * @cert: is a DER encoded X.509 certificate
-  * @bits: if bits is non-null it will have enough space to hold the
+  * @bits: if bits is non null it should have enough space to hold the
   * parameters size in bits.
   *
   * This function will return the public key algorithm of an X.509 

@@ -192,6 +192,12 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT,
 typedef enum GNUTLS_X509_CertificateFmt { GNUTLS_X509_FMT_DER, 
 	GNUTLS_X509_FMT_PEM } GNUTLS_X509_CertificateFmt;
 
+typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
+	GNUTLS_PK_UNKNOWN 
+} PKAlgorithm;
+
+#define GNUTLS_PKAlgorithm PKAlgorithm
+
 /* STATE (stop) */
 
 
