@@ -86,9 +86,13 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 	/* Calculate the size of a prime factor of (prime-1)/2.
 	 * This is a bad emulation of Michael Wiener's table
 	 */
-        qbits = 120 + (((bits / 256) - 1) * 20);
-                if (qbits & 1)          /* better have an even number */
- 	               qbits++;
+        if (bits < 256) qbits = bits/2;
+        else {
+	        qbits = 120 + (((bits / 256) - 1) * 20);
+	}
+
+        if (qbits & 1)          /* better have an even number */
+	        qbits++;
 
 	/* find a prime number of size bits.
 	 */
@@ -122,7 +126,7 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 		result = GNUTLS_E_INTERNAL_ERROR;
 		goto cleanup;
 	}
-	
+
 	gcry_prime_release_factors (factors); factors = NULL;
 	
 	if (ret_g)
@@ -244,11 +248,13 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
   **/
 int gnutls_dh_params_generate2(gnutls_dh_params params, unsigned int bits)
 {
+int ret;
 
-	if (_gnutls_dh_generate_prime(&params->_generator, 
-		&params->_prime, bits) < 0) {
+	ret = _gnutls_dh_generate_prime(&params->_generator, 
+		&params->_prime, bits);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return ret;
 	}
 
 	return 0;
@@ -531,6 +537,13 @@ int gnutls_dh_params_export_raw(gnutls_dh_params params,
 
 	size_t size;
 
+	if (params->_generator == NULL ||
+		params->_prime == NULL) 
+	{
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
 	size = 0;
 	_gnutls_mpi_print(NULL, &size, params->_generator);
 

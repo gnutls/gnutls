@@ -38,6 +38,7 @@ static int cparams = 0;
 int generate_prime(int bits)
 {
 	unsigned int i;
+	int ret;
 	gnutls_dh_params dh_params;
 	gnutls_datum p, g;
 
@@ -45,8 +46,19 @@ int generate_prime(int bits)
 
 	fprintf(stderr, "Generating DH parameters...");
 	
-	gnutls_dh_params_generate2( dh_params, bits);
-	gnutls_dh_params_export_raw( dh_params, &p, &g, NULL);
+	ret = gnutls_dh_params_generate2( dh_params, bits);
+	if (ret < 0) {
+		fprintf(stderr, "Error generating parameters: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_dh_params_export_raw( dh_params, &p, &g, NULL);
+	if (ret < 0) {
+		fprintf(stderr, "Error exporting parameters: %s\n",
+			gnutls_strerror(ret));
+		exit(1);
+	}
 
 	if (cparams) {
 

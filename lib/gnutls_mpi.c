@@ -75,6 +75,8 @@ int _gnutls_mpi_print( void *buffer, size_t *nbytes, const GNUTLS_MPI a )
 {
 int ret;
 
+	if (nbytes == NULL || a == NULL) return GNUTLS_E_INVALID_REQUEST;
+
 	ret = gcry_mpi_print( GCRYMPI_FMT_USG, buffer, *nbytes, nbytes, a);
 	if (!ret) return ret;
 	
@@ -85,6 +87,8 @@ int ret;
 int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const GNUTLS_MPI a ) 
 {
 int ret;
+
+	if (nbytes == NULL || a == NULL) return GNUTLS_E_INVALID_REQUEST;
 
 	ret = gcry_mpi_print( GCRYMPI_FMT_STD, buffer, *nbytes, nbytes, a);
 	if (!ret) return ret;
