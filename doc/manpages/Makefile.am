@@ -44,12 +44,24 @@ doit:
 			$(top_srcdir)/libextra/*.c >> $$i.3 && \
 		echo "ok"; \
 	done; \
-	for i in `../scripts/gdoc -listfunc $(top_srcdir)/lib/x509/*.c`; do \
+	for i in `../scripts/gdoc -listfunc $(top_srcdir)/lib/x509/*.c | grep -v gnutls_pkcs12`; do \
 		echo -n "Creating man page in lib/x509/ for $$i... " && \
 		../scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-include "gnutls/x509.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2004 Free Software Foundation" \
+			-function $$i \
+			$(top_srcdir)/lib/x509/*.c >> $$i.3 && \
+		echo "ok"; \
+	done; \
+	for i in `../scripts/gdoc -listfunc $(top_srcdir)/lib/x509/*.c | grep gnutls_pkcs12`; do \
+		echo -n "Creating man page in lib/x509/ (pkcs12) for $$i... " && \
+		../scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-include "gnutls/pkcs12.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2004 Free Software Foundation" \
 			-function $$i \
