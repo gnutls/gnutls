@@ -23,7 +23,7 @@
 /* This implementation was written by Nikos Mavroyanopoulos for GNUTLS
  * as a Libgcrypt module (gnutls/lib/x509/rc2.c) and later adapted for
  * direct use by Libgcrypt by Werner Koch and later adapted for direct
- * use by Nettle by Simon Josefsson.  This implementation is not only
+ * use by Nettle by Simon Josefsson.  This implementation is only
  * useful for pkcs#12 descryption.
  *
  * The implementation here is based on Peter Gutmann's RRC.2 paper.
