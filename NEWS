@@ -4,6 +4,9 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.1.23
+- It is now possible to generate PKCS#12 structures without private
+  keys using "certtool --to-p12", suggested by Fabian Fagerholm
+  <fabbe@paniq.net>.
 
 * Version 1.1.22 (2004-11-04)
 - Replace GNU LD version script with Libtool -export-symbols-regex,
