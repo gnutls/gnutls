@@ -1,81 +1,133 @@
-dnl
-dnl Configure script source for GNUTLS
-dnl
-dnl (Process this file with autoconf to produce a configure script.)
-AC_REVISION($Revision$)dnl
-AC_PREREQ(2.13)
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT()
+dnl AC_CONFIG_HEADER(config.h)
 
-AC_INIT(src/gnutls.c)
+AC_PREFIX_DEFAULT(/usr/local)
+
+AC_CANONICAL_SYSTEM
+AC_DEFINE_UNQUOTED(T_CPU, "$target_cpu")
+AC_DEFINE_UNQUOTED(T_VENDOR, "$target_vendor")
+AC_DEFINE_UNQUOTED(T_OS, "$target_os")
+
+GNUTLS_MAJOR_VERSION=0
+GNUTLS_MINOR_VERSION=0
+GNUTLS_MICRO_VERSION=1
+GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
+
+
+AM_INIT_AUTOMAKE(gnutls, $GNUTLS_VERSION)
 AM_CONFIG_HEADER(config.h)
 
-dnl
-dnl The version number goes here
-dnl
-AM_INIT_AUTOMAKE(gnutls,0.0.0)
 
-dnl
-dnl Setup some stuff depending on host/target.
-dnl
+GNUTLS_MOST_RECENT_INTERFACE=$GNUTLS_MINOR_VERSION
+GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER=$GNUTLS_MICRO_VERSION
+GNUTLS_OLDEST_INTERFACE=0
+
+AC_SUBST(GNUTLS_MAJOR_VERSION)
+AC_SUBST(GNUTLS_MINOR_VERSION)
+AC_SUBST(GNUTLS_MICRO_VERSION)
+AC_SUBST(GNUTLS_VERSION)
+
+AC_SUBST(GNUTLS_MOST_RECENT_INTERFACE)
+AC_SUBST(GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER)
+AC_SUBST(GNUTLS_OLDEST_INTERFACE)
+
+LT_CURRENT=$GNUTLS_MOST_RECENT_INTERFACE
+LT_REVISION=$GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER
+LT_AGE=`expr $GNUTLS_MOST_RECENT_INTERFACE - $GNUTLS_OLDEST_INTERFACE`
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION)
+AC_SUBST(LT_AGE)
+
+
+
+
+AC_PROG_CC
+
+
+AC_C_CONST
+
+dnl Checks for programs.
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PATH_PROG(RM,rm)
+AC_PATH_PROG(MAKEINFO,makeinfo)
+dnl AC_PATH_PROG(AR,ar)
+dnl AC_PATH_PROG(RANLIB,ranlib)
+
+dnl AC_PROG_MAKE_SET
+
+dnl From GNUPG
+AC_MSG_CHECKING([whether use of /dev/random is requested])
+AC_ARG_ENABLE(dev-random,
+[  --disable-dev-random    disable the use of dev random],
+    try_dev_random=$enableval, try_dev_random=yes)
+AC_MSG_RESULT($try_dev_random)
+
+opt_maintainer_mode=no
+AC_MSG_CHECKING([whether in maintanance mode])
+AC_ARG_ENABLE(maintainer-mode,
+[  --enable-maintainer-mode enable maintainer mode],
+opt_maintainer_mode=$enableval)
+AC_MSG_RESULT($opt_maintainer_mode)
+
 case "${target}" in
-    *-*-mingw32)
-        # special stuff for Windoze NT
-        # Do we need to set cross_compiling here or is it sufficient
-        # to rely on AC_PROG_CC which is called later?
-        CC="${target}-gcc"
-        CPP="${target}-gcc -E"
-        RANLIB="${target}-ranlib"
+    *-openbsd*)
+        NAME_OF_DEV_RANDOM="/dev/srandom"
+        NAME_OF_DEV_URANDOM="/dev/urandom"
         ;;
     *)
-       ;;
+        NAME_OF_DEV_RANDOM="/dev/random"
+        NAME_OF_DEV_URANDOM="/dev/urandom"
+        ;;
 esac
 
+AC_DEFINE_UNQUOTED(NAME_OF_DEV_RANDOM, "$NAME_OF_DEV_RANDOM")
+AC_DEFINE_UNQUOTED(NAME_OF_DEV_URANDOM, "$NAME_OF_DEV_URANDOM")
 
-AM_MAINTAINER_MODE
-
-dnl
-dnl Checks for programs
-dnl
-AC_PROG_CC
-AC_STDC_HEADERS
-AC_ARG_PROGRAM
-AC_PROG_RANLIB
-
-
-dnl
-dnl Checks for libraries
-dnl
-
-
-dnl
-dnl Checks for header files
-dnl
-
-
-dnl
-dnl Checks for typedefs and structures
-dnl
+dnl check whether we have a random device
+if test "$try_dev_random" = yes ; then
+AC_CACHE_CHECK(for random device, ac_cv_have_dev_random,
+[if test -c "/dev/random" && test -c "$NAME_OF_DEV_URANDOM" ; then
+  ac_cv_have_dev_random=yes; else ac_cv_have_dev_random=no; fi])
+if test "$ac_cv_have_dev_random" = yes; then
+    AC_DEFINE(HAVE_DEV_RANDOM)
+else
+    AC_MSG_WARN(No random device found. No real random data can be used.)
+fi
+else
+    AC_MSG_CHECKING(for random device)
+    ac_cv_have_dev_random=no
+    AC_MSG_RESULT(has been disabled)
+    AC_MSG_WARN(Support for random device was disabled. No real random data can be used.)
+fi
 
 
+if test $ac_cv_prog_gcc = yes; then
+  CFLAGS="${CFLAGS} -ffast-math"
 
-dnl
-dnl Checks for compiler features
-dnl
+	if test $opt_maintainer_mode = yes; then
+	  CFLAGS="${CFLAGS} -Wall -Wpointer-arith -pedantic"
+	fi
+fi
 
-dnl
-dnl Checks for library functions
-dnl
+AC_HEADER_STDC
+AC_CHECK_HEADERS(unistd.h pwd.h locale.h strings.h mcrypt.h)
+AC_CHECK_HEADERS(sys/stat.h sys/types.h fcntl.h sys/wait.h)
+AC_CHECK_HEADERS(utime.h signal.h)
+AC_CHECK_HEADERS(termios.h termio.h sgtty.h)
+AC_CHECK_FUNCS(bzero signal sigaction memset fcntl fsync siglongjmp,,)
+AC_CHECK_FUNCS(lstat stat umask utime memmove bcopy getpwuid waitpid,,)
 
+dnl Checks for libraries.
+AC_C_BIGENDIAN
+AC_TYPE_SIGNAL
+AC_CHECK_SIZEOF(unsigned long long, 8)
+AC_CHECK_SIZEOF(unsigned long int, 4)
+AC_CHECK_SIZEOF(unsigned int, 4)
+AC_CHECK_SIZEOF(unsigned short int, 2)
+AC_CHECK_SIZEOF(unsigned char, 1)
 
-dnl
-dnl Checks for system services
-dnl
+AM_PROG_LIBTOOL
 
-
-AC_OUTPUT([
-Makefile
-lib/Makefile
-src/Makefile
-])
-
-
-dnl *-*wedit:notab*-*  Please keep this as the last line.
+AC_OUTPUT([Makefile src/Makefile])

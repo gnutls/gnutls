@@ -1,18 +1,16 @@
-/* acconfig.h - used by autoheader to make config.h.in
- */
-#ifndef GPA_CONFIG_H
-#define GPA_CONFIG_H
+/* and the real names of the random devices */
+#undef NAME_OF_DEV_RANDOM
+#undef NAME_OF_DEV_URANDOM
+#undef HAVE_DEV_RANDOM
 
-/* Need this, because some autoconf tests rely on this (e.g. stpcpy)
- * and it should be used for new programs anyway. */
-#define _GNU_SOURCE  1
+#undef PACKAGE
+#undef VERSION
 
-@TOP@
+#undef T_CPU
+#undef T_VENDOR
+#undef T_OS
 
-#undef HAVE_BYTE_TYPEDEF
-
-
-@BOTTOM@
-
-
-#endif /*GPA_CONFIG_H*/
+LT_CURRENT
+LT_REVISION
+LT_AGE
+ 
