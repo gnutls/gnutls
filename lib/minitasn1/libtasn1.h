@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#define LIBASN1_VERSION "0.2.1"
+#define LIBTASN1_VERSION "0.2.2"
 
 #include <sys/types.h>
 #include <time.h>
@@ -175,6 +175,8 @@ asn1_retCode asn1_read_tag(node_asn *root,const char *name,int *tag,
 
 asn1_retCode asn1_find_structure_from_oid(ASN1_TYPE definitions,
 		    const char *oidValue,char *structureName);
+
+const char *asn1_check_version( const char *req_version );
 
 const char* libtasn1_strerror(asn1_retCode error);
 

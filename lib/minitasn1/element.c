@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Fabio Fiorina
+ *      Copyright (C) 2000,2001,2002,2003 Fabio Fiorina
  *
  * This file is part of LIBASN1.
  *
@@ -69,7 +69,7 @@ _asn1_hierarchical_name(node_asn *node,char *name,int name_size)
 /*              allocated).                                       */
 /*   value_out_size: number of bytes of value_out.                */
 /*   len: number of significant byte of value_out.                */
-/* Return: ASN1_MEM_ERROR or ASN1_SUCCESS                                */
+/* Return: ASN1_MEM_ERROR or ASN1_SUCCESS                         */
 /******************************************************************/
 asn1_retCode
 _asn1_convert_integer(const char *value,unsigned char *value_out,int value_out_size, int *len)
@@ -87,7 +87,7 @@ _asn1_convert_integer(const char *value,unsigned char *value_out,int value_out_s
 
   if(val[0]&0x80) negative=1;
   else negative=0;
-  
+
   for(k=0;k<SIZEOF_UNSIGNED_LONG_INT-1;k++){
     if(negative && (val[k]!=0xFF)) break;
     else if(!negative && val[k]) break;
@@ -96,14 +96,14 @@ _asn1_convert_integer(const char *value,unsigned char *value_out,int value_out_s
   if((negative && !(val[k]&0x80)) ||
      (!negative && (val[k]&0x80))) k--; 
 
+  *len=SIZEOF_UNSIGNED_LONG_INT-k;  
+
   if (SIZEOF_UNSIGNED_LONG_INT-k> value_out_size)
     /* VALUE_OUT is too short to contain the value convertion */
     return ASN1_MEM_ERROR;
 
   for(k2=k;k2<SIZEOF_UNSIGNED_LONG_INT;k2++)
     value_out[k2-k]=val[k2];
-
-  *len=SIZEOF_UNSIGNED_LONG_INT-k;
 
 
 #ifdef LIBTASN1_DEBUG_INTEGER
@@ -540,6 +540,9 @@ asn1_write_value(node_asn *node_root,const char *name,
   *   ASN1_ELEMENT_NOT_FOUND\: NAME is not a valid element.
   *
   *   ASN1_VALUE_NOT_FOUND\: there isn't any value for the element selected.
+  *
+  *   ASN1_MEM_ERROR\: the value vector isn't big enough to store the result.
+  *   In this case LEN will contain the number of bytes needed.
   * 
   * Examples: 
   *   a description for each type
@@ -585,7 +588,7 @@ asn1_write_value(node_asn *node_root,const char *name,
 asn1_retCode 
 asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
 {
-  node_asn *node,*p;
+  node_asn *node,*p,*p2;
   int len2,len3;
   int value_size = *len;
 
@@ -623,7 +626,25 @@ asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
     if((node->type&CONST_DEFAULT) && (node->value==NULL)){
       p=node->down;
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
-      if (_asn1_convert_integer(p->value,value,value_size, len)!=ASN1_SUCCESS) return ASN1_MEM_ERROR;
+      if((isdigit(p->value[0])) || (p->value[0]=='-') || (p->value[0]=='+')){
+	if (_asn1_convert_integer(p->value,value,value_size, len) != 
+	    ASN1_SUCCESS) 
+	  return ASN1_MEM_ERROR;
+      }
+      else{ /* is an identifier like v1 */
+	p2=node->down;
+	while(p2){
+	  if(type_field(p2->type)==TYPE_CONSTANT){
+	    if((p2->name) && (!strcmp(p2->name,p->value))){
+	      if (_asn1_convert_integer(p2->value,value,value_size, len) != 
+		  ASN1_SUCCESS) 
+		return ASN1_MEM_ERROR;
+	      break;
+	    }
+	  }
+	  p2=p2->right;
+	}
+      }
     }
     else{
       len2=-1;
@@ -636,11 +657,9 @@ asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
       p=node->down;
       while(p){
 	if(type_field(p->type)==TYPE_CONSTANT){
-	  value_size-=strlen(p->value)+1;
-	  if(value_size<1) return ASN1_MEM_ERROR;
-	  strcat(value,p->value); 
+	  ADD_STR_VALUE(value,value_size,p->value);	  
 	  if(p->right) {
-	    strcat(value,".");
+	  ADD_STR_VALUE(value,value_size,".");
 	  }
 	}
 	p=p->right;
