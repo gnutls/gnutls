@@ -66,7 +66,7 @@ void print_x509_info(GNUTLS_STATE state)
 	       gnutls_x509_extract_certificate_version(&cert_list[0]));
 
 	algo = gnutls_x509_extract_certificate_pk_algorithm( &cert_list[0], &bits);
-	printf(" # Certificate public key: ");
+	printf(" # Certificate public key algorithm: ");
 
 	if (algo==GNUTLS_PK_RSA) {
 		printf("RSA\n");
@@ -100,7 +100,9 @@ void print_openpgp_info(GNUTLS_STATE state)
 
 	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
-	if (cert_list_size > 0)
+	if (cert_list_size > 0) {
+		int algo, bits;
+		
 		if (gnutls_openpgp_fingerprint
 		    (&cert_list[0], digest, &digest_size) >= 0) {
 			print = printable;
@@ -113,6 +115,20 @@ void print_openpgp_info(GNUTLS_STATE state)
 			printf(" # PGP Key version: %d\n", 
 				gnutls_openpgp_extract_key_version(&cert_list[0]));
 
+			algo = gnutls_x509_extract_certificate_pk_algorithm( &cert_list[0], &bits);
+		
+			printf(" # PGP Key public key algorithm: ");
+
+			if (algo==GNUTLS_PK_RSA) {
+				printf("RSA\n");
+				printf(" #   Modulus: %d bits\n", bits);
+			} else if (algo==GNUTLS_PK_DSA) {
+				printf("DSA\n");
+				printf(" #   Exponent: %d bits\n", bits);
+			} else {
+				printf("UNKNOWN\n");
+			}
+
 			printf(" # PGP Key fingerprint: %s\n",
 			       printable);
 
@@ -122,7 +138,7 @@ void print_openpgp_info(GNUTLS_STATE state)
 
 		}
 
-
+	}
 }
 
 void print_cert_vrfy(GNUTLS_STATE state)
