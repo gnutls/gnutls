@@ -31,7 +31,7 @@ HIGNORE = auth_anon.h auth_cert.h auth_dh_common.h auth_srp.h		\
 	gnutls_record.h gnutls_rsa_export.h gnutls_session.h		\
 	gnutls_session_pack.h gnutls_sig.h gnutls_srp.h gnutls_state.h	\
 	gnutls_str.h gnutls_ui.h gnutls_v2_compat.h gnutls_x509.h	\
-	io_debug.h strfile.h x509_b64.h \
+	io_debug.h strfile.h x509_b64.h memmem.h \
 	common.h compat.h crq.h dn.h dsa.h extensions.h mpi.h pkcs7.h privkey.h rfc2818.h sign.h verify.h \
 	gnutls_extra.h lzoconf.h minilzo.h openssl_compat.h \
 	gnutls_openpgp.h openpgp.h
