@@ -1,5 +1,7 @@
 /* defines for compatibility with older versions.
  */
+#ifndef GNUTLS_COMPAT4_H
+# define GNUTLS_COMPAT4_H
 
 #define gnutls_DN gnutls_x509_dn
 #define GNUTLS_X509_SUBJECT_ALT_NAME gnutls_x509_subject_alt_name
@@ -98,3 +100,5 @@
 #define GNUTLS_E_PARSING_ERROR GNUTLS_E_BASE64_DECODING_ERROR
 #define GNUTLS_E_PWD_ERROR GNUTLS_E_SRP_PWD_ERROR
 #define GNUTLS_E_ASCII_ARMOR_ERROR GNUTLS_E_BASE64_DECODING_ERROR
+
+#endif
