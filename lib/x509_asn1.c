@@ -126,7 +126,8 @@ _asn1_set_name(node_asn *node,char *name)
 	{
   	node->name=(char *) gnutls_malloc(strlen(name)+1);
   	if (node->name==NULL) return NULL;
-  	_gnutls_str_cpy(node->name,sizeof(node->name),name);
+  	/* this strcpy is checked */
+  	strcpy(node->name, name);
       }
   else node->name=NULL;
   return node;
@@ -536,14 +537,14 @@ _asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name)
 
   memcpy(structure_name,slash_p,dot_p-slash_p);
   structure_name[dot_p-slash_p]=0;
-  _gnutls_str_cat(structure_name,sizeof(structure_name),"_asn1_tab");
+  _gnutls_str_cat(structure_name, sizeof(structure_name),"_asn1_tab");
 
   if (out_name==NULL) {
 	  memcpy(file_out_name,file_name,dot_p-file_name);
 	  file_out_name[dot_p-file_name]=0;
-	  _gnutls_str_cat(file_out_name,sizeof(file_out_name),"_asn1_tab.c");
+	  _gnutls_str_cat(file_out_name, sizeof(file_out_name), "_asn1_tab.c");
   } else {
-  	  strncpy( file_out_name, out_name, sizeof(file_out_name));
+  	  _gnutls_str_cpy( file_out_name, sizeof(file_out_name), out_name);
   }
   file=fopen( file_out_name,"w");
 
@@ -1303,7 +1304,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	if (ptr_size < *len) { \
 		return ASN_MEM_ERROR; \
 	} else { \
-		_gnutls_str_cpy(ptr,sizeof(ptr), data); \
+		/* this strcpy is checked */ \
+		strcpy(ptr, data); \
 	}
 		
 #define ADD_STR_VALUE( ptr, ptr_size, data) \
@@ -1311,7 +1313,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	if (ptr_size < strlen(ptr)+(*len)) { \
 		return ASN_MEM_ERROR; \
 	} else { \
-		_gnutls_str_cat(ptr,sizeof(ptr),data); \
+		/* this strcat is checked */ \
+		strcat(ptr, data); \
 	}
 
 /**
@@ -1320,7 +1323,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   * @name: the name of the element inside a structure that you want to read.
   * @value: vector that will contain the element's content. 
   * VALUE must be a pointer to memory cells already allocated.
-  * @len: number of bytes of *value: value[0]..value[len-1]
+  * @len: number of bytes of *value: value[0]..value[len-1]. Initialy holds the sizeof value.
+  *
   * Description:
   *
   * Returns the value of one element inside a structure.
@@ -1359,7 +1363,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   * 
   **/
 int 
-asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
+asn1_read_value(node_asn *root,char *name,unsigned char *value, int *len)
 {
   node_asn *node,*p;
   int len2,len3;
@@ -1408,7 +1412,7 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
     break;
   case TYPE_OBJECT_ID:
     if(node->type&CONST_ASSIGN){
-      _gnutls_str_cpy(value,sizeof(value),"");
+      _gnutls_str_cpy(value, *len, "");
       p=node->down;
       while(p){
 	if(type_field(p->type)==TYPE_CONSTANT){
@@ -1501,7 +1505,9 @@ _asn1_check_identifier(node_asn *node)
   p=node;
   while(p){
     if(type_field(p->type)==TYPE_IDENTIFIER){
-      _gnutls_str_cpy(name2,sizeof(name2),node->name);_gnutls_str_cat(name2,sizeof(name2),".");_gnutls_str_cat(name2,sizeof(name2),p->value);
+      _gnutls_str_cpy(name2, sizeof(name2), node->name);
+      _gnutls_str_cat(name2, sizeof(name2), ".");
+      _gnutls_str_cat(name2, sizeof(name2), p->value);
       p2=_asn1_find_node(node,name2);
       if(p2==NULL){printf("%s\n",name2); return ASN_IDENTIFIER_NOT_FOUND;} 
     }
@@ -1510,7 +1516,9 @@ _asn1_check_identifier(node_asn *node)
       p2=p->down;
       if(p2 && (type_field(p2->type)==TYPE_CONSTANT)){
 	if(p2->value && !isdigit(p2->value[0])){
-	  _gnutls_str_cpy(name2,sizeof(name2),node->name);_gnutls_str_cat(name2,sizeof(name2),".");_gnutls_str_cat(name2,sizeof(name2),p2->value);
+	  _gnutls_str_cpy(name2, sizeof(name2), node->name);
+	  _gnutls_str_cat(name2, sizeof(name2), ".");
+	  _gnutls_str_cat(name2, sizeof(name2), p2->value);
 	  p2=_asn1_find_node(node,name2);
 	  if(!p2 || (type_field(p2->type)!=TYPE_OBJECT_ID) ||
 	     !(p2->type&CONST_ASSIGN)) 
@@ -1649,7 +1657,9 @@ _asn1_expand_identifier(node_asn **node,node_asn *root)
   while(!((p==*node) && (move==UP))){
     if(move!=UP){
       if(type_field(p->type)==TYPE_IDENTIFIER){
-	_gnutls_str_cpy(name2,sizeof(name2),root->name);_gnutls_str_cat(name2,sizeof(name2),".");_gnutls_str_cat(name2,sizeof(name2),p->value);
+	_gnutls_str_cpy(name2, sizeof(name2), root->name);
+	_gnutls_str_cat(name2, sizeof(name2), ".");
+	_gnutls_str_cat(name2, sizeof(name2), p->value);
 	p2=_asn1_copy_structure2(root,name2);
 	if(p2==NULL) return ASN_IDENTIFIER_NOT_FOUND;
 	_asn1_set_name(p2,p->name);
@@ -1823,7 +1833,7 @@ _asn1_expand_object_id(node_asn *node)
  
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
 
-  _gnutls_str_cpy(name_root,sizeof(name_root),node->name);
+  _gnutls_str_cpy(name_root, sizeof(name_root), node->name);
 
   p=node;
   move=DOWN;
@@ -1834,7 +1844,9 @@ _asn1_expand_object_id(node_asn *node)
 	p2=p->down;
         if(p2 && (type_field(p2->type)==TYPE_CONSTANT)){
 	  if(p2->value && !isdigit(p2->value[0])){
-	    _gnutls_str_cpy(name2,sizeof(name2),name_root);_gnutls_str_cat(name2,sizeof(name2),".");_gnutls_str_cat(name2,sizeof(name2),p2->value);
+	    _gnutls_str_cpy(name2, sizeof(name2), name_root);
+	    _gnutls_str_cat(name2, sizeof(name2), ".");
+	    _gnutls_str_cat(name2, sizeof(name2), p2->value);
 	    p3=_asn1_find_node(node,name2);
 	    if(!p3 || (type_field(p3->type)!=TYPE_OBJECT_ID) ||
 	       !(p3->type&CONST_ASSIGN)) return ASN_ELEMENT_NOT_FOUND;

@@ -271,8 +271,8 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
 
   if(der==NULL) return;
 
-  _gnutls_str_cpy(temp,sizeof(temp),str);
-  _gnutls_str_cat(temp,sizeof(temp)," ");
+  _gnutls_str_cpy(temp, sizeof(temp), str);
+  _gnutls_str_cat(temp, sizeof(temp), " ");
 
   counter=0;
   n_start=temp;
@@ -310,7 +310,7 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
 
 
 void
-_asn1_get_objectid_der(unsigned char *der,int *der_len,unsigned char *str)
+_asn1_get_objectid_der(unsigned char *der,int *der_len,unsigned char *str, int str_size)
 {
   int len_len,len,k;
   char temp[20];
@@ -322,17 +322,17 @@ _asn1_get_objectid_der(unsigned char *der,int *der_len,unsigned char *str)
   val1=der[len_len]/40;
   val=der[len_len]-val1*40;
 
-  _gnutls_str_cpy(str,sizeof(str),_asn1_ltostr(val1,temp));
-  _gnutls_str_cat(str,sizeof(str)," ");
-  _gnutls_str_cat(str,sizeof(str),_asn1_ltostr(val,temp));
+  _gnutls_str_cpy(str, str_size, _asn1_ltostr(val1,temp));
+  _gnutls_str_cat(str, str_size, " ");
+  _gnutls_str_cat(str, str_size, _asn1_ltostr(val,temp));
 
   val=0;
   for(k=1;k<len;k++){
     val=val<<7;
     val|=der[len_len+k]&0x7F;
     if(!(der[len_len+k]&0x80)){
-      _gnutls_str_cat(str,sizeof(str)," ");
-      _gnutls_str_cat(str,sizeof(str),_asn1_ltostr(val,temp));
+      _gnutls_str_cat(str, str_size," ");
+      _gnutls_str_cat(str, str_size,_asn1_ltostr(val,temp));
       val=0;
     }
   }
@@ -1099,7 +1099,7 @@ asn1_get_der(node_asn *root,unsigned char *der,int len)
 	move=RIGHT;
 	break;
       case TYPE_OBJECT_ID:
-	_asn1_get_objectid_der(der+counter,&len2,temp);
+	_asn1_get_objectid_der(der+counter,&len2, temp, sizeof(temp));
 	_asn1_set_value(p,temp,strlen(temp)+1);
 	counter+=len2;
 	move=RIGHT;
