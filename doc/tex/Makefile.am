@@ -15,6 +15,8 @@ gnutls.html: $(TEX_OBJECTS)
 gnutls.ps: $(TEX_OBJECTS)
 	-$(LN_S) ../../lib/gnutls-api.tex .
 	-$(LN_S) ../../libextra/gnutls-extra-api.tex .
+	-latex gnutls.tex
+	-makeindex gnutls.idx
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps
 
 clean:
