@@ -177,6 +177,10 @@ int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 
+/* Returns the name of a cipher suite */
+const char *gnutls_cipher_suite_get_name(GNUTLS_KXAlgorithm kx_algorithm,
+	GNUTLS_BulkCipherAlgorithm cipher_algorithm, GNUTLS_MACAlgorithm mac_algorithm);
+
 /* get the currently used protocol version */
 GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
 

@@ -835,8 +835,32 @@ const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
 
 	/* avoid prefix */
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret =
-				     p->name + sizeof("GNUTLS_") -
+				     p->name + sizeof("GNU") -
 					    1);
+
+	return ret;
+}
+
+/**
+  * gnutls_cipher_suite_get_name - Returns a string with the name of the specified cipher suite
+  * @kx_algorithm: is a Key exchange algorithm
+  * @cipher_algorithm: is a cipher algorithm
+  * @mac_algorithm: is a MAC algorithm
+  *
+  * Returns a string that contains the name 
+  * of the specified MAC algorithm.
+  **/
+const char *gnutls_cipher_suite_get_name(GNUTLS_KXAlgorithm kx_algorithm,
+	GNUTLS_BulkCipherAlgorithm cipher_algorithm, GNUTLS_MACAlgorithm mac_algorithm)
+{
+	const char *ret = NULL;
+
+	/* avoid prefix */
+	GNUTLS_CIPHER_SUITE_LOOP(
+		if (kx_algorithm == p->kx_algorithm &&
+		 cipher_algorithm == p->block_algorithm &&
+		 mac_algorithm == p->mac_algorithm)
+			ret = p->name + sizeof("GNU") - 1);
 
 	return ret;
 }
