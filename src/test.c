@@ -1,23 +1,20 @@
 #include <defines.h>
 #include <gnutls.h>
-#include "gnutls_compress.h"
-#include "gnutls_plaintext.h"
-#include "gnutls_cipher.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-//#define ENCRYPT
+#define ENCRYPT
                      
 int main()
 {
 	GNUTLS_STATE state;
 	char text[] = "A very large english test\n";
-	GNUTLSPlaintext *gtxt;
-	GNUTLSCompressed *gcomp;
-	GNUTLSCiphertext *gcipher;
+	void *gtxt;
+	void *gcomp;
+	void *gcipher;
 	int cd;
 	int ret;
 	char tmp[11];

@@ -1,7 +1,7 @@
 #include <defines.h>
-#include "gnutls.h"
-
-
+#include "gnutls_record.h"
+#include "gnutls_handshake.h"
+#include "gnutls_errors.h"
 
 /* Plaintext Handling */
 int _gnutls_text2TLSPlaintext(ContentType type, GNUTLSPlaintext** plain, char *text, uint16 length)

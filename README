@@ -1,0 +1,5 @@
+* Run the buildconf script before doing anything. This will create
+the needed configure, makefiles etc. using Automake, Autoconf, and libtool.
+
+* The library needs libgcrypt and libmhash (until hmac is included in libgcrypt)
+

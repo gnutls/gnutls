@@ -1,6 +1,8 @@
 #include <defines.h>
-#include "gnutls.h"
+#include "gnutls_record.h"
+#include "gnutls_handshake.h"
 #include "gnutls_compress.h"
+#include "gnutls_errors.h"
 
 int _gnutls_TLSPlaintext2TLSCompressed(GNUTLS_STATE state,
 						     GNUTLSCompressed **

@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <defines.h>
-#include "gnutls.h"
+#include "gnutls_record.h"
+#include "gnutls_handshake.h"
+#include "gnutls_errors.h"
 
 
 static char hexconvtab[] = "0123456789abcdef";
