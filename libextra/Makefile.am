@@ -1,4 +1,4 @@
-INCLUDES = -I../lib -I../includes
+INCLUDES = -I../lib -I../includes -I../lib/minitasn1/
 bin_SCRIPTS = libgnutls-extra-config
 
 m4datadir = $(datadir)/aclocal
@@ -18,7 +18,7 @@ COBJECTS_EXTRA = ext_srp.c \
 	auth_srp_rsa.c
 
 libgnutls_extra_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
-	$(LIBOPENCDK_LIBS) $(LZO_LINK) #-export-symbols gnutls-extra.sym
+	$(LIBOPENCDK_LIBS) $(LZO_LINK) -export-symbols gnutls-extra.sym
 libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) ../lib/libgnutls.la
 libgnutls_extra_la_DEPENDENCIES = $(LZO_OBJECTS)
 
