@@ -1,3 +1,20 @@
+2004-04-15 14:04  nmav <nmav@gnutls.org>
+
+	* lib/auth_rsa.c, lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_auth.c, lib/gnutls_constate.c, lib/gnutls_handshake.c,
+	lib/gnutls_pk.c, lib/gnutls_pk.h, lib/gnutls_state.c,
+	lib/gnutls_v2_compat.c, src/certtool-cfg.c, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/cli-gaa.c, src/cli-gaa.h, src/serv-gaa.c,
+	src/serv-gaa.h, src/tls_test-gaa.c, src/tls_test-gaa.h:
+
+	Some updates in order to compile with tcc.  
+
+2004-04-15 10:53  nmav <nmav@gnutls.org>
+
+	* src/: certtool-cfg.c, certtool-cfg.h, certtool.c:
+
+	some cleanups in the parsing code.  
+
 2004-04-14 18:07  nmav <nmav@gnutls.org>
 
 	* NEWS, src/certtool.c:
