@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -17,6 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
+
+#include <config.h>
+
+#ifdef ENABLE_PKI
 
 #include <stdio.h>
 #include <string.h>
@@ -129,3 +134,5 @@ int generate_prime(int bits)
 
 	return 0;
 }
+
+#endif
