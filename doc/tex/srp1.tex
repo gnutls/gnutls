@@ -83,7 +83,7 @@ int main()
 
    /* put the SRP credentials to the current state
     */
-   gnutls_set_cred(state, GNUTLS_SRP, xcred);
+   gnutls_cred_set(state, GNUTLS_SRP, xcred);
 
    gnutls_transport_set_ptr( state, sd);
 

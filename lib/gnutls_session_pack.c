@@ -50,7 +50,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 	}
 
 
-	switch (gnutls_get_auth_type(state)) {
+	switch (gnutls_auth_get_type(state)) {
 	case GNUTLS_SRP:{
 			SRP_SERVER_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
@@ -141,7 +141,7 @@ int _gnutls_session_size( GNUTLS_STATE state)
 
 	pack_size = PACK_HEADER_SIZE + sizeof(uint32);
 
-	switch ( gnutls_get_auth_type(state)) {
+	switch ( gnutls_auth_get_type(state)) {
 	case GNUTLS_SRP:
 	case GNUTLS_ANON:
 		pack_size += state->gnutls_key->auth_info_size;

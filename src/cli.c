@@ -64,7 +64,7 @@ int cert_list_size = 0;
 	tmp = gnutls_kx_get_name(gnutls_kx_get_algo( state));
 	printf("- Key Exchange: %s\n", tmp);
 
-	cred = gnutls_get_auth_type(state);
+	cred = gnutls_auth_get_type(state);
 	switch(cred) {
 		case GNUTLS_ANON:
 			printf("- Anonymous DH using prime of %d bits\n",
@@ -242,9 +242,9 @@ int main(int argc, char** argv)
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 
-	gnutls_set_cred( state, GNUTLS_ANON, anon_cred);
-	gnutls_set_cred( state, GNUTLS_SRP, cred);
-	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
+	gnutls_cred_set( state, GNUTLS_ANON, anon_cred);
+	gnutls_cred_set( state, GNUTLS_SRP, cred);
+	gnutls_cred_set( state, GNUTLS_X509PKI, xcred);
 
 /* This TLS extension may break old implementations.
  */
@@ -303,9 +303,9 @@ int main(int argc, char** argv)
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 
-	gnutls_set_cred( state, GNUTLS_ANON, NULL);
-	gnutls_set_cred( state, GNUTLS_SRP, cred);
-	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
+	gnutls_cred_set( state, GNUTLS_ANON, NULL);
+	gnutls_cred_set( state, GNUTLS_SRP, cred);
+	gnutls_cred_set( state, GNUTLS_X509PKI, xcred);
 
 #ifdef RESUME
 	gnutls_session_set_data( state, session, session_size);

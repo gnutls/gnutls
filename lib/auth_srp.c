@@ -80,7 +80,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
               	state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(SRP_SERVER_AUTH_INFO_INT));
 		state->gnutls_key->auth_info_type = GNUTLS_SRP;
 	} else
-		if (gnutls_get_auth_type( state) != state->gnutls_key->auth_info_type) {
+		if (gnutls_auth_get_type( state) != state->gnutls_key->auth_info_type) {
 	        	gnutls_assert();
 	                return GNUTLS_E_INVALID_REQUEST;
 		}	                         	 			 			

@@ -44,7 +44,7 @@ typedef int x509pki_server_cert_callback_func(GNUTLS_STATE, const gnutls_datum *
 /* Functions that allow AUTH_INFO structures handling
  */
 
-CredType gnutls_get_auth_type( GNUTLS_STATE state);
+CredType gnutls_auth_get_type( GNUTLS_STATE state);
 
 /* SRP */
 

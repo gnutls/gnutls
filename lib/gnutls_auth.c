@@ -53,7 +53,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
  * { algorithm, credentials, pointer to next }
  */
 /**
-  * gnutls_set_cred - Sets the needed credentials for the specified authentication algorithm.
+  * gnutls_cred_set - Sets the needed credentials for the specified authentication algorithm.
   * @state: is a &GNUTLS_STATE structure.
   * @type: is the type of the credentials
   * @cred: is a pointer to a structure.
@@ -78,7 +78,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
   * in case of a client, and X509PKI_SERVER_CREDENTIALS, in case
   * of a server.
   **/
-int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
+int gnutls_cred_set( GNUTLS_STATE state, CredType type, void* cred) {
 	AUTH_CRED * ccred, *pcred;
 	int exists=0;	
 	
@@ -124,7 +124,7 @@ int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
 }
 
 /**
-  * gnutls_get_auth_type - Returns the type of credentials for the current authentication schema.
+  * gnutls_auth_get_type - Returns the type of credentials for the current authentication schema.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns type of credentials for the current authentication schema.
@@ -135,7 +135,7 @@ int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
   * the same function are to be used to access the authentication data.
   **/
 
-CredType gnutls_get_auth_type( GNUTLS_STATE state) {
+CredType gnutls_auth_get_type( GNUTLS_STATE state) {
 
 	return _gnutls_map_kx_get_cred(
 		 _gnutls_cipher_suite_get_kx_algo

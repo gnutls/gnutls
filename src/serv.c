@@ -94,9 +94,9 @@ GNUTLS_STATE initialize_state()
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 	
-	gnutls_set_cred(state, GNUTLS_ANON, dh_cred);
-	gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
-	gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
+	gnutls_cred_set(state, GNUTLS_ANON, dh_cred);
+	gnutls_cred_set(state, GNUTLS_SRP, srp_cred);
+	gnutls_cred_set(state, GNUTLS_X509PKI, x509_cred);
 
 	gnutls_mac_set_priority(state, mac_priority);
 
@@ -127,7 +127,7 @@ void print_info(GNUTLS_STATE state)
 	/* we could also use the KX algorithm to distinguish the functions
 	 * to call, but this is easier.
 	 */
-	cred = gnutls_get_auth_type(state);
+	cred = gnutls_auth_get_type(state);
 
 	switch(cred) {
 		case GNUTLS_SRP:

@@ -27,7 +27,7 @@
 
 /* SRP */
 
-#define CHECK_AUTH(auth, ret) if (gnutls_get_auth_type(state) != auth) { \
+#define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \
 	gnutls_assert(); \
 	return ret; \
 	}

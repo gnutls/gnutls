@@ -152,7 +152,7 @@ void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
 void* gnutls_db_get_ptr( GNUTLS_STATE);
 int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
 
-void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
+void gnutls_handshake_set_max_data_buffer_size( GNUTLS_STATE state, int max);
 
 /* returns libgnutls version */
 const char* gnutls_check_version();
@@ -160,7 +160,7 @@ const char* gnutls_check_version();
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
-int gnutls_set_cred( GNUTLS_STATE, CredType type, void* cred);
+int gnutls_cred_set( GNUTLS_STATE, CredType type, void* cred);
 
 /* This will set the Common Name field in case of X509PKI
  * authentication. This will be used while verifying the
@@ -240,6 +240,6 @@ typedef void (*LOG_FUNC)( const char*);
 void gnutls_transport_set_push_function( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
 void gnutls_transport_set_pull_function( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 
-size_t gnutls_get_max_record_size( GNUTLS_STATE state);
-size_t gnutls_set_max_record_size( GNUTLS_STATE state, size_t size);
+size_t gnutls_record_get_max_size( GNUTLS_STATE state);
+size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
 

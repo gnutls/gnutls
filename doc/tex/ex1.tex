@@ -73,7 +73,7 @@ int main()
       gnutls_kx_set_priority(state, kx_priority);
       gnutls_mac_set_priority(state, mac_priority);
 
-      gnutls_set_cred(state, GNUTLS_X509PKI, xcred);
+      gnutls_cred_set(state, GNUTLS_X509PKI, xcred);
 
       if (t > 0) { /* if this is not the first time we connect */
          gnutls_session_set_data(state, session, session_size);

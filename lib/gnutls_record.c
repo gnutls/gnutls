@@ -141,9 +141,9 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 
 	(*state)->gnutls_internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
-	gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
+	gnutls_transport_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 
-	gnutls_set_max_handshake_data_buffer_size( (*state), MAX_HANDSHAKE_DATA_BUFFER_SIZE);
+	gnutls_handshake_set_max_data_buffer_size( (*state), MAX_HANDSHAKE_DATA_BUFFER_SIZE);
 
 	/* Allocate a minimum size for recv_data 
 	 * This is allocated in order to avoid small messages, makeing
@@ -1180,7 +1180,7 @@ ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata) {
 }
 
 /**
-  * gnutls_get_max_record_size - returns the maximum record size
+  * gnutls_record_get_max_size - returns the maximum record size
   * @state: is a &GNUTLS_STATE structure.
   *
   * This function returns the maximum record size in this connection.
@@ -1188,13 +1188,13 @@ ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata) {
   * first handshake message.
   *
   **/
-size_t gnutls_get_max_record_size( GNUTLS_STATE state) {
+size_t gnutls_record_get_max_size( GNUTLS_STATE state) {
 	return state->security_parameters.max_record_size;
 }
 
 
 /**
-  * gnutls_set_max_record_size - sets the maximum record size
+  * gnutls_record_set_max_size - sets the maximum record size
   * @state: is a &GNUTLS_STATE structure.
   * @size: is the new size
   *
@@ -1211,7 +1211,7 @@ size_t gnutls_get_max_record_size( GNUTLS_STATE state) {
   * Not all TLS implementations use or even understand this extension.
   *
   **/
-size_t gnutls_set_max_record_size( GNUTLS_STATE state, size_t size) {
+size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size) {
 size_t new_size;
 
 	if (state->security_parameters.entity==GNUTLS_SERVER)

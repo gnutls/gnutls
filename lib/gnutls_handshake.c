@@ -2257,7 +2257,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 }
 
 /**
-  * gnutls_set_max_handshake_data_buffer_size - This function will set the maximum size of handshake message sequence
+  * gnutls_handshake_set_max_data_buffer_size - This function will set the maximum size of handshake message sequence
   * @state: is a a &GNUTLS_STATE structure.
   * @max: is the maximum number.
   *
@@ -2268,7 +2268,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
   * to set an upper limit.
   *
   **/
-void gnutls_set_max_handshake_data_buffer_size(GNUTLS_STATE state, int max)
+void gnutls_handshake_set_max_data_buffer_size(GNUTLS_STATE state, int max)
 {
 	state->gnutls_internals.max_handshake_data_buffer_size = max;
 }

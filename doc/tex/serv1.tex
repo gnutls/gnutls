@@ -56,8 +56,8 @@ GNUTLS_STATE initialize_state()
    gnutls_kx_set_priority(state, kx_priority);
    gnutls_mac_set_priority(state, mac_priority);
 
-   gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
-   gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
+   gnutls_cred_set(state, GNUTLS_SRP, srp_cred);
+   gnutls_cred_set(state, GNUTLS_X509PKI, x509_cred);
 
    /* request client certificate if any.
     */
