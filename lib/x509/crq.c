@@ -170,7 +170,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
@@ -202,7 +202,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
@@ -365,7 +365,7 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
   * This function will return the challenge password in the
   * request.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq, 
@@ -393,7 +393,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
@@ -415,7 +415,7 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid,
   * This function will set the version of the certificate request. This
   * must be zero.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
@@ -445,7 +445,7 @@ uint8 null = version;
   * This function will set the public parameters from the given private key to the
   * request. Only RSA keys are currently supported.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key)
@@ -476,7 +476,7 @@ int result;
   *
   * This function will set a challenge password to be used when revoking the request.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq, const char* pass)
@@ -519,7 +519,7 @@ int result;
   * This must be the last step in a certificate request generation since all
   * the previously set parameters are now signed.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key)

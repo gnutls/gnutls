@@ -222,7 +222,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
@@ -254,7 +254,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
@@ -282,7 +282,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
@@ -314,7 +314,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
@@ -447,7 +447,7 @@ time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert)
   * large serial numbers, thus it may be wise to handle it as something
   * opaque. 
   *
-  * Returns a negative value in case of an error, and 0 on success.
+  * Returns 0 on success and a negative value in case of an error.
   *
   **/
 int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, 
@@ -854,7 +854,7 @@ cleanup:
   * This function will return a pointer to the DER encoded DN structure and
   * the length.
   *
-  * Returns a negative value on error, and zero on success.
+  * Returns 0 on success or a negative value on error.
   *
   -*/
 int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
@@ -871,7 +871,7 @@ int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
   * This function will return a pointer to the DER encoded DN structure and
   * the length.
   *
-  * Returns a negative value on error, and zero on success.
+  * Returns 0 on success, or a negative value on error.
   *
   -*/
 int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
@@ -895,7 +895,7 @@ int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 

@@ -288,7 +288,9 @@ int _pkcs12_encode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* raw
   * @data: the data to be copied.
   *
   * This function will insert the given data of the given type into the
-  * bag. On success returns the index of the added bag, or a negative
+  * bag. 
+  *
+  * Returns the index of the added bag on success, or a negative
   * value on error.
   *
   **/
@@ -342,8 +344,8 @@ int ret;
   * This function will insert the given certificate into the
   * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
   *
-  * On success returns the index of the added bag, or a negative
-  * value on error.
+  * Returns the index of the added bag on success, or a negative
+  * value on failure.
   *
   **/
 int gnutls_pkcs12_bag_set_crt(gnutls_pkcs12_bag bag, gnutls_x509_crt crt)
@@ -377,8 +379,8 @@ gnutls_datum data;
   * This function will insert the given CRL into the
   * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
   *
-  * On success returns the index of the added bag, or a negative
-  * value on error.
+  * Returns the index of the added bag on success, or a negative
+  * value on failure.
   *
   **/
 int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag bag, gnutls_x509_crl crl)

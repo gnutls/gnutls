@@ -55,7 +55,7 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
@@ -82,7 +82,7 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid,
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
@@ -104,7 +104,7 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid,
   * This function will set the version of the certificate request. This
   * must be zero.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
@@ -129,7 +129,7 @@ uint8 null = version;
   * This function will set the public parameters from the given private key to the
   * certificate. Only RSA keys are currently supported.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_key(gnutls_x509_crt crt, gnutls_x509_privkey key)
@@ -156,7 +156,7 @@ int result;
   * This function will set the name and public parameters from the given certificate request to the
   * certificate. Only RSA keys are currently supported.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq)
@@ -196,7 +196,7 @@ int pk_algorithm;
   *
   * This function will set the basicConstraints certificate extension. 
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_ca_status(gnutls_x509_crt crt, unsigned int ca)
@@ -234,7 +234,7 @@ gnutls_datum der_data;
   *
   * This function will set the subject alternative name certificate extension. 
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
@@ -289,7 +289,7 @@ unsigned int critical;
   * This must be the last step in a certificate generation since all
   * the previously set parameters are now signed.
   *
-  * On success zero is returned.
+  * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer, 
@@ -400,7 +400,7 @@ const char* pk;
   *
   * This function will set the time this Certificate was or will be activated.
   *
-  * Returns a negative value in case of an error, and 0 on success.
+  * Returns 0 on success, or a negative value in case of an error.
   *
   **/
 int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time)
@@ -415,7 +415,7 @@ int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time)
   *
   * This function will set the time this Certificate will expire.
   *
-  * Returns a negative value in case of an error, and 0 on success.
+  * Returns 0 on success, or a negative value in case of an error.
   *
   **/
 int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time)
@@ -434,7 +434,7 @@ int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time)
   * large serial numbers, thus it may be wise to handle it as something
   * opaque. 
   *
-  * Returns a negative value in case of an error, and 0 on success.
+  * Returns 0 on success, or a negative value in case of an error.
   *
   **/
 int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial, 

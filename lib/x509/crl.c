@@ -159,8 +159,8 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
   * If buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * in that case the sizeof_buf will be updated with the required size, and
+  * 0 on success.
   *
   **/
 int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
@@ -192,8 +192,8 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
   * If buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
+  * in that case the sizeof_buf will be updated with the required size,
+  * and 0 on success.
   *
   **/
 int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
@@ -502,8 +502,7 @@ cleanup:
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN X509 CRL".
   *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
+  * Returns 0 on success, and a negative value on failure.
   *
   **/
 int gnutls_x509_crl_export( gnutls_x509_crl crl,
