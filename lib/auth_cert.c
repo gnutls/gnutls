@@ -732,7 +732,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 
 	if ((ret =
 	     _gnutls_auth_info_set(state, GNUTLS_CRD_CERTIFICATE,
-				   sizeof(CERTIFICATE_AUTH_INFO_INT))) <
+				   sizeof(CERTIFICATE_AUTH_INFO_INT), 1)) <
 	    0) {
 		gnutls_assert();
 		return ret;
@@ -863,7 +863,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 
 	if ((ret =
 	     _gnutls_auth_info_set(state, GNUTLS_CRD_CERTIFICATE,
-				   sizeof(CERTIFICATE_AUTH_INFO_INT))) <
+				   sizeof(CERTIFICATE_AUTH_INFO_INT), 1)) <
 	    0) {
 		gnutls_assert();
 		return ret;
@@ -1048,7 +1048,7 @@ int _gnutls_proc_cert_cert_req(GNUTLS_STATE state, opaque * data,
 
 	if ((ret =
 	     _gnutls_auth_info_set(state, GNUTLS_CRD_CERTIFICATE,
-				   sizeof(CERTIFICATE_AUTH_INFO_INT))) <
+				   sizeof(CERTIFICATE_AUTH_INFO_INT), 0)) <
 	    0) {
 		gnutls_assert();
 		return ret;

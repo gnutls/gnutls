@@ -241,7 +241,7 @@ int main(int argc, char **argv)
    sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr);
 
    inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF);
-   fprintf(stderr, "Connecting to '%s'...\n", buffer);
+   fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port);
 
    err = connect(sd, (SA *) & sa, sizeof(sa));
    ERR(err, "connect");
@@ -394,7 +394,6 @@ int main(int argc, char **argv)
 		|| ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
 	       printf("* Received alert [%d]\n", gnutls_alert_get(state));
 	    if (ret == GNUTLS_E_REHANDSHAKE) {
-
 	       /* There is a race condition here. If application
 	        * data is sent after the rehandshake request,
 	        * the server thinks we ignored his request.
@@ -402,14 +401,15 @@ int main(int argc, char **argv)
 	        */
 	       printf("* Received rehandshake request\n");
 	       /* gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
+
 	       do {
 		  ret = gnutls_handshake(state);
 	       } while (ret == GNUTLS_E_AGAIN
 			|| ret == GNUTLS_E_INTERRUPTED);
 
-	       if (ret == 0)
+	       if (ret == 0) {
 		  printf("* Rehandshake was performed\n");
-	       else {
+	       } else {
 		  printf("* Rehandshake Failed [%d]\n", ret);
 	       }
 	    }

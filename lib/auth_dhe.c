@@ -117,7 +117,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_CERTIFICATE, sizeof( CERTIFICATE_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_CERTIFICATE, sizeof( CERTIFICATE_AUTH_INFO_INT), 0)) < 0) {
 		gnutls_assert();
 		return ret;
 	}

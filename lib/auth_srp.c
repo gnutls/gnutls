@@ -78,7 +78,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	int err;
 	SRP_SERVER_AUTH_INFO info;
 	
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT))) < 0) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}

@@ -1,5 +1,10 @@
-Version ?.?.?
-- Added tls_test program
+Version 0.3.91 (3/03/2002)
+- Added gnutls-cli-debug program
+- Corrections in session resumption
+- Rehandshake can now handle negotiation of different authentication
+  type.
+- gnutls-cli, gnutls-serv, gnutls-srpcrypt and gnutls-cli-debug are 
+  now being installed.
 
 Version 0.3.90 (24/02/2002)
 - Handshake messages are not kept in memory any more. Now we use 
