@@ -4,6 +4,10 @@
 #include <gnutls_cert.h>
 #include <gnutls_errors.h>
 
+/* FIXME: This test uses gnutls internals. Rewrite it using
+ * the exported stuff. (I leave it as an exercise to the reader :)
+ */
+
 #define MAX_FILE_SIZE 16*1024
 
 struct file_res {
