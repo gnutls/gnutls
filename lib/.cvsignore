@@ -18,3 +18,4 @@ x509_ASN.c
 *.texi
 t-openpgp.c
 autogen.sh
+gnutls.pc
