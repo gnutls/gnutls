@@ -52,8 +52,6 @@ void gnutls_credentials_clear( gnutls_session session) {
 		}
 		session->key->cred = NULL;
 	}
-
-	return;
 }
 
 /* 
@@ -167,10 +165,12 @@ int server = session->security_parameters.entity==GNUTLS_SERVER?1:0;
 }
 
 const void *_gnutls_get_cred( GNUTLS_KEY key, gnutls_credentials_type type, int *err) {
+	const void *retval = NULL;
+	int _err = -1;
 	AUTH_CRED * ccred;
 
-	if (key == NULL) return NULL;
-	
+	if (key == NULL) goto out;
+
 	ccred = key->cred;
 	while(ccred!=NULL) {
 		if (ccred->algorithm==type) {
@@ -178,13 +178,14 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, gnutls_credentials_type type, int 
 		}
 		ccred = ccred->next;
 	}
-	if (ccred==NULL) {
-		if (err!=NULL) *err=-1;
-		return NULL;
-	}
-			
-	if (err!=NULL) *err=0;
-	return ccred->credentials;
+	if (ccred==NULL) goto out;
+
+	_err = 0;
+	retval = ccred->credentials;
+
+	out:
+	if (err!=NULL) *err=_err;
+	return retval;
 }
 
 /*-

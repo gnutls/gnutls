@@ -79,7 +79,7 @@ static gnutls_error_entry error_algorithms[] = {
 
 	ERROR_ENTRY("Internal error in memory allocation.", GNUTLS_E_MEMORY_ERROR, 1 ), 
 	ERROR_ENTRY("An unimplemented feature has been requested.", GNUTLS_E_UNIMPLEMENTED_FEATURE, 1 ), 
-	ERROR_ENTRY("Insuficient credentials for that request.", GNUTLS_E_INSUFICIENT_CREDENTIALS, 1 ), 
+	ERROR_ENTRY("Insufficient credentials for that request.", GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1 ), 
 	ERROR_ENTRY("Error in SRP password file.", GNUTLS_E_SRP_PWD_ERROR, 1 ), 
 	ERROR_ENTRY("Wrong padding in PKCS1 packet.", GNUTLS_E_PKCS1_WRONG_PAD, 1 ), 
 	ERROR_ENTRY("The requested session has expired.", GNUTLS_E_EXPIRED, 1 ), 
@@ -274,8 +274,6 @@ void _gnutls_log( int level, const char *fmt, ...) {
  va_end(args);   
 
  log_func( level, str);
-
- return;
 }
 #ifndef DEBUG
 # ifndef C99_MACROS

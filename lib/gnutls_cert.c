@@ -317,7 +317,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	if (info->raw_certificate_list == NULL || info->ncerts == 0) {
@@ -571,8 +571,6 @@ void _gnutls_free_cert(gnutls_cert *cert)
 	}
 
 	_gnutls_free_datum(&cert->raw);
-
-	return;
 }
 
 /* Returns the issuer's Distinguished name in odn, of the certificate 

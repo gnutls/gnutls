@@ -6,48 +6,48 @@ The rules here are not always used, although we try to stick to them.
   All file names are usually prefixed with "gnutls_", "auth_", or
  "x509_", or something else that indicates the part of gnutls
  where this file refers to. The suffix should be more
- specific. Ie. "gnutls_record.c" refers to the TLS library
- and more specific, to the TLS record protocol. "auth_rsa",
+ specific. I.e., "gnutls_record.c" refers to the TLS library
+ and, more specifically, to the TLS record protocol. "auth_rsa.c"
  is the implementation of the RSA certificate authentication
  method.
 
- An other way to distinguish files, might be using different
+ Another way to distinguish files might be using different
  subdirectories. Use the lib/x509/ directory, which contains
  all the X.509 certificate and crl stuff.
 
 
 *** Function names:
   All the function names use underscore "_", to separate words,
- functions like gnutlsDoThat, are not used. The function names
+ functions like gnutlsDoThat are not used. The function names
  usually start with "gnutls_" prefix, and the words that follow
  specify the exact part of gnutls that this function refers to.
- Ie "gnutls_x509_crt_get_dn", refers to the X.509 
+ E.g. "gnutls_x509_crt_get_dn", refers to the X.509
  certificate parsing part of gnutls. Currently used prefixes are:
  "gnutls_x509_crt_" for the X.509 certificate part
  "gnutls_openpgp_key_" for the openpgp key part
  "gnutls_session_" for the TLS session part (but this may be omited)
  "gnutls_handshake_" for the TLS handshake part
- "gnutls_record_" for the TLS record part
+ "gnutls_record_" for the TLS record protocol part
  "gnutls_alert_" for the TLS alert protocol part
  "gnutls_credentials_" for the credentials structures
  "gnutls_global_" for the global structures handling
  and probably more.
 
  Internal functions -- that are not exported in the API -- should
- be prefixed with an underscore. Ie. _gnutls_handshake_begin()
+ be prefixed with an underscore. E.g. _gnutls_handshake_begin()
 
- All exported functions must be listed in gnutls.sym and gnutls-extra.sym,
+ All exported functions must be listed in gnutls.sym and gnutls-extra.sym
  in order to be exported.
 
 *** Constructed types:
   The constructed types in gnutls always have the "gnutls_" prefix.
  Definitions, value defaults and enumerated values should be in
- capitals. Ie GNUTLS_CIPHER_3DES_CBC
+ capitals. E.g. GNUTLS_CIPHER_3DES_CBC
 
 
 *** Function parameters:
   The gnutls functions accept parameters in the order:
-  1. Input parameters.
+  1. Input parameters
   2. Output parameters
 
   When data and size is expected, a gnutls_datum structure should be
@@ -56,7 +56,7 @@ The rules here are not always used, although we try to stick to them.
 *** Callback function parameters:
   Callback functions should be avoided, if this is possible. 
  Callbacks that refer to a TLS session should include the
- current session as a parameter, in order for the called, to
+ current session as a parameter, in order for the called function to
  be able to retrieve the data associated with the session.
  This is not always done though -- see the push/pull callbacks.
 
@@ -65,6 +65,6 @@ The rules here are not always used, although we try to stick to them.
  case 0 should be returned in case of success, or maybe a positive
  value, if some other indication is needed.
  
- A negative value, always indicates failure. All the available 
+ A negative value always indicates failure. All the available
  error codes are defined in gnutls_errors_int.h and a description
  is available in gnutls_errors.c

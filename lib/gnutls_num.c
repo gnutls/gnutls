@@ -97,7 +97,6 @@ uint24 tmp;
 	data[0] = tmp.pint[0];
 	data[1] = tmp.pint[1];
 	data[2] = tmp.pint[2];
-	return;
 }
 
 uint32 _gnutls_read_uint32( const opaque* data) {
@@ -116,7 +115,6 @@ void _gnutls_write_uint32( uint32 num, opaque* data) {
 	num = byteswap32( num);
 #endif
 	memcpy( data, &num, sizeof(uint32));
-	return;
 }
 
 uint16 _gnutls_read_uint16( const opaque* data) {
@@ -134,7 +132,6 @@ void _gnutls_write_uint16( uint16 num, opaque* data) {
 	num = byteswap16( num);
 #endif
 	memcpy( data, &num, sizeof(uint16));
-	return;
 }
 
 uint32 _gnutls_conv_uint32( uint32 data) {

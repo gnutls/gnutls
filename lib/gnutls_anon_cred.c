@@ -19,11 +19,11 @@
  *
  */
 
+#ifdef ENABLE_ANON
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "auth_anon.h"
-
-#ifdef ENABLE_ANON
 
 #include "gnutls_auth_int.h"
 #include "gnutls_dh.h"
@@ -70,7 +70,6 @@ int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc)
   * the structure.
   **/
 void gnutls_anon_free_client_credentials( gnutls_anon_client_credentials sc) {
-	return;
 }
 
 /**

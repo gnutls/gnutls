@@ -131,7 +131,6 @@ void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void *digest)
 	gcry_md_close(handle->handle);
 
 	gnutls_free(handle);
-	return;
 }
 
 
@@ -209,7 +208,6 @@ void _gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle, void *digest)
 	gcry_md_close(handle->handle);
 
 	gnutls_free(handle);
-	return;
 }
 
 GNUTLS_MAC_HANDLE _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *key,
@@ -279,7 +277,6 @@ void _gnutls_mac_deinit_ssl3(GNUTLS_MAC_HANDLE handle, void *digest)
 
 		_gnutls_hash_deinit(td, digest);
 	}
-	return;
 }
 
 void _gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle,
@@ -325,7 +322,6 @@ void _gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle,
 
 		_gnutls_hash_deinit(td, digest);
 	}
-	return;
 }
 
 static int ssl3_sha(int i, char *secret, int secret_len, char *random,

@@ -310,8 +310,6 @@ void _gnutls_deinit(gnutls_session session)
 
 	memset( session, 0, sizeof(struct gnutls_session_int));
 	gnutls_free(session);
-
-	return;
 }
 
 /**
@@ -635,7 +633,6 @@ int i;
 	for (i = 0; i < length; i++) {
 		o1[i] ^= o2[i];
 	}
-	return ;
 }
 
 

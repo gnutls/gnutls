@@ -181,7 +181,7 @@ int _level = -1;
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
 		case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
-                case GNUTLS_E_INSUFICIENT_CREDENTIALS:
+		case GNUTLS_E_INSUFFICIENT_CREDENTIALS:
 		case GNUTLS_E_NO_CIPHER_SUITES:
 		case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
                         ret = GNUTLS_A_HANDSHAKE_FAILURE;
@@ -276,4 +276,3 @@ int level;
 gnutls_alert_description gnutls_alert_get( gnutls_session session) {
 	return session->internals.last_alert;
 }
-

@@ -619,7 +619,7 @@ int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MP
 
 	if (rc != 0) {
 		gnutls_assert();
-		return GNUTLS_E_PK_ENCRYPTION_FAILED;
+		return GNUTLS_E_PK_DECRYPTION_FAILED;
 
 	} else { /* add better error handling or make gnupg use S-Exp directly */
 		resarr[0] = gcry_sexp_nth_mpi(s_plain, 0, 0);

@@ -212,7 +212,8 @@ typedef enum gnutls_privkey_pkcs8_flags {
 			        * be encrypted.
 				*/
 	GNUTLS_PKCS8_USE_PKCS12_3DES,
-	GNUTLS_PKCS8_USE_PKCS12_ARCFOUR
+	GNUTLS_PKCS8_USE_PKCS12_ARCFOUR,
+	GNUTLS_PKCS8_USE_PKCS12_RC2_40
 } gnutls_privkey_pkcs8_flags;
 
 int gnutls_x509_privkey_init(gnutls_x509_privkey * key);

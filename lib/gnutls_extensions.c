@@ -166,8 +166,6 @@ static void _gnutls_extension_list_add( gnutls_session session, uint16 type) {
 			_gnutls_debug_log("extensions: Increase MAX_EXT_TYPES\n");
 		}
 	}
-
-	return;
 }
 
 int _gnutls_gen_extensions( gnutls_session session, opaque** data) {

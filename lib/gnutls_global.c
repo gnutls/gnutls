@@ -96,7 +96,7 @@ int _gnutls_is_secure_mem_null( const void*);
   * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
   * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
   * @realloc_func: A realloc function
-  * @free_func: The function that frees allocated data.
+  * @free_func: The function that frees allocated data. Must accept a NULL pointer.
   *
   * This is the function were you set the memory allocation functions gnutls
   * is going to use. By default the libc's allocation functions (malloc(), free()),
@@ -117,7 +117,7 @@ void gnutls_global_set_mem_functions(
 	gnutls_realloc = gnutls_realloc_func;
 	gnutls_free = gnutls_free_func;
 
-	if (gnutls_is_secure_func==NULL)
+	if (gnutls_is_secure_func!=NULL)
 		_gnutls_is_secure_memory = gnutls_is_secure_func;
 	else
 		_gnutls_is_secure_memory = _gnutls_is_secure_mem_null;
@@ -132,7 +132,6 @@ void gnutls_global_set_mem_functions(
 		gnutls_strdup = _gnutls_strdup;
 		gnutls_calloc = _gnutls_calloc;
 	}
-	return;
 }
 
 #ifdef DEBUG

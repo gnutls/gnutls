@@ -157,8 +157,6 @@ static void _gnutls_add_openpgp_functions(void) {
 	_E_gnutls_openpgp_fingerprint = gnutls_openpgp_fingerprint;
 	_E_gnutls_openpgp_request_key = _gnutls_openpgp_request_key;
 	_E_gnutls_openpgp_cert2gnutls_cert = _gnutls_openpgp_cert2gnutls_cert;
-	
-	return;
 }
 
 extern const char* gnutls_check_version( const char*);

@@ -39,7 +39,6 @@ int SSL_library_init(void)
 
 void OpenSSL_add_all_algorithms(void)
 {
-    return;
 }
 
 
@@ -111,7 +110,7 @@ long SSL_CTX_set_mode(SSL_CTX *ctx, long mode)
 int SSL_CTX_set_cipher_list(SSL_CTX *ctx, const char *list)
 {
     /* FIXME: ignore this for the moment */
-    /* We've going to have to parse the "list" string to do this */
+    /* We're going to have to parse the "list" string to do this */
     /* It is a string, which in its simplest form is something like
        "DES-CBC3-SHA:IDEA-CBC-MD5", but can be rather more complicated
        (see OpenSSL's ciphers(1) manpage for details) */
@@ -225,12 +224,10 @@ void SSL_free(SSL *ssl)
     gnutls_certificate_free_cred(ssl->gnutls_cred);
     gnutls_deinit(ssl->gnutls_state);
     free(ssl);
-    return;
 }
 
 void SSL_load_error_strings(void)
 {
-    return;
 }
 
 int SSL_get_error(SSL *ssl, int ret)
@@ -275,7 +272,6 @@ void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio)
 
 void SSL_set_connect_state(SSL *ssl)
 {
-    return;
 }
 
 int SSL_pending(SSL *ssl)
@@ -806,7 +802,6 @@ char *X509_NAME_oneline(gnutls_x509_dn *name, char *buf, int len)
 void X509_free(const X509 *cert)
 {
     /* only get certificates as const items */
-    return;
 }
 
 
@@ -858,7 +853,6 @@ int RAND_status(void)
 
 void RAND_seed(const void *buf, int num)
 {
-    return;
 }
 
 int RAND_bytes(unsigned char *buf, int num)
@@ -893,7 +887,7 @@ int RAND_egd_bytes(const char *path, int bytes)
 
 void MD5_Init(MD5_CTX *ctx)
 {
-    ctx->handle = gcry_md_open(GCRY_MD_MD5, 0);
+    gcry_md_open(&ctx->handle, GCRY_MD_MD5, 0);
 }
 
 void MD5_Update(MD5_CTX *ctx, const void *buf, int len)
@@ -934,7 +928,7 @@ unsigned char *MD5(const unsigned char *buf, unsigned long len,
 
 void RIPEMD160_Init(RIPEMD160_CTX *ctx)
 {
-    ctx->handle = gcry_md_open(GCRY_MD_RMD160, 0);
+    gcry_md_open(&ctx->handle, GCRY_MD_RMD160, 0);
 }
 
 void RIPEMD160_Update(RIPEMD160_CTX *ctx, const void *buf, int len)

@@ -19,6 +19,10 @@
  *
  */
 
+/* This file contains the RC2 cipher algorithm. This is the RC2
+ * used in PKCS #12. RC2 with 40 bit key reduced to 40 bits (!!!).
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gcrypt.h>
@@ -193,6 +197,9 @@ do_rc2_setkey (void *context, const uint8 *key, unsigned int keylen)
     int bits = keylen * 8, len;
 
 #if 0
+    /* Self test is for the plain cipher (with phase 2 stripped)
+     */
+
     if( !initialized ) {
 	initialized = 1;
 	selftest_failed = selftest();

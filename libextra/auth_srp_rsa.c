@@ -95,7 +95,7 @@ int apr_cert_list_length;
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
-	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	/* find the appropriate certificate */

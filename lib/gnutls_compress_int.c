@@ -135,8 +135,6 @@ int err;
 		gnutls_free( handle);
 
 	}
-
-	return;
 }
 
 /* These functions are memory consuming 

@@ -112,8 +112,6 @@ static void resume_copy_required_values(gnutls_session session)
 	session->security_parameters.session_id_size =
 	    session->internals.resumed_security_parameters.
 	    session_id_size;
-
-	return;
 }
 
 void _gnutls_set_server_random(gnutls_session session, uint8 * random)
@@ -227,7 +225,7 @@ int _gnutls_create_random(opaque * dst)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	memcpy(&dst[4], rand, 28);
+	memcpy(&dst[4], rand, TLS_RANDOM_SIZE - 4);
 
 	return 0;
 }
@@ -586,14 +584,14 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		return retval;
 	}
 	
-	/* check if the credentials (username, public key etc. are ok)
+	/* check if the credentials (username, public key etc.) are ok
 	 */
 	if (_gnutls_get_kx_cred
 	    (session, _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 
@@ -818,11 +816,11 @@ static int _gnutls_recv_handshake_header(gnutls_session session,
 					       SSL2_HEADERS);
 
 		if (ret < 0) {
-			return (ret <
-				0) ? ret :
-			    GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 
+		/* The case ret==0 is catched here.
+		 */
 		if (ret != SSL2_HEADERS) {
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -965,8 +963,10 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 	if (ret < 0) {
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET
 		    && optional == OPTIONAL_PACKET) {
-			*datalen = 0;
-			*data = NULL;
+			if (datalen != NULL)
+				*datalen = 0;
+			if (data != NULL)
+				*data = NULL;
 			return 0;	/* ok just ignore the packet */
 		}
 		/* gnutls_assert(); */
@@ -1077,7 +1077,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	
 	for (i = 0; i < cipher_suite_num; i++) {
 		if (memcmp(&cipher_suites[i], suite, 2) == 0) {
-			z = 0;
+			z = 0; break;
 		}
 	}
 
@@ -1107,7 +1107,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 
@@ -1150,7 +1150,7 @@ static int _gnutls_client_set_comp_method(gnutls_session session,
 	
 	for (i = 0; i < comp_methods_num; i++) {
 		if (compression_methods[i] == comp_method) {
-			comp_methods_num = 0;
+			comp_methods_num = 0; break;
 		}
 	}
 
@@ -1340,7 +1340,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 	 */
 	if (ret == 0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	cipher_num = ret;
@@ -1397,6 +1397,7 @@ static int _gnutls_copy_comp_methods(gnutls_session session,
 	*ret_data = gnutls_malloc(datalen);
 	if (*ret_data == NULL) {
 		gnutls_assert();
+		gnutls_free(compression_methods);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -1415,7 +1416,7 @@ static int _gnutls_copy_comp_methods(gnutls_session session,
  */
 static int _gnutls_send_client_hello(gnutls_session session, int again)
 {
-	opaque *data = NULL;
+	opaque *data;
 	opaque *extdata = NULL;
 	int extdatalen;
 	int pos = 0;
@@ -1463,6 +1464,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 			if (hver == 0)
 				hver = GNUTLS_E_INTERNAL_ERROR;
 			gnutls_assert();
+			gnutls_free(data);
 			return hver;
 		}
 
@@ -1876,14 +1878,14 @@ int gnutls_handshake(gnutls_session session)
 	return 0;
 }
 
-#define IMED_RET( str, ret) \
+#define IMED_RET( str, ret) do { \
 	if (ret < 0) { \
 		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
 		_gnutls_handshake_hash_buffers_clear(session); \
 		return ret; \
-	}
+	} } while (0)
 
 
 

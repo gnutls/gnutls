@@ -114,8 +114,6 @@ void _libtasn1_log( const char *fmt, ...) {
  va_end(args);   
 
  fprintf(stderr, str);
-
- return;
 }
 #else /* not DEBUG */
 # ifndef C99_MACROS

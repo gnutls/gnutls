@@ -1,5 +1,7 @@
 Version 0.9.7
 - The tex files are now included in the distribution.
+- The library can now decrypt PKCS #12 files encrypted with
+  the RC2-40 cipher.
 
 Version 0.9.6 (28/06/2003)
 - Added gnutls_x509_privkey_get_key_id() and gnutls_x509_crt_get_key_id()

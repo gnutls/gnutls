@@ -43,15 +43,17 @@ int _gnutls_get_random(opaque * res, int bytes, int level)
     int fd;
     char *device;
 
-    device = "dev/urandom";
+    device = "/dev/urandom";
 
     fd = open(device, O_RDONLY);
-    if (device == NULL || fd < 0) {
+    if (fd < 0) {
 	_gnutls_log( "Could not open random device\n");
 	return GNUTLS_E_FILE_ERROR;
     } else {
-	read(fd, res, bytes);
+	ssize_t err = read(fd, res, bytes);
+	/* IMPLEMENTME: handle EINTR etc. nicely! */
 	close(fd);
+	if ( (err < 0) || (err < bytes) ) return GNUTLS_E_FILE_ERROR;
     }
     return 0;
 #else				/* using gcrypt */
@@ -61,4 +63,3 @@ int _gnutls_get_random(opaque * res, int bytes, int level)
 #endif
 
 }
-

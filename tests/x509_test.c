@@ -47,8 +47,6 @@ static void print_res( int x)
 
 	if (x&GNUTLS_CERT_REVOKED)
 		printf("- certificate is revoked.\n");
-
-	return;
 }
 
 int main() 

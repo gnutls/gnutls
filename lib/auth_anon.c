@@ -67,7 +67,7 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	bits = _gnutls_dh_get_prime_bits( session);
@@ -113,7 +113,7 @@ GNUTLS_MPI p, g;
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
-	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {

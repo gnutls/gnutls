@@ -1021,7 +1021,6 @@ static void wrap_db_init(void)
 
 static void wrap_db_deinit(void)
 {
-   return;
 }
 
 static int wrap_db_store(void *dbf, gnutls_datum key, gnutls_datum data)

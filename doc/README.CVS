@@ -1,7 +1,7 @@
 If you just want to browse the cvs tree, you may visit
 http://cvs.gnupg.org/cgi-bin/viewcvs.cgi/gnutls/?cvsroot=GNU+TLS+Library
 
-Otherwise, if you want to get and built the tree, you should have the 
+Otherwise, if you want to get and build the tree, you should have the
 following software:
 
 * cvs (http://www.gnu.org/software/cvs/)
@@ -35,6 +35,5 @@ $ cd doc/tex
 $ make gnutls.ps
 $ make gnutls.html
 
-4. If you intend to change any code in gnutls, check the
+4. If you intend to change any code in gnutls, check the file
  doc/README.CODING_STYLE.
-

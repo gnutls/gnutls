@@ -95,9 +95,9 @@ typedef void * gnutls_transport_ptr;
 #include <gnutls_mem.h>
 #include <gnutls_ui.h>
 
-#define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
-#define DECR_LENGTH_RET(len, x, RET) len-=x; if (len<0) {gnutls_assert(); return RET;}
-#define DECR_LENGTH_COM(len, x, COM) len-=x; if (len<0) {gnutls_assert(); COM;}
+#define DECR_LEN(len, x) do { len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;} } while (0)
+#define DECR_LENGTH_RET(len, x, RET) do { len-=x; if (len<0) {gnutls_assert(); return RET;} } while (0)
+#define DECR_LENGTH_COM(len, x, COM) do { len-=x; if (len<0) {gnutls_assert(); COM;} } while (0)
 
 typedef unsigned char opaque;
 typedef struct { opaque pint[3]; } uint24;

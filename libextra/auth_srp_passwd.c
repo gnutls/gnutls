@@ -238,7 +238,7 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	if (cred==NULL) {
 		gnutls_assert();
 		_gnutls_srp_entry_free(entry);
-		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	/* if the callback which sends the parameters is
@@ -399,8 +399,6 @@ void _gnutls_srp_entry_free( SRP_PWD_ENTRY * entry) {
 
 	gnutls_free(entry->username);
 	gnutls_free(entry);
-	
-	return;
 }
 
 

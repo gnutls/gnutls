@@ -162,7 +162,7 @@ const gnutls_certificate_credentials cred;
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
-	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	if ( (index=session->internals.selected_cert_index) < 0) {
@@ -307,7 +307,7 @@ int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 		 * function should have detected that.
 		 */
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 	RANDOMIZE_KEY(session->key->key, gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
 

@@ -197,7 +197,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 	
 	username = cred->username;
@@ -205,14 +205,14 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 
 	if (username == NULL || password == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	/* calc A = g^a % N 
 	 */
 	if (G == NULL || N == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 	
 	A = _gnutls_calc_srp_A( &_a, G, N);
@@ -380,7 +380,7 @@ int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data
 
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 	
 	username = cred->username;
@@ -388,7 +388,7 @@ int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data
 
 	if (username == NULL || password == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	i = 0;

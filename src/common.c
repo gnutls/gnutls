@@ -407,8 +407,6 @@ void print_list(void)
 	printf("Compression methods:");
 	printf(" ZLIB");
 	printf(", NULL\n");
-
-	return;
 }
 
 void print_license(void)

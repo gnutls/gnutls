@@ -83,7 +83,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
-	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
+	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
 	/* find the appropriate certificate */
