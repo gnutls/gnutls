@@ -138,9 +138,12 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	mpi_release((*state)->gnutls_internals.dh_secret);
 
 	/* free priorities */
-	gnutls_free((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
-	gnutls_free((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
-	gnutls_free((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
+	if ((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
+		gnutls_free((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
+	if ((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
+		gnutls_free((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
+	if ((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
+		gnutls_free((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
 
 
 	gnutls_free(*state);

@@ -34,6 +34,8 @@ void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...) {
 
 	_ap = ap;
 
+	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
+		gnutls_free(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
 	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
 	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithms = num;
 	for (i=0;i<num;i++) {
@@ -52,6 +54,8 @@ void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...) {
 
 	_ap = ap;
 
+	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
+		gnutls_free(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
 	state->gnutls_internals.KXAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
 	state->gnutls_internals.KXAlgorithmPriority.algorithms = num;
 	for (i=0;i<num;i++) {
@@ -69,6 +73,8 @@ void gnutls_set_mac_priority( GNUTLS_STATE state, int num, ...) {
 	va_start( ap, num);
 	_ap = ap;
 	
+	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
+		gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);	
 	state->gnutls_internals.MACAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
 	state->gnutls_internals.MACAlgorithmPriority.algorithms = num;
 	for (i=0;i<num;i++) {

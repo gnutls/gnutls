@@ -63,9 +63,9 @@ int main()
     client_len = sizeof(sa_cli);
     for (;;) {
 	gnutls_init(&state, GNUTLS_SERVER);
-	gnutls_set_cipher_priority( 1, GNUTLS_3DES);
-	gnutls_set_kx_priority( 1, GNUTLS_KX_ANON_DH);
-	gnutls_set_mac_priority(2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
+	gnutls_set_cipher_priority( state, 1, GNUTLS_3DES);
+	gnutls_set_kx_priority( state, 1, GNUTLS_KX_ANON_DH);
+	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
 
