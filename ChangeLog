@@ -1,3 +1,16 @@
+2002-05-27 18:56  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h:
+
+	Added error code for unsupported trustdb.  
+
+2002-05-26 15:34  nmav <nmav@gnutls.org>
+
+	* src/: CertificateExample.c, CrlExample.c, Makefile.am, cli-gaa.c,
+	cli.gaa, crypt.c, serv-gaa.c, serv.gaa:
+
+	some parts were moved to libasn1.  
+
 2002-05-24 10:51  nmav <nmav@gnutls.org>
 
 	* doc/tex/: Makefile.am, errors.tex, gnutls.tex, memory.tex:
