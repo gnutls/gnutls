@@ -43,6 +43,8 @@ HTML_OBJECTS = index.html c4.html gnutls-gnutls.html gnutls-extra.html \
 EXTRA_DIST = $(PACKAGE)-docs.tmpl $(HTML_OBJECTS) $(IMAGES)
 IMAGES = home.png left.png right.png up.png
 
+all: index.html
+
 scan.stamp: $(top_builddir)/includes/gnutls/*.h $(top_srcdir)/lib/*.c $(top_srcdir)/lib/x509/*.c $(top_srcdir)/libextra/*.c $(top_srcdir)/libextra/openpgp/*.c
 	gtkdoc-scan --module=$(PACKAGE) \
 		--source-dir=$(top_builddir)/includes/gnutls \
@@ -66,9 +68,7 @@ index.html: sgml.stamp
 	rm -f $(PACKAGE)-docs.sgml ../html.stamp
 	gtkdoc-fixxref --module-dir=. --html-dir=$(HTML_DIR)
 
-all: index.html
-
 clean-local:
 	rm -f *.bak scan.stamp tmpl.stamp sgml.stamp *.txt *.sgml \
 		$(PACKAGE)-doc.bottom $(PACKAGE)-doc.top \
-		$(HTML_OBJECTS) $(IMAGES) 
+		$(HTML_OBJECTS) $(IMAGES) style.css
