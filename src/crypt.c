@@ -70,8 +70,10 @@ int crypt, salt;
     
     salt = info.salt;
     
-    if(info.crypt==NULL) crypt = SRPSHA1_CRYPT;
-    else {
+    if(info.crypt==NULL) {
+    	crypt = SRPSHA1_CRYPT;
+    	salt = 16;
+    } else {
     	if (strcasecmp( info.crypt, "bcrypt")==0) {
     		crypt = BLOWFISH_CRYPT;
     		if (salt==0) salt = 6; /* cost is 6 */
