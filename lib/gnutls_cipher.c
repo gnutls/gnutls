@@ -320,7 +320,7 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 	{
 		/* copy the random IV.
 		 */
-		if (_gnutls_get_random(data_ptr, blocksize, GNUTLS_STRONG_RANDOM) < 0) {
+		if (_gnutls_get_random(data_ptr, blocksize, GNUTLS_WEAK_RANDOM) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
