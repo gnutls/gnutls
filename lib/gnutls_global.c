@@ -24,7 +24,6 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_dh.h>
-#include "x509/rc2.h"
 
 #define gnutls_log_func LOG_FUNC
 
@@ -194,12 +193,6 @@ int gnutls_global_init( void)
 #endif
 	}
 
-	result = _gnutls_register_rc2_cipher();
-	if (result < 0) {
-		gnutls_assert();
-		goto out;
-	}
-
 #ifdef DEBUG
 	gnutls_global_set_log_function( dlog);
 #endif
@@ -245,8 +238,6 @@ void gnutls_global_deinit( void) {
 		_gnutls_init--;
 		asn1_delete_structure(&_gnutls_gnutls_asn);
 		asn1_delete_structure(&_gnutls_pkix1_asn);
-
-		_gnutls_unregister_rc2_cipher();
 	}
 	
 }
