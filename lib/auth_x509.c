@@ -414,7 +414,6 @@ int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 	gnutls_private_key *apr_pkey;
 	int apr_cert_list_length;
 
-#warning GET_CLIENT_CERTIFICATE
 	/* find the appropriate certificate */
 	if ((ret=_gnutls_find_apr_cert( state, &apr_cert_list, &apr_cert_list_length, &apr_pkey))<0) {
 		gnutls_assert();
@@ -475,7 +474,6 @@ int _gnutls_gen_x509_server_certificate(GNUTLS_STATE state, opaque ** data)
 	gnutls_private_key *apr_pkey;
 	int apr_cert_list_length;
 
-#warning GET_SERVER_CERTIFICATE
 	if ((ret=_gnutls_find_apr_cert( state, &apr_cert_list, &apr_cert_list_length, &apr_pkey))<0) {
 		gnutls_assert();
 		return ret;
@@ -533,7 +531,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	gnutls_datum tmp;
 	CertificateStatus verify;
 
-#warning PUT_SERVER_CERTIFICATE
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
@@ -626,7 +623,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 		j++;
 	}
 
-#warning GET_SERVER_CERTIFICATE_PARAMS
 	/* store the required parameters for the handshake
 	 */
 	if ((ret =
@@ -759,7 +755,6 @@ int _gnutls_gen_x509_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 
 	*data = NULL;
 	
-#warning GENERATE_SIGNATURE_FROM_DATA
 	/* find the appropriate certificate */
 	if ((ret=_gnutls_find_apr_cert( state, &apr_cert_list, &apr_cert_list_length, &apr_pkey))<0) {
 		gnutls_assert();
@@ -802,7 +797,6 @@ gnutls_datum sig;
 	size = READuint16( pdata);
 	pdata += 2;
 
-#warning VERIFY_SIGNATURE_FROM_DATA
 	if ( size < data_size - 2) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -861,7 +855,6 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	pdata += 2;
 	size += 2;
 
-#warning GET_TRUSTED_CAS_DN
 	for (i = 0; i < cred->ncas; i++) {
 		if ( (ret=_gnutls_find_dn( &dn, &cred->ca_list[i])) < 0) {
 			gnutls_free( (*data));

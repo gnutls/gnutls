@@ -176,6 +176,7 @@ dnl **** CROSS COMPILING
 AC_MSG_RESULT(none)
 )
 
+
 AC_MSG_CHECKING([whether to check for external libraries])
 
 dnl if used --with-ext-libraries then we will not check

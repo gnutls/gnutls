@@ -1,4 +1,3 @@
-#define IO_DEBUG 5
 /*
  *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
@@ -37,6 +36,12 @@
 #ifndef EAGAIN
 # define EAGAIN EWOULDBLOCK
 #endif
+
+inline 
+static int RET( int err) {
+	if (err==EAGAIN) return GNUTLS_E_AGAIN;
+	return GNUTLS_E_INTERRUPTED;
+}
 
 #ifdef IO_DEBUG
 # include <io_debug.h>
@@ -206,8 +211,8 @@ static ssize_t _gnutls_read( SOCKET fd, GNUTLS_STATE state, void *iptr, size_t s
 					goto finish;
 				}
 				gnutls_assert();
-				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
-				else return GNUTLS_E_INTERRUPTED;
+
+				return RET(errno);
 			} else {
 				gnutls_assert();
 				return GNUTLS_E_PULL_ERROR;
@@ -440,6 +445,58 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	}
 }
 
+
+/* These two functions are used to insert data to the send buffer of the handshake or
+ * record protocol. The send buffer is kept if a send is interrupted and we need to keep
+ * the data left to sent, in order to send them later.
+ */
+ 
+#define MEMSUB(x,y) (x-y)
+
+inline
+static int _gnutls_buffer_insert( gnutls_datum * buffer, const opaque* _data, int data_size) {
+
+	if ( ( MEMSUB(_data, buffer->data) >= 0) && (MEMSUB(_data, buffer->data) < buffer->size) ) {
+		/* the given _data is part of the buffer.
+		 */
+		if (data_size > buffer->size) {
+			gnutls_assert();
+			/* this shouldn't have happened */
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+		
+		if (_data==buffer->data) { /* then don't even memmove */
+			buffer->size = data_size;
+			return 0;
+		}
+		
+		memmove( buffer->data, _data, data_size);
+		buffer->size = data_size;
+
+		return 0;		
+	}
+	
+	buffer->data = gnutls_realloc_fast( buffer->data, data_size);
+	buffer->size = data_size;
+	
+	if (buffer->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	memcpy( buffer->data, _data, data_size);
+
+	return 0;
+}
+
+inline
+static int _gnutls_buffer_get( gnutls_datum * buffer, const opaque ** ptr, size_t *ptr_size) {
+	*ptr_size = buffer->size;
+	*ptr = buffer->data;
+	
+	return 0;
+}
+
 /* This function is like write. But it does not return -1 on error.
  * It does return gnutls_errno instead.
  *
@@ -459,8 +516,8 @@ ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, 
 #endif
 	ssize_t retval, i;
 	const opaque * ptr;
-	int ptrcopy; /* indicates whether to copy from the ptr */
-
+	int ret;
+	
 	ptr = iptr;
 	
 	/* In case the previous write was interrupted, check if the
@@ -474,12 +531,13 @@ ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, 
 
 	/* If data in the buffer exist
 	 */
-	ptrcopy = 1;
 	if (iptr == NULL) {
 		/* checking is handled above */
-		ptr = state->gnutls_internals.send_buffer.data;
-		n = state->gnutls_internals.send_buffer.size;
-		ptrcopy = 0;
+		ret = _gnutls_buffer_get( &state->gnutls_internals.send_buffer, &ptr, &n);
+		if (ret < 0) {
+			gnutls_assert();
+			return retval;
+		}
 #ifdef WRITE_DEBUG
 		_gnutls_log( "WRITE: Restoring old write. (%d bytes to send)\n", n);
 #endif
@@ -502,25 +560,16 @@ ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, 
 			if (errno == EAGAIN || errno == EINTR) {
 				state->gnutls_internals.send_buffer_prev_size += n - left;
 
-				state->gnutls_internals.send_buffer.data = gnutls_realloc_fast( 
-					state->gnutls_internals.send_buffer.data, left);
-	
-				if (state->gnutls_internals.send_buffer.data == NULL) {
+				retval = _gnutls_buffer_insert( &state->gnutls_internals.send_buffer, &ptr[n-left], left);
+				if (retval < 0) {
 					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					return retval;
 				}
-				state->gnutls_internals.send_buffer.size = left;
-
-				if (ptrcopy != 0)
-					memcpy( state->gnutls_internals.send_buffer.data, &ptr[n-left], left);
-				else 
-					memmove( state->gnutls_internals.send_buffer.data, &state->gnutls_internals.send_buffer.data[n-left], left);
-
+				
 #ifdef WRITE_DEBUG
 				_gnutls_log( "WRITE: Interrupted. Stored %d bytes to buffer. Already sent %d bytes.\n", left, n-left);
 #endif
-				if (errno==EAGAIN) retval = GNUTLS_E_AGAIN;
-				else retval = GNUTLS_E_INTERRUPTED;
+				retval = RET(errno);
 
 				return retval;
 			} else {
@@ -584,7 +633,6 @@ ssize_t _gnutls_write_flush(SOCKET fd, GNUTLS_STATE state)
 ssize_t _gnutls_handshake_write_flush(SOCKET fd, GNUTLS_STATE state)
 {
     ssize_t ret;
-
     ret = _gnutls_handshake_send_int(fd, state, 0, 0, NULL, 0);
     if (ret < 0) {
 	gnutls_assert();
@@ -609,41 +657,63 @@ ssize_t _gnutls_handshake_write_flush(SOCKET fd, GNUTLS_STATE state)
 /* This is a send function for the gnutls handshake 
  * protocol. Just makes sure that all data have been sent.
  */
-ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t n)
+ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *iptr, size_t n)
 {
 	size_t left;
 	ssize_t i = 0, ret=0;
-	opaque *ptr;
-        int ptrcopy;
+	const opaque *ptr;
         ssize_t retval = 0;
+
+	ptr = iptr;
        
-        ptrcopy = 1; 
-	if (state->gnutls_internals.handshake_send_buffer.size > 0 && iptr==NULL && n == 0) {
+	if (state->gnutls_internals.handshake_send_buffer.size > 0 && ptr==NULL && n == 0) {
 		/* resuming previously interrupted write
 		 */
 		gnutls_assert(); 
-		n = state->gnutls_internals.handshake_send_buffer.size;
-		iptr = state->gnutls_internals.handshake_send_buffer.data;
+		ret = _gnutls_buffer_get( &state->gnutls_internals.handshake_send_buffer, &ptr, &n);
+		if (ret < 0) {
+			gnutls_assert();
+			return retval;
+		}
 
 		type = state->gnutls_internals.handshake_send_buffer_type;
 		htype = state->gnutls_internals.handshake_send_buffer_htype;
-		ptrcopy = 0;
 
 	} else if (state->gnutls_internals.handshake_send_buffer.size > 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
+	} else {
+#ifdef WRITE_DEBUG
+		size_t sum=0, x, j;
+		
+		_gnutls_log( "HWRITE: will write %d bytes to %d.\n", n, fd);
+		for (x=0;x<((n)/16)+1;x++) {
+			if (sum>n)
+				break;
+
+			_gnutls_log( "%.4x - ",x);
+			for (j=0;j<16;j++) {
+				if (sum<n) {
+					_gnutls_log( "%.2x ", ((unsigned char*)ptr)[sum++]);
+				} else break;
+			}
+			_gnutls_log( "\n");
+		}
+		_gnutls_log( "\n");
+#endif
+
+	
 	}
 
 	if (n==0) { /* if we have no data to send */
 		gnutls_assert();
 		return 0;
-	} else if (iptr==NULL) {
+	} else if (ptr==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 	
 
-	ptr = iptr;
 	left = n;
 	while (left > 0) {
 		ret = gnutls_send_int(fd, state, type, htype, &ptr[n-left], left);
@@ -657,22 +727,12 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 			if ( left > 0 && (ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN)) { 
 				gnutls_assert();
 
-				state->gnutls_internals.handshake_send_buffer.data = gnutls_realloc_fast(
-						state->gnutls_internals.handshake_send_buffer.data, left);
-
-				if (state->gnutls_internals.handshake_send_buffer.data==NULL) {
+				retval = _gnutls_buffer_insert( &state->gnutls_internals.handshake_send_buffer, &ptr[n-left], left);
+				if (retval < 0) {
 					gnutls_assert();
-					return GNUTLS_E_MEMORY_ERROR;
+					return retval;
 				}
-				
-				if (ptrcopy!=0) 
-					memcpy( state->gnutls_internals.handshake_send_buffer.data, &ptr[n-left], left);
-				else
-					if (n-left > 0)
-						memmove( state->gnutls_internals.handshake_send_buffer.data, 
-							&state->gnutls_internals.handshake_send_buffer.data[n-left], left);
 
-				state->gnutls_internals.handshake_send_buffer.size = left;
 				state->gnutls_internals.handshake_send_buffer_prev_size += n-left;
 
 				state->gnutls_internals.handshake_send_buffer_type = type;

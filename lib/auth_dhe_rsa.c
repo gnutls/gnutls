@@ -309,7 +309,7 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	
 	sigsize = READuint16( &data[vparams.size]);
 	signature.data = &data[vparams.size+2];
-	signature.size = GMIN(data_size-vparams.size-2, sigsize);	
+	signature.size = GMIN(data_size-vparams.size-2, sigsize);
 
 	ret = _gnutls_verify_sig_params( state, &state->gnutls_internals.peer_cert, &vparams, &signature);
 	if (ret<0) {

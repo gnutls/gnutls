@@ -543,6 +543,8 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	if (state->gnutls_internals.send_buffer.size > 0) {
 		ret = _gnutls_write_flush(cd, state);
 		if (ret > 0) cipher_size = ret;
+		else cipher_size = 0;
+		
 		cipher = NULL;
 
 		retval = state->gnutls_internals.send_buffer_user_size;

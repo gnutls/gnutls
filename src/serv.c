@@ -63,7 +63,7 @@ static char http_buffer[16*1024];
 
 #define HTTP_END  "</BODY></HTML>\n\n"
 
-//#define RENEGOTIATE
+#define RENEGOTIATE
 
 /* These are global */
 SRP_SERVER_CREDENTIALS srp_cred;

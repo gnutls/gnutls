@@ -88,7 +88,6 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	username = ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username;
 	strcpy( username, state->security_parameters.extensions.srp_username);
 
-#warning GET_PWD_ENTRY_USERNAME
 	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, username, &err);
 
 	if (pwd_entry == NULL) {
@@ -249,7 +248,6 @@ int gen_srp_client_kx0(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 	
-#warning GET_USERNAME_PASSWORD
 	username = cred->username;
 	password = cred->password;
 
@@ -310,7 +308,6 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 	
-#warning GET_USERNAME_PASSWORD
 	username = cred->username;
 	password = cred->password;
 
