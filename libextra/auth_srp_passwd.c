@@ -35,6 +35,9 @@
 #include "debug.h"
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
+#include <gnutls_num.h>
+
+static int _randomize_pwd_entry(SRP_PWD_ENTRY* entry);
 
 /* this function parses tpasswd.conf file. Format is:
  * string(username):base64(v):base64(salt):int(index)
@@ -201,7 +204,7 @@ static int pwd_read_conf( const char* pconf_file, SRP_PWD_ENTRY* entry, int inde
 	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
 	            i++;
 	    }
-	    if (strncmp( indexstr, line, (i>len)?i:len) == 0) {
+	    if (strncmp( indexstr, line, GMAX(i,len)) == 0) {
 			if ((index = pwd_put_values2( entry, line)) >= 0)
 				return 0;
 			else {
@@ -219,7 +222,8 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	const gnutls_srp_server_credentials cred;
 	FILE * fd;
 	char line[2*1024];
-	uint i, len, ret;
+	uint i, len;
+	int ret;
 	int index, pwd_index = 0, last_index;
 	SRP_PWD_ENTRY* entry;
 
@@ -308,7 +312,7 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	            i++;
 	    }
 	    
-	    if (strncmp( username, line, (i>len)?i:len) == 0) {
+	    if (strncmp( username, line, GMAX(i,len)) == 0) {
 			if ((index = pwd_put_values( entry, line)) >= 0) {
 				/* Keep the last index in memory, so we can retrieve fake parameters (g,n)
 				 * when the user does not exist.
@@ -352,17 +356,22 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 /* Randomizes the given password entry. It actually sets the verifier
  * and the salt. Returns 0 on success.
  */
-#define RNDUSER "rnd"
-#define RND_SALT_SIZE 17
-int _randomize_pwd_entry(SRP_PWD_ENTRY* entry) {
-	int ret;
-	
+static int _randomize_pwd_entry(SRP_PWD_ENTRY* entry) 
+{
+char rnduser[64];
+unsigned char rndsuffix[5];
+
 	if (entry->g.size == 0 || entry->n.size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
+	
+	_gnutls_get_random( rndsuffix, sizeof(rndsuffix), GNUTLS_WEAK_RANDOM);
+	sprintf( rnduser, "__invalid%x%x%x%x", rndsuffix[0], 
+		rndsuffix[1], rndsuffix[2], rndsuffix[3]);
+	entry->salt.size = (rndsuffix[4] % 10) + 7;
 
-	entry->username = gnutls_strdup(RNDUSER);
+	entry->username = gnutls_strdup(rnduser);
 	if (entry->username == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -375,21 +384,19 @@ int _randomize_pwd_entry(SRP_PWD_ENTRY* entry) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_get_random( entry->v.data, 20, GNUTLS_WEAK_RANDOM);
+	_gnutls_get_random( entry->v.data, 20, GNUTLS_STRONG_RANDOM);
 
-	entry->salt.size = RND_SALT_SIZE;
-	
-	entry->salt.data = gnutls_malloc(RND_SALT_SIZE);
+	entry->salt.data = gnutls_malloc( entry->salt.size);
 	if (entry->salt.data==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	if (_gnutls_get_random(entry->salt.data, RND_SALT_SIZE, GNUTLS_WEAK_RANDOM) < 0) {
+	if (_gnutls_get_random(entry->salt.data, entry->salt.size, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
+
 	return 0;
 }
 
