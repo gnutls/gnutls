@@ -1860,7 +1860,8 @@ It's purpose is to connect onto a @acronym{TLS} server, perform some
 tests and print the server's capabilities. If called with the `-v'
 parameter a more checks will be performed. An example output is:
 
-@smallexample @noindent
+@exampleindent 0
+@smallexample
 crystal:/cvs/gnutls/src$ ./gnutls-cli-debug localhost -p 5556
 Resolving 'localhost'...
 Connecting to '127.0.0.1:5556'...
@@ -1898,6 +1899,7 @@ Checking for max record size (TLS extension)... yes
 Checking for SRP authentication support (TLS extension)... yes
 Checking for OpenPGP authentication support (TLS extension)... no
 @end smallexample
+@exampleindent 3
 
 @section Invoking gnutls-serv
 @anchor{Invoking gnutls-serv}
