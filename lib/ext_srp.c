@@ -20,6 +20,8 @@
 
 #include <defines.h>
 #include "gnutls_int.h"
+#include "gnutls_auth_int.h"
+#include "auth_srp.h"
 
 int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_size) {
 	if (data_size > 0) {
@@ -35,10 +37,15 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
  */
 int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 	/* this functions sends the server extension data */
+SRP_CLIENT_CREDENTIALS* cred = _gnutls_get_kx_cred( state->gnutls_key, GNUTLS_KX_SRP);
+
 	(*data) = NULL;
-	if (state->gnutls_key->username!=NULL) { /* send username */
-		(*data) = strdup( state->gnutls_key->username);
-		return strlen(state->gnutls_key->username);
+
+	if (cred==NULL) return 0;
+
+	if (cred->username!=NULL) { /* send username */
+		(*data) = strdup( cred->username);
+		return strlen( cred->username);
 	}
 	return 0;
 }

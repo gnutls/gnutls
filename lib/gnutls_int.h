@@ -156,7 +156,11 @@ typedef struct {
 	MPI				a;
 	MPI				x;
 	
-	char*				username; /* user in srp */
+	/* this is only used in server side - 
+	 * to hold the requested user - currently only in srp 
+	 */
+	char*				username;
+	
 	AUTH_CRED*			cred; /* used in srp, etc */
 } GNUTLS_KEY_A;
 typedef GNUTLS_KEY_A* GNUTLS_KEY;
