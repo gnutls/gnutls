@@ -330,11 +330,11 @@ if test x$ac_enable_openpgp = xyes; then
   )
 
 if test x$ac_enable_included_opencdk = xno;then 
-  AM_PATH_LIBOPENCDK( 0.5.2, ,
+  AM_PATH_LIBOPENCDK( 0.5.5, ,
    ac_enable_included_opencdk=yes
    AC_MSG_WARN([[
 ***
-*** libopencdk 0.5.2 was not found. You may want to get it from
+*** libopencdk 0.5.5 was not found. You may want to get it from
 *** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
 ***
 *** Will use the included opencdk.

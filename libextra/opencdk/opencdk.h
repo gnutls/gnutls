@@ -23,7 +23,7 @@
 
 #include <stdarg.h>
 
-#define OPENCDK_VERSION "0.5.4"
+#define OPENCDK_VERSION "0.5.5"
 
 #ifdef __cplusplus
 extern "C" {
@@ -266,7 +266,8 @@ enum cdk_key_flag_t {
     CDK_KEY_VALID   = 0,
     CDK_KEY_INVALID = 1, /* missing or wrong self signature */
     CDK_KEY_EXPIRED = 2,
-    CDK_KEY_REVOKED = 4
+    CDK_KEY_REVOKED = 4,
+    CDK_KEY_NOSIGNER= 8,
 };
 
 enum cdk_trust_flag_t {

@@ -29,7 +29,6 @@
 #include <gnutls_openpgp.h>
 #include <openpgp.h>
 
-
 static int
 openpgp_get_key_trust( gnutls_openpgp_trustdb trustdb, 
      gnutls_openpgp_key key, unsigned int *r_trustval )
@@ -126,9 +125,7 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
 
     if (status & CDK_KEY_INVALID) *verify |= GNUTLS_CERT_INVALID;
     if (status & CDK_KEY_REVOKED) *verify |= GNUTLS_CERT_REVOKED;
-
-    /* FIXME: CHECK HERE IF THE WAS ANY SIGNER
-     */
+    if (status & CDK_KEY_NOSIGNER) *verify |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
     return 0;
 }

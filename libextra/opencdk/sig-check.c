@@ -1,6 +1,5 @@
-/* -*- Mode: C; c-file-style: "bsd" -*-
- * sig-check.c - Check signatures
- *        Copyright (C) 2001, 2002, 2003 Timo Schulz
+/* sig-check.c - Check signatures
+ *        Copyright (C) 2001, 2002, 2003, 2004 Timo Schulz
  *        Copyright (C) 1998,1999,2000,2001,2002 Free Software Foundation, Inc.
  *
  * This file is part of OpenCDK.
@@ -202,8 +201,10 @@ _cdk_sig_check( cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
     if( sig->flags.checked )
         return sig->flags.valid ? 0 : CDK_Bad_Sig;
 
-    if( !KEY_CAN_SIGN( pk->pubkey_algo ) )
+    if( !KEY_CAN_SIGN( pk->pubkey_algo ) ) {
+        _cdk_log_debug ("pk algo `%d´ is not useable for signing.\n", pk->pubkey_algo);
         return CDK_Inv_Algo;
+    }
     if( pk->timestamp > sig->timestamp || pk->timestamp > cur_time )
         return CDK_Time_Conflict;
 
@@ -226,7 +227,8 @@ _cdk_sig_check( cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
 
 
 int
-_cdk_pk_check_sig( cdk_keydb_hd_t hd, cdk_kbnode_t knode, cdk_kbnode_t snode )
+_cdk_pk_check_sig (cdk_keydb_hd_t hd, cdk_kbnode_t knode, cdk_kbnode_t snode,
+                   int * is_selfsig)
 {
     cdk_md_hd_t md;
     cdk_pkt_pubkey_t pk = NULL, sig_pk = NULL;
@@ -238,6 +240,8 @@ _cdk_pk_check_sig( cdk_keydb_hd_t hd, cdk_kbnode_t knode, cdk_kbnode_t snode )
     if( !knode || !snode )
         return CDK_Inv_Value;
 
+    if (is_selfsig)
+        *is_selfsig = 0;
     if( knode->pkt->pkttype != CDK_PKT_PUBLIC_KEY
         || snode->pkt->pkttype != CDK_PKT_SIGNATURE )
         return CDK_Inv_Value;
@@ -284,18 +288,21 @@ _cdk_pk_check_sig( cdk_keydb_hd_t hd, cdk_kbnode_t knode, cdk_kbnode_t snode )
             goto fail;
         }
         cdk_kbnode_hash( knode, md, 0, 0, 0 );
-        cdk_kbnode_hash( node, md, sig->version==4, 0, 0 );
-        if( pk->keyid[0] == sig->keyid[0] && pk->keyid[1] == sig->keyid[1] )
-            rc = _cdk_sig_check( pk, sig, md, &is_expired );
-        else if( hd ) {
-            rc = cdk_keydb_get_pk( hd, sig->keyid, &sig_pk );
+        cdk_kbnode_hash( node, md, sig->version == 4, 0, 0 );
+        if (pk->keyid[0] == sig->keyid[0] && pk->keyid[1] == sig->keyid[1]) {
+            rc = _cdk_sig_check (pk, sig, md, &is_expired);
+            if (is_selfsig)
+                *is_selfsig = 1;
+        }
+        else if (hd) {
+            rc = cdk_keydb_get_pk (hd, sig->keyid, &sig_pk);
             if( !rc )
-                rc = _cdk_sig_check( sig_pk, sig, md, &is_expired );
-            _cdk_free_pubkey( sig_pk );
+                rc = _cdk_sig_check (sig_pk, sig, md, &is_expired);
+            _cdk_free_pubkey (sig_pk);
 	}
     }
  fail:
-    cdk_md_close( md );
+    cdk_md_close (md);
     return rc;
 }
 
@@ -316,7 +323,8 @@ cdk_pk_check_sigs( cdk_kbnode_t knode, cdk_keydb_hd_t hd, int * r_status )
     cdk_pkt_signature_t sig = NULL;
     cdk_kbnode_t k;
     u32 keyid = 0;
-    int key_status = 0;
+    int key_status = 0, is_selfsig = 0;
+    int no_signer = 0, n_sigs = 0;
     int rc = 0;
 
     if( !knode || !r_status )
@@ -339,20 +347,28 @@ cdk_pk_check_sigs( cdk_kbnode_t knode, cdk_keydb_hd_t hd, int * r_status )
         if( k->pkt->pkttype != CDK_PKT_SIGNATURE )
             continue;
         sig = k->pkt->pkt.signature;
-        rc = _cdk_pk_check_sig( hd, knode, k );
-        if( rc && IS_UID_SIG( sig ) && rc == CDK_Error_No_Key ) {
-            sig->flags.missing_key = 1;
-            continue;
+        rc = _cdk_pk_check_sig (hd, knode, k, &is_selfsig);
+        if (IS_UID_SIG (sig)) {
+            if (is_selfsig == 0)
+                n_sigs++;
+            if (rc && rc == CDK_Error_No_Key) {
+                sig->flags.missing_key = 1;
+                no_signer++;
+                continue;
+            }
         }
-        else if( rc && rc != CDK_Error_No_Key ) {
+        else if (rc && rc != CDK_Error_No_Key) {
             *r_status = CDK_KEY_INVALID;
+            rc = 0;
             break; /* invalid self signature or key signature */
         }
         _cdk_log_debug( "signature %s: signer %08lX keyid %08lX\n",
                         rc==CDK_Bad_Sig? "BAD" : "good", sig->keyid[1],
                         keyid );
     }
+    if (n_sigs == no_signer)
+        *r_status |= CDK_KEY_NOSIGNER;
     if( !rc || rc == CDK_Error_No_Key )
-        *r_status = CDK_KEY_VALID;
+        *r_status |= CDK_KEY_VALID;
     return rc;
 }

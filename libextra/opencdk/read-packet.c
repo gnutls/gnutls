@@ -1,5 +1,4 @@
-/* -*- Mode: C; c-file-style: "bsd" -*-
- * read-packet.c - Read OpenPGP packets
+/* read-packet.c - Read OpenPGP packets
  *        Copyright (C) 2001, 2002, 2003 Timo Schulz 
  *
  * This file is part of OpenCDK.
@@ -585,13 +584,15 @@ read_user_id( cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t user_id )
         return CDK_Inv_Packet;
   
     if (DEBUG_PKT)
-        _cdk_log_debug ("** read user ID packet\n");
+        _cdk_log_debug ("** read user ID packet: ");
 
     user_id->len = pktlen;
     rc = stream_read( inp, user_id->name, pktlen, &nread );
     if( !rc && nread != pktlen )
         return CDK_Inv_Packet;
     user_id->name[nread] = '\0';
+    if (DEBUG_PKT)
+        _cdk_log_debug ("%s\n", user_id->name);
     return rc;
 }
 
