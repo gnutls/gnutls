@@ -10,7 +10,7 @@ dnl $id$
 dnl AM_PATH_LIBOPENCDK([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
 dnl Test for libopencdk, and define CDK_CFLAGS and CDK_LIBS
 dnl
-AC_DEFUN(AM_PATH_LIBOPENCDK,
+AC_DEFUN([AM_PATH_LIBOPENCDK],
 [dnl
 dnl Get the cflags and libraries from the opencdk-config script
 dnl

@@ -35,7 +35,8 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_sig.h gnutls_mem.h gnutls_ui.h \
 	io_debug.h ext_max_record.h gnutls_session_pack.h \
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h \
-	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h auth_dh_common.h
+	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h auth_dh_common.h \
+	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h 
 lib_LTLIBRARIES = libgnutls.la
 
 X509_COBJECTS = x509/crl.c x509/dn.c x509/common.c x509/x509.c x509/extensions.c \
@@ -43,6 +44,9 @@ X509_COBJECTS = x509/crl.c x509/dn.c x509/common.c x509/x509.c x509/extensions.c
 	x509/privkey.c x509/pkcs7.c x509/crq.c x509/xml.c x509/sign.c x509/pkcs5.c \
 	x509/privkey_pkcs8.c x509/pkcs12.c x509/pkcs12_bag.c x509/pkcs12_encr.c \
 	x509/x509_write.c x509/crl_write.c x509/compat.c
+
+SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c \
+	auth_srp_sb64.c auth_srp_rsa.c
 
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
@@ -63,7 +67,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 
 # Separate so we can create the documentation
 
-libgnutls_la_SOURCES = $(COBJECTS) $(X509_COBJECTS) $(MINITASN1_COBJECTS)
+libgnutls_la_SOURCES = $(COBJECTS) $(X509_COBJECTS) $(MINITASN1_COBJECTS) $(SRP_COBJECTS)
 
 libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
 	$(libgnutls_version_script_cmd) \

@@ -22,102 +22,11 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
-#include <ext_srp.h>
 #include <gnutls_openpgp.h>
 #include <gnutls_extra.h>
 #include <gnutls_algorithms.h>
 #ifdef USE_LZO
 # include <minilzo.h>
-#endif
-
-extern gnutls_extension_entry _gnutls_extensions[];
-extern const int _gnutls_extensions_size;
-
-extern const int _gnutls_kx_algorithms_size;
-extern gnutls_kx_algo_entry _gnutls_kx_algorithms[];
-
-#define TOSTR(x) #x
-
-#ifdef ENABLE_SRP
-static int _gnutls_add_srp_extension(void)
-{
-    int i;
-
-    /* find the last element */
-    for (i = 0; i < _gnutls_extensions_size; i++) {
-	if (_gnutls_extensions[i].name == NULL)
-	    break;
-    }
-
-    if (_gnutls_extensions[i].name == NULL
-	&& (i < _gnutls_extensions_size - 1)) {
-	_gnutls_extensions[i].name = TOSTR(GNUTLS_EXTENSION_SRP);
-	_gnutls_extensions[i].type = GNUTLS_EXTENSION_SRP;
-	_gnutls_extensions[i].gnutls_ext_func_recv =
-	    _gnutls_srp_recv_params;
-	_gnutls_extensions[i].gnutls_ext_func_send =
-	    _gnutls_srp_send_params;
-
-	_gnutls_extensions[i + 1].name = 0;
-
-	return 0;		/* ok */
-    }
-
-    return GNUTLS_E_MEMORY_ERROR;
-}
-
-extern mod_auth_st srp_auth_struct;
-extern mod_auth_st srp_rsa_auth_struct;
-extern mod_auth_st srp_dss_auth_struct;
-
-
-static int _gnutls_add_srp_auth_struct(void)
-{
-    int i;
-
-    /* find the last element */
-    for (i = 0; i < _gnutls_kx_algorithms_size; i++) {
-	if (_gnutls_kx_algorithms[i].name == NULL)
-	    break;
-    }
-
-    if (_gnutls_kx_algorithms[i].name == NULL
-	&& (i < _gnutls_kx_algorithms_size - 1)) {
-	_gnutls_kx_algorithms[i].name = "SRP";
-	_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP;
-	_gnutls_kx_algorithms[i].auth_struct = &srp_auth_struct;
-	_gnutls_kx_algorithms[i].needs_dh_params = 0;
-	_gnutls_kx_algorithms[i].needs_rsa_params = 0;
-	_gnutls_kx_algorithms[i + 1].name = 0;
-    }
-    i++;
-
-    if (_gnutls_kx_algorithms[i].name == NULL
-	&& (i < _gnutls_kx_algorithms_size - 1)) {
-	_gnutls_kx_algorithms[i].name = "SRP RSA";
-	_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP_RSA;
-	_gnutls_kx_algorithms[i].auth_struct = &srp_rsa_auth_struct;
-	_gnutls_kx_algorithms[i].needs_dh_params = 0;
-	_gnutls_kx_algorithms[i].needs_rsa_params = 0;
-	_gnutls_kx_algorithms[i + 1].name = 0;
-    }
-    i++;
-
-    if (_gnutls_kx_algorithms[i].name == NULL
-	&& (i < _gnutls_kx_algorithms_size - 1)) {
-	_gnutls_kx_algorithms[i].name = "SRP DSS";
-	_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP_DSS;
-	_gnutls_kx_algorithms[i].auth_struct = &srp_dss_auth_struct;
-	_gnutls_kx_algorithms[i].needs_dh_params = 0;
-	_gnutls_kx_algorithms[i].needs_rsa_params = 0;
-	_gnutls_kx_algorithms[i + 1].name = 0;
-
-	return 0;		/* ok */
-    }
-
-    return GNUTLS_E_MEMORY_ERROR;
-}
-
 #endif
 
 
@@ -246,25 +155,6 @@ int gnutls_global_init_extra(void)
      * methods.
      */
     ret = _gnutls_add_lzo_comp();
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
-    }
-#endif
-
-#ifdef ENABLE_SRP
-    /* Add the SRP authentication to the list of authentication
-     * methods.
-     */
-    ret = _gnutls_add_srp_auth_struct();
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
-    }
-
-    /* Do the same of the extension
-     */
-    ret = _gnutls_add_srp_extension();
     if (ret < 0) {
 	gnutls_assert();
 	return ret;

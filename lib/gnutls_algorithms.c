@@ -217,6 +217,9 @@ extern mod_auth_st rsa_export_auth_struct;
 extern mod_auth_st dhe_rsa_auth_struct;
 extern mod_auth_st dhe_dss_auth_struct;
 extern mod_auth_st anon_auth_struct;
+extern mod_auth_st srp_auth_struct;
+extern mod_auth_st srp_rsa_auth_struct;
+extern mod_auth_st srp_dss_auth_struct;
 
 
 #define MAX_KX_ALGOS 10
@@ -230,6 +233,10 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
     {"RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0, 1},
     {"DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
     {"DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
+
+    {"SRP DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, 0},
+    {"SRP RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, 0},
+    {"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0, 0},
     /* other algorithms are appended here by gnutls-extra
      * initialization function.
      */

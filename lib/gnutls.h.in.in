@@ -497,3 +497,52 @@ void gnutls_openpgp_send_key(gnutls_session_t session, gnutls_openpgp_key_status
 int gnutls_fingerprint(gnutls_digest_algorithm_t algo, const gnutls_datum_t* data, 
     void* result, size_t* result_size);
 
+
+/* SRP 
+ */
+
+typedef struct DSTRUCT* gnutls_srp_server_credentials_t;
+typedef struct DSTRUCT* gnutls_srp_client_credentials_t;
+
+void gnutls_srp_free_client_credentials( gnutls_srp_client_credentials_t sc);
+int gnutls_srp_allocate_client_credentials( gnutls_srp_client_credentials_t *sc);
+int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials_t res, char *username, char* password);
+
+void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials_t sc);
+int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials_t *sc);
+int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials_t res, 
+    const char *password_file, const char* password_conf_file);
+
+const char* gnutls_srp_server_get_username( gnutls_session_t state);
+
+int gnutls_srp_verifier( const char* username, const char* password, const gnutls_datum_t *salt, 
+    const gnutls_datum_t* g, const gnutls_datum_t* n, 
+    gnutls_datum_t * res);
+
+/* The static parameters defined in draft-ietf-tls-srp-05
+ * Those should be used as input to gnutls_srp_verifier().
+ */
+extern const gnutls_datum_t gnutls_srp_2048_group_prime;
+extern const gnutls_datum_t gnutls_srp_2048_group_generator;
+
+extern const gnutls_datum_t gnutls_srp_1536_group_prime;
+extern const gnutls_datum_t gnutls_srp_1536_group_generator;
+
+extern const gnutls_datum_t gnutls_srp_1024_group_prime;
+extern const gnutls_datum_t gnutls_srp_1024_group_generator;
+
+typedef int gnutls_srp_server_credentials_function(
+    gnutls_session_t, 
+    const char* username, gnutls_datum_t* salt, 
+    gnutls_datum_t* verifier, gnutls_datum_t* generator,
+    gnutls_datum_t* prime
+);
+void gnutls_srp_set_server_credentials_function( 
+    gnutls_srp_server_credentials_t, 
+    gnutls_srp_server_credentials_function *);
+
+typedef int gnutls_srp_client_credentials_function(gnutls_session_t, unsigned int,
+    char **, char**);
+void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials_t, 
+    gnutls_srp_client_credentials_function *);
+
