@@ -81,6 +81,7 @@ static gnutls_error_entry error_algorithms[] = {
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_X509_KEY_USAGE_VIOLATION, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_AGAIN, 0),
+	GNUTLS_ERROR_ENTRY( GNUTLS_E_INTERRUPTED, 0),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_REHANDSHAKE, 0),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_GOT_APPLICATION_DATA, 0),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_DB_ERROR, 1),
@@ -100,7 +101,7 @@ static gnutls_error_entry error_algorithms[] = {
 
 /**
   * gnutls_is_fatal_error - Returns non-zero in case of a fatal error
-  * @error: is an error returned by a gnutls function. Error is always a negative value.
+  * @error: is an error returned by a gnutls function. Error should be a negative value.
   *
   * If a function returns a negative value you may feed that value
   * to this function to see if it is fatal. Returns 1 for a fatal 

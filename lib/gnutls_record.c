@@ -585,7 +585,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 * must be set to non blocking mode
 	 */
 	if ( (ret = _gnutls_read_buffered(cd, state, &headers, header_size, flags, -1)) != header_size) {
-		if (ret==GNUTLS_E_AGAIN) return ret;
+		if (ret<0 && gnutls_is_fatal_error(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) {
@@ -666,7 +666,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* check if we have that data into buffer. 
  	 */
 	if ( (ret = _gnutls_read_buffered(cd, state, &recv_data, header_size+length, flags, recv_type)) != length+header_size) {
-		if (ret==GNUTLS_E_AGAIN) return ret;
+		if (ret<0 && gnutls_is_fatal_error(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
@@ -1002,6 +1002,10 @@ ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, const void *data, size_t size
   * The only acceptable flag is currently MSG_DONTWAIT. In that case,
   * if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
   * if there are no data in the socket. 
+  *
+  * If the recv() operation is interrupted then GNUTLS_E_INTERRUPTED, will be
+  * returned.
+  *
   * Returns the number of bytes received, zero on EOF, or
   * a negative error code.
   **/

@@ -1,6 +1,8 @@
 Version 0.3.0
 - AUTH_INFO types and structures were moved to library internals
 - AUTH_FAILED is no longer returned in SRP (any fatal error in SRP means auth failed)
+- Introduced GNUTLS_E_INTERRUPTED
+- Added support for Non blocking IO
 
 Version 0.2.4 (12/10/2001)
 - Better handling of X.509 certificate extensions

@@ -156,9 +156,10 @@ static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 	while (left > 0) {
 		i = _gnutls_recv_func(fd, &ptr[i], left, flag);
 		if (i < 0) {
-			if (errno == EAGAIN)
-				return GNUTLS_E_AGAIN;
-			else 
+			if (errno == EAGAIN || errno == EINTR) {
+				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
+				else return GNUTLS_E_INTERRUPTED;
+			} else 
 				return GNUTLS_E_UNKNOWN_ERROR;
 		} else {
 			if (i == 0)
@@ -266,14 +267,14 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 */
 	if ( sizeOfPtr - recvlowat > 0) {
 		ret = _gnutls_Read( fd, &buf[min], sizeOfPtr - recvlowat, flag);
-		if (ret==GNUTLS_E_AGAIN) 
+		if (ret < 0 && gnutls_is_fatal_error(ret)==0) 
 			return ret;
 	}
 
 	if (ret >= 0 && recvlowat > 0) {
 		ret2 = _gnutls_Read( fd, &buf[min+ret], recvlowat, MSG_PEEK|flag);
 
-		if (ret2==GNUTLS_E_AGAIN) 
+		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) 
 			return ret2;
 
 		if (ret2 > 0)
