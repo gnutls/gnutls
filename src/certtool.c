@@ -8,6 +8,7 @@
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
 
+void pkcs12_info( void);
 void generate_pkcs12( void);
 void verify_chain(void);
 gnutls_x509_privkey load_private_key(void);
@@ -25,7 +26,7 @@ static gaainfo info;
 FILE* outfile;
 FILE* infile;
 int in_cert_format;
-int out_cert_format = GNUTLS_X509_FMT_PEM;
+int out_cert_format;
 
 static unsigned char buffer[50*1024];
 static const int buffer_size = sizeof(buffer);
@@ -172,7 +173,7 @@ int size, ret;
 
 	if (!info.pkcs8) {
 		size = sizeof(buffer);
-		ret = gnutls_x509_privkey_export( key, out_cert_format, buffer, &size);	
+		ret = gnutls_x509_privkey_export( key, out_cert_format, buffer, &size);
 		if (ret < 0) {
 			fprintf(stderr, "privkey_export: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -186,7 +187,7 @@ int size, ret;
 		}
 	}
 
-	fprintf(outfile,"Private key: \n%s\n", buffer);
+	fwrite(buffer, 1, size, outfile);
 }
 
 void generate_private_key( void)
@@ -220,12 +221,12 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 
 
 	crq = load_request();
-	
+
 	if (crq == NULL) {
 		fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
 		"Just press enter to ignore a field.\n");
 
-		key = generate_private_key_int();
+		key = load_private_key();
 
 		read_crt_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
 		read_crt_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
@@ -347,7 +348,7 @@ gnutls_x509_crt update_certificate( void)
 		fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
-	
+
 	return crt;
 
 }
@@ -372,8 +373,6 @@ void generate_self_signed( void)
 		exit(1);
 	}
 
-	print_private_key( key);
-
 	size = sizeof(buffer);
 	result = gnutls_x509_crt_export( crt, out_cert_format, buffer, &size);	
 	if (result < 0) {
@@ -381,12 +380,10 @@ void generate_self_signed( void)
 		exit(1);
 	}
 
-	fprintf(outfile, "Certificate: \n%s", buffer);
-
+	fwrite( buffer, 1, size, outfile);
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
-	fclose(outfile);
 }
 
 void generate_signed_certificate( void)
@@ -412,8 +409,6 @@ void generate_signed_certificate( void)
 		exit(1);
 	}
 
-	print_private_key( key);
-
 	size = sizeof(buffer);
 	result = gnutls_x509_crt_export( crt, out_cert_format, buffer, &size);	
 	if (result < 0) {
@@ -421,7 +416,7 @@ void generate_signed_certificate( void)
 		exit(1);
 	}
 
-	fprintf(outfile, "Certificate: \n%s", buffer);
+	fwrite( buffer, 1, size, outfile);
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
@@ -456,7 +451,7 @@ void update_signed_certificate( void)
 		exit(1);
 	}
 
-	fprintf(outfile, "Certificate: \n%s", buffer);
+	fwrite( buffer, 1, size, outfile);
 
 	gnutls_x509_crt_deinit(crt);
 }
@@ -487,6 +482,9 @@ void gaa_parser(int argc, char **argv)
 	
 	if (info.incert_format) in_cert_format = GNUTLS_X509_FMT_DER;
 	else in_cert_format = GNUTLS_X509_FMT_PEM;
+
+	if (info.outcert_format) out_cert_format = GNUTLS_X509_FMT_DER;
+	else out_cert_format = GNUTLS_X509_FMT_PEM;
 
 	gnutls_global_init();
 	gnutls_global_set_log_function( tls_log_func);
@@ -519,6 +517,9 @@ void gaa_parser(int argc, char **argv)
 			break;
 		case 8:
 			generate_pkcs12();
+			break;
+		case 9:
+			pkcs12_info();
 			break;
 	}
 	fclose(outfile);
@@ -1059,9 +1060,6 @@ void generate_request(void)
 		exit(1);
 	}
 
-
-	print_private_key( key);
-
 	size = sizeof(buffer);	
 	ret = gnutls_x509_crq_export( crq, out_cert_format, buffer, &size);	
 	if (ret < 0) {
@@ -1069,7 +1067,7 @@ void generate_request(void)
 		exit(1);
 	}
 
-	fprintf(outfile, "Request: \n%s", buffer);
+	fwrite( buffer, 1, size, outfile);
 
 	gnutls_x509_crq_deinit(crq);
 	gnutls_x509_privkey_deinit(key);
@@ -1266,11 +1264,6 @@ void generate_pkcs12( void)
 	
 	fprintf(stderr, "Generating a PKCS #12 structure...\n");
 	
-	if (outfile == stdout) {
-		fprintf(stderr, "Sorry, will not output DER data to stdout.\n");
-		exit(1);
-	}
-	
 	key = load_private_key();
 	crt = load_cert();
 	
@@ -1370,12 +1363,6 @@ void generate_pkcs12( void)
 		exit(1);
 	}
 
-	result = gnutls_pkcs12_bag_encrypt( kbag, password, 0);
-	if (result < 0) {
-		fprintf(stderr, "bag_encrypt: %s\n", gnutls_strerror(result));
-		exit(1);
-	}
-
 	/* write the PKCS #12 structure.
 	 */
 	result = gnutls_pkcs12_init(&pkcs12);
@@ -1403,7 +1390,7 @@ void generate_pkcs12( void)
 	}
 
 	size = sizeof(buffer);
-	result = gnutls_pkcs12_export( pkcs12, GNUTLS_X509_FMT_DER, buffer, &size);
+	result = gnutls_pkcs12_export( pkcs12, out_cert_format, buffer, &size);
 	if (result < 0) {
 		fprintf(stderr, "pkcs12_export: %s\n", gnutls_strerror(result));
 		exit(1);
@@ -1412,3 +1399,181 @@ void generate_pkcs12( void)
 	fwrite( buffer, 1, size, outfile);
 	
 }
+
+const char* BAGTYPE( gnutls_pkcs12_bag_type x)
+{
+	switch (x) {
+		case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY:
+			return "PKCS #8 Encrypted key";
+		case GNUTLS_BAG_EMPTY:
+			return "Empty";
+		case GNUTLS_BAG_PKCS8_KEY:
+			return "PKCS #8 Key";
+		case GNUTLS_BAG_CERTIFICATE:
+			return "Certificate";
+		case GNUTLS_BAG_ENCRYPTED:
+			return "Encrypted";
+		case GNUTLS_BAG_CRL:
+			return "CRL";
+		default:
+			return "Unknown";
+	}
+}
+
+void print_bag_data(gnutls_pkcs12_bag bag)
+{
+int result;
+int count, i, type;
+gnutls_datum data;
+const char* str;
+gnutls_datum out;
+
+	count = gnutls_pkcs12_bag_get_count( bag);
+	if (count < 0) {
+		fprintf(stderr, "get_count: %s\n", gnutls_strerror(count));
+		exit(1);
+	}
+	
+	for (i=0;i<count;i++) {
+		type = gnutls_pkcs12_bag_get_type( bag, i);
+		if (type < 0) {
+			fprintf(stderr, "get_type: %s\n", gnutls_strerror(type));
+			exit(1);
+		}
+		
+		fprintf( stderr, "\tType: %s\n", BAGTYPE( type));
+		
+		result = gnutls_pkcs12_bag_get_data( bag, i, &data);
+		if (result < 0) {
+			fprintf(stderr, "get_data: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+		
+		switch (type) {
+		case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY:
+			str = "ENCRYPTED PRIVATE KEY";
+			break;
+		case GNUTLS_BAG_PKCS8_KEY:
+			str = "PRIVATE KEY";
+			break;
+		case GNUTLS_BAG_CERTIFICATE:
+			str = "CERTIFICATE";
+			break;
+		case GNUTLS_BAG_CRL:
+			str = "CRL";
+			break;
+		case GNUTLS_BAG_ENCRYPTED:
+		case GNUTLS_BAG_EMPTY:
+		default:
+			str = NULL;
+		}		
+	
+		if (str != NULL) {
+			gnutls_pem_base64_encode_alloc( str, &data, &out);
+			fprintf( stderr, "%s\n", out.data);
+		
+			gnutls_free(out.data);
+		}
+	
+	}
+}
+
+void pkcs12_info( void)
+{
+	gnutls_pkcs12 pkcs12;
+	gnutls_pkcs12_bag bag;
+	int result, ret;
+	size_t size;
+	gnutls_datum data;
+	char* password;
+	int index;
+	
+	size = fread( buffer, 1, sizeof(buffer)-1, infile);
+	buffer[size] = 0;
+	
+	data.data = buffer;
+	data.size = size;
+
+	password = getpass( "Enter password: ");
+	
+	result = gnutls_pkcs12_init(&pkcs12);
+	if (result < 0) {
+		fprintf(stderr, "p12_init: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	result = gnutls_pkcs12_import( pkcs12, &data, in_cert_format, 0);
+	if (result < 0) {
+		fprintf(stderr, "p12_import: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	result = gnutls_pkcs12_verify_mac( pkcs12, password);
+	if (result < 0) {
+		fprintf(stderr, "verify_mac: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+
+
+	index = 0;
+
+	do {
+		result = gnutls_pkcs12_bag_init( &bag);
+		if (result < 0) {
+			fprintf(stderr, "bag_init: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+
+		ret = gnutls_pkcs12_get_bag( pkcs12, index, bag);
+		if (ret < 0) {
+			break;
+		}
+		
+		result = gnutls_pkcs12_bag_get_count( bag);
+		if (result < 0) {
+			fprintf(stderr, "bag_init: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+	
+		fprintf( stderr, "BAG #%d\n", index);
+		fprintf( stderr, "\tElements: %d\n", result);
+		
+		result = gnutls_pkcs12_bag_get_type( bag, 0);
+		if (result < 0) {
+			fprintf(stderr, "bag_init: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+
+		
+		if (result == GNUTLS_BAG_ENCRYPTED) {
+			fprintf( stderr, "\tType: %s\n", BAGTYPE( result));
+			fprintf( stderr, "\n\tDecrypting...\n");
+
+			result = gnutls_pkcs12_bag_decrypt( bag, password);
+
+			if (result < 0) {
+				fprintf(stderr, "bag_decrypt: %s\n", gnutls_strerror(result));
+				exit(1);
+			}
+
+			result = gnutls_pkcs12_bag_get_count( bag);
+			if (result < 0) {
+				fprintf(stderr, "get_count: %s\n", gnutls_strerror(result));
+				exit(1);
+			}
+	
+			fprintf( stderr, "\tElements: %d\n", result);
+		
+		}
+
+		print_bag_data( bag);
+		
+		gnutls_pkcs12_bag_deinit(bag);
+		
+		index++;
+	} while( ret == 0);
+
+	
+}
+

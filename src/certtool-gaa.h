@@ -8,17 +8,19 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 52 "certtool.gaa"
+#line 57 "certtool.gaa"
 	int debug;
-#line 49 "certtool.gaa"
+#line 54 "certtool.gaa"
 	char *infile;
-#line 46 "certtool.gaa"
+#line 51 "certtool.gaa"
 	char *outfile;
-#line 43 "certtool.gaa"
+#line 48 "certtool.gaa"
 	int bits;
-#line 40 "certtool.gaa"
+#line 45 "certtool.gaa"
+	int outcert_format;
+#line 42 "certtool.gaa"
 	int incert_format;
-#line 37 "certtool.gaa"
+#line 39 "certtool.gaa"
 	int pkcs8;
 #line 28 "certtool.gaa"
 	char *ca;
