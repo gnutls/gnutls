@@ -9,9 +9,8 @@ option (v, verbose) { $more_info = 1 } "More verbose output"
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 
-#int nrest_args;
-#char **rest_args;
-rest *STR "hostname" { $rest_args = $1; $nrest_args = @1 }
+#char *rest_args;
+rest STR "hostname" { $rest_args = $1; }
 
-init { $rest_args=NULL; $nrest_args=0; $pp = 443; $more_info = 0; }
+init { $rest_args=NULL; $pp = 443; $more_info = 0; }
 

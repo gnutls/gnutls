@@ -134,10 +134,8 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 13 "tls_test.gaa"
-	char **rest_args;
 #line 12 "tls_test.gaa"
-	int nrest_args;
+	char *rest_args;
 #line 6 "tls_test.gaa"
 	int more_info;
 #line 3 "tls_test.gaa"
@@ -395,7 +393,7 @@ struct GAAOPTION_port
 
 struct GAAREST
 {
-	char** arg1;
+	char* arg1;
 	int size1;
 };
          
@@ -498,9 +496,11 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		return GAA_OK;
 		break;
 	case GAA_REST:
-		GAA_LIST_FILL(GAAREST_tmp.arg1, gaa_getstr, char*, GAAREST_tmp.size1);
-#line 14 "tls_test.gaa"
-{ gaaval->rest_args = GAAREST_tmp.arg1; gaaval->nrest_args = GAAREST_tmp.size1 ;};
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAAREST_tmp.arg1, gaa_getstr, GAAREST_tmp.size1);
+		gaa_index++;
+#line 13 "tls_test.gaa"
+{ gaaval->rest_args = GAAREST_tmp.arg1; ;};
 
 		return GAA_OK;
 		break;
@@ -528,8 +528,8 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 16 "tls_test.gaa"
-{ gaaval->rest_args=NULL; gaaval->nrest_args=0; gaaval->pp = 443; gaaval->more_info = 0; ;};
+#line 15 "tls_test.gaa"
+{ gaaval->rest_args=NULL; gaaval->pp = 443; gaaval->more_info = 0; ;};
 
     }
     inited = 1;

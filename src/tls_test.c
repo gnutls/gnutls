@@ -217,8 +217,8 @@ void gaa_parser(int argc, char **argv)
 	}
 
 	port = info.pp;
-	if (info.nrest_args==0) hostname="localhost";
-	else hostname = info.rest_args[0];
+	if (info.rest_args==NULL) hostname="localhost";
+	else hostname = info.rest_args;
 
 	more_info = info.more_info;
 	
