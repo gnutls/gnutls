@@ -527,6 +527,9 @@ int proc_rsa_server_certificate(GNUTLS_STATE state, opaque * data, int data_size
 	verify = gnutls_verify_certificate(peer_certificate_list, peer_certificate_list_size,
 				     cred->ca_list, cred->ncas, NULL, 0);
 
+	/* keep the PK algorithm */
+	state->gnutls_internals.peer_pk_algorithm = peer_certificate_list[0].subject_pk_algorithm;
+
 	_gnutls_copy_x509_client_auth_info(info, &peer_certificate_list[0], verify);
 
 	/* This works for the client
@@ -819,8 +822,41 @@ int gen_rsa_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 
 int proc_rsa_client_cert_vrfy(GNUTLS_STATE state, opaque * data, int data_size)
 {
-	#warning "CHECK THE CERT VERIFY MESSAGE"
+int size, ret;
+int dsize = data_size;
+opaque* pdata = data;
+gnutls_cert cert;
+gnutls_datum sig;
+
+	DECR_LEN(dsize, 2);
+	size = READuint16( pdata);
+	pdata += 2;
+
+	if ( size < data_size - 2) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+
+	sig.data = pdata;
+	sig.size = size;
 	
+	cert.params = gnutls_malloc( 2*sizeof(MPI));
+	if (cert.params==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	cert.params[0] = state->gnutls_key->x;
+	cert.params[1] = state->gnutls_key->a;
+	cert.subject_pk_algorithm = state->gnutls_internals.peer_pk_algorithm;
+
+	if ( (ret=_gnutls_verify_sig( state, &cert, &sig, data_size+HANDSHAKE_HEADER_SIZE))<0) {
+		gnutls_assert();
+		gnutls_free( cert.params);
+		return ret;
+	}
+
+	gnutls_free( cert.params);
+
 	return 0;
 }
 

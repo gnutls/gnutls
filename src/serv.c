@@ -105,18 +105,29 @@ GNUTLS_STATE initialize_state()
 
 	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
-	gnutls_set_certificate_request( state, GNUTLS_CERT_REQUIRE);
+	gnutls_set_certificate_request( state, GNUTLS_CERT_REQUEST);
 
 	return state;
 }
+
+#define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
+#define PRINT_DN(X) PRINTX( "CN:", X->common_name); \
+	PRINTX( "OU:", X->organizational_unit_name); \
+	PRINTX( "O:", X->organization); \
+	PRINTX( "L:", X->locality_name); \
+	PRINTX( "S:", X->state_or_province_name); \
+	PRINTX( "C:", X->country); \
+	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_alt_name(x509_info))
 
 void print_info(GNUTLS_STATE state)
 {
 	SRP_SERVER_AUTH_INFO srp_info;
 	ANON_SERVER_AUTH_INFO dh_info;
+	X509PKI_SERVER_AUTH_INFO x509_info;
 	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
+	const gnutls_DN* dn;
 	
 	/* print session_id specific data */
 	gnutls_get_current_session_id( state, sesid, &sesid_size);
@@ -143,6 +154,39 @@ void print_info(GNUTLS_STATE state)
 			printf("\n- Anonymous DH using prime of %d bits\n",
 			        gnutls_anon_server_get_dh_bits(dh_info));
 	}
+
+	if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
+		x509_info = gnutls_get_auth_info(state);
+		if (x509_info != NULL) {
+			switch( gnutls_x509pki_client_get_peer_certificate_status(x509_info)) {
+			case GNUTLS_CERT_NOT_TRUSTED:
+				printf("- Peer's X509 Certificate was NOT verified\n");
+				break;
+			case GNUTLS_CERT_EXPIRED:
+				printf("- Peer's X509 Certificate was verified but is expired\n");
+				break;
+			case GNUTLS_CERT_TRUSTED:
+				printf("- Peer's X509 Certificate was verified\n");
+				break;
+			case GNUTLS_CERT_INVALID:
+			default:
+				printf("- Peer's X509 Certificate was invalid\n");
+				break;
+
+			}
+
+			printf(" - Certificate info:\n");
+			printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
+
+			dn = gnutls_x509pki_client_get_peer_dn( x509_info);
+			PRINT_DN( dn);
+
+			dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
+			printf(" - Certificate Issuer's info:\n");
+			PRINT_DN( dn);
+		}
+	}
+
 
 	/* print state information */
 

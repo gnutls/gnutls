@@ -30,9 +30,9 @@
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
 #define RECORD_DEBUG
-#define HANDSHAKE_DEBUG*/
+#define HANDSHAKE_DEBUG
 #define DEBUG
-
+*/
 
 #define SOCKET int
 #define LIST ...
@@ -348,6 +348,7 @@ typedef struct {
 	 * supports it.
 	 */
 	int				send_cert_req;
+	int				peer_pk_algorithm;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

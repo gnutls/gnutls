@@ -1,8 +1,9 @@
-Version 0.2.0
+Version 0.2.0 (07/08/2001)
 - Partial support for X509v3 Certificate extensions.
 - Added Internal memory handlers
 - Removed gnutls_x509_set_cn()
 - Added X509 client authentication
+- Several bug fixes and protocol fixes
 
 Version 0.1.9 (30/07/2001)
 - Corrected bug(s) in ChangeCipherSpec packet (fixes renegotiate)

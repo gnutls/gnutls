@@ -41,17 +41,16 @@ int print_info(GNUTLS_STATE state)
             break;
 
          }
+         printf(" - Certificate info:\n");
+         printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
+
+         dn = gnutls_x509pki_client_get_peer_dn( x509_info);
+         PRINT_DN(dn);
+
+         printf(" - Certificate Issuer's info:\n");
+         dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
+         PRINT_DN(dn);
       }
-      printf(" - Certificate info:\n");
-      printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
-
-      dn = gnutls_x509pki_client_get_peer_dn( x509_info);
-      PRINT_DN(dn);
-
-      printf(" - Certificate Issuer's info:\n");
-      dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
-      PRINT_DN(dn);
-
    }
 
    tmp = gnutls_version_get_name(gnutls_get_current_version(state));

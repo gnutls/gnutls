@@ -54,7 +54,10 @@ GNUTLS_STATE initialize_state()
    gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
    gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
 
-
+   /* request client certificate if any.
+    */
+   gnutls_set_certificate_request( state, GNUTLS_CERT_REQUEST);
+   
    return state;
 }
 

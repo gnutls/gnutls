@@ -144,7 +144,7 @@ int len;
  * e is public key
  */
 int
-_gnutls_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e, MPI m)
+_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e, MPI m)
 {
 	MACAlgorithm hash;
 	int ret;
@@ -187,7 +187,7 @@ _gnutls_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e
 	return 0;		
 }
 
-CertificateStatus gnutls_verify_signature(gnutls_cert* cert, gnutls_cert* issuer) {
+CertificateStatus gnutls_x509_verify_signature(gnutls_cert* cert, gnutls_cert* issuer) {
 gnutls_datum signature;
 gnutls_datum* tbs;
 
@@ -201,7 +201,7 @@ gnutls_datum* tbs;
 			return GNUTLS_CERT_INVALID;
 		}
 		
-		if (_gnutls_pkcs1_rsa_verify_sig( &signature, tbs, issuer->params[1], issuer->params[0])!=0) {
+		if (_pkcs1_rsa_verify_sig( &signature, tbs, issuer->params[1], issuer->params[0])!=0) {
 			gnutls_assert();
 			gnutls_free_datum( tbs);
 			return GNUTLS_CERT_NOT_TRUSTED;

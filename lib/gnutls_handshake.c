@@ -725,7 +725,10 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	if (length32 > 0)
 		dataptr = gnutls_malloc(length32);
 	else
-fprintf(stderr, "recv_type: %d\nLenght: %d\n", recv_type, length32);
+		if (recv_type != GNUTLS_SERVER_HELLO_DONE) {
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
 		
 	if (dataptr == NULL) {
 		gnutls_assert();
@@ -781,9 +784,9 @@ fprintf(stderr, "recv_type: %d\nLenght: %d\n", recv_type, length32);
 		ret = length32;
 		break;
 	case GNUTLS_CERTIFICATE_REQUEST:
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log("Requested Client Certificate!\n");
-#endif
+		ret = length32;
+		break;
+	case GNUTLS_CERTIFICATE_VERIFY:
 		ret = length32;
 		break;
 	default:

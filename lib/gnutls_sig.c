@@ -88,7 +88,6 @@ int ret;
 
 }
 
-
 int _gnutls_pkcs1_rsa_generate_sig( gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) {
 	int ret;
 
@@ -100,3 +99,90 @@ int _gnutls_pkcs1_rsa_generate_sig( gnutls_private_key *pkey, const gnutls_datum
 
 	return 0;
 }
+
+int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, gnutls_datum *signature) {
+	int ret;
+	gnutls_datum plain;
+	
+	/* decrypt signature */
+	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &plain, *signature, cert->params[0], cert->params[1], 1)) < 0) {
+	     gnutls_assert();
+	     return ret;
+	}
+
+	if (plain.size != data->size) {
+		gnutls_assert();
+		return GNUTLS_E_PK_SIGNATURE_FAILED;
+	}
+
+	if ( memcmp(plain.data, data->data, plain.size)!=0) {
+		gnutls_assert();
+		return GNUTLS_E_PK_SIGNATURE_FAILED;
+	}
+
+	return 0;
+}
+
+
+/* Verifies a TLS signature (like the one in the client certificate
+ * verify message).
+ */
+int _gnutls_verify_sig( GNUTLS_STATE state, gnutls_cert *cert, gnutls_datum* signature, int ubuffer_size) {
+opaque digest[20+16];
+gnutls_datum data;
+GNUTLS_HASH_HANDLE td;
+int size = gnutls_getHashDataBufferSize( state) - ubuffer_size; /* do not get the last message */
+int ret;
+
+	data.data = gnutls_malloc(size);
+	data.size = size;
+	if (data.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+			
+	gnutls_readHashDataFromBuffer( state, data.data, data.size);
+
+	switch(cert->subject_pk_algorithm) {
+		case GNUTLS_PK_RSA:
+			
+			td = gnutls_hash_init( GNUTLS_MAC_MD5);
+			if (td==NULL) {
+				gnutls_assert();
+				gnutls_free_datum( &data);
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			gnutls_hash( td, data.data, data.size);
+			gnutls_hash_deinit( td, digest);
+
+			td = gnutls_hash_init( GNUTLS_MAC_SHA);
+			if (td==NULL) {
+				gnutls_assert();
+				gnutls_free_datum( &data);
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			gnutls_hash( td, data.data, data.size);
+			gnutls_hash_deinit( td, &digest[16]);
+			gnutls_free_datum( &data);
+			
+
+			data.data = digest;
+			data.size = 20+16; /* md5 + sha */	
+			ret = _gnutls_pkcs1_rsa_verify_sig( cert, &data, signature);
+
+			break;
+		default:
+			gnutls_assert();
+			gnutls_free_datum( &data);
+			ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			break;
+	}
+
+	return ret;
+
+}
+
+
+
+
+

@@ -289,7 +289,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 		return GNUTLS_CERT_NOT_TRUSTED;
 	}
 	
-        ret = gnutls_verify_signature(cert, issuer);
+        ret = gnutls_x509_verify_signature(cert, issuer);
         if (ret != GNUTLS_CERT_TRUSTED)
               return ret;
 

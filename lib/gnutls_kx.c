@@ -640,7 +640,7 @@ int _gnutls_recv_client_certificate_verify_message(SOCKET cd, GNUTLS_STATE state
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 					   &datasize,
-					   GNUTLS_CLIENT_KEY_EXCHANGE, OPTIONAL_PACKET);
+					   GNUTLS_CERTIFICATE_VERIFY, OPTIONAL_PACKET);
 		if (ret < 0)
 			return ret;
 

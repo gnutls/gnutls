@@ -85,17 +85,17 @@ const gnutls_DN* dn;
 				break;
 
 			}
+
+			printf(" - Certificate info:\n");
+			printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
+
+			dn = gnutls_x509pki_client_get_peer_dn( x509_info);
+			PRINT_DN( dn);
+
+			dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
+			printf(" - Certificate Issuer's info:\n");
+			PRINT_DN( dn);
 		}
-
-		printf(" - Certificate info:\n");
-		printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
-
-		dn = gnutls_x509pki_client_get_peer_dn( x509_info);
-		PRINT_DN( dn);
-
-		dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
-		printf(" - Certificate Issuer's info:\n");
-		PRINT_DN( dn);
 	}
 
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
 
 
 	/* X509 stuff */
-	if (gnutls_allocate_x509_client_sc( &xcred, 1) < 0) { 
+	if (gnutls_allocate_x509_client_sc( &xcred, 1) < 0) {  /* space for 1 certificate */
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
