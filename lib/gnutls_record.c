@@ -766,13 +766,13 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		gnutls_afree(tmpdata);
 
 		if (ret==GNUTLS_E_INT_RET_0) return 0;
-
 		gnutls_assert();
 		return ret;
 	}
 	gnutls_afree(tmpdata);
 
-	/* Get Application data from buffer */
+	/* Get Application data from buffer 
+	 */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
 
 		ret = _gnutls_record_buffer_get(type, state, data, sizeofdata);
@@ -788,7 +788,6 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 				return ret2;
 			}
 		}
-
 	} else {
 		gnutls_assert();
 		ret = GNUTLS_E_UNEXPECTED_PACKET; 
@@ -796,7 +795,12 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		 */
 	}
 
-	/* TLS 1.0 CBC protection. Read the next fragment.
+	/* TLS 1.0 CBC protection. 
+	 * Actually this code is called if we just received
+	 * an empty packet. An empty TLS packet is usually
+	 * sent to protect some vulnerabilities in the CBC mode.
+	 * In that case we go to the begining and start reading
+	 * the next packet.
 	 */
 	if (ret==0) {
 		empty_packet++;
@@ -825,6 +829,8 @@ parse_version_number( const char *s, int *number )
 }
 
 
+/* The parse version functions were copied from libgcrypt.
+ */
 static const char *
 parse_version_string( const char *s, int *major, int *minor, int *micro )
 {

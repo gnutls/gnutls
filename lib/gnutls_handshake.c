@@ -124,7 +124,8 @@ void _gnutls_set_client_random(GNUTLS_STATE state, uint8 * random)
 	       TLS_RANDOM_SIZE);
 }
 
-/* Calculate The SSL3 Finished message */
+/* Calculate The SSL3 Finished message 
+ */
 #define SSL3_CLIENT_MSG "CLNT"
 #define SSL3_SERVER_MSG "SRVR"
 #define SSL_MSG_LEN 4
@@ -163,7 +164,8 @@ static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, opaque * ret)
 	return 0;
 }
 
-/* Hash the handshake messages as required by TLS 1.0 */
+/* Hash the handshake messages as required by TLS 1.0 
+ */
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
 #define TLS_MSG_LEN 15
@@ -226,12 +228,12 @@ int _gnutls_create_random(opaque * dst)
 	return 0;
 }
 
-/* Read a client hello 
- * client hello must be a known version client hello
+
+/* Read a client hello packet. 
+ * A client hello must be a known version client hello
  * or version 2.0 client hello (only for compatibility
  * since SSL version 2.0 is not supported).
  */
-
 int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 			      int datalen)
 {
@@ -622,7 +624,8 @@ int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int datalen)
 }
 
 
-/* This selects the best supported compression method from the ones provided */
+/* This selects the best supported compression method from the ones provided 
+ */
 int _gnutls_server_select_comp_method(GNUTLS_STATE state, opaque * data,
 				    int datalen)
 {
@@ -1026,35 +1029,27 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 	case GNUTLS_CLIENT_HELLO:
 	case GNUTLS_SERVER_HELLO:
 		ret = _gnutls_recv_hello(state, dataptr, length32);
-		/* dataptr is freed because the called does not
+		/* dataptr is freed because the caller does not
 		 * need it */
 		gnutls_free(dataptr);
-		break;
-	case GNUTLS_CERTIFICATE_PKT:
-		ret = length32;
+		*data = NULL;
 		break;
 	case GNUTLS_SERVER_HELLO_DONE:
 		if (length32==0) ret = 0;
 		else ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		break;
+	case GNUTLS_CERTIFICATE_PKT:
 	case GNUTLS_FINISHED:
-		ret = length32;
-		break;
 	case GNUTLS_SERVER_KEY_EXCHANGE:
-		ret = length32;
-		break;
 	case GNUTLS_CLIENT_KEY_EXCHANGE:
-		ret = length32;
-		break;
 	case GNUTLS_CERTIFICATE_REQUEST:
-		ret = length32;
-		break;
 	case GNUTLS_CERTIFICATE_VERIFY:
 		ret = length32;
 		break;
 	default:
 		gnutls_assert();
 		gnutls_free(dataptr);
+		*data = NULL;
 		ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	}
 
