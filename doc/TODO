@@ -1,8 +1,8 @@
+* Add Client Certificate support in X509 authentication
+* Add certificate extensions support (x509v3)
+* Add DHE_* ciphersuites
+* Tools for processing/generating certificates
+* Documentation (of existing functions + Manual)
 * OpenPGP certificate support (through libgcrypt)
 * Add Kerberos support (who wants that?)
 * Audit the code (volunteers?)
-* Tools for processing/generating certificates
-* Add certificate extensions support (x509v3)
-* Documentation (of existing functions + Manual)
-* Add DHE_* ciphersuites
-* Add Client Certificate support in X509 authentication

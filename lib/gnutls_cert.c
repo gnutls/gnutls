@@ -457,10 +457,10 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 
 /* res is not malloced 
  */
-#define _READ( str, OID, NAME, res) \
+#define _READ( str, OID, ANAME, NAME, res) \
 	if(strcmp(str, OID)==0){ \
-	  strcpy( str, "PKIX1Implicit88.X520"); \
-	  strcat( str, NAME); \
+	  strcpy( str, "PKIX1Implicit88."); \
+	  strcat( str, ANAME); \
 	  strcpy( name2, "temp-structure-"); \
 	  strcat( name2, NAME); \
 	  if ( (result = asn1_create_structure( _gnutls_get_pkix(), str, &tmpasn, name2)) != ASN_OK) { \
@@ -508,7 +508,6 @@ void _gnutls_int2str(int k, char* data) {
  * ASN.1 structure. (Taken from Fabio's samples!)
  * --nmav
  */
-#warning "Fix COUNTRY/EMAIL"
 static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 {
 	int k, k2, result, len;
@@ -562,21 +561,21 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 
 			if (result == ASN_OK) {
 				node_asn *tmpasn;
-
-				_READ(str, "2 5 4 6", "countryName",
- 				      dn->country);
-				_READ(str, "2 5 4 10", "OrganizationName",
-				      dn->organization);
-				_READ(str, "2 5 4 11",
-				      "OrganizationalUnitName",
-				      dn->organizational_unit_name);
-				_READ(str, "2 5 4 3", "CommonName",
-				      dn->common_name);
-				_READ(str, "2 5 4 7", "LocalityName",
-				      dn->locality_name);
-				_READ(str, "2 5 4 8",
-				      "StateOrProvinceName",
-				      dn->state_or_province_name);
+#ifdef DEBUG
+# warning " FIX COUNTRY HERE"
+#endif
+				_READ(str, "2 5 4 6", "X520OrganizationName",
+					"countryName", dn->country);
+				_READ(str, "2 5 4 10", "X520OrganizationName",
+					"OrganizationName", dn->organization);
+				_READ(str, "2 5 4 11", "X520OrganizationalUnitName",
+				      "OrganizationalUnitName", dn->organizational_unit_name);
+				_READ(str, "2 5 4 3", "X520CommonName", 
+					"CommonName", dn->common_name);
+				_READ(str, "2 5 4 7", "X520LocalityName",
+					"LocalityName", dn->locality_name);
+				_READ(str, "2 5 4 8", "X520StateOrProvinceName",
+				      "StateOrProvinceName", dn->state_or_province_name);
 			}
 		} while (1);
 	} while (1);
