@@ -1,3 +1,14 @@
+2003-08-07 18:01  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, debug.c, gnutls_algorithms.c, gnutls_cert.h,
+	gnutls_cipher_int.c, gnutls_cipher_int.h, gnutls_dh.h,
+	gnutls_global.c, gnutls_hash_int.c, gnutls_hash_int.h,
+	gnutls_int.h, gnutls_mpi.c, gnutls_mpi.h, gnutls_pk.c, gnutls_pk.h,
+	gnutls_rsa_export.c, rc2.c, rc2.h:
+
+	Ported to the new libgcrypt (still unstable). Also added the RC2
+	cipher and improved the PKCS #12 stuff in order to support it.  
+
 2003-08-04 17:37  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/tex/Makefile.am:
