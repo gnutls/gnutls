@@ -35,6 +35,7 @@
 #include "gnutls_record.h"
 #include "gnutls_datum.h"
 #include "ext_max_record.h"
+#include <gnutls_alert.h>
 
 /**
   * gnutls_protocol_get_version - Returns the version of the currently used protocol
