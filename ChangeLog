@@ -1,3 +1,15 @@
+2004-08-12 20:34  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-badra-tls-key-exchange-00.txt:
+
+	Add.  
+
+2004-08-11 22:38  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc2246-bis-08.txt:
+
+	Add.  
+
 2004-08-11 15:23  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in:
