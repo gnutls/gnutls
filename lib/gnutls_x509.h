@@ -18,3 +18,4 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 
 int _gnutls_x509_key2gnutls_key( gnutls_privkey* privkey, const gnutls_datum* raw_key,
         gnutls_x509_crt_fmt type);
+int _gnutls_x509_privkey2gnutls_key( gnutls_privkey* privkey, gnutls_x509_privkey);

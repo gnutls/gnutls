@@ -44,10 +44,10 @@
 #include <gnutls_extra.h>
 #include "debug.h"
 
-static gnutls_cert *alloc_and_load_certs(const gnutls_datum * certs,
-	 uint ncerts, gnutls_certificate_type type);
-static gnutls_privkey *alloc_and_load_key(const gnutls_datum * raw_key,
-	  gnutls_certificate_type type);
+static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs, uint);
+static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key);
+static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert);
+static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey key);
 
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
@@ -400,39 +400,80 @@ static int call_client_cert_callback(gnutls_session session,
 
 /* Calls the client get callback.
  */
-static int call_client_get_cert_callback( gnutls_session session,
+static int call_get_cert_callback( gnutls_session session,
 	gnutls_datum* issuers_dn, int issuers_dn_length)
 {
-gnutls_datum *certs, key;
-uint ncerts, i;
-gnutls_certificate_type type =
-    gnutls_certificate_type_get(session);
+uint i;
 gnutls_cert *local_certs = NULL;
 gnutls_privkey *local_key = NULL;
+retr_st st;
 int ret;
+gnutls_certificate_type type =
+    gnutls_certificate_type_get(session);
 
-	ret =
-	    session->internals.client_get_cert_callback(session,
-	    		issuers_dn, issuers_dn_length,
-			&certs, &ncerts, &key);
+	memset( &st, 0, sizeof(st));
+
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
+		ret =
+		    session->internals.server_get_cert_callback(session, &st);
+	} else { /* CLIENT */
+		ret =
+		    session->internals.client_get_cert_callback(session,
+		    		issuers_dn, issuers_dn_length,
+				&st);
+	}
+
 	if (ret < 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
-
-	local_certs = alloc_and_load_certs(certs, ncerts, type);
-	if (local_certs != NULL)
-		local_key = alloc_and_load_key(&key, type);
-
-	for (i = 0; i < ncerts; i++) {
-		_gnutls_free_datum(&certs[i]);
+	
+	if (type != st.type) {
+		gnutls_assert();
+		ret = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
 	}
-	_gnutls_free_datum(&key);
 
-	_gnutls_selected_certs_set(session, local_certs, ncerts,
+	if (type == GNUTLS_CRT_X509) {
+		local_certs = alloc_and_load_x509_certs(st.cert.x509, st.ncerts);
+		if (local_certs != NULL)
+			local_key = alloc_and_load_x509_key(st.key.x509);
+
+	} else { /* PGP */
+		if (st.ncerts != 1) {
+			gnutls_assert();
+			ret = GNUTLS_E_INVALID_REQUEST;
+			goto cleanup;
+		}
+
+		local_certs = alloc_and_load_pgp_certs(st.cert.pgp);
+		if (local_certs != NULL)
+			local_key = alloc_and_load_pgp_key(st.key.pgp);
+
+	}
+
+	_gnutls_selected_certs_set(session, local_certs, st.ncerts,
 				   local_key, 1);
 
-	return 0;
+	ret = 0;
+
+cleanup:
+
+	if (st.type == GNUTLS_CRT_X509) {
+		if (st.deinit_all_keys) {
+			for (i = 0; i < st.ncerts; i++) {
+				gnutls_x509_crt_deinit(st.cert.x509[i]);
+			}
+			gnutls_x509_privkey_deinit(st.key.x509);
+		}
+	} else {
+		if (st.deinit_all_keys) {
+			gnutls_openpgp_key_deinit(st.cert.pgp);
+			gnutls_openpgp_privkey_deinit(st.key.pgp);
+		}
+	}
+
+	return ret;
 }
 
 /* Finds the appropriate certificate depending on the cA Distinguished name
@@ -488,7 +529,7 @@ static int _select_client_cert(gnutls_session session,
 		}
 
 		if (session->internals.client_get_cert_callback) {
-			result = call_client_get_cert_callback( session, issuers_dn, issuers_dn_length);
+			result = call_get_cert_callback( session, issuers_dn, issuers_dn_length);
 			goto cleanup;
 		}
 
@@ -1368,12 +1409,11 @@ int _gnutls_get_selected_cert(gnutls_session session,
 	return 0;
 }
 
-/* converts the given raw certificate to gnutls_cert* and allocates
+/* converts the given x509 certificate to gnutls_cert* and allocates
  * space for them.
  */
-static gnutls_cert *alloc_and_load_certs(const gnutls_datum * certs,
-					 uint ncerts,
-					 gnutls_certificate_type type)
+static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
+					 uint ncerts)
 {
 	gnutls_cert *local_certs;
 	int ret = 0;
@@ -1386,10 +1426,70 @@ static gnutls_cert *alloc_and_load_certs(const gnutls_datum * certs,
 	}
 
 	for (i = 0; i < ncerts; i++) {
-		ret = _gnutls_cert2gnutls_cert(&local_certs[i], type,
-					       &certs[i], 0);
+		ret = _gnutls_x509_crt2gnutls_cert(&local_certs[i], 
+			certs[i], 0);
 		if (ret < 0)
 			break;
+	}
+
+	if (ret < 0) {
+		gnutls_assert();
+		for (j = 0; j < i; j++) {
+			_gnutls_cert_deinit(&local_certs[j]);
+		}
+		gnutls_free(local_certs);
+		return NULL;
+	}
+
+	return local_certs;
+}
+
+/* converts the given x509 key to gnutls_privkey* and allocates
+ * space for it.
+ */
+static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key)
+{
+	gnutls_privkey *local_key;
+	int ret = 0;
+
+	local_key = gnutls_malloc(sizeof(gnutls_privkey));
+	if (local_key == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	ret =
+	    _gnutls_x509_privkey2gnutls_key(local_key, key);
+	if (ret < 0) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	return local_key;
+}
+
+
+
+
+/* converts the given pgp certificate to gnutls_cert* and allocates
+ * space for them.
+ */
+static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
+{
+	gnutls_cert *local_certs;
+	int ret = 0;
+	uint i, j;
+
+	local_certs = gnutls_malloc(sizeof(gnutls_cert));
+	if (local_certs == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	ret = _gnutls_openpgp_key2gnutls_cert(&local_certs[i], cert);
+	if (ret < 0) {
+		gnutls_assert();
+		return NULL;
 	}
 
 	if (ret < 0) {
@@ -1407,8 +1507,7 @@ static gnutls_cert *alloc_and_load_certs(const gnutls_datum * certs,
 /* converts the given raw key to gnutls_privkey* and allocates
  * space for it.
  */
-static gnutls_privkey *alloc_and_load_key(const gnutls_datum * raw_key,
-					  gnutls_certificate_type type)
+static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey key)
 {
 	gnutls_privkey *local_key;
 	int ret = 0;
@@ -1420,8 +1519,7 @@ static gnutls_privkey *alloc_and_load_key(const gnutls_datum * raw_key,
 	}
 
 	ret =
-	    _gnutls_key2gnutls_key(local_key, type, raw_key,
-				   GNUTLS_X509_FMT_DER);
+	    _gnutls_openpgp_privkey2gnutls_key(local_key, key);
 	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
@@ -1429,6 +1527,7 @@ static gnutls_privkey *alloc_and_load_key(const gnutls_datum * raw_key,
 
 	return local_key;
 }
+
 
 void _gnutls_selected_certs_deinit(gnutls_session session)
 {
@@ -1512,36 +1611,8 @@ int _gnutls_server_select_cert(gnutls_session session,
 	 * set use it.
 	 */
 	if (session->internals.server_get_cert_callback != NULL) {
-		gnutls_datum *certs, key;
-		uint ncerts;
-		gnutls_certificate_type type =
-		    gnutls_certificate_type_get(session);
-		gnutls_cert *local_certs = NULL;
-		gnutls_privkey *local_key = NULL;
 
-		ret =
-		    session->internals.server_get_cert_callback(session,
-								&certs,
-								&ncerts,
-								&key);
-		if (ret < 0) {
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
-
-		local_certs = alloc_and_load_certs(certs, ncerts, type);
-		if (local_certs != NULL)
-			local_key = alloc_and_load_key(&key, type);
-
-		for (i = 0; i < ncerts; i++) {
-			_gnutls_free_datum(&certs[i]);
-		}
-		_gnutls_free_datum(&key);
-
-		_gnutls_selected_certs_set(session, local_certs, ncerts,
-					   local_key, 1);
-
-		return 0;
+		return call_get_cert_callback( session, NULL, 0);
 
 	} else if (session->internals.server_cert_callback != NULL
 		   && cred->ncerts > 0) {

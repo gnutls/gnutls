@@ -422,13 +422,30 @@ typedef int srp_server_select_func(struct gnutls_session_int*,
 
 /* authentication function definitions:
  */
+#include "../libextra/openpgp/openpgp.h"
+
+typedef struct retr_st {
+	gnutls_certificate_type type;
+	union cert {
+		gnutls_x509_crt* x509;
+		gnutls_openpgp_key pgp;
+	} cert;
+	uint ncerts;
+
+	union key {
+		gnutls_x509_privkey x509;
+		gnutls_openpgp_privkey pgp;
+	} key;
+	
+	uint deinit_all_keys;
+} retr_st;
+
 typedef int gnutls_certificate_client_retrieve_function(
    struct gnutls_session_int*, const gnutls_datum* req_ca_cert, int nreqs,
-   gnutls_datum** certs, unsigned int* ncerts, gnutls_datum* key);
+   retr_st*);
 
 typedef int gnutls_certificate_server_retrieve_function(
-   struct gnutls_session_int*, gnutls_datum **server_certs, unsigned int* ncerts,
-   gnutls_datum* key);
+   struct gnutls_session_int*, retr_st*);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];

@@ -519,7 +519,7 @@ int read_cert_mem(gnutls_certificate_credentials res, const void *cert, int cert
 }
 
 
-static int privkey_cpy( gnutls_privkey* dest, gnutls_x509_privkey src)
+int _gnutls_x509_privkey2gnutls_key( gnutls_privkey* dest, gnutls_x509_privkey src)
 {
 int i, ret;
 
@@ -576,7 +576,7 @@ int ret;
 		return ret;
 	}
 
-	ret = privkey_cpy( privkey, tmpkey);
+	ret = _gnutls_x509_privkey2gnutls_key( privkey, tmpkey);
 	if (ret < 0) {
 		gnutls_assert();
 		gnutls_x509_privkey_deinit( tmpkey);
@@ -839,7 +839,7 @@ int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = privkey_cpy( &res->pkey[res->ncerts], key);
+	ret = _gnutls_x509_privkey2gnutls_key( &res->pkey[res->ncerts], key);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

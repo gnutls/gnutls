@@ -53,8 +53,8 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
 int gnutls_x509_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_x509_dn *) DEPRECATED;
 int gnutls_x509_extract_certificate_version( const gnutls_datum*) DEPRECATED;
 int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size) DEPRECATED;
-time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*) DEPRECATED;
-time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*) DEPRECATED;
+time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
+time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
 int gnutls_x509_extract_certificate_subject_alt_name( const gnutls_datum*, int seq, char*, int*) DEPRECATED;
 int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size) DEPRECATED;
 int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int* bits) DEPRECATED;

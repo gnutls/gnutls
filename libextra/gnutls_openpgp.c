@@ -24,7 +24,7 @@
 #include "gnutls_cert.h"
 #include "gnutls_datum.h"
 #include "gnutls_global.h"
-#include "auth_cert.h"
+//#include "auth_cert.h"
 #include <openpgp/gnutls_openpgp.h>
 
 #ifdef HAVE_LIBOPENCDK
@@ -292,7 +292,8 @@ openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdk_pkt_pubkey_t pk )
  -*/
 int
 _gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
-                                const gnutls_datum *raw_key )
+                                const gnutls_datum *raw_key,
+                                gnutls_openpgp_key_fmt format)
 {
     cdk_kbnode_t snode;
     CDK_PACKET *pkt;
@@ -311,6 +312,16 @@ _gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
     out = cdk_stream_tmp( );
     if( !out )
         return GNUTLS_E_CERTIFICATE_ERROR;
+
+    if (format == GNUTLS_OPENPGP_FMT_BASE64) {
+    	rc = cdk_stream_set_armor_flag( out, 0);
+    	if (rc) {
+    	   rc = _gnutls_map_cdk_rc( rc);
+    	   gnutls_assert();
+    	   return rc;
+    	}
+    }
+
     cdk_stream_write( out, raw_key->data, raw_key->size );
     cdk_stream_seek( out, 0 );
 
@@ -519,8 +530,7 @@ stream_to_datum( cdk_stream_t inp, gnutls_datum *raw )
  **/
 int
 gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
-                                        const gnutls_datum *cert,
-                                       const  gnutls_datum *key )
+	const gnutls_datum *cert, const gnutls_datum *key )
 {
     gnutls_datum raw;
     cdk_kbnode_t knode = NULL, ctx = NULL, p;
@@ -528,6 +538,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     int i = 0;
     int rc = 0;
     cdk_stream_t inp = NULL;
+    gnutls_openpgp_key_fmt format;
     
     if ( !res || !key || !cert ) {
         gnutls_assert( );
@@ -540,8 +551,12 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     	return GNUTLS_E_INTERNAL_ERROR;
     }
     
-    if( cdk_armor_filter_use( inp ) )
+    if( cdk_armor_filter_use( inp ) ) {
+        format = GNUTLS_OPENPGP_FMT_BASE64;
     	cdk_stream_set_armor_flag( inp, 0 );
+    } else {
+        format = GNUTLS_OPENPGP_FMT_RAW;
+    }
 
     res->cert_list = gnutls_realloc_fast(res->cert_list,
                                     (1+res->ncerts)*sizeof(gnutls_cert*));
@@ -626,7 +641,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     }
     cdk_stream_close( inp );
     
-    rc = _gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], &raw );
+    rc = _gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], &raw, format);
     if (rc) {
     	gnutls_assert();
     }
@@ -1005,6 +1020,143 @@ void gnutls_openpgp_set_recv_key_function( gnutls_session session,
 {
     session->internals.openpgp_recv_key_func = func;
 }
+
+/* Copies a gnutls_openpgp_privkey to a gnutls_privkey structure.
+ */
+int _gnutls_openpgp_privkey2gnutls_key( gnutls_privkey* dest, gnutls_openpgp_privkey src)
+{
+int i, ret;
+
+	memset( dest, 0, sizeof(gnutls_privkey));
+
+	for(i=0;i<src->pkey.params_size;i++) {
+		dest->params[i] = _gnutls_mpi_copy( src->pkey.params[i]);
+		if (dest->params[i] == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
+	}
+	
+	dest->pk_algorithm = src->pkey.pk_algorithm;
+	dest->params_size = src->pkey.params_size;
+
+	return 0;
+	
+cleanup:
+	for (i=0;i<src->pkey.params_size;i++) {
+		_gnutls_mpi_release( &dest->params[i]);
+	}
+	return ret;
+}
+
+/* Converts a parsed gnutls_openpgp_key to a gnutls_cert structure.
+ */
+int _gnutls_openpgp_key2gnutls_cert(gnutls_cert * gcert, gnutls_openpgp_key cert)
+{
+	int ret = 0;
+	opaque* der;
+	size_t der_size = 0;
+	gnutls_datum raw;
+	
+	memset(gcert, 0, sizeof(gnutls_cert));
+	gcert->cert_type = GNUTLS_CRT_OPENPGP;
+
+		
+	ret = gnutls_openpgp_key_export( cert, GNUTLS_OPENPGP_FMT_RAW, NULL, &der_size);
+	if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		gnutls_assert();
+		return ret;
+	}
+		
+	der = gnutls_malloc( der_size);
+	if (der == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret = gnutls_openpgp_key_export( cert, GNUTLS_OPENPGP_FMT_RAW, der, &der_size);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_free(der);
+		return ret;
+	}
+
+	raw.data = der;
+	raw.size = der_size;
+
+	ret = _gnutls_openpgp_cert2gnutls_cert( gcert, &raw);
+	
+	gnutls_free(der);
+	
+	return 0;
+
+}
+
+/**
+  * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
+  * @key: contains an openpgp public key
+  * @pkey: is an openpgp private key
+  *
+  * This function sets a certificate/private key pair in the 
+  * gnutls_certificate_credentials structure. This function may be called
+  * more than once (in case multiple keys/certificates exist for the
+  * server).
+  *
+  **/
+int gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials res, 
+	gnutls_openpgp_key key, 
+	gnutls_openpgp_privkey pkey)
+{
+	int ret;
+
+	/* this should be first 
+	 */
+
+	res->pkey = gnutls_realloc_fast( res->pkey, (res->ncerts+1)*sizeof(gnutls_privkey));
+	if (res->pkey==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret = _gnutls_openpgp_privkey2gnutls_key( &res->pkey[res->ncerts], pkey);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	res->cert_list = gnutls_realloc_fast( res->cert_list, 
+		(1+ res->ncerts)*sizeof(gnutls_cert*));
+	if ( res->cert_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	res->cert_list_length = gnutls_realloc_fast( res->cert_list_length,
+		(1+ res->ncerts)*sizeof(int));
+	if (res->cert_list_length==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	res->cert_list[res->ncerts] = NULL; /* for realloc */
+	res->cert_list_length[res->ncerts] = 1;
+
+	ret = _gnutls_openpgp_key2gnutls_cert( res->cert_list[res->ncerts], key);
+	if ( ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	res->ncerts++;
+	
+	/* FIXME: Check if they match.
+	 */
+
+	return 0;
+}
+
 
 #endif /* HAVE_LIBOPENCDK */
 

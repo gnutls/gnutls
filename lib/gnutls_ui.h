@@ -17,12 +17,34 @@ typedef int gnutls_certificate_client_select_function(
 typedef int gnutls_certificate_server_select_function(
    gnutls_session, const gnutls_datum *server_certs, int ncerts);
 
+
+struct gnutls_openpgp_key_int;
+typedef struct gnutls_openpgp_key_int* gnutls_openpgp_key;
+
+struct gnutls_openpgp_privkey_int;
+typedef struct gnutls_openpgp_privkey_int* gnutls_openpgp_privkey;
+
+typedef struct gnutls_retr_st {
+	gnutls_certificate_type type;
+	union cert {
+		gnutls_x509_crt *x509;
+		gnutls_openpgp_key pgp;
+	} cert;
+	uint ncerts; /* one for pgp keys */
+
+	union key {
+		gnutls_x509_privkey x509;
+		gnutls_openpgp_privkey pgp;
+	} key;
+	
+	uint deinit_all_keys; /* if non zero all keys will be deinited */
+} gnutls_retr_st;
+
 typedef int gnutls_certificate_client_retrieve_function(
    gnutls_session, const gnutls_datum* req_ca_cert, int nreqs,
-   gnutls_datum** certs, unsigned int* ncerts, gnutls_datum* key);
+   gnutls_retr_st*);
 typedef int gnutls_certificate_server_retrieve_function(
-   gnutls_session, gnutls_datum **server_certs, unsigned int* ncerts,
-   gnutls_datum* key);
+   gnutls_session, gnutls_retr_st*);
 
 
 /* Functions that allow AUTH_INFO structures handling

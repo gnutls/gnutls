@@ -606,7 +606,7 @@ int _gnutls_key2gnutls_key(gnutls_privkey * key, gnutls_certificate_type type,
 				return GNUTLS_E_INIT_LIBEXTRA;
 			}
 			return
-			     _E_gnutls_openpgp_key2gnutls_key( key, raw_key);
+			     _E_gnutls_openpgp_key2gnutls_key( key, raw_key, key_enc);
 		default:
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
