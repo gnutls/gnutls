@@ -1426,7 +1426,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
 
 #define GNUTLS_PK_LOOP(b) \
         const gnutls_pk_entry *p; \
-                for(p = sign_algorithms; p->name != NULL; p++) { b ; }
+                for(p = pk_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_PK_ALG_LOOP(a) \
                         GNUTLS_PK_LOOP( if(p->id == algorithm) { a; break; } )
