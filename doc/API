@@ -100,7 +100,10 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred, int cred_size);
 	specified kx algorithm and on the current state (client or server).
 	cred_size is the size of the structure.
 
-	In GNUTLS_KX_ANON cred should be NULL.
+	* For GNUTLS_KX_ANON cred should be NULL.
+	* For GNUTLS_KX_SRP cred should be SRP_CLIENT_CREDENTIALS
+ 	 in case of a client, and SRP_SERVER_CREDENTIALS, in case
+	 of a server.
 
 void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
 	like gnutls_set_cipher_priority, but for key exchange methods.
