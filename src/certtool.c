@@ -1,7 +1,7 @@
 /*
+ * Copyright (C) 2004,2005 Free Software Foundation
  * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -809,9 +809,10 @@ void gaa_parser(int argc, char **argv)
 	out_cert_format = GNUTLS_X509_FMT_PEM;
 
     if (info.hash!=NULL) {
-    	if (strcasecmp(info.hash, "md5")==0)
+    	if (strcasecmp(info.hash, "md5")==0) {
+    	   fprintf(stderr, "Warning: MD5 is broken, and should not be used any more for digital signatures.\n");
     	   dig = GNUTLS_DIG_MD5;
-    	else if (strcasecmp(info.hash, "sha1")==0)
+    	} else if (strcasecmp(info.hash, "sha1")==0)
     	   dig = GNUTLS_DIG_SHA;
     	else if (strcasecmp(info.hash, "rmd160")==0)
     	   dig = GNUTLS_DIG_RMD160;
@@ -1030,6 +1031,9 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 	if (cprint == NULL)
 	    cprint = UNKNOWN;
 	fprintf(out, "%s\n", cprint);
+	if (ret == GNUTLS_SIGN_RSA_MD5 || ret == GNUTLS_SIGN_RSA_MD2) {
+	    fprintf(stderr, "Warning: certificate uses a broken signature algorithm that can be forged.\n");
+	}
     }
 
     /* Validity
@@ -1316,7 +1320,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     if (all) {
 	size = sizeof(buffer);
 	if ((ret =
-	     gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, buffer,
+	     gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_SHA, buffer,
 					     &size)) < 0) {
 	    fprintf(out, "Error in fingerprint calculation: %s\n",
 		    gnutls_strerror(ret));

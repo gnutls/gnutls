@@ -8,6 +8,8 @@ See the end for copying conditions.
   data are available for reading.
 - Added more strict checks for the SRP parameters (g,n), when they
   are not in the included list.
+- Added warning to certtool when MD5 is being used for digital
+  signatures.
 
 * Version 1.2.0 (2005-01-27)
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
