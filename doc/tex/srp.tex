@@ -14,7 +14,9 @@ harm to the system security if they were revealed.
 The SRP needs instead of the plain password something called a verifier, 
 which is calculated using the user's password, and if stolen cannot
 be used to impersonate the user. See \cite{TOMSRP} for a detailed description
-of the SRP protocol, and for the Stanford SRP libraries.
+of the SRP protocol and the Stanford SRP libraries, which includes a PAM module
+that synchronizes the system's users passwords with the SRP password files. That
+way SRP authentication could be used for all the system's users.
 
 \par
 The implementation in \gnutls{} is based on paper \cite{TLSSRP}.

@@ -1,11 +1,7 @@
-INCLUDES = -I../ -I../../includes/ -I../../lib -I../../lib/minitasn1 $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
-EXTRA_DIST = openpgp.h gnutls_openpgp.h
-
+INCLUDES = -I../ -I../../includes/ -I../../lib -I../../lib/minitasn1 $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) -I../opencdk
+EXTRA_DIST = openpgp.h gnutls_openpgp.h 
 noinst_LTLIBRARIES = libpgp.la
-
-COBJECTS = openpgp.c xml.c verify.c extras.c compat.c privkey.c
-
-libpgp_la_SOURCES = $(COBJECTS)
+libpgp_la_SOURCES = openpgp.c xml.c verify.c extras.c compat.c privkey.c
 
 pgp-api.tex: $(COBJECTS)
 	@echo "" > pgp-api.tex
