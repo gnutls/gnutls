@@ -1,3 +1,24 @@
+2003-02-09 09:53  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_dh_primes.c, src/prime.c:
+
+	fixes in pkcs3 DH parameter generation.  
+
+2003-02-09 09:37  nmav <nmav@gnutls.org>
+
+	* lib/Makefile.am, lib/auth_cert.c, lib/auth_cert.h,
+	lib/auth_dhe.c, lib/auth_rsa.c, lib/auth_rsa_export.c,
+	lib/gnutls.h.in.in, lib/gnutls_cert.c, lib/gnutls_cert.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_handshake.c,
+	lib/gnutls_rsa_export.c, lib/gnutls_ui.h, lib/gnutls_x509.c,
+	lib/gnutls_x509.h, lib/x509_extensions.c, lib/x509_extensions.h,
+	lib/x509_sig_check.c, lib/x509_verify.c, lib/x509_verify.h,
+	src/cli-gaa.c, src/cli-gaa.h, src/cli.c, src/cli.gaa,
+	src/serv-gaa.c, src/serv-gaa.h, src/serv.c, src/serv.gaa:
+
+	Several internal changes to use the new certificate API. CRL support
+	is complete.  
+
 2003-02-08 14:46  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls.h.in.in, gnutls_int.h:
