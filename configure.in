@@ -175,7 +175,7 @@ AC_CHECK_HEADERS(errno.h sys/time.h time.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h)
 dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_FUNCS(isascii memmove strnstr mmap gmtime_r inet_ntop,,)
+AC_CHECK_FUNCS(vasprintf isascii memmove strnstr mmap gmtime_r inet_ntop,,)
 AC_FUNC_ALLOCA
 
 
@@ -367,17 +367,17 @@ AM_CONDITIONAL(ENABLE_OPENSSL, test "$ac_enable_openssl" = "yes")
 
 AC_ARG_WITH(included-libtasn1,
 	[  --with-included-libtasn1 Use the included libtasn1],
-minitasn1_enabled=$withval, 
+minitasn1_enabled=yes, 
 minitasn1_enabled=no)
 
-dnl We now need libtasn1 0.2.x
-dnl
+if test x$minitasn1_enabled = xno; then
 AM_PATH_LIBTASN1($GNUTLS_LIBTASN1_VERSION,,
  minitasn1_enabled=yes
  AC_MSG_WARN([[
 *** 
-*** LibtASN1 0.2.x was not found. Will use the included one.
+*** LibtASN1 ${GNUTLS_LIBTASN1_VERSION} was not found. Will use the included one.
 ]]))
+fi
 
 SAVED_LIBS=$LIBS
 

@@ -250,7 +250,7 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 {
 	uint8 session_id_len, z;
 	int pos = 0, ret;
-	uint16 sizeOfSuites;
+	uint16 suite_size;
 	gnutls_protocol_version version;
 	int len = datalen;
 	opaque random[TLS_RANDOM_SIZE], *suite_ptr;
@@ -325,12 +325,12 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 	/* Remember ciphersuites for later
 	 */
 	DECR_LEN(len, 2);
-	sizeOfSuites = _gnutls_read_uint16(&data[pos]);
+	suite_size = _gnutls_read_uint16(&data[pos]);
 	pos += 2;
 
-	DECR_LEN(len, sizeOfSuites);
+	DECR_LEN(len, suite_size);
 	suite_ptr = &data[pos];
-	pos += sizeOfSuites;
+	pos += suite_size;
 
 	/* Select an appropriate compression method
 	 */
@@ -358,7 +358,7 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 	
 	/* select an appropriate cipher suite
 	 */
-	ret = _gnutls_server_select_suite(session, suite_ptr, sizeOfSuites);
+	ret = _gnutls_server_select_suite(session, suite_ptr, suite_size);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -575,7 +575,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	 * every ciphersuite is 2 bytes. (this check is needed
 	 * see below).
 	 */
-	if (datalen % 2 == 0) {
+	if (datalen % 2 != 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}

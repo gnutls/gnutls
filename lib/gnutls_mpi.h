@@ -26,6 +26,8 @@
 #define _gnutls_mpi_add gcry_mpi_add
 #define _gnutls_mpi_add_ui gcry_mpi_add_ui
 #define _gnutls_mpi_mul_ui gcry_mpi_mul_ui
+#define _gnutls_prime_check gcry_prime_check
+#define _gnutls_mpi_div gcry_mpi_div
 
 # define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x)) 
 # define _gnutls_mpi_salloc_like(x) _gnutls_mpi_snew(_gnutls_mpi_get_nbits(x)) 

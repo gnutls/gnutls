@@ -9,7 +9,7 @@ dnl $id$
 dnl AM_PATH_LIBTASN1([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
 dnl Test for libtasn1, and define LIBTASN1_CFLAGS and LIBTASN1_LIBS
 dnl
-AC_DEFUN(AM_PATH_LIBTASN1,
+AC_DEFUN([AM_PATH_LIBTASN1],
 [dnl
 dnl Get the cflags and libraries from the libtasn1-config script
 dnl

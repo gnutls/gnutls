@@ -128,7 +128,6 @@ int _gnutls_openpgp_verify_key(const char *trustdb,
 	 */
 	if (!trustdb && (!keyring || !keyring->data))
 		ret |= GNUTLS_CERT_SIGNER_NOT_FOUND;
-	goto leave;
 
 leave:
 	gnutls_openpgp_key_deinit( key);

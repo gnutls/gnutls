@@ -543,7 +543,7 @@ int ret, i;
 	/* Only allow small generators, to avoid getting stuck
 	 * into checking parameters.
 	 */
-	if (gcry_mpi_get_nbits(g) > 4) {
+	if (_gnutls_mpi_get_nbits(g) > 4) {
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
@@ -551,7 +551,7 @@ int ret, i;
 	/* N must be of the form N=2q+1
 	 * where q is also a prime.
 	 */
-	if (gcry_prime_check( n, 0) != 0) {
+	if (_gnutls_prime_check( n, 0) != 0) {
 		_gnutls_dump_mpi( "no prime N: ", n);
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -572,14 +572,14 @@ int ret, i;
 	
 	/* q = n-1 
 	 */
-	gcry_mpi_sub_ui( q, n, 1);
+	_gnutls_mpi_sub_ui( q, n, 1);
 	
 	/* q = q/2, remember that q is divisible by 2 (prime - 1)
 	 */
-	gcry_mpi_set_ui( two, 2);
-	gcry_mpi_div( q, NULL, q, two, 0);
+	_gnutls_mpi_set_ui( two, 2);
+	_gnutls_mpi_div( q, NULL, q, two, 0);
 
-	if (gcry_prime_check( q, 0) != 0) {
+	if (_gnutls_prime_check( q, 0) != 0) {
 		/* N was not on the form N=2q+1, where q = prime
 		 */
 		_gnutls_dump_mpi( "no prime Q: ", q);
@@ -592,7 +592,7 @@ int ret, i;
 	 
 	/* check if g < q < N
 	 */
-	if (gcry_mpi_cmp( g, q) >= 0) {
+	if (_gnutls_mpi_cmp( g, q) >= 0) {
 		gnutls_assert();
 		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto error;
@@ -608,13 +608,13 @@ int ret, i;
 	/* check if g^q mod N == N-1
 	 * w = g^q mod N
 	 */
-	gcry_mpi_powm( w, g, q, n);
+	_gnutls_mpi_powm( w, g, q, n);
 	
 	/* w++
 	 */
-	gcry_mpi_add_ui( w, w, 1);
+	_gnutls_mpi_add_ui( w, w, 1);
 	
-	if (gcry_mpi_cmp( w, n)!=0) {
+	if (_gnutls_mpi_cmp( w, n)!=0) {
 		gnutls_assert();
 		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 		goto error;
@@ -625,15 +625,15 @@ int ret, i;
 	 */
 	i = 2;
 
-	while( gcry_mpi_cmp( two, g) != 0) {
+	while( _gnutls_mpi_cmp( two, g) != 0) {
 
-		gcry_mpi_set_ui( two, i);
+		_gnutls_mpi_set_ui( two, i);
 
-		gcry_mpi_powm( w, two, q, n);
+		_gnutls_mpi_powm( w, two, q, n);
 
-		gcry_mpi_mod( w, w, n);
+		_gnutls_mpi_mod( w, w, n);
 		
-		if (gcry_mpi_cmp_ui( w, 1) != 0) {
+		if (_gnutls_mpi_cmp_ui( w, 1) != 0) {
 			gnutls_assert();
 			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 			goto error;
