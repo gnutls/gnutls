@@ -524,9 +524,10 @@ int _gnutls_recv_client_certificate( GNUTLS_STATE state)
 		if (ret < 0) {
 			if (optional == OPTIONAL_PACKET &&
 			        ret==GNUTLS_E_WARNING_ALERT_RECEIVED && 
-				gnutls_alert_get_last(state)==GNUTLS_A_NETSCAPE_NO_CLIENT_CERTIFICATE) {
+			        gnutls_protocol_get_version(state) == GNUTLS_SSL3 &&
+				gnutls_alert_get_last(state)==GNUTLS_A_SSL3_NO_CERTIFICATE) {
 
-				/* netscape does not send an empty certificate,
+				/* SSL3 does not send an empty certificate,
 				 * but this alert. So we just ignore it.
 				 */
 				gnutls_assert();
