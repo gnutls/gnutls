@@ -14,6 +14,10 @@ Version ?.?.?
   simple example on how to use gdbm for resuming.
 - Headers for the gnutls library are now installed in $(includedir)/gnutls
 
+Version 0.4.4 (24/06/2002)
+- Corrected bug in PKCS-1 RSA encryption which prevented gnutls to encrypt
+  using keys of some specific size.
+
 Version 0.4.3 (23/05/2002)
 - The gnutls-extra library now compiles fine, if the opencdk library is
   not present.
