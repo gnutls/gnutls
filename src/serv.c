@@ -37,6 +37,9 @@
 #define KEYFILE2 "x509/key-dsa.pem"
 #define CERTFILE2 "x509/cert-dsa.pem"
 
+#define PGP_KEYFILE "openpgp/sec.asc"
+#define PGP_CERTFILE "openpgp/pub.asc"
+
 #define CAFILE "x509/ca.pem"
 #define CRLFILE NULL
 
@@ -84,6 +87,7 @@ GNUTLS_STATE initialize_state(void)
 	int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 	int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 	int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+	int cert_type_priority[] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
@@ -97,6 +101,7 @@ GNUTLS_STATE initialize_state(void)
 	gnutls_kx_set_priority(state, kx_priority);
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
+	gnutls_cert_type_set_priority(state, cert_type_priority);
 	
 	gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
 	gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
@@ -263,6 +268,11 @@ int main(int argc, char **argv)
 
 	if (gnutls_certificate_set_x509_trust_file( x509_cred, CAFILE, CRLFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
+		exit(1);
+	}
+
+	if (gnutls_certificate_set_openpgp_key_file( x509_cred, PGP_CERTFILE, PGP_KEYFILE) < 0) {
+		fprintf(stderr, "PGP PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 

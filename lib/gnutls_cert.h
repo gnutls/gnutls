@@ -9,15 +9,16 @@
 
 /* parameters should not be larger than this limit */
 #define MAX_PARAMETER_SIZE 1200
-#define DSA_PARAMS 5
+#define DSA_PRIVATE_PARAMS 5
+#define DSA_PUBLIC_PARAMS 4
 #define RSA_PARAMS 3
 
 #if MAX_PARAMS_SIZE - RSA_PARAMS < 0
-# error INCREASE RSA_PARAMS
+# error INCREASE MAX_PARAMS
 #endif
 
-#if MAX_PARAMS_SIZE - DSA_PARAMS < 0
-# error INCREASE DSA_PARAMS
+#if MAX_PARAMS_SIZE - DSA_PRIVATE_PARAMS < 0
+# error INCREASE MAX_PARAMS
 #endif
 
 typedef struct gnutls_cert {
@@ -30,6 +31,8 @@ typedef struct gnutls_cert {
 				 *      [2] is g
 				 *      [3] is public key
 				 */
+	int params_size; /* holds the size of MPI params */
+	
 	PKAlgorithm subject_pk_algorithm;
 
 	gnutls_datum   signature;
@@ -72,6 +75,7 @@ typedef struct {
 				 *      [3] is y (public key)
 				 *      [4] is x (private key)
 				 */
+	int params_size; /* holds the number of params */
 
 	PKAlgorithm pk_algorithm;
 

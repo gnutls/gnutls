@@ -27,6 +27,8 @@
 #include "gnutls_sig.h"
 #include <gnutls_datum.h>
 #include <auth_cert.h>
+#include <gnutls_x509.h>
+#include <gnutls_openpgp.h>
 
 static int gen_dhe_server_kx(GNUTLS_STATE, opaque **);
 static int gen_dhe_client_kx(GNUTLS_STATE, opaque **);
@@ -35,44 +37,44 @@ static int proc_dhe_client_kx(GNUTLS_STATE, opaque *, int);
 
 MOD_AUTH_STRUCT dhe_rsa_auth_struct = {
 	"DHE_RSA",
-	_gnutls_gen_x509_server_certificate,
-	_gnutls_gen_x509_client_certificate,
+	_gnutls_gen_cert_server_certificate,
+	_gnutls_gen_cert_client_certificate,
 	gen_dhe_server_kx,
 	NULL,
 	NULL,
 	gen_dhe_client_kx,
-	_gnutls_gen_x509_client_cert_vrfy,	/* gen client cert vrfy */
-	_gnutls_gen_x509_server_cert_req,	/* server cert request */
+	_gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
+	_gnutls_gen_cert_server_cert_req,	/* server cert request */
 
-	_gnutls_proc_x509_server_certificate,
-	_gnutls_proc_x509_client_certificate,
+	_gnutls_proc_cert_server_certificate,
+	_gnutls_proc_cert_client_certificate,
 	proc_dhe_server_kx,
 	NULL,
 	NULL,
 	proc_dhe_client_kx,
-	_gnutls_proc_x509_client_cert_vrfy,	/* proc client cert vrfy */
-	_gnutls_proc_x509_cert_req	/* proc server cert request */
+	_gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
+	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
 MOD_AUTH_STRUCT dhe_dss_auth_struct = {
 	"DHE_DSS",
-	_gnutls_gen_x509_server_certificate,
-	_gnutls_gen_x509_client_certificate,
+	_gnutls_gen_cert_server_certificate,
+	_gnutls_gen_cert_client_certificate,
 	gen_dhe_server_kx,
 	NULL,
 	NULL,
 	gen_dhe_client_kx,
-	_gnutls_gen_x509_client_cert_vrfy,	/* gen client cert vrfy */
-	_gnutls_gen_x509_server_cert_req,	/* server cert request */
+	_gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
+	_gnutls_gen_cert_server_cert_req,	/* server cert request */
 
-	_gnutls_proc_x509_server_certificate,
-	_gnutls_proc_x509_client_certificate,
+	_gnutls_proc_cert_server_certificate,
+	_gnutls_proc_cert_client_certificate,
 	proc_dhe_server_kx,
 	NULL,
 	NULL,
 	proc_dhe_client_kx,
-	_gnutls_proc_x509_client_cert_vrfy,	/* proc client cert vrfy */
-	_gnutls_proc_x509_cert_req	/* proc server cert request */
+	_gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
+	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
 static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
@@ -330,11 +332,27 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 	signature.data = &data[vparams.size + 2];
 	signature.size = sigsize;
 
-	if ((ret =
-	     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-				     info->raw_certificate_list[0])) < 0) {
-		gnutls_assert();
-		return ret;
+	switch( state->security_parameters.cert_type) {
+		case GNUTLS_CRT_X509:
+			if ((ret =
+			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
+					     info->raw_certificate_list[0])) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			break;
+		case GNUTLS_CRT_OPENPGP:
+			if ((ret =
+			     _gnutls_openpgp_cert2gnutls_cert( &peer_cert,
+					     info->raw_certificate_list[0])) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			break;
+		
+		default:
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
 	}
 
 	ret =

@@ -23,6 +23,7 @@
 #include "gnutls_errors.h"
 #include "ext_srp.h"
 #include "ext_max_record.h"
+#include <ext_cert_type.h>
 #include "gnutls_num.h"
 
 /* Key Exchange Section */
@@ -39,6 +40,7 @@ typedef struct {
 static gnutls_extension_entry extensions[] = {
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_MAX_RECORD_SIZE, _gnutls_max_record_recv_params, _gnutls_max_record_send_params),
+	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_CERT_TYPE, _gnutls_cert_type_recv_params, _gnutls_cert_type_send_params),
 	{0}
 };
 

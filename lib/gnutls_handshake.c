@@ -98,6 +98,9 @@ static void resume_copy_required_values(GNUTLS_STATE state)
 	state->security_parameters.version =
 	    state->gnutls_internals.resumed_security_parameters.version;
 
+	state->security_parameters.cert_type =
+	    state->gnutls_internals.resumed_security_parameters.cert_type;
+
 	memcpy(state->security_parameters.session_id,
 	       state->gnutls_internals.resumed_security_parameters.
 	       session_id, sizeof(state->security_parameters.session_id));
@@ -237,7 +240,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	uint16 sizeOfSuites;
 	GNUTLS_Version version;
 	int len = datalen;
-	opaque random[TLS_RANDOM_SIZE];
+	opaque random[TLS_RANDOM_SIZE], *suite_ptr;
 	GNUTLS_Version ver;
 
 	if (state->gnutls_internals.v2_hello != 0) {	/* version 2.0 */
@@ -316,13 +319,8 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 2;
 
 	DECR_LEN(len, sizeOfSuites);
-	ret = _gnutls_server_select_suite(state, &data[pos], sizeOfSuites);
+	suite_ptr = &data[pos];
 	pos += sizeOfSuites;
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
 
 	/* Select an appropriate compression method
 	 */
@@ -345,7 +343,16 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 		gnutls_assert();
 		return ret;
 	}
-	return ret;
+
+	/* select an appropriate cipher suite
+	 */
+	ret = _gnutls_server_select_suite(state, suite_ptr, sizeOfSuites);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;
 }
 
 /* here we hash all pending data. 
@@ -2300,7 +2307,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	cert = NULL;
 
 	if (state->security_parameters.entity == GNUTLS_SERVER)
-		cert = _gnutls_server_find_x509_cert(state, requested_pk_algo);
+		cert = _gnutls_server_find_cert(state, requested_pk_algo);
 
 	if (cert == NULL) {
 		/* No certificate was found 

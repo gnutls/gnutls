@@ -81,7 +81,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) 
 		asn1_delete_structure(pkey_asn);
 		return result;
 	}
-
+	pkey->params_size = RSA_PARAMS;
 
 	asn1_delete_structure(pkey_asn);
 
@@ -110,7 +110,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) {
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	if ((sizeof( pkey->params)/sizeof(MPI)) < DSA_PARAMS) {
+	if ((sizeof( pkey->params)/sizeof(MPI)) < DSA_PRIVATE_PARAMS) {
 		gnutls_assert();
 		/* internal error. Increase the MPIs in params */
 		return GNUTLS_E_INTERNAL;
@@ -166,6 +166,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) {
 		_gnutls_mpi_release( &pkey->params[3]);
 		return result;
 	}
+	pkey->params_size = DSA_PRIVATE_PARAMS;
 
 	asn1_delete_structure(dsa_asn);
 
@@ -185,16 +186,9 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) {
 }
 
 void _gnutls_free_private_key( gnutls_private_key pkey) {
-int n, i;
+int i;
 
-	switch( pkey.pk_algorithm) {
-	case GNUTLS_PK_RSA:
-		n = 2;/* the number of parameters in MPI* */
-		break;
-	default:
-		n=0;
-	}
-	for (i=0;i<n;i++) {
+	for (i=0;i<pkey.params_size;i++) {
 		_gnutls_mpi_release( &pkey.params[i]);
 	}
 

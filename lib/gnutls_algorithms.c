@@ -393,7 +393,7 @@ const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm algorithm)
 int _gnutls_mac_count(void)
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_MAC_ALGOS; i++) {
+	for (i = 0; i < MAX_ALGOS; i++) {
 		if (_gnutls_mac_is_ok(i) == 0)
 			counter++;
 	}
@@ -475,7 +475,7 @@ CompressionMethod _gnutls_compression_get_id(int num)
 int _gnutls_compression_count(void)
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_COMPRESSION_ALGOS; i++) {
+	for (i = 0; i < MAX_ALGOS; i++) {
 		if (_gnutls_compression_is_ok(i) == 0)
 			counter++;
 	}
@@ -568,7 +568,7 @@ const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm algorithm)
 int _gnutls_cipher_count(void)
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_CIPHER_ALGOS; i++) {
+	for (i = 0; i < MAX_ALGOS; i++) {
 		if (_gnutls_cipher_is_ok(i) == 0)
 			counter++;
 	}
@@ -630,7 +630,7 @@ const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm)
 int _gnutls_kx_count(void)
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < MAX_KX_ALGOS; i++) {
+	for (i = 0; i < MAX_ALGOS; i++) {
 		if (_gnutls_kx_is_ok(i) == 0)
 			counter++;
 	}

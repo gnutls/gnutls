@@ -104,6 +104,9 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
                         ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_PROTOCOL_VERSION);
 			break;
+		case GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE:
+                        ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_UNSUPPORTED_CERTIFICATE);
+			break;
 		case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
 			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
 			break;

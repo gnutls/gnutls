@@ -693,7 +693,7 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
 	/* Verify certificate 
 	 */
 	verify =
-	    gnutls_verify_certificate(peer_certificate_list,
+	    _gnutls_x509_verify_certificate(peer_certificate_list,
 				      peer_certificate_list_size,
 				      cred->x509_ca_list, cred->x509_ncas, NULL, 0);
 
@@ -791,7 +791,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	/* Verify certificate 
 	 */
 	verify =
-	    gnutls_verify_certificate(peer_certificate_list,
+	    _gnutls_x509_verify_certificate(peer_certificate_list,
 				      peer_certificate_list_size,
 				      ca_certificate_list, ca_certificate_list_size, NULL, 0);
 
@@ -1519,6 +1519,7 @@ int len, result;
 			gnutls_assert();
 			return result;
 		}
+		gCert->params_size = RSA_PARAMS;
 		
 		return 0;
 	}
@@ -1542,7 +1543,7 @@ int len, result;
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
-		if ((sizeof(gCert->params) / sizeof(MPI)) < DSA_PARAMS) {
+		if ((sizeof(gCert->params) / sizeof(MPI)) < DSA_PUBLIC_PARAMS) {
 			gnutls_assert();
 			/* internal error. Increase the MPIs in params */
 			return GNUTLS_E_INTERNAL;
@@ -1572,6 +1573,7 @@ int len, result;
 			gnutls_assert();
 			return result;
 		}
+		gCert->params_size = DSA_PUBLIC_PARAMS;
 		
 		return 0;
 	}

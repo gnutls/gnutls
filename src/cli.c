@@ -45,7 +45,7 @@
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
 #define MAX_BUF 4096
 
-#define RESUME
+/* #define RESUME */
 
 #define MAX(X,Y) (X >= Y ? X : Y);
 #define CAFILE "x509/ca.pem"
@@ -89,6 +89,8 @@ const int kx_priority[] = { GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA,
 const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+const int cert_type_priority[] = { GNUTLS_CRT_OPENPGP, 0 };
+//const int cert_type_priority[] = { GNUTLS_CRT_OPENPGP, GNUTLS_CRT_OPENPGP, 0 };
 
 
 int main(int argc, char** argv)
@@ -178,6 +180,7 @@ int main(int argc, char** argv)
 	gnutls_kx_set_priority(state, kx_priority);
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
+	gnutls_cert_type_set_priority(state, cert_type_priority);
 
 	gnutls_cred_set( state, GNUTLS_CRD_ANON, anon_cred);
 	gnutls_cred_set( state, GNUTLS_CRD_SRP, cred);
@@ -243,6 +246,7 @@ int main(int argc, char** argv)
 	gnutls_kx_set_priority(state, kx_priority);
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
+	gnutls_cert_type_set_priority(state, cert_type_priority);
 
 	gnutls_cred_set( state, GNUTLS_CRD_ANON, NULL);
 	gnutls_cred_set( state, GNUTLS_CRD_SRP, cred);

@@ -36,6 +36,7 @@
 #include <gnutls_state.h>
 #include <gnutls_auth_int.h>
 #include <gnutls_x509.h>
+#include <gnutls_openpgp.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -76,20 +77,9 @@ PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
 
 void gnutls_free_cert(gnutls_cert cert)
 {
-	int n, i;
+	int i;
 
-	switch (cert.subject_pk_algorithm) {
-	case GNUTLS_PK_RSA:
-		n = RSA_PARAMS;		/* the number of parameters in MPI* */
-		break;
-	case GNUTLS_PK_DSA:
-		n = DSA_PARAMS;		/* the number of parameters in MPI* */
-		break;
-	default:
-		n = 0;
-	}
-
-	for (i = 0; i < n; i++) {
+	for (i = 0; i < cert.params_size; i++) {
 		_gnutls_mpi_release(&cert.params[i]);
 	}
 
@@ -169,10 +159,10 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 	KXAlgorithm kx;
 	int i;
 	PKAlgorithm pk;
-	KXAlgorithm kxlist[MAX_KX_ALGOS];
+	KXAlgorithm kxlist[MAX_ALGOS];
 
 	i = 0;
-	for (kx = 0; kx < MAX_KX_ALGOS; kx++) {
+	for (kx = 0; kx < MAX_ALGOS; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
 			if (cert->cert_type==GNUTLS_CRT_X509) {
@@ -306,6 +296,62 @@ void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
 	state->gnutls_internals.server_cert_callback = func;
 }
 
+/*-
+  * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
+  * @state: is a gnutls state
+  *
+  * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
+  * The return value (status) should be one of the CertificateStatus enumerated elements.
+  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
+  * actual peer. Returns a negative error code in case of an error, or GNUTLS_CERT_NONE if no certificate was sent.
+  *
+  -*/
+int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
+{
+	CERTIFICATE_AUTH_INFO info;
+	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	CertificateStatus verify;
+	int peer_certificate_list_size;
+
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	if (info->raw_certificate_list == NULL || info->ncerts == 0)
+		return GNUTLS_CERT_NONE;
+
+	/* generate a list of gnutls_certs based on the auth info
+	 * raw certs.
+	 */
+	peer_certificate_list_size = info->ncerts;
+
+	if (peer_certificate_list_size != 1) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+	
+	/* Verify certificate 
+	 */
+	verify = gnutls_openpgp_verify_certificate( &info->raw_certificate_list[0],
+				      peer_certificate_list_size);
+
+	if (verify < 0) {
+		gnutls_assert();
+		return GNUTLS_CERT_CORRUPTED;
+	}
+
+
+	return verify;
+}
+
 /**
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
   * @state: is a gnutls state
@@ -333,8 +379,7 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 		case GNUTLS_CRT_X509:
 			return _gnutls_x509_cert_verify_peers( state);
 		case GNUTLS_CRT_OPENPGP:
-			/* FIX THIS */
-/*			return _gnutls_openpgp_cert_verify_peers( state); */
+			return _gnutls_openpgp_cert_verify_peers( state);
 		default:
 			return GNUTLS_E_INVALID_REQUEST;
 	}

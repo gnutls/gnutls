@@ -305,7 +305,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	return GNUTLS_CERT_TRUSTED;
 }
 
-int gnutls_verify_certificate( gnutls_cert * certificate_list,
+int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
     int clist_size, gnutls_cert * trusted_cas, int tcas_size, void *CRLs,
 			      int crls_size)
 {

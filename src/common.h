@@ -41,26 +41,106 @@ GNUTLS_KXAlgorithm kx;
 				       gnutls_srp_server_get_username(state));
 			break;
 		case GNUTLS_CRD_CERTIFICATE:
-		   /* in case of X509 PKI
-		    */
-			cert_list = gnutls_certificate_get_peers( state, &cert_list_size);
-			status = gnutls_certificate_verify_peers( state);
+			switch( gnutls_cert_type_get( state)) {
+				case GNUTLS_CRT_X509:
+
+					printf("- Peer requested X509 certificate authentication.\n");
+
+					   /* in case of X509 PKI
+					    */
+					cert_list = gnutls_certificate_get_peers( state, &cert_list_size);
+
+					if (cert_list_size > 0) {
+						char digest[20];
+						char serial[40];
+						int digest_size = sizeof(digest), i;
+						int serial_size = sizeof(serial);
+						char printable[120];
+						char* print;
+
+						printf(" - Certificate info:\n");
+				
+						/* Print the fingerprint of the certificate
+						 */
+						if ( gnutls_x509_fingerprint( GNUTLS_DIG_MD5, &cert_list[0], digest, &digest_size) >= 0) {
+							print = printable;
+							for (i=0;i<digest_size;i++) {
+								sprintf( print, "%.2x ", (unsigned char)digest[i]);
+								print += 3;
+							}
+							printf(" - Certificate fingerprint: %s\n", printable);
+						}
+				
+						/* Print the serial number of the certificate.
+						 */
+		
+						if ( gnutls_x509_extract_certificate_serial( &cert_list[0], serial, &serial_size) >= 0) {
+							print = printable;
+							for (i=0;i<serial_size;i++) {
+								sprintf( print, "%.2x ", (unsigned char)serial[i]);
+								print += 3;
+							}
+							printf(" - Certificate serial number: %s\n", printable);
+						}
+	
+						/* Print the version of the X.509 
+						 * certificate.
+						 */
+						printf(" - Certificate version: #%d\n", gnutls_x509_extract_certificate_version( &cert_list[0]));
+	
+						gnutls_x509_extract_certificate_dn( &cert_list[0], &dn);
+						PRINT_DN( dn);
+
+						gnutls_x509_extract_certificate_issuer_dn( &cert_list[0], &dn);
+						printf(" - Certificate Issuer's info:\n");
+						PRINT_DN( dn);
+					}
+
+					break;
+				case GNUTLS_CRT_OPENPGP: {
+					char digest[20];
+					int digest_size = sizeof(digest), i;
+					char printable[120];
+					char* print;
+					
+					printf("- Peer requested OpenPGP certificate authentication.\n");
+
+					if ( gnutls_openpgp_fingerprint( &cert_list[0], digest, &digest_size) >= 0) {
+						print = printable;
+						for (i=0;i<digest_size;i++) {
+							sprintf( print, "%.2x ", (unsigned char)digest[i]);
+							print += 3;
+						}
+						printf(" - Certificate fingerprint: %s\n", printable);
+					}
 			
+					gnutls_openpgp_extract_certificate_dn( &cert_list[0], &dn);
+					PRINT_DN( dn);
+
+					break;
+				}
+			}
+
+			status = gnutls_certificate_verify_peers( state);
+								
 			switch( status) {
-			case GNUTLS_CERT_NOT_TRUSTED:
-				printf("- Peer's X509 Certificate was NOT verified\n");
+				case GNUTLS_CERT_NOT_TRUSTED:
+				printf("- Peer's Certificate was NOT verified\n");
 				break;
 			case GNUTLS_CERT_EXPIRED:
-				printf("- Peer's X509 Certificate was verified but is expired\n");
+				printf("- Peer's Certificate was verified but is expired\n");
 				break;
 			case GNUTLS_CERT_TRUSTED:
-				printf("- Peer's X509 Certificate was verified\n");
+				printf("- Peer's Certificate was verified\n");
 				break;
 			case GNUTLS_CERT_NONE:
-				printf("- Peer did not send any X509 Certificate.\n");
+				printf("- Peer did not send any Certificate.\n");
 				break;
 			case GNUTLS_CERT_CORRUPTED:
-				printf("- Peer's X509 Certificate was invalid\n");
+				printf("- Peer's Certificate was corrupted\n");
+				break;
+			default:
+				printf("- Invalid status of peer's certificate.\n");
 				break;
 			}
 
@@ -70,51 +150,6 @@ GNUTLS_KXAlgorithm kx;
 		         printf("\n- Ephemeral DH using prime of %d bits\n",
         		    gnutls_dh_get_bits( state));
       			}
-
-			if (cert_list_size > 0) {
-				char digest[20];
-				char serial[40];
-				int digest_size = sizeof(digest), i;
-				int serial_size = sizeof(serial);
-				char printable[120];
-				char* print;
-
-				printf(" - Certificate info:\n");
-				
-				/* Print the fingerprint of the certificate
-				 */
-				if ( gnutls_fingerprint( GNUTLS_DIG_MD5, &cert_list[0], digest, &digest_size) >= 0) {
-					print = printable;
-					for (i=0;i<digest_size;i++) {
-						sprintf( print, "%.2x ", (unsigned char)digest[i]);
-						print += 3;
-					}
-					printf(" - Certificate fingerprint: %s\n", printable);
-				}
-				
-				/* Print the serial number of the certificate.
-				 */
-				if ( gnutls_x509_extract_certificate_serial( &cert_list[0], serial, &serial_size) >= 0) {
-					print = printable;
-					for (i=0;i<serial_size;i++) {
-						sprintf( print, "%.2x ", (unsigned char)serial[i]);
-						print += 3;
-					}
-					printf(" - Certificate serial number: %s\n", printable);
-				}
-
-				/* Print the version of the X.509 
-				 * certificate.
-				 */
-				printf(" - Certificate version: #%d\n", gnutls_x509_extract_certificate_version( &cert_list[0]));
-
-				gnutls_x509_extract_certificate_dn( &cert_list[0], &dn);
-				PRINT_DN( dn);
-
-				gnutls_x509_extract_certificate_issuer_dn( &cert_list[0], &dn);
-				printf(" - Certificate Issuer's info:\n");
-				PRINT_DN( dn);
-			}
 	}
 
 	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));

@@ -34,36 +34,120 @@
 #include <x509_verify.h>
 #include "debug.h"
 #include <gnutls_sig.h>
-
+#include <gnutls_x509.h>
+#include <gnutls_openpgp.h>
 
 int gen_rsa_client_kx(GNUTLS_STATE, opaque **);
 int proc_rsa_client_kx(GNUTLS_STATE, opaque *, int);
 
 
-MOD_AUTH_STRUCT rsa_auth_struct =
-{
+MOD_AUTH_STRUCT rsa_auth_struct = {
 	"RSA",
-	_gnutls_gen_x509_server_certificate,
-	_gnutls_gen_x509_client_certificate,
+	_gnutls_gen_cert_server_certificate,
+	_gnutls_gen_cert_client_certificate,
 	NULL,			/* gen server kx */
 	NULL,			/* gen server kx2 */
 	NULL,			/* gen client kx0 */
 	gen_rsa_client_kx,
-	_gnutls_gen_x509_client_cert_vrfy, /* gen client cert vrfy */
-	_gnutls_gen_x509_server_cert_req, /* server cert request */
+	_gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
+	_gnutls_gen_cert_server_cert_req,	/* server cert request */
 
-	_gnutls_proc_x509_server_certificate,
-	_gnutls_proc_x509_client_certificate,
+	_gnutls_proc_cert_server_certificate,
+	_gnutls_proc_cert_client_certificate,
 	NULL,			/* proc server kx */
 	NULL,			/* proc server kx2 */
 	NULL,			/* proc client kx0 */
 	proc_rsa_client_kx,	/* proc client kx */
-	_gnutls_proc_x509_client_cert_vrfy, /* proc client cert vrfy */
-	_gnutls_proc_x509_cert_req	/* proc server cert request */
+	_gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
+	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
 
 
+/* This function reads the RSA parameters from peer's certificate;
+ */
+static int _gnutls_get_public_rsa_params(GNUTLS_STATE state)
+{
+int ret;
+CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
+gnutls_cert peer_cert;
+
+	if (info==NULL || info->ncerts==0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+	
+	switch( state->security_parameters.cert_type) {
+		case GNUTLS_CRT_X509:
+			if ((ret =
+			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
+					     info->raw_certificate_list[0])) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			break;
+		case GNUTLS_CRT_OPENPGP:
+			if ((ret =
+			     _gnutls_openpgp_cert2gnutls_cert( &peer_cert,
+					     info->raw_certificate_list[0])) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			break;
+		
+		default:
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+	}
+	
+	
+	state->gnutls_key->a =
+	    gcry_mpi_copy( peer_cert.params[0]);
+	if (state->gnutls_key->a==NULL) {
+		gnutls_free_cert( peer_cert);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	state->gnutls_key->x =
+	    gcry_mpi_copy( peer_cert.params[1]);
+	if (state->gnutls_key->x==NULL) {
+		_gnutls_mpi_release( &state->gnutls_key->a);
+		gnutls_free_cert( peer_cert);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	return 0;
+}
+
+/* This function reads the RSA parameters from the private key
+ */
+static int _gnutls_get_private_rsa_params(GNUTLS_STATE state)
+{
+int index;
+const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+	        gnutls_assert();
+	        return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	if ( (index=state->gnutls_internals.selected_cert_index) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+	
+	state->gnutls_key->u = gcry_mpi_copy( cred->pkey[index].params[2]);
+	if (state->gnutls_key->u==NULL) return GNUTLS_E_MEMORY_ERROR;
+
+	state->gnutls_key->A = gcry_mpi_copy(cred->pkey[index].params[0]);
+	if (state->gnutls_key->A==NULL) {
+		_gnutls_mpi_release( &state->gnutls_key->u);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	return 0;
+}
 
 
 
@@ -81,14 +165,14 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	int ret, dsize;
 	MPI params[RSA_PARAMS];
 
-	if ( gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
+	if (gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		ciphertext.data = data;
 		ciphertext.size = data_size;
 	} else {		/* TLS 1 */
 		ciphertext.data = &data[2];
 		dsize = READuint16(data);
-		
+
 		if (dsize != data_size - 2) {
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -96,10 +180,15 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		ciphertext.size = dsize;
 	}
 
+	ret = _gnutls_get_private_rsa_params(state);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	params[0] = state->gnutls_key->A;
 	params[1] = state->gnutls_key->u;
-	ret =
-	    _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 2); /* btype==2 */
+	ret = _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 2);	/* btype==2 */
 
 	if (ret < 0) {
 		/* in case decryption fails then don't inform
@@ -109,16 +198,20 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 
 		gnutls_assert();
 
-		_gnutls_log( "RSA_AUTH: Possible PKCS-1 format attack\n");
+		_gnutls_log("RSA_AUTH: Possible PKCS-1 format attack\n");
 
-		RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
+		RANDOMIZE_KEY(state->gnutls_key->key,
+			      gnutls_secure_malloc);
 	} else {
 		ret = 0;
 		if (plaintext.size != TLS_MASTER_SIZE) {	/* WOW */
-			RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
+			RANDOMIZE_KEY(state->gnutls_key->key,
+				      gnutls_secure_malloc);
 		} else {
-			if (_gnutls_get_adv_version_major( state) != plaintext.data[0] 
-				|| _gnutls_get_adv_version_minor( state) != plaintext.data[1]) {
+			if (_gnutls_get_adv_version_major(state) !=
+			    plaintext.data[0]
+			    || _gnutls_get_adv_version_minor(state) !=
+			    plaintext.data[1]) {
 				gnutls_assert();
 				ret = GNUTLS_E_DECRYPTION_FAILED;
 			}
@@ -161,22 +254,32 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	}
 	RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
 
-	ver = _gnutls_get_adv_version( state);
+	ver = _gnutls_get_adv_version(state);
 
 	state->gnutls_key->key.data[0] = _gnutls_version_get_major(ver);
 	state->gnutls_key->key.data[1] = _gnutls_version_get_minor(ver);
 
+	/* move RSA parameters to gnutls_key (state).
+	 */
+	if ((ret =
+	     _gnutls_get_public_rsa_params(state)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	params[0] = state->gnutls_key->a;
 	params[1] = state->gnutls_key->x;
 	if ((ret =
-	     _gnutls_pkcs1_rsa_encrypt(&sdata, state->gnutls_key->key, params, 2)) < 0) {
+	     _gnutls_pkcs1_rsa_encrypt(&sdata, state->gnutls_key->key,
+				       params, 2)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 	_gnutls_mpi_release(&state->gnutls_key->a);
 	_gnutls_mpi_release(&state->gnutls_key->x);
 
-	if ( ver == GNUTLS_SSL3) {
+
+	if (ver == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		*data = sdata.data;
 		return sdata.size;
@@ -194,4 +297,3 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	}
 
 }
-
