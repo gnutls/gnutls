@@ -362,6 +362,8 @@ size_t tot_len = 0;
 		asn1_delete_structure(&sig);
 	}
 
+	if (sig_value->data == NULL) sig_value->size = 0;
+
 	result = asn1_der_coding( sig, "", sig_value->data, &sig_value->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

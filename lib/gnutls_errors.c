@@ -239,7 +239,7 @@ int _gnutls_asn2err( int asn_err) {
 		case ASN1_SYNTAX_ERROR:
 			return GNUTLS_E_ASN1_SYNTAX_ERROR;
 		case ASN1_MEM_ERROR:
-			return GNUTLS_E_MEMORY_ERROR;
+			return GNUTLS_E_SHORT_MEMORY_BUFFER;
 		case ASN1_DER_OVERFLOW:
 			return GNUTLS_E_ASN1_DER_OVERFLOW;
 		default:

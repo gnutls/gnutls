@@ -35,6 +35,7 @@
 #include <dn.h>
 #include <x509.h>
 #include <mpi.h>
+#include <common.h>
 #include <verify.h>
 
 static int _gnutls_verify_certificate2(gnutls_x509_crt cert,

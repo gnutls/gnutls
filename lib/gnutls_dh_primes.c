@@ -397,6 +397,8 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	}
 
 	if (format == GNUTLS_X509_FMT_DER) {
+		if (params_data == NULL) *params_data_size = 0;
+
 		if ((result=asn1_der_coding( c2, "", params_data, params_data_size, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
@@ -410,12 +412,22 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 		asn1_delete_structure(&c2);
 
 	} else { /* PEM */
-		opaque tmp[5*1024];
+		opaque *tmp;
 		opaque *out;
-		int len = sizeof(tmp) - 1;
+		int len;
 
+		len = 0;
+		asn1_der_coding( c2, "", NULL, &len, NULL);
+
+		tmp = gnutls_alloca( len);
+		if (tmp == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		
 		if ((result=asn1_der_coding( c2, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_afree( tmp);
 			asn1_delete_structure(&c2);
 			return _gnutls_asn2err(result);
 		}
@@ -424,6 +436,8 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 		
 		result = _gnutls_fbase64_encode("DH PARAMETERS",
 						tmp, len, &out);
+
+		gnutls_afree( tmp);
 
 		if (result < 0) {
 			gnutls_assert();

@@ -219,7 +219,6 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
 	char tmpbuffer3[64];
 	char counter[MAX_INT_DIGITS];
 	char value[200];
-	char escaped[256];
 	char oid[128];
 	int len, printable;
 
@@ -456,7 +455,8 @@ int der_size, result;
 		return _gnutls_asn2err(result);
 	}
 
-	der_size = MAX_PARAMETER_SIZE*2 + 128;
+	_gnutls_x509_write_rsa_params( key->params, key->params_size, NULL, &der_size);
+
 	der = gnutls_alloca( der_size);
 	if (der == NULL) {
 		gnutls_assert();

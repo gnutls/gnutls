@@ -85,7 +85,9 @@ const char* algo;
 		return _gnutls_asn2err(result);
 	}
 
-	info->size = 128;
+	info->size = 0;
+	asn1_der_coding( dinfo, "", NULL, &info->size, NULL);
+
 	info->data = gnutls_malloc( info->size);
 	if (info->data == NULL) {
 		gnutls_assert();
@@ -200,21 +202,33 @@ int _gnutls_x509_sign_tbs( ASN1_TYPE cert, const char* tbs_name,
 	gnutls_mac_algorithm hash, gnutls_x509_privkey signer, gnutls_datum* signature) 
 {
 int result;
-opaque buf[MAX_X509_CERT_SIZE];
-int buf_size = sizeof(buf);
+opaque *buf;
+int buf_size;
 gnutls_datum tbs;
+
+	buf_size = 0;
+	asn1_der_coding( cert, tbs_name, NULL, &buf_size, NULL);
+
+	buf = gnutls_alloca( buf_size);
+	if (buf == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	result = asn1_der_coding( cert, tbs_name, buf, &buf_size, NULL);
 	
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_afree(buf);
 		return _gnutls_asn2err(result);
 	}
 
 	tbs.data = buf;
 	tbs.size = buf_size;
 	
-	return _gnutls_x509_sign( &tbs, hash, signer, signature);
-
+	result = _gnutls_x509_sign( &tbs, hash, signer, signature);
+	gnutls_afree(buf);
+	
+	return result;
 }
 

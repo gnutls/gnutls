@@ -978,8 +978,8 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert,
 	gnutls_digest_algorithm algo, char *buf,
 	 int *sizeof_buf)
 {
-opaque cert_buf[MAX_X509_CERT_SIZE];
-int cert_buf_size = sizeof( cert_buf);
+opaque *cert_buf;
+int cert_buf_size;
 int result;
 gnutls_datum tmp;
 
@@ -987,18 +987,31 @@ gnutls_datum tmp;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
+	cert_buf_size = 0;
+	asn1_der_coding( cert->cert, "", NULL, &cert_buf_size, NULL);
+
+	cert_buf = gnutls_alloca( cert_buf_size);
+	if (cert_buf == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	result = asn1_der_coding( cert->cert, "",
 		cert_buf, &cert_buf_size, NULL);
 	
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_afree( cert_buf);
 		return _gnutls_asn2err(result);
 	}
 	
 	tmp.data = cert_buf;
 	tmp.size = cert_buf_size;
 
-	return gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
+	result = gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
+	gnutls_afree( cert_buf);
+
+	return result;
 }
 
 
@@ -1012,6 +1025,8 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	int result;
 	
 	if (format == GNUTLS_X509_FMT_DER) {
+		if (output_data == NULL) *output_data_size = 0;
+	
 		if ((result=asn1_der_coding( asn1_data, "", output_data, output_data_size, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			

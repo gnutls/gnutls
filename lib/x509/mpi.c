@@ -309,6 +309,7 @@ int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
 		return result;
 	}
 
+	if (der == NULL) *dersize = 0;
 	result = asn1_der_coding( spk, "", der, dersize, NULL);
 
 	asn1_delete_structure(&spk);

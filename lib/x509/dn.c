@@ -482,7 +482,8 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 }
 
 /* This will encode and write the AttributeTypeAndValue field.
- * multi must be zero if writing an AttributeTypeAndValue, and 1 if Attribute.
+ * 'multi' must be zero if writing an AttributeTypeAndValue, and 1 if Attribute.
+ * In all cases only one value is written.
  */
 int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
 	const char* where, const unsigned char* data, int sizeof_data, int multi) 
@@ -548,9 +549,10 @@ int der_len, result;
 		return _gnutls_asn2err(result);
 	}
 
-	der_len = sizeof_data + 64;
-	der = gnutls_alloca( der_len);
+	der_len = 0;
+	asn1_der_coding( c2, "", NULL, &der_len, NULL);
 
+	der = gnutls_alloca( der_len);
 	result = asn1_der_coding( c2, "", der, &der_len, NULL);
 	
 	asn1_delete_structure( &c2);
