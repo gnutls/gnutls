@@ -20,6 +20,11 @@
 
 #ifndef GNUTLS_OPENSSL_H
 #define GNUTLS_OPENSSL_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <gnutls/gnutls.h>
 #include <gcrypt.h>
 
@@ -283,4 +288,8 @@ void RIPEMD160_Update(RIPEMD160_CTX *ctx, const void *buf, int len);
 void RIPEMD160_Final(unsigned char *md, RIPEMD160_CTX *ctx);
 unsigned char *RIPEMD160(const unsigned char *buf, unsigned long len,
                          unsigned char *md);
+
+#ifdef __cplusplus
+}
+#endif
 #endif
