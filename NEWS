@@ -1,10 +1,10 @@
-Version 0.8.1 (22/01/2003)
+Version 0.8.1
 - Improved the SRP support, to prevent attackers guessing the
   available usernames by brute force.
 - Improved the SRP detection in gnutls-cli-debug
 - Some fixes which now allow compilation.
 
-Version 0.8.0 (20/01/2003)
+Version 0.8.0 (20/01/2002)
 - Added gnutls_x509_extract_dn_string() which returns a 
   distinguished name in a single string.
 - Added gnutls_openpgp_extract_key_name_string() which returns
