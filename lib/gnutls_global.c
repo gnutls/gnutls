@@ -167,6 +167,9 @@ int gnutls_global_init( void)
 		gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL,0);
 
 #ifdef DEBUG
+		/* applications may want to override that, so we only use
+		 * it in debugging mode.
+		 */
 		gcry_set_log_handler( _gnutls_gcry_log_handler, NULL);
 #endif
 	}
