@@ -1,9 +1,7 @@
 /* minip12.c - A mini pkcs-12 implementation (modified for gnutls)
  *
- * Copyright (C) 2004 Simon Josefsson
- * Copyright (C) 2002 Free Software Foundation, Inc.
+ * Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
  *
- * This file some day was part of GnuPG.
  * This file is part of GNUTLS.
  *
  * The GNUTLS library is free software; you can redistribute it and/or
