@@ -5,7 +5,7 @@ EXTRA_DIST = common.h crypt.gaa crypt-gaa.h README.srpcrypt \
 
 SUBDIRS = srp x509 openpgp cfg
 
-INCLUDES = -I../lib -I../libtasn1/lib -I../includes $(LIBOPENCDK_CFLAGS)
+INCLUDES = -I../lib -I../libtasn1/lib -I../includes $(LIBOPENCDK_CFLAGS) -Icfg/
 
 bin_PROGRAMS = gnutls-serv gnutls-cli srptool gnutls-cli-debug certtool
 gnutls_serv_SOURCES = serv-gaa.c serv.c common.c
