@@ -380,10 +380,12 @@ int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt,
 }
 
 /**
-  * gnutls_x509_crt_sign - This function will sign a Certificate request with a key
+  * gnutls_x509_crt_sign2 - This function will sign a certificate with a key
   * @crt: should contain a gnutls_x509_crt_t structure
   * @issuer: is the certificate of the certificate issuer
   * @issuer_key: holds the issuer's private key
+  * @dig: The message digest to use. GNUTLS_DIG_SHA is the safe choice unless you know what you're doing.
+  * @flags: must be 0
   *
   * This function will sign the certificate with the issuer's private key, and
   * will copy the issuer's information into the certificate.
@@ -394,8 +396,8 @@ int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_sign(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
-			 gnutls_x509_privkey_t issuer_key)
+int gnutls_x509_crt_sign2(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+    gnutls_x509_privkey_t issuer_key, gnutls_digest_algorithm_t dig, unsigned int flags)
 {
     int result;
 
@@ -408,14 +410,32 @@ int gnutls_x509_crt_sign(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
      */
     disable_optional_stuff(crt);
 
-    result = _gnutls_x509_pkix_sign(crt->cert, "tbsCertificate", issuer,
-				    issuer_key);
+    result = _gnutls_x509_pkix_sign(crt->cert, "tbsCertificate", 
+        dig, issuer, issuer_key);
     if (result < 0) {
 	gnutls_assert();
 	return result;
     }
 
     return 0;
+}
+
+/**
+  * gnutls_x509_crt_sign - This function will sign a certificate with a key
+  * @crt: should contain a gnutls_x509_crt_t structure
+  * @issuer: is the certificate of the certificate issuer
+  * @issuer_key: holds the issuer's private key
+  *
+  * This function is the same a gnutls_x509_crt_sign2() with no flags, and
+  * SHA1 as the hash algorithm.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crt_sign(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+    gnutls_x509_privkey_t issuer_key)
+{
+    return gnutls_x509_crt_sign2( crt, issuer, issuer_key, GNUTLS_MAC_SHA, 0);
 }
 
 /**

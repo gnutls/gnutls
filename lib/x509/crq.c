@@ -590,9 +590,11 @@ int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 }
 
 /**
-  * gnutls_x509_crq_sign - This function will sign a Certificate request with a key
+  * gnutls_x509_crq_sign2 - This function will sign a Certificate request with a key
   * @crq: should contain a gnutls_x509_crq_t structure
   * @key: holds a private key
+  * @dig: The message digest to use. GNUTLS_DIG_SHA is the safe choice unless you know what you're doing.
+  * @flags: must be 0
   *
   * This function will sign the certificate request with a private key.
   * This must be the same key as the one used in gnutls_x509_crt_set_key() since a
@@ -604,7 +606,8 @@ int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
+int gnutls_x509_crq_sign2(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
+    gnutls_digest_algorithm_t dig, unsigned int flags)
 {
     int result;
     gnutls_datum_t signature;
@@ -618,7 +621,7 @@ int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
      */
     result =
 	_gnutls_x509_sign_tbs(crq->crq, "certificationRequestInfo",
-			      GNUTLS_MAC_SHA, key, &signature);
+            dig, key, &signature);
 
     if (result < 0) {
 	gnutls_assert();
@@ -641,14 +644,29 @@ int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
     /* Step 3. Write the signatureAlgorithm field.
      */
     result = _gnutls_x509_write_sig_params(crq->crq, "signatureAlgorithm",
-					   key->pk_algorithm, key->params,
-					   key->params_size);
+	key->pk_algorithm, dig, key->params, key->params_size);
     if (result < 0) {
 	gnutls_assert();
 	return result;
     }
 
     return 0;
+}
+
+/**
+  * gnutls_x509_crq_sign - This function will sign a Certificate request with a key
+  * @crq: should contain a gnutls_x509_crq_t structure
+  * @key: holds a private key
+  *
+  * This function is the same a gnutls_x509_crq_sign2() with no flags, and
+  * SHA1 as the hash algorithm.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
+{
+    return gnutls_x509_crq_sign2(crq, key, GNUTLS_MAC_SHA, 0);
 }
 
 /**

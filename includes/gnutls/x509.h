@@ -180,6 +180,8 @@ int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt, gnutls_x
     const char* data_string);
 int gnutls_x509_crt_sign(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer, 
     gnutls_x509_privkey_t issuer_key);
+int gnutls_x509_crt_sign2(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer, 
+    gnutls_x509_privkey_t issuer_key, gnutls_digest_algorithm_t, unsigned int flags);
 int gnutls_x509_crt_set_activation_time(gnutls_x509_crt_t cert, time_t act_time);
 int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt_t cert, time_t exp_time);
 int gnutls_x509_crt_set_serial(gnutls_x509_crt_t cert, const void* serial, 
@@ -239,6 +241,8 @@ int gnutls_x509_crl_check_issuer( gnutls_x509_crl_t crl,
 int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version);
 int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer, 
     gnutls_x509_privkey_t issuer_key);
+int gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer, 
+    gnutls_x509_privkey_t issuer_key, gnutls_digest_algorithm_t, unsigned int flags);
 int gnutls_x509_crl_set_this_update(gnutls_x509_crl_t crl, time_t act_time);
 int gnutls_x509_crl_set_next_update(gnutls_x509_crl_t crl, time_t exp_time);
 int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl_t crl, const void* serial, 
@@ -410,6 +414,8 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq_t crq, const char* oid,
     unsigned int raw_flag, const void *name, unsigned int sizeof_name);
 int gnutls_x509_crq_set_version(gnutls_x509_crq_t crq, unsigned int version);
 int gnutls_x509_crq_set_key(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key);
+int gnutls_x509_crq_sign2(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
+    gnutls_digest_algorithm_t, unsigned int flags);
 int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key);
 
 int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq, const char* pass);

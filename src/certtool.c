@@ -58,7 +58,7 @@ void certificate_info(void);
 void crl_info(void);
 void privkey_info(void);
 static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
-				   unsigned int);
+    unsigned int);
 static void gaa_parser(int argc, char **argv);
 void generate_self_signed(void);
 void generate_request(void);
@@ -69,6 +69,7 @@ FILE *outfile;
 FILE *infile;
 static int in_cert_format;
 static int out_cert_format;
+gnutls_digest_algorithm_t dig = GNUTLS_DIG_SHA;
 
 #define UNKNOWN "Unknown"
 
@@ -114,6 +115,7 @@ static gnutls_x509_privkey generate_private_key_int(void)
 	msg = "RSA";
 	key_type = GNUTLS_PK_RSA;
     }
+    
 
     if (info.privkey)
 	return load_private_key(1);
@@ -439,8 +441,7 @@ gnutls_x509_crt generate_certificate(gnutls_x509_privkey * ret_key,
 	if (result) {
 	    result =
 		gnutls_x509_crt_set_key_purpose_oid(crt,
-						    GNUTLS_KP_CODE_SIGNING,
-						    0);
+			GNUTLS_KP_CODE_SIGNING, 0);
 	    if (result < 0) {
 		fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
 		exit(1);
@@ -632,8 +633,8 @@ void generate_self_signed(void)
     print_certificate_info(crt, stderr, 0);
 
     fprintf(stderr, "\n\nSigning certificate...\n");
-
-    result = gnutls_x509_crt_sign(crt, crt, key);
+fprintf(stderr, "DIG: %d\n",dig);
+    result = gnutls_x509_crt_sign2(crt, crt, key, dig, 0);
     if (result < 0) {
 	fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 	exit(1);
@@ -678,7 +679,8 @@ void generate_signed_certificate(void)
 
     fprintf(stderr, "\n\nSigning certificate...\n");
 
-    result = gnutls_x509_crt_sign(crt, ca_crt, ca_key);
+fprintf(stderr, "DIG: %d\n",dig);
+    result = gnutls_x509_crt_sign2(crt, ca_crt, ca_key, dig, 0);
     if (result < 0) {
 	fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 	exit(1);
@@ -751,7 +753,8 @@ void update_signed_certificate(void)
 
     fprintf(stderr, "\n\nSigning certificate...\n");
 
-    result = gnutls_x509_crt_sign(crt, ca_crt, ca_key);
+fprintf(stderr, "DIG: %d\n",dig);
+    result = gnutls_x509_crt_sign2(crt, ca_crt, ca_key, dig, 0);
     if (result < 0) {
 	fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
 	exit(1);
@@ -806,6 +809,16 @@ void gaa_parser(int argc, char **argv)
 	out_cert_format = GNUTLS_X509_FMT_DER;
     else
 	out_cert_format = GNUTLS_X509_FMT_PEM;
+
+    if (info.hash!=NULL) {
+    	if (strcasecmp(info.hash, "md5")==0)
+    	   dig = GNUTLS_DIG_MD5;
+    	else if (strcasecmp(info.hash, "sha1")==0)
+    	   dig = GNUTLS_DIG_SHA;
+    	else if (strcasecmp(info.hash, "rmd160")==0)
+    	   dig = GNUTLS_DIG_RMD160;
+    	else fprintf(stderr, "Unsupported hash algorithm '%s'. Using the default.\n", info.hash);
+    }
 
     batch = 0;
     if (info.template) {
@@ -2469,7 +2482,7 @@ void generate_pkcs12(void)
      */
     result = gnutls_pkcs12_init(&pkcs12);
     if (result < 0) {
-	fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
+	fprintf(stderr, "pkcs12_init: %s\n", gnutls_strerror(result));
 	exit(1);
     }
 

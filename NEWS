@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 1.2.0
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
+- Introduced gnutls_x509_crt_sign2(), gnutls_x509_crq_sign2() and 
+  gnutls_x509_crl_sign2().
 
 * Version 1.1.23 (2005-01-18)
 - It is now possible to generate PKCS#12 structures without private

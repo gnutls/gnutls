@@ -333,8 +333,8 @@ int _gnutls_x509_write_rsa_params(mpi_t * params, int params_size,
  * This is the "signatureAlgorithm" fields.
  */
 int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
-				  gnutls_pk_algorithm_t pk_algorithm,
-				  mpi_t * params, int params_size)
+    gnutls_pk_algorithm_t pk_algorithm, gnutls_digest_algorithm_t dig,
+    mpi_t * params, int params_size)
 {
     gnutls_datum_t der;
     int result;
@@ -344,7 +344,7 @@ int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
     _gnutls_str_cpy(name, sizeof(name), dst_name);
     _gnutls_str_cat(name, sizeof(name), ".algorithm");
 
-    pk = _gnutls_x509_sign_to_oid(pk_algorithm, GNUTLS_MAC_SHA);
+    pk = _gnutls_x509_sign_to_oid(pk_algorithm, dig);
     if (pk == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_INVALID_REQUEST;

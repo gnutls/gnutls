@@ -80,10 +80,12 @@ int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl,
 }
 
 /**
-  * gnutls_x509_crl_sign - This function will sign a CRL with a key
+  * gnutls_x509_crl_sign2 - This function will sign a CRL with a key
   * @crl: should contain a gnutls_x509_crl_t structure
   * @issuer: is the certificate of the certificate issuer
   * @issuer_key: holds the issuer's private key
+  * @dig: The message digest to use. GNUTLS_DIG_SHA is the safe choice unless you know what you're doing.
+  * @flags: must be 0
   *
   * This function will sign the CRL with the issuer's private key, and
   * will copy the issuer's information into the CRL.
@@ -94,8 +96,8 @@ int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
-			 gnutls_x509_privkey_t issuer_key)
+int gnutls_x509_crl_sign2(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
+    gnutls_x509_privkey_t issuer_key, gnutls_digest_algorithm_t dig, unsigned int flags)
 {
     int result;
 
@@ -108,14 +110,32 @@ int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
      */
     disable_optional_stuff(crl);
 
-    result = _gnutls_x509_pkix_sign(crl->crl, "tbsCertList", issuer,
-				    issuer_key);
+    result = _gnutls_x509_pkix_sign(crl->crl, "tbsCertList", 
+        dig, issuer, issuer_key);
     if (result < 0) {
 	gnutls_assert();
 	return result;
     }
 
     return 0;
+}
+
+/**
+  * gnutls_x509_crl_sign - This function will sign a CRL with a key
+  * @crl: should contain a gnutls_x509_crl_t structure
+  * @issuer: is the certificate of the certificate issuer
+  * @issuer_key: holds the issuer's private key
+  *
+  * This function is the same a gnutls_x509_crl_sign2() with no flags, and
+  * SHA1 as the hash algorithm.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
+    gnutls_x509_privkey_t issuer_key)
+{
+    return gnutls_x509_crl_sign2( crl, issuer, issuer_key, GNUTLS_MAC_SHA, 0);
 }
 
 /**

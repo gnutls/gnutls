@@ -71,6 +71,9 @@ option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 #int dsa;
 option (dsa) { $dsa=1 } "Use DSA keys."
 
+#char *hash;
+option (hash) STR "STR" { $hash = $1 } "Hash algorithm to use for signing (MD5,SHA1,RMD160)."
+
 #int export;
 option (export-ciphers) { $export=1 } "Use weak encryption algorithms."
 
@@ -107,5 +110,5 @@ option ( copyright) { print_license(); exit(0); } "shows the program's license"
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; 
-	$export = 0; $template = NULL; $xml = 0;}
+	$export = 0; $template = NULL; $xml = 0; $hash=NULL; }
 

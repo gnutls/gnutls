@@ -82,7 +82,7 @@ typedef enum { GNUTLS_MAC_NULL=1,
 /* The enumerations here should have the same value with gnutls_mac_algorithm_t.
  */
 typedef enum { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, 
-    GNUTLS_DIG_SHA, GNUTLS_DIG_RIPEMD160 
+    GNUTLS_DIG_SHA, GNUTLS_DIG_RMD160 
 } gnutls_digest_algorithm_t;
 
 /* exported for other gnutls headers. This is the maximum number

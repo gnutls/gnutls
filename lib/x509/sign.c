@@ -46,9 +46,8 @@
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.
  */
-static int encode_ber_digest_info(gnutls_mac_algorithm_t hash,
-				  const gnutls_datum_t * digest,
-				  gnutls_datum_t * info)
+static int encode_ber_digest_info(gnutls_digest_algorithm_t hash,
+    const gnutls_datum_t * digest, gnutls_datum_t * info)
 {
     ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
     int result;
@@ -117,7 +116,7 @@ static int encode_ber_digest_info(gnutls_mac_algorithm_t hash,
  * params[1] is public key
  */
 static int
-pkcs1_rsa_sign(gnutls_mac_algorithm_t hash, const gnutls_datum_t * text,
+pkcs1_rsa_sign(gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
 	       mpi_t * params, int params_len, gnutls_datum_t * signature)
 {
     int ret;
@@ -198,9 +197,8 @@ dsa_sign(const gnutls_datum_t * text,
  * 'hash' is only used in PKCS1 RSA signing.
  */
 int _gnutls_x509_sign(const gnutls_datum_t * tbs,
-		      gnutls_mac_algorithm_t hash,
-		      gnutls_x509_privkey_t signer,
-		      gnutls_datum_t * signature)
+    gnutls_digest_algorithm_t hash, gnutls_x509_privkey_t signer,
+    gnutls_datum_t * signature)
 {
     int ret;
 
@@ -237,9 +235,8 @@ int _gnutls_x509_sign(const gnutls_datum_t * tbs,
  * of the TBS and sign it on the fly.
  */
 int _gnutls_x509_sign_tbs(ASN1_TYPE cert, const char *tbs_name,
-			  gnutls_mac_algorithm_t hash,
-			  gnutls_x509_privkey_t signer,
-			  gnutls_datum_t * signature)
+    gnutls_digest_algorithm_t hash, gnutls_x509_privkey_t signer,
+    gnutls_datum_t * signature)
 {
     int result;
     opaque *buf;
@@ -285,8 +282,8 @@ int _gnutls_x509_sign_tbs(ASN1_TYPE cert, const char *tbs_name,
   *
   -*/
 int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
-			   gnutls_x509_crt_t issuer,
-			   gnutls_x509_privkey_t issuer_key)
+    gnutls_digest_algorithm_t dig,
+    gnutls_x509_crt_t issuer, gnutls_x509_privkey_t issuer_key)
 {
     int result;
     gnutls_datum_t signature;
@@ -298,8 +295,7 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
     _gnutls_str_cat(name, sizeof(name), ".issuer");
 
     result = _gnutls_asn1_copy_node(&src, name,
-				    issuer->cert,
-				    "tbsCertificate.subject");
+	issuer->cert, "tbsCertificate.subject");
     if (result < 0) {
 	gnutls_assert();
 	return result;
@@ -311,9 +307,8 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
     _gnutls_str_cat(name, sizeof(name), ".signature");
 
     result = _gnutls_x509_write_sig_params(src, name,
-					   issuer_key->pk_algorithm,
-					   issuer_key->params,
-					   issuer_key->params_size);
+	issuer_key->pk_algorithm, dig, issuer_key->params, 
+	issuer_key->params_size);
     if (result < 0) {
 	gnutls_assert();
 	return result;
@@ -321,8 +316,8 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
 
     /* Step 2. Sign the certificate.
      */
-    result = _gnutls_x509_sign_tbs(src, src_name, GNUTLS_MAC_SHA,
-				   issuer_key, &signature);
+    result = _gnutls_x509_sign_tbs(src, src_name, dig,
+	issuer_key, &signature);
 
     if (result < 0) {
 	gnutls_assert();
@@ -333,7 +328,7 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
      */
     result =
 	asn1_write_value(src, "signature", signature.data,
-			 signature.size * 8);
+            signature.size * 8);
 
     _gnutls_free_datum(&signature);
 
@@ -347,9 +342,8 @@ int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
      */
 
     result = _gnutls_x509_write_sig_params(src, "signatureAlgorithm",
-					   issuer_key->pk_algorithm,
-					   issuer_key->params,
-					   issuer_key->params_size);
+	issuer_key->pk_algorithm, dig, issuer_key->params,
+        issuer_key->params_size);
     if (result < 0) {
 	gnutls_assert();
 	return result;
