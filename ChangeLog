@@ -1,3 +1,10 @@
+2002-07-20 18:44  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_handshake.c:
+
+	Added a special error code for cases where the peer (server)
+	supports only export ciphersuites.  
+
 2002-07-15 19:38  nmav <nmav@gnutls.org>
 
 	* doc/tex/: auth.tex, errors.tex, howto.tex, openpgp.tex,
@@ -15,9 +22,9 @@
 	lib/gnutls_compress_int.c (tags: gnutls_0_5_1),
 	lib/gnutls_constate.c (tags: gnutls_0_5_1), lib/gnutls_errors.c
 	(tags: gnutls_0_5_1), lib/gnutls_errors_int.h (tags: gnutls_0_5_1),
-	lib/gnutls_global.c (tags: gnutls_0_5_1), lib/gnutls_int.h (tags:
-	gnutls_0_5_1), lib/gnutls_record.c (tags: gnutls_0_5_1),
-	lib/gnutls_state.c (tags: gnutls_0_5_1):
+	lib/gnutls_global.c (tags: gnutls_0_5_1), lib/gnutls_int.h,
+	lib/gnutls_record.c (tags: gnutls_0_5_1), lib/gnutls_state.c (tags:
+	gnutls_0_5_1):
 
 	Fixes in zlib compression code. gnutls_global_init_extra() in
 	libgnutls-extra fails if library versions do not match. Semantic
