@@ -605,7 +605,9 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 			break;
 
 		case GNUTLS_CHANGE_CIPHER_SPEC:
-			/* this packet is now handled above */
+			/* this packet is now handled in the recv_int()
+			 * function
+			 */
 			gnutls_assert();
 	
 			return GNUTLS_E_UNEXPECTED_PACKET;
@@ -635,8 +637,13 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 				gnutls_assert();
 				return GNUTLS_E_UNEXPECTED_PACKET;
 			}
-			gnutls_assert();
 			
+			/* If we are already in a handshake then a Hello
+			 * Request is illegal. But here we don't really care
+			 * since this message will never make it up here.
+			 */
+
+			/* So we accept it */
 			return _gnutls_recv_hello_request( session, data, data_size);
 
 			break;
