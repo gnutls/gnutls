@@ -841,7 +841,7 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	size = CERTTYPE_SIZE + 2;	/* 2 for CertType + 2 for size of rdn_seq 
 					 */
 
-	size += cred->rdn_sequence.size;
+	size += cred->x509_rdn_sequence.size;
 
 	(*data) = gnutls_malloc(size);
 	pdata = (*data);
@@ -857,8 +857,8 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	pdata[2] = DSA_SIGN;	/* only these for now */
 	pdata += CERTTYPE_SIZE;
 
-	WRITEdatum16(pdata, cred->rdn_sequence);
-	pdata += cred->rdn_sequence.size + 2;
+	WRITEdatum16(pdata, cred->x509_rdn_sequence);
+	pdata += cred->x509_rdn_sequence.size + 2;
 
 	return size;
 }
@@ -1287,7 +1287,7 @@ int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 	verify =
 	    gnutls_verify_certificate(peer_certificate_list,
 				      peer_certificate_list_size,
-				      cred->ca_list, cred->ncas, NULL, 0);
+				      cred->x509_ca_list, cred->x509_ncas, NULL, 0);
 
 	CLEAR_CERTS;
 	gnutls_free(peer_certificate_list);

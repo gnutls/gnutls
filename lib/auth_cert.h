@@ -8,27 +8,29 @@
  */
 typedef struct {
 
-	/* X509 stuff */
-
 	gnutls_cert ** cert_list; 
 			/* contains a list of a list of certificates.
-			 * eg:   [0] certificate1, certificate11, certificate111 
+			 * eg (X509): [0] certificate1, certificate11, certificate111 
 			 * (if more than one, one certificate certifies the one before)
 			 *       [1] certificate2, certificate22, ...
 			 */
 	int * cert_list_length;
 			/* contains the number of the certificates in a
-			 * row.
+			 * row (should be 1 for OpenPGP keys).
 			 */
 	int ncerts;     /* contains the number of columns in cert_list.
 			 */
-	gnutls_private_key * pkey;   /* private keys. It contains ncerts private
+
+	gnutls_private_key * pkey; 
+			       /* private keys. It contains ncerts private
 				* keys. pkey[i] corresponds to certificate in
 				* cert_list[i][0].
 				*/
 
-	gnutls_cert * ca_list;
-	int ncas;	/* number of CAs in the ca_list 
+	/* X509 specific stuff */
+
+	gnutls_cert * x509_ca_list;
+	int x509_ncas;	/* number of CAs in the ca_list 
 			 */
 
 			/* holds a sequence of the
@@ -36,7 +38,7 @@ typedef struct {
 			 * This is better than
 			 * generating it every time.
 			 */
-	gnutls_datum	rdn_sequence;
+	gnutls_datum	x509_rdn_sequence;
 } CERTIFICATE_CREDENTIALS_INT;
 
 /* typedef CERTIFICATE_CREDENTIALS_INT * CERTIFICATE_CREDENTIALS; */
