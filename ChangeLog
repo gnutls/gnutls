@@ -1,3 +1,25 @@
+2002-10-05 09:34  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_ui.c, lib/gnutls_ui.h:
+
+	rolled back addition of certificate_get_our_issuer() function.  
+
+2002-10-04 19:09  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, lib/gnutls_state.c, lib/gnutls_ui.c,
+	lib/gnutls_ui.h:
+
+	Corrected bug which prevented gnutls_certificate_get_ours() from
+	working.  Added gnutls_certificate_get_our_issuer() function.  
+
+2002-10-04 10:12  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_privkey.c, gnutls_privkey.h, gnutls_ui.h,
+	gnutls_x509.c, x509_b64.c:
+
+	Improved gnutls_x509_extract_key_pk_algorithm(), which can now
+	distinguish DSA keys from unknown keys.  
+
 2002-10-02 12:43  nmav <nmav@gnutls.org>
 
 	* configure.in, lib/gnutls_buffers.c:
