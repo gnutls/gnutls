@@ -27,6 +27,7 @@
 #include <cert_asn1.h>
 #include <cert_der.h>
 #include <gnutls_datum.h>
+#include <gnutls_gcry.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -64,11 +65,69 @@ PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
 	return ret;
 }
 
+#define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
+void gnutls_free_cert( gnutls_cert cert) {
+int n,i;
 
+	switch( cert.subject_pk_algorithm) {
+	case GNUTLS_PK_RSA:
+		n = 2;/* the number of parameters in MPI* */
+		break;
+	default:
+		n=0;
+	}
+	
+	for (i=0;i<n;i++) {
+		_gnutls_mpi_release( &cert.params[i]);
+	}
+	
+	GNUTLS_FREE( cert.common_name);
+	GNUTLS_FREE( cert.country);
+	GNUTLS_FREE( cert.organization);
+	GNUTLS_FREE( cert.organizational_unit_name);
+	GNUTLS_FREE( cert.locality_name);
+	GNUTLS_FREE( cert.state_or_province_name);
+
+	gnutls_free_datum( &cert.raw);
+
+	return;
+}
+
+/**
+  * gnutls_free_x509_sc - Used to free an allocated x509 SERVER CREDENTIALS structure
+  * @sc: is an &X509PKI_SERVER_CREDENTIALS structure.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to free (deallocate)
+  * the structure.
+  **/
+void gnutls_free_x509_sc( X509PKI_SERVER_CREDENTIALS sc) {
+int i,j;
+
+	for (i=0;i<sc.ncerts;i++) {
+		for (j=0;j<sc.cert_list_length[i];j++) {
+			gnutls_free_cert( sc.cert_list[i][j]);
+		}
+		gnutls_free( sc.cert_list[i]);
+	}
+	gnutls_free( sc.cert_list );
+	gnutls_free_datum( sc.pkey);
+}
 
 /* FIXME: this function is a mess 
  */
-int gnutls_read_certs(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
+/**
+  * gnutls_allocate_x509_sc - Used to allocate an x509 SERVER CREDENTIALS structure
+  * @res: is a pointer to an &X509PKI_SERVER_CREDENTIALS structure.
+  * @CERTFILE: is the name of a PEM encoded certificate file
+  * @KEYFILE: is the name of a PEM encoded key file
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to allocate
+  * the structure from the given keys.
+  * FIXME: does not support multiple keys yet.
+  **/
+int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
 		      char *KEYFILE)
 {
 	FILE *fd1, *fd2;

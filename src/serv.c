@@ -72,7 +72,7 @@ GNUTLS_STATE initialize_state()
 	GNUTLS_STATE state;
 	int ret;
 
-	if (gnutls_read_certs(&x509_cred, CERTFILE, KEYFILE) < 0) {
+	if (gnutls_allocate_x509_sc(&x509_cred, CERTFILE, KEYFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\n");
 		exit(1);
 	}

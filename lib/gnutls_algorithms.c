@@ -753,7 +753,7 @@ int _gnutls_kx_is_ok(KXAlgorithm algorithm)
 
 /**
   * gnutls_version_get_name - Returns a string with the name of the specified SSL/TLS version
-  * @algorithm: is a version number
+  * @version: is a (gnutls) version number
   *
   * Returns an allocated (with malloc) string that contains the name 
   * of the specified TLS version.

@@ -29,7 +29,6 @@
 #include <unistd.h>
 #include "../lib/gnutls.h"
 #include <signal.h>
-#include "port.h"
 #include <sys/time.h>
 
 #define SA struct sockaddr
@@ -45,6 +44,7 @@
 static int print_info( GNUTLS_STATE state) {
 char *tmp;
 const ANON_AUTH_INFO *dh_info;
+const X509PKI_AUTH_INFO *x509_info;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp); free(tmp);
@@ -53,6 +53,26 @@ const ANON_AUTH_INFO *dh_info;
 		if (dh_info != NULL)
 			printf("- Anonymous DH using prime of %d bits\n",
 			       dh_info->dh_bits);
+	}
+
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_RSA) {
+		x509_info = gnutls_get_auth_info(state);
+		if (x509_info != NULL) {
+			switch( x509_info->peer_certificate_status) {
+			case GNUTLS_NOT_VERIFIED:
+				printf("- Peer's Certificate was NOT verified\n");
+				break;
+			case GNUTLS_EXPIRED:
+				printf("- Peer's Certificate was verified but is expired\n");
+				break;
+			case GNUTLS_INVALID:
+				printf("- Peer's Certificate was invalid\n");
+				break;
+			case GNUTLS_VERIFIED:
+				printf("- Peer's Certificate was verified\n");
+				break;
+			}
+		}
 	}
 
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
@@ -71,7 +91,7 @@ const ANON_AUTH_INFO *dh_info;
 	return 0;
 }
 
-int main()
+int main(int argc, char** argv)
 {
 	int err, ret;
 	int sd, ii;
@@ -91,6 +111,10 @@ int main()
 	SRP_CLIENT_CREDENTIALS cred;
 	X509PKI_CLIENT_CREDENTIALS xcred;
 
+	if (argc!=3) {
+		fprintf(stderr, "Usage: cli [host] [port]\n");
+		exit(1);
+	}
 	PARSE();
 		
 	cred.username = "test";
@@ -103,8 +127,8 @@ int main()
 
 	memset(&sa, '\0', sizeof(sa));
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = inet_addr(SERVER);
-	sa.sin_port = htons(PORT);
+	sa.sin_port = htons(atoi(argv[2]));
+	inet_pton( AF_INET, argv[1], &sa.sin_addr); 
 
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");

@@ -29,9 +29,9 @@
 #define BUFFERS_DEBUG
 #define RECORD_DEBUG
 #define HARD_DEBUG
-*/
 #define HANDSHAKE_DEBUG
 #define DEBUG
+*/
 
 #define SOCKET int
 #define LIST ...
