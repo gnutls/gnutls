@@ -85,8 +85,8 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 
 	state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_SERVER_AUTH_INFO));
 	if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
-	((ANON_SERVER_AUTH_INFO*)state->gnutls_key->auth_info)->dh_bits = gcry_mpi_get_nbits(p);
-	state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO);
+	((ANON_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->dh_bits = gcry_mpi_get_nbits(p);
+	state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO_INT);
 
 	X = gnutls_calc_dh_secret(&x, g, p);
 	state->gnutls_key->dh_secret = x;
@@ -212,8 +212,8 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	/* set auth_info */
 	state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_CLIENT_AUTH_INFO));
 	if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
-	((ANON_CLIENT_AUTH_INFO*)state->gnutls_key->auth_info)->dh_bits = gcry_mpi_get_nbits(state->gnutls_key->client_p);
-	state->gnutls_key->auth_info_size = sizeof(ANON_CLIENT_AUTH_INFO);
+	((ANON_CLIENT_AUTH_INFO)state->gnutls_key->auth_info)->dh_bits = gcry_mpi_get_nbits(state->gnutls_key->client_p);
+	state->gnutls_key->auth_info_size = sizeof(ANON_CLIENT_AUTH_INFO_INT);
 
 	/* We should check signature in non-anonymous KX 
 	 * this is anonymous however

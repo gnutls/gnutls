@@ -26,7 +26,7 @@
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (X509PKI_CLIENT_AUTH_INFO)
  */
-void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO* info, gnutls_cert* cert, CertificateStatus verify) {
+void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify) {
  /* Copy peer's information to AUTH_INFO
   */
   	memcpy( &info->peer_dn, &cert->cert_info, sizeof(gnutls_DN));

@@ -110,8 +110,8 @@ GNUTLS_STATE initialize_state()
 
 void print_info(GNUTLS_STATE state)
 {
-	const SRP_SERVER_AUTH_INFO *srp_info;
-	const ANON_SERVER_AUTH_INFO *dh_info;
+	SRP_SERVER_AUTH_INFO srp_info;
+	ANON_SERVER_AUTH_INFO dh_info;
 	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
@@ -169,8 +169,8 @@ void print_info(GNUTLS_STATE state)
 #define tmp2 &http_buffer[strlen(http_buffer)]
 void peer_print_info(int cd, GNUTLS_STATE state)
 {
-	const SRP_SERVER_AUTH_INFO *srp_info;
-	const ANON_SERVER_AUTH_INFO *dh_info;
+	SRP_SERVER_AUTH_INFO srp_info;
+	ANON_SERVER_AUTH_INFO dh_info;
 	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;

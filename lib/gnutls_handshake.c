@@ -250,6 +250,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 #endif
 
 	version = _gnutls_version_get(data[pos], data[pos + 1]);
+	set_adv_version( state, data[pos], data[pos+1]);
 
 	/* if we do not support that version  */
 	if (_gnutls_version_is_supported(state, version) == 0) {

@@ -38,9 +38,6 @@ int _gnutls_generate_master( GNUTLS_STATE state) {
 
 static int generate_normal_master( GNUTLS_STATE state) {
 int premaster_size;
-#ifdef HARD_DEBUG
-int i;
-#endif
 opaque* premaster, *master;
 int ret = 0;
 char random[2*TLS_RANDOM_SIZE];
@@ -244,6 +241,9 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 		gnutls_assert();
 		return data_size;
 	}
+	if (data_size == 0)
+		return 0;
+
 	ret =
 	    _gnutls_send_handshake(cd, state, data,
 				   data_size,

@@ -27,7 +27,9 @@
 extern ssize_t (*_gnutls_recv_func)( SOCKET, void*, size_t, int);
 extern ssize_t (*_gnutls_send_func)( SOCKET,const void*, size_t, int);
 
-
+/* Buffers received packets of type APPLICATION DATA and
+ * HANDSHAKE DATA.
+ */
 int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
 	int old_buffer;
@@ -38,7 +40,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 
 		state->gnutls_internals.buffer.size += length;
 #ifdef BUFFERS_DEBUG
-	_gnutls_log( "BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
+	_gnutls_log( "RECORD BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer.data =
 		    gnutls_realloc(state->gnutls_internals.buffer.data,
@@ -50,7 +52,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 
 		state->gnutls_internals.buffer_handshake.size += length;
 #ifdef BUFFERS_DEBUG
-	_gnutls_log( "BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
+	_gnutls_log( "HANDSHAKE BUFFER: Inserted %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer_handshake.data =
 		    gnutls_realloc(state->gnutls_internals.buffer_handshake.data,
@@ -94,7 +96,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 			length = state->gnutls_internals.buffer.size;
 		}
 #ifdef BUFFERS_DEBUG
-	_gnutls_log( "BUFFER: Read %d bytes of Data(%d)\n", length, type);
+	_gnutls_log( "RECORD BUFFER: Read %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer.size -= length;
 		memcpy(data, state->gnutls_internals.buffer.data, length);
@@ -112,7 +114,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 			length = state->gnutls_internals.buffer_handshake.size;
 		}
 #ifdef BUFFERS_DEBUG
-	_gnutls_log( "BUFFER: Read %d bytes of Data(%d)\n", length, type);
+	_gnutls_log( "HANDSHAKE BUFFER: Read %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer_handshake.size -= length;
 		memcpy(data, state->gnutls_internals.buffer_handshake.data, length);
@@ -256,6 +258,9 @@ ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, Handshake
 }
 
 #warning "FIX THIS FUNCTION - too many reallocs()"
+/* Buffer for handshake packets. Keeps the packets in order
+ * for finished messages to use them.
+ */
 int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 {
 	int old_buffer;
@@ -265,7 +270,7 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 
 	state->gnutls_internals.hash_buffer.size += length;
 #ifdef BUFFERS_DEBUG
-	_gnutls_log( "HASH_BUFFER: Inserted %d bytes of Data\n", length);
+	_gnutls_log( "HASH BUFFER: Inserted %d bytes of Data\n", length);
 #endif
 	state->gnutls_internals.hash_buffer.data =
 		    gnutls_realloc(state->gnutls_internals.hash_buffer.data,

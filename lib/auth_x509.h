@@ -31,7 +31,7 @@ typedef struct {
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
 #define X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
 
-typedef struct {
+typedef struct X509PKI_CLIENT_AUTH_INFO_INT {
 	gnutls_DN	  peer_dn;
 	gnutls_DN	  issuer_dn;
 	CertificateStatus peer_certificate_status;
@@ -41,9 +41,11 @@ typedef struct {
 	char		  subjectAltName[X509_CN_SIZE];
 	unsigned char	  keyUsage;
 	int		  certificate_requested;
-} X509PKI_CLIENT_AUTH_INFO;
+} *X509PKI_CLIENT_AUTH_INFO;
 
-void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO* info, gnutls_cert* cert, CertificateStatus verify);
+typedef struct X509PKI_CLIENT_AUTH_INFO_INT X509PKI_CLIENT_AUTH_INFO_INT;
+
+void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
 
 #endif
 

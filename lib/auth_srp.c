@@ -78,7 +78,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, ((SRP_SERVER_AUTH_INFO*)state->gnutls_key->auth_info)->username, &err);
+	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username, &err);
 
 	if (pwd_entry == NULL) {
 		if (err==0)

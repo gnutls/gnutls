@@ -178,7 +178,7 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
   * In case of GNUTLS_X509PKI returns a pointer to structure &X509PKI_(SERVER/CLIENT)_AUTH_INFO;
   * In case of GNUTLS_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
   **/
-const void* gnutls_get_auth_info( GNUTLS_STATE state) {
+void* gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;
 }
 

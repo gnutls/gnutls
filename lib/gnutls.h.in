@@ -132,7 +132,7 @@ int gnutls_clear_creds( GNUTLS_STATE state);
 int gnutls_set_cred( GNUTLS_STATE, CredType type, void* cred);
 
 CredType gnutls_get_auth_info_type( GNUTLS_STATE);
-const void* gnutls_get_auth_info( GNUTLS_STATE);
+void* gnutls_get_auth_info( GNUTLS_STATE);
 
 /* A null terminated string containing the dnsname.
  * This will only exist if the client supports the dnsname
@@ -210,9 +210,9 @@ void gnutls_global_set_recv_func( RECV_FUNC recv_func);
 
 /* Auth_Info structures */
 
-typedef struct X509PKI_CLIENT_AUTH_INFO X509PKI_CLIENT_AUTH_INFO;
-typedef struct SRP_CLIENT_AUTH_INFO SRP_CLIENT_AUTH_INFO;
-typedef struct SRP_SERVER_AUTH_INFO SRP_SERVER_AUTH_INFO;
-typedef struct ANON_CLIENT_AUTH_INFO ANON_CLIENT_AUTH_INFO;
-typedef struct ANON_SERVER_AUTH_INFO ANON_SERVER_AUTH_INFO;
+typedef struct X509PKI_CLIENT_AUTH_INFO_INT *X509PKI_CLIENT_AUTH_INFO;
+typedef struct SRP_CLIENT_AUTH_INFO_INT *SRP_CLIENT_AUTH_INFO;
+typedef struct SRP_SERVER_AUTH_INFO_INT *SRP_SERVER_AUTH_INFO;
+typedef struct ANON_CLIENT_AUTH_INFO_INT *ANON_CLIENT_AUTH_INFO;
+typedef struct ANON_SERVER_AUTH_INFO_INT *ANON_SERVER_AUTH_INFO;
 

@@ -34,7 +34,7 @@
   * called in case of SRP authentication and in case of a server.
   *
   **/
-const char* gnutls_srp_server_get_username( const SRP_SERVER_AUTH_INFO* info) {
+const char* gnutls_srp_server_get_username(  SRP_SERVER_AUTH_INFO info) {
 	if (info==NULL) return NULL;
 	return info->username;
 }
@@ -49,7 +49,7 @@ const char* gnutls_srp_server_get_username( const SRP_SERVER_AUTH_INFO* info) {
   * with the peer. This should only be called in case of a server.
   *
   **/
-int gnutls_anon_server_get_dh_bits( const ANON_SERVER_AUTH_INFO* info) {
+int gnutls_anon_server_get_dh_bits(  ANON_SERVER_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->dh_bits;
 }
@@ -62,7 +62,7 @@ int gnutls_anon_server_get_dh_bits( const ANON_SERVER_AUTH_INFO* info) {
   * with the peer. This should only be called in case of a client.
   *
   **/
-int gnutls_anon_client_get_dh_bits( const ANON_CLIENT_AUTH_INFO* info) {
+int gnutls_anon_client_get_dh_bits(  ANON_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->dh_bits;
 }
@@ -77,7 +77,7 @@ int gnutls_anon_client_get_dh_bits( const ANON_CLIENT_AUTH_INFO* info) {
   * is a obtained by the peer's certificate.
   *
   **/
-const gnutls_DN* gnutls_x509pki_client_get_peer_dn( const X509PKI_CLIENT_AUTH_INFO* info) {
+const gnutls_DN* gnutls_x509pki_client_get_peer_dn(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return NULL;
 	return &info->peer_dn;
 }
@@ -90,7 +90,7 @@ const gnutls_DN* gnutls_x509pki_client_get_peer_dn( const X509PKI_CLIENT_AUTH_IN
   * is a obtained by the peer's certificate.
   *
   **/
-const gnutls_DN* gnutls_x509pki_client_get_issuer_dn( const X509PKI_CLIENT_AUTH_INFO* info) {
+const gnutls_DN* gnutls_x509pki_client_get_issuer_dn(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return NULL;
 	return &info->issuer_dn;
 }
@@ -104,7 +104,7 @@ const gnutls_DN* gnutls_x509pki_client_get_issuer_dn( const X509PKI_CLIENT_AUTH_
   * to check if the verified certificate belongs to the actual peer.
   *
   **/
-CertificateStatus gnutls_x509pki_client_get_peer_certificate_status( const X509PKI_CLIENT_AUTH_INFO* info) {
+CertificateStatus gnutls_x509pki_client_get_peer_certificate_status(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->peer_certificate_status;
 }
@@ -117,7 +117,7 @@ CertificateStatus gnutls_x509pki_client_get_peer_certificate_status( const X509P
   * Version field.
   *
   **/
-int gnutls_x509pki_client_get_peer_certificate_version( const X509PKI_CLIENT_AUTH_INFO* info) {
+int gnutls_x509pki_client_get_peer_certificate_version(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->peer_certificate_version;
 }
@@ -130,7 +130,7 @@ int gnutls_x509pki_client_get_peer_certificate_version( const X509PKI_CLIENT_AUT
   * 00:00:00 UTC January 1, 1970).
   *
   **/
-time_t gnutls_x509pki_client_get_peer_certificate_activation_time( const X509PKI_CLIENT_AUTH_INFO* info) {
+time_t gnutls_x509pki_client_get_peer_certificate_activation_time(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->peer_certificate_activation_time;
 }
@@ -143,7 +143,7 @@ time_t gnutls_x509pki_client_get_peer_certificate_activation_time( const X509PKI
   * 00:00:00 UTC January 1, 1970).
   *
   **/
-time_t gnutls_x509pki_client_get_peer_certificate_expiration_time( const X509PKI_CLIENT_AUTH_INFO* info) {
+time_t gnutls_x509pki_client_get_peer_certificate_expiration_time(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->peer_certificate_expiration_time;
 }
@@ -157,7 +157,7 @@ time_t gnutls_x509pki_client_get_peer_certificate_expiration_time( const X509PKI
   * Extensions and is an 8bit string.
   *
   **/
-unsigned char gnutls_x509pki_client_get_key_usage( const X509PKI_CLIENT_AUTH_INFO* info) {
+unsigned char gnutls_x509pki_client_get_key_usage(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->keyUsage;
 }
@@ -170,7 +170,7 @@ unsigned char gnutls_x509pki_client_get_key_usage( const X509PKI_CLIENT_AUTH_INF
   * authentication or 1 otherwise.
   *
   **/
-unsigned char gnutls_x509pki_client_get_certificate_request_status( const X509PKI_CLIENT_AUTH_INFO* info) {
+unsigned char gnutls_x509pki_client_get_certificate_request_status(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
 	return info->certificate_requested;
 }
@@ -184,7 +184,7 @@ unsigned char gnutls_x509pki_client_get_certificate_request_status( const X509PK
   * Extensions. GNUTLS will only return the dnsName of the Alternative name, or a null string.
   *
   **/
-const char* gnutls_x509pki_client_get_subject_alt_name( const X509PKI_CLIENT_AUTH_INFO* info) {
+const char* gnutls_x509pki_client_get_subject_alt_name(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return NULL;
 	return info->subjectAltName;
 }

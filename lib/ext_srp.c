@@ -39,15 +39,15 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 			state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(SRP_SERVER_AUTH_INFO));
 			if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
 			
-			if (sizeof( ((SRP_SERVER_AUTH_INFO*)state->gnutls_key->auth_info)->username) > data_size) {
+			if (sizeof( ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username) > data_size) {
 				len = data[0];
 				if (len > data_size) {
 					gnutls_assert();
 					return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 				}
-				memcpy( ((SRP_SERVER_AUTH_INFO*)state->gnutls_key->auth_info)->username, &data[1], len);
-				((SRP_SERVER_AUTH_INFO*)state->gnutls_key->auth_info)->username[len]=0; /* null terminated */
-				state->gnutls_key->auth_info_size = sizeof(SRP_SERVER_AUTH_INFO);
+				memcpy( ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username, &data[1], len);
+				((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username[len]=0; /* null terminated */
+				state->gnutls_key->auth_info_size = sizeof(SRP_SERVER_AUTH_INFO_INT);
 			} else {
 				state->gnutls_key->auth_info_size = 0;
 				gnutls_free(state->gnutls_key->auth_info);

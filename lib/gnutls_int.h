@@ -31,9 +31,8 @@
 #define HARD_DEBUG
 #define RECORD_DEBUG
 #define HANDSHAKE_DEBUG
-*/
 #define DEBUG
-
+*/
 
 #define SOCKET int
 #define LIST ...
@@ -156,10 +155,10 @@ struct GNUTLS_KEY_INT {
 	MPI				b;
 	MPI				a;
 	MPI				x;
-	/* RSA: 
-	 * modulus is A
-	 * exponent is B
-	 * private key is u;
+	/* RSA:                   peer:
+	 * modulus is A            a
+	 * exponent is B           b
+	 * private key is u        x
 	 */
 	
 	/* this is used to hold the peers authentication data 
@@ -332,6 +331,11 @@ typedef struct {
 						* certificate to use. -1
 						* if none.
 						*/
+	/* this is the highest version available
+	 * to the peer.
+	 */
+	uint8				adv_version_major;
+	uint8				adv_version_minor;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {
@@ -364,5 +368,14 @@ int _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
 
 #define _gnutls_version_cmp( ver1, ver2) ver1==ver2?0:1
 #define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)
+
+/* These macros return the advertized TLS version of
+ * the peer.
+ */
+#define _gnutls_get_adv_version_major( state) \
+	state->gnutls_internals.adv_version_major
+
+#define _gnutls_get_adv_version_minor( state) \
+	state->gnutls_internals.adv_version_minor
 
 #endif /* GNUTLS_INT_H */

@@ -41,24 +41,24 @@ typedef struct {
 
 /* SRP */
 
-const char* gnutls_srp_server_get_username( const SRP_SERVER_AUTH_INFO* info);
+const char* gnutls_srp_server_get_username( const SRP_SERVER_AUTH_INFO info);
 
 /* ANON */
 
-int gnutls_anon_server_get_dh_bits( const ANON_SERVER_AUTH_INFO* info);
-int gnutls_anon_client_get_dh_bits( const ANON_CLIENT_AUTH_INFO* info);
+int gnutls_anon_server_get_dh_bits(  ANON_SERVER_AUTH_INFO info);
+int gnutls_anon_client_get_dh_bits(  ANON_CLIENT_AUTH_INFO info);
 
 /* X509PKI */
 
 
-const gnutls_DN* gnutls_x509pki_client_get_peer_dn( const X509PKI_CLIENT_AUTH_INFO* info);
-const gnutls_DN* gnutls_x509pki_client_get_issuer_dn( const X509PKI_CLIENT_AUTH_INFO* info);
-CertificateStatus gnutls_x509pki_client_get_peer_certificate_status( const X509PKI_CLIENT_AUTH_INFO* info);
-int gnutls_x509pki_client_get_peer_certificate_version( const X509PKI_CLIENT_AUTH_INFO* info);
-time_t gnutls_x509pki_client_get_peer_certificate_activation_time( const X509PKI_CLIENT_AUTH_INFO* info);
-time_t gnutls_x509pki_client_get_peer_certificate_expiration_time( const X509PKI_CLIENT_AUTH_INFO* info);
-unsigned char gnutls_x509pki_client_get_key_usage( const X509PKI_CLIENT_AUTH_INFO* info);
-const char* gnutls_x509pki_client_get_subject_alt_name( const X509PKI_CLIENT_AUTH_INFO* info);
+const gnutls_DN* gnutls_x509pki_client_get_peer_dn(  X509PKI_CLIENT_AUTH_INFO info);
+const gnutls_DN* gnutls_x509pki_client_get_issuer_dn(  X509PKI_CLIENT_AUTH_INFO info);
+CertificateStatus gnutls_x509pki_client_get_peer_certificate_status(  X509PKI_CLIENT_AUTH_INFO info);
+int gnutls_x509pki_client_get_peer_certificate_version(  X509PKI_CLIENT_AUTH_INFO info);
+time_t gnutls_x509pki_client_get_peer_certificate_activation_time(  X509PKI_CLIENT_AUTH_INFO info);
+time_t gnutls_x509pki_client_get_peer_certificate_expiration_time(  X509PKI_CLIENT_AUTH_INFO info);
+unsigned char gnutls_x509pki_client_get_key_usage(  X509PKI_CLIENT_AUTH_INFO info);
+const char* gnutls_x509pki_client_get_subject_alt_name(  X509PKI_CLIENT_AUTH_INFO info);
 # endif /* LIBGNUTLS_VERSION */
 
 #endif

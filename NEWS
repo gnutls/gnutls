@@ -2,6 +2,7 @@ Version 0.2.0
 - Partial support for X509v3 Certificate extensions.
 - Added Internal memory handlers
 - Removed gnutls_x509_set_cn()
+- Added X509 client authentication
 
 Version 0.1.9 (30/07/2001)
 - Corrected bug(s) in ChangeCipherSpec packet (fixes renegotiate)
@@ -11,7 +12,7 @@ Version 0.1.9 (30/07/2001)
 - Optimizations in hash/hmac functions
 - (Error) message handling has changed
 - Better Protocol Version handling
-- Added x509 Certificate Verification
+- Added X509 Certificate Verification
 - gnutls_read() semantics are now closer to read(2) - added EOF
 - Documentated some part of gnutls in doc/tex/ using Latex
 
@@ -23,7 +24,7 @@ Version 0.1.4 (22/06/2001)
 - Added ASN.1 and DER parsers.
 - Bugfixes in session resuming
 - Updated Ciphersuite selection algorithm
-- Added internal representation of x509 structures.
+- Added internal representation of X509 structures.
 - Added global state
 
 Version 0.1.3 (01/06/2001)

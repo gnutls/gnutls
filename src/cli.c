@@ -53,8 +53,8 @@
 
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
-const ANON_CLIENT_AUTH_INFO *dh_info;
-const X509PKI_CLIENT_AUTH_INFO *x509_info;
+ANON_CLIENT_AUTH_INFO dh_info;
+X509PKI_CLIENT_AUTH_INFO x509_info;
 const gnutls_DN* dn;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
