@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -416,7 +416,7 @@ int ret;
 	ret = do_handshake( session);
 	if (ret==FAILED) {
 		/* disable TLS 1.0 */
-		if (tls1_ok!=0) {
+		if (ssl3_ok!=0) {
 			protocol_priority[0] = GNUTLS_SSL3;
 			protocol_priority[1] = 0;
 		}

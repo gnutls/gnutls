@@ -79,13 +79,13 @@ typedef struct {
 static const TLS_TEST tls_tests[] = {
 	{ "for TLS 1.0 support", test_tls1, "yes", "no", "dunno" },
 	{ "for SSL 3.0 support", test_ssl3, "yes", "no", "dunno" },
+	{ "whether we need to disable TLS 1.0", test_tls1_2, "no", "yes", "dunno" },
 	{ "for certificate information", test_certificate, "", "", "" },
 	{ "for trusted CAs", test_server_cas, "", "", "" },
 	{ "for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes", "dunno" },
 	{ "for version rollback bug in Client Hello", test_version_rollback, "no", "yes", "dunno" },
 	/* this test will disable TLS 1.0 if the server is 
 	 * buggy */
-	{ "whether we need to disable TLS 1.0", test_tls1_2, "no", "yes", "dunno" },
 	{ "whether the server can accept Hello Extensions", test_hello_extension, "yes", "no", "dunno"},
 	{ "whether the server can accept cipher suites not in SSL 3.0 spec", test_unknown_ciphersuites, "yes", "no", "dunno"},
 	{ "whether the server understands TLS closure alerts", test_bye, "yes", "no", "partially"},
