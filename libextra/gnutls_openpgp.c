@@ -1555,9 +1555,9 @@ xml_add_mpi( gnutls_datum *xmlkey, CDK_MPI *m, const char *tag )
     int i = 0;
 
     p = gnutls_calloc( 1, 2 * ( m->bytes + 3 ) );
-    for ( i = 0; i < m->bytes + 2; i++ )
+    for ( i = 0; i < (m->bytes + 2); i++ )
         sprintf( p + 2 * i, "%02X", m->data[i] );
-    p[2 * m->bytes] = '\0';
+    p[2 * ( m->bytes + 2 )] = '\0';
     xml_add_tag( xmlkey, tag, p );
     gnutls_free( p );
 }
