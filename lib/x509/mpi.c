@@ -326,14 +326,31 @@ int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
  * from asn1 structs. Combines the read and the convertion
  * steps.
  */
-int _gnutls_x509_read_ui( ASN1_TYPE node, const char* value, 
-	opaque* tmpstr, int tmpstr_size, unsigned int* ret)
+int _gnutls_x509_read_uint( ASN1_TYPE node, const char* value, 
+	unsigned int* ret)
 {
 int len, result;
+opaque* tmpstr;
 
-	len = tmpstr_size;
+	len = 0;
+	result = asn1_read_value( node, value, NULL, &len);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	tmpstr = gnutls_alloca( len);
+	if (tmpstr==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	result = asn1_read_value( node, value, tmpstr, &len);
+
+	gnutls_afree( tmpstr);
+
 	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
@@ -352,3 +369,23 @@ int len, result;
 
 	return 0;
 }
+
+/* Writes the specified integer into the specified node.
+ */
+int _gnutls_x509_write_uint32( ASN1_TYPE node, const char* value, uint32 num)
+{
+opaque tmpstr[4];
+int result;
+
+	_gnutls_write_uint32(num, tmpstr);
+
+	result = asn1_write_value( node, value, tmpstr, 4);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+

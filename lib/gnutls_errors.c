@@ -138,6 +138,7 @@ static gnutls_error_entry error_algorithms[] = {
         ERROR_ENTRY("The PKCS structure's content type is unknown.", GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE, 1),
         ERROR_ENTRY("The PKCS structure's Bag type is unknown.", GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE, 1),
         ERROR_ENTRY("The password given contains invalid characters.", GNUTLS_E_INVALID_PASSWORD, 1),
+        ERROR_ENTRY("The Message Authentication Code verification failed.", GNUTLS_E_MAC_VERIFY_FAILED, 1),
 	{0, 0, 0, 0}
 };
 

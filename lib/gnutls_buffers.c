@@ -210,7 +210,7 @@ static ssize_t _gnutls_read( gnutls_session session, void *iptr, size_t sizeOfPt
 	while (left > 0) {
 		
 		if (session->internals._gnutls_pull_func==NULL)
-			i = recv(fd, &ptr[sizeOfPtr-left], left, flags);
+			i = recv( (int)fd, &ptr[sizeOfPtr-left], left, flags);
 		else
 			i = session->internals._gnutls_pull_func(fd, &ptr[sizeOfPtr-left], left);
 				
@@ -578,7 +578,7 @@ ssize_t _gnutls_io_write_buffered( gnutls_session session, const void *iptr, siz
 	while (left > 0) {
 		
 		if (session->internals._gnutls_push_func==NULL) 
-			i = send(fd, &ptr[n-left], left, 0);
+			i = send( (int)fd, &ptr[n-left], left, 0);
 		else
 			i = session->internals._gnutls_push_func(fd, &ptr[n-left], left);
 

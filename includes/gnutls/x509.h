@@ -285,6 +285,7 @@ int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12,
 int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag);
 
 int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass);
+int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char* pass);
 
 int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass);
 int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag bag, const char* pass, unsigned int flags);

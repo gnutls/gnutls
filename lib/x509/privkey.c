@@ -29,6 +29,7 @@
 #include <x509_b64.h>
 #include <x509.h>
 #include <dn.h>
+#include <mpi.h>
 #include <extensions.h>
 
 static int _encode_rsa( ASN1_TYPE* c2, MPI* params);

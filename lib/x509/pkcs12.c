@@ -36,6 +36,7 @@
 #include <x509_b64.h>
 #include <pkcs12.h>
 #include <dn.h>
+#include <mpi.h>
 
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
@@ -799,6 +800,98 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass)
 
 	cleanup:
 		_gnutls_free_datum( &tmp);
+		return result;
+}
+
+/**
+  * gnutls_pkcs12_verify_mac - This function verifies the MAC of the PKCS12 structure
+  * @pkcs12_struct: should contain a gnutls_pkcs12 structure
+  * @pass: The password for the MAC
+  *
+  * This function will verify the MAC for the PKCS12 structure.
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char* pass)
+{
+	opaque key[20];
+	int result;
+	int iter, len;
+	GNUTLS_MAC_HANDLE td1 = NULL;
+	gnutls_datum tmp = {NULL, 0}, salt = {NULL, 0};
+	opaque sha_mac[20];
+	opaque sha_mac_orig[20];
+
+	/* read the iterations
+	 */
+	
+	result = _gnutls_x509_read_uint( pkcs12->pkcs12, "macData.iterations", &iter);
+	if (result < 0) {
+		iter = 1; /* the default */
+	}
+
+
+	/* Read the salt from the structure.
+	 */
+	result = _gnutls_x509_read_value(pkcs12->pkcs12, "macData.macSalt", &salt, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+
+	/* Generate the key.
+	 */
+	result = _pkcs12_string_to_key( 3/*MAC*/, salt.data, salt.size,
+        	iter, pass, sizeof(key), key);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	_gnutls_free_datum( &salt);
+
+	/* Get the data to be MACed
+	 */
+	result = _decode_pkcs12_auth_safe( pkcs12->pkcs12, NULL, &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* MAC the data
+	 */
+	td1 = _gnutls_hmac_init(GNUTLS_MAC_SHA, key, sizeof(key));
+	if (td1 == GNUTLS_MAC_FAILED) {
+		gnutls_assert();
+		result = GNUTLS_E_INTERNAL_ERROR;
+		goto cleanup;
+	}	 
+
+	_gnutls_hmac(td1, tmp.data, tmp.size);
+	_gnutls_free_datum( &tmp);
+	
+	_gnutls_hmac_deinit(td1, sha_mac);
+	
+	len = sizeof(sha_mac_orig);
+	result = asn1_read_value(pkcs12->pkcs12, "macData.mac.digest", sha_mac_orig, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (memcmp( sha_mac_orig, sha_mac, sizeof(sha_mac)) != 0) {
+		gnutls_assert();
+		return GNUTLS_E_MAC_VERIFY_FAILED;
+	}
+
+	return 0;
+
+	cleanup:
+		_gnutls_free_datum( &tmp);
+		_gnutls_free_datum( &salt);
 		return result;
 }
 

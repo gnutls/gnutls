@@ -25,6 +25,7 @@
 #include <x509_b64.h> /* for PKCS3 PEM decoding */
 #include <gnutls_global.h>
 #include <gnutls_dh.h>
+#include <x509/mpi.h>
 #include "debug.h"
 
 

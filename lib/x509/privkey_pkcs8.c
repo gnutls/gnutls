@@ -922,9 +922,8 @@ static int read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 
 	/* read the iteration count 
 	 */
-	len = sizeof(oid);
 	result =
-	    _gnutls_x509_read_ui(pbkdf2_asn, "iterationCount", oid, len,
+	    _gnutls_x509_read_uint(pbkdf2_asn, "iterationCount", 
 				 &params->iter_count);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -934,10 +933,8 @@ static int read_pbkdf2_params(ASN1_TYPE pbes2_asn,
 
 	/* read the keylength, if it is set.
 	 */
-	len = sizeof(oid);
-
 	result =
-	    _gnutls_x509_read_ui(pbkdf2_asn, "keyLength", oid, len,
+	    _gnutls_x509_read_uint(pbkdf2_asn, "keyLength", 
 				 &params->key_size);
 	if (result < 0) {
 		params->key_size = 0;
@@ -979,9 +976,8 @@ static int read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 
 	/* read the iteration count 
 	 */
-	len = sizeof(oid);
 	result =
-	    _gnutls_x509_read_ui(pbes2_asn, "iterations", oid, len,
+	    _gnutls_x509_read_uint(pbes2_asn, "iterations",
 				 &params->iter_count);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

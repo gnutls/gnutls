@@ -32,6 +32,7 @@
 #include <gnutls_global.h>
 #include <gnutls_num.h>
 #include "debug.h"
+#include <x509/mpi.h>
 
 static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len);
 static int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pkey, int);
