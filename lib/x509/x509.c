@@ -1912,7 +1912,7 @@ int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
 /**
   * gnutls_x509_crt_list_import - This function will import a PEM encoded certificate list
   * @certs: The structures to store the parsed certificate. Must not be initialized.
-  * @cert_max: The number of certs.
+  * @cert_max: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
   * @data: The PEM encoded certificate.
   * @format: One of DER or PEM. Only PEM is supported for now.
   * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
@@ -1927,13 +1927,13 @@ int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
   * Returns the number of certificates read or a negative error value.
   *
   **/
-int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int cert_max,
+int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int* cert_max,
     const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format, unsigned int flags)
 {
     int size;
     const char *ptr;
     gnutls_datum_t tmp;
-    int ret;
+    int ret, nocopy=0;
     unsigned int count=0,j;
 
     /* move to the certificate
@@ -1953,30 +1953,30 @@ int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int cert_max,
     count = 0;
 
     do {
-        if (count >= cert_max) {
-            if (flags & GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED) {
+        if (count >= *cert_max) {
+            if (!(flags & GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED))
+                break;
+            else
+                nocopy = 1;
+        }
+        
+	if (!nocopy) {
+	    ret = gnutls_x509_crt_init( &certs[count]);
+	    if (ret < 0) {
                 gnutls_assert();
-                ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
                 goto error;
             }
-            break;
-        }
-        
-	ret = gnutls_x509_crt_init( &certs[count]);
-	if (ret < 0) {
-            gnutls_assert();
-            goto error;
+
+	    tmp.data = (void*)ptr;
+	    tmp.size = size;
+
+	    ret = gnutls_x509_crt_import( certs[count], &tmp, GNUTLS_X509_FMT_PEM);
+	    if (ret < 0) {
+                gnutls_assert();
+                goto error;
+            }
         }
 
-	tmp.data = (void*)ptr;
-	tmp.size = size;
-
-	ret = gnutls_x509_crt_import( certs[count], &tmp, GNUTLS_X509_FMT_PEM);
-	if (ret < 0) {
-            gnutls_assert();
-            goto error;
-        }
-        
 	/* now we move ptr after the pem header 
 	 */
 	ptr++;
@@ -2000,7 +2000,12 @@ int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int cert_max,
 	count++;
     } while (ptr != NULL);
 
-    return count;
+    *cert_max = count;
+    
+    if (nocopy==0)
+        return count;
+    else 
+        return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
 error:
     CLEAR_CERTS;

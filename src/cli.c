@@ -167,6 +167,7 @@ static gnutls_openpgp_privkey pgp_key = NULL;
  */
 static void load_keys(void)
 {
+    unsigned int crt_num;
     int ret;
     gnutls_datum data;
 
@@ -177,12 +178,20 @@ static void load_keys(void)
 	    exit(1);
 	}
 
-	ret = gnutls_x509_crt_list_import(x509_crt, MAX_CRT, &data, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED);
+        crt_num = MAX_CRT;
+	ret = gnutls_x509_crt_list_import(x509_crt, &crt_num, &data, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
 	if (ret < 0) {
-	    fprintf(stderr,
+	    if (ret==GNUTLS_E_SHORT_MEMORY_BUFFER) {
+	        fprintf(stderr,
+		    "*** Error loading cert file: Too many certs %d\n",
+		    crt_num);
+	    
+	    } else {
+	        fprintf(stderr,
 		    "*** Error loading cert file: %s\n",
 		    gnutls_strerror(ret));
-	    exit(1);
+            }
+            exit(1);
 	}
 	x509_crt_size = ret;
 	/* fprintf(stderr, "Processed %d client certificates...\n", ret); */

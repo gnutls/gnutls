@@ -917,6 +917,7 @@ void certificate_info(void)
     size_t size;
     int ret,i, count;
     gnutls_datum pem;
+    unsigned int crt_num;
 
     size = fread(buffer, 1, sizeof(buffer) - 1, infile);
     buffer[size] = 0;
@@ -926,7 +927,14 @@ void certificate_info(void)
     pem.data = buffer;
     pem.size = size;
 
-    ret = gnutls_x509_crt_list_import(crt, MAX_CRTS, &pem, in_cert_format, 0);
+    crt_num = MAX_CRTS;
+    ret = gnutls_x509_crt_list_import(crt, &crt_num, &pem, in_cert_format, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+    if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+	fprintf(stderr, "Too many certificates (%d), will only read the first %d.\n", crt_num, MAX_CRTS);
+	crt_num = MAX_CRTS;
+        ret = gnutls_x509_crt_list_import(crt, &crt_num, &pem, in_cert_format,0);
+    }
+
     if (ret < 0) {
 	fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 	exit(1);

@@ -40,7 +40,7 @@ typedef struct gnutls_x509_crt_int {
 } gnutls_x509_crt_int;
 
 typedef enum gnutls_certificate_import_flags {
-    GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED=1
+    GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED=1
 } gnutls_certificate_import_flags;
                                  
 
