@@ -643,8 +643,12 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
-	_gnutls_Read(cd, headers, HEADER_SIZE, 0); /* read and clear the headers - again! */
-
+	if (_gnutls_Read(cd, headers, HEADER_SIZE, 0)!=HEADER_SIZE) {  /* read and clear the headers - again! */
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
 /* Read the whole packet - again? */	
 	if ( type==GNUTLS_APPLICATION_DATA) {
 		/* get the data - but do not free the buffer in the kernel */
