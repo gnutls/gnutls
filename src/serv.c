@@ -377,14 +377,12 @@ int main(int argc, char **argv)
 					ret = gnutls_rehandshake( state);
 				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
-				if (gnutls_alert_get_last(state)!=GNUTLS_A_NO_RENEGOTIATION) {
-					printf("* Requesting rehandshake.\n");
-					/* continue handshake proccess */
-					do {
-						ret = gnutls_handshake( state);
-					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
-					printf("* Rehandshake returned %d\n", ret);
-				}
+				printf("* Requesting rehandshake.\n");
+				/* continue handshake proccess */
+				do {
+					ret = gnutls_handshake( state);
+				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+				printf("* Rehandshake returned %d\n", ret);
 			}
 #endif
 			

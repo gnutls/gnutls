@@ -317,6 +317,13 @@ int main(int argc, char** argv)
 				if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
 					printf("* Received alert [%d]\n", gnutls_alert_get_last(state));
 				if (ret==GNUTLS_E_REHANDSHAKE) {
+				
+				/* There is a race condition here. If application
+				 * data is sent after the rehandshake request,
+				 * the server thinks we ignored his request.
+				 * This is a bad design of this client.
+				 */
+					printf("* Received rehandshake request\n");
 					/* gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
 					do {
 						ret = gnutls_handshake( state);
@@ -337,8 +344,8 @@ int main(int argc, char** argv)
 			}
 			if (user_term!=0) break;
 		}
+
 		if (FD_ISSET(fileno(stdin), &rset)) {
-	
 			if( fgets(buffer, MAX_BUF, stdin) == NULL) {
 				do {
 					ret = gnutls_bye( state, GNUTLS_SHUT_WR);

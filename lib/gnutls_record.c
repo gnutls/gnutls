@@ -740,7 +740,8 @@ static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 				/* if the alert is FATAL or WARNING
 				 * return the apropriate message
 				 */
-			
+				
+				gnutls_assert();		
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
 				if (data[0] == GNUTLS_AL_FATAL) {
 					_gnutls_session_unresumable( state);
@@ -780,11 +781,12 @@ static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 		case GNUTLS_HANDSHAKE:
 			/* This is only legal if HELLO_REQUEST is received - and we are a client 
 			 */
-			if (htype!=GNUTLS_HELLO_REQUEST && state->security_parameters.entity==GNUTLS_SERVER) {
+			if ( state->security_parameters.entity==GNUTLS_SERVER) {
 				gnutls_assert();
 				return GNUTLS_E_UNEXPECTED_PACKET;
 			}
-
+			gnutls_assert();
+			
 			return _gnutls_recv_hello_request( state, data, data_size);
 
 			break;
