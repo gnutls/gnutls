@@ -10,6 +10,7 @@ See the end for copying conditions.
 - Code indented using 'indent -i4 -kr'.
 - The API manual is included in Devhelp format.  (Was in last release too,
   but the NEWS entry was forgotten.)
+- The OpenSSL compatibility code now use the internal crypto interface.
 
 * Version 1.1.21 (2004-10-27)
 - Print DN of certificates with unknown characters in them, but in hexform
