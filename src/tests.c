@@ -446,7 +446,7 @@ int ret;
 
 	ret = do_handshake( session);
 	if (ret < 0) return FAILED;
-	
+
 	if (gnutls_protocol_get_version(session)==GNUTLS_TLS1) return SUCCEED;
 	return UNSURE;
 }

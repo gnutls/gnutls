@@ -70,6 +70,7 @@ char *x509_certfile;
 char *x509_cafile;
 char *x509_crlfile = NULL;
 static int x509ctype;
+static int disable_extensions;
 
 static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
@@ -150,9 +151,11 @@ static gnutls_session init_tls_session( const char* hostname)
 
    /* allow the use of private ciphersuites.
     */
-   gnutls_handshake_set_private_extensions(session, 1);
+   if (disable_extensions == 0)
+      gnutls_handshake_set_private_extensions(session, 1);
 
-   gnutls_set_server_name( session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
+   if (disable_extensions == 0)
+      gnutls_set_server_name( session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
 
    gnutls_cipher_set_priority(session, cipher_priority);
    gnutls_compression_set_priority(session, comp_priority);
@@ -174,7 +177,7 @@ static gnutls_session init_tls_session( const char* hostname)
       gnutls_openpgp_send_key(session, GNUTLS_OPENPGP_KEY_FINGERPRINT);
 
    /* use the max record size extension */
-   if (record_max_size > 0) {
+   if (record_max_size > 0 && disable_extensions == 0) {
       if (gnutls_record_set_max_size(session, record_max_size) < 0) {
 	 fprintf(stderr,
 		 "Cannot set the maximum record size to %d.\n",
@@ -402,6 +405,7 @@ void gaa_parser(int argc, char **argv)
       exit(1);
    }
 
+   disable_extensions = info.disable_extensions;
    xml = info.xml;
    starttls = info.starttls;
    resume = info.resume;
