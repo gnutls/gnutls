@@ -42,7 +42,7 @@
 #include <progname.h>
 
 static void print_crl_info(gnutls_x509_crl crl, FILE * out, int all);
-int generate_prime(int bits);
+int generate_prime(int bits, int how);
 void pkcs7_info(void);
 void smime_to_pkcs7(void);
 void pkcs12_info(void);
@@ -865,7 +865,10 @@ void gaa_parser(int argc, char **argv)
 	pkcs12_info();
 	break;
     case 10:
-	generate_prime(info.bits);
+	generate_prime(info.bits, 1);
+	break;
+    case 16:
+	generate_prime(info.bits, 0);
 	break;
     case 11:
 	crl_info();

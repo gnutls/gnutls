@@ -32,6 +32,7 @@ option (e, verify-chain) { $action=5; } "Verify a PEM encoded certificate chain.
 option (verify-crl) { $action=14; } "Verify a CRL."
 
 option (generate-dh-params) { $action=10; } "Generate PKCS #3 encoded Diffie Hellman parameters."
+option (get-dh-params) { $action=16; } "Get the included PKCS #3 encoded Diffie Hellman parameters."
 
 #char *privkey;
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."

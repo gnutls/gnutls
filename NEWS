@@ -10,6 +10,8 @@ See the end for copying conditions.
   are not in the included list.
 - Added warning to certtool when MD5 is being used for digital
   signatures.
+- Added the option --get-dh-params to certtool, in order to get the
+  included in the library primes and generators.
 
 * Version 1.2.0 (2005-01-27)
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.

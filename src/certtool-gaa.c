@@ -139,6 +139,7 @@ void gaa_help(void)
 	__gaa_helpsingle('e', "verify-chain", "", "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one.");
 	__gaa_helpsingle(0, "verify-crl", "", "Verify a CRL.");
 	__gaa_helpsingle(0, "generate-dh-params", "", "Generate PKCS #3 encoded Diffie Hellman parameters.");
+	__gaa_helpsingle(0, "get-dh-params", "", "Get the included PKCS #3 encoded Diffie Hellman parameters.");
 	__gaa_helpsingle(0, "load-privkey", "FILE ", "Private key file to use.");
 	__gaa_helpsingle(0, "load-request", "FILE ", "Certificate request file to use.");
 	__gaa_helpsingle(0, "load-certificate", "FILE ", "Certificate file to use.");
@@ -181,41 +182,41 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 102 "certtool.gaa"
+#line 103 "certtool.gaa"
 	int debug;
-#line 98 "certtool.gaa"
+#line 99 "certtool.gaa"
 	char *template;
-#line 95 "certtool.gaa"
+#line 96 "certtool.gaa"
 	char *infile;
-#line 92 "certtool.gaa"
+#line 93 "certtool.gaa"
 	char *outfile;
-#line 89 "certtool.gaa"
+#line 90 "certtool.gaa"
 	int bits;
-#line 86 "certtool.gaa"
+#line 87 "certtool.gaa"
 	int outcert_format;
-#line 83 "certtool.gaa"
+#line 84 "certtool.gaa"
 	int xml;
-#line 80 "certtool.gaa"
+#line 81 "certtool.gaa"
 	int incert_format;
-#line 77 "certtool.gaa"
+#line 78 "certtool.gaa"
 	int export;
-#line 74 "certtool.gaa"
+#line 75 "certtool.gaa"
 	char *hash;
-#line 71 "certtool.gaa"
+#line 72 "certtool.gaa"
 	int dsa;
-#line 68 "certtool.gaa"
+#line 69 "certtool.gaa"
 	int pkcs8;
-#line 51 "certtool.gaa"
+#line 52 "certtool.gaa"
 	char *pass;
-#line 48 "certtool.gaa"
+#line 49 "certtool.gaa"
 	char *ca;
-#line 45 "certtool.gaa"
+#line 46 "certtool.gaa"
 	char *ca_privkey;
-#line 42 "certtool.gaa"
+#line 43 "certtool.gaa"
 	char *cert;
-#line 39 "certtool.gaa"
+#line 40 "certtool.gaa"
 	char *request;
-#line 36 "certtool.gaa"
+#line 37 "certtool.gaa"
 	char *privkey;
 #line 17 "certtool.gaa"
 	int action;
@@ -273,7 +274,7 @@ static int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           37
+#define GAA_NB_OPTION           38
 #define GAAOPTID_copyright	1
 #define GAAOPTID_version	2
 #define GAAOPTID_help	3
@@ -302,15 +303,16 @@ static int gaa_error = 0;
 #define GAAOPTID_load_certificate	26
 #define GAAOPTID_load_request	27
 #define GAAOPTID_load_privkey	28
-#define GAAOPTID_generate_dh_params	29
-#define GAAOPTID_verify_crl	30
-#define GAAOPTID_verify_chain	31
-#define GAAOPTID_generate_request	32
-#define GAAOPTID_generate_privkey	33
-#define GAAOPTID_update_certificate	34
-#define GAAOPTID_generate_crl	35
-#define GAAOPTID_generate_certificate	36
-#define GAAOPTID_generate_self_signed	37
+#define GAAOPTID_get_dh_params	29
+#define GAAOPTID_generate_dh_params	30
+#define GAAOPTID_verify_crl	31
+#define GAAOPTID_verify_chain	32
+#define GAAOPTID_generate_request	33
+#define GAAOPTID_generate_privkey	34
+#define GAAOPTID_update_certificate	35
+#define GAAOPTID_generate_crl	36
+#define GAAOPTID_generate_certificate	37
+#define GAAOPTID_generate_self_signed	38
 
 #line 168 "gaa.skel"
 
@@ -628,6 +630,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("", GAAOPTID_p12_info);
 			GAA_CHECK1STR("l", GAAOPTID_crl_info);
 			GAA_CHECK1STR("i", GAAOPTID_certificate_info);
+			GAA_CHECK1STR("", GAAOPTID_get_dh_params);
 			GAA_CHECK1STR("", GAAOPTID_generate_dh_params);
 			GAA_CHECK1STR("", GAAOPTID_verify_crl);
 			GAA_CHECK1STR("e", GAAOPTID_verify_chain);
@@ -669,6 +672,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("load-certificate", GAAOPTID_load_certificate);
 			GAA_CHECKSTR("load-request", GAAOPTID_load_request);
 			GAA_CHECKSTR("load-privkey", GAAOPTID_load_privkey);
+			GAA_CHECKSTR("get-dh-params", GAAOPTID_get_dh_params);
 			GAA_CHECKSTR("generate-dh-params", GAAOPTID_generate_dh_params);
 			GAA_CHECKSTR("verify-crl", GAAOPTID_verify_crl);
 			GAA_CHECKSTR("verify-chain", GAAOPTID_verify_chain);
@@ -724,21 +728,21 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_copyright:
 	OK = 0;
-#line 108 "certtool.gaa"
+#line 109 "certtool.gaa"
 { print_license(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_version:
 	OK = 0;
-#line 107 "certtool.gaa"
+#line 108 "certtool.gaa"
 { certtool_version(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_help:
 	OK = 0;
-#line 105 "certtool.gaa"
+#line 106 "certtool.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
@@ -748,7 +752,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_debug.arg1, gaa_getint, GAATMP_debug.size1);
 		gaa_index++;
-#line 103 "certtool.gaa"
+#line 104 "certtool.gaa"
 { gaaval->debug = GAATMP_debug.arg1 ;};
 
 		return GAA_OK;
@@ -758,7 +762,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_template.arg1, gaa_getstr, GAATMP_template.size1);
 		gaa_index++;
-#line 99 "certtool.gaa"
+#line 100 "certtool.gaa"
 { gaaval->template = GAATMP_template.arg1 ;};
 
 		return GAA_OK;
@@ -768,7 +772,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_infile.arg1, gaa_getstr, GAATMP_infile.size1);
 		gaa_index++;
-#line 96 "certtool.gaa"
+#line 97 "certtool.gaa"
 { gaaval->infile = GAATMP_infile.arg1 ;};
 
 		return GAA_OK;
@@ -778,7 +782,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_outfile.arg1, gaa_getstr, GAATMP_outfile.size1);
 		gaa_index++;
-#line 93 "certtool.gaa"
+#line 94 "certtool.gaa"
 { gaaval->outfile = GAATMP_outfile.arg1 ;};
 
 		return GAA_OK;
@@ -788,35 +792,35 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_bits.arg1, gaa_getint, GAATMP_bits.size1);
 		gaa_index++;
-#line 90 "certtool.gaa"
+#line 91 "certtool.gaa"
 { gaaval->bits = GAATMP_bits.arg1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_outder:
 	OK = 0;
-#line 87 "certtool.gaa"
+#line 88 "certtool.gaa"
 { gaaval->outcert_format=1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_xml:
 	OK = 0;
-#line 84 "certtool.gaa"
+#line 85 "certtool.gaa"
 { gaaval->xml=1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_inder:
 	OK = 0;
-#line 81 "certtool.gaa"
+#line 82 "certtool.gaa"
 { gaaval->incert_format=1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_export_ciphers:
 	OK = 0;
-#line 78 "certtool.gaa"
+#line 79 "certtool.gaa"
 { gaaval->export=1 ;};
 
 		return GAA_OK;
@@ -826,70 +830,70 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_hash.arg1, gaa_getstr, GAATMP_hash.size1);
 		gaa_index++;
-#line 75 "certtool.gaa"
+#line 76 "certtool.gaa"
 { gaaval->hash = GAATMP_hash.arg1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_dsa:
 	OK = 0;
-#line 72 "certtool.gaa"
+#line 73 "certtool.gaa"
 { gaaval->dsa=1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_pkcs8:
 	OK = 0;
-#line 69 "certtool.gaa"
+#line 70 "certtool.gaa"
 { gaaval->pkcs8=1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_to_p12:
 	OK = 0;
-#line 66 "certtool.gaa"
+#line 67 "certtool.gaa"
 { gaaval->action = 8; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_key_info:
 	OK = 0;
-#line 64 "certtool.gaa"
+#line 65 "certtool.gaa"
 { gaaval->action = 6; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_smime_to_p7:
 	OK = 0;
-#line 62 "certtool.gaa"
+#line 63 "certtool.gaa"
 { gaaval->action = 15; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_p7_info:
 	OK = 0;
-#line 60 "certtool.gaa"
+#line 61 "certtool.gaa"
 { gaaval->action = 12; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_p12_info:
 	OK = 0;
-#line 58 "certtool.gaa"
+#line 59 "certtool.gaa"
 { gaaval->action = 9; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_crl_info:
 	OK = 0;
-#line 56 "certtool.gaa"
+#line 57 "certtool.gaa"
 { gaaval->action = 11; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_certificate_info:
 	OK = 0;
-#line 54 "certtool.gaa"
+#line 55 "certtool.gaa"
 { gaaval->action = 2; ;};
 
 		return GAA_OK;
@@ -899,7 +903,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_password.arg1, gaa_getstr, GAATMP_password.size1);
 		gaa_index++;
-#line 52 "certtool.gaa"
+#line 53 "certtool.gaa"
 { gaaval->pass = GAATMP_password.arg1 ;};
 
 		return GAA_OK;
@@ -909,7 +913,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_ca_certificate.arg1, gaa_getstr, GAATMP_load_ca_certificate.size1);
 		gaa_index++;
-#line 49 "certtool.gaa"
+#line 50 "certtool.gaa"
 { gaaval->ca = GAATMP_load_ca_certificate.arg1 ;};
 
 		return GAA_OK;
@@ -919,7 +923,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_ca_privkey.arg1, gaa_getstr, GAATMP_load_ca_privkey.size1);
 		gaa_index++;
-#line 46 "certtool.gaa"
+#line 47 "certtool.gaa"
 { gaaval->ca_privkey = GAATMP_load_ca_privkey.arg1 ;};
 
 		return GAA_OK;
@@ -929,7 +933,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_certificate.arg1, gaa_getstr, GAATMP_load_certificate.size1);
 		gaa_index++;
-#line 43 "certtool.gaa"
+#line 44 "certtool.gaa"
 { gaaval->cert = GAATMP_load_certificate.arg1 ;};
 
 		return GAA_OK;
@@ -939,7 +943,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_request.arg1, gaa_getstr, GAATMP_load_request.size1);
 		gaa_index++;
-#line 40 "certtool.gaa"
+#line 41 "certtool.gaa"
 { gaaval->request = GAATMP_load_request.arg1 ;};
 
 		return GAA_OK;
@@ -949,8 +953,15 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_privkey.arg1, gaa_getstr, GAATMP_load_privkey.size1);
 		gaa_index++;
-#line 37 "certtool.gaa"
+#line 38 "certtool.gaa"
 { gaaval->privkey = GAATMP_load_privkey.arg1 ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_get_dh_params:
+	OK = 0;
+#line 35 "certtool.gaa"
+{ gaaval->action=16; ;};
 
 		return GAA_OK;
 		break;
@@ -1041,7 +1052,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 110 "certtool.gaa"
+#line 111 "certtool.gaa"
 { gaaval->bits = 1024; gaaval->pkcs8 = 0; gaaval->privkey = NULL; gaaval->ca=NULL; gaaval->ca_privkey = NULL; 
 	gaaval->debug=1; gaaval->request = NULL; gaaval->infile = NULL; gaaval->outfile = NULL; gaaval->cert = NULL; 
 	gaaval->incert_format = 0; gaaval->outcert_format = 0; gaaval->action=-1; gaaval->pass = NULL; 

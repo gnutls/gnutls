@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004,2005 Free Software Foundation
  * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -40,7 +40,9 @@ extern const int buffer_size;
 
 static int cparams = 0;
 
-int generate_prime(int bits)
+/* If how is zero then the included parameters are used.
+ */
+int generate_prime(int bits, int how)
 {
     unsigned int i;
     int ret;
@@ -51,18 +53,38 @@ int generate_prime(int bits)
 
     fprintf(stderr, "Generating DH parameters...");
 
-    ret = gnutls_dh_params_generate2(dh_params, bits);
-    if (ret < 0) {
-	fprintf(stderr, "Error generating parameters: %s\n",
+    if (how!=0) {
+        ret = gnutls_dh_params_generate2(dh_params, bits);
+        if (ret < 0) {
+	    fprintf(stderr, "Error generating parameters: %s\n",
 		gnutls_strerror(ret));
-	exit(1);
-    }
+	    exit(1);
+        }
 
-    ret = gnutls_dh_params_export_raw(dh_params, &p, &g, NULL);
-    if (ret < 0) {
-	fprintf(stderr, "Error exporting parameters: %s\n",
+        ret = gnutls_dh_params_export_raw(dh_params, &p, &g, NULL);
+        if (ret < 0) {
+  	    fprintf(stderr, "Error exporting parameters: %s\n",
 		gnutls_strerror(ret));
-	exit(1);
+	    exit(1);
+        }
+    } else {
+        if (bits <= 1024) {
+            p=gnutls_srp_1024_group_prime;
+            g=gnutls_srp_1024_group_generator;
+        } else if (bits<=1536) {
+            p=gnutls_srp_1536_group_prime;
+            g=gnutls_srp_1536_group_generator;
+        } else {
+            p=gnutls_srp_2048_group_prime;
+            g=gnutls_srp_2048_group_generator;
+        }
+
+        ret = gnutls_dh_params_import_raw(dh_params, &p, &g);
+        if (ret < 0) {
+  	    fprintf(stderr, "Error exporting parameters: %s\n",
+		gnutls_strerror(ret));
+	    exit(1);
+        }
     }
 
     if (cparams) {
