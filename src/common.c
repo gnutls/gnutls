@@ -11,6 +11,9 @@
 #define TEST_STRING
 
 int xml = 0;
+int print_cert;
+
+static char buffer[5*1024];
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", name)
@@ -72,6 +75,21 @@ void print_x509_info(gnutls_session session, const char* hostname)
 		}
 
 		printf(" - Certificate[%d] info:\n", j);
+
+		if (print_cert) {
+			size_t size;
+			
+			size = sizeof(buffer);
+			
+			ret = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);
+			if (ret < 0) {
+				fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+				return;
+			}
+			fputs( "\n", stdout);
+			fputs( buffer, stdout);
+			fputs( "\n", stdout);
+		}
 		
 		if (j==0 && hostname != NULL) { /* Check the hostname of the first certificate
 		             * if it matches the name of the host we

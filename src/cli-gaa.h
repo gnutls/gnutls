@@ -8,56 +8,58 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 106 "cli.gaa"
+#line 109 "cli.gaa"
 	char *rest_args;
-#line 96 "cli.gaa"
+#line 99 "cli.gaa"
 	char *srp_passwd;
-#line 93 "cli.gaa"
+#line 96 "cli.gaa"
 	char *srp_username;
-#line 90 "cli.gaa"
+#line 93 "cli.gaa"
 	char *x509_certfile;
-#line 87 "cli.gaa"
+#line 90 "cli.gaa"
 	char *x509_keyfile;
-#line 84 "cli.gaa"
+#line 87 "cli.gaa"
 	char *pgp_certfile;
-#line 81 "cli.gaa"
+#line 84 "cli.gaa"
 	char *pgp_trustdb;
-#line 78 "cli.gaa"
+#line 81 "cli.gaa"
 	char *pgp_keyring;
-#line 75 "cli.gaa"
+#line 78 "cli.gaa"
 	char *pgp_keyfile;
-#line 72 "cli.gaa"
+#line 75 "cli.gaa"
 	char *x509_crlfile;
-#line 69 "cli.gaa"
+#line 72 "cli.gaa"
 	char *x509_cafile;
-#line 66 "cli.gaa"
+#line 69 "cli.gaa"
 	char **ctype;
-#line 65 "cli.gaa"
+#line 68 "cli.gaa"
 	int nctype;
-#line 62 "cli.gaa"
+#line 65 "cli.gaa"
 	char **kx;
-#line 61 "cli.gaa"
+#line 64 "cli.gaa"
 	int nkx;
-#line 58 "cli.gaa"
+#line 61 "cli.gaa"
 	char **macs;
-#line 57 "cli.gaa"
+#line 60 "cli.gaa"
 	int nmacs;
-#line 54 "cli.gaa"
+#line 57 "cli.gaa"
 	char **comp;
-#line 53 "cli.gaa"
+#line 56 "cli.gaa"
 	int ncomp;
-#line 50 "cli.gaa"
+#line 53 "cli.gaa"
 	char **proto;
-#line 49 "cli.gaa"
+#line 52 "cli.gaa"
 	int nproto;
-#line 46 "cli.gaa"
+#line 49 "cli.gaa"
 	char **ciphers;
-#line 45 "cli.gaa"
+#line 48 "cli.gaa"
 	int nciphers;
-#line 41 "cli.gaa"
+#line 44 "cli.gaa"
 	int record_size;
-#line 38 "cli.gaa"
+#line 41 "cli.gaa"
 	int port;
+#line 38 "cli.gaa"
+	int print_cert;
 #line 35 "cli.gaa"
 	int xml;
 #line 32 "cli.gaa"

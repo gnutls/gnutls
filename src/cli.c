@@ -59,6 +59,7 @@ int fingerprint;
 int crlf;
 int quiet = 0;
 extern int xml;
+extern int print_cert;
 
 char *srp_passwd = NULL;
 char *srp_username;
@@ -504,6 +505,7 @@ void gaa_parser(int argc, char **argv)
 	debug = info.debug;
 	disable_extensions = info.disable_extensions;
 	xml = info.xml;
+	print_cert = info.print_cert;
 	starttls = info.starttls;
 	resume = info.resume;
 	port = info.port;

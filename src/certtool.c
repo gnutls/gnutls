@@ -600,7 +600,7 @@ void certificate_info( void)
 			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
 			print += 3;
 		}
-		printf("Key ID: %s\n", printable);
+		printf("Public Key ID: %s\n", printable);
 	}
 
 	printf("\n");
@@ -656,7 +656,7 @@ void privkey_info( void)
 			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
 			print += 3;
 		}
-		printf("Key ID: %s\n", printable);
+		printf("Public Key ID: %s\n", printable);
 	}
 
 	printf("\n");
