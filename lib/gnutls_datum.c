@@ -55,6 +55,17 @@ int gnutls_set_datum( gnutls_datum* dat, const void* data, int data_size) {
 	return 0;
 }
 
+int gnutls_datum_append( gnutls_datum* dat, const void* data, int data_size) {
+
+	dat->data = gnutls_realloc(dat->data, data_size+dat->size);
+	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
+	
+	memcpy( &dat->data[dat->size], data, data_size);
+	dat->size += data_size;
+
+	return 0;
+}
+
 int gnutls_sset_datum( gnutls_datum* dat, const void* data, int data_size) {
 	dat->data = gnutls_secure_malloc(data_size);
 	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
