@@ -83,11 +83,12 @@ void gnutls_global_set_send_func( SEND_FUNC send_func) {
 
 /**
   * gnutls_global_set_log_func - This function sets the logging function
-  * @send_func: it's a send(2) like function
+  * @log_func: it's a log function
   *
   * This is the function were you set the logging function gnutls
-  * is going to use. Normaly you may not use this function since
-  * it is only used for debug reason.
+  * is going to use. This function only accepts a character array.
+  * Normaly you may not use this function since
+  * it is only used for debugging reasons.
   **/
 void gnutls_global_set_log_func( LOG_FUNC log_func) {
 	_gnutls_log_func = log_func;

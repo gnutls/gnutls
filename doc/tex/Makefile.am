@@ -8,8 +8,8 @@ gnutls-api.tex:
 	@echo "\\section{Function Reference}" >> gnutls-api.tex
 	@../scripts/gdoc -tex ../../lib/*.c >> gnutls-api.tex
 
-gnutls.ps: gnutls.tex gnutls-api.tex
+gnutls.ps: gnutls.tex gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps
 
-gnutls.html: gnutls.tex gnutls-api.tex
-	-latex2html gnutls.tex -no_subdir 1 -split 0 -local_icons
+gnutls.html: gnutls.tex gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex
+	-latex2html gnutls.tex -no_subdir 1 -split 0 -local_icons -prefix ./

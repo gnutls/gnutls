@@ -39,16 +39,13 @@ GNUTLS_STATE initialize_state()
        int ret;
 
        gnutls_init(&state, GNUTLS_SERVER);
+	
+       /* in order to support session resuming:
+        */
        if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
 	      fprintf(stderr, "*** DB error (%d)\n\n", ret);
 
-       /* null cipher is here only for debuging 
-        * purposes.
-        */
-       gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER,
-		GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, 0);
-       gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER,
-				GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
+       gnutls_set_cipher_priority(state, GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
        gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
        gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, 0);
        gnutls_set_protocol_priority(state, GNUTLS_TLS1, GNUTLS_SSL3, 0);

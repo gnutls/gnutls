@@ -1,4 +1,4 @@
-Version 0.1.9
+Version 0.1.9 (30/07/2001)
 - Corrected bug(s) in ChangeCipherSpec packet (fixes renegotiate)
 - SRP is updated to conform to the newest draft.
 - Added support for DNSNAME extension.
@@ -7,7 +7,7 @@ Version 0.1.9
 - (Error) message handling has changed
 - Better Protocol Version handling
 - Added x509 Certificate Verification
-- gnutls_read() semantics are now closer to read(2)
+- gnutls_read() semantics are now closer to read(2) - added EOF
 - Documentated some part of gnutls in doc/tex/ using Latex
 
 Version 0.1.4 (22/06/2001)
