@@ -1309,23 +1309,27 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 				      gnutls_x509_crt_t * ca_list,
 				      int ca_list_size)
 {
-    int ret, i, ret2;
+    int ret, i,j, ret2;
 
     res->x509_ca_list = gnutls_realloc_fast(res->x509_ca_list,
-					    (ca_list_size +
-					     res->x509_ncas) *
-					    sizeof(gnutls_x509_crt_t));
+	(ca_list_size + res->x509_ncas) * sizeof(gnutls_x509_crt_t));
     if (res->x509_ca_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
     }
 
     for (i = 0; i < ca_list_size; i++) {
-      gnutls_x509_crt_init(&res->x509_ca_list[i + res->x509_ncas]);
-      ret = _gnutls_x509_crt_cpy(res->x509_ca_list[i + res->x509_ncas],
-				   ca_list[i]);
+        ret = gnutls_x509_crt_init(&res->x509_ca_list[i + res->x509_ncas]);
 	if (ret < 0) {
 	    gnutls_assert();
+	    return ret;
+	}
+
+        ret = _gnutls_x509_crt_cpy(res->x509_ca_list[i + res->x509_ncas],
+            ca_list[i]);
+	if (ret < 0) {
+	    gnutls_assert();
+	    gnutls_x509_crt_deinit( res->x509_ca_list[i + res->x509_ncas]);
 	    return ret;
 	}
 	res->x509_ncas++;
