@@ -29,7 +29,7 @@
 
 #include "x509_asn1.h" 
 #include "x509_der.h"
-
+#include <gnutls_str.h>
 
 
 /* define used for visiting trees */
@@ -58,7 +58,8 @@ _asn1_add_node(unsigned int type)
   if(parse_mode==PARSE_MODE_CHECK) return NULL;
 
   punt=(node_asn *) gnutls_malloc(sizeof(node_asn));
-
+  if (punt==NULL) return NULL;
+  
   punt->left=NULL;
   punt->name=NULL;
   punt->type=type; 
@@ -91,6 +92,8 @@ _asn1_set_value(node_asn *node,unsigned char *value,unsigned int len)
   }
   if(!len) return node;
   node->value=(unsigned char *) gnutls_malloc(len);
+  if (node->value==NULL) return NULL;
+  
   memcpy(node->value,value,len);
   return node;
 }
@@ -122,6 +125,7 @@ _asn1_set_name(node_asn *node,char *name)
   if(strlen(name))
 	{
   	node->name=(char *) gnutls_malloc(strlen(name)+1);
+  	if (node->name==NULL) return NULL;
   	strcpy(node->name,name);
       }
   else node->name=NULL;
@@ -967,7 +971,7 @@ int
 _asn1_append_sequence_set(node_asn *node)
 {
   node_asn *p,*p2;
-  char *temp;
+  char temp[10];
   long n;
 
   if(!node || !(node->down)) return ASN_GENERIC_ERROR;
@@ -977,7 +981,7 @@ _asn1_append_sequence_set(node_asn *node)
   p2=_asn1_copy_structure3(p);
   while(p->right) p=p->right;
   _asn1_set_right(p,p2);
-  temp=(char *) gnutls_malloc(10);
+  
   if(p->name==NULL) strcpy(temp,"?1");
   else{
     n=strtol(p->name+1,NULL,0);
@@ -986,7 +990,6 @@ _asn1_append_sequence_set(node_asn *node)
     _asn1_ltostr(n,temp+1);
   } 
   _asn1_set_name(p2,temp);
-  gnutls_free(temp);
 
   return ASN_OK;
 }
@@ -1104,6 +1107,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
     if(len==0){
       if(isdigit(value[0])){
 	value_temp=(unsigned char *)gnutls_malloc(4);
+	if (value_temp==NULL) return ASN_MEM_ERROR;
+
 	_asn1_convert_integer(value,value_temp,4, &len);
       }
       else{ /* is an identifier like v1 */
@@ -1113,6 +1118,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	  if(type_field(p->type)==TYPE_CONSTANT){
 	    if((p->name) && (!strcmp(p->name,value))){
 	      value_temp=(unsigned char *)gnutls_malloc(4);
+	      if (value_temp==NULL) return ASN_MEM_ERROR;
+
 	      _asn1_convert_integer(p->value,value_temp,4, &len);
 	      break;
 	    }
@@ -1124,6 +1131,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
     }
     else{
       value_temp=(unsigned char *)gnutls_malloc(len);
+      if (value_temp==NULL) return ASN_MEM_ERROR;
       memcpy(value_temp,value,len);
     }
 
@@ -1143,6 +1151,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 
     _asn1_length_der(len-k,NULL,&len2);
     temp=(unsigned char *)gnutls_malloc(len-k+len2);
+    if (temp==NULL) return ASN_MEM_ERROR;
+
     _asn1_octet_der(value_temp+k,len-k,temp,&len2);
     _asn1_set_value(node,temp,len2);
 
@@ -1153,6 +1163,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
       if(isdigit(p->value[0])){
 	default_temp=(unsigned char *)gnutls_malloc(4);
+        if (default_temp==NULL) return ASN_MEM_ERROR;
+
 	_asn1_convert_integer(p->value,default_temp,4,&len2);
       }
       else{ /* is an identifier like v1 */
@@ -1162,6 +1174,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	  if(type_field(p2->type)==TYPE_CONSTANT){
 	    if((p2->name) && (!strcmp(p2->name,p->value))){
 	      default_temp=(unsigned char *)gnutls_malloc(4);
+	      if (default_temp==NULL) return ASN_MEM_ERROR;
+
 	      _asn1_convert_integer(p2->value,default_temp,4,&len2);
 	      break;
 	    }
@@ -1225,6 +1239,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   case  TYPE_OCTET_STRING:
     _asn1_length_der(len,NULL,&len2);
     temp=(unsigned char *)gnutls_malloc(len+len2);
+    if (temp==NULL) return ASN_MEM_ERROR;
+
     _asn1_octet_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
     gnutls_free(temp);
@@ -1232,6 +1248,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   case  TYPE_BIT_STRING:
     _asn1_length_der((len>>3)+2,NULL,&len2);
     temp=(unsigned char *)gnutls_malloc((len>>3)+2+len2);
+    if (temp==NULL) return ASN_MEM_ERROR;
+
     _asn1_bit_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
     gnutls_free(temp);
@@ -1254,6 +1272,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   case TYPE_ANY:
     _asn1_length_der(len,NULL,&len2);
     temp=(unsigned char *)gnutls_malloc(len+len2);
+    if (temp==NULL) return ASN_MEM_ERROR;
+
     _asn1_octet_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
     gnutls_free(temp);
@@ -1271,29 +1291,29 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 }
 
 #define PUT_VALUE( ptr, ptr_size, data, data_size) \
+	*len = data_size; \
 	if (ptr_size < data_size) { \
 		return ASN_MEM_ERROR; \
 	} else { \
 		memcpy( ptr, data, data_size); \
-		*len = data_size; \
 	}
-		
+
 #define PUT_STR_VALUE( ptr, ptr_size, data) \
-	if (ptr_size <= strlen(data)) { \
+	*len = strlen(data) + 1; \
+	if (ptr_size < *len) { \
 		return ASN_MEM_ERROR; \
 	} else { \
 		strcpy( ptr, data); \
-		*len = strlen(ptr)+1; \
 	}
 		
 #define ADD_STR_VALUE( ptr, ptr_size, data) \
-	if (ptr_size <= strlen(data)+strlen(ptr)) { \
+	*len = strlen(data) + 1; \
+	if (ptr_size < strlen(ptr)+(*len)) { \
 		return ASN_MEM_ERROR; \
 	} else { \
 		strcat( ptr, data); \
-		*len = strlen(ptr)+1; \
 	}
-		
+
 /**
   * asn1_read_value - Returns the value of one element inside a structure
   * @root: pointer to a structure

@@ -666,7 +666,9 @@ _asn1_ordering_set(unsigned char *der,node_asn *node)
 
   first=last=NULL;
   while(p){
-    p_vet=(struct vet *)gnutls_malloc(sizeof(struct vet));
+    p_vet=(struct vet *)gnutls_malloc( sizeof(struct vet));
+    if (p_vet==NULL) return;
+    
     p_vet->next=NULL;
     p_vet->prev=last;
     if(first==NULL) first=p_vet;
@@ -694,7 +696,9 @@ _asn1_ordering_set(unsigned char *der,node_asn *node)
     while(p2_vet){
       if(p_vet->value>p2_vet->value){
 	/* change position */
-	temp=(unsigned char *)gnutls_malloc(p_vet->end-counter);
+	temp=(unsigned char *)gnutls_malloc( p_vet->end-counter);
+	if (temp==NULL) return;
+	
 	memcpy(temp,der+counter,p_vet->end-counter);
 	memmove(der+counter,der+p_vet->end,p2_vet->end-p_vet->end);
 	memcpy(der+p_vet->end,temp,p_vet->end-counter);
@@ -747,6 +751,8 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
   first=last=NULL;
   while(p){
     p_vet=(struct vet *)gnutls_malloc(sizeof(struct vet));
+    if (p_vet==NULL) return;
+    
     p_vet->next=NULL;
     p_vet->prev=last;
     if(first==NULL) first=p_vet;
@@ -785,6 +791,8 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
       if(change==1){
 	/* change position */
 	temp=(unsigned char *)gnutls_malloc(p_vet->end-counter);
+	if (temp==NULL) return;
+	
 	memcpy(temp,der+counter,p_vet->end-counter);
 	memmove(der+counter,der+p_vet->end,p2_vet->end-p_vet->end);
 	memcpy(der+p_vet->end,temp,p_vet->end-counter);
@@ -1160,6 +1168,8 @@ asn1_get_der(node_asn *root,unsigned char *der,int len)
 	len2+=_asn1_get_length_der(der+counter+len2,&len3);
 	_asn1_length_der(len2+len3,NULL,&len4);
 	temp2=(unsigned char *)gnutls_malloc(len2+len3+len4);
+        if (temp2==NULL) return ASN_MEM_ERROR;
+        
 	_asn1_octet_der(der+counter,len2+len3,temp2,&len4);
 	_asn1_set_value(p,temp2,len4);
 	gnutls_free(temp2);
