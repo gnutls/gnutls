@@ -1,3 +1,30 @@
+2003-11-27 22:01  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/Makefile.am, doc/tex/appendix.tex,
+	doc/tex/ciphers.tex, doc/tex/ciphersuites.tex,
+	doc/tex/supported_ciphersuites.tex, lib/gnutls.h.in.in,
+	lib/gnutls_algorithms.c, lib/gnutls_cipher_int.c, lib/gnutls_int.h,
+	lib/gnutls_state.c:
+
+	Removed the TWOFISH cipher. Documented the supported ciphersuites.  
+
+2003-11-27 21:52  nmav <nmav@gnutls.org>
+
+	* doc/protocol/: draft-benaloh-pct-00.txt,
+	draft-benaloh-pct-01.txt, draft-hickman-netscape-ssl-00.txt:
+
+	Added historical documents. Got from
+	http://www21.ocn.ne.jp/~k-west/SSLandTLS/index-e.html 
+
+2003-11-27 10:29  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, doc/tex/Makefile.am, lib/auth_cert.c,
+	lib/auth_rsa_export.c, lib/gnutls.h.in.in, lib/gnutls_handshake.c,
+	lib/gnutls_int.h, lib/gnutls_mem.h, lib/gnutls_mpi.c,
+	lib/gnutls_mpi.h, lib/gnutls_x509.c, src/serv.c:
+
+	corrected some bugs that affected openpgp authentication.  
+
 2003-11-26 08:59  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/protocol/rfc3279.txt, doc/tex/cover.tex.in,
