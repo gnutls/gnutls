@@ -1,3 +1,23 @@
+2004-07-31 08:25  nmav <nmav@gnutls.org>
+
+	* src/: certtool.c, certtool.c:
+
+	print the number of bits of the public key in a certificate.  
+
+2004-07-31 07:58  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, lib/auth_cert.h, lib/gnutls.h.in.in,
+	lib/gnutls_cert.c, lib/gnutls_errors.c, lib/gnutls_errors_int.h,
+	lib/gnutls_int.h, lib/gnutls_ui.c, lib/gnutls_ui.h,
+	lib/gnutls_x509.c, lib/gnutls_x509.h, NEWS, lib/auth_cert.h,
+	lib/gnutls.h.in.in, lib/gnutls_cert.c, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, lib/gnutls_int.h, lib/gnutls_ui.c,
+	lib/gnutls_ui.h, lib/gnutls_x509.c:
+
+	Added some default limits in the verification of certificate chains,
+	to avoid denial of service attacks. Also added 
+	gnutls_certificate_set_verify_limits() to override them.  
+
 2004-07-30 21:57  nmav <nmav@gnutls.org>
 
 	* doc/tex/ex-cert-select.tex, lib/gnutls_cert.c,
