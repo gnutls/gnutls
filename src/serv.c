@@ -73,7 +73,8 @@ int main()
     client_len = sizeof(sa_cli);
     for (;;) {
 	gnutls_init(&state, GNUTLS_SERVER);
-	gnutls_set_db_name(state, "/tmp/gdb");
+	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
+		fprintf(stderr, "*** DB error (%d)\n", ret);
 	gnutls_set_cipher_priority( state, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0);
@@ -85,7 +86,7 @@ int main()
 	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
 
-	fprintf(stderr, "connection from %s, port %d\n",
+	printf("- connection from %s, port %d\n",
 		inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
 			  sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
@@ -95,30 +96,30 @@ int main()
 	if (ret < 0) {
 	    close(sd);
 	    gnutls_deinit(&state);
-	    fprintf(stderr, "Handshake has failed (%d)\n", ret);
+	    fprintf(stderr, "*** Handshake has failed (%d)\n", ret);
 	    gnutls_perror(ret);
 	    continue;
 	}
-	fprintf(stderr, "Handshake was completed\n");
+	printf("- Handshake was completed\n");
 
 	/* print srp specific data */
 	if ( gnutls_get_current_kx( state) == GNUTLS_KX_SRP) {
 		info = gnutls_get_auth_info( state);
 		if (info != NULL)
-			printf("\nUser '%s' connected\n", info->username);
+			printf("\n- User '%s' connected\n", info->username);
 	}
 	
 	/* print state information */
 	tmp = _gnutls_kx_get_name(gnutls_get_current_kx( state));
-	printf("Key Exchange: %s\n", tmp); free(tmp);
+	printf("- Key Exchange: %s\n", tmp); free(tmp);
 	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
-	printf("Compression: %s\n", tmp); free(tmp);
+	printf("- Compression: %s\n", tmp); free(tmp);
 	tmp = _gnutls_cipher_get_name(gnutls_get_current_cipher( state));
-	printf("Cipher: %s\n", tmp); free(tmp);
+	printf("- Cipher: %s\n", tmp); free(tmp);
 	tmp = _gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
-	printf("MAC: %s\n", tmp); free(tmp);
+	printf("- MAC: %s\n", tmp); free(tmp);
 
-	fprintf(stderr, "Acting as echo server...\n");
+	printf("- Acting as echo server...\n");
 /*	ret =
 	    gnutls_write(sd, state, "hello client",
 			sizeof("hello client"));
@@ -134,11 +135,10 @@ int main()
 	    ret = gnutls_read(sd, state, buffer, MAX_BUF);
 	    if (gnutls_is_fatal_error(ret) == 1) {
 		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
-		    fprintf(stderr,
-			    "\nPeer has closed the GNUTLS connection\n");
+		    printf("\n- Peer has closed the GNUTLS connection\n");
 		    break;
 		} else {
-		    fprintf(stderr, "\nReceived corrupted data(%d). Closing the connection.\n", ret);
+		    fprintf(stderr, "\n*** Received corrupted data(%d). Closing the connection.\n", ret);
 		    break;
 		}
 
