@@ -248,11 +248,9 @@ static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque 
 
 	x = _gnutls_supported_compression_methods(state, &ciphers);
 	memset(ret, '\0', sizeof(CompressionMethod));
-fprintf(stderr, "datalen: %d\n", datalen);
+
 	for (j = 0; j < datalen; j++) {
 		for (i = 0; i < x; i++) {
-			fprintf(stderr, "cipher[%d] = %d\n", i, (int)ciphers[i]);
-			fprintf(stderr, "data[%d] = %d\n", j, (int)data[j]);
 			if ( ciphers[i] == data[j]) {
 				*ret = ciphers[i];
 				gnutls_free(ciphers);
@@ -825,8 +823,21 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen
 /* This is the main function in the handshake protocol. This does actually
  * everything. (exchange hello messages etc).
  */
+int gnutls_handshake(int cd, GNUTLS_STATE state) {
+	int ret;
+	
+	ret = gnutls_handshake_begin( cd, state);
+	/* FIXME: check certificate */
+	if (ret==0) ret = gnutls_handshake_finish( cd, state);
+	
+	return ret;
+}
 
-int gnutls_handshake(int cd, GNUTLS_STATE state)
+/* in this function we initiate the handshake and we receive - 
+ * if requested - the certificate. This certificate should be checked
+ * somehow.
+ */
+int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 {
 	int ret;
 	char *session_id;
@@ -849,7 +860,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+		/* RECV CERTIFICATE */
 		ret =
 		    _gnutls_recv_handshake(cd, state, NULL, NULL, GNUTLS_CERTIFICATE);
 		if (ret < 0) {
@@ -857,7 +868,54 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			gnutls_clearHashDataBuffer( state);
 			return ret;
 		}
-		
+		return 0;
+	} else {		/* SERVER */
+
+		ret =
+		    _gnutls_recv_handshake(cd, state, NULL, NULL,
+					   GNUTLS_CLIENT_HELLO);
+		if (ret < 0) {
+			ERR("recv hello", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+		_gnutls_generate_session_id(&session_id, &session_id_size);
+		ret =
+		    _gnutls_send_hello(cd, state, session_id,
+				       session_id_size);
+		if (ret < 0) {
+			ERR("send hello", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+		gnutls_free(session_id);
+
+		/* FIXME: send our certificate - if required */
+
+		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+		ret = _gnutls_send_server_kx_message(cd, state);
+		if (ret < 0) {
+			ERR("send server kx", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+		/* FIXME: request - and get - a client certificate */
+		return 0;
+	}
+}
+
+/* in this function we finish the handshake procedure
+ * This should happen only if we trust the peer. (check certificate)
+ */
+int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
+{
+	int ret;
+	char *session_id;
+	uint8 session_id_size;
+
+	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 
 		/* receive the server key exchange */
 		ret = _gnutls_recv_server_kx_message(cd, state);
@@ -867,6 +925,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
+		/* FIXME: receive certificate request */
 
 		/* receive the server hello done */
 		ret =
@@ -878,14 +937,13 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
+		/* send our certificate - if any */
 		ret = _gnutls_send_client_certificate(cd, state);
 		if (ret < 0) {
 			ERR("send client certificate", ret);
 			gnutls_clearHashDataBuffer( state);
 			return ret;
 		}
-
 
 		ret = _gnutls_send_client_kx_message(cd, state);
 		if (ret < 0) {
@@ -894,6 +952,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
+		/* send client certificate verify */
 		ret = _gnutls_send_client_certificate_verify( cd, state);
 		if (ret < 0) {
 			ERR("send client certificate verify", ret);
@@ -926,7 +985,6 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-
 		ret =
 		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
 				    NULL, 0);
@@ -943,35 +1001,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-	} else {		/* SERVER */
-
-		ret =
-		    _gnutls_recv_handshake(cd, state, NULL, NULL,
-					   GNUTLS_CLIENT_HELLO);
-		if (ret < 0) {
-			ERR("recv hello", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		_gnutls_generate_session_id(&session_id, &session_id_size);
-		ret =
-		    _gnutls_send_hello(cd, state, session_id,
-				       session_id_size);
-		if (ret < 0) {
-			ERR("send hello", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-		gnutls_free(session_id);
-
-		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
-		ret = _gnutls_send_server_kx_message(cd, state);
-		if (ret < 0) {
-			ERR("send server kx", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
+	} else { /* SERVER SIDE */
 
 		/* send the server hello done */
 		ret =
