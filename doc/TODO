@@ -21,7 +21,6 @@ Current list:
 - Convert documentation to texinfo format
 - Allow sending V2 Hello messages. It seems that some (old) broken 
   implementations require that.
-- Allow unexpected Client Hello messages
 - Add Kerberos support
 
 (+) Means high priority 

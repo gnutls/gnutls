@@ -162,7 +162,6 @@ int gnutls_global_init( void)
 {
 	int result = 0;
 	int res;
-	char c;
 
 	if (_gnutls_init) goto out;
 	_gnutls_init++;

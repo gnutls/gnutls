@@ -594,8 +594,8 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 			
 			break;
 		case GNUTLS_HANDSHAKE:
-			/* This is legal if HELLO_REQUEST is received - and we are a client,
-			 * or we are a server. A client may initiate a renegotiation at any time.
+			/* This is legal if HELLO_REQUEST is received - and we are a client.
+			 * If we are a server, a client may initiate a renegotiation at any time.
 			 */
 			if ( session->security_parameters.entity==GNUTLS_SERVER) {
 				gnutls_assert();
