@@ -236,10 +236,17 @@ int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
 	uint8 *data;
 	int ret = 0;
 	int data_size;
+	KXAlgorithm algorithm =
+	    _gnutls_cipher_suite_get_kx_algo
+	    (state->gnutls_internals.current_cipher_suite);
 
 	/* if certificate verify is not needed just exit */
 	if (state->gnutls_internals.certificate_verify_needed==0) return 0;
 
+	if (_gnutls_kx_client_cert_vrfy(algorithm)==0) {
+		return 0; /* this algorithm does not support cli_cert_vrfy */
+	}
+	
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Sending client certificate verify message\n");
 #endif

@@ -59,13 +59,21 @@ char *_gnutls_cipher_get_name(BulkCipherAlgorithm algorithm);
 /* functions for key exchange */
 int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm);
 int _gnutls_kx_server_certificate(KXAlgorithm algorithm);
+
+/* key exchange */
 int _gnutls_kx_server_key_exchange(KXAlgorithm algorithm);
 int _gnutls_kx_server_key_exchange2(KXAlgorithm algorithm);
 int _gnutls_kx_client_key_exchange(KXAlgorithm algorithm);
 int _gnutls_kx_client_key_exchange0(KXAlgorithm algorithm);
+/* client certificate */
 int _gnutls_kx_client_certificate(KXAlgorithm algorithm);
 int _gnutls_kx_RSA_premaster(KXAlgorithm algorithm);
 int _gnutls_kx_DH_public_value(KXAlgorithm algorithm);
+
+/* cert vrfy */
+int _gnutls_kx_client_cert_vrfy(KXAlgorithm algorithm);
+int _gnutls_kx_server_cert_vrfy(KXAlgorithm algorithm);
+
 MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(KXAlgorithm algorithm);
 char *_gnutls_kx_get_name(KXAlgorithm algorithm);
 int _gnutls_kx_is_ok(KXAlgorithm algorithm);

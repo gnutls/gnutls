@@ -28,26 +28,20 @@ int gen_anon_client_kx( GNUTLS_KEY, opaque**);
 int proc_anon_server_kx( GNUTLS_KEY, opaque*, int);
 int proc_anon_client_kx( GNUTLS_KEY, opaque*, int);
 
-int gen_anon_client_cert_vrfy( GNUTLS_KEY, opaque**);
-int proc_anon_client_cert_vrfy( GNUTLS_KEY, opaque*, int);
-
-int gen_anon_server_cert_vrfy( GNUTLS_KEY, opaque**);
-int proc_anon_server_cert_vrfy( GNUTLS_KEY, opaque*, int);
-
 MOD_AUTH_STRUCT anon_auth_struct = {
 	"ANON",
 	gen_anon_server_kx,
 	NULL,
 	NULL,
 	gen_anon_client_kx,
-	gen_anon_client_cert_vrfy,
-	gen_anon_server_cert_vrfy,
+	NULL,
+	NULL,
 	proc_anon_server_kx,
 	NULL,
 	NULL,
 	proc_anon_client_kx,
-	proc_anon_client_cert_vrfy,
-	proc_anon_server_cert_vrfy
+	NULL,
+	NULL
 };
 
 int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
@@ -239,22 +233,5 @@ int proc_anon_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	key->client_Y = NULL;
 	key->dh_secret = NULL;
 
-	return 0;
-}
-
-int gen_anon_client_cert_vrfy( GNUTLS_KEY key, opaque** data) {
-	(*data) =  NULL;
-	return 0;
-}
-int gen_anon_server_cert_vrfy( GNUTLS_KEY key, opaque** data) {
-	(*data) =  NULL;
-	return 0;
-}
-int proc_anon_client_cert_vrfy( GNUTLS_KEY key, opaque* data, int data_size) {
-	/* no certificate check in anonymous KX */
-	return 0;
-}
-int proc_anon_server_cert_vrfy( GNUTLS_KEY key, opaque* data, int data_size) {
-	/* no certificate check in this algorithm */
 	return 0;
 }
