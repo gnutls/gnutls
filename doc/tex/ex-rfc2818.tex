@@ -18,13 +18,13 @@ void verify_certificate( gnutls_session session, const char* hostname)
    status = gnutls_certificate_verify_peers(session);
 
    if (status == GNUTLS_E_NO_CERTIFICATE_FOUND) {
-      printf("No certificate was sent");
+      printf("No certificate was sent\n");
       return;
    }
 
    if (status & GNUTLS_CERT_INVALID || status & GNUTLS_CERT_NOT_TRUSTED
       || status & GNUTLS_CERT_CORRUPTED || status & GNUTLS_CERT_REVOKED) {
-      printf("The certificate is not trusted");
+      printf("The certificate is not trusted\n");
       return;
    }
 

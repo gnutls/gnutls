@@ -104,8 +104,7 @@ int main()
          printf("- Peer has closed the TLS connection\n");
          goto end;
       } else if (ret < 0) {
-         fprintf(stderr, "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
-                 ret);
+         fprintf(stderr, "*** Error: %s\n", gnutls_strerror(ret));
          goto end;
       } else if (ret > 0) {
          printf("- Received %d bytes: ", ret);
