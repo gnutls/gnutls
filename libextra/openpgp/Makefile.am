@@ -1,4 +1,4 @@
-INCLUDES = -I../ -I../../includes/ -I../../lib
+INCLUDES = -I../ -I../../includes/ -I../../lib -I../../lib/minitasn1
 EXTRA_DIST = openpgp.h gnutls_openpgp.h
 
 noinst_LTLIBRARIES = libpgp.la
