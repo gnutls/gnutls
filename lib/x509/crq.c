@@ -342,7 +342,6 @@ int der_size, result;
 		return _gnutls_asn2err(result);
 	}
 
-#if 0
 	/* FIXME: disable attributes.
 	 */
 	result = asn1_write_value( crq->crq, "certificationRequestInfo.attributes", NULL, 0);
@@ -350,7 +349,6 @@ int der_size, result;
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
-#endif
 
 	return 0;
 }
