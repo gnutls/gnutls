@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -133,7 +133,7 @@ int main()
 	print_info( state);
 
 	printf("- Disconnecting\n");
-	gnutls_close(sd, state);
+	gnutls_bye(sd, state);
 	shutdown( sd, SHUT_WR);
 	close(sd);	
 	gnutls_deinit( state);	
@@ -237,7 +237,7 @@ int main()
 		if (FD_ISSET(fileno(stdin), &rset)) {
 	
 			if( fgets(buffer, MAX_BUF, stdin) == NULL) {
-				gnutls_close(sd, state);
+				gnutls_bye(sd, state);
 				user_term = 1;
 				continue;
 			}
@@ -245,7 +245,7 @@ int main()
 			printf("- Sent: %d bytes\n", strlen(buffer));
 		}
 	}
-	if (user_term!=0) gnutls_close(sd, state);
+	if (user_term!=0) gnutls_bye(sd, state);
 	
 	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);

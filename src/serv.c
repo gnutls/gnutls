@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -186,7 +186,7 @@ int main()
 			i++;
 #ifdef RENEGOTIATE
 			if (i == 10)
-				ret = gnutls_send_hello_request(sd, state);
+				ret = gnutls_rehandshake(sd, state);
 #endif
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
@@ -200,7 +200,7 @@ int main()
 			}
 		}
 		fprintf(stderr, "\n");
-		gnutls_close(sd, state);
+		gnutls_bye(sd, state);
 		close(sd);
 		gnutls_deinit(state);
 	}
