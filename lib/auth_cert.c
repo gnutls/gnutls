@@ -110,10 +110,8 @@ int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
  * -1 otherwise.
  */
 inline
-    static int _gnutls_check_pk_algo_in_list(gnutls_pk_algorithm *
-					     pk_algos, int pk_algos_length,
-					     gnutls_pk_algorithm
-					     algo_to_check)
+static int _gnutls_check_pk_algo_in_list(const gnutls_pk_algorithm *pk_algos, 
+	int pk_algos_length, gnutls_pk_algorithm algo_to_check)
 {
 	int i;
 	for (i = 0; i < pk_algos_length; i++) {
@@ -131,7 +129,7 @@ inline
  */
 static int _find_x509_cert(const gnutls_certificate_credentials cred,
 			   opaque * _data, size_t _data_size,
-			   gnutls_pk_algorithm * pk_algos,
+			   const gnutls_pk_algorithm * pk_algos,
 			   int pk_algos_length, int *indx)
 {
 	uint size;
@@ -401,15 +399,17 @@ static int call_client_cert_callback(gnutls_session session,
 
 OPENPGP_KEY_DEINIT _E_gnutls_openpgp_key_deinit;
 OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
+
 /* Calls the client get callback.
  */
 static int call_get_cert_callback( gnutls_session session,
-	gnutls_datum* issuers_dn, int issuers_dn_length)
+	gnutls_datum* issuers_dn, int issuers_dn_length, 
+	gnutls_pk_algorithm* pk_algos, int pk_algos_length)
 {
 uint i;
 gnutls_cert *local_certs = NULL;
 gnutls_privkey *local_key = NULL;
-retr_st st;
+gnutls_retr_st st;
 int ret;
 gnutls_certificate_type type =
     gnutls_certificate_type_get(session);
@@ -431,6 +431,7 @@ const gnutls_certificate_credentials cred;
 		ret =
 		    cred->client_get_cert_callback(session,
 		    		issuers_dn, issuers_dn_length,
+				pk_algos, pk_algos_length,
 				&st);
 	}
 
@@ -547,7 +548,8 @@ static int _select_client_cert(gnutls_session session,
 		}
 
 		if (cred->client_get_cert_callback) {
-			result = call_get_cert_callback( session, issuers_dn, issuers_dn_length);
+			result = call_get_cert_callback( session, issuers_dn, issuers_dn_length,
+				pk_algos, pk_algos_length);
 			goto cleanup;
 		}
 
@@ -1621,7 +1623,7 @@ int _gnutls_server_select_cert(gnutls_session session,
 	 */
 	if (cred->server_get_cert_callback != NULL) {
 
-		return call_get_cert_callback( session, NULL, 0);
+		return call_get_cert_callback( session, NULL, 0, NULL, 0);
 
 	} else if (session->internals.server_cert_callback != NULL
 		   && cred->ncerts > 0) {

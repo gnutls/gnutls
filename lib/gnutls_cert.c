@@ -327,20 +327,18 @@ void gnutls_certificate_server_set_select_function(gnutls_session session,
   * to be used in the handshake.
   * The callback's function prototype is:
   * int (*callback)(gnutls_session, const gnutls_datum* req_ca_dn, int nreqs, 
-  * gnutls_datum **cert, unsigned int *ncerts, gnutls_key* key);
+  * gnutls_pk_algorithm* pk_algos, int pk_algos_length, gnutls_retr_st st);
   *
-  * @cert should contain @ncerts gnutls_datum structures which hold
-  * the raw certificates (DER for X.509 or binary for OpenPGP), of the
-  * client. Those should be allocated with gnutls_malloc(). The certificate
-  * type to be sent should be obtained using gnutls_certificate_type_get();
-  *
-  * @key should contain a private key.
+  * @st should contain the certificates and private keys.
   *
   * @req_ca_cert, is only used in X.509 certificates. 
   * Contains a list with the CA names that the server considers trusted. 
   * Normally we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
   * meaningful value use the function gnutls_x509_rdn_get().
+  *
+  * @pk_algos, contains a list with server's acceptable signature algorithms.
+  * The certificate returned should support the server's given algorithms.
   *
   * If the callback function is provided then gnutls will call it, in the
   * handshake, after the certificate request message has been received.
@@ -363,15 +361,10 @@ void gnutls_certificate_client_set_retrieve_function(gnutls_certificate_credenti
   * This function sets a callback to be called in order to retrieve the certificate
   * to be used in the handshake.
   * The callback's function prototype is:
-  * int (*callback)(gnutls_session, gnutls_datum **cert, unsigned int *ncerts
-  * gnutls_key* key);
+  * int (*callback)(gnutls_session, const gnutls_datum* req_ca_dn, int nreqs, 
+  * gnutls_pk_algorithm* pk_algos, int pk_algos_length, gnutls_retr_st st);
   *
-  * @cert should contain @ncerts gnutls_datum structures which hold
-  * the raw certificates (DER for X.509 or binary for OpenPGP), of the
-  * server. Those should be allocated with gnutls_malloc(). The certificate
-  * type to be sent should be obtained using gnutls_certificate_type_get();
-  *
-  * @key should contain a private key.
+  * @st should contain the certificates and private keys.
   *
   * If the callback function is provided then gnutls will call it, in the
   * handshake, after the certificate request message has been received.

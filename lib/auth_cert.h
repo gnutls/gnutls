@@ -19,14 +19,15 @@ typedef struct retr_st {
 	} key;
 	
 	uint deinit_all;
-} retr_st;
+} gnutls_retr_st;
 
-typedef int gnutls_certificate_client_retrieve_function(
-   struct gnutls_session_int*, const gnutls_datum* req_ca_cert, int nreqs,
-   retr_st*);
+typedef int gnutls_certificate_client_retrieve_function(gnutls_session,
+	const gnutls_datum* req_ca_rdn, int nreqs,
+	const gnutls_pk_algorithm* pk_algos, int pk_algos_length,
+	gnutls_retr_st *);
 
 typedef int gnutls_certificate_server_retrieve_function(
-   struct gnutls_session_int*, retr_st*);
+   struct gnutls_session_int*, gnutls_retr_st*);
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates

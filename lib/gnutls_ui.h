@@ -47,12 +47,11 @@ typedef struct gnutls_retr_st {
 } gnutls_retr_st;
 
 typedef int gnutls_certificate_client_retrieve_function(gnutls_session,
-							const gnutls_datum
-							* req_ca_rdn,
-							int nreqs,
-							gnutls_retr_st *);
+	const gnutls_datum* req_ca_rdn, int nreqs,
+	const gnutls_pk_algorithm* pk_algos, int pk_algos_length,
+	gnutls_retr_st *);
 typedef int gnutls_certificate_server_retrieve_function(gnutls_session,
-							gnutls_retr_st *);
+	gnutls_retr_st *);
 
 
 /* Functions that allow AUTH_INFO structures handling
