@@ -16,16 +16,22 @@ EXTRA_DIST = openssl_compat.h gnutls-extra-api.texi gnutls_extra.h	\
 	libgnutls-extra-config.in libgnutls-extra.m4 lzoconf.h		\
 	minilzo.h
 
+lib_LTLIBRARIES = libgnutls-extra.la
+
 if ENABLE_OPENSSL
-lib_LTLIBRARIES = libgnutls-extra.la libgnutls-openssl.la
+lib_LTLIBRARIES += libgnutls-openssl.la
 
 libgnutls_openssl_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.c
 
 libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la ../crypto/libgc.la
+
+if ENABLE_MINITASN1
+libgnutls_openssl_la_LIBADD += ../lib/minitasn1/libminitasn1.la
 else
-lib_LTLIBRARIES = libgnutls-extra.la
+libgnutls_openssl_la_LDFLAGS += $(LIBTASN1_LIBS) 
+endif
 endif
 
 if ENABLE_OPENPGP
