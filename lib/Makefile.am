@@ -77,6 +77,8 @@ libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
 	$(libgnutls_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
+libgnutls_la_LIBADD = ../gl/libgnu.la
+
 pkix_asn1_tab.c: pkix.asn
 	-asn1Parser pkix.asn pkix_asn1_tab.c
 
