@@ -23,7 +23,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 /* Set the defaults (only to remind me that they should be allocated ) */
 	(*state)->security_parameters.bulk_cipher_algorithm = GNUTLS_NULL;
-	(*state)->security_parameters.mac_algorithm = MAC_NULL;
+	(*state)->security_parameters.mac_algorithm = GNUTLS_MAC_NULL;
 	(*state)->security_parameters.compression_algorithm = COMPRESSION_NULL;
 
 	(*state)->connection_state.read_compression_state = NULL;

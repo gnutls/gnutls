@@ -74,7 +74,7 @@ enum KX_Algorithm { KX_RSA, KX_DHE_DSS, KX_DHE_RSA, KX_DH_DSS, KX_DH_RSA, KX_ANO
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
 enum IsExportable { EXPORTABLE_TRUE, EXPORTABLE_FALSE };
-enum MACAlgorithm { MAC_NULL, MAC_MD5, MAC_SHA };
+enum MACAlgorithm { GNUTLS_MAC_NULL, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
 enum CompressionMethod { COMPRESSION_NULL };
 
 enum ValidSession { VALID_TRUE, VALID_FALSE };

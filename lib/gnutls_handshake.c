@@ -700,7 +700,8 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		    mhash_end(state->gnutls_internals.client_td_sha1);
 
 		/* Initialize the connection state (start encryption) */
-		_gnutls_connection_state_init(state);
+		ret = _gnutls_connection_state_init(state);
+		if (ret<0) return ret;
 
 		/* send the finished message */
 
@@ -814,7 +815,8 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		}
 
 		/* Initialize the connection state (start encryption) */
-		_gnutls_connection_state_init(state);
+		ret = _gnutls_connection_state_init(state);
+		if (ret<0) return ret;
 
 		state->gnutls_internals.client_md_md5 =
 		    mhash_end(state->gnutls_internals.client_td_md5);
