@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#define LIBTASN1_VERSION "0.2.2"
+#define LIBTASN1_VERSION "0.2.3"
 
 #include <sys/types.h>
 #include <time.h>
@@ -58,10 +58,11 @@ typedef int asn1_retCode;  /* type returned by libasn1 functions */
 #define ASN1_ERROR_TYPE_ANY        10
 #define ASN1_SYNTAX_ERROR          11
 #define ASN1_MEM_ERROR		   12
-#define ASN1_DER_OVERFLOW          13
-#define ASN1_NAME_TOO_LONG         14
-#define ASN1_ARRAY_ERROR           15
-#define ASN1_ELEMENT_NOT_EMPTY     16
+#define ASN1_MEM_ALLOC_ERROR	   13
+#define ASN1_DER_OVERFLOW          14
+#define ASN1_NAME_TOO_LONG         15
+#define ASN1_ARRAY_ERROR           16
+#define ASN1_ELEMENT_NOT_EMPTY     17
 
 /*************************************/
 /* Constants used in asn1_visit_tree */
@@ -170,11 +171,11 @@ asn1_retCode asn1_expand_any_defined_by(ASN1_TYPE definitions,
 asn1_retCode asn1_expand_octet_string(ASN1_TYPE definitions,ASN1_TYPE *element,
 	       const char *octetName,const char *objectName);
 
-asn1_retCode asn1_read_tag(node_asn *root,const char *name,int *tag, 
-			   int *class);
+asn1_retCode asn1_read_tag(node_asn *root,const char *name,int *tagValue, 
+			   int *classValue);
 
-asn1_retCode asn1_find_structure_from_oid(ASN1_TYPE definitions,
-		    const char *oidValue,char *structureName);
+const char*  asn1_find_structure_from_oid(ASN1_TYPE definitions,
+		    const char *oidValue);
 
 const char *asn1_check_version( const char *req_version );
 

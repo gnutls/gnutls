@@ -602,7 +602,7 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
 	temp2=(unsigned char *)_asn1_alloca(len2+len3+len4);
         if (temp2==NULL){
 	  asn1_delete_structure(element);
-	  return ASN1_MEM_ERROR;
+	  return ASN1_MEM_ALLOC_ERROR;
 	}
         
 	_asn1_octet_der(der+counter,len2+len3,temp2,&len4);
@@ -669,6 +669,7 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
   *   ASN1_ELEMENT_NOT_FOUND\: ELEMENT is ASN1_TYPE_EMPTY or elementName == NULL.
   *
   *   ASN1_TAG_ERROR,ASN1_DER_ERROR\: the der encoding doesn't match the structure STRUCTURE. *ELEMENT deleted. 
+  *
   **/
 asn1_retCode
 asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
@@ -700,7 +701,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
     if(nameLen>0) strcpy(currentName,(*structure)->name);
     else{
       asn1_delete_structure(structure);
-    return ASN1_MEM_ERROR;
+      return ASN1_MEM_ERROR;
     }
     if(!(strcmp(currentName,elementName))){ 
       state=FOUND;
@@ -1000,7 +1001,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	  temp2=(unsigned char *)_asn1_alloca(len2+len3+len4);
 	  if (temp2==NULL){
 	    asn1_delete_structure(structure);
-	    return ASN1_MEM_ERROR;
+	    return ASN1_MEM_ALLOC_ERROR;
 	  }
         
 	_asn1_octet_der(der+counter,len2+len3,temp2,&len4);

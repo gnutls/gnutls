@@ -488,7 +488,8 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
 	const char* where, const unsigned char* data, int sizeof_data, int multi) 
 {
-char val_name[MAX_NAME_SIZE], tmp[128];
+const char *val_name;
+char tmp[128];
 ASN1_TYPE c2;
 opaque *der;
 int der_len, result;
@@ -496,10 +497,10 @@ int der_len, result;
 
 	/* Find how to encode the data.
 	 */
-	result = asn1_find_structure_from_oid( _gnutls_get_pkix(), given_oid, val_name);
-	if (result != ASN1_SUCCESS) {
+	val_name = asn1_find_structure_from_oid( _gnutls_get_pkix(), given_oid);
+	if (val_name == NULL) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	_gnutls_str_cpy( tmp, sizeof(tmp), "PKIX1.");

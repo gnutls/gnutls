@@ -294,7 +294,7 @@ asn1_write_value(node_asn *node_root,const char *name,
     if(len==0){
       if((isdigit(value[0])) || (value[0]=='-')){
 	value_temp=(unsigned char *)_asn1_alloca(SIZEOF_UNSIGNED_LONG_INT);
-	if (value_temp==NULL) return ASN1_MEM_ERROR;
+	if (value_temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
 	_asn1_convert_integer(value,value_temp,SIZEOF_UNSIGNED_LONG_INT, &len);
       }
@@ -305,7 +305,7 @@ asn1_write_value(node_asn *node_root,const char *name,
 	  if(type_field(p->type)==TYPE_CONSTANT){
 	    if((p->name) && (!strcmp(p->name,value))){
 	      value_temp=(unsigned char *)_asn1_alloca(SIZEOF_UNSIGNED_LONG_INT);
-	      if (value_temp==NULL) return ASN1_MEM_ERROR;
+	      if (value_temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
 	      _asn1_convert_integer(p->value,value_temp,SIZEOF_UNSIGNED_LONG_INT, &len);
 	      break;
@@ -318,7 +318,7 @@ asn1_write_value(node_asn *node_root,const char *name,
     }
     else{ /* len != 0 */
       value_temp=(unsigned char *)_asn1_alloca(len);
-      if (value_temp==NULL) return ASN1_MEM_ERROR;
+      if (value_temp==NULL) return ASN1_MEM_ALLOC_ERROR;
       memcpy(value_temp,value,len);
     }
 
@@ -338,7 +338,7 @@ asn1_write_value(node_asn *node_root,const char *name,
 
     _asn1_length_der(len-k,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca(len-k+len2);
-    if (temp==NULL) return ASN1_MEM_ERROR;
+    if (temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
     _asn1_octet_der(value_temp+k,len-k,temp,&len2);
     _asn1_set_value(node,temp,len2);
@@ -351,7 +351,7 @@ asn1_write_value(node_asn *node_root,const char *name,
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
       if((isdigit(p->value[0])) || (p->value[0]=='-')){
 	default_temp=(unsigned char *)_asn1_alloca(SIZEOF_UNSIGNED_LONG_INT);
-        if (default_temp==NULL) return ASN1_MEM_ERROR;
+        if (default_temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
 	_asn1_convert_integer(p->value,default_temp,SIZEOF_UNSIGNED_LONG_INT,&len2);
       }
@@ -362,7 +362,7 @@ asn1_write_value(node_asn *node_root,const char *name,
 	  if(type_field(p2->type)==TYPE_CONSTANT){
 	    if((p2->name) && (!strcmp(p2->name,p->value))){
 	      default_temp=(unsigned char *)_asn1_alloca(SIZEOF_UNSIGNED_LONG_INT);
-	      if (default_temp==NULL) return ASN1_MEM_ERROR;
+	      if (default_temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
 	      _asn1_convert_integer(p2->value,default_temp,SIZEOF_UNSIGNED_LONG_INT,&len2);
 	      break;
@@ -430,7 +430,7 @@ asn1_write_value(node_asn *node_root,const char *name,
       len=strlen(value);
     _asn1_length_der(len,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca(len+len2);
-    if (temp==NULL) return ASN1_MEM_ERROR;
+    if (temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
     _asn1_octet_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
@@ -441,7 +441,7 @@ asn1_write_value(node_asn *node_root,const char *name,
       len=strlen(value);
     _asn1_length_der(len,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca(len+len2);
-    if (temp==NULL) return ASN1_MEM_ERROR;
+    if (temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
     _asn1_octet_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
@@ -452,7 +452,7 @@ asn1_write_value(node_asn *node_root,const char *name,
       len=strlen(value);
     _asn1_length_der((len>>3)+2,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca((len>>3)+2+len2);
-    if (temp==NULL) return ASN1_MEM_ERROR;
+    if (temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
     _asn1_bit_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
@@ -476,7 +476,7 @@ asn1_write_value(node_asn *node_root,const char *name,
   case TYPE_ANY:
     _asn1_length_der(len,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca(len+len2);
-    if (temp==NULL) return ASN1_MEM_ERROR;
+    if (temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
     _asn1_octet_der(value,len,temp,&len2);
     _asn1_set_value(node,temp,len2);
@@ -704,8 +704,8 @@ asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
   * asn1_read_tag - Returns the TAG of one element inside a structure
   * @root: pointer to a structure
   * @name: the name of the element inside a structure.
-  * @tag:  variable that will contain the TAG value. 
-  * @class: variable that will specify the TAG type.
+  * @tagValue:  variable that will contain the TAG value. 
+  * @classValue: variable that will specify the TAG type.
   *
   * Description:
   *
@@ -721,7 +721,7 @@ asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
   * 
   **/
 asn1_retCode 
-asn1_read_tag(node_asn *root,const char *name,int *tag, int *class)
+asn1_read_tag(node_asn *root,const char *name,int *tagValue, int *classValue)
 {
   node_asn *node,*p,*pTag;
  
@@ -745,43 +745,43 @@ asn1_read_tag(node_asn *root,const char *name,int *tag, int *class)
   }
 
   if(pTag){
-    *tag=strtoul(pTag->value,NULL,10);
+    *tagValue=strtoul(pTag->value,NULL,10);
   
-    if(pTag->type&CONST_APPLICATION) *class=ASN1_CLASS_APPLICATION;
-    else if(pTag->type&CONST_UNIVERSAL) *class=ASN1_CLASS_UNIVERSAL;
-    else if(pTag->type&CONST_PRIVATE) *class=ASN1_CLASS_PRIVATE;
-    else *class=ASN1_CLASS_CONTEXT_SPECIFIC;
+    if(pTag->type&CONST_APPLICATION) *classValue=ASN1_CLASS_APPLICATION;
+    else if(pTag->type&CONST_UNIVERSAL) *classValue=ASN1_CLASS_UNIVERSAL;
+    else if(pTag->type&CONST_PRIVATE) *classValue=ASN1_CLASS_PRIVATE;
+    else *classValue=ASN1_CLASS_CONTEXT_SPECIFIC;
   }
   else{
-    *class=ASN1_CLASS_UNIVERSAL;
+    *classValue=ASN1_CLASS_UNIVERSAL;
 
     switch(type_field(node->type)){
     case TYPE_NULL:
-      *tag=ASN1_TAG_NULL;break;
+      *tagValue=ASN1_TAG_NULL;break;
     case TYPE_BOOLEAN:
-      *tag=ASN1_TAG_BOOLEAN;break;
+      *tagValue=ASN1_TAG_BOOLEAN;break;
     case TYPE_INTEGER:
-      *tag=ASN1_TAG_INTEGER;break;
+      *tagValue=ASN1_TAG_INTEGER;break;
     case TYPE_ENUMERATED:
-      *tag=ASN1_TAG_ENUMERATED;break;
+      *tagValue=ASN1_TAG_ENUMERATED;break;
     case TYPE_OBJECT_ID:
-      *tag=ASN1_TAG_OBJECT_ID;break;
+      *tagValue=ASN1_TAG_OBJECT_ID;break;
     case TYPE_TIME:
       if(node->type&CONST_UTC){
-	*tag=ASN1_TAG_UTCTime;
+	*tagValue=ASN1_TAG_UTCTime;
       }
-      else *tag=ASN1_TAG_GENERALIZEDTime;
+      else *tagValue=ASN1_TAG_GENERALIZEDTime;
       break;
     case TYPE_OCTET_STRING:
-      *tag=ASN1_TAG_OCTET_STRING;break;
+      *tagValue=ASN1_TAG_OCTET_STRING;break;
     case TYPE_GENERALSTRING:
-      *tag=ASN1_TAG_GENERALSTRING;break;
+      *tagValue=ASN1_TAG_GENERALSTRING;break;
     case TYPE_BIT_STRING:
-      *tag=ASN1_TAG_BIT_STRING;break;
+      *tagValue=ASN1_TAG_BIT_STRING;break;
     case TYPE_SEQUENCE: case TYPE_SEQUENCE_OF:
-      *tag=ASN1_TAG_SEQUENCE;break;
+      *tagValue=ASN1_TAG_SEQUENCE;break;
     case TYPE_SET: case TYPE_SET_OF:
-      *tag=ASN1_TAG_SET;break;
+      *tagValue=ASN1_TAG_SET;break;
     case TYPE_TAG:
     case TYPE_CHOICE:
     case TYPE_ANY:

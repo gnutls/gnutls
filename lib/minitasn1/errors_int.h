@@ -15,9 +15,10 @@
 #define ASN1_ERROR_TYPE_ANY        10
 #define ASN1_SYNTAX_ERROR          11
 #define ASN1_MEM_ERROR		   12
-#define ASN1_DER_OVERFLOW          13
-#define ASN1_NAME_TOO_LONG         14
-#define ASN1_ARRAY_ERROR           15
-#define ASN1_ELEMENT_NOT_EMPTY     16
+#define ASN1_MEM_ALLOC_ERROR	   13
+#define ASN1_DER_OVERFLOW          14
+#define ASN1_NAME_TOO_LONG         15
+#define ASN1_ARRAY_ERROR           16
+#define ASN1_ELEMENT_NOT_EMPTY     17
 
 

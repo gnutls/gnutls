@@ -175,9 +175,9 @@ _asn1_time_der(unsigned char *str,unsigned char *der,int *der_len)
 
   max_len=*der_len;
 
-  if(der==NULL) return ASN1_SUCCESS;
-  _asn1_length_der(strlen(str),der,&len_len);
-  if((len_len+strlen(str))<=max_len)
+  _asn1_length_der(strlen(str),(max_len>0)?der:NULL,&len_len);
+
+  if((len_len+(int)strlen(str))<=max_len)
     memcpy(der+len_len,str,strlen(str));
   *der_len=len_len+strlen(str);
 
@@ -244,11 +244,10 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
   unsigned char bit7;
   unsigned long val,val1=0;
 
-  if(der==NULL) return ASN1_SUCCESS;
-
   max_len=*der_len;
 
-  temp=(char *) malloc(strlen(str)+2);
+  temp=(char *) _asn1_alloca(strlen(str)+2);
+  if(temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
   strcpy(temp, str);
   strcat(temp, ".");
@@ -290,7 +289,7 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
   }
   *der_len+=len_len;
 
-  free(temp);
+  _asn1_afree(temp);
 
   if(max_len<(*der_len)) return ASN1_MEM_ERROR;
 
@@ -812,6 +811,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,unsigned char *der,int *len,
       }
       len2=max_len;
       ris=_asn1_objectid_der(p->value,der+counter,&len2);
+      if(ris==ASN1_MEM_ALLOC_ERROR) return ris;
       max_len-=len2;
       counter+=len2;
       move=RIGHT;
