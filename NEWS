@@ -1,3 +1,7 @@
+Version 1.1.17
+- Removed length limit on passwords read by 'certtool'.
+- Documentation fixes.
+
 Version 1.1.16 (15/08/2004)
 - Fix missing gnulib linker parameter when building certtool.
 - Add gnulib module 'progname', needed by module 'error'.
