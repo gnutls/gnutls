@@ -930,9 +930,11 @@ opaque *data = NULL;
 	/* Write the key derivation algorithm
 	 */
 	result = asn1_write_value( dest, dest_name, data, size);
+
+	gnutls_afree(data);
+
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		gnutls_afree(data);
 		return _gnutls_asn2err(result);
 	}
 

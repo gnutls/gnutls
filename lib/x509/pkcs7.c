@@ -174,6 +174,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	 */
 	if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
 		gnutls_assert();
+		_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}					 		 	
 
@@ -309,6 +310,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 
 	if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
 		gnutls_assert();
+		_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}					 		 	
 
@@ -405,7 +407,7 @@ int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
 
 static int create_empty_signed_data(ASN1_TYPE pkcs7)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY, ec = ASN1_TYPE_EMPTY;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	uint8 one = 1;
 	int result;
 
@@ -427,73 +429,30 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7)
 
 	/* Use no digest algorithms
 	 */
-	result = asn1_write_value( c2, "digestAlgorithms", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	/* Create a data encapContentInfo
-	 */
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.EncapsulatedContentInfo", &ec)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
 
 	/* id-data */
-	result = asn1_write_value( ec, "eContentType", "1.2.840.113549.1.7.5", 1);
+	result = asn1_write_value( c2, "encapContentInfo.eContentType", "1.2.840.113549.1.7.5", 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	result = asn1_write_value( ec, "eContent", NULL, 0);
+	result = asn1_write_value( c2, "encapContentInfo.eContent", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
-
-	/* Copy the generated encapsulated data.
-	 */
-	result = _gnutls_x509_der_encode_and_copy( ec, "", c2, "encapContentInfo");
-	if (result < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-	asn1_delete_structure( &ec);
-
 
 	/* Add no certificates.
 	 */
-	result = asn1_write_value( c2, "certificates", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
 
 	/* Add no crls.
 	 */
-	result = asn1_write_value( c2, "crls", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
 
 	/* Add no signerInfos.
 	 */
-	result = asn1_write_value( c2, "signerInfos", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
 
 	/* Copy the signed data to the pkcs7
 	 */
@@ -517,7 +476,6 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7)
 
 	cleanup:
 		asn1_delete_structure( &c2);
-		asn1_delete_structure( &ec);
 		return result;	
 
 }
@@ -549,11 +507,6 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 		return _gnutls_asn2err(result);
 	}
 
-	if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_PKCS7_CONTENT_TYPE;
-	}					 		 	
-
 	if (result == ASN1_VALUE_NOT_FOUND) {
 		/* The pkcs7 structure is new, so create the
 		 * signedData.
@@ -563,7 +516,13 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 			gnutls_assert();
 			return result;
 		}
-	}
+	} else { /* success */
+		if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
+			gnutls_assert();
+			_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
+			return GNUTLS_E_UNKNOWN_PKCS7_CONTENT_TYPE;
+		}
+	}					 		 	
 
 	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
@@ -606,7 +565,6 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 
 	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
 	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;	
@@ -617,14 +575,25 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 
 	/* Step 2. Append the new certificate.
 	 */
-	result = asn1_write_value(c2, "certificates.?LAST", "certificate", 1);
+
+	result = asn1_write_value(c2, "certificates", "NEW", 1);
 	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;	
 	}
 
+	result = asn1_write_value(c2, "certificates.?LAST", "certificate", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+
+#error FIX THAT.
 	result = asn1_write_value(c2, "certificates.?LAST.certificate", crt->data, crt->size);
 	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;	
 	}
