@@ -31,7 +31,7 @@
 GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 {
 	GNUTLS_MAC_HANDLE ret = NULL;
-	gcry_error_t result;
+	gcry_error_t result = 0;
 
 	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 	if (ret == NULL) {
@@ -54,7 +54,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 	default:
 		gnutls_assert();
 		gnutls_free( ret);
-		ret = GNUTLS_HASH_FAILED; break;
+		ret = GNUTLS_HASH_FAILED;
 	}
 
 	if (result) {
@@ -141,7 +141,7 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 				    const void *key, int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;
-	gcry_error_t result;
+	gcry_error_t result = 0;
 
 	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 	if (ret == NULL)

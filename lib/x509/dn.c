@@ -283,6 +283,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 					goto cleanup;
 				}
 				STR_APPEND(str_escape(string, escaped, sizeof_escaped));
+				gnutls_free(string); string = NULL;
 			} else {
 				char *res;
 
@@ -320,6 +321,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 
       cleanup:
 	gnutls_free( value2);
+	gnutls_free( string);
 	gnutls_free( escaped);
 	_gnutls_string_clear(&out_str);
 	return result;
