@@ -50,7 +50,7 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 	char str_critical[10];
 	int critical = 0;
 	char extnID[128];
-	char extnValue[256];
+	gnutls_datum value;
 	int indx_counter = 0;
 
 	ret->data = NULL;
@@ -91,60 +91,44 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 				return _gnutls_asn2err(result);
 			}
 
-			_gnutls_str_cpy(name2, sizeof(name2), name);
-			_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
+			/* Handle Extension 
+			 */
+			if ( strcmp(extnID, extension_id)==0 && indx == indx_counter++) { 
+				/* extension was found 
+				 */
 
-			len = sizeof(str_critical);
-			result =
-			    asn1_read_value(cert->cert, name2, str_critical, &len);
-
-			if (result == ASN1_ELEMENT_NOT_FOUND) {
-				gnutls_assert();
-				break;
-			} else if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(result);
-			}
-
-			if (str_critical[0] == 'T')
-				critical = 1;
-			else critical = 0;
-
-			_gnutls_str_cpy(name2, sizeof(name2), name);
-			_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
-
-			len = sizeof(extnValue) - 1;
-			result =
-			    asn1_read_value(cert->cert, name2, extnValue, &len);
-
-			if (result == ASN1_ELEMENT_NOT_FOUND)
-				break;
-			else {
-				if (result == ASN1_MEM_ERROR
-				    && critical == 0) {
-
-					_gnutls_x509_log
-					    ("X509_EXT: Cannot parse extension: %s. Too small buffer.",
-					     extnID);
-
-					continue;
-				}
-				if (result != ASN1_SUCCESS) {
+				/* read the critical status.
+				 */
+				len = sizeof(str_critical);
+				result =
+				    asn1_read_value(cert->cert, name2, str_critical, &len);
+	
+				if (result == ASN1_ELEMENT_NOT_FOUND) {
+					gnutls_assert();
+					break;
+				} else if (result != ASN1_SUCCESS) {
 					gnutls_assert();
 					return _gnutls_asn2err(result);
 				}
-			}
 
-			/* Handle Extension */
-			if ( strcmp(extnID, extension_id)==0 && indx == indx_counter++) { 
-				/* extension was found */
+				if (str_critical[0] == 'T')
+					critical = 1;
+				else critical = 0;
 
-				ret->data = gnutls_malloc( len);
-				if (ret->data==NULL)
-					return GNUTLS_E_MEMORY_ERROR;	
+				/* read the value.
+				 */
+				_gnutls_str_cpy(name2, sizeof(name2), name);
+				_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
 
-				ret->size = len;
-				memcpy( ret->data, extnValue, len);
+				result = _gnutls_x509_read_value( cert->cert, name2, 
+					&value, 0);
+				if (result < 0) {
+					gnutls_assert();
+					return result;
+				}
+				
+				ret->data = value.data;
+				ret->size = value.size;
 				
 				if (_critical)
 					*_critical = critical;
@@ -164,14 +148,14 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 	}
 }
 
-/* This function will attempt to return the requested extension OID found in
+#warning does not work yet
+/* This function will attempt to delete the requested extension found in
  * the given X509v3 certificate. 
  *
- * If you have passed the last extension, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
+ * If the extension does not exist, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
  * be returned.
  */
-int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
-	int indx, void* oid, size_t* sizeof_oid)
+int _gnutls_x509_crt_delete_extension( gnutls_x509_crt cert, const char* extension_id) 
 {
 	int k, result, len;
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
@@ -217,12 +201,74 @@ int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
 				return _gnutls_asn2err(result);
 			}
 
-			_gnutls_str_cpy(name2, sizeof(name2), name);
-			_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
+			/* Delete Extension 
+			 */
+			if ( strcmp(extnID, extension_id)==0) { 
+				/* extension was found 
+				 */
+				result = asn1_write_value( cert->cert, name2, NULL, 0);
+				if (result != ASN1_SUCCESS) {
+					gnutls_assert();
+					return _gnutls_asn2err(result);
+				}
+				
+				return 0;
+			}
 
-			len = sizeof(str_critical);
+
+		} while (0);
+	} while (1);
+
+	if (result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	} else {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+}
+
+/* This function will attempt to return the requested extension OID found in
+ * the given X509v3 certificate. 
+ *
+ * If you have passed the last extension, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
+ * be returned.
+ */
+int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
+	int indx, void* oid, size_t* sizeof_oid)
+{
+	int k, result, len;
+	char name[128], name2[128], counter[MAX_INT_DIGITS];
+	char str[1024];
+	char extnID[128];
+	char extnValue[256];
+	int indx_counter = 0;
+
+	k = 0;
+	do {
+		k++;
+
+		_gnutls_str_cpy(name, sizeof(name), "tbsCertificate.extensions.?"); 
+		_gnutls_int2str(k, counter); 
+		_gnutls_str_cat(name, sizeof(name), counter); 
+
+		len = sizeof(str) - 1;
+		result = asn1_read_value(cert->cert, name, str, &len);
+
+		/* move to next
+		 */
+
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			break;
+		}
+
+		do {
+
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnID"); 
+
+			len = sizeof(extnID) - 1;
 			result =
-			    asn1_read_value(cert->cert, name2, str_critical, &len);
+			    asn1_read_value(cert->cert, name2, extnID, &len);
 
 			if (result == ASN1_ELEMENT_NOT_FOUND) {
 				gnutls_assert();
@@ -232,36 +278,8 @@ int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
 				return _gnutls_asn2err(result);
 			}
 
-			if (strcmp( str_critical, "TRUE")==0)
-				critical = 1;
-			else critical = 0;
-
-			_gnutls_str_cpy(name2, sizeof(name2), name);
-			_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
-
-			len = sizeof(extnValue) - 1;
-			result =
-			    asn1_read_value(cert->cert, name2, extnValue, &len);
-
-			if (result == ASN1_ELEMENT_NOT_FOUND)
-				break;
-			else {
-				if (result == ASN1_MEM_ERROR
-				    && critical == 0) {
-
-					_gnutls_x509_log
-					    ("X509_EXT: Cannot parse extension: %s. Too small buffer.",
-					     extnID);
-
-					continue;
-				}
-				if (result != ASN1_SUCCESS) {
-					gnutls_assert();
-					return _gnutls_asn2err(result);
-				}
-			}
-
-			/* Handle Extension */
+			/* Handle Extension 
+			 */
 			if ( indx == indx_counter++) { 
 				len = strlen( extnID) + 1;
 
@@ -622,6 +640,42 @@ int _gnutls_x509_ext_gen_key_id(const void* id, size_t id_size, gnutls_datum* de
 
 	return 0;
 }
+
+/* generate the AuthorityKeyID in a DER encoded extension
+ */
+int _gnutls_x509_ext_gen_auth_key_id(const void* id, size_t id_size, gnutls_datum* der_ext)
+{
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+	int result;
+
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.AuthorityKeyIdentifier", &ext);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_write_value(ext, "keyIdentifier", id, id_size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&ext);
+		return _gnutls_asn2err(result);
+	}
+
+	asn1_write_value(ext, "authorityCertIssuer", NULL, 0);
+	asn1_write_value(ext, "authorityCertSerialNumber", NULL, 0);
+
+	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
+
+	asn1_delete_structure(&ext);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}
+
 
 /* Creates and encodes the CRL Distribution points. data_string should be a name
  * and type holds the type of the name. 

@@ -1,3 +1,8 @@
+Version 1.1.9
+- Added support for authority key identifier X.509 extension
+  field.
+- Added support for the extended key usage X.509 extension field.
+
 Version 1.1.8 (07/04/2004)
 - Implemented all the tests for the SRP group parameters in
   client side. This may lead to incompatibility with very

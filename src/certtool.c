@@ -215,6 +215,25 @@ static void print_key_usage( unsigned int x, FILE* out)
 		fprintf(out,"\t\tKey decipher only.\n");
 }
 
+static void print_key_purpose( const char* x, FILE* out) 
+{
+	if (strcasecmp( x, GNUTLS_KP_TLS_WWW_SERVER)==0)
+		fprintf(out,"\t\tTLS WWW Server.\n");
+	else if (strcasecmp( x, GNUTLS_KP_TLS_WWW_CLIENT)==0)
+		fprintf(out,"\t\tTLS WWW Client.\n");
+	else if (strcasecmp( x, GNUTLS_KP_CODE_SIGNING)==0)
+		fprintf(out,"\t\tCode signing.\n");
+	else if (strcasecmp( x, GNUTLS_KP_EMAIL_PROTECTION)==0)
+		fprintf(out,"\t\tEmail protection.\n");
+	else if (strcasecmp( x, GNUTLS_KP_TIME_STAMPING)==0)
+		fprintf(out,"\t\tTime stamping.\n");
+	else if (strcasecmp( x, GNUTLS_KP_OCSP_SIGNING)==0)
+		fprintf(out,"\t\tOCSP signing.\n");
+	else if (strcasecmp( x, GNUTLS_KP_ANY)==0)
+		fprintf(out,"\t\tAny purpose.\n");
+	else fprintf(out,"\t\t%s\n", x);
+}
+
 static void print_private_key( gnutls_x509_privkey key)
 {
 int ret;
@@ -262,7 +281,8 @@ gnutls_x509_privkey key;
 }
 
 
-gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
+gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
+	gnutls_x509_crt ca_crt)
 {
 	gnutls_x509_crt crt;
 	gnutls_x509_privkey key = NULL;
@@ -414,6 +434,24 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 			exit(1);
 		}
 	}
+/* ---------------------- */
+result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
+		if (result < 0) {
+			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_CLIENT, 0);
+		if (result < 0) {
+			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+
+result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_CODE_SIGNING, 0);
+		if (result < 0) {
+			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+
 
 	/* Version.
 	 */
@@ -432,6 +470,20 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		if (result < 0) {
 			fprintf(stderr, "set_subject_key_id: %s\n", gnutls_strerror(result));
 			exit(1);
+		}
+	}
+
+	/* Authority Key ID.
+	 */
+	if (ca_crt != NULL) {
+		size = sizeof(buffer);
+		result = gnutls_x509_crt_get_key_id(ca_crt, 0, buffer, &size);
+		if (result >= 0) {
+			result = gnutls_x509_crt_set_authority_key_id( crt, buffer, size);
+			if (result < 0) {
+				fprintf(stderr, "set_authority_key_id: %s\n", gnutls_strerror(result));
+				exit(1);
+			}
 		}
 	}
 
@@ -532,7 +584,7 @@ void generate_self_signed( void)
 
 	fprintf(stderr, "Generating a self signed certificate...\n");
 
-	crt = generate_certificate( &key);
+	crt = generate_certificate( &key, NULL);
 
 	uri = read_str( "Enter the URI of the CRL distribution point: ");
 	if (uri) {
@@ -581,7 +633,7 @@ void generate_signed_certificate( void)
 	ca_key = load_ca_private_key();
 	ca_crt = load_ca_cert();
 
-	crt = generate_certificate( &key);
+	crt = generate_certificate( &key, ca_crt);
 	
 	/* Copy the CRL distribution points.
 	 */
@@ -816,7 +868,9 @@ static inline int known_oid( const char* oid)
 	if (strcmp(oid, "2.5.29.17") == 0 ||
 		strcmp( oid, "2.5.29.19") == 0 ||
 		strcmp( oid, "2.5.29.31") == 0 ||
+		strcmp( oid, "2.5.29.37") == 0 ||
 		strcmp( oid, "2.5.29.14") == 0 ||
+		strcmp( oid, "2.5.29.35") == 0 ||
 		strcmp( oid, "2.5.29.15") == 0)
 			return 1;
 	
@@ -1023,6 +1077,24 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 		print_key_usage(key_usage, out);
 	}
 
+	/* Key Purpose identifiers.
+	 */
+	i = 0;
+	
+	size = sizeof(buffer);
+	if ((ret=gnutls_x509_crt_get_key_purpose_oid( crt, 0, buffer, &size, &critical)) >= 0) {
+		fprintf(out, "\tKey purpose OIDs: %s\n", critical?"(critical)":"");
+		do {
+			size = sizeof(buffer);
+			ret = gnutls_x509_crt_get_key_purpose_oid( crt, i, buffer, &size, &critical);
+	
+			if (ret >= 0) {
+				print_key_purpose(buffer, out);
+			}
+			i++;
+		} while(ret >= 0);
+	}
+
 	/* Subject Key ID 
 	 */
 	size = sizeof(buffer);
@@ -1040,6 +1112,25 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 			print += 3;
 		}
 		fprintf(out, "\tSubject Key ID: %s\n\t\t%s\n", critical?"(critical)":"", printable);
+	}
+
+	/* Authority Key ID 
+	 */
+	size = sizeof(buffer);
+	ret = gnutls_x509_crt_get_authority_key_id(crt, buffer, &size, &critical);
+
+	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	{
+	    	fprintf(out, "Error getting authority key id: %s\n", gnutls_strerror(ret));
+	}
+	
+	if (ret >= 0) {
+		print = printable;
+		for (i = 0; i < size; i++) {
+			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
+			print += 3;
+		}
+		fprintf(out, "\tAuthority Key ID: %s\n\t\t%s\n", critical?"(critical)":"", printable);
 	}
 
 	/* other extensions:

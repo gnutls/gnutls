@@ -3,6 +3,10 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Document the format for the supported DN attributes.
+* Add batch support to certtool with template files
+* Add support for Certificate Extensions Profile for Qualified 
+  Certificates (rfc3039)
 * Audit the code
 * Add gnutls_certificate_set_openpgp_keyring()
   functions, similar to gnutls_certificate_set_openpgp_key().
