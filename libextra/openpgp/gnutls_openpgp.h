@@ -1,6 +1,6 @@
 #include <config.h>
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 
 #ifndef GNUTLS_OPENPGP_H
 #define GNUTLS_OPENPGP_H
@@ -98,4 +98,4 @@ time_t _gnutls_openpgp_get_raw_key_expiration_time(const gnutls_datum * cert);
 
 #endif /*GNUTLS_OPENPGP_H*/
 
-#endif /*HAVE_LIBOPENCDK*/
+#endif /*USE_OPENPGP*/

@@ -23,7 +23,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
 #include <ext_srp.h>
-#include <openpgp/gnutls_openpgp.h>
+#include <gnutls_openpgp.h>
 #include <gnutls_extra.h>
 #include <gnutls_algorithms.h>
 #ifdef USE_LZO

@@ -1,4 +1,4 @@
-INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) -Iopencdk/
+INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) -Iopencdk/ -Iopenpgp/
 bin_SCRIPTS = libgnutls-extra-config
 DIST_SUBDIRS = openpgp opencdk
 
@@ -32,6 +32,7 @@ endif
 
 if ENABLE_OPENPGP
 PGP_SOURCES = gnutls_openpgp.c
+
 if ENABLE_INCLUDED_OPENCDK
 SUBDIRS = openpgp opencdk
 PGP_OBJECTS = openpgp/libpgp.la opencdk/libopencdk.la
@@ -39,6 +40,7 @@ else
 SUBDIRS = openpgp
 PGP_OBJECTS = openpgp/libpgp.la
 endif
+
 endif
 
 if ENABLE_INCLUDED_LZO

@@ -6,7 +6,7 @@
 typedef enum gnutls_openpgp_key_fmt { GNUTLS_OPENPGP_FMT_RAW,
         GNUTLS_OPENPGP_FMT_BASE64 } gnutls_openpgp_key_fmt;
 
-#ifdef HAVE_LIBOPENCDK
+#ifdef USE_OPENPGP
 
 
 #include <opencdk.h>
@@ -91,6 +91,6 @@ typedef void *gnutls_openpgp_privkey;
 typedef void *gnutls_openpgp_keyring;
 typedef void *gnutls_openpgp_trustdb;
 
-#endif /* HAVE_LIBOPENCDK */
+#endif /* USE_OPENPGP */
 
 #endif /* OPENPGP_H */

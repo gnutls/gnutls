@@ -29,8 +29,6 @@
 #include <gnutls_openpgp.h>
 #include <openpgp.h>
 
-#ifdef HAVE_LIBOPENCDK
-
 /*-
  * gnutls_openpgp_verify_key - Verify all signatures on the key
  * @cert_list: the structure that holds the certificates.
@@ -242,4 +240,3 @@ time_t _gnutls_openpgp_get_raw_key_expiration_time(const gnutls_datum * cert)
 	return tim;
 }
 
-#endif

@@ -23,9 +23,6 @@
  */
 
 #include <gnutls_int.h>
-
-#ifdef HAVE_LIBOPENCDK
-
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -130,4 +127,3 @@ gnutls_openpgp_privkey_get_pk_algorithm( gnutls_openpgp_privkey key, unsigned in
 }
 
 
-#endif
