@@ -1,3 +1,16 @@
+2004-11-08 23:43  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-11-08 23:42  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	Make private key optional in --to-p12, suggested by Fabian Fagerholm 
+	<fabbe@paniq.net>.  
+
 2004-11-04 21:50  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, configure.in:
