@@ -1,4 +1,4 @@
-Version 1.0.10
+Version 1.0.10 (03/04/2004)
 - Corrected bug in RSA parameters handling which could cause
   unexpected crashes.
 - Corrected bug in SSL 3.0 authentication.
