@@ -1,6 +1,6 @@
 \chapter{More on certificate authentication}
 
-\section{The X.509 trust model}
+\section{The X.509\index{X.509 certificates} trust model}
 \label{x509:trust}
 
 The X.509 protocols rely on a hierarchical trust model. In this trust model
@@ -10,7 +10,12 @@ authorities may certify other authorities to issue certificates as well,
 following a hierachical model. 
 One needs to trust one or more CAs for his secure
 communications. In that case only the certificates issued by the trusted
-authorities are acceptable. 
+authorities are acceptable. See figure \ref{fig:x509-1} for a typical example.
+
+\begin{figure}[hbtp]
+\includegraphics[height=9.5cm,width=9cm]{x509-1}
+\label{fig:x509-1}
+\end{figure}
 
 \par The use of X.509 certificates requires some functions which will 
 assist in parsing them. \gnutls{} includes functions which extract 
@@ -43,7 +48,7 @@ Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is 
 in order to use the TLS ciphersuites which depend on X.509 certificates.
 
 
-\section{The OpenPGP trust model}
+\section{The OpenPGP\index{OpenPGP keys} trust model}
 \label{pgp:trust}
 
 The OpenPGP key authentication relies on a distributed trust model, called
