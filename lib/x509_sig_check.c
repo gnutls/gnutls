@@ -184,6 +184,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *p
 }
 
 /* verifies if the certificate is properly signed.
+ * returns 0 on success.
  */
 CertificateStatus gnutls_x509_verify_signature(gnutls_cert* cert, gnutls_cert* issuer) {
 gnutls_datum signature;
@@ -211,7 +212,7 @@ gnutls_datum tbs;
 			}
 
 			gnutls_free_datum(&tbs);
-			return GNUTLS_CERT_VALID;
+			return 0;
 			break;
 
 		case GNUTLS_PK_DSA:
@@ -222,7 +223,7 @@ gnutls_datum tbs;
 			}
 
 			gnutls_free_datum(&tbs);
-			return GNUTLS_CERT_VALID;
+			return 0;
 			break;
 
 	}

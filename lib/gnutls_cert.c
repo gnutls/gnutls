@@ -304,7 +304,7 @@ void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
   * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
   * The return value (status) should be one of the CertificateStatus enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. Returns a negative error code in case of an error, or GNUTLS_CERT_NONE if no certificate was sent.
+  * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
 int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
@@ -328,7 +328,7 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 
 	if (info->raw_certificate_list == NULL || info->ncerts == 0) {
 		gnutls_assert();
-		return GNUTLS_CERT_NONE;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 	
 	/* generate a list of gnutls_certs based on the auth info
@@ -367,10 +367,8 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * The return value (status) should be one or more of the CertificateStatus 
   * enumerated elements bitwise or'd.
   *
-  * GNUTLS_CERT_NONE: No certificate was sent by the peer.
   * GNUTLS_CERT_TRUSTED: the peer's certificate is trusted.
   * GNUTLS_CERT_NOT_TRUSTED: the peer's certificate is not trusted.
-  * GNUTLS_CERT_VALID: the certificate chain is ok.
   * GNUTLS_CERT_INVALID: the certificate chain is broken.
   * GNUTLS_CERT_REVOKED: the certificate has been revoked
   *  (not implemented yet).
@@ -378,6 +376,8 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * GNUTLS_CERT_CORRUPTED: the certificate is corrupted.
   *
   * A negative error code is returned in case of an error.
+  * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that
+  * no certificate was sent by the peer.
   *
   *
   **/
@@ -394,7 +394,7 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 	}
 	
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
-		return GNUTLS_CERT_NONE;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
 	switch( gnutls_cert_type_get( state)) {
 		case GNUTLS_CRT_X509:

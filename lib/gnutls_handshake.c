@@ -272,7 +272,6 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	}
 	_gnutls_set_current_version(state, ver);
 
-
 	/* Read client random value.
 	 */
 	DECR_LEN(len, TLS_RANDOM_SIZE);

@@ -35,7 +35,6 @@
 #define RECORD_DEBUG*/
 #define DEBUG
 
-
 /* It might be a good idea to replace int with void*
  * here.
  */
@@ -104,11 +103,11 @@ typedef enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 } crypt_algo;
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
 
 typedef enum CertificateStatus { 
-	GNUTLS_CERT_NONE = 0, GNUTLS_CERT_TRUSTED=1, 
+	GNUTLS_CERT_TRUSTED=1, 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
-	GNUTLS_CERT_VALID=4, GNUTLS_CERT_INVALID=8, /* for openpgp use */
-	GNUTLS_CERT_EXPIRED=16, GNUTLS_CERT_CORRUPTED=32,
-	GNUTLS_CERT_REVOKED=64
+	GNUTLS_CERT_INVALID=4, 
+	GNUTLS_CERT_EXPIRED=8, GNUTLS_CERT_CORRUPTED=16,
+	GNUTLS_CERT_REVOKED=32
 } CertificateStatus;
 #define GNUTLS_CertificateStatus CertificateStatus
 

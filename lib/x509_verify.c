@@ -141,7 +141,7 @@ time_t _gnutls_generalTime2gtime(char *ttime)
 	return ret;
 }
 
-/* Returns VALID or EXPIRED. 
+/* Returns 0 or EXPIRED. 
  */
 static int check_if_expired(gnutls_cert * cert)
 {
@@ -151,12 +151,12 @@ static int check_if_expired(gnutls_cert * cert)
 	 */
 
 	if (time(NULL) < cert->expiration_time)
-		ret = GNUTLS_CERT_VALID;
+		ret = 0;
 
 	return ret;
 }
 
-/* Return GNUTLS_CERT_VALID or INVALID, if the issuer is a CA,
+/* Return 0 or INVALID, if the issuer is a CA,
  * or not.
  */
 static int check_if_ca(const gnutls_cert * cert, const gnutls_cert* issuer)
@@ -169,12 +169,12 @@ static int check_if_ca(const gnutls_cert * cert, const gnutls_cert* issuer)
 	 */
 	if (cert->raw.size == issuer->raw.size) {
 		if ( memcmp( cert->raw.data, issuer->raw.data, cert->raw.size)==0) {
-			return GNUTLS_CERT_VALID;
+			return 0;
 		}
 	}
 
 	if (issuer->CA==1) {
-		ret = GNUTLS_CERT_VALID;
+		ret = 0;
 	} else
 		gnutls_assert();
 
@@ -322,19 +322,19 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	}
 
 	ret = check_if_ca( cert, issuer);
-	if (ret != GNUTLS_CERT_VALID) {
+	if (ret != 0) {
 		gnutls_assert();
 		return ret_else;
 	}
 
 	ret = check_if_expired( issuer);
-	if (ret != GNUTLS_CERT_VALID) {
+	if (ret != 0) {
 		gnutls_assert();
 		return ret_else;
 	}
 	
         ret = gnutls_x509_verify_signature(cert, issuer);
-        if (ret != GNUTLS_CERT_VALID) {
+        if (ret != 0) {
 	      gnutls_assert();
               return ret_else;
 	}
@@ -364,14 +364,14 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 			      int crls_size)
 {
 	int i = 0, ret;
-	CertificateStatus status=GNUTLS_CERT_NONE;
-
+	CertificateStatus status=0;
+	
 	if (tcas_size == 0 || clist_size == 0) {
-		return status;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 
 	ret = check_if_expired( &certificate_list[0]);
-	if (ret != GNUTLS_CERT_VALID) {
+	if (ret != 0) {
 		gnutls_assert();
 		status |= GNUTLS_CERT_EXPIRED;
 	}
@@ -382,7 +382,7 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 			break;
 
 		if ((ret = gnutls_verify_certificate2(&certificate_list[i], &certificate_list[i + 1], 
-			1, NULL, 0, GNUTLS_CERT_VALID, GNUTLS_CERT_INVALID)) != GNUTLS_CERT_VALID) {
+			1, NULL, 0, 0, GNUTLS_CERT_INVALID)) != 0) {
 			 /*
 			 * We only accept the first certificate to be
 			 * expired, revoked etc. If any of the certificates in the
@@ -398,9 +398,6 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 			}
 		}
 	}
-
-	if ( !(status & GNUTLS_CERT_INVALID))
-		status |= GNUTLS_CERT_VALID;
 
 	/* Now verify the last certificate in the certificate path
 	 * against the trusted CA certificate list.

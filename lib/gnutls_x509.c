@@ -698,7 +698,7 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
   * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
   * The return value (status) should be one of the CertificateStatus enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. Returns a negative error code in case of an error, or GNUTLS_CERT_NONE if no certificate was sent.
+  * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
 int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
@@ -722,7 +722,7 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
 	}
 
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
-		return GNUTLS_CERT_NONE;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
@@ -798,7 +798,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	int peer_certificate_list_size, i, x, ret, ca_certificate_list_size;
 
 	if (cert_list == NULL || cert_list_length == 0)
-		return GNUTLS_CERT_NONE;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
