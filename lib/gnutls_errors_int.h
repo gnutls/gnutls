@@ -73,7 +73,6 @@
 #define GNUTLS_E_OPENPGP_UID_REVOKED -79
 #define GNUTLS_E_UNKNOWN_PK_ALGORITHM -80
 #define GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED -81
-#define GNUTLS_E_OPENPGP_GETKEY_FAILED -88
 
 /* returned if libextra functionality was requested but
  * gnutls_global_init_extra() was not called.
@@ -91,8 +90,8 @@
 #define GNUTLS_E_NO_COMPRESSION_ALGORITHMS -86
 #define GNUTLS_E_NO_CIPHER_SUITES -87
 
+#define GNUTLS_E_OPENPGP_GETKEY_FAILED -88
 #define GNUTLS_E_PK_SIG_VERIFY_FAILED -89
-
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -250
 
