@@ -1,3 +1,6 @@
+Version 0.8.4
+- Corrected a broken buffer check in _gnutls_io_read_buffered()
+
 Version 0.8.3 (04/03/2003)
 - Corrected a bug in 64 bit architectures, which affected the
   serial number calculation in the record layer.
