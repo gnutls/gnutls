@@ -103,7 +103,7 @@ void print_openpgp_info(GNUTLS_STATE state)
 			       printable);
 
 			gnutls_openpgp_extract_key_name(&cert_list
-							      [0], &pgp_name);
+							      [0], 0, &pgp_name);
 			PRINT_PGP_NAME(pgp_name);
 
 		}
