@@ -198,7 +198,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	uint8 *rand;
 	uint64 seq_num;
 	int length;
-	int td;
+	MHASH td;
 
 
 	content =
@@ -214,7 +214,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 
 	switch (state->security_parameters.mac_algorithm) {
 	case MAC_NULL:
-		td = -1;
+		td = MHASH_FAILED;
 		break;
 	case MAC_SHA:
 		td = hmac_mhash_init( MHASH_SHA1, state->connection_state.write_mac_secret, state->connection_state.mac_secret_size, mhash_get_hash_pblock(MHASH_SHA1));
@@ -235,7 +235,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	seq_num = byteswap64(state->connection_state.write_sequence_number);
 	c_length = byteswap16(compressed->length);
 #endif
-	if (td>=0) {
+	if (td!=MHASH_FAILED) {
 		mhash( td, &seq_num, 8);
 		mhash( td, &compressed->type, 1);
 		mhash( td, &compressed->version.major, 1);
@@ -317,7 +317,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	}
 
 //	gnutls_free( MAC);
-	if (td>=0) free( MAC);
+	if (td!=MHASH_FAILED) free( MAC);
 	gnutls_free( content);
 
 	return 0;
@@ -338,7 +338,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	uint8 pad;
 	uint64 seq_num;
 	int length;
-	int td;
+	MHASH td;
 
 
 	content =
@@ -355,7 +355,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 
 	switch (state->security_parameters.mac_algorithm) {
 	case MAC_NULL:
-		td = -1;
+		td = MHASH_FAILED;
 		break;
 	case MAC_SHA:
 		td = hmac_mhash_init( MHASH_SHA1, state->connection_state.read_mac_secret, state->connection_state.mac_secret_size, mhash_get_hash_pblock(MHASH_SHA1));
@@ -376,7 +376,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	seq_num = byteswap64(state->connection_state.read_sequence_number);
 	c_length = byteswap16(ciphertext->length);
 #endif
-	if (td>=0) {
+	if (td!=MHASH_FAILED) {
 		mhash( td, &seq_num, 8);
 		mhash( td, &ciphertext->type, 1);
 		mhash( td, &ciphertext->version.major, 1);
@@ -451,7 +451,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	}
 
 //	gnutls_free( MAC);
-	if (td>=0) free( MAC);
+	if (td!=MHASH_FAILED) free( MAC);
 	gnutls_free( content);
 
 	return 0;

@@ -44,11 +44,11 @@ int gnutls_deinit(GNUTLS_STATE * state)
 
 	gnutls_free((*state)->gnutls_internals.buffer);
 
-	if (state->connection_state.read_cipher_state != NULL)
-		gcry_cipher_close(state->connection_state.
+	if ((*state)->connection_state.read_cipher_state != NULL)
+		gcry_cipher_close((*state)->connection_state.
 				  read_cipher_state);
-	if (state->connection_state.write_cipher_state != NULL)
-		gcry_cipher_close(state->connection_state.
+	if ((*state)->connection_state.write_cipher_state != NULL)
+		gcry_cipher_close((*state)->connection_state.
 				  write_cipher_state);
 
 	secure_free((*state)->cipher_specs.server_write_mac_secret);

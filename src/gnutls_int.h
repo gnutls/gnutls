@@ -111,11 +111,18 @@ typedef struct {
 } ConnectionState;
 
 typedef struct {
-	char*	buffer;
-	uint32  bufferSize;
-	ResumableSession resumable;
-	ValidSession	 valid_connection;
-	AlertDescription last_alert;
+	uint8 CipherSuite[2];
+} GNUTLS_CipherSuite;
+
+
+typedef struct {
+	char*			buffer;
+	uint32			bufferSize;
+	ResumableSession	resumable;
+	ValidSession		valid_connection;
+	AlertDescription	last_alert;
+	GNUTLS_CipherSuite	current_cipher_suite;
+	CompressionMethod	compression_method;
 } GNUTLS_INTERNALS;
 
 typedef struct {
@@ -201,9 +208,6 @@ typedef struct {
 	opaque  random_bytes[28];
 } GNUTLS_random;
 
-typedef struct {
-	uint8 CipherSuite[2];
-} GNUTLS_CipherSuite;
 
 typedef struct {
 	ProtocolVersion		client_version;
