@@ -29,6 +29,8 @@ int _gnutls_x509_oid_data_printable( const char* OID);
 
 gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid);
 gnutls_mac_algorithm _gnutls_x509_oid2mac_algorithm( const char* oid);
+gnutls_pk_algorithm _gnutls_x509_oid2sign_algorithm( const char* oid, 
+	gnutls_mac_algorithm * mac);
 
 const char* _gnutls_x509_pk2oid( gnutls_pk_algorithm pk);
 const char* _gnutls_x509_sign2oid( gnutls_pk_algorithm pk, gnutls_mac_algorithm mac);

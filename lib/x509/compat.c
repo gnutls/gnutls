@@ -31,7 +31,6 @@
 #include <libtasn1.h>
 #include <gnutls/x509.h>
 
-
 /**
   * gnutls_x509_extract_dn - This function parses an RDN sequence
   * @idn: should contain a DER encoded RDN sequence
@@ -414,74 +413,6 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
 	return ret;
 }
 
-/**
-  * gnutls_x509_pkcs7_extract_certificate - This function returns a certificate in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
-  * @indx: contains the index of the certificate to extract
-  * @certificate: the contents of the certificate will be copied there
-  * @certificate_size: should hold the size of the certificate
-  *
-  * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
-  * Returns 0 on success. If the provided buffer is not long enough,
-  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
-  *
-  * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-  * will be returned.
-  *
-  **/
-int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size)
-{
-	gnutls_pkcs7 pkcs7;
-	int result;
-
-	result = gnutls_pkcs7_init( &pkcs7);
-	if (result < 0) return result;
-	
-	result = gnutls_pkcs7_import( pkcs7, pkcs7_struct, GNUTLS_X509_FMT_DER);
-	if (result < 0) {
-		gnutls_pkcs7_deinit( pkcs7);
-		return result;
-	}
-	
-	result = gnutls_pkcs7_get_certificate( pkcs7, indx, certificate, certificate_size);
-	
-	gnutls_pkcs7_deinit( pkcs7);
-	
-	return result;
-}
-
-
-/**
-  * gnutls_x509_pkcs7_extract_certificate_count - This function returns the number of certificates in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
-  *
-  * This function will return the number of certifcates in the PKCS7 or 
-  * RFC2630 certificate set.
-  *
-  * Returns a negative value on failure.
-  *
-  **/
-int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struct)
-{
-	gnutls_pkcs7 pkcs7;
-	int result;
-
-	result = gnutls_pkcs7_init( &pkcs7);
-	if (result < 0) return result;
-	
-	result = gnutls_pkcs7_import( pkcs7, pkcs7_struct, GNUTLS_X509_FMT_DER);
-	if (result < 0) {
-		gnutls_pkcs7_deinit( pkcs7);
-		return result;
-	}
-	
-	result = gnutls_pkcs7_get_certificate_count( pkcs7);
-	
-	gnutls_pkcs7_deinit( pkcs7);
-	
-	return result;
-}
-
 
 /**
   * gnutls_x509_extract_certificate_pk_algorithm - This function returns the certificate's PublicKey algorithm
@@ -687,6 +618,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 		}
 	}
 
+#ifdef ENABLE_PKI
 	/* convert CRL_list to gnutls_x509_crl* list
 	 */
 	for (i = 0; i < crl_list_size; i++) {
@@ -704,6 +636,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 			goto cleanup;
 		}
 	}
+#endif
 
 	/* Verify certificate 
 	 */
@@ -734,6 +667,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 				gnutls_x509_crt_deinit(ca_certificate_list[x]);
 		}
 
+#ifdef ENABLE_PKI
 	if (crl_list != NULL)
 		for(x=0;x<crl_list_size;x++) {
 			if (crl_list[x] != NULL)
@@ -741,6 +675,8 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 		}
 	
 	gnutls_free( crl_list);
+#endif
+
 	gnutls_free( ca_certificate_list);
 	gnutls_free( peer_certificate_list);
 
@@ -781,3 +717,74 @@ int gnutls_x509_extract_key_pk_algorithm( const gnutls_datum * key)
 	return pk;
 }
 
+#ifdef ENABLE_PKI
+
+/**
+  * gnutls_x509_pkcs7_extract_certificate - This function returns a certificate in a PKCS7 certificate set
+  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
+  * @indx: contains the index of the certificate to extract
+  * @certificate: the contents of the certificate will be copied there
+  * @certificate_size: should hold the size of the certificate
+  *
+  * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
+  * Returns 0 on success. If the provided buffer is not long enough,
+  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+  *
+  * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+  * will be returned.
+  *
+  **/
+int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size)
+{
+	gnutls_pkcs7 pkcs7;
+	int result;
+
+	result = gnutls_pkcs7_init( &pkcs7);
+	if (result < 0) return result;
+	
+	result = gnutls_pkcs7_import( pkcs7, pkcs7_struct, GNUTLS_X509_FMT_DER);
+	if (result < 0) {
+		gnutls_pkcs7_deinit( pkcs7);
+		return result;
+	}
+	
+	result = gnutls_pkcs7_get_certificate( pkcs7, indx, certificate, certificate_size);
+	
+	gnutls_pkcs7_deinit( pkcs7);
+	
+	return result;
+}
+
+
+/**
+  * gnutls_x509_pkcs7_extract_certificate_count - This function returns the number of certificates in a PKCS7 certificate set
+  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
+  *
+  * This function will return the number of certifcates in the PKCS7 or 
+  * RFC2630 certificate set.
+  *
+  * Returns a negative value on failure.
+  *
+  **/
+int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struct)
+{
+	gnutls_pkcs7 pkcs7;
+	int result;
+
+	result = gnutls_pkcs7_init( &pkcs7);
+	if (result < 0) return result;
+	
+	result = gnutls_pkcs7_import( pkcs7, pkcs7_struct, GNUTLS_X509_FMT_DER);
+	if (result < 0) {
+		gnutls_pkcs7_deinit( pkcs7);
+		return result;
+	}
+	
+	result = gnutls_pkcs7_get_certificate_count( pkcs7);
+	
+	gnutls_pkcs7_deinit( pkcs7);
+	
+	return result;
+}
+
+#endif

@@ -24,6 +24,9 @@
  */
 
 #include <gnutls_int.h>
+
+#ifdef ENABLE_PKI
+
 #include <gnutls_errors.h>
 #include <gnutls_cert.h>
 #include <libtasn1.h>
@@ -232,3 +235,4 @@ gnutls_datum tbs;
 	return result;
 }
 
+#endif

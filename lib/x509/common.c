@@ -208,17 +208,31 @@ gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid)
 		return GNUTLS_PK_RSA;
 	else if (strcmp( oid, DSA_OID) == 0)
 		return GNUTLS_PK_DSA;
-	else if (strcmp( oid, RSA_MD5_OID) == 0)
-		return GNUTLS_PK_RSA;
-	else if (strcmp( oid, RSA_SHA1_OID) == 0)
-		return GNUTLS_PK_RSA;
-	else if (strcmp( oid, DSA_SHA1_OID) == 0)
-		return GNUTLS_PK_DSA;
 
 	_gnutls_x509_log("Unknown PK OID: '%s'\n", oid);
 
 	return GNUTLS_PK_UNKNOWN;
 }
+
+gnutls_pk_algorithm _gnutls_x509_oid2sign_algorithm( const char* oid, 
+	gnutls_mac_algorithm * mac)
+{
+	if (strcmp( oid, RSA_MD5_OID) == 0) {
+		if (mac) *mac = GNUTLS_MAC_MD5;
+		return GNUTLS_PK_RSA;
+	} else if (strcmp( oid, RSA_SHA1_OID) == 0) {
+		if (mac) *mac = GNUTLS_MAC_SHA;
+		return GNUTLS_PK_RSA;
+	} else if (strcmp( oid, DSA_SHA1_OID) == 0) {
+		if (mac) *mac = GNUTLS_MAC_SHA;
+		return GNUTLS_PK_DSA;
+	}
+
+	_gnutls_x509_log("Unknown SIGN OID: '%s'\n", oid);
+
+	return GNUTLS_PK_UNKNOWN;
+}
+
 
 /* returns -1 on error
  */

@@ -583,6 +583,7 @@ int main(int argc, char **argv)
       }
    }
 
+#ifdef ENABLE_PKI
    if (x509_crlfile != NULL) {
       if ((ret = gnutls_certificate_set_x509_crl_file
 	   (cert_cred, x509_crlfile, x509ctype)) < 0) {
@@ -592,6 +593,7 @@ int main(int argc, char **argv)
 	 printf("Processed %d CRL(s).\n", ret);
       }
    }
+#endif
 
    if (pgp_keyring != NULL) {
       ret =

@@ -21,6 +21,9 @@
 
 #include <libtasn1.h>
 #include <gnutls_int.h>
+
+#ifdef ENABLE_PKI
+
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -203,7 +206,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 		goto cleanup;
 	}
 
-	crl->signature_algorithm = _gnutls_x509_oid2pk_algorithm( signature);
+	crl->signature_algorithm = _gnutls_x509_oid2sign_algorithm( signature, NULL);
 		
 	gnutls_free( signature);
 	signature = NULL;
@@ -576,3 +579,5 @@ gnutls_datum tmp;
 	return 0;
 
 }
+
+#endif

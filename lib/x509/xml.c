@@ -23,6 +23,10 @@
  * to XML format.
  */
 
+#include <defines.h>
+
+#ifdef ENABLE_PKI
+
 #include <int.h>
 #include <errors.h>
 #include <structure.h>
@@ -665,3 +669,5 @@ static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn)
 	else
 		return _gnutls_asn2err(result);
 }
+
+#endif

@@ -24,6 +24,9 @@
 
 #include <libtasn1.h>
 #include <gnutls_int.h>
+
+#ifdef ENABLE_PKI
+
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -827,3 +830,5 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx)
 		if (c2) asn1_delete_structure(&c2);
 		return result;
 }
+
+#endif /* ENABLE_PKI */

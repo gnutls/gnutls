@@ -231,6 +231,7 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 #define CERT_PEM 1
 
+
 /* Reads a PKCS7 base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure.
  * returns the number of certificate parsed
@@ -238,6 +239,7 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 	char *input_cert, int input_cert_size, int flags)
 {
+#ifdef ENABLE_PKI
 	int i, j, count;
 	gnutls_datum tmp, tmp2;
 	int ret;
@@ -262,8 +264,10 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 		 */
 		gnutls_assert();
 		gnutls_pkcs7_deinit(pkcs7);
+#endif
 		return parse_der_cert_mem( cert_list, ncerts,
 			input_cert, input_cert_size);
+#ifdef ENABLE_PKI
 	}
 
 	i = *ncerts + 1;
@@ -338,8 +342,8 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 
 	gnutls_pkcs7_deinit(pkcs7);
 	return count;
+#endif
 }
-
 
 /* Reads a base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure. Returns the number of certificate parsed.
@@ -353,6 +357,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	gnutls_datum tmp;
 	int ret, count;
 
+#ifdef ENABLE_PKI
 	if ( (ptr = strnstr( input_cert, PEM_PKCS7_SEP, input_cert_size)) != NULL) 
 	{
 		size = strlen( ptr);
@@ -362,6 +367,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 		return ret;
 	}
+#endif
 
 	/* move to the certificate
 	 */
@@ -1227,6 +1233,8 @@ int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res,
 	return ret;
 }
 
+#ifdef ENABLE_PKI
+
 static int parse_pem_crl_mem( gnutls_x509_crl** crl_list, int* ncrls, 
 	const char *input_crl, int input_crl_size)
 {
@@ -1474,3 +1482,28 @@ int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res,
 
 	return ret;
 }
+
+
+/**
+  * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the CRLs associated
+  * with the given credentials.
+  *
+  **/
+void gnutls_certificate_free_crls(gnutls_certificate_credentials sc)
+{
+	uint j;
+
+        for (j = 0; j < sc->x509_ncrls; j++) {
+		gnutls_x509_crl_deinit( sc->x509_crl_list[j]);
+        }
+        
+        sc->x509_ncrls = 0;
+
+	gnutls_free( sc->x509_crl_list);
+	sc->x509_crl_list = NULL;
+}
+
+#endif

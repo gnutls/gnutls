@@ -71,6 +71,7 @@ void print_x509_info(gnutls_session session)
 		printf(" - Certificate[%d] info:\n", j);
 
 		if (xml) {
+#ifdef ENABLE_PKI
 			gnutls_datum xml_data;
 
 			ret = gnutls_x509_crt_to_xml( crt, &xml_data, 0);
@@ -82,7 +83,7 @@ void print_x509_info(gnutls_session session)
 			
 			printf("%s", xml_data.data);
 			gnutls_free( xml_data.data);
-
+#endif
 		} else {
 
 			expiret = gnutls_x509_crt_get_expiration_time(crt);

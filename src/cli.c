@@ -606,6 +606,7 @@ int ret;
       }
    }
 
+#ifdef ENABLE_PKI
    if (x509_crlfile != NULL) {
       ret =
 	  gnutls_certificate_set_x509_crl_file(xcred,
@@ -616,6 +617,7 @@ int ret;
 	 printf("Processed %d CRL(s).\n", ret);
       }
    }
+#endif
 
    if (x509_certfile != NULL) {
       ret =

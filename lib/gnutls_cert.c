@@ -105,28 +105,6 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
 }
 
 /**
-  * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials structure
-  * @sc: is an &gnutls_certificate_credentials structure.
-  *
-  * This function will delete all the CRLs associated
-  * with the given credentials.
-  *
-  **/
-void gnutls_certificate_free_crls(gnutls_certificate_credentials sc)
-{
-	uint j;
-
-        for (j = 0; j < sc->x509_ncrls; j++) {
-		gnutls_x509_crl_deinit( sc->x509_crl_list[j]);
-        }
-        
-        sc->x509_ncrls = 0;
-
-	gnutls_free( sc->x509_crl_list);
-	sc->x509_crl_list = NULL;
-}
-
-/**
   * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials structure
   * @sc: is an &gnutls_certificate_credentials structure.
   *
@@ -142,7 +120,9 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 {
 	gnutls_certificate_free_keys( sc);
 	gnutls_certificate_free_cas( sc);
+#ifdef ENABLE_PKI
 	gnutls_certificate_free_crls( sc);
+#endif
 
 	_gnutls_free_datum( &sc->keyring);
 

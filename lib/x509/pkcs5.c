@@ -19,6 +19,10 @@
 
 /* XXX what about namespace? */
 
+#include <defines.h>
+
+#ifdef ENABLE_PKI
+
 #include <gcrypt.h>
 #include "pkcs5.h"
 
@@ -200,3 +204,5 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 
   return PKCS5_OK;
 }
+
+#endif

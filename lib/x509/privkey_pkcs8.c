@@ -20,6 +20,9 @@
  */
 
 #include <gnutls_int.h>
+
+#ifdef ENABLE_PKI
+
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -1182,3 +1185,4 @@ opaque pad;
 		return result;
 }
 
+#endif

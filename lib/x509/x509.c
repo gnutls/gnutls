@@ -261,8 +261,8 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 		goto cleanup;
 	}
 
-	cert->signature_algorithm = _gnutls_x509_oid2pk_algorithm( signature);
-		
+	cert->signature_algorithm = _gnutls_x509_oid2sign_algorithm( signature, NULL);
+
 	gnutls_free( signature);
 	signature = NULL;
 
@@ -957,6 +957,91 @@ int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
 
 
 /**
+  * gnutls_x509_crt_get_fingerprint - This function returns the Certificate's fingerprint
+  * @cert: should contain a gnutls_x509_crt structure
+  * @algo: is a digest algorithm
+  * @buf: a pointer to a structure to hold the fingerprint (may be null)
+  * @sizeof_buf: initialy holds the size of 'buf'
+  *
+  * This function will calculate and copy the certificate's fingerprint
+  * in the provided buffer.
+  *
+  * If the buffer is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_buf will be updated with the required size.
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
+	gnutls_digest_algorithm algo, char *buf,
+	 int *sizeof_buf)
+{
+opaque *cert_buf;
+int cert_buf_size;
+int result;
+gnutls_datum tmp;
+
+	if (sizeof_buf == 0 || cert == NULL) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	cert_buf_size = 0;
+	asn1_der_coding( cert->cert, "", NULL, &cert_buf_size, NULL);
+
+	cert_buf = gnutls_alloca( cert_buf_size);
+	if (cert_buf == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	result = asn1_der_coding( cert->cert, "",
+		cert_buf, &cert_buf_size, NULL);
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		gnutls_afree( cert_buf);
+		return _gnutls_asn2err(result);
+	}
+	
+	tmp.size = cert_buf_size;
+
+	result = gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
+	gnutls_afree( cert_buf);
+
+	return result;
+}
+
+/**
+  * gnutls_x509_crt_export - This function will export the certificate
+  * @cert: Holds the certificate
+  * @format: the format of output params. One of PEM or DER.
+  * @output_data: will contain a certificate PEM or DER encoded
+  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will export the certificate to DER or PEM format.
+  *
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  *
+  * If the structure is PEM encoded, it will have a header
+  * of "BEGIN CERTIFICATE".
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_x509_crt_export( gnutls_x509_crt cert,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+{
+	return _gnutls_x509_export_int( cert->cert, format, "CERTIFICATE", *output_data_size,
+		output_data, output_data_size);
+}
+
+
+#ifdef ENABLE_PKI
+
+/**
   * gnutls_x509_crt_check_revocation - This function checks if the given certificate is revoked
   * @cert: should contain a gnutls_x509_crt structure
   * @crl_list: should contain a list of gnutls_x509_crl structures
@@ -1051,86 +1136,4 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 	return 0;		/* not revoked. */
 }
 
-/**
-  * gnutls_x509_crt_get_fingerprint - This function returns the Certificate's fingerprint
-  * @cert: should contain a gnutls_x509_crt structure
-  * @algo: is a digest algorithm
-  * @buf: a pointer to a structure to hold the fingerprint (may be null)
-  * @sizeof_buf: initialy holds the size of 'buf'
-  *
-  * This function will calculate and copy the certificate's fingerprint
-  * in the provided buffer.
-  *
-  * If the buffer is null then only the size will be filled.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
-  * On success zero is returned.
-  *
-  **/
-int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
-	gnutls_digest_algorithm algo, char *buf,
-	 int *sizeof_buf)
-{
-opaque *cert_buf;
-int cert_buf_size;
-int result;
-gnutls_datum tmp;
-
-	if (sizeof_buf == 0 || cert == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	cert_buf_size = 0;
-	asn1_der_coding( cert->cert, "", NULL, &cert_buf_size, NULL);
-
-	cert_buf = gnutls_alloca( cert_buf_size);
-	if (cert_buf == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = asn1_der_coding( cert->cert, "",
-		cert_buf, &cert_buf_size, NULL);
-	
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		gnutls_afree( cert_buf);
-		return _gnutls_asn2err(result);
-	}
-	
-	tmp.size = cert_buf_size;
-
-	result = gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
-	gnutls_afree( cert_buf);
-
-	return result;
-}
-
-/**
-  * gnutls_x509_crt_export - This function will export the certificate
-  * @cert: Holds the certificate
-  * @format: the format of output params. One of PEM or DER.
-  * @output_data: will contain a certificate PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
-  *
-  * This function will export the certificate to DER or PEM format.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN CERTIFICATE".
-  *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
-  *
-  **/
-int gnutls_x509_crt_export( gnutls_x509_crt cert,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
-{
-	return _gnutls_x509_export_int( cert->cert, format, "CERTIFICATE", *output_data_size,
-		output_data, output_data_size);
-}
-
-
+#endif

@@ -109,49 +109,6 @@ int is_issuer(gnutls_x509_crt cert, gnutls_x509_crt issuer_cert)
 
 }
 
-/* The same as above, but here we've got a CRL.
- */
-static
-int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_crt issuer_cert)
-{
-	gnutls_const_datum dn1, dn2;
-	int ret;
-
-	ret = _gnutls_x509_crl_get_raw_issuer_dn( crl, &dn1);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = _gnutls_x509_crt_get_raw_dn( issuer_cert, &dn2);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return _gnutls_x509_compare_raw_dn( &dn1, &dn2);
-
-}
-
-static inline
-gnutls_x509_crt find_crl_issuer(gnutls_x509_crl crl,
-				gnutls_x509_crt * trusted_cas, int tcas_size)
-{
-	int i;
-
-	/* this is serial search. 
-	 */
-
-	for (i = 0; i < tcas_size; i++) {
-		if (is_crl_issuer(crl, trusted_cas[i]) == 1)
-			return trusted_cas[i];
-	}
-
-	gnutls_assert();
-	return NULL;
-}
-
-
 
 static inline
 gnutls_x509_crt find_issuer(gnutls_x509_crt cert,
@@ -227,54 +184,6 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 	return ret;
 }
 
-/* 
- * Returns only 0 or 1. If 1 it means that the CRL
- * was successfuly verified.
- *
- * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
- */
-static int _gnutls_verify_crl2(gnutls_x509_crl crl,
-			       gnutls_x509_crt *trusted_cas, int tcas_size, 
-			       unsigned int flags)
-{
-/* CRL is ignored for now */
-
-	gnutls_x509_crt issuer;
-	int ret;
-
-	if (tcas_size >= 1)
-		issuer = find_crl_issuer(crl, trusted_cas, tcas_size);
-	else {
-		gnutls_assert();
-		return 0;
-	}
-
-	/* issuer is not in trusted certificate
-	 * authorities.
-	 */
-	if (issuer == NULL) {
-		gnutls_assert();
-		return 0;
-	}
-
-	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN)) {
-		if (gnutls_x509_crt_get_ca_status(issuer, NULL) != 1) 
-		{
-			gnutls_assert();
-			return 0;
-		}
-	}
-
-	ret = _gnutls_x509_verify_signature(&crl->signed_data, &crl->signature, issuer);
-	if (ret < 0) {
-		gnutls_assert();
-		/* error. ignore it */
-		ret = 0;
-	}
-
-	return ret;
-}
-
 
 /* The algorithm used is:
  * 1. Check the certificate chain given by the peer, if it is ok.
@@ -301,6 +210,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 
 	/* Check for revoked certificates in the chain
 	 */
+#ifdef ENABLE_PKI
 	for (i = 0; i < clist_size; i++) {
 		ret = gnutls_x509_crt_check_revocation( certificate_list[i],
 			CRLs, crls_size);
@@ -308,6 +218,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 			status |= GNUTLS_CERT_REVOKED;
 		}
 	}
+#endif
 
 	/* Verify the certificate path 
 	 */
@@ -393,7 +304,7 @@ int len;
 
 	if (*hash==GNUTLS_MAC_UNKNOWN) {
 
-		_gnutls_x509_log( "X509_SIG: HASH OID: %s\n", str);
+		_gnutls_x509_log( "verify.c: HASH OID: %s\n", str);
 
 		gnutls_assert();
 		asn1_delete_structure(&dinfo);
@@ -433,7 +344,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
 		gnutls_assert();
 		return ret;
 	}
-	
+
 	/* decrypted is a BER encoded data of type DigestInfo
 	 */
 
@@ -632,6 +543,9 @@ int gnutls_x509_crt_check_issuer( gnutls_x509_crt cert,
 	return is_issuer(cert, issuer);
 }
 
+
+#ifdef ENABLE_PKI
+
 /**
   * gnutls_x509_crl_check_issuer - This function checks if the CRL given has the given issuer
   * @crl: is the CRL to be checked
@@ -676,3 +590,96 @@ int gnutls_x509_crl_verify( gnutls_x509_crl crl,
 
 	return 0;
 }
+
+
+/* The same as above, but here we've got a CRL.
+ */
+static
+int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_crt issuer_cert)
+{
+	gnutls_const_datum dn1, dn2;
+	int ret;
+
+	ret = _gnutls_x509_crl_get_raw_issuer_dn( crl, &dn1);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _gnutls_x509_crt_get_raw_dn( issuer_cert, &dn2);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return _gnutls_x509_compare_raw_dn( &dn1, &dn2);
+
+}
+
+static inline
+gnutls_x509_crt find_crl_issuer(gnutls_x509_crl crl,
+				gnutls_x509_crt * trusted_cas, int tcas_size)
+{
+	int i;
+
+	/* this is serial search. 
+	 */
+
+	for (i = 0; i < tcas_size; i++) {
+		if (is_crl_issuer(crl, trusted_cas[i]) == 1)
+			return trusted_cas[i];
+	}
+
+	gnutls_assert();
+	return NULL;
+}
+
+/* 
+ * Returns only 0 or 1. If 1 it means that the CRL
+ * was successfuly verified.
+ *
+ * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
+ */
+static int _gnutls_verify_crl2(gnutls_x509_crl crl,
+			       gnutls_x509_crt *trusted_cas, int tcas_size, 
+			       unsigned int flags)
+{
+/* CRL is ignored for now */
+
+	gnutls_x509_crt issuer;
+	int ret;
+
+	if (tcas_size >= 1)
+		issuer = find_crl_issuer(crl, trusted_cas, tcas_size);
+	else {
+		gnutls_assert();
+		return 0;
+	}
+
+	/* issuer is not in trusted certificate
+	 * authorities.
+	 */
+	if (issuer == NULL) {
+		gnutls_assert();
+		return 0;
+	}
+
+	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN)) {
+		if (gnutls_x509_crt_get_ca_status(issuer, NULL) != 1) 
+		{
+			gnutls_assert();
+			return 0;
+		}
+	}
+
+	ret = _gnutls_x509_verify_signature(&crl->signed_data, &crl->signature, issuer);
+	if (ret < 0) {
+		gnutls_assert();
+		/* error. ignore it */
+		ret = 0;
+	}
+
+	return ret;
+}
+
+#endif

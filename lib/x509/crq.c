@@ -23,6 +23,9 @@
  */
 
 #include <gnutls_int.h>
+
+#ifdef ENABLE_PKI
+
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -618,3 +621,5 @@ int gnutls_x509_crq_export( gnutls_x509_crq crq,
 	return _gnutls_x509_export_int( crq->crq, format, PEM_CRQ, *output_data_size,
 		output_data, output_data_size);
 }
+
+#endif /* ENABLE_PKI */
