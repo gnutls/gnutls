@@ -114,31 +114,30 @@ void print_openpgp_info(GNUTLS_STATE state)
 void print_cert_vrfy(GNUTLS_STATE state)
 {
 
-	GNUTLS_CertificateStatus status;
+	int status;
 	status = gnutls_certificate_verify_peers(state);
 	printf("\n");
 
-	switch (status) {
-	case GNUTLS_CERT_VALID:
+	if (status < 0) {
+		printf("- Could not verify certificate (err %d)\n", status);
+		return;
+	}
+
+	if (status & GNUTLS_CERT_VALID)
 		printf("- Peer's certificate is NOT trusted but valid\n");
-		break;
-	case GNUTLS_CERT_INVALID:
+	if (status & GNUTLS_CERT_INVALID)
 		printf("- Peer's certificate is invalid\n");
-		break;
-	case GNUTLS_CERT_EXPIRED:
+	if (status & GNUTLS_CERT_EXPIRED)
 		printf
 		    ("- Peer's certificate was verified but is expired\n");
-		break;
-	case GNUTLS_CERT_TRUSTED:
+	if (status & GNUTLS_CERT_TRUSTED)
 		printf("- Peer's certificate is trusted\n");
-		break;
-	case GNUTLS_CERT_NONE:
+	if (status & GNUTLS_CERT_NOT_TRUSTED)
+		printf("- Peer's certificate is NOT trusted\n");
+	if (status & GNUTLS_CERT_CORRUPTED)
+		printf("- Peer's certificate is corrupted\n");
+	if (status & GNUTLS_CERT_NONE)
 		printf("- Peer did not send any certificate.\n");
-		break;
-	default:
-		printf("- Invalid status of peer's certificate.\n");
-		break;
-	}
 
 }
 

@@ -762,7 +762,7 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
 
 	if (verify < 0) {
 		gnutls_assert();
-		return GNUTLS_CERT_INVALID;
+		return verify;
 	}
 
 
@@ -781,9 +781,13 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
   * @CRL_list_length: not used
   *
   * This function will try to verify the given certificate list and return it's status (TRUSTED, EXPIRED etc.). 
-  * The return value (status) should be one of the CertificateStatus enumerated elements.
+  * The return value (status) should be one or more of the CertificateStatus 
+  * enumerated elements bitwise or'd.
+  *
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. Returns a negative error code in case of an error.
+  * actual peer. 
+  *
+  * Returns a negative error code in case of an error.
   *
   **/
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length)
@@ -861,7 +865,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 
 	if (verify < 0) {
 		gnutls_assert();
-		return GNUTLS_CERT_INVALID;
+		return verify;
 	}
 
 	return verify;

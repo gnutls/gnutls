@@ -18,7 +18,7 @@ int print_info(GNUTLS_STATE state)
    GNUTLS_CredType cred;
    gnutls_x509_dn dn;
    const gnutls_datum *cert_list;
-   GNUTLS_CertificateStatus status;
+   int status;
    int cert_list_size = 0;
    GNUTLS_KXAlgorithm kx;
 
@@ -40,24 +40,27 @@ int print_info(GNUTLS_STATE state)
        */
       cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
       status = gnutls_certificate_verify_peers(state);
+      
+      if ( status < 0) {
+         printf("- Could not verify certificate\n");
+      else {
+         if ( status == GNUTLS_CERT_NONE)
+            printf("- Peer did not send any X509 Certificate.\n");
 
-      switch (status) {
-      case GNUTLS_CERT_VALID:
-      case GNUTLS_CERT_INVALID:
-         printf("- Peer's certificate is NOT trusted\n");
-         break;
-      case GNUTLS_CERT_EXPIRED:
-         printf("- Peer's certificate was verified but is expired\n");
-         break;
-      case GNUTLS_CERT_TRUSTED:
-         printf("- Peer's certificate is trusted\n");
-         break;
-      case GNUTLS_CERT_NONE:
-         printf("- Peer did not send any X509 Certificate.\n");
-         break;
-      case GNUTLS_CERT_REVOKED:
-         printf("- Peer's certificate was revoked\n");
-         break;
+         if ( status & GNUTLS_CERT_VALID)
+            printf("- Peer's certificate is valid\n");
+         if ( status & GNUTLS_CERT_INVALID)
+            printf("- Peer's certificate is invalid\n");
+         if ( status & GNUTLS_CERT_EXPIRED)
+            printf("- Peer's certificate is expired\n");
+         if ( status & GNUTLS_CERT_TRUSTED)
+            printf("- Peer's certificate is trusted\n");
+         if ( status & GNUTLS_CERT_NOT_TRUSTED)
+            printf("- Peer's certificate is not trusted\n");
+         if ( status & GNUTLS_CERT_CORRUPTED)
+            printf("- Peer's certificate is corrupted.\n");
+         if ( status & GNUTLS_CERT_REVOKED)
+            printf("- Peer's certificate is revoked\n");
       }
 
       /* Check if we have been using ephemeral Diffie Hellman.

@@ -297,7 +297,6 @@ void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
 	state->gnutls_internals.server_cert_callback = func;
 }
 
-#ifdef HAVE_LIBOPENCDK
 /*-
   * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
   * @state: is a gnutls state
@@ -344,7 +343,7 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 	
 	/* Verify certificate 
 	 */
-	verify = gnutls_openpgp_verify_key( &cred->trustdb, &cred->keyring, &info->raw_certificate_list[0],
+	verify = gnutls_openpgp_verify_key( cred->pgp_trustdb, &cred->keyring, &info->raw_certificate_list[0],
 				      peer_certificate_list_size);
 
 	if (verify < 0) {
@@ -355,7 +354,6 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 
 	return verify;
 }
-#endif /* HAVE_LIBOPENCDK */
 
 /**
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
@@ -366,17 +364,18 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
-  * The return values are:
+  * The return value (status) should be one or more of the CertificateStatus 
+  * enumerated elements bitwise or'd.
   *
   * GNUTLS_CERT_NONE: No certificate was sent by the peer.
   * GNUTLS_CERT_TRUSTED: the peer's certificate is trusted.
-  * GNUTLS_CERT_VALID: the certificate is not trusted,
-  *  but the certificate chain is ok.
-  * GNUTLS_CERT_INVALID: the certificate is not trusted, and
-  *  the certificate chain is broken..
+  * GNUTLS_CERT_NOT_TRUSTED: the peer's certificate is not trusted.
+  * GNUTLS_CERT_VALID: the certificate chain is ok.
+  * GNUTLS_CERT_INVALID: the certificate chain is broken.
   * GNUTLS_CERT_REVOKED: the certificate has been revoked
   *  (not implemented yet).
   * GNUTLS_CERT_EXPIRED: the certificate has expired.
+  * GNUTLS_CERT_CORRUPTED: the certificate is corrupted.
   *
   * A negative error code is returned in case of an error.
   *
@@ -400,10 +399,8 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 	switch( gnutls_cert_type_get( state)) {
 		case GNUTLS_CRT_X509:
 			return _gnutls_x509_cert_verify_peers( state);
-#ifdef HAVE_LIBOPENCDK
 		case GNUTLS_CRT_OPENPGP:
 			return _gnutls_openpgp_cert_verify_peers( state);
-#endif /* HAVE_LIBOPENCDK */
 		default:
 			return GNUTLS_E_INVALID_REQUEST;
 	}

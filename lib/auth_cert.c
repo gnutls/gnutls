@@ -859,8 +859,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	return 0;
 }
 
-#ifdef HAVE_LIBOPENCDK
-
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x])
 int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 					    opaque * data, int data_size)
@@ -1014,17 +1012,14 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 
 	return 0;
 }
-#endif				/* HAVE_LIBOPENCDK */
 
 int _gnutls_proc_cert_server_certificate(GNUTLS_STATE state, opaque * data,
 					 int data_size)
 {
 	switch (state->security_parameters.cert_type) {
-#ifdef HAVE_LIBOPENCDK
 	case GNUTLS_CRT_OPENPGP:
 		return _gnutls_proc_openpgp_server_certificate(state, data,
 							       data_size);
-#endif				/* HAVE_LIBOPENCDK */
 	case GNUTLS_CRT_X509:
 		return _gnutls_proc_x509_server_certificate(state, data,
 							    data_size);
@@ -1217,7 +1212,6 @@ int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 						  info->
 						  raw_certificate_list[0]);
 		break;
-#ifdef HAVE_LIBOPENCDK
 	case GNUTLS_CRT_OPENPGP:
 		ret =
 		    _gnutls_openpgp_cert2gnutls_cert(&peer_cert,
@@ -1225,7 +1219,6 @@ int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 						     raw_certificate_list
 						     [0]);
 		break;
-#endif				/* HAVE_LIBOPENCDK */
 	default:
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;

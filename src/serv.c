@@ -352,12 +352,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_openpgp_keyserver
-	    (cert_cred, "wwwkeys.pgp.net", 0) < 0) {
-		fprintf(stderr,
-			"PGP ERROR\n");
-		exit(1);
-	}
+	gnutls_certificate_set_openpgp_keyserver(cert_cred, "wwwkeys.pgp.net", 0);
 
 	if (gnutls_certificate_set_x509_key_file
 	    (cert_cred, CERTFILE1, KEYFILE1) < 0) {

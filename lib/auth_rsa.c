@@ -86,7 +86,7 @@ gnutls_cert peer_cert;
 				return ret;
 			}
 			break;
-#ifdef HAVE_LIBOPENCDK
+
 		case GNUTLS_CRT_OPENPGP:
 			if ((ret =
 			     _gnutls_openpgp_cert2gnutls_cert( &peer_cert,
@@ -95,7 +95,7 @@ gnutls_cert peer_cert;
 				return ret;
 			}
 			break;
-#endif /* HAVE_LIBOPENCDK */
+
 		default:
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_ERROR;

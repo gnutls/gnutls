@@ -56,13 +56,12 @@ typedef enum GNUTLS_AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTE
 			GNUTLS_A_NO_RENEGOTIATION=100
 } GNUTLS_AlertDescription;
 
-/* Currently the VALID flag is not used. It indicates a certificate
- * which is not trusted, but it is neither expired nor revoked,
- * and the signatures in the chain were verified.
- */
-typedef enum GNUTLS_CertificateStatus { GNUTLS_CERT_TRUSTED=1, 
-	GNUTLS_CERT_VALID, GNUTLS_CERT_INVALID, GNUTLS_CERT_EXPIRED, 
-	GNUTLS_CERT_REVOKED, GNUTLS_CERT_NONE 
+typedef enum GNUTLS_CertificateStatus { 
+	GNUTLS_CERT_NONE = 0, GNUTLS_CERT_TRUSTED=1, 
+	GNUTLS_CERT_NOT_TRUSTED=2, 
+	GNUTLS_CERT_VALID=4, GNUTLS_CERT_INVALID=8, /* for openpgp use */
+	GNUTLS_CERT_EXPIRED=16, GNUTLS_CERT_CORRUPTED=32,
+	GNUTLS_CERT_REVOKED=64
 } GNUTLS_CertificateStatus;
 
 typedef enum GNUTLS_CertificateRequest { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } GNUTLS_CertificateRequest;

@@ -387,7 +387,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 				return ret;
 			}
 			break;
-#ifdef HAVE_LIBOPENCDK
+
 		case GNUTLS_CRT_OPENPGP:
 			if ((ret =
 			     _gnutls_openpgp_cert2gnutls_cert( &peer_cert,
@@ -396,7 +396,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 				return ret;
 			}
 			break;
-#endif /* HAVE_LIBOPENCDK */
+
 		default:
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_ERROR;

@@ -211,7 +211,7 @@ gnutls_datum tbs;
 			}
 
 			gnutls_free_datum(&tbs);
-			return GNUTLS_CERT_TRUSTED;
+			return GNUTLS_CERT_VALID;
 			break;
 
 		case GNUTLS_PK_DSA:
@@ -222,7 +222,7 @@ gnutls_datum tbs;
 			}
 
 			gnutls_free_datum(&tbs);
-			return GNUTLS_CERT_TRUSTED;
+			return GNUTLS_CERT_VALID;
 			break;
 
 	}

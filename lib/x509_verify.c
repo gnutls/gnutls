@@ -326,7 +326,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	}
 	
         ret = gnutls_x509_verify_signature(cert, issuer);
-        if (ret != GNUTLS_CERT_TRUSTED) {
+        if (ret != GNUTLS_CERT_VALID) {
 	      gnutls_assert();
               return ret;
 	}
@@ -340,7 +340,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 		return ret;
 	}
 
-	return GNUTLS_CERT_TRUSTED;
+	return GNUTLS_CERT_VALID;
 }
 
 /* The algorithm used is:
@@ -360,12 +360,11 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
     int clist_size, gnutls_cert * trusted_cas, int tcas_size, void *CRLs,
 			      int crls_size)
 {
-	int i = 0;
-	int expired = 0;
-	CertificateStatus ret=GNUTLS_CERT_INVALID;
+	int i = 0, ret;
+	CertificateStatus status=GNUTLS_CERT_NONE;
 
 	if (tcas_size == 0 || clist_size == 0) {
-		return ret;
+		return status;
 	}
 
 	/* Verify the certificate path */
@@ -373,17 +372,16 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 		if (i + 1 >= clist_size)
 			break;
 
-		if ((ret = gnutls_verify_certificate2(&certificate_list[i], &certificate_list[i + 1], 1, NULL, 0)) != GNUTLS_CERT_TRUSTED) {
+		if ((ret = gnutls_verify_certificate2(&certificate_list[i], &certificate_list[i + 1], 1, NULL, 0)) != GNUTLS_CERT_VALID) {
 			 /*
 			 * We only accept the first certificate to be
-			 * expired. If any of the certificates in the
+			 * expired, revoked etc. If any of the certificates in the
 			 * certificate chain is expired then the certificate
 			 * is not valid.
 			 */
-			if (ret == GNUTLS_CERT_EXPIRED) {
+			if (ret >= 0 && i==0) {
 				gnutls_assert();
-				if (i==0) expired = 1;
-				else return GNUTLS_CERT_INVALID;
+				status |= ret;
 			} else {
 				gnutls_assert();
 				return GNUTLS_CERT_INVALID;
@@ -396,23 +394,26 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 	 */
 	ret = gnutls_verify_certificate2(&certificate_list[i], trusted_cas, tcas_size, CRLs, crls_size);
 	
-	if (ret==GNUTLS_CERT_EXPIRED) {
+	if (ret >=0 && ret != GNUTLS_CERT_VALID) {
 		/* if the last certificate in the certificate
 		 * list is expired, then the certificate is not
 		 * trusted.
 		 */
 		gnutls_assert();
-		return GNUTLS_CERT_INVALID;
-	} else {
-		if (ret == GNUTLS_CERT_REVOKED)  {
-			gnutls_assert();
-			return ret;
-		}
+		status |= ret;
+		return (status | GNUTLS_CERT_NOT_TRUSTED);
+	}
 
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 	
-	if (expired != 0)
-		return GNUTLS_CERT_EXPIRED;
-
-	return ret;
+	status |= ret;
+	
+	/* if we got here, then it's trusted.
+	 */
+	status |= GNUTLS_CERT_TRUSTED;
+	
+	return status;
 }
