@@ -54,3 +54,4 @@ while test -d X509tests/test$i; do
     fi
     i=`expr $i + 1`
 done
+rm -f out
