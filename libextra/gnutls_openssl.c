@@ -16,11 +16,11 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <gnutls.h>
+#include <gnutls/gnutls.h>
 #include <gcrypt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "openssl.h"
+#include <gnutls/openssl.h>
 
 static int last_error = 0;
 

@@ -1,5 +1,4 @@
-INCLUDES = -I../lib -I../libtasn1/lib/
-include_HEADERS = extra.h openssl.h
+INCLUDES = -I../lib -I../libtasn1/lib/ -I../includes
 bin_SCRIPTS = libgnutls-extra-config
 
 m4datadir = $(datadir)/aclocal

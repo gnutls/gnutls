@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include "prime-gaa.h"
 #include <gcrypt.h>
-#include "../lib/gnutls.h"
+#include <gnutls/gnutls.h>
 #include "../lib/defines.h"
 
 MPI _gcry_generate_elg_prime( int mode, unsigned pbits, unsigned qbits,

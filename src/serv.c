@@ -31,8 +31,8 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
-#include "../lib/gnutls.h"
-#include "../libextra/extra.h"
+#include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
 #include "common.h"
 #include <signal.h>
 #include "serv-gaa.h"
@@ -600,7 +600,6 @@ int main(int argc, char **argv)
 	    	time_t tt;
 	    	char* ctt;
 
-		int yes = 1;
 /* new list entry for the connection */
 		lappend (listener_list);
 		j = listener_list.tail;

@@ -1,5 +1,4 @@
-INCLUDES = -I../libextra -I../libtasn1/lib/
-include_HEADERS = gnutls.h 
+INCLUDES = -I../libextra -I../libtasn1/lib/ -I../includes
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal

@@ -27,8 +27,8 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
-#include "../lib/gnutls.h"
-#include "../libextra/extra.h"
+#include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
 #include <sys/time.h>
 #include <signal.h>
 #include <netdb.h>

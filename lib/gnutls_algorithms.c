@@ -560,6 +560,8 @@ int _gnutls_cipher_is_block(BulkCipherAlgorithm algorithm)
   * @algorithm: is an encryption algorithm
   *
   * Returns the length (in bytes) of the given cipher's key size.
+  * Returns 0 if the given cipher is invalid.
+  *
   **/
 size_t gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm)
 {				/* In bytes */

@@ -3,7 +3,7 @@ EXTRA_DIST = common.h prime.gaa crypt.gaa crypt-gaa.h README.srpcrypt prime-gaa.
 		tls_test-gaa.h tests.h gnutls-http-serv list.h
 SUBDIRS = srp x509 openpgp
 
-INCLUDES = -I../lib -I../libtasn1/lib
+INCLUDES = -I../lib -I../libtasn1/lib -I../includes
 
 bin_PROGRAMS = gnutls-serv gnutls-cli gnutls-srpcrypt gnutls-cli-debug
 gnutls_serv_SOURCES = serv-gaa.c serv.c common.c

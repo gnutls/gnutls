@@ -75,6 +75,8 @@ static oid2string OID2STR[] = {
 	{NULL}
 };
 
+/* Returns 1 if the data defined by the OID are printable.
+ */
 int _gnutls_x509_oid_data_printable( const char* OID) {
 int i = 0;
 
@@ -87,6 +89,9 @@ int i = 0;
 	return 0;
 }
 
+/* Returns 1 if the data defined by the OID are of a choice
+ * type.
+ */
 int _gnutls_x509_oid_data_choice( const char* OID) {
 int i = 0;
 

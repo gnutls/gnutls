@@ -1,4 +1,4 @@
-#include "gnutls.h"
+#include <gnutls/gnutls.h>
 
 /* This file contains functions needed only for binary compatibility
  * with previous versions.

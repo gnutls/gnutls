@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-INCLUDES= -I../lib/ -I../libtasn1/lib/
+INCLUDES= -I../lib/ -I../libtasn1/lib/ -I../includes
 
 noinst_PROGRAMS = x509test
 x509test_SOURCES = x509_test.c

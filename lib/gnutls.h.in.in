@@ -130,7 +130,7 @@ GNUTLS_MACAlgorithm		gnutls_mac_get( GNUTLS_STATE state);
 GNUTLS_CompressionMethod	gnutls_compression_get( GNUTLS_STATE state);
 GNUTLS_CertificateType		gnutls_cert_type_get( GNUTLS_STATE state);
 
-size_t gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm);
+size_t gnutls_cipher_get_key_size( GNUTLS_BulkCipherAlgorithm algorithm);
 
 /* the name of the specified algorithms */
 const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm);
