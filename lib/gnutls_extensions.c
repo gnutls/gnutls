@@ -86,31 +86,24 @@ const opaque* sdata;
 int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
 uint16 size;
 
-	if (data_size < 2) return 0;
-
-	DECR_LEN( data_size, 2);
+	DECR_LENGTH_RET( data_size, 2, 0);
 	next = READuint16( data);
 	pos+=2;
 
-	if (data_size < next) return 0;
-	DECR_LEN( data_size, next);
+	DECR_LENGTH_RET( data_size, next, 0);
 	
 	do {
-		next--; if (next < 0) return 0;
-		DECR_LEN( data_size, 1);
+		DECR_LENGTH_RET( next, 1, 0);
 		memcpy( &type, &data[pos], 1);
 		pos++;
 
-		next-=2; if (next < 0) return 0;
-
-		DECR_LEN( data_size, 2);
+		DECR_LENGTH_RET( next, 2, 0);
 		size = READuint16(&data[pos]);
 		pos+=2;
 				
-		DECR_LEN( data_size, size);
+		DECR_LENGTH_RET( next, size, 0);
 		sdata = &data[pos];
 		pos+=size;
-		next-=size; if (next < 0) return 0;
 		
 		ext_func_recv = _gnutls_ext_func_recv(type);
 		if (ext_func_recv == NULL) continue;

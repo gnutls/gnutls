@@ -19,6 +19,9 @@
  */
 
 #include "gnutls_errors.h"
+#ifdef STDC_HEADERS
+# include <stdarg.h>
+#endif
 
 extern void (*_gnutls_log_func)( const char*);
 
