@@ -15,9 +15,9 @@ See the end for copying conditions.
   CFLAGS="-O2 -finline-functions"' to get the old optimizations.
 - Added the option --get-dh-params to certtool, in order to get the
   included in the library primes and generators.
-- Improved the semantics of GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, to allow
-  only trusted Version 1 CAs and introduced GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT 
-  which has the old semantics.
+- Improved the semantics of GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, to
+  allow only trusted Version 1 CAs and introduced
+  GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT which has the old semantics.
 
 * Version 1.2.0 (2005-01-27)
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
