@@ -27,16 +27,15 @@
 
 typedef struct {
 	char *name;
-	GNUTLS_Version *id;
-	int supported;		/* 0 not supported, > 0 is supported */
+	GNUTLS_Version id; /* gnutls internal version number */
+	int major; /* defined by the protocol */
+	int minor; /* defined by the protocol */
+	int supported;	/* 0 not supported, > 0 is supported */
 } gnutls_version_entry;
 
-GNUTLS_Version GNUTLS_TLS1 = { 0, 3, 1 };
-GNUTLS_Version GNUTLS_SSL3 = { 0, 3, 0 };
-
 static gnutls_version_entry sup_versions[] = {
-	{"SSL3", &GNUTLS_SSL3, 1},
-	{"TLS1", &GNUTLS_TLS1, 1},
+	{"SSL3", GNUTLS_SSL3, 3, 0, 1},
+	{"TLS1", GNUTLS_TLS1, 3, 1, 1},
 	{0}
 };
 
@@ -45,7 +44,7 @@ static gnutls_version_entry sup_versions[] = {
                 for(p = sup_versions; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_VERSION_ALG_LOOP(a) \
-                        GNUTLS_VERSION_LOOP( if( (p->id->local == version.local)&&(p->id->major == version.major)&&(p->id->minor == version.minor) ) { a; break; } )
+                        GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
 
 
 #define GNUTLS_CIPHER_ENTRY(name, blksize, keysize, block, iv) \
@@ -618,17 +617,33 @@ int _gnutls_kx_is_ok(KXAlgorithm algorithm)
 	else
 		ret = 1;
 	return ret;
+}
 
+int _gnutls_version_get_minor( GNUTLS_Version version) {
+int ret = -1;
+
+	GNUTLS_VERSION_ALG_LOOP(ret = p->minor);
+	return ret;
+}
+
+GNUTLS_Version _gnutls_version_get( int major, int minor) {
+int ret = -1;
+
+	GNUTLS_VERSION_LOOP(if ((p->major == major) && (p->minor==minor)) ret = p->id);
+	return ret;
+}
+
+int _gnutls_version_get_major( GNUTLS_Version version) {
+int ret = -1;
+
+	GNUTLS_VERSION_ALG_LOOP(ret = p->major);
+	return ret;
 }
 
 /* Version Functions */
 int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2)
 {
-	if (ver1.major != ver2.major)
-		return 1;
-	if (ver1.minor != ver2.minor)
-		return 1;
-	if (ver1.local != ver2.local)
+	if (ver1 != ver2)
 		return 1;
 	return 0;
 }

@@ -33,14 +33,9 @@ typedef enum CompressionMethod CompressionMethod;
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 typedef enum ConnectionEnd ConnectionEnd;
 
-typedef struct {
-	unsigned char local;
-	unsigned char  major;
-	unsigned char  minor;
-} GNUTLS_Version;
-extern GNUTLS_Version GNUTLS_TLS1;
-extern GNUTLS_Version GNUTLS_SSL3;
-
+#define GNUTLS_Version int
+#define GNUTLS_TLS1 0
+#define GNUTLS_SSL3 1
 
 struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;

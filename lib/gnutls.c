@@ -47,16 +47,12 @@ void gnutls_free(void *ptr) {
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
-	ver.local = state->connection_state.version.local;
-	ver.major = state->connection_state.version.major;
-	ver.minor = state->connection_state.version.minor;
+	ver = state->connection_state.version;
 	return ver;
 }
 
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
-	state->connection_state.version.local = version.local;
-	state->connection_state.version.major = version.major;
-	state->connection_state.version.minor = version.minor;
+	state->connection_state.version = version;
 }
 
 int gnutls_is_secure_memory(const void* mem) {
@@ -434,8 +430,8 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 	}
 
 	headers[0]=type;
-	headers[1]=state->connection_state.version.major;
-	headers[2]=state->connection_state.version.minor;
+	headers[1]=_gnutls_version_get_major(state->connection_state.version);
+	headers[2]=_gnutls_version_get_minor(state->connection_state.version);
 	
 	for (i = 0; i < iterations; i++) {
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
@@ -507,8 +503,8 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	}
 
 	headers[0] = type;
-	headers[1] = state->connection_state.version.major;
-	headers[2] = state->connection_state.version.minor;
+	headers[1] = _gnutls_version_get_major(state->connection_state.version);
+	headers[2] = _gnutls_version_get_minor(state->connection_state.version);
 
 #ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Send Change Cipher Spec\n");
@@ -600,9 +596,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	}
 
 	memcpy( &recv_type, &headers[0], 1);
-	memcpy( &version.major, &headers[1], 1);
-	memcpy( &version.minor, &headers[2], 1);
-	version.local = 0; /* TLS/SSL 3.0 */
+	version = _gnutls_version_get( headers[1], headers[2]);
 
 	memcpy( &length, &headers[3], 2);
 #ifndef WORDS_BIGENDIAN

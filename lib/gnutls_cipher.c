@@ -92,8 +92,8 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 
 	gcipher.type = type;
 	gcipher.length = ciphertext_size;
-	gcipher.version.major = state->connection_state.version.major;
-	gcipher.version.minor = state->connection_state.version.minor;
+	gcipher.version.major = _gnutls_version_get_major(state->connection_state.version);
+	gcipher.version.minor = _gnutls_version_get_minor(state->connection_state.version);
 	gcipher.fragment = gnutls_malloc(ciphertext_size);
 	memmove(gcipher.fragment, ciphertext, ciphertext_size);
 

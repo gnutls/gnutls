@@ -20,6 +20,9 @@
 
 /* functions for version */
 int _gnutls_version_is_supported(GNUTLS_STATE state, const GNUTLS_Version version);
+int _gnutls_version_get_major( GNUTLS_Version ver);
+int _gnutls_version_get_minor( GNUTLS_Version ver);
+GNUTLS_Version _gnutls_version_get( int major, int minor);
 
 /* functions for macs */
 int   _gnutls_mac_get_digest_size(MACAlgorithm algorithm);

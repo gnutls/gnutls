@@ -21,6 +21,7 @@
 #include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
+#include "gnutls_algorithms.h"
 
 /* Plaintext Handling */
 int _gnutls_text2TLSPlaintext(GNUTLS_STATE state, ContentType type, GNUTLSPlaintext** plain, char *text, uint16 length)
@@ -37,8 +38,8 @@ int _gnutls_text2TLSPlaintext(GNUTLS_STATE state, ContentType type, GNUTLSPlaint
 	memmove(plaintext->fragment, text, length);
 	plaintext->length = length;
 	plaintext->type = type;
-	plaintext->version.major = state->connection_state.version.major;
-	plaintext->version.minor = state->connection_state.version.minor;
+	plaintext->version.major = _gnutls_version_get_major(state->connection_state.version);
+	plaintext->version.minor = _gnutls_version_get_minor(state->connection_state.version);
 
 	return 0;
 }

@@ -493,8 +493,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		 */
 		data = gnutls_malloc(datalen);
 
-		data[pos++] = state->connection_state.version.major;
-		data[pos++] = state->connection_state.version.minor;
+		data[pos++] = _gnutls_version_get_major(state->connection_state.version);
+		data[pos++] = _gnutls_version_get_minor(state->connection_state.version);
 #ifdef WORDS_BIGENDIAN
 		cur_time = time(NULL);
 #else
@@ -565,8 +565,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		datalen = 2 + session_id_len + 1 + 32;
 		data = gnutls_malloc(datalen);
 
-		data[pos++] = state->connection_state.version.major;
-		data[pos++] = state->connection_state.version.minor;
+		data[pos++] = _gnutls_version_get_major(state->connection_state.version);
+		data[pos++] = _gnutls_version_get_minor(state->connection_state.version);
 
 		memmove( &data[pos], state->security_parameters.server_random, 32);
 		pos += 32;
@@ -625,9 +625,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 #ifdef DEBUG
 		fprintf(stderr, "Server's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
-		version.local = 0; /* TLS 1.0 / SSL 3.0 */
-		version.major = data[pos];
-		version.minor = data[pos+1];
+		version = _gnutls_version_get( data[pos], data[pos+1]);
 		if ( _gnutls_version_is_supported( state, version) == 0) {
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
@@ -722,9 +720,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 #ifdef DEBUG
 		fprintf(stderr, "Client's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
-		version.local = 0; /* TLS 1.0 / SSL 3.0 */
-		version.major = data[pos];
-		version.minor = data[pos+1];
+		version = _gnutls_version_get( data[pos], data[pos+1]);
 		if ( _gnutls_version_is_supported( state, version) == 0) {
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;

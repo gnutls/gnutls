@@ -164,17 +164,12 @@ typedef struct {
 } CipherSpecs;
 
 
-typedef struct {
-	uint8 local;
-	uint8 major;
-	uint8 minor;
-} GNUTLS_Version;
-
-extern GNUTLS_Version GNUTLS_TLS1;
-extern GNUTLS_Version GNUTLS_SSL3;
+#define GNUTLS_Version int
+#define GNUTLS_TLS1 0
+#define GNUTLS_SSL3 1
 
 typedef struct {
-	GNUTLS_Version version;
+	GNUTLS_Version	version;
 	opaque* 	read_compression_state;
 	opaque* 	write_compression_state;
 	GNUTLS_CIPHER_HANDLE write_cipher_state;
@@ -182,8 +177,8 @@ typedef struct {
 	opaque* 	read_mac_secret;
 	opaque* 	write_mac_secret;
 	uint8   	mac_secret_size;
-	uint64	read_sequence_number;
-	uint64	write_sequence_number;
+	uint64		read_sequence_number;
+	uint64		write_sequence_number;
 } ConnectionState;
 
 typedef struct {
