@@ -1,5 +1,7 @@
-Version 0.8.7
-- Some corrections in the Makefiles.
+Version 0.8.7 (03/05/2003)
+- Some corrections in the Makefiles, to prevent some build errors
+  in solaris.
+- Corrections in the TLS layer openpgp certificate packet parser.
 
 Version 0.8.6 (25/03/2003)
 - Corrected a parsing error in the Certificate request message.
