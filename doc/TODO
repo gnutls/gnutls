@@ -5,7 +5,6 @@ in order to avoid having people working on the same thing.
 Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
 * Convert documentation to texinfo format
-* Provide the callbacks with a malloc() and a free() like functions.
 * Add support for certificate CRLs in certificate verification
 * Audit the code
 * Add GPGSM certificate manager support
