@@ -1376,6 +1376,10 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
   * is checked automatically.
   * This function will fail if any problem is encountered,
   * and the connection should be terminated.
+  *
+  * This function may also return the non-fatal errors GNUTLS_E_AGAIN, or 
+  * GNUTLS_E_INTERRUPTED, and you may resume this handshake later.
+  *
   **/
 int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 {
