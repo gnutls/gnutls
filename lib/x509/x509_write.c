@@ -221,6 +221,59 @@ gnutls_datum der_data;
 		return result;
 	}
 
+	crt->use_extensions = 1;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crt_set_subject_alt_name - This function will set the subject Alternative Name
+  * @crt: should contain a gnutls_x509_crt structure
+  * @type: is one of the gnutls_x509_subject_alt_name enumerations
+  * @data_string: The data to be set
+  *
+  * This function will set the subject alternative name certificate extension. 
+  *
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
+	const char* data_string)
+{
+int result;
+gnutls_datum der_data;
+gnutls_datum dnsname;
+unsigned int critical;
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(crt, "2.5.29.17", 0, &dnsname, &critical);
+
+	if (result >= 0) _gnutls_free_datum( &dnsname);
+	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_subject_alt_name( type, data_string, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( crt, "2.5.29.17", &der_data, 0);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt->use_extensions = 1;
+
 	return 0;
 }
 
@@ -398,22 +451,15 @@ int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial
  */
 static void disable_optional_stuff( gnutls_x509_crt cert)
 {
-int ret, len = 1;
-opaque tmp;
 
-	ret = asn1_read_value( cert->cert, "tbsCertificate.issuerUniqueID", &tmp, &len);
-	if (ret == ASN1_VALUE_NOT_FOUND)
-		asn1_write_value( cert->cert, "tbsCertificate.issuerUniqueID", NULL, 0);
+	asn1_write_value( cert->cert, "tbsCertificate.issuerUniqueID", NULL, 0);
 
-	len = 1;
-	ret = asn1_read_value( cert->cert, "tbsCertificate.subjectUniqueID", &tmp, &len);
-	if (ret == ASN1_VALUE_NOT_FOUND)
-		asn1_write_value( cert->cert, "tbsCertificate.subjectUniqueID", NULL, 0);
+	asn1_write_value( cert->cert, "tbsCertificate.subjectUniqueID", NULL, 0);
 
-	len = 1;
-	ret = asn1_read_value( cert->cert, "tbsCertificate.extensions", &tmp, &len);
-	if (ret == ASN1_VALUE_NOT_FOUND)
+	if (cert->use_extensions == 0) {
+		_gnutls_x509_log( "Disabling X.509 extensions.\n");
 		asn1_write_value( cert->cert, "tbsCertificate.extensions", NULL, 0);
+	}
 
 	return;
 }

@@ -314,7 +314,6 @@ int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
 	asn1_delete_structure(&spk);
 
 	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 

@@ -1126,3 +1126,100 @@ int _gnutls_asn1_copy_node( ASN1_TYPE *dst, const char* dst_name,
 	
 	return 0;
 }
+
+/* Reads the DER signed data from the certificate and allocates space and
+ * returns them into signed_data.
+ */
+int _gnutls_x509_get_signed_data( ASN1_TYPE src, const char* src_name, gnutls_datum * signed_data)
+{
+gnutls_datum der;
+int start, end, result;
+
+	result = _gnutls_x509_der_encode( src, "", &der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+        
+	/* Get the signed data
+	 */
+	result = asn1_der_decoding_startEnd( src, der.data, der.size,
+					    src_name, &start,
+					    &end);
+	if (result != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result =
+	    _gnutls_set_datum( signed_data, &der.data[start], end - start + 1);
+
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = 0;
+
+      cleanup:
+	_gnutls_free_datum(&der);
+
+	return result;
+}	
+
+/* Reads the DER signature from the certificate and allocates space and
+ * returns them into signed_data.
+ */
+int _gnutls_x509_get_signature( ASN1_TYPE src, const char* src_name, gnutls_datum * signature)
+{
+int bits, result, len;
+
+	signature->data = NULL;
+	signature->size = 0;
+
+	/* Read the signature 
+	 */
+	bits = 0;
+	result = asn1_read_value( src, src_name, NULL, &bits);
+
+	if (result != ASN1_MEM_ERROR) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (bits % 8 != 0) {
+		gnutls_assert();
+		result = GNUTLS_E_CERTIFICATE_ERROR;
+		goto cleanup;
+	}
+
+	len = bits/8;
+
+	signature->data = gnutls_malloc( len);
+	if (signature->data == NULL) {
+		gnutls_assert();
+		result = GNUTLS_E_MEMORY_ERROR;
+		return result;
+	}
+		
+	/* read the bit string of the signature
+	 */
+	bits = len;
+	result = asn1_read_value( src, src_name, signature->data,
+		&bits);
+
+	if (result != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		goto cleanup;
+	}
+		
+	signature->size = len;
+
+	return 0;
+
+      cleanup:
+	return result;
+}

@@ -127,8 +127,6 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt cert)
 
 	if (cert->cert)
 		asn1_delete_structure(&cert->cert);
-	_gnutls_free_datum(&cert->signed_data);
-	_gnutls_free_datum(&cert->signature);
 
 	gnutls_free(cert);
 }
@@ -152,7 +150,6 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
-	int start, end, len, bits;
 	gnutls_datum _data = { data->data, data->size };
 	opaque *signature = NULL;
 
@@ -190,85 +187,6 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 		goto cleanup;
 	}
 
-	/* Get the signed data
-	 */
-	result = asn1_der_decoding_startEnd(cert->cert, _data.data, _data.size,
-					    "tbsCertificate", &start,
-					    &end);
-	if (result != ASN1_SUCCESS) {
-		result = _gnutls_asn2err(result);
-		gnutls_assert();
-		goto cleanup;
-	}
-
-
-	result =
-	    _gnutls_set_datum(&cert->signed_data, &_data.data[start],
-			      end - start + 1);
-	if (result < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-	
-	/* Read the signature 
-	 */
-	bits = 0;
-	result = asn1_read_value( cert->cert, "signature", NULL, &bits);
-
-	if (result != ASN1_MEM_ERROR) {
-		result = _gnutls_asn2err(result);
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	if (bits % 8 != 0) {
-		gnutls_assert();
-		result = GNUTLS_E_CERTIFICATE_ERROR;
-		goto cleanup;
-	}
-
-	len = bits/8;
-	signature = gnutls_malloc( len);
-	if (signature == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-		
-	/* read the bit string of the signature
-	 */
-	bits = len;
-	result = asn1_read_value( cert->cert, "signature", signature,
-		&bits);
-
-	if (result != ASN1_SUCCESS) {
-		result = _gnutls_asn2err(result);
-		gnutls_assert();
-		goto cleanup;
-	}
-		
-		
-	if ((result=_gnutls_set_datum(&cert->signature, signature, len)) < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-		
-	/* Read the signature algorithm. Note that parameters are not
-	 * read. They will be read from the issuer's certificate if needed.
-	 */
-		
-	result = asn1_read_value( cert->cert, "signatureAlgorithm.algorithm",
-		signature, &len);
-		
-	if (result != ASN1_SUCCESS) {
-		result = _gnutls_asn2err(result);
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	cert->signature_algorithm = _gnutls_x509_oid2sign_algorithm( signature, NULL);
-
-	gnutls_free( signature);
-	signature = NULL;
 
 	if (need_free) _gnutls_free_datum( &_data);
 
@@ -276,8 +194,6 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 
       cleanup:
       	gnutls_free( signature);
-	_gnutls_free_datum(&cert->signed_data);
-	_gnutls_free_datum(&cert->signature);
 	if (need_free) _gnutls_free_datum( &_data);
 	return result;
 }
@@ -419,9 +335,24 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid,
   **/
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert)
 {
-	return cert->signature_algorithm;
+	int result;
+	gnutls_datum sa;
 
-	return 0;
+	/* Read the signature algorithm. Note that parameters are not
+	 * read. They will be read from the issuer's certificate if needed.
+	 */
+	result = _gnutls_x509_read_value( cert->cert, "signatureAlgorithm.algorithm", &sa, 0);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+	
+	result = _gnutls_x509_oid2sign_algorithm( sa.data, NULL);
+
+	_gnutls_free_datum( &sa);
+
+	return result;
 }
 
 /**
@@ -554,6 +485,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
   * This is specified in X509v3 Certificate Extensions. 
   * GNUTLS will return the Alternative name, or a negative
   * error code.
+  *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative 
   * name, or the type of alternative name if everything was ok. The type is 
   * one of the enumerated gnutls_x509_subject_alt_name.
@@ -804,11 +736,12 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
 
 static
 int _gnutls_x509_crt_get_raw_dn2( gnutls_x509_crt cert,
-	const char* whom, gnutls_const_datum* start)
+	const char* whom, gnutls_datum* start)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len1;
 	int start1, end1;
+	gnutls_datum signed_data;
 
 	/* get the issuer of 'cert'
 	 */
@@ -819,31 +752,41 @@ int _gnutls_x509_crt_get_raw_dn2( gnutls_x509_crt cert,
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&c2, cert->signed_data.data, cert->signed_data.size, NULL);
+	result = _gnutls_x509_get_signed_data( cert->cert, "tbsCertificate", &signed_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = asn1_der_decoding(&c2, signed_data.data, signed_data.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(&c2);
-		return _gnutls_asn2err(result);
+		result = _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
 	result =
-	    asn1_der_decoding_startEnd(c2, cert->signed_data.data, cert->signed_data.size,
+	    asn1_der_decoding_startEnd(c2, signed_data.data, signed_data.size,
 		   whom, &start1, &end1);
-	asn1_delete_structure(&c2);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		result = _gnutls_asn2err(result);
+		goto cleanup;
 	}
 
 	len1 = end1 - start1 + 1;
 
-	start->data = &cert->signed_data.data[start1];
-	start->size = len1;
+	_gnutls_set_datum( start, &signed_data.data[start1], len1);
 
-	return 0;
+	result = 0;
 
+cleanup:
+	asn1_delete_structure(&c2);
+	_gnutls_free_datum( &signed_data);
+	return result;
 }
 
 /*-
@@ -858,7 +801,7 @@ int _gnutls_x509_crt_get_raw_dn2( gnutls_x509_crt cert,
   *
   -*/
 int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
-	gnutls_const_datum* start)
+	gnutls_datum* start)
 {
 	return _gnutls_x509_crt_get_raw_dn2( cert, "issuer", start);
 }
@@ -875,7 +818,7 @@ int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
   *
   -*/
 int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
-	gnutls_const_datum * start)
+	gnutls_datum * start)
 {
 	return _gnutls_x509_crt_get_raw_dn2( cert, "subject", start);
 }
@@ -1043,7 +986,7 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 	opaque cert_serial[64];
 	int serial_size, cert_serial_size;
 	int ncerts, ret, i, j;
-	gnutls_const_datum dn1, dn2;
+	gnutls_datum dn1, dn2;
 
 	for (j = 0; j < crl_list_length; j++) {	/* do for all the crls */
 

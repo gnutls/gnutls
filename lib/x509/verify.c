@@ -58,30 +58,69 @@ static int _gnutls_verify_crl2(gnutls_x509_crl crl,
  * Returns true or false, if the issuer is a CA,
  * or not.
  */
-static int check_if_ca(gnutls_x509_crt cert,
-	gnutls_x509_crt issuer)
+static int check_if_ca(gnutls_x509_crt cert, gnutls_x509_crt issuer)
 {
+gnutls_datum cert_signed_data = { NULL, 0 };
+gnutls_datum issuer_signed_data = { NULL, 0 };
+gnutls_datum cert_signature = { NULL, 0 };
+gnutls_datum issuer_signature = { NULL, 0 };
+int result;
+
 	/* Check if the issuer is the same with the
 	 * certificate. This is added in order for trusted
 	 * certificates to be able to verify themselves.
 	 */
-	if (cert->signed_data.size == issuer->signed_data.size) {
-		if (
-		    (memcmp(cert->signed_data.data, issuer->signed_data.data,
-		    	cert->signed_data.size) == 0) &&
-		    (cert->signature.size == issuer->signature.size) &&
-		    (memcmp(cert->signature.data, issuer->signature.data,
-		    	cert->signature.size) == 0))
 
-			return 1;
+	result = _gnutls_x509_get_signed_data( issuer->cert, "tbsCertificate", &issuer_signed_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_get_signed_data( cert->cert, "tbsCertificate", &cert_signed_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_get_signature( issuer->cert, "signature", &issuer_signature);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_get_signature( cert->cert, "signature", &cert_signature);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	if (cert_signed_data.size == issuer_signed_data.size) {
+		if (
+		    (memcmp(cert_signed_data.data, issuer_signed_data.data,
+		    	cert_signed_data.size) == 0) &&
+		    (cert_signature.size == issuer_signature.size) &&
+		    (memcmp(cert_signature.data, issuer_signature.data,
+		    	cert_signature.size) == 0))
+
+			result = 1;
+			goto cleanup;
 	}
 
 	if (gnutls_x509_crt_get_ca_status(issuer, NULL) == 1) {
-		return 1;
+		result = 1;
+		goto cleanup;
 	} else
 		gnutls_assert();
 
-	return 0;
+	result = 0;
+
+cleanup:
+	_gnutls_free_datum( &cert_signed_data);
+	_gnutls_free_datum( &issuer_signed_data);
+	_gnutls_free_datum( &cert_signature);
+	_gnutls_free_datum( &issuer_signature);
+	return result;
 }
 
 
@@ -95,22 +134,27 @@ static int check_if_ca(gnutls_x509_crt cert,
 static
 int is_issuer(gnutls_x509_crt cert, gnutls_x509_crt issuer_cert)
 {
-	gnutls_const_datum dn1, dn2;
+	gnutls_datum dn1 = {NULL, 0}, dn2 = { NULL, 0 };
 	int ret;
 
 	ret = _gnutls_x509_crt_get_raw_issuer_dn( cert, &dn1);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	ret = _gnutls_x509_crt_get_raw_dn( issuer_cert, &dn2);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
-	return _gnutls_x509_compare_raw_dn( &dn1, &dn2);
+	ret = _gnutls_x509_compare_raw_dn( &dn1, &dn2);
+	
+cleanup:
+	_gnutls_free_datum(&dn1);
+	_gnutls_free_datum(&dn2);	
+	return ret;
 
 }
 
@@ -145,10 +189,10 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 			       gnutls_x509_crt *trusted_cas, int tcas_size, 
 			       unsigned int flags)
 {
-/* CRL is ignored for now */
-
-	gnutls_x509_crt issuer;
-	int ret, issuer_version;
+gnutls_datum cert_signed_data = { NULL, 0 };
+gnutls_datum cert_signature = { NULL, 0 };
+gnutls_x509_crt issuer;
+int ret, issuer_version, result;
 
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
@@ -179,14 +223,33 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 		}
 	}
 
-	ret = _gnutls_x509_verify_signature(&cert->signed_data, &cert->signature, issuer);
+
+	result = _gnutls_x509_get_signed_data( cert->cert, "tbsCertificate", &cert_signed_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_get_signature( cert->cert, "signature", &cert_signature);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_x509_verify_signature(&cert_signed_data, &cert_signature, issuer);
 	if (ret < 0) {
 		gnutls_assert();
 		/* error. ignore it */
 		ret = 0;
 	}
 
-	return ret;
+	result = ret;
+	
+cleanup:
+	_gnutls_free_datum( &cert_signed_data);
+	_gnutls_free_datum( &cert_signature);
+	
+	return result;
 }
 
 
@@ -602,13 +665,13 @@ int gnutls_x509_crl_verify( gnutls_x509_crl crl,
 static
 int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_crt issuer_cert)
 {
-	gnutls_const_datum dn1, dn2;
+	gnutls_datum dn1 = {NULL, 0}, dn2 = {NULL, 0};
 	int ret;
 
 	ret = _gnutls_x509_crl_get_raw_issuer_dn( crl, &dn1);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup;
 	}
 
 	ret = _gnutls_x509_crt_get_raw_dn( issuer_cert, &dn2);
@@ -617,8 +680,13 @@ int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_crt issuer_cert)
 		return ret;
 	}
 
-	return _gnutls_x509_compare_raw_dn( &dn1, &dn2);
-
+	ret = _gnutls_x509_compare_raw_dn( &dn1, &dn2);
+	
+cleanup:
+	_gnutls_free_datum( &dn1);
+	_gnutls_free_datum( &dn2);
+	
+	return ret;
 }
 
 static inline
@@ -650,9 +718,10 @@ static int _gnutls_verify_crl2(gnutls_x509_crl crl,
 			       unsigned int flags)
 {
 /* CRL is ignored for now */
-
-	gnutls_x509_crt issuer;
-	int ret;
+gnutls_datum crl_signed_data = { NULL, 0 };
+gnutls_datum crl_signature = { NULL, 0 };
+gnutls_x509_crt issuer;
+int ret, result;
 
 	if (tcas_size >= 1)
 		issuer = find_crl_issuer(crl, trusted_cas, tcas_size);
@@ -677,14 +746,33 @@ static int _gnutls_verify_crl2(gnutls_x509_crl crl,
 		}
 	}
 
-	ret = _gnutls_x509_verify_signature(&crl->signed_data, &crl->signature, issuer);
+	result = _gnutls_x509_get_signed_data( crl->crl, "tbsCertList", &crl_signed_data);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_get_signature( crl->crl, "signature", &crl_signature);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+
+	ret = _gnutls_x509_verify_signature(&crl_signed_data, &crl_signature, issuer);
 	if (ret < 0) {
 		gnutls_assert();
 		/* error. ignore it */
 		ret = 0;
 	}
 
-	return ret;
+	result = ret;
+	
+cleanup:
+	_gnutls_free_datum( &crl_signed_data);
+	_gnutls_free_datum( &crl_signature);
+	
+	return result;
 }
 
 #endif

@@ -114,6 +114,8 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid,
 int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version);
 int gnutls_x509_crt_set_key(gnutls_x509_crt crt, gnutls_x509_privkey key);
 int gnutls_x509_crt_set_ca_status(gnutls_x509_crt crt, unsigned int ca);
+int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
+	const char* data_string);
 int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer, 
 	gnutls_x509_privkey issuer_key);
 int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time);

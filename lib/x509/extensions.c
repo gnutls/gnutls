@@ -34,6 +34,9 @@
  * ret.
  *
  * Critical will be either 0 or 1.
+ *
+ * If the extension does not exist, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
+ * be returned.
  */
 int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_id, 
 	int indx, gnutls_datum* ret, unsigned int * _critical)
@@ -303,9 +306,8 @@ int _gnutls_x509_ext_gen_basicConstraints(int CA, gnutls_datum* der_ext)
 	if (CA == 0) str = "FALSE";
 	else str = "TRUE";
 
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext
-	     )) != ASN1_SUCCESS) {
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -316,7 +318,77 @@ int _gnutls_x509_ext_gen_basicConstraints(int CA, gnutls_datum* der_ext)
 		asn1_delete_structure(&ext);
 		return _gnutls_asn2err(result);
 	}
+
+	asn1_write_value(ext, "pathLenConstraint", NULL, 0);
 	
+	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
+
+	asn1_delete_structure(&ext);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}
+
+/* generate the subject alternative name in a DER encoded extension
+ */
+int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name type, 
+	const char* data_string, gnutls_datum* der_ext)
+{
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+	const char *str;
+	char name[128];
+	int result;
+
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.SubjectAltName", &ext);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_write_value( ext, "", "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	switch(type) {
+		case GNUTLS_SAN_DNSNAME:
+			str = "dNSName";
+			break;
+		case GNUTLS_SAN_RFC822NAME:
+			str = "rfc822Name";
+			break;
+		case GNUTLS_SAN_URI:
+			str = "uniformResourceIdentifier";
+			break;
+		case GNUTLS_SAN_IPADDRESS:
+			str = "iPAddress";
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	result = asn1_write_value( ext, "?LAST", str, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	_gnutls_str_cpy( name, sizeof(name), "?LAST.");
+	_gnutls_str_cat( name, sizeof(name), str);
+
+	result = asn1_write_value(ext, name, data_string, strlen(data_string));
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&ext);
+		return _gnutls_asn2err(result);
+	}
+
 	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
 
 	asn1_delete_structure(&ext);

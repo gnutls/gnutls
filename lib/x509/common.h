@@ -65,3 +65,6 @@ int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name
 	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size);
 int _gnutls_asn1_copy_node( ASN1_TYPE *dst, const char* dst_name,
 	ASN1_TYPE src, const char* src_name);
+
+int _gnutls_x509_get_signed_data( ASN1_TYPE src, const char* src_name, gnutls_datum * signed_data);
+int _gnutls_x509_get_signature( ASN1_TYPE src, const char* src_name, gnutls_datum * signature);

@@ -6,18 +6,11 @@
 
 typedef struct gnutls_x509_crl_int {
 	ASN1_TYPE crl;
-	gnutls_datum signed_data; /* Holds the signed data of the CRL.
-				   */
-	gnutls_datum signature;
-	gnutls_pk_algorithm signature_algorithm;
 } gnutls_x509_crl_int;
 
 typedef struct gnutls_x509_crt_int {
 	ASN1_TYPE cert;
-	gnutls_datum signed_data; /* Holds the signed data of the CRL.
-				   */
-	gnutls_datum signature;
-	gnutls_pk_algorithm signature_algorithm;
+	int use_extensions;
 } gnutls_x509_crt_int;
 
 
@@ -76,21 +69,21 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
 
 int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src);
 int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
-	gnutls_const_datum* start);
+	gnutls_datum* start);
 int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
-	gnutls_const_datum* start);
+	gnutls_datum* start);
 
 int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, size_t* result_size);
 
-int _gnutls_x509_compare_raw_dn(const gnutls_const_datum * dn1,
-	const gnutls_const_datum * dn2);
+int _gnutls_x509_compare_raw_dn(const gnutls_datum * dn1,
+	const gnutls_datum * dn2);
 
 int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert, gnutls_x509_crl * crl_list, int crl_list_length);
 
 
 int _gnutls_x509_crl_cpy(gnutls_x509_crl dest, gnutls_x509_crl src);
 int _gnutls_x509_crl_get_raw_issuer_dn( gnutls_x509_crl crl,
-	gnutls_const_datum* dn);
+	gnutls_datum* dn);
 int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
 				    unsigned char *serial,
@@ -133,6 +126,5 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum* u);
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
-
 
 #endif

@@ -811,8 +811,8 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid, int in
  * Returns 1 if the DN's match and zero if they don't match. Otherwise
  * a negative value is returned to indicate error.
  */
-int _gnutls_x509_compare_raw_dn(const gnutls_const_datum * dn1,
-	const gnutls_const_datum * dn2) 
+int _gnutls_x509_compare_raw_dn(const gnutls_datum * dn1,
+	const gnutls_datum * dn2) 
 {
 
 	if (dn1->size != dn2->size) {
