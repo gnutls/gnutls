@@ -35,7 +35,6 @@
 #include "debug.h"
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <gnutls_num.h>
 
 static int _randomize_pwd_entry(SRP_PWD_ENTRY* entry);
 
@@ -204,7 +203,7 @@ static int pwd_read_conf( const char* pconf_file, SRP_PWD_ENTRY* entry, int inde
 	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
 	            i++;
 	    }
-	    if (strncmp( indexstr, line, GMAX(i,len)) == 0) {
+	    if (strncmp( indexstr, line, (i>len)?i:len) == 0) {
 			if ((index = pwd_put_values2( entry, line)) >= 0)
 				return 0;
 			else {
@@ -312,7 +311,7 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	            i++;
 	    }
 	    
-	    if (strncmp( username, line, GMAX(i,len)) == 0) {
+	    if (strncmp( username, line, (i>len)?i:len) == 0) {
 			if ((index = pwd_put_values( entry, line)) >= 0) {
 				/* Keep the last index in memory, so we can retrieve fake parameters (g,n)
 				 * when the user does not exist.
@@ -356,18 +355,22 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 /* Randomizes the given password entry. It actually sets the verifier
  * and the salt. Returns 0 on success.
  */
-static int _randomize_pwd_entry(SRP_PWD_ENTRY* entry) 
-{
-unsigned char rnd;
-
+#define RNDUSER "rnd"
+#define RND_SALT_SIZE 17
+static int _randomize_pwd_entry(SRP_PWD_ENTRY* entry) {
+	int ret;
+	
 	if (entry->g.size == 0 || entry->n.size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
-	
-	_gnutls_get_random( &rnd, 1, GNUTLS_WEAK_RANDOM);
-	entry->salt.size = (rnd % 10) + 9;
 
+	entry->username = gnutls_strdup(RNDUSER);
+	if (entry->username == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 	entry->v.data = gnutls_malloc(20);
 	entry->v.size = 20;
 	if (entry->v.data==NULL) {
@@ -375,19 +378,21 @@ unsigned char rnd;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_get_random( entry->v.data, 20, GNUTLS_STRONG_RANDOM);
+	_gnutls_get_random( entry->v.data, 20, GNUTLS_WEAK_RANDOM);
 
-	entry->salt.data = gnutls_malloc( entry->salt.size);
+	entry->salt.size = RND_SALT_SIZE;
+	
+	entry->salt.data = gnutls_malloc(RND_SALT_SIZE);
 	if (entry->salt.data==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	if (_gnutls_get_random(entry->salt.data, entry->salt.size, GNUTLS_WEAK_RANDOM) < 0) {
+	if (_gnutls_get_random(entry->salt.data, RND_SALT_SIZE, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
+	
 	return 0;
 }
 
