@@ -1,4 +1,4 @@
-EXTRA_DIST = run-tests
+EXTRA_DIST = run-tests testutils.c testutils.h
 
 AM_CPPFLAGS = -I$(srcdir)/..
 
@@ -9,7 +9,6 @@ noinst_PROGRAMS = aes-test arcfour-test arctwo-test \
 	   knuth-lfib-test \
 	   cbc-test hmac-test
 
-SOURCES = testutils.c testutils.h
 LDADD = testutils.o ../libnettle.la
 
 TESTS = $(noinst_PROGRAMS)
