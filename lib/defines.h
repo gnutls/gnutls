@@ -98,6 +98,8 @@ typedef unsigned int uint;
 typedef signed int sint;
 #endif
 
+#define SIZEOF_UNSIGNED_LONG_INT SIZEOF_UNSIGNED_LONG
+
 #if SIZEOF_UNSIGNED_LONG == 8
 # define HAVE_UINT64
 /* only used native uint64 in 64 bit machines */

@@ -1,9 +1,11 @@
-Version 0.6.1
+Version 0.7.0
 - Added gnutls_x509_extract_dn_string() which returns a 
   distinguished name in a single string.
 - Added gnutls_openpgp_extract_key_name_string() which returns
   an openpgp user ID in a single string.
 - Added SRP-6 support. Follows draft-ietf-tls-srp-04.
+- If libtasn1 is not present it is included in the
+  main gnutls library.
 
 Version 0.6.0 (8/12/2002)
 - Added "gnutls/compat4.h" header. This is included in gnutls.h

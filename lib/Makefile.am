@@ -1,8 +1,10 @@
-INCLUDES = -I../libextra -I../libtasn1/lib/ -I../includes
+INCLUDES = -I../libextra -Iminitasn1/ -I../includes
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
+
+SUBDIRS = minitasn1
 
 EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_cipher.h gnutls_buffers.h gnutls_errors.h gnutls_int.h \
@@ -40,7 +42,9 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 
 # Separate so we can create the documentation
 
-libgnutls_la_SOURCES = $(COBJECTS)
+libgnutls_la_SOURCES = $(COBJECTS) 
+
+libgnutls_la_LIBADD = $(MINITASN1_OBJECTS)
 
 libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)

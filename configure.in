@@ -11,8 +11,8 @@ AC_DEFINE_UNQUOTED(T_OS, "$target_os", [OS name])
 
 dnl Gnutls Version
 GNUTLS_MAJOR_VERSION=0
-GNUTLS_MINOR_VERSION=6
-GNUTLS_MICRO_VERSION=1
+GNUTLS_MINOR_VERSION=7
+GNUTLS_MICRO_VERSION=0
 GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
 AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION", [version of gnutls])
@@ -314,19 +314,30 @@ AC_CHECK_LIB( tasn1, asn1_array2tree,:,
 
 )
 
-dnl In developer mode we always use the included library
-if test x$opt_developer_mode = xyes; then
- libtasn1_enabled=yes
-fi
-
-
-
 AC_MSG_RESULT([***
 *** Detecting options for shared libraries...
 ])
 AM_PROG_LIBTOOL
 
-LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls -ltasn1 $LIBGCRYPT_LIBS"
+
+if test x$opt_developer_mode = xyes; then
+ libtasn1_enabled=yes
+fi
+
+if test x"$libtasn1_enabled" = xyes; then
+ AC_CONFIG_SUBDIRS(libtasn1)
+ AC_DEFINE(USE_MINITASN1, 1, [use the included tasn1])
+ MINITASN1_OBJECTS="minitasn1/coding.lo minitasn1/decoding.lo minitasn1/element.lo \
+	minitasn1/errors.lo minitasn1/gstr.lo minitasn1/parser_aux.lo minitasn1/structure.lo"
+else
+ LIBASN1_LINK=-ltasn1
+fi
+
+AC_SUBST(MINITASN1_OBJECTS)
+AC_SUBST(LIBASN1_LINK)
+
+
+LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBASN1_LINK $LIBGCRYPT_LIBS"
 LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
 
 CFLAGS="${CFLAGS} ${LIBGCRYPT_CFLAGS}"
@@ -359,17 +370,6 @@ AC_MSG_WARN(***
 fi
 
 
-if test x"$libtasn1_enabled" = xyes; then
- AC_CONFIG_SUBDIRS(libtasn1)
- LIBASN1_DIR=libtasn1
- AC_SUBST(LIBASN1_DIR)
- LIBASN1_LINK=../libtasn1/lib/libtasn1.la
-else
- LIBASN1_LINK=-ltasn1
-fi
-
-AC_SUBST(LIBASN1_LINK)
-
 AC_CONFIG_FILES(lib/gnutls.h.in)
 
 AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
@@ -392,7 +392,7 @@ AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
 lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
-doc/examples/Makefile \
+doc/examples/Makefile lib/minitasn1/Makefile \
 includes/Makefile includes/gnutls/Makefile])
 
 AC_OUTPUT
