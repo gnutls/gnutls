@@ -85,7 +85,7 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, int data_size) 
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
-			
+
 			data[0] = len;
 			memcpy( &data[1], cred->username, len);
 			return len + 1;
