@@ -50,6 +50,7 @@ Free Documentation License".
 @menu
 * Preface::
 * The Library::
+* Introduction to TLS::
 * Copying This Manual::
 * Index::
 @end menu
@@ -76,8 +77,11 @@ a program or a communication line and @acronym{GnuTLS} only helps with
 some of them.
 
 This document tries to be self contained, although basic network
-programming and PKI knowlegde is assumed in most of it.  \cite{GUTPKI}
-is a good introduction to Public Key Infrastructure.
+programming and PKI knowlegde is assumed in most of it.  Peter
+Gutmann's ``Everything you never wanted to know about PKI but were
+forced to find out''@footnote{Available from
+@url{http://www.cs.auckland.ac.nz/~pgut001/pubs/pkitutorial.pdf}} is a
+good introduction to Public Key Infrastructure.
 
 @section Availability
 
@@ -94,13 +98,13 @@ privacy over insecure lines, and were designed to prevent
 eavesdropping, tampering, or message forgery.
 
 Technically @acronym{GnuTLS} is a portable ANSI C based library which
-implements the TLS 1.0@footnote{See section \ref{sec:tlsintro} on page
-\pageref{sec:tlsintro} for a more detailed description of the
-protocols.} and SSL 3.0 protocols, accompanied with the required
-framework for authentication and public key infrastructure.  The
-library is available under the GNU Lesser GPL license@footnote{A copy
-of the license is included in the distribution}.  Important features
-of the @acronym{GnuTLS} library include:
+implements the TLS 1.0 (@xref{Introduction to TLS}, for a more
+detailed description of the protocols) and SSL 3.0 protocols,
+accompanied with the required framework for authentication and public
+key infrastructure.  The library is available under the GNU Lesser GPL
+license@footnote{A copy of the license is included in the
+distribution}.  Important features of the @acronym{GnuTLS} library
+include:
 
 @itemize
 
@@ -146,14 +150,14 @@ small library, with the required features, can be generated.
 
 @c explain how it works
 
-A brief description of how @acronym{GnuTLS} works internally is shown at the
-figure \ref{fig:internals}. This section may be easier to understand
-after having seen the examples on page \pageref{examples}.
+A brief description of how @acronym{GnuTLS} works internally is shown
+at the figure below. This section may be easier to understand after
+having seen the examples (@pxref{examples}).
 
-\begin{figure}[htp]
-\includegraphics[height=8cm,width=12cm]{internals}
-\label{fig:internals}
-\end{figure}
+@c \begin{figure}[htp]
+@c \includegraphics[height=8cm,width=12cm]{internals}
+@c \label{fig:internals}
+@c \end{figure}
 
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
@@ -165,17 +169,17 @@ global structure and is called after the program has permanently
 finished using @acronym{GnuTLS}.
 
 The credentials structure is used by some authentication methods, such
-as certificate authentication\footnote{see section \ref{certificate}
-on page \pageref{certificate}}.  A credentials structure may contain
-certificates, private keys, temporary parameters for diffie hellman or
-RSA key exchange, and other stuff that may be shared between several
-TLS sessions.
+as certificate authentication (@pxref{certificate}).  A credentials
+structure may contain certificates, private keys, temporary parameters
+for diffie hellman or RSA key exchange, and other stuff that may be
+shared between several TLS sessions.
 
-This structure should be initialized using the appropriate initialization
-functions. For example an application which uses certificate authentication
-would probably initialize the credentials, using the appropriate functions,
-and put its trusted certificates in this structure. The next step is to
-associate the credentials structure with each @acronym{TLS} session.
+This structure should be initialized using the appropriate
+initialization functions. For example an application which uses
+certificate authentication would probably initialize the credentials,
+using the appropriate functions, and put its trusted certificates in
+this structure. The next step is to associate the credentials
+structure with each @acronym{TLS} session.
 
 A @acronym{GnuTLS} session contains all the required stuff for a
 session to handle one secure connection. This session calls directly
@@ -185,14 +189,13 @@ peer.  Every session has a unique session ID shared with the peer.
 Since TLS sessions can be resumed, servers would probably need a
 database backend to hold the session's parameters. Every
 @acronym{GnuTLS} session after a successful handshake calls the
-appropriate backend function\footnote{see section \ref{resume} on
-\pageref{resume} for information on initialization} to store the newly
-negotiated session. The session database is examined by the server
-just after having received the client hello\footnote{The first message
-in a @acronym{TLS} handshake}, and if the session ID sent by the
-client, matches a stored session, the stored session will be
-retrieved, and the new session will be a resumed one, and will share
-the same session ID with the previous one.
+appropriate backend function (@xref{resume}, for information on
+initialization) to store the newly negotiated session. The session
+database is examined by the server just after having received the
+client hello@footnote{The first message in a @acronym{TLS} handshake},
+and if the session ID sent by the client, matches a stored session,
+the stored session will be retrieved, and the new session will be a
+resumed one, and will share the same session ID with the previous one.
 
 @section Error handling
 
@@ -203,31 +206,29 @@ to be taken. Thus negative error codes may be fatal or not.
 
 Fatal errors terminate the connection immediately and further sends
 and receives will be disallowed. An example of a fatal error code is
-GNUTLS\_E\_DECRYPTION\_FAILED. Non-fatal errors may warn about
+@code{GNUTLS_E_DECRYPTION_FAILED}. Non-fatal errors may warn about
 something, ie a warning alert was received, or indicate the some
 action has to be taken. This is the case with the error code
-GNUTLS\_E\_REHANDSHAKE returned by
-\printfunc{gnutls_record_recv}{gnutls\_record\_recv}.  This error code
-indicates that the server requests a re-handshake. The client may
-ignore this request, or may reply with an alert.  You can test if an
-error code is a fatal one by using the
-\printfunc{gnutls_error_is_fatal}{gnutls\_error\_is\_fatal}.
+@code{GNUTLS_E_REHANDSHAKE} returned by @code{gnutls_record_recv}.
+This error code indicates that the server requests a re-handshake. The
+client may ignore this request, or may reply with an alert.  You can
+test if an error code is a fatal one by using the
+@code{gnutls_error_is_fatal}.
 
 If any non fatal errors, that require an action, are to be returned by
 a function, these error codes will be documented in the function's
-reference. All the error codes are documented in appendix
-\ref{ap:error_codes} on page \pageref{ap:error_codes}.
+reference.  @xref{error_codes}, for all the error codes.
 
 @section Memory handling
 
-@acronym{GnuTLS} internally handles heap allocated objects differently,
-depending on the sensitivity of the data they contain. However for
-performance reasons, the default memory functions do not overwrite
-sensitive data from memory, nor protect such objects from being
-written to the swap.  In order to change the default behavior the
-\printfunc{gnutls_global_set_mem_functions}{gnutls\_global\_set\_mem\_functions}
-function is available which can be used to set other memory handlers
-than the defaults.
+@acronym{GnuTLS} internally handles heap allocated objects
+differently, depending on the sensitivity of the data they
+contain. However for performance reasons, the default memory functions
+do not overwrite sensitive data from memory, nor protect such objects
+from being written to the swap.  In order to change the default
+behavior the @code{gnutls_global_set_mem_functions} function is
+available which can be used to set other memory handlers than the
+defaults.
 
 The @acronym{Libgcrypt} library on which @acronym{GnuTLS} depends, has such
 secure memory allocation functions available. These should be used in
@@ -248,24 +249,461 @@ data to the transport layer.
 
 @itemize
 
-@item \printfunc{gnutls_transport_set_push_function}{gnutls\_transport\_set\_push\_function}
-@item \printfunc{gnutls_transport_set_pull_function}{gnutls\_transport\_set\_pull\_function}
+@item @code{gnutls_transport_set_push_function}
+
+@item @code{gnutls_transport_set_pull_function}
 
 @end itemize
 
 Other callback functions such as the one set by
-\printfunc{gnutls_srp_set_server_credentials_function}{gnutls\_srp\_set\_server\_credentials\_function},
-may require more complicated input, including data to be allocated.
-These callbacks should allocate and free memory using the functions
-shown below.
+@code{gnutls_srp_set_server_credentials_function}, may require more
+complicated input, including data to be allocated.  These callbacks
+should allocate and free memory using the functions shown below.
 
 @itemize
 
-@item \printfunc{gnutls_malloc}{gnutls\_malloc}
+@item @code{gnutls_malloc}
 
-@item \printfunc{gnutls_free}{gnutls\_free}
+@item @code{gnutls_free}
 
 @end itemize
+
+@node Introduction to TLS
+@chapter Introduction to TLS
+
+@acronym{TLS} stands for ``Transport Layer Security'' and is the
+successor of SSL, the Secure Sockets Layer protocol@footnote{Described
+in @cite{SSL3}} designed by Netscape.  @acronym{TLS} 1.0 is an
+Internet protocol, defined by @acronym{IETF}@footnote{IETF, or
+Internet Engineering Task Force, is a large open international
+community of network designers, operators, vendors, and researchers
+concerned with the evolution of the Internet architecture and the
+smooth operation of the Internet.  It is open to any interested
+individual.}, described in @acronym{RFC} 2246 and also in
+@cite{RESCOLA}. The protocol provides confidentiality, and
+authentication layers over any reliable transport layer. The
+description, below, refers to @acronym{TLS} 1.0 but also applies to
+@acronym{SSL} 3.0 since the differences of these protocols are
+minor. Older protocols such as @acronym{SSL} 2.0 are not discussed nor
+implemented in @acronym{GnuTLS} since they are not considered secure
+today.
+
+@section TLS layers
+@cindex TLS Layers
+
+@acronym{TLS} 1.0 is a layered protocol, and consists of the Record
+Protocol, the Handshake Protocol and the Alert Protocol. The Record
+Protocol is to serve all other protocols and is above the transport
+layer.  The Record protocol offers symmetric encryption, data
+authenticity, and optionally compression.
+
+The Alert protocol offers some signaling to the other protocols. It
+can help informing the peer for the cause of failures and other error
+conditions.  @xref{alert}, for more information.  The alert protocol
+is above the record protocol.
+
+The Handshake protocol is responsible for the security parameters'
+negotiation, the initial key exchange and authentication.
+@xref{handshake}, for more information about the handshake protocol.
+The protocol layering in TLS is shown in the figure below.
+
+@c \begin{figure}[hbtp]
+@c \includegraphics[height=8cm,width=12cm]{layers}
+@c \label{fig:layers}
+@c \caption{Layers in the TLS protocol}
+@c \end{figure}
+
+@section The transport layer
+
+@acronym{TLS} is not limited to one transport layer, it can be used
+above any transport layer, as long as it is a reliable one.  A set of
+functions is provided and their purpose is to load to @acronym{GnuTLS} the
+required callbacks to access the transport layer.
+
+@itemize
+@item @code{gnutls_transport_set_push_function}
+@item @code{gnutls_transport_set_pull_function}
+@item @code{gnutls_transport_set_ptr}
+@end itemize
+
+These functions accept a callback function as a parameter.  The
+callback functions should return the number of bytes written, or -1 on
+error and should set @code{errno} appropriately.
+
+@acronym{GnuTLS} currently only interprets the EINTR and EAGAIN errno
+values and returns the corresponding @acronym{GnuTLS} error codes
+@code{GNUTLS_E_INTERRUPTED} and @code{GNUTLS_E_AGAIN}.  These values
+are usually returned by interrupted system calls, or when non blocking
+IO is used. All @acronym{GnuTLS} functions can be resumed (called
+again), if any of these error codes is returned.  The error codes
+above refer to the system call, not the @acronym{GnuTLS} function,
+since signals do not interrupt @acronym{GnuTLS}' functions.
+
+By default, if the transport functions are not set, @acronym{GnuTLS}
+will use the Berkeley Sockets functions.  In this case
+@acronym{GnuTLS} will use some hacks in order for @code{select} to
+work, thus making it easy to add @acronym{TLS} support to existing
+TCP/IP servers.
+
+@section The TLS record protocol
+@cindex TLS protocols
+@cindex Record protocol
+
+The Record protocol is the secure communications provider. Its purpose
+is to encrypt, authenticate and --optionally-- compress packets.
+The following functions are available:
+
+@itemize
+
+@item @code{gnutls_record_send}
+To send a record packet (with application data).
+
+@item @code{gnutls_record_recv}:
+To receive a record packet (with application data).
+@end itemize
+
+As you may have already noticed, the functions which access the Record
+protocol, are quite limited, given the importance of this protocol in
+@acronym{TLS}.  This is because the Record protocol's parameters are
+all set by the Handshake protocol.
+
+The Record protocol initially starts with NULL parameters, which means
+no encryption, and no MAC is used. Encryption and authentication begin
+just after the handshake protocol has finished.
+
+@subsection Encryption algorithms used in the record layer
+@cindex Symmetric encryption algorithms
+
+Confidentiality in the record layer is achieved by using symmetric
+block encryption algorithms like @code{3DES}, @code{AES}@footnote{AES,
+or Advanced Encryption Standard, is actually the RIJNDAEL algorithm.
+This is the algorithm that replaced DES.}, or stream algorithms like
+@code{ARCFOUR_128}@footnote{@code{ARCFOUR_128} is a compatible
+algorithm with RSA's RC4 algorithm, which is considered to be a trade
+secret.}. Ciphers are encryption algorithms that use a single, secret,
+key to encrypt and decrypt data. Block algorithms in TLS also provide
+protection against statistical analysis of the data.  Thus, if you're
+using the @acronym{TLS} 1.0 protocol, a random number of blocks will
+be appended to data, to prevent eavesdroppers from guessing the actual
+data size.
+
+Supported cipher algorithms:
+
+@itemize
+
+@item @code{3DES_CBC}
+@code{3DES_CBC} is the DES block cipher algorithm used with triple
+encryption (EDE). Has 64 bits block size and is used in CBC mode.
+
+@item @code{ARCFOUR_128}
+ARCFOUR is a fast stream cipher.
+
+@item @code{ARCFOUR_40}
+This is the ARCFOUR cipher that is fed with a 40 bit key,
+which is considered weak.
+
+@item @code{AES_CBC}
+AES or RIJNDAEL is the block cipher algorithm that replaces the old
+DES algorithm.  Has 128 bits block size and is used in CBC mode. This
+is not officially supported in TLS.
+
+@end itemize
+
+Supported MAC algorithms:
+
+@itemize
+@item @code{MAC_MD5}
+MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs 128 bits of data.
+
+@item @code{MAC_SHA}
+SHA is a cryptographic hash algorithm designed by NSA. Outputs 160 bits of data.
+
+@item @code{MAC_RMD160}
+RIPEMD is a cryptographic hash algorithm developed in the framework of
+the EU project RIPE. Outputs 160 bits of data.
+
+@end itemize
+
+@subsection Compression algorithms used in the record layer
+@cindex Compression algorithms
+
+The TLS record layer also supports compression.  The algorithms
+implemented in @acronym{GnuTLS} can be found in figure
+@cite{compression}.  All the algorithms except for DEFLATE which is
+referenced in @cite{TLSCOMP}, should be considered as
+@acronym{GnuTLS}' extensions@footnote{You should use
+@code{gnutls_handshake_set_private_extensions} to enable private
+extensions.}, and should be advertised only when the peer is known to
+have a compliant client, to avoid interoperability problems.
+
+The included algorithms perform really good when text, or other
+compressible data are to be transfered, but offer nothing on already
+compressed data, such as compressed images, zipped archives etc.
+These compression algorithms, may be useful in high bandwidth TLS
+tunnels, and in cases where network usage has to be minimized. As a
+drawback, compression increases latency.
+
+The record layer compression in @acronym{GnuTLS} is implemented based
+on the paper @cite{TLSCOMP}.
+
+Supported compression algorithms:
+
+@itemize
+@item DEFLATE
+Zlib compression, using the deflate algorithm.
+
+@item LZO
+LZO is a very fast compression algorithm. This algorithm is only
+available if the @acronym{GnuTLS-extra} library has been initialized
+and the private extensions are enabled.
+
+@end itemize
+
+@subsection Weaknesses and countermeasures
+
+Some weaknesses that may affect the security of the Record layer have been
+found in @acronym{TLS} 1.0 protocol. These weaknesses can be exploited by active attackers,
+and exploit the facts that
+
+@enumerate
+
+@item
+@acronym{TLS} has separate alerts for ``decryption_failed'' and
+``bad_record_mac''
+
+@item
+The decryption failure reason can be detected by timing the response
+time.
+
+@item
+The IV for CBC encrypted packets is the last block of the previous
+encrypted packet.
+
+@end enumerate
+
+Those weaknesses were solved in @acronym{TLS} 1.1 which is implemented
+in @acronym{GnuTLS}. For a detailed discussion see the archives of the
+TLS Working Group mailing list and the paper @cite{CBCATT}.
+
+@section The TLS alert protocol
+
+The Alert protocol is there to allow signals to be sent between peers.
+These signals are mostly used to inform the peer about the cause of a
+protocol failure. Some of these signals are used internally by the
+protocol and the application protocol does not have to cope with them
+(see @code{GNUTLS_A_CLOSE_NOTIFY}), and others refer to the
+application protocol solely (see @code{GNUTLS_A_USER_CANCELLED}).  An
+alert signal includes a level indication which may be either fatal or
+warning. Fatal alerts always terminate the current connection, and
+prevent future renegotiations using the current session ID.
+
+The alert messages are protected by the record protocol, thus the
+information that is included does not leak. You must take extreme care
+for the alert information not to leak to a possible attacker, via
+public log files etc.
+
+@itemize
+@item @code{gnutls_alert_send}:
+To send an alert signal.
+
+@item @code{gnutls_error_to_alert}:
+To map a gnutls error number to an alert signal.
+
+@item @code{gnutls_alert_get}:
+Returns the last received alert.
+
+@item @code{gnutls_alert_get_name}:
+Returns the name, in a character array, of the given alert.
+
+@end itemize
+
+@section The TLS handshake protocol
+@cindex TLS handshake protocol
+
+The Handshake protocol is responsible for the ciphersuite negotiation,
+the initial key exchange, and the authentication of the two peers.
+This is fully controlled by the application layer, thus your program
+has to set up the required parameters. Available functions to control
+the handshake protocol include:
+
+@itemize
+@item @code{gnutls_cipher_set_priority}:
+To set the priority of bulk cipher algorithms.
+
+@item @code{gnutls_mac_set_priority}:
+To set the priority of MAC algorithms.
+
+@item @code{gnutls_kx_set_priority}:
+To set the priority of key exchange algorithms.
+
+@item @code{gnutls_compression_set_priority}:
+To set the priority of compression methods.
+
+@item @code{gnutls_certificate_type_set_priority}:
+To set the priority of certificate types (e.g., @acronym{OpenPGP},
+@acronym{X.509}).
+
+@item @code{gnutls_protocol_set_priority}:
+To set the priority of protocol versions (e.g., @acronym{SSL} 3.0,
+@acronym{TLS} 1.0).
+
+@item @code{gnutls_set_default_priority}:
+To set some defaults in the current session.  That way you don't have
+to call each priority function, independently, but you have to live
+with the defaults.
+
+@item @code{gnutls_credentials_set}:
+To set the appropriate credentials structures.
+
+@item @code{gnutls_certificate_server_set_request}:
+To set whether client certificate is required or not.
+
+@item @code{gnutls_handshake}:
+To initiate the handshake.
+@end itemize
+
+@subsection TLS cipher suites
+
+The Handshake Protocol of @acronym{TLS} 1.0 negotiates cipher suites 
+of the form @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA}.
+The usual cipher suites contain these parameters:
+
+@itemize
+
+@item The key exchange algorithm.
+@code{DHE_RSA} in the example.
+
+@item The Symmetric encryption algorithm and mode
+@code{3DES_CBC} in this example.
+
+@item The MAC@footnote{MAC stands for Message Authentication Code. It can be described as a keyed hash algorithm. See RFC2104.} algorithm used for authentication.
+@code{MAC_SHA} is used in the above example.
+
+@end itemize
+
+The cipher suite negotiated in the handshake protocol will affect the
+Record Protocol, by enabling encryption and data authentication.  Note
+that you should not over rely on @acronym{TLS} to negotiate the
+strongest available cipher suite. Do not enable ciphers and algorithms
+that you consider weak.
+
+The priority functions, dicussed above, allow the application layer to
+enable and set priorities on the individual ciphers. It may imply that
+all combinations of ciphersuites are allowed, but this is not
+true. For several reasons, not discussed here, some combinations were
+not defined in the @acronym{TLS} protocol.  The supported ciphersuites
+are shown in appendix @xref{ciphersuites}.
+
+@subsection Client authentication
+@cindex Client Certificate authentication
+
+In the case of ciphersuites that use certificate authentication, the
+authentication of the client is optional in @acronym{TLS}.  A server
+may request a certificate from the client -- using the
+@code{gnutls_certificate_server_set_request} function. If a
+certificate is to be requested from the client during the handshake,
+the server will send a certificate request message that contains a
+list of acceptable certificate signers. The client may then send a
+certificate, signed by one of the server's acceptable signers. In
+@acronym{GnuTLS} the server's acceptable signers list is constructed
+using the trusted CA certificates in the credentials structure.
+
+@subsection Resuming Sessions
+@cindex Resuming sessions
+
+The @code{gnutls_handshake} function, is expensive since a lot of
+calculations are performed. In order to support many fast connections
+to the same server a client may use session resuming. @strong{Session
+resuming} is a feature of the @acronym{TLS} protocol which allows a
+client to connect to a server, after a successful handshake, without
+the expensive calculations.  This is achieved by using the previously
+established keys. @acronym{GnuTLS} supports this feature, and the
+example (@pxref{resume client}) illustrates a typical use of it.
+
+Keep in mind that sessions are expired after some time, for security
+reasons, thus it may be normal for a server not to resume a session
+even if you requested that.  Also note that you must enable, using the
+priority functions, at least the algorithms used in the last session.
+
+@subsection Resuming internals
+
+The resuming capability, mostly in the server side, is one of the
+problems of a thread-safe TLS implementations. The problem is that all
+threads must share information in order to be able to resume
+sessions. The gnutls approach is, in case of a client, to leave all
+the burden of resuming to the client. Ie. copy and keep the necessary
+parameters. See the functions:
+
+@itemize
+
+@item @code{gnutls_session_get_data}
+
+@item @code{gnutls_session_get_id}
+
+@item @code{gnutls_session_set_data}
+
+@end itemize
+
+The server side is different. A server has to specify some callback
+functions which store, retrieve and delete session data. These can be
+registered with:
+
+@itemize
+
+@item @code{gnutls_db_set_remove_function}
+
+@item @code{gnutls_db_set_store_function}
+
+@item @code{gnutls_db_set_retrieve_function}
+
+@item @code{gnutls_db_set_ptr}
+
+@end itemize
+
+It might also be useful to be able to check for expired sessions in
+order to remove them, and save space. The function
+@code{gnutls_db_check_entry} is provided for that reason.
+
+@section TLS Extensions
+@cindex TLS Extensions
+
+A number of extensions to the @acronym{TLS} protocol have been
+proposed mainly in @acronym{RFC} 3546
+(@url{http://www.ietf.org/rfc/rfc3546.txt}). The extensions supported
+in @acronym{GnuTLS} are
+
+@itemize
+@item Maximum fragment length negotiation
+@item Server name indication
+@end itemize
+
+discussed in the subsections that follow.
+
+@subsection Maximum fragment length negotiation
+@cindex TLS Extensions
+@cindex Maximum fragment length
+
+This extension allows a @acronym{TLS} 1.0 implementation to negotiate
+a smaller value for record packet maximum length. This extension may
+be useful to clients with constrained capabilities. See the
+@code{gnutls_record_set_max_size} and the
+@code{gnutls_record_get_max_size} functions.
+
+@subsection Server name indication
+@cindex TLS Extensions
+@cindex Server name indication
+
+A common problem in HTTPS servers is the fact that the @acronym{TLS}
+protocol is not aware of the hostname that a client connects to, when
+the handshake procedure begins. For that reason the @acronym{TLS}
+server has no way to know which certificate to send.
+
+This extension solves that problem within the @acronym{TLS} protocol,
+and allows a client to send the HTTP hostname before the handshake
+begins within the first handshake packet.  The functions
+@code{gnutls_server_name_set} and @code{gnutls_server_name_get} can be
+used to enable this extension, or to retrieve the name sent by a
+client.
 
 @node Copying This Manual
 @appendix Copying This Manual
