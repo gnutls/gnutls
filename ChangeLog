@@ -1,3 +1,10 @@
+2003-02-10 16:51  nmav <nmav@gnutls.org>
+
+	* lib/: debug.c, debug.h, gnutls.h.in.in, gnutls_errors.c,
+	gnutls_global.c, gnutls_ui.c, gnutls_ui.h:
+
+	renamed gnutls_x509_fingerprint to gnutls_fingerprint.  
+
 2003-02-09 09:53  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_dh_primes.c, src/prime.c:
