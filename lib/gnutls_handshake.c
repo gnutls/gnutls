@@ -39,6 +39,7 @@
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
 #include <gnutls_record.h>
+#include <gnutls_alert.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_log( "GNUTLS Error: %s (%d)\n", x,y)
@@ -1653,7 +1654,7 @@ int gnutls_rehandshake(GNUTLS_STATE state)
 
 	/* only server sends that handshake packet */
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_INVALID_REQUEST;
 
 	ret =
 	    _gnutls_send_empty_handshake(state, GNUTLS_HELLO_REQUEST,
@@ -1669,13 +1670,23 @@ int gnutls_rehandshake(GNUTLS_STATE state)
 	return 0;
 }
 
+static int _gnutls_abort_handshake( GNUTLS_STATE state, int ret) {
+	if ( ((ret==GNUTLS_E_WARNING_ALERT_RECEIVED) && 
+		( gnutls_alert_get_last(state) == GNUTLS_A_NO_RENEGOTIATION))
+		|| ret==GNUTLS_E_GOT_APPLICATION_DATA)
+			return 0;
+
+	/* this doesn't matter */
+	return GNUTLS_E_UNKNOWN_ERROR;
+}
+
 /**
   * gnutls_handshake - This the main function in the handshake protocol.
   * @state: is a a &GNUTLS_STATE structure.
   *
   * This function does the handshake of the TLS/SSL protocol,
-  * and initializes the TLS connection. Here the identity of the peer
-  * is checked automatically.
+  * and initializes the TLS connection. 
+  *
   * This function will fail if any problem is encountered,
   * and will return a negative error code. In case of a client,
   * if it has been asked to resume a session, but the server didn't, then
@@ -1684,6 +1695,12 @@ int gnutls_rehandshake(GNUTLS_STATE state)
   * This function may also return the non-fatal errors GNUTLS_E_AGAIN, or 
   * GNUTLS_E_INTERRUPTED. In that case you may resume the handshake
   * (call this function again, until it returns ok)
+  *
+  * If this function is called by a server after a rehandshake request
+  * then GNUTLS_E_GOT_APPLICATION_DATA or GNUTLS_E_WARNING_ALERT_RECEIVED 
+  * may be returned. Note that these are non fatal errors, only in the
+  * case of a rehandshake. In that case they mean that the client
+  * rejected the rehandshake request.
   *
   **/
 int gnutls_handshake(GNUTLS_STATE state)
@@ -1695,14 +1712,23 @@ int gnutls_handshake(GNUTLS_STATE state)
 	} else {
 		ret = gnutls_handshake_server(state);
 	}
-	if (ret < 0)
+	if (ret < 0) {
+		/* In the case of a rehandshake abort
+		 * we should reset the handshake's state
+		 */
+		if (_gnutls_abort_handshake( state, ret) == 0)
+			STATE = STATE0;
 		return ret;
-
+	}
+	
 	ret = gnutls_handshake_common(state);
 
-	if (ret < 0)
+	if (ret < 0) {
+		if (_gnutls_abort_handshake( state, ret) == 0)
+			STATE = STATE0;
 		return ret;
-
+	}
+	
 	STATE = STATE0;
 
 	_gnutls_handshake_io_buffer_clear(state);

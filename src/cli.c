@@ -82,7 +82,7 @@ static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, 
 }
 
 const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
+const int kx_priority[] = { GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
 const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
@@ -309,9 +309,11 @@ int main(int argc, char** argv)
 				if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
 					printf("* Received alert [%d]\n", gnutls_alert_get_last(state));
 				if (ret==GNUTLS_E_REHANDSHAKE) {
+					/* gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
 					do {
 						ret = gnutls_handshake( state);
 					} while( ret==GNUTLS_E_AGAIN || ret==GNUTLS_E_INTERRUPTED);
+
 					if (ret==0) printf("* Rehandshake was performed\n");
 					else {
 						printf("* Rehandshake Failed [%d]\n", ret);

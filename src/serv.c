@@ -207,9 +207,12 @@ int read_request( GNUTLS_STATE state, char *data, int data_size, int rnl)
 }
 
 void check_alert( GNUTLS_STATE state, int ret) {
+int last_alert;
+
 	if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-		ret = gnutls_alert_get_last(state);
-		if (ret == GNUTLS_A_NO_RENEGOTIATION)
+		last_alert = gnutls_alert_get_last(state);
+		if (last_alert == GNUTLS_A_NO_RENEGOTIATION &&
+			ret == GNUTLS_E_WARNING_ALERT_RECEIVED)
 			printf("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
 		else
 			printf("* Received alert '%d'.\n", ret);

@@ -13,7 +13,8 @@ may warn about something (ie a warning alert was received), or
 indicate the some action has to be taken. This is the case with
 the error code GNUTLS\_E\_REHANDSHAKE returned by 
 \hyperref{gnutls\_read()}{gnutls\_read() (see Section }{)}{gnutls_read}.
-This error code requires a full handshake to be performed again, or an alert to be sent.
+This error code indicates that the server requests a rehandshake. The client
+may ignore this request, or may reply with an alert.
 You can test if an error code is a fatal one by using the
 \hyperref{gnutls\_error\_is\_fatal()}{gnutls\_error\_is\_fatal() (see Section }{)}{gnutls_error_is_fatal}.
 \par

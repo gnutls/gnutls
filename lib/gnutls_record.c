@@ -621,8 +621,6 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	int ret, ret2;
 	int header_size;
 
-	begin:
-
 	header_size = RECORD_HEADER_SIZE;
 	ret = 0;
 
@@ -859,10 +857,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			gnutls_assert();
 			gnutls_free(tmpdata);
 			
-			goto begin; /* ok we received the packet, 
-			             * and now we should get the one
-			             * we expected.
-			             */
+			return GNUTLS_E_GOT_APPLICATION_DATA;
 			
 			break;
 		case GNUTLS_HANDSHAKE:
@@ -1067,9 +1062,9 @@ ssize_t gnutls_write( GNUTLS_STATE state, const void *data, size_t sizeofdata) {
   * Also returns the number of bytes received, zero on EOF, but
   * a negative error code in case of an error.
   *
-  * If this function returns GNUTLS_E_REHANDSHAKE, then you must
-  * either send an alert containing NO_RENEGOTIATION, or perform a
-  * handshake. (only a client may receive this message)
+  * If this function returns GNUTLS_E_REHANDSHAKE, then you may
+  * ignore this message, send an alert containing NO_RENEGOTIATION, 
+  * or perform a handshake again. (only a client may receive this message)
   *
   **/
 ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata) {
