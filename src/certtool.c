@@ -939,7 +939,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 {
     int ret;
     unsigned int i, indx, j, version;
-    unsigned int critical, key_usage;
+    unsigned int critical, key_usage, bits;
     time_t tim;
     char serial[40];
     size_t serial_size = sizeof(serial), dn_size, size;
@@ -1010,13 +1010,15 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     /* Public key algorithm
      */
     fprintf(out, "Subject Public Key Info:\n");
-    ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
+    ret = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
     fprintf(out, "\tPublic Key Algorithm: ");
 
     cprint = gnutls_pk_algorithm_get_name(ret);
     if (cprint == NULL)
 	cprint = UNKNOWN;
-    fprintf(out, "%s\n", cprint);
+    fprintf(out, "%s", cprint);
+    if (bits) fprintf(out,  " (%u bits)", bits);
+    fprintf(out, "\n");
 
 
     if (version >= 3)
