@@ -14,8 +14,8 @@ and prevent future renegotiations using the current session ID.
 
 \par The alert messages are protected by the record protocol, thus
 the information that is included does not leak. You must take
-extreme care for the alert information not to leak to a possible attacker
-(via public log files etc).
+extreme care for the alert information not to leak to a possible attacker, 
+via public log files etc.
 
 \par
 \begin{itemize}
@@ -26,5 +26,5 @@ to map a gnutls error number to an alert signal.
 \item \printfunc{gnutls_alert_get}{gnutls\_alert\_get}:
 returns the last received alert.
 \item \printfunc{gnutls_alert_get_name}{gnutls\_alert\_get\_name}:
-returns the name (in a character array) of the given alert.
+returns the name, in a character array, of the given alert.
 \end{itemize}
