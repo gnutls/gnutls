@@ -71,7 +71,7 @@ static const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
  * Return: e and if ret_x is not NULL x.
  * It also returns g and p.
  */
-MPI _gnutls_calc_dh_secret(MPI * ret_x)
+MPI gnutls_calc_dh_secret(MPI * ret_x)
 {
 	MPI e, g, x, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;
@@ -117,7 +117,7 @@ MPI _gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 }
 
 /* returns g and p */
-MPI _gnutls_get_dh_params(MPI * ret_p)
+MPI gnutls_get_dh_params(MPI * ret_p)
 {
 	MPI g, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;
@@ -136,7 +136,7 @@ MPI _gnutls_get_dh_params(MPI * ret_p)
 }
 
 
-MPI _gnutls_calc_dh_key(MPI f, MPI x)
+MPI gnutls_calc_dh_key(MPI f, MPI x)
 {
 	MPI k, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;

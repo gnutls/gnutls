@@ -54,11 +54,11 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
 
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == GNUTLS_KX_ANON_DH) {
-			X = _gnutls_calc_dh_secret(&x);
+			X = gnutls_calc_dh_secret(&x);
 
 			state->gnutls_internals.dh_secret = x;
 
-			g = _gnutls_get_dh_params(&p);
+			g = gnutls_get_dh_params(&p);
 
 			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
 				       &n_g, g);
@@ -325,7 +325,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 			_n_Y = n_Y;
 			
 			gcry_mpi_scan( &state->gnutls_internals.client_Y, GCRYMPI_FMT_STD, &data[3], &_n_Y);
-			state->gnutls_internals.KEY = _gnutls_calc_dh_key( state->gnutls_internals.client_Y, state->gnutls_internals.dh_secret);
+			state->gnutls_internals.KEY = gnutls_calc_dh_key( state->gnutls_internals.client_Y, state->gnutls_internals.dh_secret);
 
 			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
 				       &premaster_size, state->gnutls_internals.KEY);
