@@ -161,7 +161,6 @@ static void _gnutls_extension_list_add( GNUTLS_STATE state, uint8 type) {
 		} else {
 #ifdef DEBUG
 			_gnutls_log("EXT: Increase MAX_EXT_TYPES\n");
-			exit(1);
 #endif
 		}
 	}

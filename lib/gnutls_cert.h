@@ -5,12 +5,30 @@
 #include <x509_asn1.h>
 #include <gnutls_ui.h>
 
-#define MAX_PARAMS_SIZE 2 /* ok for RSA */
+#define MAX_PARAMS_SIZE 5 /* ok for RSA and DSA */
+
+/* parameters should not be larger than this limit */
+#define MAX_PARAMETER_SIZE 1200
+#define DSA_PARAMS 5
+#define RSA_PARAMS 2
+
+#if MAX_PARAMS_SIZE - RSA_PARAMS < 0
+# error INCREASE RSA_PARAMS
+#endif
+
+#if MAX_PARAMS_SIZE - DSA_PARAMS < 0
+# error INCREASE DSA_PARAMS
+#endif
+
 typedef struct gnutls_cert {
 	MPI params[MAX_PARAMS_SIZE];	/* the size of params depends on the public 
 				 * key algorithm 
 				 * RSA: [0] is modulus
 				 *      [1] is public exponent
+				 * DSA: [0] is p
+				 *      [1] is q
+				 *      [2] is g
+				 *      [3] is pub
 				 */
 	PKAlgorithm subject_pk_algorithm;
 
@@ -39,6 +57,14 @@ typedef struct {
 	MPI params[MAX_PARAMS_SIZE];/* the size of params depends on the public 
 				 * key algorithm 
 				 */
+				/*
+				 * DSA: [0] is p
+				 *      [1] is q
+				 *      [2] is g
+				 *      [3] is Y (public)
+				 *      [4] is priv
+				 */
+
 	PKAlgorithm pk_algorithm;
 
 	gnutls_datum raw; /* the raw key */

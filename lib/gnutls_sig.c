@@ -65,12 +65,10 @@ GNUTLS_MAC_HANDLE td_sha;
 	dconcat.data = concat;
 	dconcat.size = 36;
 
-	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &dconcat, signature);
-	if (ret < 0) {
+	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
+	if (ret < 0)
 		gnutls_assert();
-		return ret;
-	}
-
+	
 	return ret;
 
 }
@@ -113,23 +111,20 @@ opaque concat[36];
 	dconcat.data = concat;
 	dconcat.size = 36;
 	
-	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &dconcat, signature);
-
-	if (ret < 0) {
+	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
+	if (ret < 0)
 		gnutls_assert();
-		return ret;
-	}
-
+	
 	return ret;
 
 }
 
 
-/* This will create a PKCS1 signature, as defined in the TLS protocol.
+/* This will create a PKCS1 or DSA signature, as defined in the TLS protocol.
  * Cert is the certificate of the corresponding private key. It is only checked if
  * it supports signing.
  */
-int _gnutls_pkcs1_rsa_generate_sig( gnutls_cert* cert, gnutls_private_key *pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
+int _gnutls_generate_sig( gnutls_cert* cert, gnutls_private_key *pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
 {
 int ret;
 gnutls_datum tmpdata;
@@ -146,10 +141,28 @@ gnutls_datum tmpdata;
 
 	switch(pkey->pk_algorithm) {
 		case GNUTLS_PK_RSA:
-			
 			tmpdata.data = hash_concat->data;
 			tmpdata.size = hash_concat->size; /* md5 + sha */
 
+			/* encrypt */
+			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params[0], pkey->params[1], 1)) < 0) {
+			     gnutls_assert();
+			     return ret;
+			}
+
+			break;
+		case GNUTLS_PK_DSA:
+			/* Ok this is silly. We have calculated
+			 * md5 also!
+			 */
+			tmpdata.data = &hash_concat->data[16];
+			tmpdata.size = 20; /* sha */
+
+			/* sign */
+			if ((ret=_gnutls_dsa_sign( signature, tmpdata, pkey->params[0], pkey->params[1], pkey->params[2], pkey->params[3])) < 0) {
+			     gnutls_assert();
+			     return ret;
+			}
 			break;
 		default:
 			gnutls_assert();
@@ -158,18 +171,15 @@ gnutls_datum tmpdata;
 	}
 
 
-	/* encrypt der */
-	if ( (ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params[0], pkey->params[1], 1)) < 0) {
-	     gnutls_assert();
-	     return ret;
-	}
 
 	return 0;
 }
 
+
+
 int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_concat, gnutls_datum *signature) {
 	int ret;
-	gnutls_datum plain, vdata;
+	gnutls_datum vdata;
 
 	if (cert->version == 0 || cert==NULL) {                /* this is the only way to check
 							       * if it is initialized
@@ -193,30 +203,32 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 			vdata.data = hash_concat->data;
 			vdata.size = hash_concat->size;
 
+			/* verify signature */
+			if ( (ret=_gnutls_rsa_verify( &vdata, signature, cert->params[1], cert->params[0], 1)) < 0) {
+			     gnutls_assert();
+			     return ret;
+			}
+
+			break;
+		case GNUTLS_PK_DSA:
+			
+			vdata.data = &hash_concat->data[16];
+			vdata.size = 20; /* sha1 */
+
+			/* decrypt signature */
+			if ( (ret=_gnutls_dsa_verify( &vdata, *signature, cert->params[0], 
+				cert->params[1], cert->params[2], cert->params[3])) < 0) {
+			     gnutls_assert();
+			     return ret;
+			}
+
 			break;
 		default:
 			gnutls_assert();
 			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 	
-	/* decrypt signature */
-	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &plain, *signature, cert->params[1], cert->params[0], 1)) < 0) {
-	     gnutls_assert();
-	     return ret;
-	}
 
-	if (plain.size != vdata.size) {
-		gnutls_assert();
-		gnutls_sfree_datum( &plain);
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
-	}
-
-	if ( memcmp(plain.data, vdata.data, plain.size)!=0) {
-		gnutls_assert();
-		gnutls_sfree_datum( &plain);
-		return GNUTLS_E_PK_SIGNATURE_FAILED;
-	}
-	gnutls_sfree_datum( &plain);
 
 	return 0;
 }

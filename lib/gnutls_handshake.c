@@ -359,7 +359,11 @@ opaque * data;
 	/* We check if there are pending data to hash.
 	 */
 	siz = _gnutls_handshake_buffer_get_size(state);
-	
+	if (siz < 0) {
+		gnutls_assert();
+		return siz;
+	}
+
 	if (siz > 0) { /* if there are data to hash */
 		data = gnutls_malloc(siz);
 		if (data == NULL) {

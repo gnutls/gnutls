@@ -613,9 +613,10 @@ sha1WithRSAEncryption OBJECT IDENTIFIER  ::=  { pkcs-1 5 }
 id-dsa-with-sha1 OBJECT IDENTIFIER ::=  {
      iso(1) member-body(2) us(840) x9-57 (10040) x9algorithm(4) 3 }
 
-Dss-Sig-Value  ::=  SEQUENCE  {
+Dss-Sig-Value ::= SEQUENCE {
      r       INTEGER,
-     s       INTEGER  }
+     s       INTEGER  
+}
 
 dhpublicnumber OBJECT IDENTIFIER ::= {
      iso(1) member-body(2) us(840) ansi-x942(10046) number-type(2) 1 }

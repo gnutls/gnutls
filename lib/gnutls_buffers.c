@@ -160,7 +160,7 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 		memcpy(data, state->gnutls_internals.application_data_buffer.data, length);
 
 		/* overwrite buffer */
-		memcpy(state->gnutls_internals.application_data_buffer.data,
+		memmove(state->gnutls_internals.application_data_buffer.data,
 			&state->gnutls_internals.application_data_buffer.data[length],
 			state->gnutls_internals.application_data_buffer.size);
 		state->gnutls_internals.application_data_buffer.data =
@@ -179,7 +179,7 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 		memcpy(data, state->gnutls_internals.handshake_data_buffer.data, length);
 
 		/* overwrite buffer */
-		memcpy(state->gnutls_internals.handshake_data_buffer.data,
+		memmove(state->gnutls_internals.handshake_data_buffer.data,
 			&state->gnutls_internals.handshake_data_buffer.data[length],
 			state->gnutls_internals.handshake_data_buffer.size);
 		state->gnutls_internals.handshake_data_buffer.data =
@@ -902,18 +902,22 @@ int _gnutls_handshake_buffer_get( GNUTLS_STATE state, char *data, int length)
 	state->gnutls_internals.handshake_hash_buffer.size -= length;
 	memcpy(data, state->gnutls_internals.handshake_hash_buffer.data, length);
 	/* overwrite buffer */
-	memcpy(state->gnutls_internals.handshake_hash_buffer.data,
-		&state->gnutls_internals.handshake_hash_buffer.data[length],
-		state->gnutls_internals.handshake_hash_buffer.size);
-	state->gnutls_internals.handshake_hash_buffer.data =
-	    gnutls_realloc_fast(state->gnutls_internals.handshake_hash_buffer.data,
-			   state->gnutls_internals.handshake_hash_buffer.size);
+	
+	if (state->gnutls_internals.handshake_hash_buffer.size > 0) {
+		memmove(state->gnutls_internals.handshake_hash_buffer.data,
+			&state->gnutls_internals.handshake_hash_buffer.data[length],
+			state->gnutls_internals.handshake_hash_buffer.size);
 
-	if (state->gnutls_internals.handshake_hash_buffer.data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		state->gnutls_internals.handshake_hash_buffer.data =
+		    gnutls_realloc_fast(state->gnutls_internals.handshake_hash_buffer.data,
+				   state->gnutls_internals.handshake_hash_buffer.size);
+
+		if (state->gnutls_internals.handshake_hash_buffer.data == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 	}
-
+	
 	return length;	
 
 }

@@ -8,7 +8,11 @@ typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
 int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI ** pkey);
 int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 		      MPI pkey, MPI n, int btype);
+int _gnutls_dsa_sign(gnutls_datum * signature, gnutls_datum plaintext,
+		      MPI p, MPI q, MPI g, MPI Y);
 int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 		      MPI pkey, MPI n, int btype);
+int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertext, 
+	MPI pkey, MPI n, int btype);
 
 #endif /* GNUTLS_PK_H */

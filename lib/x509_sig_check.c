@@ -81,7 +81,7 @@ int result;
 opaque str[1024];
 int len;
 
-	if (asn1_create_structure( _gnutls_get_pkcs(), "PKCS-1.DigestInfo", &dinfo, "digest_info")!=ASN_OK) {
+	if (asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DigestInfo", &dinfo, "digest_info")!=ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
@@ -182,6 +182,13 @@ _pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e, MPI m
 	return 0;		
 }
 
+#ifdef DEBUG
+/* This is for CA DSS params - can wait */
+# warning CHECK HERE FOR DSS
+#endif
+
+/* verifies if the certificate is properly signed.
+ */
 CertificateStatus gnutls_x509_verify_signature(gnutls_cert* cert, gnutls_cert* issuer) {
 gnutls_datum signature;
 gnutls_datum tbs;
@@ -218,8 +225,8 @@ static int _gnutls_digestinfo_encode( opaque* data, int data_size, char* OID, gn
 node_asn *di;
 int result;
 
-	if (asn1_create_structure( _gnutls_get_pkcs(),
-                    "PKCS-1.DigestInfo", &di, "di") != ASN_OK) {
+	if (asn1_create_structure( _gnutls_get_gnutls_asn(),
+                    "GNUTLS.DigestInfo", &di, "di") != ASN_OK) {
         	gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}

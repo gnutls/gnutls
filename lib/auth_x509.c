@@ -607,16 +607,15 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	return 0;
 }
 
-
-#ifdef DEBUG
-# warning CHECK FOR DSS
-#endif
-
-#define RSA_SIGN 1
+enum CertificateSigType { RSA_SIGN=1, DSA_SIGN=2 };
+/* Checks if we support the given signature algorithm 
+ * (RSA or DSA). Returns 0 if true.
+ */
 int _gnutls_check_supported_sign_algo(uint8 algo)
 {
 	switch (algo) {
 	case RSA_SIGN:
+	case DSA_SIGN:
 		return 0;
 	}
 
@@ -653,7 +652,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 	size = p[0];
 	p += 1;
 
-	/* FIXME: Add support for DSS certificates too
+	/* check if the sign algorithm is supported.
 	 */
 	found = 0;
 	for (i = 0; i < size; i++, p++) {
@@ -674,6 +673,9 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 		return 0;
 	}
 
+	/* now we ask the user to tell which one
+	 * he wants to use.
+	 */
 	DECR_LEN(dsize, size);
 	if ((ret =
 	     _gnutls_find_acceptable_client_cert(state, p, size,
@@ -782,7 +784,7 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 	return 0;
 }
 
-#define CERTTYPE_SIZE 2
+#define CERTTYPE_SIZE 3
 int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 {
 	const GNUTLS_X509PKI_CREDENTIALS cred;
@@ -814,10 +816,9 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	}
 
 	pdata[0] = CERTTYPE_SIZE - 1;
-#ifdef DEBUG
-# warning CHECK HERE FOR DSS
-#endif
-	pdata[1] = RSA_SIGN;	/* only this for now */
+
+	pdata[1] = RSA_SIGN;
+	pdata[2] = DSA_SIGN;	/* only these for now */
 	pdata += CERTTYPE_SIZE;
 
 	WRITEdatum16(pdata, cred->rdn_sequence);
@@ -847,6 +848,7 @@ int _gnutls_find_apr_cert(GNUTLS_STATE state, gnutls_cert ** apr_cert_list,
 		*apr_cert_list_length = 0;
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
+
 
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 
@@ -882,6 +884,9 @@ int _gnutls_find_apr_cert(GNUTLS_STATE state, gnutls_cert ** apr_cert_list,
 			/* it is allowed not to have a certificate 
 			 */
 		} else {
+			/* we had already decided which certificate
+			 * to send.
+			 */
 			ind =
 			    state->gnutls_internals.
 			    client_certificate_index;

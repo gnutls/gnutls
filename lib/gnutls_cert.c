@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -35,10 +35,6 @@
 #include <gnutls_dh.h>
 #include <gnutls_str.h>
 
-#ifdef DEBUG
-# warning MAX ALGORITHM PARAMS == 2, ok for RSA
-#endif
-
 /* KX mappings to PK algorithms */
 typedef struct {
 	KXAlgorithm kx_algorithm;
@@ -73,6 +69,29 @@ PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
 
 	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm);
 	return ret;
+}
+
+/* this function reads an integer
+ * from asn1 structs. Combines the read and mpi_scan
+ * steps.
+ */
+static
+int _gnutls_x509_read_int( node_asn* node, char* value, char* tmpstr, int tmpstr_size, MPI* ret_mpi) {
+int len, result;
+
+	len = tmpstr_size - 1;
+	result = asn1_read_value(node, value, tmpstr, &len);
+	if (result != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	if (_gnutls_mpi_scan( ret_mpi, tmpstr, &len) != 0) {
+		gnutls_assert();
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	return 0;
 }
 
 void gnutls_free_cert(gnutls_cert cert)
@@ -270,15 +289,26 @@ static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_si
 
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
+ * 2002-01-26: Added ability to read DSA keys.
  */
 static int read_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *key, int key_size)
 {
 	int siz, ret;
 	opaque *b64;
 	gnutls_datum tmp;
+	PKAlgorithm pk;
 
 	/* read PKCS-1 private key */
 	siz = key_size;
+
+	
+	/* If we find the "DSA PRIVATE" string in the
+	 * pem encoded certificate then it's a DSA key.
+	 */
+	if (strstr( key, "DSA PRIVATE")!=NULL) 
+		pk = GNUTLS_PK_DSA;
+	else
+		pk = GNUTLS_PK_RSA;
 
 	siz = _gnutls_fbase64_decode(key, siz, &b64);
 
@@ -290,14 +320,27 @@ static int read_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *key, int key
 
 	tmp.data = b64;
 	tmp.size = siz;
-	if ((ret =
-	     _gnutls_pkcs1key2gnutlsKey(&res->pkey[res->ncerts],
-					tmp)) < 0) {
-		gnutls_assert();
-		gnutls_free(b64);
-		return ret;
+	
+	switch (pk) { /* decode the key */
+		case GNUTLS_PK_RSA:
+			if ((ret =
+			     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
+							tmp)) < 0) {
+				gnutls_assert();
+				gnutls_free(b64);
+				return ret;
+			}
+			break;
+		case GNUTLS_PK_DSA:
+			if ((ret =
+			     _gnutls_DSAkey2gnutlsKey(&res->pkey[res->ncerts],
+							tmp)) < 0) {
+				gnutls_assert();
+				gnutls_free(b64);
+				return ret;
+			}
+			break;	
 	}
-
 	gnutls_free(b64);
 
 	return 0;
@@ -413,6 +456,18 @@ int gnutls_x509pki_allocate_sc(GNUTLS_X509PKI_CREDENTIALS * res, int ncerts)
 	return 0;
 }
 
+/* returns error if the certificate has different algorithm than
+ * the given key parameters.
+ */
+static int _gnutls_check_key_cert_match( GNUTLS_X509PKI_CREDENTIALS res) {
+	if (res->pkey->pk_algorithm != res->cert_list[0]->subject_pk_algorithm) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
+	}
+	return 0;
+}
+
+
 /**
   * gnutls_x509pki_set_key_file - Used to set keys in a GNUTLS_X509PKI_CREDENTIALS structure
   * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
@@ -425,7 +480,7 @@ int gnutls_x509pki_allocate_sc(GNUTLS_X509PKI_CREDENTIALS * res, int ncerts)
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
-  * Currently only PKCS-1 PEM encoded RSA private keys are accepted by
+  * Currently only PKCS-1 PEM encoded RSA and DSA private keys are accepted by
   * this function.
   *
   **/
@@ -441,6 +496,11 @@ int gnutls_x509pki_set_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE,
 
 	if ((ret = read_cert_file(res, CERTFILE)) < 0)
 		return ret;
+
+	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0;
 }
@@ -575,18 +635,23 @@ int gnutls_x509pki_set_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datu
 	if ((ret = read_cert_mem( res, CERT->data, CERT->size)) < 0)
 		return ret;
 
+	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	return 0;
 }
 
 
 static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 {
-	opaque str[MAX_X509_CERT_SIZE];
-	int len, result;
+	opaque str[MAX_PARAMETER_SIZE];
+	int result;
 	node_asn *spk;
 
 	if (asn1_create_structure
-	    (_gnutls_get_pkcs(), "PKCS-1.RSAPublicKey", &spk,
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk,
 	     "rsa_public_key") != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
@@ -600,36 +665,20 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	len = sizeof(str) - 1;
-	result = asn1_read_value(spk, "rsa_public_key.modulus", str, &len);
-	if (result != ASN_OK) {
+
+	if ( (result=_gnutls_x509_read_int( spk, "rsa_public_key.modulus", 
+		str, sizeof(str)-1, &params[0])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(spk);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	if (_gnutls_mpi_scan(&params[0], str, &len) != 0) {
-		gnutls_assert();
-		asn1_delete_structure(spk);
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	len = sizeof(str) - 1;
-	result =
-	    asn1_read_value(spk, "rsa_public_key.publicExponent", str,
-			    &len);
-	if (result != ASN_OK) {
+	if ( (result=_gnutls_x509_read_int( spk, "rsa_public_key.publicExponent", 
+		str, sizeof(str)-1, &params[1])) < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&params[0]);
 		asn1_delete_structure(spk);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	if (_gnutls_mpi_scan(&params[1], str, &len) != 0) {
-		gnutls_assert();
-		_gnutls_mpi_release(&params[0]);
-		asn1_delete_structure(spk);
-		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	asn1_delete_structure(spk);
@@ -637,6 +686,109 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 	return 0;
 
 }
+
+
+/* reads p,q and g 
+ * from the certificate 
+ * params[0-2]
+ */
+static int _read_dsa_params(opaque * der, int dersize, MPI * params)
+{
+	opaque str[MAX_PARAMETER_SIZE];
+	int result;
+	node_asn *spk;
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Dss-Parms", &spk,
+	     "dsa_parms") != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der(spk, der, dersize);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(spk);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	/* FIXME: If the parameters are not included in the certificate
+	 * then the issuer's parameters should be used.
+	 */
+
+	/* Read p */
+
+	if ( (result=_gnutls_x509_read_int( spk, "dsa_parms.p", str, sizeof(str)-1, &params[0])) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(spk);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	/* Read q */
+
+	if ( (result=_gnutls_x509_read_int( spk, "dsa_parms.q", str, sizeof(str)-1, &params[1])) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(spk);
+		_gnutls_mpi_release(&params[0]);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	/* Read g */
+	
+	if ( (result=_gnutls_x509_read_int( spk, "dsa_parms.g", str, sizeof(str)-1, &params[2])) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(spk);
+		_gnutls_mpi_release(&params[0]);
+		_gnutls_mpi_release(&params[1]);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	asn1_delete_structure(spk);
+
+	return 0;
+
+}
+
+/* reads DSA's Y
+ * from the certificate 
+ * params[3]
+ */
+static int _read_dsa_pubkey(opaque * der, int dersize, MPI * params)
+{
+	opaque str[MAX_PARAMETER_SIZE];
+	int result;
+	node_asn *spk;
+
+	if ( (result=asn1_create_structure
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &spk,
+	     "dsa_public_key")) != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der(spk, der, dersize);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(spk);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	/* Read p */
+
+	if ( (result=_gnutls_x509_read_int( spk, "dsa_public_key", str, sizeof(str)-1, &params[3])) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(spk);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	asn1_delete_structure(spk);
+
+	return 0;
+
+}
+
 
 #define _READ(a, aa, b, c, d, e, res, f) \
 	result = _IREAD(a, aa, sizeof(aa), b, c, d, e, res, sizeof(res)-1, f); \
@@ -898,9 +1050,113 @@ int _gnutls_get_version(node_asn * c2, char *root)
 	return (int) gversion[0] + 1;
 }
 
-#ifdef DEBUG
-# warning FIX THIS FOR DSS
-#endif
+
+/* Extracts DSA and RSA parameters from a certificate.
+ */
+static 
+int _gnutls_extract_cert_mpi_params( const char* ALGO_OID, gnutls_cert * gCert,
+	node_asn* c2, char* tmpstr, int tmpstr_size) {
+int len, result;
+	
+	if (strcmp( ALGO_OID, "1 2 840 113549 1 1 1") == 0) {	/* pkix-1 1 - RSA */
+		/* params[0] is the modulus,
+		 * params[1] is the exponent
+		 */
+		gCert->subject_pk_algorithm = GNUTLS_PK_RSA;
+
+		len = tmpstr_size - 1;
+		result =
+		    asn1_read_value
+		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+		     tmpstr, &len);
+
+		if (result != ASN_OK) {
+			gnutls_assert();
+			return GNUTLS_E_ASN1_PARSING_ERROR;
+		}
+
+		if ((sizeof(gCert->params) / sizeof(MPI)) < RSA_PARAMS) {
+			gnutls_assert();
+			/* internal error. Increase the MPIs in params */
+			return GNUTLS_E_INTERNAL;
+		}
+
+		if ((result =
+		     _read_rsa_params(tmpstr, len / 8, gCert->params)) < 0) {
+			gnutls_assert();
+			return result;
+		}
+		
+		return 0;
+	}
+
+	if (strcmp( ALGO_OID, "1 2 840 10040 4 1") == 0) {	/* pkix-1 1 - DSA */
+		/* params[0] is p,
+		 * params[1] is q,
+		 * params[2] is q,
+		 * params[3] is pub.
+		 */
+		gCert->subject_pk_algorithm = GNUTLS_PK_DSA;
+
+		len = tmpstr_size - 1;
+		result =
+		    asn1_read_value
+		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+		     tmpstr, &len);
+
+		if (result != ASN_OK) {
+			gnutls_assert();
+			return GNUTLS_E_ASN1_PARSING_ERROR;
+		}
+
+		if ((sizeof(gCert->params) / sizeof(MPI)) < DSA_PARAMS) {
+			gnutls_assert();
+			/* internal error. Increase the MPIs in params */
+			return GNUTLS_E_INTERNAL;
+		}
+
+		if ((result =
+		     _read_dsa_pubkey(tmpstr, len / 8, gCert->params)) < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		/* Now read the parameters
+		 */
+		len = tmpstr_size - 1;
+		result =
+		    asn1_read_value
+		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
+		     tmpstr, &len);
+
+		if (result != ASN_OK) {
+			gnutls_assert();
+			return GNUTLS_E_ASN1_PARSING_ERROR;
+		}
+
+		if ((result =
+		     _read_dsa_params(tmpstr, len, gCert->params)) < 0) {
+			gnutls_assert();
+			return result;
+		}
+		
+		return 0;
+	}
+
+
+
+	/* other types like DH
+	 * currently not supported
+	 */
+	gnutls_assert();
+
+	_gnutls_log("CERT: ALGORITHM: %s\n", ALGO_OID);
+
+	gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
+
+	return GNUTLS_E_INVALID_PARAMETERS;
+}
+
 
 /* This function will convert a der certificate, to a format
  * (structure) that gnutls can understand and use. Actually the
@@ -958,52 +1214,11 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	if (strcmp(str, "1 2 840 113549 1 1 1") == 0) {	/* pkix-1 1 - RSA */
-		/* params[0] is the modulus,
-		 * params[1] is the exponent
-		 */
-		gCert->subject_pk_algorithm = GNUTLS_PK_RSA;
-
-		len = sizeof(str) - 1;
-		result =
-		    asn1_read_value
-		    (c2,
-		     "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-		     str, &len);
-
-		if (result != ASN_OK) {
-			gnutls_assert();
-			asn1_delete_structure(c2);
-			gnutls_free_datum( &gCert->raw);
-			return GNUTLS_E_ASN1_PARSING_ERROR;
-		}
-
-		if ((sizeof(gCert->params) / sizeof(MPI)) < 2) {
-			gnutls_assert();
-			/* internal error. Increase the MPIs in params */
-			asn1_delete_structure(c2);
-			gnutls_free_datum( &gCert->raw);
-			return GNUTLS_E_UNKNOWN_ERROR;
-		}
-
-		if ((result =
-		     _read_rsa_params(str, len / 8, gCert->params)) < 0) {
-			gnutls_assert();
-			asn1_delete_structure(c2);
-			gnutls_free_datum( &gCert->raw);
-			return result;
-		}
-
-	} else {
-		/* other types like DH, DSA
-		 * currently not supported
-		 */
+	if ( (result=_gnutls_extract_cert_mpi_params( str, gCert, c2, str, sizeof(str))) < 0) {
 		gnutls_assert();
-
-		_gnutls_log("CERT: ALGORITHM: %s\n", str);
-
-		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
-
+		asn1_delete_structure(c2);
+		gnutls_free_datum( &gCert->raw);
+		return result;
 	}
 
 	len = sizeof(gCert->signature);

@@ -4,7 +4,7 @@ bin_SCRIPTS = libgnutls-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
 
-EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
+EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_cipher.h gnutls_buffers.h gnutls_errors.h gnutls_int.h \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
@@ -34,7 +34,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_datum.c auth_rsa.c gnutls_session_pack.c \
 	gnutls_gcry.c gnutls_pk.c gnutls_cert.c x509_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
-	x509_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c gnutls_mem.c \
+	x509_sig_check.c pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c \
 	x509_extensions.c auth_x509.c gnutls_ui.c gnutls_sig.c auth_dhe_rsa.c \
 	gnutls_dh_primes.c ext_max_record.c gnutls_alert.c gnutls_int_compat.c \
 	gnutls_str.c
@@ -49,8 +49,8 @@ libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 pkix_asn1_tab.c: pkix.asn
 	-../src/asn1c pkix.asn pkix_asn1_tab.c
 
-pkcs1_asn1_tab.c: pkcs1.asn
-	-../src/asn1c pkcs1.asn pkcs1_asn1_tab.c
+gnutls_asn1_tab.c: gnutls.asn
+	-../src/asn1c gnutls.asn gnutls_asn1_tab.c
 
 gnutls-api.tex: $(COBJECTS)
 	@echo "\\newpage" > gnutls-api.tex

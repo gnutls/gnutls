@@ -38,8 +38,6 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 	
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
-			gnutls_assert();
-			
 			if ( data_size != 1) {
 				gnutls_assert();
 				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;

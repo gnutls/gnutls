@@ -25,7 +25,7 @@
 
 
 /* created by asn1c */
-extern const static_asn pkcs1_asn1_tab[];
+extern const static_asn gnutls_asn1_tab[];
 extern const static_asn pkix_asn1_tab[];
 
 
@@ -35,14 +35,14 @@ typedef void (*LOG_FUNC)( const char*);
 LOG_FUNC _gnutls_log_func;
 
 static node_asn *PKIX1_ASN;
-static node_asn *PKCS1_ASN;
+static node_asn *GNUTLS_ASN;
 
 node_asn* _gnutls_get_pkix(void) {
 	return PKIX1_ASN;
 }
 
-node_asn* _gnutls_get_pkcs(void) {
-	return PKCS1_ASN;
+node_asn* _gnutls_get_gnutls_asn(void) {
+	return GNUTLS_ASN;
 }
 
 
@@ -108,7 +108,7 @@ int gnutls_global_init( void)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	result=asn1_create_tree( (void*)pkcs1_asn1_tab, &PKCS1_ASN);
+	result=asn1_create_tree( (void*)gnutls_asn1_tab, &GNUTLS_ASN);
 	if (result != ASN_OK) {
 		asn1_delete_structure( PKIX1_ASN);
 		return GNUTLS_E_PARSING_ERROR;
@@ -135,7 +135,7 @@ void gnutls_global_deinit( void) {
 	_gnutls_init--;
 
 	if (_gnutls_init==0) {
-		asn1_delete_structure( PKCS1_ASN);
+		asn1_delete_structure( GNUTLS_ASN);
 		asn1_delete_structure( PKIX1_ASN);
 	
 		_gnutls_dh_clear_mpis();

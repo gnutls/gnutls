@@ -1,11 +1,11 @@
-PKCS-1 {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) pkcs-1(1)  modules(0) pkcs-1(1)}
+GNUTLS { 0 }
 
 DEFINITIONS EXPLICIT TAGS ::=
 
 BEGIN
 
-
--- Main structures
+-- This file contains parts of PKCS-1 structures and some stuff
+-- required for DSA keys.
 
 RSAPublicKey ::= SEQUENCE {
         modulus                 INTEGER, -- n
@@ -60,5 +60,21 @@ DigestAlgorithmIdentifier ::= AlgorithmIdentifier
 
 Digest ::= OCTET STRING
 
+DSAPublicKey ::= INTEGER
+
+DSAParameters ::= SEQUENCE {
+        p                   INTEGER,
+        q                   INTEGER,
+        g                   INTEGER
+}
+
+DSAPrivateKey ::= SEQUENCE {
+        version          	INTEGER, -- should be zero
+        p          		INTEGER,
+        q   			INTEGER,
+        g  			INTEGER,
+        Y	     	      	INTEGER, -- public
+	priv           		INTEGER
+}
 
 END
