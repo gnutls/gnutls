@@ -77,7 +77,7 @@ int i;
 	i++;
 
 	if (_gnutls_kx_algorithms[i].name==NULL && (i < _gnutls_kx_algorithms_size-1)) {
-		_gnutls_kx_algorithms[i].name = "SRP_RSA";
+		_gnutls_kx_algorithms[i].name = "SRP RSA";
 		_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP_RSA;
 		_gnutls_kx_algorithms[i].auth_struct = &srp_rsa_auth_struct;
 		_gnutls_kx_algorithms[i+1].name = 0;
@@ -85,7 +85,7 @@ int i;
 	i++;
 
 	if (_gnutls_kx_algorithms[i].name==NULL && (i < _gnutls_kx_algorithms_size-1)) {
-		_gnutls_kx_algorithms[i].name = "SRP_DSS";
+		_gnutls_kx_algorithms[i].name = "SRP DSS";
 		_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP_DSS;
 		_gnutls_kx_algorithms[i].auth_struct = &srp_dss_auth_struct;
 		_gnutls_kx_algorithms[i+1].name = 0;
