@@ -41,6 +41,11 @@
 #define MAX24 16777215
 #define MAX16 65535
 
+/* The sequence of handshake messages should not
+ * be larger than this value.
+ */
+#define MAX_HANDSHAKE_DATA_BUFFER_SIZE 128*1024
+
 #define TLS_RANDOM_SIZE 32
 #define TLS_MAX_SESSION_ID_SIZE 32
 #define TLS_MASTER_SIZE 48
@@ -376,6 +381,7 @@ typedef struct {
 	 */
 	int				(*x509_client_cert_callback)(void*,void*,int, void*, int);
 	gnutls_cert			peer_cert;
+	int				max_handshake_data_buffer_size;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

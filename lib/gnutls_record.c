@@ -103,6 +103,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 
+	gnutls_set_max_handshake_data_buffer_size( (*state), MAX_HANDSHAKE_DATA_BUFFER_SIZE);
+
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
 	 */

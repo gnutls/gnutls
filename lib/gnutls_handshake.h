@@ -34,6 +34,7 @@ void _gnutls_set_server_random( GNUTLS_STATE state, uint8* random);
 void _gnutls_set_client_random( GNUTLS_STATE state, uint8* random);
 int _gnutls_create_random( opaque* dst);
 int _gnutls_remove_unwanted_ciphersuites( GNUTLS_STATE state, GNUTLS_CipherSuite ** cipherSuites, int numCipherSuites);
+void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max);
 
 #define set_adv_version( state, major, minor) \
 	state->gnutls_internals.adv_version_major = data[pos]; \

@@ -58,5 +58,6 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
 void _gnutls_int2str(int k, char* data);
 int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_DN * dn);
 void gnutls_free_cert(gnutls_cert cert);
+int _gnutls_check_x509_key_usage(gnutls_cert * cert, KXAlgorithm alg);
 
 #endif

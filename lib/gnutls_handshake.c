@@ -1821,3 +1821,19 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	return ret;
 
 }
+
+/**
+  * gnutls_set_max_handshake_data_buffer_size - This function will set the maximum size of handshake message sequence
+  * @state: is a a &GNUTLS_STATE structure.
+  * @max: is the maximum number.
+  *
+  * This function will set the maximum size of the handshake message sequence.
+  * Since the handshake messages are kept into memory until the handshake is successful
+  * this function allows you to set the maximum number of bytes that will be kept.
+  * The default value is 128kb which is large enough. Set this to 0 if you do not want
+  * to set an upper limit.
+  *
+  **/
+void gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state, int max) {
+	state->gnutls_internals.max_handshake_data_buffer_size = max;
+}

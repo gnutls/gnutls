@@ -148,26 +148,13 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 
 	/* Generate the signature. */
 
-	/* If our certificate supports signing
-	 */
-	if (apr_cert_list != NULL)
-		if (apr_cert_list[0].keyUsage != 0)
-			if (!
-			    (apr_cert_list[0].
-			     keyUsage & X509KEY_DIGITAL_SIGNATURE)) {
-				gnutls_assert();
-				gnutls_free( *data);
-				return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
-			}
-
-
 	ddata.data = *data;
 	ddata.size = data_size;
 
 	if (apr_pkey != NULL) {
 		if ((ret =
 		     _gnutls_generate_sig_params(
-		     	state, apr_pkey, &ddata, &signature)) < 0) {
+		     	state, &apr_cert_list[0], apr_pkey, &ddata, &signature)) < 0) {
 			gnutls_assert();
 			gnutls_free( *data);
 			return ret;
@@ -313,12 +300,6 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	signature.data = &data[vparams.size+2];
 	signature.size = GMIN(data_size-vparams.size-2, sigsize);	
 
-	if (state->gnutls_internals.peer_cert.version == 0) { /* this is the only way to check
-							       * if it is initialized
-							       */
-		gnutls_assert();
-		return GNUTLS_E_X509_CERTIFICATE_ERROR;
-	}
 	ret = _gnutls_verify_sig_params( state, &state->gnutls_internals.peer_cert, &vparams, &signature);
 	if (ret<0) {
 		gnutls_assert();

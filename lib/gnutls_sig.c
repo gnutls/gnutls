@@ -39,7 +39,7 @@
 /* Generates a signature of all the previous sended packets in the 
  * handshake procedure.
  */
-int _gnutls_generate_sig_from_hdata( GNUTLS_STATE state, gnutls_private_key *pkey, gnutls_datum *signature) {
+int _gnutls_generate_sig_from_hdata( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum *signature) {
 gnutls_datum data;
 int size = gnutls_getHashDataBufferSize( state);
 int ret;
@@ -53,7 +53,7 @@ int ret;
 			
 	gnutls_readHashDataFromBuffer( state, data.data, data.size);
 
-	ret = _gnutls_pkcs1_rsa_generate_sig( pkey, &data, signature);
+	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &data, signature);
 	gnutls_free_datum( &data);
 	if (ret < 0) {
 		gnutls_assert();
@@ -67,7 +67,7 @@ int ret;
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_private_key *pkey, gnutls_datum* params, gnutls_datum *signature) 
+int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum* params, gnutls_datum *signature) 
 {
 	gnutls_datum sdata;
 	int size = 2*TLS_RANDOM_SIZE; 
@@ -84,7 +84,7 @@ int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_private_key *pkey, g
 	memcpy( &sdata.data[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
 	memcpy( &sdata.data[2*TLS_RANDOM_SIZE], params->data, params->size);
 
-	ret = _gnutls_pkcs1_rsa_generate_sig( pkey, &sdata, signature);
+	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &sdata, signature);
 
 	gnutls_free_datum( &sdata);
 	if (ret < 0) {
@@ -98,13 +98,25 @@ int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_private_key *pkey, g
 
 
 /* This will create a PKCS1 signature, as defined in the TLS protocol.
+ * Cert is the certificate of the corresponding private key. It is only checked if
+ * it supports signing.
  */
-int _gnutls_pkcs1_rsa_generate_sig( gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) 
+int _gnutls_pkcs1_rsa_generate_sig( gnutls_cert* cert, gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) 
 {
 int ret;
 opaque digest[20+16];
 gnutls_datum tmpdata;
 GNUTLS_HASH_HANDLE td;
+
+	/* If our certificate supports signing
+	 */
+
+	if ( cert != NULL)
+	   if ( cert->keyUsage != 0)
+		if ( !(cert->keyUsage & X509KEY_DIGITAL_SIGNATURE)) {
+			gnutls_assert();
+			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+		}
 
 	switch(pkey->pk_algorithm) {
 		case GNUTLS_PK_RSA:
@@ -151,6 +163,22 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, g
 	gnutls_datum plain, vdata;
 	opaque digest[20+16];
 	GNUTLS_HASH_HANDLE td;
+
+	if (cert->version == 0 || cert==NULL) {                /* this is the only way to check
+							       * if it is initialized
+							       */
+		gnutls_assert();
+		return GNUTLS_E_X509_CERTIFICATE_ERROR;
+	}
+
+	/* If the certificate supports signing continue.
+	 */
+	if ( cert != NULL)
+	   if ( cert->keyUsage != 0)
+		if ( !(cert->keyUsage & X509KEY_DIGITAL_SIGNATURE)) {
+			gnutls_assert();
+			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
+		}
 
 	switch(cert->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:

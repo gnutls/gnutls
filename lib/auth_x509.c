@@ -507,6 +507,7 @@ int _gnutls_gen_x509_server_certificate(GNUTLS_STATE state, opaque ** data)
 	return pdatasize;
 }
 
+
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x])
 int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int data_size)
 {
@@ -639,15 +640,12 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 
 	_gnutls_copy_x509_client_auth_info(info, &peer_certificate_list[0], verify);
 
-	/* This works for the client
-	 */
-	if ( peer_certificate_list[0].keyUsage != 0)
-		if ( !(peer_certificate_list[0].keyUsage & X509KEY_KEY_ENCIPHERMENT)) {
-			gnutls_assert();
-			CLEAR_CERTS;
-			gnutls_free(peer_certificate_list);
-			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
-		}
+	if ( (ret=_gnutls_check_x509_key_usage( &peer_certificate_list[0], gnutls_get_current_kx( state))) < 0) {
+		gnutls_assert();
+		CLEAR_CERTS;
+		gnutls_free(peer_certificate_list);
+		return ret;
+	}
 
 	CLEAR_CERTS;
 	gnutls_free(peer_certificate_list);
@@ -656,7 +654,20 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 }
 
 
+#ifdef DEBUG
+# warning CHECK FOR DSS
+#endif
+
 #define RSA_SIGN 1
+int _gnutls_check_supported_sign_algo( uint8 algo) {
+	switch(algo) {
+		case RSA_SIGN:
+			return 0;
+	}
+	
+	return -1;
+}
+
 int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 {
 	int size, ret;
@@ -697,7 +708,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 	found = 0;
 	for (i = 0; i < size; i++, p++) {
 		DECR_LEN(dsize, 1);
-		if (*p == RSA_SIGN)
+		if ( _gnutls_check_supported_sign_algo(*p)==0)
 			found = 1;
 	}
 
@@ -741,17 +752,8 @@ int _gnutls_gen_x509_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 		return ret;
 	}
 	
-	/* If our certificate supports signing
-	 */
-	if ( apr_cert_list != NULL)
-	   if ( apr_cert_list[0].keyUsage != 0)
-		if ( !(apr_cert_list[0].keyUsage & X509KEY_DIGITAL_SIGNATURE)) {
-			gnutls_assert();
-			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
-		}
-	
 	if (apr_pkey != NULL) {
-		if ( (ret=_gnutls_generate_sig_from_hdata( state, apr_pkey, &signature)) < 0) {
+		if ( (ret=_gnutls_generate_sig_from_hdata( state, &apr_cert_list[0], apr_pkey, &signature)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
@@ -793,7 +795,7 @@ gnutls_datum sig;
 
 	sig.data = pdata;
 	sig.size = size;
-	
+
 	if ( (ret=_gnutls_verify_sig_hdata( state, &state->gnutls_internals.peer_cert, &sig, data_size+HANDSHAKE_HEADER_SIZE))<0) {
 		gnutls_assert();
 		return ret;

@@ -919,9 +919,9 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 }
 
 /* Returns 0 if it's ok to use the KXAlgorithm with this cert
- * (using KeyUsage field). 1 otherwise.
+ * (using KeyUsage field). 
  */
-static int _gnutls_check_x509_key_usage(gnutls_cert * cert,
+int _gnutls_check_x509_key_usage(gnutls_cert * cert,
 					KXAlgorithm alg)
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
@@ -931,7 +931,7 @@ static int _gnutls_check_x509_key_usage(gnutls_cert * cert,
 				if (!
 				    (cert->
 				     keyUsage & X509KEY_KEY_ENCIPHERMENT))
-					return 1;
+					return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 				else
 					return 0;
 			}
@@ -941,13 +941,14 @@ static int _gnutls_check_x509_key_usage(gnutls_cert * cert,
 				if (!
 				    (cert->
 				     keyUsage & X509KEY_DIGITAL_SIGNATURE))
-					return 1;
+					return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 				else
 					return 0;
 			}
 			return 0;
 		default:
-			return 1;
+			gnutls_assert();
+			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 		}
 	}
 	return 0;

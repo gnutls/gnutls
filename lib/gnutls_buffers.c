@@ -377,6 +377,11 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 	old_buffer = state->gnutls_internals.hash_buffer.size;
 
 	state->gnutls_internals.hash_buffer.size += length;
+	if (state->gnutls_internals.max_handshake_data_buffer_size > 0 && state->gnutls_internals.hash_buffer.size > state->gnutls_internals.max_handshake_data_buffer_size) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 #ifdef BUFFERS_DEBUG
 	_gnutls_log( "HASH BUFFER: Inserted %d bytes of Data\n", length);
 #endif
