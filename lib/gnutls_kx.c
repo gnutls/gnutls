@@ -225,9 +225,13 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 	
 	/* if certificate verify is not needed just exit 
 	 */
-	if (state->gnutls_key->certificate_requested==0) return 0;
+	if (state->gnutls_key->certificate_requested==0) {
+		gnutls_assert();
+		return 0;
+	}
 
 	if (state->gnutls_internals.auth_struct->gnutls_generate_client_cert_vrfy==NULL) {
+		gnutls_assert();
 		return 0; /* this algorithm does not support cli_cert_vrfy 
 		           */
 	}

@@ -699,5 +699,6 @@ int gen_rsa_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 	memcpy( &(*data)[2], signature.data, size);
 
 	gnutls_free_datum( &signature);
+
 	return size+2;
 }

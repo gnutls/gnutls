@@ -598,8 +598,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
  * returns UNEXPECTED_HANDSHAKE_PACKET.
  */
 #define SSL2_HEADERS 1
-static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, uint8 ** const header,
-			   int *header_size, HandshakeType type, HandshakeType* recv_type)
+static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, HandshakeType type, HandshakeType* recv_type)
 {
 	int ret;
 	uint32 length32 = 0;
@@ -609,8 +608,6 @@ static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, uint8 *
 	/* if we have data into the buffer then return them, do not read the next packet
 	 */
 	if (state->gnutls_internals.handshake_header_buffer.header_size > 0) {
-		*header = state->gnutls_internals.handshake_header_buffer.header;
-		*header_size = state->gnutls_internals.handshake_header_buffer.header_size;
 		*recv_type = state->gnutls_internals.handshake_header_buffer.recv_type;
 
 		state->gnutls_internals.handshake_header_buffer.header_size = 0; /* reset buffering */
@@ -652,7 +649,7 @@ static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, uint8 *
 #ifdef HANDSHAKE_DEBUG
 		_gnutls_log("Handshake: %s was received [%ld bytes]\n",
 			    _gnutls_handshake2str(dataptr[0]),
-			    length32 + HANDSHAKE_HEADERS_SIZE);
+			    length32 + HANDSHAKE_HEADER_SIZE);
 #endif
 
 	} else {		/* v2 hello */
@@ -664,7 +661,7 @@ static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, uint8 *
 #ifdef HANDSHAKE_DEBUG
 		_gnutls_log(
 			  "Handshake: %s(v2) was received [%ld bytes]\n",
-				   _gnutls_handshake2str(recv_type),
+				   _gnutls_handshake2str(*recv_type),
 				   length32 + handshake_header_size);
 #endif
 
@@ -674,7 +671,7 @@ static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, uint8 *
 		}
 	}
 
-	if (recv_type != GNUTLS_HELLO_REQUEST) {
+	if (*recv_type != GNUTLS_HELLO_REQUEST) {
 		if ( (ret=gnutls_insertHashDataBuffer(state, dataptr, handshake_header_size)) < 0) {
 			gnutls_assert();
 			return ret;
@@ -685,7 +682,6 @@ static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, uint8 *
 		gnutls_assert();
 
 		/* put the packet into the buffer */
-		memcpy( state->gnutls_internals.handshake_header_buffer.header, dataptr, handshake_header_size);
 		state->gnutls_internals.handshake_header_buffer.header_size = handshake_header_size;
 		state->gnutls_internals.handshake_header_buffer.packet_length = length32;
 		state->gnutls_internals.handshake_header_buffer.recv_type = *recv_type;
@@ -693,8 +689,6 @@ static int _gnutls_recv_handshake_header( SOCKET cd, GNUTLS_STATE state, uint8 *
 	}
 
 	state->gnutls_internals.handshake_header_buffer.header_size = 0; /* no buffering */
-	*header = dataptr;
-	*header_size = handshake_header_size;
 
 	return length32;
 }
@@ -710,12 +704,10 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 {
 	int ret;
 	uint32 length32 = 0;
-	int handshake_header_size;
 	opaque * dataptr;
 	HandshakeType recv_type;
-	opaque *handshake_header;
 
-	ret = _gnutls_recv_handshake_header( cd, state, &handshake_header, &handshake_header_size, type, &recv_type);
+	ret = _gnutls_recv_handshake_header( cd, state, type, &recv_type);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET && optional==OPTIONAL_PACKET) {
 			gnutls_assert();
@@ -1297,6 +1289,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
+
 		/* RECV CERTIFICATE */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_certificate(cd, state);
@@ -1515,7 +1508,8 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
-		/* send our certificate - if any 
+
+		/* send our certificate - if any and if requested
 		 */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_send_client_certificate(cd, state);
@@ -1525,6 +1519,7 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
+
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_send_client_kx_message(cd, state);
 		if (ret < 0) {
@@ -1537,14 +1532,14 @@ int gnutls_handshake_finish(SOCKET cd, GNUTLS_STATE state) {
 		/* send client certificate verify */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
-			    _gnutls_send_client_certificate_verify(cd,
-								   state);
+			    _gnutls_send_client_certificate_verify(cd, state);
 		if (ret < 0) {
 			gnutls_assert();
 			ERR("send client certificate verify", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
+
 	} else {		/* SERVER SIDE */
 
 		/* send the server hello done */

@@ -255,6 +255,7 @@ ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, Handshake
 	return (sizeOfPtr - left);
 }
 
+#warning "FIX THIS FUNCTION - too many reallocs()"
 int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 {
 	int old_buffer;
