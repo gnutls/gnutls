@@ -763,9 +763,11 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	_gnutls_io_clear_read_buffer( state);
 	ciphertext = &recv_data[header_size];
 	
-	/* decrypt the data we got
+	/* decrypt the data we got. We allocate MAX_RECORD_RECV_SIZE
+	 * because we cannot predict the output data by the record
+	 * packet length (due to compression).
 	 */
-	tmplen = length + MAX_RECORD_OVERHEAD;
+	tmplen = MAX_RECORD_RECV_SIZE;
 	tmpdata = gnutls_alloca( tmplen);
 	if (tmpdata==NULL) {
 		gnutls_assert();
