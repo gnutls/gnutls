@@ -68,7 +68,7 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
 
   cur_keylen = 0;
   pwlen = strlen (pw);
-  if (pwlen > 63/2 || (salt_size % 8) != 0) {
+  if (pwlen > 63/2) {
       gnutls_assert();
       return GNUTLS_E_INVALID_REQUEST;
   }
