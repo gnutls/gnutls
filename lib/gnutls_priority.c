@@ -256,7 +256,7 @@ int gnutls_certificate_type_set_priority(gnutls_session session,
   * the appropriate functions.
   *
   * The order is TLS1, SSL3 for protocols.
-  * GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA for key exchange 
+  * GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA for key exchange 
   * algorithms.
   * GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms.
   * GNUTLS_CIPHER_RIJNDAEL_256_CBC, 
@@ -267,16 +267,16 @@ int gnutls_certificate_type_set_priority(gnutls_session session,
   **/
 int gnutls_set_default_priority(gnutls_session session)
 {
-	static const int protocol_priority[16] =
+	static const int protocol_priority[4] =
 	    { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-	static const int kx_priority[16] =
-	    { GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, 0 };
-	static const int cipher_priority[16] = {
+	static const int kx_priority[8] =
+	    { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, 0 };
+	static const int cipher_priority[8] = {
 	  GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
 	  GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, 0
 	};
-	static const int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
-	static const int mac_priority[16] =
+	static const int comp_priority[4] = { GNUTLS_COMP_NULL, 0 };
+	static const int mac_priority[4] =
 	    { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
 	gnutls_cipher_set_priority(session, cipher_priority);
@@ -295,8 +295,8 @@ int gnutls_set_default_priority(gnutls_session session)
   * Sets some default priority on the ciphers, key exchange methods, macs
   * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
   * these defaults are ok. This function also includes weak algorithms.
-  * The order is TLS1, SSL3 for protocols,  GNUTLS_KX_DHE_DSS, 
-  * GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_RSA_EXPORT for key exchange algorithms.
+  * The order is TLS1, SSL3 for protocols,  GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, 
+  * GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA_EXPORT for key exchange algorithms.
   * GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms,
   * GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
   * and GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, 
@@ -305,20 +305,20 @@ int gnutls_set_default_priority(gnutls_session session)
   **/
 int gnutls_set_default_export_priority(gnutls_session session)
 {
-	static const int protocol_priority[16] = {
+	static const int protocol_priority[4] = {
 	    GNUTLS_TLS1, GNUTLS_SSL3, 0 
 	};
-	static const int kx_priority[16] = {
-	    GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA,
-            GNUTLS_KX_RSA, GNUTLS_KX_RSA_EXPORT, 0 
+	static const int kx_priority[8] = {
+	    GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA,
+            GNUTLS_KX_RSA_EXPORT, 0 
         };
-	static const int cipher_priority[16] = {
+	static const int cipher_priority[8] = {
 	   GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
 	   GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128,
 	   GNUTLS_CIPHER_ARCFOUR_40, 0
 	};
-	static const int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
-	static const int mac_priority[16] =
+	static const int comp_priority[4] = { GNUTLS_COMP_NULL, 0 };
+	static const int mac_priority[4] =
 	    { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
 	gnutls_cipher_set_priority(session, cipher_priority);
