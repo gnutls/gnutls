@@ -1919,6 +1919,7 @@ int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
   *
   * This function will convert the given PEM encoded certificate list
   * to the native gnutls_x509_crt_t format. The output will be stored in @certs.
+  * They will be automatically initialized.
   *
   * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
   * "CERTIFICATE".
