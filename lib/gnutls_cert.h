@@ -12,8 +12,6 @@ typedef struct gnutls_cert {
 				 */
 	PKAlgorithm subject_pk_algorithm;
 
-	gnutls_DN  cert_info;
-	gnutls_DN  issuer_info;
 	opaque	   subjectAltDNSName[X509_CN_SIZE]; 
 	int 	   subjectAltDNSName_size;
 	
@@ -47,18 +45,18 @@ typedef struct {
 	gnutls_datum raw; /* the raw key */
 } gnutls_private_key;
 
+struct GNUTLS_STATE_INT; /* because GNUTLS_STATE is not defined when this file is included */
 
-int _gnutls_cert_supported_kx(gnutls_cert* cert, KXAlgorithm **alg, int *alg_size);
+int _gnutls_cert_supported_kx( const gnutls_cert* cert, KXAlgorithm **alg, int *alg_size);
 PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm);
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert);
-gnutls_cert* _gnutls_find_cert( gnutls_cert** cert_list, int cert_list_length, const char* name);
-int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
-			       int cert_list_length, const char *name);
+const gnutls_cert* _gnutls_find_cert( struct GNUTLS_STATE_INT*, gnutls_cert** cert_list, int cert_list_length);
+int _gnutls_find_cert_list_index( struct GNUTLS_STATE_INT*, gnutls_cert ** cert_list, int cert_list_length);
 
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data);
 int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_DN * dn);
 void gnutls_free_cert(gnutls_cert cert);
-int _gnutls_check_x509_key_usage(gnutls_cert * cert, KXAlgorithm alg);
+int _gnutls_check_x509_key_usage( const gnutls_cert * cert, KXAlgorithm alg);
 
 #endif

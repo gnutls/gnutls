@@ -820,7 +820,9 @@ static int _gnutls_get_version(node_asn * c2, char *root)
 #endif
 
 /* This function will convert a der certificate, to a format
- * (structure) that gnutls can understand and use.
+ * (structure) that gnutls can understand and use. Actually the
+ * important thing on this function is that it extracts the 
+ * certificate's (public key) parameters.
  */
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 {
@@ -924,18 +926,6 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	gCert->signature_size = len;
 
 
-	memset(&gCert->cert_info, 0, sizeof(gCert->cert_info));
-	memset(&gCert->issuer_info, 0, sizeof(gCert->issuer_info));
-
-	if ((result =
-	     _gnutls_get_name_type(c2,
-				   "certificate2.tbsCertificate.subject",
-				   &gCert->cert_info)) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return result;
-	}
-
 	memset(&gCert->subjectAltDNSName, 0,
 	       sizeof(gCert->subjectAltDNSName));
 	if ((result =
@@ -946,16 +936,6 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		asn1_delete_structure(c2);
 		return result;
 	}
-
-	if ((result =
-	     _gnutls_get_name_type(c2,
-				   "certificate2.tbsCertificate.issuer",
-				   &gCert->issuer_info)) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return result;
-	}
-
 
 	gCert->expiration_time =
 	    _gnutls_get_time(c2, "certificate2", "notAfter");
@@ -982,7 +962,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 /* Returns 0 if it's ok to use the KXAlgorithm with this cert
  * (using KeyUsage field). 
  */
-int _gnutls_check_x509_key_usage(gnutls_cert * cert, KXAlgorithm alg)
+int _gnutls_check_x509_key_usage(const gnutls_cert * cert, KXAlgorithm alg)
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
 		switch (alg) {
@@ -1022,7 +1002,7 @@ int _gnutls_check_x509_key_usage(gnutls_cert * cert, KXAlgorithm alg)
  * This function also uses the KeyUsage field of the certificate
  * extensions in order to disable unneded algorithms.
  */
-int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
+int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 			      int *alg_size)
 {
 	KXAlgorithm kx;
@@ -1052,53 +1032,30 @@ int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
 	return 0;
 }
 
-/* finds a certificate in the cert lists that contains
- * common_name (or subjectAltDNSName) field similar to name
+/* finds the most appropriate certificate in the cert list.
+ * The 'appropriate' is defined by the user.
+ * FIXME: provide user callback.
  */
-gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
-			       int cert_list_length, const char *name)
+const gnutls_cert *_gnutls_find_cert( GNUTLS_STATE state, gnutls_cert ** cert_list,
+			       int cert_list_length)
 {
-	gnutls_cert *cert = NULL;
 	int i;
 
-	for (i = 0; i < cert_list_length; i++) {
-		if (cert_list[i][0].cert_info.common_name[0] != 0
-		    || cert_list[i][0].subjectAltDNSName[0] != 0) {
-			if (strcasecmp
-			    (cert_list[i][0].cert_info.common_name,
-			     name) == 0
-			    || strcasecmp(cert_list[i][0].
-					  subjectAltDNSName, name) == 0) {
-				cert = &cert_list[i][0];
-				break;
-			}
-		}
-	}
-	return cert;
+	i = _gnutls_find_cert_list_index( state, cert_list, cert_list_length);
+	if (i<0) return NULL;
+	
+	return &cert_list[i][0];
 }
 
-/* finds the index of a certificate in the cert lists that contains
- * common_name (or subjectAltDNSName) field similar to name
+/* finds the most appropriate certificate in the cert list.
+ * The 'appropriate' is defined by the user.
+ * FIXME: provide user callback.
  */
-int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
-				 int cert_list_length, const char *name)
+int _gnutls_find_cert_list_index( GNUTLS_STATE state, gnutls_cert ** cert_list,
+				 int cert_list_length)
 {
 	int index = 0;
-	int i;
 
-	for (i = 0; i < cert_list_length; i++) {
-		if (cert_list[i][0].cert_info.common_name[0] != 0
-		    || cert_list[i][0].subjectAltDNSName[0] != 0) {
-			if (strcasecmp
-			    (cert_list[i][0].cert_info.common_name,
-			     name) == 0
-			    || strcasecmp(cert_list[i][0].
-					  subjectAltDNSName, name) == 0) {
-				index = i;
-				break;
-			}
-		}
-	}
 	return index;
 }
 
@@ -1127,16 +1084,15 @@ int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(gnutls_DN *client_cert, gnutls_DN *issuer_cert, int ncerts, gnutls_DN* req_ca_cert, int nreqs);
+  * int (*callback)(gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_cert, int nreqs);
   *
-  * 'client_cert' contains 'ncerts' gnutls_DN structures which hold
-  * DN data from the client certificate. 'issuer_cert' holds DN data
-  * for the issuer of the certificate. Ie. issuer_cert[i] is the issuer of
-  * client_cert[i]. (i < ncerts)
+  * 'client_cert' contains 'ncerts' gnutls_datum structures which hold
+  * the DER encoded X.509 certificates of the client. 
   *
-  * 'req_ca_cert' contains a list with the CA certificates that the server
+  * 'req_ca_cert' contains a list with the CA names that the server
   * considers trusted. Normaly we should send a certificate that is signed
-  * by one of these CAs.
+  * by one of these CAs. These names are DER encoded. To get a more
+  * meaningful value use the function _gnutls_dn2gnutlsdn().
   *
   * This function specifies what we (in case of a client) are going
   * to do when we have to send a certificate. If this callback

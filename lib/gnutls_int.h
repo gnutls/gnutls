@@ -31,9 +31,9 @@
 #define WRITE_DEBUG
 #define READ_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define RECORD_DEBUG
+#define RECORD_DEBUG*/
 #define DEBUG
-*/
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -338,6 +338,8 @@ typedef struct {
 #define CompressionMethod_Priority GNUTLS_Priority
 #define Protocol_Priority GNUTLS_Priority
 
+typedef int x509_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
+
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
 	/* this holds the number of bytes in the handshake_header[] */
@@ -449,7 +451,7 @@ typedef struct {
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
 	 */
-	int				(*x509_client_cert_callback)(void*,void*,int, void*, int);
+	x509_cert_callback_func*	x509_client_cert_callback;
 	gnutls_cert			peer_cert;
 	int				max_handshake_data_buffer_size;
 

@@ -45,10 +45,6 @@ int _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cer
   */
 int ret;
 
-  	memcpy( &info->peer_dn, &cert->cert_info, sizeof(gnutls_DN));
-  	memcpy( &info->issuer_dn, &cert->issuer_info, sizeof(gnutls_DN));
-  	
-
 	info->peer_certificate_status = verify;
 
 	info->peer_certificate_version = cert->version;
@@ -312,7 +308,7 @@ int data_size = _data_size;
 		 * choose of certificate, otherwise (-1), he
 		 * will be prompted to choose one.
 		 */
-		try = cred->client_cert_callback( NULL, NULL, 0, NULL, 0);
+		try = cred->client_cert_callback( NULL, 0, NULL, 0);
 	}
 	
 	if (try>=0)
@@ -357,18 +353,13 @@ int data_size = _data_size;
 	} while (1);
 
 	if (indx==-1 && cred->client_cert_callback!=NULL && cred->ncerts > 0) {/* use a callback to get certificate */
-		gnutls_DN *cdn=NULL;
-		gnutls_DN *idn=NULL;
-		gnutls_DN *req_dn=NULL;
-		gnutls_datum tmp;
+		gnutls_datum *my_certs=NULL;
+		gnutls_datum *issuers_dn=NULL;
 		int count;
 		
-		cdn = gnutls_malloc( cred->ncerts* sizeof(gnutls_DN));
-		if (cdn==NULL) goto clear;
+		my_certs = gnutls_malloc( cred->ncerts* sizeof(gnutls_datum));
+		if (my_certs==NULL) goto clear;
 		
-		idn = gnutls_malloc( cred->ncerts* sizeof(gnutls_DN));
-		if (idn==NULL) goto clear;
-
 		/* put the requested DNs to req_dn
 		 */		
 		data = _data;
@@ -384,13 +375,14 @@ int data_size = _data_size;
 			
 			data += 2;
 			
-			req_dn = gnutls_realloc_fast( req_dn, (count+1)*sizeof(gnutls_DN));
-			if (req_dn==NULL) goto clear;
+			issuers_dn = gnutls_realloc_fast( issuers_dn, (count+1)*sizeof(gnutls_datum));
+			if (issuers_dn==NULL) goto clear;
 			
-			tmp.data = data;
-			tmp.size = size;
-			if (_gnutls_dn2gnutlsdn( &req_dn[count], &tmp)==0)
-				count++; /* otherwise we have failed */
+			issuers_dn->data = data;
+			issuers_dn->size = size;
+			
+			count++; /* otherwise we have failed */
+			
 			data+=size;
 
 			if (data_size==0) break;
@@ -400,15 +392,13 @@ int data_size = _data_size;
 		/* put our certificate's issuer and dn into cdn, idn
 		 */
 		for(i=0;i<cred->ncerts;i++) {
-			memcpy( &cdn[i], &cred->cert_list[i][0].cert_info, sizeof(gnutls_DN));
-			memcpy( &idn[i], &cred->cert_list[i][0].issuer_info, sizeof(gnutls_DN));
+			my_certs[i] = cred->cert_list[i][0].raw;
 		}
-		indx = cred->client_cert_callback( cdn, idn, cred->ncerts, req_dn, count);
+		indx = cred->client_cert_callback( my_certs, cred->ncerts, issuers_dn, count);
 
 		clear:
-			gnutls_free(cdn);
-			gnutls_free(req_dn);
-			gnutls_free(idn);
+			gnutls_free(my_certs);
+			gnutls_free(issuers_dn);
 	}
 	*ind = indx;
 	return 0;
@@ -906,13 +896,10 @@ int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int 
 			*apr_cert_list_length = 0;
 			*apr_pkey = NULL;
 		} else {
-			const char* dnsname = gnutls_ext_get_name_ind( state, GNUTLS_DNSNAME);
-			if (dnsname==NULL) dnsname="";
 			
 			ind =
-			    _gnutls_find_cert_list_index(cred->cert_list,
-							 cred->ncerts,
-							 dnsname);
+			    _gnutls_find_cert_list_index(state, cred->cert_list,
+							 cred->ncerts);
 
 			if (ind < 0) {
 				*apr_cert_list = NULL;
@@ -945,5 +932,125 @@ int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int 
 	
 	}
 	
+	return 0;
+}
+
+#define CHECK_AUTH(auth, ret) if (gnutls_get_auth_type(state) != auth) { \
+	gnutls_assert(); \
+	return ret; \
+	}
+
+/**
+  * gnutls_x509pki_get_peer_dn - This function returns the peer's distinguished name
+  * @state: is a gnutls state
+  * @ret: a pointer to a structure to hold the peer's name
+  *
+  * This function will return the name of the peer. The name is gnutls_DN structure and 
+  * is a obtained by the peer's certificate. If the certificate send by the
+  * peer is invalid, or in any other failure this function returns error.
+  * Returns a negative error code in case of an error.
+  *
+  **/
+int gnutls_x509pki_get_peer_dn(GNUTLS_STATE state, gnutls_DN * ret)
+{
+	X509PKI_AUTH_INFO info;
+	node_asn *c2;
+	int result;
+
+	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
+
+	memset( ret, 0, sizeof(gnutls_DN));
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	     "certificate2")
+	    != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+
+	result = asn1_get_der(c2, info->raw_certificate.data, info->raw_certificate.size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+#ifdef DEBUG
+		_gnutls_log("Decoding error %d\n", result);
+#endif
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	if ((result =
+	     _gnutls_get_name_type(c2,
+				   "certificate2.tbsCertificate.subject",
+				   ret)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+
+	asn1_delete_structure(c2);
+
+	return 0;
+}
+
+/**
+  * gnutls_x509pki_get_issuer_dn - This function returns the peer's issuer distinguished name
+  * @state: is a gnutls state
+  * @ret: a pointer to a structure to hold the issuer's name
+  *
+  * This function will return the name of the issuer of peer. The name is a gnutls_DN structure and 
+  * is a obtained by the peer's certificate. If the certificate send by the
+  * peer is invalid, or in any other failure this function returns error.
+  * Returns a negative error code in case of an error.
+  *
+  **/
+int gnutls_x509pki_get_issuer_dn(GNUTLS_STATE state, gnutls_DN * ret)
+{
+	X509PKI_AUTH_INFO info;
+	node_asn *c2;
+	int result;
+
+	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
+
+	memset( ret, 0, sizeof(gnutls_DN));
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	     "certificate2")
+	    != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der(c2, info->raw_certificate.data, info->raw_certificate.size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+#ifdef DEBUG
+		_gnutls_log("Decoding error %d\n", result);
+#endif
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	if ((result =
+	     _gnutls_get_name_type(c2,
+				   "certificate2.tbsCertificate.issuer",
+				   ret)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+
+	asn1_delete_structure(c2);
+
 	return 0;
 }

@@ -218,4 +218,9 @@ static char str[512];
 	return str;	
 	
 }
+
+const char* GET_CN( gnutls_datum cert) {
+	return NULL; /* FIXME */
+}
+
 #endif

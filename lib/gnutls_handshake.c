@@ -1870,11 +1870,10 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	GNUTLS_CipherSuite *newSuite;
 	int newSuiteSize = 0, i, j, keep;
 	const X509PKI_CREDENTIALS x509_cred;
-	gnutls_cert *cert = NULL;
+	const gnutls_cert *cert = NULL;
 	KXAlgorithm *alg;
 	int alg_size;
 	KXAlgorithm kx;
-	const char *dnsname;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
 		return 0;
@@ -1891,23 +1890,18 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	/* if x509_cred==NULL we should remove all X509 ciphersuites
 	 */
 
-	/* find the certificate that has dnsname in the subject
-	 * name or subject Alternative name.
-	 */
-
 	cert = NULL;
-	dnsname = gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME);
 
-	if (dnsname != NULL && dnsname[0] != 0) {
-		cert =
-		    (gnutls_cert *) _gnutls_find_cert(x509_cred->cert_list,
-						      x509_cred->ncerts,
-						      dnsname);
-	}
-	if (cert == NULL && x509_cred->cert_list != NULL) {	/* if no such cert, use the first in the list 
-								 */
-		cert = &x509_cred->cert_list[0][0];
+	cert =
+	    _gnutls_find_cert(state, x509_cred->cert_list,
+						      x509_cred->ncerts);
 
+	if (cert == NULL) {
+		/* No certificate was found 
+		 */
+		alg_size = 0;
+		alg = NULL;
+	} else {
 		/* get all the key exchange algorithms that are 
 		 * supported by the X509 certificate parameters.
 		 */
@@ -1917,13 +1911,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 			gnutls_assert();
 			return ret;
 		}
-	} else {
-		/* No certificate was found 
-		 */
-		alg_size = 0;
-		alg = NULL;
 	}
-
 
 	newSuite =
 	    gnutls_malloc(numCipherSuites * sizeof(GNUTLS_CipherSuite));

@@ -35,10 +35,10 @@ typedef struct {
 #define X509KEY_ENCIPHER_ONLY		2
 #define X509KEY_DECIPHER_ONLY		1
 
-typedef int x509_cert_callback_func(gnutls_DN *, gnutls_DN *, int, gnutls_DN *, int);
-
 
 # ifdef LIBGNUTLS_VERSION /* defined only in gnutls.h */
+
+typedef int x509_cert_callback_func(const gnutls_datum *, int, const gnutls_datum *, int);
 
 /* Functions that allow AUTH_INFO structures handling
  */
@@ -60,9 +60,9 @@ int gnutls_set_x509_cert_callback( X509PKI_CREDENTIALS, x509_cert_callback_func 
 int gnutls_x509pki_set_cert_request( GNUTLS_STATE, CertificateRequest);
 
 int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE);
-const gnutls_DN* gnutls_x509pki_get_peer_dn( GNUTLS_STATE);
+int gnutls_x509pki_get_peer_dn( GNUTLS_STATE, gnutls_DN*);
 const gnutls_datum* gnutls_x509pki_get_peer_certificate( GNUTLS_STATE);
-const gnutls_DN* gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE);
+int gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE, gnutls_DN *);
 CertificateStatus gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
 int gnutls_x509pki_get_peer_certificate_version( GNUTLS_STATE);
 time_t gnutls_x509pki_get_peer_certificate_activation_time( GNUTLS_STATE);

@@ -53,19 +53,19 @@
 #define CLICERTFILE "x509/clicert.pem"
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
-#define PRINT_DN(X) PRINTX( "CN:", X->common_name); \
-	PRINTX( "OU:", X->organizational_unit_name); \
-	PRINTX( "O:", X->organization); \
-	PRINTX( "L:", X->locality_name); \
-	PRINTX( "S:", X->state_or_province_name); \
-	PRINTX( "C:", X->country); \
-	PRINTX( "E:", X->email); \
+#define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
+	PRINTX( "OU:", X.organizational_unit_name); \
+	PRINTX( "O:", X.organization); \
+	PRINTX( "L:", X.locality_name); \
+	PRINTX( "S:", X.state_or_province_name); \
+	PRINTX( "C:", X.country); \
+	PRINTX( "E:", X.email); \
 	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(state))
 
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
 CredType cred;
-const gnutls_DN* dn;
+gnutls_DN dn;
 CertificateStatus status;
 
 
@@ -102,10 +102,10 @@ CertificateStatus status;
 				printf(" - Certificate info:\n");
 				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version( state));
 
-				dn = gnutls_x509pki_client_get_peer_dn( state);
+				gnutls_x509pki_client_get_peer_dn( state, &dn);
 				PRINT_DN( dn);
 
-				dn = gnutls_x509pki_client_get_issuer_dn( state);
+				gnutls_x509pki_client_get_issuer_dn( state, &dn);
 				printf(" - Certificate Issuer's info:\n");
 				PRINT_DN( dn);
 			}
@@ -126,9 +126,9 @@ CertificateStatus status;
 	return 0;
 }
 
-int cert_callback( gnutls_DN *client_cert, gnutls_DN *issuer_cert, int ncerts, gnutls_DN* req_ca_cert, int nreqs) {
+int cert_callback( const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
 
-	if (client_cert==NULL) {
+	if (client_certs==NULL) {
 		return 0; /* means the we will only be called again
 		           * if the library cannot determine which
 		           * certificate to send

@@ -432,6 +432,15 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		case GNUTLS_E_ILLEGAL_PARAMETER:
                         ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
                         break;
+		case GNUTLS_E_ASN1_PARSING_ERROR:
+                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+                        break;
+		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
+                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);
+                        break;
+		case GNUTLS_E_UNEXPECTED_PACKET:
+                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_UNEXPECTED_MESSAGE);
+                        break;
                                                               
 	}
 	return ret;
@@ -448,10 +457,10 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   *
   * in case of GNUTLS_SHUT_RDWR then the connection gets terminated and
   * further receives and sends will be disallowed. If the return
-  * value is zero you may continue using the TCP connection.
+  * value is zero you may continue using the connection.
   *
   * in case of GNUTLS_SHUT_WR then the connection gets terminated and
-  * further sends will be disallowed. In order to reuse the TCP connection
+  * further sends will be disallowed. In order to reuse the connection
   * you should wait for an EOF from the peer.
   *
   * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
@@ -1111,7 +1120,8 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * @sizeofdata: is the length of the data
   *
   * This function has the same semantics as write() has. The only
-  * difference is that is accepts a GNUTLS state.
+  * difference is that is accepts a GNUTLS state, and uses different
+  * error codes.
   *
   * If the EINTR is returned by the internal push function (write())
   * then GNUTLS_E_INTERRUPTED, will be returned. If GNUTLS_E_INTERRUPTED or
@@ -1132,10 +1142,10 @@ ssize_t gnutls_write( GNUTLS_STATE state, const void *data, size_t sizeofdata) {
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
-  * This function has the same semantics as read() has. The only
-  * difference is that is accepts a GNUTLS state. 
-  * Returns the number of bytes received, zero on EOF, or
-  * a negative error code.
+  * This function has the same semantics as write() has. The only
+  * difference is that is accepts a GNUTLS state.
+  * Also returns the number of bytes received, zero on EOF, but
+  * a negative error code in case of an error.
   *
   * If this function returns GNUTLS_E_REHANDSHAKE, then you must
   * either send an alert containing NO_RENEGOTIATION, or perform a

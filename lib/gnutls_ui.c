@@ -40,13 +40,15 @@
   * Returns NULL in case of an error.
   *
   **/
-const char* gnutls_srp_server_get_username(  GNUTLS_STATE state) {
-SRP_SERVER_AUTH_INFO info;
+const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
+{
+	SRP_SERVER_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_SRP, NULL);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return NULL;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return NULL;
 	return info->username;
 }
 
@@ -61,13 +63,15 @@ SRP_SERVER_AUTH_INFO info;
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_anon_server_get_dh_bits( GNUTLS_STATE state) {
-ANON_SERVER_AUTH_INFO info;
+int gnutls_anon_server_get_dh_bits(GNUTLS_STATE state)
+{
+	ANON_SERVER_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_ANON, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
 	return info->dh_bits;
 }
 
@@ -80,57 +84,20 @@ ANON_SERVER_AUTH_INFO info;
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_anon_client_get_dh_bits(  GNUTLS_STATE state) {
-ANON_CLIENT_AUTH_INFO info;
+int gnutls_anon_client_get_dh_bits(GNUTLS_STATE state)
+{
+	ANON_CLIENT_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_ANON, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
 	return info->dh_bits;
 }
 
 
 /* X509PKI */
-/**
-  * gnutls_x509pki_get_peer_dn - This function returns the peer's distinguished name
-  * @state: is a gnutls state
-  *
-  * This function will return the name of the peer. The name is gnutls_DN structure and 
-  * is a obtained by the peer's certificate. If the certificate send by the
-  * peer is invalid, or in any other failure this function returns NULL.
-  * Returns NULL in case of an error.
-  *
-  **/
-const gnutls_DN* gnutls_x509pki_get_peer_dn(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, NULL);
-
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return NULL;
-	return &info->peer_dn;
-}
-
-/**
-  * gnutls_x509pki_get_issuer_dn - This function returns the peer's certificate issuer distinguished name
-  * @state: is a gnutls state
-  *
-  * This function will return the name of the peer's certificate issuer. The name is gnutls_DN structure and 
-  * is a obtained by the peer's certificate. If the certificate send by the
-  * peer is invalid, or in any other failure this function returns NULL.
-  * Returns NULL in case of an error.
-  *
-  **/
-const gnutls_DN* gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, NULL);
-
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return NULL;
-	return &info->issuer_dn;
-}
 
 /**
   * gnutls_x509pki_get_peer_certificate_status - This function returns the peer's certificate status
@@ -142,13 +109,16 @@ X509PKI_AUTH_INFO info;
   * Returns GNUTLS_CERT_NONE in case of an error, or if no certificate was sent.
   *
   **/
-CertificateStatus gnutls_x509pki_get_peer_certificate_status(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+CertificateStatus gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE
+							     state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_CERT_NONE);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return GNUTLS_CERT_NONE;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_CERT_NONE;
 	return info->peer_certificate_status;
 }
 
@@ -161,13 +131,15 @@ X509PKI_AUTH_INFO info;
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/
-const gnutls_datum * gnutls_x509pki_get_peer_certificate(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+const gnutls_datum *gnutls_x509pki_get_peer_certificate(GNUTLS_STATE state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, NULL);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return NULL;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return NULL;
 	return &info->raw_certificate;
 }
 
@@ -180,13 +152,15 @@ X509PKI_AUTH_INFO info;
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509pki_get_peer_certificate_version(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+int gnutls_x509pki_get_peer_certificate_version(GNUTLS_STATE state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
 	return info->peer_certificate_version;
 }
 
@@ -200,13 +174,15 @@ X509PKI_AUTH_INFO info;
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509pki_get_dh_bits(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+int gnutls_x509pki_get_dh_bits(GNUTLS_STATE state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
 	return info->dh_bits;
 }
 
@@ -219,13 +195,16 @@ X509PKI_AUTH_INFO info;
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t gnutls_x509pki_get_peer_certificate_activation_time(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+time_t gnutls_x509pki_get_peer_certificate_activation_time(GNUTLS_STATE
+							   state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, -1);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return -1;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return -1;
 	return info->peer_certificate_activation_time;
 }
 
@@ -238,13 +217,16 @@ X509PKI_AUTH_INFO info;
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t gnutls_x509pki_get_peer_certificate_expiration_time(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+time_t gnutls_x509pki_get_peer_certificate_expiration_time(GNUTLS_STATE
+							   state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, -1);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return -1;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return -1;
 	return info->peer_certificate_expiration_time;
 }
 
@@ -258,13 +240,15 @@ X509PKI_AUTH_INFO info;
   * Returns zero in case of an error.
   *
   **/
-unsigned char gnutls_x509pki_get_key_usage(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+unsigned char gnutls_x509pki_get_key_usage(GNUTLS_STATE state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, 0);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return 0;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return 0;
 	return info->keyUsage;
 }
 
@@ -277,13 +261,15 @@ X509PKI_AUTH_INFO info;
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+int gnutls_x509pki_get_certificate_request_status(GNUTLS_STATE state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, 0);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
 	return info->certificate_requested;
 }
 
@@ -299,13 +285,14 @@ X509PKI_AUTH_INFO info;
   * Returns NULL in case of an error.
   *
   **/
-const char* gnutls_x509pki_get_subject_dns_name( GNUTLS_STATE state) {
-X509PKI_AUTH_INFO info;
+const char *gnutls_x509pki_get_subject_dns_name(GNUTLS_STATE state)
+{
+	X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, NULL);
 
-	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return NULL;
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return NULL;
 	return info->subjectAltDNSName;
 }
-

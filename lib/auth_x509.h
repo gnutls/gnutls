@@ -44,8 +44,6 @@ typedef struct {
 #define X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
 
 typedef struct X509PKI_AUTH_INFO_INT {
-	gnutls_DN	  peer_dn;
-	gnutls_DN	  issuer_dn;
 	CertificateStatus peer_certificate_status;
 	int		  peer_certificate_version;
 	time_t		  peer_certificate_activation_time;

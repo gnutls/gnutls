@@ -101,13 +101,13 @@ GNUTLS_STATE initialize_state()
 }
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
-#define PRINT_DN(X) PRINTX( "CN:", X->common_name); \
-	PRINTX( "OU:", X->organizational_unit_name); \
-	PRINTX( "O:", X->organization); \
-	PRINTX( "L:", X->locality_name); \
-	PRINTX( "S:", X->state_or_province_name); \
-	PRINTX( "C:", X->country); \
-	PRINTX( "E:", X->email); \
+#define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
+	PRINTX( "OU:", X.organizational_unit_name); \
+	PRINTX( "O:", X.organization); \
+	PRINTX( "L:", X.locality_name); \
+	PRINTX( "S:", X.state_or_province_name); \
+	PRINTX( "C:", X.country); \
+	PRINTX( "E:", X.email); \
 	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(state))
 
 void print_info(GNUTLS_STATE state)
@@ -115,7 +115,7 @@ void print_info(GNUTLS_STATE state)
 	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
-	const gnutls_DN* dn;
+	gnutls_DN dn;
 	CredType cred;
 	CertificateStatus status;
 	
@@ -176,12 +176,11 @@ void print_info(GNUTLS_STATE state)
 				printf(" - Certificate info:\n");
 				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(state));
 
-				dn = gnutls_x509pki_client_get_peer_dn( state);
-				if (dn!=NULL)
+				if (gnutls_x509pki_client_get_peer_dn( state, &dn) > 0) {
 					PRINT_DN( dn);
-
-				dn = gnutls_x509pki_client_get_issuer_dn( state);
-				if (dn!=NULL) {
+				}
+				
+				if (gnutls_x509pki_client_get_issuer_dn( state, &dn) > 0) {
 					printf(" - Certificate Issuer's info:\n");
 					PRINT_DN( dn);
 				}

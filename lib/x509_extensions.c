@@ -191,7 +191,7 @@ static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, ch
 	}
 
 #ifdef DEBUG
-	_gnutls_log("CERT[%s]: Unsupported Extension: %s, %s\n", cert->cert_info.common_name, extnID, critical);
+	_gnutls_log("CERT[%s]: Unsupported Extension: %s, %s\n", GET_CN(cert->raw), extnID, critical);
 #endif
 	
 	if (strcmp( critical, "TRUE")==0) {
