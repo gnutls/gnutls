@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -267,11 +267,11 @@ int main(int argc, char **argv)
 
 		if (ret < 0) {
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
-			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
+			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 				alert = gnutls_alert_get( state);
 				printf("*** Received alert [%d]: %s\n",
 				       alert, gnutls_alert_get_name( alert));
-
+			}
 			fprintf(stderr, "*** Handshake has failed\n");
 			gnutls_perror(ret);
 			gnutls_deinit(state);
