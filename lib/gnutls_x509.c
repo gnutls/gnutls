@@ -2849,10 +2849,13 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, int sizeof_buf,
 
    buf[0] = 0;
 
-#define PRINTX(buf, bufsize, x, y) { \
-   if (y[0]!=0 && (strlen(x)+strlen(y)+4 < bufsize)) \
+#define PRINTX(buf, bufsize, x, y) \
+   if (y[0]!=0 && (strlen(x)+strlen(y)+4 < bufsize)) { \
       sprintf(buf, "/%s=%s", x, y); \
-}
+   } else { \
+      return GNUTLS_E_INVALID_REQUEST; \
+   }
+
    if (!issuer)
       gnutls_x509_extract_certificate_dn(cert, &dn);
    else
@@ -2872,5 +2875,5 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, int sizeof_buf,
    len = strlen(buf);
    PRINTX(buf + len, sizeof_buf - len - 1, "E", dn.email);
 
-   return;
+   return 0;
 }
