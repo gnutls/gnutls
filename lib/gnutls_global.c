@@ -136,8 +136,8 @@ static int _gnutls_init = 0;
   *
   * Note that this function will also initialize libgcrypt, if it has not
   * been initialized before. Thus if you want to manualy initialize libgcrypt
-  * you must do it before calling this function. (useful in cases you want
-  * to disable internal lockings etc.)
+  * you must do it before calling this function. This is useful in cases you 
+  * want to disable libgcrypt's internal lockings etc.
   *
   **/
 int gnutls_global_init( void)
