@@ -51,6 +51,8 @@ typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON
 
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } gnutls_mac_algorithm;
 
+/* The enumerations here should have the same value with gnutls_mac_algorithm.
+ */
 typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } gnutls_digest_algorithm;
 
 /* exported for other gnutls headers. This is the maximum number

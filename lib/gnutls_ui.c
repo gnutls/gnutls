@@ -260,7 +260,7 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
 }
 
 
-typedef gnutls_mac_algorithm GNUTLS_DigestAlgorithm;
+typedef gnutls_mac_algorithm gnutls_digest_algorithm;
 /**
   * gnutls_x509_fingerprint - This function calculates the fingerprint of the given data
   * @algo: is a digest algorithm
@@ -275,7 +275,7 @@ typedef gnutls_mac_algorithm GNUTLS_DigestAlgorithm;
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* data, char* result, size_t* result_size)
+int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size)
 {
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = _gnutls_hash_get_algo_len(algo);
