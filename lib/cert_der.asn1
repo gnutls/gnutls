@@ -52,18 +52,19 @@ id-ad-caIssuers OBJECT IDENTIFIER ::= { id-ad 2 }
 
 -- attribute data types --
 
-Attribute       ::=     SEQUENCE {
-        type            AttributeType,
-        values  SET OF AttributeValue
-                -- at least one value is required -- 
-}
-
 AttributeType           ::=   OBJECT IDENTIFIER
-AttributeValue          ::=   ANY
+--AttributeValue          ::=   ANY DEFINED BY AttributeType
+
+-- removed --
+--Attribute       ::=     SEQUENCE {
+--        type            AttributeType
+--        values  SET OF AttributeValue
+                -- at least one value is required -- 
+--}
 
 AttributeTypeAndValue           ::=     SEQUENCE {
         type    AttributeType,
-        value   AttributeValue 
+        value   ANY DEFINED BY type -- AttributeValue 
 }
 
 -- suggested naming attributes: Definition of the following

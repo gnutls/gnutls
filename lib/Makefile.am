@@ -3,7 +3,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls_plaintext.h \
 	gnutls_cipher.h gnutls_buffers.h gnutls_errors.h gnutls_int.h \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
-	gnutls_cert.lex gnutls_compress_int.h gnutls_session.h gnutls_priority.h
+	gnutls_compress_int.h gnutls_session.h gnutls_priority.h
 lib_LTLIBRARIES = libgnutls.la
 libgnutls_la_SOURCES = gnutls.c gnutls_compress.c debug.c gnutls_plaintext.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
