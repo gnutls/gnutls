@@ -155,7 +155,7 @@ int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *
 int gnutls_dh_params_init(gnutls_dh_params * dh_params)
 {
 
-	(*dh_params) = gnutls_calloc(1, sizeof(gnutls_dh_params));
+	(*dh_params) = gnutls_calloc(1, sizeof(_gnutls_dh_params));
 	if (*dh_params == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

@@ -136,6 +136,9 @@ int len, i, ret;
 		}
 	}
 
+	if (client_certs_num > 0)
+		return 0; /* use the first one */
+
 	return -1;
 
 }

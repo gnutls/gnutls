@@ -526,36 +526,68 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 #include <fcntl.h>
 #include <errno.h>
 
-opaque * _gnutls_file_to_str( const char * file, size_t* str_size)
+#ifdef HAVE_MMAP
+# include <unistd.h>
+# include <sys/mman.h>
+#endif
+
+typedef struct {
+	opaque * data;
+	size_t size;
+	int mmaped;
+} strfile;
+
+inline static void _strfile_free( strfile *x)
+{
+	if (x->mmaped) return;
+	
+	gnutls_free( x->data);
+	x->data = NULL;
+}
+
+strfile _gnutls_file_to_str( const char * file)
 {
 	int fd1 = -1;
-	opaque * ret = NULL;
 	struct stat stat_st;
 	size_t tot_size;
 	size_t left;
+	opaque* tmp;
 	ssize_t i = 0;
+	strfile null = { NULL, 0, 0 };
+	strfile ret = { NULL, 0, 0 };
 	
 	fd1 = open( file, 0);
 	if (fd1==-1) {
 		gnutls_assert();
-		return NULL;
+		return null;
 	}
 	
 	if (fstat( fd1, &stat_st) == -1) {
 		gnutls_assert();
 		goto error;
 	}
-	
+
 	tot_size = stat_st.st_size;
-	ret = gnutls_malloc( tot_size + 1);
-	if (ret == NULL) {
+
+#ifdef HAVE_MMAP
+	if ((tmp=mmap( NULL, tot_size, PROT_READ, MAP_SHARED, fd1, 0)) != MAP_FAILED) {
+		ret.mmaped = 1;
+		ret.data = tmp;
+		ret.size = tot_size;
+		
+		return ret;
+	}
+#endif
+
+	ret.data = gnutls_malloc( tot_size);
+	if (ret.data == NULL) {
 		gnutls_assert();
 		goto error;
 	}
 	
 	left = tot_size;
 	while (left > 0) {
-		i = read( fd1, &ret[tot_size - left], left);
+		i = read( fd1, &ret.data[tot_size - left], left);
 		if (i == -1) {
 			if (errno == EAGAIN || errno == EINTR)
 				continue;
@@ -568,18 +600,20 @@ opaque * _gnutls_file_to_str( const char * file, size_t* str_size)
 		left -= i;
 	}
 
-	close(fd1);
+	ret.size = tot_size - left;
 
-	*str_size = tot_size - left;
-	ret[*str_size] = 0; /* null terminated */
+	ret.mmaped = 0;
+
+	close(fd1);
 
 	return ret;
 	
 	error:
-		gnutls_free( ret);
+			
+		if (!ret.mmaped)
+			gnutls_free( ret.data);
 		close(fd1);
-		return NULL;
-		
+		return null;
 }
 
 /* Reads a certificate file
@@ -587,18 +621,17 @@ opaque * _gnutls_file_to_str( const char * file, size_t* str_size)
 static int read_cert_file(gnutls_certificate_credentials res, const char *certfile,
 	gnutls_x509_crt_fmt type)
 {
-	size_t size;
 	int ret;
-	char *x;
+	strfile x;
 
-	x = _gnutls_file_to_str( certfile, &size);
-	if (x == NULL) {
+	x = _gnutls_file_to_str( certfile);
+	if (x.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	ret = read_cert_mem( res, x, size, type);
-	gnutls_free(x);
+	ret = read_cert_mem( res, x.data, x.size, type);
+	_strfile_free(&x);
 	
 	return ret;
 
@@ -612,19 +645,17 @@ static int read_cert_file(gnutls_certificate_credentials res, const char *certfi
 static int read_key_file(gnutls_certificate_credentials res, const char *keyfile,
 	gnutls_x509_crt_fmt type)
 {
-	size_t size;
 	int ret;
-	opaque* x;
+	strfile x;
 
-	x = _gnutls_file_to_str( keyfile, &size);
-	if (x == NULL) {
+	x = _gnutls_file_to_str( keyfile);
+	if (x.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	ret = read_key_mem( res, x, size, type);
-	memset( x, 0, size);
-	gnutls_free(x);
+	ret = read_key_mem( res, x.data, x.size, type);
+	_strfile_free(&x);
 	
 	return ret;
 }
@@ -1040,24 +1071,22 @@ int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res,
 		const char *cafile, gnutls_x509_crt_fmt type)
 {
 	int ret, ret2;
-	size_t size;
-	opaque *x;
+	strfile x;
 
-	x = _gnutls_file_to_str( cafile, &size);
-	if (x == NULL) {
+	x = _gnutls_file_to_str( cafile);
+	if (x.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
-
 	
 	if (type==GNUTLS_X509_FMT_DER)
 		ret = parse_der_ca_mem( &res->x509_ca_list, &res->x509_ncas,
-			x, size);
+			x.data, x.size);
 	else
 		ret = parse_pem_ca_mem( &res->x509_ca_list, &res->x509_ncas,
-			x, size);
+			x.data, x.size);
 
-	gnutls_free(x);
+	_strfile_free(&x);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1258,23 +1287,22 @@ int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res,
 		const char *crlfile, gnutls_x509_crt_fmt type)
 {
 	int ret;
-	size_t size;
-	opaque * x;
+	strfile x;
 
-	x = _gnutls_file_to_str( crlfile, &size);
-	if (x == NULL) {
+	x = _gnutls_file_to_str( crlfile);
+	if (x.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
 
 	if (type==GNUTLS_X509_FMT_DER)
 		ret = parse_der_crl_mem( &res->x509_crl_list, &res->x509_ncrls,
-			x, size);
+			x.data, x.size);
 	else
 		ret = parse_pem_crl_mem( &res->x509_crl_list, &res->x509_ncrls,
-			x, size);
+			x.data, x.size);
 	
-	gnutls_free(x);
+	_strfile_free(&x);
 
 	if (ret < 0) {
 		gnutls_assert();
