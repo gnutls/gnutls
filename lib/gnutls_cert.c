@@ -98,14 +98,14 @@ void gnutls_free_cert(gnutls_cert cert)
 }
 
 /**
-  * gnutls_x509pki_free_sc - Used to free an allocated x509 SERVER CREDENTIALS structure
+  * gnutls_certificate_free_sc - Used to free an allocated CERTIFICATE CREDENTIALS structure
   * @sc: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_x509pki_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
+void gnutls_certificate_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 {
 	int i, j;
 
@@ -119,18 +119,18 @@ void gnutls_x509pki_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 	gnutls_free(sc->cert_list_length);
 	gnutls_free(sc->cert_list);
 
-	for (j = 0; j < sc->ncas; j++) {
-		gnutls_free_cert(sc->ca_list[j]);
+	for (j = 0; j < sc->x509_ncas; j++) {
+		gnutls_free_cert(sc->x509_ca_list[j]);
 	}
 
-	gnutls_free(sc->ca_list);
+	gnutls_free(sc->x509_ca_list);
 
 	for (i = 0; i < sc->ncerts; i++) {
 		_gnutls_free_private_key(sc->pkey[i]);
 	}
 
 	gnutls_free(sc->pkey);
-	gnutls_free(sc->rdn_sequence.data);
+	gnutls_free(sc->x509_rdn_sequence.data);
 
 	gnutls_free(sc);
 }
@@ -207,7 +207,7 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 
 	/* WE DO NOT CATCH OVERRUNS in gnutls_x509pki_set_key().
 	 * This function should be called as many times as specified 
-	 * in x509pki_allocate_sc().
+	 * in certificate_allocate_sc().
 	 */
 	res->ncerts++;
 
@@ -229,7 +229,7 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 
 	ptr = ca;
 
-	i = res->ncas + 1;
+	i = res->x509_ncas + 1;
 
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
@@ -242,22 +242,22 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
-		res->ca_list =
-		    (gnutls_cert *) gnutls_realloc(res->ca_list,
+		res->x509_ca_list =
+		    (gnutls_cert *) gnutls_realloc(res->x509_ca_list,
 						   i *
 						   sizeof(gnutls_cert));
-		if (res->ca_list == NULL) {
+		if (res->x509_ca_list == NULL) {
 			gnutls_assert();
 			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		memset(&res->ca_list[i - 1], 0, sizeof(gnutls_cert));
+		memset(&res->x509_ca_list[i - 1], 0, sizeof(gnutls_cert));
 
 		tmp.data = b64;
 		tmp.size = siz2;
 
 		if ((ret =
-		     _gnutls_x509_cert2gnutls_cert(&res->ca_list[i - 1],
+		     _gnutls_x509_cert2gnutls_cert(&res->x509_ca_list[i - 1],
 					     tmp)) < 0) {
 			gnutls_assert();
 			gnutls_free(b64);
@@ -273,7 +273,7 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 		i++;
 	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
 
-	res->ncas = i - 1;
+	res->x509_ncas = i - 1;
 
 
 
@@ -405,7 +405,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
 }
 
 /**
-  * gnutls_x509pki_allocate_sc - Used to allocate an x509 SERVER CREDENTIALS structure
+  * gnutls_certificate_allocate_sc - Used to allocate an x509 SERVER CREDENTIALS structure
   * @res: is a pointer to an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @ncerts: this is the number of certificate/private key pair you're going to use.
   * This should be 1 in common sites.
@@ -414,7 +414,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_x509pki_allocate_sc(GNUTLS_CERTIFICATE_CREDENTIALS * res, int ncerts)
+int gnutls_certificate_allocate_sc(GNUTLS_CERTIFICATE_CREDENTIALS * res, int ncerts)
 {
 	*res = gnutls_calloc(1, sizeof(CERTIFICATE_CREDENTIALS_INT));
 
@@ -522,31 +522,31 @@ opaque *pdata;
 	 */
 
 	size = 0;
-	for (i = 0; i < res->ncas; i++) {
-		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
+	for (i = 0; i < res->x509_ncas; i++) {
+		if ((ret = _gnutls_find_dn(&tmp, &res->x509_ca_list[i])) < 0) {
 			gnutls_assert();
 			return ret;
 		}
 		size += (2 + tmp.size);
 	}
 
-	if (res->rdn_sequence.data != NULL)
-		gnutls_free( res->rdn_sequence.data);
+	if (res->x509_rdn_sequence.data != NULL)
+		gnutls_free( res->x509_rdn_sequence.data);
 
-	res->rdn_sequence.data = gnutls_malloc(size);
-	if (res->rdn_sequence.data == NULL) {
+	res->x509_rdn_sequence.data = gnutls_malloc(size);
+	if (res->x509_rdn_sequence.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	res->rdn_sequence.size = size;
+	res->x509_rdn_sequence.size = size;
 
-	pdata = res->rdn_sequence.data;
+	pdata = res->x509_rdn_sequence.data;
 
-	for (i = 0; i < res->ncas; i++) {
-		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
-			gnutls_free(res->rdn_sequence.data);
-			res->rdn_sequence.size = 0;
-			res->rdn_sequence.data = NULL;
+	for (i = 0; i < res->x509_ncas; i++) {
+		if ((ret = _gnutls_find_dn(&tmp, &res->x509_ca_list[i])) < 0) {
+			gnutls_free(res->x509_rdn_sequence.data);
+			res->x509_rdn_sequence.size = 0;
+			res->x509_rdn_sequence.data = NULL;
 			gnutls_assert();
 			return ret;
 		}
@@ -1356,7 +1356,7 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 
 
 /**
-  * gnutls_x509pki_server_set_cert_request - Used to set whether to request a client certificate
+  * gnutls_certificate_server_set_request - Used to set whether to request a client certificate
   * @state: is an &GNUTLS_STATE structure.
   * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
   *
@@ -1367,7 +1367,7 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
   * call this function then the client will not be asked to
   * send a certificate.
   **/
-void gnutls_x509pki_server_set_cert_request(GNUTLS_STATE state,
+void gnutls_certificate_server_set_request(GNUTLS_STATE state,
 					    CertificateRequest req)
 {
 	state->gnutls_internals.send_cert_req = req;
