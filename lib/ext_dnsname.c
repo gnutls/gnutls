@@ -28,24 +28,14 @@ int _gnutls_dnsname_recv_params( GNUTLS_STATE state, const opaque* data, int dat
 	uint8 len;
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
-			state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO));
-			if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
-			
-			if (sizeof( ((X509PKI_AUTH_INFO*)state->gnutls_key->auth_info)->dnsname) > data_size) {
+			if (sizeof( state->gnutls_key->dnsname) > data_size) {
 				len = data[0];
 				if (len > data_size) {
 					gnutls_assert();
 					return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 				}
-				memcpy( ((X509PKI_AUTH_INFO*)state->gnutls_key->auth_info)->dnsname, &data[1], len);
-				((X509PKI_AUTH_INFO*)state->gnutls_key->auth_info)->dnsname[len]=0; /* null terminated */
-				state->gnutls_key->auth_info_size = sizeof(X509PKI_AUTH_INFO);
-			} else {
-				state->gnutls_key->auth_info_size = 0;
-				gnutls_free(state->gnutls_key->auth_info);
-				state->gnutls_key->auth_info = NULL;
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				memcpy( state->gnutls_key->dnsname, &data[1], len);
+				state->gnutls_key->dnsname[len]=0; /* null terminated */
 			}
 		}
 	}
@@ -59,17 +49,11 @@ int _gnutls_dnsname_send_params( GNUTLS_STATE state, opaque** data) {
 	uint8 len;
 	/* this function sends the client extension data (dnsname) */
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		const X509PKI_CLIENT_CREDENTIALS* cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_X509PKI, NULL);
 
-		(*data) = NULL;
-
-		if (cred==NULL) return 0;
-
-		if (cred->dnsname!=NULL) { /* send dnsname */
-			len = strlen(cred->dnsname);
+		if ( (len = strlen(state->gnutls_key->dnsname)) > 0) { /* send dnsname */
 			(*data) = gnutls_malloc(len+1); /* hold the size also */
 			(*data)[0] = len;
-			memcpy( &(*data)[1], cred->dnsname, len);
+			memcpy( &(*data)[1], state->gnutls_key->dnsname, len);
 			return len + 1;
 		}
 	}

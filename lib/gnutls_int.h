@@ -22,14 +22,14 @@
 
 #define GNUTLS_INT_H
 
-/*
+
 #define READ_DEBUG
-#define WRITE_DEBUG
-#define HARD_DEBUG
+//#define WRITE_DEBUG
+//#define HARD_DEBUG
 #define BUFFERS_DEBUG
 #define HANDSHAKE_DEBUG
 #define DEBUG
-*/
+
 
 #define LIST ...
 
@@ -167,7 +167,8 @@ typedef struct {
 	opaque				server_random[32];
 	opaque				client_random[32];
 	ProtocolVersion			version;
-
+	opaque				dnsname[256];
+	
 	AUTH_CRED*			cred; /* used to specify keys/certificates etc */
 } GNUTLS_KEY_A;
 typedef GNUTLS_KEY_A* GNUTLS_KEY;
@@ -208,7 +209,7 @@ typedef struct {
 	opaque* client_write_key;
 } CipherSpecs;
 
-typedef enum GNUTLS_Version { GNUTLS_TLS1, GNUTLS_SSL3 } GNUTLS_Version;
+typedef enum GNUTLS_Version { GNUTLS_TLS1, GNUTLS_SSL3, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
 
 typedef struct {
 	GNUTLS_Version	version;

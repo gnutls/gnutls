@@ -24,11 +24,9 @@ typedef struct {
 } X509PKI_SERVER_CREDENTIALS;
 
 typedef struct {
-	opaque dnsname[256];
+	int ne;
 } X509PKI_CLIENT_CREDENTIALS;
 
 typedef struct {
-	opaque dnsname[256];  /* the client may send us the 
-			       * hostname he thinks he connected to.
-			       */
+	int ne;
 } X509PKI_AUTH_INFO;

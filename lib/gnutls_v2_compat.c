@@ -141,7 +141,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	DECR_LEN(len, 2);
 	sizeOfSuites = READuint16( &data[pos]);
 	pos += 2;
-
+fprintf(stderr, "suites: %d\n", sizeOfSuites);
 	
 	/* read session id length */
 	DECR_LEN(len, 2);
@@ -152,13 +152,15 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
+fprintf(stderr, "sessid: %d\n", session_id_len);
 
 	/* read challenge length */
 	DECR_LEN(len, 2);
 	challenge = READuint16( &data[pos]);
 	pos += 2;
+fprintf(stderr, "challenge: %d\n", challenge);
 
-	if ( challenge < 15) {
+	if ( challenge < 16 || challenge > 32) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
@@ -209,9 +211,8 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	
 	DECR_LEN(len, challenge);
 	memset( random, 0, 32);
-	memcpy( random, &data[ (challenge > 32)?(pos+challenge-32):pos], (challenge<32)?challenge:32);
-
-	/* read the last 32 bytes */
+	memcpy( random, &data[pos], challenge);
+fprintf(stderr, "challenge: %s\n", _gnutls_bin2hex(random, 32));
 	_gnutls_set_client_random( state, random);
 
 	/* generate server random value */

@@ -435,19 +435,6 @@ int gnutls_bye(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
-/* This function will check the input buffer for 
- * any pending alert.
- */
-int _gnutls_check_for_pending_alert(int cd, GNUTLS_STATE state)
-{
-	int ret;
-
-	/* receive the alert */
-	ret = gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0, 0|MSG_DONTWAIT); 
-
-	return ret;
-}
-
 int gnutls_close_nowait(int cd, GNUTLS_STATE state)
 {
 	int ret;
@@ -478,23 +465,6 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 		return 0;
 	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
 		return GNUTLS_E_INVALID_SESSION;
-	}
-	
-	/* Before we send data while in handshake, we
-	 * check for any FATAL alert. Our intention
-	 * here is to minimize to possibility of receiving
-	 * a SIGPIPE.
-	 */
-	if (type==GNUTLS_HANDSHAKE) {
-		if ((ret = _gnutls_check_for_pending_alert(cd, state)) < 0) {
-			if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED) {
-#ifdef DEBUG
-				fprintf(stderr, "Record: Got alert[%d] - %s - Ignoring...\n", gnutls_get_last_alert(state), _gnutls_alert2str(gnutls_get_last_alert(state)));
-#endif	
-				return 0;
-			}
-			return ret;
-		}
 	}
 	
 	if (sizeofdata < MAX_ENC_LEN) {
@@ -676,12 +646,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	 * must be set to non blocking mode
 	 */
 	if ( (ret = _gnutls_Read(cd, headers, HEADER_SIZE, MSG_PEEK|flags)) != HEADER_SIZE) {
-		if (type==GNUTLS_ALERT && flags==MSG_DONTWAIT && ret==(0-EAGAIN)) 
-			return 0;                 /* we expected an alert
-		                                   * but nothing came thus success.
-		                                   * we only wait for an alert
-		                                   * in check_pending_alert().
-		                                   */
 		if (ret==(0-EAGAIN)) return GNUTLS_E_AGAIN;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -699,7 +663,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	/* if msb set and expecting handshake message
 	 * it should be SSL 2 hello 
 	 */
-		version = GNUTLS_SSL3; /* assume ssl 3.0 - not really needed */
+		version = GNUTLS_VERSION_UNKNOWN; /* assume unknown version */
 		length = (((headers[0] & 0x7f) << 8)) | headers[1];
 		header_size = 2;
 		recv_type = GNUTLS_HANDSHAKE; /* we accept only v2 client hello
