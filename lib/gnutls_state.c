@@ -172,7 +172,8 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session)
 	session->internals.handshake_restarted = 0;
 
 	session->internals.resumable = RESUME_TRUE;
-	
+	_gnutls_free_datum( &session->internals.recv_buffer);
+
 	deinit_internal_params( session);
 
 }

@@ -624,6 +624,42 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 
 }
 
+
+/* This function will return the internal (per session) temporary
+ * recv buffer. If the buffer was not initialized before it will
+ * also initialize it.
+ */
+inline static int get_temp_recv_buffer( gnutls_session session, gnutls_datum* tmp) 
+{
+
+	/* We allocate MAX_RECORD_RECV_SIZE length
+	 * because we cannot predict the output data by the record
+	 * packet length (due to compression).
+	 */
+
+	if (MAX_RECORD_RECV_SIZE > session->internals.recv_buffer.size || 
+		session->internals.recv_buffer.data == NULL) {
+		
+		/* Initialize the internal buffer.
+		 */
+		session->internals.recv_buffer.data = gnutls_realloc( 
+			session->internals.recv_buffer.data, MAX_RECORD_RECV_SIZE);
+
+		if (session->internals.recv_buffer.data==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		
+		session->internals.recv_buffer.size = MAX_RECORD_RECV_SIZE;
+	}
+
+	tmp->data = session->internals.recv_buffer.data;
+	tmp->size = session->internals.recv_buffer.size;
+	
+	return 0;
+}
+
+
 #define MAX_EMPTY_PACKETS_SEQUENCE 4
 
 /* This function behaves exactly like read(). The only difference is
@@ -636,8 +672,8 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, 
 	HandshakeType htype, opaque *data, size_t sizeofdata)
 {
-	uint8 *tmpdata;
-	int tmplen;
+	gnutls_datum tmp;
+	int decrypted_length;
 	opaque version[2];
 	uint8 *headers;
 	ContentType recv_type;
@@ -664,16 +700,16 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type,
 		return GNUTLS_E_INVALID_SESSION;
 	}
 	
-	/* If we have enough data in the cache do not bother receiving
-	 * a new packet. (in order to flush the cache)
-	 */
+/* If we have enough data in the cache do not bother receiving
+ * a new packet. (in order to flush the cache)
+ */
 	ret = _gnutls_check_buffers( session, type, data, sizeofdata);
 	if (ret != 0)
 		return ret;
 
 
-	/* default headers for TLS 1.0
-	 */
+/* default headers for TLS 1.0
+ */
 	header_size = RECORD_HEADER_SIZE;
 
 	if ( (ret = _gnutls_io_read_buffered( session, &headers, header_size, -1)) != header_size) {
@@ -694,18 +730,18 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type,
 		return ret;
 	}
 
-	/* Here we check if the Type of the received packet is
-	 * ok. 
-	 */
+/* Here we check if the Type of the received packet is
+ * ok. 
+ */
 	if ( (ret = _gnutls_check_recv_type( recv_type)) < 0) {
 		
 		gnutls_assert();
 		return ret;
 	}
 
-	/* Here we check if the advertized version is the one we
-	 * negotiated in the handshake.
-	 */
+/* Here we check if the advertized version is the one we
+ * negotiated in the handshake.
+ */
 	if ( (ret=_gnutls_check_record_version( session, htype, version)) < 0) {
 		gnutls_assert();
 		_gnutls_session_invalidate( session);
@@ -727,8 +763,8 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	/* check if we have that data into buffer. 
- 	 */
+/* check if we have that data into buffer. 
+ */
 	if ( (ret = _gnutls_io_read_buffered( session, &recv_data, header_size+length, recv_type)) != header_size+length) {
 		if (ret<0 && gnutls_error_is_fatal(ret)==0) return ret;
 
@@ -744,65 +780,58 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type,
 	_gnutls_io_clear_read_buffer( session);
 	ciphertext = &recv_data[header_size];
 	
-	/* decrypt the data we got. We allocate MAX_RECORD_RECV_SIZE
-	 * because we cannot predict the output data by the record
-	 * packet length (due to compression).
-	 */
-	tmplen = MAX_RECORD_RECV_SIZE;
-	tmpdata = gnutls_malloc( tmplen);
-	if (tmpdata==NULL) {
+	ret = get_temp_recv_buffer( session, &tmp);
+	if (ret < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return ret;
 	}
 
-	tmplen = _gnutls_decrypt( session, ciphertext, length, tmpdata, tmplen, recv_type);
-	if (tmplen < 0) {
+/* decrypt the data we got. 
+ */
+	ret = _gnutls_decrypt( session, ciphertext, length, tmp.data, tmp.size, recv_type);
+	if (ret < 0) {
 		_gnutls_session_unresumable( session);
 		_gnutls_session_invalidate( session);
-		gnutls_free(tmpdata);
 		gnutls_assert();
-		return tmplen;
+		return ret;
 	}
+	decrypted_length = ret;
 
-	/* Check if this is a CHANGE_CIPHER_SPEC
-	 */
+/* Check if this is a CHANGE_CIPHER_SPEC
+ */
 	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
 
 		_gnutls_record_log( "REC[%x]: ChangeCipherSpec Packet was received\n", session);
 
-		if ((size_t)tmplen!=sizeofdata) { /* sizeofdata should be 1 */
+		if ((size_t)ret!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
-			gnutls_free(tmpdata);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
-		memcpy( data, tmpdata, sizeofdata);
-		gnutls_free(tmpdata);
+		memcpy( data, tmp.data, sizeofdata);
 
-		return tmplen;
+		return ret;
 	}
 
 	_gnutls_record_log( "REC[%x]: Decrypted Packet[%d] %s(%d) with length: %d\n",
-		session, (int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
+		session, (int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, decrypted_length);
 
-	/* increase sequence number */
+/* increase sequence number 
+ */
 	if (_gnutls_uint64pp( &session->connection_state.read_sequence_number)!=0) {
 		_gnutls_session_invalidate( session);
-		gnutls_free(tmpdata);
 		gnutls_assert();
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-	if ( (ret=_gnutls_record_check_type( session, recv_type, type, htype, tmpdata, tmplen)) < 0) {
-		gnutls_free(tmpdata);
-
+	ret=_gnutls_record_check_type( session, recv_type, type, htype, tmp.data, decrypted_length);
+	if (ret < 0) {
 		if (ret==GNUTLS_E_INT_RET_0) return 0;
 		gnutls_assert();
 		return ret;
 	}
-	gnutls_free(tmpdata);
 
-	/* Get Application data from buffer 
-	 */
+/* Get Application data from buffer 
+ */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
 
 		ret = _gnutls_record_buffer_get(type, session, data, sizeofdata);
@@ -811,7 +840,8 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type,
 			return ret;
 		}
 
-		/* if the buffer just got empty */
+	/* if the buffer just got empty 
+ 	*/
 		if (_gnutls_record_buffer_get_size(type, session)==0) {
 			if ( (ret2 = _gnutls_io_clear_peeked_data( session)) < 0) {
 				gnutls_assert();
@@ -821,17 +851,17 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type,
 	} else {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET;
-		/* we didn't get what we wanted to 
-		 */
+	/* we didn't get what we wanted to 
+	 */
 	}
 
-	/* TLS 1.0 CBC protection. 
-	 * Actually this code is called if we just received
-	 * an empty packet. An empty TLS packet is usually
-	 * sent to protect some vulnerabilities in the CBC mode.
-	 * In that case we go to the beginning and start reading
-	 * the next packet.
-	 */
+/* (originally for) TLS 1.0 CBC protection. 
+ * Actually this code is called if we just received
+ * an empty packet. An empty TLS packet is usually
+ * sent to protect some vulnerabilities in the CBC mode.
+ * In that case we go to the beginning and start reading
+ * the next packet.
+ */
 	if (ret==0) {
 		empty_packet++;
 		goto begin;

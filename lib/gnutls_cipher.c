@@ -106,9 +106,11 @@ int _gnutls_encrypt(gnutls_session session, const opaque* headers, size_t header
 	return ret+headers_size;
 }
 
-
+/* Decrypts the given data.
+ * Returns the decrypted data length.
+ */
 int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
-		    size_t ciphertext_size, uint8 * data, size_t data_size,
+		    size_t ciphertext_size, uint8 * data, size_t max_data_size,
 		    ContentType type)
 {
 	gnutls_datum gtxt;
@@ -121,7 +123,7 @@ int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 	gcipher.size = ciphertext_size;
 	gcipher.data = ciphertext;
 
-	ret = _gnutls_ciphertext2compressed(session, data, data_size, gcipher, type);
+	ret = _gnutls_ciphertext2compressed(session, data, max_data_size, gcipher, type);
 	if (ret < 0) {
 		return ret;
 	}
@@ -142,7 +144,7 @@ int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 			return ret;
 		}
 		
-		if (gtxt.size > data_size) {
+		if (gtxt.size > max_data_size) {
 			gnutls_assert();
 			_gnutls_free_datum( &gtxt);
 			/* This shouldn't have happen and
@@ -191,8 +193,9 @@ static void mac_deinit( GNUTLS_MAC_HANDLE td, opaque* res, int ver)
 }
 
 inline
-static int calc_enc_length( gnutls_session session, int data_size, int hash_size, uint8* pad, int random_pad, 
-	CipherType block_algo, uint16 blocksize) 
+static int calc_enc_length( 
+	gnutls_session session, int data_size, int hash_size, uint8* pad, 
+	int random_pad, CipherType block_algo, uint16 blocksize) 
 {
 uint8 rand;
 int length;

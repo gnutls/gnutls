@@ -668,6 +668,11 @@ typedef struct {
 	 */
 	gnutls_internal_params  params;
 
+	/* This buffer is used by the record recv functions,
+	 * as a temporary store buffer.
+	 */
+	gnutls_datum recv_buffer;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } GNUTLS_INTERNALS;
