@@ -32,6 +32,7 @@
 #define gcry_mpi_addm mpi_addm
 #define gcry_mpi_mul mpi_mul
 #define gcry_mpi_mulm mpi_mulm
+MPI generate_public_prime( unsigned  nbits );
 
 /* Here functions for SRP (like g^x mod n) are defined 
  */
@@ -53,17 +54,24 @@ const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n) {
+int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n, int bits) {
 
 	MPI g, prime;
-	size_t n = sizeof diffie_hellman_group1_prime;
+	size_t n;
 	int siz;
 	char* tmp;
 
-	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-			  diffie_hellman_group1_prime, &n)) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
+	n = sizeof diffie_hellman_group1_prime;
+
+	if (bits==n*8) {
+		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
+				  diffie_hellman_group1_prime, &n)) {
+			gnutls_assert();
+			return GNUTLS_E_MPI_SCAN_FAILED;
+		}
+	} else {
+		/* generate a random prime */
+		prime = generate_public_prime(bits);
 	}
 
 	g = gcry_mpi_set_ui(NULL, SRP_G);

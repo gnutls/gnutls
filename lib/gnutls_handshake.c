@@ -1455,6 +1455,8 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (ret < 0) {
 			gnutls_assert();
 			gnutls_clearHashDataBuffer(state);
+			/* for srp */
+			if (state->security_parameters.kx_algorithm==GNUTLS_KX_SRP) return GNUTLS_E_AUTH_FAILED;
 			return ret;
 		}
 
@@ -1477,6 +1479,8 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (ret < 0) {
 			gnutls_assert();
 			gnutls_clearHashDataBuffer(state);
+			/* in srp failure here - means authentication error */
+			if (state->security_parameters.kx_algorithm==GNUTLS_KX_SRP) return GNUTLS_E_AUTH_FAILED;
 			return ret;
 		}
 	}
