@@ -74,7 +74,7 @@ int main()
    gnutls_global_init();
    gnutls_global_init_extra(); /* for SRP */
 
-   /* SRP_PASSWD a password file (created with the included srpcrypt utility) 
+   /* SRP_PASSWD a password file (created with the included srptool utility) 
     */
    gnutls_srp_allocate_server_credentials(&srp_cred);
    gnutls_srp_set_server_credentials_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
