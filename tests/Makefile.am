@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 # Copyright (C) 2004, 2005 Free Software Foundation
 #
-# Author: Nikos Mavroyanopoulos
+# Author: Simon Josefsson
 #
 # This file is part of GNUTLS.
 #
@@ -34,26 +34,3 @@ ctests = simple anonself openssl
 TESTS = pkcs12_neon $(ctests)	
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = pkcs12_neon
-
-# LIBS=`../lib/libgnutls-config --libs`  -lgcrypt
-# LIBS2=`../lib/libgnutls-config --libs` `../libextra/libgnutls-extra-config --libs` -lgcrypt -lopencdk
-# CC=gcc
-# CFLAGS=-O2 -I../libextra/ -I../ -I../lib/ `../lib/libgnutls-config --cflags` -I../lib/minitasn1/
-#
-# all: x509test opgptest
-#
-# x509test: x509_test.c
-# 	$(CC) $(CFLAGS) x509_test.c $(LIBS) -o x509test
-#
-# opgptest: openpgp_test.c
-# 	$(CC) $(CFLAGS) openpgp_test.c $(LIBS2) -o opgptest
-#
-# check: x509test
-# 	./x509test
-# 	./opgptest
-#
-# clean:
-# 	rm *~
-# 	rm *.o
-# 	rm x509test
-# 	rm opgptest
