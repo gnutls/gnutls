@@ -155,7 +155,7 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
 }
 
 int
-gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key)
+gc_cipher_setkey (gc_cipher handle, size_t keylen, const char *key)
 {
   gcry_error_t err;
 
@@ -167,7 +167,7 @@ gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key)
 }
 
 int
-gc_cipher_setiv (gc_cipher handle, size_t ivlen, char *iv)
+gc_cipher_setiv (gc_cipher handle, size_t ivlen, const char *iv)
 {
   gcry_error_t err;
 
@@ -202,4 +202,117 @@ gc_cipher_close (gc_cipher handle)
   gcry_cipher_close (handle);
 
   return GC_OK;
+}
+
+/* Hashes. */
+
+int
+gc_hash_open (int hash, int mode, gc_hash * outhandle)
+{
+  int gcryalg, gcrymode;
+  gcry_error_t err;
+
+  switch (hash)
+    {
+    case GC_MD5:
+      gcryalg = GCRY_MD_MD5;
+      break;
+
+    case GC_SHA1:
+      gcryalg = GCRY_MD_SHA1;
+      break;
+
+    case GC_RMD160:
+      gcryalg = GCRY_MD_RMD160;
+      break;
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  switch (mode)
+    {
+    case 0:
+      gcrymode = 0;
+      break;
+
+    case GC_HMAC:
+      gcrymode = GCRY_MD_FLAG_HMAC;
+      break;
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  err = gcry_md_open ((gcry_md_hd_t*) outhandle, gcryalg, gcrymode);
+  if (gcry_err_code (err))
+    return GC_INVALID_HASH;
+
+  return GC_OK;
+}
+
+int
+gc_hash_clone (gc_hash handle, gc_hash * outhandle)
+{
+  int err;
+
+  err = gcry_md_copy((gcry_md_hd_t*)outhandle, (gcry_md_hd_t)handle);
+  if (err)
+    return GC_INVALID_HASH;
+
+  return GC_OK;
+}
+
+size_t
+gc_hash_digest_length (int hash)
+{
+  int gcryalg;
+
+  switch (hash)
+    {
+    case GC_MD5:
+      gcryalg = GCRY_MD_MD5;
+      break;
+
+    case GC_SHA1:
+      gcryalg = GCRY_MD_SHA1;
+      break;
+
+    case GC_RMD160:
+      gcryalg = GCRY_MD_RMD160;
+      break;
+
+    default:
+      return 0;
+    }
+
+  return gcry_md_get_algo_dlen (gcryalg);
+}
+void
+gc_hash_hmac_setkey (gc_hash handle, size_t len, const char *key)
+{
+  gcry_md_setkey((gcry_md_hd_t)handle, key, len);
+}
+
+void
+gc_hash_write (gc_hash handle, size_t len, const char *data)
+{
+  gcry_md_write ((gcry_md_hd_t)handle, data, len);
+}
+
+const char *
+gc_hash_read (gc_hash handle)
+{
+  const char *digest;
+
+  gcry_md_final ((gcry_md_hd_t)handle);
+  digest = gcry_md_read ((gcry_md_hd_t)handle, 0);
+
+  return digest;
+}
+
+void
+gc_hash_close (gc_hash handle)
+{
+  gcry_md_close ((gcry_md_hd_t)handle);
 }

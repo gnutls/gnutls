@@ -230,7 +230,7 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
 }
 
 int
-gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key)
+gc_cipher_setkey (gc_cipher handle, size_t keylen, const char *key)
 {
   cinfo *cinf = (cinfo*) handle;
 
@@ -241,7 +241,7 @@ gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key)
 }
 
 int
-gc_cipher_setiv (gc_cipher handle, size_t ivlen, char *iv)
+gc_cipher_setiv (gc_cipher handle, size_t ivlen, const char *iv)
 {
   cinfo *cinf = (cinfo*) handle;
 
@@ -294,4 +294,205 @@ gc_cipher_close (gc_cipher handle)
   free (cinf);
 
   return GC_OK;
+}
+
+/* Hashes. */
+
+#include "nettle-meta.h"
+#include "hmac.h"
+#include "md5.h"
+#include "sha.h"
+
+#define MAX_DIGEST_SIZE 20
+
+typedef struct hash_info {
+  int alg;
+  int mode;
+  const struct nettle_hash *info;
+  void *context;
+  void *outer;
+  void *inner;
+  char digest[MAX_DIGEST_SIZE];
+} hinfo;
+
+int
+gc_hash_open (int hash, int mode, gc_hash * outhandle)
+{
+  hinfo *hinf;
+
+  hinf = malloc (sizeof (*hinf));
+  if (!hinf)
+    return GC_MALLOC_ERROR;
+
+  hinf->alg = hash;
+  hinf->mode = mode;
+
+  switch (hash)
+    {
+    case GC_MD5:
+      hinf->info = &nettle_md5;
+      break;
+
+    case GC_SHA1:
+      hinf->info = &nettle_sha1;
+      break;
+
+      /* FIXME: RMD160. */
+
+    default:
+      free (hinf);
+      return GC_INVALID_HASH;
+    }
+
+  hinf->context = malloc (hinf->info->context_size);
+  if (!hinf->context)
+    {
+      free (hinf);
+      return GC_MALLOC_ERROR;
+    }
+
+  if (mode == GC_HMAC)
+    {
+      hinf->outer = malloc (hinf->info->context_size);
+      if (!hinf->outer)
+	{
+	  free (hinf->context);
+	  free (hinf);
+	  return GC_MALLOC_ERROR;
+	}
+
+      hinf->inner = malloc (hinf->info->context_size);
+      if (!hinf->inner)
+	{
+	  free (hinf->outer);
+	  free (hinf->context);
+	  free (hinf);
+	  return GC_MALLOC_ERROR;
+	}
+    }
+  else
+    hinf->inner = hinf->outer = NULL;
+
+  hinf->info->init (hinf->context);
+
+  *outhandle = hinf;
+
+  return GC_OK;
+}
+
+int
+gc_hash_clone (gc_hash handle, gc_hash * outhandle)
+{
+  hinfo *oldhinf = (hinfo*) handle;
+  hinfo *newhinf;
+
+  newhinf = malloc (sizeof (*newhinf));
+  if (!newhinf)
+    return GC_MALLOC_ERROR;
+
+  newhinf->alg = oldhinf->alg;
+  newhinf->mode = oldhinf->mode;
+  newhinf->info = oldhinf->info;
+
+  newhinf->context = malloc (newhinf->info->context_size);
+  if (!newhinf->context)
+    {
+      free (newhinf);
+      return GC_MALLOC_ERROR;
+    }
+
+  if (oldhinf->mode == GC_HMAC)
+    {
+      newhinf->inner = malloc (newhinf->info->context_size);
+      if (!newhinf->inner)
+	{
+	  free (newhinf->context);
+	  free (newhinf);
+	  return GC_MALLOC_ERROR;
+	}
+
+      newhinf->outer = malloc (newhinf->info->context_size);
+      if (!newhinf->outer)
+	{
+	  free (newhinf->inner);
+	  free (newhinf->context);
+	  free (newhinf);
+	  return GC_MALLOC_ERROR;
+	}
+
+      memcpy (newhinf->inner, oldhinf->inner, newhinf->info->context_size);
+      memcpy (newhinf->outer, oldhinf->outer, newhinf->info->context_size);
+    }
+
+  memcpy (newhinf->context, oldhinf->context, newhinf->info->context_size);
+
+  *outhandle = newhinf;
+
+  return GC_OK;
+}
+
+size_t
+gc_hash_digest_length (int hash)
+{
+  switch (hash)
+    {
+    case GC_MD5:
+      return MD5_DIGEST_SIZE;
+      break;
+
+    case GC_SHA1:
+      return SHA1_DIGEST_SIZE;
+      break;
+
+    case GC_RMD160:
+      return /* FIXME */20;
+      break;
+
+    default:
+      break;
+    }
+
+  return 0;
+}
+
+void
+gc_hash_hmac_setkey (gc_hash handle, size_t len, const char *key)
+{
+  hinfo *hinf = (hinfo*) handle;
+
+  hmac_set_key(hinf->outer, hinf->inner, hinf->context,
+	       hinf->info, (unsigned) len, key);
+}
+
+void
+gc_hash_write (gc_hash handle, size_t len, const char *data)
+{
+  hinfo *hinf = (hinfo*) handle;
+
+  hinf->info->update (hinf->context, (size_t) len, data);
+}
+
+const char *
+gc_hash_read (gc_hash handle)
+{
+  hinfo *hinf = (hinfo*) handle;
+
+  if (hinf->mode == GC_HMAC)
+    hmac_digest(hinf->outer, hinf->inner, hinf->context,
+		hinf->info, (unsigned) hinf->info->digest_size,
+		hinf->digest);
+  else
+    hinf->info->digest (hinf->context, (unsigned) hinf->info->digest_size,
+			hinf->digest);
+
+  return hinf->digest;
+}
+
+void
+gc_hash_close (gc_hash handle)
+{
+  hinfo *hinf = (hinfo*) handle;
+
+  free (hinf->context);
+  free (hinf);
 }

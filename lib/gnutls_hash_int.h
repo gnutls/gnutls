@@ -1,4 +1,5 @@
 /*
+ *      Copyright (C) 2004 Simon Josefsson
  *      Copyright (C) 2000 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
@@ -26,7 +27,7 @@
 /* for message digests */
 
 typedef struct {
-    gcry_md_hd_t handle;
+    gc_hash handle;
     gnutls_mac_algorithm_t algorithm;
     const void *key;
     int keysize;

@@ -32,9 +32,18 @@ enum Gc_rc
   GC_MALLOC_ERROR,
   GC_INIT_ERROR,
   GC_RANDOM_ERROR,
-  GC_INVALID_CIPHER
+  GC_INVALID_CIPHER,
+  GC_INVALID_HASH
 };
 typedef enum Gc_rc Gc_rc;
+
+enum Gc_hash
+  {
+    GC_MD5,
+    GC_SHA1,
+    GC_RMD160
+  };
+typedef enum Gc_hash Gc_hash;
 
 enum Gc_cipher
 {
@@ -48,12 +57,18 @@ enum Gc_cipher
 };
 typedef enum Gc_cipher Gc_cipher;
 
-enum Gc_mode
+enum Gc_cipher_mode
 {
   GC_CBC,
   GC_STREAM
 };
-typedef enum Gc_mode Gc_mode;
+typedef enum Gc_cipher_mode Gc_cipher_mode;
+
+enum Gc_hash_mode
+  {
+    GC_HMAC = 1
+  };
+typedef enum Gc_hash_mode Gc_hash_mode;
 
 typedef void *gc_hash;
 typedef void *gc_cipher;
@@ -78,12 +93,19 @@ extern void gc_set_allocators (gc_malloc_t func_malloc,
 
 /* Ciphers. */
 extern int gc_cipher_open (int cipher, int mode, gc_cipher * outhandle);
-extern int gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key);
-extern int gc_cipher_setiv (gc_cipher handle, size_t ivlen, char *iv);
-extern int gc_cipher_encrypt_inline (gc_cipher handle, size_t len,
-				     char *data);
-extern int gc_cipher_decrypt_inline (gc_cipher handle, size_t len,
-				     char *data);
+extern int gc_cipher_setkey (gc_cipher handle, size_t keylen, const char *key);
+extern int gc_cipher_setiv (gc_cipher handle, size_t ivlen, const char *iv);
+extern int gc_cipher_encrypt_inline (gc_cipher handle, size_t len, char *data);
+extern int gc_cipher_decrypt_inline (gc_cipher handle, size_t len, char *data);
 extern int gc_cipher_close (gc_cipher handle);
+
+/* Hashes. */
+extern int gc_hash_open (int hash, int mode, gc_hash * outhandle);
+extern int gc_hash_clone (gc_hash handle, gc_hash * outhandle);
+extern size_t gc_hash_digest_length (int hash);
+extern void gc_hash_hmac_setkey (gc_hash handle, size_t len, const char *key);
+extern void gc_hash_write (gc_hash handle, size_t len, const char *data);
+extern const char *gc_hash_read (gc_hash handle);
+extern void gc_hash_close (gc_hash handle);
 
 #endif /* GC_H */

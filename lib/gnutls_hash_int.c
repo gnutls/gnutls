@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -21,8 +22,7 @@
  */
 
 /* This file handles all the internal functions that cope with hashes
- * and HMACs. Currently it uses the functions provided by
- * the gcrypt library that this can be easily changed.
+ * and HMACs.
  */
 
 #include <gnutls_int.h>
@@ -32,7 +32,7 @@
 GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm_t algorithm)
 {
     mac_hd_t ret;
-    gcry_error_t result;
+    int result;
 
     ret = gnutls_malloc(sizeof(mac_hd_st));
     if (ret == NULL) {
@@ -44,17 +44,17 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm_t algorithm)
 
     switch (algorithm) {
     case GNUTLS_MAC_SHA:
-	result = gcry_md_open(&ret->handle, GCRY_MD_SHA1, 0);
-	break;
+      result = gc_hash_open(GC_SHA1, 0, &ret->handle);
+      break;
     case GNUTLS_MAC_MD5:
-	result = gcry_md_open(&ret->handle, GCRY_MD_MD5, 0);
-	break;
+      result = gc_hash_open(GC_MD5, 0, &ret->handle);
+      break;
     case GNUTLS_MAC_RMD160:
-	result = gcry_md_open(&ret->handle, GCRY_MD_RMD160, 0);
-	break;
+      result = gc_hash_open(GC_RMD160, 0, &ret->handle);
+      break;
     default:
-	gnutls_assert();
-	result = -1;
+      gnutls_assert();
+      result = -1;
     }
 
     if (result) {
@@ -72,13 +72,13 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm_t algorithm)
 
     switch (algorithm) {
     case GNUTLS_MAC_SHA:
-	ret = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
+	ret = gc_hash_digest_length(GC_SHA1);
 	break;
     case GNUTLS_MAC_MD5:
-	ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
+	ret = gc_hash_digest_length(GC_MD5);
 	break;
     case GNUTLS_MAC_RMD160:
-	ret = gcry_md_get_algo_dlen(GCRY_MD_RMD160);
+	ret = gc_hash_digest_length(GC_RMD160);
 	break;
     default:
 	ret = 0;
@@ -92,15 +92,15 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm_t algorithm)
 int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text,
 		 size_t textlen)
 {
-    if (textlen > 0)
-	gcry_md_write(handle->handle, text, textlen);
-    return 0;
+  if (textlen > 0)
+    gc_hash_write(handle->handle, textlen, text);
+  return 0;
 }
 
 GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
 {
     GNUTLS_HASH_HANDLE ret;
-    gcry_error_t result;
+    int result;
 
     ret = gnutls_malloc(sizeof(mac_hd_st));
 
@@ -111,7 +111,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
     ret->key = NULL;		/* it's a hash anyway */
     ret->keysize = 0;
 
-    result = gcry_md_copy(&ret->handle, handle->handle);
+    result = gc_hash_clone(handle->handle, &ret->handle);
 
     if (result) {
 	gnutls_free(ret);
@@ -123,17 +123,16 @@ GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
 
 void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void *digest)
 {
-    opaque *mac;
+    const opaque *mac;
     int maclen;
 
     maclen = _gnutls_hash_get_algo_len(handle->algorithm);
 
-    gcry_md_final(handle->handle);
-    mac = gcry_md_read(handle->handle, 0);
+    mac = gc_hash_read(handle->handle);
     if (digest != NULL)
 	memcpy(digest, mac, maclen);
 
-    gcry_md_close(handle->handle);
+    gc_hash_close(handle->handle);
 
     gnutls_free(handle);
 }
@@ -143,7 +142,7 @@ mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
 			   const void *key, int keylen)
 {
     mac_hd_t ret;
-    gcry_error_t result;
+    int result;
 
     ret = gnutls_malloc(sizeof(mac_hd_st));
     if (ret == NULL)
@@ -152,15 +151,15 @@ mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
     switch (algorithm) {
     case GNUTLS_MAC_SHA:
 	result =
-	    gcry_md_open(&ret->handle, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
+	  gc_hash_open(GC_SHA1, GC_HMAC, &ret->handle);
 	break;
     case GNUTLS_MAC_MD5:
 	result =
-	    gcry_md_open(&ret->handle, GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
+	  gc_hash_open(GC_MD5, GC_HMAC, &ret->handle);
 	break;
     case GNUTLS_MAC_RMD160:
 	result =
-	    gcry_md_open(&ret->handle, GCRY_MD_RMD160, GCRY_MD_FLAG_HMAC);
+	  gc_hash_open(GC_RMD160, GC_HMAC, &ret->handle);
 	break;
     default:
 	result = -1;
@@ -172,7 +171,7 @@ mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
     }
 
     if (ret != GNUTLS_MAC_FAILED) {
-	gcry_md_setkey(ret->handle, key, keylen);
+	gc_hash_hmac_setkey(ret->handle, keylen, key);
 
 	ret->algorithm = algorithm;
 	ret->key = key;
@@ -184,18 +183,17 @@ mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
 
 void _gnutls_hmac_deinit(mac_hd_t handle, void *digest)
 {
-    opaque *mac;
+    const opaque *mac;
     int maclen;
 
     maclen = _gnutls_hash_get_algo_len(handle->algorithm);
 
-    gcry_md_final(handle->handle);
-    mac = gcry_md_read(handle->handle, 0);
+    mac = gc_hash_read(handle->handle);
 
     if (digest != NULL)
 	memcpy(digest, mac, maclen);
 
-    gcry_md_close(handle->handle);
+    gc_hash_close(handle->handle);
 
     gnutls_free(handle);
 }
