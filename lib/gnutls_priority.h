@@ -18,8 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int gnutls_set_cipher_priority( GNUTLS_STATE state, LIST);
-int gnutls_set_kx_priority( GNUTLS_STATE state, LIST); 
-int gnutls_set_mac_priority( GNUTLS_STATE state, LIST);
-int gnutls_set_compression_priority( GNUTLS_STATE state, LIST);
-int gnutls_set_protocol_priority( GNUTLS_STATE state, LIST);
+int gnutls_set_cipher_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_set_kx_priority( GNUTLS_STATE state, GNUTLS_LIST); 
+int gnutls_set_mac_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_set_compression_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_set_protocol_priority( GNUTLS_STATE state, GNUTLS_LIST);
