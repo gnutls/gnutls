@@ -9,9 +9,6 @@ AC_DEFINE_UNQUOTED(T_CPU, "$target_cpu")
 AC_DEFINE_UNQUOTED(T_VENDOR, "$target_vendor")
 AC_DEFINE_UNQUOTED(T_OS, "$target_os")
 
-test "x$includedir" = 'x${prefix}/include' && \
-        includedir='$(prefix)/include/gnutls'
-
 dnl Gnutls Version
 GNUTLS_MAJOR_VERSION=0
 GNUTLS_MINOR_VERSION=5
