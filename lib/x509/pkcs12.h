@@ -68,7 +68,8 @@ int _gnutls_pkcs7_decrypt_data( const gnutls_datum* data,
 typedef enum schema_id {
 	PBES2,			/* the stuff in PKCS #5 */
 	PKCS12_3DES_SHA1, /* the fucking stuff in PKCS #12 */
-	PKCS12_ARCFOUR_SHA1
+	PKCS12_ARCFOUR_SHA1,
+	PKCS12_RC2_40_SHA1
 } schema_id;
 
 int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,

@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_get_dh_params(gnutls_dh_params, MPI *ret_p, MPI* ret_g);
-MPI gnutls_calc_dh_secret( MPI *ret_x, MPI g, MPI prime );
-MPI gnutls_calc_dh_key( MPI f, MPI x, MPI prime );
-int _gnutls_dh_generate_prime(MPI *ret_g, MPI* ret_n, int bits);
+int _gnutls_get_dh_params(gnutls_dh_params, GNUTLS_MPI *ret_p, GNUTLS_MPI* ret_g);
+GNUTLS_MPI gnutls_calc_dh_secret( GNUTLS_MPI *ret_x, GNUTLS_MPI g, GNUTLS_MPI prime );
+GNUTLS_MPI gnutls_calc_dh_key( GNUTLS_MPI f, GNUTLS_MPI x, GNUTLS_MPI prime );
+int _gnutls_dh_generate_prime(GNUTLS_MPI *ret_g, GNUTLS_MPI* ret_n, int bits);

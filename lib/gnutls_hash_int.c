@@ -31,14 +31,15 @@
 GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 {
 	GNUTLS_MAC_HANDLE ret;
+	gcry_error_t result;
 
 	switch (algorithm) {
 	case GNUTLS_MAC_SHA:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 		if (ret == NULL)
 			return GNUTLS_HASH_FAILED;
-		ret->handle = gcry_md_open(GCRY_MD_SHA1, 0);
-		if (!ret->handle) {
+		result = gcry_md_open( &ret->handle, GCRY_MD_SHA1, 0);
+		if (result) {
 			gnutls_free(ret);
 			ret = GNUTLS_HASH_FAILED;
 		}
@@ -48,8 +49,8 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 		if (ret == NULL)
 			return GNUTLS_HASH_FAILED;
-		ret->handle = gcry_md_open(GCRY_MD_MD5, 0);
-		if (!ret->handle) {
+		result = gcry_md_open( &ret->handle, GCRY_MD_MD5, 0);
+		if (result) {
 			gnutls_free(ret);
 			ret = GNUTLS_HASH_FAILED;
 		}
@@ -94,6 +95,7 @@ int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text, size_t textlen)
 GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
 {
 	GNUTLS_HASH_HANDLE ret;
+	gcry_error_t result;
 
 	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 
@@ -104,9 +106,9 @@ GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
 	ret->key = NULL;	/* it's a hash anyway */
 	ret->keysize = 0;
 
-	ret->handle = gcry_md_copy(handle->handle);
+	result = gcry_md_copy( &ret->handle, handle->handle);
 
-	if (ret->handle == NULL) {
+	if (result) {
 		gnutls_free(ret);
 		return GNUTLS_HASH_FAILED;
 	}
@@ -137,20 +139,17 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 				    const void *key, int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;
+	gcry_error_t result;
 
 	switch (algorithm) {
-	case GNUTLS_MAC_NULL:
-		ret = GNUTLS_MAC_FAILED;
-		break;
 	case GNUTLS_MAC_SHA:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 		if (ret == NULL)
 			return GNUTLS_MAC_FAILED;
 
-		ret->handle =
-		    gcry_md_open(GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
+		result = gcry_md_open(&ret->handle, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
 
-		if (!ret->handle)
+		if (result)
 			ret = GNUTLS_MAC_FAILED;
 		break;
 	case GNUTLS_MAC_MD5:
@@ -158,9 +157,9 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 		if (ret == NULL)
 			return GNUTLS_MAC_FAILED;
 
-		ret->handle = gcry_md_open(GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
+		result = gcry_md_open(&ret->handle, GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
 
-		if (!ret->handle)
+		if (result)
 			ret = GNUTLS_MAC_FAILED;
 		break;
 	default:

@@ -58,7 +58,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 {
 
 	int ret;
-	GCRY_SEXP parms, key, list;
+	gcry_sexp_t parms, key, list;
 
 	ret = gcry_sexp_build( &parms, NULL, "(genkey(rsa(nbits %d)))", bits);
 	if (ret != 0) {

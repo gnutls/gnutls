@@ -21,7 +21,7 @@
 #ifndef GNUTLS_CIPHER_INT
 # define GNUTLS_CIPHER_INT
 
-#define GNUTLS_CIPHER_HANDLE GCRY_CIPHER_HD
+#define GNUTLS_CIPHER_HANDLE gcry_cipher_hd_t
 #define GNUTLS_CIPHER_FAILED NULL
 
 GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, 

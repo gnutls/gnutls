@@ -519,7 +519,7 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
  */
 static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len)
 {
-	GCRY_SEXP s_ciph, s_data, s_pkey;
+	gcry_sexp_t s_ciph, s_data, s_pkey;
 	int rc=-1;
 
 	/* make a sexp from pkey */
@@ -558,7 +558,7 @@ static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 		return GNUTLS_E_PK_ENCRYPTION_FAILED;
 
 	} else {		/* add better error handling or make gnupg use S-Exp directly */
-		GCRY_SEXP list = gcry_sexp_find_token(s_ciph, "a", 0);
+		gcry_sexp_t list = gcry_sexp_find_token(s_ciph, "a", 0);
 		if (list == NULL) {
 			gnutls_assert();
 			gcry_sexp_release(s_ciph);
@@ -579,9 +579,10 @@ static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 	return rc;
 }
 
-static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len)
+static 
+int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len)
 {
-	GCRY_SEXP s_plain, s_data, s_pkey;
+	gcry_sexp_t s_plain, s_data, s_pkey;
 	int rc=-1;
 
 	/* make a sexp from pkey */
@@ -620,7 +621,7 @@ static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 		gnutls_assert();
 		return GNUTLS_E_PK_ENCRYPTION_FAILED;
 
-	} else {		/* add better error handling or make gnupg use S-Exp directly */
+	} else { /* add better error handling or make gnupg use S-Exp directly */
 		resarr[0] = gcry_sexp_nth_mpi(s_plain, 0, 0);
 
 		if (resarr[0] == NULL) {
@@ -640,7 +641,7 @@ static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 static 
 int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pkey, int pkey_len)
 {
-	GCRY_SEXP s_hash, s_key, s_sig;
+	gcry_sexp_t s_hash, s_key, s_sig;
 	int rc=-1;
 
 	/* make a sexp from pkey */
@@ -692,7 +693,7 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 		return GNUTLS_E_PK_SIGN_FAILED;
 
 	} else {
-		GCRY_SEXP list;
+		gcry_sexp_t list;
 		
 		if (algo==GCRY_PK_DSA) {
 			list = gcry_sexp_find_token( s_sig, "r" , 0);
@@ -734,7 +735,7 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 
 static int _gnutls_pk_verify(int algo, GNUTLS_MPI hash, GNUTLS_MPI* data, GNUTLS_MPI *pkey, int pkey_len)
 {
-	GCRY_SEXP s_sig, s_hash, s_pkey;
+	gcry_sexp_t s_sig, s_hash, s_pkey;
 	int rc=-1;
 
 	/* make a sexp from pkey */

@@ -26,7 +26,7 @@
 /* for message digests */
 
 typedef struct {
-	GCRY_MD_HD handle;
+	gcry_md_hd_t handle;
 	gnutls_mac_algorithm algorithm;
 	const void* key;
 	int keysize;

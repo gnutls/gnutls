@@ -32,7 +32,7 @@
 #include <mpi.h>
 #include <extensions.h>
 
-static int _encode_rsa( ASN1_TYPE* c2, MPI* params);
+static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params);
 
 /**
   * gnutls_x509_privkey_init - This function initializes a gnutls_crl structure
@@ -593,7 +593,7 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 
 /* Encodes the RSA parameters into an ASN.1 RSA private key structure.
  */
-static int _encode_rsa( ASN1_TYPE* c2, MPI* params)
+static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 {
 	int result, i;
 	size_t size[8], total, tmp_size;

@@ -159,8 +159,7 @@ typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL=1,
 	GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC,
 	GNUTLS_CIPHER_ARCFOUR_40, 
 	
-	GNUTLS_CIPHER_RC2_128=90, GNUTLS_CIPHER_RC2_40,
-	GNUTLS_CIPHER_DES_CBC
+	GNUTLS_CIPHER_RC2_40_CBC=90, GNUTLS_CIPHER_DES_CBC
 } gnutls_cipher_algorithm;
 
 typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
@@ -229,21 +228,21 @@ typedef struct AUTH_CRED {
 struct GNUTLS_KEY_INT {
 	/* For DH KX */
 	gnutls_datum			key;
-	MPI				KEY;
-	MPI				client_Y;
-	MPI				client_g;
-	MPI				client_p;
-	MPI				dh_secret;
+	GNUTLS_MPI				KEY;
+	GNUTLS_MPI				client_Y;
+	GNUTLS_MPI				client_g;
+	GNUTLS_MPI				client_p;
+	GNUTLS_MPI				dh_secret;
 	/* for SRP */
-	MPI				A;
-	MPI				B;
-	MPI				u;
-	MPI				b;
-	MPI				a;
-	MPI				x;
+	GNUTLS_MPI				A;
+	GNUTLS_MPI				B;
+	GNUTLS_MPI				u;
+	GNUTLS_MPI				b;
+	GNUTLS_MPI				a;
+	GNUTLS_MPI				x;
 	/* RSA: e, m
 	 */
-	MPI 				rsa[2];
+	GNUTLS_MPI 				rsa[2];
 	
 	/* this is used to hold the peers authentication data 
 	 */
@@ -627,8 +626,8 @@ struct gnutls_session_int {
 typedef struct gnutls_session_int *gnutls_session;
 
 typedef struct {
-	MPI _prime;
-        MPI _generator;
+	GNUTLS_MPI _prime;
+        GNUTLS_MPI _generator;
 } _gnutls_dh_params;
 
 #define gnutls_dh_params _gnutls_dh_params*

@@ -4,7 +4,7 @@
 # include <gcrypt.h>
 # include <libtasn1.h>
 
-#define GNUTLS_MPI GCRY_MPI
+#define GNUTLS_MPI gcry_mpi_t
 
 #define _gnutls_mpi_cmp_ui gcry_mpi_cmp_ui
 #define _gnutls_mpi_mod gcry_mpi_mod
@@ -27,7 +27,7 @@
 
 # define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x)) 
 
-void _gnutls_mpi_release( MPI* x);
+void _gnutls_mpi_release( GNUTLS_MPI* x);
 
 int _gnutls_mpi_scan( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes );
 int _gnutls_mpi_scan_pgp( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes );

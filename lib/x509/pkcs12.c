@@ -376,14 +376,15 @@ char counter[MAX_INT_DIGITS];
 		_gnutls_str_cat( root, sizeof(root), ".bagAttributes"); 
 
 		result = asn1_number_of_elements( c2, root, &attributes);
-		if (result != ASN1_SUCCESS) {
+		if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
 			goto cleanup;
 		}
-		
+
 		if (attributes < 0) attributes = 1;
-		
+
+		if (result != ASN1_ELEMENT_NOT_FOUND)
 		for (j=0;j<attributes;j++) {
 
 			_gnutls_str_cpy( root, sizeof(root), "?"); 
@@ -395,6 +396,7 @@ char counter[MAX_INT_DIGITS];
 
 			result = _gnutls_x509_decode_and_read_attribute( 
 				c2, root, oid, sizeof(oid), &attr_val, 1);
+			
 			if (result < 0) {
 				gnutls_assert();
 				goto cleanup;

@@ -50,6 +50,7 @@
 /* oid_pbeWithSHAAnd3_KeyTripleDES_CBC */
 #define PKCS12_PBE_3DES_SHA1_OID "1.2.840.113549.1.12.1.3"
 #define PKCS12_PBE_ARCFOUR_SHA1_OID "1.2.840.113549.1.12.1.1"
+#define PKCS12_PBE_RC2_40_SHA1_OID "1.2.840.113549.1.12.1.6"
 
 struct pbkdf2_params {
 	opaque salt[32];
@@ -110,6 +111,9 @@ inline static int check_schema(const char *oid)
 
 	if (strcmp(oid, PKCS12_PBE_ARCFOUR_SHA1_OID) == 0)
 		return PKCS12_ARCFOUR_SHA1;
+
+	if (strcmp(oid, PKCS12_PBE_RC2_40_SHA1_OID) == 0)
+		return PKCS12_RC2_40_SHA1;
 
 	_gnutls_x509_log("PKCS encryption schema OID '%s' is unsupported.\n", oid);
 
@@ -298,6 +302,11 @@ int encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der_key,
 			    asn1_write_value(pkcs8_asn, "encryptionAlgorithm.algorithm",
 				     PKCS12_PBE_ARCFOUR_SHA1_OID, 1);
 			break;
+		case PKCS12_RC2_40_SHA1:
+			result =
+			    asn1_write_value(pkcs8_asn, "encryptionAlgorithm.algorithm",
+				     PKCS12_PBE_RC2_40_SHA1_OID, 1);
+			break;
 		
 	}
 
@@ -407,6 +416,8 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 		schema = PKCS12_3DES_SHA1;
 	else if (flags & GNUTLS_PKCS8_USE_PKCS12_ARCFOUR)
 		schema = PKCS12_ARCFOUR_SHA1;
+	else if (flags & GNUTLS_PKCS8_USE_PKCS12_RC2_40)
+		schema = PKCS12_RC2_40_SHA1;
 	else
 		schema = PBES2;
 
@@ -509,13 +520,17 @@ int read_pkcs_schema_params(schema_id schema, const char* password,
 
 	case PKCS12_3DES_SHA1:
 	case PKCS12_ARCFOUR_SHA1:
+	case PKCS12_RC2_40_SHA1:
 
 		if ((schema) == PKCS12_3DES_SHA1) {
 			enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
 			enc_params->iv_size = 8;
-		} else {
+		} else if ((schema) == PKCS12_ARCFOUR_SHA1) {
 			enc_params->cipher = GNUTLS_CIPHER_ARCFOUR_128;
 			enc_params->iv_size = 0;
+		} else if ((schema) == PKCS12_RC2_40_SHA1) {
+			enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
+			enc_params->iv_size = 8;
 		}
 
 		if ((result =
@@ -1439,8 +1454,10 @@ static int generate_key( schema_id schema,
 
 	if (schema == PKCS12_ARCFOUR_SHA1)
 		enc_params->cipher = GNUTLS_CIPHER_ARCFOUR_128;
-	else
+	else if (schema == PKCS12_3DES_SHA1)
 		enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
+	else if (schema == PKCS12_RC2_40_SHA1)
+		enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
 
 	_gnutls_get_random(rnd, 2, GNUTLS_STRONG_RANDOM);
 
@@ -1794,6 +1811,11 @@ int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,
 			result =
 			    asn1_write_value(pkcs7_asn, "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
 				     PKCS12_PBE_ARCFOUR_SHA1_OID, 1);
+			break;
+		case PKCS12_RC2_40_SHA1:
+			result =
+			    asn1_write_value(pkcs7_asn, "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
+				     PKCS12_PBE_RC2_40_SHA1_OID, 1);
 			break;
 		
 	}

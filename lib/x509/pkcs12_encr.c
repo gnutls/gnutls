@@ -58,9 +58,10 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
 	unsigned int req_keylen, opaque *keybuf)
 {
   int rc;
+  gcry_error_t err;
   unsigned int i, j;
-  GcryMDHd md;
-  GcryMPI num_b1 = NULL;
+  gcry_md_hd_t md;
+  GNUTLS_MPI num_b1 = NULL;
   unsigned int pwlen;
   opaque hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
@@ -92,8 +93,8 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
 
   for (;;)
     {
-      md = gcry_md_open (GCRY_MD_SHA1, 0);
-      if (!md)
+      err = gcry_md_open (&md, GCRY_MD_SHA1, 0);
+      if (err)
         {
           gnutls_assert();
           return GNUTLS_E_DECRYPTION_FAILED;
@@ -118,32 +119,32 @@ _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_si
       for(i=0; i < 64; i++)
         buf_b[i] = hash[i % 20];
       n = 64;
-      rc = gcry_mpi_scan (&num_b1, GCRYMPI_FMT_USG, buf_b, &n);
-      if (rc)
+      rc = _gnutls_mpi_scan(&num_b1, buf_b, &n);
+      if (rc < 0)
         {
           gnutls_assert();
-          return GNUTLS_E_DECRYPTION_FAILED;
+          return rc;
         }
       gcry_mpi_add_ui (num_b1, num_b1, 1);
       for (i=0; i < 128; i += 64)
         {
-          GcryMPI num_ij;
+          GNUTLS_MPI num_ij;
 
           n = 64;
-          rc = gcry_mpi_scan (&num_ij, GCRYMPI_FMT_USG, buf_i + i, &n);
-          if (rc)
+          rc = _gnutls_mpi_scan (&num_ij, buf_i + i, &n);
+          if (rc < 0)
             {
               gnutls_assert();
-              return GNUTLS_E_DECRYPTION_FAILED;
+              return rc;
             }
           gcry_mpi_add (num_ij, num_ij, num_b1);
           gcry_mpi_clear_highbit (num_ij, 64*8);
           n = 64;
-          rc = gcry_mpi_print (GCRYMPI_FMT_USG, buf_i + i, &n, num_ij);
-          if (rc)
+          rc = _gnutls_mpi_print( buf_i + i, &n, num_ij);
+          if (rc < 0)
             {
               gnutls_assert();
-              return GNUTLS_E_DECRYPTION_FAILED;
+              return rc;
             }
           gcry_mpi_release (num_ij);
         }

@@ -24,43 +24,46 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
+extern int _gcry_rc2_40_id;
+
 GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, 
 	const gnutls_datum *key, const gnutls_datum *iv)
 {
-GNUTLS_CIPHER_HANDLE ret;
+GNUTLS_CIPHER_HANDLE ret = NULL;
+gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
+
 
 	switch (cipher) {
-	case GNUTLS_CIPHER_NULL:
-		ret = GNUTLS_CIPHER_FAILED;
-		break;
 	case GNUTLS_CIPHER_RIJNDAEL_128_CBC:
-		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
+		err = gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
 		break;
 	case GNUTLS_CIPHER_RIJNDAEL_256_CBC:
-		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
+		err = gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
 		break;
 	case GNUTLS_CIPHER_TWOFISH_128_CBC:
-		ret = gcry_cipher_open(GCRY_CIPHER_TWOFISH, GCRY_CIPHER_MODE_CBC, 0);
+		err = gcry_cipher_open(&ret, GCRY_CIPHER_TWOFISH, GCRY_CIPHER_MODE_CBC, 0);
 		break;
 	case GNUTLS_CIPHER_3DES_CBC:
-		ret = gcry_cipher_open(GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC, 0);
+		err = gcry_cipher_open(&ret, GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC, 0);
 		break;
 	case GNUTLS_CIPHER_DES_CBC:
-		ret = gcry_cipher_open(GCRY_CIPHER_DES, GCRY_CIPHER_MODE_CBC, 0);
+		err = gcry_cipher_open(&ret, GCRY_CIPHER_DES, GCRY_CIPHER_MODE_CBC, 0);
 		break;
 	case GNUTLS_CIPHER_ARCFOUR_128:
 	case GNUTLS_CIPHER_ARCFOUR_40:
-		ret = gcry_cipher_open(GCRY_CIPHER_ARCFOUR, GCRY_CIPHER_MODE_STREAM, 0);
+		err = gcry_cipher_open(&ret, GCRY_CIPHER_ARCFOUR, GCRY_CIPHER_MODE_STREAM, 0);
 		break;
-	default:
-		ret = GNUTLS_CIPHER_FAILED;
+	case GNUTLS_CIPHER_RC2_40_CBC:
+		err = gcry_cipher_open(&ret, _gcry_rc2_40_id, GCRY_CIPHER_MODE_CBC, 0);
+		break;
 	}
-	if (ret!=GNUTLS_CIPHER_FAILED) {
+
+	if (err == 0) {
 		gcry_cipher_setkey(ret, key->data, key->size);
 		if (iv->data!=NULL && iv->size>0) gcry_cipher_setiv(ret, iv->data, iv->size);
 	}
 
-return ret;	
+	return ret;	
 }
 
 int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) {

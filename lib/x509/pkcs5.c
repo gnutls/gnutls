@@ -62,7 +62,8 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 	const char *S,
 	size_t Slen, unsigned int c, unsigned int dkLen, char *DK)
 {
-  GCRY_MD_HD prf;
+  gcry_md_hd_t prf;
+  gcry_error_t err;
   char U[MAX_PRF_BLOCK_LEN];
   char T[MAX_PRF_BLOCK_LEN];
   unsigned int u;
@@ -157,8 +158,8 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
    *
    */
 
-  prf = gcry_md_open (PRF, GCRY_MD_FLAG_HMAC);
-  if (prf == NULL)
+  err = gcry_md_open ( &prf, PRF, GCRY_MD_FLAG_HMAC);
+  if (err)
     return PKCS5_INVALID_PRF;
 
   for (i = 1; i <= l; i++)
@@ -172,7 +173,7 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 	  gcry_md_reset (prf);
 
 	  rc = gcry_md_setkey (prf, P, Plen);
-	  if (rc != GCRYERR_SUCCESS)
+	  if (rc)
 	    return PKCS5_INVALID_PRF;
 
 	  if (u == 1)

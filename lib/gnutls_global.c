@@ -23,6 +23,7 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_dh.h>
+#include "rc2.h"
 
 typedef void (*LOG_FUNC)( int, const char*);
 #define gnutls_log_func LOG_FUNC
@@ -185,6 +186,12 @@ int gnutls_global_init( void)
 #endif
 	}
 	
+	result = _gnutls_register_rc2_cipher();
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
 	/* set default recv/send functions
 	 */
 #ifdef DEBUG
@@ -225,6 +232,8 @@ void gnutls_global_deinit( void) {
 	if (_gnutls_init==0) {
 		asn1_delete_structure(&_gnutls_gnutls_asn);
 		asn1_delete_structure(&_gnutls_pkix1_asn);
+
+		_gnutls_unregister_rc2_cipher();
 	}
 	
 }
@@ -348,3 +357,4 @@ gnutls_check_version( const char *req_version )
     }
     return NULL;
 }
+
