@@ -26,6 +26,7 @@
 #include <gnutls_int.h>
 #include <libtasn1.h>
 #include <gnutls_errors.h>
+#include <gnutls_num.h>
 
 /* Functions that refer to the libgcrypt library.
  */
@@ -154,6 +155,25 @@ int result;
 	result = asn1_write_value( node, value, tmpstr, s_len);
 
 	gnutls_afree( tmpstr);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+/* Writes the specified integer into the specified node.
+ */
+int _gnutls_x509_write_uint32( ASN1_TYPE node, const char* value, uint32 num)
+{
+opaque tmpstr[4];
+int result;
+
+	_gnutls_write_uint32(num, tmpstr);
+
+	result = asn1_write_value( node, value, tmpstr, 4);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

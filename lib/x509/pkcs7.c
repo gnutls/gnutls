@@ -517,7 +517,7 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 
 	/* Step 3. Replace the old content with the new
 	 */
-	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content");
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -573,7 +573,7 @@ int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
 
 	/* Step 3. Replace the old content with the new
 	 */
-	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content");
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -760,7 +760,7 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7,
 
 	/* Step 3. Replace the old content with the new
 	 */
-	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content");
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -816,7 +816,7 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx)
 
 	/* Step 3. Replace the old content with the new
 	 */
-	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content");
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;

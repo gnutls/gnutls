@@ -952,6 +952,13 @@ pkcs-7-ContentInfo ::= SEQUENCE {
   contentType pkcs-7-ContentType,
   content [0] EXPLICIT ANY DEFINED BY contentType }
 
+pkcs-7-DigestInfo ::= SEQUENCE {
+  digestAlgorithm pkcs-7-DigestAlgorithmIdentifier,
+  digest pkcs-7-Digest 
+}
+
+pkcs-7-Digest ::= OCTET STRING
+
 pkcs-7-ContentType ::= OBJECT IDENTIFIER
 
 pkcs-7-SignedData ::= SEQUENCE {
@@ -1099,15 +1106,13 @@ pkcs-12-PbeParams ::= SEQUENCE {
 	iterations INTEGER
 }
 
-pkcs-12-MacData ::= ANY
--- we don't use it
--- SEQUENCE {
---    	mac 		ANY, --DigestInfo,
---	macSalt	        OCTET STRING,
---	iterations	INTEGER DEFAULT 1
+pkcs-12-MacData ::= SEQUENCE {
+    	mac 		pkcs-7-DigestInfo,
+	macSalt	        OCTET STRING,
+	iterations	INTEGER DEFAULT 1
 -- Note: The default is for historical reasons and its use is
 -- deprecated. A higher value, like 1024 is recommended.
---}
+}
 
 pkcs-12-AuthenticatedSafe ::= SEQUENCE OF pkcs-7-ContentInfo
 	-- Data if unencrypted

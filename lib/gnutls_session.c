@@ -79,7 +79,7 @@ int gnutls_session_get_data( gnutls_session session, opaque* session_data, int *
   * original session.
   *
   * Session id is some data set by the server, that identify the current session. 
-  * In TLS 1.0 session id should not be more than 32 bytes.
+  * In TLS 1.0 and SSL 3.0 session id is always less than 32 bytes.
   **/
 int gnutls_session_get_id( gnutls_session session, void* session_id, int *session_id_size) {
 

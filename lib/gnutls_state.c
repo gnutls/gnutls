@@ -545,15 +545,20 @@ void gnutls_handshake_set_private_extensions(gnutls_session session, int allow)
 }
 
 inline
-static void _gnutls_cal_PRF_A( gnutls_mac_algorithm algorithm, const void *secret, int secret_size, const void *seed, int seed_size, void* result)
+static int _gnutls_cal_PRF_A( gnutls_mac_algorithm algorithm, const void *secret, int secret_size, const void *seed, int seed_size, void* result)
 {
 	GNUTLS_MAC_HANDLE td1;
 
 	td1 = _gnutls_hmac_init(algorithm, secret, secret_size);
+	if (td1 == GNUTLS_MAC_FAILED) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
 	_gnutls_hmac(td1, seed, seed_size);
 	_gnutls_hmac_deinit(td1, result);
 	
-	return;
+	return 0;
 }
 
 #define MAX_SEED_SIZE 200
@@ -567,7 +572,7 @@ static int _gnutls_P_hash( gnutls_mac_algorithm algorithm, const opaque * secret
 	GNUTLS_MAC_HANDLE td2;
 	int i, times, how, blocksize, A_size;
 	opaque final[20], Atmp[MAX_SEED_SIZE];
-	int output_bytes;
+	int output_bytes, result;
 
 	if (seed_size > MAX_SEED_SIZE || total_bytes<=0) {
 		gnutls_assert();
@@ -590,9 +595,17 @@ static int _gnutls_P_hash( gnutls_mac_algorithm algorithm, const opaque * secret
 
 	for (i = 0; i < times; i++) {
 		td2 = _gnutls_hmac_init(algorithm, secret, secret_size);
+		if (td2 == GNUTLS_MAC_FAILED) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
 
 		/* here we calculate A(i+1) */
-		_gnutls_cal_PRF_A( algorithm, secret, secret_size, Atmp, A_size, Atmp);
+		if ((result=_gnutls_cal_PRF_A( algorithm, secret, secret_size, Atmp, A_size, Atmp)) < 0) {
+			gnutls_assert();
+			_gnutls_hmac_deinit(td2, final);
+			return result;
+		}
 
 		A_size = blocksize;
 

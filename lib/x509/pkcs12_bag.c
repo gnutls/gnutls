@@ -22,7 +22,6 @@
 /* Functions that relate on PKCS12 Bag packet parsing.
  */
 
-#include <libtasn1.h>
 #include <gnutls_int.h>
 
 #ifdef ENABLE_PKI
@@ -116,6 +115,40 @@ int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum* da
 
 	data->data = bag->data[indx].data;
 	data->size = bag->data[indx].size;
+
+	return 0;
+}
+
+/**
+  * gnutls_pkcs12_bag_set_data - This function inserts data into the bag
+  * @bag: The bag
+  * @type: The data's type
+  * @data: the data to be copied.
+  *
+  * This function will insert the given data of the given type into the
+  * bag.
+  *
+  **/
+int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag bag, gnutls_pkcs12_bag_type type,
+	const gnutls_datum* data)
+{
+int ret;
+
+	if (bag->bag_elements == MAX_BAG_ELEMENTS-1) {
+		gnutls_assert();
+		/* bag is full */
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ret = _gnutls_set_datum( &bag->data[bag->bag_elements], data->data, data->size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	bag->type[bag->bag_elements] = type;
+
+	bag->bag_elements++;
 
 	return 0;
 }

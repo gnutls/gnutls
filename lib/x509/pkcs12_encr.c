@@ -15,7 +15,7 @@
 int _pkcs12_check_pass( const char* pass, size_t plen) 
 {
 const unsigned char* p = pass;
-int i;
+unsigned int i;
 
 	for (i=0;i<plen;i++) {
 		if ( p[i] < 128) continue;
@@ -25,15 +25,22 @@ int i;
 	return 0;
 }
 
+/* ID should be:
+ * 3 for MAC
+ * 2 for IV
+ * 1 for encryption key
+ */
 int 
-_pkcs12_string_to_key (int id, const char *salt, int salt_size, int iter, const char *pw,
-               int req_keylen, unsigned char *keybuf)
+_pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_size, 
+	unsigned int iter, const char *pw,
+	unsigned int req_keylen, opaque *keybuf)
 {
-  int rc, i, j;
+  int rc;
+  unsigned int i, j;
   GcryMDHd md;
   GcryMPI num_b1 = NULL;
-  int pwlen;
-  unsigned char hash[20], buf_b[64], buf_i[128], *p;
+  unsigned int pwlen;
+  opaque hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
   size_t n;
 

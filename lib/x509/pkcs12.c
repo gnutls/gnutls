@@ -31,6 +31,7 @@
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
+#include <gnutls_random.h>
 #include <common.h>
 #include <x509_b64.h>
 #include <pkcs12.h>
@@ -97,7 +98,8 @@ int tmp_size, len, result;
 		raw->size = auth_safe.size;
 	}
 
-	*authen_safe = c2;
+	if (authen_safe)
+		*authen_safe = c2;
 
 	return 0;
 
@@ -246,11 +248,25 @@ static int _oid2bag( const char* oid)
 		return GNUTLS_BAG_CRL;
 	
 	return GNUTLS_BAG_UNKNOWN;
+}
 
+static const char* _bag2oid( int bag)
+{
+	switch (bag) {
+		case GNUTLS_BAG_PKCS8_KEY:
+			return BAG_PKCS8_KEY;
+		case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY:
+			return BAG_PKCS8_ENCRYPTED_KEY;
+		case GNUTLS_BAG_CERTIFICATE:
+			return BAG_CERTIFICATE;
+		case GNUTLS_BAG_CRL:
+			return BAG_CRL;
+	}
+	return NULL;
 }
 
 /* Decodes the SafeContents, and puts the output in
- * the given bag. FIXME: 
+ * the given bag. 
  */
 int
 _pkcs12_decode_safe_contents( const gnutls_datum* content, gnutls_pkcs12_bag bag)
@@ -375,7 +391,6 @@ int result;
 }
 
 
-
 /**
   * gnutls_pkcs12_get_bag - This function returns a Bag from a PKCS12 structure
   * @pkcs12_struct: should contain a gnutls_pkcs12 structure
@@ -460,6 +475,351 @@ int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12,
 		_gnutls_free_datum( &tmp);
 		if (c2) asn1_delete_structure(&c2);
 		return result;
+}
+
+/* Creates an empty PFX structure for the PKCS12 structure.
+ */
+static int create_empty_pfx(ASN1_TYPE pkcs12)
+{
+	uint8 three = 3;
+	int result;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	/* Use version 3
+	 */
+	result = asn1_write_value( pkcs12, "version", &three, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* Write the content type of the data
+	 */
+	result = asn1_write_value(pkcs12, "authSafe.contentType", DATA_OID, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* Check if the authenticatedSafe content is empty, and encode a
+	 * null one in that case.
+	 */
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.pkcs-12-AuthenticatedSafe", &c2)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+	
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs12, "authSafe.content", 1);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	asn1_delete_structure( &c2);
+
+	return 0;
+
+	cleanup:
+		asn1_delete_structure( &c2);
+		return result;	
+
+}
+
+static int
+_pkcs12_encode_safe_contents( gnutls_pkcs12_bag bag, ASN1_TYPE* content, int *enc);
+
+/**
+  * gnutls_pkcs12_set_bag - This function inserts a Bag into a PKCS12 structure
+  * @pkcs12_struct: should contain a gnutls_pkcs12 structure
+  * @bag: An initialized bag
+  *
+  * This function will insert a Bag into the PKCS12 structure.
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
+	int result;
+	int enc = 0, dum = 1;
+	char null;
+
+	/* Step 1. Check if the pkcs12 structure is empty. In that
+	 * case generate an empty PFX.
+	 */
+	result = asn1_read_value(pkcs12->pkcs12, "authSafe.content", &null, &dum);
+	if (result == ASN1_VALUE_NOT_FOUND) {
+		result = create_empty_pfx( pkcs12->pkcs12);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+	}
+
+	/* Step 2. decode the authenticatedSafe.
+	 */
+	result = _decode_pkcs12_auth_safe( pkcs12->pkcs12, &c2, NULL);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* Step 3. Encode the bag elements into a SafeContents 
+	 * structure.
+	 */
+	result = _pkcs12_encode_safe_contents( bag, &safe_cont, &enc);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* Step 4. Insert the encoded SafeContents into the AuthenticatedSafe
+	 * structure.
+	 */
+	result = asn1_write_value(c2, "", "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (enc)
+		result = asn1_write_value(c2, "?LAST.contentType", ENC_DATA_OID, 1);
+	else
+		result = asn1_write_value(c2, "?LAST.contentType", DATA_OID, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode_and_copy( safe_cont, "", c2, "?LAST.content", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&safe_cont);
+
+	
+	/* Step 5. Reencode and copy the AuthenticatedSafe into the pkcs12
+	 * structure.
+	 */
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs12->pkcs12, "authSafe.content", 1);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&c2);
+
+	return 0;
+
+	cleanup:
+		asn1_delete_structure(&c2);
+		asn1_delete_structure(&safe_cont);
+		return result;
+}
+
+/**
+  * gnutls_pkcs12_generate_mac - This function generates the MAC of the PKCS12 structure
+  * @pkcs12_struct: should contain a gnutls_pkcs12 structure
+  * @pass: The password for the MAC
+  *
+  * This function will generate a MAC for the PKCS12 structure.
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass)
+{
+	opaque salt[8], key[20];
+	int result;
+	const int iter = 1;
+	GNUTLS_MAC_HANDLE td1 = NULL;
+	gnutls_datum tmp = {NULL, 0};
+	opaque sha_mac[20];
+
+	/* Generate the salt.
+	 */
+	_gnutls_get_random(salt, sizeof(salt), GNUTLS_WEAK_RANDOM);
+
+	/* Write the salt into the structure.
+	 */
+	result = asn1_write_value(pkcs12->pkcs12, "macData.macSalt", salt, sizeof(salt));
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* write the iterations
+	 */
+	
+	if (iter > 1) {
+		result = _gnutls_x509_write_uint32( pkcs12->pkcs12, "macData.iterations", iter);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+	
+	/* Generate the key.
+	 */
+	result = _pkcs12_string_to_key( 3/*MAC*/, salt, sizeof(salt),
+        	iter, pass, sizeof(key), key);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+                                
+	/* Get the data to be MACed
+	 */
+	result = _decode_pkcs12_auth_safe( pkcs12->pkcs12, NULL, &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* MAC the data
+	 */
+	td1 = _gnutls_hmac_init(GNUTLS_MAC_SHA, key, sizeof(key));
+	if (td1 == GNUTLS_MAC_FAILED) {
+		gnutls_assert();
+		result = GNUTLS_E_INTERNAL_ERROR;
+		goto cleanup;
+	}	 
+
+	_gnutls_hmac(td1, tmp.data, tmp.size);
+	_gnutls_free_datum( &tmp);
+	
+	_gnutls_hmac_deinit(td1, sha_mac);
+	
+
+	result = asn1_write_value(pkcs12->pkcs12, "macData.mac.digest", sha_mac, sizeof(sha_mac));
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value(pkcs12->pkcs12, "macData.mac.digestAlgorithm.parameters", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value(pkcs12->pkcs12, "macData.mac.digestAlgorithm.algorithm", OID_SHA1, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	return 0;
+
+	cleanup:
+		_gnutls_free_datum( &tmp);
+		return result;
+}
+
+/* Encodes the bag into a SafeContents structure, and puts the output in
+ * the given datum. Enc is set to non zero if the data are encrypted;
+ */
+static int
+_pkcs12_encode_safe_contents( gnutls_pkcs12_bag bag, ASN1_TYPE* contents, int *enc)
+{
+ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+int result;
+int i;
+const char* oid;
+
+	if (bag->bag_elements > 1) {
+		/* A bag with a key or an encrypted bag, must have
+		 * only one element.
+		 */
+	
+		if (bag->type[0] == GNUTLS_BAG_PKCS8_KEY ||
+			bag->type[0] == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY ||
+			bag->type[0] == GNUTLS_BAG_ENCRYPTED) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+	}
+
+	*enc = 0;
+
+	/* Step 1. Create the SEQUENCE.
+	 */
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.pkcs-12-SafeContents", &c2)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+
+	for (i=0;i<bag->bag_elements;i++) {
+
+		if (bag->type[i] == GNUTLS_BAG_ENCRYPTED) *enc = 1;
+
+		oid = _bag2oid( bag->type[i]);
+		if (oid==NULL) continue;
+
+		result = asn1_write_value(c2, "", "NEW", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		/* Copy the bag type.
+		 */
+		result = asn1_write_value(c2, "?LAST.bagId", oid, 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		/* Set empty attributes
+		 */
+		result = asn1_write_value(c2, "?LAST.bagAttributes", NULL, 0);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+
+		/* Copy the Bag Value
+		 */
+
+		result = asn1_write_value( c2, "?LAST.bagValue", bag->data[i].data, bag->data[i].size);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+	}
+	
+	/* Encode the data and copy them into the datum
+	 */
+	*contents = c2;
+
+	return 0;
+
+	cleanup:
+		if (c2) asn1_delete_structure(&c2);
+		return result;
+
 }
 
 

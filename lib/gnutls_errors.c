@@ -43,7 +43,7 @@ static gnutls_error_entry error_algorithms[] = {
 	/* "Short Description", Error code define, critical (0,1) -- 1 in most cases */
 	ERROR_ENTRY("Success.", GNUTLS_E_SUCCESS, 0 ), 
 	ERROR_ENTRY("Could not negotiate a supported cipher suite.", GNUTLS_E_UNKNOWN_CIPHER_SUITE, 1 ), 
-	ERROR_ENTRY("The cipher type is unknown.", GNUTLS_E_UNKNOWN_CIPHER_TYPE, 1 ), 
+	ERROR_ENTRY("The cipher type is unsupported.", GNUTLS_E_UNKNOWN_CIPHER_TYPE, 1 ), 
 	ERROR_ENTRY("The certificate and the given key do not match.", GNUTLS_E_CERTIFICATE_KEY_MISMATCH, 1 ), 
 	ERROR_ENTRY("Could not negotiate a supported compression method.", GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM, 1 ), 
 	ERROR_ENTRY("An unknown public key algorithm was encountered.", GNUTLS_E_UNKNOWN_PK_ALGORITHM, 1 ), 

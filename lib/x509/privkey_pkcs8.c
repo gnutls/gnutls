@@ -510,13 +510,18 @@ int read_pkcs_schema_params(schema_id schema, const char* password,
 		result = read_pkcs12_kdf_params(pbes2_asn, kdf_params);
 		if (result < 0) {
 			gnutls_assert();
-			result = _gnutls_asn2err(result);
 			goto error;
 		}
 
-		if (enc_params->iv_size)
-			_pkcs12_string_to_key( 2/*IV*/, kdf_params->salt, kdf_params->salt_size,
+		if (enc_params->iv_size) {
+			result = _pkcs12_string_to_key( 2/*IV*/, kdf_params->salt, kdf_params->salt_size,
 				kdf_params->iter_count, password, enc_params->iv_size, enc_params->iv);
+			if (result < 0) {
+				gnutls_assert();
+				goto error;
+			}
+
+		}
 
 		asn1_delete_structure(&pbes2_asn);
 
@@ -968,6 +973,7 @@ static int read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 
 }
 
+#define DES_CBC_OID "1.3.14.3.2.7"
 
 /* Converts an OID to a gnutls cipher type.
  */
@@ -979,6 +985,11 @@ inline
 
 	if (strcmp(oid, DES_EDE3_CBC_OID) == 0) {
 		*algo = GNUTLS_CIPHER_3DES_CBC;
+		return 0;
+	}
+
+	if (strcmp(oid, DES_CBC_OID) == 0) {
+		*algo = GNUTLS_CIPHER_DES_CBC;
 		return 0;
 	}
 
@@ -1259,7 +1270,7 @@ static int write_pbkdf2_params(ASN1_TYPE pbes2_asn,
 	 */
 	result = _gnutls_x509_der_encode_and_copy(pbkdf2_asn, "",
 						  pbes2_asn,
-						  "keyDerivationFunc.parameters");
+						  "keyDerivationFunc.parameters", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -1316,7 +1327,7 @@ static int write_pbe_enc_params(ASN1_TYPE pbes2_asn,
 	 */
 	result = _gnutls_x509_der_encode_and_copy(pbe_asn, "",
 						  pbes2_asn,
-						  "encryptionScheme.parameters");
+						  "encryptionScheme.parameters", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -1417,7 +1428,7 @@ static int write_pbe2_params(ASN1_TYPE pkcs8_asn,
 
 	result = _gnutls_x509_der_encode_and_copy(pbes2_asn, "",
 						  pkcs8_asn,
-						  "encryptionAlgorithm.parameters");
+						  "encryptionAlgorithm.parameters", 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;

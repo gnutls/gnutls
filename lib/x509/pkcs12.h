@@ -42,8 +42,9 @@ int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag);
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag);
 
 int 
-_pkcs12_string_to_key (int id, const char *salt, int salt_size, int iter, const char *pw,
-               int req_keylen, unsigned char *keybuf);
+_pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_size, 
+	unsigned int iter, const char *pw,
+	unsigned int req_keylen, opaque *keybuf);
 
 int _gnutls_x509_decrypt_pkcs7_encrypted_data( const gnutls_datum* data,
         const char* password, gnutls_datum* dec);

@@ -590,12 +590,14 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 
 /* DER Encodes the src ASN1_TYPE and stores it to
  * dest in dest_name. Usefull to encode something and store it
- * as OCTET.
+ * as OCTET. If str is non null then the data are encoded as
+ * an OCTET STRING.
  */
 int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
-	ASN1_TYPE dest, const char* dest_name)
+	ASN1_TYPE dest, const char* dest_name, int str)
 {
 int size, result;
+int asize;
 opaque *data = NULL;
 
 	size = 0;
@@ -607,6 +609,10 @@ opaque *data = NULL;
 
 	/* allocate data for the der
 	 */
+
+	if (str) size += 16; /* for later to include the octet tags */
+	asize = size;
+
 	data = gnutls_alloca( size);
 	if (data == NULL) {
 		gnutls_assert();
@@ -619,8 +625,36 @@ opaque *data = NULL;
 		gnutls_afree(data);
 		return _gnutls_asn2err(result);
 	}
+
+	if (str) {
+		ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+		
+		if ((result=asn1_create_element
+		    (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+		result = asn1_write_value(c2, "", data, size);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			asn1_delete_structure( &c2);
+			return _gnutls_asn2err(result);
+		}
+
+		result = asn1_der_coding(c2, "", data, &asize, NULL);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			asn1_delete_structure( &c2);
+			return _gnutls_asn2err(result);
+		}
+		
+		size = asize;
+
+		asn1_delete_structure( &c2);
+	}
 	
-	/* Write the key derivation algorithm
+	/* Write the data.
 	 */
 	result = asn1_write_value( dest, dest_name, data, size);
 
