@@ -1,3 +1,17 @@
+2003-11-25 12:31  nmav <nmav@gnutls.org>
+
+	* doc/tex/certificate.tex, doc/tex/ex-crq.tex, doc/tex/gnutls.bib,
+	doc/tex/openssl.tex, src/certtool.c:
+
+	Some documentation fixes. Changed gnutls_x509_*_set_version() to
+	have a compatible input with gnutls_x509_*_get_version().  
+
+2003-11-25 10:20  nmav <nmav@gnutls.org>
+
+	* doc/protocol/: rfc2459.txt, rfc3280.txt:
+
+	added the newest PKIX rfc.  
+
 2003-11-21 12:52  nmav <nmav@gnutls.org>
 
 	* src/certtool.c:
