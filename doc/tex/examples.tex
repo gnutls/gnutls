@@ -10,7 +10,7 @@ Let's assume now that we want to create a client which communicates
 with servers using the X.509 authentication schema. The following client
 is a very simple \tls{} client, it does not support session resuming nor
 any other fancy features.
-\input{ex2}
+\input{ex-client2}
 
 \subsection{Verifying peer's certificate}
 \par A TLS connection is not secure just after the handshake has finished.
@@ -31,20 +31,20 @@ and prints some information about the certificate and the current session.
 This function should be called after a successful
 \printfunc{gnutls_handshake}{gnutls\_handshake}
 
-\input{ex3}
+\input{ex-info}
 
 
 \subsection{Client with Resume capability example}
 \label{resume-example}
 This is a modification of the simple client above. Here we added support 
 for session resumption.
-\input{ex4}
+\input{ex-client-resume}
 
 \subsection{Client with Resume capability example II}
 \label{resume-example2}
 This is also a client with resume capability, but also demonstrates
 the use of session IDs.
-\input{ex1}
+\input{ex-client1}
 
 \subsection{Simple client example with SRP authentication}
 Although {\bf SRP} is not part of the \tls{} standard, \gnutls{} implements
@@ -53,23 +53,23 @@ within the \tls{} handshake protocol. The following client
 is a very simple SRP-TLS client which connects to a server 
 and authenticates using {\it username} and {\it password}.
 
-\input{srp1}
+\input{ex-client-srp}
 
 \section{Server examples}
 This section contains examples of \tls{} and \ssl{} servers, using \gnutls{}.
 
 \subsection{Echo Server with X.509 authentication}
 This example is a server which supports {\bf X.509} authentication.
-\input{serv1}
+\input{ex-serv1}
 
 \subsection{Echo Server with X.509 authentication II}
 The following example is a server which supports {\bf X.509} authentication.
 This server also supports export-grade cipher suites and session resuming.
-\input{serv-export}
+\input{ex-serv-export}
 
 \subsection{Echo Server with SRP authentication}
 This is a server which supports {\bf SRP} authentication.
-\input{serv-srp}
+\input{ex-serv-srp}
 
 \subsection{Checking for an alert}
 This is a function that checks if an alert has been received
