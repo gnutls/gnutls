@@ -1092,6 +1092,9 @@ leave:
  * at all. Then we don't check the signatures because it makes no sense.
  *
  * The return value is one of the CertificateStatus entries.
+ *
+ * NOTE: this function does not verify using any "web of trust". You
+ * may use GnuPG for that purpose, or any other external PGP application.
  **/
 int
 gnutls_openpgp_verify_key( const char *trustdb,
