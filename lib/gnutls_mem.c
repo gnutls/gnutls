@@ -25,6 +25,7 @@
 
 void* (*gnutls_secure_malloc)(size_t) = malloc;
 void* (*gnutls_malloc)(size_t) = malloc;
+void* (*gnutls_calloc)(size_t, size_t) = calloc;
 void (*gnutls_free)(void*) = free;
 char* (*gnutls_strdup)(const char*) = strdup;
 
@@ -34,7 +35,7 @@ int (*_gnutls_is_secure_memory)(const void*) = _gnutls_is_secure_mem_null;
 void* (*gnutls_realloc)(void*, size_t) = realloc;
 
 
-void *gnutls_calloc(size_t nmemb, size_t size)
+void *_gnutls_calloc(size_t nmemb, size_t size)
 {
 	void *ret;
 	ret = gnutls_malloc(size);

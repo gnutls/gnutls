@@ -76,6 +76,7 @@ extern void (*gnutls_free)(void*);
 extern int (*_gnutls_is_secure_memory)(const void*);
 extern void* (*gnutls_realloc)(void*, size_t);
 extern char* (*gnutls_strdup)(const char*);
+extern void* (*gnutls_calloc)(size_t, size_t);
 
 int _gnutls_is_secure_mem_null( const void*);
 
@@ -114,10 +115,13 @@ void gnutls_global_set_mem_func(
 	/* if using the libc's default malloc
 	 * then also use the libc's strdup.
 	 */
-	if ( gnutls_malloc == malloc)
+	if ( gnutls_malloc == malloc) {
 		gnutls_strdup = strdup;
-	else /* use the included one */
+		gnutls_calloc = calloc;
+	} else { /* use the included ones */
 		gnutls_strdup = _gnutls_strdup;
+		gnutls_calloc = _gnutls_calloc;
+	}
 	return;
 }
 

@@ -6,6 +6,7 @@ Version ?.?.?
 - Added gnutls_handshake_set_private_extensions() function. This
   function can be used to enable private (gnutls specific) cipher suites
   and compression algorithms.
+- Added check for C99 macro support by the compiler.
 
 Version 0.4.3 (23/05/2002)
 - The gnutls-extra library now compiles fine, if the opencdk library is

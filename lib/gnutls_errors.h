@@ -95,14 +95,30 @@ int gnutls_error_is_fatal( int error);
 
 /* FIXME: These macros only work with C99 compliant compilers
  */
-# define _gnutls_log(...)
-# define _gnutls_handshake_log( ...)
-# define _gnutls_io_log( ...)
-# define _gnutls_buffers_log( ...)
-# define _gnutls_hard_log( ...)
-# define _gnutls_record_log( ...)
-# define _gnutls_read_log( ...)
-# define _gnutls_write_log( ...)
-# define _gnutls_x509_log( ...)
+# ifdef C99_MACROS
+#  define _gnutls_log(...)
+#  define _gnutls_handshake_log( ...)
+#  define _gnutls_io_log( ...)
+#  define _gnutls_buffers_log( ...)
+#  define _gnutls_hard_log( ...)
+#  define _gnutls_record_log( ...)
+#  define _gnutls_read_log( ...)
+#  define _gnutls_write_log( ...)
+#  define _gnutls_x509_log( ...)
+# else
+#  define _gnutls_log _gnutls_null_log
+#  define _gnutls_handshake_log _gnutls_null_log
+#  define _gnutls_io_log _gnutls_null_log
+#  define _gnutls_buffers_log _gnutls_null_log
+#  define _gnutls_hard_log _gnutls_null_log
+#  define _gnutls_record_log _gnutls_null_log
+#  define _gnutls_read_log _gnutls_null_log
+#  define _gnutls_write_log _gnutls_null_log
+#  define _gnutls_x509_log _gnutls_null_log
+
+void _gnutls_null_log( void*, ...);
+
+# endif /* C99_MACROS */
+
 #endif /* DEBUG */
 

@@ -64,6 +64,21 @@ static const gnutls_alert_entry sup_alerts[] = {
                         GNUTLS_ALERT_LOOP( if(p->alert == alert) { a; break; })
 
 
+/**
+  * gnutls_alert_get_name - Returns a string describing the alert number given
+  * @alert: is an alert number &GNUTLS_STATE structure.
+  *
+  * Returns a string that describes the given alert number.
+  * See. gnutls_alert_get().
+  *
+  **/
+const char* gnutls_alert_get_name( int alert) {
+char* ret = NULL;
+
+	GNUTLS_ALERT_ID_LOOP( ret = p->desc);
+
+	return ret;
+}
 
 /**
   * gnutls_alert_send - This function sends an alert message to the peer
@@ -86,7 +101,7 @@ int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_Alert
 	data[0] = (uint8) level;
 	data[1] = (uint8) desc;
 
-	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert_get_name((int)data[1]));
+	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], gnutls_alert_get_name((int)data[1]));
 
 	if ( (ret = gnutls_send_int( state, GNUTLS_ALERT, -1, data, 2)) >= 0)
 		return 0;
@@ -179,18 +194,3 @@ GNUTLS_AlertDescription gnutls_alert_get( GNUTLS_STATE state) {
 	return state->gnutls_internals.last_alert;
 }
 
-/**
-  * gnutls_alert_get_name - Returns a string describing the alert number given
-  * @alert: is an alert number &GNUTLS_STATE structure.
-  *
-  * Returns a string that describes the given alert number.
-  * See. gnutls_alert_get().
-  *
-  **/
-const char* gnutls_alert_get_name( int alert) {
-char* ret = NULL;
-
-	GNUTLS_ALERT_ID_LOOP( ret = p->desc);
-
-	return ret;
-}
