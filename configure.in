@@ -156,6 +156,11 @@ AC_CONFIG_COMMANDS([default],[[
  echo "" >> lib/gnutls.h
  cat lib/x509_asn1.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
+ echo "#ifdef __cplusplus" >> lib/gnutls.h
+ echo "}" >> lib/gnutls.h
+ echo "#endif" >> lib/gnutls.h
+ echo "#endif /* GNUTLS_H */" >> lib/gnutls.h
+ echo "" >> lib/gnutls.h
  chmod -w lib/gnutls.h 
  chmod +x lib/libgnutls-config
 ]],[[]])
