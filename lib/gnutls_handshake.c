@@ -302,7 +302,6 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 
 	if (ret == 0) {		/* resumed! */
 		resume_copy_required_values(state);
-
 		state->gnutls_internals.resumed = RESUME_TRUE;
 		return 0;
 	} else {

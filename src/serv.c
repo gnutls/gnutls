@@ -32,7 +32,7 @@
 #include "common.h"
 #include <signal.h>
 #include "serv-gaa.h"
-
+#include <config.h>
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -83,6 +83,27 @@ char *x509_crlfile = NULL;
 GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
 GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
 GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
+
+
+#ifdef HAVE_LIBGDBM
+
+# include <gdbm.h>
+
+ typedef struct {
+	GDBM_FILE read_dbf;
+ } DBF;
+
+ static DBF dbf;
+
+# define DB_FILE "gnutls-rsm.db"
+
+ static void wrap_gdbm_init(void);
+ static void wrap_gdbm_deinit(void);
+ static int wrap_gdbm_store( DBF* dbf, gnutls_datum key, gnutls_datum data);
+ static gnutls_datum wrap_gdbm_fetch( DBF* dbf, gnutls_datum key);
+ static int wrap_gdbm_delete( DBF* dbf, gnutls_datum key);
+
+#endif
 
 
 #define DEFAULT_PRIME_BITS 1024
@@ -150,7 +171,6 @@ int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 GNUTLS_STATE initialize_state(void)
 {
    GNUTLS_STATE state;
-   int ret;
 
    gnutls_init(&state, GNUTLS_SERVER);
 
@@ -158,10 +178,12 @@ GNUTLS_STATE initialize_state(void)
     */
    gnutls_handshake_set_private_extensions( state, 1);
 
-   if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
-      fprintf(stderr,
-	      "*** DB error (%d). Resuming will not be possible.\n\n",
-	      ret);
+#ifdef HAVE_LIBGDBM
+   gnutls_db_set_retrieve_func( state, wrap_gdbm_fetch);
+   gnutls_db_set_remove_func( state, wrap_gdbm_delete);
+   gnutls_db_set_store_func( state, wrap_gdbm_store);
+   gnutls_db_set_ptr( state, &dbf);
+#endif
 
    /* null cipher is here only for debuging 
     * purposes.
@@ -329,6 +351,10 @@ int main(int argc, char **argv)
    signal(SIGPIPE, SIG_IGN);
 
    gaa_parser(argc, argv);
+
+#ifdef HAVE_LIBGDBM
+   wrap_gdbm_init();
+#endif
 
    if (http == 1) {
       strcpy(name, "HTTP Server");
@@ -554,6 +580,9 @@ int main(int argc, char **argv)
    gnutls_srp_free_server_sc(srp_cred);
    gnutls_anon_free_server_sc(dh_cred);
 
+#ifdef HAVE_LIBGDBM
+   wrap_gdbm_deinit();
+#endif
    gnutls_global_deinit();
 
    return 0;
@@ -723,12 +752,93 @@ void gaa_parser(int argc, char **argv)
       }
       comp_priority[j] = 0;
    }
-
-
-
 }
 
 void serv_version(void) {
 	fprintf(stderr, "GNU TLS test server, ");
 	fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
 }
+
+#ifdef HAVE_LIBGDBM
+
+static void wrap_gdbm_init(void) {
+	GDBM_FILE tmpdbf;
+	
+	/* create db */
+	tmpdbf = gdbm_open(DB_FILE, 0, GDBM_NEWDB, 0600, NULL);
+	if (tmpdbf==NULL) {
+		fprintf(stderr, "Error opening gdbm database\n");
+		exit(1);
+	}
+	gdbm_close( tmpdbf);
+
+	dbf.read_dbf = gdbm_open(DB_FILE, 0, GDBM_READER, 0600, NULL);
+	if (dbf.read_dbf==NULL) {
+		fprintf(stderr, "Error opening gdbm database\n");
+		exit(1);
+	}
+}
+
+static void wrap_gdbm_deinit(void) {
+	gdbm_close( dbf.read_dbf);
+}
+
+static int wrap_gdbm_store( DBF* dbf, gnutls_datum key, gnutls_datum data) {
+	datum _key, _data;
+	int res;
+	GDBM_FILE write_dbf;
+
+	write_dbf = gdbm_open(DB_FILE, 0, GDBM_WRITER, 0600, NULL);
+	if (write_dbf==NULL) {
+		fprintf(stderr, "Error opening gdbm database\n");
+		exit(1);
+	}
+	
+	_key.dptr = key.data;
+	_key.dsize = key.size;
+
+	_data.dptr = data.data;
+	_data.dsize = data.size;
+	
+	res = gdbm_store( write_dbf, _key, _data, GDBM_INSERT);
+
+	gdbm_close( write_dbf);
+	return res;
+}
+
+static gnutls_datum wrap_gdbm_fetch( DBF* dbf, gnutls_datum key) {
+	datum _key, _res;
+	gnutls_datum res2;
+	
+	_key.dptr = key.data;
+	_key.dsize = key.size;
+	
+	_res = gdbm_fetch( dbf->read_dbf, _key);
+
+	res2.data = _res.dptr;
+	res2.size = _res.dsize;
+
+	return res2;
+}
+
+static int wrap_gdbm_delete( DBF* dbf, gnutls_datum key) {
+	datum _key;
+	int res;
+	GDBM_FILE write_dbf;
+
+	write_dbf = gdbm_open(DB_FILE, 0, GDBM_WRITER, 0600, NULL);
+	if (write_dbf==NULL) {
+		fprintf(stderr, "Error opening gdbm database\n");
+		exit(1);
+	}
+	
+	_key.dptr = key.data;
+	_key.dsize = key.size;
+	
+	res = gdbm_delete( write_dbf, _key);
+	gdbm_close( write_dbf);
+
+	return res;
+}
+
+#endif /* HAVE LIBGDBM */

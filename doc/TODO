@@ -5,7 +5,6 @@ in order to avoid having people working on the same thing.
 Current list:
 * Audit the code
 * Add function(s) to get the DHE/A parameters
-* Add function(s) to extract the certificate key's parameters
 * Add PKCS-12 support
 * Convert documentation to texinfo format
 * Merge common stuff in DHE and DHA key exchange

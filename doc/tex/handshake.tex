@@ -39,11 +39,7 @@ feature of the {\bf TLS} protocol which allows a client to connect to a server,
 after a successful handshake, without the expensive calculations. This is
 achieved by using the previously
 established keys. \gnutls{} supports this feature, and the
-example \hyperref{resume client}{resume client (see Section }{)}{resume-example} illustrates a typical use of it.
-\par
-Servers only need to use the
-\hyperref{gnutls\_db\_set\_name()}{gnutls\_db\_set\_name() (see Section }{)}{gnutls_db_set_name} function if they want to use the gdbm
-backend to store sessions. 
+example \hyperref{resume client}{resume client (see section }{)}{resume-example} illustrates a typical use of it.
 \par
 Keep in mind that sessions are expired after some time, for security reasons, thus
 it may be normal for a server not to resume a session even if you requested that.
@@ -57,49 +53,24 @@ order to be able to resume sessions. The gnutls approach is, in case of a
 client, to leave all the burden of resuming to the client. Ie. copy and keep the
 nesessary parameters. See the functions:
 \begin{itemize}
-\item \hyperref{gnutls\_session\_get\_data()}
-{gnutls\_session\_get\_data() on section }{}{gnutls_session_get_data}
-\item \hyperref{gnutls\_session\_get\_id()}
-{gnutls\_session\_get\_id() on section }{}{gnutls_session_get_id}
-\item \hyperref{gnutls\_session\_set\_data()}
-{gnutls\_session\_set\_data() on section }{}{gnutls_session_set_data}
+\item \printfunc{gnutls_session_get_data}{gnutls\_session\_get\_data}
+\item \printfunc{gnutls_session_get_id}{gnutls\_session\_get\_id}
+\item \printfunc{gnutls_session_set_data}{gnutls\_session\_set\_data}
 \end{itemize}
 
 \par
-The server side is different.
-Here the server only specifies a DB file, using 
-\hyperref{gnutls\_db\_set\_name()}{gnutls\_db\_set\_name() (see Section }{)}{gnutls_db_set_name}.
-This DB file is used to store the sessions' required parameters for
-resuming. This means that this file contains very sensitive information,
-such as encryption keys. In a multi-threaded application every thread can
-read from the DB file and access all previously established sessions, but
-only one thread can write at a time. The current behaviour of gnutls is
-not to block to wait for the DB to be ready for writing, but continue the
-process normally (and do not save the parameters).  
-\par
-The default behaviour is not efficient in servers where many connections
-per second arrive. Thus
- \gnutls{} provides the following callback functions:
+The server side is different. A server has to specify some callback functions
+which store, retrieve and delete session data. These can be registered with:
 \begin{itemize}
-\item \hyperref{gnutls\_db\_set\_remove\_function()}{gnutls\_db\_set\_remove\_function() (see Section }{)}
-{gnutls_db_set_remove_function}
-\item \hyperref{gnutls\_db\_set\_store\_function()}{gnutls\_db\_set\_store\_function() (see Section }{)}
-{gnutls_db_set_store_function}
-\item \hyperref{gnutls\_db\_set\_retrieve\_function()}{gnutls\_db\_set\_retrieve\_function() (see Section }{)
-}{gnutls_db_set_retrieve_function}
-\item \hyperref{gnutls\_db\_set\_ptr()}{gnutls\_db\_set\_ptr() (see Section }{)}
-{gnutls_db_set_ptr}
+\item \printfunc{gnutls_db_set_remove_function}{gnutls\_db\_set\_remove\_function}
+\item \printfunc{gnutls_db_set_store_function}{gnutls\_db\_set\_store\_function}
+\item \printfunc{gnutls_db_set_retrieve_function}{gnutls\_db\_set\_retrieve\_function}
+\item \printfunc{gnutls_db_set_ptr}{gnutls\_db\_set\_ptr}
 \end{itemize}
 
-These callback functions are required in order to use a session
-storage method, other than the default gdbm backend. 
 \par
-If an alternative backend is in use, it might be usefull to be able to check
-for expired sessions in order to remove them, and save space. This is what
-\hyperref{gnutls\_db\_clean()}{gnutls\_db\_clean() (see Section }{)}
-{gnutls_db_clean} does for the gdbm backend. 
-\gnutls{} provides the function
-\hyperref{gnutls\_db\_check\_entry()}{gnutls\_db\_check\_entry() (see Section }{)
-}{gnutls_db_check_entry}, which takes as input session data, and
-returns a negative value if the data are to be removed.
+It might also be usefull to be able to check for expired sessions in order to remove 
+them, and save space. The function
+\printfunc{gnutls_db_check_entry}{gnutls\_db\_check\_entry} is provided for that
+reason.
 

@@ -47,7 +47,6 @@ void print_x509_info(GNUTLS_STATE state)
 	if (cert_list_size <= 0)
 		return;
 
-
 	printf(" - Certificate info:\n");
 
 	printf(" # Certificate is valid since: %s", my_ctime( &activet));

@@ -473,9 +473,6 @@ typedef struct {
 	int				v2_hello; /* 0 if the client hello is v3+.
 						   * non-zero if we got a v2 hello.
 						   */
-#ifdef HAVE_LIBGDBM
-	GDBM_FILE			db_reader;
-#endif
 	/* keeps the headers of the handshake packet 
 	 */
 	HANDSHAKE_HEADER_BUFFER		handshake_header_buffer;

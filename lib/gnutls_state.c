@@ -220,12 +220,6 @@ void gnutls_deinit(GNUTLS_STATE state)
 	/* remove auth info firstly */
 	_gnutls_free_auth_info(state );
 
-#ifdef HAVE_LIBGDBM
-	/* close the database - resuming sessions */
-	if ( state->gnutls_internals.db_reader != NULL)
-		gdbm_close(state->gnutls_internals.db_reader);
-#endif
-
 	_gnutls_handshake_io_buffer_clear( state);
 
 	gnutls_sfree_datum(&state->connection_state.read_mac_secret);

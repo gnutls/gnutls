@@ -66,10 +66,6 @@ typedef long ptrdiff_t;
 # include <sys/types.h>
 #endif
 
-#ifdef HAVE_LIBGDBM
-# include <gdbm.h>
-#endif
-
 #ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif

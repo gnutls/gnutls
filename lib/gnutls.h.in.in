@@ -188,9 +188,7 @@ typedef gnutls_datum (*GNUTLS_DB_RETR_FUNC)(void*, gnutls_datum key);
 
 void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds);
 
-int  gnutls_db_set_name( GNUTLS_STATE state, const char* filename);	
-int  gnutls_db_clean( GNUTLS_STATE state);
-void  gnutls_db_remove_session( GNUTLS_STATE state);
+void gnutls_db_remove_session( GNUTLS_STATE state);
 void gnutls_db_set_retrieve_func( GNUTLS_STATE, GNUTLS_DB_RETR_FUNC);
 void gnutls_db_set_remove_func( GNUTLS_STATE, GNUTLS_DB_REMOVE_FUNC);
 void gnutls_db_set_store_func( GNUTLS_STATE, GNUTLS_DB_STORE_FUNC);

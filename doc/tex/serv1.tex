@@ -47,11 +47,6 @@ GNUTLS_STATE initialize_state()
 
    gnutls_init(&state, GNUTLS_SERVER);
 
-   /* in order to support session resuming:
-    */
-   if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
-      fprintf(stderr, "*** DB error (%d)\n\n", ret);
-
    gnutls_protocol_set_priority(state, protocol_priority);
    gnutls_cipher_set_priority(state, cipher_priority);
    gnutls_compression_set_priority(state, comp_priority);

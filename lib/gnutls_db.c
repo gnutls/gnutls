@@ -31,15 +31,8 @@
 
 #define GNUTLS_DBNAME state->gnutls_internals.db_name
 
-#ifdef HAVE_LIBGDBM
-# define GNUTLS_DBF state->gnutls_internals.db_reader
-# define GNUTLS_REOPEN_DB() if (GNUTLS_DBF!=NULL) \
-	gdbm_close( GNUTLS_DBF); \
-	GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
-#endif
-
 /**
-  * gnutls_db_set_retrieve_function - Sets the function that will be used to get data
+  * gnutls_db_set_retrieve_func - Sets the function that will be used to get data
   * @state: is a &GNUTLS_STATE structure.
   * @retr_func: is the function.
   *
@@ -53,12 +46,12 @@
   * has been called.
   *
   **/
-void gnutls_db_set_retrieve_function( GNUTLS_STATE state, GNUTLS_DB_RETR_FUNC retr_func) {
+void gnutls_db_set_retrieve_func( GNUTLS_STATE state, GNUTLS_DB_RETR_FUNC retr_func) {
 	state->gnutls_internals.db_retrieve_func = retr_func;
 }
 
 /**
-  * gnutls_db_set_remove_function - Sets the function that will be used to remove data
+  * gnutls_db_set_remove_func - Sets the function that will be used to remove data
   * @state: is a &GNUTLS_STATE structure.
   * @rem_func: is the function.
   *
@@ -71,12 +64,12 @@ void gnutls_db_set_retrieve_function( GNUTLS_STATE state, GNUTLS_DB_RETR_FUNC re
   * has been called.
   *
   **/
-void gnutls_db_set_remove_function( GNUTLS_STATE state, GNUTLS_DB_REMOVE_FUNC rem_func) {
+void gnutls_db_set_remove_func( GNUTLS_STATE state, GNUTLS_DB_REMOVE_FUNC rem_func) {
 	state->gnutls_internals.db_remove_func = rem_func;
 }
 
 /**
-  * gnutls_db_set_store_function - Sets the function that will be used to put data
+  * gnutls_db_set_store_func - Sets the function that will be used to put data
   * @state: is a &GNUTLS_STATE structure.
   * @store_func: is the function
   *
@@ -89,7 +82,7 @@ void gnutls_db_set_remove_function( GNUTLS_STATE state, GNUTLS_DB_REMOVE_FUNC re
   * has been called.
   *
   **/
-void gnutls_db_set_store_function( GNUTLS_STATE state, GNUTLS_DB_STORE_FUNC store_func) {
+void gnutls_db_set_store_func( GNUTLS_STATE state, GNUTLS_DB_STORE_FUNC store_func) {
 	state->gnutls_internals.db_store_func = store_func;
 }
 
@@ -131,59 +124,10 @@ void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds) {
 }
 
 /**
-  * gnutls_db_set_name - Sets the name of the database that holds TLS sessions.
-  * @state: is a &GNUTLS_STATE structure.
-  * @filename: is the filename for the database
-  *
-  * Sets the name of the (gdbm) database to be used to keep
-  * the sessions to be resumed. This function also creates the database
-  * - if it does not exist - and opens it for reading.
-  * You should not call this function if using an other backend
-  * than gdbm (ie. called function gnutls_db_set_store_func() etc.)
-  *
-  **/
-int gnutls_db_set_name( GNUTLS_STATE state, const char* filename) {
-#ifdef HAVE_LIBGDBM
-GDBM_FILE dbf;
-
-	if (filename==NULL) return 0;
-
-	/* deallocate previous name */
-	if (GNUTLS_DBNAME!=NULL)
-		gnutls_free(GNUTLS_DBNAME);
-
-	/* set name */
-	GNUTLS_DBNAME = gnutls_strdup(filename);
-	if (GNUTLS_DBNAME==NULL) return GNUTLS_E_MEMORY_ERROR;
-
-	/* open for reader */
-	GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
-	if (GNUTLS_DBF==NULL) {
-		/* maybe it does not exist - so try to
-		 * create it.
-		 */
-		dbf = gdbm_open( (char*)filename, 0, GDBM_WRCREAT, 0600, NULL);
-		if (dbf==NULL) return GNUTLS_E_DB_ERROR;
-		gdbm_close(dbf);
-
-		/* try to open again */
-		GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
-	}
-	if (GNUTLS_DBF==NULL)
-		return GNUTLS_E_DB_ERROR;
-
-	return 0;
-#else
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#endif
-}
-
-/**
   * gnutls_db_check_entry - checks if the given db entry has expired
   * @state: is a &GNUTLS_STATE structure.
   * @session_entry: is the session data (not key)
   *
-  * This function should only be used if not using the gdbm backend.
   * This function returns GNUTLS_E_EXPIRED, if the database entry
   * has expired or 0 otherwise. This function is to be used when
   * you want to clear unnesessary session which occupy space in your
@@ -200,59 +144,6 @@ time_t timestamp;
 			return GNUTLS_E_EXPIRED;
 	
 	return 0;
-}
-
-/**
-  * gnutls_db_clean - removes expired and invalid sessions from the database
-  * @state: is a &GNUTLS_STATE structure.
-  *
-  * This function Deletes all expired records in the resumed sessions' database. 
-  * This database may become huge if this function is not called.
-  * This function is also quite expensive. This function should only
-  * be called if using the gdbm backend.
-  *
-  **/
-int gnutls_db_clean( GNUTLS_STATE state) {
-#ifdef HAVE_LIBGDBM
-GDBM_FILE dbf;
-int ret;
-datum key;
-time_t timestamp;
-gnutls_datum _key;
-
-	if (GNUTLS_DBF==NULL) return GNUTLS_E_DB_ERROR;
-	if (GNUTLS_DBNAME==NULL) return GNUTLS_E_DB_ERROR;
-
-	dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
-	if (dbf==NULL) return GNUTLS_E_AGAIN;
-	key = gdbm_firstkey(dbf);
-
-	timestamp = time(0);
-
-	_key.data = key.dptr;
-	_key.size = key.dsize;
-	while( _key.data != NULL) {
-
-		if ( gnutls_db_check_entry( state, _key)==GNUTLS_E_EXPIRED) {
-		    /* delete expired entry */
-		    gdbm_delete( dbf, key);
-		}
-		
-		free(key.dptr);
-		key = gdbm_nextkey(dbf, key);
-	}
-	ret = gdbm_reorganize(dbf);
-	
-	gdbm_close(dbf);
-	GNUTLS_REOPEN_DB();
-	
-	if (ret!=0) return GNUTLS_E_DB_ERROR;
-		
-	return 0;
-#else
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#endif
-
 }
 
 /* The format of storing data is:
@@ -356,11 +247,6 @@ gnutls_datum key = { session_id, session_id_size };
  */
 int _gnutls_store_session( GNUTLS_STATE state, gnutls_datum session_id, gnutls_datum session_data)
 {
-#ifdef HAVE_LIBGDBM
-GDBM_FILE dbf;
-datum key = { session_id.data, session_id.size };
-datum content = {session_data.data, session_data.size};
-#endif
 int ret = 0;
 
 	if (state->gnutls_internals.resumable==RESUME_FALSE) {
@@ -383,29 +269,8 @@ int ret = 0;
 	}
 	/* if we can't read why bother writing? */
 
-#ifdef HAVE_LIBGDBM
-	if (GNUTLS_DBF!=NULL) { /* use gdbm */
-		dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
-		if (dbf==NULL) {
-			/* cannot open db for writing. This may happen if multiple
-			 * instances try to write. 
-			 */
-			gnutls_assert();
-			return GNUTLS_E_AGAIN;
-		}
-		ret = gdbm_store( dbf, key, content, GDBM_INSERT);
-		if (ret<0) {
-			gnutls_assert();
-		}
-		gdbm_close(dbf);
-
-		return 0; /*GNUTLS_E_UNIMPLEMENTED_FEATURE;*/
-	}
-	else 
-#endif
-		if (state->gnutls_internals.db_store_func!=NULL)
-			ret = state->gnutls_internals.db_store_func( state->gnutls_internals.db_ptr, session_id, session_data);
-
+	if (state->gnutls_internals.db_store_func!=NULL)
+		ret = state->gnutls_internals.db_store_func( state->gnutls_internals.db_ptr, session_id, session_data);
 
 	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
 
@@ -415,10 +280,6 @@ int ret = 0;
  */
 gnutls_datum _gnutls_retrieve_session( GNUTLS_STATE state, gnutls_datum session_id)
 {
-#ifdef HAVE_LIBGDBM
-datum key = { session_id.data, session_id.size };
-datum content;
-#endif
 gnutls_datum ret = { NULL, 0 };
 
 	if (session_id.data==NULL || session_id.size==0) {
@@ -426,16 +287,8 @@ gnutls_datum ret = { NULL, 0 };
 		return ret;
 	}
 	
-	/* if we can't read why bother writing? */
-#ifdef HAVE_LIBGDBM
-	if (GNUTLS_DBF!=NULL) { /* use gdbm */
-		content = gdbm_fetch( GNUTLS_DBF, key);
-		ret.data = content.dptr;
-		ret.size = content.dsize;
-	} else
-#endif
-		if (state->gnutls_internals.db_retrieve_func!=NULL)
-			ret = state->gnutls_internals.db_retrieve_func( state->gnutls_internals.db_ptr, session_id);
+	if (state->gnutls_internals.db_retrieve_func!=NULL)
+		ret = state->gnutls_internals.db_retrieve_func( state->gnutls_internals.db_ptr, session_id);
 
 	return ret;
 
@@ -445,10 +298,6 @@ gnutls_datum ret = { NULL, 0 };
  */
 int _gnutls_remove_session( GNUTLS_STATE state, gnutls_datum session_id)
 {
-#ifdef HAVE_LIBGDBM
-GDBM_FILE dbf;
-datum key = { session_id.data, session_id.size };
-#endif
 int ret = 0;
 
 	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
@@ -459,23 +308,8 @@ int ret = 0;
 		return GNUTLS_E_INVALID_SESSION;
 
 	/* if we can't read why bother writing? */
-#ifdef HAVE_LIBGDBM
-	if (GNUTLS_DBF!=NULL) { /* use gdbm */
-
-		dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
-		if (dbf==NULL) {
-			/* cannot open db for writing. This may happen if multiple
-			 * instances try to write. 
-			 */
-			return GNUTLS_E_AGAIN;
-		}
-		ret = gdbm_delete( dbf, key);
-
-		gdbm_close(dbf);
-	} else
-#endif
-		if (state->gnutls_internals.db_remove_func!=NULL)
-			ret = state->gnutls_internals.db_remove_func( state->gnutls_internals.db_ptr, session_id);
+	if (state->gnutls_internals.db_remove_func!=NULL)
+		ret = state->gnutls_internals.db_remove_func( state->gnutls_internals.db_ptr, session_id);
 
 
 	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
