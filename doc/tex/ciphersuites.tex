@@ -8,14 +8,12 @@ These ciphersuites contain three parameters:
 \item The Symmetric encryption algorithm and mode (3DES\_CBC in this
 example)
 \item The MAC\footnote{MAC stands for Message Authentication Code. It can
-be described as a keyed hash algorithm} algorithm used for authentication.
-MAC-SHA is used in the above example.
+be described as a keyed hash algorithm. See RFC2104} algorithm used for authentication.
+MAC\_SHA is used in the above example.
 \end{itemize}
 
-\par The key exchange algorithms currently in the \tls protocol
-are:
 
-\par
+\begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
 
 \hline
@@ -33,28 +31,62 @@ parameters which are send to the peer. Currently \gnutls does not support this c
 \\
 \hline
 DH\_DSS & Static Diffie Hellman parameters signed by a DSS certificate.
-Currently \gnutls does not support this ciphersuite.
+\gnutls does not support this ciphersuite.
 \\
 \hline
 DH\_RSA & Static Diffie Hellman parameters signed by an RSA certificate.
-Currently \gnutls does not support this ciphersuite.
-\\
-\hline
-DH\_ANON & Diffie Hellman parameters not signed. This key exchange method is
-vulnerable to man in the middle attack.
-\\
-\hline
-SRP\footnote{The SRP key exchange is not a part of the TLS 1.0 protocol} & Authentication using the SRP\footnote{SRP stands for Secure Remote Password protocol}
-protocol
+\gnutls does not support this ciphersuite.
 \\
 \hline
 \end{tabular}
 
-\addvspace{1.5cm}
-\par
+\caption{Supported X.509 key exchange algorithms}
 
- The Bulk Cipher algorithms used in \gnutls are: 
-\par
+\end{figure}
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+DH\_ANON & This algorithm exchanges not signed diffie Hellman parameters. That way encryption may 
+be performed but there is no indication of the identity of the peer. This kind of
+authentication is vulnerable to man in the middle attack, but this protocol
+can be used even if there is no prior communication or common trusted
+parties with the peer.
+Unless really required, do not use anonymous authentication.
+\\
+\hline
+\end{tabular}
+
+\caption{Supported anonymous key exchange algorithms}
+
+\end{figure}
+
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+SRP\footnote{SRP stands for Secure Password Protocol and is described in
+RFC2945. The SRP key exchange is not a part of the TLS 1.0 protocol} & Authentication using the SRP
+protocol. This protocol is actually password authentication, since the two
+peers are identified by the knowledge of a password. However this protocol
+also offers protection against off-line attacks (password file stealing
+etc.). Use SRP authentication if password based authentication is required.
+\\
+\hline
+\end{tabular}
+
+\caption{Supported SRP key exchange algorithms}
+
+\end{figure}
+
+
+
+
+\addvspace{1.5cm}
+
+\begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
 
 \hline
@@ -76,12 +108,15 @@ TWOFISH\_CBC & TWOFISH is a block cipher algorithm by Counterpane. Has
 \\
 \hline
 \end{tabular}
+\caption{Supported cipher algorithms}
+
+\end{figure}
+
+
 
 \addvspace{1.5cm}
-\par
- The MAC\footnote{see RFC2104} algorithms used in \gnutls are: 
-\par
 
+\begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
 
 \hline
@@ -92,4 +127,7 @@ MAC\_SHA & SHA is a hash algorithm by NSA. Outputs 160 bits of data.
 \\
 \hline
 \end{tabular}
+\caption{Supported MAC algorithms}
+
+\end{figure}
 
