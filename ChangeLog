@@ -1,3 +1,11 @@
+2003-08-27 15:24  nmav <nmav@gnutls.org>
+
+	* src/: serv.c, tests.c, tls_test-gaa.c, tls_test-gaa.h,
+	tls_test.c, tls_test.gaa:
+
+	corrected bug in the session resumption detection in the
+	gnutls-cli-debug, and other minor fixes.  
+
 2003-08-21 16:50  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_compress_int.c, src/tls_test.c (utags: gnutls_0_9_7):
