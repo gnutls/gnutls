@@ -80,7 +80,7 @@ MOD_AUTH_STRUCT dhe_dss_auth_struct = {
 
 static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 {
-	MPI x, X, g, p;
+	GNUTLS_MPI x, X, g, p;
 	size_t n_X, n_g, n_p;
 	uint8 *data_p;
 	uint8 *data_g;
@@ -123,7 +123,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 	}
 
 	info = _gnutls_get_auth_info( state);
-	ret=_gnutls_dh_set_prime_bits( state, gcry_mpi_get_nbits(p));
+	ret=_gnutls_dh_set_prime_bits( state, _gnutls_mpi_get_nbits(p));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -137,7 +137,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	state->gnutls_key->dh_secret = x;
-	ret=_gnutls_dh_set_secret_bits( state, gcry_mpi_get_nbits(x));
+	ret=_gnutls_dh_set_secret_bits( state, _gnutls_mpi_get_nbits(x));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -212,7 +212,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 
 static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 {
-	MPI x, X;
+	GNUTLS_MPI x, X;
 	size_t n_X;
 	int ret;
 
@@ -225,7 +225,7 @@ static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret=_gnutls_dh_set_secret_bits( state, gcry_mpi_get_nbits(x));
+	ret=_gnutls_dh_set_secret_bits( state, _gnutls_mpi_get_nbits(x));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -255,7 +255,7 @@ static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(
+	ret=_gnutls_dh_set_peer_public_bits( state, _gnutls_mpi_get_nbits(
 		state->gnutls_key->client_Y));
 	if (ret<0) {
 		gnutls_assert();
@@ -350,21 +350,21 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(
+	ret=_gnutls_dh_set_peer_public_bits( state, _gnutls_mpi_get_nbits(
 		state->gnutls_key->client_Y));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	if ( gcry_mpi_get_nbits( state->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( state)) {
+	if ( _gnutls_mpi_get_nbits( state->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( state)) {
 		/* the prime used by the peer is not acceptable
 		 */
 		gnutls_assert();
 		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 	}
 
-	ret=_gnutls_dh_set_prime_bits( state, gcry_mpi_get_nbits(
+	ret=_gnutls_dh_set_prime_bits( state, _gnutls_mpi_get_nbits(
 		state->gnutls_key->client_p));
 	if (ret<0) {
 		gnutls_assert();
@@ -426,7 +426,7 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 {
 	uint16 n_Y;
 	size_t _n_Y;
-	MPI g, p;
+	GNUTLS_MPI g, p;
 	int bits, ret;
 	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 
@@ -448,7 +448,7 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(
+	ret=_gnutls_dh_set_peer_public_bits( state, _gnutls_mpi_get_nbits(
 		state->gnutls_key->client_Y));
 	if (ret<0) {
 		gnutls_assert();

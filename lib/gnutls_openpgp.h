@@ -69,12 +69,3 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
 	int key_fpr_size);
 
 #endif /*GNUTLS_OPENPGP_H*/
-
-
-
-
-
-
-
-
-

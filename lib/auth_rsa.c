@@ -66,7 +66,7 @@ MOD_AUTH_STRUCT rsa_auth_struct = {
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-static int _gnutls_get_public_rsa_params(GNUTLS_STATE state, MPI params[MAX_PARAMS_SIZE], int* params_len)
+static int _gnutls_get_public_rsa_params(GNUTLS_STATE state, GNUTLS_MPI params[MAX_PARAMS_SIZE], int* params_len)
 {
 int ret;
 CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
@@ -108,7 +108,7 @@ int i;
 	*params_len = peer_cert.params_size;
 
 	for (i=0;i<*params_len;i++) {
-		params[i] = gcry_mpi_copy(peer_cert.params[i]);
+		params[i] = _gnutls_mpi_copy(peer_cert.params[i]);
 	}
 	_gnutls_free_cert( peer_cert);
 
@@ -117,7 +117,7 @@ int i;
 
 /* This function reads the RSA parameters from the private key
  */
-static int _gnutls_get_private_rsa_params(GNUTLS_STATE state, MPI **params, int* params_size)
+static int _gnutls_get_private_rsa_params(GNUTLS_STATE state, GNUTLS_MPI **params, int* params_size)
 {
 int index;
 const GNUTLS_CERTIFICATE_CREDENTIALS cred;
@@ -153,7 +153,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
-	MPI *params;
+	GNUTLS_MPI *params;
 	int params_len;
 
 	if (gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
@@ -218,7 +218,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 {
 	CERTIFICATE_AUTH_INFO auth = state->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */
-	MPI params[MAX_PARAMS_SIZE];
+	GNUTLS_MPI params[MAX_PARAMS_SIZE];
 	int params_len = MAX_PARAMS_SIZE;
 	int ret, i;
 	GNUTLS_Version ver;

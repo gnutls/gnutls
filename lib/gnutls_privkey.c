@@ -52,9 +52,9 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		return _gnutls_asn2err(result);
 	}
 
-	if ((sizeof(pkey->params) / sizeof(MPI)) < RSA_PRIVATE_PARAMS) {
+	if ((sizeof(pkey->params) / sizeof(GNUTLS_MPI)) < RSA_PRIVATE_PARAMS) {
 		gnutls_assert();
-		/* internal error. Increase the MPIs in params */
+		/* internal error. Increase the GNUTLS_MPIs in params */
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -121,14 +121,14 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 	 * library is uses the p,q in the reverse order.
 	 */
 	pkey->params[5] =
-	    gcry_mpi_snew(gcry_mpi_get_nbits(pkey->params[0]));
+	    _gnutls_mpi_snew(_gnutls_mpi_get_nbits(pkey->params[0]));
 
 	if (pkey->params[5] == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gcry_mpi_invm(pkey->params[5], pkey->params[3], pkey->params[4]);
+	_gnutls_mpi_invm(pkey->params[5], pkey->params[3], pkey->params[4]);
 	/*				p, q */
 #else
 	if ( (result=_gnutls_x509_read_int( pkey_asn, "rsakey.coefficient",
@@ -181,9 +181,9 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 		return _gnutls_asn2err(result);
 	}
 
-	if ((sizeof(pkey->params) / sizeof(MPI)) < DSA_PRIVATE_PARAMS) {
+	if ((sizeof(pkey->params) / sizeof(GNUTLS_MPI)) < DSA_PRIVATE_PARAMS) {
 		gnutls_assert();
-		/* internal error. Increase the MPIs in params */
+		/* internal error. Increase the GNUTLS_MPIs in params */
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 

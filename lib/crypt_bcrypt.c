@@ -600,7 +600,7 @@ static const char magic[] = "$2$";
 
 #define B64TEXT "OrpheanBeholderScryDoubt"
 
-char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, MPI g, MPI n)
+char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	unsigned char *sp;
 	blf_ctx *ctx;
@@ -695,7 +695,7 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, M
 /* cost is stored as the first byte in salt (thus < 255) which is 
  * just fine! 
  */
-char *crypt_bcrypt_wrapper(const char* username, const char *pass_new, int cost, MPI g, MPI n)
+char *crypt_bcrypt_wrapper(const char* username, const char *pass_new, int cost, GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	opaque *result;
 	char *tcp;

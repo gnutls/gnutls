@@ -26,7 +26,7 @@
 #include "crypt_srpsha1.h"
 #include "gnutls_random.h"
 
-char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt, MPI g, MPI n) {
+char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt, GNUTLS_MPI g, GNUTLS_MPI n) {
 	
 	switch(algo) {
 	case BLOWFISH_CRYPT: /* bcrypt */
@@ -39,7 +39,7 @@ char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, i
 	return NULL;
 }
 
-int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt, MPI g, MPI n) {
+int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt, GNUTLS_MPI g, GNUTLS_MPI n) {
 	char* cr;
 
 	switch(salt[0]) {

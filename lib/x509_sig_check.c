@@ -140,7 +140,7 @@ int len;
  * params[1] is public key
  */
 static int
-_pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *params, int params_len)
+_pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, GNUTLS_MPI *params, int params_len)
 {
 	MACAlgorithm hash;
 	int ret;

@@ -57,7 +57,7 @@ MOD_AUTH_STRUCT anon_auth_struct = {
 };
 
 int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
-	MPI x, X, g, p;
+	GNUTLS_MPI x, X, g, p;
 	int bits, ret;
 	size_t n_X, n_g, n_p;
 	uint8 *data_p;
@@ -86,7 +86,7 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	}
 
 	info = _gnutls_get_auth_info( state);	
-	if ((ret=_gnutls_dh_set_prime_bits( state, gcry_mpi_get_nbits(p))) < 0) {
+	if ((ret=_gnutls_dh_set_prime_bits( state, _gnutls_mpi_get_nbits(p))) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -100,7 +100,7 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 		_gnutls_mpi_release( &X);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	ret=_gnutls_dh_set_secret_bits( state, gcry_mpi_get_nbits(x));
+	ret=_gnutls_dh_set_secret_bits( state, _gnutls_mpi_get_nbits(x));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -139,7 +139,7 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 }
 
 int gen_anon_client_kx( GNUTLS_STATE state, opaque** data) {
-MPI x, X;
+GNUTLS_MPI x, X;
 size_t n_X;
 int ret;
 
@@ -151,7 +151,7 @@ int ret;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	ret=_gnutls_dh_set_secret_bits( state, gcry_mpi_get_nbits(x));
+	ret=_gnutls_dh_set_secret_bits( state, _gnutls_mpi_get_nbits(x));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -249,21 +249,21 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 		return ret;
 	}
 
-	if ( gcry_mpi_get_nbits( state->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( state)) {
+	if ( _gnutls_mpi_get_nbits( state->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( state)) {
 		/* the prime used by the peer is not acceptable
 		 */
 		gnutls_assert();
 		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 	}
 	
-	ret=_gnutls_dh_set_prime_bits( state, gcry_mpi_get_nbits(
+	ret=_gnutls_dh_set_prime_bits( state, _gnutls_mpi_get_nbits(
 		state->gnutls_key->client_p));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(
+	ret=_gnutls_dh_set_peer_public_bits( state, _gnutls_mpi_get_nbits(
 		state->gnutls_key->client_Y));
 	if (ret<0) {
 		gnutls_assert();
@@ -277,7 +277,7 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	uint16 n_Y;
 	size_t _n_Y;
-	MPI g, p;
+	GNUTLS_MPI g, p;
 	int bits, ret;
 	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
 	
@@ -305,7 +305,7 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(state->gnutls_key->client_Y));
+	ret=_gnutls_dh_set_peer_public_bits( state, _gnutls_mpi_get_nbits(state->gnutls_key->client_Y));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;

@@ -33,7 +33,7 @@
 static const char magic[] = "";
 
 char *crypt_srpsha1(const char *username, const char *passwd,
-		    const char *salt, MPI g, MPI n)
+		    const char *salt, GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	unsigned char *sp, r1[MAX_HASH_SIZE];
 	int salt_size = strlen(salt);
@@ -130,7 +130,7 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 
 /* salt here is the salt size */
 char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
-			    int salt, MPI g, MPI n)
+			    int salt, GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	unsigned char *result;
 	char *tcp;

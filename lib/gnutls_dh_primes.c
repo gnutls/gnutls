@@ -223,7 +223,7 @@ static uint8 diffie_hellman_prime_2048[] = { 0x00,
 };
 
 /* Holds the prime to be used in DH authentication.
- * Initialy the MPIs are not calculated (must call global_init, or _gnutls_dh_calc_mpis()).
+ * Initialy the GNUTLS_MPIs are not calculated (must call global_init, or _gnutls_dh_calc_mpis()).
  */
 _GNUTLS_DH_PARAMS _gnutls_dh_default_params[] = {
 	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
@@ -301,7 +301,7 @@ static int normalize_bits(int bits)
 	return bits;
 }
 
-/* Clears allocated MPIs and data. Only to be called at exit.
+/* Clears allocated GNUTLS_MPIs and data. Only to be called at exit.
  */
 void _gnutls_dh_clear_mpis(void) {
 int i;
@@ -321,7 +321,7 @@ int i;
 
 }
 
-/* Generates MPIs from opaque integer data. Initializes the dh_primes to
+/* Generates GNUTLS_MPIs from opaque integer data. Initializes the dh_primes to
  * be used.
  */
 int _gnutls_dh_calc_mpis(void)
@@ -363,9 +363,9 @@ int i, n;
 /* returns g and p, depends on the requested bits.
  * We only support limited key sizes.
  */
-MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, MPI * ret_p, int bits)
+GNUTLS_MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, GNUTLS_MPI * ret_p, int bits)
 {
-	MPI g=NULL, prime=NULL;
+	GNUTLS_MPI g=NULL, prime=NULL;
 	int i;
 
 	if (dh_primes==NULL) {
@@ -378,8 +378,8 @@ MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, MPI * ret_p, int bits)
 	i = 0;
 	do {
 		if (dh_primes[i].bits == bits) {
-			prime = gcry_mpi_copy(dh_primes[i]._prime);
-			g = gcry_mpi_copy(dh_primes[i]._generator);
+			prime = _gnutls_mpi_copy(dh_primes[i]._prime);
+			g = _gnutls_mpi_copy(dh_primes[i]._generator);
 			break;
 		}
 		i++;
@@ -401,9 +401,9 @@ MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes, MPI * ret_p, int bits)
 /* returns g and p, depends on the requested bits.
  * We only support limited key sizes.
  */
-MPI _gnutls_get_rnd_srp_params( MPI * ret_p, int bits)
+GNUTLS_MPI _gnutls_get_rnd_srp_params( GNUTLS_MPI * ret_p, int bits)
 {
-	MPI g=NULL, prime=NULL;
+	GNUTLS_MPI g=NULL, prime=NULL;
 	int i;
 
 	if (_gnutls_dh_default_params==NULL) {
@@ -416,8 +416,8 @@ MPI _gnutls_get_rnd_srp_params( MPI * ret_p, int bits)
 	i = 0;
 	do {
 		if (_gnutls_dh_default_params[i].bits == bits) {
-			prime = gcry_mpi_copy(_gnutls_dh_default_params[i]._prime);
-			g = gcry_mpi_copy(_gnutls_dh_default_params[i]._generator);
+			prime = _gnutls_mpi_copy(_gnutls_dh_default_params[i]._prime);
+			g = _gnutls_mpi_copy(_gnutls_dh_default_params[i]._generator);
 			break;
 		}
 		i++;
@@ -437,13 +437,13 @@ MPI _gnutls_get_rnd_srp_params( MPI * ret_p, int bits)
 }
 
 /* These should be added in gcrypt.h */
-MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
-			     unsigned qbits, MPI g, MPI ** ret_factors);
+GNUTLS_MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
+			     unsigned qbits, GNUTLS_MPI g, GNUTLS_MPI ** ret_factors);
 
-int _gnutls_dh_generate_prime(MPI * ret_g, MPI * ret_n, int bits)
+int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n, int bits)
 {
 
-	MPI g, prime;
+	GNUTLS_MPI g, prime;
 	int qbits;
 
 	g = mpi_new(16);	/* this should be ok */
@@ -509,7 +509,7 @@ int i=0;
   **/
 int gnutls_dh_params_set( GNUTLS_DH_PARAMS dh_params, gnutls_datum prime, gnutls_datum generator, int bits)
 {
-	MPI tmp_prime, tmp_g;
+	GNUTLS_MPI tmp_prime, tmp_g;
 	int siz=0, i=0;
 	GNUTLS_DH_PARAMS sprime;
 
@@ -551,8 +551,8 @@ int gnutls_dh_params_set( GNUTLS_DH_PARAMS dh_params, gnutls_datum prime, gnutls
 	sprime->_prime = tmp_prime;
 	sprime->_generator = tmp_g;
 
-/*	sprime->_prime = gcry_mpi_copy(tmp_prime);
-	sprime->_generator = gcry_mpi_copy(tmp_g);
+/*	sprime->_prime = _gnutls_mpi_copy(tmp_prime);
+	sprime->_generator = _gnutls_mpi_copy(tmp_g);
 */
 	if (gnutls_set_datum( &sprime->prime, prime.data, prime.size) < 0) {
 		gnutls_assert();
@@ -641,7 +641,7 @@ int i;
 int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits)
 {
 
-	MPI tmp_prime, tmp_g;
+	GNUTLS_MPI tmp_prime, tmp_g;
 	int siz;
 
 	if (check_bits(bits) < 0) {

@@ -282,7 +282,7 @@ int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size, int allo
 	return 0;
 }
 
-/* this function will copy an MPI key to 
+/* this function will copy an GNUTLS_MPI key to 
  * opaque data.
  */
 int _gnutls_generate_key(GNUTLS_KEY key) {

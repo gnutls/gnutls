@@ -343,7 +343,7 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 		return NULL;
 	}
 
-        gcry_mpi_randomize( pwd_entry->v, 160, GCRY_WEAK_RANDOM);
+        _gnutls_mpi_randomize( pwd_entry->v, 160, GCRY_WEAK_RANDOM);
 
 	pwd_entry->salt_size = RND_SALT_SIZE;
 	
@@ -384,7 +384,7 @@ void _gnutls_srp_clear_pwd_entry( GNUTLS_SRP_PWD_ENTRY * entry) {
 int _gnutls_srp_generate_prime(opaque ** ret_g, opaque ** ret_n, int bits)
 {
 
-	MPI prime, g;
+	GNUTLS_MPI prime, g;
 	int siz;
 	char *tmp;
 

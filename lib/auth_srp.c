@@ -126,9 +126,9 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	gcry_mpi_set(G, pwd_entry->g);
-	gcry_mpi_set(N, pwd_entry->n);
-	gcry_mpi_set(V, pwd_entry->v);
+	_gnutls_mpi_set(G, pwd_entry->g);
+	_gnutls_mpi_set(N, pwd_entry->n);
+	_gnutls_mpi_set(V, pwd_entry->v);
 
 	if (data_size < n_n + n_g + pwd_entry->salt_size + 6 + 1) {
 		gnutls_assert();

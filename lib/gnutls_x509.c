@@ -1614,7 +1614,7 @@ int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, cons
 
 
 
-static int _read_rsa_params(opaque * der, int dersize, MPI * params)
+static int _read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 {
 	opaque str[MAX_PARAMETER_SIZE];
 	int result;
@@ -1662,7 +1662,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
  * from the certificate 
  * params[0-2]
  */
-static int _read_dsa_params(opaque * der, int dersize, MPI * params)
+static int _read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 {
 	opaque str[MAX_PARAMETER_SIZE];
 	int result;
@@ -1724,7 +1724,7 @@ static int _read_dsa_params(opaque * der, int dersize, MPI * params)
  * from the certificate 
  * params[3]
  */
-static int _read_dsa_pubkey(opaque * der, int dersize, MPI * params)
+static int _read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 {
 	opaque str[MAX_PARAMETER_SIZE];
 	int result;
@@ -1786,9 +1786,9 @@ int len, result;
 		 */
 		gCert->subject_pk_algorithm = GNUTLS_PK_RSA;
 
-		if ((sizeof(gCert->params) / sizeof(MPI)) < RSA_PUBLIC_PARAMS) {
+		if ((sizeof(gCert->params) / sizeof(GNUTLS_MPI)) < RSA_PUBLIC_PARAMS) {
 			gnutls_assert();
-			/* internal error. Increase the MPIs in params */
+			/* internal error. Increase the GNUTLS_MPIs in params */
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
@@ -1810,9 +1810,9 @@ int len, result;
 		 */
 		gCert->subject_pk_algorithm = GNUTLS_PK_DSA;
 
-		if ((sizeof(gCert->params) / sizeof(MPI)) < DSA_PUBLIC_PARAMS) {
+		if ((sizeof(gCert->params) / sizeof(GNUTLS_MPI)) < DSA_PUBLIC_PARAMS) {
 			gnutls_assert();
-			/* internal error. Increase the MPIs in params */
+			/* internal error. Increase the GNUTLS_MPIs in params */
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
@@ -2306,7 +2306,7 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 	opaque str[MAX_X509_CERT_SIZE];
 	int algo;
 	int len = sizeof(str);
-	MPI params[MAX_PARAMS_SIZE];
+	GNUTLS_MPI params[MAX_PARAMS_SIZE];
 
 	if ((result=asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
@@ -2375,7 +2375,7 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 			return result;
 		}
 
-		bits[0] = gcry_mpi_get_nbits( params[0]);
+		bits[0] = _gnutls_mpi_get_nbits( params[0]);
 	
 		_gnutls_mpi_release( &params[0]);
 		_gnutls_mpi_release( &params[1]);
@@ -2390,7 +2390,7 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 			return result;
 		}
 
-		bits[0] = gcry_mpi_get_nbits( params[3]);
+		bits[0] = _gnutls_mpi_get_nbits( params[3]);
 
 		_gnutls_mpi_release( &params[3]);
 	}
