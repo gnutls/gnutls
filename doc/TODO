@@ -3,14 +3,10 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-+ Trace memory leaks in libgcrypt
 + Audit the code
-* Add support for certificates with DSS parameters
-* OpenPGP certificate support
-* Add callbacks to get SRP parameters (instead of a reading password file)
++ Add support for certificates with DSS parameters
++ OpenPGP certificate support
 * Minimize footprint.
-* Add more TLS extensions
-* Add support for PKCS8 encrypted private keys
 - Add Kerberos support
 
 (+) Means high priority 
