@@ -41,6 +41,9 @@
 #include <x509.h>
 #include <common.h>
 
+const char*  asn1_find_structure_from_oid(ASN1_TYPE definitions,
+		    const char *oidValue);
+
 static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root);
 
 static const void *find_default_value(ASN1_TYPE x)
@@ -151,7 +154,7 @@ static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 			 up->type & CONST_DEFINED_BY &&
 			 type_field(up->left->type)==TYPE_OBJECT_ID) {
 
-			 tmp = _gnutls_x509_oid2string(up->left->value);
+			 tmp = asn1_find_structure_from_oid( _gnutls_get_pkix(), up->left->value);
 			 if ( tmp != NULL)
 				 _gnutls_str_cpy( output, output_size, tmp);
 			 else {

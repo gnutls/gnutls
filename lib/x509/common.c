@@ -30,47 +30,46 @@
 #include <common.h>
 
 typedef struct _oid2string {
-	const char * OID;
-	const char * DESC;
+	const char * oid;
 	const char * ldap_desc;
 	int choice;
 	int printable;
 } oid2string;
 
-static const oid2string OID2STR[] = {
-	{"2.5.4.6", "X520countryName", "C", 0, 1},
-	{"2.5.4.12", "X520title", "T", 1, 1},
-	{"2.5.4.10", "X520OrganizationName", "O", 1, 1},
-	{"2.5.4.11", "X520OrganizationalUnitName", "OU", 1, 1},
-	{"2.5.4.3", "X520CommonName", "CN", 1, 1},
-	{"2.5.4.7", "X520LocalityName", "L", 1, 1},
-	{"2.5.4.8", "X520StateOrProvinceName", "ST", 1, 1},
-	{"2.5.4.5", "X520serialNumber", "serialNumber", 0, 1},
-	{"2.5.4.20", "X520telephoneNumber", "telephoneNumber", 0, 1},
+static const oid2string _oid2str[] = {
+	{"2.5.4.6", "C", 0, 1},
+	{"2.5.4.12", "T", 1, 1},
+	{"2.5.4.10", "O", 1, 1},
+	{"2.5.4.11", "OU", 1, 1},
+	{"2.5.4.3", "CN", 1, 1},
+	{"2.5.4.7", "L", 1, 1},
+	{"2.5.4.8", "ST", 1, 1},
+	{"2.5.4.5", "serialNumber", 0, 1},
+	{"2.5.4.20", "telephoneNumber", 0, 1},
 
-	{"0.9.2342.19200300.100.1.25", "dc", "DC", 0, 1}, /* FIXME: CHOICE? */
-	{"0.9.2342.19200300.100.1.1", "uid", "UID", 0, 1}, /* FIXME: CHOICE? */
-	{"1.2.840.113549.1.9.1", "Pkcs9email", "EMAIL", 0, 1},
-	{"1.2.840.113549.1.9.7", "Pkcs9challengePassword", NULL, 1, 1},
-	{PKIX1_RSA_OID, "rsaEncryption", NULL, 0, 0},
+	{"0.9.2342.19200300.100.1.25", "DC", 0, 1}, /* FIXME: CHOICE? */
+	{"0.9.2342.19200300.100.1.1", "UID", 0, 1}, /* FIXME: CHOICE? */
+	{"1.2.840.113549.1.9.1", "EMAIL", 0, 1},
+	{"1.2.840.113549.1.9.7", NULL, 1, 1},
+	{PKIX1_RSA_OID, NULL, 0, 0},
 
-	{RSA_MD5_OID, "md5WithRSAEncryption", NULL, 0, 0},
-	{RSA_SHA1_OID, "sha1WithRSAEncryption", NULL, 0, 0},
-	{DSA_SHA1_OID, "id-dsa-with-sha1", NULL, 0, 0},
-	{DSA_OID, "id-dsa", NULL, 0, 0},
-	{NULL, NULL, NULL, 0, 0}
+	{RSA_MD5_OID, NULL, 0, 0},
+	{RSA_SHA1_OID, NULL, 0, 0},
+	{DSA_SHA1_OID, NULL, 0, 0},
+	{DSA_OID, NULL, 0, 0},
+	{NULL, NULL, 0, 0}
 };
 
 /* Returns 1 if the data defined by the OID are printable.
  */
-int _gnutls_x509_oid_data_printable( const char* OID) {
+int _gnutls_x509_oid_data_printable( const char* oid) {
 int i = 0;
 
 	do {
-		if ( strcmp(OID2STR[i].OID, OID)==0)
-			return OID2STR[i].printable;
+		if ( strcmp(_oid2str[i].oid, oid)==0)
+			return _oid2str[i].printable;
 		i++;
-	} while( OID2STR[i].OID != NULL);
+	} while( _oid2str[i].oid != NULL);
 
 	return 0;
 }
@@ -78,38 +77,26 @@ int i = 0;
 /* Returns 1 if the data defined by the OID are of a choice
  * type.
  */
-int _gnutls_x509_oid_data_choice( const char* OID) {
+int _gnutls_x509_oid_data_choice( const char* oid) {
 int i = 0;
 
 	do {
-		if ( strcmp(OID2STR[i].OID, OID)==0)
-			return OID2STR[i].choice;
+		if ( strcmp(_oid2str[i].oid, oid)==0)
+			return _oid2str[i].choice;
 		i++;
-	} while( OID2STR[i].OID != NULL);
+	} while( _oid2str[i].oid != NULL);
 
 	return 0;
 }
 
-const char* _gnutls_x509_oid2string( const char* OID) {
+const char* _gnutls_x509_oid2ldap_string( const char* oid) {
 int i = 0;
 
 	do {
-		if ( strcmp(OID2STR[i].OID, OID)==0)
-			return OID2STR[i].DESC;
+		if ( strcmp(_oid2str[i].oid, oid)==0)
+			return _oid2str[i].ldap_desc;
 		i++;
-	} while( OID2STR[i].OID != NULL);
-
-	return NULL;
-}
-
-const char* _gnutls_x509_oid2ldap_string( const char* OID) {
-int i = 0;
-
-	do {
-		if ( strcmp(OID2STR[i].OID, OID)==0)
-			return OID2STR[i].ldap_desc;
-		i++;
-	} while( OID2STR[i].OID != NULL);
+	} while( _oid2str[i].oid != NULL);
 
 	return NULL;
 }
@@ -120,7 +107,7 @@ int i = 0;
  * res may be null. This will just return the res_size, needed to
  * hold the string.
  */
-int _gnutls_x509_oid_data2string( const char* OID, void* value, 
+int _gnutls_x509_oid_data2string( const char* oid, void* value, 
 	int value_size, char * res, int *res_size) {
 
 int result;
@@ -137,13 +124,13 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 	
 	res[0] = 0;
 	
-	if ( _gnutls_x509_oid_data_printable( OID) == 0) {
+	if ( _gnutls_x509_oid_data_printable( oid) == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	ANAME = _gnutls_x509_oid2string( OID);
-	CHOICE = _gnutls_x509_oid_data_choice( OID);
+	ANAME = asn1_find_structure_from_oid( _gnutls_get_pkix(), oid);
+	CHOICE = _gnutls_x509_oid_data_choice( oid);
 
 	if (ANAME==NULL) {
 		gnutls_assert();

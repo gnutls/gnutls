@@ -210,8 +210,8 @@ static int encode_to_private_key_info( gnutls_x509_privkey pkey, gnutls_datum* d
 /* Converts a PKCS #8 private key info to
  * a PKCS #8 EncryptedPrivateKeyInfo.
  */
-static ASN1_TYPE encode_to_pkcs8_key( gnutls_x509_privkey pkey, 
-	const gnutls_datum *raw_key, char* password, unsigned int flags)
+static ASN1_TYPE encode_to_pkcs8_key( const gnutls_datum *raw_key, 
+	char* password, unsigned int flags)
 {
 	int result;
 	gnutls_datum key = {NULL, 0};
@@ -319,7 +319,7 @@ gnutls_datum tmp;
 	}
 
 
-	pkcs8_asn = encode_to_pkcs8_key( key, &tmp, password, flags);
+	pkcs8_asn = encode_to_pkcs8_key( &tmp, password, flags);
 	_gnutls_free_datum( &tmp);
 
 	if (pkcs8_asn == NULL) {
