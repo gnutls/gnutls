@@ -1,3 +1,80 @@
+2002-02-24 10:47  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_cert.c, gnutls_handshake.c,
+	gnutls_int.h, gnutls_openpgp.c, gnutls_record.c, gnutls_x509.c,
+	x509_sig_check.c, x509_verify.c:
+
+	removed GNUTLS_CERT_NONE (replaced by
+	GNUTLS_E_NO_CERTIFICATE_FOUND).  removed GNUTLS_CERT_VALID (it's
+	valid if it's not invalid) 
+
+2002-02-23 21:50  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Bug fixes for _verify_key and basic trust handling for keys.  
+
+2002-02-22 23:49  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	includes moved before #ifdef 
+
+2002-02-22 18:49  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Added stubs for the case we don't have OpenCDK support.  
+
+2002-02-22 18:31  nmav <nmav@gnutls.org>
+
+	* doc/tex/ex3.tex, lib/auth_cert.c, lib/auth_dhe.c, lib/auth_rsa.c,
+	lib/gnutls.h.in.in, lib/gnutls_cert.c, lib/gnutls_x509.c,
+	lib/x509_sig_check.c, lib/x509_verify.c, src/common.c, src/serv.c:
+
+	Changed certificate verification functions.  
+
+2002-02-22 17:14  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_openpgp.c, gnutls_openpgp.h:
+
+	Implemented gnutls_certificate_set_openpgp_key_mem.  Some basic
+	routines for key ownertrust.  
+
+2002-02-22 13:30  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.h, gnutls.h.in.in, gnutls_cert.c:
+
+	added trustdb stuff 
+
+2002-02-22 12:52  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Modified code for the new OpenCDK code.  
+
+2002-02-22 11:34  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_algorithms.c:
+
+	moved private cipher suites to 0xFF space.  
+
+2002-02-22 00:40  nmav <nmav@gnutls.org>
+
+	* ChangeLog, doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/layers.tex,
+	doc/tex/serv1.tex, doc/tex/srp1.tex, lib/gnutls.h.in.in,
+	lib/gnutls_alert.c, lib/gnutls_alert.h, lib/gnutls_algorithms.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_kx.c,
+	lib/gnutls_record.c, src/cli.c, src/serv.c:
+
+	Several alert protocol changes.  
+
+2002-02-21 22:34  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Fixed return code check for GnuTLS functions.  
+
 2002-02-21 20:57  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls.h.in.in, gnutls_openpgp.c:

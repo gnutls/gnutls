@@ -304,13 +304,13 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 /* CRL is ignored for now */
 
 	gnutls_cert *issuer;
-	CertificateStatus ret = ret_else;
+	int ret;
 
 	if (tcas_size >= 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
 	else {
 		gnutls_assert();
-		return ret;
+		return ret_else;
 	}
 
 	/* issuer is not in trusted certificate
@@ -318,25 +318,25 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	 */
 	if (issuer == NULL) {
 		gnutls_assert();
-		return ret;
+		return ret_else;
 	}
 
 	ret = check_if_ca( cert, issuer);
 	if (ret != 0) {
 		gnutls_assert();
-		return ret_else;
+		return ret_else|GNUTLS_CERT_INVALID;
 	}
 
 	ret = check_if_expired( issuer);
 	if (ret != 0) {
 		gnutls_assert();
-		return ret_else;
+		return ret_else|GNUTLS_CERT_EXPIRED;
 	}
 	
         ret = gnutls_x509_verify_signature(cert, issuer);
         if (ret != 0) {
 	      gnutls_assert();
-              return ret_else;
+              return ret_else|GNUTLS_CERT_INVALID;
 	}
 
 	/* FIXME: Check CRL --not done yet.

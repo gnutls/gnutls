@@ -52,7 +52,7 @@ typedef enum GNUTLS_X509_SUBJECT_ALT_NAME {
 typedef int gnutls_certificate_client_select_func(GNUTLS_STATE, const gnutls_datum *, int, const gnutls_datum *, int);
 typedef int gnutls_certificate_server_select_func(GNUTLS_STATE, const gnutls_datum *, int);
 
-typedef int gnutls_srp_server_select_func(GNUTLS_STATE, const char **, const char**, int);
+typedef int gnutls_srp_server_select_func(GNUTLS_STATE, char **, char**, int);
 
 /* Functions that allow AUTH_INFO structures handling
  */

@@ -1,10 +1,11 @@
-Version ?.?.?
+Version 0.3.90 (24/02/2002)
 - Handshake messages are not kept in memory any more. Now we use 
   less memory during a handshake
 - Added support for certificates with DSA parameters
 - Added DHE_DSS cipher suites
 - Key exchange methods changed so they do not depend on the 
-  certificate type.
+  certificate type. Added certificate type negotiation TLS extension.
+- Added openpgp key support (EXPERIMENTAL)
 - Improved Diffie Hellman key exchange support.
 - Bug fixes in the RSA key exchange.
 - Added check for the requested TLS extensions
@@ -15,10 +16,6 @@ Version ?.?.?
   gnutls_x509_extract_subject_dns_name()
 - gnutls_x509_set_trust_(file/mem) can now be called multiple times
 - gnutls_srp_server_set_cred_file() can now be called multiple times
-
-
-OpenPGP:
-- Added openpgp key support (EXPERIMENTAL)
 
 Version 0.3.5 (25/01/2002)
 - Corrected the RSA key exchange method, to avoid attacks against

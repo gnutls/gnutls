@@ -374,7 +374,7 @@ typedef struct {
 
 typedef int certificate_client_select_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
 typedef int certificate_server_select_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
-typedef int srp_server_select_func(struct GNUTLS_STATE_INT*, const char**, const char**, int);
+typedef int srp_server_select_func(struct GNUTLS_STATE_INT*, char**, char**, int);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];

@@ -45,6 +45,7 @@
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
 #define MAX_BUF 4096
+#define GERR(ret) fprintf(stderr, "* Error: %s\n", gnutls_strerror(ret))
 
 /* global stuff here */
 int resume;
@@ -433,7 +434,10 @@ int main(int argc, char **argv)
 						 strlen(buffer));
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);
-			printf("- Sent: %d bytes\n", ret);
+			if (ret > 0)
+				printf("- Sent: %d bytes\n", ret);
+			else
+				GERR( ret);
 
 		}
 	}
