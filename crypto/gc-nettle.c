@@ -20,7 +20,9 @@
  *
  */
 
-/* Note: This file is only built if GC uses Libgcrypt. */
+/* Note: This file is only built if GC uses Nettle. */
+
+#include <stdlib.h>
 
 /* Get prototype. */
 #include <gc.h>
@@ -63,60 +65,82 @@ gc_set_allocators (gc_malloc_t func_malloc,
 			       func_realloc, func_free);
 }
 
+#include "nettle-meta.h"
+#include "aes.h"
+
+#define MAX_BLOCK_SIZE 64
+
+typedef struct cipher_info {
+  int alg;
+  int mode;
+  const struct nettle_cipher *info;
+  void *encrypt_context;
+  void *decrypt_context;
+  char encrypt_iv[MAX_BLOCK_SIZE];
+  char decrypt_iv[MAX_BLOCK_SIZE];
+} cinfo;
+
 int
 gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
 {
-  int gcryalg, gcrymode;
-  gcry_error_t err;
+  cinfo *cinf;
+
+  cinf = malloc (sizeof (*cinf));
+  if (!cinf)
+    return GC_MALLOC_ERROR;
+
+  cinf->alg = alg;
+  cinf->mode = mode;
 
   switch (alg)
     {
-    case GC_AES128:
-      gcryalg = GCRY_CIPHER_RIJNDAEL;
+    case GC_AES256:
+      cinf->info = &nettle_aes256;
       break;
 
-    case GC_AES256:
-      gcryalg = GCRY_CIPHER_RIJNDAEL256;
+    case GC_AES128:
+      cinf->info = &nettle_aes128;
       break;
 
     case GC_3DES:
-      gcryalg = GCRY_CIPHER_3DES;
+      cinf->info = &nettle_des3;
       break;
 
     case GC_DES:
-      gcryalg = GCRY_CIPHER_DES;
+      cinf->info = &nettle_des;
       break;
 
     case GC_ARCFOUR128:
     case GC_ARCFOUR40:
-      gcryalg = GCRY_CIPHER_ARCFOUR;
+      cinf->info = &nettle_arcfour128;
       break;
 
-    case GC_ARCTWO40:
-      gcryalg = GCRY_CIPHER_RFC2268_40;
-      break;
+      /* FIXME: ARCTWO-40. */
 
     default:
+      free (cinf);
       return GC_INVALID_CIPHER;
     }
 
-  switch (mode)
+  cinf->encrypt_context = malloc (cinf->info->context_size);
+  if (!cinf->encrypt_context)
     {
-    case GC_CBC:
-      gcrymode = GCRY_CIPHER_MODE_CBC;
-      break;
-
-    case GC_STREAM:
-      gcrymode = GCRY_CIPHER_MODE_STREAM;
-      break;
-
-    default:
-      return GC_INVALID_CIPHER;
+      free (cinf);
+      return GC_MALLOC_ERROR;
     }
 
-  err = gcry_cipher_open ((gcry_cipher_hd_t*) outhandle, gcryalg, gcrymode, 0);
-  if (gcry_err_code (err))
-    return GC_INVALID_CIPHER;
+  cinf->decrypt_context = malloc (cinf->info->context_size);
+  if (!cinf->decrypt_context)
+    {
+      free (cinf->encrypt_context);
+      free (cinf);
+      return GC_MALLOC_ERROR;
+    }
+
+  memset (cinf->encrypt_context, 0, cinf->info->context_size);
+  memset (cinf->decrypt_context, 0, cinf->info->context_size);
+
+  *outhandle = cinf;
 
   return GC_OK;
 }
@@ -124,11 +148,10 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
 int
 gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key)
 {
-  gcry_error_t err;
+  cinfo *cinf = (cinfo*) handle;
 
-  err = gcry_cipher_setkey (handle, key, keylen);
-  if (gcry_err_code (err))
-    return GC_INVALID_CIPHER;
+  cinf->info->set_encrypt_key (cinf->encrypt_context, keylen, key);
+  cinf->info->set_decrypt_key (cinf->decrypt_context, keylen, key);
 
   return GC_OK;
 }
@@ -136,11 +159,13 @@ gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key)
 int
 gc_cipher_setiv (gc_cipher handle, size_t ivlen, char *iv)
 {
-  gcry_error_t err;
+  cinfo *cinf = (cinfo*) handle;
 
-  err = gcry_cipher_setiv (handle, iv, ivlen);
-  if (gcry_err_code (err))
+  if (ivlen != cinf->info->block_size)
     return GC_INVALID_CIPHER;
+
+  memcpy (cinf->encrypt_iv, iv, ivlen);
+  memcpy (cinf->decrypt_iv, iv, ivlen);
 
   return GC_OK;
 }
@@ -148,8 +173,14 @@ gc_cipher_setiv (gc_cipher handle, size_t ivlen, char *iv)
 int
 gc_cipher_encrypt_inline (gc_cipher handle, size_t len, char *data)
 {
-  if (gcry_cipher_encrypt (handle, data, len, NULL, len) != 0)
-    return GC_INVALID_CIPHER;
+  cinfo *cinf = (cinfo*) handle;
+
+  if (cinf->mode == GC_CBC)
+    cbc_encrypt (cinf->encrypt_context, cinf->info->encrypt,
+		 cinf->info->block_size, cinf->encrypt_iv,
+		 len, data, data);
+  else
+    cinf->info->encrypt (cinf->encrypt_context, len, data, data);
 
   return GC_OK;
 }
@@ -157,8 +188,14 @@ gc_cipher_encrypt_inline (gc_cipher handle, size_t len, char *data)
 int
 gc_cipher_decrypt_inline (gc_cipher handle, size_t len, char *data)
 {
-  if (gcry_cipher_decrypt (handle, data, len, NULL, len) != 0)
-    return GC_INVALID_CIPHER;
+  cinfo *cinf = (cinfo*) handle;
+
+  if (cinf->mode == GC_CBC)
+    cbc_decrypt (cinf->decrypt_context, cinf->info->decrypt,
+		 cinf->info->block_size, cinf->decrypt_iv,
+		 len, data, data);
+  else
+    cinf->info->decrypt (cinf->decrypt_context, len, data, data);
 
   return GC_OK;
 }
@@ -166,7 +203,11 @@ gc_cipher_decrypt_inline (gc_cipher handle, size_t len, char *data)
 int
 gc_cipher_close (gc_cipher handle)
 {
-  gcry_cipher_close (handle);
+  cinfo *cinf = (cinfo*) handle;
+
+  free (cinf->encrypt_context);
+  free (cinf->decrypt_context);
+  free (cinf);
 
   return GC_OK;
 }
