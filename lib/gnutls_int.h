@@ -172,12 +172,12 @@ typedef struct {
 	GNUTLS_CipherSuite	current_cipher_suite;
 	CompressionMethod	compression_method;
 	/* for the handshake protocol */
-	GNUTLS_HASH_HANDLE	client_td_md5;
-	GNUTLS_HASH_HANDLE	client_td_sha1;
+	GNUTLS_MAC_HANDLE	client_td_md5;
+	GNUTLS_MAC_HANDLE	client_td_sha1;
 	void*			client_md_md5;
 	void*			client_md_sha1;
-	GNUTLS_HASH_HANDLE	server_td_md5;
-	GNUTLS_HASH_HANDLE	server_td_sha1;
+	GNUTLS_MAC_HANDLE	server_td_md5;
+	GNUTLS_MAC_HANDLE	server_td_sha1;
 	void*			server_md_md5;
 	void*			server_md_sha1;
 	int			server_hash;

@@ -34,7 +34,7 @@ GNUTLS_Version GNUTLS_TLS1 = {0, 3, 1};
 GNUTLS_Version GNUTLS_SSL3 = {0, 3, 0};
 
 static gnutls_version_entry sup_versions[] = {
-	{ "SSL3", &GNUTLS_SSL3,  0 },
+	{ "SSL3", &GNUTLS_SSL3,  1 },
 	{ "TLS1", &GNUTLS_TLS1,  1 },
 	{0}
 };
