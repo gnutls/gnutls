@@ -147,25 +147,30 @@ asn1_retCode asn1_delete_structure(ASN1_TYPE *structure);
 
 asn1_retCode asn1_delete_element(ASN1_TYPE structure,const char *element_name);
 
-asn1_retCode asn1_write_value(ASN1_TYPE element,const char *name,
-			      const void *value,int len);
+asn1_retCode asn1_write_value(ASN1_TYPE *node_root,const char *name,
+			      const void *ivalue,int len);
 
-asn1_retCode asn1_read_value(ASN1_TYPE element,const char *name,void *value,
-                             int *len);
+asn1_retCode asn1_read_value(ASN1_TYPE *root,const char *name,
+			     void* ivalue,int *len);
 
 asn1_retCode asn1_number_of_elements(ASN1_TYPE element,const char *name,int *num);
 
 asn1_retCode asn1_der_coding(ASN1_TYPE element,const char *name,
-               void *der,int *len,char *ErrorDescription);
+			     void *ider,int *len,
+			     char *ErrorDescription);
 
-asn1_retCode asn1_der_decoding(ASN1_TYPE *element,const void *der,int len,
-                 char *errorDescription);
+asn1_retCode asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
+			       char *errorDescription);
 
-asn1_retCode asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
-		 const void *der,int len,char *errorDescription);
+asn1_retCode asn1_der_decoding_element(ASN1_TYPE *structure,
+				       const char *elementName,
+				       const void *ider,int len,
+				       char *errorDescription);
 
-asn1_retCode asn1_der_decoding_startEnd(ASN1_TYPE element,const void *der,
-               int len,const char *name,int *start, int *end);
+asn1_retCode asn1_der_decoding_startEnd(ASN1_TYPE element,
+					const void *ider,int len,
+					const char *name_element,
+					int *start,int *end);
 
 asn1_retCode asn1_expand_any_defined_by(ASN1_TYPE definitions,
                ASN1_TYPE *element);

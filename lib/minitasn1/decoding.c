@@ -492,7 +492,7 @@ _asn1_get_indefinite_length_string(const unsigned char* der,int* len)
   * @element: pointer to an ASN1 structure
   * @ider: vector that contains the DER encoding. 
   * @len: number of bytes of *der: der[0]..der[len-1]
-  * Description:
+  * @errorDescription: null-terminated string contains details when an error occurred.
   *
   * Fill the structure *ELEMENT with values of a DER encoding string. The sructure must just be
   * created with function 'create_stucture'.
@@ -1742,8 +1742,7 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
 
 
 /**
-  * asn1_expand_any_defined_by - Expand every "ANY DEFINED BY" fields of 
-  *    structure *ELEMENT with the corresponding type.
+  * asn1_expand_any_defined_by - Expand "ANY DEFINED BY" fields in structure.
   * @definitions: ASN1 definitions
   * @element: pointer to an ASN1 structure
   * Description:
@@ -1938,8 +1937,7 @@ asn1_expand_any_defined_by(ASN1_TYPE definitions,ASN1_TYPE *element)
 
 
 /**
-  * asn1_expand_octet_string - Expand an "OCTET STRING" fields of 
-  *    structure *ELEMENT with the corresponding type.
+  * asn1_expand_octet_string - Expand "OCTET STRING" fields in structure.
   * @definitions: ASN1 definitions
   * @element: pointer to an ASN1 structure
   * @octetName: name of the OCTECT STRING field to expand.
