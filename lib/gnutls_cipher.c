@@ -30,7 +30,7 @@
 #include "debug.h"
 
 int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
-		    uint8 ** ciphertext, ContentType type)
+		    uint8 * ciphertext, ContentType type)
 {
 	GNUTLSPlaintext *gtxt;
 	GNUTLSCompressed *gcomp;
@@ -63,13 +63,17 @@ int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 
 	_gnutls_freeTLSCompressed(gcomp);
 
-	*ciphertext = gnutls_malloc(gcipher->length);
-	if (*ciphertext == NULL) {
+	if (ciphertext == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	memmove((*ciphertext), gcipher->fragment, gcipher->length);
-
+	if (gcipher->length < MAX_ENC_LEN)
+		memmove(ciphertext, gcipher->fragment, gcipher->length);
+	else {
+		/* that shouldn't happen! */
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
 
 	total_length += gcipher->length;
 	_gnutls_freeTLSCiphertext(gcipher);
