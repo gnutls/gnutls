@@ -588,7 +588,7 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * This is specified in X509v3 Certificate Extensions. 
   * GNUTLS will return the Alternative name, or a negative
   * error code.
-  * Returns GNUTLS_E_INVALID_REQUEST if ret_size is not enough to hold the alternative 
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative 
   * name, or the type of alternative name if everything was ok. The type is 
   * one of the enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
   *
@@ -677,7 +677,7 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 	asn1_delete_structure(&c2);
 	
 	if (result==ASN1_MEM_ERROR)
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -2035,7 +2035,7 @@ char name1[128];
 
 	gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 
-	return GNUTLS_E_INVALID_PARAMETERS;
+	return GNUTLS_E_INVALID_REQUEST;
 }
 
 
@@ -2399,7 +2399,7 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 			memcpy( certificate, &pcert[start], end);
 		else {
 			*certificate_size = end;
-			return GNUTLS_E_INVALID_REQUEST;
+			return GNUTLS_E_SHORT_MEMORY_BUFFER;
 		}
 
 		*certificate_size = end;
@@ -2839,7 +2839,7 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
   * This function will copy the name of the certificate holder in the provided buffer. The name 
   * will be in the form "/C=xxxx/O=yyyy/CN=zzzz".
   *
-  * Returns GNUTLS_E_INVALID_REQUEST if the provided buffer is not long enough,
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
   * and 0 on success.
   *
   **/
@@ -2850,7 +2850,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    gnutls_string str;
    int ret;
 
-   if (buf == NULL || buf_size == 0) {
+   if (buf == NULL || sizeof_buf == 0) {
       return GNUTLS_E_INVALID_REQUEST;
    }
    
@@ -2859,6 +2859,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    _gnutls_string_init( &str, gnutls_malloc, gnutls_realloc, gnutls_free);
 
 #define STR_APPEND(y) if (_gnutls_string_append_str( &str, y) < 0) { \
+		_gnutls_string_clear( &str); \
 		gnutls_assert(); \
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
@@ -2885,7 +2886,8 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    PRINTX( "E", dn.email);
 
    if (str.length >= sizeof_buf) {
-	return GNUTLS_E_INVALID_REQUEST;
+        _gnutls_string_clear( &str);
+	return GNUTLS_E_SHORT_MEMORY_BUFFER;
    }
    
    memcpy( buf, str.data, str.length);

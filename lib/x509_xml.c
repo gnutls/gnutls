@@ -119,10 +119,12 @@ static int is_leaf(ASN1_TYPE p)
 }
 
 #define APPEND(y, z) if (_gnutls_string_append_data( &str, y, z) < 0) { \
+		_gnutls_string_clear( &str); \
 		gnutls_assert(); \
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
 #define STR_APPEND(y) if (_gnutls_string_append_str( &str, y) < 0) { \
+		_gnutls_string_clear( &str); \
 		gnutls_assert(); \
 		return GNUTLS_E_MEMORY_ERROR; \
 	}
@@ -191,7 +193,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 
 	if (res == NULL || structure == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_PARAMETERS;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	_gnutls_string_init( &str, malloc, realloc, free);
@@ -201,8 +203,10 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 
 	root = _asn1_find_node(structure, name);
 
-	if (root == NULL)
+	if (root == NULL) {
+		_gnutls_string_clear( &str);
 		return GNUTLS_E_INTERNAL_ERROR;
+	}
 
 	ret = asn1_expand_any_defined_by( _gnutls_get_pkix(),
 					&structure);
@@ -216,6 +220,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 				APPEND(" ", 1);
 
 			if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
+				_gnutls_string_clear( &str);
 				gnutls_assert();
 				return ret;
 			}
@@ -493,6 +498,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 		} else if (p == root) {
 			if (is_node_printable(p)) {
 				if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
+					_gnutls_string_clear( &str);
 					gnutls_assert();
 					return ret;
 				}
@@ -506,6 +512,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 		} else {
 			if (is_node_printable(p)) {
 				if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
+					_gnutls_string_clear( &str);
 					gnutls_assert();
 					return ret;
 				}
@@ -532,6 +539,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 								STR_APPEND(" ");
 
 						if ((ret=normalize_name( p, nname, sizeof(nname))) < 0) {
+							_gnutls_string_clear( &str);
 							gnutls_assert();
 							return ret;
 						}
