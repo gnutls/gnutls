@@ -1,7 +1,7 @@
 * Add Client Certificate support in X509 authentication
 * Add certificate extensions support (x509v3)
 * Add DHE_* ciphersuites
-* Tools for processing/generating certificates
+* Tools for processing/generating certificates (fabio.fiorina@alcatel.it is working on that)
 * Documentation (of existing functions + Manual)
 * OpenPGP certificate support (through libgcrypt)
 * Add Kerberos support (who wants that?)
