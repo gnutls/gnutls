@@ -22,6 +22,7 @@ Version 1.1.10
 - Added the functions gnutls_dh_get_group(), gnutls_dh_get_pubkey() and
   gnutls_rsa_export_get_pubkey() to retrieve parameters of the DH or
   RSA-EXPORT key exchange.
+- Some fixes in the session resuming code.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage

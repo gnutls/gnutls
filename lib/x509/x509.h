@@ -74,32 +74,33 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
 
 int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src);
 int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
-	gnutls_datum* start);
+    gnutls_datum* start);
 int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
-	gnutls_datum* start);
+    gnutls_datum* start);
 
 int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result, size_t* result_size);
 
 int _gnutls_x509_compare_raw_dn(const gnutls_datum * dn1,
-	const gnutls_datum * dn2);
+    const gnutls_datum * dn2);
 
-int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert, gnutls_x509_crl * crl_list, int crl_list_length);
+int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert, 
+    const gnutls_x509_crl * crl_list, int crl_list_length);
 
 
 int _gnutls_x509_crl_cpy(gnutls_x509_crl dest, gnutls_x509_crl src);
 int _gnutls_x509_crl_get_raw_issuer_dn( gnutls_x509_crl crl,
-	gnutls_datum* dn);
+    gnutls_datum* dn);
 int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index,
-	    unsigned char *serial,
-	    size_t *serial_size, time_t * time);
+    unsigned char *serial,
+    size_t *serial_size, time_t * time);
 
 void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
 int gnutls_x509_crl_init(gnutls_x509_crl * crl);
 int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 			   gnutls_x509_crt_fmt format);
 int gnutls_x509_crl_export( gnutls_x509_crl crl,
-	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size);
+    gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size);
 
 int gnutls_x509_crt_init(gnutls_x509_crt * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt cert);

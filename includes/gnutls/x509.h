@@ -294,19 +294,19 @@ int gnutls_x509_crt_check_issuer( gnutls_x509_crt cert,
     gnutls_x509_crt issuer);
 
 int gnutls_x509_crt_list_verify( gnutls_x509_crt* cert_list, int cert_list_length, 
-    gnutls_x509_crt * CA_list, int CA_list_length, 
-    gnutls_x509_crl* CRL_list, int CRL_list_length, 
+    const gnutls_x509_crt * CA_list, int CA_list_length, 
+    const gnutls_x509_crl* CRL_list, int CRL_list_length, 
     unsigned int flags, unsigned int *verify);
 
 int gnutls_x509_crt_verify( gnutls_x509_crt cert,
-    gnutls_x509_crt *CA_list, int CA_list_length,
+    const gnutls_x509_crt *CA_list, int CA_list_length,
     unsigned int flags, unsigned int *verify);
 int gnutls_x509_crl_verify( gnutls_x509_crl crl,
-    gnutls_x509_crt *CA_list, int CA_list_length,
+    const gnutls_x509_crt *CA_list, int CA_list_length,
     unsigned int flags, unsigned int *verify);
 
 int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
-    gnutls_x509_crl * crl_list,
+    const gnutls_x509_crl * crl_list,
     int crl_list_length);
 
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 

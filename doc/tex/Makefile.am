@@ -5,7 +5,7 @@ EXTRA_DIST = gnutls.tex gnutls.ps \
 # If you add any examples here, also change the ../examples/Makefile.am
 # to include the C source.
 EXAMPLE_OBJECTS = ex-alert.tex ex-client-srp.tex ex-serv-export.tex \
-	ex-client2.tex ex-x509-info.tex ex-rfc2818.tex \
+	ex-client2.tex ex-x509-info.tex ex-verify.tex \
 	ex-serv1.tex ex-client-resume.tex ex-serv-srp.tex \
 	ex-serv-pgp.tex ex-cert-select.tex \
 	ex-crq.tex ex-session-info.tex ex-pkcs12.tex

@@ -1,4 +1,4 @@
-INCLUDES = -I. -I../ -I../../includes/ -I../../lib -I../../lib/minitasn1 $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS) -I../opencdk
+INCLUDES = -I. -I../ -I../../includes/ -I../../lib -I../../lib/minitasn1 -I../opencdk $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS)
 EXTRA_DIST = openpgp.h gnutls_openpgp.h 
 noinst_LTLIBRARIES = libpgp.la
 libpgp_la_SOURCES = openpgp.c xml.c verify.c extras.c compat.c privkey.c

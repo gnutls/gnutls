@@ -1411,8 +1411,7 @@ int gnutls_x509_crt_get_key_id(gnutls_x509_crt crt, unsigned int flags,
   *
   **/
 int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
-				     gnutls_x509_crl * crl_list,
-				     int crl_list_length)
+   const gnutls_x509_crl * crl_list, int crl_list_length)
 {
     opaque serial[64];
     opaque cert_serial[64];
