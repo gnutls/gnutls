@@ -38,9 +38,9 @@
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
-static int gen_anon_server_kx(gnutls_session, opaque **);
-static int proc_anon_client_kx(gnutls_session, opaque *, size_t);
-static int proc_anon_server_kx(gnutls_session, opaque *, size_t);
+static int gen_anon_server_kx(gnutls_session_t, opaque **);
+static int proc_anon_client_kx(gnutls_session_t, opaque *, size_t);
+static int proc_anon_server_kx(gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st anon_auth_struct = {
     "ANON",
@@ -59,13 +59,13 @@ const mod_auth_st anon_auth_struct = {
     NULL
 };
 
-static int gen_anon_server_kx(gnutls_session session, opaque ** data)
+static int gen_anon_server_kx(gnutls_session_t session, opaque ** data)
 {
     mpi_t g, p;
     const mpi_t *mpis;
     int ret;
-    gnutls_dh_params dh_params;
-    const gnutls_anon_server_credentials cred;
+    gnutls_dh_params_t dh_params;
+    const gnutls_anon_server_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
     if (cred == NULL) {
@@ -101,14 +101,14 @@ static int gen_anon_server_kx(gnutls_session session, opaque ** data)
 }
 
 
-static int proc_anon_client_kx(gnutls_session session, opaque * data,
+static int proc_anon_client_kx(gnutls_session_t session, opaque * data,
 			       size_t _data_size)
 {
-    const gnutls_anon_server_credentials cred;
+    const gnutls_anon_server_credentials_t cred;
     int bits;
     int ret;
     mpi_t p, g;
-    gnutls_dh_params dh_params;
+    gnutls_dh_params_t dh_params;
     const mpi_t *mpis;
 
     bits = _gnutls_dh_get_allowed_prime_bits(session);
@@ -136,7 +136,7 @@ static int proc_anon_client_kx(gnutls_session session, opaque * data,
 
 }
 
-int proc_anon_server_kx(gnutls_session session, opaque * data,
+int proc_anon_server_kx(gnutls_session_t session, opaque * data,
 			size_t _data_size)
 {
 

@@ -31,8 +31,8 @@
 #include <openpgp.h>
 
 static int
-openpgp_get_key_trust(gnutls_openpgp_trustdb trustdb,
-		      gnutls_openpgp_key key, unsigned int *r_trustval)
+openpgp_get_key_trust(gnutls_openpgp_trustdb_t trustdb,
+		      gnutls_openpgp_key_t key, unsigned int *r_trustval)
 {
     cdk_packet_t pkt;
     cdk_pkt_pubkey_t pk = NULL;
@@ -85,7 +85,7 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb trustdb,
  * Verify all signatures in the key, using the given set of keys (keyring). 
  *
  * The key verification output will be put in @verify and will be
- * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
+ * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
  * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
  *
@@ -96,8 +96,8 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb trustdb,
  *
  * Returns 0 on success.
  **/
-int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key key,
-     gnutls_openpgp_keyring keyring,
+int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key_t key,
+     gnutls_openpgp_keyring_t keyring,
      unsigned int flags, unsigned int *verify)
 {
     int rc = 0;
@@ -165,13 +165,13 @@ void cdk_md_close(cdk_md_hd_t hd);
  *
  * Verifies the self signature in the key.
  * The key verification output will be put in @verify and will be
- * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
+ * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
  * GNUTLS_CERT_INVALID\: The self signature on the key is invalid.
  *
  * Returns 0 on success.
  **/
-int gnutls_openpgp_key_verify_self(gnutls_openpgp_key key,
+int gnutls_openpgp_key_verify_self(gnutls_openpgp_key_t key,
 				   unsigned int flags,
 				   unsigned int *verify)
 {
@@ -252,7 +252,7 @@ int gnutls_openpgp_key_verify_self(gnutls_openpgp_key key,
  *
  * Checks if the key is revoked or disabled, in the trustdb.
  * The verification output will be put in @verify and will be
- * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
+ * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
  * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
  *
@@ -263,8 +263,8 @@ int gnutls_openpgp_key_verify_self(gnutls_openpgp_key key,
  *
  * Returns 0 on success.
  **/
-int gnutls_openpgp_key_verify_trustdb(gnutls_openpgp_key key,
-				      gnutls_openpgp_trustdb trustdb,
+int gnutls_openpgp_key_verify_trustdb(gnutls_openpgp_key_t key,
+				      gnutls_openpgp_trustdb_t trustdb,
 				      unsigned int flags,
 				      unsigned int *verify)
 {

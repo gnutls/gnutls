@@ -68,7 +68,7 @@ int _gnutls_hostname_compare(const char *certname, const char *hostname)
 
 /**
   * gnutls_x509_crt_check_hostname - This function compares the given hostname with the hostname in the certificate
-  * @cert: should contain an gnutls_x509_crt structure
+  * @cert: should contain an gnutls_x509_crt_t structure
   * @hostname: A null terminated string that contains a DNS name
   *
   * This function will check if the given certificate's subject matches
@@ -79,7 +79,7 @@ int _gnutls_hostname_compare(const char *certname, const char *hostname)
   * Returns non zero on success, and zero on failure.
   *
   **/
-int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
+int gnutls_x509_crt_check_hostname(gnutls_x509_crt_t cert,
 				   const char *hostname)
 {
 

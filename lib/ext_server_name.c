@@ -35,7 +35,7 @@
  *
  */
 
-int _gnutls_server_name_recv_params(gnutls_session session,
+int _gnutls_server_name_recv_params(gnutls_session_t session,
 				    const opaque * data, size_t _data_size)
 {
     int i;
@@ -113,7 +113,7 @@ int _gnutls_server_name_recv_params(gnutls_session session,
 
 /* returns data_size or a negative number on failure
  */
-int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
+int _gnutls_server_name_send_params(gnutls_session_t session, opaque * data,
 				    size_t _data_size)
 {
     uint16 len;
@@ -198,7 +198,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 
 /**
   * gnutls_server_name_get - Used to get the server name indicator send by a client
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @data: will hold the data
   * @data_length: will hold the data length. Must hold the maximum size of data.
   * @type: will hold the server name indicator type
@@ -206,7 +206,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   *
   * This function will allow you to get the name indication (if any),
   * a client has sent. The name indication may be any of the enumeration
-  * gnutls_server_name_type.
+  * gnutls_server_name_type_t.
   *
   * If @type is GNUTLS_NAME_DNS, then this function is to be used by servers
   * that support virtual hosting, and the data will be a null terminated UTF-8 string.
@@ -219,7 +219,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   * index exists GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
   *
   **/
-int gnutls_server_name_get(gnutls_session session, void *data,
+int gnutls_server_name_get(gnutls_session_t session, void *data,
 			   size_t * data_length,
 			   unsigned int *type, unsigned int indx)
 {
@@ -263,7 +263,7 @@ int gnutls_server_name_get(gnutls_session session, void *data,
 
 /**
   * gnutls_server_name_set - Used to set a name indicator to be sent as an extension
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @type: specifies the indicator type
   * @name: is a string that contains the server name.
   * @name_length: holds the length of name
@@ -278,8 +278,8 @@ int gnutls_server_name_get(gnutls_session session, void *data,
   * IPv4 or IPv6 addresses are not permitted.
   *
   **/
-int gnutls_server_name_set(gnutls_session session,
-			   gnutls_server_name_type type,
+int gnutls_server_name_set(gnutls_session_t session,
+			   gnutls_server_name_type_t type,
 			   const void *name, size_t name_length)
 {
     int server_names;

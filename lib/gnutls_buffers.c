@@ -77,7 +77,7 @@ inline static int RET(int err)
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
-int _gnutls_record_buffer_put(content_type_t type, gnutls_session session,
+int _gnutls_record_buffer_put(content_type_t type, gnutls_session_t session,
 			      opaque * data, size_t length)
 {
     if (length == 0)
@@ -118,7 +118,7 @@ int _gnutls_record_buffer_put(content_type_t type, gnutls_session session,
 }
 
 int _gnutls_record_buffer_get_size(content_type_t type,
-				   gnutls_session session)
+				   gnutls_session_t session)
 {
     switch (type) {
     case GNUTLS_APPLICATION_DATA:
@@ -134,7 +134,7 @@ int _gnutls_record_buffer_get_size(content_type_t type,
 
 /**
   * gnutls_record_check_pending - checks if there are any data to receive in gnutls buffers.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * This function checks if there are any data to receive
   * in the gnutls buffers. Returns the size of that data or 0.
@@ -143,13 +143,13 @@ int _gnutls_record_buffer_get_size(content_type_t type,
   * (gnutls leaves some data in the tcp buffer in order for select
   * to work).
   **/
-size_t gnutls_record_check_pending(gnutls_session session)
+size_t gnutls_record_check_pending(gnutls_session_t session)
 {
     return _gnutls_record_buffer_get_size(GNUTLS_APPLICATION_DATA,
 					  session);
 }
 
-int _gnutls_record_buffer_get(content_type_t type, gnutls_session session,
+int _gnutls_record_buffer_get(content_type_t type, gnutls_session_t session,
 			      opaque * data, size_t length)
 {
     if (length == 0 || data == NULL) {
@@ -215,14 +215,14 @@ int _gnutls_record_buffer_get(content_type_t type, gnutls_session session,
  *
  * Flags are only used if the default recv() function is being used.
  */
-static ssize_t _gnutls_read(gnutls_session session, void *iptr,
+static ssize_t _gnutls_read(gnutls_session_t session, void *iptr,
 			    size_t sizeOfPtr, int flags)
 {
     size_t left;
     ssize_t i = 0;
     char *ptr = iptr;
     uint j, x, sum = 0;
-    gnutls_transport_ptr fd = session->internals.transport_recv_ptr;
+    gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 
     session->internals.direction = 0;
 
@@ -302,7 +302,7 @@ static ssize_t _gnutls_read(gnutls_session session, void *iptr,
 /* This function is only used with berkeley style sockets.
  * Clears the peeked data (read with MSG_PEEK).
  */
-int _gnutls_io_clear_peeked_data(gnutls_session session)
+int _gnutls_io_clear_peeked_data(gnutls_session_t session)
 {
     char *peekdata;
     int ret, sum;
@@ -338,7 +338,7 @@ int _gnutls_io_clear_peeked_data(gnutls_session session)
 }
 
 
-void _gnutls_io_clear_read_buffer(gnutls_session session)
+void _gnutls_io_clear_read_buffer(gnutls_session_t session)
 {
     session->internals.record_recv_buffer.length = 0;
 }
@@ -352,7 +352,7 @@ void _gnutls_io_clear_read_buffer(gnutls_session session)
  * which are stored in a local (in the session) buffer. A pointer (iptr) to this buffer is returned.
  *
  */
-ssize_t _gnutls_io_read_buffered(gnutls_session session, opaque ** iptr,
+ssize_t _gnutls_io_read_buffered(gnutls_session_t session, opaque ** iptr,
 				 size_t sizeOfPtr,
 				 content_type_t recv_type)
 {
@@ -577,7 +577,7 @@ inline
  * to decrypt and verify the integrity. 
  *
  */
-ssize_t _gnutls_io_write_buffered(gnutls_session session, const void *iptr,
+ssize_t _gnutls_io_write_buffered(gnutls_session_t session, const void *iptr,
 				  size_t n)
 {
     size_t left;
@@ -585,7 +585,7 @@ ssize_t _gnutls_io_write_buffered(gnutls_session session, const void *iptr,
     ssize_t retval, i;
     const opaque *ptr;
     int ret;
-    gnutls_transport_ptr fd = session->internals.transport_send_ptr;
+    gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
 
     /* to know where the procedure was interrupted.
      */
@@ -701,7 +701,7 @@ ssize_t _gnutls_io_write_buffered(gnutls_session session, const void *iptr,
 /* This is exactly like write_buffered, but will use two buffers to read
  * from.
  */
-ssize_t _gnutls_io_write_buffered2(gnutls_session session,
+ssize_t _gnutls_io_write_buffered2(gnutls_session_t session,
 				   const void *iptr, size_t n,
 				   const void *iptr2, size_t n2)
 {
@@ -733,7 +733,7 @@ ssize_t _gnutls_io_write_buffered2(gnutls_session session,
  * TLS write buffer (ie. because the previous write was
  * interrupted.
  */
-ssize_t _gnutls_io_write_flush(gnutls_session session)
+ssize_t _gnutls_io_write_flush(gnutls_session_t session)
 {
     ssize_t ret;
 
@@ -751,7 +751,7 @@ ssize_t _gnutls_io_write_flush(gnutls_session session)
  * Handshake write buffer (ie. because the previous write was
  * interrupted.
  */
-ssize_t _gnutls_handshake_io_write_flush(gnutls_session session)
+ssize_t _gnutls_handshake_io_write_flush(gnutls_session_t session)
 {
     ssize_t ret;
     ret = _gnutls_handshake_io_send_int(session, 0, 0, NULL, 0);
@@ -774,9 +774,9 @@ ssize_t _gnutls_handshake_io_write_flush(gnutls_session session)
 /* This is a send function for the gnutls handshake 
  * protocol. Just makes sure that all data have been sent.
  */
-ssize_t _gnutls_handshake_io_send_int(gnutls_session session,
+ssize_t _gnutls_handshake_io_send_int(gnutls_session_t session,
 				      content_type_t type,
-				      HandshakeType htype,
+				      handshake_t htype,
 				      const void *iptr, size_t n)
 {
     size_t left;
@@ -892,9 +892,9 @@ ssize_t _gnutls_handshake_io_send_int(gnutls_session session,
 /* This is a receive function for the gnutls handshake 
  * protocol. Makes sure that we have received all data.
  */
-ssize_t _gnutls_handshake_io_recv_int(gnutls_session session,
+ssize_t _gnutls_handshake_io_recv_int(gnutls_session_t session,
 				      content_type_t type,
-				      HandshakeType htype, void *iptr,
+				      handshake_t htype, void *iptr,
 				      size_t sizeOfPtr)
 {
     size_t left;
@@ -988,7 +988,7 @@ ssize_t _gnutls_handshake_io_recv_int(gnutls_session session,
  * for finished messages to use them. Used in HMAC calculation
  * and finished messages.
  */
-int _gnutls_handshake_buffer_put(gnutls_session session, opaque * data,
+int _gnutls_handshake_buffer_put(gnutls_session_t session, opaque * data,
 				 size_t length)
 {
 
@@ -1013,7 +1013,7 @@ int _gnutls_handshake_buffer_put(gnutls_session session, opaque * data,
     return 0;
 }
 
-int _gnutls_handshake_buffer_get_size(gnutls_session session)
+int _gnutls_handshake_buffer_get_size(gnutls_session_t session)
 {
 
     return session->internals.handshake_hash_buffer.length;
@@ -1022,7 +1022,7 @@ int _gnutls_handshake_buffer_get_size(gnutls_session session)
 /* this function does not touch the buffer
  * and returns data from it (peek mode!)
  */
-int _gnutls_handshake_buffer_peek(gnutls_session session, opaque * data,
+int _gnutls_handshake_buffer_peek(gnutls_session_t session, opaque * data,
 				  size_t length)
 {
     if (length > session->internals.handshake_hash_buffer.length) {
@@ -1038,7 +1038,7 @@ int _gnutls_handshake_buffer_peek(gnutls_session session, opaque * data,
 /* this function does not touch the buffer
  * and returns data from it (peek mode!)
  */
-int _gnutls_handshake_buffer_get_ptr(gnutls_session session,
+int _gnutls_handshake_buffer_get_ptr(gnutls_session_t session,
 				     opaque ** data_ptr, size_t * length)
 {
     if (length != NULL)
@@ -1054,7 +1054,7 @@ int _gnutls_handshake_buffer_get_ptr(gnutls_session session,
 
 /* Does not free the buffer
  */
-int _gnutls_handshake_buffer_empty(gnutls_session session)
+int _gnutls_handshake_buffer_empty(gnutls_session_t session)
 {
 
     _gnutls_buffers_log("BUF[HSK]: Emptied buffer\n");
@@ -1065,7 +1065,7 @@ int _gnutls_handshake_buffer_empty(gnutls_session session)
 }
 
 
-int _gnutls_handshake_buffer_clear(gnutls_session session)
+int _gnutls_handshake_buffer_clear(gnutls_session_t session)
 {
 
     _gnutls_buffers_log("BUF[HSK]: Cleared Data from buffer\n");

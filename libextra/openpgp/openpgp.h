@@ -3,9 +3,9 @@
 
 #include <config.h>
 
-typedef enum gnutls_openpgp_key_fmt { 
+typedef enum gnutls_openpgp_key_fmt_t { 
     GNUTLS_OPENPGP_FMT_RAW, GNUTLS_OPENPGP_FMT_BASE64
-} gnutls_openpgp_key_fmt;
+} gnutls_openpgp_key_fmt_t;
 
 #ifdef USE_OPENPGP
 
@@ -29,63 +29,63 @@ typedef struct gnutls_openpgp_trustdb_int {
     cdk_stream_t st;
 } gnutls_openpgp_trustdb_int;
 
-typedef struct gnutls_openpgp_key_int *gnutls_openpgp_key;
-typedef struct gnutls_openpgp_privkey_int *gnutls_openpgp_privkey;
-typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring;
-typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb;
+typedef struct gnutls_openpgp_key_int *gnutls_openpgp_key_t;
+typedef struct gnutls_openpgp_privkey_int *gnutls_openpgp_privkey_t;
+typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
+typedef struct gnutls_openpgp_trustdb_int *gnutls_openpgp_trustdb_t;
 
 int _gnutls_map_cdk_rc(int rc);
 int
-gnutls_openpgp_key_get_name(gnutls_openpgp_key key,
+gnutls_openpgp_key_get_name(gnutls_openpgp_key_t key,
     int idx, char *buf, size_t * sizeof_buf);
-int gnutls_openpgp_key_get_fingerprint(gnutls_openpgp_key key,
+int gnutls_openpgp_key_get_fingerprint(gnutls_openpgp_key_t key,
     void *fpr, size_t * fprlen);
-int gnutls_openpgp_key_get_pk_algorithm(gnutls_openpgp_key key,
+int gnutls_openpgp_key_get_pk_algorithm(gnutls_openpgp_key_t key,
     unsigned int *bits);
-int gnutls_openpgp_key_get_version(gnutls_openpgp_key key);
-time_t gnutls_openpgp_key_get_creation_time(gnutls_openpgp_key key);
-time_t gnutls_openpgp_key_get_expiration_time(gnutls_openpgp_key key);
-int gnutls_openpgp_key_get_id(gnutls_openpgp_key key,
+int gnutls_openpgp_key_get_version(gnutls_openpgp_key_t key);
+time_t gnutls_openpgp_key_get_creation_time(gnutls_openpgp_key_t key);
+time_t gnutls_openpgp_key_get_expiration_time(gnutls_openpgp_key_t key);
+int gnutls_openpgp_key_get_id(gnutls_openpgp_key_t key,
     unsigned char keyid[8]);
 
-int gnutls_openpgp_key_init(gnutls_openpgp_key * key);
-void gnutls_openpgp_key_deinit(gnutls_openpgp_key key);
-int gnutls_openpgp_key_import(gnutls_openpgp_key key,
-    const gnutls_datum * data,
-    gnutls_openpgp_key_fmt format);
-int gnutls_openpgp_key_export(gnutls_openpgp_key key,
-    gnutls_openpgp_key_fmt format, void *output_data,
+int gnutls_openpgp_key_init(gnutls_openpgp_key_t * key);
+void gnutls_openpgp_key_deinit(gnutls_openpgp_key_t key);
+int gnutls_openpgp_key_import(gnutls_openpgp_key_t key,
+    const gnutls_datum_t * data,
+    gnutls_openpgp_key_fmt_t format);
+int gnutls_openpgp_key_export(gnutls_openpgp_key_t key,
+    gnutls_openpgp_key_fmt_t format, void *output_data,
     size_t * output_data_size);
 
-void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring keyring);
-int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring * keyring);
-int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring keyring,
-    const gnutls_datum * data, gnutls_openpgp_key_fmt format);
-int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring ring,
+void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring_t keyring);
+int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring_t * keyring);
+int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
+    const gnutls_datum_t * data, gnutls_openpgp_key_fmt_t format);
+int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring_t ring,
     const unsigned char keyid[8], unsigned int flags);
 
-void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb trustdb);
-int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb * trustdb);
-int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb trustdb,
+void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb_t trustdb);
+int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb_t * trustdb);
+int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb_t trustdb,
     const char *file);
 
-int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key key,
-    gnutls_openpgp_keyring keyring, unsigned int flags,
+int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key_t key,
+    gnutls_openpgp_keyring_t keyring, unsigned int flags,
     unsigned int *verify);
 
-int gnutls_openpgp_key_verify_trustdb(gnutls_openpgp_key key,
-    gnutls_openpgp_trustdb trustdb, unsigned int flags,
+int gnutls_openpgp_key_verify_trustdb(gnutls_openpgp_key_t key,
+    gnutls_openpgp_trustdb_t trustdb, unsigned int flags,
     unsigned int *verify);
 
-int gnutls_openpgp_key_verify_self(gnutls_openpgp_key key,
+int gnutls_openpgp_key_verify_self(gnutls_openpgp_key_t key,
     unsigned int flags, unsigned int *verify);
 
 int _gnutls_openpgp_key_to_gcert(gnutls_cert * gcert,
-    gnutls_openpgp_key cert);
+    gnutls_openpgp_key_t cert);
 int _gnutls_openpgp_privkey_to_gkey(gnutls_privkey * dest,
-    gnutls_openpgp_privkey src);
+    gnutls_openpgp_privkey_t src);
 
-void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key);
+void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey_t key);
 
 #else				/* no opencdk */
 

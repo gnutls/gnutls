@@ -46,25 +46,25 @@
 
 /**
   * gnutls_protocol_get_version - Returns the version of the currently used protocol
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * Returns the version of the currently used protocol. 
   *
   **/
-gnutls_protocol_version gnutls_protocol_get_version(gnutls_session session)
+gnutls_protocol_t gnutls_protocol_get_version(gnutls_session_t session)
 {
     return session->security_parameters.version;
 }
 
-void _gnutls_set_current_version(gnutls_session session,
-				 gnutls_protocol_version version)
+void _gnutls_set_current_version(gnutls_session_t session,
+				 gnutls_protocol_t version)
 {
     session->security_parameters.version = version;
 }
 
 /**
   * gnutls_transport_set_lowat - Used to set the lowat value in order for select to check for pending data.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @num: is the low water value.
   *
   * Used to set the lowat value in order for select to check
@@ -75,14 +75,14 @@ void _gnutls_set_current_version(gnutls_session session,
   * Otherwise it must be called and set lowat to zero.
   *
   **/
-void gnutls_transport_set_lowat(gnutls_session session, int num)
+void gnutls_transport_set_lowat(gnutls_session_t session, int num)
 {
     session->internals.lowat = num;
 }
 
 /**
   * gnutls_transport_set_ptr - Used to set first argument of the transport functions
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @ptr: is the value.
   *
   * Used to set the first argument of the transport function (like PUSH and
@@ -90,8 +90,8 @@ void gnutls_transport_set_lowat(gnutls_session session, int num)
   * handle.
   *
   **/
-void gnutls_transport_set_ptr(gnutls_session session,
-			      gnutls_transport_ptr ptr)
+void gnutls_transport_set_ptr(gnutls_session_t session,
+			      gnutls_transport_ptr_t ptr)
 {
     session->internals.transport_recv_ptr = ptr;
     session->internals.transport_send_ptr = ptr;
@@ -100,7 +100,7 @@ void gnutls_transport_set_ptr(gnutls_session session,
 
 /**
   * gnutls_transport_set_ptr2 - Used to set first argument of the transport functions
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @recv_ptr: is the value for the pull function
   * @send_ptr: is the value for the push function
   *
@@ -110,9 +110,9 @@ void gnutls_transport_set_ptr(gnutls_session session,
   * receiving and sending.
   *
   **/
-void gnutls_transport_set_ptr2(gnutls_session session,
-			       gnutls_transport_ptr recv_ptr,
-			       gnutls_transport_ptr send_ptr)
+void gnutls_transport_set_ptr2(gnutls_session_t session,
+			       gnutls_transport_ptr_t recv_ptr,
+			       gnutls_transport_ptr_t send_ptr)
 {
     session->internals.transport_send_ptr = send_ptr;
     session->internals.transport_recv_ptr = recv_ptr;
@@ -120,20 +120,20 @@ void gnutls_transport_set_ptr2(gnutls_session session,
 
 /**
   * gnutls_transport_get_ptr - Used to return the first argument of the transport functions
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * Used to get the first argument of the transport function (like PUSH and
   * PULL). This must have been set using gnutls_transport_set_ptr().
   *
   **/
-gnutls_transport_ptr gnutls_transport_get_ptr(gnutls_session session)
+gnutls_transport_ptr_t gnutls_transport_get_ptr(gnutls_session_t session)
 {
     return session->internals.transport_recv_ptr;
 }
 
 /**
   * gnutls_transport_get_ptr2 - Used to return the first argument of the transport functions
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @recv_ptr: will hold the value for the pull function
   * @send_ptr: will hold the value for the push function
   *
@@ -141,9 +141,9 @@ gnutls_transport_ptr gnutls_transport_get_ptr(gnutls_session session)
   * PULL). These should have been set using gnutls_transport_set_ptr2().
   *
   **/
-void gnutls_transport_get_ptr2(gnutls_session session,
-			       gnutls_transport_ptr * recv_ptr,
-			       gnutls_transport_ptr * send_ptr)
+void gnutls_transport_get_ptr2(gnutls_session_t session,
+			       gnutls_transport_ptr_t * recv_ptr,
+			       gnutls_transport_ptr_t * send_ptr)
 {
 
     *recv_ptr = session->internals.transport_recv_ptr;
@@ -152,7 +152,7 @@ void gnutls_transport_get_ptr2(gnutls_session session,
 
 /**
   * gnutls_bye - This function terminates the current TLS/SSL connection.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @how: is an integer
   *
   * Terminates the current TLS/SSL connection. The connection should
@@ -174,7 +174,7 @@ void gnutls_transport_get_ptr2(gnutls_session session,
   * gnutls_record_get_direction().
   *
   **/
-int gnutls_bye(gnutls_session session, gnutls_close_request how)
+int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 {
     int ret = 0;
 
@@ -222,20 +222,20 @@ int gnutls_bye(gnutls_session session, gnutls_close_request how)
     return 0;
 }
 
-inline static void session_invalidate(gnutls_session session)
+inline static void session_invalidate(gnutls_session_t session)
 {
     session->internals.valid_connection = VALID_FALSE;
 }
 
 
-inline static void session_unresumable(gnutls_session session)
+inline static void session_unresumable(gnutls_session_t session)
 {
     session->internals.resumable = RESUME_FALSE;
 }
 
 /* returns 0 if session is valid
  */
-inline static int session_is_valid(gnutls_session session)
+inline static int session_is_valid(gnutls_session_t session)
 {
     if (session->internals.valid_connection == VALID_FALSE)
 	return GNUTLS_E_INVALID_SESSION;
@@ -247,10 +247,10 @@ inline static int session_is_valid(gnutls_session session)
  * version must have 2 bytes at least.
  */
 inline static
-void copy_record_version(gnutls_session session, HandshakeType htype,
+void copy_record_version(gnutls_session_t session, handshake_t htype,
 			 opaque version[2])
 {
-    gnutls_protocol_version lver;
+    gnutls_protocol_t lver;
 
     if (htype != GNUTLS_CLIENT_HELLO
 	|| session->internals.default_record_version[0] == 0) {
@@ -265,7 +265,7 @@ void copy_record_version(gnutls_session session, HandshakeType htype,
 }
 
 /* This function behaves exactly like write(). The only difference is
- * that it accepts, the gnutls_session and the content_type_t of data to
+ * that it accepts, the gnutls_session_t and the content_type_t of data to
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current session.    
  *
@@ -278,8 +278,8 @@ void copy_record_version(gnutls_session session, HandshakeType htype,
  * and only if the previous send was interrupted for some reason.
  *
  */
-ssize_t _gnutls_send_int(gnutls_session session, content_type_t type,
-			 HandshakeType htype, const void *_data,
+ssize_t _gnutls_send_int(gnutls_session_t session, content_type_t type,
+			 handshake_t htype, const void *_data,
 			 size_t sizeofdata)
 {
     uint8 *cipher;
@@ -420,7 +420,7 @@ ssize_t _gnutls_send_int(gnutls_session session, content_type_t type,
 /* This function is to be called if the handshake was successfully 
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
-ssize_t _gnutls_send_change_cipher_spec(gnutls_session session, int again)
+ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
 {
     static const opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
@@ -453,7 +453,7 @@ static int check_recv_type(content_type_t recv_type)
 /* Checks if there are pending data in the record buffers. If there are
  * then it copies the data.
  */
-static int check_buffers(gnutls_session session, content_type_t type,
+static int check_buffers(gnutls_session_t session, content_type_t type,
 			 opaque * data, int sizeofdata)
 {
     if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)
@@ -486,9 +486,9 @@ static int check_buffers(gnutls_session session, content_type_t type,
  * content type.
  */
 static
-int record_check_headers(gnutls_session session,
+int record_check_headers(gnutls_session_t session,
 			 uint8 headers[RECORD_HEADER_SIZE],
-			 content_type_t type, HandshakeType htype,
+			 content_type_t type, handshake_t htype,
 			 /*output */ content_type_t * recv_type,
 			 opaque version[2], uint16 * length,
 			 uint16 * header_size)
@@ -542,8 +542,8 @@ int record_check_headers(gnutls_session session,
  */
 #ifdef CHECK_RECORD_VERSION
 inline
-    static int record_check_version(gnutls_session session,
-				    HandshakeType htype, opaque version[2])
+    static int record_check_version(gnutls_session_t session,
+				    handshake_t htype, opaque version[2])
 {
     if ((htype != GNUTLS_CLIENT_HELLO && htype != GNUTLS_SERVER_HELLO) &&
 	gnutls_protocol_get_version(session) !=
@@ -565,9 +565,9 @@ inline
 /* This function will check if the received record type is
  * the one we actually expect.
  */
-static int record_check_type(gnutls_session session,
+static int record_check_type(gnutls_session_t session,
 			     content_type_t recv_type, content_type_t type,
-			     HandshakeType htype, opaque * data,
+			     handshake_t htype, opaque * data,
 			     int data_size)
 {
 
@@ -683,8 +683,8 @@ static int record_check_type(gnutls_session session,
  * also initialize it.
  */
 inline
-    static int get_temp_recv_buffer(gnutls_session session,
-				    gnutls_datum * tmp)
+    static int get_temp_recv_buffer(gnutls_session_t session,
+				    gnutls_datum_t * tmp)
 {
 
     /* We allocate MAX_RECORD_RECV_SIZE length
@@ -719,17 +719,17 @@ inline
 #define MAX_EMPTY_PACKETS_SEQUENCE 4
 
 /* This function behaves exactly like read(). The only difference is
- * that it accepts the gnutls_session and the content_type_t of data to
+ * that it accepts the gnutls_session_t and the content_type_t of data to
  * receive (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
  *
- * The HandshakeType was introduced to support SSL V2.0 client hellos.
+ * The handshake_t was introduced to support SSL V2.0 client hellos.
  */
-ssize_t _gnutls_recv_int(gnutls_session session, content_type_t type,
-			 HandshakeType htype, opaque * data,
+ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
+			 handshake_t htype, opaque * data,
 			 size_t sizeofdata)
 {
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     int decrypted_length;
     opaque version[2];
     uint8 *headers;
@@ -964,7 +964,7 @@ ssize_t _gnutls_recv_int(gnutls_session session, content_type_t type,
 
 /**
   * gnutls_record_send - sends to the peer the specified data
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
@@ -986,7 +986,7 @@ ssize_t _gnutls_recv_int(gnutls_session session, content_type_t type,
   * maximum record size.
   *
   **/
-ssize_t gnutls_record_send(gnutls_session session, const void *data,
+ssize_t gnutls_record_send(gnutls_session_t session, const void *data,
 			   size_t sizeofdata)
 {
     return _gnutls_send_int(session, GNUTLS_APPLICATION_DATA, -1, data,
@@ -995,7 +995,7 @@ ssize_t gnutls_record_send(gnutls_session session, const void *data,
 
 /**
   * gnutls_record_recv - reads data from the TLS record protocol
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
@@ -1015,7 +1015,7 @@ ssize_t gnutls_record_send(gnutls_session session, const void *data,
   * A negative error code is returned in case of an error.
   *
   **/
-ssize_t gnutls_record_recv(gnutls_session session, void *data,
+ssize_t gnutls_record_recv(gnutls_session_t session, void *data,
 			   size_t sizeofdata)
 {
     return _gnutls_recv_int(session, GNUTLS_APPLICATION_DATA, -1, data,
@@ -1024,14 +1024,14 @@ ssize_t gnutls_record_recv(gnutls_session session, void *data,
 
 /**
   * gnutls_record_get_max_size - returns the maximum record size
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * This function returns the maximum record packet size in this connection.
   * The maximum record size is negotiated by the client after the
   * first handshake message.
   *
   **/
-size_t gnutls_record_get_max_size(gnutls_session session)
+size_t gnutls_record_get_max_size(gnutls_session_t session)
 {
     /* Recv will hold the negotiated max record size
      * always.
@@ -1042,7 +1042,7 @@ size_t gnutls_record_get_max_size(gnutls_session session)
 
 /**
   * gnutls_record_set_max_size - sets the maximum record size
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @size: is the new size
   *
   * This function sets the maximum record packet size in this connection.
@@ -1058,7 +1058,7 @@ size_t gnutls_record_get_max_size(gnutls_session session)
   * Not all TLS implementations use or even understand this extension.
   *
   **/
-ssize_t gnutls_record_set_max_size(gnutls_session session, size_t size)
+ssize_t gnutls_record_set_max_size(gnutls_session_t session, size_t size)
 {
     ssize_t new_size;
 

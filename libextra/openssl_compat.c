@@ -43,7 +43,7 @@
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
+int gnutls_x509_extract_dn(const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
 {
     ASN1_TYPE dn = ASN1_TYPE_EMPTY;
     int result;
@@ -110,10 +110,10 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
+int gnutls_x509_extract_certificate_dn(const gnutls_datum_t * cert,
 				       gnutls_x509_dn * ret)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     int result;
     size_t len;
 
@@ -174,10 +174,10 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
+int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum_t * cert,
 					      gnutls_x509_dn * ret)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     int result;
     size_t len;
 
@@ -255,12 +255,12 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
   * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   *
   **/
-int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum *
+int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum_t *
 						     cert, int seq,
 						     char *ret,
 						     int *ret_size)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     int result;
     size_t size = *ret_size;
 
@@ -297,9 +297,9 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum *
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
+int gnutls_x509_extract_certificate_ca_status(const gnutls_datum_t * cert)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     int result;
 
     result = gnutls_x509_crt_init(&xcert);
@@ -329,9 +329,9 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
   *
   **/
 time_t gnutls_x509_extract_certificate_activation_time(const
-						       gnutls_datum * cert)
+						       gnutls_datum_t * cert)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     time_t result;
 
     result = gnutls_x509_crt_init(&xcert);
@@ -361,9 +361,9 @@ time_t gnutls_x509_extract_certificate_activation_time(const
   *
   **/
 time_t gnutls_x509_extract_certificate_expiration_time(const
-						       gnutls_datum * cert)
+						       gnutls_datum_t * cert)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     time_t result;
 
     result = gnutls_x509_crt_init(&xcert);
@@ -391,9 +391,9 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
   * Version field. Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
+int gnutls_x509_extract_certificate_version(const gnutls_datum_t * cert)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     int result;
 
     result = gnutls_x509_crt_init(&xcert);
@@ -428,10 +428,10 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert,
+int gnutls_x509_extract_certificate_serial(const gnutls_datum_t * cert,
 					   char *result, int *result_size)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     size_t size = *result_size;
     int ret;
 
@@ -467,14 +467,14 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert,
   * For DSA the bits returned are of the public
   * exponent.
   *
-  * Returns a member of the gnutls_pk_algorithm enumeration on success,
+  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
   * or a negative value on error.
   *
   **/
-int gnutls_x509_extract_certificate_pk_algorithm(const gnutls_datum * cert,
+int gnutls_x509_extract_certificate_pk_algorithm(const gnutls_datum_t * cert,
 						 int *bits)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     int result;
 
     result = gnutls_x509_crt_init(&xcert);
@@ -511,10 +511,10 @@ int gnutls_x509_extract_certificate_pk_algorithm(const gnutls_datum * cert,
   **/
 int gnutls_x509_extract_certificate_dn_string(char *buf,
 					      unsigned int sizeof_buf,
-					      const gnutls_datum * cert,
+					      const gnutls_datum_t * cert,
 					      int issuer)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     int result;
 
     result = gnutls_x509_crt_init(&xcert);
@@ -547,7 +547,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf,
   * @CRL_list_length: not used
   *
   * This function will try to verify the given certificate list and return its status (TRUSTED, EXPIRED etc.). 
-  * The return value (status) should be one or more of the gnutls_certificate_status 
+  * The return value (status) should be one or more of the gnutls_certificate_status_t 
   * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
   * by this function, you should check them using the appropriate functions.
   *
@@ -557,7 +557,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf,
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
-  * The return value (status) should be one or more of the gnutls_certificate_status 
+  * The return value (status) should be one or more of the gnutls_certificate_status_t 
   * enumerated elements bitwise or'd.
   *
   * GNUTLS_CERT_INVALID\: the peer's certificate is not valid.
@@ -570,17 +570,17 @@ int gnutls_x509_extract_certificate_dn_string(char *buf,
   *  
   *
   **/
-int gnutls_x509_verify_certificate(const gnutls_datum * cert_list,
+int gnutls_x509_verify_certificate(const gnutls_datum_t * cert_list,
 				   int cert_list_length,
-				   const gnutls_datum * CA_list,
+				   const gnutls_datum_t * CA_list,
 				   int CA_list_length,
-				   const gnutls_datum * CRL_list,
+				   const gnutls_datum_t * CRL_list,
 				   int CRL_list_length)
 {
     unsigned int verify;
-    gnutls_x509_crt *peer_certificate_list = NULL;
-    gnutls_x509_crt *ca_certificate_list = NULL;
-    gnutls_x509_crl *crl_list = NULL;
+    gnutls_x509_crt_t *peer_certificate_list = NULL;
+    gnutls_x509_crt_t *ca_certificate_list = NULL;
+    gnutls_x509_crl_t *crl_list = NULL;
     int peer_certificate_list_size = 0, i, x, ret;
     int ca_certificate_list_size = 0, crl_list_size = 0;
 
@@ -594,7 +594,7 @@ int gnutls_x509_verify_certificate(const gnutls_datum * cert_list,
     peer_certificate_list =
 	gnutls_calloc(1,
 		      peer_certificate_list_size *
-		      sizeof(gnutls_x509_crt));
+		      sizeof(gnutls_x509_crt_t));
     if (peer_certificate_list == NULL) {
 	gnutls_assert();
 	ret = GNUTLS_E_MEMORY_ERROR;
@@ -604,7 +604,7 @@ int gnutls_x509_verify_certificate(const gnutls_datum * cert_list,
     ca_certificate_list_size = CA_list_length;
     ca_certificate_list =
 	gnutls_calloc(1,
-		      ca_certificate_list_size * sizeof(gnutls_x509_crt));
+		      ca_certificate_list_size * sizeof(gnutls_x509_crt_t));
     if (ca_certificate_list == NULL) {
 	gnutls_assert();
 	ret = GNUTLS_E_MEMORY_ERROR;
@@ -614,7 +614,7 @@ int gnutls_x509_verify_certificate(const gnutls_datum * cert_list,
     /* allocate memory for CRL
      */
     crl_list_size = CRL_list_length;
-    crl_list = gnutls_calloc(1, crl_list_size * sizeof(gnutls_x509_crl));
+    crl_list = gnutls_calloc(1, crl_list_size * sizeof(gnutls_x509_crl_t));
     if (crl_list == NULL) {
 	gnutls_assert();
 	ret = GNUTLS_E_MEMORY_ERROR;
@@ -729,13 +729,13 @@ int gnutls_x509_verify_certificate(const gnutls_datum * cert_list,
   * This function will return the public key algorithm of a DER encoded private
   * key.
   *
-  * Returns a member of the gnutls_pk_algorithm enumeration on success,
+  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
   * or GNUTLS_E_UNKNOWN_PK_ALGORITHM on error.
   *
   **/
-int gnutls_x509_extract_key_pk_algorithm(const gnutls_datum * key)
+int gnutls_x509_extract_key_pk_algorithm(const gnutls_datum_t * key)
 {
-    gnutls_x509_privkey pkey;
+    gnutls_x509_privkey_t pkey;
     int ret, pk;
 
     ret = gnutls_x509_privkey_init(&pkey);
@@ -773,12 +773,12 @@ int gnutls_x509_extract_key_pk_algorithm(const gnutls_datum * key)
   * will be returned.
   *
   **/
-int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum *
+int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum_t *
 					  pkcs7_struct, int indx,
 					  char *certificate,
 					  int *certificate_size)
 {
-    gnutls_pkcs7 pkcs7;
+    gnutls_pkcs7_t pkcs7;
     int result;
     size_t size = *certificate_size;
 
@@ -811,10 +811,10 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum *
   * Returns a negative value on failure.
   *
   **/
-int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum *
+int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum_t *
 						pkcs7_struct)
 {
-    gnutls_pkcs7 pkcs7;
+    gnutls_pkcs7_t pkcs7;
     int result;
 
     result = gnutls_pkcs7_init(&pkcs7);

@@ -49,8 +49,8 @@ static int _gnutls_pk_decrypt(int algo, mpi_t * resarr, mpi_t data,
 /* Do PKCS-1 RSA encryption. 
  * params is modulus, public exp.
  */
-int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
-			      const gnutls_datum * plaintext,
+int _gnutls_pkcs1_rsa_encrypt(gnutls_datum_t * ciphertext,
+			      const gnutls_datum_t * plaintext,
 			      mpi_t * params, uint params_len, uint btype)
 {
     unsigned int i, pad;
@@ -210,8 +210,8 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
  * params is modulus, public exp., private key
  * Can decrypt block type 1 and type 2 packets.
  */
-int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
-			      const gnutls_datum * ciphertext,
+int _gnutls_pkcs1_rsa_decrypt(gnutls_datum_t * plaintext,
+			      const gnutls_datum_t * ciphertext,
 			      mpi_t * params, uint params_len, uint btype)
 {
     uint k, i;
@@ -325,12 +325,12 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 }
 
 
-int _gnutls_rsa_verify(const gnutls_datum * vdata,
-		       const gnutls_datum * ciphertext, mpi_t * params,
+int _gnutls_rsa_verify(const gnutls_datum_t * vdata,
+		       const gnutls_datum_t * ciphertext, mpi_t * params,
 		       int params_len, int btype)
 {
 
-    gnutls_datum plain;
+    gnutls_datum_t plain;
     int ret;
 
     /* decrypt signature */
@@ -360,7 +360,7 @@ int _gnutls_rsa_verify(const gnutls_datum * vdata,
 
 /* encodes the Dss-Sig-Value structure
  */
-static int encode_ber_rs(gnutls_datum * sig_value, mpi_t r, mpi_t s)
+static int encode_ber_rs(gnutls_datum_t * sig_value, mpi_t r, mpi_t s)
 {
     ASN1_TYPE sig;
     int result, tot_len;
@@ -404,7 +404,7 @@ static int encode_ber_rs(gnutls_datum * sig_value, mpi_t r, mpi_t s)
 
 /* Do DSA signature calculation. params is p, q, g, y, x in that order.
  */
-int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum * hash,
+int _gnutls_dsa_sign(gnutls_datum_t * signature, const gnutls_datum_t * hash,
 		     mpi_t * params, uint params_len)
 {
     mpi_t rs[2], mdata;
@@ -447,7 +447,7 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum * hash,
 
 /* decodes the Dss-Sig-Value structure
  */
-static int decode_ber_rs(const gnutls_datum * sig_value, mpi_t * r,
+static int decode_ber_rs(const gnutls_datum_t * sig_value, mpi_t * r,
 			 mpi_t * s)
 {
     ASN1_TYPE sig;
@@ -491,8 +491,8 @@ static int decode_ber_rs(const gnutls_datum * sig_value, mpi_t * r,
 
 /* params is p, q, g, y in that order
  */
-int _gnutls_dsa_verify(const gnutls_datum * vdata,
-		       const gnutls_datum * sig_value, mpi_t * params,
+int _gnutls_dsa_verify(const gnutls_datum_t * vdata,
+		       const gnutls_datum_t * sig_value, mpi_t * params,
 		       int params_len)
 {
 

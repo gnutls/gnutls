@@ -3,7 +3,7 @@ typedef struct gnutls_pkcs12_int {
 	ASN1_TYPE pkcs12;
 } gnutls_pkcs12_int;
 
-typedef enum gnutls_pkcs12_bag_type {
+typedef enum gnutls_pkcs12_bag_type_t {
 	GNUTLS_BAG_EMPTY = 0,
 
 	GNUTLS_BAG_PKCS8_ENCRYPTED_KEY=1,
@@ -12,14 +12,14 @@ typedef enum gnutls_pkcs12_bag_type {
 	GNUTLS_BAG_CRL,
 	GNUTLS_BAG_ENCRYPTED=10,
 	GNUTLS_BAG_UNKNOWN=20
-} gnutls_pkcs12_bag_type;
+} gnutls_pkcs12_bag_type_t;
 
 #define MAX_BAG_ELEMENTS 32
 
 struct bag_element {
-	gnutls_datum data;
-	gnutls_pkcs12_bag_type type;
-	gnutls_datum local_key_id;
+	gnutls_datum_t data;
+	gnutls_pkcs12_bag_type_t type;
+	gnutls_datum_t local_key_id;
 	char * friendly_name;
 };
 
@@ -43,27 +43,27 @@ typedef struct gnutls_pkcs12_bag_int {
 #define FRIENDLY_NAME_OID "1.2.840.113549.1.9.20"
 #define KEY_ID_OID "1.2.840.113549.1.9.21"
 
-typedef struct gnutls_pkcs12_int *gnutls_pkcs12;
-typedef struct gnutls_pkcs12_bag_int *gnutls_pkcs12_bag;
+typedef struct gnutls_pkcs12_int *gnutls_pkcs12_t;
+typedef struct gnutls_pkcs12_bag_int *gnutls_pkcs12_bag_t;
 
-int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12);
-void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12);
-int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
-	gnutls_x509_crt_fmt format, unsigned int flags);
+int gnutls_pkcs12_init(gnutls_pkcs12_t * pkcs12);
+void gnutls_pkcs12_deinit(gnutls_pkcs12_t pkcs12);
+int gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12, const gnutls_datum_t * data,
+	gnutls_x509_crt_fmt_t format, unsigned int flags);
 
-int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12, 
-	int indx, gnutls_pkcs12_bag bag);
+int gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12, 
+	int indx, gnutls_pkcs12_bag_t bag);
 
-int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag);
-void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag);
+int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t * bag);
+void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag_t  bag);
 
 int 
 _pkcs12_string_to_key (unsigned int id, const opaque *salt, unsigned int salt_size, 
 	unsigned int iter, const char *pw,
 	unsigned int req_keylen, opaque *keybuf);
 
-int _gnutls_pkcs7_decrypt_data( const gnutls_datum* data,
-        const char* password, gnutls_datum* dec);
+int _gnutls_pkcs7_decrypt_data( const gnutls_datum_t* data,
+        const char* password, gnutls_datum_t* dec);
 
 typedef enum schema_id {
 	PBES2,			/* the stuff in PKCS #5 */
@@ -72,15 +72,15 @@ typedef enum schema_id {
 	PKCS12_RC2_40_SHA1
 } schema_id;
 
-int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,
+int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum_t * data,
 					      const char *password,
-					      gnutls_datum * enc);
-int _pkcs12_decode_safe_contents( const gnutls_datum* content, gnutls_pkcs12_bag bag);
+					      gnutls_datum_t * enc);
+int _pkcs12_decode_safe_contents( const gnutls_datum_t* content, gnutls_pkcs12_bag_t bag);
 
 int
-_pkcs12_encode_safe_contents( gnutls_pkcs12_bag bag, ASN1_TYPE* content, int *enc);
+_pkcs12_encode_safe_contents( gnutls_pkcs12_bag_t bag, ASN1_TYPE* content, int *enc);
 
-int _pkcs12_decode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* in,
-		gnutls_datum* out);
-int _pkcs12_encode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* raw,
-		gnutls_datum* out);
+int _pkcs12_decode_crt_bag( gnutls_pkcs12_bag_type_t type, const gnutls_datum_t* in,
+		gnutls_datum_t* out);
+int _pkcs12_encode_crt_bag( gnutls_pkcs12_bag_type_t type, const gnutls_datum_t* raw,
+		gnutls_datum_t* out);

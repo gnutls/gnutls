@@ -35,11 +35,11 @@
 #include <gnutls_datum.h>
 #include <gnutls_alert.h>
 
-int _gnutls_gen_srp_server_kx(gnutls_session, opaque **);
-int _gnutls_gen_srp_client_kx(gnutls_session, opaque **);
+int _gnutls_gen_srp_server_kx(gnutls_session_t, opaque **);
+int _gnutls_gen_srp_client_kx(gnutls_session_t, opaque **);
 
-int _gnutls_proc_srp_server_kx(gnutls_session, opaque *, size_t);
-int _gnutls_proc_srp_client_kx(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_server_kx(gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_srp_client_kx(gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st srp_auth_struct = {
     "SRP",
@@ -72,10 +72,10 @@ const mod_auth_st srp_auth_struct = {
  * Returns a proper error code in that case, and 0 when
  * all are ok.
  */
-inline static int check_b_mod_n(GNUTLS_MPI b, GNUTLS_MPI n)
+inline static int check_b_mod_n(mpi_t b, mpi_t n)
 {
     int ret;
-    GNUTLS_MPI r = _gnutls_mpi_alloc_like(b);
+    mpi_t r = _gnutls_mpi_alloc_like(b);
 
     if (r == NULL) {
 	gnutls_assert();
@@ -99,10 +99,10 @@ inline static int check_b_mod_n(GNUTLS_MPI b, GNUTLS_MPI n)
  * Returns a proper error code in that case, and 0 when
  * all are ok.
  */
-inline static int check_a_mod_n(GNUTLS_MPI a, GNUTLS_MPI n)
+inline static int check_a_mod_n(mpi_t a, mpi_t n)
 {
     int ret;
-    GNUTLS_MPI r = _gnutls_mpi_alloc_like(a);
+    mpi_t r = _gnutls_mpi_alloc_like(a);
 
     if (r == NULL) {
 	gnutls_assert();
@@ -126,7 +126,7 @@ inline static int check_a_mod_n(GNUTLS_MPI a, GNUTLS_MPI n)
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
  */
-int _gnutls_gen_srp_server_kx(gnutls_session session, opaque ** data)
+int _gnutls_gen_srp_server_kx(gnutls_session_t session, opaque ** data)
 {
     int ret;
     uint8 *data_n, *data_s;
@@ -238,7 +238,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session session, opaque ** data)
 }
 
 /* return A = g^a % N */
-int _gnutls_gen_srp_client_kx(gnutls_session session, opaque ** data)
+int _gnutls_gen_srp_client_kx(gnutls_session_t session, opaque ** data)
 {
     size_t n_a;
     int ret;
@@ -246,7 +246,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session session, opaque ** data)
     char *username;
     char buf[64];
     char *password;
-    const gnutls_srp_client_credentials cred =
+    const gnutls_srp_client_credentials_t cred =
 	_gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
 
     if (cred == NULL) {
@@ -341,7 +341,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session session, opaque ** data)
 
 
 /* just read A and put it to session */
-int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data,
+int _gnutls_proc_srp_client_kx(gnutls_session_t session, opaque * data,
 			       size_t _data_size)
 {
     size_t _n_A;
@@ -430,10 +430,10 @@ static const unsigned char srp_params_1024[] = {
 
 static const unsigned char srp_generator = 0x02;
 
-const gnutls_datum gnutls_srp_1024_group_prime = {
+const gnutls_datum_t gnutls_srp_1024_group_prime = {
     (void *) srp_params_1024, sizeof(srp_params_1024)
 };
-const gnutls_datum gnutls_srp_1024_group_generator = {
+const gnutls_datum_t gnutls_srp_1024_group_generator = {
     (void *) &srp_generator, sizeof(srp_generator)
 };
 
@@ -462,10 +462,10 @@ static const unsigned char srp_params_1536[] = {
     0x35, 0xF9, 0xBB
 };
 
-const gnutls_datum gnutls_srp_1536_group_prime = {
+const gnutls_datum_t gnutls_srp_1536_group_prime = {
     (void *) srp_params_1536, sizeof(srp_params_1536)
 };
-const gnutls_datum gnutls_srp_1536_group_generator = {
+const gnutls_datum_t gnutls_srp_1536_group_generator = {
     (void *) &srp_generator, sizeof(srp_generator)
 };
 
@@ -501,10 +501,10 @@ static const unsigned char srp_params_2048[] = {
     0x9E, 0x4A, 0xFF, 0x73
 };
 
-const gnutls_datum gnutls_srp_2048_group_prime = {
+const gnutls_datum_t gnutls_srp_2048_group_prime = {
     (void *) srp_params_2048, sizeof(srp_params_2048)
 };
-const gnutls_datum gnutls_srp_2048_group_generator = {
+const gnutls_datum_t gnutls_srp_2048_group_generator = {
     (void *) &srp_generator, sizeof(srp_generator)
 };
 
@@ -539,9 +539,9 @@ static int check_g_n(const opaque * g, size_t n_g,
 /* Check if N is a prime and G a generator of the
  * group.
  */
-static int group_check_g_n(GNUTLS_MPI g, GNUTLS_MPI n)
+static int group_check_g_n(mpi_t g, mpi_t n)
 {
-    GNUTLS_MPI q = NULL, two = NULL, w = NULL;
+    mpi_t q = NULL, two = NULL, w = NULL;
     int ret;
 
     /* N must be of the form N=2q+1
@@ -629,7 +629,7 @@ static int group_check_g_n(GNUTLS_MPI g, GNUTLS_MPI n)
 
 /* receive the key exchange message ( n, g, s, B) 
  */
-int _gnutls_proc_srp_server_kx(gnutls_session session, opaque * data,
+int _gnutls_proc_srp_server_kx(gnutls_session_t session, opaque * data,
 			       size_t _data_size)
 {
     uint8 n_s;
@@ -644,7 +644,7 @@ int _gnutls_proc_srp_server_kx(gnutls_session session, opaque * data,
     char *username, *password;
     ssize_t data_size = _data_size;
 
-    const gnutls_srp_client_credentials cred =
+    const gnutls_srp_client_credentials_t cred =
 	_gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
 
     if (cred == NULL) {

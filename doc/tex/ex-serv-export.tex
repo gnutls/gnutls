@@ -27,19 +27,19 @@
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials cert_cred;
+gnutls_certificate_credentials_t cert_cred;
 
 static void wrap_db_init(void);
 static void wrap_db_deinit(void);
-static int wrap_db_store(void *dbf, gnutls_datum key, gnutls_datum data);
-static gnutls_datum wrap_db_fetch(void *dbf, gnutls_datum key);
-static int wrap_db_delete(void *dbf, gnutls_datum key);
+static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data);
+static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key);
+static int wrap_db_delete(void *dbf, gnutls_datum_t key);
 
 #define TLS_SESSION_CACHE 50
 
-gnutls_session initialize_tls_session()
+gnutls_session_t initialize_tls_session()
 {
-   gnutls_session session;
+   gnutls_session_t session;
 
    gnutls_init(&session, GNUTLS_SERVER);
 
@@ -65,11 +65,11 @@ gnutls_session initialize_tls_session()
    return session;
 }
 
-gnutls_dh_params dh_params;
+gnutls_dh_params_t dh_params;
 /* Export-grade cipher suites require temporary RSA
  * keys.
  */
-gnutls_rsa_params rsa_params;
+gnutls_rsa_params_t rsa_params;
 
 int generate_dh_params(void)
 {
@@ -107,7 +107,7 @@ int main()
    struct sockaddr_in sa_cli;
    int client_len;
    char topbuf[512];
-   gnutls_session session;
+   gnutls_session_t session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
    char name[256];
@@ -168,7 +168,7 @@ int main()
              inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-      gnutls_transport_set_ptr(session, (gnutls_transport_ptr)sd);
+      gnutls_transport_set_ptr(session, (gnutls_transport_ptr_t)sd);
       ret = gnutls_handshake(session);
       if (ret < 0) {
          close(sd);
@@ -251,7 +251,7 @@ static void wrap_db_deinit(void)
    return;
 }
 
-static int wrap_db_store(void *dbf, gnutls_datum key, gnutls_datum data)
+static int wrap_db_store(void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
 
    if (cache_db == NULL)
@@ -274,9 +274,9 @@ static int wrap_db_store(void *dbf, gnutls_datum key, gnutls_datum data)
    return 0;
 }
 
-static gnutls_datum wrap_db_fetch(void *dbf, gnutls_datum key)
+static gnutls_datum_t wrap_db_fetch(void *dbf, gnutls_datum_t key)
 {
-   gnutls_datum res = { NULL, 0 };
+   gnutls_datum_t res = { NULL, 0 };
    int i;
 
    if (cache_db == NULL)
@@ -301,7 +301,7 @@ static gnutls_datum wrap_db_fetch(void *dbf, gnutls_datum key)
    return res;
 }
 
-static int wrap_db_delete(void *dbf, gnutls_datum key)
+static int wrap_db_delete(void *dbf, gnutls_datum_t key)
 {
    int i;
 

@@ -35,7 +35,7 @@
  */
 
 /**
-  * gnutls_openpgp_keyring_init - This function initializes a gnutls_openpgp_keyring structure
+  * gnutls_openpgp_keyring_init - This function initializes a gnutls_openpgp_keyring_t structure
   * @keyring: The structure to be initialized
   *
   * This function will initialize an OpenPGP keyring structure. 
@@ -43,7 +43,7 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring * keyring)
+int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring_t * keyring)
 {
     *keyring = gnutls_calloc(1, sizeof(gnutls_openpgp_keyring_int));
 
@@ -54,13 +54,13 @@ int gnutls_openpgp_keyring_init(gnutls_openpgp_keyring * keyring)
 }
 
 /**
-  * gnutls_openpgp_keyring_deinit - This function deinitializes memory used by a gnutls_openpgp_keyring structure
+  * gnutls_openpgp_keyring_deinit - This function deinitializes memory used by a gnutls_openpgp_keyring_t structure
   * @keyring: The structure to be initialized
   *
   * This function will deinitialize a CRL structure. 
   *
   **/
-void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring keyring)
+void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring_t keyring)
 {
     if (!keyring)
 	return;
@@ -84,7 +84,7 @@ void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring keyring)
  * Returns 0 on success (if keyid exists) and a negative error code
  * on failure.
  */
-int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring ring, 
+int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring_t ring, 
     const unsigned char keyid[8], unsigned int flags)
 {
 int rc;
@@ -108,14 +108,14 @@ uint32 id[2];
   * @format: One of gnutls_openpgp_keyring_fmt elements.
   *
   * This function will convert the given RAW or Base64 encoded keyring
-  * to the native gnutls_openpgp_keyring format. The output will be stored in 'keyring'.
+  * to the native gnutls_openpgp_keyring_t format. The output will be stored in 'keyring'.
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring keyring,
-				  const gnutls_datum * data,
-				  gnutls_openpgp_key_fmt format)
+int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring_t keyring,
+				  const gnutls_datum_t * data,
+				  gnutls_openpgp_key_fmt_t format)
 {
     int rc;
     keybox_blob *blob = NULL;
@@ -146,7 +146,7 @@ int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring keyring,
  */
 
 /**
-  * gnutls_openpgp_trustdb_init - This function initializes a gnutls_openpgp_trustdb structure
+  * gnutls_openpgp_trustdb_init - This function initializes a gnutls_openpgp_trustdb_t structure
   * @trustdb: The structure to be initialized
   *
   * This function will initialize an OpenPGP trustdb structure. 
@@ -154,7 +154,7 @@ int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring keyring,
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb * trustdb)
+int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb_t * trustdb)
 {
     *trustdb = gnutls_calloc(1, sizeof(gnutls_openpgp_trustdb_int));
 
@@ -165,13 +165,13 @@ int gnutls_openpgp_trustdb_init(gnutls_openpgp_trustdb * trustdb)
 }
 
 /**
-  * gnutls_openpgp_trustdb_deinit - This function deinitializes memory used by a gnutls_openpgp_trustdb structure
+  * gnutls_openpgp_trustdb_deinit - This function deinitializes memory used by a gnutls_openpgp_trustdb_t structure
   * @trustdb: The structure to be initialized
   *
   * This function will deinitialize a CRL structure. 
   *
   **/
-void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb trustdb)
+void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb_t trustdb)
 {
     if (!trustdb)
 	return;
@@ -190,12 +190,12 @@ void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb trustdb)
   * @file: The file that holds the trustdb.
   *
   * This function will convert the given RAW or Base64 encoded trustdb
-  * to the native gnutls_openpgp_trustdb format. The output will be stored in 'trustdb'.
+  * to the native gnutls_openpgp_trustdb_t format. The output will be stored in 'trustdb'.
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb trustdb,
+int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb_t trustdb,
 				       const char *file)
 {
     int rc;

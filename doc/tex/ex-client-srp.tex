@@ -7,7 +7,7 @@
 
 /* Those functions are defined in other examples.
  */
-extern void check_alert(gnutls_session session, int ret);
+extern void check_alert(gnutls_session_t session, int ret);
 extern int tcp_connect( void);
 extern void tcp_close( int sd);
 
@@ -25,10 +25,10 @@ int main()
 {
    int ret;
    int sd, ii;
-   gnutls_session session;
+   gnutls_session_t session;
    char buffer[MAX_BUF + 1];
-   gnutls_srp_client_credentials srp_cred;
-   gnutls_certificate_client_credentials cert_cred;
+   gnutls_srp_client_credentials_t srp_cred;
+   gnutls_certificate_client_credentials_t cert_cred;
 
    gnutls_global_init();
 
@@ -63,7 +63,7 @@ int main()
    gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
-   gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
+   gnutls_transport_set_ptr( session, (gnutls_transport_ptr_t)sd);
 
    /* Perform the TLS handshake
     */

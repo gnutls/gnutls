@@ -40,9 +40,9 @@
 
 
 
-static void release_mpi_array(GNUTLS_MPI * arr, size_t n)
+static void release_mpi_array(mpi_t * arr, size_t n)
 {
-    GNUTLS_MPI x;
+    mpi_t x;
 
     while (arr && n--) {
 	x = *arr;
@@ -152,7 +152,7 @@ cdk_keydb_hd_t kbx_to_keydb(keybox_blob * blob)
 
 
 /* Extract a keybox blob from the given position. */
-keybox_blob *kbx_read_blob(const gnutls_datum * keyring, size_t pos)
+keybox_blob *kbx_read_blob(const gnutls_datum_t * keyring, size_t pos)
 {
     keybox_blob *blob = NULL;
     int rc;
@@ -219,7 +219,7 @@ static uint8 *kbx_data_to_keyring(int type, int enc, const char *data,
 }
 
 
-cdk_packet_t search_packet(const gnutls_datum * buf, int pkttype)
+cdk_packet_t search_packet(const gnutls_datum_t * buf, int pkttype)
 {
     static cdk_kbnode_t knode = NULL;
     cdk_packet_t pkt;
@@ -293,7 +293,7 @@ openpgp_pk_to_gnutls_cert(gnutls_cert * cert, cdk_pkt_pubkey_t pk)
  -*/
 int
 _gnutls_openpgp_raw_privkey_to_gkey(gnutls_privkey * pkey,
-				    const gnutls_datum * raw_key)
+				    const gnutls_datum_t * raw_key)
 {
     cdk_kbnode_t snode;
     cdk_packet_t pkt;
@@ -376,7 +376,7 @@ _gnutls_openpgp_raw_privkey_to_gkey(gnutls_privkey * pkey,
  -*/
 int
 _gnutls_openpgp_raw_key_to_gcert(gnutls_cert * cert,
-				 const gnutls_datum * raw)
+				 const gnutls_datum_t * raw)
 {
     cdk_kbnode_t knode = NULL;
     cdk_packet_t pkt = NULL;
@@ -417,7 +417,7 @@ _gnutls_openpgp_raw_key_to_gcert(gnutls_cert * cert,
  * from a binary or a file keyring.
  -*/
 int
-gnutls_openpgp_get_key(gnutls_datum * key, const gnutls_datum * keyring,
+gnutls_openpgp_get_key(gnutls_datum_t * key, const gnutls_datum_t * keyring,
 		       key_attr_t by, opaque * pattern)
 {
     keybox_blob *blob = NULL;
@@ -480,7 +480,7 @@ gnutls_openpgp_get_key(gnutls_datum * key, const gnutls_datum * keyring,
     return rc;
 }
 
-static int stream_to_datum(cdk_stream_t inp, gnutls_datum * raw)
+static int stream_to_datum(cdk_stream_t inp, gnutls_datum_t * raw)
 {
     uint8 buf[4096];
     int rc = 0, nread, nbytes = 0;
@@ -518,11 +518,11 @@ static int stream_to_datum(cdk_stream_t inp, gnutls_datum * raw)
  * should only contain one key which should not be encrypted.
  **/
 int
-gnutls_certificate_set_openpgp_key_mem(gnutls_certificate_credentials res,
-				       const gnutls_datum * cert,
-				       const gnutls_datum * key)
+gnutls_certificate_set_openpgp_key_mem(gnutls_certificate_credentials_t res,
+				       const gnutls_datum_t * cert,
+				       const gnutls_datum_t * key)
 {
-    gnutls_datum raw;
+    gnutls_datum_t raw;
     cdk_kbnode_t knode = NULL, ctx = NULL, p;
     cdk_packet_t pkt;
     int i = 0;
@@ -658,13 +658,13 @@ gnutls_certificate_set_openpgp_key_mem(gnutls_certificate_credentials res,
  * should only contain one key which should not be encrypted.
  **/
 int
-gnutls_certificate_set_openpgp_key_file(gnutls_certificate_credentials res,
+gnutls_certificate_set_openpgp_key_file(gnutls_certificate_credentials_t res,
 					const char *certfile,
 					const char *keyfile)
 {
     struct stat statbuf;
     int rc = 0;
-    gnutls_datum key, cert;
+    gnutls_datum_t key, cert;
     strfile xcert, xkey;
 
     if (!res || !keyfile || !certfile) {
@@ -710,7 +710,7 @@ gnutls_certificate_set_openpgp_key_file(gnutls_certificate_credentials res,
 }
 
 
-int gnutls_openpgp_count_key_names(const gnutls_datum * cert)
+int gnutls_openpgp_count_key_names(const gnutls_datum_t * cert)
 {
     cdk_kbnode_t knode, p, ctx = NULL;
     cdk_packet_t pkt;
@@ -747,7 +747,7 @@ int gnutls_openpgp_count_key_names(const gnutls_datum * cert)
  * is needed for an operations.
  -*/
 int
-gnutls_openpgp_add_keyring_file(gnutls_datum * keyring, const char *name)
+gnutls_openpgp_add_keyring_file(gnutls_datum_t * keyring, const char *name)
 {
     cdk_stream_t inp = NULL;
     uint8 *blob;
@@ -789,7 +789,7 @@ gnutls_openpgp_add_keyring_file(gnutls_datum * keyring, const char *name)
  * data instead of the filename.
  -*/
 int
-gnutls_openpgp_add_keyring_mem(gnutls_datum * keyring,
+gnutls_openpgp_add_keyring_mem(gnutls_datum_t * keyring,
 			       const void *data, size_t len)
 {
     uint8 *blob;
@@ -824,7 +824,7 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum * keyring,
  *
  **/
 int
-gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials
+gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials_t
 					    c, const char *file)
 {
     struct stat statbuf;
@@ -842,7 +842,7 @@ gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials
 
 
 int
-gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials
+gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials_t
 					   c, const opaque * data,
 					   size_t dlen)
 {
@@ -885,8 +885,8 @@ gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials
 
 /*-
  * _gnutls_openpgp_request_key - Receives a key from a database, key server etc
- * @ret - a pointer to gnutls_datum structure.
- * @cred - a gnutls_certificate_credentials structure.
+ * @ret - a pointer to gnutls_datum_t structure.
+ * @cred - a gnutls_certificate_credentials_t structure.
  * @key_fingerprint - The keyFingerprint
  * @key_fingerprint_size - the size of the fingerprint
  *
@@ -895,8 +895,8 @@ gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials
  *
  -*/
 int
-_gnutls_openpgp_request_key(gnutls_session session, gnutls_datum * ret,
-			    const gnutls_certificate_credentials cred,
+_gnutls_openpgp_request_key(gnutls_session_t session, gnutls_datum_t * ret,
+			    const gnutls_certificate_credentials_t cred,
 			    opaque * key_fpr, int key_fpr_size)
 {
     int rc = 0;
@@ -945,7 +945,7 @@ _gnutls_openpgp_request_key(gnutls_session session, gnutls_datum * ret,
  *
  **/
 int
-gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials
+gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials_t
 					 res, const char *keyserver,
 					 int port)
 {
@@ -977,7 +977,7 @@ gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials
  *
  **/
 int
-gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials res,
+gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials_t res,
 				       const char *trustdb)
 {
     if (!res || !trustdb) {
@@ -1006,17 +1006,17 @@ gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials res,
  * sent a key fingerprint instead of a full key.
  *
  **/
-void gnutls_openpgp_set_recv_key_function(gnutls_session session,
+void gnutls_openpgp_set_recv_key_function(gnutls_session_t session,
 					  gnutls_openpgp_recv_key_func
 					  func)
 {
     session->internals.openpgp_recv_key_func = func;
 }
 
-/* Copies a gnutls_openpgp_privkey to a gnutls_privkey structure.
+/* Copies a gnutls_openpgp_privkey_t to a gnutls_privkey structure.
  */
 int _gnutls_openpgp_privkey_to_gkey(gnutls_privkey * dest,
-				    gnutls_openpgp_privkey src)
+				    gnutls_openpgp_privkey_t src)
 {
     int i, ret;
 
@@ -1043,15 +1043,15 @@ int _gnutls_openpgp_privkey_to_gkey(gnutls_privkey * dest,
     return ret;
 }
 
-/* Converts a parsed gnutls_openpgp_key to a gnutls_cert structure.
+/* Converts a parsed gnutls_openpgp_key_t to a gnutls_cert structure.
  */
 int _gnutls_openpgp_key_to_gcert(gnutls_cert * gcert,
-				 gnutls_openpgp_key cert)
+				 gnutls_openpgp_key_t cert)
 {
     int ret = 0;
     opaque *der;
     size_t der_size = 0;
-    gnutls_datum raw;
+    gnutls_datum_t raw;
 
     memset(gcert, 0, sizeof(gnutls_cert));
     gcert->cert_type = GNUTLS_CRT_OPENPGP;
@@ -1092,20 +1092,20 @@ int _gnutls_openpgp_key_to_gcert(gnutls_cert * gcert,
 }
 
 /**
-  * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @key: contains an openpgp public key
   * @pkey: is an openpgp private key
   *
   * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials structure. This function may be called
+  * gnutls_certificate_credentials_t structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
   **/
-int gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials res,
-				       gnutls_openpgp_key key,
-				       gnutls_openpgp_privkey pkey)
+int gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials_t res,
+				       gnutls_openpgp_key_t key,
+				       gnutls_openpgp_privkey_t pkey)
 {
     int ret;
 

@@ -32,7 +32,7 @@
 
 /* returns the prime and the generator of DH params.
  */
-const mpi_t *_gnutls_get_dh_params(gnutls_dh_params dh_primes)
+const mpi_t *_gnutls_get_dh_params(gnutls_dh_params_t dh_primes)
 {
     if (dh_primes == NULL || dh_primes->params[1] == NULL ||
 	dh_primes->params[0] == NULL) {
@@ -138,9 +138,9 @@ int _gnutls_dh_generate_prime(mpi_t * ret_g, mpi_t * ret_n,
   * appropriate gnutls_datum. 
   * 
   **/
-int gnutls_dh_params_import_raw(gnutls_dh_params dh_params,
-				const gnutls_datum * prime,
-				const gnutls_datum * generator)
+int gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
+				const gnutls_datum_t * prime,
+				const gnutls_datum_t * generator)
 {
     mpi_t tmp_prime, tmp_g;
     size_t siz;
@@ -174,7 +174,7 @@ int gnutls_dh_params_import_raw(gnutls_dh_params dh_params,
   * This function will initialize the DH parameters structure.
   *
   **/
-int gnutls_dh_params_init(gnutls_dh_params * dh_params)
+int gnutls_dh_params_init(gnutls_dh_params_t * dh_params)
 {
 
     (*dh_params) = gnutls_calloc(1, sizeof(dh_params_st));
@@ -194,7 +194,7 @@ int gnutls_dh_params_init(gnutls_dh_params * dh_params)
   * This function will deinitialize the DH parameters structure.
   *
   **/
-void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
+void gnutls_dh_params_deinit(gnutls_dh_params_t dh_params)
 {
     if (dh_params == NULL)
 	return;
@@ -215,7 +215,7 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
   * to destination.
   *
   **/
-int gnutls_dh_params_cpy(gnutls_dh_params dst, gnutls_dh_params src)
+int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
 {
     if (src == NULL)
 	return GNUTLS_E_INVALID_REQUEST;
@@ -246,7 +246,7 @@ int gnutls_dh_params_cpy(gnutls_dh_params dst, gnutls_dh_params src)
   * no use to call this in client side.
   *
   **/
-int gnutls_dh_params_generate2(gnutls_dh_params params, unsigned int bits)
+int gnutls_dh_params_generate2(gnutls_dh_params_t params, unsigned int bits)
 {
     int ret;
 
@@ -276,13 +276,13 @@ int gnutls_dh_params_generate2(gnutls_dh_params params, unsigned int bits)
   * 0 on success.
   *
   **/
-int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
-				  const gnutls_datum * pkcs3_params,
-				  gnutls_x509_crt_fmt format)
+int gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
+				  const gnutls_datum_t * pkcs3_params,
+				  gnutls_x509_crt_fmt_t format)
 {
     ASN1_TYPE c2;
     int result, need_free = 0;
-    gnutls_datum _params;
+    gnutls_datum_t _params;
 
     if (format == GNUTLS_X509_FMT_PEM) {
 	opaque *out;
@@ -378,8 +378,8 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
   * 0 on success.
   *
   **/
-int gnutls_dh_params_export_pkcs3(gnutls_dh_params params,
-				  gnutls_x509_crt_fmt format,
+int gnutls_dh_params_export_pkcs3(gnutls_dh_params_t params,
+				  gnutls_x509_crt_fmt_t format,
 				  unsigned char *params_data,
 				  size_t * params_data_size)
 {
@@ -534,10 +534,8 @@ int gnutls_dh_params_export_pkcs3(gnutls_dh_params params,
   * gnutls_malloc() and will be stored in the appropriate datum.
   * 
   **/
-int gnutls_dh_params_export_raw(gnutls_dh_params params,
-				gnutls_datum * prime,
-				gnutls_datum * generator,
-				unsigned int *bits)
+int gnutls_dh_params_export_raw(gnutls_dh_params_t params,
+    gnutls_datum_t * prime, gnutls_datum_t * generator, unsigned int *bits)
 {
 
     size_t size;

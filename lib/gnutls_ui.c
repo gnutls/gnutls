@@ -37,7 +37,7 @@
 
 /**
   * gnutls_dh_set_prime_bits - Used to set the bits for a DH ciphersuite
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @bits: is the number of bits
   *
   * This function sets the number of bits, for use in an 
@@ -51,7 +51,7 @@
   * handshake.
   *
   **/
-void gnutls_dh_set_prime_bits(gnutls_session session, unsigned int bits)
+void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
 {
     session->internals.dh_prime_bits = bits;
 }
@@ -71,8 +71,8 @@ void gnutls_dh_set_prime_bits(gnutls_session session, unsigned int bits)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_group(gnutls_session session,
-			gnutls_datum * raw_gen, gnutls_datum * raw_prime)
+int gnutls_dh_get_group(gnutls_session_t session,
+			gnutls_datum_t * raw_gen, gnutls_datum_t * raw_prime)
 {
     dh_info_t *dh;
     int ret;
@@ -125,7 +125,7 @@ int gnutls_dh_get_group(gnutls_session session,
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_pubkey(gnutls_session session, gnutls_datum * raw_key)
+int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 {
     dh_info_t *dh;
     anon_server_auth_info_t anon_info;
@@ -167,8 +167,8 @@ int gnutls_dh_get_pubkey(gnutls_session session, gnutls_datum * raw_key)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_rsa_export_get_pubkey(gnutls_session session,
-				 gnutls_datum * exp, gnutls_datum * mod)
+int gnutls_rsa_export_get_pubkey(gnutls_session_t session,
+				 gnutls_datum_t * exp, gnutls_datum_t * mod)
 {
     cert_auth_info_t info;
     int ret;
@@ -209,7 +209,7 @@ int gnutls_rsa_export_get_pubkey(gnutls_session session,
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_secret_bits(gnutls_session session)
+int gnutls_dh_get_secret_bits(gnutls_session_t session)
 {
     switch (gnutls_auth_get_type(session)) {
     case GNUTLS_CRD_ANON:{
@@ -245,7 +245,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_prime_bits(gnutls_session session)
+int gnutls_dh_get_prime_bits(gnutls_session_t session)
 {
     dh_info_t *dh;
 
@@ -287,7 +287,7 @@ int gnutls_dh_get_prime_bits(gnutls_session session)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_rsa_export_get_modulus_bits(gnutls_session session)
+int gnutls_rsa_export_get_modulus_bits(gnutls_session_t session)
 {
     cert_auth_info_t info;
 
@@ -307,7 +307,7 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session session)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_peers_public_bits(gnutls_session session)
+int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 {
     dh_info_t *dh;
 
@@ -354,9 +354,9 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
   * Returns NULL in case of an error, or if no certificate was used.
   *
   **/
-const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
+const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
 {
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
 
     CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
@@ -389,7 +389,7 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/
-const gnutls_datum *gnutls_certificate_get_peers(gnutls_session session,
+const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t session,
 						 unsigned int *list_size)
 {
     cert_auth_info_t info;
@@ -414,7 +414,7 @@ const gnutls_datum *gnutls_certificate_get_peers(gnutls_session session,
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_certificate_client_get_request_status(gnutls_session session)
+int gnutls_certificate_client_get_request_status(gnutls_session_t session)
 {
     cert_auth_info_t info;
 
@@ -446,8 +446,8 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_fingerprint(gnutls_digest_algorithm algo,
-		       const gnutls_datum * data, void *result,
+int gnutls_fingerprint(gnutls_digest_algorithm_t algo,
+		       const gnutls_datum_t * data, void *result,
 		       size_t * result_size)
 {
     GNUTLS_HASH_HANDLE td;
@@ -474,7 +474,7 @@ int gnutls_fingerprint(gnutls_digest_algorithm algo,
 
 /**
   * gnutls_anon_set_server_dh_params - This function will set the DH parameters for a server to use
-  * @res: is a gnutls_anon_server_credentials structure
+  * @res: is a gnutls_anon_server_credentials_t structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
   * This function will set the diffie hellman parameters for an anonymous
@@ -482,15 +482,15 @@ int gnutls_fingerprint(gnutls_digest_algorithm algo,
   * cipher suites.
   *
   **/
-void gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials res,
-				      gnutls_dh_params dh_params)
+void gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials_t res,
+				      gnutls_dh_params_t dh_params)
 {
     res->dh_params = dh_params;
 }
 
 /**
   * gnutls_certificate_set_dh_params - This function will set the DH parameters for a server to use
-  * @res: is a gnutls_certificate_credentials structure
+  * @res: is a gnutls_certificate_credentials_t structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
   * This function will set the diffie hellman parameters for a certificate
@@ -498,15 +498,15 @@ void gnutls_anon_set_server_dh_params(gnutls_anon_server_credentials res,
   * cipher suites.
   *
   **/
-void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res,
-				      gnutls_dh_params dh_params)
+void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
+				      gnutls_dh_params_t dh_params)
 {
     res->dh_params = dh_params;
 }
 
 /**
   * gnutls_certificate_set_params_function - This function will set the DH or RSA parameters callback
-  * @res: is a gnutls_certificate_credentials structure
+  * @res: is a gnutls_certificate_credentials_t structure
   * @func: is the function to be called
   *
   * This function will set a callback in order for the server to get the 
@@ -514,7 +514,7 @@ void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res,
   * should return zero on success.
   *
   **/
-void gnutls_certificate_set_params_function(gnutls_certificate_credentials
+void gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
 					    res,
 					    gnutls_params_function * func)
 {
@@ -523,7 +523,7 @@ void gnutls_certificate_set_params_function(gnutls_certificate_credentials
 
 /**
   * gnutls_anon_set_params_function - This function will set the DH parameters callback
-  * @res: is a gnutls_certificate_credentials structure
+  * @res: is a gnutls_certificate_credentials_t structure
   * @func: is the function to be called
   *
   * This function will set a callback in order for the server to get the 
@@ -531,7 +531,7 @@ void gnutls_certificate_set_params_function(gnutls_certificate_credentials
   * return zero on success.
   *
   **/
-void gnutls_anon_set_params_function(gnutls_anon_server_credentials res,
+void gnutls_anon_set_params_function(gnutls_anon_server_credentials_t res,
 				     gnutls_params_function * func)
 {
     res->params_func = func;
@@ -540,14 +540,14 @@ void gnutls_anon_set_params_function(gnutls_anon_server_credentials res,
 
 /**
   * gnutls_certificate_set_verify_flags - This function will set the flags to be used at certificate verification
-  * @res: is a gnutls_certificate_credentials structure
+  * @res: is a gnutls_certificate_credentials_t structure
   * @flags: are the flagsis a structure that holds diffie hellman parameters.
   *
   * This function will set the flags to be used at verification of the certificates.
   * Flags must be OR of the gnutls_certificate_verify_flags enumerations.
   *
   **/
-void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials
+void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
 					 res, unsigned int flags)
 {
     res->verify_flags = flags;
@@ -555,7 +555,7 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials
 
 /**
   * gnutls_certificate_set_rsa_export_params - This function will set the RSA parameters for a server to use
-  * @res: is a gnutls_certificate_credentials structure
+  * @res: is a gnutls_certificate_credentials_t structure
   * @rsa_params: is a structure that holds temporary RSA parameters.
   *
   * This function will set the temporary RSA parameters for a certificate
@@ -564,8 +564,8 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials
   *
   **/
 void
-gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials
-					 res, gnutls_rsa_params rsa_params)
+gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t
+					 res, gnutls_rsa_params_t rsa_params)
 {
     res->rsa_params = rsa_params;
 }

@@ -41,9 +41,9 @@
  * If the extension does not exist, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
  * be returned.
  */
-int _gnutls_x509_crt_get_extension(gnutls_x509_crt cert,
+int _gnutls_x509_crt_get_extension(gnutls_x509_crt_t cert,
 				   const char *extension_id, int indx,
-				   gnutls_datum * ret,
+				   gnutls_datum_t * ret,
 				   unsigned int *_critical)
 {
     int k, result, len;
@@ -52,7 +52,7 @@ int _gnutls_x509_crt_get_extension(gnutls_x509_crt cert,
     char str_critical[10];
     int critical = 0;
     char extnID[128];
-    gnutls_datum value;
+    gnutls_datum_t value;
     int indx_counter = 0;
 
     ret->data = NULL;
@@ -160,7 +160,7 @@ int _gnutls_x509_crt_get_extension(gnutls_x509_crt cert,
  * If you have passed the last extension, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
  * be returned.
  */
-int _gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert,
+int _gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert,
 				       int indx, void *oid,
 				       size_t * sizeof_oid)
 {
@@ -239,7 +239,7 @@ int _gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert,
  * Critical will be either 0 or 1.
  */
 static int set_extension(ASN1_TYPE asn, const char *extension_id,
-			 const gnutls_datum * ext_data,
+			 const gnutls_datum_t * ext_data,
 			 unsigned int critical)
 {
     int result;
@@ -291,7 +291,7 @@ static int set_extension(ASN1_TYPE asn, const char *extension_id,
  * index here starts from one.
  */
 static int overwrite_extension(ASN1_TYPE asn, unsigned int indx,
-			       const gnutls_datum * ext_data,
+			       const gnutls_datum_t * ext_data,
 			       unsigned int critical)
 {
     char name[128], name2[128], counter[MAX_INT_DIGITS];
@@ -333,9 +333,9 @@ static int overwrite_extension(ASN1_TYPE asn, unsigned int indx,
  *
  * Critical will be either 0 or 1.
  */
-int _gnutls_x509_crt_set_extension(gnutls_x509_crt cert,
+int _gnutls_x509_crt_set_extension(gnutls_x509_crt_t cert,
 				   const char *ext_id,
-				   const gnutls_datum * ext_data,
+				   const gnutls_datum_t * ext_data,
 				   unsigned int critical)
 {
     int result;
@@ -495,7 +495,7 @@ int _gnutls_x509_ext_extract_basicConstraints(int *CA, opaque * extnValue,
 /* generate the basicConstraints in a DER encoded extension
  * Use 0 or 1 (TRUE) for CA.
  */
-int _gnutls_x509_ext_gen_basicConstraints(int CA, gnutls_datum * der_ext)
+int _gnutls_x509_ext_gen_basicConstraints(int CA, gnutls_datum_t * der_ext)
 {
     ASN1_TYPE ext = ASN1_TYPE_EMPTY;
     const char *str;
@@ -538,7 +538,7 @@ int _gnutls_x509_ext_gen_basicConstraints(int CA, gnutls_datum * der_ext)
 /* generate the keyUsage in a DER encoded extension
  * Use an ORed SEQUENCE of GNUTLS_KEY_* for usage.
  */
-int _gnutls_x509_ext_gen_keyUsage(uint16 usage, gnutls_datum * der_ext)
+int _gnutls_x509_ext_gen_keyUsage(uint16 usage, gnutls_datum_t * der_ext)
 {
     ASN1_TYPE ext = ASN1_TYPE_EMPTY;
     int result;
@@ -574,7 +574,7 @@ int _gnutls_x509_ext_gen_keyUsage(uint16 usage, gnutls_datum * der_ext)
 }
 
 static int write_new_general_name(ASN1_TYPE ext, const char *ext_name,
-				  gnutls_x509_subject_alt_name type,
+				  gnutls_x509_subject_alt_name_t type,
 				  const char *data_string)
 {
     const char *str;
@@ -634,9 +634,9 @@ static int write_new_general_name(ASN1_TYPE ext, const char *ext_name,
 /* Convert the given name to GeneralNames in a DER encoded extension.
  * This is the same as subject alternative name.
  */
-int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name
+int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name_t
 					  type, const char *data_string,
-					  gnutls_datum * der_ext)
+					  gnutls_datum_t * der_ext)
 {
     ASN1_TYPE ext = ASN1_TYPE_EMPTY;
     int result;
@@ -671,7 +671,7 @@ int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name
 /* generate the SubjectKeyID in a DER encoded extension
  */
 int _gnutls_x509_ext_gen_key_id(const void *id, size_t id_size,
-				gnutls_datum * der_ext)
+				gnutls_datum_t * der_ext)
 {
     ASN1_TYPE ext = ASN1_TYPE_EMPTY;
     int result;
@@ -706,7 +706,7 @@ int _gnutls_x509_ext_gen_key_id(const void *id, size_t id_size,
 /* generate the AuthorityKeyID in a DER encoded extension
  */
 int _gnutls_x509_ext_gen_auth_key_id(const void *id, size_t id_size,
-				     gnutls_datum * der_ext)
+				     gnutls_datum_t * der_ext)
 {
     ASN1_TYPE ext = ASN1_TYPE_EMPTY;
     int result;
@@ -747,13 +747,12 @@ int _gnutls_x509_ext_gen_auth_key_id(const void *id, size_t id_size,
  * reason_flags should be an or'ed sequence of GNUTLS_CRL_REASON_*.
  *
  */
-int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name type,
-					 const void *data_string,
-					 unsigned int reason_flags,
-					 gnutls_datum * der_ext)
+int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name_t type,
+    const void *data_string, unsigned int reason_flags,
+    gnutls_datum_t * der_ext)
 {
     ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-    gnutls_datum gnames = { NULL, 0 };
+    gnutls_datum_t gnames = { NULL, 0 };
     int result;
     uint8 reasons[2];
 

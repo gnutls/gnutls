@@ -118,7 +118,7 @@ gnutls_dh_params dh_params;
  * or RSA parameters. The parameters returned (if any) will
  * be used for the first handshake only.
  */
-static int get_params( gnutls_session session, gnutls_params_type type,
+static int get_params( gnutls_session session, gnutls_params_type_t type,
         gnutls_params_st *st)
 {
    if (type == GNUTLS_PARAMS_RSA_EXPORT)
@@ -137,7 +137,7 @@ static int get_params( gnutls_session session, gnutls_params_type type,
 
 int main()
 {
-   gnutls_certificate_credentials cert_cred;
+   gnutls_certificate_credentials_t cert_cred;
 
    initialize_params();
 

@@ -4,11 +4,11 @@
 #include <gnutls_auth.h>
 
 
-typedef int gnutls_srp_server_credentials_function(gnutls_session,
-   const char *username, gnutls_datum * salt, gnutls_datum * verifier,
-   gnutls_datum * generator, gnutls_datum * prime);
+typedef int gnutls_srp_server_credentials_function(gnutls_session_t,
+   const char *username, gnutls_datum_t * salt, gnutls_datum_t * verifier,
+   gnutls_datum_t * generator, gnutls_datum_t * prime);
 
-typedef int gnutls_srp_client_credentials_function(gnutls_session,
+typedef int gnutls_srp_client_credentials_function(gnutls_session_t,
    unsigned int times, char **username, char** password);
 
 
@@ -18,7 +18,7 @@ typedef struct {
    gnutls_srp_client_credentials_function *get_function;
 } srp_client_credentials_st;
 
-#define gnutls_srp_client_credentials srp_client_credentials_st*
+#define gnutls_srp_client_credentials_t srp_client_credentials_st*
 
 typedef struct {
    char *password_file;
@@ -29,7 +29,7 @@ typedef struct {
    gnutls_srp_server_credentials_function *pwd_callback;
 } srp_server_cred_st;
 
-#define gnutls_srp_server_credentials srp_server_cred_st*
+#define gnutls_srp_server_credentials_t srp_server_cred_st*
 
 /* these structures should not use allocated data */
 typedef struct srp_server_auth_info_st {
@@ -38,16 +38,16 @@ typedef struct srp_server_auth_info_st {
 
 #ifdef ENABLE_SRP
 
-int _gnutls_proc_srp_server_hello(gnutls_session state,
+int _gnutls_proc_srp_server_hello(gnutls_session_t state,
 				  const opaque * data, size_t data_size);
-int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data,
+int _gnutls_gen_srp_server_hello(gnutls_session_t state, opaque * data,
 				 size_t data_size);
 
-int _gnutls_gen_srp_server_kx(gnutls_session, opaque **);
-int _gnutls_gen_srp_client_kx(gnutls_session, opaque **);
+int _gnutls_gen_srp_server_kx(gnutls_session_t, opaque **);
+int _gnutls_gen_srp_client_kx(gnutls_session_t, opaque **);
 
-int _gnutls_proc_srp_server_kx(gnutls_session, opaque *, size_t);
-int _gnutls_proc_srp_client_kx(gnutls_session, opaque *, size_t);
+int _gnutls_proc_srp_server_kx(gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_srp_client_kx(gnutls_session_t, opaque *, size_t);
 
 typedef struct srp_server_auth_info_st srp_server_auth_info_st;
 

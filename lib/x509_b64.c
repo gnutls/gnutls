@@ -284,7 +284,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data,
   * the terminating null.
   * 
   **/
-int gnutls_pem_base64_encode(const char *msg, const gnutls_datum * data,
+int gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
 			     char *result, size_t * result_size)
 {
     opaque *ret;
@@ -321,8 +321,8 @@ int gnutls_pem_base64_encode(const char *msg, const gnutls_datum * data,
   * 
   **/
 int gnutls_pem_base64_encode_alloc(const char *msg,
-				   const gnutls_datum * data,
-				   gnutls_datum * result)
+				   const gnutls_datum_t * data,
+				   gnutls_datum_t * result)
 {
     opaque *ret;
     int size;
@@ -499,7 +499,7 @@ int _gnutls_fbase64_decode(const char *header, const opaque * data,
   * or 0 on success.
   **/
 int gnutls_pem_base64_decode(const char *header,
-			     const gnutls_datum * b64_data,
+			     const gnutls_datum_t * b64_data,
 			     unsigned char *result, size_t * result_size)
 {
     opaque *ret;
@@ -540,8 +540,8 @@ int gnutls_pem_base64_decode(const char *header,
   *
   **/
 int gnutls_pem_base64_decode_alloc(const char *header,
-				   const gnutls_datum * b64_data,
-				   gnutls_datum * result)
+				   const gnutls_datum_t * b64_data,
+				   gnutls_datum_t * result)
 {
     opaque *ret;
     int size;

@@ -28,7 +28,7 @@
 #ifdef DEBUG
 
 
-void _gnutls_print_state(gnutls_session session)
+void _gnutls_print_state(gnutls_session_t session)
 {
 
     _gnutls_debug_log("GNUTLS State:\n");
@@ -65,7 +65,7 @@ const char *_gnutls_packet2str(content_type_t packet)
     }
 }
 
-const char *_gnutls_handshake2str(HandshakeType handshake)
+const char *_gnutls_handshake2str(handshake_t handshake)
 {
 
     switch (handshake) {

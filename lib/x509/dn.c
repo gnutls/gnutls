@@ -794,7 +794,7 @@ int _gnutls_x509_write_attribute(const char *given_oid,
 int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct,
 					   const char *where, char *oid,
 					   int oid_size,
-					   gnutls_datum * value, int multi)
+					   gnutls_datum_t * value, int multi)
 {
     char tmpbuffer[128];
     int len, result;
@@ -923,7 +923,7 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
   * and 0 on success.
   *
   **/
-int gnutls_x509_rdn_get(const gnutls_datum * idn,
+int gnutls_x509_rdn_get(const gnutls_datum_t * idn,
 			char *buf, size_t * sizeof_buf)
 {
     int result;
@@ -977,7 +977,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
   * and 0 on success.
   *
   **/
-int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char *oid,
+int gnutls_x509_rdn_get_by_oid(const gnutls_datum_t * idn, const char *oid,
 			       int indx, unsigned int raw_flag,
 			       void *buf, size_t * sizeof_buf)
 {
@@ -1026,7 +1026,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char *oid,
   * and 0 on success.
   *
   **/
-int gnutls_x509_rdn_get_oid(const gnutls_datum * idn,
+int gnutls_x509_rdn_get_oid(const gnutls_datum_t * idn,
 			    int indx, void *buf, size_t * sizeof_buf)
 {
     int result;
@@ -1067,8 +1067,8 @@ int gnutls_x509_rdn_get_oid(const gnutls_datum * idn,
  * Returns 1 if the DN's match and zero if they don't match. Otherwise
  * a negative value is returned to indicate error.
  */
-int _gnutls_x509_compare_raw_dn(const gnutls_datum * dn1,
-				const gnutls_datum * dn2)
+int _gnutls_x509_compare_raw_dn(const gnutls_datum_t * dn1,
+				const gnutls_datum_t * dn2)
 {
 
     if (dn1->size != dn2->size) {

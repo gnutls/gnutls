@@ -86,7 +86,7 @@ typedef struct {
 #define SSL_MODE_AUTO_RETRY (0x4)
 
 typedef gnutls_x509_dn X509_NAME;
-typedef gnutls_datum X509;
+typedef gnutls_datum_t X509;
 
 struct _SSL;
 
@@ -97,29 +97,29 @@ typedef struct
     int comp_priority[GNUTLS_MAX_ALGORITHM_NUM];
     int kx_priority[GNUTLS_MAX_ALGORITHM_NUM];
     int mac_priority[GNUTLS_MAX_ALGORITHM_NUM];
-    gnutls_connection_end connend;
+    gnutls_connection_end_t connend;
 } SSL_METHOD;
 
 typedef struct
 {
-    gnutls_protocol_version version;
-    gnutls_cipher_algorithm cipher;
-    gnutls_kx_algorithm kx;
-    gnutls_mac_algorithm mac;
-    gnutls_compression_method compression;
-    gnutls_certificate_type cert;
+    gnutls_protocol_t version;
+    gnutls_cipher_algorithm_t cipher;
+    gnutls_kx_algorithm_t kx;
+    gnutls_mac_algorithm_t mac;
+    gnutls_compression_method_t compression;
+    gnutls_certificate_type_t cert;
 } SSL_CIPHER;
 
 typedef struct _BIO
 {
-    gnutls_transport_ptr fd;
+    gnutls_transport_ptr_t fd;
 } BIO;
 
 typedef struct
 {
     struct _SSL *ssl;
     int error;
-    const gnutls_datum *cert_list;
+    const gnutls_datum_t *cert_list;
 #define current_cert cert_list
 } X509_STORE_CTX;
 
@@ -141,7 +141,7 @@ typedef struct _SSL_CTX
 
 typedef struct _SSL
 {
-    gnutls_session gnutls_state;
+    gnutls_session_t gnutls_state;
 #define rbio gnutls_state
 
     gnutls_certificate_client_credentials gnutls_cred;
@@ -157,8 +157,8 @@ typedef struct _SSL
     int (*verify_callback)(int, X509_STORE_CTX *);
     int verify_mode;
     
-    gnutls_transport_ptr rfd;
-    gnutls_transport_ptr wfd;
+    gnutls_transport_ptr_t rfd;
+    gnutls_transport_ptr_t wfd;
 } SSL;
 
 typedef struct
@@ -282,7 +282,7 @@ void X509_free(const X509 *cert);
 
 /* BIO functions */
 
-void BIO_get_fd(gnutls_session gnutls_state, int *fd);
+void BIO_get_fd(gnutls_session_t gnutls_state, int *fd);
 BIO *BIO_new_socket(int sock, int close_flag);
 
 /* error handling */

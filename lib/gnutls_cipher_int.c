@@ -25,9 +25,9 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
-cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm cipher,
-				const gnutls_datum * key,
-				const gnutls_datum * iv)
+cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
+				const gnutls_datum_t * key,
+				const gnutls_datum_t * iv)
 {
     cipher_hd_t ret = NULL;
     gcry_error_t err = GPG_ERR_GENERAL;	/* doesn't matter */

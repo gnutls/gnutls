@@ -30,76 +30,76 @@
 
 /* SRP */
 
-typedef struct DSTRUCT* gnutls_srp_server_credentials;
-typedef struct DSTRUCT* gnutls_srp_client_credentials;
+typedef struct DSTRUCT* gnutls_srp_server_credentials_t;
+typedef struct DSTRUCT* gnutls_srp_client_credentials_t;
 
-void gnutls_srp_free_client_credentials( gnutls_srp_client_credentials sc);
-int gnutls_srp_allocate_client_credentials( gnutls_srp_client_credentials *sc);
-int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *username, char* password);
+void gnutls_srp_free_client_credentials( gnutls_srp_client_credentials_t sc);
+int gnutls_srp_allocate_client_credentials( gnutls_srp_client_credentials_t *sc);
+int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials_t res, char *username, char* password);
 
-void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials sc);
-int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials *sc);
-int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, 
+void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials_t sc);
+int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials_t *sc);
+int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials_t res, 
     const char *password_file, const char* password_conf_file);
 
-const char* gnutls_srp_server_get_username( gnutls_session state);
+const char* gnutls_srp_server_get_username( gnutls_session_t state);
 
-int gnutls_srp_verifier( const char* username, const char* password, const gnutls_datum *salt, 
-    const gnutls_datum* g, const gnutls_datum* n, 
-    gnutls_datum * res);
+int gnutls_srp_verifier( const char* username, const char* password, const gnutls_datum_t *salt, 
+    const gnutls_datum_t* g, const gnutls_datum_t* n, 
+    gnutls_datum_t * res);
 
 /* The static parameters defined in draft-ietf-tls-srp-05
  * Those should be used as input to gnutls_srp_verifier().
  */
-extern const gnutls_datum gnutls_srp_2048_group_prime;
-extern const gnutls_datum gnutls_srp_2048_group_generator;
+extern const gnutls_datum_t gnutls_srp_2048_group_prime;
+extern const gnutls_datum_t gnutls_srp_2048_group_generator;
 
-extern const gnutls_datum gnutls_srp_1536_group_prime;
-extern const gnutls_datum gnutls_srp_1536_group_generator;
+extern const gnutls_datum_t gnutls_srp_1536_group_prime;
+extern const gnutls_datum_t gnutls_srp_1536_group_generator;
 
-extern const gnutls_datum gnutls_srp_1024_group_prime;
-extern const gnutls_datum gnutls_srp_1024_group_generator;
+extern const gnutls_datum_t gnutls_srp_1024_group_prime;
+extern const gnutls_datum_t gnutls_srp_1024_group_generator;
 
 typedef int gnutls_srp_server_credentials_function(
-    gnutls_session, 
-    const char* username, gnutls_datum* salt, 
-    gnutls_datum* verifier, gnutls_datum* generator,
-    gnutls_datum* prime
+    gnutls_session_t, 
+    const char* username, gnutls_datum_t* salt, 
+    gnutls_datum_t* verifier, gnutls_datum_t* generator,
+    gnutls_datum_t* prime
 );
 void gnutls_srp_set_server_credentials_function( 
-    gnutls_srp_server_credentials, 
+    gnutls_srp_server_credentials_t, 
     gnutls_srp_server_credentials_function *);
 
-typedef int gnutls_srp_client_credentials_function(gnutls_session, unsigned int,
+typedef int gnutls_srp_client_credentials_function(gnutls_session_t, unsigned int,
     char **, char**);
-void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials, 
+void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials_t, 
     gnutls_srp_client_credentials_function *);
 
 
 /* Openpgp certificate stuff 
  */
 
-typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session, const unsigned char *keyfpr, 
-    unsigned int keyfpr_length, gnutls_datum *key);
+typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session_t, const unsigned char *keyfpr, 
+    unsigned int keyfpr_length, gnutls_datum_t *key);
 
-void gnutls_openpgp_set_recv_key_function( gnutls_session, gnutls_openpgp_recv_key_func);
+void gnutls_openpgp_set_recv_key_function( gnutls_session_t, gnutls_openpgp_recv_key_func);
 
-int gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res, 
+int gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials_t res, 
     const char *CERTFILE, const char* KEYFILE);
-int gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
-    const gnutls_datum* CERT, const gnutls_datum* KEY);
+int gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials_t res,
+    const gnutls_datum_t* CERT, const gnutls_datum_t* KEY);
 
-int gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
+int gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials_t res,
     const char* keyserver, int port);
 
-int gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials res,
+int gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials_t res,
     const char* trustdb);
 
 int gnutls_certificate_set_openpgp_keyring_mem(
-    gnutls_certificate_credentials c,
+    gnutls_certificate_credentials_t c,
     const unsigned char *data, size_t dlen );
 
-int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials res, 
+int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials_t res, 
     const char *name);
 
 int gnutls_global_init_extra(void);
@@ -109,12 +109,12 @@ int gnutls_global_init_extra(void);
 const char* gnutls_extra_check_version( const char*);
 
 /* base64 */
-int gnutls_srp_base64_encode( const gnutls_datum *data, char* result, int* result_size);
-int gnutls_srp_base64_encode_alloc( const gnutls_datum *data, gnutls_datum* result);
+int gnutls_srp_base64_encode( const gnutls_datum_t *data, char* result, int* result_size);
+int gnutls_srp_base64_encode_alloc( const gnutls_datum_t *data, gnutls_datum_t* result);
 
-int gnutls_srp_base64_decode( const gnutls_datum *b64_data, char* result, int* result_size);
-int gnutls_srp_base64_decode_alloc( const gnutls_datum *b64_data, 
-   gnutls_datum* result);
+int gnutls_srp_base64_decode( const gnutls_datum_t *b64_data, char* result, int* result_size);
+int gnutls_srp_base64_decode_alloc( const gnutls_datum_t *b64_data, 
+   gnutls_datum_t* result);
 
 
 #endif

@@ -29,10 +29,10 @@
 
 typedef struct comp_hd_t_STRUCT {
     void *handle;
-    gnutls_compression_method algo;
+    gnutls_compression_method_t algo;
 } *comp_hd_t;
 
-comp_hd_t _gnutls_comp_init(gnutls_compression_method, int d);
+comp_hd_t _gnutls_comp_init(gnutls_compression_method_t, int d);
 void _gnutls_comp_deinit(comp_hd_t handle, int d);
 
 int _gnutls_decompress(comp_hd_t handle, opaque * compressed,

@@ -45,11 +45,11 @@
 #include <gnutls_extra.h>
 #include "debug.h"
 
-static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
+static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt_t * certs,
 					      uint);
-static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key);
-static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert);
-static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey
+static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey_t key);
+static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key_t cert);
+static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey_t
 					      key);
 
 
@@ -71,7 +71,7 @@ int _gnutls_copy_certificate_auth_info(cert_auth_info_t info,
     }
 
     info->raw_certificate_list =
-	gnutls_calloc(1, sizeof(gnutls_datum) * ncerts);
+	gnutls_calloc(1, sizeof(gnutls_datum_t) * ncerts);
     if (info->raw_certificate_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
@@ -111,9 +111,9 @@ int _gnutls_copy_certificate_auth_info(cert_auth_info_t info,
  * -1 otherwise.
  */
 inline
-    static int _gnutls_check_pk_algo_in_list(const gnutls_pk_algorithm *
+    static int _gnutls_check_pk_algo_in_list(const gnutls_pk_algorithm_t *
 					     pk_algos, int pk_algos_length,
-					     gnutls_pk_algorithm
+					     gnutls_pk_algorithm_t
 					     algo_to_check)
 {
     int i;
@@ -130,7 +130,7 @@ inline
  * specified in cert.
  */
 static int _gnutls_cert_get_issuer_dn(gnutls_cert * cert,
-				      gnutls_datum * odn)
+				      gnutls_datum_t * odn)
 {
     ASN1_TYPE dn;
     int len, result;
@@ -177,13 +177,13 @@ static int _gnutls_cert_get_issuer_dn(gnutls_cert * cert,
  * That is to guess which certificate to use, based on the 
  * CAs and sign algorithms supported by the peer server.
  */
-static int _find_x509_cert(const gnutls_certificate_credentials cred,
+static int _find_x509_cert(const gnutls_certificate_credentials_t cred,
 			   opaque * _data, size_t _data_size,
-			   const gnutls_pk_algorithm * pk_algos,
+			   const gnutls_pk_algorithm_t * pk_algos,
 			   int pk_algos_length, int *indx)
 {
     uint size;
-    gnutls_datum odn;
+    gnutls_datum_t odn;
     opaque *data = _data;
     ssize_t data_size = _data_size;
     uint i, j;
@@ -242,8 +242,8 @@ static int _find_x509_cert(const gnutls_certificate_credentials cred,
 
 /* Locates the most appropriate openpgp cert
  */
-static int _find_openpgp_cert(const gnutls_certificate_credentials cred,
-			      gnutls_pk_algorithm * pk_algos,
+static int _find_openpgp_cert(const gnutls_certificate_credentials_t cred,
+			      gnutls_pk_algorithm_t * pk_algos,
 			      int pk_algos_length, int *indx)
 {
     uint i, j;
@@ -274,7 +274,7 @@ static int _find_openpgp_cert(const gnutls_certificate_credentials cred,
 /* Returns the number of issuers in the server's
  * certificate request packet.
  */
-static int get_issuers_num(gnutls_session session, opaque * data,
+static int get_issuers_num(gnutls_session_t session, opaque * data,
 			   ssize_t data_size)
 {
     int issuers_dn_len = 0, result;
@@ -320,8 +320,8 @@ static int get_issuers_num(gnutls_session session, opaque * data,
 /* Returns the issuers in the server's certificate request
  * packet.
  */
-static int get_issuers(gnutls_session session,
-		       gnutls_datum * issuers_dn, int issuers_len,
+static int get_issuers(gnutls_session_t session,
+		       gnutls_datum_t * issuers_dn, int issuers_len,
 		       opaque * data, size_t data_size)
 {
     int i;
@@ -362,10 +362,10 @@ OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
 
 /* Calls the client get callback.
  */
-static int call_get_cert_callback(gnutls_session session,
-				  gnutls_datum * issuers_dn,
+static int call_get_cert_callback(gnutls_session_t session,
+				  gnutls_datum_t * issuers_dn,
 				  int issuers_dn_length,
-				  gnutls_pk_algorithm * pk_algos,
+				  gnutls_pk_algorithm_t * pk_algos,
 				  int pk_algos_length)
 {
     uint i;
@@ -373,8 +373,8 @@ static int call_get_cert_callback(gnutls_session session,
     gnutls_privkey *local_key = NULL;
     gnutls_retr_st st;
     int ret;
-    gnutls_certificate_type type = gnutls_certificate_type_get(session);
-    const gnutls_certificate_credentials cred;
+    gnutls_certificate_type_t type = gnutls_certificate_type_get(session);
+    const gnutls_certificate_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -464,18 +464,18 @@ static int call_get_cert_callback(gnutls_session session,
  * 20020128: added ability to select a certificate depending on the SIGN
  * algorithm (only in automatic mode).
  */
-static int _select_client_cert(gnutls_session session,
+static int _select_client_cert(gnutls_session_t session,
 			       opaque * _data, size_t _data_size,
-			       gnutls_pk_algorithm * pk_algos,
+			       gnutls_pk_algorithm_t * pk_algos,
 			       int pk_algos_length)
 {
     int result;
     int indx = -1;
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
     opaque *data = _data;
     ssize_t data_size = _data_size;
     int issuers_dn_length;
-    gnutls_datum *issuers_dn = NULL;
+    gnutls_datum_t *issuers_dn = NULL;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -498,7 +498,7 @@ static int _select_client_cert(gnutls_session session,
 
 	    if (issuers_dn_length > 0) {
 		issuers_dn =
-		    gnutls_malloc(sizeof(gnutls_datum) *
+		    gnutls_malloc(sizeof(gnutls_datum_t) *
 				  issuers_dn_length);
 		if (issuers_dn == NULL) {
 		    gnutls_assert();
@@ -561,7 +561,7 @@ static int _select_client_cert(gnutls_session session,
 /* Generate client certificate
  */
 
-int _gnutls_gen_x509_crt(gnutls_session session, opaque ** data)
+int _gnutls_gen_x509_crt(gnutls_session_t session, opaque ** data)
 {
     int ret, i;
     opaque *pdata;
@@ -614,7 +614,7 @@ int _gnutls_gen_x509_crt(gnutls_session session, opaque ** data)
 
 enum PGPKeyDescriptorType { PGP_KEY_FINGERPRINT, PGP_KEY };
 
-int _gnutls_gen_openpgp_certificate(gnutls_session session, opaque ** data)
+int _gnutls_gen_openpgp_certificate(gnutls_session_t session, opaque ** data)
 {
     int ret;
     opaque *pdata;
@@ -663,7 +663,7 @@ OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint = NULL;
 OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key = NULL;
 extern OPENPGP_RAW_KEY_TO_GCERT _E_gnutls_openpgp_raw_key_to_gcert;
 
-int _gnutls_gen_openpgp_certificate_fpr(gnutls_session session,
+int _gnutls_gen_openpgp_certificate_fpr(gnutls_session_t session,
 					opaque ** data)
 {
     int ret, packet_size;
@@ -727,7 +727,7 @@ int _gnutls_gen_openpgp_certificate_fpr(gnutls_session session,
 
 
 
-int _gnutls_gen_cert_client_certificate(gnutls_session session,
+int _gnutls_gen_cert_client_certificate(gnutls_session_t session,
 					opaque ** data)
 {
     switch (session->security_parameters.cert_type) {
@@ -746,7 +746,7 @@ int _gnutls_gen_cert_client_certificate(gnutls_session session,
     }
 }
 
-int _gnutls_gen_cert_server_certificate(gnutls_session session,
+int _gnutls_gen_cert_server_certificate(gnutls_session_t session,
 					opaque ** data)
 {
     switch (session->security_parameters.cert_type) {
@@ -764,18 +764,18 @@ int _gnutls_gen_cert_server_certificate(gnutls_session session,
  */
 
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_gcert_deinit(&peer_certificate_list[x])
-int _gnutls_proc_x509_server_certificate(gnutls_session session,
+int _gnutls_proc_x509_server_certificate(gnutls_session_t session,
 					 opaque * data, size_t data_size)
 {
     int size, len, ret;
     opaque *p = data;
     cert_auth_info_t info;
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
     ssize_t dsize = data_size;
     int i, j, x;
     gnutls_cert *peer_certificate_list;
     int peer_certificate_list_size = 0;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -891,19 +891,19 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 }
 
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_gcert_deinit(&peer_certificate_list[x])
-int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
+int _gnutls_proc_openpgp_server_certificate(gnutls_session_t session,
 					    opaque * data,
 					    size_t data_size)
 {
     int size, ret, len;
     opaque *p = data;
     cert_auth_info_t info;
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
     ssize_t dsize = data_size;
     int i, x;
     gnutls_cert *peer_certificate_list = NULL;
     int peer_certificate_list_size = 0;
-    gnutls_datum tmp, akey = { NULL, 0 };
+    gnutls_datum_t tmp, akey = { NULL, 0 };
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -1052,7 +1052,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 }
 
-int _gnutls_proc_cert_server_certificate(gnutls_session session,
+int _gnutls_proc_cert_server_certificate(gnutls_session_t session,
 					 opaque * data, size_t data_size)
 {
     switch (session->security_parameters.cert_type) {
@@ -1073,7 +1073,7 @@ typedef enum CertificateSigType { RSA_SIGN = 1, DSA_SIGN
 } CertificateSigType;
 
 /* Checks if we support the given signature algorithm 
- * (RSA or DSA). Returns the corresponding gnutls_pk_algorithm
+ * (RSA or DSA). Returns the corresponding gnutls_pk_algorithm_t
  * if true;
  */
 inline static
@@ -1089,16 +1089,16 @@ int _gnutls_check_supported_sign_algo(CertificateSigType algo)
     return -1;
 }
 
-int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
+int _gnutls_proc_cert_cert_req(gnutls_session_t session, opaque * data,
 			       size_t data_size)
 {
     int size, ret;
     opaque *p;
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
     cert_auth_info_t info;
     ssize_t dsize;
     int i, j;
-    gnutls_pk_algorithm pk_algos[MAX_SIGN_ALGOS];
+    gnutls_pk_algorithm_t pk_algos[MAX_SIGN_ALGOS];
     int pk_algos_length;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -1169,14 +1169,14 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
     return 0;
 }
 
-int _gnutls_gen_cert_client_cert_vrfy(gnutls_session session,
+int _gnutls_gen_cert_client_cert_vrfy(gnutls_session_t session,
 				      opaque ** data)
 {
     int ret;
     gnutls_cert *apr_cert_list;
     gnutls_privkey *apr_pkey;
     int apr_cert_list_length, size;
-    gnutls_datum signature;
+    gnutls_datum_t signature;
 
     *data = NULL;
 
@@ -1216,13 +1216,13 @@ int _gnutls_gen_cert_client_cert_vrfy(gnutls_session session,
     return size + 2;
 }
 
-int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session,
+int _gnutls_proc_cert_client_cert_vrfy(gnutls_session_t session,
 				       opaque * data, size_t data_size)
 {
     int size, ret;
     ssize_t dsize = data_size;
     opaque *pdata = data;
-    gnutls_datum sig;
+    gnutls_datum_t sig;
     cert_auth_info_t info = _gnutls_get_auth_info(session);
     gnutls_cert peer_cert;
 
@@ -1262,10 +1262,10 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session,
 }
 
 #define CERTTYPE_SIZE 3
-int _gnutls_gen_cert_server_cert_req(gnutls_session session,
+int _gnutls_gen_cert_server_cert_req(gnutls_session_t session,
 				     opaque ** data)
 {
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
     int size;
     opaque *pdata;
 
@@ -1280,7 +1280,7 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session,
 	return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-    size = CERTTYPE_SIZE + 2;	/* 2 for gnutls_certificate_type + 2 for size of rdn_seq 
+    size = CERTTYPE_SIZE + 2;	/* 2 for gnutls_certificate_type_t + 2 for size of rdn_seq 
 				 */
 
     if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
@@ -1318,7 +1318,7 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session,
  * It is normal to return 0 with no certificates in client side.
  *
  */
-int _gnutls_get_selected_cert(gnutls_session session,
+int _gnutls_get_selected_cert(gnutls_session_t session,
 			      gnutls_cert ** apr_cert_list,
 			      int *apr_cert_list_length,
 			      gnutls_privkey ** apr_pkey)
@@ -1358,7 +1358,7 @@ int _gnutls_get_selected_cert(gnutls_session session,
 /* converts the given x509 certificate to gnutls_cert* and allocates
  * space for them.
  */
-static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
+static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt_t * certs,
 					      uint ncerts)
 {
     gnutls_cert *local_certs;
@@ -1395,7 +1395,7 @@ static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
 /* converts the given x509 key to gnutls_privkey* and allocates
  * space for it.
  */
-static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key)
+static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey_t key)
 {
     gnutls_privkey *local_key;
     int ret = 0;
@@ -1425,7 +1425,7 @@ OPENPGP_PRIVKEY_TO_GKEY _E_gnutls_openpgp_privkey_to_gkey;
 /* converts the given pgp certificate to gnutls_cert* and allocates
  * space for them.
  */
-static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
+static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key_t cert)
 {
     gnutls_cert *local_certs;
     int ret = 0;
@@ -1463,7 +1463,7 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 /* converts the given raw key to gnutls_privkey* and allocates
  * space for it.
  */
-static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey
+static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey_t
 					      key)
 {
     gnutls_privkey *local_key;
@@ -1493,7 +1493,7 @@ static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey
 }
 
 
-void _gnutls_selected_certs_deinit(gnutls_session session)
+void _gnutls_selected_certs_deinit(gnutls_session_t session)
 {
     if (session->internals.selected_need_free != 0) {
 	int i;
@@ -1511,7 +1511,7 @@ void _gnutls_selected_certs_deinit(gnutls_session session)
     return;
 }
 
-void _gnutls_selected_certs_set(gnutls_session session,
+void _gnutls_selected_certs_set(gnutls_session_t session,
 				gnutls_cert * certs, int ncerts,
 				gnutls_privkey * key, int need_free)
 {
@@ -1535,12 +1535,12 @@ void _gnutls_selected_certs_set(gnutls_session session,
  * selected certificate will be in session->internals.selected_*.
  *
  */
-int _gnutls_server_select_cert(gnutls_session session,
-			       gnutls_pk_algorithm requested_algo)
+int _gnutls_server_select_cert(gnutls_session_t session,
+			       gnutls_pk_algorithm_t requested_algo)
 {
     uint i;
     int index, ret;
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {

@@ -224,8 +224,8 @@ SSL *SSL_new(SSL_CTX * ctx)
 
     ssl->options = ctx->options;
 
-    ssl->rfd = (gnutls_transport_ptr) - 1;
-    ssl->wfd = (gnutls_transport_ptr) - 1;
+    ssl->rfd = (gnutls_transport_ptr_t) - 1;
+    ssl->wfd = (gnutls_transport_ptr_t) - 1;
 
     return ssl;
 }
@@ -251,15 +251,15 @@ int SSL_get_error(SSL * ssl, int ret)
 
 int SSL_set_fd(SSL * ssl, int fd)
 {
-    gnutls_transport_set_ptr(ssl->gnutls_state, (gnutls_transport_ptr) fd);
+    gnutls_transport_set_ptr(ssl->gnutls_state, (gnutls_transport_ptr_t) fd);
     return 1;
 }
 
 int SSL_set_rfd(SSL * ssl, int fd)
 {
-    ssl->rfd = (gnutls_transport_ptr) fd;
+    ssl->rfd = (gnutls_transport_ptr_t) fd;
 
-    if (ssl->wfd != (gnutls_transport_ptr) - 1)
+    if (ssl->wfd != (gnutls_transport_ptr_t) - 1)
 	gnutls_transport_set_ptr2(ssl->gnutls_state, ssl->rfd, ssl->wfd);
 
     return 1;
@@ -267,9 +267,9 @@ int SSL_set_rfd(SSL * ssl, int fd)
 
 int SSL_set_wfd(SSL * ssl, int fd)
 {
-    ssl->wfd = (gnutls_transport_ptr) fd;
+    ssl->wfd = (gnutls_transport_ptr_t) fd;
 
-    if (ssl->rfd != (gnutls_transport_ptr) - 1)
+    if (ssl->rfd != (gnutls_transport_ptr_t) - 1)
 	gnutls_transport_set_ptr2(ssl->gnutls_state, ssl->rfd, ssl->wfd);
 
     return 1;
@@ -299,7 +299,7 @@ void SSL_set_verify(SSL * ssl, int verify_mode,
 
 const X509 *SSL_get_peer_certificate(SSL * ssl)
 {
-    const gnutls_datum *cert_list;
+    const gnutls_datum_t *cert_list;
     int cert_list_size = 0;
 
     cert_list = gnutls_certificate_get_peers(ssl->gnutls_state,
@@ -801,7 +801,7 @@ void X509_free(const X509 * cert)
 
 /* BIO functions */
 
-void BIO_get_fd(gnutls_session gnutls_state, int *fd)
+void BIO_get_fd(gnutls_session_t gnutls_state, int *fd)
 {
     *fd = (int) gnutls_transport_get_ptr(gnutls_state);
 }
@@ -814,7 +814,7 @@ BIO *BIO_new_socket(int sock, int close_flag)
     if (!bio)
 	return NULL;
 
-    bio->fd = (gnutls_transport_ptr) sock;
+    bio->fd = (gnutls_transport_ptr_t) sock;
 
     return bio;
 }

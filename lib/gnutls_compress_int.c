@@ -45,7 +45,7 @@ LZO_FUNC _gnutls_lzo1x_1_compress = NULL;
 /* The flag d is the direction (compress, decompress). Non zero is
  * decompress.
  */
-comp_hd_t _gnutls_comp_init(gnutls_compression_method method, int d)
+comp_hd_t _gnutls_comp_init(gnutls_compression_method_t method, int d)
 {
     comp_hd_t ret;
     int err;

@@ -39,7 +39,7 @@
 #include "gnutls_record.h"
 #include "gnutls_constate.h"
 
-inline static int is_write_comp_null(gnutls_session session)
+inline static int is_write_comp_null(gnutls_session_t session)
 {
     if (session->security_parameters.write_compression_algorithm ==
 	GNUTLS_COMP_NULL)
@@ -48,7 +48,7 @@ inline static int is_write_comp_null(gnutls_session session)
     return 1;
 }
 
-inline static int is_read_comp_null(gnutls_session session)
+inline static int is_read_comp_null(gnutls_session_t session)
 {
     if (session->security_parameters.read_compression_algorithm ==
 	GNUTLS_COMP_NULL)
@@ -63,14 +63,14 @@ inline static int is_read_comp_null(gnutls_session session)
  * 
  * If random pad != 0 then the random pad data will be appended.
  */
-int _gnutls_encrypt(gnutls_session session, const opaque * headers,
+int _gnutls_encrypt(gnutls_session_t session, const opaque * headers,
 		    size_t headers_size, const opaque * data,
 		    size_t data_size, opaque * ciphertext,
 		    size_t ciphertext_size, content_type_t type,
 		    int random_pad)
 {
-    gnutls_datum plain;
-    gnutls_datum comp;
+    gnutls_datum_t plain;
+    gnutls_datum_t comp;
     int ret;
     int free_comp = 1;
 
@@ -114,12 +114,12 @@ int _gnutls_encrypt(gnutls_session session, const opaque * headers,
 /* Decrypts the given data.
  * Returns the decrypted data length.
  */
-int _gnutls_decrypt(gnutls_session session, opaque * ciphertext,
+int _gnutls_decrypt(gnutls_session_t session, opaque * ciphertext,
 		    size_t ciphertext_size, uint8 * data,
 		    size_t max_data_size, content_type_t type)
 {
-    gnutls_datum gtxt;
-    gnutls_datum gcipher;
+    gnutls_datum_t gtxt;
+    gnutls_datum_t gcipher;
     int ret;
 
     if (ciphertext_size == 0)
@@ -139,7 +139,7 @@ int _gnutls_decrypt(gnutls_session session, opaque * ciphertext,
 	/* ret == ret */
 
     } else {
-	gnutls_datum gcomp;
+	gnutls_datum_t gcomp;
 
 	/* compression has this malloc overhead.
 	 */
@@ -171,7 +171,7 @@ int _gnutls_decrypt(gnutls_session session, opaque * ciphertext,
 
 inline
     static mac_hd_t
-mac_init(gnutls_mac_algorithm mac, opaque * secret, int secret_size,
+mac_init(gnutls_mac_algorithm_t mac, opaque * secret, int secret_size,
 	 int ver)
 {
     mac_hd_t td;
@@ -198,7 +198,7 @@ inline static void mac_deinit(mac_hd_t td, opaque * res, int ver)
 }
 
 inline
-    static int calc_enc_length(gnutls_session session, int data_size,
+    static int calc_enc_length(gnutls_session_t session, int data_size,
 			       int hash_size, uint8 * pad, int random_pad,
 			       cipher_type_t block_algo, uint16 blocksize)
 {
@@ -253,9 +253,9 @@ inline
  * which has cipher_size size.
  * return the actual encrypted data length.
  */
-int _gnutls_compressed2ciphertext(gnutls_session session,
+int _gnutls_compressed2ciphertext(gnutls_session_t session,
 				  opaque * cipher_data, int cipher_size,
-				  gnutls_datum compressed,
+				  gnutls_datum_t compressed,
 				  content_type_t _type, int random_pad)
 {
     uint8 MAC[MAX_HASH_SIZE];
@@ -268,7 +268,7 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
     int hash_size =
 	_gnutls_hash_get_algo_len(session->security_parameters.
 				  write_mac_algorithm);
-    gnutls_protocol_version ver;
+    gnutls_protocol_t ver;
     int blocksize =
 	_gnutls_cipher_get_block_size(session->security_parameters.
 				      write_bulk_cipher_algorithm);
@@ -370,10 +370,10 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 /* Deciphers the ciphertext packet, and puts the result to compress_data, of compress_size.
  * Returns the actual compressed packet size.
  */
-int _gnutls_ciphertext2compressed(gnutls_session session,
+int _gnutls_ciphertext2compressed(gnutls_session_t session,
 				  opaque * compress_data,
 				  int compress_size,
-				  gnutls_datum ciphertext, uint8 type)
+				  gnutls_datum_t ciphertext, uint8 type)
 {
     uint8 MAC[MAX_HASH_SIZE];
     uint16 c_length;
@@ -383,7 +383,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
     uint16 blocksize;
     int ret, i, pad_failed = 0;
     uint8 major, minor;
-    gnutls_protocol_version ver;
+    gnutls_protocol_t ver;
     int hash_size =
 	_gnutls_hash_get_algo_len(session->security_parameters.
 				  read_mac_algorithm);

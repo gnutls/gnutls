@@ -43,10 +43,10 @@
 #include <gnutls_rsa_export.h>
 #include <gnutls_state.h>
 
-int _gnutls_gen_rsa_client_kx(gnutls_session, opaque **);
-int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, size_t);
-static int gen_rsa_export_server_kx(gnutls_session, opaque **);
-static int proc_rsa_export_server_kx(gnutls_session, opaque *, size_t);
+int _gnutls_gen_rsa_client_kx(gnutls_session_t, opaque **);
+int _gnutls_proc_rsa_client_kx(gnutls_session_t, opaque *, size_t);
+static int gen_rsa_export_server_kx(gnutls_session_t, opaque **);
+static int proc_rsa_export_server_kx(gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st rsa_export_auth_struct = {
     "RSA EXPORT",
@@ -65,9 +65,9 @@ const mod_auth_st rsa_export_auth_struct = {
     _gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
-static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
+static int gen_rsa_export_server_kx(gnutls_session_t session, opaque ** data)
 {
-    gnutls_rsa_params rsa_params;
+    gnutls_rsa_params_t rsa_params;
     const mpi_t *rsa_mpis;
     size_t n_e, n_m;
     uint8 *data_e, *data_m;
@@ -75,9 +75,9 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
     gnutls_cert *apr_cert_list;
     gnutls_privkey *apr_pkey;
     int apr_cert_list_length;
-    gnutls_datum signature, ddata;
+    gnutls_datum_t signature, ddata;
     cert_auth_info_t info;
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -175,7 +175,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 
 /* if the peer's certificate is of 512 bits or less, returns non zero.
  */
-int _gnutls_peers_cert_less_512(gnutls_session session)
+int _gnutls_peers_cert_less_512(gnutls_session_t session)
 {
     gnutls_cert peer_cert;
     int ret;
@@ -213,7 +213,7 @@ int _gnutls_peers_cert_less_512(gnutls_session session)
     return 0;
 }
 
-static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
+static int proc_rsa_export_server_kx(gnutls_session_t session, opaque * data,
 				     size_t _data_size)
 {
     uint16 n_m, n_e;
@@ -221,7 +221,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
     uint8 *data_m;
     uint8 *data_e;
     int i, sigsize;
-    gnutls_datum vparams, signature;
+    gnutls_datum_t vparams, signature;
     int ret;
     ssize_t data_size = _data_size;
     cert_auth_info_t info;

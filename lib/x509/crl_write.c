@@ -41,11 +41,11 @@
 #include <libtasn1.h>
 #include <gnutls_ui.h>
 
-static void disable_optional_stuff(gnutls_x509_crl crl);
+static void disable_optional_stuff(gnutls_x509_crl_t crl);
 
 /**
   * gnutls_x509_crl_set_version - This function will set the CRL version
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @version: holds the version number. For CRLv1 crls must be 1.
   *
   * This function will set the version of the CRL. This
@@ -55,7 +55,7 @@ static void disable_optional_stuff(gnutls_x509_crl crl);
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_set_version(gnutls_x509_crl crl, unsigned int version)
+int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
 {
     int result;
     char null = version;
@@ -80,7 +80,7 @@ int gnutls_x509_crl_set_version(gnutls_x509_crl crl, unsigned int version)
 
 /**
   * gnutls_x509_crl_sign - This function will sign a CRL with a key
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @issuer: is the certificate of the certificate issuer
   * @issuer_key: holds the issuer's private key
   *
@@ -93,8 +93,8 @@ int gnutls_x509_crl_set_version(gnutls_x509_crl crl, unsigned int version)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_sign(gnutls_x509_crl crl, gnutls_x509_crt issuer,
-			 gnutls_x509_privkey issuer_key)
+int gnutls_x509_crl_sign(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
+			 gnutls_x509_privkey_t issuer_key)
 {
     int result;
 
@@ -119,7 +119,7 @@ int gnutls_x509_crl_sign(gnutls_x509_crl crl, gnutls_x509_crt issuer,
 
 /**
   * gnutls_x509_crl_set_this_update - This function will set the CRL's issuing time
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @act_time: The actual time
   *
   * This function will set the time this CRL was issued.
@@ -127,7 +127,7 @@ int gnutls_x509_crl_sign(gnutls_x509_crl crl, gnutls_x509_crt issuer,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_this_update(gnutls_x509_crl crl, time_t act_time)
+int gnutls_x509_crl_set_this_update(gnutls_x509_crl_t crl, time_t act_time)
 {
     if (crl == NULL) {
 	gnutls_assert();
@@ -140,7 +140,7 @@ int gnutls_x509_crl_set_this_update(gnutls_x509_crl crl, time_t act_time)
 
 /**
   * gnutls_x509_crl_set_next_update - This function will set the CRL next update time
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @exp_time: The actual time
   *
   * This function will set the time this CRL will be updated.
@@ -148,7 +148,7 @@ int gnutls_x509_crl_set_this_update(gnutls_x509_crl crl, time_t act_time)
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_next_update(gnutls_x509_crl crl, time_t exp_time)
+int gnutls_x509_crl_set_next_update(gnutls_x509_crl_t crl, time_t exp_time)
 {
     if (crl == NULL) {
 	gnutls_assert();
@@ -160,7 +160,7 @@ int gnutls_x509_crl_set_next_update(gnutls_x509_crl crl, time_t exp_time)
 
 /**
   * gnutls_x509_crl_set_crt_serial - This function will set a revoked certificate's serial number
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @serial: The revoked certificate's serial number
   * @serial_size: Holds the size of the serial field.
   * @revocation_time: The time this certificate was revoked
@@ -170,7 +170,7 @@ int gnutls_x509_crl_set_next_update(gnutls_x509_crl crl, time_t exp_time)
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl crl, const void *serial,
+int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl_t crl, const void *serial,
 				   size_t serial_size,
 				   time_t revocation_time)
 {
@@ -221,8 +221,8 @@ int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl crl, const void *serial,
 
 /**
   * gnutls_x509_crl_set_crt - This function will set a revoked certificate's serial number
-  * @crl: should contain a gnutls_x509_crl structure
-  * @crt: should contain a gnutls_x509_crt structure with the revoked certificate
+  * @crl: should contain a gnutls_x509_crl_t structure
+  * @crt: should contain a gnutls_x509_crt_t structure with the revoked certificate
   * @revocation_time: The time this certificate was revoked
   *
   * This function will set a revoked certificate's serial number to the CRL. 
@@ -230,7 +230,7 @@ int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl crl, const void *serial,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_crt(gnutls_x509_crl crl, gnutls_x509_crt crt,
+int gnutls_x509_crl_set_crt(gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
 			    time_t revocation_time)
 {
     int ret;
@@ -264,7 +264,7 @@ int gnutls_x509_crl_set_crt(gnutls_x509_crl crl, gnutls_x509_crt crt,
 /* If OPTIONAL fields have not been initialized then
  * disable them.
  */
-static void disable_optional_stuff(gnutls_x509_crl crl)
+static void disable_optional_stuff(gnutls_x509_crl_t crl)
 {
 
     asn1_write_value(crl->crl, "tbsCertList.crlExtensions", NULL, 0);

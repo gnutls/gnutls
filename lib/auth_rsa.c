@@ -41,8 +41,8 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 
-int _gnutls_gen_rsa_client_kx(gnutls_session, opaque **);
-int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, size_t);
+int _gnutls_gen_rsa_client_kx(gnutls_session_t, opaque **);
+int _gnutls_proc_rsa_client_kx(gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st rsa_auth_struct = {
     "RSA",
@@ -63,7 +63,7 @@ const mod_auth_st rsa_auth_struct = {
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-int _gnutls_get_public_rsa_params(gnutls_session session,
+int _gnutls_get_public_rsa_params(gnutls_session_t session,
 				  mpi_t params[MAX_PUBLIC_PARAMS_SIZE],
 				  int *params_len)
 {
@@ -136,12 +136,12 @@ int _gnutls_get_public_rsa_params(gnutls_session session,
 
 /* This function reads the RSA parameters from the private key
  */
-int _gnutls_get_private_rsa_params(gnutls_session session, mpi_t ** params,
+int _gnutls_get_private_rsa_params(gnutls_session_t session, mpi_t ** params,
 				   int *params_size)
 {
     int bits;
-    const gnutls_certificate_credentials cred;
-    gnutls_rsa_params rsa_params;
+    const gnutls_certificate_credentials_t cred;
+    gnutls_rsa_params_t rsa_params;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -196,11 +196,11 @@ int _gnutls_get_private_rsa_params(gnutls_session session, mpi_t ** params,
 			return GNUTLS_E_MEMORY_ERROR; \
 		}
 
-int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data,
+int _gnutls_proc_rsa_client_kx(gnutls_session_t session, opaque * data,
 			       size_t _data_size)
 {
-    gnutls_datum plaintext;
-    gnutls_datum ciphertext;
+    gnutls_datum_t plaintext;
+    gnutls_datum_t ciphertext;
     int ret, dsize;
     mpi_t *params;
     int params_len;
@@ -284,14 +284,14 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data,
 
 /* return RSA(random) using the peers public key 
  */
-int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
+int _gnutls_gen_rsa_client_kx(gnutls_session_t session, opaque ** data)
 {
     cert_auth_info_t auth = session->key->auth_info;
-    gnutls_datum sdata;		/* data to send */
+    gnutls_datum_t sdata;		/* data to send */
     mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
     int params_len = MAX_PUBLIC_PARAMS_SIZE;
     int ret, i;
-    gnutls_protocol_version ver;
+    gnutls_protocol_t ver;
 
     if (auth == NULL) {
 	/* this shouldn't have happened. The proc_certificate

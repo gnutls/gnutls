@@ -31,32 +31,32 @@
 #include <gnutls_errors.h>
 
 
-void _gnutls_write_datum16(opaque * dest, gnutls_datum dat)
+void _gnutls_write_datum16(opaque * dest, gnutls_datum_t dat)
 {
     _gnutls_write_uint16(dat.size, dest);
     memcpy(&dest[2], dat.data, dat.size);
 }
 
-void _gnutls_write_datum24(opaque * dest, gnutls_datum dat)
+void _gnutls_write_datum24(opaque * dest, gnutls_datum_t dat)
 {
     _gnutls_write_uint24(dat.size, dest);
     memcpy(&dest[3], dat.data, dat.size);
 }
 
-void _gnutls_write_datum32(opaque * dest, gnutls_datum dat)
+void _gnutls_write_datum32(opaque * dest, gnutls_datum_t dat)
 {
     _gnutls_write_uint32(dat.size, dest);
     memcpy(&dest[4], dat.data, dat.size);
 }
 
-void _gnutls_write_datum8(opaque * dest, gnutls_datum dat)
+void _gnutls_write_datum8(opaque * dest, gnutls_datum_t dat)
 {
     dest[0] = (uint8) dat.size;
     memcpy(&dest[1], dat.data, dat.size);
 }
 
 
-int _gnutls_set_datum_m(gnutls_datum * dat, const void *data,
+int _gnutls_set_datum_m(gnutls_datum_t * dat, const void *data,
 			int data_size, gnutls_alloc_function galloc_func)
 {
     if (data_size == 0) {
@@ -75,7 +75,7 @@ int _gnutls_set_datum_m(gnutls_datum * dat, const void *data,
     return 0;
 }
 
-int _gnutls_datum_append_m(gnutls_datum * dst, const void *data,
+int _gnutls_datum_append_m(gnutls_datum_t * dst, const void *data,
 			   int data_size,
 			   gnutls_realloc_function grealloc_func)
 {
@@ -90,7 +90,7 @@ int _gnutls_datum_append_m(gnutls_datum * dst, const void *data,
     return 0;
 }
 
-void _gnutls_free_datum_m(gnutls_datum * dat,
+void _gnutls_free_datum_m(gnutls_datum_t * dat,
 			  gnutls_free_function gfree_func)
 {
     if (dat->data != NULL && dat->size != 0)

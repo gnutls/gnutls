@@ -179,7 +179,7 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, mpi_t * params)
 
 /* Extracts DSA and RSA parameters from a certificate.
  */
-int _gnutls_x509_crt_get_mpis(gnutls_x509_crt cert,
+int _gnutls_x509_crt_get_mpis(gnutls_x509_crt_t cert,
 			      mpi_t * params, int *params_size)
 {
     int len, result;
@@ -280,7 +280,7 @@ int _gnutls_x509_crt_get_mpis(gnutls_x509_crt cert,
  * Allocates the space used to store the DER data.
  */
 int _gnutls_x509_write_rsa_params(mpi_t * params, int params_size,
-				  gnutls_datum * der)
+				  gnutls_datum_t * der)
 {
     int result;
     ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -333,10 +333,10 @@ int _gnutls_x509_write_rsa_params(mpi_t * params, int params_size,
  * This is the "signatureAlgorithm" fields.
  */
 int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
-				  gnutls_pk_algorithm pk_algorithm,
+				  gnutls_pk_algorithm_t pk_algorithm,
 				  mpi_t * params, int params_size)
 {
-    gnutls_datum der;
+    gnutls_datum_t der;
     int result;
     char name[128];
     const char *pk;
@@ -398,7 +398,7 @@ int _gnutls_x509_write_sig_params(ASN1_TYPE dst, const char *dst_name,
  * Allocates the space used to store the DER data.
  */
 int _gnutls_x509_write_dsa_params(mpi_t * params, int params_size,
-				  gnutls_datum * der)
+				  gnutls_datum_t * der)
 {
     int result;
     ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -458,7 +458,7 @@ int _gnutls_x509_write_dsa_params(mpi_t * params, int params_size,
  * Allocates the space used to store the DER data.
  */
 int _gnutls_x509_write_dsa_public_key(mpi_t * params, int params_size,
-				      gnutls_datum * der)
+				      gnutls_datum_t * der)
 {
     int result;
     ASN1_TYPE spk = ASN1_TYPE_EMPTY;

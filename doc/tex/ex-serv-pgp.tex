@@ -29,13 +29,13 @@
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials cred;
+gnutls_certificate_credentials_t cred;
 const int cert_type_priority[2] = { GNUTLS_CRT_OPENPGP, 0 };
-gnutls_dh_params dh_params;
+gnutls_dh_params_t dh_params;
 
 /* Defined in a previous example */
 extern int generate_dh_params( void);
-extern gnutls_session initialize_tls_session( void);
+extern gnutls_session_t initialize_tls_session( void);
 
 int main()
 {
@@ -45,7 +45,7 @@ int main()
    struct sockaddr_in sa_cli;
    int client_len;
    char topbuf[512];
-   gnutls_session session;
+   gnutls_session_t session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
    char name[256];
@@ -95,7 +95,7 @@ int main()
              inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-      gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
+      gnutls_transport_set_ptr( session, (gnutls_transport_ptr_t)sd);
       ret = gnutls_handshake( session);
       if (ret < 0) {
          close(sd);

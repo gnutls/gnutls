@@ -37,10 +37,10 @@
  */
 
 int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result,
-		   GNUTLS_MPI g, GNUTLS_MPI prime,
+		   mpi_t g, mpi_t prime,
 		   gnutls_alloc_function galloc_func)
 {
-    GNUTLS_MPI x, e;
+    mpi_t x, e;
     size_t result_size;
 
     if (_gnutls_mpi_scan(&x, text, &textsize)) {
@@ -80,11 +80,11 @@ int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result,
  * where k == SHA1(N|g)
  * Return: B and if ret_b is not NULL b.
  */
-GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g,
-			      GNUTLS_MPI n, GNUTLS_MPI v)
+mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g,
+			      mpi_t n, mpi_t v)
 {
-    GNUTLS_MPI tmpB = NULL, tmpV = NULL;
-    GNUTLS_MPI b = NULL, B = NULL, k = NULL;
+    mpi_t tmpB = NULL, tmpV = NULL;
+    mpi_t b = NULL, B = NULL, k = NULL;
     int bits;
 
     /* calculate:  B = (k*v + g^b) % N 
@@ -151,14 +151,14 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g,
 
 /* This calculates the SHA1(A | B)
  */
-GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
+mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B)
 {
     size_t b_size, a_size;
     opaque *holder, hd[MAX_HASH_SIZE];
     size_t holder_size, hash_size;
     GNUTLS_HASH_HANDLE td;
     int ret;
-    GNUTLS_MPI res;
+    mpi_t res;
 
     _gnutls_mpi_print(NULL, &a_size, A);
     _gnutls_mpi_print(NULL, &b_size, B);
@@ -198,11 +198,11 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 /* S = (A * v^u) ^ b % N 
  * this is our shared key (server premaster secret)
  */
-GNUTLS_MPI _gnutls_calc_srp_S1(GNUTLS_MPI A, GNUTLS_MPI b, GNUTLS_MPI u,
-			       GNUTLS_MPI v, GNUTLS_MPI n)
+mpi_t _gnutls_calc_srp_S1(mpi_t A, mpi_t b, mpi_t u,
+			       mpi_t v, mpi_t n)
 {
-    GNUTLS_MPI tmp1 = NULL, tmp2 = NULL;
-    GNUTLS_MPI S = NULL;
+    mpi_t tmp1 = NULL, tmp2 = NULL;
+    mpi_t S = NULL;
 
     S = _gnutls_mpi_alloc_like(n);
     if (S == NULL)
@@ -232,10 +232,10 @@ GNUTLS_MPI _gnutls_calc_srp_S1(GNUTLS_MPI A, GNUTLS_MPI b, GNUTLS_MPI u,
 /* A = g^a % N 
  * returns A and a (which is random)
  */
-GNUTLS_MPI _gnutls_calc_srp_A(GNUTLS_MPI * a, GNUTLS_MPI g, GNUTLS_MPI n)
+mpi_t _gnutls_calc_srp_A(mpi_t * a, mpi_t g, mpi_t n)
 {
-    GNUTLS_MPI tmpa;
-    GNUTLS_MPI A;
+    mpi_t tmpa;
+    mpi_t A;
     int bits;
 
     bits = _gnutls_mpi_get_nbits(n);
@@ -310,11 +310,11 @@ int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
 /* S = (B - k*g^x) ^ (a + u * x) % N
  * this is our shared key (client premaster secret)
  */
-GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x,
-			       GNUTLS_MPI a, GNUTLS_MPI u, GNUTLS_MPI n)
+mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
+			       mpi_t a, mpi_t u, mpi_t n)
 {
-    GNUTLS_MPI S = NULL, tmp1 = NULL, tmp2 = NULL;
-    GNUTLS_MPI tmp4 = NULL, tmp3 = NULL, k = NULL;
+    mpi_t S = NULL, tmp1 = NULL, tmp2 = NULL;
+    mpi_t tmp4 = NULL, tmp3 = NULL, k = NULL;
 
     S = _gnutls_mpi_alloc_like(n);
     if (S == NULL)
@@ -364,14 +364,14 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x,
 }
 
 /**
-  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_client_credentials structure
-  * @sc: is an &gnutls_srp_client_credentials structure.
+  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_client_credentials_t structure
+  * @sc: is an &gnutls_srp_client_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
   *
   **/
-void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials sc)
+void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
 {
     gnutls_free(sc->username);
     gnutls_free(sc->password);
@@ -379,15 +379,15 @@ void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials sc)
 }
 
 /**
-  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials structure
-  * @sc: is a pointer to an &gnutls_srp_server_credentials structure.
+  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
+  * @sc: is a pointer to an &gnutls_srp_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate it.
   *
   * Returns 0 on success.
   **/
-int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials *
+int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *
 					   sc)
 {
     *sc = gnutls_calloc(1, sizeof(srp_client_credentials_st));
@@ -399,18 +399,18 @@ int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials *
 }
 
 /**
-  * gnutls_srp_set_client_credentials - Used to set the username/password, in a gnutls_srp_client_credentials structure
-  * @res: is an &gnutls_srp_client_credentials structure.
+  * gnutls_srp_set_client_credentials - Used to set the username/password, in a gnutls_srp_client_credentials_t structure
+  * @res: is an &gnutls_srp_client_credentials_t structure.
   * @username: is the user's userid
   * @password: is the user's password
   *
-  * This function sets the username and password, in a gnutls_srp_client_credentials structure.
+  * This function sets the username and password, in a gnutls_srp_client_credentials_t structure.
   * Those will be used in SRP authentication. @username and @password should be ASCII
   * strings or UTF-8 strings prepared using the "SASLprep" profile of "stringprep".
   *
   * Returns 0 on success.
   **/
-int gnutls_srp_set_client_credentials(gnutls_srp_client_credentials res,
+int gnutls_srp_set_client_credentials(gnutls_srp_client_credentials_t res,
 				      char *username, char *password)
 {
 
@@ -433,14 +433,14 @@ int gnutls_srp_set_client_credentials(gnutls_srp_client_credentials res,
 }
 
 /**
-  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_server_credentials structure
-  * @sc: is an &gnutls_srp_server_credentials structure.
+  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_server_credentials_t structure
+  * @sc: is an &gnutls_srp_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
   *
   **/
-void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials sc)
+void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
 {
     gnutls_free(sc->password_file);
     gnutls_free(sc->password_conf_file);
@@ -449,15 +449,15 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials sc)
 }
 
 /**
-  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials structure
-  * @sc: is a pointer to an &gnutls_srp_server_credentials structure.
+  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
+  * @sc: is a pointer to an &gnutls_srp_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate it.
   * 
   * Returns 0 on success.
   **/
-int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials *
+int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
 					   sc)
 {
     *sc = gnutls_calloc(1, sizeof(srp_server_cred_st));
@@ -481,18 +481,18 @@ inline static int file_exists(const char *file)
 }
 
 /**
-  * gnutls_srp_set_server_credentials_file - Used to set the password files, in a gnutls_srp_server_credentials structure
-  * @res: is an &gnutls_srp_server_credentials structure.
+  * gnutls_srp_set_server_credentials_file - Used to set the password files, in a gnutls_srp_server_credentials_t structure
+  * @res: is an &gnutls_srp_server_credentials_t structure.
   * @password_file: is the SRP password file (tpasswd)
   * @password_conf_file: is the SRP password conf file (tpasswd.conf)
   *
-  * This function sets the password files, in a gnutls_srp_server_credentials structure.
+  * This function sets the password files, in a gnutls_srp_server_credentials_t structure.
   * Those password files hold usernames and verifiers and will be used for SRP authentication.
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials
+int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
 					   res, const char *password_file,
 					   const char *password_conf_file)
 {
@@ -533,14 +533,14 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials
 
 /**
   * gnutls_srp_set_server_credentials_function - Used to set a callback to retrieve the user's SRP credentials
-  * @cred: is a &gnutls_srp_server_credentials structure.
+  * @cred: is a &gnutls_srp_server_credentials_t structure.
   * @func: is the callback function
   *
   * This function can be used to set a callback to retrieve the user's SRP credentials.
   * The callback's function form is:
-  * int (*callback)(gnutls_session, const char* username,
-  *  gnutls_datum* salt, gnutls_datum *verifier, gnutls_datum* g,
-  *  gnutls_datum* n);
+  * int (*callback)(gnutls_session_t, const char* username,
+  *  gnutls_datum_t* salt, gnutls_datum_t *verifier, gnutls_datum_t* g,
+  *  gnutls_datum_t* n);
   *
   * @username contains the actual username. 
   * The @salt, @verifier, @generator and @prime must be filled
@@ -560,7 +560,7 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials
   *
   **/
 void
-gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials
+gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
 					   cred,
 					   gnutls_srp_server_credentials_function
 					   * func)
@@ -570,13 +570,13 @@ gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials
 
 /**
   * gnutls_srp_set_client_credentials_function - Used to set a callback to retrieve the username and password
-  * @cred: is a &gnutls_srp_server_credentials structure.
+  * @cred: is a &gnutls_srp_server_credentials_t structure.
   * @func: is the callback function
   *
   * This function can be used to set a callback to retrieve the username and
   * password for client SRP authentication.
   * The callback's function form is:
-  * int (*callback)(gnutls_session, unsigned int times, char** username,
+  * int (*callback)(gnutls_session_t, unsigned int times, char** username,
   *  char** password);
   *
   * The @username and @password must be allocated using gnutls_malloc().
@@ -600,7 +600,7 @@ gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials
   *
   **/
 void
-gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials
+gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials_t
 					   cred,
 					   gnutls_srp_client_credentials_function
 					   * func)
@@ -618,7 +618,7 @@ gnutls_srp_set_client_credentials_function(gnutls_srp_client_credentials
   * Returns NULL in case of an error.
   *
   **/
-const char *gnutls_srp_server_get_username(gnutls_session session)
+const char *gnutls_srp_server_get_username(gnutls_session_t session)
 {
     srp_server_auth_info_t info;
 
@@ -648,11 +648,11 @@ const char *gnutls_srp_server_get_username(gnutls_session session)
   *
   **/
 int gnutls_srp_verifier(const char *username, const char *password,
-			const gnutls_datum * salt,
-			const gnutls_datum * generator,
-			const gnutls_datum * prime, gnutls_datum * res)
+			const gnutls_datum_t * salt,
+			const gnutls_datum_t * generator,
+			const gnutls_datum_t * prime, gnutls_datum_t * res)
 {
-    GNUTLS_MPI _n, _g;
+    mpi_t _n, _g;
     int ret;
     size_t digest_size = 20, size;
     opaque digest[20];

@@ -100,9 +100,9 @@ void _gnutls_string_clear(gnutls_string * str)
 
 /* This one does not copy the string.
  */
-gnutls_datum _gnutls_string2datum(gnutls_string * str)
+gnutls_datum_t _gnutls_string2datum(gnutls_string * str)
 {
-    gnutls_datum ret;
+    gnutls_datum_t ret;
 
     ret.data = str->data;
     ret.size = str->length;

@@ -43,7 +43,7 @@ inline static int _gnutls_cert_type2num(int record_size);
  *
  */
 
-int _gnutls_cert_type_recv_params(gnutls_session session,
+int _gnutls_cert_type_recv_params(gnutls_session_t session,
 				  const opaque * data, size_t _data_size)
 {
     int new_type = -1, ret, i;
@@ -126,7 +126,7 @@ int _gnutls_cert_type_recv_params(gnutls_session session,
 
 /* returns data_size or a negative number on failure
  */
-int _gnutls_cert_type_send_params(gnutls_session session, opaque * data,
+int _gnutls_cert_type_send_params(gnutls_session_t session, opaque * data,
 				  size_t data_size)
 {
     uint len, i;

@@ -38,9 +38,9 @@
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
-static int gen_dhe_server_kx(gnutls_session, opaque **);
-static int proc_dhe_server_kx(gnutls_session, opaque *, size_t);
-static int proc_dhe_client_kx(gnutls_session, opaque *, size_t);
+static int gen_dhe_server_kx(gnutls_session_t, opaque **);
+static int proc_dhe_server_kx(gnutls_session_t, opaque *, size_t);
+static int proc_dhe_client_kx(gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st dhe_rsa_auth_struct = {
     "DHE_RSA",
@@ -77,7 +77,7 @@ const mod_auth_st dhe_dss_auth_struct = {
 };
 
 
-static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
+static int gen_dhe_server_kx(gnutls_session_t session, opaque ** data)
 {
     mpi_t g, p;
     const mpi_t *mpis;
@@ -86,9 +86,9 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
     gnutls_cert *apr_cert_list;
     gnutls_privkey *apr_pkey;
     int apr_cert_list_length;
-    gnutls_datum signature, ddata;
-    const gnutls_certificate_credentials cred;
-    gnutls_dh_params dh_params;
+    gnutls_datum_t signature, ddata;
+    const gnutls_certificate_credentials_t cred;
+    gnutls_dh_params_t dh_params;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {
@@ -165,11 +165,11 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
     return data_size;
 }
 
-static int proc_dhe_server_kx(gnutls_session session, opaque * data,
+static int proc_dhe_server_kx(gnutls_session_t session, opaque * data,
 			      size_t _data_size)
 {
     int sigsize;
-    gnutls_datum vparams, signature;
+    gnutls_datum_t vparams, signature;
     int ret;
     cert_auth_info_t info = _gnutls_get_auth_info(session);
     ssize_t data_size = _data_size;
@@ -223,14 +223,14 @@ static int proc_dhe_server_kx(gnutls_session session, opaque * data,
 
 
 
-static int proc_dhe_client_kx(gnutls_session session, opaque * data,
+static int proc_dhe_client_kx(gnutls_session_t session, opaque * data,
 			      size_t _data_size)
 {
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
     int ret;
     mpi_t p, g;
     const mpi_t *mpis;
-    gnutls_dh_params dh_params;
+    gnutls_dh_params_t dh_params;
 
     cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
     if (cred == NULL) {

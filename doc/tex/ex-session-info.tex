@@ -5,16 +5,16 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-extern void print_x509_certificate_info(gnutls_session);
+extern void print_x509_certificate_info(gnutls_session_t);
 
 /* This function will print some details of the
  * given session.
  */
-int print_info(gnutls_session session)
+int print_info(gnutls_session_t session)
 {
    const char *tmp;
-   gnutls_credentials_type cred;
-   gnutls_kx_algorithm kx;
+   gnutls_credentials_type_t cred;
+   gnutls_kx_algorithm_t kx;
 
    /* print the key exchange's algorithm name
     */

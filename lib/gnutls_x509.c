@@ -64,17 +64,17 @@
   * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return its status (TRUSTED, REVOKED etc.). 
-  * The return value (status) should be one of the gnutls_certificate_status enumerated elements.
+  * The return value (status) should be one of the gnutls_certificate_status_t enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
-int _gnutls_x509_cert_verify_peers(gnutls_session session)
+int _gnutls_x509_cert_verify_peers(gnutls_session_t session)
 {
     cert_auth_info_t info;
-    const gnutls_certificate_credentials cred;
+    const gnutls_certificate_credentials_t cred;
     unsigned int verify;
-    gnutls_x509_crt *peer_certificate_list;
+    gnutls_x509_crt_t *peer_certificate_list;
     int peer_certificate_list_size, i, x, ret;
 
     CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
@@ -101,7 +101,7 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
     peer_certificate_list =
 	gnutls_calloc(1,
 		      peer_certificate_list_size *
-		      sizeof(gnutls_x509_crt));
+		      sizeof(gnutls_x509_crt_t));
     if (peer_certificate_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
@@ -153,10 +153,10 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 /* returns error if the certificate has different algorithm than
  * the given key parameters.
  */
-static int _gnutls_check_key_cert_match(gnutls_certificate_credentials res)
+static int _gnutls_check_key_cert_match(gnutls_certificate_credentials_t res)
 {
-    gnutls_datum cid;
-    gnutls_datum kid;
+    gnutls_datum_t cid;
+    gnutls_datum_t kid;
     uint pk = res->cert_list[res->ncerts - 1][0].subject_pk_algorithm;
 
     if (res->pkey[res->ncerts - 1].pk_algorithm != pk) {
@@ -212,7 +212,7 @@ static int _gnutls_check_key_cert_match(gnutls_certificate_credentials res)
  * returns the number of certificates parsed (1)
  */
 static int parse_crt_mem(gnutls_cert ** cert_list, uint * ncerts,
-			 gnutls_x509_crt cert)
+			 gnutls_x509_crt_t cert)
 {
     int i;
     int ret;
@@ -246,8 +246,8 @@ static int parse_crt_mem(gnutls_cert ** cert_list, uint * ncerts,
 static int parse_der_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
 			      const void *input_cert, int input_cert_size)
 {
-    gnutls_datum tmp;
-    gnutls_x509_crt cert;
+    gnutls_datum_t tmp;
+    gnutls_x509_crt_t cert;
     int ret;
 
     ret = gnutls_x509_crt_init(&cert);
@@ -285,11 +285,11 @@ static int parse_pkcs7_cert_mem(gnutls_cert ** cert_list, uint * ncerts, const
 {
 #ifdef ENABLE_PKI
     int i, j, count;
-    gnutls_datum tmp, tmp2;
+    gnutls_datum_t tmp, tmp2;
     int ret;
     opaque *pcert = NULL;
     size_t pcert_size;
-    gnutls_pkcs7 pkcs7;
+    gnutls_pkcs7_t pkcs7;
 
     ret = gnutls_pkcs7_init(&pkcs7);
     if (ret < 0) {
@@ -400,7 +400,7 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
     int size, siz2, i;
     const char *ptr;
     opaque *ptr2;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     int ret, count;
 
 #ifdef ENABLE_PKI
@@ -490,8 +490,8 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
 /* Reads a DER or PEM certificate from memory
  */
 static
-int read_cert_mem(gnutls_certificate_credentials res, const void *cert,
-		  int cert_size, gnutls_x509_crt_fmt type)
+int read_cert_mem(gnutls_certificate_credentials_t res, const void *cert,
+		  int cert_size, gnutls_x509_crt_fmt_t type)
 {
     int ret;
 
@@ -538,7 +538,7 @@ int read_cert_mem(gnutls_certificate_credentials res, const void *cert,
 
 
 int _gnutls_x509_privkey_to_gkey(gnutls_privkey * dest,
-				 gnutls_x509_privkey src)
+				 gnutls_x509_privkey_t src)
 {
     int i, ret;
 
@@ -578,10 +578,10 @@ void _gnutls_gkey_deinit(gnutls_privkey * key)
 }
 
 int _gnutls_x509_raw_privkey_to_gkey(gnutls_privkey * privkey,
-				     const gnutls_datum * raw_key,
-				     gnutls_x509_crt_fmt type)
+				     const gnutls_datum_t * raw_key,
+				     gnutls_x509_crt_fmt_t type)
 {
-    gnutls_x509_privkey tmpkey;
+    gnutls_x509_privkey_t tmpkey;
     int ret;
 
     ret = gnutls_x509_privkey_init(&tmpkey);
@@ -613,12 +613,12 @@ int _gnutls_x509_raw_privkey_to_gkey(gnutls_privkey * privkey,
  * 2002-01-26: Added ability to read DSA keys.
  * type indicates the certificate format.
  */
-static int read_key_mem(gnutls_certificate_credentials res,
+static int read_key_mem(gnutls_certificate_credentials_t res,
 			const void *key, int key_size,
-			gnutls_x509_crt_fmt type)
+			gnutls_x509_crt_fmt_t type)
 {
     int ret;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
 
     /* allocate space for the pkey list
      */
@@ -752,8 +752,8 @@ strfile _gnutls_file_to_str(const char *file)
 
 /* Reads a certificate file
  */
-static int read_cert_file(gnutls_certificate_credentials res,
-			  const char *certfile, gnutls_x509_crt_fmt type)
+static int read_cert_file(gnutls_certificate_credentials_t res,
+			  const char *certfile, gnutls_x509_crt_fmt_t type)
 {
     int ret;
     strfile x;
@@ -776,8 +776,8 @@ static int read_cert_file(gnutls_certificate_credentials res,
 /* Reads PKCS-1 RSA private key file or a DSA file (in the format openssl
  * stores it).
  */
-static int read_key_file(gnutls_certificate_credentials res,
-			 const char *keyfile, gnutls_x509_crt_fmt type)
+static int read_key_file(gnutls_certificate_credentials_t res,
+			 const char *keyfile, gnutls_x509_crt_fmt_t type)
 {
     int ret;
     strfile x;
@@ -795,14 +795,14 @@ static int read_key_file(gnutls_certificate_credentials res,
 }
 
 /**
-  * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @cert: contains a certificate list (path) for the specified private key
   * @key: is the private key
   * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials structure. This function may be called
+  * gnutls_certificate_credentials_t structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
@@ -820,10 +820,10 @@ static int read_key_file(gnutls_certificate_credentials res,
   * then the strings that hold their values must be null terminated.
   *
   **/
-int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res,
-					const gnutls_datum * cert,
-					const gnutls_datum * key,
-					gnutls_x509_crt_fmt type)
+int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t res,
+					const gnutls_datum_t * cert,
+					const gnutls_datum_t * key,
+					gnutls_x509_crt_fmt_t type)
 {
     int ret;
 
@@ -846,22 +846,22 @@ int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res,
 }
 
 /**
-  * gnutls_certificate_set_x509_key - Used to set keys in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_key - Used to set keys in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @cert_list: contains a certificate list (path) for the specified private key
   * @cert_list_size: holds the size of the certificate list
-  * @key: is a gnutls_x509_privkey key
+  * @key: is a gnutls_x509_privkey_t key
   *
   * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials structure. This function may be called
+  * gnutls_certificate_credentials_t structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
   **/
-int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res,
-				    gnutls_x509_crt * cert_list,
+int gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
+				    gnutls_x509_crt_t * cert_list,
 				    int cert_list_size,
-				    gnutls_x509_privkey key)
+				    gnutls_x509_privkey_t key)
 {
     int ret, i;
 
@@ -924,15 +924,15 @@ int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res,
 }
 
 /**
-  * gnutls_certificate_set_x509_key_file - Used to set keys in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_key_file - Used to set keys in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @CERTFILE: is a file that containing the certificate list (path) for
   * the specified private key, in PKCS7 format, or a list of certificates
   * @KEYFILE: is a file that contains the private key
   * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
-  * gnutls_certificate_credentials structure. This function may be called
+  * gnutls_certificate_credentials_t structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
@@ -940,10 +940,10 @@ int gnutls_certificate_set_x509_key(gnutls_certificate_credentials res,
   * this function.
   *
   **/
-int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials
+int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t
 					 res, const char *CERTFILE,
 					 const char *KEYFILE,
-					 gnutls_x509_crt_fmt type)
+					 gnutls_x509_crt_fmt_t type)
 {
     int ret;
 
@@ -965,10 +965,10 @@ int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials
     return 0;
 }
 
-static int generate_rdn_seq(gnutls_certificate_credentials res)
+static int generate_rdn_seq(gnutls_certificate_credentials_t res)
 {
-    gnutls_datum tmp;
-    gnutls_datum _tmp;
+    gnutls_datum_t tmp;
+    gnutls_datum_t _tmp;
     int ret;
     uint size, i;
     opaque *pdata;
@@ -1030,11 +1030,11 @@ static int generate_rdn_seq(gnutls_certificate_credentials res)
 
 
 
-/* Returns 0 if it's ok to use the gnutls_kx_algorithm with this 
+/* Returns 0 if it's ok to use the gnutls_kx_algorithm_t with this 
  * certificate (uses the KeyUsage field). 
  */
 int _gnutls_check_key_usage(const gnutls_cert * cert,
-			    gnutls_kx_algorithm alg)
+			    gnutls_kx_algorithm_t alg)
 {
     unsigned int keyUsage = 0;
     int encipher_type;
@@ -1081,12 +1081,12 @@ int _gnutls_check_key_usage(const gnutls_cert * cert,
 
 
 
-static int parse_pem_ca_mem(gnutls_x509_crt ** cert_list, uint * ncerts,
+static int parse_pem_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
 			    const opaque * input_cert, int input_cert_size)
 {
     int i, size;
     const opaque *ptr;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     int ret, count;
 
     /* move to the certificate
@@ -1107,10 +1107,10 @@ static int parse_pem_ca_mem(gnutls_x509_crt ** cert_list, uint * ncerts,
     do {
 
 	*cert_list =
-	    (gnutls_x509_crt *) gnutls_realloc_fast(*cert_list,
+	    (gnutls_x509_crt_t *) gnutls_realloc_fast(*cert_list,
 						    i *
 						    sizeof
-						    (gnutls_x509_crt));
+						    (gnutls_x509_crt_t));
 
 	if (*cert_list == NULL) {
 	    gnutls_assert();
@@ -1167,19 +1167,19 @@ static int parse_pem_ca_mem(gnutls_x509_crt ** cert_list, uint * ncerts,
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
  * returns the number of certificates parsed (1)
  */
-static int parse_der_ca_mem(gnutls_x509_crt ** cert_list, uint * ncerts,
+static int parse_der_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
 			    const void *input_cert, int input_cert_size)
 {
     int i;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     int ret;
 
     i = *ncerts + 1;
 
     *cert_list =
-	(gnutls_x509_crt *) gnutls_realloc_fast(*cert_list,
+	(gnutls_x509_crt_t *) gnutls_realloc_fast(*cert_list,
 						i *
-						sizeof(gnutls_x509_crt));
+						sizeof(gnutls_x509_crt_t));
 
     if (*cert_list == NULL) {
 	gnutls_assert();
@@ -1209,8 +1209,8 @@ static int parse_der_ca_mem(gnutls_x509_crt ** cert_list, uint * ncerts,
 }
 
 /**
-  * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @ca: is a list of trusted CAs or a DER certificate
   * @type: is DER or PEM
   *
@@ -1228,9 +1228,9 @@ static int parse_der_ca_mem(gnutls_x509_crt ** cert_list, uint * ncerts,
   * value on error.
   *
   **/
-int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials
-					  res, const gnutls_datum * ca,
-					  gnutls_x509_crt_fmt type)
+int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t
+					  res, const gnutls_datum_t * ca,
+					  gnutls_x509_crt_fmt_t type)
 {
     int ret, ret2;
 
@@ -1248,8 +1248,8 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials
 }
 
 /**
-  * gnutls_certificate_set_x509_trust - Used to add trusted CAs in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_trust - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @ca_list: is a list of trusted CAs
   * @ca_list_size: holds the size of the CA list
   *
@@ -1266,8 +1266,8 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials
   * Returns 0 on success.
   *
   **/
-int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res,
-				      gnutls_x509_crt * ca_list,
+int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
+				      gnutls_x509_crt_t * ca_list,
 				      int ca_list_size)
 {
     int ret, i, ret2;
@@ -1275,7 +1275,7 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res,
     res->x509_ca_list = gnutls_realloc_fast(res->x509_ca_list,
 					    (ca_list_size +
 					     res->x509_ncas) *
-					    sizeof(gnutls_x509_crt));
+					    sizeof(gnutls_x509_crt_t));
     if (res->x509_ca_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
@@ -1298,8 +1298,8 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res,
 }
 
 /**
-  * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
   * @type: is PEM or DER
   *
@@ -1317,9 +1317,9 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials res,
   * value on error.
   *
   **/
-int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials
+int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials_t
 					   res, const char *cafile,
-					   gnutls_x509_crt_fmt type)
+					   gnutls_x509_crt_fmt_t type)
 {
     int ret, ret2;
     strfile x;
@@ -1352,12 +1352,12 @@ int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials
 
 #ifdef ENABLE_PKI
 
-static int parse_pem_crl_mem(gnutls_x509_crl ** crl_list, uint * ncrls,
+static int parse_pem_crl_mem(gnutls_x509_crl_t ** crl_list, uint * ncrls,
 			     const opaque * input_crl, int input_crl_size)
 {
     int size, i;
     const opaque *ptr;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     int ret, count;
 
     /* move to the certificate
@@ -1376,10 +1376,10 @@ static int parse_pem_crl_mem(gnutls_x509_crl ** crl_list, uint * ncrls,
     do {
 
 	*crl_list =
-	    (gnutls_x509_crl *) gnutls_realloc_fast(*crl_list,
+	    (gnutls_x509_crl_t *) gnutls_realloc_fast(*crl_list,
 						    i *
 						    sizeof
-						    (gnutls_x509_crl));
+						    (gnutls_x509_crl_t));
 
 	if (*crl_list == NULL) {
 	    gnutls_assert();
@@ -1429,19 +1429,19 @@ static int parse_pem_crl_mem(gnutls_x509_crl ** crl_list, uint * ncrls,
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
  * returns the number of certificates parsed (1)
  */
-static int parse_der_crl_mem(gnutls_x509_crl ** crl_list, uint * ncrls,
+static int parse_der_crl_mem(gnutls_x509_crl_t ** crl_list, uint * ncrls,
 			     const void *input_crl, int input_crl_size)
 {
     int i;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     int ret;
 
     i = *ncrls + 1;
 
     *crl_list =
-	(gnutls_x509_crl *) gnutls_realloc_fast(*crl_list,
+	(gnutls_x509_crl_t *) gnutls_realloc_fast(*crl_list,
 						i *
-						sizeof(gnutls_x509_crl));
+						sizeof(gnutls_x509_crl_t));
 
     if (*crl_list == NULL) {
 	gnutls_assert();
@@ -1474,8 +1474,8 @@ static int parse_der_crl_mem(gnutls_x509_crl ** crl_list, uint * ncrls,
 /* Reads a DER or PEM CRL from memory
  */
 static
-int read_crl_mem(gnutls_certificate_credentials res, const void *crl,
-		 int crl_size, gnutls_x509_crt_fmt type)
+int read_crl_mem(gnutls_certificate_credentials_t res, const void *crl,
+		 int crl_size, gnutls_x509_crt_fmt_t type)
 {
     int ret;
 
@@ -1484,7 +1484,7 @@ int read_crl_mem(gnutls_certificate_credentials res, const void *crl,
     res->x509_crl_list = gnutls_realloc_fast(res->x509_crl_list,
 					     (1 +
 					      res->x509_ncrls) *
-					     sizeof(gnutls_x509_crl));
+					     sizeof(gnutls_x509_crl_t));
     if (res->x509_crl_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
@@ -1506,8 +1506,8 @@ int read_crl_mem(gnutls_certificate_credentials res, const void *crl,
 }
 
 /**
-  * gnutls_certificate_set_x509_crl_mem - Used to add CRLs in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_crl_mem - Used to add CRLs in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @CRL: is a list of trusted CRLs. They should have been verified before.
   * @type: is DER or PEM
   *
@@ -1521,9 +1521,9 @@ int read_crl_mem(gnutls_certificate_credentials res, const void *crl,
   * on error. 
   *
   **/
-int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res,
-					const gnutls_datum * CRL,
-					gnutls_x509_crt_fmt type)
+int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t res,
+					const gnutls_datum_t * CRL,
+					gnutls_x509_crt_fmt_t type)
 {
     int ret;
 
@@ -1534,8 +1534,8 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res,
 }
 
 /**
-  * gnutls_certificate_set_x509_crl - Used to add CRLs in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_crl - Used to add CRLs in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @crl_list: is a list of trusted CRLs. They should have been verified before.
   * @crl_list_size: holds the size of the crl_list
   *
@@ -1548,8 +1548,8 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res,
   * Returns 0 on success.
   *
   **/
-int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res,
-				    gnutls_x509_crl * crl_list,
+int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
+				    gnutls_x509_crl_t * crl_list,
 				    int crl_list_size)
 {
     int ret, i;
@@ -1557,7 +1557,7 @@ int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res,
     res->x509_crl_list = gnutls_realloc_fast(res->x509_crl_list,
 					     (crl_list_size +
 					      res->x509_ncrls) *
-					     sizeof(gnutls_x509_crl));
+					     sizeof(gnutls_x509_crl_t));
     if (res->x509_crl_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
@@ -1577,8 +1577,8 @@ int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res,
 }
 
 /**
-  * gnutls_certificate_set_x509_crl_file - Used to add CRLs in a gnutls_certificate_credentials structure
-  * @res: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_set_x509_crl_file - Used to add CRLs in a gnutls_certificate_credentials_t structure
+  * @res: is an &gnutls_certificate_credentials_t structure.
   * @crlfile: is a file containing the list of verified CRLs (DER or PEM list)
   * @type: is PEM or DER
   *
@@ -1592,9 +1592,9 @@ int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials res,
   * on error. 
   *
   **/
-int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials
+int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t
 					 res, const char *crlfile,
-					 gnutls_x509_crt_fmt type)
+					 gnutls_x509_crt_fmt_t type)
 {
     int ret;
     strfile x;
@@ -1624,14 +1624,14 @@ int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials
 
 
 /**
-  * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials structure
-  * @sc: is an &gnutls_certificate_credentials structure.
+  * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials_t structure
+  * @sc: is an &gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the CRLs associated
   * with the given credentials.
   *
   **/
-void gnutls_certificate_free_crls(gnutls_certificate_credentials sc)
+void gnutls_certificate_free_crls(gnutls_certificate_credentials_t sc)
 {
     uint j;
 

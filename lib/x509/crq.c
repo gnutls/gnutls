@@ -42,7 +42,7 @@
 #include <gnutls_ui.h>
 
 /**
-  * gnutls_x509_crq_init - This function initializes a gnutls_x509_crq structure
+  * gnutls_x509_crq_init - This function initializes a gnutls_x509_crq_t structure
   * @crq: The structure to be initialized
   *
   * This function will initialize a PKCS10 certificate request structure. 
@@ -50,7 +50,7 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_init(gnutls_x509_crq * crq)
+int gnutls_x509_crq_init(gnutls_x509_crq_t * crq)
 {
     *crq = gnutls_calloc(1, sizeof(gnutls_x509_crq_int));
 
@@ -69,13 +69,13 @@ int gnutls_x509_crq_init(gnutls_x509_crq * crq)
 }
 
 /**
-  * gnutls_x509_crq_deinit - This function deinitializes memory used by a gnutls_x509_crq structure
+  * gnutls_x509_crq_deinit - This function deinitializes memory used by a gnutls_x509_crq_t structure
   * @crq: The structure to be initialized
   *
   * This function will deinitialize a CRL structure. 
   *
   **/
-void gnutls_x509_crq_deinit(gnutls_x509_crq crq)
+void gnutls_x509_crq_deinit(gnutls_x509_crq_t crq)
 {
     if (!crq)
 	return;
@@ -96,18 +96,18 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq crq)
   * @format: One of DER or PEM
   *
   * This function will convert the given DER or PEM encoded Certificate
-  * to the native gnutls_x509_crq format. The output will be stored in @cert.
+  * to the native gnutls_x509_crq_t format. The output will be stored in @cert.
   *
   * If the Certificate is PEM encoded it should have a header of "NEW CERTIFICATE REQUEST".
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
-			   gnutls_x509_crt_fmt format)
+int gnutls_x509_crq_import(gnutls_x509_crq_t crq, const gnutls_datum_t * data,
+			   gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;
-    gnutls_datum _data;
+    gnutls_datum_t _data;
 
     if (crq == NULL) {
 	gnutls_assert();
@@ -163,7 +163,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 
 /**
   * gnutls_x509_crq_get_dn - This function returns the Certificate request subject's distinguished name
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
@@ -178,7 +178,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
+int gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf,
 			   size_t * sizeof_buf)
 {
     if (crq == NULL) {
@@ -193,7 +193,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
 
 /**
   * gnutls_x509_crq_get_dn_by_oid - This function returns the Certificate request subject's distinguished name
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
@@ -216,7 +216,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char *oid,
+int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
 				  int indx, unsigned int raw_flag,
 				  void *buf, size_t * sizeof_buf)
 {
@@ -232,7 +232,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char *oid,
 
 /**
   * gnutls_x509_crq_get_dn_oid - This function returns the Certificate request subject's distinguished name OIDs
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @indx: Specifies which DN OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the name (may be null)
   * @sizeof_oid: initially holds the size of @oid
@@ -247,7 +247,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char *oid,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq crq,
+int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq_t crq,
 			       int indx, void *oid, size_t * sizeof_oid)
 {
     if (crq == NULL) {
@@ -384,7 +384,7 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
 
 /**
   * gnutls_x509_crq_get_challenge_password - This function will get the challenge password 
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @pass: will hold a null terminated password
   * @sizeof_pass: Initially holds the size of @pass.
   *
@@ -394,7 +394,7 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
+int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq_t crq,
 					   char *pass,
 					   size_t * sizeof_pass)
 {
@@ -409,7 +409,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
 
 /**
   * gnutls_x509_crq_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @oid: holds an Object Identifier in a null terminated string
   * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @data: a pointer to the input data
@@ -427,7 +427,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char *oid,
+int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
 				  unsigned int raw_flag, const void *data,
 				  unsigned int sizeof_data)
 {
@@ -442,7 +442,7 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char *oid,
 
 /**
   * gnutls_x509_crq_set_version - This function will set the Certificate request version
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @version: holds the version number. For v1 Requests must be 1.
   *
   * This function will set the version of the certificate request. For
@@ -451,7 +451,7 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char *oid,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
+int gnutls_x509_crq_set_version(gnutls_x509_crq_t crq, unsigned int version)
 {
     int result;
     unsigned char null = version;
@@ -477,14 +477,14 @@ int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
 
 /**
   * gnutls_x509_crq_get_version - This function returns the Certificate request's version number
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   *
   * This function will return the version of the specified Certificate request.
   *
   * Returns a negative value on error.
   *
   **/
-int gnutls_x509_crq_get_version(gnutls_x509_crq crq)
+int gnutls_x509_crq_get_version(gnutls_x509_crq_t crq)
 {
     opaque version[5];
     int len, result;
@@ -510,7 +510,7 @@ int gnutls_x509_crq_get_version(gnutls_x509_crq crq)
 
 /**
   * gnutls_x509_crq_set_key - This function will associate the Certificate request with a key
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @key: holds a private key
   *
   * This function will set the public parameters from the given private key to the
@@ -519,7 +519,7 @@ int gnutls_x509_crq_get_version(gnutls_x509_crq crq)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key)
+int gnutls_x509_crq_set_key(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
     int result;
 
@@ -544,7 +544,7 @@ int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key)
 
 /**
   * gnutls_x509_crq_set_challenge_password - This function will set a challenge password 
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @pass: holds a null terminated password
   *
   * This function will set a challenge password to be used when revoking the request.
@@ -552,7 +552,7 @@ int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq,
+int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 					   const char *pass)
 {
     int result;
@@ -588,7 +588,7 @@ int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq,
 
 /**
   * gnutls_x509_crq_sign - This function will sign a Certificate request with a key
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @key: holds a private key
   *
   * This function will sign the certificate request with a private key.
@@ -601,10 +601,10 @@ int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq crq,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key)
+int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
     int result;
-    gnutls_datum signature;
+    gnutls_datum_t signature;
 
     if (crq == NULL) {
 	gnutls_assert();
@@ -667,8 +667,8 @@ int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key)
   * 0 on success.
   *
   **/
-int gnutls_x509_crq_export(gnutls_x509_crq crq,
-			   gnutls_x509_crt_fmt format, void *output_data,
+int gnutls_x509_crq_export(gnutls_x509_crq_t crq,
+			   gnutls_x509_crt_fmt_t format, void *output_data,
 			   size_t * output_data_size)
 {
     if (crq == NULL) {
@@ -683,7 +683,7 @@ int gnutls_x509_crq_export(gnutls_x509_crq crq,
 
 /**
   * gnutls_x509_crq_get_pk_algorithm - This function returns the certificate request's PublicKey algorithm
-  * @crq: should contain a gnutls_x509_crq structure
+  * @crq: should contain a gnutls_x509_crq_t structure
   * @bits: if bits is non null it will hold the size of the parameters' in bits
   *
   * This function will return the public key algorithm of a PKCS \#10 
@@ -694,11 +694,11 @@ int gnutls_x509_crq_export(gnutls_x509_crq crq,
   * For DSA the bits returned are of the public
   * exponent.
   *
-  * Returns a member of the gnutls_pk_algorithm enumeration on success,
+  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
   * or a negative value on error.
   *
   **/
-int gnutls_x509_crq_get_pk_algorithm(gnutls_x509_crq crq,
+int gnutls_x509_crq_get_pk_algorithm(gnutls_x509_crq_t crq,
 				     unsigned int *bits)
 {
     int result;

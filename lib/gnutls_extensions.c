@@ -93,7 +93,7 @@ const char *_gnutls_extension_get_name(uint16 type)
 /* Checks if the extension we just received is one of the 
  * requested ones. Otherwise it's a fatal error.
  */
-static int _gnutls_extension_list_check(gnutls_session session,
+static int _gnutls_extension_list_check(gnutls_session_t session,
 					uint16 type)
 {
     if (session->security_parameters.entity == GNUTLS_CLIENT) {
@@ -108,7 +108,7 @@ static int _gnutls_extension_list_check(gnutls_session session,
     return 0;
 }
 
-int _gnutls_parse_extensions(gnutls_session session, const opaque * data,
+int _gnutls_parse_extensions(gnutls_session_t session, const opaque * data,
 			     int data_size)
 {
     int next, ret;
@@ -177,7 +177,7 @@ int _gnutls_parse_extensions(gnutls_session session, const opaque * data,
  * This list is used to check whether the (later) received
  * extensions are the ones we requested.
  */
-static void _gnutls_extension_list_add(gnutls_session session, uint16 type)
+static void _gnutls_extension_list_add(gnutls_session_t session, uint16 type)
 {
 
     if (session->security_parameters.entity == GNUTLS_CLIENT) {
@@ -192,7 +192,7 @@ static void _gnutls_extension_list_add(gnutls_session session, uint16 type)
     }
 }
 
-int _gnutls_gen_extensions(gnutls_session session, opaque * data,
+int _gnutls_gen_extensions(gnutls_session_t session, opaque * data,
 			   size_t data_size)
 {
     int next, size;

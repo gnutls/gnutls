@@ -52,7 +52,7 @@ static const int servwrite_length = sizeof(servwrite) - 1;
  * This function creates the keys and stores them into pending session.
  * (session->cipher_specs)
  */
-int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
+int _gnutls_set_keys(gnutls_session_t session, int hash_size, int IV_size,
 		     int key_size, int export_flag)
 {
 
@@ -349,13 +349,13 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
     return 0;
 }
 
-int _gnutls_set_read_keys(gnutls_session session)
+int _gnutls_set_read_keys(gnutls_session_t session)
 {
     int hash_size;
     int IV_size;
     int key_size, export_flag;
-    gnutls_cipher_algorithm algo;
-    gnutls_mac_algorithm mac_algo;
+    gnutls_cipher_algorithm_t algo;
+    gnutls_mac_algorithm_t mac_algo;
 
     mac_algo = session->security_parameters.read_mac_algorithm;
     algo = session->security_parameters.read_bulk_cipher_algorithm;
@@ -369,13 +369,13 @@ int _gnutls_set_read_keys(gnutls_session session)
 			    export_flag);
 }
 
-int _gnutls_set_write_keys(gnutls_session session)
+int _gnutls_set_write_keys(gnutls_session_t session)
 {
     int hash_size;
     int IV_size;
     int key_size, export_flag;
-    gnutls_cipher_algorithm algo;
-    gnutls_mac_algorithm mac_algo;
+    gnutls_cipher_algorithm_t algo;
+    gnutls_mac_algorithm_t mac_algo;
 
     mac_algo = session->security_parameters.write_mac_algorithm;
     algo = session->security_parameters.write_bulk_cipher_algorithm;
@@ -434,7 +434,7 @@ static void _gnutls_cpy_write_security_parameters(security_parameters_st *
  * secrets and random numbers to have been negotiated)
  * This is to be called after sending the Change Cipher Spec packet.
  */
-int _gnutls_connection_state_init(gnutls_session session)
+int _gnutls_connection_state_init(gnutls_session_t session)
 {
     int ret;
 
@@ -453,7 +453,7 @@ int _gnutls_connection_state_init(gnutls_session session)
 /* Initializes the read connection session
  * (read encrypted data)
  */
-int _gnutls_read_connection_state_init(gnutls_session session)
+int _gnutls_read_connection_state_init(gnutls_session_t session)
 {
     int mac_size;
     int rc;
@@ -632,7 +632,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 /* Initializes the write connection session
  * (write encrypted data)
  */
-int _gnutls_write_connection_state_init(gnutls_session session)
+int _gnutls_write_connection_state_init(gnutls_session_t session)
 {
     int mac_size;
     int rc;
@@ -812,8 +812,8 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 
 /* Sets the specified cipher into the pending session 
  */
-int _gnutls_set_read_cipher(gnutls_session session,
-			    gnutls_cipher_algorithm algo)
+int _gnutls_set_read_cipher(gnutls_session_t session,
+			    gnutls_cipher_algorithm_t algo)
 {
 
     if (_gnutls_cipher_is_ok(algo) == 0) {
@@ -833,8 +833,8 @@ int _gnutls_set_read_cipher(gnutls_session session,
 
 }
 
-int _gnutls_set_write_cipher(gnutls_session session,
-			     gnutls_cipher_algorithm algo)
+int _gnutls_set_write_cipher(gnutls_session_t session,
+			     gnutls_cipher_algorithm_t algo)
 {
 
     if (_gnutls_cipher_is_ok(algo) == 0) {
@@ -857,8 +857,8 @@ int _gnutls_set_write_cipher(gnutls_session session,
 
 /* Sets the specified algorithm into pending compression session 
  */
-int _gnutls_set_read_compression(gnutls_session session,
-				 gnutls_compression_method algo)
+int _gnutls_set_read_compression(gnutls_session_t session,
+				 gnutls_compression_method_t algo)
 {
 
     if (_gnutls_compression_is_ok(algo) == 0) {
@@ -871,8 +871,8 @@ int _gnutls_set_read_compression(gnutls_session session,
 
 }
 
-int _gnutls_set_write_compression(gnutls_session session,
-				  gnutls_compression_method algo)
+int _gnutls_set_write_compression(gnutls_session_t session,
+				  gnutls_compression_method_t algo)
 {
 
     if (_gnutls_compression_is_ok(algo) == 0) {
@@ -887,7 +887,7 @@ int _gnutls_set_write_compression(gnutls_session session,
 
 /* Sets the specified kx algorithm into pending session 
  */
-int _gnutls_set_kx(gnutls_session session, gnutls_kx_algorithm algo)
+int _gnutls_set_kx(gnutls_session_t session, gnutls_kx_algorithm_t algo)
 {
 
     if (_gnutls_kx_is_ok(algo) == 0) {
@@ -907,7 +907,7 @@ int _gnutls_set_kx(gnutls_session session, gnutls_kx_algorithm algo)
 }
 
 /* Sets the specified mac algorithm into pending session */
-int _gnutls_set_read_mac(gnutls_session session, gnutls_mac_algorithm algo)
+int _gnutls_set_read_mac(gnutls_session_t session, gnutls_mac_algorithm_t algo)
 {
 
     if (_gnutls_mac_is_ok(algo) == 0) {
@@ -926,8 +926,8 @@ int _gnutls_set_read_mac(gnutls_session session, gnutls_mac_algorithm algo)
 
 }
 
-int _gnutls_set_write_mac(gnutls_session session,
-			  gnutls_mac_algorithm algo)
+int _gnutls_set_write_mac(gnutls_session_t session,
+			  gnutls_mac_algorithm_t algo)
 {
 
     if (_gnutls_mac_is_ok(algo) == 0) {

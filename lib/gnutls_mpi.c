@@ -109,7 +109,7 @@ int _gnutls_mpi_print_lz(void *buffer, size_t * nbytes, const mpi_t a)
 }
 
 /* Always has the first bit zero */
-int _gnutls_mpi_dprint_lz(gnutls_datum * dest, const mpi_t a)
+int _gnutls_mpi_dprint_lz(gnutls_datum_t * dest, const mpi_t a)
 {
     int ret;
     opaque *buf = NULL;

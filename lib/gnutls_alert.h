@@ -1,5 +1,5 @@
-typedef enum gnutls_alert_level { GNUTLS_AL_WARNING = 1, GNUTLS_AL_FATAL
-} gnutls_alert_level;
+typedef enum gnutls_alert_level_t { GNUTLS_AL_WARNING = 1, GNUTLS_AL_FATAL
+} gnutls_alert_level_t;
 
 typedef enum AlertDescription {
     GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE = 10,
@@ -19,9 +19,9 @@ typedef enum AlertDescription {
 	112,
     GNUTLS_A_UNKNOWN_SRP_USERNAME = 120, GNUTLS_A_MISSING_SRP_USERNAME =
 	121
-} gnutls_alert_description;
+} gnutls_alert_description_t;
 
-gnutls_alert_description gnutls_alert_get(gnutls_session session);
-int gnutls_alert_send(gnutls_session session, gnutls_alert_level level,
-		      gnutls_alert_description desc);
-const char *gnutls_alert_get_name(gnutls_alert_level alert);
+gnutls_alert_description_t gnutls_alert_get(gnutls_session_t session);
+int gnutls_alert_send(gnutls_session_t session, gnutls_alert_level_t level,
+		      gnutls_alert_description_t desc);
+const char *gnutls_alert_get_name(gnutls_alert_level_t alert);

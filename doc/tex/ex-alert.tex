@@ -8,7 +8,7 @@
  * a gnutls function (recv/send), is an alert, and will print
  * that alert.
  */
-void check_alert(gnutls_session session, int ret)
+void check_alert(gnutls_session_t session, int ret)
 {
    int last_alert;
 

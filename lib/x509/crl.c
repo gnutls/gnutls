@@ -34,7 +34,7 @@
 #include <dn.h>
 
 /**
-  * gnutls_x509_crl_init - This function initializes a gnutls_x509_crl structure
+  * gnutls_x509_crl_init - This function initializes a gnutls_x509_crl_t structure
   * @crl: The structure to be initialized
   *
   * This function will initialize a CRL structure. CRL stands for
@@ -46,7 +46,7 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_init(gnutls_x509_crl * crl)
+int gnutls_x509_crl_init(gnutls_x509_crl_t * crl)
 {
     *crl = gnutls_calloc(1, sizeof(gnutls_x509_crl_int));
 
@@ -65,13 +65,13 @@ int gnutls_x509_crl_init(gnutls_x509_crl * crl)
 }
 
 /**
-  * gnutls_x509_crl_deinit - This function deinitializes memory used by a gnutls_x509_crl structure
+  * gnutls_x509_crl_deinit - This function deinitializes memory used by a gnutls_x509_crl_t structure
   * @crl: The structure to be initialized
   *
   * This function will deinitialize a CRL structure. 
   *
   **/
-void gnutls_x509_crl_deinit(gnutls_x509_crl crl)
+void gnutls_x509_crl_deinit(gnutls_x509_crl_t crl)
 {
     if (!crl)
 	return;
@@ -89,18 +89,18 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl crl)
   * @format: One of DER or PEM
   *
   * This function will convert the given DER or PEM encoded CRL
-  * to the native gnutls_x509_crl format. The output will be stored in 'crl'.
+  * to the native gnutls_x509_crl_t format. The output will be stored in 'crl'.
   *
   * If the CRL is PEM encoded it should have a header of "X509 CRL".
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
-			   gnutls_x509_crt_fmt format)
+int gnutls_x509_crl_import(gnutls_x509_crl_t crl, const gnutls_datum_t * data,
+			   gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;
-    gnutls_datum _data;
+    gnutls_datum_t _data;
 
     _data.data = data->data;
     _data.size = data->size;
@@ -153,7 +153,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 
 /**
   * gnutls_x509_crl_get_issuer_dn - This function returns the CRL's issuer distinguished name
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @buf: a pointer to a structure to hold the peer's name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
@@ -168,7 +168,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
   * 0 on success.
   *
   **/
-int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
+int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl_t crl, char *buf,
 				  size_t * sizeof_buf)
 {
     if (crl == NULL) {
@@ -183,7 +183,7 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
 
 /**
   * gnutls_x509_crl_get_issuer_dn_by_oid - This function returns the CRL's issuer distinguished name
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
@@ -206,7 +206,7 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
   * and 0 on success.
   *
   **/
-int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
+int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl_t crl,
 					 const char *oid, int indx,
 					 unsigned int raw_flag, void *buf,
 					 size_t * sizeof_buf)
@@ -223,7 +223,7 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
 
 /**
   * gnutls_x509_crl_get_issuer_dn_oid - This function returns the Certificate request issuer's distinguished name OIDs
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @indx: Specifies which DN OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the name (may be null)
   * @sizeof_oid: initially holds the size of 'oid'
@@ -238,7 +238,7 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crl_get_dn_oid(gnutls_x509_crl crl,
+int gnutls_x509_crl_get_dn_oid(gnutls_x509_crl_t crl,
 			       int indx, void *oid, size_t * sizeof_oid)
 {
     if (crl == NULL) {
@@ -254,18 +254,18 @@ int gnutls_x509_crl_get_dn_oid(gnutls_x509_crl crl,
 
 /**
   * gnutls_x509_crl_get_signature_algorithm - This function returns the CRL's signature algorithm
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   *
-  * This function will return a value of the gnutls_sign_algorithm enumeration that 
+  * This function will return a value of the gnutls_sign_algorithm_t enumeration that 
   * is the signature algorithm. 
   *
   * Returns a negative value on error.
   *
   **/
-int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl)
+int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl_t crl)
 {
     int result;
-    gnutls_datum sa;
+    gnutls_datum_t sa;
 
     if (crl == NULL) {
 	gnutls_assert();
@@ -294,14 +294,14 @@ int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl)
 
 /**
   * gnutls_x509_crl_get_version - This function returns the CRL's version number
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   *
   * This function will return the version of the specified CRL.
   *
   * Returns a negative value on error.
   *
   **/
-int gnutls_x509_crl_get_version(gnutls_x509_crl crl)
+int gnutls_x509_crl_get_version(gnutls_x509_crl_t crl)
 {
     opaque version[5];
     int len, result;
@@ -324,14 +324,14 @@ int gnutls_x509_crl_get_version(gnutls_x509_crl crl)
 
 /**
   * gnutls_x509_crl_get_this_update - This function returns the CRL's thisUpdate time
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   *
   * This function will return the time this CRL was issued.
   *
   * Returns (time_t)-1 on error.
   *
   **/
-time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl crl)
+time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl_t crl)
 {
     if (crl == NULL) {
 	gnutls_assert();
@@ -343,7 +343,7 @@ time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl crl)
 
 /**
   * gnutls_x509_crl_get_next_update - This function returns the CRL's nextUpdate time
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   *
   * This function will return the time the next CRL will be issued.
   * This field is optional in a CRL so it might be normal to get
@@ -352,7 +352,7 @@ time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl crl)
   * Returns (time_t)-1 on error.
   *
   **/
-time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl)
+time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl_t crl)
 {
     if (crl == NULL) {
 	gnutls_assert();
@@ -364,7 +364,7 @@ time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl)
 
 /**
   * gnutls_x509_crl_get_crt_count - This function returns the number of revoked certificates in a CRL
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   *
   * This function will return the number of revoked certificates in the
   * given CRL.
@@ -372,7 +372,7 @@ time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl)
   * Returns a negative value on failure.
   *
   **/
-int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl)
+int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl)
 {
 
     int count, result;
@@ -396,7 +396,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl)
 
 /**
   * gnutls_x509_crl_get_crt_serial - This function returns the serial number of a revoked certificate
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @index: the index of the certificate to extract (starting from 0)
   * @serial: where the serial number will be copied
   * @serial_size: initially holds the size of serial
@@ -408,7 +408,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl)
   * Returns a negative value on failure.
   *
   **/
-int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index,
+int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int index,
 				   unsigned char *serial,
 				   size_t * serial_size, time_t * time)
 {
@@ -454,7 +454,7 @@ int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index,
 
 /*-
   * _gnutls_x509_crl_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
-  * @crl: should contain a gnutls_x509_crl structure
+  * @crl: should contain a gnutls_x509_crl_t structure
   * @dn: will hold the starting point of the DN
   *
   * This function will return a pointer to the DER encoded DN structure and
@@ -463,13 +463,13 @@ int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index,
   * Returns a negative value on error, and zero on success.
   *
   -*/
-int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl crl,
-				       gnutls_datum * dn)
+int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl_t crl,
+				       gnutls_datum_t * dn)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result, len1;
     int start1, end1;
-    gnutls_datum crl_signed_data;
+    gnutls_datum_t crl_signed_data;
 
     if (crl == NULL) {
 	gnutls_assert();
@@ -545,8 +545,8 @@ int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl crl,
   * Returns 0 on success, and a negative value on failure.
   *
   **/
-int gnutls_x509_crl_export(gnutls_x509_crl crl,
-			   gnutls_x509_crt_fmt format, void *output_data,
+int gnutls_x509_crl_export(gnutls_x509_crl_t crl,
+			   gnutls_x509_crt_fmt_t format, void *output_data,
 			   size_t * output_data_size)
 {
     if (crl == NULL) {
@@ -560,7 +560,7 @@ int gnutls_x509_crl_export(gnutls_x509_crl crl,
 }
 
 /*-
-  * _gnutls_x509_crl_cpy - This function copies a gnutls_x509_crl structure
+  * _gnutls_x509_crl_cpy - This function copies a gnutls_x509_crl_t structure
   * @dest: The structure where to copy
   * @src: The structure to be copied
   *
@@ -569,12 +569,12 @@ int gnutls_x509_crl_export(gnutls_x509_crl crl,
   * Returns 0 on success.
   *
   -*/
-int _gnutls_x509_crl_cpy(gnutls_x509_crl dest, gnutls_x509_crl src)
+int _gnutls_x509_crl_cpy(gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 {
     int ret;
     size_t der_size;
     opaque *der;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
 
     ret =
 	gnutls_x509_crl_export(src, GNUTLS_X509_FMT_DER, NULL, &der_size);

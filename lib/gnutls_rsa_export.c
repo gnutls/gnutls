@@ -42,7 +42,7 @@
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.
  */
-const mpi_t *_gnutls_get_rsa_params(gnutls_rsa_params rsa_params)
+const mpi_t *_gnutls_get_rsa_params(gnutls_rsa_params_t rsa_params)
 {
     if (rsa_params == NULL) {
 	return NULL;
@@ -168,13 +168,13 @@ int _gnutls_rsa_generate_params(mpi_t * resarr, int *resarr_len, int bits)
   * The new parameters should be stored in the appropriate gnutls_datum. 
   * 
   **/
-int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params,
-				 const gnutls_datum * m,
-				 const gnutls_datum * e,
-				 const gnutls_datum * d,
-				 const gnutls_datum * p,
-				 const gnutls_datum * q,
-				 const gnutls_datum * u)
+int gnutls_rsa_params_import_raw(gnutls_rsa_params_t rsa_params,
+				 const gnutls_datum_t * m,
+				 const gnutls_datum_t * e,
+				 const gnutls_datum_t * d,
+				 const gnutls_datum_t * p,
+				 const gnutls_datum_t * q,
+				 const gnutls_datum_t * u)
 {
     return gnutls_x509_privkey_import_rsa_raw(rsa_params,
 					      m, e, d, p, q, u);
@@ -187,7 +187,7 @@ int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params,
   * This function will initialize the temporary RSA parameters structure.
   *
   **/
-int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
+int gnutls_rsa_params_init(gnutls_rsa_params_t * rsa_params)
 {
     int ret;
 
@@ -209,7 +209,7 @@ int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
   * This function will deinitialize the RSA parameters structure.
   *
   **/
-void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
+void gnutls_rsa_params_deinit(gnutls_rsa_params_t rsa_params)
 {
     gnutls_x509_privkey_deinit(rsa_params);
 }
@@ -223,7 +223,7 @@ void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
   * to destination.
   *
   **/
-int gnutls_rsa_params_cpy(gnutls_rsa_params dst, gnutls_rsa_params src)
+int gnutls_rsa_params_cpy(gnutls_rsa_params_t dst, gnutls_rsa_params_t src)
 {
     return gnutls_x509_privkey_cpy(dst, src);
 }
@@ -243,7 +243,7 @@ int gnutls_rsa_params_cpy(gnutls_rsa_params dst, gnutls_rsa_params src)
   * no use calling this in client side.
   *
   **/
-int gnutls_rsa_params_generate2(gnutls_rsa_params params,
+int gnutls_rsa_params_generate2(gnutls_rsa_params_t params,
 				unsigned int bits)
 {
     return gnutls_x509_privkey_generate(params, GNUTLS_PK_RSA, bits, 0);
@@ -265,9 +265,9 @@ int gnutls_rsa_params_generate2(gnutls_rsa_params params,
   * 0 on success.
   *
   **/
-int gnutls_rsa_params_import_pkcs1(gnutls_rsa_params params,
-				   const gnutls_datum * pkcs1_params,
-				   gnutls_x509_crt_fmt format)
+int gnutls_rsa_params_import_pkcs1(gnutls_rsa_params_t params,
+				   const gnutls_datum_t * pkcs1_params,
+				   gnutls_x509_crt_fmt_t format)
 {
     return gnutls_x509_privkey_import(params, pkcs1_params, format);
 }
@@ -291,8 +291,8 @@ int gnutls_rsa_params_import_pkcs1(gnutls_rsa_params params,
   * 0 on success.
   *
   **/
-int gnutls_rsa_params_export_pkcs1(gnutls_rsa_params params,
-				   gnutls_x509_crt_fmt format,
+int gnutls_rsa_params_export_pkcs1(gnutls_rsa_params_t params,
+				   gnutls_x509_crt_fmt_t format,
 				   unsigned char *params_data,
 				   size_t * params_data_size)
 {
@@ -317,11 +317,10 @@ int gnutls_rsa_params_export_pkcs1(gnutls_rsa_params params,
   * gnutls_malloc() and will be stored in the appropriate datum.
   * 
   **/
-int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
-				 gnutls_datum * m, gnutls_datum * e,
-				 gnutls_datum * d, gnutls_datum * p,
-				 gnutls_datum * q, gnutls_datum * u,
-				 unsigned int *bits)
+int gnutls_rsa_params_export_raw(gnutls_rsa_params_t params,
+    gnutls_datum_t * m, gnutls_datum_t * e,
+    gnutls_datum_t * d, gnutls_datum_t * p,
+    gnutls_datum_t * q, gnutls_datum_t * u, unsigned int *bits)
 {
     int ret;
 

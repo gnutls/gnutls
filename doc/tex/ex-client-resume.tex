@@ -6,7 +6,7 @@
 
 /* Those functions are defined in other examples.
  */
-extern void check_alert(gnutls_session session, int ret);
+extern void check_alert(gnutls_session_t session, int ret);
 extern int tcp_connect( void);
 extern void tcp_close( int sd);
 
@@ -20,9 +20,9 @@ int main()
 {
    int ret;
    int sd, ii, alert;
-   gnutls_session session;
+   gnutls_session_t session;
    char buffer[MAX_BUF + 1];
-   gnutls_certificate_credentials xcred;
+   gnutls_certificate_credentials_t xcred;
 
    /* variables used in session resuming 
     */
@@ -52,7 +52,7 @@ int main()
          free(session_data);
       }
       
-      gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
+      gnutls_transport_set_ptr( session, (gnutls_transport_ptr_t)sd);
 
       /* Perform the TLS handshake
        */

@@ -296,7 +296,7 @@ int _gnutls_sbase64_decode(uint8 * data, size_t idata_size,
   * If the provided buffer is not long enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
   * 
   **/
-int gnutls_srp_base64_encode(const gnutls_datum * data, char *result,
+int gnutls_srp_base64_encode(const gnutls_datum_t * data, char *result,
 			     int *result_size)
 {
     opaque *ret;
@@ -331,8 +331,8 @@ int gnutls_srp_base64_encode(const gnutls_datum * data, char *result,
   * You should use gnutls_free() to free the returned data.
   * 
   **/
-int gnutls_srp_base64_encode_alloc(const gnutls_datum * data,
-				   gnutls_datum * result)
+int gnutls_srp_base64_encode_alloc(const gnutls_datum_t * data,
+				   gnutls_datum_t * result)
 {
     opaque *ret;
     int size;
@@ -366,7 +366,7 @@ int gnutls_srp_base64_encode_alloc(const gnutls_datum * data,
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
   * or 0 on success.
   **/
-int gnutls_srp_base64_decode(const gnutls_datum * b64_data, char *result,
+int gnutls_srp_base64_decode(const gnutls_datum_t * b64_data, char *result,
 			     int *result_size)
 {
     opaque *ret;
@@ -401,8 +401,8 @@ int gnutls_srp_base64_decode(const gnutls_datum * b64_data, char *result,
   * You should use gnutls_free() to free the returned data.
   * 
   **/
-int gnutls_srp_base64_decode_alloc(const gnutls_datum * b64_data,
-				   gnutls_datum * result)
+int gnutls_srp_base64_decode_alloc(const gnutls_datum_t * b64_data,
+				   gnutls_datum_t * result)
 {
     opaque *ret;
     int size;

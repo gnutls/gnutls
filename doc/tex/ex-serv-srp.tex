@@ -28,12 +28,12 @@
 #define PORT 5556               /* listen to 5556 port */
 
 /* These are global */
-gnutls_srp_server_credentials srp_cred;
-gnutls_certificate_credentials cert_cred;
+gnutls_srp_server_credentials_t srp_cred;
+gnutls_certificate_credentials_t cert_cred;
 
-gnutls_session initialize_tls_session()
+gnutls_session_t initialize_tls_session()
 {
-   gnutls_session session;
+   gnutls_session_t session;
    const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS,
       GNUTLS_KX_SRP_RSA, 0 };
 
@@ -62,7 +62,7 @@ int main()
    struct sockaddr_in sa_cli;
    int client_len;
    char topbuf[512];
-   gnutls_session session;
+   gnutls_session_t session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
    char name[256];
@@ -113,7 +113,7 @@ int main()
              inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-      gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
+      gnutls_transport_set_ptr( session, (gnutls_transport_ptr_t)sd);
       ret = gnutls_handshake( session);
       if (ret < 0) {
          close(sd);

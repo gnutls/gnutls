@@ -30,7 +30,7 @@
 #include "gnutls_algorithms.h"
 #include <gnutls_num.h>
 
-int _gnutls_srp_recv_params(gnutls_session session, const opaque * data,
+int _gnutls_srp_recv_params(gnutls_session_t session, const opaque * data,
 			    size_t _data_size)
 {
     uint8 len;
@@ -77,7 +77,7 @@ inline static int is_srp(cipher_suite_st suite)
 /* returns data_size or a negative number on failure
  * data is allocated locally
  */
-int _gnutls_srp_send_params(gnutls_session session, opaque * data,
+int _gnutls_srp_send_params(gnutls_session_t session, opaque * data,
 			    size_t data_size)
 {
     uint len;
@@ -92,7 +92,7 @@ int _gnutls_srp_send_params(gnutls_session session, opaque * data,
 
     /* this function sends the client extension data (username) */
     if (session->security_parameters.entity == GNUTLS_CLIENT) {
-	const gnutls_srp_client_credentials cred =
+	const gnutls_srp_client_credentials_t cred =
 	    _gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
 
 	if (cred == NULL)

@@ -13,12 +13,12 @@
  *  encrypted using a PKCS #12 cipher, or some browsers will crash)
  * password: is the password used to encrypt the PKCS #12 packet.
  */
-int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
+int write_pkcs12(const gnutls_datum_t * cert, const gnutls_datum_t * pkcs8_key,
                  const char *password)
 {
-   gnutls_pkcs12 pkcs12;
+   gnutls_pkcs12_t pkcs12;
    int ret, bag_index;
-   gnutls_pkcs12_bag bag, key_bag;
+   gnutls_pkcs12_bag_t bag, key_bag;
    char pkcs12_struct[10 * 1024];
    int pkcs12_struct_size;
    FILE *fd;
@@ -26,7 +26,7 @@ int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
    /* A good idea might be to use gnutls_x509_privkey_get_key_id()
     * to obtain a unique ID.
     */
-   gnutls_datum key_id = { "\x00\x00\x07", 3 };
+   gnutls_datum_t key_id = { "\x00\x00\x07", 3 };
 
    gnutls_global_init();
 

@@ -57,9 +57,9 @@ void tcp_close( int sd)
 int main()
 {
    int ret, sd, ii;
-   gnutls_session session;
+   gnutls_session_t session;
    char buffer[MAX_BUF + 1];
-   gnutls_certificate_credentials xcred;
+   gnutls_certificate_credentials_t xcred;
    /* Allow connections to servers that have OpenPGP keys as well.
     */
    const int cert_type_priority[3] = { GNUTLS_CRT_X509, 
@@ -90,7 +90,7 @@ int main()
     */
    sd = tcp_connect();
 
-   gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
+   gnutls_transport_set_ptr( session, (gnutls_transport_ptr_t)sd);
 
    /* Perform the TLS handshake
     */

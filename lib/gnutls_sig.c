@@ -37,23 +37,23 @@
 
 static
 int _gnutls_tls_sign(gnutls_cert * cert, gnutls_privkey * pkey,
-		     const gnutls_datum * hash_concat,
-		     gnutls_datum * signature);
+		     const gnutls_datum_t * hash_concat,
+		     gnutls_datum_t * signature);
 
 
 /* Generates a signature of all the previous sent packets in the 
  * handshake procedure. (20040227: now it works for SSL 3.0 as well)
  */
-int _gnutls_tls_sign_hdata(gnutls_session session,
+int _gnutls_tls_sign_hdata(gnutls_session_t session,
 			   gnutls_cert * cert, gnutls_privkey * pkey,
-			   gnutls_datum * signature)
+			   gnutls_datum_t * signature)
 {
-    gnutls_datum dconcat;
+    gnutls_datum_t dconcat;
     int ret;
     opaque concat[36];
     mac_hd_t td_md5;
     mac_hd_t td_sha;
-    gnutls_protocol_version ver = gnutls_protocol_get_version(session);
+    gnutls_protocol_t ver = gnutls_protocol_get_version(session);
 
     td_sha =
 	_gnutls_hash_copy(session->internals.handshake_mac_handle_sha);
@@ -116,11 +116,11 @@ int _gnutls_tls_sign_hdata(gnutls_session session,
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_tls_sign_params(gnutls_session session, gnutls_cert * cert,
-			    gnutls_privkey * pkey, gnutls_datum * params,
-			    gnutls_datum * signature)
+int _gnutls_tls_sign_params(gnutls_session_t session, gnutls_cert * cert,
+			    gnutls_privkey * pkey, gnutls_datum_t * params,
+			    gnutls_datum_t * signature)
 {
-    gnutls_datum dconcat;
+    gnutls_datum_t dconcat;
     int ret;
     mac_hd_t td_md5;
     mac_hd_t td_sha;
@@ -182,8 +182,8 @@ int _gnutls_tls_sign_params(gnutls_session session, gnutls_cert * cert,
 /* This will create a PKCS1 or DSA signature, using the given parameters, and the
  * given data. The output will be allocated and be put in signature.
  */
-int _gnutls_sign(gnutls_pk_algorithm algo, mpi_t * params, int params_size,
-		 const gnutls_datum * data, gnutls_datum * signature)
+int _gnutls_sign(gnutls_pk_algorithm_t algo, mpi_t * params, int params_size,
+		 const gnutls_datum_t * data, gnutls_datum_t * signature)
 {
     int ret;
 
@@ -220,8 +220,8 @@ int _gnutls_sign(gnutls_pk_algorithm algo, mpi_t * params, int params_size,
  */
 static
 int _gnutls_tls_sign(gnutls_cert * cert, gnutls_privkey * pkey,
-		     const gnutls_datum * hash_concat,
-		     gnutls_datum * signature)
+		     const gnutls_datum_t * hash_concat,
+		     gnutls_datum_t * signature)
 {
 
     /* If our certificate supports signing
@@ -242,11 +242,11 @@ int _gnutls_tls_sign(gnutls_cert * cert, gnutls_privkey * pkey,
 
 static
 int _gnutls_pkcs1_rsa_verify_sig(gnutls_cert * cert,
-				 const gnutls_datum * hash_concat,
-				 gnutls_datum * signature)
+				 const gnutls_datum_t * hash_concat,
+				 gnutls_datum_t * signature)
 {
     int ret;
-    gnutls_datum vdata;
+    gnutls_datum_t vdata;
 
     if (cert->version == 0 || cert == NULL) {	/* this is the only way to check
 						   * if it is initialized
@@ -306,15 +306,15 @@ int _gnutls_pkcs1_rsa_verify_sig(gnutls_cert * cert,
 /* Verifies a TLS signature (like the one in the client certificate
  * verify message). 
  */
-int _gnutls_verify_sig_hdata(gnutls_session session, gnutls_cert * cert,
-			     gnutls_datum * signature)
+int _gnutls_verify_sig_hdata(gnutls_session_t session, gnutls_cert * cert,
+			     gnutls_datum_t * signature)
 {
     int ret;
     opaque concat[36];
     mac_hd_t td_md5;
     mac_hd_t td_sha;
-    gnutls_datum dconcat;
-    gnutls_protocol_version ver = gnutls_protocol_get_version(session);
+    gnutls_datum_t dconcat;
+    gnutls_protocol_t ver = gnutls_protocol_get_version(session);
 
     td_md5 =
 	_gnutls_hash_copy(session->internals.handshake_mac_handle_md5);
@@ -365,11 +365,11 @@ int _gnutls_verify_sig_hdata(gnutls_session session, gnutls_cert * cert,
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_verify_sig_params(gnutls_session session, gnutls_cert * cert,
-			      const gnutls_datum * params,
-			      gnutls_datum * signature)
+int _gnutls_verify_sig_params(gnutls_session_t session, gnutls_cert * cert,
+			      const gnutls_datum_t * params,
+			      gnutls_datum_t * signature)
 {
-    gnutls_datum dconcat;
+    gnutls_datum_t dconcat;
     int ret;
     mac_hd_t td_md5;
     mac_hd_t td_sha;

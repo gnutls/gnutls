@@ -201,7 +201,7 @@ static int normalize_name(ASN1_TYPE p, char *output, int output_size)
 
 static int
 _gnutls_asn1_get_structure_xml(ASN1_TYPE structure,
-			       gnutls_datum * res, int detail)
+			       gnutls_datum_t * res, int detail)
 {
     node_asn *p, *root;
     int k, indent = 0, len, len2, len3;
@@ -586,7 +586,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure,
 
 /**
   * gnutls_x509_crt_to_xml - This function parses an RDN sequence
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @res: The datum that will hold the result
   * @detail: The detail level (must be GNUTLS_XML_SHOW_ALL or GNUTLS_XML_NORMAL)
   *
@@ -595,7 +595,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure,
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum * res,
+int gnutls_x509_crt_to_xml(gnutls_x509_crt_t cert, gnutls_datum_t * res,
 			   int detail)
 {
     int result;

@@ -31,9 +31,9 @@
 
 /* These functions allocate the return value internally
  */
-int _gnutls_m_plaintext2compressed(gnutls_session session,
-				   gnutls_datum *
-				   compress, gnutls_datum plaintext)
+int _gnutls_m_plaintext2compressed(gnutls_session_t session,
+				   gnutls_datum_t *
+				   compress, gnutls_datum_t plaintext)
 {
     int size;
     opaque *data;
@@ -52,9 +52,9 @@ int _gnutls_m_plaintext2compressed(gnutls_session session,
     return 0;
 }
 
-int _gnutls_m_compressed2plaintext(gnutls_session session,
-				   gnutls_datum * plain,
-				   gnutls_datum compressed)
+int _gnutls_m_compressed2plaintext(gnutls_session_t session,
+				   gnutls_datum_t * plain,
+				   gnutls_datum_t compressed)
 {
     int size;
     opaque *data;

@@ -27,28 +27,28 @@
 
 typedef struct {
     gcry_md_hd_t handle;
-    gnutls_mac_algorithm algorithm;
+    gnutls_mac_algorithm_t algorithm;
     const void *key;
     int keysize;
-} mac_hd_t_INT;
-typedef mac_hd_t_INT *mac_hd_t;
+} mac_hd_st;
+typedef mac_hd_st *mac_hd_t;
 typedef mac_hd_t GNUTLS_HASH_HANDLE;
 
 #define GNUTLS_HASH_FAILED NULL
 #define GNUTLS_MAC_FAILED NULL
 
-mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm algorithm, const void *key,
+mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm, const void *key,
 			   int keylen);
 #define _gnutls_hmac_get_algo_len _gnutls_hash_get_algo_len
 #define _gnutls_hmac _gnutls_hash
 void _gnutls_hmac_deinit(mac_hd_t handle, void *digest);
 
-mac_hd_t _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *key,
+mac_hd_t _gnutls_mac_init_ssl3(gnutls_mac_algorithm_t algorithm, void *key,
 			       int keylen);
 void _gnutls_mac_deinit_ssl3(mac_hd_t handle, void *digest);
 
-GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm);
-int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm);
+GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm_t algorithm);
+int _gnutls_hash_get_algo_len(gnutls_mac_algorithm_t algorithm);
 int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text,
 		 size_t textlen);
 void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void *digest);

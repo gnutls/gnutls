@@ -40,7 +40,7 @@
 #include <verify.h>
 
 /**
-  * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt structure
+  * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt_t structure
   * @cert: The structure to be initialized
   *
   * This function will initialize an X.509 certificate structure. 
@@ -48,7 +48,7 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_init(gnutls_x509_crt * cert)
+int gnutls_x509_crt_init(gnutls_x509_crt_t * cert)
 {
     *cert = gnutls_calloc(1, sizeof(gnutls_x509_crt_int));
 
@@ -67,7 +67,7 @@ int gnutls_x509_crt_init(gnutls_x509_crt * cert)
 }
 
 /*-
-  * _gnutls_x509_crt_cpy - This function copies a gnutls_x509_crt structure
+  * _gnutls_x509_crt_cpy - This function copies a gnutls_x509_crt_t structure
   * @dest: The structure where to copy
   * @src: The structure to be copied
   *
@@ -76,12 +76,12 @@ int gnutls_x509_crt_init(gnutls_x509_crt * cert)
   * Returns 0 on success.
   *
   -*/
-int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src)
+int _gnutls_x509_crt_cpy(gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
 {
     int ret;
     size_t der_size;
     opaque *der;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
 
     ret =
 	gnutls_x509_crt_export(src, GNUTLS_X509_FMT_DER, NULL, &der_size);
@@ -119,13 +119,13 @@ int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src)
 }
 
 /**
-  * gnutls_x509_crt_deinit - This function deinitializes memory used by a gnutls_x509_crt structure
+  * gnutls_x509_crt_deinit - This function deinitializes memory used by a gnutls_x509_crt_t structure
   * @cert: The structure to be initialized
   *
   * This function will deinitialize a CRL structure. 
   *
   **/
-void gnutls_x509_crt_deinit(gnutls_x509_crt cert)
+void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert)
 {
     if (!cert)
 	return;
@@ -143,7 +143,7 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt cert)
   * @format: One of DER or PEM
   *
   * This function will convert the given DER or PEM encoded Certificate
-  * to the native gnutls_x509_crt format. The output will be stored in @cert.
+  * to the native gnutls_x509_crt_t format. The output will be stored in @cert.
   *
   * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
   * "CERTIFICATE".
@@ -151,11 +151,11 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt cert)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
-			   gnutls_x509_crt_fmt format)
+int gnutls_x509_crt_import(gnutls_x509_crt_t cert, const gnutls_datum_t * data,
+			   gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;
-    gnutls_datum _data;
+    gnutls_datum_t _data;
     opaque *signature = NULL;
 
     if (cert == NULL) {
@@ -221,7 +221,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 
 /**
   * gnutls_x509_crt_get_issuer_dn - This function returns the Certificate's issuer distinguished name
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
@@ -236,7 +236,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
+int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
 				  size_t * sizeof_buf)
 {
     if (cert == NULL) {
@@ -251,7 +251,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
 
 /**
   * gnutls_x509_crt_get_issuer_dn_by_oid - This function returns the Certificate's issuer distinguished name
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
@@ -274,7 +274,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
 					 const char *oid, int indx,
 					 unsigned int raw_flag, void *buf,
 					 size_t * sizeof_buf)
@@ -291,7 +291,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_issuer_dn_oid - This function returns the Certificate's issuer distinguished name OIDs
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
@@ -306,7 +306,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
 				      int indx, void *oid,
 				      size_t * sizeof_oid)
 {
@@ -322,7 +322,7 @@ int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_dn - This function returns the Certificate's distinguished name
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
@@ -337,7 +337,7 @@ int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt cert,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
+int gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
 			   size_t * sizeof_buf)
 {
     if (cert == NULL) {
@@ -352,7 +352,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
 
 /**
   * gnutls_x509_crt_get_dn_by_oid - This function returns the Certificate's distinguished name
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
@@ -375,7 +375,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char *oid,
+int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert, const char *oid,
 				  int indx, unsigned int raw_flag,
 				  void *buf, size_t * sizeof_buf)
 {
@@ -391,7 +391,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char *oid,
 
 /**
   * gnutls_x509_crt_get_dn_oid - This function returns the Certificate's subject distinguished name OIDs
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
@@ -406,7 +406,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char *oid,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt_t cert,
 			       int indx, void *oid, size_t * sizeof_oid)
 {
     if (cert == NULL) {
@@ -421,18 +421,18 @@ int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_signature_algorithm - This function returns the Certificate's signature algorithm
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   *
-  * This function will return a value of the gnutls_sign_algorithm enumeration that 
+  * This function will return a value of the gnutls_sign_algorithm_t enumeration that 
   * is the signature algorithm. 
   *
   * Returns a negative value on error.
   *
   **/
-int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert)
+int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt_t cert)
 {
     int result;
-    gnutls_datum sa;
+    gnutls_datum_t sa;
 
     if (cert == NULL) {
 	gnutls_assert();
@@ -460,14 +460,14 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert)
 
 /**
   * gnutls_x509_crt_get_version - This function returns the Certificate's version number
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   *
   * This function will return the version of the specified Certificate.
   *
   * Returns a negative value on error.
   *
   **/
-int gnutls_x509_crt_get_version(gnutls_x509_crt cert)
+int gnutls_x509_crt_get_version(gnutls_x509_crt_t cert)
 {
     opaque version[5];
     int len, result;
@@ -493,14 +493,14 @@ int gnutls_x509_crt_get_version(gnutls_x509_crt cert)
 
 /**
   * gnutls_x509_crt_get_activation_time - This function returns the Certificate's activation time
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   *
   * This function will return the time this Certificate was or will be activated.
   *
   * Returns (time_t)-1 on error.
   *
   **/
-time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert)
+time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt_t cert)
 {
     if (cert == NULL) {
 	gnutls_assert();
@@ -513,14 +513,14 @@ time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert)
 
 /**
   * gnutls_x509_crt_get_expiration_time - This function returns the Certificate's expiration time
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   *
   * This function will return the time this Certificate was or will be expired.
   *
   * Returns (time_t)-1 on error.
   *
   **/
-time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert)
+time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt_t cert)
 {
     if (cert == NULL) {
 	gnutls_assert();
@@ -533,7 +533,7 @@ time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert)
 
 /**
   * gnutls_x509_crt_get_serial - This function returns the certificate's serial number
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @result: The place where the serial number will be copied
   * @result_size: Holds the size of the result field.
   *
@@ -546,7 +546,7 @@ time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert)
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void *result,
+int gnutls_x509_crt_get_serial(gnutls_x509_crt_t cert, void *result,
 			       size_t * result_size)
 {
     int ret;
@@ -568,7 +568,7 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void *result,
 
 /**
   * gnutls_x509_crt_get_subject_key_id - This function returns the certificate's key identifier
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @result: The place where the identifier will be copied
   * @result_size: Holds the size of the result field.
   * @critical: will be non zero if the extension is marked as critical (may be null)
@@ -580,12 +580,12 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void *result,
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void *ret,
+int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt_t cert, void *ret,
 				       size_t * ret_size,
 				       unsigned int *critical)
 {
     int result, len;
-    gnutls_datum id;
+    gnutls_datum_t id;
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
     if (cert == NULL) {
@@ -647,7 +647,7 @@ int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void *ret,
 
 /**
   * gnutls_x509_crt_get_authority_key_id - This function returns the certificate authority's identifier
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @result: The place where the identifier will be copied
   * @result_size: Holds the size of the result field.
   * @critical: will be non zero if the extension is marked as critical (may be null)
@@ -660,12 +660,12 @@ int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void *ret,
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt cert, void *ret,
+int gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt_t cert, void *ret,
 					 size_t * ret_size,
 					 unsigned int *critical)
 {
     int result, len;
-    gnutls_datum id;
+    gnutls_datum_t id;
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
     if (cert == NULL) {
@@ -727,7 +727,7 @@ int gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt cert, void *ret,
 
 /**
   * gnutls_x509_crt_get_pk_algorithm - This function returns the certificate's PublicKey algorithm
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @bits: if bits is non null it will hold the size of the parameters' in bits
   *
   * This function will return the public key algorithm of an X.509 
@@ -738,11 +738,11 @@ int gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt cert, void *ret,
   * For DSA the bits returned are of the public
   * exponent.
   *
-  * Returns a member of the gnutls_pk_algorithm enumeration on success,
+  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
   * or a negative value on error.
   *
   **/
-int gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_pk_algorithm(gnutls_x509_crt_t cert,
 				     unsigned int *bits)
 {
     int result;
@@ -776,7 +776,7 @@ static int parse_general_name(ASN1_TYPE src, const char *src_name,
     char nptr[128];
     int result;
     opaque choice_type[128];
-    gnutls_x509_subject_alt_name type;
+    gnutls_x509_subject_alt_name_t type;
 
     seq++;			/* 0->1, 1->2 etc */
     _gnutls_int2str(seq, num);
@@ -802,7 +802,7 @@ static int parse_general_name(ASN1_TYPE src, const char *src_name,
 
 
     type = _gnutls_x509_san_find_type(choice_type);
-    if (type == (gnutls_x509_subject_alt_name) - 1) {
+    if (type == (gnutls_x509_subject_alt_name_t) - 1) {
 	gnutls_assert();
 	return GNUTLS_E_X509_UNKNOWN_SAN;
     }
@@ -827,7 +827,7 @@ static int parse_general_name(ASN1_TYPE src, const char *src_name,
 
 /**
   * gnutls_x509_crt_get_subject_alt_name - This function returns the certificate's alternative name, if any
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
   * @ret: is the place where the alternative name will be copied to
   * @ret_size: holds the size of ret.
@@ -842,21 +842,21 @@ static int parse_general_name(ASN1_TYPE src, const char *src_name,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative 
   * name, or the type of alternative name if everything was ok. The type is 
-  * one of the enumerated gnutls_x509_subject_alt_name.
+  * one of the enumerated gnutls_x509_subject_alt_name_t.
   *
   * If the certificate does not have an Alternative name with the specified 
   * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   *
   **/
-int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt_t cert,
 					 unsigned int seq, void *ret,
 					 size_t * ret_size,
 					 unsigned int *critical)
 {
     int result;
-    gnutls_datum dnsname;
+    gnutls_datum_t dnsname;
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-    gnutls_x509_subject_alt_name type;
+    gnutls_x509_subject_alt_name_t type;
 
     if (cert == NULL) {
 	gnutls_assert();
@@ -911,7 +911,7 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_ca_status - This function returns the certificate CA status
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return certificates CA status, by reading the
@@ -924,11 +924,11 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_ca_status(gnutls_x509_crt_t cert,
 				  unsigned int *critical)
 {
     int result;
-    gnutls_datum basicConstraints;
+    gnutls_datum_t basicConstraints;
     int ca;
 
     if (cert == NULL) {
@@ -965,7 +965,7 @@ int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_key_usage - This function returns the certificate's key usage
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @key_usage: where the key usage bits will be stored
   * @critical: will be non zero if the extension is marked as critical
   *
@@ -982,12 +982,12 @@ int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert,
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_key_usage(gnutls_x509_crt_t cert,
 				  unsigned int *key_usage,
 				  unsigned int *critical)
 {
     int result;
-    gnutls_datum keyUsage;
+    gnutls_datum_t keyUsage;
     uint16 _usage;
 
     if (cert == NULL) {
@@ -1022,7 +1022,7 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_extension_by_oid - This function returns the specified extension
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use zero to get the first one.
   * @buf: a pointer to a structure to hold the name (may be null)
@@ -1038,13 +1038,13 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert,
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert,
 					 const char *oid, int indx,
 					 void *buf, size_t * sizeof_buf,
 					 unsigned int *critical)
 {
     int result;
-    gnutls_datum output;
+    gnutls_datum_t output;
 
     if (cert == NULL) {
 	gnutls_assert();
@@ -1082,7 +1082,7 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_extension_oid - This function returns the specified extension OID
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @indx: Specifies which extension OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
@@ -1095,7 +1095,7 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert,
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx,
+int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert, int indx,
 				      void *oid, size_t * sizeof_oid)
 {
     int result;
@@ -1117,13 +1117,13 @@ int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx,
 
 
 static
-int _gnutls_x509_crt_get_raw_dn2(gnutls_x509_crt cert,
-				 const char *whom, gnutls_datum * start)
+int _gnutls_x509_crt_get_raw_dn2(gnutls_x509_crt_t cert,
+				 const char *whom, gnutls_datum_t * start)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result, len1;
     int start1, end1;
-    gnutls_datum signed_data;
+    gnutls_datum_t signed_data;
 
     /* get the issuer of 'cert'
      */
@@ -1175,7 +1175,7 @@ int _gnutls_x509_crt_get_raw_dn2(gnutls_x509_crt cert,
 
 /*-
   * _gnutls_x509_crt_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @start: will hold the starting point of the DN
   *
   * This function will return a pointer to the DER encoded DN structure and
@@ -1184,15 +1184,15 @@ int _gnutls_x509_crt_get_raw_dn2(gnutls_x509_crt cert,
   * Returns 0 on success or a negative value on error.
   *
   -*/
-int _gnutls_x509_crt_get_raw_issuer_dn(gnutls_x509_crt cert,
-				       gnutls_datum * start)
+int _gnutls_x509_crt_get_raw_issuer_dn(gnutls_x509_crt_t cert,
+				       gnutls_datum_t * start)
 {
     return _gnutls_x509_crt_get_raw_dn2(cert, "issuer", start);
 }
 
 /*-
   * _gnutls_x509_crt_get_raw_dn - This function returns the subject's DN DER encoded
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @start: will hold the starting point of the DN
   *
   * This function will return a pointer to the DER encoded DN structure and
@@ -1201,7 +1201,7 @@ int _gnutls_x509_crt_get_raw_issuer_dn(gnutls_x509_crt cert,
   * Returns 0 on success, or a negative value on error.
   *
   -*/
-int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt cert, gnutls_datum * start)
+int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert, gnutls_datum_t * start)
 {
     return _gnutls_x509_crt_get_raw_dn2(cert, "subject", start);
 }
@@ -1209,7 +1209,7 @@ int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt cert, gnutls_datum * start)
 
 /**
   * gnutls_x509_crt_get_fingerprint - This function returns the Certificate's fingerprint
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @algo: is a digest algorithm
   * @buf: a pointer to a structure to hold the fingerprint (may be null)
   * @sizeof_buf: initially holds the size of @buf
@@ -1224,14 +1224,14 @@ int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt cert, gnutls_datum * start)
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert,
-				    gnutls_digest_algorithm algo,
+int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt_t cert,
+				    gnutls_digest_algorithm_t algo,
 				    void *buf, size_t * sizeof_buf)
 {
     opaque *cert_buf;
     int cert_buf_size;
     int result;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
 
     if (sizeof_buf == 0 || cert == NULL) {
 	return GNUTLS_E_INVALID_REQUEST;
@@ -1283,8 +1283,8 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert,
   * 0 on success.
   *
   **/
-int gnutls_x509_crt_export(gnutls_x509_crt cert,
-			   gnutls_x509_crt_fmt format, void *output_data,
+int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
+			   gnutls_x509_crt_fmt_t format, void *output_data,
 			   size_t * output_data_size)
 {
     if (cert == NULL) {
@@ -1317,14 +1317,14 @@ int gnutls_x509_crt_export(gnutls_x509_crt cert,
   * 0 on success.
   *
   **/
-int gnutls_x509_crt_get_key_id(gnutls_x509_crt crt, unsigned int flags,
+int gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt, unsigned int flags,
 			       unsigned char *output_data,
 			       size_t * output_data_size)
 {
     mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
     int params_size = MAX_PUBLIC_PARAMS_SIZE;
     int i, pk, result = 0;
-    gnutls_datum der = { NULL, 0 };
+    gnutls_datum_t der = { NULL, 0 };
     GNUTLS_HASH_HANDLE hd;
 
     if (crt == NULL) {
@@ -1399,8 +1399,8 @@ int gnutls_x509_crt_get_key_id(gnutls_x509_crt crt, unsigned int flags,
 
 /**
   * gnutls_x509_crt_check_revocation - This function checks if the given certificate is revoked
-  * @cert: should contain a gnutls_x509_crt structure
-  * @crl_list: should contain a list of gnutls_x509_crl structures
+  * @cert: should contain a gnutls_x509_crt_t structure
+  * @crl_list: should contain a list of gnutls_x509_crl_t structures
   * @crl_list_length: the length of the crl_list
   *
   * This function will return check if the given certificate is revoked.
@@ -1410,14 +1410,14 @@ int gnutls_x509_crt_get_key_id(gnutls_x509_crt crt, unsigned int flags,
   * A negative value is returned on error. 
   *
   **/
-int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
-   const gnutls_x509_crl * crl_list, int crl_list_length)
+int gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
+   const gnutls_x509_crl_t * crl_list, int crl_list_length)
 {
     opaque serial[64];
     opaque cert_serial[64];
     size_t serial_size, cert_serial_size;
     int ncerts, ret, i, j;
-    gnutls_datum dn1, dn2;
+    gnutls_datum_t dn1, dn2;
 
     if (cert == NULL) {
 	gnutls_assert();
@@ -1506,9 +1506,9 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
   * 1 on success.
   *
   **/
-int gnutls_x509_crt_verify_data(gnutls_x509_crt crt, unsigned int flags,
-				const gnutls_datum * data,
-				const gnutls_datum * signature)
+int gnutls_x509_crt_verify_data(gnutls_x509_crt_t crt, unsigned int flags,
+				const gnutls_datum_t * data,
+				const gnutls_datum_t * signature)
 {
     int result;
 
@@ -1528,7 +1528,7 @@ int gnutls_x509_crt_verify_data(gnutls_x509_crt crt, unsigned int flags,
 
 /**
   * gnutls_x509_crt_get_crl_dist_points - This function returns the CRL distribution points
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @seq: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
   * @ret: is the place where the distribution point will be copied to
   * @ret_size: holds the size of ret.
@@ -1550,25 +1550,25 @@ int gnutls_x509_crt_verify_data(gnutls_x509_crt crt, unsigned int flags,
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the distribution
   * point, or the type of the distribution point if everything was ok. The type is 
-  * one of the enumerated gnutls_x509_subject_alt_name.
+  * one of the enumerated gnutls_x509_subject_alt_name_t.
   *
   * If the certificate does not have an Alternative name with the specified 
   * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   *
   **/
-int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt_t cert,
 					unsigned int seq, void *ret,
 					size_t * ret_size,
 					unsigned int *reason_flags,
 					unsigned int *critical)
 {
     int result;
-    gnutls_datum dist_points = { NULL, 0 };
+    gnutls_datum_t dist_points = { NULL, 0 };
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     char name[128];
     int len;
     char num[MAX_INT_DIGITS];
-    gnutls_x509_subject_alt_name type;
+    gnutls_x509_subject_alt_name_t type;
     uint8 reasons[2];
 
     if (cert == NULL) {
@@ -1652,7 +1652,7 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_get_key_purpose_oid - This function returns the Certificate's key purpose OIDs
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
@@ -1668,7 +1668,7 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt cert,
+int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
 					int indx, void *oid,
 					size_t * sizeof_oid,
 					unsigned int *critical)
@@ -1676,7 +1676,7 @@ int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt cert,
     char counter[MAX_INT_DIGITS];
     char tmpstr[64];
     int result, len;
-    gnutls_datum id;
+    gnutls_datum_t id;
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
     if (cert == NULL) {
@@ -1754,8 +1754,8 @@ int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt cert,
   * gnutls_malloc() and will be stored in the appropriate datum.
   * 
   **/
-int gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt crt,
-				   gnutls_datum * m, gnutls_datum * e)
+int gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt_t crt,
+				   gnutls_datum_t * m, gnutls_datum_t * e)
 {
     int ret;
     mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
@@ -1814,9 +1814,9 @@ int gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt crt,
   * gnutls_malloc() and will be stored in the appropriate datum.
   * 
   **/
-int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt crt,
-				   gnutls_datum * p, gnutls_datum * q,
-				   gnutls_datum * g, gnutls_datum * y)
+int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt_t crt,
+				   gnutls_datum_t * p, gnutls_datum_t * q,
+				   gnutls_datum_t * g, gnutls_datum_t * y)
 {
     int ret;
     mpi_t params[MAX_PUBLIC_PARAMS_SIZE];

@@ -41,9 +41,9 @@
  */
 
 #define MASTER_SECRET "master secret"
-static int generate_normal_master(gnutls_session session, int);
+static int generate_normal_master(gnutls_session_t session, int);
 
-int _gnutls_generate_master(gnutls_session session, int keep_premaster)
+int _gnutls_generate_master(gnutls_session_t session, int keep_premaster)
 {
     if (session->internals.resumed == RESUME_FALSE)
 	return generate_normal_master(session, keep_premaster);
@@ -53,7 +53,7 @@ int _gnutls_generate_master(gnutls_session session, int keep_premaster)
 /* here we generate the TLS Master secret.
  */
 #define PREMASTER session->key->key
-static int generate_normal_master(gnutls_session session,
+static int generate_normal_master(gnutls_session_t session,
 				  int keep_premaster)
 {
     int ret = 0;
@@ -110,7 +110,7 @@ static int generate_normal_master(gnutls_session session,
  * server. It does nothing if this type of message is not required
  * by the selected ciphersuite. 
  */
-int _gnutls_send_server_kx_message(gnutls_session session, int again)
+int _gnutls_send_server_kx_message(gnutls_session_t session, int again)
 {
     uint8 *data = NULL;
     int data_size = 0;
@@ -153,7 +153,7 @@ int _gnutls_send_server_kx_message(gnutls_session session, int again)
 /* This function sends a certificate request message to the
  * client.
  */
-int _gnutls_send_server_certificate_request(gnutls_session session,
+int _gnutls_send_server_certificate_request(gnutls_session_t session,
 					    int again)
 {
     uint8 *data = NULL;
@@ -196,7 +196,7 @@ int _gnutls_send_server_certificate_request(gnutls_session session,
 /* This is the function for the client to send the key
  * exchange message 
  */
-int _gnutls_send_client_kx_message(gnutls_session session, int again)
+int _gnutls_send_client_kx_message(gnutls_session_t session, int again)
 {
     uint8 *data;
     int data_size;
@@ -235,7 +235,7 @@ int _gnutls_send_client_kx_message(gnutls_session session, int again)
 /* This is the function for the client to send the certificate
  * verify message
  */
-int _gnutls_send_client_certificate_verify(gnutls_session session,
+int _gnutls_send_client_certificate_verify(gnutls_session_t session,
 					   int again)
 {
     uint8 *data;
@@ -283,7 +283,7 @@ int _gnutls_send_client_certificate_verify(gnutls_session session,
 }
 
 
-int _gnutls_recv_server_kx_message(gnutls_session session)
+int _gnutls_recv_server_kx_message(gnutls_session_t session)
 {
     uint8 *data = NULL;
     int datasize;
@@ -323,7 +323,7 @@ int _gnutls_recv_server_kx_message(gnutls_session session)
     return ret;
 }
 
-int _gnutls_recv_server_certificate_request(gnutls_session session)
+int _gnutls_recv_server_certificate_request(gnutls_session_t session)
 {
     uint8 *data;
     int datasize;
@@ -355,7 +355,7 @@ int _gnutls_recv_server_certificate_request(gnutls_session session)
     return ret;
 }
 
-int _gnutls_recv_client_kx_message(gnutls_session session)
+int _gnutls_recv_client_kx_message(gnutls_session_t session)
 {
     uint8 *data;
     int datasize;
@@ -388,7 +388,7 @@ int _gnutls_recv_client_kx_message(gnutls_session session)
 
 /* This is called when we want send our certificate
  */
-int _gnutls_send_client_certificate(gnutls_session session, int again)
+int _gnutls_send_client_certificate(gnutls_session_t session, int again)
 {
     uint8 *data = NULL;
     int data_size = 0;
@@ -450,7 +450,7 @@ int _gnutls_send_client_certificate(gnutls_session session, int again)
 
 /* This is called when we want send our certificate
  */
-int _gnutls_send_server_certificate(gnutls_session session, int again)
+int _gnutls_send_server_certificate(gnutls_session_t session, int again)
 {
     uint8 *data = NULL;
     int data_size = 0;
@@ -488,7 +488,7 @@ int _gnutls_send_server_certificate(gnutls_session session, int again)
 }
 
 
-int _gnutls_recv_client_certificate(gnutls_session session)
+int _gnutls_recv_client_certificate(gnutls_session_t session)
 {
     int datasize;
     opaque *data;
@@ -567,7 +567,7 @@ int _gnutls_recv_client_certificate(gnutls_session session)
     return ret;
 }
 
-int _gnutls_recv_server_certificate(gnutls_session session)
+int _gnutls_recv_server_certificate(gnutls_session_t session)
 {
     int datasize;
     opaque *data;
@@ -603,7 +603,7 @@ int _gnutls_recv_server_certificate(gnutls_session session)
 /* Recv the client certificate verify. This packet may not
  * arrive if the peer did not send us a certificate.
  */
-int _gnutls_recv_client_certificate_verify_message(gnutls_session session)
+int _gnutls_recv_client_certificate_verify_message(gnutls_session_t session)
 {
     uint8 *data;
     int datasize;

@@ -36,9 +36,9 @@
 
 #define PACK_HEADER_SIZE 1
 int _gnutls_pack_certificate_auth_info(cert_auth_info_t info,
-				       gnutls_datum * packed_session);
+				       gnutls_datum_t * packed_session);
 int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
-					 const gnutls_datum *
+					 const gnutls_datum_t *
 					 packed_session);
 static int _gnutls_pack_certificate_auth_info_size(cert_auth_info_t info);
 
@@ -47,8 +47,8 @@ static int _gnutls_pack_certificate_auth_info_size(cert_auth_info_t info);
  * is required in order to pack these structures in a vector in
  * order to store them to the DB.
  */
-int _gnutls_session_pack(gnutls_session session,
-			 gnutls_datum * packed_session)
+int _gnutls_session_pack(gnutls_session_t session,
+			 gnutls_datum_t * packed_session)
 {
     uint32 pack_size;
     int ret;
@@ -147,7 +147,7 @@ int _gnutls_session_pack(gnutls_session session,
 
 /* Returns the size needed to hold the current session.
  */
-uint _gnutls_session_size(gnutls_session session)
+uint _gnutls_session_size(gnutls_session_t session)
 {
     uint32 pack_size;
 
@@ -173,8 +173,8 @@ uint _gnutls_session_size(gnutls_session session)
     return pack_size;
 }
 
-int _gnutls_session_unpack(gnutls_session session,
-			   const gnutls_datum * packed_session)
+int _gnutls_session_unpack(gnutls_session_t session,
+			   const gnutls_datum_t * packed_session)
 {
     uint32 pack_size;
     int ret;
@@ -321,7 +321,7 @@ int _gnutls_session_unpack(gnutls_session session,
 }
 
 int _gnutls_pack_certificate_auth_info(cert_auth_info_t info,
-				       gnutls_datum * packed_session)
+				       gnutls_datum_t * packed_session)
 {
     unsigned int pos, i;
     int info_size;
@@ -378,7 +378,7 @@ static int _gnutls_pack_certificate_auth_info_size(cert_auth_info_t info)
 
 
 int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
-					 const gnutls_datum *
+					 const gnutls_datum_t *
 					 packed_session)
 {
     unsigned int i, j, pos;
@@ -392,7 +392,7 @@ int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
     pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(cert_auth_info_st);
     if (info->ncerts > 0) {
 	info->raw_certificate_list =
-	    gnutls_calloc(1, info->ncerts * sizeof(gnutls_datum));
+	    gnutls_calloc(1, info->ncerts * sizeof(gnutls_datum_t));
 	if (info->raw_certificate_list == NULL) {
 	    gnutls_assert();
 	    return GNUTLS_E_MEMORY_ERROR;

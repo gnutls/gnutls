@@ -37,7 +37,7 @@ typedef struct gnutls_cert {
 						 */
     int params_size;		/* holds the size of MPI params */
 
-    gnutls_pk_algorithm subject_pk_algorithm;
+    gnutls_pk_algorithm_t subject_pk_algorithm;
 
     unsigned int keyUsage;	/* bits from KEY_* 
 				 */
@@ -45,9 +45,9 @@ typedef struct gnutls_cert {
     unsigned int version;
     /* holds the type (PGP, X509)
      */
-    gnutls_certificate_type cert_type;
+    gnutls_certificate_type_t cert_type;
 
-    gnutls_datum raw;
+    gnutls_datum_t raw;
 
 } gnutls_cert;
 
@@ -70,10 +70,10 @@ typedef struct gnutls_privkey_int {
      */
     int params_size;		/* holds the number of params */
 
-    gnutls_pk_algorithm pk_algorithm;
+    gnutls_pk_algorithm_t pk_algorithm;
 } gnutls_privkey;
 
-struct gnutls_session_int;	/* because gnutls_session is not defined when this file is included */
+struct gnutls_session_int;	/* because gnutls_session_t is not defined when this file is included */
 
 typedef enum ConvFlags {
     CERT_NO_COPY = 2,
@@ -82,25 +82,25 @@ typedef enum ConvFlags {
 } ConvFlags;
 
 int _gnutls_x509_raw_cert_to_gcert(gnutls_cert * gcert,
-				   const gnutls_datum * derCert,
+				   const gnutls_datum_t * derCert,
 				   int flags);
-int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt cert,
+int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt_t cert,
 			      unsigned int flags);
 
 void _gnutls_gkey_deinit(gnutls_privkey * key);
 void _gnutls_gcert_deinit(gnutls_cert * cert);
 
 int _gnutls_selected_cert_supported_kx(struct gnutls_session_int *session,
-				       gnutls_kx_algorithm ** alg,
+				       gnutls_kx_algorithm_t ** alg,
 				       int *alg_size);
 
 int _gnutls_raw_cert_to_gcert(gnutls_cert * gcert,
-			      gnutls_certificate_type type,
-			      const gnutls_datum * raw_cert,
+			      gnutls_certificate_type_t type,
+			      const gnutls_datum_t * raw_cert,
 			      int flags /* OR of ConvFlags */ );
 int _gnutls_raw_privkey_to_gkey(gnutls_privkey * key,
-				gnutls_certificate_type type,
-				const gnutls_datum * raw_key,
+				gnutls_certificate_type_t type,
+				const gnutls_datum_t * raw_key,
 				int key_enc /* DER or PEM */ );
 
 #endif

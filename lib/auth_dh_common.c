@@ -37,7 +37,7 @@
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
-int _gnutls_proc_dh_common_client_kx(gnutls_session session, opaque * data,
+int _gnutls_proc_dh_common_client_kx(gnutls_session_t session, opaque * data,
 				     size_t _data_size, mpi_t g, mpi_t p)
 {
     uint16 n_Y;
@@ -80,7 +80,7 @@ int _gnutls_proc_dh_common_client_kx(gnutls_session session, opaque * data,
     return 0;
 }
 
-int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
+int _gnutls_gen_dh_common_client_kx(gnutls_session_t session, opaque ** data)
 {
     mpi_t x = NULL, X = NULL;
     size_t n_X;
@@ -147,7 +147,7 @@ int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
     return ret;
 }
 
-int _gnutls_proc_dh_common_server_kx(gnutls_session session, opaque * data,
+int _gnutls_proc_dh_common_server_kx(gnutls_session_t session, opaque * data,
 				     size_t _data_size)
 {
     uint16 n_Y, n_g, n_p;
@@ -224,7 +224,7 @@ int _gnutls_proc_dh_common_server_kx(gnutls_session session, opaque * data,
     return n_Y + n_p + n_g + 6;
 }
 
-int _gnutls_dh_common_print_server_kx(gnutls_session session,
+int _gnutls_dh_common_print_server_kx(gnutls_session_t session,
 				      mpi_t g, mpi_t p, opaque ** data)
 {
     mpi_t x, X;

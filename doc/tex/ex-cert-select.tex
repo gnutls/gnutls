@@ -24,21 +24,21 @@
 #define KEY_FILE "key.pem"
 #define CAFILE "ca.pem"
 
-static int cert_callback(gnutls_session session,
-                  const gnutls_datum* req_ca_rdn, int nreqs,
-                  const gnutls_pk_algorithm* sign_algos, int sign_algos_length,
+static int cert_callback(gnutls_session_t session,
+                  const gnutls_datum_t* req_ca_rdn, int nreqs,
+                  const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length,
                   gnutls_retr_st * st);
 
-gnutls_x509_crt crt;
-gnutls_x509_privkey key;
+gnutls_x509_crt_t crt;
+gnutls_x509_privkey_t key;
 
 /* Helper functions to load a certificate and key
  * files into memory. They use mmap for simplicity.
  */
-static gnutls_datum mmap_file( const char* file)
+static gnutls_datum_t mmap_file( const char* file)
 {
 int fd;
-gnutls_datum mmaped_file = { NULL, 0 };
+gnutls_datum_t mmaped_file = { NULL, 0 };
 struct stat stat_st;
 void* ptr;
 
@@ -56,7 +56,7 @@ void* ptr;
    return mmaped_file;
 }
 
-static void munmap_file( gnutls_datum data)
+static void munmap_file( gnutls_datum_t data)
 {
    munmap( data.data, data.size);
 }
@@ -66,7 +66,7 @@ static void munmap_file( gnutls_datum data)
 static void load_keys( void)
 {
 int ret;
-gnutls_datum data;
+gnutls_datum_t data;
 
    data = mmap_file( CERT_FILE);
    if (data.data == NULL) {
@@ -104,9 +104,9 @@ gnutls_datum data;
 int main()
 {
    int ret, sd, ii;
-   gnutls_session session;
+   gnutls_session_t session;
    char buffer[MAX_BUF + 1];
-   gnutls_certificate_credentials xcred;
+   gnutls_certificate_credentials_t xcred;
    /* Allow connections to servers that have OpenPGP keys as well.
     */
 
@@ -138,7 +138,7 @@ int main()
     */
    sd = tcp_connect();
 
-   gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
+   gnutls_transport_set_ptr( session, (gnutls_transport_ptr_t)sd);
 
    /* Perform the TLS handshake
     */
@@ -191,15 +191,15 @@ int main()
  * before a handshake.
  */
 
-static int cert_callback(gnutls_session session,
-                  const gnutls_datum* req_ca_rdn, int nreqs,
-                  const gnutls_pk_algorithm* sign_algos, int sign_algos_length,
+static int cert_callback(gnutls_session_t session,
+                  const gnutls_datum_t* req_ca_rdn, int nreqs,
+                  const gnutls_pk_algorithm_t* sign_algos, int sign_algos_length,
                   gnutls_retr_st * st)
 {
    char issuer_dn[256];
    int i, ret;
    size_t len;
-   gnutls_certificate_type type;
+   gnutls_certificate_type_t type;
 
    /* Print the server's trusted CAs
     */

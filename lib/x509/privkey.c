@@ -48,7 +48,7 @@ static int _encode_dsa(ASN1_TYPE * c2, mpi_t * params);
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_privkey_init(gnutls_x509_privkey * key)
+int gnutls_x509_privkey_init(gnutls_x509_privkey_t * key)
 {
     *key = gnutls_calloc(1, sizeof(gnutls_x509_privkey_int));
 
@@ -62,13 +62,13 @@ int gnutls_x509_privkey_init(gnutls_x509_privkey * key)
 }
 
 /**
-  * gnutls_x509_privkey_deinit - This function deinitializes memory used by a gnutls_x509_privkey structure
+  * gnutls_x509_privkey_deinit - This function deinitializes memory used by a gnutls_x509_privkey_t structure
   * @key: The structure to be initialized
   *
   * This function will deinitialize a private key structure. 
   *
   **/
-void gnutls_x509_privkey_deinit(gnutls_x509_privkey key)
+void gnutls_x509_privkey_deinit(gnutls_x509_privkey_t key)
 {
     int i;
 
@@ -91,8 +91,8 @@ void gnutls_x509_privkey_deinit(gnutls_x509_privkey key)
   * This function will copy a private key from source to destination key.
   *
   **/
-int gnutls_x509_privkey_cpy(gnutls_x509_privkey dst,
-			    gnutls_x509_privkey src)
+int gnutls_x509_privkey_cpy(gnutls_x509_privkey_t dst,
+			    gnutls_x509_privkey_t src)
 {
     int i, ret;
 
@@ -137,9 +137,9 @@ int gnutls_x509_privkey_cpy(gnutls_x509_privkey dst,
 /* Converts an RSA PKCS#1 key to
  * an internal structure (gnutls_private_key)
  */
-ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum *
+ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum_t *
 					       raw_key,
-					       gnutls_x509_privkey pkey)
+					       gnutls_x509_privkey_t pkey)
 {
     int result;
     ASN1_TYPE pkey_asn;
@@ -233,8 +233,8 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key(const gnutls_datum *
 
 }
 
-static ASN1_TYPE decode_dsa_key(const gnutls_datum * raw_key,
-				gnutls_x509_privkey pkey)
+static ASN1_TYPE decode_dsa_key(const gnutls_datum_t * raw_key,
+				gnutls_x509_privkey_t pkey)
 {
     int result;
     ASN1_TYPE dsa_asn;
@@ -315,7 +315,7 @@ static ASN1_TYPE decode_dsa_key(const gnutls_datum * raw_key,
   * @format: One of DER or PEM
   *
   * This function will convert the given DER or PEM encoded key
-  * to the native gnutls_x509_privkey format. The output will be stored in @key .
+  * to the native gnutls_x509_privkey_t format. The output will be stored in @key .
   *
   * If the key is PEM encoded it should have a header of "RSA PRIVATE KEY", or
   * "DSA PRIVATE KEY".
@@ -323,12 +323,12 @@ static ASN1_TYPE decode_dsa_key(const gnutls_datum * raw_key,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_privkey_import(gnutls_x509_privkey key,
-			       const gnutls_datum * data,
-			       gnutls_x509_crt_fmt format)
+int gnutls_x509_privkey_import(gnutls_x509_privkey_t key,
+			       const gnutls_datum_t * data,
+			       gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;
-    gnutls_datum _data;
+    gnutls_datum_t _data;
 
     if (key == NULL) {
 	gnutls_assert();
@@ -435,16 +435,16 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key,
   * @u: holds the coefficient
   *
   * This function will convert the given RSA raw parameters
-  * to the native gnutls_x509_privkey format. The output will be stored in @key.
+  * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
   * 
   **/
-int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key,
-				       const gnutls_datum * m,
-				       const gnutls_datum * e,
-				       const gnutls_datum * d,
-				       const gnutls_datum * p,
-				       const gnutls_datum * q,
-				       const gnutls_datum * u)
+int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey_t key,
+				       const gnutls_datum_t * m,
+				       const gnutls_datum_t * e,
+				       const gnutls_datum_t * d,
+				       const gnutls_datum_t * p,
+				       const gnutls_datum_t * q,
+				       const gnutls_datum_t * u)
 {
     int i = 0, ret;
     size_t siz = 0;
@@ -522,15 +522,15 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key,
   * @x: holds the x
   *
   * This function will convert the given DSA raw parameters
-  * to the native gnutls_x509_privkey format. The output will be stored in @key.
+  * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
   * 
   **/
-int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey key,
-				       const gnutls_datum * p,
-				       const gnutls_datum * q,
-				       const gnutls_datum * g,
-				       const gnutls_datum * y,
-				       const gnutls_datum * x)
+int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey_t key,
+				       const gnutls_datum_t * p,
+				       const gnutls_datum_t * q,
+				       const gnutls_datum_t * g,
+				       const gnutls_datum_t * y,
+				       const gnutls_datum_t * x)
 {
     int i = 0, ret;
     size_t siz = 0;
@@ -594,16 +594,16 @@ int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey key,
 
 /**
   * gnutls_x509_privkey_get_pk_algorithm - This function returns the key's PublicKey algorithm
-  * @key: should contain a gnutls_x509_privkey structure
+  * @key: should contain a gnutls_x509_privkey_t structure
   *
   * This function will return the public key algorithm of a private
   * key.
   *
-  * Returns a member of the gnutls_pk_algorithm enumeration on success,
+  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
   * or a negative value on error.
   *
   **/
-int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey key)
+int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey_t key)
 {
     if (key == NULL) {
 	gnutls_assert();
@@ -635,8 +635,8 @@ int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey key)
   * 0 on success.
   *
   **/
-int gnutls_x509_privkey_export(gnutls_x509_privkey key,
-			       gnutls_x509_crt_fmt format,
+int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
+			       gnutls_x509_crt_fmt_t format,
 			       void *output_data,
 			       size_t * output_data_size)
 {
@@ -698,10 +698,10 @@ int gnutls_x509_privkey_export(gnutls_x509_privkey key,
   * gnutls_malloc() and will be stored in the appropriate datum.
   * 
   **/
-int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
-				       gnutls_datum * m, gnutls_datum * e,
-				       gnutls_datum * d, gnutls_datum * p,
-				       gnutls_datum * q, gnutls_datum * u)
+int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey_t key,
+				       gnutls_datum_t * m, gnutls_datum_t * e,
+				       gnutls_datum_t * d, gnutls_datum_t * p,
+				       gnutls_datum_t * q, gnutls_datum_t * u)
 {
     int ret;
 
@@ -783,10 +783,10 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
   * gnutls_malloc() and will be stored in the appropriate datum.
   * 
   **/
-int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey key,
-				       gnutls_datum * p, gnutls_datum * q,
-				       gnutls_datum * g, gnutls_datum * y,
-				       gnutls_datum * x)
+int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey_t key,
+				       gnutls_datum_t * p, gnutls_datum_t * q,
+				       gnutls_datum_t * g, gnutls_datum_t * y,
+				       gnutls_datum_t * x)
 {
     int ret;
 
@@ -1156,7 +1156,7 @@ static int _encode_dsa(ASN1_TYPE * c2, mpi_t * params)
 
 /**
   * gnutls_x509_privkey_generate - This function will generate a private key
-  * @key: should contain a gnutls_x509_privkey structure
+  * @key: should contain a gnutls_x509_privkey_t structure
   * @algo: is one of RSA or DSA.
   * @bits: the size of the modulus
   * @flags: unused for now. Must be 0.
@@ -1167,8 +1167,8 @@ static int _encode_dsa(ASN1_TYPE * c2, mpi_t * params)
   * Returns 0 on success or a negative value on error.
   *
   **/
-int gnutls_x509_privkey_generate(gnutls_x509_privkey key,
-				 gnutls_pk_algorithm algo,
+int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
+				 gnutls_pk_algorithm_t algo,
 				 unsigned int bits, unsigned int flags)
 {
     int ret, params_len;
@@ -1252,14 +1252,14 @@ int gnutls_x509_privkey_generate(gnutls_x509_privkey key,
   * 0 on success.
   *
   **/
-int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey key,
+int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
 				   unsigned int flags,
 				   unsigned char *output_data,
 				   size_t * output_data_size)
 {
     int result;
     GNUTLS_HASH_HANDLE hd;
-    gnutls_datum der = { NULL, 0 };
+    gnutls_datum_t der = { NULL, 0 };
 
     if (key == NULL || key->crippled) {
 	gnutls_assert();
@@ -1334,14 +1334,14 @@ int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey key,
   * 0 on success.
   *
   **/
-int gnutls_x509_privkey_sign_data(gnutls_x509_privkey key,
-				  gnutls_digest_algorithm digest,
+int gnutls_x509_privkey_sign_data(gnutls_x509_privkey_t key,
+				  gnutls_digest_algorithm_t digest,
 				  unsigned int flags,
-				  const gnutls_datum * data,
+				  const gnutls_datum_t * data,
 				  void *signature, size_t * signature_size)
 {
     int result;
-    gnutls_datum sig = { NULL, 0 };
+    gnutls_datum_t sig = { NULL, 0 };
 
     if (key == NULL) {
 	gnutls_assert();
@@ -1382,10 +1382,10 @@ int gnutls_x509_privkey_sign_data(gnutls_x509_privkey key,
   * 1 on success.
   *
   **/
-int gnutls_x509_privkey_verify_data(gnutls_x509_privkey key,
+int gnutls_x509_privkey_verify_data(gnutls_x509_privkey_t key,
 				    unsigned int flags,
-				    const gnutls_datum * data,
-				    const gnutls_datum * signature)
+				    const gnutls_datum_t * data,
+				    const gnutls_datum_t * signature)
 {
     int result;
 

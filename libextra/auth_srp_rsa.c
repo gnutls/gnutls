@@ -39,8 +39,8 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 
-static int gen_srp_cert_server_kx(gnutls_session, opaque **);
-static int proc_srp_cert_server_kx(gnutls_session, opaque *, size_t);
+static int gen_srp_cert_server_kx(gnutls_session_t, opaque **);
+static int proc_srp_cert_server_kx(gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st srp_rsa_auth_struct = {
     "SRP",
@@ -76,11 +76,11 @@ const mod_auth_st srp_dss_auth_struct = {
     NULL
 };
 
-static int gen_srp_cert_server_kx(gnutls_session session, opaque ** data)
+static int gen_srp_cert_server_kx(gnutls_session_t session, opaque ** data)
 {
     ssize_t ret, data_size;
-    gnutls_datum signature, ddata;
-    const gnutls_certificate_credentials cred;
+    gnutls_datum_t signature, ddata;
+    const gnutls_certificate_credentials_t cred;
     gnutls_cert *apr_cert_list;
     gnutls_privkey *apr_pkey;
     int apr_cert_list_length;
@@ -133,12 +133,12 @@ static int gen_srp_cert_server_kx(gnutls_session session, opaque ** data)
 
 }
 
-static int proc_srp_cert_server_kx(gnutls_session session, opaque * data,
+static int proc_srp_cert_server_kx(gnutls_session_t session, opaque * data,
 				   size_t _data_size)
 {
     ssize_t ret;
     int sigsize;
-    gnutls_datum vparams, signature;
+    gnutls_datum_t vparams, signature;
     ssize_t data_size;
     cert_auth_info_t info;
     gnutls_cert peer_cert;

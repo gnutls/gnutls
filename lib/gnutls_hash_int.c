@@ -29,12 +29,12 @@
 #include <gnutls_hash_int.h>
 #include <gnutls_errors.h>
 
-GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
+GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm_t algorithm)
 {
     mac_hd_t ret;
     gcry_error_t result;
 
-    ret = gnutls_malloc(sizeof(mac_hd_t_INT));
+    ret = gnutls_malloc(sizeof(mac_hd_st));
     if (ret == NULL) {
 	gnutls_assert();
 	return GNUTLS_HASH_FAILED;
@@ -66,7 +66,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
     return ret;
 }
 
-int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm)
+int _gnutls_hash_get_algo_len(gnutls_mac_algorithm_t algorithm)
 {
     int ret;
 
@@ -102,7 +102,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
     GNUTLS_HASH_HANDLE ret;
     gcry_error_t result;
 
-    ret = gnutls_malloc(sizeof(mac_hd_t_INT));
+    ret = gnutls_malloc(sizeof(mac_hd_st));
 
     if (ret == NULL)
 	return GNUTLS_HASH_FAILED;
@@ -139,13 +139,13 @@ void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void *digest)
 }
 
 
-mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
+mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
 			   const void *key, int keylen)
 {
     mac_hd_t ret;
     gcry_error_t result;
 
-    ret = gnutls_malloc(sizeof(mac_hd_t_INT));
+    ret = gnutls_malloc(sizeof(mac_hd_st));
     if (ret == NULL)
 	return GNUTLS_MAC_FAILED;
 
@@ -200,7 +200,7 @@ void _gnutls_hmac_deinit(mac_hd_t handle, void *digest)
     gnutls_free(handle);
 }
 
-inline static int get_padsize(gnutls_mac_algorithm algorithm)
+inline static int get_padsize(gnutls_mac_algorithm_t algorithm)
 {
     switch (algorithm) {
     case GNUTLS_MAC_MD5:
@@ -212,7 +212,7 @@ inline static int get_padsize(gnutls_mac_algorithm algorithm)
     }
 }
 
-mac_hd_t _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *key,
+mac_hd_t _gnutls_mac_init_ssl3(gnutls_mac_algorithm_t algorithm, void *key,
 			       int keylen)
 {
     mac_hd_t ret;

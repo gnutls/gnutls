@@ -36,12 +36,12 @@
 
 /**
   * gnutls_credentials_clear - Clears all the credentials previously set
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * Clears all the credentials previously set in this session.
   *
   **/
-void gnutls_credentials_clear(gnutls_session session)
+void gnutls_credentials_clear(gnutls_session_t session)
 {
     if (session->key && session->key->cred) {	/* beginning of the list */
 	auth_cred_st *ccred, *ncred;
@@ -61,7 +61,7 @@ void gnutls_credentials_clear(gnutls_session session)
  */
 /**
   * gnutls_credentials_set - Sets the needed credentials for the specified authentication algorithm.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @type: is the type of the credentials
   * @cred: is a pointer to a structure.
   *
@@ -74,18 +74,18 @@ void gnutls_credentials_clear(gnutls_session session)
   * structure. Thus you will have to keep the structure allocated until   
   * you call gnutls_deinit(). ]
   *
-  * For GNUTLS_CRD_ANON cred should be gnutls_anon_client_credentials in case of a client.
-  * In case of a server it should be gnutls_anon_server_credentials.
+  * For GNUTLS_CRD_ANON cred should be gnutls_anon_client_credentials_t in case of a client.
+  * In case of a server it should be gnutls_anon_server_credentials_t.
   * 
-  * For GNUTLS_CRD_SRP cred should be gnutls_srp_client_credentials
-  * in case of a client, and gnutls_srp_server_credentials, in case
+  * For GNUTLS_CRD_SRP cred should be gnutls_srp_client_credentials_t
+  * in case of a client, and gnutls_srp_server_credentials_t, in case
   * of a server.
   *
-  * For GNUTLS_CRD_CERTIFICATE cred should be gnutls_certificate_credentials.
+  * For GNUTLS_CRD_CERTIFICATE cred should be gnutls_certificate_credentials_t.
   *
   **/
-int gnutls_credentials_set(gnutls_session session,
-			   gnutls_credentials_type type, void *cred)
+int gnutls_credentials_set(gnutls_session_t session,
+			   gnutls_credentials_type_t type, void *cred)
 {
     auth_cred_st *ccred = NULL, *pcred = NULL;
     int exists = 0;
@@ -137,7 +137,7 @@ int gnutls_credentials_set(gnutls_session session,
 
 /**
   * gnutls_auth_get_type - Returns the type of credentials for the current authentication schema.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * Returns type of credentials for the current authentication schema.
   * The returned information is to be used to distinguish the function used
@@ -146,7 +146,7 @@ int gnutls_credentials_set(gnutls_session session,
   * Eg. for CERTIFICATE ciphersuites (key exchange algorithms: KX_RSA, KX_DHE_RSA),
   * the same function are to be used to access the authentication data.
   **/
-gnutls_credentials_type gnutls_auth_get_type(gnutls_session session)
+gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 {
 /* This is not the credentials we must set, but the authentication data
  * we get by the peer, so it should be reversed.
@@ -162,14 +162,14 @@ gnutls_credentials_type gnutls_auth_get_type(gnutls_session session)
 
 /**
   * gnutls_auth_server_get_type - Returns the type of credentials for the server authentication schema.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * Returns the type of credentials that were used for server authentication.
   * The returned information is to be used to distinguish the function used
   * to access authentication data.
   * 
   **/
-gnutls_credentials_type gnutls_auth_server_get_type(gnutls_session session)
+gnutls_credentials_type_t gnutls_auth_server_get_type(gnutls_session_t session)
 {
     return
 	_gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
@@ -179,14 +179,14 @@ gnutls_credentials_type gnutls_auth_server_get_type(gnutls_session session)
 
 /**
   * gnutls_auth_client_get_type - Returns the type of credentials for the client authentication schema.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * Returns the type of credentials that were used for client authentication.
   * The returned information is to be used to distinguish the function used
   * to access authentication data.
   * 
   **/
-gnutls_credentials_type gnutls_auth_client_get_type(gnutls_session session)
+gnutls_credentials_type_t gnutls_auth_client_get_type(gnutls_session_t session)
 {
     return
 	_gnutls_map_kx_get_cred(_gnutls_cipher_suite_get_kx_algo
@@ -199,8 +199,8 @@ gnutls_credentials_type gnutls_auth_client_get_type(gnutls_session session)
  * This returns a pointer to the linked list. Don't
  * free that!!!
  */
-const void *_gnutls_get_kx_cred(gnutls_session session,
-				gnutls_kx_algorithm algo, int *err)
+const void *_gnutls_get_kx_cred(gnutls_session_t session,
+				gnutls_kx_algorithm_t algo, int *err)
 {
     int server =
 	session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
@@ -210,7 +210,7 @@ const void *_gnutls_get_kx_cred(gnutls_session session,
 }
 
 const void *_gnutls_get_cred(gnutls_key_st key,
-			     gnutls_credentials_type type, int *err)
+			     gnutls_credentials_type_t type, int *err)
 {
     const void *retval = NULL;
     int _err = -1;
@@ -240,7 +240,7 @@ const void *_gnutls_get_cred(gnutls_key_st key,
 
 /*-
   * _gnutls_get_auth_info - Returns a pointer to authentication information.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * This function must be called after a succesful gnutls_handshake().
   * Returns a pointer to authentication information. That information
@@ -251,20 +251,20 @@ const void *_gnutls_get_cred(gnutls_key_st key,
   * In case of GNUTLS_CRD_CERTIFICATE returns a type of &cert_auth_info_t;
   * In case of GNUTLS_CRD_SRP returns a type of &srp_(server/client)_auth_info_t;
   -*/
-void *_gnutls_get_auth_info(gnutls_session session)
+void *_gnutls_get_auth_info(gnutls_session_t session)
 {
     return session->key->auth_info;
 }
 
 /*-
   * _gnutls_free_auth_info - Frees the auth info structure
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   *
   * This function frees the auth info structure and sets it to
   * null. It must be called since some structures contain malloced
   * elements.
   -*/
-void _gnutls_free_auth_info(gnutls_session session)
+void _gnutls_free_auth_info(gnutls_session_t session)
 {
     if (session == NULL || session->key == NULL) {
 	gnutls_assert();
@@ -310,8 +310,8 @@ void _gnutls_free_auth_info(gnutls_session session)
  * If allow change is !=0 then this will allow changing the auth
  * info structure to a different type.
  */
-int _gnutls_auth_info_set(gnutls_session session,
-			  gnutls_credentials_type type, int size,
+int _gnutls_auth_info_set(gnutls_session_t session,
+			  gnutls_credentials_type_t type, int size,
 			  int allow_change)
 {
     if (session->key->auth_info == NULL) {

@@ -18,10 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int gnutls_cipher_set_priority(gnutls_session session, const int *);
-int gnutls_kx_set_priority(gnutls_session session, const int *);
-int gnutls_mac_set_priority(gnutls_session session, const int *);
-int gnutls_compression_set_priority(gnutls_session session, const int *);
-int gnutls_protocol_set_priority(gnutls_session session, const int *);
-int gnutls_certificate_type_set_priority(gnutls_session session,
+int gnutls_cipher_set_priority(gnutls_session_t session, const int *);
+int gnutls_kx_set_priority(gnutls_session_t session, const int *);
+int gnutls_mac_set_priority(gnutls_session_t session, const int *);
+int gnutls_compression_set_priority(gnutls_session_t session, const int *);
+int gnutls_protocol_set_priority(gnutls_session_t session, const int *);
+int gnutls_certificate_type_set_priority(gnutls_session_t session,
 					 const int *);

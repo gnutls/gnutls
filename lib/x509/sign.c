@@ -46,9 +46,9 @@
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.
  */
-static int encode_ber_digest_info(gnutls_mac_algorithm hash,
-				  const gnutls_datum * digest,
-				  gnutls_datum * info)
+static int encode_ber_digest_info(gnutls_mac_algorithm_t hash,
+				  const gnutls_datum_t * digest,
+				  gnutls_datum_t * info)
 {
     ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
     int result;
@@ -117,13 +117,13 @@ static int encode_ber_digest_info(gnutls_mac_algorithm hash,
  * params[1] is public key
  */
 static int
-pkcs1_rsa_sign(gnutls_mac_algorithm hash, const gnutls_datum * text,
-	       mpi_t * params, int params_len, gnutls_datum * signature)
+pkcs1_rsa_sign(gnutls_mac_algorithm_t hash, const gnutls_datum_t * text,
+	       mpi_t * params, int params_len, gnutls_datum_t * signature)
 {
     int ret;
     opaque _digest[MAX_HASH_SIZE];
     GNUTLS_HASH_HANDLE hd;
-    gnutls_datum digest, info;
+    gnutls_datum_t digest, info;
 
     hd = _gnutls_hash_init(hash);
     if (hd == NULL) {
@@ -158,13 +158,13 @@ pkcs1_rsa_sign(gnutls_mac_algorithm hash, const gnutls_datum * text,
 }
 
 static int
-dsa_sign(const gnutls_datum * text,
-	 mpi_t * params, int params_len, gnutls_datum * signature)
+dsa_sign(const gnutls_datum_t * text,
+	 mpi_t * params, int params_len, gnutls_datum_t * signature)
 {
     int ret;
     opaque _digest[MAX_HASH_SIZE];
     GNUTLS_HASH_HANDLE hd;
-    gnutls_datum digest;
+    gnutls_datum_t digest;
 
     hd = _gnutls_hash_init(GNUTLS_MAC_SHA);
     if (hd == NULL) {
@@ -197,8 +197,8 @@ dsa_sign(const gnutls_datum * text,
  * 'signature' will hold the signature!
  * 'hash' is only used in PKCS1 RSA signing.
  */
-int _gnutls_x509_sign(const gnutls_datum * tbs, gnutls_mac_algorithm hash,
-		      gnutls_x509_privkey signer, gnutls_datum * signature)
+int _gnutls_x509_sign(const gnutls_datum_t * tbs, gnutls_mac_algorithm_t hash,
+		      gnutls_x509_privkey_t signer, gnutls_datum_t * signature)
 {
     int ret;
 
@@ -235,14 +235,14 @@ int _gnutls_x509_sign(const gnutls_datum * tbs, gnutls_mac_algorithm hash,
  * of the TBS and sign it on the fly.
  */
 int _gnutls_x509_sign_tbs(ASN1_TYPE cert, const char *tbs_name,
-			  gnutls_mac_algorithm hash,
-			  gnutls_x509_privkey signer,
-			  gnutls_datum * signature)
+			  gnutls_mac_algorithm_t hash,
+			  gnutls_x509_privkey_t signer,
+			  gnutls_datum_t * signature)
 {
     int result;
     opaque *buf;
     int buf_size;
-    gnutls_datum tbs;
+    gnutls_datum_t tbs;
 
     buf_size = 0;
     asn1_der_coding(cert, tbs_name, NULL, &buf_size, NULL);
@@ -283,11 +283,11 @@ int _gnutls_x509_sign_tbs(ASN1_TYPE cert, const char *tbs_name,
   *
   -*/
 int _gnutls_x509_pkix_sign(ASN1_TYPE src, const char *src_name,
-			   gnutls_x509_crt issuer,
-			   gnutls_x509_privkey issuer_key)
+			   gnutls_x509_crt_t issuer,
+			   gnutls_x509_privkey_t issuer_key)
 {
     int result;
-    gnutls_datum signature;
+    gnutls_datum_t signature;
     char name[128];
 
     /* Step 1. Copy the issuer's name into the certificate.

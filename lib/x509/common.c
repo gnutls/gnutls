@@ -255,7 +255,7 @@ void _gnutls_int2str(unsigned int k, char *data)
 }
 
 
-gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm(const char *oid)
+gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm(const char *oid)
 {
     if (strcmp(oid, PKIX1_RSA_OID) == 0)	/* pkix-1 1 - RSA */
 	return GNUTLS_PK_RSA;
@@ -267,7 +267,7 @@ gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm(const char *oid)
     return GNUTLS_PK_UNKNOWN;
 }
 
-gnutls_sign_algorithm _gnutls_x509_oid2sign_algorithm(const char *oid)
+gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm(const char *oid)
 {
     if (strcmp(oid, RSA_MD5_OID) == 0) {
 	return GNUTLS_SIGN_RSA_MD5;
@@ -287,7 +287,7 @@ gnutls_sign_algorithm _gnutls_x509_oid2sign_algorithm(const char *oid)
 
 /* returns -1 on error
  */
-gnutls_mac_algorithm _gnutls_x509_oid2mac_algorithm(const char *oid)
+gnutls_mac_algorithm_t _gnutls_x509_oid2mac_algorithm(const char *oid)
 {
     if (strcmp(oid, OID_SHA1) == 0)
 	return GNUTLS_MAC_SHA;
@@ -297,7 +297,7 @@ gnutls_mac_algorithm _gnutls_x509_oid2mac_algorithm(const char *oid)
     return GNUTLS_MAC_UNKNOWN;
 }
 
-const char *_gnutls_x509_mac_to_oid(gnutls_mac_algorithm mac)
+const char *_gnutls_x509_mac_to_oid(gnutls_mac_algorithm_t mac)
 {
     if (mac == GNUTLS_MAC_SHA)
 	return OID_SHA1;
@@ -307,7 +307,7 @@ const char *_gnutls_x509_mac_to_oid(gnutls_mac_algorithm mac)
 	return NULL;
 }
 
-const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm pk)
+const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm_t pk)
 {
     if (pk == GNUTLS_PK_RSA)
 	return PKIX1_RSA_OID;
@@ -317,8 +317,8 @@ const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm pk)
 	return NULL;
 }
 
-gnutls_sign_algorithm _gnutls_x509_pk_to_sign(gnutls_pk_algorithm pk,
-					      gnutls_mac_algorithm mac)
+gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign(gnutls_pk_algorithm_t pk,
+					      gnutls_mac_algorithm_t mac)
 {
     if (pk == GNUTLS_PK_RSA) {
 	if (mac == GNUTLS_MAC_SHA)
@@ -332,10 +332,10 @@ gnutls_sign_algorithm _gnutls_x509_pk_to_sign(gnutls_pk_algorithm pk,
     return GNUTLS_SIGN_UNKNOWN;
 }
 
-const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm pk,
-				     gnutls_mac_algorithm mac)
+const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t pk,
+				     gnutls_mac_algorithm_t mac)
 {
-    gnutls_sign_algorithm sign;
+    gnutls_sign_algorithm_t sign;
 
     sign = _gnutls_x509_pk_to_sign(pk, mac);
 
@@ -646,7 +646,7 @@ int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim)
 }
 
 
-gnutls_x509_subject_alt_name _gnutls_x509_san_find_type(char *str_type)
+gnutls_x509_subject_alt_name_t _gnutls_x509_san_find_type(char *str_type)
 {
     if (strcmp(str_type, "dNSName") == 0)
 	return GNUTLS_SAN_DNSNAME;
@@ -656,14 +656,14 @@ gnutls_x509_subject_alt_name _gnutls_x509_san_find_type(char *str_type)
 	return GNUTLS_SAN_URI;
     if (strcmp(str_type, "iPAddress") == 0)
 	return GNUTLS_SAN_IPADDRESS;
-    return (gnutls_x509_subject_alt_name) - 1;
+    return (gnutls_x509_subject_alt_name_t) - 1;
 }
 
 /* A generic export function. Will export the given ASN.1 encoded data
  * to PEM or DER raw data.
  */
 int _gnutls_x509_export_int(ASN1_TYPE asn1_data,
-			    gnutls_x509_crt_fmt format, char *pem_header,
+			    gnutls_x509_crt_fmt_t format, char *pem_header,
 			    int tmp_buf_size, unsigned char *output_data,
 			    size_t * output_data_size)
 {
@@ -758,7 +758,7 @@ int _gnutls_x509_export_int(ASN1_TYPE asn1_data,
  * an octet string.
  */
 int _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
-			    gnutls_datum * ret, int str)
+			    gnutls_datum_t * ret, int str)
 {
     int len = 0, result;
     opaque *tmp = NULL;
@@ -833,7 +833,7 @@ int _gnutls_x509_read_value(ASN1_TYPE c, const char *root,
  * an OCTET STRING.
  */
 int _gnutls_x509_der_encode(ASN1_TYPE src, const char *src_name,
-			    gnutls_datum * res, int str)
+			    gnutls_datum_t * res, int str)
 {
     int size, result;
     int asize;
@@ -919,7 +919,7 @@ int _gnutls_x509_der_encode_and_copy(ASN1_TYPE src, const char *src_name,
 				     int str)
 {
     int result;
-    gnutls_datum encoded;
+    gnutls_datum_t encoded;
 
     result = _gnutls_x509_der_encode(src, src_name, &encoded, str);
 
@@ -946,12 +946,12 @@ int _gnutls_x509_der_encode_and_copy(ASN1_TYPE src, const char *src_name,
  * zero it encodes it as OCTET STRING.
  */
 int _gnutls_x509_write_value(ASN1_TYPE c, const char *root,
-			     const gnutls_datum * data, int str)
+			     const gnutls_datum_t * data, int str)
 {
     int result;
     int asize;
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-    gnutls_datum val;
+    gnutls_datum_t val;
 
     asize = data->size + 16;
 
@@ -1017,12 +1017,12 @@ int _gnutls_x509_write_value(ASN1_TYPE c, const char *root,
  */
 int _gnutls_x509_encode_and_copy_PKI_params(ASN1_TYPE dst,
 					    const char *dst_name,
-					    gnutls_pk_algorithm
+					    gnutls_pk_algorithm_t
 					    pk_algorithm, mpi_t * params,
 					    int params_size)
 {
     const char *pk;
-    gnutls_datum der = { NULL, 0 };
+    gnutls_datum_t der = { NULL, 0 };
     int result;
     char name[128];
 
@@ -1221,7 +1221,7 @@ int _gnutls_asn1_copy_node(ASN1_TYPE * dst, const char *dst_name,
 {
 
     int result;
-    gnutls_datum der;
+    gnutls_datum_t der;
     ASN1_TYPE dst_node;
 
     result = _gnutls_x509_der_encode(src, src_name, &der, 0);
@@ -1257,9 +1257,9 @@ int _gnutls_asn1_copy_node(ASN1_TYPE * dst, const char *dst_name,
  * returns them into signed_data.
  */
 int _gnutls_x509_get_signed_data(ASN1_TYPE src, const char *src_name,
-				 gnutls_datum * signed_data)
+				 gnutls_datum_t * signed_data)
 {
-    gnutls_datum der;
+    gnutls_datum_t der;
     int start, end, result;
 
     result = _gnutls_x509_der_encode(src, "", &der, 0);
@@ -1298,7 +1298,7 @@ int _gnutls_x509_get_signed_data(ASN1_TYPE src, const char *src_name,
  * returns them into signed_data.
  */
 int _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
-			       gnutls_datum * signature)
+     gnutls_datum_t * signature)
 {
     int bits, result, len;
 

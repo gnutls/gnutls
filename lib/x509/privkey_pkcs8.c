@@ -61,7 +61,7 @@ struct pbkdf2_params {
 };
 
 struct pbe_enc_params {
-    gnutls_cipher_algorithm cipher;
+    gnutls_cipher_algorithm_t cipher;
     opaque iv[8];
     int iv_size;
 };
@@ -69,28 +69,28 @@ struct pbe_enc_params {
 static int generate_key(schema_id schema, const char *password,
 			struct pbkdf2_params *kdf_params,
 			struct pbe_enc_params *enc_params,
-			gnutls_datum * key);
+			gnutls_datum_t * key);
 static int read_pbkdf2_params(ASN1_TYPE pbes2_asn,
-			      const gnutls_datum * der,
+			      const gnutls_datum_t * der,
 			      struct pbkdf2_params *params);
 static int read_pbe_enc_params(ASN1_TYPE pbes2_asn,
-			       const gnutls_datum * der,
+			       const gnutls_datum_t * der,
 			       struct pbe_enc_params *params);
 static int decrypt_data(schema_id, ASN1_TYPE pkcs8_asn, const char *root,
 			const char *password,
 			const struct pbkdf2_params *kdf_params,
 			const struct pbe_enc_params *enc_params,
-			gnutls_datum * decrypted_data);
-static int decode_private_key_info(const gnutls_datum * der,
-				   gnutls_x509_privkey pkey,
+			gnutls_datum_t * decrypted_data);
+static int decode_private_key_info(const gnutls_datum_t * der,
+				   gnutls_x509_privkey_t pkey,
 				   ASN1_TYPE * out);
 static int write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn,
 			       const char *where,
 			       const struct pbkdf2_params *kdf_params,
 			       const struct pbe_enc_params *enc_params);
-static int encrypt_data(const gnutls_datum * plain,
+static int encrypt_data(const gnutls_datum_t * plain,
 			const struct pbe_enc_params *enc_params,
-			gnutls_datum * key, gnutls_datum * encrypted);
+			gnutls_datum_t * key, gnutls_datum_t * encrypted);
 
 static int read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 				  struct pbkdf2_params *params);
@@ -129,8 +129,8 @@ inline static int check_schema(const char *oid)
  * info. The output will be allocated and stored into der. Also
  * the ASN1_TYPE of private key info will be returned.
  */
-static int encode_to_private_key_info(gnutls_x509_privkey pkey,
-				      gnutls_datum * der,
+static int encode_to_private_key_info(gnutls_x509_privkey_t pkey,
+				      gnutls_datum_t * der,
 				      ASN1_TYPE * pkey_info)
 {
     int result;
@@ -268,12 +268,12 @@ static int encode_to_private_key_info(gnutls_x509_privkey pkey,
  * a PKCS #8 EncryptedPrivateKeyInfo.
  */
 static
-int encode_to_pkcs8_key(schema_id schema, const gnutls_datum * der_key,
+int encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
 			const char *password, ASN1_TYPE * out)
 {
     int result;
-    gnutls_datum key = { NULL, 0 };
-    gnutls_datum tmp = { NULL, 0 };
+    gnutls_datum_t key = { NULL, 0 };
+    gnutls_datum_t tmp = { NULL, 0 };
     ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
     struct pbkdf2_params kdf_params;
     struct pbe_enc_params enc_params;
@@ -378,7 +378,7 @@ int encode_to_pkcs8_key(schema_id schema, const gnutls_datum * der_key,
   * @key: Holds the key
   * @format: the format of output params. One of PEM or DER.
   * @password: the password that will be used to encrypt the key. 
-  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags
+  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
   * @output_data: will contain a private key PEM or DER encoded
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
@@ -401,8 +401,8 @@ int encode_to_pkcs8_key(schema_id schema, const gnutls_datum * der_key,
   * 0 on success.
   *
   **/
-int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
-				     gnutls_x509_crt_fmt format,
+int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
+				     gnutls_x509_crt_fmt_t format,
 				     const char *password,
 				     unsigned int flags,
 				     void *output_data,
@@ -410,7 +410,7 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 {
     ASN1_TYPE pkcs8_asn, pkey_info;
     int ret;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     schema_id schema;
 
     if (key == NULL) {
@@ -481,7 +481,7 @@ int read_pkcs_schema_params(schema_id schema, const char *password,
 {
     ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY;
     int result;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
 
     switch (schema) {
 
@@ -601,13 +601,13 @@ int read_pkcs_schema_params(schema_id schema, const char *password,
  * (normally a PKCS #1 encoded RSA key)
  */
 static
-int decode_pkcs8_key(const gnutls_datum * raw_key,
+int decode_pkcs8_key(const gnutls_datum_t * raw_key,
 		     const char *password,
-		     gnutls_x509_privkey pkey, ASN1_TYPE * out)
+		     gnutls_x509_privkey_t pkey, ASN1_TYPE * out)
 {
     int result, len;
     char enc_oid[64];
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY, pkcs8_asn = ASN1_TYPE_EMPTY;
     ASN1_TYPE ret_asn;
     int params_start, params_end, params_len;
@@ -702,12 +702,12 @@ int decode_pkcs8_key(const gnutls_datum * raw_key,
 }
 
 static
-int decode_private_key_info(const gnutls_datum * der,
-			    gnutls_x509_privkey pkey, ASN1_TYPE * out)
+int decode_private_key_info(const gnutls_datum_t * der,
+			    gnutls_x509_privkey_t pkey, ASN1_TYPE * out)
 {
     int result, len;
     opaque oid[64], *data = NULL;
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
     ASN1_TYPE ret_asn;
     int data_size;
@@ -809,7 +809,7 @@ int decode_private_key_info(const gnutls_datum * der,
   * @flags: use 0.
   *
   * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
-  * to the native gnutls_x509_privkey format. The output will be stored in @key.
+  * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
   * Currently only RSA keys can be imported, and flags can only be used to indicate
   * an unencrypted key.
   *
@@ -822,14 +822,14 @@ int decode_private_key_info(const gnutls_datum * der,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key,
-				     const gnutls_datum * data,
-				     gnutls_x509_crt_fmt format,
+int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
+				     const gnutls_datum_t * data,
+				     gnutls_x509_crt_fmt_t format,
 				     const char *password,
 				     unsigned int flags)
 {
     int result = 0, need_free = 0;
-    gnutls_datum _data;
+    gnutls_datum_t _data;
     int encrypted;
 
     if (key == NULL) {
@@ -905,7 +905,7 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key,
 /* Reads the PBKDF2 parameters.
  */
 static int read_pbkdf2_params(ASN1_TYPE pbes2_asn,
-			      const gnutls_datum * der,
+			      const gnutls_datum_t * der,
 			      struct pbkdf2_params *params)
 {
     int params_start, params_end;
@@ -1089,7 +1089,7 @@ static int write_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 /* Converts an OID to a gnutls cipher type.
  */
 inline
-    static int oid2cipher(const char *oid, gnutls_cipher_algorithm * algo)
+    static int oid2cipher(const char *oid, gnutls_cipher_algorithm_t * algo)
 {
 
     *algo = 0;
@@ -1110,7 +1110,7 @@ inline
 
 
 static int read_pbe_enc_params(ASN1_TYPE pbes2_asn,
-			       const gnutls_datum * der,
+			       const gnutls_datum_t * der,
 			       struct pbe_enc_params *params)
 {
     int params_start, params_end;
@@ -1188,12 +1188,12 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
 			const char *root, const char *password,
 			const struct pbkdf2_params *kdf_params,
 			const struct pbe_enc_params *enc_params,
-			gnutls_datum * decrypted_data)
+			gnutls_datum_t * decrypted_data)
 {
     int result;
     int data_size;
     opaque *data = NULL, *key = NULL;
-    gnutls_datum dkey, div;
+    gnutls_datum_t dkey, div;
     cipher_hd_t ch = NULL;
     int key_size;
 
@@ -1461,7 +1461,7 @@ static int generate_key(schema_id schema,
 			const char *password,
 			struct pbkdf2_params *kdf_params,
 			struct pbe_enc_params *enc_params,
-			gnutls_datum * key)
+			gnutls_datum_t * key)
 {
     opaque rnd[2];
     int ret;
@@ -1628,14 +1628,14 @@ static int write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn,
 
 }
 
-static int encrypt_data(const gnutls_datum * plain,
+static int encrypt_data(const gnutls_datum_t * plain,
 			const struct pbe_enc_params *enc_params,
-			gnutls_datum * key, gnutls_datum * encrypted)
+			gnutls_datum_t * key, gnutls_datum_t * encrypted)
 {
     int result;
     int data_size;
     opaque *data = NULL;
-    gnutls_datum div;
+    gnutls_datum_t div;
     cipher_hd_t ch = NULL;
     opaque pad, pad_size;
 
@@ -1695,12 +1695,12 @@ static int encrypt_data(const gnutls_datum * plain,
 /* Decrypts a PKCS #7 encryptedData. The output is allocated
  * and stored in dec.
  */
-int _gnutls_pkcs7_decrypt_data(const gnutls_datum * data,
-			       const char *password, gnutls_datum * dec)
+int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
+			       const char *password, gnutls_datum_t * dec)
 {
     int result, len;
     char enc_oid[64];
-    gnutls_datum tmp;
+    gnutls_datum_t tmp;
     ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY, pkcs7_asn = ASN1_TYPE_EMPTY;
     int params_start, params_end, params_len;
     struct pbkdf2_params kdf_params;
@@ -1793,12 +1793,12 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum * data,
 /* Encrypts to a PKCS #7 encryptedData. The output is allocated
  * and stored in enc.
  */
-int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,
-			       const char *password, gnutls_datum * enc)
+int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum_t * data,
+			       const char *password, gnutls_datum_t * enc)
 {
     int result;
-    gnutls_datum key = { NULL, 0 };
-    gnutls_datum tmp = { NULL, 0 };
+    gnutls_datum_t key = { NULL, 0 };
+    gnutls_datum_t tmp = { NULL, 0 };
     ASN1_TYPE pkcs7_asn = ASN1_TYPE_EMPTY;
     struct pbkdf2_params kdf_params;
     struct pbe_enc_params enc_params;

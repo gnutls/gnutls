@@ -41,11 +41,11 @@
 #include <libtasn1.h>
 #include <gnutls_ui.h>
 
-static void disable_optional_stuff(gnutls_x509_crt cert);
+static void disable_optional_stuff(gnutls_x509_crt_t cert);
 
 /**
   * gnutls_x509_crt_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @oid: holds an Object Identifier in a null terminated string
   * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @name: a pointer to the name
@@ -63,7 +63,7 @@ static void disable_optional_stuff(gnutls_x509_crt cert);
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char *oid,
+int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt_t crt, const char *oid,
 				  unsigned int raw_flag, const void *name,
 				  unsigned int sizeof_name)
 {
@@ -77,7 +77,7 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char *oid,
 
 /**
   * gnutls_x509_crt_set_issuer_dn_by_oid - This function will set the Certificate request issuer's distinguished name
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @oid: holds an Object Identifier in a null terminated string
   * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @name: a pointer to the name
@@ -98,7 +98,7 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char *oid,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt,
+int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt_t crt,
 					 const char *oid,
 					 unsigned int raw_flag,
 					 const void *name,
@@ -114,7 +114,7 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt,
 
 /**
   * gnutls_x509_crt_set_version - This function will set the Certificate request version
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @version: holds the version number. For X.509v1 certificates must be 1.
   *
   * This function will set the version of the certificate. This
@@ -124,7 +124,7 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
+int gnutls_x509_crt_set_version(gnutls_x509_crt_t crt, unsigned int version)
 {
     int result;
     unsigned char null = version;
@@ -149,7 +149,7 @@ int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
 
 /**
   * gnutls_x509_crt_set_key - This function will associate the Certificate with a key
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @key: holds a private key
   *
   * This function will set the public parameters from the given private key to the
@@ -158,7 +158,7 @@ int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_key(gnutls_x509_crt crt, gnutls_x509_privkey key)
+int gnutls_x509_crt_set_key(gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
 {
     int result;
 
@@ -183,7 +183,7 @@ int gnutls_x509_crt_set_key(gnutls_x509_crt crt, gnutls_x509_privkey key)
 
 /**
   * gnutls_x509_crt_set_crq - This function will associate the Certificate with a request
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @crq: holds a certificate request
   *
   * This function will set the name and public parameters from the given certificate request to the
@@ -192,7 +192,7 @@ int gnutls_x509_crt_set_key(gnutls_x509_crt crt, gnutls_x509_privkey key)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq)
+int gnutls_x509_crt_set_crq(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
 {
     int result;
     int pk_algorithm;
@@ -228,7 +228,7 @@ int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq)
 
 /**
   * gnutls_x509_crt_set_ca_status - This function will set the basicConstraints extension
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @ca: true(1) or false(0). Depending on the Certificate authority status.
   *
   * This function will set the basicConstraints certificate extension. 
@@ -236,10 +236,10 @@ int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_ca_status(gnutls_x509_crt crt, unsigned int ca)
+int gnutls_x509_crt_set_ca_status(gnutls_x509_crt_t crt, unsigned int ca)
 {
     int result;
-    gnutls_datum der_data;
+    gnutls_datum_t der_data;
 
     if (crt == NULL) {
 	gnutls_assert();
@@ -271,7 +271,7 @@ int gnutls_x509_crt_set_ca_status(gnutls_x509_crt crt, unsigned int ca)
 
 /**
   * gnutls_x509_crt_set_key_usage - This function will set the keyUsage extension
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
   *
   * This function will set the keyUsage certificate extension. 
@@ -279,10 +279,10 @@ int gnutls_x509_crt_set_ca_status(gnutls_x509_crt crt, unsigned int ca)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_key_usage(gnutls_x509_crt crt, unsigned int usage)
+int gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt, unsigned int usage)
 {
     int result;
-    gnutls_datum der_data;
+    gnutls_datum_t der_data;
 
     if (crt == NULL) {
 	gnutls_assert();
@@ -314,8 +314,8 @@ int gnutls_x509_crt_set_key_usage(gnutls_x509_crt crt, unsigned int usage)
 
 /**
   * gnutls_x509_crt_set_subject_alt_name - This function will set the subject Alternative Name
-  * @crt: should contain a gnutls_x509_crt structure
-  * @type: is one of the gnutls_x509_subject_alt_name enumerations
+  * @crt: should contain a gnutls_x509_crt_t structure
+  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
   * @data_string: The data to be set
   *
   * This function will set the subject alternative name certificate extension. 
@@ -323,14 +323,14 @@ int gnutls_x509_crt_set_key_usage(gnutls_x509_crt crt, unsigned int usage)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt crt,
-						 gnutls_x509_subject_alt_name
+int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt_t crt,
+						 gnutls_x509_subject_alt_name_t
 						 type,
 						 const char *data_string)
 {
     int result;
-    gnutls_datum der_data;
-    gnutls_datum dnsname;
+    gnutls_datum_t der_data;
+    gnutls_datum_t dnsname;
     unsigned int critical;
 
     if (crt == NULL) {
@@ -378,7 +378,7 @@ int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt crt,
 
 /**
   * gnutls_x509_crt_sign - This function will sign a Certificate request with a key
-  * @crt: should contain a gnutls_x509_crt structure
+  * @crt: should contain a gnutls_x509_crt_t structure
   * @issuer: is the certificate of the certificate issuer
   * @issuer_key: holds the issuer's private key
   *
@@ -391,8 +391,8 @@ int gnutls_x509_crt_set_subject_alternative_name(gnutls_x509_crt crt,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer,
-			 gnutls_x509_privkey issuer_key)
+int gnutls_x509_crt_sign(gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+			 gnutls_x509_privkey_t issuer_key)
 {
     int result;
 
@@ -417,7 +417,7 @@ int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer,
 
 /**
   * gnutls_x509_crt_set_activation_time - This function will set the Certificate's activation time
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @act_time: The actual time
   *
   * This function will set the time this Certificate was or will be activated.
@@ -425,7 +425,7 @@ int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert,
+int gnutls_x509_crt_set_activation_time(gnutls_x509_crt_t cert,
 					time_t act_time)
 {
     if (cert == NULL) {
@@ -440,7 +440,7 @@ int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_set_expiration_time - This function will set the Certificate's expiration time
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @exp_time: The actual time
   *
   * This function will set the time this Certificate will expire.
@@ -448,7 +448,7 @@ int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert,
+int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt_t cert,
 					time_t exp_time)
 {
     if (cert == NULL) {
@@ -462,7 +462,7 @@ int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_set_serial - This function will set the certificate's serial number
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @serial: The serial number
   * @serial_size: Holds the size of the serial field.
   *
@@ -474,7 +474,7 @@ int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const void *serial,
+int gnutls_x509_crt_set_serial(gnutls_x509_crt_t cert, const void *serial,
 			       size_t serial_size)
 {
     int ret;
@@ -499,7 +499,7 @@ int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const void *serial,
 /* If OPTIONAL fields have not been initialized then
  * disable them.
  */
-static void disable_optional_stuff(gnutls_x509_crt cert)
+static void disable_optional_stuff(gnutls_x509_crt_t cert)
 {
 
     asn1_write_value(cert->cert, "tbsCertificate.issuerUniqueID", NULL, 0);
@@ -517,8 +517,8 @@ static void disable_optional_stuff(gnutls_x509_crt cert)
 
 /**
   * gnutls_x509_crt_set_crl_dist_points - This function will set the CRL dist points
-  * @crt: should contain a gnutls_x509_crt structure
-  * @type: is one of the gnutls_x509_subject_alt_name enumerations
+  * @crt: should contain a gnutls_x509_crt_t structure
+  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
   * @data_string: The data to be set
   * @reason_flags: revocation reasons
   *
@@ -527,14 +527,14 @@ static void disable_optional_stuff(gnutls_x509_crt cert)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt,
-					gnutls_x509_subject_alt_name type,
+int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt_t crt,
+					gnutls_x509_subject_alt_name_t type,
 					const void *data_string,
 					unsigned int reason_flags)
 {
     int result;
-    gnutls_datum der_data;
-    gnutls_datum oldname;
+    gnutls_datum_t der_data;
+    gnutls_datum_t oldname;
     unsigned int critical;
 
     if (crt == NULL) {
@@ -582,7 +582,7 @@ int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt,
 
 /**
   * gnutls_x509_crt_cpy_crl_dist_points - This function will copy the CRL dist points
-  * @dst: should contain a gnutls_x509_crt structure
+  * @dst: should contain a gnutls_x509_crt_t structure
   * @src: the certificate where the dist points will be copied from
   *
   * This function will copy the CRL distribution points certificate 
@@ -592,11 +592,11 @@ int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt dst,
-					gnutls_x509_crt src)
+int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt_t dst,
+					gnutls_x509_crt_t src)
 {
     int result;
-    gnutls_datum der_data;
+    gnutls_datum_t der_data;
     unsigned int critical;
 
     if (dst == NULL || src == NULL) {
@@ -631,7 +631,7 @@ int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt dst,
 
 /**
   * gnutls_x509_crt_set_subject_key_id - This function will set the certificate's subject key id
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @id: The key ID
   * @id_size: Holds the size of the serial field.
   *
@@ -640,11 +640,11 @@ int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt dst,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert,
+int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt_t cert,
 				       const void *id, size_t id_size)
 {
     int result;
-    gnutls_datum old_id, der_data;
+    gnutls_datum_t old_id, der_data;
     unsigned int critical;
 
     if (cert == NULL) {
@@ -690,7 +690,7 @@ int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_set_authority_key_id - This function will set the certificate authority's key id
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @id: The key ID
   * @id_size: Holds the size of the serial field.
   *
@@ -700,11 +700,11 @@ int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert,
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt cert,
+int gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt_t cert,
 					 const void *id, size_t id_size)
 {
     int result;
-    gnutls_datum old_id, der_data;
+    gnutls_datum_t old_id, der_data;
     unsigned int critical;
 
     if (cert == NULL) {
@@ -750,7 +750,7 @@ int gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt cert,
 
 /**
   * gnutls_x509_crt_set_key_purpose_oid - This function sets the Certificate's key purpose OIDs
-  * @cert: should contain a gnutls_x509_crt structure
+  * @cert: should contain a gnutls_x509_crt_t structure
   * @oid: a pointer to a null terminated string that holds the OID
   * @critical: Whether this extension will be critical or not
   *
@@ -763,12 +763,12 @@ int gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt cert,
   * On success 0 is returned.
   *
   **/
-int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt cert,
+int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt_t cert,
 					const void *oid,
 					unsigned int critical)
 {
     int result;
-    gnutls_datum old_id, der_data;
+    gnutls_datum_t old_id, der_data;
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
     if (cert == NULL) {

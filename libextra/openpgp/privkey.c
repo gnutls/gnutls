@@ -33,7 +33,7 @@
 #include <gnutls_cert.h>
 
 /**
-  * gnutls_openpgp_privkey_init - This function initializes a gnutls_openpgp_privkey structure
+  * gnutls_openpgp_privkey_init - This function initializes a gnutls_openpgp_privkey_t structure
   * @key: The structure to be initialized
   *
   * This function will initialize an OpenPGP key structure. 
@@ -41,7 +41,7 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey * key)
+int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey_t * key)
 {
     *key = gnutls_calloc(1, sizeof(gnutls_openpgp_privkey_int));
 
@@ -52,13 +52,13 @@ int gnutls_openpgp_privkey_init(gnutls_openpgp_privkey * key)
 }
 
 /**
-  * gnutls_openpgp_privkey_deinit - This function deinitializes memory used by a gnutls_openpgp_privkey structure
+  * gnutls_openpgp_privkey_deinit - This function deinitializes memory used by a gnutls_openpgp_privkey_t structure
   * @key: The structure to be initialized
   *
   * This function will deinitialize a key structure. 
   *
   **/
-void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key)
+void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey_t key)
 {
     if (!key)
 	return;
@@ -71,19 +71,19 @@ void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key)
   * gnutls_openpgp_privkey_import - This function will import a RAW or BASE64 encoded key
   * @key: The structure to store the parsed key.
   * @data: The RAW or BASE64 encoded key.
-  * @format: One of gnutls_openpgp_key_fmt elements.
+  * @format: One of gnutls_openpgp_key_fmt_t elements.
   * @pass: Unused for now
   * @flags: should be zero
   *
   * This function will convert the given RAW or Base64 encoded key
-  * to the native gnutls_openpgp_privkey format. The output will be stored in 'key'.
+  * to the native gnutls_openpgp_privkey_t format. The output will be stored in 'key'.
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey key,
-				  const gnutls_datum * data,
-				  gnutls_openpgp_key_fmt format,
+int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey_t key,
+				  const gnutls_datum_t * data,
+				  gnutls_openpgp_key_fmt_t format,
 				  const char *pass, unsigned int flags)
 {
     int rc;
@@ -114,7 +114,7 @@ int gnutls_openpgp_privkey_import(gnutls_openpgp_privkey key,
   *
   **/
 int
-gnutls_openpgp_privkey_get_pk_algorithm(gnutls_openpgp_privkey key,
+gnutls_openpgp_privkey_get_pk_algorithm(gnutls_openpgp_privkey_t key,
 					unsigned int *bits)
 {
     int pk = key->pkey.pk_algorithm;

@@ -343,8 +343,8 @@ xml_add_sig(gnutls_string * xmlkey, int ext, cdk_pkt_signature_t sig)
  * a XML string.
  **/
 int
-gnutls_openpgp_key_to_xml(gnutls_openpgp_key key,
-			  gnutls_datum * xmlkey, int ext)
+gnutls_openpgp_key_to_xml(gnutls_openpgp_key_t key,
+			  gnutls_datum_t * xmlkey, int ext)
 {
     cdk_kbnode_t node, ctx = NULL;
     cdk_packet_t pkt;

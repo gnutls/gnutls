@@ -48,14 +48,14 @@
  * may use GnuPG for that purpose, or any other external PGP application.
  -*/
 int _gnutls_openpgp_verify_key(const char *trustdb,
-			       const gnutls_datum * keyring,
-			       const gnutls_datum * cert_list,
+			       const gnutls_datum_t * keyring,
+			       const gnutls_datum_t * cert_list,
 			       int cert_list_length)
 {
     int ret = 0;
-    gnutls_openpgp_key key = NULL;
-    gnutls_openpgp_keyring ring = NULL;
-    gnutls_openpgp_trustdb tdb = NULL;
+    gnutls_openpgp_key_t key = NULL;
+    gnutls_openpgp_keyring_t ring = NULL;
+    gnutls_openpgp_trustdb_t tdb = NULL;
     unsigned int verify_ring = 0, verify_db = 0, verify_self = 0;
 
     if (!cert_list || cert_list_length != 1) {
@@ -146,10 +146,10 @@ int _gnutls_openpgp_verify_key(const char *trustdb,
  * Returns the fingerprint of the OpenPGP key. Depence on the algorithm,
  * the fingerprint can be 16 or 20 bytes.
  -*/
-int _gnutls_openpgp_fingerprint(const gnutls_datum * cert,
+int _gnutls_openpgp_fingerprint(const gnutls_datum_t * cert,
 				unsigned char *fpr, size_t * fprlen)
 {
-    gnutls_openpgp_key key;
+    gnutls_openpgp_key_t key;
     int ret;
 
     ret = gnutls_openpgp_key_init(&key);
@@ -181,9 +181,9 @@ int _gnutls_openpgp_fingerprint(const gnutls_datum * cert,
  *
  * Returns the timestamp when the OpenPGP key was created.
  -*/
-time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum * cert)
+time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum_t * cert)
 {
-    gnutls_openpgp_key key;
+    gnutls_openpgp_key_t key;
     int ret;
     time_t tim;
 
@@ -214,10 +214,10 @@ time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum * cert)
  * Returns the time when the OpenPGP key expires. A value of '0' means
  * that the key doesn't expire at all.
  -*/
-time_t _gnutls_openpgp_get_raw_key_expiration_time(const gnutls_datum *
+time_t _gnutls_openpgp_get_raw_key_expiration_time(const gnutls_datum_t *
 						   cert)
 {
-    gnutls_openpgp_key key;
+    gnutls_openpgp_key_t key;
     int ret;
     time_t tim;
 

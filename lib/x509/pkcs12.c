@@ -45,11 +45,11 @@
  */
 static
 int _decode_pkcs12_auth_safe(ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
-			     gnutls_datum * raw)
+			     gnutls_datum_t * raw)
 {
     char oid[128];
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-    gnutls_datum auth_safe = { NULL, 0 };
+    gnutls_datum_t auth_safe = { NULL, 0 };
     int tmp_size, len, result;
 
     len = sizeof(oid) - 1;
@@ -114,7 +114,7 @@ int _decode_pkcs12_auth_safe(ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
 }
 
 /**
-  * gnutls_pkcs12_init - This function initializes a gnutls_pkcs12 structure
+  * gnutls_pkcs12_init - This function initializes a gnutls_pkcs12_t structure
   * @pkcs12: The structure to be initialized
   *
   * This function will initialize a PKCS12 structure. PKCS12 structures
@@ -124,7 +124,7 @@ int _decode_pkcs12_auth_safe(ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12)
+int gnutls_pkcs12_init(gnutls_pkcs12_t * pkcs12)
 {
     *pkcs12 = gnutls_calloc(1, sizeof(gnutls_pkcs12_int));
 
@@ -143,13 +143,13 @@ int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12)
 }
 
 /**
-  * gnutls_pkcs12_deinit - This function deinitializes memory used by a gnutls_pkcs12 structure
+  * gnutls_pkcs12_deinit - This function deinitializes memory used by a gnutls_pkcs12_t structure
   * @pkcs12: The structure to be initialized
   *
   * This function will deinitialize a PKCS12 structure. 
   *
   **/
-void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12)
+void gnutls_pkcs12_deinit(gnutls_pkcs12_t pkcs12)
 {
     if (!pkcs12)
 	return;
@@ -168,18 +168,18 @@ void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12)
   * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
   *
   * This function will convert the given DER or PEM encoded PKCS12
-  * to the native gnutls_pkcs12 format. The output will be stored in 'pkcs12'.
+  * to the native gnutls_pkcs12_t format. The output will be stored in 'pkcs12'.
   *
   * If the PKCS12 is PEM encoded it should have a header of "PKCS12".
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
-			 gnutls_x509_crt_fmt format, unsigned int flags)
+int gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12, const gnutls_datum_t * data,
+			 gnutls_x509_crt_fmt_t format, unsigned int flags)
 {
     int result = 0, need_free = 0;
-    gnutls_datum _data;
+    gnutls_datum_t _data;
 
     _data.data = data->data;
     _data.size = data->size;
@@ -249,8 +249,8 @@ int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
   * 0 on success.
   *
   **/
-int gnutls_pkcs12_export(gnutls_pkcs12 pkcs12,
-			 gnutls_x509_crt_fmt format, void *output_data,
+int gnutls_pkcs12_export(gnutls_pkcs12_t pkcs12,
+			 gnutls_x509_crt_fmt_t format, void *output_data,
 			 size_t * output_data_size)
 {
     if (pkcs12 == NULL) {
@@ -307,14 +307,14 @@ static inline char *ucs2_to_ascii(char *data, int size)
  * the given bag. 
  */
 int
-_pkcs12_decode_safe_contents(const gnutls_datum * content,
-			     gnutls_pkcs12_bag bag)
+_pkcs12_decode_safe_contents(const gnutls_datum_t * content,
+			     gnutls_pkcs12_bag_t  bag)
 {
     char oid[128], root[128];
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int len, result;
     int bag_type;
-    gnutls_datum attr_val;
+    gnutls_datum_t attr_val;
     int count = 0, i, attributes, j;
     char counter[MAX_INT_DIGITS];
 
@@ -388,7 +388,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum * content,
 
 	if (bag_type == GNUTLS_BAG_CERTIFICATE ||
 	    bag_type == GNUTLS_BAG_CRL) {
-	    gnutls_datum tmp = bag->element[i].data;
+	    gnutls_datum_t tmp = bag->element[i].data;
 
 	    result =
 		_pkcs12_decode_crt_bag(bag_type, &tmp,
@@ -470,9 +470,9 @@ _pkcs12_decode_safe_contents(const gnutls_datum * content,
 
 static
 int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
-			 gnutls_pkcs12_bag bag)
+			 gnutls_pkcs12_bag_t  bag)
 {
-    gnutls_datum content = { NULL, 0 };
+    gnutls_datum_t content = { NULL, 0 };
     int result;
 
     /* Step 1. Extract the content.
@@ -502,7 +502,7 @@ int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
 
 /**
   * gnutls_pkcs12_get_bag - This function returns a Bag from a PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12 structure
+  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
   * @indx: contains the index of the bag to extract
   * @bag: An initialized bag, where the contents of the bag will be copied
   *
@@ -513,15 +513,15 @@ int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
   * will be returned.
   *
   **/
-int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12,
-			  int indx, gnutls_pkcs12_bag bag)
+int gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
+			  int indx, gnutls_pkcs12_bag_t  bag)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result, len;
     char root2[64];
     char oid[128];
     char counter[MAX_INT_DIGITS];
-    gnutls_datum tmp = { NULL, 0 };
+    gnutls_datum_t tmp = { NULL, 0 };
 
     if (pkcs12 == NULL) {
 	gnutls_assert();
@@ -649,14 +649,14 @@ static int create_empty_pfx(ASN1_TYPE pkcs12)
 
 /**
   * gnutls_pkcs12_set_bag - This function inserts a Bag into a PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12 structure
+  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
   * @bag: An initialized bag
   *
   * This function will insert a Bag into the PKCS12 structure.
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag)
+int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t  bag)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
@@ -768,20 +768,20 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag)
 
 /**
   * gnutls_pkcs12_generate_mac - This function generates the MAC of the PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12 structure
+  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
   * @pass: The password for the MAC
   *
   * This function will generate a MAC for the PKCS12 structure.
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char *pass)
+int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 {
     opaque salt[8], key[20];
     int result;
     const int iter = 1;
     mac_hd_t td1 = NULL;
-    gnutls_datum tmp = { NULL, 0 };
+    gnutls_datum_t tmp = { NULL, 0 };
     opaque sha_mac[20];
 
     if (pkcs12 == NULL) {
@@ -887,20 +887,20 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char *pass)
 
 /**
   * gnutls_pkcs12_verify_mac - This function verifies the MAC of the PKCS12 structure
-  * @pkcs12_struct: should contain a gnutls_pkcs12 structure
+  * @pkcs12_struct: should contain a gnutls_pkcs12_t structure
   * @pass: The password for the MAC
   *
   * This function will verify the MAC for the PKCS12 structure.
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char *pass)
+int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 {
     opaque key[20];
     int result;
     unsigned int iter, len;
     mac_hd_t td1 = NULL;
-    gnutls_datum tmp = { NULL, 0 }, salt = {
+    gnutls_datum_t tmp = { NULL, 0 }, salt = {
     NULL, 0};
     opaque sha_mac[20];
     opaque sha_mac_orig[20];
@@ -989,7 +989,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char *pass)
 }
 
 
-static int write_attributes(gnutls_pkcs12_bag bag, int elem, ASN1_TYPE c2,
+static int write_attributes(gnutls_pkcs12_bag_t  bag, int elem, ASN1_TYPE c2,
 			    const char *where)
 {
     int result;
@@ -1089,7 +1089,7 @@ static int write_attributes(gnutls_pkcs12_bag bag, int elem, ASN1_TYPE c2,
  * the given datum. Enc is set to non zero if the data are encrypted;
  */
 int
-_pkcs12_encode_safe_contents(gnutls_pkcs12_bag bag, ASN1_TYPE * contents,
+_pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t  bag, ASN1_TYPE * contents,
 			     int *enc)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -1152,7 +1152,7 @@ _pkcs12_encode_safe_contents(gnutls_pkcs12_bag bag, ASN1_TYPE * contents,
 
 	if (bag->element[i].type == GNUTLS_BAG_CERTIFICATE ||
 	    bag->element[i].type == GNUTLS_BAG_CRL) {
-	    gnutls_datum tmp;
+	    gnutls_datum_t tmp;
 
 	    /* in that case encode it to a CertBag or
 	     * a CrlBag.

@@ -7,43 +7,35 @@
 #include "../libextra/openpgp/openpgp.h"
 
 typedef struct retr_st {
-    gnutls_certificate_type type;
+    gnutls_certificate_type_t type;
     union cert {
-	gnutls_x509_crt *x509;
-	gnutls_openpgp_key pgp;
+	gnutls_x509_crt_t *x509;
+	gnutls_openpgp_key_t pgp;
     } cert;
     uint ncerts;
 
     union key {
-	gnutls_x509_privkey x509;
-	gnutls_openpgp_privkey pgp;
+	gnutls_x509_privkey_t x509;
+	gnutls_openpgp_privkey_t pgp;
     } key;
 
     uint deinit_all;
 } gnutls_retr_st;
 
-typedef int gnutls_certificate_client_retrieve_function(gnutls_session,
-							const gnutls_datum
-							* req_ca_rdn,
-							int nreqs,
-							const
-							gnutls_pk_algorithm
-							* pk_algos,
-							int
-							pk_algos_length,
-							gnutls_retr_st *);
+typedef int gnutls_certificate_client_retrieve_function(gnutls_session_t,
+    const gnutls_datum_t *req_ca_rdn, int nreqs,
+    const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length,
+    gnutls_retr_st *);
 
 typedef int gnutls_certificate_server_retrieve_function(struct
-							gnutls_session_int
-							*,
-							gnutls_retr_st *);
+    gnutls_session_int*, gnutls_retr_st *);
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
  */
 typedef struct {
-    gnutls_dh_params dh_params;
-    gnutls_rsa_params rsa_params;
+    gnutls_dh_params_t dh_params;
+    gnutls_rsa_params_t rsa_params;
     /* this callback is used to retrieve the DH or RSA
      * parameters.
      */
@@ -71,7 +63,7 @@ typedef struct {
 
     /* OpenPGP specific stuff */
 
-    gnutls_datum keyring;
+    gnutls_datum_t keyring;
     char *pgp_key_server;
     int pgp_key_server_port;
 
@@ -79,11 +71,11 @@ typedef struct {
 
     /* X509 specific stuff */
 
-    gnutls_x509_crt *x509_ca_list;
+    gnutls_x509_crt_t *x509_ca_list;
     uint x509_ncas;		/* number of CAs in the ca_list 
 				 */
 
-    gnutls_x509_crl *x509_crl_list;
+    gnutls_x509_crl_t *x509_crl_list;
     uint x509_ncrls;		/* number of CRLs in the crl_list 
 				 */
 
@@ -96,13 +88,13 @@ typedef struct {
      * This is better than
      * generating on every handshake.
      */
-    gnutls_datum x509_rdn_sequence;
+    gnutls_datum_t x509_rdn_sequence;
 
     gnutls_certificate_client_retrieve_function *client_get_cert_callback;
     gnutls_certificate_server_retrieve_function *server_get_cert_callback;
 } certificate_credentials_st;
 
-#define gnutls_certificate_credentials certificate_credentials_st*
+#define gnutls_certificate_credentials_t certificate_credentials_st*
 
 typedef struct rsa_info_st {
     opaque modulus[65];
@@ -118,7 +110,7 @@ typedef struct cert_auth_info_st {
     dh_info_t dh;
 
     rsa_info_t rsa_export;
-    gnutls_datum *raw_certificate_list;	/* holds the raw certificate of the
+    gnutls_datum_t *raw_certificate_list;	/* holds the raw certificate of the
 					 * peer.
 					 */
     unsigned int ncerts;	/* holds the size of the list above */
@@ -127,35 +119,29 @@ typedef struct cert_auth_info_st {
 typedef struct cert_auth_info_st cert_auth_info_st;
 
 /* AUTH X509 functions */
-int _gnutls_gen_cert_server_certificate(gnutls_session, opaque **);
-int _gnutls_gen_cert_client_certificate(gnutls_session, opaque **);
-int _gnutls_gen_cert_client_cert_vrfy(gnutls_session, opaque **);
-int _gnutls_gen_cert_server_cert_req(gnutls_session, opaque **);
-int _gnutls_proc_cert_cert_req(gnutls_session, opaque *, size_t);
-int _gnutls_proc_cert_client_cert_vrfy(gnutls_session, opaque *, size_t);
-int _gnutls_proc_cert_server_certificate(gnutls_session, opaque *, size_t);
-int _gnutls_get_selected_cert(gnutls_session session,
-			      gnutls_cert ** apr_cert_list,
-			      int *apr_cert_list_length,
-			      gnutls_privkey ** apr_pkey);
+int _gnutls_gen_cert_server_certificate(gnutls_session_t, opaque **);
+int _gnutls_gen_cert_client_certificate(gnutls_session_t, opaque **);
+int _gnutls_gen_cert_client_cert_vrfy(gnutls_session_t, opaque **);
+int _gnutls_gen_cert_server_cert_req(gnutls_session_t, opaque **);
+int _gnutls_proc_cert_cert_req(gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_cert_client_cert_vrfy(gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_cert_server_certificate(gnutls_session_t, opaque *, size_t);
+int _gnutls_get_selected_cert(gnutls_session_t session,
+     gnutls_cert ** apr_cert_list, int *apr_cert_list_length,
+     gnutls_privkey ** apr_pkey);
 
 int _gnutls_server_select_cert(struct gnutls_session_int *,
-			       gnutls_pk_algorithm);
-void _gnutls_selected_certs_deinit(gnutls_session session);
-void _gnutls_selected_certs_set(gnutls_session session,
-				gnutls_cert * certs, int ncerts,
-				gnutls_privkey * key, int need_free);
+     gnutls_pk_algorithm_t);
+void _gnutls_selected_certs_deinit(gnutls_session_t session);
+void _gnutls_selected_certs_set(gnutls_session_t session,
+    gnutls_cert * certs, int ncerts,
+    gnutls_privkey * key, int need_free);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 
-gnutls_rsa_params _gnutls_certificate_get_rsa_params(const
-						     gnutls_certificate_credentials
-						     sc,
-						     gnutls_session
-						     session);
-gnutls_dh_params _gnutls_certificate_get_dh_params(const
-						   gnutls_certificate_credentials
-						   sc,
-						   gnutls_session session);
+gnutls_rsa_params_t _gnutls_certificate_get_rsa_params(const
+    gnutls_certificate_credentials_t sc, gnutls_session_t);
+gnutls_dh_params_t _gnutls_certificate_get_dh_params(const
+    gnutls_certificate_credentials_t sc, gnutls_session_t session);
 
 #endif

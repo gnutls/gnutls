@@ -41,7 +41,7 @@
 #include "gnutls_auth_int.h"
 
 /* This selects the best supported ciphersuite from the ones provided */
-static int _gnutls_handshake_select_v2_suite(gnutls_session session,
+static int _gnutls_handshake_select_v2_suite(gnutls_session_t session,
 					     opaque * data, int datalen)
 {
     int i, j, ret;
@@ -82,20 +82,20 @@ static int _gnutls_handshake_select_v2_suite(gnutls_session session,
 /* Read a v2 client hello. Some browsers still use that beast!
  * However they set their version to 3.0 or 3.1.
  */
-int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
+int _gnutls_read_client_hello_v2(gnutls_session_t session, opaque * data,
 				 int datalen)
 {
     uint16 session_id_len = 0;
     int pos = 0;
     int ret = 0;
     uint16 sizeOfSuites;
-    gnutls_protocol_version version;
+    gnutls_protocol_t version;
     opaque random[TLS_RANDOM_SIZE];
     int len = datalen;
     int err;
     uint16 challenge;
     opaque session_id[TLS_MAX_SESSION_ID_SIZE];
-    gnutls_protocol_version ver;
+    gnutls_protocol_t ver;
 
     /* we only want to get here once - only in client hello */
     session->internals.v2_hello = 0;

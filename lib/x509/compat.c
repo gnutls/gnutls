@@ -25,11 +25,6 @@
  * API.
  */
 
-#include <gnutls_global.h>
-#include <gnutls_errors.h>
-#include <string.h>		/* memset */
-#include <dn.h>
-#include <libtasn1.h>
 #include <gnutls/x509.h>
 
 /**
@@ -41,9 +36,9 @@
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t _gnutls_x509_get_raw_crt_activation_time(const gnutls_datum * cert)
+time_t _gnutls_x509_get_raw_crt_activation_time(const gnutls_datum_t * cert)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     time_t result;
 
     result = gnutls_x509_crt_init(&xcert);
@@ -72,9 +67,9 @@ time_t _gnutls_x509_get_raw_crt_activation_time(const gnutls_datum * cert)
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t _gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum * cert)
+time_t _gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum_t * cert)
 {
-    gnutls_x509_crt xcert;
+    gnutls_x509_crt_t xcert;
     time_t result;
 
     result = gnutls_x509_crt_init(&xcert);

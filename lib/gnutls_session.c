@@ -28,7 +28,7 @@
 
 /**
   * gnutls_session_get_data - Returns all session parameters.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @session_data: is a pointer to space to hold the session.
   * @session_data_size: is the session_data's size, or it will be set by the function.
   *
@@ -39,11 +39,11 @@
   *
   * Resuming sessions is really useful and speedups connections after a succesful one.
   **/
-int gnutls_session_get_data(gnutls_session session,
+int gnutls_session_get_data(gnutls_session_t session,
 			    void *session_data, size_t * session_data_size)
 {
 
-    gnutls_datum psession;
+    gnutls_datum_t psession;
     int ret;
 
     if (*session_data_size < SESSION_SIZE || session_data == NULL) {
@@ -73,7 +73,7 @@ int gnutls_session_get_data(gnutls_session session,
 
 /**
   * gnutls_session_get_id - Returns session id.
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @session_id: is a pointer to space to hold the session id.
   * @session_id_size: is the session id's size, or it will be set by the function.
   *
@@ -85,7 +85,7 @@ int gnutls_session_get_data(gnutls_session session,
   * Session id is some data set by the server, that identify the current session. 
   * In TLS 1.0 and SSL 3.0 session id is always less than 32 bytes.
   **/
-int gnutls_session_get_id(gnutls_session session,
+int gnutls_session_get_id(gnutls_session_t session,
 			  void *session_id, size_t * session_id_size)
 {
 
@@ -103,7 +103,7 @@ int gnutls_session_get_id(gnutls_session session,
 
 /**
   * gnutls_session_set_data - Sets all session parameters
-  * @session: is a &gnutls_session structure.
+  * @session: is a &gnutls_session_t structure.
   * @session_data: is a pointer to space to hold the session.
   * @session_data_size: is the session's size
   *
@@ -118,12 +118,12 @@ int gnutls_session_get_id(gnutls_session session,
   * Returns a negative value on error.
   *
   **/
-int gnutls_session_set_data(gnutls_session session,
+int gnutls_session_set_data(gnutls_session_t session,
 			    const void *session_data,
 			    size_t session_data_size)
 {
     int ret;
-    gnutls_datum psession;
+    gnutls_datum_t psession;
 
     psession.data = (opaque *) session_data;
     psession.size = session_data_size;
