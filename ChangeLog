@@ -1,3 +1,26 @@
+2003-11-10 21:21  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in:
+
+	Removed the gnutls_handshake_set_rsa_pms_check() prototype from
+	gnutls.h. Corrected the *_get_dn() functions to return the data size
+	if the data argument is NULL, and *data_size == 0. Bugs reported by
+	Gergely Nagy <algernon@bonehunter.rulez.org>.  
+
+2003-11-10 15:32  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, ext_cert_type.c, ext_cert_type.h,
+	gnutls_constate.c, gnutls_extensions.c, gnutls_session_pack.c:
+
+	some fixes to have the correct cert_type on resumed sessions.  
+
+2003-11-10 12:25  nmav <nmav@gnutls.org>
+
+	* NEWS, src/certtool.c:
+
+	The certtool utility can now generate PKCS #12 structures without
+	specifying a certificate.  
+
 2003-11-09 19:16  nmav <nmav@gnutls.org>
 
 	* src/: certtool-gaa.c, certtool-gaa.h, certtool.gaa, cli.c,
