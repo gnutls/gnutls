@@ -478,8 +478,14 @@ static int group_check_g_n( GNUTLS_MPI g, GNUTLS_MPI n)
 	}
 	
 	/* We should also check whether g is a generator,
-	 * but this is not possible.
+	 * but this is not possible. We now only check if
+	 * the generator is not too large.
 	 */
+	
+	if (_gnutls_mpi_get_nbits(g) > 7) {
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
 	
 	return 0;
 
