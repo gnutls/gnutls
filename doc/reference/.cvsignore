@@ -15,6 +15,7 @@ gnutls-doc.top
 gnutls-extra.html
 gnutls-gnutls.html
 gnutls-openssl.html
+gnutls-overrides.txt
 gnutls-pkcs12.html
 gnutls-sections.txt
 gnutls.sgml
