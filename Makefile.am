@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = ChangeLog NEWS INSTALL README THANKS COPYING PGPKEYS COPYING.LIB
+EXTRA_DIST = ChangeLog NEWS INSTALL README THANKS COPYING COPYING.LIB
 SUBDIRS = $(LIBASN1_DIR) includes lib libextra src doc tests
 
 ChangeLog:
