@@ -25,6 +25,26 @@ Nothing special here. In case you are compiling for embedded systems
 you should check the configure options (that is run: 'configure --help'),
 and disable unneeded features of gnutls.
 
+Experimental:
+
+If you specify --with-nettle, the copy of some files from Nettle that
+are included in nettle/ will be used.  It is used via the generic
+crypto interface in crypto/, which would normally invoke Libgcrypt.
+
+Currently the generic crypto interface only support encryption,
+decryption, hashing and gathering of random data.  Supporting
+RSA/DSA/DH/SEXP/MPI in the generic crypto interface is pending.
+
+As Nettle do not include a randomness gatherer, if --with-nettle is
+specified, random data will be read from system device files (e.g.,
+/dev/urandom) directly.  The files used are printed when running
+configure, you can override them using --enable-random-device,
+--enable-pseudo-random-device, and --enable-nonce-device.  Please let
+us know if the defaults for some systems are wrong.
+
+The goal here is to make GnuTLS build standalone, in case Libgcrypt is
+not available, but also to allow easy use of other crypto libraries or
+crypto hardware.
 
 ****************************
 LICENSE ISSUES:
