@@ -40,6 +40,8 @@ int _gnutls_get_random(opaque * res, int bytes, int dev)
     struct timeval tv;
     char prand[16];
     char *device;
+
+#error DONT USE THAT
         
     switch(dev) {
     	case 1:
