@@ -232,7 +232,7 @@ static int _find_openpgp_cert(const gnutls_certificate_credentials cred,
  */
 static int get_issuers_num( gnutls_session session, opaque * data, ssize_t data_size)
 {
-int issuers_dn_len, result;
+int issuers_dn_len = 0, result;
 uint size;
 
 	/* Count the number of the given issuers;
@@ -472,7 +472,7 @@ static int _select_client_cert(gnutls_session session,
 			gnutls_assert();
 			return issuers_dn_length;
 		}
-		
+
 		if (issuers_dn_length > 0) {
 			issuers_dn = gnutls_malloc( sizeof(gnutls_datum)*issuers_dn_length);
 			if (issuers_dn == NULL) {

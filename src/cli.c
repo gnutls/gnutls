@@ -124,7 +124,7 @@ static int cert_callback(gnutls_session session,
 	/* Print the server's trusted CAs
 	 */
 	if (nreqs > 0)
-		printf("- Server's trusted authorities:\n");
+		printf("- Server's trusted authorities (%d):\n", nreqs);
 	else
 		printf
 		    ("- Server did not send us any trusted authorities names.\n");
@@ -617,6 +617,8 @@ void socket_bye(socket_st * socket)
 			    gnutls_bye(socket->session, GNUTLS_SHUT_RDWR);
 		while (ret == GNUTLS_E_INTERRUPTED
 		       || ret == GNUTLS_E_AGAIN);
+		if (ret < 0)
+			fprintf(stderr, "*** gnutls_bye() error: %s\n", gnutls_strerror(ret));
 		gnutls_deinit(socket->session);
 		socket->session = NULL;
 	}

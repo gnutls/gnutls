@@ -169,29 +169,37 @@ void gnutls_transport_get_ptr2(gnutls_session session,
   **/
 int gnutls_bye( gnutls_session session, gnutls_close_request how)
 {
-	int ret = 0, ret2 = 0;
+	int ret = 0;
 
 	switch (STATE) {
 		case STATE0:
 		case STATE60:
-			if (STATE==STATE60) {
-				ret = _gnutls_io_write_flush( session);
-			} else {
-				ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
-				STATE = STATE60;
-			}
-
-			if (ret < 0)
+			ret = _gnutls_io_write_flush( session);
+			STATE = STATE60;
+			if (ret < 0) {
+				gnutls_assert();
 				return ret;
-		case STATE61:
-			if ( how == GNUTLS_SHUT_RDWR && ret >= 0) {
-				ret2 = _gnutls_recv_int( session, GNUTLS_ALERT, -1, NULL, 0); 
-				if (ret2 >= 0) session->internals.may_read = 1;
 			}
-			STATE = STATE61;
 
-			if (ret2 < 0)
-				return ret2;
+		case STATE61:
+			ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
+			STATE = STATE61;
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+
+		case STATE62:
+			if ( how == GNUTLS_SHUT_RDWR) {
+				ret = _gnutls_recv_int( session, GNUTLS_ALERT, -1, NULL, 0); 
+				if (ret >= 0) session->internals.may_read = 1;
+			}
+			STATE = STATE62;
+
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
 			break;
 		default:
 			gnutls_assert();
@@ -300,7 +308,8 @@ ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
  * and only if the previous send was interrupted for some reason.
  *
  */
-ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
+ssize_t _gnutls_send_int( gnutls_session session, ContentType type, 
+	HandshakeType htype, const void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
 	int cipher_size;
@@ -429,7 +438,6 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
 			gnutls_assert();
 			ret = GNUTLS_E_INTERNAL_ERROR;
 		}
-
 		_gnutls_session_unresumable( session);
 		_gnutls_session_invalidate( session);
 		gnutls_assert();
@@ -610,7 +618,6 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 				if (data[0] == GNUTLS_AL_FATAL) {
 					_gnutls_session_unresumable( session);
 					_gnutls_session_invalidate( session);
-
 					ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
 				}
 
@@ -681,9 +688,11 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
  * that it accepts the gnutls_session and the ContentType of data to
  * receive (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
+ *
+ * The HandshakeType was introduced to support SSL V2.0 client hellos.
  */
-ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType htype, 
-	opaque *data, size_t sizeofdata)
+ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, 
+	HandshakeType htype, opaque *data, size_t sizeofdata)
 {
 	uint8 *tmpdata;
 	int tmplen;
@@ -697,7 +706,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	uint16 header_size;
 	int empty_packet = 0;
 
-	if (sizeofdata == 0 || data == NULL) {
+	if (type != GNUTLS_ALERT && (sizeofdata == 0 || data == NULL)) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 

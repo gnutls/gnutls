@@ -137,6 +137,7 @@ static const char *safe_strerror(int value)
 
 static void listener_free(listener_item * j)
 {
+
    if (j->http_request)
       free(j->http_request);
    if (j->http_response)
