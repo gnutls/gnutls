@@ -1,4 +1,4 @@
-dnl Process this file with autoconf to produce a configure script.
+## Process this file with automake to produce Makefile.in
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
 #
 # Author: Nikos Mavroyanopoulos
