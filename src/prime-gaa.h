@@ -8,6 +8,8 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
+#line 8 "prime.gaa"
+	int cparams;
 #line 3 "prime.gaa"
 	int bits;
 
@@ -21,7 +23,7 @@ extern "C"
 
     int gaa(int argc, char *argv[], gaainfo *gaaval);
 
-    void gaa_help();
+    void gaa_help(void);
     
     int gaa_file(char *name, gaainfo *gaaval);
     

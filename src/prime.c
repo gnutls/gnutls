@@ -69,16 +69,18 @@ int main(int argc, char **argv)
 	_generator.data = tmp1;
 	_generator.size = size;
 
-	printf( "/* generator - %d bits */\n", gcry_mpi_get_nbits(g)); 
-	printf( "\nconst uint8 g[%d] = { ", size);
+	if (info.cparams) {
+		printf( "/* generator - %d bits */\n", gcry_mpi_get_nbits(g)); 
+		printf( "\nconst uint8 g[%d] = { ", size);
 	
-	for (i=0;i<size;i++) {
-		if (i%7==0) printf("\n\t");
-		printf( "0x%.2x", tmp1[i]);
-		if (i!=size-1) printf( ", ");
-	}
+		for (i=0;i<size;i++) {
+			if (i%7==0) printf("\n\t");
+			printf( "0x%.2x", tmp1[i]);
+			if (i!=size-1) printf( ", ");
+		}
 
-	printf("\n};\n\n");
+		printf("\n};\n\n");
+	}
 
 	/* print prime */
 	size = 0;
@@ -90,18 +92,20 @@ int main(int argc, char **argv)
 	_prime.data = tmp2;
 	_prime.size = size;
 
-	printf( "/* prime - %d bits */\n",  gcry_mpi_get_nbits(prime)); 
-	printf( "\nconst uint8 prime[%d] = { ", size);
+	if (info.cparams) {
+		printf( "/* prime - %d bits */\n",  gcry_mpi_get_nbits(prime)); 
+		printf( "\nconst uint8 prime[%d] = { ", size);
 	
-	for (i=0;i<size;i++) {
-		if (i%7==0) printf("\n\t");
-		printf( "0x%.2x", tmp2[i]);
-		if (i!=size-1) printf( ", ");
+		for (i=0;i<size;i++) {
+			if (i%7==0) printf("\n\t");
+			printf( "0x%.2x", tmp2[i]);
+			if (i!=size-1) printf( ", ");
+		}
+
+		printf("\n};\n");
 	}
 
-	printf("\n};\n");
-
-	{ /* generate a PKCS#3 structure */
+	if (!info.cparams) { /* generate a PKCS#3 structure */
 	
 		unsigned char out[2048];
 		int ret, len = sizeof(out);
