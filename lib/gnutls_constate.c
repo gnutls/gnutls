@@ -466,14 +466,6 @@ int rc;
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
 
-		state->connection_state.write_compression_state =
-		    gnutls_comp_init(state->security_parameters.write_compression_algorithm, 0);
-
-		if (state->connection_state.write_compression_state == GNUTLS_COMP_FAILED) {
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-		}
-
 
 		/* copy mac secrets from cipherspecs, to connection
 		 * state.
@@ -503,15 +495,6 @@ int rc;
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
 
-		state->connection_state.write_compression_state =
-		    gnutls_comp_init(state->security_parameters.write_compression_algorithm, 0);
-
-		if (state->connection_state.write_compression_state ==
-		    GNUTLS_COMP_FAILED) {
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-		}
-
 		/* copy mac secret to connection state
 		 */
 		if (mac_size > 0) {
@@ -525,6 +508,15 @@ int rc;
 	default:
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
+
+	state->connection_state.write_compression_state =
+	    gnutls_comp_init(state->security_parameters.write_compression_algorithm, 0);
+
+	if (state->connection_state.write_compression_state == GNUTLS_COMP_FAILED) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
 
 	return 0;
