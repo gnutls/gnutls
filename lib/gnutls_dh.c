@@ -73,9 +73,11 @@ MPI gnutls_calc_dh_secret(MPI * ret_x)
 	size_t n = sizeof diffie_hellman_group1_prime;
 
 	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-			  diffie_hellman_group1_prime, &n))
+			  diffie_hellman_group1_prime, &n)) {
+		gnutls_assert();
 		abort();
-	/*dump_mpi(stderr, "prime=", prime ); */
+	}
+	/*_gnutls_dump_mpi(stderr, "prime=", prime ); */
 
 	g = mpi_set_ui(NULL, 2);
 	x = mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
@@ -123,8 +125,10 @@ MPI gnutls_get_dh_params(MPI * ret_p)
 	size_t n = sizeof diffie_hellman_group1_prime;
 
 	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-			  diffie_hellman_group1_prime, &n))
+			  diffie_hellman_group1_prime, &n)) {
+		gnutls_assert();
 		abort();
+	}
 
 	g = mpi_set_ui(NULL, 2);
 
@@ -146,7 +150,7 @@ MPI gnutls_calc_dh_key(MPI f, MPI x)
 		gnutls_assert();
 		abort();
 	}
-	/*dump_mpi(stderr, "prime=", prime ); */
+	/*_gnutls_dump_mpi(stderr, "prime=", prime ); */
 
 	k = gcry_mpi_alloc_like(prime);
 /*	k = mpi_new(E_SIZE);	 FIXME: allocate in secure memory */

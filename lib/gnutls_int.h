@@ -2,9 +2,9 @@
 
 #define GNUTLS_INT_H
 
-#undef HARD_DEBUG
-#undef READ_DEBUG
-#undef WRITE_DEBUG
+//#define HARD_DEBUG
+//#define READ_DEBUG
+//#define WRITE_DEBUG
 #define DEBUG
 
 #define MAX32 4294967295
@@ -135,6 +135,7 @@ typedef struct {
 
 
 typedef struct {
+	uint8 local;
 	uint8 major;
 	uint8 minor;
 } GNUTLS_Version;
@@ -203,8 +204,8 @@ enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
 		GNUTLS_APPLICATION_DATA };
 typedef enum ContentType ContentType;
 
-#define GNUTLS_VERSION_MAJOR 3
-#define GNUTLS_VERSION_MINOR 1
+#define GNUTLS_DEFAULT_VERSION_MAJOR 3
+#define GNUTLS_DEFAULT_VERSION_MINOR 1
 
 typedef struct {
 	uint8 major;
@@ -284,14 +285,24 @@ typedef struct {
 /* functions */
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
 int gnutls_close(int cd, GNUTLS_STATE state);
-svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
+svoid *gnutls_PRF(GNUTLS_STATE state, opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);
 int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor);
+void gnutls_set_current_version(GNUTLS_STATE state, int local, int major, int minor);
+GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 int _gnutls_set_keys(GNUTLS_STATE state);
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
+int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);
+int _gnutls_version_ssl3(GNUTLS_Version ver);
 
+#define gnutls_hmac_init(x,y,z) _gnutls_version_ssl3(state->connection_state.version) ? \
+				_gnutls_hmac_init(x,y,z,1) : \
+				_gnutls_hmac_init(x,y,z,0)
+#define gnutls_hmac_deinit(x) _gnutls_version_ssl3(state->connection_state.version) ? \
+				_gnutls_hmac_deinit(x,1) : \
+				_gnutls_hmac_deinit(x,0)
 
 #endif /* GNUTLS_INT_H */

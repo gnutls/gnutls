@@ -343,7 +343,11 @@ int i;
 			rand = gcry_random_bytes(1, GCRY_WEAK_RANDOM);
 
 			/* make rand a multiple of blocksize */
-			rand[0] = (rand[0]%(255/blocksize))*blocksize;
+			if (_gnutls_version_ssl3(state->connection_state.version)==0) {
+				rand[0]=0;
+			} else {
+				rand[0] = (rand[0]%(255/blocksize))*blocksize;
+			}
 			
 			length =
 			    compressed->length +
@@ -370,7 +374,7 @@ int i;
 			    compressed->version.major;
 			ciphertext->version.minor =
 			    compressed->version.minor;
-
+			
 			gcry_free(rand);
 		break;
 	default:

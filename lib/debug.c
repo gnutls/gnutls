@@ -24,10 +24,9 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 
+#ifdef DEBUG
 
-static char hexconvtab[] = "0123456789abcdef";
-
-void dump_mpi(char* prefix, MPI a)
+void _gnutls_dump_mpi(char* prefix, MPI a)
 {
 	char buf[400];
 	size_t n = sizeof buf;
@@ -38,18 +37,18 @@ void dump_mpi(char* prefix, MPI a)
 }
 
 
-char *bin2hex(const unsigned char *old, const size_t oldlen)
+char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 {
 	unsigned char *new = NULL;
 	int i, j;
 
-	new = malloc(oldlen * 2 * sizeof(char) + 1);
+	new = calloc(1, oldlen * 2 * sizeof(char) + 1);
 	if (!new)
 		return (new);
 
-	for (i = j = 0; i < oldlen; i++) {
-		new[j++] = hexconvtab[old[i] >> 4];
-		new[j++] = hexconvtab[old[i] & 15];
+	for (i = j = 0; j < oldlen; j+=2) {
+		sprintf(&new[j], "%.2x", old[i]);
+		i++;
 	}
 	new[j] = '\0';
 
@@ -57,7 +56,7 @@ char *bin2hex(const unsigned char *old, const size_t oldlen)
 }
 
 
-void _print_state(GNUTLS_STATE state)
+void _gnutls_print_state(GNUTLS_STATE state)
 {
 
 	fprintf(stderr, "GNUTLS State:\n");
@@ -83,7 +82,7 @@ void _print_state(GNUTLS_STATE state)
 
 }
 
-void _print_TLSCompressed(GNUTLSCompressed * compressed)
+void _gnutls_print_TLSCompressed(GNUTLSCompressed * compressed)
 {
 	fprintf(stderr, "TLSCompressed packet:\n");
 	fprintf(stderr, "type: %d\n", compressed->type);
@@ -91,12 +90,12 @@ void _print_TLSCompressed(GNUTLSCompressed * compressed)
 		compressed->version.minor);
 	fprintf(stderr, "length: %d\n", compressed->length);
 	fprintf(stderr, "fragment: %s\n",
-		bin2hex(compressed->fragment, compressed->length));
+		_gnutls_bin2hex(compressed->fragment, compressed->length));
 	fprintf(stderr, "\n");
 }
 
 
-void _print_TLSPlaintext(GNUTLSPlaintext * plaintext)
+void _gnutls_print_TLSPlaintext(GNUTLSPlaintext * plaintext)
 {
 	fprintf(stderr, "TLSPlaintext packet:\n");
 	fprintf(stderr, "type: %d\n", plaintext->type);
@@ -104,12 +103,12 @@ void _print_TLSPlaintext(GNUTLSPlaintext * plaintext)
 		plaintext->version.minor);
 	fprintf(stderr, "length: %d\n", plaintext->length);
 	fprintf(stderr, "fragment: %s\n",
-		bin2hex(plaintext->fragment, plaintext->length));
+		_gnutls_bin2hex(plaintext->fragment, plaintext->length));
 	fprintf(stderr, "\n");
 }
 
 
-void _print_TLSCiphertext(GNUTLSCiphertext * ciphertext)
+void _gnutls_print_TLSCiphertext(GNUTLSCiphertext * ciphertext)
 {
 
 	fprintf(stderr, "TLSCiphertext packet:\n");
@@ -119,11 +118,11 @@ void _print_TLSCiphertext(GNUTLSCiphertext * ciphertext)
 	fprintf(stderr, "length: %d\n", ciphertext->length);
 
 	fprintf(stderr, "fragment: %s\n",
-		bin2hex(ciphertext->fragment, ciphertext->length));
+		_gnutls_bin2hex(ciphertext->fragment, ciphertext->length));
 	fprintf(stderr, "\n");
 }
 
-char* alert2str( int alert) {
+char* _gnutls_alert2str( int alert) {
 static char str[512];
 
 	switch(alert) {
@@ -205,7 +204,7 @@ static char str[512];
 }
 
 
-char* packet2str( int packet) {
+char* _gnutls_packet2str( int packet) {
 static char str[512];
 
 	switch(packet) {
@@ -229,3 +228,4 @@ static char str[512];
 	return str;	
 	
 }
+#endif

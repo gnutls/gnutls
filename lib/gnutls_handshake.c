@@ -63,7 +63,7 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.client_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state->security_parameters.master_secret,
+		    gnutls_PRF(state, state->security_parameters.master_secret,
 			       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
 			       36, 12);
 	} else {		/* server */
@@ -72,7 +72,7 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.server_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state->security_parameters.master_secret,
+		    gnutls_PRF(state, state->security_parameters.master_secret,
 			       48, SERVER_MSG, strlen(SERVER_MSG), concat,
 			       36, 12);
 	}
@@ -111,7 +111,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.server_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state->security_parameters.master_secret,
+		    gnutls_PRF(state, state->security_parameters.master_secret,
 			       48, SERVER_MSG, strlen(SERVER_MSG), concat,
 			       36, 12);
 	} else {		/* server */
@@ -120,7 +120,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.client_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state->security_parameters.master_secret,
+		    gnutls_PRF(state, state->security_parameters.master_secret,
 			       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
 			       36, 12);
 	}
@@ -621,7 +621,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifdef HARD_DEBUG
 		fprintf(stderr, "SessionID length: %d\n", session_id_len);
 		fprintf(stderr, "SessionID: %s\n",
-			bin2hex(&data[pos], session_id_len));
+			_gnutls_bin2hex(&data[pos], session_id_len));
 #endif
 		pos += session_id_len;
 
@@ -679,7 +679,6 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifdef DEBUG
 		fprintf(stderr, "Client's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
-
 		if ( _gnutls_valid_version( state, data[pos], data[pos+1]) != 0) {
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
@@ -1076,7 +1075,7 @@ int _gnutls_generate_session_id(char **session_id, uint8 * len)
 	*len = 32;
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "SessionID: %s\n", bin2hex(*session_id, 32));
+	fprintf(stderr, "SessionID: %s\n", _gnutls_bin2hex(*session_id, 32));
 #endif
 	return 0;
 }

@@ -52,6 +52,8 @@ void gnutls_set_cipher_priority( int num, ...);
 void gnutls_set_kx_priority( int num, ...);
 void gnutls_set_mac_priority( int num, ...);
 
+/* set our version - local is 0x00 for TLS 1.0 and SSL3 */
+void gnutls_set_current_version(GNUTLS_STATE state, int local, int major, int minor); 
 
 #define	GNUTLS_E_MAC_FAILED -1
 #define	GNUTLS_E_UNKNOWN_CIPHER -2

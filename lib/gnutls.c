@@ -35,10 +35,26 @@
  */
 int _gnutls_valid_version(GNUTLS_STATE state, int major, int minor)
 {
+GNUTLS_Version ver = {0, major, minor};
 
-	if (state->connection_state.version.major == major && state->connection_state.version.minor == minor)
-		return 0;
+	if (_gnutls_version_is_supported(ver) > 0 ) {
+		return 0; /* supported */
+	}
 	return 1;
+}
+
+GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
+GNUTLS_Version ver;
+	ver.local = state->connection_state.version.local;
+	ver.major = state->connection_state.version.major;
+	ver.minor = state->connection_state.version.minor;
+	return ver;
+}
+
+void gnutls_set_current_version(GNUTLS_STATE state, int local, int major, int minor) {
+	state->connection_state.version.local = local;
+	state->connection_state.version.major = major;
+	state->connection_state.version.minor = minor;
 }
 
 int gnutls_is_secure_memory(const void* mem) {
@@ -82,8 +98,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.client_hash = 0;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	(*state)->connection_state.version.major = GNUTLS_VERSION_MAJOR;
-	(*state)->connection_state.version.minor = GNUTLS_VERSION_MINOR;
+	gnutls_set_current_version ( (*state), 0, GNUTLS_DEFAULT_VERSION_MAJOR, GNUTLS_DEFAULT_VERSION_MINOR);
 
 	(*state)->gnutls_internals.KEY = NULL;
 	(*state)->gnutls_internals.client_Y = NULL;
@@ -131,7 +146,7 @@ int gnutls_deinit(GNUTLS_STATE * state)
 }
 
 
-void *_gnutls_cal_PRF_A(MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size)
+void *_gnutls_cal_PRF_A(GNUTLS_STATE state, MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size)
 {
 	GNUTLS_MAC_HANDLE td1;
 
@@ -144,7 +159,7 @@ void *_gnutls_cal_PRF_A(MACAlgorithm algorithm, void *secret, int secret_size, v
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
-svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes)
+svoid *gnutls_P_hash(GNUTLS_STATE state, MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes)
 {
 
 	GNUTLS_MAC_HANDLE td2;
@@ -170,7 +185,7 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 		td2 = gnutls_hmac_init(algorithm, secret, secret_size);
 
 		/* here we calculate A(i+1) */
-		Atmp = _gnutls_cal_PRF_A(algorithm, secret, secret_size, A, A_size);
+		Atmp = _gnutls_cal_PRF_A(state, algorithm, secret, secret_size, A, A_size);
 		A_size = blocksize;
 		gnutls_free(A);
 		A = Atmp;
@@ -198,7 +213,7 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 /* The PRF function expands a given secret 
  * needed by the TLS specification
  */
-svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
+svoid *gnutls_PRF(GNUTLS_STATE state, opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
 {
 	int l_s, i, s_seed_size;
 	char *o1, *o2;
@@ -219,8 +234,8 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label, int label_siz
 		l_s++;
 	}
 
-	o1 = gnutls_P_hash(GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes);
-	o2 = gnutls_P_hash(GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes);
+	o1 = gnutls_P_hash(state, GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes);
+	o2 = gnutls_P_hash(state, GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes);
 
 	gnutls_free(s_seed);
 
@@ -256,7 +271,7 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	memmove(&random[32], state->security_parameters.client_random, 32);
 
 	key_block =
-	    gnutls_PRF(state->security_parameters.master_secret, 48,
+	    gnutls_PRF(state, state->security_parameters.master_secret, 48,
 		       keyexp, strlen(keyexp), random, 64, 2 * hash_size + 2 * key_size + 2 * IV_size);
 
 	state->cipher_specs.client_write_mac_secret = secure_malloc(hash_size);
@@ -391,7 +406,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		}
 #ifdef HARD_DEBUG
 		fprintf(stderr, "Send Packet[%d] %s(%d) with length: %d\n",
-			(int) state->connection_state.write_sequence_number, packet2str(gcipher->type), gcipher->type, gcipher->length);
+			(int) state->connection_state.write_sequence_number, _gnutls_packet2str(gcipher->type), gcipher->type, gcipher->length);
 #endif
 #ifdef WORDS_BIGENDIAN
 		length = gcipher->length;
@@ -601,6 +616,8 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+	} else {
+		gnutls_set_current_version(state, 0, gcipher.version.major, gcipher.version.minor);
 	}
 
 	if (Read(cd, &gcipher.length, 2) != 2) {
@@ -615,9 +632,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Expected Packet[%d] %s(%d) with length: %d\n",
-		(int) state->connection_state.read_sequence_number, packet2str(type), type, sizeofdata);
+		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(type), type, sizeofdata);
 	fprintf(stderr, "Received Packet[%d] %s(%d) with length: %d\n",
-		(int) state->connection_state.read_sequence_number, packet2str(gcipher.type), gcipher.type, gcipher.length);
+		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(gcipher.type), gcipher.type, gcipher.length);
 #endif
 
 	if (gcipher.length > 18432) {	/* 2^14+2048 */
@@ -698,7 +715,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		switch (gcipher.type) {
 		case GNUTLS_ALERT:
 #ifdef HARD_DEBUG
-			fprintf(stderr, "Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], alert2str((int)tmpdata[1]));
+			fprintf(stderr, "Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];
 

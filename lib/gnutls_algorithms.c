@@ -22,6 +22,36 @@
 #include "gnutls_int.h"
 #include "gnutls_algorithms.h"
 
+/* TLS Versions */
+#define GNUTLS_VERSION_ENTRY( name, supported) \
+	{ #name, name, supported }
+
+typedef struct {
+	char *name;
+	GNUTLS_Version id;
+	int supported; /* 0 not supported, > 0 is supported */
+} gnutls_version_entry;
+
+#define GNUTLS_SSLv3 { 0, 3, 0 }
+#define GNUTLS_WTLS1 { 1, 1, 0 }
+#define GNUTLS_TLS1  { 0, 3, 1 }
+
+static gnutls_version_entry sup_versions[] = {
+	GNUTLS_VERSION_ENTRY(GNUTLS_SSLv3, 0),
+	GNUTLS_VERSION_ENTRY(GNUTLS_WTLS1, 0),
+	GNUTLS_VERSION_ENTRY(GNUTLS_TLS1, 1),
+	{0}
+};
+
+#define GNUTLS_VERSION_LOOP(b) \
+        gnutls_version_entry *p; \
+                for(p = sup_versions; p->name != NULL; p++) { b ; }
+
+#define GNUTLS_VERSION_ALG_LOOP(a) \
+                        GNUTLS_VERSION_LOOP( if( memcmp( &p->id, &version, 2)==0) { a; break; } )
+
+
+
 #define GNUTLS_CIPHER_ENTRY(name, blksize, keysize, block, iv, priority) \
 	{ #name, name, blksize, keysize, block, iv, priority }
 
@@ -184,7 +214,6 @@ static gnutls_cipher_suite_entry cs_algorithms[] = {
 
 #define GNUTLS_CIPHER_SUITE_ALG_LOOP(a) \
                         GNUTLS_CIPHER_SUITE_LOOP( if( memcmp( &p->id, &suite, 2)==0) { a; break; } )
-
 
 
 
@@ -489,6 +518,29 @@ int _gnutls_kx_is_ok(KXAlgorithm algorithm)
 	}
 
 }
+
+/* Version Functions */
+int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2) {
+	if (ver1.major!=ver2.major) return 1;
+	if (ver1.minor!=ver2.minor) return 1;
+	if (ver1.local!=ver2.local) return 1;
+	return 0;
+}
+
+int _gnutls_version_ssl3(GNUTLS_Version ver) {
+	if (ver.major!=3) return 1;
+	if (ver.minor!=0) return 1;
+	if (ver.local!=0) return 1;
+	return 0;
+}
+
+int _gnutls_version_is_supported(const GNUTLS_Version version)
+{
+	size_t ret = 0;
+	GNUTLS_VERSION_ALG_LOOP(ret = p->supported);
+	return ret;
+}
+
 
 /* Cipher Suite's functions */
 BulkCipherAlgorithm _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite

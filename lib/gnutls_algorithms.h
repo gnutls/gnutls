@@ -1,3 +1,6 @@
+/* functions for version */
+int _gnutls_version_is_supported(const GNUTLS_Version version);
+
 /* functions for macs */
 int   _gnutls_mac_get_digest_size(MACAlgorithm algorithm);
 char* _gnutls_mac_get_name(MACAlgorithm algorithm);
