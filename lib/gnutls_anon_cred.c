@@ -77,7 +77,7 @@ int gnutls_anon_set_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits) {
   * the structure.
   **/
 void gnutls_anon_free_client_sc( ANON_CLIENT_CREDENTIALS sc) {
-	gnutls_free(sc);
+	return;
 }
 
 const static int anon_tmp;
