@@ -2,6 +2,8 @@ Version 0.9.95
 - Improved the verification functions. Added new verification
   output flags and removed the unused and redundant ones.
 - Improved the OpenPGP key support.
+- The prime utility was removed, and its functionality was moved
+  to certtool.
 
 Version 0.9.94 (30/10/2003)
 - Added manpages for the included programs.

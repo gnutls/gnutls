@@ -534,25 +534,25 @@ int ret, issuer_params_size, i;
   * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
   * @verify: will hold the certificate verification output.
   *
-  * This function will try to verify the given certificate list and return its status (TRUSTED, REVOKED etc.). 
-  * The return value (status) should be one or more of the gnutls_certificate_status 
-  * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
+  * This function will try to verify the given certificate list and return its status.
+  * Note that expiration and activation dates are not checked
   * by this function, you should check them using the appropriate functions.
   *
   * If no flags are specified (0), this function will use the 
   * basicConstraints (2.5.29.19) PKIX extension. This means that only a certificate 
   * authority is allowed to sign a certificate.
   *
-  * However you must also check the peer's name in order to check if the verified 
+  * You must also check the peer's name in order to check if the verified 
   * certificate belongs to the actual peer. 
-  *
   *
   * The certificate verification output will be put in 'verify' and will be
   * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
+  * For a more detailed verification status use gnutls_x509_crt_verify() per list
+  * element.
   *
-  * GNUTLS_CERT_INVALID\: the peer's certificate is not valid.
+  * GNUTLS_CERT_INVALID\: the certificate chain is not valid.
   *
-  * GNUTLS_CERT_REVOKED\: the certificate has been revoked.
+  * GNUTLS_CERT_REVOKED\: a certificate in the chain has been revoked.
   *
   * Returns 0 on success and a negative value in case of an error.
   *

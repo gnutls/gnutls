@@ -129,7 +129,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "load-certificate", "FILE ", "Certificate file to use.");
 	__gaa_helpsingle(0, "load-ca-privkey", "FILE ", "Certificate authority's private key file to use.");
 	__gaa_helpsingle(0, "load-ca-certificate", "FILE ", "Certificate authority's certificate file to use.");
-	__gaa_helpsingle(0, "password", "FILE ", "Password to use.");
+	__gaa_helpsingle(0, "password", "PASSWORD ", "Password to use.");
 	__gaa_helpsingle('i', "certificate-info", "", "Print information on a certificate.");
 	__gaa_helpsingle(0, "p12-info", "", "Print information on a PKCS #12 structure.");
 	__gaa_helpsingle('k', "key-info", "", "Print information on a private key.");

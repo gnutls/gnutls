@@ -31,7 +31,7 @@ option (load-ca-privkey) STR "FILE" { $ca_privkey = $1 } "Certificate authority'
 option (load-ca-certificate) STR "FILE" { $ca = $1 } "Certificate authority's certificate file to use."
 
 #char *pass;
-option (password) STR "FILE" { $pass = $1 } "Password to use."
+option (password) STR "PASSWORD" { $pass = $1 } "Password to use."
 
 option (i, certificate-info) { $action = 2; } "Print information on a certificate."
 

@@ -139,8 +139,7 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
  * @verify: will hold the certificate verification output.
  *
  * Checks if the key is revoked or disabled, in the trustdb.
- *
- * The certificate verification output will be put in 'verify' and will be
+ * The verification output will be put in 'verify' and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
  *
  * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
