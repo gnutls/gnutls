@@ -35,7 +35,7 @@
 #include "debug.h"
 #include <gnutls_sig.h>
 #include <gnutls_x509.h>
-#include <gnutls_openpgp.h>
+#include <gnutls_extra.h>
 
 int gen_rsa_client_kx(GNUTLS_STATE, opaque **);
 int proc_rsa_client_kx(GNUTLS_STATE, opaque *, int);
@@ -62,7 +62,8 @@ const MOD_AUTH_STRUCT rsa_auth_struct = {
 	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
-
+/* in auth_dhe.c */
+extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 
 /* This function reads the RSA parameters from peer's certificate;
  */
@@ -88,8 +89,12 @@ int i;
 			break;
 
 		case GNUTLS_CRT_OPENPGP:
+			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
 			if ((ret =
-			     _gnutls_openpgp_cert2gnutls_cert( &peer_cert,
+			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
 					     info->raw_certificate_list[0])) < 0) {
 				gnutls_assert();
 				return ret;

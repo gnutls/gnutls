@@ -39,7 +39,7 @@
 #include <gnutls_state.h>
 #include <gnutls_pk.h>
 #include <gnutls_x509.h>
-#include <gnutls_openpgp.h>
+#include <gnutls_extra.h>
 #include "debug.h"
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
@@ -555,6 +555,10 @@ int _gnutls_gen_openpgp_certificate(GNUTLS_STATE state,
 	return ret;
 }
 
+OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint = NULL;
+OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key = NULL;
+extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
+
 int _gnutls_gen_openpgp_certificate_fpr(GNUTLS_STATE state,
 					       opaque ** data)
 {
@@ -600,7 +604,13 @@ int _gnutls_gen_openpgp_certificate_fpr(GNUTLS_STATE state,
 	pdata++;
 
 	fpr_size = 20;
-	if ( (ret=gnutls_openpgp_fingerprint( &apr_cert_list[0].raw, pdata, &fpr_size)) < 0) {
+
+	if (_E_gnutls_openpgp_fingerprint==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if ( (ret=_E_gnutls_openpgp_fingerprint( &apr_cert_list[0].raw, pdata, &fpr_size)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -848,7 +858,11 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		/* request the actual key from our database, or
 		 * a key server or anything.
 		 */
-		if ( (ret=_gnutls_openpgp_request_key( &akey, cred, p, 20)) < 0) {
+		if (_E_gnutls_openpgp_request_key==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+		if ( (ret=_E_gnutls_openpgp_request_key( &akey, cred, p, 20)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
@@ -900,9 +914,16 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	memset( peer_certificate_list, 0, sizeof(gnutls_cert)*
 			peer_certificate_list_size);
 
-
+	if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
+		gnutls_assert();
+		gnutls_free_datum( &akey);
+		CLEAR_CERTS;
+		gnutls_afree(peer_certificate_list);
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
 	if ((ret =
-	     _gnutls_openpgp_cert2gnutls_cert(&peer_certificate_list[0],
+	     _E_gnutls_openpgp_cert2gnutls_cert(&peer_certificate_list[0],
 					      tmp)) < 0) {
 		gnutls_assert();
 		gnutls_free_datum( &akey);
@@ -1139,8 +1160,12 @@ int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 						  raw_certificate_list[0]);
 		break;
 	case GNUTLS_CRT_OPENPGP:
+		if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
 		ret =
-		    _gnutls_openpgp_cert2gnutls_cert(&peer_cert,
+		    _E_gnutls_openpgp_cert2gnutls_cert(&peer_cert,
 						     info->
 						     raw_certificate_list
 						     [0]);

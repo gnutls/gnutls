@@ -52,18 +52,10 @@ typedef enum GNUTLS_X509_SUBJECT_ALT_NAME {
 typedef int gnutls_certificate_client_select_func(GNUTLS_STATE, const gnutls_datum *, int, const gnutls_datum *, int);
 typedef int gnutls_certificate_server_select_func(GNUTLS_STATE, const gnutls_datum *, int);
 
-typedef int gnutls_srp_server_select_func(GNUTLS_STATE, char **, char**, int);
-
 /* Functions that allow AUTH_INFO structures handling
  */
 
 GNUTLS_CredType gnutls_auth_get_type( GNUTLS_STATE state);
-
-/* SRP */
-
-const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
-
-void gnutls_srp_server_set_select_func( GNUTLS_STATE, gnutls_srp_server_select_func *);
 
 /* DH */
 
@@ -93,22 +85,6 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length);
 
-/* Openpgp certificate stuff */
-int gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
-                                 int idx,
-                                 gnutls_openpgp_name *dn );
-
-int gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert,
-                                            int *r_bits);
-
-int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );
-
-time_t gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert );
-time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert );
-
-int gnutls_openpgp_verify_key( const gnutls_datum* keyring, 
-	const gnutls_datum* key_list, 
-	int key_list_length);
 
 /* get data from the state */
 const gnutls_datum* gnutls_certificate_get_peers( GNUTLS_STATE, int* list_size);

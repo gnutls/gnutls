@@ -6,7 +6,6 @@ exec_prefix_set=no
 
 gnutls_libs="@LIBGNUTLS_LIBS@"
 gnutls_cflags="@LIBGNUTLS_CFLAGS@"
-gnutls_modules="@LIBGNUTLS_MODULES@"
 
 usage()
 {
@@ -18,7 +17,6 @@ Options:
 	[--version]
 	[--libs]
 	[--cflags]
-	[--modules]
 EOF
 	exit $1
 }
@@ -60,9 +58,6 @@ while test $# -gt 0; do
     --libs)
       echo_libs=yes
       ;;
-    --modules)
-      echo_modules=yes
-      ;;
     *)
       usage 1 1>&2
       ;;
@@ -94,8 +89,5 @@ if test "$echo_libs" = "yes"; then
     echo ${gnutls_libs}
 fi
 
-if test "$echo_modules" = "yes"; then
-    echo ${gnutls_modules}
-fi
 
 

@@ -28,7 +28,7 @@
 #include <gnutls_datum.h>
 #include <auth_cert.h>
 #include <gnutls_x509.h>
-#include <gnutls_openpgp.h>
+#include <gnutls_extra.h>
 #include <gnutls_state.h>
 
 static int gen_dhe_server_kx(GNUTLS_STATE, opaque **);
@@ -278,6 +278,8 @@ static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 	return n_X + 2;
 }
 
+OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert = NULL;
+
 static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 				  int data_size)
 {
@@ -394,8 +396,12 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 			break;
 
 		case GNUTLS_CRT_OPENPGP:
+			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+			}
 			if ((ret =
-			     _gnutls_openpgp_cert2gnutls_cert( &peer_cert,
+			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
 					     info->raw_certificate_list[0])) < 0) {
 				gnutls_assert();
 				return ret;

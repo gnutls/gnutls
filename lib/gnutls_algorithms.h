@@ -74,3 +74,10 @@ const char *gnutls_compression_get_name(CompressionMethod algorithm);
 /* Type to KX mappings */
 KXAlgorithm _gnutls_map_kx_get_kx(CredType type);
 CredType _gnutls_map_kx_get_cred(KXAlgorithm algorithm);
+
+struct gnutls_kx_algo_entry {
+	char *name;
+	KXAlgorithm algorithm;
+	MOD_AUTH_STRUCT *auth_struct;
+};
+typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;

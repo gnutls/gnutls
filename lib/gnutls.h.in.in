@@ -203,19 +203,8 @@ typedef struct DSTRUCT* GNUTLS_CERTIFICATE_CREDENTIALS;
 typedef GNUTLS_CERTIFICATE_CREDENTIALS GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS;
 typedef GNUTLS_CERTIFICATE_CREDENTIALS GNUTLS_CERTIFICATE_SERVER_CREDENTIALS;
 
-typedef struct DSTRUCT* GNUTLS_SRP_SERVER_CREDENTIALS;
-typedef struct DSTRUCT* GNUTLS_SRP_CLIENT_CREDENTIALS;
-
 typedef struct DSTRUCT* GNUTLS_ANON_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* GNUTLS_ANON_CLIENT_CREDENTIALS;
-
-void gnutls_srp_free_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS sc);
-int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc);
-int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char* password);
-
-void gnutls_srp_free_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS sc);
-int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc);
-int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
 
 void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
 int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
@@ -245,22 +234,6 @@ int gnutls_certificate_set_x509_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res,
 int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
 	const gnutls_datum* CERT, const gnutls_datum* KEY,
 	GNUTLS_X509_CertificateFmt);
-
-int gnutls_certificate_set_openpgp_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
-int gnutls_certificate_set_openpgp_key_mem( GNUTLS_CERTIFICATE_CREDENTIALS res,
-	const gnutls_datum* CERT, const gnutls_datum* KEY);
-
-void gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
-     char* keyserver, int port);
-
-void gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
-     char* trustdb);
-
-int gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS res,
-                                   const char *data, size_t len);
-
-int gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS res, const char *name);
-
 
 /* global state functions 
  */

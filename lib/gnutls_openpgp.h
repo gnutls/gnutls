@@ -1,6 +1,8 @@
 #ifndef GNUTLS_OPENPGP_H
 #define GNUTLS_OPENPGP_H
 
+#include <auth_cert.h>
+
 /* OpenCDK compatible */
 typedef enum {
   KEY_ATTR_NONE = 0,

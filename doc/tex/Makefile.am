@@ -6,12 +6,13 @@ EXTRA_DIST = gnutls.tex gnutls.ps gnutls.html asn1.ps asn1.html \
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex asn1.tex ../../lib/asn1-api.tex \
 	auth.tex ciphers.tex errors.tex layers.tex alert.tex record.tex \
-	funcs.tex examples.tex ex4.tex
+	funcs.tex examples.tex ex4.tex ../../lib/gnutls-extra-api.tex
 
 ASN1_TEX_OBJECTS = fdl.tex asn1.tex ../../lib/asn1-api.tex
 
 gnutls.ps: $(TEX_OBJECTS)
 	-$(LN_S) ../../lib/gnutls-api.tex .
+	-$(LN_S) ../../lib/gnutls-extra-api.tex .
 	-$(LN_S) ../../lib/asn1-api.tex .
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps
 
@@ -30,5 +31,4 @@ asn1.html: $(ASN1_TEX_OBJECTS)
 clean:
 	@-rm *.log *.aux *.toc
 	@-rm *.pl index.html gnutls.dvi
-	@-rm WARNINGS gnutls-api.tex
-	
+	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex

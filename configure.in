@@ -252,7 +252,6 @@ AC_ARG_ENABLE( srp-authentication, [  --disable-srp-authentication     disable t
 if test x$ac_enable_srp != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_SRP)
- LIBGNUTLS_MODULES="$LIBGNUTLS_MODULES srp-authentication"
 else
  AC_MSG_RESULT(yes)
 fi
@@ -264,7 +263,6 @@ AC_ARG_ENABLE( anon-authentication, [  --disable-anon-authentication    disable 
 if test x$ac_enable_anon != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_ANON)
- LIBGNUTLS_MODULES="$LIBGNUTLS_MODULES anonymous-authentication"
 else
  AC_MSG_RESULT(yes)
 fi
@@ -276,8 +274,7 @@ AC_ARG_ENABLE( openpgp-authentication, [  --disable-openpgp-authentication disab
 )
 if test x$ac_enable_openpgp != xno; then
  AC_MSG_RESULT(no)
- AM_PATH_LIBOPENCDK( 0.1.0, AC_DEFINE(HAVE_LIBOPENCDK)
- LIBGNUTLS_MODULES="$LIBGNUTLS_MODULES openpgp-authentication",
+ AM_PATH_LIBOPENCDK( 0.1.0, AC_DEFINE(HAVE_LIBOPENCDK),
  AC_MSG_WARN([[
 ***
 *** libopencdk was not found. You will not be able to use OpenPGP keys with gnutls.
@@ -299,7 +296,6 @@ LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBGCRYPT_LIBS $LIBOPENCDK_LIBS"
 LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS $LIBOPENCDK_CFLAGS -I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
-AC_SUBST(LIBGNUTLS_MODULES)
 
 if test $ac_cv_c_compiler_gnu != no; then
 
@@ -334,18 +330,6 @@ AC_CONFIG_COMMANDS([lib/gnutls.h],[[
  echo "" >> lib/gnutls.h
  chmod +x lib/libgnutls-config
 ]],[[]])
-
-AC_CONFIG_COMMANDS_POST( 
-	echo "***************************"
-if test x$ac_enable_srp = xno && test x$ac_enable_openpgp = xno;then
-	echo "* License: GNU Lesser GPL *"
-else
-	echo "* License: GNU GPL        *"
-fi
-	echo "***************************"
-	echo "(see the README file)"
-	echo ""
-)
 
 AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile doc/tex/Makefile \

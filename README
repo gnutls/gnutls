@@ -14,34 +14,21 @@ It is currently under heavy development.
 ****************************
 LICENSE ISSUES:
 
-Since the 0.4.2 version the gnutls library is covered under both the 
-GNU Lesser GPL, and GNU GPL Licenses. Previously released versions were 
-licensed under the GPL. (see COPYING and COPYING.LIB for the licenses)
+Since the 0.4.2 version the gnutls library is covered under the GNU 
+Lesser GPL. Previously released versions were licensed under the GNU GPL.
 
-The LGPL license applies to all parts of the gnutls library except for the 
-"OPENPGP authentication" part, and the "SRP authentication" part, which are 
-only available under the GPL.  Both of these parts can be disabled at compile 
-time.
+We changed the license for most of GNUTLS because other free libraries
+already exist that do the same jobs and have lax licenses.  We want
+GNUTLS to be usable in all the same places as those other libraries.
+We kept some parts of GNUTLS under the GPL because they are unique,
+and with the GPL they provide free software projects (which deserve
+our help) an advantage over non-free projects (which do not deserve
+our help, since they refuse to share with us).  For more explanation,
+see http://www.gnu.org/philosophy/why-not-lgpl.html.
 
-In order to create a library under the LGPL run the configure script with 
-the following parameters:
-    --disable-srp-authentication
-    --disable-openpgp-authentication
+The GNU Lesser GPL license applies to the main gnutls library, while the
+gnutls-extra library is under the GPL.
 
-This will disable the above authentication methods. If this is not done 
-the library will be only available under the GPL. In both cases the generated
-libraries are binary compatible. In the LGPL case the missing functions are 
-replaced with stubs that always fail.
-
-The rationale behind this license change is that given the fact that other 
-free libraries with similar functionality exist, keeping the gnutls library 
-GPL would not give any practical advantage to Free software developers.
-
-Please note that in many cases it is better for a library to be licensed 
-under the GPL, so that it provides an advantage for free software projects.
-The Lesser GPL is so named because it does less to protect the freedom of 
-the users of the code that it covers.  
-See http://www.gnu.org/philosophy/why-not-lgpl.html for more explanation.
 
 
 ****************************

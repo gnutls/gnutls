@@ -22,7 +22,6 @@
 #include "gnutls_int.h"
 #include "gnutls_extensions.h"
 #include "gnutls_errors.h"
-#include "ext_srp.h"
 #include "ext_max_record.h"
 #include <ext_cert_type.h>
 #include "gnutls_num.h"
@@ -31,17 +30,11 @@
 #define GNUTLS_EXTENSION_ENTRY(type, ext_func_recv, ext_func_send) \
 	{ #type, type, ext_func_recv, ext_func_send }
 
-typedef struct {
-	char *name;
-	uint16 type;
-	int (*gnutls_ext_func_recv)( GNUTLS_STATE, const opaque*, int); /* recv data */
-	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque*, int); /* send data */
-} gnutls_extension_entry;
 
-static gnutls_extension_entry extensions[] = {
-#ifdef ENABLE_SRP
-	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
-#endif
+#define MAX_EXT_SIZE 10
+const int _gnutls_extensions_size = MAX_EXT_SIZE;
+
+gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_MAX_RECORD_SIZE, _gnutls_max_record_recv_params, _gnutls_max_record_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_CERT_TYPE, _gnutls_cert_type_recv_params, _gnutls_cert_type_send_params),
 	{0}
@@ -49,7 +42,7 @@ static gnutls_extension_entry extensions[] = {
 
 #define GNUTLS_EXTENSION_LOOP2(b) \
         gnutls_extension_entry *p; \
-                for(p = extensions; p->name != NULL; p++) { b ; }
+                for(p = _gnutls_extensions; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_EXTENSION_LOOP(a) \
                         GNUTLS_EXTENSION_LOOP2( if(p->type == type) { a; break; } )

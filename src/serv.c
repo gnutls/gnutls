@@ -28,6 +28,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "../lib/gnutls.h"
+#include "../lib/gnutls-extra.h"
 #include "common.h"
 #include <signal.h>
 #include "serv-gaa.h"
@@ -330,6 +331,10 @@ int main(int argc, char **argv)
    }
 
    if (gnutls_global_init() < 0) {
+      fprintf(stderr, "global state initialization error\n");
+      exit(1);
+   }
+   if (gnutls_global_init_ext() < 0) {
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }

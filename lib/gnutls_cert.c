@@ -37,7 +37,7 @@
 #include <gnutls_state.h>
 #include <gnutls_auth_int.h>
 #include <gnutls_x509.h>
-#include <gnutls_openpgp.h>
+#include <gnutls_extra.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -300,6 +300,13 @@ void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
 	state->gnutls_internals.server_cert_callback = func;
 }
 
+/* These are set by the gnutls_extra library's initialization function.
+ */
+
+OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_extract_key_creation_time = NULL;
+OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_extract_key_expiration_time = NULL;
+OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
+
 /*-
   * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
   * @state: is a gnutls state
@@ -344,7 +351,11 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 	
 	/* Verify certificate 
 	 */
-	verify = gnutls_openpgp_verify_key( cred->pgp_trustdb, &cred->keyring, &info->raw_certificate_list[0],
+	if (_E_gnutls_openpgp_verify_key==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	verify = _E_gnutls_openpgp_verify_key( cred->pgp_trustdb, &cred->keyring, &info->raw_certificate_list[0],
 				      peer_certificate_list_size);
 
 	if (verify < 0) {
@@ -426,7 +437,9 @@ time_t gnutls_certificate_expiration_time_peers(GNUTLS_STATE state)
 			return gnutls_x509_extract_certificate_expiration_time(
 				&info->raw_certificate_list[0]);
 		case GNUTLS_CRT_OPENPGP:
-			return gnutls_openpgp_extract_key_expiration_time(
+			if (_E_gnutls_openpgp_extract_key_expiration_time==NULL)
+				return (time_t)-1;
+			return _E_gnutls_openpgp_extract_key_expiration_time(
 				&info->raw_certificate_list[0]);
 		default:
 			return (time_t)-1;
@@ -465,7 +478,9 @@ time_t gnutls_certificate_activation_time_peers(GNUTLS_STATE state)
 			return gnutls_x509_extract_certificate_activation_time(
 				&info->raw_certificate_list[0]);
 		case GNUTLS_CRT_OPENPGP:
-			return gnutls_openpgp_extract_key_creation_time(
+			if (_E_gnutls_openpgp_extract_key_creation_time==NULL)
+				return (time_t)-1;
+			return _E_gnutls_openpgp_extract_key_creation_time(
 				&info->raw_certificate_list[0]);
 		default:
 			return (time_t)-1;

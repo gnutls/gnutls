@@ -161,35 +161,29 @@ static const gnutls_compression_entry compression_algorithms[] = {
 
 /* Key Exchange Section */
 
-struct gnutls_kx_algo_entry {
-	char *name;
-	KXAlgorithm algorithm;
-	MOD_AUTH_STRUCT *auth_struct;
-};
-typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 extern MOD_AUTH_STRUCT rsa_auth_struct;
 extern MOD_AUTH_STRUCT dhe_rsa_auth_struct;
 extern MOD_AUTH_STRUCT dhe_dss_auth_struct;
 extern MOD_AUTH_STRUCT anon_auth_struct;
-extern MOD_AUTH_STRUCT srp_auth_struct;
 
-static const gnutls_kx_algo_entry kx_algorithms[] = {
+
+#define MAX_KX_ALGOS 10
+const int _gnutls_kx_algorithms_size = MAX_KX_ALGOS;
+
+gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 #ifdef ENABLE_ANON
 	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
 #endif
 	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
 	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
 	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
-#ifdef ENABLE_SRP
-	{ "SRP", GNUTLS_KX_SRP, &srp_auth_struct },
-#endif
 	{0}
 };
 
 #define GNUTLS_KX_LOOP(b) \
         const gnutls_kx_algo_entry *p; \
-                for(p = kx_algorithms; p->name != NULL; p++) { b ; }
+                for(p = _gnutls_kx_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_KX_ALG_LOOP(a) \
                         GNUTLS_KX_LOOP( if(p->algorithm == algorithm) { a; break; } )
