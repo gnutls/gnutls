@@ -828,11 +828,17 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 
 	gCert->valid = 1;
 
+	if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
 	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
+		gnutls_free_datum( &gCert->raw);
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
@@ -844,6 +850,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 #endif
 		gnutls_assert();
 		asn1_delete_structure(c2);
+		gnutls_free_datum( &gCert->raw);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
@@ -857,6 +864,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
+		gnutls_free_datum( &gCert->raw);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
@@ -876,6 +884,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		if (result != ASN_OK) {
 			gnutls_assert();
 			asn1_delete_structure(c2);
+			gnutls_free_datum( &gCert->raw);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
@@ -883,6 +892,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 			gnutls_assert();
 			/* internal error. Increase the MPIs in params */
 			asn1_delete_structure(c2);
+			gnutls_free_datum( &gCert->raw);
 			return GNUTLS_E_UNKNOWN_ERROR;
 		}
 
@@ -890,6 +900,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		     _read_rsa_params(str, len / 8, gCert->params)) < 0) {
 			gnutls_assert();
 			asn1_delete_structure(c2);
+			gnutls_free_datum( &gCert->raw);
 			return result;
 		}
 
@@ -915,6 +926,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	if ((len % 8) != 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
+		gnutls_free_datum( &gCert->raw);
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 	len /= 8;		/* convert to bytes */
@@ -933,15 +945,12 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 				  gCert)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
+		gnutls_free_datum( &gCert->raw);
 		return result;
 	}
 
 	asn1_delete_structure(c2);
 
-	if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
 
 	gCert->valid = 0;	/* if we got until here
 				 * the certificate is valid.

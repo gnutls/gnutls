@@ -219,8 +219,17 @@ static char str[512];
 	
 }
 
+int gnutls_x509pki_extract_certificate_dn( const gnutls_datum*, gnutls_DN*);
+
 const char* GET_CN( gnutls_datum cert) {
-	return NULL; /* FIXME */
+static gnutls_DN dn;
+
+	if (gnutls_x509pki_extract_certificate_dn( &cert, &dn) >= 0)
+		return &dn.common_name[0]; /* FIXME */
+	else 
+		return NULL;
+
+//fprintf(stderr, "CN: %s\n", dn.common_name);
 }
 
 #endif
