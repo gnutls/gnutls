@@ -1,22 +1,30 @@
-\documentclass{article}
+\documentclass{book}
 \usepackage{html}
+\usepackage{fancyheadings}
+\usepackage{times}
+
+\input{macros}
+
 \begin{document}
 
+\pagenumbering{roman}
 
-\title{GNUTLS: a Transport Layer Security Library}
-\author{Nikos Mavroyanopoulos}
-\maketitle
+\input{cover}
+
 
 \tableofcontents
 \newpage
+\pagenumbering{arabic}
+\pagestyle{fancy}
 
+\chapter{The Library}
 \section{Introduction}
 \par
-gnuTLS is a library which implements the {\bf TLS 1.0} and {\bf SSL 3.0} protocols.
+\gnutls is a library which implements the {\bf TLS 1.0} and {\bf SSL 3.0} protocols.
 TLS stands for 'Transport Layer Security' and is the sucessor of SSL\footnote{
 SSL or Secure Sockets Layer is a protocol designed by Netscape. TLS 1.0 is based on
 {\bf SSL 3.0} protocol. {\bf SSL 2.0} is very old protocol which is vulnerable to several attacks. SSL 2.0 is not
-implemented in gnuTLS}.
+implemented in \gnutls}.
 {\bf TLS 1.0} is described is {\it RFC 2246} and is an Internet protocol,
 defined by IETF\footnote{IETF or Internet Engineering Task Force 
 is a large open international community of network
@@ -25,7 +33,7 @@ the Internet architecture and the smooth operation of the Internet. It is open t
 that provides confidentiality, and authentication layers. 
 TLS is mostly used over {\bf TCP/IP} although this is not restrictive, you may
 use it over any reliable transport layer.
-Currently gnuTLS implements:
+Currently \gnutls implements:
 \begin{itemize}
  \item the {\bf TLS 1.0} and {\bf{ SSL 3.0}} protocols, without any (US) export-controlled algorithms
  \item {\bf X509} Public Key Infrastructure (with several limitations).
@@ -41,7 +49,7 @@ to encrypt and decrypt data.
 
 \subsection{Authentication}
 \par
-The following authentication schemas are supported in gnuTLS:
+The following authentication schemas are supported in \gnutls:
 \begin{enumerate}
  \item X509 Public Key Infrastructure
  \item Anonymous authentication
@@ -51,7 +59,7 @@ The following authentication schemas are supported in gnuTLS:
 
 
 \section{Client Examples}
-This section contains examples of TLS and SSL clients, using gnuTLS. 
+This section contains examples of TLS and SSL clients, using \gnutls. 
 
 \subsection{Simple Client example with X509 Authentication}
 Let's assume now that we want to create a client which communicates
@@ -80,7 +88,7 @@ a lot of calculations are performed. In order to support many fast connections t
 the same server a client may use session resuming. {\bf Session resuming} is a
 feature of the {\bf TLS} protocol which allows a client to connect to a server,
 after a successful handshake, without the expensive calculations (ie. use the previously
-established keys). {\bf gnuTLS} supports this feature, and this example illustrates a
+established keys). \gnutls supports this feature, and this example illustrates a
 typical use of it (This is a modification of the simple client example).
 
 \par
@@ -90,7 +98,7 @@ it may be normal for a server not to resume a session even if you requested that
 \input{ex1}
 
 \subsection{Simple Client example with SRP Authentication}
-Although {\bf SRP} is not part of the TLS standard, gnuTLS implements
+Although {\bf SRP} is not part of the TLS standard, \gnutls implements
 {\it draft-ietf-tls-srp-01} which defines a way to use the SRP algorithm
 within the TLS handshake. The following client
 is a very simple SRP-TLS client which connects to a server by using 
@@ -99,7 +107,7 @@ is a very simple SRP-TLS client which connects to a server by using
 \input{srp1}
 
 \section{Server Examples}
-This section contains examples of TLS and SSL servers, using gnuTLS.
+This section contains examples of TLS and SSL servers, using \gnutls.
 
 \subsection{Echo Server with X509 and SRP authentication}
 The following example is a server which supports both {\bf SRP} and {\bf X509} authentication.
@@ -107,6 +115,8 @@ This server also supports {\it session resuming}.
 \input{serv1}
 
 \include{gnutls-api}
+
+\input{fdl.tex}
 
 \end{document}
 
