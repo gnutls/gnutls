@@ -1,3 +1,15 @@
+2004-12-09 02:18  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-kerb-01.txt:
+
+	Add.  
+
+2004-12-09 01:01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-rfc2246-bis-09.txt:
+
+	Add.  
+
 2004-12-07 22:28  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-ecc-07.txt:
