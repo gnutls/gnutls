@@ -64,6 +64,8 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE, opaque **);
 int _gnutls_proc_x509_cert_req(GNUTLS_STATE, opaque *, int);
 int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE, opaque *, int);
 int _gnutls_proc_x509_server_certificate(GNUTLS_STATE, opaque *, int);
+int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_private_key** apr_pkey);
+
 #define _gnutls_proc_x509_client_certificate _gnutls_proc_x509_server_certificate
 
 #endif

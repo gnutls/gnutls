@@ -57,6 +57,6 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data);
 int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_DN * dn);
-
+void gnutls_free_cert(gnutls_cert cert);
 
 #endif

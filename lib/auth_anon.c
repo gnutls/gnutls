@@ -261,16 +261,6 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 		bits = cred->dh_bits;
 	}
 
-#if 0
-	  /* removed. I do not know why - maybe I didn't get the protocol,
-       * but openssl does not use that byte
-       */
-	if (data[0] != 1) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-#endif
-
 	n_Y = READuint16( &data[0]);
 
 	_n_Y = n_Y;

@@ -182,12 +182,14 @@ struct gnutls_kx_algo_entry {
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 extern MOD_AUTH_STRUCT rsa_auth_struct;
+extern MOD_AUTH_STRUCT dhe_rsa_auth_struct;
 extern MOD_AUTH_STRUCT anon_auth_struct;
 extern MOD_AUTH_STRUCT srp_auth_struct;
 
 static const gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_ANON, &anon_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, &rsa_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP, &srp_auth_struct),
 	{0}
 };

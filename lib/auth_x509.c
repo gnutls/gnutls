@@ -407,34 +407,17 @@ int data_size = _data_size;
 
 int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 {
-	const X509PKI_CREDENTIALS cred;
-	int ret, i, ind, pdatasize;
+	int ret, i, pdatasize;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
 	gnutls_private_key *apr_pkey;
 	int apr_cert_list_length;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
-	}
-	if (cred->ncerts == 0) {
-		apr_cert_list = NULL;
-		apr_cert_list_length = 0;
-		apr_pkey = NULL;
-	} else {
-		ind = state->gnutls_internals.client_certificate_index;
 
-		if (ind < 0) {
-			apr_cert_list = NULL;
-			apr_cert_list_length = 0;
-			apr_pkey = NULL;
-		} else {
-			apr_cert_list = cred->cert_list[ind];
-			apr_cert_list_length = cred->cert_list_length[ind];
-			apr_pkey = &cred->pkey[ind];
-		}
+	/* find the appropriate certificate */
+	if ((ret=_gnutls_find_apr_cert( state, &apr_cert_list, &apr_cert_list_length, &apr_pkey))<0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	ret = 3;
@@ -476,34 +459,15 @@ int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 
 int _gnutls_gen_x509_server_certificate(GNUTLS_STATE state, opaque ** data)
 {
-	const X509PKI_CREDENTIALS cred;
-	int ret, i, ind, pdatasize;
+	int ret, i, pdatasize;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
 	gnutls_private_key *apr_pkey;
 	int apr_cert_list_length;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
+	if ((ret=_gnutls_find_apr_cert( state, &apr_cert_list, &apr_cert_list_length, &apr_pkey))<0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
-	}
-	if (cred->ncerts == 0) {
-		apr_cert_list = NULL;
-		apr_cert_list_length = 0;
-		apr_pkey = NULL;
-	} else {
-		ind = _gnutls_find_cert_list_index(cred->cert_list, cred->ncerts, state->security_parameters.extensions.dnsname);
-
-		if (ind < 0) {
-			apr_cert_list = NULL;
-			apr_cert_list_length = 0;
-			apr_pkey = NULL;
-		} else {
-			apr_cert_list = cred->cert_list[ind];
-			apr_cert_list_length = cred->cert_list_length[ind];
-			apr_pkey = &cred->pkey[ind];
-		}
+		return ret;
 	}
 
 	ret = 3;
@@ -543,6 +507,7 @@ int _gnutls_gen_x509_server_certificate(GNUTLS_STATE state, opaque ** data)
 	return pdatasize;
 }
 
+#define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x])
 int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int data_size)
 {
 	int size, len, ret;
@@ -550,7 +515,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	X509PKI_CLIENT_AUTH_INFO info;
 	const X509PKI_CREDENTIALS cred;
 	int dsize = data_size;
-	int i, j;
+	int i, j, x;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size = 0;
 	gnutls_datum tmp;
@@ -561,20 +526,23 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
-	if (state->gnutls_key->auth_info == NULL)
-		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO_INT));
 	if (state->gnutls_key->auth_info == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO_INT));
+		if (state->gnutls_key->auth_info == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		state->gnutls_key->auth_info_size = sizeof(X509PKI_CLIENT_AUTH_INFO_INT);
+
+		info = state->gnutls_key->auth_info;
+		info->peer_certificate_status = GNUTLS_CERT_NONE;
 	}
-	state->gnutls_key->auth_info_size = sizeof(X509PKI_CLIENT_AUTH_INFO_INT);
+	info = state->gnutls_key->auth_info;
 
 	DECR_LEN(dsize, 3);
 	size = READuint24(p);
 	p += 3;
 
-	info = state->gnutls_key->auth_info;
-	info->peer_certificate_status = GNUTLS_CERT_INVALID;
 
 	if (size == 0) {
 		gnutls_assert();
@@ -601,13 +569,14 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	dsize = data_size;
 	i = dsize;
 	peer_certificate_list =
-	    gnutls_malloc(sizeof(gnutls_cert) *
+	    gnutls_calloc(1, sizeof(gnutls_cert) *
 			  (peer_certificate_list_size));
 
 	if (peer_certificate_list == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
 	p = data + 3;
 	i = data_size - 3;
 	j = 0;
@@ -623,9 +592,22 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 
 		if ((ret = _gnutls_cert2gnutlsCert(&peer_certificate_list[j], tmp)) < 0) {
 			gnutls_assert();
+			CLEAR_CERTS;
 			gnutls_free(peer_certificate_list);
 			return ret;
 		}
+		if (j==0) { /* Copy the first certificate in the chain - peer's certificate 
+			     * into the peer_cert. This is needed in order to access these
+			     * parameters later.
+			     */
+			if ((ret = _gnutls_cert2gnutlsCert(&state->gnutls_internals.peer_cert, tmp)) < 0) {
+				gnutls_assert();
+				CLEAR_CERTS;
+				gnutls_free(peer_certificate_list);
+				return ret;
+			}
+		}
+		
 		p += len;
 		i -= len + 3;
 		j++;
@@ -637,6 +619,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	     _gnutls_get_rsa_params(NULL, &state->gnutls_key->a, &state->gnutls_key->x,
 				    peer_certificate_list[0].raw)) < 0) {
 		gnutls_assert();
+		CLEAR_CERTS;
 		gnutls_free(peer_certificate_list);
 		return ret;
 	}
@@ -644,6 +627,12 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	 */
 	verify = gnutls_verify_certificate(peer_certificate_list, peer_certificate_list_size,
 				     cred->ca_list, cred->ncas, NULL, 0);
+	if (verify < 0) {
+		gnutls_assert();
+		CLEAR_CERTS;
+		gnutls_free(peer_certificate_list);
+		return verify;
+	}
 
 	/* keep the PK algorithm */
 	state->gnutls_internals.peer_pk_algorithm = peer_certificate_list[0].subject_pk_algorithm;
@@ -655,10 +644,12 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	if ( peer_certificate_list[0].keyUsage != 0)
 		if ( !(peer_certificate_list[0].keyUsage & X509KEY_KEY_ENCIPHERMENT)) {
 			gnutls_assert();
+			CLEAR_CERTS;
 			gnutls_free(peer_certificate_list);
 			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 		}
 
+	CLEAR_CERTS;
 	gnutls_free(peer_certificate_list);
 
 	return 0;
@@ -671,6 +662,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 	int size, ret;
 	opaque *p = data;
 	const X509PKI_CREDENTIALS cred;
+	X509PKI_CLIENT_AUTH_INFO info;
 	int dsize = data_size;
 	int i;
 	int found;
@@ -683,14 +675,19 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 	}
 	state->gnutls_key->certificate_requested = 1;
 
-	if (state->gnutls_key->auth_info == NULL)
-		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO_INT));
 	if (state->gnutls_key->auth_info == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	state->gnutls_key->auth_info_size = sizeof(X509PKI_CLIENT_AUTH_INFO_INT);
+		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO_INT));
+		if (state->gnutls_key->auth_info == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		state->gnutls_key->auth_info_size = sizeof(X509PKI_CLIENT_AUTH_INFO_INT);
 
+		info = state->gnutls_key->auth_info;
+		info->peer_certificate_status = GNUTLS_CERT_NONE;
+	}
+	info = state->gnutls_key->auth_info;
+	
 	DECR_LEN(dsize, 1);
 	size = p[0];
 	p += 1;
@@ -730,8 +727,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 
 int _gnutls_gen_x509_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 {
-	const X509PKI_CREDENTIALS cred;
-	int ret, ind;
+	int ret;
 	gnutls_cert *apr_cert_list;
 	gnutls_private_key *apr_pkey;
 	int apr_cert_list_length, size;
@@ -739,28 +735,12 @@ int _gnutls_gen_x509_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 
 	*data = NULL;
 	
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
+	/* find the appropriate certificate */
+	if ((ret=_gnutls_find_apr_cert( state, &apr_cert_list, &apr_cert_list_length, &apr_pkey))<0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return ret;
 	}
-	if (cred->ncerts == 0) {
-		apr_cert_list = NULL;
-		apr_cert_list_length = 0;
-		apr_pkey = NULL;
-	} else {
-		ind = state->gnutls_internals.client_certificate_index;
-		if (ind < 0) {
-			apr_cert_list = NULL;
-			apr_cert_list_length = 0;
-			apr_pkey = NULL;
-		} else {
-			apr_cert_list = cred->cert_list[ind];
-			apr_cert_list_length = cred->cert_list_length[ind];
-			apr_pkey = &cred->pkey[ind];
-		}
-	}
-
+	
 	/* If our certificate supports signing
 	 */
 	if ( apr_cert_list != NULL)
@@ -771,7 +751,7 @@ int _gnutls_gen_x509_client_cert_vrfy(GNUTLS_STATE state, opaque ** data)
 		}
 	
 	if (apr_pkey != NULL) {
-		if ( (ret=_gnutls_generate_sig( state, apr_pkey, &signature)) < 0) {
+		if ( (ret=_gnutls_generate_sig_from_hdata( state, apr_pkey, &signature)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
@@ -800,7 +780,6 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data, int da
 int size, ret;
 int dsize = data_size;
 opaque* pdata = data;
-gnutls_cert cert;
 gnutls_datum sig;
 
 	DECR_LEN(dsize, 2);
@@ -815,22 +794,10 @@ gnutls_datum sig;
 	sig.data = pdata;
 	sig.size = size;
 	
-	cert.params = gnutls_malloc( 2*sizeof(MPI));
-	if (cert.params==NULL) {
+	if ( (ret=_gnutls_verify_sig_hdata( state, &state->gnutls_internals.peer_cert, &sig, data_size+HANDSHAKE_HEADER_SIZE))<0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	cert.params[0] = state->gnutls_key->x;
-	cert.params[1] = state->gnutls_key->a;
-	cert.subject_pk_algorithm = state->gnutls_internals.peer_pk_algorithm;
-
-	if ( (ret=_gnutls_verify_sig( state, &cert, &sig, data_size+HANDSHAKE_HEADER_SIZE))<0) {
-		gnutls_assert();
-		gnutls_free( cert.params);
 		return ret;
 	}
-
-	gnutls_free( cert.params);
 
 	return 0;
 }
@@ -866,6 +833,9 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	}
 
 	pdata[0] = CERTTYPE_SIZE - 1;
+#ifdef DEBUG
+# warning CHECK HERE FOR DSS
+#endif
 	pdata[1] = RSA_SIGN; /* only this for now */
 	pdata += CERTTYPE_SIZE;
 	size = CERTTYPE_SIZE;
@@ -889,4 +859,72 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	WRITEuint16( size-CERTTYPE_SIZE-2, &(*data)[CERTTYPE_SIZE]);
 	
 	return size;
+}
+
+
+/* This function will return the appropriate certificate to use. The return
+ * value depends on the side (client or server).
+ */
+int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_private_key** apr_pkey) 
+{
+	const X509PKI_CREDENTIALS cred;
+	int ind;
+
+	cred =
+	    _gnutls_get_kx_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	
+	if (cred==NULL) {
+		gnutls_assert();
+		*apr_cert_list = NULL;
+		*apr_pkey= NULL;
+		*apr_cert_list_length = 0;
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+	
+	if (state->security_parameters.entity == GNUTLS_SERVER) {
+	
+		if (cred->ncerts == 0) {
+			*apr_cert_list = NULL;
+			*apr_cert_list_length = 0;
+			*apr_pkey = NULL;
+		} else {
+			ind =
+			    _gnutls_find_cert_list_index(cred->cert_list,
+							 cred->ncerts,
+							 state->
+							 security_parameters.
+							 extensions.dnsname);
+
+			if (ind < 0) {
+				*apr_cert_list = NULL;
+				*apr_cert_list_length = 0;
+				*apr_pkey = NULL;
+			} else {
+				*apr_cert_list = cred->cert_list[ind];
+				*apr_cert_list_length = cred->cert_list_length[ind];
+				*apr_pkey = &cred->pkey[ind];
+			}
+		}
+	} else { /* CLIENT SIDE */
+		if (cred->ncerts == 0) {
+			*apr_cert_list = NULL;
+			*apr_cert_list_length = 0;
+			*apr_pkey = NULL;
+		} else {
+			ind = state->gnutls_internals.client_certificate_index;
+
+			if (ind < 0) {
+				*apr_cert_list = NULL;
+				*apr_cert_list_length = 0;
+				*apr_pkey = NULL;
+			} else {
+				*apr_cert_list = cred->cert_list[ind];
+				*apr_cert_list_length = cred->cert_list_length[ind];
+				*apr_pkey = &cred->pkey[ind];
+			}
+		}
+	
+	}
+	
+	return 0;
 }

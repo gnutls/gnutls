@@ -178,6 +178,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 	GNUTLS_FREE(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);
 
 	GNUTLS_FREE(state->gnutls_internals.db_name);
+	gnutls_free_cert( state->gnutls_internals.peer_cert);
 
 	memset( state, 0, sizeof(struct GNUTLS_STATE_INT));
 	GNUTLS_FREE(state);

@@ -1,3 +1,7 @@
+Version 0.2.4
+- Better handling of extensions
+- Added DHE_RSA ciphersuites
+
 Version 0.2.3 (19/09/2001)
 - Memory optimizations in gnutls_recv()
 - Fixed several memory leaks

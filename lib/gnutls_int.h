@@ -194,6 +194,7 @@ typedef struct GNUTLS_KEY_INT* GNUTLS_KEY;
 
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
+#include <gnutls_cert.h>
 
 typedef struct {
 	uint8 CipherSuite[2];
@@ -374,6 +375,7 @@ typedef struct {
 	 * client certificates were found.
 	 */
 	int				(*x509_client_cert_callback)(void*,void*,int, void*, int);
+	gnutls_cert			peer_cert;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

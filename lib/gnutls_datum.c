@@ -24,7 +24,8 @@
 #include <gnutls_errors.h>
 
 /* contains functions that make it easier to
- * write vectors of <size|data>
+ * write vectors of <size|data>. The destination size
+ * should be preallocated (datum.size+(bits/8))
  */
 
 void WRITEdatum16( opaque* dest, gnutls_datum dat) {

@@ -78,7 +78,8 @@ const gnutls_DN* dn;
 	if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
 		x509_info = gnutls_get_auth_info(state);
 		if (x509_info != NULL) {
-			switch( gnutls_x509pki_client_get_peer_certificate_status(x509_info)) {
+			CertificateStatus status = gnutls_x509pki_client_get_peer_certificate_status(x509_info);
+			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:
 				printf("- Peer's X509 Certificate was NOT verified\n");
 				break;
@@ -92,21 +93,21 @@ const gnutls_DN* dn;
 				printf("- Peer did not send any X509 Certificate.\n");
 				break;
 			case GNUTLS_CERT_INVALID:
-			default:
 				printf("- Peer's X509 Certificate was invalid\n");
 				break;
-
 			}
 
-			printf(" - Certificate info:\n");
-			printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
+			if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
+				printf(" - Certificate info:\n");
+				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
 
-			dn = gnutls_x509pki_client_get_peer_dn( x509_info);
-			PRINT_DN( dn);
+				dn = gnutls_x509pki_client_get_peer_dn( x509_info);
+				PRINT_DN( dn);
 
-			dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
-			printf(" - Certificate Issuer's info:\n");
-			PRINT_DN( dn);
+				dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
+				printf(" - Certificate Issuer's info:\n");
+				PRINT_DN( dn);
+			}
 		}
 	}
 
@@ -218,7 +219,7 @@ int main(int argc, char** argv)
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_kx_priority( state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
