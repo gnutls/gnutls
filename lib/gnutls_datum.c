@@ -55,13 +55,13 @@ int gnutls_set_datum( gnutls_datum* dat, const void* data, int data_size) {
 	return 0;
 }
 
-int gnutls_datum_append( gnutls_datum* dat, const void* data, int data_size) {
+int gnutls_datum_append( gnutls_datum* dst, const void* data, int data_size) {
 
-	dat->data = gnutls_realloc(dat->data, data_size+dat->size);
-	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
+	dst->data = gnutls_realloc(dst->data, data_size+dst->size);
+	if (dst->data==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
-	memcpy( &dat->data[dat->size], data, data_size);
-	dat->size += data_size;
+	memcpy( &dst->data[dst->size], data, data_size);
+	dst->size += data_size;
 
 	return 0;
 }
