@@ -33,6 +33,8 @@ typedef struct gnutls_cert {
 	PKAlgorithm subject_pk_algorithm;
 
 	gnutls_datum   signature;
+
+    opaque fingerprint[20];
 	
 	time_t	   expiration_time;
 	time_t	   activation_time;
