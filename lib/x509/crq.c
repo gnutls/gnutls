@@ -386,7 +386,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
   *
   **/
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
-	const char *name, int sizeof_name)
+	const char *name, unsigned int sizeof_name)
 {
 	if (sizeof_name == 0 || name == NULL || crq == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -407,7 +407,7 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid,
   * On success zero is returned.
   *
   **/
-int gnutls_x509_crq_set_version(gnutls_x509_crq crq, int version)
+int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
 {
 int result;
 uint8 null = version;
@@ -434,88 +434,15 @@ uint8 null = version;
   **/
 int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key)
 {
-const char* pk;
-opaque * der;
-int der_size, result;
+int result;
 
-	if (key->pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
+	result = _gnutls_x509_encode_and_copy_PKI_params( crq->crq,
+		"certificationRequestInfo.subjectPKInfo", key->pk_algorithm,
+		key->params, key->params_size);
 
-	pk = _gnutls_x509_pk2oid( key->pk_algorithm);
-	if (pk == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
-	}
-
-	/* write the RSA OID
-	 */
-	result = asn1_write_value( crq->crq, "certificationRequestInfo.subjectPKInfo.algorithm.algorithm", pk, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* disable parameters, which are not used in RSA.
-	 */
-	result = asn1_write_value( crq->crq, "certificationRequestInfo.subjectPKInfo.algorithm.parameters", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	_gnutls_x509_write_rsa_params( key->params, key->params_size, NULL, &der_size);
-
-	der = gnutls_alloca( der_size);
-	if (der == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = _gnutls_x509_write_rsa_params( key->params, key->params_size, der, &der_size);
 	if (result < 0) {
 		gnutls_assert();
-		gnutls_afree(der);
 		return result;
-	}
-
-	/* Write the DER parameters. (in bits)
-	 */
-	result = asn1_write_value( crq->crq, 
-		"certificationRequestInfo.subjectPKInfo.subjectPublicKey", der, der_size*8);
-
-	gnutls_afree(der);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* Step 2. Move up and write the AlgorithmIdentifier, which is also
-	 * the same. Note that requests are self signed.
-	 */
-
-	pk = _gnutls_x509_sign2oid( key->pk_algorithm, GNUTLS_MAC_SHA);
-	if (pk == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	/* write the RSA OID
-	 */
-	result = asn1_write_value( crq->crq, "signatureAlgorithm.algorithm", pk, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* disable parameters, which are not used in RSA.
-	 */
-	result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
 	}
 
 	return 0;
@@ -627,6 +554,37 @@ int gnutls_x509_crq_export( gnutls_x509_crq crq,
 {
 	return _gnutls_x509_export_int( crq->crq, format, PEM_CRQ, *output_data_size,
 		output_data, output_data_size);
+}
+
+/**
+  * gnutls_x509_crq_get_pk_algorithm - This function returns the certificate request's PublicKey algorithm
+  * @crq: should contain a gnutls_x509_crq structure
+  * @bits: if bits is non null it will hold the size of the parameters' in bits
+  *
+  * This function will return the public key algorithm of a PKCS #10 
+  * certificate request.
+  *
+  * If bits is non null, it should have enough size to hold the parameters
+  * size in bits. For RSA the bits returned is the modulus. 
+  * For DSA the bits returned are of the public
+  * exponent.
+  *
+  * Returns a member of the gnutls_pk_algorithm enumeration on success,
+  * or a negative value on error.
+  *
+  **/
+int gnutls_x509_crq_get_pk_algorithm( gnutls_x509_crq crq, unsigned int* bits)
+{
+int result;
+
+	result = _gnutls_x509_get_pk_algorithm( crq->crq, "certificationRequestInfo.subjectPKInfo",
+		bits);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+	
+	return result;
 }
 
 #endif /* ENABLE_PKI */

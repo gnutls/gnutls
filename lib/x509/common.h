@@ -17,8 +17,9 @@ void _gnutls_int2str(unsigned int k, char *data);
 #define RSA_MD5_OID "1.2.840.113549.1.1.4"
 #define RSA_SHA1_OID "1.2.840.113549.1.1.5"
 
-time_t _gnutls_x509_utcTime2gtime(char *ttime);
-time_t _gnutls_x509_generalTime2gtime(char *ttime);
+time_t _gnutls_x509_utcTime2gtime(const char *ttime);
+time_t _gnutls_x509_generalTime2gtime(const char *ttime);
+int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim);
 
 int _gnutls_x509_oid_data2string( const char* OID, void* value, 
 	int value_size, char * res, int *res_size);
@@ -57,3 +58,7 @@ int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE as
 	const char* where, const unsigned char* data, int sizeof_data, int multi);
 int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct, const char* where,
         char* oid, int oid_size, gnutls_datum* value, int multi);
+int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name,
+	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size);
+
+int _gnutls_x509_get_pk_algorithm( ASN1_TYPE src, const char* src_name, unsigned int* bits);

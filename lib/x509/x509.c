@@ -500,7 +500,7 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result,
 
 	if ((ret = asn1_read_value(cert->cert, "tbsCertificate.serialNumber", result, result_size)) < 0) {
 		gnutls_assert();
-		return ret;
+		return _gnutls_asn2err(ret);
 	}
 
 	return 0;
@@ -527,97 +527,17 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result,
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
 {
 	int result;
-	opaque *str = NULL;
-	int algo;
-	char oid[64];
-	int len;
-	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
 
-	len = sizeof(oid);
-	result =
-	    asn1_read_value
-	    (cert->cert,
-	     "tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
-	     oid, &len);
+	result = _gnutls_x509_get_pk_algorithm( cert->cert, "tbsCertificate.subjectPublicKeyInfo",
+		bits);
 
-	if (result != ASN1_SUCCESS) {
+	if (result < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
-	algo = _gnutls_x509_oid2pk_algorithm( oid);
+	return result;
 
-	if ( bits==NULL) {
-		gnutls_free(str);
-		return algo;
-	}
-
-	/* Now read the parameters' bits */
-
-	len = 0;
-	result =
-	    asn1_read_value
-	    (cert->cert, "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-	     NULL, &len);
-
-	if (result != ASN1_MEM_ERROR) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	if (len % 8 != 0) {
-		gnutls_assert();
-		return GNUTLS_E_CERTIFICATE_ERROR;
-	}
-	
-	len /= 8;
-	
-	str = gnutls_malloc( len);
-	if (str == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result =
-	    asn1_read_value
-	    (cert->cert, "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-	     str, &len);
-	
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		gnutls_free(str);
-		return _gnutls_asn2err(result);
-	}
-
-	len /= 8;
-
-	if (algo==GNUTLS_PK_RSA) {
-		if ((result=_gnutls_x509_read_rsa_params( str, len, params)) < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		bits[0] = _gnutls_mpi_get_nbits( params[0]);
-	
-		_gnutls_mpi_release( &params[0]);
-		_gnutls_mpi_release( &params[1]);
-	}
-
-	if (algo==GNUTLS_PK_DSA) {
-
-		if ((result =
-		     _gnutls_x509_read_dsa_pubkey(str, len, params)) < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		bits[0] = _gnutls_mpi_get_nbits( params[3]);
-
-		_gnutls_mpi_release( &params[3]);
-	}
-
-	gnutls_free(str);
-	return algo;
 }
 
 /**

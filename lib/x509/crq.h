@@ -1,5 +1,5 @@
-#ifndef CRL_H
-# define CRL_H
+#ifndef CRQ_H
+# define CRQ_H
 
 typedef struct gnutls_x509_crq_int {
 	ASN1_TYPE crq;
@@ -15,5 +15,7 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq crq);
 
 int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
+
+int gnutls_x509_crq_get_pk_algorithm( gnutls_x509_crq crq, unsigned int* bits);
 
 #endif

@@ -29,6 +29,7 @@
 #include <gnutls_num.h>
 #include <x509_b64.h>
 #include <common.h>
+#include <mpi.h>
 
 typedef struct _oid2string {
 	const char * oid;
@@ -346,7 +347,7 @@ static time_t mktime_utc(const struct fake_tm *tm)
  * month|day|hour|minute (2 chars each)
  * and year is given. Returns a time_t date.
  */
-static time_t _gnutls_x509_time2gtime(char *ttime, int year)
+time_t _gnutls_x509_time2gtime(const char *ttime, int year)
 {
 	char xx[3];
 	struct fake_tm etime;
@@ -403,7 +404,7 @@ static time_t _gnutls_x509_time2gtime(char *ttime, int year)
  * The given time is expressed as:
  * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
  */
-time_t _gnutls_x509_utcTime2gtime(char *ttime)
+time_t _gnutls_x509_utcTime2gtime(const char *ttime)
 {
 	char xx[3];
 	int year;
@@ -427,11 +428,42 @@ time_t _gnutls_x509_utcTime2gtime(char *ttime)
 	return _gnutls_x509_time2gtime( ttime, year);
 }
 
+/* returns a time value that contains the given time.
+ * The given time is expressed as:
+ * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
+ */
+int _gnutls_x509_gtime2utcTime(time_t gtime, char *str_time, int str_time_size)
+{
+size_t ret;
+
+#ifdef HAVE_GMTIME_R
+struct tm _tm;
+
+	gmtime_r( &gtime, &_tm);
+
+	ret = strftime( str_time, str_time_size, "%y%m%d%H%M00Z", &_tm);
+#else
+struct tm* _tm;
+	
+	_tm = gmtime( &gtime);
+	
+	ret = strftime( str_time, str_time_size, "%y%m%d%H%M00Z", _tm);
+#endif
+	
+	if (!ret) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+	
+	return 0;
+	
+}
+
 /* returns a time_t value that contains the given time.
  * The given time is expressed as:
  * YEAR(4)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
  */
-time_t _gnutls_x509_generalTime2gtime(char *ttime)
+time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 {
 	char xx[5];
 	int year;
@@ -506,6 +538,40 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
 	return ctime;
 }
 
+/* Sets the time in time_t in the ASN1_TYPE given. Where should
+ * be something like "tbsCertList.thisUpdate".
+ */
+int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim)
+{
+	opaque str_time[MAX_TIME];
+	char name[1024];
+	int result, len;
+
+	_gnutls_str_cpy(name, sizeof(name), where);
+
+	if ((result = asn1_write_value(c2, name, "UTCTime", 1)) < 0) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_gtime2utcTime( tim, str_time, sizeof(str_time));
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	_gnutls_str_cat(name, sizeof(name), ".utcTime"); 
+
+	result = asn1_write_value(c2, name, str_time, len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+
 gnutls_x509_subject_alt_name _gnutls_x509_san_find_type( char* str_type) {
 	if (strcmp( str_type, "dNSName")==0) return GNUTLS_SAN_DNSNAME;
 	if (strcmp( str_type, "rfc822Name")==0) return GNUTLS_SAN_RFC822NAME;
@@ -521,13 +587,18 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	gnutls_x509_crt_fmt format, char* pem_header,
 	int tmp_buf_size, unsigned char* output_data, size_t* output_data_size)
 {
-	int result;
+	int result, len;
 	if (tmp_buf_size == 0) tmp_buf_size = 16*1024;
 	
 	if (format == GNUTLS_X509_FMT_DER) {
+		len = *output_data_size;
+
 		if (output_data == NULL) *output_data_size = 0;
 	
-		if ((result=asn1_der_coding( asn1_data, "", output_data, output_data_size, NULL)) != ASN1_SUCCESS) {
+		if ((result=asn1_der_coding( asn1_data, "", output_data, &len, NULL)) != ASN1_SUCCESS) 
+		{
+			*output_data_size = len;
+
 			if (result == ASN1_MEM_ERROR)
 				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
@@ -538,8 +609,9 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	} else { /* PEM */
 		opaque *tmp;
 		opaque *out;
-		int len = tmp_buf_size;
 		
+		len = tmp_buf_size;
+
 		tmp = gnutls_alloca( len);
 		if (tmp == NULL) {
 			gnutls_assert();
@@ -841,4 +913,177 @@ gnutls_datum val;
 	cleanup:
 		if (val.data != data->data) _gnutls_free_datum( &val);
 		return result;
+}
+
+/* Encodes and copies the private key parameters into a
+ * subjectPublicKeyInfo structure.
+ *
+ * FIXME: can only support RSA parameters.
+ */
+int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name,
+	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size)
+{
+const char* pk;
+opaque * der;
+int der_size, result;
+char name[128];
+
+	if (pk_algorithm != GNUTLS_PK_RSA) {
+		gnutls_assert();
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	}
+
+	pk = _gnutls_x509_pk2oid( pk_algorithm);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	}
+
+	/* write the RSA OID
+	 */
+	_gnutls_str_cpy( name, sizeof(name), dst_name);
+	_gnutls_str_cat( name, sizeof(name), ".algorithm.algorithm");
+	result = asn1_write_value( dst, name, pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* disable parameters, which are not used in RSA.
+	 */
+	_gnutls_str_cpy( name, sizeof(name), dst_name);
+	_gnutls_str_cat( name, sizeof(name), ".algorithm.parameters");
+	result = asn1_write_value( dst, name, NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	_gnutls_x509_write_rsa_params( params, params_size, NULL, &der_size);
+
+	der = gnutls_alloca( der_size);
+	if (der == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	result = _gnutls_x509_write_rsa_params( params, params_size, der, &der_size);
+	if (result < 0) {
+		gnutls_assert();
+		gnutls_afree(der);
+		return result;
+	}
+
+	/* Write the DER parameters. (in bits)
+	 */
+	_gnutls_str_cpy( name, sizeof(name), dst_name);
+	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
+	result = asn1_write_value( dst, name, der, der_size*8);
+
+	gnutls_afree(der);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+/* Reads and returns the PK algorithm of the given certificate-like
+ * ASN.1 structure. src_name should be something like "tbsCertificate.subjectPublicKeyInfo".
+ */
+int _gnutls_x509_get_pk_algorithm( ASN1_TYPE src, const char* src_name, unsigned int* bits)
+{
+int result;
+opaque *str = NULL;
+int algo;
+char oid[64];
+int len;
+GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
+char name[128];
+
+	_gnutls_str_cpy( name, sizeof(name), src_name);
+	_gnutls_str_cat( name, sizeof(name), ".algorithm.algorithm");
+
+	len = sizeof(oid);
+	result =
+	    asn1_read_value(src, name, oid, &len);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	algo = _gnutls_x509_oid2pk_algorithm( oid);
+
+	if ( bits==NULL) {
+		gnutls_free(str);
+		return algo;
+	}
+
+	/* Now read the parameters' bits */
+	_gnutls_str_cpy( name, sizeof(name), src_name);
+	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
+
+	len = 0;
+	result = asn1_read_value( src, name, NULL, &len);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (len % 8 != 0) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_ERROR;
+	}
+	
+	len /= 8;
+	
+	str = gnutls_malloc( len);
+	if (str == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	_gnutls_str_cpy( name, sizeof(name), src_name);
+	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
+
+	result = asn1_read_value(src, name, str, &len);
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		gnutls_free(str);
+		return _gnutls_asn2err(result);
+	}
+
+	len /= 8;
+
+	if (algo==GNUTLS_PK_RSA) {
+		if ((result=_gnutls_x509_read_rsa_params( str, len, params)) < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		bits[0] = _gnutls_mpi_get_nbits( params[0]);
+	
+		_gnutls_mpi_release( &params[0]);
+		_gnutls_mpi_release( &params[1]);
+	}
+
+	if (algo==GNUTLS_PK_DSA) {
+
+		if ((result =
+		     _gnutls_x509_read_dsa_pubkey(str, len, params)) < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		bits[0] = _gnutls_mpi_get_nbits( params[3]);
+
+		_gnutls_mpi_release( &params[3]);
+	}
+
+	gnutls_free(str);
+	return algo;
 }

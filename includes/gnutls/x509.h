@@ -105,7 +105,26 @@ int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail);
 #define GNUTLS_XML_SHOW_ALL 1
 #define GNUTLS_XML_NORMAL 0
 
-/* RDN handling */
+/* X.509 Certificate writing.
+ */
+int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
+	const char *name, unsigned int sizeof_name);
+int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
+	const char *name, unsigned int sizeof_name);
+int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version);
+int gnutls_x509_crt_set_key(gnutls_x509_crt crt, gnutls_x509_privkey key);
+int gnutls_x509_crt_set_ca_status(gnutls_x509_crt crt, unsigned int ca);
+int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer, 
+	gnutls_x509_privkey issuer_key);
+int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time);
+int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time);
+int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial, 
+	size_t serial_size);
+int gnutls_x509_crt_set_crq(gnutls_x509_crt crt, gnutls_x509_crq crq);
+
+
+/* RDN handling 
+ */
 int gnutls_x509_rdn_get(const gnutls_datum * idn,
 				  char *buf, size_t *sizeof_buf);
 
@@ -256,13 +275,14 @@ int gnutls_x509_crq_init(gnutls_x509_crq * crq);
 void gnutls_x509_crq_deinit(gnutls_x509_crq crq);
 int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
+int gnutls_x509_crq_get_pk_algorithm( gnutls_x509_crq crq, unsigned int* bits);
 int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
 					 size_t *sizeof_buf);
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf);
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
-	const char *name, int sizeof_name);
-int gnutls_x509_crq_set_version(gnutls_x509_crq crq, int version);
+	const char *name, unsigned int sizeof_name);
+int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version);
 int gnutls_x509_crq_set_key(gnutls_x509_crq crq, gnutls_x509_privkey key);
 int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key);
 

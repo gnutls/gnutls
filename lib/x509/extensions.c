@@ -158,6 +158,52 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 	}
 }
 
+/* This function will attempt to set the requested extension in
+ * the given X509v3 certificate. 
+ *
+ * Critical will be either 0 or 1.
+ */
+int _gnutls_x509_crt_set_extension( gnutls_x509_crt cert, const char* extension_id, 
+	const gnutls_datum* ext_data, unsigned int critical)
+{
+	int result;
+	const char *str;
+
+	/* Add a new extension in the list.
+	 */
+	result = asn1_write_value(cert->cert, "tbsCertificate.extensions", "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_write_value(cert->cert, "tbsCertificate.extensions.?LAST.extnID", extension_id, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if (critical==0) str = "FALSE";
+	else str = "TRUE";
+	
+
+	result = asn1_write_value(cert->cert, "tbsCertificate.extensions.?LAST.critical", str, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_write_value( cert->cert, "tbsCertificate.extensions.?LAST.extnValue",
+		ext_data, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+	
+	return 0;
+}
+
+
 /* Here we only extract the KeyUsage field, from the DER encoded
  * extension.
  */
@@ -241,6 +287,44 @@ int _gnutls_x509_ext_extract_basicConstraints(int *CA, opaque * extnValue,
 	else
 		*CA = 0;
 
+
+	return 0;
+}
+
+/* generate the basicConstraints in a DER encoded extension
+ * Use 0 or 1 (TRUE) for CA.
+ */
+int _gnutls_x509_ext_gen_basicConstraints(int CA, gnutls_datum* der_ext)
+{
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+	const char *str;
+	int result;
+
+	if (CA == 0) str = "FALSE";
+	else str = "TRUE";
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext
+	     )) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_write_value(ext, "cA", str, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&ext);
+		return _gnutls_asn2err(result);
+	}
+	
+	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
+
+	asn1_delete_structure(&ext);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
 
 	return 0;
 }

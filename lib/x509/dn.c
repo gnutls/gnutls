@@ -285,6 +285,96 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	return result;
 }
 
+/* Parses an X509 DN in the src, and puts the output into
+ * the DN dst. 
+ *
+ * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
+ * That is to point in the rndSequence.
+ */
+int _gnutls_x509_copy_cert_dn(ASN1_TYPE *dst, ASN1_TYPE src)
+{
+int result;
+gnutls_datum der_cert;
+ASN1_TYPE new_dst = ASN1_TYPE_EMPTY;
+
+	/* DER Encode the dest certificate.
+	 */
+	result = _gnutls_x509_der_encode( *dst, "", &der_cert, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+	
+	/* Generate a Certificate_write structure.
+	 */
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+					 "PKIX1.Certificate_write", &new_dst
+					 )) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+	
+	/* Copy the dest certificate into the certificate_write struct.
+	 */
+	result = asn1_der_decoding( &new_dst, der_cert.data, der_cert.size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* Encode the Issuer certificate name and copy into the
+	 * issuer's name of certificate_write.
+	 */
+	result = _gnutls_x509_der_encode_and_copy( src, "tbsCertificate.subject", 
+		new_dst, "tbsCertificate.issuer", 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Decode the new certificate.
+	 */
+
+	_gnutls_free_datum( &der_cert);
+
+	result = _gnutls_x509_der_encode( new_dst, "", &der_cert, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure( dst);
+	*dst = ASN1_TYPE_EMPTY;
+
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+					 "PKIX1.Certificate", dst
+					 )) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+	
+	/* Copy to the dest certificate.
+	 */
+	result = asn1_der_decoding( dst, der_cert.data, der_cert.size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+	
+	result = 0;
+
+cleanup:
+	_gnutls_free_datum( &der_cert);
+	return result;
+
+}
+
 /* Parses an X509 DN in the asn1_struct, and searches for the
  * given OID in the DN.
  * The output will be encoded in the LDAP way. (#hex for non printable).
