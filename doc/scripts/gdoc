@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 ## Copyright (c) 1998 Michael Zucchi, All Rights Reserved        ##
+##                    hacked to allow -tex option --nmav         ##
 ##                                                               ##
 ## This software falls under the GNU Public License. Please read ##
 ##              the COPYING file for more information            ##
@@ -75,7 +76,8 @@
 
 # match expressions used to find embedded type information
 $type_constant = "\\\%(\\w+)";
-$type_func = "(\\w+\\(\\))";
+#$type_func = "(\\w+\\(\\))";
+$type_func = "(\\(w||\\\\)+\\(\\))";
 $type_param = "\\\@(\\w+)";
 $type_struct = "\\\&(\\w+)";
 $type_env = "(\\\$\\w+)";
@@ -91,10 +93,10 @@ $type_env = "(\\\$\\w+)";
 		     $type_param, "<tt><b>\$1</b></tt>" );
 $blankline_html = "<p>";
 
-%highlights_tex = ( $type_constant, "{\\it \$1}",
-		     $type_func, "{\\bf \$1}",
-		     $type_struct, "{\\it \$1}",
-		     $type_param, "{\\bf \$1}" );
+%highlights_tex = ( $type_constant, "{\\\\it \$1}",
+		     $type_func, "{\\\\bf \$1}",
+		     $type_struct, "{\\\\it \$1}",
+		     $type_param, "{\\\\bf \$1}" );
 $blankline_tex = "\\par";
 
 # sgml, docbook format
@@ -273,14 +275,31 @@ sub output_tex {
     my %args = %{$_[0]};
     my ($parameter, $section);
     my $count;
-    print "\n\n\\subsection{". $args{'function'} . "}\n";
+    my $func = $args{'function'};
+    my $param;
+    my $param2;
+    my $sec;
+    my $check;
+    my $type;
 
-    print "{\\it ".$args{'functiontype'}."}\n";
-    print "{\\bf ".$args{'function'}."}\n";
+    $func =~ s/_/\\_/g;
+
+    print "\n\n\\subsection{". $func . "}\n";
+
+    $type = $args{'functiontype'};
+    $type =~ s/_/\\_/g;
+
+    print "{\\it ".$type."}\n";
+    print "{\\bf ".$func."}\n";
     print "(\n";
     $count = 0;
     foreach $parameter (@{$args{'parameterlist'}}) {
-	print "{\\it ".$args{'parametertypes'}{$parameter}."} {\\bf ".$parameter."}\n";
+        $param = $args{'parametertypes'}{$parameter};
+        $param2 = $parameter;
+	$param =~ s/_/\\_/g;
+        $param2 =~ s/_/\\_/g;
+
+	print "{\\it ".$param."} {\\bf ".$param2."}\n";
 	if ($count != $#{$args{'parameterlist'}}) {
 	    $count++;
 	    print ", ";
@@ -288,18 +307,35 @@ sub output_tex {
     }
     print ")\n";
 
-    print "\n\\large{Arguments}\n";
+    print "\n{\\large{Arguments}}\n";
+
     print "\\begin{itemize}\n";
+    $check=0;
     foreach $parameter (@{$args{'parameterlist'}}) {
-	print "\\item {\\it ".$args{'parametertypes'}{$parameter}."} {\\bf ".$parameter."}\n";
+        $param = $args{'parametertypes'}{$parameter};
+        $param =~ s/_/\\_/g;
+        $param2 = $parameter;
+	$param2 =~ s/_/\\_/g;
+
+	$check = 1;
+	print "\\item {\\it ".$param."} {\\bf ".$param2."}\n";
 	print "\n";
-	output_highlight($args{'parameters'}{$parameter});
+
+	output_highlight($param{$parameter});
+    }
+    if ($check==0) {
+	print "\\item void\n";
     }
     print "\\end{itemize}\n";
+
     foreach $section (@{$args{'sectionlist'}}) {
-	print "\\large{$section}\n";
+	print "{\\large{$section}}\n";
 	print "\\begin{rmfamily}\n";
-	output_highlight($args{'sections'}{$section});
+
+	$sec = $args{'sections'}{$section};
+	$sec =~ s/_/\\_/g;
+	$sec =~ s/&/\\&/g;
+	output_highlight($sec);
 	print "\\end{rmfamily}\n";
     }
     print "\n";

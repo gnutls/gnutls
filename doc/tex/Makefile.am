@@ -8,8 +8,8 @@ gnutls-api.tex:
 	@../scripts/gdoc -tex ../../lib/*.c >> gnutls-api.tex
 
 gnutls.ps: gnutls.tex gnutls-api.tex
-	latex gnutls.tex
-	dvips gnutls.dvi -o gnutls.ps
+	-latex gnutls.tex
+	-dvips gnutls.dvi -o gnutls.ps
 
 gnutls.html: gnutls.tex gnutls-api.tex
-	latex2html gnutls.tex -no_subdir 1 -split 0
+	-latex2html gnutls.tex -no_subdir 1 -split 0
