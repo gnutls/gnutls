@@ -510,7 +510,7 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	headers[2] = _gnutls_version_get_minor(state->connection_state.version);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Send Change Cipher Spec\n");
+	fprintf(stderr, "ChangeCipherSpec was sent\n");
 #endif
 
 #ifdef WORDS_BIGENDIAN
@@ -687,7 +687,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	
 	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
 #ifdef HARD_DEBUG
-		fprintf(stderr, "Received Change Cipher Spec Packet\n");
+		fprintf(stderr, "ChangeCipherSpec Packet was received\n");
 #endif
 		if (length!=1) {
 			gnutls_assert();

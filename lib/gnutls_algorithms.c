@@ -27,6 +27,12 @@
 #include "auth_anon.h"
 #include "auth_dhe_dss.h"
 
+#define MAX_CIPHER 256
+#define MAX_MAC 256
+#define MAX_KX 256
+#define MAX_CIPHERSUITE 256
+#define MAX_COMPRESSION 256
+
 /* TLS Versions */
 
 typedef struct {
@@ -349,7 +355,7 @@ char *_gnutls_mac_get_name(MACAlgorithm algorithm)
 int _gnutls_mac_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < MAX_MAC; i++) {
 		if (_gnutls_mac_is_ok(i) == 0)
 			counter++;
 	}
@@ -410,7 +416,7 @@ char *_gnutls_compression_get_name(CompressionMethod algorithm)
 int _gnutls_compression_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < MAX_COMPRESSION; i++) {
 		if (_gnutls_compression_is_ok(i) == 0)
 			counter++;
 	}
@@ -506,7 +512,7 @@ char *_gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 int _gnutls_cipher_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < MAX_CIPHER; i++) {
 		if (_gnutls_cipher_is_ok(i) == 0)
 			counter++;
 	}
@@ -613,7 +619,7 @@ char *_gnutls_kx_get_name(KXAlgorithm algorithm)
 int _gnutls_kx_count()
 {
 	uint8 i, counter = 0;
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < MAX_KX; i++) {
 		if (_gnutls_kx_is_ok(i) == 0)
 			counter++;
 	}
@@ -744,11 +750,11 @@ int _gnutls_cipher_suite_count()
 	GNUTLS_CipherSuite suite;
 	int i, counter = 0, j;
 
-	for (j = 0; j < 256; j++) {
+	for (j = 0; j < MAX_CIPHERSUITE; j++) {
 		suite.CipherSuite[0] = j;
 		if (j!=0x00 && j!=0xFF) continue;
 
-		for (i = 0; i < 256; i++) {
+		for (i = 0; i < MAX_CIPHERSUITE; i++) {
 			suite.CipherSuite[1] = i;
 			if (_gnutls_cipher_suite_is_ok(suite) == 0)
 				counter++;
