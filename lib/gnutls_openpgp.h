@@ -24,6 +24,11 @@ int gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid );
 
 int gnutls_openpgp_add_keyring( const char *fname, int is_secret );
 
+/* internal */
+int _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw);
+
+     
+
 #endif /*GNUTLS_OPENPGP_H*/
 
 
