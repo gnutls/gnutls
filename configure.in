@@ -309,7 +309,7 @@ AC_MSG_RESULT([***
 ])
 AM_PROG_LIBTOOL
 
-LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBGCRYPT_LIBS"
+LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls -lasn1 $LIBGCRYPT_LIBS"
 LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
 
 AC_SUBST(LIBGNUTLS_LIBS)
@@ -337,6 +337,8 @@ AC_MSG_WARN(***
 	fi
 fi
 
+AC_CONFIG_SUBDIRS(libasn1)
+
 AC_CONFIG_FILES(lib/gnutls.h.in)
 
 AC_CONFIG_COMMANDS([lib/gnutls.h],[[
@@ -345,8 +347,6 @@ AC_CONFIG_COMMANDS([lib/gnutls.h],[[
  cat lib/gnutls_ui.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
  cat lib/gnutls_errors_int.h | grep -v _INT_ >> lib/gnutls.h
- echo "" >> lib/gnutls.h
- cat lib/x509_asn1.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
  echo "#ifdef __cplusplus" >> lib/gnutls.h
  echo "}" >> lib/gnutls.h
