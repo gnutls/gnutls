@@ -33,4 +33,4 @@ gnutls-extra-api.tex: $(COBJECTS_EXTRA)
 	&& echo "ok"; \
 	done
 
-all-local: gnutls-extra-api.tex 
+dist-hook: gnutls-extra-api.tex 

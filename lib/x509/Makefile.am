@@ -19,4 +19,4 @@ x509-api.tex: $(COBJECTS)
 	&& echo "ok"; \
 	done
 
-all-local: x509-api.tex
+dist-hook: x509-api.tex

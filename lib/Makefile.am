@@ -67,4 +67,4 @@ gnutls-api.tex: $(COBJECTS)
 	&& echo "ok"; \
 	done
 
-all-local: gnutls-api.tex
+dist-hook: gnutls-api.tex
