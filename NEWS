@@ -1,3 +1,7 @@
+Version 0.9.93 (26/10/2003)
+- Corrected some compilation issues.
+- Improved the certtool command line utility.
+
 Version 0.9.92 (25/10/2003)
 - The RFC2818 hostname verification is now case insensitive.
 - Added support for generating X.509 certificates.
