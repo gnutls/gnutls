@@ -55,7 +55,7 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test
-  * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
+  * for known OIDs using gnutls_x509_dn_oid_known(). For OIDs that are
   * not known (by gnutls) you should properly DER encode your data, and
   * call this function with raw_flag set.
   *
@@ -86,7 +86,7 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid,
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test
-  * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
+  * for known OIDs using gnutls_x509_dn_oid_known(). For OIDs that are
   * not known (by gnutls) you should properly DER encode your data, and
   * call this function with raw_flag set.
   *

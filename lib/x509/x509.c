@@ -250,9 +250,9 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   * by the given OID. The output will be encoded as described in RFC2253.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * This function will only return known OIDs as text. For other OIDs the output
+  * If raw flag is zero, this function will only return known OIDs as text. Other OIDs
   * will be DER encoded, as described in RFC2253 -- in hex format with a '#' prefix.
-  * You can check about known OIDs using gnutls_x509_oid_known().
+  * You can check about known OIDs using gnutls_x509_dn_oid_known().
   *
   * If buf is null then only the size will be filled.
   *
@@ -343,9 +343,9 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   * by the given OID.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * This function will only return known OIDs as text. For other OIDs the output
+  * If raw flag is zero, this function will only return known OIDs as text. Other OIDs
   * will be DER encoded, as described in RFC2253 -- in hex format with a '#' prefix.
-  * You can check about known OIDs using gnutls_x509_oid_known().
+  * You can check about known OIDs using gnutls_x509_dn_oid_known().
   *
   * If buf is null then only the size will be filled.
   *
