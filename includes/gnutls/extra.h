@@ -68,6 +68,11 @@ time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert );
 
 int gnutls_openpgp_extract_key_id( const gnutls_datum *cert, unsigned char keyid[8]);
 
+typedef int (*gnutls_openpgp_recv_key_func)(unsigned char keyid[8], 
+	gnutls_datum *key);
+
+void gnutls_openpgp_set_recv_key_function( gnutls_session, gnutls_openpgp_recv_key_func);
+
 int gnutls_openpgp_verify_key( const gnutls_datum* keyring, 
 	const gnutls_datum* key_list, 
 	int key_list_length);

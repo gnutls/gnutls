@@ -1586,6 +1586,10 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
 
     /* fixme: we can't use the code for old V3 RSA keys! */
     keyid = buftou32( key_fpr + (key_fpr_size - 4) );
+
+    /* Here the callback in session->internals->openpgp_recv_key() should
+     * be used.
+     */
     rc = gnutls_openpgp_recv_key( cred->pgp_key_server,
                                   cred->pgp_key_server_port,
                                   keyid, ret );
@@ -2059,6 +2063,22 @@ gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
     return 0;
 } 
 
+/**
+ * gnutls_openpgp_set_recv_key_function - Used to set a key retrieval callback for PGP keys
+ * @session: a TLS session
+ * @func: the callback
+ *
+ * This funtion will set a key retrieval function for OpenPGP keys. This
+ * callback is only useful in server side, and will be used if the peer
+ * sent a key fingerprint instead of a full key.
+ *
+ **/
+void gnutls_openpgp_set_recv_key_function( gnutls_session session,
+ gnutls_openpgp_recv_key_func func)
+{
+    session->internals.openpgp_recv_key_func = func;
+}
+
 #else /*!HAVE_LIBOPENCDK*/
 int
 _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
@@ -2198,6 +2218,13 @@ gnutls_openpgp_extract_key_id( const gnutls_datum *cert, unsigned char keyid[8] 
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
+
+void gnutls_openpgp_set_recv_key_function( gnutls_session session,
+ gnutls_openpgp_recv_key_func func)
+{
+
+}
+
 
 #endif /* HAVE_LIBOPENCDK */
 

@@ -407,6 +407,10 @@ typedef struct {
 	HandshakeType			recv_type;
 } HANDSHAKE_HEADER_BUFFER;
 
+/* Openpgp key retrieval callback */
+typedef int (*gnutls_openpgp_recv_key_func)(unsigned char keyid[8], 
+	gnutls_datum *key);
+
 typedef struct {
 	gnutls_buffer			application_data_buffer; /* holds data to be delivered to application layer */
 	gnutls_buffer			handshake_hash_buffer; /* used to keep the last received handshake 
@@ -577,6 +581,11 @@ typedef struct {
 	 * receiving, and non zero otherwise.
 	 */
 	int			direction;
+	
+	/* This callback will be used (if set) to receive an
+	 * openpgp key. (if the peer sends a fingerprint)
+	 */
+	gnutls_openpgp_recv_key_func openpgp_recv_key_func;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
