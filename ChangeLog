@@ -1,3 +1,9 @@
+2003-02-25 21:39  nmav <nmav@gnutls.org>
+
+	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa, tests.c, tls_test.c:
+
+	Added option to disable all TLS 1.0 extensions.  
+
 2003-02-22 22:26  nmav <nmav@gnutls.org>
 
 	* configure.in, doc/tex/Makefile.am, lib/Makefile.am:
