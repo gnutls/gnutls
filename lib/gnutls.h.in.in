@@ -260,7 +260,7 @@ void gnutls_transport_set_push_func( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
 void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
-size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
+ssize_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
 
 size_t gnutls_record_check_pending(GNUTLS_STATE state);
 

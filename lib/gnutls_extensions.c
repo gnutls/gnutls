@@ -32,7 +32,7 @@
 
 typedef struct {
 	char *name;
-	int type;
+	uint16 type;
 	int (*gnutls_ext_func_recv)( GNUTLS_STATE, const opaque*, int); /* recv data */
 	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque**); /* send data */
 } gnutls_extension_entry;
@@ -54,14 +54,14 @@ static gnutls_extension_entry extensions[] = {
 
 /* EXTENSION functions */
 
-void* _gnutls_ext_func_recv(int type)
+void* _gnutls_ext_func_recv(uint16 type)
 {
 	void* ret=NULL;
 	GNUTLS_EXTENSION_LOOP(ret = p->gnutls_ext_func_recv);
 	return ret;
 
 }
-void* _gnutls_ext_func_send(int type)
+void* _gnutls_ext_func_send(uint16 type)
 {
 	void* ret=NULL;
 	GNUTLS_EXTENSION_LOOP(ret = p->gnutls_ext_func_send);
@@ -69,7 +69,7 @@ void* _gnutls_ext_func_send(int type)
 
 }
 
-const char *_gnutls_extension_get_name(int type)
+const char *_gnutls_extension_get_name(uint16 type)
 {
 	char *ret = NULL;
 
@@ -98,7 +98,7 @@ int i;
 int _gnutls_parse_extensions( GNUTLS_STATE state, const opaque* data, int data_size) {
 int next, ret;
 int pos=0;
-uint8 type;
+uint16 type;
 const opaque* sdata;
 int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
 uint16 size;
@@ -120,7 +120,8 @@ int i;
 	
 	do {
 		DECR_LENGTH_RET( next, 1, 0);
-		type = data[pos++];
+		type = READuint16( &data[pos]);
+		pos+=2;
 		
 		if ( (ret=_gnutls_extension_list_check( state, type)) < 0) {
 			gnutls_assert();
@@ -193,14 +194,17 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 		size = ext_func_send( state, &sdata);
 
 		if (size > 0) {
-			(*data) = gnutls_realloc( (*data), pos+size+3);
+			(*data) = gnutls_realloc( (*data), pos+size+4);
 			if ((*data)==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
-			(*data)[pos++] = (uint8) next; /* set type */
-
+			/* write extension type */
+			WRITEuint16( next, &(*data)[pos]);
+			pos+=2;
+			
+			/* write size */
 			WRITEuint16( size, &(*data)[pos]);
 			pos+=2;
 			

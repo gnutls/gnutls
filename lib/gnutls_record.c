@@ -980,8 +980,8 @@ size_t gnutls_record_get_max_size( GNUTLS_STATE state) {
   * Not all TLS implementations use or even understand this extension.
   *
   **/
-size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size) {
-size_t new_size;
+ssize_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size) {
+ssize_t new_size;
 
 	if (state->security_parameters.entity==GNUTLS_SERVER)
 		return GNUTLS_E_INVALID_REQUEST;

@@ -18,9 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-void* _gnutls_ext_func_send(int type);
-void* _gnutls_ext_func_recv(int type);
-const char *_gnutls_extension_get_name(int type);
+void* _gnutls_ext_func_send(uint16 type);
+void* _gnutls_ext_func_recv(uint16 type);
+const char *_gnutls_extension_get_name(uint16 type);
 int _gnutls_parse_extensions( GNUTLS_STATE, const opaque*, int);
 int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data);
 
