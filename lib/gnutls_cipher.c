@@ -370,7 +370,7 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	if (memcmp
 	    (MAC, &ciphertext.data[compress->size], hash_size) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MAC_FAILED;
+		return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
 	return 0;

@@ -76,11 +76,11 @@ int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_Alert
 int gnutls_alert_send_appropriate( GNUTLS_STATE state, int err) {
 int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	switch (err) { /* send appropriate alert */
-		case GNUTLS_E_MAC_FAILED:
-			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
-			break;
 		case GNUTLS_E_DECRYPTION_FAILED:
-			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_DECRYPTION_FAILED);
+			/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
+			 * it is not defined in SSL3.
+			 */
+			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
 			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
 			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_DECOMPRESSION_FAILURE);
