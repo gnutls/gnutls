@@ -2,6 +2,8 @@ Version ?.?.?
 - Fixes in TLS 1.0 PRF and SSL3 random functions.
 - gnutls_handshake_set_exportable_detection() was obsoleted.
 - Added gnutls_openpgp_extract_key_id() which returns the key ID.
+- Corrected bug in DHE key exchange
+- Added the TLS_RSA_EXPORT_ARCFOUR_EXPORT_MD5 ciphersuite.
 
 Version 0.5.3 (23/08/2002)
 - No changes. Replaces the tarball of 0.5.2 which accidentaly contained
