@@ -29,6 +29,7 @@
 
 #ifdef HAVE_LIBOPENCDK
 
+#include <gnutls_str.h>
 #include <stdio.h>
 #include <gcrypt.h>
 #include <opencdk.h>
@@ -680,20 +681,28 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     int eof = 0, i = 0;
     int rc = 0;
   
-    if ( !res || !KEYFILE || !CERTFILE )
+    if ( !res || !KEYFILE || !CERTFILE ) {
+    	gnutls_assert();
         return GNUTLS_E_INVALID_PARAMETERS;
-
-    if ( !file_exist(CERTFILE) || !file_exist(KEYFILE) )
+    }
+    
+    if ( !file_exist(CERTFILE) || !file_exist(KEYFILE) ) {
+        gnutls_assert();
         return GNUTLS_E_FILE_ERROR;
-  
+    }
+      
     rc = cdk_iobuf_open(&inp, CERTFILE, IOBUF_MODE_RD);
-    if ( rc )
+    if ( rc ) {
+        gnutls_assert();
         return GNUTLS_E_FILE_ERROR;
+    }
+    
     if ( cdk_armor_filter_use( inp ) ) {
         memset( &afx, 0, sizeof afx );
         rc = cdk_armor_filter( &afx, IOBUF_CTRL_UNDERFLOW, inp );
         if ( rc ) {
             cdk_iobuf_close( inp );
+            gnutls_assert();
             rc = GNUTLS_E_ASCII_ARMOR_ERROR;
             goto leave;          
         }
@@ -746,19 +755,23 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     cdk_iobuf_close(inp);
     if ( rc ) {
         cdk_kbnode_release( kb_pk );
+        gnutls_assert();
         rc = GNUTLS_E_UNKNOWN_ERROR;
         goto leave;
     }
     cdk_kbnode_release( kb_pk );
 
     rc = cdk_iobuf_open( &inp, KEYFILE, IOBUF_MODE_RD );
-    if ( rc )
+    if ( rc ) {
+        gnutls_assert();
         return GNUTLS_E_FILE_ERROR;
+    }
     if ( cdk_armor_filter_use( inp ) ) {      
         memset( &afx, 0, sizeof afx );
         rc = cdk_armor_filter( &afx, IOBUF_CTRL_UNDERFLOW, inp );
         if ( rc ) {
             cdk_iobuf_close( inp );
+            gnutls_assert();
             rc = GNUTLS_E_ASCII_ARMOR_ERROR;
             goto leave;
         }
@@ -1528,188 +1541,270 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
    return 0;
 }
 
-static void
-xml_add_tag( gnutls_datum *xmlkey, const char *tag, const char *val )
+static int
+xml_add_tag( gnutls_string *xmlkey, const char *tag, const char *val )
 {
-    char *p = NULL;
+    int ret;
+    
+    if ((ret=_gnutls_string_append_str( xmlkey, "    <" )) < 0) {
+       return ret;
+    }
 
-    p = gnutls_calloc( 1, strlen( tag ) + 6 + 1 ); /* 6 chars + null */
-    strcat( p, "    <" );
-    strcat( p, tag );
-    strcat( p, ">" );
-    APPEND_DATUM( xmlkey, p, strlen( p ) );
-    gnutls_free( p ); p = NULL;
+    if ((ret=_gnutls_string_append_str( xmlkey, tag )) < 0) {
+       return ret;
+    }
+    
+    if ((ret=_gnutls_string_append_str( xmlkey, ">" )) < 0) {
+       return ret;
+    }
 
-    APPEND_DATUM( xmlkey, val, strlen( val ) );
+    if ((ret=_gnutls_string_append_str( xmlkey, val)) < 0) {
+       return ret;
+    }
 
-    p = gnutls_calloc( 1, strlen( tag ) + 4 + 1 );
-    strcat( p, "</" );
-    strcat( p, tag );
-    strcat( p, ">\n" );
-    APPEND_DATUM( xmlkey, p, strlen( p ) );
-    gnutls_free( p ); p = NULL;
+    if ((ret=_gnutls_string_append_str( xmlkey, "</")) < 0) {
+       return ret;
+    }
+
+    if ((ret=_gnutls_string_append_str( xmlkey, tag)) < 0) {
+       return ret;
+    }
+
+    if ((ret=_gnutls_string_append_str( xmlkey, ">\n" )) < 0) {
+       return ret;
+    }
+    
+    return 0;
 }
 
-static void
-xml_add_mpi( gnutls_datum *xmlkey, CDK_MPI *m, const char *tag )
+static int
+xml_add_mpi( gnutls_string *xmlkey, CDK_MPI *m, const char *tag )
 {
     char *p = NULL;
-    int i = 0;
+    int i = 0, ret;
 
     p = gnutls_calloc( 1, 2 * ( m->bytes + 3 ) );
     for ( i = 0; i < (m->bytes + 2); i++ )
         sprintf( p + 2 * i, "%02X", m->data[i] );
     p[2 * ( m->bytes + 2 )] = '\0';
-    xml_add_tag( xmlkey, tag, p );
+    
+    ret = xml_add_tag( xmlkey, tag, p);
     gnutls_free( p );
+
+    if (ret < 0) return ret;
+    
+    return 0;
 }
 
-void
-xml_add_key_mpi( gnutls_datum *xmlkey, cdkPKT_public_key *pk )
+static int
+xml_add_key_mpi( gnutls_string *xmlkey, cdkPKT_public_key *pk )
 {
     const char *s = "    <KEY ENCODING=\"HEX\"/>\n";
-
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    int ret;
+    
+    if ((ret=_gnutls_string_append_str( xmlkey, s)) < 0) {
+    	return ret;
+    }
          
     if ( is_RSA( pk->pubkey_algo ) ) {
-        xml_add_mpi( xmlkey, pk->mpi[0], "RSA-N" );
-        xml_add_mpi( xmlkey, pk->mpi[1], "RSA-E" );
+        ret = xml_add_mpi( xmlkey, pk->mpi[0], "RSA-N" );
+        if (ret < 0) return ret;
+
+        ret = xml_add_mpi( xmlkey, pk->mpi[1], "RSA-E" );
+        if (ret < 0) return ret;
     }
     else if ( is_DSA( pk->pubkey_algo ) ) {
-        xml_add_mpi( xmlkey, pk->mpi[0], "DSA-P" );
-        xml_add_mpi( xmlkey, pk->mpi[1], "DSA-Q" );
-        xml_add_mpi( xmlkey, pk->mpi[2], "DSA-G" );
-        xml_add_mpi( xmlkey, pk->mpi[3], "DSA-Y" );
+        ret = xml_add_mpi( xmlkey, pk->mpi[0], "DSA-P" );
+        if (ret < 0) return ret;
+
+        ret = xml_add_mpi( xmlkey, pk->mpi[1], "DSA-Q" );
+        if (ret < 0) return ret;
+
+        ret = xml_add_mpi( xmlkey, pk->mpi[2], "DSA-G" );
+        if (ret < 0) return ret;
+
+        ret = xml_add_mpi( xmlkey, pk->mpi[3], "DSA-Y" );
+        if (ret < 0) return ret;
     }
     else if ( is_ELG( pk->pubkey_algo ) ) {
-        xml_add_mpi( xmlkey, pk->mpi[0], "ELG-P" );
-        xml_add_mpi( xmlkey, pk->mpi[1], "ELG-G" );
-        xml_add_mpi( xmlkey, pk->mpi[2], "ELG-Y" );
+        ret = xml_add_mpi( xmlkey, pk->mpi[0], "ELG-P" );
+        if (ret < 0) return ret;
+
+        ret = xml_add_mpi( xmlkey, pk->mpi[1], "ELG-G" );
+        if (ret < 0) return ret;
+
+        ret = xml_add_mpi( xmlkey, pk->mpi[2], "ELG-Y" );
+        if (ret < 0) return ret;
     }
+    
+    return 0;
 }
 
-static void
-xml_add_key( gnutls_datum *xmlkey, int ext, cdkPKT_public_key *pk, int sub )
+static int
+xml_add_key( gnutls_string *xmlkey, int ext, cdkPKT_public_key *pk, int sub )
 {
     const char *algo, *s;
     char keyid[16], fpr[41], tmp[32];
     byte fingerpr[20];
     u32 kid[2];
-    int i = 0;
+    int i = 0, ret;
 
     s = sub? "  <SUBKEY>\n" : "  <MAINKEY>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    if ((ret=_gnutls_string_append_str( xmlkey, s)) < 0) {
+    	return ret;
+    }
 
     cdk_pk_get_keyid( pk, kid );
     snprintf( keyid, 16, "%08X%08X", kid[0], kid[1] );
-    xml_add_tag( xmlkey, "KEYID", keyid );
+    ret = xml_add_tag( xmlkey, "KEYID", keyid );
+    if ( ret < 0) return ret;
 
     cdk_pk_get_fingerprint( pk, fingerpr );
     for ( i = 0; i < 20; i++ )
         sprintf( fpr + 2 * i, "%02X", fingerpr[i] );
     fpr[40] = '\0';
-    xml_add_tag( xmlkey, "FINGERPRINT", fpr );
+    ret = xml_add_tag( xmlkey, "FINGERPRINT", fpr );
+    if ( ret < 0) return ret;
 
     if ( is_DSA( pk->pubkey_algo ) ) algo = "DSA";
     else if ( is_RSA( pk->pubkey_algo ) ) algo = "RSA";
     else algo = "ELG";
-    xml_add_tag( xmlkey, "PKALGO", algo );
+    ret = xml_add_tag( xmlkey, "PKALGO", algo );
+    if ( ret < 0) return ret;
 
     sprintf( tmp, "%d", cdk_pk_get_nbits( pk ) );
-    xml_add_tag( xmlkey, "KEYLEN", tmp );
+    ret = xml_add_tag( xmlkey, "KEYLEN", tmp );
+    if ( ret < 0) return ret;
 
     sprintf( tmp, "%u", pk->timestamp );
-    xml_add_tag( xmlkey, "CREATED", tmp );
+    ret = xml_add_tag( xmlkey, "CREATED", tmp );
+    if ( ret < 0) return ret;
 
     if ( pk->expiredate ) {
         sprintf( tmp, "%u", pk->expiredate );
-        xml_add_tag( xmlkey, "EXPIREDATE", tmp );
+        ret = xml_add_tag( xmlkey, "EXPIREDATE", tmp );
+	if ( ret < 0) return ret;
     }
 
     sprintf( tmp, "%d", pk->is_revoked );
-    xml_add_tag( xmlkey, "REVOKED", tmp );
+    ret = xml_add_tag( xmlkey, "REVOKED", tmp );
+    if ( ret < 0) return ret;
 
-    if ( ext )
-        xml_add_key_mpi( xmlkey, pk );
-    
+    if ( ext ) {
+        ret = xml_add_key_mpi( xmlkey, pk );
+        if ( ret < 0) return ret;
+    }
+     
     s = sub? "  </SUBKEY>\n" : "  </MAINKEY>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    
+    ret = _gnutls_string_append_str( xmlkey, s);
+    if ( ret < 0) return ret;
+
+    return 0;
 }
 
-static void
-xml_add_userid( gnutls_datum *xmlkey, int ext,
+static int
+xml_add_userid( gnutls_string *xmlkey, int ext,
                 gnutls_openpgp_name *dn, cdkPKT_user_id *id )
 {
     const char *s;
     char *p, *name, tmp[32];
+    int ret;
 
     s = "  <USERID>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    ret = _gnutls_string_append_str( xmlkey, s);
+    if (ret < 0) return ret;
 
     p = strchr( dn->name, '<' );
     if ( p ) {
         int len = (p - dn->name - 1);
         name = gnutls_calloc( 1, len );
+        if (name==NULL) return GNUTLS_E_MEMORY_ERROR;
+
         memcpy( name, dn->name, len );
-        xml_add_tag( xmlkey, "NAME", name );
+
+        ret = xml_add_tag( xmlkey, "NAME", name );
         gnutls_free( name );
+        if (ret < 0) return ret;
     }
-    else
-        xml_add_tag( xmlkey, "NAME", dn->name );
-    xml_add_tag( xmlkey, "EMAIL", dn->email );
+    else {
+        ret = xml_add_tag( xmlkey, "NAME", dn->name );
+        if (ret < 0) return ret;
+    }
+    
+    ret = xml_add_tag( xmlkey, "EMAIL", dn->email );
+    if (ret < 0) return ret;
 
     if ( ext ) {
         sprintf( tmp, "%d", id->is_primary );
-        xml_add_tag( xmlkey, "PRIMARY", tmp );
-
+        ret = xml_add_tag( xmlkey, "PRIMARY", tmp );
+        if (ret < 0) return ret;
+        
         sprintf( tmp, "%d", id->is_revoked );
-        xml_add_tag( xmlkey, "REVOKED", tmp );
-    }    
+        ret = xml_add_tag( xmlkey, "REVOKED", tmp );
+        if (ret < 0) return ret;
+    }
 
     s = "  </USERID>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    ret = _gnutls_string_append_str( xmlkey, s);
+    if (ret < 0) return ret;
+    
+    return 0;
 }
 
-static void
-xml_add_sig( gnutls_datum *xmlkey, int ext, cdkPKT_signature *sig )
+static int
+xml_add_sig( gnutls_string *xmlkey, int ext, cdkPKT_signature *sig )
 {
     const char *algo, *s;
     char tmp[32], keyid[16];
     u32 kid[2];
+    int ret;
 
     s = "  <SIGNATURE>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    ret = _gnutls_string_append_str( xmlkey, s);
+    if (ret < 0) return ret;
 
     sprintf( tmp, "%d", sig->version );
-    xml_add_tag( xmlkey, "VERSION", tmp );
+    ret = xml_add_tag( xmlkey, "VERSION", tmp );
+    if (ret < 0) return ret;
 
     if ( ext ) {
         sprintf( tmp, "%d", sig->sig_class );
-        xml_add_tag( xmlkey, "SIGCLASS", tmp );
+        ret = xml_add_tag( xmlkey, "SIGCLASS", tmp );
+        if (ret < 0) return ret;
     }
     
     sprintf( tmp, "%d", sig->flags.expired );
-    xml_add_tag( xmlkey, "EXPIRED", tmp );
+    ret = xml_add_tag( xmlkey, "EXPIRED", tmp );
+    if (ret < 0) return ret;
 
     if ( ext ) {
         if ( is_DSA( sig->pubkey_algo ) ) algo = "DSA";
         else algo = "RSA";
-        xml_add_tag( xmlkey, "PKALGO", algo );
+        ret = xml_add_tag( xmlkey, "PKALGO", algo );
+        if (ret < 0) return ret;
 
         if ( sig->digest_algo == GCRY_MD_SHA1 ) algo = "SHA1";
         else algo = "MD5";
-        xml_add_tag( xmlkey, "MDALGO", algo );
+        ret = xml_add_tag( xmlkey, "MDALGO", algo );
+        if (ret < 0) return ret;
     }    
 
     sprintf( tmp, "%u", sig->timestamp );
-    xml_add_tag( xmlkey, "CREATED", tmp );
+    ret = xml_add_tag( xmlkey, "CREATED", tmp );
+    if (ret < 0) return ret;
 
     cdk_sig_get_keyid( sig, kid );
     snprintf( keyid, 16, "%08X%08X", kid[0], kid[1] );
-    xml_add_tag( xmlkey, "KEYID", keyid );
+    ret = xml_add_tag( xmlkey, "KEYID", keyid );
+    if (ret < 0) return ret;
 
     s = "  </SIGNATURE>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+
+    ret = _gnutls_string_append_str( xmlkey, s);
+    if (ret < 0) return ret;
+
+    return 0;
 }
 
 /**
@@ -1729,7 +1824,8 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
     CDK_PACKET *pkt;
     gnutls_openpgp_name dn;
     const char *s;
-    int idx = 0, rc = 0;
+    int idx = 0, rc = 0, ret;
+    gnutls_string string_xml_key;
 
     if ( !cert || !xmlkey )
         return GNUTLS_E_INVALID_PARAMETERS;
@@ -1738,33 +1834,40 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
     if ( rc )
         return rc;
 
+    _gnutls_string_init( &string_xml_key, malloc, realloc, free);
     memset( xmlkey, 0, sizeof *xmlkey );
 
     s = "<?xml version=\"1.0\"?>\n\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    ret = _gnutls_string_append_str( &string_xml_key, s);
+    if (ret < 0) return ret;
     
     s = "<OPENPGPKEY>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    ret = _gnutls_string_append_str( &string_xml_key, s);
+    if (ret < 0) return ret;
 
     for ( p = kb_pk; p; p = p->next ) {
         pkt = p->pkt;
         switch ( pkt->pkttype ) {
         case PKT_PUBLIC_KEY:
-            xml_add_key( xmlkey, ext, pkt->pkt.public_key, 0 );
+            ret = xml_add_key( &string_xml_key, ext, pkt->pkt.public_key, 0 );
+            if (ret < 0) return ret;
             break;
 
         case PKT_PUBLIC_SUBKEY:
-            xml_add_key( xmlkey, ext, pkt->pkt.public_key, 1 );
+            ret = xml_add_key( &string_xml_key, ext, pkt->pkt.public_key, 1 );
+            if (ret < 0) return ret;
             break;
 
         case PKT_USER_ID:
             gnutls_openpgp_extract_key_name( cert, idx, &dn );
-            xml_add_userid( xmlkey, ext, &dn, pkt->pkt.user_id );
+            ret = xml_add_userid( &string_xml_key, ext, &dn, pkt->pkt.user_id );
+            if (ret < 0) return ret;
             idx++;
             break;
 
         case PKT_SIGNATURE:
-            xml_add_sig( xmlkey, ext, pkt->pkt.signature );
+            ret = xml_add_sig( &string_xml_key, ext, pkt->pkt.signature );
+            if (ret < 0) return ret;
             break;
             
         default:
@@ -1772,7 +1875,10 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
         }
     }
     s = "</OPENPGPKEY>\n";
-    APPEND_DATUM( xmlkey, s, strlen( s ) );
+    ret = _gnutls_string_append_str( &string_xml_key, s);
+    if (ret < 0) return ret;
+    
+    *xmlkey = _gnutls_string2datum( &string_xml_key);
 
     return rc;
 }   
@@ -1936,7 +2042,7 @@ gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 int
-gnutls_openpgp_get_key_xml( const gnutls_datum *cert,
+gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
                             gnutls_datum *xmlkey, int ext )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;   
