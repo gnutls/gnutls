@@ -80,7 +80,7 @@ map_cdk_rc( int rc )
     case CDK_Error_No_Key: return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     case CDK_Wrong_Format: return GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED;
     case CDK_Armor_Error: return GNUTLS_E_ASCII_ARMOR_ERROR;
-    case CDK_Inv_Value: return GNUTLS_E_INVALID_VALUE;
+    case CDK_Inv_Value: return GNUTLS_E_INVALID_REQUEST;
     }
     return rc;
 }
@@ -103,8 +103,10 @@ kbx_blob_new( keybox_blob **r_ctx )
 {
     keybox_blob *c;
   
-    if( !r_ctx )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !r_ctx ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
   
     c = cdk_calloc( 1, sizeof * c );
     if( !c ) {
@@ -133,12 +135,14 @@ kbx_to_keydb( keybox_blob *blob )
     CDK_KEYDB_HD hd;
     int rc;
 
-    if( !blob )
+    if( !blob ) {
+        gnutls_assert( );
         return NULL;
+    }
   
     switch( blob->type ) {
     case KBX_BLOB_FILE:
-        rc = cdk_keydb_new( &hd, blob->armored?CDK_DBTYPE_ARMORED:
+        rc = cdk_keydb_new( &hd, blob->armored? CDK_DBTYPE_ARMORED:
                             CDK_DBTYPE_KEYRING, blob->data, blob->size );
         break;
       
@@ -148,6 +152,7 @@ kbx_to_keydb( keybox_blob *blob )
 
     default:
         rc = -1;
+        gnutls_assert( );
         break;
     }
     if( rc )
@@ -163,8 +168,10 @@ kbx_read_blob( const gnutls_datum* keyring, size_t pos )
     keybox_blob *blob = NULL;
     int rc;
   
-    if( !keyring || !keyring->data || pos > keyring->size )
+    if( !keyring || !keyring->data || pos > keyring->size ) {
+        gnutls_assert( );
         return NULL;
+    }
     
     rc = kbx_blob_new( &blob );
     if( rc )
@@ -233,8 +240,10 @@ kbnode_to_datum( CDK_KBNODE knode, gnutls_datum *raw )
     uint8 buf[4096];
     int rc = 0, nread;
   
-    if( !knode || !raw )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !knode || !raw ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     while( (node = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
         pkt = cdk_kbnode_get_packet( node );
@@ -276,8 +285,10 @@ datum_to_kbnode( const gnutls_datum *raw, CDK_KBNODE *r_knode )
     CDK_KBNODE knode;
     int rc;
 
-    if( !raw || !r_knode )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !raw || !r_knode ) {
+        return GNUTLS_E_INVALID_REQUEST;
+        gnutls_assert( );
+    }
 
     s = cdk_stream_tmp( );
     if( !s ) {
@@ -324,8 +335,10 @@ stream_to_datum( CDK_STREAM inp, gnutls_datum *raw )
     uint8 buf[4096];
     int rc = 0, nread, nbytes = 0;
   
-    if( !buf || !raw )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !buf || !raw ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     cdk_stream_seek( inp, 0 );
     while( !cdk_stream_eof( inp ) ) {
@@ -351,8 +364,10 @@ openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdkPKT_public_key *pk )
     int algo, i;
     int rc = 0;
   
-    if( !cert || !pk )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !cert || !pk ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     /* GnuTLS OpenPGP doesn't support ELG keys */
     if( is_ELG(pk->pubkey_algo) )
@@ -400,8 +415,10 @@ openpgp_sig_to_gnutls_cert( gnutls_cert *cert, cdkPKT_signature *sig )
     uint8 buf[4096];
     int rc, nread;
   
-    if( !cert || !sig )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !cert || !sig ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     tmp = cdk_stream_tmp( );
     if( !tmp ) {
@@ -453,8 +470,10 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
     uint8 buf[512];
     int rc = 0;
 
-    if( !pkey || raw_key->size <= 0 )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !pkey || raw_key->size <= 0 ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     out = cdk_stream_tmp( );
     if( !out )
@@ -532,8 +551,10 @@ _gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, gnutls_datum raw )
     CDK_PACKET *pkt = NULL;
     int rc;
   
-    if( !cert )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !cert ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     memset( cert, 0, sizeof *cert );
 
@@ -574,8 +595,10 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
     void * desc;
     int rc = 0;
   
-    if( !key || !keyring || by == KEY_ATTR_NONE )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !key || !keyring || by == KEY_ATTR_NONE ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     memset( key, 0, sizeof *key );
     blob = kbx_read_blob( keyring, 0 );
@@ -632,8 +655,10 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     int i = 0;
     int rc = 0;
     
-    if ( !res || !key || !cert )
-        return GNUTLS_E_INVALID_VALUE;
+    if ( !res || !key || !cert ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     rc = datum_to_kbnode( cert, &knode );
     if ( rc )
@@ -725,7 +750,7 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
   
     if( !res || !KEYFILE || !CERTFILE ) {
     	gnutls_assert();
-        return GNUTLS_E_INVALID_VALUE;
+        return GNUTLS_E_INVALID_REQUEST;
     }
 
     if( stat( CERTFILE, &statbuf ) || stat( KEYFILE, &statbuf ) ) {
@@ -832,8 +857,10 @@ gnutls_openpgp_count_key_names( const gnutls_datum *cert )
 
     if( cert == NULL )
         return 0;
-    if( datum_to_kbnode( cert, &knode ) )
+    if( datum_to_kbnode( cert, &knode ) ) {
+        gnutls_assert();
         return 0;
+    }
     while( (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
         pkt = cdk_kbnode_get_packet( p );
         if( pkt->pkttype == CDK_PKT_USER_ID )
@@ -864,8 +891,12 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
     size_t size = 0;
     int rc = 0;
 
-    if( !cert || !dn )
-        return GNUTLS_E_INVALID_VALUE;
+    printf ("** cert=%p nnames=%d\n", cert,
+            gnutls_openpgp_count_key_names( cert ) );
+    if( !cert || !dn ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
     
     if( idx < 0 || idx > gnutls_openpgp_count_key_names( cert ) )
         return GNUTLS_E_INTERNAL_ERROR;
@@ -1049,8 +1080,10 @@ _gnutls_openpgp_get_key_trust( const char *trustdb,
     int flags = 0, ot = 0;
     int rc = 0;
 
-    if( !trustdb || !key || !r_trustval )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !trustdb || !key || !r_trustval ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     *r_trustval = 0;
 
@@ -1145,8 +1178,10 @@ gnutls_openpgp_verify_key( const char *trustdb,
     if( !cert_list || cert_list_length != 1 || !keyring )
         return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-    if( !keyring->size && !trustdb )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !keyring->size && !trustdb ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     blob = kbx_read_blob( keyring, 0 );
     if( !blob )
@@ -1208,8 +1243,10 @@ gnutls_openpgp_fingerprint( const gnutls_datum *cert,
     CDK_PACKET *pkt;
     cdkPKT_public_key *pk = NULL;
   
-    if( !cert || !fpr || !fprlen )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !cert || !fpr || !fprlen ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     *fprlen = 0;
 
@@ -1243,8 +1280,10 @@ gnutls_openpgp_extract_key_id( const gnutls_datum *cert,
     cdkPKT_public_key *pk = NULL;
     unsigned long kid[2];
   
-    if( !cert || !keyid )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !cert || !keyid ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
     if( !pkt )
@@ -1284,8 +1323,10 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
     int enc = 0;
     int rc = 0;
   
-    if( !keyring || !name )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !keyring || !name ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     rc = cdk_stream_open( name, &inp );
     if( rc )
@@ -1322,8 +1363,10 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
     uint8 *blob;
     size_t nbytes = 0;
   
-    if( !keyring || !data || !len )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !keyring || !data || !len ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
   
     blob = kbx_data_to_keyring( KBX_BLOB_DATA, 0, data, len, &nbytes );
     if( blob && nbytes ) {
@@ -1354,8 +1397,10 @@ gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials c,
 {
     struct stat statbuf;
     
-    if( !c || !file )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !c || !file ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     if( stat( file, &statbuf ) )
         return GNUTLS_E_FILE_ERROR;
@@ -1373,8 +1418,10 @@ gnutls_certificate_set_openpgp_keyring_mem( gnutls_certificate_credentials c,
     uint8 *buf;
     int rc = 0;
   
-    if( !c || !data || !dlen )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !c || !data || !dlen ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     inp = cdk_stream_tmp_from_mem( data, dlen );
     if( !inp )
@@ -1426,8 +1473,10 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
     int rc = 0, state = 0, nread = 0;
     size_t nbytes = 0, n = 0;
   
-    if ( !host || !key )
-        return GNUTLS_E_INVALID_VALUE;
+    if ( !host || !key ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     if( !port )
         port = 11371; /* standard service port */
@@ -1524,9 +1573,11 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
     uint32 keyid;
     int rc = 0;
 
-    if( !ret || !cred || !key_fpr )
-        return GNUTLS_E_INVALID_VALUE;
-
+    if( !ret || !cred || !key_fpr ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
+    
     if( key_fpr_size != 16 && key_fpr_size != 20 )
         return GNUTLS_E_HASH_FAILED; /* only MD5 and SHA1 are supported */
   
@@ -1561,8 +1612,10 @@ gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
                                          char* keyserver,
                                          int port)
 {
-    if ( !res || !keyserver )
-        return GNUTLS_E_INVALID_VALUE;
+    if ( !res || !keyserver ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     if( !port )
         port = 11371;
@@ -1580,8 +1633,10 @@ gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
 static int
 xml_add_tag( gnutls_string *xmlkey, const char *tag, const char *val )
 {
-    if( !xmlkey || !tag || !val )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !xmlkey || !tag || !val ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
     
     _gnutls_string_append_str( xmlkey, "    <" );
     _gnutls_string_append_str( xmlkey, tag );
@@ -1603,8 +1658,10 @@ xml_add_mpi2( gnutls_string *xmlkey, const uint8 *data, size_t count,
     size_t i;
     int rc = 0;
 
-    if( !xmlkey || !data || !tag )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !xmlkey || !data || !tag ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     p = gnutls_calloc( 1, 2 * ( count + 3 ) );
     if( !p ) {
@@ -1642,8 +1699,10 @@ xml_add_key_mpi( gnutls_string *xmlkey, cdkPKT_public_key *pk )
     const char *s = "    <KEY ENCODING=\"HEX\"/>\n";
     int rc = 0;
 
-    if( !xmlkey || !pk )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !xmlkey || !pk ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
     
     _gnutls_string_append_str( xmlkey, s );
          
@@ -1684,8 +1743,10 @@ xml_add_key( gnutls_string *xmlkey, int ext, cdkPKT_public_key *pk, int sub )
     unsigned long kid[2];
     int i = 0, rc = 0;
 
-    if( !xmlkey || !pk )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !xmlkey || !pk ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
         
     s = sub? "  <SUBKEY>\n" : "  <MAINKEY>\n";
     _gnutls_string_append_str( xmlkey, s );
@@ -1758,8 +1819,10 @@ xml_add_userid( gnutls_string *xmlkey, int ext,
     char *p, *name, tmp[32];
     int rc = 0;
 
-    if ( !xmlkey || !dn || !id )
-        return GNUTLS_E_INVALID_VALUE;
+    if ( !xmlkey || !dn || !id ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     s = "  <USERID>\n";
     _gnutls_string_append_str( xmlkey, s );
@@ -1814,8 +1877,10 @@ xml_add_sig( gnutls_string *xmlkey, int ext, cdkPKT_signature *sig )
     unsigned long kid[2];
     int rc = 0;
 
-    if( !xmlkey || !sig )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !xmlkey || !sig ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     s = "  <SIGNATURE>\n";
     _gnutls_string_append_str( xmlkey, s );
@@ -1900,8 +1965,10 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
     int idx = 0, rc = 0;
     gnutls_string string_xml_key;
 
-    if( !cert || !xmlkey )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !cert || !xmlkey ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
         
     rc = datum_to_kbnode( cert, &knode );
     if( rc )
@@ -1974,8 +2041,10 @@ int
 gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
                                         char* trustdb )
 {
-    if( !res || !trustdb )
-        return GNUTLS_E_INVALID_VALUE;
+    if( !res || !trustdb ) {
+        gnutls_assert( );
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
     /* the old v2 format was used with 1.0.6, do we still need to check
        it now because GPG 1.0.7, 1.2.0, 1.21 and even 1.3.0 is out? */
