@@ -29,6 +29,10 @@
 
 #define MASTER_SECRET "master secret"
 
+/* This is called when we want to receive the key exchange message of the
+ * server. It does nothing if this type of message is not required
+ * by the selected ciphersuite. 
+ */
 int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KX_Algorithm algorithm;
@@ -118,6 +122,9 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 
 }
 
+/* This is the function for the client to send the key
+ * exchange message 
+ */
 int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 {
 	KX_Algorithm algorithm;

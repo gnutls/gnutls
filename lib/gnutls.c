@@ -28,6 +28,9 @@
 #include "gnutls_buffers.h"
 #include "gnutls_handshake.h"
 
+/* This function should check if we support the version of the peer.
+ * However now we only support version 3.1 
+ */
 int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor) {
 
 	if (state->connection_state.version.major == major && state->connection_state.version.minor == minor)
@@ -35,6 +38,7 @@ int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor) {
 	return 1;
 }
 
+/* This function initializes the state to null (null encryption etc...)
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
 	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
@@ -80,6 +84,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	return 0;
 }
 
+/* This function clears all buffers associated with the state. */
 int gnutls_deinit(GNUTLS_STATE * state)
 {
 	gnutls_free((*state)->connection_state.read_compression_state);
@@ -191,7 +196,9 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 }
 
 
-/* The PRF function expands a given secret */
+/* The PRF function expands a given secret 
+ * needed by the TLS specification
+ */
 svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes)
@@ -239,8 +246,10 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 
 }
 
-/* if  master_secret, client_random and server_random have been initialized,
- * this function creates the keys and stores them into state->cipher_specs
+/* This function is to be called after handshake, when master_secret,
+ *  client_random and server_random have been initialized. 
+ * This function creates the keys and stores them into pending state.
+ * (state->cipher_specs)
  */
 int _gnutls_set_keys(GNUTLS_STATE state)
 {
@@ -322,6 +331,11 @@ int gnutls_close(int cd, GNUTLS_STATE state)
 
 }
 
+/* This function behave exactly like write(). The only difference is 
+ * that it accepts, the gnutls_state and the ContentType of data to
+ * send (if called by the user the Content is specific)
+ * It is intended to transfer data, under the current state.    
+ */
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 			char *data, size_t sizeofdata)
 {
@@ -496,7 +510,11 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 	return ret;
 }
 
-
+/* This function behave exactly like read(). The only difference is 
+ * that it accepts, the gnutls_state and the ContentType of data to
+ * send (if called by the user the Content is specific)
+ * It is intended to receive data, under the current state.
+ */
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 			char *data, size_t sizeofdata)
 {
@@ -720,6 +738,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 	return ret;
 }
 
+/* This function is to be called if the handshake was successfully 
+ * completed. This sends a Change Cipher Spec packet to the peer.
+ */
 int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 {
 	ChangeCipherSpecType x = GNUTLS_TYPE_CHANGE_CIPHER_SPEC;

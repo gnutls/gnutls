@@ -41,6 +41,10 @@
 #define HASH_TRUE 1
 #define HASH_FALSE 0
 
+/* This is to be called after sending CHANGE CIPHER SPEC packet
+ * and initializing encryption. This is the first encrypted message
+ * we send.
+ */
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
 int _gnutls_send_finished(int cd, GNUTLS_STATE state)
@@ -78,6 +82,9 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
+/* This is to be called after sending our finished message. If everything
+ * went fine we have negotiated a secure connection 
+ */
 int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 {
 	uint8 *data, *vrfy;
@@ -254,6 +261,11 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 }
 
 
+/* This function will receive handshake messages of the given types,
+ * and will pass the message to the right place in order to be processes.
+ * Eg. for the SERVER_HELLO message (if it is expected), it will be
+ * send to _gnutls_recv_hello().
+ */
 int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 				int* datalen, HandshakeType type)
 {
@@ -617,9 +629,11 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 	return ret;
 }
 
+/* This is the main function in the handshake protocol. This does actually
+everything. (exchange hello messages etc).
+
 #define HASH(x) state->gnutls_internals.x=HASH_TRUE
 #define NOT_HASH(x) state->gnutls_internals.x=HASH_FALSE
-
 int gnutls_handshake(int cd, GNUTLS_STATE state)
 {
 	int ret;

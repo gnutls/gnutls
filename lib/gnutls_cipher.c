@@ -100,6 +100,9 @@ int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
 
 /* Sets the current connection state to conform with the
  * Security parameters(pending state), and initializes encryption.
+ * Actually it initializes and starts encryption ( so it needs
+ * secrets and random numbers to have been negotiated)
+ * This is to be called after sending the Change Cipher Spec packet.
  */
 int _gnutls_connection_state_init(GNUTLS_STATE state)
 {
