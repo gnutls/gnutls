@@ -988,7 +988,7 @@ gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert, int *r_bits)
   else if ( is_DSA( algo ) )
     algo = GNUTLS_PK_DSA;
   else
-    algo = GNUTLS_PK_UNKNOWN;
+    algo = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
   cdk_kbnode_release( kb_pk );
   
   return algo;
