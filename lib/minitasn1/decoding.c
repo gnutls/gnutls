@@ -37,7 +37,7 @@ void
 _asn1_error_description_tag_error(node_asn *node,char *ErrorDescription)
 {
 
-  Estrcpy(ErrorDescription,":: tag error near element '");
+  Estrcpy(ErrorDescription,":: tag error near element ' ");
   _asn1_hierarchical_name(node,ErrorDescription+strlen(ErrorDescription),
 			  MAX_ERROR_DESCRIPTION_SIZE-40);
   Estrcat(ErrorDescription,"'");

@@ -27,6 +27,7 @@
 # else
 #  ifdef _AIX
 #pragma alloca
+#  endif
 # endif
 #endif
 

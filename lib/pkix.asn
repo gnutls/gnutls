@@ -1111,14 +1111,8 @@ pkcs-12-AuthenticatedSafe ::= SEQUENCE OF pkcs-7-ContentInfo
 
 pkcs-12-SafeContents ::= SEQUENCE OF pkcs-12-SafeBag
 
--- To replace TYPE-IDENTIFIER
-pkcs-12-BAG-TYPE ::= SEQUENCE {
-     type-id    OBJECT IDENTIFIER,
-     value      [0] EXPLICIT ANY DEFINED BY type-id }
-
-
 pkcs-12-SafeBag ::= SEQUENCE {
-  	bagId	      	pkcs-12-BAG-TYPE,
+  	bagId	      	OBJECT IDENTIFIER,
   	bagValue      	[0] EXPLICIT ANY DEFINED BY badId,
   	bagAttributes 	SET OF pkcs-12-PKCS12Attribute OPTIONAL
 }
@@ -1142,7 +1136,7 @@ pkcs-12-PKCS8ShroudedKeyBag ::= pkcs-8-EncryptedPrivateKeyInfo
 -- CertBag
 
 pkcs-12-CertBag ::= SEQUENCE {
-	certId    pkcs-12-BAG-TYPE,
+	certId    OBJECT IDENTIFIER,
 	certValue [0] EXPLICIT ANY DEFINED BY certId
 }
 
@@ -1150,7 +1144,7 @@ pkcs-12-CertBag ::= SEQUENCE {
 -- DER-encoded X.509 certificate stored in OCTET STRING
 
 pkcs-12-CRLBag ::= SEQUENCE {
-	crlId     	pkcs-12-BAG-TYPE,
+	crlId     	OBJECT IDENTIFIER,
 	crlValue 	[0] EXPLICIT ANY DEFINED BY crlId
 }
 

@@ -35,8 +35,8 @@
 void
 _asn1_hierarchical_name(node_asn *node,char *name,int name_size)
 {
-  char *aux;
   node_asn *p;
+  char tmp_name[64];
   
   p=node;
 
@@ -44,16 +44,16 @@ _asn1_hierarchical_name(node_asn *node,char *name,int name_size)
 
   while(p != NULL){
     if(p->name != NULL){
-      aux=(char*)malloc(strlen(name)+1);
-      strcpy(aux,name);
+      _asn1_str_cpy(tmp_name,sizeof(tmp_name),name);
+
       _asn1_str_cpy(name,name_size,p->name);
       _asn1_str_cat(name,name_size,".");
-      _asn1_str_cat(name,name_size,aux);
-      free(aux);
+      _asn1_str_cat(name,name_size,tmp_name);
     }
     p=_asn1_find_up(p);
   }
-  name[strlen(name)-1]=0;
+  
+  if (name[0]==0) _asn1_str_cpy(name,name_size, "ROOT");
 }
 
 
