@@ -85,6 +85,11 @@ int gnutls_openpgp_recv_key(
     short port,
     uint32 keyid,
     gnutls_datum *key );
+
+int gnutls_certificate_openpgp_get_as_xml(
+    const gnutls_datum *cert,
+    int ext,
+    gnutls_datum *xmlkey );
      
 /* internal */
 int _gnutls_openpgp_cert2gnutls_cert(
