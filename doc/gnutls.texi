@@ -4,7 +4,11 @@
 @setfilename gnutls.info
 @include version.texi
 @settitle GNU TLS @value{VERSION}
+
+@c Unify some of the indices.
+@syncodeindex tp fn
 @syncodeindex pg cp
+
 @comment %**end of header
 @finalout
 @copying
@@ -73,7 +77,8 @@ Free Documentation License''.
 * Certificate to XML convertion functions::
 * All the supported ciphersuites in GnuTLS::
 * Copying This Manual::
-* Index::
+* Concept Index::
+* Function and Data Index::
 @end menu
 
 
@@ -2990,10 +2995,14 @@ draft-ietf-tls-56-bit-ciphersuites
 
 @include fdl.texi
 
-
-@node Index
-@unnumbered Index
+@node Concept Index
+@unnumbered Concept Index
 
 @printindex cp
+
+@node Function and Data Index
+@unnumbered Function and Data Index
+
+@printindex fn
 
 @bye
