@@ -3,6 +3,10 @@
 
 #include <gnutls/gnutls.h>
 
+/* the number of elements in the priority structures.
+ */
+#define PRI_MAX 16
+
 int print_info( gnutls_session state, const char* hostname);
 void print_cert_info( gnutls_session state, const char* hostname);
 void print_list(void);

@@ -78,20 +78,20 @@ static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
 static gnutls_certificate_credentials xcred;
 
-static const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-static const int kx_priority[] =
+int protocol_priority[PRI_MAX] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+int kx_priority[PRI_MAX] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
 	/* Do not use anonymous authentication, unless you know what that means */
 	GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
 };
-static const int cipher_priority[] =
+int cipher_priority[PRI_MAX] =
     { GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_3DES_CBC,
 	GNUTLS_CIPHER_ARCFOUR_40, 0
 };
-static const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
-static const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
-static const int cert_type_priority[] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
+int comp_priority[PRI_MAX] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+int mac_priority[PRI_MAX] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+int cert_type_priority[PRI_MAX] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 /* end of global stuff */
 
