@@ -409,7 +409,7 @@ int gnutls_close_nowait(int cd, GNUTLS_STATE state)
  */
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_data, size_t sizeofdata, int flags)
 {
-	uint8 cipher[MAX_ENC_LEN];
+	uint8 cipher[MAX_ENC_LEN+HEADER_SIZE];
 	int i, cipher_size;
 	int ret = 0;
 	int iterations;
