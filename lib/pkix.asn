@@ -484,6 +484,7 @@ X520countryName ::=     PrintableString (SIZE (2)) -- IS 3166 codes
 pkcs-9 OBJECT IDENTIFIER ::=
        { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 }
 
+
 emailAddress AttributeType      ::= { pkcs-9 1 }
 
 Pkcs9email ::= IA5String (SIZE (1..ub-emailaddress-length))
@@ -1009,5 +1010,65 @@ Pkcs9challengePassword        ::= CHOICE {
       printableString       PrintableString (SIZE (1..pkcs-9-ub-challengePassword)),
       utf8String            UTF8String (SIZE (1..pkcs-9-ub-challengePassword)) }
 
+
+-- PKCS #8 stuff
+
+-- Private-key information syntax
+
+PrivateKeyInfo ::= SEQUENCE {
+  version Version,
+  privateKeyAlgorithm AlgorithmIdentifier,
+  privateKey PrivateKey,
+  attributes [0] Attributes OPTIONAL }
+
+Version ::= INTEGER {v1(0)}
+
+PrivateKey ::= OCTET STRING
+
+Attributes ::= SET OF Attribute
+
+-- Encrypted private-key information syntax
+
+EncryptedPrivateKeyInfo ::= SEQUENCE {
+    encryptionAlgorithm AlgorithmIdentifier,
+    encryptedData EncryptedData 
+}
+
+EncryptedData ::= OCTET STRING
+
+-- PKCS #5 stuff
+
+pkcs-5 OBJECT IDENTIFIER ::=
+       { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 5 }
+
+pkcs-5-encryptionAlgorithm OBJECT IDENTIFIER ::=
+       { iso(1) member-body(2) us(840) rsadsi(113549) 3 }
+
+pkcs-5-des-EDE3-CBC OBJECT IDENTIFIER ::= {pkcs-5-encryptionAlgorithm 7}
+
+pkcs-5-des-EDE3-CBC-params ::= OCTET STRING (SIZE(8))
+
+pkcs-5-id-PBES2 OBJECT IDENTIFIER ::= {pkcs-5 13}
+
+pkcs-5-PBES2-params ::= SEQUENCE {
+  keyDerivationFunc AlgorithmIdentifier,
+  encryptionScheme AlgorithmIdentifier }
+
+-- PBKDF2
+
+pkcs-5-id-PBKDF2 OBJECT IDENTIFIER ::= {pkcs-5 12}
+
+-- pkcs-5-algid-hmacWithSHA1 AlgorithmIdentifier ::=
+--  {algorithm pkcs-5-id-hmacWithSHA1, parameters NULL : NULL}
+
+pkcs-5-PBKDF2-params ::= SEQUENCE {
+  salt CHOICE {
+    specified OCTET STRING,
+    otherSource AlgorithmIdentifier
+  },
+  iterationCount INTEGER (1..MAX),
+  keyLength INTEGER (1..MAX) OPTIONAL,
+  prf AlgorithmIdentifier OPTIONAL -- DEFAULT pkcs-5-algid-hmacWithSHA1 
+}
 
 END

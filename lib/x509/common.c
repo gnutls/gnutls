@@ -37,13 +37,6 @@ typedef struct _oid2string {
 	int printable;
 } oid2string;
 
-#define PKIX1_RSA_OID "1.2.840.113549.1.1.1"
-#define DSA_OID "1.2.840.10040.4.1"
-
-#define DSA_SHA1_OID "1.2.840.10040.4.3"
-#define RSA_MD5_OID "1.2.840.113549.1.1.4"
-#define RSA_SHA1_OID "1.2.840.113549.1.1.5"
-
 static const oid2string OID2STR[] = {
 	{"2.5.4.6", "X520countryName", "C", 0, 1},
 	{"2.5.4.12", "X520title", "T", 1, 1},

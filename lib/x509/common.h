@@ -7,6 +7,13 @@ void _gnutls_int2str(unsigned int k, char *data);
 #define PEM_X509_CERT2 "CERTIFICATE"
 #define PEM_PKCS7 "PKCS7"
 
+#define PKIX1_RSA_OID "1.2.840.113549.1.1.1"
+#define DSA_OID "1.2.840.10040.4.1"
+
+#define DSA_SHA1_OID "1.2.840.10040.4.3"
+#define RSA_MD5_OID "1.2.840.113549.1.1.4"
+#define RSA_SHA1_OID "1.2.840.113549.1.1.5"
+
 time_t _gnutls_x509_utcTime2gtime(char *ttime);
 time_t _gnutls_x509_generalTime2gtime(char *ttime);
 

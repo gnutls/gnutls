@@ -39,4 +39,7 @@ int _gnutls_x509_read_int( ASN1_TYPE node, const char* value,
 	char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi);
 int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, GNUTLS_MPI mpi);
 
+int _gnutls_x509_read_ui( ASN1_TYPE node, const char* value, 
+	opaque* tmpstr, int tmpstr_size, unsigned int* ret);
+
 #endif

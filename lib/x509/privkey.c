@@ -77,7 +77,7 @@ int i;
 /* Converts an RSA PKCS#1 key to
  * an internal structure (gnutls_private_key)
  */
-static ASN1_TYPE decode_pkcs1_rsa_key( const gnutls_datum *raw_key, 
+ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key( const gnutls_datum *raw_key, 
 	gnutls_x509_privkey pkey) 
 {
 	int result;
@@ -259,7 +259,7 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
 
 /**
-  * gnutls_x509_privkey_import - This function will import a DER or PEM encoded Certificate
+  * gnutls_x509_privkey_import - This function will import a DER or PEM encoded key
   * @key: The structure to store the parsed key
   * @data: The DER or PEM encoded certificate.
   * @format: One of DER or PEM
@@ -267,8 +267,8 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
   * This function will convert the given DER or PEM encoded key
   * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
   *
-  * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
-  * "CERTIFICATE".
+  * If the key is PEM encoded it should have a header of "RSA PRIVATE KEY", or
+  * "DSA PRIVATE KEY".
   *
   * Returns 0 on success.
   *
@@ -311,7 +311,7 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
 	}
 
 	if (key->pk_algorithm == GNUTLS_PK_RSA) {
-		key->key = decode_pkcs1_rsa_key( &_data, key);
+		key->key = _gnutls_privkey_decode_pkcs1_rsa_key( &_data, key);
 		if (key->key == NULL) {
 			gnutls_assert();
 			result = GNUTLS_E_ASN1_DER_ERROR;
@@ -333,7 +333,7 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
 
 		if (key->key == NULL) {
 			key->pk_algorithm = GNUTLS_PK_RSA;
-			key->key = decode_pkcs1_rsa_key( &_data, key);
+			key->key = _gnutls_privkey_decode_pkcs1_rsa_key( &_data, key);
 			if (key->key == NULL) {
 				gnutls_assert();
 				result = GNUTLS_E_ASN1_DER_ERROR;
