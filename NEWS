@@ -1,5 +1,6 @@
 Version 1.1.18
 - Corrected handling of certificate with dates after year 2038.
+- Corrected DER decoder which could incorrectly treat input as BER and fail.
 - Added example client and server for anonymous authentication.
 - Added self test that tests anonymous TLS client and server.
 - Assume C89 or better; removed checks for size_t, ptrdiff_t and time_t.
