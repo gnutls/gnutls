@@ -57,6 +57,8 @@ static const gnutls_alert_entry sup_alerts[] = {
 	{ GNUTLS_A_CERTIFICATE_UNOBTAINABLE, "Could not retrieve the specified certificate" },
 	{ GNUTLS_A_UNSUPPORTED_EXTENSION, "An unsupported extension was sent" },
 	{ GNUTLS_A_UNRECOGNIZED_NAME, "The server name sent was not recognized" },
+	{ GNUTLS_A_UNKNOWN_SRP_USERNAME, "The SRP username is not known" },
+	{ GNUTLS_A_MISSING_SRP_USERNAME, "The SRP username was not sent" },
 	{0, NULL}
 };
 
@@ -150,9 +152,7 @@ int _level = -1;
 			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_EMPTY_SRP_USERNAME:
-			/* FIXME: needs to be changed
-			 */
-			ret = GNUTLS_A_ACCESS_DENIED;
+			ret = GNUTLS_A_MISSING_SRP_USERNAME;
 			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
@@ -181,13 +181,16 @@ int _level = -1;
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
 		case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
-                case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
                 case GNUTLS_E_INSUFICIENT_CREDENTIALS:
 		case GNUTLS_E_NO_CIPHER_SUITES:
 		case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
                         ret = GNUTLS_A_HANDSHAKE_FAILURE;
 			_level = GNUTLS_AL_FATAL;
                         break;
+                case GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION:
+                	ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
+                	_level = GNUTLS_AL_FATAL;
+                	break;
 		case GNUTLS_E_UNEXPECTED_PACKET:
                         ret = GNUTLS_A_UNEXPECTED_MESSAGE;
 			_level = GNUTLS_AL_FATAL;

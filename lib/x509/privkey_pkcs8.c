@@ -894,54 +894,6 @@ int key_size;
 }
 
 
-
-/* DER Encodes the src ASN1_TYPE and stores it to
- * dest in dest_name. Usefull to encode something and store it
- * as OCTET.
- */
-int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
-	ASN1_TYPE dest, const char* dest_name)
-{
-int size, result;
-opaque *data = NULL;
-
-	size = 0;
-	result = asn1_der_coding( src, src_name, NULL, &size, NULL);
-	if (result != ASN1_MEM_ERROR) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* allocate data for the der
-	 */
-	data = gnutls_alloca( size);
-	if (data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = asn1_der_coding( src, src_name, data, &size, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		gnutls_afree(data);
-		return _gnutls_asn2err(result);
-	}
-	
-	/* Write the key derivation algorithm
-	 */
-	result = asn1_write_value( dest, dest_name, data, size);
-
-	gnutls_afree(data);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	return 0;
-}
-
-
 /* Writes the PBKDF2 parameters.
  */
 static int write_pbkdf2_params( ASN1_TYPE pbes2_asn, const struct pbkdf2_params *kdf_params)

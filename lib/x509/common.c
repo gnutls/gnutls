@@ -27,6 +27,7 @@
 #include <gnutls_str.h>
 #include <gnutls_x509.h>
 #include <gnutls_num.h>
+#include <x509_b64.h>
 #include <common.h>
 
 typedef struct _oid2string {
@@ -486,4 +487,127 @@ gnutls_x509_subject_alt_name _gnutls_x509_san_find_type( char* str_type) {
 	if (strcmp( str_type, "uniformResourceIdentifier")==0) return GNUTLS_SAN_URI;
 	if (strcmp( str_type, "iPAddress")==0) return GNUTLS_SAN_IPADDRESS;
 	return -1;
+}
+
+/* A generic export function. Will export the given ASN.1 encoded data
+ * to PEM or DER raw data.
+ */
+int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
+	gnutls_x509_crt_fmt format, char* pem_header,
+	int tmp_buf_size, unsigned char* output_data, int* output_data_size)
+{
+	int result;
+	if (tmp_buf_size == 0) tmp_buf_size = 16*1024;
+	
+	if (format == GNUTLS_X509_FMT_DER) {
+		if (output_data == NULL) *output_data_size = 0;
+	
+		if ((result=asn1_der_coding( asn1_data, "", output_data, output_data_size, NULL)) != ASN1_SUCCESS) {
+			if (result == ASN1_MEM_ERROR)
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
+
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+	} else { /* PEM */
+		opaque *tmp;
+		opaque *out;
+		int len = tmp_buf_size;
+		
+		tmp = gnutls_alloca( len);
+		if (tmp == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			if (result == ASN1_MEM_ERROR) {
+				_gnutls_x509_log("Length required for der coding: %d\n", len);
+				*output_data_size = B64FSIZE(strlen(pem_header),len);
+			}
+			gnutls_afree(tmp);
+			return _gnutls_asn2err(result);
+		}
+
+		result = _gnutls_fbase64_encode( pem_header,
+						tmp, len, &out);
+
+		gnutls_afree(tmp);
+
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		if (result == 0) {	/* oooops */
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		if (result + 1 > *output_data_size) {
+			gnutls_assert();
+			gnutls_free(out);
+			*output_data_size = result;
+			return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		}
+
+		*output_data_size = result;
+		
+		if (output_data) {
+			memcpy( output_data, out, result);
+			output_data[result] = 0;
+		}
+		gnutls_free( out);
+		
+	}
+
+	return 0;
+}
+
+/* DER Encodes the src ASN1_TYPE and stores it to
+ * dest in dest_name. Usefull to encode something and store it
+ * as OCTET.
+ */
+int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
+	ASN1_TYPE dest, const char* dest_name)
+{
+int size, result;
+opaque *data = NULL;
+
+	size = 0;
+	result = asn1_der_coding( src, src_name, NULL, &size, NULL);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* allocate data for the der
+	 */
+	data = gnutls_alloca( size);
+	if (data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	result = asn1_der_coding( src, src_name, data, &size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		gnutls_afree(data);
+		return _gnutls_asn2err(result);
+	}
+	
+	/* Write the key derivation algorithm
+	 */
+	result = asn1_write_value( dest, dest_name, data, size);
+
+	gnutls_afree(data);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
 }

@@ -64,9 +64,6 @@ typedef struct gnutls_x509_privkey_int {
 	ASN1_TYPE key;
 } gnutls_x509_privkey_int;
 
-int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
-	ASN1_TYPE dest, const char* dest_name);
-
 typedef struct gnutls_x509_crt_int *gnutls_x509_crt;
 typedef struct gnutls_x509_crl_int *gnutls_x509_crl;
 typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey;
@@ -140,8 +137,5 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
 
-int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
-	gnutls_x509_crt_fmt format, char* pem_header,
-	int tmp_buf_size, unsigned char* output_data, int* output_data_size);
 
 #endif
