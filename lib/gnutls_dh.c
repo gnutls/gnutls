@@ -98,7 +98,7 @@ MPI _gnutls_calc_dh_secret(MPI * ret_x)
 	return e;
 }
 
-MPI __gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
+MPI _gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 {
 	MPI e, x;
 
@@ -152,7 +152,7 @@ MPI _gnutls_calc_dh_key(MPI f, MPI x)
 	return k;
 }
 
-MPI __gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
+MPI _gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 {
 	MPI k;
 
