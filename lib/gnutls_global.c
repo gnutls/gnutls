@@ -32,7 +32,7 @@ extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 
 LOG_FUNC _gnutls_log_func;
-int _gnutls_log_level = 2; /* default log level */
+int _gnutls_log_level = 1; /* default log level */
 
 static ASN1_TYPE PKIX1_ASN;
 static ASN1_TYPE GNUTLS_ASN;

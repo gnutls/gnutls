@@ -1,7 +1,7 @@
 /*
- *      Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -209,18 +209,22 @@ const gnutls_certificate_credentials cred;
 
 int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _data_size)
 {
-	gnutls_sdatum plaintext;
+	gnutls_sdatum plaintext = { NULL, 0 };
 	gnutls_datum ciphertext;
 	int ret, dsize;
 	GNUTLS_MPI *params;
 	int params_len;
+	int randomize_key = 0;
 	ssize_t data_size = _data_size;
 
 	if (gnutls_protocol_get_version(session) == GNUTLS_SSL3) {
-		/* SSL 3.0 */
+		/* SSL 3.0 
+		 */
 		ciphertext.data = data;
 		ciphertext.size = data_size;
-	} else {		/* TLS 1 */
+	} else {
+		/* TLS 1.0
+		 */
 		DECR_LEN( data_size, 2);
 		ciphertext.data = &data[2];
 		dsize = _gnutls_read_uint16(data);
@@ -242,32 +246,52 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 		params_len, 2);	/* btype==2 */
 
 	if (ret < 0 || plaintext.size != TLS_MASTER_SIZE) {
-		/* in case decryption fails then don't inform
+		/* In case decryption fails then don't inform
 		 * the peer. Just use a random key. (in order to avoid
 		 * attack against pkcs-1 formating).
 		 */
-		ret = 0;
 		gnutls_assert();
-		_gnutls_x509_log("auth_rsa: Possible PKCS-1 format attack\n");
+		_gnutls_x509_log("auth_rsa: Possible PKCS #1 format attack\n");
+		randomize_key = 1;
+	} else {
+		/* If the secret was properly formatted, then
+		 * check the version number.
+		 */
+		if (_gnutls_get_adv_version_major(session) != plaintext.data[0]
+		    || _gnutls_get_adv_version_minor(session) != plaintext.data[1]) 
+		{
+		    	/* No error is returned here, if the version number check
+		    	 * fails. We proceed normally.
+		    	 * That is to defend against the attack described in the paper
+		    	 * "Attacking RSA-based sessions in SSL/TLS" by Vlastimil Klima,
+		    	 * Ondej Pokorny and Tomas Rosa.
+		    	 */
+			gnutls_assert();
+			_gnutls_x509_log("auth_rsa: Possible PKCS #1 version check format attack\n");
+		}
+	}
+
+	if (randomize_key != 0) {
+		/* if the pkcs1 padding check failed, no need for
+		 * that. That's why it has been initialized to zero.
+		 */
+		_gnutls_free_datum( &plaintext);
 
 		RANDOMIZE_KEY(session->key->key,
-			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
-	} else {
-		ret = 0;
-		if (session->internals.rsa_pms_check==0)
-			if (_gnutls_get_adv_version_major(session) !=
-			    plaintext.data[0]
-			    || _gnutls_get_adv_version_minor(session) !=
-			    plaintext.data[1]) {
-				gnutls_assert();
-				ret = GNUTLS_E_DECRYPTION_FAILED;
-			}
+			      gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
 
+	} else {
 		session->key->key.data = plaintext.data;
 		session->key->key.size = plaintext.size;
 	}
 
-	return ret;
+	/* This is here to avoid the version check attack
+	 * discussed above.
+	 */
+	session->key->key.data[0] = _gnutls_get_adv_version_major(session);
+	session->key->key.data[1] = _gnutls_get_adv_version_minor(session);
+
+	return 0;
 }
 
 
@@ -294,8 +318,13 @@ int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 
 	ver = _gnutls_get_adv_version(session);
 
-	session->key->key.data[0] = _gnutls_version_get_major(ver);
-	session->key->key.data[1] = _gnutls_version_get_minor(ver);
+	if (session->internals.rsa_pms_version[0] == 0) {
+		session->key->key.data[0] = _gnutls_version_get_major(ver);
+		session->key->key.data[1] = _gnutls_version_get_minor(ver);
+	} else { /* use the version provided */
+		session->key->key.data[0] = session->internals.rsa_pms_version[0];
+		session->key->key.data[1] = session->internals.rsa_pms_version[1];
+	}
 
 	/* move RSA parameters to key (session).
 	 */

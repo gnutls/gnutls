@@ -6,6 +6,12 @@ Version 0.9.3
   by allowing debugging messages just by increasing the level.
 - The diffie Hellman ciphersuites are now of higher priority than
   the plain RSA.
+- The RSA premaster secret version check can no longer be disabled.
+- Implemented the counter measure discussed in the paper "Attacking
+  RSA-based Sessions in SSL/TLS", against the attack discussed in the
+  same paper.
+- Added the functions: gnutls_handshake_get_last_in(), 
+  gnutls_handshake_get_last_out().
 
 Version 0.9.2 (15/03/2003)
 - Some corrections in the memory mapping code (file is unmapped after 

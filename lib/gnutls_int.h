@@ -132,6 +132,8 @@ typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_S
 		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
 		     GNUTLS_FINISHED=20 } HandshakeType;
 
+typedef HandshakeType gnutls_handshake_description;
+
 typedef struct {
 	opaque * data;
 	unsigned int size;
@@ -441,6 +443,12 @@ typedef struct {
 	int				may_write;
 
 	int				last_alert; /* last alert received */
+
+	/* The last handshake messages sent or received.
+	 */
+	int				last_handshake_in;
+	int				last_handshake_out;
+
 	/* this is the compression method we are going to use */
 	gnutls_compression_method		compression_method;
 	/* priorities */
@@ -575,8 +583,6 @@ typedef struct {
 
 	int			cbc_protection_hack;
 
-	int			rsa_pms_check; /* 0 means enabled */
-
 	void*			user_ptr;
 
 	int			enable_private;/* non zero to
@@ -598,6 +604,12 @@ typedef struct {
 	 * trusts (do not send an RDN sequence).
 	 */
 	int			ignore_rdn_sequence;
+
+	/* This is used to set an arbitary version in the RSA
+	 * PMS secret. Can be used by clients to test whether the
+	 * server checks that version.
+	 */
+	opaque			rsa_pms_version[2];
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

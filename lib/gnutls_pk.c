@@ -30,6 +30,7 @@
 #include <gnutls_random.h>
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
+#include <gnutls_num.h>
 #include "debug.h"
 
 static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GNUTLS_MPI * pkey, int pkey_len);
@@ -85,13 +86,35 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		
-		if ( (ret=_gnutls_get_random(ps, psize, GNUTLS_WEAK_RANDOM)) < 0) {
+		if ( (ret=_gnutls_get_random(ps, psize, GNUTLS_STRONG_RANDOM)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
 		for (i = 0; i < psize; i++) {
-			if (ps[i] == 0)
-				ps[i] = 0xff;
+			opaque rnd[3];
+
+			/* Read three random bytes that will be
+			 * used to replace the zeros.
+			 */
+			if ( (ret=_gnutls_get_random( rnd, 3, GNUTLS_STRONG_RANDOM)) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			/* use non zero values for 
+			 * the first two.
+			 */
+			if (rnd[0]==0) rnd[0] = 0xaf;
+			if (rnd[1]==0) rnd[1] = 0xae;
+
+			if (ps[i] == 0) {
+				/* If the first one is zero then set it to rnd[0].
+				 * If the second one is zero then set it to rnd[1].
+				 * Otherwise add (mod 256) the two previous ones plus rnd[3], or use
+				 * rnd[1] if the value == 0.
+				 */
+				if (i<2) ps[i] = rnd[i];
+				else ps[i] = GMAX( rnd[3] + ps[i-1] + ps[i-2], rnd[1]);
+			}
 		}
 		break;
 	case 1:

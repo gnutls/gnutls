@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -766,6 +766,8 @@ int _gnutls_send_handshake(gnutls_session session, void *i_data,
 				return ret;
 		}
 
+	session->internals.last_handshake_out = type;
+
 	ret =
 	    _gnutls_handshake_io_send_int(session, GNUTLS_HANDSHAKE, type,
 				       data, datasize);
@@ -979,6 +981,7 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 		return ret;
 	}
 
+	session->internals.last_handshake_in = recv_type;
 
 	length32 = ret;
 
@@ -2251,18 +2254,17 @@ int _gnutls_handshake_common(gnutls_session session)
 int _gnutls_generate_session_id(char *session_id, uint8 * len)
 {
 	char buf[64];
-	opaque rand[TLS_RANDOM_SIZE];
 
-	if (_gnutls_get_random(rand, TLS_RANDOM_SIZE, GNUTLS_WEAK_RANDOM) <
+	*len = TLS_RANDOM_SIZE;
+
+	if (_gnutls_get_random(session_id, *len, GNUTLS_WEAK_RANDOM) <
 	    0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	memcpy(session_id, rand, TLS_RANDOM_SIZE);
-	*len = TLS_RANDOM_SIZE;
 
 	_gnutls_handshake_log("HSK: Generated SessionID: %s\n",
-		    _gnutls_bin2hex(session_id, TLS_RANDOM_SIZE, buf, sizeof(buf)));
+		    _gnutls_bin2hex(session_id, *len, buf, sizeof(buf)));
 
 	return 0;
 }
@@ -2442,5 +2444,36 @@ void _gnutls_set_adv_version( gnutls_session session, gnutls_protocol_version ve
 gnutls_protocol_version _gnutls_get_adv_version( gnutls_session session) {
 	return _gnutls_version_get( _gnutls_get_adv_version_major( session), 
 		_gnutls_get_adv_version_minor( session));
+}
+
+/**
+  * gnutls_handshake_get_last_in - Returns the last handshake message received.
+  * @session: is a &gnutls_session structure.
+  *
+  * Returns the last handshake message received. This function is only useful
+  * to check where the last performed handshake failed. If the previous handshake
+  * succeed or was not performed at all then no meaningful value will be returned.
+  *
+  * Check gnutls.h for the available handshake descriptions.
+  **/
+gnutls_handshake_description gnutls_handshake_get_last_in( gnutls_session session) 
+{
+	return session->internals.last_handshake_in;
+}
+
+/**
+  * gnutls_handshake_get_last_out - Returns the last handshake message sent.
+  * @session: is a &gnutls_session structure.
+  *
+  * Returns the last handshake message sent. This function is only useful
+  * to check where the last performed handshake failed. If the previous handshake
+  * succeed or was not performed at all then no meaningful value will be returned.
+  *
+  * Check gnutls.h for the available handshake descriptions.
+  *
+  **/
+gnutls_handshake_description gnutls_handshake_get_last_out( gnutls_session session) 
+{
+	return session->internals.last_handshake_out;
 }
 

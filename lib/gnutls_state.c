@@ -135,6 +135,12 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 	session->internals.adv_version_minor = 0;
 	session->internals.direction = 0;
 
+	/* use out of band data for the last
+	 * handshake messages received.
+	 */
+	session->internals.last_handshake_in = -1;
+	session->internals.last_handshake_out = -1;
+
 	session->internals.resumable = RESUME_TRUE;
 
 }
@@ -535,28 +541,6 @@ void gnutls_handshake_set_private_extensions(gnutls_session session, int allow)
 	session->internals.enable_private = allow;
 }
 
-/**
-  * gnutls_handshake_set_rsa_pms_check - Used to disable the RSA PMS check
-  * @session: is a &gnutls_session structure.
-  * @prot: is an integer (0 or 1)
-  *
-  * The TLS 1.0 handshake protocol includes a check in the in the RSA
-  * encrypted data (only in the case of RSA key exchange), which allows
-  * to detect version roll back attacks. 
-  *
-  * However it seems that some broken TLS clients exist which do not
-  * use this check properly. The only solution is to disable this
-  * check completely.
-  *
-  * if check == 0 then the check is enabled (default), otherwise it
-  * is disabled.
-  *
-  **/
-void gnutls_handshake_set_rsa_pms_check(gnutls_session session, int check)
-{
-	session->internals.rsa_pms_check = check;
-}
-
 inline
 static void _gnutls_cal_PRF_A( gnutls_mac_algorithm algorithm, const void *secret, int secret_size, const void *seed, int seed_size, void* result)
 {
@@ -783,3 +767,20 @@ int gnutls_record_get_direction(gnutls_session session) {
 	return session->internals.direction;
 }
 
+/*-
+  * _gnutls_rsa_pms_set_version - Sets a version to be used at the RSA PMS
+  * @session: is a &gnutls_session structure.
+  * @major: is the major version to use
+  * @minor: is the minor version to use
+  *
+  * This function will set the given version number to be used at the
+  * RSA PMS secret. This is only useful to clients, which want to
+  * test server's capabilities.
+  *
+  -*/
+void _gnutls_rsa_pms_set_version(gnutls_session session, unsigned char major,
+	unsigned char minor)
+{
+	session->internals.rsa_pms_version[0] = major;
+	session->internals.rsa_pms_version[1] = minor;
+}

@@ -84,8 +84,9 @@ typedef enum gnutls_connection_end { GNUTLS_SERVER=1, GNUTLS_CLIENT } gnutls_con
 
 typedef enum gnutls_alert_level { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } gnutls_alert_level;
 
-typedef enum gnutls_alert_description { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE=10, GNUTLS_A_BAD_RECORD_MAC=20,
-	GNUTLS_A_DECRYPTION_FAILED, GNUTLS_A_RECORD_OVERFLOW,  GNUTLS_A_DECOMPRESSION_FAILURE=30,
+typedef enum gnutls_alert_description { GNUTLS_A_CLOSE_NOTIFY, 
+	GNUTLS_A_UNEXPECTED_MESSAGE=10, GNUTLS_A_BAD_RECORD_MAC=20,
+	GNUTLS_A_DECRYPTION_FAILED, GNUTLS_A_RECORD_OVERFLOW, GNUTLS_A_DECOMPRESSION_FAILURE=30,
 	GNUTLS_A_HANDSHAKE_FAILURE=40, GNUTLS_A_SSL3_NO_CERTIFICATE=41,
 	GNUTLS_A_BAD_CERTIFICATE=42, GNUTLS_A_UNSUPPORTED_CERTIFICATE,
 	GNUTLS_A_CERTIFICATE_REVOKED, GNUTLS_A_CERTIFICATE_EXPIRED, GNUTLS_A_CERTIFICATE_UNKNOWN,
@@ -95,6 +96,14 @@ typedef enum gnutls_alert_description { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECT
 	GNUTLS_A_NO_RENEGOTIATION=100, GNUTLS_A_UNSUPPORTED_EXTENSION=110,
 	GNUTLS_A_CERTIFICATE_UNOBTAINABLE=111, GNUTLS_A_UNRECOGNIZED_NAME=112
 } gnutls_alert_description;
+
+typedef enum gnutls_handshake_description { GNUTLS_HANDSHAKE_HELLO_REQUEST, 
+	GNUTLS_HANDSHAKE_CLIENT_HELLO, GNUTLS_HANDSHAKE_SERVER_HELLO,
+	GNUTLS_HANDSHAKE_CERTIFICATE_PKT=11, GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE,
+	GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST, GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
+	GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY, GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE,
+	GNUTLS_HANDSHAKE_FINISHED=20 
+} gnutls_handshake_description;
 
 typedef enum gnutls_certificate_status { 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
@@ -184,8 +193,11 @@ const char* gnutls_strerror( int error);
 /* Semi-internal functions.
  */
 void gnutls_handshake_set_private_extensions(gnutls_session session, int allow);
-void gnutls_record_set_cbc_protection(gnutls_session session, int prot);
 void gnutls_handshake_set_rsa_pms_check(gnutls_session session, int check);
+gnutls_handshake_description gnutls_handshake_get_last_out( gnutls_session session);
+gnutls_handshake_description gnutls_handshake_get_last_in( gnutls_session session);
+
+void gnutls_record_set_cbc_protection(gnutls_session session, int prot);
 
 /* Record layer functions.
  */

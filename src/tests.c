@@ -44,6 +44,7 @@ static char *session_data = NULL;
 static char session_id[32];
 static int session_data_size=0, session_id_size=0;
 static int sfree=0;
+static int handshake_output = 0;
 
 int do_handshake( gnutls_session session) {
 int ret, alert;
@@ -52,6 +53,8 @@ int ret, alert;
 			ret = gnutls_handshake(session);
 		} while (ret == GNUTLS_E_INTERRUPTED
 			 || ret == GNUTLS_E_AGAIN);
+	
+		handshake_output = ret;
 
 		if (ret < 0 && more_info != 0) {
 			printf("\n");
@@ -496,7 +499,8 @@ int ret;
 	 * and we connect using a 3.1 client hello version,
 	 * and a 3.0 record version. Some implementations
 	 * are buggy (and vulnerable to man in the middle
-	 * attacks) and this connection will fail.
+	 * attacks which allow a version downgrade) and this 
+	 * connection will fail.
 	 */
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -514,6 +518,31 @@ int ret;
 		return FAILED;
 	
 	return SUCCEED;
+}
+
+void _gnutls_rsa_pms_set_version(gnutls_session session, unsigned char major,
+        unsigned char minor);
+
+int test_rsa_pms_version_check( gnutls_session session) 
+{
+int ret;
+	/* here we use an arbitary version in the RSA PMS
+	 * to see whether to server will check this version.
+	 *
+	 * A normal server would abort this handshake.
+	 */
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	_gnutls_rsa_pms_set_version( session, 5, 5); /* use SSL 5.5 version */
+
+	ret = do_handshake( session);
+	return ret;
+
 }
 
 
