@@ -1,3 +1,34 @@
+2002-11-02 08:41  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/ext_cert_type.c, lib/ext_max_record.c,
+	lib/ext_server_name.c, lib/gnutls_alert.c, lib/gnutls_buffers.c,
+	lib/gnutls_cert.c, lib/gnutls_dh_primes.c, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, lib/gnutls_handshake.c,
+	lib/gnutls_record.c, lib/gnutls_rsa_export.c,
+	lib/gnutls_session_pack.c, lib/gnutls_ui.c, lib/x509_b64.c:
+
+	Combined GNUTLS_E_INVALID_PARAMETERS wich GNUTLS_E_INVALID_REQUEST.
+	Introduced GNUTLS_E_SHORT_MEMORY_BUFFER.  
+
+2002-11-02 08:37  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_x509.c, x509_xml.c:
+
+	Fixed some memory leaks which may occured on error cases.  
+
+2002-11-01 21:29  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_x509.c, src/common.c:
+
+	gnutls_x509_extract_certificate_dn_string() was rewritten.  
+
+2002-11-01 18:33  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	Added a check for dn extraction failure in
+	gnutls_x509_extract_certificate_dn_string().  
+
 2002-10-29 14:03  twoaday <twoaday@gnutls.org>
 
 	* configure.in:
