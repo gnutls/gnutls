@@ -519,7 +519,7 @@ _asn1_expand_object_id(ASN1_TYPE node)
 {
   node_asn *p,*p2,*p3,*p4,*p5;
   char name_root[MAX_NAME_SIZE],name2[2*MAX_NAME_SIZE+1];
-  int move;
+  int move, tlen;
  
   if(node==NULL) return ASN1_ELEMENT_NOT_FOUND;
 
@@ -548,7 +548,9 @@ _asn1_expand_object_id(ASN1_TYPE node)
 	      if(type_field(p4->type)==TYPE_CONSTANT){
 		p5=_asn1_add_node_only(TYPE_CONSTANT);
 		_asn1_set_name(p5,p4->name);
-		_asn1_set_value(p5,p4->value,strlen(p4->value)+1);
+		tlen = strlen( p4->value);
+		if (tlen > 0)
+		    _asn1_set_value(p5,p4->value,tlen+1);
 		if(p2==p){
 		  _asn1_set_right(p5,p->down);
 		  _asn1_set_down(p,p5);
@@ -612,7 +614,9 @@ _asn1_expand_object_id(ASN1_TYPE node)
 	    }
 	    p4=p4->right;
 	  }
-	  _asn1_set_value(p2,name2,strlen(name2)+1);
+	  tlen = strlen(name2);
+	  if (tlen > 0)
+	      _asn1_set_value(p2,name2,tlen+1);
 	}
       }
       move=DOWN;

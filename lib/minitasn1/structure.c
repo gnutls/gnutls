@@ -342,7 +342,7 @@ node_asn *
 _asn1_copy_structure3(node_asn *source_node)
 {
   node_asn *dest_node,*p_s,*p_d,*p_d_prev;
-  int len,len2,move;
+  int len,len2,move, tlen;
 
   if(source_node==NULL) return NULL;
 
@@ -365,7 +365,10 @@ _asn1_copy_structure3(node_asn *source_node)
 	  _asn1_set_value(p_d,p_s->value,len+len2);
 	  break;
 	default:
-	  _asn1_set_value(p_d,p_s->value,strlen(p_s->value)+1);
+	  tlen = strlen(p_s->value);
+	  
+	  if (tlen > 0)
+	      _asn1_set_value(p_d,p_s->value,tlen+1);
 	}
       }
       move=DOWN;
@@ -419,7 +422,7 @@ asn1_retCode
 _asn1_type_choice_config(node_asn *node)
 {
   node_asn *p,*p2,*p3,*p4;
-  int move;
+  int move,tlen;
  
   if(node==NULL) return ASN1_ELEMENT_NOT_FOUND;
 
@@ -438,7 +441,9 @@ _asn1_type_choice_config(node_asn *node)
 	    while(p3){
 	      if(type_field(p3->type)==TYPE_TAG){
 		p4=_asn1_add_node_only(p3->type);
-		_asn1_set_value(p4,p3->value,strlen(p3->value)+1);
+		tlen = strlen(p3->value);
+		if (tlen > 0)
+		    _asn1_set_value(p4,p3->value,tlen+1);
 		_asn1_set_right(p4,p2->down);
 		_asn1_set_down(p2,p4);
 	      }

@@ -246,7 +246,7 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
 
   max_len=*der_len;
 
-  temp=(char *) _asn1_alloca(strlen(str)+2);
+  temp= (char *) _asn1_alloca(strlen(str)+2);
   if(temp==NULL) return ASN1_MEM_ALLOC_ERROR;
 
   strcpy(temp, str);
@@ -742,7 +742,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 {
   node_asn *node,*p,*p2;
   char temp[SIZEOF_UNSIGNED_LONG_INT*3+1];
-  int counter,counter_old,len2,len3,move,max_len,max_len_old;
+  int counter,counter_old,len2,len3,tlen,move,max_len,max_len_old;
   asn1_retCode ris;
   unsigned char* der = ider;
 
@@ -875,7 +875,9 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
     case TYPE_SEQUENCE: case TYPE_SET: 
       if(move!=UP){
 	_asn1_ltostr(counter,temp);
-	_asn1_set_value(p,temp,strlen(temp)+1);
+	tlen = strlen(temp);
+	if (tlen > 0)
+	   _asn1_set_value(p,temp,tlen+1);
 	if(p->down==NULL){
 	  move=UP;
 	  continue;
@@ -910,7 +912,10 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
     case TYPE_SEQUENCE_OF: case TYPE_SET_OF:
       if(move!=UP){
 	_asn1_ltostr(counter,temp);
-	_asn1_set_value(p,temp,strlen(temp)+1);
+	tlen = strlen(temp);
+	
+	if (tlen > 0)
+	   _asn1_set_value(p,temp,tlen+1);
 	p=p->down;
 	while((type_field(p->type)==TYPE_TAG) || (type_field(p->type)==TYPE_SIZE)) p=p->right;
 	if(p->right){
