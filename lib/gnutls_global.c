@@ -331,7 +331,7 @@ static const char *parse_version_string(const char *s, int *major,
   **/
 const char *gnutls_check_version(const char *req_version)
 {
-    const char *ver = GNUTLS_VERSION;
+    const char *ver = VERSION;
     int my_major, my_minor, my_micro;
     int rq_major, rq_minor, rq_micro;
     const char *my_plvl, *rq_plvl;
