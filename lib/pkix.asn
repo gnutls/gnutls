@@ -200,8 +200,8 @@ DistributionPoint ::= SEQUENCE {
 -- This does not work since it does not tag elements.
 
 DistributionPointName ::= SEQUENCE {
-     fullName                [0]     GeneralNames
---     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
+     fullName                [0]     GeneralNames OPTIONAL,
+     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName OPTIONAL
 }
 
 ReasonFlags ::= BIT STRING {

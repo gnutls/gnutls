@@ -687,6 +687,8 @@ int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name type,
 	}
 #endif
 
+	asn1_write_value( ext, "?LAST.distributionPoint.nameRelativeToCRLIssuer", NULL, 0);
+
 	result = write_new_general_name(ext, "?LAST.distributionPoint.fullName", type, data_string);
 	if (result < 0) {
 		gnutls_assert();
