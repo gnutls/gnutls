@@ -55,6 +55,7 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("The Diffie Hellman prime sent by the server is not acceptable (not long enough).", GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1 ), 
 	ERROR_ENTRY("A TLS packet with unexpected length was received.", GNUTLS_E_UNEXPECTED_PACKET_LENGTH, 1 ), 
 	ERROR_ENTRY("The specified session has been invalidated for some reason.", GNUTLS_E_INVALID_SESSION, 1 ), 
+	ERROR_ENTRY("The specified name does not match the name in the certificate.", GNUTLS_E_NAME_DOES_NOT_MATCH, 1 ), 
 
 	ERROR_ENTRY("GnuTLS internal error.", GNUTLS_E_INTERNAL_ERROR, 1 ), 
 	ERROR_ENTRY("An illegal TLS extension was received.", GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION, 1 ), 

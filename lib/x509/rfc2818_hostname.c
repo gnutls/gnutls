@@ -113,7 +113,7 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
       if (ret == GNUTLS_SAN_DNSNAME) {
          found_dnsname = 1;
          if (_gnutls_hostname_compare(dnsname, hostname)) {
-            return 1;
+            return GNUTLS_E_NAME_DOES_NOT_MATCH;
          }
       }
 
@@ -124,14 +124,14 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
        */
       dnsnamesize = sizeof(dnsname);
       if (gnutls_x509_crt_get_dn_by_oid(cert, OID_X520_COMMON_NAME, 0,
-      		0, dnsname, &dnsnamesize) != 0) {
+      		0, dnsname, &dnsnamesize) < 0) {
          /* got an error, can't find a name 
           */
-         return 0;
+         return GNUTLS_E_NAME_DOES_NOT_MATCH;
       }
 
       if (_gnutls_hostname_compare(dnsname, hostname)) {
-         return 1;
+         return GNUTLS_E_NAME_DOES_NOT_MATCH;
       }
    }
 
