@@ -52,7 +52,7 @@ AC_PROG_INSTALL
 
 dnl AC_PROG_MAKE_SET
 
-if test $ac_cv_prog_gcc = yes; then
+if test $ac_cv_prog_gcc != no; then
   CFLAGS="${CFLAGS} -ffast-math"
 
 	if test $opt_maintainer_mode = yes; then
