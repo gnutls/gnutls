@@ -25,6 +25,8 @@
 
 #include <gnutls/gnutls.h>
 
+#define LIBGNUTLS_EXTRA_VERSION LIBGNUTLS_VERSION
+
 /* SRP */
 
 typedef struct DSTRUCT* gnutls_srp_server_credentials;
@@ -87,6 +89,10 @@ int gnutls_certificate_set_openpgp_keyring_mem(
 int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials res, const char *name);
 
 int gnutls_global_init_extra(void);
+
+/* returns libgnutls-extra version (call it with a NULL argument) 
+ */
+const char* gnutls_extra_check_version( const char*);
 
 /* Defines for compatibility with previous versions.
  */

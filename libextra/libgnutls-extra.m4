@@ -49,17 +49,17 @@ dnl
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
 
 int
 main ()
 {
     system ("touch conf.libgnutlstest");
 
-    if( strcmp( gnutls_check_version(NULL), "$libgnutls_extra_config_version" ) )
+    if( strcmp( gnutls_extra_check_version(NULL), "$libgnutls_extra_config_version" ) )
     {
       printf("\n*** 'libgnutls-extra-config --version' returned %s, but LIBGNUTLS_EXTRA (%s)\n",
-             "$libgnutls_extra_config_version", gnutls_check_version(NULL) );
+             "$libgnutls_extra_config_version", gnutls_extra_check_version(NULL) );
       printf("*** was found! If libgnutls-extra-config was correct, then it is best\n");
       printf("*** to remove the old version of LIBGNUTLS_EXTRA. You may also be able to fix the error\n");
       printf("*** by modifying your LD_LIBRARY_PATH enviroment variable, or by editing\n");
@@ -69,21 +69,22 @@ main ()
       printf("*** to point to the correct copy of libgnutls-extra-config, and remove the file config.cache\n");
       printf("*** before re-running configure\n");
     }
-    else if ( strcmp(gnutls_check_version(NULL), LIBGNUTLS_EXTRA_VERSION ) )
+    else if ( strcmp(gnutls_extra_check_version(NULL), LIBGNUTLS_EXTRA_VERSION ) )
     {
       printf("\n*** LIBGNUTLS_EXTRA header file (version %s) does not match\n", LIBGNUTLS_EXTRA_VERSION);
-      printf("*** library (version %s)\n", gnutls_check_version(NULL) );
+      printf("*** library (version %s). This is may be due to a different version of gnutls\n", gnutls_extra_check_version(NULL) );
+      printf("*** and gnutls-extra.\n");
     }
     else
     {
-      if ( gnutls_check_version( "$min_libgnutls_version" ) )
+      if ( gnutls_extra_check_version( "$min_libgnutls_version" ) )
       {
         return 0;
       }
      else
       {
         printf("no\n*** An old version of LIBGNUTLS_EXTRA (%s) was found.\n",
-                gnutls_check_version(NULL) );
+                gnutls_extra_check_version(NULL) );
         printf("*** You need a version of LIBGNUTLS_EXTRA newer than %s. The latest version of\n",
                "$min_libgnutls_version" );
         printf("*** LIBGNUTLS_EXTRA is always available from ftp://gnutls.hellug.gr/pub/gnutls.\n");
@@ -129,8 +130,8 @@ main ()
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gnutls/gnutls.h>
-],      [ return !!gnutls_check_version(NULL); ],
+#include <gnutls/extra.h>
+],      [ return !!gnutls_extra_check_version(NULL); ],
         [ echo "*** The test program compiled, but did not run. This usually means"
           echo "*** that the run-time linker is not finding LIBGNUTLS_EXTRA or finding the wrong"
           echo "*** version of LIBGNUTLS_EXTRA. If it is not finding LIBGNUTLS_EXTRA, you'll need to set your"
