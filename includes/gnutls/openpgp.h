@@ -94,6 +94,9 @@ int gnutls_openpgp_key_verify_ring(
 	unsigned int flags,
 	unsigned int * verify /* the output of the verification */);
 
+int gnutls_openpgp_key_verify_self( gnutls_openpgp_key key,
+        unsigned int flags, unsigned int *verify);
+
 int gnutls_openpgp_key_verify_trustdb( 
 	gnutls_openpgp_key key, 
 	gnutls_openpgp_trustdb db,

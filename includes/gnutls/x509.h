@@ -231,14 +231,20 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert,
 
 /* Flags for the gnutls_x509_privkey_export_pkcs8() function.
  */
-typedef enum gnutls_privkey_pkcs8_flags {
-	GNUTLS_PKCS8_PLAIN=1,  /* if set the private key will not
+typedef enum gnutls_pkcs_encrypt_flags {
+	GNUTLS_PKCS_PLAIN=1,  /* if set the private key will not
 			        * be encrypted.
 				*/
-	GNUTLS_PKCS8_USE_PKCS12_3DES,
-	GNUTLS_PKCS8_USE_PKCS12_ARCFOUR,
-	GNUTLS_PKCS8_USE_PKCS12_RC2_40
-} gnutls_privkey_pkcs8_flags;
+	GNUTLS_PKCS_USE_PKCS12_3DES=2,
+	GNUTLS_PKCS_USE_PKCS12_ARCFOUR=4,
+	GNUTLS_PKCS_USE_PKCS12_RC2_40=8,
+	GNUTLS_PKCS_USE_PBES2_3DES=16
+} gnutls_pkcs_encrypt_flags;
+
+#define GNUTLS_PKCS8_PLAIN GNUTLS_PKCS_PLAIN
+#define GNUTLS_PKCS8_USE_PKCS12_3DES GNUTLS_PKCS_USE_PKCS12_3DES
+#define GNUTLS_PKCS8_USE_PKCS12_ARCFOUR GNUTLS_PKCS_USE_PKCS12_ARCFOUR
+#define GNUTLS_PKCS8_USE_PKCS12_RC2_40 GNUTLS_PKCS_USE_PKCS12_RC2_40
 
 int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
 void gnutls_x509_privkey_deinit(gnutls_x509_privkey key);
