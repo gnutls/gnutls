@@ -1058,7 +1058,7 @@ static gnutls_datum wrap_db_fetch(void *dbf, gnutls_datum key)
 
 	 res.size = cache_db[i].session_data_size;
 
-	 res.data = malloc(res.size);
+	 res.data = gnutls_malloc(res.size);
 	 if (res.data == NULL)
 	    return res;
 
