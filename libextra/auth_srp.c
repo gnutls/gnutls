@@ -91,18 +91,11 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 	
 	_gnutls_str_cpy( username, MAX_SRP_USERNAME, state->security_parameters.extensions.srp_username);
 
-	pwd_entry = _gnutls_srp_pwd_read_entry( state, username, &err);
+	ret = _gnutls_srp_pwd_read_entry( state, username, &pwd_entry);
 
-	if (pwd_entry == NULL) {
-		if (err==0) {
-			gnutls_assert();
-			/* in order to avoid informing the peer that
-			 * username does not exist.
-			 */
-			pwd_entry = _gnutls_randomize_pwd_entry();
-		} else {
-		        return GNUTLS_E_SRP_PWD_ERROR;
-		}
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	/* copy from pwd_entry to local variables (actually in state) */

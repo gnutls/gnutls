@@ -534,13 +534,17 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
   *  gnutls_datum* salt, gnutls_datum *verifier, gnutls_datum* g,
   *  gnutls_datum* n);
   *
-  * 'username' contains the actual username.
-  *
+  * 'username' contains the actual username. 
   * The 'salt', 'verifier', 'generator' and 'prime' must be filled
   * in using the gnutls_malloc().
   *
   * In case the callback returned a negative number then gnutls will
   * assume that the username does not exist.
+  *
+  * In order to prevent allowing an attack to guess valid usernames,
+  * if username does not exist, the g, and n values should be filled in 
+  * using a random user's parameters. In that case the callback should
+  * return the special value (1).
   *
   * The callback function will only be called once per handshake.
   * The callback function should return 0 on success.

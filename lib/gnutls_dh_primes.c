@@ -417,52 +417,6 @@ GNUTLS_MPI gnutls_get_dh_params(gnutls_dh_params dh_primes,
 	return g;
 }
 
-/* returns g and p, depends on the requested bits.
- * We only support limited key sizes.
- */
-int _gnutls_get_rnd_srp_params(gnutls_datum *g, gnutls_datum* p, int bits)
-{
-	int i;
-
-	if (_gnutls_dh_default_params == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	g->data = p->data = NULL;
-	g->size = p->size = 0;
-
-	bits = normalize_bits(bits);
-
-	i = 0;
-	do {
-		if (_gnutls_dh_default_params[i].bits == bits) {
-			if (_gnutls_set_datum( p, _gnutls_dh_default_params[i].prime.data,
-				_gnutls_dh_default_params[i].prime.size) < 0) {
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-
-			if (_gnutls_set_datum( g, _gnutls_dh_default_params[i].generator.data,
-				_gnutls_dh_default_params[i].generator.size) < 0) {
-				_gnutls_free_datum( p);
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-
-			break;
-		}
-		i++;
-	} while (_gnutls_dh_default_params[i].bits != 0);
-
-	if (g->data == NULL || p->data == NULL) {
-		gnutls_assert();
-		_gnutls_free_datum(g);
-		_gnutls_free_datum(p);
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	return 0;
-}
-
 /* These should be added in gcrypt.h */
 GNUTLS_MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
 				    unsigned qbits, GNUTLS_MPI g,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -177,12 +177,13 @@ int ret;
 }
 
 
-/* this function opens the tpasswd.conf file
+/* this function opens the tpasswd.conf file and reads the g and n
+ * values. They are put in the entry.
  */
 static int pwd_read_conf( const char* pconf_file, SRP_PWD_ENTRY* entry, int index) {
 	FILE * fd;
 	char line[2*1024];
-	uint i;
+	uint i, len;
 	char indexstr[10];
 
 	sprintf( indexstr, "%d", index); /* Flawfinder: ignore */
@@ -193,13 +194,14 @@ static int pwd_read_conf( const char* pconf_file, SRP_PWD_ENTRY* entry, int inde
 		return GNUTLS_E_FILE_ERROR;
 	}
 
+	len = strlen(indexstr);
 	while( fgets( line, sizeof(line), fd) != NULL) {
-    /* move to first ':' */
+	    /* move to first ':' */
 	    i=0;
 	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
 	            i++;
 	    }
-	    if (strncmp( indexstr, line, strlen(indexstr)) == 0) {
+	    if (strncmp( indexstr, line, (i>len)?i:len) == 0) {
 			if ((index = pwd_put_values2( entry, line)) >= 0)
 				return 0;
 			else {
@@ -211,54 +213,70 @@ static int pwd_read_conf( const char* pconf_file, SRP_PWD_ENTRY* entry, int inde
 	
 }
 
-
-SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username, int *err) {
+int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username, 
+	SRP_PWD_ENTRY** _entry) 
+{
 	const gnutls_srp_server_credentials cred;
 	FILE * fd;
 	char line[2*1024];
-	uint i, len;
-	SRP_PWD_ENTRY * entry;
-	int index, pwd_index = 0, ret;
+	uint i, len, ret;
+	int index, pwd_index = 0, last_index;
+	SRP_PWD_ENTRY* entry;
 
-	entry = gnutls_calloc(1, sizeof(SRP_PWD_ENTRY));
-	if (entry==NULL) {
+	*_entry = gnutls_calloc(1, sizeof(SRP_PWD_ENTRY));
+	if (*_entry==NULL) {
 		gnutls_assert();
-		*err = 1;
-		return NULL;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
+	entry = *_entry;
 
-	*err = 0; /* normal exit */
-	
 	cred = _gnutls_get_cred( state->key, GNUTLS_CRD_SRP, NULL);
 	if (cred==NULL) {
-		*err = 1;
 		gnutls_assert();
 		_gnutls_srp_entry_free(entry);
-		return NULL;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	/* if the callback which sends the parameters is
-	 * set.
+	 * set, use it.
 	 */
 	if (cred->pwd_callback != NULL) {
 		ret = cred->pwd_callback( state, username, &entry->salt,
 			&entry->v, &entry->g, &entry->n);
+
+		if (ret==1) { /* the user does not exist */
+			if (entry->g.size!=0 && entry->n.size!=0) { 
+				ret = _randomize_pwd_entry( entry);
+				if (ret < 0) {
+					_gnutls_srp_entry_free(entry);
+					return ret;
+				}
+				return 0;
+			} else {
+				gnutls_assert();
+				ret = -1; /* error in the callback */
+			}
+		}
 		
 		if (ret < 0) {
 			gnutls_assert();
 			_gnutls_srp_entry_free(entry);
-			return NULL;
+			return GNUTLS_E_SRP_PWD_ERROR;
 		}
-		
-		return entry;
+
+		return 0;
 	}
+	
+	/* The callback was not set. Proceed.
+	 */
 
 	if (cred->password_files<=0) {
 		gnutls_assert();
-		return NULL;
+		return GNUTLS_E_SRP_PWD_ERROR;
 	}
 	
-	/* use the callback to select a password file */
+	/* use the callback to select a password file. If set.
+	 */
 	if (state->internals.server_srp_callback!=NULL) {
 		pwd_index = state->internals.server_srp_callback(
 			state, (const char**)cred->password_file, 
@@ -267,95 +285,113 @@ SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 
 		if (pwd_index < 0) {
 			gnutls_assert();
-			return NULL;
+			return GNUTLS_E_SRP_PWD_ERROR;
 		}
 	}
 
+	/* Open the selected password file.
+	 */
 	fd = fopen( cred->password_file[pwd_index], "r");
 	if (fd==NULL) {
-		*err = 1; /* failed due to critical error */
 		gnutls_assert();
 		_gnutls_srp_entry_free(entry);
-		return NULL;
+		return GNUTLS_E_SRP_PWD_ERROR;
 	}
 
+	last_index = 1; /* a default value */
+
+	len = strlen(username);
 	while( fgets( line, sizeof(line), fd) != NULL) {
 	    /* move to first ':' */
 	    i=0;
 	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
 	            i++;
 	    }
-	    len = strlen(username);
+	    
 	    if (strncmp( username, line, (i>len)?i:len) == 0) {
-			if ((index = pwd_put_values( entry, line)) >= 0)
+			if ((index = pwd_put_values( entry, line)) >= 0) {
+				/* Keep the last index in memory, so we can retrieve fake parameters (g,n)
+				 * when the user does not exist.
+				 */
+				last_index = index;
 				if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, index)==0) {
-					return entry;
+					return 0;
 				} else {
+					gnutls_assert();
 					_gnutls_srp_entry_free(entry);
-					return NULL;
+					return GNUTLS_E_SRP_PWD_ERROR;
 				}
-			else {
+			} else {
+				gnutls_assert();
 				_gnutls_srp_entry_free(entry);
-				return NULL;
+				return GNUTLS_E_SRP_PWD_ERROR;
 			}
 	    }
     }
-    return NULL;
-	
-}
-#define RNDUSER "rnd"
-#define RND_SALT_SIZE 17
-SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
-	int ret;
-	SRP_PWD_ENTRY * pwd_entry = gnutls_calloc(1, sizeof(SRP_PWD_ENTRY));
-	
-	if (pwd_entry == NULL) {
-		gnutls_assert(); 
-		return NULL;
-	}
-	
-	ret = _gnutls_get_rnd_srp_params( &pwd_entry->g, &pwd_entry->n, 1024);
+
+    /* user was not found. Fake him. Actually read the g,n values from
+     * the last index found and randomize the entry.
+     */
+fprintf(stderr, "username: %s\nindex: %d\n", username, last_index);
+    if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, last_index)==0) {
+	ret = _randomize_pwd_entry( entry);
 	if (ret < 0) {
 		gnutls_assert();
-		_gnutls_srp_entry_free( pwd_entry);
-		return NULL;
+		_gnutls_srp_entry_free(entry);
+		return ret;
 	}
 	
-	pwd_entry->username = gnutls_malloc(strlen(RNDUSER)+1);
-	if (pwd_entry->username == NULL) {
-		gnutls_assert();
-		_gnutls_srp_entry_free( pwd_entry);
-		return NULL;
-	}
-	_gnutls_str_cpy( pwd_entry->username, MAX_SRP_USERNAME, RNDUSER); /* Flawfinder: ignore */
+	return 0;
+    }
+    
+    gnutls_assert();
+    _gnutls_srp_entry_free(entry);
+    return GNUTLS_E_SRP_PWD_ERROR;
+
+}
+
+/* Randomizes the given password entry. It actually sets the verifier
+ * and the salt. Returns 0 on success.
+ */
+#define RNDUSER "rnd"
+#define RND_SALT_SIZE 17
+int _randomize_pwd_entry(SRP_PWD_ENTRY* entry) {
+	int ret;
 	
-	pwd_entry->v.data = gnutls_malloc(20);
-	pwd_entry->v.size = 20;
-	if (pwd_entry->v.data==NULL) {
+	if (entry->g.size == 0 || entry->n.size == 0) {
 		gnutls_assert();
-		_gnutls_srp_entry_free( pwd_entry);
-		return NULL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	_gnutls_get_random( pwd_entry->v.data, 20, GNUTLS_WEAK_RANDOM);
-
-	pwd_entry->salt.size = RND_SALT_SIZE;
-	
-	pwd_entry->salt.data = gnutls_malloc(RND_SALT_SIZE);
-	if (pwd_entry->salt.data==NULL) {
+	entry->username = gnutls_strdup(RNDUSER);
+	if (entry->username == NULL) {
 		gnutls_assert();
-		_gnutls_srp_entry_free( pwd_entry);
-		return NULL;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	if (_gnutls_get_random(pwd_entry->salt.data, RND_SALT_SIZE, GNUTLS_WEAK_RANDOM) < 0) {
+	entry->v.data = gnutls_malloc(20);
+	entry->v.size = 20;
+	if (entry->v.data==NULL) {
 		gnutls_assert();
-		_gnutls_srp_entry_free( pwd_entry);
-		return NULL;
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	_gnutls_get_random( entry->v.data, 20, GNUTLS_WEAK_RANDOM);
+
+	entry->salt.size = RND_SALT_SIZE;
+	
+	entry->salt.data = gnutls_malloc(RND_SALT_SIZE);
+	if (entry->salt.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	return pwd_entry;
-
+	if (_gnutls_get_random(entry->salt.data, RND_SALT_SIZE, GNUTLS_WEAK_RANDOM) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	return 0;
 }
 
 void _gnutls_srp_entry_free( SRP_PWD_ENTRY * entry) {

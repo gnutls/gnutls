@@ -24,6 +24,5 @@ MPI gnutls_calc_dh_key( MPI f, MPI x, MPI prime );
 int _gnutls_dh_generate_prime(MPI *ret_g, MPI* ret_n, int bits);
 void _gnutls_dh_clear_mpis(void);
 int _gnutls_dh_calc_mpis(void);
-int _gnutls_get_rnd_srp_params(gnutls_datum *g, gnutls_datum* p, int bits);
 
 extern _gnutls_dh_params _gnutls_dh_default_params;

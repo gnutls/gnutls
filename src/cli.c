@@ -58,7 +58,7 @@ int crlf;
 int quiet = 0;
 extern int xml;
 
-char *srp_passwd;
+char *srp_passwd = NULL;
 char *srp_username;
 char *pgp_keyfile;
 char *pgp_certfile;

@@ -32,6 +32,7 @@ extern gnutls_anon_client_credentials anon_cred;
 extern gnutls_certificate_credentials xcred;
 
 extern int more_info;
+static int srp = 0;
 
 extern int tls1_ok;
 extern int ssl3_ok;
@@ -60,6 +61,11 @@ int ret, alert;
 			}
 			printf( "*** Handshake has failed\n");
 			GERR(ret);
+		}
+
+		if (srp) {
+			if (ret == GNUTLS_E_DECRYPTION_FAILED)
+				return SUCCEED; /* SRP was detected */
 		}
 
 		if (ret < 0) return FAILED;
@@ -152,6 +158,8 @@ static void ADD_PROTOCOL(gnutls_session session, int protocol) {
 
 
 int test_srp( gnutls_session session) {
+int ret;
+
 		ADD_ALL_CIPHERS(session);
 		ADD_ALL_COMP(session);
 		ADD_ALL_CERTTYPES(session);
@@ -159,10 +167,14 @@ int test_srp( gnutls_session session) {
 		ADD_ALL_MACS(session);
 
 		ADD_KX(session, GNUTLS_KX_SRP);
+		srp = 1;
 
 		gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 
-		return do_handshake( session);
+		ret = do_handshake( session);
+		srp = 0;
+		
+		return ret;
 }
 
 int test_export( gnutls_session session) {
