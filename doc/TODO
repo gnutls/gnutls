@@ -4,4 +4,5 @@
 * Tools for processing/generating certificates
 * Add certificate extensions support (x509v3)
 * Documentation (of existing functions + Manual)
-* Added DHE_* ciphersuites
+* Add DHE_* ciphersuites
+* Add Client Certificate support in X509 authentication

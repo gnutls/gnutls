@@ -35,8 +35,9 @@
 static gnutls_datum* _gnutls_get_tbs( gnutls_cert* cert) {
 node_asn *c2;
 gnutls_datum * ret;
-opaque str[MAX_X509_CERT_SIZE];
+opaque *str;
 int result, len;
+int start, end;
 
 	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate")!=ASN_OK) {
 		gnutls_assert();
@@ -50,23 +51,19 @@ int result, len;
 		return NULL;
 	}
 	
-	len = sizeof(str)-1;
-	result =
-	    asn1_create_der( c2, "certificate.tbsCertificate", str, &len);
+	result = asn1_get_start_end_der( c2, cert->raw.data, cert->raw.size, 
+		"certificate.tbsCertificate", &start, &end);
+	asn1_delete_structure(c2);
+		
 	if (result != ASN_OK) {
 		gnutls_assert();
-		asn1_delete_structure(c2);
 		return NULL;
 	}
-{
-FILE* fd;
-fd = fopen("/tmp/der", "w");
-fwrite( str, len, 1, fd);
-fclose(fd);
-}
-	asn1_delete_structure(c2);
 
-	ret = gnutls_malloc(sizeof(gnutls_cert));
+	len = end - start + 1;
+	str = &cert->raw.data[start];
+
+	ret = gnutls_malloc(sizeof(gnutls_datum));
 	if (ret==NULL) {
 		gnutls_assert();
 		return NULL;
