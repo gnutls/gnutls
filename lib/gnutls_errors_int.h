@@ -93,6 +93,8 @@
 #define GNUTLS_E_OPENPGP_GETKEY_FAILED -88
 #define GNUTLS_E_PK_SIG_VERIFY_FAILED -89
 
+#define GNUTLS_E_ILLEGAL_SRP_USERNAME -90
+
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -250
 
 /* _INT_ internal errors. Not exported */

@@ -125,7 +125,9 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("The initialization of LZO has failed.", GNUTLS_E_LZO_INIT_FAILED, 1 ), 
 	ERROR_ENTRY("No supported compression algorithms have been found.", GNUTLS_E_NO_COMPRESSION_ALGORITHMS, 1 ), 
 	ERROR_ENTRY("No supported cipher suites have been found.", GNUTLS_E_NO_CIPHER_SUITES, 1 ),
-        ERROR_ENTRY("Could not get OpenPGP key", GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
+        ERROR_ENTRY("Could not get OpenPGP key.", GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
+
+        ERROR_ENTRY("The SRP username supplied by the peer is illegal.", GNUTLS_E_ILLEGAL_SRP_USERNAME, 1),
 	{0, 0, 0, 0}
 };
 

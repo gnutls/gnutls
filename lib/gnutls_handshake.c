@@ -1420,7 +1420,7 @@ static int _gnutls_copy_comp_methods(gnutls_session session,
 static int _gnutls_send_client_hello(gnutls_session session, int again)
 {
 	opaque *data = NULL;
-	opaque *extdata;
+	opaque *extdata = NULL;
 	int extdatalen;
 	int pos = 0;
 	int datalen, ret = 0;
@@ -1566,6 +1566,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 		 */
 		if (hver >= GNUTLS_TLS1) {
 			extdatalen = _gnutls_gen_extensions(session, &extdata);
+
 			if (extdatalen > 0) {
 				datalen += extdatalen;
 				data = gnutls_realloc_fast(data, datalen);
@@ -1577,6 +1578,11 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 				memcpy(&data[pos], extdata, extdatalen);
 				gnutls_free(extdata);
+			} else if (extdatalen < 0) {
+				gnutls_assert();
+				gnutls_free(extdata);
+				gnutls_free(data);
+				return extdatalen;
 			}
 		}
 	}
@@ -1591,8 +1597,8 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 static int _gnutls_send_server_hello(gnutls_session session, int again)
 {
-	opaque *data;
-	opaque *extdata;
+	opaque *data = NULL;
+	opaque *extdata = NULL;
 	int extdatalen;
 	int pos = 0;
 	int datalen, ret = 0;
@@ -1603,12 +1609,17 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 	if (SessionID == NULL)
 		session_id_len = 0;
 
-	data = NULL;
 	datalen = 0;
 
 	if (again == 0) {
 		datalen = 2 + session_id_len + 1 + TLS_RANDOM_SIZE + 3;
 		extdatalen = _gnutls_gen_extensions(session, &extdata);
+
+		if (extdatalen < 0) {
+			gnutls_assert();
+			gnutls_free(extdata);
+			return extdatalen;
+		}
 
 		data = gnutls_alloca(datalen + extdatalen);
 		if (data == NULL) {

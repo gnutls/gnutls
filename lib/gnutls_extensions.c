@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -215,6 +215,10 @@ int (*ext_func_send)( gnutls_session, opaque*, int);
 			/* add this extension to the extension list
 			 */
 			_gnutls_extension_list_add( session, next);
+		} else if (size < 0) {
+			gnutls_assert();
+			gnutls_free(*data);
+			return size;
 		}
 		
 	} while(next >= 0);
