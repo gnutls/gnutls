@@ -618,7 +618,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		_gnutls_handshake_log
 		    ("HSK: Cannot find the appropriate handler for the KX algorithm\n");
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	return 0;
@@ -1090,7 +1090,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 
 	if (z != 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 	}
 
 	memcpy(session->security_parameters.
@@ -1131,7 +1131,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 		_gnutls_handshake_log
 		    ("HSK: Cannot find the appropriate handler for the KX algorithm\n");
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 

@@ -175,7 +175,7 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 			"HSK: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n");
 
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	

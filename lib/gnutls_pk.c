@@ -520,7 +520,7 @@ static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (rc != 0) {
@@ -583,7 +583,7 @@ static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (rc != 0) {
@@ -652,7 +652,7 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (rc != 0) {

@@ -508,7 +508,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 	if (_gnutls_mac_is_ok
 	    (session->security_parameters.read_mac_algorithm) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* Free all the previous keys/ sessions etc.
@@ -549,7 +549,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 		    && session->security_parameters.
 		    read_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		/* copy mac secrets from cipherspecs, to connection
@@ -581,7 +581,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 		    && session->security_parameters.
 		    read_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 
@@ -684,7 +684,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 	if (_gnutls_mac_is_ok
 	    (session->security_parameters.write_mac_algorithm) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 
@@ -727,7 +727,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 		    && session->security_parameters.
 		    write_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 
@@ -761,7 +761,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 		    && session->security_parameters.
 		    write_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		/* copy mac secret to connection session
@@ -812,7 +812,7 @@ int _gnutls_set_read_cipher(gnutls_session session, gnutls_cipher_algorithm algo
 
 	} else {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	return 0;
@@ -833,7 +833,7 @@ int _gnutls_set_write_cipher(gnutls_session session, gnutls_cipher_algorithm alg
 
 	} else {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	return 0;
@@ -882,7 +882,7 @@ int _gnutls_set_kx(gnutls_session session, gnutls_kx_algorithm algo)
 		session->security_parameters.kx_algorithm = algo;
 	} else {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	if (_gnutls_kx_priority(session, algo) < 0) {
 		gnutls_assert();
@@ -902,7 +902,7 @@ int _gnutls_set_read_mac(gnutls_session session, gnutls_mac_algorithm algo)
 		session->security_parameters.read_mac_algorithm = algo;
 	} else {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	if (_gnutls_mac_priority(session, algo) < 0) {
 		gnutls_assert();
@@ -921,7 +921,7 @@ int _gnutls_set_write_mac(gnutls_session session, gnutls_mac_algorithm algo)
 		session->security_parameters.write_mac_algorithm = algo;
 	} else {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	if (_gnutls_mac_priority(session, algo) < 0) {
 		gnutls_assert();

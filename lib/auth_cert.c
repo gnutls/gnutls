@@ -1048,7 +1048,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 
 	if (pk_algos_length == 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 	}
 
 	if (session->security_parameters.cert_type == GNUTLS_CRT_X509) {

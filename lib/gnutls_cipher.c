@@ -222,7 +222,7 @@ int length;
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	return length;
@@ -267,7 +267,7 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 	if (td == GNUTLS_MAC_FAILED
 	    && session->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	c_length = _gnutls_conv_uint16(compressed.size);
@@ -357,7 +357,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 	if (td == GNUTLS_MAC_FAILED
 	    && session->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 
@@ -414,7 +414,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 
