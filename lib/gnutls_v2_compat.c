@@ -43,7 +43,7 @@
 static int _gnutls_handshake_select_v2_suite(gnutls_session session, opaque *data, int datalen)
 {
 	int i, j, ret;
-	char* _data;
+	opaque* _data;
 	int _datalen;
 	
 	_data = gnutls_malloc( datalen);

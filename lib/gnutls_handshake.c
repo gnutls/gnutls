@@ -136,7 +136,7 @@ static int _gnutls_ssl3_finished(gnutls_session session, int type, opaque * ret)
 	const int siz = SSL_MSG_LEN;
 	GNUTLS_MAC_HANDLE td_md5;
 	GNUTLS_MAC_HANDLE td_sha;
-	const opaque *mesg;
+	const char *mesg;
 
 	td_md5 = _gnutls_hash_copy( session->internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
@@ -175,7 +175,7 @@ int _gnutls_finished(gnutls_session session, int type, void *ret)
 {
 	const int siz = TLS_MSG_LEN;
 	opaque concat[36];
-	const opaque *mesg;
+	const char *mesg;
 	GNUTLS_MAC_HANDLE td_md5;
 	GNUTLS_MAC_HANDLE td_sha;
 
@@ -1181,7 +1181,7 @@ static int _gnutls_client_check_if_resuming(gnutls_session session,
 					    opaque * session_id,
 					    int session_id_len)
 {
-char buf[2*TLS_MAX_SESSION_ID_SIZE+1];
+opaque buf[2*TLS_MAX_SESSION_ID_SIZE+1];
 
 	_gnutls_handshake_log("HSK[%x]: SessionID length: %d\n", session, session_id_len);
 	_gnutls_handshake_log("HSK[%x]: SessionID: %s\n", session,
@@ -1222,7 +1222,7 @@ char buf[2*TLS_MAX_SESSION_ID_SIZE+1];
  * This function also restores resumed parameters if we are resuming a
  * session.
  */
-static int _gnutls_read_server_hello(gnutls_session session, char *data,
+static int _gnutls_read_server_hello(gnutls_session session, opaque *data,
 				     int datalen)
 {
 	uint8 session_id_len = 0;
@@ -1604,7 +1604,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 	uint8 comp;
 	opaque *SessionID = session->security_parameters.session_id;
 	uint8 session_id_len = session->security_parameters.session_id_size;
-	char buf[2*TLS_MAX_SESSION_ID_SIZE+1];
+	opaque buf[2*TLS_MAX_SESSION_ID_SIZE+1];
 
 	if (SessionID == NULL)
 		session_id_len = 0;
@@ -1694,7 +1694,7 @@ int _gnutls_send_hello(gnutls_session session, int again)
  * hello message is expected. It uses the security_parameters.current_cipher_suite
  * and internals.compression_method.
  */
-int _gnutls_recv_hello(gnutls_session session, char *data, int datalen)
+int _gnutls_recv_hello(gnutls_session session, opaque *data, int datalen)
 {
 	int ret;
 
@@ -2246,7 +2246,7 @@ int _gnutls_handshake_common(gnutls_session session)
 
 }
 
-int _gnutls_generate_session_id(char *session_id, uint8 * len)
+int _gnutls_generate_session_id(opaque *session_id, uint8 * len)
 {
 	*len = TLS_MAX_SESSION_ID_SIZE;
 

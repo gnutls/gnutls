@@ -58,8 +58,8 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 /* FIXME: This function is too long
  */
 	opaque *key_block;
-	char random[2 * TLS_RANDOM_SIZE];
-	char rrandom[2 * TLS_RANDOM_SIZE];
+	opaque random[2 * TLS_RANDOM_SIZE];
+	opaque rrandom[2 * TLS_RANDOM_SIZE];
 	int pos, ret;
 	int block_size;
 	char buf[64];
@@ -285,7 +285,6 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 
 	} else if (IV_size > 0 && export_flag != 0) {
 		opaque *iv_block = gnutls_alloca(IV_size * 2);
-
 		if (iv_block == NULL) {
 			gnutls_assert();
 			gnutls_free(key_block);
@@ -301,6 +300,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 			if (ret < 0) {
 				gnutls_assert();
 				gnutls_free(key_block);
+				gnutls_afree(iv_block);
 				return ret;
 			}
 
@@ -311,7 +311,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 
 		} else {	/* TLS 1.0 */
 			ret =
-			    _gnutls_PRF("", 0,
+			    _gnutls_PRF( "", 0,
 					ivblock, ivblock_length, rrandom,
 					2 * TLS_RANDOM_SIZE, IV_size * 2,
 					iv_block);
@@ -319,6 +319,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 
 		if (ret < 0) {
 			gnutls_assert();
+			gnutls_afree(iv_block);
 			gnutls_free(key_block);
 			return ret;
 		}
@@ -326,6 +327,7 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 		if (_gnutls_sset_datum
 		    (&session->cipher_specs.client_write_IV, iv_block,
 		     IV_size) < 0) {
+			gnutls_afree(iv_block);
 			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
@@ -333,9 +335,12 @@ int _gnutls_set_keys(gnutls_session session, int hash_size, int IV_size,
 		if (_gnutls_sset_datum
 		    (&session->cipher_specs.server_write_IV,
 		     &iv_block[IV_size], IV_size) < 0) {
+			gnutls_afree(iv_block);
 			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
+
+		gnutls_afree(iv_block);
 	}
 
 	gnutls_free(key_block);

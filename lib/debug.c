@@ -104,7 +104,7 @@ const char* _gnutls_handshake2str( HandshakeType handshake)
 
 void _gnutls_dump_mpi(const char* prefix, GNUTLS_MPI a)
 {
-	char buf[1024];
+	opaque buf[1024];
 	size_t n = sizeof buf;
 	
 	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, n, &n, a))

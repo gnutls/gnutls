@@ -71,7 +71,6 @@ _gnutls_map_cdk_rc( int rc )
     case CDK_Inv_Value: return GNUTLS_E_INVALID_REQUEST;
     default: return GNUTLS_E_INTERNAL_ERROR;
     }
-    return rc;
 }
 
 
@@ -786,7 +785,7 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
  -*/
 int
 gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
-                               const opaque *data, size_t len)
+                               const void *data, size_t len)
 {
     uint8 *blob;
     size_t nbytes = 0;

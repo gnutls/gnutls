@@ -18,8 +18,6 @@
 
 #include <config.h>
 
-#ifdef ENABLE_OPENSSL
-
 #include <gnutls/gnutls.h>
 #include <gcrypt.h>
 #include <stdio.h>
@@ -970,4 +968,3 @@ unsigned char *RIPEMD160(const unsigned char *buf, unsigned long len,
     return md;
 }
 
-#endif

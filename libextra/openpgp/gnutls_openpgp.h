@@ -39,7 +39,7 @@ int gnutls_openpgp_count_key_names(
      
 int gnutls_openpgp_add_keyring_mem(
     gnutls_datum *keyring,
-    const opaque *data,
+    const void *data,
     size_t len );
 
 int gnutls_openpgp_add_keyring_file(

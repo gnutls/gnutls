@@ -32,7 +32,7 @@ int _gnutls_session_is_export( gnutls_session session);
 
 int _gnutls_openpgp_send_fingerprint( gnutls_session session);
 
-int _gnutls_PRF( const opaque * secret, int secret_size, const uint8 * label, 
+int _gnutls_PRF( const opaque * secret, int secret_size, const char * label, 
    int label_size, opaque * seed, int seed_size, int total_bytes, void* ret);
 
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509

@@ -122,15 +122,15 @@ void gnutls_global_set_mem_functions(
 		_gnutls_is_secure_memory = _gnutls_is_secure_mem_null;
 
 	/* if using the libc's default malloc
-	 * then also use the libc's strdup.
+	 * use libc's calloc as well.
 	 */
 	if ( gnutls_malloc == malloc) {
-		gnutls_strdup = strdup;
 		gnutls_calloc = calloc;
 	} else { /* use the included ones */
-		gnutls_strdup = _gnutls_strdup;
 		gnutls_calloc = _gnutls_calloc;
 	}
+	gnutls_strdup = _gnutls_strdup;
+
 }
 
 #ifdef DEBUG

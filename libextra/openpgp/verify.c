@@ -102,7 +102,7 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
                            unsigned int flags, unsigned int *verify)
 {
     int rc = 0;
-    unsigned int status = 0;
+    int status = 0;
   
     if( !key || !keyring ) {
         gnutls_assert();

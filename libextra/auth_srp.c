@@ -73,7 +73,8 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 {
 	int ret;
 	uint8 *data_n, *data_s;
-	uint8 *data_g, *username;
+	uint8 *data_g;
+	char *username;
 	SRP_PWD_ENTRY *pwd_entry;
 	SRP_SERVER_AUTH_INFO info;
 	ssize_t data_size;

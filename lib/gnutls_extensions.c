@@ -57,22 +57,23 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
 
 /* EXTENSION functions */
 
-void* _gnutls_ext_func_recv(uint16 type)
+ext_recv_func _gnutls_ext_func_recv(uint16 type)
 {
-	void* ret=NULL;
+	ext_recv_func ret = NULL;
 	GNUTLS_EXTENSION_LOOP(ret = p->gnutls_ext_func_recv);
 	return ret;
 
 }
-void* _gnutls_ext_func_send(uint16 type)
+
+ext_send_func _gnutls_ext_func_send(uint16 type)
 {
-	void* ret=NULL;
+	ext_send_func ret = NULL;
 	GNUTLS_EXTENSION_LOOP(ret = p->gnutls_ext_func_send);
 	return ret;
 
 }
 
-const char *_gnutls_extension_get_name(uint16 type)
+const char* _gnutls_extension_get_name(uint16 type)
 {
 	const char *ret = NULL;
 

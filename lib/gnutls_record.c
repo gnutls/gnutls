@@ -244,7 +244,7 @@ gnutls_protocol_version lver;
 	}
 }
 
-static
+inline static
 ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
 	opaque* erecord, unsigned int erecord_size)
 {
@@ -382,7 +382,7 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
 		/* now proceed to packet encryption
 		 */
 		cipher_size = data2send_size + MAX_RECORD_OVERHEAD;
-		cipher = gnutls_alloca( cipher_size);
+		cipher = gnutls_malloc( cipher_size);
 		if (cipher==NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
@@ -394,7 +394,7 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
 			gnutls_assert();
 			if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
 			gnutls_afree( erecord);
-			gnutls_afree( cipher);
+			gnutls_free( cipher);
 			return cipher_size; /* error */
 		}
 
@@ -407,13 +407,13 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
 			_gnutls_session_invalidate( session);
 			gnutls_assert();
 			gnutls_afree( erecord);
-			gnutls_afree( cipher);
+			gnutls_free( cipher);
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}
 
 		ret = _gnutls_io_write_buffered2( session, erecord, erecord_size, cipher, cipher_size);
 		gnutls_afree( erecord);
-		gnutls_afree( cipher);
+		gnutls_free( cipher);
 	}
 
 	if ( ret != cipher_size + erecord_size) {
@@ -682,7 +682,8 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
  * receive (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
  */
-ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
+ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType htype, 
+	opaque *data, size_t sizeofdata)
 {
 	uint8 *tmpdata;
 	int tmplen;
@@ -797,7 +798,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	 * packet length (due to compression).
 	 */
 	tmplen = MAX_RECORD_RECV_SIZE;
-	tmpdata = gnutls_alloca( tmplen);
+	tmpdata = gnutls_malloc( tmplen);
 	if (tmpdata==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -807,7 +808,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	if (tmplen < 0) {
 		_gnutls_session_unresumable( session);
 		_gnutls_session_invalidate( session);
-		gnutls_afree(tmpdata);
+		gnutls_free(tmpdata);
 		gnutls_assert();
 		return tmplen;
 	}
@@ -820,11 +821,11 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 
 		if ((size_t)tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
-			gnutls_afree(tmpdata);
+			gnutls_free(tmpdata);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 		memcpy( data, tmpdata, sizeofdata);
-		gnutls_afree(tmpdata);
+		gnutls_free(tmpdata);
 
 		return tmplen;
 	}
@@ -835,19 +836,19 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	/* increase sequence number */
 	if (_gnutls_uint64pp( &session->connection_state.read_sequence_number)!=0) {
 		_gnutls_session_invalidate( session);
-		gnutls_afree(tmpdata);
+		gnutls_free(tmpdata);
 		gnutls_assert();
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
 	if ( (ret=_gnutls_record_check_type( session, recv_type, type, htype, tmpdata, tmplen)) < 0) {
-		gnutls_afree(tmpdata);
+		gnutls_free(tmpdata);
 
 		if (ret==GNUTLS_E_INT_RET_0) return 0;
 		gnutls_assert();
 		return ret;
 	}
-	gnutls_afree(tmpdata);
+	gnutls_free(tmpdata);
 
 	/* Get Application data from buffer 
 	 */

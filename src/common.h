@@ -36,7 +36,7 @@ void parse_macs( char** macs, int nmacs, int *mac_priority);
 void parse_ciphers( char** ciphers, int nciphers, int* cipher_priority);
 void parse_protocols( char** protocols, int protocols_size, int* protocol_priority);
 
-void socket_init( void);
+void sockets_init( void);
 #ifndef HAVE_INET_NTOP
 const char *inet_ntop(int af, const void *src,
                              char *dst, size_t cnt);

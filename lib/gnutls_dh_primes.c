@@ -384,7 +384,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	_gnutls_mpi_print( NULL, &g_size, params->_generator);
 	_gnutls_mpi_print( NULL, &p_size, params->_prime);
 
-	all_data = gnutls_alloca( g_size + p_size);
+	all_data = gnutls_malloc( g_size + p_size);
 	if (all_data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -403,7 +403,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	     (_gnutls_get_gnutls_asn(), "GNUTLS.DHParameter", &c2))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
-		gnutls_afree(all_data);
+		gnutls_free(all_data);
 		return _gnutls_asn2err(result);
 	}
 
@@ -413,7 +413,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 					    p_data, p_size)) != ASN1_SUCCESS) 
 	{
 		gnutls_assert();
-		gnutls_afree(all_data);
+		gnutls_free(all_data);
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
@@ -423,12 +423,12 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	if ((result = asn1_write_value(c2, "base",
 					    g_data, g_size)) != ASN1_SUCCESS) {
 		gnutls_assert();
-		gnutls_afree(all_data);
+		gnutls_free(all_data);
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
 
-	gnutls_afree(all_data);
+	gnutls_free(all_data);
 
 	if ((result = asn1_write_value(c2, "privateValueLength",
 					    NULL, 0)) != ASN1_SUCCESS) {
@@ -461,7 +461,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 		len = 0;
 		asn1_der_coding( c2, "", NULL, &len, NULL);
 
-		tmp = gnutls_alloca( len);
+		tmp = gnutls_malloc( len);
 		if (tmp == NULL) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
@@ -470,7 +470,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 
 		if ((result=asn1_der_coding( c2, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
-			gnutls_afree( tmp);
+			gnutls_free( tmp);
 			asn1_delete_structure(&c2);
 			return _gnutls_asn2err(result);
 		}
@@ -480,7 +480,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 		result = _gnutls_fbase64_encode("DH PARAMETERS",
 						tmp, len, &out);
 
-		gnutls_afree( tmp);
+		gnutls_free( tmp);
 
 		if (result < 0) {
 			gnutls_assert();

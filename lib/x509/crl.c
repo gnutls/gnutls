@@ -97,7 +97,10 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 			   gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
-	gnutls_datum _data = { data->data, data->size };
+	gnutls_datum _data;
+	
+	_data.data = data->data;
+	_data.size = data->size;
 
 	if (crl == NULL) {
 		gnutls_assert();

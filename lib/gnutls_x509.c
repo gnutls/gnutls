@@ -202,7 +202,7 @@ uint pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
  * returns the number of certificates parsed (1)
  */
-static int parse_crt_mem( gnutls_cert** cert_list, int* ncerts, 
+static int parse_crt_mem( gnutls_cert** cert_list, uint* ncerts, 
 	gnutls_x509_crt cert)
 {
 	int i;
@@ -236,8 +236,8 @@ static int parse_crt_mem( gnutls_cert** cert_list, int* ncerts,
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
  * returns the number of certificates parsed (1)
  */
-static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts, 
-	const char *input_cert, int input_cert_size)
+static int parse_der_cert_mem( gnutls_cert** cert_list, uint* ncerts, 
+	const void *input_cert, int input_cert_size)
 {
 	gnutls_datum tmp;
 	gnutls_x509_crt cert;
@@ -272,15 +272,15 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
  * a gnutls_cert structure.
  * returns the number of certificate parsed
  */
-static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
-	char *input_cert, int input_cert_size, int flags)
+static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, uint* ncerts, const
+	void *input_cert, int input_cert_size, int flags)
 {
 #ifdef ENABLE_PKI
 	int i, j, count;
 	gnutls_datum tmp, tmp2;
 	int ret;
 	opaque *pcert = NULL;
-	int pcert_size;
+	size_t pcert_size;
 	gnutls_pkcs7 pkcs7;
 	
 	ret = gnutls_pkcs7_init( &pkcs7);
@@ -384,11 +384,11 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 /* Reads a base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure. Returns the number of certificate parsed.
  */
-static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts, 
-	const char *input_cert, int input_cert_size)
+static int parse_pem_cert_mem( gnutls_cert** cert_list, uint* ncerts, 
+	const opaque *input_cert, int input_cert_size)
 {
 	int size, siz2, i;
-	const char *ptr;
+	const opaque *ptr;
 	opaque *ptr2;
 	gnutls_datum tmp;
 	int ret, count;
@@ -479,7 +479,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 /* Reads a DER or PEM certificate from memory
  */
 static 
-int read_cert_mem(gnutls_certificate_credentials res, const char *cert, int cert_size, 
+int read_cert_mem(gnutls_certificate_credentials res, const void *cert, int cert_size, 
 	gnutls_x509_crt_fmt type)
 {
 	int ret;
@@ -561,7 +561,7 @@ int i;
  * 2002-01-26: Added ability to read DSA keys.
  * type indicates the certificate format.
  */
-static int read_key_mem(gnutls_certificate_credentials res, const char *key, int key_size, 
+static int read_key_mem(gnutls_certificate_credentials res, const void *key, int key_size, 
 	gnutls_x509_crt_fmt type)
 {
 	int ret;
@@ -753,8 +753,8 @@ static int read_key_file(gnutls_certificate_credentials res, const char *keyfile
 /**
   * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials structure
   * @res: is an &gnutls_certificate_credentials structure.
-  * @CERT: contains a certificate list (path) for the specified private key
-  * @KEY: is the private key
+  * @cert: contains a certificate list (path) for the specified private key
+  * @key: is the private key
   * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
@@ -776,17 +776,17 @@ static int read_key_file(gnutls_certificate_credentials res, const char *keyfile
   * then the strings that hold their values must be null terminated.
   *
   **/
-int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, const gnutls_datum* CERT,
-			   const gnutls_datum* KEY, gnutls_x509_crt_fmt type)
+int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, const gnutls_datum* cert,
+			   const gnutls_datum* key, gnutls_x509_crt_fmt type)
 {
 	int ret;
 
 	/* this should be first 
 	 */
-	if ((ret = read_key_mem( res, KEY->data, KEY->size, type)) < 0)
+	if ((ret = read_key_mem( res, key->data, key->size, type)) < 0)
 		return ret;
 
-	if ((ret = read_cert_mem( res, CERT->data, CERT->size, type)) < 0)
+	if ((ret = read_cert_mem( res, cert->data, cert->size, type)) < 0)
 		return ret;
 
 	res->ncerts++;
@@ -804,7 +804,7 @@ int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, cons
   * @res: is an &gnutls_certificate_credentials structure.
   * @cert_list: contains a certificate list (path) for the specified private key
   * @cert_list_size: holds the size of the certificate list
-  * @key: is a gnutls_x509_privkey  key
+  * @key: is a gnutls_x509_privkey key
   *
   * This function sets a certificate/private key pair in the 
   * gnutls_certificate_credentials structure. This function may be called
@@ -960,7 +960,7 @@ opaque *pdata;
 			return ret;
 		}
 
-		_tmp.data = (char*) tmp.data;
+		_tmp.data = (opaque*) tmp.data;
 		_tmp.size = tmp.size;
 		_gnutls_write_datum16(pdata, _tmp);
 		pdata += (2 + tmp.size);
@@ -1022,11 +1022,11 @@ int _gnutls_check_key_usage( const gnutls_cert* cert,
 
 
 
-static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, int* ncerts, 
-	const char *input_cert, int input_cert_size)
+static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, uint* ncerts, 
+	const opaque *input_cert, int input_cert_size)
 {
 	int i, size;
-	const char *ptr;
+	const opaque *ptr;
 	gnutls_datum tmp;
 	int ret, count;
 
@@ -1062,7 +1062,7 @@ static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
 			return ret;
 		}
 		
-		tmp.data = (char*)ptr;
+		tmp.data = (opaque*)ptr;
 		tmp.size = size;
 
 		ret =
@@ -1105,8 +1105,8 @@ static int parse_pem_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
  * returns the number of certificates parsed (1)
  */
-static int parse_der_ca_mem( gnutls_x509_crt** cert_list, int* ncerts, 
-	const char *input_cert, int input_cert_size)
+static int parse_der_ca_mem( gnutls_x509_crt** cert_list, uint* ncerts, 
+	const void *input_cert, int input_cert_size)
 {
 	int i;
 	gnutls_datum tmp;
@@ -1150,7 +1150,7 @@ static int parse_der_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
 /**
   * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a gnutls_certificate_credentials structure
   * @res: is an &gnutls_certificate_credentials structure.
-  * @CA: is a list of trusted CAs or a DER certificate
+  * @ca: is a list of trusted CAs or a DER certificate
   * @type: is DER or PEM
   *
   * This function adds the trusted CAs in order to verify client
@@ -1162,16 +1162,16 @@ static int parse_der_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
   *
   **/
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CA, gnutls_x509_crt_fmt type)
+	const gnutls_datum *ca, gnutls_x509_crt_fmt type)
 {
 	int ret, ret2;
 
 	if (type==GNUTLS_X509_FMT_DER)
 		return parse_der_ca_mem( &res->x509_ca_list, &res->x509_ncas,
-			CA->data, CA->size);
+			ca->data, ca->size);
 	else
 		return parse_pem_ca_mem( &res->x509_ca_list, &res->x509_ncas,
-			CA->data, CA->size);
+			ca->data, ca->size);
 
 	if ((ret2 = generate_rdn_seq(res)) < 0)
 		return ret2;
@@ -1267,11 +1267,11 @@ int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res,
 
 #ifdef ENABLE_PKI
 
-static int parse_pem_crl_mem( gnutls_x509_crl** crl_list, int* ncrls, 
-	const char *input_crl, int input_crl_size)
+static int parse_pem_crl_mem( gnutls_x509_crl** crl_list, uint* ncrls, 
+	const opaque *input_crl, int input_crl_size)
 {
 	int size, i;
-	const char *ptr;
+	const opaque *ptr;
 	gnutls_datum tmp;
 	int ret, count;
 
@@ -1343,8 +1343,8 @@ static int parse_pem_crl_mem( gnutls_x509_crl** crl_list, int* ncrls,
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
  * returns the number of certificates parsed (1)
  */
-static int parse_der_crl_mem( gnutls_x509_crl** crl_list, int* ncrls, 
-	const char *input_crl, int input_crl_size)
+static int parse_der_crl_mem( gnutls_x509_crl** crl_list, uint* ncrls, 
+	const void *input_crl, int input_crl_size)
 {
 	int i;
 	gnutls_datum tmp;
@@ -1389,7 +1389,7 @@ static int parse_der_crl_mem( gnutls_x509_crl** crl_list, int* ncrls,
 /* Reads a DER or PEM CRL from memory
  */
 static 
-int read_crl_mem(gnutls_certificate_credentials res, const char *crl, int crl_size, 
+int read_crl_mem(gnutls_certificate_credentials res, const void *crl, int crl_size, 
 	gnutls_x509_crt_fmt type)
 {
 	int ret;

@@ -331,7 +331,7 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 	ssize_t ret=0, ret2=0;
 	size_t min;
 	int buf_pos;
-	char *buf;
+	opaque *buf;
 	int recvlowat;
 	int recvdata, alloc_size;
 
@@ -817,11 +817,12 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 /* This is a receive function for the gnutls handshake 
  * protocol. Makes sure that we have received all data.
  */
-ssize_t _gnutls_handshake_io_recv_int( gnutls_session session, ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
+ssize_t _gnutls_handshake_io_recv_int( gnutls_session session, 
+	ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
 {
 	size_t left;
 	ssize_t i;
-	char *ptr;
+	opaque *ptr;
 	size_t dsize;
 		
 	ptr = iptr;

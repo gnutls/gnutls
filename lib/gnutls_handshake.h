@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -24,10 +24,10 @@ int _gnutls_send_handshake( gnutls_session session, void* i_data, uint32 i_datas
 int gnutls_send_hello_request( gnutls_session session);
 int _gnutls_recv_hello_request( gnutls_session session, void* data, uint32 data_size);
 int _gnutls_send_hello( gnutls_session session, int again);
-int _gnutls_recv_hello( gnutls_session session, char* data, int datalen);
+int _gnutls_recv_hello( gnutls_session session, opaque* data, int datalen);
 int gnutls_handshake( gnutls_session session);
 int _gnutls_recv_handshake( gnutls_session session, uint8**, int*, HandshakeType, Optional optional);
-int _gnutls_generate_session_id( char* session_id, uint8* len);
+int _gnutls_generate_session_id( opaque* session_id, uint8* len);
 int _gnutls_handshake_common( gnutls_session session);
 int _gnutls_handshake_client( gnutls_session session);
 int _gnutls_handshake_server( gnutls_session session);

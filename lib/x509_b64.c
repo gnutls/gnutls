@@ -55,7 +55,7 @@ static const uint8 asciitable[128] = {
 	0xff, 0xff
 };
 
-inline static int encode(uint8 * result, const uint8 * data, int left)
+inline static int encode(char * result, const uint8 * data, int left)
 {
 
 	int data_len;
@@ -103,7 +103,7 @@ inline static int encode(uint8 * result, const uint8 * data, int left)
  * result should be 3 bytes
  */
 #define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
-inline static int decode(uint8 * result, const uint8 * data)
+inline static int decode(uint8 * result, const opaque * data)
 {
 	uint8 a1, a2;
 	int ret = 3;

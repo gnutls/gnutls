@@ -219,6 +219,10 @@ static int _find_openpgp_cert(const gnutls_certificate_credentials cred,
 	return 0;
 }
 
+/* Some upper limit to protect alloca();
+ */
+#define MAX_ISSUERS 512
+
 /* Finds the appropriate certificate depending on the cA Distinguished name
  * advertized by the server. If none matches then returns 0 and -1 as index.
  * In case of an error a negative value, is returned.
@@ -308,8 +312,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 				if (dataptr_size == 0)
 					break;
 
-			} while (1);
-
+			} while (issuers_dn_len < MAX_ISSUERS);
 
 			my_certs =
 			    gnutls_alloca(cred->ncerts * sizeof(gnutls_datum));
@@ -529,7 +532,8 @@ extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 int _gnutls_gen_openpgp_certificate_fpr(gnutls_session session,
 					opaque ** data)
 {
-	int ret, fpr_size, packet_size;
+	int ret, packet_size;
+	size_t fpr_size;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
 	gnutls_privkey* apr_pkey;
@@ -697,7 +701,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 	 */
 
 	peer_certificate_list =
-	    gnutls_alloca(sizeof(gnutls_cert) *
+	    gnutls_malloc(sizeof(gnutls_cert) *
 			  (peer_certificate_list_size));
 
 	if (peer_certificate_list == NULL) {
@@ -724,12 +728,9 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 		if ((ret =
 		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list
 						   [j], &tmp,
-						   CERT_ONLY_EXTENSIONS)) <
-		    0) {
+						   CERT_ONLY_EXTENSIONS)) < 0) {
 			gnutls_assert();
-			CLEAR_CERTS;
-			gnutls_afree(peer_certificate_list);
-			return ret;
+			goto cleanup;
 		}
 
 		p += len;
@@ -739,28 +740,25 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session,
 	if ((ret =
 	     _gnutls_copy_certificate_auth_info(info, gnutls_certificate_type_get(session),
 						peer_certificate_list,
-						peer_certificate_list_size))
-	    < 0) {
+						peer_certificate_list_size)) < 0) {
 		gnutls_assert();
-		CLEAR_CERTS;
-		gnutls_afree(peer_certificate_list);
-		return ret;
+		goto cleanup;
 	}
 
 	if ((ret =
 	     _gnutls_check_key_usage(&peer_certificate_list[0],
-					  gnutls_kx_get(session)))
-	    < 0) {
+					  gnutls_kx_get(session))) < 0) {
 		gnutls_assert();
-		CLEAR_CERTS;
-		gnutls_afree(peer_certificate_list);
-		return ret;
+		goto cleanup;
 	}
 
-	CLEAR_CERTS;
-	gnutls_afree(peer_certificate_list);
+	ret = 0;
 
-	return 0;
+cleanup:
+	CLEAR_CERTS;
+	gnutls_free(peer_certificate_list);
+	return ret;
+
 }
 
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) _gnutls_free_cert(&peer_certificate_list[x])
@@ -774,7 +772,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 	const gnutls_certificate_credentials cred;
 	ssize_t dsize = data_size;
 	int i, x;
-	gnutls_cert *peer_certificate_list;
+	gnutls_cert *peer_certificate_list = NULL;
 	int peer_certificate_list_size = 0;
 	gnutls_datum tmp, akey = { NULL, 0 };
 
@@ -874,7 +872,6 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 	if (peer_certificate_list_size == 0) {
 		gnutls_assert();
-		_gnutls_free_datum(&akey);
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
@@ -883,56 +880,50 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 			  (peer_certificate_list_size));
 	if (peer_certificate_list == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
 	}
 	memset(peer_certificate_list, 0, sizeof(gnutls_cert) *
 	       peer_certificate_list_size);
 
 	if (_E_gnutls_openpgp_cert2gnutls_cert == NULL) {
 		gnutls_assert();
-		_gnutls_free_datum(&akey);
-		CLEAR_CERTS;
-		gnutls_afree(peer_certificate_list);
-		return GNUTLS_E_INIT_LIBEXTRA;
+		ret = GNUTLS_E_INIT_LIBEXTRA;
+		goto cleanup;
 	}
 
 	if ((ret =
 	     _E_gnutls_openpgp_cert2gnutls_cert(&peer_certificate_list[0],
 						&tmp)) < 0) {
 		gnutls_assert();
-		_gnutls_free_datum(&akey);
-		CLEAR_CERTS;
-		gnutls_afree(peer_certificate_list);
-		return ret;
+		goto cleanup;
 	}
-	_gnutls_free_datum(&akey);
 
 	if ((ret =
 	     _gnutls_copy_certificate_auth_info(info,
 						gnutls_certificate_type_get(session),
 						peer_certificate_list, 
-						peer_certificate_list_size))
-	    < 0) {
+						peer_certificate_list_size)) < 0) {
 		gnutls_assert();
-		CLEAR_CERTS;
-		gnutls_afree(peer_certificate_list);
-		return ret;
+		goto cleanup;
 	}
 
 	if ((ret =
 	     _gnutls_check_key_usage(&peer_certificate_list[0],
-					  gnutls_kx_get(session)))
-	    < 0) {
+					  gnutls_kx_get(session))) < 0) {
 		gnutls_assert();
-		CLEAR_CERTS;
-		gnutls_afree(peer_certificate_list);
-		return ret;
+		goto cleanup;
 	}
 
+	ret = 0;
+	
+cleanup:
+
+	_gnutls_free_datum(&akey);
 	CLEAR_CERTS;
 	gnutls_afree(peer_certificate_list);
-
-	return 0;
+	return ret;
+	
 }
 
 int _gnutls_proc_cert_server_certificate(gnutls_session session,
@@ -1232,7 +1223,7 @@ int _gnutls_find_apr_cert(gnutls_session session,
 	const gnutls_certificate_credentials cred;
 	int ind;
 
-	cred = _gnutls_get_kx_cred(session, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();

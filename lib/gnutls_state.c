@@ -648,10 +648,11 @@ int i;
  * needed by the TLS specification. ret must have a least total_bytes
  * available.
  */
-int _gnutls_PRF( const opaque * secret, int secret_size, const uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes, void* ret)
+int _gnutls_PRF( const opaque * secret, int secret_size, const char * label, int label_size, 
+	opaque * seed, int seed_size, int total_bytes, void* ret)
 {
 	int l_s, s_seed_size;
-	const char *s1, *s2;
+	const opaque *s1, *s2;
 	opaque s_seed[MAX_SEED_SIZE];
 	opaque o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
 	int result;
@@ -672,6 +673,7 @@ int _gnutls_PRF( const opaque * secret, int secret_size, const uint8 * label, in
 	memcpy(&s_seed[label_size], seed, seed_size);
 
 	l_s = secret_size / 2;
+	
 	s1 = &secret[0];
 	s2 = &secret[l_s];
 

@@ -138,7 +138,7 @@ int _gnutls_sbase64_encode(uint8 * data, size_t data_size, uint8 ** result)
 {
 	uint i,j;
 	int ret, tmp;
-	char tmpres[4];
+	opaque tmpres[4];
 	int mod = data_size % 3;
 
 	ret = mod;

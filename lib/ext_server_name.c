@@ -116,7 +116,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 				    size_t _data_size)
 {
    uint16 len;
-   char *p;
+   opaque *p;
    int i;
    ssize_t data_size = _data_size;
    int total_size = 0;
