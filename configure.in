@@ -131,6 +131,7 @@ AC_MSG_RESULT([***
 *** Detecting compiler options...
 ])
 
+gl_EARLY
 
 AC_C_CONST
 AC_C_INLINE
@@ -513,6 +514,14 @@ fi
 AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
 AM_CONDITIONAL(ENABLE_INCLUDED_LZO, test "$minilzo_enabled" = "yes")
 
+AC_MSG_RESULT([***
+*** Setting up gnulib compatbility files...
+])
+
+gl_SOURCE_BASE(gl)
+gl_M4_BASE(gl/m4)
+gl_MODULES(getline)
+gl_INIT
 
 AC_MSG_RESULT([***
 *** Detecting options for shared libraries...
