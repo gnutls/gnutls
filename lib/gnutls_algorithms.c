@@ -1225,8 +1225,8 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 	for (i = j = 0; i < count; i++) {
 		/* remove private cipher suites, if requested.
 		 */
-		if ( session->internals.enable_private == 0 &&
-			tmp_ciphers[i].CipherSuite[0] == 0xFF)
+		if ( tmp_ciphers[i].CipherSuite[0] == 0xFF && 
+			session->internals.enable_private == 0)
 				continue;
 
 		/* remove cipher suites which do not support the
@@ -1307,9 +1307,8 @@ _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 
 		/* remove private compression algorithms, if requested.
 		 */
-		if (tmp == -1 || (session->internals.enable_private == 0 &&
-			tmp >= MIN_PRIVATE_COMP_ALGO)) {
-
+		if (tmp == -1 || (tmp >= MIN_PRIVATE_COMP_ALGO && 
+			session->internals.enable_private == 0)) {
 			gnutls_assert();
 			continue;
 		}
