@@ -28,6 +28,7 @@
 #include "gnutls_cipher_int.h"
 #include "gnutls_plaintext.h"
 #include "debug.h"
+#include "gnutls_random.h"
 
 int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 		    uint8 ** ciphertext, ContentType type)
@@ -491,7 +492,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 
 		break;
 	case CIPHER_BLOCK:
-		rand = gcry_random_bytes(1, GCRY_WEAK_RANDOM);
+		rand = _gnutls_get_random(1, GNUTLS_WEAK_RANDOM);
 
 		/* make rand a multiple of blocksize */
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
@@ -523,7 +524,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		ciphertext->version.major = compressed->version.major;
 		ciphertext->version.minor = compressed->version.minor;
 
-		gcry_free(rand);
+		_gnutls_free_rand(rand);
 		break;
 	default:
 		gnutls_free(*cipher);

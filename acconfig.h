@@ -18,4 +18,5 @@
 #undef LT_AGE
 #undef USE_DMALLOC
 
+#undef USE_GCRYPT
  

@@ -18,6 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#ifndef DEFINES_H
+# define DEFINES_H
+
 #include <config.h>
 
 #ifdef STDC_HEADERS
@@ -40,6 +43,10 @@
 /* for open */
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
+#endif
+
+#ifdef USE_GCRYPT
+# include <gcrypt.h>
 #endif
 
 #ifdef HAVE_SYS_STAT_H
@@ -99,3 +106,5 @@
 #  error "Neither memmove nor bcopy exists on your system."
 # endif
 #endif
+
+#endif /* defines_h */

@@ -30,6 +30,8 @@ AM_PATH_GCRYPT(1.1.1a,,
 *** ftp://ftp.gnupg.org/pub/gcrypt/alpha/gnupg/
 ***
 ]]))
+dnl Can't disable for now
+AC_DEFINE(USE_GCRYPT)
 
 AC_SUBST(GNUTLS_MAJOR_VERSION)
 AC_SUBST(GNUTLS_MINOR_VERSION)

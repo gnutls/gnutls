@@ -34,6 +34,7 @@
 #include "gnutls_hash_int.h"
 #include "gnutls_db.h"
 #include "gnutls_extensions.h"
+#include "gnutls_random.h"
 
 #ifdef DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
@@ -506,10 +507,10 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		memmove(state->security_parameters.client_random,
 			&cur_time, 4);
 
-		rand = gcry_random_bytes(28, GCRY_STRONG_RANDOM);
+		rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
 		memmove(&state->security_parameters.client_random[4], rand,
 			28);
-		gcry_free(rand);
+		_gnutls_free_rand(rand);
 		
 		state->security_parameters.timestamp = time(0);
 
@@ -791,10 +792,10 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 #endif
 		memmove(state->security_parameters.server_random,
 			&cur_time, 4);
-		rand = gcry_random_bytes(28, GCRY_STRONG_RANDOM);
+		rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
 		memmove(&state->security_parameters.server_random[4], rand,
 			28);
-		gcry_free(rand);
+		_gnutls_free_rand(rand);
 		state->security_parameters.timestamp = time(NULL);
 
 		memmove(&session_id_len, &data[pos++], 1);
@@ -1249,10 +1250,10 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 int _gnutls_generate_session_id(char *session_id, uint8 * len)
 {
 	char *rand;
-	rand = gcry_random_bytes(32, GCRY_WEAK_RANDOM);
+	rand = _gnutls_get_random(32, GNUTLS_WEAK_RANDOM);
 
 	memmove(session_id, rand, 32);
-	gcry_free(rand);
+	_gnutls_free_rand(rand);
 	*len = 32;
 
 #ifdef HARD_DEBUG

@@ -1,0 +1,13 @@
+helpnode "Crypt help\nUsage : crypt [-u user] [-p password file]"
+
+#char *username;
+option (u,username) STR "username" { $username = $1 } "specify username."
+
+#char *passwd;
+option (p, passwd) STR "passwd" { $passwd = $1 } "specify a password file."
+
+option (h, help) { gaa_help(); exit(0); } "shows this help text"
+
+init { $username=NULL; $passwd=NULL; }
+
+OBLIGAT u

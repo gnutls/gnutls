@@ -25,8 +25,6 @@
 
 #ifdef USE_MHASH
 # include <mhash.h>
-#else
-# include <gcrypt.h>
 #endif
 
 /* for message digests */

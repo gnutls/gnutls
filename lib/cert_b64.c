@@ -49,7 +49,7 @@ const static uint8 asciitable[128] = {
 	0xff, 0xff
 };
 
-inline static int encode(uint8 * result, uint8 * data, int left)
+inline static int encode(uint8 * result, const uint8 * data, int left)
 {
 
 	int data_len;
@@ -97,7 +97,7 @@ inline static int encode(uint8 * result, uint8 * data, int left)
  * result should be 3 bytes
  */
 #define TOASCII(c) (c<127 ? asciitable[c] : 0xff)
-inline static int decode(uint8 * result, uint8 * data)
+inline static int decode(uint8 * result, const uint8 * data)
 {
 	uint8 a1, a2;
 	int ret = 3;
@@ -359,6 +359,7 @@ int _gnutls_fbase64_decode(char *msg, uint8 * data, int data_size,
 	gnutls_free(kdata);
 	return ret;
 }
+
 
 #ifdef B64_TEST
 int main()

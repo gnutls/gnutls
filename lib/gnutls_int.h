@@ -40,9 +40,6 @@
 #define HEADER_SIZE 5
 #define MAX_RECV_SIZE 18432+HEADER_SIZE 	/* 2^14+2048+HEADER_SIZE */
 
-/* for big numbers support */ /* FIXME */
-#include <gcrypt.h>
-
 #ifdef USE_DMALLOC
 #include <dmalloc.h>
 #endif
