@@ -1,3 +1,9 @@
+2003-05-03 09:01  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, auth_cert.c:
+
+	Corrections in the TLS layer openpgp certificate packet parser.  
+
 2003-04-18 10:29  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_x509.c, src/serv.c:
