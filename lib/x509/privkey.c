@@ -1014,6 +1014,10 @@ static int _encode_rsa(ASN1_TYPE * c2, mpi_t * params)
 	goto cleanup;
     }
 
+    _gnutls_mpi_release(&exp1);
+    _gnutls_mpi_release(&exp2);
+    _gnutls_mpi_release(&q1);
+    _gnutls_mpi_release(&p1);
     gnutls_free(all_data);
 
     if ((result = asn1_write_value(*c2, "otherPrimeInfos",
