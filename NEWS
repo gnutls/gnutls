@@ -11,6 +11,7 @@ See the end for copying conditions.
 - The API manual is included in Devhelp format.  (Was in last release too,
   but the NEWS entry was forgotten.)
 - The OpenSSL compatibility code now use the internal crypto interface.
+- Added simple self test of OpenSSL compatibility library.
 - Internally, minitasn1 and x509 are built as proper libraries.
 
 * Version 1.1.21 (2004-10-27)
