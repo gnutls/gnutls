@@ -349,10 +349,11 @@ gnutls_check_version( const char *req_version )
   * @session: is a &gnutls_session structure.
   *
   * This function will return a malloc() compatible function to be
-  * used by callbacks.
+  * used by callbacks. The returned function is the one set by
+  * gnutls_global_set_mem_functions().
   *
   **/
-gnutls_alloc_function gnutls_global_get_malloc_function()
+gnutls_alloc_function gnutls_global_get_malloc_function(void)
 {
 	return gnutls_malloc;
 }
@@ -362,10 +363,11 @@ gnutls_alloc_function gnutls_global_get_malloc_function()
   * @session: is a &gnutls_session structure.
   *
   * This function will return a free() compatible function to be
-  * used by callbacks.
+  * used by callbacks. The returned function is the one set by
+  * gnutls_global_set_mem_functions().
   *
   **/
-gnutls_alloc_function gnutls_global_get_free_function()
+gnutls_free_function gnutls_global_get_free_function(void)
 {
 	return gnutls_free;
 }
