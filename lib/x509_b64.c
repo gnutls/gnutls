@@ -353,12 +353,13 @@ inline static int cpydata(const uint8 * data, int data_size, uint8 ** result)
  * The result_size is the return value
  */
 #define ENDSTR "-----\n"
+#define ENDSTR2 "-----\r\n"
 int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t data_size,
 			   uint8 ** result)
 {
 	int ret;
-	char top[] = "-----BEGIN ";
-	char bottom[] = "\n-----END ";
+	const char top[] = "-----BEGIN ";
+	const char bottom[] = "\n-----END ";
 	uint8 *rdata;
 	int rdata_size;
 	uint8 *kdata;
@@ -385,6 +386,10 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 	}
 
 	kdata = strnstr( rdata, ENDSTR, data_size);
+	/* allow CR as well.
+	 */
+	if (kdata==NULL) kdata = strnstr( rdata, ENDSTR2, data_size);
+
 	if (kdata==NULL) {
 		gnutls_assert();
 		_gnutls_x509_log( "Could not find '%s'\n", ENDSTR);
