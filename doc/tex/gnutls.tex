@@ -19,19 +19,19 @@
 \chapter{The Library}
 \section{Introduction}
 \par
-\gnutls is a portable library which implements the {\emph TLS 1.0} and 
-{\emph SSL 3.0} protocols.
+\gnutls is a portable library which implements the \tls 1.0 and 
+\ssl 3.0 protocols.
 TLS stands for 'Transport Layer Security' and is the sucessor of SSL\footnote{
 SSL or Secure Sockets Layer is a protocol designed by Netscape. TLS 1.0 is based on
-{\emph SSL 3.0} protocol. {\emph SSL 2.0} is a very old protocol which is 
-not considered secure today. SSL 2.0 is not implemented in \gnutls}.
-{\emph TLS 1.0}\footnote{described in {\it RFC 2246}} is an Internet protocol,
+\ssl 3.0 protocol. \ssl 2.0 is a very old protocol which is 
+not considered secure today. \ssl 2.0 is not implemented in \gnutls}.
+\tls 1.0\footnote{described in {\it RFC 2246}} is an Internet protocol,
 defined by IETF\footnote{IETF or Internet Engineering Task Force 
 is a large open international community of network
 designers, operators, vendors, and researchers concerned with the evolution of 
 the Internet architecture and the smooth operation of the Internet. It is open to any interested individual.}
 that provides confidentiality, and authentication layers over a {reliable
-transport layer}\footnote{TLS is mostly used over {\emph TCP/IP} although this is not restrictive, you may
+transport layer}\footnote{TLS is mostly used over {\emph{TCP/IP}} although this is not restrictive, you may
 use it over any reliable transport layer.}. \gnutls implements the
 above protocols in reentrant way in order to be used in multiple threads of 
 execution (without the need for Critical Sections and locks).
