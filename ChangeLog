@@ -1,3 +1,40 @@
+2003-01-23 20:55  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_rsa.c, lib/debug.c, lib/gnutls_algorithms.c,
+	lib/gnutls_compress_int.c, lib/gnutls_dh_primes.c,
+	lib/gnutls_errors.c, lib/gnutls_errors.h, lib/gnutls_extensions.c,
+	lib/gnutls_global.c, lib/gnutls_rsa_export.c, lib/gnutls_x509.c,
+	src/cli.c:
+
+	Added ability to send some messages back to the application using 
+	the gnutls_global_set_log_function(). This is quite experimental.  
+
+2003-01-23 18:05  nmav <nmav@gnutls.org>
+
+	* doc/tex/: ex-client-resume.tex, ex-client-srp.tex,
+	ex-client1.tex, ex-client2.tex, ex-rfc2818.tex:
+
+	some minor bugfixes in the documentation.  
+
+2003-01-23 15:29  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_mpi.h:
+
+	Added check and error code for some SRP fatal protocol failures.  
+
+2003-01-23 10:18  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_alert.c, lib/gnutls_auth_int.h,
+	lib/gnutls_handshake.c, src/cli.c:
+
+	The library notifies the application on empty and illegal SRP
+	usernames, so that proper notification (via an alert) is sent to the
+	peer. Currently when the SRP ciphersuite is advertized but no
+	username is sent by the peer, the library returns
+	GNUTLS_E_EMPTY_SRP_USERNAME, and the alert associated with this is
+	GNUTLS_A_ACCESS_DENIED (to be changed when the srp draft defines
+	something more appropriate).  
+
 2003-01-22 17:51  nmav <nmav@gnutls.org>
 
 	* src/: tests.c, tls_test.c (utags: gnutls_0_8_1):
