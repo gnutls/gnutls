@@ -41,7 +41,7 @@ lib_LTLIBRARIES = libgnutls.la
 
 X509_COBJECTS = x509/crl.c x509/dn.c x509/common.c x509/x509.c x509/extensions.c \
 	x509/dsa.c x509/rfc2818_hostname.c x509/verify.c x509/mpi.c \
-	x509/privkey.c x509/pkcs7.c x509/crq.c x509/xml.c x509/sign.c x509/pkcs5.c \
+	x509/privkey.c x509/pkcs7.c x509/crq.c x509/xml.c x509/sign.c \
 	x509/privkey_pkcs8.c x509/pkcs12.c x509/pkcs12_bag.c x509/pkcs12_encr.c \
 	x509/x509_write.c x509/crl_write.c x509/compat.c
 
