@@ -66,6 +66,7 @@ _gnutls_map_cdk_rc( int rc )
 {
     switch( rc ) {
     case CDK_Success: return 0;
+    case CDK_Too_Short: return GNUTLS_E_SHORT_MEMORY_BUFFER;
     case CDK_General_Error: return GNUTLS_E_INTERNAL_ERROR;
     case CDK_File_Error: return GNUTLS_E_FILE_ERROR;
     case CDK_MPI_Error: return GNUTLS_E_MPI_SCAN_FAILED;

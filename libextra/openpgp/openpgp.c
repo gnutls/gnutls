@@ -104,7 +104,12 @@ int rc;
     			return GNUTLS_E_INTERNAL_ERROR;
     		}
 
-	    	cdk_stream_set_armor_flag( key->inp, 0 );
+		rc = cdk_stream_set_armor_flag( key->inp, 0);
+		if (rc) {
+			rc = _gnutls_map_cdk_rc( rc);
+			gnutls_assert();
+			return rc;
+		}
 
 		rc = cdk_keydb_get_keyblock( key->inp, &key->knode );
 		if( rc) {
@@ -114,6 +119,77 @@ int rc;
 		}
 	}
 	
+	return 0;
+}
+
+/**
+  * gnutls_openpgp_key_export - This function will export a RAW or BASE64 encoded key
+  * @key: Holds the key.
+  * @format: One of gnutls_openpgp_key_fmt elements.
+  * @output_data: will contain the key base64 encoded or raw
+  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will convert the given key to RAW or Base64 format.
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_openpgp_key_export(gnutls_openpgp_key key, 
+	gnutls_openpgp_key_fmt format, unsigned char* output_data,
+	size_t* output_data_size)
+{
+int rc;
+size_t input_data_size = *output_data_size;
+
+	rc = cdk_kbnode_write_to_mem( key->knode, 
+		output_data, output_data_size);
+	if( rc) {
+		rc = _gnutls_map_cdk_rc( rc);
+		gnutls_assert();
+		return rc;
+	}
+
+	if (format == GNUTLS_OPENPGP_FMT_BASE64) {
+		cdk_stream_t s;
+		
+		s = cdk_stream_tmp_from_mem( output_data, *output_data_size);
+		if (s == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		cdk_stream_tmp_set_mode( s, 1);
+		rc = cdk_stream_set_armor_flag( s, CDK_ARMOR_PUBKEY);
+		if (rc) {
+			rc = _gnutls_map_cdk_rc( rc);
+			gnutls_assert();
+			cdk_stream_close(s);
+			return rc;
+		}
+		
+		
+		*output_data_size = input_data_size;
+		
+		rc = cdk_stream_read( s, output_data, *output_data_size);
+		if (rc==EOF) {
+			gnutls_assert();
+			cdk_stream_close(s);
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		*output_data_size = rc;
+		if (*output_data_size !=  cdk_stream_get_length(s)) {
+			*output_data_size = cdk_stream_get_length(s);
+			cdk_stream_close(s);
+			gnutls_assert();
+			return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		}
+		
+		cdk_stream_close(s);
+	}
+
 	return 0;
 }
 
@@ -184,6 +260,10 @@ _gnutls_openpgp_count_key_names( gnutls_openpgp_key key)
  * @sizeof_buf: holds the size of 'buf'
  *
  * Extracts the userID from the parsed OpenPGP key.
+ *
+ * Returns 0 on success, and GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the index of the ID does not exist.
+ *
  **/
 int
 gnutls_openpgp_key_get_name( gnutls_openpgp_key key, 
@@ -203,8 +283,7 @@ gnutls_openpgp_key_get_name( gnutls_openpgp_key key,
     }
     
     if( idx < 0 || idx > _gnutls_openpgp_count_key_names( key) ) {
-        gnutls_assert( );
-        return GNUTLS_E_INTERNAL_ERROR;
+        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
     if( !idx )

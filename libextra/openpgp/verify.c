@@ -182,7 +182,6 @@ int gnutls_openpgp_key_verify_trustdb( gnutls_openpgp_key key,
 	gnutls_openpgp_trustdb trustdb,
         unsigned int flags, unsigned int *verify)
 {
-    cdk_keydb_hd_t hd = NULL;
     int rc = 0;
   
     if( !key) {
@@ -202,7 +201,6 @@ int gnutls_openpgp_key_verify_trustdb( gnutls_openpgp_key key,
     rc = 0;
     
 leave:
-    cdk_free( hd );
     if( rc ) {
         gnutls_assert();
     }

@@ -57,7 +57,7 @@ int gnutls_openpgp_verify_key(const char *trustdb,
 	gnutls_openpgp_key key = NULL;
 	gnutls_openpgp_keyring ring = NULL;
 	gnutls_openpgp_trustdb tdb = NULL;
-	unsigned int verify_ring, verify_db, verify_self;
+	unsigned int verify_ring = 0, verify_db = 0, verify_self = 0;
 
 	if (!cert_list || cert_list_length != 1) {
 		gnutls_assert();
