@@ -23,15 +23,19 @@ functions.
 
 \subsection*{Server name indication}
 \index{TLS Extensions!Server name indication}
+\label{serverind}
 
 A common problem in HTTPS servers is the fact that the \tls{}
 protocol is not aware of the hostname that a client connects to, when
 the handshake procedure begins. For that reason the \tls{} server
-has no way to know which certificate to send. This extension is hack
-to the \tls{} protocol to allow the client to send the HTTP hostname
-before the handshake begins --within the first handshake packet.
+has no way to know which certificate to send. 
 
-See the functions
+This extension solves that problem within the \tls{} protocol
+and allows a client to send the HTTP hostname
+before the handshake begins --within the first handshake packet.
+The functions 
 \printfunc{gnutls_server_name_set}{gnutls\_server\_name\_set} and
-\printfunc{gnutls_server_name_get}{gnutls\_server\_name\_get}.
+\printfunc{gnutls_server_name_get}{gnutls\_server\_name\_get}
+can be used to enable this extension, or to retrieve the name sent
+by a client.
 
