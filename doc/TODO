@@ -4,7 +4,7 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
-* Add functions to parse DER encoded private keys
+* Add more functions to parse DER encoded private keys
 * Add support for the certificate authenticated SRP cipher suites
 * Add option to read the SRP parameters using a callback (server side)
 * Add functions to generate SRP parameters and SRP verifiers

@@ -100,6 +100,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 /* get data from the session */
 const gnutls_datum* gnutls_certificate_get_peers( gnutls_session, int* list_size);
 const gnutls_datum *gnutls_certificate_get_ours( gnutls_session session);
+const gnutls_datum *gnutls_certificate_get_our_issuer(gnutls_session session);
 
 time_t gnutls_certificate_activation_time_peers(gnutls_session session);
 time_t gnutls_certificate_expiration_time_peers(gnutls_session session);

@@ -1,6 +1,8 @@
 Version 0.5.9
 - Added gnutls_x509_extract_key_pk_algorithm() function which extracts
   the private key type.
+- Corrected some code which worked fine in gcc 3.2, but not with any
+  other compiler.
 
 Version 0.5.8 (25/09/2002)
 - Updated documentation.

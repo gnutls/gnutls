@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -181,7 +181,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
   * gnutls_certificate_get_ours - This function returns the raw certificate sent in the last handshake
   * @session: is a gnutls session
   *
-  * This function will return the raw certificate list as sent to the peer,
+  * This function will return the certificate as sent to the peer,
   * in the last handshake. These certificates are in raw format. 
   * In X.509 this is a certificate list. In OpenPGP this is a single
   * certificate.
@@ -202,9 +202,46 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 	}
 
 	index = session->internals.selected_cert_index;
-	if (index < 0) return NULL; /* no certificate */
+	if (index < 0) {
+	   gnutls_assert();
+	   return NULL; /* no certificate */
+	}
 	
-	return &cred->cert_list[index]->raw;
+	return &cred->cert_list[index][0].raw;
+}
+
+/**
+  * gnutls_certificate_get_our_issuer - This function returns the raw certificate sent in the last handshake
+  * @session: is a gnutls session
+  *
+  * This function will return the raw certificate of our issuer as sent to the peer,
+  * in the last handshake. This certificate is in raw format. 
+  * This has no meaning for OpenPGP keys.
+  * Returns NULL in case of an error, or if no certificate was found.
+  *
+  **/
+const gnutls_datum *gnutls_certificate_get_our_issuer(gnutls_session session)
+{
+	const gnutls_certificate_credentials cred;
+	int index;
+
+	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
+
+	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	index = session->internals.selected_cert_index;
+	if (index < 0) {
+	   gnutls_assert();
+	   return NULL; /* no certificate */
+	}
+
+	if (cred->cert_list_length[index]-1 > 0)
+   	   return &cred->cert_list[index][cred->cert_list_length[index]-1].raw;
+   	else return NULL;
 }
 
 /**

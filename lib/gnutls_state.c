@@ -125,7 +125,6 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 	session->internals.extensions_sent_size = 0;
 
 	/* by default no selected certificate */
-	session->internals.selected_cert_index = -1;
 	session->internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
 	session->internals.adv_version_major = 0;
 	session->internals.adv_version_minor = 0;
