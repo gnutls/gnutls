@@ -428,7 +428,7 @@ int main(int argc, char **argv)
 {
 	gaainfo info;
 	char *passwd;
-	int salt;
+	int salt, ret;
 	struct passwd *pwd;
 
 	if ((ret=gnutls_global_init()) < 0) {
