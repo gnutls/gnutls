@@ -1,3 +1,24 @@
+2002-11-19 13:07  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in, lib/gnutls_alert.c, lib/gnutls_algorithms.c,
+	lib/gnutls_cert.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_x509.c, src/cli.c, src/common.c, src/common.h,
+	src/serv.c:
+
+	Added support for the DSS certificate SRP authenticated cipher
+	suites (currently only with 3DES cipher). Cleaned up the client and
+	server code, which was duplicated.  
+
+2002-11-19 12:01  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_cert.c, lib/gnutls.h.in.in,
+	lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_auth.c, lib/gnutls_auth_int.h, lib/gnutls_cert.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_v2_compat.c,
+	lib/gnutls_x509.c, src/cli.c, src/common.c, src/serv.c:
+
+	Added certificate authenticated SRP cipher suites.  
+
 2002-11-17 12:13  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_int_compat.c:
