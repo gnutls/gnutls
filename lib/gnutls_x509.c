@@ -284,6 +284,10 @@ time_t _gnutls_x509_get_time(node_asn * c2, char *root, char *when)
 			ctime = _gnutls_utcTime2gtime(ttime);
 	}
 
+	/* We cannot handle dates after 2031 in 32 bit machines.
+	 * a time_t of 64bits has to be used.
+	 */
+	 	
 	if (result != ASN_OK) {
 		gnutls_assert();
 		return (time_t) (-1);
@@ -303,7 +307,7 @@ int _gnutls_x509_get_version(node_asn * c2, char *root)
 	len = sizeof(gversion) - 1;
 	if ((result = asn1_read_value(c2, name, gversion, &len)) < 0) {
 		gnutls_assert();
-		return (-1);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	return (int) gversion[0] + 1;
 }
@@ -1747,7 +1751,20 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	    _gnutls_x509_get_time(c2, "certificate2", "notAfter");
 	gCert->activation_time =
 	    _gnutls_x509_get_time(c2, "certificate2", "notBefore");
+
+	if (gCert->expiration_time == (time_t)(-1) ||
+		gCert->activation_time == (time_t)(-1)) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_UNIX_TIME_LIMIT_EXCEEDED;
+	}
+
 	gCert->version = _gnutls_x509_get_version(c2, "certificate2");
+	if (gCert->version < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;  
+	}	 
 
 	if ((result =
 	     _gnutls_get_ext_type(c2,

@@ -149,7 +149,6 @@ static int check_if_expired(gnutls_cert * cert)
 
 	/* get the issuer of 'cert'
 	 */
-
 	if (time(NULL) < cert->expiration_time)
 		ret = 0;
 
@@ -330,7 +329,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	ret = check_if_expired( issuer);
 	if (ret != 0) {
 		gnutls_assert();
-		return ret_else|GNUTLS_CERT_EXPIRED;
+		return ret_else | GNUTLS_CERT_EXPIRED;
 	}
 	
         ret = gnutls_x509_verify_signature(cert, issuer);

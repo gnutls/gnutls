@@ -1864,10 +1864,13 @@ yylex()
   *
   * Returns:
   *
-  * ASN_OK: the file has a correct syntax and every identifier is known. 
-  * ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
-  * ASN_SYNTAX_ERROR: the syntax is not correct.
-  * ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
+  * ASN_OK\: the file has a correct syntax and every identifier is known. 
+  *
+  * ASN_FILE_NOT_FOUND\: an error occured while opening FILE_NAME.
+  *
+  * ASN_SYNTAX_ERROR\: the syntax is not correct.
+  *
+  * ASN_IDENTIFIER_NOT_FOUND\: in the file there is an identifier that is not defined.
   **/
 int asn1_parser_asn1(char *file_name,node_asn **pointer){
   p_tree=NULL;
@@ -1916,10 +1919,13 @@ int asn1_parser_asn1(char *file_name,node_asn **pointer){
   *
   * Returns:
   *
-  *  ASN_OK: the file has a correct syntax and every identifier is known. 
-  *  ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
-  *  ASN_SYNTAX_ERROR: the syntax is not correct.
-  *  ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
+  *  ASN_OK\: the file has a correct syntax and every identifier is known. 
+  *
+  *  ASN_FILE_NOT_FOUND\: an error occured while opening FILE_NAME.
+  *
+  *  ASN_SYNTAX_ERROR\: the syntax is not correct.
+  *
+  *  ASN_IDENTIFIER_NOT_FOUND\: in the file there is an identifier that is not defined.
   **/
 int asn1_parser_asn1_file_c(char *file_name){
   int result;

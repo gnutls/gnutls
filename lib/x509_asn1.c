@@ -30,7 +30,7 @@
 #include "x509_asn1.h" 
 #include "x509_der.h"
 #include <gnutls_str.h>
-
+#include <gnutls_errors.h>
 
 /* define used for visiting trees */
 #define UP     1
@@ -436,7 +436,10 @@ _asn1_convert_integer(char *value,unsigned char *value_out,int value_out_size, i
      (!negative && (val[k]&0x80))) k--; 
 
   for(k2=k;k2<4;k2++) {
-    if (k2-k > value_out_size-1) return ASN_MEM_ERROR;
+    if (k2-k > value_out_size-1) {
+        gnutls_assert();
+    	return ASN_MEM_ERROR;
+    }
     /* VALUE_OUT is too short to contain the value convertion */
     value_out[k2-k]=val[k2];
   }
@@ -1299,6 +1302,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 #define PUT_VALUE( ptr, ptr_size, data, data_size) \
 	*len = data_size; \
 	if (ptr_size < data_size) { \
+		gnutls_assert(); \
 		return ASN_MEM_ERROR; \
 	} else { \
 		memcpy( ptr, data, data_size); \
@@ -1307,6 +1311,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 #define PUT_STR_VALUE( ptr, ptr_size, data) \
 	*len = strlen(data) + 1; \
 	if (ptr_size < *len) { \
+		gnutls_assert(); \
 		return ASN_MEM_ERROR; \
 	} else { \
 		/* this strcpy is checked */ \
@@ -1316,6 +1321,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 #define ADD_STR_VALUE( ptr, ptr_size, data) \
 	*len = strlen(data) + 1; \
 	if (ptr_size < strlen(ptr)+(*len)) { \
+		gnutls_assert(); \
 		return ASN_MEM_ERROR; \
 	} else { \
 		/* this strcat is checked */ \

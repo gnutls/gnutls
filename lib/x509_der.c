@@ -29,7 +29,7 @@
 #include "x509_der.h"
 #include "x509_asn1.h"
 #include <gnutls_str.h>
-
+#include <gnutls_errors.h>
 
 #define TAG_BOOLEAN          0x01
 #define TAG_INTEGER          0x02
@@ -192,9 +192,12 @@ _asn1_get_octet_der(unsigned char *der,int *der_len,unsigned char *str,int str_s
 
   if(str==NULL) return ASN_OK;
   *str_len=_asn1_get_length_der(der,&len_len);
-  if ( str_size > *str_len)
+  if ( str_size >= *str_len)
 	  memcpy(str,der+len_len,*str_len);
-  else return ASN_MEM_ERROR;
+  else {
+  	gnutls_assert();
+  	return ASN_MEM_ERROR;
+  }
   *der_len=*str_len+len_len;
   
   return ASN_OK;
@@ -369,10 +372,12 @@ _asn1_get_bit_der(unsigned char *der,int *der_len,unsigned char *str, int str_si
   if(str==NULL) return ASN_OK;
   len_byte=_asn1_get_length_der(der,&len_len)-1;
   
-  if (str_size > len_byte)
+  if (str_size >= len_byte)
  	memcpy(str,der+len_len+1,len_byte);
-  else return ASN_MEM_ERROR;
-  
+  else {
+  	gnutls_assert();
+  	return ASN_MEM_ERROR;
+  }
   *bit_len=len_byte*8-der[len_len];
   *der_len=len_byte+len_len+1;
 
