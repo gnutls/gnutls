@@ -40,7 +40,7 @@
   * data on success, or a gnutls_datum containing null and 0 on failure.
   *
   * The datum's data must be allocated using the function returned by
-  * gnutls_get_malloc_function().
+  * gnutls_global_get_malloc_function().
   *
   * The first argument to store_function() will be null unless gnutls_db_set_ptr() 
   * has been called.

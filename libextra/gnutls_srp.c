@@ -514,7 +514,7 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
   * 'username' contains the actual username.
   *
   * The 'salt', 'verifier', 'generator' and 'prime' must be filled
-  * in using the malloc returned by gnutls_get_malloc_function().
+  * in using the malloc returned by gnutls_global_get_malloc_function().
   *
   * In case the callback returned a negative number then gnutls will
   * assume that the username does not exist.
