@@ -74,6 +74,7 @@
 #define GNUTLS_E_UNKNOWN_PK_ALGORITHM -80
 #define GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED -81
 #define GNUTLS_E_OPENPGP_GETKEY_FAILED -88
+#define GNUTLS_E_INVALID_VALUE -89
 
 /* returned if libextra functionality was requested but
  * gnutls_global_init_extra() was not called.
