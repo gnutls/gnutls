@@ -22,11 +22,11 @@ release:
 	cvs commit -m "" ChangeLog
 	cvs rtag -F $(tag) gnutls
 	make dist
-	gpg -b $(distdir).tar.gz
-	gpg --verify $(distdir).tar.gz.sig
-	scp $(distdir).tar.gz{,.sig} igloo.linux.gr:/ftp/pub/gnutls/devel
+	gpg -b $(distdir).tar.bz2
+	gpg --verify $(distdir).tar.bz2.sig
+	scp $(distdir).tar.bz2{,.sig} igloo.linux.gr:/ftp/pub/gnutls/devel
 	ssh igloo.linux.gr 'cd /ftp/pub/gnutls/devel && md5sum *.tar.gz *.tar.bz2 > CHECKSUMS'
 	cd doc && ./gendocs.sh -o ../$(htmldir)/manual/ $(PACKAGE) "GNU TLS"
-	cp -v $(distdir).tar.gz{,.sig} $(htmldir)/releases/
-	cd $(htmldir) && cvs add -kb releases/$(distdir).tar.gz{,.sig} && \
+	cp -v $(distdir).tar.bz2{,.sig} $(htmldir)/releases/
+	cd $(htmldir) && cvs add -kb releases/$(distdir).tar.bz2{,.sig} && \
 		cvs commit -m "Update." manual/ releases/
