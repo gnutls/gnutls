@@ -1,25 +1,30 @@
 2003-03-12 12:43  nmav <nmav@gnutls.org>
 
-	* NEWS, configure.in, lib/gnutls_dh_primes.c, lib/gnutls_x509.c,
-	src/cli.c:
+	* NEWS, configure.in (tags: gnutls_0_9_1), lib/gnutls_dh_primes.c
+	(tags: gnutls_0_9_1), lib/gnutls_x509.c (tags: gnutls_0_9_1),
+	src/cli.c (tags: gnutls_0_9_1):
 
 	Use mmap() if available to read files.  
 
 2003-03-12 12:06  nmav <nmav@gnutls.org>
 
-	* NEWS, configure.in, lib/Makefile.am, lib/defines.h,
-	lib/gnutls_dh_primes.c, lib/gnutls_x509.c, lib/strnstr.c,
-	lib/x509_b64.c:
+	* NEWS, configure.in, lib/Makefile.am (tags: gnutls_0_9_1),
+	lib/defines.h (tags: gnutls_0_9_1), lib/gnutls_dh_primes.c,
+	lib/gnutls_x509.c, lib/strnstr.c (tags: gnutls_0_9_1),
+	lib/x509_b64.c (tags: gnutls_0_9_1):
 
 	* Added an strnstr() function and the requirement in some functions
 	  to use null terminated PEM structures is no more.  
 
 2003-03-12 10:57  nmav <nmav@gnutls.org>
 
-	* NEWS, lib/auth_cert.c, lib/auth_cert.h, lib/auth_dhe.c,
-	lib/auth_rsa.c, lib/auth_rsa_export.c, lib/gnutls_cert.c,
-	lib/gnutls_cert.h, lib/gnutls_mpi.h, lib/gnutls_sig.c,
-	lib/gnutls_sig.h, lib/gnutls_x509.c:
+	* NEWS, lib/auth_cert.c (tags: gnutls_0_9_1), lib/auth_cert.h
+	(tags: gnutls_0_9_1), lib/auth_dhe.c (tags: gnutls_0_9_1),
+	lib/auth_rsa.c (tags: gnutls_0_9_1), lib/auth_rsa_export.c (tags:
+	gnutls_0_9_1), lib/gnutls_cert.c, lib/gnutls_cert.h (tags:
+	gnutls_0_9_1), lib/gnutls_mpi.h (tags: gnutls_0_9_1),
+	lib/gnutls_sig.c (tags: gnutls_0_9_1), lib/gnutls_sig.h (tags:
+	gnutls_0_9_1), lib/gnutls_x509.c:
 
 	* Added ability to generate RSA keys.  
 	* Increased the maximum parameter size in order to read some large
@@ -32,14 +37,14 @@
 	* lib/: Makefile.am, auth_cert.c, auth_cert.h, auth_dhe.c,
 	auth_rsa.c, auth_rsa_export.c, gnutls_cert.c, gnutls_cert.h,
 	gnutls_int.h, gnutls_privkey.c, gnutls_privkey.h, gnutls_sig.c,
-	gnutls_sig.h, gnutls_x509.c, gnutls_x509.h:
+	gnutls_sig.h, gnutls_x509.c, gnutls_x509.h (tags: gnutls_0_9_1):
 
 	some improvements in the private key handling api. It is now used
 	internally.  
 
 2003-03-11 07:51  nmav <nmav@gnutls.org>
 
-	* lib/: gnutls.h.in.in, gnutls_ui.c:
+	* lib/: gnutls.h.in.in (tags: gnutls_0_9_1), gnutls_ui.c:
 
 	The fingerprint now accepts a pointer to an int instead of a ptr to
 	a size_t.  
@@ -54,13 +59,14 @@
 2003-03-07 12:24  nmav <nmav@gnutls.org>
 
 	* doc/protocol/: draft-ietf-tls-rfc2246-bis-02.txt,
-	draft-ietf-tls-rfc2246-bis-03.txt:
+	draft-ietf-tls-rfc2246-bis-03.txt (tags: gnutls_0_9_1):
 
 	added the new tls 1.1 draft 
 
 2003-03-06 20:20  nmav <nmav@gnutls.org>
 
-	* configure.in, lib/Makefile.am, lib/gnutls_buffers.c:
+	* configure.in, lib/Makefile.am, lib/gnutls_buffers.c (tags:
+	gnutls_0_9_1):
 
 	the documentation is now created on dist time.  
 
@@ -73,7 +79,8 @@
 2003-03-05 17:23  nmav <nmav@gnutls.org>
 
 	* doc/: README.CODING_STYLE, tex/certificate.tex,
-	tex/ex-rfc2818.tex, tex/ex-serv-export.tex, tex/ex-serv1.tex:
+	tex/ex-rfc2818.tex, tex/ex-serv-export.tex, tex/ex-serv1.tex
+	(utags: gnutls_0_9_1):
 
 	some documentation fixes.  
 
@@ -85,16 +92,19 @@
 
 2003-03-04 14:38  nmav <nmav@gnutls.org>
 
-	* doc/tex/record_weaknesses.tex:
+	* doc/tex/record_weaknesses.tex (tags: gnutls_0_9_1):
 
 	Documented the last timing attack.  
 
 2003-03-04 07:47  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/defines.h, lib/gnutls.h.in.in,
-	lib/gnutls_alert.c, lib/gnutls_cipher.c, lib/gnutls_constate.c,
-	lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_num.c,
-	lib/gnutls_num.h, lib/gnutls_ui.c, lib/gnutls_x509.c, src/serv.c:
+	lib/gnutls_alert.c (tags: gnutls_0_9_1), lib/gnutls_cipher.c (tags:
+	gnutls_0_9_1), lib/gnutls_constate.c (tags: gnutls_0_9_1),
+	lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_num.c (tags:
+	gnutls_0_9_1), lib/gnutls_num.h (tags: gnutls_0_9_1),
+	lib/gnutls_ui.c, lib/gnutls_x509.c, src/serv.c (tags:
+	gnutls_0_9_1):
 
 	* Corrected a bug in 64 bit architectures, which affected the 
 	  serial number calculation in the record layer.  
@@ -121,7 +131,8 @@
 
 2003-03-03 16:08  nmav <nmav@gnutls.org>
 
-	* NEWS, lib/gnutls_cipher.c, lib/gnutls_cipher_int.c:
+	* NEWS, lib/gnutls_cipher.c, lib/gnutls_cipher_int.c (tags:
+	gnutls_0_9_1):
 
 	Added protection against the new TLS 1.0 record layer timing attack.  
 
@@ -136,40 +147,45 @@
 
 2003-03-03 15:34  nmav <nmav@gnutls.org>
 
-	* src/: tests.c, tls_test.c:
+	* src/: tests.c, tls_test.c (utags: gnutls_0_9_1):
 
 	some fixes in tests 
 
 2003-02-27 23:40  nmav <nmav@gnutls.org>
 
-	* NEWS, lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
-	lib/gnutls_hash_int.c, lib/gnutls_int.h:
+	* NEWS, lib/gnutls.h.in.in, lib/gnutls_algorithms.c (tags:
+	gnutls_0_9_1), lib/gnutls_hash_int.c (tags: gnutls_0_9_1),
+	lib/gnutls_int.h:
 
 	Added support for MD2 signature verification in X.509 certificates.  
 
 2003-02-25 21:39  nmav <nmav@gnutls.org>
 
-	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa, tests.c, tls_test.c:
+	* src/: cli-gaa.c (tags: gnutls_0_9_1), cli-gaa.h (tags:
+	gnutls_0_9_1), cli.c, cli.gaa (tags: gnutls_0_9_1), tests.c,
+	tls_test.c:
 
 	Added option to disable all TLS 1.0 extensions.  
 
 2003-02-22 22:26  nmav <nmav@gnutls.org>
 
-	* configure.in, doc/tex/Makefile.am, lib/Makefile.am:
+	* configure.in, doc/tex/Makefile.am (tags: gnutls_0_9_1),
+	lib/Makefile.am:
 
 	some fixes in makefiles.  
 
 2003-02-20 07:38  nmav <nmav@gnutls.org>
 
-	* doc/tex/: Makefile.am, ex-cert-select.tex, ex-info.tex,
-	examples.tex:
+	* doc/tex/: Makefile.am, ex-cert-select.tex (tags: gnutls_0_9_1),
+	ex-info.tex, examples.tex (tags: gnutls_0_9_1):
 
 	Added a small example on how to use the certificate selection
 	callback in client side.  
 
 2003-02-18 22:55  nmav <nmav@gnutls.org>
 
-	* lib/: gnutls_auth.c, gnutls_mpi.c, gnutls_pk.c:
+	* lib/: gnutls_auth.c, gnutls_mpi.c, gnutls_pk.c (utags:
+	gnutls_0_9_1):
 
 	some fixes in types.  
 
@@ -189,9 +205,11 @@
 2003-02-16 09:17  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex-serv-export.tex, doc/tex/ex-serv1.tex,
-	lib/Makefile.am, lib/dh_compat.c, lib/gnutls.h.in.in,
-	lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_rsa_export.c,
-	lib/gnutls_rsa_export.h, lib/rsa_compat.c, src/prime.c, src/serv.c:
+	lib/Makefile.am, lib/dh_compat.c (tags: gnutls_0_9_1),
+	lib/gnutls.h.in.in, lib/gnutls_dh_primes.c, lib/gnutls_int.h,
+	lib/gnutls_rsa_export.c (tags: gnutls_0_9_1),
+	lib/gnutls_rsa_export.h (tags: gnutls_0_9_1), lib/rsa_compat.c
+	(tags: gnutls_0_9_1), src/prime.c (tags: gnutls_0_9_1), src/serv.c:
 
 	The RSA and DH parameter handling has been updated.  
 
@@ -213,8 +231,8 @@
 2003-02-14 15:48  nmav <nmav@gnutls.org>
 
 	* lib/auth_cert.c, lib/gnutls.h.in.in, lib/gnutls_cert.c,
-	lib/gnutls_ui.h, src/cli.c, src/common.c, src/tests.c, src/tests.h,
-	src/tls_test.c:
+	lib/gnutls_ui.h (tags: gnutls_0_9_1), src/cli.c, src/common.c,
+	src/tests.c, src/tests.h (tags: gnutls_0_9_1), src/tls_test.c:
 
 	Corrected bugs in gnutls_x509_rdn_get(). Added a test to print the
 	server's trusted CAs in gnutls-cli-debug, and in gnutls-cli.  
@@ -237,8 +255,9 @@
 
 2003-02-13 09:23  nmav <nmav@gnutls.org>
 
-	* README, doc/TODO, lib/auth_cert.c, lib/gnutls_int.h,
-	lib/gnutls_state.c, lib/gnutls_x509.c:
+	* README (tags: gnutls_0_9_1), doc/TODO, lib/auth_cert.c,
+	lib/gnutls_int.h, lib/gnutls_state.c (tags: gnutls_0_9_1),
+	lib/gnutls_x509.c:
 
 	Added option to allow an X.509 server not to send the trusted CA
 	list to the peer.  
@@ -261,7 +280,7 @@
 2003-02-12 11:48  nmav <nmav@gnutls.org>
 
 	* doc/protocol/: draft-ietf-tls-extensions-05.txt,
-	draft-ietf-tls-extensions-06.txt:
+	draft-ietf-tls-extensions-06.txt (tags: gnutls_0_9_1):
 
 	added new extensions draft.  
 
@@ -281,7 +300,8 @@
 
 2003-02-10 16:51  nmav <nmav@gnutls.org>
 
-	* lib/: debug.c, debug.h, gnutls.h.in.in, gnutls_errors.c,
+	* lib/: debug.c (tags: gnutls_0_9_1), debug.h (tags: gnutls_0_9_1),
+	gnutls.h.in.in, gnutls_errors.c (tags: gnutls_0_9_1),
 	gnutls_global.c, gnutls_ui.c, gnutls_ui.h:
 
 	renamed gnutls_x509_fingerprint to gnutls_fingerprint.  
@@ -297,12 +317,14 @@
 	* lib/Makefile.am, lib/auth_cert.c, lib/auth_cert.h,
 	lib/auth_dhe.c, lib/auth_rsa.c, lib/auth_rsa_export.c,
 	lib/gnutls.h.in.in, lib/gnutls_cert.c, lib/gnutls_cert.h,
-	lib/gnutls_dh_primes.c, lib/gnutls_handshake.c,
-	lib/gnutls_rsa_export.c, lib/gnutls_ui.h, lib/gnutls_x509.c,
-	lib/gnutls_x509.h, lib/x509_extensions.c, lib/x509_extensions.h,
-	lib/x509_sig_check.c, lib/x509_verify.c, lib/x509_verify.h,
-	src/cli-gaa.c, src/cli-gaa.h, src/cli.c, src/cli.gaa,
-	src/serv-gaa.c, src/serv-gaa.h, src/serv.c, src/serv.gaa:
+	lib/gnutls_dh_primes.c, lib/gnutls_handshake.c (tags:
+	gnutls_0_9_1), lib/gnutls_rsa_export.c, lib/gnutls_ui.h,
+	lib/gnutls_x509.c, lib/gnutls_x509.h, lib/x509_extensions.c,
+	lib/x509_extensions.h, lib/x509_sig_check.c, lib/x509_verify.c,
+	lib/x509_verify.h, src/cli-gaa.c, src/cli-gaa.h, src/cli.c,
+	src/cli.gaa, src/serv-gaa.c (tags: gnutls_0_9_1), src/serv-gaa.h
+	(tags: gnutls_0_9_1), src/serv.c, src/serv.gaa (tags:
+	gnutls_0_9_1):
 
 	Several internal changes to use the new certificate API. CRL support
 	is complete.  
@@ -344,8 +366,9 @@
 
 2003-02-07 14:48  nmav <nmav@gnutls.org>
 
-	* NEWS, lib/Makefile.am, lib/gnutls_cert.c, lib/gnutls_errors.h,
-	lib/gnutls_errors_int.h, lib/gnutls_x509.c:
+	* NEWS, lib/Makefile.am, lib/gnutls_cert.c, lib/gnutls_errors.h
+	(tags: gnutls_0_9_1), lib/gnutls_errors_int.h (tags: gnutls_0_9_1),
+	lib/gnutls_x509.c:
 
 	The old certificate parsing API was reimplemented over the new one.
 	It will stay in the 1.0.0 release for compatibility reasons.  
@@ -358,10 +381,12 @@
 
 2003-02-07 10:15  nmav <nmav@gnutls.org>
 
-	* doc/tex/ex-client-resume.tex, doc/tex/ex-client1.tex,
-	doc/tex/ex-client2.tex, doc/tex/ex-serv-export.tex,
-	doc/tex/ex-serv-pgp.tex, doc/tex/ex-serv1.tex, lib/Makefile.am,
-	lib/gnutls_x509.c, lib/gnutls_x509.h, lib/x509_xml.c:
+	* doc/tex/ex-client-resume.tex (tags: gnutls_0_9_1),
+	doc/tex/ex-client1.tex (tags: gnutls_0_9_1), doc/tex/ex-client2.tex
+	(tags: gnutls_0_9_1), doc/tex/ex-serv-export.tex,
+	doc/tex/ex-serv-pgp.tex (tags: gnutls_0_9_1), doc/tex/ex-serv1.tex,
+	lib/Makefile.am, lib/gnutls_x509.c, lib/gnutls_x509.h,
+	lib/x509_xml.c:
 
 	Added the new certificate handling functions.  
 
@@ -382,7 +407,8 @@
 2003-02-06 10:05  nmav <nmav@gnutls.org>
 
 	* lib/: debug.c, debug.h, gnutls_dh_primes.c, gnutls_rsa_export.c,
-	gnutls_str.c, gnutls_str.h, gnutls_x509.c, gnutls_x509.h:
+	gnutls_str.c (tags: gnutls_0_9_1), gnutls_str.h (tags:
+	gnutls_0_9_1), gnutls_x509.c, gnutls_x509.h:
 
 	Several fixes and improvements in CRL support.  
 
@@ -403,7 +429,8 @@
 
 2003-02-03 17:41  nmav <nmav@gnutls.org>
 
-	* src/: prime-gaa.c, prime-gaa.h, prime.c, prime.gaa:
+	* src/: prime-gaa.c (tags: gnutls_0_9_1), prime-gaa.h (tags:
+	gnutls_0_9_1), prime.c, prime.gaa (tags: gnutls_0_9_1):
 
 	use options to print DH parameters.  
 
@@ -423,14 +450,15 @@
 
 	* NEWS, doc/TODO, doc/tex/ex-serv-export.tex,
 	doc/tex/ex-serv-pgp.tex, doc/tex/ex-serv1.tex, lib/Makefile.am,
-	lib/auth_anon.c, lib/auth_dhe.c, lib/gnutls.asn,
-	lib/gnutls.h.in.in, lib/gnutls_alert.c, lib/gnutls_anon_cred.c,
-	lib/gnutls_asn1_tab.c, lib/gnutls_cert.c, lib/gnutls_dh.h,
-	lib/gnutls_dh_primes.c, lib/gnutls_errors.c,
-	lib/gnutls_errors_int.h, lib/gnutls_global.c, lib/gnutls_int.h,
-	lib/gnutls_mpi.c, lib/gnutls_rsa_export.c, lib/gnutls_state.c,
-	lib/gnutls_ui.h, src/serv-gaa.c, src/serv-gaa.h, src/serv.c,
-	src/serv.gaa:
+	lib/auth_anon.c (tags: gnutls_0_9_1), lib/auth_dhe.c,
+	lib/gnutls.asn (tags: gnutls_0_9_1), lib/gnutls.h.in.in,
+	lib/gnutls_alert.c, lib/gnutls_anon_cred.c (tags: gnutls_0_9_1),
+	lib/gnutls_asn1_tab.c (tags: gnutls_0_9_1), lib/gnutls_cert.c,
+	lib/gnutls_dh.h (tags: gnutls_0_9_1), lib/gnutls_dh_primes.c,
+	lib/gnutls_errors.c, lib/gnutls_errors_int.h, lib/gnutls_global.c,
+	lib/gnutls_int.h, lib/gnutls_mpi.c, lib/gnutls_rsa_export.c,
+	lib/gnutls_state.c, lib/gnutls_ui.h, src/serv-gaa.c,
+	src/serv-gaa.h, src/serv.c, src/serv.gaa:
 
 	* gnutls_dh_params_generate() and gnutls_rsa_params_generate() now
 	 use gnutls_malloc() to allocate the output parameters.  
@@ -451,8 +479,8 @@
 
 2003-01-30 09:16  nmav <nmav@gnutls.org>
 
-	* NEWS, configure.in, lib/gnutls.sym, lib/gnutls_alert.c,
-	lib/gnutls_int_compat.c:
+	* NEWS, configure.in, lib/gnutls.sym (tags: gnutls_0_9_1),
+	lib/gnutls_alert.c, lib/gnutls_int_compat.c (tags: gnutls_0_9_1):
 
 	removed backward compatibility functions for 0.9.0 version.  
 
@@ -472,18 +500,18 @@
 2003-01-23 20:55  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/auth_rsa.c, lib/debug.c, lib/gnutls_algorithms.c,
-	lib/gnutls_compress_int.c, lib/gnutls_dh_primes.c,
-	lib/gnutls_errors.c, lib/gnutls_errors.h, lib/gnutls_extensions.c,
-	lib/gnutls_global.c, lib/gnutls_rsa_export.c, lib/gnutls_x509.c,
-	src/cli.c:
+	lib/gnutls_compress_int.c (tags: gnutls_0_9_1),
+	lib/gnutls_dh_primes.c, lib/gnutls_errors.c, lib/gnutls_errors.h,
+	lib/gnutls_extensions.c (tags: gnutls_0_9_1), lib/gnutls_global.c,
+	lib/gnutls_rsa_export.c, lib/gnutls_x509.c, src/cli.c:
 
 	Added ability to send some messages back to the application using 
 	the gnutls_global_set_log_function(). This is quite experimental.  
 
 2003-01-23 18:05  nmav <nmav@gnutls.org>
 
-	* doc/tex/: ex-client-resume.tex, ex-client-srp.tex,
-	ex-client1.tex, ex-client2.tex, ex-rfc2818.tex:
+	* doc/tex/: ex-client-resume.tex, ex-client-srp.tex (tags:
+	gnutls_0_9_1), ex-client1.tex, ex-client2.tex, ex-rfc2818.tex:
 
 	some minor bugfixes in the documentation.  
 
@@ -495,8 +523,8 @@
 
 2003-01-23 10:18  nmav <nmav@gnutls.org>
 
-	* NEWS, lib/gnutls_alert.c, lib/gnutls_auth_int.h,
-	lib/gnutls_handshake.c, src/cli.c:
+	* NEWS, lib/gnutls_alert.c, lib/gnutls_auth_int.h (tags:
+	gnutls_0_9_1), lib/gnutls_handshake.c, src/cli.c:
 
 	The library notifies the application on empty and illegal SRP
 	usernames, so that proper notification (via an alert) is sent to the
@@ -527,9 +555,10 @@
 2003-01-16 16:56  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_alert.c, gnutls_buffers.c, gnutls_handshake.c,
-	gnutls_handshake.h (tags: gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_handshake.h (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
 	gnutls_0_8_1), gnutls_record.c, gnutls_record.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1) (utags: gnutls_0_8_0):
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1) (utags:
+	gnutls_0_8_0):
 
 	Prefixed with underscore some internal functions.  
 
@@ -556,19 +585,20 @@
 
 2003-01-09 21:52  nmav <nmav@gnutls.org>
 
-	* NEWS, acinclude.m4 (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0), configure.in, doc/README.CODING_STYLE
-	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0),
-	lib/Makefile.am, lib/defines.h (tags: gnutls_0_8_1, gnutls_0_8_0),
-	lib/gnutls.h.in.in (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0), lib/gnutls.sym (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0), lib/gnutls_auth.c (tags:
-	gnutls_0_8_0), lib/gnutls_cipher_int.c (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0), lib/gnutls_cipher_int.h
-	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0),
-	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0), lib/gnutls_state.c
-	(tags: gnutls_0_8_0):
+	* NEWS, acinclude.m4 (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0), configure.in,
+	doc/README.CODING_STYLE (tags: gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0), lib/Makefile.am, lib/defines.h (tags:
+	gnutls_0_8_1, gnutls_0_8_0), lib/gnutls.h.in.in (tags:
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0),
+	lib/gnutls.sym (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0), lib/gnutls_auth.c (tags: gnutls_0_8_0),
+	lib/gnutls_cipher_int.c (tags: gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0), lib/gnutls_cipher_int.h (tags:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0), lib/gnutls_hash_int.c, lib/gnutls_hash_int.h (tags:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0), lib/gnutls_state.c (tags: gnutls_0_8_0):
 
 	Only the documented symbols are now exported.  
 
@@ -618,12 +648,13 @@
 
 	* lib/: auth_anon.c (tags: gnutls_0_8_0), auth_dhe.c (tags:
 	gnutls_0_8_0), auth_rsa.c (tags: gnutls_0_8_0), auth_rsa_export.c
-	(tags: gnutls_0_8_0), gnutls_auth.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0), gnutls_handshake.c,
-	gnutls_int.h (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0), gnutls_kx.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0), gnutls_kx.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0):
+	(tags: gnutls_0_8_0), gnutls_auth.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0),
+	gnutls_handshake.c, gnutls_int.h (tags: gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0), gnutls_kx.c (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0),
+	gnutls_kx.h (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0):
 
 	Dropped the support for the client key exchange message 0, and
 	server key exchange message 2.  
@@ -681,11 +712,11 @@
 
 2002-12-07 11:19  nmav <nmav@gnutls.org>
 
-	* NEWS, doc/tex/callbacks.tex (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), lib/gnutls.h.in.in
-	(tags: gnutls_0_6_0), lib/gnutls_db.c (tags: gnutls_0_8_0,
-	gnutls_0_6_0), lib/gnutls_global.c (tags: gnutls_0_8_0,
-	gnutls_0_6_0), lib/gnutls_mem.c, lib/x509_b64.c:
+	* NEWS, doc/tex/callbacks.tex (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
+	lib/gnutls.h.in.in (tags: gnutls_0_6_0), lib/gnutls_db.c (tags:
+	gnutls_0_8_0, gnutls_0_6_0), lib/gnutls_global.c (tags:
+	gnutls_0_8_0, gnutls_0_6_0), lib/gnutls_mem.c, lib/x509_b64.c:
 
 	Exported the more convenient gnutls_malloc() and gnutls_free()
 	functions. Actually pointers to functions.  
@@ -713,16 +744,16 @@
 	* NEWS, doc/TODO, doc/tex/Makefile.am (tags: gnutls_0_6_0),
 	doc/tex/callbacks.tex, doc/tex/library.tex (tags: gnutls_0_6_0),
 	lib/gnutls.h.in.in, lib/gnutls_datum.c (tags: gnutls_0_8_0,
-	gnutls_0_6_0), lib/gnutls_datum.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
-	lib/gnutls_db.c, lib/gnutls_global.c, lib/gnutls_mem.c,
-	lib/gnutls_mem.h (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0), lib/gnutls_state.c (tags:
-	gnutls_0_6_0), lib/gnutls_str.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), lib/gnutls_str.h (tags:
+	gnutls_0_6_0), lib/gnutls_datum.h (tags: gnutls_0_9_1,
 	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0), src/cli.c (tags: gnutls_0_8_0, gnutls_0_6_0),
-	src/serv.c:
+	gnutls_0_6_0), lib/gnutls_db.c, lib/gnutls_global.c,
+	lib/gnutls_mem.c, lib/gnutls_mem.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0), lib/gnutls_state.c (tags: gnutls_0_6_0),
+	lib/gnutls_str.c (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), lib/gnutls_str.h (tags: gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), src/cli.c
+	(tags: gnutls_0_8_0, gnutls_0_6_0), src/serv.c:
 
 	Added the new functions gnutls_get_malloc_function(),
 	gnutls_get_free_function(). Also changed the way callback functions
@@ -749,10 +780,10 @@
 
 	* doc/tex/: Makefile.am, ex-pgp-keyserver.tex, examples.tex (tags:
 	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0), macros.tex (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), preparation.tex (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0):
+	gnutls_0_6_0), macros.tex (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
+	preparation.tex (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0):
 
 	Added a chapter for sources preparation. Based on the documenation
 	of libksba.  
@@ -771,8 +802,8 @@
 
 2002-12-02 07:37  nmav <nmav@gnutls.org>
 
-	* doc/tex/auth.tex (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0):
+	* doc/tex/auth.tex (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0):
 
 	some updates on srp documentation.  
 
@@ -787,30 +818,31 @@
 	gnutls_0_8_0, gnutls_0_6_0), gnutls_auth.c (tags: gnutls_0_6_0),
 	gnutls_buffers.c (tags: gnutls_0_6_0), gnutls_cert.c (tags:
 	gnutls_0_8_0, gnutls_0_6_0), gnutls_cipher.c (tags: gnutls_0_8_0,
-	gnutls_0_6_0), gnutls_compress.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), gnutls_compress_int.c
-	(tags: gnutls_0_6_0), gnutls_constate.c (tags: gnutls_0_8_0,
-	gnutls_0_6_0), gnutls_datum.c, gnutls_datum.h, gnutls_db.c,
-	gnutls_dh.c (tags: gnutls_0_8_0, gnutls_0_6_0), gnutls_dh_primes.c
-	(tags: gnutls_0_8_0, gnutls_0_6_0), gnutls_global.c,
-	gnutls_handshake.c, gnutls_kx.c (tags: gnutls_0_6_0), gnutls_mem.c,
-	gnutls_mpi.c (tags: gnutls_0_6_0), gnutls_num.c (tags:
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), gnutls_pk.c (tags:
-	gnutls_0_8_0, gnutls_0_6_0), gnutls_priority.c (tags: gnutls_0_8_4,
+	gnutls_0_6_0), gnutls_compress.c (tags: gnutls_0_9_1, gnutls_0_8_4,
 	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
-	gnutls_privkey.c (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0), gnutls_random.c (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
-	gnutls_record.c (tags: gnutls_0_6_0), gnutls_rsa_export.c (tags:
-	gnutls_0_8_0, gnutls_0_6_0), gnutls_session.c (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
-	gnutls_session_pack.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), gnutls_sig.c,
-	gnutls_state.c, gnutls_str.c, gnutls_ui.c (tags: gnutls_0_8_0,
-	gnutls_0_6_0), gnutls_v2_compat.c (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
-	gnutls_x509.c (tags: gnutls_0_6_0), x509_extensions.c,
-	x509_sig_check.c (tags: gnutls_0_8_0, gnutls_0_6_0):
+	gnutls_compress_int.c (tags: gnutls_0_6_0), gnutls_constate.c
+	(tags: gnutls_0_8_0, gnutls_0_6_0), gnutls_datum.c, gnutls_datum.h,
+	gnutls_db.c, gnutls_dh.c (tags: gnutls_0_8_0, gnutls_0_6_0),
+	gnutls_dh_primes.c (tags: gnutls_0_8_0, gnutls_0_6_0),
+	gnutls_global.c, gnutls_handshake.c, gnutls_kx.c (tags:
+	gnutls_0_6_0), gnutls_mem.c, gnutls_mpi.c (tags: gnutls_0_6_0),
+	gnutls_num.c (tags: gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
+	gnutls_pk.c (tags: gnutls_0_8_0, gnutls_0_6_0), gnutls_priority.c
+	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0), gnutls_privkey.c (tags: gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), gnutls_random.c (tags:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), gnutls_record.c (tags: gnutls_0_6_0),
+	gnutls_rsa_export.c (tags: gnutls_0_8_0, gnutls_0_6_0),
+	gnutls_session.c (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), gnutls_session_pack.c (tags:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), gnutls_sig.c, gnutls_state.c,
+	gnutls_str.c, gnutls_ui.c (tags: gnutls_0_8_0, gnutls_0_6_0),
+	gnutls_v2_compat.c (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), gnutls_x509.c (tags:
+	gnutls_0_6_0), x509_extensions.c, x509_sig_check.c (tags:
+	gnutls_0_8_0, gnutls_0_6_0):
 
 	Cleanups. Prefixed some internal function with underscore.  
 
@@ -840,11 +872,11 @@
 2002-12-01 19:50  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/x509_b64.c, src/common.c, src/crypt-gaa.c (tags:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), src/crypt.c (tags: gnutls_0_9_1,
 	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0), src/crypt.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), src/crypt.gaa (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0):
+	gnutls_0_6_0), src/crypt.gaa (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0):
 
 	Added the functions: 
 	   gnutls_srp_verifier() 
@@ -875,9 +907,9 @@
 2002-11-20 22:10  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_algorithms.c, lib/gnutls_algorithms.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0), lib/gnutls_cert.c, lib/gnutls_cert.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), lib/gnutls_cert.c, lib/gnutls_cert.h
+	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
 	gnutls_0_6_0), lib/gnutls_errors.c, lib/gnutls_extensions.c:
 
 	Several cleanups and elimination of warnings.  
@@ -886,10 +918,10 @@
 
 	* doc/tex/Makefile.am, doc/tex/gnutls.bib, doc/tex/record.tex,
 	doc/tex/record_weaknesses.tex, doc/tex/tls_extensions.tex,
-	doc/tex/tlsintro.tex (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), lib/ext_server_name.c,
-	lib/gnutls_int_compat.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0):
+	doc/tex/tlsintro.tex (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
+	lib/ext_server_name.c, lib/gnutls_int_compat.c (tags: gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0):
 
 	updated documentation to include record layer weaknesses and
 	counter-measures, and the supported TLS extensions.  
@@ -921,8 +953,8 @@
 	* lib/gnutls.h.in.in, lib/gnutls_alert.c, lib/gnutls_algorithms.c,
 	lib/gnutls_cert.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
 	lib/gnutls_x509.c, src/cli.c, src/common.c, src/common.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0), src/serv.c:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), src/serv.c:
 
 	Added support for the DSS certificate SRP authenticated cipher
 	suites (currently only with 3DES cipher). Cleaned up the client and
@@ -950,8 +982,8 @@
 
 	* doc/tex/: Makefile.am, appendix.tex (tags: gnutls_0_6_0),
 	auth.tex, compression.tex, examples.tex, gnutls.bib, gnutls.tex
-	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0), openpgp.tex, tlsintro.tex:
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0), openpgp.tex, tlsintro.tex:
 
 	added bibliography in documentation.  
 
@@ -972,8 +1004,8 @@
 2002-11-14 13:48  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls.h.in.in, gnutls_alert.c, gnutls_alert.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0):
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0):
 
 	Added some new alert codes from the extensions draft.  
 
@@ -1039,8 +1071,8 @@
 
 2002-11-06 08:24  nmav <nmav@gnutls.org>
 
-	* opencdk.m4 (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0):
+	* opencdk.m4 (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0):
 
 	updated url for opencdk 
 
@@ -1128,16 +1160,17 @@
 2002-11-02 08:41  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/ext_cert_type.c (tags: gnutls_0_5_11),
-	lib/ext_max_record.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11),
-	lib/ext_server_name.c (tags: gnutls_0_5_11), lib/gnutls_alert.c,
-	lib/gnutls_buffers.c (tags: gnutls_0_5_11), lib/gnutls_cert.c,
-	lib/gnutls_dh_primes.c (tags: gnutls_0_5_11), lib/gnutls_errors.c,
-	lib/gnutls_errors_int.h, lib/gnutls_handshake.c (tags:
-	gnutls_0_5_11), lib/gnutls_record.c (tags: gnutls_0_5_11),
-	lib/gnutls_rsa_export.c (tags: gnutls_0_5_11),
-	lib/gnutls_session_pack.c (tags: gnutls_0_5_11), lib/gnutls_ui.c
-	(tags: gnutls_0_5_11), lib/x509_b64.c (tags: gnutls_0_5_11):
+	lib/ext_max_record.c (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11), lib/ext_server_name.c (tags: gnutls_0_5_11),
+	lib/gnutls_alert.c, lib/gnutls_buffers.c (tags: gnutls_0_5_11),
+	lib/gnutls_cert.c, lib/gnutls_dh_primes.c (tags: gnutls_0_5_11),
+	lib/gnutls_errors.c, lib/gnutls_errors_int.h,
+	lib/gnutls_handshake.c (tags: gnutls_0_5_11), lib/gnutls_record.c
+	(tags: gnutls_0_5_11), lib/gnutls_rsa_export.c (tags:
+	gnutls_0_5_11), lib/gnutls_session_pack.c (tags: gnutls_0_5_11),
+	lib/gnutls_ui.c (tags: gnutls_0_5_11), lib/x509_b64.c (tags:
+	gnutls_0_5_11):
 
 	Combined GNUTLS_E_INVALID_PARAMETERS wich GNUTLS_E_INVALID_REQUEST.
 	Introduced GNUTLS_E_SHORT_MEMORY_BUFFER.  
@@ -1177,8 +1210,9 @@
 
 2002-10-29 05:51  nmav <nmav@gnutls.org>
 
-	* lib/gnutls_buffer.h (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11):
+	* lib/gnutls_buffer.h (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11):
 
 	added missing file 
 
@@ -1200,8 +1234,8 @@
 2002-10-26 12:34  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_buffers.c, lib/gnutls_buffers.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11), lib/gnutls_handshake.c,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11), lib/gnutls_handshake.c,
 	lib/gnutls_int.h (tags: gnutls_0_5_11), lib/gnutls_record.c,
 	lib/gnutls_state.c, lib/gnutls_str.c (tags: gnutls_0_5_11),
 	lib/gnutls_str.h (tags: gnutls_0_5_11):
@@ -1211,9 +1245,9 @@
 
 2002-10-26 09:46  nmav <nmav@gnutls.org>
 
-	* lib/gnutls_errors.c, src/retcodes.c (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11):
+	* lib/gnutls_errors.c, src/retcodes.c (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11):
 
 	The error code table now contains all the error codes sorted.  
 
@@ -1223,17 +1257,17 @@
 	doc/tex/appendix.tex (tags: gnutls_0_5_11), doc/tex/errors.tex
 	(tags: gnutls_0_5_11), doc/tex/gnutls.tex (tags: gnutls_0_5_11),
 	lib/gnutls_errors.c, lib/gnutls_pk.c, src/Makefile.am (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11), src/retcodes.c:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11), src/retcodes.c:
 
 	Documented error codes in an appendix. This documentation is
 	generated automatically using the retcodes program.  
 
 2002-10-24 19:07  nmav <nmav@gnutls.org>
 
-	* doc/: scripts/gdoc, scripts/sort1.pl (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11), tex/Makefile.am:
+	* doc/: scripts/gdoc, scripts/sort1.pl (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11), tex/Makefile.am:
 
 	Added script to sort function  names in function reference.  
 
@@ -1249,12 +1283,12 @@
 
 2002-10-24 16:39  nmav <nmav@gnutls.org>
 
-	* src/: tls_test-gaa.c (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), tls_test-gaa.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0), tls_test.c, tls_test.gaa (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0) (utags:
-	gnutls_0_5_11):
+	* src/: tls_test-gaa.c (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0),
+	tls_test-gaa.h (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0), tls_test.c, tls_test.gaa
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0) (utags: gnutls_0_5_11):
 
 	gnutls-cli-debug now accepts one hostname only 
 
@@ -1269,8 +1303,8 @@
 	* doc/TODO (tags: gnutls_0_5_11), doc/tex/Makefile.am,
 	lib/Makefile.am, lib/auth_anon.c (tags: gnutls_0_5_11),
 	lib/auth_dh_common.c (tags: gnutls_0_5_11), lib/auth_dh_common.h
-	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11), lib/auth_dhe.c,
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11), lib/auth_dhe.c,
 	lib/rfc2818_hostname.c (tags: gnutls_0_5_11):
 
 	Merged common stuff in DHE and anonymous DH key exchange.  
@@ -1323,12 +1357,13 @@
 	* doc/tex/: Makefile.am (tags: gnutls_0_5_10), alert.tex (tags:
 	gnutls_0_5_11, gnutls_0_5_10), auth.tex, certificate.tex (tags:
 	gnutls_0_5_11, gnutls_0_5_10), ciphersuites.tex (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10), compression.tex (tags:
-	gnutls_0_5_10), handshake.tex (tags: gnutls_0_5_11, gnutls_0_5_10),
-	howto.tex (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
 	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
-	memory.tex (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	compression.tex (tags: gnutls_0_5_10), handshake.tex (tags:
+	gnutls_0_5_11, gnutls_0_5_10), howto.tex (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10), memory.tex (tags:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
 	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
 	record.tex (tags: gnutls_0_5_11, gnutls_0_5_10), tlsintro.tex
 	(tags: gnutls_0_5_10):
@@ -1352,51 +1387,53 @@
 	gnutls_0_5_10), lib/auth_rsa_export.c (tags: gnutls_0_5_10),
 	lib/defines.h (tags: gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
 	lib/ext_cert_type.c (tags: gnutls_0_5_10), lib/ext_cert_type.h
-	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10), lib/ext_max_record.c
-	(tags: gnutls_0_5_10), lib/ext_max_record.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10), lib/ext_server_name.c (tags:
-	gnutls_0_5_10), lib/ext_server_name.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls.h.in.in (tags:
-	gnutls_0_5_10), lib/gnutls_alert.c (tags: gnutls_0_5_10),
-	lib/gnutls_alert.h (tags: gnutls_0_5_10), lib/gnutls_algorithms.c,
-	lib/gnutls_auth.c (tags: gnutls_0_5_11, gnutls_0_5_10),
-	lib/gnutls_auth.h (tags: gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10), lib/gnutls_buffers.c (tags: gnutls_0_5_10),
-	lib/gnutls_buffers.h (tags: gnutls_0_5_10), lib/gnutls_cert.c
-	(tags: gnutls_0_5_10), lib/gnutls_cipher.c (tags: gnutls_0_5_10),
-	lib/gnutls_cipher.h (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10), lib/gnutls_compress_int.c (tags: gnutls_0_5_11,
-	gnutls_0_5_10), lib/gnutls_compress_int.h (tags: gnutls_0_8_4,
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
+	lib/ext_max_record.c (tags: gnutls_0_5_10), lib/ext_max_record.h
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
+	lib/ext_server_name.c (tags: gnutls_0_5_10), lib/ext_server_name.h
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
+	lib/gnutls.h.in.in (tags: gnutls_0_5_10), lib/gnutls_alert.c (tags:
+	gnutls_0_5_10), lib/gnutls_alert.h (tags: gnutls_0_5_10),
+	lib/gnutls_algorithms.c, lib/gnutls_auth.c (tags: gnutls_0_5_11,
+	gnutls_0_5_10), lib/gnutls_auth.h (tags: gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_buffers.c (tags:
+	gnutls_0_5_10), lib/gnutls_buffers.h (tags: gnutls_0_5_10),
+	lib/gnutls_cert.c (tags: gnutls_0_5_10), lib/gnutls_cipher.c (tags:
+	gnutls_0_5_10), lib/gnutls_cipher.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
+	lib/gnutls_compress_int.c (tags: gnutls_0_5_11, gnutls_0_5_10),
+	lib/gnutls_compress_int.h (tags: gnutls_0_9_1, gnutls_0_8_4,
 	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
 	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_db.c (tags:
 	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_dh_primes.c (tags:
-	gnutls_0_5_10), lib/gnutls_extensions.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_global.c (tags:
-	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_handshake.c (tags:
+	gnutls_0_5_10), lib/gnutls_extensions.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_global.c
+	(tags: gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_handshake.c (tags:
 	gnutls_0_5_10), lib/gnutls_hash_int.c (tags: gnutls_0_6_0,
 	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_hash_int.h (tags:
 	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_int.h
 	(tags: gnutls_0_5_10), lib/gnutls_mem.c (tags: gnutls_0_5_11,
 	gnutls_0_5_10), lib/gnutls_pk.c (tags: gnutls_0_5_10),
-	lib/gnutls_pk.h (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
-	lib/gnutls_record.c (tags: gnutls_0_5_10), lib/gnutls_rsa_export.c
-	(tags: gnutls_0_5_10), lib/gnutls_session_pack.c (tags:
-	gnutls_0_5_10), lib/gnutls_sig.c (tags: gnutls_0_5_10),
-	lib/gnutls_sig.h (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
-	lib/gnutls_state.c (tags: gnutls_0_5_10), lib/gnutls_ui.c (tags:
-	gnutls_0_5_10), lib/gnutls_ui.h (tags: gnutls_0_5_11,
-	gnutls_0_5_10), lib/gnutls_x509.c (tags: gnutls_0_5_10),
-	lib/gnutls_x509.h (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10),
-	lib/rfc2818_hostname.c (tags: gnutls_0_5_10), lib/x509_b64.c (tags:
-	gnutls_0_5_10), lib/x509_b64.h (tags: gnutls_0_8_4, gnutls_0_8_3,
+	lib/gnutls_pk.h (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10), lib/gnutls_record.c (tags: gnutls_0_5_10),
+	lib/gnutls_rsa_export.c (tags: gnutls_0_5_10),
+	lib/gnutls_session_pack.c (tags: gnutls_0_5_10), lib/gnutls_sig.c
+	(tags: gnutls_0_5_10), lib/gnutls_sig.h (tags: gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10), lib/gnutls_state.c (tags:
+	gnutls_0_5_10), lib/gnutls_ui.c (tags: gnutls_0_5_10),
+	lib/gnutls_ui.h (tags: gnutls_0_5_11, gnutls_0_5_10),
+	lib/gnutls_x509.c (tags: gnutls_0_5_10), lib/gnutls_x509.h (tags:
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10), lib/rfc2818_hostname.c
+	(tags: gnutls_0_5_10), lib/x509_b64.c (tags: gnutls_0_5_10),
+	lib/x509_b64.h (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
 	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
 	gnutls_0_5_10), lib/x509_sig_check.c (tags: gnutls_0_5_10):
 
@@ -1457,9 +1494,9 @@
 
 2002-10-10 22:15  nmav <nmav@gnutls.org>
 
-	* doc/tex/ex-alert.tex (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes),
+	* doc/tex/ex-alert.tex (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes),
 	doc/tex/ex-rfc2818.tex, lib/rfc2818_hostname.c (tags:
 	gnutls_0_5_x_before_int_fixes), doc/tex/ex-rfc2818.tex,
 	doc/tex/examples.tex:
@@ -1694,11 +1731,11 @@
 
 2002-09-10 15:54  nmav <nmav@gnutls.org>
 
-	* NEWS, buildconf (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7), configure.in (tags: gnutls_0_5_7), libmcrypt.m4
-	(tags: gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	* NEWS, buildconf (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7), configure.in (tags: gnutls_0_5_7),
+	libmcrypt.m4 (tags: gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7), lib/gnutls.h.in.in (tags: gnutls_0_5_7),
 	lib/gnutls_global.c (tags: gnutls_0_5_7):
@@ -1749,15 +1786,15 @@
 2002-09-06 17:12  nmav <nmav@gnutls.org>
 
 	* NEWS (tags: gnutls_0_5_6), doc/tex/pgpcert.xml.tex (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6), doc/tex/x509cert.xml.tex,
 	lib/x509_xml.c (tags: gnutls_0_5_6), src/common.c,
-	src/gnutls-http-serv (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6):
+	src/gnutls-http-serv (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6):
 
 	added versioning in the XML output of certificate functions.  
 
@@ -1801,10 +1838,11 @@
 
 2002-09-03 11:05  nmav <nmav@gnutls.org>
 
-	* lib/: gnutls_priority.c, gnutls_priority.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9) (utags: gnutls_0_5_6, gnutls_0_5_7, gnutls_0_5_8):
+	* lib/: gnutls_priority.c, gnutls_priority.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9) (utags: gnutls_0_5_6,
+	gnutls_0_5_7, gnutls_0_5_8):
 
 	gnutls_list replaced by const int* 
 
@@ -1902,11 +1940,12 @@
 	lib/gnutls_algorithms.c (tags: gnutls_0_5_6, gnutls_0_5_5),
 	lib/gnutls_cert.c, lib/gnutls_int_compat.c, lib/gnutls_priority.c
 	(tags: gnutls_0_5_5), lib/gnutls_priority.h (tags: gnutls_0_5_5),
-	lib/gnutls_state.c, lib/gnutls_state.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), src/cli.c, src/common.c, src/serv.c, src/tests.c:
+	lib/gnutls_state.c, lib/gnutls_state.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), src/cli.c, src/common.c,
+	src/serv.c, src/tests.c:
 
 	cert_type abreviation was expanded to certificate_type.  
 
@@ -1963,8 +2002,8 @@
 	lib/gnutls_compress.c (tags: gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_compress.h
-	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5),
 	lib/gnutls_compress_int.c (tags: gnutls_0_5_6, gnutls_0_5_5),
@@ -1973,29 +2012,29 @@
 	gnutls_0_5_5), lib/gnutls_constate.c (tags: gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_constate.h
-	(tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	(tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_db.c (tags:
-	gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_db.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_db.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_dh.h (tags:
 	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
 	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), lib/gnutls_dh.h (tags: gnutls_0_5_11, gnutls_0_5_10,
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_dh_primes.c
-	(tags: gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_extensions.c (tags:
-	gnutls_0_5_5), lib/gnutls_extensions.h (tags:
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_global.c
-	(tags: gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_handshake.c,
-	lib/gnutls_handshake.h (tags: gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5),
-	lib/gnutls_hash_int.c (tags: gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_5), lib/gnutls_dh_primes.c (tags: gnutls_0_5_6,
+	gnutls_0_5_5), lib/gnutls_extensions.c (tags: gnutls_0_5_5),
+	lib/gnutls_extensions.h (tags: gnutls_0_5_x_before_int_fixes,
 	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), lib/gnutls_hash_int.h (tags:
+	gnutls_0_5_5), lib/gnutls_global.c (tags: gnutls_0_5_6,
+	gnutls_0_5_5), lib/gnutls_handshake.c, lib/gnutls_handshake.h
+	(tags: gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_hash_int.c
+	(tags: gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_hash_int.h
+	(tags: gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_int.h,
 	lib/gnutls_int_compat.c, lib/gnutls_kx.c (tags: gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_kx.h (tags:
@@ -2013,34 +2052,34 @@
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_session.c
 	(tags: gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
 	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), lib/gnutls_session.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), lib/gnutls_session_pack.c (tags:
+	gnutls_0_5_5), lib/gnutls_session.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5),
-	lib/gnutls_session_pack.h (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5),
-	lib/gnutls_sig.c (tags: gnutls_0_5_x_before_int_fixes,
+	lib/gnutls_session_pack.c (tags: gnutls_0_5_x_before_int_fixes,
 	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), lib/gnutls_sig.h (tags:
+	gnutls_0_5_5), lib/gnutls_session_pack.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_sig.c (tags:
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_sig.h (tags:
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_state.c,
 	lib/gnutls_state.h, lib/gnutls_ui.c, lib/gnutls_ui.h,
-	lib/gnutls_v2_compat.c, lib/gnutls_v2_compat.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), lib/gnutls_x509.c, lib/gnutls_x509.h,
-	lib/x509_sig_check.c (tags: gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5), lib/x509_verify.c (tags: gnutls_0_5_10,
+	lib/gnutls_v2_compat.c, lib/gnutls_v2_compat.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), src/cli.c, src/common.c,
-	src/serv.c, src/tests.c, src/tls_test.c:
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/gnutls_x509.c,
+	lib/gnutls_x509.h, lib/x509_sig_check.c (tags:
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), lib/x509_verify.c (tags:
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5), src/cli.c,
+	src/common.c, src/serv.c, src/tests.c, src/tls_test.c:
 
 	Renamed all the constructed types to have more consisten names, and
 	some other minor improvements.  
@@ -2084,8 +2123,8 @@
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change), src/crypt-gaa.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change), src/crypt.c (tags: gnutls_0_5_7,
@@ -2329,10 +2368,10 @@
 
 2002-08-17 20:49  nmav <nmav@gnutls.org>
 
-	* AUTHORS (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	* AUTHORS (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
 	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites):
@@ -2378,12 +2417,13 @@
 
 2002-07-21 19:15  admcd <admcd@gnutls.org>
 
-	* doc/tex/openssl.tex (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* doc/tex/openssl.tex (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites):
 
 	add ability to use separate file descriptors for send() and recv() 
@@ -2500,12 +2540,13 @@
 
 2002-07-12 17:46  nmav <nmav@gnutls.org>
 
-	* NEWS, lib/libgnutls.m4 (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* NEWS, lib/libgnutls.m4 (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1):
 
 	corrected m4 macros for gnutls 
@@ -2652,12 +2693,13 @@
 
 2002-07-04 10:04  nmav <nmav@gnutls.org>
 
-	* src/: README.srpcrypt (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* src/: README.srpcrypt (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0),
 	crypt-gaa.c (tags: gnutls_0_5_4, gnutls_0_5_3, gnutls_0_5_2,
 	gnutls_0_5_x_before_export_ciphersuites,
@@ -2896,13 +2938,13 @@
 
 2002-06-18 17:19  nmav <nmav@gnutls.org>
 
-	* src/: Makefile.am, common.c, list.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	* src/: Makefile.am, common.c, list.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0),
 	serv.c:
 
@@ -3262,8 +3304,8 @@
 	lib/gnutls_extensions.h (tags: gnutls_0_4_with_libtasn1,
 	gnutls_0_4_3, gnutls_0_4_2), lib/gnutls_openpgp.h, lib/gnutls_ui.h
 	(tags: gnutls_0_4_3, gnutls_0_4_2), lib/libgnutls-config.in (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
@@ -3299,10 +3341,10 @@
 
 2002-05-14 11:40  nmav <nmav@gnutls.org>
 
-	* COPYING.LIB (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	* COPYING.LIB (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
 	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
@@ -3630,12 +3672,13 @@
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2,
 	gnutls_0_4_1), buildconf (tags: gnutls_0_4_3, gnutls_0_4_2,
-	gnutls_0_4_1), libgcrypt.m4 (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_4_1), libgcrypt.m4 (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2,
 	gnutls_0_4_1), libmcrypt.m4 (tags: gnutls_0_5_6, gnutls_0_5_5,
@@ -4498,12 +4541,13 @@
 
 2002-02-24 17:34  nmav <nmav@gnutls.org>
 
-	* src/openpgp/Makefile.am (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* src/openpgp/Makefile.am (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90):
@@ -4888,7 +4932,17 @@
 
 2002-02-11 10:08  nmav <nmav@gnutls.org>
 
-	* src/: cli.c, openpgp/cli_pub.asc (tags: gnutls_0_8_4,
+	* src/: cli.c, openpgp/cli_pub.asc (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
+	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90),
+	openpgp/cli_ring.gpg (tags: gnutls_0_9_1, gnutls_0_8_4,
 	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
 	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
 	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
@@ -4898,21 +4952,13 @@
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90),
-	openpgp/cli_ring.gpg (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
-	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
-	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
-	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90),
-	openpgp/cli_sec.asc (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	openpgp/cli_sec.asc (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90):
@@ -5215,7 +5261,7 @@
 	gnutls_0_5_11, gnutls_0_5_5, gnutls_0_5_6, gnutls_0_5_7,
 	gnutls_0_5_x_before_export_ciphersuites, gnutls_0_5_8,
 	gnutls_0_8_0, gnutls_0_5_9, gnutls_0_8_1, gnutls_0_3_90,
-	gnutls_0_8_3, gnutls_0_3_91, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_3_91, gnutls_0_9_1, gnutls_0_8_4,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_3_92,
 	gnutls_0_4_with_libtasn1):
 
@@ -5562,18 +5608,19 @@
 
 	* lib/auth_dhe.c (tags: gnutls_with_dss_ciphersuites),
 	lib/auth_dhe_dss.c, lib/auth_dhe_dss.h, lib/auth_dhe_rsa.c,
-	src/x509/cert-dsa.pem (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	src/x509/cert-dsa.pem (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
 	gnutls_with_dss_ciphersuites), src/x509/key-dsa.pem (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
@@ -5649,72 +5696,73 @@
 
 2002-01-26 22:55  nmav <nmav@gnutls.org>
 
-	* src/x509/: Makefile.am, ca.pem (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	* src/x509/: Makefile.am, ca.pem (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
+	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
+	gnutls_with_dss_ciphersuites), cert.pem (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
 	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
-	gnutls_with_dss_ciphersuites), cert.pem (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_with_dss_ciphersuites), clicert-dsa.pem (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
-	gnutls_with_dss_ciphersuites), clicert-dsa.pem (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_with_dss_ciphersuites), clicert.pem (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
-	gnutls_with_dss_ciphersuites), clicert.pem (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_with_dss_ciphersuites), clikey-dsa.pem (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
-	gnutls_with_dss_ciphersuites), clikey-dsa.pem (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_with_dss_ciphersuites), clikey.pem (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
-	gnutls_with_dss_ciphersuites), clikey.pem (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
-	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
-	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
-	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
-	gnutls_with_dss_ciphersuites), key.pem (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_with_dss_ciphersuites), key.pem (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -5986,12 +6034,13 @@
 
 2002-01-18 16:47  nmav <nmav@gnutls.org>
 
-	* doc/protocol/rfc2440.txt (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* doc/protocol/rfc2440.txt (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -6100,8 +6149,8 @@
 	gnutls_with_dss_ciphersuites, gnutls_with_dss_cert_support),
 	doc/tex/cover.tex.in (tags: gnutls_with_dss_ciphersuites,
 	gnutls_with_dss_cert_support), doc/tex/gnutls-logo.ps (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
@@ -6659,10 +6708,10 @@
 
 2001-12-09 11:02  nmav <nmav@gnutls.org>
 
-	* src/: .cvsignore (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	* src/: .cvsignore (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
 	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
@@ -7134,13 +7183,13 @@
 	lib/gnutls_handshake.c, lib/gnutls_handshake.h (tags:
 	gnutls_0_2_11), lib/gnutls_int.h, lib/gnutls_kx.c (tags:
 	gnutls_0_2_11), lib/gnutls_priority.c (tags: gnutls_0_2_11),
-	lib/gnutls_record.c, lib/io_debug.h (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	lib/gnutls_record.c, lib/io_debug.h (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -7672,13 +7721,13 @@
 	draft-ietf-tls-extensions-01.txt (tags: gnutls_0_3_5, gnutls_0_3_2,
 	gnutls_0_3_1, gnutls_0_3_0, gnutls_0_2_91, gnutls_0_2_90,
 	gnutls_0_2_11, gnutls_0_2_10, gnutls_0_2_9),
-	draft-ietf-tls-kerb-00.txt, rfc2712.txt (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	draft-ietf-tls-kerb-00.txt, rfc2712.txt (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -8224,13 +8273,13 @@
 2001-08-02 11:49  nmav <nmav@gnutls.org>
 
 	* doc/tex/: Makefile.am (tags: gnutls_0_2_2, gnutls_0_2_1,
-	gnutls_0_2_0), cover.tex, fdl.tex (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_2_0), cover.tex, fdl.tex (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -8443,10 +8492,10 @@
 	lib/gnutls_int.h, lib/gnutls_privkey.c, lib/gnutls_record.c,
 	lib/gnutls_sig_check.c, src/.cvsignore (tags: gnutls_0_1_9),
 	src/asn1c.c (tags: gnutls_0_1_9), src/ca.pem, src/cli.c,
-	src/pkcs1.asn (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	src/pkcs1.asn (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
 	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
@@ -8474,12 +8523,13 @@
 	gnutls_0_2_2, gnutls_0_2_1, gnutls_0_2_0, gnutls_0_1_9),
 	src/Makefile.am (tags: gnutls_0_1_9), src/PkixTabExample.c,
 	src/asn1c.c, src/cli.c, src/pkix.asn, src/serv.c,
-	src/srp/Makefile.am (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	src/srp/Makefile.am (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -8495,12 +8545,13 @@
 2001-07-20 17:58  nmav <nmav@gnutls.org>
 
 	* src/: Makefile.am, cert.pem, key.pem, serv.c, tpasswd,
-	tpasswd.conf, srp/tpasswd (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	tpasswd.conf, srp/tpasswd (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -8508,13 +8559,13 @@
 	gnutls_0_3_5, gnutls_0_3_2, gnutls_0_3_1, gnutls_0_3_0,
 	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
 	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
-	gnutls_0_2_0, gnutls_0_1_9), srp/tpasswd.conf (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_2_0, gnutls_0_1_9), srp/tpasswd.conf (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -8551,8 +8602,8 @@
 	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
 	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
 	gnutls_0_2_0, gnutls_0_1_9), doc/protocol/rfc2313.txt (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
@@ -8820,10 +8871,10 @@
 	gnutls_0_2_11, gnutls_0_2_10, gnutls_0_2_9, gnutls_0_2_3,
 	gnutls_0_2_2, gnutls_0_2_1, gnutls_0_2_0, gnutls_0_1_9),
 	draft-ietf-tls-seedhas-00.txt, draft-ietf-tls-wireless-00.txt,
-	rfc2817.txt (tags: gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
-	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
-	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
-	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	rfc2817.txt (tags: gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3,
+	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
+	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
+	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
 	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
@@ -8839,12 +8890,13 @@
 
 2001-06-24 18:20  nmav <nmav@gnutls.org>
 
-	* doc/protocol/x509guide.txt (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* doc/protocol/x509guide.txt (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -9130,8 +9182,8 @@
 	gnutls_0_2_2, gnutls_0_2_1, gnutls_0_2_0, gnutls_0_1_9,
 	gnutls_0_1_4), gnutls_pk.c, gnutls_pk.h (tags: gnutls_0_1_4),
 	gnutls_random.c (tags: gnutls_0_1_4), gnutls_random.h (tags:
-	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
-	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
 	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
 	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
@@ -9256,12 +9308,13 @@
 
 2001-06-13 08:51  nmav <nmav@gnutls.org>
 
-	* doc/protocol/rfc2631.txt (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* doc/protocol/rfc2631.txt (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -9968,12 +10021,13 @@
 
 2001-03-11 22:29  nmav <nmav@gnutls.org>
 
-	* doc/protocol/rfc2945.txt (tags: gnutls_0_8_4, gnutls_0_8_3,
-	gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11,
-	gnutls_0_5_10, gnutls_0_5_x_before_int_fixes, gnutls_0_5_9,
-	gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
-	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
-	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	* doc/protocol/rfc2945.txt (tags: gnutls_0_9_1, gnutls_0_8_4,
+	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
+	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
+	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
+	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
+	gnutls_0_5_3, gnutls_0_5_2,
+	gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -10107,6 +10161,21 @@
 	gnutls-0_1_2, gnutls-0-1-0-srp),
 	protocol/draft-ietf-tn3270e-telnet-tls-05.txt (tags: gnutls_0_1_4,
 	gnutls-0_1_2, gnutls-0-1-0-srp), protocol/rfc1422.txt (tags:
+	gnutls_0_9_1, gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1,
+	gnutls_0_8_0, gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
+	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
+	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
+	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
+	gnutls_with_dss_ciphersuites, gnutls_with_dss_cert_support,
+	gnutls_0_3_5, gnutls_0_3_2, gnutls_0_3_1, gnutls_0_3_0,
+	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
+	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
+	gnutls_0_2_0, gnutls_0_1_9, gnutls_0_1_4, gnutls-0_1_2,
+	gnutls-0-1-0-srp), protocol/rfc1423.txt (tags: gnutls_0_9_1,
 	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
 	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
 	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
@@ -10121,13 +10190,13 @@
 	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
 	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
 	gnutls_0_2_0, gnutls_0_1_9, gnutls_0_1_4, gnutls-0_1_2,
-	gnutls-0-1-0-srp), protocol/rfc1423.txt (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls-0-1-0-srp), protocol/rfc2246.txt (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -10136,13 +10205,13 @@
 	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
 	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
 	gnutls_0_2_0, gnutls_0_1_9, gnutls_0_1_4, gnutls-0_1_2,
-	gnutls-0-1-0-srp), protocol/rfc2246.txt (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls-0-1-0-srp), protocol/rfc2279.txt (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -10151,13 +10220,13 @@
 	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
 	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
 	gnutls_0_2_0, gnutls_0_1_9, gnutls_0_1_4, gnutls-0_1_2,
-	gnutls-0-1-0-srp), protocol/rfc2279.txt (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls-0-1-0-srp), protocol/rfc2459.txt (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
@@ -10166,28 +10235,13 @@
 	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
 	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
 	gnutls_0_2_0, gnutls_0_1_9, gnutls_0_1_4, gnutls-0_1_2,
-	gnutls-0-1-0-srp), protocol/rfc2459.txt (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
-	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
-	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
-	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
-	gnutls_with_dss_ciphersuites, gnutls_with_dss_cert_support,
-	gnutls_0_3_5, gnutls_0_3_2, gnutls_0_3_1, gnutls_0_3_0,
-	gnutls_0_2_91, gnutls_0_2_90, gnutls_0_2_11, gnutls_0_2_10,
-	gnutls_0_2_9, gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1,
-	gnutls_0_2_0, gnutls_0_1_9, gnutls_0_1_4, gnutls-0_1_2,
-	gnutls-0-1-0-srp), protocol/rfc2818.txt (tags: gnutls_0_8_4,
-	gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0, gnutls_0_6_0,
-	gnutls_0_5_11, gnutls_0_5_10, gnutls_0_5_x_before_int_fixes,
-	gnutls_0_5_9, gnutls_0_5_8, gnutls_0_5_7, gnutls_0_5_6,
-	gnutls_0_5_5, gnutls_0_5_x_before_types_change, gnutls_0_5_4,
-	gnutls_0_5_3, gnutls_0_5_2,
-	gnutls_0_5_x_before_export_ciphersuites,
+	gnutls-0-1-0-srp), protocol/rfc2818.txt (tags: gnutls_0_9_1,
+	gnutls_0_8_4, gnutls_0_8_3, gnutls_0_8_1, gnutls_0_8_0,
+	gnutls_0_6_0, gnutls_0_5_11, gnutls_0_5_10,
+	gnutls_0_5_x_before_int_fixes, gnutls_0_5_9, gnutls_0_5_8,
+	gnutls_0_5_7, gnutls_0_5_6, gnutls_0_5_5,
+	gnutls_0_5_x_before_types_change, gnutls_0_5_4, gnutls_0_5_3,
+	gnutls_0_5_2, gnutls_0_5_x_before_export_ciphersuites,
 	gnutls_0_5_x_with_export_ciphersuites, gnutls_0_5_1, gnutls_0_5_0,
 	gnutls_0_4_with_libtasn1, gnutls_0_4_3, gnutls_0_4_2, gnutls_0_4_1,
 	gnutls_0_4_0, gnutls_0_3_92, gnutls_0_3_91, gnutls_0_3_90,
