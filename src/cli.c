@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 	X509PKI_CLIENT_CREDENTIALS xcred;
 
 	if (argc!=3) {
-		fprintf(stderr, "Usage: cli [host] [port]\n");
+		fprintf(stderr, "Usage: cli [IP] [PORT]\n");
 		exit(1);
 	}
 	
