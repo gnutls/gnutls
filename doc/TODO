@@ -4,8 +4,6 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Audit the code
-+ Add support for certificates with DSS parameters
-+ OpenPGP certificate support
 * Add function to clone GNUTLS_STATE structures
 * Minimize footprint.
 * Improve support for compression

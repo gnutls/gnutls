@@ -634,14 +634,14 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 }
 
 #define MAX_SIGN_ALGOS 2
-enum CertificateSigType { RSA_SIGN=1, DSA_SIGN };
+typedef enum CertificateSigType { RSA_SIGN=1, DSA_SIGN } CertificateSigType;
 
 /* Checks if we support the given signature algorithm 
  * (RSA or DSA). Returns the corresponding PKAlgorithm
  * if true;
  */
 inline static 
-int _gnutls_check_supported_sign_algo(uint8 algo)
+int _gnutls_check_supported_sign_algo(CertificateSigType algo)
 {
 	switch (algo) {
 	case RSA_SIGN:
