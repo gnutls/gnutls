@@ -1,3 +1,6 @@
+#include <gcrypt.h>
+#include <mhash.h>
+
 #define DEBUG
 
 #define svoid void /* for functions that allocate using secure_free */
@@ -150,6 +153,12 @@ typedef struct {
 	void*			server_md_sha1;
 	int			server_hash;
 	int			client_hash;
+	/* For DH KX */
+	MPI			KEY;
+	MPI			client_Y;
+	MPI			client_g;
+	MPI			client_p;
+	MPI			dh_secret;
 } GNUTLS_INTERNALS;
 
 typedef struct {

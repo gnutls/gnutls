@@ -26,7 +26,6 @@
 # include <unistd.h>
 #endif
 
-#include <gcrypt.h>
 
 #if SIZEOF_UNSIGNED_LONG_INT == 8
  typedef unsigned long int uint64;

@@ -1,7 +1,7 @@
 #include <defines.h>
-#include <mhash.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
+#include "gnutls_dh.h"
 #include "debug.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_compress.h"
@@ -21,32 +21,279 @@
 #define HASH_FALSE 0
 
 
-int _gnutls_send_kx_message(int cd, GNUTLS_STATE state)
+int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KX_Algorithm algorithm;
+	MPI x, Y, g, p;
+	int n_Y, n_g, n_p;
+	uint16 _n_Y, _n_g, _n_p;
+	uint8 data[1536];	/* 3*512 */
+	uint8 *data_p;
+	uint8 *data_g;
+	uint8 *data_Y;
+	int ret=0;
+
+
+	n_Y = n_g = n_p = 512 - 2;
 
 	algorithm =
-	    _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.
-					     current_cipher_suite.
-					     CipherSuite);
+	    _gnutls_cipher_suite_get_kx_algo(state->
+					     gnutls_internals.current_cipher_suite);
 
 	/* Do key exchange only if the algorithm permits it */
 	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
 
-		if (_gnutls_kx_algo_DH_public_value != 0) {
-			data[0] = GNUTLS_DIFFIE_HELLMAN;
+		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+			Y = _gnutls_calc_dh_secret(&x);
+			state->gnutls_internals.dh_secret = x;
+			g = _gnutls_get_dh_params(&p);
+
+
+			data_p = &data[0];
+			gcry_mpi_print(GCRYMPI_FMT_STD, &data_p[2],
+				       &n_p, p);
+
+			_n_p = n_p;
+#ifndef WORDS_BIGENDIAN
+			_n_p = byteswap16(_n_p);
+			memmove(data_p, &_n_p, 2);
+#else
+			memmove(data_p, &_n_p, 2);
+#endif
+
+
+			data_g = &data_p[2+n_p];
+			gcry_mpi_print(GCRYMPI_FMT_STD, &data_g[2],
+				       &n_g, g);
+			_n_g = n_g;
+#ifndef WORDS_BIGENDIAN
+
+			_n_g = byteswap16(_n_g);
+			memmove(data_g, &_n_g, 2);
+#else
+			memmove(data_g, &_n_g, 2);
+#endif
+
+			data_Y = &data_g[2+n_g];
+			gcry_mpi_print(GCRYMPI_FMT_STD, &data_Y[2],
+				       &n_Y, Y);
+			_n_Y = n_Y;
+#ifndef WORDS_BIGENDIAN
+			_n_Y = byteswap16(_n_Y);
+			memmove(data_Y, &_n_Y, 2);
+#else
+			memmove(data_Y, &_n_Y, 2);
+#endif
+
+
+			ret =
+			    _gnutls_send_handshake(cd, state, data,
+						   n_p + n_g + n_Y + 6,
+						   GNUTLS_SERVER_KEY_EXCHANGE);
 		} else {
-			data[0] = GNUTLS_RSA;
+			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 		}
-		g = mpi_set_ui(NULL, 2);
-		E = calc_dh_secret(&y);
-
-
 	}
 
-	return 0;
+	return ret;
 
 }
+
+int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
+{
+	KX_Algorithm algorithm;
+	MPI x, X;
+	int n_X;
+	uint16 _n_X;
+	uint8 data[1536];	/* 3*512 */
+	int ret=0;
+	uint8 premaster[1500];
+	int premaster_size = sizeof(premaster);
+	svoid* master;
+	char* random = gnutls_malloc(64);
+	
+	memmove( random, state->security_parameters.client_random, 32);
+	memmove( &random[32], state->security_parameters.server_random, 32);
+
+	n_X = 1530;
+
+	algorithm =
+	    _gnutls_cipher_suite_get_kx_algo(state->
+					     gnutls_internals.current_cipher_suite);
+
+	if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+
+			data[0] = 1; /* extern */
+			
+			X = __gnutls_calc_dh_secret(&x, state->gnutls_internals.client_g, state->gnutls_internals.client_p);
+			gcry_mpi_print(GCRYMPI_FMT_STD, &data[3],
+				       &n_X, X);
+
+
+			_n_X = n_X;
+#ifndef WORDS_BIGENDIAN
+			_n_X = byteswap16(_n_X);
+			memmove(&data[1], &_n_X, 2);
+#else
+			memmove(&data[1], &_n_X, 2);
+#endif
+
+			ret =
+			    _gnutls_send_handshake(cd, state, data,
+						   n_X + 3,
+						   GNUTLS_CLIENT_KEY_EXCHANGE);
+
+			/* calculate the key after sending the message */
+			state->gnutls_internals.KEY = __gnutls_calc_dh_key( state->gnutls_internals.client_Y, x, state->gnutls_internals.client_p);
+
+			gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
+				       &premaster_size, state->gnutls_internals.KEY);
+			fprintf(stderr, "premaster: %s || %d\n", bin2hex(premaster, premaster_size), premaster_size);
+
+			
+		} else {
+			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+	}
+
+	master = gnutls_PRF( premaster, premaster_size, "master secret", strlen("master secret"),
+						random, 64 ,48);
+	memmove( state->security_parameters.master_secret, master, 48);
+	secure_free(master);
+	gnutls_free(random);
+	
+	return ret;
+
+}
+
+int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
+{
+	KX_Algorithm algorithm;
+	uint16 n_Y, n_g, n_p;
+	int _n_Y, _n_g, _n_p;
+	uint8 data[15000];
+	uint8 *data_p;
+	uint8 *data_g;
+	uint8 *data_Y;
+	int ret=0, i=0;
+
+	n_Y = n_g = n_p = 512 - 2;
+
+	algorithm =
+	    _gnutls_cipher_suite_get_kx_algo(state->
+					     gnutls_internals.current_cipher_suite);
+
+	/* Do key exchange only if the algorithm permits it */
+	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
+
+		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+
+			state->gnutls_internals.next_handshake_type = GNUTLS_SERVER_KEY_EXCHANGE;
+			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, 15000);
+			state->gnutls_internals.next_handshake_type = GNUTLS_NONE;
+
+
+			memmove( &n_p, &data[i], 2);
+			i+=2;
+#ifndef WORDS_BIGENDIAN
+			n_p = byteswap16(n_p);
+#endif
+			data_p = &data[i];
+			i+=n_p;			
+			
+			memmove( &n_g, &data[i], 2);
+#ifndef WORDS_BIGENDIAN
+			n_g = byteswap16(n_g);
+#endif
+			i+=2;
+			data_g = &data[i];
+			i+=n_g;
+			
+			memmove( &n_Y, &data[i], 2);
+			i+=2;
+#ifndef WORDS_BIGENDIAN
+			n_Y = byteswap16(n_Y);
+#endif
+			i+=n_Y;
+			data_Y = &data[i];
+
+			_n_Y = n_Y;
+			_n_g = n_g;
+			_n_p = n_p;
+			
+			gcry_mpi_scan( &state->gnutls_internals.client_Y, GCRYMPI_FMT_STD, data_Y, &_n_Y);
+			gcry_mpi_scan( &state->gnutls_internals.client_g, GCRYMPI_FMT_STD, data_g, &_n_g);
+			gcry_mpi_scan( &state->gnutls_internals.client_p, GCRYMPI_FMT_STD, data_p, &_n_p);
+		} else {
+			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+		}
+	}
+
+	return ret;
+
+}
+
+int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
+{
+	KX_Algorithm algorithm;
+	uint16 n_Y;
+	int _n_Y;
+	uint8 data[1000];
+	int ret=0;
+	uint8 premaster[1500];
+	int premaster_size = sizeof(premaster);
+	svoid* master;
+	char* random = gnutls_malloc(64);
+	
+	memmove( random, state->security_parameters.client_random, 32);
+	memmove( &random[32], state->security_parameters.server_random, 32);
+
+	n_Y = 1000 - 3;
+
+	algorithm =
+	    _gnutls_cipher_suite_get_kx_algo(state->
+					     gnutls_internals.current_cipher_suite);
+
+	/* Do key exchange only if the algorithm permits it */
+	if (_gnutls_kx_algo_server_key_exchange(algorithm) != 0) {
+
+		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
+
+			state->gnutls_internals.next_handshake_type = GNUTLS_CLIENT_KEY_EXCHANGE;
+			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, 15000);
+			state->gnutls_internals.next_handshake_type = GNUTLS_NONE;
+			
+			if ( data[0] != 1) return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+			memmove( &n_Y, &data[1], 2);
+#ifndef WORDS_BIGENDIAN
+			n_Y = byteswap16(n_Y);
+#endif
+
+			_n_Y = n_Y;
+			
+			gcry_mpi_scan( &state->gnutls_internals.client_Y, GCRYMPI_FMT_STD, &data[3], &_n_Y);
+			state->gnutls_internals.KEY = _gnutls_calc_dh_key( state->gnutls_internals.client_Y, state->gnutls_internals.dh_secret);
+
+			gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
+				       &premaster_size, state->gnutls_internals.KEY);
+			fprintf(stderr, "premaster: %s\n", bin2hex(premaster, premaster_size));
+		} else {
+			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+		}
+	}
+
+	master = gnutls_PRF( premaster, premaster_size, "master secret", strlen("master secret"),
+						random, 64 ,48);
+	memmove( state->security_parameters.master_secret, master, 48);
+	secure_free(master);
+	gnutls_free(random);
+
+
+	return ret;
+
+}
+
+
 
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
@@ -202,8 +449,8 @@ int _gnutls_supported_ciphersuites(GNUTLS_CipherSuite ** ciphers)
 
 
 	for (i = 0; i < count; i++) {
-		
-		    (*ciphers)[i].CipherSuite[0] =
+
+		(*ciphers)[i].CipherSuite[0] =
 		    cipher_suite_algorithms[i].suite.CipherSuite[0];
 		(*ciphers)[i].CipherSuite[1] =
 		    cipher_suite_algorithms[i].suite.CipherSuite[1];
@@ -248,6 +495,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 
 	i_datasize += 4;
 	data = gnutls_malloc(i_datasize);
+
 	memmove(&data[pos++], &type, 1);
 	memmove(&data[pos++], &length.pint[0], 1);
 	memmove(&data[pos++], &length.pint[1], 1);
@@ -311,6 +559,7 @@ int _gnutls_recv_handshake_int(int cd, GNUTLS_STATE state, void *data,
 	}
 
 	ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+
 	switch (dataptr[0]) {
 	case GNUTLS_CLIENT_HELLO:
 	case GNUTLS_SERVER_HELLO:
@@ -323,6 +572,18 @@ int _gnutls_recv_handshake_int(int cd, GNUTLS_STATE state, void *data,
 		ret = 0;
 		break;
 	case GNUTLS_FINISHED:
+		if (output_datasize > length32)
+			output_datasize = length32;
+		memmove(output_data, &dataptr[4], length32);
+		ret = length32;
+		break;
+	case GNUTLS_SERVER_KEY_EXCHANGE:
+		if (output_datasize > length32)
+			output_datasize = length32;
+		memmove(output_data, &dataptr[4], length32);
+		ret = length32;
+		break;
+	case GNUTLS_CLIENT_KEY_EXCHANGE:
 		if (output_datasize > length32)
 			output_datasize = length32;
 		memmove(output_data, &dataptr[4], length32);
@@ -459,8 +720,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		datalen += 2;
 		data = gnutls_realloc(data, datalen);
 		memmove(&data[pos],
-			&state->gnutls_internals.current_cipher_suite.
-			CipherSuite, 2);
+			&state->gnutls_internals.
+			current_cipher_suite.CipherSuite, 2);
 		pos += 2;
 
 		datalen += 1;
@@ -539,8 +800,9 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		}
 		if (z != 0)
 			return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
-		memmove(state->gnutls_internals.current_cipher_suite.
-			CipherSuite, cipher_suite.CipherSuite, 2);
+		memmove(state->gnutls_internals.
+			current_cipher_suite.CipherSuite,
+			cipher_suite.CipherSuite, 2);
 
 		z = 1;
 		memmove(&compression_method, &data[pos++], 1);
@@ -592,13 +854,15 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifndef WORDS_BIGENDIAN
 		sizeOfSuites = byteswap16(sizeOfSuites);
 #endif
-		SelectSuite(state->gnutls_internals.current_cipher_suite.
-			    CipherSuite, &data[pos], sizeOfSuites);
+		SelectSuite(state->gnutls_internals.
+			    current_cipher_suite.CipherSuite, &data[pos],
+			    sizeOfSuites);
 		pos += sizeOfSuites;
 
 		memmove(&z, &data[pos++], 1);
-		SelectCompMethod(&state->gnutls_internals.
-				 compression_method, &data[pos], z);
+		SelectCompMethod(&state->
+				 gnutls_internals.compression_method,
+				 &data[pos], z);
 
 	}
 
@@ -645,6 +909,18 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
 
+		/* receive the server key exchange */
+		HASH(client_hash);
+		HASH(server_hash);
+		ret = _gnutls_recv_server_kx_message(cd, state);
+		NOT_HASH(client_hash);
+		NOT_HASH(server_hash);
+		if (ret < 0) {
+			ERR("recv server hello done", ret);
+			return ret;
+		}
+
+
 		/* receive the server hello done */
 		HASH(client_hash);
 		HASH(server_hash);
@@ -659,6 +935,17 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		}
 
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
+
+		HASH(client_hash);
+		HASH(server_hash);
+		ret = _gnutls_send_client_kx_message(cd, state);
+		NOT_HASH(client_hash);
+		NOT_HASH(server_hash);
+		if (ret < 0) {
+			ERR("send client kx", ret);
+			return ret;
+		}
+
 
 		/* Send the CHANGE CIPHER SPEC PACKET */
 		ret = _gnutls_send_change_cipher_spec(cd, state);
@@ -744,7 +1031,15 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		gnutls_free(session_id);
 
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
-
+		HASH(client_hash);
+		HASH(server_hash);
+		ret = _gnutls_send_server_kx_message(cd, state);
+		NOT_HASH(client_hash);
+		NOT_HASH(server_hash);
+		if (ret < 0) {
+			ERR("send server kx", ret);
+			return ret;
+		}
 
 		/* send the server hello done */
 		HASH(client_hash);
@@ -760,6 +1055,17 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		}
 
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
+		
+		HASH(client_hash);
+		HASH(server_hash);
+		ret = _gnutls_recv_client_kx_message(cd, state);
+		NOT_HASH(client_hash);
+		NOT_HASH(server_hash);
+		if (ret < 0) {
+			ERR("recv client kx", ret);
+			return ret;
+		}
+
 
 
 		/* Initialize the connection state (start encryption) */
