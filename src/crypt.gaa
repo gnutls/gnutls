@@ -9,9 +9,6 @@ option (p, passwd) STR "FILE" { $passwd = $1 } "specify a password file."
 #int index;
 option (i, index) INT "INDEX" { $index = $1 } "specify the index of the parameters in tpasswd.conf to use."
 
-#char *crypt;
-option (c, crypt) STR "CRYPT" { $crypt = $1 } "specify crypt algorithm (bcrypt/srpsha)."
-
 #int salt;
 option (s, salt) INT "SALT" { $salt = $1 } "specify salt/cost size for crypt algorithm."
 
@@ -29,7 +26,7 @@ option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for prime nu
 
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
-init { $username=NULL; $passwd=NULL; $crypt=NULL; $salt=0;
+init { $username=NULL; $passwd=NULL; $salt=0;
        $create_conf=NULL; $passwd_conf=NULL; $verify = 0; $bits=1040; 
        $index = 1; }
 

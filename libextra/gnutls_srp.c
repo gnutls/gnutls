@@ -27,7 +27,6 @@
 
 #include <gnutls_srp.h>
 #include <auth_srp_passwd.h>
-#include <crypt_bcrypt.h>
 #include <gnutls_mpi.h>
 #include "debug.h"
 
@@ -258,18 +257,11 @@ int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 }
 
 int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
-			 size_t salt_size, uint8 crypt_algo, size_t *size, void* digest)
+			 size_t salt_size, size_t *size, void* digest)
 {
 
-	switch (crypt_algo) {
-	case SRPSHA1_CRYPT:
-		return _gnutls_calc_srp_sha(username, password, salt,
+	return _gnutls_calc_srp_sha(username, password, salt,
 					    salt_size, size, digest);
-	case BLOWFISH_CRYPT:
-		return _gnutls_calc_srp_bcrypt(username, password, salt, salt_size,
-					       size, digest);
-	}
-	return -1;
 }
 
 

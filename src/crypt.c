@@ -39,7 +39,7 @@
  * are in the library, which is not good.
  */
 
-int crypt_int(char *username, char *passwd, int crypt, int salt,
+int crypt_int(char *username, char *passwd, int salt,
 	      char *tpasswd_conf, char *tpasswd, int uindex);
 static int read_conf_values(MPI * g, MPI * n, char *str, int str_size);
 static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, MPI n);
@@ -72,7 +72,7 @@ int generate_create_conf(char *tpasswd_conf, int bits)
 static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, MPI n) {
 	if (salt==NULL) return -1;
 
-	if (gnutls_crypt_vrfy
+	if (_gnutls_srp_crypt_vrfy
 	    (username, passwd, salt, g, n) == 0) {
 		fprintf(stderr, "Password verified\n");
 		return 0;
@@ -225,7 +225,7 @@ int main(int argc, char **argv)
 {
 	gaainfo info;
 	char *passwd;
-	int crypt, salt;
+	int salt;
 	struct passwd *pwd;
 
 	if (gaa(argc, argv, &info) != -1) {
@@ -255,23 +255,7 @@ int main(int argc, char **argv)
 		info.username = pwd->pw_name;
 	}
 
-	if (info.crypt == NULL) {
-		crypt = SRPSHA1_CRYPT;
-		salt = 16;
-	} else {
-		if (strcasecmp(info.crypt, "bcrypt") == 0) {
-			crypt = BLOWFISH_CRYPT;
-			if (salt == 0)
-				salt = 6;	/* cost is 6 */
-		} else if (strcasecmp(info.crypt, "srpsha") == 0) {
-			crypt = SRPSHA1_CRYPT;
-			if (salt == 0)
-				salt = 10;	/* 10 bytes salt */
-		} else {
-			fprintf(stderr, "Unknown algorithm\n");
-			return -1;
-		}
-	}
+	salt = 16;
 
 	passwd = getpass("Enter password: ");
 
@@ -282,12 +266,12 @@ int main(int argc, char **argv)
 	}
 
 
-	return crypt_int(info.username, passwd, crypt, salt,
+	return crypt_int(info.username, passwd, salt,
 			 info.passwd_conf, info.passwd, info.index);
 
 }
 
-int crypt_int(char *username, char *passwd, int crypt, int salt,
+int crypt_int(char *username, char *passwd, int salt,
 	      char *tpasswd_conf, char *tpasswd, int uindex)
 {
 	FILE *fd;
@@ -322,9 +306,9 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 		return -1;
 	}
 
-	cr = gnutls_crypt(username, passwd, crypt, salt, g, n);
+	cr = _gnutls_srp_crypt(username, passwd, salt, g, n);
 	if (cr == NULL) {
-		fprintf(stderr, "Cannot gnutls_crypt()...\n");
+		fprintf(stderr, "Cannot _gnutls_srp_crypt()...\n");
 		return -1;
 	} else {
 		/* delete previous entry */

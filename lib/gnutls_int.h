@@ -102,7 +102,6 @@ typedef struct { opaque pint[3]; } uint24;
 
 # include <gnutls_mpi.h>
 
-typedef enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 } crypt_algo;
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
 
 typedef enum CertificateStatus { 

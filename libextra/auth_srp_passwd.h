@@ -2,7 +2,6 @@
 
 typedef struct {
 	char* username;
-	int algorithm;
 	
 	opaque *salt;
 	int salt_size;

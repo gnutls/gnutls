@@ -78,7 +78,6 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 	size_t ret;
 	uint8 *data_n, *data_s;
 	uint8 *data_g, *username;
-	uint8 pwd_algo;
 	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
 	int err;
 	SRP_SERVER_AUTH_INFO info;
@@ -105,8 +104,6 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 		        return GNUTLS_E_PWD_ERROR;
 	}
 
-	pwd_algo = (uint8) pwd_entry->algorithm;
-
 	if (_gnutls_mpi_print( NULL, &n_g, pwd_entry->g)!=0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
@@ -130,21 +127,15 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 	_gnutls_mpi_set(N, pwd_entry->n);
 	_gnutls_mpi_set(V, pwd_entry->v);
 
-	if (data_size < n_n + n_g + pwd_entry->salt_size + 6 + 1) {
+	if (data_size < n_n + n_g + pwd_entry->salt_size + 6) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	data_g = data; 
 
-	/* firstly copy the algorithm used to generate the verifier 
-	 */
-	data_g[0] = pwd_algo;
-
 	/* copy G (generator) to data */
 
-	data_g++;
-	
 	if(_gnutls_mpi_print( &data_g[2], &n_g, G)!=0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
@@ -299,7 +290,6 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	const uint8 *data_n;
 	const uint8 *data_g;
 	const uint8 *data_s;
-	uint8 pwd_algo;
 	int i, ret;
 	opaque hd[SRP_MAX_HASH_SIZE];
 	char *username;
@@ -321,9 +311,6 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 /* read the algorithm used to generate V */
 	
 	i = 0;
-	DECR_LEN( data_size, 1);
-	pwd_algo = data[0];
-	i++;
 
 	DECR_LEN( data_size, 2);
 	n_g = _gnutls_read_uint16( &data[i]);
@@ -370,7 +357,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
 	 */
-	if ( ( ret =_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g, hd)) < 0) {
+	if ( ( ret =_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, &_n_g, hd)) < 0) {
 		gnutls_assert();
 		return ret;
 	}

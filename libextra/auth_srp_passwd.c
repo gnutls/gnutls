@@ -39,7 +39,7 @@
  * string(username):base64(v):base64(salt):int(index)
  */
 static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
-char * p, *p2;
+char * p;
 int len, ret;
 opaque *verifier;
 size_t verifier_size;
@@ -89,20 +89,6 @@ int indx;
 	
 	*p='\0';
 	p++;
-
-	if ( (p2 = index(p, '$')) == NULL) {
-		entry->algorithm = SRPSHA1_CRYPT;
-	} else {
-		p++;
-		entry->algorithm = atoi(p);
-		p2 = index(p, '$'); /* find the last $ */
-		if (p2==NULL) {
-			gnutls_assert();
-			gnutls_free(entry->salt);
-			return GNUTLS_E_PARSING_ERROR;
-		}
-		p = p2+1;
-	}
 
 	len = strlen(p);
 	ret = _gnutls_sbase64_decode( p, len, &verifier);
@@ -365,8 +351,6 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 		return NULL;
 	}
 	
-	pwd_entry->algorithm = 0;
-
 	return pwd_entry;
 
 }

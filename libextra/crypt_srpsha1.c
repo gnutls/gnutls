@@ -28,11 +28,15 @@
 #include "gnutls_srp.h"
 #include <gnutls_errors.h>
 
-/*	x = SHA(<salt> | SHA(<username> | ":" | <raw password>)) */
+/*
+ * x = SHA(<salt> | SHA(<username> | ":" | <raw password>)) 
+ */
 
 static const char magic[] = "";
 
-char *crypt_srpsha1(const char *username, const char *passwd,
+/* This function does the actual srpsha1 encoding.
+ */
+char *_gnutls_crypt_srpsha1(const char *username, const char *passwd,
 		    const char *salt, GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	unsigned char *sp, *spe, r1[MAX_HASH_SIZE];
@@ -129,9 +133,8 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	return tmp;
 }
 
-/* salt here is the salt size */
-char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
-			    int salt, GNUTLS_MPI g, GNUTLS_MPI n)
+char *_gnutls_crypt_srpsha1_wrapper(const char *username, const char *pass_new,
+			    int salt_size, GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	unsigned char *result;
 	char *tcp;
@@ -139,18 +142,18 @@ char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
 	char *e = NULL;
 	int result_size;
 
-	if (salt > 50 || salt <= 0)
+	if (salt_size > 50 || salt_size <= 0)
 		return NULL;	/* wow that's pretty long salt */
 
-	rand = gnutls_malloc(salt);
-	if (rand==NULL || _gnutls_get_random(rand, salt, GNUTLS_WEAK_RANDOM) < 0) {
+	rand = gnutls_alloca(salt_size);
+	if (rand==NULL || _gnutls_get_random(rand, salt_size, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
 		return NULL;
 	}
 
-	result_size = _gnutls_sbase64_encode(rand, salt, &result);
+	result_size = _gnutls_sbase64_encode(rand, salt_size, &result);
 	if (result_size < 0) {
-		gnutls_free(rand);
+		gnutls_afree(rand);
 		gnutls_assert();
 		return NULL;
 	}
@@ -158,16 +161,16 @@ char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
 	tcp = gnutls_calloc(1, 1+ result_size + 1);
 	if (tcp==NULL) {
 		gnutls_assert();
-		gnutls_free(rand);
+		gnutls_afree(rand);
 		return NULL;
 	}	
 	sprintf(tcp, ":%s", result); /* Flawfinder: ignore */
 
 	gnutls_free(result);
-	gnutls_free(rand);
+	gnutls_afree(rand);
 	/* no longer need cleartext */
 
-	e = crypt_srpsha1(username, pass_new, (const char *) tcp, g, n);
+	e = _gnutls_crypt_srpsha1(username, pass_new, (const char *) tcp, g, n);
 	gnutls_free(tcp);
 
 	return e;
