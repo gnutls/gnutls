@@ -2258,7 +2258,7 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
   *
   * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
   * Returns 0 on success. If the provided buffer is not long enough,
-  * then GNUTLS_E_INVALID_REQUEST is returned.
+  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
   *
   * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
   * will be returned.

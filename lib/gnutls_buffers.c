@@ -127,7 +127,7 @@ int _gnutls_record_buffer_get_size(ContentType type, gnutls_session session)
   * This function checks if there are any data to receive
   * in the gnutls buffers. Returns the size of that data or 0.
   * Notice that you may also use select() to check for data in
-  * the TCP connection, instead of this function.
+  * a TCP connection, instead of this function.
   * (gnutls leaves some data in the tcp buffer in order for select
   * to work).
   **/

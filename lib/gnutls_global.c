@@ -134,10 +134,10 @@ static void _gnutls_gcry_log_handler( void* dummy, int level, const char* fmt,
 static int _gnutls_init = 0;
 
 /**
-  * gnutls_global_init - This function initializes the global session to defaults.
+  * gnutls_global_init - This function initializes the global data to defaults.
   *
-  * This function initializes the global session to defaults.
-  * Every gnutls application has a global session which holds common parameters
+  * This function initializes the global data to defaults.
+  * Every gnutls application has a global data which holds common parameters
   * shared by gnutls session structures.
   * You must call gnutls_global_deinit() when gnutls usage is no longer needed
   * Returns zero on success.
@@ -204,9 +204,10 @@ int gnutls_global_init( void)
 }
 
 /**
-  * gnutls_global_deinit - This function deinitializes the global session 
+  * gnutls_global_deinit - This function deinitializes the global data 
   *
-  * This function deinitializes the global session.
+  * This function deinitializes the global data, that were initialized
+  * using gnutls_global_init().
   *
   **/
 

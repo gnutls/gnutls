@@ -38,8 +38,6 @@
   * Sets the function that will be used to retrieve data from the resumed
   * sessions database. This function must return a gnutls_datum containing the
   * data on success, or a gnutls_datum containing null and 0 on failure.
-  * This function should only be used if you do
-  * not plan to use the included gdbm backend.
   *
   * The first argument to store_function() will be null unless gnutls_db_set_ptr() 
   * has been called.
@@ -56,8 +54,6 @@ void gnutls_db_set_retrieve_function( gnutls_session session, gnutls_db_retr_fun
   *
   * Sets the function that will be used to remove data from the resumed
   * sessions database. This function must return 0 on success.
-  * This function should only be used if you do
-  * not plan to use the included gdbm backend.
   *
   * The first argument to rem_function() will be null unless gnutls_db_set_ptr() 
   * has been called.
@@ -74,8 +70,6 @@ void gnutls_db_set_remove_function( gnutls_session session, gnutls_db_remove_fun
   *
   * Sets the function that will be used to store data from the resumed
   * sessions database. This function must remove 0 on success. 
-  * This function should only be used if you do
-  * not plan to use the included gdbm backend.
   *
   * The first argument to store_function() will be null unless gnutls_db_set_ptr() 
   * has been called.
@@ -90,8 +84,8 @@ void gnutls_db_set_store_function( gnutls_session session, gnutls_db_store_func 
   * @session: is a &gnutls_session structure.
   * @ptr: is the pointer
   *
-  * Sets the pointer that will be sent to db store, retrieve and delete functions, as
-  * the first argument. Should only be called if not using the gdbm backend.
+  * Sets the pointer that will be provided to db store, retrieve and delete functions, as
+  * the first argument. 
   *
   **/
 void gnutls_db_set_ptr( gnutls_session session, void* ptr) {
@@ -103,7 +97,7 @@ void gnutls_db_set_ptr( gnutls_session session, void* ptr) {
   * @session: is a &gnutls_session structure.
   *
   * Returns the pointer that will be sent to db store, retrieve and delete functions, as
-  * the first argument. Should only be used if not using the default (gdbm) backend.
+  * the first argument. 
   *
   **/
 void* gnutls_db_get_ptr( gnutls_session session) {
