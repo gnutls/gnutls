@@ -32,15 +32,28 @@
 #include <gnutls_datum.h>
 #include <gnutls_state.h>
 
+static const char keyexp[] = "key expansion";
+static const int  keyexp_length = sizeof(keyexp) - 1;
+
+static const char ivblock[] = "IV block";
+static const int  ivblock_length = sizeof(ivblock) - 1;
+
+static const char cliwrite[] = "client write key";
+static const int  cliwrite_length = sizeof(cliwrite) - 1;
+
+static const char servwrite[] = "server write key";
+static const int  servwrite_length = sizeof(servwrite) - 1;
+
+#define EXPORT_FINAL_KEY_SIZE 16
+
 /* This function is to be called after handshake, when master_secret,
  *  client_random and server_random have been initialized. 
  * This function creates the keys and stores them into pending state.
  * (state->cipher_specs)
  */
-int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_size)
+int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_size, int export_flag)
 {
 	opaque *key_block;
-	char keyexp[] = "key expansion";
 	char random[2*TLS_RANDOM_SIZE];
 	int pos, ret;
 	int block_size;
@@ -52,9 +65,10 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 		 state->cipher_specs.generated_keys=0;
 		 return 0;
 	}
-	
 
-	block_size = 2 * hash_size + 2 * key_size + 2 * IV_size;
+	block_size = 2 * hash_size + 2 * key_size;
+	if (export_flag == 0) block_size += 2 * IV_size;
+
 	key_block = gnutls_secure_malloc( block_size);
 	if (key_block==NULL) {
 		gnutls_assert();
@@ -70,7 +84,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	} else { /* TLS 1.0 */
 		ret =
 		    _gnutls_PRF( state->security_parameters.master_secret, TLS_MASTER_SIZE,
-			       keyexp, strlen(keyexp), random, 2*TLS_RANDOM_SIZE, 
+			       keyexp, keyexp_length, random, 2*TLS_RANDOM_SIZE, 
 			       block_size, key_block);
 	}
 	
@@ -98,19 +112,113 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	}
 	
 	if (key_size > 0) {
-		if (gnutls_sset_datum( &state->cipher_specs.client_write_key, &key_block[pos], key_size) < 0 ) {
-			gnutls_free(key_block);
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		pos+=key_size;
+		opaque * client_write_key, *server_write_key;
+		int client_write_key_size, server_write_key_size;
+		int free_keys = 0;
 
-		if (gnutls_sset_datum( &state->cipher_specs.server_write_key, &key_block[pos], key_size) < 0 ) {
+		if (export_flag==0) {
+			client_write_key = &key_block[pos];
+			client_write_key_size = key_size;
+			
+			pos += key_size;
+			
+			server_write_key = &key_block[pos];
+			server_write_key_size = key_size;
+
+			pos += key_size;
+
+		} else { /* export */
+			free_keys = 1;
+
+			client_write_key = gnutls_secure_malloc( EXPORT_FINAL_KEY_SIZE);
+			if (client_write_key == NULL) {
+				gnutls_assert();
+				gnutls_free(key_block);
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+
+			server_write_key = gnutls_secure_malloc( EXPORT_FINAL_KEY_SIZE);
+			if (server_write_key == NULL) {
+				gnutls_assert();
+				gnutls_free(key_block);
+				gnutls_free( client_write_key);
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			
+			/* generate the final keys */
+
+			/* SSL3: check */
+			if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3 */
+				ret = _gnutls_ssl3_generate_random(  &key_block[pos], key_size, 
+					random, 2*TLS_RANDOM_SIZE, EXPORT_FINAL_KEY_SIZE, 
+						client_write_key);
+			} else { /* TLS 1.0 */
+				ret =
+				    _gnutls_PRF( &key_block[pos], key_size,
+				       cliwrite, cliwrite_length, random, 2*TLS_RANDOM_SIZE, 
+				       EXPORT_FINAL_KEY_SIZE, client_write_key);
+			}
+
+			if (ret<0) {
+				gnutls_assert();
+				gnutls_free(key_block);
+				gnutls_free( server_write_key);
+				gnutls_free( client_write_key);
+				return ret;
+			}
+			
+			client_write_key_size = EXPORT_FINAL_KEY_SIZE;
+			pos += key_size;
+
+			if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3 */
+				ret = _gnutls_ssl3_generate_random(  &key_block[pos], key_size, 
+					random, 2*TLS_RANDOM_SIZE, EXPORT_FINAL_KEY_SIZE,
+						server_write_key);
+			} else { /* TLS 1.0 */
+				ret =
+				    _gnutls_PRF( &key_block[pos], key_size,
+				       servwrite, servwrite_length, random, 2*TLS_RANDOM_SIZE, 
+				       EXPORT_FINAL_KEY_SIZE, server_write_key);
+			}
+
+			if (ret<0) {
+				gnutls_assert();
+				gnutls_free(key_block);
+				gnutls_free( server_write_key);
+				gnutls_free( client_write_key);
+				return ret;
+			}
+			
+			server_write_key_size = EXPORT_FINAL_KEY_SIZE;
+			pos += key_size;
+
+		}
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_key, 
+			client_write_key, client_write_key_size) < 0 ) {
 			gnutls_free(key_block);
+			gnutls_free( server_write_key);
+			gnutls_free( client_write_key);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		pos+=key_size;
+
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_key, 
+			server_write_key, server_write_key_size) < 0 ) {
+			gnutls_free(key_block);
+			gnutls_free( server_write_key);
+			gnutls_free( client_write_key);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		
+		if (free_keys != 0) {
+			gnutls_free( server_write_key);
+			gnutls_free( client_write_key);
+		}
 	}
-	if (IV_size > 0) {
+
+
+	/* IV generation in export and non export ciphers.
+	 */
+	if (IV_size > 0 && export_flag == 0) {
 		if (gnutls_sset_datum( &state->cipher_specs.client_write_IV, &key_block[pos], IV_size) < 0 ) {
 			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
@@ -122,6 +230,41 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		pos+=IV_size;
+	} else if (IV_size > 0 && export_flag != 0) {
+		opaque *iv_block = gnutls_alloca( IV_size * 2);
+
+		if (iv_block == NULL) {
+			gnutls_assert();
+			gnutls_free(key_block);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		/* SSL3: check */		
+		if ( state->security_parameters.version == GNUTLS_SSL3) { /* SSL 3 */
+			ret = _gnutls_ssl3_generate_random( "", 0, random, 2*TLS_RANDOM_SIZE,
+				IV_size*2, iv_block);
+		} else { /* TLS 1.0 */
+			ret =
+			    _gnutls_PRF( "", 0,
+				       ivblock, ivblock_length, random, 2*TLS_RANDOM_SIZE, 
+				       IV_size*2, iv_block);
+		}
+
+		if (ret<0) {
+			gnutls_assert();
+			gnutls_free(key_block);
+			return ret;
+		}
+
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_IV, iv_block, IV_size) < 0 ) {
+			gnutls_free(key_block);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+	
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_IV, &iv_block[IV_size], IV_size) < 0 ) {
+			gnutls_free(key_block);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 	}
 	
 	gnutls_free(key_block);
@@ -135,7 +278,7 @@ int _gnutls_set_read_keys(GNUTLS_STATE state)
 {
 	int hash_size;
 	int IV_size;
-	int key_size;
+	int key_size, export_flag;
 	BulkCipherAlgorithm algo;
 	MACAlgorithm mac_algo;
 	
@@ -145,15 +288,16 @@ int _gnutls_set_read_keys(GNUTLS_STATE state)
 	hash_size = _gnutls_mac_get_digest_size( mac_algo);
 	IV_size = _gnutls_cipher_get_iv_size( algo);
 	key_size = gnutls_cipher_get_key_size( algo);
+        export_flag = _gnutls_cipher_get_export_flag( algo);
 
-	return _gnutls_set_keys( state, hash_size, IV_size, key_size);
+	return _gnutls_set_keys( state, hash_size, IV_size, key_size, export_flag);
 }
 
 int _gnutls_set_write_keys(GNUTLS_STATE state)
 {
 	int hash_size;
 	int IV_size;
-	int key_size;
+	int key_size, export_flag;
 	BulkCipherAlgorithm algo;
 	MACAlgorithm mac_algo;
 	
@@ -163,8 +307,9 @@ int _gnutls_set_write_keys(GNUTLS_STATE state)
 	hash_size = _gnutls_mac_get_digest_size( mac_algo);
 	IV_size = _gnutls_cipher_get_iv_size( algo);
 	key_size = gnutls_cipher_get_key_size( algo);
+        export_flag = _gnutls_cipher_get_export_flag( algo);
 
-	return _gnutls_set_keys( state, hash_size, IV_size, key_size);
+	return _gnutls_set_keys( state, hash_size, IV_size, key_size, export_flag);
 }
 
 #define CPY_COMMON dst->entity = src->entity; \

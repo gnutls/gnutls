@@ -80,6 +80,7 @@ struct gnutls_cipher_entry {
 	size_t keysize;
 	CipherType block;
 	size_t iv;
+	int export_flag; /* 0 non export */
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
@@ -89,12 +90,13 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  */
 static const gnutls_cipher_entry algorithms[] = {
-	{"3DES 168 CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8 },
-	{"RIJNDAEL 128 CBC", GNUTLS_CIPHER_RIJNDAEL_128_CBC, 16, 16, CIPHER_BLOCK, 16 },
-	{"RIJNDAEL 256 CBC", GNUTLS_CIPHER_RIJNDAEL_256_CBC, 16, 32, CIPHER_BLOCK, 16 },
-	{"TWOFISH 128 CBC", GNUTLS_CIPHER_TWOFISH_128_CBC, 16, 16, CIPHER_BLOCK, 16 },
-	{"ARCFOUR 128", GNUTLS_CIPHER_ARCFOUR, 1, 16, CIPHER_STREAM, 0 },
-	{"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0 },
+	{"3DES 168 CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0 },
+	{"RIJNDAEL 128 CBC", GNUTLS_CIPHER_RIJNDAEL_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0 },
+	{"RIJNDAEL 256 CBC", GNUTLS_CIPHER_RIJNDAEL_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0 },
+	{"TWOFISH 128 CBC", GNUTLS_CIPHER_TWOFISH_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0 },
+	{"ARCFOUR 128", GNUTLS_CIPHER_ARCFOUR, 1, 16, CIPHER_STREAM, 0, 0 },
+	{"ARCFOUR 40", GNUTLS_CIPHER_ARCFOUR_EXPORT, 1, 5, CIPHER_STREAM, 0, 1 },
+	{"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0 },
 	{0}
 };
 
@@ -241,6 +243,8 @@ typedef struct {
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
 
+#define GNUTLS_RSA_ARCFOUR_EXPORT_MD5 { 0x00, 0x03 }
+
 /* draft-ietf-tls-ciphersuite-05: 
  */
 #define GNUTLS_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x2F }
@@ -357,6 +361,10 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* RSA */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_NULL_MD5,
 				  GNUTLS_CIPHER_NULL,
+				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5, GNUTLS_SSL3),
+
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_EXPORT_MD5,
+				  GNUTLS_CIPHER_ARCFOUR_EXPORT,
 				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5, GNUTLS_SSL3),
 
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_SHA,
@@ -575,6 +583,14 @@ int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm)
 {				/* In bytes */
 	size_t ret = 0;
 	GNUTLS_ALG_LOOP(ret = p->iv);
+	return ret;
+
+}
+
+int _gnutls_cipher_get_export_flag(BulkCipherAlgorithm algorithm)
+{				/* In bytes */
+	size_t ret = 0;
+	GNUTLS_ALG_LOOP(ret = p->export_flag);
 	return ret;
 
 }

@@ -77,7 +77,7 @@ int kx_priority[16] =
    GNUTLS_KX_ANON_DH, 0
 };
 int cipher_priority[16] =
-    { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
+    { GNUTLS_CIPHER_ARCFOUR_EXPORT, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
    GNUTLS_CIPHER_ARCFOUR, 0
 };
 int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
@@ -235,7 +235,6 @@ int main(int argc, char **argv)
       /* allow the use of private ciphersuites.
        */
       gnutls_handshake_set_private_extensions( state, 1);
-      gnutls_handshake_set_exportable_detection( state, 1);
 
       if (i == 1) {
 	 gnutls_session_set_data(state, session, session_size);

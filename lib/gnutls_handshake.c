@@ -1063,8 +1063,6 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 	return ret;
 }
 
-const static opaque EXPORT_CIPHERSUITE[2] = { 0x00, 0x03 };
-
 /* This function checks if the given cipher suite is supported, and sets it
  * to the state;
  */
@@ -1075,12 +1073,6 @@ static int _gnutls_client_set_ciphersuite(GNUTLS_STATE state,
 	GNUTLS_CipherSuite *cipher_suites;
 	uint16 x;
 	int i, err;
-
-	if (state->gnutls_internals.exportable_detection_hack != 0)
-		if ( memcmp( suite, EXPORT_CIPHERSUITE, 2)==0) {
-			gnutls_assert();
-			return GNUTLS_E_EXPORT_CIPHER_SUITE;
-		} 
 
 	z = 1;
 	x = _gnutls_supported_ciphersuites(state, &cipher_suites);
@@ -1351,11 +1343,6 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 
 	cipher_num = ret;
 	
-	/* for the EXPORT DETECTION */
-	if ( state->gnutls_internals.exportable_detection_hack != 0) {
-		cipher_num += 1; /* add 1 for the export cipher suite */
-	}
-
 	cipher_num *= sizeof(uint16);	/* in order to get bytes */
  
 	datalen = pos = 0;
@@ -1368,20 +1355,11 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-
-        /* add 2 for the export cipher suite 
-         */
 	_gnutls_write_uint16(cipher_num, *ret_data);
 	pos += 2;
 
 	for (i = 0; i < (cipher_num / 2) - 1; i++) {
 		memcpy( &(*ret_data)[pos], cipher_suites[i].CipherSuite, 2);
-		pos += 2;
-	}
-
-	/* for the EXPORT DETECTION */
-	if ( state->gnutls_internals.exportable_detection_hack != 0) {
-		memcpy( &(*ret_data)[pos], EXPORT_CIPHERSUITE, 2);
 		pos += 2;
 	}
 

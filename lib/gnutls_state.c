@@ -468,24 +468,6 @@ void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
 }
 
 /**
-  * gnutls_handshake_set_exportable_detection - Used to enable the detection of server's export cipher suites
-  * @state: is a &GNUTLS_STATE structure.
-  * @det: is an integer (0 or 1)
-  *
-  * The function will allow clients to detect if a server only
-  * supports exportable ciphersuites. In that case an error code
-  * of GNUTLS_E_EXPORT_CIPHER_SUITE is returned.
-  *
-  * This check will be enabled if det != 0, and disabled otherwise
-  * (the default behaviour).
-  *
-  **/
-void gnutls_handshake_set_exportable_detection(GNUTLS_STATE state, int det)
-{
-	state->gnutls_internals.exportable_detection_hack = det;
-}
-
-/**
   * gnutls_handshake_set_private_extensions - Used to enable the private cipher suites
   * @state: is a &GNUTLS_STATE structure.
   * @allow: is an integer (0 or 1)
