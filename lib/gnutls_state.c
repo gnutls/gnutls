@@ -138,7 +138,7 @@ static void deinit_internal_params( gnutls_session session)
 	if (session->internals.params.free_cert_dh_params)
 		gnutls_dh_params_deinit( session->internals.params.cert_dh_params);
 
-	if (session->internals.params.rsa_params)
+	if (session->internals.params.free_rsa_params)
 		gnutls_rsa_params_deinit( session->internals.params.rsa_params);
 	
 	memset( &session->internals.params, 0, sizeof( session->internals.params));

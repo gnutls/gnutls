@@ -2,6 +2,8 @@ Version 1.1.8
 - Implemented all the tests for the SRP group parameters in
   client side. This may lead to incompatibility with very
   old gnutls servers.
+- Corrected bug in RSA parameters handling which could cause
+  unexpected crashes.
 
 Version 1.1.7 (29/03/2004)
 - Added gnutls_certificate_set_params_function() and 
