@@ -9,7 +9,7 @@ Version 0.5.12
    gnutls_srp_verifier()
    gnutls_srp_base64_encode()
    gnutls_srp_base64_decode()
-- Added the function gnutls_srp_server_set_credentials_function()
+- Added the function gnutls_srp_set_server_credentials_function()
   to allow retrieving SRP parameters from an external backend - other
   than password files.
 - Added the function gnutls_openpgp_set_recv_key_function()

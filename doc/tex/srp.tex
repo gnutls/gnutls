@@ -1,0 +1,61 @@
+\section{Authentication using SRP\index{SRP authentication}}
+Authentication using the SRP\footnote{SRP stands for Secure Password Protocol and 
+is described in RFC2945. The SRP key exchange is not a part of the \tlsI{} protocol}
+is actually password authentication, since the two peers are identified by the knowledge of a password. 
+This protocol also offers protection against off-line attacks, such as password 
+file stealing. 
+This is achieved since SRP does not use the plain password to perform authentication, but something called a 
+verifier. The verifier is $g^{x}mod(n)$ and $x$ is a value calculated
+from the user name and the password. 
+\par SRP is normally used with a SHA based hash function, to calculate
+the value of $x$. 
+\par The advantage of SRP authentication, over other proposed secure password 
+authentication schemas, is that SRP does not require the server to hold
+the user's password. This kind of protection is similar to the one used traditionally
+in the \emph{UNIX} ``passwd'' file, where the contents of this file did not cause
+harm to the system security if they were revealed.
+\par
+The implementation in \gnutls{} is based on paper \cite{TLSSRP}.
+Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp}.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+SRP & Authentication using the SRP protocol. 
+\\
+\hline
+SRP\_DSS & Client authentication using the SRP protocol. Server is 
+authenticated using a certificate with DSA parameters.
+\\
+\hline
+SRP\_RSA & Client authentication using the SRP protocol. Server is 
+authenticated using a certificate with RSA parameters.
+\\
+\hline
+\end{tabular}
+
+\caption{Supported SRP key exchange algorithms}
+\label{fig:srp}
+
+\end{figure}
+
+The default behaviour of \gnutls{} is to read the usernames and
+SRP verifiers from password files. These password files are the ones used
+by \emph{libsrp} and can be specified using the
+\printfunc{gnutls_srp_set_server_credentials_file}{gnutls\_srp\_set\_server\_credentials\_file}.
+If a different password file format is to be used, then the 
+function \printfunc{gnutls_srp_set_server_credentials_function}{gnutls\_srp\_set\_server\_credentials\_function},
+should be called, in order to set an appropriate callback.
+
+Some helper functions such as
+\begin{itemize}
+\item \printfunc{gnutls_srp_verifier}{gnutls\_srp\_verifier}
+\item \printfunc{gnutls_srp_base64_encode}{gnutls\_srp\_base64\_encode}
+\item \printfunc{gnutls_srp_base64_decode}{gnutls\_srp\_base64\_decode}
+\end{itemize}
+are included in \gnutls{}, and may be used to generate, and maintain
+SRP verifiers, and password files. A program to manipulate the required parameters 
+for SRP authentication is also included. See section \ref{srpcrypt} on 
+page \pageref{srpcrypt} for more information.
+
