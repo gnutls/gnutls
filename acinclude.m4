@@ -10,7 +10,7 @@ dnl Test for gcrypt, and define GCRYPT_CFLAGS and GCRYPT_LIBS
 dnl
 AC_DEFUN(AM_PATH_GCRYPT,
 [dnl
-dnl Get the cflags and libraries from the gcrypt-config script
+dnl Get the cflags and libraries from the libgcrypt-config script
 dnl
 AC_ARG_WITH(gcrypt-prefix,
           [  --with-gcrypt-prefix=PFX   Prefix where gcrypt is installed (optional)],
@@ -22,11 +22,11 @@ AC_ARG_ENABLE(gcrypttest,
   if test x$gcrypt_config_prefix != x ; then
      gcrypt_config_args="$gcrypt_config_args --prefix=$gcrypt_config_prefix"
      if test x${GCRYPT_CONFIG+set} != xset ; then
-        GCRYPT_CONFIG=$gcrypt_config_prefix/bin/gcrypt-config
+        GCRYPT_CONFIG=$gcrypt_config_prefix/bin/libgcrypt-config
      fi
   fi
 
-  AC_PATH_PROG(GCRYPT_CONFIG, gcrypt-config, no)
+  AC_PATH_PROG(GCRYPT_CONFIG, libgcrypt-config, no)
   min_gcrypt_version=ifelse([$1], ,1.1.0,$1)
   AC_MSG_CHECKING(for gcrypt - version >= $min_gcrypt_version)
   no_gcrypt=""
@@ -43,7 +43,7 @@ AC_ARG_ENABLE(gcrypttest,
       LIBS="$LIBS $GCRYPT_LIBS"
 dnl
 dnl Now check if the installed gcrypt is sufficiently new. Also sanity
-dnl checks the results of gcrypt-config to some extent
+dnl checks the results of libgcrypt-config to some extent
 dnl
       rm -f conf.gcrypttest
       AC_TRY_RUN([
@@ -59,15 +59,15 @@ main ()
 
     if( strcmp( gcry_check_version(NULL), "$gcrypt_config_version" ) )
     {
-      printf("\n*** 'gcrypt-config --version' returned %s, but GCRYPT (%s)\n",
+      printf("\n*** 'libgcrypt-config --version' returned %s, but GCRYPT (%s)\n",
              "$gcrypt_config_version", gcry_check_version(NULL) );
-      printf("*** was found! If gcrypt-config was correct, then it is best\n");
+      printf("*** was found! If libgcrypt-config was correct, then it is best\n");
       printf("*** to remove the old version of GCRYPT. You may also be able to fix the error\n");
       printf("*** by modifying your LD_LIBRARY_PATH enviroment variable, or by editing\n");
       printf("*** /etc/ld.so.conf. Make sure you have run ldconfig if that is\n");
       printf("*** required on your system.\n");
-      printf("*** If gcrypt-config was wrong, set the environment variable GCRYPT_CONFIG\n");
-      printf("*** to point to the correct copy of gcrypt-config, and remove the file config.cache\n");
+      printf("*** If libgcrypt-config was wrong, set the environment variable GCRYPT_CONFIG\n");
+      printf("*** to point to the correct copy of libgcrypt-config, and remove the file config.cache\n");
       printf("*** before re-running configure\n");
     }
     else if ( strcmp(gcry_check_version(NULL), GCRYPT_VERSION ) )
@@ -91,10 +91,10 @@ main ()
         printf("*** (It is distributed along with GnuPG).\n");
         printf("*** \n");
         printf("*** If you have already installed a sufficiently new version, this error\n");
-        printf("*** probably means that the wrong copy of the gcrypt-config shell script is\n");
+        printf("*** probably means that the wrong copy of the libgcrypt-config shell script is\n");
         printf("*** being found. The easiest way to fix this is to remove the old version\n");
         printf("*** of GCRYPT, but you can also set the GCRYPT_CONFIG environment to point to the\n");
-        printf("*** correct copy of gcrypt-config. (In this case, you will have to\n");
+        printf("*** correct copy of libgcrypt-config. (In this case, you will have to\n");
         printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
         printf("*** so that the correct libraries are found at run-time))\n");
       }
@@ -116,10 +116,10 @@ main ()
         AC_MSG_RESULT(no)
      fi
      if test "$GCRYPT_CONFIG" = "no" ; then
-       echo "*** The gcrypt-config script installed by GCRYPT could not be found"
+       echo "*** The libgcrypt-config script installed by GCRYPT could not be found"
        echo "*** If GCRYPT was installed in PREFIX, make sure PREFIX/bin is in"
        echo "*** your path, or set the GCRYPT_CONFIG environment variable to the"
-       echo "*** full path to gcrypt-config."
+       echo "*** full path to libgcrypt-config."
      else
        if test -f conf.gcrypttest ; then
         :
@@ -146,7 +146,7 @@ main ()
         [ echo "*** The test program failed to compile or link. See the file config.log for the"
           echo "*** exact error that occured. This usually means GCRYPT was incorrectly installed"
           echo "*** or that you have moved GCRYPT since it was installed. In the latter case, you"
-          echo "*** may want to edit the gcrypt-config script: $GCRYPT_CONFIG" ])
+          echo "*** may want to edit the libgcrypt-config script: $GCRYPT_CONFIG" ])
           CFLAGS="$ac_save_CFLAGS"
           LIBS="$ac_save_LIBS"
        fi
