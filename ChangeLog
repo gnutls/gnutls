@@ -1,3 +1,48 @@
+2002-03-31 06:04  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, gnutls_errors.c, gnutls_errors.h,
+	gnutls_gcry.c, gnutls_global.c, gnutls_pk.c, gnutls_privkey.c,
+	gnutls_x509.c, x509_asn1.h, x509_extensions.c, x509_sig_check.c,
+	x509_verify.c:
+
+	Error codes of ASN.1 parser are now independent, with a map to 
+	gnutls' error codes.  
+
+2002-03-31 06:02  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_cipher.c:
+
+	cleanups 
+
+2002-03-30 10:00  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Added the text for gnutls_openpgp_extract_key_pk_algorithm.  
+
+2002-03-30 09:52  nmav <nmav@gnutls.org>
+
+	* ChangeLog, doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/ex3.tex,
+	doc/tex/serv1.tex, lib/gnutls.h.in.in, lib/gnutls_x509.c,
+	src/cli.c, src/serv.c:
+
+	Removed the CRL list parameter from
+	gnutls_certificate_set_x509_trust_*.  
+
+2002-03-30 09:42  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	gnutls_certificate_set_x509_trust_*() now accept single DER
+	certificates or PEM certificate lists.  
+
+2002-03-29 18:35  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, crypt_srpsha1.c, gnutls_x509.c:
+
+	Added ability to read DSA DER formatted keys, and corrected bugs in 
+	DER certificate reading.  
+
 2002-03-29 12:12  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_algorithms.c, gnutls_cipher.c, gnutls_cipher_int.c,

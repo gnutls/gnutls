@@ -8,6 +8,7 @@ Current list:
 * Add function(s) to get the DHE/A parameters
 * Add function to quickly report if a session is a resumed one
 * Add function(s) to extract the certificate key's parameters
+* Use alloca, if available, for temporary variables
 * Minimize footprint.
 * Improve support for compression
 - Add Kerberos support
