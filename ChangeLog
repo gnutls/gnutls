@@ -1,3 +1,76 @@
+2004-10-24 19:21  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS:
+
+	Resign PGP key.  
+
+2004-10-24 16:17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-10-24 16:06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-10-24 16:05  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	Fix --password.  
+
+2004-10-24 14:28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS:
+
+	Add.  
+
+2004-10-24 14:28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c:
+
+	(gnutls_certificate_set_x509_trust): Fix memory bug, tiny patch by 
+	Aleix Conchillo Flaque <aleix@member.fsf.org>.  
+
+2004-10-24 14:25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, configure.in, lib/Makefile.am, lib/gnutls.pc.in:
+
+	 Add pkg-config meta files, suggested by Stéphane LOEUILLET 
+	<stephane.loeuillet@tiscali.fr>.  
+
+2004-10-24 14:23  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS:
+
+	Add.  
+
+2004-10-24 14:22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_x509.c:
+
+	(gnutls_certificate_set_x509_trust): Fix memory bug, tiny patch by 
+	Aleix Conchillo Flaque <aleix@member.fsf.org>.  
+
+2004-10-24 14:12  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, configure.in, lib/Makefile.am, lib/gnutls.pc.in:
+
+	Add pkg-config meta files, suggested by Stéphane LOEUILLET 
+	<stephane.loeuillet@tiscali.fr>.  
+
+2004-10-24 13:47  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, lib/libgnutls-config.in, NEWS, THANKS,
+	lib/libgnutls-config.in:
+
+	Add parameter --la-file to libgnutls-config and
+	libgnutls-extra-config, tiny patch contributed by Joe Orton
+	<joe@manyfish.co.uk>.  
+
 2004-10-18 20:49  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS:
