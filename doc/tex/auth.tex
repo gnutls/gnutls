@@ -97,6 +97,14 @@ Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:srp
 SRP & Authentication using the SRP protocol. 
 \\
 \hline
+SRP\_DSS & Client authentication using the SRP protocol. Server is 
+authenticated using a certificate with DSA parameters.
+\\
+\hline
+SRP\_RSA & Client authentication using the SRP protocol. Server is 
+authenticated using a certificate with RSA parameters.
+\\
+\hline
 \end{tabular}
 
 \caption{Supported SRP key exchange algorithms}
@@ -104,7 +112,7 @@ SRP & Authentication using the SRP protocol.
 
 \end{figure}
 
-\gnutls{} includes a program to manipulate the required for SRP
+\gnutls{} includes a program to manipulate the required parameters for SRP
 authentication. See section \ref{srpcrypt} on page \pageref{srpcrypt} for
 more information.
 
