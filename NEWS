@@ -1,4 +1,4 @@
-Version 0.9.4
+Version 0.9.4 (28/03/2003)
 - Corrected a parsing error in the Certificate request message.
 - Corrected behaviour when a certificate request message is received.
   Now a certificate packet is always sent, and in SSL 3.0 cipher suites
