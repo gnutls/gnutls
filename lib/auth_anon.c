@@ -37,10 +37,14 @@ int proc_anon_server_cert_vrfy( GNUTLS_KEY, opaque*, int);
 MOD_AUTH_STRUCT anon_auth_struct = {
 	"ANON",
 	gen_anon_server_kx,
+	NULL,
+	NULL,
 	gen_anon_client_kx,
 	gen_anon_client_cert_vrfy,
 	gen_anon_server_cert_vrfy,
 	proc_anon_server_kx,
+	NULL,
+	NULL,
 	proc_anon_client_kx,
 	proc_anon_client_cert_vrfy,
 	proc_anon_server_cert_vrfy

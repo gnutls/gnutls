@@ -39,10 +39,14 @@ int proc_dhe_dss_server_cert_vrfy( GNUTLS_KEY, opaque*, int);
 MOD_AUTH_STRUCT dhe_dss_auth_struct = {
 	"DHE_DSS",
 	gen_dhe_dss_server_kx,
+	NULL,
+	NULL,
 	gen_dhe_dss_client_kx,
 	gen_dhe_dss_client_cert_vrfy,
 	gen_dhe_dss_server_cert_vrfy,
 	proc_dhe_dss_server_kx,
+	NULL,
+	NULL,
 	proc_dhe_dss_client_kx,
 	proc_dhe_dss_client_cert_vrfy,
 	proc_dhe_dss_server_cert_vrfy

@@ -139,14 +139,17 @@ static gnutls_compression_entry compression_algorithms[] = {
 
 
 /* Key Exchange Section */
-#define GNUTLS_KX_ALGO_ENTRY(name, server_cert, server_kx, client_cert, RSA_premaster, DH_public_value, auth_struct) \
-	{ #name, name, server_cert, server_kx, client_cert, RSA_premaster, DH_public_value, auth_struct }
+#define GNUTLS_KX_ALGO_ENTRY(name, server_cert, server_kx, server_kx2, client_kx, client_kx0, client_cert, RSA_premaster, DH_public_value, auth_struct) \
+	{ #name, name, server_cert, server_kx, server_kx2, client_kx, client_kx0, client_cert, RSA_premaster, DH_public_value, auth_struct }
 
 struct gnutls_kx_algo_entry {
 	char *name;
 	KXAlgorithm algorithm;
 	int server_cert;
 	int server_kx;
+	int server_kx2;
+	int client_kx;
+	int client_kx0;
 	int client_cert;
 	int RSA_premaster;
 	int DH_public_value;
@@ -155,12 +158,13 @@ struct gnutls_kx_algo_entry {
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static gnutls_kx_algo_entry kx_algorithms[] = {
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 1, 0, 0, 1, &anon_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 0, 1, 1, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 1, 0, 0, &dhe_dss_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 0, 1, 0, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 0, 1, 0, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 1, 0, 1, 0, 0, 0, 1, &anon_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA,     1, 0, 0, 1, 0, 1, 1, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 1, 0, 1, 0, 0, &dhe_dss_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 1, 0, 1, 0, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS,  1, 0, 0, 1, 0, 1, 0, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA,  1, 0, 0, 1, 0, 1, 0, 0, NULL),
+//	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP,  0, 1, 1, 0, 1, 0, 0, 0, &srp_auth_struct),
 	{0}
 };
 
@@ -563,6 +567,32 @@ inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
 }
 
 int _gnutls_kx_server_key_exchange(KXAlgorithm algorithm)
+{
+	size_t ret = 0;
+
+	GNUTLS_KX_ALG_LOOP(ret = p->server_kx);
+	return ret;
+
+}
+
+int _gnutls_kx_server_key_exchange2(KXAlgorithm algorithm)
+{
+	size_t ret = 0;
+
+	GNUTLS_KX_ALG_LOOP(ret = p->server_kx2);
+	return ret;
+
+}
+
+int _gnutls_kx_client_key_exchange0(KXAlgorithm algorithm)
+{
+	size_t ret = 0;
+
+	GNUTLS_KX_ALG_LOOP(ret = p->client_kx0);
+	return ret;
+
+}
+int _gnutls_kx_client_key_exchange(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
 

@@ -972,7 +972,7 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 		return 0;
-	} else {		/* SERVER */
+	} else {		/* SERVER SIDE */
 
 		ret =
 		    _gnutls_recv_handshake(cd, state, NULL, NULL,
@@ -996,10 +996,31 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 		/* NOTE: these should not be send if we are resuming */
 	
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+
+		/* send server key exchange (A) */
 		if (state->gnutls_internals.resumed==RESUME_FALSE)
 		ret = _gnutls_send_server_kx_message(cd, state);
 		if (ret < 0) {
 			ERR("send server kx", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+/* Added for SRP which uses a different handshake */
+		/* receive the client key exchange message */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
+		ret = _gnutls_recv_client_kx_message0(cd, state);
+		if (ret < 0) {
+			ERR("recv client kx0", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+		/* send server key exchange (B) */
+		if (state->gnutls_internals.resumed==RESUME_FALSE)
+		ret = _gnutls_send_server_kx_message2(cd, state);
+		if (ret < 0) {
+			ERR("send server kx2", ret);
 			gnutls_clearHashDataBuffer( state);
 			return ret;
 		}
@@ -1091,6 +1112,28 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
+
+		/* Added for SRP */
+		
+		/* send the client key exchange for SRP */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
+		ret = _gnutls_send_client_kx_message0(cd, state);
+		if (ret < 0) {
+			ERR("send client kx0", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+		
+		/* receive the server key exchange (B) (SRP only) */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
+		ret = _gnutls_recv_server_kx_message2(cd, state);
+		if (ret < 0) {
+			ERR("recv server kx message2", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+
 		/* FIXME: receive certificate request */
 
 		/* receive the server hello done */
@@ -1144,7 +1187,8 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		}
 
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
-		
+
+		/* receive the client key exchange message */		
 		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret = _gnutls_recv_client_kx_message(cd, state);
 		if (ret < 0) {
