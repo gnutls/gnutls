@@ -162,8 +162,16 @@ int _gnutls_base64_encode(const uint8 * data, size_t data_size, uint8 ** result)
 	return ret;
 }
 
+#define INCR(what, size) \
+	what+=size; \
+	if (what > ret) { \
+		gnutls_assert(); \
+		gnutls_free( (*result)); *result = NULL; \
+		return GNUTLS_E_INTERNAL_ERROR; \
+	}
+
 /* encodes data and puts the result into result (locally allocated)
- * The result_size is the return value
+ * The result_size (including the null terminator) is the return value.
  */
 int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 			   uint8 ** result)
@@ -173,11 +181,13 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	uint8 *ptr;
 	uint8 top[80];
 	uint8 bottom[80];
-	int pos;
+	int pos, bytes, top_len, bottom_len;
 	size_t msglen = strlen(msg);
 
-	if (msglen > 50)
+	if (msglen > 50) {
+		gnutls_assert();
 		return GNUTLS_E_BASE64_ENCODING_ERROR;
+	}
 
 	memset(bottom, 0, sizeof(bottom));
 	memset(top, 0, sizeof(top));
@@ -190,50 +200,70 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	strcat(bottom, msg); /* Flawfinder: ignore */
 	strcat(bottom, "-----\n"); /* Flawfinder: ignore */
 
+	top_len = strlen(top);
+	bottom_len = strlen(bottom);
+
 	ret = B64FSIZE( msglen, data_size);
 
 	(*result) = gnutls_calloc(1, ret + 1);
-	if ((*result) == NULL)
+	if ((*result) == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	bytes = pos = 0;
+	INCR( bytes, top_len);
+	pos = top_len;
 
 	strcpy(*result, top); /* Flawfinder: ignore */
-	pos = strlen(top);
 
 	for (i = j = 0; i < data_size; i += 3, j += 4) {
+
 		tmp = encode(tmpres, &data[i], data_size - i);
 		if (tmp == -1) {
+			gnutls_assert();
 			gnutls_free( (*result)); *result = NULL;
 			return GNUTLS_E_BASE64_ENCODING_ERROR;
 		}
+
+		INCR(bytes, 4);
 		ptr = &(*result)[j + pos];
 
 		if ((j) % 64 == 0) {
+			INCR(bytes, 1);
 			pos++;
 			*ptr++ = '\n';
 		}
 		*ptr++ = tmpres[0];
 
 		if ((j + 1) % 64 == 0) {
-			*ptr++ = '\n';
+			INCR(bytes, 1);
 			pos++;
+			*ptr++ = '\n';
 		}
 		*ptr++ = tmpres[1];
 
 		if ((j + 2) % 64 == 0) {
+			INCR(bytes, 1);
 			pos++;
 			*ptr++ = '\n';
 		}
 		*ptr++ = tmpres[2];
 
 		if ((j + 3) % 64 == 0) {
-			*ptr++ = '\n';
+			INCR(bytes, 1);
 			pos++;
+			*ptr++ = '\n';
 		}
 		*ptr++ = tmpres[3];
 	}
 
-	strcat(*result, bottom); /* Flawfinder: ignore */
-	return strlen(*result) + 1;
+	INCR( bytes, bottom_len);
+
+	memcpy( &(*result)[ bytes-bottom_len], bottom, bottom_len);
+	(*result)[ bytes] = 0;
+
+	return ret + 1;
 }
 
 /**
