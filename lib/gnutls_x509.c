@@ -3029,7 +3029,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    int ret, i;
    char str_buffer[256];
 
-   if (buf == NULL || sizeof_buf == 0) {
+   if (buf == NULL || sizeof_buf == 0 || cert == NULL || cert.size == 0) {
       return GNUTLS_E_INVALID_REQUEST;
    }
    
