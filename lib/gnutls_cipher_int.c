@@ -68,9 +68,9 @@ cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
     }
 
     if (err == 0) {
-	gc_cipher_setkey(ret, key->data, key->size);
+	gc_cipher_setkey(ret, key->size, key->data);
 	if (iv->data != NULL && iv->size > 0)
-	    gc_cipher_setiv(ret, iv->data, iv->size);
+	    gc_cipher_setiv(ret, iv->size, iv->data);
     } else if (cipher != GNUTLS_CIPHER_NULL) {
 	gnutls_assert();
 	_gnutls_x509_log("Crypto cipher[%d] error: %d\n", cipher, err);

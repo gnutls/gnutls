@@ -114,7 +114,7 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
       return GC_INVALID_CIPHER;
     }
 
-  err = gcry_cipher_open (outhandle, gcryalg, gcrymode, 0);
+  err = gcry_cipher_open ((gcry_cipher_hd_t*) outhandle, gcryalg, gcrymode, 0);
   if (gcry_err_code (err))
     return GC_INVALID_CIPHER;
 
@@ -126,7 +126,7 @@ gc_cipher_setkey (gc_cipher handle, size_t keylen, char *key)
 {
   gcry_error_t err;
 
-  err = gcry_cipher_setkey (handle, keylen, key);
+  err = gcry_cipher_setkey (handle, key, keylen);
   if (gcry_err_code (err))
     return GC_INVALID_CIPHER;
 
@@ -138,7 +138,7 @@ gc_cipher_setiv (gc_cipher handle, size_t ivlen, char *iv)
 {
   gcry_error_t err;
 
-  err = gcry_cipher_setiv (handle, ivlen, iv);
+  err = gcry_cipher_setiv (handle, iv, ivlen);
   if (gcry_err_code (err))
     return GC_INVALID_CIPHER;
 
@@ -167,4 +167,6 @@ int
 gc_cipher_close (gc_cipher handle)
 {
   gcry_cipher_close (handle);
+
+  return GC_OK;
 }

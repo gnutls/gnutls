@@ -26,8 +26,6 @@
 #include <libtasn1.h>
 #include <gnutls_dh.h>
 
-#include <gc.h>
-
 #define gnutls_log_func LOG_FUNC
 
 /* created by asn1c */
