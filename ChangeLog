@@ -1,3 +1,14 @@
+2002-05-01 09:05  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_dhe.c, auth_rsa.c, auth_srp.c,
+	auth_srp_passwd.c, crypt.c, crypt_bcrypt.c, crypt_srpsha1.c,
+	debug.c, gnutls_auth.c, gnutls_dh.c, gnutls_dh_primes.c,
+	gnutls_gcry.c, gnutls_gcry.h, gnutls_openpgp.c, gnutls_openpgp.h,
+	gnutls_pk.c, gnutls_privkey.c, gnutls_srp.c, gnutls_x509.c,
+	x509_ASN.c, x509_sig_check.c:
+
+	Cleaned up the big number support.  
+
 2002-04-21 14:21  twoaday <twoaday@gnutls.org>
 
 	* lib/gnutls_openpgp.c:
