@@ -551,12 +551,14 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	}
 
 #ifdef HANDSHAKE_DEBUG
-	memcpy( &cs.CipherSuite, &data[j], 2);
 
 	_gnutls_handshake_log("HSK[%x]: Requested cipher suites: \n", session);
-	for (j = 0; j < datalen; j += 2)
+	for (j = 0; j < datalen; j += 2) {
+		memcpy( &cs.CipherSuite, &data[j], 2);
+
 		_gnutls_handshake_log("\t%s\n",
 			    _gnutls_cipher_suite_get_name(cs));
+	}
 	_gnutls_handshake_log("HSK[%x]: Supported cipher suites: \n", session);
 	for (j = 0; j < x; j++)
 		_gnutls_handshake_log("\t%s\n",

@@ -1,3 +1,6 @@
+Version 0.9.91
+- Fixed a compilation issue in the openpgp authentication part.
+
 Version 0.9.90 (08/10/2003)
 - Updated the openpgp key API (depends on the unreleased new
   opencdk).
