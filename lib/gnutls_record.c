@@ -698,7 +698,115 @@ static int _gnutls_check_record_headers( GNUTLS_STATE state, uint8 headers[RECOR
 	return 0;
 }
 
+#define GNUTLS_E_RET_0 -255
 
+/* Here we check if the advertized version is the one we
+ * negotiated in the handshake.
+ */
+inline
+static int _gnutls_check_record_version( GNUTLS_STATE state, HandshakeType htype, GNUTLS_Version version) 
+{
+#ifdef CHECK_RECORD_VERSION
+	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_protocol_get_version(state) != version) {
+		gnutls_assert();
+# ifdef RECORD_DEBUG
+		_gnutls_log( "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
+# endif
+		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+	}
+#endif
+
+	return 0;
+}
+
+static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
+	ContentType type, HandshakeType htype, opaque* data, int data_size) {
+	
+	int ret;
+
+	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
+		_gnutls_record_buffer_put(type, state, (void *) data, data_size);
+	} else {
+		switch (recv_type) {
+		case GNUTLS_ALERT:
+#ifdef RECORD_DEBUG
+			_gnutls_log( "Record: Alert[%d|%d] - %s - was received\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
+#endif
+			state->gnutls_internals.last_alert = data[1];
+
+			/* if close notify is received and
+			 * the alert is not fatal
+			 */
+			if (data[1] == GNUTLS_A_CLOSE_NOTIFY && data[0] != GNUTLS_AL_FATAL) {
+				/* If we have been expecting for an alert do 
+				 */
+
+				return GNUTLS_E_RET_0; /* EOF */
+			} else {
+			
+				/* if the alert is FATAL or WARNING
+				 * return the apropriate message
+				 */
+			
+				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
+				if (data[0] == GNUTLS_AL_FATAL) {
+					_gnutls_session_unresumable( state);
+					_gnutls_session_invalidate( state);
+
+					ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
+				}
+
+				return ret;
+			}
+			break;
+
+		case GNUTLS_CHANGE_CIPHER_SPEC:
+			/* this packet is now handled above */
+			gnutls_assert();
+	
+			return GNUTLS_E_UNEXPECTED_PACKET;
+
+		case GNUTLS_APPLICATION_DATA:
+			/* even if data is unexpected put it into the buffer */
+			if ( (ret=_gnutls_record_buffer_put(recv_type, state, (void *) data, data_size)) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+
+			gnutls_assert();
+			
+			/* the got_application data is only returned
+			 * if expecting client hello (for rehandshake
+			 * reasons). Otherwise it is an unexpected packet
+			 */
+			if (htype == GNUTLS_CLIENT_HELLO && type==GNUTLS_HANDSHAKE)
+				return GNUTLS_E_GOT_APPLICATION_DATA;
+			else return GNUTLS_E_UNEXPECTED_PACKET;
+			
+			break;
+		case GNUTLS_HANDSHAKE:
+			/* This is only legal if HELLO_REQUEST is received - and we are a client 
+			 */
+			if (htype!=GNUTLS_HELLO_REQUEST && state->security_parameters.entity==GNUTLS_SERVER) {
+				gnutls_assert();
+				return GNUTLS_E_UNEXPECTED_PACKET;
+			}
+
+			return _gnutls_recv_hello_request( state, data, data_size);
+
+			break;
+		default:
+#ifdef RECORD_DEBUG
+			_gnutls_log( "Record: Received Unknown packet %d expecting %d\n", recv_type, type);
+#endif
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+	}
+	
+	return 0;
+
+}
 
 /* This function behave exactly like read(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
@@ -762,6 +870,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	 * ok. 
 	 */
 	if ( (ret = _gnutls_check_recv_type( recv_type)) < 0) {
+		
 		gnutls_assert();
 		return ret;
 	}
@@ -769,16 +878,11 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	/* Here we check if the advertized version is the one we
 	 * negotiated in the handshake.
 	 */
-#ifdef CHECK_RECORD_VERSION
-	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_protocol_get_version(state) != version) {
+	if ( (ret=_gnutls_check_record_version( state, htype, version)) < 0) {
 		gnutls_assert();
-# ifdef RECORD_DEBUG
-		_gnutls_log( "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
-# endif
 		_gnutls_session_invalidate( state);
-		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+		return ret;
 	}
-#endif
 
 #ifdef RECORD_DEBUG
 	_gnutls_log( "Record: Expected Packet[%d] %s(%d) with length: %d\n",
@@ -855,97 +959,19 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
-		_gnutls_record_buffer_put(type, state, (void *) tmpdata, tmplen);
-	} else {
-		switch (recv_type) {
-		case GNUTLS_ALERT:
-#ifdef RECORD_DEBUG
-			_gnutls_log( "Record: Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
-#endif
-			state->gnutls_internals.last_alert = tmpdata[1];
+	if ( (ret=_gnutls_record_check_type( state, recv_type, type, htype, tmpdata, tmplen)) < 0) {
+		gnutls_free( tmpdata);
 
-			/* if close notify is received and
-			 * the alert is not fatal
-			 */
-			if (tmpdata[1] == GNUTLS_A_CLOSE_NOTIFY && tmpdata[0] != GNUTLS_AL_FATAL) {
-				/* If we have been expecting for an alert do 
-				 * not call close().
-				 */
-				if (type != GNUTLS_ALERT) 
-					do ret=gnutls_bye( state, GNUTLS_SHUT_WR);
-					while(ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
-				gnutls_free(tmpdata);
+		if (ret==GNUTLS_E_RET_0) return 0;
 
-				return 0; /* EOF */
-			} else {
-			
-				/* if the alert is FATAL or WARNING
-				 * return the apropriate message
-				 */
-			
-				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
-				if (tmpdata[0] == GNUTLS_AL_FATAL) {
-					_gnutls_session_unresumable( state);
-					_gnutls_session_invalidate( state);
-
-					ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
-				}
-
-				gnutls_free(tmpdata);
-
-				return ret;
-			}
-			break;
-
-		case GNUTLS_CHANGE_CIPHER_SPEC:
-			/* this packet is now handled above */
-			gnutls_assert();
-	
-			gnutls_free(tmpdata);
-
-			return GNUTLS_E_UNEXPECTED_PACKET;
-		case GNUTLS_APPLICATION_DATA:
-			/* even if data is unexpected put it into the buffer */
-			if ( (ret=_gnutls_record_buffer_put(recv_type, state, (void *) tmpdata, tmplen)) < 0) {
-				gnutls_assert();
-				return ret;
-			}
-
-			gnutls_assert();
-			gnutls_free(tmpdata);
-			
-			/* the got_application data is only returned
-			 * if expecting client hello (for rehandshake
-			 * reasons). Otherwise it is an unexpected packet
-			 */
-			if (htype == GNUTLS_CLIENT_HELLO && type==GNUTLS_HANDSHAKE)
-				return GNUTLS_E_GOT_APPLICATION_DATA;
-			else return GNUTLS_E_UNEXPECTED_PACKET;
-			
-			break;
-		case GNUTLS_HANDSHAKE:
-			/* This is only legal if HELLO_REQUEST is received - and we are a client 
-			 */
-			if (htype!=GNUTLS_HELLO_REQUEST && state->security_parameters.entity==GNUTLS_SERVER) {
-				gnutls_assert();
-				gnutls_free( tmpdata);
-				return GNUTLS_E_UNEXPECTED_PACKET;
-			}
-
-			break;
-		default:
-#ifdef RECORD_DEBUG
-			_gnutls_log( "Record: Received Unknown packet %d expecting %d\n", recv_type, type);
-#endif
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_ERROR;
-		}
+		gnutls_assert();
+		return ret;
 	}
-
+	gnutls_free( tmpdata);
 
 	/* Get Application data from buffer */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
+
 		ret = _gnutls_record_buffer_get(type, state, data, sizeofdata);
 		if (ret < 0) {
 			gnutls_assert();
@@ -960,20 +986,11 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			}
 		}
 
-		gnutls_free(tmpdata);
 	} else {
-		if (recv_type == GNUTLS_HANDSHAKE) {
-			/* we may get a hello request */
-			ret = _gnutls_recv_hello_request( state, tmpdata, tmplen);
-		} else {
-			gnutls_assert();
-			ret = GNUTLS_E_UNEXPECTED_PACKET; 
-				/* we didn't get what we wanted to 
-				 */
-			if (recv_type == GNUTLS_APPLICATION_DATA)
-				ret = GNUTLS_E_GOT_APPLICATION_DATA;
-		}
-		gnutls_free(tmpdata);
+		gnutls_assert();
+		ret = GNUTLS_E_UNEXPECTED_PACKET; 
+		/* we didn't get what we wanted to 
+		 */
 	}
 
 	return ret;
