@@ -814,7 +814,6 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 					       SSL2_HEADERS);
 
 		if (ret < 0) {
-			gnutls_assert();
 			return (ret <
 				0) ? ret :
 			    GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -962,12 +961,11 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 	if (ret < 0) {
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET
 		    && optional == OPTIONAL_PACKET) {
-			gnutls_assert();
 			*datalen = 0;
 			*data = NULL;
 			return 0;	/* ok just ignore the packet */
 		}
-		gnutls_assert();
+		/* gnutls_assert(); */
 		return ret;
 	}
 

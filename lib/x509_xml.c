@@ -562,17 +562,17 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 }
 
 /**
-  * gnutls_x509_get_certificate_xml - This function parses an RDN sequence
+  * gnutls_x509_certificate_to_xml - This function parses an RDN sequence
   * @cert: should contain a DER encoded certificate
-  * @detail: The detail level (must be 0 for now)
   * @res: The datum that will hold the result
+  * @detail: The detail level (must be 0 for now)
   *
   * This function will return the XML structures of the given X.509 certificate.
   * The XML structures are allocated internaly (with malloc) and stored into res.
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_get_certificate_xml(const gnutls_datum * cert, int detail, gnutls_datum* res)
+int gnutls_x509_certificate_to_xml(const gnutls_datum * cert, gnutls_datum* res, int detail)
 {
 	ASN1_TYPE asn1_cert;
 	int result;

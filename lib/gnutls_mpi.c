@@ -54,7 +54,7 @@ int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a ) {
  * from asn1 structs. Combines the read and mpi_scan
  * steps.
  */
-int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, const char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi) {
+int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi) {
 int len, result;
 
 	len = tmpstr_size - 1;

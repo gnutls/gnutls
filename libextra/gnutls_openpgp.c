@@ -1713,17 +1713,17 @@ xml_add_sig( gnutls_datum *xmlkey, int ext, cdkPKT_signature *sig )
 }
 
 /**
- * gnutls_openpgp_get_key_xml - Return a certificate as a XML fragment
+ * gnutls_openpgp_key_to_xml - Return a certificate as a XML fragment
  * @cert: the certificate which holds the whole OpenPGP key.
- * @ext: extension mode (1/0), 1 means include key signatures and key data.
  * @xmlkey: he datum struct to store the XML result.
+ * @ext: extension mode (1/0), 1 means include key signatures and key data.
  *
  * This function will return the all OpenPGP key information encapsulated as
  * a XML string.
  **/
 int
-gnutls_openpgp_get_key_xml( const gnutls_datum *cert, int ext,
-                            gnutls_datum *xmlkey )
+gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
+                            gnutls_datum *xmlkey, int ext )
 {
     CDK_KBNODE kb_pk, p;
     CDK_PACKET *pkt;
