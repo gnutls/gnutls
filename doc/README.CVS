@@ -9,9 +9,9 @@ following software:
 * libtool (http://www.gnu.org/software/libtoool/)
 * automake (http://www.gnu.org/software/automake/)
 * libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
+* texinfo (http://www.gnu.org/software/texinfo/)
 
 Those are optional:
-* latex2html (in order to create gnutls.html)
 * latex/dvips (in order to create gnutls.ps)
 * cvs2cl (in order to create ChangeLog) (http://www.red-bean.com/cvs2cl/)
 * gaa (to handle example programs' parameters) (http://gaa.sf.net)
@@ -26,16 +26,11 @@ $ cd gnutls
 $ ./buildconf
 
 3. Compile the sources
-$ ./configure --enable-developer-mode
+$ ./configure
 $ make
 
 * Create the ChangeLog
 $ make ChangeLog
-
-* Create documentation
-$ cd doc/tex
-$ make gnutls.ps
-$ make gnutls.html
 
 4. If you intend to change any code in gnutls, check the file
  doc/README.CODING_STYLE.
