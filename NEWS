@@ -1,6 +1,4 @@
 Version 0.2.11
-
-
 - Changed the meaning of GNUTLS_E_REHANDSHAKE value. If this value
   is returned, then the caller should perform a handshake or send
   an alert to the peer.
