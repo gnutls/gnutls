@@ -22,27 +22,27 @@ AC_DEFUN([GTK_DOC_CHECK],
     enable_gtk_doc=no)
 
   have_gtk_doc=no
-  if test -z "$PKG_CONFIG"; then
-    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-  fi
-  if test "$PKG_CONFIG" != "no" && $PKG_CONFIG --exists gtk-doc; then
-    have_gtk_doc=yes
-  fi
+  if test x$enable_gtk_doc = xyes; then
+    if test -z "$PKG_CONFIG"; then
+      AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+    fi
+    if test "$PKG_CONFIG" != "no" && $PKG_CONFIG --exists gtk-doc; then
+      have_gtk_doc=yes
+    fi
 
   dnl do we want to do a version check?
 ifelse([$1],[],,
-  [gtk_doc_min_version=$1
-  if test "$have_gtk_doc" = yes; then
-    AC_MSG_CHECKING([gtk-doc version >= $gtk_doc_min_version])
-    if $PKG_CONFIG --atleast-version $gtk_doc_min_version gtk-doc; then
-      AC_MSG_RESULT(yes)
-    else
-      AC_MSG_RESULT(no)
-      have_gtk_doc=no
+    [gtk_doc_min_version=$1
+    if test "$have_gtk_doc" = yes; then
+      AC_MSG_CHECKING([gtk-doc version >= $gtk_doc_min_version])
+      if $PKG_CONFIG --atleast-version $gtk_doc_min_version gtk-doc; then
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_RESULT(no)
+        have_gtk_doc=no
+      fi
     fi
-  fi
 ])
-  if test x$enable_gtk_doc = xyes; then
     if test "$have_gtk_doc" != yes; then
       enable_gtk_doc=no
     fi
