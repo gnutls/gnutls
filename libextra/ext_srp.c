@@ -52,13 +52,6 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _d
 			memcpy( state->security_parameters.extensions.srp_username, &data[1], len);
 			state->security_parameters.extensions.srp_username[len]=0; /* null terminated */
 		}
-	} else { /* client side reading server hello extensions */
-		if (state->internals.resumed==RESUME_FALSE)
-			return _gnutls_proc_srp_server_hello( state, data, data_size);
-		else /* we do not need to process this if
-		      * we are resuming.
-		      */
-			return 0;
 	}
 	return 0;
 }
@@ -107,27 +100,6 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_siz
 			memcpy( &data[1], cred->username, len);
 			return len + 1;
 		}
-	} else { /* SERVER SIDE sending (g,n,s) */
-		/* We only send the packet if we are NOT
-		 * resuming AND we are using SRP
-		 */
-		
-		/* note that security parameters are not fully established
-		 */
-
-		if ( !is_srp(state->security_parameters.current_cipher_suite))
-			return 0; /* no data to send */
-
-		/* Even if we are resuming, the username in the parameters
-		 * should be non null.
-		 */
-		if (state->security_parameters.extensions.srp_username[0]==0)
-			return GNUTLS_E_ILLEGAL_SRP_USERNAME;
-
-		if (state->internals.resumed==RESUME_FALSE)
-			return _gnutls_gen_srp_server_hello( state, data, data_size);
-		else
-			return 0;
 	}
 	return 0;
 }

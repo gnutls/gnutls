@@ -39,15 +39,15 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 
-static int gen_srp_cert_server_kx2(gnutls_session, opaque **);
-static int proc_srp_cert_server_kx2(gnutls_session, opaque *, size_t);
+static int gen_srp_cert_server_kx0(gnutls_session, opaque **);
+static int proc_srp_cert_server_kx0(gnutls_session, opaque *, size_t);
 
 const MOD_AUTH_STRUCT srp_rsa_auth_struct = {
 	"SRP",
 	_gnutls_gen_cert_server_certificate,
 	NULL,
+	gen_srp_cert_server_kx0,
 	NULL,
-	gen_srp_cert_server_kx2,
 	_gnutls_gen_srp_client_kx0,
 	NULL,
 	NULL,
@@ -55,8 +55,8 @@ const MOD_AUTH_STRUCT srp_rsa_auth_struct = {
 
 	_gnutls_proc_cert_server_certificate,
 	NULL, /* certificate */
+	proc_srp_cert_server_kx0,
 	NULL,
-	proc_srp_cert_server_kx2,
 	_gnutls_proc_srp_client_kx0,
 	NULL,
 	NULL,
@@ -67,8 +67,8 @@ const MOD_AUTH_STRUCT srp_dss_auth_struct = {
 	"SRP",
 	_gnutls_gen_cert_server_certificate,
 	NULL,
+	gen_srp_cert_server_kx0,
 	NULL,
-	gen_srp_cert_server_kx2,
 	_gnutls_gen_srp_client_kx0,
 	NULL,
 	NULL,
@@ -76,15 +76,15 @@ const MOD_AUTH_STRUCT srp_dss_auth_struct = {
 
 	_gnutls_proc_cert_server_certificate,
 	NULL, /* certificate */
+	proc_srp_cert_server_kx0,
 	NULL,
-	proc_srp_cert_server_kx2,
 	_gnutls_proc_srp_client_kx0,
 	NULL,
 	NULL,
 	NULL
 };
 
-static int gen_srp_cert_server_kx2(gnutls_session session, opaque ** data)
+static int gen_srp_cert_server_kx0(gnutls_session session, opaque ** data)
 {
 ssize_t ret, data_size;
 gnutls_datum signature, ddata;
@@ -93,7 +93,7 @@ gnutls_cert *apr_cert_list;
 gnutls_private_key *apr_pkey;
 int apr_cert_list_length;
 
-	ret = _gnutls_gen_srp_server_kx2( session, data);
+	ret = _gnutls_gen_srp_server_kx0( session, data);
 
 	if (ret < 0) return ret;
 	
@@ -143,7 +143,7 @@ int apr_cert_list_length;
 
 extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 
-static int proc_srp_cert_server_kx2(gnutls_session session, opaque * data, size_t _data_size)
+static int proc_srp_cert_server_kx0(gnutls_session session, opaque * data, size_t _data_size)
 {
 ssize_t ret;
 int sigsize;
@@ -153,7 +153,7 @@ CERTIFICATE_AUTH_INFO info;
 gnutls_cert peer_cert;
 opaque* p;
 
-	ret = _gnutls_proc_srp_server_kx2( session, data, _data_size);
+	ret = _gnutls_proc_srp_server_kx0( session, data, _data_size);
 	if (ret < 0) return ret;
 	
 	data_size = _data_size - ret;

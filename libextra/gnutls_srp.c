@@ -78,15 +78,23 @@ int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result, GNUTLS_MPI 
  */
 GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GNUTLS_MPI v)
 {
-	GNUTLS_MPI tmpB;
+	GNUTLS_MPI tmpB, tmpV;
 	GNUTLS_MPI b, B;
 	int bits;
 
-	/* calculate:  B = (v + g^b) % N */
+	/* calculate:  B = (3v + g^b) % N 
+	 */
 	bits = _gnutls_mpi_get_nbits(n);
 	b = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	if (b==NULL) {
 		gnutls_assert();
+		return NULL;
+	}
+
+	tmpV = _gnutls_mpi_alloc_like(n);
+
+	if (tmpV == NULL) {
+		_gnutls_mpi_release(&b);
 		return NULL;
 	}
 	
@@ -96,6 +104,7 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 	if (tmpB==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &b);
+		_gnutls_mpi_release(&tmpV);
 		return NULL;
 	}
 
@@ -104,13 +113,17 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 		gnutls_assert();
 		_gnutls_mpi_release( &b);
 		_gnutls_mpi_release( &tmpB);
+		_gnutls_mpi_release(&tmpV);
 		return NULL;
 	}
 
+	_gnutls_mpi_mul_ui(tmpV, v, 3);
+
 	_gnutls_mpi_powm(tmpB, g, b, n);
-	_gnutls_mpi_addm(B, v, tmpB, n);
+	_gnutls_mpi_addm(B, tmpV, tmpB, n);
 
 	_gnutls_mpi_release(&tmpB);
+	_gnutls_mpi_release(&tmpV);
 
 	if (ret_b)
 		*ret_b = b;
@@ -120,43 +133,47 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 	return B;
 }
 
-GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI B)
+GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 {
-	size_t b_size;
-	opaque *b_holder, hd[MAX_HASH_SIZE];
+	size_t b_size, a_size;
+	opaque *holder, hd[MAX_HASH_SIZE];
+	size_t holder_size;
 	GNUTLS_HASH_HANDLE td;
 	uint32 u;
-	GNUTLS_MPI ret;
+	int ret;
+	GNUTLS_MPI res;
 
+	_gnutls_mpi_print( NULL, &a_size, A);
 	_gnutls_mpi_print( NULL, &b_size, B);
-	b_holder = gnutls_malloc(b_size);
-	if (b_holder==NULL) return NULL;
 
-	_gnutls_mpi_print( b_holder, &b_size, B);
+	holder_size = a_size + b_size;
 
+	holder = gnutls_alloca(holder_size);
+	if (holder==NULL) return NULL;
+	
+	_gnutls_mpi_print( holder, &a_size, A);
+	_gnutls_mpi_print( &holder[a_size], &b_size, B);
 
 	td = _gnutls_hash_init(GNUTLS_MAC_SHA);
 	if (td==NULL) {
-		gnutls_free(b_holder);
+		gnutls_afree(holder);
 		gnutls_assert();
 		return NULL;
 	}
-	_gnutls_hash(td, b_holder, b_size);
+	_gnutls_hash(td, holder, holder_size);
 	_gnutls_hash_deinit(td, hd);
 	
 	/* convert the first 4 bytes of hd to uint32
 	 */
-	u = _gnutls_read_uint32( hd);
+	ret = _gnutls_mpi_scan( &res, holder, &holder_size);
+	gnutls_afree(holder);
 
-	gnutls_free(b_holder);
-
-	ret = _gnutls_mpi_set_ui(NULL, u);
-	if (ret==NULL) {
+	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
 	}
 
-	return ret;
+	return res;
 }
 
 /* S = (A * v^u) ^ b % N 
@@ -164,8 +181,8 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI B)
  */
 GNUTLS_MPI _gnutls_calc_srp_S1(GNUTLS_MPI A, GNUTLS_MPI b, GNUTLS_MPI u, GNUTLS_MPI v, GNUTLS_MPI n)
 {
-	GNUTLS_MPI tmp1, tmp2;
-	GNUTLS_MPI S;
+	GNUTLS_MPI tmp1=NULL, tmp2 = NULL;
+	GNUTLS_MPI S = NULL;
 
 	S = _gnutls_mpi_alloc_like(n);
 	if (S==NULL)
@@ -174,20 +191,20 @@ GNUTLS_MPI _gnutls_calc_srp_S1(GNUTLS_MPI A, GNUTLS_MPI b, GNUTLS_MPI u, GNUTLS_
 	tmp1 = _gnutls_mpi_alloc_like(n);
 	tmp2 = _gnutls_mpi_alloc_like(n);
 
-	if (tmp1 == NULL || tmp2 == NULL) {
-		_gnutls_mpi_release(&tmp1);
-		_gnutls_mpi_release(&tmp2);
-		return NULL;
-	}
+	if (tmp1 == NULL || tmp2 == NULL)
+		goto freeall;
 
 	_gnutls_mpi_powm(tmp1, v, u, n);
 	_gnutls_mpi_mulm(tmp2, A, tmp1, n);
-	_gnutls_mpi_release(&tmp1);
-
 	_gnutls_mpi_powm(S, tmp2, b, n);
-	_gnutls_mpi_release(&tmp2);
 
 	return S;
+
+	freeall:
+	_gnutls_mpi_release(&tmp1);
+	_gnutls_mpi_release(&tmp2);
+
+	return NULL;
 }
 
 /* A = g^a % N 
@@ -267,12 +284,13 @@ int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
 }
 
 
-/* S = (B - g^x) ^ (a + u * x) % N
+/* S = (B - 3*g^x) ^ (a + u * x) % N
  * this is our shared key
  */
 GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_MPI a, GNUTLS_MPI u, GNUTLS_MPI n)
 {
-	GNUTLS_MPI S, tmp1, tmp2, tmp4;
+	GNUTLS_MPI S=NULL, tmp1=NULL, tmp2=NULL;
+	GNUTLS_MPI tmp4=NULL, tmp3=NULL;
 
 	S = _gnutls_mpi_alloc_like(n);
 	if (S==NULL)
@@ -280,29 +298,34 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 		
 	tmp1 = _gnutls_mpi_alloc_like(n);
 	tmp2 = _gnutls_mpi_alloc_like(n);
-	if (tmp1 == NULL || tmp2 == NULL) {
-		_gnutls_mpi_release(&tmp1);
-		_gnutls_mpi_release(&tmp2);
-		return NULL;
+	tmp3 = _gnutls_mpi_alloc_like(n);
+	if (tmp1 == NULL || tmp2 == NULL || tmp3 == NULL) {
+		goto freeall;
 	}
 
-	_gnutls_mpi_powm(tmp1, g, x, n);
-
-	_gnutls_mpi_subm(tmp2, B, tmp1, n);
+	_gnutls_mpi_powm(tmp1, g, x, n); /* g^x */
+	_gnutls_mpi_mul_ui(tmp3, tmp1, 3); /* 3*g^x */
+	_gnutls_mpi_subm(tmp2, B, tmp3, n);
 
 	tmp4 = _gnutls_mpi_alloc_like(n);
 	if (tmp4==NULL)
-		return NULL;
+		goto freeall;
 
 	_gnutls_mpi_mul(tmp1, u, x);
 	_gnutls_mpi_add(tmp4, a, tmp1);
-	_gnutls_mpi_release(&tmp1);
-
 	_gnutls_mpi_powm(S, tmp2, tmp4, n);
-	_gnutls_mpi_release(&tmp2);
-	_gnutls_mpi_release(&tmp4);
-
+	
 	return S;
+
+	freeall:
+
+	_gnutls_mpi_release(&tmp1);
+	_gnutls_mpi_release(&tmp2);
+	_gnutls_mpi_release(&tmp3);
+	_gnutls_mpi_release(&tmp4);
+	_gnutls_mpi_release(&S);
+
+	return NULL;
 }
 
 /**

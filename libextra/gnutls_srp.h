@@ -2,7 +2,7 @@
 
 int _gnutls_srp_gx(opaque *text, size_t textsize, opaque** result, MPI g, MPI prime, gnutls_alloc_function);
 MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v);
-MPI _gnutls_calc_srp_u( MPI B);
+MPI _gnutls_calc_srp_u( MPI A, MPI B);
 MPI _gnutls_calc_srp_S1(MPI A, MPI b, MPI u, MPI v, MPI n);
 MPI _gnutls_calc_srp_A(MPI *a, MPI g, MPI n);
 MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n);
