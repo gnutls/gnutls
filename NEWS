@@ -7,7 +7,10 @@ Version ?.?.?
 - gnutls_anon_set_server_cred() was deprecated by gnutls_dh_set_bits()
 - gnutls_x509pki_set_trust_(file/mem) can now be called multiple times
 
-Version 0.3.3
+Version 0.3.4 (20/01/2002)
+- Corrected bugs in DHE_RSA key exchange method
+
+Version 0.3.3 (19/01/2002)
 - Added gnutls_x509pki_verify_certificate()
 - Added gnutls_x509pki_set_trust_mem() and gnutls_x509pki_set_key_mem()
 - Bug fixes in srpcrypt (based on patch by Marc Huber)
