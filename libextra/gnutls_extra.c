@@ -97,9 +97,8 @@ static void _gnutls_add_openpgp_functions(void) {
 	return;
 }
 
+const char* gnutls_check_version( const char*);
 static int _gnutls_init_extra = 0;
-
-const char* _gnutls_return_version( void);
 
 /**
   * gnutls_global_init_extra - This function initializes the global state of gnutls-extra 
@@ -119,7 +118,7 @@ int ret;
 	 * libextra, then do not initialize the library.
 	 * This is because it may break things.
 	 */
-	if (strcmp( _gnutls_return_version(), VERSION)!=0) {
+	if (strcmp( gnutls_check_version(NULL), GNUTLS_VERSION)!=0) {
 		return GNUTLS_E_LIBRARY_VERSION_MISMATCH;
 	}
 

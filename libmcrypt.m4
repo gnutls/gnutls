@@ -60,7 +60,7 @@ main ()
     fi
     LIBMCRYPT_CFLAGS="${TTINCLUDE}"
     LIBMCRYPT_LIBS="${TTLIBS} -lmcrypt"
-    AC_DEFINE(LIBMCRYPT22)
+    AC_DEFINE(LIBMCRYPT22, 1, [have libmcrypt 2.2])
 
 ,   libmcrypt_config_version="2.4.0"
     if test x$libmcrypt_config_prefix != x ; then
@@ -69,13 +69,13 @@ main ()
     fi
     LIBMCRYPT_CFLAGS="${TTINCLUDE}"
     LIBMCRYPT_LIBS="${TTLIBS} -lmcrypt -lltdl ${LIBADD_DL}"
-    AC_DEFINE(LIBMCRYPT24))
+    AC_DEFINE(LIBMCRYPT24, 1, [have libmcrypt 2.4]))
   else
 dnl libmcrypt-config was found
     LIBMCRYPT_CFLAGS=`$LIBMCRYPT_CONFIG $libmcrypt_config_args --cflags`
     LIBMCRYPT_LIBS=`$LIBMCRYPT_CONFIG $libmcrypt_config_args --libs`
     libmcrypt_config_version=`$LIBMCRYPT_CONFIG $libmcrypt_config_args --version`
-    AC_DEFINE(LIBMCRYPT24)
+    AC_DEFINE(LIBMCRYPT24, 1, [have libmcrypt 2.4])
   fi
 
   ac_save_CFLAGS="$CFLAGS"

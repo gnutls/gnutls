@@ -1,7 +1,7 @@
 Version 0.5.7
 - Some fixes in the memory allocation functions (realloc).
-- Fixes in the string functions used in XML certificate generation.
-- Removed gdbm dependency.
+- Improved the string functions used in XML certificate generation.
+- Removed dependency on libgdbm.
 
 Version 0.5.6 (6/09/2002)
 - Corrected bugs in SRP implementation, which prevented gnutls 

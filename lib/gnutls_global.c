@@ -326,8 +326,3 @@ gnutls_check_version( const char *req_version )
     return NULL;
 }
 
-const char *
-_gnutls_return_version( void)
-{
-   return GNUTLS_VERSION;
-}

@@ -3,7 +3,7 @@
 aclocal -I . && \
 libtoolize -c --force --automake && \
 aclocal -I . && \
-autoheader  && \
+autoheader -Wall && \
 automake -a -c --gnu || automake -a -c --gnu
 autoconf
 

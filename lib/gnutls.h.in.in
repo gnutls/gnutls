@@ -224,7 +224,8 @@ int  gnutls_db_check_entry( gnutls_session session, gnutls_datum session_entry);
 
 void gnutls_handshake_set_max_packet_length( gnutls_session session, int max);
 
-/* returns libgnutls version */
+/* returns libgnutls version (call it with a NULL argument) 
+ */
 const char* gnutls_check_version( const char*);
 
 /* Functions for setting/clearing credentials 
