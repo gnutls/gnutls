@@ -1,3 +1,9 @@
+2004-04-07 08:07  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_rsa_export.c:
+
+	Optimized (a bit) the rsa_parameter copying. I don't like it.  
+
 2004-04-03 11:16  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/auth_cert.c (tags: gnutls_1_0_10), lib/gnutls_cert.c
