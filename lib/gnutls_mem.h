@@ -24,12 +24,11 @@ extern void* (*gnutls_malloc)(size_t);
 extern void (*gnutls_free)(void*);
 extern int (*_gnutls_is_secure_memory)(const void*);
 extern void* (*gnutls_realloc)(void*, size_t);
+extern char* (*gnutls_strdup)( const char*);
 
 #define gnutls_realloc_fast(x, y) (y==0?x:realloc(x, y))
 
 svoid* gnutls_secure_calloc( size_t nmemb, size_t size);
 void* gnutls_calloc( size_t nmemb, size_t size);
-
-char* gnutls_strdup( const char* s);
 
 #endif /* GNUTLS_MEM_H */

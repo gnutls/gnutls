@@ -26,6 +26,7 @@
 void* (*gnutls_secure_malloc)(size_t) = malloc;
 void* (*gnutls_malloc)(size_t) = malloc;
 void (*gnutls_free)(void*) = free;
+char* (*gnutls_strdup)(const char*) = strdup;
 
 int _gnutls_is_secure_mem_null( const void* ign) { return 0; }
 
@@ -53,20 +54,6 @@ svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 		return ret;
 
 	memset(ret, 0, size);
-
-	return ret;
-}
-
-char *gnutls_strdup(const char *s)
-{
-	int size = strlen(s);
-	char *ret;
-
-	ret = gnutls_malloc(size + 1);	/* hold null */
-	if (ret == NULL)
-		return ret;
-
-	strcpy(ret, s); /* Flawfinder: ignore */
 
 	return ret;
 }
