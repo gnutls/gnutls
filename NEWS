@@ -3,6 +3,7 @@ Version 0.9.1
   serial number calculation in the record layer.
 - Added gnutls_certificate_free_keys() which deletes all the
   private keys and certificates from the credentials structure.
+- Corrected a broken buffer check in _gnutls_io_read_buffered()
 
 Version 0.9.0 (03/03/2003)
 - This version is not binary compatible with the previous ones.

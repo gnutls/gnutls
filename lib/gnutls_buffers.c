@@ -330,8 +330,7 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 
 	*iptr = session->internals.record_recv_buffer.data;
 
-	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0 
- 	   || (session->internals.record_recv_buffer.length+sizeOfPtr) > MAX_RECV_SIZE) 
+	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0) { 
 	{
 		gnutls_assert(); /* internal error */
 		return GNUTLS_E_INVALID_REQUEST;
@@ -363,10 +362,18 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 	 * receive in order to return the requested data.
 	 */
 	recvdata = sizeOfPtr - min;
+
+	/* Check if the previously read data plus the new data to
+	 * receive are longer than the maximum receive buffer size.
+	 */
+ 	if ((session->internals.record_recv_buffer.length + recvdata) > MAX_RECV_SIZE) 
+	{
+		gnutls_assert(); /* internal error */
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 	
 	/* Allocate the data required to store the new packet.
 	 */
-	 
 	alloc_size = recvdata+session->internals.record_recv_buffer.length;
 	session->internals.record_recv_buffer.data = gnutls_realloc_fast(
 		session->internals.record_recv_buffer.data, alloc_size);
