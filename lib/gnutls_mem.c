@@ -58,3 +58,16 @@ svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 	return ret;
 }
 
+char* _gnutls_strdup( const char* str) {
+int siz = strlen( str);
+char * ret;
+
+	ret = gnutls_malloc( siz + 1);
+	if (ret == NULL)
+		return ret;
+		
+	memcpy( ret, str, siz);
+	ret[ siz] = 0;
+	
+	return ret;
+}

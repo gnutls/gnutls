@@ -31,4 +31,6 @@ extern char* (*gnutls_strdup)( const char*);
 svoid* gnutls_secure_calloc( size_t nmemb, size_t size);
 void* gnutls_calloc( size_t nmemb, size_t size);
 
+char* _gnutls_strdup( const char*);
+
 #endif /* GNUTLS_MEM_H */
