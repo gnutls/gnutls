@@ -25,13 +25,14 @@ errcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS)
 
 if HAVE_LIBCFG
 certtool_SOURCES = certtool-gaa.c certtool.c prime.c getpass.c certtool-cfg.c
-certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) -lcfg+
+certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBTASN1_LIBS) -lcfg+ \
+	../gl/libgnu.la
 else
 certtool_SOURCES = certtool-gaa.c certtool.c prime.c getpass.c certtool-cfg.c \
 	cfg/cfg+.c cfg/cfgfile.c cfg/cmdline.c cfg/parse.c cfg/props.c \
 	cfg/shared.c cfg/platon/str/dynfgets.c cfg/platon/str/strctype.c \
 	cfg/platon/str/strdyn.c cfg/platon/str/strplus.c
-certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) ../gl/libgnu.la
 endif
 
 
