@@ -1,5 +1,5 @@
 \section{TLS Extensions}
-\index{TLS extensions}
+\index{TLS Extensions}
 
 A number of extensions to the \tls{} protocol have been proposed 
 mainly in \cite{TLSEXT}. The extensions supported in \gnutls{} are
@@ -10,6 +10,7 @@ mainly in \cite{TLSEXT}. The extensions supported in \gnutls{} are
 discussed in the subsections that follow.
 
 \subsection{Maximum fragment length negotiation}
+\index{TLS Extensions!Maximum fragment length}
 
 This extension allows a \tlsI{} implementation to negotiate
 a smaller value for record packet maximum length. This extension
@@ -21,6 +22,7 @@ and the
 functions.
 
 \subsection{Server name indication}
+\index{TLS Extensions!Server name indication}
 
 A common problem in HTTPS servers is the fact that the \tls{}
 protocol is not aware of the hostname that a client connects to, when

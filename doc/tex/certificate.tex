@@ -47,7 +47,7 @@ owner is the one you expect. See \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
 for an example.
 
 \par
-Client certificate authentication\index{Client certificate authentication} is 
+Client certificate authentication\index{Certificate authentication!Client} is 
 optional in \tls{}. A server may request a certificate from the client -- using the
 \printfunc{gnutls_certificate_server_set_request}{gnutls\_certificate\_server\_set\_request}
 function. If a certificate is to be requested by the client, at the handshake 
@@ -65,7 +65,7 @@ Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is 
 in order to use the TLS cipher suites which depend on X.509 certificates.
 
 
-\section{The OpenPGP\index{OpenPGP keys} trust model}
+\section{The OpenPGP\index{OpenPGP!Keys} trust model}
 \label{pgp:trust}
 
 The OpenPGP key authentication relies on a distributed trust model, called
