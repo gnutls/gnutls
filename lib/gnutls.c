@@ -29,6 +29,8 @@
 #include "gnutls_handshake.h"
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
+#include "gnutls_priority.h"
+#include "gnutls_algorithms.h"
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
@@ -362,7 +364,7 @@ int gnutls_close_nowait(int cd, GNUTLS_STATE state)
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
-	int i, err, cipher_size;
+	int i, cipher_size;
 	int ret = 0;
 	int iterations;
 	uint16 length;
@@ -450,7 +452,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 {
 	uint16 length;
-	int ret = 0, Size;
+	int ret = 0;
 	uint8 type=GNUTLS_CHANGE_CIPHER_SPEC;
 	char data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 	uint8 headers[5];

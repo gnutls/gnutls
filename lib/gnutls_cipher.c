@@ -26,6 +26,8 @@
 #include "gnutls_algorithms.h"
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
+#include "gnutls_plaintext.h"
+#include "debug.h"
 
 int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 		    uint8 ** ciphertext, ContentType type)
@@ -33,7 +35,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 	GNUTLSPlaintext *gtxt;
 	GNUTLSCompressed *gcomp;
 	GNUTLSCiphertext *gcipher;
-	int total_length = 0, err, i;
+	int total_length = 0, err;
 
 	if (data_size == 0)
 		return 0;
@@ -81,9 +83,7 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 	GNUTLSPlaintext *gtxt;
 	GNUTLSCompressed *gcomp;
 	GNUTLSCiphertext gcipher;
-	int iterations, i;
-	int err, ret;
-	int total_length = 0;
+	int ret;
 
 	if (ciphertext_size == 0)
 		return 0;

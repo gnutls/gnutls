@@ -280,8 +280,6 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 	uint8 *data_g;
 	uint8 *data_Y;
 	int ret = 0, i;
-unsigned char tmpy[2048];
-int ii;
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Receiving Server KX message\n");

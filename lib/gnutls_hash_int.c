@@ -237,7 +237,6 @@ GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3(MACAlgorithm algorithm, void *key,
 {
 	GNUTLS_MAC_HANDLE ret;
 	char ipad[48];
-	char *digest;
 	int padsize;
 
 	switch (algorithm) {
@@ -269,8 +268,6 @@ GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3_handshake(MACAlgorithm algorithm, void *k
 					int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;
-	char *digest;
-	int padsize;
 
 	ret = gnutls_hash_init(algorithm);
 	if (ret!=GNUTLS_MAC_FAILED) {
@@ -382,7 +379,6 @@ static void *ssl3_sha(int i, char *secret, int secret_len, char *random,
 static void *ssl3_md5(int i, char *secret, int secret_len, char *random,
 	       int random_len)
 {
-	int j;
 	void *digest;
 	GNUTLS_MAC_HANDLE td;
 

@@ -35,13 +35,13 @@
 #  ifdef __LINE__
 #   define gnutls_assert() fprintf(stderr, "GNUTLS_ASSERT: %s:%d\n", __FILE__,__LINE__);
 #  else
-#   define gnutls_assert() 1
+#   define gnutls_assert() 
 #  endif
 # else /* __FILE__ defined */
-#  define gnutls_assert() 1
+#  define gnutls_assert() 
 # endif
 #else /* no debug */
-# define gnutls_assert() 1
+# define gnutls_assert() 
 #endif
 
 char* gnutls_strerror(int error);

@@ -163,7 +163,6 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 {
 	uint8 *data, *vrfy;
 	int data_size;
-	uint8* concat;	/* md5+sha1 */
 	int ret;
 	int vrfysize;
 
@@ -300,7 +299,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 		memmove(&data[pos], i_data, i_datasize - 4);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Send HANDSHAKE[%d] of %d bytes\n", type, i_datasize+4);
+	fprintf(stderr, "Send HANDSHAKE[%d] of %ld bytes\n", type, i_datasize+4);
 #endif
 
 	/* Here we keep the handshake messages in order to hash them later!
@@ -370,7 +369,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	length32 = byteswap32(length32);
 #endif
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Received HANDSHAKE[%d] of %d bytes\n", dataptr[0], length32+4);
+	fprintf(stderr, "Received HANDSHAKE[%d] of %ld bytes\n", dataptr[0], length32+4);
 #endif
 
 	dataptr = gnutls_realloc( dataptr, length32+HANDSHAKE_HEADERS_SIZE);
@@ -785,11 +784,9 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 
 int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen)
 {
-	uint8 session_id_len = 0, z;
 	int pos = 0;
 	char* certificate_list;
-	int i, ret=0;
-	uint16 x;
+	int ret=0;
 	uint32 sizeOfCert;
 	uint24 num;
 	
@@ -995,8 +992,6 @@ int ret=0;
 int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 {
 	int ret=0;
-	char *session_id;
-	uint8 session_id_size;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 

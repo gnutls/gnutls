@@ -39,11 +39,9 @@ int main()
     int sd, ret;
     struct sockaddr_in sa_serv;
     struct sockaddr_in sa_cli;
-    int client_len, i;
+    int client_len;
     char topbuf[512];
     GNUTLS_STATE state;
-    char *str;
-    char buf[4096];
     char buffer[MAX_BUF];
 
 
