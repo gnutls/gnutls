@@ -34,8 +34,8 @@ libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 pkix_asn1_tab.c: pkix.asn
-	../src/asn1c pkix.asn pkix_asn1_tab.c
+	-../src/asn1c pkix.asn pkix_asn1_tab.c
 
 pkcs1_asn1_tab.c: pkcs1.asn
-	../src/asn1c pkcs1.asn pkcs1_asn1_tab.c
+	-../src/asn1c pkcs1.asn pkcs1_asn1_tab.c
 
