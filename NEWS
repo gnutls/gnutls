@@ -1,3 +1,9 @@
+Version 0.1.3
+- Updated API
+- Added function to access alert messages.
+- Added support for renegotiating parameters.
+- Better and Faster Resume Database handling.
+ 
 Version 0.1.2 (14/05/2001)
 - Updated API
 - Fixes in extension handling
