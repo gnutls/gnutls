@@ -697,6 +697,8 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
   * CA flag set. 
   *
   * A negative value may be returned in case of parsing error.
+  * If the certificate does not contain the basicConstraints extension
+  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
 int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
@@ -710,17 +712,13 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
 
 	if ((result =
 	     _gnutls_get_extension(cert, "2 5 29 19", &basicConstraints)) < 0) {
-	        if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-	        	/* The extension does not exist so it's not a CA */
-	        	return 0;
-	        }
 	     	gnutls_assert();
 		return result;
 	}
 
 	if (basicConstraints.size == 0 || basicConstraints.data==NULL) {
 		gnutls_assert();
-		return 0;
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
 	if ((result=_gnutls_asn1_create_element
