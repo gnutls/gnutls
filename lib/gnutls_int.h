@@ -116,8 +116,8 @@ typedef struct {
 
 #include <gnutls_mpi.h>
 
-typedef enum change_cipher_spec_t { GNUTLS_TYPE_CHANGE_CIPHER_SPEC =
-	1 } change_cipher_spec_t;
+typedef enum change_cipher_spec_t { GNUTLS_TYPE_CHANGE_CIPHER_SPEC = 1
+} change_cipher_spec_t;
 
 typedef enum gnutls_certificate_status {
     GNUTLS_CERT_INVALID = 2,	/* will be set if the certificate
@@ -221,7 +221,8 @@ typedef enum { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
 
 typedef enum valid_session_t { VALID_TRUE, VALID_FALSE } valid_session_t;
 typedef enum resumable_session_t { RESUME_TRUE,
-	RESUME_FALSE } resumable_session_t;
+    RESUME_FALSE
+} resumable_session_t;
 
 /* Record Protocol */
 typedef enum content_type_t {

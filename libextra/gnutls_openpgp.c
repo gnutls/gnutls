@@ -825,9 +825,8 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum_t * keyring,
  *
  **/
 int
-gnutls_certificate_set_openpgp_keyring_file
-(gnutls_certificate_credentials_t c, const char *file)
-{
+ gnutls_certificate_set_openpgp_keyring_file
+    (gnutls_certificate_credentials_t c, const char *file) {
     struct stat statbuf;
 
     if (!c || !file) {

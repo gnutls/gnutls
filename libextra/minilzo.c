@@ -608,13 +608,14 @@ __asm__ __volatile__( \
 	    __volatile__("movb %b1, %b0; rorb %b2, %b0":"=a"(result):"g"
 			 (value), "c"(shift));
 	 return result;
-    }
-    unsigned short lzo_rotr16(unsigned short value, int shift);
+    } unsigned short lzo_rotr16(unsigned short value, int shift);
     extern __inline__ unsigned short lzo_rotr16(unsigned short value,
 						int shift) {
 	unsigned short result;
 
-      __asm__ __volatile__("movw %b1, %b0; rorw %b2, %b0": "=a"(result):"g"(value), "c"(shift));
+	__asm__
+	    __volatile__("movw %b1, %b0; rorw %b2, %b0":"=a"(result):"g"
+			 (value), "c"(shift));
 	return result;
     }
 
@@ -1155,7 +1156,8 @@ LZO_PUBLIC(int)
 	unsigned short b;
 	lzo_uint32 aa[4];
 	unsigned char x[4 * sizeof(lzo_full_align_t)];
-    } u;
+    }
+    u;
 
     COMPILE_TIME_ASSERT((int) ((unsigned char) ((signed char) -1)) == 255);
     COMPILE_TIME_ASSERT((((unsigned char) 128) <<

@@ -41,9 +41,8 @@ int gnutls_openpgp_add_keyring_mem(gnutls_datum_t * keyring,
 int gnutls_openpgp_add_keyring_file(gnutls_datum_t * keyring,
 				    const char *name);
 
-int
-gnutls_certificate_set_openpgp_keyring_file
-(gnutls_certificate_credentials_t c, const char *file);
+int gnutls_certificate_set_openpgp_keyring_file
+    (gnutls_certificate_credentials_t c, const char *file);
 
 int
 gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials_t

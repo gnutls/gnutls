@@ -76,14 +76,12 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session_t session);
 
 /* These are set on the credentials structure.
  */
-void
-gnutls_certificate_client_set_retrieve_function
-(gnutls_certificate_credentials_t cred,
-gnutls_certificate_client_retrieve_function * func);
-void
-gnutls_certificate_server_set_retrieve_function
-(gnutls_certificate_credentials_t cred,
-gnutls_certificate_server_retrieve_function * func);
+void gnutls_certificate_client_set_retrieve_function
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_client_retrieve_function * func);
+void gnutls_certificate_server_set_retrieve_function
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_server_retrieve_function * func);
 
 void gnutls_certificate_server_set_request(gnutls_session_t session,
 					   gnutls_certificate_request_t
@@ -92,8 +90,7 @@ void gnutls_certificate_server_set_request(gnutls_session_t session,
 /* get data from the session 
  */
 const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
-						   session,
-						   unsigned int
+						   session, unsigned int
 						   *list_size);
 const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t
 						  session);
