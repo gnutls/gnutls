@@ -1,3 +1,17 @@
+2003-12-05 14:21  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/Makefile.am, src/cli.c:
+
+	Some minor fixes in the makefiles. They now include CFLAGS from
+	libgcrypt or opencdk if installed in a non standard directory.  
+
+2003-12-05 09:25  nmav <nmav@gnutls.org>
+
+	* doc/TODO, doc/tex/ciphers.tex, lib/gnutls_dh_primes.c,
+	lib/gnutls_mpi.c, src/prime.c:
+
+	some minor fixes and cleanups.  
+
 2003-12-02 21:39  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_cipher.c, gnutls_cipher_int.c (utags: gnutls_1_0_0):
