@@ -12,6 +12,9 @@ typedef void svoid; /* for functions that allocate using gnutls_secure_malloc */
  * support alloca.
  */
 #ifdef HAVE_ALLOCA
+# ifdef HAVE_ALLOCA_H
+#  include <alloca.h>
+# endif
 # define gnutls_alloca alloca
 # define gnutls_afree(x)
 #else
