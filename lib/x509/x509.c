@@ -242,6 +242,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   * @cert: should contain a gnutls_x509_crt structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
+  * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   *
@@ -261,7 +262,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   *
   **/
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
-	int indx, void *buf, size_t *sizeof_buf)
+	int indx, unsigned int raw_flag, void *buf, size_t *sizeof_buf)
 {
 	if (cert==NULL) {
 		gnutls_assert();
@@ -269,7 +270,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid,
 	}
 
 	return _gnutls_x509_parse_dn_oid( cert->cert, "tbsCertificate.issuer.rdnSequence", oid,
-		indx, buf, sizeof_buf);
+		indx, raw_flag, buf, sizeof_buf);
 }
 
 /**
@@ -305,6 +306,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   * @cert: should contain a gnutls_x509_crt structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
+  * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   *
@@ -324,7 +326,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   *
   **/
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
-	int indx, void *buf, size_t *sizeof_buf)
+	int indx, unsigned int raw_flag, void *buf, size_t *sizeof_buf)
 {
 	if (cert==NULL) {
 		gnutls_assert();
@@ -332,7 +334,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid,
 	}
 
 	return _gnutls_x509_parse_dn_oid( cert->cert, "tbsCertificate.subject.rdnSequence", oid,
-		indx, buf, sizeof_buf);
+		indx, raw_flag, buf, sizeof_buf);
 }
 
 /**

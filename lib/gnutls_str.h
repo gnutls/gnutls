@@ -28,7 +28,7 @@ int _gnutls_string_copy_str( gnutls_string* dest, const char* src);
 int _gnutls_string_append_str( gnutls_string*, const char* str);
 int _gnutls_string_append_data( gnutls_string*, const void* data, size_t data_size);
 
-char * _gnutls_bin2hex(const opaque *old, size_t oldlen, char* buffer,
+char * _gnutls_bin2hex(const void *old, size_t oldlen, char* buffer,
 	size_t buffer_size);
 
 #endif

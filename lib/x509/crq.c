@@ -190,6 +190,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   * @crq: should contain a gnutls_x509_crq structure
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
+  * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   *
@@ -209,15 +210,15 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   *
   **/
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
-	int indx, void *buf, size_t *sizeof_buf)
+	int indx, unsigned int raw_flag, void *buf, size_t *sizeof_buf)
 {
 	if (crq==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	return _gnutls_x509_parse_dn_oid( crq->crq, "certificationRequestInfo.subject.rdnSequence", oid,
-		indx, buf, sizeof_buf);
+	return _gnutls_x509_parse_dn_oid( crq->crq, "certificationRequestInfo.subject.rdnSequence", 
+		oid, indx, raw_flag, buf, sizeof_buf);
 }
 
 /* Parses an Attribute list in the asn1_struct, and searches for the

@@ -138,13 +138,11 @@ int i = 0;
  * hold the string.
  */
 int _gnutls_x509_oid_data2string( const char* oid, void* value, 
-	int value_size, char * res, size_t *res_size) {
-
-int result;
-char str[1024];
-char tmpname[128];
+	int value_size, char * res, size_t *res_size) 
+{
+char str[1024], tmpname[128];
 const char* ANAME = NULL;
-int CHOICE = -1, len = -1;
+int CHOICE = -1, len = -1, result;
 ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 
 	if (value==NULL || value_size <=0 || res_size == NULL) {
@@ -152,8 +150,6 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
-	if (res) res[0] = 0;
-
 	if ( _gnutls_x509_oid_data_printable( oid) == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
@@ -178,6 +174,7 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 	}
 
 	if ((result = asn1_der_decoding(&tmpasn, value, value_size, NULL)) != ASN1_SUCCESS) {
+		gnutls_assert();
 		asn1_delete_structure(&tmpasn);
 		return _gnutls_asn2err(result);
 	}
@@ -187,6 +184,7 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 	 */
 	len = sizeof( str) - 1;
 	if ((result = asn1_read_value(tmpasn, "", str, &len)) != ASN1_SUCCESS) {	/* CHOICE */
+		gnutls_assert();
 		asn1_delete_structure(&tmpasn);
 		return _gnutls_asn2err(result);
 	}
