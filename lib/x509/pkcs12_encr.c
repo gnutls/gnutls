@@ -1,22 +1,25 @@
-/*  minip12.c - A mini pkcs-12 implementation (modified for gnutls)
- *	Copyright (C) 2002 Free Software Foundation, Inc.
+/* minip12.c - A mini pkcs-12 implementation (modified for gnutls)
  *
- *  This file some day was part of GnuPG.
- *  This file is part of GNUTLS.
+ * Copyright (C) 2004 Simon Josefsson
+ * Copyright (C) 2002 Free Software Foundation, Inc.
  *
- *  The GNUTLS library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public   
- *  License as published by the Free Software Foundation; either 
- *  version 2.1 of the License, or (at your option) any later version.
+ * This file some day was part of GnuPG.
+ * This file is part of GNUTLS.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * The GNUTLS library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * USA
  *
  */
 
@@ -25,6 +28,7 @@
 #ifdef ENABLE_PKI
 
 #include <gcrypt.h>
+#include <gc.h>
 #include <gnutls_errors.h>
 
 /* Returns 0 if the password is ok, or a negative error
@@ -58,7 +62,7 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
     int rc;
     gcry_error_t err;
     unsigned int i, j;
-    gcry_md_hd_t md;
+    gc_hash md;
     mpi_t num_b1 = NULL;
     unsigned int pwlen;
     opaque hash[20], buf_b[64], buf_i[128], *p;
@@ -89,19 +93,21 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
     }
 
     for (;;) {
-	err = gcry_md_open(&md, GCRY_MD_SHA1, 0);
+	err = gc_hash_open(GC_SHA1, 0, &md);
 	if (err) {
 	    gnutls_assert();
 	    return GNUTLS_E_DECRYPTION_FAILED;
 	}
 	for (i = 0; i < 64; i++)
-	    gcry_md_putc(md, id);
-	gcry_md_write(md, buf_i, 128);
-	memcpy(hash, gcry_md_read(md, 0), 20);
-	gcry_md_close(md);
+	  {
+	    unsigned char lid = id & 0xFF;
+	    gc_hash_write(md, 1, &lid);
+	  }
+	gc_hash_write(md, 128, buf_i);
+	memcpy(hash, gc_hash_read(md), 20);
+	gc_hash_close(md);
 	for (i = 1; i < iter; i++)
-	    gcry_md_hash_buffer(GCRY_MD_SHA1, hash, hash, 20);
-
+		gc_hash_buffer (GC_SHA1, hash, 20, hash);
 	for (i = 0; i < 20 && cur_keylen < req_keylen; i++)
 	    keybuf[cur_keylen++] = hash[i];
 	if (cur_keylen == req_keylen) {
