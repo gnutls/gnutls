@@ -252,6 +252,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 		get_locality_crt_set( crt);
 		get_state_crt_set( crt);
 		get_cn_crt_set( crt);
+		get_uid_crt_set( crt);
 	
 		if (!batch) fprintf(stderr, "This field should not be used in new certificates.\n");
 
@@ -1645,6 +1646,7 @@ void generate_request(void)
 	get_locality_crq_set( crq);
 	get_state_crq_set( crq);
 	get_cn_crq_set( crq);
+	get_uid_crq_set( crq);
 
 	ret = gnutls_x509_crq_set_version( crq, 1);
 	if (ret < 0) {

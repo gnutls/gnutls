@@ -25,6 +25,7 @@ void get_unit_crt_set( gnutls_x509_crt crt);
 void get_state_crt_set( gnutls_x509_crt crt);
 void get_locality_crt_set( gnutls_x509_crt crt);
 void get_cn_crt_set( gnutls_x509_crt crt);
+void get_uid_crt_set( gnutls_x509_crt crt);
 void get_pkcs9_email_crt_set( gnutls_x509_crt crt);
 int get_serial( void);
 int get_days( void);
@@ -46,6 +47,7 @@ const char* get_ip_addr( void);
 
 
 void get_cn_crq_set( gnutls_x509_crq crq);
+void get_uid_crq_set( gnutls_x509_crq crq);
 void get_locality_crq_set( gnutls_x509_crq crq);
 void get_state_crq_set( gnutls_x509_crq crq);
 void get_unit_crq_set( gnutls_x509_crq crq);
