@@ -275,7 +275,7 @@ test_code_t test_server(gnutls_session session)
             putc( *p, stdout);
             p++;
             i++;
-            if (i>64) break;
+            if (i>128) break;
         }
     }
     
