@@ -21,8 +21,7 @@ SUBDIRS = x509
 MINITASN1_COBJECTS = 
 endif
 
-EXTRA_DIST = gnutls.asn pkix.asn libgnutls.vers \
-	libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls-api.texi
+EXTRA_DIST = libgnutls.vers libgnutls.m4 gnutls-api.texi
 lib_LTLIBRARIES = libgnutls.la
 
 X509_COBJECTS = x509/crl.c x509/dn.c x509/common.c x509/x509.c	\
@@ -71,7 +70,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(X509_COBJECTS)	\
-	$(MINITASN1_COBJECTS) $(SRP_COBJECTS)
+	$(MINITASN1_COBJECTS) $(SRP_COBJECTS) gnutls.asn pkix.asn
 
 libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
 	../crypto/libgc.la \
