@@ -117,6 +117,9 @@ keyring_to_keydb(keyring_blob *blob)
 {
   KEYDB_HD khd = NULL;
 
+  if (!blob)
+    return NULL;
+  
   khd = cdk_alloc_clear(sizeof *khd);
   khd->used = 1;
   if (blob->type == 0x00) /* file */
@@ -190,7 +193,8 @@ conv_data_to_keyring(int type, const char *data, size_t size, size_t *r_size)
   p[3] = (size >>  8) & 0xff;
   p[4] = (size      ) & 0xff;
   memcpy(p+5, data, size);
-  *r_size = 1+4+size;
+  if (r_size)
+    *r_size = 1+4+size;
   
   return p; 
 }
@@ -203,7 +207,8 @@ is_file_armored(char *file)
   struct stat f_stat;
   FILE *fp;
 
-  if ( (fp = fopen(file, "r")) )
+  fp = fopen(file, "r");
+  if (fp)
     {
       fstat(fileno(fp), &f_stat);
       if (f_stat.st_size == 0)
@@ -223,7 +228,7 @@ is_file_armored(char *file)
 
 leave:
   return armored;
-}    
+}
 
 static int
 pkt_find_type(PKT pkt, int type)
@@ -248,6 +253,7 @@ pkt_to_datum(PKT pkt, gnutls_datum *raw)
   struct packet_s *p;
   byte *data;
   size_t n = 0;
+  int rc = 0;
   IOBUF a;
   
   if (!pkt || !raw)
@@ -259,12 +265,14 @@ pkt_to_datum(PKT pkt, gnutls_datum *raw)
       if (p->id == PKT_PUBKEY)
         {
           a = cdk_iobuf_temp();
-          if ( cdk_pkt_write_public_key(a, p->p.pk) )
+          rc = cdk_pkt_write_public_key(a, p->p.pk);
+          if (rc)
             return GNUTLS_E_UNKNOWN_ERROR;
-          data = cdk_iobuf_get_data_as_buffer(a, &n);
+          data = cdk_iobuf_get_data(a, &n);
           if (data && n)
             { 
-              if ( gnutls_set_datum(raw, data, n) < 0 )
+              rc = gnutls_set_datum(raw, data, n);
+              if (rc < 0)
                 return GNUTLS_E_MEMORY_ERROR;
             }
           cdk_free(data);
@@ -298,10 +306,8 @@ datum_to_openpgp_pkt( const gnutls_datum *raw, PKT *r_pkt )
 
 leave:
   cdk_iobuf_close(buf);
-  if (!rc)
-    *r_pkt = pkt;
-  else
-    *r_pkt = NULL;
+  *r_pkt = (!rc)? pkt : NULL;
+
   return rc;
 }
 
@@ -315,10 +321,11 @@ iobuf_to_datum(IOBUF buf, gnutls_datum *raw)
   if (!buf || !raw)
     return GNUTLS_E_INVALID_PARAMETERS;
   
-  data = cdk_iobuf_get_data_as_buffer(buf, &nbytes);
+  data = cdk_iobuf_get_data(buf, &nbytes);
   if (data && nbytes)
     {
-      if ( gnutls_set_datum(raw, data, nbytes) < 0 )
+      rc = gnutls_set_datum(raw, data, nbytes);
+      if (rc < 0)
         return GNUTLS_E_MEMORY_ERROR;
       cdk_free(data);
     }
@@ -410,8 +417,9 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
   for (i=0; i<cert->params_size; i++)
     {      
       nbytes = pk->mpi[i].bytes+2;
-      if (gcry_mpi_scan(&cert->params[i], GCRYMPI_FMT_PGP,
-                        pk->mpi[i].data, &nbytes))
+      rc = gcry_mpi_scan(&cert->params[i], GCRYMPI_FMT_PGP,
+                         pk->mpi[i].data, &nbytes);
+      if (rc)
         {
           rc = GNUTLS_E_MPI_SCAN_FAILED;
           goto leave;
@@ -444,10 +452,11 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
   rc = cdk_pkt_write_signature(buf, sig);
   if (rc)
     goto leave;
-  data = cdk_iobuf_get_data_as_buffer(buf, &nbytes);
+  data = cdk_iobuf_get_data(buf, &nbytes);
   if (data && nbytes)
     {
-      if ( gnutls_datum_append( &cert->signature, data, nbytes) < 0 )
+      rc = gnutls_datum_append( &cert->signature, data, nbytes);
+      if (rc < 0)
         {
           gnutls_assert();
           return GNUTLS_E_MEMORY_ERROR;
@@ -517,8 +526,9 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
   for (i=0; i<pkey->params_size; i++)
     {
       nbytes = sk->pk->mpi[i].bytes+2;
-      if (gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
-                        sk->pk->mpi[i].data, &nbytes))
+      rc = gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
+                         sk->pk->mpi[i].data, &nbytes);
+      if (rc)
         {
           rc = GNUTLS_E_MPI_SCAN_FAILED;
           release_mpi_array(pkey->params, i-1);
@@ -529,8 +539,9 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
   for (j=0; j<cdk_key_sk_get_nmpis(pke_algo); j++, i++)
     {
       nbytes = sk->mpi[j]->bytes+2;
-      if (gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
-                        sk->mpi[j]->data, &nbytes))
+      rc = gcry_mpi_scan(&pkey->params[i], GCRYMPI_FMT_PGP,
+                         sk->mpi[j]->data, &nbytes);
+      if (rc)
         {
           rc = GNUTLS_E_MPI_SCAN_FAILED;
           release_mpi_array(pkey->params, i-1);
@@ -543,7 +554,8 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
     pkey->pk_algorithm = GNUTLS_PK_DSA;
   else if (is_RSA(pke_algo))
     pkey->pk_algorithm = GNUTLS_PK_RSA;
-  if ( gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0 )
+  rc = gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size);
+  if (rc < 0)
     {
       release_mpi_array(pkey->params, i);
       rc = GNUTLS_E_MEMORY_ERROR;
@@ -593,7 +605,8 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
       goto leave;
     }
 
-  if ( gnutls_set_datum(&cert->raw, raw.data, raw.size) < 0 )
+  rc = gnutls_set_datum(&cert->raw, raw.data, raw.size);
+  if (rc < 0)
     {
       rc = GNUTLS_E_MEMORY_ERROR;
       goto leave;
@@ -700,10 +713,11 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                         char* CERTFILE,
                                         char* KEYFILE)
 {
-  IOBUF a, buf;
+  IOBUF buf = NULL;
   PKT pkt = NULL;
   gnutls_datum raw;
   struct packet_s *p = NULL;
+  armor_filter_s afx;
   int eof = 0, i;
   int rc = 0;
   
@@ -714,20 +728,24 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     return GNUTLS_E_FILE;
   
   if ( is_file_armored(CERTFILE) )
-    {      
-      if ( cdk_iobuf_open(&a, CERTFILE, IOBUF_MODE_RD) == -1 )
+    {
+      rc = cdk_iobuf_open(&buf, CERTFILE, IOBUF_MODE_RD);
+      if (rc == -1)
         return GNUTLS_E_FILE;
-      if ( cdk_armor_decode_iobuf(a, &buf) )
+      memset(&afx, 0, sizeof afx);
+      rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
+      if (rc)
         {
-          cdk_iobuf_close(a);
+          cdk_iobuf_close(buf);
           rc = GNUTLS_E_ASCII_ARMOR;
           goto leave;          
         }
-      /*cdk_iobuf_close(a);*/
+      /*cdk_iobuf_close(buf);*/
     }
   else
     {
-      if ( cdk_iobuf_open(&buf, CERTFILE, IOBUF_MODE_RD) == -1 )
+      rc = cdk_iobuf_open(&buf, CERTFILE, IOBUF_MODE_RD);
+      if (rc == -1)
         return GNUTLS_E_FILE;
     }
   cdk_pkt_new(&pkt);
@@ -753,7 +771,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
       gnutls_assert();
       return GNUTLS_E_MEMORY_ERROR;
     }
-  
+
   do {
     rc = cdk_keydb_enum_pk(buf, &pkt, &eof);
     if ( (eof == 1 && !pkt) || rc)
@@ -789,19 +807,23 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
 
   if ( is_file_armored(KEYFILE) )
     {
-      if ( cdk_iobuf_open(&a, KEYFILE, IOBUF_MODE_RD) == -1 )
+      rc = cdk_iobuf_open(&buf, KEYFILE, IOBUF_MODE_RD);
+      if (rc == -1)
         return GNUTLS_E_FILE;
-      if ( cdk_armor_decode_iobuf(a, &buf) )
+      memset(&afx, 0, sizeof afx);
+      rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
+      if (rc)
         {
-          cdk_iobuf_close(a);
+          cdk_iobuf_close(buf);
           rc = GNUTLS_E_ASCII_ARMOR;
           goto leave;
         }
-      /*cdk_iobuf_close(a);*/
+      /*cdk_iobuf_close(buf);*/
     }
   else
     {
-      if ( cdk_iobuf_open(&buf, KEYFILE, IOBUF_MODE_RD) == -1 )
+      rc = cdk_iobuf_open(&buf, KEYFILE, IOBUF_MODE_RD);
+      if (rc == -1)
         return GNUTLS_E_FILE;
     }
   iobuf_to_datum(buf, &raw);
@@ -1183,9 +1205,10 @@ int
 gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
                                            const char *file)
 {
-  IOBUF a, asc;
-  byte *data;
+  IOBUF buf = NULL;
+  byte *data = NULL;
   size_t nbytes = 0;
+  armor_filter_s afx;
   int rc = 0;
   
   if (!c || !file)
@@ -1196,20 +1219,23 @@ gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
 
   if ( is_file_armored( (char*)file) )
     {
-      if ( cdk_iobuf_open(&asc, file, IOBUF_MODE_RD) == -1 )
+      rc = cdk_iobuf_open(&buf, file, IOBUF_MODE_RD);
+      if (rc == -1)
         return GNUTLS_E_FILE;
-      if ( cdk_armor_decode_iobuf(asc, &a) )
+      rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
+      if (rc)
         {
-          cdk_iobuf_close(asc);
+          cdk_iobuf_close(buf);
           return GNUTLS_E_ASCII_ARMOR;
         }
     }
   else
     {
-      if ( cdk_iobuf_open(&a, file, IOBUF_MODE_RD) == -1 )
+      rc = cdk_iobuf_open(&buf, file, IOBUF_MODE_RD);
+      if (rc == -1)
         return GNUTLS_E_FILE;
     }
-  data = cdk_iobuf_get_data_as_buffer(a, &nbytes);
+  data = cdk_iobuf_get_data(buf, &nbytes);
   if (data && nbytes)
     {
       rc = gnutls_openpgp_add_keyring_mem(&c->keyring, data, nbytes);
@@ -1217,7 +1243,7 @@ gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
     }
   else
     rc = GNUTLS_E_UNKNOWN_ERROR;
-  cdk_iobuf_close(a);
+  cdk_iobuf_close(buf);
   
   return rc;
 }
@@ -1238,9 +1264,10 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
   int rc = 0, state = 0;
   struct hostent *hp;
   struct sockaddr_in sock;
+  armor_filter_s afx;
   char *request = NULL;
-  char buf[4096];
-  IOBUF ibuf, raw;
+  char buffer[4096];
+  IOBUF buf = NULL;
   int fd = -1;
   byte *data;
   ssize_t n = 0, nbytes = 0;
@@ -1281,15 +1308,15 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
     }
   cdk_free(request);
 
-  ibuf = cdk_iobuf_temp();
-  while ( (n = read(fd, buf, sizeof(buf)-1)) > 0 )
+  buf = cdk_iobuf_temp();
+  while ( (n = read(fd, buffer, sizeof(buffer)-1)) > 0 )
     {
-      buf[n] = '\0';
+      buffer[n] = '\0';
       nbytes += n;
-      if (nbytes > cdk_iobuf_get_size(ibuf))
-        cdk_iobuf_expand(ibuf, n);
-      cdk_iobuf_write(ibuf, buf, n);
-      if ( strstr(buf, "<pre>") || strstr(buf, "</pre>") )
+      if (nbytes > cdk_iobuf_get_size(buf))
+        cdk_iobuf_expand(buf, n);
+      cdk_iobuf_write(buf, buffer, n);
+      if ( strstr(buffer, "<pre>") || strstr(buffer, "</pre>") )
         state++;
     }
   
@@ -1298,21 +1325,22 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
       rc = GNUTLS_E_UNKNOWN_ERROR;
       goto leave;
     }
-  if ( cdk_armor_decode_iobuf(ibuf, &raw) )
+  memset(&afx, 0, sizeof afx);
+  rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
+  if (rc)
     {
       rc = GNUTLS_E_ASCII_ARMOR;
       goto leave;
     }
-  data = cdk_iobuf_get_data_as_buffer(raw, &n);
+  data = cdk_iobuf_get_data(buf, &n);
   if (data && n)
     { 
       gnutls_set_datum(key, data, n);
       cdk_free(data);
     }
-  cdk_iobuf_close(raw);
   
 leave:
-  cdk_iobuf_close(ibuf);
+  cdk_iobuf_close(buf);
   close(fd);
   
   return 0;
@@ -1385,3 +1413,9 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 #endif /* HAVE_LIBOPENCDK */
+
+
+
+
+
+
