@@ -49,7 +49,7 @@
 #define GERR(ret) fprintf(stderr, "* Error: %s\n", gnutls_strerror(ret))
 
 /* global stuff here */
-int resume;
+int resume, starttls;
 char *hostname = NULL;
 int port;
 int record_max_size;
@@ -69,15 +69,19 @@ char *x509_cafile;
 char *x509_crlfile = NULL;
 static int x509ctype;
 
+static gnutls_srp_client_credentials cred;
+static gnutls_anon_client_credentials anon_cred;
+static gnutls_certificate_credentials xcred;
 
 int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[16] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
-  /* Do not use anonymous authentication, unless you know what that means */ 
+   /* Do not use anonymous authentication, unless you know what that means */
    GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
 };
 int cipher_priority[16] =
-    { GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
+    { GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
+   GNUTLS_CIPHER_3DES_CBC,
    GNUTLS_CIPHER_ARCFOUR_40, 0
 };
 int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
@@ -85,6 +89,21 @@ int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 /* end of global stuff */
+
+/* prototypes */
+typedef struct {
+   int fd;
+   gnutls_session session;
+   int secure;
+} socket_st;
+
+ssize_t socket_recv(socket_st socket, void *buffer, int buffer_size);
+ssize_t socket_send(socket_st socket, void *buffer, int buffer_size);
+void socket_bye(socket_st socket);
+void check_rehandshake(socket_st socket, int ret);
+void check_alert(socket_st socket, int ret);
+int do_handshake(socket_st *socket);
+
 
 #define MAX(X,Y) (X >= Y ? X : Y);
 #define DEFAULT_X509_CAFILE "x509/ca.pem"
@@ -101,6 +120,49 @@ int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 #define DEFAULT_SRP_USERNAME "test"
 #define DEFAULT_SRP_PASSWD "test"
 
+/* initializes a gnutls_session with some defaults.
+ */
+static gnutls_session init_tls_session(void)
+{
+   gnutls_session session;
+
+   gnutls_init(&session, GNUTLS_CLIENT);
+
+   /* allow the use of private ciphersuites.
+    */
+   gnutls_handshake_set_private_extensions(session, 1);
+
+   gnutls_cipher_set_priority(session, cipher_priority);
+   gnutls_compression_set_priority(session, comp_priority);
+   gnutls_kx_set_priority(session, kx_priority);
+   gnutls_protocol_set_priority(session, protocol_priority);
+   gnutls_mac_set_priority(session, mac_priority);
+   gnutls_certificate_type_set_priority(session, cert_type_priority);
+
+   gnutls_dh_set_prime_bits(session, 512);
+
+   gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
+   if (srp_username != NULL)
+      gnutls_cred_set(session, GNUTLS_CRD_SRP, cred);
+   gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+   /* send the fingerprint */
+   if (fingerprint != 0)
+      gnutls_openpgp_send_key(session, GNUTLS_OPENPGP_KEY_FINGERPRINT);
+
+   /* use the max record size extension */
+   if (record_max_size > 0) {
+      if (gnutls_record_set_max_size(session, record_max_size) < 0) {
+	 fprintf(stderr,
+		 "Cannot set the maximum record size to %d.\n",
+		 record_max_size);
+	 exit(1);
+      }
+   }
+
+   return session;
+}
+
 
 static void gaa_parser(int argc, char **argv);
 
@@ -109,22 +171,17 @@ int main(int argc, char **argv)
    int err, ret;
    int sd, ii, i;
    struct sockaddr_in sa;
-   gnutls_session session;
    char buffer[MAX_BUF + 1];
    char *session_data = NULL;
    char *session_id = NULL;
    int session_data_size, alert;
    int session_id_size;
-   char *tmp_session_id;
-   int tmp_session_id_size;
    fd_set rset;
    int maxfd;
    struct timeval tv;
    int user_term = 0;
-   gnutls_srp_client_credentials cred;
-   gnutls_anon_client_credentials anon_cred;
-   gnutls_certificate_credentials xcred;
    struct hostent *server_host;
+   socket_st hd;
 
    gaa_parser(argc, argv);
 
@@ -148,31 +205,35 @@ int main(int argc, char **argv)
 
    if (x509_cafile != NULL) {
       ret =
-	  gnutls_certificate_set_x509_trust_file(xcred, x509_cafile,
-					 x509ctype);
+	  gnutls_certificate_set_x509_trust_file(xcred,
+						 x509_cafile, x509ctype);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 trust file\n");
       } else {
-      	 printf("Processed %d CA certificate(s).\n", ret);
+	 printf("Processed %d CA certificate(s).\n", ret);
       }
    }
 
    if (x509_certfile != NULL) {
       ret =
-	  gnutls_certificate_set_x509_key_file(xcred, x509_certfile,
-				       x509_keyfile, x509ctype);
+	  gnutls_certificate_set_x509_key_file(xcred,
+					       x509_certfile,
+					       x509_keyfile, x509ctype);
       if (ret < 0) {
-	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s')\n",
+	 fprintf(stderr,
+		 "Error setting the x509 key files ('%s', '%s')\n",
 		 x509_certfile, x509_keyfile);
       }
    }
 
    if (pgp_certfile != NULL) {
       ret =
-	  gnutls_certificate_set_openpgp_key_file(xcred, pgp_certfile,
+	  gnutls_certificate_set_openpgp_key_file(xcred,
+						  pgp_certfile,
 						  pgp_keyfile);
       if (ret < 0) {
-	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s')\n",
+	 fprintf(stderr,
+		 "Error setting the x509 key files ('%s', '%s')\n",
 		 pgp_certfile, pgp_keyfile);
       }
    }
@@ -194,13 +255,13 @@ int main(int argc, char **argv)
 /*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 
    /* SRP stuff */
-   if (srp_username!=NULL) {
+   if (srp_username != NULL) {
       if (gnutls_srp_allocate_client_cred(&cred) < 0) {
-         fprintf(stderr, "SRP authentication error\n");
+	 fprintf(stderr, "SRP authentication error\n");
       }
       gnutls_srp_set_client_cred(cred, srp_username, srp_passwd);
    }
-   
+
    /* ANON stuff */
    if (gnutls_anon_allocate_client_cred(&anon_cred) < 0) {
       fprintf(stderr, "Anonymous authentication error\n");
@@ -229,110 +290,63 @@ int main(int argc, char **argv)
    err = connect(sd, (SA *) & sa, sizeof(sa));
    ERR(err, "connect");
 
-   for (i = 0; i < 2; i++) {
-      gnutls_init(&session, GNUTLS_CLIENT);
+   hd.secure = 0;
+   hd.fd = sd;
 
-      /* allow the use of private ciphersuites.
-       */
-      gnutls_handshake_set_private_extensions( session, 1);
+   hd.session = init_tls_session();
+   if (starttls)
+      goto after_handshake;
+
+   for (i = 0; i < 2; i++) {
+
 
       if (i == 1) {
-	 gnutls_session_set_data(session, session_data, session_data_size);
+	 hd.session = init_tls_session();
+	 gnutls_session_set_data(hd.session, session_data,
+				 session_data_size);
 	 free(session_data);
-      }
-
-      gnutls_cipher_set_priority(session, cipher_priority);
-      gnutls_compression_set_priority(session, comp_priority);
-      gnutls_kx_set_priority(session, kx_priority);
-      gnutls_protocol_set_priority(session, protocol_priority);
-      gnutls_mac_set_priority(session, mac_priority);
-      gnutls_certificate_type_set_priority(session, cert_type_priority);
-
-      gnutls_dh_set_prime_bits(session, 512);
-
-      gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
-      if (srp_username!=NULL)
-         gnutls_cred_set(session, GNUTLS_CRD_SRP, cred);
-      gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-
-      /* send the fingerprint */
-      if (fingerprint != 0)
-	 gnutls_openpgp_send_key(session, GNUTLS_OPENPGP_KEY_FINGERPRINT);
-
-      /* use the max record size extension */
-      if (record_max_size > 0) {
-	 if (gnutls_record_set_max_size(session, record_max_size) < 0) {
-	    fprintf(stderr, "Cannot set the maximum record size to %d.\n",
-		    record_max_size);
-	    exit(1);
-	 }
       }
 
 /* This TLS extension may break old implementations.
  */
-      gnutls_transport_set_ptr(session, sd);
-      do {
-	 ret = gnutls_handshake(session);
-      } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+
+      ret = do_handshake(&hd);
 
       if (ret < 0) {
 	 if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 	     || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-	    alert = gnutls_alert_get(session);
+	    alert = gnutls_alert_get(hd.session);
 	    printf("*** Received alert [%d]: %s\n",
 		   alert, gnutls_alert_get_name(alert));
 	 }
 	 fprintf(stderr, "*** Handshake has failed\n");
 	 gnutls_perror(ret);
-	 gnutls_deinit(session);
+	 gnutls_deinit(hd.session);
 	 return 1;
       } else {
 	 printf("- Handshake was completed\n");
-	 if (gnutls_session_is_resumed( session)!=0)
-	 	printf("*** This is a resumed session\n");
-      }
-
-      if (i == 1) {		/* resume */
-	 /* check if we actually resumed the previous session */
-
-	 gnutls_session_get_id(session, NULL, &tmp_session_id_size);
-	 tmp_session_id = malloc(tmp_session_id_size);
-	 gnutls_session_get_id(session, tmp_session_id,
-			       &tmp_session_id_size);
-
-	 if (memcmp(tmp_session_id, session_id, session_id_size) == 0) {
-	    printf("- Previous session was resumed\n");
-	 } else {
-	    fprintf(stderr, "*** Previous session was NOT resumed\n");
-	 }
-	 free(tmp_session_id);
-	 free(session_id);
+	 if (gnutls_session_is_resumed(hd.session) != 0)
+	    printf("*** This is a resumed session\n");
       }
 
 
 
       if (resume != 0 && i == 0) {
 
-	 gnutls_session_get_data(session, NULL, &session_data_size);
+	 gnutls_session_get_data(hd.session, NULL, &session_data_size);
 	 session_data = malloc(session_data_size);
-	 gnutls_session_get_data(session, session_data, &session_data_size);
+	 gnutls_session_get_data(hd.session, session_data,
+				 &session_data_size);
 
-	 gnutls_session_get_id(session, NULL, &session_id_size);
+	 gnutls_session_get_id(hd.session, NULL, &session_id_size);
 	 session_id = malloc(session_id_size);
-	 gnutls_session_get_id(session, session_id, &session_id_size);
+	 gnutls_session_get_id(hd.session, session_id, &session_id_size);
 
 	 /* print some information */
-	 print_info(session);
+	 print_info(hd.session);
 
 	 printf("- Disconnecting\n");
-	 do {
-	    ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
-	 } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-
-	 shutdown(sd, SHUT_WR);
-	 close(sd);
-
-	 gnutls_deinit(session);
+	 socket_bye(hd);
 
 	 printf
 	     ("\n\n- Connecting again- trying to resume previous session\n");
@@ -347,7 +361,9 @@ int main(int argc, char **argv)
    }
 
 /* print some information */
-   print_info(session);
+   print_info(hd.session);
+
+ after_handshake:
 
    printf("\n- Simple Client Mode:\n\n");
 
@@ -363,92 +379,68 @@ int main(int argc, char **argv)
 
       if (FD_ISSET(sd, &rset)) {
 	 bzero(buffer, MAX_BUF + 1);
-	 do {
-	    ret = gnutls_record_recv(session, buffer, MAX_BUF);
-	 } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-	 /* remove new line */
+	 ret = socket_recv(hd, buffer, MAX_BUF);
 
-	 if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
-	    if (ret == 0) {
-	       printf("- Peer has closed the GNUTLS connection\n");
-	       break;
-	    } else {
-	       fprintf(stderr,
-		       "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
-		       ret);
-	       break;
-	    }
-	 } else {
-	    if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
-		|| ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-	       printf("* Received alert [%d]\n", gnutls_alert_get(session));
-	    if (ret == GNUTLS_E_REHANDSHAKE) {
-	       /* There is a race condition here. If application
-	        * data is sent after the rehandshake request,
-	        * the server thinks we ignored his request.
-	        * This is a bad design of this client.
-	        */
-	       printf("* Received rehandshake request\n");
-	       /* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
-
-	       do {
-		  ret = gnutls_handshake(session);
-	       } while (ret == GNUTLS_E_AGAIN
-			|| ret == GNUTLS_E_INTERRUPTED);
-
-	       if (ret == 0) {
-		  printf("* Rehandshake was performed\n");
-	       } else {
-		  printf("* Rehandshake Failed [%d]\n", ret);
-	       }
-	    }
-	    if (ret > 0) {
-	       if (quiet!=0) printf("- Received[%d]: ", ret);
-	       for (ii = 0; ii < ret; ii++) {
-		  fputc(buffer[ii], stdout);
-	       }
-	       fputs("\n", stdout);
+	 if (ret == 0) {
+	    printf("- Peer has closed the GNUTLS connection\n");
+	    break;
+	 } else if (ret < 0) {
+	    fprintf(stderr,
+		    "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
+		    ret);
+	    break;
+	 } else if (ret > 0) {
+	    if (quiet != 0)
+	       printf("- Received[%d]: ", ret);
+	    for (ii = 0; ii < ret; ii++) {
+	       fputc(buffer[ii], stdout);
 	    }
 	 }
+
 	 if (user_term != 0)
 	    break;
       }
 
       if (FD_ISSET(fileno(stdin), &rset)) {
 	 if (fgets(buffer, MAX_BUF, stdin) == NULL) {
-	    do {
-	       ret = gnutls_bye(session, GNUTLS_SHUT_WR);
-	    } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-	    user_term = 1;
-	    continue;
-	 }
-	 do {
-	    if ( crlf != 0) {
-	        char* b=strchr( buffer, '\n');
-	        if (b!=NULL)
-		    	strcpy( b, "\r\n");
+  	    if (hd.secure == 0) {
+  	       fprintf(stderr, "*** Starting TLS handshake\n");
+	       ret = do_handshake(&hd);
+	       if (ret < 0) {
+ 		 fprintf(stderr, "*** Handshake has failed\n");
+		 gnutls_perror(ret);
+		 gnutls_deinit(hd.session);
+	       }
+	       continue;
+            } else {
+  	       socket_bye(hd);
+	       user_term = 1;
+	       continue;
 	    }
-	    	
-	    ret = gnutls_record_send(session, buffer, strlen(buffer));
-	 } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+	 }
+
+	 if (crlf != 0) {
+	    char *b = strchr(buffer, '\n');
+	    if (b != NULL)
+	       strcpy(b, "\r\n");
+	 }
+
+	 ret = socket_send(hd, buffer, strlen(buffer));
+
 	 if (ret > 0) {
-	    if (quiet!=0) printf("- Sent: %d bytes\n", ret);
+	    if (quiet != 0)
+	       printf("- Sent: %d bytes\n", ret);
 	 } else
 	    GERR(ret);
 
       }
    }
+
    if (user_term != 0)
-      do
-	 ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
-      while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+      socket_bye(hd);
 
-   shutdown(sd, SHUT_RDWR);	/* no more receptions */
-   close(sd);
 
-   gnutls_deinit(session);
-
-   if (srp_username!=NULL) 
+   if (srp_username != NULL)
       gnutls_srp_free_client_cred(cred);
    gnutls_certificate_free_cred(xcred);
    gnutls_anon_free_client_cred(anon_cred);
@@ -471,6 +463,7 @@ void gaa_parser(int argc, char **argv)
       exit(1);
    }
 
+   starttls = info.starttls;
    resume = info.resume;
    port = info.port;
    record_max_size = info.record_size;
@@ -517,19 +510,19 @@ void gaa_parser(int argc, char **argv)
    else
       srp_username = DEFAULT_SRP_USERNAME;
 #else
-      srp_username = info.srp_username;
-      srp_passwd = info.srp_passwd;
-      x509_cafile = info.x509_cafile;
-      x509_keyfile = info.x509_keyfile;
-      x509_certfile = info.x509_certfile;
-      pgp_keyfile = info.pgp_keyfile;
-      pgp_certfile = info.pgp_certfile;
+   srp_username = info.srp_username;
+   srp_passwd = info.srp_passwd;
+   x509_cafile = info.x509_cafile;
+   x509_keyfile = info.x509_keyfile;
+   x509_certfile = info.x509_certfile;
+   pgp_keyfile = info.pgp_keyfile;
+   pgp_certfile = info.pgp_certfile;
 
 #endif
 
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;
-   
+
    crlf = info.crlf;
 
    if (info.nrest_args == 0)
@@ -617,7 +610,106 @@ void gaa_parser(int argc, char **argv)
 
 }
 
-void cli_version(void) {
-	fprintf(stderr, "GNU TLS test client, ");
-	fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
+void cli_version(void)
+{
+   fprintf(stderr, "GNU TLS test client, ");
+   fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
+}
+
+
+
+/* Functions to manipulate sockets
+ */
+
+ssize_t socket_recv(socket_st socket, void *buffer, int buffer_size)
+{
+   int ret;
+
+   if (socket.secure)
+      do {
+	 ret = gnutls_record_recv(socket.session, buffer, buffer_size);
+      } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+   else
+      do {
+	 ret = recv(socket.fd, buffer, buffer_size, 0);
+      } while (ret == -1 && errno == EINTR);
+
+   return ret;
+}
+
+ssize_t socket_send(socket_st socket, void *buffer, int buffer_size)
+{
+   int ret;
+
+   if (socket.secure)
+      do {
+	 ret = gnutls_record_send(socket.session, buffer, strlen(buffer));
+      } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+   else
+      do {
+	 ret = send(socket.fd, buffer, strlen(buffer), 0);
+      } while (ret == -1 && errno == EINTR);
+
+
+   return ret;
+}
+
+void socket_bye(socket_st socket)
+{
+   int ret;
+
+   if (socket.secure) {
+      do
+	 ret = gnutls_bye(socket.session, GNUTLS_SHUT_RDWR);
+      while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+      gnutls_deinit(socket.session);
+   }
+
+   shutdown(socket.fd, SHUT_RDWR);	/* no more receptions */
+   close(socket.fd);
+}
+
+void check_rehandshake(socket_st socket, int ret)
+{
+   if (socket.secure && ret == GNUTLS_E_REHANDSHAKE) {
+      /* There is a race condition here. If application
+       * data is sent after the rehandshake request,
+       * the server thinks we ignored his request.
+       * This is a bad design of this client.
+       */
+      printf("* Received rehandshake request\n");
+      /* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
+
+      do {
+	 ret = gnutls_handshake(socket.session);
+      } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+      if (ret == 0) {
+	 printf("* Rehandshake was performed\n");
+      } else {
+	 printf("* Rehandshake Failed [%d]\n", ret);
+      }
+   }
+}
+
+void check_alert(socket_st socket, int ret)
+{
+   if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
+       || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
+      printf("* Received alert [%d]\n", gnutls_alert_get(socket.session));
+
+      check_rehandshake(socket, ret);
+   }
+}
+
+int do_handshake(socket_st* socket)
+{
+   int ret;
+   gnutls_transport_set_ptr(socket->session, socket->fd);
+   do {
+      ret = gnutls_handshake(socket->session);
+   } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+
+   socket->secure = 1;
+   return ret;
 }

@@ -14,6 +14,9 @@ helpnode "GNU TLS test client\nUsage:  gnutls-cli [options] hostname\n\n"
 #int resume;
 option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again and resume this session."
 
+#int starttls;
+option (s, starttls) { $starttls = 1 } "Connect, establish a plain session and start TLS when EOF is sent."
+
 #int crlf;
 option (crlf) { $crlf = 1 } "Send CR LF instead of LF."
 
@@ -98,6 +101,6 @@ init { $resume=0; $port=443; $rest_args=NULL; $nrest_args=0; $ciphers=NULL;
 	$fingerprint=0; $pgp_trustdb=NULL; $pgp_keyring=NULL;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $crlf = 0;
-	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; }
+	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; }
 
 
