@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Fabio Fiorina
+ *      Copyright (C) 2000,2001 Fabio Fiorina
  *
  * This file is part of GNUTLS.
  *
@@ -30,6 +30,7 @@
 #include "../lib/cert_asn1.h"
 #include "../lib/cert_der.h"
 
+extern static_asn pkix_asn1_tab[];
 
 /******************************************************/
 /* Function : get_name_type                           */
@@ -428,12 +429,7 @@ main(int argc,char *argv[])
   char file_name[128];
   node_asn *PKIX1Implicit88;
 
-  if(argc==2) strcpy(file_name,argv[1]);
-  else file_name[0]=0;
-
-  strcat(file_name,"pkix.asn");
-
-  result=asn1_parser_asn1(file_name,&PKIX1Implicit88);
+  result=asn1_create_tree(pkix_asn1_tab,&PKIX1Implicit88);
 
   if(result==ASN_FILE_NOT_FOUND){
     printf("FILE NOT FOUND\n");

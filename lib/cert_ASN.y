@@ -358,15 +358,11 @@ definitions:   definitions_id
                     _asn1_set_down($$,$1);
       		    if(parse_mode==PARSE_MODE_CREATE){
 		      _asn1_set_default_tag($$);
-		      _asn1_change_integer_value($$);
 		      _asn1_type_set_config($$);
 		      result_parse=_asn1_check_identifier($$);
 		      if(result_parse==ASN_IDENTIFIER_NOT_FOUND)
 		      	asn1_delete_structure($$);
-		      else{
-			_asn1_expand_object_id($$);
-			p_tree=$$;
-		      }
+		      else p_tree=$$;
 		    }}
 ;
 
@@ -483,6 +479,8 @@ asn1_parser_asn1(char *file_name,node_asn **pointer)
 
     parse_mode=PARSE_MODE_CREATE;
     yyparse();
+    _asn1_change_integer_value(p_tree);
+    _asn1_expand_object_id(p_tree);
   }
 
   fclose(file_asn1);
@@ -490,6 +488,54 @@ asn1_parser_asn1(char *file_name,node_asn **pointer)
   parse_mode=PARSE_MODE_CREATE;
 
   *pointer=p_tree;
+
+  return result_parse;
+}
+
+
+
+/*************************************************************/
+/*  Function: parser_asn1_file_c                             */
+/*  Description: function that generates a C structure from  */
+/*               an ASN1 file                                */
+/*  Parameters:                                              */
+/*    char *file_name : file name to parse                   */
+/*  Return: int                                              */
+/*                                                           */
+/*************************************************************/
+int 
+asn1_parser_asn1_file_c(char *file_name)
+{
+  int result;
+
+  /*  yydebug=1;  */
+
+  p_tree=NULL;
+    
+  file_asn1=fopen(file_name,"r");
+
+  if(file_asn1==NULL) return ASN_FILE_NOT_FOUND;
+
+  result_parse=ASN_OK;
+
+  parse_mode=PARSE_MODE_CHECK;
+  yyparse();
+
+  if(result_parse==ASN_OK){
+    fclose(file_asn1);
+    file_asn1=fopen(file_name,"r");
+
+    parse_mode=PARSE_MODE_CREATE;
+    yyparse();
+
+    result=_asn1_create_static_structure(p_tree,file_name);
+
+    asn1_delete_structure(p_tree);
+   }
+
+  fclose(file_asn1);
+
+  parse_mode=PARSE_MODE_CREATE;
 
   return result_parse;
 }

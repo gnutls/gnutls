@@ -69,6 +69,9 @@
 #define CONST_SET         (1<<27)
 #define CONST_ASSIGN      (1<<28)
 
+#define CONST_DOWN        (1<<29)
+#define CONST_RIGHT       (1<<30)
+
 
 #define ASN_OK                    0
 #define ASN_FILE_NOT_FOUND        1
@@ -83,7 +86,6 @@
 #define ASN_ERROR_TYPE_ANY       10
 #define ASN_SYNTAX_ERROR         11
 
-
 /******************************************************/
 /* Structure definition used for the node of the tree */
 /* that rappresent an ASN.1 DEFINITION.               */
@@ -96,6 +98,14 @@ typedef struct node_asn_struct{
   struct node_asn_struct *right; /* Pointer to the brother node */
   struct node_asn_struct *left;  /* Pointer to the next list element */ 
 } node_asn;
+
+
+
+typedef struct static_struct_asn{
+  char *name;                    /* Node name */
+  unsigned int type;             /* Node type */
+  unsigned char *value;          /* Node value */
+} static_asn;
 
 
 /****************************************/

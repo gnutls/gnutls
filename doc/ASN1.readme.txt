@@ -11,8 +11,9 @@
 
 INTRODUCTION
 ------------
-This file describes the third version of ASN.1 parser I developed.
-The main difference from the first version is the use of pointers.
+This file describes the forth version of ASN.1 parser I developed.
+The main difference from the first version is the use of pointers and the
+possibility to save/get ASN1 definitions in/from a C vector.
 Other differences are:
 - write_value function for type ANY
 - the introduction of ENUMERATED type,
@@ -30,6 +31,7 @@ cert_ASN.y            bison input file
 cert_ASN.tab.c        bison output file
 CertificateExample.c  example based on Appendix D.1 of rfc2459
 CrlExample.c          example based on Appendix D.4 of rfc2459
+PkixTabExample.c      the program used to create pkix_asn1_tab.c
 cert_asn1.c           functions for ASN1 parser and for reading and setting elements' value
 cert_asn1.h           contains constants for the gnutls_asn1.c. Must be included in files 
                       that use ASN1 parser.
@@ -37,6 +39,8 @@ cert_der.c            functions for der encoding creation and analysis
 cert_der.h            contains constants for the gnutls_der.c. Must be included in files 
                       that use ASN1 parser.
 pkix.asn              certificate and CRL structures 
+pkix_asn1_tab.c       C vector to use with 'asn1_create_tree' function. 
+                      It was created from pkix.asn file.
 
 
 ASN.1 SYNTAX
@@ -132,9 +136,36 @@ Return Value:
   ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
 
 
+   int asn1_parser_asn1_file_c(char *file_name);
+   --------------------------------------------
+Creates a file containing a C vector to use to manage the definitions included in
+*FILE_NAME file. If *FILE_NAME is "/aa/bb/xx.yy" the file created is "/aa/bb/xx_asn1_tab.c",
+and the vector is "xx_asn1_tab".
+Input Parameter: 
+  char *file_name: specify the path and the name of file that contains ASN.1 declarations.
+Return Value:
+  ASN_OK: the file has a correct syntax and every identifier is known. 
+  ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
+  ASN_SYNTAX_ERROR: the syntax is not correct.
+  ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
+
+
+  int asn1_create_tree(static_asn *root,node_asn **pointer);
+  ---------------------------------------------------------
+Creates the structures needed to manage the ASN1 definitions. ROOT is a vector created by
+'asn1_parser_asn1_file_c' function.
+Input Parameter: 
+  static_asn *root: specify vector that contains ASN.1 declarations.
+Output Parameter:
+  node_asn **pointer : return the pointer to the structure created by *ROOT ASN.1 declarations.  
+Return Value:
+  ASN_OK: structure created correctly. 
+  ASN_GENERIC_ERROR: an error occured while structure creation.
+
+
    int asn1_create_structure(node_asn *p_structure,char *source_name,node_asn **pointer,
                         char *dest_name,);
-   -------------------------------------------------------
+   -------------------------------------------------------------------------------------
 Creates a structure called DEST_NAME of type SOURCE_NAME.
 Input Parameters:
   node_asn *p_structure: pointer to the structure returned by "parser_asn1" function 
@@ -324,13 +355,12 @@ the structure *POINTER.
 
 FUTURE DEVELOPMENTS
 -------------------
-1. Create a parser that creates C static functions to avoid files for initialization.
-2. type REAL 
-3. improve the error signaling with strings that give you more details. 
+1. type REAL 
+2. improve the error signaling with strings that give you more details. 
    Examples: in case of ASN1 syntax error you will have the line number where the error is,  
              if creating a der encoding the result is ASN_VALUE_NOT_FOUND you will have the
              name of the element without the value.
-4. improve the 'visit_tree' function and change the output from stdout to a null terminated 
+3. improve the 'visit_tree' function and change the output from stdout to a null terminated 
    string.  
 
 

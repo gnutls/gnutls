@@ -30,13 +30,20 @@
 /*
 #include <string.h>  
 #include <stdlib.h> 
+#include <stdio.h>
 */
 
 #include "cert_asn1.h"
 #include "cert_der.h"
 
 
+#define UP     1
+#define RIGHT  2
+#define DOWN   3
+
+
 int parse_mode;
+
 
 /******************************************************/
 /* Function : add_node                                */
@@ -310,6 +317,143 @@ _asn1_convert_integer(char *value,unsigned char *value_out,int *len)
 }
 
 
+int
+asn1_create_tree(static_asn *root,node_asn **pointer)
+{
+  node_asn *p,*p_last;
+  unsigned long k;
+  int move;
+
+  *pointer=NULL;
+  move=UP;
+
+  k=0;
+  while(root[k].value || root[k].type || root[k].name){
+    p=_asn1_add_node(root[k].type&(~CONST_DOWN));
+    if(root[k].name) _asn1_set_name(p,root[k].name);
+    if(root[k].value) _asn1_set_value(p,root[k].value,strlen(root[k].value)+1);
+
+    if(*pointer==NULL) *pointer=p;
+
+    if(move==DOWN) _asn1_set_down(p_last,p);
+    else if(move==RIGHT) _asn1_set_right(p_last,p);
+
+    p_last=p;
+
+    if(root[k].type&CONST_DOWN) move=DOWN;
+    else if(root[k].type&CONST_RIGHT) move=RIGHT;
+    else{
+      while(1){
+	if(p_last==*pointer) break;
+   
+	p_last= _asn1_find_up(p_last);
+
+	if(p_last==NULL) break;
+
+	if(p_last->type&CONST_RIGHT){
+	  p_last->type&=~CONST_RIGHT;
+	  move=RIGHT;
+	  break;
+	}
+      }
+    }
+    k++;
+  }
+
+  if(p_last==*pointer){
+    _asn1_change_integer_value(*pointer);
+    _asn1_expand_object_id(*pointer);
+  }
+  else asn1_delete_structure(*pointer);
+
+  return (p_last==*pointer)?ASN_OK:ASN_GENERIC_ERROR;
+}
+
+
+int
+_asn1_create_static_structure(node_asn *pointer,char *file_name)
+{
+  FILE *file;  
+  node_asn *p;
+  unsigned long t;
+  char structure_name[128],file_out_name[128],*char_p,*slash_p,*dot_p;
+
+  char_p=file_name;
+  slash_p=file_name;
+  while(char_p=strchr(char_p,'/')){
+    char_p++;
+    slash_p=char_p;
+  }
+
+  char_p=slash_p;
+  dot_p=file_name+strlen(file_name);
+
+  while(char_p=strchr(char_p,'.')){
+    dot_p=char_p;
+    char_p++;
+  }
+
+  memcpy(structure_name,slash_p,dot_p-slash_p);
+  structure_name[dot_p-slash_p]=0;
+  strcat(structure_name,"_asn1_tab");
+
+  memcpy(file_out_name,file_name,dot_p-file_name);
+  file_out_name[dot_p-file_name]=0;
+  strcat(file_out_name,"_asn1_tab.c");
+
+  file=fopen(file_out_name,"w");
+
+  if(file==NULL) return ASN_FILE_NOT_FOUND;
+
+ fprintf(file,"\n#include \"cert_asn1.h\"\n\n");
+ fprintf(file,"const static_asn %s[]={\n",structure_name);
+
+ p=pointer;
+
+ while(p){
+   fprintf(file,"  {");
+
+   if(p->name) fprintf(file,"\"%s\",",p->name);
+   else fprintf(file,"0,");
+
+   t=p->type;
+   if(p->down) t|=CONST_DOWN;
+   if(p->right) t|=CONST_RIGHT;
+
+   fprintf(file,"%lu,",t);
+
+   if(p->value) fprintf(file,"\"%s\"},\n",p->value);
+   else fprintf(file,"0},\n");
+
+   if(p->down){
+     p=p->down;
+   }
+   else if(p->right){
+     p=p->right;
+   }
+   else{
+     while(1){
+       p=_asn1_find_up(p);
+       if(p==pointer){
+	 p=NULL;
+	 break;
+       }
+       if(p->right){
+	 p=p->right;
+	 break;
+       }
+     }
+   }
+ }
+
+ fprintf(file,"  {0,0,0}\n};\n");
+
+ fclose(file);
+
+ return ASN_OK;
+}
+
+
 void
 asn1_visit_tree(node_asn *pointer,char *name)
 {
@@ -524,12 +668,6 @@ asn1_delete_structure(node_asn *root)
   }
   return ASN_OK;
 }
-
-
-
-#define UP     1
-#define RIGHT  2
-#define DOWN   3
 
 
 node_asn *
