@@ -985,11 +985,6 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	/* set defaults to zero 
-	 */
-	memset( &cert_list[0][i - 1], 0,
-	       sizeof(gnutls_cert));
-
 	tmp.data = (opaque*) input_cert;
 	tmp.size = input_cert_size;
 
@@ -1061,10 +1056,6 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
-
-			/* set defaults to zero 
-			 */
-			memset( &cert_list[0][i - 1], 0, sizeof(gnutls_cert));
 
 			tmp2.data = pcert;
 			tmp2.size = pcert_size;
@@ -1138,10 +1129,6 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		/* set defaults to zero 
-		 */
-		memset( &cert_list[0][i - 1], 0,
-		       sizeof(gnutls_cert));
 
 		tmp.data = b64;
 		tmp.size = siz2;
@@ -2067,7 +2054,6 @@ int _gnutls_verify_x509_mem( const char *ca, int ca_size)
 			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		memset(&x509_ca_list[i - 1], 0, sizeof(gnutls_cert));
 
 		tmp.data = b64;
 		tmp.size = siz2;

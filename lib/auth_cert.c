@@ -289,7 +289,6 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-
 	if (state->gnutls_internals.client_cert_callback != NULL) {
 		/* if try>=0 then the client wants automatic
 		 * choose of certificate, otherwise (-1), he
@@ -332,9 +331,38 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		gnutls_datum *my_certs = NULL;
 		gnutls_datum *issuers_dn = NULL;
 		int count;
+		int issuers_dn_len = 0;
+		opaque* dataptr = data;
+		int dataptr_size = data_size;
+
+		/* Count the number of the given issuers;
+		 * This is used to allocate the issuers_dn without
+		 * using realloc().
+		 */
+		do {
+			dataptr_size -= 2;
+			if (dataptr_size <= 0)
+				goto clear;
+			size = READuint16(data);
+
+			dataptr_size -= size;
+			if (dataptr_size < 0)
+				goto clear;
+
+			dataptr += 2;
+
+			issuers_dn_len++;
+
+			dataptr += size;
+
+			if (dataptr_size == 0)
+				break;
+
+		} while (1);
+
 
 		my_certs =
-		    gnutls_malloc(cred->ncerts * sizeof(gnutls_datum));
+		    gnutls_alloca(cred->ncerts * sizeof(gnutls_datum));
 		if (my_certs == NULL)
 			goto clear;
 
@@ -344,48 +372,46 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		if (gnutls_cert_type_get(state) == GNUTLS_CRT_X509) {
 			data = _data;
 			data_size = _data_size;
-			count = 0;	/* holds the number of given CA's DN */
-			do {
-				data_size -= 2;
-				if (data_size <= 0)
-					goto clear;
-				size = READuint16(data);
-				data_size -= size;
-				if (data_size < 0)
-					goto clear;
 
+			issuers_dn = gnutls_alloca( issuers_dn_len * sizeof(gnutls_datum));
+			if (issuers_dn == NULL)
+				goto clear;
+
+			for (i=0;i<issuers_dn_len;i++) {
+				/* The checks here for the buffer boundaries
+				 * are not needed since the buffer has been
+				 * parsed above.
+				 */
+				data_size -= 2;
+
+				size = READuint16(data);
 
 				data += 2;
 
-				issuers_dn =
-				    gnutls_realloc_fast(issuers_dn,
-							(count +
-							 1) *
-							sizeof
-							(gnutls_datum));
-				if (issuers_dn == NULL)
-					goto clear;
-
-				issuers_dn->data = data;
-				issuers_dn->size = size;
-
-				count++;	/* otherwise we have failed */
+				issuers_dn[count].data = data;
+				issuers_dn[count].size = size;
 
 				data += size;
 
-				if (data_size == 0)
-					break;
+			}
 
-			} while (1);
 		} else {	/* Other certificate types */
-			count = 0;
+			issuers_dn_len = 0;
 			issuers_dn = NULL;
 		}
 
 		/* maps j -> i */
-		ij_map = gnutls_malloc(sizeof(int) * cred->ncerts);
+		ij_map = gnutls_alloca(sizeof(int) * cred->ncerts);
+		if (ij_map==NULL) {
+			gnutls_assert();
+			goto clear;
+		}
 
 		/* put our certificate's issuer and dn into cdn, idn
+		 * Note that the certificates we provide to the callback
+		 * are not all the certificates we have. Only the certificates
+		 * that are requested by the server (CA matches - and sign
+		 * algorithm matches), are provided.
 		 */
 		for (j = i = 0; i < cred->ncerts; i++) {
 			if ((cred->cert_list[i][0].cert_type ==
@@ -403,12 +429,13 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 				my_certs[j++] = cred->cert_list[i][0].raw;
 			}
 		}
+
 		indx =
 		    state->gnutls_internals.client_cert_callback(state,
 								 my_certs,
 								 j,
 								 issuers_dn,
-								 count);
+								 issuers_dn_len);
 
 		/* the indx returned by the user is relative
 		 * to the certificates we provided him.
@@ -418,9 +445,9 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		indx = ij_map[indx];
 
 	      clear:
-		gnutls_free(my_certs);
-		gnutls_free(issuers_dn);
-		gnutls_free(ij_map);
+		gnutls_afree(my_certs);
+		gnutls_afree(ij_map);
+		gnutls_afree(issuers_dn);
 	}
 
 	*ind = indx;
@@ -691,13 +718,15 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	 */
 
 	peer_certificate_list =
-	    gnutls_calloc(1, sizeof(gnutls_cert) *
+	    gnutls_alloca( sizeof(gnutls_cert) *
 			  (peer_certificate_list_size));
 
 	if (peer_certificate_list == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+	memset( peer_certificate_list, 0, sizeof(gnutls_cert)*
+					peer_certificate_list_size);
 
 	p = data + 3;
 
@@ -718,7 +747,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 						   [j], tmp)) < 0) {
 			gnutls_assert();
 			CLEAR_CERTS;
-			gnutls_free(peer_certificate_list);
+			gnutls_afree(peer_certificate_list);
 			return ret;
 		}
 
@@ -733,7 +762,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	    < 0) {
 		gnutls_assert();
 		CLEAR_CERTS;
-		gnutls_free(peer_certificate_list);
+		gnutls_afree(peer_certificate_list);
 		return ret;
 	}
 
@@ -743,12 +772,12 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	    < 0) {
 		gnutls_assert();
 		CLEAR_CERTS;
-		gnutls_free(peer_certificate_list);
+		gnutls_afree(peer_certificate_list);
 		return ret;
 	}
 
 	CLEAR_CERTS;
-	gnutls_free(peer_certificate_list);
+	gnutls_afree(peer_certificate_list);
 
 	return 0;
 }
@@ -862,12 +891,14 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	}
 
 	peer_certificate_list =
-	    gnutls_calloc(1, sizeof(gnutls_cert) *
+	    gnutls_alloca( sizeof(gnutls_cert) *
 			  (peer_certificate_list_size));
 		if (peer_certificate_list == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+	memset( peer_certificate_list, 0, sizeof(gnutls_cert)*
+			peer_certificate_list_size);
 
 
 	if ((ret =
@@ -876,7 +907,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		gnutls_assert();
 		gnutls_free_datum( &akey);
 		CLEAR_CERTS;
-		gnutls_free(peer_certificate_list);
+		gnutls_afree(peer_certificate_list);
 		return ret;
 	}
 	gnutls_free_datum( &akey);
@@ -888,7 +919,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	    < 0) {
 		gnutls_assert();
 		CLEAR_CERTS;
-		gnutls_free(peer_certificate_list);
+		gnutls_afree(peer_certificate_list);
 		return ret;
 	}
 
@@ -898,12 +929,12 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	    < 0) {
 		gnutls_assert();
 		CLEAR_CERTS;
-		gnutls_free(peer_certificate_list);
+		gnutls_afree(peer_certificate_list);
 		return ret;
 	}
 
 	CLEAR_CERTS;
-	gnutls_free(peer_certificate_list);
+	gnutls_afree(peer_certificate_list);
 
 	return 0;
 }

@@ -273,40 +273,26 @@ static ssize_t _gnutls_read( GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, i
  * Clears the peeked data (read with MSG_PEEK).
  */
 int _gnutls_io_clear_peeked_data( GNUTLS_STATE state) {
-char peekdata1[10];
-char *peekdata2 = NULL;
-char * peek;
+char *peekdata = NULL;
 int ret, sum;
 
 	if (state->gnutls_internals.have_peeked_data==0 || RCVLOWAT==0)
 		return 0;
 		
-	if (RCVLOWAT > sizeof(peekdata1)) {
-		peekdata2 = gnutls_malloc( RCVLOWAT);
-		if (peekdata2==NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
+	peekdata = gnutls_alloca( RCVLOWAT);
+	if (peekdata==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 		
-		peek = peekdata2;
-		
-        } else {
-        	peek = peekdata1;
-        }
-
         /* this was already read by using MSG_PEEK - so it shouldn't fail */
 	sum = 0;
         do { /* we need this to finish now */
-        	ret = _gnutls_read( state, peek, RCVLOWAT-sum, 0);
+        	ret = _gnutls_read( state, peekdata, RCVLOWAT-sum, 0);
         	if (ret > 0) sum+=ret;
        	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN || sum < RCVLOWAT);
 
-	/* This check is here to see if peekdata2 is malloced or
-	 * not. This is not clean I know.
-	 */
-	if (peek==peekdata2) {
-		gnutls_free(peekdata2);
-	}
+	gnutls_afree(peekdata);
 	
 	if (ret < 0) {
 		gnutls_assert();
@@ -634,7 +620,7 @@ ssize_t _gnutls_io_write_buffered2( GNUTLS_STATE state, const void *iptr, size_t
 		opaque* sptr;
 		ssize_t ret;
 
-		sptr = gnutls_malloc( n+n2);
+		sptr = gnutls_alloca( n+n2);
 		if (sptr==NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
@@ -644,8 +630,8 @@ ssize_t _gnutls_io_write_buffered2( GNUTLS_STATE state, const void *iptr, size_t
 		memcpy( &sptr[n], iptr2, n2);
 
 		ret = _gnutls_io_write_buffered( state, sptr, n+n2);
-		gnutls_free( sptr);
-	
+		gnutls_afree( sptr);
+
 		return ret;
 	}
 }

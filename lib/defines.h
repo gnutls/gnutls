@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -21,6 +21,21 @@
 #ifndef DEFINES_H
 # define DEFINES_H
 
+#ifndef __GNUC__
+# if HAVE_ALLOCA_H
+#  include <alloca.h>
+# else
+#  ifdef _AIX
+#pragma alloca
+#  else
+#   ifndef alloca	/* predefined by HP cc +Olibcalls */
+char *alloca();
+#   endif
+#  endif
+# endif
+#endif
+
+
 #include <config.h>
 
 #ifdef STDC_HEADERS
@@ -31,12 +46,12 @@
 #endif
 
 #ifdef NO_TIME_T
- typedef unsigned int time_t;
+typedef unsigned int time_t;
 #endif
 
 #ifdef NO_SIZE_T
- typedef unsigned int size_t;
- typedef int ssize_t;
+typedef unsigned int size_t;
+typedef int ssize_t;
 #endif
 
 #ifdef HAVE_STRINGS_H
@@ -74,38 +89,40 @@
 #if SIZEOF_UNSIGNED_LONG_INT == 8
 # define HAVE_UINT64
 /* only used native uint64 in 64 bit machines */
- typedef unsigned long int uint64;
+typedef unsigned long int uint64;
 #else
 /* some systems had problems with long long int, thus,
  * it is not used.
  */
- typedef struct { unsigned char i[8]; } uint64;
+typedef struct {
+	unsigned char i[8];
+} uint64;
 #endif
 
 
 #if SIZEOF_UNSIGNED_LONG_INT == 4
- typedef unsigned long int uint32;
- typedef signed long int sint32;
+typedef unsigned long int uint32;
+typedef signed long int sint32;
 #elif SIZEOF_UNSIGNED_INT == 4
- typedef unsigned int uint32;
- typedef signed int sint32;
+typedef unsigned int uint32;
+typedef signed int sint32;
 #else
 # error "Cannot find a 32 bit integer in your system, sorry."
 #endif
 
 #if SIZEOF_UNSIGNED_INT == 2
- typedef unsigned int uint16;
- typedef signed int sint16;
+typedef unsigned int uint16;
+typedef signed int sint16;
 #elif SIZEOF_UNSIGNED_SHORT_INT == 2
- typedef unsigned short int uint16;
- typedef signed short int sint16;
-#else 
+typedef unsigned short int uint16;
+typedef signed short int sint16;
+#else
 # error "Cannot find a 16 bit integer in your system, sorry."
 #endif
 
 #if SIZEOF_UNSIGNED_CHAR == 1
- typedef unsigned char uint8; 
- typedef signed char int8; 
+typedef unsigned char uint8;
+typedef signed char int8;
 #else
 # error "Cannot find an 8 bit char in your system, sorry."
 #endif
@@ -118,4 +135,4 @@
 # endif
 #endif
 
-#endif /* defines_h */
+#endif				/* defines_h */

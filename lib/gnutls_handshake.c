@@ -727,7 +727,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 
 	/* first run */
 	datasize = i_datasize + HANDSHAKE_HEADER_SIZE;
-	data = gnutls_malloc(datasize);
+	data = gnutls_alloca(datasize);
 	if (data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -749,7 +749,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 	if ( type != GNUTLS_HELLO_REQUEST)
 		if ( (ret= _gnutls_handshake_hash_add_sent( state, type, data, datasize)) < 0) {
 				gnutls_assert();
-				gnutls_free(data);
+				gnutls_afree(data);
 				return ret;
 		}
 
@@ -757,7 +757,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 	    _gnutls_handshake_io_send_int(state, GNUTLS_HANDSHAKE, type,
 				       data, datasize);
 
-	gnutls_free(data);
+	gnutls_afree(data);
 
 	return ret;
 }
@@ -1429,9 +1429,11 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 	data = NULL;
 	datalen = 0;
 	if (again == 0) {
+
 		datalen = 2 + (session_id_len + 1) + TLS_RANDOM_SIZE;
 		/* 2 for version, (4 for unix time + 28 for random bytes==TLS_RANDOM_SIZE) 
 		 */
+		 
 		data = gnutls_malloc(datalen + 16);	/* 16 is added to avoid realloc
 							 * if no much data are added.
 							 */
@@ -1596,9 +1598,12 @@ static int _gnutls_send_server_hello(GNUTLS_STATE state, int again)
 
 	if (again == 0) {
 		datalen = 2 + session_id_len + 1 + TLS_RANDOM_SIZE + 3;
-		data = gnutls_malloc(datalen);
+		extdatalen = _gnutls_gen_extensions(state, &extdata);
+
+		data = gnutls_alloca(datalen + extdatalen);
 		if (data == NULL) {
 			gnutls_assert();
+			gnutls_free(extdata);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
@@ -1635,15 +1640,8 @@ static int _gnutls_send_server_hello(GNUTLS_STATE state, int again)
 		data[pos++] = comp;
 
 
-		extdatalen = _gnutls_gen_extensions(state, &extdata);
 		if (extdatalen > 0) {
 			datalen += extdatalen;
-			data = gnutls_realloc_fast(data, datalen);
-			if (data == NULL) {
-				gnutls_free(extdata);
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
-			}
 
 			memcpy(&data[pos], extdata, extdatalen);
 			gnutls_free(extdata);
@@ -1653,8 +1651,7 @@ static int _gnutls_send_server_hello(GNUTLS_STATE state, int again)
 	ret =
 	    _gnutls_send_handshake(state, data, datalen,
 				   GNUTLS_SERVER_HELLO);
-	gnutls_free(data);
-
+	gnutls_afree(data);
 
 	return ret;
 }

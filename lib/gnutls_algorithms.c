@@ -1044,14 +1044,14 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 
 	version = gnutls_protocol_get_version( state);
 
-	tmp_ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
+	tmp_ciphers = gnutls_alloca(count * sizeof(GNUTLS_CipherSuite));
 	if ( tmp_ciphers==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
 	ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
 
 	if ( ciphers==NULL) {
-		gnutls_free( tmp_ciphers);
+		gnutls_afree( tmp_ciphers);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
@@ -1105,7 +1105,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 	}
 
 	*_ciphers = ciphers;
-	gnutls_free(tmp_ciphers);
+	gnutls_afree(tmp_ciphers);
 	return ret_count;
 }
 

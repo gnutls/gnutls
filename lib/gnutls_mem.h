@@ -7,6 +7,18 @@
 
 typedef void svoid; /* for functions that allocate using gnutls_secure_free */
 
+/* Use gnutls_afree() when calling alloca, or
+ * memory leaks may occur in systems which do not
+ * support alloca.
+ */
+#ifdef HAVE_ALLOCA
+# define gnutls_alloca alloca
+# define gnutls_afree(x)
+#else
+# define gnutls_alloca gnutls_malloc
+# define gnutls_afree gnutls_free
+#endif /* HAVE_ALLOCA */
+
 #ifdef USE_LIBCALLOC
 # define gnutls_malloc malloc
 # define gnutls_realloc realloc
