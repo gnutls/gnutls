@@ -302,7 +302,7 @@ fi
 
 libasn1_enabled=no
 
-AC_CHECK_LIB(asn1, asn1_array2tree,, 
+AC_CHECK_LIB(asn1, asn1_array2tree,:, 
  libasn1_enabled=yes
  AC_MSG_WARN(
 *** 
