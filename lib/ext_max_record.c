@@ -25,7 +25,7 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
-#include "ext_max_record.h"
+#include <ext_max_record.h>
 
 /* 
  * In case of a server: if a MAX_RECORD_SIZE extension type is received then it stores
@@ -123,7 +123,7 @@ int _gnutls_max_record_send_params( gnutls_session session, opaque* data, int da
 /* Maps numbers to record sizes according to the
  * extensions draft.
  */
-ssize_t _gnutls_mre_num2record( int num) {
+int _gnutls_mre_num2record( int num) {
 	switch( num) {
 	case 1:
 		return 512;
@@ -141,7 +141,7 @@ ssize_t _gnutls_mre_num2record( int num) {
 /* Maps record size to numbers according to the
  * extensions draft.
  */
-int _gnutls_mre_record2num( int record_size) {
+int _gnutls_mre_record2num( uint16 record_size) {
 	switch(record_size) {
 	case 512:
 		return 1;
