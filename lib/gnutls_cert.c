@@ -139,20 +139,21 @@ gnutls_dh_params _gnutls_certificate_get_dh_params(const gnutls_certificate_cred
 gnutls_params_st params;
 int ret;
 
-	if (session->internals.cert_dh_params) {
-		return session->internals.cert_dh_params;
+	if (session->internals.params.cert_dh_params) {
+		return session->internals.params.cert_dh_params;
 	}
 
 	if (sc->dh_params) {
-		session->internals.cert_dh_params = sc->dh_params;
+		session->internals.params.cert_dh_params = sc->dh_params;
 	} else if (sc->params_func) {
 		ret = sc->params_func( session, GNUTLS_PARAMS_DH, &params);
 		if (ret == 0 && params.type == GNUTLS_PARAMS_DH) {
-			session->internals.cert_dh_params = params.params.dh;
+			session->internals.params.cert_dh_params = params.params.dh;
+			session->internals.params.free_cert_dh_params = params.deinit;
 		}
 	}
 	
-	return session->internals.cert_dh_params;
+	return session->internals.params.cert_dh_params;
 }
 
 /*-
@@ -168,20 +169,21 @@ gnutls_rsa_params _gnutls_certificate_get_rsa_params(const gnutls_certificate_cr
 gnutls_params_st params;
 int ret;
 
-	if (session->internals.rsa_params) {
-		return session->internals.rsa_params;
+	if (session->internals.params.rsa_params) {
+		return session->internals.params.rsa_params;
 	}
 
 	if (sc->rsa_params) {
-		session->internals.rsa_params = sc->rsa_params;
+		session->internals.params.rsa_params = sc->rsa_params;
 	} else if (sc->params_func) {
 		ret = sc->params_func( session, GNUTLS_PARAMS_RSA_EXPORT, &params);
 		if (ret == 0 && params.type == GNUTLS_PARAMS_RSA_EXPORT) {
-			session->internals.rsa_params = params.params.rsa_export;
+			session->internals.params.rsa_params = params.params.rsa_export;
+			session->internals.params.free_rsa_params = params.deinit;
 		}
 	}
 	
-	return session->internals.rsa_params;
+	return session->internals.params.rsa_params;
 }
 
 

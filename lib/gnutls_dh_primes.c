@@ -205,6 +205,30 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
 }
 
 /**
+  * gnutls_dh_params_cpy - This function will copy a DH parameters structure
+  * @dst: Is the destination structure, which should be initialized.
+  * @src: Is the source structure
+  *
+  * This function will copy the DH parameters structure from source
+  * to destination.
+  *
+  **/
+int gnutls_dh_params_cpy(gnutls_dh_params dst, gnutls_dh_params src)
+{
+	if (src == NULL)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	dst->params[0] = _gnutls_mpi_copy(src->params[0]);
+	dst->params[1] = _gnutls_mpi_copy(src->params[1]);
+
+	if (dst->params[0]==NULL || dst->params[1] == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+
+	return 0;
+}
+
+
+/**
   * gnutls_dh_params_generate2 - This function will generate new DH parameters
   * @params: Is the structure that the DH parameters will be stored
   * @bits: is the prime's number of bits

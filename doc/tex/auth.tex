@@ -93,8 +93,8 @@ KX\_ANON\_DH & CRD\_ANON & CRD\_ANON
 
 Several parameters such as the ones used for Diffie-Hellman authentication
 are stored within the credentials structures, so all sessions can access
-them. Those parameters are stored in structures such as {\bf gnutls_dh_params}
-and {\bf gnutls_rsa_params}, and functions like 
+them. Those parameters are stored in structures such as {\bf gnutls\_dh\_params}
+and {\bf gnutls\_rsa\_params}, and functions like 
 \printfunc{gnutls_certificate_set_dh_params}{gnutls\_certificate\_set\_dh\_params}
 and
 \printfunc{gnutls_certificate_set_rsa_export_params}{gnutls\_certificate\_set\_rsa\_export\_params}
@@ -128,6 +128,9 @@ static int get_params( gnutls_session session, gnutls_params_type type,
    else return -1;
 
    st->type = type;
+   /* do not deinitialize those parameters.
+    */
+   st->deinit = 0;
 
    return 0;
 }

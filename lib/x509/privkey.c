@@ -82,6 +82,51 @@ int i;
 	gnutls_free(key);
 }
 
+/**
+  * gnutls_x509_privkey_cpy - This function copies a private key
+  * @dst: The destination key, which should be initialized.
+  * @src: The source key
+  *
+  * This function will copy a private key from source to destination key.
+  *
+  **/
+int gnutls_x509_privkey_cpy(gnutls_x509_privkey dst, gnutls_x509_privkey src)
+{
+int i, ret;
+
+	if (!src || !dst) return GNUTLS_E_INVALID_REQUEST;
+
+	for (i = 0; i < src->params_size; i++) {
+		dst->params[i] = _gnutls_mpi_copy( src->params[i]);
+		if (dst->params[i] == NULL) return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	dst->params_size = src->params_size;
+	dst->pk_algorithm = src->pk_algorithm;
+
+	switch( dst->pk_algorithm) {
+		case GNUTLS_PK_DSA:
+			ret = _encode_dsa( &dst->key, dst->params);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			break;
+		case GNUTLS_PK_RSA:
+			ret = _encode_rsa( &dst->key, dst->params);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return 0;
+}
+
 /* Converts an RSA PKCS#1 key to
  * an internal structure (gnutls_private_key)
  */

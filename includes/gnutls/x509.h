@@ -311,6 +311,7 @@ typedef enum gnutls_pkcs_encrypt_flags {
 
 int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
 void gnutls_x509_privkey_deinit(gnutls_x509_privkey key);
+int gnutls_x509_privkey_cpy(gnutls_x509_privkey dst, gnutls_x509_privkey src);
 int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
 int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key, const gnutls_datum * data,

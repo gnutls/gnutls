@@ -59,18 +59,20 @@ gnutls_dh_params _gnutls_anon_get_dh_params(const gnutls_anon_server_credentials
 gnutls_params_st params;
 int ret;
 
-	if (session->internals.anon_dh_params) return session->internals.anon_dh_params;
+	if (session->internals.params.anon_dh_params) 
+		return session->internals.params.anon_dh_params;
 
 	if (sc->dh_params) {
-		session->internals.anon_dh_params = sc->dh_params;
+		session->internals.params.anon_dh_params = sc->dh_params;
 	} else if (sc->params_func) {
 		ret = sc->params_func( session, GNUTLS_PARAMS_DH, &params);
 		if (ret == 0 && params.type == GNUTLS_PARAMS_DH) {
-			session->internals.anon_dh_params = params.params.dh;
+			session->internals.params.anon_dh_params = params.params.dh;
+			session->internals.params.free_anon_dh_params = params.deinit;
 		}
 	}
 	
-	return session->internals.anon_dh_params;
+	return session->internals.params.anon_dh_params;
 }
 
 /**

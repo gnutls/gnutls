@@ -135,6 +135,7 @@ typedef struct gnutls_params_st {
 		gnutls_dh_params dh;
 		gnutls_rsa_params rsa_export;
 	} params;
+	int deinit;
 } gnutls_params_st;
 
 typedef int gnutls_params_function(gnutls_session, gnutls_params_type,

@@ -443,12 +443,22 @@ typedef struct {
 
 #define gnutls_rsa_params gnutls_x509_privkey
 
+typedef struct gnutls_internal_params {
+	gnutls_dh_params	anon_dh_params;
+	int			free_anon_dh_params;
+	gnutls_dh_params	cert_dh_params;
+	int			free_cert_dh_params;
+	gnutls_rsa_params	rsa_params;
+	int 			free_rsa_params;
+} gnutls_internal_params;
+
 typedef struct gnutls_params_st {
 	gnutls_params_type type;
 	union params {
 		gnutls_dh_params dh;
 		gnutls_rsa_params rsa_export;
 	} params;
+	int deinit;
 } gnutls_params_st;
 
 
@@ -673,9 +683,7 @@ typedef struct {
 	 * credentials structure, or from a callback. That is to
 	 * minimize external calls.
 	 */
-	gnutls_dh_params	anon_dh_params;
-	gnutls_dh_params	cert_dh_params;
-	gnutls_rsa_params	rsa_params;
+	gnutls_internal_params  params;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
