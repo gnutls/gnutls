@@ -231,85 +231,6 @@ kbx_data_to_keyring( int type, int enc, const char *data,
 }
 
 
-static int
-kbnode_to_datum( CDK_KBNODE knode, gnutls_datum *raw )
-{
-    CDK_KBNODE node, ctx = NULL;
-    CDK_STREAM a;
-    CDK_PACKET *pkt, pkt2;
-    uint8 buf[4096];
-    int rc = 0, nread;
-  
-    if( !knode || !raw ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    while( (node = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
-        pkt = cdk_kbnode_get_packet( node );
-        if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
-            a = cdk_stream_tmp( );
-            if( !a )
-              return GNUTLS_E_INTERNAL_ERROR;
-            memset( &pkt2, 0, sizeof pkt2 );
-            pkt2.pkttype = CDK_PKT_PUBLIC_KEY;
-            pkt2.pkt.public_key = pkt->pkt.public_key;
-            rc = cdk_pkt_build( a, &pkt2 );
-            if( rc ) {
-                cdk_stream_close( a );
-                return map_cdk_rc( rc );
-            }
-            cdk_stream_seek( a, 0 );
-            while( !cdk_stream_eof( a ) ) {
-                nread = cdk_stream_read( a, buf, sizeof buf-1);
-                if( nread == EOF )
-                    break;
-                rc = datum_append( raw, buf, nread );
-                if( rc < 0 ) {
-                    gnutls_assert( );
-                    rc = GNUTLS_E_MEMORY_ERROR;
-                    break;
-                }
-            }
-            cdk_stream_close( a );
-        }
-    }
-    return rc;
-}
-
-
-static int
-datum_to_kbnode( const gnutls_datum *raw, CDK_KBNODE *r_knode )
-{
-    CDK_STREAM s;
-    CDK_KBNODE knode;
-    int rc;
-
-    if( !raw || !r_knode ) {
-        return GNUTLS_E_INVALID_REQUEST;
-        gnutls_assert( );
-    }
-
-    s = cdk_stream_tmp( );
-    if( !s ) {
-        gnutls_assert();
-        return GNUTLS_E_MEMORY_ERROR;
-    }
-    cdk_stream_write( s, raw->data, raw->size );
-    cdk_stream_seek( s, 0 );
-
-    rc = cdk_keydb_get_keyblock( s, &knode );
-    if( rc && rc != CDK_EOF )
-        rc = map_cdk_rc( rc );
-    else
-        rc = 0;
-
-    cdk_stream_close( s );
-    *r_knode = (!rc)? knode : NULL;
-    return rc;
-}
-
-
 CDK_PACKET*
 search_packet( const gnutls_datum *buf, int pkttype )
 {
@@ -321,7 +242,7 @@ search_packet( const gnutls_datum *buf, int pkttype )
         knode = NULL;
         return NULL;
     }
-    if( datum_to_kbnode( buf, &knode ) )
+    if( cdk_kbnode_read_from_mem( &knode, buf->data, buf->size ) )
         return NULL;
     pkt = cdk_kbnode_find_packet( knode, pkttype );
 
@@ -558,8 +479,8 @@ _gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, gnutls_datum raw )
 
     memset( cert, 0, sizeof *cert );
 
-    rc = datum_to_kbnode( &raw, &knode );
-    if( !rc )
+    rc = cdk_kbnode_read_from_mem( &knode, raw.data, raw.size );
+    if( !(rc = map_cdk_rc( rc )) )
         pkt = cdk_kbnode_find_packet( knode, CDK_PKT_PUBLIC_KEY );
     if( !pkt )
         rc = GNUTLS_E_INTERNAL_ERROR;
@@ -592,7 +513,9 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
     CDK_KBNODE knode = NULL;
     CDK_DBSEARCH ks = NULL;
     unsigned long keyid[2];
+    unsigned char *buf;
     void * desc;
+    size_t len;
     int rc = 0;
   
     if( !key || !keyring || by == KEY_ATTR_NONE ) {
@@ -633,7 +556,13 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
         rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
         goto leave;
     }
-    rc = kbnode_to_datum( knode, key );
+
+    len = 20000;
+    buf = cdk_calloc (1, len + 1);
+    rc = cdk_kbnode_write_to_mem( knode, buf, &len );
+    if( !rc )
+        datum_append( key, buf, len );
+    cdk_free( buf );
   
 leave:
     cdk_free( hd );
@@ -660,9 +589,9 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
         return GNUTLS_E_INVALID_REQUEST;
     }
 
-    rc = datum_to_kbnode( cert, &knode );
-    if ( rc )
-        goto leave;
+    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
+    if( (rc = map_cdk_rc( rc )) )
+      goto leave;
 
     /* fixme: too much duplicated code from (set_openpgp_key_file) */
     res->cert_list = gnutls_realloc_fast(res->cert_list,
@@ -857,7 +786,7 @@ gnutls_openpgp_count_key_names( const gnutls_datum *cert )
 
     if( cert == NULL )
         return 0;
-    if( datum_to_kbnode( cert, &knode ) ) {
+    if( cdk_kbnode_read_from_mem( &knode, cert->data, cert->size ) ) {
         gnutls_assert();
         return 0;
     }
@@ -900,8 +829,8 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
         return GNUTLS_E_INTERNAL_ERROR;
 
     memset( dn, 0, sizeof *dn );
-    rc = datum_to_kbnode( cert, &knode );
-    if( rc )
+    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
+    if( (rc = map_cdk_rc( rc )) )
         return rc;
     if( !idx )
         pkt = cdk_kbnode_find_packet( knode, CDK_PKT_USER_ID );
@@ -1085,8 +1014,8 @@ _gnutls_openpgp_get_key_trust( const char *trustdb,
 
     *r_trustval = 0;
 
-    rc = datum_to_kbnode( key, &knode );
-    if( rc )
+    rc = cdk_kbnode_read_from_mem( &knode, key->data, key->size );
+    if( (rc = map_cdk_rc( rc )) )
         return rc;
 
     pkt = cdk_kbnode_find_packet( knode, CDK_PKT_PUBLIC_KEY );
@@ -1184,7 +1113,7 @@ gnutls_openpgp_verify_key( const char *trustdb,
     blob = kbx_read_blob( keyring, 0 );
     if( !blob )
         return GNUTLS_CERT_INVALID|GNUTLS_CERT_NOT_TRUSTED;
-    hd = kbx_to_keydb(blob);
+    hd = kbx_to_keydb( blob );
     if( !hd ) {
         rc = GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
         goto leave;
@@ -1197,8 +1126,8 @@ gnutls_openpgp_verify_key( const char *trustdb,
             goto leave;
     }
 
-    rc = datum_to_kbnode( cert_list, &knode );
-    if( rc ) {
+    rc = cdk_kbnode_read_from_mem( &knode, cert_list->data, cert_list->size );
+    if( (rc = map_cdk_rc( rc )) ) {
         goto leave;
         return GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
     }
@@ -1462,93 +1391,19 @@ int
 gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
                         gnutls_datum *key)
 {
-    CDK_STREAM buf = NULL;
-    struct hostent *hp;
-    struct sockaddr_in sock;
-    char *request = NULL;
-    char buffer[4096];
-    int fd = -1;
-    int rc = 0, state = 0, nread = 0;
-    size_t nbytes = 0, n = 0;
-  
-    if ( !host || !key ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    if( !port )
-        port = 11371; /* standard service port */
-  
-    hp = gethostbyname( host );
-    if( hp == NULL )
-        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
-  
-    memset( &sock, 0, sizeof sock );
-    memcpy( &sock.sin_addr, hp->h_addr, hp->h_length );
-    sock.sin_family = hp->h_addrtype;
-    sock.sin_port = htons( port );
-
-    fd = socket( AF_INET, SOCK_STREAM, 0 );
-    if( fd == -1 )
-        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
-
-    setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (char *)1, 1 );
-    if( connect( fd, (struct sockaddr*)&sock, sizeof sock ) == -1 ) {
-        close( fd );
-        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
-    }
-
-    n = strlen( host ) + 100;
-    request = cdk_calloc( 1, n + 1 );
-    if( !request ) {
-        close( fd );
-        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
-    }
-    snprintf( request, n,
-              "GET /pks/lookup?op=get&search=0x%08lX HTTP/1.0\r\n"
-              "Host: %s:%d\r\n\r\n", keyid, host, port );
+    int rc;
+    CDK_KBNODE knode = NULL;
     
-    if( write( fd, request, strlen( request ) ) == -1 ) {
-        cdk_free( request );
-        close( fd );
-        return -1;
+    rc = cdk_keyserver_recv_key( host, port, &keyid, &knode );
+    if( !rc ) {
+        unsigned char *buf = cdk_calloc( 1, 20001 );
+        size_t len = 20000;
+        cdk_kbnode_write_to_mem( knode, buf, &len);
+        datum_append( key, buf, len );
+        cdk_free( buf );
     }
-    cdk_free( request );
-
-    buf = cdk_stream_tmp ();
-    if( !buf ) {
-        rc = GNUTLS_E_MEMORY_ERROR;
-        goto leave;
-    }
-    
-    while ( (n = read( fd, buffer, sizeof buffer -1 )) > 0 ) {
-        buffer[n] = '\0';
-        nbytes += n;
-        cdk_stream_write( buf, buffer, n );
-        if( strstr( buffer, "<pre>" ) || strstr( buffer, "</pre>" ) )
-            state++;
-    }
-  
-    if( state != 2 ) {
-        rc = GNUTLS_E_INTERNAL_ERROR;
-        goto leave;
-    }
-    
-    cdk_stream_set_armor_flag( buf, 0 );
-    cdk_stream_seek( buf, 0 );
-    while( !cdk_stream_eof( buf ) ) {
-        nread = cdk_stream_read( buf, buf, sizeof buf-1 );
-        if( nread == EOF )
-            break;
-        rc = datum_append( key, buf, nread );
-        if ( rc < 0 )
-            rc = GNUTLS_E_MEMORY_ERROR;
-    }
-  
-leave:
-    cdk_stream_close( buf );
-    close( fd );    
-    return 0;
+    cdk_kbnode_release( knode );
+    return map_cdk_rc( rc );
 }
 
 
@@ -1584,17 +1439,14 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
     if( rc >= 0 )
         return rc;
 
-    /* fixme: we can't use the code for old V3 RSA keys! */
     keyid = buftou32( key_fpr + (key_fpr_size - 4) );
 
-    /* Here the callback in session->internals->openpgp_recv_key() should
-     * be used.
-     */
+    /* fixme: we should use the internal callback. */
     rc = gnutls_openpgp_recv_key( cred->pgp_key_server,
                                   cred->pgp_key_server_port,
                                   keyid, ret );
 
-    if (rc == GNUTLS_E_INVALID_REQUEST)
+    if( rc == GNUTLS_E_INVALID_REQUEST )
     	return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
     return rc;
@@ -1793,7 +1645,7 @@ xml_add_key( gnutls_string *xmlkey, int ext, cdkPKT_public_key *pk, int sub )
         return rc;
 
     if( pk->expiredate > 0 ) {
-        sprintf( tmp, "%u", pk->expiredate );
+        sprintf( tmp, "%lu", pk->expiredate );
         rc = xml_add_tag( xmlkey, "EXPIREDATE", tmp );
 	if( rc )
             return rc;
@@ -1975,11 +1827,11 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
         gnutls_assert( );
         return GNUTLS_E_INVALID_REQUEST;
     }
-        
-    rc = datum_to_kbnode( cert, &knode );
-    if( rc )
-        return rc;
 
+    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
+    if( (rc = map_cdk_rc( rc )) )
+      return rc;
+    
     _gnutls_string_init( &string_xml_key, malloc, realloc, free );
     memset( xmlkey, 0, sizeof *xmlkey );
 
@@ -2074,7 +1926,7 @@ gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
  *
  **/
 void gnutls_openpgp_set_recv_key_function( gnutls_session session,
- gnutls_openpgp_recv_key_func func)
+                                           gnutls_openpgp_recv_key_func func )
 {
     session->internals.openpgp_recv_key_func = func;
 }
@@ -2220,7 +2072,7 @@ gnutls_openpgp_extract_key_id( const gnutls_datum *cert, unsigned char keyid[8] 
 }
 
 void gnutls_openpgp_set_recv_key_function( gnutls_session session,
- gnutls_openpgp_recv_key_func func)
+                                           gnutls_openpgp_recv_key_func func )
 {
 
 }
