@@ -756,8 +756,10 @@ signer is trusted the key is considered trusted or not.
 @acronym{GnuTLS}'s OpenPGP authentication implementation is based on
 the @cite{TLSPGP} proposal.
 
-@xref{pgp:trust}, for more information about the OpenPGP trust model.
-For a more detailed introduction to OpenPGP and GnuPG see @cite{GPGH}.
+@xref{The OpenPGP trust model}, for more information about the OpenPGP
+trust model.  For a more detailed introduction to OpenPGP and GnuPG
+see Mike Ashley's @cite{The GNU Privacy
+Handbook}@footnote{@url{http://www.gnupg.org/gph/en/manual.html}}.
 
 @subsection Using certificate authentication
 
@@ -1238,7 +1240,7 @@ An example of a PKCS #12 structure generation can be found at section
 @ref{ex:pkcs12}.
 
 @section The OpenPGP trust model
-@anchor{pgp:trust}
+@anchor{The OpenPGP trust model}
 @cindex OpenPGP Keys
 
 The OpenPGP key authentication relies on a distributed trust model,
