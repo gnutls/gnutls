@@ -146,11 +146,11 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	gnutls_free(state->connection_state.read_mac_secret);
 
 	if (state->connection_state.read_cipher_state != NULL)
-		gcry_cipher_close(state->
+		gnutls_cipher_deinit(state->
 				  connection_state.read_cipher_state);
 
 	if (state->connection_state.write_cipher_state != NULL)
-		gcry_cipher_close(state->
+		gnutls_cipher_deinit(state->
 				  connection_state.write_cipher_state);
 
 	gnutls_free(state->connection_state.read_compression_state);

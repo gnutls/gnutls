@@ -66,6 +66,25 @@ AC_ARG_ENABLE(maintainer-mode,
 opt_maintainer_mode=$enableval)
 AC_MSG_RESULT($opt_maintainer_mode)
 
+AC_ARG_WITH( mcrypt, [  --with-mcrypt           enable mcrypt support],
+ [  AC_CHECK_LIB(dl, dlopen)
+  AC_CHECK_LIB(mcrypt, mcrypt_module_open,
+  LIBS="${LIBS} -lmcrypt"
+  AC_DEFINE(USE_MCRYPT),
+  [
+    AC_CHECK_LIB(dld, dld_init)
+    AC_CHECK_LIB(ltdl, lt_dlinit)
+    AC_CHECK_LIB(mcrypt, mcrypt_enc_get_key_size,
+    LIBS="${LIBS} -lmcrypt"
+    AC_DEFINE(USE_MCRYPT),
+    AC_MSG_ERROR("You need libmcrypt 2.4.x or libmcrypt-nm to compile this program. http://mcrypt.hellug.gr"))
+  ])
+ ]
+
+)
+
+AC_ARG_WITH( mhash, [  --with-mhash            enable mhash support],
+ [AC_CHECK_LIB(mhash, mhash_init_m, AC_DEFINE(USE_MHASH))])
 
 if test $ac_cv_prog_gcc != no; then
   CFLAGS="${CFLAGS} -O2 -g -ffast-math"

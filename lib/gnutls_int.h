@@ -2,7 +2,7 @@
 
 #define GNUTLS_INT_H
 
-#undef HARD_DEBUG
+#define HARD_DEBUG
 #undef READ_DEBUG
 #undef WRITE_DEBUG
 #define DEBUG
@@ -11,12 +11,9 @@
 #define MAX24 16777215
 #define MAX16 65535
 
-
-/* for symmetric ciphers */
-#define GNUTLS_CIPHER_HANDLE GCRY_CIPHER_HD
-#define GNUTLS_CIPHER_FAILED NULL
-
 /* for big numbers support */ /* FIXME */
+#include <gcrypt.h>
+
 #define GNUTLS_MPI MPI
 #define gnutls_mpi_release mpi_release
 
@@ -108,6 +105,7 @@ typedef enum MACAlgorithm MACAlgorithm;
 typedef enum CompressionMethod CompressionMethod;
 
 #include <gnutls_hash_int.h>
+#include <gnutls_cipher_int.h>
 
 typedef struct {
 	ConnectionEnd entity;

@@ -3,6 +3,9 @@
 #undef NAME_OF_DEV_URANDOM
 #undef HAVE_DEV_RANDOM
 
+#undef USE_MHASH
+#undef USE_MCRYPT
+
 #undef PACKAGE
 #undef VERSION
 

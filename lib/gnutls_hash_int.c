@@ -37,7 +37,7 @@ GNUTLS_HASH_HANDLE ret;
 			break;
 		case GNUTLS_MAC_SHA:
 #ifdef USE_MHASH
-			ret = mhash_init( MHASH_SHA1);
+			ret = mhash_init_m( MHASH_SHA1, gnutls_malloc);
 #else
 			ret = gcry_md_open( GCRY_MD_SHA1, 0);
 #endif
@@ -45,7 +45,7 @@ GNUTLS_HASH_HANDLE ret;
 			break;
 		case GNUTLS_MAC_MD5:
 #ifdef USE_MHASH
-			ret = mhash_init( MHASH_SHA1);
+			ret = mhash_init_m( MHASH_MD5, gnutls_malloc);
 #else
 			ret = gcry_md_open( GCRY_MD_MD5, 0);
 #endif
@@ -74,7 +74,7 @@ int ret;
 			break;
 		case GNUTLS_MAC_MD5:
 #ifdef USE_MHASH
-			ret = mhash_get_block_size(MHASH_SHA1);
+			ret = mhash_get_block_size(MHASH_MD5);
 #else			 
 			ret = gcry_md_get_algo_dlen( GCRY_MD_MD5);
 #endif
@@ -88,8 +88,11 @@ return ret;
 }
 
 int gnutls_hash(GNUTLS_HASH_HANDLE handle, void* text, int textlen) {
-
+#ifdef USE_MHASH
+	mhash( handle, text, textlen);
+#else
 	gcry_md_write( handle, text, textlen);
+#endif
 	return 0;
 }
 
@@ -122,7 +125,7 @@ GNUTLS_MAC_HANDLE ret;
 			break;
 		case GNUTLS_MAC_SHA:
 #ifdef USE_MHASH
-			ret = mhash_hmac_init( MHASH_SHA1, key, keylen, 0);
+			ret = mhash_hmac_init_m( MHASH_SHA1, key, keylen, 0, gnutls_malloc);
 #else
 			ret = gcry_md_open( GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
 #endif
@@ -130,7 +133,7 @@ GNUTLS_MAC_HANDLE ret;
 			break;
 		case GNUTLS_MAC_MD5:
 #ifdef USE_MHASH
-			ret = mhash_hmac_init( MHASH_SHA1, key, keylen, 0);
+			ret = mhash_hmac_init_m( MHASH_MD5, key, keylen, 0, gnutls_malloc);
 #else
 			ret = gcry_md_open( GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
 #endif
@@ -162,7 +165,7 @@ int ret;
 			break;
 		case GNUTLS_MAC_MD5:
 #ifdef USE_MHASH
-			ret = mhash_get_block_size(MHASH_SHA1);
+			ret = mhash_get_block_size(MHASH_MD5);
 #else			
 			ret = gcry_md_get_algo_dlen( GCRY_MD_MD5);
 #endif

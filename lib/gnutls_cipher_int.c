@@ -19,8 +19,9 @@
  */
 
 #include <defines.h>
-#include "gnutls_int.h"
-#include "gnutls_errors.h"
+#include <gnutls_int.h>
+#include <gnutls_errors.h>
+#include <gnutls_cipher_int.h>
 
 GNUTLS_CIPHER_HANDLE gnutls_cipher_init( BulkCipherAlgorithm cipher, void* key, int keysize, void* iv, int ivsize)
 {
@@ -31,14 +32,32 @@ GNUTLS_CIPHER_HANDLE ret;
 		ret = GNUTLS_CIPHER_FAILED;
 		break;
 	case GNUTLS_3DES:
+#ifdef USE_MCRYPT
+		ret = mcrypt_module_open( "tripledes", NULL, "cbc", NULL);
+#else
 		ret = gcry_cipher_open(GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC, 0);
+#endif
+		break;
+	case GNUTLS_ARCFOUR:
+#ifdef USE_MCRYPT
+		ret = mcrypt_module_open( "arcfour", NULL, "stream", NULL);
+#else
+		ret = GNUTLS_CIPHER_FAILED;
+#endif
 		break;
 	default:
 		ret = GNUTLS_CIPHER_FAILED;
 	}
-	if (ret!=NULL) {
+	if (ret!=GNUTLS_CIPHER_FAILED) {
+#ifdef USE_MCRYPT
+		/* ivsize is assumed to be blocksize */
+		if ( mcrypt_generic_init( ret, key, keysize, iv) < 0) {
+			return GNUTLS_CIPHER_FAILED;
+		}; 
+#else
 		gcry_cipher_setkey(ret, key, keysize);
 		gcry_cipher_setiv(ret, iv, ivsize);
+#endif
 	}
 
 return ret;	
@@ -46,20 +65,32 @@ return ret;
 
 int gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) {
 	if (handle!=NULL) {
+#ifdef USE_MCRYPT
+		mcrypt_generic( handle, text, textlen);
+#else
 		gcry_cipher_encrypt( handle, text, textlen, text, textlen);
+#endif
 	}
 	return 0;
 }
 
 int gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int ciphertextlen) {
 	if (handle!=NULL) {
+#ifdef USE_MCRYPT
+		mdecrypt_generic( handle, ciphertext, ciphertextlen);
+#else
 		gcry_cipher_decrypt( handle, ciphertext, ciphertextlen, ciphertext, ciphertextlen);
+#endif
 	}
 	return 0;
 }
 
 void gnutls_cipher_deinit(GNUTLS_CIPHER_HANDLE handle) {
 	if (handle!=NULL) {
+#ifdef USE_MCRYPT
+		mcrypt_generic_end( handle);
+#else
 		gcry_cipher_close(handle);
+#endif
 	}
 }

@@ -38,7 +38,7 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
 static gnutls_cipher_entry algorithms[] = {
 	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES, 8, 24, 1, 8, -1),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0, -2),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0, -1),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_NULL, 1, 0, 0, 0, -1),
 	{0}
 };
