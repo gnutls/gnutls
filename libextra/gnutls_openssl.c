@@ -694,8 +694,9 @@ const char *SSL_CIPHER_get_name(SSL_CIPHER *cipher)
     if (!cipher)
         return ("NONE");
 
-    /* FIXME? - the openssl name is of the form "DES-CBC3-SHA" */
-    return gnutls_cipher_get_name(cipher->cipher);
+    return gnutls_cipher_suite_get_name(cipher->kx,
+                                        cipher->cipher,
+                                        cipher->mac);
 }
 
 int SSL_CIPHER_get_bits(SSL_CIPHER *cipher, int *bits)
