@@ -205,9 +205,9 @@ static ssize_t _gnutls_read( gnutls_session session, void *iptr, size_t sizeOfPt
 #ifdef READ_DEBUG
 	int j,x, sum=0;
 #endif
-	session->internals.direction = 0;
-
 	gnutls_transport_ptr fd = session->internals.transport_recv_ptr;
+
+	session->internals.direction = 0;
 
 	left = sizeOfPtr;
 	while (left > 0) {
