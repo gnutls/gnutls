@@ -205,11 +205,6 @@ AC_CHECK_SIZEOF(unsigned short, 2)
 AC_CHECK_SIZEOF(unsigned char, 1)
 AC_CHECK_SIZEOF(unsigned char*, 4)
 
-AC_CHECK_TYPES(ptrdiff_t,,, [
-# include <sys/types.h>
-# include <stddef.h>
-])
-
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
@@ -229,27 +224,6 @@ AC_SUBST( DEFINE_SSIZE_T)
 # include <unistd.h>
 #endif
 ])
-
-AC_CHECK_TYPE(time_t,
- DEFINE_TIME_T="#include <time.h>"
- AC_SUBST( DEFINE_TIME_T)
- ,
-  AC_CHECK_TYPE(time_t,
-   DEFINE_TIME_T="#include <sys/time.h>"
-   AC_SUBST( DEFINE_TIME_T)
-   ,
-    DEFINE_TIME_T="typedef unsigned int time_t;"
-    AC_SUBST( DEFINE_TIME_T)
-    AC_DEFINE(NO_TIME_T, 1, [no time_t type was found]),
-  [
-   #include <sys/time.h>
-  ]
-  )
-,
-[
- #include <time.h>
-]
-)
 
 AC_C_BIGENDIAN
 
