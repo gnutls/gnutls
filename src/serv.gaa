@@ -41,3 +41,6 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; }
 
+##
+
+#include <common.h>

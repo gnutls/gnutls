@@ -55,7 +55,7 @@ extern "C"
 
     int gaa(int argc, char *argv[], gaainfo *gaaval);
 
-    void gaa_help();
+    void gaa_help(void);
     
     int gaa_file(char *name, gaainfo *gaaval);
     

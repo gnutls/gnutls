@@ -50,3 +50,8 @@ init { $resume=0; $port=5556; $rest_args=NULL; $nrest_args=0; $ciphers=NULL;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $record_size=0; 
 	$fingerprint=0; }
 
+##
+
+/* C declarations */
+
+#include <common.h>
