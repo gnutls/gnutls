@@ -391,6 +391,7 @@ static void get_response(GNUTLS_STATE state, char *request, char **response, int
     	*response = strdup( request);
     	*response_length = strlen( *response);
     }
+    
     return;
 
   unimplemented:
@@ -428,6 +429,8 @@ int main(int argc, char **argv)
    char topbuf[512];
 //   int optval = 1;
    char name[256];
+   int accept_fd;
+   struct sockaddr_in client_address;
 
    signal(SIGPIPE, SIG_IGN);
    signal( SIGHUP, SIG_IGN);
@@ -586,8 +589,6 @@ int main(int argc, char **argv)
 	if (FD_ISSET (h, &rd)) {
 	    unsigned int l;
 	    GNUTLS_STATE tstate;
-	    int accept_fd;
-	    struct sockaddr_in client_address;
 
 	    tstate = initialize_state ();
 
@@ -616,13 +617,12 @@ int main(int argc, char **argv)
 			ctt = ctime(&tt);
 			ctt[strlen(ctt)-1] = 0;
 
-//		printf ("- %s: connection from %s\n", ctt, inet_ntoa (client_address.sin_addr));
-
+/*
 		        printf("- connection from %s, port %d\n",
 			     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
 			       sizeof(topbuf)), ntohs(client_address.sin_port));
+      */
 
-			fflush(stdout);
 		}
 	    }
 	}
@@ -649,8 +649,13 @@ int main(int argc, char **argv)
 		    } else if (r == 0) {
 		        if ( gnutls_session_is_resumed( j->tstate)!=0 && quiet==0)
         	 	  printf("*** This is a resumed session\n");
-//		        print_info(j->tstate);
 
+			if (quiet == 0) {
+			      printf("- connection from %s, port %d\n",
+				     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
+				       sizeof(topbuf)), ntohs(client_address.sin_port));
+			      print_info( j->tstate);
+			}
 			j->handshake_ok = 1;
 		    }
 		}
@@ -706,8 +711,12 @@ int main(int argc, char **argv)
 		    } else if (r == 0) {
 		        if ( gnutls_session_is_resumed( j->tstate)!=0 && quiet == 0)
         	 	  printf("*** This is a resumed session\n");
-//		        print_info(j->tstate);
-
+			if (quiet == 0) {
+			      printf("- connection from %s, port %d\n",
+				     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
+				       sizeof(topbuf)), ntohs(client_address.sin_port));
+			      print_info( j->tstate);
+			}
 			j->handshake_ok = 1;
 		    }
 		}

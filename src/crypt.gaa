@@ -19,13 +19,13 @@ option (s, salt) INT "SALT" { $salt = $1 } "specify salt/cost size for crypt alg
 option (verify) { $verify = 1 } "just verify password."
 
 #char *passwd_conf;
-option ( passwd_conf) STR "FILE" { $passwd_conf = $1 } "specify a password conf file."
+option ( passwd-conf) STR "FILE" { $passwd_conf = $1 } "specify a password conf file."
 
 #char *create_conf;
-option ( create_conf) STR "FILE" { $create_conf = $1 } "Generate a tpasswd.conf file."
+option ( create-conf) STR "FILE" { $create_conf = $1 } "Generate a tpasswd.conf file."
 
 #int bits;
-option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for prime numbers (used only when create_conf option is specified)."
+option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for prime numbers (used only when create-conf option is specified)."
 
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
