@@ -77,7 +77,7 @@ gnutls_digest_algorithm_t dig = GNUTLS_DIG_SHA1;
  */
 int batch;
 
-unsigned char buffer[50 * 1024];
+unsigned char buffer[64 * 1024];
 const int buffer_size = sizeof(buffer);
 
 static void tls_log_func(int level, const char *str)
@@ -910,11 +910,12 @@ static inline int known_oid(const char *oid)
     return 0;
 }
 
+#define MAX_CRTS 64
 void certificate_info(void)
 {
-    gnutls_x509_crt crt;
+    gnutls_x509_crt crt[MAX_CRTS];
     size_t size;
-    int ret;
+    int ret,i, count;
     gnutls_datum pem;
 
     size = fread(buffer, 1, sizeof(buffer) - 1, infile);
@@ -925,39 +926,42 @@ void certificate_info(void)
     pem.data = buffer;
     pem.size = size;
 
-    ret = gnutls_x509_crt_import(crt, &pem, in_cert_format);
+    ret = gnutls_x509_crt_list_import(crt, MAX_CRTS, &pem, in_cert_format, 0);
     if (ret < 0) {
 	fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 	exit(1);
     }
+    count = ret;
 
-    print_certificate_info(crt, outfile, 1);
+    for(i=0;i<count;i++) {
+        print_certificate_info(crt[i], outfile, 1);
 
-    if (!info.xml) {
-	size = sizeof(buffer);
-	ret =
-	    gnutls_x509_crt_export(crt, GNUTLS_X509_FMT_PEM, buffer,
+        if (!info.xml) {
+  	    size = sizeof(buffer);
+	    ret =
+	        gnutls_x509_crt_export(crt[i], GNUTLS_X509_FMT_PEM, buffer,
 				   &size);
-	if (ret < 0) {
-	    fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
-	    exit(1);
-	}
-	fprintf(outfile, "\n%s\n", buffer);
+	    if (ret < 0) {
+	        fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+	        exit(1);
+	     }
+	     fprintf(outfile, "\n%s\n", buffer);
 
-    } else {
-	gnutls_datum xml;
+         } else {
+     	     gnutls_datum xml;
 
-	ret = gnutls_x509_crt_to_xml(crt, &xml, GNUTLS_XML_SHOW_ALL);
-	if (ret < 0) {
-	    fprintf(stderr, "XML encoding error: %s\n",
+	     ret = gnutls_x509_crt_to_xml(crt[i], &xml, GNUTLS_XML_SHOW_ALL);
+	     if (ret < 0) {
+	         fprintf(stderr, "XML encoding error: %s\n",
 		    gnutls_strerror(ret));
-	    exit(1);
-	}
+	         exit(1);
+	     }
 
-	fprintf(outfile, "\n%s\n", xml.data);
-	gnutls_free(xml.data);
+	     fprintf(outfile, "\n%s\n", xml.data);
+	     gnutls_free(xml.data);
+         }
     }
-
+    
 }
 
 static void print_hex_datum( gnutls_datum* dat)
