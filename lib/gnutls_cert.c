@@ -82,7 +82,7 @@ int n,i;
 	for (i=0;i<n;i++) {
 		_gnutls_mpi_release( &cert.params[i]);
 	}
-	gnutls_free( cert.params);
+	if (cert.params!=NULL) gnutls_free( cert.params);
 	
 	gnutls_free_datum( &cert.raw);
 
@@ -691,10 +691,22 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 * currently not supported
 		 */
 		gnutls_assert();
-		asn1_delete_structure(c2);
-
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
+		gCert->params = NULL;
+		
 	}
+
+	len = sizeof( gCert->signature);
+	result =
+	    asn1_read_value
+		    (c2, "certificate2.signature",
+		     gCert->signature, &len);
+	if ((len % 8) !=0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;		
+	}
+	gCert->signature_size = len;
 
 
 	memset( &gCert->cert_info, 0, sizeof(gCert->cert_info));

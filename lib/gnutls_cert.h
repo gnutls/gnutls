@@ -1,6 +1,8 @@
 #ifndef GNUTLS_CERT_H
 # define GNUTLS_CERT_H
 
+#include <gnutls_pk.h>
+
 typedef struct {
 	char common_name[256];
 	char country[3];
@@ -10,9 +12,6 @@ typedef struct {
 	char state_or_province_name[256];
 } gnutls_DN;
 
-typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
-	GNUTLS_PK_DH
-} PKAlgorithm;
 
 typedef struct {
 	MPI *params;		/* the size of params depends on the public 
@@ -23,6 +22,9 @@ typedef struct {
 	gnutls_DN  cert_info;
 	gnutls_DN  issuer_info;
 
+	opaque	   signature[MAX_HASH_SIZE];
+	int	   signature_size;
+	
 	time_t	   expiration_time;
 	time_t	   activation_time;
 

@@ -110,7 +110,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
  */
 
 int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
-		      MPI pkey, MPI n)
+		      MPI pkey, MPI n, int btype)
 {
 	int k, esize, i, ret;
 	MPI c, res;
@@ -153,13 +153,13 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 	gcry_mpi_release(res);
 
 	/* EB = 00||BT||PS||00||D 
-	 * (use block type 2)
+	 * (use block type 'btype')
 	 */
 
 	edata[0] = 0;
 	esize++;
 
-	if (edata[0] != 0 || edata[1] != 2) {
+	if (edata[0] != 0 || edata[1] != btype) {
 		gnutls_assert();
 		gnutls_free(edata);
 		return GNUTLS_E_DECRYPTION_FAILED;

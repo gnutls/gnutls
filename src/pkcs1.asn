@@ -45,5 +45,23 @@ OtherPrimeInfo ::= SEQUENCE {
 	coefficient INTEGER -- ti 
 }
 
+-- for signature calculation -nmav
+
+AlgorithmIdentifier  ::=  SEQUENCE  {
+     algorithm               OBJECT IDENTIFIER,
+     parameters              ANY DEFINED BY algorithm OPTIONAL  }
+                                -- contains a value of the type
+                                -- registered for use with the
+                                -- algorithm object identifier value
+
+DigestInfo ::= SEQUENCE {
+     digestAlgorithm DigestAlgorithmIdentifier,
+     digest Digest 
+}
+
+DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+
+Digest ::= OCTET STRING
+
 
 END

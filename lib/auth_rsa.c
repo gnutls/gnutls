@@ -311,7 +311,7 @@ int proc_rsa_client_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	}
 	ret =
 	    _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, key->u,
-				      key->A);
+				      key->A, 2); /* btype==2 */
 
 	if (ret < 0) {
 		/* in case decryption fails then don't inform
