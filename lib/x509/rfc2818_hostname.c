@@ -211,3 +211,4 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
     */
    return 0;
 }
+

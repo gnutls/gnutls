@@ -78,7 +78,7 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("Compression of the TLS record packet has failed.", GNUTLS_E_COMPRESSION_FAILED, 1 ), 
 
 	ERROR_ENTRY("Internal error in memory allocation.", GNUTLS_E_MEMORY_ERROR, 1 ), 
-	ERROR_ENTRY("An unimplemented feature has been requested.", GNUTLS_E_UNIMPLEMENTED_FEATURE, 1 ), 
+	ERROR_ENTRY("An unimplemented or disabled feature has been requested.", GNUTLS_E_UNIMPLEMENTED_FEATURE, 1 ), 
 	ERROR_ENTRY("Insufficient credentials for that request.", GNUTLS_E_INSUFFICIENT_CREDENTIALS, 1 ), 
 	ERROR_ENTRY("Error in SRP password file.", GNUTLS_E_SRP_PWD_ERROR, 1 ), 
 	ERROR_ENTRY("Wrong padding in PKCS1 packet.", GNUTLS_E_PKCS1_WRONG_PAD, 1 ), 

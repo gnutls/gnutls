@@ -64,7 +64,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		return GNUTLS_E_PK_ENCRYPTION_FAILED;
 	}
 
-	edata = gnutls_malloc(k);
+	edata = gnutls_alloca(k);
 	if (edata == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -84,13 +84,13 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		/* using public key */
 		if (params_len < RSA_PUBLIC_PARAMS) {
 			gnutls_assert();
-			gnutls_free(edata);
+			gnutls_afree(edata);
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		
 		if ( (ret=_gnutls_get_random(ps, psize, GNUTLS_STRONG_RANDOM)) < 0) {
 			gnutls_assert();
-			gnutls_free(edata);
+			gnutls_afree(edata);
 			return ret;
 		}
 		for (i = 0; i < psize; i++) {
@@ -101,7 +101,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			 */
 			if ( (ret=_gnutls_get_random( rnd, 3, GNUTLS_STRONG_RANDOM)) < 0) {
 				gnutls_assert();
-				gnutls_free(edata);
+				gnutls_afree(edata);
 				return ret;
 			}
 			/* use non zero values for 
@@ -126,7 +126,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 
 		if (params_len < RSA_PRIVATE_PARAMS) {
 			gnutls_assert();
-			gnutls_free(edata);
+			gnutls_afree(edata);
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		
@@ -135,7 +135,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		break;
 	default:
 		gnutls_assert();
-		gnutls_free(edata);
+		gnutls_afree(edata);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -144,10 +144,10 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 
 	if (_gnutls_mpi_scan(&m, edata, &k) != 0) {
 		gnutls_assert();
-		gnutls_free(edata);
+		gnutls_afree(edata);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	gnutls_free(edata);
+	gnutls_afree(edata);
 
 	if (btype==2) /* encrypt */
 		ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, params, params_len);
@@ -239,7 +239,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 	}
 
 	_gnutls_mpi_print(NULL, &esize, res);
-	edata = gnutls_malloc(esize + 1);
+	edata = gnutls_alloca(esize + 1);
 	if (edata == NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release(&res);
@@ -259,7 +259,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 
 	if (edata[0] != 0 || edata[1] != btype) {
 		gnutls_assert();
-		gnutls_free(edata);
+		gnutls_afree(edata);
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
@@ -287,24 +287,24 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 		break;
 	default:
 		gnutls_assert();
-		gnutls_free(edata);
+		gnutls_afree(edata);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	i++;
 
 	if (ret < 0) {
 		gnutls_assert();
-		gnutls_free(edata);
+		gnutls_afree(edata);
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
 	if (_gnutls_sset_datum(plaintext, &edata[i], esize - i) < 0) {
 		gnutls_assert();
-		gnutls_free(edata);
+		gnutls_afree(edata);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	gnutls_free(edata);
+	gnutls_afree(edata);
 
 	return 0;
 }
@@ -366,30 +366,16 @@ int result, tot_len;
 	}
 
 	tot_len = 0;
-	result = asn1_der_coding( sig, "", NULL, &tot_len, NULL);
-	if (result != ASN1_MEM_ERROR) {
-		gnutls_assert();
-		asn1_delete_structure(&sig);
-		return _gnutls_asn2err(result);
-	}
-
-	sig_value->size = tot_len;
-	sig_value->data = gnutls_malloc( sig_value->size);
-	if (sig_value->data==NULL) {
-		gnutls_assert();
-		asn1_delete_structure(&sig);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = asn1_der_coding( sig, "", sig_value->data, &sig_value->size, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&sig);
-		return _gnutls_asn2err(result);
-	}
+	
+	result = _gnutls_x509_der_encode( sig, "", sig_value, 0);
 
 	asn1_delete_structure(&sig);
-		
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
 	return 0;
 }
 
