@@ -1434,8 +1434,10 @@ static const gnutls_sign_entry sign_algorithms[] = {
 };
 
 #define GNUTLS_SIGN_LOOP(b) \
-        const gnutls_sign_entry *p; \
-                for(p = sign_algorithms; p->name != NULL; p++) { b ; }
+  do {								       \
+    const gnutls_sign_entry *p;					       \
+    for(p = sign_algorithms; p->name != NULL; p++) { b ; }	       \
+  } while (0)
 
 #define GNUTLS_SIGN_ALG_LOOP(a) \
                         GNUTLS_SIGN_LOOP( if(p->id == sign) { a; break; } )
@@ -1487,8 +1489,8 @@ gnutls_sign_algorithm_t ret = 0;
 const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t pk,
     gnutls_mac_algorithm_t mac)
 {
-gnutls_sign_algorithm_t sign;
-const char* ret = NULL;
+  gnutls_sign_algorithm_t sign;
+  const char* ret = NULL;
 
     sign = _gnutls_x509_pk_to_sign(pk, mac);
     if (sign == GNUTLS_SIGN_UNKNOWN)
