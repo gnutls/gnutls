@@ -1,5 +1,5 @@
 GNU TLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2004 Simon Josefsson
+Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
@@ -11,6 +11,11 @@ See the end for copying conditions.
 - The certificate chain verification function now checks certificates
   in the reverse order to minimize the spent resources.
 - Corrected several bugs found by Marcin Garski <mgarski@post.pl>
+- The functions gnutls_x509_crl_get_issuer_dn, gnutls_x509_crq_get_dn,
+  gnutls_x509_crt_get_issuer_dn, gnutls_x509_crt_get_dn, and
+  gnutls_x509_rdn_get now set *sizeof_buf to the string length instead
+  of the buffer length (i.e., +1), reported by Martin Lambers
+  <marlam@web.de>.
 
 * Version 1.1.22 (2004-11-04)
 - Replace GNU LD version script with Libtool -export-symbols-regex,
