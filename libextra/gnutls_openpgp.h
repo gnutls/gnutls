@@ -61,8 +61,26 @@ int gnutls_openpgp_add_keyring_file(
     gnutls_datum *keyring,
     const char *name );
 
-int gnutls_certificate_set_openpgp_keyring_file(
-    GNUTLS_CERTIFICATE_CREDENTIALS c,
+int gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert,
+                                            int *r_bits);
+
+int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );
+
+time_t gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert );
+
+time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum  *cert );
+
+int gnutls_openpgp_verify_key( const char *trustdb,
+                               const gnutls_datum *keyring,
+                               const gnutls_datum* cert_list,
+                               int cert_list_length );
+
+int gnutls_openpgp_fingerprint( const gnutls_datum *cert, char *fpr,
+                                size_t *fprlen );
+
+int gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid );
+
+int gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS c,
     const char *file );
 
 int gnutls_certificate_set_openpgp_keyring_mem(
