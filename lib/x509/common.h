@@ -2,6 +2,8 @@
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(unsigned int k, char *data);
 
+#define MAX_STRING_LEN 512
+
 #define GNUTLS_XML_SHOW_ALL 1
 
 #define PEM_CRL "X509 CRL"
@@ -26,6 +28,7 @@ int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim);
 
 int _gnutls_x509_oid_data2string( const char* OID, void* value, 
 	int value_size, char * res, size_t *res_size);
+int _gnutls_x509_data2hex( const opaque* data, size_t data_size, opaque* out, size_t* sizeof_out);
 
 const char* _gnutls_x509_oid2ldap_string( const char* OID);
 

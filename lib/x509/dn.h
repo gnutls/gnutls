@@ -30,4 +30,5 @@ int _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
       int indx, 
       void *_oid, size_t * sizeof_oid);
 
+
 #endif

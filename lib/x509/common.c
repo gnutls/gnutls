@@ -158,10 +158,9 @@ const char *_gnutls_x509_oid2ldap_string(const char *oid)
  * hold the string.
  */
 int _gnutls_x509_oid_data2string(const char *oid, void *value,
-				 int value_size, char *res,
-				 size_t * res_size)
+	 int value_size, char *res, size_t * res_size)
 {
-    char str[1024], tmpname[128];
+    char str[MAX_STRING_LEN], tmpname[128];
     const char *ANAME = NULL;
     int CHOICE = -1, len = -1, result;
     ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
@@ -220,16 +219,14 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
 
     } else { /* CHOICE */
 	str[len] = 0;
+        int non_printable = 0;
 
         /* Note that we do not support strings other than
          * UTF-8 (thus ASCII as well).
-         * FIXME: convert the other types.
          */
         if ( strcmp( str, "printableString")!=0 && 
             strcmp( str, "utf8String")!=0 ) {
-            gnutls_assert();
-            asn1_delete_structure(&tmpasn);
-            return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+            non_printable = 1;
         }
 
 	_gnutls_str_cpy(tmpname, sizeof(tmpname), str);
@@ -241,16 +238,62 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
 	    asn1_delete_structure(&tmpasn);
 	    return _gnutls_asn2err(result);
 	}
-	str[len] = 0;
 
-	if (res)
-	    _gnutls_str_cpy(res, *res_size, str);
-	*res_size = len;
+        asn1_delete_structure(&tmpasn);
+
+	if (res) {
+            if (non_printable==0) {
+                str[len] = 0;
+	        _gnutls_str_cpy(res, *res_size, str);
+                 *res_size = len;
+            } else {
+                result = _gnutls_x509_data2hex( str, len, res, res_size);
+                if (result < 0) {
+                    gnutls_assert();
+                    return result;
+                }
+            }
+        }
+
     }
-    asn1_delete_structure(&tmpasn);
 
     return 0;
+}
 
+
+/* Converts a data string to an LDAP rfc2253 hex string
+ * something like '#01020304'
+ */
+int _gnutls_x509_data2hex(const opaque * data, size_t data_size,
+                          opaque * out, size_t * sizeof_out)
+{
+    char *res;
+    char escaped[MAX_STRING_LEN];
+
+    res = _gnutls_bin2hex(data, data_size, escaped, sizeof(escaped));
+
+    if (res) {
+        unsigned int size = strlen(res) + 1;
+        if (size + 1 > *sizeof_out) {
+            fprintf(stderr, "size: %d\nreq: %d\n", *sizeof_out, size+1
+            );
+            *sizeof_out = size;
+            return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
+        *sizeof_out = size;     /* -1 for the null +1 for the '#' */
+
+        if (out) {
+            strcpy(out, "#");
+            strcat(out, res);
+        }
+
+        return 0;
+    } else {
+        gnutls_assert();
+        return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+    return 0;
 }
 
 
