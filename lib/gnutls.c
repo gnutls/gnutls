@@ -41,7 +41,7 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
-void gnutls_free(void *ptr) {
+void agnutls_free(void *ptr) {
 	if (ptr!=NULL) free(ptr);
 }
 
@@ -157,7 +157,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	
 	return 0;
 }
-
+#undef gnutls_free
+#define gnutls_free(x) if(x!=NULL) free(x)
 /* This function clears all buffers associated with the state. */
 int gnutls_deinit(GNUTLS_STATE * state)
 {
@@ -200,17 +201,15 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	mpi_release((*state)->gnutls_key->b);
 
 	mpi_release((*state)->gnutls_key->dh_secret);
+	gnutls_free((*state)->gnutls_key->username);
 	gnutls_free((*state)->gnutls_key);
 
-	gnutls_free((*state)->gnutls_key->username);
 
 	/* free priorities */
-	if ((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
-		gnutls_free((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
-	if ((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
-		gnutls_free((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
-	if ((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
-		gnutls_free((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
+	gnutls_free((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
+	gnutls_free((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
+	gnutls_free((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
+	gnutls_free((*state)->gnutls_internals.CompressionMethodPriority.algorithm_priority);
 
 	gnutls_free((*state)->gnutls_internals.db_name);
 
@@ -278,7 +277,7 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 		}
 		gnutls_free(final);
 	}
-
+	gnutls_free(A);
 	return ret;
 }
 
@@ -701,6 +700,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
  * move on !
  */
 	if (_gnutls_Read(cd, headers, header_size, 0)!=header_size) {  /* read and clear the headers - again! */
+		gnutls_free(ciphertext);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -735,9 +735,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 #ifdef HARD_DEBUG
 		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
 #endif
+		gnutls_free(ciphertext);
 		if (length!=1) {
 			gnutls_assert();
-			gnutls_free(ciphertext);
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 		return 0;

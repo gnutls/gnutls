@@ -300,7 +300,8 @@ int gnutls_clearHashDataBuffer( GNUTLS_STATE state)
 	fprintf(stderr, "Cleared Hash Data from buffer\n");
 #endif
 	state->gnutls_internals.hash_bufferSize = 0;
-	gnutls_free(state->gnutls_internals.hash_buffer);
+	if (state->gnutls_internals.hash_buffer!=NULL)
+		gnutls_free(state->gnutls_internals.hash_buffer);
 	state->gnutls_internals.hash_buffer = NULL;
 	
 	return 0;

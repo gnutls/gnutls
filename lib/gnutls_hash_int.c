@@ -30,35 +30,41 @@
 
 GNUTLS_MAC_HANDLE gnutls_hash_init(MACAlgorithm algorithm)
 {
-	GNUTLS_MAC_HANDLE ret =
-	    gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+	GNUTLS_MAC_HANDLE ret;
 
-	ret->algorithm = algorithm;
 	switch (algorithm) {
 	case GNUTLS_NULL_MAC:
 		ret = GNUTLS_HASH_FAILED;
 		break;
 	case GNUTLS_MAC_SHA:
+		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 #ifdef USE_MHASH
 		ret->handle = mhash_init(MHASH_SHA1);
 #else
 		ret->handle = gcry_md_open(GCRY_MD_SHA1, 0);
 #endif
-		if (!ret->handle)
-			return GNUTLS_HASH_FAILED;
+		if (!ret->handle) {
+			gnutls_free(ret);
+			ret = GNUTLS_HASH_FAILED;
+		}
 		break;
 	case GNUTLS_MAC_MD5:
+		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 #ifdef USE_MHASH
 		ret->handle = mhash_init(MHASH_MD5);
 #else
 		ret->handle = gcry_md_open(GCRY_MD_MD5, 0);
 #endif
-		if (!ret->handle)
-			return GNUTLS_HASH_FAILED;
+		if (!ret->handle) {
+			gnutls_free(ret);
+			ret = GNUTLS_HASH_FAILED;
+		}
 		break;
 	default:
 		ret = GNUTLS_HASH_FAILED;
 	}
+
+	if (ret!=GNUTLS_HASH_FAILED) ret->algorithm = algorithm;
 
 	return ret;
 }
@@ -128,17 +134,14 @@ void *gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle)
 GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, void *key,
 				   int keylen)
 {
-	GNUTLS_MAC_HANDLE ret =
-	    gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
-	ret->algorithm = algorithm;
-	ret->key = key;
-	ret->keysize = keylen;
+	GNUTLS_MAC_HANDLE ret;
 
 	switch (algorithm) {
 	case GNUTLS_NULL_MAC:
 		ret = GNUTLS_MAC_FAILED;
 		break;
 	case GNUTLS_MAC_SHA:
+		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 #ifdef USE_MHASH
 		ret->handle = mhash_hmac_init(MHASH_SHA1, key, keylen, 0);
 #else
@@ -149,6 +152,7 @@ GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, void *key,
 			ret = GNUTLS_MAC_FAILED;
 		break;
 	case GNUTLS_MAC_MD5:
+		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 #ifdef USE_MHASH
 		ret->handle = mhash_hmac_init(MHASH_MD5, key, keylen, 0);
 #else
@@ -160,10 +164,17 @@ GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, void *key,
 	default:
 		ret = GNUTLS_MAC_FAILED;
 	}
+
+	if (ret != GNUTLS_MAC_FAILED) {
 #ifndef USE_MHASH
-	if (ret != GNUTLS_MAC_FAILED)
 		gcry_md_setkey(ret->handle, key, keylen);
 #endif
+		ret->algorithm = algorithm;
+		ret->key = key;
+		ret->keysize = keylen;
+	}
+
+
 
 	return ret;
 }

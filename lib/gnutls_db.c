@@ -34,7 +34,8 @@ int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds) {
 int gnutls_set_db_name( GNUTLS_STATE state, char* filename) {
 #ifdef HAVE_LIBGDBM
 
-	gnutls_free(state->gnutls_internals.db_name);
+	if (state->gnutls_internals.db_name!=NULL)
+		gnutls_free(state->gnutls_internals.db_name);
 	state->gnutls_internals.db_name = strdup(filename);
 
 	return 0;
