@@ -104,10 +104,10 @@ $type_env = "(\\\$\\w+)";
 		     $type_param, "<tt><b>\$1</b></tt>" );
 $blankline_html = "<p>";
 
-%highlights_texinfo = ( $type_constant, "@var{\$1}",
-			$type_func, "@code{\$1}",
-			$type_struct, "@code{\$1}",
-			$type_param, "@code{\$1}" );
+%highlights_texinfo = ( $type_constant, "\@var{\$1}",
+			$type_func, "\@code{\$1}",
+			$type_struct, "\@code{\$1}",
+			$type_param, "\@code{\$1}" );
 $blankline_texinfo = "";
 
 %highlights_tex = ( $type_constant, "{\\\\it \$1}",

@@ -20,9 +20,18 @@ TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex ../../lib/x509/x509-ap
 	tlsintro.tex compression.tex $(EXAMPLE_OBJECTS) \
 	tls_extensions.tex srp.tex preparation.tex callbacks.tex
 
-gnutls.html: $(TEX_OBJECTS)            
+gnutls.html: build_api_lib build_api_x509 build_api_extra $(TEX_OBJECTS)
 	-latex2html gnutls.tex -no_navigation -split 0 \
 	-local_icons -html_version 3.2,math -info "" -white
+
+build_api_lib:
+	cd ../../lib && make gnutls-api.tex
+
+build_api_x509:
+	cd ../../lib/x509 && make x509-api.tex
+
+build_api_extra:
+	cd ../../libextra && make gnutls-extra-api.tex
 
 error_codes.tex: ../../lib/gnutls_errors_int.h ../../lib/gnutls_errors.c
 	-../../src/retcodes > error_codes.tex
@@ -38,7 +47,7 @@ x509-api.tex: ../../lib/x509/x509-api.tex
 
 DOC_OBJECTS = x509-api.tex gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
-gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
+gnutls.ps: build_api_lib build_api_x509 build_api_extra $(TEX_OBJECTS) $(DOC_OBJECTS)
 	-latex gnutls.tex
 	-bibtex gnutls
 	-makeindex gnutls.idx
@@ -59,3 +68,5 @@ examples: $(EXAMPLE_OBJECTS)
 		done
 
 dist-hook: examples
+
+.PHONY: build_api_lib build_api_x509 build_api_extra
