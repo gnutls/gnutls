@@ -580,7 +580,9 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
     keybox_blob *blob = NULL;
     CDK_KEYDB_HD hd = NULL;
     CDK_KBNODE knode = NULL;
-    CDK_DBSEARCH ks;
+    CDK_DBSEARCH ks = NULL;
+    unsigned long keyid[2];
+    void * desc;
     int rc = 0;
   
     if( !key || !keyring || by == KEY_ATTR_NONE )
@@ -591,23 +593,25 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
     if( !blob )
         return GNUTLS_E_MEMORY_ERROR;
     hd = kbx_to_keydb( blob );
-    ks.type = by;
-    switch( by ) {
-    case KEY_ATTR_SHORT_KEYID:
-        ks.u.keyid[1] = buftou32( pattern );
-        break;
-    case KEY_ATTR_KEYID:
-        ks.u.keyid[0] = buftou32( pattern );
-        ks.u.keyid[1] = buftou32( pattern + 4 );
-        break;
-    case KEY_ATTR_FPR:
-        memcpy( ks.u.fpr, pattern, 20 );
-        break;
-    default:
+
+    if( by == KEY_ATTR_SHORT_KEYID ) {
+        keyid[0] = buftou32( pattern );
+        desc = keyid;
+    }
+    else if( by == KEY_ATTR_KEYID ) {
+        keyid[0] = buftou32( pattern );
+        keyid[1] = buftou32( pattern + 4 );
+        desc = keyid;
+    }
+    else
+        desc = pattern;
+    rc = cdk_keydb_search_new( &ks, by, desc );
+    if( rc ) {
+        rc = map_cdk_rc( rc );
         goto leave;
     }
   
-    rc = cdk_keydb_search( hd, &ks, &knode );
+    rc = cdk_keydb_search( hd, ks, &knode );
     if( rc ) {
         rc = map_cdk_rc( rc );
         goto leave;
@@ -622,6 +626,7 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
 leave:
     cdk_free( hd );
     cdk_kbnode_release( knode );
+    cdk_keydb_search_free( ks );
     kbx_blob_release( blob );
     return rc;
 }

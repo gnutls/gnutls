@@ -5,10 +5,10 @@
 
 /* OpenCDK compatible */
 typedef enum {
-    KEY_ATTR_NONE = 0,
+    KEY_ATTR_NONE        = 0,
     KEY_ATTR_SHORT_KEYID = 3,
-    KEY_ATTR_KEYID = 4,
-    KEY_ATTR_FPR = 5
+    KEY_ATTR_KEYID       = 4,
+    KEY_ATTR_FPR         = 5
 } key_attr_t;
 
 int gnutls_certificate_set_openpgp_key_file(
