@@ -5,10 +5,7 @@ It is a TLS implementation for the GNU project.
 It is currently under heavy development. (and still not ready for 
 real world programs)
 
-* The library needs libgcrypt. Libgcrypt is part of gnupg (cvs.gnupg.org)
-
-* Run the buildconf script before doing anything. This will create
-the needed configure, makefiles etc. using Automake, Autoconf, and libtool.
+* The library needs libgcrypt. Libgcrypt is part of gnupg (ftp.gnupg.org)
 
 * Documentation:
  view the doc/ directory and the examples in the src/ directory.

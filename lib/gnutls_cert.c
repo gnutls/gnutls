@@ -385,6 +385,9 @@ int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE)
 {
 int ret;
 
+/* FIXME: This function fails (DER parsing) if it is called
+ * after gnutls_set_x509_key(). why?
+ */
 	if ( (ret=read_ca_file( res, CAFILE)) < 0)
 		return ret;
 
@@ -729,7 +732,6 @@ return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
 	len = sizeof( gCert->signature);
-
 	result =
 	    asn1_read_value
 		    (c2, "certificate2.signature",

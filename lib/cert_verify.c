@@ -172,8 +172,6 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	opaque issuer_dn[MAX_DN_ELEM];
 	opaque issuer_own_dn[MAX_DN_ELEM];
 
-fprintf(stderr, "XXX: %s - III: %s\n", cert->issuer_info.common_name, issuer_cert->issuer_info.common_name);
-fprintf(stderr, "XXX: %s - III: %s\n", cert->cert_info.common_name, issuer_cert->cert_info.common_name);
 	/* get the issuer of 'cert'
 	 */
 	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {

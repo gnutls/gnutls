@@ -491,7 +491,7 @@ int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 	key->key.data[1] = key->version.minor;
 
 	if ((ret =
-	     _gnutls_pkcs1_rsa_encrypt(&sdata, key->key, key->u, key->A)) < 0) {
+	     _gnutls_pkcs1_rsa_encrypt(&sdata, key->key, key->u, key->A, 2)) < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&pkey);
 		_gnutls_mpi_release(&n);

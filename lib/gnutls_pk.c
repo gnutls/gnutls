@@ -34,7 +34,7 @@
  */
 
 int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
-		      MPI pkey, MPI n)
+		      MPI pkey, MPI n, int btype)
 {
 	int k, psize, i, ret;
 	MPI m, res;
@@ -55,11 +55,11 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 	}
 
 	/* EB = 00||BT||PS||00||D 
-	 * (use block type 2)
+	 * (use block type 'btype')
 	 */
 
 	edata[0] = 0;
-	edata[1] = 2;
+	edata[1] = btype;
 	psize = k - 3 - plaintext.size;
 
 	ps = &edata[2];
@@ -121,6 +121,8 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 	esize = ciphertext.size;
 
 	if (esize!=k) {
+#warning "REMOVE ME"
+fprintf(stderr, "ESIZE: %d/%d\n", esize, k);
 		gnutls_assert();
 		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}

@@ -30,6 +30,7 @@
 #include <gnutls_privkey.h>
 #include <gnutls_global.h>
 #include <gnutls_pk.h>
+#include <debug.h>
 
 static gnutls_datum* _gnutls_get_tbs( gnutls_cert* cert) {
 node_asn *c2;
@@ -51,11 +52,8 @@ int result, len;
 	
 	len = sizeof(str)-1;
 	result =
-	    asn1_read_value( c2, "certificate.tbsCertificate", str, &len);
+	    asn1_create_der( c2, "certificate.tbsCertificate", str, &len);
 	if (result != ASN_OK) {
-#ifdef DEBUG
-		fprintf(stderr, "ASN.1 failure number %d\n", result);
-#endif
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return NULL;
@@ -68,24 +66,20 @@ int result, len;
 		gnutls_assert();
 		return NULL;
 	}
-	
-	ret->data = gnutls_malloc( len);
-	if (ret->data==NULL) {
+
+	if (gnutls_set_datum( ret, str, len) < 0) {
 		gnutls_assert();
 		gnutls_free(ret);
 		return NULL;
 	}
 	
-	memcpy( ret->data, str, len);
-	ret->size = len;
-
 	return ret;
 }
 
 
 /* we use DER here -- FIXME: use BER
  */
-static int _gnutls_get_ber_digest_info( const gnutls_datum *info, MACAlgorithm *hash, opaque* digest, int digest_size) {
+static int _gnutls_get_ber_digest_info( const gnutls_datum *info, MACAlgorithm *hash, opaque* digest, int *digest_size) {
 node_asn* dinfo;
 int result;
 opaque str[1024];
@@ -95,7 +89,7 @@ int len;
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
-	
+
 	result = asn1_get_der( dinfo, info->data, info->size);
 	if (result != ASN_OK) {
 		gnutls_assert();
@@ -122,14 +116,15 @@ int len;
 	}
 
 	if (*hash==-1) {
-fprintf(stderr, "OID: %s\n", str);
+#ifdef DEBUG
+		fprintf(stderr, "HASH OID: %s\n", str);
+#endif
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 	
-	len = digest_size;
 	result =
-	    asn1_read_value( dinfo, "digest_info.digest", digest, &len);
+	    asn1_read_value( dinfo, "digest_info.digest", digest, digest_size);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(dinfo);
@@ -147,7 +142,7 @@ fprintf(stderr, "OID: %s\n", str);
  * e is public key
  */
 int
-_gnutls_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI m, MPI e)
+_gnutls_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e, MPI m)
 {
 	MACAlgorithm hash;
 	int ret;
@@ -164,22 +159,34 @@ _gnutls_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI m
 	
 	/* decrypted is a BER encoded data of type DigestInfo
 	 */
-	
-	if ( (ret = _gnutls_get_ber_digest_info( &decrypted, &hash, digest, sizeof(digest))) != 0) {
+
+	digest_size = sizeof(digest);	
+	if ( (ret = _gnutls_get_ber_digest_info( &decrypted, &hash, digest, &digest_size )) != 0) {
 		gnutls_assert();
 		return ret;
 	}
 
+#ifdef DEBUG
+fprintf(stderr, "digest_size: %s\n", _gnutls_bin2hex(digest,digest_size));
+#endif
+
 	gnutls_free_datum( &decrypted);
 
-	digest_size = gnutls_hash_get_algo_len(hash);
+	if (digest_size != gnutls_hash_get_algo_len(hash)) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
 
-	hd = gnutls_hash_init(hash);
-	gnutls_hash(hd, text->data, text->size);
-	gnutls_hash_deinit(hd, md);
-
-	if (memcmp( md, digest, digest_size)!=0) 
+	hd = gnutls_hash_init( hash);
+	gnutls_hash( hd, text->data, text->size);
+	gnutls_hash_deinit( hd, md);
+#ifdef DEBUG
+	fprintf(stderr, "cmd: %s\n", _gnutls_bin2hex(md, 16));
+#endif
+	if (memcmp( md, digest, digest_size)!=0) {
+		gnutls_assert();
 		return GNUTLS_E_PK_SIGNATURE_FAILED;
+	}
 
 	return 0;		
 }
@@ -206,7 +213,10 @@ gnutls_datum* tbs;
 		gnutls_free_datum(tbs);
 		return GNUTLS_CERT_TRUSTED;
 	}
+#ifdef DEBUG
 fprintf(stderr, "PK: %d\n", issuer->subject_pk_algorithm);	
+#endif
+
 	gnutls_assert();
 	return GNUTLS_CERT_INVALID;
 }
