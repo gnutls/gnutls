@@ -152,7 +152,6 @@ typedef struct {
 	GNUTLS_CipherSuite	current_cipher_suite;
 	CompressionMethod	compression_method;
 	/* for the handshake protocol */
-	HandshakeType		next_handshake_type;
 	MHASH			client_td_md5;
 	MHASH			client_td_sha1;
 	void*			client_md_md5;
