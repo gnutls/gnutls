@@ -9,4 +9,4 @@ autoreconf --force --install
 #automake -a -c --gnu || automake -a -c --gnu
 #autoconf
 
-echo "You can now run \"./configure --enable-developer-mode\" and \"make\""
+echo "You can now run \"./configure\" and \"make\""
