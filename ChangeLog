@@ -1,3 +1,45 @@
+2003-02-03 17:41  nmav <nmav@gnutls.org>
+
+	* src/: prime-gaa.c, prime-gaa.h, prime.c, prime.gaa:
+
+	use options to print DH parameters.  
+
+2003-02-03 17:34  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_ui.h,
+	src/prime.c:
+
+	* Added gnutls_pkcs3_extract_dh_params() and
+	  gnutls_pkcs3_export_dh_params() which extracts and export parameters
+	  from and to PKCS#3 encoded structures.  These were added to read
+	parameters generated using the openssl dhparam tool.  
+	* The prime program was modified to also print the generated prime
+	  and generator using the PKCS#3 format.  
+
+2003-02-03 16:11  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, doc/tex/ex-serv-export.tex,
+	doc/tex/ex-serv-pgp.tex, doc/tex/ex-serv1.tex, lib/Makefile.am,
+	lib/auth_anon.c, lib/auth_dhe.c, lib/gnutls.asn,
+	lib/gnutls.h.in.in, lib/gnutls_alert.c, lib/gnutls_anon_cred.c,
+	lib/gnutls_asn1_tab.c, lib/gnutls_cert.c, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, lib/gnutls_global.c, lib/gnutls_int.h,
+	lib/gnutls_mpi.c, lib/gnutls_rsa_export.c, lib/gnutls_state.c,
+	lib/gnutls_ui.h, src/serv-gaa.c, src/serv-gaa.h, src/serv.c,
+	src/serv.gaa:
+
+	* gnutls_dh_params_generate() and gnutls_rsa_params_generate() now
+	 use gnutls_malloc() to allocate the output parameters.  
+	
+	* Added gnutls_pkcs3_extract_dh_params() which extracts parameters
+	 from PKCS#3 encoded structures. This was in order to read parameters
+	 generated using the openssl dhparam tool.  
+	
+	* Several changes in the temporary (DH/RSA) parameter codebase. No
+	 DH parameters are now included in the library. Also a credentials
+	 structure can now hold only one temporary parameter.  
+
 2003-01-30 20:36  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_ui.c:
