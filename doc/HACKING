@@ -1,0 +1,34 @@
+So far, the following functions have been implemented:
+(The functions prefixed by '_' are internal functions, not intended
+to be included in the API)
+
+gnutls_init(GNUTLS_STATE*, ConnectionEnd):
+	This function just initializes the state to null. (null encryption,
+	null mac etc.)
+
+_gnutls_set_cipher( GNUTLS_STATE, BulkCipherAlgorithm):
+	This function sets the BulkCipherAlgorithm to the pending state.
+
+_gnutls_set_compression(GNUTLS_STATE, CompressionMethod):
+	This function sets the CompressionMethod to the pending state.
+
+_gnutls_set_mac( GNUTLS_STATE, MACAlgorithm):
+	This function sets the MACAlgorithm to the pending state.
+
+_gnutls_set_keys( GNUTLS_STATE):
+	This function is to be called after handshake, when master_secret, 
+	client_random and server_random have been initialized.
+	This function creates the keys and stores them into pending state.
+
+_gnutls_connection_state_init( GNUTLS_STATE):
+	This function sets the current connection state to conform with the
+	security parameters(pending state), and initializes encryption.
+
+gnutls_send( int desc, GNUTLS_STATE, char* data, int datalen):
+gnutls_recv( int desc, GNUTLS_STATE, char* data, int datalen):
+	These functions behave exactly like write()/read(). The 
+	only difference is that they accept, the gnutls_state.
+	They are to transfer data, under the current state.
+
+gnutls_deinit( GNUTLS_STATE* state):
+	This functions clears all buffers associated with the state.
