@@ -1,3 +1,48 @@
+2002-10-09 21:49  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/Makefile.am, lib/gnutls_ui.h, lib/rfc2818_hostname.c:
+
+	Added int gnutls_x509_check_certificates_hostname() which check
+	whether the given hostname matches the owner of the given X.509
+	certificate.  
+
+2002-10-09 21:40  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls_extensions.c, lib/x509_xml.c:
+
+	cleanups 
+
+2002-10-08 13:50  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex4.tex, doc/tex/serv-export.tex,
+	doc/tex/serv1.tex, lib/gnutls.h.in.in, lib/gnutls_priority.c,
+	src/cli-gaa.c:
+
+	Added gnutls_set_default_priority() and
+	gnutls_set_default_export_priority() functions, to avoid calling all
+	the *_priority() functions if the defaults are ok.  
+
+2002-10-07 16:32  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_ui.h, lib/gnutls_x509.c:
+
+	Added gnutls_x509_extract_certificate_dn_string() which returns the
+	peer's Distinguished name in a single string.  
+
+2002-10-07 16:15  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, lib/gnutls.h.in.in, lib/gnutls_auth.c,
+	lib/gnutls_errors.h, lib/gnutls_handshake.c, lib/gnutls_kx.c,
+	src/cli.c, src/cli.gaa:
+
+	several cleanups 
+
+2002-10-07 13:38  nmav <nmav@gnutls.org>
+
+	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa:
+
+	Changes in gnutls-cli, to allow testing of starttls implementations.  
+
 2002-10-05 09:34  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_ui.c, lib/gnutls_ui.h:
