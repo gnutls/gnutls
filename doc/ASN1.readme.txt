@@ -1,0 +1,333 @@
+
+------------------------------------------------
+--   Readme file for ASN1 parser              --
+--                                            --
+--   Originator:  Fabio Fiorina               --
+--   e-mail:      Fabio.Fiorina@alcatel.it    --
+--                fiorinaf@bgonline.it        --
+------------------------------------------------
+
+
+
+INTRODUCTION
+------------
+This file wants to be only the first introduction to the parser I developed, that is also
+in his first version. 
+So I ask you to let me know whether this kind of interface (software functions) is useful or not.
+I know also that this is not the correct format for GNU documentation, but in this moment
+I prefer to have a feedback as soon as possible.
+
+I forgot, thanks for your patience reading my 'black and white' writing (and speaking).
+
+
+FILE LIST
+---------
+ASN.readme.txt        this file
+ASN.y                 bison input file
+ASN.tab.c             bison output file
+CertificateExample.c  example based on Appendix D.1 of rfc2459
+gnutls_asn1.c         functions for ASN1 parser and for reading and setting elements' value
+gnutls_asn1.h         contains constants for the gnutls_asn1.c. Must be included in files 
+                      that use ASN1 parser.
+gnutls_der.c          functions for der encoding creation and analysis
+gnutls_der.h          contains constants for the gnutls_der.c. Must be included in files 
+                      that use ASN1 parser.
+Certificate.txt       certificate and CRL structures 
+Makefile              how to create 'CertificateExample'
+
+
+
+ASN.1 SYNTAX
+------------
+The parser is case sensitive. The comments begin with "-- " and end at the end of line.
+An example is in "Certificate.txt" file.
+The ASN.1 declarations must have this form:
+      
+      object_name {<object definition>}
+
+      DEFINITIONS <EXPLICIT or IMPLICIT> TAGS ::=
+
+      BEGIN 
+
+      <type and constants definitions>
+
+      END
+
+The token "::=" must be separate from others elements, so this is a wrong declaration:
+      Version ::=INTEGER 
+the correct one is :   Version ::= INTEGER
+In this parser is not possible to use negative numbers:
+      version  INTEGER default -1     -- not allowed
+Here is the list of types that the parser can manage:
+     INTEGER
+     BOOLEAN
+     OBJECT IDENTIFIER
+     NULL
+     BIT STRING
+     OCTET STRING
+     UTCTime
+     GeneralizedTime
+     SEQUENCE
+     SEQUENCE OF
+     SET 
+     SET OF
+     CHOICE
+     ANY
+     ANY DEFINED BY
+This version doesn't manage REAL and ENUMERATED types. It also not allow the use of 
+"EXPORT" and "IMPORT" sections.
+
+The SIZE constraints are allowed but no check is done on them.
+
+
+
+NAMING
+--------
+If you have this definitions:
+
+      Example { 1 2 3 4 }
+
+      DEFINITIONS EXPLICIT TAGS ::=
+
+      BEGIN 
+
+      Group ::= SEQUENCE {
+	 id   OBJECT IDENTIFIER,
+	 value  Value
+      }
+
+      Value ::= SEQUENCE {
+	    value1  INTEGER,
+	    value2  BOOLEAN 
+      }
+
+      END
+
+to identify the type 'Group' you have to use the null terminated string "Example.Group".
+Others examples:
+Field 'id' in 'Group' type :  "Example.Group.id"
+Field 'value1' in filed 'value' in type 'Group':   "Example.Group.value.value1" 
+These strings are used in functions that are described below.
+Elements of structured types that don't have a name, receve the name "?1","?2", and so on. 
+The name "?LAST" indicates the last element of a SET_OF or SEQUENCE_OF.
+
+
+
+FUNCTIONS
+---------
+
+   int parser_asn1(char *file_name);
+   --------------------------------
+Creates the structures needed to manage the definitions included in *FILE_NAME file.
+Input Parameters: 
+  char *file_name: specify the path and the name of file that contains ASN.1 declarations.
+Return Value:
+  ASN_OK: the file has a correct syntax and every identifier is known. 
+  ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
+  ASN_SYNTAX_ERROR: the syntax is not correct.
+  ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
+
+
+   int create_structure(char *dest_name,char *source_name);
+   -------------------------------------------------------
+Creates a structure called DEST_NAME of type SOURCE_NAME.
+Input Parameters:
+  char *dest_name: the name of the new structure. It must be different from any other structure 
+                   or type already created.
+  char *source_name: the name of the type to use to create the structure.
+Return Value:
+  ASN_OK: creation OK
+  ASN_ELEMENT_NOT_FOUND: SOURCE_NAME isn't known
+Example: using "Certificate.txt"
+  result=create_structure("certificate1","PKIX1Explicit88.Certificate");
+
+
+   int write_value(char *name,unsigned char *value,int len);
+   --------------------------------------------------------
+Set the value of one element inside a structure.
+Input Parameters:
+  char *name: the name of the element inside a structure that you want to set.
+  unsigned char *value: vector used to specify the value to set.
+  int len: number of bytes of *value to use to set the value: value[0]..value[len-1]
+Return Value:
+  ASN_OK: set value OK
+  ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
+  ASN_VALUE_NOT_VALID: VALUE has a wrong format.
+Examples:  description for each type
+  INTEGER: VALUE must contain a two's complement form integer.
+           value[0]=0xFF ,               len=1 -> integer=-1
+           value[0]=0xFF value[1]=0xFF , len=2 -> integer=-1
+           value[0]=0x01 ,               len=1 -> integer= 1
+           value[0]=0x00 value[1]=0x01 , len=2 -> integer= 1
+  BOOLEAN: VALUE must be the null terminated string "TRUE" or "FALSE" and LEN != 0
+           value="TRUE" , len=1 -> boolean=TRUE
+           value="FALSE" , len=1 -> boolean=FALSE
+  OBJECT IDENTIFIER: VALUE must be a null terminated string with each number separated by
+                     a blank (e.g. "1 2 3 543 1"). 
+                     LEN != 0
+           value="1 2 840 10040 4 3" , len=1 -> OID=dsa-with-sha
+  UTCTime: VALUE must be a null terminated string in one of these formats:
+           "YYMMDDhhmmssZ" "YYMMDDhhmmssZ" "YYMMDDhhmmss+hh'mm'" "YYMMDDhhmmss-hh'mm'"
+           "YYMMDDhhmm+hh'mm'" "YYMMDDhhmm-hh'mm'".  
+           LEN != 0
+           value="9801011200Z" , len=1 -> time=Jannuary 1st, 1998 at 12h 00m  Greenwich Mean Time
+  GeneralizedTime: VALUE must be in one of this format:
+                   "YYYYMMDDhhmmss.sZ" "YYYYMMDDhhmmss.sZ" "YYYYMMDDhhmmss.s+hh'mm'" 
+                   "YYYYMMDDhhmmss.s-hh'mm'" "YYYYMMDDhhmm+hh'mm'" "YYYYMMDDhhmm-hh'mm'" 
+                   where ss.s indicates the seconds with any precision like "10.1" or "01.02".
+                   LEN != 0
+           value="2001010112001.12-0700" , len=1 -> time=Jannuary 1st, 2001 at 12h 00m 01.12s 
+                                                    Pacific Daylight Time
+  OCTET STRING: VALUE contains the octet string and LEN is the number of octet.
+           value="\x01\x02\x03" , len=3  -> three bytes octet string
+  BIT STRING: VALUE contains the bit string organized by bytes and LEN is the number of bits.
+           value="\xCF" , len=6 -> bit string="110011" (six bits)
+  CHOICE: if NAME indicates a choice type, VALUE must specify one of the alternatives with a
+          null terminated string. LEN != 0
+          Using "Certificate.txt":
+          result=write_value("certificate1.tbsCertificate.subject","rdnSequence",1);
+  ANY: VALUE (null terminated string) indicates the type that must be used instead of ANY.
+       LEN != 0 
+          value="X520name" , len=1 -> type ANY becomes X520name
+  SEQUENCE OF: VALUE must be the null terminated string "NEW" and LEN != 0. With this 
+               instruction another element is appended in the sequence. The name of this
+               element will be "?1" if it's the first one, "?2" for the second and so on.
+          Using "Certificate.txt":   
+          result=write_value("certificate1.tbsCertificate.subject.rdnSequence","NEW",1);
+  SET OF: the same as SEQUENCE OF. 
+          Using "Certificate.txt":
+          result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",1);
+
+If an element is OPTIONAL and you want to delete it, you must use the value=NULL and len=0.
+          Using "Certificate.txt":
+          result=write_value("certificate1.tbsCertificate.issuerUniqueID",NULL,0);
+
+
+   int read_value(char *name,unsigned char *value,int *len);
+   --------------------------------------------------------
+Returns the value of one element inside a structure.
+Input Parameters:
+  char *name: the name of the element inside a structure that you want to read.
+Output Parameters:
+  unsigned char *value: vector that will contain the element's content. 
+                        VALUE must be a pointer to memory cells already allocated.
+  int *len: number of bytes of *value: value[0]..value[len-1]
+Return Value:
+  ASN_OK: set value OK
+  ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
+  ASN_VALUE_NOT_FOUND: there isn't any value for the element selected.
+Examples: a description for each type
+  INTEGER: VALUE will contain a two's complement form integer.
+           integer=-1  -> value[0]=0xFF , len=1
+           integer=1   -> value[0]=0x01 , len=1
+  BOOLEAN: VALUE will be the null terminated string "TRUE" or "FALSE" and LEN=5 or LEN=6
+  OBJECT IDENTIFIER: VALUE will be a null terminated string with each number separated by
+                     a blank (i.e. "1 2 3 543 1"). 
+                     LEN = strlen(VALUE)+1  
+  UTCTime: VALUE will be a null terminated string in one of these formats: 
+           "YYMMDDhhmmss+hh'mm'" or "YYMMDDhhmmss-hh'mm'"
+           LEN=strlen(VALUE)+1
+  GeneralizedTime: VALUE will be a null terminated string in the same format used to set
+                   the value
+  OCTET STRING: VALUE will contain the octet string and LEN will be the number of octet.
+  BIT STRING: VALUE will contain the bit string organized by bytes and LEN will be the 
+              number of bits.
+  CHOICE: if NAME indicates a choice type, VALUE will specify the alternative selected
+  ANY: if NAME indicates an any type, VALUE will indicate the DER encoding of the structure 
+       actually used.
+
+If an element is OPTIONAL and the function "read_value" returns ASN_ELEMENT_NOT_FOUND, it 
+means that this element wasn't present in the der encoding that created the structure.
+The first element of a SEQUENCE_OF or SET_OF is named "?1". The second one "?2" and so on.
+
+
+   int create_der(char *name,unsigned char *der,int *len);
+   ------------------------------------------------------
+Creates the DER encoding for the NAME structure.
+Input Parameters:
+  char *name: the name of the structure you want to encode.
+Output Parameters:
+  unsigned char *der: vector that will contain the DER encoding. 
+                      DER must be a pointer to memory cells already allocated.
+  int *len: number of bytes of *der: der[0]..der[len-1]
+Return Value:
+  ASN_OK: DER encoding OK
+  ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
+  ASN_VALUE_NOT_FOUND: there is an element without a value.
+
+
+   int get_der(char *name,unsigned char *der,int len);
+   --------------------------------------------------
+Fill the structure NAME with values of a DER encoding string. The sructure must just be
+created with function 'create_stucture'.
+Input Parameters:
+  char *name: the name of the structure that you want to fill.
+  unsigned char *der: vector that contains the DER encoding. 
+  int len: number of bytes of *der: der[0]..der[len-1]
+Return Value:
+  ASN_OK: DER encoding OK
+  ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
+  ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
+
+
+   int get_start_end_der(char *name,unsigned char *der,int len,char *name_element,int *start, int *end);
+   ----------------------------------------------------------------------------------------------------
+Find the start and end point of an element in a DER encoding string. I mean that if you
+have a der encoding and you have already used the function "get_der" to fill a structure, it may
+happen that you want to find the piece of string concerning an element of the structure.
+Example: the sequence "tbsCertificate" inside an X509 certificate.
+Input Parameters:
+  char *name: the name of the structure that is already setted with DER string.
+  unsigned char *der: vector that contains the DER encoding. 
+  int len: number of bytes of *der: der[0]..der[len-1]
+  char *name_element: an element of NAME structure.
+Output Parameters:
+  int *start: the position of the first byte of NAME_ELEMENT decoding (der[*start]) 
+  int *end: the position of the last byte of NAME_ELEMENT decoding (der[*end])
+Return Value:
+  ASN_OK: DER encoding OK
+  ASN_ELEMENT_NOT_FOUND: NAME or NAME_ELEMENT is not a valid element.
+  ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
+  
+
+   int delete_structure(char *name);
+   ---------------------------------
+Deletes the structure NAME. 
+Input Parameters:
+  char *name: the name of the structure that you want to delete.
+Return Value:
+  ASN_OK: everything OK
+  ASN_ELEMENT_NOT_FOUND: wasn't find the NAME element.
+
+
+   void visit_tree(char *name);
+   ---------------------------
+Prints on the standard output the structure's tree starting from the NAME element.
+
+
+
+FUTURE DEVELOPMENTS
+-------------------
+If this parser and this kind of interface is useful, I want to:
+1. intoduce the REAL and ENUMERATED types 
+2. allow negative numbers in ASN.1 files.
+3. allow an easiest way to set INTEGER and OBJECT IDENTFIER using constant names instead of 
+   numbers. I mean it will be possible set an OID with a string like "dsa-with-sha" or an
+   INTEGER with "v1" (see 'Version' type in the Certificate structure) 
+4. improve the error signaling with strings that give you more details. 
+   Examples: in case of ASN1 syntax error you will have the line number where the error is,  
+             if creating a der encoding the result is ASN_VALUE_NOT_FOUND you will have the
+             name of the element without the value.
+5. improve the 'visit_tree' function and change the output from stdout to a null terminated 
+   string.  
+
+
+
+
+
+
+
+
+
+
+
