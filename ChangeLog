@@ -1,3 +1,36 @@
+2002-12-01 21:57  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	more fixes in gnutls_x509_extract_certificate_dn_string() 
+
+2002-12-01 21:47  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex-pgp-keyserver.tex, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, src/common.c:
+
+	Added the function gnutls_srp_server_set_credentials_function() to
+	allow retrieving SRP parameters from an external backend - other 
+	than password files.  
+
+2002-12-01 20:29  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex-pgp-keyserver.tex, lib/auth_cert.c:
+
+	Enabled the OpenPGP key retrieval callback function (untested yet).  
+
+2002-12-01 19:50  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/x509_b64.c, src/common.c, src/crypt-gaa.c, src/crypt.c,
+	src/crypt.gaa:
+
+	Added the functions: 
+	   gnutls_srp_verifier() 
+	   gnutls_srp_base64_encode() 
+	   gnutls_srp_base64_decode() 
+	
+	and modified the gnutls-srpcrypt, to use the exported functions.  
+
 2002-11-25 10:39  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_int.h, gnutls_x509.c:
