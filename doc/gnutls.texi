@@ -56,6 +56,7 @@ Free Documentation License".
 * More on certificate authentication::
 * How to use TLS in application protocols::
 * Included programs::
+* Error codes and descriptions::
 * Copying This Manual::
 * Index::
 @end menu
@@ -2004,6 +2005,7 @@ signing_key
 #time_stamping_key
 @end example
 
+@include error_codes.texi
 
 @node Copying This Manual
 @appendix Copying This Manual
