@@ -30,7 +30,7 @@
 #include "gnutls_int.h"
 #include "crypt_bcrypt.h"
 #include "gnutls_random.h"
-#include "cert_b64.h"
+#include "auth_srp_passwd.h"
 #include "gnutls_srp.h"
 #include <gnutls_errors.h>
 

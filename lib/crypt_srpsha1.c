@@ -22,7 +22,7 @@
 #include "gnutls_int.h"
 #include "gnutls_random.h"
 #include "gnutls_hash_int.h"
-#include "cert_b64.h"
+#include "auth_srp_passwd.h"
 #include "gnutls_srp.h"
 #include <gnutls_errors.h>
 
