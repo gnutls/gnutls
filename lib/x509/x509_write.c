@@ -110,10 +110,11 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid,
 /**
   * gnutls_x509_crt_set_version - This function will set the Certificate request version
   * @crt: should contain a gnutls_x509_crt structure
-  * @version: holds the version number. For X509v1 certificates must be 0.
+  * @version: holds the version number. For X.509v1 certificates must be 1.
   *
-  * This function will set the version of the certificate request. This
-  * must be zero.
+  * This function will set the version of the certificate. This
+  * must be one for X.509 version 1, and so on. Plain certificates without
+  * extensions must have version set to one.
   *
   * Returns 0 on success.
   *
@@ -121,7 +122,9 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid,
 int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
 {
 int result;
-uint8 null = version;
+char null = version - 1;
+
+	if (null < 0) null = 0;
 
 	result = asn1_write_value( crt->cert, "tbsCertificate.version", &null, 1);
 	if (result != ASN1_SUCCESS) {

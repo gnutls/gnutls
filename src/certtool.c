@@ -274,7 +274,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	int size, serial;
 	int days, result, ca_status;
 	const char* str;
-	int vers = 0; /* the default version in the certificate 
+	int vers = 1; /* the default version in the certificate 
 	               */
 	gnutls_x509_crq crq; /* request */
 
@@ -359,7 +359,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	if (result != 0) {
 		str = read_str( "Enter the dnsName of the subject of the certificate: ");
 		if (str != NULL) {
-			vers = 2; /* only version 3 certificates, can
+			vers = 3; /* only version 3 certificates, can
 			           * have extensions.
 			           */
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_DNSNAME, str);
@@ -373,7 +373,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		str = read_str( "Enter the e-mail of the subject of the certificate: ");
 	
 		if (str != NULL) {
-			vers = 2;
+			vers = 3;
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_RFC822NAME, str);
 			if (result < 0) {
 				fprintf(stderr, "subject_alt_name: %s\n", gnutls_strerror(result));
@@ -1398,7 +1398,7 @@ void generate_request(void)
 	read_crq_set( crq, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
 	read_crq_set( crq, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
 
-	ret = gnutls_x509_crq_set_version( crq, 0);
+	ret = gnutls_x509_crq_set_version( crq, 1);
 	if (ret < 0) {
 		fprintf(stderr, "set_version: %s\n", gnutls_strerror(ret));
 		exit(1);

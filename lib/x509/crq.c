@@ -93,7 +93,7 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq crq)
   * @format: One of DER or PEM
   *
   * This function will convert the given DER or PEM encoded Certificate
-  * to the native gnutls_x509_crq format. The output will be stored in 'cert'.
+  * to the native gnutls_x509_crq format. The output will be stored in @cert.
   *
   * If the Certificate is PEM encoded it should have a header of "NEW CERTIFICATE REQUEST".
   *
@@ -161,7 +161,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
   * gnutls_x509_crq_get_dn - This function returns the Certificate request subject's distinguished name
   * @crq: should contain a gnutls_x509_crq structure
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of 'buf'
+  * @sizeof_buf: initialy holds the size of @buf
   *
   * This function will copy the name of the Certificate request subject in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
@@ -193,7 +193,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of 'buf'
+  * @sizeof_buf: initialy holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate request subject, specified
   * by the given OID. The output will be encoded as described in RFC2253. The output
@@ -228,7 +228,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
   * @crq: should contain a gnutls_x509_crq structure
   * @indx: Specifies which DN OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the name (may be null)
-  * @sizeof_oid: initialy holds the size of 'oid'
+  * @sizeof_oid: initialy holds the size of @oid
   *
   * This function will extract the requested OID of the name of the Certificate request subject, specified
   * by the given index. 
@@ -421,7 +421,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
   * @oid: holds an Object Identifier in a null terminated string
   * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @data: a pointer to the input data
-  * @sizeof_data: holds the size of 'data'
+  * @sizeof_data: holds the size of @data
   *
   * This function will set the part of the name of the Certificate request subject, specified
   * by the given OID. The input string should be ASCII or UTF-8 encoded.
@@ -449,10 +449,10 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 /**
   * gnutls_x509_crq_set_version - This function will set the Certificate request version
   * @crq: should contain a gnutls_x509_crq structure
-  * @version: holds the version number. For v1 Requests must be 0.
+  * @version: holds the version number. For v1 Requests must be 1.
   *
-  * This function will set the version of the certificate request. This
-  * must be zero.
+  * This function will set the version of the certificate request. For
+  * version 1 requests this must be one.
   *
   * Returns 0 on success.
   *
@@ -460,8 +460,10 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
 {
 int result;
-uint8 null = version;
+char null = version - 1;
 
+	if (null < 0) null = 0;
+	
 	if (crq==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;

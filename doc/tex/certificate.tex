@@ -82,11 +82,14 @@ owner is the one you expect. See section \ref{ex:rfc2818} on page \pageref{ex:rf
 for an example.
 
 
-\subsection{PKCS \#10 certificate requests}
-A certificate request is a structure, defined in PKCS \#10, which
+\subsection{PKCS \#10 certificate requests\index{Certificate requests}\index
+{PKCS \#10}}
+A certificate request is a structure, which
 is contains information about an applicant of a certificate service.
 It usually contains a private key, a distinguished name and secondary
-data such as a challenge password.
+data such as a challenge password. \gnutls{} supports the requests
+defined in PKCS \#10. Other certificate request's format such as
+PKIX's RFC2511 are not currently supported.
 \par
 The following example is about generating a certificate request, and
 a private key. A certificate request can be later be processed by a CA,
@@ -94,7 +97,7 @@ which should return a signed certificate.
 
 \input{ex-crq}
 
-\subsection{PKCS \#12 structures}
+\subsection{PKCS \#12 structures\index{PKCS \#12}}
 A PKCS \#12 structure usually contains a user's private keys and
 certificates. It is commonly used in browsers to export and import
 the user's identities.
