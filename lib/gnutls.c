@@ -190,9 +190,9 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 	o1 =
 	    gnutls_P_hash(MHASH_MD5, s1, l_s1, s_seed, s_seed_size,
 			  total_bytes);
-//	o2 =
-//	    gnutls_P_hash(MHASH_SHA1, s2, l_s2, s_seed, s_seed_size,
-//			  total_bytes);
+	o2 =
+	    gnutls_P_hash(MHASH_SHA1, s2, l_s2, s_seed, s_seed_size,
+			  total_bytes);
 
 	ret = secure_calloc(1, total_bytes);
 	gnutls_free(s_seed);
@@ -201,7 +201,7 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 	}
 
 	secure_free(o1);
-//	secure_free(o2);
+	secure_free(o2);
 
 	return ret;
 
@@ -313,6 +313,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 		iterations = sizeofdata / 16384;
 		Size = 16384;
 	}
+
 	for (i = 0; i < iterations; i++) {
 		err =
 		    _gnutls_text2TLSPlaintext(type, &gtxt, &data[i * Size],
@@ -363,6 +364,9 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Send Packet[%d] %d with length: %d\n", (int)state->connection_state.write_sequence_number, gcipher->type, gcipher->length);
+#endif
 #ifdef WORDS_BIGENDIAN
 		length = gcipher->length;
 #else
@@ -525,6 +529,10 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 	gcipher.length = byteswap16(gcipher.length);
 #endif
 
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Received Packet[%d] %d with length: %d\n", (int)state->connection_state.read_sequence_number, gcipher.type, gcipher.length);
+#endif
+
 	if (gcipher.length > 18432) {	/* 2^14+2048 */
 #ifdef DEBUG
 		fprintf(stderr,
@@ -592,6 +600,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 		return ret;
 	}
 	tmplen = gtxt->length;
+
 
 	_gnutls_freeTLSPlaintext(gtxt);
 

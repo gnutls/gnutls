@@ -83,8 +83,9 @@ _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 		ERR("recv finished int", ret);
 		return ret;
 	}
-	if (ret != 12)
+	if (ret != 12) {
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
+	}
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		memmove(concat, state->gnutls_internals.server_md_md5, 16);
@@ -212,6 +213,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 	uint32 datasize;
 	int pos = 0;
 
+
 #ifdef WORDS_BIGENDIAN
 	datasize = i_datasize;
 #else
@@ -244,6 +246,9 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 		      i_datasize);
 	}
 
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Send HANDSHAKE[%d]\n", type);
+#endif
 	ret =
 	    gnutls_send_int(cd, state, GNUTLS_HANDSHAKE, data, i_datasize);
 
@@ -286,6 +291,10 @@ int _gnutls_recv_handshake_int(int cd, GNUTLS_STATE state, void *data,
 	}
 
 	ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Received HANDSHAKE[%d]\n", dataptr[0]);
+#endif
 
 	switch (dataptr[0]) {
 	case GNUTLS_CLIENT_HELLO:
@@ -805,11 +814,6 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		}
 
 
-
-		/* Initialize the connection state (start encryption) */
-
-
-
 		ret =
 		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
 				    NULL, 0);
@@ -818,6 +822,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
+		/* Initialize the connection state (start encryption) */
 		_gnutls_connection_state_init(state);
 
 		state->gnutls_internals.client_md_md5 =
@@ -850,7 +855,7 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		NOT_HASH(server_hash);
 		ret = _gnutls_send_finished(cd, state);
 		if (ret < 0) {
-			ERR("recv finished", ret);
+			ERR("send finished", ret);
 			return ret;
 		}
 

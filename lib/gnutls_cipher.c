@@ -14,7 +14,7 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 
 	if (_gnutls_cipher_is_ok(algo) == 0) {
 		state->security_parameters.bulk_cipher_algorithm = algo;
-		if (_gnutls_cipher_is_block(algo) == 0) {
+		if (_gnutls_cipher_is_block(algo) == 1) {
 			state->security_parameters.cipher_type =
 			    CIPHER_BLOCK;
 		} else {
@@ -86,14 +86,16 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 {
 	int rc;
 
-/* Set the keys since we have the master secret*/
-_gnutls_set_keys(state);
-
 /* Update internals from CipherSuite selected */
+
 rc = _gnutls_set_cipher( state, _gnutls_cipher_suite_get_cipher_algo(state->gnutls_internals.current_cipher_suite));
 if (rc<0) return rc;
 rc = _gnutls_set_mac( state, _gnutls_cipher_suite_get_mac_algo(state->gnutls_internals.current_cipher_suite));
 if (rc<0) return rc;
+
+/* Set the keys since we have the master secret*/
+_gnutls_set_keys(state);
+
 
 /* FIXME: This is not implemented (no compression algorithms used)
  * state->security_parameters.compression_algorithm = _gnutls_cipher_suite_get_mac_algo(state->gnutls_internals.current_cipher_suite);
@@ -177,12 +179,13 @@ if (rc<0) return rc;
 					       server_write_key,
 					       state->security_parameters.
 					       key_size);
-			gcry_cipher_setiv(state->connection_state.
+			    gcry_cipher_setiv(state->connection_state.
 					  write_cipher_state,
 					  state->cipher_specs.
 					  server_write_IV,
 					  state->security_parameters.
 					  IV_size);
+
 		}
 		if (state->connection_state.mac_secret_size > 0) {
 			memmove(state->connection_state.read_mac_secret,
@@ -202,7 +205,7 @@ if (rc<0) return rc;
 					       client_write_key,
 					       state->security_parameters.
 					       key_size);
-			gcry_cipher_setiv(state->connection_state.
+			    gcry_cipher_setiv(state->connection_state.
 					  read_cipher_state,
 					  state->cipher_specs.
 					  client_write_IV,
@@ -226,6 +229,7 @@ if (rc<0) return rc;
 					  server_write_IV,
 					  state->security_parameters.
 					  IV_size);
+
 		}
 		if (state->connection_state.mac_secret_size > 0) {
 			memmove(state->connection_state.read_mac_secret,
@@ -278,10 +282,10 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	int length;
 	MHASH td;
 
-
 	content = gnutls_malloc(compressed->length);
 	memmove(content, compressed->fragment, compressed->length);
 
+/* not needed in mhash */
 /*	if (state->connection_state.mac_secret_size>0) {
 		MAC = gnutls_malloc(state->connection_state.mac_secret_size);
 	}*/
@@ -321,9 +325,9 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	seq_num = state->connection_state.write_sequence_number;
 	c_length = compressed->length;
 #else
+	c_length = byteswap16(compressed->length);
 	seq_num =
 	    byteswap64(state->connection_state.write_sequence_number);
-	c_length = byteswap16(compressed->length);
 #endif
 	if (td != MHASH_FAILED) {
 		mhash(td, &seq_num, 8);
@@ -331,7 +335,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		mhash(td, &compressed->version.major, 1);
 		mhash(td, &compressed->version.minor, 1);
 		mhash(td, &c_length, 2);
-		mhash(td, &compressed->fragment, compressed->length);
+		mhash(td, compressed->fragment, compressed->length);
 		MAC = mhash_hmac_end(td);
 	}
 	switch (state->security_parameters.cipher_type) {
@@ -341,6 +345,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			length =
 			    compressed->length +
 			    state->connection_state.mac_secret_size;
+
 			data = gnutls_malloc(length);
 			memmove(data, content, compressed->length);
 			memmove(&data[compressed->length], MAC,
@@ -370,9 +375,9 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			    state->connection_state.mac_secret_size +
 			    rand[0] + 1;
 			length =
-			    (length /
-			     _gnutls_cipher_get_block_size(GNUTLS_3DES)) *
-			    _gnutls_cipher_get_block_size(GNUTLS_3DES);
+			    (length / _gnutls_cipher_get_block_size(GNUTLS_3DES));
+			length *= _gnutls_cipher_get_block_size(GNUTLS_3DES);
+
 			pad =
 			    length - compressed->length -
 			    state->connection_state.mac_secret_size - 1;
@@ -486,22 +491,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
 
-#ifdef WORDS_BIGENDIAN
-	seq_num = state->connection_state.read_sequence_number;
-	c_length = ciphertext->length;
-#else
-	seq_num = byteswap64(state->connection_state.read_sequence_number);
-	c_length = byteswap16(ciphertext->length);
-#endif
-	if (td != MHASH_FAILED) {
-		mhash(td, &seq_num, 8);
-		mhash(td, &ciphertext->type, 1);
-		mhash(td, &ciphertext->version.major, 1);
-		mhash(td, &ciphertext->version.minor, 1);
-		mhash(td, &c_length, 2);
-		mhash(td, &ciphertext->fragment, ciphertext->length);
-		MAC = mhash_hmac_end(td);
-	}
+
 	switch (state->security_parameters.cipher_type) {
 	case CIPHER_STREAM:
 		switch (state->security_parameters.bulk_cipher_algorithm) {
@@ -511,12 +501,6 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			    state->connection_state.mac_secret_size;
 			data = gnutls_malloc(length);
 			memmove(data, content, length);
-
-			/* HMAC was not the same. */
-			if (memcmp
-			    (MAC, &data[length],
-			     state->connection_state.mac_secret_size) != 0)
-				return GNUTLS_E_MAC_FAILED;
 
 			compressed->fragment = data;
 			compressed->length = length;
@@ -536,7 +520,6 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	case CIPHER_BLOCK:
 		switch (state->security_parameters.bulk_cipher_algorithm) {
 		case GNUTLS_3DES:
-
 			gcry_cipher_decrypt(state->connection_state.
 					    read_cipher_state, content,
 					    ciphertext->length, content,
@@ -547,12 +530,6 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			    ciphertext->length -
 			    state->connection_state.mac_secret_size - pad -
 			    1;
-
-			/* HMAC was not the same. */
-			if (memcmp
-			    (MAC, &data[length],
-			     state->connection_state.mac_secret_size) != 0)
-				return GNUTLS_E_MAC_FAILED;
 
 			data = gnutls_malloc(length);
 			memmove(data, content, length);
@@ -578,9 +555,35 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
-//      gnutls_free( MAC);
+#ifdef WORDS_BIGENDIAN
+	seq_num = state->connection_state.read_sequence_number;
+	c_length = compressed->length;
+#else
+	seq_num = byteswap64(state->connection_state.read_sequence_number);
+	c_length = byteswap16((uint16)compressed->length);
+#endif
+
+
+	if (td != MHASH_FAILED) {
+		mhash(td, &seq_num, 8);
+		mhash(td, &compressed->type, 1);
+		mhash(td, &compressed->version.major, 1);
+		mhash(td, &compressed->version.minor, 1);
+		mhash(td, &c_length, 2);
+		mhash(td, data, compressed->length);
+		MAC = mhash_hmac_end(td);
+	}
+		/* HMAC was not the same. */
+	if (memcmp( MAC, &content[compressed->length], state->connection_state.mac_secret_size) != 0) {
+#ifdef DEBUG	
+		fprintf(stderr, "MAC FAILED\n");
+#endif
+		return GNUTLS_E_MAC_FAILED;
+	}
+
+
 	if (td != MHASH_FAILED)
-		free(MAC);
+		mhash_free(MAC);
 	gnutls_free(content);
 
 	return 0;
