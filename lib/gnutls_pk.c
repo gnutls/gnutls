@@ -19,7 +19,8 @@
  *
  */
 
-/* This file contains function for RSA/DSA etc. 
+/* This file contains the functions needed for RSA/DSA public key
+ * encryption and signatures. 
  */
 
 #include <gnutls_int.h>

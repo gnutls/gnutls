@@ -19,6 +19,10 @@
  *
  */
 
+/* Functions that are supposed to run after the handshake procedure is
+ * finished. These functions activate the established security parameters.
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_constate.h>
 #include <gnutls_errors.h>

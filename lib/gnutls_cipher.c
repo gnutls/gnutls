@@ -19,6 +19,10 @@
  *
  */
 
+/* Some high level functions to be used in the record encryption are
+ * included here.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_compress.h"

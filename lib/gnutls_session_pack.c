@@ -18,6 +18,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
+ 
+/* Contains functions that are supposed to pack and unpack session data,
+ * before and after they are sent to the database backend.
+ */
+
 #include <gnutls_int.h>
 #include <auth_srp.h>
 #include <auth_anon.h>

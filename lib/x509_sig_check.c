@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions that relate to X.509 certificate signature checking.
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <x509_b64.h>

@@ -19,6 +19,9 @@
  *
  */
 
+/* Here lies the code of the gnutls_*_set_priority() functions.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_errors.h"

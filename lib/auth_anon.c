@@ -16,7 +16,13 @@
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
- * */
+ * 
+ */
+
+/* This file contains the Anonymous Diffie Hellman key exchange part of
+ * the anonymous authentication. The functions here are used in the
+ * handshake.
+ */
 
 #include "gnutls_int.h"
 

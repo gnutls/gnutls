@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions that relate to the X.509 extension parsing.
+ */
+
 #include <gnutls_int.h>
 #include <libtasn1.h>
 #include <gnutls_num.h>

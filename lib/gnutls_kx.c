@@ -19,6 +19,10 @@
  *
  */
 
+/* This file contains functions which are wrappers for the key exchange
+ * part of TLS. They are called by the handshake functions (gnutls_handshake)
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_handshake.h"
 #include "gnutls_kx.h"
@@ -43,6 +47,8 @@ int _gnutls_generate_master( GNUTLS_STATE state) {
 	return 0;
 }
 
+/* here we generate the TLS Master secret.
+ */
 #define PREMASTER state->gnutls_key->key
 static int generate_normal_master( GNUTLS_STATE state) {
 int ret = 0;

@@ -27,6 +27,8 @@ int _gnutls_dh_get_prime_bits( GNUTLS_STATE state);
 void gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
 void _gnutls_handshake_internal_state_clear( GNUTLS_STATE);
 
+int _gnutls_session_is_resumable( GNUTLS_STATE state);
+
 int _gnutls_openpgp_send_fingerprint( GNUTLS_STATE state);
 
 int _gnutls_PRF( const opaque * secret, int secret_size, const uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes, void* ret);

@@ -19,6 +19,10 @@
  *
  */
 
+/* This file contains the code the Certificate Type TLS extension.
+ * This extension is currently gnutls specific.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"

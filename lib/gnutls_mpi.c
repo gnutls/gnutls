@@ -19,6 +19,10 @@
  *
  */
 
+/* Here lie everything that has to do with large numbers, libgcrypt and
+ * other stuff that didn't fit anywhere else.
+ */
+
 #include <gnutls_int.h>
 #include <libtasn1.h>
 #include <gnutls_errors.h>

@@ -19,6 +19,10 @@
  */
 
 
+/* This file has the required functions to convert an X.509 DER certificate
+ * to XML format.
+ */
+
 #include <int.h>
 #include <errors.h>
 #include <structure.h>
@@ -201,9 +205,6 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 					&structure);
 	ret = _gnutls_x509_expand_extensions( &structure, name);
 
-//asn1_print_structure( stdout, structure, name, ASN1_PRINT_ALL);
-//return 0;
-////
 	p = root;
 	while (p) {
 

@@ -19,6 +19,11 @@
  *
  */
 
+/* Functions that relate to the TLS hello extension parsing.
+ * Hello extensions are packets appended in the TLS hello packet, and
+ * allow for extra functionality.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_extensions.h"
 #include "gnutls_errors.h"

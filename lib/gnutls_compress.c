@@ -19,6 +19,10 @@
  *
  */
 
+/* This file contains the functions which convert the TLS plaintext
+ * packet to TLS compressed packet.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_compress.h"
 #include "gnutls_errors.h"

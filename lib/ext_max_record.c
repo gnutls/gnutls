@@ -19,6 +19,9 @@
  *
  */
 
+/* This file contains the code for the Max Record Size TLS extension.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"

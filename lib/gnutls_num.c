@@ -19,6 +19,10 @@
  *
  */
 
+/* This file contains the functions needed for 64 bit integer support in
+ * TLS, and functions which ease the access to TLS vectors (data of given size).
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_num.h>
 #include <gnutls_errors.h>

@@ -470,8 +470,6 @@ typedef struct {
 					 */
 	int				have_peeked_data;
 
-	/* gdbm */
-	char*				db_name;
 	int				expire_time; /* after expire_time seconds this session will expire */
 	struct MOD_AUTH_STRUCT_INT*	auth_struct; /* used in handshake packets and KX algorithms */
 	int				v2_hello; /* 0 if the client hello is v3+.

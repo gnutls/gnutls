@@ -19,13 +19,6 @@
  *
  */
 
-#include <gnutls_int.h>
-#include <gnutls_errors.h>
-#include <gnutls_num.h>
-#include <gnutls_record.h>
-#include <gnutls_buffers.h>
-#include <gnutls_datum.h>
-
 /* This is the only file that uses the berkeley sockets API.
  * 
  * Also holds all the buffering code used in gnutls.
@@ -50,6 +43,13 @@
  *  (see _gnutls_handshake_buffer_put() etc.)
  *
  */
+
+#include <gnutls_int.h>
+#include <gnutls_errors.h>
+#include <gnutls_num.h>
+#include <gnutls_record.h>
+#include <gnutls_buffers.h>
+#include <gnutls_datum.h>
 
 #ifdef HAVE_ERRNO_H
 # include <errno.h>

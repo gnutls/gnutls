@@ -19,6 +19,9 @@
  *
  */
 
+/* This file contains functions needed to read DSA or RSA private keys
+ * from files, or memory.
+ */
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>

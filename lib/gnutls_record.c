@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions that are record layer specific, are included in this file.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "debug.h"

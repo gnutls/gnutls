@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions that relate to base64 encoding and decoding.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include <gnutls_datum.h>

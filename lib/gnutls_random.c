@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions to return random bytes.
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_random.h>
 #include <gnutls_errors.h>

@@ -19,17 +19,16 @@
  *
  */
 
-/* This file contains functions that manipulate a database
+/* This file contains functions that manipulate a database backend
  * for resumed sessions. 
  */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_session.h"
 #include <gnutls_db.h>
 #include "debug.h"
 #include <gnutls_session_pack.h>
-
-#define GNUTLS_DBNAME state->gnutls_internals.db_name
 
 /**
   * gnutls_db_set_retrieve_function - Sets the function that will be used to get data
@@ -210,7 +209,7 @@ gnutls_datum data;
 gnutls_datum key = { session_id, session_id_size };
 int ret;
 
-	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
+	if (_gnutls_db_func_is_ok(state)!=0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
@@ -254,7 +253,7 @@ int ret = 0;
 		return GNUTLS_E_INVALID_SESSION;
 	}
 	
-	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
+	if (_gnutls_db_func_is_ok(state)!=0) {
 		return GNUTLS_E_DB_ERROR;
 	}
 	
@@ -300,7 +299,7 @@ int _gnutls_remove_session( GNUTLS_STATE state, gnutls_datum session_id)
 {
 int ret = 0;
 
-	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
+	if (_gnutls_db_func_is_ok(state)!=0) {
 		return GNUTLS_E_DB_ERROR;
 	}
 	

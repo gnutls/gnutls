@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions that relate to the TLS handshake procedure.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"

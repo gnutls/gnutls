@@ -16,7 +16,12 @@
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
- * */
+ * 
+ */
+
+/* The certificate authentication functions which are needed in the handshake,
+ * and are common to RSA and DHE key exchange, are in this file.
+ */
 
 #include <gnutls_int.h>
 #include "gnutls_auth_int.h"

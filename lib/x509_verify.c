@@ -19,6 +19,10 @@
  *
  */
 
+/* All functions which relate to X.509 certificate verification stuff are
+ * included here
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"

@@ -19,6 +19,10 @@
  *
  */
 
+/* Some of the stuff needed for Certificate authentication is contained
+ * in this file.
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <auth_cert.h>

@@ -19,6 +19,10 @@
  *
  */
 
+/* This file was intended to contains functions to be exported in the
+ * API and did not fit elsewhere.
+ */
+
 #include <gnutls_int.h>
 #include <auth_srp.h>
 #include <auth_anon.h>

@@ -19,6 +19,10 @@
  *
  */
 
+/* Functions to manipulate the state (gnutls_int.h), and some other stuff
+ * are included here.
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_auth_int.h>
@@ -279,8 +283,6 @@ void _gnutls_deinit(GNUTLS_STATE state)
 
 		state->gnutls_key = NULL;
 	}
-
-	_gnutls_free(state->gnutls_internals.db_name);
 
 	memset( state, 0, sizeof(struct GNUTLS_STATE_INT));
 	gnutls_free(state);

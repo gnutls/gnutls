@@ -19,14 +19,14 @@
  *
  */
 
+/* This file handles all the internal functions that cope with hashes
+ * and HMACs. Currently it uses the functions provided by
+ * the gcrypt library that this can be easily changed.
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_hash_int.h>
 #include <gnutls_errors.h>
-
-/* This file handles all the internal functions that cope with hashes
- * and hmacs. Currently it uses the functions provided by
- * the gcrypt library that this can be easily changed.
- */
 
 GNUTLS_HASH_HANDLE _gnutls_hash_init(MACAlgorithm algorithm)
 {

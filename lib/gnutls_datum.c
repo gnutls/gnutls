@@ -19,15 +19,16 @@
  *
  */
 
+/* contains functions that make it easier to
+ * write vectors of <size|data>. The destination size
+ * should be preallocated (datum.size+(bits/8))
+ */
+
 #include <gnutls_int.h>
 #include <gnutls_num.h>
 #include <gnutls_datum.h>
 #include <gnutls_errors.h>
 
-/* contains functions that make it easier to
- * write vectors of <size|data>. The destination size
- * should be preallocated (datum.size+(bits/8))
- */
 
 void _gnutls_write_datum16( opaque* dest, gnutls_datum dat) {
 	_gnutls_write_uint16( dat.size, dest);

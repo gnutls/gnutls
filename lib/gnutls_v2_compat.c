@@ -19,6 +19,9 @@
  *
  */
 
+/* Functions to parse the SSLv2.0 hello message.
+ */
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
