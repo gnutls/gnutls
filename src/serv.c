@@ -399,9 +399,10 @@ int main(int argc, char **argv)
    gnutls_srp_allocate_server_sc(&srp_cred);
 
    if (srp_passwd!=NULL)
-   if (gnutls_srp_set_server_cred_file(srp_cred, srp_passwd, srp_passwd_conf) < 0) {
+   if ((ret=gnutls_srp_set_server_cred_file(srp_cred, srp_passwd, srp_passwd_conf)) < 0) {
+	/* only exit is this function is not disabled 
+	 */
    	fprintf(stderr, "Error while setting SRP parameters\n");
-	exit(1);
    }
 
    gnutls_anon_allocate_server_sc(&dh_cred);

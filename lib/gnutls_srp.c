@@ -19,14 +19,14 @@
  */
 
 #include <gnutls_int.h>
+#include <gnutls_errors.h>
+#include <auth_srp.h>
 
 #ifdef ENABLE_SRP
 
-#include <gnutls_errors.h>
-#include <crypt_bcrypt.h>
 #include <gnutls_srp.h>
 #include <auth_srp_passwd.h>
-#include <auth_srp.h>
+#include <crypt_bcrypt.h>
 #include <gnutls_gcry.h>
 #include "debug.h"
 
@@ -503,6 +503,65 @@ void gnutls_srp_server_set_select_func(GNUTLS_STATE state,
 					     * func)
 {
 	state->gnutls_internals.server_srp_callback = func;
+}
+
+/**
+  * gnutls_srp_server_get_username - This function returns the username of the peer
+  * @state: is a gnutls state
+  *
+  * This function will return the username of the peer. This should only be
+  * called in case of SRP authentication and in case of a server.
+  * Returns NULL in case of an error.
+  *
+  **/
+const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
+{
+	SRP_SERVER_AUTH_INFO info;
+
+	CHECK_AUTH(GNUTLS_CRD_SRP, NULL);
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return NULL;
+	return info->username;
+}
+
+
+#else /* NO SRP: so define stubs */
+
+const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
+{
+	return NULL;
+}
+
+void gnutls_srp_free_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS sc) {
+	return;
+}
+
+int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc) {
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char * password) {
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+void gnutls_srp_free_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS sc) {
+	return;
+}
+
+int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc) {
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+void gnutls_srp_server_set_select_func(GNUTLS_STATE state,
+					     srp_server_select_func
+					     * func) {
+	return;
 }
 
 #endif /* ENABLE_SRP */

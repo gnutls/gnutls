@@ -1,6 +1,5 @@
 #include <gnutls_auth.h>
 
-#ifdef ENABLE_SRP
 
 typedef struct {
 	char* username;
@@ -21,6 +20,8 @@ typedef struct {
 typedef struct SRP_SERVER_AUTH_INFO_INT {
 	char username[MAX_SRP_USERNAME];
 } *SRP_SERVER_AUTH_INFO;
+
+#ifdef ENABLE_SRP
 
 int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size);
 int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size);

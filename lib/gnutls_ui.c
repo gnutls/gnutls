@@ -26,33 +26,6 @@
 #include <gnutls_auth_int.h>
 #include <gnutls_state.h>
 
-/* SRP */
-
-#ifdef ENABLE_SRP
-
-/**
-  * gnutls_srp_server_get_username - This function returns the username of the peer
-  * @state: is a gnutls state
-  *
-  * This function will return the username of the peer. This should only be
-  * called in case of SRP authentication and in case of a server.
-  * Returns NULL in case of an error.
-  *
-  **/
-const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
-{
-	SRP_SERVER_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_CRD_SRP, NULL);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return NULL;
-	return info->username;
-}
-
-#endif
-
 /* ANON & DHE */
 
 /**

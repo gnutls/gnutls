@@ -165,7 +165,7 @@ int main(int argc, char **argv)
 
    /* X509 stuff */
    if (gnutls_certificate_allocate_sc(&xcred) < 0) {	/* space for 2 certificates */
-      fprintf(stderr, "memory error\n");
+      fprintf(stderr, "Certificate allocation memory error\n");
       exit(1);
    }
 
@@ -216,16 +216,14 @@ int main(int argc, char **argv)
    /* SRP stuff */
    if (srp_username!=NULL) {
       if (gnutls_srp_allocate_client_sc(&cred) < 0) {
-         fprintf(stderr, "memory error\n");
-         exit(1);
+         fprintf(stderr, "SRP authentication error\n");
       }
       gnutls_srp_set_client_cred(cred, srp_username, srp_passwd);
    }
    
    /* ANON stuff */
    if (gnutls_anon_allocate_client_sc(&anon_cred) < 0) {
-      fprintf(stderr, "memory error\n");
-      exit(1);
+      fprintf(stderr, "Anonymous authentication error\n");
    }
 
    printf("Resolving '%s'...\n", hostname);

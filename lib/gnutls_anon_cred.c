@@ -19,13 +19,13 @@
  */
 
 #include "gnutls_int.h"
+#include "gnutls_errors.h"
+#include "auth_anon.h"
 
 #ifdef ENABLE_ANON
 
 #include "gnutls_auth_int.h"
-#include "gnutls_errors.h"
 #include "gnutls_dh.h"
-#include "auth_anon.h"
 #include "gnutls_num.h"
 #include "gnutls_gcry.h"
 
@@ -89,6 +89,26 @@ int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
 	*sc = (void*) &anon_tmp;
 	
 	return 0;
+}
+
+#else /* No ANON: define stubs */
+
+void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
+	return;
+}
+
+int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
+
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
+void gnutls_anon_free_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS sc) {
+	return;
+}
+
+
+int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 #endif
