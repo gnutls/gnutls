@@ -1,4 +1,4 @@
-helpnode "tls_test help\nUsage: tls_test [options] hostname"
+helpnode "gnutls-cli-debug help\nUsage: gnutls-cli-debug [options] hostname"
 
 #int pp;
 option (p, port) INT "integer" { $pp = $1 } "The port to connect to."

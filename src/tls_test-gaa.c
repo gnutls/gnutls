@@ -104,7 +104,7 @@ void __gaa_helpsingle(char short_name, char *name,
 
 void gaa_help(void)
 {
-	printf("tls_test help\nUsage: tls_test [options] hostname""\n");
+	printf("gnutls-cli-debug help\nUsage: gnutls-cli-debug [options] hostname""\n");
 	__gaa_helpsingle('p', "port", """integer"" ", "The port to connect to.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 
