@@ -1091,8 +1091,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	memcpy(session->security_parameters.
 	       current_cipher_suite.CipherSuite, suite, 2);
 
-	_gnutls_handshake_log("HSK[%x]: Selected cipher suite: ", session);
-	_gnutls_handshake_log("%s\n",
+	_gnutls_handshake_log("HSK[%x]: Selected cipher suite: %s\n", session,
 		    _gnutls_cipher_suite_get_name(session->
 						  security_parameters.
 						  current_cipher_suite));
