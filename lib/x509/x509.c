@@ -643,7 +643,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
   *
   **/
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, char *ret, size_t *ret_size, int *critical)
+	int seq, char *ret, size_t *ret_size, unsigned int *critical)
 {
 	int result;
 	gnutls_datum dnsname;
@@ -750,7 +750,7 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
   * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
   *
   **/
-int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, int* critical)
+int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical)
 {
 	int result;
 	gnutls_datum basicConstraints;
@@ -799,7 +799,7 @@ int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, int* critical)
   *
   **/
 int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
-	int *critical)
+	unsigned int *critical)
 {
 	int result;
 	gnutls_datum keyUsage;
@@ -848,7 +848,7 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
   *
   **/
 int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
-	int indx, unsigned char* buf, size_t * sizeof_buf, int * critical)
+	int indx, unsigned char* buf, size_t * sizeof_buf, unsigned int * critical)
 {
 	int result;
 	gnutls_datum output;

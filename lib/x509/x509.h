@@ -68,10 +68,10 @@ typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey;
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, char *ret, size_t *ret_size, int* critical);
+	int seq, char *ret, size_t *ret_size, unsigned int* critical);
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf);
-int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, int* critical);
+int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits);
 
 int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src);
@@ -111,7 +111,7 @@ int gnutls_x509_crt_export( gnutls_x509_crt cert,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 
 int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
-	int *critical);
+	unsigned int *critical);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
 
 int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
