@@ -120,7 +120,6 @@ void _gnutls_handshake_internal_state_clear( GNUTLS_STATE state) {
 	/* by default no selected certificate */
 	state->gnutls_internals.selected_cert_index = -1;
 	state->gnutls_internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
-	state->gnutls_internals.send_cert_req;
 	state->gnutls_internals.adv_version_major = 0;
 	state->gnutls_internals.adv_version_minor = 0;
 	state->gnutls_internals.v2_hello = 0;
