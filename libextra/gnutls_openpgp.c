@@ -327,7 +327,6 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
     algo = is_DSA(pk->pubkey_algo)? GNUTLS_PK_DSA : GNUTLS_PK_RSA;
     cert->subject_pk_algorithm = algo;
     cert->version = pk->version;
-    cert->valid = 0; /* fixme: should set after the verification */
     cert->cert_type = GNUTLS_CRT_OPENPGP;
 
     if (is_DSA(pk->pubkey_algo) || pk->pubkey_algo == GCRY_PK_RSA_S)
