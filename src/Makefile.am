@@ -1,4 +1,4 @@
-EXTRA_DIST = common.h crypt.gaa crypt-gaa.h README.srpcrypt \
+EXTRA_DIST = common.h crypt.gaa crypt-gaa.h README.srptool \
 	README cli.gaa cli-gaa.h serv-gaa.h serv.gaa tls_test.gaa \
 	tls_test-gaa.h tests.h gnutls-http-serv list.h certtool-gaa.h \
 	certtool.gaa getpass.h certtool-cfg.h
