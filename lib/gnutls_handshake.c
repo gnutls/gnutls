@@ -804,10 +804,11 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 		       resumed_security_parameters.client_random,
 		       state->security_parameters.client_random,
 		       32);
-			state->gnutls_internals.resumed = RESUME_TRUE;	/* we are resuming */
+		state->gnutls_internals.resumed = RESUME_TRUE;	/* we are resuming */
+
 		return 0;
 	} else {
-		/* keep the session id */
+		/* keep the new session id */
 		state->gnutls_internals.resumed = RESUME_FALSE;	/* we are not resuming */
 		state->security_parameters.session_id_size =
 		    session_id_len;

@@ -218,14 +218,15 @@ int main()
 			} else {
 				if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
 					printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
-				else {
-					if (ret > 0) {
-						printf("- Received[%d]: ", ret);
-						for (ii=0;ii<ret;ii++) {
-							fputc(buffer[ii], stdout);
-						}
-						fputs("\n", stdout);
+				if (ret==GNUTLS_E_GOT_HELLO_REQUEST)
+					printf("* Received HelloRequest message\n");
+
+				if (ret > 0) {
+					printf("- Received[%d]: ", ret);
+					for (ii=0;ii<ret;ii++) {
+						fputc(buffer[ii], stdout);
 					}
+					fputs("\n", stdout);
 				}
 			}
 			if (user_term!=0) break;

@@ -1,5 +1,5 @@
 This is the GNU TLS library. More up to date information can be found
-at http://gnutls.hellug.gr
+at http://www.gnu.org/software/gnutls
 
 It is a TLS implementation for the GNU project. 
 It is currently under heavy development. (and still not ready for 
@@ -12,5 +12,6 @@ the needed configure, makefiles etc. using Automake, Autoconf, and libtool.
 
 BUGS:
 
-If you find any report it to bug-gnutls@gnu.org
+There should be plenty, but if you find any 
+report it to bug-gnutls@gnu.org
 

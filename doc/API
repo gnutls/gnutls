@@ -87,8 +87,7 @@ ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void* data, int sizeofdata, int 
 	difference is that is accepts a GNUTLS state. However the
 	only acceptable flag is currently MSG_DONTWAIT. In that case,
 	if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
-	if there no data in the socket. In some rare cases it may return 0,
-	thus you may need to call this function again.
+	if there no data in the socket. 
 	
 ssize_t gnutls_send(int cd, GNUTLS_STATE state, void* data, int sizeofdata, int flags);
 	This function has the same semantics as send() has. The only

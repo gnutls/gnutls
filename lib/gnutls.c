@@ -848,6 +848,8 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			/* we may get a hello request */
 			ret = _gnutls_recv_hello_request( cd, state, tmpdata, tmplen);
 			if (ret < 0) gnutls_assert();
+			else /* inform the caller */
+			return GNUTLS_E_GOT_HELLO_REQUEST;
 		} else
 			if (recv_type != GNUTLS_APPLICATION_DATA) {
 				gnutls_assert();
