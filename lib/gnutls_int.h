@@ -28,8 +28,8 @@
 #define BUFFERS_DEBUG
 #define HANDSHAKE_DEBUG
 #define HARD_DEBUG
-*/
 #define DEBUG
+*/
 
 #define MAX32 4294967295
 #define MAX24 16777215

@@ -102,7 +102,7 @@ int verify_passwd(char *conffile, char *file, char *username, char *passwd)
 		       && (i < sizeof(line))) {
 			i++;
 		}
-		if (strncmp(username, line, strlen(username)) == 0) {
+		if (strncmp(username, line, (i>strlen(username))?i:strlen(username)) == 0) {
 			if (gnutls_crypt_vrfy
 			    (username, passwd, &line[++i], g, n) == 0) {
 				fprintf(stderr, "Password verified\n");

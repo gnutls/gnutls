@@ -232,7 +232,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	SRP_SERVER_CREDENTIALS* cred;
 	FILE * fd;
 	char line[5*1024];
-	int i;
+	int i, len;
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	int index;
 
@@ -260,7 +260,8 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	    while( (line[i]!=':') && (line[i]!='\0') && (i < sizeof(line)) ) {
 	            i++;
 	    }
-	    if (strncmp( username, line, strlen(username)) == 0) {
+	    len = strlen(username);
+	    if (strncmp( username, line, (i>len)?i:len) == 0) {
 			if ((index = pwd_put_values( entry, line, strlen(line))) >= 0)
 				if (pwd_read_conf( cred, entry, index)==0) {
 					return entry;
