@@ -494,7 +494,6 @@ int crypt_int(char *username, char *passwd, int salt_size,
 		if (put==0) {
 			fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
 		}
-		free(cr);
 		
 		fclose(fd);
 		fclose(fd2);

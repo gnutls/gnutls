@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001,2002 Paul Sheer
- * Portions Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ * Portions Copyright (C) 2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -59,7 +59,6 @@ static int generate = 0;
 static int http = 0;
 static int port = 0;
 static int x509ctype;
-static int prime_bits = 1024;
 
 static int quiet;
 static int nodb;
@@ -73,7 +72,6 @@ char *pgp_certfile;
 char *x509_keyfile;
 char *x509_certfile;
 char *x509_cafile;
-char *dh_params_file;
 char *x509_crlfile = NULL;
 
 /* end of globals */
@@ -149,22 +147,28 @@ static void listener_free(listener_item * j)
 }
 
 
+
+#define DEFAULT_PRIME_BITS 1024
+
 /* we use primes up to 1024 in this server.
  * otherwise we should add them here.
  */
+static int prime_nums[] = { 768, 1024, 0 };
 
 gnutls_dh_params dh_params;
 gnutls_rsa_params rsa_params;
 
 static int generate_dh_primes(void)
 {
-   int prime_bits = 768;
+   gnutls_datum prime, generator;
+   int i = 0;
 
    if (gnutls_dh_params_init(&dh_params) < 0) {
       fprintf(stderr, "Error in dh parameter initialization\n");
       exit(1);
    }
 
+   do {
       /* Generate Diffie Hellman parameters - for use with DHE
        * kx algorithms. These should be discarded and regenerated
        * once a day, once a week or once a month. Depends on the
@@ -172,58 +176,31 @@ static int generate_dh_primes(void)
        */
       printf
 	  ("Generating Diffie Hellman parameters [%d]. Please wait...\n",
-	   prime_bits);
+	   prime_nums[i]);
       fflush(stdout);
 
-      if (gnutls_dh_params_generate2( dh_params, prime_bits) < 0) {
+      if (gnutls_dh_params_generate(&prime, &generator, prime_nums[i]) < 0) {
 	 fprintf(stderr, "Error in prime generation\n");
 	 exit(1);
       }
 
+      if (gnutls_dh_params_set
+	  (dh_params, prime, generator, prime_nums[i]) < 0) {
+	 fprintf(stderr, "Error in prime replacement\n");
+	 exit(1);
+      }
+      free(prime.data);
+      free(generator.data);
+
+   } while (prime_nums[++i] != 0);
+
    return 0;
-}
-
-static void read_dh_params(void)
-{
-   char tmpdata[2048];
-   int size;
-   gnutls_datum params;
-   FILE* fd;
-   
-   if (gnutls_dh_params_init(&dh_params) < 0) {
-      fprintf(stderr, "Error in dh parameter initialization\n");
-      exit(1);
-   }
-
-   /* read the params file
-    */
-   fd = fopen(dh_params_file, "r");
-   if (fd==NULL) {
-   	fprintf(stderr, "Could not open %s\n", dh_params_file);
-   	exit(1);
-   }
-
-   size = fread( tmpdata, 1, sizeof(tmpdata)-1, fd);
-   tmpdata[size] = 0;
-   fclose(fd);
-
-   params.data = tmpdata;
-   params.size = size;
-
-   size = gnutls_dh_params_import_pkcs3( dh_params, &params, GNUTLS_X509_FMT_PEM);
-
-   if (size < 0) {
-   	fprintf(stderr, "Error parsing dh params: %s\n", gnutls_strerror(size));
-   	exit(1);
-   }
-
-   printf("Read Diffie Hellman parameters.\n");
-   fflush(stdout);
-   
 }
 
 static int generate_rsa_params(void)
 {
+   gnutls_datum m, e, d, p, q, u;
+
    if (gnutls_rsa_params_init(&rsa_params) < 0) {
       fprintf(stderr, "Error in rsa parameter initialization\n");
       exit(1);
@@ -237,10 +214,22 @@ static int generate_rsa_params(void)
    printf("Generating temporary RSA parameters. Please wait...\n");
    fflush(stdout);
 
-   if (gnutls_rsa_params_generate2( rsa_params, 512) < 0) {
+   if (gnutls_rsa_params_generate(&m, &e, &d, &p, &q, &u, 512) < 0) {
       fprintf(stderr, "Error in rsa parameter generation\n");
       exit(1);
    }
+
+   if (gnutls_rsa_params_set(rsa_params, m, e, d, p, q, u, 512) < 0) {
+      fprintf(stderr, "Error in rsa parameter setting\n");
+      exit(1);
+   }
+
+   free(m.data);
+   free(e.data);
+   free(d.data);
+   free(p.data);
+   free(q.data);
+   free(u.data);
 
    return 0;
 }
@@ -284,7 +273,6 @@ gnutls_session initialize_session(void)
       gnutls_db_set_ptr(session, NULL);
    }
 
-/*   gnutls_dh_set_prime_bits( session, prime_bits); */
    gnutls_cipher_set_priority(session, cipher_priority);
    gnutls_compression_set_priority(session, comp_priority);
    gnutls_kx_set_priority(session, kx_priority);
@@ -556,10 +544,6 @@ int main(int argc, char **argv)
       generate_rsa_params();
       generate_dh_primes();
    }
-   
-   if (dh_params_file) {
-      read_dh_params();
-   }
 
    if (gnutls_certificate_allocate_credentials(&cert_cred) < 0) {
       fprintf(stderr, "memory error\n");
@@ -570,19 +554,10 @@ int main(int argc, char **argv)
       if ((ret = gnutls_certificate_set_x509_trust_file
 	   (cert_cred, x509_cafile, x509ctype)) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_cafile);
+	 GERR( ret, "X509 trust file");
 	 exit(1);
       } else {
 	 printf("Processed %d CA certificate(s).\n", ret);
-      }
-   }
-
-   if (x509_crlfile != NULL) {
-      if ((ret = gnutls_certificate_set_x509_crl_file
-	   (cert_cred, x509_crlfile, x509ctype)) < 0) {
-	 fprintf(stderr, "Error reading '%s'\n", x509_crlfile);
-	 exit(1);
-      } else {
-	 printf("Processed %d CRL(s).\n", ret);
       }
    }
 
@@ -592,6 +567,7 @@ int main(int argc, char **argv)
 						      pgp_keyring);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the OpenPGP keyring file\n");
+	 GERR( ret, "Openpgp keyring");
       }
    }
 
@@ -599,6 +575,7 @@ int main(int argc, char **argv)
       ret = gnutls_certificate_set_openpgp_trustdb(cert_cred, pgp_trustdb);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
+	 GERR( ret, "Openpgp trustdb");
       }
    }
 
@@ -606,20 +583,22 @@ int main(int argc, char **argv)
       if ((ret = gnutls_certificate_set_openpgp_key_file
 	   (cert_cred, pgp_certfile, pgp_keyfile)) < 0) {
 	 fprintf(stderr,
-		 "Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
-		 ret, pgp_certfile, pgp_keyfile);
+		 "Error while reading the OpenPGP key pair ('%s', '%s')\n",
+		  pgp_certfile, pgp_keyfile);
+	 GERR( ret, "Openpgp key");
       }
 
    if (x509_certfile != NULL)
-      if (gnutls_certificate_set_x509_key_file
-	  (cert_cred, x509_certfile, x509_keyfile, x509ctype) < 0) {
+      if ((ret=gnutls_certificate_set_x509_key_file
+	  (cert_cred, x509_certfile, x509_keyfile, x509ctype)) < 0) {
 	 fprintf(stderr,
 		 "Error reading '%s' or '%s'\n", x509_certfile,
 		 x509_keyfile);
+	 GERR( ret, "X509 key");
 	 exit(1);
       }
 
-   if (generate != 0 || read_dh_params != NULL) {
+   if (generate != 0) {
       if (gnutls_certificate_set_dh_params(cert_cred, dh_params) < 0) {
 	 fprintf(stderr, "Error while setting DH parameters\n");
 	 exit(1);
@@ -910,6 +889,23 @@ int main(int argc, char **argv)
 
 }
 
+#define DEFAULT_X509_KEYFILE "x509/key.pem"
+#define DEFAULT_X509_CERTFILE "x509/cert.pem"
+
+#define DEFAULT_X509_KEYFILE2 "x509/key-dsa.pem"
+#define DEFAULT_X509_CERTFILE2 "x509/cert-dsa.pem"
+
+#define DEFAULT_PGP_KEYFILE "openpgp/sec.asc"
+#define DEFAULT_PGP_CERTFILE "openpgp/pub.asc"
+
+#define DEFAULT_X509_CAFILE "x509/ca.pem"
+#define DEFAULT_X509_CRLFILE NULL;
+
+#define DEFAULT_SRP_PASSWD "srp/tpasswd"
+#define DEFAULT_SRP_PASSWD_CONF "srp/tpasswd.conf"
+
+#undef DEBUG
+
 static gaainfo info;
 void gaa_parser(int argc, char **argv)
 {
@@ -936,19 +932,53 @@ void gaa_parser(int argc, char **argv)
       generate = 0;
    else
       generate = 1;
-   
-   dh_params_file = info.dh_params_file;
 
    port = info.port;
 
+#ifdef DEBUG
+   if (info.x509_certfile != NULL)
+      x509_certfile = info.x509_certfile;
+   else
+      x509_certfile = DEFAULT_X509_CERTFILE;
+
+   if (info.x509_keyfile != NULL)
+      x509_keyfile = info.x509_keyfile;
+   else
+      x509_keyfile = DEFAULT_X509_KEYFILE;
+
+   if (info.x509_cafile != NULL)
+      x509_cafile = info.x509_certfile;
+   else
+      x509_cafile = DEFAULT_X509_CAFILE;
+
+   if (info.pgp_certfile != NULL)
+      pgp_certfile = info.pgp_certfile;
+   else
+      pgp_certfile = DEFAULT_PGP_CERTFILE;
+
+   if (info.pgp_keyfile != NULL)
+      pgp_keyfile = info.pgp_keyfile;
+   else
+      pgp_keyfile = DEFAULT_PGP_KEYFILE;
+
+   if (info.srp_passwd != NULL)
+      srp_passwd = info.srp_passwd;
+   else
+      srp_passwd = DEFAULT_SRP_PASSWD;
+
+   if (info.srp_passwd_conf != NULL)
+      srp_passwd_conf = info.srp_passwd_conf;
+   else
+      srp_passwd_conf = DEFAULT_SRP_PASSWD_CONF;
+#else
    x509_certfile = info.x509_certfile;
    x509_keyfile = info.x509_keyfile;
    x509_cafile = info.x509_cafile;
-   x509_crlfile = info.x509_crlfile;
    pgp_certfile = info.pgp_certfile;
    pgp_keyfile = info.pgp_keyfile;
    srp_passwd = info.srp_passwd;
    srp_passwd_conf = info.srp_passwd_conf;
+#endif
 
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;
@@ -964,7 +994,7 @@ void gaa_parser(int argc, char **argv)
 void serv_version(void)
 {
    fprintf(stderr, "GNU TLS test server, ");
-   fprintf(stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION, gnutls_check_version(NULL));
+   fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
 }
 
 /* session resuming support */
