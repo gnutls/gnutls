@@ -174,7 +174,7 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 	return ret;
 }
 
-
+#define TOASCII(c) (c<127 ? asciitable[c] : 0xff)
 int _gnutls_sbase64_decode(uint8 * data, int data_size, uint8 ** result)
 {
 	uint8 *a, loc;
@@ -188,13 +188,8 @@ int _gnutls_sbase64_decode(uint8 * data, int data_size, uint8 ** result)
 		return -1;
 
 	i = 0;
-	while (i < data_size) {
-		loc = asciitable[data[i]];
-		if (loc == 0xff)
-			break;
-		else
-			a[i] = loc;
-		++i;
+	while ( i < data_size && (loc = TOASCII(data[i])) != 0xff) {
+		a[i++] = loc;
 	}
 	data_size = i;
 
@@ -222,7 +217,7 @@ int _gnutls_sbase64_decode(uint8 * data, int data_size, uint8 ** result)
 	}
 
 	while (a[j] == 0 && j <= data_size)
-		++j;
+		j++;
 
 	(*result) = gnutls_malloc(data_size - j + 1);
 
