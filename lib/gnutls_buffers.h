@@ -27,11 +27,11 @@ int _gnutls_io_clear_peeked_data( GNUTLS_STATE state);
 
 ssize_t _gnutls_io_write_buffered( GNUTLS_STATE, const void *iptr, size_t n );
 
-int _gnutls_handshake_buffer_get( GNUTLS_STATE state, char *data, int length);
 int _gnutls_handshake_buffer_get_size( GNUTLS_STATE state);
 int _gnutls_handshake_buffer_peek( GNUTLS_STATE state, char *data, int length);
 int _gnutls_handshake_buffer_put( GNUTLS_STATE state, char *data, int length);
 int _gnutls_handshake_buffer_clear( GNUTLS_STATE state);
+int _gnutls_handshake_buffer_get_ptr( GNUTLS_STATE state, char **data_ptr, int *length);
 
 #define _gnutls_handshake_io_buffer_clear( state) \
         gnutls_free( state->gnutls_internals.handshake_send_buffer.data); \

@@ -353,7 +353,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 inline static int
 _gnutls_handshake_hash_pending( GNUTLS_STATE state) {
 int siz;
-opaque * data;
+char * data;
 
 	/* We check if there are pending data to hash.
 	 */
@@ -364,21 +364,15 @@ opaque * data;
 	}
 
 	if (siz > 0) { /* if there are data to hash */
-		data = gnutls_malloc(siz);
-		if (data == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
 
-		_gnutls_handshake_buffer_get(state, data, siz);
+		_gnutls_handshake_buffer_get_ptr(state, &data, &siz);
 
 		gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, data, siz);
 		gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, data, siz);
 
-		gnutls_free(data);
-
 	}
-
+	_gnutls_handshake_buffer_clear( state);
+	
 	return 0;
 }
 

@@ -891,37 +891,6 @@ int _gnutls_handshake_buffer_get_size( GNUTLS_STATE state)
 	return state->gnutls_internals.handshake_hash_buffer.size;
 }
 
-int _gnutls_handshake_buffer_get( GNUTLS_STATE state, char *data, int length)
-{
-	if (length > state->gnutls_internals.handshake_hash_buffer.size) {
-		length = state->gnutls_internals.handshake_hash_buffer.size;
-	}
-
-	_gnutls_buffers_log( "BUF[HSK]: Got %d bytes of Data\n", length);
-
-	state->gnutls_internals.handshake_hash_buffer.size -= length;
-	memcpy(data, state->gnutls_internals.handshake_hash_buffer.data, length);
-	/* overwrite buffer */
-	
-	if (state->gnutls_internals.handshake_hash_buffer.size > 0) {
-		memmove(state->gnutls_internals.handshake_hash_buffer.data,
-			&state->gnutls_internals.handshake_hash_buffer.data[length],
-			state->gnutls_internals.handshake_hash_buffer.size);
-
-		state->gnutls_internals.handshake_hash_buffer.data =
-		    gnutls_realloc_fast(state->gnutls_internals.handshake_hash_buffer.data,
-				   state->gnutls_internals.handshake_hash_buffer.size);
-
-		if (state->gnutls_internals.handshake_hash_buffer.data == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-	}
-	
-	return length;	
-
-}
-
 /* this function does not touch the buffer
  * and returns data from it (peek mode!)
  */
@@ -931,10 +900,26 @@ int _gnutls_handshake_buffer_peek( GNUTLS_STATE state, char *data, int length)
 		length = state->gnutls_internals.handshake_hash_buffer.size;
 	}
 
-	_gnutls_buffers_log( "BUF[HSK]: Read %d bytes of Data\n", length);
+	_gnutls_buffers_log( "BUF[HSK]: Peeked %d bytes of Data\n", length);
 
 	memcpy(data, state->gnutls_internals.handshake_hash_buffer.data, length);
 	return length;	
+}
+
+/* this function does not touch the buffer
+ * and returns data from it (peek mode!)
+ */
+int _gnutls_handshake_buffer_get_ptr( GNUTLS_STATE state, char **data_ptr, int *length)
+{
+	if (length!=NULL)
+		*length = state->gnutls_internals.handshake_hash_buffer.size;
+
+	_gnutls_buffers_log( "BUF[HSK]: Peeded %d bytes of Data\n", length);
+
+	if (data_ptr!=NULL)
+		*data_ptr = state->gnutls_internals.handshake_hash_buffer.data;
+
+	return 0;	
 }
 
 
