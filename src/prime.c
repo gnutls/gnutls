@@ -35,7 +35,8 @@ int main(int argc, char **argv)
 	gaainfo info;
 	int size, i, qbits;
 	MPI prime;
-	uint8 * tmp;
+	gnutls_datum _prime, _generator;
+	uint8 * tmp1, *tmp2;
 	MPI g;
 
 	if (gaa(argc, argv, &info) != -1) {
@@ -62,39 +63,59 @@ int main(int argc, char **argv)
 	size = 0;
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &size, g);
 
-	tmp = malloc(size);
-   	gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &size, g);
+	tmp1 = malloc(size);
+   	gcry_mpi_print(GCRYMPI_FMT_USG, tmp1, &size, g);
+
+	_generator.data = tmp1;
+	_generator.size = size;
 
 	printf( "/* generator - %d bits */\n", gcry_mpi_get_nbits(g)); 
 	printf( "\nconst uint8 g[%d] = { ", size);
 	
 	for (i=0;i<size;i++) {
 		if (i%7==0) printf("\n\t");
-		printf( "0x%.2x", tmp[i]);
+		printf( "0x%.2x", tmp1[i]);
 		if (i!=size-1) printf( ", ");
 	}
 
 	printf("\n};\n\n");
-	free(tmp);
 
 	/* print prime */
 	size = 0;
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &size, prime);
 
-	tmp = malloc(size);
-   	gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &size, prime);
+	tmp2 = malloc(size);
+   	gcry_mpi_print(GCRYMPI_FMT_USG, tmp2, &size, prime);
+
+	_prime.data = tmp2;
+	_prime.size = size;
 
 	printf( "/* prime - %d bits */\n",  gcry_mpi_get_nbits(prime)); 
 	printf( "\nconst uint8 prime[%d] = { ", size);
 	
 	for (i=0;i<size;i++) {
 		if (i%7==0) printf("\n\t");
-		printf( "0x%.2x", tmp[i]);
+		printf( "0x%.2x", tmp2[i]);
 		if (i!=size-1) printf( ", ");
 	}
 
 	printf("\n};\n");
-	free(tmp);
+
+	{ /* generate a PKCS#3 structure */
+	
+		unsigned char out[2048];
+		int ret, len = sizeof(out);
+	
+		ret = gnutls_pkcs3_export_dh_params( &_prime, &_generator, GNUTLS_X509_FMT_PEM,
+			out, &len);
+	
+		if (ret == 0) {
+			printf("\n%s", out);
+		} else {
+			fprintf(stderr, "Error: %s\n", gnutls_strerror(ret));
+		}
+
+	}
 
 	gnutls_global_deinit();
 	

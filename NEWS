@@ -6,9 +6,9 @@ Version 0.9.0
 - This version is not binary compatible with the previous ones.
 - gnutls_dh_params_generate() and gnutls_rsa_params_generate() now use 
   gnutls_malloc() to allocate the output parameters.
-- Added gnutls_pkcs3_extract_dh_params() which extracts parameters from
-  PKCS#3 encoded structures. This was in order to read parameters generated
-  using the openssl dhparam tool.
+- Added gnutls_pkcs3_extract_dh_params() and gnutls_pkcs3_export_dh_params()
+  which extracts and export parameters from and to PKCS#3 encoded structures. 
+  These were added to read parameters generated using the openssl dhparam tool.
 - Several changes in the temporary (DH/RSA) parameter codebase. No DH 
   parameters are now included in the library. Also a credentials structure 
   can now hold only one temporary parameter.
