@@ -651,6 +651,6 @@ void _gnutls_set_adv_version( gnutls_session, gnutls_protocol_version);
 gnutls_protocol_version _gnutls_get_adv_version( gnutls_session);
 
 int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
-	char* result, size_t* result_size);
+	unsigned char* result, int* result_size);
 
 #endif /* GNUTLS_INT_H */
