@@ -332,7 +332,11 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 	while (left > 0) {
 		i = _gnutls_send_func(fd, &ptr[i], left, flags);
 		if (i == -1) {
-			return (0-errno);
+			if (errno == EAGAIN || errno == EINTR) {
+				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
+				else return GNUTLS_E_INTERRUPTED;
+			} else 
+				return GNUTLS_E_UNKNOWN_ERROR;
 		}
 		left -= i;
 	}
