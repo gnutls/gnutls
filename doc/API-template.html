@@ -54,7 +54,7 @@ anything other fancy features.
 
 int main()
 {
-	const char* PORT = "5556";
+	const char* PORT = "443";
 	const char* SERVER = "127.0.0.1";
 	int err, ret;
 	int sd, ii;
@@ -119,6 +119,11 @@ int main()
 	/* put the x509 credentials to the current state
          */
 	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
+
+	/* This should be the CN in the server's 
+         * certificate.
+         */
+	gnutls_x509_set_cn( state, "www.host.com");
 
 
 	/* Perform the TLS handshake
