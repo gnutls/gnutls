@@ -1,3 +1,27 @@
+2004-05-13 21:53  nmav <nmav@gnutls.org>
+
+	* doc/tex/ex-pkcs12.tex, doc/tex/examples.tex, lib/gnutls.h.in.in,
+	src/certtool.c, lib/gnutls_int.h, doc/tex/ex-pkcs12.tex,
+	doc/tex/examples.tex, lib/gnutls.h.in.in, lib/gnutls_int.h,
+	src/certtool.c:
+
+	removed gnutls_const_datum type.  
+
+2004-05-13 08:27  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_compress_int.c, lib/gnutls_handshake.c,
+	lib/gnutls_priority.c, src/cli.c, src/common.c, src/serv.c,
+	configure.in, lib/gnutls_compress_int.c, lib/gnutls_handshake.c,
+	lib/gnutls_priority.c, src/cli.c, src/common.c, src/serv.c:
+
+	some fixes in the compilation system.  
+
+2004-05-13 06:39  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/Makefile.am:
+
+	Opencdk library is being included if not found.  
+
 2004-05-12 16:32  nmav <nmav@gnutls.org>
 
 	* configure.in:
