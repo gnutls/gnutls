@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -546,9 +547,11 @@ void print_list(void)
     printf(", SSL3.0\n");
 
     printf("Ciphers:");
-    printf(" AES-128-CBC");
+    printf(" AES-256-CBC");
+    printf(", AES-128-CBC");
     printf(", 3DES-CBC");
     printf(", ARCFOUR");
+    printf(", DES-CBC");
     printf(", ARCFOUR-40\n");
 
     printf("MACs:");
@@ -615,10 +618,14 @@ void parse_ciphers(char **ciphers, int nciphers, int *cipher_priority)
 
     if (ciphers != NULL && nciphers > 0) {
 	for (j = i = 0; i < nciphers; i++) {
-	    if (strncasecmp(ciphers[i], "AES", 3) == 0)
+	    if (strncasecmp(ciphers[i], "AES-2", 5) == 0)
+		cipher_priority[j++] = GNUTLS_CIPHER_AES_256_CBC;
+	    else if (strncasecmp(ciphers[i], "AES", 3) == 0)
 		cipher_priority[j++] = GNUTLS_CIPHER_AES_128_CBC;
 	    else if (strncasecmp(ciphers[i], "3DE", 3) == 0)
 		cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
+	    else if (strncasecmp(ciphers[i], "DES", 3) == 0)
+		cipher_priority[j++] = GNUTLS_CIPHER_DES_CBC;
 	    else if (strcasecmp(ciphers[i], "ARCFOUR-40") == 0)
 		cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
 	    else if (strcasecmp(ciphers[i], "ARCFOUR") == 0)
