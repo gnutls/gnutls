@@ -207,7 +207,7 @@ int _gnutls_get_ext_type( node_asn *rasn, char *root, gnutls_cert *cert)
 	char str[1024];
 	char critical[10];
 	char extnID[128];
-	char extnValue[512];
+	char extnValue[256];
 
 	k = 0;
 	do {
@@ -262,7 +262,7 @@ int _gnutls_get_ext_type( node_asn *rasn, char *root, gnutls_cert *cert)
 
 			if (result==ASN_ELEMENT_NOT_FOUND) break;
 			else {
-				if (result==ASN_MEM_ERROR && strcmp(critical, "TRUE")==0) {
+				if (result==ASN_MEM_ERROR && strcmp(critical, "FALSE")==0) {
 					_gnutls_log("Cannot parse extension: %s. Too small buffer.", extnID);
 					continue;
 				}

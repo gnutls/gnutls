@@ -162,11 +162,13 @@ void _gnutls_log( const char *fmt, ...) {
  char str[MAX_LOG_SIZE];
  void (*log_func)() = _gnutls_log_func;
  
+ if (_gnutls_log_func==NULL) return;
+
  va_start(args,fmt);
  vsprintf( str,fmt,args);
  va_end(args);   
-  
+
  log_func( str);
- 
+
  return;
 }
