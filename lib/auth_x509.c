@@ -1370,7 +1370,7 @@ int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_l
  * The 'appropriate' is defined by the user. 
  * (frontend to _gnutls_server_find_cert_index())
  */
-const gnutls_cert *_gnutls_server_find_x509_cert(GNUTLS_STATE state)
+const gnutls_cert *_gnutls_server_find_x509_cert(GNUTLS_STATE state, PKAlgorithm requested_algo)
 {
 	int i;
 	const GNUTLS_X509PKI_CREDENTIALS x509_cred;
@@ -1382,7 +1382,7 @@ const gnutls_cert *_gnutls_server_find_x509_cert(GNUTLS_STATE state)
         	return NULL;
 
 	i = _gnutls_server_find_x509_cert_list_index(state, x509_cred->cert_list,
-					 x509_cred->ncerts);
+					 x509_cred->ncerts, requested_algo);
 
 	if (i < 0)
 		return NULL;
@@ -1392,15 +1392,18 @@ const gnutls_cert *_gnutls_server_find_x509_cert(GNUTLS_STATE state)
 
 /* finds the most appropriate certificate in the cert list.
  * The 'appropriate' is defined by the user.
+ *
+ * requested_algo holds the parameters required by the peer (RSA, DSA
+ * or -1 for any).
  */
 int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 					gnutls_cert ** cert_list,
-					int cert_list_length)
+					int cert_list_length, 
+					PKAlgorithm requested_algo)
 {
-	int i, index = -1;
+	int i, index = -1, j;
 	const GNUTLS_X509PKI_CREDENTIALS cred;
-
-	state->gnutls_internals.selected_cert_index = 0;
+	int my_certs_length;
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
@@ -1408,8 +1411,20 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	if (cred->ncerts > 0)
+	if (cred->ncerts > 0) {
+		state->gnutls_internals.selected_cert_index = 0;
 		index = 0;	/* default is use the first certificate */
+
+		/* find one compatible certificate */
+		if (requested_algo>0) {
+			for (i = 0; i < cred->ncerts; i++) {
+				if (requested_algo==cred->cert_list[i][0].subject_pk_algorithm) {
+					state->gnutls_internals.selected_cert_index = i;
+					index = i;
+				}
+			}
+		}
+	}
 
 	if (state->gnutls_internals.client_cert_callback != NULL && cred->ncerts > 0) {	/* use the callback to get certificate */
 		gnutls_datum *my_certs = NULL;
@@ -1418,15 +1433,25 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 		    gnutls_malloc(cred->ncerts * sizeof(gnutls_datum));
 		if (my_certs == NULL)
 			goto clear;
+		my_certs_length = cred->ncerts;
 
 		/* put our certificate's issuer and dn into cdn, idn
 		 */
-		for (i = 0; i < cred->ncerts; i++) {
-			my_certs[i] = cred->cert_list[i][0].raw;
+		j=0;
+		for (i = 0; i < cred->ncerts; i++,j++) {
+			/* Does not add incompatible certificates */
+			if (requested_algo>0) {
+				if (requested_algo!=cred->cert_list[i][0].subject_pk_algorithm) {
+					my_certs_length--;
+					j--;
+					continue;
+				}
+			}
+			my_certs[j] = cred->cert_list[i][0].raw;
 		}
 		index =
 		    state->gnutls_internals.server_cert_callback(state, my_certs,
-								 cred->ncerts);
+								 my_certs_length);
 
 	      clear:
 		gnutls_free(my_certs);

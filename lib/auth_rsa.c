@@ -79,7 +79,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
-	MPI params[2];
+	MPI params[RSA_PARAMS];
 
 	if ( gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
@@ -99,7 +99,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	params[0] = state->gnutls_key->A;
 	params[1] = state->gnutls_key->u;
 	ret =
-	    _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 2);		/* btype==2 */
+	    _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 2); /* btype==2 */
 
 	if (ret < 0) {
 		/* in case decryption fails then don't inform
@@ -109,7 +109,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 
 		gnutls_assert();
 
-		_gnutls_log( "RSA_auth: Possible PKCS-1 format attack\n");
+		_gnutls_log( "RSA_AUTH: Possible PKCS-1 format attack\n");
 
 		RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
 	} else {

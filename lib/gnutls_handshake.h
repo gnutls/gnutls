@@ -34,8 +34,10 @@ int gnutls_handshake_server( GNUTLS_STATE state);
 void _gnutls_set_server_random( GNUTLS_STATE state, uint8* random);
 void _gnutls_set_client_random( GNUTLS_STATE state, uint8* random);
 int _gnutls_create_random( opaque* dst);
-int _gnutls_remove_unwanted_ciphersuites( GNUTLS_STATE state, GNUTLS_CipherSuite ** cipherSuites, int numCipherSuites);
+int _gnutls_remove_unwanted_ciphersuites( GNUTLS_STATE state, GNUTLS_CipherSuite ** cipherSuites, int numCipherSuites, PKAlgorithm);
 void gnutls_handshake_set_max_packet_length( GNUTLS_STATE state, int max);
+int _gnutls_find_pk_algos_in_ciphersuites( opaque* data, int datalen);
+int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int datalen);
 
 #define STATE state->gnutls_internals.handshake_state
 /* This returns true if we have got there

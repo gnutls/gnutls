@@ -50,7 +50,6 @@
 #define TRUE 1
 #define FALSE 0
 
-static int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int datalen);
 int _gnutls_server_select_comp_method(GNUTLS_STATE state,
 				    opaque * data, int datalen);
 
@@ -492,16 +491,42 @@ int _gnutls_recv_finished(GNUTLS_STATE state)
 	return ret;
 }
 
+/* returns PK_RSA if the given cipher suite list only supports,
+ * RSA algorithms, PK_DSA if DSS, and -1 if both or none.
+ */
+int _gnutls_find_pk_algos_in_ciphersuites( opaque* data, int datalen) {
+int j;
+PKAlgorithm algo=-1, prev_algo = 0;
+KXAlgorithm kx;
+
+	for (j = 0; j < datalen; j += 2) {
+		kx = _gnutls_cipher_suite_get_kx_algo(*((GNUTLS_CipherSuite *) & data[j]));
+		
+		if ( _gnutls_map_kx_get_cred( kx) == GNUTLS_X509PKI) {
+			algo = _gnutls_map_pk_get_pk( kx);
+	
+			if (algo!=prev_algo && prev_algo!=0) return -1;
+			prev_algo = algo;
+		}
+	}
+
+	return algo;
+}
 
 
 /* This selects the best supported ciphersuite from the ones supported. Then
  * it adds the suite into the state and performs some checks. 
  */
-static int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int datalen)
+int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int datalen)
 {
 	int x, i, j;
 	GNUTLS_CipherSuite *ciphers;
 	int retval, err;
+	PKAlgorithm pk_algo; /* will hold the pk algorithms
+			      * supported by the peer.
+			      */
+
+	pk_algo = _gnutls_find_pk_algos_in_ciphersuites( data, datalen);
 
 	x = _gnutls_supported_ciphersuites(state, &ciphers);
 
@@ -509,7 +534,7 @@ static int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int dat
 	 * the certificate requested, or to the
 	 * authentication requested (eg SRP).
 	 */
-	x = _gnutls_remove_unwanted_ciphersuites(state, &ciphers, x);
+	x = _gnutls_remove_unwanted_ciphersuites(state, &ciphers, x, pk_algo);
 
 #ifdef HANDSHAKE_DEBUG
 	_gnutls_handshake_log("HSK: Requested cipher suites: \n");
@@ -1258,7 +1283,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 }
 
 /* This function copies the appropriate ciphersuites, to a localy allocated buffer 
- * Needed in hello messages. Returns the new data length.
+ * Needed in client hello messages. Returns the new data length.
  */
 static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 				     opaque ** ret_data)
@@ -1280,7 +1305,7 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 	 */
 	ret =
 	    _gnutls_remove_unwanted_ciphersuites(state, &cipher_suites,
-						 ret);
+						 ret, -1);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -2249,7 +2274,8 @@ int _gnutls_recv_hello_request(GNUTLS_STATE state, void *data,
  */
 int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 					 GNUTLS_CipherSuite **
-					 cipherSuites, int numCipherSuites)
+					 cipherSuites, int numCipherSuites, 
+					 PKAlgorithm requested_pk_algo)
 {
 
 	int ret = 0;
@@ -2277,7 +2303,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	cert = NULL;
 
 	if (state->security_parameters.entity == GNUTLS_SERVER)
-		cert = _gnutls_server_find_x509_cert(state);
+		cert = _gnutls_server_find_x509_cert(state, requested_pk_algo);
 
 	if (cert == NULL) {
 		/* No certificate was found 
@@ -2304,6 +2330,8 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
+	/* now removes ciphersuites based on the KX algorithm
+	 */
 	for (i = 0; i < numCipherSuites; i++) {
 		/* finds the key exchange algorithm in
 		 * the ciphersuite

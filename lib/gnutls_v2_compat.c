@@ -35,62 +35,34 @@
 #include "gnutls_random.h"
 #include "gnutls_auth_int.h"
 
-int _gnutls_SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque * data, int datalen);
-
 /* This selects the best supported ciphersuite from the ones provided */
-static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
-			  int datalen)
+static int _gnutls_handshake_select_v2_suite(GNUTLS_STATE state, char *data, int datalen)
 {
-	int x, i, j;
-	GNUTLS_CipherSuite *ciphers;
-
-	x = _gnutls_supported_ciphersuites(state, &ciphers);
-	x = _gnutls_remove_unwanted_ciphersuites( state, &ciphers, x);
-
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_handshake_log( "HSK: Requested cipher suites [v2 hello]: \n");
-	for (j = 0; j < datalen; j += 3) {
-		if (data[j] == 0) {	/* only print if in v2 compat mode */
-			_gnutls_handshake_log( "\t%s\n",
-				_gnutls_cipher_suite_get_name(*
-							      ((GNUTLS_CipherSuite *) & data[j+1])));
-		}
+	int i, j, ret;
+	char* _data;
+	int _datalen;
+	
+	_data = gnutls_malloc( datalen);
+	if (_data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
 	}
-	_gnutls_handshake_log( "HSK: Supported cipher suites: \n");
-	for (j = 0; j < x; j++)
-		_gnutls_handshake_log( "\t%s\n",
-			_gnutls_cipher_suite_get_name(ciphers[j]));
-#endif
-	memset(ret, '\0', 2);
 
+	_gnutls_handshake_log( "HSK: Parsing a version 2.0 client hello.\n");
+
+	i = _datalen = 0;
 	for (j = 0; j < datalen; j += 3) {
-		for (i = 0; i < x; i++) {
-			if (data[j] == 0)
-				if ( memcmp(ciphers[i].CipherSuite, &data[j+1],
-				     2) == 0) {
-
-					_gnutls_handshake_log(
-						"HSK: Selected cipher suite: ");
-					_gnutls_handshake_log( "%s\n",
-						_gnutls_cipher_suite_get_name
-						(*
-						 ((GNUTLS_CipherSuite *) &
-						  data[j+1])));
-
-					memcpy(ret,
-						ciphers[i].CipherSuite,
-						2);
-					gnutls_free(ciphers);
-
-					return 0;
-				}
+		if (data[j] == 0) {
+			memcpy( &_data[i], &data[j+1], 2);
+			i+=2;
+			_datalen+=2;
 		}
 	}
 
+	ret = _gnutls_server_select_suite( state, _data, _datalen);
+	gnutls_free(_data);
 
-	gnutls_free(ciphers);
-	gnutls_assert();
-	return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
+	return ret;
 
 }
 
@@ -118,7 +90,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	DECR_LEN(len, 2);
 
-	_gnutls_handshake_log( "HSK: V2 Hello: Client's version: %d.%d\n", data[pos],
+	_gnutls_handshake_log( "HSK: SSL 2.0 Hello: Client's version: %d.%d\n", data[pos],
 		data[pos + 1]);
 
 	set_adv_version( state, data[pos], data[pos+1]);
@@ -170,9 +142,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	/* find an appropriate cipher suite */
 
 	DECR_LEN(len, sizeOfSuites);
-	ret = SelectSuite_v2(state, state->security_parameters.
-				  current_cipher_suite.CipherSuite,
-				  &data[pos], sizeOfSuites);
+	ret = _gnutls_handshake_select_v2_suite(state, &data[pos], sizeOfSuites);
 
 	pos += sizeOfSuites;
 	if (ret < 0) {
@@ -198,7 +168,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	if (state->gnutls_internals.auth_struct == NULL) {
 
 		_gnutls_handshake_log(
-			"HSK: V2 Hello: Cannot find the appropriate handler for the KX algorithm\n");
+			"HSK: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n");
 
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
