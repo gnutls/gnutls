@@ -349,7 +349,7 @@ main(void)
   int result,der_len;
   unsigned char der[1024];
 
-  result=parser_asn1("Certificate.txt");
+  result=parser_asn1("pkix.asn");
 
   if(result==ASN_SYNTAX_ERROR){
     printf("PARSE ERROR\n");
