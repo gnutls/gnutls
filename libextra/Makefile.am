@@ -4,8 +4,8 @@ bin_SCRIPTS = libgnutls-extra-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls-extra.m4
 
-EXTRA_DIST = ext_srp.h crypt_srpsha1.h gnutls_srp.h \
-	auth_srp.h auth_srp_passwd.h crypt.h gnutls_openpgp.h \
+EXTRA_DIST = ext_srp.h gnutls_srp.h \
+	auth_srp.h auth_srp_passwd.h gnutls_openpgp.h \
 	gnutls-extra-api.tex gnutls_extra.h libgnutls-extra-config.in \
 	libgnutls-extra.m4 lzoconf.h minilzo.h
 
@@ -13,7 +13,7 @@ EXTRA_DIST = ext_srp.h crypt_srpsha1.h gnutls_srp.h \
 lib_LTLIBRARIES = libgnutls-extra.la
 
 
-COBJECTS_EXTRA = crypt.c crypt_srpsha1.c ext_srp.c \
+COBJECTS_EXTRA = ext_srp.c \
 	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
 	gnutls_openpgp.c gnutls_extra.c gnutls_openssl.c minilzo.c \
 	auth_srp_rsa.c
