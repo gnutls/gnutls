@@ -84,7 +84,7 @@ typedef struct
 {
     struct _SSL *ssl;
     int error;
-    gnutls_datum *cert_list;
+    const gnutls_datum *cert_list;
 #define current_cert cert_list
 } X509_STORE_CTX;
 
@@ -171,6 +171,8 @@ void SSL_free(SSL *ssl);
 void SSL_load_error_strings(void);
 int SSL_get_error(SSL *ssl, int ret);
 int SSL_set_fd(SSL *ssl, int fd);
+int SSL_set_rfd(SSL *ssl, int fd);
+int SSL_set_wfd(SSL *ssl, int fd);
 void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio);
 void SSL_set_connect_state(SSL *ssl);
 int SSL_pending(SSL *ssl);
@@ -182,7 +184,7 @@ const X509 *SSL_get_peer_certificate(SSL *ssl);
 
 int SSL_connect(SSL *ssl);
 int SSL_shutdown(SSL *ssl);
-int SSL_read(SSL *ssl, const void *buf, int len);
+int SSL_read(SSL *ssl, void *buf, int len);
 int SSL_write(SSL *ssl, const void *buf, int len);
 
 int SSL_want(SSL *ssl);
@@ -232,7 +234,7 @@ BIO *BIO_new_socket(int sock, int close_flag);
 /* error handling */
 
 unsigned long ERR_get_error(void);
-char *ERR_error_string(unsigned long e, char *buf);
+const char *ERR_error_string(unsigned long e, char *buf);
 
 
 /* RAND functions */
