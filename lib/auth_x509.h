@@ -1,3 +1,7 @@
+#ifndef AUTH_X509_H
+# define AUTH_X509_H
+# include "gnutls_cert.h"
+
 /* this is not to be included by gnutls_anon.c */
 extern MOD_AUTH_STRUCT rsa_auth_struct;
 
@@ -5,7 +9,7 @@ extern MOD_AUTH_STRUCT rsa_auth_struct;
  * support a server that has multiple certificates
  */
 typedef struct {
-	gnutls_datum ** cert_list; 
+	gnutls_cert ** cert_list; 
 			/* contains a list of a list of certificates.
 			 * eg:   [0] certificate1, certificate11, certificate111 
 			 * (if more than one, one certificate certifies the one before)
@@ -17,6 +21,8 @@ typedef struct {
 			 */
 	int ncerts;     /* contains the number of columns in cert_list.
 			 */
+	/* FIXME: replace datum with an internal type 
+	 */
 	gnutls_datum * pkey;   /* private keys. It contains ncerts private
 				* keys. pkey[i] corresponds to certificate in
 				* cert_list[i][0].
@@ -33,3 +39,8 @@ typedef struct {
 	int peer_certificate_list_size;
 	CertificateStatus peer_certificate_status;
 } X509PKI_AUTH_INFO;
+
+
+
+#endif
+

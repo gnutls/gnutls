@@ -36,6 +36,8 @@
 #include "gnutls_random.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_v2_compat.h"
+#include "auth_x509.h"
+#include "gnutls_cert.h"
 
 #ifdef DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
@@ -46,23 +48,25 @@
 #define TRUE 1
 #define FALSE 0
 
-static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
-		       int datalen);
-int _gnutls_SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret,
-			     opaque * data, int datalen);
+static int _gnutls_server_SelectSuite(GNUTLS_STATE state, opaque ret[2],
+				      char *data, int datalen);
+int _gnutls_server_SelectCompMethod(GNUTLS_STATE state,
+				    CompressionMethod * ret, opaque * data,
+				    int datalen);
 
-/* this will keep as less data to security_parameters.
+/* this will copy the required values for resuming to 
+ * gnutls_internals, and to security_parameters.
+ * this will keep as less data to security_parameters.
  */
-static void resume_copy_required_values(GNUTLS_STATE state) {
+static void resume_copy_required_values(GNUTLS_STATE state)
+{
 	/* get the new random values */
 	memcpy(state->gnutls_internals.resumed_security_parameters.
 	       server_random,
-	       state->security_parameters.server_random,
-	       TLS_RANDOM_SIZE);
+	       state->security_parameters.server_random, TLS_RANDOM_SIZE);
 	memcpy(state->gnutls_internals.resumed_security_parameters.
 	       client_random,
-	       state->security_parameters.client_random,
-	       TLS_RANDOM_SIZE);
+	       state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
 	/* keep the ciphersuite and compression 
 	 * That is because the client must see these in our
@@ -305,9 +309,9 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 2;
 
 	DECR_LEN(len, sizeOfSuites);
-	ret = SelectSuite(state, state->security_parameters.
-			  current_cipher_suite.CipherSuite, &data[pos],
-			  sizeOfSuites);
+	ret = _gnutls_server_SelectSuite(state, state->security_parameters.
+					 current_cipher_suite.CipherSuite,
+					 &data[pos], sizeOfSuites);
 
 	pos += sizeOfSuites;
 	if (ret < 0) {
@@ -348,9 +352,10 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	memcpy(&z, &data[pos++], 1);	/* z is the number of compression methods */
 
 	DECR_LEN(len, z);
-	ret = _gnutls_SelectCompMethod(state, &state->
-				       gnutls_internals.compression_method,
-				       &data[pos], z);
+	ret = _gnutls_server_SelectCompMethod(state, &state->
+					      gnutls_internals.
+					      compression_method,
+					      &data[pos], z);
 #ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Selected Compression Method: %s\n",
 		gnutls_compression_get_name(state->gnutls_internals.
@@ -467,13 +472,20 @@ int _gnutls_recv_finished(SOCKET cd, GNUTLS_STATE state)
 
 
 /* This selects the best supported ciphersuite from the ones provided */
-static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
-		       int datalen)
+static int _gnutls_server_SelectSuite(GNUTLS_STATE state, opaque ret[2],
+				      char *data, int datalen)
 {
 	int x, i, j;
 	GNUTLS_CipherSuite *ciphers;
 
 	x = _gnutls_supported_ciphersuites(state, &ciphers);
+
+	/* Here we remove any ciphersuite that does not conform
+	 * the certificate requested (using dnsname), or to the
+	 * authentication requested (eg SRP).
+	 */
+	x = _gnutls_remove_unwanted_ciphersuites(state, &ciphers, x);
+
 #ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Requested cipher suites: \n");
 	for (j = 0; j < datalen; j += 2)
@@ -486,7 +498,7 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
 		fprintf(stderr, "\t%s\n",
 			_gnutls_cipher_suite_get_name(ciphers[j]));
 #endif
-	memset(ret, '\0', sizeof(GNUTLS_CipherSuite));
+	memset(ret, '\0', 2);
 
 	for (j = 0; j < datalen; j += 2) {
 		for (i = 0; i < x; i++) {
@@ -515,8 +527,9 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
 
 
 /* This selects the best supported compression method from the ones provided */
-int _gnutls_SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret,
-			     opaque * data, int datalen)
+int _gnutls_server_SelectCompMethod(GNUTLS_STATE state,
+				    CompressionMethod * ret, opaque * data,
+				    int datalen)
 {
 	int x, i, j;
 	uint8 *ciphers;
@@ -1258,7 +1271,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state)
 
 		/* RECV CERTIFICATE */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_certificate( cd, state);
+			ret = _gnutls_recv_certificate(cd, state);
 		if (ret < 0) {
 			gnutls_assert();
 			ERR("recv server certificate", ret);
@@ -1641,4 +1654,98 @@ int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
 		return GNUTLS_E_UNEXPECTED_PACKET;
 	}
 #endif
+}
+
+/* This function will remove algorithms that are not supported by
+ * the requested authentication method. We only remove algorithm if
+ * we receive client hello extensions (dnsname).
+ */
+int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
+					 GNUTLS_CipherSuite **
+					 cipherSuites, int numCipherSuites)
+{
+
+	int ret = 0;
+	GNUTLS_CipherSuite *newSuite;
+	int newSuiteSize = 0, i, j, keep;
+	const X509PKI_SERVER_CREDENTIALS *x509_cred;
+	gnutls_cert *cert;
+	KXAlgorithm *alg;
+	int alg_size;
+	KXAlgorithm kx;
+
+	if (state->security_parameters.entity == GNUTLS_CLIENT)
+		return 0;	/* currently does nothing */
+
+	/* if we should use a specific certificate, 
+	 * we should remove all algorithms that are not supported
+	 * by that certificate and are on the same authentication
+	 * method (X509PKI).
+	 */
+
+	x509_cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	/* if x509_cred==NULL we should remove all X509 ciphersuites
+	 */
+
+	/* find the certificate that has dnsname in the subject
+	 * name or subject Alternative name.
+	 */
+
+	cert = NULL;
+	if (state->gnutls_key->dnsname[0] != 0) {
+		cert =
+		    (gnutls_cert *) _gnutls_find_cert(x509_cred->cert_list,
+						      x509_cred->ncerts,
+						      state->gnutls_key->
+						      dnsname);
+	}
+
+	if (cert == NULL) {	/* if no such cert, use the first in the list 
+				 */
+		cert = &x509_cred->cert_list[0][0];
+	}
+
+	/* get all the key exchange algorithms that are 
+	 * supported by the certificate parameters.
+	 */
+	if ((ret = _gnutls_cert_supported_kx(cert, &alg, &alg_size)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	newSuite =
+	    gnutls_malloc(numCipherSuites * sizeof(GNUTLS_CipherSuite));
+
+	for (i = 0; i < numCipherSuites; i++) {
+		kx = _gnutls_cipher_suite_get_kx_algo((*cipherSuites)[i]);
+
+		keep = 0;
+		if (_gnutls_map_kx_get_cred( kx) == GNUTLS_X509PKI) {
+			keep = 1;	/* do not keep */
+			if (x509_cred != NULL)
+				for (j = 0; j < alg_size; j++) {
+					if (alg[j] == kx) {
+						keep = 0;
+						break;
+					}
+				}
+		} else /* if it is defined but had no credentials 
+			*/
+			if ( _gnutls_get_kx_cred( state->gnutls_key, kx, NULL)==NULL) 
+				keep = 1;
+
+		if (keep == 0) {
+			memcpy(newSuite[newSuiteSize].CipherSuite,
+			       (*cipherSuites)[i].CipherSuite, 2);
+			newSuiteSize++;
+		}
+	}
+
+	gnutls_free(*cipherSuites);
+	*cipherSuites = newSuite;
+
+	ret = newSuiteSize;
+
+	return ret;
+
 }

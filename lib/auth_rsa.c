@@ -252,7 +252,7 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 	const X509PKI_SERVER_CREDENTIALS *cred;
 	int ret, i, pdatasize;
 	opaque* pdata;
-	gnutls_datum* apr_cert_list;
+	gnutls_cert* apr_cert_list;
 	gnutls_datum apr_pkey;
 	int apr_cert_list_length;
 	
@@ -275,7 +275,7 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 
 	ret = 3;
 	for (i=0;i<apr_cert_list_length;i++) {
-		ret += apr_cert_list[i].size + 3; 
+		ret += apr_cert_list[i].raw.size + 3; 
 					/* hold size
 					 * for uint24 */
 	}
@@ -291,8 +291,8 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 	WRITEuint24( ret-3, pdata);
 	pdata+=3;
 	for (i=0;i<apr_cert_list_length;i++) {
-		WRITEdatum24( pdata, apr_cert_list[i]); 
-		pdata += 3 + apr_cert_list[i].size;
+		WRITEdatum24( pdata, apr_cert_list[i].raw); 
+		pdata += (3 + apr_cert_list[i].raw.size);
 	}
 	pdatasize = ret;
 	
@@ -493,7 +493,7 @@ int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 			gnutls_free_datum(&sdata);
 			return GNUTLS_E_MEMORY_ERROR; 
 		}
-		WRITEuint16(sdata.size, *data);
+		WRITEuint16( sdata.size, *data);
 		memcpy( &(*data)[2], sdata.data, sdata.size);
 		ret = sdata.size + 2;
 		gnutls_free_datum(&sdata);

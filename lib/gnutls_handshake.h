@@ -31,3 +31,4 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state);
 void _gnutls_set_server_random( GNUTLS_STATE state, uint8* random);
 void _gnutls_set_client_random( GNUTLS_STATE state, uint8* random);
 int _gnutls_create_random( opaque* dst);
+int _gnutls_remove_unwanted_ciphersuites( GNUTLS_STATE state, GNUTLS_CipherSuite ** cipherSuites, int numCipherSuites);

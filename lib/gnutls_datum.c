@@ -24,6 +24,10 @@
 #include <gnutls_datum.h>
 #include <gnutls_errors.h>
 
+/* contains functions that make it easier to
+ * write vectors of <size|data>
+ */
+
 void WRITEdatum16( opaque* dest, gnutls_datum dat) {
 	WRITEuint16( dat.size, dest);
 	memcpy( &dest[2], dat.data, dat.size);

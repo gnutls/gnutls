@@ -51,6 +51,27 @@ typedef struct {
 	int size;
 } gnutls_datum;
 
+typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
+	GNUTLS_PK_DH
+} PKAlgorithm;
+
+typedef struct {
+	MPI *params;		/* the size of params depends on the public 
+				 * key algorithm 
+				 */
+	PKAlgorithm subject_pk_algorithm;
+
+	char *common_name;
+	char *country;
+	char *organization;
+	char *organizational_unit_name;
+	char *locality_name;
+	char *state_or_province_name;
+
+	gnutls_datum raw; /* the raw certificate */
+} gnutls_cert;
+
+
 /* internal functions */
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
@@ -158,7 +179,7 @@ typedef struct {
 } X509PKI_CLIENT_CREDENTIALS;
 
 typedef struct {
-	gnutls_datum ** cert_list; 
+	gnutls_cert ** cert_list; 
 		       /* contains a list of a list of certificates.
 			* eg:   [0] certificate1, certificate11, certificate111 
 			* (if more than one, one certificate certifies the one before)

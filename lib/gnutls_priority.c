@@ -74,7 +74,7 @@ void gnutls_set_cipher_priority( GNUTLS_STATE state, LIST) {
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
-  **/
+ **/
 void gnutls_set_kx_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;

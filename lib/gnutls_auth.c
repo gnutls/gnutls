@@ -155,7 +155,7 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
   * and the TLS extensions messages.
   *
   * In case of %GNUTLS_ANON returns a pointer to &ANON_AUTH_INFO;
-  *
+  * In case of %GNUTLS_X509PKI returns a pointer to structure &X509PKI_AUTH_INFO;
   * In case of %GNUTLS_SRP returns a pointer to structure &SRP_AUTH_INFO;
   **/
 const void* gnutls_get_auth_info( GNUTLS_STATE state) {

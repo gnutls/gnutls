@@ -9,6 +9,4 @@
 * Create global variables that hold read/write and initialize
   the ASN.1 parser's structures.
 * Create certificate verification function(s)
-* Make the selection of the proper ciphersuite to depend on
-  the certificate/credentials.
 * Modify SRP to conform the newest draft

@@ -46,7 +46,9 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 	GNUTLS_CipherSuite *ciphers;
 
 	x = _gnutls_supported_ciphersuites(state, &ciphers);
-#ifdef HARD_DEBUG
+	x = _gnutls_remove_unwanted_ciphersuites( state, &ciphers, x);
+
+#ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Requested cipher suites: \n");
 	for (j = 0; j < datalen; j += 3) {
 		if (data[j] == 0) {	/* only print if in v2 compat mode */
@@ -67,7 +69,7 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 			if (data[j] == 0)
 				if ( memcmp(ciphers[i].CipherSuite, &data[j+1],
 				     2) == 0) {
-#ifdef HARD_DEBUG
+#ifdef HANDSHAKE_DEBUG
 					fprintf(stderr,
 						"Selected cipher suite: ");
 					fprintf(stderr, "%s\n",

@@ -95,7 +95,7 @@ GNUTLS_STATE initialize_state()
 	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, 
 				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
 	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
+	gnutls_set_kx_priority(state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
 			       GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);
 	gnutls_set_cred(state, GNUTLS_SRP, &srp_cred);

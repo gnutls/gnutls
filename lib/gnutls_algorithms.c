@@ -22,6 +22,7 @@
 #include "gnutls_int.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_errors.h"
+#include "gnutls_cert.h"
 
 /* include all the kx handler's definitions */
 #include "auth_anon.h"
@@ -59,6 +60,7 @@ static const gnutls_cred_map cred_mappings[] = {
 
 #define GNUTLS_KX_MAP_ALG_LOOP(a) \
                         GNUTLS_KX_MAP_LOOP( if(p->type == type) { a; break; })
+
 
 /* TLS Versions */
 
