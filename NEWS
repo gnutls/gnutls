@@ -3,6 +3,10 @@ Copyright (C) 2004 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.1.22
+- The API manual is included in Devhelp format.  (Was in last release too,
+  but the NEWS entry was forgotten.)
+
 * Version 1.1.21 (2004-10-27)
 - Print DN of certificates with unknown characters in them, but in hexform
   only.
