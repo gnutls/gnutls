@@ -12,6 +12,6 @@ the needed configure, makefiles etc. using Automake, Autoconf, and libtool.
 
 BUGS:
 
-There should be plenty, but if you find any 
+There should be plenty, but if you think you found any 
 report it to bug-gnutls@gnu.org
 
