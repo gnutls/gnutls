@@ -316,6 +316,66 @@ int ret;
 }
 
 /**
+  * gnutls_pkcs12_bag_set_crt - This function inserts a certificate into the bag
+  * @bag: The bag
+  * @crt: the certificate to be copied.
+  *
+  * This function will insert the given certificate into the
+  * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
+  *
+  * On success returns the index of the added bag, or a negative
+  * value on error.
+  *
+  **/
+int gnutls_pkcs12_bag_set_crt(gnutls_pkcs12_bag bag, gnutls_x509_crt crt)
+{
+int ret;
+gnutls_datum data;
+
+	ret = _gnutls_x509_der_encode( crt->cert, "", &data, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	
+	ret = gnutls_pkcs12_bag_set_data( bag, GNUTLS_BAG_CERTIFICATE, &data);
+
+	_gnutls_free_datum( &data);
+	
+	return ret;
+}
+
+/**
+  * gnutls_pkcs12_bag_set_crl - This function inserts the CRL into the bag
+  * @bag: The bag
+  * @crl: the CRL to be copied.
+  *
+  * This function will insert the given CRL into the
+  * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
+  *
+  * On success returns the index of the added bag, or a negative
+  * value on error.
+  *
+  **/
+int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag bag, gnutls_x509_crl crl)
+{
+int ret;
+gnutls_datum data;
+
+	ret = _gnutls_x509_der_encode( crl->crl, "", &data, 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	
+	ret = gnutls_pkcs12_bag_set_data( bag, GNUTLS_BAG_CRL, &data);
+
+	_gnutls_free_datum( &data);
+	
+	return ret;
+}
+
+/**
   * gnutls_pkcs12_bag_set_key_id - This function sets a key ID into the bag element
   * @bag: The bag
   * @indx: The bag's element to add the id
