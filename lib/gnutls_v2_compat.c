@@ -47,6 +47,11 @@ static int _gnutls_handshake_select_v2_suite(gnutls_session session, opaque *dat
 	opaque* _data;
 	int _datalen;
 	
+	if (datalen % 3 != 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+	
 	_data = gnutls_malloc( datalen);
 	if (_data==NULL) {
 		gnutls_assert();
