@@ -159,11 +159,9 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 int _gnutls_set_compression(GNUTLS_STATE state, CompressionMethod algo)
 {
 
-	switch (algo) {
-	case COMPRESSION_NULL:
-		break;
-
-	default:
+	if (_gnutls_compression_is_ok(algo)==0) {
+		state->security_parameters.compression_algorithm = algo;
+	} else {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
@@ -221,13 +219,16 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	if (rc < 0)
 		return rc;
 
+	rc =
+	    _gnutls_set_compression(state,
+			    state->gnutls_internals.compression_method);
+	if (rc < 0)
+		return rc;
+
 /* Setup the keys since we have the master secret 
  */
 	_gnutls_set_keys(state);
 
-
-/* FIXME: Compression is not implemented (no compression algorithms used)
- */
 
 #ifdef DEBUG
 	fprintf(stderr, "Cipher Suite: %s\n",
@@ -239,7 +240,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	fprintf(stderr, "MAC: %s\n",
 		_gnutls_mac_get_name(state->security_parameters.
 				     mac_algorithm));
-	fprintf(stderr, "Compression: %s\n", "null");
+	fprintf(stderr, "Compression: %s\n", _gnutls_compression_get_name(state->security_parameters.compression_algorithm));
 #endif
 
 	gnutls_free(state->connection_state.write_mac_secret);
@@ -256,12 +257,10 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	gnutls_free(state->connection_state.read_compression_state);
 	gnutls_free(state->connection_state.write_compression_state);
 
-	switch (state->security_parameters.compression_algorithm) {
-	case COMPRESSION_NULL:
+	if (_gnutls_compression_is_ok(state->security_parameters.compression_algorithm) == 0) {
 		state->connection_state.read_compression_state = NULL;
 		state->connection_state.write_compression_state = NULL;
-		break;
-	default:
+	} else {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}

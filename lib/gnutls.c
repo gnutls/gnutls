@@ -61,7 +61,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 /* Set the defaults (only to remind me that they should be allocated ) */
 	(*state)->security_parameters.bulk_cipher_algorithm = GNUTLS_NULL;
 	(*state)->security_parameters.mac_algorithm = GNUTLS_MAC_NULL;
-	(*state)->security_parameters.compression_algorithm = COMPRESSION_NULL;
+	(*state)->security_parameters.compression_algorithm = GNUTLS_COMPRESSION_NULL;
 
 	(*state)->connection_state.read_compression_state = NULL;
 	(*state)->connection_state.read_mac_secret = NULL;
@@ -101,7 +101,10 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority=NULL;
 	(*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithms=0;
-	
+
+	(*state)->gnutls_internals.CompressionMethodPriority.algorithm_priority=NULL;
+	(*state)->gnutls_internals.CompressionMethodPriority.algorithms=0;
+
 	return 0;
 }
 

@@ -2,7 +2,7 @@
 
 #define GNUTLS_INT_H
 
-#define HANDSHAKE_DEBUG
+//#define HANDSHAKE_DEBUG
 //#define HARD_DEBUG
 //#define READ_DEBUG
 //#define WRITE_DEBUG
@@ -19,14 +19,14 @@
 #define gnutls_mpi_release mpi_release
 
 #define svoid void /* for functions that allocate using secure_free */
-#define secure_free(x) if (x!=NULL) free(x)
+#define secure_free free
 #define secure_malloc malloc
 #define secure_realloc realloc
 #define secure_calloc calloc
 #define gnutls_malloc malloc
 #define gnutls_realloc realloc
 #define gnutls_calloc calloc
-#define gnutls_free(x) if (x!=NULL) free(x)
+#define gnutls_free free
 
 typedef struct {
 	uint8	pint[3];
@@ -89,7 +89,7 @@ enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
 enum IsExportable { EXPORTABLE_TRUE, EXPORTABLE_FALSE };
 enum MACAlgorithm { GNUTLS_MAC_NULL, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
-enum CompressionMethod { COMPRESSION_NULL };
+enum CompressionMethod { GNUTLS_COMPRESSION_NULL, GNUTLS_ZLIB=224 };
 
 enum ValidSession { VALID_TRUE, VALID_FALSE };
 enum ResumableSession { RESUME_TRUE, RESUME_FALSE };
@@ -176,6 +176,11 @@ typedef struct {
 } KXAlgorithm_Priority;
 
 typedef struct {
+	int* algorithm_priority;
+	int algorithms;
+} CompressionMethod_Priority;
+
+typedef struct {
 	char*			buffer;
 	uint32			bufferSize;
 	char*			hash_buffer; /* used in SSL3 */
@@ -198,6 +203,7 @@ typedef struct {
 	BulkCipherAlgorithm_Priority	BulkCipherAlgorithmPriority;
 	MACAlgorithm_Priority		MACAlgorithmPriority;
 	KXAlgorithm_Priority		KXAlgorithmPriority;
+	CompressionMethod_Priority	CompressionMethodPriority;
 } GNUTLS_INTERNALS;
 
 typedef struct {

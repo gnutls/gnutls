@@ -21,7 +21,7 @@
 #include "defines.h"
 #include "gnutls_errors.h"
 
-void tolow(char *str, int size);
+void _gnutls_tolow(char *str, int size);
 
 #define GNUTLS_ERROR_ENTRY(name, fatal) \
 	{ #name, name, fatal }
@@ -59,6 +59,7 @@ static gnutls_error_entry error_algorithms[] = {
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_MPI_SCAN_FAILED, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_DECRYPTION_FAILED, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_DECOMPRESSION_FAILED, 1),
+	GNUTLS_ERROR_ENTRY( GNUTLS_E_COMPRESSION_FAILED, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_MEMORY_ERROR, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_UNIMPLEMENTED_FEATURE, 1),
 	{0}
@@ -91,7 +92,7 @@ void gnutls_perror(int error)
 
 
 	if (ret != NULL) {
-		tolow(ret, strlen(ret));
+		_gnutls_tolow(ret, strlen(ret));
 		pointerTo_ = strchr(ret, '_');
 
 		while (pointerTo_ != NULL) {
@@ -115,7 +116,7 @@ char* gnutls_strerror(int error)
 
 
 	if (ret != NULL) {
-		tolow(ret, strlen(ret));
+		_gnutls_tolow(ret, strlen(ret));
 		pointerTo_ = strchr(ret, '_');
 
 		while (pointerTo_ != NULL) {

@@ -26,7 +26,7 @@ enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_K
 typedef enum KXAlgorithm KXAlgorithm;
 enum MACAlgorithm { GNUTLS_MAC_NULL, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
 typedef enum MACAlgorithm MACAlgorithm;
-enum CompressionMethod { COMPRESSION_NULL };
+enum CompressionMethod { GNUTLS_COMPRESSION_NULL, GNUTLS_ZLIB=224 };
 typedef enum CompressionMethod CompressionMethod;
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 typedef enum ConnectionEnd ConnectionEnd;
@@ -60,6 +60,7 @@ void gnutls_perror( int error);
 void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...);
 void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
 void gnutls_set_mac_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_compression_priority( GNUTLS_STATE state, int num, ...);
 
 /* set our version - local is 0x00 for TLS 1.0 and SSL3 */
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 

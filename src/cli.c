@@ -59,7 +59,7 @@ int main()
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
 	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
-//	gnutls_set_kx_priority( state, 1, GNUTLS_KX_ANON_DH);
+	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_COMPRESSION_NULL);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 	ret = gnutls_handshake(sd, state);

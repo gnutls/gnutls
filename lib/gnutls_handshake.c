@@ -147,8 +147,6 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 		data_size=12;
 	}
 
-fprintf(stderr, "Finished: %s\n", _gnutls_bin2hex(data, data_size));
-
 	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_FINISHED);
 	gnutls_free(data);
 
@@ -243,27 +241,29 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data, int datale
 }
 
 /* This selects the best supported compression method from the ones provided */
-static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, char *data, int datalen)
+static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque *data, int datalen)
 {
 	int x, i, j;
 	CompressionMethod *ciphers;
 
 	x = _gnutls_supported_compression_methods(state, &ciphers);
 	memset(ret, '\0', sizeof(CompressionMethod));
-fprintf(stderr, "datalen: %d\n",datalen);
+fprintf(stderr, "datalen: %d\n", datalen);
 	for (j = 0; j < datalen; j++) {
 		for (i = 0; i < x; i++) {
-			fprintf(stderr, "cipher[%d] = %u\n", i, ciphers[i]);
-			fprintf(stderr, "data[%d] = %u\n", j, data[j]);
-			if (memcmp(&ciphers[i], &data[j], 1) == 0) {
-				memmove(ret, &ciphers[i], 1);
+			fprintf(stderr, "cipher[%d] = %d\n", i, (int)ciphers[i]);
+			fprintf(stderr, "data[%d] = %d\n", j, (int)data[j]);
+			if ( ciphers[i] == data[j]) {
+				*ret = ciphers[i];
 				gnutls_free(ciphers);
 				return 0;
 			}
 		}
 	}
 
-
+	/* we were not able to find a compatible compression
+	 * algorithm
+	 */
 	gnutls_free(ciphers);
 	gnutls_assert();
 	return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
@@ -763,7 +763,9 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 				 &data[pos], z);
 		pos+=z;
 		
-		if (ret<0) return ret;
+		if (ret < 0) {
+			return ret;
+		}
 	}
 
 	return ret;

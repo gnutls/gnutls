@@ -82,3 +82,22 @@ void gnutls_set_mac_priority( GNUTLS_STATE state, int num, ...) {
 	}
 	va_end(ap);
 }
+
+void gnutls_set_compression_priority( GNUTLS_STATE state, int num, ...) {
+	
+	va_list ap;
+	int i;
+	CompressionMethod *_ap;
+	
+	va_start( ap, num);
+	_ap = ap;
+	
+	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority!=NULL)
+		gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);	
+	state->gnutls_internals.CompressionMethodPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	state->gnutls_internals.CompressionMethodPriority.algorithms = num;
+	for (i=0;i<num;i++) {
+		state->gnutls_internals.CompressionMethodPriority.algorithm_priority[i] = _ap[i];
+	}
+	va_end(ap);
+}
