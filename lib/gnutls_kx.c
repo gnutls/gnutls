@@ -34,6 +34,7 @@
 #include <gnutls_state.h>
 #include <gnutls_datum.h>
 #include <gnutls_alert.h>
+#include <gnutls_rsa_export.h>
 
 /* This file contains important thing for the TLS handshake procedure.
  */
@@ -103,6 +104,11 @@ int _gnutls_send_server_kx_message( GNUTLS_STATE state, int again)
 	if (again == 0) {
 		data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx( state, &data);
 		
+		if (data_size == GNUTLS_E_INT_RET_0) {
+			gnutls_assert();
+			return 0;
+		}
+	
 		if (data_size < 0) {
 			gnutls_assert();
 			return data_size;
@@ -302,24 +308,36 @@ int _gnutls_send_client_certificate_verify( GNUTLS_STATE state, int again)
 
 int _gnutls_recv_server_kx_message( GNUTLS_STATE state)
 {
-	uint8 *data;
+	uint8 *data = NULL;
 	int datasize;
 	int ret = 0;
 
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx!=NULL) {
 
+		/* EXCEPTION FOR RSA_EXPORT cipher suite 
+		 */
+		if ( _gnutls_session_is_export( state) != 0 &&
+			_gnutls_peers_cert_less_512(state) != 0) {
+				gnutls_assert();
+				return 0;
+		}
+
 		ret =
 		    _gnutls_recv_handshake( state, &data,
 				   &datasize,
 				   GNUTLS_SERVER_KEY_EXCHANGE, MANDATORY_PACKET);
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_assert();
 			return ret;
+		}
 
 		ret = state->gnutls_internals.auth_struct->gnutls_process_server_kx( state, data, datasize);
 		gnutls_free(data);
 
-		if (ret < 0)
+		if (ret < 0) {
+			gnutls_assert();
 			return ret;
+		}
 		
 	}
 	return ret;

@@ -37,6 +37,7 @@
 #include <gnutls_state.h>
 #include <auth_cert.h>
 #include <auth_anon.h>
+#include <gnutls_algorithms.h>
 
 #define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \
 	gnutls_assert(); \
@@ -689,6 +690,21 @@ int gnutls_session_is_resumed(GNUTLS_STATE state)
 		if (state->gnutls_internals.resumed==RESUME_TRUE)
 			return 1;
 	}
+
+	return 0;
+}
+
+/*-
+  * _gnutls_session_is_export - Used to check whether this session is of export grade
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function will return non zero if this session is of export grade.
+  *
+  -*/
+int _gnutls_session_is_export(GNUTLS_STATE state)
+{
+	if ( _gnutls_cipher_suite_get_kx_algo( state->security_parameters.current_cipher_suite)
+		== GNUTLS_KX_RSA_EXPORT) return 1;
 
 	return 0;
 }

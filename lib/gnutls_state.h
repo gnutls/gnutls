@@ -30,6 +30,7 @@ void _gnutls_handshake_internal_state_clear( GNUTLS_STATE);
 int _gnutls_rsa_export_set_modulus_bits( GNUTLS_STATE state, int bits);
 
 int _gnutls_session_is_resumable( GNUTLS_STATE state);
+int _gnutls_session_is_export( GNUTLS_STATE state);
 
 int _gnutls_openpgp_send_fingerprint( GNUTLS_STATE state);
 

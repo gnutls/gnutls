@@ -100,6 +100,13 @@ static int gen_rsa_export_server_kx(GNUTLS_STATE state, opaque ** data)
 		return ret;
 	}
 
+	/* abort sending this message if we have a certificate
+	 * of 512 bits or less.
+	 */
+	if ( _gnutls_mpi_get_nbits( apr_pkey->params[0]) <= 512) {
+		return GNUTLS_E_INT_RET_0;
+	}
+
 	rsa_params = _gnutls_get_rsa_params( cred->rsa_params, 512);
 	if (rsa_params == NULL) {
 		gnutls_assert();
@@ -173,6 +180,58 @@ static int gen_rsa_export_server_kx(GNUTLS_STATE state, opaque ** data)
 	return data_size;
 }
 
+/* if the peer's certificate is of 512 bits or less, returns non zero.
+ */
+int _gnutls_peers_cert_less_512( GNUTLS_STATE state) 
+{
+gnutls_cert peer_cert;
+int ret;
+CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
+
+	if (info == NULL || info->ncerts==0) {
+		gnutls_assert();
+		/* we need this in order to get peer's certificate */
+		return 0;
+	}
+
+	switch( state->security_parameters.cert_type) {
+		case GNUTLS_CRT_X509:
+			if ((ret =
+			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
+					     info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
+				gnutls_assert();
+				return 0;
+			}
+			break;
+
+		case GNUTLS_CRT_OPENPGP:
+			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INIT_LIBEXTRA;
+			}
+			if ((ret =
+			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
+					     info->raw_certificate_list[0])) < 0) {
+				gnutls_assert();
+				return 0;
+			}
+			break;
+
+		default:
+			gnutls_assert();
+			return 0;
+	}
+
+	if ( _gnutls_mpi_get_nbits( peer_cert.params[0]) 
+		<= 512) {
+		_gnutls_free_cert( peer_cert);
+		return 1;
+	}
+	
+	_gnutls_free_cert( peer_cert);
+	
+	return 0;
+}
 
 static int proc_rsa_export_server_kx(GNUTLS_STATE state, opaque * data,
 				  int data_size)
@@ -184,14 +243,16 @@ static int proc_rsa_export_server_kx(GNUTLS_STATE state, opaque * data,
 	int i, sigsize;
 	gnutls_datum vparams, signature;
 	int ret;
-	CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
+	CERTIFICATE_AUTH_INFO info;
 	gnutls_cert peer_cert;
 
+	info = _gnutls_get_auth_info( state);
 	if (info == NULL || info->ncerts==0) {
 		gnutls_assert();
 		/* we need this in order to get peer's certificate */
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
+
 
 	i = 0;
 	

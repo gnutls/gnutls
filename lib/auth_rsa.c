@@ -77,25 +77,6 @@ CERTIFICATE_AUTH_INFO info;
 gnutls_cert peer_cert;
 int i;
 
-	if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite)
-		 == GNUTLS_KX_RSA_EXPORT) {
-		/* EXPORT case: */
-
-		if (state->gnutls_key->rsa[0] == NULL ||
-			state->gnutls_key->rsa[1] == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
-		}
-
-		*params_len = 2;
-		for (i=0;i<*params_len;i++) {
-			params[i] = _gnutls_mpi_copy(state->gnutls_key->rsa[i]);
-		}
-
-		return 0;
-	}
-
-
 	/* normal non export case */
 
 	info = _gnutls_get_auth_info( state);
@@ -132,6 +113,34 @@ int i;
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 	}
+
+
+	/* EXPORT case: */
+	if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite)
+		 == GNUTLS_KX_RSA_EXPORT && 
+		 	_gnutls_mpi_get_nbits(peer_cert.params[0]) > 512) {
+
+		_gnutls_free_cert( peer_cert);
+
+		if (state->gnutls_key->rsa[0] == NULL ||
+			state->gnutls_key->rsa[1] == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		if (*params_len < 2) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		*params_len = 2;
+		for (i=0;i<*params_len;i++) {
+			params[i] = _gnutls_mpi_copy(state->gnutls_key->rsa[i]);
+		}
+
+		return 0;
+	}
+
+	/* end of export case */
 	
 	if (*params_len < peer_cert.params_size) {
 		gnutls_assert();
@@ -160,8 +169,15 @@ const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	        return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
+	if ( (index=state->gnutls_internals.selected_cert_index) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
 	if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite)
-		 == GNUTLS_KX_RSA_EXPORT) {
+		 == GNUTLS_KX_RSA_EXPORT && 
+		 	_gnutls_mpi_get_nbits(cred->cert_list[index][0].params[0]) > 512) {
+
 		/* EXPORT case: */
 		if (cred->rsa_params == NULL) {
 			gnutls_assert();
@@ -175,12 +191,6 @@ const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	}
 
 	/* non export cipher suites. */	
-
-
-	if ( (index=state->gnutls_internals.selected_cert_index) < 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
-	}
 	
 	*params_size = cred->pkey[index].params_size;
 	*params = cred->pkey[index].params;

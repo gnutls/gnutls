@@ -19,4 +19,5 @@
  */
 
 const GNUTLS_MPI* _gnutls_get_rsa_params(GNUTLS_RSA_PARAMS, int bits);
+int _gnutls_peers_cert_less_512( GNUTLS_STATE state);
 
