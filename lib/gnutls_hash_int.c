@@ -214,8 +214,8 @@ char* ret;
     return ret;
 }
 
-GNUTLS_MAC_HANDLE gnutls_hmac_init_ssl3( MACAlgorithm algorithm, char* key, int keylen) {
-GNUTLS_MAC_HANDLE ret=gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+GNUTLS_MAC_HANDLE gnutls_hash_init_ssl3( MACAlgorithm algorithm, char* key, int keylen) {
+GNUTLS_MAC_HANDLE ret;
 char* ipad;
 char* digest;
 int padsize;
@@ -242,7 +242,7 @@ int padsize;
 	return ret;
 }
 
-void* gnutls_hmac_deinit_ssl3( GNUTLS_MAC_HANDLE handle) {
+void* gnutls_hash_deinit_ssl3( GNUTLS_MAC_HANDLE handle) {
 void *ret;
 GNUTLS_HASH_HANDLE td;
 char* opad;
