@@ -939,7 +939,7 @@ int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
 }
 
 /* finds a certificate in the cert list that contains
- * common_name field similar to name
+ * common_name (or subjectAltName) field similar to name
  */
 gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 			       int cert_list_length, char *name)
@@ -949,7 +949,7 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 
 	for (i = 0; i < cert_list_length; i++) {
 		if (cert_list[i][0].cert_info.common_name[0] != 0) {
-			if (strcmp(cert_list[i][0].cert_info.common_name, name) == 0) {
+			if (strcasecmp(cert_list[i][0].cert_info.common_name, name) == 0 || strcasecmp(cert_list[i][0].subjectAltName, name) == 0) {
 				cert = &cert_list[i][0];
 				break;
 			}
