@@ -86,7 +86,7 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 	/* calculate:  B = (3v + g^b) % N 
 	 */
 	bits = _gnutls_mpi_get_nbits(n);
-	b = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	b = _gnutls_mpi_snew(bits);
 	if (b==NULL) {
 		gnutls_assert();
 		return NULL;
@@ -101,7 +101,7 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 	
 	_gnutls_mpi_randomize(b, bits, GCRY_STRONG_RANDOM);
 
-	tmpB = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	tmpB = _gnutls_mpi_snew(bits);
 	if (tmpB==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &b);
@@ -109,7 +109,7 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 		return NULL;
 	}
 
-	B = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	B = _gnutls_mpi_snew(bits);
 	if (tmpB==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &b);
@@ -220,7 +220,7 @@ GNUTLS_MPI _gnutls_calc_srp_A(GNUTLS_MPI * a, GNUTLS_MPI g, GNUTLS_MPI n)
 	int bits;
 
 	bits = _gnutls_mpi_get_nbits(n);
-	tmpa = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	tmpa = _gnutls_mpi_snew(bits);
 	if (tmpa==NULL) {
 		gnutls_assert();
 		return NULL;
@@ -228,7 +228,7 @@ GNUTLS_MPI _gnutls_calc_srp_A(GNUTLS_MPI * a, GNUTLS_MPI g, GNUTLS_MPI n)
 	
 	_gnutls_mpi_randomize(tmpa, bits, GCRY_STRONG_RANDOM);
 
-	A = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	A = _gnutls_mpi_snew(bits);
 	if (A==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &tmpa);
@@ -697,36 +697,6 @@ opaque digest[20];
 	res->size = ret;
 	
 	return 0;
-}
-
-/* FIXME: Functions for backwards compatibility 
- */
-
-void gnutls_srp_free_client_cred( gnutls_srp_client_credentials sc) {
-	gnutls_srp_free_client_credentials( sc);
-}
-
-void gnutls_srp_free_server_cred( gnutls_srp_server_credentials sc) {
-	gnutls_srp_free_server_credentials( sc);
-}
-
-int gnutls_srp_allocate_client_cred( gnutls_srp_client_credentials *sc) {
-	return gnutls_srp_allocate_client_credentials( sc);
-}
-
-int gnutls_srp_allocate_server_cred( gnutls_srp_server_credentials *sc) 
-{
-	return gnutls_srp_allocate_server_credentials( sc);
-}
-
-int gnutls_srp_set_server_cred_file( gnutls_srp_server_credentials res, char *password_file, char * password_conf_file) 
-{
-	return gnutls_srp_set_server_credentials_file( res, password_file, password_conf_file);
-}
-
-int gnutls_srp_set_client_cred( gnutls_srp_client_credentials res, char *username, char * password) 
-{
-	return gnutls_srp_set_client_credentials( res, username, password);
 }
 
 #endif /* ENABLE_SRP */

@@ -218,18 +218,28 @@ int _gnutls_finished(gnutls_session session, int type, void *ret)
 int _gnutls_create_random(opaque * dst)
 {
 	uint32 tim;
-	opaque rand[TLS_RANDOM_SIZE - 4];
+
+	/* Use weak random numbers for the most of the
+	 * buffer except for the first 4 that are the
+	 * system's time, and the last 3 which are of
+	 * better quality.
+	 */
 
 	tim = time(NULL);
 	/* generate server random value */
 	_gnutls_write_uint32(tim, dst);
 
 	if (_gnutls_get_random
-	    (rand, TLS_RANDOM_SIZE - 4, GNUTLS_STRONG_RANDOM) < 0) {
+	    (&dst[4], TLS_RANDOM_SIZE - 7, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	memcpy(&dst[4], rand, TLS_RANDOM_SIZE - 4);
+
+	if (_gnutls_get_random
+	    (&dst[29], 3, GNUTLS_STRONG_RANDOM) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return 0;
 }
