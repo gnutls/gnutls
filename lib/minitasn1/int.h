@@ -32,7 +32,7 @@
 
 #include <mem.h>
 
-#define LIBTASN1_VERSION "0.2.5"
+#define LIBTASN1_VERSION "0.2.6"
 
 #define MAX32 4294967295
 #define MAX24 16777215

@@ -661,7 +661,7 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
 	break;
       case TYPE_TAG:
 	if(mode == ASN1_PRINT_ALL)
-	  if(p->value) fprintf(out,"  value:%s",p->value);
+	  fprintf(out,"  value:%s",p->value);
 	break;
       case TYPE_SIZE:
 	if(mode == ASN1_PRINT_ALL)
