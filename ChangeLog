@@ -1,3 +1,41 @@
+2004-09-17 09:07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, NEWS:
+
+	Add.  
+
+2004-09-17 09:04  Simon Josefsson <simon@josefsson.org>
+
+	* src/: Makefile.am, Makefile.am:
+
+	Fix objdir != srcdir in -I, reported by "Gerrit P. Haase" 
+	<gp@familiehaase.de>.  
+
+2004-09-17 08:59  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am:
+
+	Fix objdir != srcdir in -I, reported by "Gerrit P. Haase" 
+	<gp@familiehaase.de>.  
+
+2004-09-17 08:55  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS:
+
+	Add.  
+
+2004-09-17 08:49  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS:
+
+	Add.  
+
+2004-09-17 08:28  Simon Josefsson <simon@josefsson.org>
+
+	* buildconf:
+
+	Cleanup.  
+
 2004-09-15 08:02  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS:
