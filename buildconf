@@ -1,11 +1,12 @@
 #! /bin/sh
 
-aclocal -I . && \
-libtoolize -c --force --automake && \
-aclocal -I . && \
-autoheader -Wall && \
-automake -a -c --gnu || automake -a -c --gnu
-autoconf
+autoreconf --force --install
 
+#aclocal -I . && \
+#libtoolize -c --force --automake && \
+#aclocal -I . && \
+#autoheader -Wall && \
+#automake -a -c --gnu || automake -a -c --gnu
+#autoconf
 
 echo "You can now run \"./configure --enable-developer-mode\" and \"make\""
