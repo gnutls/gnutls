@@ -206,7 +206,7 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
      * is the value;
      */
     len = sizeof(str) - 1;
-    if ((result = asn1_read_value(tmpasn, "", str, &len)) != ASN1_SUCCESS) {	/* CHOICE */
+    if ((result = asn1_read_value(tmpasn, "", str, &len)) != ASN1_SUCCESS) { /* CHOICE */
 	gnutls_assert();
 	asn1_delete_structure(&tmpasn);
 	return _gnutls_asn2err(result);
@@ -218,8 +218,21 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
 	    _gnutls_str_cpy(res, *res_size, str);
 	*res_size = len;
 
-    } else {			/* CHOICE */
+    } else { /* CHOICE */
 	str[len] = 0;
+
+        /* Note that we do not supports strings other than
+         * UTF-8 (thus ASCII as well).
+         * FIXME: convert the other types.
+         */
+        if ( strcmp( str, "printableString")!=0 && 
+            strcmp( str, "teletexString")!=0 &&
+            strcmp( str, "utf8String")!=0 ) {
+            gnutls_assert();
+            asn1_delete_structure(&tmpasn);
+            return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+        }
+
 	_gnutls_str_cpy(tmpname, sizeof(tmpname), str);
 
 	len = sizeof(str) - 1;
@@ -417,7 +430,7 @@ static time_t mktime_utc(const struct fake_tm *tm)
 
 
 /* this one will parse dates of the form:
- * month|day|hour|minute (2 chars each)
+ * month|day|hour|minute|sec* (2 chars each)
  * and year is given. Returns a time_t date.
  */
 time_t _gnutls_x509_time2gtime(const char *ttime, int year)
@@ -465,7 +478,12 @@ time_t _gnutls_x509_time2gtime(const char *ttime, int year)
     etime.tm_min = atoi(xx);
     ttime += 2;
 
-    etime.tm_sec = 0;
+    if (strlen(ttime) >= 2) {
+        memcpy(xx, ttime, 2);
+        etime.tm_sec = atoi(xx);
+        ttime += 2;
+    } else
+        etime.tm_sec = 0;
 
     ret = mktime_utc(&etime);
 
@@ -475,7 +493,9 @@ time_t _gnutls_x509_time2gtime(const char *ttime, int year)
 
 /* returns a time_t value that contains the given time.
  * The given time is expressed as:
- * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
+ * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)*
+ *
+ * (seconds are optional)
  */
 time_t _gnutls_x509_utcTime2gtime(const char *ttime)
 {
@@ -506,7 +526,7 @@ time_t _gnutls_x509_utcTime2gtime(const char *ttime)
  * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
  */
 int _gnutls_x509_gtime2utcTime(time_t gtime, char *str_time,
-			       int str_time_size)
+    int str_time_size)
 {
     size_t ret;
 
@@ -515,13 +535,13 @@ int _gnutls_x509_gtime2utcTime(time_t gtime, char *str_time,
 
     gmtime_r(&gtime, &_tm);
 
-    ret = strftime(str_time, str_time_size, "%y%m%d%H%M00Z", &_tm);
+    ret = strftime(str_time, str_time_size, "%y%m%d%H%M%SZ", &_tm);
 #else
     struct tm *_tm;
 
     _tm = gmtime(&gtime);
 
-    ret = strftime(str_time, str_time_size, "%y%m%d%H%M00Z", _tm);
+    ret = strftime(str_time, str_time_size, "%y%m%d%H%M%SZ", _tm);
 #endif
 
     if (!ret) {
@@ -535,7 +555,7 @@ int _gnutls_x509_gtime2utcTime(time_t gtime, char *str_time,
 
 /* returns a time_t value that contains the given time.
  * The given time is expressed as:
- * YEAR(4)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
+ * YEAR(4)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)*
  */
 time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 {
