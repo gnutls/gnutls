@@ -1,3 +1,10 @@
+2002-07-21 19:15  admcd <admcd@gnutls.org>
+
+	* doc/tex/openssl.tex:
+
+	add ability to use separate file descriptors for send() and recv() 
+	using new set_transport_ptr2() function 
+
 2002-07-20 18:44  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_handshake.c:
