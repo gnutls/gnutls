@@ -40,20 +40,16 @@
 #include <verify.h>
 
 static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
-				       const gnutls_x509_crt_t *
-				       trusted_cas, int tcas_size,
-				       unsigned int flags,
-				       unsigned int *output);
+    const gnutls_x509_crt_t *trusted_cas, int tcas_size,
+    unsigned int flags, unsigned int *output);
 int _gnutls_x509_verify_signature(const gnutls_datum_t * signed_data,
-				  const gnutls_datum_t * signature,
-				  gnutls_x509_crt_t issuer);
+    const gnutls_datum_t * signature, gnutls_x509_crt_t issuer);
 
 static
 int is_crl_issuer(gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer_cert);
 static int _gnutls_verify_crl2(gnutls_x509_crl_t crl,
-			       const gnutls_x509_crt_t * trusted_cas,
-			       int tcas_size, unsigned int flags,
-			       unsigned int *output);
+    const gnutls_x509_crt_t * trusted_cas, int tcas_size, unsigned int flags,
+    unsigned int *output);
 
 
 /* Checks if the issuer of a certificate is a
@@ -208,10 +204,8 @@ static inline
  * procedure.
  */
 static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
-				       const gnutls_x509_crt_t *
-				       trusted_cas, int tcas_size,
-				       unsigned int flags,
-				       unsigned int *output)
+     const gnutls_x509_crt_t *trusted_cas, int tcas_size,
+     unsigned int flags, unsigned int *output)
 {
     gnutls_datum_t cert_signed_data = { NULL, 0 };
     gnutls_datum_t cert_signature = { NULL, 0 };
@@ -298,30 +292,47 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
 
 
 /* The algorithm used is:
- * 1. Check the certificate chain given by the peer, if it is ok.
- * 2. If any certificate in the chain are revoked, not
- *    valid, or they are not CAs then the certificate is invalid.
- * 3. If 1 is ok, then find a certificate in the trusted CAs file
- *    that has the DN of the issuer field in the last certificate
- *    in the peer's certificate chain.
- * 4. If it does exist then verify it. If verification is ok then
- *    it is trusted. Otherwise it is just valid (but not trusted).
- */
-/* This function verifies a X.509 certificate list. The certificate list should
+ * 1. Check last certificate in the chain. If it is not verified return.
+ * 2. Check if any certificates in the chain are revoked. If yes return.
+ * 3. Try to verify the rest of certificates in the chain. If not verified return.
+ * 4. Return 0.
+ *
+ * Note that the return value is an OR of GNUTLS_CERT_* elements.
+ *
+ * This function verifies a X.509 certificate list. The certificate list should
  * lead to a trusted CA in order to be trusted.
  */
 static
-unsigned int _gnutls_x509_verify_certificate(const gnutls_x509_crt_t *
-					     certificate_list,
-					     int clist_size,
-					     const gnutls_x509_crt_t *
-					     trusted_cas, int tcas_size,
-					     const gnutls_x509_crl_t *
-					     CRLs, int crls_size,
-					     unsigned int flags)
+unsigned int _gnutls_x509_verify_certificate(
+    const gnutls_x509_crt_t *certificate_list, int clist_size,
+    const gnutls_x509_crt_t *trusted_cas, int tcas_size,
+    const gnutls_x509_crl_t *CRLs, int crls_size,
+    unsigned int flags)
 {
     int i = 0, ret;
     unsigned int status = 0, output;
+
+
+    /* Verify the last certificate in the certificate path
+     * against the trusted CA certificate list.
+     *
+     * If no CAs are present returns NOT_TRUSTED. Thus works
+     * in self signed etc certificates.
+     */
+    ret =
+	_gnutls_verify_certificate2(certificate_list[clist_size-1], 
+	    trusted_cas, tcas_size, flags, &output);
+
+    if (ret == 0) {
+	/* if the last certificate in the certificate
+	 * list is invalid, then the certificate is not
+	 * trusted.
+	 */
+	gnutls_assert();
+	status |= output;
+	status |= GNUTLS_CERT_INVALID;
+	return status;
+    }
 
     /* Check for revoked certificates in the chain
      */
@@ -331,55 +342,26 @@ unsigned int _gnutls_x509_verify_certificate(const gnutls_x509_crt_t *
 					       CRLs, crls_size);
 	if (ret == 1) {		/* revoked */
 	    status |= GNUTLS_CERT_REVOKED;
+	    return status;
 	}
     }
 #endif
 
-    /* Verify the certificate path 
+    /* Verify the certificate path (chain) 
      */
-    for (i = 0; i < clist_size; i++) {
-	if (i + 1 >= clist_size)
+    for (i = clist_size-1; i > 0; i--) {
+	if (i - 1 < 0)
 	    break;
 
 	if ((ret =
-	     _gnutls_verify_certificate2(certificate_list[i],
-					 &certificate_list[i + 1], 1,
-					 flags, NULL)) != 1) {
+	     _gnutls_verify_certificate2(certificate_list[i-1],
+                  &certificate_list[i], 1, flags, NULL)) == 0) {
 	    status |= GNUTLS_CERT_INVALID;
+	    return status;
 	}
     }
 
-    if (status != 0) {
-	/* If there is any problem in the
-	 * certificate chain then mark as not trusted
-	 * and return immediately.
-	 */
-	gnutls_assert();
-	return (0 | GNUTLS_CERT_INVALID);
-    }
-
-    /* Now verify the last certificate in the certificate path
-     * against the trusted CA certificate list.
-     *
-     * If no CAs are present returns NOT_TRUSTED. Thus works
-     * in self signed etc certificates.
-     */
-    ret =
-	_gnutls_verify_certificate2(certificate_list[i], trusted_cas,
-				    tcas_size, flags, &output);
-
-    if (ret == 0) {
-	/* if the last certificate in the certificate
-	 * list is invalid, then the certificate is not
-	 * trusted.
-	 */
-	gnutls_assert();
-	status |= output;
-
-	status |= GNUTLS_CERT_INVALID;
-    }
-
-    return status;
+    return 0;
 }
 
 
@@ -666,12 +648,9 @@ int _gnutls_x509_privkey_verify_signature(const gnutls_datum_t * tbs,
   *
   **/
 int gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
-				int cert_list_length,
-				const gnutls_x509_crt_t * CA_list,
-				int CA_list_length,
-				const gnutls_x509_crl_t * CRL_list,
-				int CRL_list_length, unsigned int flags,
-				unsigned int *verify)
+    int cert_list_length, const gnutls_x509_crt_t * CA_list,
+    int CA_list_length, const gnutls_x509_crl_t * CRL_list,
+    int CRL_list_length, unsigned int flags, unsigned int *verify)
 {
     if (cert_list == NULL || cert_list_length == 0)
 	return GNUTLS_E_NO_CERTIFICATE_FOUND;
@@ -701,9 +680,8 @@ int gnutls_x509_crt_list_verify(const gnutls_x509_crt_t * cert_list,
   *
   **/
 int gnutls_x509_crt_verify(gnutls_x509_crt_t cert,
-			   const gnutls_x509_crt_t * CA_list,
-			   int CA_list_length, unsigned int flags,
-			   unsigned int *verify)
+     const gnutls_x509_crt_t * CA_list,
+     int CA_list_length, unsigned int flags, unsigned int *verify)
 {
     int ret;
     /* Verify certificate 
