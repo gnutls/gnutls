@@ -29,15 +29,15 @@
 
 #include <gnutls/x509.h>
 
-/**
-  * gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
+/*-
+  * _gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
   * @cert: should contain an X.509 DER encoded certificate
   *
   * This function will return the certificate's activation time in UNIX time 
   * (ie seconds since 00:00:00 UTC January 1, 1970).
   * Returns a (time_t) -1 in case of an error.
   *
-  **/
+  -*/
 time_t _gnutls_x509_get_raw_crt_activation_time(const gnutls_datum_t *
 						cert)
 {
@@ -61,7 +61,7 @@ time_t _gnutls_x509_get_raw_crt_activation_time(const gnutls_datum_t *
     return result;
 }
 
-/**
+/*-
   * gnutls_x509_extract_certificate_expiration_time - This function returns the certificate's expiration time
   * @cert: should contain an X.509 DER encoded certificate
   *
@@ -69,7 +69,7 @@ time_t _gnutls_x509_get_raw_crt_activation_time(const gnutls_datum_t *
   * (ie seconds since 00:00:00 UTC January 1, 1970).
   * Returns a (time_t) -1 in case of an error.
   *
-  **/
+  -*/
 time_t _gnutls_x509_get_raw_crt_expiration_time(const gnutls_datum_t *
 						cert)
 {
