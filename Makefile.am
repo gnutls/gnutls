@@ -8,9 +8,15 @@ ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 ChangeLog:
 	cvs2cl --utc -U .cvsusers --fsf -t -S -I ChangeLog -I .cvs
 
+tag = $(PACKAGE)-`echo $(VERSION) | sed 's/\./_/g'`
 htmldir = ../www-$(PACKAGE)
 
 release:
+	cvs rtag gnutls_1_1_15 gnutls
+	rm -f ChangeLog
+	make ChangeLog
+	cvs commit -m "" ChangeLog
+	cvs rtag -F gnutls_1_1_15 gnutls
 	make dist
 	gpg -b $(distdir).tar.gz
 	gpg --verify $(distdir).tar.gz.sig
