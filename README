@@ -1,14 +1,18 @@
 This is the GNU TLS library. More up to date information can be found
 at http://www.gnu.org/software/gnutls/ and http://www.gnutls.org/
 
-It is a TLS 1.0 and SSL 3.0 implementation for the GNU project. 
-It is currently under heavy development.
+This is a TLS (Transport Layer Security) 1.0 and SSL (Secure Sockets Layer) 3.0
+implementation for the GNU project. 
 
 - The library needs libgcrypt. You can find libgcrypt at
  ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/
 
  Note that by compiling libgcrypt with CPU optimizations gnutls' speed
  will increase.
+
+- For OpenPGP key support the OpenCDK library is required. You can find
+ libopencdk at:
+ ftp://ftp.gnutls.org/pub/gnutls/opencdk/
 
 - Documentation:
  view the doc/ directory and the examples in the src/ directory.

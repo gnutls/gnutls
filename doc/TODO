@@ -4,6 +4,7 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
+* Create and include a general purpose certificate library
 * Convert documentation to texinfo format
 * Add support for certificate CRLs in certificate verification
 * Audit the code
