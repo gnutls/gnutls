@@ -62,7 +62,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	printf(" - Got a certificate list of %d certificates.\n\n",
 	       cert_list_size);
 
-	for (j = 0; j < (uint)cert_list_size; j++) {
+	for (j = 0; j < (unsigned int)cert_list_size; j++) {
 
 		gnutls_x509_crt_init(&crt);
 		ret =
