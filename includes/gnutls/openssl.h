@@ -83,7 +83,7 @@ typedef struct
 
 typedef struct _BIO
 {
-    int fd;
+    gnutls_transport_ptr fd;
 } BIO;
 
 typedef struct
@@ -128,8 +128,8 @@ typedef struct _SSL
     int (*verify_callback)(int, X509_STORE_CTX *);
     int verify_mode;
     
-    int rfd;
-    int wfd;
+    gnutls_transport_ptr rfd;
+    gnutls_transport_ptr wfd;
 } SSL;
 
 typedef struct

@@ -214,8 +214,8 @@ SSL *SSL_new(SSL_CTX *ctx)
 
     ssl->options = ctx->options;
 
-    ssl->rfd = -1;
-    ssl->wfd = -1;
+    ssl->rfd = (gnutls_transport_ptr)-1;
+    ssl->wfd = (gnutls_transport_ptr)-1;
 
     return ssl;
 }
@@ -243,15 +243,15 @@ int SSL_get_error(SSL *ssl, int ret)
 
 int SSL_set_fd(SSL *ssl, int fd)
 {
-    gnutls_transport_set_ptr (ssl->gnutls_state, fd);
+    gnutls_transport_set_ptr (ssl->gnutls_state, (gnutls_transport_ptr)fd);
     return 1;
 }
 
 int SSL_set_rfd(SSL *ssl, int fd)
 {
-    ssl->rfd = fd;
+    ssl->rfd = (gnutls_transport_ptr)fd;
     
-    if (ssl->wfd != -1)
+    if (ssl->wfd != (gnutls_transport_ptr)-1)
       gnutls_transport_set_ptr2(ssl->gnutls_state, ssl->rfd, ssl->wfd);
 
     return 1;
@@ -259,9 +259,9 @@ int SSL_set_rfd(SSL *ssl, int fd)
 
 int SSL_set_wfd(SSL *ssl, int fd)
 {
-    ssl->wfd = fd;
+    ssl->wfd = (gnutls_transport_ptr)fd;
     
-    if (ssl->rfd != -1)
+    if (ssl->rfd != (gnutls_transport_ptr)-1)
       gnutls_transport_set_ptr2(ssl->gnutls_state, ssl->rfd, ssl->wfd);
 
     return 1;
@@ -814,7 +814,7 @@ void X509_free(const X509 *cert)
 
 void BIO_get_fd(gnutls_session gnutls_state, int *fd)
 {
-    *fd = gnutls_transport_get_ptr(gnutls_state);
+    *fd = (int)gnutls_transport_get_ptr(gnutls_state);
 }
 
 BIO *BIO_new_socket(int sock, int close_flag)
@@ -825,7 +825,7 @@ BIO *BIO_new_socket(int sock, int close_flag)
     if (!bio)
         return NULL;
 
-    bio->fd = sock;
+    bio->fd = (gnutls_transport_ptr)sock;
 
     return bio;
 }
