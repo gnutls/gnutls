@@ -1,3 +1,125 @@
+2004-08-21 21:32  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-21 21:12  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/rrc2.doc:
+
+	Add.  
+
+2004-08-21 20:34  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO:
+
+	Add.  
+
+2004-08-21 16:56  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-21 16:27  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Bump version.  
+
+2004-08-21 16:27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-21 16:26  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi:
+
+	Add examples.  
+
+2004-08-21 00:30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi:
+
+	Markup.  
+
+2004-08-21 00:03  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Enable gnits in automake.  
+
+2004-08-21 00:02  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Allow AC_PROG_CC to modify CFLAGS (why not?).  Don't check for
+	install (handled by automake).  
+
+2004-08-20 23:56  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Simplify shared library versioning.  
+
+2004-08-20 23:39  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_global.c:
+
+	Use automake VERSION instead of GNUTLS_VERSION.  
+
+2004-08-20 23:38  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Use modern AC_INIT.  Remove GNUTLS_*VERSION.  Separate libtool
+	versioning from package versioning.  
+
+2004-08-20 23:02  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am:
+
+	Remove, all are dist'ed by automake automatically.  
+
+2004-08-20 22:58  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Typo.  
+
+2004-08-20 22:49  Simon Josefsson <simon@josefsson.org>
+
+	* lib/defines.h:
+
+	Remove size_t, time_t, ptrdiff_t definitions.  
+
+2004-08-20 22:48  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Assume time_t and ptrdiff_t (ANSI C89).  
+
+2004-08-20 22:46  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls.h.in.in:
+
+	Assume time_t is in time.h (ANSI C89).  
+
+2004-08-20 22:39  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/gnutls.h.in.in:
+
+	Assume size_t is in stddef.h (C89).  
+
+2004-08-20 22:35  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	(T_CPU, T_VENDOR, T_OS): Remove (unused).  
+
 2004-08-18 13:09  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS (tags: gnutls_1_1_17):
