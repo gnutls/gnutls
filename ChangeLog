@@ -1,3 +1,41 @@
+2002-11-20 22:10  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_cert.c, lib/gnutls_cert.h, lib/gnutls_errors.c,
+	lib/gnutls_extensions.c:
+
+	Several cleanups and elimination of warnings.  
+
+2002-11-20 20:35  nmav <nmav@gnutls.org>
+
+	* doc/tex/Makefile.am, doc/tex/gnutls.bib, doc/tex/record.tex,
+	doc/tex/record_weaknesses.tex, doc/tex/tls_extensions.tex,
+	doc/tex/tlsintro.tex, lib/ext_server_name.c,
+	lib/gnutls_int_compat.c:
+
+	updated documentation to include record layer weaknesses and
+	counter-measures, and the supported TLS extensions.  
+
+2002-11-20 17:45  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in:
+
+	compat4.h was added, and is included by default in gnutls.h.  
+
+2002-11-20 17:44  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_algorithms.c, gnutls_algorithms.h, gnutls_cert.h,
+	gnutls_sig.c, gnutls_ui.h, gnutls_x509.c, rfc2818_hostname.c:
+
+	Moved the GNUTLS_X509KEY_* to gnutls_cert.h and renamed them to
+	KEY_*. Improved the checking of key usage.  
+
+2002-11-20 07:30  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_algorithms.c:
+
+	added the AES ciphersuites for certificate srp authentication.  
+
 2002-11-19 13:07  nmav <nmav@gnutls.org>
 
 	* lib/gnutls.h.in.in, lib/gnutls_alert.c, lib/gnutls_algorithms.c,
