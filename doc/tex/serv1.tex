@@ -105,7 +105,20 @@ void print_info(GNUTLS_STATE state)
 
 }
 
+static int generate_dh_primes(void) {
+gnutls_datum prime, generator;
 
+   /* Generate Diffie Hellman parameters - for use with DHE
+    * kx algorithms. These should be discarded and regenerated
+    * once a day, once a week or once a month. Depends on the
+    * security requirements.
+    */
+   gnutls_dh_generate_params( &prime, &generator, 1024);
+   gnutls_dh_replace_params( prime, generator);
+
+   free( prime.data);
+   free( generator.data);
+}
 
 int main()
 {
@@ -147,6 +160,7 @@ int main()
    gnutls_srp_allocate_server_sc(&srp_cred);
    gnutls_srp_set_server_cred_file(srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
+   generate_dh_params();
 
    /* Socket operations
     */
