@@ -86,6 +86,7 @@ static const TLS_TEST tls_tests[] = {
 	{ "whether the server can accept Hello Extensions", test_hello_extension, "yes", "no", "dunno"},
 	{ "whether the server can accept cipher suites not in SSL 3.0 spec", test_unknown_ciphersuites, "yes", "no", "dunno"},
 	{ "whether the server understands TLS closure alerts", test_bye, "yes", "no", "partially"},
+	{ "whether the server supports session resumption", test_session_resume2, "yes", "no", "dunno"},
 	{ "for anonymous authentication support", test_anonymous, "yes", "no", "dunno"},
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
 	{ "for AES cipher support", test_aes, "yes", "no", "dunno"},
@@ -117,20 +118,10 @@ static void gaa_parser(int argc, char **argv);
 int main(int argc, char **argv)
 {
 	int err, ret;
-	int sd, ii, i;
+	int sd, i;
 	struct sockaddr_in sa;
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF + 1];
-	char *session;
-	char *session_id;
-	int session_size, alert;
-	int session_id_size;
-	char *tmp_session_id;
-	int tmp_session_id_size;
-	fd_set rset;
-	int maxfd;
-	struct timeval tv;
-	int user_term = 0;
 	struct hostent *server_host;
 
 	gaa_parser(argc, argv);
@@ -208,8 +199,6 @@ int main(int argc, char **argv)
 static gaainfo info;
 void gaa_parser(int argc, char **argv)
 {
-	int i, j;
-
 	if (gaa(argc, argv, &info) != -1) {
 		fprintf(stderr, "Error in the arguments. Use the -h or --help parameters to get more info.\n");
 		exit(1);

@@ -17,10 +17,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-#include <gnutls.h>
+#include "../lib/gnutls.h"
 #include <tests.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdlib.h>
 
 extern GNUTLS_SRP_CLIENT_CREDENTIALS srp_cred;
 extern GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
@@ -31,6 +32,11 @@ extern int more_info;
 extern int tls1_ok;
 extern int ssl3_ok;
 
+/* keep session info */
+static char *session = NULL;
+static char session_id[32];
+static int session_size=0, session_id_size=0;
+static int sfree=0;
 
 int do_handshake( GNUTLS_STATE state) {
 int ret, alert;
@@ -53,6 +59,21 @@ int ret, alert;
 		}
 
 		if (ret < 0) return FAILED;
+
+		gnutls_session_get_data(state, NULL, &session_size);
+		
+		if (sfree!=0) {
+			free(session);
+			sfree=0;
+		}
+		session = malloc(session_size);
+		sfree = 1;
+		if (session==NULL) exit(1);
+		gnutls_session_get_data(state, session, &session_size);
+
+		session_id_size = sizeof( session_id);
+		gnutls_session_get_id(state, session_id, &session_id_size);
+
 		return SUCCEED;
 }
 
@@ -139,7 +160,6 @@ int test_srp( GNUTLS_STATE state) {
 }
 
 int test_dhe( GNUTLS_STATE state) {
-int ret;
 		ADD_ALL_CIPHERS(state);
 		ADD_ALL_COMP(state);
 		ADD_ALL_CERTTYPES(state);
@@ -454,3 +474,38 @@ int test_anonymous( GNUTLS_STATE state) {
 
 }
 
+
+int test_session_resume2( GNUTLS_STATE state) {
+int ret;
+char tmp_session_id[32];
+int tmp_session_id_size;
+
+	if (session == NULL) return UNSURE;
+	
+	ADD_ALL_CIPHERS(state);
+	ADD_ALL_COMP(state);
+	ADD_ALL_CERTTYPES(state);
+	ADD_ALL_PROTOCOLS(state);
+	ADD_ALL_MACS(state);
+	ADD_ALL_KX(state);
+	gnutls_cred_set(state, GNUTLS_CRD_ANON, anon_cred);
+
+	gnutls_session_set_data(state, session, session_size);
+
+	memcpy( tmp_session_id, session_id, session_id_size);
+	tmp_session_id_size = session_id_size;
+
+	ret = do_handshake( state);
+	if (ret < 0) return FAILED;
+	
+	/* check if we actually resumed the previous session */
+
+	session_id_size = sizeof(session_id);
+	gnutls_session_get_id(state, session_id, &session_id_size);
+
+	if (memcmp(tmp_session_id, session_id, tmp_session_id_size) == 0)
+		return SUCCEED;
+	else
+		return FAILED;
+
+}
