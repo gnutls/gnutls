@@ -13,18 +13,20 @@
 
 \begin{document}
 
-\pagenumbering{roman}
+\frontmatter
 
 \input{cover}
 
 \tableofcontents
-\newpage
-\pagenumbering{arabic}
+
 \pagestyle{fancy}
 \fancyhead[RE]{\slshape \rightmark}
 \fancyhead[LO]{\slshape \leftmark}
 \fancyhead[RO,LE]{\empty}
 \fancyfoot[C]{\thepage}
+
+\mainmatter
+\input{preface}
 
 \input{library}
 
@@ -47,6 +49,8 @@
 \input{appendix}
 
 \input{fdl}
+
+\backmatter
 
 \printindex
 

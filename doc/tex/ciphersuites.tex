@@ -16,7 +16,14 @@ MAC\_SHA is used in the above example.
 The cipher suite negotiated in the handshake protocol will affect
 the Record Protocol, by enabling encryption and data authentication.
 Note that you should not over rely on \tls{} to negotiate the strongest 
-available cipher suite. Do not enable
-ciphers and algorithms that you consider weak.
+available cipher suite. Do not enable ciphers and algorithms that you consider weak.
+\par
+The priority functions, dicussed above, allow the application layer to enable
+and set priorities on the individual ciphers. It may imply that all combinations of ciphersuites
+are allowed, but this is not true. For several reasons, not discussed here, some combinations 
+were not defined in the \tls{} protocol.
+\gnutls{} may even decide to remove some of the valid ones. This behaviour depends on the
+key parameters. For example keys marked as sign-only, will not be able to
+access the plain RSA ciphersuites, but only the DHE\_RSA ones.
 
 \addvspace{1.5cm}
