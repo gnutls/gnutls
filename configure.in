@@ -478,8 +478,9 @@ AC_CHECK_LIB( lzo, lzo1x_1_compress, minilzo_enabled=no,
 fi
 
 if test x"$minilzo_enabled" = xyes; then
- 
- AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
+AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
+else
+LZO_LINK=-llzo
 fi
 
 dnl use lzo
