@@ -1772,7 +1772,8 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res,
   * @type: is PEM or DER
   *
   * This function sets the trusted CAs in order to verify client
-  * certificates. This function may be called multiple times.
+  * certificates. This function may be called multiple times, and the
+  * given certificates will be appended to the trusted certificate list.
   * Returns the number of certificate processed.
   *
   **/

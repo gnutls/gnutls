@@ -47,6 +47,18 @@ owner is the one you expect. See \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
 for an example.
 
 \par
+Client certificate authentication\index{Client certificate authentication} is 
+optional in \tls{}. A server may request a certificate from the client -- using the
+\printfunc{gnutls_certificate_server_set_request}{gnutls\_certificate\_server\_set\_request}
+function. If a certificate is to be requested by the client, at the handshake 
+procedure, the server will send an extra packet,
+than contains a list of acceptable certificate signers, and indicates the
+request of a certificate. The client may then send a certificate, signed
+by one of the server's acceptable signers. In \gnutls{} the server's acceptable
+signers list is constructed using the trusted CA certificates in the
+credentials structure.
+
+\par
 Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit. See 
 \htmladdnormallink{http://www.gnupg.org/aegypten/}{http://www.gnupg.org/aegypten/}}. 
 \gnutls{} only includes the required,
