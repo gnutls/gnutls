@@ -1954,15 +1954,6 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	gCert->activation_time =
 	    _gnutls_x509_get_time(c2, "certificate2", "notBefore");
 
-#if 0 
-	if (gCert->expiration_time == (time_t)(-1) ||
-		gCert->activation_time == (time_t)(-1)) {
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return GNUTLS_E_UNIX_TIME_LIMIT_EXCEEDED;
-	}
-#endif
-
 	gCert->version = _gnutls_x509_get_version(c2, "certificate2");
 	if (gCert->version < 0) {
 		gnutls_assert();
