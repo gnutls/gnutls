@@ -39,7 +39,7 @@
 #define MAX16 65535
 
 #define MAX_LOG_SIZE 1024 /* maximum number of characters of a log message */
-#define MAX_NAME_SIZE 128 /* maximum number of characters of a name inside an ASN1 file definitons */
+#define MAX_NAME_SIZE 128 /* maximum number of characters of a name inside an ASN1 file definiton */
 #define MAX_ERROR_DESCRIPTION_SIZE 128 /* maximum number of characters of a description message */
 
 /*****************************************/
@@ -79,7 +79,7 @@ typedef int asn1_retCode;  /* type returned by libasn1 functions */
 
 /******************************************************/
 /* Structure definition used for the node of the tree */
-/* that rappresent an ASN.1 DEFINITION.               */
+/* that represent an ASN.1 DEFINITION.               */
 /******************************************************/
 typedef struct node_asn_struct{
   char *name;                    /* Node name */
@@ -136,7 +136,7 @@ typedef struct static_struct_asn ASN1_ARRAY_TYPE;
 
 
 /***********************************************************************/
-/* List of constants for specify better the type of typedef node_asn.  */
+/* List of constants to better specify the type of typedef node_asn.   */
 /***********************************************************************/
 /*  Used with TYPE_TAG  */
 #define CONST_UNIVERSAL   (1<<8)
@@ -195,5 +195,3 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 
 
 #endif /* INT_H */
-
-

@@ -99,7 +99,7 @@ _asn1_convert_integer(const char *value,unsigned char *value_out,int value_out_s
   *len=SIZEOF_UNSIGNED_LONG_INT-k;  
 
   if (SIZEOF_UNSIGNED_LONG_INT-k> value_out_size)
-    /* VALUE_OUT is too short to contain the value convertion */
+    /* VALUE_OUT is too short to contain the value conversion */
     return ASN1_MEM_ERROR;
 
   for(k2=k;k2<SIZEOF_UNSIGNED_LONG_INT;k2++)
@@ -204,10 +204,10 @@ _asn1_append_sequence_set(node_asn *node)
   *            value="2001010112001.12-0700" , len=1 -> time=Jannuary 1st, 2001 at 12h 00m 01.12s 
   *                                                     Pacific Daylight Time
   *
-  * \item OCTET STRING\: VALUE contains the octet string and LEN is the number of octet.
+  * \item OCTET STRING\: VALUE contains the octet string and LEN is the number of octets.
   *            value="$\backslash$x01$\backslash$x02$\backslash$x03" , len=3  -> three bytes octet string
   *
-  * \item GeneralString\: VALUE contains the generalstring and LEN is the number of octet.
+  * \item GeneralString\: VALUE contains the generalstring and LEN is the number of octets.
   *            value="$\backslash$x01$\backslash$x02$\backslash$x03" , len=3  -> three bytes generalstring
   *
   * \item BIT STRING\: VALUE contains the bit string organized by bytes and LEN is the number of bits.
@@ -576,9 +576,9 @@ asn1_write_value(node_asn *node_root,const char *name,
   * \item GeneralizedTime\: VALUE will be a null terminated string in the same format used to set
   *                    the value
   *
-  * \item OCTET STRING\: VALUE will contain the octet string and LEN will be the number of octet.
+  * \item OCTET STRING\: VALUE will contain the octet string and LEN will be the number of octets.
   *
-  * \item GeneralString\: VALUE will contain the generalstring and LEN will be the number of octet.
+  * \item GeneralString\: VALUE will contain the generalstring and LEN will be the number of octets.
   *
   * \item BIT STRING\: VALUE will contain the bit string organized by bytes and LEN will be the 
   *               number of bits.
@@ -811,7 +811,3 @@ asn1_read_tag(node_asn *root,const char *name,int *tagValue, int *classValue)
   return ASN1_SUCCESS;
 
 }
-
-
-
-

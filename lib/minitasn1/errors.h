@@ -58,9 +58,3 @@ void _libtasn1_null_log( void*, ...);
 #endif /* DEBUG */
 
 #endif /* ERRORS_H */
-
-
-
-
-
-

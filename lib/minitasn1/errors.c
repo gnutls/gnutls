@@ -126,4 +126,3 @@ void _libtasn1_log( const char *fmt, ...) {
 void _libtasn1_null_log( void* x, ...) { return; }
 # endif /* C99_MACROS */
 #endif /* DEBUG */
-

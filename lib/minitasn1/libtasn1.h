@@ -100,7 +100,7 @@ typedef int asn1_retCode;  /* type returned by libasn1 functions */
 
 /******************************************************/
 /* Structure definition used for the node of the tree */
-/* that rappresent an ASN.1 DEFINITION.               */
+/* that represent an ASN.1 DEFINITION.                */
 /******************************************************/
 typedef struct node_asn_struct{
   char *name;                    /* Node name */
@@ -190,16 +190,3 @@ void libtasn1_perror(asn1_retCode error);
 #endif
 
 #endif /* LIBASN1_H */
-
-
-
-
-
-
-
-
-
-
-
-
-

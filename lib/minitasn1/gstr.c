@@ -21,7 +21,7 @@
 #include <int.h>
 
 /* These function are like strcat, strcpy. They only
- * do bound checking (they shouldn't cause buffer overruns),
+ * do bounds checking (they shouldn't cause buffer overruns),
  * and they always produce null terminated strings.
  *
  * They should be used only with null terminated strings.
@@ -64,14 +64,3 @@ void _asn1_mem_cpy( char* dest, size_t dest_tot_size, const char* src, size_t sr
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-

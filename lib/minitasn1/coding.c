@@ -63,7 +63,7 @@ _asn1_error_description_value_not_found(node_asn *node,char *ErrorDescription)
 /* Parameters:                                        */
 /*   len: value to convert.                           */
 /*   ans: string returned.                            */
-/*   ans_len: number of meanful bytes of ANS          */
+/*   ans_len: number of meaningful bytes of ANS       */
 /*            (ans[0]..ans[ans_len-1]).               */
 /* Return:                                            */
 /******************************************************/
@@ -101,7 +101,7 @@ _asn1_length_der(unsigned long len,unsigned char *ans,int *ans_len)
 /*   class: value to convert.                         */
 /*   tag_value: value to convert.                     */
 /*   ans: string returned.                            */
-/*   ans_len: number of meanful bytes of ANS          */
+/*   ans_len: number of meaningful bytes of ANS       */
 /*            (ans[0]..ans[ans_len-1]).               */
 /* Return:                                            */
 /******************************************************/
@@ -138,7 +138,7 @@ _asn1_tag_der(unsigned char class,unsigned int tag_value,unsigned char *ans,int 
 /*   str: OCTET string.                               */
 /*   str_len: STR length (str[0]..str[str_len-1]).    */
 /*   der: string returned.                            */
-/*   der_len: number of meanful bytes of DER          */
+/*   der_len: number of meaningful bytes of DER       */
 /*            (der[0]..der[ans_len-1]).               */
 /* Return:                                            */
 /******************************************************/
@@ -160,7 +160,7 @@ _asn1_octet_der(const unsigned char *str,int str_len,unsigned char *der,int *der
 /* Parameters:                                        */
 /*   str: TIME null-terminated string.                */
 /*   der: string returned.                            */
-/*   der_len: number of meanful bytes of DER          */
+/*   der_len: number of meaningful bytes of DER       */
 /*            (der[0]..der[ans_len-1]). Initially it  */
 /*            if must store the lenght of DER.        */
 /* Return:                                            */
@@ -229,9 +229,9 @@ _asn1_get_utctime_der(unsigned char *der,int *der_len,unsigned char *str)
 /* Parameters:                                        */
 /*   str: OBJECT IDENTIFIER null-terminated string.   */
 /*   der: string returned.                            */
-/*   der_len: number of meanful bytes of DER          */
+/*   der_len: number of meaningful bytes of DER       */
 /*            (der[0]..der[ans_len-1]). Initially it  */
-/*            if must store the lenght of DER.        */
+/*            must store the length of DER.           */
 /* Return:                                            */
 /*   ASN1_MEM_ERROR when DER isn't big enough         */
 /*   ASN1_SUCCESS otherwise                           */
@@ -305,9 +305,9 @@ char bit_mask[]={0xFF,0xFE,0xFC,0xF8,0xF0,0xE0,0xC0,0x80};
 /* STRING  type (length and pad included).            */
 /* Parameters:                                        */
 /*   str: BIT string.                                 */
-/*   bit_len: number of meanful bits in STR.          */
+/*   bit_len: number of meaningful bits in STR.       */
 /*   der: string returned.                            */
-/*   der_len: number of meanful bytes of DER          */
+/*   der_len: number of meaningful bytes of DER       */
 /*            (der[0]..der[ans_len-1]).               */
 /* Return:                                            */
 /******************************************************/
@@ -336,7 +336,7 @@ _asn1_bit_der(const unsigned char *str,int bit_len,unsigned char *der,int *der_l
 /* Parameters:                                        */
 /*   node: pointer to the tree element.               */
 /*   der: string with the DER coding of the whole tree*/
-/*   counter: number of meanful bytes of DER          */
+/*   counter: number of meaningful bytes of DER       */
 /*            (der[0]..der[*counter-1]).              */
 /*   max_len: size of der vector                      */
 /* Return:                                            */
@@ -356,7 +356,7 @@ _asn1_complete_explicit_tag(node_asn *node,unsigned char *der,int *counter,int *
     p=node->down;
     /* When there are nested tags we must complete them reverse to
        the order they were created. This is because completing a tag
-       modifies alla date within it, including the incomplete tags 
+       modifies all data within it, including the incomplete tags 
        which store buffer positions -- simon@josefsson.org 2002-09-06
     */
     while(p->right)
@@ -398,7 +398,7 @@ _asn1_complete_explicit_tag(node_asn *node,unsigned char *der,int *counter,int *
 /* Parameters:                                        */
 /*   node: pointer to the tree element.               */
 /*   der: string returned                             */
-/*   counter: number of meanful bytes of DER          */
+/*   counter: number of meaningful bytes of DER       */
 /*            (counter[0]..der[*counter-1]).          */
 /*   max_len: size of der vector                      */
 /* Return:                                            */
@@ -572,7 +572,7 @@ _asn1_ordering_set(unsigned char *der,node_asn *node)
     p_vet->value=(class<<24)|tag;
     counter+=len2;
 
-    /* extraction  and length */
+    /* extraction and length */
     len2=_asn1_get_length_der(der+counter,&len);
     counter+=len+len2;
 
@@ -976,18 +976,3 @@ asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
 
   return ASN1_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

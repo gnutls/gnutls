@@ -91,7 +91,7 @@ _asn1_add_node(unsigned int type)
 /* Parameters:                                                    */
 /*   pointer: NODE_ASN element pointer.                           */
 /*   name: null terminated string with the element's name to find.*/
-/* Return: the searching result. NULL if not find.                */
+/* Return: the searching result. NULL if not found.               */
 /******************************************************************/
 node_asn *
 _asn1_find_node(node_asn *pointer,const char *name)
@@ -107,7 +107,7 @@ _asn1_find_node(node_asn *pointer,const char *name)
   p=pointer;
   n_start=name;
 
-  if(p->name != NULL){ /* has *pointer a name ? */
+  if(p->name != NULL){ /* has *pointer got a name ? */
     n_end=strchr(n_start,'.');     /* search the first dot */
     if(n_end){
       memcpy(n,n_start,n_end-n_start);
@@ -171,7 +171,7 @@ _asn1_find_node(node_asn *pointer,const char *name)
 /******************************************************************/
 /* Function : _asn1_set_value                                     */
 /* Description: sets the field VALUE in a NODE_ASN element. The   */
-/*              previus value (if exist) will be lost             */
+/*              previous value (if exist) will be lost            */
 /* Parameters:                                                    */
 /*   node: element pointer.                                       */
 /*   value: pointer to the value that you want to set.            */
@@ -198,7 +198,7 @@ _asn1_set_value(node_asn *node,const unsigned char *value,unsigned int len)
 /******************************************************************/
 /* Function : _asn1_set_name                                      */
 /* Description: sets the field NAME in a NODE_ASN element. The    */
-/*              previus value (if exist) will be lost             */
+/*              previous value (if exist) will be lost            */
 /* Parameters:                                                    */
 /*   node: element pointer.                                       */
 /*   name: a null terminated string with the name that you want   */
@@ -788,9 +788,9 @@ _asn1_check_identifier(ASN1_TYPE node)
 /* Parameters:                                                    */
 /*   node: pointer to a DEFINITIONS element.                      */
 /* Return:                                                        */
-/*   ASN1_ELEMENT_NOT_FOUND if NODE is NULL or not a pointer to    */
+/*   ASN1_ELEMENT_NOT_FOUND if NODE is NULL or not a pointer to   */
 /*     a DEFINITIONS element,                                     */
-/*   otherwise ASN1_SUCCESS                                             */
+/*   otherwise ASN1_SUCCESS                                       */
 /******************************************************************/
 asn1_retCode 
 _asn1_set_default_tag(ASN1_TYPE node)
@@ -871,7 +871,7 @@ parse_version_string( const char *s, int *major, int *minor, int *micro )
   * asn1_check_version - This function checks the library's version
   * @req_version: the version to check
   *
-  * Check that the the version of the library is at minimum the requested one
+  * Check that the version of the library is at minimum the requested one
   * and return the version string; return NULL if the condition is not
   * satisfied.  If a NULL is passed to this function, no check is done,
   * but the version string is simply returned.
@@ -907,5 +907,3 @@ asn1_check_version( const char *req_version )
     }
     return NULL;
 }
-
-
