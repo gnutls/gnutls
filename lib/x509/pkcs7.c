@@ -173,7 +173,13 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}					 		 	
 
-	tmp_size = 256; /* some initial size */
+	tmp_size = 0;
+	result = asn1_read_value(pkcs7->pkcs7, "content", NULL, &tmp_size);
+	if (result!=ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
 	tmp = gnutls_malloc(tmp_size);
 	if (tmp==NULL) {
 		gnutls_assert();
@@ -181,17 +187,6 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	}
 
 	result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
-	/* FIXME: a hard coded value
-	 */
-	if (result==ASN1_MEM_ERROR && tmp_size > 0 && tmp_size < 50*1024) {
-		tmp = gnutls_realloc_fast( tmp, tmp_size);
-		if (tmp==NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
-	} 
-	
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -313,7 +308,13 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}					 		 	
 
-	tmp_size = 256; /* some initial size */
+	tmp_size = 0;
+	result = asn1_read_value(pkcs7->pkcs7, "content", NULL, &tmp_size);
+	if (result!=ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
 	tmp = gnutls_malloc(tmp_size);
 	if (tmp==NULL) {
 		gnutls_assert();
@@ -321,18 +322,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 	}
 
 	result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
-	/* FIXME: a hard coded value
-	 */
-	if (result==ASN1_MEM_ERROR && tmp_size > 0 && tmp_size < 50*1024) {
-		tmp = gnutls_realloc_fast( tmp, tmp_size);
-		if (tmp==NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
-	} 
-
-	if (result != ASN1_SUCCESS) {
+	if (result!=ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;

@@ -103,7 +103,8 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 	}
 
 	/* FIXME: If the parameters are not included in the certificate
-	 * then the issuer's parameters should be used.
+	 * then the issuer's parameters should be used. This is not
+	 * done yet.
 	 */
 
 	/* Read p */

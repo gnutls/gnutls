@@ -935,7 +935,6 @@ int _gnutls_check_key_usage( const gnutls_cert* cert,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	/* FIXME: check here */
 	if (_gnutls_map_kx_get_cred(alg, 1) == GNUTLS_CRD_CERTIFICATE ||
 		_gnutls_map_kx_get_cred(alg, 0) == GNUTLS_CRD_CERTIFICATE) 
 	{

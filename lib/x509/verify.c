@@ -351,9 +351,6 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 		status |= GNUTLS_CERT_NOT_TRUSTED;
 	}
 
-	/* FIXME: Check CRL --not done yet.
-	 */
-
 	return status;
 }
 
