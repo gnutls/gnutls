@@ -10,3 +10,4 @@ Makefile.in
 crypt
 asn1c
 CertificateExample
+CrlExample

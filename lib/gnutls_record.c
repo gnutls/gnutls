@@ -332,9 +332,20 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 
 }
 
-
-
-int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
+/**
+  * gnutls_send_alert - This function sends an alert message to the peer
+  * @cd: is a connection descriptor.
+  * @state: is a &GNUTLS_STATE structure.
+  * @level: is the level of the alert
+  * @desc: is the alert description
+  *
+  * This function will send an alert to the peer in order to inform
+  * him of something important (eg. his Certificate could not be verified).
+  * If the alert level is Fatal then the peer is expected to close the
+  * connection, otherwise he may ignore the alert and continue.
+  *
+  **/
+int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
 {
 	uint8 data[2];
 
@@ -368,7 +379,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, int wait)
 {
 	int ret;
 
-	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+	ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
 	/* receive the closure alert */
 	if (wait==0) gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
@@ -622,7 +633,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			 * we send them a close notify. 
 			 * silently ignore that.
 			 */
-			_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
+			gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
 		}
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
@@ -640,7 +651,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 #ifdef RECORD_DEBUG
 		_gnutls_log( "Record: FATAL ERROR: Received packet with length: %d\n", length);
 #endif
-		_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
+		gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -708,13 +719,13 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	if (tmplen < 0) {
 		switch (tmplen) {
 			case GNUTLS_E_MAC_FAILED:
-				_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
+				gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
 				break;
 			case GNUTLS_E_DECRYPTION_FAILED:
-				_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECRYPTION_FAILED);
+				gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECRYPTION_FAILED);
 				break;
 			case GNUTLS_E_DECOMPRESSION_FAILED:
-				_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
+				gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
 				break;
 		}
 		state->gnutls_internals.valid_connection = VALID_FALSE;

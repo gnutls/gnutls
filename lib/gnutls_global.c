@@ -60,8 +60,7 @@ node_asn* _gnutls_get_pkcs() {
   * some external library (like gnu pthreads), which provide
   * a front end to this function. This function should be
   * called once and after gnutls_global_init().
-  *
-  * RECV_FUNC is of the form:
+  * RECV_FUNC is of the form, 
   * ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
   **/
 void gnutls_global_set_recv_func( RECV_FUNC recv_func) {
@@ -78,8 +77,7 @@ void gnutls_global_set_recv_func( RECV_FUNC recv_func) {
   * some external library (like gnu pthreads), which provide
   * a front end to this function. This function should be
   * called once and after gnutls_global_init().
-  *
-  * SEND_FUNC is of the form:
+  * SEND_FUNC is of the form, 
   * ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
   **/
 void gnutls_global_set_send_func( SEND_FUNC send_func) {
@@ -94,8 +92,7 @@ void gnutls_global_set_send_func( SEND_FUNC send_func) {
   * is going to use. This function only accepts a character array.
   * Normaly you may not use this function since
   * it is only used for debugging reasons.
-  *
-  * LOG_FUNC is of the form:
+  * LOG_FUNC is of the form, 
   * void (*LOG_FUNC)( const char*);
   **/
 void gnutls_global_set_log_func( LOG_FUNC log_func) {

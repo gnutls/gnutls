@@ -10,8 +10,8 @@ AC_DEFINE_UNQUOTED(T_VENDOR, "$target_vendor")
 AC_DEFINE_UNQUOTED(T_OS, "$target_os")
 
 GNUTLS_MAJOR_VERSION=0
-GNUTLS_MINOR_VERSION=1
-GNUTLS_MICRO_VERSION=9
+GNUTLS_MINOR_VERSION=2
+GNUTLS_MICRO_VERSION=0
 GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
 AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION")
@@ -152,7 +152,7 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 AC_CONFIG_COMMANDS([default],[[
  cat lib/gnutls_errors_int.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
- cat lib/cert_asn1.h >> lib/gnutls.h
+ cat lib/x509_asn1.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
  chmod -w lib/gnutls.h 
  chmod +x lib/libgnutls-config

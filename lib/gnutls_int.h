@@ -343,7 +343,7 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HA
 
 
 /* functions */
-int _gnutls_send_alert( SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
+int gnutls_send_alert( SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
 int gnutls_close(SOCKET cd, GNUTLS_STATE state);
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,

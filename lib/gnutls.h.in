@@ -37,6 +37,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_INSUFFICIENT_SECURITY, GNUTLS_INTERNAL_ERROR=80, GNUTLS_USER_CANCELED=90,
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
+typedef enum AlertLevel { GNUTLS_WARNING=1, GNUTLS_FATAL } AlertLevel;
 
 typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
@@ -72,6 +73,7 @@ int gnutls_check_pending(GNUTLS_STATE state);
 int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state);
 
 AlertDescription gnutls_get_last_alert( GNUTLS_STATE state);
+int gnutls_send_alert(SOCKET, GNUTLS_STATE, AlertLevel, AlertDescription);
 
 /* get information on the current state */
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);

@@ -1173,7 +1173,7 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		ret = _gnutls_read_server_hello(state, data, datalen);
 		if (ret < 0) {
-			_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);	/* send handshake failure */
+			gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);	/* send handshake failure */
 			gnutls_assert();
 			return ret;
 		}
@@ -1181,7 +1181,7 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 
 		ret = _gnutls_read_client_hello(state, data, datalen);
 		if (ret < 0) {
-			_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);	/* send handshake failure */
+			gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);	/* send handshake failure */
 			gnutls_assert();
 			return ret;
 		}
@@ -1669,7 +1669,7 @@ int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
 
 	/* just return an alert that we don't like that */
 	ret =
-	    _gnutls_send_alert(cd, state, GNUTLS_WARNING,
+	    gnutls_send_alert(cd, state, GNUTLS_WARNING,
 			       GNUTLS_NO_RENEGOTIATION);
 	if (ret < 0) {
 		gnutls_assert();
