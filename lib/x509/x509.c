@@ -93,12 +93,12 @@ int gnutls_x509_certificate_import(gnutls_x509_certificate cert, const gnutls_da
 		opaque *out;
 		
 		/* Try the first header */
-		result = _gnutls_fbase64_decode(PEM_CERT_SEP, data->data, data->size,
+		result = _gnutls_fbase64_decode(PEM_X509_CERT, data->data, data->size,
 			&out);
 
 		if (result <= 0) {
 			/* try for the second header */
-			result = _gnutls_fbase64_decode(PEM_CERT_SEP2, data->data, data->size,
+			result = _gnutls_fbase64_decode(PEM_X509_CERT2, data->data, data->size,
 				&out);
 			
 			if (result <= 0) {
@@ -201,7 +201,8 @@ int gnutls_x509_certificate_import(gnutls_x509_certificate cert, const gnutls_da
 	return 0;
 
       cleanup:
-	asn1_delete_structure(&cert->cert);
+	if (cert->cert)
+		asn1_delete_structure(&cert->cert);
 	_gnutls_free_datum(&cert->signed_data);
 	_gnutls_free_datum(&cert->signature);
 	if (need_free) _gnutls_free_datum( &_data);

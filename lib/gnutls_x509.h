@@ -10,6 +10,8 @@ typedef enum ConvFlags {
 
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert, ConvFlags flags);
 
+#define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
+#define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
 #define PEM_PKCS7_SEP "-----BEGIN PKCS7"
 
 #define PEM_KEY_RSA_SEP "-----BEGIN RSA"

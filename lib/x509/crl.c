@@ -91,7 +91,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 	if (format == GNUTLS_X509_FMT_PEM) {
 		opaque *out;
 		
-		result = _gnutls_fbase64_decode("X509 CRL", data->data, data->size,
+		result = _gnutls_fbase64_decode(PEM_CRL, data->data, data->size,
 			&out);
 
 		if (result <= 0) {
@@ -193,7 +193,8 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 	return 0;
 
       cleanup:
-	asn1_delete_structure(&crl->crl);
+      	if (crl->crl)
+		asn1_delete_structure(&crl->crl);
 	_gnutls_free_datum(&crl->signed_data);
 	_gnutls_free_datum(&crl->signature);
 	if (need_free) _gnutls_free_datum( &_data);

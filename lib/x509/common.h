@@ -2,8 +2,10 @@
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(unsigned int k, char *data);
 
-#define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
-#define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
+#define PEM_CRL "X509 CRL"
+#define PEM_X509_CERT "X509 CERTIFICATE"
+#define PEM_X509_CERT2 "CERTIFICATE"
+#define PEM_PKCS7 "PKCS7"
 
 time_t _gnutls_x509_utcTime2gtime(char *ttime);
 time_t _gnutls_x509_generalTime2gtime(char *ttime);

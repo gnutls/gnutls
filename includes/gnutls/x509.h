@@ -34,15 +34,15 @@ extern "C" {
 
 /* Some OIDs usually found in Distinguished names
  */
-#define X520_COUNTRY_NAME		"2 5 4 6"
-#define X520_ORGANIZATION_NAME 		"2 5 4 10"
-#define X520_ORGANIZATIONAL_UNIT_NAME 	"2 5 4 11"
-#define X520_COMMON_NAME 		"2 5 4 3"
-#define X520_LOCALITY_NAME 		"2 5 4 7"
-#define X520_STATE_OR_PROVINCE_NAME 	"2 5 4 8"
-#define LDAP_DC				"0 9 2342 19200300 100 1 25"
-#define LDAP_UID			"0 9 2342 19200300 100 1 1"
-#define PKCS9_EMAIL 			"1 2 840 113549 1 9 1"
+#define GNUTLS_OID_X520_COUNTRY_NAME		"2 5 4 6"
+#define GNUTLS_OID_X520_ORGANIZATION_NAME 	"2 5 4 10"
+#define GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME "2 5 4 11"
+#define GNUTLS_OID_X520_COMMON_NAME 		"2 5 4 3"
+#define GNUTLS_OID_X520_LOCALITY_NAME 		"2 5 4 7"
+#define GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME 	"2 5 4 8"
+#define GNUTLS_OID_LDAP_DC			"0 9 2342 19200300 100 1 25"
+#define GNUTLS_OID_LDAP_UID			"0 9 2342 19200300 100 1 1"
+#define GNUTLS_OID_PKCS9_EMAIL 			"1 2 840 113549 1 9 1"
 
 /* Certificate handling functions */
                       
@@ -109,6 +109,22 @@ time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index, unsigned char* serial,
         int* serial_size, time_t* time);
+
+
+/* PKCS7 structures handling 
+ */
+
+struct gnutls_pkcs7_int;
+typedef struct gnutls_pkcs7_int* gnutls_pkcs7;
+
+int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7);
+void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7);
+int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
+	gnutls_x509_certificate_format format);
+int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, 
+	int indx, char* certificate, int* certificate_size);
+int gnutls_pkcs7_extract_certificate_count(gnutls_pkcs7 pkcs7);
+
 
 #ifdef __cplusplus
 }
