@@ -1057,7 +1057,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 	for (i = j = 0; i < count; i++) {
 		/* remove private cipher suites, if requested.
 		 */
-		if ( state->gnutls_internals.enable_experimental == 0 &&
+		if ( state->gnutls_internals.enable_private == 0 &&
 			tmp_ciphers[i].CipherSuite[0] == 0xFF)
 				continue;
 
@@ -1133,7 +1133,7 @@ _gnutls_supported_compression_methods(GNUTLS_STATE state, uint8 ** comp)
 		
 		/* remove private compression algorithms, if requested.
 		 */
-		if (tmp == -1 || (state->gnutls_internals.enable_experimental == 0 &&
+		if (tmp == -1 || (state->gnutls_internals.enable_private == 0 &&
 			tmp >= MIN_PRIVATE_COMP_ALGO)) {
 
 			gnutls_assert();

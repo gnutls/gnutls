@@ -138,14 +138,26 @@ int gnutls_error_is_fatal( int error);
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
 
+/* Semi-internal functions.
+ */
+void gnutls_handshake_set_private_extensions(GNUTLS_STATE state, int allow);
 void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot);
 void gnutls_handshake_set_rsa_pms_check(GNUTLS_STATE state, int check);
+
+/* Record layer functions.
+ */
 ssize_t gnutls_record_send( GNUTLS_STATE state, const void *data, size_t sizeofdata);
 ssize_t gnutls_record_recv( GNUTLS_STATE state, void *data, size_t sizeofdata);
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send
 
-/* functions to set priority of cipher suites */
+size_t gnutls_record_get_max_size( GNUTLS_STATE state);
+ssize_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
+
+size_t gnutls_record_check_pending(GNUTLS_STATE state);
+
+/* functions to set priority of cipher suites 
+ */
 int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
@@ -186,7 +198,7 @@ void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
 void* gnutls_db_get_ptr( GNUTLS_STATE);
 int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
 
-void gnutls_handshake_set_max_length( GNUTLS_STATE state, int max);
+void gnutls_handshake_set_max_packet_length( GNUTLS_STATE state, int max);
 
 /* returns libgnutls version */
 const char* gnutls_check_version( const char*);
@@ -268,15 +280,10 @@ void gnutls_transport_set_lowat( GNUTLS_STATE state, int num);
 void gnutls_transport_set_push_func( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
 void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 
-/* state specific */
+/* state specific 
+ */
 void gnutls_state_set_ptr(GNUTLS_STATE state, void* ptr);
 void* gnutls_state_get_ptr(GNUTLS_STATE state);
-
-/* record layer */
-size_t gnutls_record_get_max_size( GNUTLS_STATE state);
-ssize_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
-
-size_t gnutls_record_check_pending(GNUTLS_STATE state);
 
 void gnutls_openpgp_send_key(GNUTLS_STATE state, GNUTLS_OpenPGPKeyStatus status);
 

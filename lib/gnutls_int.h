@@ -559,7 +559,7 @@ typedef struct {
 
 	void*			user_ptr;
 
-	int			enable_experimental; /* non zero to
+	int			enable_private;/* non zero to
 						* enable cipher suites
 						* which have 0xFF status.
 						*/

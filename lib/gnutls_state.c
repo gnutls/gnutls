@@ -168,7 +168,7 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	(*state)->security_parameters.read_compression_algorithm = GNUTLS_COMP_NULL;
 	(*state)->security_parameters.write_compression_algorithm = GNUTLS_COMP_NULL;
 
-	(*state)->gnutls_internals.enable_experimental = 0;
+	(*state)->gnutls_internals.enable_private = 0;
 
 	gnutls_protocol_set_priority( *state, default_protocol_list); /* default */
 	
@@ -429,7 +429,7 @@ void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
 }
 
 /**
-  * gnutls_state_allow_private_ciphersuites - Used to enable the private cipher suites
+  * gnutls_handshake_set_private_extensions - Used to enable the private cipher suites
   * @state: is a &GNUTLS_STATE structure.
   * @allow: is an integer (0 or 1)
   *
@@ -444,9 +444,9 @@ void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
   * are not yet defined in any RFC or even internet draft.
   *
   **/
-void gnutls_state_allow_private_ciphersuites(GNUTLS_STATE state, int allow)
+void gnutls_handshake_set_private_extensions(GNUTLS_STATE state, int allow)
 {
-	state->gnutls_internals.enable_experimental = allow;
+	state->gnutls_internals.enable_private = allow;
 }
 
 /**

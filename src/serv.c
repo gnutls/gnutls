@@ -153,6 +153,11 @@ GNUTLS_STATE initialize_state(void)
    int ret;
 
    gnutls_init(&state, GNUTLS_SERVER);
+
+   /* allow the use of private ciphersuites.
+    */
+   gnutls_handshake_set_private_extensions( state, 1);
+
    if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
       fprintf(stderr,
 	      "*** DB error (%d). Resuming will not be possible.\n\n",
