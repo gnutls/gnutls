@@ -37,7 +37,7 @@
 
 static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root);
 
-static void *find_default_value(ASN1_TYPE x)
+static const void *find_default_value(ASN1_TYPE x)
 {
 	ASN1_TYPE p = x;
 
@@ -173,7 +173,7 @@ static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 
 
 static int
-_gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
+_gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 			 gnutls_datum * res)
 {
 	node_asn *p, *root;
@@ -315,7 +315,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			STR_APPEND( ">");
 
 		if (is_node_printable(p)) {
-			unsigned char *value;
+			const unsigned char *value;
 
 			if (p->value == NULL)
 				value = find_default_value(p);

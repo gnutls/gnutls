@@ -471,7 +471,7 @@ void gnutls_handshake_set_rsa_pms_check(GNUTLS_STATE state, int check)
 }
 
 inline
-static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size, void* result)
+static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, const void *secret, int secret_size, const void *seed, int seed_size, void* result)
 {
 	GNUTLS_MAC_HANDLE td1;
 
@@ -487,7 +487,7 @@ static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
-static int _gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes, opaque* ret)
+static int _gnutls_P_hash( MACAlgorithm algorithm, const opaque * secret, int secret_size, const opaque * seed, int seed_size, int total_bytes, opaque* ret)
 {
 
 	GNUTLS_MAC_HANDLE td2;
@@ -565,10 +565,10 @@ int modlen = _length%sizeof(unsigned long int);
  * needed by the TLS specification. ret must have a least total_bytes
  * available.
  */
-int _gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes, void* ret)
+int _gnutls_PRF( const opaque * secret, int secret_size, const uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes, void* ret)
 {
 	int l_s, s_seed_size;
-	char *s1, *s2;
+	const char *s1, *s2;
 	opaque s_seed[MAX_SEED_SIZE];
 	opaque o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
 	int result;

@@ -60,7 +60,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 		const char *data, size_t data_size,
 		opaque * ciphertext, int ciphertext_size, ContentType type, int random_pad)
 {
-	gnutls_datum plain = { (char*)data, data_size };
+	const gnutls_datum plain = { data, data_size };
 	gnutls_datum comp;
 	int ret;
 	int free_comp = 1;
@@ -69,6 +69,9 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 		comp = plain;
 		free_comp = 0;
 	} else {
+		/* Here comp is allocated and must be 
+		 * freed.
+		 */
 		ret = _gnutls_m_plaintext2compressed(state, &comp, plain);
 		if (ret < 0) {
 			gnutls_assert();

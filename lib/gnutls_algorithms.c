@@ -51,7 +51,7 @@ static const gnutls_cred_map cred_mappings[] = {
 /* TLS Versions */
 
 typedef struct {
-	char *name;
+	const char *name;
 	GNUTLS_Version id;	/* gnutls internal version number */
 	int major;		/* defined by the protocol */
 	int minor;		/* defined by the protocol */
@@ -74,7 +74,7 @@ static const gnutls_version_entry sup_versions[] = {
 
 
 struct gnutls_cipher_entry {
-	char *name;
+	const char *name;
 	BulkCipherAlgorithm id;
 	size_t blocksize;
 	size_t keysize;
@@ -107,7 +107,7 @@ static const gnutls_cipher_entry algorithms[] = {
 
 
 struct gnutls_hash_entry {
-	char *name;
+	const char *name;
 	MACAlgorithm id;
 	size_t digestsize;
 };
@@ -133,7 +133,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
 	{ #name, name, id }
 
 struct gnutls_compression_entry {
-	char *name;
+	const char *name;
 	CompressionMethod id;
 	int num; /* the number reserved in TLS for the specific compression method */
 };
@@ -192,7 +192,7 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, version }
 
 typedef struct {
-	char *name;
+	const char *name;
 	GNUTLS_CipherSuite id;
 	BulkCipherAlgorithm block_algorithm;
 	KXAlgorithm kx_algorithm;
@@ -424,7 +424,7 @@ inline int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
   **/
 const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm algorithm)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_HASH_ALG_LOOP(ret =
@@ -471,7 +471,7 @@ inline
   **/
 const char *gnutls_compression_get_name( GNUTLS_CompressionMethod algorithm)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_COMPRESSION_ALG_LOOP(ret =
@@ -588,7 +588,7 @@ int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm)
   **/
 const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm algorithm)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_ALG_LOOP(ret = p->name);
@@ -639,7 +639,7 @@ inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
   **/
 const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_KX_ALG_LOOP(ret = p->name);
@@ -725,7 +725,7 @@ GNUTLS_Version _gnutls_version_max(GNUTLS_STATE state)
   **/
 const char *gnutls_protocol_get_name( GNUTLS_Version version)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_VERSION_ALG_LOOP(ret =
@@ -831,7 +831,7 @@ _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite suite)
 
 const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret =
@@ -845,7 +845,7 @@ inline
 static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
 {
 	size_t ret;
-	char *name = NULL;
+	const char *name = NULL;
 
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(name = p->name);
 	if (name != NULL)
@@ -936,20 +936,20 @@ _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 		     const void *i_A2)
 {
 	KXAlgorithm kA1 =
-	    _gnutls_cipher_suite_get_kx_algo(*(GNUTLS_CipherSuite *) i_A1);
+	    _gnutls_cipher_suite_get_kx_algo(*(const GNUTLS_CipherSuite *) i_A1);
 	KXAlgorithm kA2 =
-	    _gnutls_cipher_suite_get_kx_algo(*(GNUTLS_CipherSuite *) i_A2);
+	    _gnutls_cipher_suite_get_kx_algo(*(const GNUTLS_CipherSuite *) i_A2);
 	BulkCipherAlgorithm cA1 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_cipher_algo(*(const GNUTLS_CipherSuite *)
 						 i_A1);
 	BulkCipherAlgorithm cA2 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_cipher_algo(*(const GNUTLS_CipherSuite *)
 						 i_A2);
 	MACAlgorithm mA1 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_mac_algo(*(const GNUTLS_CipherSuite *)
 					      i_A1);
 	MACAlgorithm mA2 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_mac_algo(*(const GNUTLS_CipherSuite *)
 					      i_A2);
 
 	int p1 = (_gnutls_kx_priority(state, kA1) + 1) * 64;
@@ -1163,7 +1163,7 @@ _gnutls_supported_compression_methods(GNUTLS_STATE state, uint8 ** comp)
   **/
 const char *gnutls_cert_type_get_name( GNUTLS_CertificateType type)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	if (type==GNUTLS_CRT_X509) ret = "X.509";
 	if (type==GNUTLS_CRT_OPENPGP) ret = "OPENPGP";

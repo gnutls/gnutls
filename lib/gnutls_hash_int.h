@@ -36,7 +36,7 @@ typedef struct {
 	GCRY_MD_HD handle;
 #endif
 	MACAlgorithm algorithm;
-	void* key;
+	const void* key;
 	int keysize;
 } GNUTLS_MAC_HANDLE_INT;
 typedef GNUTLS_MAC_HANDLE_INT* GNUTLS_MAC_HANDLE;
@@ -45,7 +45,7 @@ typedef GNUTLS_MAC_HANDLE GNUTLS_HASH_HANDLE;
 #define GNUTLS_HASH_FAILED NULL
 #define GNUTLS_MAC_FAILED NULL
 
-GNUTLS_MAC_HANDLE _gnutls_hmac_init( MACAlgorithm algorithm, void* key, int keylen);
+GNUTLS_MAC_HANDLE _gnutls_hmac_init( MACAlgorithm algorithm, const void* key, int keylen);
 int _gnutls_hmac_get_algo_len(MACAlgorithm algorithm);
 int _gnutls_hmac(GNUTLS_MAC_HANDLE handle, const void* text, int textlen);
 void _gnutls_hmac_deinit( GNUTLS_MAC_HANDLE handle, void* digest);

@@ -265,7 +265,7 @@ void _gnutls_int2str(unsigned int k, char *data)
  * (they're complex enough)
  * --nmav
  */
-int _gnutls_x509_get_name_type(ASN1_TYPE rasn, char *root, gnutls_DN * dn)
+int _gnutls_x509_get_name_type(ASN1_TYPE rasn, const char *root, gnutls_DN * dn)
 {
 	int k, k2, result, len;
 	char name[128], str[1024], name2[128], counter[MAX_INT_DIGITS],
@@ -349,7 +349,7 @@ int _gnutls_x509_get_name_type(ASN1_TYPE rasn, char *root, gnutls_DN * dn)
 
 
 #define MAX_TIME 1024
-time_t _gnutls_x509_get_time(ASN1_TYPE c2, char *root, char *when)
+time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *root, const char *when)
 {
 	opaque ttime[MAX_TIME];
 	char name[1024];
@@ -400,7 +400,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, char *root, char *when)
 	return ctime;
 }
 
-int _gnutls_x509_get_version(ASN1_TYPE c2, char *root)
+int _gnutls_x509_get_version(ASN1_TYPE c2, const char *root)
 {
 	opaque gversion[5];
 	char name[1024];
@@ -1101,7 +1101,7 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	tmp.data = (opaque*) input_cert;
+	tmp.data = (opaque*)input_cert;
 	tmp.size = input_cert_size;
 
 	if ((ret =

@@ -157,7 +157,7 @@ static int _parse_extension(gnutls_cert * cert, char *extnID,
  * If no_critical_ext is non zero, then unsupported critical extensions
  * do not lead into a fatal error.
  */
-int _gnutls_get_ext_type(ASN1_TYPE rasn, char *root, gnutls_cert * cert,
+int _gnutls_get_ext_type(ASN1_TYPE rasn, const char *root, gnutls_cert * cert,
 	int no_critical_ext)
 {
 	int k, result, len;

@@ -36,6 +36,6 @@ GNUTLS_COMP_HANDLE _gnutls_comp_init( CompressionMethod, int d);
 void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d);
 
 int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size);
-int _gnutls_compress( GNUTLS_COMP_HANDLE, char* plain, int plain_size, char** compressed, int max_comp_size);
+int _gnutls_compress( GNUTLS_COMP_HANDLE, const char* plain, int plain_size, char** compressed, int max_comp_size);
 
 #endif

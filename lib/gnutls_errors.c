@@ -33,7 +33,7 @@ extern void (*_gnutls_log_func)( const char*);
 	{ #name, name, fatal }
 
 struct gnutls_error_entry {
-	char *name;
+	const char *name;
 	int  number;
 	int  fatal;
 };
@@ -176,7 +176,7 @@ void gnutls_perror(int error)
   **/
 const char* gnutls_strerror(int error)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret =

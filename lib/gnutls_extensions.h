@@ -27,7 +27,7 @@ int _gnutls_parse_extensions( GNUTLS_STATE, const opaque*, int);
 int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data);
 
 typedef struct {
-	char *name;
+	const char *name;
 	uint16 type;
 	int (*gnutls_ext_func_recv)( GNUTLS_STATE, const opaque*, int); /* recv data */
 	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque*, int); /* send data */

@@ -165,7 +165,7 @@ void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void* digest)
 }
 
 
-GNUTLS_MAC_HANDLE _gnutls_hmac_init(MACAlgorithm algorithm, void *key,
+GNUTLS_MAC_HANDLE _gnutls_hmac_init(MACAlgorithm algorithm, const void *key,
 				   int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;

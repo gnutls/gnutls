@@ -2,7 +2,7 @@
 # define GNUTLS_AUTH_H
 
 typedef struct MOD_AUTH_STRUCT_INT {
-	char* name; /* null terminated */
+	const char* name; /* null terminated */
 	int (*gnutls_generate_server_certificate)( GNUTLS_STATE, opaque**);
 	int (*gnutls_generate_client_certificate)( GNUTLS_STATE, opaque**);
 	int (*gnutls_generate_server_kx)( GNUTLS_STATE, opaque**);

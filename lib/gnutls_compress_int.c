@@ -85,6 +85,7 @@ int err;
 					err = deflateEnd( handle->handle);
 				break;
 #endif
+			default:
 		}
 		gnutls_free( handle->handle);
 		gnutls_free( handle);
@@ -97,7 +98,7 @@ int err;
 /* These functions are memory consuming 
  */
 
-int _gnutls_compress( GNUTLS_COMP_HANDLE handle, char* plain, int plain_size, char** compressed, int max_comp_size) {
+int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const char* plain, int plain_size, char** compressed, int max_comp_size) {
 int compressed_size=GNUTLS_E_COMPRESSION_FAILED;
 #ifdef HAVE_LIBZ
 uLongf size;

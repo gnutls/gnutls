@@ -76,7 +76,7 @@ KXAlgorithm _gnutls_map_kx_get_kx(CredType type);
 CredType _gnutls_map_kx_get_cred(KXAlgorithm algorithm);
 
 struct gnutls_kx_algo_entry {
-	char *name;
+	const char *name;
 	KXAlgorithm algorithm;
 	MOD_AUTH_STRUCT *auth_struct;
 };

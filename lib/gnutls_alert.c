@@ -27,7 +27,7 @@
 
 typedef struct {
 	AlertDescription alert;
-	char *desc;
+	const char *desc;
 } gnutls_alert_entry;
 
 static const gnutls_alert_entry sup_alerts[] = {
@@ -73,7 +73,7 @@ static const gnutls_alert_entry sup_alerts[] = {
   *
   **/
 const char* gnutls_alert_get_name( int alert) {
-char* ret = NULL;
+const char* ret = NULL;
 
 	GNUTLS_ALERT_ID_LOOP( ret = p->desc);
 

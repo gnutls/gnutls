@@ -67,7 +67,7 @@ void* _gnutls_ext_func_send(uint16 type)
 
 const char *_gnutls_extension_get_name(uint16 type)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_EXTENSION_LOOP(ret = p->name + sizeof("EXTENSION_") - 1);

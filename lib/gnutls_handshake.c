@@ -134,7 +134,7 @@ static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, opaque * ret)
 	const int siz = SSL_MSG_LEN;
 	GNUTLS_MAC_HANDLE td_md5;
 	GNUTLS_MAC_HANDLE td_sha;
-	char *mesg;
+	const opaque *mesg;
 
 	td_md5 = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
@@ -173,7 +173,7 @@ int _gnutls_finished(GNUTLS_STATE state, int type, void *ret)
 {
 	const int siz = TLS_MSG_LEN;
 	opaque concat[36];
-	opaque *mesg;
+	const opaque *mesg;
 	GNUTLS_MAC_HANDLE td_md5;
 	GNUTLS_MAC_HANDLE td_sha;
 
@@ -1985,6 +1985,7 @@ int gnutls_handshake_client(GNUTLS_STATE state)
 		IMED_RET("send client certificate verify", ret);
 
 		STATE = STATE0;
+	default:
 	}
 
 
@@ -2038,6 +2039,7 @@ static int _gnutls_send_handshake_final(GNUTLS_STATE state, int init)
 		}
 
 		STATE = STATE0;
+	default:
 	}
 
 	return 0;
@@ -2091,6 +2093,7 @@ static int _gnutls_recv_handshake_final(GNUTLS_STATE state, int init)
 			return ret;
 		}
 		STATE = STATE0;
+	default:
 	}
 
 
@@ -2205,6 +2208,7 @@ int gnutls_handshake_server(GNUTLS_STATE state)
 		IMED_RET("recv client certificate verify", ret);
 
 		STATE = STATE0;	/* finished thus clear state */
+	default:
 	}
 
 	return 0;

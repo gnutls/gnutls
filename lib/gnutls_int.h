@@ -26,7 +26,7 @@
 #include <defines.h>
 
 /*
-#define IO_DEBUG 3 // define this to check non blocking behaviour 
+#define IO_DEBUG 3 // define this to check non blocking behaviour
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
 #define WRITE_DEBUG
