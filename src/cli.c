@@ -304,6 +304,8 @@ static int cert_callback(gnutls_session session,
 	    st->cert.x509 = &x509_crt;
 	    st->key.x509 = x509_key;
 
+	    st->type = type;
+
 	    st->deinit_all = 0;
 
 	    return 0;
@@ -314,6 +316,8 @@ static int cert_callback(gnutls_session session,
 
 	    st->cert.pgp = pgp_crt;
 	    st->key.pgp = pgp_key;
+
+	    st->type = type;
 
 	    st->deinit_all = 0;
 
