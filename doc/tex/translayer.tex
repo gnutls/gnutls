@@ -12,8 +12,8 @@ to gnutls the required callbacks to access the transport layer.
 \end{itemize}
 
 These functions accept a callback function as a parameter.
-The callback functions should return -1 on error and should set errno 
-appropriately.
+The callback functions should return the number of bytes written, or -1 on 
+error and should set errno appropriately.
 \par
 \gnutls{} currently only interprets the EINTR and EAGAIN errno values and
 returns the corresponding gnutls error codes GNUTLS\_E\_INTERRUPTED and
