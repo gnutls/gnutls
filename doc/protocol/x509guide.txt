@@ -4,6 +4,18 @@
                   Peter Gutmann, pgut001@cs.auckland.ac.nz
                                  October 2000
 
+[This file is frequently cited as a reference on PKI issues, when in fact it
+ was really intended as X.509 implementation notes meant mostly for
+ developers, to tell them all the things the standards leave out.  If you're
+ looking for a general overview of PKI that includes most of what's in here
+ but presented in a more accessible manner, you should use "Everything you
+ never wanted to know about PKI but have been forced to find out",
+ http://www.cs.auckland.ac.nz/~pgut001/pubs/pkitutorial.pdf, a less technical
+ overview aimed at people charged with implementing and deploying the
+ technology.  If you need to know what you're in for when you work with PKI,
+ this is definitely the one to read.  Further PKI information and material can
+ be found on my home page, http://www.cs.auckland.ac.nz/~pgut001/].
+
 There seems to be a lot of confusion about how to implement and work with X.509
 certificates, either because of ASN.1 encoding issues, or because vagueness in
 the relevant standards means people end up taking guesses at what some of the
