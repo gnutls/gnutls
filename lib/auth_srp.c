@@ -38,7 +38,7 @@ int gen_srp_client_kx0(GNUTLS_STATE, opaque **);
 int proc_srp_server_kx2(GNUTLS_STATE, opaque *, int);
 int proc_srp_client_kx0(GNUTLS_STATE, opaque *, int);
 
-MOD_AUTH_STRUCT srp_auth_struct = {
+const MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
 	NULL,
 	NULL,

@@ -44,7 +44,12 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Error in the arguments.\n");
 		return -1;
 	}
+	
+	gnutls_global_init();
 
+	fprintf(stderr, "Generating prime...");
+//	gcry_control (GCRYCTL_SET_VERBOSITY, (int)0);
+	
 	/* this is an emulation of Michael Wiener's table
 	 * bad emulation.
 	 */
@@ -93,5 +98,7 @@ int main(int argc, char **argv)
 	printf("\n};\n");
 	free(tmp);
 
+	gnutls_global_deinit();
+	
 	return 0;
 }

@@ -13,8 +13,14 @@ real world programs)
 
 LICENSE ISSUES:
 
-COPYING.LIB (GNU Lesser GPL) applies to the whole gnutls library
-except for the SRP and OPENPGP parts, which are under the GPL.
+The latest release of the gnutls library is covered under the GNU Lesser 
+GPL License, unlike previously released versions which were licensed under 
+the GPL. 
+
+The LGPL license (found in COPYING.LIB) applies to all parts of the gnutls 
+library except for the "OPENPGP authentication" part, and the "SRP 
+authentication" part, which stay GPL (see the COPYING file).  Both of these 
+parts can be disabled at compile time.
 
 In order to create a library under the LGPL run the configure script with 
 the following parameters:
@@ -24,6 +30,16 @@ the following parameters:
 or the library will be under the GPL. In both cases the libraries are
 binary compatible. In the LGPL case the functions are replaced with
 stubs that always fail.
+
+The rationale behind this license change is that given the fact that other 
+free libraries with similar functionality exist, keeping the gnutls library 
+GPL would not give any practical advantage to Free software developers.
+
+Please note that in many cases it is better for a library to be licensed 
+under the GPL, so that it provides an advantage for free software projects.
+The Lesser GPL is so named because it does less to protect the freedom of 
+the users of the code that it covers.  
+See http://www.gnu.org/philosophy/why-not-lgpl.html for more explanation.
 
 
 BUGS:

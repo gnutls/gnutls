@@ -36,7 +36,7 @@ static int gen_dhe_client_kx(GNUTLS_STATE, opaque **);
 static int proc_dhe_server_kx(GNUTLS_STATE, opaque *, int);
 static int proc_dhe_client_kx(GNUTLS_STATE, opaque *, int);
 
-MOD_AUTH_STRUCT dhe_rsa_auth_struct = {
+const MOD_AUTH_STRUCT dhe_rsa_auth_struct = {
 	"DHE_RSA",
 	_gnutls_gen_cert_server_certificate,
 	_gnutls_gen_cert_client_certificate,
@@ -57,7 +57,7 @@ MOD_AUTH_STRUCT dhe_rsa_auth_struct = {
 	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
-MOD_AUTH_STRUCT dhe_dss_auth_struct = {
+const MOD_AUTH_STRUCT dhe_dss_auth_struct = {
 	"DHE_DSS",
 	_gnutls_gen_cert_server_certificate,
 	_gnutls_gen_cert_client_certificate,
