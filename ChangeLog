@@ -1,3 +1,9 @@
+2003-06-24 06:57  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_cert.c, gnutls_errors.c, gnutls_errors_int.h:
+
+	Passwords in PKCS5 and PKCS12 are now restricted to ASCII ones.  
+
 2003-06-23 06:52  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_errors.c:
