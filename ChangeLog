@@ -1,3 +1,9 @@
+2002-09-20 14:51  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_global.c:
+
+	enabled error messages of libgcrypt in debug mode 
+
 2002-09-17 17:57  nmav <nmav@gnutls.org>
 
 	* lib/Makefile.am, lib/defines.h, lib/gnutls.h.in.in,
