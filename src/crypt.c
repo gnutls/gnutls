@@ -40,6 +40,7 @@ int main (int argc, char **argv)
 #include <gnutls/extra.h>
 #include <gcrypt.h> /* for randomize */
 #include <crypt-gaa.h>
+#include <getpass.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -51,35 +52,16 @@ int main (int argc, char **argv)
 # include <windows.h>
 #endif
 
-#ifdef _WIN32
-
-# define getpass read_str
-
-static const char* read_str( const char* input_str)
-{
-static char input[128];
-
-	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
-	
-	input[strlen(input)-1] = 0;
-
-	if (strlen(input)==0) return NULL;
-
-	return input;
-}
-#endif
-
 #define _MAX(x,y) (x>y?x:y)
 
 /* This may need some rewrite. A lot of stuff which should be here
  * are in the library, which is not good.
  */
 
-int crypt_int(char *username, char *passwd, int salt,
+int crypt_int(const char *username, const char *passwd, int salt,
 	      char *tpasswd_conf, char *tpasswd, int uindex);
 static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str);
-static int _verify_passwd_int(char* username, char* passwd, char* verifier, char* salt, 
+static int _verify_passwd_int(const char* username, const char* passwd, char* verifier, char* salt, 
 	const gnutls_datum* g, const gnutls_datum* n);
 
 
@@ -159,7 +141,7 @@ int generate_create_conf(char *tpasswd_conf)
  *
  * index is the index of the prime-generator pair in tpasswd.conf
  */
-static int _verify_passwd_int(char* username, char* passwd, char* verifier, 
+static int _verify_passwd_int(const char* username, const char* passwd, char* verifier, 
 	char* salt, const gnutls_datum* g, const gnutls_datum* n) 
 {
 char _salt[1024];
@@ -279,7 +261,7 @@ unsigned int i;
 /* Parses the tpasswd files, in order to verify the given
  * username/password pair.
  */
-int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
+int verify_passwd(char *conffile, char *tpasswd, char *username, const char *passwd)
 {
 	FILE *fd;
 	char line[5 * 1024];
@@ -369,7 +351,7 @@ int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 int main(int argc, char **argv)
 {
 	gaainfo info;
-	char *passwd;
+	const char *passwd;
 	int salt, ret;
 	struct passwd *pwd;
 
@@ -418,7 +400,7 @@ int main(int argc, char **argv)
 
 	salt = 16;
 
-	passwd = getpass("Enter password: ");
+	passwd = read_pass("Enter password: ");
 
 /* not ready yet */
 	if (info.verify != 0) {
@@ -432,7 +414,7 @@ int main(int argc, char **argv)
 
 }
 
-char* _srp_crypt( char* username, char* passwd, int salt_size, 
+char* _srp_crypt( const char* username, const char* passwd, int salt_size, 
 	const gnutls_datum* g,  const gnutls_datum* n)
 {
 char salt[128];
@@ -482,7 +464,7 @@ gnutls_datum verifier, txt_verifier;
 }
 
 
-int crypt_int(char *username, char *passwd, int salt_size,
+int crypt_int(const char *username, const char *passwd, int salt_size,
 	      char *tpasswd_conf, char *tpasswd, int uindex)
 {
 	FILE *fd;

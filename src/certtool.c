@@ -32,6 +32,7 @@
 #include "certtool-gaa.h"
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
+#include <getpass.h>
 
 static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all);
 int generate_prime(int bits);
@@ -136,33 +137,6 @@ int len;
 	if (input[0] == 0) return NULL;
 
 	return input;
-}
-
-static const char* read_pass( const char* input_str)
-{
-#ifndef HAVE_GETPASS
-static char input[128];
-#endif
-const char* pass;
-
-	if (info.pass) return info.pass;
-
-#ifndef HAVE_GETPASS
-
-	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
-	
-	input[strlen(input)-1] = 0;
-
-	if (strlen(input)==0 || input[0]=='\n') return NULL;
-
-	return input;
-#else
-	pass = getpass(input_str);
-	if (pass == NULL || strlen(pass)==0 || pass[0]=='\n') return NULL;
-
-	return pass;
-#endif
 }
 
 static int read_yesno( const char* input_str)
@@ -742,13 +716,13 @@ int ret;
 	if (info.outcert_format) out_cert_format = GNUTLS_X509_FMT_DER;
 	else out_cert_format = GNUTLS_X509_FMT_PEM;
 
+	gnutls_global_set_log_function( tls_log_func);
+	gnutls_global_set_log_level(info.debug);
+
 	if ((ret=gnutls_global_init()) < 0) {
 		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
-
-	gnutls_global_set_log_function( tls_log_func);
-	gnutls_global_set_log_level(info.debug);
 
 	switch( info.action) {
 		case 0:
