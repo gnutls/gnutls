@@ -201,7 +201,7 @@ int gen_srp_client_kx0(GNUTLS_KEY key, opaque ** data)
 	uint8 *data_a;
 	char *username;
 	char *password;
-	const SRP_CLIENT_CREDENTIALS *cred =
+	const SRP_CLIENT_CREDENTIALS cred =
 	    _gnutls_get_cred(key, GNUTLS_SRP, NULL);
 
 	if (cred == NULL)
@@ -244,7 +244,7 @@ int proc_srp_server_hello(GNUTLS_KEY key, const opaque * data, int data_size)
 	opaque hd[SRP_MAX_HASH_SIZE];
 	char *username;
 	char *password;
-	const SRP_CLIENT_CREDENTIALS *cred =
+	const SRP_CLIENT_CREDENTIALS cred =
 	    _gnutls_get_cred(key, GNUTLS_SRP, NULL);
 
 	if (cred == NULL)

@@ -346,7 +346,7 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_srp_client_sc( SRP_CLIENT_CREDENTIALS* sc) {
+void gnutls_free_srp_client_sc( SRP_CLIENT_CREDENTIALS sc) {
 	gnutls_free(sc);
 }
 
@@ -358,8 +358,8 @@ void gnutls_free_srp_client_sc( SRP_CLIENT_CREDENTIALS* sc) {
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_allocate_srp_client_sc( SRP_CLIENT_CREDENTIALS **sc) {
-	*sc = gnutls_malloc( sizeof(SRP_CLIENT_CREDENTIALS));
+int gnutls_allocate_srp_client_sc( SRP_CLIENT_CREDENTIALS *sc) {
+	*sc = gnutls_malloc( sizeof(SRP_CLIENT_CREDENTIALS_INT));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 
@@ -373,7 +373,7 @@ int gnutls_allocate_srp_client_sc( SRP_CLIENT_CREDENTIALS **sc) {
   * @password: is the user's password
   *
   **/
-int gnutls_set_srp_client_cred( SRP_CLIENT_CREDENTIALS* res, char *username, char * password) {
+int gnutls_set_srp_client_cred( SRP_CLIENT_CREDENTIALS res, char *username, char * password) {
 
 	res->username = gnutls_strdup( username);
 	if (res->username == NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -395,7 +395,7 @@ int gnutls_set_srp_client_cred( SRP_CLIENT_CREDENTIALS* res, char *username, cha
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_srp_server_sc( SRP_SERVER_CREDENTIALS* sc) {
+void gnutls_free_srp_server_sc( SRP_SERVER_CREDENTIALS sc) {
 	gnutls_free(sc);
 }
 
@@ -408,8 +408,8 @@ void gnutls_free_srp_server_sc( SRP_SERVER_CREDENTIALS* sc) {
   * the structure.
   **/
 
-int gnutls_allocate_srp_server_sc( SRP_SERVER_CREDENTIALS **sc) {
-	*sc = gnutls_malloc( sizeof(SRP_SERVER_CREDENTIALS));
+int gnutls_allocate_srp_server_sc( SRP_SERVER_CREDENTIALS *sc) {
+	*sc = gnutls_malloc( sizeof(SRP_SERVER_CREDENTIALS_INT));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
@@ -423,7 +423,7 @@ int gnutls_allocate_srp_server_sc( SRP_SERVER_CREDENTIALS **sc) {
   * @password_conf_file: is the SRP password conf file (tpasswd.conf)
   *
   **/
-int gnutls_set_srp_server_cred( SRP_SERVER_CREDENTIALS* res, char *password_file, char * password_conf_file) {
+int gnutls_set_srp_server_cred( SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
 
 	res->password_file = gnutls_strdup( password_file);
 	if (res->password_file==NULL) return GNUTLS_E_MEMORY_ERROR;

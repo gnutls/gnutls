@@ -3,7 +3,9 @@ extern MOD_AUTH_STRUCT anon_auth_struct;
 
 typedef struct {
 	int dh_bits;
-} ANON_SERVER_CREDENTIALS;
+} ANON_SERVER_CREDENTIALS_INT;
+
+#define ANON_SERVER_CREDENTIALS ANON_SERVER_CREDENTIALS_INT*
 
 typedef struct {
 	int dh_bits;

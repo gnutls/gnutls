@@ -60,7 +60,7 @@ int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS **sc) {
   *
   **/
 
-int gnutls_set_anon_server_cred( ANON_SERVER_CREDENTIALS* res, int dh_bits) {
+int gnutls_set_anon_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits) {
 	res->dh_bits = dh_bits;
 	return 0;
 }

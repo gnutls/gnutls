@@ -329,7 +329,7 @@ sub output_tex {
     print "\\end{itemize}\n";
 
     foreach $section (@{$args{'sectionlist'}}) {
-	print "\n{\\large{$section}}\n";
+	print "\n\\par{\\large{$section}}\\par\n";
 	print "\\begin{rmfamily}\n";
 
 	$sec = $args{'sections'}{$section};

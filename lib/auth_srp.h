@@ -4,12 +4,16 @@ extern MOD_AUTH_STRUCT srp_auth_struct;
 typedef struct {
 	char* username;
 	char* password;
-} SRP_CLIENT_CREDENTIALS;
+} SRP_CLIENT_CREDENTIALS_INT;
+
+#define SRP_CLIENT_CREDENTIALS SRP_CLIENT_CREDENTIALS_INT*
 
 typedef struct {
 	char* password_file;
 	char* password_conf_file;
-} SRP_SERVER_CREDENTIALS;
+} SRP_SERVER_CREDENTIALS_INT;
+
+#define SRP_SERVER_CREDENTIALS SRP_SERVER_CREDENTIALS_INT*
 
 /* these structures should not use allocated data */
 typedef struct {
