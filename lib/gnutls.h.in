@@ -85,16 +85,16 @@ typedef struct gnutls_private_key gnutls_private_key;
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE state);
-int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how);
+int gnutls_bye( GNUTLS_STATE state, CloseRequest how);
 
-int gnutls_handshake(SOCKET cd, GNUTLS_STATE state);
+int gnutls_handshake( GNUTLS_STATE state);
 int gnutls_check_pending(GNUTLS_STATE state);
-int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state);
+int gnutls_rehandshake( GNUTLS_STATE state);
 
 
 AlertDescription gnutls_get_last_alert( GNUTLS_STATE state);
 int gnutls_send_alert(SOCKET, GNUTLS_STATE, AlertLevel, AlertDescription);
-int gnutls_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err);
+int gnutls_send_appropriate_alert(  GNUTLS_STATE state, int err);
 
 /* get information on the current state */
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);
@@ -114,10 +114,10 @@ int gnutls_is_fatal_error( int error);
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
 
-#define gnutls_send(a,b,c,d,e,f) gnutls_write(a,b,c,d,e)
-#define gnutls_recv(a,b,c,d,e,f) gnutls_read(a,b,c,d,e)
-ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata);
-ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata);
+#define gnutls_send(a,b,c,d,e) gnutls_write(a,b,c,d)
+#define gnutls_recv(a,b,c,d,e) gnutls_read(a,b,c,d)
+ssize_t gnutls_write( GNUTLS_STATE state, void *data, size_t sizeofdata);
+ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata);
 
 /* functions to set priority of cipher suites */
 int gnutls_set_cipher_priority( GNUTLS_STATE state, GNUTLS_LIST);
@@ -232,6 +232,7 @@ int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int
 
 typedef ssize_t (*PULL_FUNC)(SOCKET, void*, size_t);
 typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
+void gnutls_set_transport_ptr(GNUTLS_STATE state, SOCKET ptr);
 
 typedef void (*LOG_FUNC)( const char*);
 

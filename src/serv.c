@@ -214,7 +214,7 @@ void print_info(GNUTLS_STATE state)
 /* Creates html with the current state information.
  */
 #define tmp2 &http_buffer[strlen(http_buffer)]
-void peer_print_info(int cd, GNUTLS_STATE state)
+void peer_print_info( GNUTLS_STATE state)
 {
 	const char *tmp;
 	unsigned char sesid[32];
@@ -283,7 +283,7 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 /* actually something like readline.
  * if rnl!=1 then reads an http request in the form REQ\n\n
  */
-int read_request(int cd, GNUTLS_STATE state, char *data, int data_size, int rnl)
+int read_request( GNUTLS_STATE state, char *data, int data_size, int rnl)
 {
 	int n, rc, nl = 0;
 	char c, *ptr, p1=0, p2=0;
@@ -291,7 +291,7 @@ int read_request(int cd, GNUTLS_STATE state, char *data, int data_size, int rnl)
 	ptr = data;
 	for (n = 1; n < data_size; n++) {
 		do {
-			rc = gnutls_read(cd, state, &c, 1);
+			rc = gnutls_read( state, &c, 1);
 		} while( rc==GNUTLS_E_INTERRUPTED || rc==GNUTLS_E_AGAIN);
 
 		if ( rc == 1) {
@@ -416,8 +416,9 @@ int main(int argc, char **argv)
 				 sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
 
+		gnutls_set_transport_ptr( state, sd);
 		do {
-			ret = gnutls_handshake(sd, state);
+			ret = gnutls_handshake( state);
 		} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 		if (ret < 0) {
@@ -435,7 +436,7 @@ int main(int argc, char **argv)
 		i = 0;
 		for (;;) {
 			bzero(buffer, MAX_BUF + 1);
-			ret = read_request(sd, state, buffer, MAX_BUF, (http==0)?1:2);
+			ret = read_request( state, buffer, MAX_BUF, (http==0)?1:2);
 
 			if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
 				fflush(stdout);
@@ -457,15 +458,15 @@ int main(int argc, char **argv)
 				if (http == 0) {
 					printf( "* Read %d bytes from client.\n", strlen(buffer));
 					do {
-						ret = gnutls_write(sd, state, buffer, strlen(buffer));
+						ret = gnutls_write( state, buffer, strlen(buffer));
 					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 					printf( "* Wrote %d bytes to client.\n", ret);
 				} else {
 					strcpy( http_buffer, HTTP_BEGIN);
-					peer_print_info(sd, state);
+					peer_print_info( state);
 					strcat( http_buffer, HTTP_END);
 					do {
-						ret = gnutls_write(sd, state, http_buffer, strlen(http_buffer));
+						ret = gnutls_write( state, http_buffer, strlen(http_buffer));
 					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 					printf("- Served request. Closing connection.\n");
@@ -476,14 +477,14 @@ int main(int argc, char **argv)
 #ifdef RENEGOTIATE
 			if (i == 20) {
 				do {
-					ret = gnutls_rehandshake(sd, state);
+					ret = gnutls_rehandshake( state);
 				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 				if (gnutls_get_last_alert(state)!=GNUTLS_NO_RENEGOTIATION) {
 					printf("* Requesting rehandshake.\n");
 					/* continue handshake proccess */
 					do {
-						ret = gnutls_handshake(sd, state);
+						ret = gnutls_handshake( state);
 					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 					printf("* Rehandshake returned %d\n", ret);
 				}
@@ -498,7 +499,7 @@ int main(int argc, char **argv)
 		}
 		printf("\n");
 		do {
-			ret = gnutls_bye(sd, state, GNUTLS_SHUT_WR); 
+			ret = gnutls_bye( state, GNUTLS_SHUT_WR); 
 		} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 		/* do not wait for
 		 * the peer to close the connection.

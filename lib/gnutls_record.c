@@ -59,9 +59,22 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
   * Otherwise it must be called and set lowat to zero.
   *
   **/
-int gnutls_set_lowat(GNUTLS_STATE state, int num) {
+void gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	state->gnutls_internals.lowat = num;
-	return 0;
+}
+
+/**
+  * gnutls_set_transport_ptr - Used to set first argument of the transport functions
+  * @state: is a &GNUTLS_STATE structure.
+  * @ptr: is the value.
+  *
+  * Used to set the first argument of the transport function (like PUSH and
+  * PULL). In berkeley style sockets this function will set the connection
+  * handle.
+  *
+  **/
+void gnutls_set_transport_ptr(GNUTLS_STATE state, SOCKET ptr) {
+	state->gnutls_internals.transport_ptr = ptr;
 }
 
 #define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
@@ -354,7 +367,6 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 
 /**
   * gnutls_send_alert - This function sends an alert message to the peer
-  * @cd: is a connection descriptor.
   * @state: is a &GNUTLS_STATE structure.
   * @level: is the level of the alert
   * @desc: is the alert description
@@ -366,7 +378,7 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
   * Returns 0 on success.
   *
   **/
-int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
+int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
 {
 	uint8 data[2];
 	int ret;
@@ -378,7 +390,7 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
 	_gnutls_log( "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
 #endif
 
-	if ( (ret = gnutls_send_int(cd, state, GNUTLS_ALERT, -1, data, 2)) >= 0)
+	if ( (ret = gnutls_send_int( state, GNUTLS_ALERT, -1, data, 2)) >= 0)
 		return 0;
 	else
 		return ret;
@@ -389,7 +401,6 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
  */
 /**
   * gnutls_send_appropriate_alert - This function sends an alert to the peer depending on the error code
-  * @cd: is a connection descriptor.
   * @state: is a &GNUTLS_STATE structure.
   * @err: is an integer
   *
@@ -403,20 +414,20 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
   * been sent to the peer.
   *
   **/
-int gnutls_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err) {
+int gnutls_send_appropriate_alert( GNUTLS_STATE state, int err) {
 int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	switch (err) { /* send appropriate alert */
 		case GNUTLS_E_MAC_FAILED:
-			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
+			ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
 			break;
 		case GNUTLS_E_DECRYPTION_FAILED:
-			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECRYPTION_FAILED);
+			ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_DECRYPTION_FAILED);
 			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
-			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
+			ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
 			break;
 		case GNUTLS_E_ILLEGAL_PARAMETER:
-                        ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
+                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
                         break;
                                                               
 	}
@@ -425,7 +436,6 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
 /**
   * gnutls_bye - This function terminates the current TLS/SSL connection.
-  * @cd: is a connection descriptor.
   * @state: is a &GNUTLS_STATE structure.
   * @how: is an integer
   *
@@ -444,7 +454,7 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
   *
   **/
-int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
+int gnutls_bye( GNUTLS_STATE state, CloseRequest how)
 {
 	int ret = 0, ret2 = 0;
 
@@ -452,9 +462,9 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 		case STATE0:
 		case STATE60:
 			if (STATE==STATE60) {
-				ret = _gnutls_write_flush( cd, state);
+				ret = _gnutls_write_flush( state);
 			} else {
-				ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+				ret = gnutls_send_alert( state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 				STATE = STATE60;
 			}
 
@@ -462,7 +472,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 				return ret;
 		case STATE61:
 			if ( how == GNUTLS_SHUT_RDWR && ret >= 0) {
-				ret2 = gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0); 
+				ret2 = gnutls_recv_int( state, GNUTLS_ALERT, -1, NULL, 0); 
 				if (ret2 >= 0) state->gnutls_internals.may_read = 1;
 			}
 			STATE = STATE61;
@@ -489,7 +499,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
  * --nmav
  *
  */
-ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
+ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
 	int cipher_size;
@@ -541,7 +551,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 * from the previous run. - probably interrupted.
 	 */
 	if (state->gnutls_internals.send_buffer.size > 0) {
-		ret = _gnutls_write_flush(cd, state);
+		ret = _gnutls_write_flush( state);
 		if (ret > 0) cipher_size = ret;
 		else cipher_size = 0;
 		
@@ -569,7 +579,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}
 
-		ret = _gnutls_write_buffered(cd, state, cipher, cipher_size);
+		ret = _gnutls_write_buffered( state, cipher, cipher_size);
 	}
 
 	if ( ret != cipher_size) {
@@ -609,7 +619,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 /* This function is to be called if the handshake was successfully 
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
-ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state, int again)
+ssize_t _gnutls_send_change_cipher_spec( GNUTLS_STATE state, int again)
 {
 	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
@@ -617,9 +627,9 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state, int again
 	_gnutls_log( "Record: Sent ChangeCipherSpec\n");
 #endif
 	if (again==0)
-		return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
+		return gnutls_send_int( state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
 	else {
-		return _gnutls_write_flush( cd, state);
+		return _gnutls_write_flush( state);
 	}
 }
 
@@ -644,7 +654,7 @@ static int _gnutls_check_recv_type( ContentType recv_type) {
  * send (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current state.
  */
-ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
+ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
 {
 	uint8 *tmpdata;
 	int tmplen;
@@ -684,7 +694,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		
 		/* if the buffer just got empty */
 		if (gnutls_get_data_buffer_size(type, state)==0) {
-			if ( (ret2=_gnutls_clear_peeked_data( cd, state)) < 0) {
+			if ( (ret2=_gnutls_clear_peeked_data( state)) < 0) {
 				gnutls_assert();
 				return ret2;
 			}
@@ -696,7 +706,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
 	 * must be set to non blocking mode
 	 */
-	if ( (ret = _gnutls_read_buffered(cd, state, &headers, header_size, -1)) != header_size) {
+	if ( (ret = _gnutls_read_buffered( state, &headers, header_size, -1)) != header_size) {
 		if (ret < 0 && gnutls_is_fatal_error(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -761,7 +771,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			 * we send them a close notify. 
 			 * silently ignore that.
 			 */
-			gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
+			gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
 		}
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
@@ -779,7 +789,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 #ifdef RECORD_DEBUG
 		_gnutls_log( "Record: FATAL ERROR: Received packet with length: %d\n", length);
 #endif
-		gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
+		gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -788,7 +798,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 	/* check if we have that data into buffer. 
  	 */
-	if ( (ret = _gnutls_read_buffered(cd, state, &recv_data, header_size+length, recv_type)) != length+header_size) {
+	if ( (ret = _gnutls_read_buffered( state, &recv_data, header_size+length, recv_type)) != length+header_size) {
 		if (ret<0 && gnutls_is_fatal_error(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -862,7 +872,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 				 * not call close().
 				 */
 				if (type != GNUTLS_ALERT) 
-					do ret=gnutls_bye( cd, state, GNUTLS_SHUT_WR);
+					do ret=gnutls_bye( state, GNUTLS_SHUT_WR);
 					while(ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 				gnutls_free(tmpdata);
 
@@ -940,7 +950,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 		/* if the buffer just got empty */
 		if (gnutls_get_data_buffer_size(type, state)==0) {
-			if ( (ret2 = _gnutls_clear_peeked_data( cd, state)) < 0) {
+			if ( (ret2 = _gnutls_clear_peeked_data( state)) < 0) {
 				gnutls_assert();
 				return ret2;
 			}
@@ -950,7 +960,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	} else {
 		if (recv_type == GNUTLS_HANDSHAKE) {
 			/* we may get a hello request */
-			ret = _gnutls_recv_hello_request( cd, state, tmpdata, tmplen);
+			ret = _gnutls_recv_hello_request( state, tmpdata, tmplen);
 		} else {
 			gnutls_assert();
 			ret = GNUTLS_E_UNEXPECTED_PACKET; 
@@ -1093,7 +1103,6 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
 
 /**
   * gnutls_write - sends to the peer the specified data
-  * @cd: is a connection descriptor
   * @state: is a &GNUTLS_STATE structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
@@ -1110,13 +1119,12 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * Returns the number of bytes sent, or a negative error code.
   *
   **/
-ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata) {
-	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
+ssize_t gnutls_write( GNUTLS_STATE state, const void *data, size_t sizeofdata) {
+	return gnutls_send_int( state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
 /**
   * gnutls_read - reads data from the TLS connection
-  * @cd: is a connection descriptor
   * @state: is a &GNUTLS_STATE structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
@@ -1131,8 +1139,8 @@ ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t siz
   * handshake. (only a client may receive this message)
   *
   **/
-ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
-	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
+ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata) {
+	return gnutls_recv_int( state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
 /**

@@ -21,11 +21,11 @@
 int gnutls_insert_to_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int length);
 int gnutls_get_data_buffer_size(ContentType type, GNUTLS_STATE state);
 int gnutls_get_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int length);
-ssize_t _gnutls_read_buffered(int fd, GNUTLS_STATE, opaque **iptr, size_t n, ContentType);
+ssize_t _gnutls_read_buffered( GNUTLS_STATE, opaque **iptr, size_t n, ContentType);
 void _gnutls_clear_read_buffer( GNUTLS_STATE);
-int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state);
+int _gnutls_clear_peeked_data( GNUTLS_STATE state);
 
-ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE, const void *iptr, size_t n );
+ssize_t _gnutls_write_buffered( GNUTLS_STATE, const void *iptr, size_t n );
 
 /* used in SSL3 */
 int gnutls_get_handshake_buffer( GNUTLS_STATE state, char *data, int length);
@@ -34,7 +34,7 @@ int gnutls_read_handshake_buffer( GNUTLS_STATE state, char *data, int length);
 int gnutls_insert_to_handshake_buffer( GNUTLS_STATE state, char *data, int length);
 int gnutls_clear_handshake_buffer( GNUTLS_STATE state);
 
-ssize_t _gnutls_handshake_recv_int(SOCKET fd, GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
-ssize_t _gnutls_handshake_send_int(SOCKET fd, GNUTLS_STATE, ContentType, HandshakeType, const void *, size_t);
-ssize_t _gnutls_write_flush(SOCKET fd, GNUTLS_STATE state);
-ssize_t _gnutls_handshake_write_flush(SOCKET fd, GNUTLS_STATE state);
+ssize_t _gnutls_handshake_recv_int( GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
+ssize_t _gnutls_handshake_send_int( GNUTLS_STATE, ContentType, HandshakeType, const void *, size_t);
+ssize_t _gnutls_write_flush( GNUTLS_STATE state);
+ssize_t _gnutls_handshake_write_flush( GNUTLS_STATE state);

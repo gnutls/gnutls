@@ -83,9 +83,10 @@ int main()
    gnutls_set_cred(state, GNUTLS_X509PKI, xcred);
 
 
+   gnutls_set_transport_ptr( state, sd);
    /* Perform the TLS handshake
     */
-   ret = gnutls_handshake(sd, state);
+   ret = gnutls_handshake( state);
 
    if (ret < 0) {
       fprintf(stderr, "*** Handshake failed\n");
@@ -95,9 +96,9 @@ int main()
       printf("- Handshake was completed\n");
    }
 
-   gnutls_write(sd, state, MSG, strlen(MSG));
+   gnutls_write( state, MSG, strlen(MSG));
 
-   ret = gnutls_read(sd, state, buffer, MAX_BUF);
+   ret = gnutls_read( state, buffer, MAX_BUF);
    if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
       if (ret == 0) {
          printf("- Peer has closed the GNUTLS connection\n");
@@ -121,7 +122,7 @@ int main()
       }
       fputs("\n", stdout);
    }
-   gnutls_bye(sd, state, GNUTLS_SHUT_RDWR);
+   gnutls_bye( state, GNUTLS_SHUT_RDWR);
 
  end:
 

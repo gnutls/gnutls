@@ -18,21 +18,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state, int again);
-int _gnutls_send_server_kx_message2(int cd, GNUTLS_STATE state, int again);
-int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state, int again);
-int _gnutls_send_client_kx_message0(int cd, GNUTLS_STATE state, int again);
-int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state);
-int _gnutls_recv_server_kx_message2(int cd, GNUTLS_STATE state);
-int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state);
-int _gnutls_recv_client_kx_message0(int cd, GNUTLS_STATE state);
-int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state, int again);
-int _gnutls_send_server_certificate(int cd, GNUTLS_STATE state, int again);
+int _gnutls_send_server_kx_message( GNUTLS_STATE state, int again);
+int _gnutls_send_server_kx_message2( GNUTLS_STATE state, int again);
+int _gnutls_send_client_kx_message( GNUTLS_STATE state, int again);
+int _gnutls_send_client_kx_message0( GNUTLS_STATE state, int again);
+int _gnutls_recv_server_kx_message( GNUTLS_STATE state);
+int _gnutls_recv_server_kx_message2( GNUTLS_STATE state);
+int _gnutls_recv_client_kx_message( GNUTLS_STATE state);
+int _gnutls_recv_client_kx_message0( GNUTLS_STATE state);
+int _gnutls_send_client_certificate_verify( GNUTLS_STATE state, int again);
+int _gnutls_send_server_certificate( GNUTLS_STATE state, int again);
 int _gnutls_generate_master( GNUTLS_STATE state);
-int _gnutls_recv_client_certificate(SOCKET cd, GNUTLS_STATE state);
-int _gnutls_recv_server_certificate(SOCKET cd, GNUTLS_STATE state);
-int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state, int again);
-int _gnutls_recv_server_certificate_request(SOCKET cd, GNUTLS_STATE state);
-int _gnutls_send_server_certificate_request(SOCKET cd, GNUTLS_STATE state, int again);
-int _gnutls_recv_client_certificate_verify_message(SOCKET cd, GNUTLS_STATE state);
+int _gnutls_recv_client_certificate( GNUTLS_STATE state);
+int _gnutls_recv_server_certificate( GNUTLS_STATE state);
+int _gnutls_send_client_certificate( GNUTLS_STATE state, int again);
+int _gnutls_recv_server_certificate_request( GNUTLS_STATE state);
+int _gnutls_send_server_certificate_request( GNUTLS_STATE state, int again);
+int _gnutls_recv_client_certificate_verify_message( GNUTLS_STATE state);
 

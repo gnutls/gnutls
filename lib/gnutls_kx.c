@@ -89,7 +89,7 @@ char random[2*TLS_RANDOM_SIZE];
  * server. It does nothing if this type of message is not required
  * by the selected ciphersuite. 
  */
-int _gnutls_send_server_kx_message(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_server_kx_message( GNUTLS_STATE state, int again)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
@@ -110,7 +110,7 @@ int _gnutls_send_server_kx_message(SOCKET cd, GNUTLS_STATE state, int again)
 		}
 	}
 	
-	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_SERVER_KEY_EXCHANGE);
+	ret = _gnutls_send_handshake( state, data, data_size, GNUTLS_SERVER_KEY_EXCHANGE);
 	gnutls_free(data);
 
 	if (ret < 0) {
@@ -123,7 +123,7 @@ int _gnutls_send_server_kx_message(SOCKET cd, GNUTLS_STATE state, int again)
 /* This function sends a certificate request message to the
  * client.
  */
-int _gnutls_send_server_certificate_request(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_server_certificate_request( GNUTLS_STATE state, int again)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
@@ -146,7 +146,7 @@ int _gnutls_send_server_certificate_request(SOCKET cd, GNUTLS_STATE state, int a
 			return data_size;
 		}
 	}
-	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE_REQUEST);
+	ret = _gnutls_send_handshake( state, data, data_size, GNUTLS_CERTIFICATE_REQUEST);
 	gnutls_free(data);
 
 	if (ret < 0) {
@@ -157,7 +157,7 @@ int _gnutls_send_server_certificate_request(SOCKET cd, GNUTLS_STATE state, int a
 }
 
 /* Currently only used in SRP */
-int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_server_kx_message2( GNUTLS_STATE state, int again)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
@@ -178,7 +178,7 @@ int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state, int again)
 		}
 	}
 
-	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_SERVER_KEY_EXCHANGE);
+	ret = _gnutls_send_handshake( state, data, data_size, GNUTLS_SERVER_KEY_EXCHANGE);
 		
 	gnutls_free(data);
 	if (ret<0) {
@@ -192,7 +192,7 @@ int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state, int again)
 /* This is the function for the client to send the key
  * exchange message 
  */
-int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_client_kx_message( GNUTLS_STATE state, int again)
 {
 	uint8 *data;
 	int data_size;
@@ -212,7 +212,7 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state, int again)
 			return data_size;
 		}
 	}
-    	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CLIENT_KEY_EXCHANGE);
+    	ret = _gnutls_send_handshake( state, data, data_size, GNUTLS_CLIENT_KEY_EXCHANGE);
 	gnutls_free(data);
 
 	if (ret<0) {
@@ -225,7 +225,7 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state, int again)
 
 /* Only used in SRP currently
  */
-int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_client_kx_message0( GNUTLS_STATE state, int again)
 {
 	uint8 *data;
 	int data_size;
@@ -246,7 +246,7 @@ int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state, int again)
 			return data_size;
 		}
 	}
-	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CLIENT_KEY_EXCHANGE);
+	ret = _gnutls_send_handshake( state, data, data_size, GNUTLS_CLIENT_KEY_EXCHANGE);
 	gnutls_free(data);
 
 	return ret;
@@ -256,7 +256,7 @@ int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state, int again)
 /* This is the function for the client to send the certificate
  * verify message
  */
-int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_client_certificate_verify( GNUTLS_STATE state, int again)
 {
 	uint8 *data;
 	int ret = 0;
@@ -292,7 +292,7 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state, int ag
 
 	}
 	ret =
-	    _gnutls_send_handshake(cd, state, data,
+	    _gnutls_send_handshake( state, data,
 				   data_size,
 				   GNUTLS_CERTIFICATE_VERIFY);
 	gnutls_free(data);
@@ -301,7 +301,7 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state, int ag
 }
 
 
-int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_server_kx_message( GNUTLS_STATE state)
 {
 	uint8 *data;
 	int datasize;
@@ -310,7 +310,7 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx!=NULL) {
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 				   &datasize,
 				   GNUTLS_SERVER_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
@@ -326,7 +326,7 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_recv_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_server_certificate_request( GNUTLS_STATE state)
 {
 	uint8 *data;
 	int datasize;
@@ -335,7 +335,7 @@ int _gnutls_recv_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_certificate_request!=NULL) {
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 				   &datasize,
 				   GNUTLS_CERTIFICATE_REQUEST, OPTIONAL_PACKET);
 		if (ret < 0)
@@ -353,7 +353,7 @@ int _gnutls_recv_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_server_kx_message2( GNUTLS_STATE state)
 {
 	uint8 *data;
 	int datasize;
@@ -363,7 +363,7 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx2 != NULL) {
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 				   &datasize,
 				   GNUTLS_SERVER_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
@@ -379,7 +379,7 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_client_kx_message( GNUTLS_STATE state)
 {
 	uint8 *data;
 	int datasize;
@@ -390,7 +390,7 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx != NULL) {
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 					   &datasize,
 					   GNUTLS_CLIENT_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
@@ -407,7 +407,7 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 }
 
 /* only used in SRP */
-int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_client_kx_message0( GNUTLS_STATE state)
 {
 	uint8 *data;
 	int datasize;
@@ -417,7 +417,7 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx0 != NULL) {
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 					   &datasize,
 					   GNUTLS_CLIENT_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
@@ -434,7 +434,7 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 
 /* This is called when we want send our certificate
  */
-int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_client_certificate( GNUTLS_STATE state, int again)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
@@ -458,7 +458,7 @@ int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state, int again)
 			return data_size;
 		}
 	}
-	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE);
+	ret = _gnutls_send_handshake( state, data, data_size, GNUTLS_CERTIFICATE);
 	gnutls_free(data);
 	
 	if (ret<0) {
@@ -472,7 +472,7 @@ int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state, int again)
 
 /* This is called when we want send our certificate
  */
-int _gnutls_send_server_certificate(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_server_certificate( GNUTLS_STATE state, int again)
 {
 	uint8 *data = NULL;
 	int data_size = 0;
@@ -493,7 +493,7 @@ int _gnutls_send_server_certificate(SOCKET cd, GNUTLS_STATE state, int again)
 			return data_size;
 		}
 	}
-	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE);
+	ret = _gnutls_send_handshake( state, data, data_size, GNUTLS_CERTIFICATE);
 	gnutls_free(data);
 	
 	if (ret < 0) {
@@ -505,7 +505,7 @@ int _gnutls_send_server_certificate(SOCKET cd, GNUTLS_STATE state, int again)
 }
 
 
-int _gnutls_recv_client_certificate(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_client_certificate( GNUTLS_STATE state)
 {
 	int datasize;
 	opaque * data;
@@ -526,7 +526,7 @@ int _gnutls_recv_client_certificate(SOCKET cd, GNUTLS_STATE state)
 			optional = OPTIONAL_PACKET;
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 					   &datasize,
 					   GNUTLS_CERTIFICATE, optional);
 		if (ret < 0) {
@@ -542,7 +542,10 @@ int _gnutls_recv_client_certificate(SOCKET cd, GNUTLS_STATE state)
 			}
 			/* certificate was required */
 			if (optional==MANDATORY_PACKET) {
-				gnutls_send_alert( cd, state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+#ifdef DEBUG
+# warning FIX THIS ALERT
+				gnutls_send_alert(  state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+#endif
 				gnutls_assert();
 			}
 			return ret;
@@ -576,7 +579,7 @@ int _gnutls_recv_client_certificate(SOCKET cd, GNUTLS_STATE state)
 	return ret;
 }
 
-int _gnutls_recv_server_certificate(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_server_certificate( GNUTLS_STATE state)
 {
 	int datasize;
 	opaque * data;
@@ -585,7 +588,7 @@ int _gnutls_recv_server_certificate(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_certificate!=NULL) {
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 					   &datasize,
 					   GNUTLS_CERTIFICATE, MANDATORY_PACKET);
 		if (ret < 0) {
@@ -608,7 +611,7 @@ int _gnutls_recv_server_certificate(SOCKET cd, GNUTLS_STATE state)
 /* Recv the client certificate verify. This packet may not
  * arrive if the peer did not send us a certificate.
  */
-int _gnutls_recv_client_certificate_verify_message(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_client_certificate_verify_message( GNUTLS_STATE state)
 {
 	uint8 *data;
 	int datasize;
@@ -623,7 +626,7 @@ int _gnutls_recv_client_certificate_verify_message(SOCKET cd, GNUTLS_STATE state
 		}
 
 		ret =
-		    _gnutls_recv_handshake(cd, state, &data,
+		    _gnutls_recv_handshake( state, &data,
 					   &datasize,
 					   GNUTLS_CERTIFICATE_VERIFY, OPTIONAL_PACKET);
 		if (ret < 0)
@@ -631,7 +634,10 @@ int _gnutls_recv_client_certificate_verify_message(SOCKET cd, GNUTLS_STATE state
 
 		if (ret==0 && datasize == 0 && state->gnutls_internals.send_cert_req == GNUTLS_CERT_REQUIRE) {
 			/* certificate was required */
-			gnutls_send_alert( cd, state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+#ifdef DEBUG
+# warning FIX THIS ALERT
+			gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+#endif
 			gnutls_assert();
 			return GNUTLS_E_NO_CERTIFICATE_FOUND;
 		} 

@@ -181,7 +181,7 @@ int gnutls_get_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int
  *
  * Flags are only used if the default recv() function is being used.
  */
-static ssize_t _gnutls_read( SOCKET fd, GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, int flags)
+static ssize_t _gnutls_read( GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, int flags)
 {
 	size_t left;
 	ssize_t i=0;
@@ -189,7 +189,7 @@ static ssize_t _gnutls_read( SOCKET fd, GNUTLS_STATE state, void *iptr, size_t s
 #ifdef READ_DEBUG
 	int j,x, sum=0;
 #endif
-
+	SOCKET fd = state->gnutls_internals.transport_ptr;
 
 	left = sizeOfPtr;
 	while (left > 0) {
@@ -252,7 +252,7 @@ static ssize_t _gnutls_read( SOCKET fd, GNUTLS_STATE state, void *iptr, size_t s
 
 #define RCVLOWAT state->gnutls_internals.lowat 
 
-int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state) {
+int _gnutls_clear_peeked_data( GNUTLS_STATE state) {
 char peekdata1[10];
 char *peekdata2;
 char * peek;
@@ -277,7 +277,7 @@ int ret, sum;
         /* this was already read by using MSG_PEEK - so it shouldn't fail */
 	sum = 0;
         do { /* we need this to finish now */
-        	ret = _gnutls_read( cd, state, peek, RCVLOWAT-sum, 0);
+        	ret = _gnutls_read( state, peek, RCVLOWAT-sum, 0);
         	if (ret > 0) sum+=ret;
        	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN || sum < RCVLOWAT);
 
@@ -310,7 +310,7 @@ void _gnutls_clear_read_buffer( GNUTLS_STATE state) {
  * This is not a general purpose function. It returns EXACTLY the data requested.
  *
  */
-ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)
+ssize_t _gnutls_read_buffered( GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)
 {
 	ssize_t ret=0, ret2=0;
 	int min, buf_pos;
@@ -369,7 +369,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	/* READ DATA - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
 	if ( recvdata - recvlowat > 0) {
-		ret = _gnutls_read( fd, state, &buf[buf_pos], recvdata - recvlowat, 0);
+		ret = _gnutls_read( state, &buf[buf_pos], recvdata - recvlowat, 0);
 
 		/* return immediately if we got an interrupt or eagain
 		 * error.
@@ -396,7 +396,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 * select think, that the socket is ready for reading
 	 */
 	if (ret == (recvdata - recvlowat) && recvlowat > 0) {
-		ret2 = _gnutls_read( fd, state, &buf[buf_pos], recvlowat, MSG_PEEK);
+		ret2 = _gnutls_read( state, &buf[buf_pos], recvlowat, MSG_PEEK);
 
 		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) {
 			return ret2;
@@ -508,7 +508,7 @@ static int _gnutls_buffer_get( gnutls_datum * buffer, const opaque ** ptr, size_
  * to decrypt and verify the integrity. 
  *
  */
-ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, size_t n)
+ssize_t _gnutls_write_buffered( GNUTLS_STATE state, const void *iptr, size_t n)
 {
 	size_t left;
 #ifdef WRITE_DEBUG
@@ -517,6 +517,7 @@ ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, 
 	ssize_t retval, i;
 	const opaque * ptr;
 	int ret;
+	SOCKET fd = state->gnutls_internals.transport_ptr;
 	
 	ptr = iptr;
 	
@@ -611,14 +612,14 @@ ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, 
  * TLS write buffer (ie. because the previous write was
  * interrupted.
  */
-ssize_t _gnutls_write_flush(SOCKET fd, GNUTLS_STATE state)
+ssize_t _gnutls_write_flush( GNUTLS_STATE state)
 {
     ssize_t ret;
 
     if (state->gnutls_internals.send_buffer.size == 0)
         return 0; /* done */
 
-    ret = _gnutls_write_buffered(fd, state, NULL, 0);
+    ret = _gnutls_write_buffered( state, NULL, 0);
 #ifdef WRITE_DEBUG 
     _gnutls_log("WRITE FLUSH: %d [buffer: %d]\n", ret, state->gnutls_internals.send_buffer.size);
 #endif
@@ -630,10 +631,10 @@ ssize_t _gnutls_write_flush(SOCKET fd, GNUTLS_STATE state)
  * Handshake write buffer (ie. because the previous write was
  * interrupted.
  */
-ssize_t _gnutls_handshake_write_flush(SOCKET fd, GNUTLS_STATE state)
+ssize_t _gnutls_handshake_write_flush( GNUTLS_STATE state)
 {
     ssize_t ret;
-    ret = _gnutls_handshake_send_int(fd, state, 0, 0, NULL, 0);
+    ret = _gnutls_handshake_send_int( state, 0, 0, NULL, 0);
     if (ret < 0) {
 	gnutls_assert();
     	return ret;
@@ -657,7 +658,7 @@ ssize_t _gnutls_handshake_write_flush(SOCKET fd, GNUTLS_STATE state)
 /* This is a send function for the gnutls handshake 
  * protocol. Just makes sure that all data have been sent.
  */
-ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *iptr, size_t n)
+ssize_t _gnutls_handshake_send_int( GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *iptr, size_t n)
 {
 	size_t left;
 	ssize_t i = 0, ret=0;
@@ -716,7 +717,7 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 
 	left = n;
 	while (left > 0) {
-		ret = gnutls_send_int(fd, state, type, htype, &ptr[n-left], left);
+		ret = gnutls_send_int( state, type, htype, &ptr[n-left], left);
 
 		if (ret <= 0) {
 			if (ret==0) {
@@ -762,7 +763,7 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 /* This is a receive function for the gnutls handshake 
  * protocol. Makes sure that we have received all data.
  */
-ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
+ssize_t _gnutls_handshake_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
 {
 	size_t left;
 	ssize_t i;
@@ -806,7 +807,7 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 	
 	while (left > 0) {
 		dsize = sizeOfPtr - left;
-		i = gnutls_recv_int(fd, state, type, htype, &ptr[dsize], left);
+		i = gnutls_recv_int( state, type, htype, &ptr[dsize], left);
 		if (i < 0) {
 			
 			if (dsize > 0 && (i==GNUTLS_E_INTERRUPTED || i==GNUTLS_E_AGAIN)) {

@@ -455,7 +455,11 @@ typedef struct {
 	 */
 	PULL_FUNC _gnutls_pull_func;
 	PUSH_FUNC _gnutls_push_func;
-
+	/* Holds the first argument of PUSH and PULL
+	 * functions;
+	 */
+	int transport_ptr;
+	
 	/* STORE & RETRIEVE functions. Only used if other
 	 * backend than gdbm is used.
 	 */
@@ -484,8 +488,7 @@ typedef struct GNUTLS_STATE_INT *GNUTLS_STATE;
 
 
 /* functions */
-int gnutls_send_alert( SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
-int gnutls_close(SOCKET cd, GNUTLS_STATE state);
+int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);

@@ -400,7 +400,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
  * and initializing encryption. This is the first encrypted message
  * we send.
  */
-int _gnutls_send_finished(SOCKET cd, GNUTLS_STATE state, int again)
+int _gnutls_send_finished( GNUTLS_STATE state, int again)
 {
 	uint8 *data=NULL;
 	int ret;
@@ -421,7 +421,7 @@ int _gnutls_send_finished(SOCKET cd, GNUTLS_STATE state, int again)
 		}
 	}
 	ret =
-	    _gnutls_send_handshake(cd, state, data, data_size,
+	    _gnutls_send_handshake( state, data, data_size,
 				   GNUTLS_FINISHED);
 	gnutls_free(data);
 
@@ -431,7 +431,7 @@ int _gnutls_send_finished(SOCKET cd, GNUTLS_STATE state, int again)
 /* This is to be called after sending our finished message. If everything
  * went fine we have negotiated a secure connection 
  */
-int _gnutls_recv_finished(SOCKET cd, GNUTLS_STATE state)
+int _gnutls_recv_finished( GNUTLS_STATE state)
 {
 	uint8 *data, *vrfy;
 	int data_size;
@@ -441,7 +441,7 @@ int _gnutls_recv_finished(SOCKET cd, GNUTLS_STATE state)
 	ret = 0;
 
 	ret =
-	    _gnutls_recv_handshake(cd, state, &vrfy, &vrfysize,
+	    _gnutls_recv_handshake( state, &vrfy, &vrfysize,
 				   GNUTLS_FINISHED, MANDATORY_PACKET);
 	if (ret < 0) {
 		ERR("recv finished int", ret);
@@ -576,14 +576,14 @@ int _gnutls_server_SelectCompMethod(GNUTLS_STATE state,
  * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
  * (until it returns ok), with NULL parameters.
  */
-int _gnutls_send_empty_handshake(SOCKET cd, GNUTLS_STATE state, HandshakeType type, int again) {
+int _gnutls_send_empty_handshake( GNUTLS_STATE state, HandshakeType type, int again) {
 opaque data=0;
 opaque * ptr;
 
 	if (again==0) ptr = &data;
 	else ptr = NULL;
 
-	return _gnutls_send_handshake( cd, state, ptr, 0, type);
+	return _gnutls_send_handshake( state, ptr, 0, type);
 }
 
 /* This function sends a handshake message of type 'type' containing the
@@ -591,7 +591,7 @@ opaque * ptr;
  * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
  * (until it returns ok), with NULL parameters.
  */
-int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
+int _gnutls_send_handshake( GNUTLS_STATE state, void *i_data,
 			   uint32 i_datasize, HandshakeType type)
 {
 	int ret;
@@ -603,7 +603,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 		/* we are resuming a previously interrupted
 		 * send.
 		 */
-		ret = _gnutls_handshake_write_flush( cd, state);
+		ret = _gnutls_handshake_write_flush( state);
 		return ret;
 
 	}
@@ -647,7 +647,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 	}
 
 	ret =
-	    _gnutls_handshake_send_int(cd, state, GNUTLS_HANDSHAKE, type,
+	    _gnutls_handshake_send_int( state, GNUTLS_HANDSHAKE, type,
 				       data, datasize);
 
 	gnutls_free(data);
@@ -660,7 +660,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
  * returns UNEXPECTED_HANDSHAKE_PACKET.
  */
 #define SSL2_HEADERS 1
-static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
+static int _gnutls_recv_handshake_header( GNUTLS_STATE state,
 					 HandshakeType type,
 					 HandshakeType * recv_type)
 {
@@ -691,7 +691,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 	 */
 	if (state->gnutls_internals.handshake_header_buffer.header_size < SSL2_HEADERS) {
 		ret =
-		    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE, type,
+		    _gnutls_handshake_recv_int( state, GNUTLS_HANDSHAKE, type,
 				       dataptr, SSL2_HEADERS);
 
 		if (ret < 0) {
@@ -708,7 +708,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 
 	if (state->gnutls_internals.v2_hello == 0 || type != GNUTLS_CLIENT_HELLO) {
 		ret =
-		    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE,
+		    _gnutls_handshake_recv_int( state, GNUTLS_HANDSHAKE,
 					       type,
 					       &dataptr[state->gnutls_internals.handshake_header_buffer.header_size],
 					       HANDSHAKE_HEADER_SIZE -
@@ -787,7 +787,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
  * send to _gnutls_recv_hello().
  */
 
-int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
+int _gnutls_recv_handshake( GNUTLS_STATE state, uint8 ** data,
 			   int *datalen, HandshakeType type,
 			   Optional optional)
 {
@@ -796,7 +796,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	opaque *dataptr;
 	HandshakeType recv_type;
 
-	ret = _gnutls_recv_handshake_header(cd, state, type, &recv_type);
+	ret = _gnutls_recv_handshake_header( state, type, &recv_type);
 	if (ret < 0) {
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET
 		    && optional == OPTIONAL_PACKET) {
@@ -828,7 +828,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 
 	if (length32 > 0) {
 		ret =
-		    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE,
+		    _gnutls_handshake_recv_int( state, GNUTLS_HANDSHAKE,
 					       type, dataptr, length32);
 		if (ret <= 0) {
 			gnutls_assert();
@@ -864,7 +864,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	switch (recv_type) {
 	case GNUTLS_CLIENT_HELLO:
 	case GNUTLS_SERVER_HELLO:
-		ret = _gnutls_recv_hello(cd, state, dataptr, length32);
+		ret = _gnutls_recv_hello( state, dataptr, length32);
 		gnutls_free(dataptr);
 		break;
 	case GNUTLS_CERTIFICATE:
@@ -1066,7 +1066,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 
 /* This function sends the client hello handshake message.
  */
-static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
+static int _gnutls_send_client_hello( GNUTLS_STATE state, int again)
 {
 	char *data = NULL;
 	opaque *extdata;
@@ -1206,14 +1206,14 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
 	}
 	
 	ret =
-	    _gnutls_send_handshake(cd, state, data, datalen,
+	    _gnutls_send_handshake( state, data, datalen,
 				   GNUTLS_CLIENT_HELLO);
 	gnutls_free(data);
 
 	return ret;
 }
 
-static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state, int again)
+static int _gnutls_send_server_hello( GNUTLS_STATE state, int again)
 {
 	opaque *data;
 	opaque *extdata;
@@ -1298,7 +1298,7 @@ static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state, int again)
 	}
 	
 	ret =
-	    _gnutls_send_handshake(cd, state, data, datalen,
+	    _gnutls_send_handshake( state, data, datalen,
 				   GNUTLS_SERVER_HELLO);
 	gnutls_free(data);
 
@@ -1306,14 +1306,14 @@ static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state, int again)
 	return ret;
 }
 
-int _gnutls_send_hello(SOCKET cd, GNUTLS_STATE state, int again) {
+int _gnutls_send_hello( GNUTLS_STATE state, int again) {
 int ret;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = _gnutls_send_client_hello(cd, state, again);
+		ret = _gnutls_send_client_hello( state, again);
 
 	} else {		/* SERVER */
-		ret = _gnutls_send_server_hello(cd, state, again);
+		ret = _gnutls_send_server_hello( state, again);
 	}
 
 	return ret;
@@ -1323,7 +1323,7 @@ int ret;
  * hello message is expected. It uses the security_parameters.current_cipher_suite
  * and gnutls_internals.compression_method.
  */
-int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
+int _gnutls_recv_hello( GNUTLS_STATE state, char *data,
 		       int datalen)
 {
 	int ret;
@@ -1373,7 +1373,6 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 
 /**
   * gnutls_rehandshake - This function will renegotiate security parameters
-  * @cd: is a connection descriptor, as returned by socket().
   * @state: is a a &GNUTLS_STATE structure.
   *
   * This function will renegotiate security parameters with the
@@ -1391,7 +1390,7 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
   * GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
   * GNUTLS_NO_RENEGOTIATION.
   **/
-int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
+int gnutls_rehandshake( GNUTLS_STATE state)
 {
 	int ret;
 
@@ -1399,7 +1398,7 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
-	ret = _gnutls_send_empty_handshake(cd, state, GNUTLS_HELLO_REQUEST, AGAIN(STATE50));
+	ret = _gnutls_send_empty_handshake( state, GNUTLS_HELLO_REQUEST, AGAIN(STATE50));
 	STATE = STATE50;
 	
 	if (ret < 0) {
@@ -1413,7 +1412,6 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
 
 /**
   * gnutls_handshake - This the main function in the handshake protocol.
-  * @cd: is a connection descriptor, as returned by socket().
   * @state: is a a &GNUTLS_STATE structure.
   *
   * This function does the handshake of the TLS/SSL protocol,
@@ -1427,19 +1425,19 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
   * (call this function again, until it returns ok)
   *
   **/
-int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
+int gnutls_handshake( GNUTLS_STATE state)
 {
 	int ret;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = gnutls_handshake_client(cd, state);
+		ret = gnutls_handshake_client( state);
 	} else {
-		ret = gnutls_handshake_server(cd, state);
+		ret = gnutls_handshake_server( state);
 	}
 	if (ret < 0)
 		return ret;
 
-	ret = gnutls_handshake_common(cd, state);
+	ret = gnutls_handshake_common( state);
 
 	if (ret < 0)
 		return ret;
@@ -1466,7 +1464,7 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
  * gnutls_handshake_client 
  * This function performs the client side of the handshake of the TLS/SSL protocol.
  */
-int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
+int gnutls_handshake_client( GNUTLS_STATE state)
 {
 	int ret = 0;
 
@@ -1485,14 +1483,14 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 	switch( STATE) {
 	case STATE0:
 	case STATE1:
-		ret = _gnutls_send_hello(cd, state, AGAIN(STATE1));
+		ret = _gnutls_send_hello( state, AGAIN(STATE1));
 		STATE = STATE1;
 		IMED_RET("send hello", ret);
 
 	case STATE2:
 		/* receive the server hello */
 		ret =
-		    _gnutls_recv_handshake(cd, state, NULL, NULL,
+		    _gnutls_recv_handshake( state, NULL, NULL,
 					   GNUTLS_SERVER_HELLO, MANDATORY_PACKET);
 		STATE = STATE2;
 		IMED_RET("recv hello", ret);
@@ -1500,14 +1498,14 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 	case STATE3:
 		/* RECV CERTIFICATE */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_server_certificate(cd, state);
+			ret = _gnutls_recv_server_certificate( state);
 		STATE = STATE3;
 		IMED_RET("recv server certificate", ret);
 
 	case STATE4:
 		/* receive the server key exchange */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_server_kx_message(cd, state);
+			ret = _gnutls_recv_server_kx_message( state);
 		STATE = STATE4;
 		IMED_RET("recv server kx message", ret);
 
@@ -1516,7 +1514,7 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 		 * send the client key exchange for SRP 
 		 */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_send_client_kx_message0(cd, state, AGAIN(STATE5));
+			ret = _gnutls_send_client_kx_message0( state, AGAIN(STATE5));
 		STATE = STATE5;
 		IMED_RET("send client kx0", ret);
 
@@ -1525,7 +1523,7 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 		 */
 
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_server_certificate_request(cd, state);
+			ret = _gnutls_recv_server_certificate_request( state);
 		STATE = STATE6;
 		IMED_RET("recv server certificate request message", ret);
 
@@ -1534,7 +1532,7 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 		 */
 
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_server_kx_message2(cd, state);
+			ret = _gnutls_recv_server_kx_message2( state);
 		STATE = STATE7;
 		IMED_RET("recv server kx message2", ret);
 
@@ -1542,7 +1540,7 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 		/* receive the server hello done */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
-			    _gnutls_recv_handshake(cd, state, NULL, NULL,
+			    _gnutls_recv_handshake( state, NULL, NULL,
 					   GNUTLS_SERVER_HELLO_DONE,
 					   MANDATORY_PACKET);
 		STATE = STATE8;
@@ -1552,20 +1550,20 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 		/* send our certificate - if any and if requested
 		 */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_send_client_certificate(cd, state, AGAIN(STATE9));
+			ret = _gnutls_send_client_certificate( state, AGAIN(STATE9));
 		STATE = STATE9;
 		IMED_RET("send client certificate", ret);
 
 	case STATE10:
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_send_client_kx_message(cd, state, AGAIN(STATE10));
+			ret = _gnutls_send_client_kx_message( state, AGAIN(STATE10));
 		STATE = STATE10;
 		IMED_RET("send client kx", ret);
 
 	case STATE11:
 		/* send client certificate verify */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_send_client_certificate_verify(cd, state, AGAIN(STATE11));
+			ret = _gnutls_send_client_certificate_verify( state, AGAIN(STATE11));
 		STATE = STATE11;
 		IMED_RET("send client certificate verify", ret);
 
@@ -1578,7 +1576,7 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 
 /* This function sends the final handshake packets and initializes connection 
  */
-static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
+static int _gnutls_send_handshake_final( GNUTLS_STATE state,
 					int init)
 {
 	int ret = 0;
@@ -1588,7 +1586,7 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	switch( STATE) {
 	case STATE0:
 	case STATE20:
-		ret = _gnutls_send_change_cipher_spec(cd, state, AGAIN(STATE20));
+		ret = _gnutls_send_change_cipher_spec( state, AGAIN(STATE20));
 		STATE = STATE20;
 		if (ret < 0) {
 			ERR("send ChangeCipherSpec", ret);
@@ -1614,7 +1612,7 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 
 	case STATE21:
 		/* send the finished message */
-		ret = _gnutls_send_finished(cd, state, AGAIN(STATE21));
+		ret = _gnutls_send_finished( state, AGAIN(STATE21));
 		STATE = STATE21;
 		if (ret < 0) {
 			ERR("send Finished", ret);
@@ -1632,7 +1630,7 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
  * And executes the appropriate function to initialize the
  * read state.
  */
-static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
+static int _gnutls_recv_handshake_final( GNUTLS_STATE state,
 					int init)
 {
 	int ret = 0;
@@ -1642,7 +1640,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	case STATE0:
 	case STATE30:
 		ret =
-		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
+		    gnutls_recv_int( state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
 				    &ch, 1);
 		STATE = STATE30;
 		if (ret <= 0) {
@@ -1667,7 +1665,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 		}
 	
 	case STATE31:
-		ret = _gnutls_recv_finished(cd, state);
+		ret = _gnutls_recv_finished( state);
 		STATE = STATE31;
 		if (ret < 0) {
 			ERR("recv finished", ret);
@@ -1686,7 +1684,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
   * This function does the server stuff of the handshake protocol.
   */
   
-int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
+int gnutls_handshake_server( GNUTLS_STATE state)
 {
 	int ret = 0;
 
@@ -1694,13 +1692,13 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 	case STATE0:
 	case STATE1:
 		ret =
-		    _gnutls_recv_handshake(cd, state, NULL, NULL,
+		    _gnutls_recv_handshake( state, NULL, NULL,
 				   GNUTLS_CLIENT_HELLO, MANDATORY_PACKET);
 		STATE = STATE1;
 		IMED_RET("recv hello", ret);
 	
 	case STATE2:
-		ret = _gnutls_send_hello(cd, state, AGAIN(STATE2));
+		ret = _gnutls_send_hello( state, AGAIN(STATE2));
 		STATE = STATE2;
 		IMED_RET("send hello", ret);
 
@@ -1709,21 +1707,21 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 		/* NOTE: these should not be send if we are resuming */
 
 		if (state->gnutls_internals.resumed == RESUME_FALSE)
-			ret = _gnutls_send_server_certificate(cd, state, AGAIN(STATE3));
+			ret = _gnutls_send_server_certificate( state, AGAIN(STATE3));
 		STATE = STATE3;
 		IMED_RET("send server certificate", ret);
 
 	case STATE4:
 		/* send server key exchange (A) */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)
-			ret = _gnutls_send_server_kx_message(cd, state, AGAIN(STATE4));
+			ret = _gnutls_send_server_kx_message( state, AGAIN(STATE4));
 		STATE = STATE4;
 		IMED_RET("send server kx", ret);
 
 	case STATE5:
 		/* Send certificate request - if requested to */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)
-			ret = _gnutls_send_server_certificate_request(cd, state, AGAIN(STATE5));
+			ret = _gnutls_send_server_certificate_request( state, AGAIN(STATE5));
 		STATE = STATE5;
 		IMED_RET("send server cert request", ret);
 
@@ -1732,14 +1730,14 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 		/* receive the client key exchange message */
 
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_client_kx_message0(cd, state);
+			ret = _gnutls_recv_client_kx_message0( state);
 		STATE = STATE6;
 		IMED_RET("recv client kx0", ret);
 
 	case STATE7:
 		/* send server key exchange (B) */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)
-			ret = _gnutls_send_server_kx_message2(cd, state, AGAIN(STATE7));
+			ret = _gnutls_send_server_kx_message2( state, AGAIN(STATE7));
 		STATE = STATE7;
 		IMED_RET("send server kx2", ret);
 
@@ -1747,7 +1745,7 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 		/* send the server hello done */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
-			    _gnutls_send_empty_handshake(cd, state, GNUTLS_SERVER_HELLO_DONE, AGAIN(STATE8));
+			    _gnutls_send_empty_handshake( state, GNUTLS_SERVER_HELLO_DONE, AGAIN(STATE8));
 		STATE = STATE8;
 		IMED_RET("send server hello done", ret);
 
@@ -1756,14 +1754,14 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 	case STATE9:
 		/* receive the client certificate message */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_client_certificate(cd, state);
+			ret = _gnutls_recv_client_certificate( state);
 		STATE = STATE9;
 		IMED_RET("recv client certificate", ret);
 
 	case STATE10:
 		/* receive the client key exchange message */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-			ret = _gnutls_recv_client_kx_message(cd, state);
+			ret = _gnutls_recv_client_kx_message( state);
 		STATE = STATE10;
 		IMED_RET("recv client kx", ret);
 
@@ -1771,7 +1769,7 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 		/* receive the client certificate verify message */
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret =
-			    _gnutls_recv_client_certificate_verify_message(cd,
+			    _gnutls_recv_client_certificate_verify_message(
 								   state);
 		STATE = STATE11;
 		IMED_RET("recv client certificate verify", ret);
@@ -1782,7 +1780,7 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 	return 0;
 }
 
-int gnutls_handshake_common(SOCKET cd, GNUTLS_STATE state)
+int gnutls_handshake_common( GNUTLS_STATE state)
 {
 	int ret = 0;
 
@@ -1794,17 +1792,17 @@ int gnutls_handshake_common(SOCKET cd, GNUTLS_STATE state)
 		&& state->security_parameters.entity == GNUTLS_SERVER)) {
 		/* if we are a client resuming - or we are a server not resuming */
 
-		ret = _gnutls_recv_handshake_final(cd, state, TRUE);
+		ret = _gnutls_recv_handshake_final( state, TRUE);
 		IMED_RET("recv handshake final", ret);
 
-		ret = _gnutls_send_handshake_final(cd, state, FALSE);
+		ret = _gnutls_send_handshake_final( state, FALSE);
 		IMED_RET( "send handshake final", ret);
 	} else {		/* if we are a client not resuming - or we are a server resuming */
 
-		ret = _gnutls_send_handshake_final(cd, state, TRUE);
+		ret = _gnutls_send_handshake_final( state, TRUE);
 		IMED_RET("send handshake final 2", ret);
 
-		ret = _gnutls_recv_handshake_final(cd, state, FALSE);
+		ret = _gnutls_recv_handshake_final( state, FALSE);
 		IMED_RET("recv handshake final 2", ret);
 	}
 
@@ -1836,7 +1834,7 @@ int _gnutls_generate_session_id(char *session_id, uint8 * len)
 	return 0;
 }
 
-int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
+int _gnutls_recv_hello_request( GNUTLS_STATE state, void *data,
 			       uint32 data_size)
 {
 	uint8 type;

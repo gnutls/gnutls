@@ -47,7 +47,7 @@
   * This function should only be used if you do
   * not plan to use the included gdbm backend.
   *
-  * The first argument to store_func() will be null unless gnutls_db_set_db_ptr() 
+  * The first argument to store_func() will be null unless gnutls_set_db_ptr() 
   * has been called.
   *
   **/
@@ -65,7 +65,7 @@ void gnutls_set_db_retrieve_function( GNUTLS_STATE state, DB_RETR_FUNC retr_func
   * This function should only be used if you do
   * not plan to use the included gdbm backend.
   *
-  * The first argument to rem_func() will be null unless gnutls_db_set_db_ptr() 
+  * The first argument to rem_func() will be null unless gnutls_set_db_ptr() 
   * has been called.
   *
   **/
@@ -83,7 +83,7 @@ void gnutls_set_db_remove_function( GNUTLS_STATE state, DB_REMOVE_FUNC rem_func)
   * This function should only be used if you do
   * not plan to use the included gdbm backend.
   *
-  * The first argument to store_func() will be null unless gnutls_db_set_ptr() 
+  * The first argument to store_func() will be null unless gnutls_set_db_ptr() 
   * has been called.
   *
   **/
