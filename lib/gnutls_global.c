@@ -79,7 +79,7 @@ extern void* (*gnutls_calloc)(size_t, size_t);
 int _gnutls_is_secure_mem_null( const void*);
 
 /**
-  * gnutls_global_set_mem_function - This function sets the memory allocation functions
+  * gnutls_global_set_mem_functions - This function sets the memory allocation functions
   * @alloc_func: it's the default memory allocation function. Like malloc().
   * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
   * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
@@ -95,7 +95,7 @@ int _gnutls_is_secure_mem_null( const void*);
   * This function must be called before gnutls_global_init() is called.
   *
   **/
-void gnutls_global_set_mem_function( 
+void gnutls_global_set_mem_functions( 
 	void *(*gnutls_alloc_func)(size_t), void* (*gnutls_secure_alloc_func)(size_t),
 	int (*gnutls_is_secure_func)(const void*), void *(*gnutls_realloc_func)(void *, size_t),
 	void (*gnutls_free_func)(void*))
