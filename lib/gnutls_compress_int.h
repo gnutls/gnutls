@@ -1,0 +1,2 @@
+int gnutls_decompress( CompressionMethod algorithm, char* compressed, int compressed_size, char** plain);
+int gnutls_compress( CompressionMethod algorithm, char* plain, int plain_size, char** compressed);
