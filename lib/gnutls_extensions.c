@@ -68,24 +68,13 @@ void* _gnutls_ext_func_send(int type)
 
 }
 
-void _gnutls_tolow(char *str, int size);
-char *_gnutls_extension_get_name(int type)
+const char *_gnutls_extension_get_name(int type)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
-	GNUTLS_EXTENSION_LOOP(ret = gnutls_strdup(p->name + sizeof("EXTENSION_") - 1));
+	GNUTLS_EXTENSION_LOOP(ret = p->name + sizeof("EXTENSION_") - 1);
 
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = '-';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
 	return ret;
 }
 

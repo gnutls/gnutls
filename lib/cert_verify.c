@@ -28,51 +28,66 @@
 
 /* TIME functions */
 
-static time_t utcTime2gtime(char *ttime)
+time_t _gnutls_utcTime2gtime(char *ttime)
 {
 	char xx[3];
-	struct tm ctime;
+	struct tm etime;
+	time_t ret;
 
 	xx[2] = 0;
 
 /* get the year
  */
-	memcpy(xx, ttime += 2, 2);	/* year */
-	ctime.tm_year = atoi(xx);
+	memcpy(xx, ttime, 2);	/* year */
+	etime.tm_year = atoi(xx);
+	ttime+=2;
 
-	if (ctime.tm_year > 49)
-		ctime.tm_year += 1900;
+	if (etime.tm_year > 49)
+		etime.tm_year += 1900;
 	else
-		ctime.tm_year += 2000;
+		etime.tm_year += 2000;
+
+	etime.tm_year-=1900; /* well we need to find something
+	                      * better than mktime();
+	                      */
 
 /* get the month
  */
-	memcpy(xx, ttime += 2, 2);	/* month */
-	ctime.tm_mon = atoi(xx);
-
+	memcpy(xx, ttime, 2);	/* month */
+	etime.tm_mon = atoi(xx) - 1;
+	ttime+=2;
+	
 /* get the day
  */
-	memcpy(xx, ttime += 2, 2);	/* day */
-	ctime.tm_mday = atoi(xx);
-
+	memcpy(xx, ttime, 2);	/* day */
+	etime.tm_mday = atoi(xx);
+	ttime+=2;
+	
 /* get the hour
  */
-	memcpy(xx, ttime += 2, 2);	/* hour */
-	ctime.tm_hour = atoi(xx);
-
+	memcpy(xx, ttime, 2);	/* hour */
+	etime.tm_hour = atoi(xx);
+	ttime+=2;
+	
 /* get the minutes
  */
-	memcpy(xx, ttime += 2, 2);	/* minutes */
-	ctime.tm_min = atoi(xx);
+	memcpy(xx, ttime, 2);	/* minutes */
+	etime.tm_min = atoi(xx);
+	ttime+=2;
+	
+	etime.tm_isdst = -1;
+	etime.tm_sec = 0;
+	
+	ret = mktime(&etime);
 
-	return mktime(&ctime);
-
+	return ret;
 }
 
-static time_t generalTime2gtime(char *ttime)
+time_t _gnutls_generalTime2gtime(char *ttime)
 {
 	char xx[5];
-	struct tm ctime;
+	struct tm etime;
+	time_t ret;
 
 	if (strchr(ttime, 'Z') == 0) {
 		gnutls_assert();
@@ -84,89 +99,55 @@ static time_t generalTime2gtime(char *ttime)
 
 /* get the year
  */
-	memcpy(xx, ttime += 2, 4);	/* year */
-	ctime.tm_year = atoi(xx);
+	memcpy(xx, ttime, 4);	/* year */
+	etime.tm_year = atoi(xx);
+	ttime+=2;
+
+	etime.tm_year-=1900;
 
 	xx[2] = 0;
 
 /* get the month
  */
-	memcpy(xx, ttime += 2, 2);	/* month */
-	ctime.tm_mon = atoi(xx);
-
+	memcpy(xx, ttime, 2);	/* month */
+	etime.tm_mon = atoi(xx) - 1;
+	ttime+=2;
+	
 /* get the day
  */
-	memcpy(xx, ttime += 2, 2);	/* day */
-	ctime.tm_mday = atoi(xx);
-
+	memcpy(xx, ttime, 2);	/* day */
+	etime.tm_mday = atoi(xx);
+	ttime+=2;
+	
 /* get the hour
  */
-	memcpy(xx, ttime += 2, 2);	/* hour */
-	ctime.tm_hour = atoi(xx);
-
+	memcpy(xx, ttime, 2);	/* hour */
+	etime.tm_hour = atoi(xx);
+	ttime+=2;
+	
 /* get the minutes
  */
-	memcpy(xx, ttime += 2, 2);	/* minutes */
-	ctime.tm_min = atoi(xx);
+	memcpy(xx, ttime, 2);	/* minutes */
+	etime.tm_min = atoi(xx);
+	ttime+=2;
+	
+	ret = mktime(&etime);
 
-	return mktime(&ctime);
+	etime.tm_isdst = -1;
+	etime.tm_sec = 0;
+
+	return ret;
 }
 
 static int check_if_expired(gnutls_cert * cert)
 {
 	CertificateStatus ret = GNUTLS_CERT_EXPIRED;
-	opaque ttime[256];
-	int len, result;
-	time_t ctime;
-	node_asn *c2;
 
 	/* get the issuer of 'cert'
 	 */
-	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {
-		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
-	}
 
-	result = asn1_get_der(c2, cert->raw.data, cert->raw.size);
-	if (result != ASN_OK) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	len = sizeof(ttime) - 1;
-	if ((result =
-	     asn1_read_value(c2, "certificate2.tbsCertificate.validity.notAfter", ttime, &len)) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	/* CHOICE */
-	if (strcmp(ttime, "GeneralizedTime") == 0) {
-		len = sizeof(ttime) - 1;
-		result =
-		    asn1_read_value(c2, "certificate2.tbsCertificate.validity.notAfter.generalTime", ttime, &len);
-		if (result == ASN_OK)
-			ctime = generalTime2gtime(ttime);
-	} else {		/* UTCTIME */
-		len = sizeof(ttime) - 1;
-		result =
-		    asn1_read_value(c2, "certificate2.tbsCertificate.validity.notAfter.UTCTime", ttime, &len);
-		if (result == ASN_OK)
-			ctime = utcTime2gtime(ttime);
-	}
-
-	if (result != ASN_OK || ctime == (time_t) - 1) {
-		gnutls_assert();
-		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-	if (time(NULL) < ctime)
+	if (time(NULL) < cert->expiration_time)
 		ret = GNUTLS_CERT_TRUSTED;
-
-	asn1_delete_structure(c2);
 
 	return ret;
 }
@@ -262,7 +243,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 /* CRL is ignored for now */
 
 	gnutls_cert *issuer;
-	CertificateStatus ret;
+	CertificateStatus ret = GNUTLS_CERT_NOT_TRUSTED;
 
 	if (tcas_size > 1)
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
@@ -273,8 +254,8 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 		return GNUTLS_CERT_NOT_TRUSTED;
 
 //      ret = verify_signature(cert, issuer);
-	//      if (ret != GNUTLS_CERT_TRUSTED)
-	//              return ret;
+        if (ret != GNUTLS_CERT_TRUSTED)
+              return ret;
 
 	/* Check CRL --not done yet.
 	 */
@@ -293,8 +274,12 @@ int gnutls_verify_certificate(gnutls_cert * certificate_list,
 {
 	int i = 0;
 	int expired = 0;
-	CertificateStatus ret;
+	CertificateStatus ret=GNUTLS_CERT_NOT_TRUSTED;
 
+	if (tcas_size == 0) {
+		return ret;
+	}
+	
 	for (i = 0; i < clist_size; i++) {
 		if (i + 1 > clist_size)
 			break;

@@ -400,16 +400,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 
 /* Generic Functions */
 
-/* this function makes the whole string lowercase */
-void _gnutls_tolow(char *str, int size)
-{
-	int i;
-
-	for (i = 0; i < size; i++) {
-		str[i] = tolower(str[i]);
-	}
-}
-
 /* HASHES */
 int _gnutls_mac_get_digest_size(MACAlgorithm algorithm)
 {
@@ -440,25 +430,14 @@ inline int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
   * Returns an allocated (with malloc) string that contains the name 
   * of the specified MAC algorithm.
   **/
-char *gnutls_mac_get_name(MACAlgorithm algorithm)
+const char *gnutls_mac_get_name(MACAlgorithm algorithm)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
 	GNUTLS_HASH_ALG_LOOP(ret =
-			     gnutls_strdup(p->name + sizeof("GNUTLS_") - 1));
+			     p->name + sizeof("GNUTLS_") - 1);
 
-
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = '-';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
 	return ret;
 }
 
@@ -508,26 +487,15 @@ inline
   * Returns a localy allocated (with malloc) pointer to a string that contains the name 
   * of the specified compression algorithm.
   **/
-char *gnutls_compression_get_name(CompressionMethod algorithm)
+const char *gnutls_compression_get_name(CompressionMethod algorithm)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
 	GNUTLS_COMPRESSION_ALG_LOOP(ret =
-				    gnutls_strdup(p->name + sizeof("GNUTLS_") -
-					   1));
+				    p->name + sizeof("GNUTLS_") -
+					   1);
 
-
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = '-';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
 	return ret;
 }
 
@@ -638,24 +606,13 @@ int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm)
   * Returns a localy allocated (with malloc) pointer to a string that contains the name 
   * of the specified cipher.
   **/
-char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
+const char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
-	GNUTLS_ALG_LOOP(ret = gnutls_strdup(p->name + sizeof("GNUTLS_") - 1));
+	GNUTLS_ALG_LOOP(ret = p->name + sizeof("GNUTLS_") - 1);
 
-
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = '-';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
 	return ret;
 }
 
@@ -711,24 +668,13 @@ inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
   * Returns a localy allocated (with malloc) pointer to a string that contains the name 
   * of the specified key exchange algorithm.
   **/
-char *gnutls_kx_get_name(KXAlgorithm algorithm)
+const char *gnutls_kx_get_name(KXAlgorithm algorithm)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
-	GNUTLS_KX_ALG_LOOP(ret = gnutls_strdup(p->name + sizeof("KX_") - 1));
+	GNUTLS_KX_ALG_LOOP(ret = p->name + sizeof("KX_") - 1);
 
-
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = '-';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
 	return ret;
 }
 
@@ -761,13 +707,13 @@ int _gnutls_kx_is_ok(KXAlgorithm algorithm)
   * Returns an allocated (with malloc) string that contains the name 
   * of the specified TLS version.
   **/
-char *gnutls_version_get_name(GNUTLS_Version version)
+const char *gnutls_version_get_name(GNUTLS_Version version)
 {
 	char *ret = NULL;
 
 	/* avoid prefix */
 	GNUTLS_VERSION_ALG_LOOP(ret =
-			     gnutls_strdup(p->name));
+			     p->name);
 	return ret;
 }
 
@@ -860,26 +806,15 @@ _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite suite)
 
 }
 
-char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
+const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret =
-				     gnutls_strdup(p->name + sizeof("GNUTLS_") -
-					    1));
+				     p->name + sizeof("GNUTLS_") -
+					    1);
 
-
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = '-';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
 	return ret;
 }
 

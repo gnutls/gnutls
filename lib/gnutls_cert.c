@@ -29,6 +29,7 @@
 #include <gnutls_gcry.h>
 #include <gnutls_privkey.h>
 #include <gnutls_global.h>
+#include <cert_verify.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -233,7 +234,6 @@ gnutls_datum tmp;
 	} while( (ptr=strstr( ptr, CERT_SEP))!=NULL);
 
 	res->ncas = i-1;
-	
 	return 0;
 }
 
@@ -277,14 +277,14 @@ FILE* fd2;
 /**
   * gnutls_allocate_x509_sc - Used to allocate an x509 SERVER CREDENTIALS structure
   * @res: is a pointer to an &X509PKI_CREDENTIALS structure.
-  * @vsites: this is the number of certificate/private key pair you're going to use.
+  * @ncerts: this is the number of certificate/private key pair you're going to use.
   * This should be 1 in common sites.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS ** res, int vsites)
+int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS ** res, int ncerts)
 {
 	*res = gnutls_calloc( 1, sizeof( X509PKI_CREDENTIALS));
 
@@ -292,23 +292,23 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS ** res, int vsites)
 
 	(*res)->ncerts=0; /* this is right - set_key() increments it */
 
-	if (vsites > 0) {
+	if (ncerts > 0) {
 		(*res)->cert_list =
-		    (gnutls_cert **) gnutls_malloc( vsites * sizeof(gnutls_cert *));
+		    (gnutls_cert **) gnutls_malloc( ncerts * sizeof(gnutls_cert *));
 
 		if ( (*res)->cert_list == NULL) {
 			gnutls_free(*res);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		(*res)->cert_list_length = (int *) gnutls_malloc( vsites * sizeof(int *));
+		(*res)->cert_list_length = (int *) gnutls_malloc( ncerts * sizeof(int *));
 		if ( (*res)->cert_list_length == NULL) {
 			gnutls_free( *res);
 			gnutls_free( (*res)->cert_list);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		(*res)->pkey = gnutls_malloc( vsites * sizeof(gnutls_private_key));
+		(*res)->pkey = gnutls_malloc( ncerts * sizeof(gnutls_private_key));
 		if ( (*res)->pkey == NULL) {
 			gnutls_free( *res);
 			gnutls_free( (*res)->cert_list);
@@ -561,6 +561,49 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 }
 
+#define MAX_TIME 1024
+static time_t _gnutls_get_time( node_asn* c2, char* root) {
+opaque ttime[MAX_TIME];
+char name[1024];
+time_t ctime;
+int len, result;
+
+	strcpy(name, root);
+	strcat(name, ".tbsCertificate.validity.notAfter");
+	len = sizeof(ttime) - 1;
+	if ((result =
+	     asn1_read_value(c2, name, ttime, &len)) < 0) {
+		gnutls_assert();
+		return (time_t) (-1);
+	}
+
+	/* CHOICE */
+	strcpy(name, root);
+
+	if (strcmp(ttime, "GeneralizedTime") == 0) {
+
+		strcat(name, ".tbsCertificate.validity.notAfter.generalTime");
+		len = sizeof(ttime) - 1;
+		result =
+		    asn1_read_value(c2, name, ttime, &len);
+		if (result == ASN_OK)
+			ctime = _gnutls_generalTime2gtime(ttime);
+	} else {		/* UTCTIME */
+
+		strcat(name, ".tbsCertificate.validity.notAfter.utcTime");
+		len = sizeof(ttime) - 1;
+		result =
+		    asn1_read_value(c2, name, ttime, &len);
+		if (result == ASN_OK)
+			ctime = _gnutls_utcTime2gtime(ttime);
+	}
+
+	if (result!=ASN_OK) {
+		gnutls_assert();
+		return (time_t) (-1);
+	}
+	return ctime;
+}
 
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 {
@@ -644,6 +687,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		asn1_delete_structure(c2);
 		return result;
 	}
+
+	gCert->expiration_time = _gnutls_get_time( c2, "certificate2");
 
 	asn1_delete_structure(c2);
 

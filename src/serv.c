@@ -107,7 +107,7 @@ void print_info(GNUTLS_STATE state)
 {
 	const SRP_SERVER_AUTH_INFO *srp_info;
 	const ANON_SERVER_AUTH_INFO *dh_info;
-	char *tmp;
+	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
 	
@@ -124,13 +124,13 @@ void print_info(GNUTLS_STATE state)
 	}
 	
 	/* print srp specific data */
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
+	if (gnutls_get_auth_info_type(state) == GNUTLS_SRP) {
 		srp_info = gnutls_get_auth_info(state);
 		if (srp_info != NULL)
 			printf("\n- User '%s' connected\n",
 			       srp_info->username);
 	}
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+	if (gnutls_get_auth_info_type(state) == GNUTLS_ANON) {
 		dh_info = gnutls_get_auth_info(state);
 		if (dh_info != NULL)
 			printf("\n- Anonymous DH using prime of %d bits\n",
@@ -141,22 +141,20 @@ void print_info(GNUTLS_STATE state)
 
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
 	printf("- Version: %s\n", tmp);
-	free(tmp);
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
 	printf("- Key Exchange: %s\n", tmp);
-	free(tmp);
+
 	tmp =
 	    gnutls_compression_get_name
 	    (gnutls_get_current_compression_method(state));
 	printf("- Compression: %s\n", tmp);
-	free(tmp);
+
 	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
 	printf("- Cipher: %s\n", tmp);
-	free(tmp);
+
 	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
 	printf("- MAC: %s\n", tmp);
-	free(tmp);
 
 
 }
@@ -168,7 +166,7 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 {
 	const SRP_SERVER_AUTH_INFO *srp_info;
 	const ANON_SERVER_AUTH_INFO *dh_info;
-	char *tmp;
+	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
 	
@@ -209,25 +207,20 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
 	sprintf(tmp2, "Protocol version: <b>%s</b><br>\n", tmp);
-	free(tmp);
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
 	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
-	free(tmp);
 
 	tmp =
 	    gnutls_compression_get_name
 	    (gnutls_get_current_compression_method(state));
 	sprintf(tmp2, "Compression: <b>%s</b><br>\n", tmp);
-	free(tmp);
 	
 	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
 	sprintf(tmp2, "Cipher: <b>%s</b><br>\n", tmp);
-	free(tmp);
 	
 	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
 	sprintf(tmp2, "MAC: <b>%s</b><br>\n", tmp);
-	free(tmp);
 
 	strcat( http_buffer, "</P>\n");
 
@@ -278,7 +271,7 @@ int main(int argc, char **argv)
 	struct sockaddr_in sa_serv;
 	struct sockaddr_in sa_cli;
 	int client_len;
-	char topbuf[512], *tmp;
+	char topbuf[512];
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF + 1];
 	int optval = 1;
@@ -349,10 +342,8 @@ int main(int argc, char **argv)
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(state);
-			tmp = gnutls_strerror(ret);
 			fprintf(stderr, "*** Handshake has failed (%s)\n\n",
-				tmp);
-			free(tmp);
+				gnutls_strerror(ret));
 			continue;
 		}
 		printf("- Handshake was completed\n");

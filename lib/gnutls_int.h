@@ -218,6 +218,10 @@ typedef struct {
  * Holds all the required parameters to resume the current 
  * state.
  */
+
+/* if you add anything in Security_Parameters struct, then
+ * also modify CPY_COMMON in gnutls_constate.c
+ */
 typedef struct {
 	ConnectionEnd entity;
 	KXAlgorithm kx_algorithm;
@@ -245,6 +249,10 @@ typedef struct {
 	uint8 			session_id_size;
 	time_t 			timestamp;
 	TLSExtensions		extensions;
+	CredType		cred_type; /* depends on KXalgorithm
+	                                    * but makes life easier to have
+	                                    * it here;
+	                                    */
 } SecurityParameters;
 
 /* This structure holds the generated keys

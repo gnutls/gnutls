@@ -20,7 +20,6 @@
 
 #include "gnutls_errors.h"
 
-void _gnutls_tolow(char *str, int size);
 
 #define GNUTLS_ERROR_ENTRY(name, fatal) \
 	{ #name, name, fatal }
@@ -118,22 +117,11 @@ int gnutls_is_fatal_error(int error)
 void gnutls_perror(int error)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret =
 			      gnutls_strdup(p->name + sizeof("GNUTLS_E_") - 1));
 
-
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = ' ';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
 	fprintf(stderr, "GNUTLS ERROR: %s\n", ret);
 	
 	free( ret);
@@ -148,25 +136,13 @@ void gnutls_perror(int error)
   * function. gnutls_strerror() returns a malloc'ed value thus 
   * it should be free'd.
   **/
-char* gnutls_strerror(int error)
+const char* gnutls_strerror(int error)
 {
 	char *ret = NULL;
-	char *pointerTo_;
 
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret =
-			      gnutls_strdup(p->name + sizeof("GNUTLS_E_") - 1));
+			      p->name + sizeof("GNUTLS_E_") - 1);
 
-
-	if (ret != NULL) {
-		_gnutls_tolow(ret, strlen(ret));
-		pointerTo_ = strchr(ret, '_');
-
-		while (pointerTo_ != NULL) {
-			*pointerTo_ = ' ';
-			pointerTo_ = strchr(ret, '_');
-		}
-	}
-	
 	return ret;
 }

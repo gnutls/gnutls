@@ -40,21 +40,29 @@
 #define CAFILE "ca.pem"
 #define CRLFILE NULL
 
+#define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
+#define PRINT_DN(X) PRINTX( "CN:", x509_info->X.common_name); \
+	PRINTX( "OU:", x509_info->X.organizational_unit_name); \
+	PRINTX( "O:", x509_info->X.organization); \
+	PRINTX( "L:", x509_info->X.locality_name); \
+	PRINTX( "S:", x509_info->X.state_or_province_name); \
+	PRINTX( "C:", x509_info->X.country);
+
 static int print_info( GNUTLS_STATE state) {
-char *tmp;
+const char *tmp;
 const ANON_CLIENT_AUTH_INFO *dh_info;
 const X509PKI_CLIENT_AUTH_INFO *x509_info;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
-	printf("- Key Exchange: %s\n", tmp); free(tmp);
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+	printf("- Key Exchange: %s\n", tmp);
+	if (gnutls_get_auth_info_type(state) == GNUTLS_ANON) {
 		dh_info = gnutls_get_auth_info(state);
 		if (dh_info != NULL)
 			printf("- Anonymous DH using prime of %d bits\n",
 			       dh_info->dh_bits);
 	}
 
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_RSA) {
+	if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
 		x509_info = gnutls_get_auth_info(state);
 		if (x509_info != NULL) {
 			switch( x509_info->peer_certificate_status) {
@@ -77,33 +85,23 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 	}
 
 	printf(" - Certificate info:\n");
-	printf(" -   CN: %s\n", x509_info->peer_dn.common_name);
-	printf(" -   OU: %s\n", x509_info->peer_dn.organizational_unit_name);
-	printf(" -   O: %s\n", x509_info->peer_dn.organization);
-	printf(" -   L: %s\n", x509_info->peer_dn.locality_name);
-	printf(" -   S: %s\n", x509_info->peer_dn.state_or_province_name);
-	printf(" -   C: %s\n", x509_info->peer_dn.country);
+	PRINT_DN(peer_dn);
 
 	printf(" - Certificate Issuer's info:\n");
-	printf(" -   CN: %s\n", x509_info->issuer_dn.common_name);
-	printf(" -   OU: %s\n", x509_info->issuer_dn.organizational_unit_name);
-	printf(" -   O: %s\n", x509_info->issuer_dn.organization);
-	printf(" -   L: %s\n", x509_info->issuer_dn.locality_name);
-	printf(" -   S: %s\n", x509_info->issuer_dn.state_or_province_name);
-	printf(" -   C: %s\n", x509_info->issuer_dn.country);
+	PRINT_DN(issuer_dn);
+
 
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
 	printf("- Version: %s\n", tmp);
-	free(tmp);
 
 	tmp = gnutls_compression_get_name(gnutls_get_current_compression_method( state));
-	printf("- Compression: %s\n", tmp); free(tmp);
+	printf("- Compression: %s\n", tmp);
 
 	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher( state));
-	printf("- Cipher: %s\n", tmp); free(tmp);
+	printf("- Cipher: %s\n", tmp);
 
 	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
-	printf("- MAC: %s\n", tmp); free(tmp);
+	printf("- MAC: %s\n", tmp);
 
 	return 0;
 }
@@ -174,9 +172,9 @@ int main(int argc, char** argv)
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 
-	gnutls_set_cred( state, GNUTLS_SRP, &cred);
+	gnutls_set_cred( state, GNUTLS_SRP, cred);
 
-	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);
+	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
 	gnutls_ext_set_dnsname( state, "hello.server.org");
 	
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
@@ -227,8 +225,8 @@ int main(int argc, char** argv)
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
-	gnutls_set_cred( state, GNUTLS_SRP, &cred);
-	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);
+	gnutls_set_cred( state, GNUTLS_SRP, cred);
+	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
 
 	gnutls_ext_set_dnsname( state, "hello.server.org");
 

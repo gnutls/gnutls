@@ -20,7 +20,7 @@
 
 void* _gnutls_ext_func_send(int type);
 void* _gnutls_ext_func_recv(int type);
-char *_gnutls_extension_get_name(int type);
+const char *_gnutls_extension_get_name(int type);
 int _gnutls_parse_extensions( GNUTLS_STATE, const opaque*, int);
 int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data);
 

@@ -81,16 +81,16 @@ MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state);
 CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state);
 
 /* the name of the specified algorithms */
-char *gnutls_cipher_get_name( BulkCipherAlgorithm);
-char *gnutls_mac_get_name( MACAlgorithm);
-char *gnutls_compression_get_name( CompressionMethod);
-char *gnutls_kx_get_name( KXAlgorithm algorithm);
+const char *gnutls_cipher_get_name( BulkCipherAlgorithm);
+const char *gnutls_mac_get_name( MACAlgorithm);
+const char *gnutls_compression_get_name( CompressionMethod);
+const char *gnutls_kx_get_name( KXAlgorithm algorithm);
 
 
 /* error functions */
 int gnutls_is_fatal_error( int error);
 void gnutls_perror( int error);
-char* gnutls_strerror( int error);
+const char* gnutls_strerror( int error);
 
 ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags);
 ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags);
@@ -107,7 +107,7 @@ void gnutls_set_kx_priority( GNUTLS_STATE state, LIST);
 /* set our version - 0 for TLS 1.0 and 1 for SSL3 */
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
-char *gnutls_version_get_name(GNUTLS_Version version);
+const char *gnutls_version_get_name(GNUTLS_Version version);
 
 
 /* get/set session */
@@ -128,6 +128,8 @@ const char* gnutls_check_version();
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
 int gnutls_set_cred( GNUTLS_STATE, CredType type, void* cred);
+
+CredType gnutls_get_auth_info_type( GNUTLS_STATE);
 const void* gnutls_get_auth_info( GNUTLS_STATE);
 
 /* A null terminated string containing the dnsname.
@@ -136,6 +138,7 @@ const void* gnutls_get_auth_info( GNUTLS_STATE);
  */
 const char* gnutls_ext_get_dnsname( GNUTLS_STATE);
 int gnutls_ext_set_dnsname( GNUTLS_STATE, const char* dnsname);
+
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 
@@ -199,7 +202,7 @@ typedef struct {
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
 void gnutls_free_x509_sc( X509PKI_CREDENTIALS sc);
-int gnutls_allocate_x509_sc( X509PKI_CREDENTIALS *sc, int vsites);
+int gnutls_allocate_x509_sc( X509PKI_CREDENTIALS *sc, int ncerts);
 int gnutls_set_x509_key( X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
 int gnutls_set_x509_trust( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
 

@@ -144,6 +144,7 @@ int _gnutls_set_write_keys(GNUTLS_STATE state)
 
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
+	dst->cred_type = src->cred_type; \
 	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(GNUTLS_CipherSuite)); \
 	memcpy( dst->master_secret, src->master_secret, TLS_MASTER_SIZE); \
 	memcpy( dst->client_random, src->client_random, TLS_RANDOM_SIZE); \
@@ -549,6 +550,7 @@ int _gnutls_set_write_compression(GNUTLS_STATE state, CompressionMethod algo)
 }
 
 /* Sets the specified kx algorithm into pending state 
+ * (also set's cred_type)
  */
 int _gnutls_set_kx(GNUTLS_STATE state, KXAlgorithm algo)
 {
@@ -565,6 +567,7 @@ int _gnutls_set_kx(GNUTLS_STATE state, KXAlgorithm algo)
 		return GNUTLS_E_UNWANTED_ALGORITHM;
 	}
 
+	state->security_parameters.cred_type = _gnutls_map_kx_get_cred( algo);
 
 	return 0;
 

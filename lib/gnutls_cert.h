@@ -23,6 +23,8 @@ typedef struct {
 	gnutls_DN  cert_info;
 	gnutls_DN  issuer_info;
 
+	time_t	   expiration_time;
+
 	gnutls_datum raw; /* the raw certificate */
 } gnutls_cert;
 

@@ -118,6 +118,22 @@ int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
 	return 0;
 }
 
+/**
+  * gnutls_get_auth_info_type - Returns the type of credentials for the current authentication schema.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns type of credentials for the current authentication schema.
+  * The returned information can be used to distinguish the appropriate structures
+  * for the gnutls_get_auth_info() function.
+  * Eg. if this function returns GNUTLS_X509PKI then the return type
+  *  of gnutls_get_auth_info() will be X509PKI_(SERVER/CLIENT)_AUTH_INFO
+  * (depends on the side - client/server)
+  **/
+
+CredType gnutls_get_auth_info_type( GNUTLS_STATE state) {
+	return state->security_parameters.cred_type;
+}
+
 /* 
  * This returns an pointer to the linked list. Don't
  * free that!!!
