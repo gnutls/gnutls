@@ -233,7 +233,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 }
 
 /**
-  * gnutls_pkcs7_get_certificate - This function returns a certificate in a PKCS7 certificate set
+  * gnutls_pkcs7_get_crt_raw - This function returns a certificate in a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @indx: contains the index of the certificate to extract
   * @certificate: the contents of the certificate will be copied there (may be null)
@@ -247,7 +247,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
   * will be returned.
   *
   **/
-int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, 
+int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7 pkcs7, 
 	int indx, unsigned char* certificate, size_t* certificate_size)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -330,7 +330,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 }
 
 /**
-  * gnutls_pkcs7_get_certificate_count - This function returns the number of certificates in a PKCS7 certificate set
+  * gnutls_pkcs7_get_crt_count - This function returns the number of certificates in a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   *
   * This function will return the number of certifcates in the PKCS7 or 
@@ -339,7 +339,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
   * Returns a negative value on failure.
   *
   **/
-int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
+int gnutls_pkcs7_get_crt_count(gnutls_pkcs7 pkcs7)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, count;
@@ -470,7 +470,7 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 }
 
 /**
-  * gnutls_pkcs7_set_certificate - This function adds a certificate in a PKCS7 certificate set
+  * gnutls_pkcs7_set_crt_raw - This function adds a certificate in a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @crt: the DER encoded certificate to be added
   *
@@ -478,7 +478,7 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, 
+int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7 pkcs7, 
 	const gnutls_datum* crt)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -551,17 +551,17 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 }
 
 /**
-  * gnutls_pkcs7_set_certificate2 - This function adds a parsed certificate in a PKCS7 certificate set
+  * gnutls_pkcs7_set_crt - This function adds a parsed certificate in a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @crt: the certificate to be copied.
   *
   * This function will add a parsed certificate to the PKCS7 or RFC2630 certificate set.
-  * This is a wrapper function over gnutls_pkcs7_set_certificate() .
+  * This is a wrapper function over gnutls_pkcs7_set_crt_raw() .
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7, 
+int gnutls_pkcs7_set_crt(gnutls_pkcs7 pkcs7, 
 	gnutls_x509_crt crt)
 {
 	int ret;
@@ -576,7 +576,7 @@ int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7,
 		return ret;
 	}
 	
-	ret = gnutls_pkcs7_set_certificate( pkcs7, &data);
+	ret = gnutls_pkcs7_set_crt_raw( pkcs7, &data);
 
 	_gnutls_free_datum( &data);
 
@@ -590,7 +590,7 @@ int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7,
 
 
 /**
-  * gnutls_pkcs7_delete_certificate - This function deletes a certificate from a PKCS7 certificate set
+  * gnutls_pkcs7_delete_crt - This function deletes a certificate from a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @indx: the index of the certificate to delete
   *
@@ -598,7 +598,7 @@ int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7,
   * Index starts from 0. Returns 0 on success.
   *
   **/
-int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
+int gnutls_pkcs7_delete_crt(gnutls_pkcs7 pkcs7, int indx)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
@@ -651,7 +651,7 @@ int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
  */
 
 /**
-  * gnutls_pkcs7_get_crl - This function returns a crl in a PKCS7 crl set
+  * gnutls_pkcs7_get_crl_raw - This function returns a crl in a PKCS7 crl set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @indx: contains the index of the crl to extract
   * @crl: the contents of the crl will be copied there (may be null)
@@ -665,7 +665,7 @@ int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
   * will be returned.
   *
   **/
-int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
+int gnutls_pkcs7_get_crl_raw(gnutls_pkcs7 pkcs7, 
 	int indx, unsigned char* crl, size_t* crl_size)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -768,7 +768,7 @@ int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7)
 }
 
 /**
-  * gnutls_pkcs7_set_crl - This function adds a crl in a PKCS7 crl set
+  * gnutls_pkcs7_set_crl_raw - This function adds a crl in a PKCS7 crl set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @crl: the DER encoded crl to be added
   *
@@ -776,7 +776,7 @@ int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7)
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, 
+int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7 pkcs7, 
 	const gnutls_datum* crl)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -842,7 +842,7 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7,
 }
 
 /**
-  * gnutls_pkcs7_set_crl2 - This function adds a parsed crl in a PKCS7 crl set
+  * gnutls_pkcs7_set_crl - This function adds a parsed crl in a PKCS7 crl set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
   * @crl: the DER encoded crl to be added
   *
@@ -850,8 +850,7 @@ int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7,
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs7_set_crl2(gnutls_pkcs7 pkcs7, 
-	gnutls_x509_crl crl)
+int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, gnutls_x509_crl crl)
 {
 	int ret;
 	gnutls_datum data;
@@ -865,7 +864,7 @@ int gnutls_pkcs7_set_crl2(gnutls_pkcs7 pkcs7,
 		return ret;
 	}
 
-	ret = gnutls_pkcs7_set_crl( pkcs7, &data);
+	ret = gnutls_pkcs7_set_crl_raw( pkcs7, &data);
 	
 	_gnutls_free_datum( &data);
 	

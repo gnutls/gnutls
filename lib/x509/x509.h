@@ -84,10 +84,10 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert, gnutls_x509_crl * crl
 int _gnutls_x509_crl_cpy(gnutls_x509_crl dest, gnutls_x509_crl src);
 int _gnutls_x509_crl_get_raw_issuer_dn( gnutls_x509_crl crl,
 	gnutls_datum* dn);
-int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
-int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
-				    unsigned char *serial,
-				    size_t *serial_size, time_t * time);
+int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl);
+int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index,
+	    unsigned char *serial,
+	    size_t *serial_size, time_t * time);
 
 void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
 int gnutls_x509_crl_init(gnutls_x509_crl * crl);

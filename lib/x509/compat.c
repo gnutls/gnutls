@@ -743,7 +743,7 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 		return result;
 	}
 	
-	result = gnutls_pkcs7_get_certificate( pkcs7, indx, certificate, certificate_size);
+	result = gnutls_pkcs7_get_crt_raw( pkcs7, indx, certificate, certificate_size);
 	
 	gnutls_pkcs7_deinit( pkcs7);
 	
@@ -775,7 +775,7 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 		return result;
 	}
 	
-	result = gnutls_pkcs7_get_certificate_count( pkcs7);
+	result = gnutls_pkcs7_get_crt_count( pkcs7);
 	
 	gnutls_pkcs7_deinit( pkcs7);
 	

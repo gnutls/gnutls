@@ -321,7 +321,7 @@ time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl)
 }
 
 /**
-  * gnutls_x509_crl_get_certificate_count - This function returns the number of revoked certificates in a CRL
+  * gnutls_x509_crl_get_crt_count - This function returns the number of revoked certificates in a CRL
   * @crl: should contain a gnutls_x509_crl structure
   *
   * This function will return the number of revoked certificates in the
@@ -330,7 +330,7 @@ time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl)
   * Returns a negative value on failure.
   *
   **/
-int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl)
+int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl)
 {
 
 	int count, result;
@@ -354,7 +354,7 @@ int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl)
 }
 
 /**
-  * gnutls_x509_crl_get_certificate - This function returns the serial number of a revoked certificate
+  * gnutls_x509_crl_get_crt - This function returns the serial number of a revoked certificate
   * @crl: should contain a gnutls_x509_crl structure
   * @index: the index of the certificate to extract (starting from 0)
   * @serial: where the serial number will be copied
@@ -367,7 +367,7 @@ int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl)
   * Returns a negative value on failure.
   *
   **/
-int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
+int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index,
 				    unsigned char *serial,
 				    size_t *serial_size, time_t * time)
 {

@@ -9,6 +9,6 @@ int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7);
 void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7);
 int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
-int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, 
+int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7 pkcs7, 
 	int indx, unsigned char* certificate, size_t* certificate_size);
-int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7);
+int gnutls_pkcs7_get_crt_count(gnutls_pkcs7 pkcs7);

@@ -312,7 +312,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 	tmp.data = (opaque*)input_cert;
 	tmp.size = input_cert_size;
 
-	ret = gnutls_pkcs7_get_certificate_count( pkcs7);
+	ret = gnutls_pkcs7_get_crt_count( pkcs7);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -324,7 +324,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 	j = count - 1;
 	do {
 		pcert_size = 0;
-		ret = gnutls_pkcs7_get_certificate( pkcs7, j, NULL, &pcert_size);
+		ret = gnutls_pkcs7_get_crt_raw( pkcs7, j, NULL, &pcert_size);
 		if (ret!=GNUTLS_E_MEMORY_ERROR) {
 			count--;
 			continue;
@@ -339,7 +339,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 
 		/* read the certificate
 		 */
-		ret = gnutls_pkcs7_get_certificate( pkcs7, j, pcert, &pcert_size);
+		ret = gnutls_pkcs7_get_crt_raw( pkcs7, j, pcert, &pcert_size);
 		
 		j--;
 		

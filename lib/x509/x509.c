@@ -634,7 +634,7 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
   * @cert: should contain a gnutls_x509_crt structure
   * @critical: will be non zero if the extension is marked as critical
   *
-  * This function will return certificates CA status, by reading the 
+  * This function will return certificates CA status, by reading the
   * basicConstraints X.509 extension. If the certificate is a CA a positive
   * value will be returned, or zero if the certificate does not have
   * CA flag set. 
@@ -1134,7 +1134,7 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 		 *   certificate serial we have.
 		 */
 
-		ncerts = gnutls_x509_crl_get_certificate_count(crl_list[j]);
+		ncerts = gnutls_x509_crl_get_crt_count(crl_list[j]);
 		if (ncerts < 0) {
 			gnutls_assert();
 			return ncerts;
@@ -1143,7 +1143,7 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 		for (i = 0; i < ncerts; i++) {
 			serial_size = sizeof(serial);
 			ret =
-			    gnutls_x509_crl_get_certificate(crl_list[j], i, serial,
+			    gnutls_x509_crl_get_crt_serial(crl_list[j], i, serial,
 							    &serial_size,
 							    NULL);
 

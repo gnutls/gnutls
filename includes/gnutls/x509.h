@@ -155,9 +155,11 @@ int gnutls_x509_crl_get_version(gnutls_x509_crl crl);
 time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl crl);
 time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl);
 
-int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
-int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index, unsigned char* serial,
+int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl);
+int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index, unsigned char* serial,
         size_t* serial_size, time_t* time);
+#define gnutls_x509_crl_get_crt_count gnutls_x509_crl_get_certificate_count
+#define gnutls_x509_crl_get_certificate gnutls_x509_crl_get_crt_serial
 
 int gnutls_x509_crl_check_issuer( gnutls_x509_crl crl,
 	gnutls_x509_crt issuer);
@@ -171,25 +173,26 @@ typedef struct gnutls_pkcs7_int* gnutls_pkcs7;
 
 int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7);
 void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7);
-int gnutls_pkcs7_get_certificate_count( gnutls_pkcs7 pkcs7);
 int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
 int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
 
-int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx, 
+int gnutls_pkcs7_get_crt_count( gnutls_pkcs7 pkcs7);
+int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7 pkcs7, int indx, 
 	unsigned char* certificate, size_t* certificate_size);
-int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, const gnutls_datum* crt);
-int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7, gnutls_x509_crt crt);
-#define gnutls_pkcs7_set_crt gnutls_pkcs7_set_certificate2
 
-int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
+int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7 pkcs7, const gnutls_datum* crt);
+int gnutls_pkcs7_set_crt(gnutls_pkcs7 pkcs7, gnutls_x509_crt crt);
+int gnutls_pkcs7_delete_crt(gnutls_pkcs7 pkcs7, int indx);
+
+int gnutls_pkcs7_get_crl_raw(gnutls_pkcs7 pkcs7, 
 	int indx, unsigned char* crl, size_t* crl_size);
 int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7);
-int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, const gnutls_datum* crt);
-int gnutls_pkcs7_set_crl2(gnutls_pkcs7 pkcs7, gnutls_x509_crl crl);
-int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx);
 
+int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7 pkcs7, const gnutls_datum* crt);
+int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, gnutls_x509_crl crl);
+int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx);
 
 /* X.509 Certificate verification functions.
  */
