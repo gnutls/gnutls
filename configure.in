@@ -104,7 +104,7 @@ LIBS="${LIBS} -lmhash")])
 if test $ac_cv_c_compiler_gnu != no; then
 	CFLAGS=""
 
-	if test $opt_profiler_mode = yes; then
+	if test x$opt_profiler_mode = xyes; then
 	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -finstrument-functions -ftest-coverage"
 	  AC_CHECK_LIB(fnccheck, main,
 		LIBS="$LIBS -lfnccheck",
@@ -112,14 +112,14 @@ if test $ac_cv_c_compiler_gnu != no; then
 	  )
 	fi
 
-	if test $opt_maintainer_mode = yes; then
+	if test x$opt_maintainer_mode = xyes; then
 
 	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith"
 	else
 	  CFLAGS="${CFLAGS} -O2"
 	fi
 
-	if test $opt_dmalloc_mode = yes; then
+	if test x$opt_dmalloc_mode = xyes; then
 	  AC_CHECK_LIB( dmalloc, main)
 	  AC_DEFINE(USE_DMALLOC)
 	fi
@@ -128,8 +128,7 @@ fi
 AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h pwd.h locale.h strings.h stdarg.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
-AC_CHECK_HEADERS(utime.h zlib.h errno.h signal.h)
-AC_CHECK_FUNCS(signal sigaction,AC_DEFINE(USE_SIGNALS),)
+AC_CHECK_HEADERS(utime.h errno.h)
 AC_CHECK_FUNCS(bzero memset lstat stat umask utime memmove bcopy getpwuid,,)
 
 dnl Defines USE_VA_COPY
@@ -176,10 +175,26 @@ dnl **** CROSS COMPILING
 AC_MSG_RESULT(none)
 )
 
+AC_MSG_CHECKING([whether to check for external libraries])
+
+dnl if used --with-ext-libraries then we will not check
+dnl for any library (libz, libgdbm)
+
+AC_ARG_WITH( ext-libraries, [  --without-ext-libraries disable external libraries support],
+ ac_ext_libraries=$withval
+)
+
+if test x$ac_ext_libraries != xno; then
+ AC_MSG_RESULT(yes)
+ AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN("GDBM was not found. You will not be able to use Server side session resuming."))
+ AC_CHECK_LIB(z, compress,,AC_MSG_WARN("ZLIB was not found. You will not be able to use ZLIB compression."))
+else
+ AC_MSG_RESULT()
 
 
-AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN("GDBM was not found. You will not be able to use Server side session resuming."))
-AC_CHECK_LIB(z, compress,,AC_MSG_WARN("ZLIB was not found. You will not be able to use ZLIB compression."))
+fi
+
+
 
 dnl Checks for libraries.
 AC_C_BIGENDIAN

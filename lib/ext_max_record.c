@@ -38,6 +38,7 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 	
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
+			gnutls_assert();
 			
 			if ( data_size != 1) {
 				gnutls_assert();
@@ -61,15 +62,14 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 				gnutls_assert();
 				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 			}
-			
+
 			new_size = _gnutls_mre_num2record(data[0]);
 
-fprintf(stderr, "RECEIVING IT %d\n", new_size);
-
-			if (new_size < 0 || new_size != state->security_parameters.max_record_size) {
+			if (new_size < 0 || new_size != state->gnutls_internals.proposed_record_size) {
 				gnutls_assert();
 				return GNUTLS_E_ILLEGAL_PARAMETER;
-			}
+			} else 
+				state->security_parameters.max_record_size = state->gnutls_internals.proposed_record_size;
 
 		}
 	
@@ -87,12 +87,14 @@ int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque** data) {
 	/* this function sends the client extension data (dnsname) */
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 
-		if (state->security_parameters.max_record_size != DEFAULT_MAX_RECORD_SIZE) {
+		if (state->gnutls_internals.proposed_record_size != DEFAULT_MAX_RECORD_SIZE) {
+			gnutls_assert();
+			
 			len = 1;
 			(*data) = gnutls_malloc(len); /* hold the size and the type also */
 			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
 			
-			(*data)[0] = _gnutls_mre_record2num( state->security_parameters.max_record_size);
+			(*data)[0] = _gnutls_mre_record2num( state->gnutls_internals.proposed_record_size);
 			return len;
 		}
 
@@ -100,7 +102,7 @@ int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque** data) {
 
 		if (state->security_parameters.max_record_size != DEFAULT_MAX_RECORD_SIZE) {
 			len = 1;
-			(*data) = gnutls_malloc(len+2); /* hold the size and the type also */
+			(*data) = gnutls_malloc(len); 
 			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
 			
 			(*data)[0] = _gnutls_mre_record2num( state->security_parameters.max_record_size);
@@ -114,7 +116,7 @@ int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque** data) {
 	return 0;
 }
 
-/* Maps record size to numbers according to the
+/* Maps numbers to record sizes according to the
  * extensions draft.
  */
 int _gnutls_mre_num2record( int num) {
@@ -132,6 +134,9 @@ int _gnutls_mre_num2record( int num) {
 	}
 }
 
+/* Maps record size to numbers according to the
+ * extensions draft.
+ */
 int _gnutls_mre_record2num( int record_size) {
 	switch(record_size) {
 	case 512:

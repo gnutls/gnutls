@@ -94,6 +94,7 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state);
 
 AlertDescription gnutls_get_last_alert( GNUTLS_STATE state);
 int gnutls_send_alert(SOCKET, GNUTLS_STATE, AlertLevel, AlertDescription);
+int gnutls_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err);
 
 /* get information on the current state */
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);

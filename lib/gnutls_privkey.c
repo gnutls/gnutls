@@ -41,13 +41,15 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 	
 	pkey->pk_algorithm = GNUTLS_PK_RSA;
 	
-	/* we do return 2 MPIs 
-	 */
-	pkey->params = gnutls_malloc(2*sizeof(MPI));
-	
 	if (asn1_create_structure( _gnutls_get_pkcs(), "PKCS-1.RSAPrivateKey", &pkcs_asn, "rsakey")!=ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	if ((sizeof( pkey->params)/sizeof(MPI)) < 2) {
+		gnutls_assert();
+		/* internal error. Increase the MPIs in params */
+		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 
 	result = asn1_get_der( pkcs_asn, cert.data, cert.size);
@@ -117,7 +119,7 @@ int n, i;
 	for (i=0;i<n;i++) {
 		_gnutls_mpi_release( &pkey.params[i]);
 	}
-	if (pkey.params!=NULL) gnutls_free(pkey.params);
+
 	gnutls_free_datum( &pkey.raw);
 
 	return;

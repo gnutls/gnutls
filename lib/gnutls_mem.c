@@ -105,6 +105,9 @@ void *gnutls_realloc(void *_ptr, size_t size)
 	return ret;
 }
 
+/* This realloc only returns a new pointer if you
+ * request more data than the data into the pointer.
+ */
 void *gnutls_realloc_fast(void *ptr, size_t size)
 {
 
@@ -116,7 +119,6 @@ void *gnutls_realloc_fast(void *ptr, size_t size)
 	}
 	return gnutls_realloc(ptr, size);
 }
-
 
 void gnutls_free(void *_ptr)
 {
@@ -205,3 +207,4 @@ char *gnutls_strdup(const char *s)
 	return ret;
 }
 #endif				/* USE_DMALLOC */
+

@@ -29,8 +29,7 @@
 #include <unistd.h>
 #include "../lib/gnutls.h"
 #include <sys/time.h>
-
-#include <dmalloc.h>
+#include <signal.h>
 
 #ifndef SHUT_WR
 # define SHUT_WR 1
@@ -174,6 +173,8 @@ int main(int argc, char** argv)
 	SRP_CLIENT_CREDENTIALS cred;
 	X509PKI_CLIENT_CREDENTIALS xcred;
 
+	signal( SIGPIPE, SIG_IGN);
+	
 	if (argc!=3) {
 		fprintf(stderr, "Usage: cli [IP] [PORT]\n");
 		exit(1);
@@ -215,6 +216,8 @@ int main(int argc, char** argv)
 
 #ifdef RESUME
 	gnutls_init(&state, GNUTLS_CLIENT);
+	
+	gnutls_set_max_record_size( state, 512);
 	
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);

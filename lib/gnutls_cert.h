@@ -5,8 +5,9 @@
 #include <x509_asn1.h>
 #include <gnutls_ui.h>
 
+#define MAX_PARAMS_SIZE 2 /* ok for RSA */
 typedef struct gnutls_cert {
-	MPI *params;		/* the size of params depends on the public 
+	MPI params[MAX_PARAMS_SIZE];		/* the size of params depends on the public 
 				 * key algorithm 
 				 */
 	PKAlgorithm subject_pk_algorithm;
@@ -38,7 +39,7 @@ typedef struct gnutls_cert {
 } gnutls_cert;
 
 typedef struct {
-	MPI *params;		/* the size of params depends on the public 
+	MPI params[MAX_PARAMS_SIZE];/* the size of params depends on the public 
 				 * key algorithm 
 				 */
 	PKAlgorithm pk_algorithm;

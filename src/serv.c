@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include "../lib/gnutls.h"
 #include <port.h>
+#include <signal.h>
 
 #define KEYFILE "x509/key.pem"
 #define CERTFILE "x509/cert.pem"
@@ -343,6 +344,8 @@ int main(int argc, char **argv)
 	int http = 0;
 	char name[256];
 
+	signal(SIGPIPE, SIG_IGN);
+	
 	if (argc != 2) {
 		fprintf(stderr, "Usage: serv [-e] [-h]\n");
 		exit(1);
@@ -435,9 +438,11 @@ int main(int argc, char **argv)
 			ret = read_request(sd, state, buffer, MAX_BUF, (http==0)?1:2);
 
 			if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
+				fflush(stdout);
 				if (ret == 0) {
 					printf
 					    ("\n- Peer has closed the GNUTLS connection\n");
+					fflush(stdout);
 					break;
 				} else {
 					fprintf(stderr,
@@ -475,10 +480,12 @@ int main(int argc, char **argv)
 				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
 				if (gnutls_get_last_alert(state)!=GNUTLS_NO_RENEGOTIATION) {
+					printf("* Requesting rehandshake.\n");
 					/* continue handshake proccess */
 					do {
 						ret = gnutls_handshake(sd, state);
 					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+					printf("* Rehandshake returned %d\n", ret);
 				}
 			}
 #endif

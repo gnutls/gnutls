@@ -121,11 +121,12 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	/* set the default maximum record size for TLS
 	 */
 	(*state)->security_parameters.max_record_size = DEFAULT_MAX_RECORD_SIZE;
+	(*state)->gnutls_internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
 
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
 	 */
-	
+
 	return 0;
 }
 
@@ -150,6 +151,8 @@ int gnutls_deinit(GNUTLS_STATE state)
 	if ( state->gnutls_internals.db_reader != NULL)
 		gdbm_close(state->gnutls_internals.db_reader);
 #endif
+
+	_gnutls_clear_handshake_buffers( state);
 
 	gnutls_sfree_datum(&state->connection_state.read_mac_secret);
 	gnutls_sfree_datum(&state->connection_state.write_mac_secret);
@@ -384,8 +387,24 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
 /* Sends the appropriate alert, depending
  * on the error message.
  */
-int _gnutls_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err) {
-int ret;
+/**
+  * gnutls_send_appropriate_alert - This function sends an alert to the peer depending on the error code
+  * @cd: is a connection descriptor.
+  * @state: is a &GNUTLS_STATE structure.
+  * @err: is an integer
+  *
+  * Sends an alert to the peer depending on the error code returned by a gnutls
+  * function. All alerts sent by this function are fatal, so connection should
+  * be considered terminated after calling this function.
+  *
+  * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
+  *
+  * If the return value is GNUTLS_E_UNIMPLEMENTED_FEATURE, then no alert has
+  * been sent to the peer.
+  *
+  **/
+int gnutls_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err) {
+int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	switch (err) { /* send appropriate alert */
 		case GNUTLS_E_MAC_FAILED:
 			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
@@ -396,8 +415,11 @@ int ret;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
 			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
 			break;
+		case GNUTLS_E_ILLEGAL_PARAMETER:
+                        ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
+                        break;
+                                                              
 	}
-
 	return ret;
 }
 
@@ -461,7 +483,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current state.    
  *
- * Oct 30 2001: Removed capability to send data more than MAX_ENC_SIZE.
+ * Oct 30 2001: Removed capability to send data more than MAX_RECORD_SIZE.
  * This makes the function much easier to read, and more error resistant
  * (there were cases were the old function could mess everything up).
  * --nmav
@@ -510,16 +532,20 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
-	if ( sizeofdata > MAX_ENC_LEN)
-		data2send = MAX_ENC_LEN;
+	if ( sizeofdata > 128) //MAX_RECORD_SIZE)
+		data2send = 128; //MAX_RECORD_SIZE;
 	else 
 		data2send = sizeofdata;
 
 	/* Only encrypt if we don't have data to send 
 	 * from the previous run. - probably interrupted.
 	 */
-	if (state->gnutls_internals.send_buffer.size != 0) {
+	if (state->gnutls_internals.send_buffer.size > 0) {
 		ret = _gnutls_write_flush(cd, state);
+		if (ret > 0) cipher_size = ret;
+		cipher = NULL;
+
+		retval = state->gnutls_internals.send_buffer_user_size;
 	} else {
 		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, data, data2send, &cipher, type);
 		if (cipher_size <= 0) {
@@ -541,10 +567,9 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}
 
-
 		ret = _gnutls_write_buffered(cd, state, cipher, cipher_size);
 	}
-		
+
 	if ( ret != cipher_size) {
 		gnutls_free( cipher);
 		if ( ret < 0 && gnutls_is_fatal_error(ret)==0) {
@@ -554,6 +579,12 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			gnutls_assert();
 			return ret;
 		}
+		
+		if (ret > 0) {
+			gnutls_assert();
+			ret = GNUTLS_E_UNKNOWN_ERROR;
+		}
+
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -644,7 +675,11 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 */
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && gnutls_get_data_buffer_size(type, state) > 0) {
 		ret = gnutls_get_data_buffer(type, state, data, sizeofdata);
-
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+		
 		/* if the buffer just got empty */
 		if (gnutls_get_data_buffer_size(type, state)==0) {
 			if ( (ret2=_gnutls_clear_peeked_data( cd, state)) < 0) {
@@ -770,7 +805,6 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 */
 	tmplen = _gnutls_decrypt( state, ciphertext, length, &tmpdata, recv_type);
 	if (tmplen < 0) {
-		_gnutls_send_appropriate_alert( cd, state, tmplen);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -897,6 +931,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* Get Application data from buffer */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
 		ret = gnutls_get_data_buffer(type, state, data, sizeofdata);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
 		/* if the buffer just got empty */
 		if (gnutls_get_data_buffer_size(type, state)==0) {
@@ -1067,8 +1105,7 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * same parameters. Otherwise the write operation will be 
   * corrupted and the connection will be terminated.
   *
-  * Returns the number of bytes received, zero on EOF, or
-  * a negative error code.
+  * Returns the number of bytes sent, or a negative error code.
   *
   **/
 ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata) {
@@ -1120,7 +1157,9 @@ size_t gnutls_get_max_record_size( GNUTLS_STATE state) {
   * choose not to accept the requested size.
   *
   * Acceptable values are $2^{9}, 2^{10}, 2^{11}$ and $2^{12}$.
-  * Returns the new record size.
+  * Returns 0 on success. The requested record size does not
+  * get in effect immediately. It will be used after a successful
+  * handshake.
   *
   **/
 size_t gnutls_set_max_record_size( GNUTLS_STATE state, size_t size) {
@@ -1136,7 +1175,7 @@ size_t new_size;
 		return new_size;
 	}
 	
-	state->security_parameters.max_record_size = size;
+	state->gnutls_internals.proposed_record_size = size;
 
-	return state->security_parameters.max_record_size;
+	return 0;
 }

@@ -34,6 +34,10 @@
 #include <gnutls_algorithms.h>
 #include <gnutls_dh.h>
 
+#ifdef DEBUG
+# warning MAX ALGORITHM PARAMS == 2, ok for RSA
+#endif
+
 /* KX mappings to PK algorithms */
 typedef struct {
 	KXAlgorithm kx_algorithm;
@@ -70,7 +74,6 @@ PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
 	return ret;
 }
 
-#define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
 void gnutls_free_cert(gnutls_cert cert)
 {
 	int n, i;
@@ -86,9 +89,7 @@ void gnutls_free_cert(gnutls_cert cert)
 	for (i = 0; i < n; i++) {
 		_gnutls_mpi_release(&cert.params[i]);
 	}
-	if (cert.params != NULL)
-		gnutls_free(cert.params);
-
+	
 	gnutls_free_datum(&cert.raw);
 
 	return;
@@ -448,7 +449,7 @@ int gnutls_set_x509_dh_bits(X509PKI_CREDENTIALS res, int bits)
 }
 
 
-static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
+static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 {
 	opaque str[MAX_X509_CERT_SIZE];
 	int len, result;
@@ -477,16 +478,8 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	/* allocate size for the parameters (2) */
-	*params = gnutls_calloc(1, 2 * sizeof(MPI));
-	if (*params==NULL) {
+	if (_gnutls_mpi_scan(&params[0], GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	if (_gnutls_mpi_scan(&(*params)[0], GCRYMPI_FMT_USG, str, &len) != 0) {
-		gnutls_assert();
-		gnutls_free((*params));
 		asn1_delete_structure(spk);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -497,17 +490,14 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 			    &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		_gnutls_mpi_release(&(*params)[0]);
-		gnutls_free((*params));
+		_gnutls_mpi_release(&params[0]);
 		asn1_delete_structure(spk);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-
-	if (_gnutls_mpi_scan(&(*params)[1], GCRYMPI_FMT_USG, str, &len) != 0) {
+	if (_gnutls_mpi_scan(&params[1], GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
-		_gnutls_mpi_release(&(*params)[0]);
-		gnutls_free((*params));
+		_gnutls_mpi_release(&params[0]);
 		asn1_delete_structure(spk);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -807,6 +797,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		_gnutls_log("Decoding error %d\n", result);
 #endif
 		gnutls_assert();
+		asn1_delete_structure(c2);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
@@ -838,12 +829,21 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 
 		if (result != ASN_OK) {
 			gnutls_assert();
+			asn1_delete_structure(c2);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
-		if ((result =
-		     _read_rsa_params(str, len / 8, &gCert->params)) < 0) {
+		if ((sizeof( gCert->params)/sizeof(MPI)) < 2) {
 			gnutls_assert();
+			/* internal error. Increase the MPIs in params */
+			asn1_delete_structure(c2);
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+
+		if ((result =
+		     _read_rsa_params(str, len / 8, gCert->params)) < 0) {
+			gnutls_assert();
+			asn1_delete_structure(c2);
 			return result;
 		}
 
@@ -854,10 +854,10 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		gnutls_assert();
 #ifdef DEBUG
 		_gnutls_log("ALGORITHM: %s\n", str);
+		asn1_delete_structure(c2);
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 #endif
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
-		gCert->params = NULL;
 
 	}
 

@@ -37,3 +37,4 @@ int gnutls_clear_handshake_buffer( GNUTLS_STATE state);
 ssize_t _gnutls_handshake_recv_int(SOCKET fd, GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
 ssize_t _gnutls_handshake_send_int(SOCKET fd, GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
 ssize_t _gnutls_write_flush(SOCKET fd, GNUTLS_STATE state);
+ssize_t _gnutls_handshake_write_flush(SOCKET fd, GNUTLS_STATE state);

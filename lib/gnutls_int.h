@@ -25,16 +25,15 @@
 #include <defines.h>
 
 /*
-#define IO_DEBUG 5 // define this to check non blocking behaviour 
+#define IO_DEBUG 3 // define this to check non blocking behaviour 
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
-#define READ_DEBUG
 #define WRITE_DEBUG
 #define READ_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define RECORD_DEBUG
+#define RECORD_DEBUG*/
 #define DEBUG
-*/
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -77,9 +76,9 @@
 
 /* the maximum size of encrypted packets */
 #define DEFAULT_MAX_RECORD_SIZE 16384
-#define MAX_ENC_LEN state->security_parameters.max_record_size
 #define RECORD_HEADER_SIZE 5
-#define MAX_RECV_SIZE 18432+RECORD_HEADER_SIZE 	/* 2^14+2048+RECORD_HEADER_SIZE */
+#define MAX_RECORD_SIZE state->security_parameters.max_record_size
+#define MAX_RECV_SIZE 2048+MAX_RECORD_SIZE+RECORD_HEADER_SIZE 	/* 2^14+2048+RECORD_HEADER_SIZE */
 
 #define HANDSHAKE_HEADER_SIZE 4
 
@@ -149,6 +148,10 @@ typedef enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB } Compre
 
 typedef enum ValidSession { VALID_TRUE, VALID_FALSE } ValidSession;
 typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
+
+/* Record Protocol */
+typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
+		GNUTLS_APPLICATION_DATA } ContentType;
 
 /* STATE (stop) */
 
@@ -376,6 +379,17 @@ typedef struct {
 	/* sockets internals */
 	int				lowat;
 
+	/* These buffers are used in the handshake
+	 * protocol only. freed using _gnutls_clear_handshake_buffers();
+	 */
+	gnutls_datum 			handshake_send_buffer;
+	size_t	 			handshake_send_buffer_prev_size;
+	ContentType			handshake_send_buffer_type;
+	HandshakeType			handshake_send_buffer_htype;
+	ContentType			handshake_recv_buffer_type;
+	HandshakeType			handshake_recv_buffer_htype;
+	gnutls_datum 			handshake_recv_buffer;
+	
 					/* this buffer holds a record packet -mostly used for
 					 * non blocking IO.
 					 */
@@ -384,10 +398,10 @@ typedef struct {
 					* for the gnutls_write_buffered()
 					* function.
 					*/ 
-	int				send_buffer_prev_size; /* holds the
+	size_t				send_buffer_prev_size; /* holds the
 	                                * data written in the previous runs.
 	                                */
-	int				send_buffer_user_size; /* holds the
+	size_t				send_buffer_user_size; /* holds the
 	                                * size of the user specified data to
 	                                * send.
 	                                */
@@ -433,10 +447,12 @@ typedef struct {
 	int				(*x509_client_cert_callback)(void*,void*,int, void*, int);
 	gnutls_cert			peer_cert;
 	int				max_handshake_data_buffer_size;
+
 	/* PUSH & PULL functions.
 	 */
 	PULL_FUNC _gnutls_pull_func;
 	PUSH_FUNC _gnutls_push_func;
+
 	/* STORE & RETRIEVE functions. Only used if other
 	 * backend than gdbm is used.
 	 */
@@ -444,6 +460,11 @@ typedef struct {
 	DB_RETR_FUNC db_retrieve_func;
 	DB_REMOVE_FUNC db_remove_func;
 	void* db_ptr;
+	
+	/* Holds the record size requested by the
+	 * user.
+	 */
+	uint16			proposed_record_size;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {
@@ -457,9 +478,6 @@ struct GNUTLS_STATE_INT {
 typedef struct GNUTLS_STATE_INT *GNUTLS_STATE;
 
 
-/* Record Protocol */
-typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
-		GNUTLS_APPLICATION_DATA } ContentType;
 
 
 /* functions */
@@ -471,7 +489,7 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 
-/* These macros return the advertized TLS version of
+/* These two macros return the advertized TLS version of
  * the peer.
  */
 #define _gnutls_get_adv_version_major( state) \
@@ -479,5 +497,14 @@ GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 
 #define _gnutls_get_adv_version_minor( state) \
 	state->gnutls_internals.adv_version_minor
+
+#define _gnutls_clear_handshake_buffers( state) \
+        gnutls_free( state->gnutls_internals.handshake_send_buffer.data); \
+        gnutls_free( state->gnutls_internals.handshake_recv_buffer.data); \
+        state->gnutls_internals.handshake_send_buffer.data = NULL; \
+        state->gnutls_internals.handshake_recv_buffer.data = NULL; \
+        state->gnutls_internals.handshake_send_buffer.size = 0; \
+        state->gnutls_internals.handshake_recv_buffer.size = 0; \
+        state->gnutls_internals.handshake_send_buffer_prev_size = 0
 
 #endif /* GNUTLS_INT_H */

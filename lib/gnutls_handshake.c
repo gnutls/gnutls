@@ -588,7 +588,9 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 		/* we are resuming a previously interrupted
 		 * send.
 		 */
-		return _gnutls_write_flush( cd, state);
+		ret = _gnutls_handshake_write_flush( cd, state);
+		return ret;
+
 	}
 
 	if (i_data==NULL && i_datasize > 0) {
@@ -819,7 +821,6 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 		}
 	}
 	ret = GNUTLS_E_UNKNOWN_ERROR;
-
 
 	if (data != NULL && length32 > 0)
 		*data = dataptr;
@@ -1070,10 +1071,17 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		hver = _gnutls_version_max(state);
+		/* if we are resuming a session then we set the
+		 * version number to the previously established.
+		 */
+		if (SessionID==NULL)
+			hver = _gnutls_version_max(state);
+		else
+			hver = gnutls_get_current_version(state);
+
 		data[pos++] = _gnutls_version_get_major(hver);
 		data[pos++] = _gnutls_version_get_minor(hver);
-
+		
 		_gnutls_create_random(random);
 		_gnutls_set_client_random(state, random);
 
@@ -1166,7 +1174,7 @@ static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
 
 static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state, int again)
 {
-	char *data = NULL;
+	opaque *data;
 	opaque *extdata;
 	int extdatalen;
 	int pos = 0;
@@ -1270,24 +1278,6 @@ int ret;
 	return ret;
 }
 
-/* Sends the appropriate alert, depending
- * on the error message.
- */
-static int _gnutls_handshake_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err) {
-int ret;
-	switch (err) { /* send appropriate alert */
-		case GNUTLS_E_ILLEGAL_PARAMETER:
-			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
-			break;
-		default:
-			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);
-			break;
-	}
-
-	return ret;
-}
-
-
 /* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake_int only if a
  * hello message is expected. It uses the security_parameters.current_cipher_suite
  * and gnutls_internals.compression_method.
@@ -1300,7 +1290,6 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		ret = _gnutls_read_server_hello(state, data, datalen);
 		if (ret < 0) {
-			_gnutls_handshake_send_appropriate_alert( cd, state, ret);
 			gnutls_assert();
 			return ret;
 		}
@@ -1308,7 +1297,6 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 
 		ret = _gnutls_read_client_hello(state, data, datalen);
 		if (ret < 0) {
-			_gnutls_handshake_send_appropriate_alert( cd, state, ret);
 			gnutls_assert();
 			return ret;
 		}
@@ -1393,7 +1381,8 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
   * and the connection should be terminated.
   *
   * This function may also return the non-fatal errors GNUTLS_E_AGAIN, or 
-  * GNUTLS_E_INTERRUPTED, and you may resume this handshake later.
+  * GNUTLS_E_INTERRUPTED. In that case you may resume the handshake
+  * (call this function, until it returns ok)
   *
   **/
 int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
@@ -1415,6 +1404,8 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 
 	STATE = STATE0;
 	
+	_gnutls_clear_handshake_buffers( state);
+	
 	return 0;
 }
 
@@ -1423,7 +1414,6 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 		if (gnutls_is_fatal_error(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
-		_gnutls_handshake_send_appropriate_alert( cd, state, ret); \
 		gnutls_clear_handshake_buffer(state); \
 		return ret; \
 	}

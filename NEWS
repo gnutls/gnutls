@@ -6,6 +6,7 @@ Version 0.2.11
   it occupies less space.
 - Added max_record_size extension
 - Bugfixes in session handling
+- Improved non blocking IO support in the Handshake Protocol
 
 Version 0.2.10 (5/11/2001)
 - Corrected bugs and improved non blocking IO

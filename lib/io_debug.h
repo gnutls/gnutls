@@ -17,11 +17,9 @@
  */
  
 /* This debug file was contributed by 
- * Paul Sheer <psheer@icon.co.za>
- *
- * It does return EAGAIN errors in recv() and
- * send() calls in order to check, whether
- * non blocking support is ok.
+ * Paul Sheer <psheer@icon.co.za>. Some changes were made by nmav.
+ * It's purpose it to debug non blocking behaviour of gnutls. The included
+ * send() and recv() functions return EAGAIN errors in random.
  *
  */
 
@@ -66,6 +64,6 @@ static int send_debug (int fd, const char *buf, int len, int flags)
     return send (fd, buf, len, flags);
 }
 
-#define send send_debug
+//#define send send_debug
 
 #endif

@@ -22,7 +22,7 @@
 #include "gnutls_compress.h"
 #include "gnutls_errors.h"
 #include "gnutls_compress_int.h"
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_LIBZ
 #include <zlib.h>
 #endif
 
