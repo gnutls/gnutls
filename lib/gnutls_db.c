@@ -33,7 +33,6 @@ int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds) {
 
 int gnutls_set_db_name( GNUTLS_STATE state, char* filename) {
 #ifdef HAVE_LIBGDBM
-GDBM_FILE dbf;
 
 	gnutls_free(state->gnutls_internals.db_name);
 	state->gnutls_internals.db_name = strdup(filename);
@@ -116,7 +115,6 @@ int _gnutls_db_remove_session( GNUTLS_STATE state, uint8* session_id, int sessio
 {
 #ifdef HAVE_LIBGDBM
 GDBM_FILE dbf;
-datum content;
 datum key = { session_id, session_id_size};
 int ret;
 

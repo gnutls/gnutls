@@ -38,6 +38,13 @@ GNUTLS_CIPHER_HANDLE ret;
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
+	case GNUTLS_RIJNDAEL256:
+#ifdef USE_MCRYPT
+		ret = mcrypt_module_open( "rijndael-256", NULL, "cbc", NULL);
+#else
+		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
+#endif
+		break;
 	case GNUTLS_TWOFISH:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "twofish", NULL, "cbc", NULL);
