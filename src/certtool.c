@@ -44,6 +44,7 @@ gnutls_x509_crt load_cert(int mand);
 void certificate_info( void);
 void crl_info( void);
 void privkey_info( void);
+static void print_certificate_info( gnutls_x509_crt crt);
 static void gaa_parser(int argc, char **argv);
 void generate_self_signed( void);
 void generate_request(void);
@@ -117,10 +118,6 @@ char input[128];
 	return atoi(input);
 }
 
-#ifdef _WIN32
-# define getpass read_str
-#endif
-
 static const char* read_str( const char* input_str)
 {
 static char input[128];
@@ -133,6 +130,24 @@ static char input[128];
 	if (strlen(input)==0) return NULL;
 
 	return input;
+}
+
+static const char* read_pass( const char* input_str)
+{
+#ifdef _WIN32
+static char input[128];
+
+	fputs( input_str, stderr);
+	fgets( input, sizeof(input), stdin);
+	
+	input[strlen(input)-1] = 0;
+
+	if (strlen(input)==0) return NULL;
+
+	return input;
+#else
+	return getpass(input_str);
+#endif
 }
 
 static int read_yesno( const char* input_str)
@@ -295,7 +310,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		exit(1);
 	}
 
-	serial = read_int( "Enter the certificate's serial number: ");
+	serial = read_int( "Enter the certificate's serial number (decimal): ");
 	buffer[2] = serial & 0xff;
 	buffer[1] = (serial >> 8) & 0xff;
 	buffer[0] = (serial >> 16) & 0xff;
@@ -402,6 +417,8 @@ void generate_self_signed( void)
 
 	crt = generate_certificate( &key);
 
+	print_certificate_info( crt);
+
 	fprintf(stderr, "\n\nSigning certificate...\n");
 
 	result = gnutls_x509_crt_sign( crt, crt, key);
@@ -437,6 +454,8 @@ void generate_signed_certificate( void)
 	ca_crt = load_ca_cert();
 
 	crt = generate_certificate( &key);
+
+	print_certificate_info( crt);
 	
 	fprintf(stderr, "\n\nSigning certificate...\n");
 
@@ -631,7 +650,7 @@ void certificate_info( void)
 				(unsigned char) serial[i]);
 			print += 3;
 		}
-		fprintf(outfile, "Serial Number: %s\n", printable);
+		fprintf(outfile, "Serial Number (hex): %s\n", printable);
 	}
 	
 
@@ -767,6 +786,124 @@ void certificate_info( void)
 	}
 
 	fprintf(outfile, "\n");
+}
+
+static void print_certificate_info( gnutls_x509_crt crt)
+{
+	int size, ret, i;
+	unsigned int critical, key_usage;
+	time_t tim;
+	char serial[40];
+	size_t serial_size = sizeof(serial), dn_size;
+	char printable[256];
+	char *print;
+	const char* cprint;
+	char dn[256];
+	
+	fprintf( stderr, "\n\nCertificate info:\n\n");
+	
+	fprintf(stderr, "Version: %d\n", gnutls_x509_crt_get_version(crt));
+
+	/* serial number
+	 */
+	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
+		print = printable;
+		for (i = 0; i < serial_size; i++) {
+			sprintf(print, "%.2x ",
+				(unsigned char) serial[i]);
+			print += 3;
+		}
+		fprintf(stderr, "Serial Number (hex): %s\n", printable);
+	}
+	
+	/* Validity
+	 */
+	fprintf(stderr, "Validity:\n");
+
+	tim = gnutls_x509_crt_get_activation_time(crt);
+	fprintf(stderr, "\tNot Before: %s", ctime(&tim));
+
+	tim = gnutls_x509_crt_get_expiration_time(crt);
+	fprintf(stderr, "\tNot After: %s", ctime(&tim));
+
+	/* Subject
+	 */
+	dn_size = sizeof(dn);
+	ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
+	if (ret >= 0)
+		fprintf(stderr, "Subject: %s\n", dn);
+
+	/* Public key algorithm
+	 */
+	fprintf(stderr, "Subject Public Key Info:\n");
+	ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
+	fprintf(stderr, "\tPublic Key Algorithm: ");
+
+	cprint = get_algorithm( ret);
+	fprintf(stderr,  "%s\n", cprint);
+
+
+	
+	fprintf(stderr, "\nX.509 Extensions:\n");
+	
+	/* subject alternative name
+	 */
+	for (i = 0; !(ret < 0); i++) {
+		size = sizeof(buffer);
+		ret = gnutls_x509_crt_get_subject_alt_name(crt, i, buffer, &size, &critical);
+
+		if (i==0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			fprintf(stderr, "\tSubject Alternative name:");
+			if (critical) fprintf(stderr, " (critical)");
+			fprintf(stderr, "\n");
+		}
+		
+		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			fprintf(stderr, "\t\tFound unsupported alternative name.\n");
+		} else switch (ret) {
+			case GNUTLS_SAN_DNSNAME:
+				fprintf(stderr, "\t\tDNSname: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_RFC822NAME:
+				fprintf(stderr, "\t\tRFC822name: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_URI:
+				fprintf(stderr, "\t\tURI: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_IPADDRESS:
+				fprintf(stderr, "\t\tIPAddress: %s\n", buffer);
+				break;
+		}
+	}
+	
+	/* check for basicConstraints
+	 */
+	ret = gnutls_x509_crt_get_ca_status( crt, &critical);
+	
+	if (ret >= 0) {
+		fprintf(stderr, "\tBasic Constraints:");
+		if (critical) fprintf(stderr, " (critical)");
+		fprintf(stderr, "\n");		
+
+		if (ret==0) fprintf(stderr, "\t\tCA:FALSE\n");
+		else fprintf(stderr, "\t\tCA:TRUE\n");
+		
+	}
+
+	/* Key Usage.
+	 */
+	ret = gnutls_x509_crt_get_key_usage( crt, &key_usage, &critical);
+	
+	if (ret >= 0) {
+		fprintf(stderr, "\tKey usage:\n");
+		print_key_usage(key_usage);
+	}
+
+	fprintf(stderr, "\n");
+
+	if (read_yesno( "Is the above information ok? (Y/N): ")==0) {
+		exit(1);
+	}
 }
 
 void crl_info(void)
@@ -1175,7 +1312,7 @@ void generate_request(void)
 		exit(1);
 	}
 
-	pass = read_str("Enter a challenge password: ");
+	pass = read_pass("Enter a challenge password: ");
 	
 	if (pass != NULL) {
 		ret = gnutls_x509_crq_set_challenge_password( crq, pass);
@@ -1506,7 +1643,7 @@ void generate_pkcs12( void)
 	int result;
 	size_t size;
 	gnutls_datum data;
-	char* password;
+	const char* password;
 	const char* name;
 	unsigned int flags;
 	gnutls_datum key_id;
@@ -1523,7 +1660,7 @@ void generate_pkcs12( void)
 	} while( name == NULL);
 
 	if (info.pass) password = info.pass;
-	else password = getpass( "Enter password: ");
+	else password = read_pass( "Enter password: ");
 
 	result = gnutls_pkcs12_bag_init( &bag);
 	if (result < 0) {
@@ -1747,7 +1884,7 @@ void pkcs12_info( void)
 	int result, ret;
 	size_t size;
 	gnutls_datum data;
-	char* password;
+	const char* password;
 	int index;
 	
 	size = fread( buffer, 1, sizeof(buffer)-1, infile);
@@ -1757,7 +1894,7 @@ void pkcs12_info( void)
 	data.size = size;
 
 	if (info.pass) password = info.pass;
-	else password = getpass( "Enter password: ");
+	else password = read_pass( "Enter password: ");
 	
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {
