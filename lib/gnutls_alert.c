@@ -140,7 +140,7 @@ int _level = -1;
 			ret = GNUTLS_A_BAD_RECORD_MAC;
 			_level = GNUTLS_AL_FATAL;
 			break;
-		case GNUTLS_E_ILLEGAL_SRP_USERNAME:
+		case GNUTLS_E_EMPTY_SRP_USERNAME:
 			ret = GNUTLS_A_ACCESS_DENIED;
 			_level = GNUTLS_AL_FATAL;
 			break;
