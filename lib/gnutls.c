@@ -390,13 +390,13 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 		length = byteswap16(cipher_size);
 #endif
 		memmove( &headers[3], &length, sizeof(uint16));
-		if (Write(cd, headers, sizeof(headers)) != sizeof(headers)) {
+		if (_gnutls_Write(cd, headers, sizeof(headers)) != sizeof(headers)) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
-		if (Write(cd, cipher, cipher_size) != cipher_size) {
+		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
@@ -415,13 +415,13 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 		length = byteswap16(cipher_size);
 #endif
 		memmove( &headers[3], &length, sizeof(uint16));
-		if (Write(cd, headers, sizeof(headers)) != sizeof(headers)) {
+		if (_gnutls_Write(cd, headers, sizeof(headers)) != sizeof(headers)) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
-		if (Write(cd, cipher, cipher_size) != cipher_size) {
+		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
@@ -467,14 +467,14 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 #endif
 	memmove( &headers[3], &length, sizeof(uint16));
 	
-	if (Write(cd, headers, 5) != 5) {
+	if (_gnutls_Write(cd, headers, 5) != 5) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNABLE_SEND_DATA;
 	}
 
-	if (Write(cd, &data, 1) != 1) {
+	if (_gnutls_Write(cd, &data, 1) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -513,7 +513,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
-	if ( Read(cd, &recv_type, 1) != 1) {
+	if ( _gnutls_Read(cd, &recv_type, 1) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -522,14 +522,14 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 	version.local = 0; /* TLS/SSL 3.0 */
 	
-	if (Read(cd, &version.major, 1) != 1) {
+	if (_gnutls_Read(cd, &version.major, 1) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	if (Read(cd, &version.minor, 1) != 1) {
+	if (_gnutls_Read(cd, &version.minor, 1) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -548,7 +548,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		gnutls_set_current_version(state, version);
 	}
 
-	if (Read(cd, &length, 2) != 2) {
+	if (_gnutls_Read(cd, &length, 2) != 2) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -580,7 +580,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 	/* read ciphertext */
 
-	ret = Read(cd, ciphertext, length);
+	ret = _gnutls_Read(cd, ciphertext, length);
 
 	if (ret != length) {
 #ifdef DEBUG

@@ -415,7 +415,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
 		td =
-		    gnutls_hash_init_ssl3(state->security_parameters.
+		    gnutls_mac_init_ssl3(state->security_parameters.
 					  mac_algorithm,
 					  state->connection_state.
 					  write_mac_secret,
@@ -455,7 +455,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, compressed->fragment, compressed->length);
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
-			MAC = gnutls_hash_deinit_ssl3(td);
+			MAC = gnutls_mac_deinit_ssl3(td);
 		} else {
 			MAC = gnutls_hmac_deinit(td);
 		}
@@ -556,7 +556,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
 		td =
-		    gnutls_hash_init_ssl3(state->security_parameters.
+		    gnutls_mac_init_ssl3(state->security_parameters.
 					  mac_algorithm,
 					  state->connection_state.
 					  read_mac_secret,
@@ -650,7 +650,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 		gnutls_hmac(td, &c_length, 2);
 		gnutls_hmac(td, data, compressed->length);
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
-			MAC = gnutls_hash_deinit_ssl3(td);
+			MAC = gnutls_mac_deinit_ssl3(td);
 		} else {
 			MAC = gnutls_hmac_deinit(td);
 		}

@@ -232,7 +232,7 @@ void *gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle)
 	return ret;
 }
 
-GNUTLS_MAC_HANDLE gnutls_hash_init_ssl3(MACAlgorithm algorithm, void *key,
+GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3(MACAlgorithm algorithm, void *key,
 					int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;
@@ -265,7 +265,7 @@ GNUTLS_MAC_HANDLE gnutls_hash_init_ssl3(MACAlgorithm algorithm, void *key,
 	return ret;
 }
 
-void *gnutls_hash_deinit_ssl3(GNUTLS_MAC_HANDLE handle)
+void *gnutls_mac_deinit_ssl3(GNUTLS_MAC_HANDLE handle)
 {
 	void *ret=NULL;
 	GNUTLS_MAC_HANDLE td;
@@ -283,7 +283,7 @@ void *gnutls_hash_deinit_ssl3(GNUTLS_MAC_HANDLE handle)
 	default:
 		padsize=0;
 	}
-	if (padsize>0) {
+	if (padsize > 0) {
 		memset(opad, 0x5C, padsize);
 	}
 

@@ -2,8 +2,8 @@
 
 #define GNUTLS_INT_H
 
-//#define HARD_DEBUG
-//#define READ_DEBUG
+#define HARD_DEBUG
+#define READ_DEBUG
 //#define WRITE_DEBUG
 #define DEBUG
 
@@ -111,8 +111,7 @@ typedef struct {
 	ConnectionEnd entity;
 	BulkCipherAlgorithm bulk_cipher_algorithm;
 	CipherType cipher_type;
-	uint8 IV_size;   /* not specified in the protocol, but later it
-			  * uses it */
+	uint8 IV_size;
 	uint8 key_size;
 	uint8 key_material_length;
 	IsExportable is_exportable;
@@ -145,13 +144,13 @@ extern GNUTLS_Version GNUTLS_SSL3;
 
 typedef struct {
 	GNUTLS_Version version;
-	opaque* read_compression_state;
-	opaque* write_compression_state;
+	opaque* 	read_compression_state;
+	opaque* 	write_compression_state;
 	GNUTLS_CIPHER_HANDLE write_cipher_state;
 	GNUTLS_CIPHER_HANDLE read_cipher_state;
-	opaque* read_mac_secret;
-	opaque* write_mac_secret;
-	uint8   mac_secret_size;
+	opaque* 	read_mac_secret;
+	opaque* 	write_mac_secret;
+	uint8   	mac_secret_size;
 	uint64	read_sequence_number;
 	uint64	write_sequence_number;
 } ConnectionState;

@@ -108,7 +108,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 	return length;
 }
 
-ssize_t Read(int fd, void *iptr, size_t sizeOfPtr)
+ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr)
 {
 	size_t left;
 	ssize_t i=0;
@@ -151,7 +151,7 @@ ssize_t Read(int fd, void *iptr, size_t sizeOfPtr)
 }
 
 
-ssize_t Write(int fd, const void *iptr, size_t n)
+ssize_t _gnutls_Write(int fd, const void *iptr, size_t n)
 {
 	size_t left;
 #ifdef WRITE_DEBUG
@@ -306,4 +306,51 @@ int gnutls_getHashDataFromBuffer(int type, GNUTLS_STATE state, char *data, int l
 
 		return length;	
 	}
+}
+
+int gnutls_readHashDataFromBuffer(int type, GNUTLS_STATE state, char *data, int length)
+{
+	if (type==GNUTLS_SERVER) {
+		if (length > state->gnutls_internals.server_hash_bufferSize) {
+			length = state->gnutls_internals.server_hash_bufferSize;
+		}
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Read %d bytes of SSL3 Server Hash Data(%d) from buffer\n", length, type);
+#endif
+		memmove(data, state->gnutls_internals.server_hash_buffer, length);
+		return length;
+
+	} else { /* CLIENT */
+		if (length > state->gnutls_internals.client_hash_bufferSize) {
+			length = state->gnutls_internals.client_hash_bufferSize;
+		}
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Read %d bytes of SSL3 Client Hash Data(%d) from buffer\n", length, type);
+#endif
+		memmove(data, state->gnutls_internals.client_hash_buffer, length);
+		return length;	
+	}
+}
+
+
+
+int gnutls_clearHashDataBuffer(int type, GNUTLS_STATE state)
+{
+	if (type==GNUTLS_SERVER) {
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Cleared SSL3 Server Hash Data(%d) from buffer\n",type);
+#endif
+		state->gnutls_internals.server_hash_bufferSize = 0;
+		gnutls_free(state->gnutls_internals.server_hash_buffer);
+		state->gnutls_internals.server_hash_buffer = NULL;
+	} else { /* CLIENT */
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Cleared SSL3 Client Hash Data(%d) from buffer\n", type);
+#endif
+		state->gnutls_internals.client_hash_bufferSize = 0;
+		gnutls_free(state->gnutls_internals.client_hash_buffer);
+		state->gnutls_internals.client_hash_buffer = NULL;
+	}
+	
+	return 0;
 }
