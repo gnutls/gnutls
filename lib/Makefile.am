@@ -1,4 +1,7 @@
 SUBDIRS = x509
+if ENABLE_MINITASN1
+SUBDIRS += minitasn1
+endif
 
 AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl			\
 	-I$(top_srcdir)/includes -I$(srcdir)/x509			\
