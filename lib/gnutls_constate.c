@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004, 2005  Free Software Foundation
  * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -63,7 +63,7 @@ int _gnutls_set_keys(gnutls_session_t session, int hash_size, int IV_size,
     opaque rrandom[2 * TLS_RANDOM_SIZE];
     int pos, ret;
     int block_size;
-    char buf[64];
+    char buf[65];
 
     if (session->cipher_specs.generated_keys != 0) {
 	/* keys have already been generated.
