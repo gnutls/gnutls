@@ -235,3 +235,4 @@ int proc_anon_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 
 	return 0;
 }
+

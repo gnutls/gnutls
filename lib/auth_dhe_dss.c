@@ -266,3 +266,4 @@ int proc_dhe_dss_server_cert_vrfy( GNUTLS_KEY key, opaque* data, int data_size) 
 	/* no certificate check in this algorithm */
 	return 0;
 }
+

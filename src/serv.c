@@ -19,6 +19,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -40,13 +41,15 @@ int main()
     struct sockaddr_in sa_serv;
     struct sockaddr_in sa_cli;
     int client_len;
-    char topbuf[512];
+    char topbuf[512], *tmp;
     GNUTLS_STATE state;
     char buffer[MAX_BUF+1];
     int optval = 1;
     SRP_SERVER_CREDENTIALS cred;
-    
+    SRP_AUTH_INFO *info;
+ 
     /* this is a password file (created with the included crypt utility) 
+     * Read README.crypt prior to using SRP.
      */
     cred.password_file="tpasswd";
     cred.password_conf_file="tpasswd.conf";
@@ -97,6 +100,24 @@ int main()
 	    continue;
 	}
 	fprintf(stderr, "Handshake was completed\n");
+
+	/* print srp specific data */
+	if ( gnutls_get_current_kx( state) == GNUTLS_KX_SRP) {
+		info = gnutls_get_auth_info( state);
+		if (info != NULL)
+			printf("\nUser '%s' connected\n", info->username);
+	}
+	
+	/* print state information */
+	tmp = _gnutls_kx_get_name(gnutls_get_current_kx( state));
+	printf("Key Exchange: %s\n", tmp); free(tmp);
+	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
+	printf("Compression: %s\n", tmp); free(tmp);
+	tmp = _gnutls_cipher_get_name(gnutls_get_current_cipher( state));
+	printf("Cipher: %s\n", tmp); free(tmp);
+	tmp = _gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
+	printf("MAC: %s\n", tmp); free(tmp);
+
 	fprintf(stderr, "Acting as echo server...\n");
 /*	ret =
 	    gnutls_write(sd, state, "hello client",

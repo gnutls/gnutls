@@ -171,6 +171,27 @@ int _gnutls_set_compression(GNUTLS_STATE state, CompressionMethod algo)
 
 }
 
+/* Sets the specified kx algorithm into pending state */
+int _gnutls_set_kx(GNUTLS_STATE state, KXAlgorithm algo)
+{
+
+	if (_gnutls_kx_is_ok(algo) == 0) {
+		state->security_parameters.kx_algorithm = algo;
+	} else {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+	}
+	if (_gnutls_kx_priority(state, algo) < 0) {
+		gnutls_assert();
+		/* we shouldn't get here */
+		return GNUTLS_E_UNWANTED_ALGORITHM;
+	}
+
+
+	return 0;
+
+}
+
 /* Sets the specified mac algorithm into pending state */
 int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
 {
@@ -219,6 +240,13 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		rc =
 		    _gnutls_set_mac(state,
 			    _gnutls_cipher_suite_get_mac_algo
+			    (state->gnutls_internals.current_cipher_suite));
+		if (rc < 0)
+			return rc;
+
+		rc =
+		    _gnutls_set_kx(state,
+			    _gnutls_cipher_suite_get_kx_algo
 			    (state->gnutls_internals.current_cipher_suite));
 		if (rc < 0)
 			return rc;

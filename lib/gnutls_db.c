@@ -58,7 +58,7 @@ time_t timestamp;
 
 	while( key.dptr != NULL) {
 
-		if ( timestamp - ((SecurityParameters*)(key.dptr))->timestamp <= state->gnutls_internals.expire_time || ((SecurityParameters*)(key.dptr))->timestamp == 0) {
+		if ( timestamp - ((SecurityParameters*)(key.dptr))->timestamp <= state->gnutls_internals.expire_time || ((SecurityParameters*)(key.dptr))->timestamp > timestamp|| ((SecurityParameters*)(key.dptr))->timestamp == 0) {
 		    /* delete expired entry */
 		    gdbm_delete( dbf, key);
 		}
@@ -80,17 +80,32 @@ int _gnutls_server_register_current_session( GNUTLS_STATE state)
 #ifdef HAVE_LIBGDBM
 GDBM_FILE dbf;
 datum key = { state->security_parameters.session_id, state->security_parameters.session_id_size };
-datum content = { (void*)&state->security_parameters, sizeof(SecurityParameters) };
-int ret;
+datum content;
+int ret = 0;
 
-	if (state->gnutls_internals.resumable==RESUME_FALSE) return GNUTLS_E_INVALID_SESSION;
+	if (state->gnutls_internals.resumable==RESUME_FALSE) {
+		return GNUTLS_E_INVALID_SESSION;
+	}
+	if (state->gnutls_internals.db_name==NULL) {
+		return GNUTLS_E_DB_ERROR;
+	}
+	if (state->security_parameters.session_id==NULL || state->security_parameters.session_id_size==0) {
+		return GNUTLS_E_INVALID_SESSION;
+	}
 
-	if (state->gnutls_internals.db_name==NULL) return GNUTLS_E_DB_ERROR;
-	if (state->security_parameters.session_id==NULL || state->security_parameters.session_id_size==0) return GNUTLS_E_INVALID_SESSION;
+/* allocate space for data */
+	content.dptr = gnutls_malloc( sizeof(SecurityParameters) + state->gnutls_key->auth_info_size );
+	content.dsize = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size;
+
+/* copy data */
+	memcpy( content.dptr, (void*)&state->security_parameters, sizeof(SecurityParameters));
+	memcpy( &content.dptr[sizeof(SecurityParameters)], state->gnutls_key->auth_info,  state->gnutls_key->auth_info_size);
 
 	dbf = gdbm_open(state->gnutls_internals.db_name, 0, GDBM_WRCREAT|GDBM_FAST, 0600, NULL);
 	if (dbf==NULL) return GNUTLS_E_AGAIN;
 	ret = gdbm_store( dbf, key, content, GDBM_INSERT);
+
+	gnutls_free( content.dptr);
 
 	gdbm_close(dbf);
 
@@ -117,10 +132,8 @@ int ret;
 	gdbm_close(dbf);
 
 	if (content.dptr==NULL) return GNUTLS_E_INVALID_SESSION;
-	if ( ((SecurityParameters*)(content.dptr))->timestamp > time(0) || ((SecurityParameters*)(content.dptr))->timestamp == 0) return GNUTLS_E_INVALID_SESSION;
 
-	/* if not expired */	
-
+	/* expiration check is performed inside */
 	ret = gnutls_set_current_session( state, content.dptr, content.dsize);
 	free(content.dptr);
 

@@ -101,7 +101,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_key = gnutls_malloc(sizeof(GNUTLS_KEY_A));
 
-	(*state)->gnutls_key->username = NULL; /* no default username */
+	(*state)->gnutls_key->auth_info = NULL; /* no default auth_info */
+	(*state)->gnutls_key->auth_info_size = 0; /* no default auth_info */
 	(*state)->gnutls_key->cred = NULL; /* no credentials by default */
 	
 	(*state)->gnutls_key->KEY = NULL;
@@ -162,6 +163,10 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	if ( (*state)->gnutls_internals.resumable==RESUME_FALSE) {
 		_gnutls_db_remove_session( (*state), (*state)->security_parameters.session_id, (*state)->security_parameters.session_id_size);
 	}
+
+	/* remove auth info firstly */
+	GNUTLS_FREE((*state)->gnutls_key->auth_info);
+	
 	GNUTLS_FREE((*state)->connection_state.read_compression_state);
 	GNUTLS_FREE((*state)->connection_state.read_mac_secret);
 	GNUTLS_FREE((*state)->connection_state.write_compression_state);
@@ -197,7 +202,6 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	mpi_release((*state)->gnutls_key->b);
 
 	mpi_release((*state)->gnutls_key->dh_secret);
-	GNUTLS_FREE((*state)->gnutls_key->username);
 	GNUTLS_FREE((*state)->gnutls_key);
 
 
@@ -868,6 +872,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state) {
 	return state->security_parameters.bulk_cipher_algorithm;
+}
+KXAlgorithm gnutls_get_current_kx( GNUTLS_STATE state) {
+	return state->security_parameters.kx_algorithm;
 }
 MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state) {
 	return state->security_parameters.mac_algorithm;

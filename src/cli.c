@@ -127,12 +127,17 @@ int main()
 
 	gnutls_set_cipher_priority( state, 4, GNUTLS_3DES, GNUTLS_TWOFISH , GNUTLS_RIJNDAEL, GNUTLS_ARCFOUR);
 	gnutls_set_compression_priority( state, 1, GNUTLS_NULL_COMPRESSION);
-	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
+	gnutls_set_kx_priority( state, 2, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH);
+	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL);
+	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
+
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 
+#ifdef RESUME
 	gnutls_set_current_session( state, session, session_size);
 	free(session);
-	
+#endif
+
 	ret = gnutls_handshake(sd, state);
 
 	if (ret < 0) {
@@ -157,6 +162,9 @@ int main()
 	free(session_id);
 
 /* print some information */
+	tmp = _gnutls_kx_get_name(gnutls_get_current_kx( state));
+	printf("Key Exchange: %s\n", tmp); free(tmp);
+
 	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
 	printf("Compression: %s\n", tmp); free(tmp);
 

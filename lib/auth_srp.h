@@ -10,3 +10,8 @@ typedef struct {
 	char* password_file;
 	char* password_conf_file;
 } SRP_SERVER_CREDENTIALS;
+
+/* these structures should not use allocated data */
+typedef struct {
+	char username[256];
+} SRP_AUTH_INFO;

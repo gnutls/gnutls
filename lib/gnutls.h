@@ -52,6 +52,7 @@ int gnutls_check_pending(GNUTLS_STATE state);
 
 /* get information on the current state */
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);
+KXAlgorithm gnutls_get_current_kx( GNUTLS_STATE state);
 MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state);
 CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state);
 
@@ -59,6 +60,7 @@ CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state);
 char *_gnutls_cipher_get_name(BulkCipherAlgorithm);
 char *_gnutls_mac_get_name(MACAlgorithm);
 char *_gnutls_compression_get_name(CompressionMethod);
+char *_gnutls_kx_get_name(KXAlgorithm algorithm);
 
 
 
@@ -98,6 +100,7 @@ int gnutls_clean_db( GNUTLS_STATE state);
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
 int gnutls_set_kx_cred( GNUTLS_STATE, int kx, void* cred);
+void* gnutls_get_auth_info( GNUTLS_STATE);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 typedef struct {
@@ -109,6 +112,10 @@ typedef struct {
 	char* password_file;
 	char* password_conf_file;
 } SRP_SERVER_CREDENTIALS;
+
+typedef struct {
+	char* username;
+} SRP_AUTH_INFO;
 
 
 /* these are deprecated must be replaced by gnutls_errors.h */

@@ -158,10 +158,11 @@ typedef struct {
 	MPI				a;
 	MPI				x;
 	
-	/* this is only used in server side - 
-	 * to hold the requested user - currently only in srp 
+	/* this is used to hold the peers authentication data 
 	 */
-	char*				username;
+	void*				auth_info;
+	int				auth_info_size; /* needed in order to store to db for restoring */
+
 	uint8				crypt_algo;
 	
 	AUTH_CRED*			cred; /* used in srp, etc */
@@ -179,6 +180,7 @@ typedef GNUTLS_KEY_A* GNUTLS_KEY;
 typedef struct {
 	ConnectionEnd entity;
 	BulkCipherAlgorithm bulk_cipher_algorithm;
+	KXAlgorithm kx_algorithm;
 	CipherType cipher_type;
 	MACAlgorithm mac_algorithm;
 	CompressionMethod compression_algorithm;

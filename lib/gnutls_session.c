@@ -27,9 +27,9 @@
  * current version later by calling gnutls_set_current_session().
  * This function must be called after a successful handshake.
  */
-int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_size) {
+int gnutls_get_current_session( GNUTLS_STATE state, opaque* session, int *session_size) {
 
-	( *session_size = sizeof(SecurityParameters));
+	*session_size = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size;
 	
 	if (state->gnutls_internals.resumable==RESUME_FALSE) return GNUTLS_E_INVALID_SESSION;
 	/* just return the session size */
@@ -37,7 +37,8 @@ int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_
 		return 0;
 	}
 	memcpy( session, &state->security_parameters, sizeof(SecurityParameters));
-	
+	memcpy( &session[sizeof(SecurityParameters)], state->gnutls_key->auth_info, state->gnutls_key->auth_info_size);
+
 	return 0;
 }
 
@@ -60,14 +61,21 @@ int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *sessi
  * session must be the one returned by get_current_session();
  * This function should be called before gnutls_handshake_begin
  */
-int gnutls_set_current_session( GNUTLS_STATE state, void* session, int session_size) {
+int gnutls_set_current_session( GNUTLS_STATE state, opaque* session, int session_size) {
+int auth_info_size = session_size = sizeof(SecurityParameters);
+time_t timestamp = time(0);
 
-	if ( session_size != sizeof(SecurityParameters)) {
+	if ( session_size < sizeof(SecurityParameters)) {
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
-	if ( time(0) - ((SecurityParameters*)session)->timestamp <= state->gnutls_internals.expire_time) {
+	if ( timestamp - ((SecurityParameters*)session)->timestamp <= state->gnutls_internals.expire_time && ((SecurityParameters*)session)->timestamp < timestamp) {
 		memcpy( &state->gnutls_internals.resumed_security_parameters, session, sizeof(SecurityParameters));
+		if (auth_info_size > 0) {
+			state->gnutls_key->auth_info_size = auth_info_size;
+			state->gnutls_key->auth_info = gnutls_malloc(auth_info_size);
+			memcpy( state->gnutls_key->auth_info, &session[sizeof(SecurityParameters)], auth_info_size);
+		}		
 	} else {
 		return GNUTLS_E_EXPIRED;
 	}

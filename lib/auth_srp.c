@@ -73,11 +73,11 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
 	int err;
 
-	if (key->username == NULL) {
+	if (key->auth_info == NULL) {
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	pwd_entry = _gnutls_srp_pwd_read_entry( key, key->username, &err);
+	pwd_entry = _gnutls_srp_pwd_read_entry( key, ((SRP_AUTH_INFO*)key->auth_info)->username, &err);
 
 	if (pwd_entry == NULL) {
 		if (err==0)
@@ -386,3 +386,4 @@ int proc_srp_server_kx2(GNUTLS_KEY key, opaque * data, int data_size)
 	mpi_release(B);
 	return 0;
 }
+

@@ -30,6 +30,10 @@ int gnutls_close(int cd, GNUTLS_STATE state);
 	Terminates the current TLS/SSL connection. If it returns 0
 	you may continue using the TCP connection.
 
+KXAlgorithm gnutls_get_current_kx( GNUTLS_STATE state);
+	Returns the key exchange algorithm used in the first key exchange.
+	(There is not key exchange in resumed sessions).
+
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);
 	Returns the currently used cipher.
 
@@ -107,6 +111,14 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred);
 	* For GNUTLS_KX_SRP cred should be SRP_CLIENT_CREDENTIALS
  	 in case of a client, and SRP_SERVER_CREDENTIALS, in case
 	 of a server.
+
+void* gnutls_get_auth_info( GNUTLS_STATE state);
+	Must be called after a complete gnutls_handshake().
+	Returns a pointer to authentication information.
+	* For GNUTLS_KX_ANON returns NULL;
+	* For GNUTLS_KX_SRP returns a pointer to structure SRP_AUTH_INFO.
+	 (you should not free that). Thus you can access the 
+         username he used to connect.
 
 void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
 	like gnutls_set_cipher_priority, but for key exchange methods.
