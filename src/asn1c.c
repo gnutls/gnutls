@@ -34,14 +34,14 @@ int
 main(int argc,char *argv[])
 {
   int result;
-  char file_name[128];
-
-  if(argc==2) strcpy(file_name,argv[1]);
-  else file_name[0]=0;
-
-  strcat(file_name,"pkix.asn");
-
-  result=asn1_parser_asn1_file_c(file_name);
+  FILE* tmp;
+  
+  if(argc!=3) {
+  	fprintf(stderr, "Usage: %s: input.asn output.c\n", argv[0]);
+  	exit(1);
+  }
+ 
+  result=asn1_parser_asn1_file_c( argv[1], argv[2]);
 
   if(result==ASN_SYNTAX_ERROR){
     printf("PARSE ERROR\n");

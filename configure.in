@@ -153,5 +153,6 @@ AC_CONFIG_COMMANDS([default],[[
  chmod +x lib/libgnutls-config
 ]],[[]])
 
-AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config lib/gnutls.h doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config \
+lib/gnutls.h doc/Makefile src/x509/Makefile src/srp/Makefile ])
 AC_OUTPUT

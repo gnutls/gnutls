@@ -25,6 +25,10 @@
 # include <signal.h>
 #endif
 
+/* created by asn1c */
+extern const static_asn pkcs1_asn1_tab[];
+extern const static_asn pkix_asn1_tab[];
+
 static void* old_sig_handler;
 ssize_t (*recv_func)( SOCKET, void*, size_t, int);
 ssize_t (*send_func)( SOCKET,const void*, size_t, int);
@@ -52,7 +56,7 @@ int gnutls_is_secure_memory(const void* mem) {
   * You must call gnutls_global_deinit() when gnutls usage is no longer needed
   * Returns zero on success.
   **/
-int gnutls_global_init(char* PKIX, char* PKCS1)
+int gnutls_global_init()
 {
 	int result;
 
@@ -74,15 +78,16 @@ int gnutls_global_init(char* PKIX, char* PKCS1)
 	 * version.
 	 */
 	
-	result = asn1_parser_asn1(PKIX, &PKIX1_ASN);
-
+//	result=asn1_create_tree( (void*)pkix_asn1_tab, &PKIX1_ASN);
+	result=asn1_parser_asn1( "/home/nmav/cvs/gnutls/lib/pkix.asn", &PKIX1_ASN);
 	if (result != ASN_OK) {
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
-	
-	result = asn1_parser_asn1(PKCS1, &PKCS1_ASN);
 
+//	result=asn1_create_tree( (void*)pkcs1_asn1_tab, &PKCS1_ASN);
+	result=asn1_parser_asn1( "/home/nmav/cvs/gnutls/lib/pkcs1.asn" , &PKCS1_ASN);
 	if (result != ASN_OK) {
+		asn1_delete_structure( PKIX1_ASN);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	

@@ -4,7 +4,7 @@ bin_SCRIPTS = libgnutls-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
 
-EXTRA_DIST = debug.h gnutls_compress.h defines.h \
+EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
 	gnutls_cipher.h gnutls_buffers.h gnutls_errors.h gnutls_int.h \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
@@ -29,6 +29,12 @@ libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	cert_ASN.y cert_asn1.c cert_der.c gnutls_datum.c auth_rsa.c \
 	gnutls_gcry.c ext_dnsname.c gnutls_pk.c gnutls_cert.c cert_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
-	gnutls_sig_check.c
+	gnutls_sig_check.c  pkix_asn1_tab.c pkcs1_asn1_tab.c
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+
+pkix_asn1_tab.c: pkix.asn
+	../src/asn1c pkix.asn pkix_asn1_tab.c
+
+pkcs1_asn1_tab.c: pkcs1.asn
+	../src/asn1c pkcs1.asn pkcs1_asn1_tab.c
 

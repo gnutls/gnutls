@@ -226,7 +226,7 @@ int gnutls_set_x509_trust( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE)
  * This will not be the case in the final version. These files 
  * are located in the src/ directory of gnutls distribution.
  */
-int gnutls_global_init(char* PKIX, char* PKCS1);
+int gnutls_global_init();
 void gnutls_global_deinit();
 
 

@@ -293,7 +293,7 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	if (gnutls_global_init("pkix.asn", "pkcs1.asn") < 0) {
+	if (gnutls_global_init() < 0) {
 		fprintf(stderr, "global state initialization error\n");
 		exit(1);
 	}

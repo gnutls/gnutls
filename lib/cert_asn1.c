@@ -371,7 +371,7 @@ asn1_create_tree(static_asn *root,node_asn **pointer)
 
 
 int
-_asn1_create_static_structure(node_asn *pointer,char *file_name)
+_asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name)
 {
   FILE *file;  
   node_asn *p;
@@ -397,11 +397,14 @@ _asn1_create_static_structure(node_asn *pointer,char *file_name)
   structure_name[dot_p-slash_p]=0;
   strcat(structure_name,"_asn1_tab");
 
-  memcpy(file_out_name,file_name,dot_p-file_name);
-  file_out_name[dot_p-file_name]=0;
-  strcat(file_out_name,"_asn1_tab.c");
-
-  file=fopen(file_out_name,"w");
+  if (out_name==NULL) {
+	  memcpy(file_out_name,file_name,dot_p-file_name);
+	  file_out_name[dot_p-file_name]=0;
+	  strcat(file_out_name,"_asn1_tab.c");
+  } else {
+  	  strncpy( file_out_name, out_name, sizeof(file_out_name));
+  }
+  file=fopen( file_out_name,"w");
 
   if(file==NULL) return ASN_FILE_NOT_FOUND;
 

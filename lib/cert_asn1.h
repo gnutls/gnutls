@@ -174,6 +174,8 @@ asn1_write_value(node_asn *root,char *name,unsigned char *value,int len);
 int 
 asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len);
 
+int
+asn1_create_tree(static_asn *root,node_asn **pointer);
 
 #endif
 
