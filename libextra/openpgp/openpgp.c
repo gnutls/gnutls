@@ -68,6 +68,7 @@ void gnutls_openpgp_key_deinit(gnutls_openpgp_key key)
 		cdk_kbnode_release( key->knode);
 		key->knode = NULL;
 	}
+	if (key->inp) cdk_stream_close( key->inp);
 	
 	gnutls_free(key);
 }
@@ -85,15 +86,32 @@ void gnutls_openpgp_key_deinit(gnutls_openpgp_key key)
   *
   **/
 int gnutls_openpgp_key_import(gnutls_openpgp_key key, 
-	const gnutls_datum * data,
-	gnutls_openpgp_key_fmt format)
+	const gnutls_datum * data, gnutls_openpgp_key_fmt format)
 {
 int rc;
 
-	rc = cdk_kbnode_read_from_mem( &key->knode, data->data, data->size);
-	if( (rc = _gnutls_map_cdk_rc( rc ))) {
-		gnutls_assert();
-		return rc;
+	if (format == GNUTLS_OPENPGP_FMT_RAW) {
+		rc = cdk_kbnode_read_from_mem( &key->knode, data->data, data->size);
+		if( rc) {
+			rc = _gnutls_map_cdk_rc( rc);
+			gnutls_assert();
+			return rc;
+		}
+	} else { /* base64 */
+		key->inp = cdk_stream_tmp_from_mem( data->data, data->size);
+		if (key->inp == NULL) {
+    			gnutls_assert();
+    			return GNUTLS_E_INTERNAL_ERROR;
+    		}
+
+	    	cdk_stream_set_armor_flag( key->inp, 0 );
+
+		rc = cdk_keydb_get_keyblock( key->inp, &key->knode );
+		if( rc) {
+			rc = _gnutls_map_cdk_rc( rc);
+			gnutls_assert();
+			return rc;
+		}
 	}
 	
 	return 0;

@@ -7,8 +7,12 @@
 
 #include <opencdk.h>
 
+typedef enum gnutls_openpgp_key_fmt { GNUTLS_OPENPGP_FMT_RAW,
+        GNUTLS_OPENPGP_FMT_BASE64 } gnutls_openpgp_key_fmt;
+
 typedef struct gnutls_openpgp_key_int {
 	cdk_kbnode_t knode;
+	cdk_stream_t inp;
 } gnutls_openpgp_key_int;
 
 typedef struct gnutls_openpgp_keyring_int {
@@ -18,9 +22,6 @@ typedef struct gnutls_openpgp_keyring_int {
 typedef struct gnutls_openpgp_trustdb_int {
 	cdk_stream_t st;
 } gnutls_openpgp_trustdb_int;
-
-typedef enum gnutls_openpgp_key_fmt { GNUTLS_X509_FMT_RAW,
-        GNUTLS_X509_FMT_BASE64 } gnutls_openpgp_key_fmt;
 
 typedef struct gnutls_openpgp_key_int *gnutls_openpgp_key;
 typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring;
