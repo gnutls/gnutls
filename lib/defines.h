@@ -27,14 +27,8 @@
 # else
 #  ifdef _AIX
 #pragma alloca
-#  else
-#   ifndef alloca	/* predefined by HP cc +Olibcalls */
-char *alloca();
-#   endif
-#  endif
 # endif
 #endif
-
 
 #include <config.h>
 
