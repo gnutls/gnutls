@@ -1,3 +1,20 @@
+2003-11-04 13:22  nmav <nmav@gnutls.org>
+
+	* doc/scripts/gdoc:
+
+	added the new gdoc by Simon.  
+
+2003-11-04 12:52  nmav <nmav@gnutls.org>
+
+	* lib/: ext_server_name.c, gnutls_buffers.c, gnutls_buffers.h,
+	gnutls_cert.c, gnutls_cipher.c, gnutls_cipher.h,
+	gnutls_compress_int.c, gnutls_compress_int.h, gnutls_db.c,
+	gnutls_int.h, gnutls_kx.c, gnutls_state.h, gnutls_ui.c,
+	gnutls_v2_compat.c, x509_b64.c, x509_b64.h:
+
+	some type fixes. Based on build logs sent by Dimitri
+	Papadopoulos-Orfanos <papadopo@shfj.cea.fr>.  
+
 2003-11-02 13:27  nmav <nmav@gnutls.org>
 
 	* src/common.c (tags: gnutls_0_9_95):
