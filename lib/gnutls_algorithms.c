@@ -42,7 +42,7 @@ static const gnutls_cred_map cred_mappings[] = {
 	{ GNUTLS_KX_SRP,     	GNUTLS_CRD_SRP,		GNUTLS_CRD_SRP     },
 	{ GNUTLS_KX_SRP_RSA,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE     },
 	{ GNUTLS_KX_SRP_DSS,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE     },
-	{ 0 }
+	{ 0, 0, 0}
 };
 
 #define GNUTLS_KX_MAP_LOOP(b) \
@@ -54,6 +54,42 @@ static const gnutls_cred_map cred_mappings[] = {
 
 #define GNUTLS_KX_MAP_ALG_LOOP_CLIENT(a) \
                         GNUTLS_KX_MAP_LOOP( if(p->client_type == type) { a; break; })
+
+/* KX mappings to PK algorithms */
+typedef struct {
+	gnutls_kx_algorithm kx_algorithm;
+	gnutls_pk_algorithm pk_algorithm;
+	enum encipher_type encipher_type; /* CIPHER_ENCRYPT if this algorithm is to be used
+			    * for encryption, CIPHER_SIGN if signature only,
+			    * CIPHER_IGN if this does not apply at all.
+			    *
+			    * This is useful to certificate cipher suites, which check
+			    * against the certificate key usage bits.
+			    */
+} gnutls_pk_map;
+
+/* This table maps the Key exchange algorithms to
+ * the certificate algorithms. Eg. if we have
+ * RSA algorithm in the certificate then we can
+ * use GNUTLS_KX_RSA or GNUTLS_KX_DHE_RSA.
+ */
+static const gnutls_pk_map pk_mappings[] = {
+	{GNUTLS_KX_RSA, GNUTLS_PK_RSA, CIPHER_ENCRYPT},
+	{GNUTLS_KX_RSA_EXPORT, GNUTLS_PK_RSA, CIPHER_SIGN},
+	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
+	{GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
+	{GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
+	{GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
+	{0, 0, 0}
+};
+
+#define GNUTLS_PK_MAP_LOOP(b) \
+        const gnutls_pk_map *p; \
+                for(p = pk_mappings; p->kx_algorithm != 0; p++) { b ; }
+
+#define GNUTLS_PK_MAP_ALG_LOOP(a) \
+                        GNUTLS_PK_MAP_LOOP( if(p->kx_algorithm == kx_algorithm) { a; break; })
+
 
 
 /* TLS Versions */
@@ -70,7 +106,7 @@ static const gnutls_version_entry sup_versions[] = {
 	{"SSL 3.0", GNUTLS_SSL3, 3, 0, 1},
 	{"TLS 1.0", GNUTLS_TLS1, 3, 1, 1},
 	{"UNKNOWN", GNUTLS_VERSION_UNKNOWN, 0, 0, 1},
-	{0}
+	{0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_VERSION_LOOP(b) \
@@ -105,7 +141,7 @@ static const gnutls_cipher_entry algorithms[] = {
 	{"ARCFOUR 128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0 },
 	{"ARCFOUR 40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1 },
 	{"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0 },
-	{0}
+	{0, 0, 0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_LOOP(b) \
@@ -127,7 +163,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
 	{"SHA", GNUTLS_MAC_SHA, 20},
 	{"MD5", GNUTLS_MAC_MD5, 16},
 	{"NULL", GNUTLS_MAC_NULL, 0},
-	{0}
+	{0, 0, 0}
 };
 
 #define GNUTLS_HASH_LOOP(b) \
@@ -155,7 +191,7 @@ gnutls_compression_entry _gnutls_compression_algorithms[MAX_COMP_METHODS] =
 	/* draft-ietf-tls-compression-02 */
 	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB, 0x01, 15, 8, 3),
 #endif
-	{0}
+	{0, 0, 0, 0, 0, 0}
 };
 
 #define GNUTLS_COMPRESSION_LOOP(b) \
@@ -182,16 +218,16 @@ const int _gnutls_kx_algorithms_size = MAX_KX_ALGOS;
 
 gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 #ifdef ENABLE_ANON
-	{ "Anon DH", GNUTLS_KX_ANON_DH, CIPHER_IGN, &anon_auth_struct },
+	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
 #endif
-	{ "RSA", GNUTLS_KX_RSA, CIPHER_ENCRYPT, &rsa_auth_struct },
-	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, CIPHER_SIGN, &rsa_export_auth_struct },
-	{ "DHE RSA", GNUTLS_KX_DHE_RSA, CIPHER_SIGN, &dhe_rsa_auth_struct },
-	{ "DHE DSS", GNUTLS_KX_DHE_DSS, CIPHER_SIGN, &dhe_dss_auth_struct },
+	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
+	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct },
+	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
+	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
 	/* other algorithms are appended here by gnutls-extra
 	 * initialization function.
 	 */
-	{0}
+	{0, 0, 0}
 };
 
 #define GNUTLS_KX_LOOP(b) \
@@ -417,7 +453,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 				  GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_KX_RSA,
 				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 
-	{0}
+	{0, {{0,0}}, 0, 0, 0, 0}
 };
 
 #define GNUTLS_CIPHER_SUITE_LOOP(b) \
@@ -688,13 +724,6 @@ MOD_AUTH_STRUCT *_gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm)
 
 }
 
-int _gnutls_kx_encipher_type(gnutls_kx_algorithm algorithm)
-{
-	int ret = CIPHER_IGN;
-	GNUTLS_KX_ALG_LOOP(ret = p->encipher_type);
-	return ret;
-
-}
 
 inline int _gnutls_kx_priority(gnutls_session session, gnutls_kx_algorithm algorithm)
 {
@@ -1299,4 +1328,28 @@ const char *gnutls_certificate_type_get_name( gnutls_certificate_type type)
 	if (type==GNUTLS_CRT_OPENPGP) ret = "OPENPGP";
 
 	return ret;
+}
+
+/* returns the gnutls_pk_algorithm which is compatible with
+ * the given gnutls_kx_algorithm.
+ */
+gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm)
+{
+	gnutls_pk_algorithm ret = -1;
+
+	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm);
+	return ret;
+}
+
+/* Returns the encipher type for the the given key exchange algorithm.
+ * That one of CIPHER_ENCRYPT, CIPHER_SIGN, CIPHER_IGN.
+ *
+ * ex. GNUTLS_KX_RSA requires a certificate able to encrypt... so returns CIPHER_ENCRYPT.
+ */
+enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm kx_algorithm)
+{
+	int ret = CIPHER_IGN;
+	GNUTLS_PK_MAP_ALG_LOOP(ret = p->encipher_type);
+	return ret;
+
 }

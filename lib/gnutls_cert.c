@@ -42,46 +42,6 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 
-/* KX mappings to PK algorithms */
-typedef struct {
-	gnutls_kx_algorithm kx_algorithm;
-	gnutls_pk_algorithm pk_algorithm;
-} gnutls_pk_map;
-
-/* This table maps the Key exchange algorithms to
- * the certificate algorithms. Eg. if we have
- * RSA algorithm in the certificate then we can
- * use GNUTLS_KX_RSA or GNUTLS_KX_DHE_RSA.
- */
-static const gnutls_pk_map pk_mappings[] = {
-	{GNUTLS_KX_RSA, GNUTLS_PK_RSA},
-	{GNUTLS_KX_RSA_EXPORT, GNUTLS_PK_RSA},
-	{GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA},
-	{GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA},
-	{GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA},
-	{GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA},
-	{0}
-};
-
-#define GNUTLS_PK_MAP_LOOP(b) \
-        const gnutls_pk_map *p; \
-                for(p = pk_mappings; p->kx_algorithm != 0; p++) { b ; }
-
-#define GNUTLS_PK_MAP_ALG_LOOP(a) \
-                        GNUTLS_PK_MAP_LOOP( if(p->kx_algorithm == kx_algorithm) { a; break; })
-
-
-/* returns the gnutls_pk_algorithm which is compatible with
- * the given gnutls_kx_algorithm.
- */
-gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm)
-{
-	gnutls_pk_algorithm ret = -1;
-
-	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm);
-	return ret;
-}
-
 void _gnutls_free_cert(gnutls_cert cert)
 {
 	int i;

@@ -126,7 +126,7 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("No supported compression algorithms have been found.", GNUTLS_E_NO_COMPRESSION_ALGORITHMS, 1 ), 
 	ERROR_ENTRY("No supported cipher suites have been found.", GNUTLS_E_NO_CIPHER_SUITES, 1 ),
         ERROR_ENTRY("Could not get OpenPGP key", GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
-	{0}
+	{0, 0, 0, 0}
 };
 
 #define GNUTLS_ERROR_LOOP(b) \

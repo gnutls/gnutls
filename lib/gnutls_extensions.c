@@ -44,7 +44,7 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_MAX_RECORD_SIZE, _gnutls_max_record_recv_params, _gnutls_max_record_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_CERT_TYPE, _gnutls_cert_type_recv_params, _gnutls_cert_type_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SERVER_NAME, _gnutls_server_name_recv_params, _gnutls_server_name_send_params),
-	{0}
+	{0, 0, 0, 0}
 };
 
 #define GNUTLS_EXTENSION_LOOP2(b) \

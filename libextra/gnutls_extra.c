@@ -72,7 +72,6 @@ int i;
 		_gnutls_kx_algorithms[i].name = "SRP";
 		_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP;
 		_gnutls_kx_algorithms[i].auth_struct = &srp_auth_struct;
-		_gnutls_kx_algorithms[i].encipher_type = CIPHER_IGN;
 		_gnutls_kx_algorithms[i+1].name = 0;
 	}
 	i++;
@@ -81,7 +80,6 @@ int i;
 		_gnutls_kx_algorithms[i].name = "SRP_RSA";
 		_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP_RSA;
 		_gnutls_kx_algorithms[i].auth_struct = &srp_rsa_auth_struct;
-		_gnutls_kx_algorithms[i].encipher_type = CIPHER_SIGN;
 		_gnutls_kx_algorithms[i+1].name = 0;
 	}
 	i++;
@@ -90,7 +88,6 @@ int i;
 		_gnutls_kx_algorithms[i].name = "SRP_DSS";
 		_gnutls_kx_algorithms[i].algorithm = GNUTLS_KX_SRP_DSS;
 		_gnutls_kx_algorithms[i].auth_struct = &srp_dss_auth_struct;
-		_gnutls_kx_algorithms[i].encipher_type = CIPHER_SIGN;
 		_gnutls_kx_algorithms[i+1].name = 0;
 	
 		return 0; /* ok */

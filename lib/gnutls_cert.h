@@ -98,7 +98,6 @@ typedef struct {
 struct gnutls_session_int; /* because gnutls_session is not defined when this file is included */
 
 int _gnutls_cert_supported_kx( const gnutls_cert* cert, gnutls_kx_algorithm **alg, int *alg_size);
-gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm);
 
 void _gnutls_free_cert(gnutls_cert cert);
 

@@ -146,7 +146,7 @@ extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 static int proc_srp_cert_server_kx2(gnutls_session session, opaque * data, size_t _data_size)
 {
 ssize_t ret;
-int i, sigsize;
+int sigsize;
 gnutls_datum vparams, signature;
 ssize_t data_size;
 CERTIFICATE_AUTH_INFO info;

@@ -1,8 +1,8 @@
 Version 0.?.?
-- Added "gnutls/compat.h" header which must be included if the obsolete 
-  0.4.x API is to be used.
+- Added "gnutls/compat4.h" header. This is included in gnutls.h
+  to emulate the old 0.4.x API.
 - Example programs are now stored in doc/examples/
-- Added certificate authenticated SRP cipher suites.
+- Added the certificate authenticated SRP cipher suites.
 
 Version 0.5.11 (5/11/2002)
 - Some fixes in 'gnutls-cli' client program to prevent some segmentation 
