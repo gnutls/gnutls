@@ -32,7 +32,6 @@
 #include "auth_srp.h"
 #include <gnutls_str.h>
 #include <auth_cert.h>
-#include <x509_verify.h>
 #include <gnutls_datum.h>
 #include <gnutls_sig.h>
 #include <auth_srp.h>
