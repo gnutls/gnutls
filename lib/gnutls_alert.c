@@ -140,7 +140,7 @@ const char* gnutls_alert_str( int alert) {
 
 	switch(alert) {
 		case GNUTLS_A_CLOSE_NOTIFY:
-			return "Close Notify";
+			return "Close notify";
 			break;
 		case GNUTLS_A_UNEXPECTED_MESSAGE:
 			return "Unexpected message";
@@ -150,14 +150,14 @@ const char* gnutls_alert_str( int alert) {
 			break;
 
 		case GNUTLS_A_DECRYPTION_FAILED:
-			return "Decryption Failed";
+			return "Decryption failed";
 			break;
 		case GNUTLS_A_RECORD_OVERFLOW:
-			return "Record Overflow"; 
+			return "Record overflow"; 
 			break;
 
 		case GNUTLS_A_DECOMPRESSION_FAILURE:
-			return "Decompression Failed";
+			return "Decompression failed";
 			break;
 
 		case GNUTLS_A_HANDSHAKE_FAILURE:
@@ -176,10 +176,10 @@ const char* gnutls_alert_str( int alert) {
 			return "Certificate is expired";
 			break;
 		case GNUTLS_A_CERTIFICATE_UNKNOWN:
-			return "Unknown Certificate";
+			return "Unknown certificate";
 			break;
 		case GNUTLS_A_ILLEGAL_PARAMETER:
-			return "Illegal Parameter";
+			return "Illegal parameter";
 			break;
 		case GNUTLS_A_UNKNOWN_CA:
 			return "CA is not known";
@@ -194,16 +194,16 @@ const char* gnutls_alert_str( int alert) {
 			return "Decrypt error";
 			break;
 		case GNUTLS_A_EXPORT_RESTRICTION:
-			return "Export Restriction";
+			return "Export restriction";
 			break;
 		case GNUTLS_A_PROTOCOL_VERSION:
 			return "Error in protocol version";
 			break;
 		case GNUTLS_A_INSUFFICIENT_SECURITY:
-			return "Insufficient Security";
+			return "Insufficient security";
 			break;
 		case GNUTLS_A_USER_CANCELED:
-			return "User Canceled";
+			return "User canceled";
 			break;
 		case GNUTLS_A_NO_RENEGOTIATION:
 			return "No renegotiation is allowed";
