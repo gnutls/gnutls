@@ -7,6 +7,9 @@ It is currently under heavy development.
 - The library needs libgcrypt. You can find libgcrypt at
  ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/
 
+ Note that by compiling libgcrypt with CPU optimizations you should notice
+ an increase of about 30% in gnutls' speed.
+
 - Documentation:
  view the doc/ directory and the examples in the src/ directory.
 

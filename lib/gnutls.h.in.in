@@ -159,6 +159,7 @@ const char *gnutls_certificate_type_get_name( gnutls_certificate_type type);
 
 /* error functions */
 int gnutls_error_is_fatal( int error);
+int gnutls_error_to_alert( int err, int* level);
 
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);

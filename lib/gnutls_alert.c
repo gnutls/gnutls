@@ -109,40 +109,41 @@ int gnutls_alert_send( gnutls_session session, GNUTLS_AlertLevel level, GNUTLS_A
 		return ret;
 }
 
-/* Sends the appropriate alert, depending
- * on the error message.
- */
 /**
-  * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
-  * @session: is a &gnutls_session structure.
-  * @err: is an integer
+  * gnutls_error_to_alert - This function returns an alert code based on the given error code
+  * @err: is a negative integer
+  * @level: the alert level will be stored there
   *
-  * Sends an alert to the peer depending on the error code returned by a gnutls
-  * function. All alerts sent by this function are fatal, so connection should
-  * be considered terminated after calling this function. The only exception
-  * is when err == GNUTLS_E_REHANDSHAKE, then a warning alert is sent to
-  * the peer indicating the no renegotiation will be performed.
+  * Returns an alert depending on the error code returned by a gnutls
+  * function. All alerts sent by this function should be considered fatal.
+  * The only exception is when err == GNUTLS_E_REHANDSHAKE, where a warning 
+  * alert should be sent to the peer indicating that no renegotiation will 
+  * be performed.
   *
-  * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
-  *
-  * If the return value is GNUTLS_E_UNIMPLEMENTED_FEATURE, then no alert has
-  * been sent to the peer.
+  * If the return value is GNUTLS_E_INVALID_REQUEST, then there was no
+  * mapping to an alert.
   *
   **/
-int gnutls_alert_send_appropriate( gnutls_session session, int err) {
-int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+int gnutls_error_to_alert( int err, int* level) 
+{
+int ret = GNUTLS_E_INVALID_REQUEST;
+int _level = -1;
+
 	switch (err) { /* send appropriate alert */
 		case GNUTLS_E_DECRYPTION_FAILED:
 			/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
 			 * it is not defined in SSL3.
 			 */
-			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
+			ret = GNUTLS_A_BAD_RECORD_MAC;
+			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
-			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_DECOMPRESSION_FAILURE);
+			ret = GNUTLS_A_DECOMPRESSION_FAILURE;
+			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_ILLEGAL_PARAMETER:
-                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_ILLEGAL_PARAMETER);
+                        ret = GNUTLS_A_ILLEGAL_PARAMETER;
+			_level = GNUTLS_AL_FATAL;
                         break;
 		case GNUTLS_E_ASN1_ELEMENT_NOT_FOUND:
 		case GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND:
@@ -156,32 +157,74 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		case GNUTLS_E_ASN1_SYNTAX_ERROR:
 		case GNUTLS_E_ASN1_DER_OVERFLOW:
 		case GNUTLS_E_NO_CERTIFICATE_FOUND:
-                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
+                        ret = GNUTLS_A_BAD_CERTIFICATE;
+			_level = GNUTLS_AL_FATAL;
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
 		case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
-                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_HANDSHAKE_FAILURE);
+                        ret = GNUTLS_A_HANDSHAKE_FAILURE;
+			_level = GNUTLS_AL_FATAL;
                         break;
 		case GNUTLS_E_UNEXPECTED_PACKET:
-                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
+                        ret = GNUTLS_A_UNEXPECTED_MESSAGE;
+			_level = GNUTLS_AL_FATAL;
                         break;
 		case GNUTLS_E_REHANDSHAKE:
-                        ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION);
+                        ret = GNUTLS_A_NO_RENEGOTIATION;
+			_level = GNUTLS_AL_WARNING;
                         break;
 		case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
-                        ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_PROTOCOL_VERSION);
+                        ret = GNUTLS_A_PROTOCOL_VERSION;
+			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE:
-                        ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_UNSUPPORTED_CERTIFICATE);
+                        ret = GNUTLS_A_UNSUPPORTED_CERTIFICATE;
+			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
-			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
+			ret = GNUTLS_A_RECORD_OVERFLOW;
+			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_INTERNAL_ERROR:
-			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_INTERNAL_ERROR);
+			ret = GNUTLS_A_INTERNAL_ERROR;
+			_level = GNUTLS_AL_FATAL;
 			break;
 	}
+	
+	if (level != NULL) *level = _level;
+
 	return ret;
+}
+
+
+/* Sends the appropriate alert, depending
+ * on the error message.
+ */
+/**
+  * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
+  * @session: is a &gnutls_session structure.
+  * @err: is an integer
+  *
+  * Sends an alert to the peer depending on the error code returned by a gnutls
+  * function. This function will call gnutls_error_to_alert() to determine
+  * the appropriate alert to send.
+  *
+  * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
+  *
+  * If the return value is GNUTLS_E_INVALID_REQUEST, then no alert has
+  * been sent to the peer.
+  *
+  **/
+int gnutls_alert_send_appropriate( gnutls_session session, int err) {
+int alert;
+int level;
+
+	alert = gnutls_error_to_alert( err, &level);
+	if (alert < 0) {
+		return alert;
+	}
+	
+	return gnutls_alert_send( session, level, alert);
 }
 
 /**
