@@ -1,14 +1,6 @@
 * x509 Certificate API
 * OpenPGP certificate support (through libgcrypt)
-* Add a transparent support for multiple versions (so we can add SSL 3.0
-  and future versions of TLS or even WTLS)
 * Make server work (we need certificate API for that!)
-* Add support for v2.0 init packet
-* Resume old sessions
-* Add support for compression algorithms (zlib)
+* Add support for v2.0 init packet (why do that anyway ???)
+* Resume old sessions (server side)
 
-- functions needed:
-* gnutls_get_current_cipher();
-* gnutls_get_current_kx_method();
-* gnutls_get_current_compression_method();
-* gnutls_check_pending(); - if data exist in the buffer
