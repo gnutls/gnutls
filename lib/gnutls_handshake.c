@@ -1254,6 +1254,9 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
  *
  */
 
+
+#define STATE state->gnutls_internals.handshake_state
+
 /**
   * gnutls_handshake - This the main function in the handshake protocol.
   * @cd: is a connection descriptor, as returned by socket().
@@ -1277,23 +1280,35 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 	if (ret < 0)
 		return ret;
 
-	return gnutls_handshake_common(cd, state);
+	ret = gnutls_handshake_common(cd, state);
+
+	if (ret < 0)
+		return ret;
+
+	STATE = STATE0;
+	
+	return 0;
 }
 
 #define IMED_RET( str, ret) \
-	gnutls_assert(); \
-	ERR( str, ret); \
-	if (ret==GNUTLS_E_AGAIN) return ret; \
-	gnutls_clearHashDataBuffer(state); \
-	return ret
+	if (ret < 0) { \
+		gnutls_assert(); \
+		ERR( str, ret); \
+		if (ret==GNUTLS_E_AGAIN) return ret; \
+		gnutls_clearHashDataBuffer(state); \
+		return ret; \
+	}
+
+
 
  /*
   * gnutls_handshake_client 
   * This function performs the client side of the handshake of the TLS/SSL protocol.
   */
+
 int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 {
-	int ret;
+	int ret = 0;
 
 #ifdef HANDSHAKE_DEBUG
 	if (state->gnutls_internals.resumed_security_parameters.
@@ -1307,92 +1322,98 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 					    session_id_size));
 #endif
 
-	ret = _gnutls_send_hello(cd, state);
-	if (ret < 0) {
+	if (STATE==STATE0) STATE = STATE1;
+
+	switch( STATE) {
+	case STATE1:
+		ret = _gnutls_send_hello(cd, state);
+		STATE = STATE1;
 		IMED_RET("send hello", ret);
-	}
 
-	/* receive the server hello */
-	ret =
-	    _gnutls_recv_handshake(cd, state, NULL, NULL,
-				   GNUTLS_SERVER_HELLO, MANDATORY_PACKET);
-	if (ret < 0) {
-		IMED_RET("recv hello", ret);
-	}
-
-	/* RECV CERTIFICATE */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_recv_server_certificate(cd, state);
-	if (ret < 0) {
-		IMED_RET("recv server certificate", ret);
-	}
-
-	/* receive the server key exchange */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_recv_server_kx_message(cd, state);
-	if (ret < 0) {
-		IMED_RET("recv server kx message", ret);
-	}
-
-	/* Added for SRP, 
-	 * send the client key exchange for SRP 
-	 */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_send_client_kx_message0(cd, state);
-	if (ret < 0) {
-		IMED_RET("send client kx0", ret);
-	}
-
-	/* receive the server certificate request - if any 
-	 */
-
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_recv_server_certificate_request(cd, state);
-	if (ret < 0) {
-		IMED_RET("recv server certificate request message", ret);
-	}
-
-	/* receive the server key exchange (B) (SRP only) 
-	 */
-
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_recv_server_kx_message2(cd, state);
-	if (ret < 0) {
-		IMED_RET("recv server kx message2", ret);
-	}
-
-	/* receive the server hello done */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+	case STATE2:
+		/* receive the server hello */
 		ret =
 		    _gnutls_recv_handshake(cd, state, NULL, NULL,
+					   GNUTLS_SERVER_HELLO, MANDATORY_PACKET);
+		STATE = STATE2;
+		IMED_RET("recv hello", ret);
+
+	case STATE3:
+		/* RECV CERTIFICATE */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_server_certificate(cd, state);
+		STATE = STATE3;
+		IMED_RET("recv server certificate", ret);
+
+	case STATE4:
+		/* receive the server key exchange */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_server_kx_message(cd, state);
+		STATE = STATE4;
+		IMED_RET("recv server kx message", ret);
+
+	case STATE5:
+		/* Added for SRP, 
+		 * send the client key exchange for SRP 
+		 */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_send_client_kx_message0(cd, state);
+		STATE = STATE5;
+		IMED_RET("send client kx0", ret);
+
+	case STATE6:
+		/* receive the server certificate request - if any 
+		 */
+
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_server_certificate_request(cd, state);
+		STATE = STATE6;
+		IMED_RET("recv server certificate request message", ret);
+
+	case STATE7:
+		/* receive the server key exchange (B) (SRP only) 
+		 */
+
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_server_kx_message2(cd, state);
+		STATE = STATE7;
+		IMED_RET("recv server kx message2", ret);
+
+	case STATE8:
+		/* receive the server hello done */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret =
+			    _gnutls_recv_handshake(cd, state, NULL, NULL,
 					   GNUTLS_SERVER_HELLO_DONE,
 					   MANDATORY_PACKET);
-	if (ret < 0) {
+		STATE = STATE8;
 		IMED_RET("recv server hello done", ret);
-	}
 
-	/* send our certificate - if any and if requested
-	 */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_send_client_certificate(cd, state);
-	if (ret < 0) {
+	case STATE9:
+		/* send our certificate - if any and if requested
+		 */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_send_client_certificate(cd, state);
+		STATE = STATE9;
 		IMED_RET("send client certificate", ret);
-	}
 
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_send_client_kx_message(cd, state);
-	if (ret < 0) {
+	case STATE10:
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_send_client_kx_message(cd, state);
+		STATE = STATE10;
 		IMED_RET("send client kx", ret);
-	}
 
-	/* send client certificate verify */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_send_client_certificate_verify(cd, state);
-	if (ret < 0) {
+	case STATE11:
+		/* send client certificate verify */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_send_client_certificate_verify(cd, state);
+		STATE = STATE11;
 		IMED_RET("send client certificate verify", ret);
+
+		STATE = STATE0;
 	}
 
-
+		
 	return 0;
 }
 
@@ -1404,37 +1425,53 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	int ret = 0;
 
 	/* Send the CHANGE CIPHER SPEC PACKET */
-	ret = _gnutls_send_change_cipher_spec(cd, state);
-	if (ret < 0) {
-		ERR("send ChangeCipherSpec", ret);
-		gnutls_assert();
-		return ret;
-	}
-	/* Initialize the connection state (start encryption) - in case of client 
-	 */
-	if (init == TRUE) {
-		ret = _gnutls_connection_state_init(state);
+	if (STATE==STATE0) STATE = STATE20;
+
+	switch( STATE) {
+	case STATE20:
+		ret = _gnutls_send_change_cipher_spec(cd, state);
+		STATE = STATE20;
+		if (ret < 0) {
+			ERR("send ChangeCipherSpec", ret);
+			gnutls_assert();
+			return ret;
+		}
+
+		/* Initialize the connection state (start encryption) - in case of client 
+		 */
+		if (init == TRUE) {
+			ret = _gnutls_connection_state_init(state);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+		}
+
+		ret = _gnutls_write_connection_state_init(state);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
+
+	case STATE21:
+		/* send the finished message */
+		ret = _gnutls_send_finished(cd, state);
+		STATE = STATE21;
+		if (ret < 0) {
+			ERR("send Finished", ret);
+			gnutls_assert();
+			return ret;
+		}
+
+		STATE = STATE0;
 	}
-	ret = _gnutls_write_connection_state_init(state);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	/* send the finished message */
-	ret = _gnutls_send_finished(cd, state);
-	if (ret < 0) {
-		ERR("send Finished", ret);
-		gnutls_assert();
-		return ret;
-	}
-	return ret;
+
+	return 0;
 }
 
 /* This function receives the final handshake packets 
+ * And executes the appropriate function to initialize the
+ * read state.
  */
 static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 					int init)
@@ -1442,34 +1479,48 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	int ret = 0;
 	char ch;
 
-	ret =
-	    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
-			    &ch, 1, 0);
-	if (ret <= 0) {
-		ERR("recv ChangeCipherSpec", ret);
-		gnutls_assert();
-		return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-	/* Initialize the connection state (start encryption) - in case of server */
-	if (init == TRUE) {
-		ret = _gnutls_connection_state_init(state);
+	if (STATE==STATE0) STATE = STATE30;
+
+	switch(STATE) {
+	case STATE30:
+		ret =
+		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
+				    &ch, 1, 0);
+		STATE = STATE30;
+		if (ret <= 0) {
+			ERR("recv ChangeCipherSpec", ret);
+			gnutls_assert();
+			return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+	
+		/* Initialize the connection state (start encryption) - in case of server */
+		if (init == TRUE) {
+			ret = _gnutls_connection_state_init(state);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+		}
+	
+		ret = _gnutls_read_connection_state_init(state);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
+	
+	case STATE31:
+		ret = _gnutls_recv_finished(cd, state);
+		STATE = STATE31;
+		if (ret < 0) {
+			ERR("recv finished", ret);
+			gnutls_assert();
+			return ret;
+		}
+		STATE = STATE0;
 	}
-	ret = _gnutls_read_connection_state_init(state);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	ret = _gnutls_recv_finished(cd, state);
-	if (ret < 0) {
-		ERR("recv finished", ret);
-		gnutls_assert();
-		return ret;
-	}
-	return ret;
+
+	
+	return 0;
 }
 
  /*
@@ -1481,89 +1532,97 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 {
 	int ret = 0;
 
-	ret =
-	    _gnutls_recv_handshake(cd, state, NULL, NULL,
-				   GNUTLS_CLIENT_HELLO, MANDATORY_PACKET);
-	if (ret < 0) {
-		IMED_RET("recv hello", ret);
-	}
+	if (STATE==STATE0) STATE = STATE1;
 
-	ret = _gnutls_send_hello(cd, state);
-	if (ret < 0) {
+	switch( STATE) {
+	case STATE1:
+		ret =
+		    _gnutls_recv_handshake(cd, state, NULL, NULL,
+				   GNUTLS_CLIENT_HELLO, MANDATORY_PACKET);
+		STATE = STATE1;
+		IMED_RET("recv hello", ret);
+	
+	case STATE2:
+		ret = _gnutls_send_hello(cd, state);
+		STATE = STATE2;
 		IMED_RET("send hello", ret);
-	}
-	/* NOTE: these should not be send if we are resuming */
 
 	/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+	case STATE3:
+		/* NOTE: these should not be send if we are resuming */
 
-	if (state->gnutls_internals.resumed == RESUME_FALSE)
-		ret = _gnutls_send_server_certificate(cd, state);
-	if (ret < 0) {
+		if (state->gnutls_internals.resumed == RESUME_FALSE)
+			ret = _gnutls_send_server_certificate(cd, state);
+		STATE = STATE3;
 		IMED_RET("send server certificate", ret);
-	}
-	/* send server key exchange (A) */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)
-		ret = _gnutls_send_server_kx_message(cd, state);
-	if (ret < 0) {
+
+	case STATE4:
+		/* send server key exchange (A) */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)
+			ret = _gnutls_send_server_kx_message(cd, state);
+		STATE = STATE4;
 		IMED_RET("send server kx", ret);
-	}
 
-	/* Send certificate request - if requested to */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)
-		ret = _gnutls_send_server_certificate_request(cd, state);
-	if (ret < 0) {
+	case STATE5:
+		/* Send certificate request - if requested to */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)
+			ret = _gnutls_send_server_certificate_request(cd, state);
+		STATE = STATE5;
 		IMED_RET("send server cert request", ret);
-	}
 
-/* Added for SRP which uses a different handshake */
-	/* receive the client key exchange message */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_recv_client_kx_message0(cd, state);
-	if (ret < 0) {
+	case STATE6:
+		/* Added for SRP which uses a different handshake */
+		/* receive the client key exchange message */
+
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_client_kx_message0(cd, state);
+		STATE = STATE6;
 		IMED_RET("recv client kx0", ret);
-	}
 
-	/* send server key exchange (B) */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)
-		ret = _gnutls_send_server_kx_message2(cd, state);
-	if (ret < 0) {
+	case STATE7:
+		/* send server key exchange (B) */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)
+			ret = _gnutls_send_server_kx_message2(cd, state);
+		STATE = STATE7;
 		IMED_RET("send server kx2", ret);
-	}
 
-
-	/* send the server hello done */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret =
-		    _gnutls_send_handshake(cd, state, NULL, 0,
-					   GNUTLS_SERVER_HELLO_DONE);
-	if (ret < 0) {
+	case STATE8:
+		/* send the server hello done */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret =
+			    _gnutls_send_handshake(cd, state, NULL, 0,
+						   GNUTLS_SERVER_HELLO_DONE);
+		STATE = STATE8;
 		IMED_RET("send server hello done", ret);
-	}
-	/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
 
-	/* receive the client certificate message */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_recv_client_certificate(cd, state);
-	if (ret < 0) {
+	
+		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
+	case STATE9:
+		/* receive the client certificate message */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_client_certificate(cd, state);
+		STATE = STATE9;
 		IMED_RET("recv client certificate", ret);
-	}
 
-	/* receive the client key exchange message */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret = _gnutls_recv_client_kx_message(cd, state);
-	if (ret < 0) {
+	case STATE10:
+		/* receive the client key exchange message */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret = _gnutls_recv_client_kx_message(cd, state);
+		STATE = STATE10;
 		IMED_RET("recv client kx", ret);
-	}
 
-	/* receive the client certificate verify message */
-	if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
-		ret =
-		    _gnutls_recv_client_certificate_verify_message(cd,
+	case STATE11:
+		/* receive the client certificate verify message */
+		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
+			ret =
+			    _gnutls_recv_client_certificate_verify_message(cd,
 								   state);
-	if (ret < 0) {
+		STATE = STATE11;
 		IMED_RET("recv client certificate verify", ret);
-	}
 
+		STATE = STATE0; /* finished thus clear state */
+	}
+	
 	return 0;
 }
 
@@ -1580,23 +1639,17 @@ int gnutls_handshake_common(SOCKET cd, GNUTLS_STATE state)
 		/* if we are a client resuming - or we are a server not resuming */
 
 		ret = _gnutls_recv_handshake_final(cd, state, TRUE);
-		if (ret < 0) {
-			IMED_RET("recv handshake final", ret);
-		}
+		IMED_RET("recv handshake final", ret);
+
 		ret = _gnutls_send_handshake_final(cd, state, FALSE);
-		if (ret < 0) {
-			IMED_RET( "send handshake final", ret);
-		}
+		IMED_RET( "send handshake final", ret);
 	} else {		/* if we are a client not resuming - or we are a server resuming */
 
 		ret = _gnutls_send_handshake_final(cd, state, TRUE);
-		if (ret < 0) {
-			IMED_RET("send handshake final 2", ret);
-		}
+		IMED_RET("send handshake final 2", ret);
+
 		ret = _gnutls_recv_handshake_final(cd, state, FALSE);
-		if (ret < 0) {
-			IMED_RET("recv handshake final 2", ret);
-		}
+		IMED_RET("recv handshake final 2", ret);
 	}
 
 	if (state->security_parameters.entity == GNUTLS_SERVER) {

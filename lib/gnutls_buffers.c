@@ -224,6 +224,8 @@ void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
  * It does return gnutls_errno instead.
  * This function reads data from the socket and keeps them in a buffer, of up to
  * MAX_RECV_SIZE. 
+ *
+ * sizeOfPtr should be unsigned.
  */
 ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, int flag, ContentType recv_type)
 {
@@ -234,7 +236,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 	*iptr = NULL;
 
-	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr <= 0) {
+	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0) {
 		gnutls_assert(); /* internal error */
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}

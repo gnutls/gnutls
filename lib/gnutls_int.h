@@ -99,6 +99,10 @@ typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED,
 typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
 typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
 
+typedef enum HandshakeState { STATE0=0, STATE1, STATE2, STATE3, STATE4, STATE5,
+	STATE6, STATE7, STATE8, STATE9, STATE10, STATE11, STATE20=20, STATE21,
+	STATE30=30, STATE31 } HandshakeState;
+
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
 		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
@@ -318,7 +322,7 @@ typedef struct {
 	gnutls_datum			hash_buffer; /* used to keep all handshake messages */
 	gnutls_datum			buffer_handshake; /* this is a buffer that holds the current handshake message */
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
-/*	jmp_buf				handshake_nb_state; /* holds
+	HandshakeState			handshake_state; /* holds
 					* a number which indicates where
 					* the handshake procedure has been
 					* interrupted. If it is 0 then
