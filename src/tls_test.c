@@ -86,6 +86,7 @@ static const TLS_TEST tls_tests[] = {
      "SSL 3.0"},
     {"for TLS 1.0 support", test_tls1, "yes", "no", "dunno"},
     {"for SSL 3.0 support", test_ssl3, "yes", "no", "dunno"},
+    {"for HTTPS server name", test_server, "", "failed", "not checked"},
     {"for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes",
      "dunno"},
     {"for version rollback bug in Client Hello", test_version_rollback,

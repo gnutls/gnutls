@@ -238,6 +238,51 @@ test_code_t test_srp(gnutls_session session)
 }
 #endif
 
+test_code_t test_server(gnutls_session session)
+{
+    int ret, i=0;
+    char buf[5*1024];
+    char* p;
+    const char snd_buf[] = "GET / HTTP/1.0\n\n";
+
+    if (verbose==0) return TEST_UNSURE;
+
+    buf[sizeof(buf)-1] = 0;
+    
+    ADD_ALL_CIPHERS(session);
+    ADD_ALL_COMP(session);
+    ADD_ALL_CERTTYPES(session);
+    ADD_ALL_PROTOCOLS(session);
+    ADD_ALL_MACS(session);
+    ADD_ALL_KX(session);
+
+    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+    ret = do_handshake(session);
+    if (ret != TEST_SUCCEED)
+       return TEST_FAILED;
+       
+    gnutls_record_send( session, snd_buf, sizeof(snd_buf)-1);
+    ret = gnutls_record_recv( session, buf, sizeof(buf)-1);
+    if (ret < 0) 
+        return TEST_FAILED;
+
+    p = strstr( buf, "Server:");
+    if (p!=NULL) p = strchr(p, ':');
+    if (p!=NULL) {
+        p++;
+        while(*p!=0 && *p!='\r' && *p!='\n') {
+            putc( *p, stdout);
+            p++;
+            i++;
+            if (i>64) break;
+        }
+    }
+    
+    return TEST_SUCCEED;
+}
+
+
 static int export_true = 0;
 static gnutls_datum exp = { NULL, 0 }, mod = {
 NULL, 0};

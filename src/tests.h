@@ -3,6 +3,7 @@ typedef enum {
 } test_code_t;
 
 test_code_t test_srp(gnutls_session state);
+test_code_t test_server(gnutls_session state);
 test_code_t test_export(gnutls_session state);
 test_code_t test_export_info(gnutls_session state);
 test_code_t test_hello_extension(gnutls_session state);
