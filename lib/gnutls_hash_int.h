@@ -40,4 +40,6 @@ int gnutls_hash_get_algo_len(MACAlgorithm algorithm);
 int gnutls_hash(GNUTLS_MAC_HANDLE handle, void* text, int textlen);
 void* gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle);
 
+void *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random, int random_len, int bytes);
+
 #endif /* GNUTLS_HASH_INT_H */

@@ -57,20 +57,21 @@ void gnutls_perror( int error);
 #define gnutls_recv( x, y, z, w) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
 
 /* functions to set priority of cipher suites */
-void gnutls_set_cipher_priority( int num, ...);
-void gnutls_set_kx_priority( int num, ...);
-void gnutls_set_mac_priority( int num, ...);
+void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_mac_priority( GNUTLS_STATE state, int num, ...);
 
 /* set our version - local is 0x00 for TLS 1.0 and SSL3 */
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
 
-#define	GNUTLS_E_MAC_FAILED -1
-#define	GNUTLS_E_UNKNOWN_CIPHER -2
-#define	GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM -3
-#define	GNUTLS_E_UNKNOWN_MAC_ALGORITHM -4
-#define	GNUTLS_E_UNKNOWN_ERROR -5
-#define	GNUTLS_E_UNKNOWN_CIPHER_TYPE -6
-#define	GNUTLS_E_LARGE_PACKET -7
+/* these are deprecated must be replaced by gnutls_errors.h */
+#define GNUTLS_E_MAC_FAILED -1
+#define GNUTLS_E_UNKNOWN_CIPHER -2
+#define GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM -3
+#define GNUTLS_E_UNKNOWN_MAC_ALGORITHM -4
+#define GNUTLS_E_UNKNOWN_ERROR -5
+#define GNUTLS_E_UNKNOWN_CIPHER_TYPE -6
+#define GNUTLS_E_LARGE_PACKET -7
 #define GNUTLS_E_UNSUPPORTED_VERSION_PACKET -8
 #define GNUTLS_E_UNEXPECTED_PACKET_LENGTH -9
 #define GNUTLS_E_INVALID_SESSION -10

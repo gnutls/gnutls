@@ -126,7 +126,7 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 {
 
 	if (_gnutls_cipher_is_ok(algo) == 0) {
-		if (_gnutls_cipher_priority(algo) < 0) {
+		if (_gnutls_cipher_priority(state, algo) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_UNWANTED_ALGORITHM;
 		}
@@ -183,7 +183,7 @@ int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
-	if (_gnutls_mac_priority(algo) < 0) {
+	if (_gnutls_mac_priority(state, algo) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNWANTED_ALGORITHM;
 	}

@@ -96,6 +96,15 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.certificate_requested = 0;
 	(*state)->gnutls_internals.certificate_verify_needed = 0;
 
+	(*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority=NULL;
+	(*state)->gnutls_internals.MACAlgorithmPriority.algorithms=0;
+
+	(*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority=NULL;
+	(*state)->gnutls_internals.KXAlgorithmPriority.algorithms=0;
+
+	(*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority=NULL;
+	(*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithms=0;
+	
 	return 0;
 }
 
@@ -127,6 +136,12 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	mpi_release((*state)->gnutls_internals.client_p);
 	mpi_release((*state)->gnutls_internals.client_g);
 	mpi_release((*state)->gnutls_internals.dh_secret);
+
+	/* free priorities */
+	gnutls_free((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
+	gnutls_free((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
+	gnutls_free((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
+
 
 	gnutls_free(*state);
 	return 0;

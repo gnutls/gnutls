@@ -62,23 +62,33 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 		memmove(&concat[16],
 			state->gnutls_internals.client_md_sha1, 20);
 
-		data =
-		    gnutls_PRF( state->security_parameters.master_secret,
-			       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
-			       36, 12);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			data = concat;
+		} else {
+			data =
+			    gnutls_PRF( state->security_parameters.master_secret,
+				       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
+				       36, 12);
+		}
 	} else {		/* server */
 		memmove(concat, state->gnutls_internals.server_md_md5, 16);
 		memmove(&concat[16],
 			state->gnutls_internals.server_md_sha1, 20);
 
-		data =
-		    gnutls_PRF( state->security_parameters.master_secret,
-			       48, SERVER_MSG, strlen(SERVER_MSG), concat,
-			       36, 12);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			data = concat;
+		} else {
+			data =
+			    gnutls_PRF( state->security_parameters.master_secret,
+				       48, SERVER_MSG, strlen(SERVER_MSG), concat,
+				       36, 12);
+		}
 	}
 
 	ret = _gnutls_send_handshake(cd, state, data, 12, GNUTLS_FINISHED);
-	gnutls_free(data);
+	if (_gnutls_version_ssl3(state->connection_state.version) != 0) {
+		gnutls_free(data);
+	}
 
 	return ret;
 }
@@ -110,19 +120,27 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 		memmove(&concat[16],
 			state->gnutls_internals.server_md_sha1, 20);
 
-		data =
-		    gnutls_PRF( state->security_parameters.master_secret,
-			       48, SERVER_MSG, strlen(SERVER_MSG), concat,
-			       36, 12);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			data = concat;
+		} else {
+			data =
+			    gnutls_PRF( state->security_parameters.master_secret,
+				       48, SERVER_MSG, strlen(SERVER_MSG), concat,
+				       36, 12);
+		}
 	} else {		/* server */
 		memmove(concat, state->gnutls_internals.client_md_md5, 16);
 		memmove(&concat[16],
 			state->gnutls_internals.client_md_sha1, 20);
 
-		data =
-		    gnutls_PRF( state->security_parameters.master_secret,
-			       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
-			       36, 12);
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			data = concat;
+		} else {
+			data =
+			    gnutls_PRF( state->security_parameters.master_secret,
+				       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
+				       36, 12);
+		}
 	}
 
 	if (memcmp(vrfy, data, 12) != 0) {
@@ -138,12 +156,12 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 
 
 /* This selects the best supported ciphersuite from the ones provided */
-int SelectSuite(opaque ret[2], char *data, int datalen)
+int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data, int datalen)
 {
 	int x, i, j;
 	GNUTLS_CipherSuite *ciphers;
 
-	x = _gnutls_supported_ciphersuites(&ciphers);
+	x = _gnutls_supported_ciphersuites(state, &ciphers);
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Requested cipher suites: \n");
 	for (j=0;j<datalen;j+=2) fprintf(stderr, "\t%s\n", _gnutls_cipher_suite_get_name( *((GNUTLS_CipherSuite*)&data[j]) ));
@@ -175,12 +193,12 @@ int SelectSuite(opaque ret[2], char *data, int datalen)
 }
 
 /* This selects the best supported compression method from the ones provided */
-int SelectCompMethod(CompressionMethod * ret, char *data, int datalen)
+int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, char *data, int datalen)
 {
 	int x, i, j;
 	CompressionMethod *ciphers;
 
-	x = _gnutls_supported_compression_methods(&ciphers);
+	x = _gnutls_supported_compression_methods(state, &ciphers);
 	memset(ret, '\0', sizeof(CompressionMethod));
 fprintf(stderr, "datalen: %d\n",datalen);
 	for (j = 0; j < datalen; j++) {
@@ -200,22 +218,6 @@ fprintf(stderr, "datalen: %d\n",datalen);
 	gnutls_assert();
 	return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 
-}
-
-
-
-#define SUPPORTED_COMPRESSION_METHODS 1
-int _gnutls_supported_compression_methods(CompressionMethod ** comp)
-{
-
-	*comp =
-	    gnutls_malloc(SUPPORTED_COMPRESSION_METHODS *
-			  sizeof(CompressionMethod));
-
-/* NULL Compression */
-	(*comp)[0] = COMPRESSION_NULL;
-
-	return SUPPORTED_COMPRESSION_METHODS;
 }
 
 int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
@@ -488,7 +490,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		}
 		pos += session_id_len;
 
-		x = _gnutls_supported_ciphersuites(&cipher_suites);
+		x = _gnutls_supported_ciphersuites(state, &cipher_suites);
 		x *= sizeof(uint16); /* in order to get bytes */
 #ifdef WORDS_BIGENDIAN
 		memmove(&data[pos], &x, sizeof(uint16));
@@ -509,7 +511,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		}
 
 		z = _gnutls_supported_compression_methods
-		    (&compression_methods);
+		    (state, &compression_methods);
 		memmove(&data[pos++], &z, 1); /* put the number of compression methods */
 
 		datalen += z; 
@@ -640,7 +642,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		pos += 2;
 
 		z = 1;
-		x = _gnutls_supported_ciphersuites(&cipher_suites);
+		x = _gnutls_supported_ciphersuites(state, &cipher_suites);
 		for (i = 0; i < x; i++) {
 			if (memcmp
 			    (&cipher_suites[i], cipher_suite.CipherSuite,
@@ -654,12 +656,15 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		memmove(state->gnutls_internals.
 			current_cipher_suite.CipherSuite,
 			cipher_suite.CipherSuite, 2);
-
+#ifdef HARD_DEBUG
+				fprintf(stderr, "Selected cipher suite: ");
+				fprintf(stderr, "%s\n", _gnutls_cipher_suite_get_name(state->gnutls_internals.current_cipher_suite ) );
+#endif
 		z = 1;
 		memmove(&compression_method, &data[pos++], 1);
 		z =
 		    _gnutls_supported_compression_methods
-		    (&compression_methods);
+		    (state, &compression_methods);
 		for (i = 0; i < z; i++) {
 			if (memcmp
 			    (&compression_methods[i], &compression_method,
@@ -715,7 +720,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifndef WORDS_BIGENDIAN
 		sizeOfSuites = byteswap16(sizeOfSuites);
 #endif
-		ret = SelectSuite(state->gnutls_internals.
+		ret = SelectSuite(state, state->gnutls_internals.
 			    current_cipher_suite.CipherSuite, &data[pos],
 			    sizeOfSuites); 
 
@@ -724,7 +729,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		pos += sizeOfSuites;
 
 		memmove(&z, &data[pos++], 1); /* z is the number of compression methods */
-		ret = SelectCompMethod(&state->
+		ret = SelectCompMethod(state, &state->
 				 gnutls_internals.compression_method,
 				 &data[pos], z);
 		pos+=z;
@@ -801,11 +806,18 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 	/* These are in order to hash the messages transmitted and received.
 	 * (needed by the protocol)
 	 */
-	state->gnutls_internals.client_td_md5 = gnutls_hash_init(GNUTLS_MAC_MD5);
-	state->gnutls_internals.client_td_sha1 = gnutls_hash_init(GNUTLS_MAC_SHA);
-	state->gnutls_internals.server_td_md5 = gnutls_hash_init(GNUTLS_MAC_MD5);
-	state->gnutls_internals.server_td_sha1 = gnutls_hash_init(GNUTLS_MAC_SHA);
-
+	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+/* FIXME!!! we need to keep the messages and hash them - later! */
+//		state->gnutls_internals.client_td_md5 = gnutls_hash_init_ssl3(GNUTLS_MAC_MD5);
+//		state->gnutls_internals.client_td_sha1 = gnutls_hash_init_ssl3(GNUTLS_MAC_SHA);
+//		state->gnutls_internals.server_td_md5 = gnutls_hash_init_ssl3(GNUTLS_MAC_MD5);
+//		state->gnutls_internals.server_td_sha1 = gnutls_hash_init_ssl3(GNUTLS_MAC_SHA);
+	} else {
+		state->gnutls_internals.client_td_md5 = gnutls_hash_init(GNUTLS_MAC_MD5);
+		state->gnutls_internals.client_td_sha1 = gnutls_hash_init(GNUTLS_MAC_SHA);
+		state->gnutls_internals.server_td_md5 = gnutls_hash_init(GNUTLS_MAC_MD5);
+		state->gnutls_internals.server_td_sha1 = gnutls_hash_init(GNUTLS_MAC_SHA);
+	}
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		HASH(client_hash);
 		HASH(server_hash);
@@ -905,12 +917,17 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			ERR("send ChangeCipherSpec", ret);
 			return ret;
 		}
-
-
+	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+		state->gnutls_internals.client_md_md5 =
+		    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_md5);
+		state->gnutls_internals.client_md_sha1 =
+		    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_sha1);
+	} else {
 		state->gnutls_internals.client_md_md5 =
 		    gnutls_hash_deinit(state->gnutls_internals.client_td_md5);
 		state->gnutls_internals.client_md_sha1 =
 		    gnutls_hash_deinit(state->gnutls_internals.client_td_sha1);
+	}
 
 		/* Initialize the connection state (start encryption) */
 		ret = _gnutls_connection_state_init(state);
@@ -937,11 +954,17 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		state->gnutls_internals.server_md_md5 =
-		    gnutls_hash_deinit(state->gnutls_internals.server_td_md5);
-		state->gnutls_internals.server_md_sha1 =
-	    	    gnutls_hash_deinit(state->gnutls_internals.server_td_sha1);
-
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			state->gnutls_internals.server_md_md5 =
+			    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_md5);
+			state->gnutls_internals.server_md_sha1 =
+		    	    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_sha1);
+		} else {
+			state->gnutls_internals.server_md_md5 =
+			    gnutls_hash_deinit(state->gnutls_internals.server_td_md5);
+			state->gnutls_internals.server_md_sha1 =
+		    	    gnutls_hash_deinit(state->gnutls_internals.server_td_sha1);
+		}
 		NOT_HASH(client_hash);
 		NOT_HASH(server_hash);
 		ret = _gnutls_recv_finished(cd, state);
@@ -1031,11 +1054,17 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		ret = _gnutls_connection_state_init(state);
 		if (ret<0) return ret;
 
-		state->gnutls_internals.client_md_md5 =
-		    gnutls_hash_deinit(state->gnutls_internals.client_td_md5);
-		state->gnutls_internals.client_md_sha1 =
-		    gnutls_hash_deinit(state->gnutls_internals.client_td_sha1);
-
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			state->gnutls_internals.client_md_md5 =
+			    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_md5);
+			state->gnutls_internals.client_md_sha1 =
+			    gnutls_hash_deinit_ssl3(state->gnutls_internals.client_td_sha1);
+		} else {
+			state->gnutls_internals.client_md_md5 =
+			    gnutls_hash_deinit(state->gnutls_internals.client_td_md5);
+			state->gnutls_internals.client_md_sha1 =
+			    gnutls_hash_deinit(state->gnutls_internals.client_td_sha1);		
+		}
 		NOT_HASH(client_hash);
 		HASH(server_hash);
 		ret = _gnutls_recv_finished(cd, state);
@@ -1052,11 +1081,17 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		state->gnutls_internals.server_md_md5 =
-		    gnutls_hash_deinit(state->gnutls_internals.server_td_md5);
-		state->gnutls_internals.server_md_sha1 =
-		    gnutls_hash_deinit(state->gnutls_internals.server_td_sha1);
-
+		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+			state->gnutls_internals.server_md_md5 =
+			    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_md5);
+			state->gnutls_internals.server_md_sha1 =
+			    gnutls_hash_deinit_ssl3(state->gnutls_internals.server_td_sha1);
+		} else {
+			state->gnutls_internals.server_md_md5 =
+			    gnutls_hash_deinit(state->gnutls_internals.server_td_md5);
+			state->gnutls_internals.server_md_sha1 =
+			    gnutls_hash_deinit(state->gnutls_internals.server_td_sha1);		
+		}
 		NOT_HASH(client_hash);
 		NOT_HASH(server_hash);
 		ret = _gnutls_send_finished(cd, state);

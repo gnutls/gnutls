@@ -160,15 +160,29 @@ typedef struct {
 	uint8 CipherSuite[2];
 } GNUTLS_CipherSuite;
 
+typedef struct {
+	int* algorithm_priority;
+	int algorithms;
+} BulkCipherAlgorithm_Priority;
+
+typedef struct {
+	int* algorithm_priority;
+	int algorithms;
+} MACAlgorithm_Priority;
+
+typedef struct {
+	int* algorithm_priority;
+	int algorithms;
+} KXAlgorithm_Priority;
 
 typedef struct {
 	char*			buffer;
 	uint32			bufferSize;
 	char*			buffer_handshake;
 	uint32			bufferSize_handshake;
-	ResumableSession	resumable;
-	ValidSession		valid_connection;
-	AlertDescription	last_alert;
+	ResumableSession	resumable; /* TRUE or FALSE */
+	ValidSession		valid_connection; /* true or FALSE */
+	AlertDescription	last_alert; /* last alert received */
 	GNUTLS_CipherSuite	current_cipher_suite;
 	CompressionMethod	compression_method;
 	/* for the handshake protocol */
@@ -180,16 +194,20 @@ typedef struct {
 	GNUTLS_MAC_HANDLE	server_td_sha1;
 	void*			server_md_md5;
 	void*			server_md_sha1;
-	int			server_hash;
-	int			client_hash;
+	int				server_hash;
+	int				client_hash;
 	/* For DH KX */
-	MPI			KEY;
-	MPI			client_Y;
-	MPI			client_g;
-	MPI			client_p;
-	MPI			dh_secret;
-	int			certificate_requested;
-	int			certificate_verify_needed;
+	MPI				KEY;
+	MPI				client_Y;
+	MPI				client_g;
+	MPI				client_p;
+	MPI				dh_secret;
+	int				certificate_requested; /* non zero if client certificate was requested */
+	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
+	BulkCipherAlgorithm_Priority	BulkCipherAlgorithmPriority;
+	MACAlgorithm_Priority	MACAlgorithmPriority;
+	KXAlgorithm_Priority	KXAlgorithmPriority;
+	
 } GNUTLS_INTERNALS;
 
 typedef struct {

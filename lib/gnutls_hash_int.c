@@ -305,7 +305,7 @@ void *gnutls_hash_deinit_ssl3(GNUTLS_MAC_HANDLE handle)
 	return ret;
 }
 
-void *ssl3_sha(int i, char *secret, int secret_len, char *random,
+static void *ssl3_sha(int i, char *secret, int secret_len, char *random,
 	       int random_len)
 {
 	int j;
@@ -323,7 +323,7 @@ void *ssl3_sha(int i, char *secret, int secret_len, char *random,
 	gnutls_hash(td, random, random_len);
 	return gnutls_hash_deinit(td);
 }
-void *ssl3_md5(int i, char *secret, int secret_len, char *random,
+static void *ssl3_md5(int i, char *secret, int secret_len, char *random,
 	       int random_len)
 {
 	int j;
@@ -343,7 +343,7 @@ void *ssl3_md5(int i, char *secret, int secret_len, char *random,
 
 }
 
-void *ssl3_generate_random(void *secret, int secret_len, void *random,
+void *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
 			   int random_len, int bytes)
 {
 	int size = 0, i = 0;
