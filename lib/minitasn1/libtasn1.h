@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#define LIBTASN1_VERSION "0.2.7"
+#define LIBTASN1_VERSION "0.2.8"
 
 #include <sys/types.h>
 #include <time.h>
@@ -144,6 +144,8 @@ asn1_retCode asn1_create_element(ASN1_TYPE definitions,const char *source_name,
                                  ASN1_TYPE *element);
 
 asn1_retCode asn1_delete_structure(ASN1_TYPE *structure);
+
+asn1_retCode asn1_delete_element(ASN1_TYPE structure,const char *element_name);
 
 asn1_retCode asn1_write_value(ASN1_TYPE element,const char *name,
 			      const void *value,int len);
