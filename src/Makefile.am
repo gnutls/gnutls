@@ -2,8 +2,8 @@ EXTRA_DIST = README README.srptool gnutls-http-serv
 
 SUBDIRS = srp x509 openpgp cfg
 
-INCLUDES = -I../lib -I../includes $(LIBOPENCDK_CFLAGS) \
-	-I$(top_srcdir)/gl -I$(srcdir)/cfg
+INCLUDES = -I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes \
+	$(LIBOPENCDK_CFLAGS) -I$(top_srcdir)/gl -I$(srcdir)/cfg
 
 bin_PROGRAMS = gnutls-serv gnutls-cli srptool gnutls-cli-debug certtool
 
