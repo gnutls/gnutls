@@ -1,3 +1,11 @@
+2004-12-01 20:05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/pkix_asn1_tab.c:
+
+	The certificate chain verification function now checks certificates
+	in the reverse order to minimize the resources spent. This has not
+	be thoroughtly tested.  
+
 2004-11-29 22:06  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-psk-04.txt:
