@@ -72,9 +72,6 @@ static const gnutls_version_entry sup_versions[] = {
                         GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
 
 
-#define GNUTLS_CIPHER_ENTRY(name, blksize, keysize, block, iv) \
-	{ #name, name, blksize, keysize, block, iv }
-
 struct gnutls_cipher_entry {
 	char *name;
 	BulkCipherAlgorithm id;
@@ -91,12 +88,12 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  */
 static const gnutls_cipher_entry algorithms[] = {
-	GNUTLS_CIPHER_ENTRY(GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_CIPHER_RIJNDAEL_128_CBC, 16, 16, CIPHER_BLOCK, 16),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_CIPHER_RIJNDAEL_256_CBC, 16, 32, CIPHER_BLOCK, 16),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_CIPHER_TWOFISH_128_CBC, 16, 16, CIPHER_BLOCK, 16),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_CIPHER_ARCFOUR, 1, 16, CIPHER_STREAM, 0),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0),
+	{"3DES 168 CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8 },
+	{"RIJNDAEL 128 CBC", GNUTLS_CIPHER_RIJNDAEL_128_CBC, 16, 16, CIPHER_BLOCK, 16 },
+	{"RIJNDAEL 256 CBC", GNUTLS_CIPHER_RIJNDAEL_256_CBC, 16, 32, CIPHER_BLOCK, 16 },
+	{"TWOFISH 128 CBC", GNUTLS_CIPHER_TWOFISH_128_CBC, 16, 16, CIPHER_BLOCK, 16 },
+	{"ARCFOUR 128", GNUTLS_CIPHER_ARCFOUR, 1, 16, CIPHER_STREAM, 0 },
+	{"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0 },
 	{0}
 };
 
@@ -162,8 +159,6 @@ static const gnutls_compression_entry compression_algorithms[] = {
 
 
 /* Key Exchange Section */
-#define GNUTLS_KX_ALGO_ENTRY(name, auth_struct) \
-	{ #name, name, auth_struct }
 
 struct gnutls_kx_algo_entry {
 	char *name;
@@ -179,11 +174,11 @@ extern MOD_AUTH_STRUCT anon_auth_struct;
 extern MOD_AUTH_STRUCT srp_auth_struct;
 
 static const gnutls_kx_algo_entry kx_algorithms[] = {
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, &anon_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, &rsa_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP, &srp_auth_struct),
+	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
+	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
+	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
+	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
+	{ "SRP", GNUTLS_KX_SRP, &srp_auth_struct },
 	{0}
 };
 
@@ -560,7 +555,7 @@ const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm algorithm)
 	char *ret = NULL;
 
 	/* avoid prefix */
-	GNUTLS_ALG_LOOP(ret = p->name + sizeof("GNUTLS_CIPHER_") - 1);
+	GNUTLS_ALG_LOOP(ret = p->name);
 
 	return ret;
 }
@@ -622,7 +617,7 @@ const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm)
 	char *ret = NULL;
 
 	/* avoid prefix */
-	GNUTLS_KX_ALG_LOOP(ret = p->name + sizeof("GNUTLS_KX_") - 1);
+	GNUTLS_KX_ALG_LOOP(ret = p->name);
 
 	return ret;
 }
