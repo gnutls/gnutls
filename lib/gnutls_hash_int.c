@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -30,8 +31,8 @@
 
 GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 {
-	GNUTLS_MAC_HANDLE ret = NULL;
-	gcry_error_t result = 0;
+	GNUTLS_MAC_HANDLE ret;
+	gcry_error_t result;
 
 	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 	if (ret == NULL) {
@@ -53,8 +54,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 		break;
 	default:
 		gnutls_assert();
-		gnutls_free( ret);
-		ret = GNUTLS_HASH_FAILED;
+		result = -1;
 	}
 
 	if (result) {
@@ -124,12 +124,12 @@ void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void *digest)
 	opaque *mac;
 	int maclen;
 
-	maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle->handle));
+	maclen = _gnutls_hash_get_algo_len( handle->algorithm);
+
 	gcry_md_final(handle->handle);
 	mac = gcry_md_read(handle->handle, 0);
 	if (digest != NULL)
-		memcpy(digest, mac,
-		       _gnutls_hash_get_algo_len(handle->algorithm));
+		memcpy(digest, mac, maclen);
 
 	gcry_md_close(handle->handle);
 
@@ -141,7 +141,7 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 				    const void *key, int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;
-	gcry_error_t result = 0;
+	gcry_error_t result;
 
 	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
 	if (ret == NULL)
@@ -158,12 +158,15 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 		result = gcry_md_open(&ret->handle, GCRY_MD_RMD160, GCRY_MD_FLAG_HMAC);
 		break;
 	default:
+		gnutls_assert();
+		result = -1;
+	}
+
+	if (result) {
+		gnutls_assert();
 		gnutls_free(ret);
 		ret = GNUTLS_MAC_FAILED;
 	}
-
-	if (result)
-		ret = GNUTLS_MAC_FAILED;
 
 	if (ret != GNUTLS_MAC_FAILED) {
 		gcry_md_setkey(ret->handle, key, keylen);
@@ -176,26 +179,12 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 	return ret;
 }
 
-
-int _gnutls_hmac_get_algo_len(gnutls_mac_algorithm algorithm)
-{
-	return _gnutls_hash_get_algo_len( algorithm);
-}
-
-int _gnutls_hmac(GNUTLS_MAC_HANDLE handle, const void *text, size_t textlen)
-{
-
-	gcry_md_write(handle->handle, text, textlen);
-	return 0;
-
-}
-
 void _gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle, void *digest)
 {
 	opaque *mac;
 	int maclen;
 
-	maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle->handle));
+	maclen = _gnutls_hash_get_algo_len( handle->algorithm);
 
 	gcry_md_final(handle->handle);
 	mac = gcry_md_read(handle->handle, 0);

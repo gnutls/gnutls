@@ -58,7 +58,7 @@ case "${target}" in
 esac
 
 dnl In order to use the reentrant libc functions
-CFLAGS="${CFLAGS} -D_REENTRANT"
+CFLAGS="${CFLAGS} -D_REENTRANT -D_THREAD_SAFE"
 
 opt_dmalloc_mode=no
 AC_MSG_CHECKING([whether in dmalloc mode])

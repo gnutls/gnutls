@@ -146,7 +146,8 @@ typedef enum gnutls_openpgp_key_status { GNUTLS_OPENPGP_KEY,
 
 typedef enum gnutls_close_request { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } gnutls_close_request;
 
-typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1 } gnutls_protocol_version;
+#define GNUTLS_TLS1 GNUTLS_TLS1_0
+typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1_0 } gnutls_protocol_version;
 
 typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
 } gnutls_certificate_type;
