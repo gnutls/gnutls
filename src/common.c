@@ -19,14 +19,15 @@ void print_cert_info(gnutls_session session);
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
 	PRINTX( "EMAIL:", X.email)
 
-static const char* my_ctime( time_t* tv) {
-static char buf[256];
-struct tm* tp;
+static const char *my_ctime(time_t * tv)
+{
+	static char buf[256];
+	struct tm *tp;
 
-tp = localtime(tv);
-strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp);
+	tp = localtime(tv);
+	strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp);
 
-return buf;
+	return buf;
 
 }
 
@@ -53,22 +54,22 @@ void print_x509_info(gnutls_session session)
 		return;
 
 #ifdef XML
-		{
-			gnutls_datum res;
-	
-			gnutls_x509_certificate_to_xml( &cert_list[0], &res, 0);
-			printf( res.data);
-			
-			free(res.data);
-	
-			return;
+	{
+		gnutls_datum res;
+
+		gnutls_x509_certificate_to_xml(&cert_list[0], &res, 0);
+		printf(res.data);
+
+		free(res.data);
+
+		return;
 	}
 #endif
 
 	printf(" - Certificate info:\n");
 
-	printf(" # Certificate is valid since: %s", my_ctime( &activet));
-	printf(" # Certificate expires: %s", my_ctime( &expiret));
+	printf(" # Certificate is valid since: %s", my_ctime(&activet));
+	printf(" # Certificate expires: %s", my_ctime(&expiret));
 
 	/* Print the fingerprint of the certificate
 	 */
@@ -101,13 +102,15 @@ void print_x509_info(gnutls_session session)
 	printf(" # Certificate version: #%d\n",
 	       gnutls_x509_extract_certificate_version(&cert_list[0]));
 
-	algo = gnutls_x509_extract_certificate_pk_algorithm( &cert_list[0], &bits);
+	algo =
+	    gnutls_x509_extract_certificate_pk_algorithm(&cert_list[0],
+							 &bits);
 	printf(" # Certificate public key algorithm: ");
 
-	if (algo==GNUTLS_PK_RSA) {
+	if (algo == GNUTLS_PK_RSA) {
 		printf("RSA\n");
 		printf(" #   Modulus: %d bits\n", bits);
-	} else if (algo==GNUTLS_PK_DSA) {
+	} else if (algo == GNUTLS_PK_DSA) {
 		printf("DSA\n");
 		printf(" #   Exponent: %d bits\n", bits);
 	} else {
@@ -144,23 +147,23 @@ void print_openpgp_info(gnutls_session session)
 #ifdef XML
 		{
 			gnutls_datum res;
-	
-			gnutls_openpgp_key_to_xml( &cert_list[0], &res, 0);
-			printf( res.data);
-			
+
+			gnutls_openpgp_key_to_xml(&cert_list[0], &res, 0);
+			printf(res.data);
+
 			free(res.data);
-	
+
 			return;
-	}
+		}
 #endif
 
-		printf(" # Key was created at: %s", my_ctime( &activet));
+		printf(" # Key was created at: %s", my_ctime(&activet));
 		printf(" # Key expires: ");
 		if (expiret != 0)
-			printf("%s", my_ctime( &expiret));
+			printf("%s", my_ctime(&expiret));
 		else
 			printf("Never\n");
-		
+
 		if (gnutls_openpgp_fingerprint
 		    (&cert_list[0], digest, &digest_size) >= 0) {
 			print = printable;
@@ -170,28 +173,30 @@ void print_openpgp_info(gnutls_session session)
 				print += 3;
 			}
 
-			printf(" # PGP Key version: %d\n", 
-				gnutls_openpgp_extract_key_version(&cert_list[0]));
+			printf(" # PGP Key version: %d\n",
+			       gnutls_openpgp_extract_key_version
+			       (&cert_list[0]));
 
-			algo = gnutls_openpgp_extract_key_pk_algorithm( &cert_list[0], &bits);
-		
+			algo =
+			    gnutls_openpgp_extract_key_pk_algorithm
+			    (&cert_list[0], &bits);
+
 			printf(" # PGP Key public key algorithm: ");
 
-			if (algo==GNUTLS_PK_RSA) {
+			if (algo == GNUTLS_PK_RSA) {
 				printf("RSA\n");
 				printf(" #   Modulus: %d bits\n", bits);
-			} else if (algo==GNUTLS_PK_DSA) {
+			} else if (algo == GNUTLS_PK_DSA) {
 				printf("DSA\n");
 				printf(" #   Exponent: %d bits\n", bits);
 			} else {
 				printf("UNKNOWN\n");
 			}
 
-			printf(" # PGP Key fingerprint: %s\n",
-			       printable);
+			printf(" # PGP Key fingerprint: %s\n", printable);
 
 			gnutls_openpgp_extract_key_name(&cert_list
-							      [0], 0, &pgp_name);
+							[0], 0, &pgp_name);
 			PRINT_PGP_NAME(pgp_name);
 
 		}
@@ -211,7 +216,8 @@ void print_cert_vrfy(gnutls_session session)
 		return;
 	}
 	if (status < 0) {
-		printf("- Could not verify certificate (err %d)\n", status);
+		printf("- Could not verify certificate (err %d)\n",
+		       status);
 		return;
 	}
 
@@ -241,8 +247,9 @@ int print_info(gnutls_session session)
 	switch (cred) {
 	case GNUTLS_CRD_ANON:
 		printf("- Anonymous DH using prime of %d bits, secret key "
-			"of %d bits, and peer's public key is %d bits.\n",
-		       gnutls_dh_get_prime_bits(session), gnutls_dh_get_secret_bits(session),
+		       "of %d bits, and peer's public key is %d bits.\n",
+		       gnutls_dh_get_prime_bits(session),
+		       gnutls_dh_get_secret_bits(session),
 		       gnutls_dh_get_peers_public_bits(session));
 		break;
 	case GNUTLS_CRD_SRP:
@@ -254,21 +261,36 @@ int print_info(gnutls_session session)
 			       gnutls_srp_server_get_username(session));
 		break;
 	case GNUTLS_CRD_CERTIFICATE:
-		print_cert_info( session);
+		{
+			char dns[256];
+			int dns_size = sizeof(dns);
+			int type;
+
+			/* This fails in client side */
+			if (gnutls_get_server_name
+			    (session, dns, &dns_size, &type, 0) == 0) {
+				printf("- Given server name[%d]: %s\n", type, dns);
+			}
+		}
+
+		print_cert_info(session);
 
 		print_cert_vrfy(session);
 
 		/* Check if we have been using ephemeral Diffie Hellman.
 		 */
 		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
-			printf("- Ephemeral DH using prime of %d bits, secret key "
-				"of %d bits, and peer's public key is %d bits.\n",
-			       gnutls_dh_get_prime_bits(session), gnutls_dh_get_secret_bits(session),
-			       gnutls_dh_get_peers_public_bits(session));
+			printf
+			    ("- Ephemeral DH using prime of %d bits, secret key "
+			     "of %d bits, and peer's public key is %d bits.\n",
+			     gnutls_dh_get_prime_bits(session),
+			     gnutls_dh_get_secret_bits(session),
+			     gnutls_dh_get_peers_public_bits(session));
 		}
 	}
 
-	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
+	tmp =
+	    gnutls_protocol_get_name(gnutls_protocol_get_version(session));
 	printf("- Version: %s\n", tmp);
 
 	tmp = gnutls_kx_get_name(kx);
@@ -289,7 +311,7 @@ int print_info(gnutls_session session)
 void print_cert_info(gnutls_session session)
 {
 
-	printf( "- Certificate type: ");
+	printf("- Certificate type: ");
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
 		printf("X.509\n");
@@ -345,17 +367,17 @@ void print_list(void)
 
 void print_license(void)
 {
-   fprintf(stdout,
-	   "\nCopyright (C) 2001-2002 Nikos Mavroyanopoulos\n"
-	     "This program is free software; you can redistribute it and/or modify \n"
-	     "it under the terms of the GNU General Public License as published by \n"
-	     "the Free Software Foundation; either version 2 of the License, or \n"
-	     "(at your option) any later version. \n" "\n"
-	     "This program is distributed in the hope that it will be useful, \n"
-	     "but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
-	     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
-	     "GNU General Public License for more details. \n" "\n"
-	     "You should have received a copy of the GNU General Public License \n"
-	     "along with this program; if not, write to the Free Software \n"
-	     "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
+	fprintf(stdout,
+		"\nCopyright (C) 2001-2002 Nikos Mavroyanopoulos\n"
+		"This program is free software; you can redistribute it and/or modify \n"
+		"it under the terms of the GNU General Public License as published by \n"
+		"the Free Software Foundation; either version 2 of the License, or \n"
+		"(at your option) any later version. \n" "\n"
+		"This program is distributed in the hope that it will be useful, \n"
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
+		"GNU General Public License for more details. \n" "\n"
+		"You should have received a copy of the GNU General Public License \n"
+		"along with this program; if not, write to the Free Software \n"
+		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
 }

@@ -184,6 +184,18 @@ ssize_t gnutls_record_set_max_size( gnutls_session session, size_t size);
 
 size_t gnutls_record_check_pending(gnutls_session session);
 
+/* TLS Extensions */
+
+typedef enum gnutls_server_name_type { GNUTLS_NAME_DNS=1 
+} gnutls_server_name_type;
+
+int gnutls_get_server_name(gnutls_session session, void* data, int* data_length,
+				       int *type, int index);
+
+int gnutls_set_server_name(gnutls_session session,
+			       gnutls_server_name_type type,
+			       const void *name, int name_length);
+
 /* functions to set priority of cipher suites 
  */
 int gnutls_cipher_set_priority( gnutls_session session, const int*);

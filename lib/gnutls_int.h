@@ -65,6 +65,7 @@ typedef int gnutls_transport_ptr;
 #define MAX_X509_CERT_SIZE 10*1024
 #define MAX_LOG_SIZE 1024 /* maximum number of log message */
 #define MAX_SRP_USERNAME 256
+#define MAX_SERVER_NAME_SIZE 256
 
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
@@ -167,7 +168,9 @@ typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB,
 
 typedef enum gnutls_connection_end { GNUTLS_SERVER=1, GNUTLS_CLIENT } gnutls_connection_end;
 
-typedef enum Extensions { GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6, GNUTLS_EXTENSION_CERT_TYPE=7 
+typedef enum Extensions { GNUTLS_EXTENSION_SERVER_NAME=0, 
+   GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6, 
+   GNUTLS_EXTENSION_CERT_TYPE=7 
 } Extensions;
 
 typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type;
@@ -282,7 +285,18 @@ gnutls_protocol_version;
  * structures also - see SRP).
  */
 
+typedef enum gnutls_server_name_type { GNUTLS_NAME_DNS=1 
+} gnutls_server_name_type;
+
 typedef struct {
+   opaque name[MAX_SERVER_NAME_SIZE];
+   int name_length;
+   gnutls_server_name_type type;
+} server_name_st;
+
+typedef struct {
+	server_name_st* server_names;
+	int		server_names_size;
 	opaque 		srp_username[MAX_SRP_USERNAME];
 } TLSExtensions;
 

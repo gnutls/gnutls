@@ -29,6 +29,7 @@
 #include "gnutls_errors.h"
 #include "ext_max_record.h"
 #include <ext_cert_type.h>
+#include <ext_server_name.h>
 #include "gnutls_num.h"
 
 /* Key Exchange Section */
@@ -42,6 +43,7 @@ const int _gnutls_extensions_size = MAX_EXT_SIZE;
 gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_MAX_RECORD_SIZE, _gnutls_max_record_recv_params, _gnutls_max_record_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_CERT_TYPE, _gnutls_cert_type_recv_params, _gnutls_cert_type_send_params),
+	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SERVER_NAME, _gnutls_server_name_recv_params, _gnutls_server_name_send_params),
 	{0}
 };
 
@@ -192,7 +194,6 @@ int (*ext_func_send)( gnutls_session, opaque*, int);
 		ext_func_send = _gnutls_ext_func_send(next);
 		if (ext_func_send == NULL) continue;
 		size = ext_func_send( session, sdata, sdata_size);
-
 		if (size > 0) {
 			(*data) = gnutls_realloc_fast( (*data), pos+size+4);
 			if ((*data)==NULL) {

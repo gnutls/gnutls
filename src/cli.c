@@ -123,7 +123,7 @@ void init_global_tls_stuff(void);
 
 /* initializes a gnutls_session with some defaults.
  */
-static gnutls_session init_tls_session(void)
+static gnutls_session init_tls_session( const char* hostname)
 {
    gnutls_session session;
 
@@ -132,6 +132,8 @@ static gnutls_session init_tls_session(void)
    /* allow the use of private ciphersuites.
     */
    gnutls_handshake_set_private_extensions(session, 1);
+
+   gnutls_set_server_name( session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
 
    gnutls_cipher_set_priority(session, cipher_priority);
    gnutls_compression_set_priority(session, comp_priority);
@@ -217,7 +219,7 @@ int main(int argc, char **argv)
    hd.secure = 0;
    hd.fd = sd;
 
-   hd.session = init_tls_session();
+   hd.session = init_tls_session(hostname);
    if (starttls)
       goto after_handshake;
 
@@ -225,7 +227,7 @@ int main(int argc, char **argv)
 
 
       if (i == 1) {
-	 hd.session = init_tls_session();
+	 hd.session = init_tls_session(hostname);
 	 gnutls_session_set_data(hd.session, session_data,
 				 session_data_size);
 	 free(session_data);
