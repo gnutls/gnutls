@@ -27,7 +27,9 @@
  */
 
 #include <gnutls_int.h>
-#include <auth_srp.h>
+#ifdef ENABLE_SRP
+# include <auth_srp.h>
+#endif
 #include <auth_anon.h>
 #include <auth_cert.h>
 #include <gnutls_errors.h>

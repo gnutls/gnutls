@@ -1,6 +1,6 @@
 #include <config.h>
 
-#ifdef USE_OPENPGP
+#ifdef ENABLE_OPENPGP
 
 #ifndef GNUTLS_OPENPGP_H
 #define GNUTLS_OPENPGP_H
@@ -85,6 +85,6 @@ time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum_t *
 time_t _gnutls_openpgp_get_raw_key_expiration_time(const gnutls_datum_t *
 						   cert);
 
-#endif				/*GNUTLS_OPENPGP_H */
+#endif	/*GNUTLS_OPENPGP_H */
 
-#endif				/*USE_OPENPGP */
+#endif	/*ENABLE_OPENPGP */

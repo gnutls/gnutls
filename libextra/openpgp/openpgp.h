@@ -7,10 +7,9 @@ typedef enum gnutls_openpgp_key_fmt_t {
     GNUTLS_OPENPGP_FMT_RAW, GNUTLS_OPENPGP_FMT_BASE64
 } gnutls_openpgp_key_fmt_t;
 
-#ifdef USE_OPENPGP
+#ifdef ENABLE_OPENPGP
 
-
-#include <opencdk.h>
+# include <opencdk.h>
 
 typedef struct gnutls_openpgp_key_int {
     cdk_kbnode_t knode;
@@ -95,11 +94,11 @@ void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey_t key);
 
 #else				/* no opencdk */
 
-typedef void *gnutls_openpgp_key;
-typedef void *gnutls_openpgp_privkey;
-typedef void *gnutls_openpgp_keyring;
-typedef void *gnutls_openpgp_trustdb;
+typedef void *gnutls_openpgp_key_t;
+typedef void *gnutls_openpgp_privkey_t;
+typedef void *gnutls_openpgp_keyring_t;
+typedef void *gnutls_openpgp_trustdb_t;
 
-#endif				/* USE_OPENPGP */
+#endif /* ENABLE_OPENPGP */
 
-#endif				/* OPENPGP_H */
+#endif /* OPENPGP_H */

@@ -47,13 +47,12 @@
 #include <gnutls_extra.h>
 #include "debug.h"
 
-static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt_t * certs,
-					      uint);
+static gnutls_cert *alloc_and_load_x509_certs(
+    gnutls_x509_crt_t * certs, uint);
 static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey_t key);
 static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key_t cert);
-static gnutls_privkey *alloc_and_load_pgp_key(const
-					      gnutls_openpgp_privkey_t
-					      key);
+static gnutls_privkey *alloc_and_load_pgp_key(
+    const gnutls_openpgp_privkey_t key);
 
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
@@ -61,7 +60,7 @@ static gnutls_privkey *alloc_and_load_pgp_key(const
  */
 static
 int _gnutls_copy_certificate_auth_info(cert_auth_info_t info,
-				       gnutls_cert * cert, int ncerts)
+    gnutls_cert * cert, int ncerts)
 {
     /* Copy peer's information to auth_info_t
      */
@@ -1468,7 +1467,7 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key_t cert)
  * space for it.
  */
 static gnutls_privkey *alloc_and_load_pgp_key(const
-					      gnutls_openpgp_privkey_t key)
+    gnutls_openpgp_privkey_t key)
 {
     gnutls_privkey *local_key;
     int ret = 0;

@@ -54,9 +54,11 @@ gnutls_extension_entry _gnutls_extensions[MAX_EXT_SIZE] = {
     GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_SERVER_NAME,
 			   _gnutls_server_name_recv_params,
 			   _gnutls_server_name_send_params),
+#ifdef ENABLE_SRP
     GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_SRP,
 			   _gnutls_srp_recv_params,
 			   _gnutls_srp_send_params),
+#endif
     {0, 0, 0, 0}
 };
 

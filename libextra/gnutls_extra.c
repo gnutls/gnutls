@@ -95,7 +95,7 @@ extern OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
 
 static void _gnutls_add_openpgp_functions(void)
 {
-#ifdef USE_OPENPGP
+#ifdef ENABLE_OPENPGP
     _E_gnutls_openpgp_verify_key = _gnutls_openpgp_verify_key;
     _E_gnutls_openpgp_get_raw_key_expiration_time =
 	_gnutls_openpgp_get_raw_key_expiration_time;

@@ -27,20 +27,13 @@
 
 #include <gnutls_auth.h>
 
-
 typedef int gnutls_srp_server_credentials_function(gnutls_session_t,
-						   const char *username,
-						   gnutls_datum_t * salt,
-						   gnutls_datum_t *
-						   verifier,
-						   gnutls_datum_t *
-						   generator,
-						   gnutls_datum_t * prime);
+   const char *username, gnutls_datum_t * salt,
+   gnutls_datum_t *verifier, gnutls_datum_t *generator,
+   gnutls_datum_t * prime);
 
 typedef int gnutls_srp_client_credentials_function(gnutls_session_t,
-						   unsigned int times,
-						   char **username,
-						   char **password);
+   unsigned int times, char **username, char **password);
 
 
 typedef struct {

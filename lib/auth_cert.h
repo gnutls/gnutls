@@ -28,7 +28,7 @@
 # include "gnutls_auth.h"
 # include "auth_dh_common.h"
 # include "x509/x509.h"
-#include "../libextra/openpgp/openpgp.h"
+# include "../libextra/openpgp/openpgp.h"
 
 typedef struct retr_st {
     gnutls_certificate_type_t type;
@@ -47,21 +47,12 @@ typedef struct retr_st {
 } gnutls_retr_st;
 
 typedef int gnutls_certificate_client_retrieve_function(gnutls_session_t,
-							const
-							gnutls_datum_t *
-							req_ca_rdn,
-							int nreqs,
-							const
-							gnutls_pk_algorithm_t
-							* pk_algos,
-							int
-							pk_algos_length,
-							gnutls_retr_st *);
+    const gnutls_datum_t *req_ca_rdn, int nreqs,
+    const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length,
+    gnutls_retr_st *);
 
 typedef int gnutls_certificate_server_retrieve_function(struct
-							gnutls_session_int
-							*,
-							gnutls_retr_st *);
+    gnutls_session_int*, gnutls_retr_st *);
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates

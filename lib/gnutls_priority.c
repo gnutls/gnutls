@@ -200,7 +200,7 @@ int gnutls_protocol_set_priority(gnutls_session_t session, const int *list)
 int gnutls_certificate_type_set_priority(gnutls_session_t session,
 					 const int *list)
 {
-#ifdef USE_OPENPGP
+#ifdef ENABLE_OPENPGP
 
     int num = 0, i;
 

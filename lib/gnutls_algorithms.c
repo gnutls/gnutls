@@ -238,9 +238,11 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
     {"DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
     {"DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
 
+#ifdef ENABLE_SRP
     {"SRP DSS", GNUTLS_KX_SRP_DSS, &srp_dss_auth_struct, 0, 0},
     {"SRP RSA", GNUTLS_KX_SRP_RSA, &srp_rsa_auth_struct, 0, 0},
     {"SRP", GNUTLS_KX_SRP, &srp_auth_struct, 0, 0},
+#endif
     /* other algorithms are appended here by gnutls-extra
      * initialization function.
      */
