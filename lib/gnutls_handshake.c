@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -33,6 +33,7 @@
 #include "gnutls_num.h"
 #include "gnutls_hash_int.h"
 #include "gnutls_db.h"
+#include "gnutls_extensions.h"
 
 #ifdef DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
@@ -472,6 +473,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 {
 	char *rand;
 	char *data = NULL;
+	opaque *extdata;
+	int extdatalen;
 	uint8 session_id_len, z;
 	uint32 cur_time;
 	int pos = 0;
@@ -555,6 +558,14 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 
 		gnutls_free(compression_methods);
 
+		extdatalen = _gnutls_gen_extensions( state, &extdata);
+		if (extdatalen > 0) {
+			datalen+=extdatalen;
+			data = gnutls_realloc(data, datalen);
+			memcpy( &data[pos], extdata, extdatalen);
+			gnutls_free(extdata);
+		}
+
 		ret =
 		    _gnutls_send_handshake(cd, state, data, datalen,
 					   GNUTLS_CLIENT_HELLO);
@@ -588,6 +599,14 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		data = gnutls_realloc(data, datalen);
 		memmove(&data[pos++],
 			&state->gnutls_internals.compression_method, 1);
+			
+		extdatalen = _gnutls_gen_extensions( state, &extdata);
+		if (extdatalen > 0) {
+			datalen+=extdatalen;
+			data = gnutls_realloc(data, datalen);
+			memcpy( &data[pos], extdata, extdatalen);
+			gnutls_free(extdata);
+		}
 
 		ret =
 		    _gnutls_send_handshake(cd, state, data, datalen,
@@ -599,6 +618,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	return ret;
 }
 
+#define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
 
 /* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake_int only if a
  * hello message is expected. It uses the gnutls_internals.current_cipher_suite
@@ -615,6 +635,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 	GNUTLS_Version version;
 	time_t cur_time;
 	char* rand;
+	int len = datalen;
 	
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		if (datalen < 38) {
@@ -633,14 +654,17 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 			gnutls_set_current_version(state, version);
 		}
 		pos+=2;
+		DECR_LEN(len, 2);
 		
 		memmove(state->security_parameters.server_random,
 			&data[pos], 32);
 		pos += 32;
-
+		DECR_LEN(len, 32);
+		
 		memmove(&session_id_len, &data[pos++], 1);
+		DECR_LEN(len, 1);
 
-		if (datalen < 38 + session_id_len) {
+		if (len < session_id_len) {
 			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 		}
@@ -666,10 +690,12 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		}
 
 		pos += session_id_len;
-
+		DECR_LEN(len, session_id_len);
+		
 		memmove(&cipher_suite.CipherSuite, &data[pos], 2);
 		pos += 2;
-
+		DECR_LEN(len, 2);
+		
 		z = 1;
 		x = _gnutls_supported_ciphersuites(state, &cipher_suites);
 		for (i = 0; i < x; i++) {
@@ -706,6 +732,8 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		/* move to compression */
 		z = 1;
 		memmove(&compression_method, &data[pos++], 1);
+		DECR_LEN(len, 1);
+		
 		z =
 		    _gnutls_supported_compression_methods
 		    (state, &compression_methods);
@@ -722,9 +750,14 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		memmove(&state->gnutls_internals.compression_method,
 			&compression_method, 1);
 
-
 		gnutls_free(cipher_suites);
 		gnutls_free(compression_methods);
+
+		z = _gnutls_parse_extensions( state, &data[pos], datalen); /* datalen is the rest of the parsed length */
+		if (z < 0) {
+			gnutls_assert();
+			return z;
+		}
 
 	} else {		/* Server side reading a client hello */
 		if (datalen < 35) {
@@ -743,11 +776,13 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 			gnutls_set_current_version(state, version);
 		}
 		pos+=2;
+		DECR_LEN(len, 2);
 		
 		memmove(state->security_parameters.client_random,
 			&data[pos], 32);
 		pos+=32;
-
+		DECR_LEN(len, 32);
+		
 		/* generate server random value */
 #ifdef WORDS_BIGENDIAN
 		cur_time = time(NULL);
@@ -763,12 +798,14 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		state->security_parameters.timestamp = time(NULL);
 
 		memmove(&session_id_len, &data[pos++], 1);
-
+		DECR_LEN(len, 1);
+		
 		/* RESUME SESSION */
 		if (session_id_len > 32) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 
 		ret = _gnutls_server_restore_session( state, &data[pos], session_id_len);
 		pos += session_id_len;
+		DECR_LEN(len, session_id_len);
 		
 		if (ret==0) { /* resumed! */
 			/* get the new random values */
@@ -785,6 +822,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		/* Select a ciphersuite */
 		memmove(&sizeOfSuites, &data[pos], 2);
 		pos += 2;
+		DECR_LEN(len, 2);
 #ifndef WORDS_BIGENDIAN
 		sizeOfSuites = byteswap16(sizeOfSuites);
 #endif
@@ -808,16 +846,26 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		}
 		
 		pos += sizeOfSuites;
-
+		DECR_LEN(len, sizeOfSuites);
 		memmove(&z, &data[pos++], 1); /* z is the number of compression methods */
+		DECR_LEN(len, 1);
 		ret = SelectCompMethod(state, &state->
 				 gnutls_internals.compression_method,
 				 &data[pos], z);
 		pos+=z;
-		
+		DECR_LEN(len, z);
+
 		if (ret < 0) {
+			gnutls_assert();
 			return ret;
 		}
+		
+		ret = _gnutls_parse_extensions( state, &data[pos], datalen); /* datalen is the rest of the parsed length */
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
 	}
 
 	return ret;

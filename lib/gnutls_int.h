@@ -26,9 +26,9 @@
 #define HANDSHAKE_DEBUG
 #define READ_DEBUG
 #define WRITE_DEBUG
-#define HARD_DEBUG
+#define HARD_DEBUG*/
 #define DEBUG
-*/
+
 
 #define MAX32 4294967295
 #define MAX24 16777215
@@ -124,6 +124,7 @@ typedef GNUTLS_KEY_A* GNUTLS_KEY;
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 };
+enum Extensions { GNUTLS_EXTENSION_SRP=7 };
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
@@ -142,6 +143,7 @@ typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
 typedef enum CipherType CipherType;
 typedef enum MACAlgorithm MACAlgorithm;
 typedef enum CompressionMethod CompressionMethod;
+typedef enum Extensions Extensions;
 
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
