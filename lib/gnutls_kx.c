@@ -63,12 +63,12 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			X = gnutls_calc_dh_secret(&x);
 			state->gnutls_internals.dh_secret = x;
 			g = gnutls_get_dh_params(&p);
-			gcry_mpi_print(GCRYMPI_FMT_STD, NULL, &n_g, g);
-			gcry_mpi_print(GCRYMPI_FMT_STD, NULL, &n_p, p);
-			gcry_mpi_print(GCRYMPI_FMT_STD, NULL, &n_X, X);
+			gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, g);
+			gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_p, p);
+			gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
 			data = gnutls_malloc(n_g + n_p + n_X + 6);
 			data_p = &data[0];
-			gcry_mpi_print(GCRYMPI_FMT_STD, &data_p[2],
+			gcry_mpi_print(GCRYMPI_FMT_USG, &data_p[2],
 				       &n_p, p);
 			gnutls_mpi_release(p);
 			_n_p = n_p;
@@ -79,7 +79,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			memmove(data_p, &_n_p, 2);
 #endif
 			data_g = &data_p[2 + n_p];
-			gcry_mpi_print(GCRYMPI_FMT_STD, &data_g[2],
+			gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2],
 				       &n_g, g);
 			gnutls_mpi_release(g);
 			_n_g = n_g;
@@ -90,7 +90,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			memmove(data_g, &_n_g, 2);
 #endif
 			data_X = &data_g[2 + n_g];
-			gcry_mpi_print(GCRYMPI_FMT_STD, &data_X[2],
+			gcry_mpi_print(GCRYMPI_FMT_USG, &data_X[2],
 				       &n_X, X);
 			gnutls_mpi_release(X);
 			_n_X = n_X;
@@ -150,21 +150,22 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 					   gnutls_internals.client_g,
 					   state->
 					   gnutls_internals.client_p);
-		gcry_mpi_print(GCRYMPI_FMT_STD, NULL, &n_X, X);
-		data = gnutls_malloc(n_X + 3);
-		gcry_mpi_print(GCRYMPI_FMT_STD, &data[3], &n_X, X);
-		data[0] = 1;	/* extern */
+		gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
+		data = gnutls_malloc(n_X + 2);
+		gcry_mpi_print(GCRYMPI_FMT_USG, &data[2], &n_X, X);
+		data[0] = 1;	/* extern - explicit since we do not have
+				   certificate */
 		gnutls_mpi_release(X);
 		_n_X = n_X;
 #ifndef WORDS_BIGENDIAN
 		_n_X = byteswap16(_n_X);
-		memmove(&data[1], &_n_X, 2);
+		memmove(&data[0], &_n_X, 2);
 #else
-		memmove(&data[1], &_n_X, 2);
+		memmove(&data[0], &_n_X, 2);
 #endif
 		ret =
 		    _gnutls_send_handshake(cd, state, data,
-					   n_X + 3,
+					   n_X + 2,
 					   GNUTLS_CLIENT_KEY_EXCHANGE);
 		gnutls_free(data);
 		/* calculate the key after sending the message */
@@ -172,10 +173,10 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 		    _gnutls_calc_dh_key(state->gnutls_internals.client_Y,
 					x,
 					state->gnutls_internals.client_p);
-		gcry_mpi_print(GCRYMPI_FMT_STD, NULL, &premaster_size,
+		gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &premaster_size,
 			       state->gnutls_internals.KEY);
 		premaster = secure_malloc(premaster_size);
-		gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
+		gcry_mpi_print(GCRYMPI_FMT_USG, premaster,
 			       &premaster_size,
 			       state->gnutls_internals.KEY);
 		/* THIS SHOULD BE DISCARDED */
@@ -208,6 +209,42 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 }
 
 
+/* This is the function for the client to send the certificate
+ * verify message
+ */
+int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
+{
+	uint8 *data;
+	int ret = 0;
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Sending client certificate verify message\n");
+#endif
+	switch (_gnutls_cipher_suite_get_kx_algo
+		(state->gnutls_internals.current_cipher_suite)) {
+	case GNUTLS_KX_DHE_DSS:
+		data=gnutls_malloc(20);
+		ret =
+		    _gnutls_send_handshake(cd, state, data,
+					   20,
+					   GNUTLS_CERTIFICATE_VERIFY);
+		gnutls_free(data);
+		break;
+	case GNUTLS_KX_DHE_RSA:
+		data=gnutls_malloc(20+16);
+		ret =
+		    _gnutls_send_handshake(cd, state, data,
+					   20+16,
+					   GNUTLS_CERTIFICATE_VERIFY);
+		gnutls_free(data);
+		break;
+	default:
+		ret = 0;
+	}
+
+	return ret;
+}
+
+
 int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
@@ -226,6 +263,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 	    _gnutls_cipher_suite_get_kx_algo
 	    (state->gnutls_internals.current_cipher_suite);
 	/* Do key exchange only if the algorithm permits it */
+
 	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
 
 		switch (_gnutls_cipher_suite_get_kx_algo
@@ -239,12 +277,14 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 						   GNUTLS_SERVER_KEY_EXCHANGE);
 			if (ret < 0)
 				return ret;
+
 			i = 0;
 			memmove(&n_p, &data[i], 2);
 			i += 2;
 #ifndef WORDS_BIGENDIAN
 			n_p = byteswap16(n_p);
 #endif
+
 			data_p = &data[i];
 			i += n_p;
 			if (i > datasize) {
@@ -267,6 +307,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 #ifndef WORDS_BIGENDIAN
 			n_Y = byteswap16(n_Y);
 #endif
+
 			data_Y = &data[i];
 			i += n_Y;
 			if (i > datasize) {
@@ -276,12 +317,24 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 			_n_Y = n_Y;
 			_n_g = n_g;
 			_n_p = n_p;
-			gcry_mpi_scan(&state->gnutls_internals.client_Y,
-				      GCRYMPI_FMT_STD, data_Y, &_n_Y);
-			gcry_mpi_scan(&state->gnutls_internals.client_g,
-				      GCRYMPI_FMT_STD, data_g, &_n_g);
-			gcry_mpi_scan(&state->gnutls_internals.client_p,
-				      GCRYMPI_FMT_STD, data_p, &_n_p);
+
+			if (gcry_mpi_scan(&state->gnutls_internals.client_Y,
+				      GCRYMPI_FMT_USG, data_Y, &_n_Y) != 0) {
+				gnutls_assert();
+				return GNUTLS_E_MPI_SCAN_FAILED;
+			}
+			if (gcry_mpi_scan(&state->gnutls_internals.client_g,
+				      GCRYMPI_FMT_USG, data_g, &_n_g) != 0) {
+				gnutls_assert();
+				return GNUTLS_E_MPI_SCAN_FAILED;
+			}
+			if (gcry_mpi_scan(&state->gnutls_internals.client_p,
+				      GCRYMPI_FMT_USG, data_p, &_n_p) != 0) {
+				gnutls_assert();
+				return GNUTLS_E_MPI_SCAN_FAILED;
+			}
+
+		/* FIXME: We need to check signature in non-anonymous KX */
 			gnutls_free(data);
 			break;
 		default:
@@ -337,17 +390,17 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 #endif
 			_n_Y = n_Y;
 			gcry_mpi_scan(&state->gnutls_internals.client_Y,
-				      GCRYMPI_FMT_STD, &data[3], &_n_Y);
+				      GCRYMPI_FMT_USG, &data[3], &_n_Y);
 			state->gnutls_internals.KEY =
 			    gnutls_calc_dh_key(state->
 					       gnutls_internals.client_Y,
 					       state->
 					       gnutls_internals.dh_secret);
-			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
+			gcry_mpi_print(GCRYMPI_FMT_USG, NULL,
 				       &premaster_size,
 				       state->gnutls_internals.KEY);
 			premaster = secure_malloc(premaster_size);
-			gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
+			gcry_mpi_print(GCRYMPI_FMT_USG, premaster,
 				       &premaster_size,
 				       state->gnutls_internals.KEY);
 			/* THESE SHOULD BE DISCARDED */

@@ -831,6 +831,15 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
+		HASH(client_hash);
+		HASH(server_hash);
+		ret = _gnutls_send_client_certificate_verify( cd, state);
+		NOT_HASH(client_hash);
+		NOT_HASH(server_hash);
+		if (ret < 0) {
+			ERR("send client certificate verify", ret);
+			return ret;
+		}
 
 		/* Send the CHANGE CIPHER SPEC PACKET */
 		ret = _gnutls_send_change_cipher_spec(cd, state);

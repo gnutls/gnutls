@@ -2,6 +2,7 @@
  *      Copyright (C) 2000 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
+ *           someday was part of gsti
  *
  * GNUTLS is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +21,9 @@
 
 #include <defines.h>
 #include <gnutls_int.h>
+#include <gnutls_errors.h>
+
+#include <dmalloc.h>
 
 /* Taken from gsti */
 
@@ -53,8 +57,10 @@ static const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 	gnutls_mpi_release(g);
 */
 
-#define E_SIZE 1024
-#define X_SIZE 200
+/* #define E_SIZE 1024 */
+#define X_SIZE 512
+
+#define gcry_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x))
 
 /****************
  * Choose a random value x and calculate e = g^x mod p.
@@ -66,7 +72,7 @@ MPI gnutls_calc_dh_secret(MPI * ret_x)
 	MPI e, g, x, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;
 
-	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_STD,
+	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
 			  diffie_hellman_group1_prime, &n))
 		abort();
 	/*dump_mpi(stderr, "prime=", prime ); */
@@ -76,7 +82,10 @@ MPI gnutls_calc_dh_secret(MPI * ret_x)
 	gcry_mpi_randomize(x, X_SIZE, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
-	e = mpi_new(E_SIZE);
+/*	e = mpi_new(E_SIZE); */
+	e = gcry_mpi_alloc_like(prime);
+	/* e = g^x mod prime */
+
 	mpi_powm(e, g, x, prime);
 
 	if (ret_x)
@@ -96,7 +105,8 @@ MPI _gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 	gcry_mpi_randomize(x, X_SIZE, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
-	e = mpi_new(E_SIZE);
+	e = gcry_mpi_alloc_like(prime);
+/*	e = mpi_new(E_SIZE); */ 
 	mpi_powm(e, g, x, prime);
 
 	if (ret_x)
@@ -112,7 +122,7 @@ MPI gnutls_get_dh_params(MPI * ret_p)
 	MPI g, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;
 
-	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_STD,
+	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
 			  diffie_hellman_group1_prime, &n))
 		abort();
 
@@ -131,12 +141,15 @@ MPI gnutls_calc_dh_key(MPI f, MPI x)
 	MPI k, prime;
 	size_t n = sizeof diffie_hellman_group1_prime;
 
-	k = mpi_new(E_SIZE);	/* FIXME: allocate in secure memory */
-	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_STD,
-			  diffie_hellman_group1_prime, &n))
+	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
+			  diffie_hellman_group1_prime, &n)) {
+		gnutls_assert();
 		abort();
+	}
 	/*dump_mpi(stderr, "prime=", prime ); */
 
+	k = gcry_mpi_alloc_like(prime);
+/*	k = mpi_new(E_SIZE);	 FIXME: allocate in secure memory */
 	mpi_powm(k, f, x, prime);
 	mpi_release(prime);
 	return k;
@@ -146,8 +159,8 @@ MPI _gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 {
 	MPI k;
 
-	k = mpi_new(E_SIZE);	/* FIXME: allocate in secure memory */
-
+/*	k = mpi_new(E_SIZE);	 FIXME: allocate in secure memory */
+	k = gcry_mpi_alloc_like(prime);
 	mpi_powm(k, f, x, prime);
 	return k;
 }

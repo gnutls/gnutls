@@ -98,7 +98,7 @@ static gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 1, 0, 0, 1, -1),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 0, 1, 1, 0, -2),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 1, 0, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0, -2),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0, -1),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 0, 1, 0, 0, -2),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 0, 1, 0, 0, -2),
 	{0}
@@ -363,6 +363,11 @@ void _gnutls_kx_set_priority(KXAlgorithm algorithm, int prio)
 	GNUTLS_KX_ALG_LOOP(if (p->priority >= -1) p->priority=prio);
 }
 
+void _gnutls_prio()
+{
+	GNUTLS_KX_LOOP(fprintf(stderr, "prio: %s/%d\n",p->name, p->priority));
+}
+
 
 int _gnutls_kx_priority(KXAlgorithm algorithm)
 {
@@ -604,7 +609,7 @@ static int _gnutls_compare_kx_algo(const void* i_A1, const void* i_A2)
 int _gnutls_supported_ciphersuites(GNUTLS_CipherSuite ** ciphers)
 {
 
-	int i, ret_count;
+	int i, ret_count, j=0;
 	int count = _gnutls_cipher_suite_count();
 	GNUTLS_CipherSuite *tmp_ciphers;
 
@@ -634,14 +639,17 @@ int _gnutls_supported_ciphersuites(GNUTLS_CipherSuite ** ciphers)
 	qsort(tmp_ciphers, count, sizeof(GNUTLS_CipherSuite), _gnutls_compare_kx_algo);
 
 	for (i = 0; i < count; i++) {
-		if (_gnutls_kx_priority( _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0) break;
-		if (_gnutls_mac_priority( _gnutls_cipher_suite_get_mac_algo(tmp_ciphers[i])) < 0) break;
-		if (_gnutls_cipher_priority( _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i])) < 0) break;
 
-		(*ciphers)[i].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
-		(*ciphers)[i].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
+		if (_gnutls_kx_priority( _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0) continue;
+		if (_gnutls_mac_priority( _gnutls_cipher_suite_get_mac_algo(tmp_ciphers[i])) < 0) continue;
+		if (_gnutls_cipher_priority( _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i])) < 0) continue;
+
+		(*ciphers)[j].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
+		(*ciphers)[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
+/*		fprintf(stderr, "%d: %s\n", j, _gnutls_cipher_suite_get_name((*ciphers)[j])); */
+		j++;
 	}
-	ret_count=i;
+	ret_count=j;
 
 	if (ret_count > 0 && ret_count != count) {
 		 *ciphers = gnutls_realloc(*ciphers, ret_count * sizeof(GNUTLS_CipherSuite)); 

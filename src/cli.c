@@ -56,15 +56,16 @@ int main()
 	ERR(err, "connect");
 
 	gnutls_init(&state, GNUTLS_CLIENT);
-	gnutls_set_cipher_priority( 1, GNUTLS_3DES);
-	gnutls_set_kx_priority( 1, GNUTLS_KX_ANON_DH);
+	gnutls_set_cipher_priority( 2, GNUTLS_3DES, GNUTLS_ARCFOUR);
+//	gnutls_set_kx_priority( 1, GNUTLS_KX_ANON_DH);
+	gnutls_set_kx_priority( 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority(2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
-
 	ret = gnutls_handshake(sd, state);
 
 	if (ret < 0) {
 		fprintf(stderr, "Handshake has failed\n");
 		gnutls_perror(ret);
+		gnutls_deinit(&state);
 		return 1;
 	} else {
 		fprintf(stderr, "Handshake was completed\n\n");
