@@ -21,7 +21,7 @@ TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex ../../lib/x509/x509-ap
 	tlsintro.tex compression.tex $(EXAMPLE_OBJECTS) \
 	tls_extensions.tex srp.tex preparation.tex callbacks.tex
 
-gnutls.html: build_api_lib build_api_x509 build_api_extra $(TEX_OBJECTS)
+gnutls.html: build_api_pgp build_api_lib build_api_x509 build_api_extra $(TEX_OBJECTS)
 	-latex2html gnutls.tex -no_navigation -split 0 \
 	-local_icons -html_version 3.2,math -info "" -white
 
