@@ -70,6 +70,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	memset(*state, 0, sizeof(GNUTLS_STATE));
 	(*state)->security_parameters.entity = con_end;
 
+	(*state)->gnutls_internals.db_reader = NULL;
+
 /* Set the defaults (only to remind me that they should be allocated ) */
 	(*state)->security_parameters.bulk_cipher_algorithm = GNUTLS_NULL_CIPHER;
 	(*state)->security_parameters.mac_algorithm = GNUTLS_NULL_MAC;
@@ -165,7 +167,13 @@ int gnutls_deinit(GNUTLS_STATE * state)
 
 	/* remove auth info firstly */
 	GNUTLS_FREE((*state)->gnutls_key->auth_info);
-	
+
+#ifdef HAVE_LIBGDBM
+	/* close the database - resuming sessions */
+	if ( (*state)->gnutls_internals.db_reader != NULL)
+		gdbm_close((*state)->gnutls_internals.db_reader);
+#endif
+
 	GNUTLS_FREE((*state)->connection_state.read_compression_state);
 	GNUTLS_FREE((*state)->connection_state.read_mac_secret);
 	GNUTLS_FREE((*state)->connection_state.write_compression_state);

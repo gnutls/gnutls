@@ -62,20 +62,27 @@ int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *sessi
  * This function should be called before gnutls_handshake_begin
  */
 int gnutls_set_current_session( GNUTLS_STATE state, opaque* session, int session_size) {
-int auth_info_size = session_size = sizeof(SecurityParameters);
-time_t timestamp = time(0);
-
-	if ( session_size < sizeof(SecurityParameters)) {
+	int auth_info_size = session_size - sizeof(SecurityParameters);
+	int timestamp = time(0);
+	SecurityParameters sp;
+	
+	if (session_size < sizeof(SecurityParameters))
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
 
-	if ( timestamp - ((SecurityParameters*)session)->timestamp <= state->gnutls_internals.expire_time && ((SecurityParameters*)session)->timestamp < timestamp) {
-		memcpy( &state->gnutls_internals.resumed_security_parameters, session, sizeof(SecurityParameters));
+	memcpy( &sp, session, sizeof(SecurityParameters));
+
+	if ( timestamp - sp.timestamp <= state->gnutls_internals.expire_time 
+		&& sp.timestamp <= timestamp) {
+
+		memcpy( &state->gnutls_internals.resumed_security_parameters, &sp, sizeof(SecurityParameters));
 		if (auth_info_size > 0) {
 			state->gnutls_key->auth_info_size = auth_info_size;
 			state->gnutls_key->auth_info = gnutls_malloc(auth_info_size);
 			memcpy( state->gnutls_key->auth_info, &session[sizeof(SecurityParameters)], auth_info_size);
-		}		
+		} else { /* set to null */
+			state->gnutls_key->auth_info_size = 0;
+			state->gnutls_key->auth_info = NULL;
+		}
 	} else {
 		return GNUTLS_E_EXPIRED;
 	}

@@ -891,14 +891,13 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 	return ret;
 }
 
-int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
-		       uint8 SessionIDLen)
+int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 {
 	char *rand;
 	char *data = NULL;
 	opaque *extdata;
 	int extdatalen;
-	uint8 session_id_len, z;
+	uint8 z;
 	uint32 cur_time;
 	int pos = 0;
 	GNUTLS_CipherSuite *cipher_suites;
@@ -906,13 +905,12 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	int i, datalen, ret = 0;
 	uint16 x;
 
-	session_id_len = SessionIDLen;
-	if (SessionID == NULL)
-		session_id_len = 0;
-
-
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+		opaque * SessionID = state->gnutls_internals.resumed_security_parameters.session_id;
+		uint8 session_id_len = state->gnutls_internals.resumed_security_parameters.session_id_size;
 
+		if (SessionID==NULL) session_id_len = 0;
+		
 		datalen = 2 + 4 + (session_id_len + 1) + 28 + 3;
 		/* 2 for version, 4 for unix time, 28 for random bytes 2 for cipher suite's
 		 * size and 1 for compression method's size 
@@ -1003,6 +1001,10 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 
 	} else {		/* SERVER */
 		uint8 comp;
+		opaque * SessionID = state->security_parameters.session_id;
+		uint8 session_id_len = state->security_parameters.session_id_size;
+		
+		if (SessionID==NULL) session_id_len = 0;
 		
 		datalen = 2 + session_id_len + 1 + 32;
 		data = gnutls_malloc(datalen);
@@ -1169,13 +1171,7 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 						session_id_size));
 #endif
 		ret =
-		    _gnutls_send_hello(cd, state,
-				       state->gnutls_internals.
-				       resumed_security_parameters.
-				       session_id,
-				       state->gnutls_internals.
-				       resumed_security_parameters.
-				       session_id_size);
+		    _gnutls_send_hello(cd, state);
 		if (ret < 0) {
 			ERR("send hello", ret);
 			gnutls_clearHashDataBuffer(state);
@@ -1215,11 +1211,7 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 		}
 
 		ret =
-		    _gnutls_send_hello(cd, state,
-				       state->security_parameters.
-				       session_id,
-				       state->security_parameters.
-				       session_id_size);
+		    _gnutls_send_hello(cd, state);
 		if (ret < 0) {
 			ERR("send hello", ret);
 			gnutls_clearHashDataBuffer(state);

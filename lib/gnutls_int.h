@@ -74,10 +74,10 @@ typedef struct {
 
 typedef unsigned char opaque;
 
-enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 };
-enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 };
-enum AlertLevel { GNUTLS_WARNING=1, GNUTLS_FATAL };
-enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTLS_BAD_RECORD_MAC=20,
+typedef enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 } crypt_algo;
+typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
+typedef enum AlertLevel { GNUTLS_WARNING=1, GNUTLS_FATAL } AlertLevel;
+typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTLS_BAD_RECORD_MAC=20,
 			GNUTLS_DECRYPTION_FAILED, GNUTLS_RECORD_OVERFLOW,  GNUTLS_DECOMPRESSION_FAILURE=30,
 			GNUTLS_HANDSHAKE_FAILURE=40, GNUTLS_BAD_CERTIFICATE=42, GNUTLS_UNSUPPORTED_CERTIFICATE,
 			GNUTLS_CERTIFICATE_REVOKED, GNUTLS_CERTIFICATE_EXPIRED, GNUTLS_CERTIFICATE_UNKNOWN,
@@ -85,21 +85,14 @@ enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTL
 			GNUTLS_DECRYPT_ERROR, GNUTLS_EXPORT_RESTRICTION=60, GNUTLS_PROTOCOL_VERSION=70,
 			GNUTLS_INSUFFICIENT_SECURITY, GNUTLS_INTERNAL_ERROR=80, GNUTLS_USER_CANCELED=90,
 			GNUTLS_NO_RENEGOTIATION=100
-			};
+			} AlertDescription;
 			
-typedef enum AlertDescription AlertDescription;
-typedef enum AlertLevel AlertLevel;
-typedef enum ChangeCipherSpecType ChangeCipherSpecType;
-typedef enum crypt_algo crypt_algo;
-
-enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
+typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
 		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
 		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
-		     GNUTLS_FINISHED=20 };
+		     GNUTLS_FINISHED=20 } HandshakeType;
 			
-typedef enum HandshakeType HandshakeType;
-
 
 typedef struct {
 	ChangeCipherSpecType type;
@@ -112,26 +105,17 @@ typedef struct {
 
 
 /* STATE */
-enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
-enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 };
-enum Extensions { GNUTLS_EXTENSION_SRP=7 };
-enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP };
-enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
-enum MACAlgorithm { GNUTLS_NULL_MAC=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
-enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB };
+typedef enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT } ConnectionEnd;
+typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 } BulkCipherAlgorithm;
+typedef enum Extensions { GNUTLS_EXTENSION_SRP=7 } Extensions;
+typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
+typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
+typedef enum MACAlgorithm { GNUTLS_NULL_MAC=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
+typedef enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB } CompressionMethod;
 
-enum ValidSession { VALID_TRUE, VALID_FALSE };
-enum ResumableSession { RESUME_TRUE, RESUME_FALSE };
+typedef enum ValidSession { VALID_TRUE, VALID_FALSE } ValidSession;
+typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
 
-typedef enum KXAlgorithm KXAlgorithm;
-typedef enum ValidSession ValidSession;
-typedef enum ResumableSession ResumableSession;
-typedef enum ConnectionEnd ConnectionEnd;
-typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
-typedef enum CipherType CipherType;
-typedef enum MACAlgorithm MACAlgorithm;
-typedef enum CompressionMethod CompressionMethod;
-typedef enum Extensions Extensions;
 
 /* STATE (stop) */
 
@@ -236,27 +220,27 @@ typedef struct {
 #define CompressionMethod_Priority GNUTLS_Priority
 
 typedef struct {
-	char*			buffer;
-	uint32			bufferSize;
-	char*			hash_buffer; /* used to keep all handshake messages */
-	uint32			hash_bufferSize;
-	char*			buffer_handshake; /* this is a buffer that holds the current handshake message */
-	uint32			bufferSize_handshake;
-	ResumableSession	resumable; /* TRUE or FALSE - if we can resume that session */
-	ValidSession		valid_connection; /* true or FALSE - if this session is valid */
-	AlertDescription	last_alert; /* last alert received */
+	char*				buffer;
+	uint32				bufferSize;
+	char*				hash_buffer; /* used to keep all handshake messages */
+	uint32				hash_bufferSize;
+	char*				buffer_handshake; /* this is a buffer that holds the current handshake message */
+	uint32				bufferSize_handshake;
+	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
+	ValidSession			valid_connection; /* true or FALSE - if this session is valid */
+	AlertDescription		last_alert; /* last alert received */
 	/* this is the ciphersuite we are going to use */
-	GNUTLS_CipherSuite	current_cipher_suite;
+	GNUTLS_CipherSuite		current_cipher_suite;
 	/* this is the compression method we are going to use */
-	CompressionMethod	compression_method;
+	CompressionMethod		compression_method;
 	/* priorities */
 	BulkCipherAlgorithm_Priority	BulkCipherAlgorithmPriority;
 	MACAlgorithm_Priority		MACAlgorithmPriority;
 	KXAlgorithm_Priority		KXAlgorithmPriority;
 	CompressionMethod_Priority	CompressionMethodPriority;
 	/* resumed session */
-	ResumableSession	resumed; /* TRUE or FALSE - if we are resuming a session */
-	SecurityParameters  resumed_security_parameters;
+	ResumableSession		resumed; /* TRUE or FALSE - if we are resuming a session */
+	SecurityParameters		resumed_security_parameters;
 
 	int				certificate_requested; /* non zero if client certificate was requested */
 	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
@@ -267,6 +251,9 @@ typedef struct {
 	int				expire_time;
 	MOD_AUTH_STRUCT*		auth_struct; /* used in handshake packets and KX algorithms */
 	int				v2_hello; /* set 0 normally - 1 if v2 hello was received - server side only */
+#ifdef HAVE_LIBGDBM
+	GDBM_FILE			db_reader;
+#endif
 } GNUTLS_INTERNALS;
 
 typedef struct {
@@ -281,9 +268,8 @@ typedef GNUTLS_STATE_INT *GNUTLS_STATE;
 
 
 /* Record Protocol */
-enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
-		GNUTLS_APPLICATION_DATA };
-typedef enum ContentType ContentType;
+typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
+		GNUTLS_APPLICATION_DATA } ContentType;
 
 typedef struct {
 	uint8 major;

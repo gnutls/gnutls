@@ -45,6 +45,10 @@
 # include <sys/types.h>
 #endif
 
+#ifdef HAVE_LIBGDBM
+# include <gdbm.h>
+#endif
+
 #ifdef USE_GCRYPT
 # include <gcrypt.h>
 #endif
