@@ -27,54 +27,69 @@
  */
 GNUTLS_COMP_HANDLE gnutls_comp_init( CompressionMethod method, int d)
 {
-#ifdef HAVE_LIBZ
 GNUTLS_COMP_HANDLE ret;
 int err;
 
+	ret = gnutls_malloc( sizeof( struct GNUTLS_COMP_HANDLE_STRUCT));
+	if (ret==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
+	ret->algo = method;
+	ret->handle = NULL;
+
+#ifdef HAVE_LIBZ
 	if (method==GNUTLS_COMP_ZLIB) {
-		ret = gnutls_malloc( sizeof(z_stream));
-		
-		if (ret==NULL) {
+		z_stream* zhandle;
+
+		ret->handle = gnutls_malloc( sizeof( z_stream));
+		if (ret->handle==NULL) {
 			gnutls_assert();
 			return NULL;
 		}
 		
-		ret->zalloc = (alloc_func)0;
-		ret->zfree = (free_func)0;
-		ret->opaque = (voidpf)0;
+		zhandle = ret->handle;
+		
+		zhandle->zalloc = (alloc_func)0;
+		zhandle->zfree = (free_func)0;
+		zhandle->opaque = (voidpf)0;
 
 		if (d)
-			err = inflateInit(ret);
+			err = inflateInit(zhandle);
 		else
-			err = deflateInit(ret, Z_DEFAULT_COMPRESSION);
+			err = deflateInit(zhandle, Z_DEFAULT_COMPRESSION);
 		if (err!=Z_OK) {
 			gnutls_assert();
 			gnutls_free( ret);
+			gnutls_free( ret->handle);
 			return NULL;
 		}
 		
-		return ret;
 	}
 #endif
- return NULL;
+	return ret;
 }
 
 void gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d) {
-#ifdef HAVE_LIBZ
 int err;
 
 	if (handle!=NULL) {
-		if (d)
-			err = inflateEnd( handle);
-		else
-			err = deflateEnd( handle);
-		gnutls_free( handle);
-		if (err!=Z_OK) {
-			gnutls_assert();
-			return;
+		switch( handle->algo) {
+#ifdef HAVE_LIBZ
+			case GNUTLS_COMP_ZLIB:
+				if (d)
+					err = inflateEnd( handle->handle);
+				else
+					err = deflateEnd( handle->handle);
+				break;
 		}
-	}
 #endif
+		gnutls_free( handle->handle);
+		gnutls_free( handle);
+
+	}
+
 	return;
 }
 
@@ -85,46 +100,47 @@ int gnutls_compress( GNUTLS_COMP_HANDLE handle, char* plain, int plain_size, cha
 int compressed_size=GNUTLS_E_COMPRESSION_FAILED;
 #ifdef HAVE_LIBZ
 uLongf size;
+z_stream *zhandle;
 #endif
 int err;
 
-	if (handle==NULL) {
-		*compressed = gnutls_malloc(plain_size);
-		if (*compressed==NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		memcpy(*compressed, plain, plain_size);
-		compressed_size = plain_size;
-	} 
+	/* NULL compression is not handled here
+	 */
+	
+	switch( handle->algo) {
 #ifdef HAVE_LIBZ
-	else {
-		size = (plain_size*2)+10;
-		*compressed=NULL;
+		case GNUTLS_COMP_ZLIB:
+			size = (plain_size*2)+10;
+			*compressed=NULL;
 
-		*compressed = gnutls_malloc(size);
-		if (*compressed==NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
+			*compressed = gnutls_malloc(size);
+			if (*compressed==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			
+			zhandle = handle->handle;
 
-		handle->next_in = (Bytef*) plain;
-		handle->avail_in = plain_size;
-		handle->next_out = (Bytef*) *compressed;
-		handle->avail_out = size;
+			zhandle->next_in = (Bytef*) plain;
+			zhandle->avail_in = plain_size;
+			zhandle->next_out = (Bytef*) *compressed;
+			zhandle->avail_out = size;
 		
-	 	err = deflate( handle, Z_SYNC_FLUSH);
+		 	err = deflate( zhandle, Z_SYNC_FLUSH);
 
-	 	if (err!=Z_OK || handle->avail_in != 0) {
-	 		gnutls_assert();
-	 		gnutls_free( *compressed);
-	 		return GNUTLS_E_COMPRESSION_FAILED;
-	 	}
+		 	if (err!=Z_OK || zhandle->avail_in != 0) {
+		 		gnutls_assert();
+		 		gnutls_free( *compressed);
+		 		return GNUTLS_E_COMPRESSION_FAILED;
+		 	}
 
-		compressed_size = size - handle->avail_out;
-		
-	}
+			compressed_size = size - zhandle->avail_out;
+			break;
 #endif
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+	} /* switch */
 
 	if (compressed_size > max_comp_size) {
 		gnutls_free(*compressed);
@@ -138,67 +154,57 @@ int gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compress
 int plain_size=GNUTLS_E_DECOMPRESSION_FAILED, err;
 #ifdef HAVE_LIBZ
 uLongf size;
+z_stream* zhandle;
 #endif
 
 	if (compressed_size > max_record_size+1024) {
 		gnutls_assert();
 		return GNUTLS_E_DECOMPRESSION_FAILED;
 	}
+
+	/* NULL compression is not handled here
+	 */
 	
-	if (handle==NULL) {
-		*plain = gnutls_malloc(compressed_size);
-		if (*plain==NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		
-		memcpy(*plain, compressed, compressed_size);
-		plain_size = compressed_size;
-	}
+	switch(handle->algo) {
 #ifdef HAVE_LIBZ
-	else {
-		*plain = NULL;
-		size = compressed_size;
-		plain_size = 0;
+		case GNUTLS_COMP_ZLIB:
+			*plain = NULL;
+			size = compressed_size;
+			plain_size = 0;
+			
+			zhandle = handle->handle;
 
-		handle->next_in = (Bytef*) compressed;
-		handle->avail_in = compressed_size;
+			zhandle->next_in = (Bytef*) compressed;
+			zhandle->avail_in = compressed_size;
 		
-		do {
-			size*=2;
-			*plain = gnutls_realloc( *plain, size);
-			if (*plain==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
-			}
+			do {
+				size*=2;
+				*plain = gnutls_realloc( *plain, size);
+				if (*plain==NULL) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
 
-			handle->next_out = (Bytef*) *plain;
-			handle->avail_out = size;
+				zhandle->next_out = (Bytef*) *plain;
+				zhandle->avail_out = size;
 
-		 	err = inflate( handle, Z_SYNC_FLUSH);
+			 	err = inflate( zhandle, Z_SYNC_FLUSH);
 
-		} while( err==Z_BUF_ERROR && handle->avail_out==0 && size < max_record_size);
+			} while( err==Z_BUF_ERROR && zhandle->avail_out==0 && size < max_record_size);
+		
+		 	if (err!=Z_OK || zhandle->avail_in != 0) {
+		 		gnutls_assert();
+		 		gnutls_free( *plain);
+		 		return GNUTLS_E_DECOMPRESSION_FAILED;
+		 	}
 
-#if 0
-		*plain = gnutls_malloc(2048);
-		size =2048;
-			handle->next_out = (Bytef*) *plain;
-			handle->avail_out = size;
-
-		 	err = inflate( handle, Z_SYNC_FLUSH);
-
+			plain_size = size - zhandle->avail_out;
+			break;
 #endif
-
-	 	if (err!=Z_OK || handle->avail_in != 0) {
-	 		gnutls_assert();
-	 		gnutls_free( *plain);
-	 		return GNUTLS_E_DECOMPRESSION_FAILED;
-	 	}
-
-		plain_size = size - handle->avail_out;
-
-	}
-#endif
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+	} /* switch */
 
 	if (plain_size > max_record_size) {
 		gnutls_assert();

@@ -23,12 +23,14 @@
 
 #ifdef HAVE_LIBZ
 # include <zlib.h>
-# define GNUTLS_COMP_HANDLE z_stream*
-# define GNUTLS_COMP_FAILED NULL
-#else
-# define GNUTLS_COMP_HANDLE void*
-# define GNUTLS_COMP_FAILED NULL
 #endif
+
+#define GNUTLS_COMP_FAILED NULL
+
+typedef struct GNUTLS_COMP_HANDLE_STRUCT {
+	void* handle;
+	CompressionMethod algo;
+} *GNUTLS_COMP_HANDLE;
 
 GNUTLS_COMP_HANDLE gnutls_comp_init( CompressionMethod, int d);
 void gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d);

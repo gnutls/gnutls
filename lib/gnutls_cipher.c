@@ -33,6 +33,23 @@
 #include "gnutls_record.h"
 #include "gnutls_constate.h"
 
+inline static int
+is_write_comp_null( GNUTLS_STATE state) {
+	if (state->security_parameters.write_compression_algorithm == GNUTLS_COMP_NULL)
+		return 0;
+		
+	return 1;
+}
+
+inline static int
+is_read_comp_null( GNUTLS_STATE state) {
+	if (state->security_parameters.read_compression_algorithm == GNUTLS_COMP_NULL)
+		return 0;
+		
+	return 1;
+}
+
+
 /* returns ciphertext which contains the headers too. This also
  * calculates the size in the header field.
  * 
@@ -45,10 +62,11 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 	gnutls_datum plain = { (char*)data, data_size };
 	gnutls_datum comp, ciph;
 	int err;
+	int free_comp = 1;
 
-	if (plain.size == 0) { 
-		comp.data = NULL;
-		comp.size = 0;
+	if (plain.size == 0 || is_write_comp_null( state)==0) { 
+		comp = plain;
+		free_comp = 0;
 	} else {
 		err = _gnutls_plaintext2TLSCompressed(state, &comp, plain);
 		if (err < 0) {
@@ -63,7 +81,8 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 		return err;
 	}
 
-	gnutls_free_datum(&comp);
+	if (free_comp)
+		gnutls_free_datum(&comp);
 
 	/* copy the headers */
 	memcpy( ciph.data, headers, headers_size);
@@ -73,6 +92,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 
 	return ciph.size;
 }
+
 
 int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 		    size_t ciphertext_size, uint8 ** data,
@@ -96,9 +116,8 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 		return ret;
 	}
 
-	if (gcomp.size==0) {
-		gtxt.data = NULL;
-		gtxt.size = 0;
+	if (gcomp.size==0 || is_read_comp_null( state)==0) {
+		gtxt = gcomp;
 	} else {
 		ret = _gnutls_TLSCompressed2plaintext(state, &gtxt, gcomp);
 		if (ret < 0) {

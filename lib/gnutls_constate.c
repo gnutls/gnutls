@@ -315,9 +315,7 @@ int rc;
 		    gnutls_comp_init(state->security_parameters.
 				       read_compression_algorithm, 1);
 		if (state->connection_state.read_compression_state ==
-		    GNUTLS_COMP_FAILED
-		    && state->security_parameters.read_compression_algorithm !=
-		    GNUTLS_COMP_NULL) {
+		    GNUTLS_COMP_FAILED) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 		}
@@ -354,11 +352,9 @@ int rc;
 		state->connection_state.read_compression_state =
 		    gnutls_comp_init(state->security_parameters.
 				       read_compression_algorithm, 1);
-				       
+
 		if (state->connection_state.read_compression_state ==
-		    GNUTLS_COMP_FAILED
-		    && state->security_parameters.read_compression_algorithm !=
-		    GNUTLS_COMP_NULL) {
+		    GNUTLS_COMP_FAILED) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 		}
@@ -483,8 +479,7 @@ int rc;
 		state->connection_state.write_compression_state =
 		    gnutls_comp_init(state->security_parameters.write_compression_algorithm, 0);
 
-		if (state->connection_state.write_compression_state == GNUTLS_COMP_FAILED
-		    && state->security_parameters.write_compression_algorithm != GNUTLS_COMP_NULL) {
+		if (state->connection_state.write_compression_state == GNUTLS_COMP_FAILED) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 		}
@@ -522,9 +517,7 @@ int rc;
 		    gnutls_comp_init(state->security_parameters.write_compression_algorithm, 0);
 
 		if (state->connection_state.write_compression_state ==
-		    GNUTLS_COMP_FAILED
-		    && state->security_parameters.write_compression_algorithm !=
-		    GNUTLS_CIPHER_NULL) {
+		    GNUTLS_COMP_FAILED) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 		}

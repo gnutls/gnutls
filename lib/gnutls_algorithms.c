@@ -144,7 +144,7 @@ typedef struct gnutls_compression_entry gnutls_compression_entry;
 static const gnutls_compression_entry compression_algorithms[] = {
 	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_NULL, 0),
 #ifdef HAVE_LIBZ
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB, 224),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB, 0xfc),
 #endif
 	{0}
 };
