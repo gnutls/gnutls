@@ -41,6 +41,7 @@
 #include <gnutls_auth_int.h>
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
+#include "x509/compat.h"
 
 void _gnutls_free_cert(gnutls_cert cert)
 {

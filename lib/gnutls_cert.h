@@ -92,7 +92,6 @@ typedef struct {
 
 	gnutls_pk_algorithm pk_algorithm;
 
-	gnutls_datum raw; /* the raw key */
 } gnutls_private_key;
 
 struct gnutls_session_int; /* because gnutls_session is not defined when this file is included */

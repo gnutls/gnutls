@@ -150,17 +150,6 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 
 	asn1_delete_structure(&pkey_asn);
 
-	if (_gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
-		_gnutls_mpi_release(&pkey->params[0]);
-		_gnutls_mpi_release(&pkey->params[1]);
-		_gnutls_mpi_release(&pkey->params[2]);
-		_gnutls_mpi_release(&pkey->params[3]);
-		_gnutls_mpi_release(&pkey->params[4]);
-		_gnutls_mpi_release(&pkey->params[5]);
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
 	return 0;
 
 
@@ -248,16 +237,6 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 
 	asn1_delete_structure(&dsa_asn);
 
-	if (_gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
-		_gnutls_mpi_release(&pkey->params[0]);
-		_gnutls_mpi_release(&pkey->params[1]);
-		_gnutls_mpi_release(&pkey->params[2]);
-		_gnutls_mpi_release(&pkey->params[3]);
-		_gnutls_mpi_release(&pkey->params[4]);
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
 	return 0;
 
 
@@ -270,8 +249,6 @@ void _gnutls_free_private_key(gnutls_private_key pkey)
 	for (i = 0; i < pkey.params_size; i++) {
 		_gnutls_mpi_release(&pkey.params[i]);
 	}
-
-	_gnutls_free_datum(&pkey.raw);
 
 	return;
 }
