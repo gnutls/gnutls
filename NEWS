@@ -4,6 +4,8 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.1.22
+- Replace GNU LD version script with Libtool -export-symbols-regex,
+  from Joe Orton <joe@manyfish.co.uk>.
 - Documentation improvements.
 - Code indented using 'indent -i4 -kr'.
 - The API manual is included in Devhelp format.  (Was in last release too,

@@ -10,11 +10,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls-extra.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
-if HAVE_LD_VERSION_SCRIPT
-  libgnutls_extra_version_script_cmd = -Wl,--version-script=$(srcdir)/libgnutls-extra.vers
-else
-  libgnutls_extra_version_script_cmd =
-endif
+LIBGNUTLS_EXTRA_EXPORTS = -export-symbols-regex '^gnutls.*'
 
 EXTRA_DIST = libgnutls-extra.vers \
 	openssl_compat.h gnutls-extra-api.texi \
@@ -70,7 +66,7 @@ COBJECTS_EXTRA = \
 	gnutls_extra.c
 
 
-libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
+libgnutls_extra_la_LDFLAGS = $(LIBGNUTLS_EXTRA_EXPORTS) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LIBOPENCDK_LIBS) $(LZO_LIBS)
 

@@ -1,5 +1,0 @@
-GNUTLS_1_1
-{
-   global: gnutls*;
-   local: *;
-};
