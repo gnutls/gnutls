@@ -23,10 +23,10 @@
 /* This implementation was written by Nikos Mavroyanopoulos for GNUTLS
  * as a Libgcrypt module (gnutls/lib/x509/rc2.c) and later adapted for
  * direct use by Libgcrypt by Werner Koch and later adapted for direct
- * use by Nettle by Simon Josefsson.  This implementation is only
- * useful for pkcs#12 descryption.
+ * use by Nettle by Simon Josefsson.
  *
- * The implementation here is based on Peter Gutmann's RRC.2 paper.
+ * The implementation here is based on Peter Gutmann's RRC.2 paper and
+ * RFC 2268.
  */
 
 #if HAVE_CONFIG_H
@@ -204,14 +204,16 @@ setkey_core(struct arctwo_ctx *ctx,
   for (i = 0; i < length; i++)
     S[i] = key[i];
 
+  /* Phase 1: Expand input key to 128 bytes */
   for (i = length; i < ARCTWO_MAX_KEY_SIZE; i++)
     S[i] = arctwo_sbox[(S[i - length] + S[i - 1]) & 255];
 
   S[0] = arctwo_sbox[S[0]];
 
-  /* Phase 2 - reduce effective key size to "bits". This was not
-   * discussed in Gutmann's paper. I've copied that from the public
-   * domain code posted in sci.crypt. */
+  /* Phase 2 - reduce effective key size to "bits".
+   *
+   * This was not discussed in Gutmann's paper. I've copied that from
+   * the public domain code posted in sci.crypt. */
   if (with_phase2)
     {
       int bits = length * 8;
@@ -236,14 +238,14 @@ void
 pkcs12_arctwo_set_key(struct arctwo_ctx *ctx,
 		      unsigned length, const uint8_t *key)
 {
-  setkey_core (ctx, length, key, 1);
+  setkey_core (ctx, length, key, 0);
 }
 
 void
 arctwo_set_key(struct arctwo_ctx *ctx,
 	       unsigned length, const uint8_t *key)
 {
-  setkey_core (ctx, length, key, 0);
+  setkey_core (ctx, length, key, 1);
 }
 
 #ifdef TEST
@@ -254,14 +256,6 @@ int main (void)
 {
   struct arctwo_ctx ctx;
   uint8_t scratch[16];
-
-  /* Test vectors from RFC 2268. */
-  static uint8_t key_0[] =
-    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-  static uint8_t plaintext_0[] =
-    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-  static const uint8_t ciphertext_0[] =
-    { 0x27, 0x8b, 0x27, 0xe4, 0x2e, 0x2f, 0x0d, 0x49 };
 
   /* Test vectors from Peter Gutmann's paper. */
   static uint8_t key_1[] =
@@ -292,49 +286,94 @@ int main (void)
   static uint8_t ciphertext_3[] =
     { 0x8f, 0xd1, 0x03, 0x89, 0x33, 0x6b, 0xf9, 0x5e };
 
-  /* Zeroth test. */
-  arctwo_set_key (&ctx, sizeof(key_0), key_0);
-  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_0);
-  if (memcmp (scratch, ciphertext_0, sizeof(ciphertext_0)))
-    puts ("RFC2268 encryption test 1 failed.");
+  /* Test vectors from RFC 2268. */
+  static uint8_t key_4[] =
+    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+  static uint8_t plaintext_4[] =
+    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+  static const uint8_t ciphertext_4[] =
+    { 0x27, 0x8b, 0x27, 0xe4, 0x2e, 0x2f, 0x0d, 0x49 };
 
-  arctwo_set_key (&ctx, sizeof(key_0), key_0);
-  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
-  if (memcmp (scratch, plaintext_0, sizeof(plaintext_0)))
-    puts ("RFC2268 decryption test 1 failed.");
+  static uint8_t key_5[] =
+    { 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+  static uint8_t plaintext_5[] =
+    { 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+  static const uint8_t ciphertext_5[] =
+    { 0x30, 0x64, 0x9e, 0xdf, 0x9b, 0xe7, 0xd2, 0xc2 };
+
+  static uint8_t key_6[] =
+    { 0x88, 0xbc, 0xa9, 0x0e, 0x90, 0x87, 0x5a, 0x7f,
+      0x0f, 0x79, 0xc3, 0x84, 0x62, 0x7b, 0xaf, 0xb2 };
+  static uint8_t plaintext_6[] =
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+  static const uint8_t ciphertext_6[] =
+    { 0x22, 0x69, 0x55, 0x2a, 0xb0, 0xf8, 0x5c, 0xa6 };
 
   /* First test. */
-  arctwo_set_key (&ctx, sizeof(key_1), key_1);
+  pkcs12_arctwo_set_key (&ctx, sizeof(key_1), key_1);
   arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_1);
   if (memcmp (scratch, ciphertext_1, sizeof(ciphertext_1)))
     puts ("RFC2268 encryption test 1 failed.");
 
-  arctwo_set_key (&ctx, sizeof(key_1), key_1);
+  pkcs12_arctwo_set_key (&ctx, sizeof(key_1), key_1);
   arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
   if (memcmp (scratch, plaintext_1, sizeof(plaintext_1)))
     puts ("RFC2268 decryption test 1 failed.");
 
   /* Second test. */
-  arctwo_set_key (&ctx, sizeof(key_2), key_2);
+  pkcs12_arctwo_set_key (&ctx, sizeof(key_2), key_2);
   arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_2);
   if (memcmp (scratch, ciphertext_2, sizeof(ciphertext_2)))
     puts ("RFC2268 encryption test 2 failed.");
 
-  arctwo_set_key (&ctx, sizeof(key_2), key_2);
+  pkcs12_arctwo_set_key (&ctx, sizeof(key_2), key_2);
   arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
   if (memcmp (scratch, plaintext_2, sizeof(plaintext_2)))
     puts ("RFC2268 decryption test 2 failed.");
 
   /* Third test. */
-  arctwo_set_key(&ctx, sizeof(key_3), key_3);
+  pkcs12_arctwo_set_key(&ctx, sizeof(key_3), key_3);
   arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_3);
   if (memcmp(scratch, ciphertext_3, sizeof(ciphertext_3)))
     puts ("RFC2268 encryption test 3 failed.");
 
-  arctwo_set_key (&ctx, sizeof(key_3), key_3);
+  pkcs12_arctwo_set_key (&ctx, sizeof(key_3), key_3);
   arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
   if (memcmp(scratch, plaintext_3, sizeof(plaintext_3)))
     puts ("RFC2268 decryption test 3 failed.");
+
+  /* Fouth test. */
+  arctwo_set_key (&ctx, sizeof(key_4), key_4);
+  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_4);
+  if (memcmp (scratch, ciphertext_4, sizeof(ciphertext_4)))
+    puts ("RFC2268 encryption test 4 failed.");
+
+  arctwo_set_key (&ctx, sizeof(key_4), key_4);
+  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
+  if (memcmp (scratch, plaintext_4, sizeof(plaintext_4)))
+    puts ("RFC2268 decryption test 4 failed.");
+
+  /* Fifth test. */
+  arctwo_set_key (&ctx, sizeof(key_5), key_5);
+  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_5);
+  if (memcmp (scratch, ciphertext_5, sizeof(ciphertext_5)))
+    puts ("RFC2268 encryption test 5 failed.");
+
+  arctwo_set_key (&ctx, sizeof(key_5), key_5);
+  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
+  if (memcmp (scratch, plaintext_5, sizeof(plaintext_5)))
+    puts ("RFC2268 decryption test 5 failed.");
+
+  /* Sixth test. */
+  arctwo_set_key (&ctx, sizeof(key_6), key_6);
+  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_6);
+  if (memcmp (scratch, ciphertext_6, sizeof(ciphertext_6)))
+    puts ("RFC2268 encryption test 6 failed.");
+
+  arctwo_set_key (&ctx, sizeof(key_6), key_6);
+  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
+  if (memcmp (scratch, plaintext_6, sizeof(plaintext_6)))
+    puts ("RFC2268 decryption test 6 failed.");
 
   puts ("Done");
 
