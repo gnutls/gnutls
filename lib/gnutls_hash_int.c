@@ -148,6 +148,9 @@ void gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void* digest)
 		free(ret);
 	}
 #else
+	/* FIXME: replace this with something that does not
+	 * allocate the hash
+	 */
 	maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle->handle));
 	gcry_md_final(handle->handle);
 	mac = gcry_md_read(handle->handle, 0);

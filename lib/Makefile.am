@@ -39,7 +39,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	x509_extensions.c auth_cert.c gnutls_ui.c gnutls_sig.c auth_dhe.c \
 	gnutls_dh_primes.c ext_max_record.c gnutls_alert.c gnutls_int_compat.c \
 	gnutls_str.c gnutls_state.c gnutls_x509.c gnutls_openpgp.c \
-	ext_cert_type.c
+	ext_cert_type.c 
 
 # Separate so we can create the documentation
 COBJECTS2 = x509_ASN.y x509_asn1.c x509_der.c

@@ -1,4 +1,4 @@
 #! /bin/sh
 
-./gnutls-serv --http --x509certfile x509/cert.pem --x509keyfile x509/key.pem 
+./gnutls-serv --http --x509certfile x509/cert.pem --x509keyfile x509/key.pem --cafile x509/ca.pem
 

@@ -26,10 +26,10 @@
 
 
 #include <gnutls_int.h>
+#include <gnutls_errors.h>
 #include "x509_asn1.h" 
 #include "x509_der.h"
 #include <gnutls_str.h>
-#include <gnutls_errors.h>
 
 /* define used for visiting trees */
 #define UP     1
@@ -938,7 +938,7 @@ _asn1_copy_structure2(node_asn *root,char *source_name)
   *  ASN_ELEMENT_NOT_FOUND\: SOURCE_NAME isn't known
   * 
   * Example: using "pkix.asn"
-  *  result=asn1_create_structure(cert_def,"PKIX1Implicit88.Certificate",&cert,"certificate1");
+  *  result=asn1_create_structure(cert_def,"PKIX1.Certificate",&cert,"certificate1");
   **/
 int
 asn1_create_structure(node_asn *root,char *source_name,node_asn **pointer,char *dest_name)

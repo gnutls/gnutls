@@ -48,6 +48,9 @@
  * some x509 certificate parsing functions.
  */
 
+int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size);
+
+
 #define _READ(a, aa, b, c, d, e, res, f) \
 	result = _IREAD(a, aa, sizeof(aa), b, c, d, e, res, sizeof(res)-1, f); \
 	if (result<0) return result; \
@@ -64,7 +67,7 @@ static int _IREAD(node_asn * rasn, char *name3, int name3_size, char *rstr, char
 
 	if (strcmp(rstr, OID) == 0) {
 
-		_gnutls_str_cpy(str, sizeof(str), "PKIX1Implicit88."); 
+		_gnutls_str_cpy(str, sizeof(str), "PKIX1."); 
 		_gnutls_str_cat(str, sizeof(str), ANAME); 
 		_gnutls_str_cpy(name2, sizeof(name2), "temp-structure-"); 
 		_gnutls_str_cat(name2, sizeof(name2), TYPE); 
@@ -333,7 +336,7 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 
 	if ((result =
 	     asn1_create_structure(_gnutls_get_pkix(),
-				   "PKIX1Implicit88.Name", &dn,
+				   "PKIX1.Name", &dn,
 				   "dn")) != ASN_OK) {
 		gnutls_assert();
 		return result;
@@ -378,9 +381,9 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 
 	memset(ret, 0, sizeof(gnutls_x509_dn));
 
-	if (asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
-	     "certificate2")
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
+	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
 		return result;
@@ -430,9 +433,9 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 
 	memset(ret, 0, sizeof(gnutls_x509_dn));
 
-	if (asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
-	     "certificate2")
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
+	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
 		return result;
@@ -487,7 +490,8 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * or the type of alternative name if everything was ok. The type is one of the
   * enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
   *
-  * If the certificate does not have a Alternative name then returns GNUTLS_E_DATA_NOT_AVAILABLE;
+  * If the certificate does not have an Alternative name with the specified sequence number
+  * then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   *
   **/
 int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, char *ret, int *ret_size)
@@ -515,7 +519,7 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 	}
 
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.SubjectAltName", &c2, "san"))
+	    (_gnutls_get_pkix(), "PKIX1.SubjectAltName", &c2, "san"))
 	    != ASN_OK) {
 		gnutls_assert();
 		gnutls_free_datum( &dnsname);
@@ -540,8 +544,15 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 	_gnutls_str_cat( nptr, sizeof(nptr), num);
 
 	len = sizeof(ext_data);
-	if ((result =
-	     asn1_read_value(c2, nptr, ext_data, &len)) != ASN_OK) {
+	result =
+	     asn1_read_value(c2, nptr, ext_data, &len);
+
+	if (result == ASN_VALUE_NOT_FOUND) {
+		asn1_delete_structure(c2);
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
@@ -588,7 +599,7 @@ time_t gnutls_x509_extract_certificate_activation_time(const
 	time_t ret;
 
 	if (asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
 	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
@@ -630,7 +641,7 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
 	time_t ret;
 
 	if (asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
 	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
@@ -668,7 +679,7 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 	int result;
 
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
 	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
@@ -897,7 +908,7 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
 	int ret;
 
 	if ((ret=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
 	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
@@ -946,9 +957,90 @@ static int _gnutls_check_key_cert_match( GNUTLS_CERTIFICATE_CREDENTIALS res) {
 #define MAX_FILE_SIZE 100*1024
 #define CERT_SEP "-----BEGIN"
 
-/* Reads a base64 encoded certificate from memory
+/* Reads a PKCS7 base64 encoded certificate list from memory and stores it to
+ * a gnutls_cert structure.
  */
-static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size)
+static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, 
+	const char *input_cert, int input_cert_size)
+{
+	int siz, i, j;
+	opaque *b64;
+	const char *ptr;
+	gnutls_datum tmp, tmp2;
+	int ret;
+	opaque pcert[MAX_X509_CERT_SIZE];
+	int pcert_size;
+
+	ptr = input_cert;
+	siz = input_cert_size;
+	i = *ncerts + 1;
+
+	ret = _gnutls_fbase64_decode(ptr, siz, &b64);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+	
+	/* tmp now contains the decoded certificate list */
+	tmp.data = b64;
+	tmp.size = ret;
+
+	j = 0;
+	do {
+		pcert_size = sizeof(pcert);
+		ret = gnutls_x509_pkcs7_extract_certificate( &tmp, j, pcert, &pcert_size);
+
+		/* if the current certificate is too long, just ignore
+		 * it. */
+		if (ret==GNUTLS_E_MEMORY_ERROR) continue;
+		
+		if (ret >= 0) {
+			*cert_list =
+			    (gnutls_cert *) gnutls_realloc( *cert_list,
+					   i * sizeof(gnutls_cert));
+
+			if ( *cert_list == NULL) {
+				gnutls_assert();
+				gnutls_free(b64);
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+
+			/* set defaults to zero 
+			 */
+			memset( &cert_list[0][i - 1], 0, sizeof(gnutls_cert));
+
+			tmp2.data = pcert;
+			tmp2.size = pcert_size;
+
+			if ((ret =
+			     _gnutls_x509_cert2gnutls_cert(
+						     &cert_list[0][i - 1],
+						     tmp2)) < 0) {
+				gnutls_free(b64);
+				gnutls_assert();
+				return ret;
+			}
+			
+			i++;
+		}
+		j++;
+
+	} while (ret >= 0);
+	
+	gnutls_free(b64);
+
+	*ncerts = i - 1;
+
+	return 0;
+}
+
+
+/* Reads a base64 encoded certificate list from memory and stores it to
+ * a gnutls_cert structure.
+ */
+static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts, 
+	const char *input_cert, int input_cert_size)
 {
 	int siz, i, siz2;
 	opaque *b64;
@@ -956,27 +1048,15 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 	gnutls_datum tmp;
 	int ret;
 
-	/* allocate space for the certificate to add
-	 */
-	res->cert_list = gnutls_realloc( res->cert_list, (1+res->ncerts)*sizeof(gnutls_cert*));
-	if (res->cert_list==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+	if (strstr( input_cert, "-----BEGIN PKCS7")!=NULL) {
+		return parse_pkcs7_cert_mem( cert_list, ncerts, input_cert,
+			input_cert_size);
 	}
 
-	res->cert_list_length = gnutls_realloc( res->cert_list_length,
-		(1+res->ncerts)*sizeof(int));
-	if (res->cert_list_length==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-
-	ptr = cert;
-	siz = cert_size;
-	i = 1;
-
-	res->cert_list[res->ncerts] = NULL;
+	
+	ptr = input_cert;
+	siz = input_cert_size;
+	i = *ncerts + 1;
 
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
@@ -989,28 +1069,27 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 		}
 
 
-		res->cert_list[res->ncerts] =
-		    (gnutls_cert *) gnutls_realloc(res->
-						   cert_list[res->ncerts],
+		*cert_list =
+		    (gnutls_cert *) gnutls_realloc( *cert_list,
 						   i *
 						   sizeof(gnutls_cert));
 
-		if (res->cert_list[res->ncerts] == NULL) {
+		if ( *cert_list == NULL) {
 			gnutls_assert();
 			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		/* set defaults to zero 
 		 */
-		memset(&res->cert_list[res->ncerts][i - 1], 0,
+		memset( &cert_list[0][i - 1], 0,
 		       sizeof(gnutls_cert));
 
 		tmp.data = b64;
 		tmp.size = siz2;
 
 		if ((ret =
-		     _gnutls_x509_cert2gnutls_cert(&res->
-					     cert_list[res->ncerts][i - 1],
+		     _gnutls_x509_cert2gnutls_cert(
+					     &cert_list[0][i - 1],
 					     tmp)) < 0) {
 			gnutls_free(b64);
 			gnutls_assert();
@@ -1026,8 +1105,44 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 		i++;
 	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
 
-	res->cert_list_length[res->ncerts] = i - 1;
+	*ncerts = i - 1;
 
+	return 0;
+}
+
+
+
+/* Reads a base64 encoded certificate from memory
+ */
+static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size)
+{
+	int ret;
+
+	/* allocate space for the certificate to add
+	 */
+	res->cert_list = gnutls_realloc( res->cert_list, (1+ res->ncerts)*sizeof(gnutls_cert*));
+	if ( res->cert_list==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	res->cert_list_length = gnutls_realloc( res->cert_list_length,
+		(1+ res->ncerts)*sizeof(int));
+	if (res->cert_list_length==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	res->cert_list[res->ncerts] = NULL; /* for realloc */
+	res->cert_list_length[res->ncerts] = 0;
+
+	ret = parse_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
+		cert, cert_size);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0;
 }
@@ -1037,62 +1152,10 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
  */
 static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int ca_size)
 {
-	int siz, siz2, i;
-	opaque *b64;
-	const char *ptr;
-	int ret;
-	gnutls_datum tmp;
 
-	siz = ca_size;
+	return parse_cert_mem( &res->x509_ca_list, &res->x509_ncas,
+		ca, ca_size);
 
-	ptr = ca;
-
-	i = res->x509_ncas + 1;
-
-	do {
-		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
-		siz -= siz2;	/* FIXME: this is not enough
-				 */
-
-		if (siz2 < 0) {
-			gnutls_assert();
-			return GNUTLS_E_PARSING_ERROR;
-		}
-
-		res->x509_ca_list =
-		    (gnutls_cert *) gnutls_realloc(res->x509_ca_list,
-						   i *
-						   sizeof(gnutls_cert));
-		if (res->x509_ca_list == NULL) {
-			gnutls_assert();
-			gnutls_free(b64);
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		memset(&res->x509_ca_list[i - 1], 0, sizeof(gnutls_cert));
-
-		tmp.data = b64;
-		tmp.size = siz2;
-
-		if ((ret =
-		     _gnutls_x509_cert2gnutls_cert(&res->x509_ca_list[i - 1],
-					     tmp)) < 0) {
-			gnutls_assert();
-			gnutls_free(b64);
-			return ret;
-		}
-		gnutls_free(b64);
-
-		/* now we move ptr after the pem header */
-		ptr = strstr(ptr, CERT_SEP);
-		if (ptr!=NULL)
-			ptr++;
-
-		i++;
-	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
-
-	res->x509_ncas = i - 1;
-
-	return 0;
 }
 
 
@@ -1230,7 +1293,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
   * gnutls_certificate_set_x509_key_file - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   * @CERTFILE: is a PEM encoded file containing the certificate list (path) for
-  * the specified private key
+  * the specified private key or a PEM encoded PKCS7 file
   * @KEYFILE: is a PEM encoded file containing a private key
   *
   * This function sets a certificate/private key pair in the 
@@ -1320,7 +1383,7 @@ opaque *pdata;
 /**
   * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
-  * @CA: is a PEM encoded list of trusted CAs
+  * @CA: is a PEM encoded list of trusted CAs or a PKCS7 pem encoded list
   * @CRL: is a PEM encoded list of CRLs (ignored for now)
   *
   * This function adds the trusted CAs in order to verify client
@@ -1459,7 +1522,7 @@ static int _read_dsa_params(opaque * der, int dersize, MPI * params)
 	node_asn *spk;
 
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Dss-Parms", &spk,
+	    (_gnutls_get_pkix(), "PKIX1.Dss-Parms", &spk,
 	     "dsa_parms")) != ASN_OK) {
 		gnutls_assert();
 		return result;
@@ -1685,7 +1748,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	}
 
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
 	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
@@ -1767,6 +1830,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	if (gCert->version < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
+		gnutls_free_datum( &gCert->raw);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;  
 	}	 
 
@@ -1923,4 +1987,171 @@ int _gnutls_verify_x509_file( char *cafile)
 	return _gnutls_verify_x509_mem( x, siz);
 }
 
+
+
 #endif
+
+/**
+  * gnutls_x509_pkcs7_extract_certificate - This function returns a certificate in a PKCS7 certificate set
+  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
+  * @indx: contains the index of the certificate to extract
+  * @certificate: the contents of the certificate will be copied there
+  * @certificate_size: should hold the size of the certificate
+  *
+  * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size)
+{
+	node_asn *c2, *c1;
+	int result, len;
+	char root1[128];
+	char oid[128];
+	char root2[128];
+	char counter[MAX_INT_DIGITS];
+	opaque* pkcs7_str = pkcs7_struct->data;
+	int pkcs7_str_size = pkcs7_struct->size;
+
+	opaque* pcert;
+	int pcert_size;
+
+	/* Step 1. Parse content and content info */
+	
+	if (pkcs7_str_size == 0 || pkcs7_str == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+	
+	_gnutls_str_cpy( root1, sizeof(root1), "PKIX1.ContentInfo");
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), root1, &c1, "c1")) != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_get_der(c1, pkcs7_str, pkcs7_str_size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+
+		_gnutls_log("X509_auth: Decoding error %d\n");
+
+		gnutls_assert();
+		asn1_delete_structure(c1);
+		return result;
+	}
+
+	len = sizeof(oid) - 1;
+
+	/* root2 is used as a temp storage area
+	 */
+	_gnutls_str_cpy( root2, sizeof(root2), "c1.contentType");
+	result = asn1_read_value(c1, root2, oid, &len);
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(c1);
+		return result;
+	}
+
+	if ( strcmp( oid, "1 2 840 113549 1 7 2") != 0) {
+		gnutls_assert();
+		asn1_delete_structure(c1);
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}					 		 	
+
+	pcert_size = *certificate_size - 1;
+	pcert = certificate;
+
+	_gnutls_str_cpy( root2, sizeof(root2), "c1.content");
+	result = asn1_read_value(c1, root2, pcert, &pcert_size);
+
+	asn1_delete_structure(c1);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* pcert, pcert_size hold the data and the size of the CertificateSet structure
+	 * actually the ANY stuff.
+	 */
+
+
+	/* Step 1.5. In case of a signed structure extract certificate set.
+	 */
+	_gnutls_str_cpy( root2, sizeof(root2), "PKIX1.SignedData");
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), root2, &c2, "c2")) != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_get_der(c2, pcert, pcert_size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+	
+		_gnutls_log("X509_auth: Decoding error %d\n");
+
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+		
+		
+	/* Step 2. Parse CertificateSet */
+	
+
+	_gnutls_str_cpy( root2, sizeof(root2), "c2.certificates.?"); 
+	_gnutls_int2str( indx+1, counter);
+	_gnutls_str_cat( root2, sizeof(root2), counter); 
+
+	len = sizeof(oid) - 1;
+
+	result = asn1_read_value(c2, root2, oid, &len);
+
+	if (result == ASN_VALUE_NOT_FOUND) {
+		asn1_delete_structure(c2);
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+	
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+
+	/* if 'Certificate' is the choice found: */
+	if (strcmp( oid, "certificate") == 0) {
+		int start, end;
+		
+/*		_gnutls_str_cat( root2, sizeof(root2), ".certificate"); */
+
+		result = asn1_get_start_end_der(c2, pcert, pcert_size, 
+			root2, &start, &end);
+
+		if (result != ASN_OK) {
+			gnutls_assert();
+			asn1_delete_structure(c2);
+			return result;
+		}
+			
+		end = end-start+1;
+		
+		if (certificate!=NULL && end <= *certificate_size)
+			memcpy( certificate, &pcert[start], end);
+		else {
+			*certificate_size = end;
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		*certificate_size = end;
+
+	} else {
+		asn1_delete_structure(c2);
+		return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+	}
+
+	asn1_delete_structure(c2);
+
+	return 0;
+}

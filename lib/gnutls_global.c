@@ -113,7 +113,7 @@ int gnutls_global_init( void)
 		asn1_delete_structure( PKIX1_ASN);
 		return result;
 	}
-	
+
 	result = _gnutls_dh_calc_mpis();
 	if (result < 0) {
 		gnutls_assert();

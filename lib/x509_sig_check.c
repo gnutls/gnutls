@@ -42,7 +42,7 @@ opaque *str;
 int result, len;
 int start, end;
 
-	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate")!=ASN_OK) {
+	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1.Certificate", &c2, "certificate")!=ASN_OK) {
 		gnutls_assert();
 		return ret;
 	}

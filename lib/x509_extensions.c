@@ -41,7 +41,7 @@ static int _extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 	keyUsage[0] = 0;
 	
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.KeyUsage", &ext,
+	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext,
 	     "ku")) != ASN_OK) {
 		gnutls_assert();
 		return result;
@@ -80,7 +80,7 @@ static int _extract_basicConstraints(int *CA, opaque * extnValue,
 	*CA = 0;
 
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.BasicConstraints", &ext,
+	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext,
 	     "bc")) != ASN_OK) {
 		gnutls_assert();
 		return result;
@@ -268,7 +268,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	ret->size = 0;
 	
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &rasn,
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &rasn,
 	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();

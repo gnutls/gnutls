@@ -105,7 +105,7 @@ int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 	int start, end;
 
 	if ((result=asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &dn,
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn,
 	     "dn")) != ASN_OK) {
 		gnutls_assert();
 		return result;

@@ -611,7 +611,7 @@ void gaa_parser(int argc, char **argv)
 #else
       x509_certfile = info.x509_certfile;
       x509_keyfile = info.x509_keyfile;
-      x509_cafile = info.x509_certfile;
+      x509_cafile = info.x509_cafile;
       pgp_certfile = info.pgp_certfile;
       pgp_keyfile = info.pgp_keyfile;
       srp_passwd = info.srp_passwd;

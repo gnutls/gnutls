@@ -28,56 +28,30 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
-# ifdef HAVE_SYS_TIME_H
-#  include <sys/time.h>
-# endif
 #endif
 
-int _gnutls_get_random(opaque * res, int bytes, int dev)
+/* fills the buffer 'res' with random bytes of 'bytes' long.
+ * level is WEAK, STRONG, or VERY_STRONG (libgcrypt)
+ */
+int _gnutls_get_random(opaque * res, int bytes, int level)
 {
 #ifndef USE_GCRYPT
     int fd;
-    struct timeval tv;
-    char prand[16];
     char *device;
 
-#error DONT USE THAT
-        
-    switch(dev) {
-    	case 1:
-    		device = "/dev/random";
-    		break;
-    	default:
-    		device = "dev/urandom";
-    }
+    device = "dev/urandom";
 
     fd = open(device, O_RDONLY);
     if (device == NULL || fd < 0) {
-	gettimeofday(&tv, (struct timezone *) 0);
-	memcpy(prand, &tv, sizeof(tv));
-	fd = getpid();
-	memcpy(&prand[8], &fd, sizeof(fd));
-	fd = clock();
-	memcpy(&prand[12], &fd, sizeof(fd));
-	memset(res, 0, bytes);
-	if (bytes > 16)
-	    bytes = 16;
-	memcpy(res, prand, bytes);
+	_gnutls_log( "Could not open random device\n");
+	return GNUTLS_E_FILE_ERROR;
     } else {
 	read(fd, res, bytes);
 	close(fd);
     }
     return 0;
 #else				/* using gcrypt */
-    char* buf;
-    buf = gcry_random_bytes(bytes, dev);
-    if (buf==NULL) {
-    	gnutls_assert();
-    	return GNUTLS_E_MEMORY_ERROR;
-    }
-
-    memcpy( res, buf, bytes);
-    gcry_free(buf);
+    gcry_randomize( res, bytes, level);
 
     return 0;
 #endif

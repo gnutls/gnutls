@@ -1,11 +1,11 @@
 
-PKIX1Implicit88 {iso(1) identified-organization(3) dod(6) internet(1)
-  security(5) mechanisms(5) pkix(7) id-mod(0) id-pkix1-implicit-88(2)}
+PKIX1 { }
 
 DEFINITIONS IMPLICIT TAGS ::=
 
 BEGIN
 
+-- This contains both PKIX1Implicit88 and RFC2630 ASN.1 modules.
 
 -- ISO arc for standard certificate and CRL extensions
 
@@ -937,13 +937,47 @@ ub-x121-address-length INTEGER ::= 16
 
 
 
+-- END of PKIX1Implicit88
+
+
+-- BEGIN of RFC2630
+
+-- Cryptographic Message Syntax
+
+ContentInfo ::= SEQUENCE {
+  contentType ContentType,
+  content [0] EXPLICIT ANY DEFINED BY contentType }
+
+ContentType ::= OBJECT IDENTIFIER
+
+SignedData ::= SEQUENCE {
+  version CMSVersion,
+  digestAlgorithms DigestAlgorithmIdentifiers,
+  encapContentInfo EncapsulatedContentInfo,
+  certificates [0] IMPLICIT CertificateSet OPTIONAL,
+  crls [1] IMPLICIT CertificateRevocationLists OPTIONAL,
+  signerInfos SignerInfos 
+}
+
+CMSVersion ::= INTEGER  { v0(0), v1(1), v2(2), v3(3), v4(4) }
+
+DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+
+DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+
+EncapsulatedContentInfo ::= SEQUENCE {
+  eContentType ContentType,
+  eContent [0] EXPLICIT OCTET STRING OPTIONAL }
+
+CertificateRevocationLists ::= SET OF CertificateList
+
+CertificateChoices ::= CHOICE {
+  certificate Certificate
+}
+
+CertificateSet ::= SET OF CertificateChoices
+
+SignerInfos ::= SET OF ANY -- this is not correct but we don't use it
+ -- anyway
+
 END
-
-
-
-
-
-
-
-
-

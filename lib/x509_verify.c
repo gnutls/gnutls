@@ -206,7 +206,7 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 
 	/* get the issuer of 'cert'
 	 */
-	if ((result=asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2")) != ASN_OK) {
+	if ((result=asn1_create_structure(_gnutls_get_pkix(), "PKIX1.Certificate", &c2, "certificate2")) != ASN_OK) {
 		gnutls_assert();
 		return result;
 	}
@@ -223,7 +223,7 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 
 	/* get the 'subject' info of 'issuer_cert'
 	 */
-	if ((result=asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c3, "certificate2")) != ASN_OK) {
+	if ((result=asn1_create_structure(_gnutls_get_pkix(), "PKIX1.Certificate", &c3, "certificate2")) != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
