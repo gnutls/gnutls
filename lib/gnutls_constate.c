@@ -393,6 +393,7 @@ int _gnutls_set_write_keys(gnutls_session session)
 	memcpy( dst->server_random, src->server_random, TLS_RANDOM_SIZE); \
 	memcpy( dst->session_id, src->session_id, TLS_MAX_SESSION_ID_SIZE); \
 	dst->session_id_size = src->session_id_size; \
+	dst->cert_type = src->cert_type; \
 	dst->timestamp = src->timestamp; \
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \

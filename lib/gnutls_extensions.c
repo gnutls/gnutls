@@ -77,7 +77,7 @@ const char *_gnutls_extension_get_name(uint16 type)
 	const char *ret = NULL;
 
 	/* avoid prefix */
-	GNUTLS_EXTENSION_LOOP(ret = p->name + sizeof("EXTENSION_") - 1);
+	GNUTLS_EXTENSION_LOOP(ret = p->name + sizeof("GNUTLS_EXTENSION_") - 1);
 
 	return ret;
 }
@@ -111,7 +111,8 @@ int i;
 
 	if (session->security_parameters.entity==GNUTLS_CLIENT)
 		for (i=0;i<session->internals.extensions_sent_size;i++) {
-			_gnutls_debug_log("extensions: expecting extension %d\n", session->internals.extensions_sent[i]);
+			_gnutls_debug_log("EXT[%d]: expecting extension '%s'\n", session,
+				_gnutls_extension_get_name(session->internals.extensions_sent[i]));
 		}
 #endif
 
@@ -125,6 +126,9 @@ int i;
 		DECR_LENGTH_RET( next, 2, 0);
 		type = _gnutls_read_uint16( &data[pos]);
 		pos+=2;
+		
+		_gnutls_debug_log("EXT[%x]: Received extension '%s'\n", session, 
+			_gnutls_extension_get_name(type));
 		
 		if ( (ret=_gnutls_extension_list_check( session, type)) < 0) {
 			gnutls_assert();
@@ -210,6 +214,9 @@ int (*ext_func_send)( gnutls_session, opaque*, int);
 			/* add this extension to the extension list
 			 */
 			_gnutls_extension_list_add( session, next);
+
+			_gnutls_debug_log("EXT[%x]: Sending extension %s\n", session,
+				_gnutls_extension_get_name(next));
 		} else if (size < 0) {
 			gnutls_assert();
 			gnutls_free(*data); *data = NULL;

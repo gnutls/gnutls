@@ -30,6 +30,9 @@
 #include <gnutls_state.h>
 #include <gnutls_num.h>
 
+inline static int _gnutls_num2cert_type( int num);
+inline static int _gnutls_cert_type2num( int record_size);
+
 /* 
  * In case of a server: if a CERT_TYPE extension type is received then it stores
  * into the session security parameters the new value. The server may use gnutls_session_certificate_type_get(),
@@ -144,7 +147,6 @@ int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, size_t 
 		}
 
 	} else { /* server side */
-
 		if ( session->security_parameters.cert_type != DEFAULT_CERT_TYPE) {
 			len = 1;
 			if (data_size < len) {
@@ -165,7 +167,8 @@ int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, size_t 
 /* Maps numbers to record sizes according to the
  * extensions draft.
  */
-int _gnutls_num2cert_type( int num) {
+inline
+static int _gnutls_num2cert_type( int num) {
 	switch( num) {
 	case 0:
 		return GNUTLS_CRT_X509;
@@ -179,7 +182,8 @@ int _gnutls_num2cert_type( int num) {
 /* Maps record size to numbers according to the
  * extensions draft.
  */
-int _gnutls_cert_type2num( int cert_type) {
+inline
+static int _gnutls_cert_type2num( int cert_type) {
 	switch(cert_type) {
 	case GNUTLS_CRT_X509:
 		return 0;

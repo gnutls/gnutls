@@ -140,7 +140,6 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 	       data[packed_session->size - sizeof(SecurityParameters)],
 	       &session->security_parameters, sizeof(SecurityParameters));
 
-
 	return 0;
 }
 
