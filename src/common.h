@@ -43,8 +43,8 @@ GNUTLS_KXAlgorithm kx;
 		case GNUTLS_CRD_CERTIFICATE:
 		   /* in case of X509 PKI
 		    */
-			cert_list = gnutls_x509pki_client_get_peer_certificate_list( state, &cert_list_size);
-			status = gnutls_x509pki_client_get_peer_certificate_status( state);
+			cert_list = gnutls_x509pki_get_peer_certificate_list( state, &cert_list_size);
+			status = gnutls_x509pki_get_peer_certificate_status( state);
 			
 			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:
@@ -59,7 +59,7 @@ GNUTLS_KXAlgorithm kx;
 			case GNUTLS_CERT_NONE:
 				printf("- Peer did not send any X509 Certificate.\n");
 				break;
-			case GNUTLS_CERT_INVALID:
+			case GNUTLS_CERT_CORRUPTED:
 				printf("- Peer's X509 Certificate was invalid\n");
 				break;
 			}

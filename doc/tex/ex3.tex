@@ -54,8 +54,11 @@ int print_info(GNUTLS_STATE state)
       case GNUTLS_CERT_NONE:
          printf("- Peer did not send any X509 Certificate.\n");
          break;
-      case GNUTLS_CERT_INVALID:
-         printf("- Peer's X509 Certificate was invalid\n");
+      case GNUTLS_CERT_CORRUPTED:
+         printf("- Peer's X509 Certificate was corrupt\n");
+         break;
+      case GNUTLS_CERT_REVOKED:
+         printf("- Peer's X509 Certificate was revoked\n");
          break;
       }
 

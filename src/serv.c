@@ -104,7 +104,7 @@ GNUTLS_STATE initialize_state(void)
 
 	gnutls_mac_set_priority(state, mac_priority);
 
-	gnutls_x509pki_server_set_cert_request( state, GNUTLS_CERT_REQUEST);
+	gnutls_certificate_server_set_request( state, GNUTLS_CERT_REQUEST);
 
 	return state;
 }
@@ -256,22 +256,22 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_x509pki_allocate_server_sc(&x509_cred, 2) < 0) {
+	if (gnutls_certificate_allocate_server_sc(&x509_cred, 2) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 
-	if (gnutls_x509pki_set_server_trust_file( x509_cred, CAFILE, CRLFILE) < 0) {
+	if (gnutls_x509pki_set_trust_file( x509_cred, CAFILE, CRLFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_x509pki_set_server_key_file( x509_cred, CERTFILE1, KEYFILE1) < 0) {
+	if (gnutls_x509pki_set_key_file( x509_cred, CERTFILE1, KEYFILE1) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_x509pki_set_server_key_file( x509_cred, CERTFILE2, KEYFILE2) < 0) {
+	if (gnutls_x509pki_set_key_file( x509_cred, CERTFILE2, KEYFILE2) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
@@ -405,7 +405,7 @@ int main(int argc, char **argv)
 	}
 	close(listen_sd);
 
-	gnutls_x509pki_free_server_sc(x509_cred);
+	gnutls_certificate_free_server_sc(x509_cred);
 	gnutls_srp_free_server_sc(srp_cred);
 	gnutls_anon_free_server_sc(dh_cred);
 

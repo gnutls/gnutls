@@ -61,7 +61,7 @@ GNUTLS_STATE initialize_state()
 
    /* request client certificate if any.
     */
-   gnutls_x509pki_server_set_cert_request( state, GNUTLS_CERT_REQUEST);
+   gnutls_certificate_server_set_request( state, GNUTLS_CERT_REQUEST);
    
    return state;
 }
@@ -129,7 +129,7 @@ int main()
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
-   if (gnutls_x509pki_allocate_server_sc(&x509_cred, 1) < 0) {
+   if (gnutls_certificate_allocate_server_sc(&x509_cred, 1) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
    }
@@ -230,7 +230,7 @@ int main()
    }
    close(listen_sd);
 
-   gnutls_x509pki_free_server_sc(x509_cred);
+   gnutls_certificate_free_server_sc(x509_cred);
    gnutls_srp_free_server_sc(srp_cred);
 
    gnutls_global_deinit();

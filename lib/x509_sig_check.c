@@ -195,7 +195,7 @@ gnutls_datum tbs;
 	tbs = _gnutls_get_tbs( cert);
 	if (tbs.data==NULL) {
 		gnutls_assert();
-		return GNUTLS_CERT_INVALID;
+		return GNUTLS_CERT_CORRUPTED;
 	}
 
 	_gnutls_x509_log("X509_VERIFY: CERT[%s]\n", GET_CN(cert->raw));
@@ -232,7 +232,7 @@ gnutls_datum tbs;
 	_gnutls_x509_log( "X509_SIG: PK: %d\n", issuer->subject_pk_algorithm);	
 
 	gnutls_assert();
-	return GNUTLS_CERT_INVALID;
+	return GNUTLS_CERT_CORRUPTED;
 }
 
 
