@@ -1,4 +1,4 @@
-Version 0.8.2
+Version 0.8.2 (03/03/2003)
 - Added protection against the new TLS 1.0 record layer timing attack.
 
 Version 0.8.1 (22/01/2003)
