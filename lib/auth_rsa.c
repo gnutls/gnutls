@@ -31,10 +31,8 @@
 #include <gnutls_random.h>
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
+#include "debug.h"
 
-#if 0
-int gen_rsa_server_kx(GNUTLS_KEY, opaque **);
-#endif
 int gen_rsa_certificate(GNUTLS_KEY, opaque **);
 int gen_rsa_client_kx(GNUTLS_KEY, opaque **);
 int proc_rsa_client_kx( GNUTLS_KEY, opaque*, int);
@@ -63,55 +61,6 @@ typedef struct {
 	gnutls_datum rsa_exponent;
 } RSA_Params;
 
-#if 0
-/* This function will calculate the SHA/MD5 signature in server kx.
- * This is needed by the protocol.
- */
-int _gnutls_calc_rsa_signature( GNUTLS_KEY key, const opaque* data, int data_size, opaque* dst) {
-	void* md5;
-	void* sha;
-	int ret = 0;
-	GNUTLS_MAC_HANDLE td;
-	
-	td = gnutls_hash_init(GNUTLS_MAC_MD5);
-	if (td==GNUTLS_HASH_FAILED) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	gnutls_hash( td, key->client_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td, key->server_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td, data, data_size);
-	
-	md5 = gnutls_hash_deinit(td);
-	if (md5==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	memcpy( dst, md5, 16);
-	gnutls_free(md5);
-
-
-	td = gnutls_hash_init(GNUTLS_MAC_SHA);
-	if (td==GNUTLS_HASH_FAILED) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	gnutls_hash( td, key->client_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td, key->server_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td, data, data_size);
-	
-	sha = gnutls_hash_deinit(td);
-	if (sha==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	memcpy( &dst[16], sha, 20);
-	gnutls_free(sha);
-	
-	return ret;
-}
-#endif
 
 /* This function extracts the RSA parameters from the given(?) certificate.
  */
@@ -123,81 +72,83 @@ static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, MPI* mod
 
 	if (create_structure("rsa_params", "PKIX1Explicit88.Certificate")!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_ASN1_ERROR;
 	}
 
 	result = get_der("rsa_params", cert.data, cert.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
 
+	len = sizeof(str);
 	result =
-	    read_value("rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm", str, &len);
+	    read_value("rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm", str, &len);
+
 	if (result != ASN_OK) {
-fprintf(stderr, "resut: %d\n", result);
 		gnutls_assert();
 		delete_structure("rsa_params");
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
 	if (!strcmp(str, "1 2 840 113549 1 1 1")) { /* pkix-1 1 - RSA */
 		len = sizeof(str);
 		result =
-		    read_value("rsa_params.tbsCertificate.subjectPublicKeyInfo.parameters", str, &len);
+		    read_value("rsa_params.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey", str, &len);
 		delete_structure("rsa_params");
 
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("rsa_params");
-			return GNUTLS_E_PARSING_ERROR;
+			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
-		if (create_structure("rsapublickey", "PKIX1Explicit88.RSAPublicKey")!=ASN_OK) {
+		if (create_structure("rsa_public_key", "PKIX1Explicit88.RSAPublicKey")!=ASN_OK) {
 			gnutls_assert();
-			return GNUTLS_E_PARSING_ERROR;
+			return GNUTLS_E_ASN1_ERROR;
 		}
-		
-		result = get_der("rsapublickey", str, len);
+
+		result = get_der("rsa_public_key", str, len/8);
+
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("rsapublickey");
-			return GNUTLS_E_PARSING_ERROR;
+			delete_structure("rsa_public_key");
+			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}	
 
+		len = sizeof(str);
 		result =
-		    read_value("rsapublickey.modulus", str, &len);
+		    read_value("rsa_public_key.modulus", str, &len);
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("rsapublickey");
-			return GNUTLS_E_PARSING_ERROR;
+			delete_structure("rsa_public_key");
+			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
 		if (gcry_mpi_scan(mod,
 			  GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
-			delete_structure("rsapublickey");
+			delete_structure("rsa_public_key");
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 		
 		if (params!=NULL)
 			if (gnutls_set_datum(&params->rsa_modulus, str, len) < 0) {
 				gnutls_assert();
-				delete_structure("rsapublickey");
+				delete_structure("rsa_public_key");
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
 		len = sizeof(str);
 		result =
-		    read_value("rsapublickey.publicExponent", str, &len);
+		    read_value("rsa_public_key.publicExponent", str, &len);
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("rsapublickey");
+			delete_structure("rsa_public_key");
 			if (params!=NULL) gnutls_free_datum(&params->rsa_modulus);
 			_gnutls_mpi_release(mod);
-			return GNUTLS_E_PARSING_ERROR;
+			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
 		if (gcry_mpi_scan(exp,
@@ -205,22 +156,32 @@ fprintf(stderr, "resut: %d\n", result);
 			gnutls_assert();
 			_gnutls_mpi_release(mod);
 			if (params!=NULL) gnutls_free_datum(&params->rsa_modulus);
-			delete_structure("rsapublickey");
+			delete_structure("rsa_public_key");
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
-		if (gnutls_set_datum(&params->rsa_exponent, str, len) < 0) {
-			_gnutls_mpi_release(mod);
-			_gnutls_mpi_release(exp);
-			if (params!=NULL) gnutls_free_datum(&params->rsa_modulus);
-			delete_structure("rsapublickey");
-			return GNUTLS_E_MEMORY_ERROR;	
-		}
+		if (params !=NULL)
+			if (gnutls_set_datum(&params->rsa_exponent, str, len) < 0) {
+				_gnutls_mpi_release(mod);
+				_gnutls_mpi_release(exp);
+				if (params!=NULL) gnutls_free_datum(&params->rsa_modulus);
+				delete_structure("rsa_public_key");
+				return GNUTLS_E_MEMORY_ERROR;	
+			}
 
-		delete_structure("rsapublickey");
+		delete_structure("rsa_public_key");
+		
+		ret = 0;
+		
+	} else {
+		/* The certificate that was sent was not
+		 * supported by the ciphersuite
+		 */
+		gnutls_assert();
+		ret = GNUTLS_E_X509_CERTIFICATE_ERROR;
 
+		delete_structure("rsa_params");
 	}
 
-	delete_structure("rsa_params");
 
 	return ret;
 }
@@ -237,21 +198,22 @@ static int _gnutls_get_private_rsa_params( GNUTLS_KEY key, gnutls_datum cert)
 
 	if (create_structure("rsakey", "PKCS-1.RSAPrivateKey")!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_ASN1_ERROR;
 	}
 
 	result = get_der("rsakey", cert.data, cert.size);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
+	len = sizeof(str);
 	result =
 	    read_value("rsakey.privateExponent", str, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		delete_structure("rsakey");
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	if (gcry_mpi_scan(&key->u,
 		  GCRYMPI_FMT_USG, str, &len) != 0) {
@@ -268,7 +230,7 @@ static int _gnutls_get_private_rsa_params( GNUTLS_KEY key, gnutls_datum cert)
 		gnutls_assert();
 		delete_structure("rsakey");
 		_gnutls_mpi_release(&key->u);
-		return GNUTLS_E_PARSING_ERROR;
+		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
 	if (gcry_mpi_scan(&key->A,
@@ -284,54 +246,6 @@ static int _gnutls_get_private_rsa_params( GNUTLS_KEY key, gnutls_datum cert)
 	return ret;
 }
 
-#if 0 /* wow ... this was not needed ! */
-int gen_rsa_server_kx(GNUTLS_KEY key, opaque ** data)
-{
-	RSA_Params params;
-	const X509PKI_SERVER_CREDENTIALS *cred;
-	int ret;
-	opaque* pdata;
-
-	cred = _gnutls_get_cred(key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
-	}
-
-	ret =
-	    _gnutls_get_rsa_params(key, &params, cred->pkey);
-
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = params.rsa_modulus.size +
-		        params.rsa_modulus.size + 16 + 20 + 4;
-	(*data) = gnutls_malloc( ret);
-	
-	pdata = (*data);
-	if (pdata == NULL) return GNUTLS_E_MEMORY_ERROR;
-	
-	WRITEdatum16(pdata, params.rsa_modulus);
-	pdata += params.rsa_modulus.size;
-
-	WRITEdatum16(pdata, params.rsa_exponent);
-	pdata += params.rsa_exponent.size;
-
-	gnutls_free_datum(&params.rsa_modulus);
-	gnutls_free_datum(&params.rsa_modulus);
-
-	ret = _gnutls_calc_rsa_signature( key, (*data), ret-20-16, pdata);
-	if (ret< 0) {
-		gnutls_free((*data));
-		gnutls_assert();
-		return ret;
-	}
-
-	return ret;	
-}
-#endif
 
 int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 {
@@ -396,9 +310,9 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 	return pdatasize;
 }
 
-#define RANDOMIZE_X(x) x.size=TLS_MASTER_SIZE; x.data=gnutls_malloc(x.size); \
+#define RANDOMIZE_KEY(x, galloc) x.size=TLS_MASTER_SIZE; x.data=galloc(x.size); \
 		if (x.data==NULL) return GNUTLS_E_MEMORY_ERROR; \
-		if (_gnutls_get_random( key->key.data, key->key.size, GNUTLS_WEAK_RANDOM) < 0) { \
+		if (_gnutls_get_random( x.data, x.size, GNUTLS_WEAK_RANDOM) < 0) { \
 			return GNUTLS_E_MEMORY_ERROR; \
 		} 
 
@@ -424,11 +338,11 @@ int proc_rsa_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 		 * attack against pkcs-1 formating).
 		 */
 		gnutls_assert();
-		RANDOMIZE_X(key->key);
+		RANDOMIZE_KEY(key->key, secure_malloc);
 	} else {
 		ret = 0;
 		if (plaintext.size != TLS_MASTER_SIZE) { /* WOW */
-			RANDOMIZE_X(key->key);
+			RANDOMIZE_KEY(key->key, secure_malloc);
 		} else {
 			if (key->version.major != plaintext.data[0]) ret = GNUTLS_E_DECRYPTION_FAILED;
 			if (key->version.minor != plaintext.data[1]) ret = GNUTLS_E_DECRYPTION_FAILED;
@@ -535,10 +449,9 @@ int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 	X509PKI_AUTH_INFO *auth = key->auth_info;
 	svoid *rand;
 	gnutls_datum sdata; /* data to send */
-	gnutls_datum edata; /* data to encrypt */
 	MPI pkey, n;
 	int ret;
-		
+
 	if (auth == NULL) {
 		/* this shouldn't have happened. The proc_certificate
 		 * function should have detected that.
@@ -550,26 +463,41 @@ int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 	rand = secure_malloc( TLS_MASTER_SIZE);
 	if (rand==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
-			
-	_gnutls_get_random( rand, TLS_MASTER_SIZE, GNUTLS_STRONG_RANDOM);
-	
-	key->key.data = rand;
-	key->key.size = TLS_MASTER_SIZE;
 
-	edata.data = rand;
-	edata.size = TLS_MASTER_SIZE;
+	RANDOMIZE_KEY( key->key, secure_malloc);
+	key->key.data[0] = key->version.major;
+	key->key.data[1] = key->version.minor;
 
 	if ( (ret=_gnutls_get_rsa_params( key, NULL, &n, &pkey, auth->peer_certificate_list[0])) < 0 ) {
 		gnutls_assert();
 		return ret;
 	}
 
-	_gnutls_pkcs1_rsa_encrypt( &sdata, edata, pkey, n);
+	if ( (ret=_gnutls_pkcs1_rsa_encrypt( &sdata, key->key, pkey, n)) < 0 ) {
+		gnutls_assert();
+		_gnutls_mpi_release(&pkey);
+		_gnutls_mpi_release(&n);
+		return ret;
+	}
 
-	secure_free(rand);
 	_gnutls_mpi_release(&pkey);
 	_gnutls_mpi_release(&n);
-	
-	*data = sdata.data;
-	return sdata.size;
+
+	if ( _gnutls_version_ssl3(_gnutls_version_get(key->version.major, key->version.minor)) == 0 ) {
+		/* SSL 3.0 */
+		*data = sdata.data;
+		return sdata.size;
+	} else { /* TLS 1 */
+		*data = gnutls_malloc(sdata.size+2);
+		if (*data==NULL) {
+			gnutls_free_datum(&sdata);
+			return GNUTLS_E_MEMORY_ERROR; 
+		}
+		WRITEuint16(sdata.size, *data);
+		memcpy( &(*data)[2], sdata.data, sdata.size);
+		ret = sdata.size + 2;
+		gnutls_free_datum(&sdata);
+		return ret;
+	}
+
 }

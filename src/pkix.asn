@@ -309,8 +309,8 @@ md5WithRSAEncryption OBJECT IDENTIFIER  ::=  { pkcs-1 4 }
 sha1WithRSAEncryption OBJECT IDENTIFIER  ::=  { pkcs-1 5 }
 
 RSAPublicKey ::= SEQUENCE {
-	 modulus	     INTEGER, -- n
-	 publicExponent     INTEGER  -- e 
+	 modulus            INTEGER,
+	 publicExponent     INTEGER
 }
 
 id-dsa-with-sha1 OBJECT IDENTIFIER ::=  {

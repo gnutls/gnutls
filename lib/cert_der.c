@@ -3,10 +3,8 @@
 /* Description: Functions to manage DER encoding     */
 /*****************************************************/
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
+#include <defines.h>
+#include <gnutls_int.h>
 #include <cert_der.h>
 #include <cert_asn1.h>
 

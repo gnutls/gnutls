@@ -46,7 +46,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 
 	if (plaintext.size > k - 11) {
 		gnutls_assert();
-		return GNUTLS_E_ENCRYPTION_FAILED;
+		return GNUTLS_E_PK_ENCRYPTION_FAILED;
 	}
 
 	edata = gnutls_malloc(k);
@@ -82,7 +82,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 	_pkey[0] = &n;
 	_pkey[1] = &pkey;
 	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, _pkey);
-	gcry_mpi_release(m);
+	_gnutls_mpi_release(&m);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -90,6 +90,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 	}
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &psize, res);
+
 	ciphertext->data = gnutls_malloc(psize);
 	if (ciphertext->data == NULL) {
 		gnutls_assert();
@@ -122,7 +123,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 
 	if (esize!=k) {
 		gnutls_assert();
-		return GNUTLS_E_DECRYPTION_FAILED;
+		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}
 	
 	if (gcry_mpi_scan(&c, GCRYMPI_FMT_USG, ciphertext.data, &esize) != 0) {
@@ -180,7 +181,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
 	
-	if (gnutls_set_datum( plaintext, &edata[i], esize - i) < 0) {
+	if (gnutls_sset_datum( plaintext, &edata[i], esize - i) < 0) {
 		gnutls_assert();
 		gnutls_free(edata);
 		return GNUTLS_E_MEMORY_ERROR;

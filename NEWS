@@ -1,7 +1,7 @@
 Version 0.1.4
 - Corrected (srp) base64 encoding.
 - Changed bcrypt algorithm to include username.
-- Added RSA Ciphersuites (server side only).
+- Added RSA Ciphersuites (no certificate checking).
 - Fixes in SSL 2.0 client hello parsing.
 - Added ASN.1 and DER parsers.
 - Bugfixes in session resuming

@@ -8,6 +8,7 @@
   only one parse of the der structures.
 * Create global variables that hold read/write and initialize
   the ASN.1 parser's structures.
-* Create certificate verify function(s)
-* Add client side of RSA auth.
-
+* Create certificate verification function(s)
+* Make the selection of the proper ciphersuite to depend on
+  the certificate/credentials.
+* Modify SRP to conform the newest draft
