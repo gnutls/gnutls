@@ -408,7 +408,9 @@ int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription de
   *
   * Sends an alert to the peer depending on the error code returned by a gnutls
   * function. All alerts sent by this function are fatal, so connection should
-  * be considered terminated after calling this function.
+  * be considered terminated after calling this function. The only exception
+  * is when err == GNUTLS_E_REHANDSHAKE, then a warning alert is sent to
+  * the peer indicating the no renegotiation will be performed.
   *
   * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
   *
@@ -440,6 +442,9 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
                         break;
 		case GNUTLS_E_UNEXPECTED_PACKET:
                         ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_UNEXPECTED_MESSAGE);
+                        break;
+		case GNUTLS_E_REHANDSHAKE:
+                        ret = gnutls_send_alert( state, GNUTLS_WARNING, GNUTLS_NO_RENEGOTIATION);
                         break;
                                                               
 	}

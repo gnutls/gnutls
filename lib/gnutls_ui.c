@@ -105,7 +105,8 @@ int gnutls_anon_client_get_dh_bits(GNUTLS_STATE state)
   * @list_size: is the length of the certificate list
   *
   * This function will return the peer's raw certificate list as sent by the peer.
-  * These certificates are DER encoded. 
+  * These certificates are DER encoded. The first certificate in the list is the peer's certificate,
+  * following the issuer's certificate, then the issuer's issuer etc.
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/

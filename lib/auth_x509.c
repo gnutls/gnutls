@@ -819,7 +819,7 @@ int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int 
 
 /**
   * gnutls_x509pki_get_peer_dn - This function returns the peer's distinguished name
-  * @state: is a gnutls state
+  * @cert: should contain an X.509 DER encoded certificate
   * @ret: a pointer to a structure to hold the peer's name
   *
   * This function will return the name of the peer. The name is gnutls_DN structure and 
@@ -828,19 +828,12 @@ int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int 
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509pki_get_peer_dn(GNUTLS_STATE state, gnutls_DN * ret)
+int gnutls_x509pki_extract_dn(const gnutls_datum* cert, gnutls_DN * ret)
 {
-	X509PKI_AUTH_INFO info;
 	node_asn *c2;
 	int result;
 
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
-
 	memset( ret, 0, sizeof(gnutls_DN));
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_INVALID_REQUEST;
 
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
@@ -851,7 +844,7 @@ int gnutls_x509pki_get_peer_dn(GNUTLS_STATE state, gnutls_DN * ret)
 	}
 
 
-	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
@@ -876,29 +869,22 @@ int gnutls_x509pki_get_peer_dn(GNUTLS_STATE state, gnutls_DN * ret)
 }
 
 /**
-  * gnutls_x509pki_get_issuer_dn - This function returns the peer's issuer distinguished name
-  * @state: is a gnutls state
+  * gnutls_x509pki_extract_issuer_dn - This function returns the certificate's issuer distinguished name
+  * @cert: should contain an X.509 DER encoded certificate
   * @ret: a pointer to a structure to hold the issuer's name
   *
-  * This function will return the name of the issuer of peer. The name is a gnutls_DN structure and 
+  * This function will return the name of the issuer stated in the certificate. The name is a gnutls_DN structure and 
   * is a obtained by the peer's certificate. If the certificate send by the
   * peer is invalid, or in any other failure this function returns error.
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509pki_get_issuer_dn(GNUTLS_STATE state, gnutls_DN * ret)
+int gnutls_x509pki_extract_issuer_dn(const gnutls_datum* cert, gnutls_DN * ret)
 {
-	X509PKI_AUTH_INFO info;
 	node_asn *c2;
 	int result;
 
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
-
 	memset( ret, 0, sizeof(gnutls_DN));
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_INVALID_REQUEST;
 
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
@@ -908,7 +894,7 @@ int gnutls_x509pki_get_issuer_dn(GNUTLS_STATE state, gnutls_DN * ret)
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
@@ -933,12 +919,14 @@ int gnutls_x509pki_get_issuer_dn(GNUTLS_STATE state, gnutls_DN * ret)
 }
 
 /**
-  * gnutls_x509pki_get_subject_dns_name - This function returns the peer's dns name, if any
-  * @state: is a gnutls state
+  * gnutls_x509pki_extract_subject_dns_name - This function returns the peer's dns name, if any
+  * @cert: should contain an X.509 DER encoded certificate
   * @ret: is the place where dns name will be copied to
   * @ret_size: holds the size of ret.
   *
-  * This function will return the peer's alternative name (the dns part of it). 
+  * This function will return the alternative name (the dns part of it), contained in the
+  * given certificate.
+  * 
   * This is specified in X509v3 Certificate Extensions. 
   * GNUTLS will only return the dnsName of the Alternative name, or a negative
   * error code.
@@ -948,23 +936,15 @@ int gnutls_x509pki_get_issuer_dn(GNUTLS_STATE state, gnutls_DN * ret)
   * If the certificate does not have a DNS name then returns GNUTLS_E_DATA_NOT_AVAILABLE;
   *
   **/
-int gnutls_x509pki_get_subject_dns_name(GNUTLS_STATE state, char* ret, int *ret_size)
+int gnutls_x509pki_extract_subject_dns_name(const gnutls_datum* cert, char* ret, int *ret_size)
 {
-	X509PKI_AUTH_INFO info;
 	int result;
 	gnutls_datum dnsname;
-
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_INVALID_REQUEST;
-
 
 	memset(ret, 0, *ret_size);
 
 	if ((result =
-	     _gnutls_get_extension( &info->raw_certificate_list[0], "2 5 29 17", &dnsname)) < 0) {
+	     _gnutls_get_extension( cert, "2 5 29 17", &dnsname)) < 0) {
 		return result;
 	}
 
@@ -986,27 +966,19 @@ int gnutls_x509pki_get_subject_dns_name(GNUTLS_STATE state, char* ret, int *ret_
 }
 
 /**
-  * gnutls_x509pki_get_peer_certificate_activation_time - This function returns the peer's certificate activation time
-  * @state: is a gnutls state
+  * gnutls_x509pki_extract_certificate_activation_time - This function returns the peer's certificate activation time
+  * @cert: should contain an X.509 DER encoded certificate
   *
-  * This function will return the peer's certificate activation time in UNIX time 
+  * This function will return the certificate's activation time in UNIX time 
   * (ie seconds since 00:00:00 UTC January 1, 1970).
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t gnutls_x509pki_get_peer_certificate_activation_time(GNUTLS_STATE
-							   state)
+time_t gnutls_x509pki_extract_certificate_activation_time(const gnutls_datum * cert)
 {
-	X509PKI_AUTH_INFO info;
 	node_asn *c2;
 	int result;
 	time_t ret;
-
-	CHECK_AUTH(GNUTLS_X509PKI, -1);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return -1;
 
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
@@ -1016,7 +988,7 @@ time_t gnutls_x509pki_get_peer_certificate_activation_time(GNUTLS_STATE
 		return -1;
 	}
 
-	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
@@ -1034,27 +1006,19 @@ time_t gnutls_x509pki_get_peer_certificate_activation_time(GNUTLS_STATE
 }
 
 /**
-  * gnutls_x509pki_get_peer_certificate_expiration_time - This function returns the peer's certificate expiration time
-  * @state: is a gnutls state
+  * gnutls_x509pki_extract_certificate_expiration_time - This function returns the certificate's expiration time
+  * @cert: should contain an X.509 DER encoded certificate
   *
-  * This function will return the peer's certificate expiration time in UNIX time 
+  * This function will return the certificate's expiration time in UNIX time 
   * (ie seconds since 00:00:00 UTC January 1, 1970).
   * Returns a (time_t) -1 in case of an error.
   *
   **/
-time_t gnutls_x509pki_get_peer_certificate_expiration_time(GNUTLS_STATE
-							   state)
+time_t gnutls_x509pki_extract_certificate_expiration_time( const gnutls_datum* cert)
 {
-	X509PKI_AUTH_INFO info;
 	node_asn *c2;
 	int result;
 	time_t ret;
-
-	CHECK_AUTH(GNUTLS_X509PKI, -1);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return -1;
 
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
@@ -1064,7 +1028,7 @@ time_t gnutls_x509pki_get_peer_certificate_expiration_time(GNUTLS_STATE
 		return -1;
 	}
 
-	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
@@ -1082,25 +1046,17 @@ time_t gnutls_x509pki_get_peer_certificate_expiration_time(GNUTLS_STATE
 }
 
 /**
-  * gnutls_x509pki_get_peer_certificate_version - This function returns the peer's certificate version
-  * @state: is a gnutls state
+  * gnutls_x509pki_extract_certificate_version - This function returns the certificate's version
+  * @cert: is an X.509 DER encoded certificate
   *
-  * This function will return the peer's certificate version (1, 2, 3). This is obtained by the X509 Certificate
-  * Version field. If the certificate is invalid then version will be zero.
-  * Returns a negative value in case of an error.
+  * This function will return the X.509 certificate's version (1, 2, 3). This is obtained by the X509 Certificate
+  * Version field. Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509pki_get_peer_certificate_version(GNUTLS_STATE state)
+int gnutls_x509pki_extract_certificate_version( const gnutls_datum* cert)
 {
-	X509PKI_AUTH_INFO info;
 	node_asn *c2;
 	int result;
-
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_INVALID_REQUEST;
 
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
@@ -1110,7 +1066,7 @@ int gnutls_x509pki_get_peer_certificate_version(GNUTLS_STATE state)
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = asn1_get_der(c2, info->raw_certificate_list[0].data, info->raw_certificate_list[0].size);
+	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG

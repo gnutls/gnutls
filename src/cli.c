@@ -57,9 +57,9 @@ static int print_info( GNUTLS_STATE state) {
 const char *tmp;
 CredType cred;
 gnutls_DN dn;
+const gnutls_datum* cert_list;
 CertificateStatus status;
-char dnsname[512];
-int dnsname_size;
+int cert_list_size = 0;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp);
@@ -71,7 +71,9 @@ int dnsname_size;
 			       gnutls_anon_client_get_dh_bits( state));
 
 		case GNUTLS_X509PKI:
+			cert_list = gnutls_x509pki_client_get_peer_certificate_list( state, &cert_list_size);
 			status = gnutls_x509pki_client_get_peer_certificate_status( state);
+			
 			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:
 				printf("- Peer's X509 Certificate was NOT verified\n");
@@ -90,14 +92,14 @@ int dnsname_size;
 				break;
 			}
 			
-			if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
+			if (cert_list_size > 0) {
 				printf(" - Certificate info:\n");
-				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version( state));
+				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_extract_certificate_version( &cert_list[0]));
 
-				gnutls_x509pki_client_get_peer_dn( state, &dn);
+				gnutls_x509pki_client_extract_dn( &cert_list[0], &dn);
 				PRINT_DN( dn);
 
-				gnutls_x509pki_client_get_issuer_dn( state, &dn);
+				gnutls_x509pki_client_extract_issuer_dn( &cert_list[0], &dn);
 				printf(" - Certificate Issuer's info:\n");
 				PRINT_DN( dn);
 			}

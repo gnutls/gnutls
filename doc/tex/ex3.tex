@@ -7,13 +7,11 @@
 	PRINTX( "L:", X->locality_name); \
 	PRINTX( "S:", X->state_or_province_name); \
 	PRINTX( "C:", X->country); \
-	PRINTX( "E:", X->email); \
-	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name( state))
+	PRINTX( "E:", X->email)
 
 int print_info(GNUTLS_STATE state)
 {
    const char *tmp;
-   const gnutls_DN* dn;
 
    /* print the key exchange's algorithm name
     */
@@ -23,6 +21,9 @@ int print_info(GNUTLS_STATE state)
    /* in case of X509 PKI
     */
    if (gnutls_get_auth_type(state) == GNUTLS_X509PKI) {
+      const gnutls_DN* dn;
+      const gnutls_datum* cert_list;
+      int cert_list_size = 0;
       CertificateStatus status;
       KXAlgorithm kx;
 
@@ -37,6 +38,7 @@ int print_info(GNUTLS_STATE state)
 
 
       status = gnutls_x509pki_client_get_peer_certificate_status( state);
+      cert_list = gnutls_x509pki_client_get_peer_certificate_list( state, &cert_list_size);
 
       switch( status) {
          case GNUTLS_CERT_NOT_TRUSTED:
@@ -56,30 +58,30 @@ int print_info(GNUTLS_STATE state)
            break;
       }
 		
-      if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
+      if ( cert_list_size > 0) {
 
          printf(" - Certificate info:\n");
-         printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version( state));
+         printf(" - Certificate version: #%d\n", gnutls_x509pki_client_extract_certificate_version( &cert_list[0]));
 
-         dn = gnutls_x509pki_client_get_peer_dn( state);
-         PRINT_DN(dn);
+         gnutls_x509pki_client_extract_dn( &cert_list[0], &dn);
+         PRINT_DN( dn);
 
+         gnutls_x509pki_client_extract_issuer_dn( &cert_list[0], &dn);
          printf(" - Certificate Issuer's info:\n");
-         dn = gnutls_x509pki_client_get_issuer_dn( state);
          PRINT_DN(dn);
       }
    }
 
-   tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+   tmp = gnutls_version_get_name(gnutls_get_current_version( state));
    printf("- Version: %s\n", tmp);
 
-   tmp = gnutls_compression_get_name(gnutls_get_current_compression_method(state));
+   tmp = gnutls_compression_get_name(gnutls_get_current_compression_method( state));
    printf("- Compression: %s\n", tmp);
 
-   tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
+   tmp = gnutls_cipher_get_name(gnutls_get_current_cipher( state));
    printf("- Cipher: %s\n", tmp);
 
-   tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
+   tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
    printf("- MAC: %s\n", tmp);
 
    return 0;

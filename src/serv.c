@@ -104,13 +104,13 @@ GNUTLS_STATE initialize_state()
 void print_info(GNUTLS_STATE state)
 {
 	const char *tmp;
+	const gnutls_datum * cert_list;
 	unsigned char sesid[32];
 	int sesid_size, i;
 	gnutls_DN dn;
 	CredType cred;
 	CertificateStatus status;
-	char dnsname[512];
-	int dnsname_size;
+	int cert_list_size = 0;
 	
 	/* print session_id specific data */
 	gnutls_get_current_session_id( state, sesid, &sesid_size);
@@ -141,7 +141,9 @@ void print_info(GNUTLS_STATE state)
 			break;
 
 		case GNUTLS_X509PKI: 
-			status = gnutls_x509pki_client_get_peer_certificate_status( state);
+			cert_list = gnutls_x509pki_server_get_peer_certificate_list( state, &cert_list_size);
+			status = gnutls_x509pki_server_get_peer_certificate_status( state);
+			
 			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:
 				printf("- Peer's X509 Certificate was NOT verified\n");
@@ -164,16 +166,16 @@ void print_info(GNUTLS_STATE state)
 				printf("\n- Ephemeral DH using prime of %d bits\n",
 			        gnutls_x509pki_server_get_dh_bits( state));
 			}
-			
-			if (status!=GNUTLS_CERT_NONE && status!=GNUTLS_CERT_INVALID) {
-				printf(" - Certificate info:\n");
-				printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(state));
 
-				if ( gnutls_x509pki_client_get_peer_dn( state, &dn) >= 0) {
+			if (cert_list_size > 0) {
+				printf(" - Certificate info:\n");
+				printf(" - Certificate version: #%d\n", gnutls_x509pki_server_extract_certificate_version( &cert_list[0]));
+
+				if ( gnutls_x509pki_server_extract_dn( &cert_list[0], &dn) >= 0) {
 					PRINT_DN( dn);
 				}
 				
-				if (gnutls_x509pki_client_get_issuer_dn( state, &dn) >= 0) {
+				if (gnutls_x509pki_server_extract_dn( &cert_list[0], &dn) >= 0) {
 					printf(" - Certificate Issuer's info:\n");
 					PRINT_DN( dn);
 				}

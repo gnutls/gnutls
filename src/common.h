@@ -8,7 +8,4 @@
 	PRINTX( "L:", X.locality_name); \
 	PRINTX( "S:", X.state_or_province_name); \
 	PRINTX( "C:", X.country); \
-	PRINTX( "E:", X.email); \
-	dnsname_size = sizeof(dnsname); \
-	gnutls_x509pki_client_get_subject_dns_name(state, dnsname, &dnsname_size); \
-	PRINTX( "SAN:", dnsname)
+	PRINTX( "E:", X.email)
