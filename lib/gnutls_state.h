@@ -7,6 +7,7 @@ void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version versi
 
 void _gnutls_state_cert_type_set( GNUTLS_STATE state, CertificateType);
 KXAlgorithm gnutls_kx_get( GNUTLS_STATE state);
+GNUTLS_BulkCipherAlgorithm	gnutls_cipher_get( GNUTLS_STATE state);
 CertificateType gnutls_cert_type_get( GNUTLS_STATE state);
 
 #define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \

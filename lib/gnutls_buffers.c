@@ -511,6 +511,7 @@ static int _gnutls_buffer_get( gnutls_datum * buffer, const opaque ** ptr, size_
 	return 0;
 }
 
+
 /* This function is like write. But it does not return -1 on error.
  * It does return gnutls_errno instead.
  *
@@ -617,6 +618,26 @@ ssize_t _gnutls_io_write_buffered( GNUTLS_STATE state, const void *iptr, size_t 
 	return retval;
 
 }
+
+/* This is exactly like write_buffered, but will use two buffers to read
+ * from.
+ */
+ssize_t _gnutls_io_write_buffered2( GNUTLS_STATE state, const void *iptr, size_t n, const void* iptr2, size_t n2)
+{
+opaque* sptr;
+
+	sptr = gnutls_malloc( n+n2);
+	if (sptr==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	memcpy( sptr, iptr, n);
+	memcpy( &sptr[n], iptr2, n2);
+
+	return _gnutls_io_write_buffered( state, sptr, n+n2);
+}
+
 
 /* This function writes the data that are left in the
  * TLS write buffer (ie. because the previous write was

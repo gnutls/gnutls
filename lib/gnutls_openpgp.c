@@ -826,6 +826,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
       gnutls_assert();
       return GNUTLS_E_MEMORY_ERROR;
     }
+
   res->cert_list_length = gnutls_realloc(res->cert_list_length,
                                          (1+res->ncerts)*sizeof(int));
   if (res->cert_list_length == NULL)
@@ -898,14 +899,15 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   iobuf_to_datum(buf, &raw);
   cdk_iobuf_close(buf);
   
-  res->ncerts++;
   res->pkey = gnutls_realloc(res->pkey,
-                             (res->ncerts)*sizeof(gnutls_private_key));
+                             (res->ncerts+1)*sizeof(gnutls_private_key));
   if (res->pkey == NULL)
     {
       gnutls_assert();
       return GNUTLS_E_MEMORY_ERROR;
     }
+
+  res->ncerts++;
   
   /* ncerts has been incremented before */
   rc =_gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], raw);

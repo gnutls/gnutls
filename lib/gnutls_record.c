@@ -35,6 +35,7 @@
 #include "gnutls_record.h"
 #include "gnutls_datum.h"
 #include "ext_max_record.h"
+#include <gnutls_state.h>
 #include <gnutls_alert.h>
 #include <gnutls_dh.h>
 
@@ -318,6 +319,58 @@ static int _gnutls_session_is_valid( GNUTLS_STATE state) {
 	return 0;
 }
 
+static
+ssize_t gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
+	opaque** erecord)
+{
+	int cipher_size;
+	int retval;
+	int data2send;
+	uint8 headers[5];
+	GNUTLS_Version lver;
+
+	*erecord = NULL;
+	if (type!=GNUTLS_APPLICATION_DATA ||
+		_gnutls_cipher_is_block( gnutls_cipher_get(state))!=CIPHER_BLOCK) 
+		/* alert messages and stream ciphers
+		 * do not need this protection 
+		 */
+		return 0;
+
+	headers[0]=type;
+	
+	lver = gnutls_protocol_get_version(state);
+	if (lver==GNUTLS_VERSION_UNKNOWN) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL;
+	}
+
+	headers[1]=_gnutls_version_get_major( lver);
+	headers[2]=_gnutls_version_get_minor( lver);
+
+	data2send = 0;
+
+	cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, NULL, 0, erecord, type, 0);
+	if (cipher_size <= 0) {
+		gnutls_assert();
+		if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
+		return cipher_size; /* error */
+	}
+
+	retval = cipher_size;
+
+	/* increase sequence number
+	 */
+	if (uint64pp( &state->connection_state.write_sequence_number) != 0) {
+		_gnutls_session_invalidate( state);
+		gnutls_assert();
+		return GNUTLS_E_RECORD_LIMIT_REACHED;
+	}
+
+	return retval;
+}
+
+
 /* This function behave exactly like write(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is specific)
@@ -338,6 +391,8 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	uint8 headers[5];
 	const uint8 *data=_data;
 	GNUTLS_Version lver;
+	int erecord_size = 0;
+	opaque* erecord;
 
 	if (sizeofdata == 0 || _data==NULL) {
 		gnutls_assert();
@@ -348,6 +403,8 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		if ( _gnutls_session_is_valid( state) || state->gnutls_internals.may_write != 0) {
 			return GNUTLS_E_INVALID_SESSION;
 		}
+
+
 
 	headers[0]=type;
 	
@@ -380,10 +437,24 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 		retval = state->gnutls_internals.record_send_buffer_user_size;
 	} else {
-		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, data, data2send, &cipher, type);
+
+		/* Prepend our packet with an empty record. This is to
+		 * avoid the recent CBC attacks.
+		 */
+		erecord_size = 
+			gnutls_create_empty_record( state, type, &erecord);
+		if (erecord_size < 0) {
+			gnutls_assert();
+			return erecord_size;
+		}
+
+		/* now proceed to packet encryption
+		 */
+		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, data, data2send, &cipher, type, 1);
 		if (cipher_size <= 0) {
 			gnutls_assert();
 			if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
+			gnutls_free( erecord);
 			return cipher_size; /* error */
 		}
 
@@ -397,14 +468,16 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			gnutls_assert();
 			/* FIXME: Somebody has to do rehandshake before that.
 			 */
+			gnutls_free( erecord);
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}
 
-		ret = _gnutls_io_write_buffered( state, cipher, cipher_size);
+		ret = _gnutls_io_write_buffered2( state, erecord, erecord_size, cipher, cipher_size);
+		gnutls_free( erecord);
+		gnutls_free( cipher);
 	}
 
-	if ( ret != cipher_size) {
-		gnutls_free( cipher);
+	if ( ret != cipher_size + erecord_size) {
 		if ( ret < 0 && gnutls_error_is_fatal(ret)==0) {
 			/* If we have sent any data then return
 			 * that value.
@@ -425,8 +498,6 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	}
 
 	state->gnutls_internals.record_send_buffer_user_size = 0;
-
-	gnutls_free(cipher);
 
 	_gnutls_record_log( "REC: Sent Packet[%d] %s(%d) with length: %d\n",
 	(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
@@ -669,6 +740,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	int ret, ret2;
 	uint16 header_size;
 
+	begin:
 	/* default headers for TLS 1.0
 	 */
 	header_size = RECORD_HEADER_SIZE;
@@ -830,6 +902,10 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		/* we didn't get what we wanted to 
 		 */
 	}
+
+	/* TLS 1.0 CBC protection. Read the next fragment.
+	 */
+	if (ret==0) goto begin;
 
 	return ret;
 }

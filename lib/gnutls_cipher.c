@@ -35,17 +35,16 @@
 
 /* returns ciphertext which contains the headers too. This also
  * calculates the size in the header field.
+ * 
+ * If random pad != 0 then the random pad data will be appended.
  */
 int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 		const char *data, size_t data_size,
-		uint8 ** ciphertext, ContentType type)
+		uint8 ** ciphertext, ContentType type, int random_pad)
 {
 	gnutls_datum plain = { (char*)data, data_size };
 	gnutls_datum comp, ciph;
 	int err;
-
-	if (data_size == 0)
-		return 0;
 
 	err = _gnutls_plaintext2TLSCompressed(state, &comp, plain);
 	if (err < 0) {
@@ -53,7 +52,7 @@ int _gnutls_encrypt(GNUTLS_STATE state, const char* headers, int headers_size,
 		return err;
 	}
 
-	err = _gnutls_compressed2TLSCiphertext(state, &ciph, comp, type, headers_size);
+	err = _gnutls_compressed2TLSCiphertext(state, &ciph, comp, type, headers_size, random_pad);
 	if (err < 0) {
 		gnutls_assert();
 		return err;
@@ -115,7 +114,9 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 					gnutls_datum*
 					cipher,
-					gnutls_datum compressed, ContentType _type, int headers_size)
+					gnutls_datum compressed, ContentType _type, 
+					int headers_size,
+					int random_pad)
 {
 	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
@@ -199,7 +200,8 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 		}
 
 		/* make rand a multiple of blocksize */
-		if ( state->security_parameters.version == GNUTLS_SSL3) {
+		if ( state->security_parameters.version == GNUTLS_SSL3 ||
+			random_pad==0) {
 			rand = 0;
 		} else {
 			rand = (rand / blocksize) * blocksize;

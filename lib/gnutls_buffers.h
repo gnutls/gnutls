@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -26,6 +26,8 @@ void _gnutls_io_clear_read_buffer( GNUTLS_STATE);
 int _gnutls_io_clear_peeked_data( GNUTLS_STATE state);
 
 ssize_t _gnutls_io_write_buffered( GNUTLS_STATE, const void *iptr, size_t n );
+ssize_t _gnutls_io_write_buffered2( GNUTLS_STATE, const void *iptr, size_t n,
+	const void* iptr2, size_t n2);
 
 int _gnutls_handshake_buffer_get_size( GNUTLS_STATE state);
 int _gnutls_handshake_buffer_peek( GNUTLS_STATE state, char *data, int length);
