@@ -1,8 +1,8 @@
 #! /bin/sh
 
-aclocal && \
+aclocal -I . && \
 libtoolize -c --force --automake && \
-aclocal && \
+aclocal -I . && \
 autoheader  && \
 automake -a -c --gnu || automake -a -c --gnu
 autoconf
