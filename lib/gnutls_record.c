@@ -983,16 +983,6 @@ ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
   * difference is that is accepts a GNUTLS session, and uses different
   * error codes.
   *
-  * In the special case that a server requests a renegotiation, the
-  * client may receive an error code of %GNUTLS_E_REHANDSHAKE.  This
-  * message may be simply ignored, replied with an alert containing
-  * %GNUTLS_A_NO_RENEGOTIATION, or replied with a new handshake,
-  * depending on the client's will.
-  *
-  * A server may also receive %GNUTLS_E_REHANDSHAKE when a client has
-  * initiated a handshake. In that case the server can only initiate a
-  * handshake or terminate the connection.
-  *
   * If the EINTR is returned by the internal push function (the
   * default is send()} then %GNUTLS_E_INTERRUPTED will be returned. If
   * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
