@@ -520,7 +520,7 @@ Certificate  ::=  SEQUENCE  {
      signature            BIT STRING  }
 
 TBSCertificate  ::=  SEQUENCE  {
-     version         [0]  EXPLICIT Version DEFAULT 0,   --v1,
+     version         [0]  EXPLICIT Version DEFAULT v1,
      serialNumber         CertificateSerialNumber,
      signature            AlgorithmIdentifier,
      issuer               Name,

@@ -1,7 +1,7 @@
 /*************************************************/
-/* File: gnutls_der.h                            */
+/* File: cert_der.h                              */
 /* Description: list of exported object by       */
-/*   "gnutls_der.c"                              */
+/*   "cert_der.c"                                */
 /*************************************************/
 
 #ifndef _GNUTLS_DER_H
@@ -17,25 +17,26 @@
 
 
 void
-octet_der(unsigned char *str,int str_len,unsigned char *der,int *der_len);
+_asn1_octet_der(unsigned char *str,int str_len,unsigned char *der,int *der_len);
 
 void
-get_octet_der(unsigned char *der,int *der_len,unsigned char *str,int *str_len);
+_asn1_get_octet_der(unsigned char *der,int *der_len,unsigned char *str,int *str_len);
 
 void
-bit_der(unsigned char *str,int bit_len,unsigned char *der,int *der_len);
+_asn1_bit_der(unsigned char *str,int bit_len,unsigned char *der,int *der_len);
 
 void
-get_bit_der(unsigned char *der,int *der_len,unsigned char *str,int *bit_len);
+_asn1_get_bit_der(unsigned char *der,int *der_len,unsigned char *str,int *bit_len);
 
 int 
-create_der(node_asn *root,char *name,unsigned char *der,int *len);
+asn1_create_der(node_asn *root,char *name,unsigned char *der,int *len);
 
 int 
-get_der(node_asn *root,unsigned char *der,int len);
+asn1_get_der(node_asn *root,unsigned char *der,int len);
 
 int 
-get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_element,int *start, int *end);
+asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_element,int *start, int *end);
+
 
 #endif
 

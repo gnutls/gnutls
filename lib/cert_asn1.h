@@ -1,8 +1,8 @@
 
 /*************************************************/
-/* File: gnutls_asn1.h                           */
+/* File: cert_asn1.h                             */
 /* Description: list of exported object by       */
-/*   "gnutls_asn1.c"                             */
+/*   "cert_asn1.c"                               */
 /*************************************************/
 
 #ifndef _GNUTLS_ASN1_H
@@ -109,60 +109,60 @@ typedef struct node_asn_struct{
 /*  Functions used by ASN.1 parser     */
 /***************************************/
 node_asn *
-add_node(unsigned int type);
+_asn1_add_node(unsigned int type);
 
 node_asn *
-set_value(node_asn *node,unsigned char *value,unsigned int len);
+_asn1_set_value(node_asn *node,unsigned char *value,unsigned int len);
 
 node_asn *
-set_name(node_asn *node,char *name);
+_asn1_set_name(node_asn *node,char *name);
 
 node_asn *
-set_right(node_asn *node,node_asn *right);
+_asn1_set_right(node_asn *node,node_asn *right);
 
 node_asn *
-get_right(node_asn *node);
+_asn1_get_right(node_asn *node);
 
 node_asn *
-get_last_right(node_asn *node);
+_asn1_get_last_right(node_asn *node);
 
 node_asn *
-set_down(node_asn *node,node_asn *down);
+_asn1_set_down(node_asn *node,node_asn *down);
 
 char *
-get_name(node_asn *node);
+_asn1_get_name(node_asn *node);
 
 node_asn *
-get_down(node_asn *node);
+_asn1_get_down(node_asn *node);
 
 node_asn *
-mod_type(node_asn *node,unsigned int value);
+_asn1_mod_type(node_asn *node,unsigned int value);
 
 void
-append_tree(node_asn *node);
+_asn1_append_tree(node_asn *node);
 
 node_asn *
-find_node(node_asn *pointer,char *name);
+_asn1_find_node(node_asn *pointer,char *name);
 
 node_asn *
-find_up(node_asn *node);
+_asn1_find_up(node_asn *node);
 
 
 int 
-parser_asn1(char *file_name,node_asn **pointer);
+asn1_parser_asn1(char *file_name,node_asn **pointer);
 
 int
-create_structure(node_asn *root,char *source_name,node_asn **pointer,
+asn1_create_structure(node_asn *root,char *source_name,node_asn **pointer,
 		 char *dest_name);
 
 int
-delete_structure(node_asn *root);
+asn1_delete_structure(node_asn *root);
 
 int 
-write_value(node_asn *root,char *name,unsigned char *value,int len);
+asn1_write_value(node_asn *root,char *name,unsigned char *value,int len);
 
 int 
-read_value(node_asn *root,char *name,unsigned char *value,int *len);
+asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len);
 
 
 #endif
