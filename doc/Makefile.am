@@ -1,3 +1,3 @@
-EXTRA_DIST = TODO ASN1.readme.txt README.CVS README.autoconf
+EXTRA_DIST = TODO README.CVS README.autoconf
 SUBDIRS = tex scripts
 
