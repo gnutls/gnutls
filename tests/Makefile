@@ -5,15 +5,10 @@ CFLAGS=-O2 -I../libextra/ -I../ -I../lib/ `../lib/libgnutls-config --cflags`
 
 all: x509test opgptest
 
-x509test: x509_test.o
-
-x509_test.o: x509_test.c
+x509test: x509_test.c
 	$(CC) $(CFLAGS) x509_test.c $(LIBS) -o x509test
 
-
-opgptest: openpgp_test.o
-
-openpgp_test.o: openpgp_test.c
+opgptest: openpgp_test.c
 	$(CC) $(CFLAGS) openpgp_test.c $(LIBS2) -o opgptest
 
 
