@@ -1,3 +1,48 @@
+2002-06-19 19:57  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in, lib/gnutls_cert.c, lib/gnutls_db.c,
+	lib/gnutls_global.c, lib/gnutls_int_compat.c, lib/gnutls_ui.h,
+	src/serv.c:
+
+	_func abreviation is no longer used. Functions renamed to _function.  
+
+2002-06-19 16:44  nmav <nmav@gnutls.org>
+
+	* lib/x509_xml.c:
+
+	x509_xml.c 
+
+2002-06-19 14:54  nmav <nmav@gnutls.org>
+
+	* src/serv.c:
+
+	removed ioctl stuff.  
+
+2002-06-19 14:44  nmav <nmav@gnutls.org>
+
+	* src/: serv-gaa.c, serv-gaa.h, serv.c, serv.gaa, tls_test.c:
+
+	added 'nodb' and 'quiet' options to server.  
+
+2002-06-19 03:51  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_pk.c:
+
+	Corrected bug in PKCS-1 RSA encryption.  
+
+2002-06-18 17:19  nmav <nmav@gnutls.org>
+
+	* src/: Makefile.am, common.c, list.h, serv.c:
+
+	The server used was changed to a non blocking one. The server was
+	created by Paul Sheer.  
+
+2002-06-16 17:50  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, gnutls.tex, howto.tex:
+
+	Added chapter on how to use TLS in application protocols.  
+
 2002-06-15 10:49  nmav <nmav@gnutls.org>
 
 	* acconfig.h, configure.in, doc/TODO, src/Makefile.am:
