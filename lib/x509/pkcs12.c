@@ -172,7 +172,10 @@ int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format, unsigned int flags)
 {
 	int result = 0, need_free = 0;
-	gnutls_datum _data = { data->data, data->size };
+	gnutls_datum _data;
+	
+	_data.data = data->data;
+	_data.size = data->size;
 
 	if (pkcs12==NULL) {
 		gnutls_assert();

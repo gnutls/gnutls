@@ -7,6 +7,9 @@
 # include <io.h>
 #endif
 
+void print_license(void);
+void certtool_version(void);
+
 #}
 
 helpnode "Certtool help\nUsage: certtool [options]"

@@ -2,7 +2,7 @@
 
 #include <common.h>
 
-void print_license(void);
+void print_serv_license(void);
 void serv_version(void);
 
 #}
@@ -94,7 +94,7 @@ option (l, list) { print_list(); exit(0); } "Print a list of the supported algor
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 option (v, version) { serv_version(); exit(0); } "prints the program's version number"
-option ( copyright) { print_license(); exit(0); } "prints the program's license"
+option ( copyright) { print_serv_license(); exit(0); } "prints the program's license"
 
 
 init { $generate=0; $port=5556; $http=0; $ciphers=NULL;

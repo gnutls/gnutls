@@ -6,7 +6,7 @@
 
 #include <common.h>
 
-void print_license(void);
+void print_serv_license(void);
 void serv_version(void);
 
 #include <stdio.h>
@@ -463,7 +463,7 @@ int gaa_getint(char *arg)
 {
     int tmp;
     char a;
-    if(sscanf(arg, "%d%c", &tmp, &a) != 1)
+    if(sscanf(arg, "%d%c", &tmp, &a) < 1)
     {
         printf("Option %s: '%s' isn't an integer\n", gaa_current_option, arg);
         GAAERROR(-1);
@@ -489,7 +489,7 @@ float gaa_getfloat(char *arg)
 {
     float tmp;
     char a;
-    if(sscanf(arg, "%f%c", &tmp, &a) != 1)
+    if(sscanf(arg, "%f%c", &tmp, &a) < 1)
     {
         printf("Option %s: '%s' isn't a float number\n", gaa_current_option, arg);
         GAAERROR(-1);
@@ -759,7 +759,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_copyright:
 	OK = 0;
 #line 97 "serv.gaa"
-{ print_license(); exit(0); ;};
+{ print_serv_license(); exit(0); ;};
 
 		return GAA_OK;
 		break;

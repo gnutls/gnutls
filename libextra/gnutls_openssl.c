@@ -186,7 +186,7 @@ SSL *SSL_new(SSL_CTX *ctx)
     if (!ssl)
         return NULL;
 
-    err = gnutls_certificate_allocate_cred(&ssl->gnutls_cred);
+    err = gnutls_certificate_allocate_credentials(&ssl->gnutls_cred);
     if (err < 0)
     {
         last_error = err;
@@ -202,7 +202,7 @@ SSL *SSL_new(SSL_CTX *ctx)
     gnutls_kx_set_priority (ssl->gnutls_state, ctx->method->kx_priority);
     gnutls_mac_set_priority (ssl->gnutls_state, ctx->method->mac_priority);
 
-    gnutls_cred_set (ssl->gnutls_state, GNUTLS_CRD_CERTIFICATE, ssl->gnutls_cred);
+    gnutls_credentials_set (ssl->gnutls_state, GNUTLS_CRD_CERTIFICATE, ssl->gnutls_cred);
     if (ctx->certfile)
         gnutls_certificate_set_x509_trust_file(ssl->gnutls_cred, ctx->certfile,
                                                ctx->certfile_type);
@@ -223,7 +223,7 @@ SSL *SSL_new(SSL_CTX *ctx)
 
 void SSL_free(SSL *ssl)
 {
-    gnutls_certificate_free_cred(ssl->gnutls_cred);
+    gnutls_certificate_free_credentials(ssl->gnutls_cred);
     gnutls_deinit(ssl->gnutls_state);
     free(ssl);
 }
