@@ -116,9 +116,7 @@ void gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle, void* digest)
 #ifdef USE_MHASH
 	opaque* ret;
 	
-	ret = mhash_end(handle->handle);
-	memcpy( digest, ret, gnutls_hash_get_algo_len(handle->algorithm));
-	free( ret);
+	mhash_deinit(handle->handle, digest);
 #else
 	maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle->handle));
 	gcry_md_final(handle->handle);
@@ -231,9 +229,7 @@ void gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle, void* digest)
 #ifdef USE_MHASH
 	char *ret;
 
-	ret = mhash_hmac_end(handle->handle);
-	memcpy( digest, ret, gnutls_hash_get_algo_len(handle->algorithm));
-	free(ret);
+	ret = mhash_hmac_deinit(handle->handle, digest);
 #else
 	maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle->handle));
 
