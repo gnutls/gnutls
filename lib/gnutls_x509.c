@@ -710,13 +710,17 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
 
 	if ((result =
 	     _gnutls_get_extension(cert, "2 5 29 19", &basicConstraints)) < 0) {
+	        if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+	        	/* The extension does not exist so it's not a CA */
+	        	return 0;
+	        }
 	     	gnutls_assert();
 		return result;
 	}
 
 	if (basicConstraints.size == 0 || basicConstraints.data==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		return 0;
 	}
 
 	if ((result=_gnutls_asn1_create_element
@@ -729,6 +733,7 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
 
 	result = asn1_der_decoding(&c2, basicConstraints.data, basicConstraints.size, NULL);
 	_gnutls_free_datum( &basicConstraints);
+
 
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
