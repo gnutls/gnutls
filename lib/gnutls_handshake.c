@@ -271,13 +271,6 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 		ver = version;
 	}
 
-	/* he should have send us the highest version
-	 * he supports.
-	 */
-	if (ver == GNUTLS_VERSION_UNKNOWN || ver > version) {
-		gnutls_assert();
-		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	}
 	_gnutls_set_current_version(session, ver);
 
 	/* Read client random value.

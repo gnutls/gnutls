@@ -101,16 +101,12 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 	
 	version = _gnutls_version_get(data[pos], data[pos + 1]);
 
-	/* if we do not support that version  */
+	/* if we do not support that version  
+	 */
 	if (_gnutls_version_is_supported(session, version) == 0) {
 		ver = _gnutls_version_lowest( session);
 	} else {
 		ver = version;
-	}
-
-	if (ver==GNUTLS_VERSION_UNKNOWN || ver > version) {
-		gnutls_assert();
-		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
 
 	_gnutls_set_current_version(session, ver);
