@@ -93,7 +93,7 @@ int gnutls_openpgp_key_to_xml(
 /* internal */
 int _gnutls_openpgp_cert2gnutls_cert(
     gnutls_cert *cert,
-    gnutls_datum raw );
+    const gnutls_datum *raw );
 
 int
 _gnutls_openpgp_request_key(

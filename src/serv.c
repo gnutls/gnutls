@@ -152,7 +152,6 @@ static void listener_free(listener_item * j)
 /* we use primes up to 1024 in this server.
  * otherwise we should add them here.
  */
-static int prime_nums[] = { 768, 1024, 0 };
 
 gnutls_dh_params dh_params;
 gnutls_rsa_params rsa_params;
@@ -160,14 +159,13 @@ gnutls_rsa_params rsa_params;
 static int generate_dh_primes(void)
 {
    gnutls_datum prime, generator;
-   int i = 0;
+   int prime_bits = 768;
 
    if (gnutls_dh_params_init(&dh_params) < 0) {
       fprintf(stderr, "Error in dh parameter initialization\n");
       exit(1);
    }
 
-   do {
       /* Generate Diffie Hellman parameters - for use with DHE
        * kx algorithms. These should be discarded and regenerated
        * once a day, once a week or once a month. Depends on the
@@ -175,23 +173,22 @@ static int generate_dh_primes(void)
        */
       printf
 	  ("Generating Diffie Hellman parameters [%d]. Please wait...\n",
-	   prime_nums[i]);
+	   prime_bits);
       fflush(stdout);
 
-      if (gnutls_dh_params_generate(&prime, &generator, prime_nums[i]) < 0) {
+      if (gnutls_dh_params_generate(&prime, &generator, prime_bits) < 0) {
 	 fprintf(stderr, "Error in prime generation\n");
 	 exit(1);
       }
 
       if (gnutls_dh_params_set
-	  (dh_params, prime, generator, prime_nums[i]) < 0) {
+	  (dh_params, prime, generator, prime_bits) < 0) {
 	 fprintf(stderr, "Error in prime replacement\n");
 	 exit(1);
       }
       gnutls_free(prime.data);
       gnutls_free(generator.data);
 
-   } while (prime_nums[++i] != 0);
 
    return 0;
 }
@@ -616,6 +613,16 @@ int main(int argc, char **argv)
       }
    }
 
+   if (x509_crlfile != NULL) {
+      if ((ret = gnutls_certificate_set_x509_crl_file
+	   (cert_cred, x509_crlfile, x509ctype)) < 0) {
+	 fprintf(stderr, "Error reading '%s'\n", x509_crlfile);
+	 exit(1);
+      } else {
+	 printf("Processed %d CRL(s).\n", ret);
+      }
+   }
+
    if (pgp_keyring != NULL) {
       ret =
 	  gnutls_certificate_set_openpgp_keyring_file(cert_cred,
@@ -940,23 +947,6 @@ int main(int argc, char **argv)
 
 }
 
-#define DEFAULT_X509_KEYFILE "x509/key.pem"
-#define DEFAULT_X509_CERTFILE "x509/cert.pem"
-
-#define DEFAULT_X509_KEYFILE2 "x509/key-dsa.pem"
-#define DEFAULT_X509_CERTFILE2 "x509/cert-dsa.pem"
-
-#define DEFAULT_PGP_KEYFILE "openpgp/sec.asc"
-#define DEFAULT_PGP_CERTFILE "openpgp/pub.asc"
-
-#define DEFAULT_X509_CAFILE "x509/ca.pem"
-#define DEFAULT_X509_CRLFILE NULL;
-
-#define DEFAULT_SRP_PASSWD "srp/tpasswd"
-#define DEFAULT_SRP_PASSWD_CONF "srp/tpasswd.conf"
-
-#undef DEBUG
-
 static gaainfo info;
 void gaa_parser(int argc, char **argv)
 {
@@ -988,50 +978,14 @@ void gaa_parser(int argc, char **argv)
 
    port = info.port;
 
-#ifdef DEBUG
-   if (info.x509_certfile != NULL)
-      x509_certfile = info.x509_certfile;
-   else
-      x509_certfile = DEFAULT_X509_CERTFILE;
-
-   if (info.x509_keyfile != NULL)
-      x509_keyfile = info.x509_keyfile;
-   else
-      x509_keyfile = DEFAULT_X509_KEYFILE;
-
-   if (info.x509_cafile != NULL)
-      x509_cafile = info.x509_certfile;
-   else
-      x509_cafile = DEFAULT_X509_CAFILE;
-
-   if (info.pgp_certfile != NULL)
-      pgp_certfile = info.pgp_certfile;
-   else
-      pgp_certfile = DEFAULT_PGP_CERTFILE;
-
-   if (info.pgp_keyfile != NULL)
-      pgp_keyfile = info.pgp_keyfile;
-   else
-      pgp_keyfile = DEFAULT_PGP_KEYFILE;
-
-   if (info.srp_passwd != NULL)
-      srp_passwd = info.srp_passwd;
-   else
-      srp_passwd = DEFAULT_SRP_PASSWD;
-
-   if (info.srp_passwd_conf != NULL)
-      srp_passwd_conf = info.srp_passwd_conf;
-   else
-      srp_passwd_conf = DEFAULT_SRP_PASSWD_CONF;
-#else
    x509_certfile = info.x509_certfile;
    x509_keyfile = info.x509_keyfile;
    x509_cafile = info.x509_cafile;
+   x509_crlfile = info.x509_crlfile;
    pgp_certfile = info.pgp_certfile;
    pgp_keyfile = info.pgp_keyfile;
    srp_passwd = info.srp_passwd;
    srp_passwd_conf = info.srp_passwd_conf;
-#endif
 
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;

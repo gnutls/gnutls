@@ -35,7 +35,6 @@
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_global.h>
-#include <x509_verify.h>
 #include "debug.h"
 #include <gnutls_sig.h>
 #include <gnutls_x509.h>
@@ -194,7 +193,7 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 		case GNUTLS_CRT_X509:
 			if ((ret =
 			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-					     info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
+					     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
 				gnutls_assert();
 				return 0;
 			}
@@ -207,7 +206,7 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 			}
 			if ((ret =
 			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
-					     info->raw_certificate_list[0])) < 0) {
+					     &info->raw_certificate_list[0])) < 0) {
 				gnutls_assert();
 				return 0;
 			}
@@ -225,11 +224,11 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 
 	if ( _gnutls_mpi_get_nbits( peer_cert.params[0]) 
 		<= 512) {
-		_gnutls_free_cert( peer_cert);
+		_gnutls_free_cert( &peer_cert);
 		return 1;
 	}
 	
-	_gnutls_free_cert( peer_cert);
+	_gnutls_free_cert( &peer_cert);
 	
 	return 0;
 }
@@ -318,7 +317,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 		case GNUTLS_CRT_X509:
 			if ((ret =
 			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-					     info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
+					     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -331,7 +330,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 			}
 			if ((ret =
 			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
-					     info->raw_certificate_list[0])) < 0) {
+					     &info->raw_certificate_list[0])) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -347,7 +346,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 				      &peer_cert,
 				      &vparams, &signature);
 	
-	_gnutls_free_cert( peer_cert);
+	_gnutls_free_cert( &peer_cert);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

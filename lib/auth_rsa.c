@@ -35,7 +35,6 @@
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_global.h>
-#include <x509_verify.h>
 #include "debug.h"
 #include <gnutls_sig.h>
 #include <gnutls_x509.h>
@@ -86,7 +85,7 @@ int i;
 		case GNUTLS_CRT_X509:
 			if ((ret =
 			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-					     info->raw_certificate_list[0], CERT_ONLY_PUBKEY|CERT_NO_COPY)) < 0) {
+					     &info->raw_certificate_list[0], CERT_ONLY_PUBKEY|CERT_NO_COPY)) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -99,7 +98,7 @@ int i;
 			}
 			if ((ret =
 			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
-					     info->raw_certificate_list[0])) < 0) {
+					     &info->raw_certificate_list[0])) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -116,7 +115,7 @@ int i;
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	_gnutls_mpi_get_nbits(peer_cert.params[0]) > 512) {
 
-		_gnutls_free_cert( peer_cert);
+		_gnutls_free_cert( &peer_cert);
 
 		if (session->key->rsa[0] == NULL ||
 			session->key->rsa[1] == NULL) {
@@ -147,7 +146,7 @@ int i;
 	for (i=0;i<*params_len;i++) {
 		params[i] = _gnutls_mpi_copy(peer_cert.params[i]);
 	}
-	_gnutls_free_cert( peer_cert);
+	_gnutls_free_cert( &peer_cert);
 
 	return 0;
 }

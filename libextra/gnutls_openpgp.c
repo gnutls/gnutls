@@ -319,58 +319,11 @@ openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdkPKT_public_key *pk )
             break;
         }
     }
-    if( !rc ) {
-        cert->expiration_time = pk->expiredate;
-        cert->activation_time = pk->timestamp;
-    }
 
     if( rc )
         release_mpi_array( cert->params, i-1 );
     return rc;
 }
-
-
-static int
-openpgp_sig_to_gnutls_cert( gnutls_cert *cert, cdkPKT_signature *sig )
-{
-    CDK_STREAM tmp;
-    CDK_PACKET pkt;
-    uint8 buf[4096];
-    int rc, nread;
-  
-    if( !cert || !sig ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    tmp = cdk_stream_tmp( );
-    if( !tmp ) {
-        gnutls_assert();
-        return GNUTLS_E_MEMORY_ERROR;
-    }
-    
-    memset( &pkt, 0, sizeof pkt );
-    pkt.pkttype = CDK_PKT_SIGNATURE;
-    pkt.pkt.signature = sig;
-    rc = cdk_pkt_build( tmp, &pkt );
-    if( !rc ) {
-        cdk_stream_seek( tmp, 0 );
-        nread = cdk_stream_read( tmp, buf, 4095 );
-        if( nread ) {
-            rc = datum_append( &cert->signature, buf, nread );
-            if( rc < 0 ) {
-                gnutls_assert( );
-                rc = GNUTLS_E_MEMORY_ERROR;
-            }
-        }
-    }
-    else
-        rc = map_cdk_rc( rc );
-
-    cdk_stream_close( tmp );
-    return rc;
-}
-
 
 /*-
  * _gnutls_openpgp_key2gnutls_key - Converts an OpenPGP secret key to GnuTLS
@@ -463,7 +416,7 @@ leave:
  * specific certificate.
  -*/
 int
-_gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, gnutls_datum raw )
+_gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, const gnutls_datum *raw )
 {
     CDK_KBNODE knode = NULL;
     CDK_PACKET *pkt = NULL;
@@ -476,13 +429,13 @@ _gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, gnutls_datum raw )
 
     memset( cert, 0, sizeof *cert );
 
-    rc = cdk_kbnode_read_from_mem( &knode, raw.data, raw.size );
+    rc = cdk_kbnode_read_from_mem( &knode, raw->data, raw->size );
     if( !(rc = map_cdk_rc( rc )) )
         pkt = cdk_kbnode_find_packet( knode, CDK_PKT_PUBLIC_KEY );
     if( !pkt )
         rc = GNUTLS_E_INTERNAL_ERROR;
     if( !rc )
-        rc = _gnutls_set_datum( &cert->raw, raw.data, raw.size );
+        rc = _gnutls_set_datum( &cert->raw, raw->data, raw->size );
     if( !rc )
         rc = openpgp_pk_to_gnutls_cert( cert, pkt->pkt.public_key );
 
@@ -628,11 +581,6 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
             openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
             i++;
         }
-        else if( pkt->pkttype == CDK_PKT_SIGNATURE ) {
-            int n = res->ncerts;
-            cdkPKT_signature *sig = pkt->pkt.signature;
-            openpgp_sig_to_gnutls_cert( &res->cert_list[n][0], sig ); 
-        }
     }
   
     res->ncerts++;
@@ -734,11 +682,6 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
                 stream_to_datum( inp, &res->cert_list[n][0].raw );
                 openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
                 i++;
-            }
-            else if( pkt->pkttype == CDK_PKT_SIGNATURE ) {
-                int n = res->ncerts;
-                cdkPKT_signature *sig = pkt->pkt.signature;
-                openpgp_sig_to_gnutls_cert( &res->cert_list[n][0], sig );
             }
         }
     }

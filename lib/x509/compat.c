@@ -560,3 +560,189 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
 	
 	return result;
 }
+
+/**
+  * gnutls_x509_verify_certificate - This function verifies given certificate list
+  * @cert_list: is the certificate list to be verified
+  * @cert_list_length: holds the number of certificate in cert_list
+  * @CA_list: is the CA list which will be used in verification
+  * @CA_list_length: holds the number of CA certificate in CA_list
+  * @CRL_list: not used
+  * @CRL_list_length: not used
+  *
+  * This function will try to verify the given certificate list and return it's status (TRUSTED, EXPIRED etc.). 
+  * The return value (status) should be one or more of the gnutls_certificate_status 
+  * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
+  * by this function, you should check them using the appropriate functions.
+  *
+  * This function understands the basicConstraints (2 5 29 19) PKIX extension.
+  * This means that only a certificate authority can sign a certificate.
+  *
+  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
+  * actual peer. 
+  *
+  * The return value (status) should be one or more of the gnutls_certificate_status 
+  * enumerated elements bitwise or'd.
+  *
+  * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
+  *
+  * GNUTLS_CERT_INVALID\: the certificate chain is broken.
+  *
+  * GNUTLS_CERT_REVOKED\: the certificate has been revoked
+  *  (not implemented yet).
+  *
+  * GNUTLS_CERT_CORRUPTED\: the certificate is corrupted.
+  *
+  * A negative error code is returned in case of an error.
+  * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that
+  * no certificate was sent by the peer.
+  *  
+  *
+  **/
+int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, 
+	const gnutls_datum * CA_list, int CA_list_length, 
+	const gnutls_datum* CRL_list, int CRL_list_length)
+{
+	unsigned int verify;
+	gnutls_x509_certificate *peer_certificate_list = NULL;
+	gnutls_x509_certificate *ca_certificate_list = NULL;
+	gnutls_x509_crl *crl_list = NULL;
+	int peer_certificate_list_size=0, i, x, ret;
+	int ca_certificate_list_size=0, crl_list_size=0;
+
+	if (cert_list == NULL || cert_list_length == 0)
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
+
+	/* generate a list of gnutls_certs based on the auth info
+	 * raw certs.
+	 */
+	peer_certificate_list_size = cert_list_length;
+	peer_certificate_list =
+	    gnutls_calloc(1,
+			  peer_certificate_list_size *
+			  sizeof(gnutls_x509_certificate));
+	if (peer_certificate_list == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	ca_certificate_list_size = CA_list_length;
+	ca_certificate_list =
+	    gnutls_calloc(1,
+			  ca_certificate_list_size *
+			  sizeof(gnutls_x509_certificate));
+	if (ca_certificate_list == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	/* allocate memory for CRL
+	 */
+	crl_list_size = CRL_list_length;
+	crl_list =
+	    gnutls_calloc(1,
+			  crl_list_size *
+			  sizeof(gnutls_x509_crl));
+	if (crl_list == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	/* convert certA_list to gnutls_cert* list
+	 */
+	for (i = 0; i < peer_certificate_list_size; i++) {
+		ret = gnutls_x509_certificate_init( &peer_certificate_list[i]);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+				
+		ret =
+		     gnutls_x509_certificate_import(peer_certificate_list[i],
+					     &cert_list[i], GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	/* convert CA_list to gnutls_x509_cert* list
+	 */
+	for (i = 0; i < ca_certificate_list_size; i++) {
+		ret = gnutls_x509_certificate_init(&ca_certificate_list[i]);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret =
+		     gnutls_x509_certificate_import(ca_certificate_list[i],
+					 &CA_list[i], GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	/* convert CRL_list to gnutls_x509_crl* list
+	 */
+	for (i = 0; i < crl_list_size; i++) {
+		ret = gnutls_x509_crl_init( &crl_list[i]);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		ret =
+		     gnutls_x509_crl_import(crl_list[i],
+					 &CRL_list[i], GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	}
+
+	/* Verify certificate 
+	 */
+	ret =
+	    gnutls_x509_certificate_list_verify(peer_certificate_list,
+				      peer_certificate_list_size,
+				      ca_certificate_list, ca_certificate_list_size, 
+				      crl_list, crl_list_size, 0, &verify);
+
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	
+	ret = verify;
+
+	cleanup:
+
+	if (peer_certificate_list != NULL)
+		for(x=0;x<peer_certificate_list_size;x++) {
+			if (peer_certificate_list[x] != NULL)
+				gnutls_x509_certificate_deinit(peer_certificate_list[x]);
+		}
+
+	if (ca_certificate_list != NULL)
+		for(x=0;x<ca_certificate_list_size;x++) {
+			if (ca_certificate_list[x] !=  NULL)
+				gnutls_x509_certificate_deinit(ca_certificate_list[x]);
+		}
+
+	if (crl_list != NULL)
+		for(x=0;x<crl_list_size;x++) {
+			if (crl_list[x] != NULL)
+				gnutls_x509_crl_deinit(crl_list[x]);
+		}
+	
+	gnutls_free( crl_list);
+	gnutls_free( ca_certificate_list);
+	gnutls_free( peer_certificate_list);
+
+	return ret;
+}

@@ -63,6 +63,9 @@ option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Cer
 #char *x509_cafile;
 option (x509cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
 
+#char *x509_crlfile;
+option (x509crlfile) STR "FILE" { $x509_crlfile = $1 } "CRL file to use."
+
 #char *pgp_keyfile;
 option (pgpkeyfile) STR "FILE" { $pgp_keyfile = $1 } "PGP Key file to use."
 
@@ -100,7 +103,7 @@ rest STR "hostname" { $rest_args = $1; }
 init { $resume=0; $port=443; $rest_args=NULL; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $record_size=0; 
-	$fingerprint=0; $pgp_trustdb=NULL; $pgp_keyring=NULL;
+	$fingerprint=0; $pgp_trustdb=NULL; $pgp_keyring=NULL; $x509_crlfile = NULL;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $crlf = 0; $xml = 0;
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; }

@@ -31,9 +31,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>
-#include <x509_verify.h>
 #include <gnutls_privkey.h>
-#include <x509_extensions.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_dh.h>
 #include <gnutls_str.h>
@@ -42,20 +40,9 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 #include "x509/compat.h"
+#include "x509/x509.h"
+#include "x509/mpi.h"
 
-void _gnutls_free_cert(gnutls_cert cert)
-{
-	int i;
-
-	for (i = 0; i < cert.params_size; i++) {
-		_gnutls_mpi_release(&cert.params[i]);
-	}
-
-	_gnutls_free_datum(&cert.signature);
-	_gnutls_free_datum(&cert.raw);
-
-	return;
-}
 
 /**
   * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials structure
@@ -75,7 +62,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 
 	for (i = 0; i < sc->ncerts; i++) {
 		for (j = 0; j < sc->cert_list_length[i]; j++) {
-			_gnutls_free_cert(sc->cert_list[i][j]);
+			_gnutls_free_cert( &sc->cert_list[i][j]);
 		}
 		gnutls_free( sc->cert_list[i]);
 	}
@@ -84,7 +71,11 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 	gnutls_free(sc->cert_list);
 
 	for (j = 0; j < sc->x509_ncas; j++) {
-		_gnutls_free_cert( sc->x509_ca_list[j]);
+		gnutls_x509_certificate_deinit( sc->x509_ca_list[j]);
+	}
+
+	for (j = 0; j < sc->x509_ncrls; j++) {
+		gnutls_x509_crl_deinit( sc->x509_crl_list[j]);
 	}
 
 	gnutls_free( sc->x509_ca_list);
@@ -126,7 +117,7 @@ int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res
  * This function also uses the KeyUsage field of the certificate
  * extensions in order to disable unneded algorithms.
  */
-int _gnutls_cert_supported_kx(const gnutls_cert * cert, gnutls_kx_algorithm ** alg,
+int _gnutls_cert_supported_kx(const gnutls_cert* cert, gnutls_kx_algorithm ** alg,
 			      int *alg_size)
 {
 	gnutls_kx_algorithm kx;
@@ -138,16 +129,8 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, gnutls_kx_algorithm ** a
 	for (kx = 0; kx < MAX_ALGOS; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
-			if (cert->cert_type==GNUTLS_CRT_X509) {
-				/* then check key usage */
-				if (_gnutls_check_x509_key_usage(cert, kx) == 0) {
-					kxlist[i] = kx;
-					i++;
-				}
-			} else if ( cert->cert_type==GNUTLS_CRT_OPENPGP) {
-				/* FIXME: something like key usage
-				 * should be added
-				 */
+			/* then check key usage */
+			if (_gnutls_check_key_usage(cert, kx) == 0) {
 				kxlist[i] = kx;
 				i++;
 			}
@@ -457,3 +440,124 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 	}
 }
 
+
+/* This function will convert a der certificate, to a format
+ * (structure) that gnutls can understand and use. Actually the
+ * important thing on this function is that it extracts the 
+ * certificate's (public key) parameters.
+ *
+ * The noext flag is used to complete the handshake even if the
+ * extensions found in the certificate are unsupported and critical. 
+ * The critical extensions will be catched by the verification functions.
+ */
+int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCert,
+	int flags /* OR of ConvFlags */)
+{
+	int ret = 0;
+	gnutls_x509_certificate cert;
+	
+	ret = gnutls_x509_certificate_init( &cert);
+	if ( ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = gnutls_x509_certificate_import( cert, derCert, GNUTLS_X509_FMT_DER);
+	if ( ret < 0) {
+		gnutls_assert();
+		gnutls_x509_certificate_deinit( cert);
+		return ret;
+	}
+	
+	memset(gcert, 0, sizeof(gnutls_cert));
+	gcert->cert_type = GNUTLS_CRT_X509;
+
+	if ( !(flags & CERT_NO_COPY)) {
+		if (_gnutls_set_datum(&gcert->raw, derCert->data, derCert->size) < 0) {
+			gnutls_assert();
+			gnutls_x509_certificate_deinit( cert);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+	} else
+		/* now we have 0 or a bitwise or of things to decode */
+		flags ^= CERT_NO_COPY;
+
+
+	if (flags & CERT_ONLY_EXTENSIONS || flags == 0) {
+		gnutls_x509_certificate_get_key_usage( cert, &gcert->keyUsage, NULL);
+		gcert->version = gnutls_x509_certificate_get_version( cert);
+	}
+	gcert->subject_pk_algorithm = gnutls_x509_certificate_get_pk_algorithm( cert, NULL);
+
+	if (flags & CERT_ONLY_PUBKEY || flags == 0) {
+		gcert->params_size = MAX_PARAMS_SIZE;
+		ret = _gnutls_x509_certificate_get_mpis( cert, gcert->params, &gcert->params_size);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_x509_certificate_deinit( cert);
+			return ret;
+		}
+	}
+
+	gnutls_x509_certificate_deinit( cert);
+
+	return 0;
+
+}
+
+void _gnutls_free_cert(gnutls_cert *cert)
+{
+	int i;
+
+	for (i = 0; i < cert->params_size; i++) {
+		_gnutls_mpi_release( &cert->params[i]);
+	}
+
+	_gnutls_free_datum(&cert->raw);
+
+	return;
+}
+
+/* Returns the issuer's Distinguished name in odn, of the certificate 
+ * specified in cert.
+ */
+int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn )
+{
+	ASN1_TYPE dn;
+	int len, result;
+	int start, end;
+
+	if ((result=_gnutls_asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn,
+	     "dn")) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&dn, cert->raw.data, cert->raw.size, NULL);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding_startEnd(dn, cert->raw.data, cert->raw.size,
+					"dn.tbsCertificate.issuer", &start,
+					&end);
+
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+	asn1_delete_structure(&dn);
+
+	len = end - start + 1;
+
+	odn->size = len;
+	odn->data = &cert->raw.data[start];
+
+	return 0;
+}

@@ -49,4 +49,18 @@ int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
 				    unsigned char *serial,
 				    int *serial_size, time_t * time);
 
+void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
+int gnutls_x509_crl_init(gnutls_x509_crl * crl);
+int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
+			   gnutls_x509_certificate_format format);
+
+int gnutls_x509_certificate_init(gnutls_x509_certificate * cert);
+void gnutls_x509_certificate_deinit(gnutls_x509_certificate cert);
+int gnutls_x509_certificate_import(gnutls_x509_certificate cert, const gnutls_datum * data,
+	gnutls_x509_certificate_format format);
+
+int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned int *key_usage,
+	int *critical);
+int gnutls_x509_certificate_get_version(gnutls_x509_certificate cert);
+
 #endif

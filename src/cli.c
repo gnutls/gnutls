@@ -108,16 +108,6 @@ void init_global_tls_stuff(void);
 
 
 #define MAX(X,Y) (X >= Y ? X : Y);
-#define DEFAULT_X509_CAFILE "x509/ca.pem"
-#define DEFAULT_X509_KEYFILE2 "x509/clikey-dsa.pem"
-#define DEFAULT_X509_CERTFILE2 "x509/clicert-dsa.pem"
-
-#define DEFAULT_X509_KEYFILE "x509/clikey.pem"
-#define DEFAULT_X509_CERTFILE "x509/clicert.pem"
-
-#define DEFAULT_PGP_KEYFILE "openpgp/cli_sec.asc"
-#define DEFAULT_PGP_CERTFILE "openpgp/cli_pub.asc"
-#define DEFAULT_PGP_KEYRING "openpgp/cli_ring.gpg"
 
 /* initializes a gnutls_session with some defaults.
  */
@@ -370,8 +360,6 @@ int main(int argc, char **argv)
    return 0;
 }
 
-#undef DEBUG
-
 static gaainfo info;
 void gaa_parser(int argc, char **argv)
 {
@@ -395,47 +383,14 @@ void gaa_parser(int argc, char **argv)
    else
       x509ctype = GNUTLS_X509_FMT_DER;
 
-#ifdef DEBUG
-   if (info.x509_certfile != NULL)
-      x509_certfile = info.x509_certfile;
-   else
-      x509_certfile = DEFAULT_X509_CERTFILE;
-
-   if (info.x509_keyfile != NULL)
-      x509_keyfile = info.x509_keyfile;
-   else
-      x509_keyfile = DEFAULT_X509_KEYFILE;
-
-   if (info.x509_cafile != NULL)
-      x509_cafile = info.x509_certfile;
-   else
-      x509_cafile = DEFAULT_X509_CAFILE;
-
-   if (info.pgp_certfile != NULL)
-      pgp_certfile = info.pgp_certfile;
-   else
-      pgp_certfile = DEFAULT_PGP_CERTFILE;
-
-   if (info.pgp_keyfile != NULL)
-      pgp_keyfile = info.pgp_keyfile;
-   else
-      pgp_keyfile = DEFAULT_PGP_KEYFILE;
-
-   if (info.srp_passwd != NULL)
-      srp_passwd = info.srp_passwd;
-
-   if (info.srp_username != NULL)
-      srp_username = info.srp_username;
-#else
    srp_username = info.srp_username;
    srp_passwd = info.srp_passwd;
    x509_cafile = info.x509_cafile;
+   x509_crlfile = info.x509_crlfile;
    x509_keyfile = info.x509_keyfile;
    x509_certfile = info.x509_certfile;
    pgp_keyfile = info.pgp_keyfile;
    pgp_certfile = info.pgp_certfile;
-
-#endif
 
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;
@@ -602,6 +557,17 @@ int ret;
 	 fprintf(stderr, "Error setting the x509 trust file\n");
       } else {
 	 printf("Processed %d CA certificate(s).\n", ret);
+      }
+   }
+
+   if (x509_crlfile != NULL) {
+      ret =
+	  gnutls_certificate_set_x509_crl_file(xcred,
+						 x509_crlfile, x509ctype);
+      if (ret < 0) {
+	 fprintf(stderr, "Error setting the x509 CRL file\n");
+      } else {
+	 printf("Processed %d CRL(s).\n", ret);
       }
    }
 

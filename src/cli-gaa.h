@@ -8,24 +8,26 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 97 "cli.gaa"
+#line 100 "cli.gaa"
 	char *rest_args;
-#line 87 "cli.gaa"
+#line 90 "cli.gaa"
 	char *srp_passwd;
-#line 84 "cli.gaa"
+#line 87 "cli.gaa"
 	char *srp_username;
-#line 81 "cli.gaa"
+#line 84 "cli.gaa"
 	char *x509_certfile;
-#line 78 "cli.gaa"
+#line 81 "cli.gaa"
 	char *x509_keyfile;
-#line 75 "cli.gaa"
+#line 78 "cli.gaa"
 	char *pgp_certfile;
-#line 72 "cli.gaa"
+#line 75 "cli.gaa"
 	char *pgp_trustdb;
-#line 69 "cli.gaa"
+#line 72 "cli.gaa"
 	char *pgp_keyring;
-#line 66 "cli.gaa"
+#line 69 "cli.gaa"
 	char *pgp_keyfile;
+#line 66 "cli.gaa"
+	char *x509_crlfile;
 #line 63 "cli.gaa"
 	char *x509_cafile;
 #line 60 "cli.gaa"

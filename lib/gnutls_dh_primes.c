@@ -276,7 +276,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
 
 #ifdef DEBUG
 	{
-		opaque buffer[128];
+		opaque buffer[512];
 
 		_gnutls_log
 		    ("dh_params_generate: Generated %d bits prime %s, generator %s.\n",

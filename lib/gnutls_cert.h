@@ -4,6 +4,7 @@
 #include <gnutls_pk.h>
 #include <libtasn1.h>
 #include <gnutls_ui.h>
+#include "x509/x509.h"
 
 #define MAX_PARAMS_SIZE 6 /* ok for RSA and DSA */
 
@@ -49,26 +50,16 @@ typedef struct gnutls_cert {
 	
 	gnutls_pk_algorithm subject_pk_algorithm;
 
-	gnutls_datum   signature;
+ 	unsigned int keyUsage; /* bits from KEY_* 
+				  */
 
-	time_t	   expiration_time;
-	time_t	   activation_time;
-
-	int	   version; /* 1,2,3 
- 	                     */
- 	
- 	uint16	   keyUsage; /* bits from KEY_* 
- 	                      */
- 	
-	int        CA;    /* 0 if the certificate does not belong to
-	                   * a certificate authority. 1 otherwise.
-	                   */
-
+	unsigned int version; 	
 			/* holds the type (PGP, X509)
 			 */
 	gnutls_certificate_type     cert_type;
 	
-	gnutls_datum raw; /* the raw certificate */
+	gnutls_datum raw;
+	
 } gnutls_cert;
 
 typedef struct {
@@ -96,8 +87,17 @@ typedef struct {
 
 struct gnutls_session_int; /* because gnutls_session is not defined when this file is included */
 
-int _gnutls_cert_supported_kx( const gnutls_cert* cert, gnutls_kx_algorithm **alg, int *alg_size);
+typedef enum ConvFlags { 
+	CERT_NO_COPY=2, 
+	CERT_ONLY_PUBKEY=4,
+	CERT_ONLY_EXTENSIONS=16
+} ConvFlags;
 
-void _gnutls_free_cert(gnutls_cert cert);
+int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCert,
+	int flags);
+void _gnutls_free_cert(gnutls_cert* cert);
+int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn);
+
+int _gnutls_cert_supported_kx( const gnutls_cert* cert, gnutls_kx_algorithm **alg, int *alg_size);
 
 #endif

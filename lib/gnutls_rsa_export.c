@@ -433,7 +433,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 
 #ifdef DEBUG
 	{
-	opaque buffer[128];
+	opaque buffer[512];
 
 	_gnutls_log("rsa_params_generate: Generated %d bits modulus %s, exponent %s.\n",
 		    bits, _gnutls_bin2hex(m->data, m->size, buffer, sizeof(buffer)),

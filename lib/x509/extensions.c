@@ -65,7 +65,6 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 		 */
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
-			gnutls_assert();
 			break;
 		}
 
@@ -152,7 +151,6 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 	} while (1);
 
 	if (result == ASN1_ELEMENT_NOT_FOUND) {
-		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	} else {
 		gnutls_assert();

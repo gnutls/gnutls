@@ -314,6 +314,11 @@ int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials res, 
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum *CA, gnutls_x509_certificate_format);
 
+int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res, 
+		const char *crlfile, gnutls_x509_certificate_format type);
+int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res, 
+	const gnutls_datum *CRL, gnutls_x509_certificate_format type);
+
 int gnutls_certificate_set_x509_key_file( gnutls_certificate_credentials res, 
 	const char *CERTFILE, const char* KEYFILE, gnutls_x509_certificate_format);
 int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, 
@@ -326,6 +331,7 @@ int gnutls_global_init(void);
 void gnutls_global_deinit(void);
 
 typedef void* (*gnutls_alloc_function)(size_t);
+typedef void* (*gnutls_calloc_function)(size_t, size_t);
 typedef void (*gnutls_free_function)(void*);
 typedef void* (*gnutls_realloc_function)(void*, size_t);
 
@@ -336,6 +342,7 @@ void gnutls_global_set_mem_functions(
 
 /* For use in callbacks */
 extern gnutls_alloc_function gnutls_malloc;
+extern gnutls_calloc_function gnutls_calloc;
 extern gnutls_free_function gnutls_free;
 
 typedef void (*gnutls_log_func)( const char*);

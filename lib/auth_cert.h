@@ -2,6 +2,7 @@
 # define AUTH_X509_H
 # include "gnutls_cert.h"
 # include "gnutls_auth.h"
+# include "x509/x509.h"
 
 /* This structure may be complex but, it's the only way to
  * support a server that has multiple certificates
@@ -20,7 +21,7 @@ typedef struct {
 			/* contains the number of the certificates in a
 			 * row (should be 1 for OpenPGP keys).
 			 */
-	uint ncerts;    /* contains the number of columns in cert_list.
+	uint ncerts;/* contains the number of columns in cert_list.
 	                 * This is the same with the number of pkeys.
 			 */
 
@@ -40,8 +41,12 @@ typedef struct {
 	    
 	/* X509 specific stuff */
 
-	gnutls_cert * x509_ca_list;
+	gnutls_x509_certificate * x509_ca_list;
 	uint x509_ncas;	/* number of CAs in the ca_list 
+			 */
+
+	gnutls_x509_crl * x509_crl_list;
+	uint x509_ncrls;/* number of CRLs in the crl_list 
 			 */
 
 			/* holds a sequence of the
@@ -81,8 +86,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session, opaque *, size_t);
 int _gnutls_proc_cert_client_cert_vrfy(gnutls_session, opaque *, size_t);
 int _gnutls_proc_cert_server_certificate(gnutls_session, opaque *, size_t);
 int _gnutls_find_apr_cert( gnutls_session session, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_private_key** apr_pkey);
-int _gnutls_find_dn( gnutls_datum* odn, gnutls_cert* cert);
-const gnutls_cert* _gnutls_server_find_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
+const gnutls_cert * _gnutls_server_find_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 
