@@ -162,11 +162,11 @@ int main(int argc, char **argv)
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
-   if (gnutls_global_init_ext() < 0) {
+
+   if (gnutls_global_init_extra() < 0) {
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
-
 
    /* X509 stuff */
    if (gnutls_certificate_allocate_sc(&xcred) < 0) {	/* space for 2 certificates */

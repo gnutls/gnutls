@@ -334,7 +334,8 @@ int main(int argc, char **argv)
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
-   if (gnutls_global_init_ext() < 0) {
+
+   if (gnutls_global_init_extra() < 0) {
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
