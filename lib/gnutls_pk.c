@@ -51,6 +51,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	size_t k, psize;
 	
 	k = _gnutls_mpi_get_nbits(params[0]) / 8;
+	if (k % 8 != 0) k++;
 
 	if (plaintext.size > k - 11) {
 		gnutls_assert();
@@ -128,6 +129,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	}
 
 	_gnutls_mpi_print(NULL, &psize, res);
+
 	if (psize < k) {
 		/* padding psize */
 		pad = k - psize;
@@ -135,6 +137,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	} else if (psize==k) {
 		pad = 0;
 	} else { /* psize > k !!! */
+		/* This is an impossible situation */
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -170,6 +173,8 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 	size_t esize;
 
 	k = _gnutls_mpi_get_nbits(params[0]) / 8;
+	if (k % 8 != 0) k++;
+
 	esize = ciphertext.size;
 
 	if (esize != k) {
