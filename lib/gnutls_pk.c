@@ -31,9 +31,10 @@
 #include <x509_der.h>
 #include "debug.h"
 
-static int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey);
-static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey);
-static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey);
+static int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI * pkey, int pkey_len);
+static int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey, int);
+static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey, int);
+static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey, int);
 
 
 /* Do PKCS-1 RSA encryption. 
@@ -41,13 +42,19 @@ static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey);
  */
 int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			      gnutls_datum plaintext, MPI* params,
+			      int params_len,
 			      int btype)
 {
 	int k, psize, i, ret, pad;
 	MPI m, res;
 	opaque *edata, *ps;
-	MPI tmp_params[RSA_PUBLIC_PARAMS];
+	MPI tmp_params[2];
 
+	if (params_len < 2) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+	
 	k = gcry_mpi_get_nbits(params[0]) / 8;
 
 	if (plaintext.size > k - 11) {
@@ -93,16 +100,9 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		for (i = 0; i < psize; i++)
 			ps[i] = 0xff;
 		break;
-#ifdef ALLOW_BLOCK_0
-	case 0:
-		for (i = 0; i < psize; i++) {
-			ps[i] = 0x00;
-		}
-		break;
-#endif
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	ps[psize] = 0;
@@ -115,8 +115,8 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	}
 	gnutls_free(edata);
 
-	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, tmp_params);
-	
+	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, tmp_params, 2);
+
 	_gnutls_mpi_release(&m);
 
 	if (ret < 0) {
@@ -158,7 +158,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
  * Can decrypt block type 1 and type 2 packets.
  */
 int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
-			      gnutls_datum ciphertext, MPI* params,
+			      gnutls_datum ciphertext, MPI* params, int params_len,
 			      int btype)
 {
 	int k, esize, i, ret;
@@ -182,9 +182,9 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 	 * available.
 	 */
 	if (btype==2)
-		ret = _gnutls_pk_decrypt(GCRY_PK_RSA, &res, c, params);
+		ret = _gnutls_pk_decrypt(GCRY_PK_RSA, &res, c, params, params_len);
 	else
-		ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, c, params);
+		ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, c, params, params_len);
 	_gnutls_mpi_release(&c);
 
 	if (ret < 0) {
@@ -264,13 +264,13 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 
 
 int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertext, 
-	MPI *params, int btype) {
+	MPI *params, int params_len, int btype) {
 
 	gnutls_datum plain;
 	int ret;
 
 	/* decrypt signature */
-	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &plain, *ciphertext, params, btype)) < 0) {
+	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &plain, *ciphertext, params, params_len, btype)) < 0) {
 	     gnutls_assert();
 	     return ret;
 	}
@@ -361,7 +361,7 @@ int tot_len = 0;
 /* Do DSA signature calculation. params is p, q, g, y, x in that order.
  */
 int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
-		     MPI * params)
+		     MPI * params, int params_len)
 {
 	MPI rs[2], mdata;
 	int k, ret;
@@ -377,7 +377,7 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret = _gnutls_pk_sign(GCRY_PK_DSA, rs, mdata, params);
+	ret = _gnutls_pk_sign(GCRY_PK_DSA, rs, mdata, params, params_len);
 	/* res now holds r,s */
 	_gnutls_mpi_release(&mdata);
 
@@ -445,7 +445,7 @@ opaque str[MAX_PARAMETER_SIZE];
 /* params is p, q, g, y in that order
  */
 int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value, 
-	MPI * params) {
+	MPI * params, int params_len) {
 
 	MPI mdata;
 	int ret, k;
@@ -468,7 +468,8 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
 	}
 
 	/* decrypt signature */
-	if ( (ret=_gnutls_pk_verify( GCRY_PK_DSA, mdata, rs, params)) < 0) {
+	if ( (ret=_gnutls_pk_verify( GCRY_PK_DSA, mdata, rs, params, 
+		params_len)) < 0) {
 	    _gnutls_mpi_release(&mdata);
 	     gnutls_assert();
 	     return ret;
@@ -486,15 +487,16 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
  * Emulate our old PK interface here - sometime in the future we might
  * change the internal design to directly fit to libgcrypt.
  */
-int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
+static int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI * pkey, int pkey_len)
 {
 	GCRY_SEXP s_ciph, s_data, s_pkey;
-	int rc;
+	int rc=-1;
 
 	/* make a sexp from pkey */
 	switch (algo) {
 	case GCRY_PK_RSA:
-		rc = gcry_sexp_build(&s_pkey, NULL,
+		if (pkey_len >= 2)
+			rc = gcry_sexp_build(&s_pkey, NULL,
 				     "(public-key(rsa(n%m)(e%m)))",
 				     pkey[0], pkey[1]);
 		break;
@@ -506,7 +508,7 @@ int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
 
 	if (rc != 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* put the data into a simple list */
@@ -547,15 +549,16 @@ int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
 	return rc;
 }
 
-static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
+static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey, int pkey_len)
 {
 	GCRY_SEXP s_plain, s_data, s_pkey;
-	int rc;
+	int rc=-1;
 
 	/* make a sexp from pkey */
 	switch (algo) {
 	case GCRY_PK_RSA:
-		rc = gcry_sexp_build(&s_pkey, NULL,
+		if (pkey_len >=6)
+			rc = gcry_sexp_build(&s_pkey, NULL,
 				     "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
 				     pkey[0], pkey[1], pkey[2], pkey[3], pkey[4], pkey[5]);
 
@@ -605,15 +608,16 @@ static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
 /* in case of DSA puts into data, r,s
  */
 static 
-int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey)
+int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey, int pkey_len)
 {
 	GCRY_SEXP s_hash, s_key, s_sig;
-	int rc;
+	int rc=-1;
 
 	/* make a sexp from pkey */
 	switch (algo) {
 	case GCRY_PK_DSA:
-		rc = gcry_sexp_build(&s_key, NULL,
+		if (pkey_len >= 5)
+			rc = gcry_sexp_build(&s_key, NULL,
 				     "(private-key(dsa(p%m)(q%m)(g%m)(y%m)(x%m)))",
 				     pkey[0], pkey[1], pkey[2],
 				     pkey[3], pkey[4]);
@@ -672,15 +676,16 @@ int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey)
 }
 
 
-static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey)
+static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey, int pkey_len)
 {
 	GCRY_SEXP s_sig, s_hash, s_pkey;
-	int rc;
+	int rc=-1;
 
 	/* make a sexp from pkey */
 	switch (algo) {
 	case GCRY_PK_DSA:
-		rc = gcry_sexp_build(&s_pkey, NULL,
+		if (pkey_len >= 4)
+			rc = gcry_sexp_build(&s_pkey, NULL,
 				     "(public-key(dsa(p%m)(q%m)(g%m)(y%m)))",
 				     pkey[0], pkey[1], pkey[2], pkey[3]);
 		break;
@@ -723,7 +728,7 @@ static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey)
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	rc = gcry_pk_verify( s_sig, s_hash, s_pkey );
+	rc = gcry_pk_verify( s_sig, s_hash, s_pkey);
 	
 	gcry_sexp_release(s_sig);
 	gcry_sexp_release(s_hash);

@@ -8,6 +8,7 @@ option (p, port) INT "integer" { $port = $1 } "The port to connect to."
 
 #int http;
 option (http) { $http = 1 } "Act as an HTTP Server."
+option (echo) { $http = 0 } "Act as an Echo Server."
 
 #int fmtder;
 option (x509fmtder) { $fmtder = 1 } "Use DER format for certificates"

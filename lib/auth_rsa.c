@@ -66,12 +66,12 @@ MOD_AUTH_STRUCT rsa_auth_struct = {
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-static int _gnutls_get_public_rsa_params(GNUTLS_STATE state, MPI params[RSA_PUBLIC_PARAMS])
+static int _gnutls_get_public_rsa_params(GNUTLS_STATE state, MPI params[MAX_PARAMS_SIZE], int* params_len)
 {
 int ret;
 CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
 gnutls_cert peer_cert;
-
+int i;
 	if (info==NULL || info->ncerts==0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
@@ -98,34 +98,26 @@ gnutls_cert peer_cert;
 
 		default:
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
-	memcpy( params, peer_cert.params, sizeof(MPI)*RSA_PUBLIC_PARAMS);
+	if (*params_len < peer_cert.params_size) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+	*params_len = peer_cert.params_size;
 
-/*
-	state->gnutls_key->a =
-	    gcry_mpi_copy( peer_cert.params[0]);
-	if (state->gnutls_key->a==NULL) {
-		gnutls_free_cert( peer_cert);
-		return GNUTLS_E_MEMORY_ERROR;
+	for (i=0;i<*params_len;i++) {
+		params[i] = gcry_mpi_copy(peer_cert.params[i]);
 	}
-	
-	state->gnutls_key->x =
-	    gcry_mpi_copy( peer_cert.params[1]);
-	if (state->gnutls_key->x==NULL) {
-		_gnutls_mpi_release( &state->gnutls_key->a);
-		gnutls_free_cert( peer_cert);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-*/
+	gnutls_free_cert( peer_cert);
 
 	return 0;
 }
 
 /* This function reads the RSA parameters from the private key
  */
-static int _gnutls_get_private_rsa_params(GNUTLS_STATE state, MPI params[RSA_PRIVATE_PARAMS])
+static int _gnutls_get_private_rsa_params(GNUTLS_STATE state, MPI **params, int* params_size)
 {
 int index;
 const GNUTLS_CERTIFICATE_CREDENTIALS cred;
@@ -141,18 +133,8 @@ const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 	
-	memcpy( params, cred->pkey[index].params, sizeof(MPI)*RSA_PRIVATE_PARAMS);
-
-/*
-	state->gnutls_key->u = gcry_mpi_copy( cred->pkey[index].params[2]);
-	if (state->gnutls_key->u==NULL) return GNUTLS_E_MEMORY_ERROR;
-
-	state->gnutls_key->A = gcry_mpi_copy(cred->pkey[index].params[0]);
-	if (state->gnutls_key->A==NULL) {
-		_gnutls_mpi_release( &state->gnutls_key->u);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-*/
+	*params_size = cred->pkey[index].params_size;
+	*params = cred->pkey[index].params;
 
 	return 0;
 }
@@ -171,7 +153,8 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
-	MPI params[RSA_PRIVATE_PARAMS];
+	MPI *params;
+	int params_len;
 
 	if (gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
@@ -188,13 +171,14 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		ciphertext.size = dsize;
 	}
 
-	ret = _gnutls_get_private_rsa_params(state, params);
+	ret = _gnutls_get_private_rsa_params(state, &params, &params_len);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret = _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 2);	/* btype==2 */
+	ret = _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 
+		params_len, 2);	/* btype==2 */
 
 	if (ret < 0 || plaintext.size != TLS_MASTER_SIZE) {
 		/* in case decryption fails then don't inform
@@ -235,8 +219,9 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 {
 	CERTIFICATE_AUTH_INFO auth = state->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */
-	MPI params[RSA_PUBLIC_PARAMS];
-	int ret;
+	MPI params[MAX_PARAMS_SIZE];
+	int params_len;
+	int ret, i;
 	GNUTLS_Version ver;
 
 	if (auth == NULL) {
@@ -256,17 +241,20 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	/* move RSA parameters to gnutls_key (state).
 	 */
 	if ((ret =
-	     _gnutls_get_public_rsa_params(state, params)) < 0) {
+	     _gnutls_get_public_rsa_params(state, params, &params_len)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
 	if ((ret =
 	     _gnutls_pkcs1_rsa_encrypt(&sdata, state->gnutls_key->key,
-				       params, 2)) < 0) {
+				       params, params_len, 2)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
+
+	for (i=0;i<params_len;i++)
+		_gnutls_mpi_release( &params[i]);
 
 	if (gnutls_protocol_get_version( state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */

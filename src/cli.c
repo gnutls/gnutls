@@ -161,13 +161,6 @@ int main(int argc, char **argv)
       exit(1);
    }
 
-   printf("Resolving '%s'...\n", hostname);
-   /* get server name */
-   server_host = gethostbyname(hostname);
-   if (server_host == NULL) {
-      fprintf(stderr, "Cannot resolve %s\n", hostname);
-      exit(1);
-   }
 
    /* X509 stuff */
    if (gnutls_certificate_allocate_sc(&xcred) < 0) {	/* space for 2 certificates */
@@ -181,6 +174,8 @@ int main(int argc, char **argv)
 					 x509_crlfile, x509ctype);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 trust file\n");
+      } else {
+      	 printf("Processed %d CA certificate(s).\n", ret);
       }
    }
 
@@ -229,6 +224,14 @@ int main(int argc, char **argv)
    /* ANON stuff */
    if (gnutls_anon_allocate_client_sc(&anon_cred) < 0) {
       fprintf(stderr, "memory error\n");
+      exit(1);
+   }
+
+   printf("Resolving '%s'...\n", hostname);
+   /* get server name */
+   server_host = gethostbyname(hostname);
+   if (server_host == NULL) {
+      fprintf(stderr, "Cannot resolve %s\n", hostname);
       exit(1);
    }
 
@@ -526,7 +529,7 @@ void gaa_parser(int argc, char **argv)
 #else
       srp_username = info.srp_username;
       srp_passwd = info.srp_passwd;
-      x509_cafile = info.x509_certfile;
+      x509_cafile = info.x509_cafile;
       x509_keyfile = info.x509_keyfile;
       x509_certfile = info.x509_certfile;
       pgp_keyfile = info.pgp_keyfile;

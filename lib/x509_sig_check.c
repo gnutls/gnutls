@@ -140,7 +140,7 @@ int len;
  * params[1] is public key
  */
 static int
-_pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *params)
+_pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *params, int params_len)
 {
 	MACAlgorithm hash;
 	int ret;
@@ -149,7 +149,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *p
 	GNUTLS_HASH_HANDLE hd;
 	gnutls_datum decrypted;
 	
-	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &decrypted, *signature, params, 1)) < 0) {
+	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &decrypted, *signature, params, params_len, 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -205,7 +205,7 @@ gnutls_datum tbs;
 	switch( issuer->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
 		
-			if (_pkcs1_rsa_verify_sig( &signature, &tbs, issuer->params)!=0) {
+			if (_pkcs1_rsa_verify_sig( &signature, &tbs, issuer->params, issuer->params_size)!=0) {
 				gnutls_assert();
 				gnutls_free_datum( &tbs);
 				return GNUTLS_CERT_INVALID;
@@ -216,7 +216,7 @@ gnutls_datum tbs;
 			break;
 
 		case GNUTLS_PK_DSA:
-			if (_gnutls_dsa_verify( &tbs, &signature, issuer->params)!=0) {
+			if (_gnutls_dsa_verify( &tbs, &signature, issuer->params, issuer->params_size)!=0) {
 				gnutls_assert();
 				gnutls_free_datum( &tbs);
 				return GNUTLS_CERT_INVALID;

@@ -1264,7 +1264,7 @@ asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_elem
   p=node;
   while(1){
     ris=ASN_OK;
- 
+    
     if(move!=UP){
       if(p->type&CONST_SET){
 	p2=_asn1_find_up(p);
@@ -1295,9 +1295,12 @@ asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_elem
 	if(p2==NULL) return ASN_DER_ERROR;
       }
 
+      if(p==node_to_find) *start=counter;
+
       if(type_field(p->type)==TYPE_CHOICE){
 	p=p->down;
 	ris=_asn1_extract_tag_der(p,der+counter,&len2);
+	if(p==node_to_find) *start=counter;
       }
 
       if(ris==ASN_OK) ris=_asn1_extract_tag_der(p,der+counter,&len2);
@@ -1313,10 +1316,7 @@ asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_elem
 	  return ASN_TAG_ERROR;
 	}
       } 
-      else{
-	if(p==node_to_find) *start=counter;
-	counter+=len2;
-      }
+      else counter+=len2;
     }
 
     if(ris==ASN_OK){

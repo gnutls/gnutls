@@ -170,7 +170,8 @@ gnutls_datum tmpdata;
 	switch(pkey->pk_algorithm) {
 		case GNUTLS_PK_RSA:
 			/* encrypt */
-			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params, 1)) < 0) {
+			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params, 
+				pkey->params_size, 1)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
@@ -178,7 +179,8 @@ gnutls_datum tmpdata;
 			break;
 		case GNUTLS_PK_DSA:
 			/* sign */
-			if ((ret=_gnutls_dsa_sign( signature, &tmpdata, pkey->params)) < 0) {
+			if ((ret=_gnutls_dsa_sign( signature, &tmpdata, pkey->params, 
+				pkey->params_size)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
@@ -223,7 +225,8 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 			vdata.size = hash_concat->size;
 
 			/* verify signature */
-			if ( (ret=_gnutls_rsa_verify( &vdata, signature, cert->params, 1)) < 0) {
+			if ( (ret=_gnutls_rsa_verify( &vdata, signature, cert->params, 
+				cert->params_size, 1)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
@@ -235,7 +238,8 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 			vdata.size = 20; /* sha1 */
 
 			/* decrypt signature */
-			if ( (ret=_gnutls_dsa_verify( &vdata, signature, cert->params)) < 0) { 
+			if ( (ret=_gnutls_dsa_verify( &vdata, signature, cert->params,
+				cert->params_size)) < 0) { 
 			     gnutls_assert();
 			     return ret;
 			}

@@ -1,3 +1,40 @@
+2002-03-28 12:46  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_x509.c, x509_b64.c:
+
+	Cleaned up the return values of several functions.  
+
+2002-03-28 12:45  nmav <nmav@gnutls.org>
+
+	* src/: cli-gaa.c, cli-gaa.h, cli.c, cli.gaa, serv-gaa.c,
+	serv-gaa.h, serv.c, serv.gaa:
+
+	added option to read DER encoded certificates 
+
+2002-03-28 09:44  nmav <nmav@gnutls.org>
+
+	* lib/: auth_rsa.c, gnutls_cert.h, gnutls_pk.c, gnutls_privkey.c:
+
+	Optimized RSA decryption. (Very) Much faster now 
+
+2002-03-28 09:40  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	read PKCS7 certificate chains in the reverse order.  
+
+2002-03-26 21:05  fiorinaf <ffiorina@gnutls.org>
+
+	* lib/: x509_asn1.c, x509_asn1.h:
+
+	add asn1_number_of_elements function 
+
+2002-03-26 21:02  fiorinaf <ffiorina@gnutls.org>
+
+	* lib/x509_der.c:
+
+	fix bug in asn1_get_start_end_der function 
+
 2002-03-26 19:50  nmav <nmav@gnutls.org>
 
 	* ChangeLog, lib/gnutls_x509.c, src/common.c:
