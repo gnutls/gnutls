@@ -1,3 +1,11 @@
+2004-05-03 00:43  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_auth.c, lib/gnutls_handshake.c, lib/gnutls_kx.c,
+	lib/gnutls_pk.c, lib/gnutls_ui.h:
+
+	Added gnutls_auth_client_get_type() and
+	gnutls_auth_server_get_type().  
+
 2004-04-30 08:50  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/auth_cert.c, lib/ext_cert_type.c,
