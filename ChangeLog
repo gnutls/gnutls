@@ -1,3 +1,9 @@
+2003-02-22 22:26  nmav <nmav@gnutls.org>
+
+	* configure.in, doc/tex/Makefile.am, lib/Makefile.am:
+
+	some fixes in makefiles.  
+
 2003-02-20 07:38  nmav <nmav@gnutls.org>
 
 	* doc/tex/: Makefile.am, ex-cert-select.tex, ex-info.tex,
