@@ -376,6 +376,7 @@ inline static int cpydata(const uint8 * data, int data_size, uint8 ** result)
  * The result_size is the return value
  */
 #define ENDSTR "-----\n"
+#define ENDSTR2 "-----\r"
 int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t data_size,
 			   uint8 ** result)
 {
@@ -391,7 +392,7 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 	if (header != NULL) {
 		if (strlen(header) > sizeof(pem_header) - sizeof(top) - 1) {
 			gnutls_assert();
-			return GNUTLS_E_BASE64_DECODING_ERROR;
+			return GNUTLS_E_MEMORY_ERROR;
 		}
 		strcpy( pem_header, top);
 		strcpy( pem_header, header);
@@ -402,20 +403,22 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 
 	if (rdata==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	data_size -= (unsigned long int)rdata-(unsigned long int)data;
 
 	if (data_size < 4 + strlen(bottom)) {
 		gnutls_assert();
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	kdata = strstr( rdata, ENDSTR);
+	if (kdata==NULL) kdata = strstr( rdata, ENDSTR2);
+	
 	if (kdata==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 	data_size -= strlen(ENDSTR);
 	data_size -= (unsigned long int)kdata-(unsigned long int)rdata;
@@ -427,7 +430,7 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 	kdata = strstr( rdata, bottom);
 	if (kdata==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	/* position of kdata is before the ----END--- footer 
@@ -436,14 +439,14 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 
 	if (rdata_size < 4) {
 		gnutls_assert();
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	kdata_size = cpydata(rdata, rdata_size, &kdata);
 
 	if (kdata_size < 4) {
 		gnutls_assert();
-		return GNUTLS_E_BASE64_DECODING_ERROR;
+		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	if ((ret = _gnutls_base64_decode( kdata, kdata_size, result)) < 0) {

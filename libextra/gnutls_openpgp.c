@@ -510,7 +510,7 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
                         key_attr_t by, opaque *pattern )
 {
     keybox_blob *blob = NULL;
-    CDK_KEYDB_HD hd = NULL;
+    cdk_keydb_hd_t hd = NULL;
     cdk_kbnode_t knode = NULL;
     unsigned long keyid[2];
     unsigned char *buf;
@@ -1185,7 +1185,7 @@ gnutls_openpgp_verify_key( const char *trustdb,
                            int cert_list_length )
 {
     cdk_kbnode_t knode = NULL;
-    CDK_KEYDB_HD hd = NULL;
+    cdk_keydb_hd_t hd = NULL;
     keybox_blob *blob = NULL;
     int rc = 0;
     int status = 0;
