@@ -128,8 +128,8 @@ gnutls_transport_ptr gnutls_transport_get_ptr(gnutls_session session) {
   * @recv_ptr: will hold the value for the pull function
   * @send_ptr: will hold the value for the push function
   *
-  * Used to get the first argument of the transport function (like PUSH and
-  * PULL). This must have been set using gnutls_transport_set_ptr().
+  * Used to get the arguments of the transport functions (like PUSH and
+  * PULL). These should have been set using gnutls_transport_set_ptr2().
   *
   **/
 void gnutls_transport_get_ptr2(gnutls_session session,

@@ -31,8 +31,8 @@
   * @session_data: is a pointer to space to hold the session.
   * @session_data_size: is the session_data's size, or it will be set by the function.
   *
-  * Returns all session parameters - in order to support resuming.
-  * The client should call this - and keep the returned session - if he wants to
+  * Returns all session parameters, in order to support resuming.
+  * The client should call this, and keep the returned session, if he wants to
   * resume that current version later by calling gnutls_session_set_data()
   * This function must be called after a successful handshake.
   *
@@ -100,12 +100,16 @@ int gnutls_session_get_id( gnutls_session session, void* session_id, int *sessio
   * @session_data: is a pointer to space to hold the session.
   * @session_data_size: is the session's size
   *
-  * Sets all session parameters - in order to support resuming
-  * session must be the one returned by gnutls_session_get_data();
+  * Sets all session parameters, in order to resume a previously established
+  * session. The session data given must be the one returned by gnutls_session_get_data().
   * This function should be called before gnutls_handshake().
+  *
   * Keep in mind that session resuming is advisory. The server may
   * choose not to resume the session, thus a full handshake will be
   * performed.
+  *
+  * Returns a negative value on error.
+  *
   **/
 int gnutls_session_set_data( gnutls_session session, const opaque* session_data, 
 	int session_data_size) 
