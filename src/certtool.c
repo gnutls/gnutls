@@ -556,6 +556,10 @@ int ret;
 		case 9:
 			pkcs12_info();
 			break;
+		default:
+			fprintf(stderr, "GnuTLS' certtool utility.\n");
+			fprintf(stderr, "Please use the --help to get help on this program.\n");
+			exit(0);
 	}
 	fclose(outfile);
 }
@@ -1743,4 +1747,21 @@ void certtool_version(void)
 	fprintf(stderr, "certtool, ");
 	fprintf(stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
 		gnutls_check_version(NULL));
+}
+
+void print_license(void)
+{
+	fprintf(stdout,
+		"\nCopyright (C) 2001-2003 Nikos Mavroyanopoulos\n"
+		"This program is free software; you can redistribute it and/or modify \n"
+		"it under the terms of the GNU General Public License as published by \n"
+		"the Free Software Foundation; either version 2 of the License, or \n"
+		"(at your option) any later version. \n" "\n"
+		"This program is distributed in the hope that it will be useful, \n"
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
+		"GNU General Public License for more details. \n" "\n"
+		"You should have received a copy of the GNU General Public License \n"
+		"along with this program; if not, write to the Free Software \n"
+		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
 }

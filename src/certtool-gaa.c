@@ -140,7 +140,8 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "infile", "FILE ", "Output file.");
 	__gaa_helpsingle('d', "debug", "LEVEL ", "specify the debug level. Default is 1.");
 	__gaa_helpsingle('h', "help", "", "shows this help text");
-	__gaa_helpsingle('v', "version", "", "shows the program version");
+	__gaa_helpsingle('v', "version", "", "shows the program's version");
+	__gaa_helpsingle(0, "copyright", "", "shows the program's license");
 
 #line 100 "gaa.skel"
 }
@@ -235,31 +236,32 @@ int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           24
-#define GAAOPTID_version	1
-#define GAAOPTID_help	2
-#define GAAOPTID_debug	3
-#define GAAOPTID_infile	4
-#define GAAOPTID_outfile	5
-#define GAAOPTID_bits	6
-#define GAAOPTID_outder	7
-#define GAAOPTID_inder	8
-#define GAAOPTID_pkcs8	9
-#define GAAOPTID_to_p12	10
-#define GAAOPTID_key_info	11
-#define GAAOPTID_p12_info	12
-#define GAAOPTID_certificate_info	13
-#define GAAOPTID_load_ca_certificate	14
-#define GAAOPTID_load_ca_privkey	15
-#define GAAOPTID_load_certificate	16
-#define GAAOPTID_load_request	17
-#define GAAOPTID_load_privkey	18
-#define GAAOPTID_verify_chain	19
-#define GAAOPTID_generate_request	20
-#define GAAOPTID_generate_privkey	21
-#define GAAOPTID_update_certificate	22
-#define GAAOPTID_generate_certificate	23
-#define GAAOPTID_generate_self_signed	24
+#define GAA_NB_OPTION           25
+#define GAAOPTID_copyright	1
+#define GAAOPTID_version	2
+#define GAAOPTID_help	3
+#define GAAOPTID_debug	4
+#define GAAOPTID_infile	5
+#define GAAOPTID_outfile	6
+#define GAAOPTID_bits	7
+#define GAAOPTID_outder	8
+#define GAAOPTID_inder	9
+#define GAAOPTID_pkcs8	10
+#define GAAOPTID_to_p12	11
+#define GAAOPTID_key_info	12
+#define GAAOPTID_p12_info	13
+#define GAAOPTID_certificate_info	14
+#define GAAOPTID_load_ca_certificate	15
+#define GAAOPTID_load_ca_privkey	16
+#define GAAOPTID_load_certificate	17
+#define GAAOPTID_load_request	18
+#define GAAOPTID_load_privkey	19
+#define GAAOPTID_verify_chain	20
+#define GAAOPTID_generate_request	21
+#define GAAOPTID_generate_privkey	22
+#define GAAOPTID_update_certificate	23
+#define GAAOPTID_generate_certificate	24
+#define GAAOPTID_generate_self_signed	25
 
 #line 168 "gaa.skel"
 
@@ -540,6 +542,7 @@ int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("", GAAOPTID_load_privkey);
         case GAA_MULTIPLE_OPTION:
 #line 375 "gaa.skel"
+			GAA_CHECK1STR("", GAAOPTID_copyright);
 			GAA_CHECK1STR("v", GAAOPTID_version);
 			GAA_CHECK1STR("h", GAAOPTID_help);
 			GAA_CHECK1STR("", GAAOPTID_outder);
@@ -559,6 +562,7 @@ int gaa_get_option_num(char *str, int status)
 #line 277 "gaa.skel"
         break;
         case GAA_WORD_OPTION:
+			GAA_CHECKSTR("copyright", GAAOPTID_copyright);
 			GAA_CHECKSTR("version", GAAOPTID_version);
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("debug", GAAOPTID_debug);
@@ -624,6 +628,13 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     
     switch(gaa_num)
     {
+	case GAAOPTID_copyright:
+	OK = 0;
+#line 63 "certtool.gaa"
+{ print_license(); exit(0); ;};
+
+		return GAA_OK;
+		break;
 	case GAAOPTID_version:
 	OK = 0;
 #line 62 "certtool.gaa"
@@ -843,10 +854,10 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 64 "certtool.gaa"
+#line 65 "certtool.gaa"
 { gaaval->bits = 1024; gaaval->pkcs8 = 0; gaaval->privkey = NULL; gaaval->ca=NULL; gaaval->ca_privkey = NULL; 
 	gaaval->debug=1; gaaval->request = NULL; gaaval->infile = NULL; gaaval->outfile = NULL; gaaval->cert = NULL; 
-	gaaval->incert_format = 0; gaaval->outcert_format = 0; ;};
+	gaaval->incert_format = 0; gaaval->outcert_format = 0; gaaval->action=-1; ;};
 
     }
     inited = 1;
