@@ -582,15 +582,15 @@ int gnutls_dh_params_set(gnutls_dh_params dh_params, gnutls_datum prime,
 	sprime->_prime = tmp_prime;
 	sprime->_generator = tmp_g;
 
-/*	sprime->_prime = _gnutls_mpi_copy(tmp_prime);
-	sprime->_generator = _gnutls_mpi_copy(tmp_g);
-*/
+	sprime->generator.data = NULL;
+	sprime->prime.data = NULL;
+
 	if (gnutls_set_datum(&sprime->prime, prime.data, prime.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	if (gnutls_set_datum
-	    (&sprime->prime, generator.data, generator.size) < 0) {
+	    (&sprime->generator, generator.data, generator.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}

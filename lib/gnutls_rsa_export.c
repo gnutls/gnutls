@@ -150,7 +150,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 
 }
 
-/* returns a negative value if the bits is not supported 
+/* returns a negative value if the bits size is not supported 
  */
 static int check_bits(int bits)
 {

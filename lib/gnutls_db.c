@@ -225,6 +225,7 @@ int ret;
 	ret = gnutls_session_set_data( session, data.data, data.size);
 	if (ret < 0) {
 		gnutls_assert();
+		return ret;
 	}
 	
 	/* Note: Data is not allocated with gnutls_malloc
