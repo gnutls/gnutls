@@ -1028,10 +1028,10 @@ void serv_version(void)
 
 typedef struct {
    char session_id[SESSION_ID_SIZE];
-   int session_id_size;
+   unsigned int session_id_size;
 
    char session_data[SESSION_DATA_SIZE];
-   int session_data_size;
+   unsigned int session_data_size;
 } CACHE;
 
 static CACHE *cache_db;

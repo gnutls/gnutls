@@ -229,7 +229,6 @@ int ret;
 }
 
 int test_dhe_bits( gnutls_session session) {
-int ret;
 
 	if (dh_bits == 0) return GFAILED;
 
@@ -294,8 +293,9 @@ int old, secs = 6;
 #ifndef _WIN32
 	siginterrupt( SIGALRM, old);
 #else
-	/* we cannot distinguish timeouts */
-	alrm = 1;
+	if (WSAGetLastError()==WSAETIMEDOUT || 
+		WSAGetLastError() == WSAECONNABORTED)
+		alrm = 1;
 #endif
 	if (ret==0) return SUCCEED;
 

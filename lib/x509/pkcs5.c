@@ -184,6 +184,7 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
 	      tmp[Slen + 3] = (i & 0x000000ff) >> 0;
 
   	      gcry_md_write (prf, tmp, tmplen);
+  	      gnutls_afree(tmp);
 	    }
 	  else
 	    {

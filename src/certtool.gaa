@@ -9,7 +9,7 @@
 
 #}
 
-helpnode "Certtool help\nUsage : certtool [options]"
+helpnode "Certtool help\nUsage: certtool [options]"
 
 #int action;
 option (s, generate-self-signed) { $action=0; } "Generate a self-signed certificate."

@@ -126,7 +126,7 @@ void __gaa_helpsingle(char short_name, char *name,
 
 void gaa_help(void)
 {
-	printf("Certtool help\nUsage : certtool [options]\n");
+	printf("Certtool help\nUsage: certtool [options]\n");
 	__gaa_helpsingle('s', "generate-self-signed", "", "Generate a self-signed certificate.");
 	__gaa_helpsingle('c', "generate-certificate", "", "Generate a signed certificate.");
 	__gaa_helpsingle('u', "update-certificate", "", "Update a signed certificate.");
