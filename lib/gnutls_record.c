@@ -467,7 +467,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		gnutls_free(cipher);
 
 #ifdef RECORD_DEBUG
-		_gnutls_log( "Record: Sended Packet[%d] %s(%d) with length: %d\n",
+		_gnutls_log( "Record: Sent Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 #endif
 
@@ -525,7 +525,7 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
 #ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Record: Sending ChangeCipherSpec\n");
+	_gnutls_log( "Record: Sent ChangeCipherSpec\n");
 #endif
 
 	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1, 0);

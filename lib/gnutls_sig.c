@@ -36,7 +36,7 @@
 
 
 
-/* Generates a signature of all the previous sended packets in the 
+/* Generates a signature of all the previous sent packets in the 
  * handshake procedure.
  */
 int _gnutls_generate_sig_from_hdata( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum *signature) {

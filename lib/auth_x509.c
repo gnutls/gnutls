@@ -548,7 +548,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 
 	if (size == 0) {
 		gnutls_assert();
-		/* no certificate was sended */
+		/* no certificate was sent */
 		info->peer_certificate_status = GNUTLS_CERT_NONE;
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
