@@ -12,7 +12,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
 	auth_anon.h auth_dhe_dss.h gnutls_extensions.h ext_srp.h \
 	gnutls_auth_int.h crypt_bcrypt.h gnutls_random.h crypt_srpsha1.h \
 	x509_b64.h gnutls_srp.h auth_srp.h auth_srp_passwd.h gnutls_v2_compat.h \
-	crypt.h libgnutls-config.in libgnutls.m4 gnutls.h.in gnutls_errors_int.h \
+	crypt.h libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
 	x509_asn1.h x509_der.h gnutls_datum.h auth_x509.h gnutls_gcry.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \

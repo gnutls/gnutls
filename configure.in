@@ -1,7 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.50)
 AC_INIT
-dnl AC_CONFIG_HEADER(config.h)
 
 AC_PREFIX_DEFAULT(/usr/local)
 
@@ -246,7 +245,11 @@ LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
-AC_CONFIG_COMMANDS([default],[[
+AC_CONFIG_FILES(lib/gnutls.h.in)
+
+AC_CONFIG_COMMANDS([lib/gnutls.h],[[
+ test -f lib/gnutls.h.in || (echo "Could not generate lib/gnutls.h" && exit 1)
+ cat lib/gnutls.h.in > lib/gnutls.h
  cat lib/gnutls_ui.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
  cat lib/gnutls_errors_int.h >> lib/gnutls.h
@@ -262,6 +265,7 @@ AC_CONFIG_COMMANDS([default],[[
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config \
-lib/gnutls.h doc/Makefile src/x509/Makefile src/srp/Makefile doc/tex/Makefile \
+doc/Makefile src/x509/Makefile src/srp/Makefile doc/tex/Makefile \
 doc/tex/cover.tex doc/scripts/Makefile])
 AC_OUTPUT
+

@@ -1,3 +1,6 @@
+Version 0.3.?
+- Corrections in the configuration files
+
 Version 0.3.0 (17/12/2001)
 - Corrected bug in new integer formatting (now we use the old again)
 - Several corrections and usual cleanups

@@ -24,7 +24,7 @@
 
 #include <defines.h>
 
-/*
+
 #define IO_DEBUG 3 // define this to check non blocking behaviour 
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
@@ -33,7 +33,7 @@
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
 #define RECORD_DEBUG
 #define DEBUG
-*/
+
 
 /* It might be a good idea to replace int with void*
  * here.

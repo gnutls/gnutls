@@ -704,7 +704,7 @@ ssize_t _gnutls_handshake_send_int( GNUTLS_STATE state, ContentType type, Handsh
 #ifdef WRITE_DEBUG
 		size_t sum=0, x, j;
 		
-		_gnutls_log( "HWRITE: will write %d bytes to %d.\n", n, fd);
+		_gnutls_log( "HWRITE: will write %d bytes to %d.\n", n, gnutls_transport_get_ptr(state));
 		for (x=0;x<((n)/16)+1;x++) {
 			if (sum>n)
 				break;
