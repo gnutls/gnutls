@@ -1,9 +1,9 @@
 TLS Working Group                                               W. Price
 INTERNET-DRAFT                                                 M. Elkins
                                                 Network Associates, Inc.
-                                                        15 December 1999
+                                                           23 March 2001
 
-draft-ietf-tls-openpgp-00.txt
+draft-ietf-tls-openpgp-01.txt
 
 
                    Extensions to TLS for OpenPGP keys
@@ -52,9 +52,9 @@ Certificate
 
 
 
-Price                    Expires 15 June 2000                   [Page 1]
-
-Internet-Draft     Extensions to TLS for OpenPGP keys   15 December 1999
+Price                    Expires 23 September 2001              [Page 1]
+
+Internet-Draft     Extensions to TLS for OpenPGP keys      23 March 2001
 
 
    not be used in conjunction with OpenPGP keys.  An implementation
@@ -108,9 +108,9 @@ Certificate Request
 
 
 
-Price                    Expires 15 June 2000                   [Page 2]
-
-Internet-Draft     Extensions to TLS for OpenPGP keys   15 December 1999
+Price                    Expires 23 September 2001              [Page 2]
+
+Internet-Draft     Extensions to TLS for OpenPGP keys      23 March 2001
 
 
    based on OpenPGP keys.
@@ -164,9 +164,9 @@ Cipher Suites
 
 
 
-Price                    Expires 15 June 2000                   [Page 3]
-
-Internet-Draft     Extensions to TLS for OpenPGP keys   15 December 1999
+Price                    Expires 23 September 2001              [Page 3]
+
+Internet-Draft     Extensions to TLS for OpenPGP keys      23 March 2001
 
 
    Note:     The above numeric definitions for Cipher Suites have not
@@ -220,5 +220,5 @@ Authors
 
 
 
-Price                    Expires 15 June 2000                   [Page 4]
-
+Price                    Expires 23 September 2001              [Page 4]
+
