@@ -1,3 +1,16 @@
+2003-02-18 22:55  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_auth.c, gnutls_mpi.c, gnutls_pk.c:
+
+	some fixes in types.  
+
+2003-02-18 06:30  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/gnutls_cert.c, src/cli.c, src/tests.c:
+
+	The client certificate selection callback is no longer called twice.
+	It is called once if it is set.  
+
 2003-02-16 09:52  nmav <nmav@gnutls.org>
 
 	* src/: tests.c, tls_test.c:
