@@ -22,7 +22,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
-EXTRA_DIST = libgnutls.vers gnutls-api.texi
+EXTRA_DIST = gnutls-api.texi
 lib_LTLIBRARIES = libgnutls.la
 
 SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
