@@ -23,6 +23,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_global.h>
 #include <libtasn1.h>
+#include <gnutls_datum.h>
 #include "common.h"
 #include "x509.h"
 #include <gnutls_num.h>
@@ -277,12 +278,23 @@ int pk_algorithm;
  * some x509 certificate functions that relate to MPI parameter
  * setting. This writes the BIT STRING subjectPublicKey.
  * Needs 2 parameters (m,e).
+ *
+ * Allocates the space used to store the DER data.
  */
 int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
-	opaque * der, int* dersize)
+	gnutls_datum* der)
 {
 	int result;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+	der->data = NULL;
+	der->size = 0;
+
+	if (params_size < 2) {
+		gnutls_assert();
+		result = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
 
 	if ((result=asn1_create_element
 	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk))
@@ -291,35 +303,93 @@ int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
 		return _gnutls_asn2err(result);
 	}
 
-	if (params_size < 2) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
 	result = _gnutls_x509_write_int( spk, "modulus", params[0], 0);
 	if (result < 0) {
 		gnutls_assert();
-		return result;
+		goto cleanup;
 	}
 
 	result = _gnutls_x509_write_int( spk, "publicExponent", params[1], 0);
 	if (result < 0) {
 		gnutls_assert();
-		return result;
+		goto cleanup;
 	}
 
-	if (der == NULL) *dersize = 0;
-	result = asn1_der_coding( spk, "", der, dersize, NULL);
-
+	result = _gnutls_x509_der_encode( spk, "", der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+	
+	asn1_delete_structure(&spk);
+	return 0;
+	
+cleanup:
 	asn1_delete_structure(&spk);
 
-	if (result != ASN1_SUCCESS) {
+	return result;
+}
+
+/*
+ * This function writes the BIT STRING subjectPublicKey for DSS keys.
+ * Needs 3 parameters (p,q,g).
+ *
+ * Allocates the space used to store the DER data.
+ */
+int _gnutls_x509_write_dsa_params( GNUTLS_MPI * params, int params_size,
+	gnutls_datum* der)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+	der->data = NULL;
+	der->size = 0;
+
+	if (params_size < 3) {
+		gnutls_assert();
+		result = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAParameters", &spk))
+	     != ASN1_SUCCESS) {
+		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	return 0;
+	result = _gnutls_x509_write_int( spk, "p", params[0], 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
 
+	result = _gnutls_x509_write_int( spk, "q", params[1], 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_write_int( spk, "g", params[2], 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode( spk, "", der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&spk);
+	return 0;
+	
+cleanup:
+	asn1_delete_structure(&spk);
+	return result;
 }
+
 
 /* this function reads a (small) unsigned integer
  * from asn1 structs. Combines the read and the convertion

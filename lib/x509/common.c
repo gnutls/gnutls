@@ -927,8 +927,8 @@ int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name
 	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size)
 {
 const char* pk;
-opaque * der;
-int der_size, result;
+gnutls_datum der = {NULL, 0};
+int result;
 char name[128];
 
 	if (pk_algorithm != GNUTLS_PK_RSA) {
@@ -962,18 +962,9 @@ char name[128];
 		return _gnutls_asn2err(result);
 	}
 
-	_gnutls_x509_write_rsa_params( params, params_size, NULL, &der_size);
-
-	der = gnutls_alloca( der_size);
-	if (der == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = _gnutls_x509_write_rsa_params( params, params_size, der, &der_size);
+	result = _gnutls_x509_write_rsa_params( params, params_size, &der);
 	if (result < 0) {
 		gnutls_assert();
-		gnutls_afree(der);
 		return result;
 	}
 
@@ -981,9 +972,9 @@ char name[128];
 	 */
 	_gnutls_str_cpy( name, sizeof(name), dst_name);
 	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
-	result = asn1_write_value( dst, name, der, der_size*8);
+	result = asn1_write_value( dst, name, der.data, der.size*8);
 
-	gnutls_afree(der);
+	_gnutls_free_datum(&der);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();

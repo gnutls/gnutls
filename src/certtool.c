@@ -11,6 +11,7 @@ gnutls_x509_privkey load_private_key(void);
 gnutls_x509_privkey load_ca_private_key(void);
 gnutls_x509_crt load_ca_cert(void);
 void certificate_info( void);
+void privkey_info( void);
 static void gaa_parser(int argc, char **argv);
 void generate_self_signed( void);
 void generate_request(void);
@@ -27,10 +28,6 @@ static void tls_log_func( int level, const char* str)
 
 int main(int argc, char** argv)
 {
-	gnutls_global_init();
-	gnutls_global_set_log_function( tls_log_func);
-	gnutls_global_set_log_level(1);
-
 	gaa_parser(argc, argv);
 
 	return 0;
@@ -383,6 +380,10 @@ void gaa_parser(int argc, char **argv)
 		exit(1);
 	}
 
+	gnutls_global_init();
+	gnutls_global_set_log_function( tls_log_func);
+	gnutls_global_set_log_level(info.debug);
+
 	switch( info.action) {
 		case 0:
 			generate_self_signed();
@@ -401,6 +402,9 @@ void gaa_parser(int argc, char **argv)
 			return;
 		case 5:
 			verify_chain();
+			return;
+		case 6:
+			privkey_info();
 			return;
 	}
 }
@@ -436,6 +440,7 @@ void certificate_info( void)
 	size_t serial_size = sizeof(serial), dn_size;
 	char printable[256];
 	char *print;
+	const char* cprint;
 	char dn[256];
 		
 	size = fread( buffer, 1, sizeof(buffer)-1, stdin);
@@ -479,8 +484,8 @@ void certificate_info( void)
 	printf("Signature Algorithm: ");
 	ret = gnutls_x509_crt_get_signature_algorithm(crt);
 
-	print = get_algorithm( ret);
-	printf( "%s\n", print);
+	cprint = get_algorithm( ret);
+	printf( "%s\n", cprint);
 
 	/* Validity
 	 */
@@ -505,25 +510,9 @@ void certificate_info( void)
 	ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
 	printf("\tPublic Key Algorithm: ");
 
-	print = get_algorithm( ret);
-	printf( "%s\n", print);
+	cprint = get_algorithm( ret);
+	printf( "%s\n", cprint);
 
-	/* fingerprint
-	 */
-	size = sizeof(buffer);
-	if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, buffer, &size)) < 0) 
-	{
-		const char* str = gnutls_strerror(ret);
-		if (str == NULL) str = "unknown error";
-	    	fprintf(stderr, "Error in fingerprint calculation: %s\n", str);
-	} else {
-		print = printable;
-		for (i = 0; i < size; i++) {
-			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
-			print += 3;
-		}
-		printf("\nFingerprint: %s\n", printable);
-	}
 
 	
 	printf("\nX.509 Extensions:\n");
@@ -571,7 +560,9 @@ void certificate_info( void)
 		else printf("\t\tCA:TRUE\n");
 		
 	}
-	
+
+	/* Key Usage.
+	 */
 	ret = gnutls_x509_crt_get_key_usage( crt, &key_usage, &critical);
 	
 	if (ret >= 0) {
@@ -580,7 +571,97 @@ void certificate_info( void)
 	}
 
 
+	/* fingerprint
+	 */
+	size = sizeof(buffer);
+	if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, buffer, &size)) < 0) 
+	{
+		const char* str = gnutls_strerror(ret);
+		if (str == NULL) str = "unknown error";
+	    	fprintf(stderr, "Error in fingerprint calculation: %s\n", str);
+	} else {
+		print = printable;
+		for (i = 0; i < size; i++) {
+			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
+			print += 3;
+		}
+		printf("\nFingerprint: %s\n", printable);
+	}
+
+	size = sizeof(buffer);
+	if ((ret=gnutls_x509_crt_get_key_id(crt, 0, buffer, &size)) < 0) 
+	{
+		const char* str = gnutls_strerror(ret);
+		if (str == NULL) str = "unknown error";
+	    	fprintf(stderr, "Error in key id calculation: %s\n", str);
+	} else {
+		print = printable;
+		for (i = 0; i < size; i++) {
+			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
+			print += 3;
+		}
+		printf("Key ID: %s\n", printable);
+	}
+
+	printf("\n");
 }
+
+void privkey_info( void)
+{
+	gnutls_x509_privkey key;
+	int size, ret, i;
+	gnutls_datum pem;
+	char printable[256];
+	char *print;
+	const char* cprint;
+		
+	size = fread( buffer, 1, sizeof(buffer)-1, stdin);
+	buffer[size] = 0;
+
+	gnutls_x509_privkey_init(&key);
+	
+	pem.data = buffer;
+	pem.size = size;
+	
+	if (!info.pkcs8) {
+		ret = gnutls_x509_privkey_import(key, &pem, GNUTLS_X509_FMT_PEM);
+	} else {
+		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, GNUTLS_X509_FMT_PEM, NULL, GNUTLS_PKCS8_PLAIN);
+	}
+
+	if (ret < 0) {
+		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	/* Public key algorithm
+	 */
+	printf("Public Key Info:\n");
+	ret = gnutls_x509_privkey_get_pk_algorithm(key);
+	printf("\tPublic Key Algorithm: ");
+
+	cprint = get_algorithm( ret);
+	printf( "%s\n", cprint);
+
+
+	size = sizeof(buffer);
+	if ((ret=gnutls_x509_privkey_get_key_id(key, 0, buffer, &size)) < 0) 
+	{
+		const char* str = gnutls_strerror(ret);
+		if (str == NULL) str = "unknown error";
+	    	fprintf(stderr, "Error in key id calculation: %s\n", str);
+	} else {
+		print = printable;
+		for (i = 0; i < size; i++) {
+			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
+			print += 3;
+		}
+		printf("Key ID: %s\n", printable);
+	}
+
+	printf("\n");
+}
+
 
 gnutls_x509_privkey load_private_key()
 {
@@ -939,16 +1020,17 @@ static void print_verification_res( unsigned int x)
 		printf("\tcertificate chain is invalid.\n");
 	else
 	 	printf("\tcertificate chain is valid.\n");
+
 	if (x&GNUTLS_CERT_NOT_TRUSTED)
-		printf("\tcertificate is NOT trusted\n");
+		printf("\tThe certificate chain was NOT verified.\n");
 	else
-		printf("\tcertificate is trusted.\n");
+		printf("\tThe certificate chain was verified.\n");
 
 	if (x&GNUTLS_CERT_CORRUPTED)
-		printf("\tcertificate is corrupt.\n");
+		printf("\tA certificate is corrupt.\n");
 
 	if (x&GNUTLS_CERT_REVOKED)
-		printf("\tcertificate is revoked.\n");
+		printf("\tA certificate has been revoked.\n");
 }
 
 void verify_chain( void)

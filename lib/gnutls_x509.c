@@ -153,9 +153,8 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
  */
 static int _gnutls_check_key_cert_match( gnutls_certificate_credentials res) 
 {
-opaque cid[20];
-opaque kid[20];
-int cid_size, kid_size;
+gnutls_datum cid;
+gnutls_datum kid;
 uint pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
 
 	if (res->pkey[res->ncerts-1].pk_algorithm != pk) 
@@ -165,29 +164,37 @@ uint pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
 	}
 
 	if (pk == GNUTLS_PK_RSA) {
-		kid_size = sizeof(kid);
-		_gnutls_x509_hash_rsa_key( res->pkey[res->ncerts-1].params, kid, &kid_size);
+		_gnutls_x509_write_rsa_params( res->pkey[res->ncerts-1].params, 
+			res->pkey[res->ncerts-1].params_size, &kid);
 
-		cid_size = sizeof(cid);
-		_gnutls_x509_hash_rsa_key( res->cert_list[res->ncerts-1][0].params, cid, &cid_size);
+
+		_gnutls_x509_write_rsa_params( res->cert_list[res->ncerts-1][0].params,
+			res->cert_list[res->ncerts-1][0].params_size, &cid);
 	} else if ( pk == GNUTLS_PK_DSA) {
-		kid_size = sizeof(kid);
-		_gnutls_x509_hash_dsa_key( res->pkey[res->ncerts-1].params, kid, &kid_size);
 
-		cid_size = sizeof(cid);
-		_gnutls_x509_hash_dsa_key( res->cert_list[res->ncerts-1][0].params, cid, &cid_size);
+		_gnutls_x509_write_dsa_params( res->pkey[res->ncerts-1].params, 
+			res->pkey[res->ncerts-1].params_size, &kid);
+
+		_gnutls_x509_write_dsa_params( res->cert_list[res->ncerts-1][0].params,
+			res->cert_list[res->ncerts-1][0].params_size, &cid);
 	}
 	
-	if (cid_size != kid_size) {
+	if (cid.size != kid.size) {
 		gnutls_assert();
+		_gnutls_free_datum( &kid);
+		_gnutls_free_datum( &cid);
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
 	
-	if (memcmp( kid, cid, kid_size) != 0) {
+	if (memcmp( kid.data, cid.data, kid.size) != 0) {
 		gnutls_assert();
+		_gnutls_free_datum( &kid);
+		_gnutls_free_datum( &cid);
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
 	
+	_gnutls_free_datum( &kid);
+	_gnutls_free_datum( &cid);
 	return 0;
 }
 
@@ -908,7 +915,7 @@ int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials res, con
 
 static int generate_rdn_seq( gnutls_certificate_credentials res) 
 {
-gnutls_const_datum tmp;
+gnutls_datum tmp;
 gnutls_datum _tmp;
 int ret;
 uint size, i;

@@ -375,7 +375,7 @@ int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t da
 
 	if (rdata==NULL) {
 		gnutls_assert();
-		_gnutls_x509_log( "Could not find '%s'\n", pem_header);
+		_gnutls_debug_log( "Could not find '%s'\n", pem_header);
 		return GNUTLS_E_BASE64_DECODING_ERROR;
 	}
 

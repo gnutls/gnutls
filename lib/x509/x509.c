@@ -932,7 +932,14 @@ int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
 {
 GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
 int params_size = MAX_PUBLIC_PARAMS_SIZE;
-int i, pk, ret = 0;
+int i, pk, result = 0;
+gnutls_datum der = { NULL, 0 };
+GNUTLS_HASH_HANDLE hd;
+
+	if (*output_data_size < 20) {
+		gnutls_assert();
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
 
 	pk = gnutls_x509_crt_get_pk_algorithm( crt, NULL);
 	
@@ -941,25 +948,51 @@ int i, pk, ret = 0;
 		return pk;
 	}
 
-	ret = _gnutls_x509_crt_get_mpis( crt, params, &params_size);
+	result = _gnutls_x509_crt_get_mpis( crt, params, &params_size);
 	
-	if (ret < 0) {
+	if (result < 0) {
 		gnutls_assert();
-		return ret;
+		return result;
 	}
+
+	if (pk == GNUTLS_PK_RSA) {
+		result = _gnutls_x509_write_rsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+ 	} else if (pk == GNUTLS_PK_DSA) {
+		result = _gnutls_x509_write_dsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+	} else return GNUTLS_E_INTERNAL_ERROR;
 		
-	if (pk == GNUTLS_PK_RSA)
-		ret = _gnutls_x509_hash_rsa_key( params, output_data, output_data_size);
-	else if (pk == GNUTLS_PK_DSA)
-		ret = _gnutls_x509_hash_dsa_key( params, output_data, output_data_size);
-	else ret = GNUTLS_E_INTERNAL_ERROR;
+	hd = _gnutls_hash_init( GNUTLS_MAC_SHA);
+	if (hd == GNUTLS_HASH_FAILED) {
+		gnutls_assert();
+		result = GNUTLS_E_INTERNAL_ERROR;
+		goto cleanup;
+	}
+	
+	_gnutls_hash( hd, der.data, der.size);
+
+	_gnutls_hash_deinit( hd, output_data);
+	*output_data_size = 20;
+
+	result = 0;
+
+	cleanup:
+	
+	_gnutls_free_datum( &der);
 
 	/* release all allocated MPIs
 	 */
 	for (i = 0; i < params_size; i++) {
 		_gnutls_mpi_release( &params[i]);
 	}
-	return ret; 
+	return result; 
 }
 
 
