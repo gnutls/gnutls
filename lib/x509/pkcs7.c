@@ -39,7 +39,7 @@
 
 /* Decodes the PKCS #7 signed data, and returns an ASN1_TYPE, 
  * which holds them. If raw is non null then the raw decoded
- * data are copied (they are localy allocated) there.
+ * data are copied (they are locally allocated) there.
  */
 static
 int _decode_pkcs7_signed_data( ASN1_TYPE pkcs7, ASN1_TYPE * sdata, gnutls_datum* raw) 

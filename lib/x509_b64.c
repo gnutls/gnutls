@@ -133,7 +133,7 @@ inline static int decode(uint8 * result, const uint8 * data)
 	return ret;
 }
 
-/* encodes data and puts the result into result (localy alocated)
+/* encodes data and puts the result into result (locally allocated)
  * The result_size is the return value
  */
 int _gnutls_base64_encode(const uint8 * data, size_t data_size, uint8 ** result)
@@ -161,7 +161,7 @@ int _gnutls_base64_encode(const uint8 * data, size_t data_size, uint8 ** result)
 	return ret;
 }
 
-/* encodes data and puts the result into result (localy alocated)
+/* encodes data and puts the result into result (locally allocated)
  * The result_size is the return value
  */
 int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
@@ -287,23 +287,19 @@ int gnutls_pem_base64_encode_alloc( const char* msg, const gnutls_datum *data,
 opaque* ret;
 int size;
 
+	if (result==NULL) return GNUTLS_E_INVALID_REQUEST;
+
 	size = _gnutls_fbase64_encode( msg, data->data, data->size, &ret);
 	if (size < 0)
 		return size;
 
-	if (result==NULL) {
-		gnutls_free(ret);
-		return GNUTLS_E_INVALID_REQUEST;
-	} else {
-		result->data = ret;
-	        result->size = size;
-	}
-
+	result->data = ret;
+	result->size = size;
 	return 0;
 }
 
 
-/* decodes data and puts the result into result (localy alocated)
+/* decodes data and puts the result into result (locally allocated)
  * The result_size is the return value
  */
 int _gnutls_base64_decode(const uint8 * data, size_t data_size, uint8 ** result)

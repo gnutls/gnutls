@@ -35,7 +35,7 @@
  * 
  * HANDSHAKE LAYER:
  *  1. Uses a buffer to hold data that was not sent or received
- *  complete. (Ie. sent 10 bytes of a handshake packet that is 20 bytes
+ *  complete. (E.g. sent 10 bytes of a handshake packet that is 20 bytes
  *  long).
  * (see _gnutls_handshake_send_int(), _gnutls_handshake_recv_int())
  *
@@ -117,7 +117,6 @@ int _gnutls_record_buffer_get_size(ContentType type, gnutls_session session)
 		default:
 			return GNUTLS_E_INVALID_REQUEST;
 	}
-	return 0;
 }
 
 /**
@@ -278,7 +277,7 @@ static ssize_t _gnutls_read( gnutls_session session, void *iptr, size_t sizeOfPt
  * Clears the peeked data (read with MSG_PEEK).
  */
 int _gnutls_io_clear_peeked_data( gnutls_session session) {
-char *peekdata = NULL;
+char *peekdata;
 int ret, sum;
 
 	if (session->internals.have_peeked_data==0 || RCVLOWAT==0)
@@ -318,8 +317,6 @@ void _gnutls_io_clear_read_buffer( gnutls_session session) {
  * It does return gnutls_errno instead.
  * This function reads data from the socket and keeps them in a buffer, of up to
  * MAX_RECV_SIZE. 
- *
- * sizeOfPtr should be unsigned.
  *
  * This is not a general purpose function. It returns EXACTLY the data requested,
  * which are stored in a local (in the session) buffer. A pointer (iptr) to this buffer is returned.
@@ -704,8 +701,6 @@ ssize_t _gnutls_handshake_io_write_flush( gnutls_session session)
     if (session->internals.handshake_send_buffer.length == 0) {
 	ret = session->internals.handshake_send_buffer_prev_size; /* done */
 	session->internals.handshake_send_buffer_prev_size = 0;
-
-	return ret;
     }
 
     return ret;
@@ -718,7 +713,7 @@ ssize_t _gnutls_handshake_io_write_flush( gnutls_session session)
 ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type, HandshakeType htype, const void *iptr, size_t n)
 {
 	size_t left;
-	ssize_t i = 0, ret=0;
+	ssize_t ret=0;
 	const opaque *ptr;
         ssize_t retval = 0;
 
@@ -740,8 +735,9 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 	} else if (session->internals.handshake_send_buffer.length > 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
-	} else {
+	}
 #ifdef WRITE_DEBUG
+	else {
 		size_t sum=0, x, j;
 		
 		_gnutls_write_log( "HWRITE: will write %d bytes to %d.\n", n, gnutls_transport_get_ptr(session));
@@ -758,10 +754,8 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 			_gnutls_write_log( "\n");
 		}
 		_gnutls_write_log( "\n");
-#endif
-
-	
 	}
+#endif
 
 	if (n==0) { /* if we have no data to send */
 		gnutls_assert();
@@ -804,8 +798,7 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 			gnutls_assert();
 			return ret;
 		}
-		i = ret;
-		left -= i;
+		left -= ret;
 	}
 
 	retval = n + session->internals.handshake_send_buffer_prev_size;

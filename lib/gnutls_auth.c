@@ -41,13 +41,12 @@
   *
   **/
 void gnutls_credentials_clear( gnutls_session session) {
-	AUTH_CRED * ccred, *ncred;
-	
-	if (session->key && session->key->cred) { /* begining of the list */
+	if (session->key && session->key->cred) { /* beginning of the list */
+		AUTH_CRED * ccred, *ncred;
 		ccred = session->key->cred;
 		while(ccred!=NULL) {
 			ncred = ccred->next;
-			if (ccred!=NULL) gnutls_free(ccred);
+			gnutls_free(ccred);
 			ccred = ncred;
 		}
 		session->key->cred = NULL;
@@ -87,12 +86,12 @@ int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type
 	AUTH_CRED * ccred=NULL, *pcred=NULL;
 	int exists=0;	
 	
-	if (session->key->cred==NULL) { /* begining of the list */
+	if (session->key->cred==NULL) { /* beginning of the list */
 		
 		session->key->cred = gnutls_malloc(sizeof(AUTH_CRED));
 		if (session->key->cred == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
-		/* copy credentials localy */
+		/* copy credentials locally */
 		session->key->cred->credentials = cred;
 		
 		session->key->cred->next = NULL;
@@ -116,7 +115,7 @@ int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type
 		
 			ccred = pcred->next;
 
-			/* copy credentials localy */
+			/* copy credentials locally */
 			ccred->credentials = cred;
 
 			ccred->next = NULL;
@@ -154,7 +153,7 @@ int server = session->security_parameters.entity==GNUTLS_SERVER?0:1;
 }
 
 /* 
- * This returns an pointer to the linked list. Don't
+ * This returns a pointer to the linked list. Don't
  * free that!!!
  */
 const void *_gnutls_get_kx_cred( gnutls_session session, gnutls_kx_algorithm algo, int *err) 

@@ -318,7 +318,7 @@ int ret = 0;
   * This function will remove the current session data from the session
   * database. This will prevent future handshakes reusing these session
   * data. This function should be called if a session was terminated
-  * abnormaly, and before gnutls_deinit() is called.
+  * abnormally, and before gnutls_deinit() is called.
   *
   * Normally gnutls_deinit() will remove abnormally terminated sessions.
   *

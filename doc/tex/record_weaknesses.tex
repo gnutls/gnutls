@@ -12,7 +12,7 @@ and exploit the facts that \tls{}
 
 \gnutls{} implements all the known counter-measures for these attacks. For the first
 two cases, \gnutls{} does only have one error code for both of the decryption failures,
-and processes the message normaly even if a padding error occured. This avoids
+and processes the message normally even if a padding error occured. This avoids
 both of these attacks.
 For the latter, an empty record can be sent before every record packet, and this is
 believed to avoid the known attacks in CBC encrypted packets. See the function

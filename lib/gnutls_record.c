@@ -225,7 +225,7 @@ static int _gnutls_session_is_valid( gnutls_session session) {
 }
 
 /* Copies the record version into the headers. The 
- * version, must have 2 bytes at least.
+ * version must have 2 bytes at least.
  */
 inline static void copy_record_version( gnutls_session session, HandshakeType htype, 
 	opaque version[2])
@@ -285,7 +285,7 @@ ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
 	return retval;
 }
 
-/* This function behave exactly like write(). The only difference is 
+/* This function behaves exactly like write(). The only difference is
  * that it accepts, the gnutls_session and the ContentType of data to
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current session.    
@@ -474,12 +474,12 @@ static int _gnutls_check_recv_type( ContentType recv_type) {
 }
 
 
-/* Checks if there are pending data into the record buffers. If there are
+/* Checks if there are pending data in the record buffers. If there are
  * then it copies the data.
  */
 static int _gnutls_check_buffers( gnutls_session session, ContentType type, opaque* data, int sizeofdata) {
-	int ret = 0, ret2=0;
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && _gnutls_record_buffer_get_size(type, session) > 0) {
+		int ret = 0, ret2=0;
 		ret = _gnutls_record_buffer_get(type, session, data, sizeofdata);
 		if (ret < 0) {
 			gnutls_assert();
@@ -572,7 +572,7 @@ static int _gnutls_check_record_version( gnutls_session session, HandshakeType h
 }
 
 /* This function will check if the received record type is
- * the one we actually expecting for.
+ * the one we actually expect.
  */
 static int _gnutls_record_check_type( gnutls_session session, ContentType recv_type,
 	ContentType type, HandshakeType htype, opaque* data, int data_size) {
@@ -676,8 +676,8 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 
 #define MAX_EMPTY_PACKETS_SEQUENCE 4
 
-/* This function behave exactly like read(). The only difference is 
- * that it accepts, the gnutls_session and the ContentType of data to
+/* This function behaves exactly like read(). The only difference is
+ * that it accepts the gnutls_session and the ContentType of data to
  * send (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
  */
@@ -695,6 +695,10 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	uint16 header_size;
 	int empty_packet = 0;
 
+	if (sizeofdata == 0 || data == NULL) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	begin:
 	
 	if (empty_packet > MAX_EMPTY_PACKETS_SEQUENCE) {
@@ -706,10 +710,6 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	 */
 	header_size = RECORD_HEADER_SIZE;
 	ret = 0;
-
-	if (sizeofdata == 0 || data == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
 
 	if ( _gnutls_session_is_valid(session)!=0 || session->internals.may_read!=0) {
 		gnutls_assert();
@@ -877,7 +877,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	 * Actually this code is called if we just received
 	 * an empty packet. An empty TLS packet is usually
 	 * sent to protect some vulnerabilities in the CBC mode.
-	 * In that case we go to the begining and start reading
+	 * In that case we go to the beginning and start reading
 	 * the next packet.
 	 */
 	if (ret==0) {
@@ -900,7 +900,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
   * error codes.
   *
   * If the EINTR is returned by the internal push function (write())
-  * then GNUTLS_E_INTERRUPTED, will be returned. If GNUTLS_E_INTERRUPTED or
+  * then GNUTLS_E_INTERRUPTED will be returned. If GNUTLS_E_INTERRUPTED or
   * GNUTLS_E_AGAIN is returned you must call this function again, with the 
   * same parameters. Otherwise the write operation will be 
   * corrupted and the connection will be terminated.

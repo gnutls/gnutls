@@ -1308,7 +1308,7 @@ static int _gnutls_read_server_hello(gnutls_session session, char *data,
 }
 
 
-/* This function copies the appropriate ciphersuites, to a localy allocated buffer 
+/* This function copies the appropriate ciphersuites to a locally allocated buffer
  * Needed in client hello messages. Returns the new data length.
  */
 static int _gnutls_copy_ciphersuites(gnutls_session session,
@@ -1372,7 +1372,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 }
 
 
-/* This function copies the appropriate compression methods, to a localy allocated buffer 
+/* This function copies the appropriate compression methods, to a locally allocated buffer 
  * Needed in hello messages. Returns the new data length.
  */
 static int _gnutls_copy_comp_methods(gnutls_session session,

@@ -9,7 +9,7 @@ typedef struct {
 	gnutls_datum n;
 } SRP_PWD_ENTRY;
 
-/* this is localy alocated. It should be freed using the provided function */
+/* this is locally allocated. It should be freed using the provided function */
 int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username, SRP_PWD_ENTRY**);
 void _gnutls_srp_entry_free( SRP_PWD_ENTRY * entry);
 int _gnutls_sbase64_encode(uint8 * data, size_t data_size, uint8 ** result);

@@ -70,7 +70,7 @@ inline static int is_srp( GNUTLS_CipherSuite suite) {
 }
 
 /* returns data_size or a negative number on failure
- * data is allocated localy
+ * data is allocated locally
  */
 int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_size) {
 	uint len;

@@ -37,7 +37,7 @@ typedef int (*LZO_FUNC)();
 LZO_FUNC _gnutls_lzo1x_decompress_safe = NULL;
 LZO_FUNC _gnutls_lzo1x_1_compress = NULL;
 
-/* The flag d is the direction (compressed, decompress). Non zero is
+/* The flag d is the direction (compress, decompress). Non zero is
  * decompress.
  */
 GNUTLS_COMP_HANDLE _gnutls_comp_init( gnutls_compression_method method, int d)
@@ -86,15 +86,15 @@ int err;
 		}
 		if (err!=Z_OK) {
 			gnutls_assert();
-			gnutls_free( ret);
 			gnutls_free( ret->handle);
+			gnutls_free( ret);
 			return NULL;
 		}
 		break;
 	    }
 	    case GNUTLS_COMP_LZO:
 	        if (d) /* LZO does not use memory on decompressor */
-	           ret->handle = NULL;
+	        { /* ret->handle = NULL; */ }
 	        else {
   		   ret->handle = gnutls_malloc( LZO1X_1_MEM_COMPRESS);
   		  
@@ -105,9 +105,6 @@ int err;
 		}
 		
 		break;
-
-	    default:
-	    	break;
 	}
 #endif
 	return ret;
@@ -117,20 +114,18 @@ void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d) {
 int err;
 
 	if (handle!=NULL) {
-		switch( handle->algo) {
-			case GNUTLS_COMP_LZO:
-				break;
 #ifdef HAVE_LIBZ
+		switch( handle->algo) {
+			/* case GNUTLS_COMP_LZO:
+				break; */
 			case GNUTLS_COMP_ZLIB:
 				if (d)
 					err = inflateEnd( handle->handle);
 				else
 					err = deflateEnd( handle->handle);
 				break;
-#endif
-			default:
-				break;
 		}
+#endif
 		gnutls_free( handle->handle);
 		gnutls_free( handle);
 
@@ -158,22 +153,20 @@ int err;
 				return GNUTLS_E_COMPRESSION_FAILED;
 			
 			size = plain_size + plain_size / 64 + 16 + 3;
-			*compressed=NULL;
-
 			*compressed = gnutls_malloc(size);
 			if (*compressed==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
-		 	err = _gnutls_lzo1x_1_compress( plain, plain_size, *compressed,
-		 	        &out_len, handle->handle);
+			err = _gnutls_lzo1x_1_compress( plain, plain_size, *compressed,
+			        &out_len, handle->handle);
 
-		 	if (err!=LZO_E_OK) {
-		 		gnutls_assert();
-		 		gnutls_free( *compressed);
-		 		return GNUTLS_E_COMPRESSION_FAILED;
-		 	}
+			if (err!=LZO_E_OK) {
+				gnutls_assert();
+				gnutls_free( *compressed);
+				return GNUTLS_E_COMPRESSION_FAILED;
+			}
 
 			compressed_size = out_len;
 			break;
@@ -184,8 +177,6 @@ int err;
 			z_stream *zhandle;
 			
 			size = (plain_size+plain_size)+10;
-			*compressed=NULL;
-
 			*compressed = gnutls_malloc(size);
 			if (*compressed==NULL) {
 				gnutls_assert();
@@ -199,13 +190,13 @@ int err;
 			zhandle->next_out = (Bytef*) *compressed;
 			zhandle->avail_out = size;
 		
-		 	err = deflate( zhandle, Z_SYNC_FLUSH);
+			err = deflate( zhandle, Z_SYNC_FLUSH);
 
-		 	if (err!=Z_OK || zhandle->avail_in != 0) {
-		 		gnutls_assert();
-		 		gnutls_free( *compressed);
-		 		return GNUTLS_E_COMPRESSION_FAILED;
-		 	}
+			if (err!=Z_OK || zhandle->avail_in != 0) {
+				gnutls_assert();
+				gnutls_free( *compressed);
+				return GNUTLS_E_COMPRESSION_FAILED;
+			}
 
 			compressed_size = size - zhandle->avail_out;
 			break;
@@ -307,9 +298,9 @@ int cur_pos;
 				zhandle->next_out = (Bytef*) (*plain + cur_pos);
 				zhandle->avail_out = out_size - cur_pos;
 
-			 	err = inflate( zhandle, Z_SYNC_FLUSH);
+				err = inflate( zhandle, Z_SYNC_FLUSH);
 			 	
-			 	cur_pos = out_size - zhandle->avail_out;
+				cur_pos = out_size - zhandle->avail_out;
 
 			} while( (err==Z_BUF_ERROR && zhandle->avail_out==0 && out_size < max_record_size) 
 				|| ( err==Z_OK && zhandle->avail_in != 0));

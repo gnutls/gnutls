@@ -39,24 +39,18 @@ int (*_gnutls_is_secure_memory)(const void*) = _gnutls_is_secure_mem_null;
 void *_gnutls_calloc(size_t nmemb, size_t size)
 {
 	void *ret;
-	ret = gnutls_malloc(size*nmemb);
-	if (ret == NULL)
-		return ret;
-
-	memset(ret, 0, size);
-
+	size *= nmemb;
+	ret = gnutls_malloc(size);
+	if (ret != NULL) memset(ret, 0, size);
 	return ret;
 }
 
 svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 {
 	svoid *ret;
-	ret = gnutls_secure_malloc(size*nmemb);
-	if (ret == NULL)
-		return ret;
-
-	memset(ret, 0, size);
-
+	size *= nmemb;
+	ret = gnutls_secure_malloc(size);
+	if (ret != NULL) memset(ret, 0, size);
 	return ret;
 }
 
@@ -67,7 +61,7 @@ void* gnutls_realloc_fast( void* ptr, size_t size)
 {
 void *ret;
 
-        if (size == 0) return ptr;
+	if (size == 0) return ptr;
 
 	ret = gnutls_realloc( ptr, size);
 	if ( ret == NULL) {

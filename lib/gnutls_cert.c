@@ -133,7 +133,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 
 
 /**
-  * gnutls_certificate_allocate_credentials - Used to allocate an gnutls_certificate_credentials structure
+  * gnutls_certificate_allocate_credentials - Used to allocate a gnutls_certificate_credentials structure
   * @res: is a pointer to an &gnutls_certificate_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
@@ -226,7 +226,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   *
   * 'req_ca_cert', is only used in X.509 certificates. 
   * Contains a list with the CA names that the server considers trusted. 
-  * Normaly we should send a certificate that is signed
+  * Normally we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
   * meaningful value use the function gnutls_x509_rdn_get().
   *
@@ -244,8 +244,6 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * choosen by the user. The index is relative to the certificates in the
   * callback's parameter. The value (-1) indicates that the user
   * does not want to use client authentication.
-  *
-  * This function returns 0 on success.
   **/
 void gnutls_certificate_client_set_select_function(gnutls_session session,
 					     certificate_client_select_func
@@ -346,9 +344,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 
 	if (verify < 0) {
 		gnutls_assert();
-		return verify;
 	}
-
 
 	return verify;
 }
@@ -470,7 +466,7 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 }
 
 
-/* This function will convert a der certificate, to a format
+/* This function will convert a der certificate to a format
  * (structure) that gnutls can understand and use. Actually the
  * important thing on this function is that it extracts the 
  * certificate's (public key) parameters.
@@ -482,7 +478,7 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCert,
 	int flags /* OR of ConvFlags */)
 {
-	int ret = 0;
+	int ret;
 	gnutls_x509_crt cert;
 	
 	ret = gnutls_x509_crt_init( &cert);
@@ -533,6 +529,7 @@ int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
 		ret = gnutls_x509_crt_export( cert, GNUTLS_X509_FMT_DER, der, &der_size);
 		if (ret < 0) {
 			gnutls_assert();
+			gnutls_free(der);
 			return ret;
 		}
 

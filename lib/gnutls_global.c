@@ -44,7 +44,7 @@ ASN1_TYPE _gnutls_gnutls_asn;
   *
   * This is the function where you set the logging function gnutls
   * is going to use. This function only accepts a character array.
-  * Normaly you may not use this function since it is only used 
+  * Normally you may not use this function since it is only used 
   * for debugging purposes.
   *
   * gnutls_log_func is of the form, 
@@ -248,7 +248,7 @@ void gnutls_global_deinit( void) {
   * @session: gnutls session
   *
   * This is the function where you set a function for gnutls 
-  * to receive data. Normaly, if you use berkeley style sockets,
+  * to receive data. Normally, if you use berkeley style sockets,
   * you may not use this function since the default (recv(2)) will 
   * probably be ok.
   * This function should be called once and after gnutls_global_init().

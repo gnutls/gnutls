@@ -131,7 +131,7 @@ inline static int encode(uint8 * result, const uint8 * rdata, int left)
 
 }
 
-/* encodes data and puts the result into result (localy alocated)
+/* encodes data and puts the result into result (locally allocated)
  * The result_size is the return value
  */
 int _gnutls_sbase64_encode(uint8 * data, size_t data_size, uint8 ** result)
@@ -215,7 +215,7 @@ inline static int decode(uint8 * result, const uint8 * data)
 	return ret;
 }
 
-/* decodes data and puts the result into result (localy alocated)
+/* decodes data and puts the result into result (locally allocated)
  * The result_size is the return value.
  * That function does not ignore newlines tabs etc. You should remove them
  * before calling it.
