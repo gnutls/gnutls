@@ -1,5 +1,6 @@
 EXTRA_DIST = port.h prime.gaa crypt.gaa crypt-gaa.h README.crypt prime-gaa.h \
-		README tpasswd tpasswd.conf pkcs1.asn pkix.asn cert.pem key.pem
+		README tpasswd tpasswd.conf pkcs1.asn pkix.asn cert.pem \
+		key.pem ca.pem
 
 INCLUDES = -I../lib
 

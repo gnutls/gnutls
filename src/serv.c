@@ -30,10 +30,13 @@
 #include "../lib/gnutls.h"
 #include <port.h>
 
-#define KEYFILE "key.pem"
-#define CERTFILE "cert.pem"
-#define CAFILE "ca.pem"
+#define KEYFILE "x509/key.pem"
+#define CERTFILE "x509/cert.pem"
+#define CAFILE "x509/ca.pem"
 #define CRLFILE NULL
+
+#define SRP_PASSWD "srp/tpasswd"
+#define SRP_PASSWD_CONF "srp/tpasswd.conf"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -77,7 +80,7 @@ GNUTLS_STATE initialize_state()
 	 * Read README.crypt prior to using SRP.
 	 */
 	gnutls_allocate_srp_server_sc( &srp_cred);
-	gnutls_set_srp_server_cred( srp_cred, "tpasswd", "tpasswd.conf");
+	gnutls_set_srp_server_cred( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
 	gnutls_allocate_anon_server_sc( &dh_cred);
 	gnutls_set_anon_server_cred( dh_cred, 1024);
