@@ -1,3 +1,34 @@
+2004-02-10 21:04  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/compression.tex, lib/ext_server_name.c,
+	lib/gnutls.h.in.in, lib/gnutls_extensions.c, src/cli.c,
+	src/common.c:
+
+	Fixed a bug where 'server name' extension was always sent.  
+
+2004-02-10 21:04  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/ext_server_name.c, lib/gnutls.h.in.in, src/cli.c:
+
+	some bugfixes.  
+
+2004-02-10 20:03  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/Makefile.am, lib/gnutls.h.in.in,
+	lib/gnutls_cipher.c, lib/gnutls_errors.c, lib/gnutls_errors_int.h,
+	lib/gnutls_hash_int.c, lib/gnutls_int.h, lib/gnutls_mpi.h,
+	lib/gnutls_rsa_export.c, lib/gnutls_rsa_export.h, lib/gnutls_ui.h,
+	lib/rsa_compat.c, src/certtool-gaa.c, src/certtool-gaa.h,
+	src/certtool.c, src/certtool.gaa:
+
+	Backported several things from the development branch.  
+
+2004-02-10 19:40  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_dh_primes.c, gnutls_dh_primes.c:
+
+	Fixed some bugs. Patch by Brieuc Jeunhomme <bbp@via.ecp.fr>.  
+
 2004-01-06 20:45  nmav <nmav@gnutls.org>
 
 	* configure.in, src/certtool.c:
