@@ -103,7 +103,7 @@ int gnutls_x509_dn_oid_known(const char* oid);
 #define GNUTLS_KEY_KEY_CERT_SIGN		4
 #define GNUTLS_KEY_CRL_SIGN			2
 #define GNUTLS_KEY_ENCIPHER_ONLY		1
-#define GNUTLS_KEY_DECIPHER_ONLY		256
+#define GNUTLS_KEY_DECIPHER_ONLY		32768
 
 int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx, 
 	void* oid, size_t * sizeof_oid);
