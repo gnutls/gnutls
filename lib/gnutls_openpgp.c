@@ -141,9 +141,12 @@ read_keyring_blob(const gnutls_datum* keyring, size_t pos)
 {
   keyring_blob *blob = NULL;
   
-  if (!keyring || pos > keyring->size)
+  if (!keyring || !keyring->data)
     return NULL;
 
+  if (pos > keyring->size)
+    return NULL;
+    
   keyring_blob_new(&blob);
   blob->type = keyring->data[pos];
   if (blob->type < 0 || blob->type > 1)
