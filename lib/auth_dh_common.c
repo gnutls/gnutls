@@ -39,6 +39,16 @@
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
+/* Frees the dh_info_st structure.
+ */
+void _gnutls_free_dh_info( dh_info_st* dh)
+{
+    dh->secret_bits = 0;
+    _gnutls_free_datum( &dh->prime);
+    _gnutls_free_datum( &dh->generator);
+    _gnutls_free_datum( &dh->public_key);
+}
+
 int _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 				     opaque * data, size_t _data_size,
 				     mpi_t g, mpi_t p)

@@ -33,6 +33,7 @@ typedef struct {
     gnutls_datum_t public_key;
 } dh_info_st;
 
+void _gnutls_free_dh_info( dh_info_st* dh);
 int _gnutls_gen_dh_common_client_kx(gnutls_session_t, opaque **);
 int _gnutls_proc_dh_common_client_kx(gnutls_session_t session,
 				     opaque * data, size_t _data_size,

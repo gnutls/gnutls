@@ -255,6 +255,7 @@ int _gnutls_session_unpack(gnutls_session_t session,
 	    /* Delete the DH parameters. (this might need to be moved to a function)
 	     */
 	    info = session->key->auth_info;
+	    _gnutls_free_dh_info( &info->dh);
 	    memset(&info->dh, 0, sizeof(dh_info_st));
 	}
 	break;
@@ -403,6 +404,8 @@ int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
 
     /* Delete the dh_info_st and rsa_info_st fields.
      */
+    _gnutls_free_dh_info( &info->dh);
+    _gnutls_free_rsa_info( &info->rsa_export);
     memset(&info->dh, 0, sizeof(dh_info_st));
     memset(&info->rsa_export, 0, sizeof(rsa_info_st));
 

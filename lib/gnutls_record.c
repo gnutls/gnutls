@@ -986,10 +986,8 @@ ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
   * If the EINTR is returned by the internal push function (the default is recv())
   * then GNUTLS_E_INTERRUPTED will be returned. If GNUTLS_E_INTERRUPTED or
   * GNUTLS_E_AGAIN is returned, you must call this function again, with the
-  * same parameters; cf. gnutls_record_get_direction(). Alternatively
-  * you could provide a NULL pointer for data, and 0 for size. 
-  * Otherwise the write operation will be corrupted and the connection 
-  * will be terminated.
+  * same parameters; alternatively you could provide a NULL pointer for data, 
+  * and 0 for size. cf. gnutls_record_get_direction().
   *
   * Returns the number of bytes sent, or a negative error code. The number
   * of bytes sent might be less than @sizeofdata. The maximum number of bytes

@@ -1589,3 +1589,12 @@ int _gnutls_server_select_cert(gnutls_session_t session,
 
     return ret;
 }
+
+/* Frees the rsa_info_st structure.
+ */
+void _gnutls_free_rsa_info( rsa_info_st* rsa)
+{
+    _gnutls_free_datum( &rsa->modulus);
+    _gnutls_free_datum( &rsa->exponent);
+}
+

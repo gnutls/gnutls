@@ -142,6 +142,8 @@ typedef struct cert_auth_info_st {
 
 typedef struct cert_auth_info_st cert_auth_info_st;
 
+void _gnutls_free_rsa_info( rsa_info_st* rsa);
+
 /* AUTH X509 functions */
 int _gnutls_gen_cert_server_certificate(gnutls_session_t, opaque **);
 int _gnutls_gen_cert_client_certificate(gnutls_session_t, opaque **);

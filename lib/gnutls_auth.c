@@ -270,6 +270,9 @@ void *_gnutls_get_auth_info(gnutls_session_t session)
   -*/
 void _gnutls_free_auth_info(gnutls_session_t session)
 {
+dh_info_st *dh_info;
+rsa_info_st * rsa_info;
+
     if (session == NULL || session->key == NULL) {
 	gnutls_assert();
 	return;
@@ -277,8 +280,16 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
     switch (session->key->auth_info_type) {
     case GNUTLS_CRD_SRP:
-    case GNUTLS_CRD_ANON:
+        break;
+    case GNUTLS_CRD_ANON: {
+	    anon_auth_info_t info = _gnutls_get_auth_info(session);
+	    
+	    if (info == NULL)
+		break;
 
+            dh_info = &info->dh;
+            _gnutls_free_dh_info( dh_info);
+        }
 	break;
     case GNUTLS_CRD_CERTIFICATE:{
 	    unsigned int i;
@@ -286,6 +297,9 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 
 	    if (info == NULL)
 		break;
+
+            dh_info = &info->dh;
+            rsa_info = &info->rsa_export;
 	    for (i = 0; i < info->ncerts; i++) {
 		_gnutls_free_datum(&info->raw_certificate_list[i]);
 	    }
@@ -293,6 +307,9 @@ void _gnutls_free_auth_info(gnutls_session_t session)
 	    gnutls_free(info->raw_certificate_list);
 	    info->raw_certificate_list = NULL;
 	    info->ncerts = 0;
+
+            _gnutls_free_dh_info( dh_info);
+            _gnutls_free_rsa_info( rsa_info);
 	}
 
 
