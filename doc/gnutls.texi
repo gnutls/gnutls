@@ -2005,7 +2005,387 @@ signing_key
 #time_stamping_key
 @end example
 
+@chapter Certificate to XML convertion functions
+@cindex Certificate to XML convertion
+
+This appendix contains some example output of the XML convertion
+functions:
+
+@itemize
+
+@item @code{gnutls_x509_crt_to_xml}
+
+@item @code{gnutls_openpgp_key_to_xml}
+
+@end itemize
+
+@section An X.509 certificate
+
+@smallexample
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gnutls:x509:certificate version="1.1">
+ <certificate type="SEQUENCE">
+  <tbsCertificate type="SEQUENCE">
+    <version type="INTEGER" encoding="HEX">02</version>
+    <serialNumber type="INTEGER" encoding="HEX">01</serialNumber>
+    <signature type="SEQUENCE">
+      <algorithm type="OBJECT ID">1.2.840.113549.1.1.4</algorithm>
+      <parameters type="ANY">
+        <md5WithRSAEncryption encoding="HEX">0500</md5WithRSAEncryption>
+      </parameters>
+    </signature>
+    <issuer type="CHOICE">
+      <rdnSequence type="SEQUENCE OF">
+        <unnamed1 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.6</type>
+            <value type="ANY">
+              <X520countryName>GR</X520countryName>
+            </value>
+          </unnamed1>
+        </unnamed1>
+        <unnamed2 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.8</type>
+            <value type="ANY">
+              <X520StateOrProvinceName>Attiki</X520StateOrProvinceName>
+            </value>
+          </unnamed1>
+        </unnamed2>
+        <unnamed3 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.7</type>
+            <value type="ANY">
+              <X520LocalityName>Athina</X520LocalityName>
+            </value>
+          </unnamed1>
+        </unnamed3>
+        <unnamed4 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.10</type>
+            <value type="ANY">
+              <X520OrganizationName>GNUTLS</X520OrganizationName>
+            </value>
+          </unnamed1>
+        </unnamed4>
+        <unnamed5 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.11</type>
+            <value type="ANY">
+              <X520OrganizationalUnitName>GNUTLS dev.</X520OrganizationalUnitName>
+            </value>
+          </unnamed1>
+        </unnamed5>
+        <unnamed6 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.3</type>
+            <value type="ANY">
+              <X520CommonName>GNUTLS TEST CA</X520CommonName>
+            </value>
+          </unnamed1>
+        </unnamed6>
+        <unnamed7 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">1.2.840.113549.1.9.1</type>
+            <value type="ANY">
+              <Pkcs9email>gnutls-dev@@gnupg.org</Pkcs9email>
+            </value>
+          </unnamed1>
+        </unnamed7>
+      </rdnSequence>
+    </issuer>
+    <validity type="SEQUENCE">
+      <notBefore type="CHOICE">
+        <utcTime type="TIME">010707101845Z</utcTime>
+      </notBefore>
+      <notAfter type="CHOICE">
+        <utcTime type="TIME">020707101845Z</utcTime>
+      </notAfter>
+    </validity>
+    <subject type="CHOICE">
+      <rdnSequence type="SEQUENCE OF">
+        <unnamed1 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.6</type>
+            <value type="ANY">
+              <X520countryName>GR</X520countryName>
+            </value>
+          </unnamed1>
+        </unnamed1>
+        <unnamed2 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.8</type>
+            <value type="ANY">
+              <X520StateOrProvinceName>Attiki</X520StateOrProvinceName>
+            </value>
+          </unnamed1>
+        </unnamed2>
+        <unnamed3 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.7</type>
+            <value type="ANY">
+              <X520LocalityName>Athina</X520LocalityName>
+            </value>
+          </unnamed1>
+        </unnamed3>
+        <unnamed4 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.10</type>
+            <value type="ANY">
+              <X520OrganizationName>GNUTLS</X520OrganizationName>
+            </value>
+          </unnamed1>
+        </unnamed4>
+        <unnamed5 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.11</type>
+            <value type="ANY">
+              <X520OrganizationalUnitName>GNUTLS dev.</X520OrganizationalUnitName>
+            </value>
+          </unnamed1>
+        </unnamed5>
+        <unnamed6 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">2.5.4.3</type>
+            <value type="ANY">
+              <X520CommonName>localhost</X520CommonName>
+            </value>
+          </unnamed1>
+        </unnamed6>
+        <unnamed7 type="SET OF">
+          <unnamed1 type="SEQUENCE">
+            <type type="OBJECT ID">1.2.840.113549.1.9.1</type>
+            <value type="ANY">
+              <Pkcs9email>root@@localhost</Pkcs9email>
+            </value>
+          </unnamed1>
+        </unnamed7>
+      </rdnSequence>
+    </subject>
+    <subjectPublicKeyInfo type="SEQUENCE">
+      <algorithm type="SEQUENCE">
+        <algorithm type="OBJECT ID">1.2.840.113549.1.1.1</algorithm>
+        <parameters type="ANY">
+          <rsaEncryption encoding="HEX">0500</rsaEncryption>
+        </parameters>
+      </algorithm>
+      <subjectPublicKey type="BIT STRING" encoding="HEX" length="1120">30818902818100D00B49EBB226D951F5CC57072199DDF287683D2DA1A0EFCC96BFF73164777C78C3991E92EDA66584E7B97BAB4BE68D595D225557E01E7E57B5C35C04B491948C5C427AD588D8C6989764996D6D44E17B65CCFC86F3B4842DE559B730C1DE3AEF1CE1A328AFF8A357EBA911E1F7E8FC1598E21E4BF721748C587F50CF46157D950203010001</subjectPublicKey>
+    </subjectPublicKeyInfo>
+    <extensions type="SEQUENCE OF">
+      <unnamed1 type="SEQUENCE">
+        <extnID type="OBJECT ID">2.5.29.35</extnID>
+        <critical type="BOOLEAN">FALSE</critical>
+        <extnValue type="SEQUENCE">
+          <keyIdentifier type="OCTET STRING" encoding="HEX">EFEE94ABC8CA577F5313DB76DC1A950093BAF3C9</keyIdentifier>
+        </extnValue>
+      </unnamed1>
+      <unnamed2 type="SEQUENCE">
+        <extnID type="OBJECT ID">2.5.29.37</extnID>
+        <critical type="BOOLEAN">FALSE</critical>
+        <extnValue type="SEQUENCE OF">
+          <unnamed1 type="OBJECT ID">1.3.6.1.5.5.7.3.1</unnamed1>
+          <unnamed2 type="OBJECT ID">1.3.6.1.5.5.7.3.2</unnamed2>
+          <unnamed3 type="OBJECT ID">1.3.6.1.4.1.311.10.3.3</unnamed3>
+          <unnamed4 type="OBJECT ID">2.16.840.1.113730.4.1</unnamed4>
+        </extnValue>
+      </unnamed2>
+      <unnamed3 type="SEQUENCE">
+        <extnID type="OBJECT ID">2.5.29.19</extnID>
+        <critical type="BOOLEAN">TRUE</critical>
+        <extnValue type="SEQUENCE">
+          <cA type="BOOLEAN">FALSE</cA>
+        </extnValue>
+      </unnamed3>
+    </extensions>
+  </tbsCertificate>
+  <signatureAlgorithm type="SEQUENCE">
+    <algorithm type="OBJECT ID">1.2.840.113549.1.1.4</algorithm>
+    <parameters type="ANY">
+      <md5WithRSAEncryption encoding="HEX">0500</md5WithRSAEncryption>
+    </parameters>
+  </signatureAlgorithm>
+  <signature type="BIT STRING" encoding="HEX" length="1024">B73945273AF2A395EC54BF5DC669D953885A9D811A3B92909D24792D36A44EC27E1C463AF8738BEFD29B311CCE8C6D9661BEC30911DAABB39B8813382B32D2E259581EBCD26C495C083984763966FF35D1DEFE432891E610C85072578DA7423244A8F5997B41A1F44E61F4F22C94375775055A5E72F25D5E4557467A91BD4251</signature>
+ </certificate>
+</gnutls:x509:certificate>
+@end smallexample
+
+@section An OpenPGP key
+
+@smallexample
+<?xml version="1.0"?>
+
+<gnutls:openpgp:key version="1.0">
+ <OPENPGPKEY>
+  <MAINKEY>
+    <KEYID>BD572CDCCCC07C3</KEYID>
+    <FINGERPRINT>BE615E88D6CFF27225B8A2E7BD572CDCCCC07C35</FINGERPRINT>
+    <PKALGO>DSA</PKALGO>
+    <KEYLEN>1024</KEYLEN>
+    <CREATED>1011533164</CREATED>
+    <REVOKED>0</REVOKED>
+    <KEY ENCODING="HEX"/>
+    <DSA-P>0400E72E76B62EEFA9A3BD594093292418050C02D7029D6CA2066EFC34C86038627C643EB1A652A7AF1D37CF46FC505AC1E0C699B37895B4BCB3E53541FFDA4766D6168C2B8AAFD6AB22466D06D18034D5DAC698E6993BA5B350FF822E1CD8702A75114E8B73A6B09CB3B93CE44DBB516C9BB5F95BB666188602A0A1447236C0658F</DSA-P>
+    <DSA-Q>00A08F5B5E78D85F792CC2072F9474645726FB4D9373</DSA-Q>
+    <DSA-G>03FE3578D689D6606E9118E9F9A7042B963CF23F3D8F1377A273C0F0974DBF44B3CABCBE14DD64412555863E39A9C627662D77AC36662AE449792C3262D3F12E9832A7565309D67BA0AE4DF25F5EDA0937056AD5BE89F4069EBD7EC76CE432441DF5D52FFFD06D39E5F61E36947B698A77CB62AB81E4A4122BF9050671D9946C865E</DSA-G>
+    <DSA-Y>0400D061437A964DDE318818C2B24DE008E60096B60DB8A684B85A838D119FC930311889AD57A3B927F448F84EB253C623EDA73B42FF78BCE63A6A531D75A64CE8540513808E9F5B10CE075D3417B801164918B131D3544C8765A8ECB9971F61A09FC73D509806106B5977D211CB0E1D04D0ED96BCE89BAE8F73D800B052139CBF8D</DSA-Y>
+  </MAINKEY>
+  <USERID>
+    <NAME>OpenCDK test key (Only intended for test purposes!)</NAME>
+    <EMAIL>opencdk@@foo-bar.org</EMAIL>
+    <PRIMARY>0</PRIMARY>
+    <REVOKED>0</REVOKED>
+  </USERID>
+  <SIGNATURE>
+    <VERSION>4</VERSION>
+    <SIGCLASS>19</SIGCLASS>
+    <EXPIRED>0</EXPIRED>
+    <PKALGO>DSA</PKALGO>
+    <MDALGO>SHA1</MDALGO>
+    <CREATED>1011533164</CREATED>
+    <KEYID>BD572CDCCCC07C3</KEYID>
+  </SIGNATURE>
+  <SUBKEY>
+    <KEYID>FCB0CF3A5261E06</KEYID>
+    <FINGERPRINT>297B48ACC09C0FF683CA1ED1FCB0CF3A5261E067</FINGERPRINT>
+    <PKALGO>ELG</PKALGO>
+    <KEYLEN>1024</KEYLEN>
+    <CREATED>1011533167</CREATED>
+    <REVOKED>0</REVOKED>
+    <KEY ENCODING="HEX"/>
+    <ELG-P>0400E20156526069D067D24F4D71E6D38658E08BE3BF246C1ADCE08DB69CD8D459C1ED335738410798755AFDB79F1797CF022E70C7960F12CA6896D27CFD24A11CD316DDE1FBCC1EA615C5C31FEC656E467078C875FC509B1ECB99C8B56C2D875C50E2018B5B0FA378606EB6425A2533830F55FD21D649015615D49A1D09E9510F5F</ELG-P>
+    <ELG-G>000305</ELG-G>
+    <ELG-Y>0400D0BDADE40432758675C87D0730C360981467BAE1BEB6CC105A3C1F366BFDBEA12E378456513238B8AD414E52A2A9661D1DF1DB6BB5F33F6906166107556C813224330B30932DB7C8CC8225672D7AE24AF2469750E539B661EA6475D2E03CD8D3838DC4A8AC4AFD213536FE3E96EC9D0AEA65164B576E01B37A8DCA89F2B257D0</ELG-Y>
+  </SUBKEY>
+  <SIGNATURE>
+    <VERSION>4</VERSION>
+    <SIGCLASS>24</SIGCLASS>
+    <EXPIRED>0</EXPIRED>
+    <PKALGO>DSA</PKALGO>
+    <MDALGO>SHA1</MDALGO>
+    <CREATED>1011533167</CREATED>
+    <KEYID>BD572CDCCCC07C3</KEYID>
+  </SIGNATURE>
+ </OPENPGPKEY>
+</gnutls:openpgp:key>
+@end smallexample
+
 @include error_codes.texi
+
+@chapter All the supported ciphersuites in @acronym{GnuTLS}
+@cindex Ciphersuites
+
+@itemize
+
+@item @code{TLS_RSA_NULL_MD5} (0x00 0x01):
+RFC 2246
+
+@item @code{TLS_ANON_DH_3DES_EDE_CBC_SHA} (0x00 0x1B):
+RFC 2246
+
+@item @code{TLS_ANON_DH_ARCFOUR_MD5} (0x00 0x18):
+RFC 2246
+
+@item @code{TLS_ANON_DH_AES_128_CBC_SHA} (0x00 0x34):
+RFC 2246
+
+@item @code{TLS_ANON_DH_AES_256_CBC_SHA} (0x00 0x3A):
+RFC 2246
+
+@item @code{TLS_RSA_ARCFOUR_SHA} (0x00 0x05):
+RFC 2246
+
+@item @code{TLS_RSA_ARCFOUR_MD5} (0x00 0x04):
+RFC 2246
+
+@item @code{TLS_RSA_3DES_EDE_CBC_SHA} (0x00 0x0A):
+RFC 2246
+
+@item @code{TLS_RSA_EXPORT_ARCFOUR_40_MD5} (0x00 0x03):
+RFC 2246
+
+@item @code{TLS_DHE_DSS_3DES_EDE_CBC_SHA} (0x00 0x13):
+RFC 2246
+
+@item @code{TLS_DHE_RSA_3DES_EDE_CBC_SHA} (0x00 0x16):
+RFC 2246
+
+@item @code{TLS_RSA_AES_128_CBC_SHA} (0x00 0x2F):
+RFC 3268
+
+@item @code{TLS_RSA_AES_128_CBC_SHA} (0x00 0x35):
+RFC 3268
+
+@item @code{TLS_DHE_DSS_AES_256_CBC_SHA} (0x00 0x38):
+RFC 3268
+
+@item @code{TLS_DHE_DSS_AES_128_CBC_SHA} (0x00 0x32):
+RFC 3268
+
+@item @code{TLS_DHE_RSA_AES_256_CBC_SHA} (0x00 0x39):
+RFC 3268
+
+@item @code{TLS_DHE_RSA_AES_128_CBC_SHA} (0x00 0x33):
+RFC 3268
+
+@item @code{TLS_SRP_SHA_3DES_EDE_CBC_SHA} (0x00 0x50):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_AES_128_CBC_SHA} (0x00 0x53):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_AES_256_CBC_SHA} (0x00 0x56):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_RSA_3DES_EDE_CBC_SHA} (0x00 0x51):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_DSS_3DES_EDE_CBC_SHA} (0x00 0x52):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_RSA_AES_128_CBC_SHA} (0x00 0x54):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_DSS_AES_128_CBC_SHA} (0x00 0x55):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_RSA_AES_256_CBC_SHA} (0x00 0x57):
+draft-ietf-tls-srp
+
+@item @code{TLS_SRP_SHA_DSS_AES_256_CBC_SHA} (0x00 0x58):
+draft-ietf-tls-srp
+
+@item @code{TLS_DHE_DSS_3DES_EDE_CBC_RMD} (0x00 0x72):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_DHE_RSA_3DES_EDE_CBC_RMD} (0x00 0x77):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_DHE_DSS_AES_256_CBC_RMD} (0x00 0x73):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_DHE_DSS_AES_128_CBC_RMD} (0x00 0x74):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_DHE_RSA_AES_128_CBC_RMD} (0x00 0x78):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_DHE_RSA_AES_256_CBC_RMD} (0x00 0x79):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_RSA_3DES_EDE_CBC_RMD} (0x00 0x7C):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_RSA_AES_128_CBC_RMD} (0x00 0x7D):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_RSA_AES_256_CBC_RMD} (0x00 0x7E):
+draft-ietf-tls-openpgp-keys
+
+@item @code{TLS_DHE_DSS_ARCFOUR_SHA} (0x00 0x66):
+draft-ietf-tls-56-bit-ciphersuites
+
+@end itemize
 
 @node Copying This Manual
 @appendix Copying This Manual
