@@ -7,6 +7,7 @@ Version 1.1.12
 - Added some default limits in the verification of certificate
   chains, to avoid denial of service attacks. Also added 
   gnutls_certificate_set_verify_limits() to override them.
+- Added gnutls_certificate_verify_peers2().
 
 Version 1.1.11 (16/07/2004)
 - Added the '_t' suffix to all exported symbols.
