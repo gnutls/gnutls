@@ -1381,7 +1381,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 
 	datalen += sizeof(uint16) + cipher_num;
 
-	if (datalen > ret_data_size) {
+	if ((size_t)datalen > ret_data_size) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -1422,7 +1422,7 @@ static int _gnutls_copy_comp_methods(gnutls_session session,
 	datalen = pos = 0;
 	datalen += comp_num + 1;
 
-	if (datalen > ret_data_size) {
+	if ((size_t)datalen > ret_data_size) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}

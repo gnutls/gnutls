@@ -183,7 +183,7 @@ GNUTLS_MAC_MD5, GNUTLS_MAC_SHA, GNUTLS_MAC_RMD160
 } gnutls_mac_algorithm;
 typedef gnutls_mac_algorithm gnutls_digest_algorithm;
 
-typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB,
+typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, GNUTLS_COMP_DEFLATE,
 	GNUTLS_COMP_LZO
 } gnutls_compression_method;
 

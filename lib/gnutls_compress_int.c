@@ -57,7 +57,7 @@ int err;
 
 	switch( method) {
 #ifdef HAVE_LIBZ
-	    case GNUTLS_COMP_ZLIB: {
+	    case GNUTLS_COMP_DEFLATE: {
 		int window_bits, mem_level;
 		int comp_level;
 		z_stream* zhandle;
@@ -120,7 +120,7 @@ int err;
 			/* case GNUTLS_COMP_LZO:
 				break; */
 #ifdef HAVE_LIBZ
-			case GNUTLS_COMP_ZLIB:
+			case GNUTLS_COMP_DEFLATE:
 				if (d)
 					err = inflateEnd( handle->handle);
 				else
@@ -174,7 +174,7 @@ int err;
 			break;
 		}		
 #ifdef HAVE_LIBZ
-		case GNUTLS_COMP_ZLIB: {
+		case GNUTLS_COMP_DEFLATE: {
 			uLongf size;
 			z_stream *zhandle;
 			
@@ -274,7 +274,7 @@ int cur_pos;
 		}
 
 #ifdef HAVE_LIBZ
-		case GNUTLS_COMP_ZLIB: {
+		case GNUTLS_COMP_DEFLATE: {
 			uLongf out_size;
 			z_stream* zhandle;
 
