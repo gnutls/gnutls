@@ -582,8 +582,7 @@ libextra/openpgp/Makefile libextra/opencdk/Makefile \
 lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
-doc/scripts/Makefile doc/examples/Makefile \
-lib/minitasn1/Makefile lib/x509/Makefile \
+doc/scripts/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile \
 tests/Makefile])
 
