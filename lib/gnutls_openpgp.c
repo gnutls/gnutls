@@ -1627,6 +1627,13 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
   return;
 }
 
+void
+gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
+                                       char* trustdb)
+{
+  return;
+}     
+
 #endif /* HAVE_LIBOPENCDK */
 
 
