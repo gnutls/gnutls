@@ -179,3 +179,24 @@ int _gnutls_string_append_data( gnutls_string* dest, const void * data, size_t d
 		return tot_len;
 	}
 }
+
+/* Converts the given string (old) to hex. A buffer must be provided
+ * to hold the new hex string. The new string will be null terminated.
+ * If the buffer does not have enough space to hold the string retuns
+ * NULL.
+ */
+char *_gnutls_bin2hex(const opaque *old, size_t oldlen,
+	char *buffer, size_t buffer_size)
+{
+	unsigned int i, j;
+
+	if ((oldlen * 2) + 1 > buffer_size) return NULL;
+
+	for (i = j = 0; i < oldlen; j+=2) {
+		sprintf(&buffer[j], "%.2x", old[i]);
+		i++;
+	}
+	buffer[j] = '\0';
+
+	return buffer;
+}

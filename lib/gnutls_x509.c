@@ -54,25 +54,28 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 typedef struct _oid2string {
 	const char * OID;
 	const char * DESC;
+	const char * ldap_desc;
 	int choice;
 	int printable;
 } oid2string;
 
 static const oid2string OID2STR[] = {
-	{"2 5 4 6", "X520countryName", 0, 1},
-	{"2 5 4 10", "X520OrganizationName", 1, 1},
-	{"2 5 4 11", "X520OrganizationalUnitName", 1, 1},
-	{"2 5 4 3", "X520CommonName", 1, 1},
-	{"2 5 4 7", "X520LocalityName", 1, 1},
-	{"2 5 4 8", "X520StateOrProvinceName", 1, 1},
-	{"1 2 840 113549 1 9 1", "Pkcs9email", 0, 1},
-	{"1 2 840 113549 1 1 1", "rsaEncryption", 0, 0},
-	{"1 2 840 113549 1 1 2", "md2WithRSAEncryption", 0, 0},
-	{"1 2 840 113549 1 1 4", "md5WithRSAEncryption", 0, 0},
-	{"1 2 840 113549 1 1 5", "sha1WithRSAEncryption", 0, 0},
-	{"1 2 840 10040 4 3", "id-dsa-with-sha1", 0, 0},
-	{"1 2 840 10040 4 1", "id-dsa", 0, 0},
-	{NULL, NULL, 0, 0}
+	{"2 5 4 6", "X520countryName", "C", 0, 1},
+	{"2 5 4 10", "X520OrganizationName", "O", 1, 1},
+	{"2 5 4 11", "X520OrganizationalUnitName", "OU", 1, 1},
+	{"2 5 4 3", "X520CommonName", "CN", 1, 1},
+	{"2 5 4 7", "X520LocalityName", "L", 1, 1},
+	{"2 5 4 8", "X520StateOrProvinceName", "ST", 1, 1},
+	{"0 9 2342 19200300 100 1 25", "dc", "DC", 1, 1}, /* FIXME: CHOICE? */
+	{"0 9 2342 19200300 100 1 1", "uid", "UID", 1, 1}, /* FIXME: CHOICE? */
+	{"1 2 840 113549 1 9 1", "Pkcs9email", NULL, 0, 1},
+	{"1 2 840 113549 1 1 1", "rsaEncryption", NULL, 0, 0},
+	{"1 2 840 113549 1 1 2", "md2WithRSAEncryption", NULL, 0, 0},
+	{"1 2 840 113549 1 1 4", "md5WithRSAEncryption", NULL, 0, 0},
+	{"1 2 840 113549 1 1 5", "sha1WithRSAEncryption", NULL, 0, 0},
+	{"1 2 840 10040 4 3", "id-dsa-with-sha1", NULL, 0, 0},
+	{"1 2 840 10040 4 1", "id-dsa", NULL, 0, 0},
+	{NULL, NULL, NULL, 0, 0}
 };
 
 /* Returns 1 if the data defined by the OID are printable.
@@ -116,8 +119,20 @@ int i = 0;
 	return NULL;
 }
 
+const char* _gnutls_x509_oid2ldap_string( const char* OID) {
+int i = 0;
+
+	do {
+		if ( strcmp(OID2STR[i].OID, OID)==0)
+			return OID2STR[i].ldap_desc;
+		i++;
+	} while( OID2STR[i].OID != NULL);
+
+	return NULL;
+}
+
 /* This function will convert an attribute value, specified by the OID,
- * to a string.
+ * to a string. The result will be a null terminated string.
  */
 int _gnutls_x509_oid_data2string( const char* OID, void* value, 
 	int value_size, char * res, int res_size) {

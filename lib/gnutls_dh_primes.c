@@ -275,10 +275,14 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
 	_gnutls_mpi_print(prime->data, &siz, tmp_prime);
 
 #ifdef DEBUG
-	_gnutls_log
-	    ("dh_params_generate: Generated %d bits prime %s, generator %s.\n",
-	     bits, _gnutls_bin2hex(prime->data, prime->size),
-	     _gnutls_bin2hex(generator->data, generator->size));
+	{
+		opaque buffer[128];
+
+		_gnutls_log
+		    ("dh_params_generate: Generated %d bits prime %s, generator %s.\n",
+	     	bits, _gnutls_bin2hex(prime->data, prime->size, buffer, sizeof(buffer)),
+	     	_gnutls_bin2hex(generator->data, generator->size, buffer, sizeof(buffer)));
+	}
 #endif
 
 	return 0;
@@ -323,14 +327,10 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 						params->data, params->size,
 						&out);
 
-		if (result < 0) {
+		if (result <= 0) {
+			if (result==0) result = GNUTLS_E_INTERNAL_ERROR;
 			gnutls_assert();
 			return result;
-		}
-
-		if (result == 0) {	/* oooops */
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		_params.data = out;

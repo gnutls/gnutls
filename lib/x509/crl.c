@@ -24,6 +24,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
+#include <x509_b64.h>
 #include <crl.h>
 #include <dn.h>
 
@@ -61,20 +62,46 @@ void gnutls_x509_crl_deinit(gnutls_crl crl)
 }
 
 /**
-  * gnutls_x509_crl_import_der - This function will import a DER encoded CRL
+  * gnutls_x509_crl_import - This function will import a DER or PEM encoded CRL
   * @crl: The structure to store the parsed CRL.
-  * @der: The DER encoded CRL.
+  * @data: The DER or PEM encoded CRL.
+  * @format: One of DER or PEM
   *
-  * This function will convert the given DER encoded CRL
+  * This function will convert the given DER or PEM encoded CRL
   * to the native gnutls_crl format. The output will be stored in 'crl'.
+  *
+  * If the CRL is PEM encoded it should have a header of "X509 CRL", and
+  * it must be a null terminated string.
   *
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_import_der(const gnutls_datum * der, gnutls_crl crl)
+int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data,
+	gnutls_x509_certificate_format format)
 {
-	int result = 0;
+	int result = 0, need_free = 0;
 	int start, end;
+	gnutls_datum _data = { data->data, data->size };
+
+	/* If the CRL is in PEM format then decode it
+	 */
+	if (format == GNUTLS_X509_FMT_PEM) {
+		opaque *out;
+		
+		result = _gnutls_fbase64_decode("X509 CRL", data->data, data->size,
+			&out);
+
+		if (result <= 0) {
+			if (result==0) result = GNUTLS_E_INTERNAL_ERROR;
+			gnutls_assert();
+			return result;
+		}
+		
+		_data.data = out;
+		_data.size = result;
+		
+		need_free = 1;
+	}
 
 	crl->crl = ASN1_TYPE_EMPTY;
 
@@ -86,7 +113,7 @@ int gnutls_x509_crl_import_der(const gnutls_datum * der, gnutls_crl crl)
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&crl->crl, der->data, der->size, NULL);
+	result = asn1_der_decoding(&crl->crl, _data.data, _data.size, NULL);
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
 		gnutls_assert();
@@ -95,7 +122,7 @@ int gnutls_x509_crl_import_der(const gnutls_datum * der, gnutls_crl crl)
 
 	/* Get the signed data
 	 */
-	result = asn1_der_decoding_startEnd(crl->crl, der->data, der->size,
+	result = asn1_der_decoding_startEnd(crl->crl, _data.data, _data.size,
 					    "crl2.tbsCertList", &start,
 					    &end);
 	if (result != ASN1_SUCCESS) {
@@ -106,37 +133,41 @@ int gnutls_x509_crl_import_der(const gnutls_datum * der, gnutls_crl crl)
 
 
 	result =
-	    _gnutls_set_datum(&crl->signed_data, &der->data[start],
+	    _gnutls_set_datum(&crl->signed_data, &_data.data[start],
 			      end - start + 1);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;
 	}
 
+	if (need_free) _gnutls_free_datum( &_data);
+
 	return 0;
 
       cleanup:
 	asn1_delete_structure(&crl->crl);
 	_gnutls_free_datum(&crl->signed_data);
+	if (need_free) _gnutls_free_datum( &_data);
 	return result;
 }
 
 
 /**
-  * gnutls_x509_crl_get_issuer_dn_string - This function returns the CRL's issuer distinguished name
+  * gnutls_x509_crl_get_issuer_dn - This function returns the CRL's issuer distinguished name
   * @crl: should contain a gnutls_crl structure
   * @buf: a pointer to a structure to hold the peer's name
-  * @sizeof_buf: holds the size of 'buf'
+  * @sizeof_buf: initialy holds the size of 'buf'
   *
   * This function will copy the name of the CRL issuer in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
-  * and 0 on success.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_buf will be updated with the required size.
+  * On success zero is returned.
   *
   **/
-int gnutls_x509_crl_get_issuer_dn_string(const gnutls_crl crl, char *buf,
-					 unsigned int sizeof_buf)
+int gnutls_x509_crl_get_issuer_dn(gnutls_crl crl, char *buf,
+					 int *sizeof_buf)
 {
 	if (buf == NULL || sizeof_buf == 0 || crl == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -146,4 +177,23 @@ int gnutls_x509_crl_get_issuer_dn_string(const gnutls_crl crl, char *buf,
 		buf, sizeof_buf);
 
 		
+}
+
+/**
+  * gnutls_x509_crl_get_signed_data - This function returns the CRL's signed portion
+  * @crl: should contain a gnutls_crl structure
+  * @data: a datum which points to the signed data
+  *
+  * This function will return a datum that points on the CRL signed portion.
+  * The output on data should be treated as constant and must not be freed.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crl_get_signed_data(gnutls_crl crl, gnutls_datum *data)
+{
+	data->data = crl->signed_data.data;
+	data->size = crl->signed_data.size;
+
+	return 0;
 }

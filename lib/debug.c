@@ -36,25 +36,6 @@ void _gnutls_dump_mpi(char* prefix, GNUTLS_MPI a)
 	_gnutls_debug_log( "GNUTLS_MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
 }
 
-
-char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
-{
-	unsigned char *new = NULL;
-	int i, j;
-
-	new = calloc(1, oldlen * 2 * sizeof(char) + 1);
-	if (!new)
-		return (new);
-
-	for (i = j = 0; i < oldlen; j+=2) {
-		sprintf(&new[j], "%.2x", old[i]); /* Flawfinder: ignore */
-		i++;
-	}
-	new[j] = '\0';
-
-	return (new);
-}
-
 void _gnutls_print_state(gnutls_session session)
 {
 

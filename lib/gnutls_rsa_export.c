@@ -432,9 +432,13 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	FREE_ALL_MPIS;
 
 #ifdef DEBUG
+	{
+	opaque buffer[128];
+
 	_gnutls_log("rsa_params_generate: Generated %d bits modulus %s, exponent %s.\n",
-		    bits, _gnutls_bin2hex(m->data, m->size),
-		    _gnutls_bin2hex( e->data, e->size));
+		    bits, _gnutls_bin2hex(m->data, m->size, buffer, sizeof(buffer)),
+		    _gnutls_bin2hex( e->data, e->size, buffer, sizeof(buffer)));
+	}
 #endif
 
 	return 0;

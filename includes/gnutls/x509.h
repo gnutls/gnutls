@@ -38,10 +38,13 @@ typedef struct gnutls_crl_int* gnutls_crl;
 int gnutls_x509_crl_init(gnutls_crl * crl);
 void gnutls_x509_crl_deinit(gnutls_crl crl);
 
-int gnutls_x509_crl_import_der(const gnutls_datum * der, gnutls_crl crl);
+int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data, 
+	gnutls_x509_certificate_format format);
 
-int gnutls_x509_crl_get_issuer_dn_string(const gnutls_crl crl, 
-	char *buf, unsigned int sizeof_buf);
+int gnutls_x509_crl_get_issuer_dn(const gnutls_crl crl, 
+	char *buf, int *sizeof_buf);
+int gnutls_x509_crl_get_signed_data(gnutls_crl crl, gnutls_datum *data);
+
 
 #ifdef __cplusplus
 }

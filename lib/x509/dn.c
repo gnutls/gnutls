@@ -29,26 +29,6 @@
 #include <gnutls_num.h>
 #include <dn.h>
 
-typedef struct _oid2ldap_str {
-	const char *oid;
-	const char *desc;
-} oid2ldap_str;
-
-
-static const oid2ldap_str OID2STR[] = {
-	{"2 5 4 6", "C"},
-	{"2 5 4 10", "O"},
-	{"2 5 4 11", "OU"},
-	{"2 5 4 3", "CN"},
-	{"2 5 4 7", "L"},
-	{"2 5 4 8", "ST"},
-	{"2 5 4 9", "STREET"},
-	{"1 2 840 113549 1 9 1", "1.2.840.113549.1.9.1"},
-	{"0 9 2342 19200300 100 1 25", "DC"},
-	{"0 9 2342 19200300 100 1 1", "UID"},
-	{NULL, NULL}
-};
-
 /* converts all spaces to dots. Used to convert the
  * OIDs returned by libtasn1 to the dotted OID format.
  */
@@ -64,25 +44,22 @@ static void dot_spaces(char *str)
 }
 
 /* Converts the given OID to an ldap acceptable string or
- * a dotted OID. Printable will be zero if the OID does not
- * contain printable stuff.
+ * a dotted OID. 
  */
-static const char *oid2ldap_string(char *oid, int *printable)
+static const char *oid2ldap_string(char *oid)
 {
-	int i = 0;
+	const char* ret;
 
-	*printable = 1;
-	do {
-		if (strcmp(OID2STR[i].oid, oid) == 0)
-			return OID2STR[i].desc;
-		i++;
-	} while (OID2STR[i].oid != NULL);
+	ret =  _gnutls_x509_oid2ldap_string( oid);
+	if (ret) return ret;
 
-	*printable = 0;
+	/* else return the OID in dotted format */
 	dot_spaces(oid);
 	return oid;
 }
 
+/* Escapes a string following the rules from RFC2253.
+ */
 static char *str_escape(char *str, char *buffer, unsigned int buffer_size)
 {
 	int str_length, j, i;
@@ -115,7 +92,7 @@ static char *str_escape(char *str, char *buffer, unsigned int buffer_size)
  */
 int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			  const char *asn1_rdn_name, char *buf,
-			  unsigned int sizeof_buf)
+			  int *sizeof_buf)
 {
 	gnutls_string out_str;
 	int k2, k1, result;
@@ -125,12 +102,12 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	char counter[MAX_INT_DIGITS];
 	char value[200];
 	char escaped[256];
-	const char *_oid;
+	const char *ldap_desc;
 	char oid[128];
 	int first = 0;
 	int len, printable;
 
-	if (buf == NULL || sizeof_buf == 0) {
+	if (buf == NULL || *sizeof_buf == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -157,10 +134,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		    asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
 
 		if (result == ASN1_ELEMENT_NOT_FOUND) {
-			gnutls_assert();
 			break;
-			result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-			goto cleanup;
 		}
 
 		if (result != ASN1_VALUE_NOT_FOUND) {
@@ -237,7 +211,6 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 				goto cleanup;
 			}
 
-			value[len] = 0;
 
 #define STR_APPEND(y) if ((result=_gnutls_string_append_str( &out_str, y)) < 0) { \
 	gnutls_assert(); \
@@ -248,26 +221,41 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 				STR_APPEND(",");
 			}
 
-			_oid = oid2ldap_string(oid, &printable);
+			ldap_desc = oid2ldap_string(oid);
+			printable = _gnutls_x509_oid_data_printable(oid);
 
-			if (printable) {
-				if (first != 0) {
-					STR_APPEND(",");
-				}
-				STR_APPEND(_oid);
-				STR_APPEND("=");
-				STR_APPEND(str_escape(value, escaped, sizeof(escaped)));	/* value */
-				first = 1;
+			if (first != 0) {
+				STR_APPEND(",");
 			}
+			first = 1;
 
-			/* FIXME: we do not print non printable stuff 
-			 */
+			if (printable==1) {
+				char string[256];
+				
+				STR_APPEND(ldap_desc);
+				STR_APPEND("=");
+				if ( (result=_gnutls_x509_oid_data2string( oid, value, len, string, sizeof(string))) < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
+				STR_APPEND(str_escape(string, escaped, sizeof(escaped)));
+			} else {
+				char * res;
+				
+				res = _gnutls_bin2hex( value, len, escaped, sizeof(escaped));
+				if (res) {
+					STR_APPEND(ldap_desc);
+					STR_APPEND("=#");
+					STR_APPEND( res);
+				}
+			}
 		} while (1);
 
 	} while (1);
 
-	if (out_str.length >= sizeof_buf) {
+	if (out_str.length >= *sizeof_buf) {
 		gnutls_assert();
+		*sizeof_buf = out_str.length;
 		result = GNUTLS_E_SHORT_MEMORY_BUFFER;
 		goto cleanup;
 	}
