@@ -1,5 +1,4 @@
-\chapter{ASN.1 Structure Handling}
-
+\chapter{ASN.1 structure handling}
 
 \section{Introduction}
  This file describes the forth version of ASN.1 parser I
@@ -18,7 +17,7 @@ Other differences are:
 \end{itemize}
 
 
-\section{ASN.1 Syntax}
+\section{ASN.1 syntax}
 The parser is case sensitive. The comments begin with "-- " and end at the end of line.
 An example is in "Certificate.txt" file.
 The ASN.1 declarations must have this form:
@@ -98,7 +97,7 @@ These strings are used in functions that are described below.
 Elements of structured types that don't have a name, receve the name "?1","?2", and so on. 
 The name "?LAST" indicates the last element of a SET\_OF or SEQUENCE\_OF.
 
-\section{Future Developments}
+\section{Future developments}
 \begin{enumerate}
 \item type REAL 
 \item improve the error signaling with strings that give you more details. 
@@ -107,8 +106,6 @@ The name "?LAST" indicates the last element of a SET\_OF or SEQUENCE\_OF.
              name of the element without the value.
 \item improve the 'visit\_tree' function and change the output from stdout to a null terminated 
    string.  
-
-\input{asn1-api}
 
 \end{enumerate}
 

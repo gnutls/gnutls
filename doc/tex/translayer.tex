@@ -1,12 +1,13 @@
 \section{The transport layer}
 \par
-\gnutls{} can be used above any reliable transport layer. To do this you will only 
-need to set up the functions:
+\gnutls{} can be used above any reliable transport layer. You may need to
+use the functions:
 \begin{itemize}
 \item \printfunc{gnutls_transport_set_push_func}{gnutls\_transport\_set\_push\_func()}
 \item \printfunc{gnutls_transport_set_pull_func}{gnutls\_transport\_set\_pull\_func()}
 \end{itemize}
-The given functions will then be used by gnutls to send and receive data.
+These functions accept a functions as a parameter. The given functions will 
+be used by gnutls to send and receive data.
 These functions should return -1 on error and should set errno appropriately.
 \gnutls{} supports EINTR and EAGAIN errno values. These values are
 usually used in non blocking IO and interrupted system calls.
