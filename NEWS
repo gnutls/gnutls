@@ -4,6 +4,7 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
 * Version 1.2.0
+- Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
 
 * Version 1.1.23 (2005-01-18)
 - It is now possible to generate PKCS#12 structures without private
