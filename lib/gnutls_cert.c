@@ -516,40 +516,10 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 		return ret;
 	}
 	
-	memset(gcert, 0, sizeof(gnutls_cert));
-	gcert->cert_type = GNUTLS_CRT_X509;
-
-	if ( !(flags & CERT_NO_COPY)) {
-		if (_gnutls_set_datum(&gcert->raw, derCert->data, derCert->size) < 0) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit( cert);
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-	} else
-		/* now we have 0 or a bitwise or of things to decode */
-		flags ^= CERT_NO_COPY;
-
-
-	if (flags & CERT_ONLY_EXTENSIONS || flags == 0) {
-		gnutls_x509_crt_get_key_usage( cert, &gcert->keyUsage, NULL);
-		gcert->version = gnutls_x509_crt_get_version( cert);
-	}
-	gcert->subject_pk_algorithm = gnutls_x509_crt_get_pk_algorithm( cert, NULL);
-
-	if (flags & CERT_ONLY_PUBKEY || flags == 0) {
-		gcert->params_size = MAX_PUBLIC_PARAMS_SIZE;
-		ret = _gnutls_x509_crt_get_mpis( cert, gcert->params, &gcert->params_size);
-		if (ret < 0) {
-			gnutls_assert();
-			gnutls_x509_crt_deinit( cert);
-			return ret;
-		}
-	}
-
+	ret = _gnutls_x509_crt2gnutls_cert( gcert, cert, flags);
 	gnutls_x509_crt_deinit( cert);
-
-	return 0;
-
+	
+	return ret;
 }
 
 /* Like above but it accepts a parsed certificate instead.
