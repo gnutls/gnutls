@@ -4,14 +4,14 @@
 
 TLS Working Group                           Simon Blake-Wilson, Certicom
 INTERNET-DRAFT                              Magnus Nystrom, RSA Security
-September 27, 2001                 David Hopwood, Independent Consultant
-Expires March 27, 2002                    Jan Mikkelsen, Transactionware
+December 31, 2001                  David Hopwood, Independent Consultant
+Expires June 30, 2002                     Jan Mikkelsen, Transactionware
 Intended Category: Standards track                  Tim Wright, Vodafone
 
 
                              TLS Extensions
 
-                   <draft-ietf-tls-extensions-01.txt>
+                   <draft-ietf-tls-extensions-02.txt>
 
                           Status of this Memo
 
@@ -53,9 +53,9 @@ Intended Category: Standards track                  Tim Wright, Vodafone
 
 
 
-Blake-Wilson et al.        Expires: March 2002                  [Page 1]
+Blake-Wilson et al.        Expires: June 2002                   [Page 1]
 
-INTERNET-DRAFT               TLS Extensions               September 2001
+INTERNET-DRAFT               TLS Extensions                December 2001
 
 
    Please send comments on this document to the TLS mailing list.
@@ -67,28 +67,28 @@ INTERNET-DRAFT               TLS Extensions               September 2001
     2.1. Extended Client Hello ................................... 4
     2.2. Extended Server Hello ................................... 5
     2.3. Hello Extensions ........................................ 5
-    2.4. Extensions to the handshake protocol .................... 6
+    2.4. Extensions to the handshake protocol .................... 7
     3. Specific Extensions ....................................... 7
-    3.1. Server Name Indication .................................. 7
-    3.2. Maximum Record Size Negotiation ......................... 9
+    3.1. Server Name Indication .................................. 8
+    3.2. Maximum Fragment Size Negotiation ....................... 9
     3.3. Client Certificate URLs ................................ 10
-    3.4. Trusted CA Indication .................................. 11
-    3.5. Truncated HMAC ......................................... 13
+    3.4. Trusted CA Indication .................................. 12
+    3.5. Truncated HMAC ......................................... 14
     3.6. Certificate Status Request.............................. 14
-    4. Error alerts ............................................. 15
+    4. Error alerts ............................................. 16
     5. Procedure for Defining New Extensions..................... 17
-    6. Security Considerations .................................. 18
-    6.1. Security of server_name ................................ 18
-    6.2. Security of max_record_size ............................ 18
-    6.3. Security of client_certificate_url ..................... 18
-    6.4. Security of trusted_ca_keys ............................ 19
+    6. Security Considerations .................................. 19
+    6.1. Security of server_name ................................ 19
+    6.2. Security of max_fragment_size .......................... 19
+    6.3. Security of client_certificate_url ..................... 19
+    6.4. Security of trusted_ca_keys ............................ 20
     6.5. Security of truncated_hmac ............................. 20
-    6.6. Security of status_request ............................. 20
-    7. Internationalisation Considerations .......................20
-    8. Intellectual Property Rights ............................. 20
-    9. Acknowledgments .......................................... 20
-   10. References ............................................... 20
-   11. Authors' Addresses ....................................... 21
+    6.6. Security of status_request ............................. 21
+    7. Internationalization Considerations .......................21
+    8. Intellectual Property Rights ............................. 21
+    9. Acknowledgments .......................................... 21
+   10. References ............................................... 22
+   11. Authors' Addresses ....................................... 23
 
 1. Introduction
 
@@ -109,9 +109,9 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
 
 
-Blake-Wilson et al.        Expires: March 2002                  [Page 2]
+Blake-Wilson et al.        Expires: June 2002                   [Page 2]
 
-INTERNET-DRAFT               TLS Extensions               September 2001
+INTERNET-DRAFT               TLS Extensions                December 2001
 
 
    memory limitations, and battery life limitations.
@@ -128,10 +128,10 @@ INTERNET-DRAFT               TLS Extensions               September 2001
      facilitate secure connections to servers which host multiple
      'virtual' servers at a single underlying network address.
 
-   - Allow TLS clients and servers to negotiate the maximum record size
-     to be sent. This functionality is desirable as a result of memory
-     constraints among some clients, and bandwidth constraints among
-     some access networks.
+   - Allow TLS clients and servers to negotiate the maximum fragment
+     size to be sent. This functionality is desirable as a result of
+     memory constraints among some clients, and bandwidth constraints
+     among some access networks.
 
    - Allow TLS clients and servers to negotiate the use of client
      certificate URLs. This functionality is desirable in order to
@@ -165,9 +165,9 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
 
 
-Blake-Wilson et al.        Expires: March 2002                  [Page 3]
+Blake-Wilson et al.        Expires: June 2002                   [Page 3]
 
-INTERNET-DRAFT               TLS Extensions               September 2001
+INTERNET-DRAFT               TLS Extensions                December 2001
 
 
    Backwards compatibility is primarily achieved via two considerations:
@@ -221,9 +221,9 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
 
 
-Blake-Wilson et al.        Expires: March 2002                  [Page 4]
+Blake-Wilson et al.        Expires: June 2002                   [Page 4]
 
-INTERNET-DRAFT               TLS Extensions               September 2001
+INTERNET-DRAFT               TLS Extensions                December 2001
 
 
            CompressionMethod compression_methods<1..2^8-1>;
@@ -272,21 +272,21 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    hellos is:
 
        struct {
-           ExtensionType extensionType;
+           ExtensionType extension_type;
            opaque extension_data<0..2^16-1>;
 
 
 
-Blake-Wilson et al.        Expires: March 2002                  [Page 5]
+Blake-Wilson et al.        Expires: June 2002                   [Page 5]
 
-INTERNET-DRAFT               TLS Extensions               September 2001
+INTERNET-DRAFT               TLS Extensions                December 2001
 
 
        } Extension;
 
    Here:
 
-   - "extensionType" identifies the particular extension type.
+   - "extension_type" identifies the particular extension type.
 
    - "extension_data" contains information specific to the particular
       extension type.
@@ -294,14 +294,14 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    The extension types defined in this document are:
 
        enum {
-           server_name(0), max_record_size(1), client_certificate_url(2),
-           trusted_ca_keys(3), truncated_hmac(4), status_request(5),
-           (65535)
+           server_name(0), max_fragment_size(1),
+           client_certificate_url(2), trusted_ca_keys(3),
+           truncated_hmac(4), status_request(5), (65535)
        } ExtensionType;
 
    Note that for all extension types (including those defined in
-   future), the extension type should appear in the extended server
-   hello only if the same extension type appeared in the corresponding
+   future), the extension type MUST NOT appear in the extended server
+   hello unless the same extension type appeared in the corresponding
    client hello. Thus clients MUST abort the handshake if they receive
    an extension type in the extended server hello that they did not
    request in the associated (extended) client hello.
@@ -310,16 +310,33 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    future within this framework by requiring the client to first send an
    empty extension to indicate that they support a particular extension.
 
-   Also note that when multiple extensions are present in the extended
-   client hello or the extended server hello, the extensions may appear
-   in the order identified in "ExtensionType", or they may appear in
-   another order.
+   Also note that when multiple extensions of different types are
+   present in the extended client hello or the extended server hello,
+   the extensions may appear in any order. There MUST NOT be more than
+   one extension of the same type.
 
    Finally note that all the extensions defined in this document are
-   relevant only when a session is initiated. Extensions appearing in
-   client and server hellos sent during session resumption MUST be
-   ignored, and the extension functionality negotiated during session
-   initiation applied to the resumed session.
+   relevant only when a session is initiated. However, a client that
+   requests resumption of a session does not in general know whether the
+   server will accept this request, and therefore it SHOULD send an
+   extended client hello if it would normally do so for a new session.
+   If the resumption request is denied, then a new set of extensions
+   will be negotiated as normal. If, on the other hand, the older
+   session is resumed, then the server MUST ignore extensions appearing
+   in the client hello, and send a server hello containing no
+   extensions; in this case the extension functionality negotiated
+   during the original session initiation is applied to the resumed
+   session.
+
+
+
+
+
+
+Blake-Wilson et al.        Expires: June 2002                   [Page 6]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
 
  2.4. Extensions to the handshake protocol
 
@@ -330,14 +347,6 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
        enum {
            hello_request(0), client_hello(1), server_hello(2),
-
-
-
-Blake-Wilson et al.        Expires: March 2002                  [Page 6]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
            certificate(11), server_key_exchange (12),
            certificate_request(13), server_hello_done(14),
            certificate_verify(15), client_key_exchange(16),
@@ -375,8 +384,16 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
    Section 3.1 describes the extension of TLS to allow clients to
    indicate which server they are contacting. Section 3.2 describes the
-   extension to provide maximum record size negotiation. Section 3.3
+   extension to provide maximum fragment size negotiation. Section 3.3
    describes the extension to allow client certificate URLs. Section 3.4
+
+
+
+Blake-Wilson et al.        Expires: June 2002                   [Page 7]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
    describes the extension to allow clients to indicate which CA root
    keys they possess.  Section 3.5 describes the extension to allow the
    use of truncated HMAC.  Section 3.6 describes the extension to
@@ -386,14 +403,6 @@ INTERNET-DRAFT               TLS Extensions               September 2001
  3.1. Server Name Indication
 
    TLS does not provide a mechanism for clients to tell servers the name
-
-
-
-Blake-Wilson et al.        Expires: March 2002                  [Page 7]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
    of the server they are contacting. It may be desirable for clients to
    provide this information to facilitate secure connections to servers
    which host multiple 'virtual' servers at a single underlying network
@@ -401,95 +410,126 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
    In order to provide the server name, clients MAY include an extension
    of type "server_name" in the (extended) client hello. The
-   "extension_data" field of this extension shall contain "ServerName"
-   where:
+   "extension_data" field of this extension shall contain
+   "ServerNameList" where:
 
        struct {
            NameType name_type;
            select (name_type) {
-               case dns_name: DNSName;
+               case host_name: HostName;
            }
        } ServerName;
 
        enum {
-           dns_name(0), (255)
+           host_name(0), (255)
        } NameType;
 
-       opaque DNSName<1..2^16-1>;
+       opaque HostName<1..2^16-1>;
 
-   Currently the only server names supported are DNS names, however this
-   does not imply any dependency of TLS on DNS names, and other name
-   types may be added in the future.
+       struct {
+           ServerName server_name_list<1..2^16-1>
+       } ServerNameList;
 
-   "DNSName" contains the fully qualified domain name of the server, as
-   understood by the client. The domain name is represented as a byte
+   Currently the only server names supported are DNS hostnames, however
+   this does not imply any dependency of TLS on DNS, and other name
+   types may be added in the future (by an RFC that Updates this
+   document).  TLS MAY treat provided server names as opaque data and
+   pass the names and types to the application.
+
+   "HostName" contains the fully qualified DNS hostname of the server,
+   as understood by the client. The hostname is represented as a byte
    string using UTF-8 encoding [UTF8], without a trailing dot.  (Note
-   that the use of UTF-8 here for encoding internationalized domain
-   names is independent of the choice of encoding for these names in the
-   DNS protocol. The latter has yet to be decided by the IETF
-   International Domain Name Working Group.)
+   that the use of UTF-8 here for encoding internationalized hostnames
+   is independent of the choice of encoding for these names in the DNS
+   protocol. The latter has yet to be decided by the IETF
 
-   Literal IPv4 and IPv6 addresses are not permitted in "DNSName".
+
+
+Blake-Wilson et al.        Expires: June 2002                   [Page 8]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
+   Internationalized Domain Name Working Group [IDNWG].)
+
+   If the server needs to match the HostName against names that contain
+   non-ASCII characters (that is, if it has one or more
+   internationalized virtual host names), it MUST take account of name
+   equivalence rules that will be defined by the IDN Working Group.  If
+   the server only needs to match the HostName against names containing
+   exclusively ASCII characters, it MUST NOT treat a HostName that
+   contains a byte value >= 128 as matching any ASCII name, and it MUST
+   compare ASCII names case-insensitively.
+
+   Literal IPv4 and IPv6 addresses are not permitted in "HostName".
 
    It is RECOMMENDED that clients include an extension of type
-   "ServerName" in the client hello whenever they locate a server by its
-   domain name.
+   "server_name" in the client hello whenever they locate a server by a
+   supported name type.
 
    Servers that receive a client hello containing the "server_name"
    extension, MAY use the information contained in the extension to
    guide their selection of an appropriate certificate to return to the
-   client.  In this event, the server shall include an extension of type
-   "server_name" in the (extended) server hello. The "extension_data"
-   field of this extension shall be empty.
-
-
-
-
-Blake-Wilson et al.        Expires: March 2002                  [Page 8]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
+   client, and/or other aspects of security policy.  In this event, the
+   server shall include an extension of type "server_name" in the
+   (extended) server hello. The "extension_data" field of this extension
+   shall be empty.
 
    If the server understood the client hello extension but does not
-   recognize the server name as belonging to a domain it is responsible
-   for, it should send an unrecognised_domain alert (which may or may
-   not be fatal).
+   recognize the server name, it SHOULD send an "unrecognized_name"
+   alert (which MAY be fatal).
 
- 3.2. Maximum Record Size Negotiation
+   If an application negotiates a server name using an application
+   protocol, then upgrades to TLS, and a server_name extension is sent,
+   then the extension SHOULD contain the same name that was negotiated
+   in the application protocol. If the server_name is established in the
+   TLS session handshake, the client SHOULD NOT attempt to request a
+   different server name at the application layer.
 
-   TLS specifies a fixed maximum record size of 2^14 bytes. It may be
-   desirable for constrained clients to negotiate a smaller maximum
-   record size due to memory limitations or bandwidth limitations.
+ 3.2. Maximum Fragment Size Negotiation
 
-   In order to negotiate smaller maximum record sizes, clients MAY
-   include an extension of type "max_record_size" in the (extended)
+   TLS specifies a fixed maximum plaintext fragment size of 2^14 bytes.
+   It may be desirable for constrained clients to negotiate a smaller
+   maximum fragment size due to memory limitations or bandwidth
+   limitations.
+
+   In order to negotiate smaller maximum fragment sizes, clients MAY
+   include an extension of type "max_fragment_size" in the (extended)
    client hello.  The "extension_data" field of this extension shall
    contain:
 
+
+
+
+Blake-Wilson et al.        Expires: June 2002                   [Page 9]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
        enum{
            2^9(1), 2^10(2), 2^11(3), 2^12(4), (255)
-       } MaxRecordSize;
+       } MaxFragmentSize;
 
-   whose value is the desired maximum record size. The allowed values
+   whose value is the desired maximum fragment size. The allowed values
    for this field are: 2^9, 2^10, 2^11, and 2^12.
 
    Servers that receive an extended client hello containing a
-   "max_record_size" extension, MAY accept the requested maximum record
-   size by including an extension of type "max_record_size" in the
-   (extended) server hello. The "extension_data" field of this extension
-   shall contain "MaxRecordSize" whose value is the same as the
-   requested maximum record size.
+   "max_fragment_size" extension, MAY accept the requested maximum
+   fragment size by including an extension of type "max_fragment_size"
+   in the (extended) server hello. The "extension_data" field of this
+   extension shall contain "MaxFragmentSize" whose value is the same as
+   the requested maximum fragment size.
 
-   Servers receiving maximum record size negotiation requests for values
-   other than the allowed values MUST abort the handshake with an
+   Servers receiving maximum fragment size negotiation requests for
+   values other than the allowed values MUST abort the handshake with an
    "illegal_parameter" alert. Similarly, clients receiving maximum
-   record size negotiation responses that differ from the size they
+   fragment size negotiation responses that differ from the size they
    requested MUST also abort the handshake with an "illegal_parameter"
    alert.
 
-   Once a maximum record size other than 2^14 has been successfully
+   Once a maximum fragment size other than 2^14 has been successfully
    negotiated, the client and server MUST immediately begin fragmenting
-   messages (including handshake messages), to ensure that no message
+   messages (including handshake messages), to ensure that no fragment
    larger than the negotiated size is sent. Note that TLS already
    requires clients and servers to support fragmentation of handshake
    messages.
@@ -498,33 +538,31 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    session resumptions.
 
    The negotiated size limits the input that the record layer may
-
-
-
-Blake-Wilson et al.        Expires: March 2002                  [Page 9]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
-   process without fragmentation. Note that the output of the record
-   layer may be larger. For example, if the negotiated size is 2^9=512,
-   then for currently defined cipher suites (those defined in [TLS],
-   [KERB], and planned AES ciphersuites), the record layer output can be
-   at most 793 bytes: 5 bytes of headers, 512 bytes of application data,
-   256 bytes of padding, and 20 bytes of MAC. This means that in this
-   event a TLS record layer peer receiving a TLS record layer message
-   larger than 793 bytes may discard the message and output an error
-   without decrypting the message. The exact error message sent will
-   depend on the size of the received message - either "record_overflow"
-   if the message is longer than 2^14+2048 bytes, or "decryption_failed"
-   otherwise.
+   process without fragmentation (that is, the maximum value of
+   TLSPlaintext.length; see [TLS] section 6.2.1).  Note that the output
+   of the record layer may be larger. For example, if the negotiated
+   size is 2^9=512, then for currently defined cipher suites (those
+   defined in [TLS], [KERB], and planned AES ciphersuites), the record
+   layer output can be at most 793 bytes: 5 bytes of headers, 512 bytes
+   of application data, 256 bytes of padding, and 20 bytes of MAC. That
+   means that in this event a TLS record layer peer receiving a TLS
+   record layer message larger than 793 bytes may discard the message
+   and send a "record_overflow" alert, without decrypting the message.
 
  3.3. Client Certificate URLs
 
    TLS specifies that when client authentication is performed, client
    certificates are sent by clients to servers during the TLS handshake.
    It may be desirable for constrained clients to send certificate URLs
-   in place of certificates so that they do not need to store their
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 10]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
+   in place of certificates, so that they do not need to store their
    certificates and can therefore save memory.
 
    In order to negotiate to send certificate URLs to a server, clients
@@ -555,13 +593,6 @@ INTERNET-DRAFT               TLS Extensions               September 2001
            CertHash certificate_hash;
        } URLAndHash;
 
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 10]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
        opaque CertHash<0..20>;
 
    Here "url_and_hash_list" contains a sequence of URLs and hashes.
@@ -579,22 +610,31 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
    Servers receiving "CertificateURL" shall attempt to retrieve the
    client's certificate chain from the URLs, and then process the
-   certificate chain as usual. HTTP SHOULD be used to retrieve the
-   certificate chain from the URLs, and MUST be supported by servers
-   supporting this extension.
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 11]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
+   certificate chain as usual. Servers that support this extension MUST
+   support the http: URL scheme for certificate URLs, and MAY support
+   other schemes.
 
    In general, the format of the certificates retrieved by the server
    will depend on the protocol used by the server to retrieve them, as
    recommended by the PKIX working group. In the case of HTTP, the
-   response MUST be a MIME formatted response. When a single certificate
-   is returned, the Content-type is application/pkix-cert. When a
-   certificate chain is returned, the Content-type is
-   application/pkcs7-mime.
+   response MUST be a MIME formatted response. When a single X.509v3
+   certificate is returned, the Content-type is application/pkix-cert
+   [PKIOP]. When a chain of X.509v3 certificates is returned, the
+   Content-type is application/pkcs7-mime [SMIME].
 
    Servers MUST check that the SHA-1 hash of any certificates retrieved
    from a CertificateURL matches the given hash if it is present.  If
    any retrieved certificate does not have the correct SHA-1 hash, the
-   server MUST abort the handshake with a bad_certificate alert.
+   server MUST abort the handshake with a "bad_certificate_hash_value"
+   alert.
 
    Note that clients may choose to send either "Certificate" or
    "CertificateURL" after successfully negotiating the option to send
@@ -610,14 +650,6 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    Constrained clients which, due to memory limitations, possess only a
    small number of CA root keys, may wish to indicate to servers which
    root keys they possess, in order to avoid repeated handshake
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 11]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
    failures.
 
    In order to indicate which CA root keys they possess, clients MAY
@@ -634,6 +666,14 @@ INTERNET-DRAFT               TLS Extensions               September 2001
            select (identifier_type) {
                case pre_agreed: struct {};
                case key_hash_sha: KeyHash;
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 12]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
                case x509_name: DistinguishedName;
                case cert_hash: CertHash;
            } Identifier;
@@ -662,22 +702,15 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    - "cert_hash" - contains the SHA-1 hash of a certificate containing
       the CA root key.
 
-   - "x509_name" - contains the X.509 distinguished name of the CA.
+   - "x509_name" - contains the X.509 Distinguished Name of the CA.
 
    Note that clients may include none, some, or all of the CA root keys
    they possess in this extension.
 
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 12]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
-   Note also that it is possible that a key hash or a distinguished name
+   Note also that it is possible that a key hash or a Distinguished Name
    alone may not uniquely identify a certificate issuer - for example if
    a particular CA has multiple key pairs - however here we assume this
-   is the case following the use of distinguish names to identify
+   is the case following the use of Distinguished Names to identify
    certificate issuers in TLS.
 
    The option to include no CA root keys is included to allow the client
@@ -687,6 +720,15 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    extension, MAY use the information contained in the extension to
    guide their selection of an appropriate certificate chain to return
    to the client.
+
+
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 13]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
 
  3.5. Truncated HMAC
 
@@ -699,7 +741,7 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
    In order to negotiate the use of 80-bit truncated HMAC, clients MAY
    include an extension of type "truncated_hmac" in the extended client
-   hello. The "extension_data" field of this extension shall be empty.
+   hello. The "extension_data" field of this extension SHALL be empty.
 
    Servers that receive an extended hello containing a "truncated_hmac"
    extension, MAY agree to use a truncated HMAC by including an
@@ -717,18 +759,13 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    and the server pass this fact to the TLS record layer along with the
    other negotiated security parameters. Subsequently during the
    session, clients and servers MUST use truncated HMACs, calculated as
-   specified in [HMAC]. Note that this extension does not affect the
-   calculation of the PRF as part of handshaking or key derivation.
+   specified in [HMAC]. That is, CipherSpec.hash_size is 10 bytes, and
+   only the first 10 bytes of the HMAC output are transmitted and
+   checked. Note that this extension does not affect the calculation of
+   the PRF as part of handshaking or key derivation.
 
    The negotiated HMAC truncation size applies for the duration of the
    session including session resumptions.
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 13]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
 
  3.6. Certificate Status Request
 
@@ -741,6 +778,14 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    In order to indicate their desire to receive certificate status
    information, clients MAY include an extension of type
    "status_request" in the (extended) client hello. The "extension_data"
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 14]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
    field of this extension shall contain "CertificateStatusRequest"
    where:
 
@@ -778,14 +823,6 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    request.
 
    Servers return a certificate response along with their certificate by
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 14]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
    sending a "CertificateStatus" message immediately after the
    "Certificate" message (and before any "ServerKeyExchange" or
    "CertificateRequest" messages). If a server returns a
@@ -797,6 +834,14 @@ INTERNET-DRAFT               TLS Extensions               September 2001
            CertificateStatusType status_type;
            select (status_type) {
                case ocsp: OCSPResponse ocsp_response;
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 15]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
            }
        } CertificateStatus;
 
@@ -818,7 +863,7 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    hello message.
 
    Clients requesting an OCSP response, and receiving an OCSP response
-   in a "CertificateStatus" message SHOULD check the OCSP response and
+   in a "CertificateStatus" message MUST check the OCSP response and
    abort the handshake if the response is not satisfactory.
 
 4. Error Alerts
@@ -834,31 +879,34 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    - "unsupported_extension" - this alert is sent by clients that
      receive an extended server hello containing an extension that
      they did not put in the corresponding client hello (see Section
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 15]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
      2.3). This message is always fatal.
 
-   - "unrecognised_domain" - this alert is sent by servers that
+   - "unrecognized_name" - this alert is sent by servers that
      receive a server_name extension request, but do not recognize the
-     server name as belonging to a domain they are responsible for.
-     This message MAY be fatal.
+     server name. This message MAY be fatal.
 
    - "certificate_unobtainable" - this alert is sent by servers who are
      unable to retrieve a certificate chain from the URL supplied by
      the client (see Section 3.3). This message MAY be fatal - for
      example if client authentication is required by the server for the
      handshake to continue and the server is unable to retrieve the
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 16]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
      certificate chain, it may send a fatal alert.
 
    - "bad_certificate_status_response" - this alert is sent by clients
      that receive an invalid certificate status response (see Section
      3.6). This message is always fatal.
+
+   - "bad_certificate_hash_value" - this alert is sent by servers when
+     a certificate hash does not match a client provided
+     certificate_hash. This message is always fatal.
 
    These error alerts are conveyed using the following syntax:
 
@@ -888,16 +936,9 @@ INTERNET-DRAFT               TLS Extensions               September 2001
            user_canceled(90),
            no_renegotiation(100),
            unsupported_extension(110),           /* new */
-           unrecognised_domain(112),             /* new */
+           unrecognized_name(112),               /* new */
            bad_certificate_status_response(113), /* new */
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 16]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
+           bad_certificate_hash_value(114),      /* new */
            (255)
        } AlertDescription;
 
@@ -905,6 +946,14 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
    Traditionally for Internet protocols, the Internet Assigned Numbers
    Authority (IANA) handles the allocation of new values for future
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 17]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
    expansion, and RFCs usually define the procedure to be used by the
    IANA. However, there are subtle (and not so subtle) interactions that
    may occur in this protocol between new features and existing features
@@ -921,7 +970,6 @@ INTERNET-DRAFT               TLS Extensions               September 2001
       convention that for each extension that a client requests
       and that the server understands, the server replies with an
       extension of the same type.
-
 
     - Some cases where a server does not agree to an extension are
       error conditions, and some simply a refusal to support a
@@ -946,20 +994,21 @@ INTERNET-DRAFT               TLS Extensions               September 2001
     - It would be technically possible to use extensions to change
       major aspects of the design of TLS; for example the design of
       ciphersuite negotiation. This is not recommended; it
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 17]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
       would be more appropriate to define a new version of TLS -
       particularly since the TLS handshake algorithms have specific
       protection against version rollback attacks based on the
       version number, and the possibility of version rollback
       should be a significant consideration in any major design
       change.
+
+
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 18]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
 
 6. Security Considerations
 
@@ -981,34 +1030,27 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    their security needs. Apart from this, server_name does not appear to
    introduce significant security issues.
 
-   The length of the domain name should be checked for buffer overflow
-   (note that RFC 1035 restricts domain names to 255 bytes).
+   Implementations MUST ensure that a buffer overflow does not occur
+   whatever the values of the length fields in server_name.
 
- 6.2. Security of max_record_size
+ 6.2. Security of max_fragment_size
 
-   The maximum record size takes effect immediately, including for
+   The maximum fragment size takes effect immediately, including for
    handshake messages. However, that does not introduce any security
    complications that are not already present in TLS, since [TLS]
    requires implementations to be able to handle fragmented handshake
    messages.
 
    Note that as described in section 3.2, once a non-null ciphersuite
-   has been activated, the effective maximum record size depends on the
-   ciphersuite, as well as on the negotiated max_record_size.  This must
-   be taken into account when sizing buffers, and checking for buffer
-   overflow.
+   has been activated, the effective maximum fragment size depends on
+   the ciphersuite, as well as on the negotiated max_fragment_size.
+   This must be taken into account when sizing buffers, and checking for
+   buffer overflow.
 
  6.3. Security of client_certificate_url
 
    The major issue with this extension is whether or not clients should
    include certificate hashes when they send certificate URLs.
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 18]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
 
    When client authentication is used *without* the
    client_certificate_url extension, the client certificate chain is
@@ -1016,15 +1058,23 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    certificate hashes and checking them against the retrieved
    certificate chain, is to ensure that the same property holds when
    this extension is used - i.e. that all of the information in the
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 19]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
    certificate chain retrieved by the server is as the client intended.
 
    On the other hand, omitting certificate hashes enables functionality
-   which is desirable is some circumstances - for example clients can be
+   that is desirable in some circumstances - for example clients can be
    issued daily certificates which are stored at a fixed URL and need
    not be provided to the client. Clients which choose to omit
    certificate hashes should be aware of the possibility of an attack in
    which the attacker obtains a valid certificate on the client's key
-   which is different from the certificate the client intended to
+   that is different from the certificate the client intended to
    provide.
 
    Note that although TLS uses both MD5 and SHA-1 hashes in several
@@ -1034,14 +1084,14 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    Support for client_certificate_url involves the server acting as a
    client in another protocol (usually HTTP, but other URL schemes are
    not prohibited). It is therefore subject to many of the same security
-   considerations that apply to a publicly accessible HTTP proxy
-   server. This includes the possibility that an attacker might use the
-   server to indirectly attack another host that is vulnerable to some
-   security flaw. It also includes potentially increased exposure to
-   denial of service attacks: an attacker can make many connections,
-   each of which results in the server making an HTTP request.
+   considerations that apply to a publicly accessible HTTP proxy server.
+   This includes the possibility that an attacker might use the server
+   to indirectly attack another host that is vulnerable to some security
+   flaw. It also includes potentially increased exposure to denial of
+   service attacks: an attacker can make many connections, each of which
+   results in the server making an HTTP request.
 
-   It is recommended that the client_certificate_url extension should
+   It is RECOMMENDED that the client_certificate_url extension should
    have to be specifically enabled by a server administrator, rather
    than being enabled by default.
 
@@ -1058,20 +1108,20 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    The use of the SHA-1 certificate hash alternative ensures that each
    certificate is specified unambiguously. As for the previous
    extension, it was not believed necessary to use both MD5 and SHA-1
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 19]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
    hashes.
 
  6.5. Security of truncated_hmac
 
    It is possible that truncated MACs are weaker than "un-truncated"
    MACs. However, no significant weaknesses are currently known or
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 20]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
+
    expected to exist for HMAC with MD5 or SHA-1, truncated to 80 bits.
    Note that the output length of a MAC need not be as long as the
    length of a symmetric cipher key, since forging of MAC values cannot
@@ -1085,8 +1135,8 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    otherwise be used (to the extent that the handshake authentication is
    secure). Therefore, in the event that any security problem were found
    with truncated HMAC in future, if either the client or the server for
-   a given session have been updated to take into account the problem,
-   they would be able to veto use of this extension.
+   a given session were updated to take into account the problem, they
+   would be able to veto use of this extension.
 
  6.6. Security of status_request
 
@@ -1100,11 +1150,11 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    improve security against attacks that attempt to replay OCSP
    responses; see section 4.4.1 of [OCSP] for further details.
 
-7. Internationalisation Considerations
+7. Internationalization Considerations
 
    None of the extensions defined here directly use strings subject to
-   localisation. Domain names are encoded using UTF-8. If future
-   extensions use text strings, then internationalisation should be
+   localization. DNS hostnames are encoded using UTF-8. If future
+   extensions use text strings, then internationalization should be
    considered in their design.
 
 8. Intellectual Property Rights
@@ -1115,29 +1165,33 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    this document. Please address the information to the IETF Executive
    Director.
 
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 20]
-
-INTERNET-DRAFT               TLS Extensions               September 2001
-
-
 9. Acknowledgments
 
    The authors wish to thank the TLS Working Group and the WAP Security
    Group. This document is based on discussion within these groups.
+
+
+
+
+Blake-Wilson et al.        Expires: June 2002                  [Page 21]
+
+INTERNET-DRAFT               TLS Extensions                December 2001
+
 
 10. References
 
    [CMS] R. Housley, "Cryptographic Message Syntax," IETF RFC 2630, June
    1999.
 
-   [HMAC] Krawczyk, H., Bellare, M., and Canetti, R. - HMAC: Keyed-
+   [HMAC] Krawczyk, H., Bellare, M., and Canetti, R. - HMAC:  Keyed-
    hashing for message authentication. IETF RFC 2104, February 1997.
 
    [HTTP] J. Gettys, J. Mogul, H. Frystyk, L. Masinter, P. Leach, T.
    Berners-Lee, "Hypertext Transfer Protocol -- HTTP/1.1," IETF RFC
    2616, June 1999.
+
+   [IDNWG] IETF Internationalized Domain Name Working Group,
+   http://www.i-d-n.net/
 
    [KERB] A. Medvinsky, M. Hur, "Addition of Kerberos Cipher Suites to
    Transport Layer Security (TLS)," IETF RFC 2712, October 1999.
@@ -1152,6 +1206,13 @@ INTERNET-DRAFT               TLS Extensions               September 2001
    [OCSP] Myers, M., Ankney, R., Malpani, A., Galperin, S., and C.
    Adams, "Internet X.509 Public Key Infrastructure: Online Certificate
    Status Protocol - OCSP," IETF RFC 2560, June 1999.
+
+   [PKIOP] Housley, R., and P. Hoffman, "Internet X.509 Public Key
+   Infrastructure - Operation Protocols: FTP and HTTP," IETF RFC 2585,
+   May 1999.
+
+   [SMIME] B. Ramsdell, "S/MIME Version 3 Message Specification," IETF
+   RFC 2633, June 1999.
 
    [TLS] Dierks, T., and C. Allen, "The TLS Protocol - Version 1.0,"
    IETF RFC 2246, January 1999.
@@ -1168,14 +1229,9 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
 
 
-
-
-
-
-
-Blake-Wilson et al.        Expires: March 2002                 [Page 21]
+Blake-Wilson et al.        Expires: June 2002                  [Page 22]
 
-INTERNET-DRAFT               TLS Extensions               September 2001
+INTERNET-DRAFT               TLS Extensions                December 2001
 
 
 11. Authors' Addresses
@@ -1229,4 +1285,4 @@ INTERNET-DRAFT               TLS Extensions               September 2001
 
 
 
-Blake-Wilson et al.        Expires: March 2002                 [Page 22]
+Blake-Wilson et al.        Expires: June 2002                  [Page 23]
