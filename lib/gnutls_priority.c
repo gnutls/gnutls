@@ -252,8 +252,11 @@ int gnutls_certificate_type_set_priority(gnutls_session session,
   *
   * Sets some default priority on the ciphers, key exchange methods, macs
   * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
-  * these defaults are ok.
+  * these defaults are ok. You may override any of the following priorities by calling
+  * the appropriate functions.
+  *
   * The order is:
+  *
   * - TLS1, SSL3 for protocols.
   * - GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA for key exchange algorithms.
   * - GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms.
