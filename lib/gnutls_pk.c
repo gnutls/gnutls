@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -33,6 +33,7 @@
 
 static int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey);
 static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey);
+static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey);
 
 
 /* Do PKCS-1 RSA encryption. 
@@ -45,7 +46,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	int k, psize, i, ret, pad;
 	MPI m, res;
 	opaque *edata, *ps;
-	MPI tmp_params[RSA_PARAMS];
+	MPI tmp_params[RSA_PUBLIC_PARAMS];
 
 	k = gcry_mpi_get_nbits(params[0]) / 8;
 
@@ -115,6 +116,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	gnutls_free(edata);
 
 	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, tmp_params);
+	
 	_gnutls_mpi_release(&m);
 
 	if (ret < 0) {
@@ -176,7 +178,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, c, params);
+	ret = _gnutls_pk_decrypt(GCRY_PK_RSA, &res, c, params);
 	_gnutls_mpi_release(&c);
 
 	if (ret < 0) {
@@ -538,6 +540,61 @@ int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
 	gcry_sexp_release(s_ciph);
 	return rc;
 }
+
+static int _gnutls_pk_decrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
+{
+	GCRY_SEXP s_plain, s_data, s_pkey;
+	int rc;
+
+	/* make a sexp from pkey */
+	switch (algo) {
+	case GCRY_PK_RSA:
+		rc = gcry_sexp_build(&s_pkey, NULL,
+				     "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
+				     pkey[0], pkey[1], pkey[2], pkey[3], pkey[4], pkey[5]);
+
+		break;
+
+	default:
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
+	}
+
+	if (rc != 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
+	/* put the data into a simple list */
+	if (gcry_sexp_build(&s_data, NULL, "(enc-val(rsa(a%m)))", data)) {
+		gnutls_assert();
+		gcry_sexp_release(s_pkey);
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
+	/* pass it to libgcrypt */
+	rc = gcry_pk_decrypt(&s_plain, s_data, s_pkey);
+	gcry_sexp_release(s_data);
+	gcry_sexp_release(s_pkey);
+
+	if (rc != 0) {
+		gnutls_assert();
+		return GNUTLS_E_PK_ENCRYPTION_FAILED;
+
+	} else {		/* add better error handling or make gnupg use S-Exp directly */
+		resarr[0] = gcry_sexp_nth_mpi(s_plain, 0, 0);
+
+		if (resarr[0] == NULL) {
+			gnutls_assert();
+			gcry_sexp_release(s_plain);
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+	}
+
+	gcry_sexp_release(s_plain);
+	return rc;
+}
+
 
 /* in case of DSA puts into data, r,s
  */
