@@ -1,3 +1,10 @@
+2004-07-30 21:57  nmav <nmav@gnutls.org>
+
+	* doc/tex/ex-cert-select.tex, lib/gnutls_cert.c,
+	doc/tex/ex-cert-select.tex, lib/gnutls_cert.c:
+
+	corrected documentation.  
+
 2004-07-28 10:28  nmav <nmav@gnutls.org>
 
 	* NEWS, libgcrypt.m4, opencdk.m4, lib/Makefile.am, lib/auth_srp.c,
