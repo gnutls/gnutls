@@ -215,15 +215,15 @@ typedef struct {
 #define GNUTLS_ANON_DH_RIJNDAEL_128_CBC_SHA { 0x00, 0x34 }
 #define GNUTLS_ANON_DH_RIJNDAEL_256_CBC_SHA { 0x00, 0x3A }
 /* Twofish is a gnutls extension */
-#define GNUTLS_ANON_DH_TWOFISH_128_CBC_SHA { 0xF6, 0x50 }
+#define GNUTLS_ANON_DH_TWOFISH_128_CBC_SHA { 0xFF, 0x50 }
 
 /* SRP is a gnutls extension - for now */
 #define GNUTLS_SRP_3DES_EDE_CBC_SHA { 0x00, 0x5B }
 #define GNUTLS_SRP_ARCFOUR_SHA { 0x00, 0x5C }
 #define GNUTLS_SRP_ARCFOUR_MD5 { 0x00, 0x5F }
-#define GNUTLS_SRP_RIJNDAEL_128_CBC_SHA { 0xF6, 0x62 }
-#define GNUTLS_SRP_RIJNDAEL_256_CBC_SHA { 0xF6, 0x63 }
-#define GNUTLS_SRP_TWOFISH_128_CBC_SHA { 0xF6, 0x64 }
+#define GNUTLS_SRP_RIJNDAEL_128_CBC_SHA { 0xFF, 0x62 }
+#define GNUTLS_SRP_RIJNDAEL_256_CBC_SHA { 0xFF, 0x63 }
+#define GNUTLS_SRP_TWOFISH_128_CBC_SHA { 0xFF, 0x64 }
 
 /* RSA */
 #define GNUTLS_RSA_ARCFOUR_SHA { 0x00, 0x05 }
@@ -231,16 +231,16 @@ typedef struct {
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
 #define GNUTLS_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x2F }
 #define GNUTLS_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x35 }
-#define GNUTLS_RSA_TWOFISH_128_CBC_SHA { 0xF6, 0x51 }
+#define GNUTLS_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x51 }
 
 /* DHE_DSS */
-#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xF6, 0x54 }
+#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xFF, 0x54 }
 #define GNUTLS_DHE_DSS_RIJNDAEL_256_CBC_SHA { 0x00, 0x38 }
 #define GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
 #define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA { 0x00, 0x13 }
 
 /* DHE_RSA */
-#define GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA { 0xF6, 0x55 }
+#define GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x55 }
 #define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 }
 #define GNUTLS_DHE_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x39 }
 #define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
@@ -850,7 +850,7 @@ int _gnutls_cipher_suite_count(void)
 #ifdef DEBUG
 # warning CHECK SUPPORTED CIPHER SUITES HERE
 #endif
-		if (j != 0x00 && j != 0xF6)
+		if (j != 0x00 && j != 0xFF)
 			continue;
 
 		for (i = 0; i < MAX_CIPHERSUITES; i++) {
