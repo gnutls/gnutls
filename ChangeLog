@@ -1,3 +1,24 @@
+2003-11-11 16:37  nmav <nmav@gnutls.org>
+
+	* src/: certtool-gaa.c, certtool-gaa.h, certtool.c, certtool.gaa:
+
+	Added capability to read CRLs to certtool.  
+
+2003-11-11 16:23  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	Renamed several pkcs #7 related functions. That is to allow future
+	extensions to the API.  
+
+2003-11-11 09:36  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls.h.in.in, lib/gnutls_dh_primes.c,
+	lib/gnutls_ui.h, lib/x509_b64.c, src/cli-gaa.c:
+
+	Added gnutls_pkcs7_set_certificate2() and gnutls_pkcs7_set_crl2()
+	functions.  
+
 2003-11-10 21:21  nmav <nmav@gnutls.org>
 
 	* lib/gnutls.h.in.in:
