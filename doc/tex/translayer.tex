@@ -2,10 +2,10 @@
 \par
 \gnutls can be used above any transport layer. To do this you will only 
 need to set up the 
-\hyperref{gnutls\_global\_set\_push\_function()}{gnutls\_global\_set\_push\_function() (see Section }{
-for more information)}{gnutls_global_set_push_function} and
-\hyperref{gnutls\_global\_set\_pull\_function()}{gnutls\_global\_set\_pull\_function() (see Section }{
-for more information)}{gnutls_global_set_pull_function}
+\hyperref{gnutls\_transport\_set\_push\_function()}{gnutls\_transport\_set\_push\_function() (see Section }{
+for more information)}{gnutls_transport_set_push_function} and
+\hyperref{gnutls\_transport\_set\_pull\_function()}{gnutls\_transport\_set\_pull\_function() (see Section }{
+for more information)}{gnutls_transport_set_pull_function}
 functions. These functions will then be used by gnutls in order to send and receive data.
 The functions specified should return -1 on error and probably set errno appropriately.
 \gnutls supports EINTR and EAGAIN errno values (This means that appropriate

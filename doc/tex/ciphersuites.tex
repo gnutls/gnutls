@@ -4,123 +4,14 @@
 \tls 1.0 supports ciphersuites like {\bf TLS\_X509PKI\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
 These ciphersuites contain three parameters:
 \begin{itemize}
-\item The key authentication method (X.509 PKI in the example)
+\item The authentication method (X.509 PKI in the example)
 \item The key exchange algorithm (DHE\_RSA in the example)
 \item The Symmetric encryption algorithm and mode (3DES\_CBC in this
 example)
 \item The MAC\footnote{MAC stands for Message Authentication Code. It can
-be described as a keyed hash algorithm. See RFC2104} algorithm used for authentication.
+be described as a keyed hash algorithm. See RFC2104.} algorithm used for authentication.
 MAC\_SHA is used in the above example.
 \end{itemize}
 
-
-\begin{figure}[hbtp]
-\begin{tabular}{|l|p{9cm}|}
-
-\hline
-RSA & The RSA algorithm is used to encrypt a key and send it to the peer.
-The certificate must allow the key to be used for encryption.
-\\
-\hline
-DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are send to the peer. The key in the certificate must allow
-the key to be used for signing 
-\\
-\hline
-DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are send to the peer. Currently \gnutls does not support this ciphersuite.
-\\
-\hline
-\end{tabular}
-
-\caption{Supported X.509 key exchange algorithms}
-
-\end{figure}
-
-\begin{figure}[hbtp]
-\begin{tabular}{|l|p{9cm}|}
-
-\hline
-ANON\_DH & This algorithm exchanges not signed diffie Hellman parameters. That way encryption may 
-be performed but there is no indication of the identity of the peer. This kind of
-authentication is vulnerable to man in the middle attack, but this protocol
-can be used even if there is no prior communication or common trusted
-parties with the peer.
-Unless really required, do not use anonymous authentication.
-\\
-\hline
-\end{tabular}
-
-\caption{Supported anonymous key exchange algorithms}
-
-\end{figure}
-
-
-\begin{figure}[hbtp]
-\begin{tabular}{|l|p{9cm}|}
-
-\hline
-SRP\footnote{SRP stands for Secure Password Protocol and is described in
-RFC2945. The SRP key exchange is not a part of the TLS 1.0 protocol} & Authentication using the SRP
-protocol. This protocol is actually password authentication, since the two
-peers are identified by the knowledge of a password. However this protocol
-also offers protection against off-line attacks (password file stealing
-etc.). Use SRP authentication if password based authentication is required.
-\\
-\hline
-\end{tabular}
-
-\caption{Supported SRP key exchange algorithms}
-
-\end{figure}
-
-
-
-
 \addvspace{1.5cm}
-
-\begin{figure}[hbtp]
-\begin{tabular}{|l|p{9cm}|}
-
-\hline
-3DES\_CBC & 3DES\_CBC is the DES block cipher algorithm used with multiple (triple)
-encryption (EDE). Has 64 bits block size and is used in CBC mode.
-\\
-\hline
-ARCFOUR & ARCFOUR\footnote{A compatible cipher with RC4 of RSADSI} is a
-fast stream cipher.
-\\
-\hline
-AES\_CBC & AES or RIJNDAEL is the block cipher algorithm that replaces the old 
-(and insecure\footnote{due to small key length}) DES algorithm. Has
-128 bits block size and is used in CBC mode.
-\\
-\hline
-TWOFISH\_CBC & TWOFISH is a block cipher algorithm by Counterpane. Has
-128 bits block size and is used in CBC mode.
-\\
-\hline
-\end{tabular}
-\caption{Supported cipher algorithms}
-
-\end{figure}
-
-
-
-\addvspace{1.5cm}
-
-\begin{figure}[hbtp]
-\begin{tabular}{|l|p{9cm}|}
-
-\hline
-MAC\_MD5 & MD5 is a hash algorithm by Ron Rivest. Outputs 128 bits of data.
-\\
-\hline
-MAC\_SHA & SHA is a hash algorithm by NSA. Outputs 160 bits of data.
-\\
-\hline
-\end{tabular}
-\caption{Supported MAC algorithms}
-
-\end{figure}
 

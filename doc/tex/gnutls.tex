@@ -39,35 +39,19 @@ execution (without the need for Critical Sections and locks).
 \par
 Currently \gnutls implements:
 \begin{itemize}
- \item the {\bf TLS 1.0} and {\bf{ SSL 3.0}} protocols, without any (US) export-controlled algorithms
- \item {\bf X509} Public Key Infrastructure (with several limitations).
+ \item the {\bf TLS 1.0} and {\bf{ SSL 3.0}} protocols, without any weak algorithms\footnote{
+There are ciphersuites in {\it TLS 1.0} that are considered weak. These algorithms are deliberately weak 
+in order to be able to export encryption software from some countries.}
+ \item {\bf X.509} Public Key Infrastructure (with several limitations).
  \item {\bf SRP} for TLS authentication.
  \item TLS {\bf Extension mechanism}
 \end{itemize}
 
-\subsection{Confidentiality}
-\par
-Confidentiality is provided by using symmetric encryption algorithms like {\bf 3DES}, 
-{\bf AES\footnote{AES or Advanced Encryption Standard is actually the RIJNDAEL algorithm. This is the
-algorithm that will replace DES.}}, or
-stream algorithms like {\bf ARCFOUR\footnote{ARCFOUR is a compatible
-algorithm with RSA's RC4 algorithm.}}. A symmetric encryption algorithm uses a single (secret) key
-to encrypt and decrypt data. Block algorithms in TLS also provide protection
-against statistical analysis of the data. \gnutls makes use of this property
-thus, if you're operating in TLS 1.0 mode, a random number of blocks will be
-appended to the data. This will prevent eavesdroppers from guessing the 
-actual data size.
-
-\subsection{Authentication}
-\par
-The following authentication schemas are supported in \gnutls:
-\begin{enumerate}
- \item X509 Public Key Infrastructure
- \item Anonymous authentication
- \item SRP authentication
-\end{enumerate}
-
 \input{ciphersuites}
+
+\input{ciphers}
+
+\input{auth}
 
 \input{resumedb}
 
@@ -108,7 +92,7 @@ and authenticates using {\it username} and {\it password}.
 \section{Server Examples}
 This section contains examples of TLS and SSL servers, using \gnutls.
 
-\subsection{Echo Server with X509 and SRP authentication}
+\subsection{Echo Server with X.509 and SRP authentication}
 The following example is a server which supports both {\bf SRP} and {\bf X509} authentication.
 This server also supports {\it session resuming}.
 \input{serv1}

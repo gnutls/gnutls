@@ -14,3 +14,4 @@ libgnutls-config
 gnutls.h
 x509_ASN.c
 gnutls-api.tex
+asn1-api.tex

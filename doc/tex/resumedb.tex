@@ -10,8 +10,8 @@ established keys). \gnutls supports this feature, and the
 example \hyperref{resume client}{resume client (see Section }{ for more
 information)}{resume-example} illustrates a typical use of it (This is a modification of the simple client example).
 Servers only need to use the
-\hyperref{gnutls\_set\_db\_name()}{gnutls\_set\_db\_name() (see Section }{ for more
-information)}{gnutls_set_db_name} function if they want to use the gdbm
+\hyperref{gnutls\_db\_set\_name()}{gnutls\_db\_set\_name() (see Section }{ for more
+information)}{gnutls_db_set_name} function if they want to use the gdbm
 backend to store sessions. 
 \par
 Keep in mind that sessions are expired after some time (for security reasons), thus
@@ -29,8 +29,8 @@ nesessary parameters etc.).
 The server side is different\footnote{Future versions of gnutls may be
 different}. 
 Here the server only specifies a DB file (using 
-\hyperref{gnutls\_set\_db\_name()}{gnutls\_set\_db\_name() (see Section }{ for more
-information)}{gnutls_set_db_name}
+\hyperref{gnutls\_db\_set\_name()}{gnutls\_db\_set\_name() (see Section }{ for more
+information)}{gnutls_db_set_name}
 ) to be used. This DB file is used to store the sessions' required parameters for
 resuming (and this means that this file contains very sensitive information,
 such as encryption keys). In a multi-threaded application every thread can
@@ -40,23 +40,23 @@ not to block and wait for the DB to be ready for writing, but continue the
 process normally (and do not save the parameters).  
 \par
  After version {\emph 0.2.10} \gnutls provides callback functions such as:
-\hyperref{gnutls\_set\_db\_remove\_function()}{gnutls\_set\_db\_remove\_function() (see Section }{ for more
-information)}{gnutls_set_db_remove_function},
-\hyperref{gnutls\_set\_db\_store\_function()}{gnutls\_set\_db\_store\_function() (see Section }{ for more
-information)}{gnutls_set_db_store_function},
-\hyperref{gnutls\_set\_db\_retrieve\_function()}{gnutls\_set\_db\_retrieve\_function() (see Section }{ for more
-information)}{gnutls_set_db_retrieve_function} and
-\hyperref{gnutls\_set\_db\_ptr()}{gnutls\_set\_db\_ptr() (see Section }{ for more
-information)}{gnutls_set_db_ptr}.
+\hyperref{gnutls\_db\_set\_remove\_function()}{gnutls\_db\_set\_remove\_function() (see Section }{ for more
+information)}{gnutls_db_set_remove_function},
+\hyperref{gnutls\_db\_set\_store\_function()}{gnutls\_db\_set\_store\_function() (see Section }{ for more
+information)}{gnutls_db_set_store_function},
+\hyperref{gnutls\_db\_set\_retrieve\_function()}{gnutls\_db\_set\_retrieve\_function() (see Section }{ for more
+information)}{gnutls_db_set_retrieve_function} and
+\hyperref{gnutls\_db\_set\_ptr()}{gnutls\_db\_set\_ptr() (see Section }{ for more
+information)}{gnutls_db_set_ptr}.
 These callback functions are required in order to use a session
 storage method, other than the default gdbm backend. 
 \par
 If an alternative backend is in use, it might be usefull to be able to check
 for expired sessions in order to remove them, and save space (in the way 
-\hyperref{gnutls\_clean\_db()}{gnutls\_clean\_db() (see Section }{ for more
-information)}{gnutls_clean_db}.
+\hyperref{gnutls\_db\_clean()}{gnutls\_db\_clean() (see Section }{ for more
+information)}{gnutls_db_clean}.
 ) does for the gdbm backend. \gnutls provides the function
-\hyperref{gnutls\_check\_db\_entry()}{gnutls\_check\_db\_entry() (see Section }{ for more
-information)}{gnutls_check_db_entry}, which takes as input session data, and
+\hyperref{gnutls\_db\_check\_entry()}{gnutls\_db\_check\_entry() (see Section }{ for more
+information)}{gnutls_db_check_entry}, which takes as input session data, and
 returns a negative value if the data are to be removed.
 
