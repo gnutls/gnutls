@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
  *  This file is part of GNUTLS.
  *
@@ -336,7 +336,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 	uint16 length;
 	GNUTLS_MAC_HANDLE td;
 	uint16 blocksize;
-	int ret, i;
+	int ret, i, pad_failed = 0;
 	uint8 major, minor;
 	gnutls_protocol_version ver;
 	int hash_size = _gnutls_mac_get_digest_size(session->security_parameters.read_mac_algorithm);
@@ -398,7 +398,10 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		if (pad >
 		    ciphertext.size - hash_size) {
 			gnutls_assert();
-			return GNUTLS_E_DECRYPTION_FAILED;
+			/* We do not fail here. We check below for the
+			 * the pad_failed. If zero means success.
+			 */
+			pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 		}
 		
 		/* Check the pading bytes (TLS 1.0 only)
@@ -407,7 +410,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		for (i=2;i<pad;i++) {
 			if (ciphertext.data[ciphertext.size-i] != ciphertext.data[ciphertext.size - 1]) {
 				gnutls_assert();
-				return GNUTLS_E_DECRYPTION_FAILED;
+				pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 			}
 		}
 		
@@ -456,6 +459,11 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		gnutls_assert();
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
+	
+	/* This one was introduced to avoid a timing attack against the TLS
+	 * 1.0 protocol.
+	 */
+	if (pad_failed != 0) return pad_failed;
 
 	return length;
 }
