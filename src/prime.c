@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 	
 		for (i=0;i<size;i++) {
 			if (i!=0 && i%12==0) printf("\n\t");
-			else if (i!=0 && i!=size-1) printf( ":");
+			else if (i!=0 && i!=size) printf( ":");
 
 			printf( "%.2x", tmp1[i]);
 		}
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 
 		for (i=0;i<size;i++) {
 			if (i!=0 && i%12==0) printf("\n\t");
-			else if (i!=0 && i!=size-1) printf( ":");
+			else if (i!=0 && i!=size) printf( ":");
 			printf( "%.2x", tmp2[i]);
 		}
 
