@@ -3,6 +3,7 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Verify added CRLs
 * Document the format for the supported DN attributes.
 * Add support for Certificate Extensions Profile for Qualified 
   Certificates (rfc3039)
