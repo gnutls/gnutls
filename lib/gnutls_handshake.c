@@ -316,7 +316,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	state->security_parameters.timestamp = time(NULL);
 
 	DECR_LEN(len, 1);
-	memcpy(&session_id_len, &data[pos++], 1);
+	session_id_len = data[pos++];
 
 	/* RESUME SESSION 
 	 */
@@ -360,7 +360,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	/* Select an appropriate compression method
 	 */
 	DECR_LEN(len, 1);
-	memcpy(&z, &data[pos++], 1);	/* z is the number of compression methods */
+	z = data[pos++]; /* z is the number of compression methods */
 
 	DECR_LEN(len, z);
 	ret = _gnutls_server_select_comp_method(state, &data[pos], z);
@@ -668,7 +668,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	memcpy(&data[pos++], &type, 1);
+	data[pos++] = (uint8) type;
 	WRITEuint24(i_datasize, &data[pos]);
 	pos += 3;
 
@@ -1157,7 +1157,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	/* Read session ID
 	 */
 	DECR_LEN(len, 1);
-	memcpy(&session_id_len, &data[pos++], 1);
+	session_id_len = data[pos++];
 
 	if (len < session_id_len) {
 		gnutls_assert();
@@ -1297,10 +1297,10 @@ static int _gnutls_copy_comp_methods(GNUTLS_STATE state,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	memcpy(&(*ret_data)[pos++], &z, 1);	/* put the number of compression methods */
+	(*ret_data)[pos++] = z; /* put the number of compression methods */
 
 	for (i = 0; i < z; i++) {
-		memcpy(&(*ret_data)[pos++], &compression_methods[i], 1);
+		(*ret_data)[pos++] = compression_methods[i];
 	}
 
 	gnutls_free(compression_methods);
@@ -1381,7 +1381,7 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 
 		/* Copy the Session ID 
 		 */
-		memcpy(&data[pos++], &session_id_len, 1);
+		data[pos++] = session_id_len;
 
 		if (session_id_len > 0) {
 			memcpy(&data[pos], SessionID, session_id_len);
@@ -1521,7 +1521,7 @@ static int _gnutls_send_server_hello(GNUTLS_STATE state, int again)
 		    (uint8) _gnutls_compression_get_num(state->
 							gnutls_internals.
 							compression_method);
-		memcpy(&data[pos++], &comp, 1);
+		data[pos++] = comp;
 
 
 		extdatalen = _gnutls_gen_extensions(state, &extdata);

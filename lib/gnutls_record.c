@@ -405,8 +405,8 @@ int gnutls_alert_send( GNUTLS_STATE state, AlertLevel level, AlertDescription de
 	uint8 data[2];
 	int ret;
 	
-	memcpy(&data[0], &level, 1);
-	memcpy(&data[1], &desc, 1);
+	data[0] = (uint8) level;
+	data[1] = (uint8) desc;
 
 #ifdef RECORD_DEBUG
 	_gnutls_log( "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));

@@ -94,8 +94,7 @@ uint16 size;
 	
 	do {
 		DECR_LENGTH_RET( next, 1, 0);
-		memcpy( &type, &data[pos], 1);
-		pos++;
+		type = data[pos++];
 
 		DECR_LENGTH_RET( next, 2, 0);
 		size = READuint16(&data[pos]);

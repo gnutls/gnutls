@@ -141,7 +141,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 
 	/* firstly copy the algorithm used to generate the verifier 
 	 */
-	memcpy( data_g, &pwd_algo, 1);
+	data_g[0] = pwd_algo;
 
 	/* copy G (generator) to data */
 
@@ -324,7 +324,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	
 	i = 0;
 	DECR_LEN( data_size, 1);
-	memcpy( &pwd_algo, data, 1);
+	pwd_algo = data[0];
 	i++;
 
 	DECR_LEN( data_size, 2);
