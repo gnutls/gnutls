@@ -302,17 +302,15 @@ fi
 
 libtasn1_enabled=no
 
-AC_CHECK_LIB(asn1, asn1_array2tree,:, 
+AC_CHECK_LIB( tasn1, asn1_array2tree,:, 
  libtasn1_enabled=yes
  AC_MSG_WARN(
 *** 
-*** LibASN1 was not found. Will use the included one.))
-
-
+*** LibtASN1 was not found. Will use the included one.),
 AC_ARG_WITH(included-libtasn1,
 	[  --with-included-libtasn1 Use the included libtasn1],
 libtasn1_enabled=yes, libtasn1_enabled=no)
-
+)
 
 
 AC_MSG_RESULT([***
@@ -349,7 +347,7 @@ AC_MSG_WARN(***
 fi
 
 
-if test "$libtasn1_enabled" = yes; then
+if test x"$libtasn1_enabled" = xyes; then
  AC_CONFIG_SUBDIRS(libtasn1)
  LIBASN1_DIR=libtasn1
  AC_SUBST(LIBASN1_DIR)
