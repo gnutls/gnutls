@@ -1,3 +1,9 @@
+2002-12-04 23:38  nmav <nmav@gnutls.org>
+
+	* lib/: x509_extensions.c, x509_verify.c:
+
+	some optimizations in string handling of the x.509 asn.1 parsers.  
+
 2002-12-04 12:16  nmav <nmav@gnutls.org>
 
 	* doc/tex/: Makefile.am, ex-pgp-keyserver.tex, examples.tex,
