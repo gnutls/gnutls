@@ -420,42 +420,42 @@ GNUTLS_MPI gnutls_get_dh_params(gnutls_dh_params dh_primes,
 /* returns g and p, depends on the requested bits.
  * We only support limited key sizes.
  */
-GNUTLS_MPI _gnutls_get_rnd_srp_params(GNUTLS_MPI * ret_p, int bits)
+int _gnutls_get_rnd_srp_params(gnutls_datum *g, gnutls_datum* p, int bits)
 {
-	GNUTLS_MPI g = NULL, prime = NULL;
 	int i;
 
 	if (_gnutls_dh_default_params == NULL) {
 		gnutls_assert();
-		return NULL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
+
+	g->data = p->data = NULL;
+	g->size = p->size = 0;
 
 	bits = normalize_bits(bits);
 
 	i = 0;
 	do {
 		if (_gnutls_dh_default_params[i].bits == bits) {
-			prime =
-			    _gnutls_mpi_copy(_gnutls_dh_default_params[i].
-					     _prime);
-			g = _gnutls_mpi_copy(_gnutls_dh_default_params[i].
-					     _generator);
+			gnutls_set_datum( p, _gnutls_dh_default_params[i].prime.data,
+				_gnutls_dh_default_params[i].prime.size);
+
+			gnutls_set_datum( g, _gnutls_dh_default_params[i].generator.data,
+				_gnutls_dh_default_params[i].generator.size);
+
 			break;
 		}
 		i++;
 	} while (_gnutls_dh_default_params[i].bits != 0);
 
-	if (prime == NULL || g == NULL) {	/* if not prime was found */
+	if (g->data == NULL || p->data == NULL) {
 		gnutls_assert();
-		_gnutls_mpi_release(&g);
-		_gnutls_mpi_release(&prime);
-		*ret_p = NULL;
-		return NULL;
+		gnutls_free_datum(&g);
+		gnutls_free_datum(&p);
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	if (ret_p)
-		*ret_p = prime;
-	return g;
+	return 0;
 }
 
 /* These should be added in gcrypt.h */

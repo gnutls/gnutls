@@ -46,7 +46,11 @@ recv_openpgp_key(const unsigned char *keyfpr, unsigned int
        unsigned char *buf = cdk_calloc( 1, 20001 );
        size_t len = 20000;
        cdk_kbnode_write_to_mem( knode, buf, &len);
-       datum_append( key, buf, len );
+
+       key->data = malloc( len);
+       if (key->data==NULL) return -1;
+       memcpy( key->data, buf, len);
+
        cdk_free( buf );
    }
    cdk_kbnode_release( knode );

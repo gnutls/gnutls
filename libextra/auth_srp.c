@@ -31,6 +31,7 @@
 #include "gnutls_num.h"
 #include "auth_srp.h"
 #include <gnutls_str.h>
+#include <gnutls_datum.h>
 
 int _gnutls_gen_srp_server_kx2(gnutls_session, opaque **);
 int _gnutls_gen_srp_client_kx0(gnutls_session, opaque **);
@@ -74,11 +75,10 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
  */
 int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data, size_t _data_size)
 {
-	size_t n_g, n_n, n_s;
 	int ret;
 	uint8 *data_n, *data_s;
 	uint8 *data_g, *username;
-	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
+	SRP_PWD_ENTRY *pwd_entry;
 	int err;
 	SRP_SERVER_AUTH_INFO info;
 	ssize_t data_size = _data_size;
@@ -96,39 +96,35 @@ int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data, size_t _da
 	pwd_entry = _gnutls_srp_pwd_read_entry( state, username, &err);
 
 	if (pwd_entry == NULL) {
-		if (err==0)
+		if (err==0) {
+			gnutls_assert();
 			/* in order to avoid informing the peer that
 			 * username does not exist.
 			 */
 			pwd_entry = _gnutls_randomize_pwd_entry();
-		else 
+		} else {
 		        return GNUTLS_E_PWD_ERROR;
+		}
 	}
 
-	if (_gnutls_mpi_print( NULL, &n_g, pwd_entry->g)!=0) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_PRINT_FAILED;
-	}
-	if (_gnutls_mpi_print( NULL, &n_n, pwd_entry->n)!=0) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_PRINT_FAILED;
-	}
-	
 	/* copy from pwd_entry to local variables (actually in state) */
-	G = _gnutls_mpi_alloc_like(pwd_entry->g);
-	N = _gnutls_mpi_alloc_like(pwd_entry->n);
-	V = _gnutls_mpi_alloc_like(pwd_entry->v);
-
-	if (G==NULL || N == NULL || V == NULL) {
+	if (_gnutls_mpi_scan( &G, pwd_entry->g.data, &pwd_entry->g.size) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	_gnutls_mpi_set(G, pwd_entry->g);
-	_gnutls_mpi_set(N, pwd_entry->n);
-	_gnutls_mpi_set(V, pwd_entry->v);
+	if (_gnutls_mpi_scan( &N, pwd_entry->n.data, &pwd_entry->n.size) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
 
-	if ((size_t)data_size < n_n + n_g + pwd_entry->salt_size + 5) {
+	if (_gnutls_mpi_scan( &V, pwd_entry->v.data, &pwd_entry->v.size) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	if ((size_t)data_size < pwd_entry->n.size + 
+		pwd_entry->g.size + pwd_entry->salt.size + 5) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -137,33 +133,20 @@ int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data, size_t _da
 	 */
 	data_s = data;
 
-	n_s = pwd_entry->salt_size;
-	memcpy(&data_s[1], pwd_entry->salt, n_s);
-
-	data_s[0] = (uint8) n_s;
+	_gnutls_write_datum8( data_s, pwd_entry->salt);
 
 	/* copy N (mod n) */
-	data_n = &data_s[1 + n_s];
+	data_n = &data_s[1 + pwd_entry->salt.size];
+	_gnutls_write_datum16( data_n, pwd_entry->n);
 
-	if (_gnutls_mpi_print( &data_n[2], &n_n, N)!=0) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_PRINT_FAILED;
-	}
-	
-	_gnutls_write_uint16( n_n, data_n);
 
-	data_g = &data_n[2 + n_n];
-
+	data_g = &data_n[2 + pwd_entry->n.size];
 	/* copy G (generator) to data */
+	_gnutls_write_datum16( data_g, pwd_entry->g);
 
-	if(_gnutls_mpi_print( &data_g[2], &n_g, G)!=0) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_PRINT_FAILED;
-	}
-	
-	_gnutls_write_uint16( n_g, data_g);
 
-	ret = n_g + n_n + pwd_entry->salt_size + 5;
+	ret = pwd_entry->g.size + pwd_entry->n.size + 
+		pwd_entry->salt.size + 5;
 	_gnutls_srp_clear_pwd_entry( pwd_entry);
 
 	return ret;
@@ -183,8 +166,10 @@ int _gnutls_gen_srp_server_kx2(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (_gnutls_mpi_print( NULL, &n_b, B)!=0)
+	if (_gnutls_mpi_print( NULL, &n_b, B)!=0) {
+		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
+	}
 
 	(*data) = gnutls_malloc(n_b + 2);
 	if ( (*data) == NULL) {
@@ -224,8 +209,10 @@ int _gnutls_gen_srp_server_kx2(gnutls_session state, opaque ** data)
 	ret = _gnutls_generate_key( state->key);
 	_gnutls_mpi_release( &S);
 
-	if (ret < 0)
+	if (ret < 0) {
+		gnutls_assert();
 		return ret;
+	}
 
 	return n_b + 2;
 }

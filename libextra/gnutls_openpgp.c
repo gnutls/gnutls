@@ -1419,6 +1419,18 @@ _gnutls_openpgp_request_key( gnutls_session session, gnutls_datum* ret,
 		gnutls_assert();
 		return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 	}
+	
+	if (gnutls_malloc != malloc) {
+		char* tmpdata = gnutls_malloc( ret->size);
+		if (tmpdata == NULL) {
+			free( ret->data);
+			return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+		}
+		memcpy(tmpdata, ret->data, ret->size);
+		free( ret->data);
+		
+		ret->data = tmpdata;
+	}
     }
 
     return rc;

@@ -488,12 +488,11 @@ int i;
   * first password file
   *
   * In case the callback returned a negative number then gnutls will
-  * not attempt to choose the appropriate certificate and the caller function
-  * will fail.
+  * terminate this handshake.
   *
   * The callback function will only be called once per handshake.
-  * The callback function should return the index of the certificate
-  * choosen by the server. -1 indicates an error.
+  * The callback function should return the index of the password file
+  * that will be used by the server. -1 indicates an error.
   *
   **/
 void gnutls_srp_server_set_select_function(gnutls_session session,
@@ -502,6 +501,37 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
 {
 	session->internals.server_srp_callback = func;
 }
+
+/**
+  * gnutls_srp_server_set_credentials_function - Used to set a callback to retrieve the user's SRP credentials
+  * @cred: is a &gnutls_srp_server_credentials structure.
+  * @func: is the callback function
+  *
+  * The callback's function form is:
+  * int (*callback)(gnutls_session, const char* username,
+  *  gnutls_datum* salt, gnutls_datum *verifier, gnutls_datum* g,
+  *  gnutls_datum* n);
+  *
+  * 'username' contains the actual username.
+  *
+  * The 'salt', 'verifier', 'generator' and 'prime' must be filled
+  * in.
+  *
+  * In case the callback returned a negative number then gnutls will
+  * assume that the username does not exist.
+  *
+  * The callback function will only be called once per handshake.
+  * The callback function should return 0 on success.
+  * -1 indicates an error.
+  *
+  **/
+void gnutls_srp_server_set_credentials_function(
+	gnutls_srp_server_credentials cred, 
+	gnutls_srp_server_credentials_function * func)
+{
+	cred->pwd_callback = func;
+}
+
 
 /**
   * gnutls_srp_server_get_username - This function returns the username of the peer

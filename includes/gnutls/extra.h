@@ -50,6 +50,16 @@ int gnutls_srp_verifier( char* username, char* password, const gnutls_datum *sal
 	const gnutls_datum* g, const gnutls_datum* n, 
 	gnutls_datum * res);
 
+typedef int gnutls_srp_server_credentials_function(
+	gnutls_session, 
+	char* username, gnutls_datum* salt, 
+	gnutls_datum* verifier, gnutls_datum* generator,
+	gnutls_datum* prime
+);
+
+void gnutls_srp_server_set_credentials_function( 
+	gnutls_srp_server_credentials, 
+	gnutls_srp_server_credentials_function *);
 
 /* Openpgp certificate stuff */
 int gnutls_openpgp_fingerprint( const gnutls_datum* data, char* result, size_t* result_size);

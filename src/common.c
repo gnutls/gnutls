@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <time.h>
@@ -58,7 +59,7 @@ void print_x509_info(gnutls_session session)
 		gnutls_datum res;
 
 		gnutls_x509_certificate_to_xml(&cert_list[0], &res, 0);
-		printf(res.data);
+		puts(res.data);
 
 		free(res.data);
 
@@ -166,7 +167,7 @@ void print_openpgp_info(gnutls_session session)
 			gnutls_datum res;
 
 			gnutls_openpgp_key_to_xml(&cert_list[0], &res, 0);
-			printf(res.data);
+			puts(res.data);
 
 			free(res.data);
 

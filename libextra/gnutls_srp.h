@@ -9,9 +9,6 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n);
 int _gnutls_calc_srp_x( char* username, char* password, opaque* salt, size_t salt_size, size_t* size, void* digest);
 int _gnutls_srp_gn( opaque** ret_g, opaque** ret_n, int bits);
 
-/* our prime */
-extern const uint8 diffie_hellman_group1_prime[130];
-
 /* g is defined to be 2 */
 #define SRP_MAX_HASH_SIZE 24
 
