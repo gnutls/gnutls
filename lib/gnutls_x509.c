@@ -49,6 +49,7 @@
  */
 
 int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int indx, char* certificate, int* certificate_size);
+int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struct);
 
 
 #define _READ(a, aa, b, c, d, e, res, f) \
@@ -1007,7 +1008,7 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
 {
-	int i, j;
+	int i, j, count;
 	gnutls_datum tmp, tmp2;
 	int ret;
 	opaque pcert[MAX_X509_CERT_SIZE];
@@ -1018,23 +1019,28 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	/* tmp now contains the decoded certificate list */
 	tmp.data = (void*)input_cert;
 	tmp.size = input_cert_size;
-#warning FIX THIS. Make it read the certificate the reverse order
-	j = 0;
+
+	count = gnutls_x509_pkcs7_extract_certificate_count( &tmp);
+	if (count < 0) {
+		gnutls_assert();
+		/* if we failed to read the count,
+		 * then just try to decode a plain DER
+		 * certificate.
+		 */
+		return parse_der_cert_mem( cert_list, ncerts,
+			input_cert, input_cert_size);
+	}
+	
+	
+	j = count - 1;
 	do {
 		pcert_size = sizeof(pcert);
 		ret = gnutls_x509_pkcs7_extract_certificate( &tmp, j, pcert, &pcert_size);
+		j--;
 
 		/* if the current certificate is too long, just ignore
 		 * it. */
 		if (ret==GNUTLS_E_MEMORY_ERROR) continue;
-		if (ret < 0 && j==0) {
-			/* if we failed to read it in the first attempt,
-			 * then just try to decode a plain DER
-			 * certificate.
-			 */
-			return parse_der_cert_mem( cert_list, ncerts,
-				input_cert, input_cert_size);
-		}
 		
 		if (ret >= 0) {
 			*cert_list =
@@ -1063,9 +1069,8 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 			
 			i++;
 		}
-		j++;
 
-	} while (ret >= 0);
+	} while (ret >= 0 && j >= 0);
 	
 	*ncerts = i - 1;
 
@@ -1724,7 +1729,7 @@ int len, result;
 		 */
 		gCert->subject_pk_algorithm = GNUTLS_PK_RSA;
 
-		if ((sizeof(gCert->params) / sizeof(MPI)) < RSA_PARAMS) {
+		if ((sizeof(gCert->params) / sizeof(MPI)) < RSA_PUBLIC_PARAMS) {
 			gnutls_assert();
 			/* internal error. Increase the MPIs in params */
 			return GNUTLS_E_INTERNAL_ERROR;
@@ -1735,7 +1740,7 @@ int len, result;
 			gnutls_assert();
 			return result;
 		}
-		gCert->params_size = RSA_PARAMS;
+		gCert->params_size = RSA_PUBLIC_PARAMS;
 		
 		return 0;
 	}
@@ -2199,7 +2204,7 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 	/* if 'Certificate' is the choice found: */
 	if (strcmp( oid, "certificate") == 0) {
 		int start, end;
-		
+
 /*		_gnutls_str_cat( root2, sizeof(root2), ".certificate"); */
 
 		result = asn1_get_start_end_der(c2, pcert, pcert_size, 
@@ -2350,3 +2355,121 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 	return algo;
 }
 
+/**
+  * gnutls_x509_pkcs7_extract_certificate_count - This function returns the number of certificates in a PKCS7 certificate set
+  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
+  *
+  * This function will return the certificate number of the PKCS7 or RFC2630 certificate set.
+  * Returns a negative value on failure.
+  *
+  **/
+int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struct)
+{
+	node_asn *c2, *c1;
+	int result, len, count;
+	char root1[128];
+	char oid[64];
+	char tmp[MAX_X509_CERT_SIZE];
+	char root2[128];
+	opaque* pkcs7_str = pkcs7_struct->data;
+	int pkcs7_str_size = pkcs7_struct->size;
+
+	opaque* pcert;
+	int pcert_size;
+
+	/* Step 1. Parse content and content info */
+	
+	if (pkcs7_str_size == 0 || pkcs7_str == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	_gnutls_str_cpy( root1, sizeof(root1), "PKIX1.ContentInfo");
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), root1, &c1, "c1")) != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_get_der(c1, pkcs7_str, pkcs7_str_size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+
+		_gnutls_log("X509_auth: Decoding error %d\n");
+
+		gnutls_assert();
+		asn1_delete_structure(c1);
+		return result;
+	}
+
+	len = sizeof(oid) - 1;
+
+	/* root2 is used as a temp storage area
+	 */
+	_gnutls_str_cpy( root2, sizeof(root2), "c1.contentType");
+	result = asn1_read_value(c1, root2, oid, &len);
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(c1);
+		return result;
+	}
+
+	if ( strcmp( oid, "1 2 840 113549 1 7 2") != 0) {
+		gnutls_assert();
+		asn1_delete_structure(c1);
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}					 		 	
+
+	pcert_size = sizeof(tmp) - 1;
+	pcert = tmp;
+
+	_gnutls_str_cpy( root2, sizeof(root2), "c1.content");
+	result = asn1_read_value(c1, root2, pcert, &pcert_size);
+
+	asn1_delete_structure(c1);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* pcert, pcert_size hold the data and the size of the CertificateSet structure
+	 * actually the ANY stuff.
+	 */
+
+
+	/* Step 1.5. In case of a signed structure count the certificate set.
+	 */
+	_gnutls_str_cpy( root2, sizeof(root2), "PKIX1.SignedData");
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), root2, &c2, "c2")) != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_get_der(c2, pcert, pcert_size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+	
+		_gnutls_log("X509_auth: Decoding error %d\n");
+
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+		
+	/* Step 2. Count the CertificateSet */
+	
+
+	_gnutls_str_cpy( root2, sizeof(root2), "c2.certificates"); 
+	result = asn1_number_of_elements( c2, root2, &count);
+
+	asn1_delete_structure(c2);
+	
+	if (result != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	return count;
+}
