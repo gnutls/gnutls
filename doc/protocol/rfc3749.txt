@@ -1,38 +1,28 @@
 
+
+
+
+
+
 Network Working Group                                      S. Hollenbeck
-Internet-Draft                                            VeriSign, Inc.
-Updates: 2246 (if approved)                             January 16, 2004
-Expires: July 16, 2004
+Request for Comments: 3749                                VeriSign, Inc.
+Category: Standards Track                                       May 2004
+
 
 
          Transport Layer Security Protocol Compression Methods
-                   draft-ietf-tls-compression-07.txt
 
 Status of this Memo
 
-   This document is an Internet-Draft and is in full conformance with
-   all provisions of Section 10 of RFC2026.
-
-   Internet-Drafts are working documents of the Internet Engineering
-   Task Force (IETF), its areas, and its working groups. Note that other
-   groups may also distribute working documents as Internet-Drafts.
-
-   Internet-Drafts are draft documents valid for a maximum of six months
-   and may be updated, replaced, or obsoleted by other documents at any
-   time. It is inappropriate to use Internet-Drafts as reference
-   material or to cite them other than as "work in progress."
-
-   The list of current Internet-Drafts can be accessed at http://
-   www.ietf.org/ietf/1id-abstracts.txt.
-
-   The list of Internet-Draft Shadow Directories can be accessed at
-   http://www.ietf.org/shadow.html.
-
-   This Internet-Draft will expire on July 16, 2004.
+   This document specifies an Internet standards track protocol for the
+   Internet community, and requests discussion and suggestions for
+   improvements.  Please refer to the current edition of the "Internet
+   Official Protocol Standards" (STD 1) for the standardization state
+   and status of this protocol.  Distribution of this memo is unlimited.
 
 Copyright Notice
 
-   Copyright (C) The Internet Society (2004). All Rights Reserved.
+   Copyright (C) The Internet Society (2004).  All Rights Reserved.
 
 Abstract
 
@@ -47,72 +37,30 @@ Abstract
    TLS, and it describes a method for the specification of additional
    TLS compression methods.
 
-
-
-
-
-Hollenbeck               Expires July 16, 2004                  [Page 1]
-
-Internet-Draft          TLS Compression Methods             January 2004
-
-
-Conventions Used In This Document
-
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-   document are to be interpreted as described in RFC 2119 [1].
-
 Table of Contents
 
-   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
-   2.  Compression Methods  . . . . . . . . . . . . . . . . . . . . .  3
-   2.1 DEFLATE Compression  . . . . . . . . . . . . . . . . . . . . .  4
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  2
+   2.  Compression Methods  . . . . . . . . . . . . . . . . . . . . .  2
+       2.1.  DEFLATE Compression. . . . . . . . . . . . . . . . . . .  3
    3.  Compression History and Packet Processing  . . . . . . . . . .  4
-   4.  Internationalization Considerations  . . . . . . . . . . . . .  5
-   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  5
+   4.  Internationalization Considerations  . . . . . . . . . . . . .  4
+   5.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . .  4
    6.  Security Considerations  . . . . . . . . . . . . . . . . . . .  5
    7.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . .  6
-       Normative References . . . . . . . . . . . . . . . . . . . . .  6
-       Informative References . . . . . . . . . . . . . . . . . . . .  7
+   8.  References . . . . . . . . . . . . . . . . . . . . . . . . . .  6
+       8.1.  Normative References . . . . . . . . . . . . . . . . . .  6
+       8.2.  Informative References . . . . . . . . . . . . . . . . .  6
        Author's Address . . . . . . . . . . . . . . . . . . . . . . .  7
-       Intellectual Property and Copyright Statements . . . . . . . .  8
+       Full Copyright Statement . . . . . . . . . . . . . . . . . . .  8
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Hollenbeck               Expires July 16, 2004                  [Page 2]
+Hollenbeck                  Standards Track                     [Page 1]
 
-Internet-Draft          TLS Compression Methods             January 2004
+RFC 3749                TLS Compression Methods                 May 2004
 
 
-1. Introduction
+1.  Introduction
 
    The Transport Layer Security (TLS) protocol (RFC 2246, [2]) includes
    features to negotiate selection of a lossless data compression method
@@ -129,11 +77,11 @@ Internet-Draft          TLS Compression Methods             January 2004
    TLS is used extensively to secure client-server connections on the
    World Wide Web.  While these connections can often be characterized
    as short-lived and exchanging relatively small amounts of data, TLS
-   is also being used in environments where connections can be
-   long-lived and the amount of data exchanged can extend into thousands
-   or millions of octets.  XML [4], for example, is increasingly being
-   used as a data representation method on the Internet, and XML tends
-   to be verbose.  Compression within TLS is one way to help reduce the
+   is also being used in environments where connections can be long-
+   lived and the amount of data exchanged can extend into thousands or
+   millions of octets.  XML [4], for example, is increasingly being used
+   as a data representation method on the Internet, and XML tends to be
+   verbose.  Compression within TLS is one way to help reduce the
    bandwidth and latency requirements associated with exchanging large
    amounts of data while preserving the security services provided by
    TLS.
@@ -144,34 +92,42 @@ Internet-Draft          TLS Compression Methods             January 2004
    algorithms associated with this compression method is beyond the
    scope of this document.
 
-2. Compression Methods
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119 [1].
+
+2.  Compression Methods
 
    TLS [2] includes the following compression method structure in
    sections 6.1 and 7.4.1.2 and Appendix sections A.4.1 and A.6:
 
    enum { null(0), (255) } CompressionMethod;
 
+
+
+
+
+
+
+
+
+Hollenbeck                  Standards Track                     [Page 2]
+
+RFC 3749                TLS Compression Methods                 May 2004
+
+
    which allows for later specification of up to 256 different
    compression methods.  This definition is updated to segregate the
    range of allowable values into three zones:
 
-   1.  Values from 0 (zero) through 63 decimal (0x3F) inclusive are
-       reserved for IETF Standards Track protocols.
+   1. Values from 0 (zero) through 63 decimal (0x3F) inclusive are
+      reserved for IETF Standards Track protocols.
 
-   2.  Values from 64 decimal (0x40) through 223 decimal (0xDF)
-       inclusive are reserved for assignment for non-Standards Track
+   2. Values from 64 decimal (0x40) through 223 decimal (0xDF) inclusive
+      are reserved for assignment for non-Standards Track methods.
 
-
-
-Hollenbeck               Expires July 16, 2004                  [Page 3]
-
-Internet-Draft          TLS Compression Methods             January 2004
-
-
-       methods.
-
-   3.  Values from 224 decimal (0xE0) through 255 decimal (0xFF)
-       inclusive are reserved for private use.
+   3. Values from 224 decimal (0xE0) through 255 decimal (0xFF)
+      inclusive are reserved for private use.
 
    Additional information describing the role of the IANA in the
    allocation of compression method identifiers is described in Section
@@ -190,14 +146,14 @@ Internet-Draft          TLS Compression Methods             January 2004
    compression method within TLS.
 
    The DEFLATE compression method described in this document is
-   stateful. It is RECOMMENDED that other compression methods that might
-   be standardized in the future be stateful as well.
+   stateful.  It is RECOMMENDED that other compression methods that
+   might be standardized in the future be stateful as well.
 
    Compression algorithms can occasionally expand, rather than compress,
    input data.  A compression method that exceeds the expansion limits
    described in section 6.2.2 of RFC 2246 [2] MUST NOT be used with TLS.
 
-2.1 DEFLATE Compression
+2.1.  DEFLATE Compression
 
    The DEFLATE compression method and encoding format is described in
    RFC 1951 [5].  Examples of DEFLATE use in IETF protocols can be found
@@ -208,22 +164,22 @@ Internet-Draft          TLS Compression Methods             January 2004
    memory requirements.  The receiving decompressor MUST automatically
    adjust to the parameters selected by the sender.  All data that was
    submitted for compression MUST be included in the compressed output,
+
+
+
+Hollenbeck                  Standards Track                     [Page 3]
+
+RFC 3749                TLS Compression Methods                 May 2004
+
+
    with no data retained to be included in a later output payload.
    Flushing ensures that each compressed packet payload can be
    decompressed completely.
 
-3. Compression History and Packet Processing
+3.  Compression History and Packet Processing
 
    Some compression methods have the ability to maintain state/history
    information when compressing and decompressing packet payloads.  The
-
-
-
-Hollenbeck               Expires July 16, 2004                  [Page 4]
-
-Internet-Draft          TLS Compression Methods             January 2004
-
-
    compression history allows a higher compression ratio to be achieved
    on a stream as compared to per-packet compression, but maintaining a
    history across packets implies that a packet might contain data
@@ -236,7 +192,7 @@ Internet-Draft          TLS Compression Methods             January 2004
 
    As described in section 7 of RFC 2246 [2], TLS allows multiple
    connections to be instantiated using the same session through the
-   resumption feature of the TLS Handshake Protocol. Session resumption
+   resumption feature of the TLS Handshake Protocol.  Session resumption
    has operational implications when multiple compression methods are
    available for use within the session.  For example, load balancers
    will need to maintain additional state information if the compression
@@ -249,36 +205,38 @@ Internet-Draft          TLS Compression Methods             January 2004
    2.  The compression state/history MUST be cleared when resuming a
        session.
 
-4. Internationalization Considerations
+4.  Internationalization Considerations
 
    The compression method identifiers specified in this document are
    machine-readable numbers.  As such, issues of human
    internationalization and localization are not introduced.
 
-5. IANA Considerations
+5.  IANA Considerations
 
    Section 2 of this document describes a registry of compression method
    identifiers to be maintained by the IANA, including assignment of an
    identifier for the DEFLATE compression method.  Identifier values
    from the range 0-63 (decimal) inclusive are assigned via RFC 2434
    Standards Action [3].  Values from the range 64-223 (decimal)
+
+
+
+
+
+Hollenbeck                  Standards Track                     [Page 4]
+
+RFC 3749                TLS Compression Methods                 May 2004
+
+
    inclusive are assigned via RFC 2434 Specification Required [3].
    Identifier values from 224-255 (decimal) inclusive are reserved for
    RFC 2434 Private Use [3].
 
-6. Security Considerations
+6.  Security Considerations
 
    This document does not introduce any topics that alter the threat
    model addressed by TLS.  The security considerations described
    throughout RFC 2246 [2] apply here as well.
-
-
-
-
-Hollenbeck               Expires July 16, 2004                  [Page 5]
-
-Internet-Draft          TLS Compression Methods             January 2004
-
 
    However, combining compression with encryption can sometimes reveal
    information that would not have been revealed without compression:
@@ -287,7 +245,7 @@ Internet-Draft          TLS Compression Methods             January 2004
    the compressed data might be able to derive information about the
    corresponding uncompressed data.  Some symmetric encryption
    ciphersuites do not hide the length of symmetrically encrypted data
-   at all.  Others hide it to some extent, but still don't hide it
+   at all.  Others hide it to some extent, but still do not hide it
    fully.  For example, ciphersuites that use stream cipher encryption
    without padding do not hide length at all; ciphersuites that use
    Cipher Block Chaining (CBC) encryption with padding provide some
@@ -309,12 +267,24 @@ Internet-Draft          TLS Compression Methods             January 2004
    the ability to construct rogue data that expands to some enormous
    size when compressed or decompressed.  RFC 2246 describes several
    methods to ameliorate this kind of attack.  First, compression has to
-   be lossless. Second, a limit (1,024 bytes) is placed on the amount of
-   allowable compression content length increase.  Finally, a limit
+   be lossless.  Second, a limit (1,024 bytes) is placed on the amount
+   of allowable compression content length increase.  Finally, a limit
    (2^14 bytes) is placed on the total content length.  See section
    6.2.2 of RFC 2246 [2] for complete details.
 
-7. Acknowledgements
+
+
+
+
+
+
+
+Hollenbeck                  Standards Track                     [Page 5]
+
+RFC 3749                TLS Compression Methods                 May 2004
+
+
+7.  Acknowledgements
 
    The concepts described in this document were originally discussed on
    the IETF TLS working group mailing list in December, 2000.  The
@@ -325,17 +295,11 @@ Internet-Draft          TLS Compression Methods             January 2004
    Mavroyanopoulos, Alexey Melnikov, Bodo Moeller, Win Treese, and the
    IESG.
 
-Normative References
+8.  References
+
+8.1.  Normative References
 
    [1]  Bradner, S., "Key words for use in RFCs to Indicate Requirement
-
-
-
-Hollenbeck               Expires July 16, 2004                  [Page 6]
-
-Internet-Draft          TLS Compression Methods             January 2004
-
-
         Levels", BCP 14, RFC 2119, March 1997.
 
    [2]  Dierks, T. and C. Allen, "The TLS Protocol Version 1.0", RFC
@@ -344,7 +308,7 @@ Internet-Draft          TLS Compression Methods             January 2004
    [3]  Narten, T. and H. Alvestrand, "Guidelines for Writing an IANA
         Considerations Section in RFCs", BCP 26, RFC 2434, October 1998.
 
-Informative References
+8.2.  Informative References
 
    [4]  Bray, T., Paoli, J., Sperberg-McQueen, C. and E. Maler,
         "Extensible Markup Language (XML) 1.0 (2nd ed)", W3C REC-xml,
@@ -360,6 +324,20 @@ Informative References
 
    [8]  Gutmann, P., "Compressed Data Content Type for Cryptographic
         Message Syntax (CMS)", RFC 3274, June 2002.
+
+
+
+
+
+
+
+
+
+
+
+Hollenbeck                  Standards Track                     [Page 6]
+
+RFC 3749                TLS Compression Methods                 May 2004
 
 
 Author's Address
@@ -387,72 +365,76 @@ Author's Address
 
 
 
-Hollenbeck               Expires July 16, 2004                  [Page 7]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hollenbeck                  Standards Track                     [Page 7]
 
-Internet-Draft          TLS Compression Methods             January 2004
-
-
-Intellectual Property Statement
-
-   The IETF takes no position regarding the validity or scope of any
-   intellectual property or other rights that might be claimed to
-   pertain to the implementation or use of the technology described in
-   this document or the extent to which any license under such rights
-   might or might not be available; neither does it represent that it
-   has made any effort to identify any such rights. Information on the
-   IETF's procedures with respect to rights in standards-track and
-   standards-related documentation can be found in BCP-11. Copies of
-   claims of rights made available for publication and any assurances of
-   licenses to be made available, or the result of an attempt made to
-   obtain a general license or permission for the use of such
-   proprietary rights by implementors or users of this specification can
-   be obtained from the IETF Secretariat.
-
-   The IETF invites any interested party to bring to its attention any
-   copyrights, patents or patent applications, or other proprietary
-   rights which may cover technology that may be required to practice
-   this standard. Please address the information to the IETF Executive
-   Director.
+RFC 3749                TLS Compression Methods                 May 2004
 
 
 Full Copyright Statement
 
-   Copyright (C) The Internet Society (2004). All Rights Reserved.
+   Copyright (C) The Internet Society (2004).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights.
 
-   This document and translations of it may be copied and furnished to
-   others, and derivative works that comment on or otherwise explain it
-   or assist in its implementation may be prepared, copied, published
-   and distributed, in whole or in part, without restriction of any
-   kind, provided that the above copyright notice and this paragraph are
-   included on all such copies and derivative works. However, this
-   document itself may not be modified in any way, such as by removing
-   the copyright notice or references to the Internet Society or other
-   Internet organizations, except as needed for the purpose of
-   developing Internet standards in which case the procedures for
-   copyrights defined in the Internet Standards process must be
-   followed, or as required to translate it into languages other than
-   English.
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 
-   The limited permissions granted above are perpetual and will not be
-   revoked by the Internet Society or its successors or assignees.
+Intellectual Property
 
-   This document and the information contained herein is provided on an
-   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
-   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
-   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
 
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
 
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at ietf-
+   ipr@ietf.org.
 
-Hollenbeck               Expires July 16, 2004                  [Page 8]
-
-Internet-Draft          TLS Compression Methods             January 2004
-
-
-   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
-   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-
-
-Acknowledgment
+Acknowledgement
 
    Funding for the RFC Editor function is currently provided by the
    Internet Society.
@@ -465,39 +447,5 @@ Acknowledgment
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Hollenbeck               Expires July 16, 2004                  [Page 9]
-
+Hollenbeck                  Standards Track                     [Page 8]
+
