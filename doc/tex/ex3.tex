@@ -21,7 +21,8 @@ int print_info(GNUTLS_STATE state)
    int status;
    int cert_list_size = 0;
    GNUTLS_KXAlgorithm kx;
-
+   time_t expiret = gnutls_certificate_expiration_time_peers(state);
+   time_t activet = gnutls_certificate_activation_time_peers(state);
 
    /* print the key exchange's algorithm name
     */
@@ -50,8 +51,6 @@ int print_info(GNUTLS_STATE state)
 
          if ( status & GNUTLS_CERT_INVALID)
             printf("- Peer's certificate is invalid\n");
-         if ( status & GNUTLS_CERT_EXPIRED)
-            printf("- Peer's certificate is expired\n");
          if ( status & GNUTLS_CERT_CORRUPTED)
             printf("- Peer's certificate is corrupted.\n");
          if ( status & GNUTLS_CERT_REVOKED)
@@ -83,6 +82,9 @@ int print_info(GNUTLS_STATE state)
          int algo, bits;
 
          printf(" - Certificate info:\n");
+
+         printf(" - Certificate is valid since: %s", ctime( &activet));
+         printf(" - Certificate expires: %s", ctime( &expiret));
 
          /* Print the fingerprint of the certificate
           */
