@@ -51,6 +51,11 @@ typedef struct gnutls_x509_privkey_int {
 
 	gnutls_pk_algorithm pk_algorithm;
 
+	int crippled; /* The crippled keys will not use the ASN1_TYPE key.
+		       * The encoding will only be performed at the export
+		       * phase, to optimize copying etc. Cannot be used with
+		       * the exported API (used internally only).
+		       */
 	ASN1_TYPE key;
 } gnutls_x509_privkey_int;
 

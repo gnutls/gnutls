@@ -186,8 +186,17 @@ int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params,
   **/
 int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
 {
+int ret;
 
-	return gnutls_x509_privkey_init( rsa_params);
+	ret = gnutls_x509_privkey_init( rsa_params);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	
+	(*rsa_params)->crippled = 1;
+	
+	return 0;
 }
 
 /**

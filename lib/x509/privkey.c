@@ -103,25 +103,28 @@ int i, ret;
 
 	dst->params_size = src->params_size;
 	dst->pk_algorithm = src->pk_algorithm;
+	dst->crippled = src->crippled;
 
-	switch( dst->pk_algorithm) {
-		case GNUTLS_PK_DSA:
-			ret = _encode_dsa( &dst->key, dst->params);
-			if (ret < 0) {
+	if (!src->crippled) {
+		switch( dst->pk_algorithm) {
+			case GNUTLS_PK_DSA:
+				ret = _encode_dsa( &dst->key, dst->params);
+				if (ret < 0) {
+					gnutls_assert();
+					return ret;
+				}
+				break;
+			case GNUTLS_PK_RSA:
+				ret = _encode_rsa( &dst->key, dst->params);
+				if (ret < 0) {
+					gnutls_assert();
+					return ret;
+				}
+				break;
+			default:
 				gnutls_assert();
-				return ret;
-			}
-			break;
-		case GNUTLS_PK_RSA:
-			ret = _encode_rsa( &dst->key, dst->params);
-			if (ret < 0) {
-				gnutls_assert();
-				return ret;
-			}
-			break;
-		default:
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_INVALID_REQUEST;
+		}
 	}
 
 	return 0;
@@ -478,11 +481,13 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret = _encode_rsa( &key->key, key->params);
-	if (ret < 0) {
-		gnutls_assert();
-		FREE_RSA_PRIVATE_PARAMS;
-		return ret;
+	if (!key->crippled) {
+		ret = _encode_rsa( &key->key, key->params);
+		if (ret < 0) {
+			gnutls_assert();
+			FREE_RSA_PRIVATE_PARAMS;
+			return ret;
+		}
 	}
 
 	key->params_size = RSA_PRIVATE_PARAMS;
@@ -553,11 +558,13 @@ int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey key,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret = _encode_dsa( &key->key, key->params);
-	if (ret < 0) {
-		gnutls_assert();
-		FREE_DSA_PRIVATE_PARAMS;
-		return ret;
+	if (!key->crippled) {
+		ret = _encode_dsa( &key->key, key->params);
+		if (ret < 0) {
+			gnutls_assert();
+			FREE_DSA_PRIVATE_PARAMS;
+			return ret;
+		}
 	}
 
 	key->params_size = DSA_PRIVATE_PARAMS;
@@ -615,6 +622,7 @@ int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size)
 {
 	char * msg;
+	int ret;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -626,6 +634,29 @@ int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	else if (key->pk_algorithm == GNUTLS_PK_DSA)
 		msg = PEM_KEY_DSA;
 	else msg = NULL;
+
+	if (key->crippled) { /* encode the parameters on the fly.
+			      */
+		switch( key->pk_algorithm) {
+			case GNUTLS_PK_DSA:
+				ret = _encode_dsa( &key->key, key->params);
+				if (ret < 0) {
+					gnutls_assert();
+					return ret;
+				}
+			break;
+			case GNUTLS_PK_RSA:
+				ret = _encode_rsa( &key->key, key->params);
+				if (ret < 0) {
+					gnutls_assert();
+					return ret;
+				}
+			break;
+			default:
+				gnutls_assert();
+				return GNUTLS_E_INVALID_REQUEST;
+		}
+	}
 
 	return _gnutls_x509_export_int( key->key, format, msg, *output_data_size,
 		output_data, output_data_size);
@@ -1190,10 +1221,12 @@ int i;
 				return ret;
 			}
 			
-			ret = _encode_dsa( &key->key, key->params);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
+			if (!key->crippled) {
+				ret = _encode_dsa( &key->key, key->params);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
 			}
 			key->params_size = params_len;
 			key->pk_algorithm = GNUTLS_PK_DSA;
@@ -1206,11 +1239,14 @@ int i;
 				return ret;
 			}
 			
-			ret = _encode_rsa( &key->key, key->params);
-			if (ret < 0) {
-				gnutls_assert();
-				goto cleanup;
+			if (!key->crippled) {
+				ret = _encode_rsa( &key->key, key->params);
+				if (ret < 0) {
+					gnutls_assert();
+					goto cleanup;
+				}
 			}
+
 			key->params_size = params_len;
 			key->pk_algorithm = GNUTLS_PK_RSA;
 			
@@ -1257,7 +1293,7 @@ int result;
 GNUTLS_HASH_HANDLE hd;
 gnutls_datum der = { NULL, 0 };
 
-	if (key == NULL) {
+	if (key == NULL || key->crippled) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
