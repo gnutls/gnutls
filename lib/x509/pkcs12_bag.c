@@ -31,7 +31,7 @@
 #include <gnutls_errors.h>
 #include <common.h>
 #include <pkcs12.h>
-
+#include <privkey.h>
 
 /**
   * gnutls_pkcs12_bag_init - This function initializes a gnutls_pkcs12_bag structure
@@ -542,7 +542,7 @@ gnutls_datum dec;
   * gnutls_pkcs12_bag_encrypt - This function will encrypt a bag
   * @bag: The bag
   * @pass: The password used for encryption
-  * @flags: should be zero for now
+  * @flags: should be one of gnutls_pkcs_encrypt_flags elements bitwise or'd
   *
   * This function will encrypt the given bag and return 0 on success.
   *
@@ -553,6 +553,7 @@ int ret;
 ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
 gnutls_datum der = {NULL, 0};
 gnutls_datum enc = {NULL, 0};
+schema_id id;
 
 	if (bag->element[0].type == GNUTLS_BAG_ENCRYPTED) {
 		gnutls_assert();
@@ -579,9 +580,19 @@ gnutls_datum enc = {NULL, 0};
         	return ret;
         }
 
+	if (flags & GNUTLS_PKCS_PLAIN) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	if (flags & GNUTLS_PKCS_USE_PKCS12_ARCFOUR) id = PKCS12_ARCFOUR_SHA1;
+	else if (flags & GNUTLS_PKCS_USE_PKCS12_RC2_40) id = PKCS12_RC2_40_SHA1;
+	else if (flags & GNUTLS_PKCS_USE_PBES2_3DES) id = PBES2;
+	else id = PKCS12_3DES_SHA1;
+
 	/* Now encrypt them.
 	 */
-	ret = _gnutls_pkcs7_encrypt_data( PKCS12_3DES_SHA1, &der, pass, &enc);
+	ret = _gnutls_pkcs7_encrypt_data( id, &der, pass, &enc);
 
 	_gnutls_free_datum( &der);
 

@@ -107,18 +107,18 @@ typedef struct { opaque pint[3]; } uint24;
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
 
 typedef enum gnutls_certificate_status { 
-	GNUTLS_CERT_INVALID=1, /* will be set if the certificate
+	GNUTLS_CERT_INVALID=2, /* will be set if the certificate
 				* was not verified.
 				*/
-	GNUTLS_CERT_REVOKED=2,  /* in X.509 this will be set only if CRLs are checked
+	GNUTLS_CERT_REVOKED=32, /* in X.509 this will be set only if CRLs are checked
 				 */
 
 	/* Those are extra information about the verification
 	 * process. Will be set only if the certificate was 
 	 * not verified.
 	 */
-	GNUTLS_CERT_SIGNER_NOT_FOUND=4,
-	GNUTLS_CERT_SIGNER_NOT_CA=8
+	GNUTLS_CERT_SIGNER_NOT_FOUND=64,
+	GNUTLS_CERT_SIGNER_NOT_CA=128
 } gnutls_certificate_status;
 
 typedef enum gnutls_certificate_request { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } gnutls_certificate_request;

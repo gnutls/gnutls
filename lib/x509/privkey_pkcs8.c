@@ -374,7 +374,7 @@ int encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der_key,
   * @key: Holds the key
   * @format: the format of output params. One of PEM or DER.
   * @password: the password that will be used to encrypt the key
-  * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
+  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags
   * @output_data: will contain a private key PEM or DER encoded
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
@@ -415,17 +415,17 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 		return ret;
 	}
 
-	if (flags & GNUTLS_PKCS8_USE_PKCS12_3DES)
+	if (flags & GNUTLS_PKCS_USE_PKCS12_3DES)
 		schema = PKCS12_3DES_SHA1;
-	else if (flags & GNUTLS_PKCS8_USE_PKCS12_ARCFOUR)
+	else if (flags & GNUTLS_PKCS_USE_PKCS12_ARCFOUR)
 		schema = PKCS12_ARCFOUR_SHA1;
-	else if (flags & GNUTLS_PKCS8_USE_PKCS12_RC2_40)
+	else if (flags & GNUTLS_PKCS_USE_PKCS12_RC2_40)
 		schema = PKCS12_RC2_40_SHA1;
 	else
 		schema = PBES2;
 
 
-	if ((flags & GNUTLS_PKCS8_PLAIN) || password == NULL) 
+	if ((flags & GNUTLS_PKCS_PLAIN) || password == NULL) 
 	{
 		_gnutls_free_datum(&tmp);
 
@@ -800,7 +800,7 @@ int decode_private_key_info(const gnutls_datum * der,
   * @data: The DER or PEM encoded key.
   * @format: One of DER or PEM
   * @password: the password to decrypt the key (if it is encrypted)
-  * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
+  * @flags: use 0.
   *
   * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
   * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
@@ -859,7 +859,7 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key,
 		need_free = 1;
 	}
 
-	if (flags & GNUTLS_PKCS8_PLAIN || password == NULL) {
+	if (flags & GNUTLS_PKCS_PLAIN || password == NULL) {
 		result = decode_private_key_info(&_data, key, &key->key);
 	} else {		/* encrypted. */
 		result = decode_pkcs8_key(&_data, password, key, &key->key);
