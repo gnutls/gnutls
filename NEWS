@@ -1,3 +1,7 @@
+Version 0.5.3 (23/08/2002)
+- No changes. Replaces the tarball of 0.5.2 which accidentaly contained
+  code from the unstable branch.
+
 Version 0.5.2 (22/08/2002)
 - Added an error code that is returned in clients which connect
   to export only servers. This must be enabled using the
