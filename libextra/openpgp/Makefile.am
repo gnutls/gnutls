@@ -1,11 +1,9 @@
-INCLUDES = -I. -I../ -I../../includes/ -I../../lib -I../../lib/minitasn1 -I../opencdk/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS) 
-EXTRA_DIST = openpgp.h gnutls_openpgp.h
+# source files added here must be added to ../Makefile.am
+# to be compiled.
 
-noinst_LTLIBRARIES = libpgp.la
+COBJECTS = pgp.c xml.c pgpverify.c extras.c compat.c privkey.c
 
-COBJECTS = openpgp.c xml.c verify.c extras.c compat.c privkey.c
-
-libpgp_la_SOURCES = $(COBJECTS)
+EXTRA_DIST = openpgp.h gnutls_openpgp.h $(COBJECTS)
 
 pgp-api.tex: $(COBJECTS)
 	@echo "" > pgp-api.tex

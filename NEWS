@@ -2,6 +2,7 @@ Version 1.0.17
 - Updated the SRP authentication to conform to the
   latest (yet unreleased) draft. Unfortunately this breaks
   compatibility with previous versions.
+- Changed the makefiles to be more portable.
 
 Version 1.0.16 (10/07/2004)
 - Do not free the SRP (prime and generator) parameters obtained from the 

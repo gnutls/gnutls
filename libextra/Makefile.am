@@ -1,4 +1,5 @@
-INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS) -Iopencdk/
+INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS) -Iopencdk/ -Iopenpgp/
+AM_CFLAGS = -DVERSION=\"gnutls/opencdk\"
 bin_SCRIPTS = libgnutls-extra-config
 DIST_SUBDIRS = openpgp opencdk
 
@@ -31,14 +32,26 @@ lib_LTLIBRARIES = libgnutls-extra.la
 endif
 
 if ENABLE_OPENPGP
-PGP_SOURCES = gnutls_openpgp.c
+PGP_COBJECTS = gnutls_openpgp.c openpgp/xml.c \
+	openpgp/pgpverify.c openpgp/pgp.c \
+	openpgp/extras.c openpgp/compat.c openpgp/privkey.c
+
 if ENABLE_INCLUDED_OPENCDK
 SUBDIRS = openpgp opencdk
-PGP_OBJECTS = openpgp/libpgp.la opencdk/libopencdk.la
+
+OPENCDK_COBJECTS = opencdk/new-packet.c opencdk/read-packet.c opencdk/write-packet.c \
+	opencdk/main.c 	opencdk/verify.c opencdk/armor.c \
+	opencdk/sig-check.c opencdk/sign.c opencdk/keydb.c \
+        opencdk/keylist.c opencdk/seskey.c opencdk/pubkey.c opencdk/misc.c \
+	opencdk/encrypt.c opencdk/trustdb.c opencdk/kbnode.c \
+	opencdk/compress.c opencdk/plaintext.c opencdk/cipher.c \
+	opencdk/sym-cipher.c opencdk/stream.c opencdk/keyserver.c \
+	opencdk/keygen.c opencdk/md.c
 else
 SUBDIRS = openpgp
-PGP_OBJECTS = openpgp/libpgp.la
+OPENCDK_COBJECTS = 
 endif
+
 endif
 
 if ENABLE_INCLUDED_LZO
@@ -51,17 +64,17 @@ endif
 
 COBJECTS_EXTRA = ext_srp.c \
 	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
-	gnutls_extra.c auth_srp_rsa.c $(PGP_SOURCES)
+	gnutls_extra.c auth_srp_rsa.c
 
 
 libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LIBOPENCDK_LIBS) $(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS)
+libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS) \
+	$(PGP_COBJECTS) $(OPENCDK_COBJECTS)
 
-libgnutls_extra_la_LIBADD = $(PGP_OBJECTS) \
-	../lib/libgnutls.la
+libgnutls_extra_la_LIBADD = ../lib/libgnutls.la
 
 
 gnutls-extra-api.tex: $(COBJECTS_EXTRA)

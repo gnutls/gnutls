@@ -1,25 +1,15 @@
-INCLUDES = -I../ -I../../includes/ -I../../lib/minitasn1 -I../../libextra/opencdk/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
-EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
-	x509-api.tex compat.h verify.h mpi.h crq.h sign.h pkcs5.h \
-	privkey.h pkcs12.h rfc2818.h dsa.h
+# source files added here must be added to ../Makefile.am
+# to be compiled.
 
-noinst_LTLIBRARIES = libx509.la
-#lib_LTLIBRARIES = libgnutls-x509.la
-
-COBJECTS = crl.c dn.c common.c x509.c extensions.c \
+COBJECTS = crl.c dn.c common.c x509.c extensions.c dsa.c \
 	rfc2818_hostname.c verify.c mpi.c privkey.c pkcs7.c \
 	crq.c xml.c sign.c pkcs5.c privkey_pkcs8.c pkcs12.c \
-	pkcs12_bag.c pkcs12_encr.c x509_write.c crl_write.c dsa.c
+	pkcs12_bag.c pkcs12_encr.c x509_write.c crl_write.c compat.c
 
-COMPAT_OBJECTS = compat.c
+EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
+	x509-api.tex compat.h verify.h mpi.h crq.h sign.h pkcs5.h \
+	privkey.h pkcs12.h rfc2818.h dsa.h $(COBJECTS)
 
-
-libx509_la_SOURCES = $(COBJECTS) $(COMPAT_OBJECTS)
-
-#libgnutls_x509_la_SOURCES = $(COBJECTS2)
-
-#libgnutls_x509_la_LIBADD = ../libgnutls.la
-#libgnutls_x509_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 x509-api.tex: $(COBJECTS)
 	@echo "" > x509-api.tex

@@ -23,7 +23,6 @@
 #include <gnutls_int.h>
 #include <gnutls_str.h>
 #include <gnutls_errors.h>
-#include <opencdk.h>
 #include <openpgp.h>
 #include <x509/rfc2818.h> /* for MAX_CN */
 
