@@ -1,4 +1,4 @@
-Version 0.9.99
+Version 0.9.99 (28/11/2003)
 - Some fixes in the gnutls.h header for the gnutls_server_name_set()
   and gnutls_server_name_get() prototypes.
 - Exported the gnutls_x509_privkey_sign_data(), gnutls_x509_privkey_verify_data() 
