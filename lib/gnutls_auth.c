@@ -22,6 +22,8 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_auth.h"
+#include "gnutls_auth_int.h"
+#include "gnutls_algorithms.h"
 
 #include "auth_anon.h"
 /* The functions here are used in order for authentication algorithms
@@ -51,28 +53,28 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
  * { algorithm, credentials, pointer to next }
  */
 /**
-  * gnutls_set_kx_cred - Sets the needed credentials for the specified (in kx) authentication algorithm.
+  * gnutls_set_cred - Sets the needed credentials for the specified authentication algorithm.
   * @state: is a &GNUTLS_STATE structure.
-  * @kx: is a key exchange algorithm
+  * @type: is the type of the credentials
   * @cred: is a pointer to a structure.
   *
-  * Sets the needed credentials for the specified (in kx) authentication
-  * algorithm. Eg username, password - or public and private keys etc.  
+  * Sets the needed credentials for the specified type.
+  * Eg username, password - or public and private keys etc.  
   * The (void* cred) parameter is a structure that depends on the
-  * specified kx algorithm and on the current state (client or server).
+  * specified type and on the current state (client or server).
   * [ In order to minimize memory usage, and share credentials between 
   * several threads gnutls keeps a pointer to cred, and not the whole cred
   * structure. Thus you will have to keep the structure allocated until   
   * you call gnutls_deinit(). ]
   *
-  * For %GNUTLS_KX_DH_ANON cred should be NULL in case of a client.
-  * In case of a server it should be &DH_ANON_SERVER_CREDENTIALS.   
+  * For %GNUTLS_ANON cred should be NULL in case of a client.
+  * In case of a server it should be &ANON_SERVER_CREDENTIALS.   
   * 
-  * For %GNUTLS_KX_SRP cred should be &SRP_CLIENT_CREDENTIALS
+  * For %GNUTLS_SRP cred should be &SRP_CLIENT_CREDENTIALS
   * in case of a client, and &SRP_SERVER_CREDENTIALS, in case
   * of a server.
   **/
-int gnutls_set_kx_cred( GNUTLS_STATE state, KXAlgorithm kx, void* cred) {
+int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
 	AUTH_CRED * ccred, *pcred;
 	int exists=0;	
 	
@@ -85,11 +87,11 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, KXAlgorithm kx, void* cred) {
 		state->gnutls_key->cred->credentials = cred;
 		
 		state->gnutls_key->cred->next = NULL;
-		state->gnutls_key->cred->algorithm = kx;
+		state->gnutls_key->cred->algorithm = type;
 	} else {
 		ccred = state->gnutls_key->cred;
 		while(ccred!=NULL) {
-			if (ccred->algorithm==kx) {
+			if (ccred->algorithm==type) {
 				exists=1;
 				break;
 			}
@@ -107,7 +109,7 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, KXAlgorithm kx, void* cred) {
 			ccred->credentials = cred;
 
 			ccred->next = NULL;
-			ccred->algorithm = kx;
+			ccred->algorithm = type;
 		} else { /* modify existing entry */
 			gnutls_free(ccred->credentials);
 			ccred->credentials = cred;
@@ -121,12 +123,15 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, KXAlgorithm kx, void* cred) {
  * This returns an pointer to the linked list. Don't
  * free that!!!
  */
-void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx, int *err) {
+const void *_gnutls_get_kx_cred( GNUTLS_KEY key, KXAlgorithm algo, int *err) {
+	return _gnutls_get_cred( key, _gnutls_map_kx_get_cred(algo), err);
+}
+const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
 	AUTH_CRED * ccred;
 	
 	ccred = key->cred;
 	while(ccred!=NULL) {
-		if (ccred->algorithm==kx) {
+		if (ccred->algorithm==type) {
 			break;
 		}
 		ccred = ccred->next;

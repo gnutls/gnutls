@@ -56,21 +56,21 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_X;
-	DH_ANON_SERVER_CREDENTIALS * cred;
+	const ANON_SERVER_CREDENTIALS * cred;
 
-	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_DH_ANON, NULL);
+	cred = _gnutls_get_cred( key, GNUTLS_ANON, NULL);
 	if (cred==NULL) {
 		bits = DEFAULT_BITS; /* default */
 	} else {
-		bits = cred->bits;
+		bits = cred->dh_bits;
 	}
 
 	g = gnutls_get_dh_params(&p, bits);
 
-	key->auth_info = gnutls_malloc(sizeof(DH_ANON_AUTH_INFO));
+	key->auth_info = gnutls_malloc(sizeof(ANON_AUTH_INFO));
 	if (key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
-	((DH_ANON_AUTH_INFO*)key->auth_info)->bits = gcry_mpi_get_nbits(p);
-	key->auth_info_size = sizeof(DH_ANON_AUTH_INFO);
+	((ANON_AUTH_INFO*)key->auth_info)->dh_bits = gcry_mpi_get_nbits(p);
+	key->auth_info_size = sizeof(ANON_AUTH_INFO);
 
 	X = gnutls_calc_dh_secret(&x, g, p);
 	key->dh_secret = x;
@@ -190,10 +190,10 @@ int proc_anon_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	}
 
 	/* set auth_info */
-	key->auth_info = gnutls_malloc(sizeof(DH_ANON_AUTH_INFO));
+	key->auth_info = gnutls_malloc(sizeof(ANON_AUTH_INFO));
 	if (key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
-	((DH_ANON_AUTH_INFO*)key->auth_info)->bits = gcry_mpi_get_nbits(key->client_p);
-	key->auth_info_size = sizeof(DH_ANON_AUTH_INFO);
+	((ANON_AUTH_INFO*)key->auth_info)->dh_bits = gcry_mpi_get_nbits(key->client_p);
+	key->auth_info_size = sizeof(ANON_AUTH_INFO);
 
 	/* We should check signature in non-anonymous KX 
 	 * this is anonymous however
@@ -207,13 +207,13 @@ int proc_anon_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	size_t _n_Y;
 	MPI g, p;
 	int bits;
-	DH_ANON_SERVER_CREDENTIALS * cred;
+	const ANON_SERVER_CREDENTIALS * cred;
 
-	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_DH_ANON, NULL);
+	cred = _gnutls_get_cred( key, GNUTLS_ANON, NULL);
 	if (cred==NULL) {
 		bits = DEFAULT_BITS; /* default */
 	} else {
-		bits = cred->bits;
+		bits = cred->dh_bits;
 	}
 
 #if 0 /* removed. I do not know why - maybe I didn't get the protocol,

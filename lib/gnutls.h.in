@@ -24,6 +24,7 @@
 
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 } BulkCipherAlgorithm;
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
+typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
 typedef enum MACAlgorithm { GNUTLS_NULL_MAC=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
 typedef enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB } CompressionMethod;
 typedef enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT } ConnectionEnd;
@@ -107,7 +108,7 @@ const char* gnutls_check_version();
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
-int gnutls_set_kx_cred( GNUTLS_STATE, KXAlgorithm kx, void* cred);
+int gnutls_set_cred( GNUTLS_STATE, CredType type, void* cred);
 const void* gnutls_get_auth_info( GNUTLS_STATE);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
@@ -125,15 +126,15 @@ typedef struct {
 	char username[256];
 } SRP_AUTH_INFO;
 
-/* Credential structures for DH_ANON */
+/* Credential structures for ANON */
 
 typedef struct {
-	int bits;
-} DH_ANON_SERVER_CREDENTIALS;
+	int dh_bits;
+} ANON_SERVER_CREDENTIALS;
 
 typedef struct {
-	int bits;
-} DH_ANON_AUTH_INFO;
+	int dh_bits;
+} ANON_AUTH_INFO;
 
 
 /* error codes appended here */

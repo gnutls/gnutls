@@ -189,8 +189,8 @@ int gen_srp_client_kx0(GNUTLS_KEY key, opaque ** data)
 	uint8 *data_a;
 	char *username;
 	char *password;
-	SRP_CLIENT_CREDENTIALS *cred =
-	    _gnutls_get_kx_cred(key, GNUTLS_KX_SRP, NULL);
+	const SRP_CLIENT_CREDENTIALS *cred =
+	    _gnutls_get_cred(key, GNUTLS_SRP, NULL);
 
 	if (cred == NULL)
 		return GNUTLS_E_INSUFICIENT_CRED;
@@ -231,8 +231,8 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	opaque *hd;
 	char *username;
 	char *password;
-	SRP_CLIENT_CREDENTIALS *cred =
-	    _gnutls_get_kx_cred(key, GNUTLS_KX_SRP, NULL);
+	const SRP_CLIENT_CREDENTIALS *cred =
+	    _gnutls_get_cred(key, GNUTLS_SRP, NULL);
 
 	if (cred == NULL)
 		return GNUTLS_E_INSUFICIENT_CRED;

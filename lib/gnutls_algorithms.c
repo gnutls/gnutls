@@ -34,6 +34,31 @@
 #define MAX_CIPHERSUITE 256
 #define MAX_COMPRESSION 256
 
+
+/* Cred type mappings to KX algorithms */
+typedef struct {
+	KXAlgorithm algorithm;
+	CredType type;
+} gnutls_cred_map;
+
+static const gnutls_cred_map cred_mappings[] = {
+	{ GNUTLS_KX_DH_ANON, GNUTLS_ANON    },
+	{ GNUTLS_KX_RSA,     GNUTLS_X509PKI },
+	{ GNUTLS_KX_DHE_DSS, GNUTLS_X509PKI },
+	{ GNUTLS_KX_DHE_RSA, GNUTLS_X509PKI },
+	{ GNUTLS_KX_DH_DSS,  GNUTLS_X509PKI },
+	{ GNUTLS_KX_DH_RSA,  GNUTLS_X509PKI },
+	{ GNUTLS_KX_SRP,     GNUTLS_SRP     },
+	{ 0 }
+};
+
+#define GNUTLS_KX_MAP_LOOP(b) \
+        const gnutls_cred_map *p; \
+                for(p = cred_mappings; p->type != 0; p++) { b ; }
+
+#define GNUTLS_KX_MAP_ALG_LOOP(a) \
+                        GNUTLS_KX_MAP_LOOP( if(p->type == type) { a; break; })
+
 /* TLS Versions */
 
 typedef struct {
@@ -903,6 +928,23 @@ _gnutls_version_is_supported(GNUTLS_STATE state,
 	size_t ret = 0;
 	/* FIXME: make it to read it from the state */
 	GNUTLS_VERSION_ALG_LOOP(ret = p->supported);
+	return ret;
+}
+
+/* Type to KX mappings */
+KXAlgorithm _gnutls_map_kx_get_kx(CredType type)
+{
+	KXAlgorithm ret = -1;
+
+	GNUTLS_KX_MAP_ALG_LOOP(ret = p->algorithm);
+	return ret;
+}
+
+CredType _gnutls_map_kx_get_cred(KXAlgorithm algorithm)
+{
+	CredType ret = -1;
+	GNUTLS_KX_MAP_LOOP(if (p->algorithm==algorithm) ret = p->type);
+
 	return ret;
 }
 

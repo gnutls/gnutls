@@ -86,3 +86,7 @@ int _gnutls_compression_count();
 int _gnutls_compression_get_num(CompressionMethod algorithm);
 CompressionMethod _gnutls_compression_get_id(int num);
 char *_gnutls_compression_get_name(CompressionMethod algorithm);
+
+/* Type to KX mappings */
+KXAlgorithm _gnutls_map_kx_get_kx(CredType type);
+CredType _gnutls_map_kx_get_cred(KXAlgorithm algorithm);
