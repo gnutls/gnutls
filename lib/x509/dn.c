@@ -472,7 +472,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 
 
 /**
-  * gnutls_x509_rdn_to_dn - This function parses an RDN sequence and returns a string
+  * gnutls_x509_rdn_get - This function parses an RDN sequence and returns a string
   * @idn: should contain a DER encoded RDN sequence
   * @buf: a pointer to a structure to hold the peer's name
   * @sizeof_buf: holds the size of 'buf'
@@ -485,7 +485,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
   * and 0 on success.
   *
   **/
-int gnutls_x509_rdn_to_dn(const gnutls_datum * idn,
+int gnutls_x509_rdn_get(const gnutls_datum * idn,
 				  char *buf, unsigned int *sizeof_buf)
 {
 	int result;
@@ -516,6 +516,58 @@ int gnutls_x509_rdn_to_dn(const gnutls_datum * idn,
 	}
 
 	result = _gnutls_x509_parse_dn(dn, "dn", buf, sizeof_buf);
+
+	asn1_delete_structure(&dn);
+	return result;
+
+}
+
+/**
+  * gnutls_x509_rdn_get_by_oid - This function parses an RDN sequence and returns a string
+  * @idn: should contain a DER encoded RDN sequence
+  * @oid: an Object Identifier
+  * @buf: a pointer to a structure to hold the peer's name
+  * @sizeof_buf: holds the size of 'buf'
+  *
+  * This function will return the name of the given Object identifier, 
+  * of the RDN sequence.
+  * The name will be encoded using the rules from RFC2253.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
+  * and 0 on success.
+  *
+  **/
+int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
+				  char *buf, unsigned int *sizeof_buf)
+{
+	int result;
+	ASN1_TYPE dn;
+
+	if (sizeof_buf == 0) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (buf)
+		buf[0] = 0;
+
+
+	if ((result =
+	     _gnutls_asn1_create_element(_gnutls_get_pkix(),
+					 "PKIX1.Name", &dn,
+					 "dn")) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&dn, idn->data, idn->size, NULL);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_parse_dn_oid(dn, "dn", oid, buf, sizeof_buf);
 
 	asn1_delete_structure(&dn);
 	return result;

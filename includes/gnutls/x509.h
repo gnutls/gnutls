@@ -96,6 +96,13 @@ int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, c
 
 int gnutls_x509_certificate_to_xml(gnutls_x509_certificate cert, gnutls_datum* res, int detail);
 
+/* RDN handling */
+int gnutls_x509_rdn_get(const gnutls_datum * idn,
+				  char *buf, unsigned int *sizeof_buf);
+
+int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
+				  char *buf, unsigned int *sizeof_buf);
+
 
 /* CRL handling functions */
 

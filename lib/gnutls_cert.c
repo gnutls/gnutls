@@ -205,7 +205,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * Contains a list with the CA names that the server considers trusted. 
   * Normaly we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
-  * meaningful value use the function gnutls_x509_rdn_to_dn().
+  * meaningful value use the function gnutls_x509_rdn_get().
   *
   * This function specifies what we, in case of a client, are going
   * to do when we have to send a certificate. If this callback
