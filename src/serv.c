@@ -681,6 +681,8 @@ int main(int argc, char **argv)
 			
 		    }
 /* check if we have a full HTTP header */
+
+ 	            j->http_response = NULL;
 		    if (j->http_request!=NULL) {
 		        if ( (http==0 && strchr(j->http_request, '\n')) || strstr (j->http_request, "\r\n\r\n")) {
 			  get_response (j->tstate, j->http_request, &j->http_response, &j->response_length);
