@@ -1,3 +1,10 @@
+2004-07-25 07:57  nmav <nmav@gnutls.org>
+
+	* lib/Makefile.am:
+
+	avoid using libtool's convenience libraries since they are buggy and
+	cause conflicts in linking.  
+
 2004-07-18 06:27  nmav <nmav@gnutls.org>
 
 	* doc/: protocol/draft-ietf-tls-compression-07.txt,
