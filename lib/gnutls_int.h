@@ -193,8 +193,6 @@ typedef struct {
 	/* resumed session */
 	ResumableSession	resumed; /* TRUE or FALSE - if we are resuming a session */
 	SecurityParameters  resumed_security_parameters;
-	/* to keep IO buffers ok */
-	int				peek_data_size;
 	/* For DH KX */
 	MPI				KEY;
 	MPI				client_Y;
