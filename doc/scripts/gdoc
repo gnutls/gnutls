@@ -540,7 +540,7 @@ sub dump_function {
 	    }
 	    $type = join " ", @args;
 
-	    if ($parameters{$param} eq "") {
+	    if ($parameters{$param} eq "" && $param != "void") {
 		$parameters{$param} = "-- undescribed --";
 		print STDERR "Warning($lineno): Function parameter '$param' not described in '$function_name'\n";
 	    }
