@@ -1,3 +1,16 @@
+2003-02-06 16:49  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_x509.c, gnutls_x509.h:
+
+	CRL parsing support is almost complete.  
+
+2003-02-06 10:05  nmav <nmav@gnutls.org>
+
+	* lib/: debug.c, debug.h, gnutls_dh_primes.c, gnutls_rsa_export.c,
+	gnutls_str.c, gnutls_str.h, gnutls_x509.c, gnutls_x509.h:
+
+	Several fixes and improvements in CRL support.  
+
 2003-02-05 20:20  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/Makefile.am, lib/gnutls_int.h,
