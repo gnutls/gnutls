@@ -147,7 +147,7 @@ void gnutls_perror(int error)
 	GNUTLS_ERROR_ALG_LOOP(ret =
 			      gnutls_strdup(p->name + sizeof("GNUTLS_E_") - 1));
 
-	_gnutls_log( "GNUTLS ERROR: %s\n", ret);
+	fprintf(stderr,  "GNUTLS ERROR: %s\n", ret);
 	
 	gnutls_free( ret);
 }

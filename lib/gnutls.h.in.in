@@ -132,6 +132,8 @@ int gnutls_error_is_fatal( int error);
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
 
+void gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version version);
+
 ssize_t gnutls_record_send( GNUTLS_STATE state, const void *data, size_t sizeofdata);
 ssize_t gnutls_record_recv( GNUTLS_STATE state, void *data, size_t sizeofdata);
 #define gnutls_read gnutls_record_recv

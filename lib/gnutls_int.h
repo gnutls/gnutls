@@ -542,6 +542,10 @@ typedef struct {
 	 * if the fingerprint is to be sent.
 	 */
 	int			pgp_fingerprint;
+
+	/* This holds the default version that our first
+	 * record packet will have. */
+	GNUTLS_Version		default_record_version;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

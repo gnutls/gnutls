@@ -1469,7 +1469,10 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 		 * handshake packet and ignore the one in the packet's record 
 		 * header.
 		 */
-		_gnutls_set_current_version(state, hver);
+		if (state->gnutls_internals.default_record_version==0)
+			_gnutls_set_current_version(state, hver);
+		else _gnutls_set_current_version(state,
+			state->gnutls_internals.default_record_version);
 
 		/* In order to know when this session was initiated.
 		 */
