@@ -1,6 +1,9 @@
+#ifndef GNUTLS_INT_H
+
 #include <gcrypt.h>
 
-#undef NDEBUG
+#define GNUTLS_INT_H
+
 #define HARD_DEBUG
 #define DEBUG
 
@@ -292,3 +295,5 @@ int _gnutls_set_keys(GNUTLS_STATE state);
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
+
+#endif /* GNUTLS_INT_H */

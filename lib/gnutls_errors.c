@@ -99,3 +99,26 @@ void gnutls_perror(int error)
 	
 	free( ret);
 }
+
+char* gnutls_strerror(int error)
+{
+	char *ret = NULL;
+	char *pointerTo_;
+
+	/* avoid prefix */
+	GNUTLS_ERROR_ALG_LOOP(ret =
+			      strdup(p->name + sizeof("GNUTLS_E_") - 1));
+
+
+	if (ret != NULL) {
+		tolow(ret, strlen(ret));
+		pointerTo_ = strchr(ret, '_');
+
+		while (pointerTo_ != NULL) {
+			*pointerTo_ = ' ';
+			pointerTo_ = strchr(ret, '_');
+		}
+	}
+	
+	return ret;
+}

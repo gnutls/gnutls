@@ -1,5 +1,4 @@
 #include <config.h>
-#include <assert.h>
 
 #ifdef STDC_HEADERS
 # include <string.h>

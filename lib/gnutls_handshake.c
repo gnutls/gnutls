@@ -101,7 +101,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 		return ret;
 	}
 	if (vrfysize != 12) {
-		assert(0);
+		gnutls_assert();
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
 
@@ -126,7 +126,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 	}
 
 	if (memcmp(vrfy, data, 12) != 0) {
-		assert(0);
+		gnutls_assert();
 		ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
 
@@ -137,7 +137,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 }
 
 
-
+/* This selects the best supported ciphersuite from the ones provided */
 int SelectSuite(opaque ret[2], char *data, int datalen)
 {
 	int x, i, j;
@@ -169,10 +169,12 @@ int SelectSuite(opaque ret[2], char *data, int datalen)
 
 
 	gnutls_free(ciphers);
+	gnutls_assert();
 	return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 
 }
 
+/* This selects the best supported compression method from the ones provided */
 int SelectCompMethod(CompressionMethod * ret, char *data, int datalen)
 {
 	int x, i, j;
@@ -180,9 +182,11 @@ int SelectCompMethod(CompressionMethod * ret, char *data, int datalen)
 
 	x = _gnutls_supported_compression_methods(&ciphers);
 	memset(ret, '\0', sizeof(CompressionMethod));
-
+fprintf(stderr, "datalen: %d\n",datalen);
 	for (j = 0; j < datalen; j++) {
 		for (i = 0; i < x; i++) {
+			fprintf(stderr, "cipher[%d] = %u\n", i, ciphers[i]);
+			fprintf(stderr, "data[%d] = %u\n", j, data[j]);
 			if (memcmp(&ciphers[i], &data[j], 1) == 0) {
 				memmove(ret, &ciphers[i], 1);
 				gnutls_free(ciphers);
@@ -193,6 +197,7 @@ int SelectCompMethod(CompressionMethod * ret, char *data, int datalen)
 
 
 	gnutls_free(ciphers);
+	gnutls_assert();
 	return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 
 }
@@ -296,7 +301,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	ret = _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, dataptr, 4);
 	if (ret < 0) return ret;
 	if (ret!=4) {
-		assert(0);
+		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
@@ -305,7 +310,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 #endif
 
 	if (dataptr[0]!=type) {
-		assert(0);
+		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	}
 	
@@ -407,6 +412,9 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 
 		datalen = 2 + 4 + (session_id_len + 1) + 28 + 3;
+		/* 2 for version, 4 for unix time, 28 for random bytes 2 for cipher suite's
+		 * size and 1 for compression method's size 
+		 */
 		data = gnutls_malloc(datalen);
 
 		data[pos++] = state->connection_state.version.major;
@@ -433,8 +441,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		}
 		pos += session_id_len;
 
-		x = _gnutls_supported_ciphersuites(&cipher_suites);
-
+		x = _gnutls_supported_ciphersuites(&cipher_suites)*sizeof(uint16);
 #ifdef WORDS_BIGENDIAN
 		memmove(&data[pos], &x, sizeof(uint16));
 #else
@@ -453,16 +460,13 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 			pos += 2;
 		}
 
-		z =
-		    _gnutls_supported_compression_methods
+		z = _gnutls_supported_compression_methods
 		    (&compression_methods);
-		memmove(&data[pos++], &z, sizeof(uint8));
-		datalen += z;
+		memmove(&data[pos++], &z, 1); /* put the number of compression methods */
+		datalen += z; 
 		data = gnutls_realloc(data, datalen);
-
 		for (i = 0; i < z; i++) {
-			memmove(&data[pos], &compression_methods[i], 1);
-			pos++;
+			memmove(&data[pos++], &compression_methods[i], 1);
 		}
 
 		gcry_free(rand);
@@ -542,7 +546,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		if (datalen < 38) {
-			assert(0);
+			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 
@@ -561,7 +565,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		memmove(&session_id_len, &data[pos++], 1);
 
 		if (datalen < 38 + session_id_len) {
-			assert(0);
+			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 		}
 #ifdef HARD_DEBUG
@@ -618,7 +622,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 
 	} else {		/* Server side reading a client hello */
 		if (datalen < 35) {
-			assert(0);
+			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 
@@ -627,7 +631,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #endif
 
 		if ( _gnutls_valid_version( state, data[pos], data[pos+1]) != 0) {
-			assert(0);
+			gnutls_assert();
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 		}
 		pos+=2;
@@ -652,16 +656,18 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #endif
 		ret = SelectSuite(state->gnutls_internals.
 			    current_cipher_suite.CipherSuite, &data[pos],
-			    sizeOfSuites);
+			    sizeOfSuites); /* *2 because it's 2 bytes each */
 
 		if (ret<0) return ret;
 		
 		pos += sizeOfSuites;
 
-		memmove(&z, &data[pos++], 1);
+		memmove(&z, &data[pos++], 1); /* z is the number of compression methods */
 		ret = SelectCompMethod(&state->
 				 gnutls_internals.compression_method,
 				 &data[pos], z);
+		pos+=z;
+		
 		if (ret<0) return ret;
 	}
 
@@ -680,7 +686,7 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen
 	
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		if (datalen < 2) {
-			assert(0);
+			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 
@@ -694,7 +700,7 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen
 		sizeOfCert=byteswap32(sizeOfCert);
 #endif
 		if (sizeOfCert > MAX24) {
-			assert(0);
+			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 		certificate_list = gnutls_malloc(sizeOfCert);
@@ -708,7 +714,7 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen
 	} else {		/* Server side reading a client certificate */
 		/* actually this is not complete */
 		if (datalen < 1) {
-			assert(0);
+			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
 

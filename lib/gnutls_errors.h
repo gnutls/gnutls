@@ -1,3 +1,5 @@
+#include "gnutls_int.h"
+
 #define	GNUTLS_E_MAC_FAILED  -1
 #define	GNUTLS_E_UNKNOWN_CIPHER -2
 #define	GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM -3
@@ -23,7 +25,20 @@
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -50
 
 
+#ifdef DEBUG
+# ifdef __FILE__
+#  ifdef __LINE__
+#   define gnutls_assert() fprintf(stderr, "GNUTLS_ASSERT: %s:%d\n", __FILE__,__LINE__);
+#  else
+#   define gnutls_assert() 1
+#  endif
+# else /* __FILE__ defined */
+#  define gnutls_assert() 1
+# endif
+#else /* no debug */
+# define gnutls_assert() 1
+#endif
 
-
+char* gnutls_strerror(int error);
 void gnutls_perror(int error);
 int gnutls_is_fatal_error( int error);

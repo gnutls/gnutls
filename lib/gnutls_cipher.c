@@ -44,7 +44,10 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 {
 
 	if (_gnutls_cipher_is_ok(algo) == 0) {
-		if (_gnutls_cipher_priority(algo) < 0) return GNUTLS_E_UNWANTED_ALGORITHM;
+		if (_gnutls_cipher_priority(algo) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_UNWANTED_ALGORITHM;
+		}
 
 		state->security_parameters.bulk_cipher_algorithm = algo;
 		if (_gnutls_cipher_is_block(algo) == 1) {
@@ -61,6 +64,7 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 		state->security_parameters.IV_size =
 		    _gnutls_cipher_get_iv_size(algo);
 	} else {
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_CIPHER;
 	}
 
@@ -77,6 +81,7 @@ int _gnutls_set_compression(GNUTLS_STATE state, CompressionMethod algo)
 		break;
 
 	default:
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
 	return 0;
@@ -90,9 +95,13 @@ int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
 	if (_gnutls_mac_is_ok(algo) == 0) {
 		state->security_parameters.mac_algorithm = algo;
 	} else {
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
-	if (_gnutls_mac_priority(algo) < 0) return GNUTLS_E_UNWANTED_ALGORITHM;
+	if (_gnutls_mac_priority(algo) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNWANTED_ALGORITHM;
+	}
 	state->security_parameters.hash_size = _gnutls_mac_get_digest_size(algo);
 	
 	return 0;
@@ -161,6 +170,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		state->connection_state.write_compression_state = NULL;
 		break;
 	default:
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
 
@@ -175,6 +185,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 			state->connection_state.write_mac_secret = gnutls_malloc(mac_size);
 		}
 	} else {
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
 
@@ -187,6 +198,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
   			  state->cipher_specs.server_write_IV,
 			  state->security_parameters.IV_size);
 		if (state->connection_state.write_cipher_state==GNUTLS_CIPHER_FAILED && state->security_parameters.bulk_cipher_algorithm!=GNUTLS_NULL) {
+			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
 
@@ -208,6 +220,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
   			  state->cipher_specs.client_write_IV,
 			  state->security_parameters.IV_size);
 		if (state->connection_state.read_cipher_state==GNUTLS_CIPHER_FAILED && state->security_parameters.bulk_cipher_algorithm!=GNUTLS_NULL) {
+			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
 	
@@ -221,6 +234,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
   			  state->cipher_specs.server_write_IV,
 			  state->security_parameters.IV_size);
 		if (state->connection_state.read_cipher_state==GNUTLS_CIPHER_FAILED && state->security_parameters.bulk_cipher_algorithm!=GNUTLS_NULL) {
+			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
 
@@ -242,11 +256,13 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
   			  state->cipher_specs.client_write_IV,
 			  state->security_parameters.IV_size);
 		if (state->connection_state.write_cipher_state==GNUTLS_CIPHER_FAILED && state->security_parameters.bulk_cipher_algorithm!=GNUTLS_NULL) {
+			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
 		break;
 
 	default:
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 
@@ -286,6 +302,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	if (td == GNUTLS_MAC_FAILED && state->security_parameters.mac_algorithm!=GNUTLS_MAC_NULL) {
 		gnutls_free(*cipher);
 		gnutls_free(content);
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
 
@@ -381,6 +398,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	default:
 		gnutls_free(*cipher);
 		gnutls_free(content);
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
@@ -423,6 +441,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	if (td==GNUTLS_MAC_FAILED && state->security_parameters.mac_algorithm!=GNUTLS_MAC_NULL) {
 		gnutls_free(*compress);
 		gnutls_free(content);
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
 
@@ -454,8 +473,10 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			    state->connection_state.mac_secret_size - pad -
 			    1;
 
-			if (pad > ciphertext->length - state->connection_state.mac_secret_size)
+			if (pad > ciphertext->length - state->connection_state.mac_secret_size) {
+				gnutls_assert();
 				return GNUTLS_E_RECEIVED_BAD_MESSAGE;
+			}
 			data = gnutls_malloc(length);
 			memmove(data, content, length);
 
@@ -470,6 +491,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	default:
 		gnutls_free(*compress);
 		gnutls_free(content);
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
@@ -498,6 +520,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 #ifdef DEBUG
 		fprintf(stderr, "MAC FAILED\n");
 #endif
+		gnutls_assert();
 		return GNUTLS_E_MAC_FAILED;
 	}
 

@@ -38,7 +38,7 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
 static gnutls_cipher_entry algorithms[] = {
 	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES, 8, 24, 1, 8, -1),
-	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0, -1),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0, -2),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_NULL, 1, 0, 0, 0, -1),
 	{0}
 };
@@ -96,11 +96,11 @@ typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 1, 0, 0, 1, -1),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 0, 1, 1, 0, -1),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 0, 1, 1, 0, -2),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 1, 0, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 0, 1, 0, 0, -1),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 0, 1, 0, 0, -1),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0, -2),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 0, 1, 0, 0, -2),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 0, 1, 0, 0, -2),
 	{0}
 };
 
@@ -183,7 +183,7 @@ int _gnutls_mac_get_digest_size(MACAlgorithm algorithm)
 
 void _gnutls_mac_set_priority(MACAlgorithm algorithm, int prio)
 {
-	GNUTLS_HASH_ALG_LOOP(p->priority=prio);
+	GNUTLS_HASH_ALG_LOOP( if (p->priority >= -1) p->priority=prio);
 }
 
 int _gnutls_mac_priority(MACAlgorithm algorithm) /* actually returns the priority */
@@ -259,7 +259,7 @@ int _gnutls_cipher_get_block_size(BulkCipherAlgorithm algorithm)
 
 void _gnutls_cipher_set_priority(BulkCipherAlgorithm algorithm, int prio)
 {
-	GNUTLS_ALG_LOOP(p->priority=prio);
+	GNUTLS_ALG_LOOP(if (p->priority >= -1) p->priority=prio);
 }
 
  /* returns the priority */
@@ -360,7 +360,7 @@ int _gnutls_kx_server_certificate(KXAlgorithm algorithm)
 
 void _gnutls_kx_set_priority(KXAlgorithm algorithm, int prio)
 {
-	GNUTLS_KX_ALG_LOOP(p->priority=prio);
+	GNUTLS_KX_ALG_LOOP(if (p->priority >= -1) p->priority=prio);
 }
 
 
