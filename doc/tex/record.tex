@@ -1,7 +1,7 @@
 \section{The TLS record protocol\index{Record protocol}}
 
-The Record protocol is the secure communications provider. It's job is
-to encrypt and authenticate packets. 
+The Record protocol is the secure communications provider. It's purpose
+is to encrypt, authenticate and --optionally-- compress packets.
 The following functions are available:
 \par
 \begin{itemize}
@@ -16,9 +16,12 @@ are quite limited, given the importance of this protocol in \tls{}.
 This is because the Record protocol's parameters are all set by
 the Handshake protocol (see section \ref{handshake} on page \pageref{handshake}).
 \par
-The Record protocol initialy starts with NULL parameters, which means
+The Record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
 just after the handshake protocol has finished.
 
 \input{ciphers}
+
+\input{compression}
+
 

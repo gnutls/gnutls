@@ -57,7 +57,7 @@ The resuming capability, mostly in the server side, is one of the problems of a 
 implementations. The problem is that all threads must share information in
 order to be able to resume sessions. The gnutls approach is, in case of a
 client, to leave all the burden of resuming to the client. Ie. copy and keep the
-nesessary parameters. See the functions:
+necessary parameters. See the functions:
 \begin{itemize}
 \item \printfunc{gnutls_session_get_data}{gnutls\_session\_get\_data}
 \item \printfunc{gnutls_session_get_id}{gnutls\_session\_get\_id}
@@ -75,8 +75,9 @@ which store, retrieve and delete session data. These can be registered with:
 \end{itemize}
 
 \par
-It might also be usefull to be able to check for expired sessions in order to remove 
+It might also be useful to be able to check for expired sessions in order to remove 
 them, and save space. The function
 \printfunc{gnutls_db_check_entry}{gnutls\_db\_check\_entry} is provided for that
 reason.
+
 

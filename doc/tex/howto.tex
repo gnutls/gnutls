@@ -9,7 +9,7 @@ but may be extended to other ones too.
 
 \section{The traditional way}
 
-Traditionaly \ssl{} was used in application protocols by assigning 
+Traditionally \ssl{} was used in application protocols by assigning 
 a new port number for the secure services. That way two ports were assigned, one for the
 non secure sessions, and one for the secured ones. This has the benefit
 that if a user requests a secure session then the client will try to
@@ -22,7 +22,7 @@ Despite it's wide use, this method is not as good as it seems.
 This approach starts the \tls{} Handshake procedure just after the
 client connects on the --so called-- secure port. 
 That way the \tls{} protocol does not know anything
-about the client, and popular methods like the host advertizing in 
+about the client, and popular methods like the host advertising in 
 HTTP do not work. There is no way for the client to say ``I connected
 to YYY server'' before the Handshake starts, so the server cannot
 possibly know which certificate to use\footnote{There is some effort to solve
@@ -30,7 +30,7 @@ this problem within \tls{}}.
 
 \par
 Other than that it requires two separate ports to run a single service, which is 
-unnessesary complication. Due to the fact that there is a limitation on 
+unnecessary complication. Due to the fact that there is a limitation on 
 the available privileged ports, this approach was soon obsoleted.
 
 
@@ -120,5 +120,6 @@ denial of service is possible. The benefit is the server may request
 additional data before the \tls{} Handshake protocol
 starts, in order to send the correct certificate, use the correct
 password file\footnote{in SRP authentication}, or anything else!
+
 
 

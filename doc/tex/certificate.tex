@@ -9,7 +9,7 @@ The X.509 protocols rely on a hierarchical trust model. In this trust model
 Certification Authorities (CAs) are used to certify entities.
 Usually more than one certification authorities exist, and certification
 authorities may certify other authorities to issue certificates as well,
-following a hierachical model. 
+following a hierarchical model. 
 One needs to trust one or more CAs for his secure
 communications. In that case only the certificates issued by the trusted
 authorities are acceptable. See figure \ref{fig:x509-1} for a typical example.
@@ -50,7 +50,7 @@ for an example.
 Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit. See 
 \htmladdnormallink{http://www.gnupg.org/aegypten/}{http://www.gnupg.org/aegypten/}}. 
 \gnutls{} only includes the required,
-in order to use the TLS ciphersuites which depend on X.509 certificates.
+in order to use the TLS cipher suites which depend on X.509 certificates.
 
 
 \section{The OpenPGP\index{OpenPGP keys} trust model}
@@ -97,7 +97,7 @@ the signature he made. There are different ownertrust levels:
 \item I do NOT trust
 \item I trust marginally
 \item I trust fully
-\item I trust ulitmately.
+\item I trust ultimately.
 \end{enumerate}
 
 For example we need three marginally trusted signature to make a key
@@ -125,5 +125,6 @@ it was created by the key itself.
 \\
 Validity means if the signatures on the key are valid and the key was not 
 changed by somebody or corrupted during transport.
+
 
 

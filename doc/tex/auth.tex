@@ -76,12 +76,12 @@ This protocol also offers protection against off-line attacks, such as password
 file stealing. 
 This is achieved since SRP does not use the plain password to perform authentication, but something called a 
 verifier. The verifier is $g^{x}mod(n)$ and $x$ is a value calculated
-from the username and the password. 
-\par SRP is normaly used with a SHA based hash function, to calculate
+from the user name and the password. 
+\par SRP is normally used with a SHA based hash function, to calculate
 the value of $x$. 
 \par The advantage of SRP authentication, over other proposed secure password 
 authentication schemas, is that SRP does not require the server to hold
-the user's password. This kind of protection is similar to the one used traditionaly
+the user's password. This kind of protection is similar to the one used traditionally
 in the \emph{UNIX} ``passwd'' file, where the contents of this file did not cause
 harm to the system security if they were revealed.
 \par
@@ -104,3 +104,4 @@ SRP & Authentication using the SRP protocol.
 \gnutls{} includes a program to manipulate the required for SRP
 authentication. See section \ref{srpcrypt} on page \pageref{srpcrypt} for
 more information.
+

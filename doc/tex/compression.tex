@@ -1,0 +1,32 @@
+\subsection{Compression algorithms used in the record layer}
+\index{Compression algorithms}
+The TLS' record layer also supports compression. The algorithms
+implemented in \gnutls{} can found in figure \ref{fig:compression}.
+All the algorithms should be considered as \gnutls' extensions, and
+should be advertised only when the peer is known to have a compliant client,
+to avoid interoperability problems.
+\par
+The included algorithms perform really good when text, or other
+compressable data are to be transfered, but offer nothing on already 
+compressed data, such as compressed images, zipped archives etc.
+These compression algorithms, may be useful in high bandwidth TLS tunnels,
+and in cases where network usage has to be minimized. As a drawback, 
+compression increases latency.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+ZLIB & ZLIB compression, using the deflate algorithm.
+\\
+\hline
+LZO & LZO is a very fast compression algorithm. This algorithm is only
+available if the \gnutlse{} library has been initialized.
+\\
+\hline
+\end{tabular}
+\caption{Supported compression algorithms}
+\label{fig:compression}
+\end{figure}
+
+
