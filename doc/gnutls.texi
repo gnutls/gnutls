@@ -68,9 +68,11 @@ Free Documentation License''.
 * Authentication methods::
 * More on certificate authentication::
 * How to use TLS in application protocols::
+* How to use GnuTLS in applications::
 * Included programs::
 * Function reference::
-* Error codes and descriptions::
+* Certificate to XML convertion functions::
+* All the supported ciphersuites in GnuTLS::
 * Copying This Manual::
 * Index::
 @end menu
@@ -78,8 +80,6 @@ Free Documentation License''.
 
 @node Preface
 @chapter Preface
-
-@section Introduction
 
 This document tries to demonstrate and explain the @acronym{GnuTLS}
 library API.  A brief introduction to the protocols and the technology
@@ -103,7 +103,7 @@ forced to find out''@footnote{Available from
 @url{http://www.cs.auckland.ac.nz/~pgut001/pubs/pkitutorial.pdf}} is a
 good introduction to Public Key Infrastructure.
 
-@section Availability
+@anchor{Availability}
 
 Updated versions of the @acronym{GnuTLS} software and this document
 will be available from @url{http://www.gnutls.org/} and
@@ -166,6 +166,14 @@ In order to ease integration in embedded systems, parts of the
 @acronym{GnuTLS} library can be disabled at compile time. That way a
 small library, with the required features, can be generated.
 
+@menu
+* General Idea::
+* Error handling::
+* Memory handling::
+* Callback functions::
+@end menu
+
+@node General Idea
 @section General Idea
 
 A brief description of how @acronym{GnuTLS} works internally is shown
@@ -212,6 +220,7 @@ and if the session ID sent by the client, matches a stored session,
 the stored session will be retrieved, and the new session will be a
 resumed one, and will share the same session ID with the previous one.
 
+@node Error handling
 @section Error handling
 
 In @acronym{GnuTLS} most functions return an integer type as a result.  In
@@ -234,6 +243,7 @@ If any non fatal errors, that require an action, are to be returned by
 a function, these error codes will be documented in the function's
 reference.  @xref{Error Codes}, for all the error codes.
 
+@node Memory handling
 @section Memory handling
 
 @acronym{GnuTLS} internally handles heap allocated objects
@@ -251,6 +261,7 @@ cases where even the system's swap memory is not considered
 secure. See the documentation of @acronym{Libgcrypt} for more
 information.
 
+@node Callback functions
 @section Callback functions
 @cindex Callback functions
 
@@ -284,7 +295,7 @@ should allocate and free memory using the functions shown below.
 @end itemize
 
 @node Introduction to TLS
-@chapter Introduction to TLS
+@chapter Introduction to @acronym{TLS}
 
 @acronym{TLS} stands for ``Transport Layer Security'' and is the
 successor of SSL, the Secure Sockets Layer protocol@footnote{Described
@@ -303,6 +314,16 @@ minor. Older protocols such as @acronym{SSL} 2.0 are not discussed nor
 implemented in @acronym{GnuTLS} since they are not considered secure
 today.
 
+@menu
+* TLS layers::
+* The transport layer::
+* The TLS record protocol::
+* The TLS Alert Protocol::
+* The TLS Handshake Protocol::
+* TLS Extensions::
+@end menu
+
+@node TLS layers
 @section TLS layers
 @cindex TLS Layers
 
@@ -324,6 +345,7 @@ protocol.  The protocol layering in TLS is shown in the figure below.
 
 @image{layers,12cm,8cm}
 
+@node The transport layer
 @section The transport layer
 @cindex Transport protocol
 
@@ -357,6 +379,7 @@ will use the Berkeley Sockets functions.  In this case
 work, thus making it easy to add @acronym{TLS} support to existing
 TCP/IP servers.
 
+@node The TLS record protocol
 @section The TLS record protocol
 @cindex Record protocol
 
@@ -382,6 +405,13 @@ The Record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
 just after the handshake protocol has finished.
 
+@menu
+* Encryption algorithms used in the record layer::
+* Compression algorithms used in the record layer::
+* Weaknesses and countermeasures::
+@end menu
+
+@node Encryption algorithms used in the record layer
 @subsection Encryption algorithms used in the record layer
 @cindex Symmetric encryption algorithms
 
@@ -437,6 +467,7 @@ the EU project RIPE. Outputs 160 bits of data.
 
 @end itemize
 
+@node Compression algorithms used in the record layer
 @subsection Compression algorithms used in the record layer
 @cindex Compression algorithms
 
@@ -472,6 +503,7 @@ and the private extensions are enabled.
 
 @end itemize
 
+@node Weaknesses and countermeasures
 @subsection Weaknesses and countermeasures
 
 Some weaknesses that may affect the security of the Record layer have
@@ -498,6 +530,7 @@ Those weaknesses were solved in @acronym{TLS} 1.1 which is implemented
 in @acronym{GnuTLS}. For a detailed discussion see the archives of the
 TLS Working Group mailing list and the paper @cite{CBCATT}.
 
+@node The TLS Alert Protocol
 @section The TLS Alert Protocol
 @anchor{The Alert Protocol}
 @cindex Alert protocol
@@ -532,6 +565,7 @@ Returns the name, in a character array, of the given alert.
 
 @end itemize
 
+@node The TLS Handshake Protocol
 @section The TLS Handshake Protocol
 @anchor{The Handshake Protocol}
 @cindex Handshake protocol
@@ -681,6 +715,7 @@ It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
 @code{gnutls_db_check_entry} is provided for that reason.
 
+@node TLS Extensions
 @section TLS Extensions
 @cindex TLS Extensions
 
@@ -741,6 +776,15 @@ are:
 
 @end itemize
 
+@menu
+* Certificate authentication::
+* Anonymous authentication::
+* Authentication using SRP::
+* Authentication and credentials::
+* Parameters stored in credentials::
+@end menu
+
+@node Certificate authentication
 @section Certificate authentication
 
 @subsection Authentication using @acronym{X.509} certificates
@@ -874,6 +918,7 @@ Signature Standard.
 
 @end itemize
 
+@node Anonymous authentication
 @section Anonymous authentication
 @cindex Anonymous authentication
 
@@ -898,6 +943,7 @@ This algorithm exchanges Diffie Hellman parameters.
 
 @end itemize
 
+@node Authentication using SRP
 @section Authentication using @acronym{SRP}
 @cindex @acronym{SRP} authentication
 
@@ -982,6 +1028,7 @@ maintain @acronym{SRP} verifiers, and password files.  A program to
 manipulate the required parameters for @acronym{SRP} authentication is
 also included.  @xref{srptool}, for more information.
 
+@node Authentication and credentials
 @section Authentication and credentials
 
 In @acronym{GnuTLS} every key exchange method is associated with a
@@ -1019,6 +1066,7 @@ Key exchange algorithms and the corresponding credential types:
 
 @end multitable
 
+@node Parameters stored in credentials
 @section Parameters stored in credentials
 
 Several parameters such as the ones used for Diffie-Hellman
@@ -1082,8 +1130,13 @@ int main()
 @anchor{Certificate Authentication}
 @cindex Certificate authentication
 
+@menu
+* The X.509 trust model::
+* The OpenPGP trust model::
+@end menu
+
+@node The X.509 trust model
 @section The @acronym{X.509} trust model
-@anchor{The X.509 trust model}
 @cindex @acronym{X.509} certificates
 
 The @acronym{X.509} protocols rely on a hierarchical trust model. In
@@ -1100,6 +1153,14 @@ acceptable.  See the figure above for a typical example.  The API for
 handling @acronym{X.509} certificates is described at section
 @ref{sec:x509api}.  Some examples are listed below.
 
+@menu
+* X.509 certificates::
+* Verifying X.509 certificate paths::
+* PKCS #10 certificate requests::
+* PKCS #12 structures::
+@end menu
+
+@node X.509 certificates
 @subsection @acronym{X.509} certificates
 
 An @acronym{X.509} certificate usually contains information about the
@@ -1182,6 +1243,7 @@ functions for @acronym{X.509} certificate handling have their prototypes in
 @file{gnutls/x509.h}. An example program to demonstrate the @acronym{X.509}
 parsing capabilities can be found at section @ref{ex:x509-info}.
 
+@node Verifying X.509 certificate paths
 @subsection Verifying @acronym{X.509} certificate paths
 @cindex Verifying certificate paths
 
@@ -1214,6 +1276,7 @@ about the peer's identity. It is required to verify if the
 certificate's owner is the one you expect. See @cite{RFC2818} and
 section @ref{ex:verify} for an example.
 
+@node PKCS #10 certificate requests
 @subsection @acronym{PKCS} #10 certificate requests
 @cindex Certificate requests
 @cindex @acronym{PKCS} #10
@@ -1229,6 +1292,7 @@ In @acronym{GnuTLS} the @acronym{PKCS} #10 structures are handled
 using the @code{gnutls_x509_crq_t} type.  An example of a certificate
 request generation can be found at section @ref{ex:crq}.
 
+@node PKCS #12 structures
 @subsection @acronym{PKCS} #12 structures
 @cindex @acronym{PKCS} #12
 
@@ -1246,8 +1310,8 @@ in order for its data to be accessed.
 An example of a @acronym{PKCS} #12 structure generation can be found
 at section @ref{ex:pkcs12}.
 
+@node The OpenPGP trust model
 @section The @acronym{OpenPGP} trust model
-@anchor{The OpenPGP trust model}
 @cindex @acronym{OpenPGP} Keys
 
 The @acronym{OpenPGP} key authentication relies on a distributed trust
@@ -1321,15 +1385,19 @@ The key was not signed by a known signer.
 @end itemize
 
 @node How to use TLS in application protocols
-@chapter How to use TLS in application protocols
-
-@section Introduction
+@chapter How to use @acronym{TLS} in application protocols
 
 This chapter is intended to provide some hints on how to use the
-@acronym{TLS} over simple custom made application protocols.  The discussion
-below mainly refers to the @emph{TCP/IP} transport layer but may be
-extended to other ones too.
+@acronym{TLS} over simple custom made application protocols.  The
+discussion below mainly refers to the @emph{TCP/IP} transport layer
+but may be extended to other ones too.
 
+@menu
+* Separate ports::
+* Upward negotiation::
+@end menu
+
+@node Separate ports
 @section Separate ports
 
 Traditionally @acronym{SSL} was used in application protocols by
@@ -1356,6 +1424,7 @@ service, which is unnecessary complication. Due to the fact that there
 is a limitation on the available privileged ports, this approach was
 soon obsoleted.
 
+@node Upward negotiation
 @section Upward negotiation
 
 Other application protocols@footnote{See LDAP, IMAP etc.}  use a
@@ -1446,16 +1515,34 @@ starts, in order to send the correct certificate, use the correct
 password file@footnote{in @acronym{SRP} authentication}, or anything
 else!
 
+@node How to use GnuTLS in applications
 @chapter How to use @acronym{GnuTLS} in applications
 @anchor{examples}
 @cindex Example programs
 
+@menu
+* Preparation::
+* Multi-threaded applications::
+* Client examples::
+* Server examples::
+* Miscellaneous examples::
+* Compatibility with the OpenSSL library::
+@end menu
+
+@node Preparation
 @section Preparation
 
 To use @acronym{GnuTLS}, you have to perform some changes to your
 sources and your build system. The necessary changes are explained in
 the following subsections.
 
+@menu
+* Headers::
+* Version check::
+* Building the source::
+@end menu
+
+@node Headers
 @subsection Headers
 
 All the data types and functions of the @acronym{GnuTLS} library are
@@ -1467,6 +1554,7 @@ The extra functionality of the @acronym{GnuTLS-extra} library is
 available by including the header file @file{gnutls/extra.h} in your
 programs.
 
+@node Version check
 @subsection Version check
 
 It is often desirable to check that the version of `gnutls' used is
@@ -1476,6 +1564,7 @@ with the dynamic linker an old version is actually used.  So you may
 want to check that the version is okay right after program startup.
 See the function @code{gnutls_check_version}.
 
+@node Building the source
 @subsection Building the source
 
 If you want to compile a source file including the `gnutls/gnutls.h'
@@ -1521,6 +1610,7 @@ specifying both options to `libgnutls-config':
 gcc -o foo foo.c `libgnutls-config --cflags --libs`
 @end example
 
+@node Multi-threaded applications
 @section Multi-threaded applications
 
 Although the @acronym{GnuTLS} library is thread safe by design, some
@@ -1584,12 +1674,24 @@ int main()
 @end example
 @end itemize
 
+@node Client examples
 @section Client examples
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 clients, using @acronym{GnuTLS}.  Note that these examples contain
 little or no error checking.
 
+@menu
+* Simple client example with anonymous authentication::
+* Simple client example with X.509 certificate support::
+* Obtaining session information::
+* Verifying peer's certificate::
+* Using a callback to select the certificate to use::
+* Client with Resume capability example::
+* Simple client example with SRP authentication::
+@end menu
+
+@node Simple client example with anonymous authentication
 @subsection Simple client example with anonymous authentication
 
 The simplest client using TLS is the one that doesn't do any
@@ -1600,6 +1702,7 @@ However, the data is integrity and privacy protected.
 
 @verbatiminclude examples/ex-client1.c
 
+@node Simple client example with X.509 certificate support
 @subsection Simple client example with @acronym{X.509} certificate support
 
 Let's assume now that we want to create a TCP client which
@@ -1612,6 +1715,7 @@ redefining them.
 
 @verbatiminclude examples/ex-client2.c
 
+@node Obtaining session information
 @subsection Obtaining session information
 
 Most of the times it is desirable to know the security properties of
@@ -1622,6 +1726,7 @@ if called after a successful @code{gnutls_handshake}.
 
 @verbatiminclude examples/ex-session-info.c
 
+@node Verifying peer's certificate
 @subsection Verifying peer's certificate
 @anchor{ex:verify}
 
@@ -1639,6 +1744,7 @@ verification output.
 
 @verbatiminclude examples/ex-verify.c
 
+@node Using a callback to select the certificate to use
 @subsection Using a callback to select the certificate to use
 
 There are cases where a client holds several certificate and key
@@ -1648,6 +1754,7 @@ certificate selection callback.
 
 @verbatiminclude examples/ex-cert-select.c
 
+@node Client with Resume capability example
 @subsection Client with Resume capability example
 @anchor{ex:resume-client}
 
@@ -1658,6 +1765,7 @@ establish a new connection using the previously negotiated data.
 
 @verbatiminclude examples/ex-client-resume.c
 
+@node Simple client example with SRP authentication
 @subsection Simple client example with @acronym{SRP} authentication
 
 The following client is a very simple @acronym{SRP} @acronym{TLS}
@@ -1667,11 +1775,21 @@ itself using a certificate, and in that case it has to be verified.
 
 @verbatiminclude examples/ex-client-srp.c
 
+@node Server examples
 @section Server examples
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 servers, using @acronym{GnuTLS}.
 
+@menu
+* Echo Server with X.509 authentication::
+* Echo Server with X.509 authentication II::
+* Echo Server with OpenPGP authentication::
+* Echo Server with SRP authentication::
+* Echo Server with anonymous authentication::
+@end menu
+
+@node Echo Server with X.509 authentication
 @subsection Echo Server with @acronym{X.509} authentication
 
 This example is a very simple echo server which supports
@@ -1679,6 +1797,7 @@ This example is a very simple echo server which supports
 
 @verbatiminclude examples/ex-serv1.c
 
+@node Echo Server with X.509 authentication II
 @subsection Echo Server with @acronym{X.509} authentication II
 
 The following example is a server which supports @acronym{X.509}
@@ -1687,7 +1806,8 @@ the DHE ciphersuites and session resuming.
 
 @verbatiminclude examples/ex-serv-export.c
 
-@subsection Echo Server with @acronym{OpenPGP}authentication
+@node Echo Server with OpenPGP authentication
+@subsection Echo Server with @acronym{OpenPGP} authentication
 @cindex @acronym{OpenPGP} Server
 
 The following example is an echo server which supports
@@ -1698,6 +1818,7 @@ them to keep these examples as simple as possible.
 
 @verbatiminclude examples/ex-serv-pgp.c
 
+@node Echo Server with SRP authentication
 @subsection Echo Server with @acronym{SRP} authentication
 
 This is a server which supports @acronym{SRP} authentication. It is
@@ -1706,6 +1827,7 @@ server. Here it is separate for simplicity.
 
 @verbatiminclude examples/ex-serv-srp.c
 
+@node Echo Server with anonymous authentication
 @subsection Echo Server with anonymous authentication
 
 This example server support anonymous authentication, and could be
@@ -1713,8 +1835,17 @@ used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c
 
+@node Miscellaneous examples
 @section Miscellaneous examples
 
+@menu
+* Checking for an alert::
+* X.509 certificate parsing example::
+* Certificate request generation::
+* PKCS #12 structure generation::
+@end menu
+
+@node Checking for an alert
 @subsection Checking for an alert
 
 This is a function that checks if an alert has been received in the
@@ -1722,6 +1853,7 @@ current session.
 
 @verbatiminclude examples/ex-alert.c
 
+@node X.509 certificate parsing example
 @subsection @acronym{X.509} certificate parsing example
 @anchor{ex:x509-info}
 
@@ -1731,6 +1863,7 @@ information about it.
 
 @verbatiminclude examples/ex-x509-info.c
 
+@node Certificate request generation
 @subsection Certificate request generation
 @anchor{ex:crq}
 
@@ -1740,6 +1873,7 @@ which should return a signed certificate.
 
 @verbatiminclude examples/ex-crq.c
 
+@node PKCS #12 structure generation
 @subsection @acronym{PKCS} #12 structure generation
 @anchor{ex:pkcs12}
 
@@ -1748,6 +1882,7 @@ structure.
 
 @verbatiminclude examples/ex-pkcs12.c
 
+@node Compatibility with the OpenSSL library
 @section Compatibility with the OpenSSL library
 @cindex OpenSSL
 
@@ -1773,8 +1908,20 @@ Current limitations imposed by the compatibility layer include:
 @node Included programs
 @chapter Included programs
 
+Included with @acronym{GnuTLS} are also a few command line tools that
+let you use the library for common tasks without writing an
+application.  The applications are discussed in this chapter.
+
+@menu
+* Invoking srptool::
+* Invoking gnutls-cli::
+* Invoking gnutls-cli-debug::
+* Invoking gnutls-serv::
+* Invoking certtool::
+@end menu
+
+@node Invoking srptool
 @section Invoking srptool
-@anchor{Invoking srptool}
 @anchor{srptool}
 @cindex srptool
 
@@ -1818,8 +1965,8 @@ $ srptool --passwd /etc/tpasswd \
 
 @end itemize
 
+@node Invoking gnutls-cli
 @section Invoking gnutls-cli
-@anchor{Invoking gnutls-cli}
 @cindex gnutls-cli
 
 Simple client program to set up a TLS connection to some other
@@ -1875,8 +2022,8 @@ Usage:  gnutls-cli [options] hostname
      --copyright              prints the program's license
 @end verbatim
 
+@node Invoking gnutls-cli-debug
 @section Invoking gnutls-cli-debug
-@anchor{Invoking gnutls-cli-debug}
 @cindex gnutls-cli-debug
 
 This program was created to assist in debugging @acronym{GnuTLS}, but
@@ -1924,8 +2071,8 @@ Checking for SRP authentication support (TLS extension)... yes
 Checking for OpenPGP authentication support (TLS extension)... no
 @end smallexample
 
+@node Invoking gnutls-serv
 @section Invoking gnutls-serv
-@anchor{Invoking gnutls-serv}
 @cindex gnutls-serv
 
 Simple server program that listens to incoming TLS connections.
@@ -1973,8 +2120,8 @@ Usage: gnutls-serv [options]
      --copyright              prints the program's license
 @end verbatim
 
+@node Invoking certtool
 @section Invoking certtool
-@anchor{Invoking certtool}
 @cindex certtool
 
 This is a program to generate @acronym{X.509} certificates, certificate
@@ -2190,7 +2337,19 @@ handling.  Their prototypes lie in @file{gnutls/openpgp.h}.
 
 @include pgp-api.texi
 
-@chapter Certificate to XML convertion functions
+@section Error codes and descriptions
+@anchor{Error Codes}
+@cindex Error codes
+
+The error codes used throughout the library are described below.  The
+return code @code{GNUTLS_E_SUCCESS} indicate successful operation, and
+is guaranteed to have the value 0, so you can use it in logical
+expressions.
+
+@include error_codes.texi
+
+@node Certificate to XML convertion functions
+@chapter Certificate to @acronym{XML} convertion functions
 @cindex Certificate to XML convertion
 
 This appendix contains some example output of the XML convertion
@@ -2486,8 +2645,7 @@ functions:
 </gnutls:openpgp:key>
 @end smallexample
 
-@include error_codes.texi
-
+@node All the supported ciphersuites in GnuTLS
 @chapter All the supported ciphersuites in @acronym{GnuTLS}
 @anchor{ciphersuites}
 @cindex Ciphersuites
