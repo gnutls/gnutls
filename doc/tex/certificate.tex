@@ -105,8 +105,8 @@ CRL distribution points & 2.5.29.31 & This extension is set by the CA, in order 
 \\
 \par
 In \gnutls{} the X.509 certificate structures are handled using the
-\emph{gnutls\_x509\_crt} type and the corresponding private keys with
-the \emph{gnutls\_x509\_privkey} type.
+\emph{gnutls\_x509\_crt\_t} type and the corresponding private keys with
+the \emph{gnutls\_x509\_privkey\_t} type.
 All the available functions for X.509 certificate handling have their 
 prototypes in \emph{gnutls/x509.h}. An example program to demonstrate the 
 X.509 parsing capabilities can be found at section \ref{ex:x509-info} on 
@@ -145,8 +145,8 @@ CERT\_SIGNER\_NOT\_FOUND & The certificate's issuer is not known.
 Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
 about the peer's identity. It is required to verify if the certificate's
-owner is the one you expect. See section \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
-for an example.
+owner is the one you expect. See \cite{RFC2818} and section \ref{ex:verify-chain} 
+on page \pageref{ex:verify-chain} for an example.
 
 
 \subsection{PKCS \#10 certificate requests\index{Certificate requests}\index
@@ -159,7 +159,7 @@ defined in PKCS \#10 \cite{RFC2986}. Other certificate request's format such as
 PKIX's RFC2511 \cite{RFC2511} are not currently supported.
 
 In \gnutls{} the PKCS \#10 structures are handled using the
-\emph{gnutls\_x509\_crq} type. 
+\emph{gnutls\_x509\_crq\_t} type. 
 An example of a certificate request generation can be found at section \ref{ex:crq}
 on page \pageref{ex:crq}.
 
@@ -169,8 +169,8 @@ certificates. It is commonly used in browsers to export and import
 the user's identities.
 \par
 In \gnutls{} the PKCS \#12 structures are handled using the
-\emph{gnutls\_pkcs12} type. This is an abstract type that
-may hold several \emph{gnutls\_pkcs12\_bag} types. The Bag types are the
+\emph{gnutls\_pkcs12\_t} type. This is an abstract type that
+may hold several \emph{gnutls\_pkcs12\_bag\_t} types. The Bag types are the
 holders of the actual data, which may be certificates, private
 keys or encrypted data. An Bag of type encrypted should be decrypted
 in order for its data to be accessed. 
@@ -211,15 +211,17 @@ actual owner.
 
 \subsection*{OpenPGP keys}
 In \gnutls{} the OpenPGP key structures \cite{RFC2440} are handled using the
-\emph{gnutls\_openpgp\_key} type and the corresponding private keys with
-the \emph{gnutls\_openpgp\_privkey} type. All the prototypes for the key handling
+\emph{gnutls\_openpgp\_key\_t} type and the corresponding private keys with
+the \emph{gnutls\_openpgp\_privkey\_t} type. All the prototypes for the key handling
 functions can be found at \emph{gnutls/openpgp.h}.
 
 \subsection*{Verifying an OpenPGP key}
 The verification functions of OpenPGP keys, included in \gnutls{}, 
 are simple ones, and do not use the features of the ``web of trust''.
 For that reason, if the verification needs are complex, 
-the assistance of external tools like GnuPG is recommended.
+the assistance of external tools like GnuPG and GPGME\footnote{
+Available at \htmladdnormallink{http://www.gnupg.org/related\_software/gpgme/}}
+is recommended.
 \par
 There are two verification functions in \gnutls{},
 The \printfunc{gnutls_openpgp_key_verify_ring}{gnutls\_openpgp\_key\_verify\_ring}

@@ -96,15 +96,14 @@ int result;
 	}
 
 	if (cert_signed_data.size == issuer_signed_data.size) {
-		if (
-		    (memcmp(cert_signed_data.data, issuer_signed_data.data,
+		if ((memcmp(cert_signed_data.data, issuer_signed_data.data,
 		    	cert_signed_data.size) == 0) &&
 		    (cert_signature.size == issuer_signature.size) &&
 		    (memcmp(cert_signature.data, issuer_signature.data,
-		    	cert_signature.size) == 0))
-
+		    	cert_signature.size) == 0)) {
 			result = 1;
 			goto cleanup;
+		}
 	}
 
 	if (gnutls_x509_crt_get_ca_status(issuer, NULL) == 1) {

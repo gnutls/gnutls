@@ -1,3 +1,9 @@
+Version 1.0.15
+- Fixed bug in RSA encryption, report and patch by Martijn Koster 
+  <mak@greenhills.co.uk>.
+- Corrected a bug in certificate verification. Pointed out by
+  Yoann Vandoorselaere <yoann@prelude-ids.org>
+
 Version 1.0.14 (12/06/2004)
 - Automatically disable certificate types that do not have corresponding
   certificates.
