@@ -97,7 +97,7 @@ static void print_x509_certificate_info(gnutls_session session)
    time_t expiration_time, activation_time;
    const gnutls_datum *cert_list;
    int cert_list_size = 0;
-   gnutls_x509_certificate cert;
+   gnutls_x509_crt cert;
 
    cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
@@ -106,14 +106,14 @@ static void print_x509_certificate_info(gnutls_session session)
 
       /* no error checking
        */
-      gnutls_x509_certificate_init( &cert);
+      gnutls_x509_crt_init( &cert);
 
-      gnutls_x509_certificate_import( cert, &cert_list[0]);
+      gnutls_x509_crt_import( cert, &cert_list[0]);
 
       printf(" - Certificate info:\n");
 
-      expiration_time = gnutls_x509_certificate_get_expiration_time( cert);
-      activation_time = gnutls_x509_certificate_get_activation_time( cert);
+      expiration_time = gnutls_x509_crt_get_expiration_time( cert);
+      activation_time = gnutls_x509_crt_get_activation_time( cert);
 
       printf(" - Certificate is valid since: %s", ctime(&activation_time));
       printf(" - Certificate expires: %s", ctime(&expiration_time));
@@ -132,7 +132,7 @@ static void print_x509_certificate_info(gnutls_session session)
 
       /* Print the serial number of the certificate.
        */
-      if (gnutls_x509_certificate_get_serial(cert, serial, &serial_size) >= 0) 
+      if (gnutls_x509_crt_get_serial(cert, serial, &serial_size) >= 0) 
       {
          print = printable;
          for (i = 0; i < serial_size; i++) {
@@ -145,7 +145,7 @@ static void print_x509_certificate_info(gnutls_session session)
       /* Extract some of the public key algorithm's parameters
        */
       algo =
-          gnutls_x509_certificate_get_pk_algorithm(cert, &bits);
+          gnutls_x509_crt_get_pk_algorithm(cert, &bits);
 
       printf("Certificate public key: ");
 
@@ -163,17 +163,17 @@ static void print_x509_certificate_info(gnutls_session session)
        * certificate.
        */
       printf(" - Certificate version: #%d\n",
-             gnutls_x509_certificate_get_version( cert));
+             gnutls_x509_crt_get_version( cert));
 
       printable_size = sizeof(printable);
-      gnutls_x509_certificate_get_dn( cert, printable, &printable_size);
+      gnutls_x509_crt_get_dn( cert, printable, &printable_size);
       printf(" - DN: %s\n", printable);
 
       printable_size = sizeof(printable);
-      gnutls_x509_certificate_get_issuer_dn( cert, printable, &printable_size);
+      gnutls_x509_crt_get_issuer_dn( cert, printable, &printable_size);
       printf(" - Certificate Issuer's DN: %s\n", printable);
 
-      gnutls_x509_certificate_deinit( cert);
+      gnutls_x509_crt_deinit( cert);
 
    }
 }

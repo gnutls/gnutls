@@ -23,11 +23,11 @@ authorities are acceptable. See figure \ref{fig:x509-1} for a typical example.
 assist in parsing them. \gnutls{} includes functions which extract 
 parameters from given X.509 certificates. Some of them are:
 \begin{itemize}
-\item \printfunc{gnutls_x509_certificate_init}{gnutls\_x509\_certificate\_init}
-\item \printfunc{gnutls_x509_certificate_import}{gnutls\_x509\_certificate\_import}
-\item \printfunc{gnutls_x509_certificate_get_dn}{gnutls\_x509\_certificate\_get\_dn}
-\item \printfunc{gnutls_x509_certificate_get_serial}{gnutls\_x509\_certificate\_get\_serial}
-\item \printfunc{gnutls_x509_certificate_get_subject_alt_name}{gnutls\_x509\_certificate\_get\_subject\_alt\_name}
+\item \printfunc{gnutls_x509_crt_init}{gnutls\_x509\_crt\_init}
+\item \printfunc{gnutls_x509_crt_import}{gnutls\_x509\_crt\_import}
+\item \printfunc{gnutls_x509_crt_get_dn}{gnutls\_x509\_crt\_get\_dn}
+\item \printfunc{gnutls_x509_crt_get_serial}{gnutls\_x509\_crt\_get\_serial}
+\item \printfunc{gnutls_x509_crt_get_subject_alt_name}{gnutls\_x509\_crt\_get\_subject\_alt\_name}
 \end{itemize}
 
 The API for handling X.509 certificates is described at section \ref{sec:x509api}
@@ -39,7 +39,7 @@ more information.
 \par
 Verifying certificate\index{Verifying certificate paths} paths is important 
 in X.509 authentication. For this purpose you should use functions like
-\printfunc{gnutls_x509_verify_certificate}{gnutls\_x509\_verify\_certificate}.
+\printfunc{gnutls_x509_crt_verify}{gnutls\_x509\_crt\_verify}.
 A more generic one is also provided and can be used with all
 of the certificate authentication methods, but is limited to a session. See the
 \printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}

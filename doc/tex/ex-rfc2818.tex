@@ -33,9 +33,9 @@ void verify_certificate( gnutls_session session, const char* hostname)
    if ( gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
       const gnutls_datum* cert_list;
       int cert_list_size;
-      gnutls_x509_certificate cert;
+      gnutls_x509_crt cert;
 
-      if ( gnutls_x509_certificate_init( &cert) < 0) {
+      if ( gnutls_x509_crt_init( &cert) < 0) {
          printf("error in initialization\n");
          return;
       }
@@ -49,29 +49,29 @@ void verify_certificate( gnutls_session session, const char* hostname)
       /* Here we only check the first certificate in the given
        * chain.
        */
-      if ( gnutls_x509_certificate_import( cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0) {
+      if ( gnutls_x509_crt_import( cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0) {
          printf("error parsing certificate\n");
          return;
       }
 
       /* Beware here we do not check for errors.
        */
-      if ( gnutls_x509_certificate_get_expiration( cert) < time(0)) {
+      if ( gnutls_x509_crt_get_expiration( cert) < time(0)) {
          printf("The certificate has expired\n");
          return;
       }
 
-      if ( gnutls_x509_certificate_get_activation_time( cert) > time(0)) {
+      if ( gnutls_x509_crt_get_activation_time( cert) > time(0)) {
          printf("The certificate is not yet activated\n");
          return;
       }
 
-      if ( !gnutls_x509_certificate_check_hostname( cert, hostname)) {
+      if ( !gnutls_x509_crt_check_hostname( cert, hostname)) {
          printf("The certificate does not match hostname\n");
          return;
       }
 
-      gnutls_x509_certificate_deinit( cert);
+      gnutls_x509_crt_deinit( cert);
 
    }
 
