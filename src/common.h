@@ -12,13 +12,18 @@
 
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
-CredType cred;
+GNUTLS_CredType cred;
 gnutls_DN dn;
 const gnutls_datum* cert_list;
-CertificateStatus status;
+GNUTLS_CertificateStatus status;
 int cert_list_size = 0;
+GNUTLS_KXAlgorithm kx;
 
-	tmp = gnutls_kx_get_name(gnutls_kx_get_algo( state));
+
+	/* print the key exchange's algorithm name
+    	 */
+	kx = gnutls_kx_get_algo(state);
+	tmp = gnutls_kx_get_name( kx);
 	printf("- Key Exchange: %s\n", tmp);
 
 	cred = gnutls_auth_get_type(state);
@@ -28,6 +33,8 @@ int cert_list_size = 0;
 			       gnutls_anon_client_get_dh_bits( state));
 			break;
 		case GNUTLS_X509PKI:
+		   /* in case of X509 PKI
+		    */
 			cert_list = gnutls_x509pki_client_get_peer_certificate_list( state, &cert_list_size);
 			status = gnutls_x509pki_client_get_peer_certificate_status( state);
 			
@@ -48,7 +55,14 @@ int cert_list_size = 0;
 				printf("- Peer's X509 Certificate was invalid\n");
 				break;
 			}
-			
+
+			/* Check if we have been using ephemeral Diffie Hellman.
+			 */
+		        if (kx == GNUTLS_KX_X509PKI_DHE_RSA || kx == GNUTLS_KX_X509PKI_DHE_DSS) {
+		         printf("\n- Ephemeral DH using prime of %d bits\n",
+        		    gnutls_x509pki_server_get_dh_bits( state));
+      			}
+
 			if (cert_list_size > 0) {
 				char digest[20];
 				char serial[40];
@@ -59,6 +73,8 @@ int cert_list_size = 0;
 
 				printf(" - Certificate info:\n");
 				
+				/* Print the fingerprint of the certificate
+				 */
 				if ( gnutls_fingerprint( GNUTLS_DIG_MD5, &cert_list[0], digest, &digest_size) >= 0) {
 					print = printable;
 					for (i=0;i<digest_size;i++) {
@@ -67,7 +83,9 @@ int cert_list_size = 0;
 					}
 					printf(" - Certificate fingerprint: %s\n", printable);
 				}
-
+				
+				/* Print the serial number of the certificate.
+				 */
 				if ( gnutls_x509pki_extract_certificate_serial( &cert_list[0], serial, &serial_size) >= 0) {
 					print = printable;
 					for (i=0;i<serial_size;i++) {
@@ -77,6 +95,9 @@ int cert_list_size = 0;
 					printf(" - Certificate serial number: %s\n", printable);
 				}
 
+				/* Print the version of the X.509 
+				 * certificate.
+				 */
 				printf(" - Certificate version: #%d\n", gnutls_x509pki_extract_certificate_version( &cert_list[0]));
 
 				gnutls_x509pki_extract_certificate_dn( &cert_list[0], &dn);

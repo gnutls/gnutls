@@ -3,6 +3,7 @@ Version ?.?.?
 - Added gnutls_fingerprint()
 - Added gnutls_x509pki_extract_certificate_serial()
 - Corrected behaviour in version advertizing
+- Updated documentation
 
 Version 0.3.1 (21/12/2001)
 - Corrections in the configuration files
