@@ -99,6 +99,9 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 
 				/* read the critical status.
 				 */
+				_gnutls_str_cpy(name2, sizeof(name2), name);
+				_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
+
 				len = sizeof(str_critical);
 				result =
 				    asn1_read_value(cert->cert, name2, str_critical, &len);

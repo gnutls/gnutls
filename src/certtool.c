@@ -1385,7 +1385,7 @@ void certificate_info( void)
 static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int all)
 {
 	int ret;
-	unsigned int i, indx, j;
+	unsigned int i, indx, j, version;
 	unsigned int critical, key_usage;
 	time_t tim;
 	char serial[40];
@@ -1399,7 +1399,8 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 	
 	fprintf( out, "\n\nX.509 certificate info:\n\n");
 	
-	fprintf(out, "Version: %d\n", gnutls_x509_crt_get_version(crt));
+	version = gnutls_x509_crt_get_version(crt);
+	fprintf(out, "Version: %d\n", version);
 
 	/* serial number
 	 */
@@ -1462,8 +1463,8 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 	fprintf(out,  "%s\n", cprint);
 
 
-	
-	fprintf(out, "\nX.509 Extensions:\n");
+	if (version >= 3)
+		fprintf(out, "\nX.509 Extensions:\n");
 	
 	/* subject alternative name
 	 */
@@ -1627,6 +1628,9 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 			
 			size = sizeof(buffer);
 			ret = gnutls_x509_crt_get_extension_by_oid( crt, oid, indx, buffer, &size, &critical);
+if (ret < 0) {
+	fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
+}
 			if (ret >= 0) {
 				if (critical)
 					fprintf(out, "(critical)\n");
