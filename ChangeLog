@@ -1,3 +1,23 @@
+2004-03-13 09:14  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/tex/auth.tex, lib/gnutls.h.in.in,
+	lib/gnutls_anon_cred.c, lib/gnutls_cert.c, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_int.h, lib/gnutls_rsa_export.c,
+	lib/gnutls_rsa_export.h, lib/gnutls_state.c, lib/gnutls_ui.h:
+
+	* Added functions gnutls_rsa_params_cpy(), gnutls_dh_params_cpy() 
+	  and gnutls_x509_privkey_cpy().  
+
+2004-03-13 01:06  nmav <nmav@gnutls.org>
+
+	* doc/tex/auth.tex, doc/tex/preparation.tex,
+	lib/gnutls_handshake.c, lib/gnutls_state.c:
+
+	* Added some preliminary documentation for the new libgcrypt locking
+	interface.  
+	* Added some documentation for the parameters setting using
+	callback.  
+
 2004-03-11 11:32  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.h,
