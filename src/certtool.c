@@ -193,7 +193,7 @@ int ret;
 		fprintf(stderr, "privkey_generate: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
-	
+
 	return key;
 
 }
@@ -274,7 +274,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	int size, serial;
 	int days, result, ca_status;
 	const char* str;
-	int vers = 1; /* the default version in the certificate 
+	int vers = 3; /* the default version in the certificate 
 	               */
 	gnutls_x509_crq crq; /* request */
 
@@ -333,7 +333,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 
 	fprintf(stderr, "\n\nActivation/Expiration time.\n");	
 	gnutls_x509_crt_set_activation_time( crt, time(NULL));
-	
+
 	do {
 		days = read_int( "The generated certificate will expire in (days): ");
 	} while( days==0);
@@ -359,9 +359,6 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	if (result != 0) {
 		str = read_str( "Enter the dnsName of the subject of the certificate: ");
 		if (str != NULL) {
-			vers = 3; /* only version 3 certificates, can
-			           * have extensions.
-			           */
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_DNSNAME, str);
 			if (result < 0) {
 				fprintf(stderr, "subject_alt_name: %s\n", gnutls_strerror(result));
@@ -373,7 +370,6 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		str = read_str( "Enter the e-mail of the subject of the certificate: ");
 	
 		if (str != NULL) {
-			vers = 3;
 			result = gnutls_x509_crt_set_subject_alternative_name( crt, GNUTLS_SAN_RFC822NAME, str);
 			if (result < 0) {
 				fprintf(stderr, "subject_alt_name: %s\n", gnutls_strerror(result));
