@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <bookinfo>
+    <title>GNU TLS API Reference Manual</title>
+  </bookinfo>
+
+  <chapter>
+    <title>GNU TLS API Reference Manual</title>
+
+    <para>
+      This is the GNU TLS library, a implementation of the TLS
+      (Transport Layer Security) and SSL (Secure Sockets Layer) for
+      the GNU project.
+    </para>
+
+    <para>
+      More up to date information can be found at
+      <ulink url="http://www.gnu.org/software/gnutls/">
+	http://www.gnu.org/software/gnutls/</ulink>.
+    </para>
+
+    <xi:include href="xml/gnutls.xml"/>
+    <xi:include href="xml/extra.xml"/>
+    <xi:include href="xml/x509.xml"/>
+    <xi:include href="xml/pkcs12.xml"/>
+    <xi:include href="xml/openpgp.xml"/>
+    <xi:include href="xml/openssl.xml"/>
+  </chapter>
+</book>
