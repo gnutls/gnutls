@@ -28,6 +28,7 @@
 
 #include "x509_der.h"
 #include "x509_asn1.h"
+#include <gnutls_str.h>
 
 
 #define TAG_BOOLEAN          0x01
@@ -270,8 +271,8 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
 
   if(der==NULL) return;
 
-  strcpy(temp,str);
-  strcat(temp," ");
+  _gnutls_str_cpy(temp,sizeof(temp),str);
+  _gnutls_str_cat(temp,sizeof(temp)," ");
 
   counter=0;
   n_start=temp;
@@ -321,17 +322,17 @@ _asn1_get_objectid_der(unsigned char *der,int *der_len,unsigned char *str)
   val1=der[len_len]/40;
   val=der[len_len]-val1*40;
 
-  strcpy(str,_asn1_ltostr(val1,temp));
-  strcat(str," ");
-  strcat(str,_asn1_ltostr(val,temp));
+  _gnutls_str_cpy(str,sizeof(str),_asn1_ltostr(val1,temp));
+  _gnutls_str_cat(str,sizeof(str)," ");
+  _gnutls_str_cat(str,sizeof(str),_asn1_ltostr(val,temp));
 
   val=0;
   for(k=1;k<len;k++){
     val=val<<7;
     val|=der[len_len+k]&0x7F;
     if(!(der[len_len+k]&0x80)){
-      strcat(str," ");
-      strcat(str,_asn1_ltostr(val,temp));
+      _gnutls_str_cat(str,sizeof(str)," ");
+      _gnutls_str_cat(str,sizeof(str),_asn1_ltostr(val,temp));
       val=0;
     }
   }
