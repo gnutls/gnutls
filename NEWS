@@ -1,4 +1,4 @@
-Version 1.0.9
+Version 1.0.9 (29/03/2004)
 - Added gnutls_certificate_set_params_function() and 
   gnutls_anon_set_params_function() that set the RSA or DH
   parameters using a callback.
