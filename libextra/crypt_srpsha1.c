@@ -102,7 +102,7 @@ char *_gnutls_crypt_srpsha1(const char *username, const char *passwd,
 	_gnutls_hash_deinit(h1, r1);
 
 	/* v = g^x mod n */
-	vsize = _gnutls_srp_gx(r1, hash_len, &v, g, n);
+	vsize = _gnutls_srp_gx(r1, hash_len, &v, g, n, gnutls_malloc);
 
 	if (vsize == -1 || v == NULL) {
 		gnutls_assert();

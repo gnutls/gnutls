@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Nikos Mavroyanopoulos <nmav@hellug.gr>
+ * Copyright (C) 2001,2002 Nikos Mavroyanopoulos <nmav@hellug.gr>
  *
  * This file is part of GNUTLS.
  *
@@ -18,7 +18,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include "gnutls_int.h"
+#include <gnutls_int.h>
+#include <gnutls_errors.h>
+#include <gnutls_datum.h>
 
 #ifdef ENABLE_SRP
 
@@ -271,42 +273,155 @@ int _gnutls_sbase64_decode(uint8 * data, size_t idata_size, uint8 ** result)
 	return ret;
 }
 
-#ifdef B64_TEST
-int main()
+/**
+  * gnutls_srp_base64_encode - This function will convert raw data to base64 encoded
+  * @data: contain the raw data
+  * @result: the place where base64 data will be copied
+  * @result_size: holds the size of the result
+  *
+  * This function will convert the given data to printable data, using the base64 
+  * encoding, as used in the libsrp. This is the encoding used in SRP password files.
+  * If the provided buffer is not long enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+  * 
+  **/
+int gnutls_srp_base64_encode( const gnutls_datum *data, char* result, int* result_size) 
 {
-	char x[100 * 1024];
-	int siz;
-	uint8 *b64;
+opaque* ret;
+int size;
 
-/*	for (i = 0; i < 128; i++) {
-		if (i % 6 == 0)
-			fprintf(stdout, "\n");
-		if (strchr(b64table, i) == NULL)
-			fprintf(stdout, "0x%.2x, ", 0xff);
-		else
-			fprintf(stdout, "0x%.2x, ",
-				(int) ((int) index(b64table, i) -
-				       (int) b64table));
+	size = _gnutls_sbase64_encode( data->data, data->size, &ret);
+	if (size < 0)
+		return size;
 
-
-	}
-	return 0;*/
-	siz = fread(x, 1, sizeof(x), stdin);
-
-//	siz = _gnutls_sbase64_encode(x, siz, &b64);
-	siz = _gnutls_sbase64_decode(x, siz, &b64);
-
-
-	if (siz < 0) {
-		_gnutls_log( "ERROR %d\n", siz);
-		exit(1);
+	if (result==NULL || *result_size < size) {
+		gnutls_free(ret);
+		*result_size = size;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	} else {
+		memcpy( result, ret, size);
+		gnutls_free(ret);
+		*result_size = size;
 	}
 
-	fwrite(b64, siz, 1, stdout);
 	return 0;
-
-
 }
-#endif
+
+/**
+  * gnutls_srp_base64_encode_alloc - This function will convert raw data to Base64 encoded
+  * @data: contains the raw data
+  * @result: will hold the newly allocated encoded data
+  *
+  * This function will convert the given data to printable data, using the base64 
+  * encoding. This is the encoding used in SRP password files. This function will
+  * allocate (using malloc) the required memory to hold the encoded data.
+  * 
+  **/
+int gnutls_srp_base64_encode_alloc( const gnutls_datum *data, 
+   gnutls_datum* result) 
+{
+opaque* ret;
+int size, res;
+
+	size = _gnutls_sbase64_encode( data->data, data->size, &ret);
+	if (size < 0)
+		return size;
+
+	if (result==NULL) {
+		gnutls_free(ret);
+		return GNUTLS_E_INVALID_REQUEST;
+	} else {
+		if (gnutls_malloc==malloc) {
+		   result->data = ret;
+		   result->size = size;
+		} else {
+		   res = _gnutls_set_datum_m( result, ret, size, malloc);
+		   gnutls_free(ret);
+		
+		   if (res < 0) {
+		   	gnutls_assert();
+		   	return res;
+		   }
+		}
+	}
+
+	return 0;
+}
+
+/**
+  * gnutls_srp_base64_decode - This function will decode base64 encoded data
+  * @b64_data: contain the encoded data
+  * @result: the place where decoded data will be copied
+  * @result_size: holds the size of the result
+  *
+  * This function will decode the given encoded data, using the base64 encoding
+  * found in libsrp.
+  *
+  * Note that b64_data should be null terminated.
+  * 
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not long enough,
+  * or 0 on success.
+  **/
+int gnutls_srp_base64_decode( const gnutls_datum *b64_data, char* result, int* result_size) 
+{
+opaque* ret;
+int size;
+
+	size = _gnutls_sbase64_decode( b64_data->data, b64_data->size, &ret);
+	if (size < 0)
+		return size;
+
+	if (result==NULL || *result_size < size) {
+		gnutls_free(ret);
+		*result_size = size;
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	} else {
+		memcpy( result, ret, size);
+		gnutls_free(ret);
+		*result_size = size;
+	}
+
+	return 0;
+}
+
+/**
+  * gnutls_srp_base64_decode_alloc - This function will decode base64 encoded data
+  * @b64_data: contains the encoded data
+  * @result: the place where decoded data lie
+  *
+  * This function will decode the given encoded data. The decoded data
+  * will be allocated, using malloc, and stored into result.
+  * It will decode using the base64 algorithm found in libsrp.
+  * 
+  **/
+int gnutls_srp_base64_decode_alloc( const gnutls_datum *b64_data, 
+   gnutls_datum* result) 
+{
+opaque* ret;
+int size, res;
+
+	size = _gnutls_sbase64_decode( b64_data->data, b64_data->size, &ret);
+	if (size < 0)
+		return size;
+
+	if (result==NULL) {
+		gnutls_free(ret);
+		return GNUTLS_E_INVALID_REQUEST;
+	} else {
+		if (gnutls_malloc==malloc) {
+			result->data = ret;
+			result->size = size;
+		} else {
+			res = _gnutls_set_datum_m( result, ret, size, malloc);
+			gnutls_free( ret);
+			
+			if (res < 0) {
+				gnutls_assert();
+				return res;
+			}
+		}
+	}
+
+	return 0;
+}
 
 #endif /* ENABLE_SRP */

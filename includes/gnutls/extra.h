@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2002 Nikos Mavroyanopoulos
  *
  * GNUTLS-EXTRA is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,11 @@ const char* gnutls_srp_server_get_username( gnutls_session state);
 typedef int gnutls_srp_server_select_function(gnutls_session, char **, char**, int);
 
 void gnutls_srp_server_set_select_function( gnutls_session, gnutls_srp_server_select_function *);
+
+int gnutls_srp_verifier( char* username, char* password, const gnutls_datum *salt, 
+	const gnutls_datum* g, const gnutls_datum* n, 
+	gnutls_datum * res);
+
 
 /* Openpgp certificate stuff */
 int gnutls_openpgp_fingerprint( const gnutls_datum* data, char* result, size_t* result_size);
@@ -96,5 +101,14 @@ int gnutls_global_init_extra(void);
 /* returns libgnutls-extra version (call it with a NULL argument) 
  */
 const char* gnutls_extra_check_version( const char*);
+
+/* base64 */
+int gnutls_srp_base64_encode( const gnutls_datum *data, char* result, int* result_size);
+int gnutls_srp_base64_encode_alloc( const gnutls_datum *data, gnutls_datum* result);
+
+int gnutls_srp_base64_decode( const gnutls_datum *b64_data, char* result, int* result_size);
+int gnutls_srp_base64_decode_alloc( const gnutls_datum *b64_data, 
+   gnutls_datum* result);
+
 
 #endif

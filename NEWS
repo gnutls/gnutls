@@ -5,6 +5,10 @@ Version 0.5.12
 - Added the certificate authenticated SRP cipher suites.
 - gnutls_x509_extract_certificate_dn_string() was updated to return
   an RFC2253 conforming string.
+- Added the functions:
+   gnutls_srp_verifier()
+   gnutls_srp_base64_encode()
+   gnutls_srp_base64_decode()
 
 Version 0.5.11 (5/11/2002)
 - Some fixes in 'gnutls-cli' client program to prevent some segmentation 

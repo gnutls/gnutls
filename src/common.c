@@ -4,6 +4,8 @@
 #include <gnutls/extra.h>
 #include <time.h>
 
+#define TEST_STRING
+
 int xml = 0;
 void print_cert_info(gnutls_session session);
 

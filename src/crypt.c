@@ -22,18 +22,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../lib/defines.h"
-#include "../lib/gnutls_int.h"
-#include "../lib/gnutls_mem.h"
-#include "../libextra/gnutls_srp.h"
-#include "../libextra/crypt.h"
-#include "../libextra/auth_srp_passwd.h"
 #include "crypt-gaa.h"
+#include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
+#include <gcrypt.h> /* for randomize */
 #include <pwd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
-#define _MAX(x,y) x>y?x:y
+#define _MAX(x,y) (x>y?x:y)
 
 /* This may need some rewrite. A lot of stuff which should be here
  * are in the library, which is not good.
@@ -41,17 +39,17 @@
 
 int crypt_int(char *username, char *passwd, int salt,
 	      char *tpasswd_conf, char *tpasswd, int uindex);
-static int read_conf_values(MPI * g, MPI * n, char *str, int str_size);
-static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, MPI n);
-
-int _gnutls_srp_generate_prime(unsigned char ** ret_g, unsigned char ** ret_n, int bits);
+static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str);
+static int _verify_passwd_int(char* username, char* passwd, char* verifier, char* salt, 
+	const gnutls_datum* g, const gnutls_datum* n);
 
 int generate_create_conf(char *tpasswd_conf, int bits)
 {
 	FILE *fd;
 	char line[5 * 1024];
-	int index = 1;
-	unsigned char *g, *n;
+	int index = 1, ret;
+	gnutls_datum g, n;
+	gnutls_datum str_g, str_n;
 
 	fd = fopen(tpasswd_conf, "w");
 	if (fd == NULL) {
@@ -59,11 +57,27 @@ int generate_create_conf(char *tpasswd_conf, int bits)
 		return -1;
 	}
 
-	_gnutls_srp_generate_prime(&g, &n, bits);
-	sprintf(line, "%d:%s:%s\n", index, n, g);
+	if ((ret=gnutls_dh_params_generate( &n, &g, bits)) < 0) {
+		fprintf(stderr, "Could not generate primes: %s\n", gnutls_strerror(ret));
+		return -1;
+	}
+
+	if (gnutls_srp_base64_encode_alloc( &n, &str_n) < 0) {
+		fprintf(stderr, "Could not encode\n");
+		return -1;
+	}
+
+	if (gnutls_srp_base64_encode_alloc( &g, &str_g) < 0) {
+		fprintf(stderr, "Could not encode\n");
+		return -1;
+	}
+	sprintf(line, "%d:%s:%s\n", index, str_n.data, str_g.data);
 	
-	gnutls_free( n);
-	gnutls_free( g);
+	free( n.data);
+	free( g.data);
+
+	free( str_n.data);
+	free( str_g.data);
 
 	fwrite(line, 1, strlen(line), fd);
 
@@ -72,11 +86,53 @@ int generate_create_conf(char *tpasswd_conf, int bits)
 
 }
 
-static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, MPI n) {
-	if (salt==NULL) return -1;
+/* The format of a tpasswd file is:
+ * username:verifier:salt:index
+ *
+ * index is the index of the prime-generator pair in tpasswd.conf
+ */
+static int _verify_passwd_int(char* username, char* passwd, char* verifier, 
+	char* salt, const gnutls_datum* g, const gnutls_datum* n) 
+{
+char _salt[1024];
+gnutls_datum tmp, raw_salt, new_verifier;
+int salt_size;
+char *pos;
 
-	if (_gnutls_srp_crypt_vrfy
-	    (username, passwd, salt, g, n) == 0) {
+	if (salt==NULL || verifier==NULL) return -1;
+
+	/* copy salt, and null terminate after the ':' */
+	strcpy( _salt, salt);
+	pos = index(_salt, ':');
+	if (pos!=NULL) *pos = 0;
+
+	/* convert salt to binary. */
+	tmp.data = _salt;
+	tmp.size = strlen(_salt);
+
+	if (gnutls_srp_base64_decode_alloc( &tmp, &raw_salt) < 0) {
+		fprintf(stderr, "Could not decode salt.\n");
+		return -1;
+	}
+
+	if (gnutls_srp_verifier( username, passwd, &raw_salt, g, n, &new_verifier) < 0)
+	{
+		fprintf(stderr, "Could not make the verifier\n");
+		return -1;
+	}
+	
+	free( raw_salt.data);
+	
+	/* encode the verifier into _salt */
+	salt_size = sizeof(_salt);
+	if (gnutls_srp_base64_encode( &new_verifier, _salt, &salt_size) < 0) {
+		fprintf(stderr, "Encoding error\n");
+		return -1;
+	}
+	
+	free( new_verifier.data);
+
+	if (strncmp( verifier, _salt, strlen(_salt))==0) {
 		fprintf(stderr, "Password verified\n");
 		return 0;
 	} else {
@@ -124,7 +180,7 @@ static int find_index(char* username, char* file) {
 FILE * fd;
 char *pos;
 char line[5*1024];
-int i;
+unsigned int i;
 
 	fd = fopen(file, "r");
 	if (fd == NULL) {
@@ -152,12 +208,15 @@ int i;
 	return -1;
 }
 
+/* Parses the tpasswd files, in order to verify the given
+ * username/password pair.
+ */
 int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 {
 	FILE *fd;
 	char line[5 * 1024];
-	int i;
-	MPI g, n;
+	unsigned int i;
+	gnutls_datum g, n;
 	int iindex;
 	char *p, *pos;
 
@@ -185,11 +244,10 @@ int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 
 	fclose(fd);
 
-	if ((iindex = read_conf_values(&g, &n, line, strlen(line))) < 0) {
+	if ((iindex = read_conf_values(&g, &n, line)) < 0) {
 		fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
 		return -1;
 	}
-
 
 	fd = fopen(tpasswd, "r");
 	if (fd == NULL) {
@@ -198,13 +256,17 @@ int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 	}
 
 	while (fgets(line, sizeof(line), fd) != NULL) {
-		/* move to first ':' */
+		/* move to first ':' 
+		 * This is the actual verifier.
+		 */
 		i = 0;
 		while ((line[i] != ':') && (line[i] != '\0')
 		       && (i < sizeof(line))) {
 			i++;
 		}
 		if (strncmp(username, line, _MAX(i,strlen(username)) )  == 0) {
+			char* verifier_pos, *salt_pos;
+
 			pos = index(line, ':');
 			fclose(fd);
 			if (pos==NULL) {
@@ -212,7 +274,19 @@ int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 				return -1;
 			}
 			pos++;
-			return _verify_passwd_int( username, passwd, pos, g, n);
+			verifier_pos = pos;
+
+			/* Move to the salt */
+			pos = index(pos, ':');
+			if (pos==NULL) {
+				fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
+				return -1;
+			}
+			pos++;
+			salt_pos = pos;
+			
+			return _verify_passwd_int( username, passwd, 
+				verifier_pos, salt_pos, &g, &n);
 		}
 	}
 
@@ -231,6 +305,9 @@ int main(int argc, char **argv)
 	int salt;
 	struct passwd *pwd;
 
+	gnutls_global_init();
+	gnutls_global_init_extra();
+	
 	if (gaa(argc, argv, &info) != -1) {
 		fprintf(stderr, "Error in the arguments.\n");
 		return -1;
@@ -274,12 +351,57 @@ int main(int argc, char **argv)
 
 }
 
-int crypt_int(char *username, char *passwd, int salt,
+char* _srp_crypt( char* username, char* passwd, int salt_size, 
+	const gnutls_datum* g,  const gnutls_datum* n)
+{
+char salt[128];
+static char result[1024];
+gnutls_datum dat_salt, txt_salt;
+gnutls_datum verifier, txt_verifier;
+
+	if ((unsigned)salt_size > sizeof(salt))
+		return NULL;
+
+	/* generate the salt */
+	gcry_randomize( salt, salt_size, GCRY_WEAK_RANDOM);
+
+	dat_salt.data = salt;
+	dat_salt.size = salt_size;
+
+	if (gnutls_srp_verifier( username, passwd, &dat_salt, g, n, &verifier) < 0) {
+		fprintf(stderr, "Error getting verifier\n");
+		return NULL;
+	}
+	
+	/* base64 encode the verifier */
+	if (gnutls_srp_base64_encode_alloc( &verifier, &txt_verifier) < 0) {
+		fprintf(stderr, "Error encoding\n");
+		free( verifier.data);
+		return NULL;
+	}
+
+	free( verifier.data);
+
+	if (gnutls_srp_base64_encode_alloc( &dat_salt, &txt_salt) < 0) {
+		fprintf(stderr, "Error encoding\n");
+		return NULL;
+	}
+
+	sprintf( result, "%s:%s", txt_verifier.data, txt_salt.data);
+	free(txt_salt.data);
+	free(txt_verifier.data);
+	
+	return result;
+	
+}
+
+
+int crypt_int(char *username, char *passwd, int salt_size,
 	      char *tpasswd_conf, char *tpasswd, int uindex)
 {
 	FILE *fd;
 	char *cr;
-	MPI g, n;
+	gnutls_datum g, n;
 	char line[5 * 1024];
 	char *p, *pp;
 	int iindex;
@@ -303,15 +425,15 @@ int crypt_int(char *username, char *passwd, int salt,
 	line[sizeof(line) - 1] = 0;
 
 	fclose(fd);
-	if ((iindex = read_conf_values(&g, &n, line, strlen(line))) < 0) {
+	if ((iindex = read_conf_values(&g, &n, line)) < 0) {
 		fprintf(stderr, "Cannot parse conf file '%s'\n",
 			tpasswd_conf);
 		return -1;
 	}
 
-	cr = _gnutls_srp_crypt(username, passwd, salt, g, n);
+	cr = _srp_crypt(username, passwd, salt_size, &g, &n);
 	if (cr == NULL) {
-		fprintf(stderr, "Cannot _gnutls_srp_crypt()...\n");
+		fprintf(stderr, "Cannot _srp_crypt()...\n");
 		return -1;
 	} else {
 		/* delete previous entry */
@@ -361,7 +483,7 @@ int crypt_int(char *username, char *passwd, int salt,
 			pp = index( line, ':');
 			if (pp==NULL) continue;
 			
-			if ( strncmp( p, username, _MAX(strlen(username), (int)(pp-p)) ) == 0 ) {
+			if ( strncmp( p, username, _MAX(strlen(username), (unsigned int)(pp-p)) ) == 0 ) {
 				put = 1;
 				fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
 			} else {
@@ -372,7 +494,7 @@ int crypt_int(char *username, char *passwd, int salt,
 		if (put==0) {
 			fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
 		}
-		gnutls_free(cr);
+		free(cr);
 		
 		fclose(fd);
 		fclose(fd2);
@@ -390,13 +512,12 @@ int crypt_int(char *username, char *passwd, int salt,
 /* this function parses tpasswd.conf file. Format is:
  * int(index):base64(n):base64(g)
  */
-static int read_conf_values(MPI * g, MPI * n, char *str, int str_size)
+static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str)
 {
 	char *p;
 	int len;
-	opaque *tmp;
-	int tmp_size;
-	int index;
+	int index, ret;
+	gnutls_datum dat;
 
 	index = atoi(str);
 
@@ -411,18 +532,15 @@ static int read_conf_values(MPI * g, MPI * n, char *str, int str_size)
 	/* read the generator */
 	len = strlen(p);
 	if (p[len-1]=='\n') len--;
-	tmp_size = _gnutls_sbase64_decode(p, len, &tmp);
+	
+	dat.data = p;
+	dat.size = len;
+	ret = gnutls_srp_base64_decode_alloc(&dat, g);
 
-	if (tmp_size < 0) {
+	if (ret < 0) {
+		fprintf(stderr, "Decoding error\n");
 		return -1;
 	}
-	if (gcry_mpi_scan(g, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
-		gnutls_free(tmp);
-		return -1;
-	}
-
-	gnutls_free(tmp);
-
 
 	/* now go for n - modulo */
 	p = rindex(str, ':');	/* we have n */
@@ -433,19 +551,16 @@ static int read_conf_values(MPI * g, MPI * n, char *str, int str_size)
 	*p = '\0';
 	p++;
 
-	len = strlen(p);
-	tmp_size = _gnutls_sbase64_decode(p, len, &tmp);
+	dat.data = p;
+	dat.size = strlen(p);
 
-	if (tmp_size < 0) {
-		gnutls_free(tmp);
+	ret = gnutls_srp_base64_decode_alloc(&dat, n);
+
+	if (ret < 0) {
+		fprintf(stderr, "Decoding error\n");
+		free(g->data);
 		return -1;
 	}
-	if (gcry_mpi_scan(n, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
-		gnutls_free(tmp);
-		return -1;
-	}
-
-	gnutls_free(tmp);
 
 	return index;
 }

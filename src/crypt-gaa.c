@@ -650,7 +650,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 
 #line 29 "crypt.gaa"
 { gaaval->username=NULL; gaaval->passwd=NULL; gaaval->salt=0;
-       gaaval->create_conf=NULL; gaaval->passwd_conf=NULL; gaaval->verify = 0; gaaval->bits=1040; 
+       gaaval->create_conf=NULL; gaaval->passwd_conf=NULL; gaaval->verify = 0; gaaval->bits=1024; 
        gaaval->index = 1; ;};
 
     }

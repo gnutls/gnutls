@@ -31,7 +31,8 @@ char * _gnutls_srp_crypt(const char* username, const char *passwd, int salt, GNU
 	return _gnutls_crypt_srpsha1_wrapper(username, passwd, salt, g, n);
 }
 
-int _gnutls_srp_crypt_vrfy(const char* username, const char *passwd, char* salt, GNUTLS_MPI g, GNUTLS_MPI n) {
+int _gnutls_srp_crypt_vrfy(const char* username, const char *passwd, char* salt, GNUTLS_MPI g, GNUTLS_MPI n) 
+{
 	char* cr;
 
 	cr = _gnutls_crypt_srpsha1(username, passwd, salt, g, n);
