@@ -43,10 +43,8 @@ int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, c
 const char* gnutls_srp_server_get_username( gnutls_session state);
 
 typedef int gnutls_srp_server_select_function(gnutls_session, char **, char**, int);
-#define gnutls_srp_server_select_func gnutls_srp_server_select_function
 
 void gnutls_srp_server_set_select_function( gnutls_session, gnutls_srp_server_select_function *);
-#define gnutls_srp_server_set_select_func gnutls_srp_server_set_select_function
 
 /* Openpgp certificate stuff */
 int gnutls_openpgp_fingerprint( const gnutls_datum* data, char* result, size_t* result_size);
