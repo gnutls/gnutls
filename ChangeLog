@@ -1,3 +1,10 @@
+2003-09-12 13:13  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/Makefile.am, lib/libgnutls.vers:
+
+	Some additions to export only the documented API, and some support
+	for versioning.  
+
 2003-09-11 18:30  nmav <nmav@gnutls.org>
 
 	* configure.in, doc/.cvsignore, doc/tex/library.tex, lib/debug.c,
