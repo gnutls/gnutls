@@ -1,3 +1,17 @@
+2002-12-13 22:14  nmav <nmav@gnutls.org>
+
+	* NEWS:
+
+	Added gnutls_openpgp_extract_key_name_string() which returns a
+	single string for a pgp user id.  
+
+2002-12-13 12:59  nmav <nmav@gnutls.org>
+
+	* doc/tex/ex-serv-export.tex, src/serv.c:
+
+	updated some example and the server to use the new gnutls_malloc()
+	in callbacks.  
+
 2002-12-12 17:03  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_x509.c, gnutls_ui.h:
