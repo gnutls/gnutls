@@ -1,3 +1,19 @@
+2002-12-16 21:56  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_dhe.c, auth_rsa.c, auth_rsa_export.c,
+	gnutls_auth.h, gnutls_handshake.c, gnutls_int.h, gnutls_kx.c,
+	gnutls_kx.h:
+
+	Dropped the support for the client key exchange message 0, and
+	server key exchange message 2.  
+
+2002-12-16 21:26  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/debug.c, lib/gnutls_mpi.h,
+	lib/gnutls_record.c:
+
+	Finished SRP-6 stuff. It should work fine now.  
+
 2002-12-13 22:14  nmav <nmav@gnutls.org>
 
 	* NEWS:
