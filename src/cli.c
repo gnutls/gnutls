@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
+#include <gnutls/x509.h>
 #include <sys/time.h>
 #include <signal.h>
 #include <netdb.h>
@@ -109,6 +110,38 @@ void init_global_tls_stuff(void);
 
 #define MAX(X,Y) (X >= Y ? X : Y);
 
+/* A callback function to be used at the certificate selection time.
+ */
+static int cert_callback( gnutls_session session, const gnutls_datum* client_certs,
+	int client_certs_num, const gnutls_datum * req_ca_rdn, int nreqs)
+{
+char issuer_dn[256];
+int len, i, ret;
+
+	if (client_certs == NULL && req_ca_rdn == NULL) return -1;
+
+	/* Print the server's trusted CAs
+	 */
+	if (nreqs > 0)
+		printf("- Server's trusted authorities:\n");
+	else
+		printf("- Server did not send us any trusted authorities names.\n");
+
+	/* print the names (if any) */
+	for (i=0;i<nreqs;i++) {
+		len = sizeof(issuer_dn);
+		ret = gnutls_x509_rdn_get( &req_ca_rdn[i], issuer_dn, &len);
+		if ( ret >= 0) {
+			printf("   [%d]: ", i);
+			printf("%s\n", issuer_dn);
+		}
+	}
+
+	return -1;
+
+}
+
+
 /* initializes a gnutls_session with some defaults.
  */
 static gnutls_session init_tls_session( const char* hostname)
@@ -135,6 +168,8 @@ static gnutls_session init_tls_session( const char* hostname)
    gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
    gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+   gnutls_certificate_client_set_select_function( session, cert_callback);
 
    /* send the fingerprint */
    if (fingerprint != 0)
@@ -363,8 +398,6 @@ int main(int argc, char **argv)
 static gaainfo info;
 void gaa_parser(int argc, char **argv)
 {
-   int i, j;
-
    if (gaa(argc, argv, &info) != -1) {
       fprintf(stderr,
 	      "Error in the arguments. Use the --help or -h parameters to get more information.\n");
@@ -523,6 +556,7 @@ int do_handshake(socket_st* socket)
    return ret;
 }
 
+
 static void tls_log_func( const char* str)
 {
 	fprintf(stderr, "|** %s", str);
@@ -609,7 +643,7 @@ int ret;
 	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
       }
    }
-/*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
+
 
    /* SRP stuff */
    if (gnutls_srp_allocate_client_credentials(&srp_cred) < 0) {

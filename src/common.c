@@ -3,6 +3,7 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
+#include <gnutls/x509.h>
 #include <time.h>
 
 #define TEST_STRING
@@ -11,13 +12,6 @@ int xml = 0;
 void print_cert_info(gnutls_session session);
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
-#define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
-	PRINTX( "OU:", X.organizational_unit_name); \
-	PRINTX( "O:", X.organization); \
-	PRINTX( "L:", X.locality_name); \
-	PRINTX( "S:", X.state_or_province_name); \
-	PRINTX( "C:", X.country); \
-	PRINTX( "E:", X.email)
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
 	PRINTX( "EMAIL:", X.email)
 
@@ -35,80 +29,75 @@ static const char *my_ctime(time_t * tv)
 
 void print_x509_info(gnutls_session session)
 {
-
-	gnutls_x509_dn dn;
+	gnutls_x509_crt crt;
 	const gnutls_datum *cert_list;
-	int cert_list_size = 0;
+	int cert_list_size = 0, ret;
 	char digest[20];
 	char serial[40];
+	char dn[128];
+	int dn_size;
 	size_t digest_size = sizeof(digest);
 	int i;
 	int serial_size = sizeof(serial);
 	char printable[120];
 	char *print;
 	int bits, algo;
-	time_t expiret = gnutls_certificate_expiration_time_peers(session);
-	time_t activet = gnutls_certificate_activation_time_peers(session);
+	time_t expiret, activet;
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
+	
 
 	if (cert_list_size <= 0)
 		return;
 
-#if 0 /* FIXME */
-	if (xml) {
-		gnutls_datum res;
-
-		gnutls_x509_certificate_to_xml(&cert_list[0], &res, 0);
-		puts(res.data);
-
-		free(res.data);
-
+	gnutls_x509_crt_init( &crt);
+	ret = gnutls_x509_crt_import( crt, &cert_list[0], GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 		return;
 	}
-#endif
 
-	printf(" - Certificate info:\n");
+	printf(" - Got a certificate list of %d certificates.\n", cert_list_size);
+	printf(" - Certificate[0] info:\n");
 
-	printf(" # Certificate is valid since: %s", my_ctime(&activet));
-	printf(" # Certificate expires: %s", my_ctime(&expiret));
+	expiret = gnutls_x509_crt_get_expiration_time( crt);
+	activet = gnutls_x509_crt_get_activation_time( crt);
+
+	printf(" # valid since: %s", my_ctime(&activet));
+	printf(" # expires at: %s", my_ctime(&expiret));
 
 	/* Print the fingerprint of the certificate
 	 */
-	if (gnutls_x509_fingerprint
+	if (gnutls_fingerprint
 	    (GNUTLS_DIG_MD5, &cert_list[0], digest, &digest_size) >= 0) {
 		print = printable;
 		for (i = 0; i < digest_size; i++) {
 			sprintf(print, "%.2x ", (unsigned char) digest[i]);
 			print += 3;
 		}
-		printf(" # Certificate fingerprint: %s\n", printable);
+		printf(" # fingerprint: %s\n", printable);
 	}
 
 	/* Print the serial number of the certificate.
 	 */
 
-	if (gnutls_x509_extract_certificate_serial
-	    (&cert_list[0], serial, &serial_size) >= 0) {
+	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
 		print = printable;
 		for (i = 0; i < serial_size; i++) {
 			sprintf(print, "%.2x ", (unsigned char) serial[i]);
 			print += 3;
 		}
-		printf(" # Certificate serial number: %s\n", printable);
+		printf(" # serial number: %s\n", printable);
 	}
 
 	/* Print the version of the X.509 
 	 * certificate.
 	 */
-	printf(" # Certificate version: #%d\n",
-	       gnutls_x509_extract_certificate_version(&cert_list[0]));
+	printf(" # version: #%d\n", gnutls_x509_crt_get_version(crt));
 
 	algo =
-	    gnutls_x509_extract_certificate_pk_algorithm(&cert_list[0],
-							 &bits);
-	printf(" # Certificate public key algorithm: ");
-
+	    gnutls_x509_crt_get_pk_algorithm( crt, &bits);
+	printf(" # public key algorithm: ");
 	if (algo == GNUTLS_PK_RSA) {
 		printf("RSA\n");
 		printf(" #   Modulus: %d bits\n", bits);
@@ -119,31 +108,17 @@ void print_x509_info(gnutls_session session)
 		printf("UNKNOWN\n");
 	}
 
-#ifndef TEST_STRING
-	gnutls_x509_extract_certificate_dn(&cert_list[0], &dn);
-	PRINT_DN(dn);
+	dn_size = sizeof(dn);
+	ret = gnutls_x509_crt_get_dn( crt, dn, &dn_size);
+	if (ret >= 0)
+		printf( " # Subject's DN: %s\n", dn);
 
-	gnutls_x509_extract_certificate_issuer_dn(&cert_list[0], &dn);
-	printf(" # Certificate Issuer's info:\n");
-	PRINT_DN(dn);
-#else
-	{ char buf[256];
-	  int buf_size = sizeof(buf);
-	  int ret;
-	  
-	ret = gnutls_x509_extract_certificate_dn_string( buf, buf_size, &cert_list[0], 0);
-	if (ret == 0)
-  	   printf( " # %s\n", buf);
-  	else printf("gnutls_x509_extract_certificate_dn_string() returned %d\n", ret);
+	dn_size = sizeof(dn);
+	ret = gnutls_x509_crt_get_issuer_dn( crt, dn, &dn_size);
+	if (ret >= 0)
+		printf(" # Issuer's DN: %s\n", dn);
 
-	ret = gnutls_x509_extract_certificate_dn_string( buf, buf_size, &cert_list[0], 1);
-	if (ret == 0) {
-	   printf(" # Certificate Issuer's info:\n");
-  	   printf( " # %s\n", buf);
-  	} else printf("gnutls_x509_extract_certificate_dn_string() returned %d\n", ret);
-
-        }
-#endif
+	gnutls_x509_crt_deinit( crt);
 
 }
 

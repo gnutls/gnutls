@@ -8,10 +8,14 @@ typedef enum gnutls_x509_subject_alt_name {
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
 
-typedef int gnutls_certificate_client_select_function(gnutls_session, 
-	const gnutls_datum *, unsigned int, const gnutls_datum *, unsigned int);
-typedef int gnutls_certificate_server_select_function(gnutls_session, 
-	const gnutls_datum *, unsigned int);
+/* Callback prototypes for the certificate authentication
+ * callbacks.
+ */
+typedef int gnutls_certificate_client_select_function(
+   gnutls_session, const gnutls_datum *client_cert, int ncerts, 
+   const gnutls_datum* req_ca_cert, int nreqs);
+typedef int gnutls_certificate_server_select_function(
+   gnutls_session, const gnutls_datum *server_certs, int ncerts);
 
 /* Functions that allow AUTH_INFO structures handling
  */

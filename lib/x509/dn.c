@@ -116,7 +116,9 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 		_gnutls_int2str(k1, counter);
 		_gnutls_str_cpy(tmpbuffer1, sizeof(tmpbuffer1),
 				asn1_rdn_name);
-		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), ".?");
+		if (strlen(tmpbuffer1) > 0)
+			_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), ".");
+		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), "?");
 		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), counter);
 
 		len = sizeof(value) - 1;
@@ -142,8 +144,10 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			_gnutls_int2str(k2, counter);
 			_gnutls_str_cpy(tmpbuffer2, sizeof(tmpbuffer2),
 					tmpbuffer1);
-			_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2),
-					".?");
+			if (strlen( tmpbuffer2) > 0)
+				_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2),
+					".");
+			_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2), "?");
 			_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2),
 					counter);
 
@@ -323,7 +327,10 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 		_gnutls_int2str(k1, counter);
 		_gnutls_str_cpy(tmpbuffer1, sizeof(tmpbuffer1),
 				asn1_rdn_name);
-		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), ".?");
+
+		if (strlen( tmpbuffer1) > 0)
+			_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), ".");
+		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), "?");
 		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), counter);
 
 		len = sizeof(value) - 1;
@@ -350,8 +357,11 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 			_gnutls_int2str(k2, counter);
 			_gnutls_str_cpy(tmpbuffer2, sizeof(tmpbuffer2),
 					tmpbuffer1);
+
+			if (strlen( tmpbuffer2) > 0)
+				_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2), ".");
 			_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2),
-					".?");
+					"?");
 			_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2),
 					counter);
 
@@ -490,6 +500,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
 	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
 
 	if (sizeof_buf == 0) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
@@ -513,7 +524,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_parse_dn(dn, "", buf, sizeof_buf);
+	result = _gnutls_x509_parse_dn(dn, "rdnSequence", buf, sizeof_buf);
 
 	asn1_delete_structure(&dn);
 	return result;
@@ -566,7 +577,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid, int in
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_parse_dn_oid(dn, "", oid, indx, buf, sizeof_buf);
+	result = _gnutls_x509_parse_dn_oid(dn, "rdnSequence", oid, indx, buf, sizeof_buf);
 
 	asn1_delete_structure(&dn);
 	return result;

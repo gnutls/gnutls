@@ -29,7 +29,7 @@
 
 static int hostname_compare(const char *certname, const char *hostname);
 
-/**
+/*-
   * gnutls_x509_check_certificates_hostname - This function compares the given hostname with the hostname in the certificate
   * @cert: should contain a DER encoded certificate
   * @hostname: A null terminated string that contains a DNS name
@@ -40,7 +40,7 @@ static int hostname_compare(const char *certname, const char *hostname);
   *
   * Returns non zero on success, and zero on failure.
   *
-  **/
+  -*/
 int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
                                 const char *hostname)
 {

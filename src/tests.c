@@ -20,6 +20,7 @@
 
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
+#include <gnutls/x509.h>
 #include <tests.h>
 #include <unistd.h>
 #include <signal.h>
@@ -587,3 +588,61 @@ int ret;
 
 	return SUCCEED;
 }
+
+/* A callback function to be used at the certificate selection time.
+ */
+static int cert_callback( gnutls_session session, const gnutls_datum* client_certs,
+	int client_certs_num, const gnutls_datum * req_ca_rdn, int nreqs)
+{
+char issuer_dn[256];
+int len, i, ret;
+
+	if (client_certs == NULL && req_ca_rdn == NULL) return -1;
+
+	/* Print the server's trusted CAs
+	 */
+	printf("\n");
+	if (nreqs > 0)
+		printf("- Server's trusted authorities:\n");
+	else
+		printf("- Server did not send us any trusted authorities names.\n");
+
+	/* print the names (if any) */
+	for (i=0;i<nreqs;i++) {
+		len = sizeof(issuer_dn);
+		ret = gnutls_x509_rdn_get( &req_ca_rdn[i], issuer_dn, &len);
+		if ( ret >= 0) {
+			printf("   [%d]: ", i);
+			printf("%s\n", issuer_dn);
+		}
+	}
+
+	return -1;
+
+}
+
+/* Prints the trusted server's CAs. This is only
+ * if the server sends a certificate request packet.
+ */
+int test_server_cas( gnutls_session session) 
+{
+int ret;
+
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+        gnutls_certificate_client_set_select_function( session, cert_callback);
+
+	ret = do_handshake( session);
+	if (ret < 0) return FAILED;
+
+	return SUCCEED;
+}
+
+
+

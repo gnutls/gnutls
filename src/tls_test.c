@@ -80,6 +80,7 @@ static const TLS_TEST tls_tests[] = {
 	{ "for TLS 1.0 support", test_tls1, "yes", "no", "dunno" },
 	{ "for SSL 3.0 support", test_ssl3, "yes", "no", "dunno" },
 	{ "for certificate information", test_certificate, "", "", "" },
+	{ "for trusted CAs", test_server_cas, "", "", "" },
 	{ "for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes", "dunno" },
 	{ "for version rollback bug in Client Hello", test_version_rollback, "no", "yes", "dunno" },
 	/* this test will disable TLS 1.0 if the server is 

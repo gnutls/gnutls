@@ -25,6 +25,7 @@ int test_unknown_ciphersuites( gnutls_session state);
 int test_openpgp1( gnutls_session state);
 int test_bye( gnutls_session state);
 int test_certificate( gnutls_session state);
+int test_server_cas( gnutls_session state);
 int test_session_resume2( gnutls_session state);
 
 #define GERR(ret) fprintf(stderr, "*** Error: %s\n", gnutls_strerror(ret))

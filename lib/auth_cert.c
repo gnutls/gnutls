@@ -286,7 +286,9 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 
 	/* use the callback 
 	 */
-	if (indx == -1 && session->internals.client_cert_callback != NULL && cred->ncerts > 0) {	/* use a callback to get certificate */
+	if (indx == -1 && session->internals.client_cert_callback != NULL && try == -1) {
+		/* use a callback to get certificate 
+		 */
 		gnutls_datum *my_certs = NULL;
 		gnutls_datum *issuers_dn = NULL;
 		uint issuers_dn_len = 0;

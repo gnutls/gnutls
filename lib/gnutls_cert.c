@@ -178,7 +178,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(gnutls_session, gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_cert, int nreqs);
+  * int (*callback)(gnutls_session, gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_dn, int nreqs);
   *
   * 'client_cert' contains 'ncerts' gnutls_datum structures which hold
   * the raw certificates (DER for X.509 or binary for OpenPGP), of the
@@ -198,10 +198,10 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * public key algorithms.
   *
   * If the callback function is provided then gnutls will call it
-  * once with NULL parameters. If the callback function returns
+  * once with NULL parameters (except for the sesion). If the callback function returns
   * a positive or zero number then gnutls will attempt to automaticaly
   * choose the appropriate certificate. If gnutls fails to find an appropriate
-  * certificate, then it will call the callback function again with the 
+  * certificate, then it will call the callback function again with the
   * appropriate parameters.
   *
   * In case the callback returned a negative number then gnutls will
@@ -210,7 +210,8 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * only to the return value of the callback function.
   *
   * The callback function should return the index of the certificate
-  * choosen by the user. -1 indicates that the user
+  * choosen by the user. The index is relative to the certificates in the
+  * callback's parameter. The value (-1) indicates that the user
   * does not want to use client authentication.
   *
   * This function returns 0 on success.
@@ -342,7 +343,6 @@ int gnutls_certificate_verify_peers(gnutls_session session)
 
 	info = _gnutls_get_auth_info(session);
 	if (info == NULL) {
-		gnutls_assert();
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 	
@@ -376,7 +376,6 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
 
 	info = _gnutls_get_auth_info(session);
 	if (info == NULL) {
-		gnutls_assert();
 		return (time_t) -1;
 	}
 
@@ -417,7 +416,6 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 
 	info = _gnutls_get_auth_info(session);
 	if (info == NULL) {
-		gnutls_assert();
 		return (time_t) -1;
 	}
 	
