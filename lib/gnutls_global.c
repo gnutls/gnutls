@@ -68,6 +68,8 @@ static void dlog( const char* str) {
 #endif
 }
 
+static int _gnutls_init = 0;
+
 /**
   * gnutls_global_init - This function initializes the global state to defaults.
   *
@@ -81,6 +83,9 @@ static void dlog( const char* str) {
 int gnutls_global_init( void)
 {
 	int result;
+
+	if (_gnutls_init!=0) return 0;
+	_gnutls_init = 1;
 
 	/* for gcrypt in order to be able to allocate memory */
 	gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
@@ -127,6 +132,8 @@ void gnutls_global_deinit( void) {
 	asn1_delete_structure( PKIX1_ASN);
 	
 	_gnutls_dh_clear_mpis();
+
+	_gnutls_init = 0;
 	
 }
 
