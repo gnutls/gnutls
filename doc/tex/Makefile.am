@@ -1,15 +1,15 @@
 EXTRA_DIST = gnutls.tex gnutls.ps \
 	fdl.tex cover.tex.in gnutls-logo.ps layers.eps pgp-fig1.eps \
-	x509-1.eps internals.eps gnutls.bib
+	x509-1.eps internals.eps gnutls.bib $(TEX_OBJECTS)
 
 # If you add any examples here, also change the ../examples/Makefile.am
 # to include the C source.
 EXAMPLE_OBJECTS = ex-alert.tex ex-client-srp.tex ex-serv-export.tex \
 	ex-client1.tex ex-client2.tex ex-info.tex ex-rfc2818.tex \
 	ex-serv1.tex ex-client-resume.tex ex-serv-srp.tex \
-	ex-serv-pgp.tex ex-pgp-keyserver.tex ex-cert-select.tex
+	ex-serv-pgp.tex ex-pgp-keyserver.tex
 
-TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex ../../lib/x509/x509-api.tex \
+TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex \
 	auth.tex ciphers.tex errors.tex layers.tex alert.tex record.tex \
 	funcs.tex examples.tex ../../libextra/gnutls-extra-api.tex \
@@ -32,10 +32,7 @@ gnutls-api.tex: ../../lib/gnutls-api.tex
 gnutls-extra-api.tex: ../../libextra/gnutls-extra-api.tex
 	-../scripts/sort1.pl < ../../libextra/gnutls-extra-api.tex > gnutls-extra-api.tex
 
-x509-api.tex: ../../lib/x509/x509-api.tex
-	-../scripts/sort1.pl < ../../lib/x509/x509-api.tex > x509-api.tex
-
-DOC_OBJECTS = x509-api.tex gnutls-api.tex gnutls-extra-api.tex error_codes.tex
+DOC_OBJECTS = gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
 gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 	-latex gnutls.tex
@@ -46,7 +43,7 @@ gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 clean:
 	@-rm *.log *.aux *.toc *.png *.old *.html *.css *~
 	@-rm *.pl gnutls.dvi
-	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex error_codes.tex x509-api.tex
+	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
 examples: $(EXAMPLE_OBJECTS)
 	@echo "Generating example programs... "
@@ -57,4 +54,3 @@ examples: $(EXAMPLE_OBJECTS)
 		cat $$i|grep -v "^\\\\" > ../examples/$$out.c; \
 		done
 
-dist-hook: examples
