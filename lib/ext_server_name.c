@@ -117,7 +117,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 {
    uint16 len;
    opaque *p;
-   int i;
+   uint i;
    ssize_t data_size = _data_size;
    int total_size = 0;
 
@@ -223,8 +223,8 @@ int gnutls_server_name_get(gnutls_session session, void *data,
       return GNUTLS_E_INVALID_REQUEST;
    }
 
-   if (indx >
-       session->security_parameters.extensions.server_names_size - 1) {
+   if (indx+1 >
+       session->security_parameters.extensions.server_names_size) {
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
    }
 
