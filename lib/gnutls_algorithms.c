@@ -192,8 +192,8 @@ static const gnutls_kx_algo_entry kx_algorithms[] = {
 
 
 /* Cipher SUITES */
-#define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm ) \
-	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm }
+#define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, version ) \
+	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, version }
 
 typedef struct {
 	char *name;
@@ -201,6 +201,9 @@ typedef struct {
 	BulkCipherAlgorithm block_algorithm;
 	KXAlgorithm kx_algorithm;
 	MACAlgorithm mac_algorithm;
+	GNUTLS_Version version; /* this cipher suite is supported
+	                         * from 'version' and above;
+	                         */
 } gnutls_cipher_suite_entry;
 
 #define GNUTLS_RSA_NULL_MD5 { 0x00, 0x01 }
@@ -244,91 +247,91 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* ANON_DH */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_ANON_DH_ARCFOUR_MD5,
 				  GNUTLS_CIPHER_ARCFOUR,
-				  GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5),
+				  GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_ANON_DH_3DES_EDE_CBC_SHA,
 				  GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_ANON_DH,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_ANON_DH_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_KX_ANON_DH,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_ANON_DH_RIJNDAEL_256_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_KX_ANON_DH,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_ANON_DH_TWOFISH_128_CBC_SHA,
 				  GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_KX_ANON_DH,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 
 	/* SRP */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_ARCFOUR_SHA,
 				  GNUTLS_CIPHER_ARCFOUR,
-				  GNUTLS_KX_SRP, GNUTLS_MAC_SHA),
+				  GNUTLS_KX_SRP, GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_ARCFOUR_MD5,
 				  GNUTLS_CIPHER_ARCFOUR,
-				  GNUTLS_KX_SRP, GNUTLS_MAC_MD5),
+				  GNUTLS_KX_SRP, GNUTLS_MAC_MD5, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_3DES_EDE_CBC_SHA,
 				  GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_SRP,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_KX_SRP,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_RIJNDAEL_256_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_KX_SRP,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_TWOFISH_128_CBC_SHA,
 				  GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_KX_SRP,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 
 	/* DHE_DSS */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA,
 				  GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_KX_DHE_DSS,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA,
 				  GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_DHE_DSS,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_KX_DHE_DSS,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_RIJNDAEL_256_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_KX_DHE_DSS,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 
 	/* DHE_RSA */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA,
 				  GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_KX_DHE_RSA,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_DHE_RSA,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_KX_DHE_RSA,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_RIJNDAEL_256_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_KX_DHE_RSA,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 
 	/* RSA */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_NULL_MD5,
 				  GNUTLS_CIPHER_NULL,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5),
+				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5, GNUTLS_SSL3),
 
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_SHA,
 				  GNUTLS_CIPHER_ARCFOUR,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA),
+				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_MD5,
 				  GNUTLS_CIPHER_ARCFOUR,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5),
+				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_CIPHER_3DES_CBC,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA),
+				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_KX_RSA,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_RIJNDAEL_256_CBC_SHA,
 				  GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_KX_RSA,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_SSL3),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_TWOFISH_128_CBC_SHA,
 				  GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_KX_RSA,
-				  GNUTLS_MAC_SHA),
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 
 	{0}
 };
@@ -783,15 +786,23 @@ CredType _gnutls_map_kx_get_cred(KXAlgorithm algorithm)
 BulkCipherAlgorithm
 _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite suite)
 {
-	size_t ret = 0;
+	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->block_algorithm);
+	return ret;
+}
+
+GNUTLS_Version
+_gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite suite)
+{
+	int ret = 0;
+	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->version);
 	return ret;
 }
 
 KXAlgorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite
 					     suite)
 {
-	size_t ret = 0;
+	int ret = 0;
 
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->kx_algorithm);
 	return ret;
@@ -801,7 +812,7 @@ KXAlgorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite
 MACAlgorithm
 _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite suite)
 {				/* In bytes */
-	size_t ret = 0;
+	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm);
 	return ret;
 
@@ -969,7 +980,7 @@ _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 	}
 }
 
-#if 0
+#ifdef SORT_DEBUG
 static void
 _gnutls_bsort(GNUTLS_STATE state, void *_base, size_t nmemb,
 	      size_t size, int (*compar) (GNUTLS_STATE, const void *,
@@ -991,97 +1002,40 @@ _gnutls_bsort(GNUTLS_STATE state, void *_base, size_t nmemb,
 }
 #endif
 
-#ifdef DEBUG
-# warning Optimize this, by combining with remove_unwanted_algorithms.
-#endif
 int
 _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 				      GNUTLS_CipherSuite ** ciphers)
 {
 
-	int i, ret_count, j = 0;
-	int count = _gnutls_cipher_suite_count();
-	GNUTLS_CipherSuite *tmp_ciphers;
-
-	if (count == 0) {
-		*ciphers = NULL;
-		return 0;
-	}
-
-	tmp_ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
-	if (tmp_ciphers==NULL) return GNUTLS_E_MEMORY_ERROR;
-	
-	*ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
-	if (*ciphers==NULL) {
-		gnutls_free(tmp_ciphers);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-
-	for (i = 0; i < count; i++) {
-		tmp_ciphers[i].CipherSuite[0] =
-		    cs_algorithms[i].id.CipherSuite[0];
-		tmp_ciphers[i].CipherSuite[1] =
-		    cs_algorithms[i].id.CipherSuite[1];
+#ifdef SORT_DEBUG
+	int i;
+#endif
+	int count;
+		
+	count = _gnutls_supported_ciphersuites( state, ciphers);
+	if (count<=0) {
+		gnutls_assert();
+		return count;
 	}
 
 #ifdef SORT_DEBUG
 	_gnutls_log( "Unsorted: \n");
 	for (i = 0; i < count; i++)
 		_gnutls_log( "\t%d: %s\n", i,
-			_gnutls_cipher_suite_get_name((tmp_ciphers)[i]));
+			_gnutls_cipher_suite_get_name((*ciphers)[i]));
 #endif
 
-	_gnutls_qsort(state, tmp_ciphers, count,
+	_gnutls_qsort(state, *ciphers, count,
 		      sizeof(GNUTLS_CipherSuite), _gnutls_compare_algo);
-
-	for (i = 0; i < count; i++) {
-		if (_gnutls_kx_priority
-		    (state,
-		     _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0)
-			continue;
-		if (_gnutls_mac_priority
-		    (state,
-		     _gnutls_cipher_suite_get_mac_algo(tmp_ciphers[i])) <
-		    0)
-			continue;
-		if (_gnutls_cipher_priority
-		    (state,
-		     _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i]))
-		    < 0)
-			continue;
-
-		(*ciphers)[j].CipherSuite[0] =
-		    tmp_ciphers[i].CipherSuite[0];
-		(*ciphers)[j].CipherSuite[1] =
-		    tmp_ciphers[i].CipherSuite[1];
-		j++;
-	}
 
 #ifdef SORT_DEBUG
 	_gnutls_log( "Sorted: \n");
-	for (i = 0; i < j; i++)
+	for (i = 0; i < count; i++)
 		_gnutls_log( "\t%d: %s\n", i,
 			_gnutls_cipher_suite_get_name((*ciphers)[i]));
-	_gnutls_log( "SORT BUG\n");
-	exit(0);
 #endif
 
-	ret_count = j;
-
-	if (ret_count > 0 && ret_count != count) {
-		*ciphers =
-		    gnutls_realloc(*ciphers,
-				   ret_count * sizeof(GNUTLS_CipherSuite));
-	} else {
-		if (ret_count != count) {
-			gnutls_free(*ciphers);
-			*ciphers = NULL;
-		}
-	}
-
-	gnutls_free(tmp_ciphers);
-	return ret_count;
+	return count;
 }
 
 int
@@ -1093,12 +1047,15 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 	int count = _gnutls_cipher_suite_count();
 	GNUTLS_CipherSuite *tmp_ciphers;
 	GNUTLS_CipherSuite* ciphers;
+	GNUTLS_Version version;
 
 	*_ciphers = NULL;
 
 	if (count == 0) {
 		return 0;
 	}
+
+	version = gnutls_protocol_get_version( state);
 
 	tmp_ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
 	if ( tmp_ciphers==NULL)
@@ -1119,6 +1076,12 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 	}
 
 	for (i = j = 0; i < count; i++) {
+		/* remove cipher suites which are not used in the
+		 * protocol version used.
+		 */
+		if ( _gnutls_cipher_suite_get_version(tmp_ciphers[i]) > version)
+			continue;
+
 		if (_gnutls_kx_priority
 		    (state,
 		     _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0)

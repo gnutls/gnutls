@@ -159,11 +159,9 @@ int num=0, i;
   * @list: is a 0 terminated list of GNUTLS_Version elements.
   *
   * Sets the priority on the protocol versions supported by gnutls.
-  * Priority is higher for protocols specified before others.
-  * After specifying the protocols you want, you should add 0.
-  * Note that the priority is set on the client. The server does
-  * not use the protocols's priority except for disabling
-  * protocols that were not specified.
+  * This function actually enables or disables protocols. Newer protocol
+  * versions always have highest priority.
+  *
   **/
 int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
 GNUTLS_LIST _list = list;

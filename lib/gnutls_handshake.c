@@ -336,7 +336,8 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	
 	/* Parse the extensions (if any)
 	 */
-	if (ret >= GNUTLS_TLS1) {
+	if (ver >= GNUTLS_TLS1) {
+		gnutls_assert();
 		ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
 		if (ret < 0) {
 			gnutls_assert();
@@ -1289,6 +1290,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	/* Parse extensions.
 	 */
 	if (version >= GNUTLS_TLS1) {
+		gnutls_assert();
 		ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
 		if (ret < 0) {
 			gnutls_assert();
@@ -1552,6 +1554,7 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 		/* Generate and copy TLS extensions.
 		 */
 		if (hver >= GNUTLS_TLS1) {
+			gnutls_assert();
 			extdatalen = _gnutls_gen_extensions(state, &extdata);
 			if (extdatalen > 0) {
 				datalen += extdatalen;
@@ -2294,8 +2297,11 @@ int _gnutls_recv_hello_request(GNUTLS_STATE state, void *data,
 }
 
 /* This function will remove algorithms that are not supported by
- * the requested authentication method. We only remove algorithm if
+ * the requested authentication method. We remove algorithm if
  * we have a certificate with keyUsage bits set.
+ *
+ * This does a more high level check than  gnutls_supported_ciphersuites(),
+ * by checking certificates etc.
  */
 int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 					 GNUTLS_CipherSuite **

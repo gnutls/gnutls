@@ -47,6 +47,7 @@ const char* _gnutls_cipher_suite_get_name(GNUTLS_CipherSuite algorithm);
 BulkCipherAlgorithm _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite algorithm);
 KXAlgorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite algorithm);
 MACAlgorithm _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite algorithm);
+GNUTLS_Version _gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite algorithm);
 GNUTLS_CipherSuite  _gnutls_cipher_suite_get_suite_name(GNUTLS_CipherSuite algorithm);
 
 /* functions for ciphers */
