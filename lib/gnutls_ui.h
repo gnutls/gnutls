@@ -96,7 +96,9 @@ int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_key_activation_time( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert );
 
-int gnutls_openpgp_verify_key( const gnutls_datum* key_list, int key_list_length);
+int gnutls_openpgp_verify_key( const gnutls_datum* keyring, 
+	const gnutls_datum* key_list, 
+	int key_list_length);
 
 /* get data from the state */
 const gnutls_datum* gnutls_certificate_get_peers( GNUTLS_STATE, int* list_size);

@@ -33,7 +33,7 @@ Status of this Memo
 Abstract
 
    This document proposes extensions to the TLS protocol to support
-   OpenPGP trust model and keys.  The extensions discussed here
+   the OpenPGP trust model and keys.  The extensions discussed here
    include a certificate type negotiation mechanism, and the required
    modifications to the TLS Handshake Protocol.  
 
