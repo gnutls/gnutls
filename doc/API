@@ -128,5 +128,5 @@ int gnutls_set_current_session( GNUTLS_STATE state, void* session, int session_s
 int gnutls_set_lowat( GNUTLS_STATE state, int num);
 	Used to set the lowat value in order for select to check
 	if there are pending data to socket buffer. Used only
-	if you have changed the default low water value (default is 1),
-	but anyway why do that?
+	if you have changed the default low water value (default is 1).
+	Normally you will not need that function.
