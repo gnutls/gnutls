@@ -220,7 +220,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	CERTIFICATE_AUTH_INFO auth = state->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */
 	MPI params[MAX_PARAMS_SIZE];
-	int params_len;
+	int params_len = MAX_PARAMS_SIZE;
 	int ret, i;
 	GNUTLS_Version ver;
 
