@@ -1,13 +1,13 @@
 
 
 TLS Working Group                                     N. Mavroyanopoulos
-Internet-Draft                                         February 15, 2002
-Expires: August 14, 2002
+Internet-Draft                                           August 16, 2002
+Expires: February 15, 2002
 
 
                 Using OpenPGP keys for TLS authentication
 
-                  <draft-ietf-tls-openpgp-keys-01.txt>
+                  <draft-ietf-tls-openpgp-keys-02.txt>
 
 Status of this Memo
 
@@ -53,15 +53,15 @@ Abstract
 
 
 
-N. Mavroyanopoulos         Expires August 14, 2002             [Page 1]
+N. Mavroyanopoulos         Expires February 15, 2002           [Page 1]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
 1. Introduction
    
-   At the time of writing, TLS [TLS] uses the X.509 protocols, to
-   provide certificate services. Currently the X.509 protocols are
+   At the time of writing, TLS [TLS] uses the PKIX [PKIX] infrastructure,
+   to provide certificate services. Currently the PKIX protocols are
    limited to a hierarchical key management. As a result, applications
    which follow different - non hierarchical - trust models, like the 
    "web of trust" model, could not be benefited by TLS.
@@ -110,7 +110,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
 
-N. Mavroyanopoulos         Expires August 14, 2002             [Page 2]
+N. Mavroyanopoulos         Expires February 15, 2002           [Page 2]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
@@ -167,7 +167,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    DHE_RSA                 RSA public key which can be used for
                            signing.
 
-N. Mavroyanopoulos         Expires August 14, 2002             [Page 3]
+N. Mavroyanopoulos         Expires February 15, 2002           [Page 3]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
@@ -224,7 +224,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
 
-N. Mavroyanopoulos         Expires August 14, 2002             [Page 4]
+N. Mavroyanopoulos         Expires February 15, 2002           [Page 4]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
@@ -281,7 +281,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
 
-N. Mavroyanopoulos         Expires August 14, 2002             [Page 5]
+N. Mavroyanopoulos         Expires February 15, 2002           [Page 5]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
@@ -298,7 +298,13 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    to support the above cipher suites. 
 
 
-References
+4. Acknowledgments
+
+ The author wishes to thank Werner Koch for his suggestions on 
+ improving this document.
+
+
+5. References
 
  [TLS]      T. Dierks, and C. Allen, "The TLS Protocol Version 1.0",
             RFC 2246, January 1999.
@@ -313,34 +319,38 @@ References
  [X509]     CCITT. Recommendation X.509: "The Directory - Authentication
             Framework". 1988.
 
+ [PKIX]     Housley, R., Ford, W., Polk, W., Solo, D., "Internet X.509
+            Public Key Infrastructure Certificate and CRL Profile", 
+            RFC 2459, January 1999.
+
  [CAST]     Adams, C., "The CAST-128 Encryption Algorithm", RFC 2144,
             May 1997.
 
- [AES]      J. Daemen, V. Rijmen, "The Rijndael Block Cipher"
+ [AES]      Daemen, J., Rijmen, V., "The Rijndael Block Cipher"
             http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf
             3rd September 1999.
+
+
+
+
+
+
+
+
+
+N. Mavroyanopoulos         Expires February 15, 2002           [Page 6]
+
+Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
 Author's Address
 
    Nikos Mavroyanopoulos
-   nmav@gnutls.org
+   8 Arkadias Street
+   Chalandri 15234
+   Greece
 
-
-
-
-
-
-
-
-
-
-
-
-
-N. Mavroyanopoulos         Expires August 14, 2002             [Page 6]
-
-Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
+   Email: nmav@gnutls.org
 
 
 Full Copyright Statement
@@ -385,15 +395,5 @@ Acknowledgement
 
 
 
-
-
-
-
-
-
-
-
-
-
-N. Mavroyanopoulos         Expires August 14, 2002             [Page 7]
+N. Mavroyanopoulos         Expires February 15, 2002           [Page 7]
 
