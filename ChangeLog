@@ -1,3 +1,25 @@
+2004-04-30 08:50  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/auth_cert.c, lib/ext_cert_type.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_state.c:
+
+	Automatically disable certificate types that do not have
+	corresponding certificates.  
+
+2004-04-30 00:04  nmav <nmav@gnutls.org>
+
+	* lib/: ext_cert_type.c, gnutls_cert.c, gnutls_state.c:
+
+	Fixes in the automatic disabling of certificate types.  
+
+2004-04-29 23:50  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_cert.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_state.c:
+
+	Automatically disable certificate types that do not have
+	corresponding certificates.  
+
 2004-04-29 06:29  nmav <nmav@gnutls.org>
 
 	* src/: certtool-gaa.c, certtool-gaa.h, certtool.c, certtool.gaa,
