@@ -1226,8 +1226,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
-		siz -= siz2;	/* FIXME: this is not enough
-				 */
+		siz -= siz2;
 
 		if (siz2 < 0) {
 			gnutls_assert();

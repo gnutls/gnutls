@@ -147,7 +147,7 @@ const char* GET_CN( gnutls_datum cert) {
 static gnutls_x509_dn dn;
 
 	if (gnutls_x509_extract_certificate_dn( &cert, &dn) >= 0)
-		return &dn.common_name[0]; /* FIXME */
+		return &dn.common_name[0];
 	else 
 		return NULL;
 
