@@ -1,8 +1,8 @@
-Version 0.8.8
+Version 0.8.8 (10/06/2003)
 - Corrected a bug in the record layer buffering, which affected
   the case where external pull function was used. Report and patch
   by Sergey Poznyakoff <gray@Mirddin.farlep.net>.
-- Corrected a bug in gnutls-srpcrypt where a non allocated value
+- Corrected a bug in gnutls-srpcrypt where a non allocated variable
   was freed.
 
 Version 0.8.7 (12/05/2003)
