@@ -1,13 +1,13 @@
 
 
 TLS Working Group                                     N. Mavroyanopoulos
-Internet-Draft                                             April 2, 2003
-Expires: October 1, 2003
+Internet-Draft                                         November 10, 2003
+Expires: May 9, 2004
 
 
                 Using OpenPGP keys for TLS authentication
 
-                  <draft-ietf-tls-openpgp-keys-03.txt>
+                  <draft-ietf-tls-openpgp-keys-04.txt>
 
 Status of this Memo
 
@@ -53,9 +53,9 @@ Abstract
 
 
 
-N. Mavroyanopoulos          Expires October 1, 2003            [Page 1]
+N. Mavroyanopoulos           Expires May 9, 2004               [Page 1]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+Internet-Draft  Using OpenPGP keys for TLS Authentication November 2003
 
 
 1. Introduction
@@ -110,9 +110,9 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
 
 
 
-N. Mavroyanopoulos          Expires October 1, 2003            [Page 2]
+N. Mavroyanopoulos           Expires May 9, 2004               [Page 2]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+Internet-Draft  Using OpenPGP keys for TLS Authentication November 2003
 
 
    The "extension_data" field of this extension will contain a
@@ -167,9 +167,9 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
    DHE_RSA                 RSA public key which can be used for
                            signing.
 
-N. Mavroyanopoulos          Expires October 1, 2003            [Page 3]
+N. Mavroyanopoulos           Expires May 9, 2004               [Page 3]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+Internet-Draft  Using OpenPGP keys for TLS Authentication November 2003
 
 
    An OpenPGP public key appearing in the Certificate message will be sent 
@@ -224,9 +224,9 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
    } PGPCertificateRequest;
 
 
-N. Mavroyanopoulos          Expires October 1, 2003            [Page 4]
+N. Mavroyanopoulos           Expires May 9, 2004               [Page 4]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+Internet-Draft  Using OpenPGP keys for TLS Authentication November 2003
 
 
    certificate_params_types is a list of accepted client certificate 
@@ -281,9 +281,9 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
    CipherSuite TLS_DHE_RSA_WITH_3DES_EDE_CBC_RMD      = { 0x00, 0x77 };
    CipherSuite TLS_DHE_RSA_WITH_AES_128_CBC_RMD       = { 0x00, 0x78 };
 
-N. Mavroyanopoulos          Expires October 1, 2003            [Page 5]
+N. Mavroyanopoulos           Expires May 9, 2004               [Page 5]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+Internet-Draft  Using OpenPGP keys for TLS Authentication November 2003
 
 
    CipherSuite TLS_DHE_RSA_WITH_AES_256_CBC_RMD       = { 0x00, 0x79 };
@@ -303,7 +303,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
 
    This document adds support for OpenPGP keys in TLS 1.0. Since the
    OpenPGP keys can be viewed as an other format to hold public key
-   parameters, no extra threats are introduced to the TLS protocol.
+   parameters, no additional threats are introduced to the TLS protocol.
 
    All the security considerations in the TLS [TLS] and the OpenPGP 
    [OpenPGP] specifications still apply.
@@ -320,30 +320,29 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
  [TLS]      T. Dierks, and C. Allen, "The TLS Protocol Version 1.0",
             RFC 2246, January 1999.
 
- [OpenPGP]  Callas, J., Donnerhacke, L., Finney, H., Thayer, R.,
+ [OpenPGP]  J. Callas, L. Donnerhacke, H. Finney, R. Thayer,
             "OpenPGP Message Format", RFC 2440, November 1998.
 
- [TLSEXT]   Blake-Wilson, S., Nystrom, M., Hopwood, D., Mikkelsen, J. 
-            and Wright, T., "TLS Extensions", work in progress, 
-            December 2001.
+ [TLSEXT]   S. Blake-Wilson, M. Nystrom, D. Hopwood, J. Mikkelsen,
+            and T. Wright, "TLS Extensions", RFC3546, June 2003.
 
  [X509]     CCITT. Recommendation X.509: "The Directory - Authentication
             Framework". 1988.
 
- [PKIX]     Housley, R., Ford, W., Polk, W., Solo, D., "Internet X.509
+ [PKIX]     R. Housley, W. Ford, W. Polk, D. Solo, "Internet X.509
             Public Key Infrastructure Certificate and CRL Profile", 
             RFC 2459, January 1999.
 
- [CAST]     Adams, C., "The CAST-128 Encryption Algorithm", RFC 2144,
-            May 1997.
+ [CAST]     C. Adams, "The CAST-128 Encryption Algorithm", RFC 2144,
+            May 9997.
 
 
-N. Mavroyanopoulos          Expires October 1, 2003            [Page 6]
+N. Mavroyanopoulos           Expires May 9, 2004               [Page 6]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+Internet-Draft  Using OpenPGP keys for TLS Authentication November 2003
 
 
- [AES]      Chown, P. "Advanced Encryption Standard (AES) Ciphersuites 
+ [AES]      P. Chown, "Advanced Encryption Standard (AES) Ciphersuites 
             for Transport Layer Security (TLS)", RFC 3268, June 2002.
 
 
@@ -395,6 +394,6 @@ Acknowledgement
 
 
 
-N. Mavroyanopoulos          Expires October 1, 2003            [Page 7]
+N. Mavroyanopoulos           Expires May 9, 2004               [Page 7]
 
 
