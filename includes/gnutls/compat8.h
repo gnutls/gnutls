@@ -48,5 +48,6 @@ int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
                                 const char *hostname);
 
 #define gnutls_x509_fingerprint gnutls_fingerprint
+#define gnutls_x509_certificate_format gnutls_x509_crt_format
 
 #endif

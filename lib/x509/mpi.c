@@ -180,7 +180,7 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 
 /* Extracts DSA and RSA parameters from a certificate.
  */
-int _gnutls_x509_certificate_get_mpis( gnutls_x509_certificate cert,
+int _gnutls_x509_crt_get_mpis( gnutls_x509_crt cert,
 	GNUTLS_MPI* params, int *params_size) 
 {
 int len, result;
@@ -189,7 +189,7 @@ int pk_algorithm;
 
 	/* Read the algorithm's OID
 	 */
-	pk_algorithm = gnutls_x509_certificate_get_pk_algorithm(cert, NULL);
+	pk_algorithm = gnutls_x509_crt_get_pk_algorithm(cert, NULL);
 
 	/* Read the algorithm's parameters
 	 */

@@ -37,12 +37,12 @@
 #include <mpi.h>
 #include <verify.h>
 
-static int _gnutls_verify_certificate2(gnutls_x509_certificate cert,
-			       gnutls_x509_certificate *trusted_cas, int tcas_size, 
+static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
+			       gnutls_x509_crt *trusted_cas, int tcas_size, 
 			       unsigned int flags);
 static
 int _gnutls_x509_verify_signature(const gnutls_datum* signed_data,
-	const gnutls_datum* signature, gnutls_x509_certificate issuer);
+	const gnutls_datum* signature, gnutls_x509_crt issuer);
 
 
 /* Checks if the issuer of a certificate is a
@@ -52,8 +52,8 @@ int _gnutls_x509_verify_signature(const gnutls_datum* signed_data,
  * Returns true or false, if the issuer is a CA,
  * or not.
  */
-static int check_if_ca(gnutls_x509_certificate cert,
-	gnutls_x509_certificate issuer)
+static int check_if_ca(gnutls_x509_crt cert,
+	gnutls_x509_crt issuer)
 {
 	/* Check if the issuer is the same with the
 	 * certificate. This is added in order for trusted
@@ -70,7 +70,7 @@ static int check_if_ca(gnutls_x509_certificate cert,
 			return 1;
 	}
 
-	if (gnutls_x509_certificate_get_ca_status(issuer, NULL) == 1) {
+	if (gnutls_x509_crt_get_ca_status(issuer, NULL) == 1) {
 		return 1;
 	} else
 		gnutls_assert();
@@ -87,18 +87,18 @@ static int check_if_ca(gnutls_x509_certificate cert,
  * a negative value is returned to indicate error.
  */
 static
-int is_issuer(gnutls_x509_certificate cert, gnutls_x509_certificate issuer_cert)
+int is_issuer(gnutls_x509_crt cert, gnutls_x509_crt issuer_cert)
 {
 	gnutls_const_datum dn1, dn2;
 	int ret;
 
-	ret = _gnutls_x509_certificate_get_raw_issuer_dn( cert, &dn1);
+	ret = _gnutls_x509_crt_get_raw_issuer_dn( cert, &dn1);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret = _gnutls_x509_certificate_get_raw_dn( issuer_cert, &dn2);
+	ret = _gnutls_x509_crt_get_raw_dn( issuer_cert, &dn2);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -111,7 +111,7 @@ int is_issuer(gnutls_x509_certificate cert, gnutls_x509_certificate issuer_cert)
 /* The same as above, but here we've got a CRL.
  */
 static
-int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_certificate issuer_cert)
+int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_crt issuer_cert)
 {
 	gnutls_const_datum dn1, dn2;
 	int ret;
@@ -122,7 +122,7 @@ int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_certificate issuer_cert)
 		return ret;
 	}
 
-	ret = _gnutls_x509_certificate_get_raw_dn( issuer_cert, &dn2);
+	ret = _gnutls_x509_crt_get_raw_dn( issuer_cert, &dn2);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -133,8 +133,8 @@ int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_certificate issuer_cert)
 }
 
 static inline
-gnutls_x509_certificate find_crl_issuer(gnutls_x509_crl crl,
-				gnutls_x509_certificate * trusted_cas, int tcas_size)
+gnutls_x509_crt find_crl_issuer(gnutls_x509_crl crl,
+				gnutls_x509_crt * trusted_cas, int tcas_size)
 {
 	int i;
 
@@ -153,8 +153,8 @@ gnutls_x509_certificate find_crl_issuer(gnutls_x509_crl crl,
 
 
 static inline
-gnutls_x509_certificate find_issuer(gnutls_x509_certificate cert,
-				gnutls_x509_certificate * trusted_cas, int tcas_size)
+gnutls_x509_crt find_issuer(gnutls_x509_crt cert,
+				gnutls_x509_crt * trusted_cas, int tcas_size)
 {
 	int i;
 
@@ -178,13 +178,13 @@ gnutls_x509_certificate find_issuer(gnutls_x509_certificate cert,
  *
  * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
  */
-static int _gnutls_verify_certificate2(gnutls_x509_certificate cert,
-			       gnutls_x509_certificate *trusted_cas, int tcas_size, 
+static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
+			       gnutls_x509_crt *trusted_cas, int tcas_size, 
 			       unsigned int flags)
 {
 /* CRL is ignored for now */
 
-	gnutls_x509_certificate issuer;
+	gnutls_x509_crt issuer;
 	int ret;
 
 	if (tcas_size >= 1)
@@ -226,12 +226,12 @@ static int _gnutls_verify_certificate2(gnutls_x509_certificate cert,
  * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
  */
 static int _gnutls_verify_crl2(gnutls_x509_crl crl,
-			       gnutls_x509_certificate *trusted_cas, int tcas_size, 
+			       gnutls_x509_crt *trusted_cas, int tcas_size, 
 			       unsigned int flags)
 {
 /* CRL is ignored for now */
 
-	gnutls_x509_certificate issuer;
+	gnutls_x509_crt issuer;
 	int ret;
 
 	if (tcas_size >= 1)
@@ -250,7 +250,7 @@ static int _gnutls_verify_crl2(gnutls_x509_crl crl,
 	}
 
 	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN)) {
-		if (gnutls_x509_certificate_get_ca_status(issuer, NULL) != 1) 
+		if (gnutls_x509_crt_get_ca_status(issuer, NULL) != 1) 
 		{
 			gnutls_assert();
 			return 0;
@@ -282,9 +282,9 @@ static int _gnutls_verify_crl2(gnutls_x509_crl crl,
  * lead to a trusted CA in order to be trusted.
  */
 static
-unsigned int _gnutls_x509_verify_certificate(gnutls_x509_certificate * certificate_list,
+unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 				    int clist_size,
-				    gnutls_x509_certificate * trusted_cas,
+				    gnutls_x509_crt * trusted_cas,
 				    int tcas_size, gnutls_x509_crl *CRLs,
 				    int crls_size, unsigned int flags)
 {
@@ -294,7 +294,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_certificate * certifica
 	/* Check for revoked certificates in the chain
 	 */
 	for (i = 0; i < clist_size; i++) {
-		ret = gnutls_x509_certificate_check_revocation( certificate_list[i],
+		ret = gnutls_x509_crt_check_revocation( certificate_list[i],
 			CRLs, crls_size);
 		if (ret == 1) { /* revoked */
 			status |= GNUTLS_CERT_REVOKED;
@@ -475,7 +475,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
  */
 static
 int _gnutls_x509_verify_signature( const gnutls_datum* tbs,
-	const gnutls_datum* signature, gnutls_x509_certificate issuer) 
+	const gnutls_datum* signature, gnutls_x509_crt issuer) 
 {
 GNUTLS_MPI issuer_params[MAX_PARAMS_SIZE];
 int ret, issuer_params_size, i;
@@ -483,14 +483,14 @@ int ret, issuer_params_size, i;
 	/* Read the MPI parameters from the issuer's certificate.
 	 */
 	issuer_params_size = MAX_PARAMS_SIZE;
-	ret = _gnutls_x509_certificate_get_mpis(issuer, issuer_params, &issuer_params_size);
+	ret = _gnutls_x509_crt_get_mpis(issuer, issuer_params, &issuer_params_size);
 
 	if ( ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	switch( gnutls_x509_certificate_get_pk_algorithm(issuer, NULL)) 
+	switch( gnutls_x509_crt_get_pk_algorithm(issuer, NULL)) 
 	{
 		case GNUTLS_PK_RSA:
 
@@ -532,7 +532,7 @@ int ret, issuer_params_size, i;
 }
 
 /**
-  * gnutls_x509_certificate_list_verify - This function verifies the given certificate list
+  * gnutls_x509_crt_list_verify - This function verifies the given certificate list
   * @cert_list: is the certificate list to be verified
   * @cert_list_length: holds the number of certificate in cert_list
   * @CA_list: is the CA list which will be used in verification
@@ -570,8 +570,8 @@ int ret, issuer_params_size, i;
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
-int gnutls_x509_certificate_list_verify( gnutls_x509_certificate* cert_list, int cert_list_length, 
-	gnutls_x509_certificate * CA_list, int CA_list_length, 
+int gnutls_x509_crt_list_verify( gnutls_x509_crt* cert_list, int cert_list_length, 
+	gnutls_x509_crt * CA_list, int CA_list_length, 
 	gnutls_x509_crl* CRL_list, int CRL_list_length, 
 	unsigned int flags, unsigned int *verify)
 {
@@ -588,7 +588,7 @@ int gnutls_x509_certificate_list_verify( gnutls_x509_certificate* cert_list, int
 }
 
 /**
-  * gnutls_x509_certificate_verify - This function verifies the given certificate against a given trusted one
+  * gnutls_x509_crt_verify - This function verifies the given certificate against a given trusted one
   * @cert: is the certificate to be verified
   * @CA_list: is one certificate that is considered to be trusted one
   * @CA_list_length: holds the number of CA certificate in CA_list
@@ -596,14 +596,14 @@ int gnutls_x509_certificate_list_verify( gnutls_x509_certificate* cert_list, int
   * @verify: will hold the certificate verification output.
   *
   * This function will try to verify the given certificate and return it's status. 
-  * See gnutls_x509_certificate_list_verify() for a detailed description of
+  * See gnutls_x509_crt_list_verify() for a detailed description of
   * return values.
   *
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
-int gnutls_x509_certificate_verify( gnutls_x509_certificate cert,
-	gnutls_x509_certificate *CA_list, int CA_list_length,
+int gnutls_x509_crt_verify( gnutls_x509_crt cert,
+	gnutls_x509_crt *CA_list, int CA_list_length,
 	unsigned int flags, unsigned int *verify)
 {
 	/* Verify certificate 
@@ -615,7 +615,7 @@ int gnutls_x509_certificate_verify( gnutls_x509_certificate cert,
 }
 
 /**
-  * gnutls_x509_certificate_check_issuer - This function checks if the certificate given has the given issuer
+  * gnutls_x509_crt_check_issuer - This function checks if the certificate given has the given issuer
   * @cert: is the certificate to be checked
   * @issuer: is the certificate of a possible issuer
   *
@@ -626,8 +626,8 @@ int gnutls_x509_certificate_verify( gnutls_x509_certificate cert,
   * A negative value is returned in case of an error.
   *
   **/
-int gnutls_x509_certificate_check_issuer( gnutls_x509_certificate cert,
-	gnutls_x509_certificate issuer)
+int gnutls_x509_crt_check_issuer( gnutls_x509_crt cert,
+	gnutls_x509_crt issuer)
 {
 	return is_issuer(cert, issuer);
 }
@@ -645,7 +645,7 @@ int gnutls_x509_certificate_check_issuer( gnutls_x509_certificate cert,
   *
   **/
 int gnutls_x509_crl_check_issuer( gnutls_x509_crl cert,
-	gnutls_x509_certificate issuer)
+	gnutls_x509_crt issuer)
 {
 	return is_crl_issuer(cert, issuer);
 }
@@ -659,14 +659,14 @@ int gnutls_x509_crl_check_issuer( gnutls_x509_crl cert,
   * @verify: will hold the crl verification output.
   *
   * This function will try to verify the given crl and return it's status. 
-  * See gnutls_x509_certificate_list_verify() for a detailed description of
+  * See gnutls_x509_crt_list_verify() for a detailed description of
   * return values.
   *
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
 int gnutls_x509_crl_verify( gnutls_x509_crl crl,
-	gnutls_x509_certificate *CA_list, int CA_list_length,
+	gnutls_x509_crt *CA_list, int CA_list_length,
 	unsigned int flags, unsigned int *verify)
 {
 	/* Verify crl 

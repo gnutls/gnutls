@@ -41,7 +41,7 @@ typedef struct {
 	    
 	/* X509 specific stuff */
 
-	gnutls_x509_certificate * x509_ca_list;
+	gnutls_x509_crt * x509_ca_list;
 	uint x509_ncas;	/* number of CAs in the ca_list 
 			 */
 

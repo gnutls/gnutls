@@ -71,7 +71,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 	gnutls_free(sc->cert_list);
 
 	for (j = 0; j < sc->x509_ncas; j++) {
-		gnutls_x509_certificate_deinit( sc->x509_ca_list[j]);
+		gnutls_x509_crt_deinit( sc->x509_ca_list[j]);
 	}
 
 	for (j = 0; j < sc->x509_ncrls; j++) {
@@ -454,18 +454,18 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 	int flags /* OR of ConvFlags */)
 {
 	int ret = 0;
-	gnutls_x509_certificate cert;
+	gnutls_x509_crt cert;
 	
-	ret = gnutls_x509_certificate_init( &cert);
+	ret = gnutls_x509_crt_init( &cert);
 	if ( ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret = gnutls_x509_certificate_import( cert, derCert, GNUTLS_X509_FMT_DER);
+	ret = gnutls_x509_crt_import( cert, derCert, GNUTLS_X509_FMT_DER);
 	if ( ret < 0) {
 		gnutls_assert();
-		gnutls_x509_certificate_deinit( cert);
+		gnutls_x509_crt_deinit( cert);
 		return ret;
 	}
 	
@@ -475,7 +475,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 	if ( !(flags & CERT_NO_COPY)) {
 		if (_gnutls_set_datum(&gcert->raw, derCert->data, derCert->size) < 0) {
 			gnutls_assert();
-			gnutls_x509_certificate_deinit( cert);
+			gnutls_x509_crt_deinit( cert);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 	} else
@@ -484,22 +484,22 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 
 
 	if (flags & CERT_ONLY_EXTENSIONS || flags == 0) {
-		gnutls_x509_certificate_get_key_usage( cert, &gcert->keyUsage, NULL);
-		gcert->version = gnutls_x509_certificate_get_version( cert);
+		gnutls_x509_crt_get_key_usage( cert, &gcert->keyUsage, NULL);
+		gcert->version = gnutls_x509_crt_get_version( cert);
 	}
-	gcert->subject_pk_algorithm = gnutls_x509_certificate_get_pk_algorithm( cert, NULL);
+	gcert->subject_pk_algorithm = gnutls_x509_crt_get_pk_algorithm( cert, NULL);
 
 	if (flags & CERT_ONLY_PUBKEY || flags == 0) {
 		gcert->params_size = MAX_PARAMS_SIZE;
-		ret = _gnutls_x509_certificate_get_mpis( cert, gcert->params, &gcert->params_size);
+		ret = _gnutls_x509_crt_get_mpis( cert, gcert->params, &gcert->params_size);
 		if (ret < 0) {
 			gnutls_assert();
-			gnutls_x509_certificate_deinit( cert);
+			gnutls_x509_crt_deinit( cert);
 			return ret;
 		}
 	}
 
-	gnutls_x509_certificate_deinit( cert);
+	gnutls_x509_crt_deinit( cert);
 
 	return 0;
 

@@ -35,7 +35,7 @@
  *
  * Critical will be either 0 or 1.
  */
-int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const char* extension_id, 
+int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_id, 
 	int indx, gnutls_datum* ret, int * _critical)
 {
 	int k, result, len;

@@ -140,8 +140,8 @@ static int hostname_compare(const char *certname, const char *hostname)
 }
 
 /**
-  * gnutls_x509_certificate_check_hostname - This function compares the given hostname with the hostname in the certificate
-  * @cert: should contain an gnutls_x509_certificate structure
+  * gnutls_x509_crt_check_hostname - This function compares the given hostname with the hostname in the certificate
+  * @cert: should contain an gnutls_x509_crt structure
   * @hostname: A null terminated string that contains a DNS name
   *
   * This function will check if the given certificate's subject matches
@@ -151,7 +151,7 @@ static int hostname_compare(const char *certname, const char *hostname)
   * Returns non zero on success, and zero on failure.
   *
   **/
-int gnutls_x509_certificate_check_hostname(gnutls_x509_certificate cert,
+int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
                                 const char *hostname)
 {
 
@@ -179,7 +179,7 @@ int gnutls_x509_certificate_check_hostname(gnutls_x509_certificate cert,
 
       dnsnamesize = sizeof(dnsname);
       ret =
-          gnutls_x509_certificate_get_subject_alt_name(cert, i,
+          gnutls_x509_crt_get_subject_alt_name(cert, i,
                                         dnsname, &dnsnamesize, NULL);
 
       if (ret == GNUTLS_SAN_DNSNAME) {
@@ -195,7 +195,7 @@ int gnutls_x509_certificate_check_hostname(gnutls_x509_certificate cert,
       /* not got the necessary extension, use CN instead 
        */
       dnsnamesize = sizeof(dnsname);
-      if (gnutls_x509_certificate_get_dn_by_oid(cert, OID_X520_COMMON_NAME, 0,
+      if (gnutls_x509_crt_get_dn_by_oid(cert, OID_X520_COMMON_NAME, 0,
       		dnsname, &dnsnamesize) != 0) {
          /* got an error, can't find a name 
           */

@@ -103,47 +103,47 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 					  gnutls_x509_dn * ret)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int len, result;
 	
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 
 	len = sizeof( ret->country);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0,
+	gnutls_x509_crt_get_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0,
 		ret->country, &len);
 
 	len = sizeof( ret->organization);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
+	gnutls_x509_crt_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
 		ret->organization, &len);
 
 	len = sizeof( ret->organizational_unit_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
+	gnutls_x509_crt_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
 		ret->organizational_unit_name, &len);
 
 	len = sizeof( ret->common_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME, 0,
+	gnutls_x509_crt_get_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME, 0,
 		ret->common_name, &len);
 
 	len = sizeof( ret->locality_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
+	gnutls_x509_crt_get_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
 		ret->locality_name, &len);
 
 	len = sizeof( ret->state_or_province_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
+	gnutls_x509_crt_get_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
 		ret->state_or_province_name, &len);
 
 	len = sizeof( ret->email);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
+	gnutls_x509_crt_get_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
 		ret->email, &len);
 
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 
 	return 0;
 }
@@ -162,47 +162,47 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 						 gnutls_x509_dn * ret)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int len, result;
 	
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 
 	len = sizeof( ret->country);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0,
+	gnutls_x509_crt_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0,
 		ret->country, &len);
 
 	len = sizeof( ret->organization);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
+	gnutls_x509_crt_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
 		ret->organization, &len);
 
 	len = sizeof( ret->organizational_unit_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
+	gnutls_x509_crt_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
 		ret->organizational_unit_name, &len);
 
 	len = sizeof( ret->common_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME, 0,
+	gnutls_x509_crt_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME, 0,
 		ret->common_name, &len);
 
 	len = sizeof( ret->locality_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
+	gnutls_x509_crt_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
 		ret->locality_name, &len);
 
 	len = sizeof( ret->state_or_province_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
+	gnutls_x509_crt_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
 		ret->state_or_province_name, &len);
 
 	len = sizeof( ret->email);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
+	gnutls_x509_crt_get_issuer_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
 		ret->email, &len);
 
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 
 	return 0;
 }
@@ -231,21 +231,21 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
   **/
 int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, int seq, char *ret, int *ret_size)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int result;
 	
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_subject_alt_name( xcert, seq, ret, ret_size, NULL);
+	result = gnutls_x509_crt_get_subject_alt_name( xcert, seq, ret, ret_size, NULL);
 	
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return result;
 }
@@ -266,21 +266,21 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
   **/
 int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int result;
 	
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_ca_status( xcert, NULL);
+	result = gnutls_x509_crt_get_ca_status( xcert, NULL);
 	
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return result;
 }
@@ -298,21 +298,21 @@ time_t gnutls_x509_extract_certificate_activation_time(const
 							  gnutls_datum *
 							  cert)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	time_t result;
 
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_activation_time( xcert);
+	result = gnutls_x509_crt_get_activation_time( xcert);
 	
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return result;
 }
@@ -330,21 +330,21 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
 							  gnutls_datum *
 							  cert)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	time_t result;
 
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_expiration_time( xcert);
+	result = gnutls_x509_crt_get_expiration_time( xcert);
 	
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return result;
 }
@@ -359,21 +359,21 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
   **/
 int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int result;
 
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_version( xcert);
+	result = gnutls_x509_crt_get_version( xcert);
 	
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return result;
 
@@ -395,21 +395,21 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
   **/
 int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int ret;
 
-	ret = gnutls_x509_certificate_init( &xcert);
+	ret = gnutls_x509_crt_init( &xcert);
 	if (ret < 0) return ret;
 	
-	ret = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	ret = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (ret < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return ret;
 	}
 	
-	ret = gnutls_x509_certificate_get_serial( xcert, result, result_size);
+	ret = gnutls_x509_crt_get_serial( xcert, result, result_size);
 	
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return ret;
 }
@@ -502,21 +502,21 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
   **/
 int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int* bits)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int result;
 
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 	
-	result = gnutls_x509_certificate_get_pk_algorithm( xcert, bits);
+	result = gnutls_x509_crt_get_pk_algorithm( xcert, bits);
 	
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return result;
 }
@@ -539,24 +539,24 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf, 
    const gnutls_datum * cert, int issuer)
 {
-	gnutls_x509_certificate xcert;
+	gnutls_x509_crt xcert;
 	int result;
 
-	result = gnutls_x509_certificate_init( &xcert);
+	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
-	result = gnutls_x509_certificate_import( xcert, cert, GNUTLS_X509_FMT_DER);
+	result = gnutls_x509_crt_import( xcert, cert, GNUTLS_X509_FMT_DER);
 	if (result < 0) {
-		gnutls_x509_certificate_deinit( xcert);
+		gnutls_x509_crt_deinit( xcert);
 		return result;
 	}
 	
 	if (!issuer)
-		result = gnutls_x509_certificate_get_dn( xcert, buf, &sizeof_buf);
+		result = gnutls_x509_crt_get_dn( xcert, buf, &sizeof_buf);
 	else
-		result = gnutls_x509_certificate_get_issuer_dn( xcert, buf, &sizeof_buf);
+		result = gnutls_x509_crt_get_issuer_dn( xcert, buf, &sizeof_buf);
 
-	gnutls_x509_certificate_deinit( xcert);
+	gnutls_x509_crt_deinit( xcert);
 	
 	return result;
 }
@@ -604,8 +604,8 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	const gnutls_datum* CRL_list, int CRL_list_length)
 {
 	unsigned int verify;
-	gnutls_x509_certificate *peer_certificate_list = NULL;
-	gnutls_x509_certificate *ca_certificate_list = NULL;
+	gnutls_x509_crt *peer_certificate_list = NULL;
+	gnutls_x509_crt *ca_certificate_list = NULL;
 	gnutls_x509_crl *crl_list = NULL;
 	int peer_certificate_list_size=0, i, x, ret;
 	int ca_certificate_list_size=0, crl_list_size=0;
@@ -620,7 +620,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	peer_certificate_list =
 	    gnutls_calloc(1,
 			  peer_certificate_list_size *
-			  sizeof(gnutls_x509_certificate));
+			  sizeof(gnutls_x509_crt));
 	if (peer_certificate_list == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_MEMORY_ERROR;
@@ -631,7 +631,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	ca_certificate_list =
 	    gnutls_calloc(1,
 			  ca_certificate_list_size *
-			  sizeof(gnutls_x509_certificate));
+			  sizeof(gnutls_x509_crt));
 	if (ca_certificate_list == NULL) {
 		gnutls_assert();
 		ret = GNUTLS_E_MEMORY_ERROR;
@@ -654,14 +654,14 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	/* convert certA_list to gnutls_cert* list
 	 */
 	for (i = 0; i < peer_certificate_list_size; i++) {
-		ret = gnutls_x509_certificate_init( &peer_certificate_list[i]);
+		ret = gnutls_x509_crt_init( &peer_certificate_list[i]);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 				
 		ret =
-		     gnutls_x509_certificate_import(peer_certificate_list[i],
+		     gnutls_x509_crt_import(peer_certificate_list[i],
 					     &cert_list[i], GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
@@ -672,14 +672,14 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	/* convert CA_list to gnutls_x509_cert* list
 	 */
 	for (i = 0; i < ca_certificate_list_size; i++) {
-		ret = gnutls_x509_certificate_init(&ca_certificate_list[i]);
+		ret = gnutls_x509_crt_init(&ca_certificate_list[i]);
 		if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
 
 		ret =
-		     gnutls_x509_certificate_import(ca_certificate_list[i],
+		     gnutls_x509_crt_import(ca_certificate_list[i],
 					 &CA_list[i], GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
 			gnutls_assert();
@@ -708,7 +708,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	/* Verify certificate 
 	 */
 	ret =
-	    gnutls_x509_certificate_list_verify(peer_certificate_list,
+	    gnutls_x509_crt_list_verify(peer_certificate_list,
 				      peer_certificate_list_size,
 				      ca_certificate_list, ca_certificate_list_size, 
 				      crl_list, crl_list_size, 0, &verify);
@@ -725,13 +725,13 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 	if (peer_certificate_list != NULL)
 		for(x=0;x<peer_certificate_list_size;x++) {
 			if (peer_certificate_list[x] != NULL)
-				gnutls_x509_certificate_deinit(peer_certificate_list[x]);
+				gnutls_x509_crt_deinit(peer_certificate_list[x]);
 		}
 
 	if (ca_certificate_list != NULL)
 		for(x=0;x<ca_certificate_list_size;x++) {
 			if (ca_certificate_list[x] !=  NULL)
-				gnutls_x509_certificate_deinit(ca_certificate_list[x]);
+				gnutls_x509_crt_deinit(ca_certificate_list[x]);
 		}
 
 	if (crl_list != NULL)

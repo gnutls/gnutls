@@ -416,7 +416,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 /* Generate client certificate
  */
 
-int _gnutls_gen_x509_certificate(gnutls_session session, opaque ** data)
+int _gnutls_gen_x509_crt(gnutls_session session, opaque ** data)
 {
 	int ret, i;
 	opaque *pdata;
@@ -594,7 +594,7 @@ int _gnutls_gen_cert_client_certificate(gnutls_session session,
 			    (session, data);
 
 	case GNUTLS_CRT_X509:
-		return _gnutls_gen_x509_certificate(session, data);
+		return _gnutls_gen_x509_crt(session, data);
 
 	default:
 		gnutls_assert();
@@ -609,7 +609,7 @@ int _gnutls_gen_cert_server_certificate(gnutls_session session,
 	case GNUTLS_CRT_OPENPGP:
 		return _gnutls_gen_openpgp_certificate(session, data);
 	case GNUTLS_CRT_X509:
-		return _gnutls_gen_x509_certificate(session, data);
+		return _gnutls_gen_x509_crt(session, data);
 	default:
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;

@@ -310,7 +310,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
   *
   **/
 int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
-				   gnutls_x509_certificate_format format,
+				   gnutls_x509_crt_format format,
 				   gnutls_datum * prime,
 				   gnutls_datum * generator, int *bits)
 {
@@ -431,7 +431,7 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
   **/
 int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 				   const gnutls_datum * generator,
-				   gnutls_x509_certificate_format format,
+				   gnutls_x509_crt_format format,
 				   unsigned char* params_data, int* params_data_size)
 {
 	ASN1_TYPE c2;

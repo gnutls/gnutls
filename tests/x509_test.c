@@ -110,8 +110,8 @@ int _verify_x509_mem( const char* cert, int cert_size,
 	int ret;
 	unsigned int output;
 	gnutls_datum tmp;
-	gnutls_x509_certificate *x509_cert_list = NULL;
-	gnutls_x509_certificate x509_ca;
+	gnutls_x509_crt *x509_cert_list = NULL;
+	gnutls_x509_crt x509_ca;
 	gnutls_x509_crl *x509_crl_list = NULL;
 	int x509_ncerts, x509_ncrls;
 
@@ -120,13 +120,13 @@ int _verify_x509_mem( const char* cert, int cert_size,
 	tmp.data = (char*)ca;
 	tmp.size = ca_size;
 
-	ret = gnutls_x509_certificate_init( &x509_ca);
+	ret = gnutls_x509_crt_init( &x509_ca);
 	if (ret < 0) {
 		fprintf(stderr, "Error parsing the CA certificate: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 	
-	ret = gnutls_x509_certificate_import( x509_ca, &tmp, GNUTLS_X509_FMT_PEM);
+	ret = gnutls_x509_crt_import( x509_ca, &tmp, GNUTLS_X509_FMT_PEM);
 
 	if (ret < 0) {
 		fprintf(stderr, "Error parsing the CA certificate: %s\n", gnutls_strerror(ret));
@@ -186,9 +186,9 @@ int _verify_x509_mem( const char* cert, int cert_size,
 
 	do {
 		x509_cert_list =
-		    (gnutls_x509_certificate *) realloc( x509_cert_list,
+		    (gnutls_x509_crt *) realloc( x509_cert_list,
 						   i *
-						   sizeof(gnutls_x509_certificate));
+						   sizeof(gnutls_x509_crt));
 		if (x509_cert_list == NULL) {
 			fprintf(stderr, "memory error\n");
 			exit(1);
@@ -197,13 +197,13 @@ int _verify_x509_mem( const char* cert, int cert_size,
 		tmp.data = (char*)ptr;
 		tmp.size = siz;
 
-		ret = gnutls_x509_certificate_init( &x509_cert_list[i-1]);
+		ret = gnutls_x509_crt_init( &x509_cert_list[i-1]);
 		if (ret < 0) {
 			fprintf(stderr, "Error parsing the certificate[%d]: %s\n", i, gnutls_strerror(ret));
 			exit(1);
 		}
 	
-		ret = gnutls_x509_certificate_import( x509_cert_list[i-1], &tmp, GNUTLS_X509_FMT_PEM);
+		ret = gnutls_x509_crt_import( x509_cert_list[i-1], &tmp, GNUTLS_X509_FMT_PEM);
 		if (ret < 0) {
 			fprintf(stderr, "Error parsing the certificate[%d]: %s\n", i, gnutls_strerror(ret));
 			exit(1);
@@ -219,13 +219,13 @@ int _verify_x509_mem( const char* cert, int cert_size,
 
 	x509_ncerts = i - 1;
 
-	ret  = gnutls_x509_certificate_list_verify( x509_cert_list, x509_ncerts,
+	ret  = gnutls_x509_crt_list_verify( x509_cert_list, x509_ncerts,
 		&x509_ca, 1, x509_crl_list, x509_ncrls, 0, &output);
 
-	gnutls_x509_certificate_deinit( x509_ca);
+	gnutls_x509_crt_deinit( x509_ca);
 
 	for (i=0;i<x509_ncerts;i++) {
-		gnutls_x509_certificate_deinit( x509_cert_list[i]);
+		gnutls_x509_crt_deinit( x509_cert_list[i]);
 	}
 
 	for (i=0;i<x509_ncrls;i++) {

@@ -575,8 +575,8 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 }
 
 /**
-  * gnutls_x509_certificate_to_xml - This function parses an RDN sequence
-  * @cert: should contain a gnutls_x509_certificate structure
+  * gnutls_x509_crt_to_xml - This function parses an RDN sequence
+  * @cert: should contain a gnutls_x509_crt structure
   * @res: The datum that will hold the result
   * @detail: The detail level (must be 0 for now)
   *
@@ -585,7 +585,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_certificate_to_xml(gnutls_x509_certificate cert, gnutls_datum* res, int detail)
+int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail)
 {
 	int result;
 

@@ -81,7 +81,7 @@ void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7)
   *
   **/
 int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
-	gnutls_x509_certificate_format format)
+	gnutls_x509_crt_format format)
 {
 	int result = 0, need_free = 0;
 	gnutls_datum _data = { data->data, data->size };
