@@ -23,11 +23,15 @@
 #include <gnutls_compress.h>
 #include <gnutls_algorithms.h>
 #include "gnutls_errors.h"
-#include "../libextra/minilzo.h" /* get the prototypes only.
+#ifdef USE_MINILZO
+# include "../libextra/minilzo.h" /* get the prototypes only.
       *	Since LZO is a GPLed library, the gnutls_global_init_extra() has
       *	to be called, before LZO compression can be used.
       */
-	
+#else
+# include <lzo1x.h>
+#endif
+
 typedef int (*LZO_FUNC)();
 
 LZO_FUNC _gnutls_lzo1x_decompress_safe = NULL;

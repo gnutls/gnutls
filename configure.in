@@ -219,7 +219,7 @@ AC_MSG_RESULT([***
 *** Checking for external libraries...
 ])
 
-AM_PATH_LIBGCRYPT(1.1.11,,
+AM_PATH_LIBGCRYPT(1.1.8,,
  	AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from
@@ -245,23 +245,7 @@ AC_ARG_WITH( mhash, [  --with-mhash            enable libmhash support],
  [AC_CHECK_LIB(mhash, mhash_init, AC_DEFINE(USE_MHASH, 1, [Whether to use mhash]) 
 LIBS="${LIBS} -lmhash")])
 
-AC_MSG_CHECKING([whether to check for external libraries])
 
-dnl if used --without-ext-libraries then we will not check
-dnl for any library (libz)
-
-AC_ARG_WITH( ext-libraries, [  --without-ext-libraries disable external libraries support],
- ac_ext_libraries=$withval
-)
-
-if test x$ac_ext_libraries != xno; then
- AC_MSG_RESULT(yes)
- AC_CHECK_LIB(z, compress,,AC_MSG_WARN(
-*** 
-*** ZLIB was not found. You will not be able to use ZLIB compression.))
-else
- AC_MSG_RESULT()
-fi
 
 AC_MSG_CHECKING([whether to disable SRP authentication support])
 AC_ARG_ENABLE( srp-authentication, [  --disable-srp-authentication     disable the SRP authentication support],
@@ -314,15 +298,70 @@ AC_CHECK_LIB( tasn1, asn1_array2tree,:,
 
 )
 
-AC_MSG_RESULT([***
-*** Detecting options for shared libraries...
-])
-AM_PROG_LIBTOOL
-
-
 if test x$opt_developer_mode = xyes; then
  libtasn1_enabled=yes
+else
+ libtasn1_enabled=no
 fi
+
+
+dnl CHECK FOR ZLIB SUPPORT
+dnl
+
+AC_MSG_CHECKING([whether to include zlib compression support])
+
+AC_ARG_WITH( zlib, [  --without-zlib          disable zlib compression support],
+ ac_zlib=$withval,
+ ac_zlib=yes
+)
+
+if test x$ac_zlib != xno; then
+ AC_MSG_RESULT(yes)
+ AC_CHECK_LIB(z, compress,,AC_MSG_WARN(
+*** 
+*** ZLIB was not found. You will not be able to use ZLIB compression.))
+else
+ AC_MSG_RESULT(no)
+fi
+
+
+dnl CHECK FOR LZO SUPPORT (whether to use the included one)
+dnl
+
+if test x$opt_developer_mode = xyes; then
+ minilzo_enabled=yes
+fi
+
+AC_ARG_WITH(included-lzo,
+	[  --with-included-lzo     include minilzo in libgnutls-extra],
+ minilzo_enabled=$withval,
+ minilzo_enabled=no
+)
+
+AC_MSG_CHECKING([whether to use the included lzo compression library])
+
+AC_MSG_RESULT($minilzo_enabled)
+
+if test x$minilzo_enabled = xno; then
+AC_CHECK_LIB( lzo, lzo1x_1_compress, minilzo_enabled=no, 
+ minilzo_enabled=yes
+ AC_MSG_WARN(
+*** 
+*** Liblzo was not found. Will use the included minilzo.))
+fi
+
+if test x"$minilzo_enabled" = xyes; then
+ AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
+ LZO_OBJECTS="minilzo.lo"
+else
+ LZO_LINK=-llzo
+fi
+
+AC_SUBST(LZO_OBJECTS)
+AC_SUBST(LZO_LINK)
+
+dnl CHECK FOR THE LIBTASN1 LIBRARY or use the included one
+dnl
 
 if test x"$libtasn1_enabled" = xyes; then
  MINITASN1_OBJECTS="minitasn1/coding.lo minitasn1/decoding.lo minitasn1/element.lo \
@@ -337,6 +376,13 @@ AC_SUBST(MINITASN1_DIR)
 AC_SUBST(LIBASN1_LINK)
 
 
+
+AC_MSG_RESULT([***
+*** Detecting options for shared libraries...
+])
+AM_PROG_LIBTOOL
+
+
 LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBASN1_LINK $LIBGCRYPT_LIBS"
 LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
 
@@ -348,7 +394,7 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 SERV_LIBS="$LIBS $SERV_LIBS"
 AC_SUBST(SERV_LIBS)
 
-LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra -lgnutls $LIBOPENCDK_LIBS"
+LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra -lgnutls $LIBOPENCDK_LIBS $LZO_LINK"
 LIBGNUTLS_EXTRA_CFLAGS="$LIBOPENCDK_CFLAGS -I${includedir}"
 
 AC_SUBST(LIBGNUTLS_EXTRA_LIBS)

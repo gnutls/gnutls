@@ -6,6 +6,8 @@ Version 0.7.0
 - Added SRP-6 support. Follows draft-ietf-tls-srp-04.
 - If libtasn1 is not present in the system, it is included in 
   the main gnutls library.
+- If liblzo is present in the system, then the included minilzo
+  will not be used, and libgnutls-extra will depend on liblzo.
 
 Version 0.6.0 (8/12/2002)
 - Added "gnutls/compat4.h" header. This is included in gnutls.h
