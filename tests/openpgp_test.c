@@ -140,7 +140,7 @@ main( int argc, char ** argv )
     for( i = 0; i < fprlen/2; i++ )
         printf( "%02X%02X ", fpr[2*i], fpr[2*i+1] );
     printf( "\n" );
-    gnutls_free_datum( &pk );
+    _gnutls_free_datum( &pk );
     
     #if 0
     rc = gnutls_openpgp_key_to_xml( &dat, &xml, 1 );
@@ -148,10 +148,10 @@ main( int argc, char ** argv )
     assert( rc == 0 );
     xml.data[xml.size] = '\0';
     printf( "%s\n", xml.data );
-    gnutls_free_datum( &xml );
+    _gnutls_free_datum( &xml );
     #endif
 
-    gnutls_free_datum( &dat );
+    _gnutls_free_datum( &dat );
     gnutls_certificate_free_cred( ctx );
 
     return 0;
