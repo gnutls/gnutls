@@ -36,7 +36,7 @@
  */
 
 int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result, GNUTLS_MPI g,
-		   GNUTLS_MPI prime, ALLOC_FUNC galloc_func)
+		   GNUTLS_MPI prime, gnutls_alloc_function galloc_func)
 {
 	GNUTLS_MPI x, e;
 	size_t result_size;

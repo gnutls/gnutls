@@ -42,7 +42,7 @@ int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, c
 
 const char* gnutls_srp_server_get_username( gnutls_session state);
 
-typedef int gnutls_srp_server_select_function(gnutls_session, char **, char**, int);
+typedef int gnutls_srp_server_select_function(gnutls_session, const char **, const char**, unsigned int);
 
 void gnutls_srp_server_set_select_function( gnutls_session, gnutls_srp_server_select_function *);
 

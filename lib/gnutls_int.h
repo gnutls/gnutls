@@ -394,9 +394,12 @@ typedef struct {
 	unsigned int algorithms;
 } GNUTLS_Priority;
 
-typedef int certificate_client_select_func(struct gnutls_session_int*, const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int certificate_server_select_func(struct gnutls_session_int*, const gnutls_datum *, int);
-typedef int srp_server_select_func(struct gnutls_session_int*, char**, char**, int);
+typedef int certificate_client_select_func(struct gnutls_session_int*, 
+	const gnutls_datum *, unsigned int, const gnutls_datum *, unsigned int);
+typedef int certificate_server_select_func(struct gnutls_session_int*, 
+	const gnutls_datum *, unsigned int);
+typedef int srp_server_select_func(struct gnutls_session_int*, 
+	const char**, const char**, unsigned int);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];

@@ -34,8 +34,10 @@ typedef enum gnutls_x509_subject_alt_name {
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
 
-typedef int gnutls_certificate_client_select_function(gnutls_session, const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int gnutls_certificate_server_select_function(gnutls_session, const gnutls_datum *, int);
+typedef int gnutls_certificate_client_select_function(gnutls_session, 
+	const gnutls_datum *, unsigned int, const gnutls_datum *, unsigned int);
+typedef int gnutls_certificate_server_select_function(gnutls_session, 
+	const gnutls_datum *, unsigned int);
 
 /* Functions that allow AUTH_INFO structures handling
  */

@@ -261,7 +261,8 @@ SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	/* use the callback to select a password file */
 	if (state->internals.server_srp_callback!=NULL) {
 		pwd_index = state->internals.server_srp_callback(
-			state, cred->password_file, cred->password_conf_file,
+			state, (const char**)cred->password_file, 
+				(const char**)cred->password_conf_file,
 				cred->password_files);
 
 		if (pwd_index < 0) {
