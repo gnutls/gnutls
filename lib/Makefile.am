@@ -4,8 +4,8 @@ bin_SCRIPTS = libgnutls-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
 
-DIST_SUBDIRS = minitasn1 x509
-SUBDIRS = $(MINITASN1_DIR) x509
+DIST_SUBDIRS = minitasn1
+SUBDIRS = $(MINITASN1_DIR)
 
 EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_cipher.h gnutls_buffers.h gnutls_errors.h gnutls_int.h \
@@ -17,8 +17,8 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
 	gnutls-api.tex gnutls_datum.h auth_cert.h gnutls_mpi.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
-	gnutls_privkey.h gnutls_constate.h gnutls_global.h \
-	gnutls_sig.h gnutls_mem.h gnutls_ui.h \
+	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
+	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
 	io_debug.h ext_max_record.h gnutls_session_pack.h \
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h \
 	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h auth_dh_common.h \
@@ -33,32 +33,30 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_compress_int.c gnutls_session.c gnutls_db.c x509_b64.c \
 	auth_anon.c gnutls_extensions.c gnutls_auth.c gnutls_random.c \
 	gnutls_v2_compat.c gnutls_datum.c auth_rsa.c gnutls_session_pack.c \
-	gnutls_mpi.c gnutls_pk.c gnutls_cert.c \
+	gnutls_mpi.c gnutls_pk.c gnutls_cert.c x509_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
-	pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c \
-	auth_cert.c gnutls_ui.c gnutls_sig.c auth_dhe.c \
+	x509_sig_check.c pkix_asn1_tab.c gnutls_asn1_tab.c gnutls_mem.c \
+	x509_extensions.c auth_cert.c gnutls_ui.c gnutls_sig.c auth_dhe.c \
 	gnutls_dh_primes.c ext_max_record.c gnutls_alert.c gnutls_int_compat.c \
 	gnutls_str.c gnutls_state.c gnutls_x509.c ext_cert_type.c \
-	gnutls_rsa_export.c auth_rsa_export.c \
-	ext_server_name.c auth_dh_common.c \
-	dh_compat.c rsa_compat.c
+	x509_xml.c gnutls_rsa_export.c auth_rsa_export.c rfc2818_hostname.c \
+	ext_server_name.c auth_dh_common.c
 
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(COBJECTS) 
 
-libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/dn.lo x509/crl.lo x509/common.lo \
-	x509/x509.lo x509/pkcs7.lo x509/extensions.lo x509/compat.lo x509/verify.lo \
-	x509/mpi.lo x509/privkey.lo
+libgnutls_la_LIBADD = $(MINITASN1_OBJECTS)
 
 libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) #-export-symbols gnutls.sym
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+	-export-symbols gnutls.sym
 
 pkix_asn1_tab.c: pkix.asn
-	-asn1Parser pkix.asn pkix_asn1_tab.c
+	-../libtasn1/src/asn1c pkix.asn pkix_asn1_tab.c
 
 gnutls_asn1_tab.c: gnutls.asn
-	-asn1Parser gnutls.asn gnutls_asn1_tab.c
+	-../libtasn1/src/asn1c gnutls.asn gnutls_asn1_tab.c
 
 gnutls-api.tex: $(COBJECTS)
 	@echo "" > gnutls-api.tex
@@ -67,4 +65,4 @@ gnutls-api.tex: $(COBJECTS)
 	&& echo "ok"; \
 	done
 
-all-local: gnutls-api.tex
+dist-hook: gnutls-api.tex
