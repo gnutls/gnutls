@@ -503,6 +503,40 @@ gc_hash_close (gc_hash handle)
   free (hinf);
 }
 
+int
+gc_hash_buffer (int hash, const char *in, size_t inlen, char *out)
+{
+  switch (hash)
+    {
+    case GC_MD5:
+      {
+	struct md5_ctx md5;
+
+	md5_init (&md5);
+	md5_update (&md5, inlen, in);
+	md5_digest (&md5, GC_MD5_LEN, out);
+      }
+      break;
+
+    case GC_SHA1:
+      {
+	struct sha1_ctx sha1;
+
+	sha1_init (&sha1);
+	sha1_update (&sha1, inlen, in);
+	sha1_digest (&sha1, GC_SHA1_LEN, out);
+      }
+      break;
+
+      /* FIXME: RMD160. */
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  return GC_OK;
+}
+
 /**
  * gc_md5:
  * @in: input character array of data to hash.

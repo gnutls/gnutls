@@ -322,6 +322,34 @@ gc_hash_close (gc_hash handle)
 }
 
 int
+gc_hash_buffer (int hash, const char *in, size_t inlen, char *out)
+{
+  int gcryalg;
+
+  switch (hash)
+    {
+    case GC_MD5:
+      gcryalg = GCRY_MD_MD5;
+      break;
+
+    case GC_SHA1:
+      gcryalg = GCRY_MD_SHA1;
+      break;
+
+    case GC_RMD160:
+      gcryalg = GCRY_MD_RMD160;
+      break;
+
+    default:
+      return GC_INVALID_HASH;
+    }
+
+  gcry_md_hash_buffer(gcryalg, out, in, inlen);
+
+  return GC_OK;
+}
+
+int
 gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN])
 {
   size_t outlen = gcry_md_get_algo_dlen (GCRY_MD_MD5);

@@ -115,8 +115,8 @@ extern const char *gc_hash_read (gc_hash handle);
 extern void gc_hash_close (gc_hash handle);
 
 /* One-call interface. */
+extern int gc_hash_buffer (int hash, const char *in, size_t inlen, char *out);
 extern int gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN]);
-
 extern int gc_hmac_md5 (const char *key, size_t keylen,
 			const char *in, size_t inlen,
 			char outhash[GC_MD5_LEN]);
