@@ -37,7 +37,6 @@
 #include <signal.h>
 #include "serv-gaa.h"
 #include <sys/time.h>
-#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <config.h>
 #include <list.h>
@@ -558,7 +557,10 @@ int main(int argc, char **argv)
 	lloopstart (listener_list, j) {
 
 	    val = fcntl (j->fd, F_GETFL, 0);
-	    fcntl (j->fd, F_SETFL, val | O_NONBLOCK);
+	    if (fcntl (j->fd, F_SETFL, val | O_NONBLOCK) < 0) {
+	    	perror("fcntl()");
+	    	exit(1);
+	    }
 
 	    if (j->http_state == HTTP_STATE_REQUEST) {
 		FD_SET (j->fd, &rd);
@@ -605,8 +607,7 @@ int main(int argc, char **argv)
 		j->http_request = (char *) strdup ("");
 		j->http_state = HTTP_STATE_REQUEST;
 		j->fd = accept_fd;
-		if (ioctl (accept_fd, FIONBIO, &yes))
-		    perror ("ioctl()");
+
 		j->tstate = tstate;
                 gnutls_transport_set_ptr( tstate, accept_fd);
 		j->handshake_ok = 0;
