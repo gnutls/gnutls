@@ -56,11 +56,11 @@ int gnutls_x509_certificate_import(gnutls_x509_certificate cert, const gnutls_da
 int gnutls_x509_certificate_get_issuer_dn(gnutls_x509_certificate cert, char *buf,
 	 int *sizeof_buf);
 int gnutls_x509_certificate_get_issuer_dn_by_oid(gnutls_x509_certificate cert, 
-	const char* oid, char *buf, int *sizeof_buf);
+	const char* oid, int indx, char *buf, int *sizeof_buf);
 int gnutls_x509_certificate_get_dn(gnutls_x509_certificate cert, char *buf,
 	 int *sizeof_buf);
 int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, 
-	const char* oid, char *buf, int *sizeof_buf);
+	const char* oid, int indx, char *buf, int *sizeof_buf);
 
 int gnutls_x509_certificate_get_signed_data(gnutls_x509_certificate cert, gnutls_datum *data);
 int gnutls_x509_certificate_get_signature(gnutls_x509_certificate cert, gnutls_datum *data);
@@ -91,17 +91,20 @@ int gnutls_x509_certificate_get_key_usage( gnutls_x509_certificate cert, unsigne
 #define GNUTLS_KEY_ENCIPHER_ONLY		2
 #define GNUTLS_KEY_DECIPHER_ONLY		1
 
-int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, const char* oid,
+int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, 
+	const char* oid, int indx,
 	unsigned char* buf, int * sizeof_buf, int * critical);
 
 int gnutls_x509_certificate_to_xml(gnutls_x509_certificate cert, gnutls_datum* res, int detail);
+
+
 
 /* RDN handling */
 int gnutls_x509_rdn_get(const gnutls_datum * idn,
 				  char *buf, unsigned int *sizeof_buf);
 
 int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
-				  char *buf, unsigned int *sizeof_buf);
+	int indx, char *buf, unsigned int *sizeof_buf);
 
 
 /* CRL handling functions */
@@ -117,8 +120,8 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 
 int gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl crl, 
 	char *buf, int *sizeof_buf);
-int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, const char* oid, 
-	char *buf, int *sizeof_buf);
+int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, 
+	const char* oid, int indx, char *buf, int *sizeof_buf);
 
 
 int gnutls_x509_crl_get_signed_data(gnutls_x509_crl crl, gnutls_datum *data);
@@ -153,6 +156,12 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx, 
 	char* certificate, int* certificate_size);
+
+/* X.509 Certificate verification functions.
+ */
+int gnutls_x509_certificate_list_verify( gnutls_x509_certificate* cert_list, int cert_list_length, 
+	gnutls_x509_certificate * CA_list, int CA_list_length, 
+	gnutls_x509_crl * CRL_list, int CRL_list_length, unsigned int *verify);
 
 
 #ifdef __cplusplus

@@ -36,7 +36,7 @@
  * Critical will be either 0 or 1.
  */
 int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const char* extension_id, 
-	gnutls_datum* ret, int * _critical)
+	int indx, gnutls_datum* ret, int * _critical)
 {
 	int k, result, len;
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
@@ -45,6 +45,7 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 	int critical = 0;
 	char extnID[128];
 	char extnValue[256];
+	int indx_counter = 0;
 
 	ret->data = NULL;
 	ret->size = 0;
@@ -130,7 +131,9 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 			}
 
 			/* Handle Extension */
-			if ( strcmp(extnID, extension_id)==0) { /* extension was found */
+			if ( strcmp(extnID, extension_id)==0 && indx == indx_counter++) { 
+				/* extension was found */
+
 				ret->data = gnutls_malloc( len);
 				if (ret->data==NULL)
 					return GNUTLS_E_MEMORY_ERROR;	
@@ -163,13 +166,13 @@ int _gnutls_x509_certificate_get_extension( gnutls_x509_certificate cert, const 
 int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 			     int extnValueLen)
 {
-	ASN1_TYPE ext;
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
 	char str[10];
 	int len, result;
 
 	keyUsage[0] = 0;
 
-	if ((result=_gnutls_asn1_create_element
+	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext,
 	     "ku")) != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -204,13 +207,13 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 int _gnutls_x509_ext_extract_basicConstraints(int *CA, opaque * extnValue,
 				     int extnValueLen)
 {
-	ASN1_TYPE ext;
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
 	char str[128];
 	int len, result;
 
 	*CA = 0;
 
-	if ((result=_gnutls_asn1_create_element
+	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext,
 	     "bc")) != ASN1_SUCCESS) {
 		gnutls_assert();

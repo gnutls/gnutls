@@ -64,25 +64,25 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 	memset( rdn, 0, sizeof(gnutls_x509_dn));
 
 	len = sizeof(rdn->country);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_COUNTRY_NAME, rdn->country, &len);
+	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_COUNTRY_NAME, 0, rdn->country, &len);
 
 	len = sizeof(rdn->organization);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_ORGANIZATION_NAME, rdn->organization, &len);
+	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_ORGANIZATION_NAME, 0, rdn->organization, &len);
 
 	len = sizeof(rdn->organizational_unit_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, rdn->organizational_unit_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, rdn->organizational_unit_name, &len);
 
 	len = sizeof(rdn->common_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_COMMON_NAME, rdn->common_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_COMMON_NAME, 0, rdn->common_name, &len);
 
 	len = sizeof(rdn->locality_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_LOCALITY_NAME, rdn->locality_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_LOCALITY_NAME, 0, rdn->locality_name, &len);
 
 	len = sizeof(rdn->state_or_province_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, rdn->state_or_province_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, rdn->state_or_province_name, &len);
 
 	len = sizeof(rdn->email);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_PKCS9_EMAIL, rdn->email, &len);
+	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_PKCS9_EMAIL, 0, rdn->email, &len);
 
 	asn1_delete_structure(&dn);
 
@@ -116,31 +116,31 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 	}
 
 	len = sizeof( ret->country);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME,
+	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0,
 		ret->country, &len);
 
 	len = sizeof( ret->organization);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME,
+	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
 		ret->organization, &len);
 
 	len = sizeof( ret->organizational_unit_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
+	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
 		ret->organizational_unit_name, &len);
 
 	len = sizeof( ret->common_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME,
+	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME, 0,
 		ret->common_name, &len);
 
 	len = sizeof( ret->locality_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME,
+	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
 		ret->locality_name, &len);
 
 	len = sizeof( ret->state_or_province_name);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
+	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
 		ret->state_or_province_name, &len);
 
 	len = sizeof( ret->email);
-	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL,
+	gnutls_x509_certificate_get_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
 		ret->email, &len);
 
 	gnutls_x509_certificate_deinit( xcert);
@@ -175,31 +175,31 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 	}
 
 	len = sizeof( ret->country);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME,
+	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0,
 		ret->country, &len);
 
 	len = sizeof( ret->organization);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME,
+	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
 		ret->organization, &len);
 
 	len = sizeof( ret->organizational_unit_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
+	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
 		ret->organizational_unit_name, &len);
 
 	len = sizeof( ret->common_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME,
+	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_COMMON_NAME, 0,
 		ret->common_name, &len);
 
 	len = sizeof( ret->locality_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME,
+	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
 		ret->locality_name, &len);
 
 	len = sizeof( ret->state_or_province_name);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
+	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0,
 		ret->state_or_province_name, &len);
 
 	len = sizeof( ret->email);
-	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL,
+	gnutls_x509_certificate_get_issuer_dn_by_oid( xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
 		ret->email, &len);
 
 	gnutls_x509_certificate_deinit( xcert);

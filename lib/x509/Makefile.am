@@ -1,15 +1,16 @@
 INCLUDES = -I../ -I../minitasn1/ -I../../includes/
 EXTRA_DIST = crl.h dn.h common.h x509.h extensions.h pkcs7.h \
-	x509-api.tex compat.h
+	x509-api.tex compat.h verify.h mpi.h
 
 noinst_LTLIBRARIES = libx509.la
 
 COBJECTS = crl.c dn.c common.c x509.c extensions.c \
-	pkcs7.c compat.c xml.c rfc2818_hostname.c
+	pkcs7.c xml.c rfc2818_hostname.c verify.c mpi.c
+
+COMPAT_OBJECTS = compat.c
 
 
-
-libx509_la_SOURCES = $(COBJECTS)
+libx509_la_SOURCES = $(COBJECTS) $(COMPAT_OBJECTS)
 
 x509-api.tex: $(COBJECTS)
 	@echo "" > x509-api.tex

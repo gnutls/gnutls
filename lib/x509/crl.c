@@ -235,6 +235,7 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
   * gnutls_x509_crl_get_issuer_dn_by_oid - This function returns the CRL's issuer distinguished name
   * @crl: should contain a gnutls_x509_crl structure
   * @oid: holds an Object Identified in null terminated string
+  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @buf: a pointer to a structure to hold the peer's name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   *
@@ -250,15 +251,15 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
   * On success zero is returned.
   *
   **/
-int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, const char* oid, char *buf,
-					 int *sizeof_buf)
+int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, const char* oid, 
+	int indx, char *buf, int *sizeof_buf)
 {
 	if (sizeof_buf == 0 || crl == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	return _gnutls_x509_parse_dn_oid( crl->crl, "crl2.tbsCertList.issuer.rdnSequence", oid,
-		buf, sizeof_buf);
+		indx, buf, sizeof_buf);
 
 		
 }

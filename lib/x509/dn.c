@@ -109,7 +109,6 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	char escaped[256];
 	const char *ldap_desc;
 	char oid[128];
-	int first = 0;
 	int len, printable;
 
 	if (*sizeof_buf == 0) {
@@ -220,18 +219,24 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	gnutls_assert(); \
 	goto cleanup; \
 }
+			/*   The encodings of adjoining RelativeDistinguishedNames are separated
+			 *   by a comma character (',' ASCII 44).
+			 */
 
-			if (k2 != 1) {	/* the first time do not append a comma */
-				STR_APPEND(",");
+			/*   Where there is a multi-valued RDN, the outputs from adjoining
+			 *   AttributeTypeAndValues are separated by a plus ('+' ASCII 43)
+			 *   character.
+			 */
+			if (k1 != 1) {	/* the first time do not append a comma */
+				if (k2 != 1) { /* adjoining multi-value RDN */
+					STR_APPEND("+");
+				} else {
+					STR_APPEND(",");
+				}
 			}
 
 			ldap_desc = oid2ldap_string(oid);
 			printable = _gnutls_x509_oid_data_printable(oid);
-
-			if (first != 0) {
-				STR_APPEND(",");
-			}
-			first = 1;
 
 			if (printable == 1) {
 				char string[256];
@@ -294,10 +299,13 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
  *
  * asn1_rdn_name must be a string in the form "crl2.tbsCertificate.issuer.rdnSequence".
  * That is to point in the rndSequence.
+ *
+ * indx specifies which OID to return. Ie 0 means return the first specified
+ * OID found, 1 the second etc.
  */
 int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 			      const char *asn1_rdn_name,
-			      const char *given_oid, char *buf,
+			      const char *given_oid, int indx, char *buf,
 			      int *sizeof_buf)
 {
 	int k2, k1, result;
@@ -309,6 +317,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 	char escaped[256];
 	char oid[128];
 	int len, printable;
+	int i = 0;
 
 	if (*sizeof_buf == 0) {
 		gnutls_assert();
@@ -395,8 +404,8 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 				goto cleanup;
 			}
 
-			if (strcmp(oid, given_oid) == 0) {
-
+			if (strcmp(oid, given_oid) == 0 && indx == i++) { /* Found the OID */
+				
 				/* Read the Value 
 				 */
 				_gnutls_str_cpy(tmpbuffer3,
@@ -442,13 +451,14 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 							    (escaped));
 					if (res) {
 						int size = strlen(res) + 1;
-						if (size > *sizeof_buf) {
+						if (size + 1 > *sizeof_buf) {
 							*sizeof_buf = size;
 							return
 							    GNUTLS_E_SHORT_MEMORY_BUFFER;
 						}
-						*sizeof_buf = size - 1;
-						strcpy(buf, res);
+						*sizeof_buf = size; /* -1 for the null +1 for the '#' */
+						strcpy(buf, "#");
+						strcat(buf, res);
 
 						return 0;
 					} else {
@@ -489,7 +499,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
 				  char *buf, unsigned int *sizeof_buf)
 {
 	int result;
-	ASN1_TYPE dn;
+	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
 
 	if (sizeof_buf == 0) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -500,7 +510,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
 
 
 	if ((result =
-	     _gnutls_asn1_create_element(_gnutls_get_pkix(),
+	     asn1_create_element(_gnutls_get_pkix(),
 					 "PKIX1.Name", &dn,
 					 "dn")) != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -526,6 +536,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
   * gnutls_x509_rdn_get_by_oid - This function parses an RDN sequence and returns a string
   * @idn: should contain a DER encoded RDN sequence
   * @oid: an Object Identifier
+  * @indx: In case multiple same OIDs exist in the RDN indicates which to send. Use 0 for the first one.
   * @buf: a pointer to a structure to hold the peer's name
   * @sizeof_buf: holds the size of 'buf'
   *
@@ -537,11 +548,11 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
   * and 0 on success.
   *
   **/
-int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
+int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid, int indx,
 				  char *buf, unsigned int *sizeof_buf)
 {
 	int result;
-	ASN1_TYPE dn;
+	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
 
 	if (sizeof_buf == 0) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -552,7 +563,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
 
 
 	if ((result =
-	     _gnutls_asn1_create_element(_gnutls_get_pkix(),
+	     asn1_create_element(_gnutls_get_pkix(),
 					 "PKIX1.Name", &dn,
 					 "dn")) != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -567,7 +578,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_parse_dn_oid(dn, "dn", oid, buf, sizeof_buf);
+	result = _gnutls_x509_parse_dn_oid(dn, "dn", oid, indx, buf, sizeof_buf);
 
 	asn1_delete_structure(&dn);
 	return result;

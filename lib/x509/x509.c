@@ -93,14 +93,14 @@ int gnutls_x509_certificate_import(gnutls_x509_certificate cert, const gnutls_da
 		opaque *out;
 		
 		/* Try the first header */
-		result = _gnutls_fbase64_decode(PEM_X509_CERT, data->data, data->size,
+		result = _gnutls_fbase64_decode(PEM_X509_CERT2, data->data, data->size,
 			&out);
 
 		if (result <= 0) {
 			/* try for the second header */
-			result = _gnutls_fbase64_decode(PEM_X509_CERT2, data->data, data->size,
+			result = _gnutls_fbase64_decode(PEM_X509_CERT, data->data, data->size,
 				&out);
-			
+
 			if (result <= 0) {
 				if (result==0) result = GNUTLS_E_INTERNAL_ERROR;
 				gnutls_assert();
@@ -243,6 +243,7 @@ int gnutls_x509_certificate_get_issuer_dn(gnutls_x509_certificate cert, char *bu
   * gnutls_x509_certificate_get_issuer_dn_by_oid - This function returns the Certificate's issuer distinguished name
   * @cert: should contain a gnutls_x509_certificate structure
   * @oid: holds an Object Identified in null terminated string
+  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   *
@@ -258,15 +259,15 @@ int gnutls_x509_certificate_get_issuer_dn(gnutls_x509_certificate cert, char *bu
   * On success zero is returned.
   *
   **/
-int gnutls_x509_certificate_get_issuer_dn_by_oid(gnutls_x509_certificate cert, const char* oid, char *buf,
-					 int *sizeof_buf)
+int gnutls_x509_certificate_get_issuer_dn_by_oid(gnutls_x509_certificate cert, const char* oid, 
+	int indx, char *buf, int *sizeof_buf)
 {
 	if (sizeof_buf == 0 || cert == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	return _gnutls_x509_parse_dn_oid( cert->cert, "cert2.tbsCertificate.issuer.rdnSequence", oid,
-		buf, sizeof_buf);
+		indx, buf, sizeof_buf);
 
 		
 }
@@ -304,6 +305,7 @@ int gnutls_x509_certificate_get_dn(gnutls_x509_certificate cert, char *buf,
   * gnutls_x509_certificate_get_dn_by_oid - This function returns the Certificate's distinguished name
   * @cert: should contain a gnutls_x509_certificate structure
   * @oid: holds an Object Identified in null terminated string
+  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   *
@@ -319,15 +321,15 @@ int gnutls_x509_certificate_get_dn(gnutls_x509_certificate cert, char *buf,
   * On success zero is returned.
   *
   **/
-int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, const char* oid, char *buf,
-					 int *sizeof_buf)
+int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, const char* oid, 
+	int indx, char *buf, int *sizeof_buf)
 {
 	if (sizeof_buf == 0 || cert == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	return _gnutls_x509_parse_dn_oid( cert->cert, "cert2.tbsCertificate.subject.rdnSequence", oid,
-		buf, sizeof_buf);
+		indx, buf, sizeof_buf);
 
 		
 }
@@ -520,6 +522,7 @@ int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int*
 	    asn1_read_value
 	    (cert->cert, "cert2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 	     str, &len);
+	len /= 8;
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -528,7 +531,7 @@ int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int*
 
 
 	if (algo==GNUTLS_PK_RSA) {
-		if ((result=_gnutls_x509_read_rsa_params( str, len/8, params)) < 0) {
+		if ((result=_gnutls_x509_read_rsa_params( str, len, params)) < 0) {
 			gnutls_assert();
 			return result;
 		}
@@ -542,7 +545,7 @@ int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int*
 	if (algo==GNUTLS_PK_DSA) {
 
 		if ((result =
-		     _gnutls_x509_read_dsa_pubkey(str, len / 8, params)) < 0) {
+		     _gnutls_x509_read_dsa_pubkey(str, len, params)) < 0) {
 			gnutls_assert();
 			return result;
 		}
@@ -582,7 +585,7 @@ int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert,
 {
 	int result;
 	gnutls_datum dnsname;
-	ASN1_TYPE c2;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	char nptr[128];
 	char ext_data[256];
 	int len;
@@ -592,7 +595,7 @@ int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert,
 	memset(ret, 0, *ret_size);
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 17", &dnsname, critical)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 17", 0, &dnsname, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}
@@ -602,7 +605,7 @@ int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if ((result=_gnutls_asn1_create_element
+	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.SubjectAltName", &c2, "san"))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -645,6 +648,7 @@ int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert,
 
 	type = _gnutls_x509_san_find_type( ext_data);
 	if (type == (gnutls_x509_subject_alt_name)-1) {
+		asn1_delete_structure(&c2);
 		gnutls_assert();
 		return GNUTLS_E_X509_UNKNOWN_SAN;
 	}
@@ -691,7 +695,7 @@ int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert, int* cri
 	int ca;
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 19", &basicConstraints, critical)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 19", 0, &basicConstraints, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}
@@ -740,7 +744,7 @@ int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned
 	uint16 _usage;
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 15", &keyUsage, critical)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, "2 5 29 15", 0, &keyUsage, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}
@@ -768,6 +772,7 @@ int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned
   * gnutls_x509_certificate_get_extension_by_oid - This function returns the specified extension
   * @cert: should contain a gnutls_x509_certificate structure
   * @oid: holds an Object Identified in null terminated string
+  * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use zero to get the first one.
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   * @critical: will be non zero if the extension is marked as critical
@@ -782,13 +787,13 @@ int gnutls_x509_certificate_get_key_usage(gnutls_x509_certificate cert, unsigned
   *
   **/
 int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, const char* oid,
-	unsigned char* buf, int * sizeof_buf, int * critical)
+	int indx, unsigned char* buf, int * sizeof_buf, int * critical)
 {
 	int result;
 	gnutls_datum output;
 
 	if ((result =
-	     _gnutls_x509_certificate_get_extension(cert, oid, &output, critical)) < 0) {
+	     _gnutls_x509_certificate_get_extension(cert, oid, indx, &output, critical)) < 0) {
 	     	gnutls_assert();
 		return result;
 	}

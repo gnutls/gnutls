@@ -1,15 +1,9 @@
 #include <stdio.h>
-#include <gnutls_int.h>
-#include <gnutls_x509.h>
-#include <gnutls_cert.h>
-#include <gnutls_errors.h>
-#include <x509_b64.h>
-#include <x509_verify.h>
-#include <gnutls_global.h>
+#include <stdlib.h>
+#include <string.h>
+#include <gnutls/x509.h>
 
-/* FIXME: This test uses gnutls internals. Rewrite it using
- * the exported stuff. (I leave it as an exercise to the reader :)
- */
+#include <dmalloc.h>
 
 #define MAX_FILE_SIZE 16*1024
 
@@ -20,7 +14,7 @@ struct file_res {
 
 static struct file_res test_files[] = {
 	{ "test1.pem",  0 },
-	{ "test2.pem", GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED },
+	{ "test2.pem", GNUTLS_CERT_NOT_TRUSTED },
 	{ "test3.pem", GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED },
 	{ "test10.pem", 0 },
 	{ "test13.pem", GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED },
@@ -34,7 +28,7 @@ static struct file_res test_files[] = {
 
 #define CA_FILE "ca.pem"
 
-int _gnutls_verify_x509_file( const char* certfile, const char *cafile);
+int _verify_x509_file( const char* certfile, const char *cafile);
 
 
 static void print_res( int x) 
@@ -69,7 +63,7 @@ int i = 0, exp_result;
 		file = test_files[i++].test_file;
 
 		if (file==NULL) break;
-		x = _gnutls_verify_x509_file( file, CA_FILE);
+		x = _verify_x509_file( file, CA_FILE);
 
 		if (x<0) {
 			fprintf(stderr, "Unexpected error: %d\n", x);
@@ -78,69 +72,60 @@ int i = 0, exp_result;
 		printf("Test %d, file %s: ", i, file);
 
 		if ( x != exp_result) {
-			printf("failed.");
+			printf("failed.\n");
+			fflush(stdout);
 			fprintf(stderr, "Unexpected error in verification.\n");
 			fprintf(stderr, "Certificate was found to be: \n");
 			print_res( x);
-		}
-		printf("ok.");
+		} else {
+			printf("ok.");
 			
-		printf("\n");
+			printf("\n");
+		}
 	}
 
 	printf("\n");
+
+	gnutls_global_deinit();
 
 	return 0;
 
 }
 
+#define PEM_SEP "-----BEGIN CERT"
+#define PEM_SEP_SIZE (sizeof(PEM_SEP)-1)
+
 /* Verifies a base64 encoded certificate list from memory 
  */
-int _gnutls_verify_x509_mem( const char* cert, int cert_size,
+int _verify_x509_mem( const char* cert, int cert_size,
 	const char *ca, int ca_size)
 {
-	int siz, siz2, i;
-	unsigned char *b64;
+	int siz, i;
 	const char *ptr;
 	int ret;
+	unsigned int output;
 	gnutls_datum tmp;
-	gnutls_cert* x509_cert_list=NULL;
-	gnutls_cert* x509_ca_list=NULL;
-	int x509_ncerts, x509_ncas;
+	gnutls_x509_certificate *x509_cert_list = NULL;
+	gnutls_x509_certificate x509_ca;
+	int x509_ncerts;
 
 	/* Decode the CA certificate
 	 */
-	siz2 = _gnutls_fbase64_decode( NULL, ca, ca_size, &b64);
+	tmp.data = (char*)ca;
+	tmp.size = ca_size;
 
-	if (siz2 < 0) {
-		fprintf(stderr, "Error decoding CA certificate\n");
-		gnutls_assert();
-		return GNUTLS_E_PARSING_ERROR;
+	ret = gnutls_x509_certificate_init( &x509_ca);
+	if (ret < 0) {
+		fprintf(stderr, "Error parsing the CA certificate: %s\n", gnutls_strerror(ret));
+		exit(1);
 	}
+	
+	ret = gnutls_x509_certificate_import( x509_ca, &tmp, GNUTLS_X509_FMT_PEM);
 
-	x509_ca_list =
-	    (gnutls_cert *) gnutls_calloc( 1, sizeof(gnutls_cert));
-	x509_ncas = 1;
-
-	if (x509_ca_list == NULL) {
-		fprintf(stderr, "memory error\n");
-		gnutls_free(b64);
-		return GNUTLS_E_MEMORY_ERROR;
+	if (ret < 0) {
+		fprintf(stderr, "Error parsing the CA certificate: %s\n", gnutls_strerror(ret));
+		exit(1);
 	}
-
-	tmp.data = b64;
-	tmp.size = siz2;
-
-	if ((ret =
-	     _gnutls_x509_cert2gnutls_cert( x509_ca_list,
-				     tmp, 0)) < 0) {
-		fprintf(stderr, "Error parsing the CA certificate\n");
-		gnutls_assert();
-		gnutls_free(b64);
-		return ret;
-	}
-	gnutls_free(b64);
-
 
 	/* Decode the certificate chain. 
 	 */
@@ -150,65 +135,62 @@ int _gnutls_verify_x509_mem( const char* cert, int cert_size,
 	i = 1;
 
 	do {
-		siz2 = _gnutls_fbase64_decode( NULL, ptr, siz, &b64);
-		siz -= siz2;	/* FIXME: this is not enough
-				 */
-
-		if (siz2 < 0) {
-			gnutls_assert();
-			return GNUTLS_E_PARSING_ERROR;
-		}
-
 		x509_cert_list =
-		    (gnutls_cert *) gnutls_realloc( x509_cert_list,
+		    (gnutls_x509_certificate *) realloc( x509_cert_list,
 						   i *
-						   sizeof(gnutls_cert));
+						   sizeof(gnutls_x509_certificate));
 		if (x509_cert_list == NULL) {
 			fprintf(stderr, "memory error\n");
-			gnutls_assert();
-			gnutls_free(b64);
-			return GNUTLS_E_MEMORY_ERROR;
+			exit(1);
 		}
 
-		tmp.data = b64;
-		tmp.size = siz2;
+		tmp.data = (char*)ptr;
+		tmp.size = siz;
 
-		if ((ret =
-		     _gnutls_x509_cert2gnutls_cert( &x509_cert_list[i-1],
-				     tmp, 0)) < 0) {
-			fprintf(stderr, "Error parsing the certificate\n");
-			gnutls_assert();
-			gnutls_free(b64);
-			return ret;
+		ret = gnutls_x509_certificate_init( &x509_cert_list[i-1]);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the certificate[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
 		}
-		gnutls_free(b64);
+	
+		ret = gnutls_x509_certificate_import( x509_cert_list[i-1], &tmp, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the certificate[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
+		}
 
 		/* now we move ptr after the pem header */
-		ptr = strstr(ptr, PEM_CERT_SEP);
+		ptr = strstr(ptr, PEM_SEP);
 		if (ptr!=NULL)
 			ptr++;
 
 		i++;
-	} while ((ptr = strstr(ptr, PEM_CERT_SEP)) != NULL);
+	} while ((ptr = strstr(ptr, PEM_SEP)) != NULL);
 
 	x509_ncerts = i - 1;
 
-	siz = _gnutls_x509_verify_certificate( x509_cert_list, x509_ncerts,
-		x509_ca_list, 1, NULL, 0);
+	ret  = gnutls_x509_certificate_list_verify( x509_cert_list, x509_ncerts,
+		&x509_ca, 1, NULL, 0, &output);
 
-	_gnutls_free_cert( x509_ca_list[0]);
+	gnutls_x509_certificate_deinit( x509_ca);
 	for (i=0;i<x509_ncerts;i++) {
-		_gnutls_free_cert( x509_cert_list[i]);
+		gnutls_x509_certificate_deinit( x509_cert_list[i]);
+	}
+	free( x509_cert_list);
+
+	if ( ret < 0) {
+		fprintf(stderr, "Error in verification: %s\n", gnutls_strerror(ret));
+		exit(1);
 	}
 
-	return siz;
+	return output;
 }
 
 
 
 /* Reads and verifies a base64 encoded certificate file 
  */
-int _gnutls_verify_x509_file( const char* certfile, const char *cafile)
+int _verify_x509_file( const char* certfile, const char *cafile)
 {
 	int ca_size, cert_size;
 	char ca[MAX_FILE_SIZE];
@@ -218,7 +200,6 @@ int _gnutls_verify_x509_file( const char* certfile, const char *cafile)
 	fd1 = fopen(certfile, "rb");
 	if (fd1 == NULL) {
 		fprintf(stderr, "error opening %s\n", certfile);
-		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
 
@@ -231,7 +212,6 @@ int _gnutls_verify_x509_file( const char* certfile, const char *cafile)
 	fd1 = fopen(cafile, "rb");
 	if (fd1 == NULL) {
 		fprintf(stderr, "error opening %s\n", cafile);
-		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
 
@@ -240,6 +220,6 @@ int _gnutls_verify_x509_file( const char* certfile, const char *cafile)
 	
 	ca[ca_size] = 0;
 
-	return _gnutls_verify_x509_mem( cert, cert_size, ca, ca_size);
+	return _verify_x509_mem( cert, cert_size, ca, ca_size);
 }
 

@@ -194,7 +194,7 @@ int gnutls_x509_certificate_check_hostname(gnutls_x509_certificate cert,
       /* not got the necessary extension, use CN instead 
        */
       dnsnamesize = sizeof(dnsname);
-      if (gnutls_x509_certificate_get_dn_by_oid(cert, OID_X520_COMMON_NAME, 
+      if (gnutls_x509_certificate_get_dn_by_oid(cert, OID_X520_COMMON_NAME, 0,
       		dnsname, &dnsnamesize) != 0) {
          /* got an error, can't find a name 
           */
