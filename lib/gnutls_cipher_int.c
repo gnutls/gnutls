@@ -56,7 +56,7 @@ GNUTLS_CIPHER_HANDLE ret;
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "arcfour", NULL, "stream", NULL);
 #else
-		ret = GNUTLS_CIPHER_FAILED;
+		ret = gcry_cipher_open(GCRY_CIPHER_ARCFOUR, GCRY_CIPHER_MODE_STREAM, 0);
 #endif
 		break;
 	default:
@@ -70,7 +70,7 @@ GNUTLS_CIPHER_HANDLE ret;
 		}; 
 #else
 		gcry_cipher_setkey(ret, key, keysize);
-		gcry_cipher_setiv(ret, iv, ivsize);
+		if (iv!=NULL && ivsize>0) gcry_cipher_setiv(ret, iv, ivsize);
 #endif
 	}
 
