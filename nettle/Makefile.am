@@ -18,6 +18,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA
 
+SUBDIRS = tests
+
 BUILT_SOURCES = nettle-types.h
 DISTCLEANFILES = nettle-types.h
 
@@ -35,6 +37,7 @@ libnettle_la_SOURCES = aes.c aes.h aes-internal.h \
 		      des.c des.h desinfo.h desCode.h \
 		      des3.c des-compat.c des-compat.h \
 		      hmac.c hmac.h hmac-md5.c hmac-sha1.c \
+		      knuth-lfib.h knuth-lfib.c \
 		      md5.c md5.h md5-compat.c md5-compat.h md5-meta.c \
 		      sha.h sha1.c sha1-compress.c sha1-meta.c \
 		      nettle-meta.h \

@@ -1,0 +1,17 @@
+.deps
+.libs
+Makefile
+Makefile.in
+aes-test
+arcfour-test
+arctwo-test
+cbc-test
+des-compat-test
+des-test
+des3-test
+hmac-test
+knuth-lfib-test
+md4-test
+md5-compat-test
+md5-test
+sha1-test

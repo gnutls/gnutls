@@ -552,6 +552,7 @@ doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 doc/scripts/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile \
-gl/Makefile nettle/Makefile crypto/Makefile tests/Makefile])
+gl/Makefile nettle/Makefile nettle/tests/Makefile \
+crypto/Makefile tests/Makefile])
 
 AC_OUTPUT
