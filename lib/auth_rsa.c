@@ -104,11 +104,11 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		 * the peer. Just use a random key. (in order to avoid
 		 * attack against pkcs-1 formating).
 		 */
-return ret;
+
 		gnutls_assert();
-#ifdef DEBUG
-		_gnutls_log( "Possible PKCS-1 format attack\n");
-#endif
+
+		_gnutls_log( "RSA_auth: Possible PKCS-1 format attack\n");
+
 		RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc);
 	} else {
 		ret = 0;
