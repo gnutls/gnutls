@@ -29,6 +29,15 @@ Free Documentation License".
 * libgnutls: (gnutls).		A Transport Layer Security Library.
 @end direntry
 
+@dircategory Network Applications
+@direntry
+* certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
+* gnutls-cli: (gnutls)Invoking gnutls-cli.	GNU TLS test client.
+* gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GNU TLS debug client.
+* gnutls-serv: (gnutls)Invoking gnutls-serv.	GNU TLS test server.
+* srptool: (gnutls)Invoking srptool.		Simple SRP password tool.
+@end direntry
+
 @titlepage
 @title GNU TLS
 @subtitle Transport Layer Security Library for the GNU system
@@ -58,6 +67,7 @@ Free Documentation License".
 * More on certificate authentication::
 * How to use TLS in application protocols::
 * Included programs::
+* Function reference::
 * Error codes and descriptions::
 * Copying This Manual::
 * Index::
@@ -1730,6 +1740,7 @@ Current limitations imposed by the compatibility layer include:
 @chapter Included programs
 
 @section Invoking srptool
+@anchor{Invoking srptool}
 @anchor{srptool}
 @cindex srptool
 
@@ -1773,7 +1784,65 @@ $ srptool --passwd /etc/tpasswd \
 
 @end itemize
 
+@section Invoking gnutls-cli
+@anchor{Invoking gnutls-cli}
+@cindex gnutls-cli
+
+Simple client program to set up a TLS connection to some other
+computer.  It sets up a TLS connection and forwards data from the
+standard input to the secured socket and vice versa.
+
+@verbatim
+GNU TLS test client
+Usage:  gnutls-cli [options] hostname
+
+     -d, --debug integer      Enable debugging
+     -r, --resume             Connect, establish a session. Connect
+                              again and resume this session.
+     -s, --starttls           Connect, establish a plain session and
+                              start TLS when EOF or a SIGALRM is
+                              received.
+     --crlf                   Send CR LF instead of LF.
+     --x509fmtder             Use DER format for certificates to read
+                              from.
+     -f, --fingerprint        Send the openpgp fingerprint, instead
+                              of the key.
+     --disable-extensions     Disable all the TLS extensions.
+     --xml                    Print the certificate information in
+                              XML format.
+     --print-cert             Print the certificate in PEM format.
+     -p, --port integer       The port to connect to.
+     --recordsize integer     The maximum record size to advertize.
+     -V, --verbose            More verbose output.
+     --ciphers cipher1 cipher2...
+                              Ciphers to enable.
+     --protocols protocol1 protocol2...
+                              Protocols to enable.
+     --comp comp1 comp2...    Compression methods to enable.
+     --macs mac1 mac2...      MACs to enable.
+     --kx kx1 kx2...          Key exchange methods to enable.
+     --ctypes certType1 certType2...
+                              Certificate types to enable.
+     --x509cafile FILE        Certificate file to use.
+     --x509crlfile FILE       CRL file to use.
+     --pgpkeyfile FILE        PGP Key file to use.
+     --pgpkeyring FILE        PGP Key ring file to use.
+     --pgptrustdb FILE        PGP trustdb file to use.
+     --pgpcertfile FILE       PGP Public Key (certificate) file to
+                              use.
+     --x509keyfile FILE       X.509 key file to use.
+     --x509certfile FILE      X.509 Certificate file to use.
+     --srpusername NAME       SRP username to use.
+     --srppasswd PASSWD       SRP password to use.
+     -l, --list               Print a list of the supported
+                              algorithms  and modes.
+     -h, --help               prints this help
+     -v, --version            prints the program's version number
+     --copyright              prints the program's license
+@end verbatim
+
 @section Invoking gnutls-cli-debug
+@anchor{Invoking gnutls-cli-debug}
 @cindex gnutls-cli-debug
 
 This program was created to assist in debugging @acronym{GnuTLS}, but
@@ -1821,7 +1890,57 @@ Checking for SRP authentication support (TLS extension)... yes
 Checking for OpenPGP authentication support (TLS extension)... no
 @end example
 
+@section Invoking gnutls-serv
+@anchor{Invoking gnutls-serv}
+@cindex gnutls-serv
+
+Simple server program that listens to incoming TLS connections.
+
+@verbatim
+GNU TLS test server
+Usage: gnutls-serv [options]
+
+     -d, --debug integer      Enable debugging
+     -g, --generate           Generate Diffie Hellman Parameters.
+     -p, --port integer       The port to connect to.
+     -q, --quiet              Suppress some messages.
+     --nodb                   Does not use the resume database.
+     --http                   Act as an HTTP Server.
+     --echo                   Act as an Echo Server.
+     --dhparams FILE          DH params file to use.
+     --x509fmtder             Use DER format for certificates
+     --x509cafile FILE        Certificate file to use.
+     --x509crlfile FILE       CRL file to use.
+     --pgpkeyring FILE        PGP Key ring file to use.
+     --pgptrustdb FILE        PGP trustdb file to use.
+     --pgpkeyfile FILE        PGP Key file to use.
+     --pgpcertfile FILE       PGP Public Key (certificate) file to
+                              use.
+     --x509keyfile FILE       X.509 key file to use.
+     --x509certfile FILE      X.509 Certificate file to use.
+     --x509dsakeyfile FILE    Alternative X.509 key file to use.
+     --x509dsacertfile FILE   Alternative X.509 certificate file to
+                              use.
+     --srppasswd FILE         SRP password file to use.
+     --srppasswdconf FILE     SRP password conf file to use.
+     --ciphers cipher1 cipher2...
+                              Ciphers to enable.
+     --protocols protocol1 protocol2...
+                              Protocols to enable.
+     --comp comp1 comp2...    Compression methods to enable.
+     --macs mac1 mac2...      MACs to enable.
+     --kx kx1 kx2...          Key exchange methods to enable.
+     --ctypes certType1 certType2...
+                              Certificate types to enable.
+     -l, --list               Print a list of the supported
+                              algorithms  and modes.
+     -h, --help               prints this help
+     -v, --version            prints the program's version number
+     --copyright              prints the program's license
+@end verbatim
+
 @section Invoking certtool
+@anchor{Invoking certtool}
 @cindex certtool
 
 This is a program to generate X.509 certificates, certificate
@@ -1999,6 +2118,7 @@ signing_key
 #time_stamping_key
 @end example
 
+@node Function reference
 @chapter Function reference
 @cindex Function reference
 
