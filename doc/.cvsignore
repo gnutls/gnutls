@@ -6,6 +6,7 @@ gnutls.cp
 gnutls.cps
 gnutls.dvi
 gnutls.fn
+gnutls.info*
 gnutls.ky
 gnutls.log
 gnutls.pg
@@ -16,3 +17,4 @@ gnutls.vr
 mdate-sh
 texinfo.tex
 version.texi
+stamp-*
