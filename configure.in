@@ -259,7 +259,7 @@ AM_PATH_LIBGCRYPT($GNUTLS_GCRYPT_VERSION,,
  	AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from
-*** ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/
+*** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
 ***
 ]]))
 dnl Can't disable - gnutls depends on gcrypt
