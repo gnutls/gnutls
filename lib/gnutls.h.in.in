@@ -160,7 +160,6 @@ const char* gnutls_strerror( int error);
  */
 void gnutls_handshake_set_private_extensions(GNUTLS_STATE state, int allow);
 void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot);
-void gnutls_handshake_set_exportable_detection(GNUTLS_STATE state, int det);
 void gnutls_handshake_set_rsa_pms_check(GNUTLS_STATE state, int check);
 
 /* Record layer functions.
