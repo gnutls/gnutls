@@ -1,3 +1,11 @@
+2003-02-20 07:38  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, ex-cert-select.tex, ex-info.tex,
+	examples.tex:
+
+	Added a small example on how to use the certificate selection
+	callback in client side.  
+
 2003-02-18 22:55  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_auth.c, gnutls_mpi.c, gnutls_pk.c:
