@@ -537,24 +537,120 @@ static int check_g_n( const opaque* g, size_t n_g,
  */
 static int group_check_g_n( GNUTLS_MPI g, GNUTLS_MPI n) 
 {
+GNUTLS_MPI q = NULL, two = NULL, w = NULL;
+int ret, i;
+
+	/* Only allow small generators, to avoid getting stuck
+	 * into checking parameters.
+	 */
+	if (gcry_mpi_get_nbits(g) > 4) {
+		gnutls_assert();
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+	}
+
+	/* N must be of the form N=2q+1
+	 * where q is also a prime.
+	 */
 	if (gcry_prime_check( n, 0) != 0) {
 		_gnutls_dump_mpi( "no prime N: ", n);
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
+
+	two = _gnutls_mpi_new( 4);
+	if (two == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	q = _gnutls_mpi_alloc_like( n);
+	if (q==NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto error;
+	}
 	
-	/* We should also check whether g is a generator,
-	 * but this is not possible. We now only check if
-	 * the generator is not too large.
+	/* q = n-1 
 	 */
+	gcry_mpi_sub_ui( q, n, 1);
 	
-	if (_gnutls_mpi_get_nbits(g) > 7) {
+	/* q = q/2, remember that q is divisible by 2 (prime - 1)
+	 */
+	gcry_mpi_set_ui( two, 2);
+	gcry_mpi_div( q, NULL, q, two, 0);
+
+	if (gcry_prime_check( q, 0) != 0) {
+		/* N was not on the form N=2q+1, where q = prime
+		 */
+		_gnutls_dump_mpi( "no prime Q: ", q);
 		gnutls_assert();
 		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 	
-	return 0;
+	/* We also check whether g is a generator,
+	 */
+	 
+	/* check if g < q < N
+	 */
+	if (gcry_mpi_cmp( g, q) >= 0) {
+		gnutls_assert();
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		goto error;
+	}
 
+	w = _gnutls_mpi_alloc_like( q);
+	if (w==NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto error;
+	}
+	
+	/* check if g^q mod N == N-1
+	 * w = g^q mod N
+	 */
+	gcry_mpi_powm( w, g, q, n);
+	
+	/* w++
+	 */
+	gcry_mpi_add_ui( w, w, 1);
+	
+	if (gcry_mpi_cmp( w, n)!=0) {
+		gnutls_assert();
+		ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+		goto error;
+	}
+
+	/* check that g is the smallest generator mod N.
+	 * Actually check if x^q % N == 1 for all 1 < x < g
+	 */
+	i = 2;
+
+	while( gcry_mpi_cmp( two, g) != 0) {
+
+		gcry_mpi_set_ui( two, i);
+
+		gcry_mpi_powm( w, two, q, n);
+
+		gcry_mpi_mod( w, w, n);
+		
+		if (gcry_mpi_cmp_ui( w, 1) != 0) {
+			gnutls_assert();
+			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+			goto error;
+		}
+
+		i++;
+	}
+	
+	ret = 0;
+
+error:
+	_gnutls_mpi_release( &q);
+	_gnutls_mpi_release( &two);
+	_gnutls_mpi_release( &w);
+	
+	return ret;
+	
 }
 
 /* receive the key exchange message ( n, g, s, B) 
