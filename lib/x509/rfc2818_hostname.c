@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002 Andrew McDonald
+ * Portions Copyright 2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -20,7 +21,10 @@
 
 #include <gnutls_int.h>
 #include <gnutls_ui.h>
-#include <gnutls_x509.h>
+#include <compat.h>
+#include <x509.h>
+#include <dn.h>
+#include <common.h>
 
 static int hostname_compare(const char *certname, const char *hostname);
 
@@ -131,5 +135,79 @@ static int hostname_compare(const char *certname, const char *hostname)
       return 1;
    }
 
+   return 0;
+}
+
+/**
+  * gnutls_x509_certificate_check_hostname - This function compares the given hostname with the hostname in the certificate
+  * @cert: should contain an gnutls_x509_certificate structure
+  * @hostname: A null terminated string that contains a DNS name
+  *
+  * This function will check if the given certificate's subject matches
+  * the given hostname. This is a basic implementation of the matching 
+  * described in RFC2818 (HTTPS), which takes into account wildcards.
+  *
+  * Returns non zero on success, and zero on failure.
+  *
+  **/
+int gnutls_x509_certificate_check_hostname(gnutls_x509_certificate cert,
+                                const char *hostname)
+{
+
+   char dnsname[GNUTLS_X509_CN_SIZE];
+   int dnsnamesize;
+   int found_dnsname = 0;
+   int ret = 0;
+   int i = 0;
+
+   /* try matching against:
+    *  1) a DNS name as an alternative name (subjectAltName) extension
+    *     in the certificate
+    *  2) the common name (CN) in the certificate
+    *
+    *  either of these may be of the form: *.domain.tld
+    *
+    *  only try (2) if there is no subjectAltName extension of
+    *  type dNSName
+    */
+
+   /* Check through all included subjectAltName extensions, comparing
+    * against all those of type dNSName.
+    */
+   for (i = 0; !(ret < 0); i++) {
+
+      dnsnamesize = sizeof(dnsname);
+      ret =
+          gnutls_x509_certificate_get_subject_alt_name(cert, i,
+                                                           dnsname,
+                                                           &dnsnamesize);
+
+      if (ret == GNUTLS_SAN_DNSNAME) {
+         found_dnsname = 1;
+         if (hostname_compare(dnsname, hostname)) {
+            return 1;
+         }
+      }
+
+   }
+
+   if (!found_dnsname) {
+      /* not got the necessary extension, use CN instead 
+       */
+      dnsnamesize = sizeof(dnsname);
+      if (gnutls_x509_certificate_get_dn_by_oid(cert, OID_X520_COMMON_NAME, 
+      		dnsname, &dnsnamesize) != 0) {
+         /* got an error, can't find a name 
+          */
+         return 0;
+      }
+
+      if (hostname_compare(dnsname, hostname)) {
+         return 1;
+      }
+   }
+
+   /* not found a matching name
+    */
    return 0;
 }

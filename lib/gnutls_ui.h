@@ -61,8 +61,8 @@ void gnutls_certificate_server_set_select_function( gnutls_session, gnutls_certi
 
 void gnutls_certificate_server_set_request( gnutls_session, gnutls_certificate_request);
 
-/* X.509 certificate handling functions */
-int gnutls_x509_certificate_to_xml(const gnutls_datum * cert, gnutls_datum* res, int detail);
+/* X.509 certificate handling functions 
+ */
 
 int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_x509_dn*);
 int gnutls_x509_extract_dn_string(const gnutls_datum * idn,

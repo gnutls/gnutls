@@ -9,7 +9,7 @@ EXAMPLE_OBJECTS = ex-alert.tex ex-client-srp.tex ex-serv-export.tex \
 	ex-serv1.tex ex-client-resume.tex ex-serv-srp.tex \
 	ex-serv-pgp.tex ex-pgp-keyserver.tex
 
-TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex \
+TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex ../../lib/x509/x509-api.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex \
 	auth.tex ciphers.tex errors.tex layers.tex alert.tex record.tex \
 	funcs.tex examples.tex ../../libextra/gnutls-extra-api.tex \
@@ -32,7 +32,10 @@ gnutls-api.tex: ../../lib/gnutls-api.tex
 gnutls-extra-api.tex: ../../libextra/gnutls-extra-api.tex
 	-../scripts/sort1.pl < ../../libextra/gnutls-extra-api.tex > gnutls-extra-api.tex
 
-DOC_OBJECTS = gnutls-api.tex gnutls-extra-api.tex error_codes.tex
+x509-api.tex: ../../lib/x509/x509-api.tex
+	-../scripts/sort1.pl < ../../lib/x509/x509-api.tex > x509-api.tex
+
+DOC_OBJECTS = x509-api.tex gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
 gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 	-latex gnutls.tex
@@ -43,7 +46,7 @@ gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 clean:
 	@-rm *.log *.aux *.toc *.png *.old *.html *.css *~
 	@-rm *.pl gnutls.dvi
-	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex error_codes.tex
+	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex error_codes.tex x509-api.tex
 
 examples: $(EXAMPLE_OBJECTS)
 	@echo "Generating example programs... "

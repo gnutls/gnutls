@@ -18,11 +18,6 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert, Con
 #define PEM_KEY_DSA_SEP "-----BEGIN DSA"
 
 int _gnutls_check_x509_key_usage( const gnutls_cert * cert, gnutls_kx_algorithm alg);
-time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
-time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
-
-int gnutls_x509_extract_certificate_subject_alt_name( const gnutls_datum*, int seq, char*, int*);
-int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);
 
 int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params);
 int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params);

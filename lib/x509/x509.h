@@ -8,3 +8,10 @@ typedef struct gnutls_x509_certificate_int {
 } gnutls_x509_certificate_int;
 
 typedef struct gnutls_x509_certificate_int *gnutls_x509_certificate;
+
+int gnutls_x509_certificate_get_issuer_dn_by_oid(gnutls_x509_certificate cert, const char* oid, char *buf,
+					 int *sizeof_buf);
+int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert, 
+	int seq, char *ret, int *ret_size);
+int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, const char* oid, char *buf,
+					 int *sizeof_buf);

@@ -78,6 +78,7 @@ int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert);
 int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, const char* oid,
 	unsigned char* buf, int * sizeof_buf);
 
+int gnutls_x509_certificate_to_xml(gnutls_x509_certificate cert, gnutls_datum* res, int detail);
 
 
 /* CRL handling functions */

@@ -38,7 +38,8 @@
 #include <gnutls_errors.h>
 #include <gnutls_str.h>
 #include <gnutls_x509.h>
-#include "x509/common.h"
+#include <x509.h>
+#include <common.h>
 
 static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root);
 
@@ -177,7 +178,7 @@ static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 }
 
 #define XML_HEADER "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" \
-	"<gnutls:x509:certificate version=\"1.0\">\n"
+	"<gnutls:x509:certificate version=\"1.1\">\n"
 
 #define XML_FOOTER "</gnutls:x509:certificate>\n"
 
@@ -575,7 +576,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 
 /**
   * gnutls_x509_certificate_to_xml - This function parses an RDN sequence
-  * @cert: should contain a DER encoded certificate
+  * @cert: should contain a gnutls_x509_certificate structure
   * @res: The datum that will hold the result
   * @detail: The detail level (must be 0 for now)
   *
@@ -584,34 +585,14 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_certificate_to_xml(const gnutls_datum * cert, gnutls_datum* res, int detail)
+int gnutls_x509_certificate_to_xml(gnutls_x509_certificate cert, gnutls_datum* res, int detail)
 {
-	ASN1_TYPE asn1_cert;
 	int result;
 
 	res->data = NULL;
 	res->size = 0;
 	
-	if ((result =
-	     _gnutls_asn1_create_element(_gnutls_get_pkix(),
-				   "PKIX1.Certificate", &asn1_cert,
-				   "certificate")) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&asn1_cert, cert->data, cert->size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		asn1_delete_structure(&asn1_cert);
-		return _gnutls_asn2err(result);
-	}
-
-
-	result = _gnutls_asn1_get_structure_xml( asn1_cert, "certificate", res);
-	asn1_delete_structure(&asn1_cert);
-
+	result = _gnutls_asn1_get_structure_xml( cert->cert, "cert2", res);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

@@ -16,6 +16,8 @@ Version 0.9.0
   in gnutls/x509.h
 - Added support for Certificate Revocation lists. Functions defined
   in gnutls/x509.h
+- The only functions that are now incompatible are:
+  gnutls_x509_certificate_to_xml()
 
 Version 0.8.1 (22/01/2003)
 - Improved the SRP support, to prevent attackers guessing the

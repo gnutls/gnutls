@@ -4,15 +4,6 @@
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
 
-#define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
-#define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
-        PRINTX( "OU:", X.organizational_unit_name); \
-        PRINTX( "O:", X.organization); \
-        PRINTX( "L:", X.locality_name); \
-        PRINTX( "S:", X.state_or_province_name); \
-        PRINTX( "C:", X.country); \
-        PRINTX( "E:", X.email)
-
 static void print_x509_certificate_info(gnutls_session);
 
 /* This function will print some details of the
@@ -100,23 +91,32 @@ static void print_x509_certificate_info(gnutls_session session)
    int digest_size = sizeof(digest), i;
    int serial_size = sizeof(serial);
    char printable[120];
+   int printable_size;
    char *print;
    int algo, bits;
-   time_t expiret = gnutls_certificate_expiration_time_peers(session);
-   time_t activet = gnutls_certificate_activation_time_peers(session);
+   time_t expiration_time, activation_time;
    const gnutls_datum *cert_list;
    int cert_list_size = 0;
-   gnutls_x509_dn dn;
+   gnutls_x509_certificate cert;
 
    cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
    if (cert_list_size > 0
        && gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
 
+      /* no error checking
+       */
+      gnutls_x509_certificate_init( &cert);
+
+      gnutls_x509_certificate_import( cert, &cert_list[0]);
+
       printf(" - Certificate info:\n");
 
-      printf(" - Certificate is valid since: %s", ctime(&activet));
-      printf(" - Certificate expires: %s", ctime(&expiret));
+      expiration_time = gnutls_x509_certificate_get_expiration_time( cert);
+      activation_time = gnutls_x509_certificate_get_activation_time( cert);
+
+      printf(" - Certificate is valid since: %s", ctime(&activation_time));
+      printf(" - Certificate expires: %s", ctime(&expiration_time));
 
       /* Print the fingerprint of the certificate
        */
@@ -132,8 +132,8 @@ static void print_x509_certificate_info(gnutls_session session)
 
       /* Print the serial number of the certificate.
        */
-      if (gnutls_x509_extract_certificate_serial
-          (&cert_list[0], serial, &serial_size) >= 0) {
+      if (gnutls_x509_certificate_get_serial(cert, serial, &serial_size) >= 0) 
+      {
          print = printable;
          for (i = 0; i < serial_size; i++) {
             sprintf(print, "%.2x ", (unsigned char) serial[i]);
@@ -145,8 +145,8 @@ static void print_x509_certificate_info(gnutls_session session)
       /* Extract some of the public key algorithm's parameters
        */
       algo =
-          gnutls_x509_extract_certificate_pk_algorithm(&cert_list[0],
-                                                       &bits);
+          gnutls_x509_certificate_get_pk_algorithm(cert, &bits);
+
       printf("Certificate public key: ");
 
       if (algo == GNUTLS_PK_RSA) {
@@ -163,14 +163,17 @@ static void print_x509_certificate_info(gnutls_session session)
        * certificate.
        */
       printf(" - Certificate version: #%d\n",
-             gnutls_x509_extract_certificate_version(&cert_list[0]));
+             gnutls_x509_certificate_get_version( cert));
 
-      gnutls_x509_extract_certificate_dn(&cert_list[0], &dn);
-      PRINT_DN(dn);
+      printable_size = sizeof(printable);
+      gnutls_x509_certificate_get_dn( cert, printable, &printable_size);
+      printf(" - DN: %s\n", printable);
 
-      gnutls_x509_extract_certificate_issuer_dn(&cert_list[0], &dn);
-      printf(" - Certificate Issuer's info:\n");
-      PRINT_DN(dn);
+      printable_size = sizeof(printable);
+      gnutls_x509_certificate_get_issuer_dn( cert, printable, &printable_size);
+      printf(" - Certificate Issuer's DN: %s\n", printable);
+
+      gnutls_x509_certificate_deinit( cert);
 
    }
 }
