@@ -48,6 +48,7 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
           goto finish;
        }
 
+       key->size = len;
        cdk_kbnode_write_to_mem( knode, key->data, &len);
 
        rc = 0; /* success */
