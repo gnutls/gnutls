@@ -1,3 +1,9 @@
+2004-11-11 07:57  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS:
+
+	backported the fix for CRL distribution points from unstable branch.  
+
 2004-11-08 23:43  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS:
