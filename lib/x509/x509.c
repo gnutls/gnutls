@@ -223,14 +223,8 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
 					 size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || cert == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-	
 	return _gnutls_x509_parse_dn( cert->cert, "tbsCertificate.issuer.rdnSequence",
 		buf, sizeof_buf);
-
-		
 }
 
 /**
@@ -256,14 +250,8 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || cert == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-	
 	return _gnutls_x509_parse_dn_oid( cert->cert, "tbsCertificate.issuer.rdnSequence", oid,
 		indx, buf, sizeof_buf);
-
-		
 }
 
 /**
@@ -285,14 +273,8 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid,
 int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
 					 size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || cert == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-	
 	return _gnutls_x509_parse_dn( cert->cert, "tbsCertificate.subject.rdnSequence",
 		buf, sizeof_buf);
-
-		
 }
 
 /**
@@ -318,14 +300,8 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || cert == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-	
 	return _gnutls_x509_parse_dn_oid( cert->cert, "tbsCertificate.subject.rdnSequence", oid,
 		indx, buf, sizeof_buf);
-
-		
 }
 
 /**

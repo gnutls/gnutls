@@ -97,12 +97,13 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	char oid[128];
 	int len, printable;
 
-	if (*sizeof_buf == 0) {
+	if (sizeof_buf == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	buf[0] = 0;
+	if (buf) buf[0] = 0;
+	else *sizeof_buf = 0;
 
 	_gnutls_string_init(&out_str, gnutls_malloc, gnutls_realloc,
 			    gnutls_free);
@@ -311,12 +312,10 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 	int len, printable;
 	int i = 0;
 
-	if (*sizeof_buf == 0) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	buf[0] = 0;
+	if (buf==NULL)
+		*sizeof_buf = 0;
+	else
+		buf[0] = 0;
 
 	k1 = 0;
 	do {
@@ -430,10 +429,11 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 				    _gnutls_x509_oid_data_printable(oid);
 
 				if (printable == 1) {
-					if ((result =
+					result =
 					     _gnutls_x509_oid_data2string
 					     (oid, value, len, buf,
-					      sizeof_buf)) < 0) {
+					      sizeof_buf);
+					if (result < 0) {
 						gnutls_assert();
 						goto cleanup;
 					}

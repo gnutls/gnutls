@@ -171,14 +171,8 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
 					 size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || crq == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-	
 	return _gnutls_x509_parse_dn( crq->crq, "certificationRequestInfo.subject.rdnSequence",
 		buf, sizeof_buf);
-
-		
 }
 
 /**
@@ -204,14 +198,8 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
 	int indx, char *buf, size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || crq == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-	
 	return _gnutls_x509_parse_dn_oid( crq->crq, "certificationRequestInfo.subject.rdnSequence", oid,
 		indx, buf, sizeof_buf);
-
-		
 }
 
 /* Parses an Attribute list in the asn1_struct, and searches for the

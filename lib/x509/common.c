@@ -125,8 +125,8 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
-	res[0] = 0;
-	
+	if (res) res[0] = 0;
+
 	if ( _gnutls_x509_oid_data_printable( oid) == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;

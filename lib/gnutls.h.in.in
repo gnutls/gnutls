@@ -211,7 +211,6 @@ const char* gnutls_strerror( int error);
 /* Semi-internal functions.
  */
 void gnutls_handshake_set_private_extensions(gnutls_session session, int allow);
-void gnutls_handshake_set_rsa_pms_check(gnutls_session session, int check);
 gnutls_handshake_description gnutls_handshake_get_last_out( gnutls_session session);
 gnutls_handshake_description gnutls_handshake_get_last_in( gnutls_session session);
 

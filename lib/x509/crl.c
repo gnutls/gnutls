@@ -161,15 +161,9 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
 				  size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || crl == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
 	return _gnutls_x509_parse_dn(crl->crl,
 				     "tbsCertList.issuer.rdnSequence",
 				     buf, sizeof_buf);
-
-
 }
 
 /**
@@ -196,15 +190,9 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
 					 const char *oid, int indx,
 					 char *buf, size_t *sizeof_buf)
 {
-	if (sizeof_buf == 0 || crl == NULL) {
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
 	return _gnutls_x509_parse_dn_oid(crl->crl,
 					 "tbsCertList.issuer.rdnSequence",
 					 oid, indx, buf, sizeof_buf);
-
-
 }
 
 /**
