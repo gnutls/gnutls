@@ -36,29 +36,29 @@ int print_info(GNUTLS_STATE state)
              gnutls_dh_get_bits(state));
       break;
    case GNUTLS_CRD_CERTIFICATE:
-      /* in case of X509 PKI
+      /* in case of certificate authentication
        */
       cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
       status = gnutls_certificate_verify_peers(state);
 
       switch (status) {
       case GNUTLS_CERT_NOT_TRUSTED:
-         printf("- Peer's X509 Certificate was NOT verified\n");
+         printf("- Peer's certificate was NOT verified\n");
          break;
       case GNUTLS_CERT_EXPIRED:
-         printf("- Peer's X509 Certificate was verified but is expired\n");
+         printf("- Peer's certificate was verified but is expired\n");
          break;
       case GNUTLS_CERT_TRUSTED:
-         printf("- Peer's X509 Certificate was verified\n");
+         printf("- Peer's certificate was verified\n");
          break;
       case GNUTLS_CERT_NONE:
          printf("- Peer did not send any X509 Certificate.\n");
          break;
       case GNUTLS_CERT_CORRUPTED:
-         printf("- Peer's X509 Certificate was corrupt\n");
+         printf("- Peer's certificate was corrupt\n");
          break;
       case GNUTLS_CERT_REVOKED:
-         printf("- Peer's X509 Certificate was revoked\n");
+         printf("- Peer's certificate was revoked\n");
          break;
       }
 
@@ -72,7 +72,7 @@ int print_info(GNUTLS_STATE state)
       /* if the certificate list is available, then
        * print some information about it.
        */
-      if (cert_list_size > 0) {
+      if (cert_list_size > 0 && gnutls_cert_type_get(state) == GNUTLS_CRT_X509) {
          char digest[20];
          char serial[40];
          int digest_size = sizeof(digest), i;
@@ -119,7 +119,10 @@ int print_info(GNUTLS_STATE state)
    }
 
    tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
-   printf("- Version: %s\n", tmp);
+   printf("- Protocol: %s\n", tmp);
+
+   tmp = gnutls_cert_type_get_name( gnutls_cert_type_get(state));
+   printf("- Certificate Type: %s\n", tmp);
 
    tmp = gnutls_compression_get_name(gnutls_compression_get(state));
    printf("- Compression: %s\n", tmp);
