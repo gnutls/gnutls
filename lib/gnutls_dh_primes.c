@@ -29,16 +29,16 @@ static uint8 DH_G_3072[] = { 0x0D };
 
 static uint8 diffie_hellman_group1_prime[130] = { 0x04,
 	0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F,
-	0xDA, 0xA2, 0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 
-	0xDC, 0x1C, 0xD1, 0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74, 
-	0x02, 0x0B, 0xBE, 0xA6, 0x3B, 0x13, 0x9B, 0x22, 0x51, 0x4A, 0x08, 
-	0x79, 0x8E, 0x34, 0x04, 0xDD, 0xEF, 0x95, 0x19, 0xB3, 0xCD, 0x3A, 
-	0x43, 0x1B, 0x30, 0x2B, 0x0A, 0x6D, 0xF2, 0x5F, 0x14, 0x37, 0x4F, 
-	0xE1, 0x35, 0x6D, 0x6D, 0x51, 0xC2, 0x45, 0xE4, 0x85, 0xB5, 0x76, 
-	0x62, 0x5E, 0x7E, 0xC6, 0xF4, 0x4C, 0x42, 0xE9, 0xA6, 0x37, 0xED, 
-	0x6B, 0x0B, 0xFF, 0x5C, 0xB6, 0xF4, 0x06, 0xB7, 0xED, 0xEE, 0x38, 
-	0x6B, 0xFB, 0x5A, 0x89, 0x9F, 0xA5, 0xAE, 0x9F, 0x24, 0x11, 0x7C, 
-	0x4B, 0x1F, 0xE6, 0x49, 0x28, 0x66, 0x51, 0xEC, 0xE6, 0x53, 0x81, 
+	0xDA, 0xA2, 0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80,
+	0xDC, 0x1C, 0xD1, 0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74,
+	0x02, 0x0B, 0xBE, 0xA6, 0x3B, 0x13, 0x9B, 0x22, 0x51, 0x4A, 0x08,
+	0x79, 0x8E, 0x34, 0x04, 0xDD, 0xEF, 0x95, 0x19, 0xB3, 0xCD, 0x3A,
+	0x43, 0x1B, 0x30, 0x2B, 0x0A, 0x6D, 0xF2, 0x5F, 0x14, 0x37, 0x4F,
+	0xE1, 0x35, 0x6D, 0x6D, 0x51, 0xC2, 0x45, 0xE4, 0x85, 0xB5, 0x76,
+	0x62, 0x5E, 0x7E, 0xC6, 0xF4, 0x4C, 0x42, 0xE9, 0xA6, 0x37, 0xED,
+	0x6B, 0x0B, 0xFF, 0x5C, 0xB6, 0xF4, 0x06, 0xB7, 0xED, 0xEE, 0x38,
+	0x6B, 0xFB, 0x5A, 0x89, 0x9F, 0xA5, 0xAE, 0x9F, 0x24, 0x11, 0x7C,
+	0x4B, 0x1F, 0xE6, 0x49, 0x28, 0x66, 0x51, 0xEC, 0xE6, 0x53, 0x81,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
@@ -221,24 +221,45 @@ static uint8 diffie_hellman_prime_2048[256] = {
 };
 
 typedef struct {
+	int bits;
+	MPI _prime;
+	MPI _generator;
 	gnutls_datum generator;
 	gnutls_datum prime;
+	int local;		/* indicates if it is not malloced, !=0 indicated malloced */
 } PRIME;
 
-PRIME dh_prime1024 = { {DH_G_1024, sizeof(DH_G_1024)}, {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}};
-PRIME dh_prime2048 = { {DH_G_2048, sizeof(DH_G_2048)}, {diffie_hellman_prime_2048, sizeof diffie_hellman_prime_2048}};
-PRIME dh_prime4096 = { {DH_G_4096, sizeof(DH_G_4096)}, {diffie_hellman_prime_4096, sizeof diffie_hellman_prime_4096}};
-PRIME dh_prime3072 = { {DH_G_3072, sizeof(DH_G_3072)}, {diffie_hellman_prime_3072, sizeof diffie_hellman_prime_3072}};
-
-
-/* returns g and p, depends on the requested bits.
- * We only support limited key sizes.
+/* Holds the prime to be used in DH authentication.
+ * Initialy the MPIs are not calculated (must call global_init, or _gnutls_dh_calc_mpis()).
  */
-MPI gnutls_get_dh_params(MPI * ret_p, int bits)
-{
-	MPI g, prime;
-	size_t n;
+static PRIME dh_primes[] = {
+	{1024, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
+	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , 0}
+	,
+	{2048, NULL, NULL, {DH_G_2048, sizeof(DH_G_2048)}
+	 , {diffie_hellman_prime_2048, sizeof diffie_hellman_prime_2048}
+	 , 0}
+	,
+	{3072, NULL, NULL, {DH_G_3072, sizeof(DH_G_3072)}
+	 , {diffie_hellman_prime_3072, sizeof diffie_hellman_prime_3072}
+	 , 0}
+	,
+	{4096, NULL, NULL, {DH_G_4096, sizeof(DH_G_4096)}
+	 , {diffie_hellman_prime_4096, sizeof diffie_hellman_prime_4096}
+	 , 0}
+	,
+	{0, NULL, NULL, {NULL, 0}
+	 , {NULL, 0}
+	 , 0}
+};
 
+/* This function takes a number of bits and returns a supported
+ * number of bits. Ie a number of bits that we have a prime in the
+ * dh_primes structure.
+ */
+static int normalize_bits(int bits)
+{
 	if (bits >= 4096)
 		bits = 4096;
 	else if (bits <= 1024)
@@ -250,186 +271,198 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 	else if (bits <= 4096)
 		bits = 4096;
 
-	switch (bits) {
-	case 1024:
-		n = dh_prime1024.prime.size;
+	return bits;
+}
 
-		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-				  dh_prime1024.prime.data, &n)
-		    || prime == NULL) {
+/* Clears allocated MPIs and data. Only to be called at exit.
+ */
+void _gnutls_dh_clear_mpis() {
+int i;
+
+	i = 0;
+	do {
+		_gnutls_mpi_release( &dh_primes[i]._prime);
+		_gnutls_mpi_release( &dh_primes[i]._generator);
+		if (dh_primes[i].local != 0) {
+			gnutls_free( dh_primes[i].prime.data);
+			gnutls_free( dh_primes[i].generator.data);
+		}
+		i++;
+	} while (dh_primes[i].bits != 0);
+
+}
+
+/* Generates MPIs from opaque integer data. Initializes the dh_primes to
+ * be used.
+ */
+int _gnutls_dh_calc_mpis()
+{
+int i, n;
+
+	i = 0;
+	do {
+ 		n = dh_primes[i].prime.size;
+		_gnutls_mpi_release( &dh_primes[i]._prime);
+
+		if (gcry_mpi_scan(&dh_primes[i]._prime, GCRYMPI_FMT_USG,
+				  dh_primes[i].prime.data, &n)
+		    || dh_primes[i]._prime == NULL) {
 			gnutls_assert();
-			return NULL;
+			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 
-		n = dh_prime1024.generator.size;
-		if (gcry_mpi_scan(&g, GCRYMPI_FMT_USG,
-				  dh_prime1024.generator.data, &n)
-		    || prime == NULL) {
+
+		n = dh_primes[i].generator.size;
+		_gnutls_mpi_release( &dh_primes[i]._generator);
+
+		if (gcry_mpi_scan(&dh_primes[i]._generator, GCRYMPI_FMT_USG,
+				  dh_primes[i].generator.data, &n)
+		    || dh_primes[i]._generator == NULL) {
 			gnutls_assert();
-			return NULL;
+			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 
-		if (ret_p)
-			*ret_p = prime;
-		else
-			_gnutls_mpi_release(&prime);
-		return g;
-	case 2048:
-		n = dh_prime2048.prime.size;
+		i++;
+	} while (dh_primes[i].bits != 0);
 
-		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-				  dh_prime2048.prime.data, &n)
-		    || prime == NULL) {
-			gnutls_assert();
-			return NULL;
+	return 0;
+}
+
+/* returns g and p, depends on the requested bits.
+ * We only support limited key sizes.
+ */
+MPI gnutls_get_dh_params(MPI * ret_p, int bits)
+{
+	MPI g=NULL, prime=NULL;
+	int i;
+
+	bits = normalize_bits(bits);
+
+	i = 0;
+	do {
+		if (dh_primes[i].bits == bits) {
+			prime = gcry_mpi_copy(dh_primes[i]._prime);
+			g = gcry_mpi_copy(dh_primes[i]._generator);
+			break;
 		}
+		i++;
+	} while (dh_primes[i].bits != 0);
 
-		n = dh_prime2048.generator.size;
-		if (gcry_mpi_scan(&g, GCRYMPI_FMT_USG,
-				  dh_prime2048.generator.data, &n)
-		    || prime == NULL) {
-			gnutls_assert();
-			return NULL;
-		}
-
-		if (ret_p)
-			*ret_p = prime;
-		else
-			_gnutls_mpi_release(&prime);
-		return g;
-	case 3072:
-		n = dh_prime3072.prime.size;
-
-		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-				  dh_prime3072.prime.data, &n)
-		    || prime == NULL) {
-			gnutls_assert();
-			return NULL;
-		}
-
-		n = dh_prime3072.generator.size;
-		if (gcry_mpi_scan(&g, GCRYMPI_FMT_USG,
-				  dh_prime3072.generator.data, &n)
-		    || prime == NULL) {
-			gnutls_assert();
-			return NULL;
-		}
-
-		if (ret_p)
-			*ret_p = prime;
-		else
-			_gnutls_mpi_release(&prime);
-		return g;
-	case 4096:
-		n = dh_prime4096.prime.size;
-
-		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-				  dh_prime4096.prime.data, &n)
-		    || prime == NULL) {
-			gnutls_assert();
-			return NULL;
-		}
-
-		n = dh_prime4096.generator.size;
-		if (gcry_mpi_scan(&g, GCRYMPI_FMT_USG,
-				  dh_prime4096.generator.data, &n)
-		    || prime == NULL) {
-			gnutls_assert();
-			return NULL;
-		}
-
-		if (ret_p)
-			*ret_p = prime;
-		else
-			_gnutls_mpi_release(&prime);
-		return g;
-	default:
+	if (prime==NULL || g==NULL) { /* if not prime was found */
 		gnutls_assert();
+		_gnutls_mpi_release( &g);
+		_gnutls_mpi_release( &prime);
+		*ret_p = NULL;
 		return NULL;
 	}
+
+	if (ret_p)
+		*ret_p = prime;
+	return g;
 }
 
 /* These should be added in gcrypt.h */
-MPI _gcry_generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
-	                MPI g, MPI **ret_factors );
+MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
+			     unsigned qbits, MPI g, MPI ** ret_factors);
 
-int _gnutls_dh_generate_prime(MPI *ret_g, MPI* ret_n, int bits)
+int _gnutls_dh_generate_prime(MPI * ret_g, MPI * ret_n, int bits)
 {
 
 	MPI g, prime;
 	int qbits;
 
-	g = mpi_new(16); /* this should be ok */
-	if (g==NULL) {
+	g = mpi_new(16);	/* this should be ok */
+	if (g == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	/* generate a random prime */
 	/* this is an emulation of Michael Wiener's table
-         * bad emulation.
+	 * bad emulation.
 	 */
 	qbits = 120 + (((bits / 256) - 1) * 20);
-	if (qbits & 1)	/* better have a even one */
+	if (qbits & 1)		/* better have a even one */
 		qbits++;
 
 	prime = _gcry_generate_elg_prime(0, bits, qbits, g, NULL);
-	if (prime==NULL || g==NULL) {
-		_gnutls_mpi_release( &g);
-		_gnutls_mpi_release( &prime);
+	if (prime == NULL || g == NULL) {
+		_gnutls_mpi_release(&g);
+		_gnutls_mpi_release(&prime);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (ret_g) *ret_g = g;
-	if (ret_n) *ret_n = prime;
+	if (ret_g)
+		*ret_g = g;
+	if (ret_n)
+		*ret_n = prime;
 
 	return 0;
 
 }
 
-/* Replaces the prime in the static DH parameters.
+/* Replaces the prime in the static DH parameters, with a randomly
+ * generated one.
  */
-static int _gnutls_dh_replace_prime( PRIME* sprime, int bits)
+static int _gnutls_dh_replace_prime(PRIME * sprime, int bits)
 {
 
-	MPI prime, g;
+	MPI tmp_prime, tmp_g;
 	int siz;
+	gnutls_datum raw_prime, raw_g;
 
-	gnutls_free( sprime->prime.data);
 
-	if ( _gnutls_dh_generate_prime(&g, &prime, bits) < 0) {
+	if (_gnutls_dh_generate_prime(&tmp_g, &tmp_prime, bits) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, g);
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, tmp_g);
 
-	sprime->generator.data = gnutls_malloc(siz);
-	if (sprime->generator.data==NULL) {
-		_gnutls_mpi_release(&g);
-		_gnutls_mpi_release(&prime);
+	raw_g.data = gnutls_malloc(siz);
+	if (raw_g.data == NULL) {
+		_gnutls_mpi_release(&tmp_g);
+		_gnutls_mpi_release(&tmp_prime);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	sprime->generator.size = siz;
-	gcry_mpi_print(GCRYMPI_FMT_USG, sprime->generator.data, &siz, g);
+	raw_g.size = siz;
+	gcry_mpi_print(GCRYMPI_FMT_USG, raw_g.data, &siz, tmp_g);
 
-	_gnutls_mpi_release(&g);
 
 	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, prime);
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, tmp_prime);
 
-	sprime->prime.data = gnutls_malloc(siz);
-	if (sprime->prime.data==NULL) {
-		_gnutls_mpi_release(&prime);
+	raw_prime.data = gnutls_malloc(siz);
+	if (raw_prime.data == NULL) {
+		_gnutls_mpi_release(&tmp_g);
+		_gnutls_mpi_release(&tmp_prime);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	sprime->prime.size = siz;
-	gcry_mpi_print(GCRYMPI_FMT_USG, sprime->prime.data, &siz, prime);
+	raw_prime.size = siz;
+	gcry_mpi_print(GCRYMPI_FMT_USG, raw_prime.data, &siz, tmp_prime);
 
-	_gnutls_mpi_release(&prime);
+
+	/* copy the generated values to the structure
+	 */
+	if (sprime->local != 0) {
+		gnutls_free(sprime->prime.data);
+		_gnutls_mpi_release(&sprime->_prime);
+		gnutls_free(sprime->generator.data);
+		_gnutls_mpi_release(&sprime->_generator);
+	}
+	sprime->local = 1;
+	sprime->_prime = gcry_mpi_copy(tmp_prime);
+	sprime->_generator = gcry_mpi_copy(tmp_g);
+	sprime->prime.data = raw_prime.data;
+	sprime->prime.size = raw_prime.size;
+	sprime->generator.data = raw_g.data;
+	sprime->generator.size = raw_g.size;
+
+	_gnutls_mpi_release(&tmp_g);
+	_gnutls_mpi_release(&tmp_prime);
 
 	return 0;
 
@@ -444,27 +477,29 @@ static int _gnutls_dh_replace_prime( PRIME* sprime, int bits)
   * called in order to replace the included DH primes in the gnutls
   * library.
   **/
-int gnutls_dh_generate_new_primes() {
-int ret;
-	ret = _gnutls_dh_replace_prime( &dh_prime1024, 1024);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	ret = _gnutls_dh_replace_prime( &dh_prime2048, 2048);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	ret = _gnutls_dh_replace_prime( &dh_prime3072, 3072);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	ret = _gnutls_dh_replace_prime( &dh_prime4096, 4096);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+int gnutls_dh_generate_new_primes()
+{
+	int ret, i;
+
+	i = 0;
+	do {
+#ifdef DEBUG
+		_gnutls_log("Generating prime with %d bits\n",
+			    dh_primes[i].bits);
+#endif
+		ret =
+		    _gnutls_dh_replace_prime(&dh_primes[i],
+					      dh_primes[i].bits);
+		if (ret < 0) {
+			gnutls_assert();
+#ifdef DEBUG
+			_gnutls_log("Error generating prime %d\n",
+				    dh_primes[i].bits);
+#endif
+			return ret;
+		}
+		i++;
+	} while (dh_primes[i].bits != 0);
+	
 	return 0;
 }

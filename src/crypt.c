@@ -52,7 +52,7 @@ int generate_create_conf(char *tpasswd_conf, int bits)
 		return -1;
 	}
 
-	_gnutls_srp_gn(&g, &n, bits);
+	_gnutls_srp_generate_prime(&g, &n, bits);
 	sprintf(line, "%d:%s:%s\n", index, n, g);
 
 	fwrite(line, 1, strlen(line), fd);

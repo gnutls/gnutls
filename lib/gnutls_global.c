@@ -21,6 +21,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <x509_asn1.h>
+#include <gnutls_dh.h>
 
 #ifdef USE_SIGNALS
 
@@ -168,6 +169,12 @@ int gnutls_global_init()
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	
+	result = _gnutls_dh_calc_mpis();
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+	
 	return 0;
 }
 
@@ -185,7 +192,9 @@ void gnutls_global_deinit() {
 #endif
 	asn1_delete_structure( PKCS1_ASN);
 	asn1_delete_structure( PKIX1_ASN);
-
+	
+	_gnutls_dh_clear_mpis();
+	
 }
 
 #ifdef USE_SIGNALS

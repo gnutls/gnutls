@@ -82,7 +82,7 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	}
 
 	g = gnutls_get_dh_params(&p, bits);
-	if (g==NULL) {
+	if (g==NULL || p==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -94,10 +94,12 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO_INT);
 
 	X = gnutls_calc_dh_secret(&x, g, p);
-	if (X==NULL) {
+	if (X==NULL || x==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &g);
 		_gnutls_mpi_release( &p);
+		_gnutls_mpi_release( &x);
+		_gnutls_mpi_release( &X);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
