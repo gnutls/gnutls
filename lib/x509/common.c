@@ -778,3 +778,70 @@ gnutls_datum encoded;
 
 	return 0;
 }
+
+/* Writes the value of the datum in the given ASN1_TYPE. If str is non
+ * zero it encodes it as OCTET STRING.
+ */
+int _gnutls_x509_write_value( ASN1_TYPE c, const char* root,
+	const gnutls_datum *data, int str)
+{
+int result;
+int asize;
+ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+gnutls_datum val;
+
+	asize = data->size + 16;
+
+	val.data = gnutls_malloc( asize);
+	if (val.data == NULL) {
+		gnutls_assert();
+		result = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	if (str) {
+		/* Convert it to OCTET STRING
+		 */
+		if ((result=asn1_create_element
+		    (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		result = asn1_write_value(c2, "", data->data, data->size);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result =  _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		result = _gnutls_x509_der_encode( c2, "", &val, 0);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		
+	} else {
+		val.data = data->data;
+		val.size = data->size;
+	}
+
+	/* Write the data.
+	 */
+	result = asn1_write_value( c, root, val.data, val.size);
+
+	if (val.data != data->data)
+		_gnutls_free_datum(&val);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+	
+	cleanup:
+		if (val.data != data->data) _gnutls_free_datum( &val);
+		return result;
+}

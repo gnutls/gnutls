@@ -119,6 +119,138 @@ int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum* da
 	return 0;
 }
 
+#define X509_CERT_OID "1.2.840.113549.1.9.22.1"
+#define X509_CRL_OID  "1.2.840.113549.1.9.23.1"
+
+int _pkcs12_decode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* in,
+		gnutls_datum* out)
+{
+	int ret;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	
+	if (type == GNUTLS_BAG_CERTIFICATE) {
+		if ((ret=asn1_create_element(_gnutls_get_pkix(), 
+			"PKIX1.pkcs-12-CertBag", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+		
+		ret = asn1_der_decoding( &c2, in->data, in->size, NULL);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+
+		ret = _gnutls_x509_read_value( c2, "certValue", out, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;	
+		}
+
+	} else { /* CRL */
+		if ((ret=asn1_create_element(_gnutls_get_pkix(), 
+			"PKIX1.pkcs-12-CRLBag", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+
+		ret = asn1_der_decoding( &c2, in->data, in->size, NULL);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+
+		ret = _gnutls_x509_read_value( c2, "crlValue", out, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;	
+		}
+	}
+
+	asn1_delete_structure( &c2);
+
+	return 0;
+	
+
+	cleanup:
+
+	asn1_delete_structure( &c2);
+	return ret;
+}
+
+
+int _pkcs12_encode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* raw,
+		gnutls_datum* out)
+{
+	int ret;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	
+	if (type == GNUTLS_BAG_CERTIFICATE) {
+		if ((ret=asn1_create_element(_gnutls_get_pkix(), 
+			"PKIX1.pkcs-12-CertBag", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+
+		ret = asn1_write_value( c2, "certId", X509_CERT_OID, 1);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+
+		ret = _gnutls_x509_write_value( c2, "certValue", raw, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;	
+		}
+
+	} else { /* CRL */
+		if ((ret=asn1_create_element(_gnutls_get_pkix(), 
+			"PKIX1.pkcs-12-CRLBag", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+
+		ret = asn1_write_value( c2, "crlId", X509_CRL_OID, 1);
+		if (ret != ASN1_SUCCESS) {
+			gnutls_assert();
+			ret = _gnutls_asn2err(ret);
+			goto cleanup;	
+		}
+
+		ret = _gnutls_x509_write_value( c2, "crlValue", raw, 1);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;	
+		}
+	}
+
+	ret = _gnutls_x509_der_encode( c2, "", out, 0);
+
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;	
+	}
+	
+	asn1_delete_structure( &c2);
+
+	return 0;
+	
+
+	cleanup:
+
+	asn1_delete_structure( &c2);
+	return ret;
+}
+
+
 /**
   * gnutls_pkcs12_bag_set_data - This function inserts data into the bag
   * @bag: The bag
@@ -154,6 +286,7 @@ int ret;
 	}
 
 	ret = _gnutls_set_datum( &bag->data[bag->bag_elements], data->data, data->size);
+
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

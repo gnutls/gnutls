@@ -1658,22 +1658,6 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum * data,
 		goto error;
 	}
 
-#if 1
-/* not really needed
- */
-	len = sizeof(enc_oid);
-	result =
-	    asn1_read_value(pkcs7_asn,
-			    "encryptedContentInfo.contentType",
-			    enc_oid, &len);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto error;
-	}
-	_gnutls_x509_log("PKCS #7 encryptedContentInfo.contentType OID '%s'.\n", enc_oid);
-#endif
-
 	/* Check the encryption schema OID
 	 */
 	len = sizeof(enc_oid);

@@ -68,3 +68,8 @@ int _pkcs12_check_pass( const char* pass, size_t plen);
 
 int
 _pkcs12_encode_safe_contents( gnutls_pkcs12_bag bag, ASN1_TYPE* content, int *enc);
+
+int _pkcs12_decode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* in,
+		gnutls_datum* out);
+int _pkcs12_encode_crt_bag( gnutls_pkcs12_bag_type type, const gnutls_datum* raw,
+		gnutls_datum* out);

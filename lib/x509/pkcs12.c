@@ -234,7 +234,7 @@ int gnutls_pkcs12_export( gnutls_pkcs12 pkcs12,
 		output_data, output_data_size);
 }
 
-static int _oid2bag( const char* oid)
+static int oid2bag( const char* oid)
 {
 	if (strcmp(oid, BAG_PKCS8_KEY)==0) 
 		return GNUTLS_BAG_PKCS8_KEY;
@@ -248,7 +248,7 @@ static int _oid2bag( const char* oid)
 	return GNUTLS_BAG_UNKNOWN;
 }
 
-static const char* _bag2oid( int bag)
+static const char* bag2oid( int bag)
 {
 	switch (bag) {
 		case GNUTLS_BAG_PKCS8_KEY:
@@ -321,7 +321,7 @@ char counter[MAX_INT_DIGITS];
 
 		/* Read the Bag type
 		 */
-		bag_type = _oid2bag( oid);
+		bag_type = oid2bag( oid);
 	
 		if (bag_type < 0) {
 			gnutls_assert();
@@ -340,6 +340,19 @@ char counter[MAX_INT_DIGITS];
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;
+		}
+
+		if (bag_type == GNUTLS_BAG_CERTIFICATE ||
+			bag_type == GNUTLS_BAG_CRL) {
+			gnutls_datum tmp = bag->data[i];
+
+			result = _pkcs12_decode_crt_bag( bag_type, &tmp, &bag->data[i]);
+			if (result < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			
+			_gnutls_free_datum( &tmp);
 		}
 
 		bag->type[i] = bag_type;
@@ -745,8 +758,10 @@ int result;
 int i;
 const char* oid;
 
-	if (enc)
-		*enc = 0;
+	if (bag->type[0] == GNUTLS_BAG_ENCRYPTED && enc) {
+		*enc = 1;
+		return 0; /* ENCRYPTED BAG, do nothing. */
+	} else if (enc) *enc = 0;
 
 	/* Step 1. Create the SEQUENCE.
 	 */
@@ -760,9 +775,7 @@ const char* oid;
 
 	for (i=0;i<bag->bag_elements;i++) {
 
-		if (bag->type[i] == GNUTLS_BAG_ENCRYPTED && enc) *enc = 1;
-
-		oid = _bag2oid( bag->type[i]);
+		oid = bag2oid( bag->type[i]);
 		if (oid==NULL) {
 			gnutls_assert();
 			continue;
@@ -793,14 +806,37 @@ const char* oid;
 			goto cleanup;
 		}
 
-
 		/* Copy the Bag Value
 		 */
 
-		result = asn1_write_value( c2, "?LAST.bagValue", bag->data[i].data, bag->data[i].size);
-		if (result != ASN1_SUCCESS) {
+		if (bag->type[i] == GNUTLS_BAG_CERTIFICATE ||
+			bag->type[i] == GNUTLS_BAG_CRL) {
+			gnutls_datum tmp;
+
+			/* in that case encode it to a CertBag or
+			 * a CrlBag.
+			 */
+
+			result = _pkcs12_encode_crt_bag( bag->type[i], &bag->data[i], &tmp);
+
+			if (result < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			result = _gnutls_x509_write_value( c2, "?LAST.bagValue", 
+				&tmp, 0);
+				
+			_gnutls_free_datum( &tmp);
+
+		} else {
+
+			result = _gnutls_x509_write_value( c2, "?LAST.bagValue", 
+				&bag->data[i], 0);
+		}
+
+		if (result < 0) {
 			gnutls_assert();
-			result = _gnutls_asn2err(result);
 			goto cleanup;
 		}
 
