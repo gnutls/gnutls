@@ -55,6 +55,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			data_p = &data[0];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_p[2],
 				       &n_p, p);
+			mpi_release(p);
 
 			_n_p = n_p;
 #ifndef WORDS_BIGENDIAN
@@ -68,6 +69,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			data_g = &data_p[2+n_p];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_g[2],
 				       &n_g, g);
+			mpi_release(g);
 			_n_g = n_g;
 #ifndef WORDS_BIGENDIAN
 
@@ -80,6 +82,8 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			data_X = &data_g[2+n_g];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_X[2],
 				       &n_X, X);
+			mpi_release(X);
+			
 			_n_X = n_X;
 #ifndef WORDS_BIGENDIAN
 			_n_X = byteswap16(_n_X);
@@ -131,7 +135,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data[3],
 				       &n_X, X);
 
-
+			mpi_release(X);
 			
 			_n_X = n_X;
 #ifndef WORDS_BIGENDIAN
@@ -153,7 +157,13 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 			/* THIS SHOULD BE DISCARDED */
 			mpi_release(state->gnutls_internals.KEY);
-			
+			mpi_release(state->gnutls_internals.client_Y);
+			mpi_release(state->gnutls_internals.client_p);
+			mpi_release(state->gnutls_internals.client_g);
+			state->gnutls_internals.KEY=NULL;
+			state->gnutls_internals.client_Y=NULL;
+			state->gnutls_internals.client_p=NULL;
+			state->gnutls_internals.client_g=NULL;
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 	}
@@ -285,6 +295,11 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 				       &premaster_size, state->gnutls_internals.KEY);
 			/* THIS SHOULD BE DISCARDED */
 			mpi_release(state->gnutls_internals.KEY);
+			mpi_release(state->gnutls_internals.client_Y);
+			mpi_release(state->gnutls_internals.dh_secret);
+			state->gnutls_internals.KEY=NULL;
+			state->gnutls_internals.client_Y=NULL;
+			state->gnutls_internals.dh_secret=NULL;
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 		}

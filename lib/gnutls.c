@@ -39,6 +39,14 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.server_hash = 0;
 	(*state)->gnutls_internals.client_hash = 0;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
+
+	mpi_release((*state)->gnutls_internals.KEY);
+	mpi_release((*state)->gnutls_internals.client_Y);
+	mpi_release((*state)->gnutls_internals.client_p);
+	mpi_release((*state)->gnutls_internals.client_g);
+	mpi_release((*state)->gnutls_internals.dh_secret);
+
+
 }
 
 int gnutls_deinit(GNUTLS_STATE * state)
@@ -51,11 +59,11 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	gnutls_free((*state)->gnutls_internals.buffer);
 
 	if ((*state)->connection_state.read_cipher_state != NULL)
-		gcry_cipher_close((*state)->connection_state.
-				  read_cipher_state);
+		gcry_cipher_close((*state)->
+				  connection_state.read_cipher_state);
 	if ((*state)->connection_state.write_cipher_state != NULL)
-		gcry_cipher_close((*state)->connection_state.
-				  write_cipher_state);
+		gcry_cipher_close((*state)->
+				  connection_state.write_cipher_state);
 
 	secure_free((*state)->cipher_specs.server_write_mac_secret);
 	secure_free((*state)->cipher_specs.client_write_mac_secret);
@@ -64,16 +72,26 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	secure_free((*state)->cipher_specs.server_write_key);
 	secure_free((*state)->cipher_specs.client_write_key);
 
+	mpi_release((*state)->gnutls_internals.KEY);
+	mpi_release((*state)->gnutls_internals.client_Y);
+	mpi_release((*state)->gnutls_internals.client_p);
+	mpi_release((*state)->gnutls_internals.client_g);
+	mpi_release((*state)->gnutls_internals.dh_secret);
+
 	gnutls_free(*state);
+
 }
 
 
-void* _gnutls_cal_PRF_A(hashid algorithm, void* secret, int secret_size, void* seed, int seed_size) {
-MHASH td1;
-void *A;
+void *_gnutls_cal_PRF_A(hashid algorithm, void *secret, int secret_size,
+			void *seed, int seed_size)
+{
+	MHASH td1;
+	void *A;
 
 	td1 =
-	    mhash_hmac_init(algorithm, secret, secret_size, mhash_get_hash_pblock(algorithm));
+	    mhash_hmac_init(algorithm, secret, secret_size,
+			    mhash_get_hash_pblock(algorithm));
 
 	mhash(td1, seed, seed_size);
 
@@ -90,18 +108,22 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 		     opaque * seed, int seed_size, int total_bytes)
 {
 
-	MHASH td1, td2;
-	char *ret = secure_calloc(1, total_bytes);
+	MHASH td2;
+	opaque *ret;
 	void *A, *Atmp;
 	int i = 0, times, copy_bytes = 0, how, blocksize, A_size;
 	void *final;
+
+	ret = secure_calloc(1, total_bytes);
 
 	blocksize = mhash_get_block_size(algorithm);
 	do {
 		i += blocksize;
 	} while (i < total_bytes);
 
-	A = _gnutls_cal_PRF_A( algorithm, secret, secret_size, seed, seed_size);
+	A =
+	    _gnutls_cal_PRF_A(algorithm, secret, secret_size, seed,
+			      seed_size);
 	A_size = blocksize;
 
 	times = i / blocksize;
@@ -110,10 +132,12 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 		    mhash_hmac_init(algorithm, secret, secret_size,
 				    mhash_get_hash_pblock(algorithm));
 
-		Atmp = _gnutls_cal_PRF_A( algorithm, secret, secret_size, A, A_size);
+		Atmp =
+		    _gnutls_cal_PRF_A(algorithm, secret, secret_size, A,
+				      A_size);
 		free(A);
 		A = Atmp;
-		
+
 		mhash(td2, A, A_size);
 		mhash(td2, seed, seed_size);
 		final = mhash_hmac_end(td2);
@@ -156,28 +180,28 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 	if (secret_size % 2 == 0) {
 		l_s1 = l_s2 = secret_size / 2;
 		s1 = &secret[0];
-		s2 = &secret[l_s1 + 1];
+		s2 = &secret[l_s1];
 	} else {
 		l_s1 = l_s2 = (secret_size / 2) + 1;
 		s1 = &secret[0];
-		s2 = &secret[l_s1];
+		s2 = &secret[l_s1 - 1];
 	}
 
 	o1 =
 	    gnutls_P_hash(MHASH_MD5, s1, l_s1, s_seed, s_seed_size,
 			  total_bytes);
-	o2 =
-	    gnutls_P_hash(MHASH_SHA1, s2, l_s2, s_seed, s_seed_size,
-			  total_bytes);
+//	o2 =
+//	    gnutls_P_hash(MHASH_SHA1, s2, l_s2, s_seed, s_seed_size,
+//			  total_bytes);
 
 	ret = secure_calloc(1, total_bytes);
 	gnutls_free(s_seed);
 	for (i = 0; i < total_bytes; i++) {
-		ret[i] = o1[i] ^ o2[i];
+		ret[i] = o1[i]; //^ o2[i];
 	}
 
 	secure_free(o1);
-	secure_free(o2);
+//	secure_free(o2);
 
 	return ret;
 
@@ -453,10 +477,11 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 	/* If we have enough data in the cache do not bother receiving
 	 * a new packet. (in order to flush the cache)
 	 */
-	if (type == GNUTLS_APPLICATION_DATA && gnutls_getDataBufferSize(type, state) > 0) {
+	if (type == GNUTLS_APPLICATION_DATA
+	    && gnutls_getDataBufferSize(type, state) > 0) {
 		ret = gnutls_getDataFromBuffer(state, data, sizeofdata);
 		return ret;
-	}	                          
+	}
 
 	if (state->gnutls_internals.valid_connection == VALID_FALSE)
 		return GNUTLS_E_INVALID_SESSION;
@@ -589,8 +614,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 				return GNUTLS_E_CLOSURE_ALERT_RECEIVED;
 			} else {
 				if (tmpdata[0] == GNUTLS_FATAL) {
-					state->gnutls_internals.
-					    valid_connection = VALID_FALSE;
+					state->
+					    gnutls_internals.valid_connection
+					    = VALID_FALSE;
 
 					state->gnutls_internals.resumable
 					    = RESUME_FALSE;
@@ -600,15 +626,16 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 				return GNUTLS_E_WARNING_ALERT_RECEIVED;
 			}
 			break;
-			
+
 		case GNUTLS_CHANGE_CIPHER_SPEC:
 
 			if (type != GNUTLS_CHANGE_CIPHER_SPEC) {
 				return GNUTLS_E_UNEXPECTED_PACKET;
 			}
 			if (((ChangeCipherSpecType)
-			     tmpdata[0]) == GNUTLS_TYPE_CHANGE_CIPHER_SPEC && tmplen == 1) {
-				ret = 0; // _gnutls_connection_state_init(state);
+			     tmpdata[0]) == GNUTLS_TYPE_CHANGE_CIPHER_SPEC
+			    && tmplen == 1) {
+				ret = 0;	// _gnutls_connection_state_init(state);
 
 			} else {
 				state->gnutls_internals.valid_connection
@@ -625,11 +652,12 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 			if (type == GNUTLS_HANDSHAKE) {
 				ret =
 				    _gnutls_recv_handshake_int
-				    (cd, state, tmpdata, tmplen, data, sizeofdata);
-				
+				    (cd, state, tmpdata, tmplen, data,
+				     sizeofdata);
+
 				gnutls_free(tmpdata);
-				state->
-				    connection_state.read_sequence_number++;
+				state->connection_state.
+				    read_sequence_number++;
 			} else {
 
 				ret = GNUTLS_E_RECEIVED_BAD_MESSAGE;
@@ -646,7 +674,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 
 
 	/* Insert Application data to buffer */
-	if (type == GNUTLS_APPLICATION_DATA && gcipher.type==type) {
+	if (type == GNUTLS_APPLICATION_DATA && gcipher.type == type) {
 		ret = gnutls_getDataFromBuffer(state, data, sizeofdata);
 		gnutls_free(tmpdata);
 	} else {
