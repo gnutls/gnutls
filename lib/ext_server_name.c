@@ -174,12 +174,13 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
    	       p += len;
 	    break;
 	 default:
+	    gnutls_assert();
 	    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	 }
       }
    }
    if (total_size == 0)
-      return GNUTLS_E_INVALID_REQUEST;
+      return 0;
    return total_size;
 }
 
@@ -213,12 +214,16 @@ int gnutls_server_name_get(gnutls_session session, void *data,
 {
    char *_data = data;
    
-   if (session->security_parameters.entity == GNUTLS_CLIENT)
+   if (session->security_parameters.entity == GNUTLS_CLIENT) {
+      gnutls_assert();
       return GNUTLS_E_INVALID_REQUEST;
+   }
 
    if (index >
-       session->security_parameters.extensions.server_names_size - 1)
+       session->security_parameters.extensions.server_names_size - 1) {
+      gnutls_assert();
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+   }
 
    *type =
        session->security_parameters.extensions.server_names[index].type;
@@ -268,8 +273,10 @@ int gnutls_server_name_set(gnutls_session session,
 {
    int server_names;
 
-   if (session->security_parameters.entity == GNUTLS_SERVER)
+   if (session->security_parameters.entity == GNUTLS_SERVER) {
+      gnutls_assert();
       return GNUTLS_E_INVALID_REQUEST;
+   }
 
    if (name_length > MAX_SERVER_NAME_SIZE)
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
