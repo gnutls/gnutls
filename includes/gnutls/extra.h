@@ -31,6 +31,10 @@
 
 #include <gnutls/gnutls.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define LIBGNUTLS_EXTRA_VERSION LIBGNUTLS_VERSION
 
 /* Openpgp certificate stuff 
@@ -81,4 +85,7 @@ int gnutls_global_init_extra(void);
  */
 const char* gnutls_extra_check_version( const char *req_version);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
