@@ -13,6 +13,7 @@ following software:
 * cvs2cl (in order to create ChangeLog) (http://www.red-bean.com/cvs2cl/)
 * latex2html (in order to create gnutls.html)
 * latex/dvips (in order to create gnutls.ps)
+* gaa (to handle example programs' parameters) (http://members.hellug.gr/gaa)
 
 1. Download the cvs tree
 $ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls login
