@@ -24,7 +24,8 @@
 
 #ifdef USE_DMALLOC
 
-int _gnutls_is_secure_memory(const void* ign) {
+int _gnutls_is_secure_memory(const void *ign)
+{
 	return 0;
 }
 
@@ -33,151 +34,173 @@ int _gnutls_is_secure_memory(const void* ign) {
 /* #define MALLOC_DEBUG */
 # define EXTRA_SIZE sizeof(size_t)+1
 
-int _gnutls_is_secure_memory(const svoid* mem) {
-        return *((opaque*)mem-1);
+int _gnutls_is_secure_memory(const svoid * mem)
+{
+	return *((opaque *) mem - 1);
 }
 
-void* gnutls_malloc( size_t size) {
-opaque* ret;
-	if (size==0) return NULL;
-	
-	ret = malloc( size+EXTRA_SIZE);
-	if (ret==NULL) return ret;
+void *gnutls_malloc(size_t size)
+{
+	opaque *ret;
+	if (size == 0)
+		return NULL;
 
-	*((int*)ret) = size;
-	ret[sizeof(size_t)] = 0; /* not secure */
-	
+	ret = malloc(size + EXTRA_SIZE);
+	if (ret == NULL)
+		return ret;
+
+	*((int *) ret) = size;
+	ret[sizeof(size_t)] = 0;	/* not secure */
+
 	ret += EXTRA_SIZE;
 
 #ifdef MALLOC_DEBUG
-	_gnutls_log("Allocated: %x with %d bytes\n", ret, _gnutls_malloc_ptr_size(ret));
+	_gnutls_log("Allocated: %x with %d bytes\n", ret,
+		    _gnutls_malloc_ptr_size(ret));
 #endif
 
 	return ret;
-	
+
 }
 
-void* gnutls_calloc( size_t nmemb, size_t size) {
-void* ret;
-	ret = gnutls_malloc( size);
-	if (ret==NULL) return ret;
-	
-	memset( ret, 0, size);
-	
+void *gnutls_calloc(size_t nmemb, size_t size)
+{
+	void *ret;
+	ret = gnutls_malloc(size);
+	if (ret == NULL)
+		return ret;
+
+	memset(ret, 0, size);
+
 	return ret;
 }
 
-size_t _gnutls_malloc_ptr_size( void* _ptr) {
-opaque* ptr = _ptr;
+size_t _gnutls_malloc_ptr_size(void *_ptr)
+{
+	opaque *ptr = _ptr;
 
-	if (_ptr==NULL) return 0;
-	
-	return *( (int*)((opaque*)ptr-sizeof(size_t)-1));
+	if (_ptr == NULL)
+		return 0;
+
+	return *((int *) ((opaque *) ptr - sizeof(size_t) - 1));
 }
 
-void* gnutls_realloc( void* ptr, size_t size) {
-void* ret;
-	ret = gnutls_malloc( size);
-	if (ret==NULL) return ret;
+void *gnutls_realloc(void *_ptr, size_t size)
+{
+	opaque *ret;
+	opaque* ptr = _ptr;
 	
-	if (ptr!=NULL) {
-		memcpy( ret, ptr, GMIN( _gnutls_malloc_ptr_size(ptr), size));
-		gnutls_free(ptr);
-	}
-	
+	if (ptr!=NULL)
+		ptr -= EXTRA_SIZE;
+
+	ret = realloc(ptr, size + EXTRA_SIZE);
+	if (ret == NULL)
+		return ret;
+
+	*((int *) ret) = size;
+	ret[sizeof(size_t)] = 0;	/* not secure */
+
+	ret += EXTRA_SIZE;
+
 	return ret;
 }
 
-void* gnutls_realloc_fast( void* ptr, size_t size) {
-void* ret;
-	if ( ptr != NULL && size <= _gnutls_malloc_ptr_size(ptr)) {
+void *gnutls_realloc_fast(void *ptr, size_t size)
+{
+	if (ptr != NULL && size <= _gnutls_malloc_ptr_size(ptr)) {
 		/* do nothing, just return the pointer.
-		 * It's much faster.
+		   * It's much faster.
 		 */
 		return ptr;
 	}
-	ret = gnutls_malloc( size);
-	if (ret==NULL) return ret;
-	
-	if (ptr!=NULL) {
-		memcpy( ret, ptr, GMIN( _gnutls_malloc_ptr_size(ptr), size));
-		gnutls_free(ptr);
-	}
-	
-	return ret;
+	return gnutls_realloc(ptr, size);
 }
 
-void gnutls_free( void* _ptr) {
-opaque* ptr = _ptr;
-        
-        if (_ptr==NULL) return;
-        
+
+void gnutls_free(void *_ptr)
+{
+	opaque *ptr = _ptr;
+
+	if (_ptr == NULL)
+		return;
+
 	ptr -= EXTRA_SIZE;
 
 #ifdef MALLOC_DEBUG
-	_gnutls_log("Freed: %x with %d bytes\n", _ptr, _gnutls_malloc_ptr_size(_ptr));
+	_gnutls_log("Freed: %x with %d bytes\n", _ptr,
+		    _gnutls_malloc_ptr_size(_ptr));
 #endif
-	free( ptr);
+	free(ptr);
 }
 
-svoid* secure_malloc( size_t size) {
-opaque* ret;
-	ret = gnutls_malloc( size);
-	if (ret==NULL) return ret;
-	
-	*((opaque*)ret-1) = 1; /* secure mem */
-	
+svoid *secure_malloc(size_t size)
+{
+	opaque *ret;
+	ret = gnutls_malloc(size);
+	if (ret == NULL)
+		return ret;
+
+	*((opaque *) ret - 1) = 1;	/* secure mem */
+
 	return ret;
-	
+
 }
 
-svoid* secure_calloc( size_t nmemb, size_t size) {
-svoid* ret;
-	ret = secure_malloc( size);
-	if (ret==NULL) return ret;
-	
-	memset( ret, 0, size);
-	
+svoid *secure_calloc(size_t nmemb, size_t size)
+{
+	svoid *ret;
+	ret = secure_malloc(size);
+	if (ret == NULL)
+		return ret;
+
+	memset(ret, 0, size);
+
 	return ret;
 }
 
-size_t _secure_ptr_size( svoid* ptr) {
-	return _gnutls_malloc_ptr_size( ptr);
+size_t _secure_ptr_size(svoid * ptr)
+{
+	return _gnutls_malloc_ptr_size(ptr);
 }
 
-svoid* secure_realloc( svoid* ptr, size_t size) {
-svoid* ret;
-	if ( ptr != NULL && size <= _secure_ptr_size(ptr)) {
+svoid *secure_realloc(svoid * ptr, size_t size)
+{
+	svoid *ret;
+	if (ptr != NULL && size <= _secure_ptr_size(ptr)) {
 		/* do not do realloc.
 		 * return the previous pointer.
 		 */
 		return ptr;
 	}
-	ret = secure_malloc( size);
-	if (ret==NULL) return ret;
+	ret = secure_malloc(size);
+	if (ret == NULL)
+		return ret;
 
-	if (ptr!=NULL) {
-		memcpy( ret, ptr, GMIN( _secure_ptr_size(ptr), size));
+	if (ptr != NULL) {
+		memcpy(ret, ptr, GMIN(_secure_ptr_size(ptr), size));
 		secure_free(ptr);
 	}
-		
+
 	return ret;
 }
 
-void secure_free( svoid* ptr) {
-        memset( ptr, 0, _secure_ptr_size( ptr));
-	gnutls_free( ptr);
+void secure_free(svoid * ptr)
+{
+	memset(ptr, 0, _secure_ptr_size(ptr));
+	gnutls_free(ptr);
 }
 
-char* gnutls_strdup( const char* s) {
-int size = strlen(s);
-char* ret;
- 
-	ret = gnutls_malloc(size+1); /* hold null */
-	if (ret==NULL) return ret;
-	
-	strcpy( ret, s);
-	
+char *gnutls_strdup(const char *s)
+{
+	int size = strlen(s);
+	char *ret;
+
+	ret = gnutls_malloc(size + 1);	/* hold null */
+	if (ret == NULL)
+		return ret;
+
+	strcpy(ret, s);
+
 	return ret;
 }
-#endif /* USE_DMALLOC */
+#endif				/* USE_DMALLOC */

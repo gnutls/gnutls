@@ -391,7 +391,7 @@ typedef struct {
 						* if none.
 						*/
 	/* this is the highest version available
-	 * to the peer.
+	 * to the peer. (advertized version)
 	 */
 	uint8				adv_version_major;
 	uint8				adv_version_minor;

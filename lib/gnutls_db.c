@@ -142,6 +142,9 @@ time_t timestamp;
 
 }
 
+/* The format of storing data is:
+ * SECURITY_PARAMETERS + AUTH_INFO_SIZE + AUTH_INFO
+ */
 int _gnutls_server_register_current_session( GNUTLS_STATE state)
 {
 #ifdef HAVE_LIBGDBM
@@ -164,13 +167,16 @@ int ret = 0;
 		return GNUTLS_E_DB_ERROR;
 
 /* allocate space for data */
-	content.dsize = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size;
+	content.dsize = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size
+		+ sizeof(state->gnutls_key->auth_info_size);
 	content.dptr = gnutls_malloc( content.dsize);
 	if (content.dptr==NULL) return GNUTLS_E_MEMORY_ERROR;
 
 /* copy data */
 	memcpy( content.dptr, (void*)&state->security_parameters, sizeof(SecurityParameters));
-	memcpy( &content.dptr[sizeof(SecurityParameters)], state->gnutls_key->auth_info,  state->gnutls_key->auth_info_size);
+	memcpy( &content.dptr[sizeof(SecurityParameters)], &state->gnutls_key->auth_info_size,  sizeof(state->gnutls_key->auth_info_size));
+	memcpy( &content.dptr[sizeof(state->gnutls_key->auth_info_size)+sizeof(SecurityParameters)], 
+		state->gnutls_key->auth_info,  state->gnutls_key->auth_info_size);
 
 	dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
 	if (dbf==NULL) {
