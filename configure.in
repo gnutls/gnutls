@@ -254,7 +254,7 @@ if test x$ac_ext_libraries != xno; then
  AC_MSG_RESULT(yes)
  AC_CHECK_LIB(gdbm, gdbm_open, SERV_LIBS="-lgdbm", AC_MSG_WARN(
 *** 
-*** GDBM was not found. You will not be able to use the default gdbm session resumption backend.))
+*** GDBM was not found. This is only needed for the gnutls-serv application.))
  AC_CHECK_LIB(z, compress,,AC_MSG_WARN(
 *** 
 *** ZLIB was not found. You will not be able to use ZLIB compression.))
