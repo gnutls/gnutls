@@ -148,18 +148,6 @@ if test $ac_cv_c_compiler_gnu != no; then
 	fi
 fi
 
-AC_MSG_CHECKING([whether we have GNU ld or compatible])
-
-GLD=`ld --help < /dev/null 2>/dev/null | grep version-script`
-if test "$GLD"; then
-have_ld_version_script=yes
-  AC_MSG_RESULT(yes)
-else
-have_ld_version_script=no
-  AC_MSG_RESULT(no)
-fi
-
-AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
 AC_MSG_RESULT([***
 *** Detecting C library capabilities...
@@ -398,6 +386,25 @@ AC_MSG_RESULT([***
 *** Detecting options for shared libraries...
 ])
 AM_PROG_LIBTOOL
+
+dnl This is after AM_PROG_LIBTOOL so that the LD variable
+dnl has been set.
+
+AC_MSG_CHECKING([whether we have GNU ld or compatible])
+
+GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
+if test "$GLD"; then
+have_ld_version_script=yes
+  AC_MSG_RESULT(yes)
+else
+have_ld_version_script=no
+  AC_MSG_RESULT(no)
+AC_MSG_WARN(***
+*** You may want to rerun configure using --with-gnu-ld to enable versioned symbols.
+)
+fi
+
+AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
 
 LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBASN1_LINK $LIBGCRYPT_LIBS"

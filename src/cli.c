@@ -291,7 +291,7 @@ int main(int argc, char **argv)
 
       ret = do_handshake(&hd);
 
-      if (ret < 0 && handle_error(hd, ret) < 0) {
+      if (handle_error(hd, ret) < 0) {
 	 fprintf(stderr, "*** Handshake has failed\n");
 	 gnutls_perror(ret);
 	 gnutls_deinit(hd.session);
@@ -359,7 +359,7 @@ int main(int argc, char **argv)
 	 if (ret == 0) {
 	    printf("- Peer has closed the GNUTLS connection\n");
 	    break;
-	 } else if (ret < 0 && user_term == 0 && handle_error(hd, ret) < 0) {
+	 } else if (handle_error(hd, ret) < 0 && user_term == 0) {
 	    fprintf(stderr,
 		    "*** Server has terminated the connection abnormally.\n");
 	    break;
@@ -381,7 +381,7 @@ int main(int argc, char **argv)
   	    if (hd.secure == 0) {
   	       fprintf(stderr, "*** Starting TLS handshake\n");
 	       ret = do_handshake(&hd);
-	       if (ret < 0 && handle_error(hd, ret) < 0) {
+	       if (handle_error(hd, ret) < 0) {
  		 fprintf(stderr, "*** Handshake has failed\n");
 		 socket_bye(&hd);
 		 user_term = 1;
