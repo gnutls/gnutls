@@ -42,7 +42,7 @@
 
 static int print_info( GNUTLS_STATE state) {
 char *tmp;
-const DH_ANON_AUTH_INFO *dh_info;
+const ANON_AUTH_INFO *dh_info;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp); free(tmp);
@@ -50,7 +50,7 @@ const DH_ANON_AUTH_INFO *dh_info;
 		dh_info = gnutls_get_auth_info(state);
 		if (dh_info != NULL)
 			printf("- Anonymous DH using prime of %d bits\n",
-			       dh_info->bits);
+			       dh_info->dh_bits);
 	}
 
 	tmp = gnutls_compression_get_name(gnutls_get_current_compression_method( state));
@@ -107,8 +107,8 @@ int main()
 	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
-	gnutls_set_kx_cred( state, GNUTLS_KX_DH_ANON, NULL);
-	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
+	gnutls_set_cred( state, GNUTLS_ANON, NULL);
+	gnutls_set_cred( state, GNUTLS_SRP, &cred);
 
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 	ret = gnutls_handshake(sd, state);
@@ -155,8 +155,8 @@ int main()
 	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_TWOFISH , GNUTLS_RIJNDAEL, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
-	gnutls_set_kx_cred( state, GNUTLS_KX_DH_ANON, NULL);
-	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
+	gnutls_set_cred( state, GNUTLS_ANON, NULL);
+	gnutls_set_cred( state, GNUTLS_SRP, &cred);
 
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 

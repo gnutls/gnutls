@@ -4,7 +4,7 @@ aclocal && \
 libtoolize -c --force && \
 aclocal && \
 autoheader  && \
-automake -a -c || automake -a -c
+automake -a -c --foreign || automake -a -c --foreign
 autoconf 
 
 echo "You can now run \"./configure --enable-maintainer-mode\" and \"make\""

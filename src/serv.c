@@ -49,8 +49,8 @@ int main()
 	int optval = 1;
 	SRP_SERVER_CREDENTIALS srp_cred;
 	const SRP_AUTH_INFO *srp_info;
-	DH_ANON_SERVER_CREDENTIALS dh_cred;
-	const DH_ANON_AUTH_INFO *dh_info;
+	ANON_SERVER_CREDENTIALS dh_cred;
+	const ANON_AUTH_INFO *dh_info;
 
 	/* this is a password file (created with the included crypt utility) 
 	 * Read README.crypt prior to using SRP.
@@ -58,7 +58,7 @@ int main()
 	srp_cred.password_file = "tpasswd";
 	srp_cred.password_conf_file = "tpasswd.conf";
 
-	dh_cred.bits = 1024;
+	dh_cred.dh_bits = 1024;
 	
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
@@ -91,8 +91,8 @@ int main()
 		gnutls_set_kx_priority(state, GNUTLS_KX_SRP,
 				       GNUTLS_KX_DH_ANON, 0);
 
-		gnutls_set_kx_cred(state, GNUTLS_KX_DH_ANON, &dh_cred);
-		gnutls_set_kx_cred(state, GNUTLS_KX_SRP, &srp_cred);
+		gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);
+		gnutls_set_cred(state, GNUTLS_SRP, &srp_cred);
 
 		gnutls_set_mac_priority(state, GNUTLS_MAC_SHA,
 					GNUTLS_MAC_MD5, 0);
@@ -128,7 +128,7 @@ int main()
 			dh_info = gnutls_get_auth_info(state);
 			if (dh_info != NULL)
 				printf("\n- Anonymous DH using prime of %d bits\n",
-				       dh_info->bits);
+				       dh_info->dh_bits);
 		}
 
 		/* print state information */
