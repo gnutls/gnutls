@@ -12,7 +12,7 @@ See the end for copying conditions.
   but the NEWS entry was forgotten.)
 - The OpenSSL compatibility code now use the internal crypto interface.
 - Added simple self test of OpenSSL compatibility library.
-- Internally, minitasn1 and x509 are built as libtool convenience libraries.
+- Internally, libtool convenience libraries are used.
 - Cleanups to configure.ac.
 
 * Version 1.1.21 (2004-10-27)
