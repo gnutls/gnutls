@@ -9,6 +9,9 @@ AC_DEFINE_UNQUOTED(T_CPU, "$target_cpu")
 AC_DEFINE_UNQUOTED(T_VENDOR, "$target_vendor")
 AC_DEFINE_UNQUOTED(T_OS, "$target_os")
 
+test "x$includedir" = 'x${prefix}/include' && \
+        includedir='$(prefix)/include/gnutls'
+
 dnl Gnutls Version
 GNUTLS_MAJOR_VERSION=0
 GNUTLS_MINOR_VERSION=5
@@ -21,7 +24,7 @@ AM_INIT_AUTOMAKE(gnutls, $GNUTLS_VERSION)
 AM_CONFIG_HEADER(config.h)
 
 dnl This is the library version
-GNUTLS_MOST_RECENT_INTERFACE=6
+GNUTLS_MOST_RECENT_INTERFACE=5
 GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER=$GNUTLS_MICRO_VERSION
 GNUTLS_OLDEST_INTERFACE=5
 
@@ -390,8 +393,6 @@ AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
 lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
-tests/Makefile ])
-
+tests/Makefile])
 
 AC_OUTPUT
-
