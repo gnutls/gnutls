@@ -59,6 +59,7 @@ int gnutls_is_secure_memory(const void* mem) {
 
 int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	state->gnutls_internals.lowat = num;
+	return 0;
 }
 
 /* This function initializes the state to null (null encryption etc...) */
