@@ -28,6 +28,7 @@
 #include <common.h>
 #include <gnutls/compat8.h>
 #include <rfc2818.h>
+#include <gnutls_errors.h>
 
 /* compare hostname against certificate, taking account of wildcards
  * return 1 on success or 0 on error 

@@ -1408,6 +1408,13 @@ int result;
   *
   * This function will return the CRL distribution points (2.5.29.31), contained in the
   * given certificate.
+  *
+  * @reason_flags should be an ORed sequence of GNUTLS_CRL_REASON_UNUSED,
+  * GNUTLS_CRL_REASON_KEY_COMPROMISE, GNUTLS_CRL_REASON_CA_COMPROMISE,
+  * GNUTLS_CRL_REASON_AFFILIATION_CHANGED, GNUTLS_CRL_REASON_SUPERSEEDED,
+  * GNUTLS_CRL_REASON_CESSATION_OF_OPERATION, GNUTLS_CRL_REASON_CERTIFICATE_HOLD,
+  * GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN, GNUTLS_CRL_REASON_AA_COMPROMISE,
+  * or zero for all possible reasons.
   * 
   * This is specified in X509v3 Certificate Extensions. GNUTLS will return the 
   * distribution point type, or a negative error code on error.

@@ -40,3 +40,49 @@ ANON\_DH & This algorithm exchanges Diffie Hellman parameters.
 \end{figure}
 
 \input{srp}
+
+\section{Authentication and credentials}
+In \gnutls{} every key exchange method is associated with a
+credentials type. So in order to enable to enable a specific
+method, the corresponding credentials type should be initialized
+and set using \printfunc{gnutls_credentials_set}{gnutls\_credentials\_set}.
+A mapping is shown in \hyperref{figure}{figure }{}{fig:kxcred}.
+
+\begin{figure}[hbtp]
+\begin{tabular}{|l|l|p{4.5cm}|}
+
+\hline
+\bf{Key exchange} & \bf{Client credentials} & \bf{Server credentials}
+\\
+\hline
+\hline
+KX\_RSA &&
+\\
+\cline{1-1}
+KX\_DHE\_RSA & CRD\_CERTIFICATE & CRD\_CERTIFICATE
+\\
+\cline{1-1}
+KX\_DHE\_DSS &&
+\\
+\cline{1-1}
+KX\_RSA\_EXPORT &&
+\\
+\hline
+KX\_SRP\_RSA & CRD\_SRP & CRD\_SRP
+\\
+\cline{1-1}
+KX\_SRP\_DSS && CRD\_CERTIFICATE
+\\
+\hline
+KX\_SRP & CRD\_SRP & CRD\_SRP
+\\
+\hline
+KX\_ANON\_DH & CRD\_ANON & CRD\_ANON
+\\
+\hline
+\end{tabular}
+
+\caption{Key exchange algorithms and the corresponding credential types}
+\label{fig:kxcred}
+
+\end{figure}

@@ -12,16 +12,10 @@ typedef enum gnutls_x509_subject_alt_name {
  * callbacks.
  */
 typedef int gnutls_certificate_client_select_function(gnutls_session,
-						      const gnutls_datum *
-						      client_cert,
-						      int ncerts,
-						      const gnutls_datum *
-						      req_ca_cert,
-						      int nreqs);
+      const gnutls_datum * client_cert, int ncerts,
+      const gnutls_datum * req_ca_cert, int nreqs);
 typedef int gnutls_certificate_server_select_function(gnutls_session,
-						      const gnutls_datum *
-						      server_certs,
-						      int ncerts);
+      const gnutls_datum * server_certs, int ncerts);
 
 
 struct gnutls_openpgp_key_int;
@@ -72,42 +66,34 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session session);
 /* X509PKI */
 
 void gnutls_certificate_client_set_select_function(gnutls_session,
-						   gnutls_certificate_client_select_function
-						   *);
+	gnutls_certificate_client_select_function *);
 void gnutls_certificate_server_set_select_function(gnutls_session,
-						   gnutls_certificate_server_select_function
-						   *);
+	gnutls_certificate_server_select_function *);
 
 /* These are set on the credentials structure.
  */
 void gnutls_certificate_client_set_retrieve_function(gnutls_certificate_client_credentials,
-						     gnutls_certificate_client_retrieve_function
-						     *);
+	gnutls_certificate_client_retrieve_function *);
 void gnutls_certificate_server_set_retrieve_function(gnutls_certificate_server_credentials,
-						     gnutls_certificate_server_retrieve_function
-						     *);
+	gnutls_certificate_server_retrieve_function *);
 
 void gnutls_certificate_server_set_request(gnutls_session,
-					   gnutls_certificate_request);
+	gnutls_certificate_request);
 
 /* X.509 certificate handling functions 
  */
 
 int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
-				   gnutls_x509_crt_fmt format,
-				   gnutls_datum * prime,
-				   gnutls_datum * generator,
-				   int *prime_bits);
+	gnutls_x509_crt_fmt format, gnutls_datum * prime,
+	gnutls_datum * generator, int *prime_bits);
 int gnutls_pkcs3_export_dh_params(const gnutls_datum * prime,
-				  const gnutls_datum * generator,
-				  gnutls_x509_crt_fmt format,
-				  unsigned char *params_data,
-				  int *params_data_size);
+	const gnutls_datum * generator, gnutls_x509_crt_fmt format,
+	unsigned char *params_data, int *params_data_size);
 
 /* get data from the session 
  */
 const gnutls_datum *gnutls_certificate_get_peers(gnutls_session,
-						 unsigned int *list_size);
+	unsigned int *list_size);
 const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session);
 
 time_t gnutls_certificate_activation_time_peers(gnutls_session session);
@@ -117,17 +103,15 @@ int gnutls_certificate_client_get_request_status(gnutls_session);
 int gnutls_certificate_verify_peers(gnutls_session);
 
 int gnutls_pem_base64_encode(const char *header, const gnutls_datum * data,
-			     char *result, size_t * result_size);
+	char *result, size_t * result_size);
 int gnutls_pem_base64_decode(const char *header,
-			     const gnutls_datum * b64_data,
-			     unsigned char *result, size_t * result_size);
+	const gnutls_datum * b64_data,
+	unsigned char *result, size_t * result_size);
 
 int gnutls_pem_base64_encode_alloc(const char *header,
-				   const gnutls_datum * data,
-				   gnutls_datum * result);
+	const gnutls_datum * data, gnutls_datum * result);
 int gnutls_pem_base64_decode_alloc(const char *header,
-				   const gnutls_datum * b64_data,
-				   gnutls_datum * result);
+	const gnutls_datum * b64_data, gnutls_datum * result);
 
 /* key_usage will be an OR of the following values:
  */

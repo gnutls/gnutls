@@ -720,7 +720,7 @@ int ret;
 	}
 	
 	if (info.outfile) {
-		outfile = fopen(info.outfile, "w");
+		outfile = fopen(info.outfile, "wb");
 		if (outfile == NULL) {
 			fprintf(stderr, "error: could not open '%s'.\n", info.outfile);
 			exit(1);
@@ -728,7 +728,7 @@ int ret;
 	} else outfile = stdout;
 
 	if (info.infile) {
-		infile = fopen(info.infile, "r");
+		infile = fopen(info.infile, "rb");
 		if (infile == NULL) {
 			fprintf(stderr, "error: could not open '%s'.\n", info.infile);
 			exit(1);

@@ -26,7 +26,10 @@
 #include "gnutls_cert.h"
 
 
-/* Cred type mappings to KX algorithms */
+/* Cred type mappings to KX algorithms 
+ * FIXME: The mappings are not 1-1. Some KX such as SRP_RSA require
+ * more than one credentials type.
+ */
 typedef struct {
 	gnutls_kx_algorithm algorithm;
 	gnutls_credentials_type client_type;
@@ -41,8 +44,8 @@ static const gnutls_cred_map cred_mappings[] = {
 	{ GNUTLS_KX_DHE_DSS, 	GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
 	{ GNUTLS_KX_DHE_RSA, 	GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE },
 	{ GNUTLS_KX_SRP,     	GNUTLS_CRD_SRP,		GNUTLS_CRD_SRP     },
-	{ GNUTLS_KX_SRP_RSA,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE     },
-	{ GNUTLS_KX_SRP_DSS,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE     },
+	{ GNUTLS_KX_SRP_RSA,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE },
+	{ GNUTLS_KX_SRP_DSS,    GNUTLS_CRD_SRP,		GNUTLS_CRD_CERTIFICATE },
 	{ 0, 0, 0}
 };
 
