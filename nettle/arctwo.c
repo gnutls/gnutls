@@ -342,7 +342,7 @@ int main (void)
   if (memcmp(scratch, plaintext_3, sizeof(plaintext_3)))
     puts ("RFC2268 decryption test 3 failed.");
 
-  /* Fouth test. */
+  /* Fourth test. */
   arctwo_set_key (&ctx, sizeof(key_4), key_4);
   arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_4);
   if (memcmp (scratch, ciphertext_4, sizeof(ciphertext_4)))
