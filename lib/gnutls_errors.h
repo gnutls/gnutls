@@ -41,7 +41,57 @@ int gnutls_error_is_fatal( int error);
 
 #ifdef DEBUG
  void _gnutls_log( const char *fmt, ...);
+
+# ifdef HANDSHAKE_DEBUG
+#  define _gnutls_handshake_log _gnutls_log
+# else
+#  define _gnutls_handshake_log( ...)
+# endif
+
+# ifdef IO_DEBUG
+#  define _gnutls_io_log _gnutls_log
+# else
+#  define _gnutls_io_log( ...)
+# endif
+
+# ifdef BUFFERS_DEBUG
+#  define _gnutls_buffers_log _gnutls_log
+# else
+#  define _gnutls_buffers_log( ...)
+# endif
+
+# ifdef HARD_DEBUG
+#  define _gnutls_hard_log _gnutls_log
+# else
+#  define _gnutls_hard_log( ...)
+# endif
+
+# ifdef RECORD_DEBUG
+#  define _gnutls_record_log _gnutls_log
+# else
+#  define _gnutls_record_log( ...)
+# endif
+
+# ifdef READ_DEBUG
+#  define _gnutls_read_log _gnutls_log
+# else
+#  define _gnutls_read_log( ...)
+# endif
+
+# ifdef WRITE_DEBUG
+#  define _gnutls_write_log _gnutls_log
+# else
+#  define _gnutls_write_log( ...)
+# endif
+
 #else
 # define _gnutls_log(...)
+# define _gnutls_handshake_log( ...)
+# define _gnutls_io_log( ...)
+# define _gnutls_buffers_log( ...)
+# define _gnutls_hard_log( ...)
+# define _gnutls_record_log( ...)
+# define _gnutls_read_log( ...)
+# define _gnutls_write_log( ...)
 #endif
 

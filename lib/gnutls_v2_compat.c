@@ -48,17 +48,17 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 	x = _gnutls_remove_unwanted_ciphersuites( state, &ciphers, x);
 
 #ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Requested cipher suites: \n");
+	_gnutls_handshake_log( "HSK: Requested cipher suites [v2 hello]: \n");
 	for (j = 0; j < datalen; j += 3) {
 		if (data[j] == 0) {	/* only print if in v2 compat mode */
-			_gnutls_log( "\t%s\n",
+			_gnutls_handshake_log( "\t%s\n",
 				_gnutls_cipher_suite_get_name(*
 							      ((GNUTLS_CipherSuite *) & data[j+1])));
 		}
 	}
-	_gnutls_log( "Supported cipher suites: \n");
+	_gnutls_handshake_log( "HSK: Supported cipher suites: \n");
 	for (j = 0; j < x; j++)
-		_gnutls_log( "\t%s\n",
+		_gnutls_handshake_log( "\t%s\n",
 			_gnutls_cipher_suite_get_name(ciphers[j]));
 #endif
 	memset(ret, '\0', 2);
@@ -68,15 +68,15 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 			if (data[j] == 0)
 				if ( memcmp(ciphers[i].CipherSuite, &data[j+1],
 				     2) == 0) {
-#ifdef HANDSHAKE_DEBUG
-					_gnutls_log(
-						"Selected cipher suite: ");
-					_gnutls_log( "%s\n",
+
+					_gnutls_handshake_log(
+						"HSK: Selected cipher suite: ");
+					_gnutls_handshake_log( "%s\n",
 						_gnutls_cipher_suite_get_name
 						(*
 						 ((GNUTLS_CipherSuite *) &
 						  data[j+1])));
-#endif
+
 					memcpy(ret,
 						ciphers[i].CipherSuite,
 						2);
@@ -117,10 +117,9 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	state->gnutls_internals.v2_hello = 0;
 
 	DECR_LEN(len, 2);
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "V2 Handshake: Client's version: %d.%d\n", data[pos],
+
+	_gnutls_handshake_log( "HSK: V2 Hello: Client's version: %d.%d\n", data[pos],
 		data[pos + 1]);
-#endif
 
 	set_adv_version( state, data[pos], data[pos+1]);
 	
@@ -197,10 +196,10 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 				   (state->security_parameters.
 				    current_cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log(
-			"V2 Handshake: Cannot find the appropriate handler for the KX algorithm\n");
-#endif
+
+		_gnutls_handshake_log(
+			"HSK: V2 Hello: Cannot find the appropriate handler for the KX algorithm\n");
+
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}

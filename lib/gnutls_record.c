@@ -496,9 +496,10 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 
-	if ( _gnutls_session_is_valid( state) || state->gnutls_internals.may_write != 0) {
-		return GNUTLS_E_INVALID_SESSION;
-	}
+	if (type!=GNUTLS_ALERT) /* alert messages are sent anyway */
+		if ( _gnutls_session_is_valid( state) || state->gnutls_internals.may_write != 0) {
+			return GNUTLS_E_INVALID_SESSION;
+		}
 
 	headers[0]=type;
 	
@@ -511,11 +512,8 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	headers[1]=_gnutls_version_get_major( lver);
 	headers[2]=_gnutls_version_get_minor( lver);
 
-	
-#ifdef RECORD_DEBUG
-	_gnutls_log( "Record: Sending Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_record_log( "REC: Sending Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
-#endif
 
 	if ( sizeofdata > MAX_RECORD_SIZE)
 		data2send = MAX_RECORD_SIZE;
@@ -582,11 +580,8 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	gnutls_free(cipher);
 
-#ifdef RECORD_DEBUG
-	_gnutls_log( "Record: Sent Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_record_log( "REC: Sent Packet[%d] %s(%d) with length: %d\n",
 	(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
-#endif
-
 
 	return retval;
 }
@@ -598,9 +593,8 @@ ssize_t _gnutls_send_change_cipher_spec( GNUTLS_STATE state, int again)
 {
 	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Record: Sent ChangeCipherSpec\n");
-#endif
+	_gnutls_handshake_log( "REC: Sent ChangeCipherSpec\n");
+
 	if (again==0)
 		return gnutls_send_int( state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
 	else {
@@ -680,9 +674,7 @@ static int _gnutls_check_record_headers( GNUTLS_STATE state, uint8 headers[RECOR
 		 */
 		state->gnutls_internals.v2_hello = *length;
 
-#ifdef RECORD_DEBUG
-		_gnutls_log( "Record: V2 packet received. Length: %d\n", length);
-#endif
+		_gnutls_record_log( "REC: V2 packet received. Length: %d\n", *length);
 
 	} else {
 		/* version 3.x 
@@ -698,8 +690,6 @@ static int _gnutls_check_record_headers( GNUTLS_STATE state, uint8 headers[RECOR
 	return 0;
 }
 
-#define GNUTLS_E_RET_0 -255
-
 /* Here we check if the advertized version is the one we
  * negotiated in the handshake.
  */
@@ -709,9 +699,9 @@ static int _gnutls_check_record_version( GNUTLS_STATE state, HandshakeType htype
 #ifdef CHECK_RECORD_VERSION
 	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_protocol_get_version(state) != version) {
 		gnutls_assert();
-# ifdef RECORD_DEBUG
-		_gnutls_log( "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
-# endif
+
+		_gnutls_record_log( "REC: INVALID VERSION PACKET: (%d) %d.%d\n", htype, _gnutls_version_get_major(version), _gnutls_version_get_minor(version));
+
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
 #endif
@@ -729,9 +719,9 @@ static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 	} else {
 		switch (recv_type) {
 		case GNUTLS_ALERT:
-#ifdef RECORD_DEBUG
-			_gnutls_log( "Record: Alert[%d|%d] - %s - was received\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
-#endif
+
+			_gnutls_record_log( "REC: Alert[%d|%d] - %s - was received\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
+
 			state->gnutls_internals.last_alert = data[1];
 
 			/* if close notify is received and
@@ -741,7 +731,7 @@ static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 				/* If we have been expecting for an alert do 
 				 */
 
-				return GNUTLS_E_RET_0; /* EOF */
+				return GNUTLS_E_INT_RET_0; /* EOF */
 			} else {
 			
 				/* if the alert is FATAL or WARNING
@@ -796,9 +786,9 @@ static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 
 			break;
 		default:
-#ifdef RECORD_DEBUG
-			_gnutls_log( "Record: Received Unknown packet %d expecting %d\n", recv_type, type);
-#endif
+
+			_gnutls_record_log( "REC: Received Unknown packet %d expecting %d\n", recv_type, type);
+
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_ERROR;
 		}
@@ -884,17 +874,15 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		return ret;
 	}
 
-#ifdef RECORD_DEBUG
-	_gnutls_log( "Record: Expected Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_record_log( "REC: Expected Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
-	_gnutls_log( "Record: Received Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_record_log( "REC: Received Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, length);
-#endif
 
 	if (length > MAX_RECV_SIZE) {
-#ifdef RECORD_DEBUG
-		_gnutls_log( "Record: FATAL ERROR: Received packet with length: %d\n", length);
-#endif
+
+		_gnutls_record_log( "REC: FATAL ERROR: Received packet with length: %d\n", length);
+
 		_gnutls_session_unresumable( state);
 		_gnutls_session_invalidate( state);
 		gnutls_assert();
@@ -931,9 +919,8 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	/* Check if this is a CHANGE_CIPHER_SPEC
 	 */
 	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
-#ifdef RECORD_DEBUG
-		_gnutls_log( "Record: ChangeCipherSpec Packet was received\n");
-#endif
+
+		_gnutls_record_log( "REC: ChangeCipherSpec Packet was received\n");
 
 		if (tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
@@ -946,10 +933,8 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		return tmplen;
 	}
 
-#ifdef RECORD_DEBUG
-	_gnutls_log( "Record: Decrypted Packet[%d] %s(%d) with length: %d\n",
+	_gnutls_record_log( "REC: Decrypted Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
-#endif
 
 	/* increase sequence number */
 	if (uint64pp( &state->connection_state.read_sequence_number)!=0) {
@@ -962,7 +947,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	if ( (ret=_gnutls_record_check_type( state, recv_type, type, htype, tmpdata, tmplen)) < 0) {
 		gnutls_free( tmpdata);
 
-		if (ret==GNUTLS_E_RET_0) return 0;
+		if (ret==GNUTLS_E_INT_RET_0) return 0;
 
 		gnutls_assert();
 		return ret;

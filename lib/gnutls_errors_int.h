@@ -61,3 +61,7 @@
 #define GNUTLS_E_INTERNAL -58
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -250
+
+/* _INT_ internal errors. Not exported */
+
+#define GNUTLS_E_INT_RET_0 -251

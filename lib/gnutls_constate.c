@@ -74,9 +74,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 		return ret;
 	}
 	
-#ifdef HARD_DEBUG
-	_gnutls_log( "KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
-#endif
+	_gnutls_hard_log( "INT: KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
 
 	pos = 0;
 	if (hash_size > 0) {
@@ -261,11 +259,9 @@ int rc;
 	if (rc < 0)
 		return rc;
 		
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Cipher Suite: %s\n",
+	_gnutls_handshake_log( "HSK: Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
 					      security_parameters.current_cipher_suite));
-#endif
 
 	if (_gnutls_compression_is_ok(state->security_parameters.read_compression_algorithm) != 0) {
 		gnutls_assert();
@@ -291,9 +287,7 @@ int rc;
 	    _gnutls_mac_get_digest_size(state->security_parameters.
 						read_mac_algorithm);
 
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Handshake: Initializing internal [read] cipher states\n");
-#endif
+	_gnutls_handshake_log( "HSK: Initializing internal [read] cipher states\n");
 
 	switch (state->security_parameters.entity) {
 	case GNUTLS_SERVER:
@@ -408,11 +402,9 @@ int rc;
 	if (rc < 0)
 		return rc;
 
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Cipher Suite: %s\n",
+	_gnutls_handshake_log( "HSK: Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
 					      security_parameters.current_cipher_suite));
-#endif
 
 	if (_gnutls_compression_is_ok(state->security_parameters.write_compression_algorithm) != 0) {
 		gnutls_assert();
@@ -439,9 +431,7 @@ int rc;
 	    _gnutls_mac_get_digest_size(state->security_parameters.
 					write_mac_algorithm);
 
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Handshake: Initializing internal [write] cipher states\n");
-#endif
+	_gnutls_handshake_log( "HSK: Initializing internal [write] cipher states\n");
 
 	switch (state->security_parameters.entity) {
 	case GNUTLS_SERVER:

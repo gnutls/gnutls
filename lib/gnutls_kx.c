@@ -50,11 +50,9 @@ char random[2*TLS_RANDOM_SIZE];
 	memcpy(random, state->security_parameters.client_random, TLS_RANDOM_SIZE);
 	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
 
-#ifdef HARD_DEBUG
-	_gnutls_log( "PREMASTER SECRET[%d]: %s\n", PREMASTER.size, _gnutls_bin2hex(PREMASTER.data, PREMASTER.size));
-	_gnutls_log( "CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
-	_gnutls_log( "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
-#endif
+	_gnutls_hard_log( "INT: PREMASTER SECRET[%d]: %s\n", PREMASTER.size, _gnutls_bin2hex(PREMASTER.data, PREMASTER.size));
+	_gnutls_hard_log( "INT: CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
+	_gnutls_hard_log( "INT: SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
 
 	if ( state->security_parameters.version == GNUTLS_SSL3) {
 		ret =
@@ -73,9 +71,8 @@ char random[2*TLS_RANDOM_SIZE];
 	
 	if (ret<0) return ret;
 	
-#ifdef HARD_DEBUG
-	_gnutls_log( "MASTER SECRET: %s\n", _gnutls_bin2hex(state->security_parameters.master_secret, TLS_MASTER_SIZE));
-#endif
+	_gnutls_hard_log( "INT: MASTER SECRET: %s\n", _gnutls_bin2hex(state->security_parameters.master_secret, TLS_MASTER_SIZE));
+
 	return ret;
 }
 

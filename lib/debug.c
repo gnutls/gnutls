@@ -229,7 +229,6 @@ static gnutls_dn dn;
 	else 
 		return NULL;
 
-//fprintf(stderr, "CN: %s\n", dn.common_name);
 }
 
 #endif

@@ -22,6 +22,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_alert.h>
 #include <gnutls_record.h>
+#include <debug.h>
 
 /**
   * gnutls_alert_send - This function sends an alert message to the peer
@@ -44,9 +45,7 @@ int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_Alert
 	data[0] = (uint8) level;
 	data[1] = (uint8) desc;
 
-#ifdef RECORD_DEBUG
-	_gnutls_log( "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
-#endif
+	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
 
 	if ( (ret = gnutls_send_int( state, GNUTLS_ALERT, -1, data, 2)) >= 0)
 		return 0;
