@@ -394,9 +394,15 @@ unsigned char rnd;
 
 void _gnutls_srp_entry_free( SRP_PWD_ENTRY * entry) {
 	_gnutls_free_datum(&entry->v);
-	_gnutls_free_datum(&entry->g);
-	_gnutls_free_datum(&entry->n);
 	_gnutls_free_datum(&entry->salt);
+
+        if (entry->g.data != gnutls_srp_1024_group_generator.data)
+        	_gnutls_free_datum(&entry->g);
+            
+        if (entry->n.data != gnutls_srp_1024_group_prime.data &&
+                entry->n.data != gnutls_srp_1536_group_prime.data &&
+                entry->n.data != gnutls_srp_2048_group_prime.data)
+                _gnutls_free_datum(&entry->n);
 
 	gnutls_free(entry->username);
 	gnutls_free(entry);

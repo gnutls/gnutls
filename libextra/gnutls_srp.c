@@ -581,7 +581,8 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
   *
   * @username contains the actual username. 
   * The @salt, @verifier, @generator and @prime must be filled
-  * in using the gnutls_malloc().
+  * in using the gnutls_malloc(). For convenience @prime and @generator
+  * may also be one of the static parameters defined in extra.h.
   *
   * In case the callback returned a negative number then gnutls will
   * assume that the username does not exist.

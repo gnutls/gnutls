@@ -37,6 +37,13 @@ typedef struct SRP_SERVER_AUTH_INFO_INT {
    char username[MAX_SRP_USERNAME];
 } *SRP_SERVER_AUTH_INFO;
 
+extern const gnutls_datum gnutls_srp_1024_group_prime;
+extern const gnutls_datum gnutls_srp_1024_group_generator;
+extern const gnutls_datum gnutls_srp_1536_group_prime;
+extern const gnutls_datum gnutls_srp_1536_group_generator;
+extern const gnutls_datum gnutls_srp_2048_group_prime;
+extern const gnutls_datum gnutls_srp_2048_group_generator;
+
 #ifdef ENABLE_SRP
 
 int _gnutls_proc_srp_server_hello(gnutls_session state,
