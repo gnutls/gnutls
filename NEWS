@@ -1,4 +1,4 @@
-Version 1.0.3
+Version 1.0.3 (21/12/2003)
 - Corrected bug in gnutls_bye() which made it return an error code
   of INVALID_REQUEST instead of success.
 - Corrected a bug in the GNUTLS_KEY key usage definitions.

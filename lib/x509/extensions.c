@@ -339,10 +339,10 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 			     int extnValueLen)
 {
 	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	char str[10];
+	uint8 str[2];
 	int len, result;
 
-	keyUsage[0] = 0;
+	*keyUsage = 0;
 
 	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext
@@ -359,7 +359,7 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 		return 0;
 	}
 
-	len = sizeof(str) - 1;
+	len = sizeof(str);
 	result = asn1_read_value(ext, "", str, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -367,7 +367,7 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 		return 0;
 	}
 
-	keyUsage[0] = str[0];
+	*keyUsage = str[0] | (str[1] << 8);
 
 	asn1_delete_structure(&ext);
 
