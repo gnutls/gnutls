@@ -27,6 +27,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_openpgp.h>
+#include <gnutls_num.h>
 #include <openpgp.h>
 
 static int
@@ -75,6 +76,34 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb trustdb,
 }
 
 /**
+ * gnutls_openpgp_keyring_check_id - Check if a key id exists in the keyring
+ * @ring: holds the keyring to check against
+ * @keyid: will hold the keyid to check for.
+ * @flags: unused (should be 0)
+ *
+ * Check if a given key ID exists in the keyring.
+ *
+ * Returns 0 on success (if keyid exists) and a negative error code
+ * on failure.
+ */
+int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring ring, 
+    const unsigned char keyid[8], unsigned int flags)
+{
+int rc;
+cdk_pkt_pubkey_t sig_pk;
+uint32 id[2];
+
+    id[0] = _gnutls_read_uint32( keyid);
+    id[1] = _gnutls_read_uint32( &keyid[4]);
+
+    rc = cdk_keydb_get_pk( ring->hd, id, &sig_pk);
+    if (!rc)
+       return 0;
+    else
+       return GNUTLS_E_NO_CERTIFICATE_FOUND;
+}
+
+/**
  * gnutls_openpgp_key_verify_ring - Verify all signatures in the key
  * @key: the structure that holds the key.
  * @keyring: holds the keyring to check against
@@ -82,7 +111,6 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb trustdb,
  * @verify: will hold the certificate verification output.
  *
  * Verify all signatures in the key, using the given set of keys (keyring). 
- * If a signer key is not available, the signature is skipped.
  *
  * The key verification output will be put in @verify and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
@@ -97,12 +125,12 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb trustdb,
  * Returns 0 on success.
  **/
 int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key key,
-				   gnutls_openpgp_keyring keyring,
-				   unsigned int flags,
-				   unsigned int *verify)
+     gnutls_openpgp_keyring keyring,
+     unsigned int flags, unsigned int *verify)
 {
     int rc = 0;
     int status = 0;
+    opaque id[8];
 
     if (!key || !keyring) {
 	gnutls_assert();
@@ -131,6 +159,23 @@ int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key key,
     if (status & CDK_KEY_NOSIGNER)
 	*verify |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
+    /* Check if the key is included in the ring.
+     */
+    rc = gnutls_openpgp_key_get_id( key, id);
+    if (rc < 0) {
+    	gnutls_assert();
+    	return rc;
+    }
+
+    rc = gnutls_openpgp_keyring_check_id( keyring,
+        id, 0);
+
+    /* if it exists in the keyring don't treat it
+     * as unknown.
+     */
+    if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
+        *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
+    
     return 0;
 }
 
