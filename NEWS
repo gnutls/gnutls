@@ -12,7 +12,7 @@ See the end for copying conditions.
   signatures.
 - Optimizations ("-O2 -finline-functions") are not enabled by default,
   instead the standard autoconf defaults are used.  Use `./configure
-  CFLAGS="-O2 -finline-functions"' to get the same optimizations.
+  CFLAGS="-O2 -finline-functions"' to get the old optimizations.
 - Added the option --get-dh-params to certtool, in order to get the
   included in the library primes and generators.
 
