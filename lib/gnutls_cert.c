@@ -416,6 +416,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile)
   **/
 int gnutls_certificate_allocate_sc(GNUTLS_CERTIFICATE_CREDENTIALS * res, int ncerts)
 {
+#warning FIX NCERTS
 	*res = gnutls_calloc(1, sizeof(CERTIFICATE_CREDENTIALS_INT));
 
 	if (*res == NULL)
@@ -1277,7 +1278,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 /* Returns 0 if it's ok to use the KXAlgorithm with this cert
  * (using KeyUsage field). 
  */
-int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
+int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 				    KXAlgorithm alg)
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_CRD_CERTIFICATE) {
@@ -1331,7 +1332,7 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 	for (kx = 0; kx < MAX_KX_ALGOS; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
-			if (_gnutls_check_x509pki_key_usage(cert, kx) == 0) {
+			if (_gnutls_check_x509_key_usage(cert, kx) == 0) {
 				kxlist[i] = kx;
 				i++;
 			}
@@ -1389,7 +1390,7 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
   * Contains a list with the CA names that the server considers trusted. 
   * Normaly we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
-  * meaningful value use the function gnutls_x509pki_extract_dn().
+  * meaningful value use the function gnutls_x509_extract_dn().
   *
   * This function specifies what we, in case of a client, are going
   * to do when we have to send a certificate. If this callback

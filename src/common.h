@@ -44,7 +44,7 @@ GNUTLS_KXAlgorithm kx;
 		   /* in case of X509 PKI
 		    */
 			cert_list = gnutls_certificate_get_peers( state, &cert_list_size);
-			status = gnutls_x509pki_get_peer_certificate_status( state);
+			status = gnutls_x509pki_verify_peers( state);
 			
 			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:
@@ -94,7 +94,7 @@ GNUTLS_KXAlgorithm kx;
 				
 				/* Print the serial number of the certificate.
 				 */
-				if ( gnutls_x509pki_extract_certificate_serial( &cert_list[0], serial, &serial_size) >= 0) {
+				if ( gnutls_x509_extract_certificate_serial( &cert_list[0], serial, &serial_size) >= 0) {
 					print = printable;
 					for (i=0;i<serial_size;i++) {
 						sprintf( print, "%.2x ", (unsigned char)serial[i]);
@@ -106,12 +106,12 @@ GNUTLS_KXAlgorithm kx;
 				/* Print the version of the X.509 
 				 * certificate.
 				 */
-				printf(" - Certificate version: #%d\n", gnutls_x509pki_extract_certificate_version( &cert_list[0]));
+				printf(" - Certificate version: #%d\n", gnutls_x509_extract_certificate_version( &cert_list[0]));
 
-				gnutls_x509pki_extract_certificate_dn( &cert_list[0], &dn);
+				gnutls_x509_extract_certificate_dn( &cert_list[0], &dn);
 				PRINT_DN( dn);
 
-				gnutls_x509pki_extract_certificate_issuer_dn( &cert_list[0], &dn);
+				gnutls_x509_extract_certificate_issuer_dn( &cert_list[0], &dn);
 				printf(" - Certificate Issuer's info:\n");
 				PRINT_DN( dn);
 			}

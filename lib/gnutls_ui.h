@@ -64,16 +64,16 @@ void gnutls_certificate_server_set_select_func( GNUTLS_CERTIFICATE_CREDENTIALS, 
 void gnutls_certificate_server_set_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 
 /* X.509 certificate handling functions */
-int gnutls_x509pki_extract_dn( const gnutls_datum*, gnutls_dn*);
-int gnutls_x509pki_extract_certificate_dn( const gnutls_datum*, gnutls_dn*);
-int gnutls_x509pki_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_dn *);
-int gnutls_x509pki_extract_certificate_version( const gnutls_datum*);
-int gnutls_x509pki_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
-time_t gnutls_x509pki_extract_certificate_activation_time( const gnutls_datum*);
-time_t gnutls_x509pki_extract_certificate_expiration_time( const gnutls_datum*);
-int gnutls_x509pki_extract_subject_dns_name( const gnutls_datum*, char*, int*);
+int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_dn*);
+int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_dn*);
+int gnutls_x509_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_dn *);
+int gnutls_x509_extract_certificate_version( const gnutls_datum*);
+int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
+time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
+time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
+int gnutls_x509_extract_subject_dns_name( const gnutls_datum*, char*, int*);
 
-int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length);
+int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length);
 
 /* get data from the state */
 const gnutls_datum* gnutls_certificate_get_peers( GNUTLS_STATE, int* list_size);
@@ -81,7 +81,7 @@ const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state);
 int gnutls_certificate_get_ours_index(GNUTLS_STATE state);
 
 int gnutls_certificate_client_get_request_status(  GNUTLS_STATE);
-int gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
+int gnutls_x509pki_verify_peers( GNUTLS_STATE);
 
 int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size);
 int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size);

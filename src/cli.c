@@ -140,7 +140,7 @@ int main(int argc, char** argv)
 	gnutls_x509pki_set_trust_file( xcred, CAFILE, CRLFILE);
 	gnutls_x509pki_set_key_file( xcred, CLICERTFILE1, CLIKEYFILE1);
 	gnutls_x509pki_set_key_file( xcred, CLICERTFILE2, CLIKEYFILE2);
-/*	gnutls_x509pki_set_client_cert_callback( xcred, cert_callback); */
+/*	gnutls_certificate_client_callback_callback( xcred, cert_callback); */
 
 	/* SRP stuff */
 	if (gnutls_srp_allocate_client_sc( &cred)<0) {

@@ -24,13 +24,10 @@
 #include <auth_cert.h>
 #include <gnutls_errors.h>
 #include <gnutls_auth_int.h>
+#include <gnutls_state.h>
 
 /* SRP */
 
-#define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \
-	gnutls_assert(); \
-	return ret; \
-	}
 /**
   * gnutls_srp_server_get_username - This function returns the username of the peer
   * @state: is a gnutls state
