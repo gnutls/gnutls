@@ -30,38 +30,38 @@
 
 GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 {
-	GNUTLS_MAC_HANDLE ret;
+	GNUTLS_MAC_HANDLE ret = NULL;
 	gcry_error_t result;
+
+	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+	if (ret == NULL) {
+		gnutls_assert();
+		return GNUTLS_HASH_FAILED;
+	}
+
+	ret->algorithm = algorithm;
 
 	switch (algorithm) {
 	case GNUTLS_MAC_SHA:
-		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
-		if (ret == NULL)
-			return GNUTLS_HASH_FAILED;
 		result = gcry_md_open( &ret->handle, GCRY_MD_SHA1, 0);
-		if (result) {
-			gnutls_free(ret);
-			ret = GNUTLS_HASH_FAILED;
-		}
 		break;
-
 	case GNUTLS_MAC_MD5:
-		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
-		if (ret == NULL)
-			return GNUTLS_HASH_FAILED;
 		result = gcry_md_open( &ret->handle, GCRY_MD_MD5, 0);
-		if (result) {
-			gnutls_free(ret);
-			ret = GNUTLS_HASH_FAILED;
-		}
 		break;
-
+	case GNUTLS_MAC_RMD160:
+		result = gcry_md_open( &ret->handle, GCRY_MD_RMD160, 0);
+		break;
 	default:
+		gnutls_assert();
+		gnutls_free( ret);
 		ret = GNUTLS_HASH_FAILED; break;
 	}
 
-	if (ret != GNUTLS_HASH_FAILED)
-		ret->algorithm = algorithm;
+	if (result) {
+		gnutls_assert();
+		gnutls_free(ret);
+		ret = GNUTLS_HASH_FAILED;
+	}
 
 	return ret;
 }
@@ -75,6 +75,9 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm)
 		ret = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
 		break;
 	case GNUTLS_MAC_MD5:
+		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
+		break;
+	case GNUTLS_MAC_RMD160:
 		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
 		break;
 	default:
@@ -140,30 +143,27 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 	GNUTLS_MAC_HANDLE ret;
 	gcry_error_t result;
 
+	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+	if (ret == NULL)
+		return GNUTLS_MAC_FAILED;
+
 	switch (algorithm) {
 	case GNUTLS_MAC_SHA:
-		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
-		if (ret == NULL)
-			return GNUTLS_MAC_FAILED;
-
 		result = gcry_md_open(&ret->handle, GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
-
-		if (result)
-			ret = GNUTLS_MAC_FAILED;
 		break;
 	case GNUTLS_MAC_MD5:
-		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
-		if (ret == NULL)
-			return GNUTLS_MAC_FAILED;
-
 		result = gcry_md_open(&ret->handle, GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
-
-		if (result)
-			ret = GNUTLS_MAC_FAILED;
+		break;
+	case GNUTLS_MAC_RMD160:
+		result = gcry_md_open(&ret->handle, GCRY_MD_RMD160, GCRY_MD_FLAG_HMAC);
 		break;
 	default:
+		gnutls_free(ret);
 		ret = GNUTLS_MAC_FAILED;
 	}
+
+	if (result)
+		ret = GNUTLS_MAC_FAILED;
 
 	if (ret != GNUTLS_MAC_FAILED) {
 		gcry_md_setkey(ret->handle, key, keylen);
@@ -172,8 +172,6 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 		ret->key = key;
 		ret->keysize = keylen;
 	}
-
-
 
 	return ret;
 }
@@ -210,6 +208,18 @@ void _gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle, void *digest)
 	gnutls_free(handle);
 }
 
+inline static int get_padsize( gnutls_mac_algorithm algorithm)
+{
+	switch (algorithm) {
+	case GNUTLS_MAC_MD5:
+		return 48;
+	case GNUTLS_MAC_SHA:
+		return 40;
+	default:
+		return 0;
+	}
+}
+
 GNUTLS_MAC_HANDLE _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *key,
 					int keylen)
 {
@@ -217,19 +227,14 @@ GNUTLS_MAC_HANDLE _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *ke
 	char ipad[48];
 	int padsize;
 
-	switch (algorithm) {
-	case GNUTLS_MAC_MD5:
-		padsize = 48;
-		break;
-	case GNUTLS_MAC_SHA:
-		padsize = 40;
-		break;
-	default:
-		padsize = 0;
+	padsize = get_padsize( algorithm);
+	if (padsize == 0) {
+		gnutls_assert();
+		return GNUTLS_MAC_FAILED;
 	}
-	if (padsize > 0) {
-		memset(ipad, 0x36, padsize);
-	}
+
+	memset(ipad, 0x36, padsize);
+
 	ret = _gnutls_hash_init(algorithm);
 	if (ret != GNUTLS_HASH_FAILED) {
 		ret->key = key;
@@ -251,19 +256,13 @@ void _gnutls_mac_deinit_ssl3(GNUTLS_MAC_HANDLE handle, void *digest)
 	int padsize;
 	int block;
 
-	switch (handle->algorithm) {
-	case GNUTLS_MAC_MD5:
-		padsize = 48;
-		break;
-	case GNUTLS_MAC_SHA:
-		padsize = 40;
-		break;
-	default:
-		padsize = 0;
+	padsize = get_padsize( handle->algorithm);
+	if (padsize == 0) {
+		gnutls_assert();
+		return;
 	}
-	if (padsize > 0) {
-		memset(opad, 0x5C, padsize);
-	}
+
+	memset(opad, 0x5C, padsize);
 
 	td = _gnutls_hash_init(handle->algorithm);
 	if (td != GNUTLS_MAC_FAILED) {
@@ -290,20 +289,14 @@ void _gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle,
 	int padsize;
 	int block;
 
-	switch (handle->algorithm) {
-	case GNUTLS_MAC_MD5:
-		padsize = 48;
-		break;
-	case GNUTLS_MAC_SHA:
-		padsize = 40;
-		break;
-	default:
-		padsize = 0;
+	padsize = get_padsize( handle->algorithm);
+	if (padsize == 0) {
+		gnutls_assert();
+		return;
 	}
-	if (padsize > 0) {
-		memset(opad, 0x5C, padsize);
-		memset(ipad, 0x36, padsize);
-	}
+
+	memset(opad, 0x5C, padsize);
+	memset(ipad, 0x36, padsize);
 
 	td = _gnutls_hash_init(handle->algorithm);
 	if (td != GNUTLS_HASH_FAILED) {

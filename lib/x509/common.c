@@ -602,7 +602,6 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 			*output_data_size = len;
 			if (result == ASN1_MEM_ERROR) {
 				gnutls_assert();
-				_gnutls_debug_log("Length required for der coding: %d\n", len);
 				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 			gnutls_assert();
@@ -626,7 +625,6 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			if (result == ASN1_MEM_ERROR) {
-				_gnutls_debug_log("Length required for der coding: %d\n", len);
 				*output_data_size = B64FSIZE(strlen(pem_header),len) + 1;
 			}
 			gnutls_afree(tmp);

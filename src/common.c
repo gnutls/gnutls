@@ -486,6 +486,7 @@ void print_list(void)
 
 	printf("MACs:");
 	printf(" MD5");
+	printf(", RMD160");
 	printf(", SHA-1\n");
 
 	printf("Key exchange algorithms:");
@@ -571,6 +572,8 @@ void parse_macs(char **macs, int nmacs, int *mac_priority)
 		for (j = i = 0; i < nmacs; i++) {
 			if (strncasecmp(macs[i], "MD5", 3) == 0)
 				mac_priority[j++] = GNUTLS_MAC_MD5;
+			if (strncasecmp(macs[i], "RMD", 3) == 0)
+				mac_priority[j++] = GNUTLS_MAC_RMD160;
 			if (strncasecmp(macs[i], "SHA", 3) == 0)
 				mac_priority[j++] = GNUTLS_MAC_SHA;
 		}
