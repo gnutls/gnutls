@@ -2,6 +2,8 @@ EXTRA_DIST = gnutls.tex gnutls.ps \
 	fdl.tex cover.tex.in gnutls-logo.ps layers.eps pgp-fig1.eps \
 	x509-1.eps internals.eps examples
 
+# If you add any examples here, also change the ../examples/Makefile.am
+# to include the C source.
 EXAMPLE_OBJECTS = ex-alert.tex ex-client-srp.tex ex-serv-export.tex \
 	ex-client1.tex ex-client2.tex ex-info.tex ex-rfc2818.tex \
 	ex-serv1.tex ex-client-resume.tex ex-serv-srp.tex \
