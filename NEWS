@@ -7,6 +7,8 @@ See the end for copying conditions.
 - It is now possible to generate PKCS#12 structures without private
   keys using "certtool --to-p12", suggested by Fabian Fagerholm
   <fabbe@paniq.net>.
+- Certtool now prints information for the RSA and DSA parameters of
+  certificates and private keys.
 - Corrected the write of CRL distribution points.
 - The certificate chain verification function now checks certificates
   in the reverse order to minimize the spent resources.
