@@ -1,3 +1,9 @@
+2003-06-16 09:31  nmav <nmav@gnutls.org>
+
+	* doc/tex/: gnutls.bib, library.tex:
+
+	corrected a typo.  
+
 2003-06-10 08:06  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_priority.c:
