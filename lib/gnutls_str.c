@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2004, 2005  Free Software Foundation
  * Copyright (C) 2002 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -195,8 +195,8 @@ int _gnutls_string_append_data(gnutls_string * dest, const void *data,
 
 /* Converts the given string (old) to hex. A buffer must be provided
  * to hold the new hex string. The new string will be null terminated.
- * If the buffer does not have enough space to hold the string retuns
- * NULL.
+ * If the buffer does not have enough space to hold the string, a
+ * truncated hex string is returned (always null terminated).
  */
 char *_gnutls_bin2hex(const void *_old, size_t oldlen,
 		      char *buffer, size_t buffer_size)
@@ -204,10 +204,7 @@ char *_gnutls_bin2hex(const void *_old, size_t oldlen,
     unsigned int i, j;
     const opaque *old = _old;
 
-    if ((oldlen * 2) + 1 > buffer_size)
-	return NULL;
-
-    for (i = j = 0; i < oldlen; j += 2) {
+    for (i = j = 0; i < oldlen && j + 2 < buffer_size; j += 2) {
 	sprintf(&buffer[j], "%.2x", old[i]);
 	i++;
     }
