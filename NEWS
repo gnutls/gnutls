@@ -2,6 +2,8 @@ Version 0.5.5
 - Updated the SRP implementation to the latest draft. The blowfish
   crypt implementation was removed, since the new draft does not allow
   for other hash algorithms except for the srpsha. 
+- Renamed all the constructed types in order to have more consistent
+  names. 
 
 Version 0.5.4 (27/08/2002)
 - Fixes in TLS 1.0 PRF and SSL3 random functions.
