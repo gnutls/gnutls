@@ -201,6 +201,8 @@ typedef struct {
 	MPI				dh_secret;
 	int				certificate_requested; /* non zero if client certificate was requested */
 	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
+	/* sockets internals */
+	int				lowat;
 } GNUTLS_INTERNALS;
 
 typedef struct {

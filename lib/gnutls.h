@@ -92,6 +92,8 @@ int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_
 /* returns the session ID */
 int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size);
 
+int gnutls_set_lowat( GNUTLS_STATE state, int num);
+
 /* these are deprecated must be replaced by gnutls_errors.h */
 #define	GNUTLS_E_MAC_FAILED  -1
 #define	GNUTLS_E_UNKNOWN_CIPHER -2

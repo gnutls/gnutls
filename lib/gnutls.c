@@ -57,6 +57,10 @@ int gnutls_is_secure_memory(const void* mem) {
 	return 0;
 }
 
+int gnutls_set_lowat(GNUTLS_STATE state, int num) {
+	state->gnutls_internals.lowat = num;
+}
+
 /* This function initializes the state to null (null encryption etc...) */
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
@@ -124,6 +128,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.resumed_security_parameters.session_id_size = 0;
 	(*state)->gnutls_internals.resumed = RESUME_FALSE;
 
+	gnutls_set_lowat((*state), 1); /* the default for tcp */
+	
 	return 0;
 }
 
@@ -517,7 +523,7 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
-#define RCVLOWAT 1 /* this is the default for TCP - just don't change that! */
+#define RCVLOWAT state->gnutls_internals.lowat /* this is the default for TCP - just don't change that! */
 
 static int _gnutls_clear_peeked_data( int cd, GNUTLS_STATE state) {
 char peekdata;
