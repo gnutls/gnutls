@@ -78,6 +78,17 @@ do {						\
   (p)[0] = (i) & 0xff;				\
 } while(0)
 
+/* Analogous macros, for 16 bit numbers */
+#define LE_READ_UINT16(p)				\
+  (  (((uint32_t) (p)[1]) << 8)			\
+     |  ((uint32_t) (p)[0]))
+
+#define LE_WRITE_UINT16(p, i)			\
+  do {						\
+    (p)[1] = ((i) >> 8) & 0xff;			\
+    (p)[0] = (i) & 0xff;			\
+  } while(0)
+
 /* Macro to make it easier to loop over several blocks. */
 #define FOR_BLOCKS(length, dst, src, blocksize)	\
   assert( !((length) % (blocksize)));           \

@@ -78,126 +78,105 @@ static const uint8_t arctwo_sbox[] = {
 #define rotr16(x,n)   (((x) >> ((uint16_t)(n))) | ((x) << (16 - (uint16_t)(n))))
 
 void
-arctwo_encrypt(struct arctwo_ctx *ctx,
-	       unsigned length, uint8_t *dst,
-	       const uint8_t *src)
+arctwo_encrypt (struct arctwo_ctx *ctx,
+		unsigned length, uint8_t * dst, const uint8_t * src)
 {
-  FOR_BLOCKS(length, dst, src, ARCTWO_BLOCK_SIZE)
-    {
-      register int i, j;
-      uint16_t word0 = 0, word1 = 0, word2 = 0, word3 = 0;
+  FOR_BLOCKS (length, dst, src, ARCTWO_BLOCK_SIZE)
+  {
+    register int i, j;
+    uint16_t word0 = 0, word1 = 0, word2 = 0, word3 = 0;
 
-      word0 = (word0 << 8) | src[1];
-      word0 = (word0 << 8) | src[0];
-      word1 = (word1 << 8) | src[3];
-      word1 = (word1 << 8) | src[2];
-      word2 = (word2 << 8) | src[5];
-      word2 = (word2 << 8) | src[4];
-      word3 = (word3 << 8) | src[7];
-      word3 = (word3 << 8) | src[6];
+    word0 = LE_READ_UINT16 (&src[0]);
+    word1 = LE_READ_UINT16 (&src[2]);
+    word2 = LE_READ_UINT16 (&src[4]);
+    word3 = LE_READ_UINT16 (&src[6]);
 
-      for (i = 0; i < 16; i++)
-	{
-	  j = i * 4;
-	  /* For some reason I cannot combine those steps. */
-	  word0 += (word1 & ~word3) + (word2 & word3) + ctx->S[j];
-	  word0 = rotl16(word0, 1);
+    for (i = 0; i < 16; i++)
+      {
+	j = i * 4;
+	/* For some reason I cannot combine those steps. */
+	word0 += (word1 & ~word3) + (word2 & word3) + ctx->S[j];
+	word0 = rotl16 (word0, 1);
 
-	  word1 += (word2 & ~word0) + (word3 & word0) + ctx->S[j + 1];
-	  word1 = rotl16(word1, 2);
+	word1 += (word2 & ~word0) + (word3 & word0) + ctx->S[j + 1];
+	word1 = rotl16 (word1, 2);
 
-	  word2 += (word3 & ~word1) + (word0 & word1) + ctx->S[j + 2];
-	  word2 = rotl16(word2, 3);
+	word2 += (word3 & ~word1) + (word0 & word1) + ctx->S[j + 2];
+	word2 = rotl16 (word2, 3);
 
-	  word3 += (word0 & ~word2) + (word1 & word2) + ctx->S[j + 3];
-	  word3 = rotl16(word3, 5);
+	word3 += (word0 & ~word2) + (word1 & word2) + ctx->S[j + 3];
+	word3 = rotl16 (word3, 5);
 
-	  if (i == 4 || i == 10)
-	    {
-	      word0 += ctx->S[word3 & 63];
-	      word1 += ctx->S[word0 & 63];
-	      word2 += ctx->S[word1 & 63];
-	      word3 += ctx->S[word2 & 63];
-	    }
-	}
-
-      dst[0] = word0 & 255;
-      dst[1] = word0 >> 8;
-      dst[2] = word1 & 255;
-      dst[3] = word1 >> 8;
-      dst[4] = word2 & 255;
-      dst[5] = word2 >> 8;
-      dst[6] = word3 & 255;
-      dst[7] = word3 >> 8;
-    }
+	if (i == 4 || i == 10)
+	  {
+	    word0 += ctx->S[word3 & 63];
+	    word1 += ctx->S[word0 & 63];
+	    word2 += ctx->S[word1 & 63];
+	    word3 += ctx->S[word2 & 63];
+	  }
+      }
+    LE_WRITE_UINT16 (&dst[0], word0);
+    LE_WRITE_UINT16 (&dst[2], word1);
+    LE_WRITE_UINT16 (&dst[4], word2);
+    LE_WRITE_UINT16 (&dst[6], word3);
+  }
 }
 
 void
-arctwo_decrypt(struct arctwo_ctx *ctx,
-	       unsigned length, uint8_t *dst,
-	       const uint8_t *src)
+arctwo_decrypt (struct arctwo_ctx *ctx,
+		unsigned length, uint8_t * dst, const uint8_t * src)
 {
-  FOR_BLOCKS(length, dst, src, ARCTWO_BLOCK_SIZE)
-    {
-      register int i, j;
-      uint16_t word0 = 0, word1 = 0, word2 = 0, word3 = 0;
+  FOR_BLOCKS (length, dst, src, ARCTWO_BLOCK_SIZE)
+  {
+    register int i, j;
+    uint16_t word0 = 0, word1 = 0, word2 = 0, word3 = 0;
 
-      word0 = (word0 << 8) | src[1];
-      word0 = (word0 << 8) | src[0];
-      word1 = (word1 << 8) | src[3];
-      word1 = (word1 << 8) | src[2];
-      word2 = (word2 << 8) | src[5];
-      word2 = (word2 << 8) | src[4];
-      word3 = (word3 << 8) | src[7];
-      word3 = (word3 << 8) | src[6];
+    word0 = LE_READ_UINT16 (&src[0]);
+    word1 = LE_READ_UINT16 (&src[2]);
+    word2 = LE_READ_UINT16 (&src[4]);
+    word3 = LE_READ_UINT16 (&src[6]);
 
-      for (i = 15; i >= 0; i--)
-	{
-	  j = i * 4;
+    for (i = 15; i >= 0; i--)
+      {
+	j = i * 4;
 
-	  word3 = rotr16(word3, 5);
-	  word3 -= (word0 & ~word2) + (word1 & word2) + ctx->S[j + 3];
+	word3 = rotr16 (word3, 5);
+	word3 -= (word0 & ~word2) + (word1 & word2) + ctx->S[j + 3];
 
-	  word2 = rotr16(word2, 3);
-	  word2 -= (word3 & ~word1) + (word0 & word1) + ctx->S[j + 2];
+	word2 = rotr16 (word2, 3);
+	word2 -= (word3 & ~word1) + (word0 & word1) + ctx->S[j + 2];
 
-	  word1 = rotr16(word1, 2);
-	  word1 -= (word2 & ~word0) + (word3 & word0) + ctx->S[j + 1];
+	word1 = rotr16 (word1, 2);
+	word1 -= (word2 & ~word0) + (word3 & word0) + ctx->S[j + 1];
 
-	  word0 = rotr16(word0, 1);
-	  word0 -= (word1 & ~word3) + (word2 & word3) + ctx->S[j];
+	word0 = rotr16 (word0, 1);
+	word0 -= (word1 & ~word3) + (word2 & word3) + ctx->S[j];
 
-	  if (i == 5 || i == 11)
-	    {
-	      word3 = word3 - ctx->S[word2 & 63];
-	      word2 = word2 - ctx->S[word1 & 63];
-	      word1 = word1 - ctx->S[word0 & 63];
-	      word0 = word0 - ctx->S[word3 & 63];
-	    }
+	if (i == 5 || i == 11)
+	  {
+	    word3 = word3 - ctx->S[word2 & 63];
+	    word2 = word2 - ctx->S[word1 & 63];
+	    word1 = word1 - ctx->S[word0 & 63];
+	    word0 = word0 - ctx->S[word3 & 63];
+	  }
 
-	}
-
-      dst[0] = word0 & 255;
-      dst[1] = word0 >> 8;
-      dst[2] = word1 & 255;
-      dst[3] = word1 >> 8;
-      dst[4] = word2 & 255;
-      dst[5] = word2 >> 8;
-      dst[6] = word3 & 255;
-      dst[7] = word3 >> 8;
-    }
+      }
+    LE_WRITE_UINT16 (&dst[0], word0);
+    LE_WRITE_UINT16 (&dst[2], word1);
+    LE_WRITE_UINT16 (&dst[4], word2);
+    LE_WRITE_UINT16 (&dst[6], word3);
+  }
 }
 
 static void
-setkey_core(struct arctwo_ctx *ctx,
-	    unsigned length, const uint8_t *key,
-	    int with_phase2)
+setkey_core (struct arctwo_ctx *ctx,
+	     unsigned length, const uint8_t * key, int with_phase2)
 {
   unsigned i;
   uint8_t *S, x;
 
-  assert(length >= ARCTWO_MIN_KEY_SIZE);
-  assert(length <= ARCTWO_MAX_KEY_SIZE);
+  assert (length >= ARCTWO_MIN_KEY_SIZE);
+  assert (length <= ARCTWO_MAX_KEY_SIZE);
 
   S = (uint8_t *) ctx->S;
 
@@ -231,152 +210,18 @@ setkey_core(struct arctwo_ctx *ctx,
 
   /* Make the expanded key, endian independent. */
   for (i = 0; i < 64; i++)
-    ctx->S[i] = ( (uint16_t) S[i * 2] | (((uint16_t) S[i * 2 + 1]) << 8));
+    ctx->S[i] = ((uint16_t) S[i * 2] | (((uint16_t) S[i * 2 + 1]) << 8));
 }
 
 void
-gutmann_arctwo_set_key(struct arctwo_ctx *ctx,
-		      unsigned length, const uint8_t *key)
+arctwo_gutmann_set_key (struct arctwo_ctx *ctx,
+			unsigned length, const uint8_t * key)
 {
   setkey_core (ctx, length, key, 0);
 }
 
 void
-arctwo_set_key(struct arctwo_ctx *ctx,
-	       unsigned length, const uint8_t *key)
+arctwo_set_key (struct arctwo_ctx *ctx, unsigned length, const uint8_t * key)
 {
   setkey_core (ctx, length, key, 1);
 }
-
-#ifdef TEST
-
-#include <stdio.h>
-
-int main (void)
-{
-  struct arctwo_ctx ctx;
-  uint8_t scratch[16];
-
-  /* Test vectors from Peter Gutmann's paper. */
-  static uint8_t key_1[] =
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    };
-  static uint8_t plaintext_1[] =
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-  static const uint8_t ciphertext_1[] =
-    { 0x1C, 0x19, 0x8A, 0x83, 0x8D, 0xF0, 0x28, 0xB7 };
-
-  static uint8_t key_2[] =
-    { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-      0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
-    };
-  static uint8_t plaintext_2[] =
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-  static uint8_t ciphertext_2[] =
-    { 0x50, 0xDC, 0x01, 0x62, 0xBD, 0x75, 0x7F, 0x31 };
-
-  /* This one was checked against libmcrypt's RFC2268. */
-  static uint8_t key_3[] =
-    { 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    };
-  static uint8_t plaintext_3[] =
-    { 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-  static uint8_t ciphertext_3[] =
-    { 0x8f, 0xd1, 0x03, 0x89, 0x33, 0x6b, 0xf9, 0x5e };
-
-  /* Test vectors from RFC 2268. */
-  static uint8_t key_4[] =
-    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-  static uint8_t plaintext_4[] =
-    { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-  static const uint8_t ciphertext_4[] =
-    { 0x27, 0x8b, 0x27, 0xe4, 0x2e, 0x2f, 0x0d, 0x49 };
-
-  static uint8_t key_5[] =
-    { 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-  static uint8_t plaintext_5[] =
-    { 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
-  static const uint8_t ciphertext_5[] =
-    { 0x30, 0x64, 0x9e, 0xdf, 0x9b, 0xe7, 0xd2, 0xc2 };
-
-  static uint8_t key_6[] =
-    { 0x88, 0xbc, 0xa9, 0x0e, 0x90, 0x87, 0x5a, 0x7f,
-      0x0f, 0x79, 0xc3, 0x84, 0x62, 0x7b, 0xaf, 0xb2 };
-  static uint8_t plaintext_6[] =
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-  static const uint8_t ciphertext_6[] =
-    { 0x22, 0x69, 0x55, 0x2a, 0xb0, 0xf8, 0x5c, 0xa6 };
-
-  /* First test. */
-  gutmann_arctwo_set_key (&ctx, sizeof(key_1), key_1);
-  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_1);
-  if (memcmp (scratch, ciphertext_1, sizeof(ciphertext_1)))
-    puts ("RFC2268 encryption test 1 failed.");
-
-  gutmann_arctwo_set_key (&ctx, sizeof(key_1), key_1);
-  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
-  if (memcmp (scratch, plaintext_1, sizeof(plaintext_1)))
-    puts ("RFC2268 decryption test 1 failed.");
-
-  /* Second test. */
-  gutmann_arctwo_set_key (&ctx, sizeof(key_2), key_2);
-  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_2);
-  if (memcmp (scratch, ciphertext_2, sizeof(ciphertext_2)))
-    puts ("RFC2268 encryption test 2 failed.");
-
-  gutmann_arctwo_set_key (&ctx, sizeof(key_2), key_2);
-  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
-  if (memcmp (scratch, plaintext_2, sizeof(plaintext_2)))
-    puts ("RFC2268 decryption test 2 failed.");
-
-  /* Third test. */
-  gutmann_arctwo_set_key(&ctx, sizeof(key_3), key_3);
-  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_3);
-  if (memcmp(scratch, ciphertext_3, sizeof(ciphertext_3)))
-    puts ("RFC2268 encryption test 3 failed.");
-
-  gutmann_arctwo_set_key (&ctx, sizeof(key_3), key_3);
-  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
-  if (memcmp(scratch, plaintext_3, sizeof(plaintext_3)))
-    puts ("RFC2268 decryption test 3 failed.");
-
-  /* Fourth test. */
-  arctwo_set_key (&ctx, sizeof(key_4), key_4);
-  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_4);
-  if (memcmp (scratch, ciphertext_4, sizeof(ciphertext_4)))
-    puts ("RFC2268 encryption test 4 failed.");
-
-  arctwo_set_key (&ctx, sizeof(key_4), key_4);
-  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
-  if (memcmp (scratch, plaintext_4, sizeof(plaintext_4)))
-    puts ("RFC2268 decryption test 4 failed.");
-
-  /* Fifth test. */
-  arctwo_set_key (&ctx, sizeof(key_5), key_5);
-  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_5);
-  if (memcmp (scratch, ciphertext_5, sizeof(ciphertext_5)))
-    puts ("RFC2268 encryption test 5 failed.");
-
-  arctwo_set_key (&ctx, sizeof(key_5), key_5);
-  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
-  if (memcmp (scratch, plaintext_5, sizeof(plaintext_5)))
-    puts ("RFC2268 decryption test 5 failed.");
-
-  /* Sixth test. */
-  arctwo_set_key (&ctx, sizeof(key_6), key_6);
-  arctwo_encrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, plaintext_6);
-  if (memcmp (scratch, ciphertext_6, sizeof(ciphertext_6)))
-    puts ("RFC2268 encryption test 6 failed.");
-
-  arctwo_set_key (&ctx, sizeof(key_6), key_6);
-  arctwo_decrypt (&ctx, ARCTWO_BLOCK_SIZE, scratch, scratch);
-  if (memcmp (scratch, plaintext_6, sizeof(plaintext_6)))
-    puts ("RFC2268 decryption test 6 failed.");
-
-  puts ("Done");
-
-  return 0;
-}
-#endif /* TEST */
