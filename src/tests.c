@@ -41,7 +41,6 @@ extern gnutls_anon_client_credentials anon_cred;
 extern gnutls_certificate_credentials xcred;
 
 extern int more_info;
-static int srp = 0;
 static int dh_bits;
 
 extern int tls1_ok;
@@ -74,16 +73,6 @@ int ret, alert;
 			}
 			printf( "*** Handshake has failed\n");
 			GERR(ret);
-		}
-
-		if (srp) {
-			if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret ==
-				GNUTLS_E_FATAL_ALERT_RECEIVED) &&
-				gnutls_alert_get(session) == GNUTLS_A_MISSING_SRP_USERNAME)
-				return SUCCEED;
-
-			if (ret == GNUTLS_E_DECRYPTION_FAILED)
-				return SUCCEED; /* SRP was detected */
 		}
 
 		if (ret < 0) return GFAILED;
@@ -182,6 +171,18 @@ static void ADD_PROTOCOL(gnutls_session session, int protocol) {
 }
 
 #ifdef ENABLE_SRP
+static int srp_detected;
+
+int _test_srp_username_callback( gnutls_session session, unsigned int times,
+	char** username, char** password)
+{
+	if (times == 1) {
+		srp_detected = 1;
+	}
+
+	return -1;
+}
+
 int test_srp( gnutls_session session) {
 int ret;
 
@@ -192,14 +193,14 @@ int ret;
 		ADD_ALL_MACS(session);
 
 		ADD_KX(session, GNUTLS_KX_SRP);
-		srp = 1;
+		srp_detected = 0;
 
 		gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 
 		ret = do_handshake( session);
-		srp = 0;
 		
-		return ret;
+		if (srp_detected != 0) return SUCCEED;
+		else return GFAILED;
 }
 #endif
 

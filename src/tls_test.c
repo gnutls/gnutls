@@ -190,6 +190,8 @@ int main(int argc, char **argv)
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
+	gnutls_srp_set_client_credentials_function(srp_cred,
+		_test_srp_username_callback);
 #endif
 
 #ifdef ENABLE_ANON
