@@ -1,3 +1,31 @@
+2003-03-23 20:49  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	reduced the FIXMEs.  
+
+2003-03-23 19:29  nmav <nmav@gnutls.org>
+
+	* src/: cli-gaa.c, cli.gaa:
+
+	Allow for unencrypted PKCS #8 private keys.  
+
+2003-03-23 17:08  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_global.c, gnutls_global.h, gnutls_rsa_export.c:
+
+	The functions that return the pkix_asn and gnutls_asn types were
+	converted to macros.  
+
+2003-03-23 12:16  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/Makefile.am, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_constate.c,
+	lib/gnutls_errors.c:
+
+	* Added support for encoding and decoding PKCS #8 2.0 encrypted 
+	  RSA private keys.  
+
 2003-03-22 15:07  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/funcs.tex, lib/gnutls_cert.c:
