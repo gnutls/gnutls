@@ -249,7 +249,7 @@ int read_request(GNUTLS_STATE state, char *data, int data_size, int rnl)
 	ptr = data;
 	for (n = 1; n < data_size; n++) {
 		do {
-			rc = gnutls_read(state, &c, 1);
+			rc = gnutls_record_recv(state, &c, 1);
 		} while (rc == GNUTLS_E_INTERRUPTED
 			 || rc == GNUTLS_E_AGAIN);
 
@@ -453,7 +453,7 @@ int main(int argc, char **argv)
 					     strlen(buffer));
 					do {
 						ret =
-						    gnutls_write(state,
+						    gnutls_record_send(state,
 								 buffer,
 								 strlen
 								 (buffer));
@@ -469,7 +469,7 @@ int main(int argc, char **argv)
 					strcat(http_buffer, HTTP_END);
 					do {
 						ret =
-						    gnutls_write(state,
+						    gnutls_record_send(state,
 								 http_buffer,
 								 strlen
 								 (http_buffer));

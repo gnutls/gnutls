@@ -210,7 +210,7 @@ int main()
       i = 0;
       for (;;) {
          bzero(buffer, MAX_BUF + 1);
-         ret = gnutls_record_read( state, buffer, MAX_BUF);
+         ret = gnutls_record_recv( state, buffer, MAX_BUF);
 
          if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
             if (ret == 0) {
@@ -228,7 +228,7 @@ int main()
          if (ret > 0) {
             /* echo data back to the client
              */
-            gnutls_record_write( state, buffer,
+            gnutls_record_send( state, buffer,
                          strlen(buffer));
          }
          if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {

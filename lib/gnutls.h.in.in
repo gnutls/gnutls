@@ -127,10 +127,10 @@ int gnutls_error_is_fatal( int error);
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
 
-ssize_t gnutls_record_write( GNUTLS_STATE state, void *data, size_t sizeofdata);
-ssize_t gnutls_record_read( GNUTLS_STATE state, void *data, size_t sizeofdata);
-#define gnutls_read gnutls_record_read
-#define gnutls_write gnutls_record_write
+ssize_t gnutls_record_send( GNUTLS_STATE state, void *data, size_t sizeofdata);
+ssize_t gnutls_record_recv( GNUTLS_STATE state, void *data, size_t sizeofdata);
+#define gnutls_read gnutls_record_recv
+#define gnutls_write gnutls_record_send
 
 /* functions to set priority of cipher suites */
 int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST);

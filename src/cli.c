@@ -351,7 +351,7 @@ int main(int argc, char **argv)
 		if (FD_ISSET(sd, &rset)) {
 			bzero(buffer, MAX_BUF + 1);
 			do {
-				ret = gnutls_read(state, buffer, MAX_BUF);
+				ret = gnutls_record_recv(state, buffer, MAX_BUF);
 			} while (ret == GNUTLS_E_INTERRUPTED
 				 || ret == GNUTLS_E_AGAIN);
 			/* remove new line */
@@ -426,7 +426,7 @@ int main(int argc, char **argv)
 			}
 			do {
 				ret =
-				    gnutls_write(state, buffer,
+				    gnutls_record_send(state, buffer,
 						 strlen(buffer));
 			} while (ret == GNUTLS_E_AGAIN
 				 || ret == GNUTLS_E_INTERRUPTED);

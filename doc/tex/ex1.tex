@@ -130,9 +130,9 @@ int main()
        */
       print_info(state);
 
-      gnutls_record_write( state, MSG, strlen(MSG));
+      gnutls_record_send( state, MSG, strlen(MSG));
 
-      ret = gnutls_record_read( state, buffer, MAX_BUF);
+      ret = gnutls_record_recv( state, buffer, MAX_BUF);
       if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
          if (ret == 0) {
             printf("- Peer has closed the GNUTLS connection\n");
