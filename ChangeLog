@@ -1,3 +1,10 @@
+2002-11-16 09:50  nmav <nmav@gnutls.org>
+
+	* doc/tex/Makefile.am, doc/tex/ex-pgp-keyserver.tex,
+	doc/tex/examples.tex, lib/gnutls_int.h:
+
+	updated pgp key retrieval callback and added example.  
+
 2002-11-15 21:13  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/Makefile.am, doc/tex/Makefile.am:
