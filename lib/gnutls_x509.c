@@ -539,8 +539,13 @@ typedef struct {
 
 inline static void _strfile_free( strfile *x)
 {
-	if (x->mmaped) return;
-	
+#ifdef HAVE_MMAP
+	if (x->mmaped) {
+		munmap( x->data, x->size);
+		return;
+	}
+#endif
+
 	gnutls_free( x->data);
 	x->data = NULL;
 }
@@ -575,6 +580,7 @@ strfile _gnutls_file_to_str( const char * file)
 		ret.data = tmp;
 		ret.size = tot_size;
 		
+		close(fd1);
 		return ret;
 	}
 #endif
