@@ -50,11 +50,11 @@
 #define MAX(X,Y) (X >= Y ? X : Y);
 #define CAFILE "x509/ca.pem"
 #define CRLFILE NULL
-#define CLIKEYFILE1 "x509/clikey-dsa.pem"
-#define CLICERTFILE1 "x509/clicert-dsa.pem"
+#define CLIKEYFILE2 "x509/clikey-dsa.pem"
+#define CLICERTFILE2 "x509/clicert-dsa.pem"
 
-#define CLIKEYFILE2 "x509/clikey.pem"
-#define CLICERTFILE2 "x509/clicert.pem"
+#define CLIKEYFILE1 "x509/clikey.pem"
+#define CLICERTFILE1 "x509/clicert.pem"
 
 static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
 

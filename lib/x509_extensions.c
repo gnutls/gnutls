@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -136,7 +136,7 @@ static int _parse_extension(gnutls_cert * cert, char *extnID,
 						 extnValueLen);
 	}
 
-	_gnutls_log("X509_ext: CERT[%s]: Unsupported Extension: %s, %s\n",
+	_gnutls_x509_log("X509_EXT: CERT[%s]: Unsupported Extension: %s, %s\n",
 		    GET_CN(cert->raw), extnID, critical);
 
 	if (strcmp(critical, "TRUE") == 0) {
@@ -220,8 +220,8 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 				if (result == ASN_MEM_ERROR
 				    && strcmp(critical, "FALSE") == 0) {
 
-					_gnutls_log
-					    ("X509_ext: Cannot parse extension: %s. Too small buffer.",
+					_gnutls_x509_log
+					    ("X509_EXT: Cannot parse extension: %s. Too small buffer.",
 					     extnID);
 
 					continue;
@@ -280,7 +280,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_ext: Decoding error %d\n", result);
+		_gnutls_x509_log("X509_EXT: Decoding error %d\n", result);
 
 		gnutls_assert();
 		asn1_delete_structure(rasn);
@@ -349,8 +349,8 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 				if (result == ASN_MEM_ERROR
 				    && strcmp(critical, "FALSE") == 0) {
 
-					_gnutls_log
-					    ("X509_ext: Cannot parse extension: %s. Too small buffer.",
+					_gnutls_x509_log
+					    ("X509_EXT: Cannot parse extension: %s. Too small buffer.",
 					     extnID);
 
 					continue;

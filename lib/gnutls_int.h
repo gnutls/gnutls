@@ -31,6 +31,7 @@
 #define WRITE_DEBUG
 #define READ_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
+#define X509_DEBUG
 #define RECORD_DEBUG
 #define DEBUG
 */

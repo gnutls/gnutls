@@ -326,7 +326,9 @@ inline static int cpydata(const uint8 * data, int data_size, uint8 ** result)
 	return j;
 }
 
-/* decodes data and puts the result into result (localy alocated)
+/* Searches the given string for ONE PEM encoded certificate, and
+ * stores it in the result.
+ *
  * The result_size is the return value
  */
 #define ENDSTR "-----\n"

@@ -84,6 +84,12 @@ int gnutls_error_is_fatal( int error);
 #  define _gnutls_write_log( ...)
 # endif
 
+# ifdef X509_DEBUG
+#  define _gnutls_x509_log _gnutls_log
+# else
+#  define _gnutls_x509_log( ...)
+# endif
+
 #else
 # define _gnutls_log(...)
 # define _gnutls_handshake_log( ...)
@@ -93,5 +99,6 @@ int gnutls_error_is_fatal( int error);
 # define _gnutls_record_log( ...)
 # define _gnutls_read_log( ...)
 # define _gnutls_write_log( ...)
+# define _gnutls_x509_log( ...)
 #endif
 

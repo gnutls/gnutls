@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -31,11 +31,11 @@
 #include <common.h>
 #include <signal.h>
 
-#define KEYFILE2 "x509/key.pem"
-#define CERTFILE2 "x509/cert.pem"
+#define KEYFILE1 "x509/key.pem"
+#define CERTFILE1 "x509/cert.pem"
 
-#define KEYFILE1 "x509/key-dsa.pem"
-#define CERTFILE1 "x509/cert-dsa.pem"
+#define KEYFILE2 "x509/key-dsa.pem"
+#define CERTFILE2 "x509/cert-dsa.pem"
 
 #define CAFILE "x509/ca.pem"
 #define CRLFILE NULL

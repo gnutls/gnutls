@@ -115,7 +115,7 @@ int len;
 
 	if (*hash==-1) {
 
-		_gnutls_log( "X509_sig: HASH OID: %s\n", str);
+		_gnutls_x509_log( "X509_SIG: HASH OID: %s\n", str);
 
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -136,11 +136,11 @@ int len;
 
 /* if hash==MD5 then we do RSA-MD5
  * if hash==SHA then we do RSA-SHA
- * m is modulus
- * e is public key
+ * params[0] is modulus
+ * params[1] is public key
  */
 static int
-_pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI *params)
+_pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *params)
 {
 	MACAlgorithm hash;
 	int ret;
@@ -149,7 +149,6 @@ _pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI *params)
 	GNUTLS_HASH_HANDLE hd;
 	gnutls_datum decrypted;
 	
-
 	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &decrypted, *signature, params, 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -159,7 +158,7 @@ _pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI *params)
 	 */
 
 	digest_size = sizeof(digest);	
-	if ( (ret = _gnutls_get_ber_digest_info( &decrypted, &hash, digest, &digest_size )) != 0) {
+	if ( (ret = _gnutls_get_ber_digest_info( &decrypted, &hash, digest, &digest_size)) != 0) {
 		gnutls_assert();
 		gnutls_sfree_datum( &decrypted);
 		return ret;
@@ -199,6 +198,9 @@ gnutls_datum tbs;
 		return GNUTLS_CERT_INVALID;
 	}
 
+	_gnutls_x509_log("X509_VERIFY: CERT[%s]\n", GET_CN(cert->raw));
+	_gnutls_x509_log("X509_VERIFY: ISSUER[%s]\n", GET_CN(issuer->raw));
+
 	switch( issuer->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
 		
@@ -227,7 +229,7 @@ gnutls_datum tbs;
 
 	gnutls_free_datum(&tbs);
 
-	_gnutls_log( "X509_sig: PK: %d\n", issuer->subject_pk_algorithm);	
+	_gnutls_x509_log( "X509_SIG: PK: %d\n", issuer->subject_pk_algorithm);	
 
 	gnutls_assert();
 	return GNUTLS_CERT_INVALID;
