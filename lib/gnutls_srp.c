@@ -442,10 +442,11 @@ int i;
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(GNUTLS_STATE, const char** pfiles, int npfiles);
+  * int (*callback)(GNUTLS_STATE, const char** pfiles, const char** pconffiles, int npfiles);
   *
   * 'pfiles' contains 'npfiles' char* structures which hold
-  * the password file name. 
+  * the password file name. 'pconffiles' contain the corresponding
+  * conf files.
   *
   * This function specifies what we, in case of a server, are going
   * to do when we have to use a password file. If this callback
