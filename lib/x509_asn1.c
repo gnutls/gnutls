@@ -866,7 +866,7 @@ _asn1_copy_structure3(node_asn *source_node)
       if(p_s->value){
 	switch(type_field(p_s->type)){
 	case TYPE_OCTET_STRING: case TYPE_BIT_STRING: 
-	case TYPE_INTEGER: case TYPE_DEFAULT:
+	case TYPE_INTEGER:           // case TYPE_DEFAULT:
 	  len2=-1;
 	  len=_asn1_get_length_der(p_s->value,&len2);
 	  _asn1_set_value(p_d,p_s->value,len+len2);
