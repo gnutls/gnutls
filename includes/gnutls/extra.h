@@ -62,38 +62,11 @@ void gnutls_srp_set_server_credentials_function(
 	gnutls_srp_server_credentials_function *);
 
 /* Openpgp certificate stuff */
-int gnutls_openpgp_fingerprint( const gnutls_datum* data, char* result, size_t* result_size);
-
-int gnutls_openpgp_key_to_xml( const gnutls_datum *cert, gnutls_datum *xmlkey,
-	int ext);
-
-int gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
-                                 int idx,
-                                 gnutls_openpgp_name *dn );
-
-int
-gnutls_openpgp_extract_key_name_string( const gnutls_datum *cert,
-                                 int idx,
-                                 char *buf, unsigned int sizeof_buf);
-
-int gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert,
-                                            int *r_bits);
-
-int gnutls_openpgp_extract_key_version( const gnutls_datum *cert );
-
-time_t gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert );
-time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert );
-
-int gnutls_openpgp_extract_key_id( const gnutls_datum *cert, unsigned char keyid[8]);
 
 typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session, const unsigned char *keyfpr, 
 	unsigned int keyfpr_length, gnutls_datum *key);
 
 void gnutls_openpgp_set_recv_key_function( gnutls_session, gnutls_openpgp_recv_key_func);
-
-int gnutls_openpgp_verify_key( const char *trustdb, const gnutls_datum* keyring, 
-	const gnutls_datum* key_list, 
-	int key_list_length);
 
 int gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res, char *CERTFILE, char* KEYFILE);
 int gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,

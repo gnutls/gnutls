@@ -915,45 +915,6 @@ leave:
 }
 
 
-/**
- * gnutls_openpgp_fingerprint - Gets the fingerprint
- * @cert: the raw data that contains the OpenPGP public key.
- * @fpr: the buffer to save the fingerprint.
- * @fprlen: the integer to save the length of the fingerprint.
- *
- * Returns the fingerprint of the OpenPGP key. Depence on the algorithm,
- * the fingerprint can be 16 or 20 bytes.
- **/
-int
-gnutls_openpgp_fingerprint( const gnutls_datum *cert,
-                            unsigned char *fpr, size_t *fprlen )
-{
-    CDK_PACKET *pkt;
-    cdk_pkt_pubkey_t pk = NULL;
-  
-    if( !cert || !fpr || !fprlen ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    *fprlen = 0;
-
-    pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
-    if( !pkt )
-        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
-    
-    pk = pkt->pkt.public_key;
-    *fprlen = 20;
-    if ( is_RSA(pk->pubkey_algo) && pk->version < 4 )
-        *fprlen = 16;
-    cdk_pk_get_fingerprint( pk, fpr );
-    search_packet( NULL, 0 );
-  
-    return 0;
-}
-
-
-
 /*-
  * gnutls_openpgp_add_keyring_file - Adds a keyring file for OpenPGP
  * @keyring: data buffer to store the file.
