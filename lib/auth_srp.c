@@ -71,16 +71,24 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	size_t n_g, n_n, n_s;
 	size_t ret;
 	uint8 *data_n, *data_s;
-	uint8 *data_g;
+	uint8 *data_g, *username;
 	uint8 pwd_algo;
 	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
 	int err;
 
+	if ( state->gnutls_key->auth_info == NULL)
+              	state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(SRP_SERVER_AUTH_INFO_INT));
+	                         	
 	if (state->gnutls_key->auth_info == NULL) {
-		return GNUTLS_E_INSUFICIENT_CRED;
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
 	}
+	state->gnutls_key->auth_info_size = sizeof(SRP_SERVER_AUTH_INFO_INT);
+	
+	username = ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username;
+	strcpy( username, state->gnutls_internals.srp_username);
 
-	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username, &err);
+	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, username, &err);
 
 	if (pwd_entry == NULL) {
 		if (err==0)
@@ -108,11 +116,20 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	N = gcry_mpi_alloc_like(pwd_entry->n);
 	V = gcry_mpi_alloc_like(pwd_entry->v);
 
+	if (G==NULL || N == NULL || V == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	gcry_mpi_set(G, pwd_entry->g);
 	gcry_mpi_set(N, pwd_entry->n);
 	gcry_mpi_set(V, pwd_entry->v);
 
 	(*data) = gnutls_malloc(n_n + n_g + pwd_entry->salt_size + 6 + 1);
+	if ((*data)==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	data_g = (*data); 
 
@@ -168,6 +185,10 @@ int gen_srp_server_kx2(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 
 	(*data) = gnutls_malloc(n_b + 2);
+	if ( (*data) == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	/* copy B */
 	data_b = (*data);
@@ -218,18 +239,29 @@ int gen_srp_client_kx0(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_INSUFICIENT_CRED;
 
 	/* calc A = g^a % N */
+	if (G == NULL || N == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+	
 	A = _gnutls_calc_srp_A( &_a, G, N);
 
 	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_a, A)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 
 	(*data) = gnutls_malloc(n_a + 2);
+	if ( (*data) == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	/* copy A */
 	data_a = (*data);
-	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_a[2], &n_a, A)!=0)
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_a[2], &n_a, A)!=0) {
+		gnutls_free( *data);
 		return GNUTLS_E_MPI_PRINT_FAILED;
-
+	}
+	
 	WRITEuint16( n_a, data_a);
 
 	return n_a + 2;
@@ -299,12 +331,12 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	_n_g = n_g;
 	_n_n = n_n;
 
-	if (gcry_mpi_scan(&N, GCRYMPI_FMT_USG, data_n, &_n_n) != 0) {
+	if (gcry_mpi_scan(&N, GCRYMPI_FMT_USG, data_n, &_n_n) != 0 || N == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (gcry_mpi_scan(&G, GCRYMPI_FMT_USG, data_g, &_n_g) != 0) {
+	if (gcry_mpi_scan(&G, GCRYMPI_FMT_USG, data_g, &_n_g) != 0 || G == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -314,7 +346,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	 */
 	_gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g, hd);
 
-	if (gcry_mpi_scan(&state->gnutls_key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0) {
+	if (gcry_mpi_scan(&state->gnutls_key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0 || state->gnutls_key->x==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -329,7 +361,7 @@ int proc_srp_client_kx0(GNUTLS_STATE state, opaque * data, int data_size)
 
 	_n_A = READuint16( &data[0]);
 
-	if (gcry_mpi_scan(&A, GCRYMPI_FMT_USG, &data[2], &_n_A)) {
+	if (gcry_mpi_scan(&A, GCRYMPI_FMT_USG, &data[2], &_n_A) || A == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -345,7 +377,7 @@ int proc_srp_server_kx2(GNUTLS_STATE state, opaque * data, int data_size)
 	
 	_n_B = READuint16( &data[0]);
 
-	if (gcry_mpi_scan(&B, GCRYMPI_FMT_USG, &data[2], &_n_B)) {
+	if (gcry_mpi_scan(&B, GCRYMPI_FMT_USG, &data[2], &_n_B) || B==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}

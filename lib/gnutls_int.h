@@ -48,6 +48,7 @@
 
 #define MAX_X509_CERT_SIZE 10*1024
 #define MAX_LOG_SIZE 1024 /* maximum number of log message */
+#define MAX_SRP_USERNAME 256
 
 #define MAX_DNSNAME_SIZE 256
 
@@ -349,6 +350,9 @@ typedef struct {
 	 */
 	int				send_cert_req;
 	int				peer_pk_algorithm;
+	/* holds the username got in the srp tls extension
+	 */
+	opaque				srp_username[MAX_SRP_USERNAME];
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

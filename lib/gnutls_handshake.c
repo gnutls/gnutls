@@ -1105,6 +1105,10 @@ static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state) {
 
 	datalen = 2 + session_id_len + 1 + TLS_RANDOM_SIZE;
 	data = gnutls_malloc(datalen);
+	if (data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	data[pos++] =
 	    _gnutls_version_get_major(state->connection_state.version);
@@ -1136,6 +1140,10 @@ static int _gnutls_send_server_hello(SOCKET cd, GNUTLS_STATE state) {
 
 	datalen += 1;
 	data = gnutls_realloc(data, datalen);
+	if (data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	comp =
 	    (uint8) _gnutls_compression_get_num(state->gnutls_internals.

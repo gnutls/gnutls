@@ -16,7 +16,7 @@ typedef struct {
 
 /* these structures should not use allocated data */
 typedef struct SRP_SERVER_AUTH_INFO_INT {
-	char username[256];
+	char username[MAX_SRP_USERNAME];
 } *SRP_SERVER_AUTH_INFO;
 
 int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size);

@@ -79,7 +79,7 @@ const char *_gnutls_extension_get_name(int type)
 }
 
 int _gnutls_parse_extensions( GNUTLS_STATE state, const opaque* data, int data_size) {
-int next;
+int next, ret;
 int pos=0;
 uint8 type;
 const opaque* sdata;
@@ -109,7 +109,10 @@ uint16 size;
 		
 		ext_func_recv = _gnutls_ext_func_recv(type);
 		if (ext_func_recv == NULL) continue;
-		ext_func_recv( state, sdata, size);
+		if ( (ret=ext_func_recv( state, sdata, size)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
 		
 	} while(next > 2);
 

@@ -287,9 +287,9 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		n = sizeof diffie_hellman_group1_prime;
 
 		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-			  diffie_hellman_group1_prime, &n)) {
+			  diffie_hellman_group1_prime, &n) || prime==NULL) {
 			gnutls_assert();
-			abort();
+			return NULL;
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_1024);
@@ -303,9 +303,9 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		n = sizeof diffie_hellman_prime_2048;
 
 		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-			  diffie_hellman_prime_2048, &n)) {
+			  diffie_hellman_prime_2048, &n) || prime==NULL) {
 			gnutls_assert();
-			abort();
+			return NULL;
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_2048);
@@ -319,9 +319,9 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		n = sizeof diffie_hellman_prime_3072;
 
 		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-			  diffie_hellman_prime_3072, &n)) {
+			  diffie_hellman_prime_3072, &n) || prime==NULL) {
 			gnutls_assert();
-			abort();
+			return NULL;
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_3072);
@@ -335,9 +335,9 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		n = sizeof diffie_hellman_prime_4096;
 
 		if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
-			  diffie_hellman_prime_4096, &n)) {
+			  diffie_hellman_prime_4096, &n) || prime==NULL) {
 			gnutls_assert();
-			abort();
+			return NULL;
 		}
 
 		g = gcry_mpi_set_ui(NULL, DH_G_4096);
@@ -349,7 +349,7 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		return g;
 	default:
 		gnutls_assert();
-		abort();
+		return NULL;
 	}
 }
 

@@ -84,6 +84,10 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	}
 
 	g = gnutls_get_dh_params(&p, bits);
+	if (g==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_SERVER_AUTH_INFO));
 	if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -195,18 +199,18 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	_n_p = n_p;
 
 	if (gcry_mpi_scan(&state->gnutls_key->client_Y,
-			      GCRYMPI_FMT_USG, data_Y, &_n_Y) != 0) {
+			      GCRYMPI_FMT_USG, data_Y, &_n_Y) != 0 || state->gnutls_key->client_Y==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	if (gcry_mpi_scan(&state->gnutls_key->client_g,
-			      GCRYMPI_FMT_USG, data_g, &_n_g) != 0) {
+			      GCRYMPI_FMT_USG, data_g, &_n_g) != 0 || state->gnutls_key->client_g==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 	if (gcry_mpi_scan(&state->gnutls_key->client_p,
-				      GCRYMPI_FMT_USG, data_p, &_n_p) != 0) {
+				      GCRYMPI_FMT_USG, data_p, &_n_p) != 0 || state->gnutls_key->client_p==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -251,12 +255,17 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 
 	_n_Y = n_Y;
 	if (gcry_mpi_scan(&state->gnutls_key->client_Y,
-		      GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
+		      GCRYMPI_FMT_USG, &data[2], &_n_Y) !=0 || state->gnutls_key->client_Y==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	g = gnutls_get_dh_params(&p, bits);
+	if (g==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 	state->gnutls_key->KEY = gnutls_calc_dh_key( state->gnutls_key->client_Y, state->gnutls_key->dh_secret, p);
 
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);

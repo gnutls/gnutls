@@ -35,33 +35,18 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 	}
 	
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
-		/* algorithm was not selected 
-		 */
-		if ( gnutls_get_auth_info_type( state) != GNUTLS_SRP)
-			return 0;
-		 
 		if (data_size > 0) {
-			if ( state->gnutls_key->auth_info == NULL)
-				state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(SRP_SERVER_AUTH_INFO));
-				
-			if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
-			
-			if (sizeof( ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username) > data_size) {
-				len = data[0];
-				if (len > data_size) {
-					gnutls_assert();
-					return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-				}
-				memcpy( ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username, &data[1], len);
-				((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username[len]=0; /* null terminated */
-				state->gnutls_key->auth_info_size = sizeof(SRP_SERVER_AUTH_INFO_INT);
-			} else {
-				state->gnutls_key->auth_info_size = 0;
-				gnutls_free(state->gnutls_key->auth_info);
-				state->gnutls_key->auth_info = NULL;
+			len = data[0];
+			if (len > data_size) {
+				gnutls_assert();
+				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+			}
+			if ( sizeof( state->gnutls_internals.srp_username) <= len) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
+			memcpy( state->gnutls_internals.srp_username, &data[1], len);
+			state->gnutls_internals.srp_username[len]=0; /* null terminated */
 		}
 	} else { /* client side reading server hello extensions */
 		if (state->gnutls_internals.resumed==RESUME_FALSE)
@@ -98,7 +83,10 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 		/* We only send the packet if we are NOT
 		 * resuming AND we are using SRP
 		 */
-		if (state->security_parameters.kx_algorithm!=GNUTLS_KX_SRP)
+		
+		/* note that security parameters are not fully established
+		 */
+		if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite) != GNUTLS_KX_SRP)
 			return 0; /* no data to send */
 		
 		if (state->gnutls_internals.resumed==RESUME_FALSE)
