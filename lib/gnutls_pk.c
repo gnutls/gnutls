@@ -108,7 +108,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 		return ret;
 	}
 
-	_gnutls_mpi_print_raw( NULL, &psize, res);
+	_gnutls_mpi_print( NULL, &psize, res);
 
 	ciphertext->data = gnutls_malloc(psize);
 	if (ciphertext->data == NULL) {
@@ -116,7 +116,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 		_gnutls_mpi_release(&res);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	_gnutls_mpi_print_raw( ciphertext->data, &psize, res);
+	_gnutls_mpi_print( ciphertext->data, &psize, res);
 	ciphertext->size = psize;
 
 	_gnutls_mpi_release(&res);
@@ -140,15 +140,12 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext, gnutls_datum ciphertext
 	k = gcry_mpi_get_nbits(n) / 8;
 	esize = ciphertext.size;
 
-	/* here we have a problem if the integer has leading zeros.
-	 * However this is STRICT PKCS1.
-	 */
 	if (esize != k) {
 		gnutls_assert();
 		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}
 
-	if (_gnutls_mpi_scan_raw(&c, ciphertext.data, &esize) != 0) {
+	if (_gnutls_mpi_scan(&c, ciphertext.data, &esize) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}

@@ -35,7 +35,6 @@
 #define DEBUG
 */
 
-
 /* It might be a good idea to replace int with void*
  * here.
  */
