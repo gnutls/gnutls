@@ -670,6 +670,10 @@ strfile _gnutls_file_to_str( const char * file)
 	}
 
 	tot_size = stat_st.st_size;
+	if (tot_size == 0) {
+		gnutls_assert();
+		goto error;
+	}
 
 #ifdef HAVE_MMAP
 	if ((tmp=mmap( NULL, tot_size, PROT_READ, MAP_SHARED, fd1, 0)) != MAP_FAILED) {

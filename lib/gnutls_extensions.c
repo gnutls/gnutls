@@ -174,20 +174,29 @@ static void _gnutls_extension_list_add( gnutls_session session, uint16 type) {
 	}
 }
 
-int _gnutls_gen_extensions( gnutls_session session, opaque** data) {
+int _gnutls_gen_extensions( gnutls_session session, opaque* data, size_t data_size) 
+{
 int next, size;
 uint16 pos=0;
-opaque sdata[1024];
-int sdata_size = sizeof(sdata);
+opaque *sdata;
+int sdata_size;
 ext_send_func ext_send;
 
 
-	(*data) = gnutls_malloc(2); /* allocate size for size */
-	if ((*data)==NULL) {
+	if (data_size < 2) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	/* allocate enough data for each extension.
+	 */
+	sdata_size = data_size;
+	sdata = gnutls_malloc( sdata_size);
+	if (sdata == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
+	
 	pos+=2;
 	next = MAX_EXT_TYPES; /* maximum supported extensions */
 	do {
@@ -196,21 +205,21 @@ ext_send_func ext_send;
 		if (ext_send == NULL) continue;
 		size = ext_send( session, sdata, sdata_size);
 		if (size > 0) {
-			(*data) = gnutls_realloc_fast( (*data), pos+size+4);
-			if ((*data)==NULL) {
+			if (data_size < pos+(size_t)size+4) {
 				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				gnutls_free(sdata);
+				return GNUTLS_E_INTERNAL_ERROR;
 			}
 
 			/* write extension type */
-			_gnutls_write_uint16( next, &(*data)[pos]);
+			_gnutls_write_uint16( next, &data[pos]);
 			pos+=2;
 			
 			/* write size */
-			_gnutls_write_uint16( size, &(*data)[pos]);
+			_gnutls_write_uint16( size, &data[pos]);
 			pos+=2;
 			
-			memcpy( &(*data)[pos], sdata, size);
+			memcpy( &data[pos], sdata, size);
 			pos+=size;
 			
 			/* add this extension to the extension list
@@ -221,7 +230,7 @@ ext_send_func ext_send;
 				_gnutls_extension_get_name(next));
 		} else if (size < 0) {
 			gnutls_assert();
-			gnutls_free(*data); *data = NULL;
+			gnutls_free(sdata);
 			return size;
 		}
 		
@@ -230,13 +239,13 @@ ext_send_func ext_send;
 	size = pos;
 	pos-=2; /* remove the size of the size header! */
 
-	_gnutls_write_uint16( pos, (*data));
+	_gnutls_write_uint16( pos, data);
 
 	if (size==2) { /* empty */
 		size = 0;
-		gnutls_free(*data);
-		(*data) = NULL;
 	}
+	
+	gnutls_free( sdata);
 	return size;
 
 }
