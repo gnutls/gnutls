@@ -116,8 +116,8 @@ typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1 } gnutls_proto
 typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
 } gnutls_certificate_type;
 
-typedef enum gnutls_x509_crt_format { GNUTLS_X509_FMT_DER, 
-	GNUTLS_X509_FMT_PEM } gnutls_x509_crt_format;
+typedef enum gnutls_x509_crt_fmt { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } gnutls_x509_crt_fmt;
 
 typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
 	GNUTLS_PK_UNKNOWN = 0xff
@@ -310,20 +310,20 @@ int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_
 int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
 
 int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials res, const char* CAFILE, 
-	gnutls_x509_crt_format);
+	gnutls_x509_crt_fmt);
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CA, gnutls_x509_crt_format);
+	const gnutls_datum *CA, gnutls_x509_crt_fmt);
 
 int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res, 
-		const char *crlfile, gnutls_x509_crt_format type);
+		const char *crlfile, gnutls_x509_crt_fmt type);
 int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CRL, gnutls_x509_crt_format type);
+	const gnutls_datum *CRL, gnutls_x509_crt_fmt type);
 
 int gnutls_certificate_set_x509_key_file( gnutls_certificate_credentials res, 
-	const char *CERTFILE, const char* KEYFILE, gnutls_x509_crt_format);
+	const char *CERTFILE, const char* KEYFILE, gnutls_x509_crt_fmt);
 int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum* CERT, const gnutls_datum* KEY,
-	gnutls_x509_crt_format);
+	gnutls_x509_crt_fmt);
 
 /* global state functions 
  */

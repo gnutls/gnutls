@@ -390,7 +390,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
  */
 static 
 int read_cert_mem(gnutls_certificate_credentials res, const char *cert, int cert_size, 
-	gnutls_x509_crt_format type)
+	gnutls_x509_crt_fmt type)
 {
 	int ret;
 
@@ -506,7 +506,7 @@ int _gnutls_der_check_if_dsa_key(const gnutls_datum * key_struct)
  * type indicates the certificate format.
  */
 static int read_key_mem(gnutls_certificate_credentials res, const char *key, int key_size, 
-	gnutls_x509_crt_format type)
+	gnutls_x509_crt_fmt type)
 {
 	int ret;
 	opaque *b64 = NULL;
@@ -612,7 +612,7 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 /* Reads a certificate file
  */
 static int read_cert_file(gnutls_certificate_credentials res, const char *certfile,
-	gnutls_x509_crt_format type)
+	gnutls_x509_crt_fmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -637,7 +637,7 @@ static int read_cert_file(gnutls_certificate_credentials res, const char *certfi
  * stores it).
  */
 static int read_key_file(gnutls_certificate_credentials res, const char *keyfile,
-	gnutls_x509_crt_format type)
+	gnutls_x509_crt_fmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -682,7 +682,7 @@ static int read_key_file(gnutls_certificate_credentials res, const char *keyfile
   *
   **/
 int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, const gnutls_datum* CERT,
-			   const gnutls_datum* KEY, gnutls_x509_crt_format type)
+			   const gnutls_datum* KEY, gnutls_x509_crt_fmt type)
 {
 	int ret;
 
@@ -720,7 +720,7 @@ int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, cons
   *
   **/
 int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials res, const char *CERTFILE,
-			   const char *KEYFILE, gnutls_x509_crt_format type)
+			   const char *KEYFILE, gnutls_x509_crt_fmt type)
 {
 	int ret;
 
@@ -982,7 +982,7 @@ static int parse_der_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
   *
   **/
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CA, gnutls_x509_crt_format type)
+	const gnutls_datum *CA, gnutls_x509_crt_fmt type)
 {
 	int ret, ret2;
 
@@ -1012,7 +1012,7 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res,
   *
   **/
 int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res, 
-		const char *CAFILE, gnutls_x509_crt_format type)
+		const char *CAFILE, gnutls_x509_crt_fmt type)
 {
 	int ret, ret2;
 	int siz;
@@ -1168,7 +1168,7 @@ static int parse_der_crl_mem( gnutls_x509_crl** crl_list, int* ncrls,
  */
 static 
 int read_crl_mem(gnutls_certificate_credentials res, const char *crl, int crl_size, 
-	gnutls_x509_crt_format type)
+	gnutls_x509_crt_fmt type)
 {
 	int ret;
 
@@ -1207,7 +1207,7 @@ int read_crl_mem(gnutls_certificate_credentials res, const char *crl, int crl_si
   *
   **/
 int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CRL, gnutls_x509_crt_format type)
+	const gnutls_datum *CRL, gnutls_x509_crt_fmt type)
 {
 	int ret;
 
@@ -1230,7 +1230,7 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res,
   *
   **/
 int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res, 
-		const char *crlfile, gnutls_x509_crt_format type)
+		const char *crlfile, gnutls_x509_crt_fmt type)
 {
 	int ret;
 	int siz;

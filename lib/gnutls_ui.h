@@ -41,10 +41,10 @@ void gnutls_certificate_server_set_request( gnutls_session, gnutls_certificate_r
  */
 
 int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
-	gnutls_x509_crt_format format, gnutls_datum * prime,
+	gnutls_x509_crt_fmt format, gnutls_datum * prime,
 	gnutls_datum * generator, int* prime_bits);
 int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
-	const gnutls_datum * generator, gnutls_x509_crt_format format,
+	const gnutls_datum * generator, gnutls_x509_crt_fmt format,
 	unsigned char* params_data, int* params_data_size);
 
 /* get data from the session 

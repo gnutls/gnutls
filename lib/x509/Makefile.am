@@ -5,7 +5,7 @@ EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
 noinst_LTLIBRARIES = libx509.la
 
 COBJECTS = crl.c dn.c common.c x509.c extensions.c \
-	pkcs7.c xml.c rfc2818_hostname.c verify.c mpi.c
+	pkcs7.c xml.c rfc2818_hostname.c verify.c mpi.c privkey.c
 
 COMPAT_OBJECTS = compat.c
 

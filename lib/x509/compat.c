@@ -746,3 +746,38 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 
 	return ret;
 }
+
+/**
+  * gnutls_x509_extract_key_pk_algorithm - This function returns the keys's PublicKey algorithm
+  * @cert: is a DER encoded private key
+  *
+  * This function will return the public key algorithm of a DER encoded private
+  * key.
+  *
+  * Returns a member of the gnutls_pk_algorithm enumeration on success,
+  * or GNUTLS_E_UNKNOWN_PK_ALGORITHM on error.
+  *
+  **/
+int gnutls_x509_extract_key_pk_algorithm( const gnutls_datum * key)
+{
+	gnutls_x509_privkey pkey;
+	int ret, pk;
+	
+	ret = gnutls_x509_privkey_init( &pkey);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	
+	ret = gnutls_x509_privkey_import( pkey, key, GNUTLS_X509_FMT_DER);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	pk = gnutls_x509_privkey_get_pk_algorithm( pkey);
+	
+	gnutls_x509_privkey_deinit( pkey);
+	return pk;
+}
+

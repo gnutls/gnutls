@@ -17,8 +17,13 @@ typedef struct gnutls_x509_crt_int {
 	gnutls_pk_algorithm signature_algorithm;
 } gnutls_x509_crt_int;
 
+typedef struct gnutls_x509_privkey_int {
+	gnutls_datum raw; /* we only keep raw data for the moment */
+} gnutls_x509_privkey_int;
+
 typedef struct gnutls_x509_crt_int *gnutls_x509_crt;
 typedef struct gnutls_x509_crl_int *gnutls_x509_crl;
+typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey;
 
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, char *buf, int *sizeof_buf);
@@ -52,15 +57,21 @@ int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
 void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
 int gnutls_x509_crl_init(gnutls_x509_crl * crl);
 int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
-			   gnutls_x509_crt_format format);
+			   gnutls_x509_crt_fmt format);
 
 int gnutls_x509_crt_init(gnutls_x509_crt * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt cert);
 int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
-	gnutls_x509_crt_format format);
+	gnutls_x509_crt_fmt format);
 
 int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
 	int *critical);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
+
+int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
+void gnutls_x509_privkey_deinit(gnutls_x509_privkey key);
+int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * data,
+	gnutls_x509_crt_fmt format);
+int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key);
 
 #endif

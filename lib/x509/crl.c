@@ -83,7 +83,7 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl crl)
   *
   **/
 int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
-			   gnutls_x509_crt_format format)
+			   gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
 	int start, end;

@@ -85,7 +85,7 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt cert)
   *
   **/
 int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
-	gnutls_x509_crt_format format)
+	gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
 	int start, end;

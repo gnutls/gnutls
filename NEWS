@@ -12,8 +12,8 @@ Version 0.9.0
 - Several changes in the temporary (DH/RSA) parameter codebase. No DH 
   parameters are now included in the library. Also the credentials structure 
   can now hold only one temporary parameter of a kind.
-- Added a new Certificate and PKCS7 structures handling API, defined
-  in gnutls/x509.h
+- Added a new Certificate, CRL, Private key and PKCS7 structures handling 
+  API, defined in gnutls/x509.h
 - Added support for Certificate Revocation lists. Functions defined
   in gnutls/x509.h
 - The only functions were removed are:
