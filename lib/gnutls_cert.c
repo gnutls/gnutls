@@ -370,13 +370,12 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
   * @state: is a gnutls state
   *
-  * This function will try to verify the peer's certificate and return it's status (TRUSTED, INVALID etc.). 
-  * The return value (status) should be one of the CertificateStatus enumerated elements.
+  * This function will try to verify the peer's certificate and return it's status (trusted, invalid etc.). 
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
-  * The return value (status) should be one or more of the CertificateStatus 
-  * enumerated elements bitwise or'd. The return value is the same as
+  * The return value should be one or more of the CertificateStatus 
+  * enumerated elements bitwise or'd. This is the same as
   * gnutls_x509_verify_certificate().
   *
   **/
