@@ -109,7 +109,6 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum_t * ciphertext,
 		return ret;
 	    }
 	  }
-	}
 	break;
     case 1:
 	/* using private key */
