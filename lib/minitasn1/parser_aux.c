@@ -518,7 +518,7 @@ asn1_retCode
 _asn1_expand_object_id(ASN1_TYPE node)
 {
   node_asn *p,*p2,*p3,*p4,*p5;
-  char name_root[129],name2[129];
+  char name_root[MAX_NAME_SIZE],name2[2*MAX_NAME_SIZE+1];
   int move;
  
   if(node==NULL) return ASN1_ELEMENT_NOT_FOUND;
@@ -564,6 +564,55 @@ _asn1_expand_object_id(ASN1_TYPE node)
 	    move=DOWN;
 	    continue;
 	  }
+	}
+      }
+      move=DOWN;
+    }
+    else move=RIGHT;
+
+    if(move==DOWN){
+      if(p->down) p=p->down;
+      else move=RIGHT;
+    }
+    
+    if(p==node) {move=UP; continue;}
+
+    if(move==RIGHT){
+      if(p->right) p=p->right;
+      else move=UP;
+    }
+    if(move==UP) p=_asn1_find_up(p);
+  }
+
+
+  /*******************************/
+  /*       expand DEFAULT        */
+  /*******************************/
+  p=node;
+  move=DOWN;
+
+  while(!((p==node) && (move==UP))){
+    if(move!=UP){
+      if((type_field(p->type)==TYPE_OBJECT_ID) && 
+	 (p->type&CONST_DEFAULT)){
+	p2=p->down;
+        if(p2 && (type_field(p2->type)==TYPE_DEFAULT)){
+	  _asn1_str_cpy(name2, sizeof(name2), name_root);
+	  _asn1_str_cat(name2, sizeof(name2), ".");
+	  _asn1_str_cat(name2, sizeof(name2), p2->value);
+	  p3=_asn1_find_node(node,name2);
+	  if(!p3 || (type_field(p3->type)!=TYPE_OBJECT_ID) ||
+	     !(p3->type&CONST_ASSIGN)) return ASN1_ELEMENT_NOT_FOUND;
+	  p4=p3->down;
+	  name2[0]=0;
+	  while(p4){
+	    if(type_field(p4->type)==TYPE_CONSTANT){
+	      if(name2[0]) _asn1_str_cat(name2,sizeof(name2),".");
+	      _asn1_str_cat(name2,sizeof(name2),p4->value);
+	    }
+	    p4=p4->right;
+	  }
+	  _asn1_set_value(p2,name2,strlen(name2)+1);
 	}
       }
       move=DOWN;
@@ -673,6 +722,22 @@ _asn1_check_identifier(ASN1_TYPE node)
 	strcpy(_asn1_identifierMissing,p->value);
 	return ASN1_IDENTIFIER_NOT_FOUND;
       } 
+    }
+    else if((type_field(p->type)==TYPE_OBJECT_ID) && 
+	    (p->type&CONST_DEFAULT)){
+      p2=p->down;
+      if(p2 && (type_field(p2->type)==TYPE_DEFAULT)){
+	_asn1_str_cpy(name2, sizeof(name2), node->name);
+	_asn1_str_cat(name2, sizeof(name2), ".");
+	_asn1_str_cat(name2, sizeof(name2), p2->value);
+	strcpy(_asn1_identifierMissing,p2->value);
+	p2=_asn1_find_node(node,name2);
+	if(!p2 || (type_field(p2->type)!=TYPE_OBJECT_ID) ||
+	   !(p2->type&CONST_ASSIGN))
+	  return ASN1_IDENTIFIER_NOT_FOUND;
+	else
+	  _asn1_identifierMissing[0]=0;
+      }
     }
     else if((type_field(p->type)==TYPE_OBJECT_ID) && 
 	    (p->type&CONST_ASSIGN)){

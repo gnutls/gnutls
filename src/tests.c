@@ -489,7 +489,8 @@ int ret;
 	return ret;
 }
 
-void _gnutls_record_set_default_version(gnutls_session session, gnutls_protocol_version version);
+void _gnutls_record_set_default_version(gnutls_session session, unsigned char major,
+	unsigned char minor);
 
 int test_version_rollback( gnutls_session session) {
 int ret;
@@ -509,7 +510,7 @@ int ret;
 	ADD_ALL_MACS(session);
 	ADD_ALL_KX(session);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-	_gnutls_record_set_default_version( session, GNUTLS_SSL3);
+	_gnutls_record_set_default_version( session, 3, 0);
 
 	ret = do_handshake( session);
 	if (ret!=SUCCEED) return ret;
@@ -518,6 +519,28 @@ int ret;
 		return FAILED;
 	
 	return SUCCEED;
+}
+
+/* See if the server tolerates out of bounds
+ * record layer versions in the first client hello
+ * message.
+ */
+int test_version_oob( gnutls_session session) {
+int ret;
+	/* here we enable both SSL 3.0 and TLS 1.0
+	 * and we connect using a 5.5 record version.
+	 */
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	_gnutls_record_set_default_version( session, 5, 5);
+
+	ret = do_handshake( session);
+	return ret;
 }
 
 void _gnutls_rsa_pms_set_version(gnutls_session session, unsigned char major,

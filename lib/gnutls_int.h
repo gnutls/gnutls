@@ -1,7 +1,7 @@
 /*
- *      Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -578,7 +578,7 @@ typedef struct {
 
 	/* This holds the default version that our first
 	 * record packet will have. */
-	gnutls_protocol_version		default_record_version;
+	opaque			default_record_version[2];
 
 	int			cbc_protection_hack;
 

@@ -807,15 +807,21 @@ asn1_der_coding(ASN1_TYPE element,const char *name,unsigned char *der,int *len,
       move=RIGHT;
       break;
     case TYPE_OBJECT_ID:
-      if(p->value==NULL){
+      if((p->type&CONST_DEFAULT) && (p->value==NULL)){
+	counter=counter_old;
+	max_len=max_len_old;
+      }
+      else{
+	if(p->value==NULL){
 	  _asn1_error_description_value_not_found(p,ErrorDescription);
 	  return ASN1_VALUE_NOT_FOUND;
+	}
+	len2=max_len;
+	ris=_asn1_objectid_der(p->value,der+counter,&len2);
+	if(ris==ASN1_MEM_ALLOC_ERROR) return ris;
+	max_len-=len2;
+	counter+=len2;
       }
-      len2=max_len;
-      ris=_asn1_objectid_der(p->value,der+counter,&len2);
-      if(ris==ASN1_MEM_ALLOC_ERROR) return ris;
-      max_len-=len2;
-      counter+=len2;
       move=RIGHT;
       break;
     case TYPE_TIME:

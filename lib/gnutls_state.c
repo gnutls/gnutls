@@ -481,16 +481,19 @@ int _gnutls_openpgp_send_fingerprint(gnutls_session session) {
 /*-
   * _gnutls_record_set_default_version - Used to set the default version for the first record packet
   * @session: is a &gnutls_session structure.
-  * @version: is a tls version
+  * @major: is a tls major version
+  * @minor: is a tls minor version
   *
   * This function sets the default version that we will use in the first
   * record packet (client hello). This function is only useful to people
   * that know TLS internals and want to debug other implementations.
   *
   -*/
-void _gnutls_record_set_default_version(gnutls_session session, gnutls_protocol_version version)
+void _gnutls_record_set_default_version(gnutls_session session,
+	unsigned char major, unsigned char minor)
 {
-	session->internals.default_record_version = version;
+	session->internals.default_record_version[0] = major;
+	session->internals.default_record_version[1] = minor;
 }
 
 /**

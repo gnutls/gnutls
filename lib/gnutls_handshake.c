@@ -575,8 +575,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		for (i = 0; i < x; i++) {
 			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
 			    0) {
-				_gnutls_handshake_log("HSK: Selected cipher suite: ");
-				_gnutls_handshake_log("%s\n",
+				_gnutls_handshake_log("HSK: Selected cipher suite: %s\n",
 					    _gnutls_cipher_suite_get_name(*
 									  ((GNUTLS_CipherSuite *) & data[j])));
 				memcpy(session->security_parameters.current_cipher_suite.CipherSuite, ciphers[i].CipherSuite, 2);
@@ -1482,18 +1481,15 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 		 */
 		_gnutls_set_adv_version( session, hver);
 
-		/* Some implementations do not interoperate if we send a
+		/* Some old implementations do not interoperate if we send a
 		 * different version in the record layer.
 		 * It seems they prefer to read the record's version
 		 * as the one we actually requested.
-		 *  The proper behaviour is to use the one in the client hello 
+		 * The proper behaviour is to use the one in the client hello 
 		 * handshake packet and ignore the one in the packet's record 
 		 * header.
 		 */
-		if (session->internals.default_record_version==0)
-			_gnutls_set_current_version(session, hver);
-		else _gnutls_set_current_version(session,
-			session->internals.default_record_version);
+		_gnutls_set_current_version(session, hver);
 
 		/* In order to know when this session was initiated.
 		 */

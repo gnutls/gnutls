@@ -1070,7 +1070,7 @@ pkcs-5-PBKDF2-params ::= SEQUENCE {
   },
   iterationCount INTEGER (1..MAX),
   keyLength INTEGER (1..MAX) OPTIONAL,
-  prf AlgorithmIdentifier OPTIONAL -- DEFAULT pkcs-5-algid-hmacWithSHA1 
+  prf AlgorithmIdentifier OPTIONAL -- DEFAULT pkcs-5-id-hmacWithSHA1 
 }
 
 END

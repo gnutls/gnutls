@@ -105,7 +105,8 @@ void gnutls_transport_set_ptr(gnutls_session session, gnutls_transport_ptr ptr)
   *
   **/
 void gnutls_transport_set_ptr2(gnutls_session session, gnutls_transport_ptr recv_ptr,
-	gnutls_transport_ptr send_ptr) {
+	gnutls_transport_ptr send_ptr) 
+{
 	session->internals.transport_send_ptr = send_ptr;
 	session->internals.transport_recv_ptr = recv_ptr;
 }
@@ -118,7 +119,8 @@ void gnutls_transport_set_ptr2(gnutls_session session, gnutls_transport_ptr recv
   * PULL). This must have been set using gnutls_transport_set_ptr().
   *
   **/
-gnutls_transport_ptr gnutls_transport_get_ptr(gnutls_session session) {
+gnutls_transport_ptr gnutls_transport_get_ptr(gnutls_session session) 
+{
 	return session->internals.transport_recv_ptr;
 }
 
@@ -222,6 +224,25 @@ static int _gnutls_session_is_valid( gnutls_session session) {
 	return 0;
 }
 
+/* Copies the record version into the headers. The 
+ * version, must have 2 bytes at least.
+ */
+inline static void copy_record_version( gnutls_session session, HandshakeType htype, 
+	opaque version[2])
+{
+gnutls_protocol_version lver;
+
+	if (htype != GNUTLS_CLIENT_HELLO || session->internals.default_record_version[0] == 0) {
+		lver = gnutls_protocol_get_version( session);
+
+		version[0] = _gnutls_version_get_major( lver);
+		version[1] = _gnutls_version_get_minor( lver);
+	} else {
+		version[0] = session->internals.default_record_version[0];
+		version[1] = session->internals.default_record_version[1];
+	}
+}
+
 static
 ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
 	opaque* erecord, unsigned int erecord_size)
@@ -230,7 +251,6 @@ ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
 	int retval;
 	int data2send;
 	uint8 headers[5];
-	gnutls_protocol_version lver;
 
 	if (type!=GNUTLS_APPLICATION_DATA ||
 		_gnutls_cipher_is_block( gnutls_cipher_get(session))!=CIPHER_BLOCK) 
@@ -239,16 +259,9 @@ ssize_t _gnutls_create_empty_record( gnutls_session session, ContentType type,
 		 */
 		return 0;
 
-	headers[0]=type;
+	headers[0] = type;
 	
-	lver = gnutls_protocol_get_version(session);
-	if (lver==GNUTLS_VERSION_UNKNOWN) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	headers[1]=_gnutls_version_get_major( lver);
-	headers[2]=_gnutls_version_get_minor( lver);
+	copy_record_version( session, (HandshakeType)(-1), &headers[1]);
 
 	data2send = 0;
 
@@ -294,7 +307,6 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
 	int data2send_size;
 	uint8 headers[5];
 	const uint8 *data=_data;
-	gnutls_protocol_version lver;
 	int erecord_size = 0;
 	opaque* erecord = NULL;
 
@@ -316,16 +328,13 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
 
 
 
-	headers[0]=type;
+	headers[0] = type;
 	
-	lver = gnutls_protocol_get_version(session);
-	if (lver==GNUTLS_VERSION_UNKNOWN) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
+	/* Use the default record version, if it is
+	 * set.
+	 */
+	copy_record_version( session, htype, &headers[1]);
 
-	headers[1]=_gnutls_version_get_major( lver);
-	headers[2]=_gnutls_version_get_minor( lver);
 
 	_gnutls_record_log( "REC[%x]: Sending Packet[%d] %s(%d) with length: %d\n",
 		session, (int) _gnutls_uint64touint32(&session->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
@@ -498,7 +507,7 @@ static int _gnutls_check_buffers( gnutls_session session, ContentType type, opaq
  * content type.
  */
 static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[RECORD_HEADER_SIZE], ContentType type, 
-	HandshakeType htype, /*output*/ ContentType *recv_type, gnutls_protocol_version *version, uint16 *length, uint16* header_size) {
+	HandshakeType htype, /*output*/ ContentType *recv_type, opaque version[2], uint16 *length, uint16* header_size) {
 
 	/* Read the first two bytes to determine if this is a 
 	 * version 2 message 
@@ -509,7 +518,9 @@ static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[R
 		/* if msb set and expecting handshake message
 		 * it should be SSL 2 hello 
 		 */
-		*version = GNUTLS_VERSION_UNKNOWN; /* assume unknown version */
+		version[0] = 3; /* assume SSL 3.0 */
+		version[1] = 0;
+
 		*length = (((headers[0] & 0x7f) << 8)) | headers[1];
 
 		/* SSL 2.0 headers */
@@ -528,9 +539,8 @@ static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[R
 		/* version 3.x 
 		 */
 		*recv_type = headers[0];
-#ifdef CHECK_RECORD_VERSION
-		*version = _gnutls_version_get( headers[1], headers[2]);
-#endif
+		version[0] = headers[1];
+		version[1] = headers[2];
 
 		/* No DECR_LEN, since headers has enough size. 
 		 */
@@ -544,14 +554,15 @@ static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[R
  * negotiated in the handshake.
  */
 inline
-static int _gnutls_check_record_version( gnutls_session session, HandshakeType htype, gnutls_protocol_version version) 
+static int _gnutls_check_record_version( gnutls_session session, HandshakeType htype, opaque version[2]) 
 {
 #ifdef CHECK_RECORD_VERSION
-	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_protocol_get_version(session) != version) {
-		gnutls_assert();
+	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && 
+		gnutls_protocol_get_version(session) != _gnutls_version_get( version[0], version[1])) {
 
+		gnutls_assert();
 		_gnutls_record_log( "REC[%x]: INVALID VERSION PACKET: (%d) %d.%d\n", 
-			session, htype, _gnutls_version_get_major(version), _gnutls_version_get_minor(version));
+			session, htype, version[0], version[1]);
 
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
@@ -674,7 +685,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 {
 	uint8 *tmpdata;
 	int tmplen;
-	gnutls_protocol_version version;
+	opaque version[2];
 	uint8 *headers;
 	ContentType recv_type;
 	uint16 length;
@@ -726,7 +737,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	if ( (ret=_gnutls_check_record_headers( session, headers, type, htype, &recv_type, &version, &length, &header_size)) < 0) {
+	if ( (ret=_gnutls_check_record_headers( session, headers, type, htype, &recv_type, version, &length, &header_size)) < 0) {
 		gnutls_assert();
 		return ret;
 	}

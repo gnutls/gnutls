@@ -389,6 +389,14 @@ asn1_write_value(node_asn *node_root,const char *name,
     for(k=0;k<strlen(value);k++)
       if((!isdigit(value[k])) && (value[k]!='.') && (value[k]!='+')) 
 	return ASN1_VALUE_NOT_VALID; 
+    if(node->type&CONST_DEFAULT){
+      p=node->down;
+      while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
+      if(!strcmp(value,p->value)){
+	_asn1_set_value(node,NULL,0);
+	break;
+      } 
+    }
     _asn1_set_value(node,value,strlen(value)+1);
     break;
   case TYPE_TIME:
@@ -665,7 +673,13 @@ asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
 	p=p->right;
       }
       *len = strlen(value) + 1;
-    } else {
+    } 
+    else if((node->type&CONST_DEFAULT) && (node->value==NULL)){
+      p=node->down;
+      while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
+      PUT_STR_VALUE(value, value_size, p->value);
+      }
+    else {
       PUT_STR_VALUE(value, value_size, node->value);
     }
     break;
