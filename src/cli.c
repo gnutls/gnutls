@@ -157,6 +157,7 @@ int main(int argc, char **argv)
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
+
 	ret =
 	    gnutls_certificate_set_x509_trust_file(xcred, CAFILE, CRLFILE);
 	if (ret < 0) {

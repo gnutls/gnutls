@@ -302,6 +302,21 @@ int ret;
 	return FAILED;
 }
 
+int test_hello_extension( GNUTLS_STATE state) {
+int ret;
+	ADD_ALL_CIPHERS(state);
+	ADD_ALL_COMP(state);
+	ADD_ALL_CERTTYPES(state);
+	ADD_ALL_PROTOCOLS(state);
+	ADD_ALL_MACS(state);
+	ADD_ALL_KX(state);
+	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_record_set_max_size( state, 512);
+
+	ret = do_handshake( state);
+	return ret;
+}
+
 
 int test_version_rollback( GNUTLS_STATE state) {
 int ret;
