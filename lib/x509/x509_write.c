@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 2003 Nikos Mavroyanopoulos
  *  Copyright (C) 2004 Free Software Foundation
+ *  Copyright (C) 2003 Nikos Mavroyanopoulos
  *
  *  This file is part of GNUTLS.
  *
@@ -316,7 +316,7 @@ int gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt,
 }
 
 /**
-  * gnutls_x509_crt_set_subject_alt_name - This function will set the subject Alternative Name
+  * gnutls_x509_crt_set_subject_alternative_name - This function will set the subject Alternative Name
   * @crt: should contain a gnutls_x509_crt_t structure
   * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
   * @data_string: The data to be set

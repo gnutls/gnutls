@@ -1,6 +1,6 @@
 /*
- *  Copyright (C) 2003 Nikos Mavroyanopoulos
  *  Copyright (C) 2004 Free Software Foundation
+ *  Copyright (C) 2003 Nikos Mavroyanopoulos
  *
  *  This file is part of GNUTLS.
  *
@@ -223,7 +223,7 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl_t crl,
 }
 
 /**
-  * gnutls_x509_crl_get_issuer_dn_oid - This function returns the Certificate request issuer's distinguished name OIDs
+  * gnutls_x509_crl_get_dn_oid - This function returns the Certificate request issuer's distinguished name OIDs
   * @crl: should contain a gnutls_x509_crl_t structure
   * @indx: Specifies which DN OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the name (may be null)
