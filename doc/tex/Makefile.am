@@ -3,8 +3,6 @@ EXTRA_DIST = gnutls.tex gnutls.ps gnutls.html  \
 	nx_grp_g.png  prev_g.png  up_g.png fdl.tex macros.tex \
 	cover.tex.in
 
-all-local: gnutls.html gnutls.ps 
-
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
 	macros.tex cover.tex
 
