@@ -45,7 +45,7 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
 /**
   * gnutls_x509_crt_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
   * @crt: should contain a gnutls_x509_crt structure
-  * @oid: holds an Object Identified in null terminated string
+  * @oid: holds an Object Identifier in a null terminated string
   * @name: a pointer to the name
   * @sizeof_name: holds the size of 'name'
   *
@@ -53,7 +53,10 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
   * by the given OID. 
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * With this function you can only set the known OIDs.
+  * With this function you can only set the known OIDs. You can test
+  * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
+  * not known (by gnutls) you should properly DER encode your data before
+  * calling this function.
   *
   * Returns 0 on success.
   *
@@ -72,7 +75,7 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid,
 /**
   * gnutls_x509_crt_set_issuer_dn_by_oid - This function will set the Certificate request issuer's distinguished name
   * @crt: should contain a gnutls_x509_crt structure
-  * @oid: holds an Object Identified in null terminated string
+  * @oid: holds an Object Identifier in a null terminated string
   * @name: a pointer to the name
   * @sizeof_name: holds the size of 'name'
   *
@@ -80,7 +83,10 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid,
   * by the given OID. 
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * With this function you can only set the known OIDs.
+  * With this function you can only set the known OIDs. You can test
+  * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
+  * not known (by gnutls) you should properly DER encode your data before
+  * calling this function.
   *
   * Returns 0 on success.
   *
