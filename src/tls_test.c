@@ -61,8 +61,9 @@ gnutls_certificate_credentials xcred;
 
 int more_info = 0;
 
-int tls1_ok = 0;
-int ssl3_ok = 0;
+extern int tls1_ok;
+extern int tls1_1_ok;
+extern int ssl3_ok;
 
 static void tls_log_func( int level, const char* str)
 {
@@ -81,6 +82,7 @@ typedef struct {
 
 static const TLS_TEST tls_tests[] = {
 	{ "for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno" },
+	{ "fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "", "SSL 3.0" },
 	{ "for TLS 1.0 support", test_tls1, "yes", "no", "dunno" },
 	{ "for SSL 3.0 support", test_ssl3, "yes", "no", "dunno" },
 	{ "for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes", "dunno" },
@@ -151,8 +153,6 @@ int main(int argc, char **argv)
 	gnutls_session state;
 	char buffer[MAX_BUF + 1];
 	struct hostent *server_host;
-	int ssl3_ok = 0;
-	int tls1_ok = 0;
 
 	gaa_parser(argc, argv);
 
@@ -215,7 +215,10 @@ int main(int argc, char **argv)
 
 		/* if neither of SSL3 and TLSv1 are supported, exit
 		 */
-		if (i > 1 && tls1_ok == 0 && ssl3_ok == 0) break;
+		if (i > 3 && tls1_1_ok == 0 && tls1_ok == 0 && ssl3_ok == 0) {
+			fprintf(stderr, "%d %d %d\n", tls1_1_ok,tls1_ok,ssl3_ok);
+			break;
+		}
 
 		CONNECT();
 		gnutls_init(&state, GNUTLS_CLIENT);

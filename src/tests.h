@@ -17,6 +17,7 @@ int test_arcfour( gnutls_session state);
 int test_arcfour_40( gnutls_session state);
 int test_tls1( gnutls_session state);
 int test_tls1_1( gnutls_session state);
+int test_tls1_1_fallback( gnutls_session state);
 int test_tls_disable( gnutls_session state);
 int test_rsa_pms( gnutls_session state);
 int test_max_record_size( gnutls_session state);
