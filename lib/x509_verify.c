@@ -405,7 +405,7 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 	 * against the trusted CA certificate list.
 	 */
 	ret = gnutls_verify_certificate2(&certificate_list[i], trusted_cas, tcas_size, 
-		CRLs, crls_size, GNUTLS_CERT_TRUSTED, GNUTLS_CERT_NOT_TRUSTED);
+		CRLs, crls_size, 0, GNUTLS_CERT_NOT_TRUSTED);
 
 	if (ret > 0) {
 		/* if the last certificate in the certificate

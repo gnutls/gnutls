@@ -63,7 +63,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 			block_size, key_block);
 	} else { /* TLS 1.0 */
 		ret =
-		    gnutls_PRF( state->security_parameters.master_secret, TLS_MASTER_SIZE,
+		    _gnutls_PRF( state->security_parameters.master_secret, TLS_MASTER_SIZE,
 			       keyexp, strlen(keyexp), random, 2*TLS_RANDOM_SIZE, 
 			       block_size, key_block);
 	}

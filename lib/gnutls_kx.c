@@ -26,7 +26,7 @@
 #include "gnutls_algorithms.h"
 #include "debug.h"
 #include "gnutls_gcry.h"
-#include <gnutls_record.h>
+#include <gnutls_state.h>
 #include <gnutls_datum.h>
 #include <gnutls_alert.h>
 
@@ -62,7 +62,7 @@ char random[2*TLS_RANDOM_SIZE];
 
 	} else {
 		ret =
-		    gnutls_PRF( PREMASTER.data, PREMASTER.size,
+		    _gnutls_PRF( PREMASTER.data, PREMASTER.size,
 			       MASTER_SECRET, strlen(MASTER_SECRET),
 			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE, 
 			       state->security_parameters.master_secret); 

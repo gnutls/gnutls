@@ -27,4 +27,6 @@ void _gnutls_handshake_internal_state_clear( GNUTLS_STATE);
 
 int _gnutls_openpgp_send_fingerprint( GNUTLS_STATE state);
 
+int _gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes, void* ret);
+
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509

@@ -40,6 +40,7 @@
 #include "gnutls_constate.h"
 #include <gnutls_record.h>
 #include <gnutls_alert.h>
+#include <gnutls_state.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_handshake_log( "HSK: %s (%d)\n", x,y)
@@ -197,7 +198,7 @@ int _gnutls_finished(GNUTLS_STATE state, int type, void *ret)
 		mesg = CLIENT_MSG;
 	}
 
-	return gnutls_PRF(state->security_parameters.master_secret,
+	return _gnutls_PRF(state->security_parameters.master_secret,
 			  TLS_MASTER_SIZE, mesg, siz, concat, 36,
 			  12, ret);
 }

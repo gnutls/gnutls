@@ -104,7 +104,6 @@ typedef enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 } crypt_algo;
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
 
 typedef enum CertificateStatus { 
-	GNUTLS_CERT_TRUSTED=1, 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
 	GNUTLS_CERT_INVALID=4, 
 	GNUTLS_CERT_EXPIRED=8, GNUTLS_CERT_CORRUPTED=16,
@@ -572,9 +571,6 @@ typedef struct {
 #define GNUTLS_DH_PARAMS _GNUTLS_DH_PARAMS*
 
 /* functions */
-int gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
-		  int label_size, opaque * seed, int seed_size,
-		  int total_bytes, void* ret);
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
 void _gnutls_free_auth_info( GNUTLS_STATE state);

@@ -900,9 +900,7 @@ int _gnutls_cipher_suite_count(void)
 
 	for (j = 0; j < MAX_CIPHERSUITES; j++) {
 		suite.CipherSuite[0] = j;
-#ifdef DEBUG
-# warning CHECK SUPPORTED CIPHER SUITES HERE
-#endif
+
 		if (j != 0x00 && j != 0xFF)
 			continue;
 

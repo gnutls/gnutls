@@ -132,10 +132,10 @@ void print_cert_vrfy(GNUTLS_STATE state)
 	if (status & GNUTLS_CERT_EXPIRED)
 		printf
 		    ("- Peer's certificate is expired\n");
-	if (status & GNUTLS_CERT_TRUSTED)
-		printf("- Peer's certificate is trusted\n");
 	if (status & GNUTLS_CERT_NOT_TRUSTED)
 		printf("- Peer's certificate is NOT trusted\n");
+	else
+		printf("- Peer's certificate is trusted\n");
 	if (status & GNUTLS_CERT_CORRUPTED)
 		printf("- Peer's certificate is corrupted\n");
 

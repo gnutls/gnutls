@@ -367,8 +367,6 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * The return value (status) should be one or more of the CertificateStatus 
   * enumerated elements bitwise or'd.
   *
-  * GNUTLS_CERT_TRUSTED\: the peer's certificate is trusted.
-  *
   * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
   *
   * GNUTLS_CERT_INVALID\: the certificate chain is broken.
