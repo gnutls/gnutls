@@ -1,4 +1,4 @@
-INCLUDES = -I../ -I../../includes/ -I../../lib/minitasn1 $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
+INCLUDES = -I../ -I../../includes/ -I../../lib/minitasn1 -I../../libextra/opencdk/ $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
 EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
 	x509-api.tex compat.h verify.h mpi.h crq.h sign.h pkcs5.h \
 	privkey.h pkcs12.h rfc2818.h dsa.h
