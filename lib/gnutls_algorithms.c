@@ -106,8 +106,8 @@ static const gnutls_cipher_entry algorithms[] = {
                         GNUTLS_LOOP( if(p->id == algorithm) { a; break; } )
 
 
-#define GNUTLS_HASH_ENTRY(name, hashsize) \
-	{ #name, name, hashsize }
+#define GNUTLS_HASH_ENTRY(strname, name, hashsize) \
+	{ strname, name, hashsize }
 
 struct gnutls_hash_entry {
 	char *name;
@@ -117,9 +117,9 @@ struct gnutls_hash_entry {
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-	GNUTLS_HASH_ENTRY(GNUTLS_MAC_SHA, 20),
-	GNUTLS_HASH_ENTRY(GNUTLS_MAC_MD5, 16),
-	GNUTLS_HASH_ENTRY(GNUTLS_MAC_NULL, 0),
+	GNUTLS_HASH_ENTRY("SHA", GNUTLS_MAC_SHA, 20),
+	GNUTLS_HASH_ENTRY("MD5", GNUTLS_MAC_MD5, 16),
+	GNUTLS_HASH_ENTRY("NULL", GNUTLS_MAC_NULL, 0),
 	{0}
 };
 
@@ -558,7 +558,13 @@ int _gnutls_cipher_is_block(BulkCipherAlgorithm algorithm)
 
 }
 
-int _gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm)
+/**
+  * gnutls_cipher_get_key_size - Returns the length of the cipher's key size
+  * @algorithm: is an encryption algorithm
+  *
+  * Returns the length (in bytes) of the given cipher's key size.
+  **/
+size_t gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm)
 {				/* In bytes */
 	size_t ret = 0;
 	GNUTLS_ALG_LOOP(ret = p->keysize);

@@ -140,7 +140,7 @@ int _gnutls_set_read_keys(GNUTLS_STATE state)
 
 	hash_size = _gnutls_mac_get_digest_size( mac_algo);
 	IV_size = _gnutls_cipher_get_iv_size( algo);
-	key_size = _gnutls_cipher_get_key_size( algo);
+	key_size = gnutls_cipher_get_key_size( algo);
 
 	return _gnutls_set_keys( state, hash_size, IV_size, key_size);
 }
@@ -158,7 +158,7 @@ int _gnutls_set_write_keys(GNUTLS_STATE state)
 
 	hash_size = _gnutls_mac_get_digest_size( mac_algo);
 	IV_size = _gnutls_cipher_get_iv_size( algo);
-	key_size = _gnutls_cipher_get_key_size( algo);
+	key_size = gnutls_cipher_get_key_size( algo);
 
 	return _gnutls_set_keys( state, hash_size, IV_size, key_size);
 }

@@ -53,7 +53,7 @@ int _gnutls_cipher_priority(GNUTLS_STATE state, BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_get_block_size(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_is_block(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_is_ok(BulkCipherAlgorithm algorithm);
-int _gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm);
+size_t gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm);
 int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm);
 const char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm);
 

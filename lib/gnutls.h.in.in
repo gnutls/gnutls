@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -43,6 +43,12 @@ typedef enum GNUTLS_CredType { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS
 
 typedef enum GNUTLS_MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } GNUTLS_MACAlgorithm;
 typedef enum GNUTLS_DigestAlgorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } GNUTLS_DigestAlgorithm;
+
+/* exported for other gnutls headers. This is the maximum number
+ * of algorithms (ciphers, kx or macs). 
+ */
+#define GNUTLS_MAX_ALGORITHM_NUM 8
+
 typedef enum GNUTLS_CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } GNUTLS_CompressionMethod;
 typedef enum GNUTLS_ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } GNUTLS_ConnectionEnd;
 typedef enum GNUTLS_AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } GNUTLS_AlertLevel;
@@ -123,6 +129,8 @@ GNUTLS_KXAlgorithm 		gnutls_kx_get( GNUTLS_STATE state);
 GNUTLS_MACAlgorithm		gnutls_mac_get( GNUTLS_STATE state);
 GNUTLS_CompressionMethod	gnutls_compression_get( GNUTLS_STATE state);
 GNUTLS_CertificateType		gnutls_cert_type_get( GNUTLS_STATE state);
+
+size_t gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm);
 
 /* the name of the specified algorithms */
 const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm);
