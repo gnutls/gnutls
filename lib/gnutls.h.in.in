@@ -32,15 +32,17 @@ extern "C" {
 
 #define GNUTLS_AES GNUTLS_RIJNDAEL
 
-typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_TWOFISH_CBC, GNUTLS_CIPHER_RIJNDAEL256_CBC } BulkCipherAlgorithm;
-typedef enum KXAlgorithm { GNUTLS_KX_X509PKI_RSA=1, GNUTLS_KX_X509PKI_DHE_DSS, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
-typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
-typedef enum MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
-typedef enum DigestAlgorithm { GNUTLS_DIG_MD5=1, GNUTLS_DIG_SHA } DigestAlgorithm;
-typedef enum CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } CompressionMethod;
-typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
-typedef enum AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } AlertLevel;
-typedef enum AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE=10, GNUTLS_A_BAD_RECORD_MAC=20,
+typedef enum GNUTLS_BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_TWOFISH_CBC, GNUTLS_CIPHER_RIJNDAEL256_CBC } GNUTLS_BulkCipherAlgorithm;
+typedef enum GNUTLS_KXAlgorithm { GNUTLS_KX_X509PKI_RSA=1, GNUTLS_KX_X509PKI_DHE_DSS, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } GNUTLS_KXAlgorithm;
+typedef enum GNUTLS_CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } GNUTLS_CredType;
+#define CredType GNUTLS_CredType
+
+typedef enum GNUTLS_MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } GNUTLS_MACAlgorithm;
+typedef enum GNUTLS_DigestAlgorithm { GNUTLS_DIG_MD5=1, GNUTLS_DIG_SHA } GNUTLS_DigestAlgorithm;
+typedef enum GNUTLS_CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } GNUTLS_CompressionMethod;
+typedef enum GNUTLS_ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } GNUTLS_ConnectionEnd;
+typedef enum GNUTLS_AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } GNUTLS_AlertLevel;
+typedef enum GNUTLS_AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE=10, GNUTLS_A_BAD_RECORD_MAC=20,
 			GNUTLS_A_DECRYPTION_FAILED, GNUTLS_A_RECORD_OVERFLOW,  GNUTLS_A_DECOMPRESSION_FAILURE=30,
 			GNUTLS_A_HANDSHAKE_FAILURE=40, GNUTLS_A_NETSCAPE_NO_CLIENT_CERTIFICATE=41,
 			GNUTLS_A_BAD_CERTIFICATE=42, GNUTLS_A_UNSUPPORTED_CERTIFICATE,
@@ -49,11 +51,15 @@ typedef enum AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSA
 			GNUTLS_A_DECRYPT_ERROR, GNUTLS_A_EXPORT_RESTRICTION=60, GNUTLS_A_PROTOCOL_VERSION=70,
 			GNUTLS_A_INSUFFICIENT_SECURITY, GNUTLS_A_INTERNAL_ERROR=80, GNUTLS_A_USER_CANCELED=90,
 			GNUTLS_A_NO_RENEGOTIATION=100
-} AlertDescription;
+} GNUTLS_AlertDescription;
 
-typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID, GNUTLS_CERT_NONE } CertificateStatus;
-typedef enum CertificateRequest { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
-typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
+typedef enum GNUTLS_CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID, GNUTLS_CERT_NONE } GNUTLS_CertificateStatus;
+#define CertificateStatus GNUTLS_CertificateStatus
+
+typedef enum GNUTLS_CertificateRequest { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } GNUTLS_CertificateRequest;
+#define CertificateRequest GNUTLS_CertificateRequest
+
+typedef enum GNUTLS_CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } GNUTLS_CloseRequest;
 
 typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
@@ -74,30 +80,30 @@ typedef struct {
 
 /* internal functions */
 
-int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
+int gnutls_init(GNUTLS_STATE * state, GNUTLS_ConnectionEnd con_end);
 void gnutls_deinit(GNUTLS_STATE state);
-int gnutls_bye( GNUTLS_STATE state, CloseRequest how);
+int gnutls_bye( GNUTLS_STATE state, GNUTLS_CloseRequest how);
 
 int gnutls_handshake( GNUTLS_STATE state);
 int gnutls_check_pending(GNUTLS_STATE state);
 int gnutls_rehandshake( GNUTLS_STATE state);
 
 
-AlertDescription gnutls_alert_get_last( GNUTLS_STATE state);
-int 		 gnutls_alert_send(GNUTLS_SOCKET_PTR, GNUTLS_STATE, AlertLevel, AlertDescription);
+GNUTLS_AlertDescription gnutls_alert_get_last( GNUTLS_STATE state);
+int 		 gnutls_alert_send(GNUTLS_SOCKET_PTR, GNUTLS_STATE, GNUTLS_AlertLevel, GNUTLS_AlertDescription);
 int 		 gnutls_alert_send_appropriate(  GNUTLS_STATE state, int err);
 
 /* get information on the current state */
-BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state);
-KXAlgorithm 	    gnutls_kx_get_algo( GNUTLS_STATE state);
-MACAlgorithm	    gnutls_mac_get_algo( GNUTLS_STATE state);
-CompressionMethod   gnutls_compression_get_algo( GNUTLS_STATE state);
+GNUTLS_BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state);
+GNUTLS_KXAlgorithm 	    gnutls_kx_get_algo( GNUTLS_STATE state);
+GNUTLS_MACAlgorithm	    gnutls_mac_get_algo( GNUTLS_STATE state);
+GNUTLS_CompressionMethod   gnutls_compression_get_algo( GNUTLS_STATE state);
 
 /* the name of the specified algorithms */
-const char *gnutls_cipher_get_name( BulkCipherAlgorithm);
-const char *gnutls_mac_get_name( MACAlgorithm);
-const char *gnutls_compression_get_name( CompressionMethod);
-const char *gnutls_kx_get_name( KXAlgorithm algorithm);
+const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm);
+const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm);
+const char *gnutls_compression_get_name( GNUTLS_CompressionMethod);
+const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm);
 
 
 /* error functions */
@@ -129,17 +135,17 @@ int gnutls_session_get_data( GNUTLS_STATE state, void* session, int *session_siz
 /* returns the session ID */
 int gnutls_session_get_id( GNUTLS_STATE state, void* session, int *session_size);
 
-typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
-typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
-typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
+typedef int (*GNUTLS_DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
+typedef int (*GNUTLS_DB_REMOVE_FUNC)(void*, gnutls_datum key);
+typedef gnutls_datum (*GNUTLS_DB_RETR_FUNC)(void*, gnutls_datum key);
 
 void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds);
 
 int  gnutls_db_set_name( GNUTLS_STATE state, char* filename);	
 int  gnutls_db_clean( GNUTLS_STATE state);
-void gnutls_db_set_retrieve_func( GNUTLS_STATE, DB_RETR_FUNC);
-void gnutls_db_set_remove_func( GNUTLS_STATE, DB_REMOVE_FUNC);
-void gnutls_db_set_store_func( GNUTLS_STATE, DB_STORE_FUNC);
+void gnutls_db_set_retrieve_func( GNUTLS_STATE, GNUTLS_DB_RETR_FUNC);
+void gnutls_db_set_remove_func( GNUTLS_STATE, GNUTLS_DB_REMOVE_FUNC);
+void gnutls_db_set_store_func( GNUTLS_STATE, GNUTLS_DB_STORE_FUNC);
 void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
 void* gnutls_db_get_ptr( GNUTLS_STATE);
 int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
@@ -152,7 +158,7 @@ const char* gnutls_check_version(void);
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
-int gnutls_cred_set( GNUTLS_STATE, CredType type, void* cred);
+int gnutls_cred_set( GNUTLS_STATE, GNUTLS_CredType type, void* cred);
 
 /* This will set the Common Name field in case of X509PKI
  * authentication. This will be used while verifying the
@@ -234,7 +240,7 @@ GNUTLS_SOCKET_PTR gnutls_transport_get_ptr(GNUTLS_STATE state);
 
 void gnutls_transport_set_lowat( GNUTLS_STATE state, int num);
 
-typedef void (*LOG_FUNC)( const char*);
+typedef void (*GNUTLS_LOG_FUNC)( const char*);
 
 void gnutls_transport_set_push_func( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
 void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
@@ -245,4 +251,4 @@ void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
 size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
 
-int gnutls_fingerprint_calc(DigestAlgorithm algo, gnutls_datum data, char* result, int* result_size);
+int gnutls_fingerprint_calc(GNUTLS_DigestAlgorithm algo, gnutls_datum data, char* result, int* result_size);
