@@ -44,14 +44,14 @@ typedef struct {
 	int supported;		/* 0 not supported, > 0 is supported */
 } gnutls_version_entry;
 
-static gnutls_version_entry sup_versions[] = {
+static const gnutls_version_entry sup_versions[] = {
 	{"SSL3", GNUTLS_SSL3, 3, 0, 1},
 	{"TLS1", GNUTLS_TLS1, 3, 1, 1},
 	{0}
 };
 
 #define GNUTLS_VERSION_LOOP(b) \
-        gnutls_version_entry *p; \
+        const gnutls_version_entry *p; \
                 for(p = sup_versions; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_VERSION_ALG_LOOP(a) \
@@ -71,7 +71,7 @@ struct gnutls_cipher_entry {
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
-static gnutls_cipher_entry algorithms[] = {
+static const gnutls_cipher_entry algorithms[] = {
 	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES, 8, 24, 1, 8),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL, 16, 16, 1, 16),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL256, 16, 32, 1, 16),
@@ -82,7 +82,7 @@ static gnutls_cipher_entry algorithms[] = {
 };
 
 #define GNUTLS_LOOP(b) \
-        gnutls_cipher_entry *p; \
+        const gnutls_cipher_entry *p; \
                 for(p = algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_ALG_LOOP(a) \
@@ -99,7 +99,7 @@ struct gnutls_hash_entry {
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
-static gnutls_hash_entry hash_algorithms[] = {
+static const gnutls_hash_entry hash_algorithms[] = {
 	GNUTLS_HASH_ENTRY(GNUTLS_MAC_SHA, 20),
 	GNUTLS_HASH_ENTRY(GNUTLS_MAC_MD5, 16),
 	GNUTLS_HASH_ENTRY(GNUTLS_NULL_MAC, 0),
@@ -107,7 +107,7 @@ static gnutls_hash_entry hash_algorithms[] = {
 };
 
 #define GNUTLS_HASH_LOOP(b) \
-        gnutls_hash_entry *p; \
+        const gnutls_hash_entry *p; \
                 for(p = hash_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_HASH_ALG_LOOP(a) \
@@ -125,7 +125,7 @@ struct gnutls_compression_entry {
 };
 
 typedef struct gnutls_compression_entry gnutls_compression_entry;
-static gnutls_compression_entry compression_algorithms[] = {
+static const gnutls_compression_entry compression_algorithms[] = {
 	GNUTLS_COMPRESSION_ENTRY(GNUTLS_NULL_COMPRESSION, 0),
 #ifdef HAVE_LIBZ
 	GNUTLS_COMPRESSION_ENTRY(GNUTLS_ZLIB, 224),
@@ -134,7 +134,7 @@ static gnutls_compression_entry compression_algorithms[] = {
 };
 
 #define GNUTLS_COMPRESSION_LOOP(b) \
-        gnutls_compression_entry *p; \
+        const gnutls_compression_entry *p; \
                 for(p = compression_algorithms; p->name != NULL; p++) { b ; }
 #define GNUTLS_COMPRESSION_ALG_LOOP(a) \
                         GNUTLS_COMPRESSION_LOOP( if(p->id == algorithm) { a; break; } )
@@ -157,7 +157,7 @@ struct gnutls_kx_algo_entry {
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
-static gnutls_kx_algo_entry kx_algorithms[] = {
+static const gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 0, 0, 1,
 			     &anon_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, NULL),
@@ -171,7 +171,7 @@ static gnutls_kx_algo_entry kx_algorithms[] = {
 };
 
 #define GNUTLS_KX_LOOP(b) \
-        gnutls_kx_algo_entry *p; \
+        const gnutls_kx_algo_entry *p; \
                 for(p = kx_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_KX_ALG_LOOP(a) \
@@ -195,49 +195,55 @@ typedef struct {
 #define GNUTLS_DH_anon_ARCFOUR_MD5 { 0x00, 0x18 }
 #define GNUTLS_DH_anon_RIJNDAEL_128_CBC_SHA { 0x00, 0x34 }
 #define GNUTLS_DH_anon_RIJNDAEL_256_CBC_SHA { 0x00, 0x3A }
-
 /* Twofish is a gnutls extension */
-#define GNUTLS_DH_anon_TWOFISH_128_CBC_SHA { 0xFF, 0x50 }
-#define GNUTLS_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x51 }
-#define GNUTLS_DH_DSS_TWOFISH_128_CBC_SHA { 0xFF, 0x52 }
-#define GNUTLS_DH_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x53 }
-#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xFF, 0x54 }
-#define GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x55 }
+#define GNUTLS_DH_anon_TWOFISH_128_CBC_SHA { 0xF6, 0x50 }
 
 /* SRP is a gnutls extension - for now */
-#define GNUTLS_SRP_3DES_EDE_CBC_SHA { 0xFF, 0x60 }
-#define GNUTLS_SRP_ARCFOUR_MD5 { 0xFF, 0x61 }
-#define GNUTLS_SRP_RIJNDAEL_128_CBC_SHA { 0xFF, 0x62 }
-#define GNUTLS_SRP_RIJNDAEL_256_CBC_SHA { 0xFF, 0x63 }
-#define GNUTLS_SRP_TWOFISH_128_CBC_SHA { 0xFF, 0x64 }
+#define GNUTLS_SRP_3DES_EDE_CBC_SHA { 0xF6, 0x60 }
+#define GNUTLS_SRP_ARCFOUR_MD5 { 0xF6, 0x61 }
+#define GNUTLS_SRP_RIJNDAEL_128_CBC_SHA { 0xF6, 0x62 }
+#define GNUTLS_SRP_RIJNDAEL_256_CBC_SHA { 0xF6, 0x63 }
+#define GNUTLS_SRP_TWOFISH_128_CBC_SHA { 0xF6, 0x64 }
 
-#define GNUTLS_DH_DSS_3DES_EDE_CBC_SHA { 0x00, 0x0D }
-#define GNUTLS_DH_RSA_3DES_EDE_CBC_SHA { 0x00, 0x10 }
-#define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA { 0x00, 0x13 }
-#define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
+/* RSA */
 #define GNUTLS_RSA_ARCFOUR_SHA { 0x00, 0x05 }
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
 #define GNUTLS_RSA_DES_CBC_SHA { 0x00, 0x09 }
-#define GNUTLS_DH_DSS_DES_CBC_SHA { 0x00, 0x0C }
-#define GNUTLS_DH_RSA_DES_CBC_SHA { 0x00, 0x0F }
-#define GNUTLS_DHE_DSS_DES_CBC_SHA { 0x00, 0x12 }
-#define GNUTLS_DHE_RSA_DES_CBC_SHA { 0x00, 0x15 }
-
 #define GNUTLS_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x2F }
-#define GNUTLS_DH_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x30 }
-#define GNUTLS_DH_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x31 }
-#define GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
-#define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 }
-
 #define GNUTLS_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x35 }
+#define GNUTLS_RSA_TWOFISH_128_CBC_SHA { 0xF6, 0x51 }
+
+/* DH_DSS */
+#define GNUTLS_DH_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x30 }
+#define GNUTLS_DH_DSS_TWOFISH_128_CBC_SHA { 0xF6, 0x52 }
+#define GNUTLS_DH_DSS_DES_CBC_SHA { 0x00, 0x0C }
 #define GNUTLS_DH_DSS_RIJNDAEL_256_CBC_SHA { 0x00, 0x36 }
-#define GNUTLS_DH_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x37 }
+#define GNUTLS_DH_DSS_3DES_EDE_CBC_SHA { 0x00, 0x0D }
+
+/* DHE_DSS */
 #define GNUTLS_DHE_DSS_RIJNDAEL_256_CBC_SHA { 0x00, 0x38 }
+#define GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
+#define GNUTLS_DHE_DSS_DES_CBC_SHA { 0x00, 0x12 }
+#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xF6, 0x54 }
+#define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA { 0x00, 0x13 }
+
+/* DHE_RSA */
+#define GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA { 0xF6, 0x55 }
+#define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
+#define GNUTLS_DHE_RSA_DES_CBC_SHA { 0x00, 0x15 }
+#define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 }
 #define GNUTLS_DHE_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x39 }
 
+/* DH_RSA */
+#define GNUTLS_DH_RSA_TWOFISH_128_CBC_SHA { 0xF6, 0x53 }
+#define GNUTLS_DH_RSA_DES_CBC_SHA { 0x00, 0x0F }
+#define GNUTLS_DH_RSA_3DES_EDE_CBC_SHA { 0x00, 0x10 }
+#define GNUTLS_DH_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x37 }
+#define GNUTLS_DH_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x31 }
 
-static gnutls_cipher_suite_entry cs_algorithms[] = {
+
+static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* DH_anon */
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_ARCFOUR_MD5,
 				  GNUTLS_ARCFOUR,
@@ -352,7 +358,7 @@ static gnutls_cipher_suite_entry cs_algorithms[] = {
 };
 
 #define GNUTLS_CIPHER_SUITE_LOOP(b) \
-        gnutls_cipher_suite_entry *p; \
+        const gnutls_cipher_suite_entry *p; \
                 for(p = cs_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_CIPHER_SUITE_ALG_LOOP(a) \
@@ -942,7 +948,7 @@ int _gnutls_cipher_suite_count()
 
 	for (j = 0; j < MAX_CIPHERSUITE; j++) {
 		suite.CipherSuite[0] = j;
-		if (j != 0x00 && j != 0xFF)
+		if (j != 0x00 && j != 0xF6)
 			continue;
 
 		for (i = 0; i < MAX_CIPHERSUITE; i++) {
@@ -1175,7 +1181,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 			       GNUTLS_CipherSuite ** ciphers)
 {
 
-	int i, ret_count, j = 0;
+	int i, ret_count, j;
 	int count = _gnutls_cipher_suite_count();
 	GNUTLS_CipherSuite *tmp_ciphers;
 
@@ -1195,7 +1201,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 		    cs_algorithms[i].id.CipherSuite[1];
 	}
 
-	for (i = 0; i < count; i++) {
+	for (i = j = 0; i < count; i++) {
 		if (_gnutls_kx_priority
 		    (state,
 		     _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0)
