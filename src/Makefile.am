@@ -4,7 +4,7 @@ SUBDIRS = srp x509
 
 INCLUDES = -I../lib
 
-noinst_PROGRAMS = serv cli crypt prime asn1c CertificateExample
+noinst_PROGRAMS = serv cli crypt prime asn1c CertificateExample CrlExample
 serv_SOURCES = serv.c
 serv_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 crypt_SOURCES = crypt-gaa.c crypt.c
@@ -16,6 +16,8 @@ cli_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
 CertificateExample_SOURCES = CertificateExample.c  
 CertificateExample_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+CrlExample_SOURCES = CrlExample.c  
+CrlExample_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
 asn1c_SOURCES = asn1c.c
 asn1c_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)

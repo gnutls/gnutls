@@ -27,8 +27,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "../lib/cert_asn1.h"
-#include "../lib/cert_der.h"
+#include "../lib/x509_asn1.h"
+#include "../lib/x509_der.h"
 
 int
 main(int argc,char *argv[])

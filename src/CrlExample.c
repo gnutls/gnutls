@@ -27,8 +27,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "../lib/cert_asn1.h"
-#include "../lib/cert_der.h"
+#include "../lib/x509_asn1.h"
+#include "../lib/x509_der.h"
 
 extern static_asn pkix_asn1_tab[];
 
@@ -54,6 +54,8 @@ get_Name_type(node_asn *cert_def,node_asn *cert,char *root, char *answer)
     strcat(name,".rdnSequence.?");
     _asn1_ltostr(k,counter);
     strcat(name,counter);
+    
+    len = sizeof(str)-1;
     result=asn1_read_value(cert,name,str,&len);
     if(result==ASN_ELEMENT_NOT_FOUND) break;
     k2=1;
@@ -62,25 +64,35 @@ get_Name_type(node_asn *cert_def,node_asn *cert,char *root, char *answer)
       strcat(name2,".?");
       _asn1_ltostr(k2,counter);
       strcat(name2,counter);
+      
+      len = sizeof(str)-1;
       result=asn1_read_value(cert,name2,str,&len);
       if(result==ASN_ELEMENT_NOT_FOUND) break;
       strcpy(name3,name2);
       strcat(name3,".type");
+      
+      len = sizeof(str)-1;
       result=asn1_read_value(cert,name3,str,&len);
       strcpy(name3,name2);
       strcat(name3,".value");
       if(result==ASN_OK){
+	len = sizeof(str2);
 	result=asn1_read_value(cert_def,"PKIX1Implicit88.id-at-countryName",
 			  str2,&len);
 	if(!strcmp(str,str2)){
 	  asn1_create_structure(cert_def,"PKIX1Implicit88.X520OrganizationName",
 			   &value,"certificate2-subject-C");
+	  len = sizeof(str)-1;
 	  asn1_read_value(cert,name3,str,&len);
       	  asn1_get_der(value,str,len);
 	  strcpy(name3,"certificate2-subject-C");
+	  
+	  len = sizeof(str)-1;
 	  asn1_read_value(value,name3,str,&len);  /* CHOICE */
 	  strcat(name3,".");
 	  strcat(name3,str);
+	  
+	  len = sizeof(str)-1;
 	  asn1_read_value(value,name3,str,&len);
 	  str[len]=0;
 	  strcat(answer," C=");
@@ -88,17 +100,22 @@ get_Name_type(node_asn *cert_def,node_asn *cert,char *root, char *answer)
 	  asn1_delete_structure(value);
 	}
 	else{
+	  len = sizeof(str2);
 	  result=asn1_read_value(cert_def,"PKIX1Implicit88.id-at-organizationName"
 			    ,str2,&len);
 	  if(!strcmp(str,str2)){
 	    asn1_create_structure(cert_def,"PKIX1Implicit88.X520OrganizationName"
 			     ,&value,"certificate2-subject-O");
+	    
+	    len = sizeof(str)-1;
 	    asn1_read_value(cert,name3,str,&len);	  
 	    asn1_get_der(value,str,len);
 	    strcpy(name3,"certificate2-subject-O");
+	    len = sizeof(str)-1;
 	    asn1_read_value(value,name3,str,&len);  /* CHOICE */
 	    strcat(name3,".");
 	    strcat(name3,str);
+	    len = sizeof(str)-1;
 	    asn1_read_value(value,name3,str,&len);
 	    str[len]=0;
 	    strcat(answer," O=");
@@ -106,15 +123,19 @@ get_Name_type(node_asn *cert_def,node_asn *cert,char *root, char *answer)
 	    asn1_delete_structure(value);
 	  }
 	  else{
+	    len = sizeof(str2);
 	    result=asn1_read_value(cert_def,"PKIX1Implicit88.id-at-organizationalUnitName",str2,&len);
 	    if(!strcmp(str,str2)){
 	      asn1_create_structure(cert_def,"PKIX1Implicit88.X520OrganizationalUnitName",&value,"certificate2-subject-OU");
+	      len = sizeof(str)-1;
 	      asn1_read_value(cert,name3,str,&len);
 	      asn1_get_der(value,str,len);
 	      strcpy(name3,"certificate2-subject-OU");
+	      len = sizeof(str)-1;
 	      asn1_read_value(value,name3,str,&len);  /* CHOICE */
 	      strcat(name3,".");
 	      strcat(name3,str);
+	      len = sizeof(str)-1;
 	      asn1_read_value(value,name3,str,&len);
 	      str[len]=0;
 	      strcat(answer," OU=");
@@ -159,6 +180,7 @@ create_CRL(node_asn *cert_def, unsigned char *der,int *der_len)
   result=asn1_write_value(crl,"crl1.tbsCertList.version","v2",0); 
 
   /* signature: dsa-with-sha */
+  len = sizeof(str)-1;
   result=asn1_read_value(cert_def,"PKIX1Implicit88.id-dsa-with-sha1",str,&len);
   result=asn1_write_value(crl,"crl1.tbsCertList.signature.algorithm",str,1);   
   
@@ -171,6 +193,7 @@ create_CRL(node_asn *cert_def, unsigned char *der,int *der_len)
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence","NEW",1);
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence.?LAST","NEW",1);
   /* C */
+  len = sizeof(str)-1;
   result=asn1_read_value(cert_def,"PKIX1Implicit88.id-at-countryName",str,&len);
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence.?LAST.?LAST.type",str,1);
   result=asn1_create_structure(cert_def,"PKIX1Implicit88.X520countryName",
@@ -184,6 +207,7 @@ create_CRL(node_asn *cert_def, unsigned char *der,int *der_len)
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence","NEW",4);
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence.?LAST","NEW",4);
   /* O */
+  len = sizeof(str)-1;
   result=asn1_read_value(cert_def,"PKIX1Implicit88.id-at-organizationName",str,&len);
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence.?LAST.?LAST.type",str,8);
   result=asn1_create_structure(cert_def,"PKIX1Implicit88.X520OrganizationName",
@@ -198,6 +222,7 @@ create_CRL(node_asn *cert_def, unsigned char *der,int *der_len)
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence","NEW",1);
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence.?LAST","NEW",1);
   /* OU */
+  len = sizeof(str)-1;
   result=asn1_read_value(cert_def,"PKIX1Implicit88.id-at-organizationalUnitName",
 		    str,&len);
   result=asn1_write_value(crl,"crl1.tbsCertList.issuer.rdnSequence.?LAST.?LAST.type",str,1);
@@ -225,6 +250,7 @@ create_CRL(node_asn *cert_def, unsigned char *der,int *der_len)
   result=asn1_write_value(crl,"crl1.tbsCertList.revokedCertificates.?LAST.revocationDate.utcTime","970731000000Z",1);
 
   result=asn1_write_value(crl,"crl1.tbsCertList.revokedCertificates.?LAST.crlEntryExtensions","NEW",1);
+  len = sizeof(str)-1;
   result=asn1_read_value(cert_def,"PKIX1Implicit88.id-ce-cRLReasons",
 		    str,&len);
   result=asn1_write_value(crl,"crl1.tbsCertList.revokedCertificates.?LAST.crlEntryExtensions.?LAST.extnID",str,1); /* reasonCode */
@@ -238,6 +264,7 @@ create_CRL(node_asn *cert_def, unsigned char *der,int *der_len)
 
 
   /* signatureAlgorithm: dsa-with-sha  */
+  len = sizeof(str)-1;
   result=asn1_read_value(cert_def,"PKIX1Implicit88.id-dsa-with-sha1",str,&len);
   result=asn1_write_value(crl,"crl1.signatureAlgorithm.algorithm",str,1);  
   result=asn1_write_value(crl,"crl1.signatureAlgorithm.parameters",NULL,0); /* NO OPTION */  
@@ -309,6 +336,7 @@ get_CRL(node_asn *cert_def,unsigned char *der,int der_len)
 
 
   /* Verify sign */
+  len = sizeof(str)-1;
   result=asn1_read_value(crl2,"crl2.signatureAlgorithm.algorithm",str,&len);
 
   result=asn1_read_value(cert_def,"PKIX1Implicit88.id-dsa-with-sha1",str2,&len);

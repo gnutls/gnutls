@@ -26,7 +26,7 @@
 #include "../lib/gnutls_int.h"
 #include "../lib/gnutls_srp.h"
 #include "../lib/crypt.h"
-#include "../lib/cert_b64.h"
+#include "../lib/x509_b64.h"
 #include "prime-gaa.h"
 
 MPI _gcry_generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
