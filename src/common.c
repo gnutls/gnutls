@@ -221,6 +221,7 @@ void print_x509_info(gnutls_session session, const char *hostname)
 		cstr = SU(gnutls_pk_algorithm_get_name(algo));
 		printf("%s (%d bits)\n", cstr, bits);
 
+#ifdef ENABLE_PKI
 		if (algo == GNUTLS_PK_RSA) {
 		    gnutls_datum e, m;
 
@@ -260,6 +261,7 @@ void print_x509_info(gnutls_session session, const char *hostname)
 			gnutls_free(y.data);
 		    }
 		}
+#endif
 	    }
 
 	    dn_size = sizeof(dn);
