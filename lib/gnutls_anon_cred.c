@@ -92,24 +92,4 @@ int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
 	return 0;
 }
 
-#else /* No ANON: define stubs */
-
-void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
-	return;
-}
-
-int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
-
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-void gnutls_anon_free_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS sc) {
-	return;
-}
-
-
-int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
 #endif

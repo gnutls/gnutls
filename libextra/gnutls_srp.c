@@ -526,42 +526,4 @@ const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
 	return info->username;
 }
 
-
-#else /* NO SRP: so define stubs */
-
-const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
-{
-	return NULL;
-}
-
-void gnutls_srp_free_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS sc) {
-	return;
-}
-
-int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc) {
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char * password) {
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-void gnutls_srp_free_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS sc) {
-	return;
-}
-
-int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc) {
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-void gnutls_srp_server_set_select_func(GNUTLS_STATE state,
-					     srp_server_select_func
-					     * func) {
-	return;
-}
-
 #endif /* ENABLE_SRP */

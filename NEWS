@@ -1,3 +1,6 @@
+Version ?.?.?
+- Added X.509 certificate tests in tests/ directory
+
 Version 0.4.3 (23/05/2002)
 - The gnutls-extra library now compiles fine, if the opencdk library is
   not present.

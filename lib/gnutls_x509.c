@@ -978,7 +978,6 @@ static int _gnutls_check_key_cert_match( GNUTLS_CERTIFICATE_CREDENTIALS res) {
 }
 
 #define MAX_FILE_SIZE 100*1024
-#define CERT_SEP "-----BEGIN"
 
 /* Reads a DER encoded certificate list from memory and stores it to
  * a gnutls_cert structure. This is only called if PKCS7 read fails.
@@ -1162,13 +1161,13 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		gnutls_free(b64);
 
 		/* now we move ptr after the pem header */
-		ptr = strstr(ptr, CERT_SEP);
+		ptr = strstr(ptr, PEM_CERT_SEP);
 		if (ptr!=NULL)
 			ptr++;
 
 		i++;
 		count++;
-	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
+	} while ((ptr = strstr(ptr, PEM_CERT_SEP)) != NULL);
 
 	*ncerts = i - 1;
 
@@ -2024,101 +2023,6 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 	return 0;
 }
 
-#ifdef DEBUG
-
-/* Verifies a base64 encoded certificate list from memory 
- */
-int _gnutls_verify_x509_mem( const char *ca, int ca_size)
-{
-	int siz, siz2, i;
-	opaque *b64;
-	const char *ptr;
-	int ret;
-	gnutls_datum tmp;
-	gnutls_cert* x509_ca_list=NULL;
-	int x509_ncas;
-
-	siz = ca_size;
-
-	ptr = ca;
-
-	i = 1;
-
-	do {
-		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
-		siz -= siz2;	/* FIXME: this is not enough
-				 */
-
-		if (siz2 < 0) {
-			gnutls_assert();
-			return GNUTLS_E_PARSING_ERROR;
-		}
-
-		x509_ca_list =
-		    (gnutls_cert *) gnutls_realloc( x509_ca_list,
-						   i *
-						   sizeof(gnutls_cert));
-		if (x509_ca_list == NULL) {
-			gnutls_assert();
-			gnutls_free(b64);
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-
-		tmp.data = b64;
-		tmp.size = siz2;
-
-		if ((ret =
-		     _gnutls_x509_cert2gnutls_cert(&x509_ca_list[i - 1],
-					     tmp)) < 0) {
-			gnutls_assert();
-			gnutls_free(b64);
-			return ret;
-		}
-		gnutls_free(b64);
-
-		/* now we move ptr after the pem header */
-		ptr = strstr(ptr, CERT_SEP);
-		if (ptr!=NULL)
-			ptr++;
-
-		i++;
-	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
-
-	x509_ncas = i - 1;
-
-	siz = _gnutls_x509_verify_certificate( x509_ca_list, x509_ncas-1,
-		&x509_ca_list[x509_ncas-1], 1, NULL, 0);
-
-	return siz;
-}
-
-
-
-/* Reads and verifies a base64 encoded certificate file 
- */
-int _gnutls_verify_x509_file( char *cafile)
-{
-	int siz;
-	char x[MAX_FILE_SIZE];
-	FILE *fd1;
-
-	fd1 = fopen(cafile, "rb");
-	if (fd1 == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_FILE_ERROR;
-	}
-
-	siz = fread(x, 1, sizeof(x)-1, fd1);
-	fclose(fd1);
-
-	x[siz] = 0;
-
-	return _gnutls_verify_x509_mem( x, siz);
-}
-
-
-
-#endif
 
 /**
   * gnutls_x509_pkcs7_extract_certificate - This function returns a certificate in a PKCS7 certificate set
