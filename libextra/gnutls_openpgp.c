@@ -1877,6 +1877,9 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
     s = "</OPENPGPKEY>\n";
     ret = _gnutls_string_append_str( &string_xml_key, s);
     if (ret < 0) return ret;
+
+    ret = _gnutls_string_append_data( &string_xml_key, "\n\0", 2);
+    if (ret < 0) return ret;
     
     *xmlkey = _gnutls_string2datum( &string_xml_key);
 

@@ -263,11 +263,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 				STR_APPEND(" type=\"OBJECT ID\"");
 				break;
 			case TYPE_ANY:
-//				if (p->type&CONST_DEFINED_BY) {
-//					STR_APPEND(" type=\"ANY DEFINED BY\"");
-//				} else {
-					STR_APPEND(" type=\"ANY\"");
-//				}
+				STR_APPEND(" type=\"ANY\"");
 				if (!p->down) STR_APPEND(" encoding=\"HEX\"");
 				break;
 			case TYPE_CONSTANT: {
