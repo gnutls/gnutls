@@ -153,6 +153,39 @@ int server = session->security_parameters.entity==GNUTLS_SERVER?0:1;
                          &session->security_parameters.current_cipher_suite), server);
 }
 
+/**
+  * gnutls_auth_server_get_type - Returns the type of credentials for the server authentication schema.
+  * @session: is a &gnutls_session structure.
+  *
+  * Returns the type of credentials that were used for server authentication.
+  * The returned information is to be used to distinguish the function used
+  * to access authentication data.
+  * 
+  **/
+gnutls_credentials_type gnutls_auth_server_get_type( gnutls_session session) 
+{
+	return _gnutls_map_kx_get_cred(
+		 _gnutls_cipher_suite_get_kx_algo(
+                         &session->security_parameters.current_cipher_suite), 1);
+}
+
+/**
+  * gnutls_auth_client_get_type - Returns the type of credentials for the client authentication schema.
+  * @session: is a &gnutls_session structure.
+  *
+  * Returns the type of credentials that were used for client authentication.
+  * The returned information is to be used to distinguish the function used
+  * to access authentication data.
+  * 
+  **/
+gnutls_credentials_type gnutls_auth_client_get_type( gnutls_session session) 
+{
+	return _gnutls_map_kx_get_cred(
+		 _gnutls_cipher_suite_get_kx_algo(
+                         &session->security_parameters.current_cipher_suite), 0);
+}
+
+
 /* 
  * This returns a pointer to the linked list. Don't
  * free that!!!

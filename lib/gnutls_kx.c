@@ -478,7 +478,8 @@ int _gnutls_recv_client_certificate( gnutls_session session)
 		}
 
 		if (ret == 0 && datasize == 0 && optional == OPTIONAL_PACKET) {
-			/* well I'm not sure we should accept this
+			/* Client has not sent the certificate message.
+			 * well I'm not sure we should accept this
 			 * behaviour.
 			 */
 			gnutls_assert();

@@ -1040,10 +1040,11 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 		*data = dataptr;
 
 
-	if ( (ret=_gnutls_handshake_hash_add_recvd( session, recv_type, 
+	ret = _gnutls_handshake_hash_add_recvd( session, recv_type, 
 		session->internals.handshake_header_buffer.header,
 		session->internals.handshake_header_buffer.header_size,
-		dataptr, length32)) < 0) {
+		dataptr, length32);
+	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_handshake_header_buffer_clear(session);
 		return ret;

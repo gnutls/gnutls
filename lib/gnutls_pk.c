@@ -282,6 +282,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 				break;
 			}
 			if (edata[i] != 0xff) {
+				_gnutls_handshake_log("PKCS #1 padding error");
 				ret = GNUTLS_E_PKCS1_WRONG_PAD;
 				break;
 			}
