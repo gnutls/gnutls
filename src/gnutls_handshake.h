@@ -6,3 +6,4 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char* data, int datalen, opaque** SessionID, int SessionIDnum);
 int gnutls_handshake(int cd, GNUTLS_STATE state);
 int _gnutls_recv_handshake( int cd, GNUTLS_STATE state, void*, uint32);
+int _gnutls_generate_session_id( char** session_id, uint8* len);

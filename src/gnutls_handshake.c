@@ -110,9 +110,6 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_da
 #endif	
 	
 	length = uint32touint24( datasize);
-//	length.pint[0] = ((uint8*)&datasize)[1];
-//	length.pint[1] = ((uint8*)&datasize)[2];
-//	length.pint[2] = ((uint8*)&datasize)[3];
 
 	i_datasize += 4;
 	data = gnutls_malloc( i_datasize);
@@ -257,7 +254,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 		memmove( &data[pos], rand, 28);
 		pos+=28;
 
-		memmove( &data[pos++], &session_id_len, sizeof(uint8));		
+		memmove( &data[pos++], &session_id_len, sizeof(uint8));
 		if (session_id_len>0) {
 			memmove( &data[pos], SessionID, session_id_len);
 		}
@@ -310,6 +307,10 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char* data, int datalen, opaq
 		memmove( &session_id_len, &data[pos++], 1);
 
 		if (datalen < 38+session_id_len) return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+#ifdef DEBUG
+		fprintf(stderr, "SessionID length: %d\n", session_id_len);
+		fprintf(stderr, "SessionID: %s\n", bin2hex(&data[pos], session_id_len));
+#endif
 		pos+=session_id_len;
 		
 		/* We should resume an old connection here. This is not
@@ -386,6 +387,8 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char* data, int datalen, opaq
 
 int gnutls_handshake(int cd, GNUTLS_STATE state) {
 int ret;
+char* session_id;
+uint8 session_id_size;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		ret = _gnutls_send_hello( cd, state, NULL, 0);
@@ -417,11 +420,15 @@ int ret;
 			ERR("recv hello", ret);
 			return ret;
 		}
-		ret = _gnutls_send_hello( cd, state, NULL, 0);
+
+		_gnutls_generate_session_id( &session_id, &session_id_size);
+		ret = _gnutls_send_hello( cd, state, session_id, session_id_size);
 		if (ret<0) {
 			ERR("send hello", ret);
 			return ret;
 		}
+		gnutls_free(session_id);
+		
 		ret = _gnutls_send_change_cipher_spec( cd, state);
 		if (ret<0) {
 			ERR("send ChangeCipherSpec", ret);
@@ -436,4 +443,19 @@ int ret;
 
 	return ret;
 
+}
+
+int _gnutls_generate_session_id( char** session_id, uint8* len) {
+char* rand;
+	*session_id=gnutls_malloc(32);
+	rand = gcry_random_bytes(32, GCRY_WEAK_RANDOM);
+	
+	memmove( *session_id, rand, 32);
+	gcry_free(rand);
+	*len=32;
+
+#ifdef DEBUG
+	fprintf(stderr, "SessionID: %s\n", bin2hex( *session_id, 32));
+#endif
+	return 0;
 }

@@ -235,14 +235,13 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level,
 int gnutls_close(int cd, GNUTLS_STATE state)
 {
 	int ret;
-	char data[2];
 	
 	ret =
 	    _gnutls_send_alert(cd, state, GNUTLS_WARNING,
 			       GNUTLS_CLOSE_NOTIFY);
 
 	/* receive pending data or the closure alert */
-	gnutls_recv_int(cd, state, GNUTLS_ALERT, data, 2);
+	gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0);
 
 	state->gnutls_internals.valid_connection = VALID_FALSE;
 	return ret;
