@@ -25,7 +25,7 @@ AC_PREREQ(2.57)
 
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([1.8 gnits dist-bzip2 no-dist-gzip])
+AM_INIT_AUTOMAKE([1.8 gnits dist-bzip2])
 AM_CONFIG_HEADER(config.h)
 AB_INIT
 
