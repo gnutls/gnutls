@@ -28,6 +28,7 @@
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
+#define DH_BITS 1024
 
 /* These are global */
 GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
@@ -62,6 +63,8 @@ GNUTLS_STATE initialize_state()
    /* request client certificate if any.
     */
    gnutls_certificate_server_set_request( state, GNUTLS_CERT_REQUEST);
+
+   gnutls_dh_set_prime_bits( state, DH_BITS);
    
    return state;
 }
@@ -113,7 +116,7 @@ gnutls_datum prime, generator;
     * once a day, once a week or once a month. Depends on the
     * security requirements.
     */
-   gnutls_dh_generate_params( &prime, &generator, 1024);
+   gnutls_dh_generate_params( &prime, &generator, DH_BITS);
    gnutls_dh_replace_params( prime, generator);
 
    free( prime.data);

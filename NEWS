@@ -13,6 +13,7 @@ Version ?.?.?
   type.
 - Improved Diffie Hellman key exchanges support.
 - Bug fixes in the RSA key exchange.
+- Extension types now use a 16 bit type field.
 
 Version 0.3.5 (25/01/2002)
 - Corrected the RSA key exchange method, to avoid attacks against
