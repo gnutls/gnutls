@@ -27,6 +27,16 @@
 # include <string.h>
 # include <stdlib.h>
 # include <stdio.h>
+# include <ctype.h>
+#endif
+
+#ifdef NO_TIME_T
+ typedef unsigned int time_t;
+#endif
+
+#ifdef NO_SIZE_T
+ typedef unsigned int size_t;
+ typedef int ssize_t;
 #endif
 
 #ifdef HAVE_STDARG_H
@@ -37,8 +47,10 @@
 # include <strings.h>
 #endif
 
-#include <time.h>
-#include <ctype.h>
+#ifdef HAVE_TIME_H
+# include <time.h>
+#endif
+
 
 /* for open */
 #ifdef HAVE_SYS_TYPES_H

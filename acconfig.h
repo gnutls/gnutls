@@ -27,4 +27,7 @@
 
 #undef LIBMCRYPT22
 #undef LIBMCRYPT24
+
+#undef NO_SIZE_T
+#undef NO_TIME_T
  

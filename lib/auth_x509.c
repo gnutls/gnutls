@@ -876,8 +876,6 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 	WRITEdatum16( pdata, cred->rdn_sequence);
 	pdata += cred->rdn_sequence.size + 2;
 
-	/* write the recalculated size */
-
 	return size;
 }
 
