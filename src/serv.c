@@ -84,7 +84,7 @@ int main()
 	    continue;
 	}
 	fprintf(stderr, "Handshake was completed\n");
-	fprintf(stderr, "Acting as echo server...");
+	fprintf(stderr, "Acting as echo server...\n");
 	ret =
 	    gnutls_send(sd, state, "hello client",
 			sizeof("hello client"));
