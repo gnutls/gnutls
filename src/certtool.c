@@ -223,10 +223,15 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	crq = load_request();
 
 	if (crq == NULL) {
-		fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
-		"Just press enter to ignore a field.\n");
 
 		key = load_private_key();
+		if (key==NULL) {
+			fprintf(stderr, "Could not load private key.\n");
+			exit(1);
+		}
+
+		fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
+		"Just press enter to ignore a field.\n");
 
 		read_crt_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
 		read_crt_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
@@ -786,6 +791,8 @@ gnutls_x509_privkey key;
 int ret;
 gnutls_datum dat;
 size_t size;
+
+	if (!info.privkey) return NULL;
 
 	fd = fopen(info.privkey, "r");
 	if (fd == NULL) {

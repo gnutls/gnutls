@@ -1,4 +1,4 @@
-Version 0.9.94
+Version 0.9.94 (30/10/2003)
 - Added manpages for the included programs.
 - Documented and improved the certtool utility. 
 - Added PKCS #12 support to certtool utility.

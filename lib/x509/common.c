@@ -647,7 +647,7 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
-		if ((uint)result + 1 > *output_data_size) {
+		if ((uint)result > *output_data_size) {
 			gnutls_assert();
 			gnutls_free(out);
 			*output_data_size = result;
@@ -658,7 +658,10 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 		
 		if (output_data) {
 			memcpy( output_data, out, result);
-			output_data[result] = 0;
+
+			/* do not include the null character into output size.
+			 */
+			*output_data_size = result - 1;
 		}
 		gnutls_free( out);
 		

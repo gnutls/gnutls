@@ -233,7 +233,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	}
 
 	strcat(*result, bottom); /* Flawfinder: ignore */
-	return ret;
+	return strlen(*result) + 1;
 }
 
 /**
@@ -246,6 +246,9 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
   * This function will convert the given data to printable data, using the base64 
   * encoding. This is the encoding used in PEM messages. If the provided
   * buffer is not long enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+  *
+  * The output string will be null terminated, although the size will not include
+  * the terminating null.
   * 
   **/
 int gnutls_pem_base64_encode( const char* msg, const gnutls_datum *data, char* result, int* result_size) {
@@ -263,7 +266,7 @@ int size;
 	} else {
 		memcpy( result, ret, size);
 		gnutls_free(ret);
-		*result_size = size;
+		*result_size = size - 1;
 	}
 
 	return 0;
@@ -296,7 +299,7 @@ int size;
 		return size;
 
 	result->data = ret;
-	result->size = size;
+	result->size = size - 1;
 	return 0;
 }
 

@@ -108,7 +108,8 @@ How to use certtool:
 
 \item To create a self signed certificate, use the command:
 \begin{verbatim}
-$ certtool --generate-self-signed --outfile ca.pem
+$ certtool --generate-privkey --outfile ca-key.pem
+$ certtool --generate-self-signed --load-privkey ca-key.pem --outfile ca-cert.pem
 \end{verbatim}
 Note that a self-signed certificate usually belongs to a certificate
 authority, that signs other certificates.
@@ -126,7 +127,7 @@ $ certtool --generate-request --load-privkey key.pem --outfile request.pem
 \item To generate a certificate using the previous request, use the command:
 \begin{verbatim}
 $ certtool --generate-certificate --load-request request.pem --outfile cert.pem \
-   --load-ca-certificate ca.pem --load-ca-privkey ca.pem
+   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
 \end{verbatim}
 
 \item To view the certificate information, use:
@@ -134,7 +135,7 @@ $ certtool --generate-certificate --load-request request.pem --outfile cert.pem 
 $ certtool --certificate-info --infile cert.pem
 \end{verbatim}
 
-\item To generate a PKCS #12 structure using the previous key and certificate, use the command:
+\item To generate a PKCS \#12 structure using the previous key and certificate, use the command:
 \begin{verbatim}
 $ certtool --load-certificate cert.pem --load-privkey key.pem --to-p12 \
    --outder --outfile key.p12
