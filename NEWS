@@ -1,4 +1,4 @@
-Version 0.9.7
+Version 0.9.7 (25/08/2003)
 - The tex files are now included in the distribution.
 - The library can now decrypt PKCS #12 files encrypted with
   the RC2-40 cipher.
