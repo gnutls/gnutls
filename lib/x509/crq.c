@@ -405,12 +405,12 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
 	const void *data, unsigned int sizeof_data)
 {
-	if (sizeof_name == 0 || name == NULL || crq == NULL) {
+	if (sizeof_data == 0 || data == NULL || crq == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	return _gnutls_x509_set_dn_oid( crq->crq, "certificationRequestInfo.subject", oid,
-		name, sizeof_name);
+		data, sizeof_data);
 }
 
 /**

@@ -39,9 +39,6 @@ extern "C" {
 
 #define LIBGNUTLS_VERSION "@VERSION@"
 
-/* For backwards compatibility */
-#include <gnutls/compat4.h>
-
 #ifndef HAVE_SIZE_T
 # define HAVE_SIZE_T
 @DEFINE_SIZE_T@
@@ -179,6 +176,7 @@ typedef struct {
 	unsigned char * data;
 	unsigned int size;
 } gnutls_datum;
+
 
 typedef struct {
 	const unsigned char * data;

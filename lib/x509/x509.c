@@ -261,7 +261,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   *
   **/
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
-	int indx, char *buf, size_t *sizeof_buf)
+	int indx, void *buf, size_t *sizeof_buf)
 {
 	if (cert==NULL) {
 		gnutls_assert();
