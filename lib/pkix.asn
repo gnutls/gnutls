@@ -1206,4 +1206,15 @@ pkcs-7-EncryptedContent ::= OCTET STRING
 
 pkcs-7-UnprotectedAttributes ::= SET SIZE (1..MAX) OF Attribute
 
+-- LDAP stuff
+-- may not be correct
+
+id-at-ldap-DC AttributeType ::= { 0 9 2342 19200300 100 1 25 }
+
+ldap-DC ::= IA5String
+
+id-at-ldap-UID AttributeType ::= { 0 9 2342 19200300 100 1 1 }
+
+ldap-UID ::= IA5String
+
 END

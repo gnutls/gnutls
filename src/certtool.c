@@ -218,26 +218,26 @@ const char* msg;
 
 }
 
-static void print_key_usage( unsigned int x) 
+static void print_key_usage( unsigned int x, FILE* out) 
 {
 	if (x&GNUTLS_KEY_DIGITAL_SIGNATURE)
-		fprintf(stderr,"\t\tDigital signature.\n");
+		fprintf(out,"\t\tDigital signature.\n");
 	if (x&GNUTLS_KEY_NON_REPUDIATION)
-		fprintf(stderr,"\t\tNon repudiation.\n");
+		fprintf(out,"\t\tNon repudiation.\n");
 	if (x&GNUTLS_KEY_KEY_ENCIPHERMENT)
-		fprintf(stderr,"\t\tKey encipherment.\n");
+		fprintf(out,"\t\tKey encipherment.\n");
 	if (x&GNUTLS_KEY_DATA_ENCIPHERMENT)
-		fprintf(stderr,"\t\tData encipherment.\n");
+		fprintf(out,"\t\tData encipherment.\n");
 	if (x&GNUTLS_KEY_KEY_AGREEMENT)
-		fprintf(stderr,"\t\tKey agreement.\n");
+		fprintf(out,"\t\tKey agreement.\n");
 	if (x&GNUTLS_KEY_KEY_CERT_SIGN)
-		fprintf(stderr,"\t\tCertificate signing.\n");
+		fprintf(out,"\t\tCertificate signing.\n");
 	if (x&GNUTLS_KEY_CRL_SIGN)
-		fprintf(stderr,"\t\tCRL signing.\n");
+		fprintf(out,"\t\tCRL signing.\n");
 	if (x&GNUTLS_KEY_ENCIPHER_ONLY)
-		fprintf(stderr,"\t\tKey encipher only.\n");
+		fprintf(out,"\t\tKey encipher only.\n");
 	if (x&GNUTLS_KEY_DECIPHER_ONLY)
-		fprintf(stderr,"\t\tKey decipher only.\n");
+		fprintf(out,"\t\tKey decipher only.\n");
 }
 
 static void print_private_key( gnutls_x509_privkey key)
@@ -900,6 +900,8 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 	ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
 	if (ret >= 0)
 		fprintf(out, "Subject: %s\n", dn);
+	else
+		fprintf(stderr, "get_issuer_dn: %s\n", gnutls_strerror(ret));
 
 	/* Issuer
 	 */
@@ -908,6 +910,8 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 		ret = gnutls_x509_crt_get_issuer_dn(crt, dn, &dn_size);
 		if (ret >= 0)
 			fprintf(out, "Issuer: %s\n", dn);
+		else
+			fprintf(stderr, "get_issuer_dn: %s\n", gnutls_strerror(ret));
 
 
 		/* signature algorithm
@@ -1023,7 +1027,7 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 	
 	if (ret >= 0) {
 		fprintf(out, "\tKey usage: %s\n", critical?"(critical)":"");
-		print_key_usage(key_usage);
+		print_key_usage(key_usage, out);
 	}
 
 	/* Subject Key ID 

@@ -6,6 +6,7 @@ Version 1.1.4
 - Changed handshake behaviour to send the lowest TLS version
   when an unsupported version was advertized. The current behaviour
   is to send the maximum version we support.
+- Corrected problem printing the DC attributes in a DN.
 
 Version 1.1.3 (30/12/2003)
 - Implemented TLS 1.1 (and also obsoleted the TLS 1.0 CBC protection
