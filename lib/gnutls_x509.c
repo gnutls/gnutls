@@ -841,7 +841,7 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)

@@ -158,7 +158,7 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 	 */
 	if (_gnutls_get_kx_cred( session->gnutls_key, _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite), &err) == NULL && err != 0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	/* set the MOD_AUTH_STRUCT to the appropriate struct

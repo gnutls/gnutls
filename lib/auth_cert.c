@@ -290,7 +290,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	if (session->internals.client_cert_callback != NULL) {
@@ -678,7 +678,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session, opaque * data,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 
@@ -812,7 +812,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	if ((ret =
@@ -1015,7 +1015,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	if ((ret =
@@ -1211,7 +1211,7 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session, opaque ** data)
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	size = CERTTYPE_SIZE + 2;	/* 2 for gnutls_certificate_type + 2 for size of rdn_seq 
@@ -1262,7 +1262,7 @@ int _gnutls_find_apr_cert(gnutls_session session, gnutls_cert ** apr_cert_list,
 		*apr_cert_list = NULL;
 		*apr_pkey = NULL;
 		*apr_cert_list_length = 0;
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
@@ -1272,7 +1272,7 @@ int _gnutls_find_apr_cert(gnutls_session session, gnutls_cert ** apr_cert_list,
 			*apr_cert_list_length = 0;
 			*apr_pkey = NULL;
 			gnutls_assert();	/* this is not allowed */
-			return GNUTLS_E_INSUFICIENT_CRED;
+			return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 		} else {
 			/* find_cert_list_index() has been called before.
 			 */
@@ -1283,7 +1283,7 @@ int _gnutls_find_apr_cert(gnutls_session session, gnutls_cert ** apr_cert_list,
 				*apr_cert_list_length = 0;
 				*apr_pkey = NULL;
 				gnutls_assert();
-				return GNUTLS_E_INSUFICIENT_CRED;
+				return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 			} else {
 				*apr_cert_list = cred->cert_list[ind];
 				*apr_cert_list_length =
@@ -1370,7 +1370,7 @@ int _gnutls_server_find_cert_list_index(gnutls_session session,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	index = -1;		/* default is use no certificate */

@@ -151,7 +151,7 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
   * This function initializes the current session to null. Every session
   * must be initialized before use, so internal structures can be allocated.
   * This function allocates structures which can only be free'd
-  * by calling gnutls_deinit(). Returns zero on success.
+  * by calling gnutls_session_deinit(). Returns zero on success.
   **/
 int gnutls_session_init(gnutls_session * session, gnutls_connection_end con_end)
 {
@@ -227,7 +227,7 @@ int _gnutls_session_is_resumable( gnutls_session session)
   * @session: is a &gnutls_session structure.
   *
   * This function clears all buffers associated with the &session.
-  * The difference with gnutls_deinit() is that this function will not
+  * The difference with gnutls_session_deinit() is that this function will not
   * interfere with the session database.
   *
   **/
@@ -319,7 +319,7 @@ void gnutls_session_deinit(gnutls_session session)
 		gnutls_db_remove_session( session);
 	}
 
-	_gnutls_deinit( session);
+	_gnutls_session_deinit( session);
 }
 
 

@@ -552,7 +552,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	if (x<=0) {
 		gnutls_assert();
 		if (x<0) return x;
-		else return GNUTLS_E_INSUFICIENT_CRED;
+		else return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 #ifdef HANDSHAKE_DEBUG
@@ -601,7 +601,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 
@@ -1109,7 +1109,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 
@@ -1337,7 +1337,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 	 */
 	if (ret == 0) {
 		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
+		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
 
 	cipher_num = ret;

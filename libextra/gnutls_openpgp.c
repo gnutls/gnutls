@@ -2061,10 +2061,12 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;   
 }
+
+int
+gnutls_openpgp_extract_key_id( const gnutls_datum *cert, unsigned char keyid[8] )
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
 #endif /* HAVE_LIBOPENCDK */
-
-
-
-
-
 
