@@ -522,22 +522,50 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, int* result_s
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
 {
 	int result;
-	opaque *str;
+	opaque *str = NULL;
 	int algo;
-	int len = sizeof(str);
+	char oid[64];
+	int len;
 	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
 
-	len = 0;
+	len = sizeof(oid);
 	result =
 	    asn1_read_value
 	    (cert->cert,
 	     "tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+	     oid, &len);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	algo = _gnutls_x509_oid2pk_algorithm( oid);
+
+	if ( bits==NULL) {
+		gnutls_free(str);
+		return algo;
+	}
+
+	/* Now read the parameters' bits */
+
+	len = 0;
+	result =
+	    asn1_read_value
+	    (cert->cert, "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 	     NULL, &len);
 
 	if (result != ASN1_MEM_ERROR) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
+
+	if (len % 8 != 0) {
+		gnutls_assert();
+		return GNUTLS_E_CERTIFICATE_ERROR;
+	}
+	
+	len /= 8;
 	
 	str = gnutls_malloc( len);
 	if (str == NULL) {
@@ -547,38 +575,16 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
 
 	result =
 	    asn1_read_value
-	    (cert->cert,
-	     "tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
-	     str, &len);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		gnutls_free(str);
-		return _gnutls_asn2err(result);
-	}
-
-	algo = _gnutls_x509_oid2pk_algorithm( str);
-
-	if ( bits==NULL) {
-		gnutls_free(str);
-		return algo;
-	}
-
-	/* Now read the parameters' bits */
-
-	len = sizeof(str) - 1;
-	result =
-	    asn1_read_value
 	    (cert->cert, "tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 	     str, &len);
-	len /= 8;
-
+	
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		gnutls_free(str);
 		return _gnutls_asn2err(result);
 	}
 
+	len /= 8;
 
 	if (algo==GNUTLS_PK_RSA) {
 		if ((result=_gnutls_x509_read_rsa_params( str, len, params)) < 0) {

@@ -208,7 +208,15 @@ gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid)
 		return GNUTLS_PK_RSA;
 	else if (strcmp( oid, DSA_OID) == 0)
 		return GNUTLS_PK_DSA;
-		
+	else if (strcmp( oid, RSA_MD5_OID) == 0)
+		return GNUTLS_PK_RSA;
+	else if (strcmp( oid, RSA_SHA1_OID) == 0)
+		return GNUTLS_PK_RSA;
+	else if (strcmp( oid, DSA_SHA1_OID) == 0)
+		return GNUTLS_PK_DSA;
+
+	_gnutls_x509_log("Unknown PK OID: '%s'\n", oid);
+
 	return GNUTLS_PK_UNKNOWN;
 }
 
