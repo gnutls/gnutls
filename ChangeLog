@@ -1,3 +1,10 @@
+2004-05-11 11:35  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_handshake.c, gnutls_handshake.c:
+
+	the TLS hello message random values no longer use strong random
+	data.  
+
 2004-05-08 12:51  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_handshake.c, auth_rsa.c:
