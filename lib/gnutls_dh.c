@@ -62,10 +62,13 @@ MPI gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 	MPI e, x;
 	int x_size = get_x_size(gcry_mpi_get_nbits(prime));
 
+
 	x = _gnutls_mpi_new(x_size);	/* FIXME: allocate in secure memory */
 	if (x == NULL) {
+		gnutls_assert();
 		if (ret_x)
 			*ret_x = NULL;
+
 		return NULL;
 	}
 
@@ -74,8 +77,11 @@ MPI gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 
 	e = _gnutls_mpi_alloc_like(prime);
 	if (e == NULL) {
+		gnutls_assert();
 		if (ret_x)
 			*ret_x = NULL;
+
+		_gnutls_mpi_release( &x);
 		return NULL;
 	}
 	gcry_mpi_powm(e, g, x, prime);
