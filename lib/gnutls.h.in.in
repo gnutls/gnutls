@@ -197,7 +197,8 @@ typedef struct {
 
 int gnutls_init(gnutls_session * session, gnutls_connection_end con_end);
 void gnutls_deinit(gnutls_session session);
-void _gnutls_deinit(gnutls_session session);
+#define _gnutls_deinit(x) gnutls_deinit(x)
+
 int gnutls_bye( gnutls_session session, gnutls_close_request how);
 
 int gnutls_handshake( gnutls_session session);

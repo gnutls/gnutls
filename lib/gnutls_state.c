@@ -302,15 +302,15 @@ int _gnutls_session_is_resumable( gnutls_session session)
 
 
 /**
-  * _gnutls_deinit - This function clears all buffers associated with the &session
+  * gnutls_deinit - This function clears all buffers associated with the &session
   * @session: is a &gnutls_session structure.
   *
   * This function clears all buffers associated with the &session.
-  * The difference with gnutls_deinit() is that this function will not
-  * interfere with the session database.
+  * This function will also remove session data from the session database
+  * if the session was terminated abnormally.
   *
   **/
-void _gnutls_deinit(gnutls_session session)
+void gnutls_deinit(gnutls_session session)
 {
 
 	if (session==NULL) return;
@@ -379,31 +379,6 @@ void _gnutls_deinit(gnutls_session session)
 	memset( session, 0, sizeof(struct gnutls_session_int));
 	gnutls_free(session);
 }
-
-/**
-  * gnutls_deinit - This function clears all buffers associated with the &session
-  * @session: is a &gnutls_session structure.
-  *
-  * This function clears all buffers associated with the &session.
-  * This function will also remove session data from the session database
-  * if the session was terminated abnormally.
-  *
-  **/
-void gnutls_deinit(gnutls_session session)
-{
-
-	if (session==NULL) return;
-	
-	/* If the session was terminated abnormally then remove
-	 * the session data.
-	 */
-	if (_gnutls_session_is_resumable(session)==RESUME_FALSE) {
-		gnutls_db_remove_session( session);
-	}
-
-	_gnutls_deinit( session);
-}
-
 
 int _gnutls_dh_get_prime_bits( gnutls_session session) 
 {

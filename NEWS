@@ -12,6 +12,8 @@ Version 1.1.10
 - Fixes in openpgp signature verification.
 - certtool has now support for more X.520 DN attribute types.
 - Better handling of EOF in gnutls_record_recv().
+- _gnutls_deinit() is no longer used. Sessions are not
+  automatically removed any more, on abnormal termination.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage
