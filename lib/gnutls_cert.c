@@ -407,7 +407,8 @@ void gnutls_certificate_server_set_select_function(gnutls_session session,
   * handshake, after the certificate request message has been received.
   *
   * The callback function should set the certificate list to be sent, and
-  * return 0 on success.  The value (-1) indicates error and the handshake
+  * return 0 on success. If no certificate was selected then the number of certificates
+  * should be set to zero. The value (-1) indicates error and the handshake
   * will be terminated.
   **/
 void gnutls_certificate_client_set_retrieve_function(gnutls_certificate_credentials cred,
