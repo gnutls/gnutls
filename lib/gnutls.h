@@ -45,10 +45,12 @@ extern GNUTLS_Version GNUTLS_SSL3;
 struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
+/* internal functions */
+ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata, int flags);
+ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata, int flags);
+
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE * state);
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata);
-ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata);
 int gnutls_close(int cd, GNUTLS_STATE state);
 int gnutls_handshake(int cd, GNUTLS_STATE state);
 int gnutls_check_pending(GNUTLS_STATE state);
@@ -69,8 +71,11 @@ int gnutls_is_fatal_error( int error);
 void gnutls_perror( int error);
 char* gnutls_strerror(int error);
 
-#define gnutls_send( x, y, z, w) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
-#define gnutls_recv( x, y, z, w) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
+#define gnutls_send( x, y, z, w, e) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w, e)
+#define gnutls_recv( x, y, z, w, e) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w, e)
+
+#define gnutls_write( x, y, z, w) gnutls_send( x, y, z, w, 0)
+#define gnutls_read( x, y, z, w) gnutls_recv( x, y, z, w, 0)
 
 /* functions to set priority of cipher suites */
 void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...);
@@ -88,13 +93,13 @@ int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_
 int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size);
 
 /* these are deprecated must be replaced by gnutls_errors.h */
-#define GNUTLS_E_MAC_FAILED -1
-#define GNUTLS_E_UNKNOWN_CIPHER -2
-#define GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM -3
-#define GNUTLS_E_UNKNOWN_MAC_ALGORITHM -4
-#define GNUTLS_E_UNKNOWN_ERROR -5
-#define GNUTLS_E_UNKNOWN_CIPHER_TYPE -6
-#define GNUTLS_E_LARGE_PACKET -7
+#define	GNUTLS_E_MAC_FAILED  -1
+#define	GNUTLS_E_UNKNOWN_CIPHER -2
+#define	GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM -3
+#define	GNUTLS_E_UNKNOWN_MAC_ALGORITHM -4
+#define	GNUTLS_E_UNKNOWN_ERROR -5
+#define	GNUTLS_E_UNKNOWN_CIPHER_TYPE -6
+#define	GNUTLS_E_LARGE_PACKET -7
 #define GNUTLS_E_UNSUPPORTED_VERSION_PACKET -8
 #define GNUTLS_E_UNEXPECTED_PACKET_LENGTH -9
 #define GNUTLS_E_INVALID_SESSION -10
@@ -105,3 +110,15 @@ int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *sessi
 #define GNUTLS_E_UNEXPECTED_PACKET -15
 #define GNUTLS_E_WARNING_ALERT_RECEIVED -16
 #define GNUTLS_E_CLOSURE_ALERT_RECEIVED -17
+#define GNUTLS_E_ERROR_IN_FINISHED_PACKET -18
+#define GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET -19
+#define GNUTLS_E_UNKNOWN_KX_ALGORITHM -20
+#define	GNUTLS_E_UNKNOWN_CIPHER_SUITE -21
+#define	GNUTLS_E_UNWANTED_ALGORITHM -22
+#define	GNUTLS_E_MPI_SCAN_FAILED -23
+#define GNUTLS_E_DECRYPTION_FAILED -24
+#define GNUTLS_E_MEMORY_ERROR -25
+#define GNUTLS_E_DECOMPRESSION_FAILED -26
+#define GNUTLS_E_COMPRESSION_FAILED -27
+#define GNUTLS_E_AGAIN -28
+#define GNUTLS_E_UNIMPLEMENTED_FEATURE -50

@@ -59,13 +59,25 @@ char* gnutls_strerror(int error);
 	gnutls_strerror() returns a malloc'ed value thus it must be
 	freed.
 
-ssize_t gnutls_send(int cd, GNUTLS_STATE state, void* data, int sizeofdata);
+ssize_t gnutls_write(int cd, GNUTLS_STATE state, void* data, int sizeofdata);
 	This function has the same semantics as write() has. The only
 	difference is that is accepts a GNUTLS state.
 	
-ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void* data, int sizeofdata);
+ssize_t gnutls_read(int cd, GNUTLS_STATE state, void* data, int sizeofdata);
 	This function has the same semantics as read() has. The only
 	difference is that is accepts a GNUTLS state.
+
+ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void* data, int sizeofdata, int flags);
+	This function has the same semantics as recv() has. The only
+	difference is that is accepts a GNUTLS state. However the
+	only acceptable flag is currently MSG_DONTWAIT. In that case, or
+	if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
+	if there no data in the socket.
+	
+ssize_t gnutls_send(int cd, GNUTLS_STATE state, void* data, int sizeofdata, int flags);
+	This function has the same semantics as send() has. The only
+	difference is that is accepts a GNUTLS state. Currently flags cannot
+	be anything except 0.
 
 int gnutls_check_pending(GNUTLS_STATE state);
 	This function checks if there are any data to receive 

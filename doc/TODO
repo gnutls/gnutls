@@ -1,6 +1,5 @@
-* x509 Certificate API
-* OpenPGP certificate support (through libgcrypt)
+* x509 Certificate API 
 * Make server work (we need certificate API for that!)
-* Add support for v2.0 init packet (why do that anyway ???)
 * Resume old sessions (server side)
-* Non-blocking IO support (send mail to gnutls-dev@gnupg.org if you are interested/want to help)
+* Add support for v2.0 init packet (why do that anyway ???)
+* OpenPGP certificate support (through libgcrypt)

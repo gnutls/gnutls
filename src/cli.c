@@ -76,7 +76,7 @@ int main()
 	gnutls_init(&state, GNUTLS_CLIENT);
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
+	gnutls_set_cipher_priority( state, 3, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL);
 	gnutls_set_compression_priority( state, 1, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
@@ -118,7 +118,7 @@ int main()
 	
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
+	gnutls_set_cipher_priority( state, 3, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR);
 	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
@@ -174,7 +174,7 @@ int main()
 		if (FD_ISSET(sd, &rset)) {
 			bzero(buffer, MAX_BUF);
 
-			ret = gnutls_recv(sd, state, buffer, MAX_BUF);
+			ret = gnutls_read(sd, state, buffer, MAX_BUF);
 			/* remove new line */
 			if (buffer[strlen(buffer)-1]=='\n') buffer[strlen(buffer)-1]='\0';
 			if (gnutls_is_fatal_error(ret) == 1) {
@@ -203,7 +203,7 @@ int main()
 				user_term = 1;
 				continue;
 			}
-			gnutls_send( sd, state, buffer, strlen(buffer));
+			gnutls_write( sd, state, buffer, strlen(buffer));
 		}
 	}
 	if (user_term!=0) gnutls_close(sd, state);

@@ -61,7 +61,7 @@ int main()
     client_len = sizeof(sa_cli);
     for (;;) {
 	gnutls_init(&state, GNUTLS_SERVER);
-	gnutls_set_cipher_priority( state, 2, GNUTLS_RIJNDAEL, GNUTLS_3DES);
+	gnutls_set_cipher_priority( state, 3, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR);
 	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 1, GNUTLS_KX_ANON_DH);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
@@ -85,7 +85,7 @@ int main()
 	fprintf(stderr, "Handshake was completed\n");
 	fprintf(stderr, "Acting as echo server...\n");
 /*	ret =
-	    gnutls_send(sd, state, "hello client",
+	    gnutls_write(sd, state, "hello client",
 			sizeof("hello client"));
 	if (ret < 0) {
 	    close(sd);
@@ -96,7 +96,7 @@ int main()
 */
 	for (;;) {
 	    bzero( buffer, MAX_BUF);
-	    ret = gnutls_recv(sd, state, buffer, MAX_BUF);
+	    ret = gnutls_read(sd, state, buffer, MAX_BUF);
 	    if (gnutls_is_fatal_error(ret) == 1) {
 		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
 		    fprintf(stderr,
@@ -108,7 +108,7 @@ int main()
 		}
 
 	    }
-	    gnutls_send(sd, state, buffer, strlen(buffer));
+	    gnutls_write(sd, state, buffer, strlen(buffer));
 	}
 	fprintf(stderr, "\n");
 	gnutls_close(sd, state);

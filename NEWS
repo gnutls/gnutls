@@ -1,7 +1,8 @@
-Version 0.x.y 
+Version 0.0.6
 - Added client side session resuming
 - Better documentation (check doc/API)
 - Better socket handling (gnutls can be used with select())
+- Some primitive support for non blocking IO and socket options has been added.
 
 Version 0.0.5 (7/12/2000)
 - Added Compression (using ZLIB)

@@ -884,7 +884,7 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 		      sizeof(GNUTLS_CipherSuite), _gnutls_compare_algo);
 
 	for (i = 0; i < count; i++) {
-/*		if (_gnutls_kx_priority
+		if (_gnutls_kx_priority
 		    (state,
 		     _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0)
 			continue;
@@ -897,7 +897,7 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 		     _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i]))
 		    < 0)
 			continue;
-*/
+
 		(*ciphers)[j].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
 		(*ciphers)[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
 		j++;

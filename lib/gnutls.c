@@ -31,6 +31,13 @@
 #include "gnutls_cipher_int.h"
 #include "gnutls_priority.h"
 #include "gnutls_algorithms.h"
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
+
+#ifndef EAGAIN
+# define EAGAIN EWOULDBLOCK
+#endif
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
@@ -342,7 +349,7 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescri
 	memmove(&data[0], &level, 1);
 	memmove(&data[1], &desc, 1);
 
-	return gnutls_send_int(cd, state, GNUTLS_ALERT, data, 2);
+	return gnutls_send_int(cd, state, GNUTLS_ALERT, data, 2, 0);
 
 }
 
@@ -353,7 +360,7 @@ int gnutls_close(int cd, GNUTLS_STATE state)
 	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
 	/* receive the closure alert */
-	gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0); 
+	gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0, 0); 
 
 	state->gnutls_internals.valid_connection = VALID_FALSE;
 
@@ -377,7 +384,7 @@ int gnutls_close_nowait(int cd, GNUTLS_STATE state)
  * It is intended to transfer data, under the current state.    
  */
 #define MAX_ENC_LEN 16384
-ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_data, size_t sizeofdata)
+ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_data, size_t sizeofdata, int flags)
 {
 	uint8 *cipher;
 	int i, cipher_size;
@@ -510,11 +517,13 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
+#define RCVLOWAT 1 /* this is the default for TCP - just don't change that! */
+
 static int _gnutls_clear_peeked_data( int cd, GNUTLS_STATE state) {
 char peekdata;
 
 	/* this was already read by using MSG_PEEK - so it shouldn't fail */
-	_gnutls_Read( cd, &peekdata, 1, 0); 
+	_gnutls_Read( cd, &peekdata, RCVLOWAT, 0); 
 
 	return 0;
 }
@@ -523,13 +532,17 @@ char peekdata;
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current state.
+ * flags is the sockets flags to use. Currently only MSG_DONTWAIT is
+ * supported.
  */
+#define HEADER_SIZE 5
 #define MAX_RECV_SIZE 18432 	/* 2^14+2048 */
-ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata)
+ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata, int flags)
 {
 	uint8 *tmpdata;
 	int tmplen;
 	GNUTLS_Version version;
+	uint8 headers[HEADER_SIZE];
 	uint8 recv_type;
 	uint16 length;
 	uint8 *ciphertext;
@@ -554,28 +567,27 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
-	if ( _gnutls_Read(cd, &recv_type, 1, 0) != 1) {
+	/* in order for GNUTLS_E_AGAIN to be returned the socket
+	 * must be set to non blocking mode
+	 */
+	if ( _gnutls_Read(cd, headers, HEADER_SIZE, MSG_PEEK|flags) != HEADER_SIZE) {
+		if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) return 0; /* we were expecting close notify */
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-	version.local = 0; /* TLS/SSL 3.0 */
-	
-	if (_gnutls_Read(cd, &version.major, 1, 0) != 1) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
 
-	if (_gnutls_Read(cd, &version.minor, 1, 0) != 1) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+	memcpy( &recv_type, &headers[0], 1);
+	memcpy( &version.major, &headers[1], 1);
+	memcpy( &version.minor, &headers[2], 1);
+	version.local = 0; /* TLS/SSL 3.0 */
+
+	memcpy( &length, &headers[3], 2);
+#ifndef WORDS_BIGENDIAN
+	length = byteswap16(length);
+#endif
 
 	if (_gnutls_version_is_supported(state, version) == 0) {
 #ifdef DEBUG
@@ -589,15 +601,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		gnutls_set_current_version(state, version);
 	}
 
-	if (_gnutls_Read(cd, &length, 2, 0) != 2) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-#ifndef WORDS_BIGENDIAN
-	length = byteswap16(length);
-#endif
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Expected Packet[%d] %s(%d) with length: %d\n",
@@ -617,19 +620,39 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	ciphertext = gnutls_malloc(length);
+	ciphertext = gnutls_malloc(length+HEADER_SIZE);
 
-	/* read ciphertext */
+/* check if we have that data into buffer. This seems to be
+ * expensive - but this is the only way to handle Non Blocking IO.
+ */
+	if ( _gnutls_Read(cd, ciphertext, HEADER_SIZE+length, MSG_PEEK|flags) != length+HEADER_SIZE) {
+		gnutls_free(ciphertext);
+		
+		if (errno==EAGAIN) return GNUTLS_E_AGAIN;
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;		
+	}
+/* ok now we are sure that we can read all the data - so
+ * move on !
+ */
+	_gnutls_Read(cd, headers, HEADER_SIZE, 0); /* read and clear the headers - again! */
 
+/* Read the whole packet - again? */	
 	if ( type==GNUTLS_APPLICATION_DATA) {
 		/* get the data - but do not free the buffer in the kernel */
-		ret = _gnutls_Read(cd, ciphertext, length-1, 0);
+		ret = _gnutls_Read(cd, ciphertext, length-RCVLOWAT, 0);
 		if (ret>=0)
-			ret += _gnutls_Read(cd, &ciphertext[length-1], 1, MSG_PEEK);
-	} else {
+			ret += _gnutls_Read(cd, &ciphertext[length-RCVLOWAT], RCVLOWAT, MSG_PEEK);
+
+	} else { /* our - internal data */
 		ret = _gnutls_Read(cd, ciphertext, length, 0);
 	}
 
+	/* Oooops... very rare case since we know that the system HAD 
+	 * received that data.
+	 */
 	if (ret != length) {
 #ifdef DEBUG
 		fprintf(stderr, "Received packet with length: %d\nExpected %d\n", ret, length);
@@ -709,8 +732,14 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			/* this packet is now handled above */
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET;
-
+		case GNUTLS_APPLICATION_DATA:
+			/* even if data is unexpected put it into the buffer */
+			gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen);
+			break;
 		default:
+#ifdef DEBUG
+			fprintf(stderr, "Received Unknown packet %d expecting %d\n", recv_type, type);
+#endif
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_ERROR;
 		}
@@ -734,12 +763,12 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		}
 		gnutls_free(tmpdata);
 	} else {
-		if (recv_type != type) {
+		if (recv_type != GNUTLS_APPLICATION_DATA) {
 			gnutls_assert();
 			return GNUTLS_E_RECEIVED_BAD_MESSAGE;
+		} else {
+			ret = 0; /* ok */
 		}
-		gnutls_assert(); /* this shouldn't have happened */
-		ret = GNUTLS_E_RECEIVED_BAD_MESSAGE;
 	}
 
 	return ret;

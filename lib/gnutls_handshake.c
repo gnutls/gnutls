@@ -684,15 +684,15 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		z = 1;
 		x = _gnutls_supported_ciphersuites(state, &cipher_suites);
 		for (i = 0; i < x; i++) {
-			if (memcmp
-			    (&cipher_suites[i], cipher_suite.CipherSuite,
-			     2) == 0) {
+			if (memcmp (&cipher_suites[i], cipher_suite.CipherSuite, 2) == 0) {
 				z = 0;
-
 			}
 		}
-		if (z != 0)
+		if (z != 0) {
+			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		}
+			
 		memmove(state->gnutls_internals.
 			current_cipher_suite.CipherSuite,
 			cipher_suite.CipherSuite, 2);
@@ -960,7 +960,7 @@ int ret=0;
 
 		ret =
 		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
-				    NULL, 0);
+				    NULL, 0, 0);
 		if (ret < 0) {
 			ERR("recv ChangeCipherSpec", ret);
 			gnutls_clearHashDataBuffer( state);

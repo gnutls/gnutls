@@ -197,7 +197,7 @@ ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, void *ipt
 
 	left = n;
 	while (left > 0) {
-		i = gnutls_send_int(fd, state, type, &ptr[i], left);
+		i = gnutls_send_int(fd, state, type, &ptr[i], left, 0);
 		if (i <= 0) {
 			return i;
 		}
@@ -216,7 +216,7 @@ ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, void *ipt
 
 	left = sizeOfPtr;
 	while (left > 0) {
-		i = gnutls_recv_int(fd, state, type, &ptr[i], left);
+		i = gnutls_recv_int(fd, state, type, &ptr[i], left, 0);
 		if (i < 0) {
 			return i;
 		} else {
