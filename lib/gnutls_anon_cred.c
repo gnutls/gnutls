@@ -26,6 +26,8 @@
 #include "gnutls_num.h"
 #include "gnutls_gcry.h"
 
+const static int anon_tmp;
+
 /**
   * gnutls_anon_free_server_sc - Used to free an allocated GNUTLS_ANON_SERVER_CREDENTIALS structure
   * @sc: is an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
@@ -35,7 +37,7 @@
   * the structure.
   **/
 void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
-	gnutls_free(sc);
+	return;
 }
 
 /**
@@ -47,26 +49,10 @@ void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
   * the structure.
   **/
 int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
-	*sc = gnutls_malloc(sizeof( ANON_SERVER_CREDENTIALS_INT));
-	
-	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
+	*sc = &anon_tmp;
 	return 0;
 }
 
-/**
-  * gnutls_anon_set_server_cred - Used to set the number of bits to use in DH, in a GNUTLS_ANON_SERVER_CREDENTIALS structure
-  * @res: is an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
-  * @dh_bits: is the number of bits in DH key exchange
-  *
-  * Used to set the number of bits to use in an anonymous Diffie-Hellman, 
-  * key exchange.
-  *
-  **/
-
-int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits) {
-	res->dh_bits = dh_bits;
-	return 0;
-}
 
 /**
   * gnutls_anon_free_client_sc - Used to free an allocated GNUTLS_ANON_CLIENT_CREDENTIALS structure
@@ -80,7 +66,6 @@ void gnutls_anon_free_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS sc) {
 	return;
 }
 
-const static int anon_tmp;
 
 /**
   * gnutls_allocate_anon_client_sc - Used to allocate an GNUTLS_ANON_CLIENT CREDENTIALS structure
@@ -96,6 +81,5 @@ int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
 	 */
 	*sc = (void*) &anon_tmp;
 	
-	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 	return 0;
 }

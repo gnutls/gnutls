@@ -500,8 +500,11 @@ typedef struct {
 	x509pki_client_cert_callback_func*	client_cert_callback;
 	x509pki_server_cert_callback_func*	server_cert_callback;
 
-	/* how may bits to use for DHE? */
-	int				dhe_bits;
+	/* bits to use for DHE and DHA 
+	 * use _gnutls_dh_get_bits() and gnutls_dh_set_bits() 
+	 * to access it.
+	 */
+	int				dh_bits;
 	
 	int				max_handshake_data_buffer_size;
 

@@ -25,5 +25,5 @@ int _gnutls_dh_generate_prime(MPI *ret_g, MPI* ret_n, int bits);
 void _gnutls_dh_clear_mpis(void);
 int _gnutls_dh_calc_mpis(void);
 
-
-#define DEFAULT_BITS 1024
+int _gnutls_dh_get_bits( GNUTLS_STATE);
+void gnutls_dh_set_bits( GNUTLS_STATE state, int bits);

@@ -96,3 +96,10 @@ MPI gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 	gcry_mpi_powm(k, f, x, prime);
 	return k;
 }
+
+/* returns the bits the user requested for DH key exchange.
+ */
+int _gnutls_dh_get_bits(GNUTLS_STATE state)
+{
+	return state->gnutls_internals.dh_bits;
+}

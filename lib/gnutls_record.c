@@ -36,6 +36,7 @@
 #include "gnutls_datum.h"
 #include "ext_max_record.h"
 #include <gnutls_alert.h>
+#include <gnutls_dh.h>
 
 /**
   * gnutls_protocol_get_version - Returns the version of the currently used protocol
@@ -141,6 +142,8 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	(*state)->gnutls_internals.resumed = RESUME_FALSE;
 
 	(*state)->gnutls_internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
+
+	gnutls_dh_set_bits( (*state), MIN_BITS);
 
 	gnutls_transport_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 

@@ -137,6 +137,39 @@ AC_MSG_RESULT([***
 AC_C_CONST
 AC_C_INLINE
 
+if test $ac_cv_c_compiler_gnu != no; then
+
+	if test x$opt_profiler_mode = xyes; then
+	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -finstrument-functions -ftest-coverage"
+	  AC_CHECK_LIB(fnccheck, main,
+		LIBS="$LIBS -lfnccheck",
+		AC_MSG_ERROR("You must install libfnccheck in order to enable profiling. http://www710.univ-lyon1.fr/~yperret/fnccheck/profiler.html")
+	  )
+	fi
+
+	if test x$opt_maintainer_mode = xyes; then
+
+	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
+	else
+	  CFLAGS="${CFLAGS} -O2"
+	fi
+
+	if test x$opt_dmalloc_mode = xyes; then
+	  AC_CHECK_LIB( dmalloc, main)
+	  AC_DEFINE(USE_DMALLOC)
+	fi
+
+	AC_MSG_CHECKING([whether we have GNU assembler])
+	
+	GAS=`as --version < /dev/null|grep GNU`
+	if test "$GAS"; then
+	  CFLAGS="${CFLAGS} -pipe"
+	  AC_MSG_RESULT(yes)
+	else
+	  AC_MSG_RESULT(no)
+	fi
+fi
+
 
 AC_MSG_RESULT([***
 *** Detecting C library capabilities...
@@ -212,40 +245,6 @@ LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
-if test $ac_cv_c_compiler_gnu != no; then
-	CFLAGS=""
-
-
-	if test x$opt_profiler_mode = xyes; then
-	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -finstrument-functions -ftest-coverage"
-	  AC_CHECK_LIB(fnccheck, main,
-		LIBS="$LIBS -lfnccheck",
-		AC_MSG_ERROR("You must install libfnccheck in order to enable profiling. http://www710.univ-lyon1.fr/~yperret/fnccheck/profiler.html")
-	  )
-	fi
-
-	if test x$opt_maintainer_mode = xyes; then
-
-	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
-	else
-	  CFLAGS="${CFLAGS} -O2"
-	fi
-
-	if test x$opt_dmalloc_mode = xyes; then
-	  AC_CHECK_LIB( dmalloc, main)
-	  AC_DEFINE(USE_DMALLOC)
-	fi
-
-	AC_MSG_CHECKING([whether we have GNU assembler])
-	
-	GAS=`as --version < /dev/null|grep GNU`
-	if test "$GAS"; then
-	  CFLAGS="${CFLAGS} -pipe"
-	  AC_MSG_RESULT(yes)
-	else
-	  AC_MSG_RESULT(no)
-	fi
-fi
 
 AC_CONFIG_FILES(lib/gnutls.h.in)
 

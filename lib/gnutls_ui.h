@@ -55,8 +55,8 @@ const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
 
 int gnutls_dh_get_dha_bits( GNUTLS_STATE state);
 
-void gnutls_dh_set_dhe_bits( GNUTLS_STATE state, int bits);
-int gnutls_dh_get_dhe_bits( GNUTLS_STATE);
+void gnutls_dh_set_bits( GNUTLS_STATE state, int bits);
+int gnutls_dh_get_bits( GNUTLS_STATE);
 
 /* X509PKI */
 

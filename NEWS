@@ -2,8 +2,10 @@ Version ?.?.?
 - gnutls_check_pending() was renamed to gnutls_record_check_pending()
 - Key exchange methods changed so they do not depend on the Certificate
   type (GNUTLS_KX_X509PKI_* renamed to GNUTLS_KX_*)
-- Renamed gnutls_x509pki_s/get_dh_bits() to gnutls_dh_s/get_dhe_bits()
-- Renamed gnutls_anon_server/client_get_dh_bits() to gnutls_dh_get_dha_bits()
+- Combined gnutls_x509pki_(set/get)_dh_bits() and gnutls_anon_server/client_get_dh_bits()
+  to gnutls_dh_(set/get)_bits()
+- gnutls_anon_set_server_cred() was deprecated by gnutls_dh_set_bits()
+- gnutls_x509pki_set_trust_(file/mem) can now be called multiple times
 
 Version 0.3.3
 - Added gnutls_x509pki_verify_certificate()

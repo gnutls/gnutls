@@ -72,14 +72,8 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_X;
-	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
 
-	cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_ANON, NULL);
-	if (cred==NULL) {
-		bits = DEFAULT_BITS; /* default */
-	} else {
-		bits = cred->dh_bits;
-	}
+	bits = _gnutls_dh_get_bits( state);
 
 	g = gnutls_get_dh_params(&p, bits);
 	if (g==NULL || p==NULL) {
@@ -265,14 +259,8 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	size_t _n_Y;
 	MPI g, p;
 	int bits, ret;
-	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
 
-	cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_ANON, NULL);
-	if (cred==NULL) {
-		bits = DEFAULT_BITS; /* default */
-	} else {
-		bits = cred->dh_bits;
-	}
+	bits = _gnutls_dh_get_bits( state);
 
 	DECR_LEN( data_size, 2);
 	n_Y = READuint16( &data[0]);

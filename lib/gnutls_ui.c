@@ -55,23 +55,52 @@ const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
 /* ANON */
 
 /**
-  * gnutls_dh_get_dha_bits - This function returns the bits used in anonymous DH authentication
+  * gnutls_dh_set_bits - Used to set the bits for a DH ciphersuite
+  * @state: is a &GNUTLS_STATE structure.
+  * @bits: is the number of bits
+  *
+  * This function sets the number of bits, for use in an 
+  * Diffie Hellman key exchange. This is used both in DHE and
+  * DH anonymous cipher suites.
+  *
+  **/
+void gnutls_dh_set_bits(GNUTLS_STATE state, int bits)
+{
+	state->gnutls_internals.dh_bits = bits;
+}
+
+/**
+  * gnutls_dh_get_bits - This function returns the bits used in DH authentication
   * @state: is a gnutls state
   *
-  * This function will return the bits used in the anonymous Diffie Hellman authentication
+  * This function will return the bits used in the last Diffie Hellman authentication
   * with the peer. Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_dha_bits(GNUTLS_STATE state)
+int gnutls_dh_get_bits(GNUTLS_STATE state)
 {
-	ANON_SERVER_AUTH_INFO info;
+	switch( gnutls_auth_get_type( state)) {
+		case GNUTLS_ANON: {
+			ANON_SERVER_AUTH_INFO info;
 
-	CHECK_AUTH(GNUTLS_ANON, GNUTLS_E_INVALID_REQUEST);
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+			return info->dh_bits;
+		}
+		case GNUTLS_X509PKI: {
+			X509PKI_AUTH_INFO info;
 
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
-	return info->dh_bits;
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+
+			return info->dh_bits;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+	}
 }
 
 /* X509PKI */
@@ -100,30 +129,6 @@ const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state,
 	*list_size = info->ncerts;
 	return info->raw_certificate_list;
 }
-
-
-/**
-  * gnutls_dh_get_dhe_bits - This function returns the number of bits used in a DHE handshake
-  * @state: is a gnutls state
-  *
-  * This function will return the number of bits used in a Diffie Hellman Handshake. This will only
-  * occur in case of DHE_* ciphersuites. The return value may be zero if no applicable ciphersuite was
-  * used.
-  * Returns a negative value in case of an error.
-  *
-  **/
-int gnutls_dh_get_dhe_bits(GNUTLS_STATE state)
-{
-	X509PKI_AUTH_INFO info;
-
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
-	return info->dh_bits;
-}
-
 
 
 /**
