@@ -10,11 +10,13 @@
 # This will read a 'c' file and scan for embedded comments in the
 # style of gnome comments (+minor extensions - see below).
 #
+# This program is modified by Nikos Mavroyanopoulos, for the gnutls
+# project.
 
 # Note: This only supports 'c'.
 
 # usage:
-# gdoc [ -docbook | -html | -text | -man ]
+# gdoc [ -docbook | -html | -text | -man | -tex ]
 #      [ -function funcname [ -function funcname ...] ] c file(s)s > outputfile
 #
 #  Set output format using one of -docbook -html -text or -man.  Default is man.
@@ -339,6 +341,9 @@ sub output_tex {
 	$sec = $args{'sections'}{$section};
 	$sec =~ s/_/\\_/g;
 	$sec =~ s/&/\\&/g;
+	$sec =~ s/->/\$\\rightarrow\$/g;
+	$sec =~ s/([0-9]+)\^([0-9]+)/\$\{\1\}\^\{\2\}\$/g;
+
 	output_highlight($sec);
 	print "\\end{rmfamily}\n";
     }

@@ -1158,7 +1158,7 @@ size_t gnutls_get_max_record_size( GNUTLS_STATE state) {
   * This property can only be set to clients. The server may
   * choose not to accept the requested size.
   *
-  * Acceptable values are $2^{9}, 2^{10}, 2^{11}$ and $2^{12}$.
+  * Acceptable values are 2^9, 2^10, 2^11 and 2^12.
   * Returns 0 on success. The requested record size does not
   * get in effect immediately. It will be used after a successful
   * handshake.

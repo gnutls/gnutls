@@ -897,35 +897,35 @@ _asn1_append_sequence_set(node_asn *node)
   * 
   * Examples:  description for each type
   *   INTEGER: VALUE must contain a two's complement form integer.
-  *            value[0]=0xFF ,               len=1 $\rightarrow$ integer=-1
-  *            value[0]=0xFF value[1]=0xFF , len=2 $\rightarrow$ integer=-1
-  *            value[0]=0x01 ,               len=1 $\rightarrow$ integer= 1
-  *            value[0]=0x00 value[1]=0x01 , len=2 $\rightarrow$ integer= 1
-  *            value="123"                 , len=0 $\rightarrow$ integer= 123
+  *            value[0]=0xFF ,               len=1 -> integer=-1
+  *            value[0]=0xFF value[1]=0xFF , len=2 -> integer=-1
+  *            value[0]=0x01 ,               len=1 -> integer= 1
+  *            value[0]=0x00 value[1]=0x01 , len=2 -> integer= 1
+  *            value="123"                 , len=0 -> integer= 123
   *   ENUMERATED: as INTEGER (but only with not negative numbers)
   *   BOOLEAN: VALUE must be the null terminated string "TRUE" or "FALSE" and LEN != 0
-  *            value="TRUE" , len=1 $\rightarrow$ boolean=TRUE
-  *            value="FALSE" , len=1 $\rightarrow$ boolean=FALSE
+  *            value="TRUE" , len=1 -> boolean=TRUE
+  *            value="FALSE" , len=1 -> boolean=FALSE
   *   OBJECT IDENTIFIER: VALUE must be a null terminated string with each number separated by
   *                      a blank (e.g. "1 2 3 543 1"). 
   *                      LEN != 0
-  *            value="1 2 840 10040 4 3" , len=1 $\rightarrow$ OID=dsa-with-sha
+  *            value="1 2 840 10040 4 3" , len=1 -> OID=dsa-with-sha
   *   UTCTime: VALUE must be a null terminated string in one of these formats:
   *            "YYMMDDhhmmssZ" "YYMMDDhhmmssZ" "YYMMDDhhmmss+hh'mm'" "YYMMDDhhmmss-hh'mm'"
   *            "YYMMDDhhmm+hh'mm'" "YYMMDDhhmm-hh'mm'".  
   *            LEN != 0
-  *            value="9801011200Z" , len=1 $\rightarrow$ time=Jannuary 1st, 1998 at 12h 00m  Greenwich Mean Time
+  *            value="9801011200Z" , len=1 -> time=Jannuary 1st, 1998 at 12h 00m  Greenwich Mean Time
   *   GeneralizedTime: VALUE must be in one of this format:
   *                    "YYYYMMDDhhmmss.sZ" "YYYYMMDDhhmmss.sZ" "YYYYMMDDhhmmss.s+hh'mm'" 
   *                    "YYYYMMDDhhmmss.s-hh'mm'" "YYYYMMDDhhmm+hh'mm'" "YYYYMMDDhhmm-hh'mm'" 
   *                    where ss.s indicates the seconds with any precision like "10.1" or "01.02".
   *                    LEN != 0
-  *            value="2001010112001.12-0700" , len=1 $\rightarrow$ time=Jannuary 1st, 2001 at 12h 00m 01.12s 
+  *            value="2001010112001.12-0700" , len=1 -> time=Jannuary 1st, 2001 at 12h 00m 01.12s 
   *                                                     Pacific Daylight Time
   *   OCTET STRING: VALUE contains the octet string and LEN is the number of octet.
-  *            value="$\backslash$x01$\backslash$x02$\backslash$x03" , len=3  $\rightarrow$ three bytes octet string
+  *            value="$\backslash$x01$\backslash$x02$\backslash$x03" , len=3  -> three bytes octet string
   *   BIT STRING: VALUE contains the bit string organized by bytes and LEN is the number of bits.
-  *            value="$\backslash$xCF" , len=6 $\rightarrow$ bit string="110011" (six bits)
+  *            value="$\backslash$xCF" , len=6 -> bit string="110011" (six bits)
   *   CHOICE: if NAME indicates a choice type, VALUE must specify one of the alternatives with a
   *           null terminated string. LEN != 0
   *           Using "pkix.asn":
@@ -1204,8 +1204,8 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   * 
   * Examples: a description for each type
   *   INTEGER: VALUE will contain a two's complement form integer.
-  *            integer=-1  $\rightarrow$ value[0]=0xFF , len=1
-  *            integer=1   $\rightarrow$ value[0]=0x01 , len=1
+  *            integer=-1  -> value[0]=0xFF , len=1
+  *            integer=1   -> value[0]=0x01 , len=1
   *   ENUMERATED: as INTEGER (but only with not negative numbers)
   *   BOOLEAN: VALUE will be the null terminated string "TRUE" or "FALSE" and LEN=5 or LEN=6
   *   OBJECT IDENTIFIER: VALUE will be a null terminated string with each number separated by
