@@ -40,29 +40,17 @@
 */
 
 
-/* This function should return a resonable size for X
- * (DH secret key). The input is the number of bits of 
- * the modulus.
- * FIXME: This function is not correct
- */
-static int get_x_size(int bits)
-{
-	if (bits <= 2048)
-		return 512;
-	if (bits <= 4096)
-		return 768;
-	return 1024;
-}
-
 /* returns the public value (X), and the secret (ret_x).
  */
 GNUTLS_MPI gnutls_calc_dh_secret(GNUTLS_MPI * ret_x, GNUTLS_MPI g, GNUTLS_MPI prime)
 {
 	GNUTLS_MPI e, x;
-	int x_size = get_x_size(_gnutls_mpi_get_nbits(prime));
+	int x_size = _gnutls_mpi_get_nbits(prime) - 1;
+	/* The size of the secret key is less than
+	 * prime/2
+	 */
 
-
-	x = _gnutls_mpi_new(x_size);	/* FIXME: allocate in secure memory */
+	x = _gnutls_mpi_new(x_size);
 	if (x == NULL) {
 		gnutls_assert();
 		if (ret_x)
@@ -71,8 +59,9 @@ GNUTLS_MPI gnutls_calc_dh_secret(GNUTLS_MPI * ret_x, GNUTLS_MPI g, GNUTLS_MPI pr
 		return NULL;
 	}
 
-	_gnutls_mpi_randomize(x, x_size, GCRY_STRONG_RANDOM);
-	/* fixme: set high bit of x and select a larger one */
+	/* x_size-7 is there to overcome a bug in libgcrypt
+	 */
+	_gnutls_mpi_randomize(x, x_size-7, GCRY_STRONG_RANDOM);
 
 	e = _gnutls_mpi_alloc_like(prime);
 	if (e == NULL) {
