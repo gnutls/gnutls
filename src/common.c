@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <gnutls.h>
 
-#define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
+#define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
 	PRINTX( "OU:", X.organizational_unit_name); \
 	PRINTX( "O:", X.organization); \
@@ -42,7 +42,7 @@ void print_x509_info(GNUTLS_STATE state)
 			sprintf(print, "%.2x ", (unsigned char) digest[i]);
 			print += 3;
 		}
-		printf(" - Certificate fingerprint: %s\n", printable);
+		printf(" # Certificate fingerprint: %s\n", printable);
 	}
 
 	/* Print the serial number of the certificate.
@@ -55,20 +55,20 @@ void print_x509_info(GNUTLS_STATE state)
 			sprintf(print, "%.2x ", (unsigned char) serial[i]);
 			print += 3;
 		}
-		printf(" - Certificate serial number: %s\n", printable);
+		printf(" # Certificate serial number: %s\n", printable);
 	}
 
 	/* Print the version of the X.509 
 	 * certificate.
 	 */
-	printf(" - Certificate version: #%d\n",
+	printf(" # Certificate version: #%d\n",
 	       gnutls_x509_extract_certificate_version(&cert_list[0]));
 
 	gnutls_x509_extract_certificate_dn(&cert_list[0], &dn);
 	PRINT_DN(dn);
 
 	gnutls_x509_extract_certificate_issuer_dn(&cert_list[0], &dn);
-	printf(" - Certificate Issuer's info:\n");
+	printf(" # Certificate Issuer's info:\n");
 	PRINT_DN(dn);
 
 }
@@ -96,10 +96,10 @@ void print_openpgp_info(GNUTLS_STATE state)
 				print += 3;
 			}
 
-			printf(" - PGP Key version: %d\n", 
+			printf(" # PGP Key version: %d\n", 
 				gnutls_openpgp_extract_key_version(&cert_list[0]));
 
-			printf(" - PGP Key fingerprint: %s\n",
+			printf(" # PGP Key fingerprint: %s\n",
 			       printable);
 
 			gnutls_openpgp_extract_key_name(&cert_list
@@ -116,23 +116,24 @@ void print_cert_vrfy(GNUTLS_STATE state)
 
 	GNUTLS_CertificateStatus status;
 	status = gnutls_certificate_verify_peers(state);
+	printf("\n");
 
 	switch (status) {
 	case GNUTLS_CERT_NOT_TRUSTED:
-		printf("- Peer's Certificate was NOT verified\n");
+		printf("- Peer's certificate was NOT verified\n");
 		break;
 	case GNUTLS_CERT_EXPIRED:
 		printf
-		    ("- Peer's Certificate was verified but is expired\n");
+		    ("- Peer's certificate was verified but is expired\n");
 		break;
 	case GNUTLS_CERT_TRUSTED:
-		printf("- Peer's Certificate was verified\n");
+		printf("- Peer's certificate was verified\n");
 		break;
 	case GNUTLS_CERT_NONE:
-		printf("- Peer did not send any Certificate.\n");
+		printf("- Peer did not send any certificate.\n");
 		break;
 	case GNUTLS_CERT_CORRUPTED:
-		printf("- Peer's Certificate was corrupted\n");
+		printf("- Peer's certificate was corrupted.\n");
 		break;
 	default:
 		printf("- Invalid status of peer's certificate.\n");

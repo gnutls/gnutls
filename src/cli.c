@@ -88,12 +88,11 @@ static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, 
 }
 
 const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
+const int kx_priority[] = { GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
 const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
-const int cert_type_priority[] = { GNUTLS_CRT_OPENPGP, 0 };
-//const int cert_type_priority[] = { GNUTLS_CRT_OPENPGP, GNUTLS_CRT_OPENPGP, 0 };
+const int cert_type_priority[] = { GNUTLS_CRT_OPENPGP, GNUTLS_CRT_X509, 0 };
 
 
 int main(int argc, char** argv)

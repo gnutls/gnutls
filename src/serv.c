@@ -151,6 +151,11 @@ void peer_print_info( GNUTLS_STATE state)
 	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
 	sprintf(tmp2, "Protocol version: <b>%s</b><br>\n", tmp);
 
+	if ( gnutls_auth_get_type( state) == GNUTLS_CRD_CERTIFICATE) {
+		tmp = gnutls_cert_type_get_name( gnutls_cert_type_get(state));
+		sprintf(tmp2, "Certificate Type: <b>%s</b><br>\n", tmp);
+	}
+	
 	tmp = gnutls_kx_get_name(gnutls_kx_get(state));
 	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
 
@@ -412,7 +417,6 @@ int main(int argc, char **argv)
 		close(sd);
 		gnutls_deinit(state);
 
-		break;
 	}
 	close(listen_sd);
 
