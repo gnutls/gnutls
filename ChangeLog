@@ -1,3 +1,38 @@
+2003-11-30 22:27  nmav <nmav@gnutls.org>
+
+	* src/: tests.c, tests.h, tls_test.c:
+
+	added detection for ZLIB compression.  
+
+2003-11-30 15:08  nmav <nmav@gnutls.org>
+
+	* src/: tests.c, tls_test.c:
+
+	improved srp detection.  
+
+2003-11-30 15:00  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/srp.tex, lib/gnutls_cipher.c, src/cli.c:
+
+	Some fixes in the certificate authenticated SRP ciphersuites.  
+
+2003-11-30 13:58  nmav <nmav@gnutls.org>
+
+	* doc/README.autoconf, lib/gnutls_alert.c, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, lib/gnutls_handshake.c, src/serv-gaa.c,
+	src/serv.c:
+
+	some fixes to comply with the SRP draft. The handshake is now
+	repeated if an empty SRP username is received.  
+
+2003-11-30 06:36  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/srp.tex, lib/gnutls_anon_cred.c, lib/gnutls_cert.c,
+	lib/gnutls_x509.c, lib/libgnutls.vers, lib/x509_b64.c,
+	src/common.c, src/crypt.c:
+
+	several corrections in the documentation.  
+
 2003-11-27 22:01  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/Makefile.am (tags: gnutls_0_9_99),
