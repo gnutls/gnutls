@@ -1,3 +1,11 @@
+2003-02-13 09:23  nmav <nmav@gnutls.org>
+
+	* README, doc/TODO, lib/auth_cert.c, lib/gnutls_int.h,
+	lib/gnutls_state.c, lib/gnutls_x509.c:
+
+	Added option to allow an X.509 server not to send the trusted CA
+	list to the peer.  
+
 2003-02-12 13:30  nmav <nmav@gnutls.org>
 
 	* lib/Makefile.am, src/tests.c, src/tests.h, src/tls_test.c:
