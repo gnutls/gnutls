@@ -15,3 +15,10 @@ asn1-api.tex
 *.pl
 cover.tex
 error_codes.tex
+*.bbl
+*.blg
+*.idx
+*.ilg
+*.ind
+pgp-api.tex
+x509-api.tex

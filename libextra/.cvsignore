@@ -1,0 +1,9 @@
+.deps
+.libs
+Makefile
+Makefile.in
+gnutls-extra-api.tex
+libgnutls-extra-config
+libgnutls-extra.la
+libgnutls-openssl.la
+*.lo
