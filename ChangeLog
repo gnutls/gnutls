@@ -1,3 +1,9 @@
+2004-04-22 17:08  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, lib/gnutls_record.c:
+
+	allow unexpected handshake requests by the client.  
+
 2004-04-19 20:22  nmav <nmav@gnutls.org>
 
 	* src/Makefile.am:
