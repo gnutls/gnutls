@@ -836,6 +836,7 @@ int main(int argc, char **argv)
 			check_alert(j->tls_session, r);
 			/* nothing */
 		    } else if (r < 0 && gnutls_error_is_fatal(r) == 1) {
+			check_alert(j->tls_session, r);
 			fprintf(stderr, "Error in handshake\n");
 			GERR(r);
 
@@ -920,6 +921,7 @@ int main(int argc, char **argv)
 			int ret;
 
 			j->http_state = HTTP_STATE_CLOSING;
+			check_alert(j->tls_session, r);
 			fprintf(stderr, "Error in handshake\n");
 			GERR(r);
 
