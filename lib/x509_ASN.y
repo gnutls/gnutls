@@ -37,6 +37,10 @@ extern int parse_mode;   /* PARSE_MODE_CHECK  = only syntax check
 int result_parse;        /* result of the parser algorithm */
 node_asn *p_tree;        /* pointer to the root of the structure 
                             created by the parser*/     
+
+int yyerror (char *);
+int yylex();
+
 %}
 
 
@@ -546,7 +550,7 @@ int asn1_parser_asn1_file_c(char *file_name){
     yyparse();
 
     /* structure saved in a file */
-    result=_asn1_create_static_structure(p_tree,file_name);
+    result=_asn1_create_static_structure(p_tree,file_name,NULL);
 
     /* delete structure in memory */
     asn1_delete_structure(p_tree);
@@ -573,6 +577,7 @@ int yyerror (char *s)
   /* Sends the error description to the std_out */
   /*  printf("%s\n",s); */
   result_parse=ASN_SYNTAX_ERROR;
+  return 0;
 }
 
 

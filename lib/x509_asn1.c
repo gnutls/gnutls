@@ -30,6 +30,8 @@
 #include "x509_asn1.h" 
 #include "x509_der.h"
 
+
+
 /* define used for visiting trees */
 #define UP     1
 #define RIGHT  2
@@ -266,8 +268,6 @@ _asn1_mod_type(node_asn *node,unsigned int value)
 void
 _asn1_remove_node(node_asn *node)
 {
-  node_asn *punt,*punt_prev;
-
   if(node==NULL) return;
 
   if (node->name!=NULL)
@@ -520,7 +520,7 @@ _asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name)
 
   char_p=file_name;
   slash_p=file_name;
-  while(char_p=strchr(char_p,'/')){
+  while((char_p=strchr(char_p,'/'))){
     char_p++;
     slash_p=char_p;
   }
@@ -528,7 +528,7 @@ _asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name)
   char_p=slash_p;
   dot_p=file_name+strlen(file_name);
 
-  while(char_p=strchr(char_p,'.')){
+  while((char_p=strchr(char_p,'.'))){
     dot_p=char_p;
     char_p++;
   }
@@ -610,8 +610,6 @@ asn1_visit_tree(node_asn *pointer,char *name)
 {
   node_asn *p,*root;
   int k,indent=0,len,len2,len3;
-  unsigned char class;
-  unsigned long tag;
 
   root=_asn1_find_node(pointer,name);   
 
@@ -663,8 +661,8 @@ asn1_visit_tree(node_asn *pointer,char *name)
     case TYPE_BOOLEAN:
       printf("BOOLEAN");
       if(p->value){
-	if(p->value[0]=='T') printf("  value:TRUE",p->value);
-	else if(p->value[0]=='F') printf("  value:FALSE",p->value);
+	if(p->value[0]=='T') printf("  value:TRUE");
+	else if(p->value[0]=='F') printf("  value:FALSE");
       }
       break;
     case TYPE_SEQUENCE:
@@ -1082,9 +1080,8 @@ int
 asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 {
   node_asn *node,*p,*p2;
-  unsigned char *temp,*value_temp,*default_temp,val[4];
+  unsigned char *temp,*value_temp,*default_temp;
   int len2,k,k2,negative;
-  unsigned char *root,*n_end;
 
   node=_asn1_find_node(node_root,name);
   if(node==NULL) return  ASN_ELEMENT_NOT_FOUND;
@@ -1364,8 +1361,6 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
 {
   node_asn *node,*p;
   int len2,len3;
-  unsigned long tag;
-  unsigned char class;
   int value_size = *len;
 
   node=_asn1_find_node(root,name);
@@ -1416,12 +1411,13 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
       while(p){
 	if(type_field(p->type)==TYPE_CONSTANT){
 	  ADD_STR_VALUE( value, value_size, p->value);
-	  if(p->right) ADD_STR_VALUE( value, value_size, " ");
+	  if(p->right) {
+	  	ADD_STR_VALUE( value, value_size, " ");
+	  }
 	}
 	p=p->right;
       }
-    } 
-    else {
+    } else {
       PUT_STR_VALUE(value, value_size, node->value);
     }
     break;
@@ -1547,10 +1543,9 @@ _asn1_check_identifier(node_asn *node)
 int 
 _asn1_change_integer_value(node_asn *node)
 {
-  node_asn *p,*p2;
-  char negative;
-  unsigned char val[4],val2[5],temp;
-  int len,k,force_exit;
+  node_asn *p;
+  unsigned char val[4],val2[5];
+  int len;
 
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
 
@@ -1821,7 +1816,7 @@ int
 _asn1_expand_object_id(node_asn *node)
 {
   node_asn *p,*p2,*p3,*p4,*p5;
-  char name_root[129],name2[129],*c;
+  char name_root[129],name2[129];
   int move;
  
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;

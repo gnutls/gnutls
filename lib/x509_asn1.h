@@ -160,6 +160,23 @@ _asn1_find_node(node_asn *pointer,char *name);
 node_asn *
 _asn1_find_up(node_asn *node);
 
+int 
+_asn1_append_sequence_set(node_asn *node);
+
+int 
+_asn1_delete_not_used(node_asn *node);
+
+int 
+_asn1_set_default_tag(node_asn *node);
+
+/* prototypes - not defined elsewere */
+int _asn1_change_integer_value(node_asn *node);
+int _asn1_expand_object_id(node_asn *node);
+int _asn1_expand_identifier(node_asn **node,node_asn *root);
+int _asn1_type_choice_config(node_asn *node);
+int _asn1_type_set_config(node_asn *node);
+int _asn1_check_identifier(node_asn *node);
+int _asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name);
 
 int 
 asn1_parser_asn1(char *file_name,node_asn **pointer);

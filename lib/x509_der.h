@@ -37,6 +37,14 @@ asn1_get_der(node_asn *root,unsigned char *der,int len);
 int 
 asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_element,int *start, int *end);
 
+unsigned long
+_asn1_get_length_der(unsigned char *der,int  *len);
+
+void
+_asn1_length_der(unsigned long len,unsigned char *ans,int *ans_len);
+
+char *
+_asn1_ltostr(long v,char *str);
 
 #endif
 

@@ -46,7 +46,7 @@
 char *
 _asn1_ltostr(long v,char *str)
 {
-  long d,r,v2;
+  long d,r;
   char temp[20];
   int count,k,start;
 
@@ -152,7 +152,6 @@ _asn1_tag_der(unsigned char class,unsigned int tag_value,unsigned char *ans,int 
 unsigned int
 _asn1_get_tag_der(unsigned char *der,unsigned char *class,int  *len)
 {
-  unsigned long ans;
   int punt,ris;
 
   *class=der[0]&0xE0;
@@ -276,7 +275,7 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
 
   counter=0;
   n_start=temp;
-  while(n_end=strchr(n_start,' ')){
+  while((n_end=strchr(n_start,' '))){
     *n_end=0;
     val=strtoul(n_start,NULL,10);
     counter++;
@@ -391,10 +390,9 @@ void
 _asn1_complete_explicit_tag(node_asn *node,unsigned char *der,int *counter)
 {
   node_asn *p;
-  int tag_len,is_tag_implicit,len2,len3;
-  unsigned char class,class_implicit,temp[10];
-  unsigned long tag_implicit;
-   
+  int is_tag_implicit,len2,len3;
+  unsigned char temp[10];
+  
   is_tag_implicit=0;
 
   if(node->type&CONST_TAG){
@@ -426,7 +424,7 @@ int
 _asn1_insert_tag_der(node_asn *node,unsigned char *der,int *counter)
 {
   node_asn *p;
-  int tag_len,is_tag_implicit,len2,len3;
+  int tag_len,is_tag_implicit;
   unsigned char class,class_implicit,temp[10];
   unsigned long tag_implicit;
    
@@ -833,9 +831,9 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
 int 
 asn1_create_der(node_asn *root,char *name,unsigned char *der,int *len)
 {
-  node_asn *node,*p,*p2,*p3;
+  node_asn *node,*p;
   char temp[20];
-  int counter,counter_old,len2,len3,len4,move,ris;
+  int counter,counter_old,len2,len3,move,ris;
 
   node=_asn1_find_node(root,name);
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
@@ -995,7 +993,6 @@ asn1_get_der(node_asn *root,unsigned char *der,int len)
   int counter,len2,len3,len4,move,ris;
   unsigned char class,*temp2;
   unsigned int tag;
-  long val;
 
   node=root;
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
@@ -1239,11 +1236,9 @@ int
 asn1_get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_element,int *start, int *end)
 {
   node_asn *node,*node_to_find,*p,*p2,*p3;
-  char temp[128];
   int counter,len2,len3,move,ris;
   unsigned char class;
   unsigned int tag;
-  long val;
 
   node=root;
   node_to_find=_asn1_find_node(root,name_element);
