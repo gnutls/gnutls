@@ -45,6 +45,7 @@ main( int argc, char ** argv )
     gnutls_datum dat, xml, pk;
     gnutls_openpgp_name uid;
     gnutls_private_key * pkey;
+    gnutls_cert * cert;
     unsigned char fpr[20], keyid[8];
     char *s, *t;
     size_t fprlen = 0;
@@ -90,7 +91,17 @@ main( int argc, char ** argv )
     assert( rc == 0 );
     for( i = 0; i < 8; i++ )
         printf( "%02X", keyid[i] );
-    printf( "\n" );
+    printf( "\n\n" );
+
+    printf( "Check MPIs\n" );
+    cert = ctx->cert_list[0];
+    printf( "number of certs %d\n", *ctx->cert_list_length );
+    assert( *ctx->cert_list_length == 1 );
+    printf( "number of items %d\n", cert->params_size );
+    for( i = 0; i < cert->params_size; i++ ) {
+        nbits = gcry_mpi_get_nbits( cert->params[i] );
+        printf( "mpi %d %d bits\n", i, nbits );
+    }
 
     printf( "\nCheck key\n" );
     rc = gnutls_openpgp_verify_key( NULL, &ctx->keyring, &dat, 1 );
@@ -102,8 +113,9 @@ main( int argc, char ** argv )
     assert( pkey->params_size );
     nbits = gcry_mpi_get_nbits( pkey->params[0] );
     rc = pkey->pk_algorithm;
-    printf ("pk-algorithm %s %d bits\n", get_pkalgo( rc ), nbits );
-    for( i = 1; i < pkey->params_size; i++ ) {
+    printf( "pk-algorithm %s %d bits\n", get_pkalgo( rc ), nbits );
+    printf( "number of items %d\n", pkey->params_size );
+    for( i = 0; i < pkey->params_size; i++ ) {
         nbits = gcry_mpi_get_nbits( pkey->params[i] );
         printf( "mpi %d %d bits\n",  i, nbits );
     }

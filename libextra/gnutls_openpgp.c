@@ -453,29 +453,23 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
     uint8 buf[512];
     int rc = 0;
 
-    if( !pkey || raw_key->size <= 0 ) {
-        printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
+    if( !pkey || raw_key->size <= 0 )
         return GNUTLS_E_INVALID_REQUEST;
-    }
 
     out = cdk_stream_tmp( );
-    if( !out ) {
-        printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
+    if( !out )
         return GNUTLS_E_INTERNAL_ERROR;
-    }
     cdk_stream_write( out, raw_key->data, raw_key->size );
     cdk_stream_seek( out, 0 );
 
     cdk_keydb_get_keyblock( out, &snode );
     if( !snode ) {
-        printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
         rc = GNUTLS_E_INTERNAL_ERROR;
         goto leave;
     }
 
     pkt = cdk_kbnode_find_packet( snode, CDK_PKT_SECRET_KEY );
     if( !pkt ) {
-        printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
         rc = GNUTLS_E_INTERNAL_ERROR;
         goto leave;
     }
@@ -487,7 +481,6 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
         cdk_pk_get_mpi( sk->pk, i, buf, &nbytes, NULL );
         rc = _gnutls_mpi_scan_pgp( &pkey->params[i], buf, &nbytes );
         if( rc ) {
-            printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
             rc = GNUTLS_E_MPI_SCAN_FAILED;
             release_mpi_array( pkey->params, i-1 );
             goto leave;
@@ -496,27 +489,23 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
     pkey->params_size += cdk_pk_get_nskey( pke_algo );
     for( j = 0; j < cdk_pk_get_nskey( pke_algo ); j++, i++ ) {
         nbytes = sizeof buf-1;
-        cdk_sk_get_mpi( sk, i, buf, &nbytes, NULL );
+        cdk_sk_get_mpi( sk, j, buf, &nbytes, NULL );
         rc = _gnutls_mpi_scan_pgp( &pkey->params[i], buf, &nbytes );
         if ( rc ) {
-            printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
             rc = GNUTLS_E_MPI_SCAN_FAILED;
             release_mpi_array( pkey->params, i-1 );
             goto leave;
         }
     }
     
-    if( is_ELG(pke_algo) ) {
-        printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
+    if( is_ELG(pke_algo) )
         return GNUTLS_E_UNWANTED_ALGORITHM;
-    }
     else if( is_DSA(pke_algo) )
         pkey->pk_algorithm = GNUTLS_PK_DSA;
     else if( is_RSA(pke_algo) )
         pkey->pk_algorithm = GNUTLS_PK_RSA;
     rc = gnutls_set_datum( &pkey->raw, raw_key->data, raw_key->size );
     if( rc < 0 ) {
-        printf( "%s:%d: failed.\n", __FILE__, __LINE__ );
         release_mpi_array( pkey->params, i );
         rc = GNUTLS_E_MEMORY_ERROR;
     }
