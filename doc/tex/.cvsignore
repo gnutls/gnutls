@@ -1,6 +1,7 @@
 Makefile
 Makefile.in
 gnutls-api.tex
+gnutls-extra-api.tex
 *.aux
 *.ps
 *.dvi
@@ -13,3 +14,4 @@ WARNINGS
 asn1-api.tex
 *.pl
 cover.tex
+error_codes.tex
