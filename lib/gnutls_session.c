@@ -94,29 +94,36 @@ int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *sessi
   * performed.
   **/
 int gnutls_set_current_session( GNUTLS_STATE state, opaque* session, int session_size) {
-	int auth_info_size = session_size - sizeof(SecurityParameters);
+	int auth_info_size;
 	int timestamp = time(0);
 	SecurityParameters sp;
 
-	if (auth_info_size > sizeof(state->gnutls_key->auth_info_size)) { /* have more data */
+	if ( (session_size - sizeof(SecurityParameters)) 
+		>= sizeof(state->gnutls_key->auth_info_size)) { /* have more data */
 		auth_info_size = *((int*)&session[sizeof(SecurityParameters)]);	
+	} else {
+		auth_info_size = 0;
+		gnutls_assert();
+		return GNUTLS_E_DB_ERROR;
 	}
 	
-	if (session_size < sizeof(SecurityParameters))
+	if (session_size < sizeof(SecurityParameters)) {
+		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-
+	}
+	
 	memcpy( &sp, session, sizeof(SecurityParameters));
 	if ( timestamp - sp.timestamp <= state->gnutls_internals.expire_time 
 		&& sp.timestamp <= timestamp) {
 
 		memcpy( &state->gnutls_internals.resumed_security_parameters, &sp, sizeof(SecurityParameters));
 		if (auth_info_size > 0) {
-			state->gnutls_key->auth_info_size = auth_info_size;
 			state->gnutls_key->auth_info = gnutls_malloc(auth_info_size);
 			if (state->gnutls_key->auth_info==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
+			state->gnutls_key->auth_info_size = auth_info_size;
 			memcpy( state->gnutls_key->auth_info, &session[sizeof(SecurityParameters)+sizeof(state->gnutls_key->auth_info_size)], auth_info_size);
 		} else { /* set to null */
 			state->gnutls_key->auth_info_size = 0;

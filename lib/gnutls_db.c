@@ -151,7 +151,7 @@ int _gnutls_server_register_current_session( GNUTLS_STATE state)
 GDBM_FILE dbf;
 datum key = { state->security_parameters.session_id, state->security_parameters.session_id_size };
 datum content;
-int ret = 0;
+int ret = 0, pos;
 
 	if (state->gnutls_internals.resumable==RESUME_FALSE) 
 		return GNUTLS_E_INVALID_SESSION;
@@ -173,10 +173,14 @@ int ret = 0;
 	if (content.dptr==NULL) return GNUTLS_E_MEMORY_ERROR;
 
 /* copy data */
-	memcpy( content.dptr, (void*)&state->security_parameters, sizeof(SecurityParameters));
-	memcpy( &content.dptr[sizeof(SecurityParameters)], &state->gnutls_key->auth_info_size,  sizeof(state->gnutls_key->auth_info_size));
-	memcpy( &content.dptr[sizeof(state->gnutls_key->auth_info_size)+sizeof(SecurityParameters)], 
-		state->gnutls_key->auth_info,  state->gnutls_key->auth_info_size);
+	pos = 0;
+	memcpy( &content.dptr[0], (void*)&state->security_parameters, sizeof(SecurityParameters));
+	pos+=sizeof(SecurityParameters);
+	
+	memcpy( &content.dptr[pos], &state->gnutls_key->auth_info_size,  sizeof(state->gnutls_key->auth_info_size));
+	pos+=sizeof(state->gnutls_key->auth_info_size);
+	
+	memcpy( &content.dptr[pos], state->gnutls_key->auth_info, state->gnutls_key->auth_info_size);
 
 	dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
 	if (dbf==NULL) {
