@@ -187,7 +187,7 @@ int gnutls_srp_set_client_cred( SRP_CLIENT_CREDENTIALS res, char *username, char
 
 void gnutls_srp_free_server_sc( SRP_SERVER_CREDENTIALS sc);
 int gnutls_srp_allocate_server_sc( SRP_SERVER_CREDENTIALS *sc);
-int gnutls_srp_set_server_cred( SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
+int gnutls_srp_set_server_cred_file( SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
 
 void gnutls_anon_free_server_sc( ANON_SERVER_CREDENTIALS sc);
 int gnutls_anon_allocate_server_sc( ANON_SERVER_CREDENTIALS *sc);

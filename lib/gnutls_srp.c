@@ -387,13 +387,13 @@ int gnutls_srp_allocate_server_sc( SRP_SERVER_CREDENTIALS *sc) {
 }
 
 /**
-  * gnutls_srp_set_server_cred - Used to set the password files, in a SRP_SERVER_CREDENTIALS structure
+  * gnutls_srp_set_server_cred_file - Used to set the password files, in a SRP_SERVER_CREDENTIALS structure
   * @res: is an &SRP_SERVER_CREDENTIALS structure.
   * @password_file: is the SRP password file (tpasswd)
   * @password_conf_file: is the SRP password conf file (tpasswd.conf)
   *
   **/
-int gnutls_srp_set_server_cred( SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
+int gnutls_srp_set_server_cred_file( SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
 
 	res->password_file = gnutls_strdup( password_file);
 	if (res->password_file==NULL) return GNUTLS_E_MEMORY_ERROR;

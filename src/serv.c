@@ -368,7 +368,7 @@ int main(int argc, char **argv)
 	 * Read README.crypt prior to using SRP.
 	 */
 	gnutls_srp_allocate_server_sc( &srp_cred);
-	gnutls_srp_set_server_cred( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
+	gnutls_srp_set_server_cred_file( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
 
 	gnutls_anon_allocate_server_sc( &dh_cred);
 	gnutls_anon_set_server_cred( dh_cred, 1024);
