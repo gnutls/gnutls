@@ -1,3 +1,12 @@
+2003-04-18 10:29  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_x509.c, src/serv.c:
+
+	* Added gnutls_x509_privkey_get_key_id() and
+	  gnutls_x509_crt_get_key_id() functions which return a unique (per
+	  public key) ID. These can be used to check if the private key
+	corresponds to a given certificate.  
+
 2003-04-16 19:09  nmav <nmav@gnutls.org>
 
 	* lib/: Makefile.am, gnutls_errors.c, gnutls_errors_int.h,
