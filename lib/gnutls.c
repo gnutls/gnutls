@@ -27,7 +27,8 @@
 #include "gnutls_cipher.h"
 #include "gnutls_buffers.h"
 #include "gnutls_handshake.h"
-#include "gnutls_hash.h"
+#include "gnutls_hash_int.h"
+#include "gnutls_cipher_int.h"
 
 /* This function should check if we support the version of the peer.
  * However now we only support version 3.1 
@@ -97,10 +98,10 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	gnutls_free((*state)->gnutls_internals.buffer_handshake);
 
 	if ((*state)->connection_state.read_cipher_state != NULL)
-		gcry_cipher_close((*state)->
+		gnutls_cipher_deinit((*state)->
 				  connection_state.read_cipher_state);
 	if ((*state)->connection_state.write_cipher_state != NULL)
-		gcry_cipher_close((*state)->
+		gnutls_cipher_deinit((*state)->
 				  connection_state.write_cipher_state);
 
 	secure_free((*state)->cipher_specs.server_write_mac_secret);

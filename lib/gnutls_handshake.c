@@ -31,7 +31,7 @@
 #include "gnutls_kx.h"
 #include "gnutls_handshake.h"
 #include "gnutls_num.h"
-#include "gnutls_hash.h"
+#include "gnutls_hash_int.h"
 
 #ifdef DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)

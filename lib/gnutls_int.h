@@ -9,6 +9,14 @@
 #define GNUTLS_HASH_FAILED NULL
 #define GNUTLS_MAC_FAILED NULL
 
+/* for symmetric ciphers */
+#define GNUTLS_CIPHER_HANDLE GCRY_CIPHER_HD
+#define GNUTLS_CIPHER_FAILED NULL
+
+/* for big numbers support */ /* FIXME */
+#define GNUTLS_MPI MPI
+#define gnutls_mpi_release mpi_release
+
 #define svoid void /* for functions that allocate using secure_free */
 #define secure_free(x) if (x!=NULL) free(x)
 #define secure_malloc malloc
@@ -132,8 +140,8 @@ typedef struct {
 	GNUTLS_Version version;
 	opaque* read_compression_state;
 	opaque* write_compression_state;
-	GCRY_CIPHER_HD write_cipher_state;
-	GCRY_CIPHER_HD read_cipher_state;
+	GNUTLS_CIPHER_HANDLE write_cipher_state;
+	GNUTLS_CIPHER_HANDLE read_cipher_state;
 	opaque* read_mac_secret;
 	opaque* write_mac_secret;
 	uint8   mac_secret_size;

@@ -36,7 +36,7 @@
 int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
-	MPI x, X, g, p;
+	GNUTLS_MPI x, X, g, p;
 	int n_X, n_g, n_p;
 	uint16 _n_X, _n_g, _n_p;
 	uint8 *data=NULL;
@@ -71,7 +71,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			data_p = &data[0];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_p[2],
 				       &n_p, p);
-			mpi_release(p);
+			gnutls_mpi_release(p);
 
 			_n_p = n_p;
 
@@ -85,7 +85,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			data_g = &data_p[2+n_p];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_g[2],
 				       &n_g, g);
-			mpi_release(g);
+			gnutls_mpi_release(g);
 			_n_g = n_g;
 #ifndef WORDS_BIGENDIAN
 
@@ -98,7 +98,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			data_X = &data_g[2+n_g];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_X[2],
 				       &n_X, X);
-			mpi_release(X);
+			gnutls_mpi_release(X);
 			
 			_n_X = n_X;
 #ifndef WORDS_BIGENDIAN
@@ -128,7 +128,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
-	MPI x, X;
+	GNUTLS_MPI x, X;
 	int n_X;
 	uint16 _n_X;
 	uint8 *data;
@@ -159,7 +159,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 			data[0] = 1; /* extern */
 
-			mpi_release(X);
+			gnutls_mpi_release(X);
 			
 			_n_X = n_X;
 #ifndef WORDS_BIGENDIAN
@@ -185,10 +185,10 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 				       &premaster_size, state->gnutls_internals.KEY);
 
 			/* THIS SHOULD BE DISCARDED */
-			mpi_release(state->gnutls_internals.KEY);
-			mpi_release(state->gnutls_internals.client_Y);
-			mpi_release(state->gnutls_internals.client_p);
-			mpi_release(state->gnutls_internals.client_g);
+			gnutls_mpi_release(state->gnutls_internals.KEY);
+			gnutls_mpi_release(state->gnutls_internals.client_Y);
+			gnutls_mpi_release(state->gnutls_internals.client_p);
+			gnutls_mpi_release(state->gnutls_internals.client_g);
 			state->gnutls_internals.KEY=NULL;
 			state->gnutls_internals.client_Y=NULL;
 			state->gnutls_internals.client_p=NULL;
@@ -335,9 +335,9 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 				       &premaster_size, state->gnutls_internals.KEY);
 
 			/* THESE SHOULD BE DISCARDED */
-			mpi_release(state->gnutls_internals.KEY);
-			mpi_release(state->gnutls_internals.client_Y);
-			mpi_release(state->gnutls_internals.dh_secret);
+			gnutls_mpi_release(state->gnutls_internals.KEY);
+			gnutls_mpi_release(state->gnutls_internals.client_Y);
+			gnutls_mpi_release(state->gnutls_internals.dh_secret);
 			state->gnutls_internals.KEY=NULL;
 			state->gnutls_internals.client_Y=NULL;
 			state->gnutls_internals.dh_secret=NULL;
