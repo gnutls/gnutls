@@ -570,6 +570,12 @@ int _gnutls_server_SelectCompMethod(GNUTLS_STATE state,
 	return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 
 }
+
+/* This function sends an empty handshake packet. (like hello request).
+ * If the previous _gnutls_send_empty_handshake() returned
+ * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
+ * (until it returns ok), with NULL parameters.
+ */
 int _gnutls_send_empty_handshake(SOCKET cd, GNUTLS_STATE state, HandshakeType type, int again) {
 opaque data=0;
 opaque * ptr;
@@ -580,6 +586,11 @@ opaque * ptr;
 	return _gnutls_send_handshake( cd, state, ptr, 0, type);
 }
 
+/* This function sends a handshake message of type 'type' containing the
+ * data specified here. If the previous _gnutls_send_handshake() returned
+ * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
+ * (until it returns ok), with NULL parameters.
+ */
 int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 			   uint32 i_datasize, HandshakeType type)
 {
@@ -884,7 +895,10 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	return ret;
 }
 
-
+/* This function read and parse the server hello handshake message.
+ * This function also restores resumed parameters if we are resuming a
+ * session.
+ */
 static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 				     int datalen)
 {
@@ -1050,7 +1064,8 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	return ret;
 }
 
-
+/* This function sends the client hello handshake message.
+ */
 static int _gnutls_send_client_hello(SOCKET cd, GNUTLS_STATE state, int again)
 {
 	char *data = NULL;
@@ -1331,17 +1346,17 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 	return ret;
 }
 
-/* The packets in gnutls_handshake 
-
+/* The packets in gnutls_handshake (it's more broad than original TLS handshake)
+ *
  *     Client                                               Server
  *
  *     ClientHello                  -------->
- *                                                     ServerHello
+ *                                  <--------         ServerHello
  *
  *                                                    Certificate*
  *                                              ServerKeyExchange*
  *     Client Key Exchange0         -------->
- *                                              CertificateRequest*
+ *                                  <--------   CertificateRequest*
  *
  *                                  <--------   Server Key Exchange2
  *                                  <--------      ServerHelloDone
@@ -1353,6 +1368,7 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
  *                                              [ChangeCipherSpec]
  *                                  <--------             Finished
  *
+ * (*): means optional packet.
  */
 
 /**
@@ -1404,11 +1420,11 @@ int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state)
   * and initializes the TLS connection. Here the identity of the peer
   * is checked automatically.
   * This function will fail if any problem is encountered,
-  * and the connection should be terminated.
+  * and the connection should be terminated. 
   *
   * This function may also return the non-fatal errors GNUTLS_E_AGAIN, or 
   * GNUTLS_E_INTERRUPTED. In that case you may resume the handshake
-  * (call this function, until it returns ok)
+  * (call this function again, until it returns ok)
   *
   **/
 int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
@@ -1446,11 +1462,10 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 
 
 
- /*
-  * gnutls_handshake_client 
-  * This function performs the client side of the handshake of the TLS/SSL protocol.
-  */
-
+/*
+ * gnutls_handshake_client 
+ * This function performs the client side of the handshake of the TLS/SSL protocol.
+ */
 int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 {
 	int ret = 0;

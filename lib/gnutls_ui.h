@@ -93,4 +93,4 @@ int gnutls_x509pki_get_dh_bits( GNUTLS_STATE);
 
 # endif /* LIBGNUTLS_VERSION */
 
-#endif
+#endif /* GNUTLS_UI_H */
