@@ -194,7 +194,7 @@ gnutls_compression_entry _gnutls_compression_algorithms[MAX_COMP_METHODS] =
 	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_NULL, 0x00, 0, 0, 0),
 #ifdef HAVE_LIBZ
 	/* draft-ietf-tls-compression-02 */
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB, 0x01, 15, 8, 3),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_DEFLATE, 0x01, 15, 8, 3),
 #endif
 	{0, 0, 0, 0, 0, 0}
 };
