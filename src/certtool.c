@@ -945,6 +945,19 @@ void certificate_info(void)
 
 }
 
+static void print_hex_datum( gnutls_datum* dat)
+{
+unsigned int j;
+#define SPACE "\t"
+        fprintf(outfile,"\n"SPACE);
+	for (j = 0; j < dat->size; j++) {
+	    fprintf(outfile, "%.2x:", (unsigned char) dat->data[j]);
+	    if ((j+1)%15==0) fprintf(outfile,"\n"SPACE);
+	}
+	fprintf(outfile, "\n");
+}
+
+
 static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 				   unsigned int all)
 {
@@ -1032,6 +1045,40 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 	fprintf(out, " (%u bits)", bits);
     fprintf(out, "\n");
 
+    /* Print the raw public keys    
+     */
+    if (all) {
+    if (ret==GNUTLS_PK_RSA) {
+    	gnutls_datum m,e;
+    	
+    	ret = gnutls_x509_crt_get_pk_rsa_raw( crt, &m,&e);
+    	if (ret < 0) {
+    	    fprintf(stderr, "Error in key RSA data export: %s\n", gnutls_strerror(ret));
+    	}
+        
+        fprintf(outfile, "modulus:");
+        print_hex_datum( &m);
+        fprintf(outfile, "public exponent:");
+        print_hex_datum( &e);
+
+    } else if (ret==GNUTLS_PK_DSA) {
+        gnutls_datum p,q,g,y;
+    
+    	ret = gnutls_x509_crt_get_pk_dsa_raw( crt, &p,&q,&g,&y);
+    	if (ret < 0) {
+    	    fprintf(stderr, "Error in key DSA data export: %s\n", gnutls_strerror(ret));
+    	}
+
+        fprintf(outfile, "public key:");
+        print_hex_datum( &y);
+        fprintf(outfile, "p:");
+        print_hex_datum( &p);
+        fprintf(outfile, "q:");
+        print_hex_datum( &q);
+        fprintf(outfile, "g:");
+        print_hex_datum( &g);
+    }
+    }
 
     if (version >= 3)
 	fprintf(out, "\nX.509 Extensions:\n");
@@ -1400,6 +1447,7 @@ void crl_info()
 
 }
 
+
 void privkey_info(void)
 {
     gnutls_x509_privkey key;
@@ -1446,6 +1494,50 @@ void privkey_info(void)
 	cprint = UNKNOWN;
     fprintf(outfile, "%s\n", cprint);
 
+    /* Print the raw public and private keys    
+     */
+    if (ret==GNUTLS_PK_RSA) {
+    	gnutls_datum m,e,d,p,q,u;
+    	
+    	ret = gnutls_x509_privkey_export_rsa_raw( key, &m,&e,&d,&p,&q,&u);
+    	if (ret < 0) {
+    	    fprintf(stderr, "Error in key RSA data export: %s\n", gnutls_strerror(ret));
+    	}
+        
+        fprintf(outfile, "modulus:");
+        print_hex_datum( &m);
+        fprintf(outfile, "public exponent:");
+        print_hex_datum( &e);
+        fprintf(outfile, "private exponent:");
+        print_hex_datum( &d);
+        fprintf(outfile, "prime1:");
+        print_hex_datum( &p);
+        fprintf(outfile, "prime2:");
+        print_hex_datum( &q);
+        fprintf(outfile, "coefficient:");
+        print_hex_datum( &u);
+
+    } else if (ret==GNUTLS_PK_DSA) {
+        gnutls_datum p,q,g,y,x;
+    
+    	ret = gnutls_x509_privkey_export_dsa_raw( key, &p,&q,&g,&y,&x);
+    	if (ret < 0) {
+    	    fprintf(stderr, "Error in key DSA data export: %s\n", gnutls_strerror(ret));
+    	}
+
+        fprintf(outfile, "private key:");
+        print_hex_datum( &x);
+        fprintf(outfile, "public key:");
+        print_hex_datum( &y);
+        fprintf(outfile, "p:");
+        print_hex_datum( &p);
+        fprintf(outfile, "q:");
+        print_hex_datum( &q);
+        fprintf(outfile, "g:");
+        print_hex_datum( &g);
+    }
+
+    fprintf(outfile, "\n");
 
     size = sizeof(buffer);
     if ((ret = gnutls_x509_privkey_get_key_id(key, 0, buffer, &size)) < 0) {
