@@ -11,7 +11,9 @@ following software:
 * libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
 * texinfo (http://www.gnu.org/software/texinfo/)
 * gtk-doc CVS (to generate reference HTML manual in doc/reference/)
-  with the patch below
+  with the patch below, from:
+  http://bugzilla.gnome.org/show_bug.cgi?id=156300
+  http://bugzilla.gnome.org/show_bug.cgi?id=156318
 
 Those are optional:
 * latex/dvips (in order to create gnutls.ps)
