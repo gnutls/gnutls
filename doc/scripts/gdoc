@@ -314,16 +314,20 @@ sub output_tex {
     print "\\begin{itemize}\n";
     $check=0;
     foreach $parameter (@{$args{'parameterlist'}}) {
-        $param = $args{'parametertypes'}{$parameter};
-        $param =~ s/_/\\_/g;
+        $param1 = $args{'parametertypes'}{$parameter};
+        $param1 =~ s/_/\\_/g;
         $param2 = $parameter;
 	$param2 =~ s/_/\\_/g;
 
 	$check = 1;
-	print "\\item {\\it ".$param."} {\\bf ".$param2."}\n";
+	print "\\item {\\it ".$param1."} {\\bf ".$param2."}\n";
 	print "\n";
 
-	output_highlight($param{$parameter});
+	$param3 = $args{'parameters'}{$parameter};
+	$param3 =~ s/_/\\_/g;
+	$param3 =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
+
+	output_highlight($param3);
     }
     if ($check==0) {
 	print "\\item void\n";
@@ -333,14 +337,14 @@ sub output_tex {
     foreach $section (@{$args{'sectionlist'}}) {
 	$sec = $section;
 	$sec =~ s/_/\\_/g;
-	$sec =~ s/&/\\&/g;
+	$sec =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
 
 	print "\n\\par{\\large{$sec}}\\par\n";
 	print "\\begin{rmfamily}\n";
 
 	$sec = $args{'sections'}{$section};
 	$sec =~ s/_/\\_/g;
-	$sec =~ s/&/\\&/g;
+	$sec =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
 	$sec =~ s/->/\$\\rightarrow\$/g;
 	$sec =~ s/([0-9]+)\^([0-9]+)/\$\{\1\}\^\{\2\}\$/g;
 

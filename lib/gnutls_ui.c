@@ -195,8 +195,8 @@ X509PKI_AUTH_INFO info;
   * gnutls_x509pki_get_peer_certificate_activation_time - This function returns the peer's certificate activation time
   * @state: is a gnutls state
   *
-  * This function will return the peer's certificate activation time in UNIX time (ie seconds since
-  * 00:00:00 UTC January 1, 1970).
+  * This function will return the peer's certificate activation time in UNIX time 
+  * (ie seconds since 00:00:00 UTC January 1, 1970).
   * Returns a (time_t) -1 in case of an error.
   *
   **/
@@ -214,8 +214,8 @@ X509PKI_AUTH_INFO info;
   * gnutls_x509pki_get_peer_certificate_expiration_time - This function returns the peer's certificate expiration time
   * @state: is a gnutls state
   *
-  * This function will return the peer's certificate expiration time in UNIX time (ie seconds since
-  * 00:00:00 UTC January 1, 1970).
+  * This function will return the peer's certificate expiration time in UNIX time 
+  * (ie seconds since 00:00:00 UTC January 1, 1970).
   * Returns a (time_t) -1 in case of an error.
   *
   **/
