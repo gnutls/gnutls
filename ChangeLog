@@ -1,3 +1,39 @@
+2002-12-02 22:00  nmav <nmav@gnutls.org>
+
+	* configure.in, doc/tex/ex-pgp-keyserver.tex:
+
+	depends on opencdk 0.3.5 
+
+2002-12-02 17:31  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_extensions.c:
+
+	Corrected bug in extension parsing.  
+
+2002-12-02 07:37  nmav <nmav@gnutls.org>
+
+	* doc/tex/auth.tex:
+
+	some updates on srp documentation.  
+
+2002-12-02 07:13  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, auth_dhe.c, auth_rsa.c, auth_rsa_export.c,
+	ext_cert_type.c, ext_server_name.c, gnutls_alert.c,
+	gnutls_algorithms.c, gnutls_anon_cred.c, gnutls_auth.c,
+	gnutls_buffers.c, gnutls_cert.c, gnutls_cipher.c,
+	gnutls_compress.c, gnutls_compress_int.c, gnutls_constate.c,
+	gnutls_datum.c, gnutls_datum.h, gnutls_db.c, gnutls_dh.c,
+	gnutls_dh_primes.c, gnutls_global.c, gnutls_handshake.c,
+	gnutls_kx.c, gnutls_mem.c, gnutls_mpi.c, gnutls_num.c, gnutls_pk.c,
+	gnutls_priority.c, gnutls_privkey.c, gnutls_random.c,
+	gnutls_record.c, gnutls_rsa_export.c, gnutls_session.c,
+	gnutls_session_pack.c, gnutls_sig.c, gnutls_state.c, gnutls_str.c,
+	gnutls_ui.c, gnutls_v2_compat.c, gnutls_x509.c, x509_extensions.c,
+	x509_sig_check.c:
+
+	Cleanups. Prefixed some internal function with underscore.  
+
 2002-12-01 21:57  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_x509.c:
