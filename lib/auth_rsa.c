@@ -206,8 +206,6 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		state->gnutls_key->key.size = plaintext.size;
 	}
 
-	_gnutls_mpi_release(&state->gnutls_key->B);
-
 	return ret;
 }
 

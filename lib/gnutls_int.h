@@ -240,10 +240,8 @@ struct GNUTLS_KEY_INT {
 	MPI				b;
 	MPI				a;
 	MPI				x;
-	/* RSA:                   peer:
-	 * modulus is A            a
-	 * exponent is B           b
-	 * private key is u        x
+
+	/* RSA: does not use these.
 	 */
 	
 	/* this is used to hold the peers authentication data 
