@@ -1,3 +1,16 @@
+2003-10-31 12:45  nmav <nmav@gnutls.org>
+
+	* src/: certtool.c, common.c:
+
+	more openpgp related changes.  
+
+2003-10-31 09:41  nmav <nmav@gnutls.org>
+
+	* doc/tex/ex-pgp-keyserver.tex, lib/Makefile.am, lib/gnutls_x509.c,
+	lib/strfile.h, src/serv.c:
+
+	some openpgp related changes.  
+
 2003-10-30 19:03  nmav <nmav@gnutls.org>
 
 	* configure.in, lib/gnutls_errors.c, lib/gnutls_errors_int.h,
