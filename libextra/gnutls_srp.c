@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -137,7 +137,7 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 {
 	size_t b_size, a_size;
 	opaque *holder, hd[MAX_HASH_SIZE];
-	size_t holder_size;
+	size_t holder_size, hash_size;
 	GNUTLS_HASH_HANDLE td;
 	int ret;
 	GNUTLS_MPI res;
@@ -161,10 +161,11 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 	}
 	_gnutls_hash(td, holder, holder_size);
 	_gnutls_hash_deinit(td, hd);
-	
-	/* convert the first 4 bytes of hd to uint32
+
+	/* convert the bytes of hd to integer
 	 */
-	ret = _gnutls_mpi_scan( &res, holder, &holder_size);
+	hash_size = 20; /* SHA */
+	ret = _gnutls_mpi_scan( &res, hd, &hash_size);
 	gnutls_afree(holder);
 
 	if (ret < 0) {
