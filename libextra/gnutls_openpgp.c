@@ -338,9 +338,9 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
 
     cert->params_size = cdk_pk_get_npkey( pk->pubkey_algo );
     for (i=0; i<cert->params_size; i++) {      
-        nbytes = pk->mpi[i].bytes+2;
+        nbytes = pk->mpi[i]->bytes + 2;
         rc = _gnutls_mpi_scan_pgp( &cert->params[i], 
-                                   pk->mpi[i].data, &nbytes );
+                                   pk->mpi[i]->data, &nbytes );
         if ( rc ) {
             rc = GNUTLS_E_MPI_SCAN_FAILED;
             goto fail;
@@ -435,9 +435,9 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
     pke_algo = sk->pk->pubkey_algo;
     pkey->params_size = cdk_pk_get_npkey( pke_algo );
     for ( i = 0; i < pkey->params_size; i++ ) {
-        nbytes = sk->pk->mpi[i].bytes+2;
+        nbytes = sk->pk->mpi[i]->bytes + 2;
         rc = _gnutls_mpi_scan_pgp( &pkey->params[i],
-                                   sk->pk->mpi[i].data, &nbytes );
+                                   sk->pk->mpi[i]->data, &nbytes );
         if ( rc ) {
             rc = GNUTLS_E_MPI_SCAN_FAILED;
             release_mpi_array( pkey->params, i-1 );
@@ -446,7 +446,7 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
     }
     pkey->params_size += cdk_pk_get_nskey( pke_algo );
     for (j=0; j<cdk_pk_get_nskey( pke_algo ); j++, i++) {
-        nbytes = sk->mpi[j]->bytes+2;
+        nbytes = sk->mpi[j]->bytes + 2;
         rc = _gnutls_mpi_scan_pgp(&pkey->params[i],
                                   sk->mpi[j]->data, &nbytes);
         if ( rc ) {
