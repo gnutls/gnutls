@@ -1601,7 +1601,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 int
-gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
+gnutls_openpgp_extract_key_name( const gnutls_datum *cert, int idx, 
                                  gnutls_openpgp_name *dn )
 {
   return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
