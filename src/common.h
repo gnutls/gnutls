@@ -43,7 +43,7 @@ GNUTLS_KXAlgorithm kx;
 		case GNUTLS_CRD_CERTIFICATE:
 		   /* in case of X509 PKI
 		    */
-			cert_list = gnutls_x509pki_get_peer_certificate_list( state, &cert_list_size);
+			cert_list = gnutls_certificate_get_peers( state, &cert_list_size);
 			status = gnutls_x509pki_get_peer_certificate_status( state);
 			
 			switch( status) {
