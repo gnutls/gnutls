@@ -1823,7 +1823,9 @@ int gnutls_rehandshake(gnutls_session session)
 	return 0;
 }
 
-static int _gnutls_abort_handshake( gnutls_session session, int ret) {
+inline 
+static int _gnutls_abort_handshake( gnutls_session session, int ret) 
+{
 	if ( ((ret==GNUTLS_E_WARNING_ALERT_RECEIVED) && 
 		( gnutls_alert_get(session) == GNUTLS_A_NO_RENEGOTIATION))
 		|| ret==GNUTLS_E_GOT_APPLICATION_DATA)
@@ -1900,10 +1902,11 @@ int gnutls_handshake(gnutls_session session)
 	}
 	if (ret < 0) {
 		/* In the case of a rehandshake abort
-		 * we should reset the handshake's session
+		 * we should reset the handshake's internal state.
 		 */
 		if (_gnutls_abort_handshake( session, ret) == 0)
 			STATE = STATE0;
+
 		return ret;
 	}
 	
@@ -1912,6 +1915,7 @@ int gnutls_handshake(gnutls_session session)
 	if (ret < 0) {
 		if (_gnutls_abort_handshake( session, ret) == 0)
 			STATE = STATE0;
+		
 		return ret;
 	}
 	

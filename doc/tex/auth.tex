@@ -86,3 +86,62 @@ KX\_ANON\_DH & CRD\_ANON & CRD\_ANON
 \label{fig:kxcred}
 
 \end{figure}
+
+
+
+\section{Parameters stored in credentials}
+
+Several parameters such as the ones used for Diffie-Hellman authentication
+are stored within the credentials structures, so all sessions can access
+them. Those parameters are stored in structures such as {\bf gnutls_dh_params}
+and {\bf gnutls_rsa_params}, and functions like 
+\printfunc{gnutls_certificate_set_dh_params}{gnutls\_certificate\_set\_dh\_params}
+and
+\printfunc{gnutls_certificate_set_rsa_export_params}{gnutls\_certificate\_set\_rsa\_export\_params}
+can be used to associate those parameters with the given credentials structure.
+\par
+Since those parameters need to be renewed from time to time and a 
+global structure such as the credentials, may not be easy to modify
+since it is accessible by all sessions, an alternative interface is
+available using a callback function.
+This can be set using the
+\printfunc{gnutls_certificate_set_params_function}{gnutls\_certificate\_set\_params\_function}.
+An example is shown below.
+
+\begin{verbatim}
+#include <gnutls.h>
+
+gnutls_rsa_params rsa_params;
+gnutls_dh_params dh_params;
+
+/* This function will be called once a session requests DH
+ * or RSA parameters. The parameters returned (if any) will
+ * be used for the first handshake only.
+ */
+static int get_params( gnutls_session session, gnutls_params_type type,
+        gnutls_params_st *st)
+{
+   if (type == GNUTLS_PARAMS_RSA_EXPORT)
+      st->params.rsa_export = rsa_params;
+   else if (type == GNUTLS_PARAMS_DH)
+      st->params.dh = dh_params;
+   else return -1;
+
+   st->type = type;
+
+   return 0;
+}
+
+int main()
+{
+   gnutls_certificate_credentials cert_cred;
+
+   initialize_params();
+
+   /* ...
+    */
+
+   gnutls_certificate_set_params_function( cert_cred, get_params);
+
+}
+\end{verbatim}

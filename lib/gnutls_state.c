@@ -267,6 +267,7 @@ void _gnutls_deinit(gnutls_session session)
 	/* remove auth info firstly */
 	_gnutls_free_auth_info(session );
 
+	_gnutls_handshake_internal_state_clear( session);
 	_gnutls_handshake_io_buffer_clear( session);
 
 	_gnutls_free_datum(&session->connection_state.read_mac_secret);
@@ -353,11 +354,13 @@ void gnutls_deinit(gnutls_session session)
 }
 
 
-int _gnutls_dh_get_prime_bits( gnutls_session session) {
+int _gnutls_dh_get_prime_bits( gnutls_session session) 
+{
 	return session->internals.dh_prime_bits;
 }
 
-int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) {
+int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) 
+{
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -385,7 +388,8 @@ int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) {
 	return 0;
 }
 
-int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits) {
+int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits) 
+{
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -413,7 +417,8 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits) {
 	return 0;
 }
 
-int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits) {
+int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits) 
+{
 	CERTIFICATE_AUTH_INFO info;
 
 	info = _gnutls_get_auth_info(session);
@@ -467,7 +472,8 @@ int _gnutls_dh_set_prime_bits( gnutls_session session, uint bits)
   * server can obtain the client's key.
   *
   **/
-void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status) {
+void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status) 
+{
 	session->internals.pgp_fingerprint = status;
 }
 
@@ -485,11 +491,13 @@ void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status s
   * certificate with X.509 certificates.
   *
   **/
-void gnutls_certificate_send_x509_rdn_sequence(gnutls_session session, int status) {
+void gnutls_certificate_send_x509_rdn_sequence(gnutls_session session, int status) 
+{
 	session->internals.ignore_rdn_sequence = status;
 }
 
-int _gnutls_openpgp_send_fingerprint(gnutls_session session) {
+int _gnutls_openpgp_send_fingerprint(gnutls_session session) 
+{
 	return session->internals.pgp_fingerprint;
 }
 
