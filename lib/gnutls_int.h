@@ -33,8 +33,11 @@
 #define READ_DEBUG*/
 #define DEBUG
 
-
+/* It might be a good idea to replace int with void*
+ * here.
+ */
 #define SOCKET int
+
 #define LIST ...
 
 #define MAX32 4294967295

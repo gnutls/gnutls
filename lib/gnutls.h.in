@@ -56,7 +56,11 @@ typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
 
 typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
+/* If you want to change this, then also change the 
+ * define in gnutls_int.h, and recompile.
+ */
 #define SOCKET int
+
 #define LIST ...
 
 struct GNUTLS_STATE_INT;
