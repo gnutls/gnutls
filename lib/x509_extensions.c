@@ -291,7 +291,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	do {
 		k++;
 
-		_gnutls_str_cpy(name, sizeof(name), "certificate2"); 
+		_gnutls_str_cpy(name, sizeof(name), "certificate2.tbsCertificate.extensions"); 
 		_gnutls_str_cat(name, sizeof(name), ".?"); 
 		_gnutls_int2str(k, counter); 
 		_gnutls_str_cat(name, sizeof(name), counter); 
@@ -302,8 +302,10 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 		/* move to next
 		 */
 
-		if (result == ASN_ELEMENT_NOT_FOUND)
+		if (result == ASN_ELEMENT_NOT_FOUND) {
+			gnutls_assert();
 			break;
+		}
 
 		do {
 
@@ -314,9 +316,10 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 			result =
 			    asn1_read_value(rasn, name2, extnID, &len);
 
-			if (result == ASN_ELEMENT_NOT_FOUND)
+			if (result == ASN_ELEMENT_NOT_FOUND) {
+				gnutls_assert();
 				break;
-			else if (result != ASN_OK) {
+			} else if (result != ASN_OK) {
 				gnutls_assert();
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
@@ -328,9 +331,10 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 			result =
 			    asn1_read_value(rasn, name2, critical, &len);
 
-			if (result == ASN_ELEMENT_NOT_FOUND)
+			if (result == ASN_ELEMENT_NOT_FOUND) {
+				gnutls_assert();
 				break;
-			else if (result != ASN_OK) {
+			} else if (result != ASN_OK) {
 				gnutls_assert();
 				asn1_delete_structure(rasn);
 				return GNUTLS_E_ASN1_PARSING_ERROR;
@@ -382,8 +386,11 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	asn1_delete_structure(rasn);
 
 
-	if (result == ASN_ELEMENT_NOT_FOUND)
+	if (result == ASN_ELEMENT_NOT_FOUND) {
+		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	else
+	} else {
+		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
 }

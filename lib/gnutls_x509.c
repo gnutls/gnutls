@@ -458,9 +458,19 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 	return 0;
 }
 
+static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
+	if (strcmp( str_type, "dNSName")==0) return GNUTLS_SAN_DNSNAME;
+	if (strcmp( str_type, "rfc822Name")==0) return GNUTLS_SAN_RFC822NAME;
+	if (strcmp( str_type, "uniformResourceIdentifier")==0) return GNUTLS_SAN_URI;
+	if (strcmp( str_type, "iPAddress")==0) return GNUTLS_SAN_IPADDRESS;
+	return -1;
+}
+
 /**
-  * gnutls_x509_extract_subject_dns_name - This function returns the peer's dns name, if any
+  * gnutls_x509_extract_subject_alt_name - This function returns the peer's alt name, if any
   * @cert: should contain an X.509 DER encoded certificate
+  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+  * @type: Holds the alternative's name type
   * @ret: is the place where dns name will be copied to
   * @ret_size: holds the size of ret.
   *
@@ -468,40 +478,90 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
   * given certificate.
   * 
   * This is specified in X509v3 Certificate Extensions. 
-  * GNUTLS will only return the dnsName of the Alternative name, or a negative
+  * GNUTLS will return the Alternative name, or a negative
   * error code.
-  * Returns GNUTLS_E_MEMORY_ERROR if ret_size is not enough to hold dns name,
-  * or the size of dns name if everything was ok.
+  * Returns GNUTLS_E_MEMORY_ERROR if ret_size is not enough to hold the alternative name,
+  * or the size of alternative name if everything was ok.
   *
-  * If the certificate does not have a DNS name then returns GNUTLS_E_DATA_NOT_AVAILABLE;
+  * If the certificate does not have a Alternative name then returns GNUTLS_E_DATA_NOT_AVAILABLE;
   *
   **/
-int gnutls_x509_extract_subject_dns_name(const gnutls_datum * cert,
+int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, GNUTLS_X509_SUBJECT_ALT_NAME* type,
 					    char *ret, int *ret_size)
 {
 	int result;
 	gnutls_datum dnsname;
+	node_asn *c2;
+	char nptr[128];
+	char ext_data[256];
+	int len;
+	char num[MAX_INT_DIGITS];
 
 	memset(ret, 0, *ret_size);
 
 	if ((result =
 	     _gnutls_get_extension(cert, "2 5 29 17", &dnsname)) < 0) {
+	     	gnutls_assert();
 		return result;
 	}
 
-	if (dnsname.size == 0) {
+	if (dnsname.size == 0 || dnsname.data==NULL) {
+		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if (*ret_size > dnsname.size) {
-		*ret_size = dnsname.size;
-		strcpy(ret, dnsname.data); /* FlawFinder: ignore */
-		gnutls_free_datum(&dnsname);
-	} else {
-		*ret_size = dnsname.size;
-		gnutls_free_datum(&dnsname);
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.SubjectAltName", &c2, "san")
+	    != ASN_OK) {
+		gnutls_assert();
+		gnutls_free_datum( &dnsname);
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der(c2, dnsname.data, dnsname.size);
+	gnutls_free_datum( &dnsname);
+
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	seq++; /* 0->1, 1->2 etc */
+	_gnutls_int2str( seq, num);
+	_gnutls_str_cpy( nptr, sizeof(nptr), "san.?");
+	_gnutls_str_cat( nptr, sizeof(nptr), num);
+
+	len = sizeof(ext_data);
+	if ((result =
+	     asn1_read_value(c2, nptr, ext_data, &len)) != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+
+	*type = _find_type( ext_data);
+	if (*type == -1) {
+		gnutls_assert();
+		return GNUTLS_E_X509_UNKNOWN_SAN;
+	}
+
+	_gnutls_str_cat( nptr, sizeof(nptr), ".");
+	_gnutls_str_cat( nptr, sizeof(nptr), ext_data);
+
+	len = sizeof(ext_data);
+	if ((result =
+	     asn1_read_value(c2, nptr, ret, ret_size)) != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
+	asn1_delete_structure(c2);
 
 	return *ret_size;
 }
