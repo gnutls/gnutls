@@ -76,6 +76,39 @@ static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, M
 	return -1;
 }
 
+static int filecopy( char* src, char* dst) {
+FILE *fd, *fd2;
+char line[5*1024];
+char *p;
+
+		fd = fopen(dst, "w");
+		if (fd == NULL) {
+			fprintf(stderr, "Cannot open '%s' for write\n",
+				dst);
+			return -1;
+		}
+
+		fd2 = fopen(src, "r");
+		if (fd2 == NULL) {
+			/* empty file */
+			fclose(fd);
+			return 0;
+		}
+
+		line[sizeof(line)-1] = 0;
+		do {
+			p = fgets( line, sizeof(line)-1, fd2);
+			if (p==NULL) break;
+			
+			fputs( line, fd);
+		} while(1);
+
+		fclose(fd);
+		fclose(fd2);
+
+		return 0;	
+}
+
 /* accepts password file */
 static int find_index(char* username, char* file) {
 FILE * fd;
@@ -254,8 +287,9 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 	char *cr;
 	MPI g, n;
 	char line[5 * 1024];
-	char *p;
+	char *p, *pp;
 	int iindex;
+	char tmpname[1024];
 
 	fd = fopen(tpasswd_conf, "r");
 	if (fd == NULL) {
@@ -286,18 +320,71 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 		fprintf(stderr, "Cannot gnutls_crypt()...\n");
 		return -1;
 	} else {
-#warning "FIXME: DELETE PREVIOUS ENTRY"		
 		/* delete previous entry */
-		
-		fd = fopen(tpasswd, "a");
-		if (fd == NULL) {
-			fprintf(stderr, "Cannot open '%s' for append\n",
-				tpasswd);
+		struct stat st;
+		FILE * fd2;
+		int put;
+
+		if (strlen(tpasswd) > sizeof(tmpname)+5) {
+			fprintf(stderr, "file '%s' is tooooo long\n", tpasswd);
 			return -1;
 		}
-		fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
-		fclose(fd);
+		strcpy( tmpname, tpasswd);
+		strcat( tmpname, ".tmp");
+
+		if ( stat( tmpname, &st) != -1) {
+			fprintf(stderr, "file '%s' is locked\n", tpasswd);
+			return -1;
+		}
+
+		if (filecopy( tpasswd, tmpname)!=0) {
+			fprintf(stderr, "Cannot copy '%s' to '%s'\n",
+				tpasswd, tmpname);
+			return -1;
+		}
+		
+		fd = fopen(tpasswd, "w");
+		if (fd == NULL) {
+			fprintf(stderr, "Cannot open '%s' for write\n",
+				tpasswd);
+			remove(tmpname);
+			return -1;
+		}
+
+		fd2 = fopen(tmpname, "r");
+		if (fd2 == NULL) {
+			fprintf(stderr, "Cannot open '%s' for read\n",
+				tmpname);
+			remove(tmpname);
+			return -1;
+		}
+
+		put = 0;
+		do {
+			p = fgets( line, sizeof(line)-1, fd2);
+			if (p==NULL) break;
+			
+			pp = index( line, ':');
+			if (pp==NULL) continue;
+			
+			if ( strncmp( p, username, _MAX(strlen(username), (int)(pp-p)) ) == 0 ) {
+				put = 1;
+				fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
+			} else {
+				fputs( line, fd);
+			}
+		} while(1);
+
+		if (put==0) {
+			fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
+		}
 		free(cr);
+		
+		fclose(fd);
+		fclose(fd2);
+
+		remove(tmpname);
+
 	}
 
 
