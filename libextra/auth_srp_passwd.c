@@ -332,7 +332,6 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
     /* user was not found. Fake him. Actually read the g,n values from
      * the last index found and randomize the entry.
      */
-fprintf(stderr, "username: %s\nindex: %d\n", username, last_index);
     if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, last_index)==0) {
 	ret = _randomize_pwd_entry( entry);
 	if (ret < 0) {
