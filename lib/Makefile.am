@@ -59,21 +59,21 @@ gnutls_asn1_tab.c: gnutls.asn
 	-../src/asn1c gnutls.asn gnutls_asn1_tab.c
 
 gnutls-api.tex: $(COBJECTS)
-	@echo "\\newpage" > gnutls-api.tex
+	@echo "" > gnutls-api.tex
 	@for i in $(COBJECTS); \
 	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> gnutls-api.tex \
 	&& echo "ok"; \
 	done
 
 gnutls-extra-api.tex: $(COBJECTS_EXTRA)
-	@echo "\\newpage" > gnutls-extra-api.tex
+	@echo "" > gnutls-extra-api.tex
 	@for i in $(COBJECTS_EXTRA); \
 	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> gnutls-extra-api.tex \
 	&& echo "ok"; \
 	done
 
 asn1-api.tex: $(COBJECTS2)
-	@echo "\\newpage" > asn1-api.tex
+	@echo "" > asn1-api.tex
 	@for i in $(COBJECTS2); \
 	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> asn1-api.tex \
 	&& echo "ok"; \

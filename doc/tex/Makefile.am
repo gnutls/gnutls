@@ -1,7 +1,6 @@
-EXTRA_DIST = gnutls.tex gnutls.ps gnutls.html asn1.ps asn1.html \
+EXTRA_DIST = gnutls.tex gnutls.ps asn1.ps \
 	ex1.tex ex2.tex ex3.tex srp1.tex serv1.tex gnutls.css ex4.tex \
-	fdl.tex cover.tex.in img1.png  img3.png  img5.png img2.png img4.png \
-	img6.png img7.png gnutls-logo.ps layers.ps
+	fdl.tex cover.tex.in gnutls-logo.ps layers.ps
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex asn1.tex ../../lib/asn1-api.tex \
@@ -16,19 +15,11 @@ gnutls.ps: $(TEX_OBJECTS)
 	-$(LN_S) ../../lib/asn1-api.tex .
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps
 
-gnutls.html: $(TEX_OBJECTS)
-	-latex2html gnutls.tex -no_navigation -no_subdir 1 -split 0 -local_icons -html_version 3.2,math \
-	-info "" -white
-
 asn1.ps: $(ASN1_TEX_OBJECTS)
 	-$(LN_S) ../lib/asn1-api.tex .
 	-latex asn1.tex && latex asn1.tex && dvips asn1.dvi -o asn1.ps
 
-asn1.html: $(ASN1_TEX_OBJECTS)
-	-latex2html asn1.tex -no_navigation -no_subdir 1 -split 0 -local_icons -html_version 3.2,math \
-	-info "" -white
-
 clean:
 	@-rm *.log *.aux *.toc
-	@-rm *.pl index.html gnutls.dvi
+	@-rm *.pl gnutls.dvi
 	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex
