@@ -1,3 +1,10 @@
+2003-06-17 11:45  nmav <nmav@gnutls.org>
+
+	* doc/: protocol/draft-ietf-tls-srp-04.txt,
+	protocol/draft-ietf-tls-srp-05.txt, tex/gnutls.bib:
+
+	new srp draft.  
+
 2003-06-16 09:31  nmav <nmav@gnutls.org>
 
 	* doc/tex/: gnutls.bib, library.tex:
