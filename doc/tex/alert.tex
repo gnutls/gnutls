@@ -1,0 +1,29 @@
+\section{The alert protocol}
+
+The Alert protocol is there to allow signals to be sent between peers.
+These signals are mostly used to inform the peer about the cause of
+a protocol failure. Some of these signals are used internally by the
+protocol and the application protocol does not have to cope with them
+(see \emph{GNUTLS\_A\_CLOSE\_NOTIFY}), and others refer to the
+application protocol solely (see \emph{GNUTLS\_A\_USER\_CANCELLED}).
+An alert signal includes a level indication which may be either
+fatal or warning. Fatal alerts always terminate the current connection,
+and prevent future renegotiations using the current session ID.
+
+\par The alert messages are protected by the record protocol, thus
+the information that it's included does not leak. You must take
+extreme care for the alert information not to leak, to a possible attacker
+(via public logfiles etc).
+
+\par
+\begin{itemize}
+\item \printfunc{gnutls_alert_send}{gnutls\_alert\_send()}:
+to send an alert signal.
+\item \printfunc{gnutls_alert_send_appropriate}{gnutls\_alert\_send\_appropriate()}:
+to send an alert signal that depends on a given gnutls error number.
+\item \printfunc{gnutls_alert_get}{gnutls\_alert\_get()}:
+returns the last received alert.
+\item \printfunc{gnutls_alert_get_name}{gnutls\_alert\_get\_name()}:
+returns the name (in a character array) of the given alert.
+\end{itemize}
+

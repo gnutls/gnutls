@@ -1,11 +1,13 @@
-\section{Transport Layer}
+\section{The transport layer}
 \par
 \gnutls{} can be used above any reliable transport layer. To do this you will only 
-need to set up the 
-\hyperref{gnutls\_transport\_set\_push\_func()}{gnutls\_transport\_set\_push\_func() (see Section }{)}{gnutls_transport_set_push_func} and
-\hyperref{gnutls\_transport\_set\_pull\_func()}{gnutls\_transport\_set\_pull\_func() (see Section }{)}{gnutls_transport_set_pull_func}
-functions. These functions will then be used by gnutls in order to send and receive data.
-The functions specified should return -1 on error and should set errno appropriately.
+need to set up the functions:
+\begin{itemize}
+\item \printfunc{gnutls_transport_set_push_func}{gnutls\_transport\_set\_push\_func()}
+\item \printfunc{gnutls_transport_set_pull_func}{gnutls\_transport\_set\_pull\_func()}
+\end{itemize}
+The given functions will then be used by gnutls to send and receive data.
+These functions should return -1 on error and should set errno appropriately.
 \gnutls{} supports EINTR and EAGAIN errno values. These values are
 usually used in non blocking IO and interrupted system calls.
 The corresponding values (GNUTLS\_E\_INTERRUPTED, GNUTLS\_E\_AGAIN) 

@@ -1,12 +1,11 @@
 EXTRA_DIST = gnutls.tex gnutls.ps gnutls.html  \
 	ex1.tex ex2.tex ex3.tex srp1.tex serv1.tex gnutls.css \
-	fdl.tex macros.tex \
-	cover.tex.in img1.png  img3.png  img5.png img2.png img4.png \
+	fdl.tex cover.tex.in img1.png  img3.png  img5.png img2.png img4.png \
 	img6.png img7.png gnutls-logo.ps layers.ps
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex asn1.tex ../../lib/asn1-api.tex \
-	auth.tex ciphers.tex errors.tex layers.tex
+	auth.tex ciphers.tex errors.tex layers.tex alert.tex
 
 gnutls.ps: $(TEX_OBJECTS)
 	-$(LN_S) ../../lib/gnutls-api.tex .
