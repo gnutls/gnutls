@@ -1,4 +1,5 @@
 /*
+ *  Copyright (C) 2004 Simon Josefsson
  *  Copyright (C) 2000,2003 Nikos Mavroyanopoulos
  *
  *  This file is part of GNUTLS.
@@ -20,8 +21,7 @@
 
 #include <gnutls_int.h>
 
-#define GMIN(x,y) ((x<y)?x:y)
-#define GMAX(x,y) ((x>y)?x:y)
+#include <minmax.h>
 
 #define rotl32(x,n)   (((x) << ((uint16)(n))) | ((x) >> (32 - (uint16)(n))))
 #define rotr32(x,n)   (((x) >> ((uint16)(n))) | ((x) << (32 - (uint16)(n))))

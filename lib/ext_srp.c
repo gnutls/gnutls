@@ -100,7 +100,7 @@ int _gnutls_srp_send_params(gnutls_session_t session, opaque * data,
 	    return 0;
 
 	if (cred->username != NULL) {	/* send username */
-	    len = GMIN(strlen(cred->username), 255);
+	    len = MIN(strlen(cred->username), 255);
 
 	    if (data_size < len + 1) {
 		gnutls_assert();
@@ -129,7 +129,7 @@ int _gnutls_srp_send_params(gnutls_session_t session, opaque * data,
 		return 0;
 	    }
 
-	    len = GMIN(strlen(username), 255);
+	    len = MIN(strlen(username), 255);
 
 	    if (data_size < len + 1) {
 		gnutls_free(username);

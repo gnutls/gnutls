@@ -32,7 +32,7 @@
 #include <gnutls_cert.h>
 #include <libtasn1.h>
 #include <gnutls_global.h>
-#include <gnutls_num.h>		/* GMAX */
+#include <gnutls_num.h>		/* MAX */
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>

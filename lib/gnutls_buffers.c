@@ -392,7 +392,7 @@ ssize_t _gnutls_io_read_buffered(gnutls_session_t session, opaque ** iptr,
     /* calculate the actual size, ie. get the minimum of the
      * buffered data and the requested data.
      */
-    min = GMIN(session->internals.record_recv_buffer.length, sizeOfPtr);
+    min = MIN(session->internals.record_recv_buffer.length, sizeOfPtr);
     if (min > 0) {
 	/* if we have enough buffered data
 	 * then just return them.
@@ -485,7 +485,7 @@ ssize_t _gnutls_io_read_buffered(gnutls_session_t session, opaque ** iptr,
     if (ret < 0 || ret2 < 0) {
 	gnutls_assert();
 	/* that's because they are initialized to 0 */
-	return GMIN(ret, ret2);
+	return MIN(ret, ret2);
     }
 
     ret += ret2;

@@ -210,7 +210,7 @@ static int pwd_read_conf(const char *pconf_file, SRP_PWD_ENTRY * entry,
 	while ((line[i] != ':') && (line[i] != '\0') && (i < sizeof(line))) {
 	    i++;
 	}
-	if (strncmp(indexstr, line, GMAX(i, len)) == 0) {
+	if (strncmp(indexstr, line, MAX(i, len)) == 0) {
 	    if ((index = pwd_put_values2(entry, line)) >= 0)
 		return 0;
 	    else {
@@ -304,7 +304,7 @@ int _gnutls_srp_pwd_read_entry(gnutls_session_t state, char *username,
 	    i++;
 	}
 
-	if (strncmp(username, line, GMAX(i, len)) == 0) {
+	if (strncmp(username, line, MAX(i, len)) == 0) {
 	    if ((index = pwd_put_values(entry, line)) >= 0) {
 		/* Keep the last index in memory, so we can retrieve fake parameters (g,n)
 		 * when the user does not exist.

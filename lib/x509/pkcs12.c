@@ -345,7 +345,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 	goto cleanup;
     }
 
-    bag->bag_elements = GMIN(MAX_BAG_ELEMENTS, count);
+    bag->bag_elements = MIN(MAX_BAG_ELEMENTS, count);
 
     for (i = 0; i < bag->bag_elements; i++) {
 

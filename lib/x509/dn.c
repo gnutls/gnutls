@@ -58,7 +58,7 @@ static char *str_escape(char *str, char *buffer, unsigned int buffer_size)
     if (str == NULL || buffer == NULL)
 	return NULL;
 
-    str_length = GMIN(strlen(str), buffer_size - 1);
+    str_length = MIN(strlen(str), buffer_size - 1);
 
     for (i = j = 0; i < str_length; i++) {
 	if (str[i] == ',' || str[i] == '+' || str[i] == '"'

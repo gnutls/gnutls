@@ -608,7 +608,7 @@ AC_MSG_RESULT([***
 
 gl_SOURCE_BASE(gl)
 gl_M4_BASE(gl/m4)
-gl_MODULES(getline error exit progname getpass-gnu)
+gl_MODULES(getline error exit progname getpass-gnu minmax)
 gl_INIT
 
 AC_MSG_RESULT([***

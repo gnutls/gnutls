@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/libextra -I$(srcdir)/minitasn1 -I$(top_srcdir)/libextra/openpgp/ -I$(top_srcdir)/libextra/opencdk -I$(srcdir)/x509 -I$(top_srcdir)/includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
+INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl -I$(top_srcdir)/libextra -I$(srcdir)/minitasn1 -I$(top_srcdir)/libextra/openpgp/ -I$(top_srcdir)/libextra/opencdk -I$(srcdir)/x509 -I$(top_srcdir)/includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal

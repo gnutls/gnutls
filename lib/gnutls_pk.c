@@ -129,7 +129,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum_t * ciphertext,
 		if (i < 2)
 		    ps[i] = rnd[i];
 		else
-		    ps[i] = GMAX(rnd[2] + ps[i - 1] + ps[i - 2], rnd[1]);
+		    ps[i] = MAX(rnd[2] + ps[i - 1] + ps[i - 2], rnd[1]);
 	    }
 	}
 	break;
