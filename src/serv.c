@@ -497,11 +497,11 @@ int main(int argc, char **argv)
    }
 
    if (pgp_certfile != NULL)
-      if (gnutls_certificate_set_openpgp_key_file
-	  (cert_cred, pgp_certfile, pgp_keyfile) < 0) {
+      if ((ret=gnutls_certificate_set_openpgp_key_file
+	  (cert_cred, pgp_certfile, pgp_keyfile)) < 0) {
 	 fprintf(stderr,
-		 "Error while reading the OpenPGP key pair ('%s', '%s')\n",
-		 pgp_certfile, pgp_keyfile);
+		 "Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
+		 ret, pgp_certfile, pgp_keyfile);
       }
 
    gnutls_certificate_set_openpgp_keyserver(cert_cred, pgp_keyserver, 0);

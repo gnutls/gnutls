@@ -42,7 +42,6 @@ void print_x509_info(GNUTLS_STATE state)
 	time_t expiret = gnutls_certificate_expiration_time_peers(state);
 	time_t activet = gnutls_certificate_activation_time_peers(state);
 
-
 	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
 	if (cert_list_size <= 0)
