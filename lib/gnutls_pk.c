@@ -100,37 +100,15 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum_t * ciphertext,
 	    gnutls_afree(edata);
 	    return ret;
 	}
-	for (i = 0; i < psize; i++) {
-	    opaque rnd[3];
-
-	    /* Read three random bytes that will be
-	     * used to replace the zeros.
-	     */
+	for (i = 0; i < psize; i++)
+	  while (ps[i] == 0) {
 	    if ((ret =
-		 _gnutls_get_random(rnd, 3, GNUTLS_STRONG_RANDOM)) < 0) {
+		 _gnutls_get_random(&ps[i], 1, GNUTLS_STRONG_RANDOM)) < 0) {
 		gnutls_assert();
 		gnutls_afree(edata);
 		return ret;
 	    }
-	    /* use non zero values for 
-	     * the first two.
-	     */
-	    if (rnd[0] == 0)
-		rnd[0] = 0xaf;
-	    if (rnd[1] == 0)
-		rnd[1] = 0xae;
-
-	    if (ps[i] == 0) {
-		/* If the first one is zero then set it to rnd[0].
-		 * If the second one is zero then set it to rnd[1].
-		 * Otherwise add (mod 256) the two previous ones plus rnd[2], or use
-		 * rnd[1] if the value == 0.
-		 */
-		if (i < 2)
-		    ps[i] = rnd[i];
-		else
-		    ps[i] = MAX(rnd[2] + ps[i - 1] + ps[i - 2], rnd[1]);
-	    }
+	  }
 	}
 	break;
     case 1:
