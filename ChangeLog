@@ -1,3 +1,11 @@
+2003-10-28 07:15  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex-pkcs12.tex, src/certtool-gaa.c,
+	src/certtool-gaa.h, src/certtool.c, src/certtool.gaa:
+
+	added pkcs #12 support to certtool. Corrected some bugs in the
+	export functions.  
+
 2003-10-27 09:51  nmav <nmav@gnutls.org>
 
 	* configure.in, lib/gnutls_dh_primes.c:
