@@ -75,7 +75,7 @@ static char http_buffer[16*1024];
 /* These are global */
 GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
 GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
-GNUTLS_CERTIFICATE_SERVER_CREDENTIALS x509_cred;
+GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
 
 
 GNUTLS_STATE initialize_state(void)
@@ -105,7 +105,7 @@ GNUTLS_STATE initialize_state(void)
 	
 	gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
 	gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, x509_cred);
+	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
 	gnutls_mac_set_priority(state, mac_priority);
 
@@ -261,27 +261,27 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_certificate_allocate_server_sc(&x509_cred) < 0) {
+	if (gnutls_certificate_allocate_server_sc(&cert_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_x509_trust_file( x509_cred, CAFILE, CRLFILE) < 0) {
+	if (gnutls_certificate_set_x509_trust_file( cert_cred, CAFILE, CRLFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_openpgp_key_file( x509_cred, PGP_CERTFILE, PGP_KEYFILE) < 0) {
+	if (gnutls_certificate_set_openpgp_key_file( cert_cred, PGP_CERTFILE, PGP_KEYFILE) < 0) {
 		fprintf(stderr, "PGP PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_x509_key_file( x509_cred, CERTFILE1, KEYFILE1) < 0) {
+	if (gnutls_certificate_set_x509_key_file( cert_cred, CERTFILE1, KEYFILE1) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_x509_key_file( x509_cred, CERTFILE2, KEYFILE2) < 0) {
+	if (gnutls_certificate_set_x509_key_file( cert_cred, CERTFILE2, KEYFILE2) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
@@ -412,10 +412,11 @@ int main(int argc, char **argv)
 		close(sd);
 		gnutls_deinit(state);
 
+		break;
 	}
 	close(listen_sd);
 
-	gnutls_certificate_free_server_sc(x509_cred);
+	gnutls_certificate_free_server_sc(cert_cred);
 	gnutls_srp_free_server_sc(srp_cred);
 	gnutls_anon_free_server_sc(dh_cred);
 
