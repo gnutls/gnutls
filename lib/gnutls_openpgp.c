@@ -367,33 +367,40 @@ gnutls_openpgp_set_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res,
   cdk_pkt_new(&pkt);
   res->ncerts = 0;
   res->cert_list = gnutls_malloc(sizeof(gnutls_cert));
+  res->cert_list_length = gnutls_malloc( sizeof(int) );
   do {
     rc = cdk_keydb_enum_pk(buf, &pkt, &eof);
     if (eof == 1 && !pkt || rc)
       break;
-    for (i=1, p=pkt; p && pkt; p=p->next)
+    for (i=1, p=pkt; p && p->id; p=p->next)
       {
         if (i > MAX_PARAMS_SIZE)
           break;
+        if (!res->cert_list[res->ncerts])
+          {
+            int n = res->ncerts;
+            res->cert_list_length = gnutls_realloc(res->cert_list_length,
+                                                   i*sizeof(int));
+            res->cert_list[n] = gnutls_realloc(res->cert_list[n],
+                                               i*sizeof(gnutls_cert)); 
+          }
         if (p->id == PKT_PUBKEY)
           {
-            iobuf_to_datum(buf, &res->cert_list[res->ncerts]->raw);
-            openpgp_pk_to_gnutls_cert( res->cert_list[res->ncerts], p->p.pk );
+            int n = res->ncerts;
+            res->cert_list_length[n] = 1;
+            iobuf_to_datum(buf, &res->cert_list[n]->raw);
+            openpgp_pk_to_gnutls_cert( res->cert_list[n], p->p.pk );
             res->ncerts++; i++;
           }
         else if (p->id == PKT_SIG)
           {
             int n = res->ncerts;
-            res->cert_list[n] = gnutls_realloc(res->cert_list[n],
-                                               i*sizeof(gnutls_cert));
             openpgp_sig_to_gnutls_cert( res->cert_list[n], p->p.sig );
           }
       }
-    res->cert_list_length = gnutls_malloc( sizeof(int) );
-    res->cert_list_length[0] = 1;
-    res->x509_ca_list = NULL;
-    res->x509_ncas = 0;
   } while (!eof && !rc);
+  res->x509_ca_list = NULL;
+  res->x509_ncas = 0;
   cdk_iobuf_close(buf);
   cdk_iobuf_close(a);
   if (rc)
