@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <gnutls/openssl.h>
 
+/* WARNING: Error functions aren't currently thread-safe */
+
 static int last_error = 0;
 
 
@@ -171,6 +173,11 @@ int SSL_set_fd(SSL *ssl, int fd)
     return 1;
 }
 
+void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio)
+{
+    gnutls_transport_set_ptr (ssl->gnutls_state, rbio->fd);
+    free(BIO);
+}
 
 void SSL_set_connect_state(SSL *ssl)
 {
@@ -329,6 +336,136 @@ SSL_METHOD *SSLv23_client_method(void)
     return m;
 }
 
+SSL_METHOD *SSLv23_server_method(void)
+{
+    SSL_METHOD *m;
+    m = (SSL_METHOD *)calloc(1, sizeof(SSL_METHOD));
+    if (!m)
+        return NULL;
+
+    m->protocol_priority[0] = GNUTLS_TLS1;
+    m->protocol_priority[1] = GNUTLS_SSL3;
+    m->protocol_priority[2] = 0;
+
+    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[4] = 0;
+
+    m->comp_priority[0] = GNUTLS_COMP_ZLIB;
+    m->comp_priority[1] = GNUTLS_COMP_NULL;
+    m->comp_priority[2] = 0;
+
+    m->kx_priority[0] = GNUTLS_KX_DHE_RSA;
+    m->kx_priority[1] = GNUTLS_KX_RSA;
+    m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
+    m->kx_priority[3] = 0;
+
+    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[1] = GNUTLS_MAC_MD5;
+    m->mac_priority[2] = 0;
+
+    return m;
+}
+
+SSL_METHOD *SSLv23_client_method(void)
+{
+    SSL_METHOD *m;
+    m = (SSL_METHOD *)calloc(1, sizeof(SSL_METHOD));
+    if (!m)
+        return NULL;
+
+    m->protocol_priority[0] = GNUTLS_TLS1;
+    m->protocol_priority[1] = GNUTLS_SSL3;
+    m->protocol_priority[2] = 0;
+
+    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[4] = 0;
+
+    m->comp_priority[0] = GNUTLS_COMP_ZLIB;
+    m->comp_priority[1] = GNUTLS_COMP_NULL;
+    m->comp_priority[2] = 0;
+
+    m->kx_priority[0] = GNUTLS_KX_DHE_RSA;
+    m->kx_priority[1] = GNUTLS_KX_RSA;
+    m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
+    m->kx_priority[3] = 0;
+
+    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[1] = GNUTLS_MAC_MD5;
+    m->mac_priority[2] = 0;
+
+    return m;
+}
+
+SSL_METHOD *TLSv1_client_method(void)
+{
+    SSL_METHOD *m;
+    m = (SSL_METHOD *)calloc(1, sizeof(SSL_METHOD));
+    if (!m)
+        return NULL;
+
+    m->protocol_priority[0] = GNUTLS_TLS1;
+    m->protocol_priority[1] = 0;
+
+    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[4] = 0;
+
+    m->comp_priority[0] = GNUTLS_COMP_ZLIB;
+    m->comp_priority[1] = GNUTLS_COMP_NULL;
+    m->comp_priority[2] = 0;
+
+    m->kx_priority[0] = GNUTLS_KX_DHE_RSA;
+    m->kx_priority[1] = GNUTLS_KX_RSA;
+    m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
+    m->kx_priority[3] = 0;
+
+    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[1] = GNUTLS_MAC_MD5;
+    m->mac_priority[2] = 0;
+
+    return m;
+}
+
+SSL_METHOD *TLSv1_server_method(void)
+{
+    SSL_METHOD *m;
+    m = (SSL_METHOD *)calloc(1, sizeof(SSL_METHOD));
+    if (!m)
+        return NULL;
+
+    m->protocol_priority[0] = GNUTLS_TLS1;
+    m->protocol_priority[1] = 0;
+
+    m->cipher_priority[0] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+    m->cipher_priority[1] = GNUTLS_CIPHER_3DES_CBC;
+    m->cipher_priority[2] = GNUTLS_CIPHER_RIJNDAEL_256_CBC;
+    m->cipher_priority[3] = GNUTLS_CIPHER_ARCFOUR;
+    m->cipher_priority[4] = 0;
+
+    m->comp_priority[0] = GNUTLS_COMP_ZLIB;
+    m->comp_priority[1] = GNUTLS_COMP_NULL;
+    m->comp_priority[2] = 0;
+
+    m->kx_priority[0] = GNUTLS_KX_DHE_RSA;
+    m->kx_priority[1] = GNUTLS_KX_RSA;
+    m->kx_priority[2] = GNUTLS_KX_DHE_DSS;
+    m->kx_priority[3] = 0;
+
+    m->mac_priority[0] = GNUTLS_MAC_SHA;
+    m->mac_priority[1] = GNUTLS_MAC_MD5;
+    m->mac_priority[2] = 0;
+
+    return m;
+}
+
 
 /* SSL_CIPHER functions */
 
@@ -420,6 +557,19 @@ char *X509_NAME_oneline(gnutls_x509_dn *name, char *buf, int len)
 void BIO_get_fd(GNUTLS_STATE gnutls_state, int *fd)
 {
     *fd = gnutls_transport_get_ptr(gnutls_state);
+}
+
+BIO *BIO_new_socket(int sock, int close_flag)
+{
+    BIO *bio;
+
+    bio = (BIO *)malloc(sizeof(BIO));
+    if (!bio)
+        return NULL;
+
+    BIO->fd = sock;
+
+    return BIO;
 }
 
 

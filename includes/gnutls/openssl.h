@@ -16,12 +16,7 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
-/* FIXME FIXME FIXME
-   Things to fix:
-   error handling
-   SSL->options
-*/
+/* WARNING: Error functions aren't currently thread-safe */
 
 #ifndef GNUTLS_OPENSSL_H
 #define GNUTLS_OPENSSL_H
@@ -66,7 +61,6 @@ typedef struct
     int mac_priority[GNUTLS_MAX_ALGORITHM_NUM];
 } SSL_METHOD;
 
-
 typedef struct
 {
     GNUTLS_Version version;
@@ -77,6 +71,11 @@ typedef struct
     GNUTLS_CertificateType cert;
 } SSL_CIPHER;
 
+typedef struct _BIO
+{
+    int fd;
+} BIO;
+
 typedef struct
 {
     struct _SSL *ssl;
@@ -84,6 +83,8 @@ typedef struct
     gnutls_datum *cert_list;
 #define current_cert cert_list
 } X509_STORE_CTX;
+
+#define X509_STORE_CTX_get_current_cert(ctx) ((ctx)->current_cert)
 
 typedef struct _SSL_CTX
 {
@@ -103,6 +104,7 @@ typedef struct _SSL
 {
     GNUTLS_STATE gnutls_state;
 #define rbio gnutls_state
+
     GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS gnutls_cred;
 
     SSL_CTX *ctx;
@@ -121,6 +123,10 @@ typedef struct
 {
     GCRY_MD_HD handle;
 } MD_CTX;
+
+typedef struct
+{
+} RSA;
 
 #define MD5_CTX MD_CTX
 #define RIPEMD160_CTX MD_CTX
@@ -160,6 +166,7 @@ void SSL_free(SSL *ssl);
 void SSL_load_error_strings(void);
 int SSL_get_error(SSL *ssl, int ret);
 int SSL_set_fd(SSL *ssl, int fd);
+void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio);
 void SSL_set_connect_state(SSL *ssl);
 int SSL_pending(SSL *ssl);
 void SSL_set_verify(SSL *ssl, int verify_mode,
@@ -177,6 +184,9 @@ int SSL_write(SSL *ssl, const void *buf, int len);
 /* SSL_METHOD functions */
 
 SSL_METHOD *SSLv23_client_method(void);
+SSL_METHOD *TLSv1_client_method(void);
+SSL_METHOD *SSLv23_server_method(void);
+SSL_METHOD *TLSv1_server_method(void);
 
 
 /* SSL_CIPHER functions */
@@ -196,7 +206,7 @@ char *X509_NAME_oneline(gnutls_x509_dn *name, char *buf, int len);
 /* BIO functions */
 
 void BIO_get_fd(GNUTLS_STATE gnutls_state, int *fd);
-
+BIO *BIO_new_socket(int sock, int close_flag);
 
 /* error handling */
 
