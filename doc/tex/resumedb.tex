@@ -6,7 +6,7 @@ The
 the same server a client may use session resuming. {\bf Session resuming} is a
 feature of the {\bf TLS} protocol which allows a client to connect to a server,
 after a successful handshake, without the expensive calculations (by using the previously
-established keys). \gnutls supports this feature, and the
+established keys). \gnutls{} supports this feature, and the
 example \hyperref{resume client}{resume client (see Section }{)}{resume-example} illustrates a typical use of it (This is a modification of the simple client example).
 Servers only need to use the
 \hyperref{gnutls\_db\_set\_name()}{gnutls\_db\_set\_name() (see Section }{)}{gnutls_db_set_name} function if they want to use the gdbm
@@ -40,7 +40,7 @@ only one thread can write at a time. The current behaviour of gnutls is
 not to block to wait for the DB to be ready for writing, but continue the
 process normally (and do not save the parameters).  
 \par
- \gnutls also provides callback functions such as:
+ \gnutls{} also provides callback functions such as:
 \hyperref{gnutls\_db\_set\_remove\_function()}{gnutls\_db\_set\_remove\_function() (see Section }{)}
 {gnutls_db_set_remove_function}, 
 \hyperref{gnutls\_db\_set\_store\_function()}{gnutls\_db\_set\_store\_function() (see Section }{)}
@@ -56,7 +56,7 @@ If an alternative backend is in use, it might be usefull to be able to check
 for expired sessions in order to remove them, and save space. This is what
 \hyperref{gnutls\_db\_clean()}{gnutls\_db\_clean() (see Section }{)}
 {gnutls_db_clean} does for the gdbm backend. 
-\gnutls provides the function
+\gnutls{} provides the function
 \hyperref{gnutls\_db\_check\_entry()}{gnutls\_db\_check\_entry() (see Section }{)
 }{gnutls_db_check_entry}, which takes as input session data, and
 returns a negative value if the data are to be removed.

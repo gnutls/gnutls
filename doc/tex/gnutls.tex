@@ -19,35 +19,37 @@
 \chapter{The Library}
 \section{Introduction}
 \par
-\gnutls is a portable library which implements the \tlsI and 
-\sslIII protocols.
-\tls stands for 'Transport Layer Security' and is the sucessor of \ssl\footnote{
-\ssl or Secure Sockets Layer is a protocol designed by Netscape. \tlsI is based on
-\sslIII protocol. \sslII is a very old protocol which is 
-not considered secure today. \sslII is not implemented in \gnutls}.
-\tlsI\footnote{described in {\it RFC 2246}} is an Internet protocol,
-defined by IETF\footnote{IETF or Internet Engineering Task Force 
+\gnutls{} is a portable library which implements the \tlsI{} and 
+\sslIII{} protocols.
+\tls{} stands for 'Transport Layer Security' and is the sucessor of \ssl{}, 
+the Secure Sockets Layer protocol designed by Netscape. 
+
+\tlsI{}\footnote{described in {\it RFC 2246}} is an Internet protocol,
+defined by {IETF}\footnote{IETF or Internet Engineering Task Force 
 is a large open international community of network
 designers, operators, vendors, and researchers concerned with the evolution of 
-the Internet architecture and the smooth operation of the Internet. It is open to any interested individual.}
-that provides confidentiality, and authentication layers over a {reliable
-transport layer}\footnote{\tls is mostly used over {\emph{TCP/IP}} although this is not restrictive, you may
-use it over any reliable transport layer.}. \gnutls implements the
-above protocols in reentrant way in order to be used in multiple threads of 
-execution (without the need for Critical Sections and locks). See
-http://www.gnutls.org/ and http://www.gnu.org/software/gnutls/ for
-updated versions of the \gnutls software and this document.
+the Internet architecture and the smooth operation of the Internet. It is open to any interested individual.}, 
+that provides confidentiality, and authentication layers over any
+transport layer.
 
 \par
-Currently \gnutls implements:
+\gnutls{} implements the above
+protocols in a reentrant way. This allows multiple threads of
+execution, without the need for Critical Sections and locks. See
+\htmladdnormallink{http://www.gnutls.org/}{http://www.gnutls.org/}
+and \htmladdnormallink{http://www.gnu.org/software/gnutls/}{http://www.gnu.org/software/gnutls/} 
+for updated versions of the \gnutls{} software and this document.
+
+\par
+Currently \gnutls{} implements:
 \begin{itemize}
- \item the \tlsI and \sslIII protocols, without any weak algorithms\footnote{
-There are ciphersuites in \tlsI that are considered weak. These
+ \item the \tlsI{} and \sslIII{} protocols, without any weak algorithms\footnote{
+There are ciphersuites in \tlsI{} that are considered weak. These
 ciphersuites are deliberately weak in order to be able to export encryption
 software from some countries.}
  \item {\bf X.509} Public Key Infrastructure (with several limitations).
- \item {\bf SRP} for \tls authentication.
- \item \tls {\bf Extension mechanism}
+ \item {\bf SRP} for \tls{} authentication.
+ \item \tls{} {\bf Extension mechanism}
 \end{itemize}
 
 \input{ciphersuites}
@@ -63,12 +65,12 @@ software from some countries.}
 \input{errors}
 
 \section{Client Examples}
-This section contains examples of \tls and \ssl clients, using \gnutls. 
+This section contains examples of \tls{} and \ssl{} clients, using \gnutls{}. 
 
 \subsection{Simple Client example with X.509 Authentication}
 Let's assume now that we want to create a client which communicates
 with servers using the X509 authentication schema. The following client
-is a very simple \tls client, it does not support session resuming nor
+is a very simple \tls{} client, it does not support session resuming nor
 any other fancy features.
 \input{ex2}
 
@@ -86,16 +88,16 @@ This function should be called after a successful
 \input{ex1}
 
 \subsection{Simple Client example with SRP Authentication}
-Although {\bf SRP} is not part of the \tls standard, \gnutls implements
-{\it David Taylor's}\footnote{Work in progress.} proposal for using the SRP algorithm
-within the \tls handshake protocol. The following client
+Although {\bf SRP} is not part of the \tls{} standard, \gnutls{} implements
+{\it David Taylor's} proposal\footnote{This is work in progress.}  for using the SRP algorithm
+within the \tls{} handshake protocol. The following client
 is a very simple SRP-TLS client which connects to a server 
 and authenticates using {\it username} and {\it password}.
 
 \input{srp1}
 
 \section{Server Examples}
-This section contains examples of \tls and \ssl servers, using \gnutls.
+This section contains examples of \tls{} and \ssl{} servers, using \gnutls{}.
 
 \subsection{Echo Server with X.509 and SRP authentication}
 The following example is a server which supports both {\bf SRP} and {\bf X509} authentication.
