@@ -370,7 +370,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 
 	if (verify < 0) {
 		gnutls_assert();
-		return GNUTLS_CERT_INVALID;
+		return verify;
 	}
 
 
