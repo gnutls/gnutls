@@ -305,6 +305,17 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	return GNUTLS_CERT_TRUSTED;
 }
 
+/* The algorithm used is:
+ * 1. Check the certificate chain given by the peer, if it is ok.
+ * 2. If any certificate in the chain are expired, revoked or not
+ *    valid, then the certificate is not trusted.
+ * 3. If 1 is ok, then find a certificate in the trusted CAs file
+ *    that has the DN of the issuer field in the last certificate
+ *    in the peer's certificate chain.
+ * 4. If it does exist then verify it. If verification is ok then
+ *    it is trusted.
+ * 5. In all other cases the certificate is not trusted.
+ */
 /* This function verifies a X.509 certificate list. The certificate list should
  * lead to a trusted CA in order to be trusted.
  */
