@@ -1,4 +1,4 @@
-INCLUDES = -I../libextra -Iminitasn1/ -I../includes
+INCLUDES = -I../libextra -Iminitasn1/ -I../includes $(LIBGCRYPT_CFLAGS)
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal

@@ -422,7 +422,7 @@ int main(int argc, char **argv)
 		}
 
 		if (FD_ISSET(sd, &rset)) {
-			bzero(buffer, MAX_BUF + 1);
+			memset(buffer, 0, MAX_BUF + 1);
 			ret = socket_recv(hd, buffer, MAX_BUF);
 
 			if (ret == 0) {
