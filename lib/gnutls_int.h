@@ -23,14 +23,13 @@
 #define GNUTLS_INT_H
 
 /*
-#define HANDSHAKE_DEBUG
 #define READ_DEBUG
 #define WRITE_DEBUG
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
-*/
+#define HANDSHAKE_DEBUG
 #define DEBUG
-
+*/
 
 #define MAX32 4294967295
 #define MAX24 16777215
@@ -266,7 +265,7 @@ typedef struct {
 	char*				db_name;
 	int				expire_time;
 	MOD_AUTH_STRUCT*		auth_struct; /* used in handshake packets and KX algorithms */
-
+	int				v2_hello; /* set 0 normally - 1 if v2 hello was received - server side only */
 } GNUTLS_INTERNALS;
 
 typedef struct {

@@ -2,4 +2,3 @@
 * x509 Certificate API (we need an ASN.1 parser or something)
 * Add Kerberos support
 * OpenPGP certificate support (through libgcrypt)
-* Add support for v2.0 init packet (why do that anyway ???)

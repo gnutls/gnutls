@@ -92,6 +92,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->cipher_specs.server_write_key = NULL;
 	(*state)->cipher_specs.client_write_key = NULL;
 
+	(*state)->gnutls_internals.v2_hello = 0;
+	
 	(*state)->gnutls_internals.buffer = NULL;
 	/* SSL3 stuff */
 	(*state)->gnutls_internals.hash_buffer = NULL;
@@ -579,6 +581,7 @@ char peekdata;
  * flags is the sockets flags to use. Currently only MSG_DONTWAIT is
  * supported.
  */
+#define SSL2_HSIZE
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata, int flags)
 {
 	uint8 *tmpdata;
@@ -589,7 +592,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	uint16 length;
 	uint8 *ciphertext;
 	int ret = 0;
-
+	int header_size = HEADER_SIZE;
 	/* If we have enough data in the cache do not bother receiving
 	 * a new packet. (in order to flush the cache)
 	 */
@@ -621,37 +624,57 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	memcpy( &recv_type, &headers[0], 1);
-	version = _gnutls_version_get( headers[1], headers[2]);
+	/* Read the first two bytes to determine if this is a 
+	 * version 2 message 
+	 */
+	if ( headers[0] > 127 && type==GNUTLS_HANDSHAKE) { 
 
-	memcpy( &length, &headers[3], 2);
-#ifndef WORDS_BIGENDIAN
-	length = byteswap16(length);
+	/* if msb set and expecting handshake message
+	 * it should be SSL 2 hello 
+	 */
+		version = GNUTLS_SSL3; /* assume ssl 3.0 */
+		length = (((headers[0] & 0x7f) << 8)) | headers[1];
+		header_size = 2;
+		recv_type = GNUTLS_HANDSHAKE; /* only v2 client hello we accept */
+		state->gnutls_internals.v2_hello = length;
+#ifdef DEBUG
+		fprintf(stderr, "Record: V2 packet received. Length: %d\n", length);
 #endif
 
-	if (_gnutls_version_is_supported(state, version) == 0) {
+	} else {
+		/* version 3.x 
+		 */
+		memcpy( &recv_type, &headers[0], 1);
+		version = _gnutls_version_get( headers[1], headers[2]);
+
+		memcpy( &length, &headers[3], 2);
+#ifndef WORDS_BIGENDIAN
+		length = byteswap16(length);
+#endif
+	}
+	
+
+	if (type != GNUTLS_HANDSHAKE && gnutls_get_current_version(state) != version) {
 #ifdef DEBUG
-		fprintf(stderr, "INVALID VERSION PACKET: %d.%d\n", headers[1], headers[2]);
+		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d) %d.%d\n", headers[0], headers[1], headers[2]);
 #endif
 		_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	} else {
-		gnutls_set_current_version(state, version);
 	}
 
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "Expected Packet[%d] %s(%d) with length: %d\n",
+	fprintf(stderr, "Record: Expected Packet[%d] %s(%d) with length: %d\n",
 		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(type), type, sizeofdata);
-	fprintf(stderr, "Received Packet[%d] %s(%d) with length: %d\n",
+	fprintf(stderr, "Record: Received Packet[%d] %s(%d) with length: %d\n",
 		(int) state->connection_state.read_sequence_number, _gnutls_packet2str(recv_type), recv_type, length);
 #endif
 
 	if (length > MAX_RECV_SIZE) {
 #ifdef DEBUG
-		fprintf(stderr, "FATAL ERROR: Received packet with length: %d\n", length);
+		fprintf(stderr, "Record: FATAL ERROR: Received packet with length: %d\n", length);
 #endif
 		_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -660,12 +683,12 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	ciphertext = gnutls_malloc(length+HEADER_SIZE);
+	ciphertext = gnutls_malloc(length+header_size);
 
 /* check if we have that data into buffer. This seems to be
  * expensive - but this is the only way to handle Non Blocking IO.
  */
-	if ( _gnutls_Read(cd, ciphertext, HEADER_SIZE+length, MSG_PEEK|flags) != length+HEADER_SIZE) {
+	if ( _gnutls_Read(cd, ciphertext, header_size+length, MSG_PEEK|flags) != length+header_size) {
 		gnutls_free(ciphertext);
 		
 		if (errno==EAGAIN) return GNUTLS_E_AGAIN;
@@ -677,7 +700,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
-	if (_gnutls_Read(cd, headers, HEADER_SIZE, 0)!=HEADER_SIZE) {  /* read and clear the headers - again! */
+	if (_gnutls_Read(cd, headers, header_size, 0)!=header_size) {  /* read and clear the headers - again! */
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -699,7 +722,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	 */
 	if (ret != length) {
 #ifdef DEBUG
-		fprintf(stderr, "Received packet with length: %d\nExpected %d\n", ret, length);
+		fprintf(stderr, "Record: Received packet with length: %d\nExpected %d\n", ret, length);
 #endif
 		gnutls_free(ciphertext);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -710,7 +733,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	
 	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
 #ifdef HARD_DEBUG
-		fprintf(stderr, "ChangeCipherSpec Packet was received\n");
+		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
 #endif
 		if (length!=1) {
 			gnutls_assert();
@@ -748,7 +771,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		switch (recv_type) {
 		case GNUTLS_ALERT:
 #ifdef DEBUG
-			fprintf(stderr, "Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
+			fprintf(stderr, "Record: Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];
 
@@ -782,7 +805,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			break;
 		default:
 #ifdef DEBUG
-			fprintf(stderr, "Received Unknown packet %d expecting %d\n", recv_type, type);
+			fprintf(stderr, "Record: Received Unknown packet %d expecting %d\n", recv_type, type);
 #endif
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_ERROR;
