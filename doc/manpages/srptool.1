@@ -1,13 +1,18 @@
-.TH gnutls\-srpcrypt 1 "December 1st 2003"
+.TH srptool 1 "February 21st 2005"
 .SH NAME
 srptool \- Simple SRP password tool
 .SH SYNOPSIS
-gnutls\-srpcrypt [\fIoptions\fR]
+srptool [\fIoptions\fR]
 .SH DESCRIPTION
 Very simple program that emulates the programs in the Stanford SRP
 (Secure Remote Password) libraries using GNU TLS.
 It is intended for use in places where you don't expect SRP
 authentication to be the used for system users.
+
+In brief, to use SRP you need to create two files. These are 
+the password file that holds the users and the verifiers associated with them
+and the configuration file to hold the group parameters 
+(called tpasswd.conf).
 .SH OPTIONS
 .IP "\-\-bits \fIBITS\fR"
 specify the number of bits for prime numbers (used only when the
@@ -23,7 +28,7 @@ Specify a password file.
 .IP "\-\-passwd\-conf \fIFILE\fR"
 Specify a password configuration file.
 .IP "\-s, \-\-salt \fISALT\fR"
-Specify salt/cost size for crypt algorithm.
+Specify salt size for crypt algorithm.
 .IP "\-u, \-\-username \fIusername\fR"
 Specify username.
 .IP "\-\-verify"
@@ -34,7 +39,7 @@ To create tpasswd.conf which holds the g and n values for SRP protocol
 
 .RS
 .nf
-$ gnutls\-srpcrypt \-\-create\-conf /etc/tpasswd.conf
+$ srptool \-\-create\-conf /etc/tpasswd.conf
 .fi
 .RE
 
@@ -44,7 +49,7 @@ in the way libsrp expects.
 
 .RS
 .nf
-$ gnutls\-srpcrypt \-\-passwd /etc/tpasswd \\
+$ srptool \-\-passwd /etc/tpasswd \\
     \-\-passwd\-conf /etc/tpasswd.conf \-u test
 .fi
 .RE
@@ -54,7 +59,7 @@ the one in /etc/tpasswd you will get an ok.
 
 .RS
 .nf
-$ gnutls\-srpcrypt \-\-passwd /etc/tpasswd \\
+$ srptool \-\-passwd /etc/tpasswd \\
     \-\-passwd\-conf /etc/tpasswd.conf \-\-verify \-u test
 .fi
 .RE
