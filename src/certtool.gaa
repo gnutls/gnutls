@@ -28,6 +28,9 @@ option (load-ca-privkey) STR "FILE" { $ca_privkey = $1 } "Certificate authority'
 #char *ca;
 option (load-ca-certificate) STR "FILE" { $ca = $1 } "Certificate authority's certificate file to use."
 
+#char *pass;
+option (password) STR "FILE" { $pass = $1 } "Password to use."
+
 option (i, certificate-info) { $action = 2; } "Print information on a certificate."
 
 option (p12-info) { $action = 9; } "Print information on a PKCS #12 structure."
@@ -64,5 +67,5 @@ option ( copyright) { print_license(); exit(0); } "shows the program's license"
 
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
-	$incert_format = 0; $outcert_format = 0; $action=-1; }
+	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; }
 

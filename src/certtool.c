@@ -1419,8 +1419,9 @@ void generate_pkcs12( void)
 		name = read_str("Enter a name for the key: ");
 	} while( name == NULL);
 
-	password = getpass( "Enter password: ");
-	
+	if (info.pass) password = info.pass;
+	else password = getpass( "Enter password: ");
+
 	result = gnutls_pkcs12_bag_init( &bag);
 	if (result < 0) {
 		fprintf(stderr, "bag_init: %s\n", gnutls_strerror(result));
@@ -1641,7 +1642,8 @@ void pkcs12_info( void)
 	data.data = buffer;
 	data.size = size;
 
-	password = getpass( "Enter password: ");
+	if (info.pass) password = info.pass;
+	else password = getpass( "Enter password: ");
 	
 	result = gnutls_pkcs12_init(&pkcs12);
 	if (result < 0) {

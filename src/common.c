@@ -340,8 +340,8 @@ void print_cert_vrfy(gnutls_session session)
 		return;
 	}
 	if (status < 0) {
-		printf("- Could not verify certificate (err %d)\n",
-		       status);
+		printf("- Could not verify certificate (err: %s)\n",
+		       gnutls_strerror(status));
 		return;
 	}
 
