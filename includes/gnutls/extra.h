@@ -91,7 +91,7 @@ typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session, const unsigned char 
 
 void gnutls_openpgp_set_recv_key_function( gnutls_session, gnutls_openpgp_recv_key_func);
 
-int gnutls_openpgp_verify_key( const gnutls_datum* keyring, 
+int gnutls_openpgp_verify_key( const char *trustdb, const gnutls_datum* keyring, 
 	const gnutls_datum* key_list, 
 	int key_list_length);
 
