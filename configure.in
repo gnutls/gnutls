@@ -214,22 +214,6 @@ AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
 
-AC_CHECK_TYPE(size_t,
-DEFINE_SIZE_T="#include <sys/types.h>"
-AC_SUBST( DEFINE_SIZE_T)
-,
-AC_DEFINE(NO_SIZE_T, 1, [no size_t type was found])
-DEFINE_SIZE_T="typedef unsigned int size_t;"
-AC_SUBST( DEFINE_SIZE_T)
-,[
-#ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>
-#endif
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-])
-
 AC_CHECK_TYPE(ssize_t,
 DEFINE_SIZE_T="#include <sys/types.h>"
 AC_SUBST( DEFINE_SSIZE_T)

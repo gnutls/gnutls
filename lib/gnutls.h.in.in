@@ -40,10 +40,8 @@ extern "C" {
 
 #define LIBGNUTLS_VERSION "@VERSION@"
 
-#ifndef HAVE_SIZE_T
-# define HAVE_SIZE_T
-@DEFINE_SIZE_T@
-#endif
+/* Get size_t. */
+#include <stddef.h>
 
 #ifndef HAVE_SSIZE_T
 # define HAVE_SSIZE_T
