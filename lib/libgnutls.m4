@@ -34,7 +34,8 @@ AC_ARG_WITH(libgnutls-prefix,
     LIBGNUTLS_CFLAGS=`$LIBGNUTLS_CONFIG $libgnutls_config_args --cflags`
     LIBGNUTLS_LIBS=`$LIBGNUTLS_CONFIG $libgnutls_config_args --libs`
     libgnutls_config_version=`$LIBGNUTLS_CONFIG $libgnutls_config_args --version`
-    if test "x$enable_libgnutlstest" = "xyes" ; then
+
+
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LIBS="$LIBS"
       CFLAGS="$CFLAGS $LIBGNUTLS_CFLAGS"
@@ -77,7 +78,6 @@ main ()
     {
       if ( gnutls_check_version( "$min_libgnutls_version" ) )
       {
-fprintf(stderr, "Found: %s\n", $min_libgnutls_version);
         return 0;
       }
      else
@@ -102,8 +102,8 @@ fprintf(stderr, "Found: %s\n", $min_libgnutls_version);
 ],, no_libgnutls=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
        CFLAGS="$ac_save_CFLAGS"
        LIBS="$ac_save_LIBS"
-     fi
   fi
+
   if test "x$no_libgnutls" = x ; then
      AC_MSG_RESULT(yes)
      ifelse([$2], , :, [$2])
