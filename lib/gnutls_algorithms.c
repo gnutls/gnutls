@@ -206,42 +206,86 @@ typedef struct {
 	                         */
 } gnutls_cipher_suite_entry;
 
+/** RSA with NULL cipher and MD5 MAC
+ ** for test purposes.
+ **/
 #define GNUTLS_RSA_NULL_MD5 { 0x00, 0x01 }
+
+
+/** ANONymous cipher suites.
+ **/
 
 #define GNUTLS_ANON_DH_3DES_EDE_CBC_SHA { 0x00, 0x1B }
 #define GNUTLS_ANON_DH_ARCFOUR_MD5 { 0x00, 0x18 }
+
+ /* draft-ietf-tls-ciphersuite-05: */
 #define GNUTLS_ANON_DH_RIJNDAEL_128_CBC_SHA { 0x00, 0x34 }
 #define GNUTLS_ANON_DH_RIJNDAEL_256_CBC_SHA { 0x00, 0x3A }
-/* Twofish is a gnutls extension */
-#define GNUTLS_ANON_DH_TWOFISH_128_CBC_SHA { 0xFF, 0x50 }
+/* gnutls private extensions: */
+#define GNUTLS_ANON_DH_TWOFISH_128_CBC_SHA { 0xFF, 0x50 } /* gnutls */
 
-/* SRP is a gnutls extension - for now */
+
+/** SRP (not in TLS 1.0)
+ ** draft-ietf-tls-srp-01:
+ **/
 #define GNUTLS_SRP_3DES_EDE_CBC_SHA { 0x00, 0x5B }
 #define GNUTLS_SRP_ARCFOUR_SHA { 0x00, 0x5C }
 #define GNUTLS_SRP_ARCFOUR_MD5 { 0x00, 0x5F }
+
+/* gnutls private extensions: 
+ */
 #define GNUTLS_SRP_RIJNDAEL_128_CBC_SHA { 0xFF, 0x62 }
 #define GNUTLS_SRP_RIJNDAEL_256_CBC_SHA { 0xFF, 0x63 }
 #define GNUTLS_SRP_TWOFISH_128_CBC_SHA { 0xFF, 0x64 }
 
-/* RSA */
+
+/** RSA 
+ **/
 #define GNUTLS_RSA_ARCFOUR_SHA { 0x00, 0x05 }
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
+
+/* draft-ietf-tls-ciphersuite-05: 
+ */
 #define GNUTLS_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x2F }
 #define GNUTLS_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x35 }
-#define GNUTLS_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x51 }
 
-/* DHE_DSS */
-#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xFF, 0x54 }
-#define GNUTLS_DHE_DSS_RIJNDAEL_256_CBC_SHA { 0x00, 0x38 }
-#define GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
+/* gnutls private extensions: 
+ */
+#define GNUTLS_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x51 } /* gnutls */
+
+
+/** DHE DSS 
+ **/
+
 #define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA { 0x00, 0x13 }
 
-/* DHE_RSA */
-#define GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x55 }
-#define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 }
-#define GNUTLS_DHE_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x39 }
+/* gnutls private extensions: 
+ */
+#define GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA { 0xFF, 0x54 }
+
+/* draft-ietf-tls-56-bit-ciphersuites-01:
+ */
+#define GNUTLS_DHE_DSS_ARCFOUR_SHA { 0x00, 0x66 }
+
+/* draft-ietf-tls-ciphersuite-05: 
+ */
+#define GNUTLS_DHE_DSS_RIJNDAEL_256_CBC_SHA { 0x00, 0x38 }
+#define GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
+
+
+/** DHE RSA 
+ **/
 #define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
+
+/* gnutls private extensions: 
+ */
+#define GNUTLS_DHE_RSA_TWOFISH_128_CBC_SHA { 0xFF, 0x55 } /* gnutls */
+
+/* draft-ietf-tls-ciphersuite-05: 
+ */
+#define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 } /* draft-ietf-tls-ciphersuite-05 */
+#define GNUTLS_DHE_RSA_RIJNDAEL_256_CBC_SHA { 0x00, 0x39 }
 
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
 	/* ANON_DH */
@@ -282,6 +326,9 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 
 	/* DHE_DSS */
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_ARCFOUR_SHA,
+				  GNUTLS_CIPHER_ARCFOUR, GNUTLS_KX_DHE_DSS,
+				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_TWOFISH_128_CBC_SHA,
 				  GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_KX_DHE_DSS,
 				  GNUTLS_MAC_SHA, GNUTLS_TLS1),
