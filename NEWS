@@ -1,7 +1,10 @@
 Version 1.1.17
 - Initiated move from Libgcrypt to generic crypto API, with fallback on Nettle.
   Currently Libgcrypt is still required.  If you specify --with-nettle,
-  Nettle will be used for encryption/decryption functions.
+  Nettle will be used for encryption/decryption functions.  Nettle is included
+  with GnuTLS.  The goal here is to make GnuTLS build standalone, in case
+  Libgcrypt is not available, but also to allow other crypt libraries to be
+  used easily.
 - Removed length limit on passwords read by 'certtool'.
 - Documentation fixes.
 
