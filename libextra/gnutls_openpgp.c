@@ -1137,7 +1137,7 @@ int gnutls_certificate_set_openpgp_key(gnutls_certificate_credentials res,
 
 	res->ncerts++;
 	
-	/* FIXME: Check if they match.
+	/* FIXME: Check if the keys match.
 	 */
 
 	return 0;

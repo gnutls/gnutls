@@ -255,8 +255,10 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 	}
 
 	if (randomize_key != 0) {
+		/* we do not need strong random numbers here.
+		 */
 		RANDOMIZE_KEY(session->key->key,
-			      gnutls_malloc, GNUTLS_STRONG_RANDOM);
+			      gnutls_malloc, GNUTLS_WEAK_RANDOM);
 
 	} else {
 		session->key->key.data = plaintext.data;

@@ -193,7 +193,7 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 
 	/* generate server random value */
 
-	_gnutls_create_random( random);
+	_gnutls_tls_create_random( random);
 	_gnutls_set_server_random( session, random);
 	
 	session->security_parameters.timestamp = time(NULL);

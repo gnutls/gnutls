@@ -212,24 +212,34 @@ int _gnutls_finished(gnutls_session session, int type, void *ret)
 			  12, ret);
 }
 
-/* this function will produce TLS_RANDOM_SIZE bytes of random data
+/* this function will produce TLS_RANDOM_SIZE==32 bytes of random data
  * and put it to dst.
  */
-int _gnutls_create_random(opaque * dst)
+int _gnutls_tls_create_random(opaque * dst)
 {
 	uint32 tim;
-	opaque rand[TLS_RANDOM_SIZE - 4];
+
+	/* Use weak random numbers for the most of the
+	 * buffer except for the first 4 that are the
+	 * system's time, and the last 3 which are of
+	 * better quality.
+	 */
 
 	tim = time(NULL);
 	/* generate server random value */
 	_gnutls_write_uint32(tim, dst);
 
 	if (_gnutls_get_random
-	    (rand, TLS_RANDOM_SIZE - 4, GNUTLS_STRONG_RANDOM) < 0) {
+	    (&dst[4], TLS_RANDOM_SIZE - 7, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	memcpy(&dst[4], rand, TLS_RANDOM_SIZE - 4);
+
+	if (_gnutls_get_random
+	    (&dst[29], 3, GNUTLS_STRONG_RANDOM) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return 0;
 }
@@ -286,7 +296,7 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 	_gnutls_set_client_random(session, &data[pos]);
 	pos += TLS_RANDOM_SIZE;
 
-	_gnutls_create_random(random);
+	_gnutls_tls_create_random(random);
 	_gnutls_set_server_random(session, random);
 
 	session->security_parameters.timestamp = time(NULL);
@@ -1519,7 +1529,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 		/* Generate random data 
 		 */
-		_gnutls_create_random(random);
+		_gnutls_tls_create_random(random);
 		_gnutls_set_client_random(session, random);
 
 		memcpy(&data[pos], random, TLS_RANDOM_SIZE);

@@ -362,7 +362,7 @@ unsigned char rnd;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_get_random( entry->v.data, 20, GNUTLS_STRONG_RANDOM);
+	_gnutls_get_random( entry->v.data, 20, GNUTLS_WEAK_RANDOM);
 
 	entry->salt.data = gnutls_malloc( entry->salt.size);
 	if (entry->salt.data==NULL) {
