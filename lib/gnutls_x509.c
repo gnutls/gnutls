@@ -969,7 +969,6 @@ int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials_t
 static int generate_rdn_seq(gnutls_certificate_credentials_t res)
 {
     gnutls_datum_t tmp;
-    gnutls_datum_t _tmp;
     int ret;
     uint size, i;
     opaque *pdata;
@@ -994,6 +993,7 @@ static int generate_rdn_seq(gnutls_certificate_credentials_t res)
 	    return ret;
 	}
 	size += (2 + tmp.size);
+	_gnutls_free_datum( &tmp);
     }
 
     if (res->x509_rdn_sequence.data != NULL)
@@ -1011,18 +1011,15 @@ static int generate_rdn_seq(gnutls_certificate_credentials_t res)
     for (i = 0; i < res->x509_ncas; i++) {
 	if ((ret =
 	     _gnutls_x509_crt_get_raw_issuer_dn(res->x509_ca_list[i],
-						&tmp)) < 0) {
-	    gnutls_free(res->x509_rdn_sequence.data);
-	    res->x509_rdn_sequence.size = 0;
-	    res->x509_rdn_sequence.data = NULL;
+		&tmp)) < 0) {
+	    _gnutls_free_datum( &res->x509_rdn_sequence);
 	    gnutls_assert();
 	    return ret;
 	}
 
-	_tmp.data = (opaque *) tmp.data;
-	_tmp.size = tmp.size;
-	_gnutls_write_datum16(pdata, _tmp);
+	_gnutls_write_datum16(pdata, tmp);
 	pdata += (2 + tmp.size);
+	_gnutls_free_datum( &tmp);
     }
 
     return 0;
