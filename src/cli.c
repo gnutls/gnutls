@@ -45,11 +45,16 @@ int main()
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF];
 	char *session;
+	char* session_id;
 	int session_size;
+	int session_id_size;
+	char* tmp_session_id;
+	int tmp_session_id_size;
 	fd_set rset;
 	int maxfd;
 	struct timeval tv;
 	int user_term = 0;
+	char *tmp;
 	
 //	signal(SIGPIPE, SIG_IGN);
 
@@ -74,24 +79,28 @@ int main()
 	ret = gnutls_handshake(sd, state);
 
 	if (ret < 0) {
-		fprintf(stderr, "Handshake has failed\n");
+		fprintf(stderr, "- Handshake has failed\n");
 		gnutls_perror(ret);
 		gnutls_deinit(&state);
 		return 1;
 	} else {
-		fprintf(stderr, "Handshake was completed\n");
+		fprintf(stderr, "- Handshake was completed\n");
 	}
 	gnutls_get_current_session( state, NULL, &session_size);
 	session = malloc(session_size);
 	gnutls_get_current_session( state, session, &session_size);
-	
-	fprintf(stderr, "Disconnecting\n");
+
+	gnutls_get_current_session_id( state, NULL, &session_id_size);
+	session_id = malloc(session_id_size);
+	gnutls_get_current_session_id( state, session_id, &session_id_size);
+
+	fprintf(stderr, "- Disconnecting\n");
 	gnutls_close(sd, state);
 	shutdown( sd, SHUT_WR);
 	close(sd);	
 	gnutls_deinit( &state);	
 	
-	fprintf(stderr, "\n\nConnecting again- trying to resume previous session\n");
+	fprintf(stderr, "\n\n- Connecting again- trying to resume previous session\n");
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
 
@@ -114,13 +123,37 @@ int main()
 	ret = gnutls_handshake(sd, state);
 
 	if (ret < 0) {
-		fprintf(stderr, "Handshake failed\n");
+		fprintf(stderr, "- Handshake failed\n");
 		gnutls_perror(ret);
 		gnutls_deinit(&state);
 		return 1;
 	} else {
-		fprintf(stderr, "Handshake was completed\n");
+		fprintf(stderr, "- Handshake was completed\n");
 	}
+
+	/* check if we actually resumed the previous session */
+	gnutls_get_current_session_id( state, NULL, &tmp_session_id_size);
+	tmp_session_id = malloc(tmp_session_id_size);
+	gnutls_get_current_session_id( state, tmp_session_id, &tmp_session_id_size);
+	if (memcmp( tmp_session_id, session_id, session_id_size)==0) {
+		fprintf(stderr, "- Previous session was resumed\n");
+	} else {
+		fprintf(stderr, "- Previous session was NOT resumed\n");	
+	}
+	free(tmp_session_id);
+	free(session_id);
+
+/* print some information */
+	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
+	printf("Compression: %s\n", tmp); free(tmp);
+
+	tmp = _gnutls_cipher_get_name(gnutls_get_current_cipher( state));
+	printf("Cipher: %s\n", tmp); free(tmp);
+
+	tmp = _gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
+	printf("MAC: %s\n", tmp); free(tmp);
+
+	printf("\nSimple Client Mode:\n\n");
 
 	FD_ZERO(&rset);
 	for(;;) {
@@ -141,15 +174,15 @@ int main()
 			if (gnutls_is_fatal_error(ret) == 1) {
 				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED || ret == GNUTLS_E_INVALID_SESSION) {
 					fprintf(stderr,
-						"Peer has closed the GNUTLS connection\n");
+						"- Peer has closed the GNUTLS connection\n");
 					break;
 				} else {
-					fprintf(stderr, "Received corrupted data(%d) - server has terminated the connection abnormally\n",
+					fprintf(stderr, "- Received corrupted data(%d) - server has terminated the connection abnormally\n",
 						ret);
 					break;
 				}
 			} else {
-				fprintf(stdout, "Received: ");
+				fprintf(stdout, "- Received: ");
 				for (ii=0;ii<MAX_BUF;ii++) {
 					fputc(buffer[ii], stdout);
 				}

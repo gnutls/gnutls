@@ -64,6 +64,10 @@ int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state)
 	return 0;
 }
 
+int gnutls_check_pending(GNUTLS_STATE state) {
+	return gnutls_getDataBufferSize(GNUTLS_APPLICATION_DATA, state);
+}
+
 int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
 	if (type == GNUTLS_APPLICATION_DATA) {

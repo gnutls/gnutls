@@ -21,6 +21,7 @@
 enum ContentType { GNUTLS_APPLICATION_DATA=23 };
 typedef enum ContentType ContentType;
 #define GNUTLS_AES GNUTLS_RIJNDAEL
+
 enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
 typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
@@ -47,12 +48,26 @@ typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE * state);
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata);
-ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
+ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, void* data, size_t sizeofdata);
 int gnutls_close(int cd, GNUTLS_STATE state);
 int gnutls_handshake(int cd, GNUTLS_STATE state);
+int gnutls_check_pending(GNUTLS_STATE state);
+
+/* get information on the current state */
+BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);
+MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state);
+CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state);
+
+/* the name of the specified algorithms */
+char *_gnutls_cipher_get_name(BulkCipherAlgorithm);
+char *_gnutls_mac_get_name(MACAlgorithm);
+char *_gnutls_compression_get_name(CompressionMethod);
+
+
 
 int gnutls_is_fatal_error( int error);
 void gnutls_perror( int error);
+char* gnutls_strerror(int error);
 
 #define gnutls_send( x, y, z, w) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
 #define gnutls_recv( x, y, z, w) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
@@ -69,6 +84,8 @@ void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 /* get/set session */
 int gnutls_set_current_session( GNUTLS_STATE state, void* session, int session_size);
 int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_size);
+/* returns the session ID */
+int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size);
 
 /* these are deprecated must be replaced by gnutls_errors.h */
 #define GNUTLS_E_MAC_FAILED -1

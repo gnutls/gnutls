@@ -33,11 +33,20 @@ int gnutls_close(int cd, GNUTLS_STATE state);
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);
 	Returns the currently used cipher.
 
+char *_gnutls_cipher_get_name(BulkCipherAlgorithm);
+	Returns a malloc'ed string with the name of the algorithm;
+
 MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state);
 	Returns the mac algorithm used.
 
+char *_gnutls_mac_get_name(MACAlgorithm);
+	Returns a malloc'ed string with the name of the algorithm;
+
 CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state);
 	Returns the compression algorithm used.
+
+char *_gnutls_compression_get_name(CompressionMethod);
+	Returns a malloc'ed string with the name of the algorithm;
 
 int gnutls_is_fatal_error( int error);
 	If a function returns a negative value you may feed that value
@@ -81,6 +90,11 @@ void gnutls_set_compression_priority( GNUTLS_STATE state, int num, ...);
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
 	Sets the current SSL/TLS version. Accepted values are GNUTLS_SSL3
 	and GNUTLS_TLS1.
+
+int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size);
+	Returns the session id. This can be used if you want to check if 
+	the next session you tried to resume was actually resumed.
+	(resumed sessions have the same sessionID with the first session)
 
 int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_size);
 	Returns all session parameters - in order to support resuming.

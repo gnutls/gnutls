@@ -40,6 +40,21 @@ int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_
 	return 0;
 }
 
+/* Returns session id
+ */
+int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size) {
+
+	( *session_size = state->security_parameters.session_id_size);
+	
+	/* just return the session size */
+	if (session==NULL) {
+		return 0;
+	}
+	memcpy( session, &state->security_parameters.session_id, *session_size);
+	
+	return 0;
+}
+
 /* Sets all session parameters - in order to support resuming 
  * session must be the one returned by get_current_session();
  * This function should be called before gnutls_handshake_begin

@@ -731,3 +731,12 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	return ret;
 }
 
+BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state) {
+	return state->security_parameters.bulk_cipher_algorithm;
+}
+MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state) {
+	return state->security_parameters.mac_algorithm;
+}
+CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state) {
+	return state->security_parameters.compression_algorithm;
+}
