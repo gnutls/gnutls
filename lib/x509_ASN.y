@@ -337,6 +337,8 @@ type_constant_list :   type_constant    {$$=$1;}
 definitions_id  :  IDENTIFIER  '{' obj_constant_list '}' {$$=_asn1_add_node(TYPE_OBJECT_ID);
                                                           _asn1_set_down($$,$3);
                                                           _asn1_set_name($$,$1)}
+                 | IDENTIFIER  '{' '}'                   {$$=_asn1_add_node(TYPE_OBJECT_ID);
+                                                          _asn1_set_name($$,$1)}
 ;
 
 imports_def :   /* empty */  {$$=NULL;}
