@@ -39,7 +39,8 @@
  *
  */
 
-int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, int data_size) {
+int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, int data_size) 
+{
 	int new_type = -1, ret, i;
 	
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {

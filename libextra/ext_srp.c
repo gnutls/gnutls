@@ -39,10 +39,8 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, int data_
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
 			len = data[0];
-			if (len > data_size) {
-				gnutls_assert();
-				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			}
+			DECR_LEN( data_size, len);
+
 			if ( sizeof( state->security_parameters.extensions.srp_username) <= len) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
@@ -86,7 +84,7 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, int data_size) 
 				return GNUTLS_E_INVALID_REQUEST;
 			}
 
-			data[0] = len;
+			data[0] = (uint8) len;
 			memcpy( &data[1], cred->username, len);
 			return len + 1;
 		}

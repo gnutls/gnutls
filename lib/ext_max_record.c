@@ -38,14 +38,11 @@
  */
 
 int _gnutls_max_record_recv_params( gnutls_session session, const opaque* data, int data_size) {
-	size_t new_size;
+	ssize_t new_size;
 	
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
-			if ( data_size != 1) {
-				gnutls_assert();
-				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			}
+			DECR_LEN( data_size, 1);
 			
 			new_size = _gnutls_mre_num2record(data[0]);
 
@@ -100,7 +97,7 @@ int _gnutls_max_record_send_params( gnutls_session session, opaque* data, int da
 				return GNUTLS_E_INVALID_REQUEST;
 			}
 			
-			data[0] = _gnutls_mre_record2num( session->internals.proposed_record_size);
+			data[0] = (uint8) _gnutls_mre_record2num( session->internals.proposed_record_size);
 			return len;
 		}
 
@@ -113,7 +110,7 @@ int _gnutls_max_record_send_params( gnutls_session session, opaque* data, int da
 				return GNUTLS_E_INVALID_REQUEST;
 			}
 			
-			data[0] = _gnutls_mre_record2num( session->security_parameters.max_record_recv_size);
+			data[0] = (uint8) _gnutls_mre_record2num( session->security_parameters.max_record_recv_size);
 			return len;
 		}	
 	
@@ -126,7 +123,7 @@ int _gnutls_max_record_send_params( gnutls_session session, opaque* data, int da
 /* Maps numbers to record sizes according to the
  * extensions draft.
  */
-int _gnutls_mre_num2record( int num) {
+ssize_t _gnutls_mre_num2record( int num) {
 	switch( num) {
 	case 1:
 		return 512;
