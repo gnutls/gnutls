@@ -3,6 +3,8 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* In srp callback do not free the parameters if the are the
+  static ones.
 * Do not store the Anon/DHE parameters in the resume DB.
 * Make the current ciphering code a bit more abstract to
   allow easy integration with TLS hardware.

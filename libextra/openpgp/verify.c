@@ -133,20 +133,21 @@ int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key_t key,
 
     /* Check if the key is included in the ring.
      */
-    rc = gnutls_openpgp_key_get_id( key, id);
-    if (rc < 0) {
-    	gnutls_assert();
-    	return rc;
+    if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME)) {
+        rc = gnutls_openpgp_key_get_id( key, id);
+        if (rc < 0) {
+            gnutls_assert();
+    	    return rc;
+        }
+
+        rc = gnutls_openpgp_keyring_check_id( keyring, id, 0);
+
+        /* if it exists in the keyring don't treat it
+         * as unknown.
+         */
+        if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
+            *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
     }
-
-    rc = gnutls_openpgp_keyring_check_id( keyring,
-        id, 0);
-
-    /* if it exists in the keyring don't treat it
-     * as unknown.
-     */
-    if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
-        *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
     
     return 0;
 }

@@ -549,13 +549,13 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
   * In case the callback returned a negative number then gnutls will
   * assume that the username does not exist.
   *
-  * In order to prevent allowing an attack to guess valid usernames,
-  * if username does not exist, the g, and n values should be filled in 
-  * using a random user's parameters. In that case the callback should
+  * In order to prevent attackers from guessing valid usernames,
+  * if a user does not exist, g and n values should be filled in
+  * using a random user's parameters. In that case the callback must
   * return the special value (1).
   *
   * The callback function will only be called once per handshake.
-  * The callback function should return 0 on success.
+  * The callback function should return 0 on success, while
   * -1 indicates an error.
   *
   **/

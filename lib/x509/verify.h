@@ -1,8 +1,9 @@
 #include "x509.h"
 
 typedef enum gnutls_certificate_verify_flags {
-	GNUTLS_VERIFY_DISABLE_CA_SIGN=1,
-	GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT=2
+    GNUTLS_VERIFY_DISABLE_CA_SIGN=1,
+    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT=2,
+    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME=4
 } gnutls_certificate_verify_flags;
 
 int gnutls_x509_crt_is_issuer( gnutls_x509_crt_t cert,

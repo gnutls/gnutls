@@ -59,7 +59,8 @@ static int _gnutls_verify_crl2(gnutls_x509_crl_t crl,
  * Returns true or false, if the issuer is a CA,
  * or not.
  */
-static int check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
+static int check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer, 
+    unsigned int flags)
 {
     gnutls_datum_t cert_signed_data = { NULL, 0 };
     gnutls_datum_t issuer_signed_data = { NULL, 0 };
@@ -104,17 +105,21 @@ static int check_if_ca(gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer)
 	goto cleanup;
     }
 
-    if (cert_signed_data.size == issuer_signed_data.size) {
-	if ((memcmp(cert_signed_data.data, issuer_signed_data.data,
-		    cert_signed_data.size) == 0) &&
-	    (cert_signature.size == issuer_signature.size) &&
-	    (memcmp(cert_signature.data, issuer_signature.data,
-		    cert_signature.size) == 0))
-
-	    result = 1;
-	goto cleanup;
-    }
-
+    /* If the subject certificate is the same as the issuer
+     * return true.
+     */
+    if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
+        if (cert_signed_data.size == issuer_signed_data.size) {
+  	    if ((memcmp(cert_signed_data.data, issuer_signed_data.data,
+	        cert_signed_data.size) == 0) &&
+	        (cert_signature.size == issuer_signature.size) &&
+	        (memcmp(cert_signature.data, issuer_signature.data,
+		cert_signature.size) == 0)) {
+	        result = 1;
+	        goto cleanup;
+	    }
+        }
+    
     if (gnutls_x509_crt_get_ca_status(issuer, NULL) == 1) {
 	result = 1;
 	goto cleanup;
@@ -238,7 +243,7 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt_t cert,
     if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
 	!((flags & GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT)
 	  && issuer_version == 1)) {
-	if (check_if_ca(cert, issuer) == 0) {
+	if (check_if_ca(cert, issuer, flags) == 0) {
 	    gnutls_assert();
 	    if (output)
 		*output |= GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
