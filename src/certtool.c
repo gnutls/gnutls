@@ -32,6 +32,7 @@
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
 
+int generate_prime(int bits);
 void pkcs12_info( void);
 void generate_pkcs12( void);
 void verify_chain(void);
@@ -52,8 +53,8 @@ FILE* infile;
 int in_cert_format;
 int out_cert_format;
 
-static unsigned char buffer[50*1024];
-static const int buffer_size = sizeof(buffer);
+unsigned char buffer[50*1024];
+const int buffer_size = sizeof(buffer);
 
 static void tls_log_func( int level, const char* str)
 {
@@ -555,6 +556,9 @@ int ret;
 			break;
 		case 9:
 			pkcs12_info();
+			break;
+		case 10:
+			generate_prime( info.bits);
 			break;
 		default:
 			fprintf(stderr, "GnuTLS' certtool utility.\n");
@@ -1346,7 +1350,7 @@ time_t now = time(0);
 		comma = 1;
 	}
 
-	if (output&GNUTLS_CERT_ISSUER_NOT_CA) {
+	if (output&GNUTLS_CERT_SIGNER_NOT_CA) {
 		if (comma) fprintf(outfile, ", ");
 		fprintf(outfile, "Issuer is not a CA");
 		comma = 1;

@@ -171,7 +171,6 @@ int gnutls_openpgp_trustdb_import_file(gnutls_openpgp_trustdb trustdb,
 	const char * file)
 {
 int rc;
-
 	
 	rc = cdk_stream_open( file, &trustdb->st);
 	if( rc ) {

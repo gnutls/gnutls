@@ -1,4 +1,4 @@
-EXTRA_DIST = common.h prime.gaa crypt.gaa crypt-gaa.h README.srpcrypt prime-gaa.h \
+EXTRA_DIST = common.h crypt.gaa crypt-gaa.h README.srpcrypt \
 	README cli.gaa cli-gaa.h serv-gaa.h serv.gaa tls_test.gaa \
 	tls_test-gaa.h tests.h gnutls-http-serv list.h certtool-gaa.h \
 	certtool.gaa
@@ -18,20 +18,16 @@ gnutls_cli_debug_SOURCES = tls_test-gaa.c tls_test.c tests.c common.c
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
 
 
-noinst_PROGRAMS = prime retcodes
-prime_SOURCES = prime-gaa.c prime.c
-prime_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+noinst_PROGRAMS = retcodes
 retcodes_SOURCES = retcodes.c
 retcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
-certtool_SOURCES = certtool-gaa.c certtool.c
+certtool_SOURCES = certtool-gaa.c certtool.c prime.c
 certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
 
 crypt-gaa.c: crypt.gaa
 	-gaa crypt.gaa -o crypt-gaa.c -i crypt-gaa.h
-prime-gaa.c: prime.gaa
-	-gaa prime.gaa -o prime-gaa.c -i prime-gaa.h
 certtool-gaa.c: certtool.gaa
 	-gaa certtool.gaa -o certtool-gaa.c -i certtool-gaa.h
 cli-gaa.c: cli.gaa

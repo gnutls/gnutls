@@ -59,20 +59,17 @@ is equivalent to the previous one, and will verify the peer's certificate in a T
 \begin{tabular}{|l|p{9cm}|}
 
 \hline
-CERT\_INVALID & The certificate chain is broken. 
-\\
-\hline
-CERT\_NOT\_TRUSTED & The certificate is not signed by one of the authorities marked as trusted.
+CERT\_INVALID & The certificate is not signed by one of the known authorities.
 \\
 \hline
 CERT\_REVOKED & The certificate has been revoked.
 \\
 \hline
-CERT\_CORRUPTED & The certificate is corrupted.
+CERT\_SIGNER\_NOT\_FOUND & The certificate's issuer is not known.
 \\
 \hline
 \end{tabular}
-\caption{Certificate verification}
+\caption{X.509 certificate verification}
 \label{fig:verify}
 \end{figure}
 
@@ -139,44 +136,40 @@ signs other people's keys without being sure that they belong to the
 actual owner.
 
 \subsection{Verifying an OpenPGP key}
-First we've to differentiate between ownertrust and validity. Sometimes trust
-and validity is used as a synonym but this is not correct.
+The verification functions of OpenPGP keys, included in \gnutls{}, 
+are simple ones, and do not use the features of the ``web of trust''.
+For that reason, if the verification needs are complex, 
+the assistance of external tools like GnuPG is recommended.
 \par
-The ownertrust describes how trustworthy the signature of a special
-key owner is. Even if we've three or more signatures to make a key valid,
-it's possible that we don't trust the owner at all and thus we don't trust 
-the signature he made. There are different ownertrust levels:
-\begin{enumerate}
-\item Don't know
-\item I do NOT trust
-\item I trust marginally
-\item I trust fully
-\item I trust ultimately.
-\end{enumerate}
+There are two verification functions in \gnutls{},
+The \printfunc{gnutls_openpgp_key_verify_ring}{gnutls\_openpgp\_key\_verify\_ring}
+and the \printfunc{gnutls_openpgp_key_verify_trustdb}{gnutls\_openpgp\_key\_verify\_trustdb}. 
+\\
+The first one checks an OpenPGP key against a given set of public keys (keyring) and
+returns the key status. The key verification status is the same as in X.509 certificates,
+although the meaning and interpretation are different. For example an OpenPGP key may
+be valid, if the self signature is ok, even if no signers were found.
+The meaning of verification status is shown in figure \ref{fig:pgp_verify}.
+\\
+The latter function checks a GnuPG trust database for the given key. This function does not
+check the key signatures, only checks for disabled and revoked keys.
 
-For example we need three marginally trusted signature to make a key
-valid or one full trusted signature. The ultimate trust is only used
-when we are the owner of a key and we also have the secret key.
-In the case we don't trust the owner, those signatures are skipped
-for the web of trust calculation.
-\par
-All checks in GnuTLS are done in \printfunc{gnutls_openpgp_key_verify_ring}{gnutls\_openpgp\_key\_verify\_ring}
-and \printfunc{gnutls_openpgp_key_verify_trustdb}{gnutls\_openpgp\_key\_verify\_trustdb}. 
-If a trust database is available, this is the file which contains all information about the
-key owner (ownertrust), additional checks are performed.
+\begin{figure}[hbtp]
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+CERT\_INVALID & A signature on the key is invalid. That means that the key was modified
+by somebody, or corrupted during transport.
 \\
-First we get the trustdb entry to see if the key is not disabled because
-those keys shouldn't be used at all. Another possible case is that we
-don't trust the key, which means we don't need to perform further checks.
-\par
-If the ownertrust is at least marginal we continue to check all signatures
-the key contains to get the validity of the key. It is likely that the
-public keyring does not contain all needed keys to check all signatures.
-When a signature could not be checked due to a missing key, the function 
-tries the next signature. When NO public key is available, the function
-checks at least the self signature which must be valid in any case because
-it was created by the key itself.
+\hline
+CERT\_REVOKED & The key has been revoked by its owner.
 \\
-Validity means if the signatures on the key are valid and the key was not 
-changed by somebody or corrupted during transport.
+\hline
+CERT\_SIGNER\_NOT\_FOUND & The key was not signed by a known signer.
+\\
+\hline
+\end{tabular}
+\caption{OpenPGP key verification}
+\label{fig:pgp_verify}
+\end{figure}
 

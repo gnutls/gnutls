@@ -345,13 +345,21 @@ void print_cert_vrfy(gnutls_session session)
 		return;
 	}
 
-	if (status & GNUTLS_CERT_INVALID)
-		printf("- Peer's certificate chain is broken\n");
-	if (status & GNUTLS_CERT_NOT_TRUSTED)
-		printf("- Peer's certificate is NOT trusted\n");
-	else
-		printf("- Peer's certificate is trusted\n");
-
+	if (gnutls_certificate_type_get(session)==GNUTLS_CRT_X509) {
+		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
+			printf("- Peer's certificate issuer is unknown\n");
+		if (status & GNUTLS_CERT_INVALID)
+			printf("- Peer's certificate is NOT trusted\n");
+		else
+			printf("- Peer's certificate is trusted\n");
+	} else {
+		if (status & GNUTLS_CERT_INVALID)
+			printf("- Peer's key is invalid\n");
+		else
+			printf("- Peer's key is valid\n");
+		if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
+			printf("- Could not find a signer of the peer's key\n");
+	}
 }
 
 int print_info(gnutls_session session, const char* hostname)
@@ -403,7 +411,7 @@ int print_info(gnutls_session session, const char* hostname)
 		print_cert_info(session, hostname);
 
 		print_cert_vrfy(session);
-
+ 
 		/* Check if we have been using ephemeral Diffie Hellman.
 		 */
 		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {

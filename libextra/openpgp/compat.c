@@ -76,7 +76,6 @@ int gnutls_openpgp_verify_key(const char *trustdb,
 		goto leave;
 	}
 
-	
 
 	if (trustdb) { /* Use the trustDB */
 		ret = gnutls_openpgp_trustdb_init( &tdb);
@@ -101,8 +100,10 @@ int gnutls_openpgp_verify_key(const char *trustdb,
 		goto leave;
 	}
 	
-	if (!keyring) {
-		ret = GNUTLS_CERT_NOT_TRUSTED | GNUTLS_CERT_INVALID;
+	if (!keyring || !keyring->data || keyring->size == 0) {
+		ret = GNUTLS_CERT_INVALID |
+			GNUTLS_CERT_SIGNER_NOT_FOUND;
+#warning CHECK SELF SIGNATURE HERE
 		goto leave;
 	}
 

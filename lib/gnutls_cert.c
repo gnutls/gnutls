@@ -358,8 +358,9 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
   * actual peer.
   *
   * The return value should be one or more of the gnutls_certificate_status
-  * enumerated elements bitwise or'd. This is the same as
-  * gnutls_x509_verify_certificate().
+  * enumerated elements bitwise or'd.
+  *
+  * This is the same as gnutls_x509_verify_certificate().
   *
   **/
 int gnutls_certificate_verify_peers(gnutls_session session)

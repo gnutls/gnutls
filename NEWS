@@ -1,7 +1,6 @@
 Version 0.9.95
-- Improved the verification functions. Added the GNUTLS_CERT_ISSUER_NOT_CA,
-  GNUTLS_CERT_ISSUER_NOT_FOUND verification output flags, and removed
-  the unused GNUTLS_CERT_CORRUPTED.
+- Improved the verification functions. Added new verification
+  output flags and removed the unused and redundant ones.
 - Improved the OpenPGP key support.
 
 Version 0.9.94 (30/10/2003)

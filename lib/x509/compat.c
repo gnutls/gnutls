@@ -515,12 +515,9 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
   * The return value (status) should be one or more of the gnutls_certificate_status 
   * enumerated elements bitwise or'd.
   *
-  * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
+  * GNUTLS_CERT_INVALID\: the peer's certificate is not valid.
   *
-  * GNUTLS_CERT_INVALID\: the certificate chain is broken.
-  *
-  * GNUTLS_CERT_REVOKED\: the certificate has been revoked
-  *  (not implemented yet).
+  * GNUTLS_CERT_REVOKED\: the certificate has been revoked.
   *
   * A negative error code is returned in case of an error.
   * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that

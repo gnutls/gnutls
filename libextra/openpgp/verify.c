@@ -48,7 +48,7 @@ openpgp_get_key_trust( gnutls_openpgp_trustdb trustdb,
 
     pkt = cdk_kbnode_find_packet( key->knode, CDK_PKT_PUBLIC_KEY );
     if( !pkt ) {
-        rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
+        rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
         goto leave;
     }
     pk = pkt->pkt.public_key;
@@ -57,38 +57,21 @@ openpgp_get_key_trust( gnutls_openpgp_trustdb trustdb,
 
     if ( rc ) { /* no ownertrust record was found */
         rc = 0;
-        *r_trustval = 0;
         goto leave;
     }
 
     if( flags & CDK_TFLAG_DISABLED ) {
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
         *r_trustval |= GNUTLS_CERT_INVALID;
         goto leave;
     }
     
     if( flags & CDK_TFLAG_REVOKED ) {
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
         *r_trustval |= GNUTLS_CERT_REVOKED;
     }
     
-    switch( ot ) {
-    case CDK_TRUST_NEVER:
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
-        break;
-    case CDK_TRUST_UNKNOWN:
-    case CDK_TRUST_UNDEFINED:
-    case CDK_TRUST_MARGINAL:
-    case CDK_TRUST_FULLY:
-    case CDK_TRUST_ULTIMATE:
-        *r_trustval |= 1; /* means okay */
-        rc = 0;
-        break;
-    }
+    rc = 0;
 
 leave:
-    if( rc )
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
     return rc;
 }
 
@@ -99,8 +82,8 @@ leave:
  * @flags: unused (should be 0)
  * @verify: will hold the certificate verification output.
  *
- * Verify all signatures in the certificate list. When the key
- * is not available, the signature is skipped.
+ * Verify all signatures in the key, using the given set of keys (keyring). 
+ * If a signer key is not available, the signature is skipped.
  *
  * The certificate verification output will be put in 'verify' and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
@@ -108,8 +91,6 @@ leave:
  * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
  *
  * GNUTLS_CERT_REVOKED\: The key has been revoked.
- *
- * GNUTLS_CERT_NOT_TRUSTED\: The key is either invalid or revoked.
  *
  * NOTE: this function does not verify using any "web of trust". You
  * may use GnuPG for that purpose, or any other external PGP application.
@@ -121,35 +102,33 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
                            unsigned int flags, unsigned int *verify)
 {
     int rc = 0;
-    int status = 0;
+    unsigned int status = 0;
   
     if( !key || !keyring ) {
         gnutls_assert();
         return GNUTLS_E_NO_CERTIFICATE_FOUND;
     }
+    
+    *verify = 0;
 
     rc = cdk_pk_check_sigs( key->knode, keyring->hd, &status );
-    if( rc == CDK_Error_No_Key )
-        rc = GNUTLS_E_NO_CERTIFICATE_FOUND; /* fixme */
-      
-    switch( status ) {
-    case CDK_KEY_INVALID:
-        *verify = GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
-        rc = 0;
-        break;
-      
-    case CDK_KEY_REVOKED:
-        *verify = GNUTLS_CERT_REVOKED | GNUTLS_CERT_NOT_TRUSTED;
-        rc = 0;
-        break;
-    default:
-        rc = 0;
+    if( rc == CDK_Error_No_Key ) {
+        rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+        gnutls_assert();
+        return rc;
     }
 
-    if( rc ) {
+    if( rc) {
+        rc = _gnutls_map_cdk_rc(rc);
         gnutls_assert();
+        return rc;
     }
-    return rc;
+      
+    if (status & CDK_KEY_INVALID) *verify |= GNUTLS_CERT_INVALID;
+    if (status & CDK_KEY_REVOKED) *verify |= GNUTLS_CERT_REVOKED;
+#warning CHECK HERE IF THE WAS ANY SIGNER
+
+    return 0;
 }
 
 /**
@@ -159,15 +138,14 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
  * @flags: unused (should be 0)
  * @verify: will hold the certificate verification output.
  *
- * Verify all signatures in the certificate list. When the key
- * is not available, the signature is skipped.
- *
- * The function checks the ownertrust of the key before the signatures are checked. 
- * It is possible that the key was disabled or the owner is not trusted
- * at all. Then we don't check the signatures because it makes no sense.
+ * Checks if the key is revoked or disabled, in the trustdb.
  *
  * The certificate verification output will be put in 'verify' and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
+ *
+ * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
+ *
+ * GNUTLS_CERT_REVOKED\: The key has been revoked.
  *
  * NOTE: this function does not verify using any "web of trust". You
  * may use GnuPG for that purpose, or any other external PGP application.
@@ -180,7 +158,6 @@ int gnutls_openpgp_key_verify_trustdb( gnutls_openpgp_key key,
 {
     cdk_keydb_hd_t hd = NULL;
     int rc = 0;
-    int status = 0;
   
     if( !key) {
         gnutls_assert();

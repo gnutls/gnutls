@@ -203,7 +203,7 @@ int ret, issuer_version, result;
 		issuer = find_issuer(cert, trusted_cas, tcas_size);
 	else {
 		gnutls_assert();
-		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
+		if (output) *output |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
 		return 0;
 	}
 
@@ -211,7 +211,7 @@ int ret, issuer_version, result;
 	 * authorities.
 	 */
 	if (issuer == NULL) {
-		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
+		if (output) *output |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
 		gnutls_assert();
 		return 0;
 	}
@@ -226,7 +226,7 @@ int ret, issuer_version, result;
 		!((flags & GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT) && issuer_version == 1)) {
 		if (check_if_ca(cert, issuer)==0) {
 			gnutls_assert();
-			if (output) *output |= GNUTLS_CERT_ISSUER_NOT_CA | GNUTLS_CERT_NOT_TRUSTED;
+			if (output) *output |= GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
 			return 0;
 		}
 	}
@@ -250,7 +250,7 @@ int ret, issuer_version, result;
 	} else if (ret == 0) {
 		gnutls_assert();
 		/* error. ignore it */
-		if (output) *output |= GNUTLS_CERT_NOT_TRUSTED;
+		if (output) *output |= GNUTLS_CERT_INVALID;
 		ret = 0;
 	}
 
@@ -319,7 +319,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 		   * and return immediately.
 		   */
 		gnutls_assert();
-		return (status | GNUTLS_CERT_NOT_TRUSTED);
+		return (0 | GNUTLS_CERT_INVALID);
 	}
 	
 	/* Now verify the last certificate in the certificate path
@@ -338,7 +338,8 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 		 * trusted.
 		 */
 		gnutls_assert();
-		status |= GNUTLS_CERT_NOT_TRUSTED;
+		if (!(status & GNUTLS_CERT_INVALID))
+			status |= GNUTLS_CERT_INVALID;
 	}
 
 	return status;
@@ -549,9 +550,7 @@ int ret, issuer_params_size, i;
   * The certificate verification output will be put in 'verify' and will be
   * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
   *
-  * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
-  *
-  * GNUTLS_CERT_INVALID\: the certificate chain is broken.
+  * GNUTLS_CERT_INVALID\: the peer's certificate is not valid.
   *
   * GNUTLS_CERT_REVOKED\: the certificate has been revoked.
   *
@@ -748,7 +747,7 @@ int ret, result;
 		issuer = find_crl_issuer(crl, trusted_cas, tcas_size);
 	else {
 		gnutls_assert();
-		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
+		if (output) *output |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
 		return 0;
 	}
 
@@ -757,7 +756,7 @@ int ret, result;
 	 */
 	if (issuer == NULL) {
 		gnutls_assert();
-		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
+		if (output) *output |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
 		return 0;
 	}
 
@@ -765,7 +764,7 @@ int ret, result;
 		if (gnutls_x509_crt_get_ca_status(issuer, NULL) != 1) 
 		{
 			gnutls_assert();
-			if (output) *output |= GNUTLS_CERT_ISSUER_NOT_CA | GNUTLS_CERT_NOT_TRUSTED;
+			if (output) *output |= GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
 			return 0;
 		}
 	}
@@ -788,7 +787,7 @@ int ret, result;
 	} else if (ret == 0) {
 		gnutls_assert();
 		/* error. ignore it */
-		if (output) *output |= GNUTLS_CERT_NOT_TRUSTED;
+		if (output) *output |= GNUTLS_CERT_INVALID;
 		ret = 0;
 	}
 

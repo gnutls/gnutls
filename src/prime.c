@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -22,99 +22,95 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "prime-gaa.h"
 #include <gnutls/gnutls.h>
 #include "../lib/defines.h"
 
-int main(int argc, char **argv)
+extern FILE* outfile;
+extern FILE* infile;
+extern unsigned char buffer[];
+extern const int buffer_size;
+
+static int cparams = 0;
+
+int generate_prime(int bits)
 {
-	gaainfo info;
 	unsigned int i;
 	gnutls_dh_params dh_params;
 	gnutls_datum p, g;
 
-	if (gaa(argc, argv, &info) != -1) {
-		fprintf(stderr, "Error in the arguments.\n");
-		return -1;
-	}
-	
-	gnutls_global_init();
-	
 	gnutls_dh_params_init( &dh_params);
 
 	fprintf(stderr, "Generating DH parameters...");
 	
-	gnutls_dh_params_generate2( dh_params, info.bits);
+	gnutls_dh_params_generate2( dh_params, bits);
 	gnutls_dh_params_export_raw( dh_params, &p, &g, NULL);
 
-	if (info.cparams) {
+	if (cparams) {
 
-		printf( "/* generator */\n"); 
-		printf( "\nconst uint8 g[%d] = { ", g.size);
+		fprintf( outfile, "/* generator */\n"); 
+		fprintf( outfile, "\nconst uint8 g[%d] = { ", g.size);
 	
 		for (i=0;i<g.size;i++) {
-			if (i%7==0) printf("\n\t");
-			printf( "0x%.2x", g.data[i]);
-			if (i!=g.size-1) printf( ", ");
+			if (i%7==0) fprintf(outfile, "\n\t");
+			fprintf(outfile, "0x%.2x", g.data[i]);
+			if (i!=g.size-1) fprintf(outfile, ", ");
 		}
 
-		printf("\n};\n\n");
+		fprintf(outfile, "\n};\n\n");
 	} else {
-		printf( "\nGenerator: ");
+		fprintf( outfile, "\nGenerator: ");
 	
 		for (i=0;i<g.size;i++) {
-			if (i!=0 && i%12==0) printf("\n\t");
-			else if (i!=0 && i!=g.size) printf( ":");
+			if (i!=0 && i%12==0) fprintf( outfile,"\n\t");
+			else if (i!=0 && i!=g.size) fprintf( outfile, ":");
 
-			printf( "%.2x", g.data[i]);
+			fprintf( outfile, "%.2x", g.data[i]);
 		}
 
-		printf("\n\n");
+		fprintf( outfile,"\n\n");
 	}
 
 	/* print prime */
 
-	if (info.cparams) {
-		printf( "/* prime - %d bits */\n", p.size*8);
-		printf( "\nconst uint8 prime[%d] = { ", p.size);
+	if (cparams) {
+		fprintf( outfile, "/* prime - %d bits */\n", p.size*8);
+		fprintf( outfile, "\nconst uint8 prime[%d] = { ", p.size);
 	
 		for (i=0;i<p.size;i++) {
-			if (i%7==0) printf("\n\t");
-			printf( "0x%.2x", p.data[i]);
-			if (i!=p.size-1) printf( ", ");
+			if (i%7==0) fprintf( outfile,"\n\t");
+			fprintf( outfile, "0x%.2x", p.data[i]);
+			if (i!=p.size-1) fprintf( outfile, ", ");
 		}
 
-		printf("\n};\n");
+		fprintf( outfile,"\n};\n");
 	} else {
-		printf( "Prime: ");
+		fprintf( outfile, "Prime: ");
 
 		for (i=0;i<p.size;i++) {
-			if (i!=0 && i%12==0) printf("\n\t");
-			else if (i!=0 && i!=p.size) printf( ":");
-			printf( "%.2x", p.data[i]);
+			if (i!=0 && i%12==0) fprintf( outfile,"\n\t");
+			else if (i!=0 && i!=p.size) fprintf( outfile, ":");
+			fprintf( outfile, "%.2x", p.data[i]);
 		}
 
-		printf("\n\n");
+		fprintf( outfile,"\n\n");
 
 	}
 
-	if (!info.cparams) { /* generate a PKCS#3 structure */
+	if (!cparams) { /* generate a PKCS#3 structure */
 	
-		unsigned char out[5*1024];
-		int ret, len = sizeof(out);
+		int ret;
+		size_t len = buffer_size;
 	
 		ret = gnutls_dh_params_export_pkcs3( dh_params, GNUTLS_X509_FMT_PEM,
-			out, &len);
+			buffer, &len);
 	
 		if (ret == 0) {
-			printf("\n%s", out);
+			fprintf( outfile,"\n%s", buffer);
 		} else {
 			fprintf(stderr, "Error: %s\n", gnutls_strerror(ret));
 		}
 
 	}
 
-	gnutls_global_deinit();
-	
 	return 0;
 }

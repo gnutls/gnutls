@@ -13,6 +13,8 @@ option (q, generate-request) { $action=3; } "Generate a PKCS #10 certificate req
 
 option (e, verify-chain) { $action=5; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
 
+option (generate-dh-params) { $action=10; } "Generate PKCS #3 encoded Diffie Hellman parameters."
+
 #char *privkey;
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."
 
