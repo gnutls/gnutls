@@ -735,8 +735,6 @@ connection. The available authentication methods in @acronym{GnuTLS} are:
 
 @section Certificate authentication
 
-@c x.509 section
-
 @subsection Authentication using X.509 certificates
 @cindex X.509 certificates
 
@@ -744,8 +742,6 @@ X.509 certificates contain the public parameters, of a public key
 algorithm, and an authority's signature, which proves the authenticity
 of the parameters.  @xref{x509:trust}, for more information on X.509
 protocols.
-
-@c openpgp section
 
 @subsection Authentication using OpenPGPkeys
 @cindex OpenPGP Keys
@@ -842,16 +838,16 @@ Key exchange algorithms for OpenPGP and X.509 certificates:
 
 @itemize
 
-@item @code{RSA}
+@item @code{RSA}:
 The RSA algorithm is used to encrypt a key and send it to the peer.
 The certificate must allow the key to be used for encryption.
 
-@item @code{RSA_EXPORT}
+@item @code{RSA_EXPORT}:
 The RSA algorithm is used to encrypt a key and send it to the peer.
 In the EXPORT algorithm, the server signs temporary RSA parameters of
 512 bits -- which are considered weak -- and sends them to the client.
 
-@item @code{DHE_RSA}
+@item @code{DHE_RSA}:
 The RSA algorithm is used to sign Ephemeral Diffie Hellman parameters
 which are sent to the peer. The key in the certificate must allow the
 key to be used for signing. Note that key exchange algorithms which
@@ -859,7 +855,7 @@ use Ephemeral Diffie Hellman parameters, offer perfect forward
 secrecy. That means that even if the private key used for signing is
 compromised, it cannot be used to reveal past session data.
 
-@item @code{DHE_DSS}
+@item @code{DHE_DSS}:
 The DSS algorithm is used to sign Ephemeral Diffie Hellman parameters
 which are sent to the peer. The certificate must contain DSA
 parameters to use this key exchange algorithm. DSS stands for Digital
@@ -886,7 +882,7 @@ Supported anonymous key exchange algorithms:
 
 @itemize
 
-@item @code{ANON_DH}
+@item @code{ANON_DH}:
 This algorithm exchanges Diffie Hellman parameters.
 
 @end itemize
@@ -920,14 +916,14 @@ The implementation in @acronym{GnuTLS} is based on paper
 
 @itemize
 
-@item SRP
+@item @code{SRP}:
 Authentication using the SRP protocol.
 
-@item @code{SRP_DSS}
+@item @code{SRP_DSS}:
 Client authentication using the SRP protocol. Server is 
 authenticated using a certificate with DSA parameters.
 
-@item @code{SRP_RSA}
+@item @code{SRP_RSA}:
 Client authentication using the SRP protocol. Server is 
 authenticated using a certificate with RSA parameters.
 
@@ -1036,7 +1032,8 @@ gnutls_dh_params dh_params;
  * or RSA parameters. The parameters returned (if any) will
  * be used for the first handshake only.
  */
-static int get_params( gnutls_session session, gnutls_params_type_t type,
+static int get_params( gnutls_session session,
+        gnutls_params_type_t type,
         gnutls_params_st *st)
 @{
    if (type == GNUTLS_PARAMS_RSA_EXPORT)
@@ -1145,25 +1142,25 @@ shown in the table below.
 
 @itemize
 
-@item @code{subject key id} (2.5.29.14)
+@item @code{subject key id} (2.5.29.14):
 An identifier of the key of the subject.
 
-@item @code{authority key id} (2.5.29.35)
+@item @code{authority key id} (2.5.29.35):
 An identifier of the authority's key used to sign the certificate.
 
-@item @code{subject alternative name} (2.5.29.17)
+@item @code{subject alternative name} (2.5.29.17):
 Alternative names to subject's distinguished name.
 
-@item @code{key usage} (2.5.29.15)
+@item @code{key usage} (2.5.29.15):
 Constraints the key's usage of the certificate.
 
-@item @code{extended key usage} (2.5.29.37)
+@item @code{extended key usage} (2.5.29.37):
 Constraints the purpose of the certificate.
 
-@item @code{basic constraints} (2.5.29.19)
+@item @code{basic constraints} (2.5.29.19):
 Indicates whether this is a CA certificate or not.
 
-@item @code{CRL distribution points} (2.5.29.31)
+@item @code{CRL distribution points} (2.5.29.31):
 This extension is set by the CA, in order to inform about the issued CRLs.
 
 @end itemize
