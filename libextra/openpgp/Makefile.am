@@ -1,9 +1,14 @@
-# source files added here must be added to ../Makefile.am
-# to be compiled.
+AM_CPPFLAGS = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl		\
+	-I$(top_srcdir)/lib -I$(top_srcdir)/includes -I../includes	\
+	-I$(top_srcdir)/libextra/opencdk
+
+noinst_LTLIBRARIES = libgnutls_openpgp.la
 
 COBJECTS = pgp.c xml.c pgpverify.c extras.c compat.c privkey.c
 
-EXTRA_DIST = openpgp.h gnutls_openpgp.h $(COBJECTS) pgp-api.texi
+libgnutls_openpgp_la_SOURCES = $(COBJECTS) openpgp.h gnutls_openpgp.h
+
+EXTRA_DIST = pgp-api.texi
 
 pgp-api.texi: $(COBJECTS)
 	@echo "" > pgp-api.texi
