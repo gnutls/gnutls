@@ -952,7 +952,6 @@ int gnutls_x509_crt_get_ca_status(gnutls_x509_crt_t cert,
 	 _gnutls_x509_crt_get_extension(cert, "2.5.29.19", 0,
 					&basicConstraints,
 					critical)) < 0) {
-	gnutls_assert();
 	return result;
     }
 
