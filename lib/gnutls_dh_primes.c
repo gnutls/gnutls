@@ -20,7 +20,6 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <gnutls_gcry.h>
 #include <gnutls_datum.h>
 #include "debug.h"
 

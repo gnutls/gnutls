@@ -28,7 +28,7 @@
 #include <gnutls_srp.h>
 #include <auth_srp_passwd.h>
 #include <crypt_bcrypt.h>
-#include <gnutls_gcry.h>
+#include <gnutls_mpi.h>
 #include "debug.h"
 
 

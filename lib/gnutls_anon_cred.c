@@ -27,7 +27,7 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
-#include "gnutls_gcry.h"
+#include "gnutls_mpi.h"
 
 static int anon_tmp;
 

@@ -22,7 +22,7 @@
  */
 
 #include <gnutls_int.h>
-#include <gnutls_gcry.h>
+#include <gnutls_mpi.h>
 #include <gnutls_pk.h>
 #include <gnutls_errors.h>
 #include <gnutls_random.h>

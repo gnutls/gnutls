@@ -20,7 +20,7 @@
 
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
-#include "gnutls_gcry.h"
+#include "gnutls_mpi.h"
 #include "gnutls_cert.h"
 #include "gnutls_datum.h"
 #include "gnutls_global.h"

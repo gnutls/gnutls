@@ -21,7 +21,6 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <gnutls_gcry.h>
 
 
 /* 

@@ -27,7 +27,7 @@
 #include "gnutls_dh.h"
 #include "auth_anon.h"
 #include "gnutls_num.h"
-#include "gnutls_gcry.h"
+#include "gnutls_mpi.h"
 #include <gnutls_state.h>
 
 int gen_anon_server_kx( GNUTLS_STATE, opaque**);
