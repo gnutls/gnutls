@@ -54,4 +54,6 @@
 #define gnutls_datum gnutls_datum_t
 #define gnutls_transport_ptr gnutls_transport_ptr_t
 
+int gnutls_certificate_verify_peers(gnutls_session);
+
 #endif /* GCOMPAT_H */
