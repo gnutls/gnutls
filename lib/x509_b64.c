@@ -21,6 +21,7 @@
 
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
+#include <gnutls_datum.h>
 
 const static uint8 b64table[64] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -278,6 +279,46 @@ int size;
 	return 0;
 }
 
+/**
+  * gnutls_b64_encode_fmt2 - This function will convert raw data to Base64 encoded
+  * @msg: is a message to be put in the encoded header
+  * @data: contains the raw data
+  * @result: will hold the newly allocated encoded data
+  *
+  * This function will convert the given data to printable data, using the base64 
+  * encoding. This is the encoding used in PEM messages. This function will
+  * allocate (using malloc) the required memory to hold the encoded data.
+  * 
+  **/
+int gnutls_b64_encode_fmt2( const char* msg, const gnutls_datum *data, gnutls_datum* result) {
+opaque* ret;
+int size, res;
+
+	size = _gnutls_fbase64_encode( msg, data->data, data->size, &ret);
+	if (size < 0)
+		return size;
+
+	if (result==NULL) {
+		gnutls_free(ret);
+		return GNUTLS_E_INVALID_REQUEST;
+	} else {
+		if (gnutls_malloc==malloc) {
+		   result->data = ret;
+		   result->size = size;
+		} else {
+		   res = _gnutls_set_datum_m( result, ret, size, malloc);
+		   gnutls_free(ret);
+		
+		   if (res < 0) {
+		   	gnutls_assert();
+		   	return res;
+		   }
+		}
+	}
+
+	return 0;
+}
+
 
 /* decodes data and puts the result into result (localy alocated)
  * The result_size is the return value
@@ -426,6 +467,44 @@ int size;
 		memcpy( result, ret, size);
 		gnutls_free(ret);
 		*result_size = size;
+	}
+
+	return 0;
+}
+
+/**
+  * gnutls_b64_decode_fmt2 - This function will decode base64 encoded data
+  * @b64_data: contains the encoded data
+  * @result: the place where decoded data lie
+  *
+  * This function will decode the given encoded data. The decoded data
+  * will be allocated, using malloc, and stored into result.
+  * 
+  **/
+int gnutls_b64_decode_fmt2( const gnutls_datum *b64_data, gnutls_datum* result) {
+opaque* ret;
+int size, res;
+
+	size = _gnutls_fbase64_decode( b64_data->data, b64_data->size, &ret);
+	if (size < 0)
+		return size;
+
+	if (result==NULL) {
+		gnutls_free(ret);
+		return GNUTLS_E_INVALID_REQUEST;
+	} else {
+		if (gnutls_malloc==malloc) {
+			result->data = ret;
+			result->size = size;
+		} else {
+			res = _gnutls_set_datum_m( result, ret, size, malloc);
+			gnutls_free( ret);
+			
+			if (res < 0) {
+				gnutls_assert();
+				return res;
+			}
+		}
 	}
 
 	return 0;

@@ -70,11 +70,11 @@ static void dlog( const char* str) {
 #endif
 }
 
-extern void* (*gnutls_secure_malloc)(size_t);
-extern void* (*gnutls_malloc)(size_t);
-extern void (*gnutls_free)(void*);
+extern ALLOC_FUNC gnutls_secure_malloc;
+extern ALLOC_FUNC gnutls_malloc;
+extern FREE_FUNC gnutls_free;
 extern int (*_gnutls_is_secure_memory)(const void*);
-extern void* (*gnutls_realloc)(void*, size_t);
+extern REALLOC_FUNC gnutls_realloc;
 extern char* (*gnutls_strdup)(const char*);
 extern void* (*gnutls_calloc)(size_t, size_t);
 

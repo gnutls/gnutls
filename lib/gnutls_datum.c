@@ -46,19 +46,22 @@ void _gnutls_write_datum8( opaque* dest, gnutls_datum dat) {
 	memcpy( &dest[1], dat.data, dat.size);
 }
 
-int gnutls_set_datum( gnutls_datum* dat, const void* data, int data_size) {
-	dat->data = gnutls_malloc(data_size);
+
+int _gnutls_set_datum_m( gnutls_datum* dat, const void* data, int data_size, 
+	ALLOC_FUNC galloc_func) {
+	dat->data = galloc_func(data_size);
 	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
-	
+
 	dat->size = data_size;
 	memcpy( dat->data, data, data_size);
 	
 	return 0;
 }
 
-int gnutls_datum_append( gnutls_datum* dst, const void* data, int data_size) {
+int _gnutls_datum_append_m( gnutls_datum* dst, const void* data, int data_size,
+	REALLOC_FUNC grealloc_func) {
 
-	dst->data = gnutls_realloc(dst->data, data_size+dst->size);
+	dst->data = grealloc_func(dst->data, data_size+dst->size);
 	if (dst->data==NULL) return GNUTLS_E_MEMORY_ERROR;
 	
 	memcpy( &dst->data[dst->size], data, data_size);
@@ -67,28 +70,11 @@ int gnutls_datum_append( gnutls_datum* dst, const void* data, int data_size) {
 	return 0;
 }
 
-int gnutls_sset_datum( gnutls_datum* dat, const void* data, int data_size) {
-	dat->data = gnutls_secure_malloc(data_size);
-	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
-	
-	dat->size = data_size;
-	memcpy( dat->data, data, data_size);
-	
-	return 0;
-}
-
-void gnutls_free_datum( gnutls_datum* dat) {
+void _gnutls_free_datum_m( gnutls_datum* dat, FREE_FUNC gfree_func) {
 	if (dat->data!=NULL && dat->size!=0)
-		gnutls_free( dat->data);
+		gfree_func( dat->data);
 
 	dat->data = NULL;
 	dat->size = 0;
 }
 
-void gnutls_sfree_datum( gnutls_datum* dat) {
-	if (dat->data!=NULL && dat->size!=0)
-		gnutls_free( dat->data);
-
-	dat->data = NULL;
-	dat->size = 0;
-}

@@ -23,16 +23,17 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 
-void* (*gnutls_secure_malloc)(size_t) = malloc;
-void* (*gnutls_malloc)(size_t) = malloc;
+ALLOC_FUNC gnutls_secure_malloc = malloc;
+ALLOC_FUNC gnutls_malloc = malloc;
+FREE_FUNC gnutls_free = free;
+REALLOC_FUNC gnutls_realloc = realloc;
+
 void* (*gnutls_calloc)(size_t, size_t) = calloc;
-void (*gnutls_free)(void*) = free;
 char* (*gnutls_strdup)(const char*) = strdup;
 
 int _gnutls_is_secure_mem_null( const void* ign) { return 0; }
 
 int (*_gnutls_is_secure_memory)(const void*) = _gnutls_is_secure_mem_null;
-void* (*gnutls_realloc)(void*, size_t) = realloc;
 
 
 void *_gnutls_calloc(size_t nmemb, size_t size)

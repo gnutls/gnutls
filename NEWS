@@ -7,6 +7,7 @@ Version ?.?.?
   function can be used to enable private (gnutls specific) cipher suites
   and compression algorithms.
 - Added check for C99 macro support by the compiler.
+- Added functions gnutls_b64_encode_fmt2() and gnutls_b64_decode_fmt2()
 
 Version 0.4.3 (23/05/2002)
 - The gnutls-extra library now compiles fine, if the opencdk library is
