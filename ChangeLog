@@ -1,3 +1,51 @@
+2004-06-05 20:16  nmav <nmav@gnutls.org>
+
+	* doc/README.CODING_STYLE, lib/auth_anon.c, lib/auth_anon.h,
+	lib/auth_cert.h, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/auth_rsa.c, lib/auth_rsa_export.c, lib/debug.c, lib/debug.h,
+	lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_auth.c, lib/gnutls_auth.h, lib/gnutls_auth_int.h,
+	lib/gnutls_buffers.c, lib/gnutls_buffers.h, lib/gnutls_cipher.c,
+	lib/gnutls_cipher.h, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_compress_int.c,
+	lib/gnutls_compress_int.h, lib/gnutls_constate.c, lib/gnutls_db.c,
+	lib/gnutls_dh_primes.c, lib/gnutls_handshake.c,
+	lib/gnutls_handshake.h, lib/gnutls_hash_int.c,
+	lib/gnutls_hash_int.h, lib/gnutls_int.h, lib/gnutls_record.c,
+	lib/gnutls_record.h, lib/gnutls_session_pack.c, lib/gnutls_sig.c,
+	lib/gnutls_state.c, lib/gnutls_ui.c, lib/gnutls_v2_compat.c:
+
+	some other changes to the internal types names.  
+
+2004-06-05 18:10  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_anon.h, auth_cert.c, auth_cert.h,
+	auth_dh_common.c, auth_dh_common.h, auth_dhe.c, auth_rsa.c,
+	auth_rsa_export.c, debug.c, debug.h, gnutls_anon_cred.c,
+	gnutls_auth.c, gnutls_cert.c, gnutls_cert.h, gnutls_dh.c,
+	gnutls_dh.h, gnutls_dh_primes.c, gnutls_int.h, gnutls_pk.c,
+	gnutls_pk.h, gnutls_rsa_export.c, gnutls_rsa_export.h,
+	gnutls_session_pack.c, gnutls_sig.c, gnutls_sig.h, gnutls_state.c,
+	gnutls_ui.c, gnutls_ui.h, gnutls_x509.c, gnutls_x509.h:
+
+	several internal types fix.  
+
+2004-06-05 17:37  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_rsa_export.c, lib/gnutls_mpi.h:
+
+	Added the functions gnutls_x509_crt_get_pk_rsa_raw() and 
+	gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from
+	certificates.  
+
+2004-06-05 17:07  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_cert.h, auth_dh_common.c,
+	auth_dh_common.h, auth_dhe.c, auth_rsa_export.c, gnutls_state.c,
+	gnutls_state.h, gnutls_ui.c, gnutls_ui.h:
+
+	Allow access to the RSA-EXPORT parameters.  
+
 2004-06-04 13:24  nmav <nmav@gnutls.org>
 
 	* lib/: auth_dh_common.c, auth_dh_common.h, gnutls_compress_int.c,
