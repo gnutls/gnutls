@@ -1,3 +1,21 @@
+2004-11-03 15:01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Use LDFLAGS instead of LIBADD, for $(LIBTASN1_LIBS).  
+
+2004-11-03 14:09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Fix.  
+
+2004-11-03 14:06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
 2004-10-30 11:47  Simon Josefsson <simon@josefsson.org>
 
 	* doc/gnutls.texi:
