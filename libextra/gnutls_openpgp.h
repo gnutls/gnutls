@@ -86,7 +86,7 @@ int gnutls_openpgp_recv_key(
     uint32 keyid,
     gnutls_datum *key );
 
-int gnutls_openpgp_get_key_xml(
+int gnutls_openpgp_key_to_xml(
     const gnutls_datum *cert,
     gnutls_datum *xmlkey, int ext );
      
