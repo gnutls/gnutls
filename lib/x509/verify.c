@@ -342,6 +342,7 @@ unsigned int _gnutls_x509_verify_certificate(
 					       CRLs, crls_size);
 	if (ret == 1) {		/* revoked */
 	    status |= GNUTLS_CERT_REVOKED;
+	    status |= GNUTLS_CERT_INVALID;
 	    return status;
 	}
     }

@@ -1278,10 +1278,10 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t
     int ret, ret2;
 
     if (type == GNUTLS_X509_FMT_DER)
-	return parse_der_ca_mem(&res->x509_ca_list, &res->x509_ncas,
+	ret = parse_der_ca_mem(&res->x509_ca_list, &res->x509_ncas,
 				ca->data, ca->size);
     else
-	return parse_pem_ca_mem(&res->x509_ca_list, &res->x509_ncas,
+	ret = parse_pem_ca_mem(&res->x509_ca_list, &res->x509_ncas,
 				ca->data, ca->size);
 
     if ((ret2 = generate_rdn_seq(res)) < 0)
