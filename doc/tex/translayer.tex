@@ -1,21 +1,27 @@
 \section{The transport layer}
 \par
-\gnutls{} can be used above any reliable transport layer. You may need to
-use the functions:
+\gnutls{} is not limited to any transport layer, it 
+can be used above any transport layer, as long as, it is a reliable 
+one. A set of functions is provided and its purpose is to load
+to gnutls the required callbacks to access the transport layer.
+
 \begin{itemize}
-\item \printfunc{gnutls_transport_set_push_func}{gnutls\_transport\_set\_push\_func()}
-\item \printfunc{gnutls_transport_set_pull_func}{gnutls\_transport\_set\_pull\_func()}
+\item \printfunc{gnutls_transport_set_push_func}{gnutls\_transport\_set\_push\_func}
+\item \printfunc{gnutls_transport_set_pull_func}{gnutls\_transport\_set\_pull\_func}
+\item \printfunc{gnutls_transport_set_ptr}{gnutls\_transport\_set\_ptr}
 \end{itemize}
-These functions accept a function as a parameter. The given functions will 
-be used by gnutls to send and receive data.
-These functions should return -1 on error and should set errno appropriately.
-\gnutls{} supports EINTR and EAGAIN errno values. These values are
-usually used in non blocking IO and interrupted system calls.
+
+These functions accept a callback function as a parameter.
+The callback functions should return -1 on error and should set errno 
+appropriately.
+\par
+\gnutls{} currently only interprets the EINTR and EAGAIN errno values. 
+These values are usually used in non blocking IO and interrupted system calls.
 The corresponding values (GNUTLS\_E\_INTERRUPTED, GNUTLS\_E\_AGAIN) 
 will be returned to the caller of the gnutls function. \gnutls{} functions
 can be resumed (called again), if any of these values is returned.
 \par
 By default, if none of the above functions are called, gnutls will use
-the berkeley sockets functions \emph{recv()} and \emph{send()}. In this case
+the Berkeley Sockets functions \emph{recv()} and \emph{send()}. In this case
 gnutls will use some hacks in order for \emph{select()} to work, thus
-making easy to add \tls{} support to existing servers.
+making easy to add \tls{} support to existing TCP/IP servers.

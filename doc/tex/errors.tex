@@ -1,4 +1,4 @@
-\section{\index{Error handling}}
+\section{Error handling\index{Error handling}}
 \par
 In \gnutls{} most functions return an integer type as a result.
 In almost all cases a zero or a positive number means success, and
@@ -12,11 +12,11 @@ a fatal error code is GNUTLS\_E\_DECRYPTION\_FAILED. Non-fatal errors
 may warn about something, ie a warning alert was received, or
 indicate the some action has to be taken. This is the case with
 the error code GNUTLS\_E\_REHANDSHAKE returned by 
-\hyperref{gnutls\_record\_recv()}{gnutls\_record\_recv() (see Section }{)}{gnutls_record_recv}.
+\printfunc{gnutls_record_recv}{gnutls\_record\_recv}.
 This error code indicates that the server requests a rehandshake. The client
 may ignore this request, or may reply with an alert.
 You can test if an error code is a fatal one by using the
-\hyperref{gnutls\_error\_is\_fatal()}{gnutls\_error\_is\_fatal() (see Section }{)}{gnutls_error_is_fatal}.
+\printfunc{gnutls_error_is_fatal}{gnutls\_error\_is\_fatal}.
 \par
 If any non fatal errors, that require an action, are to be returned by a
 function, these error codes will be documented

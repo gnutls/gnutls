@@ -1,4 +1,5 @@
 \section{The TLS handshake protocol\index{Handshake protocol}}
+\label{handshake}
 
 The Handshake protocol is fully controlled by application layer (your 
 program). Within this protocol the parameters for cipher suites, supported
@@ -6,24 +7,24 @@ authentication methods etc. are negotiated. Thus the application layer
 has to set up the required parameters for the connection.
 See the following functions:
 \begin{itemize}
-\item \printfunc{gnutls_cipher_set_priority}{gnutls\_cipher\_set\_priority()}:
+\item \printfunc{gnutls_cipher_set_priority}{gnutls\_cipher\_set\_priority}:
 to set the priority of bulk cipher algorithms.
-\item \printfunc{gnutls_mac_set_priority}{gnutls\_mac\_set\_priority()}:
+\item \printfunc{gnutls_mac_set_priority}{gnutls\_mac\_set\_priority}:
 to set the priority of MAC algorithms.
-\item \printfunc{gnutls_kx_set_priority}{gnutls\_kx\_set\_priority()}:
+\item \printfunc{gnutls_kx_set_priority}{gnutls\_kx\_set\_priority}:
 to set the priority of key exchange algorithms.
-\item \printfunc{gnutls_compression_set_priority}{gnutls\_compression\_set\_priority()}:
+\item \printfunc{gnutls_compression_set_priority}{gnutls\_compression\_set\_priority}:
 to set the priority of compression methods.
-\item \printfunc{gnutls_cert_type_set_priority}{gnutls\_cert\_type\_set\_priority()}:
+\item \printfunc{gnutls_cert_type_set_priority}{gnutls\_cert\_type\_set\_priority}:
 to set the priority of certificate types (ie. OpenPGP, X.509).
-\item \printfunc{gnutls_protocol_set_priority}{gnutls\_protocol\_set\_priority()}:
+\item \printfunc{gnutls_protocol_set_priority}{gnutls\_protocol\_set\_priority}:
 to set the priority of protocol versions (ie. \sslIII{}, \tlsI).
-\item \printfunc{gnutls_cred_set}{gnutls\_cred\_set()}: to set the
+\item \printfunc{gnutls_cred_set}{gnutls\_cred\_set}: to set the
 appropriate credentials structures.
 \item \printfunc{gnutls_certificate_server_set_request}
-{gnutls\_certificate\_server\_set\_request()}: to set
+{gnutls\_certificate\_server\_set\_request}: to set
 whether client certificate is required or not.
-\item \printfunc{gnutls_handshake}{gnutls\_handshake()}: to initiate the
+\item \printfunc{gnutls_handshake}{gnutls\_handshake}: to initiate the
 handshake.
 \end{itemize}
 
@@ -32,7 +33,7 @@ handshake.
 \subsection{Resuming Sessions\index{Resuming sessions}}
 \par
 The 
-\printfunc{gnutls_handshake}{gnutls\_handshake()}
+\printfunc{gnutls_handshake}{gnutls\_handshake}
  function, is expensive since a lot of calculations are performed. In order to support many fast connections to
 the same server a client may use session resuming. {\bf Session resuming} is a
 feature of the {\bf TLS} protocol which allows a client to connect to a server,
@@ -62,9 +63,9 @@ nesessary parameters. See the functions:
 The server side is different. A server has to specify some callback functions
 which store, retrieve and delete session data. These can be registered with:
 \begin{itemize}
-\item \printfunc{gnutls_db_set_remove_function}{gnutls\_db\_set\_remove\_function}
-\item \printfunc{gnutls_db_set_store_function}{gnutls\_db\_set\_store\_function}
-\item \printfunc{gnutls_db_set_retrieve_function}{gnutls\_db\_set\_retrieve\_function}
+\item \printfunc{gnutls_db_set_remove_func}{gnutls\_db\_set\_remove\_func}
+\item \printfunc{gnutls_db_set_store_func}{gnutls\_db\_set\_store\_func}
+\item \printfunc{gnutls_db_set_retrieve_func}{gnutls\_db\_set\_retrieve\_func}
 \item \printfunc{gnutls_db_set_ptr}{gnutls\_db\_set\_ptr}
 \end{itemize}
 

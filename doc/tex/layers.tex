@@ -7,26 +7,22 @@ is to serve all other protocols and is above the transport layer.
 The Record protocol offers symmetric encryption, data authenticity, and
 optionally compression.
 In \gnutls{} the record protocol is accessed using the 
-\hyperref{gnutls\_record\_recv()}{gnutls\_record\_recv() (see Section }{)}{gnutls_record_recv} and
-\hyperref{gnutls\_record\_send()}{gnutls\_record\_send() (see Section }{)}{gnutls_record_send}
+\printfunc{gnutls_record_recv}{gnutls\_record\_recv} and
+\printfunc{gnutls_record_send}{gnutls\_record\_send}
 functions.
 
 \par
 The Alert protocol offers some signaling to the other protocols. It can
 help informing the peer for the cause of failures and other error
-conditions. See
-\hyperref{gnutls\_alert\_send()}{gnutls\_alert\_send() (see Section }{)}{gnutls_alert_send},
-\hyperref{gnutls\_alert\_send\_appropriate()}{gnutls\_alert\_send\_appropriate() (see Section }{)}{gnutls_alert_send_appropriate}
-and
-\hyperref{gnutls\_alert\_get()}{gnutls\_alert\_get() (see Section }{)}{gnutls_alert_get}.
+conditions. See section \ref{alert} on page \pageref{alert} for more information.
 The alert protocol is above the record protocol.
 
 \par 
 The Handshake protocol is responsible for the security parameters'
 negotiation, the initial key exchange and
 authentication. See \hyperref{figure}{figure }{}{fig:cert} for the
-protocol layering in TLS. See the
-\hyperref{gnutls\_handshake()}{gnutls\_handshake() (see Section }{)}{gnutls_handshake} function.
+protocol layering in TLS. 
+See section \ref{handshake} on page \pageref{handshake} for more information.
 
 \begin{figure}[hbtp]
 \includegraphics{layers}

@@ -5,11 +5,20 @@ to encrypt and authenticate packets.
 The following functions are available:
 \par
 \begin{itemize}
-\item \printfunc{gnutls_record_send}{gnutls\_record\_send()}:
+\item \printfunc{gnutls_record_send}{gnutls\_record\_send}:
 to send an record packet (with application data).
-\item \printfunc{gnutls_record_recv}{gnutls\_record\_recv()}:
+\item \printfunc{gnutls_record_recv}{gnutls\_record\_recv}:
 to receive a record packet (with application data).
 \end{itemize}
+
+As you may have already noticed, the functions which access the Record protocol,
+are quite limited, given the importance of this protocol in \tls{}.
+This is because the Record protocol's parameters are all set by
+the Handshake protocol (see section \ref{handshake} on page \pageref{handshake}).
+\par
+The Record protocol initialy starts with NULL parameters, which means
+no encryption, and no MAC is used. Encryption and authentication begin
+just after the handshake protocol has finished.
 
 \input{ciphers}
 
