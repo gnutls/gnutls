@@ -1,16 +1,18 @@
 This may not be complete yet. Check at gnutls.h for current information.
 
 All functions return >=0 if everything is ok, or a negative value in case
-of a failure.
+of a failure. Failure is not always fatal.
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
-	This function just initializes a gnutls state to null. 
+	This function just initializes a gnutls state to null.
+	con_end can be either GNUTLS_CLIENT or GNUTLS_SERVER. 
 
 int gnutls_deinit(GNUTLS_STATE state);
 	This function clears all buffers associated with the state.
 	
 int gnutls_handshake(int cd, GNUTLS_STATE state);
-	This function does the handshake of the TLS/SSL protocol.
+	This function does the handshake of the TLS/SSL protocol,
+	and initializes the TLS connection.
 	It accepts a TCP connection descriptor and a GNUTLS state.
 	This function will fail if any problem is encountered,
 	and the connection should be terminated.
@@ -36,8 +38,9 @@ int gnutls_send_hello_request(int cd, GNUTLS_STATE state);
 
 AlertDescription gnutls_get_last_alert( GNUTLS_STATE state);
 	Returns the last alert number received. This function
-	should be called only if GNUTLS_E_WARNING_ALERT_RECEIVED or
-	GNUTLS_E_FATAL_ALERT_RECEIVED is returned by a gnutls function.
+	should be called if GNUTLS_E_WARNING_ALERT_RECEIVED or
+	GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls 
+	function.
 	The peer may send alerts if he thinks some things were not
 	right. Check gnutls.h for the available alert descriptions.
 
@@ -66,10 +69,12 @@ char *_gnutls_compression_get_name(CompressionMethod);
 int gnutls_is_fatal_error( int error);
 	If a function returns a negative value you may feed that value
 	to this function to see if it is fatal. Returns 1 for a fatal
-	error 0 otherwise.
+	error 0 otherwise. However you may want to check the
+	error code manual, since some non-fatal errors to the protocol
+	may be fatal for you (your program).
 
 void gnutls_perror( int error);
-char* gnutls_strerror(int error);
+char* gnutls_strerror( int error);
 	These funtions are like perror() and strerror().
 	gnutls_strerror() returns a malloc'ed value thus it must be
 	freed.
@@ -84,29 +89,32 @@ ssize_t gnutls_read(int cd, GNUTLS_STATE state, void* data, int sizeofdata);
 
 ssize_t gnutls_recv(int cd, GNUTLS_STATE state, void* data, int sizeofdata, int flags);
 	This function has the same semantics as recv() has. The only
-	difference is that is accepts a GNUTLS state. However the
-	only acceptable flag is currently MSG_DONTWAIT. In that case,
+	difference is that is accepts a GNUTLS state. Flags are the flags
+	passed to recv() and should be used with care in gnutls. 
+	The only acceptable flag is currently MSG_DONTWAIT. In that case, 
 	if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
-	if there no data in the socket. 
-	
+	if there are no data in the socket. 
+
 ssize_t gnutls_send(int cd, GNUTLS_STATE state, void* data, int sizeofdata, int flags);
 	This function has the same semantics as send() has. The only
 	difference is that is accepts a GNUTLS state. Currently flags cannot
 	be anything except 0.
 
-int gnutls_check_pending(GNUTLS_STATE state);
+int gnutls_check_pending( GNUTLS_STATE state);
 	This function checks if there are any data to receive 
 	in the gnutls buffers. Returns the size of that data or 0.
-	Notice that you may use select to check for data in
+	Notice that you may also use select() to check for data in
 	the TCP connection, instead of this function.
+	(gnutls leaves some data in the tcp buffer in order for select
+	to work).
 
 void gnutls_set_cipher_priority( GNUTLS_STATE state, ...);
-	Sets the priority on the ciphers supported by gnutls. The num
-	is the number of the ciphers specified. After specifying 
-	the ciphers you want, you should add 0.
+	Sets the priority on the ciphers supported by gnutls.
+	Priority is higher for ciphers specified before others.
+	After specifying the ciphers you want, you should add 0.
 	Note that the priority is set on the client. The server does
-	not use that except for disabling algorithms that were not
-	specified.
+	not use the algorithm's priority except for disabling 
+	algorithms that were not specified.
 
 int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred);
 	Sets the needed credentials for the specified (in kx) authentication
@@ -114,9 +122,9 @@ int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred);
 	The (void* cred) parameter is a structure that depends on the
 	specified kx algorithm and on the current state (client or server).
 	[ In order to minimize memory usage, and share credentials between
-	several threads gnutls keeps a pointer to cred not the whole cred 
+	several threads gnutls keeps a pointer to cred, and not the whole cred 
 	structure. Thus you will have to keep the structure allocated until
-	the last gnutls_deinit(). ]
+	you call gnutls_deinit(). ]
 
 	* For GNUTLS_KX_ANON cred should be NULL.
 	* For GNUTLS_KX_SRP cred should be SRP_CLIENT_CREDENTIALS
