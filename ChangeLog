@@ -1,3 +1,18 @@
+2003-11-14 17:16  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls_errors.c, lib/gnutls_errors_int.h,
+	src/certtool.c, src/cli.c, src/common.c, src/tests.c:
+
+	gnutls_x509_*_set_dn_by_oid() functions have a raw_flag parameter
+	added. Some other fixes in function types.  
+
+2003-11-14 12:50  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls.h.in.in:
+
+	Compatibility header for gnutls4 is no longer included in gnutls.h.
+	Added deprecated warnings to gnutls8 stuff.  
+
 2003-11-13 09:31  nmav <nmav@gnutls.org>
 
 	* configure.in, lib/auth_cert.c, lib/debug.c,
