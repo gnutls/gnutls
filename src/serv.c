@@ -241,7 +241,7 @@ int kx_priority[16] =
 };
 int cipher_priority[16] =
     { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
-   GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_ARCFOUR_EXPORT, 0
+   GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_ARCFOUR_40, 0
 };
 
 int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
@@ -297,7 +297,7 @@ char* peer_print_info(GNUTLS_STATE state, int *ret_length, const char* header)
    const char *tmp;
    unsigned char sesid[32];
    int sesid_size, i;
-   char* http_buffer = malloc(5*1024);
+   char* http_buffer = malloc(5*1024 + strlen(header));
 
    if (http_buffer==NULL) return NULL;
    if (quiet != 0) {

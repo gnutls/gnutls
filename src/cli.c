@@ -77,7 +77,7 @@ int kx_priority[16] =
    GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
 };
 int cipher_priority[16] =
-    { GNUTLS_CIPHER_ARCFOUR_EXPORT, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
+    { GNUTLS_CIPHER_ARCFOUR_40, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
    GNUTLS_CIPHER_ARCFOUR, 0
 };
 int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
@@ -556,8 +556,8 @@ void gaa_parser(int argc, char **argv)
 	    cipher_priority[j++] = GNUTLS_CIPHER_TWOFISH_128_CBC;
 	 if (strncasecmp(info.ciphers[i], "3DE", 3) == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
-	 if (strcasecmp(info.ciphers[i], "ARCFOUR-EXPORT") == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_EXPORT;
+	 if (strcasecmp(info.ciphers[i], "ARCFOUR-40") == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
 	 if (strcasecmp(info.ciphers[i], "ARCFOUR") == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR;
 	 if (strncasecmp(info.ciphers[i], "NUL", 3) == 0)

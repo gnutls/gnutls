@@ -61,7 +61,7 @@ GNUTLS_CIPHER_HANDLE ret;
 #endif
 		break;
 	case GNUTLS_CIPHER_ARCFOUR:
-	case GNUTLS_CIPHER_ARCFOUR_EXPORT:
+	case GNUTLS_CIPHER_ARCFOUR_40:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "arcfour", NULL, "stream", NULL);
 #else
