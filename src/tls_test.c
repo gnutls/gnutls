@@ -187,7 +187,6 @@ int main(int argc, char **argv)
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_srp_set_client_credentials( srp_cred, "guest", "guest");
 #endif
 
 #ifdef ENABLE_ANON
