@@ -127,7 +127,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	fprintf(stderr, "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->gnutls_internals.
 					      current_cipher_suite));
-	fprintf(stderr, "Compression: %s\n", "none");
+	fprintf(stderr, "Compression: %s\n", "null");
 #endif
 
 	gnutls_free(state->connection_state.write_mac_secret);
