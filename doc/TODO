@@ -4,6 +4,7 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Add DHE_RSA ciphersuite
+* Add function to update the fixed Diffie Hellman primes
 * Audit the code (volunteers?)
 * Add support for PKCS8 encrypted private keys
 * Add support for PKCS12
