@@ -18,6 +18,8 @@ See the end for copying conditions.
 - Improved the semantics of GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, to
   allow only trusted Version 1 CAs and introduced
   GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT which has the old semantics.
+- Nettle self tests now build properly, reported by Pierre
+  <pierre42d@9online.fr>.
 
 * Version 1.2.0 (2005-01-27)
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
