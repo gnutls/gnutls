@@ -7,15 +7,18 @@ COBJECTS = crl.c dn.c common.c x509.c extensions.c dsa.c \
 	pkcs12_bag.c pkcs12_encr.c x509_write.c crl_write.c compat.c
 
 EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
-	x509-api.tex compat.h verify.h mpi.h crq.h sign.h pkcs5.h \
-	privkey.h pkcs12.h rfc2818.h dsa.h $(COBJECTS)
+	compat.h verify.h mpi.h crq.h sign.h pkcs5.h \
+	privkey.h pkcs12.h rfc2818.h dsa.h $(COBJECTS) \
+	x509-api.tex x509-api.texi
 
-
-x509-api.tex: $(COBJECTS)
+x509-api.tex x509-api.texi: $(COBJECTS)
 	@echo "" > x509-api.tex
-	@for i in $(COBJECTS); \
-	do echo -n "Creating documentation for file $$i... " && ../../doc/scripts/gdoc -tex $$i >> x509-api.tex \
-	&& echo "ok"; \
+	@echo "" > x509-api.texi
+	@for i in $(COBJECTS); do \
+		echo -n "Creating documentation for file $$i... " && \
+		../../doc/scripts/gdoc -tex $$i >> x509-api.tex && \
+		../../doc/scripts/gdoc -texinfo $$i >> x509-api.texi && \
+		echo "ok"; \
 	done
 
-dist-hook: x509-api.tex
+dist-hook: x509-api.tex x509-api.texi
