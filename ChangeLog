@@ -1,3 +1,27 @@
+2005-01-05 19:04  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2005-01-05 18:57  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS:
+
+	Add.  
+
+2005-01-05 02:24  Simon Josefsson <simon@josefsson.org>
+
+	* doc/README.CVS:
+
+	Add gtk-doc URLs.  
+
+2005-01-05 02:16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/README.CVS:
+
+	Fix gtk-doc stuff.  
+
 2004-12-30 00:41  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-ietf-tls-rfc3546bis-00.txt:
