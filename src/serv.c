@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "gnutls.h"
+#include "port.h"
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
@@ -28,7 +29,7 @@ int main()
 	memset(&sa_serv, '\0', sizeof(sa_serv));
 	sa_serv.sin_family = AF_INET;
 	sa_serv.sin_addr.s_addr = INADDR_ANY;
-	sa_serv.sin_port = htons(2222);	/* Server Port number */
+	sa_serv.sin_port = htons(PORT);	/* Server Port number */
 
 	err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
 	ERR(err, "bind");
@@ -49,8 +50,8 @@ int main()
 
 		gnutls_handshake(sd, state);
 		fprintf(stderr, "Handshake was completed\n");
-		ret = gnutls_send(sd, state, "hello\n", 5);
-		fprintf(stderr, "Data was send (%d)\n", ret);
+//		ret = gnutls_send(sd, state, "hello\n", 5);
+//		fprintf(stderr, "Data was send (%d)\n", ret);
 		gnutls_close(sd, state);
 		close(sd);
 		gnutls_deinit(&state);
