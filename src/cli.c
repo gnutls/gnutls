@@ -53,6 +53,7 @@ char *hostname = NULL;
 int port;
 int record_max_size;
 int fingerprint;
+int crlf;
 
 char *srp_passwd;
 char *srp_username;
@@ -439,6 +440,11 @@ int main(int argc, char **argv)
 	    continue;
 	 }
 	 do {
+	    if ( crlf != 0) {
+	        char* b=strchr( buffer, '\n');
+	    	strcpy( b, "\r\n");
+	    }
+	    	
 	    ret = gnutls_record_send(state, buffer, strlen(buffer));
 	 } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	 if (ret > 0)
@@ -539,6 +545,8 @@ void gaa_parser(int argc, char **argv)
 
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;
+   
+   crlf = info.crlf;
 
    if (info.nrest_args == 0)
       hostname = "localhost";
