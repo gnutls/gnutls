@@ -21,6 +21,9 @@
 #undef GNUTLS_VERSION
 
 #undef USE_SIGNALS
+#undef USE_VA_COPY
+#undef HAVE_VA_COPY
+#undef HAVE___VA_COPY
 
 #undef LIBMCRYPT22
 #undef LIBMCRYPT24

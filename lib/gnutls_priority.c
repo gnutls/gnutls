@@ -44,7 +44,11 @@ int gnutls_set_cipher_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 
 	va_start( ap, state);
 
+#ifdef USE_VA_COPY
+	va_copy( _ap, ap);
+#else
 	_ap = ap;
+#endif
 
 	while( va_arg(ap, BulkCipherAlgorithm) != 0) {
 		num++;
@@ -86,7 +90,12 @@ int gnutls_set_kx_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	int i,num=0;
 	
 	va_start( ap, state);
+
+#ifdef USE_VA_COPY
+	va_copy( _ap, ap);
+#else
 	_ap = ap;
+#endif
 
 	while( va_arg(ap, KXAlgorithm) != 0) {
 		num++;
@@ -127,7 +136,12 @@ int gnutls_set_mac_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	
 	va_start( ap, state);
 
+#ifdef USE_VA_COPY
+	va_copy( _ap, ap);
+#else
 	_ap = ap;
+#endif
+
 	while( va_arg(ap, MACAlgorithm) != 0) {
 		num++;
 	}
@@ -166,7 +180,12 @@ int gnutls_set_compression_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	va_list _ap;
 	
 	va_start( ap, state);
+
+#ifdef USE_VA_COPY
+	va_copy( _ap, ap);
+#else
 	_ap = ap;
+#endif
 
 	while( va_arg( ap, CompressionMethod) != 0) {
 		num++;
@@ -205,7 +224,12 @@ int gnutls_set_protocol_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	va_list _ap;
 	
 	va_start( ap, state);
+
+#ifdef USE_VA_COPY
+	va_copy( _ap, ap);
+#else
 	_ap = ap;
+#endif
 
 	while( va_arg( ap, int) != 0) {
 		num++;

@@ -132,6 +132,52 @@ AC_CHECK_HEADERS(utime.h zlib.h errno.h signal.h)
 AC_CHECK_FUNCS(signal sigaction,AC_DEFINE(USE_SIGNALS),)
 AC_CHECK_FUNCS(bzero memset lstat stat umask utime memmove bcopy getpwuid,,)
 
+dnl Defines USE_VA_COPY
+AC_MSG_CHECKING([whether we have va_copy or __va_copy])
+AC_TRY_RUN( 
+changequote(<<, >>)dnl
+<<#include <stdarg.h> 
+int main() {
+va_list a,b;
+va_copy(a, b);  
+return 0;
+}
+>>
+changequote([, ])dnl
+,
+dnl	************ HAVE_VA_COPY
+AC_DEFINE(HAVE_VA_COPY)
+AC_DEFINE(USE_VA_COPY)
+AC_MSG_RESULT(va_copy)
+,
+dnl	 ************ NO VA_COPY
+ dnl Defines USE_VA_COPY
+ AC_TRY_RUN(
+ changequote(<<, >>)dnl
+ <<#include <stdarg.h> 
+ int main() {
+ va_list a,b;
+ __va_copy(a, b);  
+ return 0;
+ }
+ >>
+ changequote([, ])dnl
+ ,
+ dnl	************ HAVE___VA_COPY
+ AC_DEFINE(HAVE___VA_COPY)
+ AC_DEFINE(USE_VA_COPY)
+ AC_MSG_RESULT(__va_copy)
+ ,
+ dnl	 ************ NO __VA_COPY
+ AC_MSG_RESULT(none)
+ )
+,
+dnl **** CROSS COMPILING
+AC_MSG_RESULT(none)
+)
+
+
+
 AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN("GDBM was not found. You will not be able to use Server side session resuming."))
 AC_CHECK_LIB(z, compress,,AC_MSG_WARN("ZLIB was not found. You will not be able to use ZLIB compression."))
 

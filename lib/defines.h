@@ -109,4 +109,10 @@
 # endif
 #endif
 
+#ifdef USE_VA_COPY
+# ifndef HAVE_VA_COPY
+# define va_copy(x,y) __va_copy(x,y)
+# endif
+#endif
+
 #endif /* defines_h */
