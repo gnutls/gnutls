@@ -45,12 +45,8 @@ extern const static_asn pkcs1_asn1_tab[];
 extern const static_asn pkix_asn1_tab[];
 
 
-typedef ssize_t (*PULL_FUNC)(SOCKET, void*, size_t);
-typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
 typedef void (*LOG_FUNC)( const char*);
 
-PULL_FUNC _gnutls_pull_func;
-PUSH_FUNC _gnutls_push_func;
 LOG_FUNC _gnutls_log_func;
 
 static node_asn *PKIX1_ASN;
@@ -64,39 +60,6 @@ node_asn* _gnutls_get_pkcs() {
 	return PKCS1_ASN;
 }
 
-/**
-  * gnutls_global_set_pull_func - This function sets a read like function
-  * @pull_func: it's a function like read
-  *
-  * This is the function where you set a function for gnutls 
-  * to receive data. Normaly, if you use berkeley style sockets,
-  * you may not use this function since the default (recv(2)) will 
-  * probably be ok.
-  * This function should be called once and after gnutls_global_init().
-  * PULL_FUNC is of the form, 
-  * ssize_t (*PULL_FUNC)(SOCKET, const void*, size_t);
-  **/
-void gnutls_global_set_pull_func( PULL_FUNC pull_func) {
-	_gnutls_pull_func = pull_func;
-}
-
-/**
-  * gnutls_global_set_push_func - This function sets the function to send data
-  * @push_func: it's a function like write
-  *
-  * This is the function where you set a push function for gnutls
-  * to use in order to send data. If you are going to use berkeley style
-  * sockets, you may not use this function since
-  * the default (send(2)) will probably be ok. Otherwise you should
-  * specify this function for gnutls to be able to send data.
-  *  
-  * This function should be called once and after gnutls_global_init().
-  * PUSH_FUNC is of the form, 
-  * ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
-  **/
-void gnutls_global_set_push_func( PUSH_FUNC push_func) {
-	_gnutls_push_func = push_func;
-}
 
 /**
   * gnutls_global_set_log_func - This function sets the logging function
@@ -149,8 +112,6 @@ int gnutls_global_init()
 
 	/* set default recv/send functions
 	 */
-	_gnutls_pull_func = NULL;
-	_gnutls_push_func = NULL;
 	gnutls_global_set_log_func( dlog);
 
 	/* initialize parser 
@@ -235,3 +196,44 @@ static Sigfunc *
 #endif /* HAVE_SIGACTION */
 }
 #endif /* USE_SIGNALS */
+
+
+/* These functions should be elsewere. Kept here for 
+ * historical reasons.
+ */
+
+/**
+  * gnutls_set_pull_func - This function sets a read like function
+  * @pull_func: it's a function like read
+  * @state: gnutls state
+  *
+  * This is the function where you set a function for gnutls 
+  * to receive data. Normaly, if you use berkeley style sockets,
+  * you may not use this function since the default (recv(2)) will 
+  * probably be ok.
+  * This function should be called once and after gnutls_global_init().
+  * PULL_FUNC is of the form, 
+  * ssize_t (*PULL_FUNC)(SOCKET, const void*, size_t);
+  **/
+void gnutls_set_pull_func( GNUTLS_STATE state, PULL_FUNC pull_func) {
+	state->gnutls_internals._gnutls_pull_func = pull_func;
+}
+
+/**
+  * gnutls_set_push_func - This function sets the function to send data
+  * @push_func: it's a function like write
+  * @state: gnutls state
+  *
+  * This is the function where you set a push function for gnutls
+  * to use in order to send data. If you are going to use berkeley style
+  * sockets, you may not use this function since
+  * the default (send(2)) will probably be ok. Otherwise you should
+  * specify this function for gnutls to be able to send data.
+  *  
+  * This function should be called once and after gnutls_global_init().
+  * PUSH_FUNC is of the form, 
+  * ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
+  **/
+void gnutls_set_push_func( GNUTLS_STATE state, PUSH_FUNC push_func) {
+	state->gnutls_internals._gnutls_push_func = push_func;
+}

@@ -143,8 +143,13 @@ typedef enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB } Compre
 typedef enum ValidSession { VALID_TRUE, VALID_FALSE } ValidSession;
 typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
 
-
 /* STATE (stop) */
+
+
+/* Pull & Push functions defines: 
+ */
+typedef ssize_t (*PULL_FUNC)(SOCKET, void*, size_t);
+typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
 
 typedef struct {
 	KXAlgorithm algorithm;
@@ -416,6 +421,10 @@ typedef struct {
 	int				(*x509_client_cert_callback)(void*,void*,int, void*, int);
 	gnutls_cert			peer_cert;
 	int				max_handshake_data_buffer_size;
+	/* PUSH & PULL functions.
+	 */
+	PULL_FUNC _gnutls_pull_func;
+	PUSH_FUNC _gnutls_push_func;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

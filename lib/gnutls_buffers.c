@@ -38,9 +38,6 @@
 # include <io_debug.h>
 #endif
 
-extern ssize_t (*_gnutls_pull_func)( SOCKET, void*, size_t);
-extern ssize_t (*_gnutls_push_func)( SOCKET,const void*, size_t);
-
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
@@ -152,7 +149,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
  *
  * Flags are only used if the default recv() function is being used.
  */
-static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
+static ssize_t _gnutls_read( SOCKET fd, GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, int flags)
 {
 	size_t left;
 	ssize_t i=0;
@@ -165,10 +162,10 @@ static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
 	left = sizeOfPtr;
 	while (left > 0) {
 		
-		if (_gnutls_pull_func==NULL)
+		if (state->gnutls_internals._gnutls_pull_func==NULL)
 			i = recv(fd, &ptr[sizeOfPtr-left], left, flags);
 		else
-			i = _gnutls_pull_func(fd, &ptr[sizeOfPtr-left], left);
+			i = state->gnutls_internals._gnutls_pull_func(fd, &ptr[sizeOfPtr-left], left);
 				
 		if (i < 0) {
 #ifdef READ_DEBUG
@@ -248,7 +245,7 @@ int ret, sum;
         /* this was already read by using MSG_PEEK - so it shouldn't fail */
 	sum = 0;
         do { /* we need this to finish now */
-        	ret = _gnutls_read( cd, peek, RCVLOWAT-sum, 0);
+        	ret = _gnutls_read( cd, state, peek, RCVLOWAT-sum, 0);
         	if (ret > 0) sum+=ret;
        	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN || sum < RCVLOWAT);
 
@@ -332,7 +329,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	/* READ DATA - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
 	if ( recvdata - recvlowat > 0) {
-		ret = _gnutls_read( fd, &buf[buf_pos], recvdata - recvlowat, 0);
+		ret = _gnutls_read( fd, state, &buf[buf_pos], recvdata - recvlowat, 0);
 
 		/* return immediately if we got an interrupt or eagain
 		 * error.
@@ -359,7 +356,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 * select think, that the socket is ready for reading
 	 */
 	if (ret == (recvdata - recvlowat) && recvlowat > 0) {
-		ret2 = _gnutls_read( fd, &buf[buf_pos], recvlowat, MSG_PEEK);
+		ret2 = _gnutls_read( fd, state, &buf[buf_pos], recvlowat, MSG_PEEK);
 
 		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) {
 			return ret2;
@@ -460,10 +457,10 @@ ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, 
 	left = n;
 	while (left > 0) {
 		
-		if (_gnutls_push_func==NULL) 
+		if (state->gnutls_internals._gnutls_push_func==NULL) 
 			i = send(fd, &ptr[n-left], left, 0);
 		else
-			i = _gnutls_push_func(fd, &ptr[n-left], left);
+			i = state->gnutls_internals._gnutls_push_func(fd, &ptr[n-left], left);
 
 		if (i == -1) {
 			if (errno == EAGAIN || errno == EINTR) {
