@@ -813,7 +813,8 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum_t * keyring,
 
 
 /**
- * gnutls_certificate_set_openpgp_keyring_file - Adds a keyring file for OpenPGP * @c: A certificate credentials structure
+ * gnutls_certificate_set_openpgp_keyring_file - Adds a keyring file for OpenPGP
+ * @c: A certificate credentials structure
  * @file: filename of the keyring.
  *
  * The function is used to set keyrings that will be used internally
@@ -823,8 +824,8 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum_t * keyring,
  *
  **/
 int
-gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials_t
-					    c, const char *file)
+gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials_t c,
+					    const char *file)
 {
     struct stat statbuf;
 
@@ -841,8 +842,8 @@ gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials_t
 
 
 int
-gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials_t
-					   c, const opaque * data,
+gnutls_certificate_set_openpgp_keyring_mem(gnutls_certificate_credentials_t c,
+					   const opaque * data,
 					   size_t dlen)
 {
     cdk_stream_t inp;
@@ -934,7 +935,7 @@ _gnutls_openpgp_request_key(gnutls_session_t session, gnutls_datum_t * ret,
 /**
  * gnutls_certificate_set_openpgp_keyserver - Used to set an OpenPGP key server
  * @res: the destination context to save the data.
- * @server: is the key server address
+ * @keyserver: is the key server address
  * @port: is the key server port to connect to
  *
  * This funtion will set a key server for use with openpgp keys. This

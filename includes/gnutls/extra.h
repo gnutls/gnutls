@@ -34,7 +34,8 @@
 typedef int (*gnutls_openpgp_recv_key_func)(gnutls_session_t, const unsigned char *keyfpr, 
     unsigned int keyfpr_length, gnutls_datum_t *key);
 
-void gnutls_openpgp_set_recv_key_function( gnutls_session_t, gnutls_openpgp_recv_key_func);
+void gnutls_openpgp_set_recv_key_function( gnutls_session_t session,
+					   gnutls_openpgp_recv_key_func func);
 
 int gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials_t res, 
     const char *CERTFILE, const char* KEYFILE);
@@ -51,8 +52,8 @@ int gnutls_certificate_set_openpgp_keyring_mem(
     gnutls_certificate_credentials_t c,
     const unsigned char *data, size_t dlen );
 
-int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials_t res, 
-    const char *name);
+int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials_t c,
+    const char *file);
 
 int gnutls_global_init_extra(void);
 
