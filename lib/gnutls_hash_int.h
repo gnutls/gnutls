@@ -10,21 +10,32 @@
 #endif
 
 /* for message digests */
+#define GNUTLS_HASH_HANDLE_INT GNUTLS_MAC_HANDLE_INT
+#define GNUTLS_HASH_HANDLE GNUTLS_MAC_HANDLE
+
+typedef struct {
 #ifdef USE_MHASH
-# define GNUTLS_HASH_HANDLE MHASH
-# define GNUTLS_MAC_HANDLE MHASH
+	MHASH handle;
 #else
-# define GNUTLS_HASH_HANDLE GCRY_MD_HD
-# define GNUTLS_MAC_HANDLE GCRY_MD_HD
+	GCRY_MD_HD handle;
 #endif
+	MACAlgorithm algorithm;
+	void* key;
+	int keysize;
+} GNUTLS_MAC_HANDLE_INT;
+typedef GNUTLS_MAC_HANDLE_INT* GNUTLS_MAC_HANDLE;
+
 
 #define GNUTLS_HASH_FAILED NULL
 #define GNUTLS_MAC_FAILED NULL
 
 GNUTLS_MAC_HANDLE gnutls_hmac_init( MACAlgorithm algorithm, char* key, int keylen);
 int gnutls_hmac_get_algo_len(MACAlgorithm algorithm);
-int gnutls_hmac(GNUTLS_HASH_HANDLE handle, void* text, int textlen);
-void* gnutls_hmac_deinit( GNUTLS_HASH_HANDLE handle);
+int gnutls_hmac(GNUTLS_MAC_HANDLE handle, void* text, int textlen);
+void* gnutls_hmac_deinit( GNUTLS_MAC_HANDLE handle);
+GNUTLS_MAC_HANDLE gnutls_hmac_init_ssl3( MACAlgorithm algorithm, char* key, int keylen);
+void* gnutls_hmac_deinit_ssl3( GNUTLS_MAC_HANDLE handle);
+
 
 GNUTLS_HASH_HANDLE gnutls_hash_init(MACAlgorithm algorithm);
 int gnutls_hash_get_algo_len(MACAlgorithm algorithm);
