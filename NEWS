@@ -1,4 +1,4 @@
-Version 0.5.7
+Version 0.5.7 (11/09/2002)
 - Some fixes in the memory allocation functions (realloc).
 - Improved the string functions used in XML certificate generation.
 - Removed dependency on libgdbm.
