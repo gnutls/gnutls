@@ -27,7 +27,6 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
-#include <opencdk.h>
 #include <gnutls_openpgp.h>
 #include <openpgp.h>
 

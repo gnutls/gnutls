@@ -2,6 +2,7 @@ Version 1.1.12
 - Updated the SRP authentication to conform to the
   latest (yet unreleased) draft. Unfortunately this breaks
   compatibility with previous versions.
+- Changed the makefiles to be more portable.
 
 Version 1.1.11 (16/07/2004)
 - Added the '_t' suffix to all exported symbols.

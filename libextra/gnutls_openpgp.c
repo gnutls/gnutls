@@ -30,7 +30,6 @@
 #include <gnutls_str.h>
 #include <stdio.h>
 #include <gcrypt.h>
-#include <opencdk.h>
 #include <time.h>
 #include <sys/stat.h>
 
