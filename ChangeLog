@@ -1,3 +1,21 @@
+2002-11-11 17:20  nmav <nmav@gnutls.org>
+
+	* src/: cli.c, serv.c, tests.c:
+
+	cleanups 
+
+2002-11-11 17:06  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in:
+
+	dropped source backwards compatibility 
+
+2002-11-11 17:02  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_int.h:
+
+	Added callback for OpenPGP key retrieval.  
+
 2002-11-06 13:00  nmav <nmav@gnutls.org>
 
 	* doc/protocol/: draft-ietf-tls-rfc2246-bis-01.txt,
