@@ -662,9 +662,9 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 	 * In order to return we need a full TLS handshake header, or in case of a version 2
 	 * packet, then we return the first byte.
 	 */
-	if ((state->gnutls_internals.handshake_header_buffer.header_size == handshake_header_size ||
-		(state->gnutls_internals.v2_hello!=0 && type==GNUTLS_CLIENT_HELLO)) &&
-		state->gnutls_internals.handshake_header_buffer.packet_length > 0) {
+	if ( state->gnutls_internals.handshake_header_buffer.header_size == handshake_header_size ||
+		(state->gnutls_internals.v2_hello!=0 && type==GNUTLS_CLIENT_HELLO &&
+		state->gnutls_internals.handshake_header_buffer.packet_length > 0)) {
 
 		*recv_type =
 		    state->gnutls_internals.handshake_header_buffer.recv_type;
@@ -682,7 +682,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 		ret =
 		    _gnutls_handshake_recv_int(cd, state, GNUTLS_HANDSHAKE, type,
 				       dataptr, SSL2_HEADERS);
-	
+
 		if (ret < 0) {
 			gnutls_assert();
 			return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -692,7 +692,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
-		state->gnutls_internals.handshake_header_buffer.header_size += ret;
+		state->gnutls_internals.handshake_header_buffer.header_size = SSL2_HEADERS;
 	}
 
 	if (state->gnutls_internals.v2_hello == 0 || type != GNUTLS_CLIENT_HELLO) {
@@ -717,8 +717,6 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 		length32 = READuint24(&dataptr[1]);
 		handshake_header_size = HANDSHAKE_HEADER_SIZE;
 
-		state->gnutls_internals.handshake_header_buffer.header_size += ret;
-		
 #ifdef HANDSHAKE_DEBUG
 		_gnutls_log("Handshake: %s was received [%ld bytes]\n",
 			    _gnutls_handshake2str(dataptr[0]),
@@ -748,11 +746,6 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 	state->gnutls_internals.handshake_header_buffer.packet_length = length32;
 	state->gnutls_internals.handshake_header_buffer.recv_type = *recv_type;
 
-	if (*recv_type != type) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
-	}
-
 	if (*recv_type != GNUTLS_HELLO_REQUEST) {
 		if ((ret =
 		     gnutls_insert_to_handshake_buffer(state, dataptr,
@@ -761,6 +754,14 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 			gnutls_assert();
 			return ret;
 		}
+	}
+
+	/* This MUST be after insert_to_handshake_buffer(), because
+	 * of optional packets.
+	 */
+	if (*recv_type != type) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	}
 
 	return length32;
