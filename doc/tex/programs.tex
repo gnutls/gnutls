@@ -1,16 +1,16 @@
 \chapter{Included programs}
 
-\section{The ``gnutls-srpcrypt'' program}
-\label{srpcrypt}
+\section{The ``srptool'' program}
+\label{srptool}
 
-The ``gnutls-srpcrypt'' is a very simple program that emulates the programs in the 
+The ``srptool'' is a very simple program that emulates the programs in the 
 \emph{Stanford SRP libraries}.
 It is intended for use in places where you don't expect SRP
 authentication to be the used for system users.
 Traditionally \emph{libsrp} used two files. One called 'tpasswd' which holds usernames 
 and verifiers, and 'tpasswd.conf' which holds generators and primes.
 \par
-How to use srpcrypt:
+How to use srptool:
 
 \begin{itemize}
 
@@ -18,7 +18,7 @@ How to use srpcrypt:
 \item To create tpasswd.conf which holds the g and n values for
 SRP protocol (generator and a large prime), run:
 \begin{verbatim}
-$ gnutls-srpcrypt --create-conf /etc/tpasswd.conf
+$ srptool --create-conf /etc/tpasswd.conf
 \end{verbatim}
 
 
@@ -26,14 +26,14 @@ $ gnutls-srpcrypt --create-conf /etc/tpasswd.conf
 be prompted for a password). Verifiers are stored by default in the
 way libsrp expects.
 \begin{verbatim}
-$ gnutls-srpcrypt --passwd /etc/tpasswd \ 
+$ srptool --passwd /etc/tpasswd \ 
     --passwd-conf /etc/tpasswd.conf -u test
 \end{verbatim}
 
 \item This command will check against a password. If the password matches 
 the one in /etc/tpasswd you will get an ok.
 \begin{verbatim}
-$ gnutls-srpcrypt --passwd /etc/tpasswd \ 
+$ srptool --passwd /etc/tpasswd \ 
     --passwd-conf /etc/tpasswd.conf --verify -u test
 \end{verbatim}
 

@@ -12,6 +12,9 @@ Current list:
   functions, similar to gnutls_certificate_set_openpgp_key().
 * Use subkeys with the 0x20 flag in openpgp keys (if present),
   instead of the main key.
+* Use the GNUTLS_CERT_SIGNER_NOT_FOUND flag to openpgp keys
+  as well. It would probably mean that no keys in the ring
+  signed the key to be verified.
 * Add function to extract the signers of an openpgp key. Should
   be similar to gnutls_x509_crt_get_dn_oid().
 * Add function to verify an openpgp key against a plain key.
