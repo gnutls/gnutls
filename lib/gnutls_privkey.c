@@ -45,12 +45,12 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 	 */
 	pkey->params = gnutls_malloc(2*sizeof(MPI));
 	
-	if (create_structure( _gnutls_get_pkcs(), "PKCS-1.RSAPrivateKey", &pkcs_asn, "rsakey")!=ASN_OK) {
+	if (asn1_create_structure( _gnutls_get_pkcs(), "PKCS-1.RSAPrivateKey", &pkcs_asn, "rsakey")!=ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = get_der( pkcs_asn, cert.data, cert.size);
+	result = asn1_get_der( pkcs_asn, cert.data, cert.size);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
@@ -58,26 +58,26 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 
 	len = sizeof(str) - 1;
 	result =
-	    read_value( pkcs_asn, "rsakey.privateExponent", str, &len);
+	    asn1_read_value( pkcs_asn, "rsakey.privateExponent", str, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		delete_structure(pkcs_asn);
+		asn1_delete_structure(pkcs_asn);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	if (gcry_mpi_scan( &pkey->params[0], /* u */
 		  GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
-		delete_structure(pkcs_asn);
+		asn1_delete_structure(pkcs_asn);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 
 	len = sizeof(str) - 1;
 	result =
-	    read_value( pkcs_asn, "rsakey.modulus", str, &len);
+	    asn1_read_value( pkcs_asn, "rsakey.modulus", str, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		delete_structure(pkcs_asn);
+		asn1_delete_structure(pkcs_asn);
 		_gnutls_mpi_release( &pkey->params[0]);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
@@ -85,12 +85,12 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 	if (gcry_mpi_scan( &pkey->params[1], /* A */
 		  GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
-		delete_structure(pkcs_asn);
+		asn1_delete_structure(pkcs_asn);
 		_gnutls_mpi_release( &pkey->params[0]);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	delete_structure(pkcs_asn);
+	asn1_delete_structure(pkcs_asn);
 
 	if (gnutls_set_datum( &pkey->raw, cert.data, cert.size) < 0) {
 		_gnutls_mpi_release(&pkey->params[0]);

@@ -7,4 +7,6 @@ typedef struct {
 
 typedef struct {
 	int dh_bits;
-} ANON_AUTH_INFO;
+} ANON_CLIENT_AUTH_INFO;
+
+typedef ANON_CLIENT_AUTH_INFO ANON_SERVER_AUTH_INFO;

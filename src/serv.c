@@ -76,10 +76,11 @@ GNUTLS_STATE initialize_state()
 	/* this is a password file (created with the included crypt utility) 
 	 * Read README.crypt prior to using SRP.
 	 */
-	srp_cred.password_file = "tpasswd";
-	srp_cred.password_conf_file = "tpasswd.conf";
+	gnutls_allocate_srp_server_sc( &srp_cred);
+	gnutls_set_srp_server_cred( srp_cred, "tpasswd", "tpasswd.conf");
 
-	dh_cred.dh_bits = 1024;
+	gnutls_allocate_anon_server_sc( &dh_cred);
+	gnutls_set_anon_server_cred( dh_cred, 1024);
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
@@ -93,8 +94,8 @@ GNUTLS_STATE initialize_state()
 	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority(state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
 			       GNUTLS_KX_DH_ANON, 0);
-	gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);
-	gnutls_set_cred(state, GNUTLS_SRP, &srp_cred);
+	gnutls_set_cred(state, GNUTLS_ANON, dh_cred);
+	gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
 	gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
 
 	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
@@ -104,8 +105,8 @@ GNUTLS_STATE initialize_state()
 
 void print_info(GNUTLS_STATE state)
 {
-	const SRP_AUTH_INFO *srp_info;
-	const ANON_AUTH_INFO *dh_info;
+	const SRP_SERVER_AUTH_INFO *srp_info;
+	const ANON_SERVER_AUTH_INFO *dh_info;
 	char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
@@ -165,8 +166,8 @@ void print_info(GNUTLS_STATE state)
 #define tmp2 &http_buffer[strlen(http_buffer)]
 void peer_print_info(int cd, GNUTLS_STATE state)
 {
-	const SRP_AUTH_INFO *srp_info;
-	const ANON_AUTH_INFO *dh_info;
+	const SRP_SERVER_AUTH_INFO *srp_info;
+	const ANON_SERVER_AUTH_INFO *dh_info;
 	char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
@@ -418,6 +419,8 @@ int main(int argc, char **argv)
 	close(listen_sd);
 
 	gnutls_free_x509_sc(x509_cred);
+	gnutls_free_srp_server_sc(x509_cred);
+	gnutls_free_anon_server_sc(x509_cred);
 
 	gnutls_global_deinit();
 	

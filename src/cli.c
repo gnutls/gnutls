@@ -40,8 +40,8 @@
 
 static int print_info( GNUTLS_STATE state) {
 char *tmp;
-const ANON_AUTH_INFO *dh_info;
-const X509PKI_AUTH_INFO *x509_info;
+const ANON_CLIENT_AUTH_INFO *dh_info;
+const X509PKI_CLIENT_AUTH_INFO *x509_info;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp); free(tmp);
@@ -120,8 +120,8 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 		
-	cred.username = "test";
-	cred.password = "test";
+	gnutls_allocate_srp_client_sc( &cred);
+	gnutls_set_srp_client_cred( cred, "test", "test");
 	
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");

@@ -138,44 +138,51 @@ const char* gnutls_ext_get_dnsname( GNUTLS_STATE);
 int gnutls_ext_set_dnsname( GNUTLS_STATE, const char* dnsname);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
-typedef struct {
-	char* username;
-	char* password;
-} SRP_CLIENT_CREDENTIALS;
+
+struct DSTRUCT;
+typedef struct DSTRUCT* X509PKI_SERVER_CREDENTIALS;
+typedef struct DSTRUCT* X509PKI_CLIENT_CREDENTIALS;
+
+typedef struct DSTRUCT* SRP_SERVER_CREDENTIALS;
+typedef struct DSTRUCT* SRP_CLIENT_CREDENTIALS;
+
+typedef struct DSTRUCT* ANON_SERVER_CREDENTIALS;
+typedef struct DSTRUCT* ANON_CLIENT_CREDENTIALS;
+
+
+void gnutls_free_srp_client_sc( SRP_CLIENT_CREDENTIALS sc);
+int gnutls_allocate_srp_client_sc( SRP_CLIENT_CREDENTIALS *sc);
+int gnutls_set_srp_client_cred( SRP_CLIENT_CREDENTIALS res, char *username, char* password);
+
+void gnutls_free_srp_server_sc( SRP_SERVER_CREDENTIALS sc);
+int gnutls_allocate_srp_server_sc( SRP_SERVER_CREDENTIALS *sc);
+int gnutls_set_srp_server_cred( SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
+
+void gnutls_free_anon_server_sc( ANON_SERVER_CREDENTIALS sc);
+int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS *sc);
+int gnutls_set_anon_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits);
+
+
+/* auth structures */
 
 typedef struct {
-	char* password_file;
-	char* password_conf_file;
-} SRP_SERVER_CREDENTIALS;
+	int dh_bits;
+} ANON_CLIENT_AUTH_INFO;
+
+/* for now it's the same */
+typedef ANON_CLIENT_AUTH_INFO ANON_SERVER_AUTH_INFO;
 
 typedef struct {
 	char username[256];
-} SRP_AUTH_INFO;
-
-/* Credential structures for ANON */
-
-typedef struct {
-	int dh_bits;
-} ANON_SERVER_CREDENTIALS;
-
-typedef struct {
-	int dh_bits;
-} ANON_AUTH_INFO;
+} SRP_SERVER_AUTH_INFO;
 
 typedef enum verified { GNUTLS_VERIFIED, GNUTLS_NOT_VERIFIED, GNUTLS_EXPIRED, GNUTLS_INVALID } CertificateStatus;
 
 typedef struct {
-	gnutls_datum *peer_certificate_list; /* In DER format */
-	int peer_certificate_list_size;
-	CertificateStatus peer_certificate_status;
-} X509PKI_AUTH_INFO;
-
-typedef struct {
-	int ne; /* nothing of interest here */
-} X509PKI_CLIENT_CREDENTIALS;
-
-struct X509PKI_SERVER_CRED;
-typedef struct X509PKI_SERVER_CRED* X509PKI_SERVER_CREDENTIALS;
+	gnutls_datum 		*peer_certificate_list; /* In DER format */
+	int 			peer_certificate_list_size;
+	CertificateStatus 	peer_certificate_status;
+} X509PKI_CLIENT_AUTH_INFO;
 
 
 /* CERTFILE is an x509 certificate in PEM form.

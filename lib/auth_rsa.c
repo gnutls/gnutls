@@ -72,13 +72,13 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 	int len = sizeof(str);
 	node_asn *srsa, *spk;
 	
-	if (create_structure( _gnutls_get_pkcs(), "PKIX1Implicit88.Certificate", &srsa, "rsa_params")
+	if (asn1_create_structure( _gnutls_get_pkcs(), "PKIX1Implicit88.Certificate", &srsa, "rsa_params")
 	    != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = get_der( srsa, cert.data, cert.size);
+	result = asn1_get_der( srsa, cert.data, cert.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 		gnutls_assert();
@@ -88,30 +88,30 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 
 	len = sizeof(str) - 1;
 	result =
-	    read_value
+	    asn1_read_value
 	    (srsa, "rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
 	     str, &len);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
-		delete_structure(srsa);
+		asn1_delete_structure(srsa);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
 	if (!strcmp(str, "1 2 840 113549 1 1 1")) {	/* pkix-1 1 - RSA */
 		len = sizeof(str) - 1;
 		result =
-		    read_value
+		    asn1_read_value
 		    (srsa, "rsa_params.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 		     str, &len);
-		delete_structure(srsa);
+		asn1_delete_structure(srsa);
 
 		if (result != ASN_OK) {
 			gnutls_assert();
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
-		if (create_structure
+		if (asn1_create_structure
 		    ( _gnutls_get_pkix(),
 		     "PKIX1Implicit88.RSAPublicKey", &spk, "rsa_public_key") != ASN_OK) {
 			gnutls_assert();
@@ -120,29 +120,29 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 
 		if (len % 8 != 0) {
 			gnutls_assert();
-			delete_structure(spk);
+			asn1_delete_structure(spk);
 			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		}
 		
-		result = get_der(spk, str, len / 8);
+		result = asn1_get_der(spk, str, len / 8);
 
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure(spk);
+			asn1_delete_structure(spk);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
 		len = sizeof(str) - 1;
-		result = read_value(spk, "rsa_public_key.modulus", str, &len);
+		result = asn1_read_value(spk, "rsa_public_key.modulus", str, &len);
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure(spk);
+			asn1_delete_structure(spk);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
 		if (gcry_mpi_scan(mod, GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
-			delete_structure(spk);
+			asn1_delete_structure(spk);
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 
@@ -150,16 +150,16 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 			if (gnutls_set_datum
 			    (&params->rsa_modulus, str, len) < 0) {
 				gnutls_assert();
-				delete_structure(spk);
+				asn1_delete_structure(spk);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
 		len = sizeof(str) - 1;
 		result =
-		    read_value(spk, "rsa_public_key.publicExponent", str, &len);
+		    asn1_read_value(spk, "rsa_public_key.publicExponent", str, &len);
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure(spk);
+			asn1_delete_structure(spk);
 			if (params != NULL)
 				gnutls_free_datum(&params->rsa_modulus);
 			_gnutls_mpi_release(mod);
@@ -171,7 +171,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 			_gnutls_mpi_release(mod);
 			if (params != NULL)
 				gnutls_free_datum(&params->rsa_modulus);
-			delete_structure(spk);
+			asn1_delete_structure(spk);
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 		if (params != NULL)
@@ -182,11 +182,11 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 				if (params != NULL)
 					gnutls_free_datum(&params->
 							  rsa_modulus);
-				delete_structure(spk);
+				asn1_delete_structure(spk);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
-		delete_structure(spk);
+		asn1_delete_structure(spk);
 
 		ret = 0;
 
@@ -197,7 +197,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 		gnutls_assert();
 		ret = GNUTLS_E_X509_CERTIFICATE_ERROR;
 
-		delete_structure(srsa);
+		asn1_delete_structure(srsa);
 	}
 
 
@@ -350,16 +350,16 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 {
 	int size, len;
 	opaque *p = data;
-	X509PKI_AUTH_INFO *info;
+	X509PKI_CLIENT_AUTH_INFO *info;
 	int dsize = data_size;
 	int i, j;
 
-	key->auth_info = gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO));
+	key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO));
 	if (key->auth_info == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	key->auth_info_size = sizeof(X509PKI_AUTH_INFO);
+	key->auth_info_size = sizeof(X509PKI_CLIENT_AUTH_INFO);
 
 	DECR_LEN(dsize, 3);
 	size = READuint24(p);
@@ -434,7 +434,7 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
  */
 int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 {
-	X509PKI_AUTH_INFO *auth = key->auth_info;
+	X509PKI_CLIENT_AUTH_INFO *auth = key->auth_info;
 	svoid *rand;
 	gnutls_datum sdata;	/* data to send */
 	MPI pkey, n;

@@ -74,13 +74,13 @@ int gnutls_global_init(char* PKIX, char* PKCS1)
 	 * version.
 	 */
 	
-	result = parser_asn1(PKIX, &PKIX1_ASN);
+	result = asn1_parser_asn1(PKIX, &PKIX1_ASN);
 
 	if (result != ASN_OK) {
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	
-	result = parser_asn1(PKCS1, &PKCS1_ASN);
+	result = asn1_parser_asn1(PKCS1, &PKCS1_ASN);
 
 	if (result != ASN_OK) {
 		return GNUTLS_E_PARSING_ERROR;
@@ -101,7 +101,7 @@ void gnutls_global_deinit() {
 #ifdef HAVE_SIGNAL
 	signal( SIGPIPE, old_sig_handler);
 #endif
-	delete_structure( PKCS1_ASN);
-	delete_structure( PKIX1_ASN);
+	asn1_delete_structure( PKCS1_ASN);
+	asn1_delete_structure( PKIX1_ASN);
 
 }

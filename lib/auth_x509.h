@@ -39,7 +39,7 @@ typedef struct {
 	gnutls_datum *peer_certificate_list; /* In DER format */
 	int peer_certificate_list_size;
 	CertificateStatus peer_certificate_status;
-} X509PKI_AUTH_INFO;
+} X509PKI_CLIENT_AUTH_INFO;
 
 
 

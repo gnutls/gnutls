@@ -23,6 +23,7 @@
 #include <crypt_bcrypt.h>
 #include <gnutls_srp.h>
 #include <auth_srp_passwd.h>
+#include <auth_srp.h>
 #include <gnutls_gcry.h>
 #include "debug.h"
 
@@ -336,3 +337,98 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
 
 	return S;
 }
+
+/**
+  * gnutls_free_srp_server_sc - Used to free an allocated SRP_CLIENT_CREDENTIALS structure
+  * @sc: is an &SRP_CLIENT_CREDENTIALS structure.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to free (deallocate)
+  * the structure.
+  **/
+void gnutls_free_srp_client_sc( SRP_CLIENT_CREDENTIALS* sc) {
+	gnutls_free(sc);
+}
+
+/**
+  * gnutls_allocate_srp_server_sc - Used to allocate an SRP_CLIENT_CREDENTIALS structure
+  * @res: is a pointer to an &SRP_CLIENT_CREDENTIALS structure.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to allocate
+  * the structure.
+  **/
+int gnutls_allocate_srp_client_sc( SRP_CLIENT_CREDENTIALS **sc) {
+	*sc = gnutls_malloc( sizeof(SRP_CLIENT_CREDENTIALS));
+	
+	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
+
+	return 0;
+}
+
+/**
+  * gnutls_set_srp_client_cred - Used to set the username/password, in a SRP_CLIENT_CREDENTIALS structure
+  * @res: is an &SRP_CLIENT_CREDENTIALS structure.
+  * @username: is the user's userid
+  * @password: is the user's password
+  *
+  **/
+int gnutls_set_srp_client_cred( SRP_CLIENT_CREDENTIALS* res, char *username, char * password) {
+	if (strlen(username) > sizeof(res->username)) return GNUTLS_E_MEMORY_ERROR;
+	if (strlen(password) > sizeof(res->password)) return GNUTLS_E_MEMORY_ERROR;
+
+	strcpy( res->username, username);
+	strcpy( res->password, password);
+
+	return 0;
+}
+
+/**
+  * gnutls_free_srp_server_sc - Used to free an allocated SRP_SERVER_CREDENTIALS structure
+  * @sc: is an &SRP_SERVER_CREDENTIALS structure.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to free (deallocate)
+  * the structure.
+  **/
+void gnutls_free_srp_server_sc( SRP_SERVER_CREDENTIALS* sc) {
+	gnutls_free(sc);
+}
+
+/**
+  * gnutls_allocate_srp_server_sc - Used to allocate an SRP_SERVER_CREDENTIALS structure
+  * @res: is a pointer to an &SRP_SERVER_CREDENTIALS structure.
+  *
+  * This structure is complex enough to manipulate directly thus
+  * this helper function is provided in order to allocate
+  * the structure.
+  **/
+
+int gnutls_allocate_srp_server_sc( SRP_SERVER_CREDENTIALS **sc) {
+	*sc = gnutls_malloc( sizeof(SRP_SERVER_CREDENTIALS));
+	
+	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
+	
+	return 0;
+}
+
+/**
+  * gnutls_set_srp_server_cred - Used to set the password files, in a SRP_SERVER_CREDENTIALS structure
+  * @res: is an &SRP_SERVER_CREDENTIALS structure.
+  * @password_file: is the SRP password file (tpasswd)
+  * @password_conf_file: is the SRP password conf file (tpasswd.conf)
+  *
+  **/
+int gnutls_set_srp_server_cred( SRP_SERVER_CREDENTIALS* res, char *password_file, char * password_conf_file) {
+	if (strlen(password_file) > sizeof(res->password_file)) 
+		return GNUTLS_E_MEMORY_ERROR;
+	if (strlen(password_conf_file) > sizeof(res->password_conf_file)) 
+		return GNUTLS_E_MEMORY_ERROR;
+
+	strcpy( res->password_file, password_file);
+	strcpy( res->password_conf_file, password_conf_file);
+
+	return 0;
+}
+
+
