@@ -16,4 +16,11 @@ typedef struct {
 	int (*gnutls_process_client_cert_vrfy) ( GNUTLS_KEY, opaque*, int);
 	int (*gnutls_process_server_cert_vrfy) ( GNUTLS_KEY, opaque*, int);
 } MOD_AUTH_STRUCT;
+
+typedef struct {
+	KXAlgorithm algorithm;
+	void* credentials;
+	void* next;
+} AUTH_CRED;
+
 #endif

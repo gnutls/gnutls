@@ -74,11 +74,14 @@ char* gnutls_strerror(int error);
 
 /* functions to set priority of cipher suites */
 void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...);
-void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
 void gnutls_set_mac_priority( GNUTLS_STATE state, int num, ...);
 void gnutls_set_compression_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
 
-/* set our version - local is 0x00 for TLS 1.0 and SSL3 */
+/* cred is a structure defined by the kx algorithm */
+int gnutls_set_kx_cred( GNUTLS_STATE, int kx, void* cred);
+
+/* set our version - 0 for TLS 1.0 and 1 for SSL3 */
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
 
 /* get/set session */

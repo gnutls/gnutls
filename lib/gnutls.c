@@ -32,6 +32,7 @@
 #include "gnutls_priority.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_db.h"
+#include "gnutls_auth_int.h"
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -98,6 +99,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.buffer_handshake = NULL;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
+	(*state)->gnutls_internals.cred = NULL; /* no credentials by default */
+
 	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */
 
 	(*state)->gnutls_key = gnutls_malloc(sizeof(GNUTLS_KEY_A));
@@ -159,6 +162,8 @@ int gnutls_deinit(GNUTLS_STATE * state)
 
 	gnutls_free((*state)->gnutls_internals.buffer);
 	gnutls_free((*state)->gnutls_internals.buffer_handshake);
+
+	gnutls_clear_creds( *state);
 
 	if ((*state)->connection_state.read_cipher_state != NULL)
 		gnutls_cipher_deinit((*state)->connection_state.read_cipher_state);

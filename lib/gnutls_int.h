@@ -240,6 +240,7 @@ typedef struct {
 	char*				db_name;
 	int				expire_time;
 	MOD_AUTH_STRUCT*		auth_struct; /* used in handshake packets and KX algorithms */
+	AUTH_CRED*			cred;
 } GNUTLS_INTERNALS;
 
 typedef struct {
