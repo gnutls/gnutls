@@ -4,6 +4,7 @@ in order to avoid having people working on the same thing.
 
 Current list:
 * Add ability to read PKCS-12 structures (certificate and private key)
+* Update to the latest SRP Draft.
 * Add a callback function in certificate authentication, to receive
   the certificate and the private key.
 * Convert documentation to texinfo format
