@@ -15,7 +15,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h \
 	crypt.h libgnutls-config.in libgnutls.m4 gnutls.h.in gnutls_errors_int.h \
 	cert_asn1.h cert_der.h gnutls_datum.h auth_x509.h gnutls_gcry.h \
 	ext_dnsname.h gnutls_pk.h gnutls_record.h gnutls_cert.h \
-	gnutls_privkey.h gnutls_constate.h
+	gnutls_privkey.h gnutls_constate.h gnutls_global.h
 lib_LTLIBRARIES = libgnutls.la
 libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \

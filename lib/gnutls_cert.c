@@ -28,6 +28,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_gcry.h>
 #include <gnutls_privkey.h>
+#include <gnutls_global.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -217,26 +218,27 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 {
 	opaque str[5 * 1024];
 	int len, result;
+	node_asn *spk;
 
 	if (create_structure
-	    ("rsa_public_key", "PKIX1Explicit88.RSAPublicKey") != ASN_OK) {
+	    ( _gnutls_get_pkcs(), "PKCS-1.RSAPublicKey", &spk, "rsa_public_key") != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = get_der("rsa_public_key", der, dersize);
+	result = get_der ( spk, der, dersize);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
-		delete_structure("rsa_public_key");
+		delete_structure(spk);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
 	len = sizeof(str) - 1;
-	result = read_value("rsa_public_key.modulus", str, &len);
+	result = read_value(spk, "rsa_public_key.modulus", str, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		delete_structure("rsa_public_key");
+		delete_structure(spk);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
@@ -246,17 +248,17 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	if (gcry_mpi_scan(&(*params)[0], GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
 		gnutls_free((*params));
-		delete_structure("rsa_public_key");
+		delete_structure(spk);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	len = sizeof(str) - 1;
-	result = read_value("rsa_public_key.publicExponent", str, &len);
+	result = read_value(spk, "rsa_public_key.publicExponent", str, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		_gnutls_mpi_release(&(*params)[0]);
 		gnutls_free((*params));
-		delete_structure("rsa_public_key");
+		delete_structure(spk);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
@@ -265,92 +267,114 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 		gnutls_assert();
 		_gnutls_mpi_release(&(*params)[0]);
 		gnutls_free((*params));
-		delete_structure("rsa_public_key");
+		delete_structure(spk);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	delete_structure("rsa_public_key");
+	delete_structure(spk);
 
 	return 0;
 
 }
 
-
-
 #define _READ( str, OID, NAME, res) \
 	if(strcmp(str, OID)==0){ \
-	  strcpy( str, "PKIX1Explicit88.X520"); \
+	  strcpy( str, "PKIX1Implicit88.X520"); \
 	  strcat( str, NAME); \
 	  strcpy( name2, "temp-structure-"); \
 	  strcat( name2, NAME); \
-	  if ( (result = create_structure( name2, str)) != ASN_OK) { \
+	  if ( (result = create_structure( _gnutls_get_pkix(), str, &tmpasn, name2)) != ASN_OK) { \
 	  	gnutls_assert(); \
 	  	return GNUTLS_E_ASN1_ERROR; \
 	  } \
 	  len = sizeof(str) - 1; \
-	  if (read_value(name3,str,&len) != ASN_OK) { \
-	  	delete_structure( name2); \
+	  if (read_value( tmpasn, name3, str,&len) != ASN_OK) { \
+	  	delete_structure( tmpasn); \
 	  	continue; \
 	  } \
-      	  if (get_der( name2, str, len) != ASN_OK) { \
-	  	delete_structure( name2); \
+      	  if (get_der( tmpasn, str, len) != ASN_OK) { \
+	  	delete_structure( tmpasn); \
 	  	continue; \
 	  } \
 	  strcpy( name3,name2); \
 	  len = sizeof(str) - 1; \
-	  if (read_value( name3, str, &len) != ASN_OK) {  /* CHOICE */ \
-	  	delete_structure( name2); \
+	  if (read_value( tmpasn, name3, str, &len) != ASN_OK) {  /* CHOICE */ \
+	  	delete_structure( tmpasn); \
 	  	continue; \
 	  } \
   	  strcat( name3, "."); \
 	  strcat( name3, str); \
 	  len = sizeof(str) - 1; \
-	  if (read_value(name3,str,&len) != ASN_OK) { \
-	  	delete_structure( name2); \
+	  if (read_value( tmpasn, name3, str,&len) != ASN_OK) { \
+	  	delete_structure( tmpasn); \
 	  	continue; \
 	  } \
 	  str[len]=0; \
+  	  fprintf(stderr, "XXX - %s: %s\n", name3, str); \
 	  res = strdup(str); \
-	  delete_structure(name2); \
+	  delete_structure( tmpasn); \
 	}
 
+
+/* this function will convert up to 3 digit
+ * numbers to characters.
+ */
+static void int2str(int k, char* data) {
+    if (k > 999) data[0] = 0;
+    else sprintf( data, "%d", k);
+}
 
 /* This function will attempt to read a Name
  * ASN.1 structure. (Taken from Fabio's samples!)
  * --nmav
  */
-static int _get_Name_type(char *root, gnutls_cert * gCert)
+static int _get_Name_type( node_asn *rasn, char *root, gnutls_cert * gCert)
 {
 	int k, k2, result, len;
 	char name[128], str[1024], name2[128], counter[5], name3[128];
 
-	k = 1;
+	k = 0;
 	do {
+		k++;
+		
 		strcpy(name, root);
 		strcat(name, ".rdnSequence.?");
-		ltostr(k, counter);
+		int2str(k, counter);
 		strcat(name, counter);
 
 		len = sizeof(str) - 1;
-		result = read_value(name, str, &len);
-		if (result == ASN_ELEMENT_NOT_FOUND)
+		result = read_value( rasn, name, str, &len);
+		
+		/* move to next
+		 */
+		if (result == ASN_VALUE_NOT_FOUND) continue;
+		
+		if (result != ASN_OK) {
 			break;
-		k2 = 1;
+		}
+			
+		k2 = 0;
 		do {
+			k2++;
+
 			strcpy(name2, name);
 			strcat(name2, ".?");
-			ltostr(k2, counter);
+			int2str(k2, counter);
 			strcat(name2, counter);
 
 			len = sizeof(str) - 1;
-			result = read_value(name2, str, &len);
-			if (result == ASN_ELEMENT_NOT_FOUND)
+			result = read_value( rasn, name2, str, &len);
+			
+			if (result==ASN_VALUE_NOT_FOUND) continue;
+			
+			if (result != ASN_OK)
 				break;
+
 			strcpy(name3, name2);
 			strcat(name3, ".type");
 			
 			len = sizeof(str) - 1;
-			result = read_value(name3, str, &len);
+			result = read_value( rasn, name3, str, &len);
 
 			if (result != ASN_OK) {
 				gnutls_assert();
@@ -360,10 +384,10 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 			strcat(name3, ".value");
 
 			if (result == ASN_OK) {
-/*				_READ(str, "2 5 4 6", "countryName",
- *				      gCert->country);
- * This one fails (with SIGSEGV).
- */
+				node_asn *tmpasn;
+
+				_READ(str, "2 5 4 6", "countryName",
+ 				      gCert->country);
 				_READ(str, "2 5 4 10", "OrganizationName",
 				      gCert->organization);
 				_READ(str, "2 5 4 11",
@@ -377,27 +401,30 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 				      "StateOrProvinceName",
 				      gCert->state_or_province_name);
 			}
-			k2++;
 		} while (1);
-		k++;
 	} while (1);
-	return 0;
+
+	if (result==ASN_ELEMENT_NOT_FOUND)
+		return 0;
+	else {fprintf(stderr, "result: %d\n", result);
+		return GNUTLS_E_ASN1_PARSING_ERROR;}
 }
 
 
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 {
 	int result;
+	node_asn *c2;
 	opaque str[5 * 1024];
 	int len = sizeof(str);
 
-	if (create_structure("certificate3", "PKIX1Explicit88.Certificate")
+	if (create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = get_der("certificate3", derCert.data, derCert.size);
+	result = get_der( c2, derCert.data, derCert.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 		gnutls_assert();
@@ -408,12 +435,12 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	len = sizeof(str) - 1;
 	result =
 	    read_value
-	    ("certificate3.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+	    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
 	     str, &len);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
-		delete_structure("certificate3");
+		delete_structure(c2);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
@@ -426,7 +453,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		len = sizeof(str) - 1;
 		result =
 		    read_value
-		    ("certificate3.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 		     str, &len);
 
 		if (result != ASN_OK) {
@@ -445,7 +472,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 * currently not supported
 		 */
 		gnutls_assert();
-		delete_structure("certificate3");
+		delete_structure(c2);
 
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
@@ -459,15 +486,15 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	gCert->organizational_unit_name = NULL;
 	gCert->locality_name = NULL;
 	gCert->state_or_province_name = NULL;
+
 	if ((result =
-	     _get_Name_type("certificate3.tbsCertificate.subject",
-			    gCert)) < 0) {
+	     _get_Name_type( c2, "certificate2.tbsCertificate.subject", gCert)) < 0) {
 		gnutls_assert();
-		delete_structure("certificate3");
+		delete_structure(c2);
 		return result;
 	}
 
-	delete_structure("certificate3");
+	delete_structure(c2);
 
 	if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
 		gnutls_assert();

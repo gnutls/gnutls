@@ -4,17 +4,9 @@
 /*****************************************************/
 
 #include <gnutls_int.h>
-#include <cert_asn1.h>
-#include <cert_der.h>
+#include "cert_asn1.h"
+#include "cert_der.h"
 
-/*****************************************/
-/* Function : parser_asn1                */
-/* Description: defined in fine "ASN.y"  */
-/*   used to parse a file.               */
-/*****************************************/
-int parser_asn1(char *file_name);
-
-node_asn *node_list=NULL; /* Pointer to the first element ot the list */
 
 int parse_mode;
 
@@ -36,8 +28,7 @@ add_node(unsigned int type)
 
   punt=(node_asn *) malloc(sizeof(node_asn));
 
-  punt->list=node_list;
-  node_list=punt;
+  punt->left=NULL;
   punt->name=NULL;
   punt->type=type; 
   punt->value=NULL;
@@ -95,6 +86,7 @@ set_right(node_asn *node,node_asn *right)
 
   if(node==NULL) return node;
   node->right=right;
+  if(right) right->left=node;
   return node;
 }
 
@@ -127,6 +119,7 @@ set_down(node_asn *node,node_asn *down)
 
   if(node==NULL) return node;
   node->down=down;
+  if(down) down->left=node;
   return node;
 }
 
@@ -165,55 +158,15 @@ remove_node(node_asn *node)
 
   if(node==NULL) return;
 
-  if(node==node_list){
-    punt=node_list;
-    node_list=punt->list;
-  }
-  else{
-    punt=node_list;
-    while(punt && (punt!=node)){
-      punt_prev=punt;
-      punt=punt->list;
-    }
-    if(punt==NULL) return;
-    punt_prev->list=punt->list;
-  }
-  free(punt->name);
-  free(punt->value);
-}
-
-void
-visit_list()
-{
-  node_asn *p;
-
-  p=node_list;
-  while(p){
-    printf("name:");
-    if(p->name) printf("%s  ",p->name);
-    else printf("NULL  ");
-    switch(p->type){
-    case TYPE_CONSTANT:
-      printf("type:CONST  value:%s\n",p->value);
-      break;
-    case TYPE_INTEGER:
-      printf("type:INTEGER\n");
-      break;
-    case TYPE_SEQUENCE:
-      printf("type:SEQUENCE\n");
-      break;
-    default:
-      printf("type:ERROR\n");
-      break;
-    }
-    p=p->list;
-  }
+  free(node->name);
+  free(node->value);
+  free(node);
 }
 
 
 
 node_asn *
-find_node(char *name)
+find_node(node_asn *pointer,char *name)
 {
   node_asn *p;
   char *n_start,*n_end,n[128];
@@ -232,11 +185,11 @@ find_node(char *name)
     strcpy(n,n_start);
     n_start=NULL;
   }
- 
-  p=node_list;
+
+  p=pointer;
   while(p){
     if((p->name) && (!strcmp(p->name,n))) break;
-    else p=p->list;
+    else p=p->right;
   }
 
   if(p==NULL) return NULL;
@@ -278,56 +231,37 @@ find_node(char *name)
 node_asn *
 find_left(node_asn *node)
 {
-  node_asn *p;
+  if((node==NULL) || (node->left==NULL) || 
+     (node->left->down==node)) return NULL;
 
-  p=node_list;
-
-  while(p){
-    if(p->right==node) return p;
-    p=p->list;
-  }
-
-  return NULL;
+  return node->left;  
 }
 
 
 node_asn *
 find_up(node_asn *node)
 {
-  node_asn *p,*p_left;
+  node_asn *p;
 
   if(node==NULL) return NULL;
 
-  p_left=node;
+  p=node;
 
-  /* look for the most left element of node , result P */
-  do{
-    p=p_left;
-    p_left=find_left(p_left);
-  }while(p_left);
+  while((p->left!=NULL) && (p->left->right==p)) p=p->left;
 
-  /* look for the upper element of p_left */
-  p_left=p;
-  p=node_list;
-  while(p){
-    if(p->down==p_left) return p;
-    p=p->list;
-  }
-
-  return NULL;
+  return p->left;
 }
 
 
-
 void
-visit_tree(char *name)
+visit_tree(node_asn *pointer,char *name)
 {
   node_asn *p,*root;
   int k,indent=0,len,len2,len3;
   unsigned char class;
   unsigned long tag;
 
-  root=find_node(name);   
+  root=find_node(pointer,name);   
 
   if(root==NULL) return;
 
@@ -354,6 +288,14 @@ visit_tree(char *name)
       break;
     case TYPE_INTEGER:
       printf("INTEGER");
+      if(p->value){
+	len=get_length_der(p->value,&len2);
+	printf("  value:0x");
+	for(k=0;k<len;k++) printf("%02x",(p->value)[k+len2]);
+      }
+      break;
+    case TYPE_ENUMERATED:
+      printf("ENUMERATED");
       if(p->value){
 	len=get_length_der(p->value,&len2);
 	printf("  value:0x");
@@ -416,10 +358,9 @@ visit_tree(char *name)
     case TYPE_ANY:
       printf("ANY");
       if(p->value){
-	tag=get_tag_der(p->value,&class,&len2);
-	len2+=get_length_der(p->value+len2,&len3);
+	len2=get_length_der(p->value,&len3);
 	printf("  value:");
-	for(k=0;k<len2+len3;k++) printf("%02x",(p->value)[k]);
+	for(k=0;k<len2;k++) printf("%02x",(p->value)[k+len3]);
       }
 
       break;
@@ -462,6 +403,7 @@ visit_tree(char *name)
       if(p->type & CONST_IMPORTS) printf("IMPORTS,");
       if(p->type & CONST_SET) printf("SET,");
       if(p->type & CONST_NOT_USED) printf("NOT_USED,");
+      if(p->type & CONST_ASSIGN) printf("ASSIGNEMENT,");
     }
 
     printf("\n");
@@ -470,12 +412,12 @@ visit_tree(char *name)
       p=p->down;
       indent+=2;
     }
+    else if(p==root){
+      p=NULL;
+      break;
+    }
     else if(p->right) p=p->right;
     else{
-      if(p==root){
-	p=NULL;
-	break;
-      }
       while(1){
 	p=find_up(p);
 	if(p==root){
@@ -493,7 +435,7 @@ visit_tree(char *name)
 }
 
 int
-delete_tree2(node_asn *root)
+delete_structure(node_asn *root)
 {
   node_asn *p,*p2,*p3;
 
@@ -508,7 +450,7 @@ delete_tree2(node_asn *root)
       p2=p->right;
       if(p!=root){
 	p3=find_up(p);
-	p3->down=p2;
+	set_down(p3,p2);
 	remove_node(p);
 	p=p3;
       }
@@ -516,9 +458,12 @@ delete_tree2(node_asn *root)
 	p3=find_left(p);
 	if(!p3){
 	  p3=find_up(p);
-	  if(p3) p3->down=p2;
+	  if(p3) set_down(p3,p2);
+	  else{
+	    if(p->right) p->right->left=NULL;
+	  }
 	}
-	else p3->right=p2;
+	else set_right(p3,p2);
 	remove_node(p);
 	p=NULL;
       }
@@ -528,16 +473,19 @@ delete_tree2(node_asn *root)
 }
 
 
+/*
 int
-delete_structure(char *root_name)
+delete_structure(node_asn *root,char *name)
 {
-  node_asn *p,*p2,*p3,*root;
+  node_asn *p;
+ 
+  p=find_node(root,name);
 
-  root=find_node(root_name);
-  if(root==NULL) return ASN_ELEMENT_NOT_FOUND;
+  if(p==NULL) return ASN_ELEMENT_NOT_FOUND;
 
-  return delete_tree2(root);
+  return delete_structure(p);
 }
+*/
 
 
 #define UP     1
@@ -554,11 +502,9 @@ copy_structure3(node_asn *source_node)
   if(source_node==NULL) return NULL;
 
   dest_node=add_node(source_node->type);
-  
+
   p_s=source_node;
   p_d=dest_node;
-
-  if(p_s->down==NULL) return dest_node;
 
   move=DOWN;
 
@@ -567,9 +513,10 @@ copy_structure3(node_asn *source_node)
       if(p_s->name) set_name(p_d,p_s->name);
       if(p_s->value){
 	switch(type_field(p_s->type)){
-	case TYPE_OCTET_STRING: case TYPE_BIT_STRING:
+	case TYPE_OCTET_STRING: case TYPE_BIT_STRING: 
+	case TYPE_INTEGER: case TYPE_DEFAULT:
 	  len=get_length_der(p_s->value,&len2);
-	  set_value(p_d,p_s->value,len2);
+	  set_value(p_d,p_s->value,len+len2);
 	  break;
 	default:
 	  set_value(p_d,p_s->value,strlen(p_s->value)+1);
@@ -588,6 +535,9 @@ copy_structure3(node_asn *source_node)
       }
       else move=RIGHT;
     }
+  
+    if(p_s==source_node) break;
+
     if(move==RIGHT){
       if(p_s->right){
 	p_s=p_s->right;
@@ -608,25 +558,30 @@ copy_structure3(node_asn *source_node)
 
 
 node_asn *
-copy_structure2(char *source_name)
+copy_structure2(node_asn *root,char *source_name)
 {
   node_asn *source_node;
 
-  source_node=find_node(source_name);
-
+  source_node=find_node(root,source_name);
+  
   return copy_structure3(source_node);
+
 }
 
 
 int
-create_structure(char *dest_name,char *source_name)
+create_structure(node_asn *root,char *source_name,node_asn **pointer,char *dest_name)
 {
   node_asn *dest_node;
   int res;
   char *end,n[129];
 
-  dest_node=copy_structure2(source_name);
+  *pointer=NULL;
+
+  dest_node=copy_structure2(root,source_name);
+ 
   if(dest_node==NULL) return ASN_ELEMENT_NOT_FOUND;
+
   set_name(dest_node,dest_name);
 
   end=strchr(source_name,'.');
@@ -638,10 +593,13 @@ create_structure(char *dest_name,char *source_name)
     strcpy(n,source_name);
   }
 
-  res=expand_asn(dest_name,n);
+  res=expand_identifier(&dest_node,root);
+  type_choice_config(dest_node);
 
-  check_asn(dest_name,CHECK_INTEGER);
- 
+  change_integer_value(dest_node);
+
+  *pointer=dest_node;
+
   return res;
 }
 
@@ -659,7 +617,7 @@ append_sequence_set(node_asn *node)
   while((type_field(p->type)==TYPE_TAG) || (type_field(p->type)==TYPE_SIZE)) p=p->right;
   p2=copy_structure3(p);
   while(p->right) p=p->right;
-  p->right=p2;
+  set_right(p,p2);
   temp=(char *) malloc(10);
   if(p->name==NULL) strcpy(temp,"?1");
   else{
@@ -676,18 +634,18 @@ append_sequence_set(node_asn *node)
 
 
 int 
-write_value(char *name,unsigned char *value,int len)
+write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 {
   node_asn *node,*p,*p2;
   unsigned char *temp,val[4];
   int len2,k,negative;
   unsigned char *root,*n_end;
 
-  node=find_node(name);
+  node=find_node(node_root,name);
   if(node==NULL) return  ASN_ELEMENT_NOT_FOUND;
 
   if((node->type & CONST_OPTION) && (value==NULL) && (len==0)){
-    delete_structure(name);
+    delete_structure(node);
     return ASN_OK;
   }
 
@@ -713,11 +671,14 @@ write_value(char *name,unsigned char *value,int len)
     }
     else return ASN_VALUE_NOT_VALID;
     break;
-  case TYPE_INTEGER:
+  case TYPE_INTEGER: case TYPE_ENUMERATED:
     if(len==0) return ASN_VALUE_NOT_VALID;
 
     if(value[0]&0x80) negative=1;
     else negative=0;
+
+    if(negative && (type_field(node->type)==TYPE_ENUMERATED)) 
+      return ASN_VALUE_NOT_VALID;
 
     for(k=0;k<len-1;k++)
       if(negative && (value[k]!=0xFF)) break;
@@ -799,8 +760,8 @@ write_value(char *name,unsigned char *value,int len)
       if(!strcmp(p->name,value)){
 	p2=node->down;
 	while(p2){
-	  if(p2!=p) delete_tree2(p2);
-	p2=p2->right;
+	  if(p2!=p){delete_structure(p2); p2=node->down;}
+	  else p2=p2->right;
 	}
 	break;
       }
@@ -808,31 +769,39 @@ write_value(char *name,unsigned char *value,int len)
     }
     if(!p) return ASN_ELEMENT_NOT_FOUND;
 
-    n_end=strchr(value,'.');
+    /*    n_end=strchr(value,'.');
     if(n_end){
       root=(char *)malloc(n_end-value+1);
       memcpy(root,value,n_end-value);
       root[n_end-value]=0;
       expand_asn(name,root);
       free(root);
-    }
+      }*/
+
     break;
   case TYPE_ANY:
-    p=copy_structure2(value);
+    length_der(len,NULL,&len2);
+    temp=(unsigned char *)malloc(len+len2);
+    octet_der(value,len,temp,&len2);
+    set_value(node,temp,len2);
+    free(temp);
+
+    /*
+    p=copy_structure2(p,value);
     if(p==NULL) return ASN_VALUE_NOT_VALID;
     set_name(p,node->name);
     set_right(p,node->right);
     p2=node->down;
     if(p2){
       while(p2->right) p2=p2->right;
-      p2->right=p->down;
-      p->down=node->down;
+      set_right(p2,p->down);
+      set_down(p,node->down);
     }
     p2=find_left(node);
-    if(p2) p2->right=p;
+    if(p2) set_right(p2,p);
     else{
       p2=find_up(node);
-      p2->down=p;
+      set_down(p2,p);
     }
     if(node->type & CONST_TAG) p->type|=CONST_TAG;
     if(node->type & CONST_OPTION) p->type|=CONST_OPTION;    
@@ -843,9 +812,12 @@ write_value(char *name,unsigned char *value,int len)
       root=(char *)malloc(n_end-value+1);
       memcpy(root,value,n_end-value);
       root[n_end-value]=0;
-      expand_asn(name,root);
+      expand_identifier(name,root);
+      type_choice_config(name);
       free(root);
     }
+    */
+
     break;
   case TYPE_SEQUENCE_OF: case TYPE_SET_OF:
     if(strcmp(value,"NEW")) return ASN_VALUE_NOT_VALID;    
@@ -861,19 +833,20 @@ write_value(char *name,unsigned char *value,int len)
 
 
 int 
-read_value(char *name,unsigned char *value,int *len)
+read_value(node_asn *root,char *name,unsigned char *value,int *len)
 {
   node_asn *node,*p;
   int len2,len3;
   unsigned long tag;
   unsigned char class;
 
-  node=find_node(name);
+  node=find_node(root,name);
   if(node==NULL) return  ASN_ELEMENT_NOT_FOUND;
 
   if((type_field(node->type)!=TYPE_NULL) && 
      (type_field(node->type)!=TYPE_CHOICE) &&  
-     !(node->type&CONST_DEFAULT) && (node->value==NULL)) 
+     !(node->type&CONST_DEFAULT) && !(node->type&CONST_ASSIGN) &&
+     (node->value==NULL)) 
     return ASN_VALUE_NOT_FOUND;
 
   switch(type_field(node->type)){
@@ -892,7 +865,7 @@ read_value(char *name,unsigned char *value,int *len)
     else strcpy(value,"FALSE");
     *len=strlen(value)+1;
     break;
-  case TYPE_INTEGER:
+  case TYPE_INTEGER: case TYPE_ENUMERATED:
     if((node->type&CONST_DEFAULT) && (node->value==NULL)){
       p=node->down;
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
@@ -901,7 +874,20 @@ read_value(char *name,unsigned char *value,int *len)
     else get_octet_der(node->value,&len2,value,len);
     break;
   case TYPE_OBJECT_ID:
-    strcpy(value,node->value);
+    if(node->type&CONST_ASSIGN){
+      strcpy(value,"");
+      p=node->down;
+      while(p){
+	if(type_field(p->type)==TYPE_CONSTANT){
+	  strcat(value,p->value);
+	  strcat(value," ");
+	}
+	p=p->right;
+      }
+      value[strlen(value)-1]=0;
+    }
+    else strcpy(value,node->value);
+
     *len=strlen(value)+1;
     break;
   case TYPE_TIME:
@@ -919,10 +905,9 @@ read_value(char *name,unsigned char *value,int *len)
     *len=strlen(value)+1;
     break;
   case TYPE_ANY:
-    tag=get_tag_der(node->value,&class,&len2);
-    len2+=get_length_der((node->value)+len2,&len3);
-    memcpy(value,node->value,len3+len2);
-    *len=len3+len2;    
+    len2=get_length_der(node->value,&len3);
+    memcpy(value,node->value+len3,len2);
+    *len=len2;    
     break;
   default:
     return  ASN_ELEMENT_NOT_FOUND;
@@ -933,78 +918,21 @@ read_value(char *name,unsigned char *value,int *len)
 
 
 int 
-check_asn(char *name,int check)
+set_default_tag(node_asn *node)
 {
-  node_asn *node,*p,*p2;
-  char name2[129],negative;
-  unsigned char val[4],val2[5],temp;
-  int k,len;
+  node_asn *p;
 
-  node=find_node(name);
-  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
+  if((node==NULL) || (type_field(node->type)!=TYPE_DEFINITIONS))
+    return ASN_ELEMENT_NOT_FOUND; 
 
   p=node;
   while(p){
-
-    switch(check){
-    case CHECK_TYPE:
-      if(type_field(p->type)==TYPE_IDENTIFIER){
-        strcpy(name2,name);strcat(name2,".");strcat(name2,p->value);
-        p2=find_node(name2);
-        if(p2==NULL) return ASN_IDENTIFIER_NOT_FOUND; 
-      }
-      break;
-    case CHECK_NOT_USED:
-      if(p->type&CONST_NOT_USED){
-	p2=NULL;
-	if(p!=node){
-	  p2=find_left(p);
-	  if(!p2) p2=find_up(p);
-	}
-	delete_tree2(p);
-	p=p2;
-      } 
-      break;
-    case CHECK_DEFAULT_TAG_TYPE:
-      if(type_field(p->type)==TYPE_DEFINITIONS) p2=p;
-      else if((type_field(p->type)==TYPE_TAG) &&
-	      !(p->type&CONST_EXPLICIT) &&
-	      !(p->type&CONST_IMPLICIT)){
-	if(p2->type&CONST_EXPLICIT) p->type|=CONST_EXPLICIT;
-	else p->type|=CONST_IMPLICIT;
-      }
-      break;
-    case CHECK_INTEGER:
-      if(type_field(p->type)==TYPE_INTEGER){
-	if(p->type&CONST_DEFAULT){
-	  p=p->down;
-	  while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
-	}
-	if(p->value){
-	  *((long*)val)=strtol(p->value,NULL,10);
-	  for(k=0;k<2;k++){
-	    temp=val[k];
-	    val[k]=val[3-k];
-	    val[3-k]=temp;
-	  }
-  
-	  if(val[0]&0x80) negative=1;
-	  else negative=0;
-
-	  for(k=0;k<3;k++)
-	    if(negative && (val[k]!=0xFF)) break;
-	    else if(!negative && val[k]) break;
-
-	  length_der(4-k,NULL,&len);
-	  octet_der(val+k,4-k,val2,&len);
-	  set_value(p,val2,len);
-	}
-      }
-    default:
-      break;
+    if((type_field(p->type)==TYPE_TAG) &&
+	    !(p->type&CONST_EXPLICIT) &&
+	    !(p->type&CONST_IMPLICIT)){
+      if(node->type&CONST_EXPLICIT) p->type|=CONST_EXPLICIT;
+      else p->type|=CONST_IMPLICIT;
     }
-
-    if(!p) break;  /* reach node */
 
     if(p->down){
       p=p->down;
@@ -1027,44 +955,228 @@ check_asn(char *name,int check)
 
   return ASN_OK;
 }
+    
+
+int 
+check_identifier(node_asn *node)
+{
+  node_asn *p,*p2;
+  char name2[129];
+
+  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
+
+  p=node;
+  while(p){
+    if(type_field(p->type)==TYPE_IDENTIFIER){
+      strcpy(name2,node->name);strcat(name2,".");strcat(name2,p->value);
+      p2=find_node(node,name2);
+      if(p2==NULL){printf("%s\n",name2); return ASN_IDENTIFIER_NOT_FOUND;} 
+    }
+    else if((type_field(p->type)==TYPE_OBJECT_ID) && 
+	    (p->type&CONST_ASSIGN)){
+      p2=p->down;
+      if(p2 && (type_field(p2->type)==TYPE_CONSTANT)){
+	if(p2->value && !isdigit(p2->value[0])){
+	  strcpy(name2,node->name);strcat(name2,".");strcat(name2,p2->value);
+	  p2=find_node(node,name2);
+	  if(!p2 || (type_field(p2->type)!=TYPE_OBJECT_ID) ||
+	     !(p2->type&CONST_ASSIGN)) 
+	    {printf("%s\n",name2); return ASN_IDENTIFIER_NOT_FOUND;}
+	}
+      }
+    }
+    
+    if(p->down){
+      p=p->down;
+    }
+    else if(p->right) p=p->right;
+    else{
+      while(1){
+	p=find_up(p);
+	if(p==node){
+	  p=NULL;
+	  break;
+	}
+	if(p->right){
+	  p=p->right;
+	  break;
+	}
+      }
+    }
+  }
+
+  return ASN_OK;
+}
 
 
 int 
-expand_asn(char *name,char *root)
+change_integer_value(node_asn *node)
 {
-  node_asn *node,*p,*p2,*p3,*p4;
-  char name_root[129],name2[129],*c;
-  int move;
+  node_asn *p,*p2;
+  char negative;
+  unsigned char val[4],val2[5],temp;
+  int len,k,force_exit;
 
-  node=find_node(name);
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
 
-  strcpy(name_root,root);
+  p=node;
+  while(p){
+    if((type_field(p->type)==TYPE_INTEGER) || (p->type&CONST_DEFAULT)){
+      if(p->type&CONST_DEFAULT){
+	p=p->down;
+	while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
+	if(!(p->type&CONST_TRUE) && !(p->type&CONST_FALSE)){
+	  force_exit=0;
+	  for(k=0;k<strlen(p->value);k++) 
+	    if(!isdigit(p->value[k]) && (p->value[k]!='-'))
+	      {force_exit=1;break;}
+	  if(force_exit){
+	    p2=find_up(p);
+	    p2=p2->down;
+	    while(p2){
+	      if((type_field(p2->type)==TYPE_CONSTANT) &&
+		 !strcmp(p->value,p2->name)) break;
+	      p2=p2->right;
+	    }
+	    if(p2) set_value(p,p2->value,strlen(p2->value)+1);
+	  }
+	}
+      }
+      if(p->value){
+	*((long*)val)=strtol(p->value,NULL,10);
+	for(k=0;k<2;k++){
+	  temp=val[k];
+	  val[k]=val[3-k];
+	  val[3-k]=temp;
+	}
+	
+	if(val[0]&0x80) negative=1;
+	else negative=0;
+	
+	for(k=0;k<3;k++){
+	  if(negative && (val[k]!=0xFF)) break;
+	  else if(!negative && val[k]) break;
+	}
+	
+	if((negative && !(val[k]&0x80)) ||
+	   (!negative && (val[k]&0x80))) k--; 
+	
+	octet_der(val+k,4-k,val2,&len);
+	set_value(p,val2,len);
+      }
+    }
+
+    if(p->down){
+      p=p->down;
+    }
+    else{
+      if(p==node) p=NULL;
+      else if(p->right) p=p->right;
+      else{
+	while(1){
+	  p=find_up(p);
+	  if(p==node){
+	    p=NULL;
+	    break;
+	  }
+	  if(p->right){
+	    p=p->right;
+	    break;
+	  }
+	}
+      }
+    }
+  }
+
+  return ASN_OK;
+}
+
+
+int 
+delete_not_used(node_asn *node)
+{
+  node_asn *p,*p2;
+
+  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
 
   p=node;
+  while(p){
+    if(p->type&CONST_NOT_USED){
+      p2=NULL;
+      if(p!=node){
+	p2=find_left(p);
+	if(!p2) p2=find_up(p);
+      }
+      delete_structure(p);
+      p=p2;
+    } 
+
+    if(!p) break;  /* reach node */
+
+    if(p->down){
+      p=p->down;
+    }
+    else{
+      if(p==node) p=NULL;
+      else if(p->right) p=p->right;
+      else{
+	while(1){
+	  p=find_up(p);
+	  if(p==node){
+	    p=NULL;
+	    break;
+	  }
+	  if(p->right){
+	    p=p->right;
+	    break;
+	  }
+	}
+      }
+    }
+  }
+  return ASN_OK;
+}
+
+
+
+int 
+expand_identifier(node_asn **node,node_asn *root)
+{
+  node_asn *p,*p2,*p3;
+  char name2[129];
+  int move;
+ 
+  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
+
+  p=*node;
   move=DOWN;
 
-  while(!((p==node) && (move==UP))){
+  while(!((p==*node) && (move==UP))){
     if(move!=UP){
       if(type_field(p->type)==TYPE_IDENTIFIER){
-	strcpy(name2,name_root);strcat(name2,".");strcat(name2,p->value);
-	p2=copy_structure2(name2);
-	if(p2==NULL) return ASN_IDENTIFIER_NOT_FOUND; 
+	strcpy(name2,root->name);strcat(name2,".");strcat(name2,p->value);
+	p2=copy_structure2(root,name2);
+	if(p2==NULL) return ASN_IDENTIFIER_NOT_FOUND;
 	set_name(p2,p->name);
-	set_right(p2,p->right);
+	p2->right=p->right;
+	p2->left=p->left;
+	if(p->right) p->right->left=p2;
 	p3=p->down;
-	
 	if(p3){
 	  while(p3->right) p3=p3->right;
-	  p3->right=p2->down;
-	  p2->down=p->down;
+	  set_right(p3,p2->down);
+	  set_down(p2,p->down);
 	}
 	
 	p3=find_left(p);
-	if(p3) p3->right=p2;
+	if(p3) set_right(p3,p2);
 	else{
 	  p3=find_up(p);
-	  p3->down=p2;
+	  if(p3) set_down(p3,p2);
+	  else {
+	    // node_list=p2;
+	    p2->left=NULL;
+	  }
 	}
 
 	if(p->type & CONST_SIZE) p2->type|=CONST_SIZE;
@@ -1074,14 +1186,50 @@ expand_asn(char *name,char *root)
 	if(p->type & CONST_SET) p2->type|=CONST_SET;
 	if(p->type & CONST_NOT_USED) p2->type|=CONST_NOT_USED;
 
-	if(p==node) node=p2;
+	if(p==*node) *node=p2;
 	remove_node(p);
 	p=p2;
 	move=DOWN;
 	continue;
       }
-      else if((type_field(p->type)==TYPE_CHOICE) &&
-	      (p->type&CONST_TAG)){
+      move=DOWN;
+    }
+    else move=RIGHT;
+    
+    if(move==DOWN){
+      if(p->down) p=p->down;
+      else move=RIGHT;
+    }
+    
+    if(p==*node) {move=UP; continue;}
+    
+    if(move==RIGHT){
+      if(p->right) p=p->right;
+      else move=UP;
+    }
+    if(move==UP) p=find_up(p);
+  }
+
+  return ASN_OK;
+}
+
+
+
+int 
+type_choice_config(node_asn *node)
+{
+  node_asn *p,*p2,*p3,*p4;
+  int move;
+ 
+  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
+
+  p=node;
+  move=DOWN;
+
+  while(!((p==node) && (move==UP))){
+    if(move!=UP){
+      if((type_field(p->type)==TYPE_CHOICE) &&
+	 (p->type&CONST_TAG)){
 	p2=p->down;
 	while(p2){
 	  if(type_field(p2->type)!=TYPE_TAG){
@@ -1091,8 +1239,8 @@ expand_asn(char *name,char *root)
 	      if(type_field(p3->type)==TYPE_TAG){
 		p4=add_node(p3->type);
 		set_value(p4,p3->value,strlen(p3->value)+1);
-		p4->right=p2->down;
-		p2->down=p4;
+		set_right(p4,p2->down);
+		set_down(p2,p4);
 	      }
 	      p3=find_left(p3);
 	    }
@@ -1103,12 +1251,46 @@ expand_asn(char *name,char *root)
 	p2=p->down;
 	while(p2){
 	  p3=p2->right;
-	  if(type_field(p2->type)==TYPE_TAG) delete_tree2(p2);
+	  if(type_field(p2->type)==TYPE_TAG) delete_structure(p2);
 	  p2=p3;
 	}
-	move=DOWN;
       }
-      else if(type_field(p->type)==TYPE_SET){
+      move=DOWN;
+    }
+    else move=RIGHT;
+    
+    if(move==DOWN){
+      if(p->down) p=p->down;
+      else move=RIGHT;
+    }
+    
+    if(p==node) {move=UP; continue;}
+    
+    if(move==RIGHT){
+      if(p->right) p=p->right;
+      else move=UP;
+    }
+    if(move==UP) p=find_up(p);
+  }
+  
+  return ASN_OK;
+}
+
+
+int 
+type_set_config(node_asn *node)
+{
+  node_asn *p,*p2;
+  int move;
+ 
+  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
+
+  p=node;
+  move=DOWN;
+
+  while(!((p==node) && (move==UP))){
+    if(move!=UP){
+      if(type_field(p->type)==TYPE_SET){
 	p2=p->down;
 	while(p2){
 	  if(type_field(p2->type)!=TYPE_TAG) 
@@ -1116,7 +1298,6 @@ expand_asn(char *name,char *root)
 	  p2=p2->right;
 	}
       }
-
       move=DOWN;
     }
     else move=RIGHT;
@@ -1137,5 +1318,83 @@ expand_asn(char *name,char *root)
 
   return ASN_OK;
 }
+
+
+int 
+expand_object_id(node_asn *node)
+{
+  node_asn *p,*p2,*p3,*p4,*p5;
+  char name_root[129],name2[129],*c;
+  int move;
+ 
+  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
+
+  strcpy(name_root,node->name);
+
+  p=node;
+  move=DOWN;
+
+  while(!((p==node) && (move==UP))){
+    if(move!=UP){
+      if((type_field(p->type)==TYPE_OBJECT_ID) && (p->type&CONST_ASSIGN)){
+	p2=p->down;
+        if(p2 && (type_field(p2->type)==TYPE_CONSTANT)){
+	  if(p2->value && !isdigit(p2->value[0])){
+	    strcpy(name2,name_root);strcat(name2,".");strcat(name2,p2->value);
+	    p3=find_node(node,name2);
+	    if(!p3 || (type_field(p3->type)!=TYPE_OBJECT_ID) ||
+	       !(p3->type&CONST_ASSIGN)) return ASN_ELEMENT_NOT_FOUND;
+	    set_down(p,p2->right);
+	    remove_node(p2);
+	    p2=p;
+	    p4=p3->down;
+	    while(p4){
+	      if(type_field(p4->type)==TYPE_CONSTANT){
+		p5=add_node(TYPE_CONSTANT);
+		set_name(p5,p4->name);
+		set_value(p5,p4->value,strlen(p4->value)+1);
+		if(p2==p){
+		  set_right(p5,p->down);
+		  set_down(p,p5);
+		}
+		else{
+		  set_right(p5,p2->right);
+		  set_right(p2,p5);
+		}
+		p2=p5;
+	      }
+	      p4=p4->right;
+	    }
+	    move=DOWN;
+	    continue;
+	  }
+	}
+      }
+      move=DOWN;
+    }
+    else move=RIGHT;
+
+    if(move==DOWN){
+      if(p->down) p=p->down;
+      else move=RIGHT;
+    }
+    
+    if(p==node) {move=UP; continue;}
+
+    if(move==RIGHT){
+      if(p->right) p=p->right;
+      else move=UP;
+    }
+    if(move==UP) p=find_up(p);
+  }
+
+  return ASN_OK;
+}
+
+
+
+
+
+
 
 

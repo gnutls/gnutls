@@ -18,10 +18,11 @@
 /*                 "C=US O=gov"                       */ 
 /******************************************************/
 void
-get_Name_type(char *root, char *answer)
+get_Name_type(node_asn *cert_def,node_asn *cert,char *root, char *answer)
 {
   int k,k2,result,len;
   char name[128],str[1024],name2[128],counter[5],name3[128];
+  node_asn *value;
 
   answer[0]=0;
   k=1;
@@ -30,7 +31,7 @@ get_Name_type(char *root, char *answer)
     strcat(name,".rdnSequence.?");
     ltostr(k,counter);
     strcat(name,counter);
-    result=read_value(name,str,&len);
+    result=read_value(cert,name,str,&len);
     if(result==ASN_ELEMENT_NOT_FOUND) break;
     k2=1;
     do{
@@ -38,55 +39,55 @@ get_Name_type(char *root, char *answer)
       strcat(name2,".?");
       ltostr(k2,counter);
       strcat(name2,counter);
-      result=read_value(name2,str,&len);
+      result=read_value(cert,name2,str,&len);
       if(result==ASN_ELEMENT_NOT_FOUND) break;
       strcpy(name3,name2);
       strcat(name3,".type");
-      result=read_value(name3,str,&len);
+      result=read_value(cert,name3,str,&len);
       strcpy(name3,name2);
       strcat(name3,".value");
       if(result==ASN_OK){
 	if(!strcmp(str,"2 5 4 6")){
-	  create_structure("certificate2-subject-C","PKIX1Explicit88.X520OrganizationName");  //X520countryName");
-	  read_value(name3,str,&len);
-      	  get_der("certificate2-subject-C",str,len);
+	  create_structure(cert_def,"PKIX1Implicit88.X520OrganizationName",&value,"certificate2-subject-C");  //X520countryName");
+	  read_value(cert,name3,str,&len);
+      	  get_der(value,str,len);
 	  strcpy(name3,"certificate2-subject-C");
-	  read_value(name3,str,&len);  /* CHOICE */
+	  read_value(value,name3,str,&len);  /* CHOICE */
 	  strcat(name3,".");
 	  strcat(name3,str);
-	  read_value(name3,str,&len);
+	  read_value(value,name3,str,&len);
 	  str[len]=0;
 	  strcat(answer," C=");
 	  strcat(answer,str);
-	  delete_structure("certificate2-subject-C");
+	  delete_structure(value);
 	}
 	else if(!strcmp(str,"2 5 4 10")){
-	  create_structure("certificate2-subject-O","PKIX1Explicit88.X520OrganizationName");
-	  read_value(name3,str,&len);	  
-	  get_der("certificate2-subject-O",str,len);
+	  create_structure(cert_def,"PKIX1Implicit88.X520OrganizationName",&value,"certificate2-subject-O");
+	  read_value(cert,name3,str,&len);	  
+	  get_der(value,str,len);
 	  strcpy(name3,"certificate2-subject-O");
-	  read_value(name3,str,&len);  /* CHOICE */
+	  read_value(value,name3,str,&len);  /* CHOICE */
 	  strcat(name3,".");
 	  strcat(name3,str);
-	  read_value(name3,str,&len);
+	  read_value(value,name3,str,&len);
 	  str[len]=0;
 	  strcat(answer," O=");
 	  strcat(answer,str);
-	  delete_structure("certificate2-subject-O");
+	  delete_structure(value);
 	}
 	else if(!strcmp(str,"2 5 4 11")){
-	  create_structure("certificate2-subject-OU","PKIX1Explicit88.X520OrganizationalUnitName");
-	  read_value(name3,str,&len);
-	  get_der("certificate2-subject-OU",str,len);
+	  create_structure(cert_def,"PKIX1Implicit88.X520OrganizationalUnitName",&value,"certificate2-subject-OU");
+	  read_value(cert,name3,str,&len);
+	  get_der(value,str,len);
 	  strcpy(name3,"certificate2-subject-OU");
-	  read_value(name3,str,&len);  /* CHOICE */
+	  read_value(value,name3,str,&len);  /* CHOICE */
 	  strcat(name3,".");
 	  strcat(name3,str);
-	  read_value(name3,str,&len);
+	  read_value(value,name3,str,&len);
 	  str[len]=0;
 	  strcat(answer," OU=");
 	  strcat(answer,str);
-	  delete_structure("certificate2-subject-OU");
+	  delete_structure(value);
 	}
       }
       k2++;
@@ -106,160 +107,186 @@ get_Name_type(char *root, char *answer)
 /*   int *der_len: number of bytes of der string      */ 
 /******************************************************/
 void
-create_certificate(unsigned char *der,int *der_len)
+create_certificate(node_asn *cert_def,unsigned char *der,int *der_len)
 {
   int result,k,len;
   unsigned char str[1024],*str2;
+  node_asn *cert1,*value,*param,*constr;
 
-
-  result=create_structure("certificate1","PKIX1Explicit88.Certificate");
+  result=create_structure(cert_def,"PKIX1Implicit88.Certificate",&cert1,"certificate1");
  
   /* Use the next 3 lines to visit the empty certificate */
   /* printf("-----------------\n");
-     visit_tree("certificate1");   
+     visit_tree(cert1,"certificate1");   
      printf("-----------------\n"); */
 
   /* version: 2 */
   str[0]=0x02;    
-  result=write_value("certificate1.tbsCertificate.version",str,1); 
+  result=write_value(cert1,"certificate1.tbsCertificate.version",str,1); 
 
   /* serialNumber: 17 */
   str[0]=17;    
-  result=write_value("certificate1.tbsCertificate.serialNumber",str,1); 
+  result=write_value(cert1,"certificate1.tbsCertificate.serialNumber",str,1); 
 
   /* signature: dsa-with-sha */
-  result=write_value("certificate1.tbsCertificate.signature.algorithm","1 2 840 10040 4 3",17);   
+  result=write_value(cert1,"certificate1.tbsCertificate.signature.algorithm","1 2 840 10040 4 3",1);   
   
-  result=write_value("certificate1.tbsCertificate.signature.parameters",NULL,0);
+  result=write_value(cert1,"certificate1.tbsCertificate.signature.parameters",NULL,0);
+
 
   /* issuer: Country="US" Organization="gov" OrganizationUnit="nist" */
-  result=write_value("certificate1.tbsCertificate.issuer","rdnSequence",12);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer","rdnSequence",12);
 
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence","NEW",4);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST","NEW",4);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence","NEW",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST","NEW",1);
   /* C */
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.type","2 5 4 6",8);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",
-		     "PKIX1Explicit88.X520countryName",13);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value","US",2);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.type","2 5 4 6",1);
+  result=create_structure(cert_def,"PKIX1Implicit88.X520countryName",
+			  &value,"countryName");
+  result=write_value(value,"countryName","US",2);
+  result=create_der(value,"countryName",der,der_len);
+  delete_structure(value);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",der,*der_len);
 
 
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence","NEW",4);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST","NEW",4);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence","NEW",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST","NEW",1);
   /* O */
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.type","2 5 4 10",8);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",
-		     "PKIX1Explicit88.X520OrganizationName",13);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",
-  		     "printableString",1);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value.printableString",
-  	     "gov",3);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.type","2 5 4 10",1);
+  result=create_structure(cert_def,"PKIX1Implicit88.X520OrganizationName",
+			  &value,"OrgName");
+  result=write_value(value,"OrgName","printableString",1);
+  result=write_value(value,"OrgName.printableString","gov",3);
+  result=create_der(value,"OrgName",der,der_len);
+  delete_structure(value);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",der,*der_len);
 
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence","NEW",4);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST","NEW",4);
+
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence","NEW",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST","NEW",1);
+
   /* OU */
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.type","2 5 4 11",8);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",
-		     "PKIX1Explicit88.X520OrganizationalUnitName",13);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",
-  		     "printableString",1);
-  result=write_value("certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value.printableString",
-		     "nist",4);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.type","2 5 4 11",1);
+  result=create_structure(cert_def,"PKIX1Implicit88.X520OrganizationalUnitName",&value,"OrgUnitName");
+  result=write_value(value,"OrgUnitName","printableString",1);
+  result=write_value(value,"OrgUnitName.printableString","nist",4);
+  result=create_der(value,"OrgUnitName",der,der_len);
+  delete_structure(value);
+  result=write_value(cert1,"certificate1.tbsCertificate.issuer.rdnSequence.?LAST.?LAST.value",der,*der_len);
+
 
   /* validity */
-  result=write_value("certificate1.tbsCertificate.validity.notBefore","utcTime",1);
-  result=write_value("certificate1.tbsCertificate.validity.notBefore.utcTime","970630000000Z",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.validity.notBefore","utcTime",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.validity.notBefore.utcTime","970630000000Z",1);
 
-  result=write_value("certificate1.tbsCertificate.validity.notAfter","utcTime",1);
-  result=write_value("certificate1.tbsCertificate.validity.notAfter.utcTime","971231000000Z",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.validity.notAfter","utcTime",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.validity.notAfter.utcTime","971231000000Z",1);
 
 
 
   /* subject: Country="US" Organization="gov" OrganizationUnit="nist" */
-  result=write_value("certificate1.tbsCertificate.subject","rdnSequence",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject","rdnSequence",1);
 
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence","NEW",1);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence","NEW",1);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",1);
   /* C */
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.type","2 5 4 6",1);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",
-		     "PKIX1Explicit88.X520countryName",13);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value","US",2);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.type","2 5 4 6",1);
+  result=create_structure(cert_def,"PKIX1Implicit88.X520countryName",
+			  &value,"countryName");
+  result=write_value(value,"countryName","US",2);
+  result=create_der(value,"countryName",der,der_len);
+  delete_structure(value);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",der,*der_len);
 
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence","NEW",4);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",4);
+
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence","NEW",4);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",4);
   /* O */
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.type","2 5 4 10",8);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",
-		     "PKIX1Explicit88.X520OrganizationName",13);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",
-  		     "printableString",1);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value.printableString",
-  	     "gov",3);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.type","2 5 4 10",8);
+  result=create_structure(cert_def,"PKIX1Implicit88.X520OrganizationName",
+			  &value,"OrgName");
+  result=write_value(value,"OrgName","printableString",1);
+  result=write_value(value,"OrgName.printableString","gov",3);
+  result=create_der(value,"OrgName",der,der_len);
+  delete_structure(value);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",der,*der_len);
 
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence","NEW",4);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",4);
+
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence","NEW",4);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",4);
   /* OU */
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.type","2 5 4 11",8);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",
-		     "PKIX1Explicit88.X520OrganizationalUnitName",13);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",
-  		     "printableString",1);
-  result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value.printableString",
-		     "nist",4);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.type","2 5 4 11",8);
+  result=create_structure(cert_def,"PKIX1Implicit88.X520OrganizationalUnitName",&value,"OrgUnitName");
+  result=write_value(value,"OrgUnitName","printableString",1);
+  result=write_value(value,"OrgUnitName.printableString","nist",4);
+  result=create_der(value,"OrgUnitName",der,der_len);
+  delete_structure(value);
+  result=write_value(cert1,"certificate1.tbsCertificate.subject.rdnSequence.?LAST.?LAST.value",der,*der_len);
 
 
   /* subjectPublicKeyInfo: dsa with parameters=Dss-Parms */
-  result=write_value("certificate1.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm","1 2 840 10040 4 1",1); 
-  result=write_value("certificate1.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters","Dss-Parms",1); 
+  result=write_value(cert1,"certificate1.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm","1 2 840 10040 4 1",1); 
+  result=create_structure(cert_def,"PKIX1Implicit88.Dss-Parms",&param,"parameters");
   str2="\xd4\x38"; /* only an example */
-  result=write_value("certificate1.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters.p",str2,128);
+  result=write_value(param,"parameters.p",str2,128);
   str2="\xd4\x38"; /* only an example */
-  result=write_value("certificate1.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters.q",str2,20);
+  result=write_value(param,"parameters.q",str2,20);
   str2="\xd4\x38"; /* only an example */
-  result=write_value("certificate1.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters.g",str2,128);
+  result=write_value(param,"parameters.g",str2,128);
+  result=create_der(param,"parameters",der,der_len);
+  delete_structure(param);
+  result=write_value(cert1,"certificate1.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",der,*der_len); 
+
 
   /* subjectPublicKey */
   str2="\x02\x81"; /* only an example */
-  result=write_value("certificate1.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",str2,1048);
+  result=write_value(cert1,"certificate1.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",str2,1048);
 
-  result=write_value("certificate1.tbsCertificate.issuerUniqueID",NULL,0);  /* NO OPTION */
-  result=write_value("certificate1.tbsCertificate.subjectUniqueID",NULL,0); /* NO OPTION */
+  result=write_value(cert1,"certificate1.tbsCertificate.issuerUniqueID",NULL,0);  /* NO OPTION */
+  result=write_value(cert1,"certificate1.tbsCertificate.subjectUniqueID",NULL,0); /* NO OPTION */
 
   /* extensions */
-  result=write_value("certificate1.tbsCertificate.extensions","NEW",1); 
-  result=write_value("certificate1.tbsCertificate.extensions.?LAST.extnID","2 5 29 19",1); /*   basicConstraints */  
-  result=write_value("certificate1.tbsCertificate.extensions.?LAST.critical","TRUE",1); 
-  str2="\x30\x03\x01\x01\xff"; /* only an example */
-  result=write_value("certificate1.tbsCertificate.extensions.?LAST.extnValue",str2,5); 
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions","NEW",1); 
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions.?LAST.extnID","2 5 29 19",1); /*   basicConstraints */  
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions.?LAST.critical","TRUE",1); 
+  result=create_structure(cert_def,"PKIX1Implicit88.BasicConstraints",&constr,
+			  "basicConstraints1");
+  result=write_value(constr,"basicConstraints1.cA","TRUE",1); 
+  result=write_value(constr,"basicConstraints1.pathLenConstraint",NULL,0); 
+  result=create_der(constr,"basicConstraints1",der,der_len);
+  result=delete_structure(constr);
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions.?LAST.extnValue",der,*der_len); 
 
-  result=write_value("certificate1.tbsCertificate.extensions","NEW",1); 
-  result=write_value("certificate1.tbsCertificate.extensions.?LAST.extnID","2 5 29 14",1); /* subjectKeyIdentifier */ 
-  result=write_value("certificate1.tbsCertificate.extensions.?LAST.critical","FALSE",1); 
+
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions","NEW",1); 
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions.?LAST.extnID","2 5 29 14",1); /* subjectKeyIdentifier */ 
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions.?LAST.critical","FALSE",1); 
   str2="\x04\x14\xe7\x26\xc5"; /* only an example */
-  result=write_value("certificate1.tbsCertificate.extensions.?LAST.extnValue",str2,22); 
+  result=write_value(cert1,"certificate1.tbsCertificate.extensions.?LAST.extnValue",str2,22); 
+
 
   /* signatureAlgorithm: dsa-with-sha  */
-  result=write_value("certificate1.signatureAlgorithm.algorithm","1 2 840 10040 4 3",1);  
-  result=write_value("certificate1.signatureAlgorithm.parameters",NULL,0); /* NO OPTION */  
+  result=write_value(cert1,"certificate1.signatureAlgorithm.algorithm","1 2 840 10040 4 3",1);  
+  result=write_value(cert1,"certificate1.signatureAlgorithm.parameters",NULL,0); /* NO OPTION */  
+
 
   /* signature */
-  result=create_der("certificate1.tbsCertificate",der,der_len);
+  result=create_der(cert1,"certificate1.tbsCertificate",der,der_len);
   if(result!=ASN_OK){
     printf("\n'tbsCertificate' encoding creation: ERROR\n");
-    return;
+    //    return;
   }
   /* add the lines for the signature on der[0]..der[der_len-1]: result in str2 */
-  result=write_value("certificate1.signature",str2,368); /* dsa-with-sha */ 
+  result=write_value(cert1,"certificate1.signature",str2,368); /* dsa-with-sha */ 
   
 
   /* Use the next 3 lines to visit the certificate */
   /* printf("-----------------\n");   
-     visit_tree("certificate1");  
+     visit_tree(cert1,"certificate1");  
      printf("-----------------\n"); */
 
 
-  result=create_der("certificate1",der,der_len);
+  result=create_der(cert1,"certificate1",der,der_len);
   if(result!=ASN_OK){
     printf("\n'certificate1' encoding creation: ERROR\n");
     return;
@@ -271,7 +298,7 @@ create_certificate(unsigned char *der,int *der_len)
   printf("\n-----------------\n");
 
   /* Clear the "certificate1" structure */
-  delete_structure("certificate1");
+  delete_structure(cert1);
 }
 
 
@@ -286,16 +313,16 @@ create_certificate(unsigned char *der,int *der_len)
 /*   int der_len: number of bytes of der string      */ 
 /******************************************************/
 void
-get_certificate(unsigned char *der,int der_len)
+get_certificate(node_asn *cert_def,unsigned char *der,int der_len)
 {
   int result,len,start,end;
   unsigned char str[1024];
+  node_asn *cert2;
 
+  create_structure(cert_def,"PKIX1Implicit88.Certificate",&cert2,"certificate2");
 
-  create_structure("certificate2","PKIX1Explicit88.Certificate");
+  result=get_der(cert2,der,der_len);
 
-  result=get_der("certificate2",der,der_len);
-  
   if(result!=ASN_OK){
     printf("Problems with DER encoding\n");
     return;
@@ -303,36 +330,37 @@ get_certificate(unsigned char *der,int der_len)
    
 
   /* issuer */
-  get_Name_type("certificate2.tbsCertificate.issuer",str);
+  get_Name_type(cert_def,cert2,"certificate2.tbsCertificate.issuer",str);
   printf("certificate2:\nissuer =%s\n",str);
   /* subject */
-  get_Name_type("certificate2.tbsCertificate.subject",str);
+  get_Name_type(cert_def,cert2,"certificate2.tbsCertificate.subject",str);
   printf("subject=%s\n",str);
 
 
   /* Verify sign */
-  result=read_value("certificate2.signatureAlgorithm.algorithm",str,&len);
+  result=read_value(cert2,"certificate2.signatureAlgorithm.algorithm"
+		    ,str,&len);
 
   if(!strcmp(str,"1 2 840 10040 4 3")){  /* dsa-with-sha */
 
-    result=get_start_end_der("certificate2",der,der_len,
+    result=get_start_end_der(cert2,der,der_len,
 			     "certificate2.tbsCertificate",&start,&end);
 
     /* add the lines to calculate the sha on der[start]..der[end] */
 
-    result=read_value("certificate2.signature",str,&len);
+    result=read_value(cert2,"certificate2.signature",str,&len);
 
     /* compare the previous value to signature ( with issuer public key) */ 
   }
 
   /* Use the next 3 lines to visit the certificate */
-  /* printf("-----------------\n");   
-     visit_tree("certificate2");  
+  /*   printf("-----------------\n");   
+     visit_tree(cert2,"certificate2");  
      printf("-----------------\n"); */
 
 
   /* Clear the "certificate2" structure */
-  delete_structure("certificate2");
+  delete_structure(cert2);
 }
 
 
@@ -348,8 +376,9 @@ main(void)
 {
   int result,der_len;
   unsigned char der[1024];
+  node_asn *PKIX1Implicit88;
 
-  result=parser_asn1("pkix.asn");
+  result=parser_asn1("pkix.asn",&PKIX1Implicit88);
 
   if(result==ASN_SYNTAX_ERROR){
     printf("PARSE ERROR\n");
@@ -361,18 +390,18 @@ main(void)
   }
 
   
-  /* Use the following 3 lines to visit the PKIX1Explicit structures */
+  /* Use the following 3 lines to visit the PKIX1Implicit structures */
   /* printf("-----------------\n");
-     visit_tree("PKIX1Explicit88");   
+     visit_tree(PKIX1Implicit88,"PKIX1Implicit88");   
      printf("-----------------\n"); */
 
-  create_certificate(der,&der_len);
 
+  create_certificate(PKIX1Implicit88,der,&der_len);
 
-  get_certificate(der,der_len);
+  get_certificate(PKIX1Implicit88,der,der_len);
 
-  /* Clear the "PKIX1Explicit88" structures */
-  delete_structure("PKIX1Explicit88");
+  /* Clear the "PKIX1Implicit88" structures */
+  delete_structure(PKIX1Implicit88);
 
   return;
 }

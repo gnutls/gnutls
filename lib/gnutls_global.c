@@ -28,6 +28,16 @@
 static void* old_sig_handler;
 ssize_t (*recv_func)( SOCKET, void*, size_t, int);
 ssize_t (*send_func)( SOCKET,const void*, size_t, int);
+static node_asn *PKIX1_ASN;
+static node_asn *PKCS1_ASN;
+
+node_asn* _gnutls_get_pkix() {
+	return PKIX1_ASN;
+}
+
+node_asn* _gnutls_get_pkcs() {
+	return PKCS1_ASN;
+}
 
 int gnutls_is_secure_memory(const void* mem) {
 	return 0;
@@ -64,13 +74,13 @@ int gnutls_global_init(char* PKIX, char* PKCS1)
 	 * version.
 	 */
 	
-	result = parser_asn1(PKIX);
+	result = parser_asn1(PKIX, &PKIX1_ASN);
 
 	if (result != ASN_OK) {
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	
-	result = parser_asn1(PKCS1);
+	result = parser_asn1(PKCS1, &PKCS1_ASN);
 
 	if (result != ASN_OK) {
 		return GNUTLS_E_PARSING_ERROR;
@@ -91,6 +101,7 @@ void gnutls_global_deinit() {
 #ifdef HAVE_SIGNAL
 	signal( SIGPIPE, old_sig_handler);
 #endif
-
+	delete_structure( PKCS1_ASN);
+	delete_structure( PKIX1_ASN);
 
 }

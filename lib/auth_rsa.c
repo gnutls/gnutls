@@ -30,6 +30,7 @@
 #include <gnutls_random.h>
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
+#include <gnutls_global.h>
 #include "debug.h"
 
 int gen_rsa_certificate(GNUTLS_KEY, opaque **);
@@ -69,14 +70,15 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 	int ret = 0, result;
 	opaque str[5 * 1024];
 	int len = sizeof(str);
-
-	if (create_structure("rsa_params", "PKIX1Explicit88.Certificate")
+	node_asn *srsa, *spk;
+	
+	if (create_structure( _gnutls_get_pkcs(), "PKIX1Implicit88.Certificate", &srsa, "rsa_params")
 	    != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = get_der("rsa_params", cert.data, cert.size);
+	result = get_der( srsa, cert.data, cert.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 		gnutls_assert();
@@ -87,12 +89,12 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 	len = sizeof(str) - 1;
 	result =
 	    read_value
-	    ("rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+	    (srsa, "rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
 	     str, &len);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
-		delete_structure("rsa_params");
+		delete_structure(srsa);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
@@ -100,9 +102,9 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 		len = sizeof(str) - 1;
 		result =
 		    read_value
-		    ("rsa_params.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+		    (srsa, "rsa_params.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 		     str, &len);
-		delete_structure("rsa_params");
+		delete_structure(srsa);
 
 		if (result != ASN_OK) {
 			gnutls_assert();
@@ -110,31 +112,37 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 		}
 
 		if (create_structure
-		    ("rsa_public_key",
-		     "PKIX1Explicit88.RSAPublicKey") != ASN_OK) {
+		    ( _gnutls_get_pkix(),
+		     "PKIX1Implicit88.RSAPublicKey", &spk, "rsa_public_key") != ASN_OK) {
 			gnutls_assert();
 			return GNUTLS_E_ASN1_ERROR;
 		}
 
-		result = get_der("rsa_public_key", str, len / 8);
+		if (len % 8 != 0) {
+			gnutls_assert();
+			delete_structure(spk);
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		}
+		
+		result = get_der(spk, str, len / 8);
 
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("rsa_public_key");
+			delete_structure(spk);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
 		len = sizeof(str) - 1;
-		result = read_value("rsa_public_key.modulus", str, &len);
+		result = read_value(spk, "rsa_public_key.modulus", str, &len);
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("rsa_public_key");
+			delete_structure(spk);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
 		if (gcry_mpi_scan(mod, GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
-			delete_structure("rsa_public_key");
+			delete_structure(spk);
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 
@@ -142,16 +150,16 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 			if (gnutls_set_datum
 			    (&params->rsa_modulus, str, len) < 0) {
 				gnutls_assert();
-				delete_structure("rsa_public_key");
+				delete_structure(spk);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
 		len = sizeof(str) - 1;
 		result =
-		    read_value("rsa_public_key.publicExponent", str, &len);
+		    read_value(spk, "rsa_public_key.publicExponent", str, &len);
 		if (result != ASN_OK) {
 			gnutls_assert();
-			delete_structure("rsa_public_key");
+			delete_structure(spk);
 			if (params != NULL)
 				gnutls_free_datum(&params->rsa_modulus);
 			_gnutls_mpi_release(mod);
@@ -163,7 +171,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 			_gnutls_mpi_release(mod);
 			if (params != NULL)
 				gnutls_free_datum(&params->rsa_modulus);
-			delete_structure("rsa_public_key");
+			delete_structure(spk);
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 		if (params != NULL)
@@ -174,11 +182,11 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 				if (params != NULL)
 					gnutls_free_datum(&params->
 							  rsa_modulus);
-				delete_structure("rsa_public_key");
+				delete_structure(spk);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
-		delete_structure("rsa_public_key");
+		delete_structure(spk);
 
 		ret = 0;
 
@@ -189,7 +197,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 		gnutls_assert();
 		ret = GNUTLS_E_X509_CERTIFICATE_ERROR;
 
-		delete_structure("rsa_params");
+		delete_structure(srsa);
 	}
 
 

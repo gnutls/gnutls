@@ -11,13 +11,14 @@
 
 INTRODUCTION
 ------------
-This file wants to be only the first introduction to the parser I developed, that is also
-in his first version. 
-So I ask you to let me know whether this kind of interface (software functions) is useful or not.
-I know also that this is not the correct format for GNU documentation, but in this moment
-I prefer to have a feedback as soon as possible.
-
-I forgot, thanks for your patience reading my 'black and white' writing (and speaking).
+This file describes the second version of ASN.1 parser I developed.
+The main difference from the previous version is the use of pointers.
+Other differences are:
+- write_value function for type ANY
+- the introduction of ENUMERATED type,
+- negative integer are allowed in ASN.1 syntax files,
+- PKIX1Implicit88.txt instead of Certificate.txt for the Certificate description
+ 
 
 
 FILE LIST
@@ -26,13 +27,14 @@ ASN.readme.txt        this file
 ASN.y                 bison input file
 ASN.tab.c             bison output file
 CertificateExample.c  example based on Appendix D.1 of rfc2459
+CrlExample.c          example based on Appendix D.4 of rfc2459
 gnutls_asn1.c         functions for ASN1 parser and for reading and setting elements' value
 gnutls_asn1.h         contains constants for the gnutls_asn1.c. Must be included in files 
                       that use ASN1 parser.
 gnutls_der.c          functions for der encoding creation and analysis
 gnutls_der.h          contains constants for the gnutls_der.c. Must be included in files 
                       that use ASN1 parser.
-Certificate.txt       certificate and CRL structures 
+PKIX1Implicit88.txt   certificate and CRL structures 
 Makefile              how to create 'CertificateExample'
 
 
@@ -56,10 +58,9 @@ The ASN.1 declarations must have this form:
 The token "::=" must be separate from others elements, so this is a wrong declaration:
       Version ::=INTEGER 
 the correct one is :   Version ::= INTEGER
-In this parser is not possible to use negative numbers:
-      version  INTEGER default -1     -- not allowed
 Here is the list of types that the parser can manage:
      INTEGER
+     ENUMERATED
      BOOLEAN
      OBJECT IDENTIFIER
      NULL
@@ -74,7 +75,7 @@ Here is the list of types that the parser can manage:
      CHOICE
      ANY
      ANY DEFINED BY
-This version doesn't manage REAL and ENUMERATED types. It also not allow the use of 
+This version doesn't manage REAL type. It also not allow the use of 
 "EXPORT" and "IMPORT" sections.
 
 The SIZE constraints are allowed but no check is done on them.
@@ -116,11 +117,14 @@ The name "?LAST" indicates the last element of a SET_OF or SEQUENCE_OF.
 FUNCTIONS
 ---------
 
-   int parser_asn1(char *file_name);
+   int parser_asn1(char *file_name,node_asn **pointer);
    --------------------------------
 Creates the structures needed to manage the definitions included in *FILE_NAME file.
-Input Parameters: 
+Input Parameter: 
   char *file_name: specify the path and the name of file that contains ASN.1 declarations.
+Output Parameter:
+  node_asn **pointer : return the pointer to the structure created from 
+                       "file_name" ASN.1 declarations.  
 Return Value:
   ASN_OK: the file has a correct syntax and every identifier is known. 
   ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
@@ -128,25 +132,29 @@ Return Value:
   ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
 
 
-   int create_structure(char *dest_name,char *source_name);
+   int create_structure(node_asn *p_structure,char *source_name,node_asn **pointer,
+                        char *dest_name,);
    -------------------------------------------------------
 Creates a structure called DEST_NAME of type SOURCE_NAME.
 Input Parameters:
-  char *dest_name: the name of the new structure. It must be different from any other structure 
-                   or type already created.
-  char *source_name: the name of the type to use to create the structure.
+  node_asn *p_structure: pointer to the structure returned by "parser_asn1" function 
+  char *source_name: the name of the type of the new structure (must be inside p_structure).
+  char *dest_name: the name of the new structure.
+Output Parameter:
+  node_asn **pointer : pointer to the structure created. 
 Return Value:
   ASN_OK: creation OK
   ASN_ELEMENT_NOT_FOUND: SOURCE_NAME isn't known
-Example: using "Certificate.txt"
-  result=create_structure("certificate1","PKIX1Explicit88.Certificate");
+Example: using "PKIX1Implicit88.txt"
+  result=create_structure(cert_def,"PKIX1Implicit88.Certificate",&cert,"certificate1");
 
 
-   int write_value(char *name,unsigned char *value,int len);
+   int write_value(node_asn *pointer,char *name,unsigned char *value,int len);
    --------------------------------------------------------
 Set the value of one element inside a structure.
 Input Parameters:
-  char *name: the name of the element inside a structure that you want to set.
+  node_asn *pointer: pointer to a structure
+  char *name: the name of the element inside the structure that you want to set.
   unsigned char *value: vector used to specify the value to set.
   int len: number of bytes of *value to use to set the value: value[0]..value[len-1]
 Return Value:
@@ -159,6 +167,7 @@ Examples:  description for each type
            value[0]=0xFF value[1]=0xFF , len=2 -> integer=-1
            value[0]=0x01 ,               len=1 -> integer= 1
            value[0]=0x00 value[1]=0x01 , len=2 -> integer= 1
+  ENUMERATED: as INTEGER (but only with not negative numbers)
   BOOLEAN: VALUE must be the null terminated string "TRUE" or "FALSE" and LEN != 0
            value="TRUE" , len=1 -> boolean=TRUE
            value="FALSE" , len=1 -> boolean=FALSE
@@ -184,29 +193,29 @@ Examples:  description for each type
            value="\xCF" , len=6 -> bit string="110011" (six bits)
   CHOICE: if NAME indicates a choice type, VALUE must specify one of the alternatives with a
           null terminated string. LEN != 0
-          Using "Certificate.txt":
-          result=write_value("certificate1.tbsCertificate.subject","rdnSequence",1);
-  ANY: VALUE (null terminated string) indicates the type that must be used instead of ANY.
+          Using "PKIX1Implicit88.txt":
+          result=write_value(cert,"certificate1.tbsCertificate.subject","rdnSequence",1);
+  ANY: VALUE indicates the der encoding of a structure.
        LEN != 0 
-          value="X520name" , len=1 -> type ANY becomes X520name
   SEQUENCE OF: VALUE must be the null terminated string "NEW" and LEN != 0. With this 
                instruction another element is appended in the sequence. The name of this
                element will be "?1" if it's the first one, "?2" for the second and so on.
-          Using "Certificate.txt":   
-          result=write_value("certificate1.tbsCertificate.subject.rdnSequence","NEW",1);
+          Using "PKIX1Implicit88.txt":   
+          result=write_value(cert,"certificate1.tbsCertificate.subject.rdnSequence","NEW",1);
   SET OF: the same as SEQUENCE OF. 
-          Using "Certificate.txt":
-          result=write_value("certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",1);
+          Using "PKIX1Implicit88.txt":
+          result=write_value(cert,"certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",1);
 
 If an element is OPTIONAL and you want to delete it, you must use the value=NULL and len=0.
-          Using "Certificate.txt":
-          result=write_value("certificate1.tbsCertificate.issuerUniqueID",NULL,0);
+          Using "PKIX1Implicit88.txt":
+          result=write_value(cert,"certificate1.tbsCertificate.issuerUniqueID",NULL,0);
 
 
-   int read_value(char *name,unsigned char *value,int *len);
+   int read_value(node_asn *pointer,char *name,unsigned char *value,int *len);
    --------------------------------------------------------
 Returns the value of one element inside a structure.
 Input Parameters:
+  node_asn *pointer: pointer to a structure
   char *name: the name of the element inside a structure that you want to read.
 Output Parameters:
   unsigned char *value: vector that will contain the element's content. 
@@ -220,6 +229,7 @@ Examples: a description for each type
   INTEGER: VALUE will contain a two's complement form integer.
            integer=-1  -> value[0]=0xFF , len=1
            integer=1   -> value[0]=0x01 , len=1
+  ENUMERATED: as INTEGER (but only with not negative numbers)
   BOOLEAN: VALUE will be the null terminated string "TRUE" or "FALSE" and LEN=5 or LEN=6
   OBJECT IDENTIFIER: VALUE will be a null terminated string with each number separated by
                      a blank (i.e. "1 2 3 543 1"). 
@@ -241,11 +251,12 @@ means that this element wasn't present in the der encoding that created the stru
 The first element of a SEQUENCE_OF or SET_OF is named "?1". The second one "?2" and so on.
 
 
-   int create_der(char *name,unsigned char *der,int *len);
+   int create_der(node_asn *pointer,char *name,unsigned char *der,int *len);
    ------------------------------------------------------
-Creates the DER encoding for the NAME structure.
+Creates the DER encoding for the NAME structure (inside *POINTER structure).
 Input Parameters:
-  char *name: the name of the structure you want to encode.
+  node_asn *pointer: pointer to a structure
+  char *name: the name of the structure you want to encode (it must be inside *POINTER).
 Output Parameters:
   unsigned char *der: vector that will contain the DER encoding. 
                       DER must be a pointer to memory cells already allocated.
@@ -256,12 +267,12 @@ Return Value:
   ASN_VALUE_NOT_FOUND: there is an element without a value.
 
 
-   int get_der(char *name,unsigned char *der,int len);
+   int get_der(node_asn *pointer,char *name,unsigned char *der,int len);
    --------------------------------------------------
-Fill the structure NAME with values of a DER encoding string. The sructure must just be
+Fill the structure *POINTER with values of a DER encoding string. The sructure must just be
 created with function 'create_stucture'.
 Input Parameters:
-  char *name: the name of the structure that you want to fill.
+  node_asn *pointer: pointer to the structure that you want to fill.
   unsigned char *der: vector that contains the DER encoding. 
   int len: number of bytes of *der: der[0]..der[len-1]
 Return Value:
@@ -270,14 +281,14 @@ Return Value:
   ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
 
 
-   int get_start_end_der(char *name,unsigned char *der,int len,char *name_element,int *start, int *end);
+   int get_start_end_der(node_asn *pointer,unsigned char *der,int len,char *name_element,int *start, int *end);
    ----------------------------------------------------------------------------------------------------
 Find the start and end point of an element in a DER encoding string. I mean that if you
 have a der encoding and you have already used the function "get_der" to fill a structure, it may
 happen that you want to find the piece of string concerning an element of the structure.
 Example: the sequence "tbsCertificate" inside an X509 certificate.
 Input Parameters:
-  char *name: the name of the structure that is already setted with DER string.
+  node_asn *pointer: the pointer to the structure that is already setted with DER string.
   unsigned char *der: vector that contains the DER encoding. 
   int len: number of bytes of *der: der[0]..der[len-1]
   char *name_element: an element of NAME structure.
@@ -290,35 +301,36 @@ Return Value:
   ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
   
 
-   int delete_structure(char *name);
+   int delete_structure(node_asn *pointer);
    ---------------------------------
-Deletes the structure NAME. 
+Deletes the structure *POINTER. 
 Input Parameters:
-  char *name: the name of the structure that you want to delete.
+  node_asn *pointer: pointer to the structure that you want to delete.
 Return Value:
   ASN_OK: everything OK
-  ASN_ELEMENT_NOT_FOUND: wasn't find the NAME element.
+  ASN_ELEMENT_NOT_FOUND: pointer==NULL.
 
 
-   void visit_tree(char *name);
+   void visit_tree(node_asn *pointer,char *name);
    ---------------------------
-Prints on the standard output the structure's tree starting from the NAME element.
+Prints on the standard output the structure's tree starting from the NAME element inside
+the structure *POINTER.
 
 
 
 FUTURE DEVELOPMENTS
 -------------------
-If this parser and this kind of interface is useful, I want to:
-1. intoduce the REAL and ENUMERATED types 
-2. allow negative numbers in ASN.1 files.
-3. allow an easiest way to set INTEGER and OBJECT IDENTFIER using constant names instead of 
+1. allow an easiest way to set INTEGER and OBJECT IDENTFIER using constant names instead of 
    numbers. I mean it will be possible set an OID with a string like "dsa-with-sha" or an
    INTEGER with "v1" (see 'Version' type in the Certificate structure) 
-4. improve the error signaling with strings that give you more details. 
+2. use a prefix for functions (e.g. gnuasn1_)
+3. Create a parser that creates C static functions to avoid files for initialization.
+4. type REAL 
+5. improve the error signaling with strings that give you more details. 
    Examples: in case of ASN1 syntax error you will have the line number where the error is,  
              if creating a der encoding the result is ASN_VALUE_NOT_FOUND you will have the
              name of the element without the value.
-5. improve the 'visit_tree' function and change the output from stdout to a null terminated 
+6. improve the 'visit_tree' function and change the output from stdout to a null terminated 
    string.  
 
 

@@ -8,12 +8,14 @@
 
 
 %{
-#include <gnutls_int.h>
-#include <cert_asn1.h>
+#include <stdio.h>
+#include <string.h>
+#include "cert_asn1.h"
 
-FILE *file_asn1;  /* Pointer to the to parse */
+FILE *file_asn1;  /* Pointer to file to parse */
 extern int parse_mode;
 int result_parse;
+node_asn *p_tree;
 %}
 
 
@@ -61,6 +63,7 @@ int result_parse;
 %token GeneralizedTime
 %token FROM
 %token IMPORTS
+%token ENUMERATED
 
 %type <node> octet_string_def constant constant_list type_assig_right 
 %type <node> integer_def type_assig type_assig_list sequence_def type_def
@@ -69,8 +72,8 @@ int result_parse;
 %type <node> constant_def type_constant type_constant_list definitions
 %type <node> definitions_id Time bit_element bit_element_list set_def
 %type <node> identifier_list imports_def tag_type tag type_assig_right_tag
-%type <node> type_assig_right_tag_default
-%type <str>  num_identifier 
+%type <node> type_assig_right_tag_default enumerated_def
+%type <str>  pos_num neg_num pos_neg_num pos_neg_identifier num_identifier 
 %type <constant> class explicit_implicit
 
 %%
@@ -79,13 +82,29 @@ input:  /* empty */
        | input definitions
 ;
 
+pos_num :   NUM       {strcpy($$,$1);}
+          | '+' NUM   {strcpy($$,$2);}
+;
+
+neg_num : '-' NUM     {strcpy($$,"-");
+                       strcat($$,$2);}
+;
+
+pos_neg_num :  pos_num  {strcpy($$,$1);}
+             | neg_num  {strcpy($$,$1);}
+;
+
 num_identifier :  NUM            {strcpy($$,$1);}
                 | IDENTIFIER     {strcpy($$,$1);}
 ;
 
-constant: '(' NUM ')'   {$$=add_node(TYPE_CONSTANT); 
+pos_neg_identifier :  pos_neg_num    {strcpy($$,$1);}
+                    | IDENTIFIER     {strcpy($$,$1);}
+;
+
+constant: '(' pos_neg_num ')'   {$$=add_node(TYPE_CONSTANT); 
                          set_value($$,$2,strlen($2)+1);}
-        | IDENTIFIER'('NUM')' {$$=add_node(TYPE_CONSTANT);
+        | IDENTIFIER'('pos_neg_num')' {$$=add_node(TYPE_CONSTANT);
 	                         set_name($$,$1); 
                                set_value($$,$3,strlen($3)+1);}
 ;
@@ -131,7 +150,7 @@ tag :  tag_type           {$$=$1;}
      | tag_type IMPLICIT  {$$=mod_type($1,CONST_IMPLICIT);}
 ;
 
-default :  DEFAULT num_identifier {$$=add_node(TYPE_DEFAULT); 
+default :  DEFAULT pos_neg_identifier {$$=add_node(TYPE_DEFAULT); 
                                    set_value($$,$2,strlen($2)+1);}
          | DEFAULT TRUE           {$$=add_node(TYPE_DEFAULT|CONST_TRUE);}
          | DEFAULT FALSE          {$$=add_node(TYPE_DEFAULT|CONST_FALSE);}
@@ -139,7 +158,7 @@ default :  DEFAULT num_identifier {$$=add_node(TYPE_DEFAULT);
 
 integer_def: INTEGER   {$$=add_node(TYPE_INTEGER);}
            | INTEGER'{'constant_list'}' {$$=add_node(TYPE_INTEGER|CONST_LIST);
-                                         set_down($$,$3);}
+	                                 set_down($$,$3);}
            | integer_def'('num_identifier'.''.'num_identifier')'
                                         {$$=add_node(TYPE_INTEGER|CONST_MIN_MAX);
                                          set_down($$,add_node(TYPE_SIZE)); 
@@ -187,6 +206,11 @@ bit_string_def : BIT STRING    {$$=add_node(TYPE_BIT_STRING);}
                                 set_down($$,$4);}
 ;
 
+enumerated_def : ENUMERATED'{'bit_element_list'}' 
+                               {$$=add_node(TYPE_ENUMERATED|CONST_LIST);
+                                set_down($$,$3);}
+;
+
 object_def :  OBJECT STR_IDENTIFIER {$$=add_node(TYPE_OBJECT_ID);}
 ;
 
@@ -196,6 +220,7 @@ type_assig_right: IDENTIFIER         {$$=add_node(TYPE_IDENTIFIER);
                                       set_value($$,$1,strlen($1)+1);
                                       set_down($$,$2);}
                 | integer_def        {$$=$1;}
+                | enumerated_def     {$$=$1;}
                 | boolean_def        {$$=$1;}
                 | Time            
                 | octet_string_def   {$$=$1;}
@@ -217,7 +242,7 @@ type_assig_right_tag :   type_assig_right  {$$=$1;}
 type_assig_right_tag_default : type_assig_right_tag  {$$=$1;}
                       | type_assig_right_tag default  {$$=mod_type($1,CONST_DEFAULT);
                                                        set_right($2,get_down($$));
-						        set_down($$,$2);}
+						       set_down($$,$2);}
                       | type_assig_right_tag OPTIONAL   {$$=mod_type($1,CONST_OPTION);}
 ;
  
@@ -260,17 +285,17 @@ any_def :  ANY                         {$$=add_node(TYPE_ANY);}
 type_def : IDENTIFIER "::=" type_assig_right_tag  {$$=set_name($3,$1);}
 ;
 
-constant_def :  IDENTIFIER OBJECT STR_IDENTIFIER "::=" '{' obj_constant_list '}'
-                        {$$=add_node(TYPE_OBJECT_ID);
+constant_def :  IDENTIFIER OBJECT STR_IDENTIFIER "::=" '{'obj_constant_list'}'
+                        {$$=add_node(TYPE_OBJECT_ID|CONST_ASSIGN);
                          set_name($$,$1);  
                          set_down($$,$6);}
               | IDENTIFIER IDENTIFIER "::=" '{' obj_constant_list '}'
-                        {$$=add_node(TYPE_OBJECT_ID|CONST_1_PARAM);
+                        {$$=add_node(TYPE_OBJECT_ID|CONST_ASSIGN|CONST_1_PARAM);
                          set_name($$,$1);  
                          set_value($$,$2,strlen($2)+1);
                          set_down($$,$5);}
               | IDENTIFIER INTEGER "::=" NUM
-                        {$$=add_node(TYPE_INTEGER);
+                        {$$=add_node(TYPE_INTEGER|CONST_ASSIGN);
                          set_name($$,$1);  
                          set_value($$,$4,strlen($4)+1);}
 ;
@@ -311,9 +336,18 @@ definitions:   definitions_id
                     if($7==NULL) set_right($1,$8);
                     else {set_right($7,$8);set_right($1,$7);}
                     set_down($$,$1);
-		    if(parse_mode==PARSE_MODE_CREATE){
-		      check_asn(get_name($$), CHECK_DEFAULT_TAG_TYPE);
-		      result_parse=check_asn(get_name($$), CHECK_TYPE);}}
+      		    if(parse_mode==PARSE_MODE_CREATE){
+		      set_default_tag($$);
+		      change_integer_value($$);
+		      type_set_config($$);
+		      result_parse=check_identifier($$);
+		      if(result_parse==ASN_IDENTIFIER_NOT_FOUND)
+		      	delete_structure($$);
+		      else{
+			expand_object_id($$);
+			p_tree=$$;
+		      }
+		    }}
 ;
 
 %%
@@ -328,14 +362,14 @@ const char *key_word[]={"::=","OPTIONAL","INTEGER","SIZE","OCTET","STRING"
                        ,"BOOLEAN","TRUE","FALSE","APPLICATION","ANY","DEFINED"
                        ,"SET","BY","EXPLICIT","IMPLICIT","DEFINITIONS","TAGS"
                        ,"BEGIN","END","UTCTime","GeneralizedTime","FROM"
-                       ,"IMPORTS","NULL"};
+                       ,"IMPORTS","NULL","ENUMERATED"};
 const int key_word_token[]={ASSIG,OPTIONAL,INTEGER,SIZE,OCTET,STRING
                        ,SEQUENCE,BIT,UNIVERSAL,PRIVATE,OPTIONAL
                        ,DEFAULT,CHOICE,OF,OBJECT,STR_IDENTIFIER
                        ,BOOLEAN,TRUE,FALSE,APPLICATION,ANY,DEFINED
                        ,SET,BY,EXPLICIT,IMPLICIT,DEFINITIONS,TAGS
                        ,BEGIN,END,UTCTime,GeneralizedTime,FROM
-                       ,IMPORTS,TOKEN_NULL};
+                       ,IMPORTS,TOKEN_NULL,ENUMERATED};
 
 /*************************************************************/
 /*  Function: yylex                                          */
@@ -353,7 +387,21 @@ yylex()
     while((c=fgetc(file_asn1))==' ' || c=='\t' || c=='\n');
     if(c==EOF) return 0;
     if(c=='(' || c==')' || c=='[' || c==']' || 
-       c=='{' || c=='}' || c==',' || c=='.') return c;
+       c=='{' || c=='}' || c==',' || c=='.' ||
+       c=='+') return c;
+    if(c=='-'){
+      if((c=fgetc(file_asn1))!='-'){
+	ungetc(c,file_asn1);
+	return '-';
+      }
+      else{
+	/* A comment finishes at the end of line */
+	counter=0;
+	while((c=fgetc(file_asn1))!=EOF && c!='\n');
+	if(c==EOF) return 0;
+	else continue; /* repeat the search */
+      }
+    }
     string[counter++]=c;
     while(!((c=fgetc(file_asn1))==EOF || c==' '|| c=='\t' || c=='\n' || 
 	     c=='(' || c==')' || c=='[' || c==']' || 
@@ -363,16 +411,6 @@ yylex()
       }
     ungetc(c,file_asn1);
     string[counter]=0;
-
-    /* Is STRING the beginning of a comment? */
-    if(!strcmp(string,"--"))
-      {
-	/* A comment finishes at the end of line */
-	counter=0;
-      while((c=fgetc(file_asn1))!=EOF && c!='\n');
-      if(c==EOF) return 0;
-      else continue; /* repeat the search */
-      }
 
     /* Is STRING a number? */
     for(k=0;k<counter;k++) 
@@ -403,9 +441,12 @@ yylex()
 /*                                                           */
 /*************************************************************/
 int 
-parser_asn1(char *file_name)
+parser_asn1(char *file_name,node_asn **pointer)
 {
   /*  yydebug=1;  */
+
+  p_tree=NULL;
+  *pointer=NULL;
   
   file_asn1=fopen(file_name,"r");
 
@@ -415,6 +456,7 @@ parser_asn1(char *file_name)
 
   parse_mode=PARSE_MODE_CHECK;
   yyparse();
+
   if(result_parse==ASN_OK){
     fclose(file_asn1);
     file_asn1=fopen(file_name,"r");
@@ -426,6 +468,8 @@ parser_asn1(char *file_name)
   fclose(file_asn1);
 
   parse_mode=PARSE_MODE_CREATE;
+
+  *pointer=p_tree;
 
   return result_parse;
 }
@@ -442,7 +486,7 @@ parser_asn1(char *file_name)
 int yyerror (char *s)
 {
   /* Sends the error description to the std_out */
-  printf("%s\n",s);
+  /*  printf("%s\n",s); */
   result_parse=ASN_SYNTAX_ERROR;
 }
 

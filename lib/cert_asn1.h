@@ -32,6 +32,7 @@
 #define TYPE_CHOICE      18
 #define TYPE_IMPORTS     19
 #define TYPE_NULL        20
+#define TYPE_ENUMERATED  21
 
 
 /***********************************************************************/
@@ -66,12 +67,7 @@
 
 #define CONST_NOT_USED    (1<<26)
 #define CONST_SET         (1<<27)
-
-
-#define CHECK_TYPE              1
-#define CHECK_NOT_USED          2
-#define CHECK_INTEGER           3
-#define CHECK_DEFAULT_TAG_TYPE  4
+#define CONST_ASSIGN      (1<<28)
 
 
 #define ASN_OK                    0
@@ -93,12 +89,12 @@
 /* that rappresent an ASN.1 DEFINITION.               */
 /******************************************************/
 typedef struct node_asn_struct{
-  struct node_asn_struct *list;  /* Pointer to the next list element */ 
   char *name;                    /* Node name */
   unsigned int type;             /* Node type */
   unsigned char *value;          /* Node value */
   struct node_asn_struct *down;  /* Pointer to the son node */
   struct node_asn_struct *right; /* Pointer to the brother node */
+  struct node_asn_struct *left;  /* Pointer to the next list element */ 
 } node_asn;
 
 
@@ -142,38 +138,44 @@ get_down(node_asn *node);
 node_asn *
 mod_type(node_asn *node,unsigned int value);
 
+void
+append_tree(node_asn *node);
+
 node_asn *
-find_node(char *name);
+find_node(node_asn *pointer,char *name);
 
 node_asn *
 find_up(node_asn *node);
 
-int 
-write_value(char *name,unsigned char *value,int len);
 
 int 
-read_value(char *name,unsigned char *value,int *len);
-
-
-int 
-check_asn(char *name,int check);
-
-int 
-expand_asn(char *name,char *root);
+parser_asn1(char *file_name,node_asn **pointer);
 
 int
-delete_tree2(node_asn *root);
+create_structure(node_asn *root,char *source_name,node_asn **pointer,
+		 char *dest_name);
+
+int
+delete_structure(node_asn *root);
 
 int 
-append_sequence_set(node_asn *node);
+write_value(node_asn *root,char *name,unsigned char *value,int len);
 
-int
-create_structure(char *dest_name,char *source_name);
+int 
+read_value(node_asn *root,char *name,unsigned char *value,int *len);
 
-int
-delete_structure(char *root_name);
-
-int parser_asn1(char *file_name);
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
 

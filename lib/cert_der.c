@@ -2,10 +2,13 @@
 /* File: gnutls_der.c                                */
 /* Description: Functions to manage DER encoding     */
 /*****************************************************/
+ 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-#include <gnutls_int.h>
-#include <cert_der.h>
-#include <cert_asn1.h>
+#include "cert_der.h"
+#include "cert_asn1.h"
 
 #define TAG_BOOLEAN          0x01
 #define TAG_INTEGER          0x02
@@ -16,6 +19,7 @@
 #define TAG_UTCTime          0x17
 #define TAG_GENERALIZEDTime  0x18
 #define TAG_OBJECT_ID        0x06
+#define TAG_ENUMERATED       0x0A
 #define TAG_NULL             0x05
 
 
@@ -294,8 +298,9 @@ objectid_der(unsigned char *str,unsigned char *der,int *der_len)
     *n_end=0;
     val=strtoul(n_start,NULL,10);
     counter++;
+
     if(counter==1) val1=val;
-    if(counter==2){
+    else if(counter==2){
       der[0]=40*val1+val;
       *der_len=1;
     }
@@ -489,6 +494,9 @@ insert_tag_der(node_asn *node,unsigned char *der,int *counter)
     case TYPE_INTEGER:
       tag_der(UNIVERSAL,TAG_INTEGER,der+*counter,&tag_len);
       break;
+    case TYPE_ENUMERATED:
+      tag_der(UNIVERSAL,TAG_ENUMERATED,der+*counter,&tag_len);
+      break;
     case TYPE_OBJECT_ID:
       tag_der(UNIVERSAL,TAG_OBJECT_ID,der+*counter,&tag_len);
       break;
@@ -514,6 +522,9 @@ insert_tag_der(node_asn *node,unsigned char *der,int *counter)
       tag_len=0;
       break;
     case TYPE_CHOICE:
+      tag_len=0;
+      break;
+    case TYPE_ANY:
       tag_len=0;
       break;
     default:
@@ -599,6 +610,9 @@ extract_tag_der(node_asn *node,unsigned char *der,int *der_len)
        break;
     case TYPE_INTEGER:
       if((class!=UNIVERSAL) || (tag!=TAG_INTEGER)) return ASN_DER_ERROR;
+       break;
+    case TYPE_ENUMERATED:
+      if((class!=UNIVERSAL) || (tag!=TAG_ENUMERATED)) return ASN_DER_ERROR;
        break;
     case TYPE_OBJECT_ID:
       if((class!=UNIVERSAL) || (tag!=TAG_OBJECT_ID)) return ASN_DER_ERROR;
@@ -808,13 +822,13 @@ ordering_set_of(unsigned char *der,node_asn *node)
 
 
 int 
-create_der(char *name,unsigned char *der,int *len)
+create_der(node_asn *root,char *name,unsigned char *der,int *len)
 {
   node_asn *node,*p,*p2,*p3;
   char temp[20];
   int counter,counter_old,len2,len3,len4,move,ris;
 
-  node=find_node(name);
+  node=find_node(root,name);
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
 
   counter=0;
@@ -840,7 +854,7 @@ create_der(char *name,unsigned char *der,int *len)
       }
       move=RIGHT;
       break;
-    case TYPE_INTEGER:
+    case TYPE_INTEGER: case TYPE_ENUMERATED:
       if((p->type&CONST_DEFAULT) && (p->value==NULL)) counter=counter_old;
       else{
 	len2=get_length_der(p->value,&len3);
@@ -914,7 +928,10 @@ create_der(char *name,unsigned char *der,int *len)
       }
       break;
     case TYPE_ANY:
-      return ASN_ERROR_TYPE_ANY;
+      len2=get_length_der(p->value,&len3);
+      memcpy(der+counter,p->value+len3,len2);
+      counter+=len2;
+      move=RIGHT;
       break;
     default:
        move=(move==UP)?RIGHT:DOWN;
@@ -943,21 +960,19 @@ create_der(char *name,unsigned char *der,int *len)
 
 
 int 
-get_der(char *name,unsigned char *der,int len)
+get_der(node_asn *root,unsigned char *der,int len)
 {
   node_asn *node,*p,*p2,*p3;
   char temp[128];
-  int counter,len2,len3,move,ris;
-  unsigned char class;
+  int counter,len2,len3,len4,move,ris;
+  unsigned char class,*temp2;
   unsigned int tag;
   long val;
 
-  node=find_node(name);
+  node=root;
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
 
   if(node->type&CONST_OPTION) return ASN_GENERIC_ERROR;
-
-  expand_asn(name,"");
 
   counter=0;
   move=DOWN;
@@ -1005,11 +1020,11 @@ get_der(char *name,unsigned char *der,int len)
 	while(p->down){
 	  ris=extract_tag_der(p->down,der+counter,&len2);
 	  if(ris==ASN_OK){
-	    while(p->down->right) delete_tree2(p->down->right);
+	    while(p->down->right) delete_structure(p->down->right);
 	    break;
 	  }
 	  else if(ris==ASN_ERROR_TYPE_ANY) return ASN_ERROR_TYPE_ANY;
-	  else delete_tree2(p->down);
+	  else delete_structure(p->down);
 	}
 	if(p->down==NULL) return ASN_DER_ERROR;
 	p=p->down;
@@ -1053,7 +1068,7 @@ get_der(char *name,unsigned char *der,int len)
 	else set_value(p,"T",1);
 	move=RIGHT;
 	break;
-      case TYPE_INTEGER:
+      case TYPE_INTEGER: case TYPE_ENUMERATED:
 	len2=get_length_der(der+counter,&len3);
 	set_value(p,der+counter,len3+len2);
 	counter+=len3+len2;
@@ -1135,10 +1150,13 @@ get_der(char *name,unsigned char *der,int len)
       case TYPE_ANY:
 	tag=get_tag_der(der+counter,&class,&len2);
 	len2+=get_length_der(der+counter+len2,&len3);
-	set_value(p,der+counter,len3+len2);
-	counter+=len3+len2;
+	length_der(len2+len3,NULL,&len4);
+	temp2=(unsigned char *)malloc(len2+len3+len4);
+	octet_der(der+counter,len2+len3,temp2,&len4);
+	set_value(p,temp2,len4);
+	free(temp2);
+	counter+=len2+len3;
 	move=RIGHT;
-	//	return ASN_ERROR_TYPE_ANY;
 	break;
       default:
 	move=(move==UP)?RIGHT:DOWN;
@@ -1159,7 +1177,7 @@ get_der(char *name,unsigned char *der,int len)
     if(move==UP) p=find_up(p);
   }
 
-  check_asn(name,CHECK_NOT_USED);
+  delete_not_used(root);
 
   return (counter==len)?ASN_OK:ASN_DER_ERROR;
 }
@@ -1167,7 +1185,7 @@ get_der(char *name,unsigned char *der,int len)
 
 
 int 
-get_start_end_der(char *name,unsigned char *der,int len,char *name_element,int *start, int *end)
+get_start_end_der(node_asn *root,unsigned char *der,int len,char *name_element,int *start, int *end)
 {
   node_asn *node,*node_to_find,*p,*p2,*p3;
   char temp[128];
@@ -1176,8 +1194,8 @@ get_start_end_der(char *name,unsigned char *der,int len,char *name_element,int *
   unsigned int tag;
   long val;
 
-  node=find_node(name);
-  node_to_find=find_node(name_element);
+  node=root;
+  node_to_find=find_node(root,name_element);
 
   if(node_to_find==NULL) return ASN_ELEMENT_NOT_FOUND;
 
@@ -1190,8 +1208,6 @@ get_start_end_der(char *name,unsigned char *der,int len,char *name_element,int *
   if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
 
   if(node->type&CONST_OPTION) return ASN_GENERIC_ERROR;
-
-  expand_asn(name,"");
 
   counter=0;
   move=DOWN;
@@ -1265,7 +1281,7 @@ get_start_end_der(char *name,unsigned char *der,int len,char *name_element,int *
 	counter++;
 	move=RIGHT;
 	break;
-      case TYPE_INTEGER:
+      case TYPE_INTEGER: case TYPE_ENUMERATED:
 	len2=get_length_der(der+counter,&len3);
 	counter+=len3+len2;
 	move=RIGHT;
