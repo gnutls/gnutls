@@ -1,4 +1,4 @@
-Version 1.1.17
+Version 1.1.17 (18/08/2004)
 - Bug fix of padding string in RSA PKCS#1 v1.5 type 2 encryption,
   reported by Robey Pointer <robey@danger.com>.
 - Generic crypto interface for secret key ciphers, hashes and randomness added.
