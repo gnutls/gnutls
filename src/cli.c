@@ -72,6 +72,7 @@ static int x509ctype;
 int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 int kx_priority[16] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
+  /* Do not use anonymous authentication, unless you know what that means */ 
    GNUTLS_KX_ANON_DH, 0
 };
 int cipher_priority[16] =
