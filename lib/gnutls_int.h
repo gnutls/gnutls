@@ -14,6 +14,11 @@
 #define MAX24 16777215
 #define MAX16 65535
 
+/* the maximum size of encrypted packets */
+#define MAX_ENC_LEN 16384
+#define HEADER_SIZE 5
+#define MAX_RECV_SIZE 18432+HEADER_SIZE 	/* 2^14+2048+HEADER_SIZE */
+
 /* for big numbers support */ /* FIXME */
 #include <gcrypt.h>
 
