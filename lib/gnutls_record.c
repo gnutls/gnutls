@@ -282,6 +282,9 @@ ssize_t _gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
  * (there were cases were the old function could mess everything up).
  * --nmav
  *
+ * This function may accept a NULL pointer for data, and 0 for size, if
+ * and only if the previous send was interrupted for some reason.
+ *
  */
 ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
 {
@@ -295,7 +298,12 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	int erecord_size = 0;
 	opaque* erecord = NULL;
 
-	if (sizeofdata == 0 || _data==NULL) {
+	/* Do not allow null pointer if the send buffer is empty.
+	 * If the previous send was interrupted then a null pointer is
+	 * ok, and means to resume.
+	 */
+	if (state->gnutls_internals.record_send_buffer.size == 0 &&
+	  (sizeofdata == 0 || _data==NULL)) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
@@ -875,6 +883,9 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
   * GNUTLS_E_AGAIN is returned you must call this function again, with the 
   * same parameters. Otherwise the write operation will be 
   * corrupted and the connection will be terminated.
+  *
+  * This function may accept a NULL pointer for data, and 0 for size, if
+  * and only if the previous send was interrupted for some reason.
   *
   * Returns the number of bytes sent, or a negative error code.
   *

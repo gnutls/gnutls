@@ -568,7 +568,7 @@ ssize_t _gnutls_io_write_buffered( GNUTLS_STATE state, const void *iptr, size_t 
 					gnutls_assert();
 					return retval;
 				}
-				
+
 				_gnutls_write_log( "WRITE: Interrupted. Stored %d bytes to buffer. Already sent %d bytes.\n", left, n-left);
 
 				retval = RET(errno);
