@@ -112,7 +112,8 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	int len = datalen;
 	int err;
 	uint16 challenge;
-
+	opaque session_id[32];
+	
 	/* we only want to get here once - only in client hello */
 	state->gnutls_internals.v2_hello = 0;
 
@@ -147,7 +148,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	session_id_len = READuint16( &data[pos]);
 	pos += 2;
 
-	if (session_id_len > 32) {
+	if (session_id_len > 32) { 
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
@@ -157,11 +158,10 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	challenge = READuint16( &data[pos]);
 	pos += 2;
 
-	if (challenge < 10) { /* wow that's not random */
+	if ( challenge < 15) {
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
-
 
 	/* find an appropriate cipher suite */
 
@@ -204,11 +204,12 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* read random new values -skip session id for now */
 	DECR_LEN(len, session_id_len); /* skip session id for now */
+	memcpy( session_id, &data[pos], session_id_len);
 	pos+=session_id_len;
 	
 	DECR_LEN(len, challenge);
 	memset( random, 0, 32);
-	memcpy( random, &data[challenge > 32 ? (pos+challenge-32) : pos], challenge < 32 ? challenge : 32);
+	memcpy( random, &data[ (challenge > 32)?(pos+challenge-32):pos], (challenge<32)?challenge:32);
 
 	/* read the last 32 bytes */
 	_gnutls_set_client_random( state, random);
@@ -223,14 +224,8 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* RESUME SESSION */
 
-	len += session_id_len; /* back to session_id */
-	pos -= session_id_len;
-	
-
 	DECR_LEN(len, session_id_len);
-	ret = _gnutls_server_restore_session(state, &data[pos], session_id_len);
-
-	pos += session_id_len;
+	ret = _gnutls_server_restore_session(state, session_id, session_id_len);
 
 	if (ret == 0) {		/* resumed! */
 		/* get the new random values */

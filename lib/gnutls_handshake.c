@@ -619,7 +619,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 	} else { /* v2 hello */
 		length32 = state->gnutls_internals.v2_hello - 1; /* we've read the first byte */
 		
-		handshake_headers = 0; /* no headers in v2 */
+		handshake_headers = SSL2_HEADERS; /* we've already read one byte */
 
 #ifdef HANDSHAKE_DEBUG
 		fprintf(stderr, "Handshake: %s(v2) was received [%ld bytes]\n",
@@ -659,7 +659,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 
 	/* here we buffer the handshake messages - needed at Finished message */
 	
-	if (recv_type!=GNUTLS_HELLO_REQUEST)
+	if (recv_type!=GNUTLS_HELLO_REQUEST) 
 		gnutls_insertHashDataBuffer(state, dataptr, length32 + handshake_headers);
 
 	switch (recv_type) {

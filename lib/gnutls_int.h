@@ -25,11 +25,11 @@
 /*
 #define READ_DEBUG
 #define WRITE_DEBUG
+#define HARD_DEBUG
 #define BUFFERS_DEBUG
 #define HANDSHAKE_DEBUG
-#define HARD_DEBUG
-*/#define DEBUG
-
+#define DEBUG
+*/
 
 #define LIST ...
 

@@ -63,7 +63,7 @@ void PARSE() {
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 100
 
-#define RENEGOTIATE
+#undef RENEGOTIATE
 
 int main()
 {

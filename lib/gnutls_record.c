@@ -402,6 +402,10 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescri
 	memmove(&data[0], &level, 1);
 	memmove(&data[1], &desc, 1);
 
+#ifdef DEBUG
+	fprintf(stderr, "Record: Sending Alert[%d|%d] - %s - was received\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
+#endif
+
 	return gnutls_send_int(cd, state, GNUTLS_ALERT, data, 2, 0);
 }
 

@@ -2,3 +2,7 @@
 * OpenPGP certificate support (through libgcrypt)
 * Add Kerberos support (who wants that?)
 * Audit the code (volunteers?)
+* Fix renegotiate
+* Add certificate verification in order for clients to work
+* Optimize X509PKI_SERVER_CREDENTIALS so that there should be
+  only one parse of the der structures.
