@@ -21,8 +21,8 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"
-#include "cert_asn1.h"
-#include "cert_der.h"
+#include "x509_asn1.h"
+#include "x509_der.h"
 #include "gnutls_global.h"
 #include "gnutls_num.h"		/* GMAX */
 #include <gnutls_sig.h>

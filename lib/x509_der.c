@@ -20,14 +20,14 @@
 
 
 /*****************************************************/
-/* File: cert_der.c                                  */
+/* File: x509_der.c                                  */
 /* Description: Functions to manage DER encoding     */
 /*****************************************************/
  
 #include <gnutls_int.h> /* for memory debugging - and types */
 
-#include "cert_der.h"
-#include "cert_asn1.h"
+#include "x509_der.h"
+#include "x509_asn1.h"
 
 
 #define TAG_BOOLEAN          0x01

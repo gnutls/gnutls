@@ -20,11 +20,11 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <cert_b64.h>
+#include <x509_b64.h>
 #include <auth_x509.h>
 #include <gnutls_cert.h>
-#include <cert_asn1.h>
-#include <cert_der.h>
+#include <x509_asn1.h>
+#include <x509_der.h>
 #include <gnutls_datum.h>
 #include <gnutls_gcry.h>
 #include <gnutls_privkey.h>

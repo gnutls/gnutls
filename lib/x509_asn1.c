@@ -20,15 +20,15 @@
 
 
 /*****************************************************/
-/* File: cert_asn1.c                                 */
+/* File: x509_asn1.c                                 */
 /* Description: Functions to manage ASN.1 DEFINITIONS*/
 /*****************************************************/
 
 
 #include <gnutls_int.h> 
 
-#include "cert_asn1.h"
-#include "cert_der.h"
+#include "x509_asn1.h"
+#include "x509_der.h"
 
 
 #define UP     1
@@ -407,7 +407,7 @@ _asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name)
 
   if(file==NULL) return ASN_FILE_NOT_FOUND;
 
- fprintf(file,"\n#include \"cert_asn1.h\"\n\n");
+ fprintf(file,"\n#include \"x509_asn1.h\"\n\n");
  fprintf(file,"const static_asn %s[]={\n",structure_name);
 
  p=pointer;

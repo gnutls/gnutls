@@ -7,7 +7,7 @@
 #ifndef _GNUTLS_DER_H
 #define _GNUTLS_DER_H
 
-#include "cert_asn1.h"
+#include "x509_asn1.h"
 
 #define UNIVERSAL        0x00
 #define APPLICATION      0x40

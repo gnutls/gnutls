@@ -21,7 +21,7 @@
 /* Functions for operating in an SRP passwd file are included here */
 
 #include "gnutls_int.h"
-#include "cert_b64.h"
+#include "x509_b64.h"
 #include "gnutls_errors.h"
 #include "auth_srp_passwd.h"
 #include "auth_srp.h"

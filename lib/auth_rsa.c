@@ -23,15 +23,15 @@
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
-#include "cert_asn1.h"
-#include "cert_der.h"
+#include "x509_asn1.h"
+#include "x509_der.h"
 #include "gnutls_datum.h"
 #include "auth_x509.h"
 #include <gnutls_random.h>
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_global.h>
-#include <cert_verify.h>
+#include <x509_verify.h>
 #include "debug.h"
 
 int gen_rsa_certificate(GNUTLS_KEY, opaque **);

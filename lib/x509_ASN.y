@@ -20,7 +20,7 @@
 
 
 /*****************************************************/
-/* File: cert_ASN.y                                  */
+/* File: x509_ASN.y                                  */
 /* Description: input file for 'bison' program.      */
 /*   The output file is a parser (in C language) for */
 /*   ASN.1 syntax                                    */
@@ -29,7 +29,7 @@
 
 %{
 #include <gnutls_int.h>
-#include "cert_asn1.h"
+#include "x509_asn1.h"
 
 FILE *file_asn1;  /* Pointer to file to parse */
 extern int parse_mode;

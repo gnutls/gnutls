@@ -20,7 +20,7 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <cert_asn1.h>
+#include <x509_asn1.h>
 #ifdef HAVE_SIGNAL_H
 # include <signal.h>
 #endif

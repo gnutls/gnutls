@@ -1,5 +1,5 @@
 
-#include "cert_asn1.h"
+#include "x509_asn1.h"
 
 const static_asn pkcs1_asn1_tab[]={
   {"PKCS-1",536872976,0},
