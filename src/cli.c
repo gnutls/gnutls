@@ -556,7 +556,9 @@ void gaa_parser(int argc, char **argv)
 	    cipher_priority[j++] = GNUTLS_CIPHER_TWOFISH_128_CBC;
 	 if (strncasecmp(info.ciphers[i], "3DE", 3) == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
-	 if (strncasecmp(info.ciphers[i], "ARC", 3) == 0)
+	 if (strcasecmp(info.ciphers[i], "ARCFOUR-EXPORT") == 0)
+	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_EXPORT;
+	 if (strcasecmp(info.ciphers[i], "ARCFOUR") == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR;
 	 if (strncasecmp(info.ciphers[i], "NUL", 3) == 0)
 	    cipher_priority[j++] = GNUTLS_CIPHER_NULL;
