@@ -1,3 +1,8 @@
+Version 0.5.?
+- Corrected the m4 macros which used <gnutls.h> instead of
+  <gnutls/gnutls.h>
+- Documentation fixes
+
 Version 0.5.0 (6/07/2002)
 - Added X.509 certificate tests in tests/ directory
 - Removed stubs for SRP and Anonymous authentication. They served
