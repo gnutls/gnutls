@@ -190,7 +190,7 @@ int gnutls_fingerprint_calc(DigestAlgorithm algo, gnutls_datum data, char* resul
 	GNUTLS_HASH_HANDLE td;
 	int hash_len = gnutls_hash_get_algo_len(algo);
 	
-	if (hash_len > *result_size) {
+	if (hash_len > *result_size || hash_len < 0) {
 		*result_size = hash_len;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
