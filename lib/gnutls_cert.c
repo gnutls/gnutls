@@ -295,7 +295,7 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
   * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
   * @session: is a gnutls session
   *
-  * This function will try to verify the peer's certificate and return it's status (TRUSTED, INVALID etc.). 
+  * This function will try to verify the peer's certificate and return its status (TRUSTED, INVALID etc.). 
   * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
@@ -353,7 +353,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
   * @session: is a gnutls session
   *
-  * This function will try to verify the peer's certificate and return it's status (trusted, invalid etc.).
+  * This function will try to verify the peer's certificate and return its status (trusted, invalid etc.).
   * However you must also check the peer's name in order to check if the verified certificate belongs to the
   * actual peer.
   *

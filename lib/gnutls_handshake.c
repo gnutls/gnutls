@@ -1006,9 +1006,6 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 		}
 	}
 
-
-	ret = GNUTLS_E_INTERNAL_ERROR;
-
 	if (data != NULL && length32 > 0)
 		*data = dataptr;
 
@@ -1035,6 +1032,7 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 		/* dataptr is freed because the caller does not
 		 * need it */
 		gnutls_free(dataptr);
+		if (data!=NULL) *data = NULL;
 		break;
 	case GNUTLS_SERVER_HELLO_DONE:
 		if (length32==0) ret = 0;
@@ -1417,11 +1415,11 @@ static int _gnutls_copy_comp_methods(gnutls_session session,
  */
 static int _gnutls_send_client_hello(gnutls_session session, int again)
 {
-	opaque *data;
+	opaque *data = NULL;
 	opaque *extdata = NULL;
 	int extdatalen;
 	int pos = 0;
-	int datalen, ret = 0;
+	int datalen = 0, ret = 0;
 	opaque random[TLS_RANDOM_SIZE];
 	gnutls_protocol_version hver;
 
@@ -1431,13 +1429,9 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 	    session->internals.resumed_security_parameters.
 	    session_id_size;
 
-	if (SessionID == NULL || session_id_len == 0) {
-		session_id_len = 0;
-		SessionID = NULL;
-	}
+	if (SessionID == NULL) session_id_len = 0;
+	else if (session_id_len == 0) SessionID = NULL;
 
-	data = NULL;
-	datalen = 0;
 	if (again == 0) {
 
 		datalen = 2 + (session_id_len + 1) + TLS_RANDOM_SIZE;
@@ -1576,7 +1570,6 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 				gnutls_free(extdata);
 			} else if (extdatalen < 0) {
 				gnutls_assert();
-				gnutls_free(extdata);
 				gnutls_free(data);
 				return extdatalen;
 			}
@@ -1614,7 +1607,6 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 
 		if (extdatalen < 0) {
 			gnutls_assert();
-			gnutls_free(extdata);
 			return extdatalen;
 		}
 

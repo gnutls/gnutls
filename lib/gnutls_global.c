@@ -154,20 +154,18 @@ static int _gnutls_init = 0;
   * Returns zero on success.
   *
   * Note that this function will also initialize libgcrypt, if it has not
-  * been initialized before. Thus if you want to manualy initialize libgcrypt
+  * been initialized before. Thus if you want to manually initialize libgcrypt
   * you must do it before calling this function. This is useful in cases you 
   * want to disable libgcrypt's internal lockings etc.
   *
   **/
 int gnutls_global_init( void)
 {
-	int result;
+	static int result = 0;
+	int res;
 
+	if (_gnutls_init) goto out;
 	_gnutls_init++;
-
-	if (_gnutls_init!=1) {
-		return 0;
-	}
 
 	if (gcry_control( GCRYCTL_ANY_INITIALIZATION_P) == 0) {
 		/* for gcrypt in order to be able to allocate memory */
@@ -188,7 +186,7 @@ int gnutls_global_init( void)
 	result = _gnutls_register_rc2_cipher();
 	if (result < 0) {
 		gnutls_assert();
-		return result;
+		goto out;
 	}
 
 	/* set default recv/send functions
@@ -202,18 +200,21 @@ int gnutls_global_init( void)
 	 * version.
 	 */
 	
-	result=asn1_array2tree( pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
-	if (result != ASN1_SUCCESS) {
-		return _gnutls_asn2err(result);
+	res=asn1_array2tree( pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
+	if (res != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(res);
+		goto out;
 	}
 
-	result=asn1_array2tree( gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
-	if (result != ASN1_SUCCESS) {
+	res=asn1_array2tree( gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
+	if (res != ASN1_SUCCESS) {
 		asn1_delete_structure(&_gnutls_pkix1_asn);
-		return _gnutls_asn2err(result);
+		result = _gnutls_asn2err(res);
+		goto out;
 	}
 
-	return 0;
+	out:
+	return result;
 }
 
 /**
@@ -226,9 +227,8 @@ int gnutls_global_init( void)
 
 void gnutls_global_deinit( void) {
 
-	_gnutls_init--;
-
-	if (_gnutls_init==0) {
+	if (_gnutls_init==1) {
+		_gnutls_init--;
 		asn1_delete_structure(&_gnutls_gnutls_asn);
 		asn1_delete_structure(&_gnutls_pkix1_asn);
 

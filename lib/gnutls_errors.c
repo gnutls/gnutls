@@ -158,7 +158,7 @@ static gnutls_error_entry error_algorithms[] = {
   * If a function returns a negative value you may feed that value
   * to this function to see if it is fatal. Returns 1 for a fatal 
   * error 0 otherwise. However you may want to check the
-  * error code manualy, since some non-fatal errors to the protocol
+  * error code manually, since some non-fatal errors to the protocol
   * may be fatal for you (your program).
   *
   * This is only useful if you are dealing with errors from the

@@ -193,7 +193,8 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 
 	(*session)->key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
 	if ( (*session)->key == NULL) {
-		gnutls_free( *session);
+		cleanup_session:
+		gnutls_free( *session); *session = NULL;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -206,10 +207,14 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 	gnutls_handshake_set_max_packet_length( (*session), MAX_HANDSHAKE_PACKET_SIZE);
 
 	/* Allocate a minimum size for recv_data 
-	 * This is allocated in order to avoid small messages, makeing
+	 * This is allocated in order to avoid small messages, making
 	 * the receive procedure slow.
 	 */
 	(*session)->internals.record_recv_buffer.data = gnutls_malloc(INITIAL_RECV_BUFFER_SIZE);
+	if ( (*session)->internals.record_recv_buffer.data == NULL) {
+		gnutls_free((*session)->key);
+		goto cleanup_session;
+	}
 
 	/* set the socket pointers to -1;
 	 */
@@ -534,7 +539,7 @@ void gnutls_record_set_cbc_protection(gnutls_session session, int prot)
   * are not yet defined in any RFC or even internet draft.
   *
   * Enabling the private ciphersuites when talking to other than gnutls
-  * servers and clients, may cause interoperability problems.
+  * servers and clients may cause interoperability problems.
   *
   **/
 void gnutls_handshake_set_private_extensions(gnutls_session session, int allow)

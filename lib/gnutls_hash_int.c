@@ -57,7 +57,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 		break;
 
 	default:
-		ret = GNUTLS_HASH_FAILED;
+		ret = GNUTLS_HASH_FAILED; break;
 	}
 
 	if (ret != GNUTLS_HASH_FAILED)
@@ -78,7 +78,7 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm)
 		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
 		break;
 	default:
-		ret = 0;
+		ret = 0; break;
 	}
 
 	return ret;

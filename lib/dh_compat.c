@@ -125,6 +125,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
 	prime->data = gnutls_malloc(siz);
 	if (prime->data == NULL) {
 		gnutls_free(generator->data);
+		generator->data = NULL; generator->size = 0;
 		_gnutls_mpi_release(&tmp_g);
 		_gnutls_mpi_release(&tmp_prime);
 		return GNUTLS_E_MEMORY_ERROR;

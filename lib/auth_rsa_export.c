@@ -152,7 +152,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 						 apr_pkey, &ddata,
 						 &signature)) < 0) {
 			gnutls_assert();
-			gnutls_free(*data);
+			gnutls_free(*data); *data = NULL;
 			return ret;
 		}
 	} else {
@@ -219,6 +219,7 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 
 	if (peer_cert.subject_pk_algorithm != GNUTLS_PK_RSA) {
 		gnutls_assert();
+		_gnutls_free_cert( &peer_cert);
 		return 0;
 	}
 
@@ -349,7 +350,6 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	_gnutls_free_cert( &peer_cert);
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
 	}
 
 	return ret;

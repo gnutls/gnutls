@@ -68,6 +68,8 @@ int err;
 		ret->handle = gnutls_malloc( sizeof( z_stream));
 		if (ret->handle==NULL) {
 			gnutls_assert();
+			cleanup_ret:
+			gnutls_free(ret);
 			return NULL;
 		}
 		
@@ -87,8 +89,7 @@ int err;
 		if (err!=Z_OK) {
 			gnutls_assert();
 			gnutls_free( ret->handle);
-			gnutls_free( ret);
-			return NULL;
+			goto cleanup_ret;
 		}
 		break;
 	    }
@@ -101,7 +102,7 @@ int err;
   		  
  		   if (ret->handle==NULL) {
 			gnutls_assert();
-			return NULL;
+			goto cleanup_ret;
 		   }
 		}
 		
@@ -164,7 +165,7 @@ int err;
 
 			if (err!=LZO_E_OK) {
 				gnutls_assert();
-				gnutls_free( *compressed);
+				gnutls_free( *compressed); *compressed = NULL;
 				return GNUTLS_E_COMPRESSION_FAILED;
 			}
 
@@ -194,7 +195,7 @@ int err;
 
 			if (err!=Z_OK || zhandle->avail_in != 0) {
 				gnutls_assert();
-				gnutls_free( *compressed);
+				gnutls_free( *compressed); *compressed = NULL;
 				return GNUTLS_E_COMPRESSION_FAILED;
 			}
 
@@ -212,7 +213,7 @@ int err;
 #endif
 
 	if ((size_t)compressed_size > max_comp_size) {
-		gnutls_free(*compressed);
+		gnutls_free(*compressed); *compressed = NULL;
 		return GNUTLS_E_COMPRESSION_FAILED;
 	}
 
@@ -263,7 +264,7 @@ int cur_pos;
 
 		 	if (err!=LZO_E_OK) {
 		 		gnutls_assert();
-		 		gnutls_free( *plain);
+		 		gnutls_free( *plain); *plain = NULL;
 		 		return GNUTLS_E_DECOMPRESSION_FAILED;
 		 	}
 
@@ -307,7 +308,7 @@ int cur_pos;
 
 		 	if (err!=Z_OK) {
 		 		gnutls_assert();
-		 		gnutls_free( *plain);
+		 		gnutls_free( *plain); *plain = NULL;
 		 		return GNUTLS_E_DECOMPRESSION_FAILED;
 		 	}
 
@@ -322,7 +323,7 @@ int cur_pos;
 
 	if ((size_t)plain_size > max_record_size) {
 		gnutls_assert();
-		gnutls_free( *plain);
+		gnutls_free( *plain); *plain = NULL;
 		return GNUTLS_E_DECOMPRESSION_FAILED;
 	}
 

@@ -498,7 +498,7 @@ int gnutls_dh_params_export_raw(gnutls_dh_params params,
 
 	prime->data = gnutls_malloc(size);
 	if (prime->data == NULL) {
-		gnutls_free(generator->data);
+		gnutls_free(generator->data); generator->data = NULL;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	prime->size = size;

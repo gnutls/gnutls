@@ -459,7 +459,7 @@ int ret, issuer_params_size, i;
   * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
   * @verify: will hold the certificate verification output.
   *
-  * This function will try to verify the given certificate list and return it's status (TRUSTED, REVOKED etc.). 
+  * This function will try to verify the given certificate list and return its status (TRUSTED, REVOKED etc.). 
   * The return value (status) should be one or more of the gnutls_certificate_status 
   * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
   * by this function, you should check them using the appropriate functions.
@@ -511,7 +511,7 @@ int gnutls_x509_crt_list_verify( gnutls_x509_crt* cert_list, int cert_list_lengt
   * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
   * @verify: will hold the certificate verification output.
   *
-  * This function will try to verify the given certificate and return it's status. 
+  * This function will try to verify the given certificate and return its status. 
   * See gnutls_x509_crt_list_verify() for a detailed description of
   * return values.
   *
@@ -577,7 +577,7 @@ int gnutls_x509_crl_check_issuer( gnutls_x509_crl cert,
   * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
   * @verify: will hold the crl verification output.
   *
-  * This function will try to verify the given crl and return it's status. 
+  * This function will try to verify the given crl and return its status.
   * See gnutls_x509_crt_list_verify() for a detailed description of
   * return values.
   *

@@ -213,7 +213,7 @@ int (*ext_func_send)( gnutls_session, opaque*, int);
 			_gnutls_extension_list_add( session, next);
 		} else if (size < 0) {
 			gnutls_assert();
-			gnutls_free(*data);
+			gnutls_free(*data); *data = NULL;
 			return size;
 		}
 		

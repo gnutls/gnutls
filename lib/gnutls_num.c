@@ -27,9 +27,6 @@
 #include <gnutls_num.h>
 #include <gnutls_errors.h>
 
-/* This function will set the uint64 x to zero 
- */
-
 /* This function will add one to uint64 x.
  * Returns 0 on success, or -1 if the uint64 max limit
  * has been reached.

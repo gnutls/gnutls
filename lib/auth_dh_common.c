@@ -127,6 +127,7 @@ int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
 	_gnutls_mpi_release(&x);
 	if (session->key->KEY == NULL) {
 		gnutls_assert();
+		gnutls_free(*data); *data = NULL;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -134,6 +135,8 @@ int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
 		session->key->client_Y));
 	if (ret<0) {
 		gnutls_assert();
+		failed:
+		gnutls_free(*data); *data = NULL;
 		return ret;
 	}
 
@@ -147,7 +150,7 @@ int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
 	_gnutls_mpi_release(&session->key->KEY);
 
 	if (ret < 0) {
-		return ret;
+		goto failed;
 	}
 
 	return n_X + 2;

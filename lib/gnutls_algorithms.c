@@ -85,7 +85,7 @@ static const gnutls_pk_map pk_mappings[] = {
 
 #define GNUTLS_PK_MAP_LOOP(b) \
         const gnutls_pk_map *p; \
-                for(p = pk_mappings; p->kx_algorithm != 0; p++) { b ; }
+                for(p = pk_mappings; p->kx_algorithm != 0; p++) { b }
 
 #define GNUTLS_PK_MAP_ALG_LOOP(a) \
                         GNUTLS_PK_MAP_LOOP( if(p->kx_algorithm == kx_algorithm) { a; break; })
@@ -1183,25 +1183,22 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 	GNUTLS_CipherSuite* ciphers;
 	gnutls_protocol_version version;
 
-	*_ciphers = NULL;
-
 	if (count == 0) {
 		return 0;
 	}
-
-	version = gnutls_protocol_get_version( session);
 
 	tmp_ciphers = gnutls_alloca(count * sizeof(GNUTLS_CipherSuite));
 	if ( tmp_ciphers==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
 	ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
-
 	if ( ciphers==NULL) {
 		gnutls_afree( tmp_ciphers);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
+	version = gnutls_protocol_get_version( session);
+
 	for (i = 0; i < count; i++) {
 		memcpy( &tmp_ciphers[i], &cs_algorithms[i].id, sizeof( GNUTLS_CipherSuite));
 	}
@@ -1252,12 +1249,7 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 		}
 	}
 #endif
-	if (ret_count == 0) {
-		gnutls_free(ciphers);
-		ciphers = NULL;
-	}
 
-	*_ciphers = ciphers;
 	gnutls_afree(tmp_ciphers);
 
 	/* This function can no longer return 0 cipher suites.
@@ -1265,9 +1257,10 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 	 */
 	if (ret_count == 0) {
 		gnutls_assert();
-		gnutls_free( ciphers);
+		gnutls_free(ciphers);
 		return GNUTLS_E_NO_CIPHER_SUITES;
 	}
+	*_ciphers = ciphers;
 	return ret_count;
 }
 
@@ -1282,15 +1275,14 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 int
 _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 {
-	unsigned int i, j=0;
-	int tmp;
+	unsigned int i, j;
 
 	*comp = gnutls_malloc( sizeof(uint8) * SUPPORTED_COMPRESSION_METHODS);
 	if (*comp == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	for (i = 0; i < SUPPORTED_COMPRESSION_METHODS; i++) {
-		tmp = _gnutls_compression_get_num(session->internals.
+	for (i = j = 0; i < SUPPORTED_COMPRESSION_METHODS; i++) {
+		int tmp = _gnutls_compression_get_num(session->internals.
 						  compression_method_priority.
 						  priority[i]);
 
@@ -1309,7 +1301,7 @@ _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 
 	if (j==0) {
 		gnutls_assert();
-		gnutls_free( *comp);
+		gnutls_free( *comp); *comp = NULL;
 		return GNUTLS_E_NO_COMPRESSION_ALGORITHMS;
 	}
 	return j;
@@ -1319,7 +1311,7 @@ _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
   * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
   * @type: is a certificate type
   *
-  * Returns a string that contains the name 
+  * Returns a string (or NULL) that contains the name
   * of the specified certificate type.
   **/
 const char *gnutls_certificate_type_get_name( gnutls_certificate_type type)
@@ -1339,7 +1331,7 @@ gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm)
 {
 	gnutls_pk_algorithm ret = -1;
 
-	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm);
+	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm)
 	return ret;
 }
 
@@ -1351,7 +1343,7 @@ gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm)
 enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm kx_algorithm)
 {
 	int ret = CIPHER_IGN;
-	GNUTLS_PK_MAP_ALG_LOOP(ret = p->encipher_type);
+	GNUTLS_PK_MAP_ALG_LOOP(ret = p->encipher_type)
 	return ret;
 
 }

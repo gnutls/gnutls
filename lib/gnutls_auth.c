@@ -208,7 +208,7 @@ void* _gnutls_get_auth_info( gnutls_session session) {
   * _gnutls_free_auth_info - Frees the auth info structure
   * @session: is a &gnutls_session structure.
   *
-  * this function frees the auth info structure and sets it to
+  * This function frees the auth info structure and sets it to
   * null. It must be called since some structures contain malloced
   * elements.
   -*/

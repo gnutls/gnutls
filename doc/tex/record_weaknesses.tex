@@ -3,10 +3,10 @@
 
 Some weaknesses that may affect the security of the Record layer have been
 found in \tlsI{} protocol. These weaknesses can be exploited by active attackers,
-and exploit the facts that \tls{} 
+and exploit the facts that
 \begin{enumerate}
-\item has separate alerts for ``decryption\_failed'' and ``bad\_record\_mac''
-\item the decryption failure reason can be detected by timing the responce time
+\item \tls{} has separate alerts for ``decryption\_failed'' and ``bad\_record\_mac''
+\item the decryption failure reason can be detected by timing the response time
 \item the IV for CBC encrypted packets is the last block of the previous encrypted packet
 \end{enumerate}
 

@@ -501,7 +501,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
   * @CRL_list: not used
   * @CRL_list_length: not used
   *
-  * This function will try to verify the given certificate list and return it's status (TRUSTED, EXPIRED etc.). 
+  * This function will try to verify the given certificate list and return its status (TRUSTED, EXPIRED etc.). 
   * The return value (status) should be one or more of the gnutls_certificate_status 
   * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
   * by this function, you should check them using the appropriate functions.

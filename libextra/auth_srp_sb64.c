@@ -25,7 +25,7 @@
 #ifdef ENABLE_SRP
 
 /* this a modified base64 for srp !!! 
- * It seems that everybody makes it's own base64 convertion.
+ * It seems that everybody makes an own base64 conversion.
  */
 static const uint8 b64table[64] =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./";
@@ -248,7 +248,7 @@ int _gnutls_sbase64_decode(uint8 * data, size_t idata_size, uint8 ** result)
 		
 		tmp = decode( tmpres, datrev);
 		if (tmp < 0) {
-			gnutls_free( (*result));
+			gnutls_free( (*result)); *result = NULL;
 			return tmp;
 		}
 
@@ -261,7 +261,7 @@ int _gnutls_sbase64_decode(uint8 * data, size_t idata_size, uint8 ** result)
 	for (i = left, j = tmp; i < idata_size; i += 4) {
 		tmp = decode(tmpres, &data[i]);
 		if (tmp < 0) {
-			gnutls_free( (*result));
+			gnutls_free( (*result)); *result = NULL;
 			return tmp;
 		}
 		memcpy(&(*result)[j], tmpres, tmp);

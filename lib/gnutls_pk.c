@@ -84,11 +84,13 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		/* using public key */
 		if (params_len < RSA_PUBLIC_PARAMS) {
 			gnutls_assert();
+			gnutls_free(edata);
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		
 		if ( (ret=_gnutls_get_random(ps, psize, GNUTLS_STRONG_RANDOM)) < 0) {
 			gnutls_assert();
+			gnutls_free(edata);
 			return ret;
 		}
 		for (i = 0; i < psize; i++) {
@@ -99,6 +101,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			 */
 			if ( (ret=_gnutls_get_random( rnd, 3, GNUTLS_STRONG_RANDOM)) < 0) {
 				gnutls_assert();
+				gnutls_free(edata);
 				return ret;
 			}
 			/* use non zero values for 
@@ -123,6 +126,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 
 		if (params_len < RSA_PRIVATE_PARAMS) {
 			gnutls_assert();
+			gnutls_free(edata);
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		
@@ -131,6 +135,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		break;
 	default:
 		gnutls_assert();
+		gnutls_free(edata);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -282,6 +287,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 		break;
 	default:
 		gnutls_assert();
+		gnutls_free(edata);
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	i++;
@@ -409,7 +415,7 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
 	}
 
 	ret = _gnutls_pk_sign(GCRY_PK_DSA, rs, mdata, params, params_len);
-	/* res now holds r,s */
+	/* rs[0], rs[1] now hold r,s */
 	_gnutls_mpi_release(&mdata);
 
 	if (ret < 0) {

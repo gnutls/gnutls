@@ -62,7 +62,7 @@
   * _gnutls_x509_cert_verify_peers - This function returns the peer's certificate status
   * @session: is a gnutls session
   *
-  * This function will try to verify the peer's certificate and return it's status (TRUSTED, REVOKED etc.). 
+  * This function will try to verify the peer's certificate and return its status (TRUSTED, REVOKED etc.). 
   * The return value (status) should be one of the gnutls_certificate_status enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.

@@ -4,7 +4,7 @@
 # include "gnutls_auth.h"
 # include "x509/x509.h"
 
-/* This structure may be complex but, it's the only way to
+/* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
  */
 typedef struct {

@@ -1213,7 +1213,7 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session,
 	if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
 		session->internals.ignore_rdn_sequence == 0) {
 		_gnutls_write_datum16(pdata, cred->x509_rdn_sequence);
-		pdata += cred->x509_rdn_sequence.size + 2;
+		/* pdata += cred->x509_rdn_sequence.size + 2; */
 	}
 
 	return size;
@@ -1333,10 +1333,9 @@ static int _gnutls_server_find_cert_list_index(gnutls_session session,
 					       requested_algo)
 {
 	uint i, j;
-	int index = -1;
+	int index;
 	const gnutls_certificate_credentials cred;
 	int my_certs_length;
-	int *ij_map = NULL;
 
 	cred =
 	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -1365,17 +1364,19 @@ static int _gnutls_server_find_cert_list_index(gnutls_session session,
 	if (session->internals.server_cert_callback != NULL && cred->ncerts > 0) {	
 		/* use the callback to get certificate 
 		 */
-		gnutls_datum *my_certs = NULL;
+		gnutls_datum *my_certs;
+		int *ij_map;
 
-		my_certs =
-		    gnutls_malloc(cred->ncerts * sizeof(gnutls_datum));
-		if (my_certs == NULL)
-			goto clear;
 		my_certs_length = cred->ncerts;
+		my_certs =
+		    gnutls_malloc(my_certs_length * sizeof(gnutls_datum));
+		if (my_certs == NULL)
+			goto out;
 
 		/* put our certificate's issuer and dn into cdn, idn
 		 */
-		ij_map = gnutls_malloc(sizeof(int) * cred->ncerts);
+		ij_map = gnutls_malloc(my_certs_length * sizeof(int));
+		if (ij_map == NULL) goto cleanup_certs;
 
 		j = 0;
 		for (i = 0; i < cred->ncerts; i++) {
@@ -1405,11 +1406,13 @@ static int _gnutls_server_find_cert_list_index(gnutls_session session,
 		if (index != -1)
 			index = ij_map[index];
 
-	      clear:
-		gnutls_free(my_certs);
 		gnutls_free(ij_map);
+		cleanup_certs:
+		gnutls_free(my_certs);
+
 	}
 
+	out:
 	/* store the index for future use, in the handshake.
 	 * (This will allow not calling this callback again.)
 	 */

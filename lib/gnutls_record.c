@@ -479,7 +479,7 @@ static int _gnutls_check_recv_type( ContentType recv_type) {
  */
 static int _gnutls_check_buffers( gnutls_session session, ContentType type, opaque* data, int sizeofdata) {
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && _gnutls_record_buffer_get_size(type, session) > 0) {
-		int ret = 0, ret2=0;
+		int ret, ret2;
 		ret = _gnutls_record_buffer_get(type, session, data, sizeofdata);
 		if (ret < 0) {
 			gnutls_assert();

@@ -30,8 +30,9 @@ typedef struct {
 } error_name;
 
 
-static int compar( const error_name* n1, const error_name* n2)
-{
+static int compar( const void* _n1, const void* _n2)
+{ const error_name* n1 = (const error_name*) _n1,
+	* n2 = (const error_name*) _n2;
 	return strcmp( n1->name, n2->name);
 }
 

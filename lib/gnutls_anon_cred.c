@@ -19,9 +19,9 @@
  *
  */
 
-#ifdef ENABLE_ANON
-
 #include "gnutls_int.h"
+
+#ifdef ENABLE_ANON
 
 #include "gnutls_errors.h"
 #include "auth_anon.h"
