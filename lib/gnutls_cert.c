@@ -182,7 +182,7 @@ static int read_cert_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *cert, int c
 		tmp.size = siz2;
 
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&res->
+		     _gnutls_x509_cert2gnutls_cert(&res->
 					     cert_list[res->ncerts][i - 1],
 					     tmp)) < 0) {
 			gnutls_free(b64);
@@ -253,7 +253,7 @@ static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_si
 		tmp.size = siz2;
 
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&res->ca_list[i - 1],
+		     _gnutls_x509_cert2gnutls_cert(&res->ca_list[i - 1],
 					     tmp)) < 0) {
 			gnutls_assert();
 			gnutls_free(b64);
@@ -1158,7 +1158,7 @@ int len, result;
  * important thing on this function is that it extracts the 
  * certificate's (public key) parameters.
  */
-int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
+int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 {
 	int result;
 	node_asn *c2;
@@ -1168,6 +1168,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	memset(gCert, 0, sizeof(gnutls_cert));
 
 	gCert->valid = 1;
+	gCert->cert_type = GNUTLS_CRT_X509;
 
 	if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
 		gnutls_assert();

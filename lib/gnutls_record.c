@@ -160,6 +160,9 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	(*state)->security_parameters.max_record_size = DEFAULT_MAX_RECORD_SIZE;
 	(*state)->gnutls_internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
 
+	/* by default no selected certificate */
+	(*state)->gnutls_internals.selected_cert_index = -1;
+	
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
 	 */

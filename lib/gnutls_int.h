@@ -179,6 +179,10 @@ typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS,
 } KXAlgorithm;
 #define GNUTLS_KXAlgorithm KXAlgorithm
 
+typedef enum CertType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
+} CertType;
+#define GNUTLS_CertType CertType
+
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP 
 } CredType;
 #define GNUTLS_CredType CredType
@@ -476,11 +480,7 @@ typedef struct {
 	/* keeps the headers of the handshake packet 
 	 */
 	HANDSHAKE_HEADER_BUFFER		handshake_header_buffer;
-	int				client_certificate_index; /* holds
-						* the index of the client
-						* certificate to use. -1
-						* if none.
-						*/
+
 	/* this is the highest version available
 	 * to the peer. (advertized version).
 	 * This is obtained by the Handshake Client Hello 
@@ -535,6 +535,7 @@ typedef struct {
 	uint16			proposed_record_size;
 	
 	/* holds the index of the selected certificate.
+	 * -1 if none.
 	 */
 	int			selected_cert_index; 
 	

@@ -36,6 +36,7 @@
 #include <x509_verify.h>
 #include <gnutls_sig.h>
 #include <x509_extensions.h>
+#include <gnutls_pk.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (X509PKI_AUTH_INFO)
@@ -193,16 +194,33 @@ int gnutls_x509pki_extract_dn(const gnutls_datum * idn, gnutls_dn * rdn)
 	return 0;
 }
 
-
-
+/* returns 0 if the algo_to-check exists in the pk_algos list,
+ * -1 otherwise.
+ */
+inline
+static int _gnutls_check_pk_algo_in_list( PKAlgorithm* pk_algos, int pk_algos_length,
+	PKAlgorithm algo_to_check) {
+int i;
+	for (i=0;i<pk_algos_length;i++) {
+		if ( algo_to_check==pk_algos[i]) {
+			return 0;
+		}
+	}
+	return -1;
+}
 
 /* Finds the appropriate certificate depending on the cA Distinguished name
  * advertized by the server. If none matches then returns 0 and -1 as index.
  * In case of an error a negative value, is returned.
+ *
+ * 20020128: added ability to select a certificate depending on the SIGN
+ * algorithm (only in automatic mode).
  */
 static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 					       opaque * _data,
-					       int _data_size, int *ind)
+					       int _data_size, int *ind,
+					       PKAlgorithm * pk_algos,
+					       int pk_algos_length)
 {
 	int result, size;
 	int indx = -1;
@@ -211,7 +229,6 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 	opaque *data = _data;
 	int data_size = _data_size;
 	const GNUTLS_X509PKI_CREDENTIALS cred;
-
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
@@ -230,6 +247,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 								 NULL, 0);
 	}
 
+
 	if (try >= 0)
 		do {
 
@@ -239,7 +257,6 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 			data += 2;
 
 			for (i = 0; i < cred->ncerts; i++) {
-
 				for (j = 0; j < cred->cert_list_length[i];
 				     j++) {
 					if ((result =
@@ -254,8 +271,15 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 					if (odn.size != size)
 						continue;
 
-					if (memcmp(odn.data,
-						   data, size) == 0) {
+					/* If the DN matches and
+					 * the *_SIGN algorithm matches
+					 * the cert is our cert!
+					 */
+					if ( (memcmp(odn.data,
+						   data, size) == 0) &&
+					(_gnutls_check_pk_algo_in_list( 
+						pk_algos, pk_algos_length,
+						cred->cert_list[i][0].subject_pk_algorithm)==0)) {
 						indx = i;
 						break;
 					}
@@ -550,7 +574,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 		tmp.data = p;
 
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&peer_certificate_list[j],
+		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list[j],
 					     tmp)) < 0) {
 			gnutls_assert();
 			CLEAR_CERTS;
@@ -609,16 +633,21 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	return 0;
 }
 
-enum CertificateSigType { RSA_SIGN=1, DSA_SIGN=2 };
+#define MAX_SIGN_ALGOS 2
+enum CertificateSigType { RSA_SIGN=1, DSA_SIGN };
+
 /* Checks if we support the given signature algorithm 
- * (RSA or DSA). Returns 0 if true.
+ * (RSA or DSA). Returns the corresponding PKAlgorithm
+ * if true;
  */
+inline static 
 int _gnutls_check_supported_sign_algo(uint8 algo)
 {
 	switch (algo) {
 	case RSA_SIGN:
+		return GNUTLS_PK_RSA;
 	case DSA_SIGN:
-		return 0;
+		return GNUTLS_PK_DSA;
 	}
 
 	return -1;
@@ -632,9 +661,9 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 	const GNUTLS_X509PKI_CREDENTIALS cred;
 	X509PKI_AUTH_INFO info;
 	int dsize = data_size;
-	int i;
-	int found;
-	int ind;
+	int i, j, ind;
+	PKAlgorithm pk_algos[MAX_SIGN_ALGOS];
+	int pk_algos_length;
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
@@ -652,21 +681,25 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 
 	DECR_LEN(dsize, 1);
 	size = p[0];
-	p += 1;
-
+	p++;
 	/* check if the sign algorithm is supported.
 	 */
-	found = 0;
+	pk_algos_length = j = 0;
 	for (i = 0; i < size; i++, p++) {
 		DECR_LEN(dsize, 1);
-		if (_gnutls_check_supported_sign_algo(*p) == 0)
-			found = 1;
+		if ( (ret=_gnutls_check_supported_sign_algo(*p)) > 0) {
+			if (j<MAX_SIGN_ALGOS) {
+				pk_algos[j++] = ret;
+				pk_algos_length++;
+			}
+		}
 	}
 
-	if (found == 0) {
+	if (pk_algos_length == 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 	}
+	
 	DECR_LEN(dsize, 2);
 	size = READuint16(p);
 	p += 2;
@@ -681,14 +714,15 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 	DECR_LEN(dsize, size);
 	if ((ret =
 	     _gnutls_find_acceptable_client_cert(state, p, size,
-						 &ind)) < 0) {
+						 &ind, pk_algos, 
+						 pk_algos_length)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
 	/* put the index of the client certificate to use
 	 */
-	state->gnutls_internals.client_certificate_index = ind;
+	state->gnutls_internals.selected_cert_index = ind;
 
 	return 0;
 }
@@ -767,7 +801,7 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 	sig.size = size;
 
 	if ((ret =
-	     _gnutls_cert2gnutlsCert(&peer_cert,
+	     _gnutls_x509_cert2gnutls_cert(&peer_cert,
 				     info->raw_certificate_list[0])) < 0) {
 		gnutls_assert();
 		return ret;
@@ -891,7 +925,7 @@ int _gnutls_find_apr_cert(GNUTLS_STATE state, gnutls_cert ** apr_cert_list,
 			 */
 			ind =
 			    state->gnutls_internals.
-			    client_certificate_index;
+			    selected_cert_index;
 
 			if (ind < 0) {
 				*apr_cert_list = NULL;
@@ -1237,7 +1271,7 @@ int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 
 	for (i = 0; i < peer_certificate_list_size; i++) {
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&peer_certificate_list[i],
+		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list[i],
 					     info->
 					     raw_certificate_list[i])) <
 		    0) {
@@ -1322,7 +1356,7 @@ int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_l
 	 */
 	for (i = 0; i < peer_certificate_list_size; i++) {
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&peer_certificate_list[i],
+		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list[i],
 					     cert_list[i])) < 0) {
 			gnutls_assert();
 			CLEAR_CERTS_CA;
@@ -1336,7 +1370,7 @@ int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_l
 	 */
 	for (i = 0; i < ca_certificate_list_size; i++) {
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&ca_certificate_list[i],
+		     _gnutls_x509_cert2gnutls_cert(&ca_certificate_list[i],
 					     CA_list[i])) < 0) {
 			gnutls_assert();
 			CLEAR_CERTS_CA;
