@@ -124,12 +124,13 @@ _asn1_get_octet_der(const unsigned char *der,int *der_len,unsigned char *str,int
 
 
 void
-_asn1_get_time_der(const unsigned char *der,int *der_len,unsigned char *str)
+_asn1_get_time_der(const unsigned char *der,int *der_len,unsigned char *str,int str_size)
 {
   int len_len,str_len;
 
   if(str==NULL) return;
   str_len=_asn1_get_length_der(der,&len_len);
+  if (str_len < 0 || str_size < str_len) return;
   memcpy(str,der+len_len,str_len);
   str[str_len]=0;
   *der_len=str_len+len_len;
@@ -686,7 +687,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 	move=RIGHT;
       break;
       case TYPE_TIME:
-	_asn1_get_time_der(der+counter,&len2,temp);
+	_asn1_get_time_der(der+counter,&len2,temp,sizeof(temp)-1);
 	_asn1_set_value(p,temp,strlen(temp)+1);
 	counter+=len2;
 	move=RIGHT;
@@ -1158,7 +1159,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
       break;
       case TYPE_TIME:
 	if(state==FOUND){
-	  _asn1_get_time_der(der+counter,&len2,temp);
+	  _asn1_get_time_der(der+counter,&len2,temp,sizeof(temp)-1);
 	  _asn1_set_value(p,temp,strlen(temp)+1);
 	  
 	  if(p==nodeFound) state=EXIT;
