@@ -984,7 +984,7 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     if (ret >= 0)
 	fprintf(out, "Subject: %s\n", dn);
     else
-	fprintf(stderr, "get_issuer_dn: %s\n", gnutls_strerror(ret));
+	fprintf(stderr, "get_dn: %s\n", gnutls_strerror(ret));
 
     /* Issuer
      */
@@ -1951,7 +1951,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 		gnutls_x509_crt_get_dn(x509_cert_list[i - 2], name,
 				       &name_size);
 	    if (ret < 0) {
-		fprintf(stderr, "Error in get_dn: %s\n",
+		fprintf(stderr, "get_dn: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	    }
@@ -1966,7 +1966,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 					      issuer_name,
 					      &issuer_name_size);
 	    if (ret < 0) {
-		fprintf(stderr, "Error in get_dn: %s\n",
+		fprintf(stderr, "get_issuer_dn: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	    }
@@ -1980,7 +1980,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 		gnutls_x509_crt_get_dn(x509_cert_list[i - 1], name,
 				       &name_size);
 	    if (ret < 0) {
-		fprintf(stderr, "Error in get_dn: %s\n",
+		fprintf(stderr, "get_dn: %s\n",
 			gnutls_strerror(ret));
 		exit(1);
 	    }
@@ -2023,7 +2023,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 	gnutls_x509_crt_get_dn(x509_cert_list[x509_ncerts - 1], name,
 			       &name_size);
     if (ret < 0) {
-	fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
+	fprintf(stderr, "get_dn: %s\n", gnutls_strerror(ret));
 	exit(1);
     }
 
@@ -2036,7 +2036,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 	gnutls_x509_crt_get_issuer_dn(x509_cert_list[x509_ncerts - 1],
 				      issuer_name, &issuer_name_size);
     if (ret < 0) {
-	fprintf(stderr, "Error in get_dn: %s\n", gnutls_strerror(ret));
+	fprintf(stderr, "get_issuer_dn: %s\n", gnutls_strerror(ret));
 	exit(1);
     }
 

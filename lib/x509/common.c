@@ -221,12 +221,11 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
     } else { /* CHOICE */
 	str[len] = 0;
 
-        /* Note that we do not supports strings other than
+        /* Note that we do not support strings other than
          * UTF-8 (thus ASCII as well).
          * FIXME: convert the other types.
          */
         if ( strcmp( str, "printableString")!=0 && 
-            strcmp( str, "teletexString")!=0 &&
             strcmp( str, "utf8String")!=0 ) {
             gnutls_assert();
             asn1_delete_structure(&tmpasn);
