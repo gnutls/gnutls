@@ -217,12 +217,14 @@ int main(int argc, char **argv)
 /*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 
    /* SRP stuff */
-   if (gnutls_srp_allocate_client_sc(&cred) < 0) {
-      fprintf(stderr, "memory error\n");
-      exit(1);
+   if (srp_username!=NULL) {
+      if (gnutls_srp_allocate_client_sc(&cred) < 0) {
+         fprintf(stderr, "memory error\n");
+         exit(1);
+      }
+      gnutls_srp_set_client_cred(cred, srp_username, srp_passwd);
    }
-   gnutls_srp_set_client_cred(cred, srp_username, srp_passwd);
-
+   
    /* ANON stuff */
    if (gnutls_anon_allocate_client_sc(&anon_cred) < 0) {
       fprintf(stderr, "memory error\n");
@@ -262,7 +264,8 @@ int main(int argc, char **argv)
       gnutls_dh_set_prime_bits(state, 1024);
 
       gnutls_cred_set(state, GNUTLS_CRD_ANON, anon_cred);
-      gnutls_cred_set(state, GNUTLS_CRD_SRP, cred);
+      if (srp_username!=NULL)
+         gnutls_cred_set(state, GNUTLS_CRD_SRP, cred);
       gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
 
       /* send the fingerprint */
@@ -451,7 +454,8 @@ int main(int argc, char **argv)
 
    gnutls_deinit(state);
 
-   gnutls_srp_free_client_sc(cred);
+   if (srp_username!=NULL) 
+      gnutls_srp_free_client_sc(cred);
    gnutls_certificate_free_sc(xcred);
    gnutls_anon_free_client_sc(anon_cred);
 
@@ -459,6 +463,8 @@ int main(int argc, char **argv)
 
    return 0;
 }
+
+#undef DEBUG
 
 static gaainfo info;
 void gaa_parser(int argc, char **argv)
@@ -476,6 +482,7 @@ void gaa_parser(int argc, char **argv)
    record_max_size = info.record_size;
    fingerprint = info.fingerprint;
 
+#ifdef DEBUG
    if (info.x509_certfile != NULL)
       x509_certfile = info.x509_certfile;
    else
@@ -510,6 +517,16 @@ void gaa_parser(int argc, char **argv)
       srp_username = info.srp_username;
    else
       srp_username = DEFAULT_SRP_USERNAME;
+#else
+      srp_username = info.srp_username;
+      srp_passwd = info.srp_passwd;
+      x509_cafile = info.x509_certfile;
+      x509_keyfile = info.x509_keyfile;
+      x509_certfile = info.x509_certfile;
+      pgp_keyfile = info.pgp_keyfile;
+      pgp_certfile = info.pgp_certfile;
+
+#endif
 
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;

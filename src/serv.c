@@ -548,6 +548,8 @@ int main(int argc, char **argv)
 #define DEFAULT_SRP_PASSWD "srp/tpasswd"
 #define DEFAULT_SRP_PASSWD_CONF "srp/tpasswd.conf"
 
+#undef DEBUG
+
 static gaainfo info;
 void gaa_parser(int argc, char **argv)
 {
@@ -571,6 +573,7 @@ void gaa_parser(int argc, char **argv)
 
    port = info.port;
 
+#ifdef DEBUG
    if (info.x509_certfile != NULL)
       x509_certfile = info.x509_certfile;
    else
@@ -596,8 +599,6 @@ void gaa_parser(int argc, char **argv)
    else
       pgp_keyfile = DEFAULT_PGP_KEYFILE;
 
-   pgp_keyserver = info.pgp_keyserver;
-
    if (info.srp_passwd != NULL)
       srp_passwd = info.srp_passwd;
    else
@@ -607,7 +608,17 @@ void gaa_parser(int argc, char **argv)
       srp_passwd_conf = info.srp_passwd_conf;
    else
       srp_passwd_conf = DEFAULT_SRP_PASSWD_CONF;
+#else
+      x509_certfile = info.x509_certfile;
+      x509_keyfile = info.x509_keyfile;
+      x509_cafile = info.x509_certfile;
+      pgp_certfile = info.pgp_certfile;
+      pgp_keyfile = info.pgp_keyfile;
+      srp_passwd = info.srp_passwd;
+      srp_passwd_conf = info.srp_passwd_conf;
+#endif
 
+   pgp_keyserver = info.pgp_keyserver;
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;
 
