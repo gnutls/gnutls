@@ -79,7 +79,7 @@ do {						\
 } while(0)
 
 /* Analogous macros, for 16 bit numbers */
-#define LE_READ_UINT16(p)				\
+#define LE_READ_UINT16(p)			\
   (  (((uint32_t) (p)[1]) << 8)			\
      |  ((uint32_t) (p)[0]))
 

@@ -56,14 +56,26 @@
 enum { DES_DECRYPT = 0, DES_ENCRYPT = 1 };
 
 /* Types */
-/* NOTE: Typedef:ed arrays should be avoided, but they're used here
- * for compatibility. */
-
 typedef uint32_t DES_LONG;
 
+/* Note: Typedef:ed arrays should be avoided, but they're used here
+ * for compatibility. */
 typedef struct des_ctx des_key_schedule[1];
 
 typedef uint8_t des_cblock[DES_BLOCK_SIZE];
+/* Note: The proper definition,
+
+     typedef const uint8_t const_des_cblock[DES_BLOCK_SIZE];
+
+   would have worked, *if* all the prototypes had used arguments like
+   foo(const_des_cblock src, des_cblock dst), letting argument arrays
+   "decay" into pointers of type uint8_t * and const uint8_t *.
+
+   But since openssl's prototypes use *pointers const_des_cblock *src,
+   des_cblock *dst, this ends up in type conflicts, and the workaround
+   is to not use const at all.
+*/
+#define const_des_cblock des_cblock
 
 /* Aliases */
 #define des_ecb2_encrypt(i,o,k1,k2,e) \
@@ -86,7 +98,7 @@ extern int des_check_key;
    des_key_schedule arguments, which is equivalent to pointers to
    struct des_ctx.  */
 void
-des_ecb3_encrypt(const des_cblock *src, des_cblock *dst,
+des_ecb3_encrypt(const_des_cblock *src, des_cblock *dst,
 		 des_key_schedule k1,
 		 des_key_schedule k2,
 		 des_key_schedule k3, int enc);
@@ -94,28 +106,28 @@ des_ecb3_encrypt(const des_cblock *src, des_cblock *dst,
 /* des_cbc_cksum in libdes returns a 32 bit integer, representing the
  * latter half of the output block, using little endian byte order. */
 uint32_t
-des_cbc_cksum(const des_cblock *src, des_cblock *dst,
+des_cbc_cksum(const uint8_t *src, des_cblock *dst,
               long length, des_key_schedule ctx,
-              const des_cblock *iv);
+              const_des_cblock *iv);
 
 /* NOTE: Doesn't update iv. */
 void
-des_cbc_encrypt(const des_cblock *src, des_cblock *dst, long length,
-		des_key_schedule ctx, const des_cblock *iv,
+des_cbc_encrypt(const_des_cblock *src, des_cblock *dst, long length,
+		des_key_schedule ctx, const_des_cblock *iv,
 		int enc);
 
 /* Similar, but updates iv. */
 void
-des_ncbc_encrypt(const des_cblock *src, des_cblock *dst, long length,
+des_ncbc_encrypt(const_des_cblock *src, des_cblock *dst, long length,
 		 des_key_schedule ctx, des_cblock *iv,
                  int enc);
 
 void
-des_ecb_encrypt(const des_cblock *src, des_cblock *dst,
+des_ecb_encrypt(const_des_cblock *src, des_cblock *dst,
 		des_key_schedule ctx, int enc);
 
 void
-des_ede3_cbc_encrypt(const des_cblock *src, des_cblock *dst, long length,
+des_ede3_cbc_encrypt(const_des_cblock *src, des_cblock *dst, long length,
 		     des_key_schedule k1,
 		     des_key_schedule k2,
 		     des_key_schedule k3,
@@ -126,9 +138,9 @@ int
 des_set_odd_parity(des_cblock *key);
 
 int
-des_key_sched(const des_cblock *key, des_key_schedule ctx);
+des_key_sched(const_des_cblock *key, des_key_schedule ctx);
 
 int
-des_is_weak_key(const des_cblock *key);
+des_is_weak_key(const_des_cblock *key);
 
 #endif /* NETTLE_DES_COMPAT_H_INCLUDED */

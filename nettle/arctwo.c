@@ -1,29 +1,35 @@
-/* arctwo.c  - The cipher described in rfc2268; aka Ron's Cipher 2.
+/* arctwo.c
+ *
+ * The cipher described in rfc2268; aka Ron's Cipher 2.
+ */
+   
+/* nettle, low-level cryptographics library
+ *
  * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004 Niels Möller
  *
- * This file is part of Libgcrypt
+ * The nettle library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
  *
- * Libgcrypt is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser general Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
+ * The nettle library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+ * License for more details.
  *
- * Libgcrypt is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the nettle library; see the file COPYING.LIB.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
  */
 
 /* This implementation was written by Nikos Mavroyanopoulos for GNUTLS
  * as a Libgcrypt module (gnutls/lib/x509/rc2.c) and later adapted for
  * direct use by Libgcrypt by Werner Koch and later adapted for direct
- * use by Nettle by Simon Josefsson.
+ * use by Nettle by Simon Josefsson and Niels Möller.
  *
  * The implementation here is based on Peter Gutmann's RRC.2 paper and
  * RFC 2268.
@@ -74,111 +80,112 @@ static const uint8_t arctwo_sbox[] = {
   0x0a, 0xa6, 0x20, 0x68, 0xfe, 0x7f, 0xc1, 0xad
 };
 
-#define rotl16(x,n)   (((x) << ((uint16_t)(n))) | ((x) >> (16 - (uint16_t)(n))))
-#define rotr16(x,n)   (((x) >> ((uint16_t)(n))) | ((x) << (16 - (uint16_t)(n))))
+#define rotl16(x,n) (((x) << ((uint16_t)(n))) | ((x) >> (16 - (uint16_t)(n))))
+#define rotr16(x,n) (((x) >> ((uint16_t)(n))) | ((x) << (16 - (uint16_t)(n))))
 
 void
 arctwo_encrypt (struct arctwo_ctx *ctx,
-		unsigned length, uint8_t * dst, const uint8_t * src)
+		unsigned length, uint8_t *dst, const uint8_t *src)
 {
   FOR_BLOCKS (length, dst, src, ARCTWO_BLOCK_SIZE)
   {
-    register int i, j;
-    uint16_t word0 = 0, word1 = 0, word2 = 0, word3 = 0;
+    register unsigned i;
+    uint16_t w0, w1, w2, w3;
 
-    word0 = LE_READ_UINT16 (&src[0]);
-    word1 = LE_READ_UINT16 (&src[2]);
-    word2 = LE_READ_UINT16 (&src[4]);
-    word3 = LE_READ_UINT16 (&src[6]);
+    w0 = LE_READ_UINT16 (&src[0]);
+    w1 = LE_READ_UINT16 (&src[2]);
+    w2 = LE_READ_UINT16 (&src[4]);
+    w3 = LE_READ_UINT16 (&src[6]);
 
     for (i = 0; i < 16; i++)
       {
-	j = i * 4;
+	register unsigned j = i * 4;
 	/* For some reason I cannot combine those steps. */
-	word0 += (word1 & ~word3) + (word2 & word3) + ctx->S[j];
-	word0 = rotl16 (word0, 1);
+	w0 += (w1 & ~w3) + (w2 & w3) + ctx->S[j];
+	w0 = rotl16 (w0, 1);
 
-	word1 += (word2 & ~word0) + (word3 & word0) + ctx->S[j + 1];
-	word1 = rotl16 (word1, 2);
+	w1 += (w2 & ~w0) + (w3 & w0) + ctx->S[j + 1];
+	w1 = rotl16 (w1, 2);
 
-	word2 += (word3 & ~word1) + (word0 & word1) + ctx->S[j + 2];
-	word2 = rotl16 (word2, 3);
+	w2 += (w3 & ~w1) + (w0 & w1) + ctx->S[j + 2];
+	w2 = rotl16 (w2, 3);
 
-	word3 += (word0 & ~word2) + (word1 & word2) + ctx->S[j + 3];
-	word3 = rotl16 (word3, 5);
+	w3 += (w0 & ~w2) + (w1 & w2) + ctx->S[j + 3];
+	w3 = rotl16 (w3, 5);
 
 	if (i == 4 || i == 10)
 	  {
-	    word0 += ctx->S[word3 & 63];
-	    word1 += ctx->S[word0 & 63];
-	    word2 += ctx->S[word1 & 63];
-	    word3 += ctx->S[word2 & 63];
+	    w0 += ctx->S[w3 & 63];
+	    w1 += ctx->S[w0 & 63];
+	    w2 += ctx->S[w1 & 63];
+	    w3 += ctx->S[w2 & 63];
 	  }
       }
-    LE_WRITE_UINT16 (&dst[0], word0);
-    LE_WRITE_UINT16 (&dst[2], word1);
-    LE_WRITE_UINT16 (&dst[4], word2);
-    LE_WRITE_UINT16 (&dst[6], word3);
+    LE_WRITE_UINT16 (&dst[0], w0);
+    LE_WRITE_UINT16 (&dst[2], w1);
+    LE_WRITE_UINT16 (&dst[4], w2);
+    LE_WRITE_UINT16 (&dst[6], w3);
   }
 }
 
 void
 arctwo_decrypt (struct arctwo_ctx *ctx,
-		unsigned length, uint8_t * dst, const uint8_t * src)
+		unsigned length, uint8_t *dst, const uint8_t *src)
 {
   FOR_BLOCKS (length, dst, src, ARCTWO_BLOCK_SIZE)
   {
-    register int i, j;
-    uint16_t word0 = 0, word1 = 0, word2 = 0, word3 = 0;
+    register unsigned i;
+    uint16_t w0, w1, w2, w3;
 
-    word0 = LE_READ_UINT16 (&src[0]);
-    word1 = LE_READ_UINT16 (&src[2]);
-    word2 = LE_READ_UINT16 (&src[4]);
-    word3 = LE_READ_UINT16 (&src[6]);
+    w0 = LE_READ_UINT16 (&src[0]);
+    w1 = LE_READ_UINT16 (&src[2]);
+    w2 = LE_READ_UINT16 (&src[4]);
+    w3 = LE_READ_UINT16 (&src[6]);
 
-    for (i = 15; i >= 0; i--)
+    for (i = 16; i-- > 0; )
       {
-	j = i * 4;
+	register unsigned j = i * 4;
 
-	word3 = rotr16 (word3, 5);
-	word3 -= (word0 & ~word2) + (word1 & word2) + ctx->S[j + 3];
+	w3 = rotr16 (w3, 5);
+	w3 -= (w0 & ~w2) + (w1 & w2) + ctx->S[j + 3];
 
-	word2 = rotr16 (word2, 3);
-	word2 -= (word3 & ~word1) + (word0 & word1) + ctx->S[j + 2];
+	w2 = rotr16 (w2, 3);
+	w2 -= (w3 & ~w1) + (w0 & w1) + ctx->S[j + 2];
 
-	word1 = rotr16 (word1, 2);
-	word1 -= (word2 & ~word0) + (word3 & word0) + ctx->S[j + 1];
+	w1 = rotr16 (w1, 2);
+	w1 -= (w2 & ~w0) + (w3 & w0) + ctx->S[j + 1];
 
-	word0 = rotr16 (word0, 1);
-	word0 -= (word1 & ~word3) + (word2 & word3) + ctx->S[j];
+	w0 = rotr16 (w0, 1);
+	w0 -= (w1 & ~w3) + (w2 & w3) + ctx->S[j];
 
 	if (i == 5 || i == 11)
 	  {
-	    word3 = word3 - ctx->S[word2 & 63];
-	    word2 = word2 - ctx->S[word1 & 63];
-	    word1 = word1 - ctx->S[word0 & 63];
-	    word0 = word0 - ctx->S[word3 & 63];
+	    w3 = w3 - ctx->S[w2 & 63];
+	    w2 = w2 - ctx->S[w1 & 63];
+	    w1 = w1 - ctx->S[w0 & 63];
+	    w0 = w0 - ctx->S[w3 & 63];
 	  }
 
       }
-    LE_WRITE_UINT16 (&dst[0], word0);
-    LE_WRITE_UINT16 (&dst[2], word1);
-    LE_WRITE_UINT16 (&dst[4], word2);
-    LE_WRITE_UINT16 (&dst[6], word3);
+    LE_WRITE_UINT16 (&dst[0], w0);
+    LE_WRITE_UINT16 (&dst[2], w1);
+    LE_WRITE_UINT16 (&dst[4], w2);
+    LE_WRITE_UINT16 (&dst[6], w3);
   }
 }
 
-static void
-setkey_core (struct arctwo_ctx *ctx,
-	     unsigned length, const uint8_t * key, int with_phase2)
+void
+arctwo_set_key_ekb (struct arctwo_ctx *ctx,
+		    unsigned length, const uint8_t *key, unsigned ekb)
 {
   unsigned i;
-  uint8_t *S, x;
+  /* Expanded key, treated as octets */
+  uint8_t S[128];
+  uint8_t x;
 
   assert (length >= ARCTWO_MIN_KEY_SIZE);
   assert (length <= ARCTWO_MAX_KEY_SIZE);
-
-  S = (uint8_t *) ctx->S;
+  assert (ekb <= 1024);
 
   for (i = 0; i < length; i++)
     S[i] = key[i];
@@ -189,16 +196,12 @@ setkey_core (struct arctwo_ctx *ctx,
 
   S[0] = arctwo_sbox[S[0]];
 
-  /* Phase 2 - reduce effective key size to "bits".
-   *
-   * This was not discussed in Gutmann's paper. I've copied that from
-   * the public domain code posted in sci.crypt. */
-  if (with_phase2)
+  /* Reduce effective key size to ekb bits, if requested by caller. */
+  if (ekb > 0 && ekb < 1024)
     {
-      int bits = length * 8;
-      int len = (bits + 7) >> 3;
+      int len = (ekb + 7) >> 3;
       i = 128 - len;
-      x = arctwo_sbox[S[i] & (255 >> (7 & -bits))];
+      x = arctwo_sbox[S[i] & (255 >> (7 & -ekb))];
       S[i] = x;
 
       while (i--)
@@ -208,20 +211,20 @@ setkey_core (struct arctwo_ctx *ctx,
 	}
     }
 
-  /* Make the expanded key, endian independent. */
+  /* Make the expanded key endian independent. */
   for (i = 0; i < 64; i++)
-    ctx->S[i] = ((uint16_t) S[i * 2] | (((uint16_t) S[i * 2 + 1]) << 8));
+    ctx->S[i] = LE_READ_UINT16(S + i * 2);
 }
 
 void
-arctwo_gutmann_set_key (struct arctwo_ctx *ctx,
-			unsigned length, const uint8_t * key)
+arctwo_set_key (struct arctwo_ctx *ctx, unsigned length, const uint8_t *key)
 {
-  setkey_core (ctx, length, key, 0);
+  arctwo_set_key_ekb (ctx, length, key, 8 * length);
 }
 
 void
-arctwo_set_key (struct arctwo_ctx *ctx, unsigned length, const uint8_t * key)
+arctwo_set_key_gutmann (struct arctwo_ctx *ctx,
+			unsigned length, const uint8_t *key)
 {
-  setkey_core (ctx, length, key, 1);
+  arctwo_set_key_ekb (ctx, length, key, 0);
 }

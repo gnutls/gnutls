@@ -6,7 +6,7 @@
 /* nettle, low-level cryptographics library
  *
  * Copyright (C) 2004 Simon Josefsson
- * Copyright (C) 2002 Niels Möller
+ * Copyright (C) 2002, 2004 Niels Möller
  *
  * The nettle library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -31,15 +31,10 @@
 
 /* Name mangling */
 #define arctwo_set_key nettle_arctwo_set_key
+#define arctwo_set_key_ekb nettle_arctwo_set_key_ekb
 #define arctwo_encrypt nettle_arctwo_encrypt
 #define arctwo_decrypt nettle_arctwo_decrypt
-#define arctwo_gutmann_set_key nettle_arctwo_gutmann_set_key
-
-/* Map Gutmann variant. */
-#define arctwo_gutmann_ctx arctwo_ctx
-#define arctwo_gutmann_encrypt arctwo_encrypt
-#define arctwo_gutmann_decrypt arctwo_decrypt
-#define arctwo_gutmann_ctx arctwo_ctx
+#define arctwo_set_key_gutmann nettle_arctwo_set_key_gutmann
 
 #define ARCTWO_BLOCK_SIZE 8
 
@@ -54,17 +49,28 @@ struct arctwo_ctx
   uint16_t S[64];
 };
 
+/* Key expansion function that takes the "effective key bits", 1-1024,
+   as an explicit argument. 0 means maximum key bits. */
 void
-arctwo_set_key (struct arctwo_ctx *ctx, unsigned length, const uint8_t * key);
+arctwo_set_key_ekb (struct arctwo_ctx *ctx,
+		    unsigned length, const uint8_t * key, unsigned ekb);
+
+/* Equvivalent to arctwo_set_key_ekb, with ekb = 8 * length */
 void
-arctwo_gutmann_set_key (struct arctwo_ctx *ctx,
-			unsigned length, const uint8_t * key);
+arctwo_set_key (struct arctwo_ctx *ctx, unsigned length, const uint8_t *key);
+
+/* Equvivalent to arctwo_set_key_ekb, with ekb = 1024 */
+/* FIXME: Is this function really needed, and if so, what's the right
+   name for it? */
+void
+arctwo_set_key_gutmann (struct arctwo_ctx *ctx,
+			unsigned length, const uint8_t *key);
 
 void
 arctwo_encrypt (struct arctwo_ctx *ctx,
-		unsigned length, uint8_t * dst, const uint8_t * src);
+		unsigned length, uint8_t *dst, const uint8_t *src);
 void
 arctwo_decrypt (struct arctwo_ctx *ctx,
-		unsigned length, uint8_t * dst, const uint8_t * src);
+		unsigned length, uint8_t *dst, const uint8_t *src);
 
 #endif /* NETTLE_ARCTWO_H_INCLUDED */

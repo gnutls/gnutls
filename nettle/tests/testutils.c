@@ -3,9 +3,7 @@
 #include "testutils.h"
 
 #include "cbc.h"
-#if WITH_PUBLIC_KEY
-# include "knuth-lfib.h"
-#endif
+#include "knuth-lfib.h"
 
 #include <ctype.h>
 #include <stdio.h>

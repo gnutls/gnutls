@@ -37,11 +37,12 @@ const struct nettle_cipher nettle_arctwo64
 const struct nettle_cipher nettle_arctwo128
 = _NETTLE_CIPHER (arctwo, ARCTWO, 128);
 
-const struct nettle_cipher nettle_arctwo_gutmann40
-= _NETTLE_CIPHER (arctwo_gutmann, ARCTWO, 40);
-
-const struct nettle_cipher nettle_arctwo_gutmann64
-= _NETTLE_CIPHER (arctwo_gutmann, ARCTWO, 64);
+/* Map Gutmann variant. */
+#define arctwo_gutmann_ctx arctwo_ctx
+#define arctwo_gutmann_encrypt arctwo_encrypt
+#define arctwo_gutmann_decrypt arctwo_decrypt
+#define arctwo_gutmann_ctx arctwo_ctx
+#define arctwo_gutmann_set_key arctwo_set_key_gutmann
 
 const struct nettle_cipher nettle_arctwo_gutmann128
 = _NETTLE_CIPHER (arctwo_gutmann, ARCTWO, 128);
