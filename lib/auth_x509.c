@@ -1283,6 +1283,105 @@ int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 	return verify;
 }
 
+#define CLEAR_CERTS_CA for(x=0;x<peer_certificate_list_size;x++) gnutls_free_cert(peer_certificate_list[x]); \
+		for(x=0;x<ca_certificate_list_size;x++) gnutls_free_cert(ca_certificate_list[x])
+/**
+  * gnutls_x509pki_verify_certificate - This function verifies given certificate list
+  * @cert_list: is the certificate list to be verified
+  * @cert_list_length: holds the number of certificate in cert_list
+  * @CA_list: is the CA list which will be used in verification
+  * @CA_list_length: holds the number of CA certificate in CA_list
+  * @CRL_list: not used
+  * @CRL_list_length: not used
+  *
+  * This function will try to verify the given certificate list and return it's status (TRUSTED, EXPIRED etc.). 
+  * The return value (status) should be one of the CertificateStatus enumerated elements.
+  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
+  * actual peer. Returns a negative error code in case of an error.
+  *
+  **/
+int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length)
+{
+	CertificateStatus verify;
+	gnutls_cert *peer_certificate_list;
+	gnutls_cert *ca_certificate_list;
+	int peer_certificate_list_size, i, x, ret, ca_certificate_list_size;
+
+	if (cert_list == NULL || cert_list_length == 0)
+		return GNUTLS_CERT_NONE;
+
+	/* generate a list of gnutls_certs based on the auth info
+	 * raw certs.
+	 */
+	peer_certificate_list_size = cert_list_length;
+	peer_certificate_list =
+	    gnutls_calloc(1,
+			  peer_certificate_list_size *
+			  sizeof(gnutls_cert));
+	if (peer_certificate_list == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	ca_certificate_list_size = CA_list_length;
+	ca_certificate_list =
+	    gnutls_calloc(1,
+			  ca_certificate_list_size *
+			  sizeof(gnutls_cert));
+	if (ca_certificate_list == NULL) {
+		gnutls_assert();
+		gnutls_free( peer_certificate_list);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	/* convert certA_list to gnutls_cert* list
+	 */
+	for (i = 0; i < peer_certificate_list_size; i++) {
+		if ((ret =
+		     _gnutls_cert2gnutlsCert(&peer_certificate_list[i],
+					     cert_list[i])) < 0) {
+			gnutls_assert();
+			CLEAR_CERTS_CA;
+			gnutls_free( peer_certificate_list);
+			gnutls_free( ca_certificate_list);
+			return ret;
+		}
+	}
+
+	/* convert CA_list to gnutls_cert* list
+	 */
+	for (i = 0; i < ca_certificate_list_size; i++) {
+		if ((ret =
+		     _gnutls_cert2gnutlsCert(&ca_certificate_list[i],
+					     CA_list[i])) < 0) {
+			gnutls_assert();
+			CLEAR_CERTS_CA;
+			gnutls_free( peer_certificate_list);
+			gnutls_free( ca_certificate_list);
+			return ret;
+		}
+	}
+
+	/* Verify certificate 
+	 */
+	verify =
+	    gnutls_verify_certificate(peer_certificate_list,
+				      peer_certificate_list_size,
+				      ca_certificate_list, ca_certificate_list_size, NULL, 0);
+
+	CLEAR_CERTS_CA;
+	gnutls_free( peer_certificate_list);
+	gnutls_free( ca_certificate_list);
+
+	if (verify < 0) {
+		gnutls_assert();
+		return GNUTLS_CERT_INVALID;
+	}
+
+	return verify;
+}
+
+
 /* finds the most appropriate certificate in the cert list.
  * The 'appropriate' is defined by the user. 
  * (frontend to _gnutls_server_find_cert_index())

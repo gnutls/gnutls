@@ -1,3 +1,6 @@
+Version ?.?.?
+- Added gnutls_x509pki_verify_certificate()
+
 Version 0.3.2 (5/01/2001)
 - Corrected bug which did not allow a client to accept multiple CA names
 - Added gnutls_fingerprint()
