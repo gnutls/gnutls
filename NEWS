@@ -9,6 +9,7 @@ See the end for copying conditions.
 - Correct certtool --smime-to-p7 end of line character handling.
 - Added example client and server for anonymous authentication.
 - Added self test that tests anonymous TLS client and server.
+- Added API reference manual in HTML format in doc/reference/ using GTK-DOC.
 - Assume C89 or better; removed checks for size_t, ptrdiff_t and time_t.
 - Man pages for API functions are included.
 
