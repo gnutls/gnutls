@@ -13,3 +13,7 @@ CertificateType gnutls_cert_type_get( GNUTLS_STATE state);
 	}
 
 #endif
+
+int _gnutls_state_cert_type_supported( GNUTLS_STATE, CertificateType);
+
+#define DEFAULT_CERT_TYPE GNUTLS_CRT_X509
