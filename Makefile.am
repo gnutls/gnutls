@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = ChangeLog NEWS INSTALL README THANKS COPYING PGPKEYS
+EXTRA_DIST = ChangeLog NEWS INSTALL README THANKS COPYING PGPKEYS \
+	libmcrypt.m4 libgcrypt.m4 opencdk.m4
 SUBDIRS = lib src doc
 
 ChangeLog:
