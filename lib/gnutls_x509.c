@@ -742,7 +742,8 @@ int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials res, con
 	return 0;
 }
 
-static int generate_rdn_seq( gnutls_certificate_credentials res) {
+static int generate_rdn_seq( gnutls_certificate_credentials res) 
+{
 gnutls_const_datum tmp;
 gnutls_datum _tmp;
 int ret;

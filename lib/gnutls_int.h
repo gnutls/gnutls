@@ -563,7 +563,7 @@ typedef struct {
 	 */
 	uint16			extensions_sent[MAX_EXT_TYPES];
 	uint16			extensions_sent_size;
-
+	
 	/* is 0 if we are to send the whole PGP key, or non zero
 	 * if the fingerprint is to be sent.
 	 */
@@ -593,6 +593,11 @@ typedef struct {
 	 * openpgp key. (if the peer sends a fingerprint)
 	 */
 	gnutls_openpgp_recv_key_func openpgp_recv_key_func;
+	
+	/* If non zero the server will not advertize the CA's he
+	 * trusts (do not send an RDN sequence).
+	 */
+	int			ignore_rdn_sequence;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */

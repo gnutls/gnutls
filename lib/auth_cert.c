@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -326,7 +326,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		 * of X509 certificates.
 		 */
 		if (gnutls_certificate_type_get(session) ==
-		    GNUTLS_CRT_X509) {
+		    GNUTLS_CRT_X509 && issuers_dn_len > 0) {
 			data = _data;
 			data_size = _data_size;
 
@@ -354,7 +354,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 
 			}
 
-		} else {	/* Other certificate types */
+		} else { /* Other certificate types */
 			issuers_dn_len = 0;
 			issuers_dn = NULL;
 		}
@@ -369,7 +369,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		/* put our certificate's issuer and dn into cdn, idn
 		 * Note that the certificates we provide to the callback
 		 * are not all the certificates we have. Only the certificates
-		 * that are requested by the server (CA matches - and sign
+		 * that are requested by the server (certificate type - and sign
 		 * algorithm matches), are provided.
 		 */
 		for (j = i = 0; i < cred->ncerts; i++) {
@@ -1181,7 +1181,8 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session,
 	size = CERTTYPE_SIZE + 2;	/* 2 for gnutls_certificate_type + 2 for size of rdn_seq 
 					 */
 
-	if (session->security_parameters.cert_type == GNUTLS_CRT_X509)
+	if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
+		session->internals.ignore_rdn_sequence == 0)
 		size += cred->x509_rdn_sequence.size;
 
 	(*data) = gnutls_malloc(size);
@@ -1198,7 +1199,8 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session,
 	pdata[2] = DSA_SIGN;	/* only these for now */
 	pdata += CERTTYPE_SIZE;
 
-	if (session->security_parameters.cert_type == GNUTLS_CRT_X509) {
+	if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
+		session->internals.ignore_rdn_sequence == 0) {
 		_gnutls_write_datum16(pdata, cred->x509_rdn_sequence);
 		pdata += cred->x509_rdn_sequence.size + 2;
 	}
