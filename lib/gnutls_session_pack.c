@@ -52,7 +52,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 
 	if (packed_session==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 
@@ -127,7 +127,7 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 		}
 		break;
 	default:
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_INTERNAL_ERROR;
 
 	}
 
@@ -183,7 +183,7 @@ int _gnutls_session_unpack(gnutls_session session,
 
 	if (packed_session==NULL || packed_session->size == 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (session->key->auth_info != NULL) {
@@ -287,7 +287,7 @@ int _gnutls_session_unpack(gnutls_session session,
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_INTERNAL_ERROR;
 
 	}
 

@@ -175,7 +175,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 	    break;
 	 default:
 	    gnutls_assert();
-	    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	    return GNUTLS_E_INTERNAL_ERROR;
 	 }
       }
    }

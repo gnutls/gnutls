@@ -52,7 +52,7 @@ const char* algo;
 	algo = _gnutls_x509_mac2oid( hash);
 	if (algo == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 	}
 
 	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), 

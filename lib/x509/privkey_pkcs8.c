@@ -291,6 +291,7 @@ static ASN1_TYPE encode_to_pkcs8_key( const gnutls_datum *raw_key,
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
   * This function will export the private key to a PKCS8 structure.
+  * Currently only RSA keys can be exported.
   *
   * If the buffer provided is not long enough to hold the output, then
   * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
@@ -564,6 +565,7 @@ static ASN1_TYPE decode_private_key_info( const gnutls_datum* der, gnutls_x509_p
   *
   * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
   * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
+  * Currently only RSA keys can be imported.
   *
   * If the Certificate is PEM encoded it should have a header of "ENCRYPTED PRIVATE KEY",
   * or "PRIVATE KEY". You only need to specify the flags if the key is DER encoded.

@@ -204,7 +204,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 /* Parses an Attribute list in the asn1_struct, and searches for the
  * given OID. The index indicates the attribute value to be returned.
  *
- * Only printable data are returned, or GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ * Only printable data are returned, or GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE.
  *
  * asn1_attr_name must be a string in the form "certificationRequestInfo.attributes"
  *
@@ -326,7 +326,7 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
 					return 0;
 				} else {
 					gnutls_assert();
-					return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+					return GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE;
 				}
 			}
 
@@ -417,7 +417,7 @@ uint8 null = version;
   * @key: holds a private key
   *
   * This function will set the public parameters from the given private key to the
-  * request.
+  * request. Only RSA keys are currently supported.
   *
   * On success zero is returned.
   *
@@ -436,7 +436,7 @@ int der_size, result;
 	pk = _gnutls_x509_pk2oid( key->pk_algorithm);
 	if (pk == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 	}
 
 	/* write the RSA OID

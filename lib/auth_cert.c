@@ -819,7 +819,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 		if (len != 20) {
 			gnutls_assert();
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			return GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED;
 		}
 
 		DECR_LEN(dsize, 20);
@@ -863,7 +863,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 
 	} else {
 		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 	}
 
 	/* ok we now have the peer's key in tmp datum

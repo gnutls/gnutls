@@ -397,7 +397,7 @@ int len;
 
 		gnutls_assert();
 		asn1_delete_structure(&dinfo);
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_UNKNOWN_HASH_ALGORITHM;
 	}
 	
 	result =

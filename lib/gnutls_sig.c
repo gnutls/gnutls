@@ -199,7 +199,7 @@ int ret;
 			break;
 		default:
 			gnutls_assert();
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			return GNUTLS_E_INTERNAL_ERROR;
 			break;
 	}
 
@@ -260,7 +260,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 
 		default:
 			gnutls_assert();
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
 

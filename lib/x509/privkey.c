@@ -808,7 +808,8 @@ static int _encode_rsa( ASN1_TYPE* c2, MPI* params)
   * @flags: unused for now. Must be 0.
   *
   * This function will generate a random private key. Note that
-  * this function must be called on an empty private key.
+  * this function must be called on an empty private key. Currently only RSA
+  * keys can be generated.
   *
   * Returns 0 on success or a negative value on error.
   *

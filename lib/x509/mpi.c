@@ -350,7 +350,7 @@ int len, result;
 		*ret = _gnutls_read_uint32(tmpstr);
 	else {
 		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	return 0;

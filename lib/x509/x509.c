@@ -224,7 +224,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 		
 		if (len % 8 != 0) {
 			gnutls_assert();
-			result = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			result = GNUTLS_E_CERTIFICATE_ERROR;
 			goto cleanup;
 		}
 		
