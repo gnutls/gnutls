@@ -532,31 +532,6 @@ static int check_g_n( const opaque* g, size_t n_g,
 	return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 }
 
-/* Check if N is a prime and G a generator of the
- * group.
- */
-static int group_check_g_n( GNUTLS_MPI g, GNUTLS_MPI n) 
-{
-	if (gcry_prime_check( n, 0) != 0) {
-		_gnutls_dump_mpi( "no prime N: ", n);
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
-	
-	/* We should also check whether g is a generator,
-	 * but this is not possible. We now only check if
-	 * the generator is not too large.
-	 */
-	
-	if (_gnutls_mpi_get_nbits(g) > 7) {
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
-	
-	return 0;
-
-}
-
 /* receive the key exchange message ( n, g, s, B) 
  */
 int _gnutls_proc_srp_server_kx(gnutls_session session, opaque * data, size_t _data_size)
@@ -662,11 +637,8 @@ int _gnutls_proc_srp_server_kx(gnutls_session session, opaque * data, size_t _da
 	 * a generator.
 	 */
 	if ( (ret = check_g_n( data_g, _n_g, data_n, _n_n)) < 0) {
-		_gnutls_x509_log("Checking the SRP group parameters.\n");
-		if ( (ret = group_check_g_n( G, N)) < 0) {
-			gnutls_assert();
-			return ret;
-		}
+		gnutls_assert();
+		return ret;
 	}
 
 	/* Checks if b % n == 0
