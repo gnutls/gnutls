@@ -32,6 +32,14 @@ GNUTLS_KXAlgorithm kx;
 			printf("- Anonymous DH using prime of %d bits\n",
 			       gnutls_dh_get_bits( state));
 			break;
+		case GNUTLS_SRP:
+			/* This should be only called in server
+			 * side.
+			 */
+			if (gnutls_srp_server_get_username(state)!=NULL)
+				printf("- SRP authentication. Connected as '%s'\n",
+				       gnutls_srp_server_get_username(state));
+			break;
 		case GNUTLS_X509PKI:
 		   /* in case of X509 PKI
 		    */
