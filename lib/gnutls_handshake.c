@@ -335,13 +335,15 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	}
 	
 	/* Parse the extensions (if any)
-	 */	
-	ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+	 */
+	if (ret >= GNUTLS_TLS1) {
+		ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
-
+	
 	/* select an appropriate cipher suite
 	 */
 	ret = _gnutls_server_select_suite(state, suite_ptr, sizeOfSuites);
@@ -1286,10 +1288,12 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 
 	/* Parse extensions.
 	 */
-	ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+	if (version >= GNUTLS_TLS1) {
+		ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
 	}
 	return ret;
 }
@@ -1547,20 +1551,21 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 
 		/* Generate and copy TLS extensions.
 		 */
-		extdatalen = _gnutls_gen_extensions(state, &extdata);
-		if (extdatalen > 0) {
-			datalen += extdatalen;
-			data = gnutls_realloc(data, datalen);
-			if (data == NULL) {
-				gnutls_assert();
+		if (hver >= GNUTLS_TLS1) {
+			extdatalen = _gnutls_gen_extensions(state, &extdata);
+			if (extdatalen > 0) {
+				datalen += extdatalen;
+				data = gnutls_realloc(data, datalen);
+				if (data == NULL) {
+					gnutls_assert();
+					gnutls_free(extdata);
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+
+				memcpy(&data[pos], extdata, extdatalen);
 				gnutls_free(extdata);
-				return GNUTLS_E_MEMORY_ERROR;
 			}
-
-			memcpy(&data[pos], extdata, extdatalen);
-			gnutls_free(extdata);
 		}
-
 	}
 
 	ret =
