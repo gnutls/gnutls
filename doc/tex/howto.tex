@@ -24,7 +24,8 @@ This approach starts the \tls{} Handshake procedure just after the
 client connects on the --so called-- secure port. 
 That way the \tls{} protocol does not know anything
 about the client, and popular methods like the host advertising in 
-HTTP do not work. There is no way for the client to say ``I connected
+HTTP do not work\footnote{see also the Server Name Indication extension on \ref{serverind}, page \pageref{serverind}.}. 
+There is no way for the client to say ``I connected
 to YYY server'' before the Handshake starts, so the server cannot
 possibly know which certificate to use\footnote{There is some effort to solve
 this problem within \tls{}}.
@@ -44,8 +45,13 @@ the application protocol to have a ``STARTTLS'' request, whose purpose
 it to start the TLS protocols just after the client requests it.
 This is a really neat idea and does not require an extra port.
 \par
-The tricky part is that the ``STARTTLS'' request is sent in the clear,
-thus is vulnerable to modifications. A typical attack is to modify the
+This method is used by almost all modern protocols and there is
+even the \cite{RFC2817} paper which proposes extensions to HTTP
+to support it.
+\par
+The tricky part, in this method, is that the ``STARTTLS'' request is sent 
+in the clear, thus is vulnerable to modifications. 
+A typical attack is to modify the
 messages in a way that the client is fooled and thinks that the server
 does not have the ``STARTTLS'' capability. See a typical conversation
 of a hypothetical protocol:
