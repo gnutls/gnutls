@@ -206,6 +206,7 @@ const char *gnutls_protocol_get_name(gnutls_protocol_version version);
 int gnutls_session_set_data( gnutls_session session, const void* session_data, int session_data_size);
 int gnutls_session_get_data( gnutls_session session, void* session_data, int *session_data_size);
 /* returns the session ID */
+#define GNUTLS_MAX_SESSION_ID 32
 int gnutls_session_get_id( gnutls_session session, void* session_id, int *session_id_size);
 
 /* checks if this session is a resumed one 
