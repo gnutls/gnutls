@@ -1,7 +1,7 @@
 EXTRA_DIST = gnutls.tex gnutls.ps \
 	ex1.tex ex2.tex ex3.tex srp1.tex serv1.tex ex4.tex \
 	fdl.tex cover.tex.in gnutls-logo.ps layers.eps pgp-fig1.eps \
-	x509-1.eps
+	x509-1.eps internals.eps
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex \
