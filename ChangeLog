@@ -1,3 +1,11 @@
+2003-09-10 19:15  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_alert.c, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, src/crypt.c, src/srp/tpasswd,
+	src/srp/tpasswd.conf:
+
+	Updated the SRP implementation to follow the latest draft.  
+
 2003-09-01 13:52  nmav <nmav@gnutls.org>
 
 	* src/: tests.c, tls_test.c:
