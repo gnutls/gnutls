@@ -45,17 +45,6 @@
 
 #define datum_append(x, y, z) _gnutls_datum_append_m( x, y, z, gnutls_realloc )
 
-typedef struct {
-    int type;
-    int armored;
-    size_t size;
-    uint8 *data;
-} keybox_blob;
-
-typedef enum {
-    KBX_BLOB_FILE = 0x00,
-    KBX_BLOB_DATA = 0x01
-} keyring_blob_types;
 
 
 static void
@@ -122,7 +111,7 @@ kbx_blob_new( keybox_blob **r_ctx )
 }
 
 
-static void
+void
 kbx_blob_release( keybox_blob *ctx )
 {
     if( ctx ) {
@@ -132,7 +121,7 @@ kbx_blob_release( keybox_blob *ctx )
 }
 
 
-static cdk_keydb_hd_t
+cdk_keydb_hd_t
 kbx_to_keydb( keybox_blob *blob )
 {
     cdk_keydb_hd_t hd;
@@ -164,7 +153,7 @@ kbx_to_keydb( keybox_blob *blob )
 
 
 /* Extract a keybox blob from the given position. */
-static keybox_blob*
+keybox_blob*
 kbx_read_blob( const gnutls_datum* keyring, size_t pos )
 {
     keybox_blob *blob = NULL;
@@ -749,170 +738,6 @@ gnutls_openpgp_count_key_names( const gnutls_datum *cert )
 
 
 
-int
-_gnutls_openpgp_get_key_trust( const char *trustdb,
-                               const gnutls_datum *key,
-                               int *r_trustval )
-{
-    cdk_kbnode_t knode = NULL;
-    cdk_stream_t inp;
-    CDK_PACKET *pkt;
-    cdk_pkt_pubkey_t pk = NULL;
-    int flags = 0, ot = 0;
-    int rc = 0;
-
-    if( !trustdb || !key || !r_trustval ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    *r_trustval = 0;
-
-    rc = cdk_kbnode_read_from_mem( &knode, key->data, key->size );
-    if( (rc = _gnutls_map_cdk_rc( rc )) )
-        return rc;
-
-    pkt = cdk_kbnode_find_packet( knode, CDK_PKT_PUBLIC_KEY );
-    if( !pkt ) {
-        rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
-        goto leave;
-    }
-    pk = pkt->pkt.public_key;
-
-    rc = cdk_stream_open( trustdb, &inp );
-    if( rc ) {
-        rc = _gnutls_map_cdk_rc( rc );
-        goto leave;
-    }
-    
-    rc = cdk_trustdb_get_ownertrust( inp, pk, &ot, &flags );
-    cdk_stream_close( inp );
-    if ( rc ) { /* no ownertrust record was found */
-        rc = 0;
-        *r_trustval = 0;
-        goto leave;
-    }
-
-    if( flags & CDK_TFLAG_DISABLED ) {
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
-        *r_trustval |= GNUTLS_CERT_INVALID;
-        goto leave;
-    }
-    
-    if( flags & CDK_TFLAG_REVOKED ) {
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
-        *r_trustval |= GNUTLS_CERT_REVOKED;
-    }
-    
-    switch( ot ) {
-    case CDK_TRUST_NEVER:
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
-        break;
-    case CDK_TRUST_UNKNOWN:
-    case CDK_TRUST_UNDEFINED:
-    case CDK_TRUST_MARGINAL:
-    case CDK_TRUST_FULLY:
-    case CDK_TRUST_ULTIMATE:
-        *r_trustval |= 1; /* means okay */
-        rc = 0;
-        break;
-    }
-
-leave:
-    if( rc )
-        *r_trustval |= GNUTLS_CERT_NOT_TRUSTED;
-    cdk_kbnode_release( knode );
-    return rc;
-}
-
-
-/**
- * gnutls_openpgp_verify_key - Verify all signatures on the key
- * @cert_list: the structure that holds the certificates.
- * @cert_list_lenght: the items in the cert_list.
- *
- * Verify all signatures in the certificate list. When the key
- * is not available, the signature is skipped.
- *
- * When the trustdb parameter is used, the function checks the
- * ownertrust of the key before the signatures are checked. It
- * is possible that the key was disabled or the owner is not trusted
- * at all. Then we don't check the signatures because it makes no sense.
- *
- * The return value is one of the CertificateStatus entries.
- *
- * NOTE: this function does not verify using any "web of trust". You
- * may use GnuPG for that purpose, or any other external PGP application.
- **/
-int
-gnutls_openpgp_verify_key( const char *trustdb,
-                           const gnutls_datum* keyring,
-                           const gnutls_datum* cert_list,
-                           int cert_list_length )
-{
-    cdk_kbnode_t knode = NULL;
-    cdk_keydb_hd_t hd = NULL;
-    keybox_blob *blob = NULL;
-    int rc = 0;
-    int status = 0;
-  
-    if( !cert_list || cert_list_length != 1 || !keyring ) {
-        gnutls_assert();
-        return GNUTLS_E_NO_CERTIFICATE_FOUND;
-    }
-
-    if( !keyring->size && !trustdb ) {
-        gnutls_assert( );
-        return GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
-    }
-
-    blob = kbx_read_blob( keyring, 0 );
-    if( !blob ) {
-        gnutls_assert();
-        return GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
-    }
-    hd = kbx_to_keydb( blob );
-    if( !hd ) {
-        rc = GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
-        goto leave;
-    }
-
-    if( trustdb ) {
-        int ktrust;
-        rc = _gnutls_openpgp_get_key_trust( trustdb, cert_list, &ktrust );
-        if( rc || !ktrust )
-            goto leave;
-    }
-
-    rc = cdk_kbnode_read_from_mem( &knode, cert_list->data, cert_list->size );
-    if( (rc = _gnutls_map_cdk_rc( rc )) ) {
-        goto leave;
-        return GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
-    }
-
-    rc = cdk_pk_check_sigs( knode, hd, &status );
-    if( rc == CDK_Error_No_Key )
-        rc = 0; /* fixme */
-      
-    switch( status ) {
-    case CDK_KEY_INVALID:
-        rc = GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
-        break;
-      
-    case CDK_KEY_REVOKED:
-        rc = GNUTLS_CERT_REVOKED | GNUTLS_CERT_NOT_TRUSTED;
-        break;
-    }
-
-leave:
-    kbx_blob_release( blob );
-    cdk_free( hd );
-    cdk_kbnode_release( knode );
-    if( rc ) {
-        gnutls_assert();
-    }
-    return rc;
-}
 
 
 /*-

@@ -1,6 +1,5 @@
 INCLUDES = -I../lib -I../includes -I../lib/minitasn1/
 bin_SCRIPTS = libgnutls-extra-config
-DIST_SUBDIRS = openpgp
 SUBDIRS = openpgp
 
 m4datadir = $(datadir)/aclocal

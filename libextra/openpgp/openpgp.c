@@ -24,6 +24,9 @@
  */
 
 #include <gnutls_int.h>
+
+#ifdef HAVE_LIBOPENCDK
+
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -412,3 +415,4 @@ int gnutls_openpgp_key_check_hostname(gnutls_openpgp_key key,
    return 0;
 }
 
+#endif

@@ -277,10 +277,10 @@ AC_ARG_ENABLE( openpgp-authentication, [  --disable-openpgp-authentication disab
 )
 if test x$ac_enable_openpgp != xno; then
  AC_MSG_RESULT(no)
- AM_PATH_LIBOPENCDK( 0.4.0, AC_DEFINE(HAVE_LIBOPENCDK, 1, [have libopencdk]),
+ AM_PATH_LIBOPENCDK( 0.5.2, AC_DEFINE(HAVE_LIBOPENCDK, 1, [have libopencdk]),
  AC_MSG_WARN([[
 ***
-*** libopencdk 0.4.0 was not found. You will not be able to use OpenPGP keys with gnutls.
+*** libopencdk 0.5.2 was not found. You will not be able to use OpenPGP keys with gnutls.
 ]]))
 else
  AC_MSG_RESULT(yes)
@@ -459,7 +459,7 @@ AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
-lib/libgnutls-config libextra/libgnutls-extra-config \
+libextra/openpgp/Makefile lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
 doc/examples/Makefile lib/minitasn1/Makefile lib/x509/Makefile \

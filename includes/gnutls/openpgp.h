@@ -79,11 +79,11 @@ int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring ring,
  */
 struct gnutls_openpgp_trustdb;
 
-int gnutls_openpgp_trustdb_init( gnutls_openpgp_trustdb* ring);
-void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb ring);
+int gnutls_openpgp_trustdb_init( gnutls_openpgp_trustdb* db);
+void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb db);
 
-int gnutls_openpgp_trustdb_import(gnutls_openpgp_trustdb ring,
-	const gnutls_datum* data, gnutls_openpgp_key_fmt format);
+int gnutls_openpgp_trustdb_import(gnutls_openpgp_trustdb db,
+	const char* file);
 
 
 int gnutls_openpgp_key_verify_ring( 
@@ -92,7 +92,7 @@ int gnutls_openpgp_key_verify_ring(
 	unsigned int flags /* if not used reserved for future use,
 	unsigned int * verify /* the output of the verification */);
 
-int gnutls_openpgp_key_verify_db( 
+int gnutls_openpgp_key_verify_trustdb( 
 	gnutls_openpgp_key key, 
 	gnutls_openpgp_trustdb db,
 	unsigned int flags /* if not used reserved for future use,

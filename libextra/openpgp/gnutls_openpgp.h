@@ -3,6 +3,19 @@
 
 #include <gnutls/compat8.h>
 #include <auth_cert.h>
+#include <opencdk.h>
+
+typedef struct {
+    int type;
+    int armored;
+    size_t size;
+    uint8 *data;
+} keybox_blob;
+
+typedef enum {
+    KBX_BLOB_FILE = 0x00,
+    KBX_BLOB_DATA = 0x01
+} keyring_blob_types;
 
 /* OpenCDK compatible */
 typedef enum {
@@ -20,39 +33,6 @@ int gnutls_certificate_set_openpgp_key_file(
 int gnutls_openpgp_count_key_names(
     const gnutls_datum *cert );
      
-int gnutls_openpgp_extract_key_name(
-    const gnutls_datum *cert,
-    int idx,
-    gnutls_openpgp_name *dn );
-
-int gnutls_openpgp_extract_key_pk_algorithm(
-    const gnutls_datum *cert,
-    int *r_bits );
-
-int gnutls_openpgp_extract_key_version(
-    const gnutls_datum *cert );
-
-time_t gnutls_openpgp_extract_key_creation_time(
-    const gnutls_datum *cert );
-
-time_t gnutls_openpgp_extract_key_expiration_time(
-    const gnutls_datum  *cert );
-
-int gnutls_openpgp_verify_key(
-    const char *trustdb,
-    const gnutls_datum *keyring,
-    const gnutls_datum* cert_list,
-    int cert_list_length );
-
-int gnutls_openpgp_fingerprint(
-    const gnutls_datum *cert,
-    unsigned char *fpr,
-    size_t *fprlen );
-
-int gnutls_openpgp_extract_key_id(
-    const gnutls_datum *cert,
-    unsigned char keyid[8] );
-
 int gnutls_openpgp_add_keyring_mem(
     gnutls_datum *keyring,
     const opaque *data,
@@ -77,20 +57,12 @@ int gnutls_openpgp_get_key(
     key_attr_t by,
     opaque *pattern );
 
-int gnutls_openpgp_get_key_trust(
-    const char *trustdb,
-    gnutls_datum *key );
-
 int gnutls_openpgp_recv_key(
     const char *host,
     short port,
     uint32 keyid,
     gnutls_datum *key );
 
-int gnutls_openpgp_key_to_xml(
-    const gnutls_datum *cert,
-    gnutls_datum *xmlkey, int ext );
-     
 /* internal */
 int _gnutls_openpgp_cert2gnutls_cert(
     gnutls_cert *cert,
@@ -103,5 +75,10 @@ _gnutls_openpgp_request_key(
     const gnutls_certificate_credentials cred,
     opaque* key_fpr,
     int key_fpr_size );
+
+keybox_blob* kbx_read_blob( const gnutls_datum* keyring, size_t pos );
+cdk_keydb_hd_t kbx_to_keydb( keybox_blob *blob );
+void kbx_blob_release( keybox_blob *ctx );
+
 
 #endif /*GNUTLS_OPENPGP_H*/

@@ -1,9 +1,9 @@
 INCLUDES = -I../ -I../../includes/ -I../../lib
-EXTRA_DIST = openpgp.h
+EXTRA_DIST = openpgp.h gnutls_openpgp.h
 
 noinst_LTLIBRARIES = libpgp.la
 
-COBJECTS = openpgp.c xml.c gnutls_openpgp.c
+COBJECTS = openpgp.c xml.c gnutls_openpgp.c verify.c extras.c
 
 libpgp_la_SOURCES = $(COBJECTS)
 
