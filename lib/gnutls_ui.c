@@ -571,13 +571,12 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
   * @max_bits: is the number of bits of an acceptable certificate (default 8200)
   * @max_depth: is maximum depth of the verification of a certificate chain (default 5)
   *
-  * This function will set some upper limits for the default verification function
-  * (gnutls_certificate_verify_peers()) to avoid denial of service attacks.
+  * This function will set some upper limits for the default verification function,
+  * gnutls_certificate_verify_peers2(), to avoid denial of service attacks.
   *
   **/
 void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t
-					  res, unsigned int max_bits,
-					  unsigned int max_depth)
+    res, unsigned int max_bits, unsigned int max_depth)
 {
     res->verify_depth = max_depth;
     res->verify_bits = max_bits;
