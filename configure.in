@@ -161,7 +161,6 @@ AC_MSG_RESULT([***
 *** Detecting system's parameters...
 ])
 
-AC_CHECK_SIZEOF(unsigned long long, 8)
 AC_CHECK_SIZEOF(unsigned long, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
 AC_CHECK_SIZEOF(unsigned short, 2)

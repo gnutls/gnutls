@@ -52,7 +52,7 @@ int gnutls_srp_verifier( char* username, char* password, const gnutls_datum *sal
 
 typedef int gnutls_srp_server_credentials_function(
 	gnutls_session, 
-	char* username, gnutls_datum* salt, 
+	const char* username, gnutls_datum* salt, 
 	gnutls_datum* verifier, gnutls_datum* generator,
 	gnutls_datum* prime
 );
