@@ -1,10 +1,3 @@
-Version ?.?.?
-- gnutls_check_pending() was renamed to gnutls_record_check_pending()
-- Key exchange methods changed so they do not depend on the Certificate
-  type (GNUTLS_KX_X509PKI_* renamed to GNUTLS_KX_*)
-- Renamed gnutls_x509pki_s/get_dh_bits() to gnutls_dh_s/get_dhe_bits()
-- Renamed gnutls_anon_server/client_get_dh_bits() to gnutls_dh_get_dha_bits()
-
 Version 0.3.3
 - Added gnutls_x509pki_verify_certificate()
 - Added gnutls_x509pki_set_trust_mem() and gnutls_x509pki_set_key_mem()
@@ -12,7 +5,7 @@ Version 0.3.3
 - Bug fixes in the Handshake protocol (based on patch by Guillaume Morin)
 - Corrected library versioning
 
-Version 0.3.2 (5/01/2002)
+Version 0.3.2 (5/01/2001)
 - Corrected bug which did not allow a client to accept multiple CA names
 - Added gnutls_fingerprint()
 - Added gnutls_x509pki_extract_certificate_serial()

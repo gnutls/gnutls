@@ -30,18 +30,10 @@ extern "C" {
 @DEFINE_SIZE_T@
 @DEFINE_TIME_T@
 
-#define GNUTLS_CIPHER_AES_128_CBC GNUTLS_CIPHER_RIJNDAEL_128_CBC
-#define GNUTLS_CIPHER_AES_256_CBC GNUTLS_CIPHER_RIJNDAEL_256_CBC
+#define GNUTLS_AES GNUTLS_RIJNDAEL
 
-typedef enum GNUTLS_BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC } GNUTLS_BulkCipherAlgorithm;
-#define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_RIJNDAEL_128_CBC
-#define GNUTLS_CIPHER_RIJNDAEL256_CBC GNUTLS_CIPHER_RIJNDAEL_256_CBC
-
-typedef enum GNUTLS_KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } GNUTLS_KXAlgorithm;
-#define GNUTLS_KX_X509PKI_RSA GNUTLS_KX_RSA
-#define GNUTLS_KX_X509PKI_DHE_RSA GNUTLS_KX_DHE_RSA
-#define GNUTLS_KX_X509PKI_DHE_DSS GNUTLS_KX_DHE_DSS
-
+typedef enum GNUTLS_BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_TWOFISH_CBC, GNUTLS_CIPHER_RIJNDAEL256_CBC } GNUTLS_BulkCipherAlgorithm;
+typedef enum GNUTLS_KXAlgorithm { GNUTLS_KX_X509PKI_RSA=1, GNUTLS_KX_X509PKI_DHE_DSS, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } GNUTLS_KXAlgorithm;
 typedef enum GNUTLS_CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } GNUTLS_CredType;
 #define CredType GNUTLS_CredType
 
@@ -93,6 +85,7 @@ void gnutls_deinit(GNUTLS_STATE state);
 int gnutls_bye( GNUTLS_STATE state, GNUTLS_CloseRequest how);
 
 int gnutls_handshake( GNUTLS_STATE state);
+int gnutls_check_pending(GNUTLS_STATE state);
 int gnutls_rehandshake( GNUTLS_STATE state);
 
 
@@ -260,7 +253,5 @@ void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
 size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
-
-size_t gnutls_record_check_pending(GNUTLS_STATE state);
 
 int gnutls_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* data, char* result, int* result_size);

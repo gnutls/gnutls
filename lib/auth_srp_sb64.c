@@ -161,7 +161,6 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 		memcpy(&(*result)[0], tmpres, tmp);
 		i = mod;
 		j = tmp;
-
 	}
 /* encode the rest
  */
