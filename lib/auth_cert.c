@@ -426,7 +426,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 /* Generate client certificate
  */
 
-int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
+int _gnutls_gen_x509_certificate(GNUTLS_STATE state, opaque ** data)
 {
 	int ret, i;
 	opaque *pdata;
@@ -593,7 +593,7 @@ int _gnutls_gen_cert_client_certificate(GNUTLS_STATE state, opaque ** data)
 			    (state, data);
 
 	case GNUTLS_CRT_X509:
-		return _gnutls_gen_x509_client_certificate(state, data);
+		return _gnutls_gen_x509_certificate(state, data);
 
 	default:
 		gnutls_assert();
@@ -650,54 +650,13 @@ int _gnutls_gen_openpgp_server_certificate(GNUTLS_STATE state,
 	return ret;
 }
 
-int _gnutls_gen_x509_server_certificate(GNUTLS_STATE state, opaque ** data)
-{
-	int ret, i, pdatasize;
-	opaque *pdata;
-	gnutls_cert *apr_cert_list;
-	gnutls_private_key *apr_pkey;
-	int apr_cert_list_length;
-
-	if ((ret =
-	     _gnutls_find_apr_cert(state, &apr_cert_list,
-				   &apr_cert_list_length,
-				   &apr_pkey)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = 3;
-	for (i = 0; i < apr_cert_list_length; i++) {
-		ret += apr_cert_list[i].raw.size + 3;
-		/* hold size for uint24
-		 * and the certificate */
-	}
-
-	(*data) = gnutls_malloc(ret);
-	pdata = (*data);
-
-	if (pdata == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	WRITEuint24(ret - 3, pdata);
-	pdata += 3;
-	for (i = 0; i < apr_cert_list_length; i++) {
-		WRITEdatum24(pdata, apr_cert_list[i].raw);
-		pdata += (3 + apr_cert_list[i].raw.size);
-	}
-	pdatasize = ret;
-
-	return pdatasize;
-}
-
 int _gnutls_gen_cert_server_certificate(GNUTLS_STATE state, opaque ** data)
 {
 	switch (state->security_parameters.cert_type) {
 	case GNUTLS_CRT_OPENPGP:
 		return _gnutls_gen_openpgp_server_certificate(state, data);
 	case GNUTLS_CRT_X509:
-		return _gnutls_gen_x509_server_certificate(state, data);
+		return _gnutls_gen_x509_certificate(state, data);
 	default:
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
@@ -740,6 +699,12 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 
 	info = _gnutls_get_auth_info(state);
 
+	if (data == NULL || data_size == 0) {
+		gnutls_assert();
+		/* no certificate was sent */
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
+	}
+
 	DECR_LEN(dsize, 3);
 	size = READuint24(p);
 	p += 3;
@@ -763,15 +728,13 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 
 	if (peer_certificate_list_size == 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 
-	/* Now we start parsing the list (again).
-	 * We don't use DECR_LEN since the list has
-	 * been parsed before.
+	/* Ok we now allocate the memory to hold the
+	 * certificate list 
 	 */
-	dsize = data_size;
-	i = dsize;
+
 	peer_certificate_list =
 	    gnutls_calloc(1, sizeof(gnutls_cert) *
 			  (peer_certificate_list_size));
@@ -782,14 +745,15 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	}
 
 	p = data + 3;
-	i = data_size - 3;
-	j = 0;
 
-	len = READuint24(p);
-	p += 3;
-	for (; i > 0; len = READuint24(p), p += 3) {
-		if (j >= peer_certificate_list_size)
-			break;
+	/* Now we start parsing the list (again).
+	 * We don't use DECR_LEN since the list has
+	 * been parsed before.
+	 */
+
+	for (j=0;j<peer_certificate_list_size;j++) {
+		len = READuint24(p);
+		p += 3;
 
 		tmp.size = len;
 		tmp.data = p;
@@ -804,8 +768,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 		}
 
 		p += len;
-		i -= len + 3;
-		j++;
 	}
 
 
