@@ -431,8 +431,16 @@ int main(int argc, char **argv)
 	int salt;
 	struct passwd *pwd;
 
-	gnutls_global_init();
-	gnutls_global_init_extra();
+	if ((ret=gnutls_global_init()) < 0) {
+		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if ((ret=gnutls_global_init_extra()) < 0) {
+		fprintf(stderr,
+			"global_init_extra: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
 	
 	if (gaa(argc, argv, &info) != -1) {
 		fprintf(stderr, "Error in the arguments.\n");

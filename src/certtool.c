@@ -487,6 +487,8 @@ void update_signed_certificate( void)
 
 void gaa_parser(int argc, char **argv)
 {
+int ret;
+
 	if (gaa(argc, argv, &info) != -1) {
 		fprintf(stderr,
 			"Error in the arguments. Use the --help or -h parameters to get more information.\n");
@@ -515,7 +517,11 @@ void gaa_parser(int argc, char **argv)
 	if (info.outcert_format) out_cert_format = GNUTLS_X509_FMT_DER;
 	else out_cert_format = GNUTLS_X509_FMT_PEM;
 
-	gnutls_global_init();
+	if ((ret=gnutls_global_init()) < 0) {
+		fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
 	gnutls_global_set_log_function( tls_log_func);
 	gnutls_global_set_log_level(info.debug);
 

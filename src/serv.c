@@ -564,16 +564,17 @@ int main(int argc, char **argv)
       strcpy(name, "Echo Server");
    }
 
-   if (gnutls_global_init() < 0) {
-      fprintf(stderr, "global state initialization error\n");
-      exit(1);
+   if ((ret=gnutls_global_init()) < 0) {
+	fprintf(stderr, "global_init: %s\n", gnutls_strerror(ret));
+	exit(1);
    }
    gnutls_global_set_log_function( tls_log_func);
    gnutls_global_set_log_level(debug);
 
-   if (gnutls_global_init_extra() < 0) {
-      fprintf(stderr, "global state (extra) initialization error\n");
-      exit(1);
+   if ((ret=gnutls_global_init_extra()) < 0) {
+		fprintf(stderr,
+			"global_init_extra: %s\n", gnutls_strerror(ret));
+		exit(1);
    }
 
    /* Note that servers must generate parameters for
