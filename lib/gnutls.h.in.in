@@ -322,8 +322,8 @@ int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc)
 
 void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutls_dh_params dh_params);
 
-void gnutls_anon_free_client_credentials( gnutls_anon_server_credentials sc);
-int gnutls_anon_allocate_client_credentials( gnutls_anon_server_credentials *sc);
+void gnutls_anon_free_client_credentials( gnutls_anon_client_credentials sc);
+int gnutls_anon_allocate_client_credentials( gnutls_anon_client_credentials *sc);
 
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
