@@ -1,6 +1,6 @@
 EXTRA_DIST = gnutls.tex gnutls.ps \
 	fdl.tex cover.tex.in gnutls-logo.ps layers.eps pgp-fig1.eps \
-	x509-1.eps internals.eps gnutls.bib
+	x509-1.eps internals.eps gnutls.bib $(TEX_OBJECTS)
 
 # If you add any examples here, also change the ../examples/Makefile.am
 # to include the C source.

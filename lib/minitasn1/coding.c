@@ -111,7 +111,7 @@ _asn1_tag_der(unsigned char class,unsigned int tag_value,unsigned char *ans,int 
   int k;
   unsigned char temp[SIZEOF_UNSIGNED_INT];
 
-  if(tag_value<30){
+  if(tag_value<31){
     /* short form */
     ans[0]=(class&0xE0) + ((unsigned char)(tag_value&0x1F));
     *ans_len=1;
@@ -592,8 +592,8 @@ _asn1_ordering_set(unsigned char *der,node_asn *node)
 	if (temp==NULL) return;
 	
 	memcpy(temp,der+counter,p_vet->end-counter);
-	memmove(der+counter,der+p_vet->end,p2_vet->end-p_vet->end);
-	memcpy(der+p_vet->end,temp,p_vet->end-counter);
+	memcpy(der+counter,der+p_vet->end,p2_vet->end-p_vet->end);
+	memcpy(der+counter+p2_vet->end-p_vet->end,temp,p_vet->end-counter);
 	_asn1_afree(temp);
 	
 	tag=p_vet->value;
@@ -693,9 +693,9 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
 	temp=(unsigned char *)_asn1_alloca(p_vet->end-counter);
 	if (temp==NULL) return;
 	
-	memcpy(temp,der+counter,p_vet->end-counter);
-	memmove(der+counter,der+p_vet->end,p2_vet->end-p_vet->end);
-	memcpy(der+p_vet->end,temp,p_vet->end-counter);
+	memcpy(temp,der+counter,(p_vet->end)-counter);
+	memcpy(der+counter,der+(p_vet->end),(p2_vet->end)-(p_vet->end));
+	memcpy(der+counter+(p2_vet->end)-(p_vet->end),temp,(p_vet->end)-counter);
 	_asn1_afree(temp);
 	
 	p_vet->end=counter+(p2_vet->end-p_vet->end);

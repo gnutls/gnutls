@@ -171,6 +171,7 @@ AC_CHECK_SIZEOF(unsigned char*, 4)
 
 AC_CHECK_TYPES(ptrdiff_t,,, [
 # include <sys/types.h>
+# include <sys/stddef.h>
 ])
 
 AC_CHECK_TYPES(uint,,, [
