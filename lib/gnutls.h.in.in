@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  *  This file is part of GNUTLS.
  *
@@ -63,11 +63,11 @@ typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS,
 
 typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type;
 
-typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA, GNUTLS_MAC_MD2 } gnutls_mac_algorithm;
+typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } gnutls_mac_algorithm;
 
 /* The enumerations here should have the same value with gnutls_mac_algorithm.
  */
-typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA, GNUTLS_DIG_MD2 } gnutls_digest_algorithm;
+typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } gnutls_digest_algorithm;
 
 /* exported for other gnutls headers. This is the maximum number
  * of algorithms (ciphers, kx or macs). 
@@ -116,17 +116,16 @@ typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1 } gnutls_proto
 typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
 } gnutls_certificate_type;
 
-typedef enum gnutls_x509_crt_fmt { GNUTLS_X509_FMT_DER, 
-	GNUTLS_X509_FMT_PEM } gnutls_x509_crt_fmt;
+typedef enum gnutls_x509_certificate_format { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_format;
 
-typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
-	GNUTLS_PK_UNKNOWN = 0xff
+typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA
 } gnutls_pk_algorithm;
 
 /* If you want to change this, then also change the 
  * define in gnutls_int.h, and recompile.
  */
-typedef int gnutls_transport_ptr;
+typedef void * gnutls_transport_ptr;
 
 struct gnutls_session_int;
 typedef struct gnutls_session_int* gnutls_session;
@@ -301,33 +300,30 @@ int gnutls_anon_allocate_client_credentials( gnutls_anon_server_credentials *sc)
 void gnutls_certificate_free_credentials( gnutls_certificate_credentials sc);
 int gnutls_certificate_allocate_credentials( gnutls_certificate_credentials *sc);
 
-void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params);
-void gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
-void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, unsigned int flags);
+int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params);
+int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
 
 int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials res, const char* CAFILE, 
-	gnutls_x509_crt_fmt);
+	gnutls_x509_certificate_format);
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CA, gnutls_x509_crt_fmt);
-
-int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res, 
-		const char *crlfile, gnutls_x509_crt_fmt type);
-int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials res, 
-	const gnutls_datum *CRL, gnutls_x509_crt_fmt type);
+	const gnutls_datum *CA, gnutls_x509_certificate_format);
 
 int gnutls_certificate_set_x509_key_file( gnutls_certificate_credentials res, 
-	const char *CERTFILE, const char* KEYFILE, gnutls_x509_crt_fmt);
+	const char *CERTFILE, const char* KEYFILE, gnutls_x509_certificate_format);
 int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum* CERT, const gnutls_datum* KEY,
-	gnutls_x509_crt_fmt);
+	gnutls_x509_certificate_format);
 
 /* global state functions 
+ */
+/* In this version global_init accepts two files (pkix.asn, pkcs1.asn).
+ * This will not be the case in the final version. These files 
+ * are located in the src/ directory of gnutls distribution.
  */
 int gnutls_global_init(void);
 void gnutls_global_deinit(void);
 
 typedef void* (*gnutls_alloc_function)(size_t);
-typedef void* (*gnutls_calloc_function)(size_t, size_t);
 typedef void (*gnutls_free_function)(void*);
 typedef void* (*gnutls_realloc_function)(void*, size_t);
 
@@ -338,42 +334,29 @@ void gnutls_global_set_mem_functions(
 
 /* For use in callbacks */
 extern gnutls_alloc_function gnutls_malloc;
-extern gnutls_calloc_function gnutls_calloc;
 extern gnutls_free_function gnutls_free;
 
 typedef void (*gnutls_log_func)( const char*);
 void gnutls_global_set_log_function( gnutls_log_func log_func);
 
-/* Diffie Hellman parameter handling.
- */
+/* DH params */
+int gnutls_dh_params_set( gnutls_dh_params, gnutls_datum prime, gnutls_datum generator, int bits);
 int gnutls_dh_params_init( gnutls_dh_params*);
 void gnutls_dh_params_deinit( gnutls_dh_params);
-int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *prime,
-			const gnutls_datum* generator);
-int gnutls_dh_params_import_pkcs3(gnutls_dh_params params, 
-	const gnutls_datum * pkcs3_params, gnutls_x509_crt_fmt format);
-int gnutls_dh_params_generate2(gnutls_dh_params params, int bits);
-int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
-	   gnutls_x509_crt_fmt format, unsigned char* params_data, int* params_data_size);
-int gnutls_dh_params_export_raw(gnutls_dh_params params,
-	gnutls_datum * prime, gnutls_datum * generator, int *bits);
+int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits);
 
-
-/* RSA params 
- */
+/* RSA params */
+int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
+	gnutls_datum m, gnutls_datum e, gnutls_datum d, 
+	gnutls_datum p, gnutls_datum q, gnutls_datum u,
+	int bits);
+int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
+	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
+	gnutls_datum* u, int bits);
 int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params);
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params);
-int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params, 
-	gnutls_datum m, gnutls_datum e,
-	gnutls_datum d, gnutls_datum p, gnutls_datum q, gnutls_datum u);
-int gnutls_rsa_params_generate2(gnutls_rsa_params params, int bits);
-int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
-	gnutls_datum * m, gnutls_datum *e,
-	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
-	gnutls_datum* u, int *bits);
 
-/* Session stuff
- */
+
 typedef ssize_t (*gnutls_pull_func)(gnutls_transport_ptr, void*, size_t);
 typedef ssize_t (*gnutls_push_func)(gnutls_transport_ptr, const void*, size_t);
 void gnutls_transport_set_ptr(gnutls_session session, gnutls_transport_ptr ptr);
@@ -398,7 +381,6 @@ void* gnutls_session_get_ptr(gnutls_session session);
 
 void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status);
 
-/* fingerprint */
-int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
-	char* result, size_t* result_size);
+int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size);
+
 

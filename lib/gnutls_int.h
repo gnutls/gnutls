@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -34,14 +34,16 @@
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
 #define X509_DEBUG
 #define RECORD_DEBUG
-#define COMPRESSION_DEBUG*/
+#define COMPRESSION_DEBUG
 #define DEBUG
-
+*/
 
 /* It might be a good idea to replace int with void*
  * here.
  */
-typedef int gnutls_transport_ptr;
+typedef void * gnutls_transport_ptr;
+
+#define MIN_BITS 767
 
 #define MAX32 4294967295
 #define MAX24 16777215
@@ -136,11 +138,6 @@ typedef struct {
 	opaque * data;
 	unsigned int size;
 } gnutls_datum;
-
-typedef struct {
-	const opaque * data;
-	unsigned int size;
-} gnutls_const_datum;
 typedef gnutls_datum gnutls_sdatum;
 
 #include <gnutls_buffer.h>
@@ -165,8 +162,7 @@ typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS,
 	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS
 } gnutls_kx_algorithm;
 
-typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA, GNUTLS_MAC_MD2 } gnutls_mac_algorithm;
-typedef gnutls_mac_algorithm gnutls_digest_algorithm;
+typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } gnutls_mac_algorithm;
 
 typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB,
 	GNUTLS_COMP_LZO
@@ -194,8 +190,8 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT,
 	GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA 
 } ContentType;
 
-typedef enum gnutls_x509_crt_fmt { GNUTLS_X509_FMT_DER, 
-	GNUTLS_X509_FMT_PEM } gnutls_x509_crt_fmt;
+typedef enum gnutls_x509_certificate_format { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_format;
 
 typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
 	GNUTLS_PK_UNKNOWN = 0xff
@@ -563,7 +559,7 @@ typedef struct {
 	 */
 	uint16			extensions_sent[MAX_EXT_TYPES];
 	uint16			extensions_sent_size;
-	
+
 	/* is 0 if we are to send the whole PGP key, or non zero
 	 * if the fingerprint is to be sent.
 	 */
@@ -593,11 +589,6 @@ typedef struct {
 	 * openpgp key. (if the peer sends a fingerprint)
 	 */
 	gnutls_openpgp_recv_key_func openpgp_recv_key_func;
-	
-	/* If non zero the server will not advertize the CA's he
-	 * trusts (do not send an RDN sequence).
-	 */
-	int			ignore_rdn_sequence;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
@@ -614,8 +605,14 @@ struct gnutls_session_int {
 typedef struct gnutls_session_int *gnutls_session;
 
 typedef struct {
+	int bits;
 	MPI _prime;
         MPI _generator;
+        gnutls_datum generator;
+       	gnutls_datum prime;
+        int local;              /* indicates if it is 
+                                 * not malloced, !=0 indicates malloced
+                                 */
 } _gnutls_dh_params;
 
 #define gnutls_dh_params _gnutls_dh_params*
@@ -649,8 +646,5 @@ void _gnutls_free_auth_info( gnutls_session session);
 
 void _gnutls_set_adv_version( gnutls_session, gnutls_protocol_version);
 gnutls_protocol_version _gnutls_get_adv_version( gnutls_session);
-
-int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
-	char* result, size_t* result_size);
 
 #endif /* GNUTLS_INT_H */
