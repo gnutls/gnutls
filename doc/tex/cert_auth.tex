@@ -76,10 +76,12 @@ and a different key for the plain RSA ciphersuites, which use encryption.
 All the key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
 available in certificate authentication. 
 
-Note that the DHE key exchange methods require Diffie Hellman parameters
-to be generated and associated with a credentials structure. The RSA-EXPORT
-method requires 512 bit RSA parameters, which should also be generated
-and associated with the credentials structure. See the functions:
+Note that the DHE key exchange methods are generally slower\footnote{It really depends
+on the group used. Primes with lesser bits are always faster, but also easier to break. 
+Values less than 768 should not be used today} 
+than plain RSA and require Diffie Hellman parameters to be generated and associated with a credentials 
+structure. The RSA-EXPORT method also requires 512 bit RSA parameters, that should 
+also be generated and associated with the credentials structure. See the functions:
 \begin{itemize}
 \item \printfunc{gnutls_dh_params_generate2}{gnutls\_dh\_params\_generate2}
 \item \printfunc{gnutls_certificate_set_dh_params}{gnutls\_certificate\_set\_dh\_params}
