@@ -1180,15 +1180,15 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, char *fpr, size_t *fprlen)
     return 0;
 }
 
-/**
+/*-
  * gnutls_openpgp_keyid - Gets the keyID
  * @cert: the raw data that contains the OpenPGP public key.
  * @keyid: the buffer to save the keyid.
  *
  * Returns the 64-bit keyID of the OpenPGP key.
- **/
+ -*/
 int
-gnutls_openpgp_keyid( const gnutls_datum *cert, opaque keyid[8] )
+gnutls_openpgp_keyid( const gnutls_datum *cert, unsigned char keyid[8] )
 {
     CDK_KBNODE kb_pk = NULL, pkt;
     PKT_public_key *pk = NULL;
@@ -1354,7 +1354,7 @@ gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
     return rc;
 }
 
-/**
+/*-
  * gnutls_openpgp_recv_key - Receives a key from a HKP keyserver.
  * @host - the hostname of the keyserver.
  * @port - the service port (if not set use 11371).
@@ -1362,7 +1362,7 @@ gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
  * @key - Context to store the raw (dearmored) key.
  *
  * Try to connect to a public keyserver to get the specified key.
- **/
+ -*/
 int
 gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
                         gnutls_datum *key)
