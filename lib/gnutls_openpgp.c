@@ -38,6 +38,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <assert.h>
 
 #define OPENPGP_NAME_SIZE GNUTLS_X509_CN_SIZE
 
@@ -86,16 +87,22 @@ file_exist(const char *file)
 
 typedef struct {
   int type;
+  int armored;
   size_t size;
   byte *data;
-} keyring_blob;
+} keybox_blob;
+
+typedef enum {
+  KBX_BLOB_FILE = 0x00,
+  KBX_BLOB_DATA = 0x01
+} keyring_blob_types;
 
 static int
-keyring_blob_new(keyring_blob **r_ctx)
+kbx_blob_new( keybox_blob **r_ctx )
 {
-  keyring_blob *c;
+  keybox_blob *c;
   
-  if (!r_ctx)
+  if ( !r_ctx )
     return GNUTLS_E_INVALID_PARAMETERS;
   
   c = cdk_alloc_clear( sizeof * c);
@@ -104,19 +111,19 @@ keyring_blob_new(keyring_blob **r_ctx)
   *r_ctx = c;
 
   return 0;
-}
+} /* kbx_blob_new */
 
 static void
-keyring_blob_release(keyring_blob *ctx)
+kbx_blob_release( keybox_blob *ctx )
 {
   if (!ctx)
     return;
   cdk_free(ctx->data);
   cdk_free(ctx);
-}
+} /* kbx_blob_release */
 
 static KEYDB_HD
-keyring_to_keydb(keyring_blob *blob)
+kbx_to_keydb( keybox_blob *blob )
 {
   KEYDB_HD khd = NULL;
 
@@ -127,65 +134,73 @@ keyring_to_keydb(keyring_blob *blob)
   if ( !khd )
     return NULL;
   khd->used = 1;
-  if (blob->type == 0x00) /* file */
-      khd->name = cdk_strdup(blob->data);   
-  else if (blob->type == 0x01) /* data */
-    {
-      cdk_iobuf_new(&khd->buf, blob->size);
-      cdk_iobuf_write(khd->buf, blob->data, blob->size);
+  if ( blob->type == KBX_BLOB_FILE )
+    { /* file */
+      khd->name = cdk_strdup( blob->data );
+      khd->type = blob->armored? KEYDB_TYPE_ARMORED: KEYDB_TYPE_KEYRING;
+    }
+  else if ( blob->type == KBX_BLOB_DATA )
+    { /* data */
+      cdk_iobuf_new( &khd->buf, blob->size );
+      cdk_iobuf_write( khd->buf, blob->data, blob->size );
+      khd->type = KEYDB_TYPE_DATA;
     }
   else /* error */
     {
-      cdk_free(khd);
+      cdk_free( khd );
       khd = NULL;
     }
   
   return khd;
-}
-                     
-/* Extract a keyring blob from the given position. */
-static keyring_blob*
-read_keyring_blob(const gnutls_datum* keyring, size_t pos)
+} /* kbx_to_keydb */
+
+/* Extract a keybox blob from the given position. */
+static keybox_blob*
+kbx_read_blob( const gnutls_datum* keyring, size_t pos )
 {
-  keyring_blob *blob = NULL;
+  keybox_blob *blob = NULL;
   
-  if (!keyring || !keyring->data)
+  if ( !keyring || !keyring->data )
     return NULL;
 
   if (pos > keyring->size)
     return NULL;
     
-  keyring_blob_new(&blob);
+  kbx_blob_new( &blob );
   blob->type = keyring->data[pos];
-  if (blob->type < 0 || blob->type > 1)
+  if ( blob->type != KBX_BLOB_FILE &&
+       blob->type != KBX_BLOB_DATA )
     {
-      keyring_blob_release(blob);
+      kbx_blob_release( blob );
       return NULL;
     }
-  blob->size = buffer_to_u32( keyring->data+pos+1 );
+  blob->armored = keyring->data[pos+1];
+  blob->size = buffer_to_u32( keyring->data+pos+2 );
   if (!blob->size)
     {
-      keyring_blob_release(blob);
+      kbx_blob_release( blob );
       return NULL;
     }
   blob->data = cdk_alloc_clear(blob->size + 1);
   if ( !blob->data )
     return NULL;
-  memcpy(blob->data, keyring->data+(pos+5), blob->size);
+  memcpy(blob->data, keyring->data+(pos+6), blob->size);
   blob->data[blob->size] = '\0';
   
   return blob;
-}
+} /* kbx_read_blob */
 
 /* Creates a keyring blob from raw data
  *
  * Format:
  * 1 octet  type
+ * 1 octet  armored
  * 4 octet  size of blob
  * n octets data
  */
 static byte*
-conv_data_to_keyring(int type, const char *data, size_t size, size_t *r_size)
+kbx_data_to_keyring( int type, int enc, const char *data,
+                     size_t size, size_t *r_size )
 {
   byte *p = NULL;
 
@@ -195,17 +210,18 @@ conv_data_to_keyring(int type, const char *data, size_t size, size_t *r_size)
   p = gnutls_malloc( 1+4+size );
   if ( !p )
     return NULL;
-  p[0] = type; /* type: keyring name */
-  p[1] = (size >> 24) & 0xff;
-  p[2] = (size >> 16) & 0xff;
-  p[3] = (size >>  8) & 0xff;
-  p[4] = (size      ) & 0xff;
-  memcpy(p+5, data, size);
+  p[0] = type; /* type: {keyring,name} */
+  p[1] = enc; /* encoded: {plain, armored} */
+  p[2] = (size >> 24) & 0xff;
+  p[3] = (size >> 16) & 0xff;
+  p[4] = (size >>  8) & 0xff;
+  p[5] = (size      ) & 0xff;
+  memcpy( p+6, data, size );
   if ( r_size )
-    *r_size = 1+4+size;
+    *r_size = 6+size;
   
-  return p; 
-}
+  return p;
+} /* kbx_data_to_keyring */
 
 static int
 is_file_armored(char *file)
@@ -570,7 +586,7 @@ gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
                        key_attr_t by, opaque *pattern)
 {
   int rc = 0;
-  keyring_blob *blob = NULL;
+  keybox_blob *blob = NULL;
   KEYDB_HD khd = NULL;
   KBNODE pk = NULL;
   KEYDB_SEARCH ks;
@@ -578,10 +594,10 @@ gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
   if (!key || !keyring || by == KEY_ATTR_NONE)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  blob = read_keyring_blob(keyring, 0);
+  blob = kbx_read_blob( keyring, 0 );
   if (!blob)
     return GNUTLS_E_MEMORY_ERROR;
-  khd = keyring_to_keydb(blob);
+  khd = kbx_to_keydb( blob );
   ks.type = by;
   switch (by)
     {
@@ -618,9 +634,9 @@ gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
   rc = kbnode_to_datum( pk, key );
   
 leave:
-  cdk_free(khd);
+  cdk_free( khd );
   cdk_kbnode_release( pk );
-  keyring_blob_release(blob);
+  kbx_blob_release( blob );
   
   return rc;
 }
@@ -890,7 +906,7 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
   memset(dn, 0, sizeof *dn);
   size = uid->len < OPENPGP_NAME_SIZE? uid->len : OPENPGP_NAME_SIZE;
   memcpy(dn->name, uid->name, size);
-  dn->name[size-1] = '\0'; /* make sure it's a string */
+  dn->name[size] = '\0'; /* make sure it's a string */
 
   /*
    * Extract the email address from the userID string and save it to
@@ -1009,7 +1025,7 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
 
   *r_success = 0;
   rc = datum_to_kbnode( key, &kb_pk );
-  if (rc)
+  if ( rc )
     return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
   p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
@@ -1024,11 +1040,12 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
       trustval = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
-  rc = cdk_trustdb_get_ownertrust(buf, pk, &ot, &flags);
-  cdk_iobuf_close(buf);
-  if (rc)
-    {
-      rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+  rc = cdk_trustdb_get_ownertrust( buf, pk, &ot, &flags );
+  cdk_iobuf_close( buf );
+  if ( rc ) /* no ownertrust record was found */
+    {      
+      trustval = 0;
+      *r_success = 1;
       goto leave;
     }
 
@@ -1059,9 +1076,10 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
     }      
 
 leave:
+  cdk_kbnode_release( kb_pk );
   return trustval;
 }
-               
+
 /**
  * gnutls_openpgp_verify_key - Verify all signatures on the key
  * @cert_list: the structure that holds the certificates.
@@ -1079,7 +1097,7 @@ gnutls_openpgp_verify_key( const char *trustdb,
 {
   KBNODE kb_pk = NULL;
   KEYDB_HD khd = NULL;
-  keyring_blob *blob = NULL;
+  keybox_blob *blob = NULL;
   int rc = 0;
   int status = 0;
   
@@ -1089,10 +1107,10 @@ gnutls_openpgp_verify_key( const char *trustdb,
   if (cert_list_length != 1 || !keyring->size)
     return GNUTLS_CERT_INVALID;
 
-  blob = read_keyring_blob(keyring, 0);
+  blob = kbx_read_blob(keyring, 0);
   if (!blob)
     return GNUTLS_CERT_INVALID;
-  khd = keyring_to_keydb(blob);
+  khd = kbx_to_keydb(blob);
   if (!khd)
     {
       rc = GNUTLS_CERT_INVALID;
@@ -1106,7 +1124,7 @@ gnutls_openpgp_verify_key( const char *trustdb,
       if (!success)
         goto leave;
     }
-  
+
   rc = datum_to_kbnode( cert_list, &kb_pk );
   if (rc)
     {
@@ -1134,8 +1152,8 @@ gnutls_openpgp_verify_key( const char *trustdb,
     }
 
 leave:
-  keyring_blob_release(blob);
-  cdk_free(khd);
+  kbx_blob_release( blob );
+  cdk_free( khd );
   cdk_kbnode_release( kb_pk );
   
   return rc;
@@ -1223,11 +1241,13 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
 {
   byte *blob;
   size_t nbytes;
+  int enc = 0;
   
   if (!keyring || !name)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  blob = conv_data_to_keyring(0x00, name, strlen(name), &nbytes);
+  enc = is_file_armored( (char*)name );
+  blob = kbx_data_to_keyring( KBX_BLOB_FILE, enc, name, strlen(name), &nbytes);
   if (blob && nbytes)
     { 
       if ( gnutls_datum_append( keyring, blob, nbytes ) < 0 )
@@ -1260,8 +1280,8 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
   if (!keyring || !data || !len)
     return GNUTLS_E_INVALID_PARAMETERS;
   
-  blob = conv_data_to_keyring(0x01, data, len, &nbytes);
-  if (blob && nbytes)
+  blob = kbx_data_to_keyring( KBX_BLOB_DATA, 0, data, len, &nbytes );
+  if ( blob && nbytes )
     {
       if ( gnutls_datum_append( keyring, blob, nbytes ) < 0 )
         {
