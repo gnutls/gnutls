@@ -1,3 +1,21 @@
+2004-09-19 12:34  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi:
+
+	Add.  
+
+2004-09-19 12:32  Simon Josefsson <simon@josefsson.org>
+
+	* doc/tex/ex-rfc2818.tex:
+
+	Fix.  
+
+2004-09-19 11:22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/tex/: ex-rfc2818.tex, examples.tex:
+
+	Add, from Nikos.  
+
 2004-09-17 09:07  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, NEWS:
