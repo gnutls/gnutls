@@ -163,9 +163,9 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 		k++;
 
 		strcpy(name, root);
-		strcat(name, ".?");
+		strcat(name, ".?"); /* Flawfinder: ignore */
 		_gnutls_int2str(k, counter);
-		strcat(name, counter);
+		strcat(name, counter); /* Flawfinder: ignore */
 
 		len = sizeof(str) - 1;
 		result = asn1_read_value(rasn, name, str, &len);
@@ -179,7 +179,7 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 		do {
 
 			strcpy(name2, name);
-			strcat(name2, ".extnID");
+			strcat(name2, ".extnID"); /* Flawfinder: ignore */
 
 			len = sizeof(extnID) - 1;
 			result =
@@ -193,7 +193,7 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 			}
 
 			strcpy(name2, name);
-			strcat(name2, ".critical");
+			strcat(name2, ".critical"); /* Flawfinder: ignore */
 
 			len = sizeof(critical) - 1;
 			result =
@@ -207,7 +207,7 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 			}
 
 			strcpy(name2, name);
-			strcat(name2, ".extnValue");
+			strcat(name2, ".extnValue"); /* Flawfinder: ignore */
 
 			len = sizeof(extnValue) - 1;
 			result =
@@ -290,10 +290,10 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	do {
 		k++;
 
-		strcpy(name, "certificate2");
-		strcat(name, ".?");
-		_gnutls_int2str(k, counter);
-		strcat(name, counter);
+		strcpy(name, "certificate2"); /* Flawfinder: ignore */
+		strcat(name, ".?"); /* Flawfinder: ignore */
+		_gnutls_int2str(k, counter); 
+		strcat(name, counter); /* Flawfinder: ignore */
 
 		len = sizeof(str) - 1;
 		result = asn1_read_value(rasn, name, str, &len);
@@ -307,7 +307,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 		do {
 
 			strcpy(name2, name);
-			strcat(name2, ".extnID");
+			strcat(name2, ".extnID"); /* Flawfinder: ignore */
 
 			len = sizeof(extnID) - 1;
 			result =
@@ -321,7 +321,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 			}
 
 			strcpy(name2, name);
-			strcat(name2, ".critical");
+			strcat(name2, ".critical"); /* Flawfinder: ignore */
 
 			len = sizeof(critical) - 1;
 			result =
@@ -336,7 +336,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 			}
 
 			strcpy(name2, name);
-			strcat(name2, ".extnValue");
+			strcat(name2, ".extnValue"); /* Flawfinder: ignore */
 
 			len = sizeof(extnValue) - 1;
 			result =

@@ -206,7 +206,7 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	}
 
 		
-	strcpy( tmpstr, "certificate2.tbsCertificate.issuer");
+	strcpy( tmpstr, "certificate2.tbsCertificate.issuer"); /* Flawfinder: ignore */
 	result = asn1_get_start_end_der( c2, cert->raw.data, cert->raw.size,
 	                tmpstr, &start1, &end1);
 	asn1_delete_structure( c2);
@@ -219,7 +219,7 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 		
 	len1 = end1 - start1 + 1;
 		
-	strcpy( tmpstr, "certificate2.tbsCertificate.subject");
+	strcpy( tmpstr, "certificate2.tbsCertificate.subject"); /* Flawfinder: ignore */
 	result = asn1_get_start_end_der( c3, issuer_cert->raw.data, issuer_cert->raw.size,
 	                tmpstr, &start2, &end2);
 	asn1_delete_structure( c3);

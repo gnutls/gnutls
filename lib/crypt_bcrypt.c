@@ -611,7 +611,7 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, M
 	uint8 cost;
 	int i, salt_size = strlen(salt), len;
 	unsigned char *local_salt, *v;
-	int passwd_len, vsize;
+	int passwd_len, vsize, tmpsize;
 	opaque *tmp;
 
 	/* copy username+null+B64TEXT to text */
@@ -624,7 +624,11 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, M
 		passwd_len = 56;
 
 	local_salt = gnutls_malloc(salt_size + 1);
-	strcpy((char *) local_salt, salt);
+	if (local_salt==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	strcpy((char *) local_salt, salt); /* Flawfinder: ignore */
 
 	sp = index( local_salt, ':'); /* move to salt - after verifier */
 	if (sp==NULL) {
@@ -672,11 +676,15 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, M
 	}
 	gnutls_free(v);
 
+	tmpsize = strlen(magic) + 3 + strlen(sp) + 1 + strlen(rtext) + 1;
 	tmp =
-	    gnutls_malloc(strlen(magic) + 3 + strlen(sp) + 1 +
-			  strlen(rtext) + 1);
+	    gnutls_malloc( tmpsize);
+	if (tmp==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 
-	sprintf(tmp, "%s%s:%s", magic, rtext, sp);
+	sprintf(tmp, "%s%s:%s", magic, rtext, sp); /* Flawfinder: ignore */
 
 	gnutls_free(local_salt);
 	gnutls_free(rtext);
@@ -715,7 +723,7 @@ char *crypt_bcrypt_wrapper(const char* username, const char *pass_new, int cost,
 	}
 
 	tcp = gnutls_calloc(1, 1 + result_size + 1);
-	sprintf(tcp, ":%s", result);
+	sprintf(tcp, ":%s", result); /* Flawfinder: ignore */
 
 	gnutls_free(result);
 

@@ -176,7 +176,7 @@ void _gnutls_log( const char *fmt, ...) {
  if (_gnutls_log_func==NULL) return;
 
  va_start(args,fmt);
- vsprintf( str,fmt,args);
+ vsprintf( str,fmt,args); /* Flawfinder: ignore */
  va_end(args);   
 
  log_func( str);

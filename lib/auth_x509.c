@@ -1048,7 +1048,7 @@ int gnutls_x509pki_extract_subject_dns_name(const gnutls_datum * cert,
 
 	if (*ret_size > dnsname.size) {
 		*ret_size = dnsname.size;
-		strcpy(ret, dnsname.data);
+		strcpy(ret, dnsname.data); /* FlawFinder: ignore */
 		gnutls_free_datum(&dnsname);
 	} else {
 		*ret_size = dnsname.size;

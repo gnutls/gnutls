@@ -179,13 +179,13 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	if (strlen(msg) > 50)
 		return -1;
 
-	strcat(top, "-----BEGIN ");
-	strcat(top, msg);
-	strcat(top, "-----");
+	strcat(top, "-----BEGIN "); /* Flawfinder: ignore */
+	strcat(top, msg); /* Flawfinder: ignore */
+	strcat(top, "-----"); /* Flawfinder: ignore */
 
-	strcat(bottom, "\n-----END ");
-	strcat(bottom, msg);
-	strcat(bottom, "-----\n");
+	strcat(bottom, "\n-----END "); /* Flawfinder: ignore */
+	strcat(bottom, msg); /* Flawfinder: ignore */
+	strcat(bottom, "-----\n"); /* Flawfinder: ignore */
 
 	ret = data_size % 3;
 	if (ret != 0)
@@ -203,7 +203,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	if ((*result) == NULL)
 		return -1;
 
-	strcat(*result, top);
+	strcat(*result, top); /* Flawfinder: ignore */
 	pos = strlen(top);
 
 	for (i = j = 0; i < data_size; i += 3, j += 4) {
@@ -239,7 +239,7 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 		*ptr++ = tmpres[3];
 	}
 
-	strcat(*result, bottom);
+	strcat(*result, bottom); /* Flawfinder: ignore */
 	return ret;
 }
 

@@ -31,7 +31,7 @@ void _gnutls_dump_mpi(char* prefix, MPI a)
 	size_t n = sizeof buf;
 	
 	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, &n, a))
-		strcpy(buf, "[can't print value]");
+		strcpy(buf, "[can't print value]"); /* Flawfinder: ignore */
 	_gnutls_log( "MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
 }
 
@@ -46,7 +46,7 @@ char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 		return (new);
 
 	for (i = j = 0; i < oldlen; j+=2) {
-		sprintf(&new[j], "%.2x", old[i]);
+		sprintf(&new[j], "%.2x", old[i]); /* Flawfinder: ignore */
 		i++;
 	}
 	new[j] = '\0';
@@ -70,7 +70,7 @@ void _gnutls_print_state(GNUTLS_STATE state)
 
 }
 
-char* _gnutls_alert2str( int alert) {
+const char* _gnutls_alert2str( int alert) {
 static char str[512];
 
 	switch(alert) {
@@ -88,7 +88,7 @@ static char str[512];
 			strcpy(str, "Decryption Failed");
 			break;
 		case GNUTLS_A_RECORD_OVERFLOW:
-			strcpy(str, "Record Overflow");
+			strcpy(str, "Record Overflow"); 
 			break;
 
 		case GNUTLS_A_DECOMPRESSION_FAILURE:

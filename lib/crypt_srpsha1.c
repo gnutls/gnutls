@@ -52,11 +52,16 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 
 	
 	local_salt = gnutls_malloc(salt_size + 1);
-	strcpy((char *) local_salt, salt);
+	if (local_salt==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	strcpy((char *) local_salt, salt); /* Flawfinder: ignore */
 
 	sp = index( local_salt, ':'); /* move to salt - after verifier */
 	if (sp==NULL) {
 		gnutls_assert();
+		gnutls_free( local_salt);
 		return NULL;
 	}
 	sp++;
@@ -70,10 +75,16 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	rsalt_size = _gnutls_sbase64_decode(sp, len, &csalt);
 	if (rsalt_size < 0) {
 		gnutls_assert();
+		gnutls_free(local_salt);
 		return NULL;
 	}
 
 	h1 = gnutls_hash_init(GNUTLS_MAC_SHA);
+	if (h1==NULL) {
+		gnutls_assert();
+		gnutls_free(local_salt);
+		return NULL;
+	}
 	gnutls_hash(h1, csalt, rsalt_size);
 	gnutls_free(csalt);
 
@@ -86,21 +97,27 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 
 	if (vsize == -1 || v == NULL) {
 		gnutls_assert();
+		gnutls_free(local_salt);
 		return NULL;
 	}
 
 	if (_gnutls_sbase64_encode(v, vsize, &rtext) < 0) {
 		gnutls_free(v);
+		gnutls_free(local_salt);
 		gnutls_assert();
 		return NULL;
 	}
 	gnutls_free(v);
 
+	tmpsize = strlen(sp) + strlen(rtext) + strlen(magic) + 1 + 1;
 	tmp =
-	    gnutls_malloc(strlen(sp) + strlen(rtext) + strlen(magic) + 1 +
-			  1);
-
-	sprintf(tmp, "%s%s:%s", magic, rtext, sp);
+	    gnutls_malloc( tmpsize);
+	if (tmp==NULL) {
+		gnutls_assert();
+		gnutls_free(local_salt);
+		return NULL;
+	}
+	sprintf(tmp, "%s%s:%s", magic, rtext, sp); /* Flawfinder: ignore */
 
 	gnutls_free(rtext);
 	gnutls_free(local_salt);
@@ -135,7 +152,12 @@ char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
 	}
 
 	tcp = gnutls_calloc(1, 1+ result_size + 1);
-	sprintf(tcp, ":%s", result);
+	if (tcp==NULL) {
+		gnutls_assert();
+		gnutls_free(rand);
+		return NULL;
+	}	
+	sprintf(tcp, ":%s", result); /* Flawfinder: ignore */
 
 	gnutls_free(result);
 	gnutls_free(rand);

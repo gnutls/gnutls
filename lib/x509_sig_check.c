@@ -268,14 +268,14 @@ int _pkcs1_rsa_generate_sig( MACAlgorithm hash_algo, gnutls_private_key *pkey, c
 	int ret;
 	GNUTLS_HASH_HANDLE hd;
 	opaque digest[MAX_HASH_SIZE];
-	char OID[40];
+	char OID[64];
 	int digest_size =  gnutls_hash_get_algo_len( hash_algo);
 	gnutls_datum der;
 	
 	if (hash_algo==GNUTLS_MAC_MD5)
-		strcpy(OID, "1 2 840 113549 2 5");
+		strcpy(OID, "1 2 840 113549 2 5"); /* Flawfinder: ignore */
 	else if (hash_algo==GNUTLS_MAC_SHA)
-		strcpy(OID, "1 3 14 3 2 26");
+		strcpy(OID, "1 3 14 3 2 26"); /* Flawfinder: ignore */
 	else {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
