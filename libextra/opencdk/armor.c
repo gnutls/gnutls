@@ -316,7 +316,7 @@ armor_encode( void * opaque, FILE * in, FILE * out )
 
     lf = afx->le ? afx->le : LF;
     fprintf( out, "-----%s-----%s", armor_begin[afx->idx], lf );
-    fprintf( out, "Version: OpenPrivacy "VERSION"%s", lf );
+    fprintf( out, "Version: OpenPrivacy "PACKAGE_VERSION"%s", lf );
     if( afx->hdrlines)
         fwrite( afx->hdrlines, 1, strlen( afx->hdrlines), out );
     fprintf( out, "%s", lf );
