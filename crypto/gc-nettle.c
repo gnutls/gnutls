@@ -200,7 +200,9 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
       cinf->info = &nettle_arcfour128;
       break;
 
-      /* FIXME: ARCTWO-40. */
+    case GC_ARCTWO40:
+      cinf->info = &nettle_pkcs12_arctwo40;
+      break;
 
     default:
       free (cinf);

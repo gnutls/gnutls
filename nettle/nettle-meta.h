@@ -115,6 +115,9 @@ extern const struct nettle_cipher nettle_twofish128;
 extern const struct nettle_cipher nettle_twofish192;
 extern const struct nettle_cipher nettle_twofish256;
 
+extern const struct nettle_cipher nettle_arctwo128;
+extern const struct nettle_cipher nettle_pkcs12_arctwo40;
+
 
 /* Hash algorithms */
 typedef void (*nettle_hash_init_func)(void *ctx);

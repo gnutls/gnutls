@@ -28,6 +28,7 @@ libnettle_la_SOURCES = aes.c aes.h aes-internal.h \
 		      aes-encrypt-table.c aes-encrypt.c \
 		      aes-set-encrypt-key.c aes-set-decrypt-key.c aes-meta.c \
 		      arcfour.c arcfour.h arcfour-crypt.c arcfour-meta.c \
+		      arctwo.c arctwo.h arctwo-meta.c \
 		      macros.h \
 		      keymap.h rotors.h parity.h \
 		      cbc.c cbc.h \
