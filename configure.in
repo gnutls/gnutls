@@ -89,18 +89,9 @@ AC_MSG_RESULT([***
 *** Checking for compilation programs...
 ])
 
-SAVED_CFLAGS="${CFLAGS}"
-
-AC_PROG_CC
-
-CFLAGS="${SAVED_CFLAGS}"
-
-AC_PROG_LN_S
-
-
 dnl Checks for programs.
-AC_PROG_INSTALL
-
+AC_PROG_CC
+AC_PROG_LN_S
 dnl AC_PROG_MAKE_SET
 
 
