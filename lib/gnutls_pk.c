@@ -178,7 +178,13 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret = _gnutls_pk_decrypt(GCRY_PK_RSA, &res, c, params);
+	/* we can use btype to see if the private key is
+	 * available.
+	 */
+	if (btype==2)
+		ret = _gnutls_pk_decrypt(GCRY_PK_RSA, &res, c, params);
+	else
+		ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, c, params);
 	_gnutls_mpi_release(&c);
 
 	if (ret < 0) {
