@@ -1,3 +1,15 @@
+2003-12-09 15:50  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_handshake.c, gnutls_record.c:
+
+	Some documentation fixes.  
+
+2003-12-09 11:42  nmav <nmav@gnutls.org>
+
+	* NEWS, src/tests.c, src/tests.h, src/tls_test.c:
+
+	Fixed the SRP detection test in gnutls-cli-debug.  
+
 2003-12-05 14:21  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/Makefile.am, src/cli.c:
