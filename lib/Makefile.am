@@ -1,3 +1,5 @@
+SUBDIRS = x509
+
 INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl -I$(top_srcdir)/libextra -I$(srcdir)/minitasn1 -I$(top_srcdir)/libextra/openpgp/ -I$(top_srcdir)/libextra/opencdk -I$(srcdir)/x509 -I$(top_srcdir)/includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
 bin_SCRIPTS = libgnutls-config
 
@@ -11,26 +13,17 @@ DISTCLEANFILES = $(pkgconfig_DATA)
 
 LIBGNUTLS_EXPORTS = -export-symbols-regex '^(_gnutls|gnutls|_E_).*'
 
-DIST_SUBDIRS = minitasn1 x509
 if ENABLE_MINITASN1
-SUBDIRS = minitasn1 x509
+SUBDIRS += minitasn1
 MINITASN1_COBJECTS = minitasn1/decoding.c minitasn1/gstr.c minitasn1/errors.c \
 	minitasn1/parser_aux.c minitasn1/structure.c minitasn1/element.c \
 	minitasn1/coding.c
 else
-SUBDIRS = x509
 MINITASN1_COBJECTS = 
 endif
 
 EXTRA_DIST = libgnutls.vers gnutls-api.texi
 lib_LTLIBRARIES = libgnutls.la
-
-X509_COBJECTS = x509/crl.c x509/dn.c x509/common.c x509/x509.c	\
-	x509/extensions.c x509/dsa.c x509/rfc2818_hostname.c	\
-	x509/verify.c x509/mpi.c x509/privkey.c x509/pkcs7.c	\
-	x509/crq.c x509/xml.c x509/sign.c x509/privkey_pkcs8.c	\
-	x509/pkcs12.c x509/pkcs12_bag.c x509/pkcs12_encr.c	\
-	x509/x509_write.c x509/crl_write.c x509/compat.c
 
 SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 	auth_srp_sb64.c auth_srp_rsa.c
@@ -70,11 +63,12 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 
 # Separate so we can create the documentation
 
-libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(X509_COBJECTS)	\
-	$(MINITASN1_COBJECTS) $(SRP_COBJECTS) gnutls.asn pkix.asn
+libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(MINITASN1_COBJECTS)	\
+	$(SRP_COBJECTS) gnutls.asn pkix.asn
 
 libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
 	../crypto/libgc.la \
+	x509/libgnutls_x509.la \
 	$(LIBGNUTLS_EXPORTS) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
