@@ -127,7 +127,6 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("No supported cipher suites have been found.", GNUTLS_E_NO_CIPHER_SUITES, 1 ),
         ERROR_ENTRY("Could not get OpenPGP key.", GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
 
-        ERROR_ENTRY("Error in the SRP protocol negotiation.", GNUTLS_E_SRP_PROTOCOL_FAILURE, 1),
         ERROR_ENTRY("The SRP username supplied by the peer is illegal.", GNUTLS_E_ILLEGAL_SRP_USERNAME, 1),
         ERROR_ENTRY("The peer advertized SRP but did not supply any SRP username.", GNUTLS_E_EMPTY_SRP_USERNAME, 1),
 	{0, 0, 0, 0}

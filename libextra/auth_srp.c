@@ -361,7 +361,7 @@ GNUTLS_MPI r = _gnutls_mpi_alloc_like(b);
 
 	if (ret == 0) {
 		gnutls_assert();
-		return GNUTLS_E_SRP_PROTOCOL_FAILURE;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 	
 	return 0;
