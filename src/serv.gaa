@@ -15,6 +15,12 @@ option (g, generate) { $generate = 1 } "Generate Diffie Hellman Parameters."
 #int port;
 option (p, port) INT "integer" { $port = $1 } "The port to connect to."
 
+#int quiet;
+option (q, quiet) { $quiet = 1 } "Suppress some messages."
+
+#int nodb;
+option (nodb) { $nodb = 1 } "Does not use the resume database."
+
 #int http;
 option (http) { $http = 1 } "Act as an HTTP Server."
 option (echo) { $http = 0 } "Act as an Echo Server."
@@ -87,10 +93,10 @@ option ( copyright) { print_license(); exit(0); } "prints the program's license"
 
 init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
-	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0;
+	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $nodb = 0;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $pgp_keyserver=NULL; 
-	$srp_passwd=NULL; $srp_passwd_conf=NULL; 
+	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
 	$pgp_trustdb=NULL; $pgp_keyring=NULL; $fmtder = 0; }
 
 

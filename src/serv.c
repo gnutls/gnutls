@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-/* This server is heavily modified for GNUTLS 
+/* This server is heavily modified for GNUTLS by Nikos Mavroyanopoulos
  * (which means it is quite unreadable)
  */
 
@@ -50,6 +50,9 @@ static int generate = 0;
 static int http = 0;
 static int port = 0;
 static int x509ctype;
+
+static int quiet;
+static int nodb;
 
 char *srp_passwd;
 char *srp_passwd_conf;
@@ -219,10 +222,12 @@ GNUTLS_STATE initialize_state (void)
    gnutls_handshake_set_private_extensions( state, 1);
 
 #ifdef HAVE_LIBGDBM
-   gnutls_db_set_retrieve_func( state, wrap_gdbm_fetch);
-   gnutls_db_set_remove_func( state, wrap_gdbm_delete);
-   gnutls_db_set_store_func( state, wrap_gdbm_store);
-   gnutls_db_set_ptr( state, NULL);
+   if (nodb==0) {
+    gnutls_db_set_retrieve_func( state, wrap_gdbm_fetch);
+    gnutls_db_set_remove_func( state, wrap_gdbm_delete);
+    gnutls_db_set_store_func( state, wrap_gdbm_store);
+    gnutls_db_set_ptr( state, NULL);
+   }
 #endif
 
     gnutls_cipher_set_priority(state, cipher_priority);
@@ -241,6 +246,9 @@ GNUTLS_STATE initialize_state (void)
     return state;
 }
 
+static char DEFAULT_DATA[] = "This is the default message reported "
+	"by GnuTLS TLS version 1.0 implementation. For more information "
+	"please visit http://www.gnutls.org or even http://www.gnu.org/software/gnutls.";
 
 /* Creates html with the current state information.
  */
@@ -250,10 +258,20 @@ char* peer_print_info(GNUTLS_STATE state, int *ret_length)
    const char *tmp;
    unsigned char sesid[32];
    int sesid_size, i;
-   char* http_buffer = malloc(16*1024);
+   char* http_buffer = malloc(5*1024);
 
    if (http_buffer==NULL) return NULL;
- 
+   if (quiet != 0) {
+   
+   	strcpy( http_buffer, HTTP_BEGIN);
+   	strcpy( &http_buffer[sizeof(HTTP_BEGIN)-1], DEFAULT_DATA);
+   	strcpy( &http_buffer[sizeof(HTTP_BEGIN)+sizeof(DEFAULT_DATA)-2], HTTP_END);
+   	*ret_length = sizeof(DEFAULT_DATA) + sizeof(HTTP_BEGIN) +
+   		sizeof(HTTP_END) - 3;
+   	return http_buffer;
+   
+   }
+
    strcpy( http_buffer, HTTP_BEGIN);
    
    /* print session_id */
@@ -309,7 +327,7 @@ char* peer_print_info(GNUTLS_STATE state, int *ret_length)
    tmp = gnutls_mac_get_name(gnutls_mac_get(state));
    sprintf(tmp2, "MAC: <b>%s</b><br>\n", tmp);
 
-   strcat(http_buffer, "</P>\n");
+   strcat(http_buffer, "</P>\n"HTTP_END);
 
    *ret_length = strlen(http_buffer);
 
@@ -420,7 +438,7 @@ int main(int argc, char **argv)
    gaa_parser(argc, argv);
 
 #ifdef HAVE_LIBGDBM
-   wrap_gdbm_init();
+   if (nodb==0) wrap_gdbm_init();
 #endif
 
    if (http == 1) {
@@ -577,7 +595,7 @@ int main(int argc, char **argv)
 	    if (accept_fd < 0) {
 		perror ("accept()");
 	    } else {
-	    	time_t tt= time(0);
+	    	time_t tt;
 	    	char* ctt;
 
 		int yes = 1;
@@ -593,14 +611,19 @@ int main(int argc, char **argv)
                 gnutls_transport_set_ptr( tstate, accept_fd);
 		j->handshake_ok = 0;
 
-		ctt = ctime(&tt);
-		ctt[strlen(ctt)-1] = 0;
-//		printf ("- %s: connection from %s\n", ctt, inet_ntoa (client_address.sin_addr));
-	        printf("- connection from %s, port %d\n",
-		     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
-		       sizeof(topbuf)), ntohs(client_address.sin_port));
+		if (quiet==0) {
+			tt = time(0);
+			ctt = ctime(&tt);
+			ctt[strlen(ctt)-1] = 0;
 
-		fflush(stdout);
+//		printf ("- %s: connection from %s\n", ctt, inet_ntoa (client_address.sin_addr));
+
+		        printf("- connection from %s, port %d\n",
+			     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
+			       sizeof(topbuf)), ntohs(client_address.sin_port));
+
+			fflush(stdout);
+		}
 	    }
 	}
 
@@ -624,7 +647,7 @@ int main(int argc, char **argv)
 		    	} while(ret==GNUTLS_E_AGAIN);
 			j->http_state = HTTP_STATE_CLOSING;
 		    } else if (r == 0) {
-		        if ( gnutls_session_is_resumed( j->tstate)!=0)
+		        if ( gnutls_session_is_resumed( j->tstate)!=0 && quiet==0)
         	 	  printf("*** This is a resumed session\n");
 //		        print_info(j->tstate);
 
@@ -681,7 +704,7 @@ int main(int argc, char **argv)
 		    		ret=gnutls_alert_send_appropriate( j->tstate, r);
 		    	} while(ret==GNUTLS_E_AGAIN);
 		    } else if (r == 0) {
-		        if ( gnutls_session_is_resumed( j->tstate)!=0)
+		        if ( gnutls_session_is_resumed( j->tstate)!=0 && quiet == 0)
         	 	  printf("*** This is a resumed session\n");
 //		        print_info(j->tstate);
 
@@ -741,7 +764,7 @@ int main(int argc, char **argv)
    gnutls_anon_free_server_sc(dh_cred);
 
 #ifdef HAVE_LIBGDBM
-   wrap_gdbm_deinit();
+   if (nodb==0) wrap_gdbm_deinit();
 #endif
    gnutls_global_deinit();
 
@@ -776,6 +799,9 @@ void gaa_parser(int argc, char **argv)
 	      "Error in the arguments. Use the --help or -h parameters to get more information.\n");
       exit(1);
    }
+ 
+   quiet = info.quiet;
+   nodb = info.nodb;
 
    if (info.http == 0)
       http = 0;
