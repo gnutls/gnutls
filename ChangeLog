@@ -1,3 +1,9 @@
+2004-12-07 22:28  Simon Josefsson <simon@josefsson.org>
+
+	* doc/protocol/draft-ietf-tls-ecc-07.txt:
+
+	Add.  
+
 2004-12-01 20:05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, lib/pkix_asn1_tab.c:
