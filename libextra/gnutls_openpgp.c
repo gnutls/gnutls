@@ -891,8 +891,6 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
     size_t size = 0;
     int rc = 0;
 
-    printf ("** cert=%p nnames=%d\n", cert,
-            gnutls_openpgp_count_key_names( cert ) );
     if( !cert || !dn ) {
         gnutls_assert( );
         return GNUTLS_E_INVALID_REQUEST;
