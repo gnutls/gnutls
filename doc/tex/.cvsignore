@@ -1,0 +1,6 @@
+Makefile
+Makefile.in
+gnutls-api.tex
+*.aux
+*.ps
+*.dvi
