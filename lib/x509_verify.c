@@ -101,6 +101,12 @@ time_t _gnutls_utcTime2gtime(char *ttime)
 	else
 		etime.tm_year += 2000;
 
+	/* In order to work with 32 bit
+	 * time_t.
+	 */
+	if (sizeof (time_t) <= 4 && etime.tm_year >= 2038)
+	      return (time_t)2145914603; /* 2037-12-31 23:23:23 */
+
 	etime.tm_year -= 1900;	/* well we need to find something
 				 * better than mktime();
 				 */
@@ -160,6 +166,12 @@ time_t _gnutls_generalTime2gtime(char *ttime)
 	memcpy(xx, ttime, 4);	/* year */
 	etime.tm_year = atoi(xx);
 	ttime += 2;
+
+	/* In order to work with 32 bit
+	 * time_t.
+	 */
+	if (sizeof (time_t) <= 4 && etime.tm_year >= 2038)
+	      return (time_t)2145914603; /* 2037-12-31 23:23:23 */
 
 	etime.tm_year -= 1900;
 
