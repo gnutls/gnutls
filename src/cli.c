@@ -99,7 +99,7 @@ typedef struct {
 
 ssize_t socket_recv(socket_st socket, void *buffer, int buffer_size);
 ssize_t socket_send(socket_st socket, void *buffer, int buffer_size);
-void socket_bye(socket_st socket);
+void socket_bye(socket_st *socket);
 void check_rehandshake(socket_st socket, int ret);
 void check_alert(socket_st socket, int ret);
 int do_handshake(socket_st *socket);
@@ -271,7 +271,7 @@ int main(int argc, char **argv)
 	 print_info(hd.session);
 
 	 printf("- Disconnecting\n");
-	 socket_bye(hd);
+	 socket_bye(&hd);
 
 	 printf
 	     ("\n\n- Connecting again- trying to resume previous session\n");
@@ -333,12 +333,11 @@ int main(int argc, char **argv)
 	       if (ret < 0) {
  		 fprintf(stderr, "*** Handshake has failed\n");
 		 gnutls_perror(ret);
-		 socket_bye(hd);
+		 socket_bye(&hd);
 		 user_term = 1;
 	       }
 	       continue;
             } else {
-  	       socket_bye(hd);
 	       user_term = 1;
 	       continue;
 	    }
@@ -362,7 +361,7 @@ int main(int argc, char **argv)
    }
 
    if (user_term != 0)
-      socket_bye(hd);
+      socket_bye(&hd);
 
 
    if (srp_username != NULL)
@@ -568,34 +567,33 @@ ssize_t socket_send(socket_st socket, void *buffer, int buffer_size)
 
    if (socket.secure)
       do {
-	 ret = gnutls_record_send(socket.session, buffer, strlen(buffer));
+	 ret = gnutls_record_send(socket.session, buffer, buffer_size);
       } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
    else
       do {
-	 ret = send(socket.fd, buffer, strlen(buffer), 0);
+	 ret = send(socket.fd, buffer, buffer_size, 0);
       } while (ret == -1 && errno == EINTR);
 
 
    return ret;
 }
 
-void socket_bye(socket_st socket)
+void socket_bye(socket_st *socket)
 {
    int ret;
-
-   if (socket.secure) {
+   if (socket->secure) {
       do
-	 ret = gnutls_bye(socket.session, GNUTLS_SHUT_RDWR);
+	 ret = gnutls_bye(socket->session, GNUTLS_SHUT_RDWR);
       while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-      gnutls_deinit(socket.session);
-      socket.session = NULL;
+      gnutls_deinit(socket->session);
+      socket->session = NULL;
    }
 
-   shutdown(socket.fd, SHUT_RDWR);	/* no more receptions */
-   close(socket.fd);
+   shutdown(socket->fd, SHUT_RDWR);	/* no more receptions */
+   close(socket->fd);
    
-   socket.fd = -1;
-   socket.secure = 0;
+   socket->fd = -1;
+   socket->secure = 0;
 }
 
 void check_rehandshake(socket_st socket, int ret)
