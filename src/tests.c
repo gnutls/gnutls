@@ -855,7 +855,7 @@ int ret;
 	ADD_ALL_KX(session);
 
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
-        gnutls_certificate_client_set_retrieve_function( session, cert_callback);
+        gnutls_certificate_client_set_retrieve_function( xcred, cert_callback);
 
 	ret = do_handshake( session);
 	if (ret ==GFAILED) return ret;
