@@ -90,7 +90,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_INSUFFICIENT_SECURITY, GNUTLS_INTERNAL_ERROR=80, GNUTLS_USER_CANCELED=90,
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
-typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
+typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID, GNUTLS_CERT_NONE } CertificateStatus;
 typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
 typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
 
@@ -373,7 +373,7 @@ typedef struct {
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
 	 */
-	int				(*x509_client_cert_callback)(void*,void*,int);
+	int				(*x509_client_cert_callback)(void*,void*,int, void*, int);
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

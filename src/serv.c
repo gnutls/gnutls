@@ -109,7 +109,8 @@ GNUTLS_STATE initialize_state()
 	PRINTX( "L:", X->locality_name); \
 	PRINTX( "S:", X->state_or_province_name); \
 	PRINTX( "C:", X->country); \
-	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_alt_name(x509_info))
+	PRINTX( "E:", X->email); \
+	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(x509_info))
 
 void print_info(GNUTLS_STATE state)
 {
@@ -159,6 +160,9 @@ void print_info(GNUTLS_STATE state)
 				break;
 			case GNUTLS_CERT_TRUSTED:
 				printf("- Peer's X509 Certificate was verified\n");
+				break;
+			case GNUTLS_CERT_NONE:
+				printf("- Peer did not send any certificate.\n");
 				break;
 			case GNUTLS_CERT_INVALID:
 			default:

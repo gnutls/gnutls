@@ -37,8 +37,8 @@ void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO info, gnutls_c
 
 	info->peer_certificate_version = cert->version;
 	
-	if ( cert->subjectAltName[0]!=0)
-		strcpy( info->subjectAltName, cert->subjectAltName);
+	if ( cert->subjectAltDNSName[0]!=0)
+		strcpy( info->subjectAltDNSName, cert->subjectAltDNSName);
 
 	info->keyUsage = cert->keyUsage;
 

@@ -2,7 +2,7 @@
 # define GNUTLS_CERT_H
 
 #include <gnutls_pk.h>
-
+#include <x509_asn1.h>
 #include <gnutls_ui.h>
 
 typedef struct gnutls_cert {
@@ -13,8 +13,8 @@ typedef struct gnutls_cert {
 
 	gnutls_DN  cert_info;
 	gnutls_DN  issuer_info;
-	opaque	   subjectAltName[X509_CN_SIZE];
-	int 	   subjectAltName_size;
+	opaque	   subjectAltDNSName[X509_CN_SIZE]; 
+	int 	   subjectAltDNSName_size;
 	
 	opaque	   signature[1024];
 	int	   signature_size;
@@ -56,6 +56,7 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
 
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data);
+int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_DN * dn);
 
 
 #endif

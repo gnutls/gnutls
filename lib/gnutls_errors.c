@@ -140,8 +140,8 @@ void gnutls_perror(int error)
   * gnutls_strerror - Returns a string with a description of an error
   * @error: is an error returned by a gnutls function. Error is always a negative value.
   *
-  * This function is like strerror(). However it accepts an error returned by a gnutls
-  * function. 
+  * This function is similar to strerror(). The only difference is that it 
+  * accepts an error (number) returned by a gnutls function. 
   **/
 const char* gnutls_strerror(int error)
 {

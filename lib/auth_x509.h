@@ -30,7 +30,7 @@ typedef struct {
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
 	 */
-	int		(*client_cert_callback)(gnutls_DN*, gnutls_DN*, int);
+	int		(*client_cert_callback)(gnutls_DN*, gnutls_DN*, int, gnutls_DN*, int);
 } X509PKI_CREDENTIALS_INT;
 
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
@@ -43,7 +43,7 @@ typedef struct X509PKI_CLIENT_AUTH_INFO_INT {
 	int		  peer_certificate_version;
 	time_t		  peer_certificate_activation_time;
 	time_t		  peer_certificate_expiration_time;
-	char		  subjectAltName[X509_CN_SIZE];
+	char		  subjectAltDNSName[X509_CN_SIZE];
 	unsigned char	  keyUsage;
 	int		  certificate_requested;
 } *X509PKI_CLIENT_AUTH_INFO;

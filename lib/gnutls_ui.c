@@ -179,15 +179,17 @@ unsigned char gnutls_x509pki_get_certificate_request_status(  X509PKI_CLIENT_AUT
 
 
 /**
-  * gnutls_x509pki_get_subject_alt_name - This function returns the peer's alternative name
+  * gnutls_x509pki_get_subject_dns_name - This function returns the peer's dns name, if any
   * @info: is an X509PKI_CLIENT_AUTH_INFO structure
   *
-  * This function will return the peer's alternative namee. This is specified in X509v3 Certificate
-  * Extensions. GNUTLS will only return the dnsName of the Alternative name, or a null string.
+  * This function will return the peer's alternative name (the dns part of it). 
+  * This is specified in X509v3 Certificate Extensions. 
+  * GNUTLS will only return the dnsName of the Alternative name, or a null 
+  * string.
   *
   **/
-const char* gnutls_x509pki_get_subject_alt_name(  X509PKI_CLIENT_AUTH_INFO info) {
+const char* gnutls_x509pki_get_subject_dns_name(  X509PKI_CLIENT_AUTH_INFO info) {
 	if (info==NULL) return NULL;
-	return info->subjectAltName;
+	return info->subjectAltDNSName;
 }
 

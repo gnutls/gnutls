@@ -49,7 +49,7 @@ pkcs1_asn1_tab.c: pkcs1.asn
 gnutls-api.tex: $(COBJECTS)
 	@echo "\\newpage" > gnutls-api.tex
 	@echo "\\section{Function Reference}" >> gnutls-api.tex
-	for i in $(COBJECTS); \
+	@for i in $(COBJECTS); \
 	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> gnutls-api.tex \
 	&& echo "ok"; \
 	done

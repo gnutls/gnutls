@@ -459,11 +459,15 @@ int proc_rsa_server_certificate(GNUTLS_STATE state, opaque * data, int data_size
 	size = READuint24(p);
 	p += 3;
 
+	info = state->gnutls_key->auth_info;
+	info->peer_certificate_status = GNUTLS_CERT_INVALID;
+
 	if (size == 0) {
 		gnutls_assert();
+		/* no certificate was sended */
+		info->peer_certificate_status = GNUTLS_CERT_NONE;
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
-	info = state->gnutls_key->auth_info;
 	i = dsize;
 
 	len = READuint24(p);
@@ -600,6 +604,8 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 
 }
 
+/* Returns the issuer's Distinguished name in odn, of the certificate specified in cert.
+ */
 int _gnutls_find_dn( gnutls_datum* odn, gnutls_cert* cert) {
 node_asn* dn;
 int len, result;
@@ -637,22 +643,56 @@ int start, end;
 	return 0;
 }
 
+/* Gets the Distinguished name in idn, and returns a gnutls_DN structure.
+ */
+int _gnutls_dn2gnutlsdn( gnutls_DN* rdn, gnutls_datum* idn) {
+node_asn* dn;
+int result;
+
+	if ((result=asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Name", &dn, "dn")) != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = asn1_get_der( dn, idn->data, idn->size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure( dn);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	result = _gnutls_get_name_type( dn, "dn", rdn);
+	asn1_delete_structure( dn);
+
+	if (result < 0) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}
+
+
 /* Finds the appropriate certificate depending on the cA Distinguished name
  * advertized by the server. If none matches then returns -1 as index.
  */
-static int _gnutls_find_acceptable_client_cert( const X509PKI_CREDENTIALS cred, const opaque* data, 
-	int data_size, int *ind) {
+static int _gnutls_find_acceptable_client_cert( const X509PKI_CREDENTIALS cred, opaque* _data, 
+	int _data_size, int *ind) {
 int result, size;
 int indx = -1;
 int i, j, try=0;
 gnutls_datum odn;
+opaque* data = _data;
+int data_size = _data_size;
 
 	if (cred->client_cert_callback!=NULL) {
 		/* if try>=0 then the client wants automatic
 		 * choose of certificate, otherwise (-1), he
 		 * will be prompted to choose one.
 		 */
-		try = cred->client_cert_callback( NULL, NULL, 0);
+		try = cred->client_cert_callback( NULL, NULL, 0, NULL, 0);
 	}
 	
 	if (try>=0)
@@ -660,6 +700,7 @@ gnutls_datum odn;
 
 		DECR_LEN(data_size, 2);
 		size = READuint16(data);
+		DECR_LEN(data_size, size);
 		data += 2;
 
 		for(i=0;i<cred->ncerts;i++) {
@@ -671,7 +712,7 @@ gnutls_datum odn;
 				}
 				
 				if ( odn.size != size) continue;
-			
+
 				if (memcmp( 
 					odn.data,
 					data, size) == 0 ) {
@@ -698,6 +739,9 @@ gnutls_datum odn;
 	if (indx==-1 && cred->client_cert_callback!=NULL && cred->ncerts > 0) {/* use a callback to get certificate */
 		gnutls_DN *cdn=NULL;
 		gnutls_DN *idn=NULL;
+		gnutls_DN *req_dn=NULL;
+		gnutls_datum tmp;
+		int count;
 		
 		cdn = gnutls_malloc( cred->ncerts* sizeof(gnutls_DN));
 		if (cdn==NULL) goto clear;
@@ -705,14 +749,45 @@ gnutls_datum odn;
 		idn = gnutls_malloc( cred->ncerts* sizeof(gnutls_DN));
 		if (idn==NULL) goto clear;
 
+		/* put the requested DNs to req_dn
+		 */		
+		data = _data;
+		data_size = _data_size;
+		count = 0; /* holds the number of given CA's DN */
+		do {
+			data_size-=2;
+			if (data_size<=0) goto clear;
+			size = READuint16(data);
+			data_size-=size;
+			if (data_size<0) goto clear;
+			
+			
+			data += 2;
+			
+			req_dn = gnutls_realloc_fast( req_dn, (count+1)*sizeof(gnutls_DN));
+			if (req_dn==NULL) goto clear;
+			
+			tmp.data = data;
+			tmp.size = size;
+			if (_gnutls_dn2gnutlsdn( &req_dn[count], &tmp)==0)
+				count++; /* otherwise we have failed */
+			data+=size;
+
+			if (data_size==0) break;
+
+		} while(1);
+
+		/* put our certificate's issuer and dn into cdn, idn
+		 */
 		for(i=0;i<cred->ncerts;i++) {
 			memcpy( &cdn[i], &cred->cert_list[i][0].cert_info, sizeof(gnutls_DN));
 			memcpy( &idn[i], &cred->cert_list[i][0].issuer_info, sizeof(gnutls_DN));
 		}
-		indx = cred->client_cert_callback( cdn, idn, cred->ncerts);
-	
+		indx = cred->client_cert_callback( cdn, idn, cred->ncerts, req_dn, count);
+
 		clear:
 			gnutls_free(cdn);
+			gnutls_free(req_dn);
 			gnutls_free(idn);
 	}
 	*ind = indx;
@@ -749,6 +824,8 @@ int proc_rsa_cert_req(GNUTLS_STATE state, opaque * data, int data_size)
 	size = p[0];
 	p += 1;
 
+	/* FIXME: Add support for DSS certificates too
+	 */
 	found = 0;
 	for (i = 0; i < size; i++, p++) {
 		DECR_LEN(dsize, 1);

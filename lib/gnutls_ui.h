@@ -10,6 +10,7 @@
 #define X509_OU_SIZE 256
 #define X509_L_SIZE 256
 #define X509_S_SIZE 256
+#define X509_EMAIL_SIZE 256
 
 typedef struct {
 	char common_name[X509_CN_SIZE];
@@ -18,6 +19,7 @@ typedef struct {
 	char organizational_unit_name[X509_OU_SIZE];
 	char locality_name[X509_L_SIZE];
 	char state_or_province_name[X509_S_SIZE];
+	char email[X509_EMAIL_SIZE];
 } gnutls_DN;
 
 /* For key Usage, test as:
@@ -50,7 +52,7 @@ int gnutls_anon_client_get_dh_bits(  ANON_CLIENT_AUTH_INFO info);
 
 /* X509PKI */
 
-int gnutls_x509pki_set_cert_callback( X509PKI_CREDENTIALS, int (*x509_cert_callback)(gnutls_DN*, gnutls_DN*, int));
+int gnutls_set_x509_cert_callback( X509PKI_CREDENTIALS, int (*x509_cert_callback)(gnutls_DN*, gnutls_DN*, int, gnutls_DN*, int));
 int gnutls_x509pki_set_cert_request( GNUTLS_STATE, CertificateRequest);
 
 const gnutls_DN* gnutls_x509pki_get_peer_dn(  X509PKI_CLIENT_AUTH_INFO info);
@@ -60,7 +62,7 @@ int gnutls_x509pki_get_peer_certificate_version(  X509PKI_CLIENT_AUTH_INFO info)
 time_t gnutls_x509pki_get_peer_certificate_activation_time(  X509PKI_CLIENT_AUTH_INFO info);
 time_t gnutls_x509pki_get_peer_certificate_expiration_time(  X509PKI_CLIENT_AUTH_INFO info);
 unsigned char gnutls_x509pki_get_key_usage(  X509PKI_CLIENT_AUTH_INFO info);
-const char* gnutls_x509pki_get_subject_alt_name(  X509PKI_CLIENT_AUTH_INFO info);
+const char* gnutls_x509pki_get_subject_dns_name(  X509PKI_CLIENT_AUTH_INFO info);
 
 #define gnutls_x509pki_server_get_peer_dn gnutls_x509pki_get_peer_dn
 #define gnutls_x509pki_server_get_issuer_dn gnutls_x509pki_get_issuer_dn
@@ -69,7 +71,7 @@ const char* gnutls_x509pki_get_subject_alt_name(  X509PKI_CLIENT_AUTH_INFO info)
 #define gnutls_x509pki_server_get_peer_certificate_activation_time gnutls_x509pki_get_peer_certificate_activation_time
 #define gnutls_x509pki_server_get_peer_certificate_expiration_time gnutls_x509pki_get_peer_certificate_expiration_time
 #define gnutls_x509pki_server_get_key_usage gnutls_x509pki_get_key_usage
-#define gnutls_x509pki_server_get_subject_alt_name gnutls_x509pki_get_subject_alt_name
+#define gnutls_x509pki_server_get_subject_dns_name gnutls_x509pki_get_subject_dns_name
 
 #define gnutls_x509pki_client_get_peer_dn gnutls_x509pki_get_peer_dn
 #define gnutls_x509pki_client_get_issuer_dn gnutls_x509pki_get_issuer_dn
@@ -78,7 +80,7 @@ const char* gnutls_x509pki_get_subject_alt_name(  X509PKI_CLIENT_AUTH_INFO info)
 #define gnutls_x509pki_client_get_peer_certificate_activation_time gnutls_x509pki_get_peer_certificate_activation_time
 #define gnutls_x509pki_client_get_peer_certificate_expiration_time gnutls_x509pki_get_peer_certificate_expiration_time
 #define gnutls_x509pki_client_get_key_usage gnutls_x509pki_get_key_usage
-#define gnutls_x509pki_client_get_subject_alt_name gnutls_x509pki_get_subject_alt_name
+#define gnutls_x509pki_client_get_subject_dns_name gnutls_x509pki_get_subject_dns_name
 
 # endif /* LIBGNUTLS_VERSION */
 

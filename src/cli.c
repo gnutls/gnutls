@@ -57,7 +57,8 @@
 	PRINTX( "L:", X->locality_name); \
 	PRINTX( "S:", X->state_or_province_name); \
 	PRINTX( "C:", X->country); \
-	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_alt_name(x509_info))
+	PRINTX( "E:", X->email); \
+	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_dns_name(x509_info))
 
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
@@ -86,6 +87,9 @@ const gnutls_DN* dn;
 				break;
 			case GNUTLS_CERT_TRUSTED:
 				printf("- Peer's X509 Certificate was verified\n");
+				break;
+			case GNUTLS_CERT_NONE:
+				printf("- Peer did not send any X509 Certificate.\n");
 				break;
 			case GNUTLS_CERT_INVALID:
 			default:
@@ -119,6 +123,34 @@ const gnutls_DN* dn;
 	printf("- MAC: %s\n", tmp);
 
 	return 0;
+}
+
+int cert_callback( gnutls_DN *client_cert, gnutls_DN *issuer_cert, int ncerts, gnutls_DN* req_ca_cert, int nreqs) {
+
+	if (client_cert==NULL) {
+		return 0; /* means the we will only be called again
+		           * if the library cannot determine which
+		           * certificate to send
+		           */
+	}
+
+#if 0
+	/* here we should prompt the user and ask him
+	 * which certificate to choose. Too bored to 
+	 * implement that. --nmav
+	 */
+	for (i=0;i<ncerts;i++){
+		fprintf(stderr, "%s.", client_cert->common_name);
+		fprintf(stderr, "%s\n", issuer_cert->common_name);
+	}
+	for (i=0;i<nreqs;i++){
+		fprintf(stderr, "%s.", req_ca_cert->common_name);
+	}
+	fprintf(stderr, "\n");
+	return 0;
+#endif
+
+	return -1; /* send no certificate to the peer */
 }
 
 int main(int argc, char** argv)
@@ -160,6 +192,7 @@ int main(int argc, char** argv)
 	}
 	gnutls_set_x509_client_trust( xcred, CAFILE, CRLFILE);
 	gnutls_set_x509_client_key( xcred, CLICERTFILE, CLIKEYFILE);
+	gnutls_set_x509_cert_callback( xcred, cert_callback);
 
 	/* SRP stuff */
 	if (gnutls_allocate_srp_client_sc( &cred)<0) {

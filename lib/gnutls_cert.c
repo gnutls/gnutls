@@ -70,23 +70,25 @@ PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
 }
 
 #define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
-void gnutls_free_cert( gnutls_cert cert) {
-int n,i;
+void gnutls_free_cert(gnutls_cert cert)
+{
+	int n, i;
 
-	switch( cert.subject_pk_algorithm) {
+	switch (cert.subject_pk_algorithm) {
 	case GNUTLS_PK_RSA:
-		n = 2;/* the number of parameters in MPI* */
+		n = 2;		/* the number of parameters in MPI* */
 		break;
 	default:
-		n=0;
+		n = 0;
 	}
-	
-	for (i=0;i<n;i++) {
-		_gnutls_mpi_release( &cert.params[i]);
+
+	for (i = 0; i < n; i++) {
+		_gnutls_mpi_release(&cert.params[i]);
 	}
-	if (cert.params!=NULL) gnutls_free( cert.params);
-	
-	gnutls_free_datum( &cert.raw);
+	if (cert.params != NULL)
+		gnutls_free(cert.params);
+
+	gnutls_free_datum(&cert.raw);
 
 	return;
 }
@@ -99,28 +101,33 @@ int n,i;
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_x509_sc( X509PKI_CREDENTIALS sc) {
-int i,j;
+void gnutls_free_x509_sc(X509PKI_CREDENTIALS sc)
+{
+	int i, j;
 
-	for (i=0;i<sc->ncerts;i++) {
-		for (j=0;j<sc->cert_list_length[i];j++) {
-			gnutls_free_cert( sc->cert_list[i][j]);
+	for (i = 0; i < sc->ncerts; i++) {
+		for (j = 0; j < sc->cert_list_length[i]; j++) {
+			gnutls_free_cert(sc->cert_list[i][j]);
 		}
-		gnutls_free( sc->cert_list[i]);
+		gnutls_free(sc->cert_list[i]);
 	}
 
-	if (sc->cert_list_length!=NULL) gnutls_free( sc->cert_list_length);
-	if (sc->cert_list!=NULL) gnutls_free( sc->cert_list );
+	if (sc->cert_list_length != NULL)
+		gnutls_free(sc->cert_list_length);
+	if (sc->cert_list != NULL)
+		gnutls_free(sc->cert_list);
 
-	for (j=0;j<sc->ncas;j++) {
-		gnutls_free_cert( sc->ca_list[j]);
+	for (j = 0; j < sc->ncas; j++) {
+		gnutls_free_cert(sc->ca_list[j]);
 	}
-	if (sc->ca_list!=NULL) gnutls_free( sc->ca_list);
+	if (sc->ca_list != NULL)
+		gnutls_free(sc->ca_list);
 
-	for (i=0;i<sc->ncerts;i++) {
-		_gnutls_free_private_key( sc->pkey[i]);
+	for (i = 0; i < sc->ncerts; i++) {
+		_gnutls_free_private_key(sc->pkey[i]);
 	}
-	if(sc->pkey!=NULL) gnutls_free(sc->pkey);
+	if (sc->pkey != NULL)
+		gnutls_free(sc->pkey);
 
 	gnutls_free(sc);
 }
@@ -130,14 +137,15 @@ int i,j;
 
 /* Reads a base64 encoded certificate file
  */
-static int read_cert_file( X509PKI_CREDENTIALS res, char* certfile) {
-int siz, i, siz2;
-opaque* b64;
-char x[MAX_FILE_SIZE];
-char* ptr;
-FILE* fd1;
-gnutls_datum tmp;
-int ret;
+static int read_cert_file(X509PKI_CREDENTIALS res, char *certfile)
+{
+	int siz, i, siz2;
+	opaque *b64;
+	char x[MAX_FILE_SIZE];
+	char *ptr;
+	FILE *fd1;
+	gnutls_datum tmp;
+	int ret;
 
 	fd1 = fopen(certfile, "r");
 	if (fd1 == NULL)
@@ -145,26 +153,29 @@ int ret;
 
 	siz = fread(x, 1, sizeof(x), fd1);
 	fclose(fd1);
-	
+
 	ptr = x;
-	i=1;
+	i = 1;
 
 	res->cert_list[res->ncerts] = NULL;
 
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
-		siz-=siz2; /* FIXME: this is not enough
-			    */
+		siz -= siz2;	/* FIXME: this is not enough
+				 */
 
 		if (siz2 < 0) {
 			gnutls_assert();
 			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
-		ptr = strstr( ptr, CERT_SEP)+1;
+		ptr = strstr(ptr, CERT_SEP) + 1;
 
 		res->cert_list[res->ncerts] =
-		    (gnutls_cert *) gnutls_realloc( res->cert_list[res->ncerts], i * sizeof(gnutls_cert));
+		    (gnutls_cert *) gnutls_realloc(res->
+						   cert_list[res->ncerts],
+						   i *
+						   sizeof(gnutls_cert));
 
 		if (res->cert_list[res->ncerts] == NULL) {
 			gnutls_assert();
@@ -173,23 +184,26 @@ int ret;
 		}
 		/* set defaults to zero 
 		 */
-		memset( &res->cert_list[res->ncerts][i-1], 0, sizeof(gnutls_cert));
-		
+		memset(&res->cert_list[res->ncerts][i - 1], 0,
+		       sizeof(gnutls_cert));
+
 		tmp.data = b64;
 		tmp.size = siz2;
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&res->cert_list[res->ncerts][i-1], tmp)) < 0) {
-			gnutls_free( b64);
+		     _gnutls_cert2gnutlsCert(&res->
+					     cert_list[res->ncerts][i - 1],
+					     tmp)) < 0) {
+			gnutls_free(b64);
 			gnutls_assert();
 			return ret;
 		}
-		gnutls_free( b64);
+		gnutls_free(b64);
 
 		i++;
-	} while( (ptr=strstr( ptr, CERT_SEP))!=NULL);
+	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
 
-	res->cert_list_length[res->ncerts] = i-1;
-	
+	res->cert_list_length[res->ncerts] = i - 1;
+
 	/* WE DO NOT CATCH OVERRUNS in gnutls_set_x509_key().
 	 * This function should be called as many times as specified 
 	 * in allocate_x509_sc().
@@ -202,77 +216,82 @@ int ret;
 /* Reads a base64 encoded CA file (file contains multiple certificate
  * authorities). This is to be called once.
  */
-static int read_ca_file( X509PKI_CREDENTIALS res, char* cafile) {
-int siz, siz2, i;
-opaque* b64;
-char x[MAX_FILE_SIZE];
-char* ptr;
-FILE* fd1;
-int ret;
-gnutls_datum tmp;
+static int read_ca_file(X509PKI_CREDENTIALS res, char *cafile)
+{
+	int siz, siz2, i;
+	opaque *b64;
+	char x[MAX_FILE_SIZE];
+	char *ptr;
+	FILE *fd1;
+	int ret;
+	gnutls_datum tmp;
 
 	fd1 = fopen(cafile, "r");
 	if (fd1 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
-	
+
 	siz = fread(x, 1, sizeof(x), fd1);
 	fclose(fd1);
 
 	ptr = x;
-	res->ncas=0;
-	i=1;
+	res->ncas = 0;
+	i = 1;
 
 	res->ca_list = NULL;
 
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
-		siz-=siz2; /* FIXME: this is not enough
-			    */
+		siz -= siz2;	/* FIXME: this is not enough
+				 */
 
 		if (siz2 < 0) {
 			gnutls_assert();
 			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
-		ptr = strstr( ptr, CERT_SEP)+1;
+		ptr = strstr(ptr, CERT_SEP) + 1;
 
 		res->ca_list =
-		    (gnutls_cert *) gnutls_realloc( res->ca_list, i * sizeof(gnutls_cert));
+		    (gnutls_cert *) gnutls_realloc(res->ca_list,
+						   i *
+						   sizeof(gnutls_cert));
 		if (res->ca_list == NULL) {
 			gnutls_assert();
 			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		memset( &res->ca_list[i-1], 0, sizeof(gnutls_cert));
-				
+		memset(&res->ca_list[i - 1], 0, sizeof(gnutls_cert));
+
 		tmp.data = b64;
 		tmp.size = siz2;
 		if ((ret =
-		     _gnutls_cert2gnutlsCert(&res->ca_list[i-1], tmp)) < 0) {
+		     _gnutls_cert2gnutlsCert(&res->ca_list[i - 1],
+					     tmp)) < 0) {
 			gnutls_assert();
 			gnutls_free(b64);
 			return ret;
 		}
-		gnutls_free( b64);
+		gnutls_free(b64);
 
 		i++;
-	} while( (ptr=strstr( ptr, CERT_SEP))!=NULL);
+	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
 
-	res->ncas = i-1;
+	res->ncas = i - 1;
 	return 0;
 }
 
 
 /* Reads a PEM encoded PKCS-1 RSA private key file
  */
-static int read_key_file( X509PKI_CREDENTIALS res, char* keyfile) {
-int siz, ret;
-opaque* b64;
-gnutls_datum tmp;
-char x[MAX_FILE_SIZE];
-FILE* fd2;
+static int read_key_file(X509PKI_CREDENTIALS res, char *keyfile)
+{
+	int siz, ret;
+	opaque *b64;
+	gnutls_datum tmp;
+	char x[MAX_FILE_SIZE];
+	FILE *fd2;
 
 	fd2 = fopen(keyfile, "r");
 	if (fd2 == NULL)
@@ -293,11 +312,13 @@ FILE* fd2;
 
 	tmp.data = b64;
 	tmp.size = siz;
-	if ( (ret =_gnutls_pkcs1key2gnutlsKey(&res->pkey[res->ncerts], tmp)) < 0) {
+	if ((ret =
+	     _gnutls_pkcs1key2gnutlsKey(&res->pkey[res->ncerts],
+					tmp)) < 0) {
 		gnutls_assert();
 		gnutls_free(b64);
 		return ret;
-	} 
+	}
 
 	gnutls_free(b64);
 
@@ -315,35 +336,39 @@ FILE* fd2;
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS* res, int ncerts)
+int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS * res, int ncerts)
 {
-	*res = gnutls_calloc( 1, sizeof( X509PKI_CREDENTIALS_INT));
+	*res = gnutls_calloc(1, sizeof(X509PKI_CREDENTIALS_INT));
 
-	if (*res==NULL) return GNUTLS_E_MEMORY_ERROR;
+	if (*res == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
 
-	(*res)->ncerts=0; /* this is right - set_key() increments it */
+	(*res)->ncerts = 0;	/* this is right - set_key() increments it */
 
 	if (ncerts > 0) {
 		(*res)->cert_list =
-		    (gnutls_cert **) gnutls_malloc( ncerts * sizeof(gnutls_cert *));
+		    (gnutls_cert **) gnutls_malloc(ncerts *
+						   sizeof(gnutls_cert *));
 
-		if ( (*res)->cert_list == NULL) {
+		if ((*res)->cert_list == NULL) {
 			gnutls_free(*res);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		(*res)->cert_list_length = (int *) gnutls_malloc( ncerts * sizeof(int *));
-		if ( (*res)->cert_list_length == NULL) {
-			gnutls_free( *res);
-			gnutls_free( (*res)->cert_list);
+		(*res)->cert_list_length =
+		    (int *) gnutls_malloc(ncerts * sizeof(int *));
+		if ((*res)->cert_list_length == NULL) {
+			gnutls_free(*res);
+			gnutls_free((*res)->cert_list);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		(*res)->pkey = gnutls_malloc( ncerts * sizeof(gnutls_private_key));
-		if ( (*res)->pkey == NULL) {
-			gnutls_free( *res);
-			gnutls_free( (*res)->cert_list);
-			gnutls_free( (*res)->cert_list_length);
+		(*res)->pkey =
+		    gnutls_malloc(ncerts * sizeof(gnutls_private_key));
+		if ((*res)->pkey == NULL) {
+			gnutls_free(*res);
+			gnutls_free((*res)->cert_list);
+			gnutls_free((*res)->cert_list_length);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
@@ -363,16 +388,17 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS* res, int ncerts)
   * more than once (in case multiple keys/certificates exist for the
   * server)
   **/
-int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char* CERTFILE, char *KEYFILE)
+int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char *CERTFILE,
+			char *KEYFILE)
 {
-int ret;
+	int ret;
 
 	/* this should be first 
 	 */
-	if ( (ret=read_key_file( res, KEYFILE)) < 0)
+	if ((ret = read_key_file(res, KEYFILE)) < 0)
 		return ret;
 
-	if ( (ret=read_cert_file( res, CERTFILE)) < 0)
+	if ((ret = read_cert_file(res, CERTFILE)) < 0)
 		return ret;
 
 	return 0;
@@ -387,11 +413,12 @@ int ret;
   * This function sets the trusted CAs in order to verify client
   * certificates.
   **/
-int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE)
+int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char *CAFILE,
+			  char *CRLFILE)
 {
-int ret;
+	int ret;
 
-	if ( (ret=read_ca_file( res, CAFILE)) < 0)
+	if ((ret = read_ca_file(res, CAFILE)) < 0)
 		return ret;
 
 	return 0;
@@ -405,12 +432,13 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	node_asn *spk;
 
 	if (asn1_create_structure
-	    ( _gnutls_get_pkcs(), "PKCS-1.RSAPublicKey", &spk, "rsa_public_key") != ASN_OK) {
+	    (_gnutls_get_pkcs(), "PKCS-1.RSAPublicKey", &spk,
+	     "rsa_public_key") != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = asn1_get_der ( spk, der, dersize);
+	result = asn1_get_der(spk, der, dersize);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
@@ -437,7 +465,9 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	}
 
 	len = sizeof(str) - 1;
-	result = asn1_read_value(spk, "rsa_public_key.publicExponent", str, &len);
+	result =
+	    asn1_read_value(spk, "rsa_public_key.publicExponent", str,
+			    &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		_gnutls_mpi_release(&(*params)[0]);
@@ -461,70 +491,106 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 
 }
 
-/* res is not malloced 
- */
-#define _READ( str, OID, ANAME, NAME, res) \
-	if(strcmp(str, OID)==0){ \
-	  strcpy( str, "PKIX1Implicit88."); \
-	  strcat( str, ANAME); \
-	  strcpy( name2, "temp-structure-"); \
-	  strcat( name2, NAME); \
-	  if ( (result = asn1_create_structure( _gnutls_get_pkix(), str, &tmpasn, name2)) != ASN_OK) { \
-	  	gnutls_assert(); \
-	  	return GNUTLS_E_ASN1_ERROR; \
-	  } \
-	  len = sizeof(str) - 1; \
-	  if ( (result=asn1_read_value( rasn, name3, str,&len)) != ASN_OK) { \
-	  	asn1_delete_structure( tmpasn); \
-	  	continue; \
-	  } \
-      	  if ( (result=asn1_get_der( tmpasn, str, len)) != ASN_OK) { \
-	  	asn1_delete_structure( tmpasn); \
-	  	continue; \
-	  } \
-	  strcpy( name3,name2); \
-	  len = sizeof(str) - 1; \
-	  if ( (result=asn1_read_value( tmpasn, name3, str, &len)) != ASN_OK) {  /* CHOICE */ \
-	  	asn1_delete_structure( tmpasn); \
-	  	continue; \
-	  } \
-	  str[len] = 0; \
-  	  strcat( name3, "."); \
-	  strcat( name3, str); \
-	  len = sizeof(str) - 1; \
-	  if ( (result=asn1_read_value( tmpasn, name3, str,&len)) != ASN_OK) { \
-	  	asn1_delete_structure( tmpasn); \
-	  	continue; \
-	  } \
-	  str[len]=0; \
-	  if (strlen(str) < sizeof(res)) strcpy( res, str); \
-	  asn1_delete_structure( tmpasn); \
-	}
+#define _READ(a, aa, b, c, d, e, res, f) \
+	result = _IREAD(a, aa, b, c, d, e, res, sizeof(res), f); \
+	if (result<0) return result; \
+	if (result==1) continue
 
+
+int _IREAD(node_asn * rasn, char* name3, char *rstr, char *OID, char *ANAME, char *TYPE,
+	   char *res, int res_size, int CHOICE)
+{
+	char name2[256];
+	int result, len;
+	char str[1024];
+	node_asn *tmpasn;
+
+	if (strcmp(rstr, OID) == 0) {
+
+		strcpy(str, "PKIX1Implicit88.");
+		strcat(str, ANAME);
+		strcpy(name2, "temp-structure-");
+		strcat(name2, TYPE);
+
+		if ((result =
+		     asn1_create_structure(_gnutls_get_pkix(), str,
+					   &tmpasn, name2)) != ASN_OK) {
+			gnutls_assert();
+			return GNUTLS_E_ASN1_ERROR;
+		}
+
+		len = sizeof(str) - 1;
+		if ((result =
+		     asn1_read_value(rasn, name3, str, &len)) != ASN_OK) {
+			asn1_delete_structure(tmpasn);
+			return 1;
+		}
+
+		if ((result = asn1_get_der(tmpasn, str, len)) != ASN_OK) {
+			asn1_delete_structure(tmpasn);
+			return 1;
+		}
+		strcpy(name3, name2);
+
+		len = sizeof(str) - 1;
+		if ((result = asn1_read_value(tmpasn, name3, str, &len)) != ASN_OK) {	/* CHOICE */
+			asn1_delete_structure(tmpasn);
+			return 1;
+		}
+
+		if (CHOICE == 0) {
+			str[len] = 0;
+			strcpy(res, str);
+			asn1_delete_structure(tmpasn);
+		} else {	/* CHOICE */
+			str[len] = 0;
+			strcat(name3, ".");
+			strcat(name3, str);
+			len = sizeof(str) - 1;
+
+			if ((result =
+			     asn1_read_value(tmpasn, name3, str,
+					     &len)) != ASN_OK) {
+				asn1_delete_structure(tmpasn);
+				return 1;
+			}
+			str[len] = 0;
+			if (strlen(str) < res_size)
+				strcpy(res, str);
+			asn1_delete_structure(tmpasn);
+		}
+	}
+	return 0;
+}
 
 /* this function will convert up to 3 digit
  * numbers to characters.
  */
-void _gnutls_int2str(int k, char* data) {
-    if (k > 999) data[0] = 0;
-    else sprintf( data, "%d", k);
+void _gnutls_int2str(int k, char *data)
+{
+	if (k > 999)
+		data[0] = 0;
+	else
+		sprintf(data, "%d", k);
 }
 
 /* This function will attempt to read a Name
  * ASN.1 structure. (Taken from Fabio's samples!)
  *
  * FIXME: These functions need carefull auditing
+ * (they're complex enough)
  * --nmav
  */
-static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
+int _gnutls_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 {
 	int k, k2, result, len;
-	char name[128], str[1024], name2[128], counter[MAX_INT_DIGITS], name3[128];
+	char name[128], str[1024], name2[128], counter[MAX_INT_DIGITS],
+	    name3[128];
 
 	k = 0;
 	do {
 		k++;
-		
+
 		strcpy(name, root);
 		strcat(name, ".rdnSequence.?");
 		_gnutls_int2str(k, counter);
@@ -532,11 +598,16 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 
 		len = sizeof(str) - 1;
 
-		result = asn1_read_value( rasn, name, str, &len);
-		
+		result = asn1_read_value(rasn, name, str, &len);
+
 		/* move to next
 		 */
-		if (result==ASN_ELEMENT_NOT_FOUND) break;
+		if (result == ASN_ELEMENT_NOT_FOUND)
+			break;
+		if (result != ASN_VALUE_NOT_FOUND) {
+			gnutls_assert();
+			return GNUTLS_E_ASN1_PARSING_ERROR;
+		}
 
 		k2 = 0;
 		do {
@@ -548,68 +619,85 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 			strcat(name2, counter);
 
 			len = sizeof(str) - 1;
-			result = asn1_read_value( rasn, name2, str, &len);
+			result = asn1_read_value(rasn, name2, str, &len);
 
-			if (result==ASN_ELEMENT_NOT_FOUND) break;
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
+			if (result != ASN_VALUE_NOT_FOUND) {
+				gnutls_assert();
+				return GNUTLS_E_ASN1_PARSING_ERROR;
+			}
 
 			strcpy(name3, name2);
 			strcat(name3, ".type");
-			
-			len = sizeof(str) - 1;
-			result = asn1_read_value( rasn, name3, str, &len);
 
-			if (result==ASN_ELEMENT_NOT_FOUND) break;
-			else
-				if (result != ASN_OK) {
-					gnutls_assert();
-					return GNUTLS_E_ASN1_PARSING_ERROR;
-				}
+			len = sizeof(str) - 1;
+			result = asn1_read_value(rasn, name3, str, &len);
+
+			if (result == ASN_ELEMENT_NOT_FOUND)
+				break;
+			else if (result != ASN_OK) {
+				gnutls_assert();
+				return GNUTLS_E_ASN1_PARSING_ERROR;
+			}
+
 			strcpy(name3, name2);
 			strcat(name3, ".value");
 
 			if (result == ASN_OK) {
-				node_asn *tmpasn;
 #ifdef DEBUG
 # warning " FIX COUNTRY HERE"
 #endif
-				_READ(str, "2 5 4 6", "X520OrganizationName",
-					"countryName", dn->country);
-				_READ(str, "2 5 4 10", "X520OrganizationName",
-					"OrganizationName", dn->organization);
-				_READ(str, "2 5 4 11", "X520OrganizationalUnitName",
-				      "OrganizationalUnitName", dn->organizational_unit_name);
-				_READ(str, "2 5 4 3", "X520CommonName", 
-					"CommonName", dn->common_name);
-				_READ(str, "2 5 4 7", "X520LocalityName",
-					"LocalityName", dn->locality_name);
-				_READ(str, "2 5 4 8", "X520StateOrProvinceName",
-				      "StateOrProvinceName", dn->state_or_province_name);
+				_READ(rasn, name3, str, "2 5 4 6",
+				      "X520OrganizationName",
+				      "countryName", dn->country, 1);
+				_READ(rasn, name3, str, "2 5 4 10",
+				      "X520OrganizationName",
+				      "OrganizationName", dn->organization,
+				      1);
+				_READ(rasn, name3, str, "2 5 4 11",
+				      "X520OrganizationalUnitName",
+				      "OrganizationalUnitName",
+				      dn->organizational_unit_name, 1);
+				_READ(rasn, name3, str, "2 5 4 3",
+				      "X520CommonName", "CommonName",
+				      dn->common_name, 1);
+				_READ(rasn, name3, str, "2 5 4 7",
+				      "X520LocalityName", "LocalityName",
+				      dn->locality_name, 1);
+				_READ(rasn, name3, str, "2 5 4 8",
+				      "X520StateOrProvinceName",
+				      "StateOrProvinceName",
+				      dn->state_or_province_name, 1);
+				_READ(rasn, name3, str, "1 2 840 113549 1 9 1",
+				      "Pkcs9email", "emailAddress",
+				      dn->email, 0);
 			}
 		} while (1);
 	} while (1);
 
-	if (result==ASN_ELEMENT_NOT_FOUND)
+	if (result == ASN_ELEMENT_NOT_FOUND)
 		return 0;
-	else 
+	else
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 }
 
 
 
 #define MAX_TIME 1024
-static time_t _gnutls_get_time( node_asn* c2, char* root, char* when) {
-opaque ttime[MAX_TIME];
-char name[1024];
-time_t ctime;
-int len, result;
+static time_t _gnutls_get_time(node_asn * c2, char *root, char *when)
+{
+	opaque ttime[MAX_TIME];
+	char name[1024];
+	time_t ctime;
+	int len, result;
 
 	strcpy(name, root);
 	strcat(name, ".tbsCertificate.validity.");
 	strcat(name, when);
-	
+
 	len = sizeof(ttime) - 1;
-	if ((result =
-	     asn1_read_value(c2, name, ttime, &len)) < 0) {
+	if ((result = asn1_read_value(c2, name, ttime, &len)) < 0) {
 		gnutls_assert();
 		return (time_t) (-1);
 	}
@@ -623,8 +711,7 @@ int len, result;
 		strcat(name, when);
 		strcat(name, ".generalTime");
 		len = sizeof(ttime) - 1;
-		result =
-		    asn1_read_value(c2, name, ttime, &len);
+		result = asn1_read_value(c2, name, ttime, &len);
 		if (result == ASN_OK)
 			ctime = _gnutls_generalTime2gtime(ttime);
 	} else {		/* UTCTIME */
@@ -633,34 +720,33 @@ int len, result;
 		strcat(name, when);
 		strcat(name, ".utcTime");
 		len = sizeof(ttime) - 1;
-		result =
-		    asn1_read_value(c2, name, ttime, &len);
+		result = asn1_read_value(c2, name, ttime, &len);
 		if (result == ASN_OK)
 			ctime = _gnutls_utcTime2gtime(ttime);
 	}
 
-	if (result!=ASN_OK) {
+	if (result != ASN_OK) {
 		gnutls_assert();
 		return (time_t) (-1);
 	}
 	return ctime;
 }
 
-static int _gnutls_get_version( node_asn* c2, char* root) {
-opaque gversion[5];
-char name[1024];
-int len, result;
+static int _gnutls_get_version(node_asn * c2, char *root)
+{
+	opaque gversion[5];
+	char name[1024];
+	int len, result;
 
 	strcpy(name, root);
 	strcat(name, ".tbsCertificate.version");
-	
+
 	len = sizeof(gversion) - 1;
-	if ((result =
-	     asn1_read_value(c2, name, gversion, &len)) < 0) {
+	if ((result = asn1_read_value(c2, name, gversion, &len)) < 0) {
 		gnutls_assert();
 		return (-1);
 	}
-	return (int) gversion[0]+1;
+	return (int) gversion[0] + 1;
 }
 
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
@@ -671,19 +757,21 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	int len = sizeof(str);
 
 	gCert->valid = 1;
-	
-	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2")
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
 	}
 
-	result = asn1_get_der( c2, derCert.data, derCert.size);
+	result = asn1_get_der(c2, derCert.data, derCert.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 #ifdef DEBUG
-		_gnutls_log( "Decoding error %d\n", result);
-#endif		
+		_gnutls_log("Decoding error %d\n", result);
+#endif
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
@@ -691,7 +779,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	len = sizeof(str) - 1;
 	result =
 	    asn1_read_value
-	    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+	    (c2,
+	     "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
 	     str, &len);
 
 	if (result != ASN_OK) {
@@ -709,7 +798,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		len = sizeof(str) - 1;
 		result =
 		    asn1_read_value
-		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+		    (c2,
+		     "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 		     str, &len);
 
 		if (result != ASN_OK) {
@@ -729,70 +819,77 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 */
 		gnutls_assert();
 #ifdef DEBUG
-_gnutls_log( "ALGORITHM: %s\n", str);
-return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		_gnutls_log("ALGORITHM: %s\n", str);
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 #endif
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 		gCert->params = NULL;
-		
+
 	}
 
-	len = sizeof( gCert->signature);
+	len = sizeof(gCert->signature);
 	result =
 	    asn1_read_value
-		    (c2, "certificate2.signature",
-		     gCert->signature, &len);
+	    (c2, "certificate2.signature", gCert->signature, &len);
 
-	if ((len % 8) !=0) {
+	if ((len % 8) != 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;		
+		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
-	len /= 8; /* convert to bytes */
+	len /= 8;		/* convert to bytes */
 	gCert->signature_size = len;
 
 
-	memset( &gCert->cert_info, 0, sizeof(gCert->cert_info));
-	memset( &gCert->issuer_info, 0, sizeof(gCert->issuer_info));
+	memset(&gCert->cert_info, 0, sizeof(gCert->cert_info));
+	memset(&gCert->issuer_info, 0, sizeof(gCert->issuer_info));
 
 	if ((result =
-	     _get_Name_type( c2, "certificate2.tbsCertificate.subject", &gCert->cert_info)) < 0) {
+	     _gnutls_get_name_type(c2,
+				   "certificate2.tbsCertificate.subject",
+				   &gCert->cert_info)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
 	}
 
-	memset( &gCert->subjectAltName, 0, sizeof(gCert->subjectAltName));
+	memset(&gCert->subjectAltDNSName, 0, sizeof(gCert->subjectAltDNSName));
 	if ((result =
-	     _gnutls_get_ext_type( c2, "certificate2.tbsCertificate.extensions", gCert)) < 0) {
+	     _gnutls_get_ext_type(c2,
+				  "certificate2.tbsCertificate.extensions",
+				  gCert)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
 	}
 
 	if ((result =
-	     _get_Name_type( c2, "certificate2.tbsCertificate.issuer", &gCert->issuer_info)) < 0) {
+	     _gnutls_get_name_type(c2,
+				   "certificate2.tbsCertificate.issuer",
+				   &gCert->issuer_info)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
 	}
 
 
-	gCert->expiration_time = _gnutls_get_time( c2, "certificate2", "notAfter");
-	gCert->activation_time = _gnutls_get_time( c2, "certificate2", "notBefore");
+	gCert->expiration_time =
+	    _gnutls_get_time(c2, "certificate2", "notAfter");
+	gCert->activation_time =
+	    _gnutls_get_time(c2, "certificate2", "notBefore");
 
-	gCert->version = _gnutls_get_version( c2, "certificate2");
-	
+	gCert->version = _gnutls_get_version(c2, "certificate2");
+
 	asn1_delete_structure(c2);
 
-	if (gnutls_set_datum( &gCert->raw, derCert.data, derCert.size) < 0) {
+	if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	gCert->valid = 0; /* if we got until here
-	                   * the certificate is valid.
-	                   */
+	gCert->valid = 0;	/* if we got until here
+				 * the certificate is valid.
+				 */
 
 	return 0;
 
@@ -801,27 +898,33 @@ return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 /* Returns 0 if it's ok to use the KXAlgorithm with this cert
  * (using KeyUsage field). 1 otherwise.
  */
-static int _gnutls_check_x509_key_usage( gnutls_cert* cert, KXAlgorithm alg) {
+static int _gnutls_check_x509_key_usage(gnutls_cert * cert,
+					KXAlgorithm alg)
+{
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_X509PKI) {
-		switch(alg) {
-			case GNUTLS_KX_RSA:
-				if (cert->keyUsage!=0) {
-					if ( !(cert->keyUsage & X509KEY_KEY_ENCIPHERMENT))
-						return 1;
-					else
-						return 0;
-				}
-				return 0;
-			case GNUTLS_KX_DHE_RSA:
-				if (cert->keyUsage!=0) {
-					if ( !(cert->keyUsage & X509KEY_DIGITAL_SIGNATURE))
-						return 1;
-					else
-						return 0;
-				}
-				return 0;
-			default:
-				return 1;
+		switch (alg) {
+		case GNUTLS_KX_RSA:
+			if (cert->keyUsage != 0) {
+				if (!
+				    (cert->
+				     keyUsage & X509KEY_KEY_ENCIPHERMENT))
+					return 1;
+				else
+					return 0;
+			}
+			return 0;
+		case GNUTLS_KX_DHE_RSA:
+			if (cert->keyUsage != 0) {
+				if (!
+				    (cert->
+				     keyUsage & X509KEY_DIGITAL_SIGNATURE))
+					return 1;
+				else
+					return 0;
+			}
+			return 0;
+		default:
+			return 1;
 		}
 	}
 	return 0;
@@ -845,7 +948,7 @@ int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
 	for (kx = 0; kx < 255; kx++) {
 		pk = _gnutls_map_pk_get_pk(kx);
 		if (pk == cert->subject_pk_algorithm) {
-			if ( _gnutls_check_x509_key_usage( cert, kx) == 0) {
+			if (_gnutls_check_x509_key_usage(cert, kx) == 0) {
 				kxlist[i] = kx;
 				i++;
 			}
@@ -858,13 +961,13 @@ int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
 
 	*alg_size = i;
 
-	memcpy(*alg, kxlist, i*sizeof(KXAlgorithm));
+	memcpy(*alg, kxlist, i * sizeof(KXAlgorithm));
 
 	return 0;
 }
 
 /* finds a certificate in the cert lists that contains
- * common_name (or subjectAltName) field similar to name
+ * common_name (or subjectAltDNSName) field similar to name
  */
 gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 			       int cert_list_length, char *name)
@@ -873,8 +976,13 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 	int i;
 
 	for (i = 0; i < cert_list_length; i++) {
-		if (cert_list[i][0].cert_info.common_name[0] != 0 || cert_list[i][0].subjectAltName[0]!=0) {
-			if (strcasecmp(cert_list[i][0].cert_info.common_name, name) == 0 || strcasecmp(cert_list[i][0].subjectAltName, name) == 0) {
+		if (cert_list[i][0].cert_info.common_name[0] != 0
+		    || cert_list[i][0].subjectAltDNSName[0] != 0) {
+			if (strcasecmp
+			    (cert_list[i][0].cert_info.common_name,
+			     name) == 0
+			    || strcasecmp(cert_list[i][0].subjectAltDNSName,
+					  name) == 0) {
 				cert = &cert_list[i][0];
 				break;
 			}
@@ -884,17 +992,22 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 }
 
 /* finds the index of a certificate in the cert lists that contains
- * common_name (or subjectAltName) field similar to name
+ * common_name (or subjectAltDNSName) field similar to name
  */
 int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
-			       int cert_list_length, char *name)
+				 int cert_list_length, char *name)
 {
 	int index = 0;
 	int i;
 
 	for (i = 0; i < cert_list_length; i++) {
-		if (cert_list[i][0].cert_info.common_name[0] != 0 || cert_list[i][0].subjectAltName[0]!=0) {
-			if (strcasecmp(cert_list[i][0].cert_info.common_name, name) == 0 || strcasecmp(cert_list[i][0].subjectAltName, name) == 0) {
+		if (cert_list[i][0].cert_info.common_name[0] != 0
+		    || cert_list[i][0].subjectAltDNSName[0] != 0) {
+			if (strcasecmp
+			    (cert_list[i][0].cert_info.common_name,
+			     name) == 0
+			    || strcasecmp(cert_list[i][0].subjectAltDNSName,
+					  name) == 0) {
 				index = i;
 				break;
 			}
@@ -915,22 +1028,29 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
   * call this function then the client will not be asked to
   * send a certificate.
   **/
-int gnutls_x509pki_set_cert_request( GNUTLS_STATE state, CertificateRequest req) {
+int gnutls_x509pki_set_cert_request(GNUTLS_STATE state,
+				    CertificateRequest req)
+{
 	state->gnutls_internals.send_cert_req = req;
 	return 0;
 }
 
 /**
-  * gnutls_x509pki_set_cert_callback - Used to set a callback while selecting the proper (client) certificate
+  * gnutls_set_x509_cert_callback - Used to set a callback while selecting the proper (client) certificate
   * @cred: is an &X509PKI_CLIENT_CREDENTIALS structure.
   * @x509_cert_callback: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(gnutls_DN *client_cert, gnutls_DN *issuer_cert, int ncerts);
-  * where client_cert contains ncerts gnutls_DN structures which hold
-  * DN data from the client certificate, and issuer_cert holds DN data
-  * for the issuer of the certificate. Ie issuer_cert[i] is the issuer of
+  * int (*callback)(gnutls_DN *client_cert, gnutls_DN *issuer_cert, int ncerts, gnutls_DN* req_ca_cert, int nreqs);
+  *
+  * 'client_cert' contains 'ncerts' gnutls_DN structures which hold
+  * DN data from the client certificate. 'issuer_cert' holds DN data
+  * for the issuer of the certificate. Ie. issuer_cert[i] is the issuer of
   * client_cert[i]. (i < ncerts)
+  *
+  * 'req_ca_cert' contains a list with the CA certificates that the server
+  * considers trusted. Normaly we should send a certificate that is signed
+  * by one of these CAs.
   *
   * This function specifies what we (in case of a client) are going
   * to do when we have to send a certificate. If this callback
@@ -940,19 +1060,28 @@ int gnutls_x509pki_set_cert_request( GNUTLS_STATE state, CertificateRequest req)
   * If the callback function is provided then gnutls will call it
   * once with NULL parameters. If the callback function returns
   * a positive or zero number then gnutls will attempt to automaticaly
-  * choose the appropriate certificate. If this fails then it will
-  * call the callback function.
+  * choose the appropriate certificate. If gnutls fails to find an appropriate
+  * certificate, then it will call the callback function again with the 
+  * appropriate parameters.
   *
   * In case the callback returned a negative number then gnutls will
-  * not attempt to choose the appropriate certificate and will rely
+  * not attempt to choose the appropriate certificate and will call again
+  * the callback function with the appropriate parameters, and rely
   * only to the return value of the callback function.
   *
   * The callback function should return the index of the certificate
-  * choosen by the user.
+  * choosen by the user (or -1 to indicate that the user
+  * does not want to use client authentication).
   *
   * This function returns 0 on success.
   **/
-int gnutls_x509pki_set_cert_callback( X509PKI_CREDENTIALS cred, int (*x509_cert_callback)(gnutls_DN*, gnutls_DN*, int)) {
+int gnutls_set_x509_cert_callback(X509PKI_CREDENTIALS cred,
+				  int (*x509_cert_callback) (gnutls_DN *,
+							     gnutls_DN *,
+							     int,
+							     gnutls_DN *,
+							     int))
+{
 	cred->client_cert_callback = x509_cert_callback;
 	return 0;
 }

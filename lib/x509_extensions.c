@@ -26,17 +26,17 @@
 #include <gnutls_errors.h>
 #include <gnutls_global.h>
 
-/* Here we only read subjectAltName, in case of
+/* Here we only read subjectAltDNSName, in case of
  * dnsName. Otherwise we read nothing.
  */
-static int _extract_subjectAltName( char* subjectAltName, opaque* extnValue, int extnValueLen) {
+static int _extract_subjectAltDNSName( char* subjectAltDNSName, opaque* extnValue, int extnValueLen) {
 node_asn* ext;
 char counter[MAX_INT_DIGITS];
 char name[1024];
 char str[1024];
 int len, k, result;
 
-	subjectAltName[0] = 0;
+	subjectAltDNSName[0] = 0;
 	
 	if (asn1_create_structure
 	    ( _gnutls_get_pkix(), "PKIX1Implicit88.GeneralNames", &ext, 
@@ -74,8 +74,8 @@ int len, k, result;
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 			
-			strncpy( subjectAltName, str, GMIN( len, X509_CN_SIZE-1));
-			subjectAltName[X509_CN_SIZE-1] = 0;
+			strncpy( subjectAltDNSName, str, GMIN( len, X509_CN_SIZE-1));
+			subjectAltDNSName[X509_CN_SIZE-1] = 0;
 			
 			break;
 		}
@@ -181,8 +181,8 @@ static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, ch
 		return _extract_basicConstraints( &cert->CA, extnValue, extnValueLen);
 	}
 
-	if (strcmp( extnID, "2 5 29 17")==0) { /* subjectAltName */
-		return _extract_subjectAltName( cert->subjectAltName, extnValue, extnValueLen);
+	if (strcmp( extnID, "2 5 29 17")==0) { /* subjectAltDNSName */
+		return _extract_subjectAltDNSName( cert->subjectAltDNSName, extnValue, extnValueLen);
 	}
 
 #ifdef DEBUG
