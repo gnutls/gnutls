@@ -4,3 +4,4 @@ gnutls-api.tex
 *.aux
 *.ps
 *.dvi
+*.toc
