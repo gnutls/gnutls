@@ -49,7 +49,11 @@
 #define MAX_RECV_SIZE 18432+HEADER_SIZE 	/* 2^14+2048+HEADER_SIZE */
 
 #ifdef USE_DMALLOC
-#include <dmalloc.h>
+# include <dmalloc.h>
+#endif
+
+#ifdef USE_GCRYPT
+# include <gnutls_gcry.h>
 #endif
 
 #define GNUTLS_MPI MPI
@@ -106,7 +110,7 @@ typedef struct {
 /* STATE */
 typedef enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT } ConnectionEnd;
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 } BulkCipherAlgorithm;
-typedef enum Extensions { GNUTLS_EXTENSION_SRP=7 } Extensions;
+typedef enum Extensions { GNUTLS_EXTENSION_SRP=7, GNUTLS_EXTENSION_DNSNAME } Extensions;
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
 typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
@@ -125,8 +129,15 @@ typedef struct {
 	void* next;
 } AUTH_CRED;
 
+
+typedef struct {
+	uint8 major;
+	uint8 minor;
+} ProtocolVersion;
+
 typedef struct {
 	/* For DH KX */
+	gnutls_datum			key;
 	MPI				KEY;
 	MPI				client_Y;
 	MPI				client_g;
@@ -149,14 +160,15 @@ typedef struct {
 	 */
 	void*				auth_info;
 	int				auth_info_size; /* needed in order to store to db for restoring */
-
 	uint8				crypt_algo;
-	
+
 	/* These are needed in RSA and DH signature calculation 
 	 */
 	opaque				server_random[32];
 	opaque				client_random[32];
-	AUTH_CRED*			cred; /* used in srp, etc */
+	ProtocolVersion			version;
+
+	AUTH_CRED*			cred; /* used to specify keys/certificates etc */
 } GNUTLS_KEY_A;
 typedef GNUTLS_KEY_A* GNUTLS_KEY;
 
@@ -278,11 +290,6 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HA
 		GNUTLS_APPLICATION_DATA } ContentType;
 
 typedef struct {
-	uint8 major;
-	uint8 minor;
-} ProtocolVersion;
-
-typedef struct {
 	uint8		type;
 	ProtocolVersion	version;
 	uint16		length;
@@ -320,9 +327,5 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data
 int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
 int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);
 #define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)
-
-#ifndef gcry_mpi_alloc_like
-# define gcry_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x)) 
-#endif
 
 #endif /* GNUTLS_INT_H */

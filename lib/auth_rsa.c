@@ -23,7 +23,6 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
-#include "auth_anon.h"
 #include "gnutls_num.h"
 #include "cert_asn1.h"
 #include "cert_der.h"
@@ -106,7 +105,7 @@ int _gnutls_calc_rsa_signature( GNUTLS_KEY key, const opaque* data, int data_siz
 	return ret;
 }
 
-
+#if 0
 /* This function reads the RSA parameters from the given(?) certificate.
  */
 static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, gnutls_datum cert)
@@ -179,20 +178,20 @@ static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, gnutls_d
 			gnutls_assert();
 			delete_structure("rsapublickey");
 			gnutls_free_datum(&params->rsa_modulus);
-			gcry_mpi_release(key->A);
+			_gnutls_mpi_release(&key->A);
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
 		if (gcry_mpi_scan(&key->B,
 			  GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
-			gcry_mpi_release(key->A);
+			_gnutls_mpi_release(&key->A);
 			gnutls_free_datum(&params->rsa_modulus);
 			delete_structure("rsapublickey");
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 		if (gnutls_set_datum(&params->rsa_exponent, str, len) < 0) {
-			gcry_mpi_release(key->A);
+			_gnutls_mpi_release(&key->A);
 			gnutls_free_datum(&params->rsa_modulus);
 			delete_structure("rsapublickey");
 			return GNUTLS_E_MEMORY_ERROR;	
@@ -206,6 +205,7 @@ static int _gnutls_get_rsa_params( GNUTLS_KEY key, RSA_Params * params, gnutls_d
 
 	return ret;
 }
+#endif
 
 /* This function reads the RSA parameters from the given private key
  * cert is not a certificate but a der structure containing the private
@@ -246,7 +246,7 @@ static int _gnutls_get_private_rsa_params( GNUTLS_KEY key, gnutls_datum cert)
 	if (result != ASN_OK) {
 		gnutls_assert();
 		delete_structure("rsa_key");
-		gcry_mpi_release(key->u);
+		_gnutls_mpi_release(&key->u);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
@@ -254,7 +254,7 @@ static int _gnutls_get_private_rsa_params( GNUTLS_KEY key, gnutls_datum cert)
 		  GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
 		delete_structure("rsa_key");
-		gcry_mpi_release(key->u);
+		_gnutls_mpi_release(&key->u);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
@@ -314,20 +314,33 @@ int gen_rsa_server_kx(GNUTLS_KEY key, opaque ** data)
 
 int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 {
-	RSA_Params params;
 	const X509PKI_SERVER_CREDENTIALS *cred;
 	int ret, i;
 	opaque* pdata;
-
+	gnutls_datum* apr_cert_list;
+	gnutls_datum apr_pkey;
+	int apr_cert_list_length;
+	
 	cred = _gnutls_get_cred(key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
+	if (cred->ncerts==0) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	/* FIXME: FIND APPROPRIATE CERTIFICATE - depending on hostname 
+	 */
+	apr_cert_list = cred->cert_list[0];
+	apr_cert_list_length = cred->cert_list_length[0];
+	apr_pkey = cred->pkey[0];
+
 	ret = 3;
-	for (i=0;i<cred->cert_list_size;i++) {
-		ret += cred->cert_list[i].size + 3; 
+	for (i=0;i<apr_cert_list_length;i++) {
+		ret += apr_cert_list[i].size + 3; 
 					/* hold size
 					 * for uint24 */
 	}
@@ -342,63 +355,34 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 	
 	WRITEuint24( ret-3, pdata);
 	pdata+=3;
-	for (i=0;i<cred->cert_list_size;i++) {
-		WRITEdatum24( pdata, cred->cert_list[i]); 
-		pdata += 3 + cred->cert_list[i].size;
+	for (i=0;i<apr_cert_list_length;i++) {
+		WRITEdatum24( pdata, apr_cert_list[i]); 
+		pdata += 3 + apr_cert_list[i].size;
 	}
 
-	return ret;	
-}
-
-
-int proc_anon_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
-	uint16 n_Y;
-	size_t _n_Y;
-	MPI g, p;
-	int bits;
-	const RSA_SERVER_CREDENTIALS * cred;
-
-	cred = _gnutls_get_cred(key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
-	}
-
+	/* read the rsa parameters now, since later we will
+	 * now know which certificate we used!
+	 */
 	ret =
-	    _gnutls_get_rsa_params(key, &params, cred->cert_list[0]);
+	    _gnutls_get_private_rsa_params(key, apr_pkey);
 
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-#if 0 /* removed. I do not know why - maybe I didn't get the protocol,
-       * but openssl does not use that byte
-       */
-	if (data[0] != 1) {
+	return ret;	
+}
+
+
+int proc_rsa_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
+	const X509PKI_SERVER_CREDENTIALS * cred;
+
+	cred = _gnutls_get_cred(key, GNUTLS_X509PKI, NULL);
+	if (cred == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return GNUTLS_E_INSUFICIENT_CRED;
 	}
-#endif
-
-	n_Y = READuint16( &data[0]);
-
-	_n_Y = n_Y;
-	if (gcry_mpi_scan(&key->client_Y,
-		      GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	g = gnutls_get_dh_params(&p, bits);
-	key->KEY = gnutls_calc_dh_key( key->client_Y, key->dh_secret, p);
-
-	gnutls_mpi_release(key->client_Y);
-	gnutls_mpi_release(key->dh_secret);
-	gnutls_mpi_release(p);
-	gnutls_mpi_release(g);
-	key->client_Y = NULL;
-	key->dh_secret = NULL;
 
 	return 0;
 }

@@ -149,6 +149,7 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 /* send the second key exchange message  */
 int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 {
+	int ret;
 	size_t n_b;
 	uint8 *data_b;
 
@@ -178,6 +179,12 @@ int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 	mpi_release(V);
 	mpi_release(key->u);
 	mpi_release(B);
+
+	ret = _gnutls_generate_key( key);
+	_gnutls_mpi_release(&S);
+
+	if (ret < 0)
+		return ret;
 
 	return n_b + 2;
 }
@@ -330,7 +337,8 @@ int proc_srp_client_kx0(GNUTLS_KEY key, opaque * data, int data_size)
 int proc_srp_server_kx2(GNUTLS_KEY key, opaque * data, int data_size)
 {
 	size_t _n_B;
-
+	int ret;
+	
 	_n_B = READuint16( &data[0]);
 
 	if (gcry_mpi_scan(&B, GCRYMPI_FMT_USG, &data[2], &_n_B)) {
@@ -349,6 +357,13 @@ int proc_srp_server_kx2(GNUTLS_KEY key, opaque * data, int data_size)
 	mpi_release(V);
 	mpi_release(key->u);
 	mpi_release(B);
+
+	ret = _gnutls_generate_key( key);
+	_gnutls_mpi_release(&S);
+
+	if (ret < 0)
+		return ret;
+
 	return 0;
 }
 

@@ -25,6 +25,7 @@
 #include "gnutls_dh.h"
 #include "auth_anon.h"
 #include "gnutls_num.h"
+#include "gnutls_gcry.h"
 
 #define DEFAULT_BITS 1024
 
@@ -49,6 +50,19 @@ MOD_AUTH_STRUCT anon_auth_struct = {
 	NULL,
 	NULL
 };
+
+/* this function will copy an MPI key to 
+ * opaque data.
+ */
+int _gnutls_generate_key(GNUTLS_KEY key) {
+        gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &key->key.size, key->KEY);
+	key->key.data = secure_malloc( key->key.size);
+	if (key->key.data==NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	gcry_mpi_print(GCRYMPI_FMT_USG, key->key.data, &key->key.size, key->KEY);
+	return 0;
+}
 
 int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 	GNUTLS_MPI x, X, g, p;
@@ -81,19 +95,19 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 	(*data) = gnutls_malloc(n_g + n_p + n_X + 6);
 	data_p = &(*data)[0];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_p[2], &n_p, p);
-	gnutls_mpi_release(p);
+	_gnutls_mpi_release(&p);
 
 	WRITEuint16( n_p, data_p);
 
 	data_g = &data_p[2 + n_p];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, g);
-	gnutls_mpi_release(g);
+	_gnutls_mpi_release(&g);
 	
 	WRITEuint16( n_g, data_g);
 
 	data_X = &data_g[2 + n_g];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_X[2], &n_X, X);
-	gnutls_mpi_release(X);
+	_gnutls_mpi_release(&X);
 
 	WRITEuint16( n_X, data_X);
 
@@ -103,6 +117,7 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 int gen_anon_client_kx( GNUTLS_KEY key, opaque** data) {
 GNUTLS_MPI x, X;
 size_t n_X;
+int ret;
 
 	X =  gnutls_calc_dh_secret(&x, key->client_g,
 		   key->client_p);
@@ -113,7 +128,7 @@ size_t n_X;
 	gcry_mpi_print(GCRYMPI_FMT_USG, &(*data)[2], &n_X, X);
 	(*data)[0] = 1;	/* extern - explicit since we do not have
 				   certificate */
-	gnutls_mpi_release(X);
+	_gnutls_mpi_release(&X);
 	
 	WRITEuint16( n_X, &(*data)[0]);
 	
@@ -121,13 +136,16 @@ size_t n_X;
 	key->KEY = gnutls_calc_dh_key(key->client_Y, x, key->client_p);
 
 	/* THESE SHOULD BE DISCARDED */
-	gnutls_mpi_release(key->client_Y);
-	gnutls_mpi_release(key->client_p);
-	gnutls_mpi_release(key->client_g);
-	key->client_Y = NULL;
-	key->client_p = NULL;
-	key->client_g = NULL;
+	_gnutls_mpi_release(&key->client_Y);
+	_gnutls_mpi_release(&key->client_p);
+	_gnutls_mpi_release(&key->client_g);
 
+	ret = _gnutls_generate_key( key);
+	_gnutls_mpi_release(&key->KEY);
+
+	if (ret < 0) {
+		return ret;
+	}
 	return n_X+2;
 }
 
@@ -207,7 +225,7 @@ int proc_anon_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	uint16 n_Y;
 	size_t _n_Y;
 	MPI g, p;
-	int bits;
+	int bits, ret;
 	const ANON_SERVER_CREDENTIALS * cred;
 
 	cred = _gnutls_get_cred( key, GNUTLS_ANON, NULL);
@@ -238,12 +256,17 @@ int proc_anon_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	g = gnutls_get_dh_params(&p, bits);
 	key->KEY = gnutls_calc_dh_key( key->client_Y, key->dh_secret, p);
 
-	gnutls_mpi_release(key->client_Y);
-	gnutls_mpi_release(key->dh_secret);
-	gnutls_mpi_release(p);
-	gnutls_mpi_release(g);
-	key->client_Y = NULL;
-	key->dh_secret = NULL;
+	_gnutls_mpi_release(&key->client_Y);
+	_gnutls_mpi_release(&key->dh_secret);
+	_gnutls_mpi_release(&p);
+	_gnutls_mpi_release(&g);
+
+	ret = _gnutls_generate_key( key);
+	_gnutls_mpi_release(&key->KEY);
+
+	if (ret < 0) {
+		return ret;
+	}
 
 	return 0;
 }

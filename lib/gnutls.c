@@ -50,6 +50,8 @@ GNUTLS_Version ver;
 
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
 	state->connection_state.version = version;
+	state->gnutls_key->version.major = _gnutls_version_get_major(version);
+	state->gnutls_key->version.minor = _gnutls_version_get_minor(version);
 }
 
 int gnutls_is_secure_memory(const void* mem) {

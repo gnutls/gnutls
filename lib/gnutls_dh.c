@@ -22,8 +22,7 @@
 #include <defines.h>
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-
-/* Taken from gsti */
+#include <gnutls_gcry.h>
 
 #define DH_G_1024 2
 #define DH_G_4096 5
@@ -235,8 +234,8 @@ const uint8 diffie_hellman_prime_2048[256] = {
 	X = gnutls_calc_dh_secret(&x, g, p);
 //      now we can calculate the shared secret
 	key = gnutls_calc_dh_key(Y, x, g, p);
-	gnutls_mpi_release(x);
-	gnutls_mpi_release(g);
+	_gnutls_mpi_release(x);
+	_gnutls_mpi_release(g);
 */
 
 
@@ -266,7 +265,7 @@ MPI gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 	if (ret_x)
 		*ret_x = x;
 	else
-		gcry_mpi_release(x);
+		_gnutls_mpi_release(&x);
 	return e;
 }
 
@@ -299,7 +298,7 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		if (ret_p)
 			*ret_p = prime;
 		else
-			gcry_mpi_release(prime);
+			_gnutls_mpi_release(&prime);
 		return g;
 	case 2048:
 		n = sizeof diffie_hellman_prime_2048;
@@ -315,7 +314,7 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		if (ret_p)
 			*ret_p = prime;
 		else
-			gcry_mpi_release(prime);
+			_gnutls_mpi_release(&prime);
 		return g;
 	case 3072:
 		n = sizeof diffie_hellman_prime_3072;
@@ -331,7 +330,7 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		if (ret_p)
 			*ret_p = prime;
 		else
-			gcry_mpi_release(prime);
+			_gnutls_mpi_release(&prime);
 		return g;
 	case 4096:
 		n = sizeof diffie_hellman_prime_4096;
@@ -347,7 +346,7 @@ MPI gnutls_get_dh_params(MPI * ret_p, int bits)
 		if (ret_p)
 			*ret_p = prime;
 		else
-			gcry_mpi_release(prime);
+			_gnutls_mpi_release(&prime);
 		return g;
 	default:
 		gnutls_assert();

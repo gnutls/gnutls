@@ -26,6 +26,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_algorithms.h"
 #include "debug.h"
+#include "gnutls_gcry.h"
 
 #define MASTER_SECRET "master secret"
 
@@ -43,13 +44,8 @@ char random[64];
 	memmove(&random[32], state->security_parameters.server_random, 32);
 
 	/* generate premaster */
-        gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &premaster_size, state->gnutls_key->KEY);
-	premaster = secure_malloc(premaster_size);
-	gcry_mpi_print(GCRYMPI_FMT_USG, premaster, &premaster_size, state->gnutls_key->KEY);
-
-	/* THIS SHOULD BE DISCARDED */
-	gnutls_mpi_release(state->gnutls_key->KEY);
-	state->gnutls_key->KEY = NULL;
+        premaster_size = state->gnutls_key->key.size;
+	premaster = state->gnutls_key->key.data;
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "PREMASTER SECRET: ");
@@ -69,6 +65,9 @@ char random[64];
 			       random, 64, 48); 
 	}
 	secure_free(premaster);
+	state->gnutls_key->key.size = 0;
+	state->gnutls_key->key.data = NULL;
+	
 #ifdef HARD_DEBUG
 	fprintf(stderr, "MASTER SECRET: %s\n", _gnutls_bin2hex(master, 48));
 #endif
@@ -96,11 +95,6 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_generate_server_kx==NULL) 
 		return 0;
 
-	/* copy random bytes - some algorithms need that.
-	 */
-	memcpy( state->gnutls_key->server_random, state->security_parameters.server_random, 32);
-	memcpy( state->gnutls_key->client_random, state->security_parameters.client_random, 32);
-	
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx( state->gnutls_key, &data);
 
 	if (data_size < 0) {
@@ -412,3 +406,31 @@ int _gnutls_recv_client_kx_message0(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
+/* This is called when we want send our certificate
+ */
+int _gnutls_send_certificate(int cd, GNUTLS_STATE state)
+{
+	uint8 *data = NULL;
+	int data_size = 0;
+	int ret = 0;
+
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Sending certificate message\n");
+#endif
+
+
+	if (state->gnutls_internals.auth_struct->gnutls_generate_certificate==NULL) 
+		return 0;
+
+	data_size = state->gnutls_internals.auth_struct->gnutls_generate_certificate( state->gnutls_key, &data);
+
+	if (data_size < 0) {
+		gnutls_assert();
+		return data_size;
+	}
+
+	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE);
+	gnutls_free(data);
+	
+	return data_size;
+}

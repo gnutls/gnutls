@@ -92,19 +92,19 @@ int gen_dhe_dss_server_kx( GNUTLS_KEY key, opaque** data) {
 	(*data) = gnutls_malloc(n_g + n_p + n_X + 6);
 	data_p = &(*data)[0];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_p[2], &n_p, p);
-	gnutls_mpi_release(p);
+	_gnutls_mpi_release(p);
 
 	WRITEuint16( n_p, data_p);
 
 	data_g = &data_p[2 + n_p];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, g);
-	gnutls_mpi_release(g);
+	_gnutls_mpi_release(g);
 
 	WRITEuint16( n_g, data_g);
 
 	data_X = &data_g[2 + n_g];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_X[2], &n_X, X);
-	gnutls_mpi_release(X);
+	_gnutls_mpi_release(X);
 
 	WRITEuint16( n_X, data_X);
 
@@ -126,7 +126,7 @@ size_t n_X;
 	gcry_mpi_print(GCRYMPI_FMT_USG, &(*data)[2], &n_X, X);
 	(*data)[0] = 1;	/* extern - explicit since we do not have
 				   certificate */
-	gnutls_mpi_release(X);
+	_gnutls_mpi_release(X);
 	
 	WRITEuint16( n_X, &(*data)[0]);    
 	
@@ -134,9 +134,9 @@ size_t n_X;
 	key->KEY = _gnutls_calc_dh_key(key->client_Y, x, key->client_p);
 
 	/* THESE SHOULD BE DISCARDED */
-	gnutls_mpi_release(key->client_Y);
-	gnutls_mpi_release(key->client_p);
-	gnutls_mpi_release(key->client_g);
+	_gnutls_mpi_release(key->client_Y);
+	_gnutls_mpi_release(key->client_p);
+	_gnutls_mpi_release(key->client_g);
 	key->client_Y = NULL;
 	key->client_p = NULL;
 	key->client_g = NULL;
@@ -248,8 +248,8 @@ int proc_dhe_dss_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	mpi_release(g);
 	mpi_release(p);
 
-	gnutls_mpi_release(key->client_Y);
-	gnutls_mpi_release(key->dh_secret);
+	_gnutls_mpi_release(key->client_Y);
+	_gnutls_mpi_release(key->dh_secret);
 	key->client_Y = NULL;
 	key->dh_secret = NULL;
 

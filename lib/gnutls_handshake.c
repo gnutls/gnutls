@@ -50,6 +50,15 @@
 static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data, int datalen);
 static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque * data, int datalen);
 
+static void set_server_random( GNUTLS_STATE state, uint8* random) {
+	memcpy( state->security_parameters.server_random, random, 32);
+	memcpy( state->gnutls_key->server_random, random, 32);
+}
+static void set_client_random( GNUTLS_STATE state, uint8* random) {
+	memcpy( state->security_parameters.client_random, random, 32);
+	memcpy( state->gnutls_key->client_random, random, 32);
+}
+
 /* Calculate The SSL3 Finished message */
 #define SSL3_CLIENT_MSG "CLNT"
 #define SSL3_SERVER_MSG "SRVR"
@@ -144,6 +153,24 @@ void *_gnutls_finished(GNUTLS_STATE state, int type, int skip)
 	return data;
 }
 
+/* this function will produce 32 bytes of random data
+ * and put it to dst.
+ */
+static int create_random( opaque* dst) {
+uint32 tim;
+opaque* rand;
+
+	tim = time(NULL);
+	/* generate server random value */
+	WRITEuint32( tim, dst);
+
+	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
+	memcpy( &dst[4], rand, 28);
+
+	_gnutls_free_rand(rand);
+
+	return 0;
+}
 
 /* Read a client hello 
  * client hello must be a known version client hello
@@ -161,10 +188,10 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	int ret = 0;
 	uint16 sizeOfSuites;
 	GNUTLS_Version version;
-	char *rand;
 	int len = datalen;
 	int err;
-
+	opaque random[32];
+	
 	if (state->gnutls_internals.v2_hello!=0) {	/* version 2.0 */
 		return _gnutls_read_client_hello_v2(state, data, datalen);
 	}
@@ -189,15 +216,12 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 2;
 
 	DECR_LEN(len, 32);
-	memcpy(state->security_parameters.client_random, &data[pos], 32);
+	set_client_random( state, &data[pos]);
 	pos += 32;
 
-	/* generate server random value */
-	WRITEuint32( time(NULL), state->security_parameters.server_random);
+	create_random( random);
+	set_server_random( state, random);
 
-	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
-	memcpy(&state->security_parameters.server_random[4], rand, 28);
-	_gnutls_free_rand(rand);
 	state->security_parameters.timestamp = time(NULL);
 
 	DECR_LEN(len, 1);
@@ -761,8 +785,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 	pos += 2;
 
 	DECR_LEN(len, 32);
-	memcpy(state->security_parameters.server_random,
-		&data[pos], 32);
+	set_server_random( state, &data[pos]);
 	pos += 32;
 
 	DECR_LEN(len, 1);
@@ -902,7 +925,6 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 
 int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 {
-	char *rand;
 	char *data = NULL;
 	opaque *extdata;
 	int extdatalen;
@@ -912,6 +934,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 	uint8 *compression_methods;
 	int i, datalen, ret = 0;
 	uint16 x;
+	opaque random[32];
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		opaque * SessionID = state->gnutls_internals.resumed_security_parameters.session_id;
@@ -932,13 +955,9 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 		    _gnutls_version_get_minor(state->connection_state.
 					      version);
 
-		WRITEuint32( time(NULL), state->security_parameters.client_random);
-
-		rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
-		memcpy(&state->security_parameters.client_random[4], rand,
-			28);
-		_gnutls_free_rand(rand);
-
+		create_random( random);
+		set_client_random( state, random);
+		
 		state->security_parameters.timestamp = time(0);
 
 		memcpy(&data[pos],

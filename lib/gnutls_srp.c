@@ -24,6 +24,7 @@
 #include <crypt_bcrypt.h>
 #include <gnutls_srp.h>
 #include <auth_srp_passwd.h>
+#include <gnutls_gcry.h>
 #include "debug.h"
 
 /* These should be added in gcrypt.h */
@@ -111,8 +112,8 @@ int _gnutls_srp_gn(opaque ** ret_g, opaque ** ret_n, int bits)
 		gnutls_free(tmp);
 	}
 
-	gcry_mpi_release(g);
-	gcry_mpi_release(prime);
+	_gnutls_mpi_release(&g);
+	_gnutls_mpi_release(&prime);
 
 	return 0;
 
@@ -135,7 +136,7 @@ int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
 
 	/* e = g^x mod prime (n) */
 	gcry_mpi_powm(e, g, x, prime);
-	gcry_mpi_release(x);
+	_gnutls_mpi_release(&x);
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
 	if (result != NULL) {
@@ -143,7 +144,7 @@ int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
 		gcry_mpi_print(GCRYMPI_FMT_USG, *result, &result_size, e);
 	}
 
-	gcry_mpi_release(e);
+	_gnutls_mpi_release(&e);
 
 	return result_size;
 
@@ -170,12 +171,12 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 	gcry_mpi_powm(tmpB, g, b, n);
 	gcry_mpi_addm(B, v, tmpB, n);
 
-	gcry_mpi_release(tmpB);
+	_gnutls_mpi_release(&tmpB);
 
 	if (ret_b)
 		*ret_b = b;
 	else
-		gcry_mpi_release(b);
+		_gnutls_mpi_release(&b);
 
 	return B;
 }
@@ -220,10 +221,10 @@ MPI _gnutls_calc_srp_S1(MPI A, MPI b, MPI u, MPI v, MPI n)
 
 	gcry_mpi_powm(tmp1, v, u, n);
 	gcry_mpi_mulm(tmp2, A, tmp1, n);
-	gcry_mpi_release(tmp1);
+	_gnutls_mpi_release(&tmp1);
 
 	gcry_mpi_powm(S, tmp2, b, n);
-	gcry_mpi_release(tmp2);
+	_gnutls_mpi_release(&tmp2);
 
 	return S;
 }
@@ -247,7 +248,7 @@ MPI _gnutls_calc_srp_A(MPI * a, MPI g, MPI n)
 	if (a != NULL)
 		*a = tmpa;
 	else
-		gcry_mpi_release(tmpa);
+		_gnutls_mpi_release(&tmpa);
 
 	return A;
 }
@@ -312,11 +313,11 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
 
 	gcry_mpi_mul(tmp1, u, x);
 	gcry_mpi_add(tmp4, a, tmp1);
-	gcry_mpi_release(tmp1);
+	_gnutls_mpi_release(&tmp1);
 
 	gcry_mpi_powm(S, tmp2, tmp4, n);
-	gcry_mpi_release(tmp2);
-	gcry_mpi_release(tmp4);
+	_gnutls_mpi_release(&tmp2);
+	_gnutls_mpi_release(&tmp4);
 
 	return S;
 }

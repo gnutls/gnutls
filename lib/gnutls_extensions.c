@@ -23,6 +23,7 @@
 #include "gnutls_extensions.h"
 #include "gnutls_errors.h"
 #include "ext_srp.h"
+#include "ext_dnsname.h"
 #include "gnutls_num.h"
 
 /* Key Exchange Section */
@@ -39,6 +40,7 @@ typedef struct {
 #define MAX_EXT 20 /* maximum supported extension */
 static gnutls_extension_entry extensions[] = {
 	GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
+	GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_DNSNAME, _gnutls_dnsname_recv_params, _gnutls_dnsname_send_params),
 	{0}
 };
 
