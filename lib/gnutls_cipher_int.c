@@ -31,6 +31,13 @@ GNUTLS_CIPHER_HANDLE ret;
 	case GNUTLS_NULL:
 		ret = GNUTLS_CIPHER_FAILED;
 		break;
+	case GNUTLS_DES:
+#ifdef USE_MCRYPT
+		ret = mcrypt_module_open( "des", NULL, "cbc", NULL);
+#else
+		ret = GNUTLS_CIPHER_FAILED;
+#endif
+		break;
 	case GNUTLS_3DES:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "tripledes", NULL, "cbc", NULL);
