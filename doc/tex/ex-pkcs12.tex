@@ -25,7 +25,7 @@ int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
    /* A good idea might be to use gnutls_x509_privkey_get_key_id()
     * to obtain a unique ID.
     */
-   gnutls_datum key_id = { "\x00\x00\x00\x01", 4 };
+   gnutls_datum key_id = { "\x00\x00\x07", 3 };
 
    gnutls_global_init();
    gnutls_global_set_log_level(2);
