@@ -151,7 +151,7 @@ _asn1_append_sequence_set(node_asn *node)
   * asn1_write_value - Set the value of one element inside a structure.
   * @node_root: pointer to a structure
   * @name: the name of the element inside the structure that you want to set.
-  * @value: vector used to specify the value to set. If len is >0, 
+  * @ivalue: vector used to specify the value to set. If len is >0, 
   * VALUE must be a two's complement form integer.
   * if len=0 *VALUE must be a null terminated string with an integer value. 
   * @len: number of bytes of *value to use to set the value: value[0]..value[len-1]
@@ -244,11 +244,12 @@ _asn1_append_sequence_set(node_asn *node)
   **/
 asn1_retCode 
 asn1_write_value(node_asn *node_root,const char *name,
-		 const unsigned char *value,int len)
+		 const void *ivalue,int len)
 {
   node_asn *node,*p,*p2;
   unsigned char *temp,*value_temp=NULL,*default_temp=NULL;
   int len2,k,k2,negative;
+  const unsigned char* value = ivalue;
 
   node=_asn1_find_node(node_root,name);
   if(node==NULL) return  ASN1_ELEMENT_NOT_FOUND;
@@ -533,7 +534,7 @@ asn1_write_value(node_asn *node_root,const char *name,
   * asn1_read_value - Returns the value of one element inside a structure
   * @root: pointer to a structure
   * @name: the name of the element inside a structure that you want to read.
-  * @value: vector that will contain the element's content. 
+  * @ivalue: vector that will contain the element's content. 
   * VALUE must be a pointer to memory cells already allocated.
   * @len: number of bytes of *value: value[0]..value[len-1]. Initialy holds the sizeof value.
   *
@@ -594,11 +595,12 @@ asn1_write_value(node_asn *node_root,const char *name,
   * 
   **/
 asn1_retCode 
-asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
+asn1_read_value(node_asn *root,const char *name,void* ivalue, int *len)
 {
   node_asn *node,*p,*p2;
   int len2,len3;
   int value_size = *len;
+  unsigned char* value = ivalue;
 
   node=_asn1_find_node(root,name);
   if(node==NULL) return  ASN1_ELEMENT_NOT_FOUND;

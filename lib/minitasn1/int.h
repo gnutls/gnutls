@@ -180,7 +180,7 @@ asn1_retCode asn1_create_element(ASN1_TYPE definitions,const char *source_name,
                                  ASN1_TYPE *element);
 
 asn1_retCode asn1_read_value(ASN1_TYPE element,const char *name,
-			     unsigned char *value,int *len);
+			     void *value,int *len);
 
 asn1_retCode
 asn1_expand_octet_string(ASN1_TYPE definitions,ASN1_TYPE *element,
@@ -190,7 +190,7 @@ asn1_retCode
 asn1_expand_any_defined_by(ASN1_TYPE definitions,ASN1_TYPE *element);
 
 asn1_retCode
-asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
+asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 		  char *errorDescription);
 
 
