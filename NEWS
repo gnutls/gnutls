@@ -3,6 +3,9 @@ Version ?.?.?
 - Added gnutls_x509pki_set_trust_mem() and gnutls_x509pki_set_key_mem()
 - Bug fixes in srpcrypt
 - Bug fixes in the Handshake protocol
+- gnutls_check_pending() was renamed to gnutls_record_check_pending()
+- Key exchange methods changed so they do not depend on the Certificate
+  type (GNUTLS_KX_X509PKI_* renamed to GNUTLS_KX_*)
 
 Version 0.3.2 (5/01/2002)
 - Corrected bug which did not allow a client to accept multiple CA names
