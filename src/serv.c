@@ -66,7 +66,7 @@ int main()
 			continue;
 		}
 		fprintf(stderr, "Data was send (%d)\n", ret);
-		
+		fprintf(stderr, "\n");
 		gnutls_close(sd, state);
 		close(sd);
 		gnutls_deinit(&state);

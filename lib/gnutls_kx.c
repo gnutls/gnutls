@@ -12,7 +12,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 	MPI x, X, g, p;
 	int n_X, n_g, n_p;
 	uint16 _n_X, _n_g, _n_p;
-	uint8 data[1536];	/* 3*512 */
+	uint8 *data=NULL;
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_X;
@@ -35,6 +35,13 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 
 			g = _gnutls_get_dh_params(&p);
 
+			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
+				       &n_g, g);
+			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
+				       &n_p, p);
+			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
+				       &n_X, X);
+			data = gnutls_malloc( n_g+n_p+n_X+6);
 
 			data_p = &data[0];
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data_p[2],
@@ -80,6 +87,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 			    _gnutls_send_handshake(cd, state, data,
 						   n_p + n_g + n_X + 6,
 						   GNUTLS_SERVER_KEY_EXCHANGE);
+			gnutls_free(data);
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 		}
@@ -95,10 +103,10 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	MPI x, X;
 	int n_X;
 	uint16 _n_X;
-	uint8 data[1536];	/* 3*512 */
+	uint8 *data;
 	int ret=0;
-	uint8 premaster[1500];
-	int premaster_size = sizeof(premaster);
+	uint8 *premaster;
+	int premaster_size;
 	svoid* master;
 	char* random = gnutls_malloc(64);
 	
@@ -113,11 +121,17 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 	if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
 
-			data[0] = 1; /* extern */
-			
+
 			X = __gnutls_calc_dh_secret(&x, state->gnutls_internals.client_g, state->gnutls_internals.client_p);
+
+			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
+				       &n_X, X);
+			data = gnutls_malloc(n_X+3);
+			
 			gcry_mpi_print(GCRYMPI_FMT_STD, &data[3],
 				       &n_X, X);
+
+			data[0] = 1; /* extern */
 
 			mpi_release(X);
 			
@@ -133,9 +147,14 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 			    _gnutls_send_handshake(cd, state, data,
 						   n_X + 3,
 						   GNUTLS_CLIENT_KEY_EXCHANGE);
-
+			gnutls_free(data);
+			
 			/* calculate the key after sending the message */
 			state->gnutls_internals.KEY = __gnutls_calc_dh_key( state->gnutls_internals.client_Y, x, state->gnutls_internals.client_p);
+			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
+				       &premaster_size, state->gnutls_internals.KEY);
+
+			premaster = secure_malloc( premaster_size);
 			gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
 				       &premaster_size, state->gnutls_internals.KEY);
 
@@ -154,6 +173,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 	master = gnutls_PRF( premaster, premaster_size, MASTER_SECRET, strlen(MASTER_SECRET),
 						random, 64 ,48);
+	secure_free(premaster);
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "master secret: %s\n", bin2hex(master, 48));
@@ -167,12 +187,15 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 }
 
+/* We have this as an upper limit. */
+#define MAX_KX_MESSAGE_SIZE 16000
+
 int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KX_Algorithm algorithm;
 	uint16 n_Y, n_g, n_p;
 	int _n_Y, _n_g, _n_p;
-	uint8 data[15000];
+	uint8 *data;
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_Y;
@@ -190,7 +213,8 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
 
 			state->gnutls_internals.next_handshake_type = GNUTLS_SERVER_KEY_EXCHANGE;
-			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, 15000);
+			data = gnutls_malloc( MAX_KX_MESSAGE_SIZE);
+			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, MAX_KX_MESSAGE_SIZE);
 			state->gnutls_internals.next_handshake_type = GNUTLS_NONE;
 
 
@@ -225,6 +249,7 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 			gcry_mpi_scan( &state->gnutls_internals.client_Y, GCRYMPI_FMT_STD, data_Y, &_n_Y);
 			gcry_mpi_scan( &state->gnutls_internals.client_g, GCRYMPI_FMT_STD, data_g, &_n_g);
 			gcry_mpi_scan( &state->gnutls_internals.client_p, GCRYMPI_FMT_STD, data_p, &_n_p);
+			gnutls_free(data);
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 		}
@@ -239,10 +264,10 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	KX_Algorithm algorithm;
 	uint16 n_Y;
 	int _n_Y;
-	uint8 data[1000];
+	uint8 *data;
 	int ret=0;
-	uint8 premaster[1500];
-	int premaster_size = sizeof(premaster);
+	uint8 *premaster;
+	int premaster_size;
 	svoid* master;
 	char* random = gnutls_malloc(64);
 	
@@ -261,7 +286,8 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 		if ( _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite) == KX_ANON_DH) {
 
 			state->gnutls_internals.next_handshake_type = GNUTLS_CLIENT_KEY_EXCHANGE;
-			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, 15000);
+			data = gnutls_malloc( MAX_KX_MESSAGE_SIZE);
+			ret = gnutls_recv_int(cd, state, GNUTLS_HANDSHAKE, data, MAX_KX_MESSAGE_SIZE);
 			state->gnutls_internals.next_handshake_type = GNUTLS_NONE;
 			
 			if ( data[0] != 1) return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -276,15 +302,21 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 			gcry_mpi_scan( &state->gnutls_internals.client_Y, GCRYMPI_FMT_STD, &data[3], &_n_Y);
 			state->gnutls_internals.KEY = _gnutls_calc_dh_key( state->gnutls_internals.client_Y, state->gnutls_internals.dh_secret);
 
+			gcry_mpi_print(GCRYMPI_FMT_STD, NULL,
+				       &premaster_size, state->gnutls_internals.KEY);
+
+			premaster = secure_malloc(premaster_size);
 			gcry_mpi_print(GCRYMPI_FMT_STD, premaster,
 				       &premaster_size, state->gnutls_internals.KEY);
-			/* THIS SHOULD BE DISCARDED */
+
+			/* THESE SHOULD BE DISCARDED */
 			mpi_release(state->gnutls_internals.KEY);
 			mpi_release(state->gnutls_internals.client_Y);
 			mpi_release(state->gnutls_internals.dh_secret);
 			state->gnutls_internals.KEY=NULL;
 			state->gnutls_internals.client_Y=NULL;
 			state->gnutls_internals.dh_secret=NULL;
+			gnutls_free(data);
 		} else {
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 		}
@@ -292,7 +324,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 
 	master = gnutls_PRF( premaster, premaster_size, MASTER_SECRET, strlen(MASTER_SECRET),
 						random, 64 ,48);
-
+	secure_free(premaster);
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "master secret: %s\n", bin2hex(master, 48));
