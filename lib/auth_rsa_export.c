@@ -103,7 +103,7 @@ static int gen_rsa_export_server_kx(GNUTLS_STATE state, opaque ** data)
 	rsa_params = _gnutls_get_rsa_params( cred->rsa_params, 512);
 	if (rsa_params == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
 	}
 
 	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_CERTIFICATE, sizeof( CERTIFICATE_AUTH_INFO_INT), 0)) < 0) {
