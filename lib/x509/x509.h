@@ -20,4 +20,10 @@ int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, const ch
 int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert, int* critical);
 int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int* bits);
 
+int _gnutls_x509_certificate_get_raw_issuer_dn( gnutls_x509_certificate cert,
+	gnutls_const_datum* start);
+int _gnutls_x509_certificate_get_raw_dn( gnutls_x509_certificate cert,
+	gnutls_const_datum* start);
+
+
 #endif

@@ -138,6 +138,11 @@ typedef struct {
 } gnutls_datum;
 typedef gnutls_datum gnutls_sdatum;
 
+typedef struct {
+	const opaque * data;
+	unsigned int size;
+} gnutls_const_datum;
+
 #include <gnutls_buffer.h>
 
 /* This is the maximum number of algorithms (ciphers or macs etc).

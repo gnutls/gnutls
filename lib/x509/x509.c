@@ -345,7 +345,7 @@ int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, const ch
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_certificate_get_signed_data(gnutls_x509_certificate cert, gnutls_datum *data)
+int gnutls_x509_certificate_get_signed_data(gnutls_x509_certificate cert, gnutls_const_datum *data)
 {
 	data->data = cert->signed_data.data;
 	data->size = cert->signed_data.size;
@@ -364,7 +364,7 @@ int gnutls_x509_certificate_get_signed_data(gnutls_x509_certificate cert, gnutls
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_certificate_get_signature(gnutls_x509_certificate cert, gnutls_datum *data)
+int gnutls_x509_certificate_get_signature(gnutls_x509_certificate cert, gnutls_const_datum *data)
 {
 	data->data = cert->signature.data;
 	data->size = cert->signature.size;
@@ -816,4 +816,83 @@ int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, c
 	
 	return 0;
 	
+}
+
+
+static
+int _gnutls_x509_certificate_get_raw_dn2( gnutls_x509_certificate cert,
+	const char* whom, gnutls_const_datum* start)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result, len1;
+	int start1, end1;
+
+	/* get the issuer of 'cert'
+	 */
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(), "PKIX1.TBSCertificate",
+				   &c2, "c2")) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, cert->signed_data.data, cert->signed_data.size, NULL);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	result =
+	    asn1_der_decoding_startEnd(c2, cert->signed_data.data, cert->signed_data.size,
+		   whom, &start1, &end1);
+	asn1_delete_structure(&c2);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	len1 = end1 - start1 + 1;
+
+	start->data = &cert->signed_data.data[start1];
+	start->size = len1;
+
+	return 0;
+
+}
+
+/*-
+  * _gnutls_x509_certificate_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
+  * @cert: should contain a gnutls_x509_certificate structure
+  * @start: will hold the starting point of the DN
+  *
+  * This function will return a pointer to the DER encoded DN structure and
+  * the length.
+  *
+  * Returns a negative value on error, and zero on success.
+  *
+  -*/
+int _gnutls_x509_certificate_get_raw_issuer_dn( gnutls_x509_certificate cert,
+	gnutls_const_datum* start)
+{
+	return _gnutls_x509_certificate_get_raw_dn2( cert, "c2.issuer", start);
+}
+
+/*-
+  * _gnutls_x509_certificate_get_raw_dn - This function returns the subject's DN DER encoded
+  * @cert: should contain a gnutls_x509_certificate structure
+  * @start: will hold the starting point of the DN
+  *
+  * This function will return a pointer to the DER encoded DN structure and
+  * the length.
+  *
+  * Returns a negative value on error, and zero on success.
+  *
+  -*/
+int _gnutls_x509_certificate_get_raw_dn( gnutls_x509_certificate cert,
+	gnutls_const_datum * start)
+{
+	return _gnutls_x509_certificate_get_raw_dn2( cert, "c2.subject", start);
 }

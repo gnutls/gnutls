@@ -142,6 +142,11 @@ typedef struct {
 	unsigned int size;
 } gnutls_datum;
 
+typedef struct {
+	const unsigned char * data;
+	unsigned int size;
+} gnutls_const_datum;
+
 /* internal functions */
 
 int gnutls_init(gnutls_session * session, gnutls_connection_end con_end);

@@ -62,8 +62,8 @@ int gnutls_x509_certificate_get_dn(gnutls_x509_certificate cert, char *buf,
 int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, 
 	const char* oid, int indx, char *buf, int *sizeof_buf);
 
-int gnutls_x509_certificate_get_signed_data(gnutls_x509_certificate cert, gnutls_datum *data);
-int gnutls_x509_certificate_get_signature(gnutls_x509_certificate cert, gnutls_datum *data);
+int gnutls_x509_certificate_get_signed_data(gnutls_x509_certificate cert, gnutls_const_datum *data);
+int gnutls_x509_certificate_get_signature(gnutls_x509_certificate cert, gnutls_const_datum *data);
 int gnutls_x509_certificate_get_signature_algorithm(gnutls_x509_certificate cert);
 int gnutls_x509_certificate_get_version(gnutls_x509_certificate cert);
 
@@ -124,9 +124,9 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
 	const char* oid, int indx, char *buf, int *sizeof_buf);
 
 
-int gnutls_x509_crl_get_signed_data(gnutls_x509_crl crl, gnutls_datum *data);
+int gnutls_x509_crl_get_signed_data(gnutls_x509_crl crl, gnutls_const_datum *data);
 
-int gnutls_x509_crl_get_signature(gnutls_x509_crl crl, gnutls_datum *data);
+int gnutls_x509_crl_get_signature(gnutls_x509_crl crl, gnutls_const_datum *data);
 int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_version(gnutls_x509_crl crl);
 
@@ -159,9 +159,27 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx,
 
 /* X.509 Certificate verification functions.
  */
+
+typedef enum gnutls_certificate_verify_flags {
+	GNUTLS_VERIFY_DISABLE_CA_SIGN=1 /* if set a signer does not have to be
+					 * a certificate authority.
+					 */
+} gnutls_certificate_verify_flags;
+
+int gnutls_x509_certificate_is_issuer( gnutls_x509_certificate cert,
+	gnutls_x509_certificate issuer);
+
 int gnutls_x509_certificate_list_verify( gnutls_x509_certificate* cert_list, int cert_list_length, 
 	gnutls_x509_certificate * CA_list, int CA_list_length, 
-	gnutls_x509_crl * CRL_list, int CRL_list_length, unsigned int *verify);
+	gnutls_x509_crl* CRL_list, int CRL_list_length, 
+	unsigned int flags, unsigned int *verify);
+
+int gnutls_x509_certificate_verify( gnutls_x509_certificate cert,
+	gnutls_x509_certificate *CA_list, int CA_list_length,
+	unsigned int flags, unsigned int *verify);
+int gnutls_x509_crl_verify( gnutls_x509_crl crl,
+	gnutls_x509_certificate *CA_list, int CA_list_length,
+	unsigned int flags, unsigned int *verify);
 
 
 #ifdef __cplusplus
