@@ -160,9 +160,7 @@ main ()
   rm -f conf.libgcrypttest
 ])
 
-dnl *-*wedit:notab*-*  Please keep this as the last line.
-
-dnl ************ Autoconf macros for libmcrypt (2.4.15) **************
+dnl Autoconf macros for libmcrypt
 dnl $id$
 
 # This script detects libmcrypt version and defines
@@ -232,7 +230,7 @@ main ()
 	TTINCLUDE="-I${libmcrypt_config_prefix}/include"
     fi
     LIBMCRYPT_CFLAGS="${TTINCLUDE}"
-    LIBMCRYPT_LIBS="${TTLIBS} -lmcrypt -lltdl"
+    LIBMCRYPT_LIBS="${TTLIBS} -lmcrypt -lltdl ${LIBADD_DL}"
     AC_DEFINE(LIBMCRYPT24))
   else
 dnl libmcrypt-config was found
@@ -404,8 +402,10 @@ return !!mcrypt_check_version(NULL);
      LIBMCRYPT_LIBS=""
      ifelse([$3], , :, [$3])
   fi
+  rm -f conf.libmcrypttest
   AC_SUBST(LIBMCRYPT_CFLAGS)
   AC_SUBST(LIBMCRYPT_LIBS)
 ])
+
 
 dnl *-*wedit:notab*-*  Please keep this as the last line.

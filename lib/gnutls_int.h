@@ -38,7 +38,7 @@
 /* It might be a good idea to replace int with void*
  * here.
  */
-#define GNUTLS_SOCKET_PTR int
+#define GNUTLS_TRANSPORT_PTR int
 
 typedef const int* GNUTLS_LIST;
 
@@ -206,8 +206,8 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT,
 
 /* Pull & Push functions defines: 
  */
-typedef ssize_t (*PULL_FUNC)(GNUTLS_SOCKET_PTR, void*, size_t);
-typedef ssize_t (*PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
+typedef ssize_t (*PULL_FUNC)(GNUTLS_TRANSPORT_PTR, void*, size_t);
+typedef ssize_t (*PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
 #define GNUTLS_PULL_FUNC PULL_FUNC
 #define GNUTLS_PUSH_FUNC PUSH_FUNC
 

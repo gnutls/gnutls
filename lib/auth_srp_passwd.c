@@ -197,7 +197,7 @@ int tmp_size;
  */
 static int pwd_read_conf( const GNUTLS_SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_PWD_ENTRY* entry, int index) {
 	FILE * fd;
-	char line[5*1024];
+	char line[2*1024];
 	int i;
 	char indexstr[10];
 
@@ -232,7 +232,7 @@ static int pwd_read_conf( const GNUTLS_SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_P
 GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username, int *err) {
 	const GNUTLS_SRP_SERVER_CREDENTIALS cred;
 	FILE * fd;
-	char line[5*1024];
+	char line[2*1024];
 	int i, len;
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	int index;

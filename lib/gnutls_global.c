@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -159,7 +159,7 @@ void gnutls_global_deinit( void) {
   * probably be ok.
   * This function should be called once and after gnutls_global_init().
   * PULL_FUNC is of the form, 
-  * ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
+  * ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
   **/
 void gnutls_transport_set_pull_func( GNUTLS_STATE state, GNUTLS_PULL_FUNC pull_func) {
 	state->gnutls_internals._gnutls_pull_func = pull_func;
@@ -178,7 +178,7 @@ void gnutls_transport_set_pull_func( GNUTLS_STATE state, GNUTLS_PULL_FUNC pull_f
   *  
   * This function should be called once and after gnutls_global_init().
   * PUSH_FUNC is of the form, 
-  * ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
+  * ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
   **/
 void gnutls_transport_set_push_func( GNUTLS_STATE state, GNUTLS_PUSH_FUNC push_func) {
 	state->gnutls_internals._gnutls_push_func = push_func;

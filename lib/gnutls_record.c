@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -82,7 +82,7 @@ void gnutls_transport_set_lowat(GNUTLS_STATE state, int num) {
   * handle.
   *
   **/
-void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr) {
+void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR ptr) {
 	state->gnutls_internals.transport_ptr = ptr;
 }
 
@@ -94,7 +94,7 @@ void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr) {
   * PULL). This must have been set using gnutls_transport_set_ptr().
   *
   **/
-GNUTLS_SOCKET_PTR gnutls_transport_get_ptr(GNUTLS_STATE state) {
+GNUTLS_TRANSPORT_PTR gnutls_transport_get_ptr(GNUTLS_STATE state) {
 	return state->gnutls_internals.transport_ptr;
 }
 
