@@ -11,3 +11,9 @@ srpcrypt
 asn1c
 CertificateExample
 CrlExample
+certtool
+gnutls-cli
+gnutls-cli-debug
+gnutls-serv
+retcodes
+srptool
