@@ -14,6 +14,14 @@ is a very simple \tls{} client, it does not support session resuming nor
 any other fancy features.
 \input{ex-client2}
 
+\subsection{Obtaining session information}
+The following function  prints some information about the current session.
+\par
+This function should be called after a successful
+\printfunc{gnutls_handshake}{gnutls\_handshake}
+
+\input{ex-session-info}
+
 \subsection{Verifying peer's certificate}
 \par A TLS connection is not secure just after the handshake has finished.
 It must be considered secure, after the peer's identity has been
@@ -98,7 +106,7 @@ and prints some information about the certificate and the current session.
 This function should be called after a successful
 \printfunc{gnutls_handshake}{gnutls\_handshake}
 
-\input{ex-info}
+\input{ex-x509-info}
 
 \subsection{Generating a certificate request}
 The following example is about generating a certificate request, and
