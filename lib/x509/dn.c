@@ -1,6 +1,6 @@
 /*
+ *  Copyright (C) 2004, 2005  Free Software Foundation
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
- *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -289,7 +289,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	memcpy(buf, out_str.data, out_str.length);
 	buf[out_str.length] = 0;
     }
-    *sizeof_buf = out_str.length;
+    *sizeof_buf = out_str.length + 1;
 
     result = 0;
 
