@@ -209,6 +209,46 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 }
 
 
+<<<<<<< gnutls_kx.c
+/* This is the function for the client to send the certificate
+ * verify message
+ * FIXME: this function does almost nothing except sending shit to
+ * peer.
+ */
+int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
+{
+	uint8 *data;
+	int ret = 0;
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Sending client certificate verify message\n");
+#endif
+	switch (_gnutls_cipher_suite_get_kx_algo
+		(state->gnutls_internals.current_cipher_suite)) {
+	case GNUTLS_KX_DHE_DSS:
+		data=gnutls_malloc(20);
+		ret =
+		    _gnutls_send_handshake(cd, state, data,
+					   20,
+					   GNUTLS_CERTIFICATE_VERIFY);
+		gnutls_free(data);
+		break;
+	case GNUTLS_KX_DHE_RSA:
+		data=gnutls_malloc(20+16);
+		ret =
+		    _gnutls_send_handshake(cd, state, data,
+					   20+16,
+					   GNUTLS_CERTIFICATE_VERIFY);
+		gnutls_free(data);
+		break;
+	default:
+		ret = 0;
+	}
+
+	return ret;
+}
+
+
+=======
 /* This is the function for the client to send the certificate
  * verify message
  */
@@ -245,6 +285,7 @@ int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
 }
 
 
+>>>>>>> 1.16
 int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
@@ -380,17 +421,25 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 						   GNUTLS_CLIENT_KEY_EXCHANGE);
 			if (ret < 0)
 				return ret;
+#if 0 /* removed. I do not know why - maybe I didn't get the protocol,
+       * but openssl does not use that byte
+       */
 			if (data[0] != 1) {
 				gnutls_assert();
 				return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 			}
-			memmove(&n_Y, &data[1], 2);
+#endif
+			memmove(&n_Y, &data[0], 2);
 #ifndef WORDS_BIGENDIAN
 			n_Y = byteswap16(n_Y);
 #endif
 			_n_Y = n_Y;
 			gcry_mpi_scan(&state->gnutls_internals.client_Y,
+<<<<<<< gnutls_kx.c
+				      GCRYMPI_FMT_USG, &data[2], &_n_Y);
+=======
 				      GCRYMPI_FMT_USG, &data[3], &_n_Y);
+>>>>>>> 1.16
 			state->gnutls_internals.KEY =
 			    gnutls_calc_dh_key(state->
 					       gnutls_internals.client_Y,
