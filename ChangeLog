@@ -1,3 +1,15 @@
+2004-09-15 08:02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-09-15 08:01  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	(load_cert): Fix crash in `certtool --to-p12 --load-privkey foo'.  
+
 2004-09-11 12:05  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS:
