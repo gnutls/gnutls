@@ -1083,11 +1083,11 @@ void privkey_info( void)
 	pem.data = buffer;
 	pem.size = size;
 	
-	pass = read_pass("Enter password: ");
 
 	if (!info.pkcs8) {
 		ret = gnutls_x509_privkey_import(key, &pem, in_cert_format);
 	} else {
+		pass = read_pass("Enter password: ");
 		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, in_cert_format, pass, 0);
 	}
 
