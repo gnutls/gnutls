@@ -1,6 +1,7 @@
 Version 0.5.2
 - Added an error code that is returned in clients which connect
-  to export only servers.
+  to export only servers. This must be enabled using the
+  gnutls_handshake_set_exportable_detection() function.
 - Updated openssl compatibility layer.
 - Added gnutls_handshake_check_direction() function which returns
   the state of the handshake when interrupted.

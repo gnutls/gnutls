@@ -1076,10 +1076,11 @@ static int _gnutls_client_set_ciphersuite(GNUTLS_STATE state,
 	uint16 x;
 	int i, err;
 
-	if ( memcmp( suite, EXPORT_CIPHERSUITE, 2)==0) {
-		gnutls_assert();
-		return GNUTLS_E_EXPORT_CIPHER_SUITE;
-	} 
+	if (state->gnutls_internals.exportable_detection_hack != 0)
+		if ( memcmp( suite, EXPORT_CIPHERSUITE, 2)==0) {
+			gnutls_assert();
+			return GNUTLS_E_EXPORT_CIPHER_SUITE;
+		} 
 
 	z = 1;
 	x = _gnutls_supported_ciphersuites(state, &cipher_suites);
@@ -1318,7 +1319,7 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 {
 	int ret, i;
 	GNUTLS_CipherSuite *cipher_suites;
-	uint16 x;
+	uint16 cipher_num;
 	int datalen, pos;
 
 	ret = _gnutls_supported_ciphersuites_sorted(state, &cipher_suites);
@@ -1339,18 +1340,27 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 		gnutls_assert();
 		return ret;
 	}
-	if (ret==0) {
+
+	/* If no cipher suites were enabled.
+	 */
+	if (ret == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
 
-	x = ret + 1; /* add 1 for the export cipher suite */
-	x *= sizeof(uint16);	/* in order to get bytes */
+	cipher_num = ret;
+	
+	/* for the EXPORT DETECTION */
+	if ( state->gnutls_internals.exportable_detection_hack != 0) {
+		cipher_num += 1; /* add 1 for the export cipher suite */
+	}
+
+	cipher_num *= sizeof(uint16);	/* in order to get bytes */
  
 	datalen = pos = 0;
 
-	datalen += sizeof(uint16) + x;
+	datalen += sizeof(uint16) + cipher_num;
 
 	*ret_data = gnutls_malloc(datalen);
 	if (*ret_data == NULL) {
@@ -1361,16 +1371,19 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 
         /* add 2 for the export cipher suite 
          */
-	_gnutls_write_uint16(x, *ret_data);
+	_gnutls_write_uint16(cipher_num, *ret_data);
 	pos += 2;
 
-	for (i = 0; i < (x / 2) - 1; i++) {
+	for (i = 0; i < (cipher_num / 2) - 1; i++) {
 		memcpy( &(*ret_data)[pos], cipher_suites[i].CipherSuite, 2);
 		pos += 2;
 	}
 
-	memcpy( &(*ret_data)[pos], EXPORT_CIPHERSUITE, 2);
-	pos += 2;
+	/* for the EXPORT DETECTION */
+	if ( state->gnutls_internals.exportable_detection_hack != 0) {
+		memcpy( &(*ret_data)[pos], EXPORT_CIPHERSUITE, 2);
+		pos += 2;
+	}
 
 	gnutls_free(cipher_suites);
 
@@ -1385,7 +1398,7 @@ static int _gnutls_copy_comp_methods(GNUTLS_STATE state,
 				     opaque ** ret_data)
 {
 	int ret, i;
-	uint8 *compression_methods, z;
+	uint8 *compression_methods, comp_num;
 	int datalen, pos;
 
 	ret =
@@ -1396,10 +1409,10 @@ static int _gnutls_copy_comp_methods(GNUTLS_STATE state,
 		return ret;
 	}
 
-	z = ret;
+	comp_num = ret;
 
 	datalen = pos = 0;
-	datalen += z + 1;
+	datalen += comp_num + 1;
 
 	*ret_data = gnutls_malloc(datalen);
 	if (*ret_data == NULL) {
@@ -1407,9 +1420,9 @@ static int _gnutls_copy_comp_methods(GNUTLS_STATE state,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	(*ret_data)[pos++] = z; /* put the number of compression methods */
+	(*ret_data)[pos++] = comp_num; /* put the number of compression methods */
 
-	for (i = 0; i < z; i++) {
+	for (i = 0; i < comp_num; i++) {
 		(*ret_data)[pos++] = compression_methods[i];
 	}
 
