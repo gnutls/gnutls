@@ -95,7 +95,7 @@ int main()
     */
    gnutls_credentials_set(state, GNUTLS_CRD_SRP, xcred);
 
-   gnutls_transport_set_ptr( state, sd);
+   gnutls_transport_set_ptr( state, (gnutls_transport_ptr)sd);
 
    /* Perform the TLS handshake
     */

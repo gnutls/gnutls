@@ -61,7 +61,7 @@ int main()
          free(session_data);
       }
       
-      gnutls_transport_set_ptr( session, sd);
+      gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
 
       /* Perform the TLS handshake
        */

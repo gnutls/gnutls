@@ -100,7 +100,7 @@ int main()
              inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-      gnutls_transport_set_ptr( session, sd);
+      gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
       ret = gnutls_handshake( session);
       if (ret < 0) {
          close(sd);

@@ -68,7 +68,7 @@ int main()
     */
    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-   gnutls_transport_set_ptr( session, sd);
+   gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
 
    /* Perform the TLS handshake
     */
