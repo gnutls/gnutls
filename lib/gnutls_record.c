@@ -906,7 +906,7 @@ gnutls_check_version( const char *req_version )
 
 
 /**
-  * gnutls_write - sends to the peer the specified data
+  * gnutls_record_write - sends to the peer the specified data
   * @state: is a &GNUTLS_STATE structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
@@ -924,12 +924,12 @@ gnutls_check_version( const char *req_version )
   * Returns the number of bytes sent, or a negative error code.
   *
   **/
-ssize_t gnutls_write( GNUTLS_STATE state, const void *data, size_t sizeofdata) {
+ssize_t gnutls_record_write( GNUTLS_STATE state, const void *data, size_t sizeofdata) {
 	return gnutls_send_int( state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
 /**
-  * gnutls_read - reads data from the TLS connection
+  * gnutls_record_read - reads data from the TLS record protocol
   * @state: is a &GNUTLS_STATE structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
@@ -944,7 +944,7 @@ ssize_t gnutls_write( GNUTLS_STATE state, const void *data, size_t sizeofdata) {
   * or perform a handshake again. (only a client may receive this message)
   *
   **/
-ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata) {
+ssize_t gnutls_record_read( GNUTLS_STATE state, void *data, size_t sizeofdata) {
 	return gnutls_recv_int( state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
