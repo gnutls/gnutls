@@ -391,7 +391,7 @@ int encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
   * encryption schemas, or ASCII for the PKCS12 schemas.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if

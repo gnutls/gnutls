@@ -891,8 +891,9 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
   * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described 
   * in RFC2253.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
-  * and 0 on success.
+  * If the provided buffer is not long enough, returns GNUTLS_E_SHORT_MEMORY_BUFFER 
+  * and &sizeof_buf will be updated.
+  * On success 0 is returned.
   *
   **/
 int gnutls_x509_rdn_get(const gnutls_datum_t * idn,
@@ -945,7 +946,7 @@ int gnutls_x509_rdn_get(const gnutls_datum_t * idn,
   * of the RDN sequence.
   * The name will be encoded using the rules from RFC2253.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates &sizeof_buf if the provided buffer is not long enough,
   * and 0 on success.
   *
   **/
@@ -994,7 +995,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum_t * idn, const char *oid,
   * This function will return the specified Object identifier, 
   * of the RDN sequence.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates &sizeof_buf if the provided buffer is not long enough,
   * and 0 on success.
   *
   **/

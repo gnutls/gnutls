@@ -626,7 +626,7 @@ int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey_t key)
   * with the parameters used by openssl.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN RSA PRIVATE KEY".
@@ -1254,7 +1254,7 @@ int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
   * corresponds to the given key.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. The output will normally
+  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. The output will normally
   * be a SHA-1 hash output, which is 20 bytes.
   *
   * In case of failure a negative value will be returned, and
@@ -1337,7 +1337,7 @@ int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
   * SHA-1 for the DSA keys.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * &signature_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.

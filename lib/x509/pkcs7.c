@@ -251,7 +251,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
   *
   * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
   * Returns 0 on success. If the provided buffer is not long enough,
-  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+  * then @certificate_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
   *
   * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
   * will be returned.
@@ -392,7 +392,7 @@ int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7)
   * This function will export the pkcs7 structure to DER or PEM format.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN PKCS7".
@@ -684,7 +684,7 @@ int gnutls_pkcs7_delete_crt(gnutls_pkcs7_t pkcs7, int indx)
   *
   * This function will return a crl of the PKCS7 or RFC2630 crl set.
   * Returns 0 on success. If the provided buffer is not long enough,
-  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+  * then @crl_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
   *
   * After the last crl has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
   * will be returned.

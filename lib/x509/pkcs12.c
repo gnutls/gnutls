@@ -240,7 +240,7 @@ int gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
   * This function will export the pkcs12 structure to DER or PEM format.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * &output_data_size will be updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN PKCS12".

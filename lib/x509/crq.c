@@ -175,7 +175,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq_t crq,
   * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
+  * in that case the &sizeof_buf will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -213,7 +213,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq_t crq, char *buf,
   * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
+  * in that case the &sizeof_buf will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -244,7 +244,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
   * If oid is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_oid will be updated with the required size.
+  * in that case the &sizeof_oid will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -661,7 +661,7 @@ int gnutls_x509_crq_sign(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
   * This function will export the certificate request to a PKCS10
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned and &output_data_size will be updated.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN NEW CERTIFICATE REQUEST".

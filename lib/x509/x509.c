@@ -233,7 +233,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt_t cert,
   * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
+  * in that case the &sizeof_buf will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -271,7 +271,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
   * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
+  * in that case the &sizeof_buf will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -303,7 +303,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
   * If @oid is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_oid will be updated with the required size.
+  * in that case the &sizeof_oid will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -334,7 +334,7 @@ int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
   * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
+  * in that case the &sizeof_buf will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -372,7 +372,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
   * If @buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
+  * in that case the &sizeof_buf will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -403,7 +403,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert, const char *oid,
   * If oid is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_oid will be updated with the required size.
+  * in that case the &sizeof_oid will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -841,9 +841,9 @@ static int parse_general_name(ASN1_TYPE src, const char *src_name,
   * GNUTLS will return the Alternative name (2.5.29.17), or a negative
   * error code.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative 
-  * name, or the type of alternative name if everything was ok. The type is 
-  * one of the enumerated gnutls_x509_subject_alt_name_t.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if &ret_size is not enough to hold the alternative 
+  * name. In that case &ret_size will be updated. If everything was ok the type of alternative 
+  * name is returned. The type is one of the enumerated gnutls_x509_subject_alt_name_t.
   *
   * If the certificate does not have an Alternative name with the specified 
   * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -1222,7 +1222,7 @@ int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert,
   * If the buffer is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_buf will be updated with the required size.
+  * in that case the &sizeof_buf will be updated with the required size.
   * On success 0 is returned.
   *
   **/
@@ -1276,7 +1276,7 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt_t cert,
   * This function will export the certificate to DER or PEM format.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN CERTIFICATE".
@@ -1312,8 +1312,8 @@ int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
   * corresponds to the given private key.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. The output will normally
-  * be a SHA-1 hash output, which is 20 bytes.
+  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. 
+  * The output will normally be a SHA-1 hash output, which is 20 bytes.
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.
@@ -1553,7 +1553,7 @@ int gnutls_x509_crt_verify_data(gnutls_x509_crt_t crt, unsigned int flags,
   * This is specified in X509v3 Certificate Extensions. GNUTLS will return the 
   * distribution point type, or a negative error code on error.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the distribution
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates &ret_size if &ret_size is not enough to hold the distribution
   * point, or the type of the distribution point if everything was ok. The type is 
   * one of the enumerated gnutls_x509_subject_alt_name_t.
   *
@@ -1562,10 +1562,8 @@ int gnutls_x509_crt_verify_data(gnutls_x509_crt_t crt, unsigned int flags,
   *
   **/
 int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt_t cert,
-					unsigned int seq, void *ret,
-					size_t * ret_size,
-					unsigned int *reason_flags,
-					unsigned int *critical)
+    unsigned int seq, void *ret, size_t * ret_size,
+    unsigned int *reason_flags, unsigned int *critical)
 {
     int result;
     gnutls_datum_t dist_points = { NULL, 0 };
@@ -1669,14 +1667,12 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt_t cert,
   * If @oid is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the sizeof_oid will be updated with the required size.
+  * in that case the &sizeof_oid will be updated with the required size.
   * On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,
-					int indx, void *oid,
-					size_t * sizeof_oid,
-					unsigned int *critical)
+    int indx, void *oid, size_t * sizeof_oid, unsigned int *critical)
 {
     char counter[MAX_INT_DIGITS];
     char tmpstr[64];
