@@ -56,6 +56,7 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 #define N key->client_p
 #define G key->client_g
 #define V key->x
+#define S key->KEY
 
 /* Send the first key exchange message ( g, n, s) */
 int gen_srp_server_kx( GNUTLS_KEY key, opaque** data) {
@@ -134,6 +135,7 @@ int gen_srp_server_kx2( GNUTLS_KEY key, opaque** data) {
 	uint8 *data_b;
 	GNUTLS_MAC_HANDLE td;
 	opaque* hd;
+	MPI tmp1, tmp2;
 	uint32 u;
 	
         bits = gcry_mpi_get_nbits( key->client_p);
@@ -143,7 +145,7 @@ int gen_srp_server_kx2( GNUTLS_KEY key, opaque** data) {
         tmpB = mpi_new(bits);	/* FIXME: allocate in secure memory */
         B = mpi_new(bits);	/* FIXME: allocate in secure memory */
         mpi_powm( tmpB, G, _b, N);
-        gcry_mpi_addm( B, V, tmpB, N);
+        mpi_addm( B, V, tmpB, N);
         
         mpi_release(tmpB);
 		
@@ -173,7 +175,24 @@ int gen_srp_server_kx2( GNUTLS_KEY key, opaque** data) {
 	key->u = mpi_set_ui( NULL, u);
 
 	/* CALC HERE */
+	/* S = (A * v^u) ^ b % N */
+	
+	S = gcry_mpi_alloc_like(N);
+	tmp1 = gcry_mpi_alloc_like(N);
+	tmp2 = gcry_mpi_alloc_like(N);
 
+	mpi_pow(tmp1, V, key->u);
+	mpi_mul(tmp2, A, tmp1);
+	mpi_release(tmp1);
+
+	mpi_powm( S, tmp2, _b, N);
+	mpi_release(tmp2);
+	
+	mpi_release(A);
+	mpi_release(_b);
+	mpi_release(V);
+	mpi_release(key->u);
+	mpi_release(B);
 	return n_b + 2;
 }
 
@@ -329,6 +348,7 @@ int proc_srp_client_kx0( GNUTLS_KEY key, opaque* data, int data_size) {
 int proc_srp_server_kx2( GNUTLS_KEY key, opaque* data, int data_size) {
 	uint16 n_B;
 	size_t _n_B;
+	MPI tmp1, tmp2, tmp3, tmp4;
 
 	memcpy(&n_B, &data[0], 2);
 #ifndef WORDS_BIGENDIAN
@@ -342,6 +362,33 @@ int proc_srp_server_kx2( GNUTLS_KEY key, opaque* data, int data_size) {
 	}
 
 	/* CALC HERE */
+	/* S = (B - g^x) ^ (a + u * x) % N */
+
+	S = gcry_mpi_alloc_like(N);
+	tmp1 = gcry_mpi_alloc_like(N);
+	tmp2 = gcry_mpi_alloc_like(N);
+
+	mpi_pow(tmp1, G, V);
+	mpi_sub(tmp2, B, tmp1);
+	mpi_release(tmp1);
+
+
+	tmp3 = gcry_mpi_alloc_like(N);
+	tmp4 = gcry_mpi_alloc_like(N);
+	
+	mpi_add( tmp3, key->u, V);
+	mpi_add( tmp4, _a, tmp3);
+	mpi_release(tmp3);
+	
+	mpi_powm( S, tmp2, tmp4, N);
+	mpi_release(tmp2);
+	mpi_release(tmp4);
+	
+	mpi_release(A);
+	mpi_release(_b);
+	mpi_release(V);
+	mpi_release(key->u);
+	mpi_release(B);
 	return 0;
 }
 
