@@ -1490,6 +1490,7 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
     if (!port)
         port = 11371;
   
+    gnutls_free( res->pgp_key_server);
     res->pgp_key_server = gnutls_strdup( keyserver );
     if ( res->pgp_key_server == NULL)
     	return GNUTLS_E_MEMORY_ERROR;
@@ -1499,7 +1500,15 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
    return 0;
 }
 
-int
+/**
+ * gnutls_certificate_set_openpgp_trustdb - Used to set an GnuPG trustdb
+ * @res: the destination context to save the data.
+ * @trustdb: is the trustdb filename
+ *
+ * This funtion will set a GnuPG trustdb which will be used in key
+ * verification functions. Only version 3 trustdb files are supported.
+ *
+ **/int
 gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
                                         char* trustdb )
 {
@@ -1511,6 +1520,8 @@ gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
            format is still used. We don't support this format. */
         return GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED;
     }
+
+    gnutls_free( res->pgp_trustdb);
     res->pgp_trustdb = gnutls_strdup( trustdb );
     if ( res->pgp_trustdb==NULL )
         return GNUTLS_E_MEMORY_ERROR;
