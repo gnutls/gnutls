@@ -160,15 +160,12 @@ int gnutls_error_is_fatal(int error)
   **/
 void gnutls_perror(int error)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
-	GNUTLS_ERROR_ALG_LOOP(ret =
-			      gnutls_strdup(p->name + sizeof("GNUTLS_E_") - 1));
+	GNUTLS_ERROR_ALG_LOOP(ret = p->name);
 
 	fprintf(stderr,  "GNUTLS ERROR: %s\n", ret);
-	
-	gnutls_free( ret);
 }
 
 
@@ -185,7 +182,7 @@ const char* gnutls_strerror(int error)
 
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret =
-			      p->name + sizeof("GNUTLS_E_") - 1);
+			      p->name);
 
 	return ret;
 }
