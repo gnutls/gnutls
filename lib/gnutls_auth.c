@@ -55,7 +55,7 @@ int gnutls_clear_creds( gnutls_session session) {
  * { algorithm, credentials, pointer to next }
  */
 /**
-  * gnutls_cred_set - Sets the needed credentials for the specified authentication algorithm.
+  * gnutls_credentials_set - Sets the needed credentials for the specified authentication algorithm.
   * @session: is a &gnutls_session structure.
   * @type: is the type of the credentials
   * @cred: is a pointer to a structure.
@@ -80,7 +80,7 @@ int gnutls_clear_creds( gnutls_session session) {
   * in case of a client, and CERTIFICATE_SERVER_CREDENTIALS, in case
   * of a server.
   **/
-int gnutls_cred_set( gnutls_session session, gnutls_credentials_type type, void* cred) {
+int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type, void* cred) {
 	AUTH_CRED * ccred=NULL, *pcred=NULL;
 	int exists=0;	
 	

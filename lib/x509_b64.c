@@ -461,7 +461,7 @@ int _gnutls_fbase64_decode( const char* header, const uint8 * data, int data_siz
 
 /**
   * gnutls_pem_base64_decode - This function will decode base64 encoded data
-  * @header: The PEM header (eg. CERTIFICATE)
+  * @header: A null terminated string with the PEM header (eg. CERTIFICATE)
   * @b64_data: contain the encoded data
   * @result: the place where decoded data will be copied
   * @result_size: holds the size of the result
@@ -469,6 +469,8 @@ int _gnutls_fbase64_decode( const char* header, const uint8 * data, int data_siz
   * This function will decode the given encoded data. If the header given
   * is non null this function will search for "-----BEGIN header" and decode
   * only this part. Otherwise it will decode the first PEM packet found.
+  *
+  * Note that b64_data should be null terminated.
   * 
   **/
 int gnutls_pem_base64_decode( const char* header, const gnutls_datum *b64_data, char* result, int* result_size) 
@@ -504,6 +506,8 @@ int size;
   * If the header given is non null this function will search for 
   * "-----BEGIN header" and decode only this part. Otherwise it will decode the 
   * first PEM packet found.
+  *
+  * Note that b64_data should be null terminated.
   * 
   **/
 int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, gnutls_datum* result) 

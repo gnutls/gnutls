@@ -30,19 +30,13 @@
 typedef struct DSTRUCT* gnutls_srp_server_credentials;
 typedef struct DSTRUCT* gnutls_srp_client_credentials;
 
-void gnutls_srp_free_client_cred( gnutls_srp_client_credentials sc);
-int gnutls_srp_allocate_client_cred( gnutls_srp_client_credentials *sc);
-#define gnutls_srp_free_client_sc gnutls_srp_free_client_cred
-#define gnutls_srp_allocate_client_sc gnutls_srp_allocate_client_cred
+void gnutls_srp_free_client_credentials( gnutls_srp_client_credentials sc);
+int gnutls_srp_allocate_client_credentials( gnutls_srp_client_credentials *sc);
+int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *username, char* password);
 
-int gnutls_srp_set_client_cred( gnutls_srp_client_credentials res, char *username, char* password);
-
-void gnutls_srp_free_server_cred( gnutls_srp_server_credentials sc);
-int gnutls_srp_allocate_server_cred( gnutls_srp_server_credentials *sc);
-#define gnutls_srp_free_server_sc gnutls_srp_free_server_cred
-#define gnutls_srp_allocate_server_sc gnutls_srp_allocate_server_cred
-
-int gnutls_srp_set_server_cred_file( gnutls_srp_server_credentials res, char *password_file, char* password_conf_file);
+void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials sc);
+int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials *sc);
+int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, char *password_file, char* password_conf_file);
 
 const char* gnutls_srp_server_get_username( gnutls_session state);
 
@@ -98,5 +92,17 @@ int gnutls_global_init_extra(void);
  */
 #define GNUTLS_SRP_SERVER_CREDENTIALS gnutls_srp_server_credentials
 #define GNUTLS_SRP_CLIENT_CREDENTIALS gnutls_srp_client_credentials
+
+#define gnutls_srp_free_client_sc gnutls_srp_free_client_credentials
+#define gnutls_srp_allocate_client_sc gnutls_srp_allocate_client_credentials
+#define gnutls_srp_free_client_cred gnutls_srp_free_client_credentials
+#define gnutls_srp_allocate_client_cred gnutls_srp_allocate_client_credentials
+#define gnutls_srp_set_client_cred gnutls_srp_set_client_credentials
+
+#define gnutls_srp_free_server_sc gnutls_srp_free_server_credentials
+#define gnutls_srp_allocate_server_sc gnutls_srp_allocate_server_credentials
+#define gnutls_srp_free_server_cred gnutls_srp_free_server_credentials
+#define gnutls_srp_allocate_server_cred gnutls_srp_allocate_server_credentials
+#define gnutls_srp_set_server_cred_file gnutls_srp_set_server_credentials_file
 
 #endif

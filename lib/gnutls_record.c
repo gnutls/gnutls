@@ -918,7 +918,7 @@ ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdat
   * gnutls_record_get_max_size - returns the maximum record size
   * @session: is a &gnutls_session structure.
   *
-  * This function returns the maximum record size in this connection.
+  * This function returns the maximum record packet size in this connection.
   * The maximum record size is negotiated by the client after the
   * first handshake message.
   *
@@ -936,11 +936,11 @@ size_t gnutls_record_get_max_size( gnutls_session session) {
   * @session: is a &gnutls_session structure.
   * @size: is the new size
   *
-  * This function sets the maximum record size in this connection.
+  * This function sets the maximum record packet size in this connection.
   * This property can only be set to clients. The server may
   * choose not to accept the requested size.
   *
-  * Acceptable values are 2^9, 2^10, 2^11 and 2^12.
+  * Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and 4096(=2^12).
   * Returns 0 on success. The requested record size does
   * get in effect immediately only while sending data. The receive
   * part will take effect after a successful handshake.

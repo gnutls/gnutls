@@ -20,6 +20,7 @@
 #include <gcrypt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <gnutls/openssl.h>
 
 /* WARNING: Error functions aren't currently thread-safe */

@@ -67,7 +67,7 @@ int ret, alert;
 		gnutls_session_get_data(session, NULL, &session_data_size);
 		
 		if (sfree!=0) {
-			free(session);
+			free(session_data);
 			sfree=0;
 		}
 		session_data = malloc(session_data_size);

@@ -1739,9 +1739,11 @@ int _gnutls_recv_hello(gnutls_session session, char *data, int datalen)
   * the new parameters.
   *
   * If the client does not wish to renegotiate parameters he
-  * will reply with an alert message, thus the return code will be
+  * will should with an alert message, thus the return code will be
   * GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
-  * GNUTLS_A_NO_RENEGOTIATION.
+  * GNUTLS_A_NO_RENEGOTIATION. A client may also choose to ignore
+  * this message.
+  *
   **/
 int gnutls_rehandshake(gnutls_session session)
 {

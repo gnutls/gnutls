@@ -83,6 +83,48 @@ int gnutls_b64_decode_fmt2( const gnutls_datum *b64_data, gnutls_datum* result)
 	return gnutls_pem_base64_decode_alloc( NULL, b64_data, result);
 }
 
+#undef gnutls_cred_set
+int gnutls_cred_set( gnutls_session session, gnutls_credentials_type type, void* cred)
+{
+	return gnutls_credentials_set( session, type, cred);
+}
+
+#undef gnutls_anon_free_server_cred
+void gnutls_anon_free_server_cred( gnutls_anon_server_credentials sc)
+{
+	return gnutls_anon_free_server_credentials( sc);
+}
+
+#undef gnutls_anon_allocate_server_cred
+int gnutls_anon_allocate_server_cred( gnutls_anon_server_credentials *sc)
+{
+	return gnutls_anon_allocate_server_credentials(sc);
+}
+
+#undef gnutls_anon_free_client_cred
+void gnutls_anon_free_client_cred( gnutls_anon_server_credentials sc)
+{
+	return gnutls_anon_free_client_credentials( sc);
+}
+
+#undef gnutls_anon_allocate_client_cred
+int gnutls_anon_allocate_client_cred( gnutls_anon_server_credentials *sc)
+{
+	return gnutls_anon_allocate_client_credentials( sc);
+}
+
+#undef gnutls_certificate_free_cred
+void gnutls_certificate_free_cred( gnutls_certificate_credentials sc)
+{
+	return gnutls_certificate_free_credentials( sc);
+}
+
+#undef gnutls_certificate_allocate_cred
+int gnutls_certificate_allocate_cred( gnutls_certificate_credentials *sc)
+{
+	return gnutls_certificate_allocate_credentials( sc);
+}
+
 /* nothing here */
 
 #endif /* GNUTLS_BACKWARDS_COMPATIBLE */

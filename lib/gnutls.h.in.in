@@ -233,9 +233,9 @@ int gnutls_clear_creds( gnutls_session session);
 
 /* cred is a structure defined by the kx algorithm 
  */
-int gnutls_cred_set( gnutls_session, gnutls_credentials_type type, void* cred);
+int gnutls_credentials_set( gnutls_session, gnutls_credentials_type type, void* cred);
 
-/* Credential structures for SRP - used in gnutls_set_cred(); */
+/* Credential structures for SRP - used in gnutls_credentials_set(); */
 
 struct DSTRUCT;
 typedef struct DSTRUCT* gnutls_certificate_credentials;
@@ -245,24 +245,17 @@ typedef gnutls_certificate_credentials gnutls_certificate_client_credentials;
 typedef struct DSTRUCT* gnutls_anon_server_credentials;
 typedef struct DSTRUCT* gnutls_anon_client_credentials;
 
-void gnutls_anon_free_server_cred( gnutls_anon_server_credentials sc);
-int gnutls_anon_allocate_server_cred( gnutls_anon_server_credentials *sc);
+void gnutls_anon_free_server_credentials( gnutls_anon_server_credentials sc);
+int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc);
 
-int gnutls_anon_set_server_cred( gnutls_anon_server_credentials res);
-void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutls_dh_params);
-
-void gnutls_anon_free_client_cred( gnutls_anon_server_credentials sc);
-int gnutls_anon_allocate_client_cred( gnutls_anon_server_credentials *sc);
-
-
-int gnutls_anon_set_client_cred( gnutls_anon_server_credentials res);
-
+void gnutls_anon_free_client_credentials( gnutls_anon_server_credentials sc);
+int gnutls_anon_allocate_client_credentials( gnutls_anon_server_credentials *sc);
 
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
-void gnutls_certificate_free_cred( gnutls_certificate_credentials sc);
-int gnutls_certificate_allocate_cred( gnutls_certificate_credentials *sc);
+void gnutls_certificate_free_credentials( gnutls_certificate_credentials sc);
+int gnutls_certificate_allocate_credentials( gnutls_certificate_credentials *sc);
 
 int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params);
 int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
@@ -368,16 +361,25 @@ int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* da
 #define GNUTLS_CERTIFICATE_CREDENTIALS gnutls_certificate_credentials
 #define GNUTLS_ANON_SERVER_CREDENTIALS gnutls_anon_server_credentials
 #define GNUTLS_ANON_CLIENT_CREDENTIALS gnutls_anon_client_credentials
-#define gnutls_anon_free_client_sc gnutls_anon_free_client_cred
-#define gnutls_anon_allocate_client_sc gnutls_anon_allocate_client_cred
-#define gnutls_anon_free_server_sc gnutls_anon_free_server_cred
-#define gnutls_anon_allocate_server_sc gnutls_anon_allocate_server_cred
 #define gnutls_transport_set_push_func gnutls_transport_set_push_function
 #define gnutls_transport_set_pull_func gnutls_transport_set_pull_function
 #define gnutls_global_set_log_func gnutls_global_set_log_function
 #define gnutls_global_set_mem_func gnutls_global_set_mem_functions
-#define gnutls_certificate_free_sc gnutls_certificate_free_cred
-#define gnutls_certificate_allocate_sc gnutls_certificate_allocate_cred
+
+#define gnutls_certificate_free_sc gnutls_certificate_free_credentials
+#define gnutls_certificate_allocate_sc gnutls_certificate_allocate_credentials
+#define gnutls_certificate_free_cred gnutls_certificate_free_credentials
+#define gnutls_certificate_allocate_cred gnutls_certificate_allocate_credentials
+
+#define gnutls_anon_free_client_sc gnutls_anon_free_client_credentials
+#define gnutls_anon_allocate_client_sc gnutls_anon_allocate_client_credentials
+#define gnutls_anon_free_server_sc gnutls_anon_free_server_credentials
+#define gnutls_anon_allocate_server_sc gnutls_anon_allocate_server_credentials
+
+#define gnutls_anon_free_client_cred gnutls_anon_free_client_credentials
+#define gnutls_anon_allocate_client_cred gnutls_anon_allocate_client_credentials
+#define gnutls_anon_free_server_cred gnutls_anon_free_server_credentials
+#define gnutls_anon_allocate_server_cred gnutls_anon_allocate_server_credentials
 
 #define gnutls_state_get_ptr gnutls_session_get_ptr
 #define gnutls_state_set_ptr gnutls_session_set_ptr
@@ -388,6 +390,7 @@ int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* da
 #define gnutls_cert_type_get gnutls_certificate_type_get
 #define gnutls_cert_type_set_priority gnutls_certificate_type_set_priority
 #define gnutls_cert_type_get_name gnutls_certificate_type_get_name
+#define gnutls_cred_set	gnutls_credentials_set
 
 #define gnutls_b64_encode_fmt gnutls_pem_base64_encode
 #define gnutls_b64_encode_fmt2 gnutls_pem_base64_encode_alloc
