@@ -82,7 +82,6 @@ typedef enum GNUTLS_CertificateType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP
  * define in gnutls_int.h, and recompile.
  */
 #define GNUTLS_TRANSPORT_PTR int
-#define GNUTLS_SOCKET_PTR GNUTLS_TRANSPORT_PTR
 
 typedef const int* GNUTLS_LIST;
 
