@@ -465,6 +465,8 @@ void certificate_info( void)
 		}
 		printf("Serial Number: %s\n", printable);
 	}
+	
+
 
 	/* Issuer
 	 */
@@ -505,6 +507,24 @@ void certificate_info( void)
 
 	print = get_algorithm( ret);
 	printf( "%s\n", print);
+
+	/* fingerprint
+	 */
+	size = sizeof(buffer);
+	if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, buffer, &size)) < 0) 
+	{
+		const char* str = gnutls_strerror(ret);
+		if (str == NULL) str = "unknown error";
+	    	fprintf(stderr, "Error in fingerprint calculation: %s\n", str);
+	} else {
+		print = printable;
+		for (i = 0; i < size; i++) {
+			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
+			print += 3;
+		}
+		printf("\nFingerprint: %s\n", printable);
+	}
+
 	
 	printf("\nX.509 Extensions:\n");
 	
@@ -515,9 +535,9 @@ void certificate_info( void)
 		ret = gnutls_x509_crt_get_subject_alt_name(crt, i, buffer, &size, &critical);
 
 		if (i==0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			printf("\tSubject Alternative name");
+			printf("\tSubject Alternative name:");
 			if (critical) printf(" (critical)");
-			printf(":\n");
+			printf("\n");
 		}
 		
 		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
@@ -536,7 +556,6 @@ void certificate_info( void)
 				printf("\t\tIPAddress: %s\n", buffer);
 				break;
 		}
-		
 	}
 	
 	/* check for basicConstraints
@@ -544,9 +563,9 @@ void certificate_info( void)
 	ret = gnutls_x509_crt_get_ca_status( crt, &critical);
 	
 	if (ret >= 0) {
-		printf("\tBasic Constraints");
+		printf("\tBasic Constraints:");
 		if (critical) printf(" (critical)");
-		printf(":\n");		
+		printf("\n");		
 
 		if (ret==0) printf("\t\tCA:FALSE\n");
 		else printf("\t\tCA:TRUE\n");
