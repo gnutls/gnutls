@@ -431,7 +431,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
   * @detail: The detail level (unused for now)
   *
   * This function will return the XML structures of the given X.509 certificate.
-  * The XML structures are allocated internaly (with malloc) and stored into res.
+  * The XML structures are allocated internaly and stored into res.
   * Returns a negative error code in case of an error.
   *
   **/
