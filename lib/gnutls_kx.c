@@ -207,7 +207,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	}
 
 	master =
-	    gnutls_PRF(state, premaster, premaster_size,
+	    gnutls_PRF( premaster, premaster_size,
 		       MASTER_SECRET, strlen(MASTER_SECRET), random, 64,
 		       48);
 	secure_free(premaster);
@@ -449,7 +449,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	}
 
 	master =
-	    gnutls_PRF(state, premaster, premaster_size,
+	    gnutls_PRF( premaster, premaster_size,
 		       MASTER_SECRET, strlen(MASTER_SECRET),
 		       random, 64, 48); secure_free(premaster);
 #ifdef HARD_DEBUG

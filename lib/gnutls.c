@@ -51,10 +51,10 @@ GNUTLS_Version ver;
 	return ver;
 }
 
-void gnutls_set_current_version(GNUTLS_STATE state, int local, int major, int minor) {
-	state->connection_state.version.local = local;
-	state->connection_state.version.major = major;
-	state->connection_state.version.minor = minor;
+void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
+	state->connection_state.version.local = version.local;
+	state->connection_state.version.major = version.major;
+	state->connection_state.version.minor = version.minor;
 }
 
 int gnutls_is_secure_memory(const void* mem) {
@@ -98,7 +98,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.client_hash = 0;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	gnutls_set_current_version ( (*state), 0, GNUTLS_DEFAULT_VERSION_MAJOR, GNUTLS_DEFAULT_VERSION_MINOR);
+	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */
 
 	(*state)->gnutls_internals.KEY = NULL;
 	(*state)->gnutls_internals.client_Y = NULL;
@@ -146,7 +146,7 @@ int gnutls_deinit(GNUTLS_STATE * state)
 }
 
 
-void *_gnutls_cal_PRF_A(GNUTLS_STATE state, MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size)
+static void *_gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size)
 {
 	GNUTLS_MAC_HANDLE td1;
 
@@ -159,7 +159,7 @@ void *_gnutls_cal_PRF_A(GNUTLS_STATE state, MACAlgorithm algorithm, void *secret
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
-svoid *gnutls_P_hash(GNUTLS_STATE state, MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes)
+static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_size, opaque * seed, int seed_size, int total_bytes)
 {
 
 	GNUTLS_MAC_HANDLE td2;
@@ -185,7 +185,7 @@ svoid *gnutls_P_hash(GNUTLS_STATE state, MACAlgorithm algorithm, opaque * secret
 		td2 = gnutls_hmac_init(algorithm, secret, secret_size);
 
 		/* here we calculate A(i+1) */
-		Atmp = _gnutls_cal_PRF_A(state, algorithm, secret, secret_size, A, A_size);
+		Atmp = _gnutls_cal_PRF_A( algorithm, secret, secret_size, A, A_size);
 		A_size = blocksize;
 		gnutls_free(A);
 		A = Atmp;
@@ -213,7 +213,7 @@ svoid *gnutls_P_hash(GNUTLS_STATE state, MACAlgorithm algorithm, opaque * secret
 /* The PRF function expands a given secret 
  * needed by the TLS specification
  */
-svoid *gnutls_PRF(GNUTLS_STATE state, opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
+svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
 {
 	int l_s, i, s_seed_size;
 	char *o1, *o2;
@@ -234,8 +234,8 @@ svoid *gnutls_PRF(GNUTLS_STATE state, opaque * secret, int secret_size, uint8 * 
 		l_s++;
 	}
 
-	o1 = gnutls_P_hash(state, GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes);
-	o2 = gnutls_P_hash(state, GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes);
+	o1 = gnutls_P_hash( GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes);
+	o2 = gnutls_P_hash( GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes);
 
 	gnutls_free(s_seed);
 
@@ -271,7 +271,7 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	memmove(&random[32], state->security_parameters.client_random, 32);
 
 	key_block =
-	    gnutls_PRF(state, state->security_parameters.master_secret, 48,
+	    gnutls_PRF( state->security_parameters.master_secret, 48,
 		       keyexp, strlen(keyexp), random, 64, 2 * hash_size + 2 * key_size + 2 * IV_size);
 
 	state->cipher_specs.client_write_mac_secret = secure_malloc(hash_size);
@@ -617,7 +617,8 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	} else {
-		gnutls_set_current_version(state, 0, gcipher.version.major, gcipher.version.minor);
+		GNUTLS_Version ver = { 0, gcipher.version.major, gcipher.version.minor };
+		gnutls_set_current_version(state, ver);
 	}
 
 	if (Read(cd, &gcipher.length, 2) != 2) {

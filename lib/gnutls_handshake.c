@@ -63,7 +63,7 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.client_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state, state->security_parameters.master_secret,
+		    gnutls_PRF( state->security_parameters.master_secret,
 			       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
 			       36, 12);
 	} else {		/* server */
@@ -72,7 +72,7 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.server_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state, state->security_parameters.master_secret,
+		    gnutls_PRF( state->security_parameters.master_secret,
 			       48, SERVER_MSG, strlen(SERVER_MSG), concat,
 			       36, 12);
 	}
@@ -111,7 +111,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.server_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state, state->security_parameters.master_secret,
+		    gnutls_PRF( state->security_parameters.master_secret,
 			       48, SERVER_MSG, strlen(SERVER_MSG), concat,
 			       36, 12);
 	} else {		/* server */
@@ -120,7 +120,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 			state->gnutls_internals.client_md_sha1, 20);
 
 		data =
-		    gnutls_PRF(state, state->security_parameters.master_secret,
+		    gnutls_PRF( state->security_parameters.master_secret,
 			       48, CLIENT_MSG, strlen(CLIENT_MSG), concat,
 			       36, 12);
 	}

@@ -116,7 +116,7 @@ char* ret;
 }
 
 
-GNUTLS_MAC_HANDLE _gnutls_hmac_init( MACAlgorithm algorithm, char* key, int keylen, int dp) {
+GNUTLS_MAC_HANDLE gnutls_hmac_init( MACAlgorithm algorithm, char* key, int keylen) {
 GNUTLS_MAC_HANDLE ret;
 
 	switch (algorithm) {
@@ -125,11 +125,7 @@ GNUTLS_MAC_HANDLE ret;
 			break;
 		case GNUTLS_MAC_SHA:
 #ifdef USE_MHASH
-			if (dp==0) {
-				ret = mhash_hmac_init( MHASH_SHA1, key, keylen, 0);
-			} else {
-				ret = mhash_hmac_init_dp( MHASH_SHA1, key, keylen, 0);
-			}
+			ret = mhash_hmac_init( MHASH_SHA1, key, keylen, 0);
 #else
 			ret = gcry_md_open( GCRY_MD_SHA1, GCRY_MD_FLAG_HMAC);
 #endif
@@ -137,11 +133,7 @@ GNUTLS_MAC_HANDLE ret;
 			break;
 		case GNUTLS_MAC_MD5:
 #ifdef USE_MHASH
-			if (dp==0) {
-				ret = mhash_hmac_init( MHASH_MD5, key, keylen, 0);
-			} else {
-				ret = mhash_hmac_init_dp( MHASH_MD5, key, keylen, 0);
-			}
+			ret = mhash_hmac_init( MHASH_MD5, key, keylen, 0);
 #else
 			ret = gcry_md_open( GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
 #endif
@@ -197,17 +189,13 @@ int gnutls_hmac(GNUTLS_MAC_HANDLE handle, void* text, int textlen) {
 
 }
 
-void* _gnutls_hmac_deinit( GNUTLS_MAC_HANDLE handle, int dp) {
+void* gnutls_hmac_deinit( GNUTLS_MAC_HANDLE handle) {
 char* mac;
 int maclen;
 char* ret;
 
 #ifdef USE_MHASH
-    if (dp==0) {
-	    ret = mhash_hmac_end(handle);
-    } else {
-    	    ret = mhash_hmac_end_dp(handle);
-    }
+    ret = mhash_hmac_end(handle);
 #else
     maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle));
     ret = gnutls_malloc( maclen);

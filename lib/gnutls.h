@@ -31,6 +31,15 @@ typedef enum CompressionMethod CompressionMethod;
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 typedef enum ConnectionEnd ConnectionEnd;
 
+typedef struct {
+	unsigned char local;
+	unsigned char  major;
+	unsigned char  minor;
+} GNUTLS_Version;
+extern GNUTLS_Version GNUTLS_TLS1;
+extern GNUTLS_Version GNUTLS_SSL3;
+
+
 struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
@@ -53,7 +62,7 @@ void gnutls_set_kx_priority( int num, ...);
 void gnutls_set_mac_priority( int num, ...);
 
 /* set our version - local is 0x00 for TLS 1.0 and SSL3 */
-void gnutls_set_current_version(GNUTLS_STATE state, int local, int major, int minor); 
+void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
 
 #define	GNUTLS_E_MAC_FAILED -1
 #define	GNUTLS_E_UNKNOWN_CIPHER -2
