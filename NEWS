@@ -1,5 +1,7 @@
 Version 0.0.8 (28/01/2001)
 - GNUTLS is a gnu library
+- Added some support for TLS extensions.
+- Added some support for SRP
 
 Version 0.0.7 (11/01/2001)
 - Added server side session resuming (using gdbm)

@@ -225,4 +225,46 @@ static char str[512];
 	return str;	
 	
 }
+
+char* _gnutls_handshake2str( int handshake) {
+static char str[512];
+
+	switch(handshake) {
+		case GNUTLS_HELLO_REQUEST:
+			strcpy(str, "HELLO REQUEST");
+			break;		
+		case GNUTLS_CLIENT_HELLO:
+			strcpy(str, "CLIENT HELLO");
+			break;		
+		case GNUTLS_SERVER_HELLO:
+			strcpy(str, "SERVER HELLO");
+			break;
+		case GNUTLS_CERTIFICATE:
+			strcpy(str, "CERTIFICATE");
+			break;
+		case GNUTLS_SERVER_KEY_EXCHANGE:
+			strcpy(str, "SERVER KEY EXCHANGE");
+			break;
+		case GNUTLS_CERTIFICATE_REQUEST:
+			strcpy(str, "CERTIFICATE REQUEST");
+			break;
+		case GNUTLS_SERVER_HELLO_DONE:
+			strcpy(str, "SERVER HELLO DONE");
+			break;
+		case GNUTLS_CERTIFICATE_VERIFY:
+			strcpy(str, "CERTIFICATE VERIFY");
+			break;
+		case GNUTLS_CLIENT_KEY_EXCHANGE:
+			strcpy(str, "CLIENT KEY EXCHANGE");
+			break;
+		case GNUTLS_FINISHED:
+			strcpy(str, "FINISHED");
+			break;
+		default:
+			strcpy(str, "Unknown Handshake");
+			
+	}	
+	return str;	
+	
+}
 #endif

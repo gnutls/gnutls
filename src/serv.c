@@ -43,7 +43,7 @@ int main()
     char topbuf[512];
     GNUTLS_STATE state;
     char buffer[MAX_BUF+1];
-
+    int optval = 1;
 
     listen_sd = socket(AF_INET, SOCK_STREAM, 0);
     ERR(listen_sd, "socket");
@@ -53,6 +53,7 @@ int main()
     sa_serv.sin_addr.s_addr = INADDR_ANY;
     sa_serv.sin_port = htons(PORT);	/* Server Port number */
 
+    setsockopt( listen_sd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
     err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
     ERR(err, "bind");
     err = listen(listen_sd, 1024);

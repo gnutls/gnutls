@@ -53,7 +53,6 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_X;
-	int ret = 0;
 
 	X = gnutls_calc_dh_secret(&x);
 	key->dh_secret = x;
@@ -92,16 +91,13 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 #else
 	memmove(data_X, &_n_X, 2);
 #endif
-	ret = n_p+n_g+n_X+6;
-
-	return ret;
+	return n_p+n_g+n_X+6;
 }
 
 int gen_anon_client_kx( GNUTLS_KEY key, opaque** data) {
 GNUTLS_MPI x, X;
 size_t n_X;
 uint16 _n_X;
-int data_size;
 
 	X =  _gnutls_calc_dh_secret(&x, key->client_g,
 		   key->client_p);
@@ -120,7 +116,6 @@ int data_size;
 #else
 	memmove(&(*data)[0], &_n_X, 2);
 #endif
-	data_size = _n_X+2;
 	
 	/* calculate the key after calculating the message */
 	key->KEY = _gnutls_calc_dh_key(key->client_Y, x, key->client_p);
@@ -133,7 +128,7 @@ int data_size;
 	key->client_p = NULL;
 	key->client_g = NULL;
 
-	return data_size;
+	return n_X+2;
 }
 
 int proc_anon_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {

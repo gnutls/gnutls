@@ -300,7 +300,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 		memmove(&data[pos], i_data, i_datasize - 4);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Send HANDSHAKE[%d] of %ld bytes\n", type, i_datasize+4);
+	fprintf(stderr, "%s was send [%ld bytes]\n", _gnutls_handshake2str(type), i_datasize);
 #endif
 
 	/* Here we keep the handshake messages in order to hash them later!
@@ -370,7 +370,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	length32 = byteswap32(length32);
 #endif
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Received HANDSHAKE[%d] of %ld bytes\n", dataptr[0], length32+4);
+	fprintf(stderr, "%s was received [%ld bytes]\n", _gnutls_handshake2str(dataptr[0]), length32+HANDSHAKE_HEADERS_SIZE);
 #endif
 
 	dataptr = gnutls_realloc( dataptr, length32+HANDSHAKE_HEADERS_SIZE);
@@ -753,10 +753,10 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		gnutls_free(cipher_suites);
 		gnutls_free(compression_methods);
 
-		z = _gnutls_parse_extensions( state, &data[pos], datalen); /* datalen is the rest of the parsed length */
-		if (z < 0) {
+		ret = _gnutls_parse_extensions( state, &data[pos], datalen); /* datalen is the rest of the parsed length */
+		if (ret < 0) {
 			gnutls_assert();
-			return z;
+			return ret;
 		}
 
 	} else {		/* Server side reading a client hello */

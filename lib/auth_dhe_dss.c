@@ -103,7 +103,6 @@ int gen_dhe_dss_client_kx( GNUTLS_KEY key, opaque** data) {
 GNUTLS_MPI x, X;
 size_t n_X;
 uint16 _n_X;
-int data_size;
 
 	X =  _gnutls_calc_dh_secret(&x, key->client_g,
 		   key->client_p);
@@ -122,7 +121,6 @@ int data_size;
 #else
 	memmove(&(*data)[0], &_n_X, 2);
 #endif
-	data_size = _n_X+2;
 	
 	/* calculate the key after calculating the message */
 	key->KEY = _gnutls_calc_dh_key(key->client_Y, x, key->client_p);
@@ -135,7 +133,7 @@ int data_size;
 	key->client_p = NULL;
 	key->client_g = NULL;
 
-	return data_size;
+	return n_X+2;
 }
 
 int proc_dhe_dss_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {
