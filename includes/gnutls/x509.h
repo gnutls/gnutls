@@ -154,6 +154,14 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx,
 int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, 
 	const gnutls_datum* crt);
 
+int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
+	int indx, unsigned char* crl, int* crl_size);
+int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7);
+int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, 
+	const gnutls_datum* crt);
+int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx);
+
+
 /* X.509 Certificate verification functions.
  */
 

@@ -891,7 +891,7 @@ const ASN1_ARRAY_TYPE pkix_asn1_tab[]={
   {"eContent",536895495,0},
   {0,2056,"0"},
   {"CertificateRevocationLists",1610612751,0},
-  {0,2,"CertificateList"},
+  {0,13,0},
   {"CertificateChoices",1610612754,0},
   {"certificate",13,0},
   {"CertificateSet",1610612751,0},

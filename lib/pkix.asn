@@ -970,7 +970,9 @@ EncapsulatedContentInfo ::= SEQUENCE {
   eContentType ContentType,
   eContent [0] EXPLICIT OCTET STRING OPTIONAL }
 
-CertificateRevocationLists ::= SET OF CertificateList
+-- We don't use CertificateList here since we only want
+-- to read the raw data.
+CertificateRevocationLists ::= SET OF ANY
 
 CertificateChoices ::= CHOICE {
 -- Although the paper uses Certificate type, we

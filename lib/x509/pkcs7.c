@@ -34,11 +34,100 @@
 
 #define SIGNED_DATA_OID "1.2.840.113549.1.7.2"
 
+/* Decodes the PKCS #7 signed data, and returns an ASN1_TYPE, 
+ * which holds them. If raw is non null then the raw decoded
+ * data are copied (they are localy allocated) there.
+ */
+static
+int _decode_pkcs7_signed_data( ASN1_TYPE pkcs7, ASN1_TYPE * sdata, gnutls_datum* raw) 
+{
+char oid[128];
+ASN1_TYPE c2;
+opaque *tmp = NULL;
+int tmp_size, len, result;
+
+	len = sizeof(oid) - 1;
+	result = asn1_read_value(pkcs7, "contentType", oid, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
+		gnutls_assert();
+		_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
+		return GNUTLS_E_UNKNOWN_PKCS7_CONTENT_TYPE;
+	}
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+	
+	/* the Signed-data has been created, so
+	 * decode them.
+	 */
+	tmp_size = 0;
+	result = asn1_read_value(pkcs7, "content", NULL, &tmp_size);
+	if (result!=ASN1_MEM_ERROR) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	tmp = gnutls_malloc(tmp_size);
+	if (tmp==NULL) {
+		gnutls_assert();
+		result = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	result = asn1_read_value(pkcs7, "content", tmp, &tmp_size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* tmp, tmp_size hold the data and the size of the CertificateSet structure
+	 * actually the ANY stuff.
+	 */
+
+	/* Step 1. In case of a signed structure extract certificate set.
+	 */
+
+	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+
+	if (raw == NULL) {
+		gnutls_free(tmp);
+	} else {
+		raw->data = tmp;
+		raw->size = tmp_size;
+	}
+
+	*sdata = c2;
+
+	return 0;
+
+	cleanup:
+		if (c2) asn1_delete_structure(&c2);
+		gnutls_free(tmp);
+		return result;
+}
+
 /**
   * gnutls_pkcs7_init - This function initializes a gnutls_pkcs7 structure
   * @pkcs7: The structure to be initialized
   *
-  * This function will initialize a PKCS7 structure. 
+  * This function will initialize a PKCS7 structure. PKCS7 structures
+  * usually contain lists of X.509 Certificates and X.509 Certificate
+  * revocation lists.
   *
   * Returns 0 on success.
   *
@@ -132,7 +221,6 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	return result;
 }
 
-
 /**
   * gnutls_pkcs7_get_certificate - This function returns a certificate in a PKCS7 certificate set
   * @pkcs7_struct: should contain a gnutls_pkcs7 structure
@@ -153,69 +241,19 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len;
-	char oid[128];
-	opaque *tmp = NULL;
 	char root2[64];
+	char oid[128];
 	char counter[MAX_INT_DIGITS];
-	int tmp_size;
+	gnutls_datum tmp = {NULL, 0};
 
 	if (certificate_size == NULL) return GNUTLS_E_INVALID_REQUEST;
 
-	/* root2 is used as a temp storage area
+	/* Step 1. decode the signed data.
 	 */
-	len = sizeof(oid) - 1;
-	result = asn1_read_value(pkcs7->pkcs7, "contentType", oid, &len);
-	if (result != ASN1_SUCCESS) {
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, &tmp);
+	if (result < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* id-signedData as defined in PKCS #7 
-	 */
-	if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
-		gnutls_assert();
-		_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}					 		 	
-
-	tmp_size = 0;
-	result = asn1_read_value(pkcs7->pkcs7, "content", NULL, &tmp_size);
-	if (result!=ASN1_MEM_ERROR) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	tmp = gnutls_malloc(tmp_size);
-	if (tmp==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	/* tmp, tmp_size hold the data and the size of the CertificateSet structure
-	 * actually the ANY stuff.
-	 */
-
-	/* Step 1. In case of a signed structure extract certificate set.
-	 */
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	}
-
-	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	
+		return result;
 	}
 	
 	/* Step 2. Parse the CertificateSet 
@@ -245,7 +283,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	if (strcmp( oid, "certificate") == 0) {
 		int start, end;
 
-		result = asn1_der_decoding_startEnd(c2, tmp, tmp_size, 
+		result = asn1_der_decoding_startEnd(c2, tmp.data, tmp.size, 
 			root2, &start, &end);
 
 		if (result != ASN1_SUCCESS) {
@@ -263,7 +301,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 		}
 
 		if (certificate)
-			memcpy( certificate, &tmp[start], end);
+			memcpy( certificate, &tmp.data[start], end);
 
 		*certificate_size = end;
 
@@ -274,11 +312,10 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	}
 
 	cleanup:
+		_gnutls_free_datum( &tmp);
 		if (c2) asn1_delete_structure(&c2);
-		gnutls_free(tmp);
 		return result;
 }
-
 
 /**
   * gnutls_pkcs7_get_certificate_count - This function returns the number of certificates in a PKCS7 certificate set
@@ -293,72 +330,15 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	int result, len, count;
-	char oid[64];
-	opaque *tmp = NULL;
-	int tmp_size;
+	int result, count;
 
-	len = sizeof(oid) - 1;
-
-	/* root2 is used as a temp storage area
+	/* Step 1. decode the signed data.
 	 */
-	result = asn1_read_value(pkcs7->pkcs7, "contentType", oid, &len);
-	if (result != ASN1_SUCCESS) {
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
+	if (result < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return result;
 	}
-
-	if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
-		gnutls_assert();
-		_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}					 		 	
-
-	tmp_size = 0;
-	result = asn1_read_value(pkcs7->pkcs7, "content", NULL, &tmp_size);
-	if (result!=ASN1_MEM_ERROR) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	tmp = gnutls_malloc(tmp_size);
-	if (tmp==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
-	if (result!=ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	/* tmp, tmp_size hold the data and the size of the CertificateSet structure
-	 * actually the ANY stuff.
-	 */
-
-	/* Step 1. In case of a signed structure count the certificate set.
-	 */
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-	
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-		
-	gnutls_free(tmp);
-	tmp = NULL;
 
 	/* Step 2. Count the CertificateSet */
 	
@@ -373,9 +353,6 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 
 	return count;
 	
-	cleanup:
-		gnutls_free(tmp);
-		return result;
 }
 
 /**
@@ -404,15 +381,18 @@ int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
 		output_data, output_data_size);
 }
 
-
-static int create_empty_signed_data(ASN1_TYPE pkcs7)
+/* Creates an empty signed data structure in the pkcs7
+ * structure and returns a handle to the signed data.
+ */
+static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 {
-	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	uint8 one = 1;
 	int result;
 
+	*sdata = ASN1_TYPE_EMPTY;
+
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.SignedData", sdata)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -420,7 +400,7 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7)
 
 	/* Use version 1
 	 */
-	result = asn1_write_value( c2, "version", &one, 1);
+	result = asn1_write_value( *sdata, "version", &one, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -431,14 +411,14 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7)
 	 */
 
 	/* id-data */
-	result = asn1_write_value( c2, "encapContentInfo.eContentType", "1.2.840.113549.1.7.5", 1);
+	result = asn1_write_value( *sdata, "encapContentInfo.eContentType", "1.2.840.113549.1.7.5", 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
-	result = asn1_write_value( c2, "encapContentInfo.eContent", NULL, 0);
+	result = asn1_write_value( *sdata, "encapContentInfo.eContent", NULL, 0);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -454,15 +434,6 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7)
 	/* Add no signerInfos.
 	 */
 
-	/* Copy the signed data to the pkcs7
-	 */
-	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7, "content");
-	if (result < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-	asn1_delete_structure( &c2);
-
 	/* Write the content type of the signed data
 	 */
 	result = asn1_write_value(pkcs7, "contentType", SIGNED_DATA_OID, 1);
@@ -475,7 +446,7 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7)
 	return 0;
 
 	cleanup:
-		asn1_delete_structure( &c2);
+		asn1_delete_structure( sdata);
 		return result;	
 
 }
@@ -493,85 +464,29 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 	const gnutls_datum* crt)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	int result, len;
-	char oid[128];
-	opaque *tmp = NULL;
-	int tmp_size;
+	int result;
 
-	/* root2 is used as a temp storage area
+	/* Step 1. decode the signed data.
 	 */
-	len = sizeof(oid) - 1;
-	result = asn1_read_value(pkcs7->pkcs7, "contentType", oid, &len);
-	if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS) {
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
+	if (result < 0 && result != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
-	if (result == ASN1_VALUE_NOT_FOUND) {
+	/* If the signed data are uninitialized
+	 * then create them.
+	 */
+	if (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
 		/* The pkcs7 structure is new, so create the
 		 * signedData.
 		 */
-		result = create_empty_signed_data( pkcs7->pkcs7);
+		result = create_empty_signed_data( pkcs7->pkcs7, &c2);
 		if (result < 0) {
 			gnutls_assert();
 			return result;
 		}
-	} else { /* success */
-		if ( strcmp( oid, SIGNED_DATA_OID) != 0) {
-			gnutls_assert();
-			_gnutls_x509_log( "Unknown PKCS7 Content OID '%s'\n", oid);
-			return GNUTLS_E_UNKNOWN_PKCS7_CONTENT_TYPE;
-		}
 	}					 		 	
-
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	
-	}
-	
-	/* the Signed-data has been created, so
-	 * decode them.
-	 */
-	tmp_size = 0;
-	result = asn1_read_value(pkcs7->pkcs7, "content", NULL, &tmp_size);
-	if (result!=ASN1_MEM_ERROR) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	tmp = gnutls_malloc(tmp_size);
-	if (tmp==NULL) {
-		gnutls_assert();
-		result = GNUTLS_E_MEMORY_ERROR;
-		goto cleanup;
-	}
-
-	result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
-	}
-
-	/* tmp, tmp_size hold the data and the size of the CertificateSet structure
-	 * actually the ANY stuff.
-	 */
-
-	/* Step 1. In case of a signed structure extract certificate set.
-	 */
-
-	result = asn1_der_decoding(&c2, tmp, tmp_size, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;	
-	}
-
-	gnutls_free(tmp);
-	tmp = NULL;
 
 	/* Step 2. Append the new certificate.
 	 */
@@ -611,6 +526,304 @@ int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7,
 
 	cleanup:
 		if (c2) asn1_delete_structure(&c2);
-		gnutls_free(tmp);
+		return result;
+}
+
+/**
+  * gnutls_pkcs7_delete_certificate - This function deletes a certificate from a PKCS7 certificate set
+  * @pkcs7_struct: should contain a gnutls_pkcs7 structure
+  * @indx: the index of the certificate to delete
+  *
+  * This function will delete a certificate from a PKCS7 or RFC2630 certificate set.
+  * Index starts from 1. Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs7_delete_certificate(gnutls_pkcs7 pkcs7, int indx)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result;
+	char counter[MAX_INT_DIGITS];
+	char root2[64];
+
+	/* Step 1. Decode the signed data.
+	 */
+
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* Step 2. Delete the certificate.
+	 */
+
+	_gnutls_str_cpy( root2, sizeof(root2), "certificates.?"); 
+	_gnutls_int2str( indx+1, counter);
+	_gnutls_str_cat( root2, sizeof(root2), counter); 
+
+	result = asn1_write_value(c2, root2, NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+
+	/* Step 3. Replace the old content with the new
+	 */
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content");
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&c2);
+
+	return 0;
+
+	cleanup:
+		if (c2) asn1_delete_structure(&c2);
+		return result;
+}
+
+/* Read and write CRLs
+ */
+
+/**
+  * gnutls_pkcs7_get_crl - This function returns a crl in a PKCS7 crl set
+  * @pkcs7_struct: should contain a gnutls_pkcs7 structure
+  * @indx: contains the index of the crl to extract
+  * @crl: the contents of the crl will be copied there (may be null)
+  * @crl_size: should hold the size of the crl
+  *
+  * This function will return a crl of the PKCS7 or RFC2630 crl set.
+  * Returns 0 on success. If the provided buffer is not long enough,
+  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+  *
+  * After the last crl has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+  * will be returned.
+  *
+  **/
+int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
+	int indx, unsigned char* crl, int* crl_size)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result;
+	char root2[64];
+	char counter[MAX_INT_DIGITS];
+	gnutls_datum tmp = {NULL, 0};
+	int start, end;
+
+	if (crl_size == NULL) return GNUTLS_E_INVALID_REQUEST;
+
+	/* Step 1. decode the signed data.
+	 */
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+	
+	/* Step 2. Parse the CertificateSet 
+	 */
+	
+	_gnutls_str_cpy( root2, sizeof(root2), "crls.?"); 
+	_gnutls_int2str( indx+1, counter);
+	_gnutls_str_cat( root2, sizeof(root2), counter); 
+
+
+	/* Get the raw CRL 
+	 */
+	result = asn1_der_decoding_startEnd(c2, tmp.data, tmp.size, 
+		root2, &start, &end);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+			
+	end = end-start+1;
+		
+	if ( end > *crl_size) {
+		*crl_size = end;
+		result = GNUTLS_E_SHORT_MEMORY_BUFFER;
+		goto cleanup;
+	}
+
+	if (crl)
+		memcpy( crl, &tmp.data[start], end);
+
+	*crl_size = end;
+
+	result = 0;
+
+	cleanup:
+		_gnutls_free_datum( &tmp);
+		if (c2) asn1_delete_structure(&c2);
+		return result;
+}
+
+/**
+  * gnutls_pkcs7_get_crl_count - This function returns the number of crls in a PKCS7 crl set
+  * @pkcs7_struct: should contain a gnutls_pkcs7 structure
+  *
+  * This function will return the number of certifcates in the PKCS7 or 
+  * RFC2630 crl set.
+  *
+  * Returns a negative value on failure.
+  *
+  **/
+int gnutls_pkcs7_get_crl_count(gnutls_pkcs7 pkcs7)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result, count;
+
+	/* Step 1. decode the signed data.
+	 */
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* Step 2. Count the CertificateSet */
+	
+	result = asn1_number_of_elements( c2, "crls", &count);
+
+	asn1_delete_structure(&c2);
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return 0; /* no crls */
+	}
+
+	return count;
+	
+}
+
+/**
+  * gnutls_pkcs7_set_crl - This function adds a crl in a PKCS7 crl set
+  * @pkcs7_struct: should contain a gnutls_pkcs7 structure
+  * @crt: the DER encoded crl to be added
+  *
+  * This function will add a crl to the PKCS7 or RFC2630 crl set.
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs7_set_crl(gnutls_pkcs7 pkcs7, 
+	const gnutls_datum* crt)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result;
+
+	/* Step 1. decode the signed data.
+	 */
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
+	if (result < 0 && result != GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* If the signed data are uninitialized
+	 * then create them.
+	 */
+	if (result == GNUTLS_E_ASN1_VALUE_NOT_FOUND) {
+		/* The pkcs7 structure is new, so create the
+		 * signedData.
+		 */
+		result = create_empty_signed_data( pkcs7->pkcs7, &c2);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+	}					 		 	
+
+	/* Step 2. Append the new crl.
+	 */
+
+	result = asn1_write_value(c2, "crls", "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+
+	result = asn1_write_value(c2, "crls.?LAST", crt->data, crt->size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+
+	/* Step 3. Replace the old content with the new
+	 */
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content");
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&c2);
+
+	return 0;
+
+	cleanup:
+		if (c2) asn1_delete_structure(&c2);
+		return result;
+}
+
+/**
+  * gnutls_pkcs7_delete_crl - This function deletes a crl from a PKCS7 crl set
+  * @pkcs7_struct: should contain a gnutls_pkcs7 structure
+  * @indx: the index of the crl to delete
+  *
+  * This function will delete a crl from a PKCS7 or RFC2630 crl set.
+  * Index starts from 1. Returns 0 on success.
+  *
+  **/
+int gnutls_pkcs7_delete_crl(gnutls_pkcs7 pkcs7, int indx)
+{
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	int result;
+	char counter[MAX_INT_DIGITS];
+	char root2[64];
+
+	/* Step 1. Decode the signed data.
+	 */
+
+	result = _decode_pkcs7_signed_data( pkcs7->pkcs7, &c2, NULL);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* Step 2. Delete the crl.
+	 */
+
+	_gnutls_str_cpy( root2, sizeof(root2), "crls.?"); 
+	_gnutls_int2str( indx+1, counter);
+	_gnutls_str_cat( root2, sizeof(root2), counter); 
+
+	result = asn1_write_value(c2, root2, NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;	
+	}
+
+	/* Step 3. Replace the old content with the new
+	 */
+	result = _gnutls_x509_der_encode_and_copy( c2, "", pkcs7->pkcs7, "content");
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&c2);
+
+	return 0;
+
+	cleanup:
+		if (c2) asn1_delete_structure(&c2);
 		return result;
 }

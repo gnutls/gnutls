@@ -34,7 +34,10 @@
   * @crl: The structure to be initialized
   *
   * This function will initialize a CRL structure. CRL stands for
-  * Certificate Revocation List.
+  * Certificate Revocation List. A revocation list usually contains
+  * lists of certificate serial numbers that have been revoked
+  * by an Authority. The revocation lists are always signed with
+  * the authority's private key.
   *
   * Returns 0 on success.
   *
