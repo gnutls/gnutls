@@ -1044,6 +1044,10 @@ static int parse_der_ca_mem( gnutls_x509_crt** cert_list, int* ncerts,
   * This function adds the trusted CAs in order to verify client
   * certificates. This function may be called multiple times.
   *
+  * In case of a server the CAs set here will be sent to the client
+  * if a certificate request is sent. This can be disabled using 
+  * gnutls_certificate_send_x509_rdn_sequence().
+  *
   **/
 int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum *CA, gnutls_x509_crt_fmt type)
