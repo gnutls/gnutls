@@ -43,20 +43,20 @@ gnutls_recv( int desc, GNUTLS_STATE, char* data, int datalen):
 gnutls_deinit( GNUTLS_STATE* state):
 	This functions clears all buffers associated with the state.
 
-gnutls_set_cipher_priority( ...)
+gnutls_set_cipher_priority( GNUTLS_STATE, int, ...)
 	This function accepts an integer and a list of algorithms.
 	The algorithms used here are defined in gnutls.h.
 	If the algorithm is not specified here then it will not
 	be used in the handshake. eg
 	gnutls_set_cipher_priority(1, GNUTLS_3DES)
 
-gnutls_set_mac_priority( ...)
+gnutls_set_mac_priority( GNUTLS_STATE, int,  ...)
 	This function accepts an integer and a list of algorithms.
 	If the algorithm is not specified here then it will not
 	be used in the handshake. eg:
 	gnutls_set_mac_priority(2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 
-gnutls_set_kx_priority( ...)
+gnutls_set_kx_priority( GNUTLS_STATE, int,  ...)
 	This function accepts an integer and a list of key exchange algorithms.
 	If the algorithm is not specified here then it will not
 	be used in the handshake. eg:

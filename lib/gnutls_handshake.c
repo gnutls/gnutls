@@ -39,6 +39,8 @@
 #define ERR(x, y)
 #endif
 
+#define TRUE 1
+#define FALSE 0
 
 /* Calculate The SSL3 Finished message */
 #define SSL3_CLIENT_MSG "CLNT"
@@ -508,10 +510,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		memmove(&state->security_parameters.client_random[4], rand,
 			28);
 
-		memmove(&data[pos], &cur_time, 4);
-		pos += 4;
-		memmove(&data[pos], rand, 28);
-		pos += 28;
+		memmove(&data[pos], state->security_parameters.client_random, 32);
+		pos += 32;
 
 		memmove(&data[pos++], &session_id_len, 1);
 
@@ -551,7 +551,6 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 			memmove(&data[pos++], &compression_methods[i], 1);
 		}
 
-		gcry_free(rand);
 		gnutls_free(cipher_suites);
 		gnutls_free(compression_methods);
 
@@ -600,13 +599,14 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		memmove(&data[pos++],
 			&state->gnutls_internals.compression_method, 1);
 
-		gcry_free(rand);
 		ret =
 		    _gnutls_send_handshake(cd, state, data, datalen,
 					   GNUTLS_SERVER_HELLO);
 		gnutls_free(data);
 
 	}
+
+	gcry_free(rand);
 
 	return ret;
 }
@@ -661,15 +661,18 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		fprintf(stderr, "SessionID: %s\n",
 			_gnutls_bin2hex(&data[pos], session_id_len));
 #endif
-		if ( (state->gnutls_internals.resumed_security_parameters.session_id_size>0) 
+		if ( (state->gnutls_internals.resumed_security_parameters.session_id_size > 0) 
 			&& memcmp(&data[pos], state->gnutls_internals.resumed_security_parameters.session_id, session_id_len)==0) {
 			/* resume session */
 			
 #ifdef DEBUG
 			fprintf(stderr, "Resuming session\n");
 #endif
-			 state->gnutls_internals.resumed=RESUME_TRUE; /* we are resuming */
-			 return 0;
+			memcpy( state->gnutls_internals.resumed_security_parameters.server_random, state->security_parameters.server_random, 32);
+			memcpy( state->gnutls_internals.resumed_security_parameters.client_random, state->security_parameters.client_random, 32);
+
+			state->gnutls_internals.resumed=RESUME_TRUE; /* we are resuming */
+			return 0;
 		} else {
 			/* keep the session id */
 			state->gnutls_internals.resumed=RESUME_FALSE; /* we are not resuming */
@@ -925,6 +928,70 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 	}
 }
 
+/* This function sends the final handshake packets and initializes connection */
+static int _gnutls_send_handshake_final( int cd, GNUTLS_STATE state, int init) {
+int ret=0;
+
+		/* Send the CHANGE CIPHER SPEC PACKET */
+		ret = _gnutls_send_change_cipher_spec(cd, state);
+		if (ret < 0) {
+			ERR("send ChangeCipherSpec", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+		/* Initialize the connection state (start encryption) - in case of client */
+		if (init == TRUE) {
+			ret = _gnutls_connection_state_init(state);
+			if (ret<0) {
+				gnutls_assert();
+				gnutls_clearHashDataBuffer( state);
+				return ret;
+			}
+		}
+		/* send the finished message */
+
+		ret = _gnutls_send_finished(cd, state);
+		if (ret < 0) {
+			ERR("send Finished", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+		return ret;
+}
+
+/* This function receives the final handshake packets */
+static int _gnutls_recv_handshake_final( int cd, GNUTLS_STATE state, int init) {
+int ret=0;
+
+		ret =
+		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
+				    NULL, 0);
+		if (ret < 0) {
+			ERR("recv ChangeCipherSpec", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+		/* Initialize the connection state (start encryption) - in case of server */
+		if (init == TRUE) {
+			ret = _gnutls_connection_state_init(state);
+			if (ret<0) {
+				gnutls_assert();
+				gnutls_clearHashDataBuffer( state);
+				return ret;
+			}
+		}
+
+		ret = _gnutls_recv_finished(cd, state);
+		if (ret < 0) {
+			ERR("recv finished", ret);
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+		return ret;
+}
+
 /* in this function we finish the handshake procedure
  * This should happen only if we trust the peer. (check certificate)
  */
@@ -984,47 +1051,6 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		/* Send the CHANGE CIPHER SPEC PACKET */
-		ret = _gnutls_send_change_cipher_spec(cd, state);
-		if (ret < 0) {
-			ERR("send ChangeCipherSpec", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		/* Initialize the connection state (start encryption) */
-		ret = _gnutls_connection_state_init(state);
-		if (ret<0) {
-			gnutls_assert();
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		/* send the finished message */
-
-		ret = _gnutls_send_finished(cd, state);
-		if (ret < 0) {
-			ERR("send Finished", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		ret =
-		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
-				    NULL, 0);
-		if (ret < 0) {
-			ERR("recv ChangeCipherSpec", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		ret = _gnutls_recv_finished(cd, state);
-		if (ret < 0) {
-			ERR("recv finished", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
 	} else { /* SERVER SIDE */
 
 		/* send the server hello done */
@@ -1046,43 +1072,44 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		ret =
-		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC,
-				    NULL, 0);
-		if (ret < 0) {
-			ERR("recv ChangeCipherSpec", ret);
-			return ret;
-		}
-
-		/* Initialize the connection state (start encryption) */
-		ret = _gnutls_connection_state_init(state);
-		if (ret<0) {
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		ret = _gnutls_recv_finished(cd, state);
-		if (ret < 0) {
-			ERR("recv finished", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		ret = _gnutls_send_change_cipher_spec(cd, state);
-		if (ret < 0) {
-			ERR("send ChangeCipherSpec", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
-		ret = _gnutls_send_finished(cd, state);
-		if (ret < 0) {
-			ERR("send finished", ret);
-			gnutls_clearHashDataBuffer( state);
-			return ret;
-		}
-
 	}
+
+	/* send and recv the change cipher spec and finished messages */
+	if ((state->gnutls_internals.resumed==RESUME_TRUE && state->security_parameters.entity == GNUTLS_CLIENT) 
+	|| (state->gnutls_internals.resumed==RESUME_FALSE && state->security_parameters.entity == GNUTLS_SERVER)) { 
+		/* if we are a client resuming - or we are a server not resuming */
+
+		ret = _gnutls_recv_handshake_final( cd, state, TRUE);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+		ret = _gnutls_send_handshake_final( cd, state, FALSE);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+	} else { /* if we are a client not resuming - or we are a server resuming */
+
+		ret = _gnutls_send_handshake_final( cd, state, TRUE);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+
+		ret = _gnutls_recv_handshake_final( cd, state, FALSE);
+		if (ret < 0) {
+			gnutls_assert();
+			gnutls_clearHashDataBuffer( state);
+			return ret;
+		}
+	}
+
+
 	/* clear handshake buffer */
 	gnutls_clearHashDataBuffer( state);
 	return ret;

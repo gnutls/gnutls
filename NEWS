@@ -1,0 +1,3 @@
+Version 0.0.5 (7/12/2000)
+- Added Compression (using ZLIB)
+- Added SSL 3.0 support

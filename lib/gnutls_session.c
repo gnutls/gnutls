@@ -21,7 +21,10 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 
-/* Returns all session parameters - in order to support resuming 
+/* Returns all session parameters - in order to support resuming.
+ * The client should call this - and keep the returned session - if he wants to resume his 
+ * current version later by calling gnutls_set_current_session().
+ * This function must be called after a successful handshake.
  */
 int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_size) {
 

@@ -222,7 +222,7 @@ typedef struct {
 } ProtocolVersion;
 
 typedef struct {
-	uint8	type;
+	uint8		type;
 	ProtocolVersion	version;
 	uint16		length;
 	opaque*		fragment;
@@ -251,12 +251,12 @@ typedef struct {
 } GNUTLS_GenericStreamCipher;
 
 typedef struct {
-	uint8		type;
-	ProtocolVersion		version;
+	uint8			type;
+	ProtocolVersion	version;
 	uint16			length;
 	void*			fragment; /* points GenericStreamCipher
-					   * or GenericBlockCipher
-					   */
+					   		 * or GenericBlockCipher
+							 */
 } GNUTLSCiphertext;
 
 

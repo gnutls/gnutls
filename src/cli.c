@@ -41,6 +41,8 @@ int main()
 	struct sockaddr_in sa;
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF];
+	char *session;
+	int session_size;
 
 //      signal(SIGPIPE, SIG_IGN);
 
@@ -70,8 +72,49 @@ int main()
 		gnutls_deinit(&state);
 		return 1;
 	} else {
-		fprintf(stderr, "Handshake was completed\n\n");
+		fprintf(stderr, "Handshake was completed\n");
 	}
+	gnutls_get_current_session( state, NULL, &session_size);
+	session = malloc(session_size);
+	gnutls_get_current_session( state, session, &session_size);
+	
+	fprintf(stderr, "Disconnecting\n");
+	gnutls_close(sd, state);
+	shutdown( sd, SHUT_WR);
+	close(sd);	
+	gnutls_deinit( &state);	
+	
+	fprintf(stderr, "\nConnecting again\n");
+	sd = socket(AF_INET, SOCK_STREAM, 0);
+	ERR(sd, "socket");
+
+	err = connect(sd, (SA *) & sa, sizeof(sa));
+	ERR(err, "connect");
+	
+	/* Begin handshake again */
+	gnutls_init(&state, GNUTLS_CLIENT);
+	
+	gnutls_set_current_version( state, GNUTLS_TLS1);
+
+	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
+	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_COMPRESSION_NULL);
+	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
+	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
+
+	gnutls_set_current_session( state, session, session_size);
+	free(session);
+	
+	ret = gnutls_handshake(sd, state);
+
+	if (ret < 0) {
+		fprintf(stderr, "Handshake has failed\n");
+		gnutls_perror(ret);
+		gnutls_deinit(&state);
+		return 1;
+	} else {
+		fprintf(stderr, "Handshake was completed\n");
+	}
+
 
 	if ( pid = fork() == 0) {
 		for(;;) {
@@ -103,7 +146,8 @@ int main()
 	gnutls_close(sd, state);
 	
 	shutdown( sd, SHUT_WR);
-
+	close(sd);
+	
 	gnutls_deinit(&state);
 	return 0;
 }
