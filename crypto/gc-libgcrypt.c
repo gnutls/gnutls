@@ -147,7 +147,8 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
       return GC_INVALID_CIPHER;
     }
 
-  err = gcry_cipher_open ((gcry_cipher_hd_t*) outhandle, gcryalg, gcrymode, 0);
+  err = gcry_cipher_open ((gcry_cipher_hd_t *) outhandle,
+			  gcryalg, gcrymode, 0);
   if (gcry_err_code (err))
     return GC_INVALID_CIPHER;
 
@@ -244,7 +245,7 @@ gc_hash_open (int hash, int mode, gc_hash * outhandle)
       return GC_INVALID_HASH;
     }
 
-  err = gcry_md_open ((gcry_md_hd_t*) outhandle, gcryalg, gcrymode);
+  err = gcry_md_open ((gcry_md_hd_t *) outhandle, gcryalg, gcrymode);
   if (gcry_err_code (err))
     return GC_INVALID_HASH;
 
@@ -256,7 +257,7 @@ gc_hash_clone (gc_hash handle, gc_hash * outhandle)
 {
   int err;
 
-  err = gcry_md_copy((gcry_md_hd_t*)outhandle, (gcry_md_hd_t)handle);
+  err = gcry_md_copy ((gcry_md_hd_t *) outhandle, (gcry_md_hd_t) handle);
   if (err)
     return GC_INVALID_HASH;
 
@@ -288,16 +289,17 @@ gc_hash_digest_length (int hash)
 
   return gcry_md_get_algo_dlen (gcryalg);
 }
+
 void
 gc_hash_hmac_setkey (gc_hash handle, size_t len, const char *key)
 {
-  gcry_md_setkey((gcry_md_hd_t)handle, key, len);
+  gcry_md_setkey ((gcry_md_hd_t) handle, key, len);
 }
 
 void
 gc_hash_write (gc_hash handle, size_t len, const char *data)
 {
-  gcry_md_write ((gcry_md_hd_t)handle, data, len);
+  gcry_md_write ((gcry_md_hd_t) handle, data, len);
 }
 
 const char *
@@ -305,8 +307,8 @@ gc_hash_read (gc_hash handle)
 {
   const char *digest;
 
-  gcry_md_final ((gcry_md_hd_t)handle);
-  digest = gcry_md_read ((gcry_md_hd_t)handle, 0);
+  gcry_md_final ((gcry_md_hd_t) handle);
+  digest = gcry_md_read ((gcry_md_hd_t) handle, 0);
 
   return digest;
 }
@@ -314,5 +316,5 @@ gc_hash_read (gc_hash handle)
 void
 gc_hash_close (gc_hash handle)
 {
-  gcry_md_close ((gcry_md_hd_t)handle);
+  gcry_md_close ((gcry_md_hd_t) handle);
 }

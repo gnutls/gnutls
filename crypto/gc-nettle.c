@@ -154,7 +154,8 @@ gc_set_allocators (gc_malloc_t func_malloc,
 
 #define MAX_BLOCK_SIZE 64
 
-typedef struct cipher_info {
+typedef struct cipher_info
+{
   int alg;
   int mode;
   const struct nettle_cipher *info;
@@ -232,7 +233,7 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
 int
 gc_cipher_setkey (gc_cipher handle, size_t keylen, const char *key)
 {
-  cinfo *cinf = (cinfo*) handle;
+  cinfo *cinf = (cinfo *) handle;
 
   cinf->info->set_encrypt_key (cinf->encrypt_context, keylen, key);
   cinf->info->set_decrypt_key (cinf->decrypt_context, keylen, key);
@@ -243,7 +244,7 @@ gc_cipher_setkey (gc_cipher handle, size_t keylen, const char *key)
 int
 gc_cipher_setiv (gc_cipher handle, size_t ivlen, const char *iv)
 {
-  cinfo *cinf = (cinfo*) handle;
+  cinfo *cinf = (cinfo *) handle;
 
   if (ivlen != cinf->info->block_size)
     return GC_INVALID_CIPHER;
@@ -257,12 +258,11 @@ gc_cipher_setiv (gc_cipher handle, size_t ivlen, const char *iv)
 int
 gc_cipher_encrypt_inline (gc_cipher handle, size_t len, char *data)
 {
-  cinfo *cinf = (cinfo*) handle;
+  cinfo *cinf = (cinfo *) handle;
 
   if (cinf->mode == GC_CBC)
     cbc_encrypt (cinf->encrypt_context, cinf->info->encrypt,
-		 cinf->info->block_size, cinf->encrypt_iv,
-		 len, data, data);
+		 cinf->info->block_size, cinf->encrypt_iv, len, data, data);
   else
     cinf->info->encrypt (cinf->encrypt_context, len, data, data);
 
@@ -272,12 +272,11 @@ gc_cipher_encrypt_inline (gc_cipher handle, size_t len, char *data)
 int
 gc_cipher_decrypt_inline (gc_cipher handle, size_t len, char *data)
 {
-  cinfo *cinf = (cinfo*) handle;
+  cinfo *cinf = (cinfo *) handle;
 
   if (cinf->mode == GC_CBC)
     cbc_decrypt (cinf->decrypt_context, cinf->info->decrypt,
-		 cinf->info->block_size, cinf->decrypt_iv,
-		 len, data, data);
+		 cinf->info->block_size, cinf->decrypt_iv, len, data, data);
   else
     cinf->info->decrypt (cinf->decrypt_context, len, data, data);
 
@@ -287,7 +286,7 @@ gc_cipher_decrypt_inline (gc_cipher handle, size_t len, char *data)
 int
 gc_cipher_close (gc_cipher handle)
 {
-  cinfo *cinf = (cinfo*) handle;
+  cinfo *cinf = (cinfo *) handle;
 
   free (cinf->encrypt_context);
   free (cinf->decrypt_context);
@@ -305,7 +304,8 @@ gc_cipher_close (gc_cipher handle)
 
 #define MAX_DIGEST_SIZE 20
 
-typedef struct hash_info {
+typedef struct hash_info
+{
   int alg;
   int mode;
   const struct nettle_hash *info;
@@ -383,7 +383,7 @@ gc_hash_open (int hash, int mode, gc_hash * outhandle)
 int
 gc_hash_clone (gc_hash handle, gc_hash * outhandle)
 {
-  hinfo *oldhinf = (hinfo*) handle;
+  hinfo *oldhinf = (hinfo *) handle;
   hinfo *newhinf;
 
   newhinf = malloc (sizeof (*newhinf));
@@ -446,7 +446,7 @@ gc_hash_digest_length (int hash)
       break;
 
     case GC_RMD160:
-      return /* FIXME */20;
+      return /* FIXME */ 20;
       break;
 
     default:
@@ -459,16 +459,16 @@ gc_hash_digest_length (int hash)
 void
 gc_hash_hmac_setkey (gc_hash handle, size_t len, const char *key)
 {
-  hinfo *hinf = (hinfo*) handle;
+  hinfo *hinf = (hinfo *) handle;
 
-  hmac_set_key(hinf->outer, hinf->inner, hinf->context,
-	       hinf->info, (unsigned) len, key);
+  hmac_set_key (hinf->outer, hinf->inner, hinf->context,
+		hinf->info, (unsigned) len, key);
 }
 
 void
 gc_hash_write (gc_hash handle, size_t len, const char *data)
 {
-  hinfo *hinf = (hinfo*) handle;
+  hinfo *hinf = (hinfo *) handle;
 
   hinf->info->update (hinf->context, (size_t) len, data);
 }
@@ -476,12 +476,12 @@ gc_hash_write (gc_hash handle, size_t len, const char *data)
 const char *
 gc_hash_read (gc_hash handle)
 {
-  hinfo *hinf = (hinfo*) handle;
+  hinfo *hinf = (hinfo *) handle;
 
   if (hinf->mode == GC_HMAC)
-    hmac_digest(hinf->outer, hinf->inner, hinf->context,
-		hinf->info, (unsigned) hinf->info->digest_size,
-		hinf->digest);
+    hmac_digest (hinf->outer, hinf->inner, hinf->context,
+		 hinf->info, (unsigned) hinf->info->digest_size,
+		 hinf->digest);
   else
     hinf->info->digest (hinf->context, (unsigned) hinf->info->digest_size,
 			hinf->digest);
@@ -492,7 +492,7 @@ gc_hash_read (gc_hash handle)
 void
 gc_hash_close (gc_hash handle)
 {
-  hinfo *hinf = (hinfo*) handle;
+  hinfo *hinf = (hinfo *) handle;
 
   if (hinf->mode == GC_HMAC)
     {
