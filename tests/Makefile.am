@@ -24,6 +24,8 @@ LDADD = ../lib/libgnutls.la libutils.la
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
+EXTRA_DIST = client.p12 noclient.p12 unclient.p12
+
 ctests = simple anonself
 TESTS = pkcs12_neon $(ctests)	
 check_PROGRAMS = $(ctests)
