@@ -123,14 +123,14 @@ int _gnutls_hostname_compare(const char *certname, const char *hostname)
          return 0;
       }
 
-      if (strcmp(cmpstr1, cmpstr2) == 0) {
+      if (strcasecmp(cmpstr1, cmpstr2) == 0) {
          return 1;
       }
 
       return 0;
    }
 
-   if (strcmp(certname, hostname) == 0) {
+   if (strcasecmp(certname, hostname) == 0) {
       return 1;
    }
 
