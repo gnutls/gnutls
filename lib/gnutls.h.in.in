@@ -263,7 +263,7 @@ int gnutls_server_name_set(gnutls_session_t session,
 
 int gnutls_server_name_get(gnutls_session_t session, 
     void *data, size_t *data_length,
-    unsigned int * type, int unsigned indx);
+    unsigned int * type, unsigned int indx);
 
 /* functions to set priority of cipher suites 
  */

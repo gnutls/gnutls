@@ -88,7 +88,7 @@ typedef struct {
 typedef gnutls_x509_dn X509_NAME;
 typedef gnutls_datum_t X509;
 
-struct _SSL;
+typedef struct _SSL SSL;
 
 typedef struct
 {
@@ -117,7 +117,7 @@ typedef struct _BIO
 
 typedef struct
 {
-    struct _SSL *ssl;
+    SSL *ssl;
     int error;
     const gnutls_datum_t *cert_list;
 #define current_cert cert_list
@@ -139,10 +139,9 @@ typedef struct _SSL_CTX
 
 } SSL_CTX;
 
-typedef struct _SSL
+struct _SSL
 {
     gnutls_session_t gnutls_state;
-#define rbio gnutls_state
 
     gnutls_certificate_client_credentials gnutls_cred;
 
@@ -159,7 +158,9 @@ typedef struct _SSL
     
     gnutls_transport_ptr_t rfd;
     gnutls_transport_ptr_t wfd;
-} SSL;
+};
+
+#define rbio gnutls_state
 
 typedef struct
 {
