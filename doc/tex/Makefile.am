@@ -20,7 +20,7 @@ gnutls.html: $(TEX_OBJECTS)
 	-latex2html gnutls.tex -no_navigation -split 0 \
 	-local_icons -html_version 3.2,math -info "" -white
 
-error_codes.tex:
+error_codes.tex: ../../lib/gnutls_errors_int.h ../../lib/gnutls_errors.c
 	-../../src/retcodes > error_codes.tex
 
 gnutls-api.tex: ../../lib/gnutls-api.tex
