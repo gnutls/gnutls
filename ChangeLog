@@ -1,3 +1,9 @@
+2002-11-23 08:10  nmav <nmav@gnutls.org>
+
+	* doc/README.CODING_STYLE, lib/gnutls_int.h:
+
+	some changes in the callback function behaviour.  
+
 2002-11-22 22:21  nmav <nmav@gnutls.org>
 
 	* lib/Makefile.am:
