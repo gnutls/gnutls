@@ -213,7 +213,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   **/
 int gnutls_server_name_get(gnutls_session session, void *data,
 			   size_t *data_length,
-			   gnutls_server_name_type * type, 
+			   unsigned int * type, 
 			   unsigned int indx)
 {
    char *_data = data;

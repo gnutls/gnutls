@@ -810,8 +810,8 @@ void certificate_info( void)
 
 				print = printable;
 				for (j = 0; j < size; j++) {
-					sprintf(print, "%.2x ", (unsigned char) buffer[j]);
-					print += 3;
+					sprintf(print, "%.2x", (unsigned char) buffer[j]);
+					print += 2;
 				}
 				fprintf(outfile, "\t\tDER Data: %s\n", printable);
 			

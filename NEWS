@@ -1,3 +1,7 @@
+Version 0.9.99
+- Some fixes in the gnutls.h header for the gnutls_server_name_set()
+  and gnutls_server_name_get() prototypes.
+
 Version 0.9.98 (16/11/2003)
 - The openssl compatibility layer was moved to gnutls-openssl
   library instead of being included in the gnutls-extra library.

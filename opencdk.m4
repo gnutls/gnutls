@@ -22,7 +22,6 @@ AC_ARG_ENABLE(libopencdktest,
           , enable_libopencdktest=yes)
 
   if test x$libopencdk_config_prefix != x ; then
-     libopencdk_config_args="$libopencdk_config_args --prefix=$libopencdk_config_prefix"
      if test x${LIBOPENCDK_CONFIG+set} != xset ; then
         LIBOPENCDK_CONFIG=$libopencdk_config_prefix/bin/opencdk-config
      fi
