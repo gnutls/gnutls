@@ -59,28 +59,26 @@ after having seen the examples on page \pageref{examples}.
 
 \par
 As shown in the figure, there is a read-only global state that
-is initialized by \printfunc{gnutls_global_init}{gnutls\_global\_init}.
+is initialized once by the global initialization function.
 This global structure, among others, contains the memory allocation
 functions used, and some structures needed for the ASN.1 parser.
 This structure is never modified by any \gnutls{} function, except
-for \printfunc{gnutls_global_deinit}{gnutls\_global\_deinit} which frees
-all memory allocated within the global structure.
+for the deinitialization function which frees all memory allocated in
+the global structure and is called after the program has permanently finished 
+using \gnutls{}.
 
 \par
 The credentials structure is used within some authentication methods,
 such as certificate authentication\footnote{see section \ref{certificate} on \pageref{certificate}}.
+A credentials structure may contain certificates, private keys, temporary parameters 
+for diffie hellman or RSA key exchange, and other stuff that may be shared
+by several TLS sessions. 
+
 This structure should be initialized using the appropriate initialization
 functions. For example an application which uses certificate authentication
-would probably call: 
-\printfunc{gnutls_certificate_allocate_credentials}{gnutls\_certificate\_allocate\_credentials},
-\printfunc{gnutls_certificate_set_x509_trust_file}{gnutls\_certificate\_set\_x509\_trust\_file}
-and
-\printfunc{gnutls_credentials_set}{gnutls\_credentials\_set},
-to set the trusted certificates.
-
-\par The credentials structures may contain certificates, temporary parameters for
-diffie hellman or RSA key exchange, and other stuff that may be shared
-by several TLS sessions.
+would probably initialize the credentials, using the appropriate functions,
+and put it's trusted certificates in this structure. The next step is to
+associate the credentials structure with each \tls{} session.
 
 \par A \gnutls{} session contains all the required stuff for a
 session to handle one secure connection. This session calls directly
