@@ -75,8 +75,8 @@ int _gnutls_get_random(opaque * res, int bytes, int dev)
     }
 
     memcpy( res, buf, bytes);
-    gnutls_free(buf);
-    
+    gcry_free(buf);
+
     return 0;
 #endif
 

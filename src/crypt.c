@@ -380,7 +380,7 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 		if (put==0) {
 			fprintf(fd, "%s:%s:%u\n", username, cr, iindex);
 		}
-		free(cr);
+		gnutls_free(cr);
 		
 		fclose(fd);
 		fclose(fd2);
@@ -422,7 +422,6 @@ static int read_conf_values(MPI * g, MPI * n, char *str, int str_size)
 	tmp_size = _gnutls_sbase64_decode(p, len, &tmp);
 
 	if (tmp_size < 0) {
-		gnutls_free(tmp);
 		return -1;
 	}
 	if (gcry_mpi_scan(g, GCRYMPI_FMT_USG, tmp, &tmp_size)) {

@@ -865,7 +865,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 {
 	int ret;
 	uint32 length32 = 0;
-	opaque *dataptr;
+	opaque *dataptr = NULL;
 	HandshakeType recv_type;
 
 	ret = _gnutls_recv_handshake_header(state, type, &recv_type);
@@ -890,7 +890,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	if (dataptr == NULL) {
+	if (dataptr == NULL && length32 > 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
