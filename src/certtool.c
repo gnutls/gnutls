@@ -1859,7 +1859,7 @@ time_t now = time(0);
 		exit(1);
 	}
 
-	if (output&GNUTLS_CERT_NOT_TRUSTED) {
+	if (output&GNUTLS_CERT_INVALID) {
 		fprintf(outfile, "Not verified");
 		comma = 1;
 	} else {
@@ -1956,7 +1956,7 @@ gnutls_x509_crt issuer;
 		exit(1);
 	}
 
-	if (output&GNUTLS_CERT_NOT_TRUSTED) {
+	if (output&GNUTLS_CERT_INVALID) {
 		fprintf(outfile, "Not verified");
 		comma = 1;
 	} else {

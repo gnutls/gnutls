@@ -30,14 +30,14 @@ typedef struct gnutls_retr_st {
 		gnutls_x509_crt *x509;
 		gnutls_openpgp_key pgp;
 	} cert;
-	uint ncerts;		/* one for pgp keys */
+	unsigned int ncerts;		/* one for pgp keys */
 
 	union key {
 		gnutls_x509_privkey x509;
 		gnutls_openpgp_privkey pgp;
 	} key;
 
-	uint deinit_all;	/* if non zero all keys will be deinited */
+	unsigned int deinit_all;	/* if non zero all keys will be deinited */
 } gnutls_retr_st;
 
 typedef int gnutls_certificate_client_retrieve_function(gnutls_session,
