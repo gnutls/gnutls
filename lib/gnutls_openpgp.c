@@ -566,7 +566,7 @@ leave:
 }
 
 /**
- * gnutls_openpgp_extract_certificate_dn - Extracts the userID
+ * gnutls_openpgp_extract_key_name - Extracts the userID
  *
  * @cert: the raw data that contains the OpenPGP public key.
  * @dn: the structure to store the userID specific data in.
@@ -574,8 +574,8 @@ leave:
  * Extracts the userID from the raw OpenPGP key.
  **/
 int
-gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
-                                       gnutls_openpgp_name *dn )
+gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
+                                 gnutls_openpgp_name *dn )
 {
   PKT pkt = NULL;
   PKT_userid *uid = NULL;
@@ -620,14 +620,14 @@ leave:
 }
 
 /**
- * gnutls_openpgp_extract_certificate_version- Extracts the version
+ * gnutls_openpgp_extract_key_version - Extracts the version of the key.
  *
  * @cert: the raw data that contains the OpenPGP public key.
  *
  * Extract the version of the OpenPGP key.
  **/
 int
-gnutls_openpgp_extract_certificate_version( const gnutls_datum *cert )
+gnutls_openpgp_extract_key_version( const gnutls_datum *cert )
 {
   PKT pkt = NULL;
   PKT_public_key *pk = NULL;
@@ -647,14 +647,14 @@ gnutls_openpgp_extract_certificate_version( const gnutls_datum *cert )
 }
 
 /**
- * gnutls_openpgp_extract_certificate_activation_time - Extract the timestamp
+ * gnutls_openpgp_extract_key_creation_time - Extract the timestamp
  *
  * @cert: the raw data that contains the OpenPGP public key.
  *
  * Returns the timestamp when the OpenPGP key was created.
  **/
 time_t
-gnutls_openpgp_extract_certificate_activation_time( const gnutls_datum *cert )
+gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert )
 {
   PKT pkt = NULL;
   PKT_public_key *pk = NULL;
@@ -674,7 +674,7 @@ gnutls_openpgp_extract_certificate_activation_time( const gnutls_datum *cert )
 }
 
 /**
- * gnutls_openpgp_extract_certificate_expiration_time - Extract the expire date
+ * gnutls_openpgp_extract_key_expiration_time - Extract the expire date
  *
  * @cert: the raw data that contains the OpenPGP public key.
  *
@@ -682,7 +682,7 @@ gnutls_openpgp_extract_certificate_activation_time( const gnutls_datum *cert )
  * that the key doesn't expire at all.
  **/
 time_t
-gnutls_openpgp_extract_certificate_expiration_time( const gnutls_datum *cert )
+gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
 {
   PKT pkt = NULL;
   PKT_public_key *pk = NULL;
@@ -702,7 +702,7 @@ gnutls_openpgp_extract_certificate_expiration_time( const gnutls_datum *cert )
 }
 
 /**
- * gnutls_openpgp_verify_certificate - Verify all signatures on the key
+ * gnutls_openpgp_verify_key - Verify all signatures on the key
  *
  * @cert_list: the structure that holds the certificates.
  * @cert_list_lenght: the items in the cert_list.
@@ -712,8 +712,8 @@ gnutls_openpgp_extract_certificate_expiration_time( const gnutls_datum *cert )
  * A return value of '0' means that all checked signatures are good.
  **/
 int
-gnutls_openpgp_verify_certificate( const gnutls_datum* cert_list,
-                                   int cert_list_length)
+gnutls_openpgp_verify_key( const gnutls_datum* cert_list,
+                           int cert_list_length)
 
 {
   PKT pkt = NULL;
@@ -830,4 +830,5 @@ gnutls_openpgp_add_keyring(const char *fname, int is_secret)
 }
 
 #endif /* HAVE_LIBOPENCDK */
+
 
