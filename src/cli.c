@@ -138,18 +138,13 @@ int main()
 			ret = gnutls_recv(sd, state, buffer, MAX_BUF);
 			/* remove new line */
 			if (buffer[strlen(buffer)-1]=='\n') buffer[strlen(buffer)-1]='\0';
-			if (ret==0) {
-				fprintf(stderr,
-					"Peer has abnormaly closed the GNUTLS connection\n");
-				break;
-			}
 			if (gnutls_is_fatal_error(ret) == 1) {
 				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED || ret == GNUTLS_E_INVALID_SESSION) {
 					fprintf(stderr,
 						"Peer has closed the GNUTLS connection\n");
 					break;
 				} else {
-					fprintf(stderr, "Received corrupted data(%d)\n",
+					fprintf(stderr, "Received corrupted data(%d) - server has terminated the connection abnormally\n",
 						ret);
 					break;
 				}
