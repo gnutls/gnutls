@@ -281,8 +281,8 @@ _asn1_find_up(node_asn *node)
   return p->left;
 }
 
-void
-_asn1_convert_integer(char *value,unsigned char *value_out,int *len)
+int
+_asn1_convert_integer(char *value,unsigned char *value_out,int value_out_size, int *len)
 {
   char negative;
   unsigned char val[4],temp;
@@ -306,8 +306,13 @@ _asn1_convert_integer(char *value,unsigned char *value_out,int *len)
   if((negative && !(val[k]&0x80)) ||
      (!negative && (val[k]&0x80))) k--; 
 
-  for(k2=k;k2<4;k2++) value_out[k2-k]=val[k2];
+  for(k2=k;k2<4;k2++) {
+  	if (k2-k > value_out_size-1) return ASN_MEM_ERROR;
+  	value_out[k2-k]=val[k2];
+  }
   *len=4-k;
+
+  return ASN_OK;
 }
 
 
@@ -847,7 +852,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
     if(len==0){
       if(isdigit(value[0])){
 	value_temp=(unsigned char *)malloc(4);
-	_asn1_convert_integer(value,value_temp,&len);
+	_asn1_convert_integer(value,value_temp,4, &len);
       }
       else{ /* is an identifier like v1 */
 	if(!(node->type&CONST_LIST)) return ASN_VALUE_NOT_VALID;
@@ -856,7 +861,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	  if(type_field(p->type)==TYPE_CONSTANT){
 	    if((p->name) && (!strcmp(p->name,value))){
 	      value_temp=(unsigned char *)malloc(4);
-	      _asn1_convert_integer(p->value,value_temp,&len);
+	      _asn1_convert_integer(p->value,value_temp,4, &len);
 	      break;
 	    }
 	  }
@@ -896,7 +901,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
       if(isdigit(p->value[0])){
 	default_temp=(unsigned char *)malloc(4);
-	_asn1_convert_integer(p->value,default_temp,&len2);
+	_asn1_convert_integer(p->value,default_temp,4,&len2);
       }
       else{ /* is an identifier like v1 */
 	if(!(node->type&CONST_LIST)) return ASN_VALUE_NOT_VALID;
@@ -905,7 +910,7 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 	  if(type_field(p2->type)==TYPE_CONSTANT){
 	    if((p2->name) && (!strcmp(p2->name,p->value))){
 	      default_temp=(unsigned char *)malloc(4);
-	      _asn1_convert_integer(p2->value,default_temp,&len2);
+	      _asn1_convert_integer(p2->value,default_temp,4,&len2);
 	      break;
 	    }
 	  }
@@ -1013,6 +1018,30 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   return ASN_OK;
 }
 
+#define PUT_VALUE( ptr, ptr_size, data, data_size) \
+	if (ptr_size < data_size) { \
+		return ASN_MEM_ERROR; \
+	} else { \
+		memcpy( ptr, data, data_size); \
+		*len = data_size; \
+	}
+		
+#define PUT_STR_VALUE( ptr, ptr_size, data) \
+	if (ptr_size <= strlen(data)) { \
+		return ASN_MEM_ERROR; \
+	} else { \
+		strcpy( ptr, data); \
+		*len = strlen(ptr)+1; \
+	}
+		
+#define ADD_STR_VALUE( ptr, ptr_size, data) \
+	if (ptr_size <= strlen(data)+strlen(ptr)) { \
+		return ASN_MEM_ERROR; \
+	} else { \
+		strcat( ptr, data); \
+		*len = strlen(ptr)+1; \
+	}
+		
 
 int 
 asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
@@ -1021,6 +1050,7 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
   int len2,len3;
   unsigned long tag;
   unsigned char class;
+  int value_size = *len;
 
   node=_asn1_find_node(root,name);
   if(node==NULL) return  ASN_ELEMENT_NOT_FOUND;
@@ -1033,27 +1063,32 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
 
   switch(type_field(node->type)){
   case TYPE_NULL:
-    strcpy(value,"NULL");
-    *len=strlen(value)+1;
+    PUT_STR_VALUE( value, value_size, "NULL");
     break;
   case TYPE_BOOLEAN:
     if((node->type&CONST_DEFAULT) && (node->value==NULL)){
       p=node->down;
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
-      if(p->type&CONST_TRUE) strcpy(value,"TRUE");
-      else strcpy(value,"FALSE");
+      if(p->type&CONST_TRUE) {
+      	PUT_STR_VALUE( value, value_size, "TRUE");
+      } else {
+      	PUT_STR_VALUE(value, value_size, "FALSE");
+      }
     }
-    else if(node->value[0]=='T') strcpy(value,"TRUE");
-    else strcpy(value,"FALSE");
-    *len=strlen(value)+1;
+    else if(node->value[0]=='T') {
+    	PUT_STR_VALUE(value, value_size, "TRUE");
+    }
+    else {
+    	PUT_STR_VALUE(value, value_size, "FALSE");
+    }
     break;
   case TYPE_INTEGER: case TYPE_ENUMERATED:
     if((node->type&CONST_DEFAULT) && (node->value==NULL)){
       p=node->down;
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
-      _asn1_convert_integer(p->value,value,len);
+      if (_asn1_convert_integer(p->value,value,value_size, len)!=ASN_OK) return ASN_MEM_ERROR;
     }
-    else _asn1_get_octet_der(node->value,&len2,value,len);
+    else if (_asn1_get_octet_der(node->value,&len2,value, value_size, len)!=ASN_OK) return ASN_MEM_ERROR;
     break;
   case TYPE_OBJECT_ID:
     if(node->type&CONST_ASSIGN){
@@ -1061,35 +1096,31 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
       p=node->down;
       while(p){
 	if(type_field(p->type)==TYPE_CONSTANT){
-	  strcat(value,p->value);
-	  strcat(value," ");
+	  ADD_STR_VALUE( value, value_size, p->value);
+	  ADD_STR_VALUE( value, value_size, " ");
 	}
 	p=p->right;
       }
-      value[strlen(value)-1]=0;
+    } 
+    else {
+      PUT_STR_VALUE(value, value_size, node->value);
     }
-    else strcpy(value,node->value);
-
-    *len=strlen(value)+1;
     break;
   case TYPE_TIME:
-    strcpy(value,node->value);
-    *len=strlen(value)+1;
+    PUT_STR_VALUE( value, value_size, node->value);
     break;
   case TYPE_OCTET_STRING:
-    _asn1_get_octet_der(node->value,&len2,value,len);
+    if (_asn1_get_octet_der(node->value,&len2,value, value_size, len)!=ASN_OK) return ASN_MEM_ERROR;
     break;
   case TYPE_BIT_STRING:
-    _asn1_get_bit_der(node->value,&len2,value,len);
+    if (_asn1_get_bit_der(node->value,&len2,value,value_size,len)!=ASN_OK) return ASN_MEM_ERROR;
     break;
   case TYPE_CHOICE:
-    strcpy(value,node->down->name);
-    *len=strlen(value)+1;
+    PUT_STR_VALUE( value, value_size, node->down->name);
     break; 
   case TYPE_ANY:
     len2=_asn1_get_length_der(node->value,&len3);
-    memcpy(value,node->value+len3,len2);
-    *len=len2;    
+    PUT_VALUE( value, value_size, node->value+len3, len2);
     break;
   default:
     return  ASN_ELEMENT_NOT_FOUND;
@@ -1205,7 +1236,7 @@ _asn1_change_integer_value(node_asn *node)
   while(p){
     if((type_field(p->type)==TYPE_INTEGER) && (p->type&CONST_ASSIGN)){
       if(p->value){
-	_asn1_convert_integer(p->value,val,&len);	
+	_asn1_convert_integer(p->value,val,sizeof(val), &len);	
 	_asn1_octet_der(val,len,val2,&len);
 	_asn1_set_value(p,val2,len);
       }

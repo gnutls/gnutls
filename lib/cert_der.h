@@ -19,14 +19,14 @@
 void
 _asn1_octet_der(unsigned char *str,int str_len,unsigned char *der,int *der_len);
 
-void
-_asn1_get_octet_der(unsigned char *der,int *der_len,unsigned char *str,int *str_len);
+int
+_asn1_get_octet_der(unsigned char *der,int *der_len,unsigned char *str,int str_size, int *str_len);
 
 void
 _asn1_bit_der(unsigned char *str,int bit_len,unsigned char *der,int *der_len);
 
-void
-_asn1_get_bit_der(unsigned char *der,int *der_len,unsigned char *str,int *bit_len);
+int
+_asn1_get_bit_der(unsigned char *der,int *der_len,unsigned char *str, int str_size, int *bit_len);
 
 int 
 asn1_create_der(node_asn *root,char *name,unsigned char *der,int *len);

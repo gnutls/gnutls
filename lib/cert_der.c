@@ -185,15 +185,19 @@ _asn1_octet_der(unsigned char *str,int str_len,unsigned char *der,int *der_len)
 }
 
 
-void
-_asn1_get_octet_der(unsigned char *der,int *der_len,unsigned char *str,int *str_len)
+int
+_asn1_get_octet_der(unsigned char *der,int *der_len,unsigned char *str,int str_size, int *str_len)
 {
   int len_len;
 
-  if(str==NULL) return;
+  if(str==NULL) return ASN_OK;
   *str_len=_asn1_get_length_der(der,&len_len);
-  memcpy(str,der+len_len,*str_len);
+  if ( str_size > *str_len)
+	  memcpy(str,der+len_len,*str_len);
+  else return ASN_MEM_ERROR;
   *der_len=*str_len+len_len;
+  
+  return ASN_OK;
 }
 
 
@@ -357,16 +361,22 @@ _asn1_bit_der(unsigned char *str,int bit_len,unsigned char *der,int *der_len)
 }
 
 
-void
-_asn1_get_bit_der(unsigned char *der,int *der_len,unsigned char *str,int *bit_len)
+int
+_asn1_get_bit_der(unsigned char *der,int *der_len,unsigned char *str, int str_size, int *bit_len)
 {
   int len_len,len_byte;
 
-  if(str==NULL) return;
+  if(str==NULL) return ASN_OK;
   len_byte=_asn1_get_length_der(der,&len_len)-1;
-  memcpy(str,der+len_len+1,len_byte);
+  
+  if (str_size > len_byte)
+ 	memcpy(str,der+len_len+1,len_byte);
+  else return ASN_MEM_ERROR;
+  
   *bit_len=len_byte*8-der[len_len];
   *der_len=len_byte+len_len+1;
+
+  return ASN_OK;
 }
 
 

@@ -85,6 +85,7 @@
 #define ASN_TAG_IMPLICIT          9
 #define ASN_ERROR_TYPE_ANY       10
 #define ASN_SYNTAX_ERROR         11
+#define ASN_MEM_ERROR		 12
 
 /******************************************************/
 /* Structure definition used for the node of the tree */
