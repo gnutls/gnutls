@@ -417,8 +417,8 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
 
 	if ( ret != cipher_size + erecord_size) {
 		if ( ret < 0 && gnutls_error_is_fatal(ret)==0) {
-			/* If we have sent any data then return
-			 * that value.
+			/* If we have sent any data then just return
+			 * the error value. Do not invalidate the session.
 			 */
 			gnutls_assert();
 			return ret;

@@ -562,7 +562,7 @@ ssize_t _gnutls_io_write_buffered( gnutls_session session, const void *iptr, siz
 		ret = _gnutls_buffer_get( &session->internals.record_send_buffer, &ptr, &n);
 		if (ret < 0) {
 			gnutls_assert();
-			return retval;
+			return ret;
 		}
 
 		_gnutls_write_log( "WRITE: Restoring old write. (%d bytes to send)\n", n);

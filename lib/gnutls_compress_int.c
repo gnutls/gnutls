@@ -54,8 +54,8 @@ int err;
 	ret->algo = method;
 	ret->handle = NULL;
 
-#ifdef HAVE_LIBZ
 	switch( method) {
+#ifdef HAVE_LIBZ
 	    case GNUTLS_COMP_ZLIB: {
 		int window_bits, mem_level;
 		int comp_level;
@@ -92,6 +92,7 @@ int err;
 		}
 		break;
 	    }
+#endif
 	    case GNUTLS_COMP_LZO:
 	        if (d) /* LZO does not use memory on decompressor */
 	        { /* ret->handle = NULL; */ }
@@ -106,7 +107,6 @@ int err;
 		
 		break;
 	}
-#endif
 	return ret;
 }
 
@@ -114,18 +114,18 @@ void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d) {
 int err;
 
 	if (handle!=NULL) {
-#ifdef HAVE_LIBZ
 		switch( handle->algo) {
 			/* case GNUTLS_COMP_LZO:
 				break; */
+#ifdef HAVE_LIBZ
 			case GNUTLS_COMP_ZLIB:
 				if (d)
 					err = inflateEnd( handle->handle);
 				else
 					err = deflateEnd( handle->handle);
 				break;
-		}
 #endif
+		}
 		gnutls_free( handle->handle);
 		gnutls_free( handle);
 
