@@ -73,7 +73,7 @@ cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
 	    gc_cipher_setiv(ret, iv->data, iv->size);
     } else if (cipher != GNUTLS_CIPHER_NULL) {
 	gnutls_assert();
-	_gnutls_x509_log("Crypto cipher error [%d]\n", cipher, err);
+	_gnutls_x509_log("Crypto cipher[%d] error: %d\n", cipher, err);
 	/* FIXME: gc_strerror */
     }
 
