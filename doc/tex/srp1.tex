@@ -1,0 +1,138 @@
+\begin{verbatim}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <gnutls.h>
+
+#define MAX_BUF 1024
+#define USERNAME "user"
+#define PASSWORD "password"
+#define SA struct sockaddr
+#define MSG "GET / HTTP/1.0\r\n\r\n"
+
+int main()
+{
+       const char *PORT = "443";
+       const char *SERVER = "127.0.0.1";
+       int err, ret;
+       int sd, ii;
+       struct sockaddr_in sa;
+       GNUTLS_STATE state;
+       char buffer[MAX_BUF + 1];
+       SRP_CLIENT_CREDENTIALS xcred;
+
+       if (gnutls_global_init() < 0) {
+	      fprintf(stderr, "global state initialization error\n");
+	      exit(1);
+       }
+
+       if (gnutls_allocate_srp_client_sc( &xcred)<0) {
+               fprintf(stderr, "memory error\n");
+               exit(1);
+       }
+       gnutls_set_srp_client_cred( xcred, USERNAME, PASSWORD);
+
+       /* connects to server 
+        */
+       sd = socket(AF_INET, SOCK_STREAM, 0);
+
+       memset(&sa, '\0', sizeof(sa));
+       sa.sin_family = AF_INET;
+       sa.sin_port = htons(atoi(PORT));
+       inet_pton(AF_INET, SERVER, &sa.sin_addr);
+
+       err = connect(sd, (SA *) & sa, sizeof(sa));
+       if (err < 0) {
+	      fprintf(stderr, "Connect error\n");
+	      exit(1);
+       }
+       /* Initialize TLS state 
+        */
+       gnutls_init(&state, GNUTLS_CLIENT);
+
+       /* allow both SSL3 and TLS1
+        */
+       gnutls_set_protocol_priority(state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
+
+       /* allow only ARCFOUR and 3DES ciphers
+        * (3DES has the highest priority)
+        */
+       gnutls_set_cipher_priority(state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, 0);
+
+       /* only allow null compression
+        */
+       gnutls_set_compression_priority(state, GNUTLS_NULL_COMPRESSION, 0);
+
+       /* use GNUTLS_KX_RSA
+        */
+       gnutls_set_kx_priority(state, GNUTLS_KX_SRP, 0);
+
+       /* allow the usage of both SHA and MD5
+        */
+       gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
+
+
+       /* put the SRP credentials to the current state
+        */
+       gnutls_set_cred(state, GNUTLS_SRP, xcred);
+
+
+       /* Perform the TLS handshake
+        */
+       ret = gnutls_handshake(sd, state);
+
+       if (ret < 0) {
+	      fprintf(stderr, "*** Handshake failed\n");
+	      gnutls_perror(ret);
+	      goto end;
+       } else {
+	      printf("- Handshake was completed\n");
+       }
+
+       gnutls_write(sd, state, MSG, strlen(MSG));
+
+       ret = gnutls_read(sd, state, buffer, MAX_BUF);
+       if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
+	      if (ret == 0) {
+		     printf("- Peer has closed the GNUTLS connection\n");
+		     goto end;
+	      } else {
+		     fprintf(stderr, "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
+			     ret);
+		     goto end;
+	      }
+       } else {
+	      if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
+		     printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
+	      if (ret == GNUTLS_E_GOT_HELLO_REQUEST)
+		     printf("* Received HelloRequest message (server asked to rehandshake)\n");
+       }
+
+       if (ret > 0) {
+	      printf("- Received %d bytes: ", ret);
+	      for (ii = 0; ii < ret; ii++) {
+		     fputc(buffer[ii], stdout);
+	      }
+	      fputs("\n", stdout);
+       }
+       gnutls_bye(sd, state, 0);
+
+     end:
+
+       shutdown(sd, SHUT_RDWR);	/* no more receptions */
+       close(sd);
+
+       gnutls_deinit(state);
+
+       gnutls_free_srp_client_sc(xcred);
+
+       gnutls_global_deinit();
+
+       return 0;
+}
+
+\end{verbatim}

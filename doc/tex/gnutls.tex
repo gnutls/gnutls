@@ -1,21 +1,26 @@
 \documentclass{article}
+\usepackage{html}
 \begin{document}
 
-\oddsidemargin=0pt
-\marginparsep = 0pt
-\marginparwidth=0pt
-\textwidth=6cm
 
-\title{Transport Layer Security}
+\title{GNU Transport Layer Security Library}
 \author{Nikos Mavroyanopoulos}
 \maketitle
+
+\tableofcontents
 
 \section{Introduction}
 \par
 gnuTLS is a library which implements the {\bf TLS 1.0} and {\bf SSL 3.0} protocols.
 TLS stands for 'Transport Layer Security' and is the sucessor of SSL (Secure Sockets Layer).
 {\bf TLS 1.0} is described is {\it RFC 2246} and is an Internet protocol (thus it's mostly used over TCP/IP),
-that provides confidentiality, and authentication layers. 
+that provides confidentiality, and authentication layers. Currently {\bf gnuTLS} implements:
+\begin{itemize}
+ \item the {\bf TLS 1.0} and {\bf{ SSL 3.0}} protocols, without any (US) export-controlled algorithms
+ \item {\bf X509} Public Key Infrastructure (with several limitations).
+ \item {\bf SRP} for TLS authentication.
+ \item {\bf TLS Extensions}
+\end{itemize}
 
 \subsection{Confidentiality}
 \par
@@ -34,23 +39,24 @@ The following authentication schemas are supported in gnuTLS:
 
 
 
-\section{X509 Client Examples}
+\section{Client Examples}
+This section contains examples of TLS and SSL clients, using gnuTLS. 
 
+\subsection{Simple Client example with X509 Authentication}
 Let's assume now that we want to create a client which communicates
 with servers using the X509 authentication schema. The following client
 is a very simple TLS client, it does not support session resuming nor
 any other fancy features.
-
-\subsection{Simple Client example}
 \input{ex2}
 
 \subsection{Getting peer's information}
 \par The above example was the simplest form of a client, it didn't even check
 the result of the peer's certificate verification function (ie. if we have
-an authenticated connection. The following function does check the peer's X509
+an authenticated connection). The following function does check the peer's X509
 Certificate, and prints some information about the current state.
 \par
 This function should be called after a successful gnutls\_handshake().
+% \hyperref{gnutls\_handshake()}{gnutls\_handshake() (see Section }{ for more information)}{gnutls\_handshake}
 
 \input{ex3}
 
@@ -62,7 +68,7 @@ the same server a client may use session resuming. {\bf Session resuming} is a
 feature of the {\bf TLS} protocol which allows a client to connect to a server,
 after a successful handshake, without the expensive calculations (ie. use the previously
 established keys). {\bf gnuTLS} supports this feature, and this example illustrates a
-typical use of it. (This is a modification of the simple client example)
+typical use of it (This is a modification of the simple client example).
 
 \par
 Keep in mind that sessions are expired after some time (for security reasons), thus
@@ -70,6 +76,22 @@ it may be normal for a server not to resume a session even if you requested that
 
 \input{ex1}
 
+\subsection{Simple Client example with SRP Authentication}
+Although {\bf SRP} is not part of the TLS standard, gnuTLS implements
+{\it draft-ietf-tls-srp-01} which defines a way to use the SRP algorithm
+within the TLS handshake. The following client
+is a very simple SRP-TLS client which connects to a server by using 
+{\it username} and {\it password}.
+
+\input{srp1}
+
+\section{Server Examples}
+This section contains examples of TLS and SSL servers, using gnuTLS.
+
+\subsection{Echo Server with X509 and SRP authentication}
+The following example is a server which supports both {\bf SRP} and {\bf X509} authentication.
+This server also supports {\it session resuming}.
+\input{serv1}
 
 \include{gnutls-api}
 
