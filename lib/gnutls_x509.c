@@ -1354,23 +1354,22 @@ static int read_ca_mem(gnutls_certificate_credentials res, const char *ca, int c
 
 
 /* This will check if the given DER key is a PKCS-1 RSA key.
+ * Returns 0 if the key is an RSA one.
  */
 int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
 {
 	ASN1_TYPE c2;
 	int result;
-	char root2[128];
 
-	/* Step 1. Parse content and content info */
-	
 	if (key_struct->size == 0 || key_struct->data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	_gnutls_str_cpy( root2, sizeof(root2), "GNUTLS.RSAPrivateKey");
 	if ((result=_gnutls_asn1_create_element
-	    (_gnutls_get_gnutls_asn(), root2, &c2, "rsakey")) != ASN1_SUCCESS) {
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPrivateKey", &c2, 
+	       "rsakey")) != ASN1_SUCCESS) 
+	{
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -1388,6 +1387,39 @@ int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
 	return 0;
 }
 
+/* This will check if the given DER key is an openssl formated DSA key.
+ * Returns 0 if the key is a DSA one.
+ */
+int _gnutls_der_check_if_dsa_key(const gnutls_datum * key_struct)
+{
+	ASN1_TYPE c2;
+	int result;
+
+	if (key_struct->size == 0 || key_struct->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if ((result=_gnutls_asn1_create_element
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", &c2, 
+	       "rsakey")) != ASN1_SUCCESS) 
+	{
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, key_struct->data, key_struct->size, NULL);
+	asn1_delete_structure(&c2);
+
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+	
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
 
 
 
@@ -1423,11 +1455,14 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 		/* The only way to distinguish the keys
 		 * is to count the sequence of integers.
 		 */
+		pk = GNUTLS_PK_UNKNOWN;
 		cv = _gnutls_der_check_if_rsa_key( &tmp);
 		if (cv==0)
 			pk = GNUTLS_PK_RSA;
-		else
-			pk = GNUTLS_PK_DSA;
+		else {
+		   cv = _gnutls_der_check_if_dsa_key( &tmp);
+		   if (cv == 0) pk = GNUTLS_PK_DSA;
+	        }
 
 	} else { /* PEM */
 

@@ -292,7 +292,8 @@ int size;
   * allocate (using malloc) the required memory to hold the encoded data.
   * 
   **/
-int gnutls_pem_base64_encode_alloc( const char* msg, const gnutls_datum *data, gnutls_datum* result) 
+int gnutls_pem_base64_encode_alloc( const char* msg, const gnutls_datum *data, 
+   gnutls_datum* result) 
 {
 opaque* ret;
 int size, res;
@@ -510,7 +511,8 @@ int size;
   * Note that b64_data should be null terminated.
   * 
   **/
-int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, gnutls_datum* result) 
+int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_data, 
+   gnutls_datum* result) 
 {
 opaque* ret;
 int size, res;

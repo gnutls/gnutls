@@ -284,14 +284,14 @@ void _gnutls_free_private_key(gnutls_private_key pkey)
   * key.
   *
   * Returns a member of the gnutls_pk_algorithm enumeration on success,
-  * or a negative value on error.
+  * or GNUTLS_E_UNKNOWN_PK_ALGORITHM on error.
   *
   **/
 int gnutls_x509_extract_key_pk_algorithm( const gnutls_datum * key)
 {
 int cv, pk;
 
-        pk = GNUTLS_PK_UNKNOWN;
+        pk = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 
 	/* The only way to distinguish the keys
 	 * is to count the sequence of integers.
@@ -299,9 +299,12 @@ int cv, pk;
 	cv = _gnutls_der_check_if_rsa_key( key);
 	if (cv==0)
 		pk = GNUTLS_PK_RSA;
-	else
-		pk = GNUTLS_PK_DSA;
-		
+	else {
+		cv = _gnutls_der_check_if_dsa_key( key);
+		if (cv==0)
+			pk = GNUTLS_PK_DSA;
+	}
+
 	return pk;
 
 }
