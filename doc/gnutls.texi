@@ -154,11 +154,11 @@ and is entirely implemented within the @acronym{GnuTLS} library.  The
 verification functions which is partially implemented in the
 @acronym{GnuTLS} library.  The
 @acronym{Libtasn1}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/libtasn1/}},
-a library which offers ASN.1 parsing capabilities, is used for the
-X.509 certificate parsing functions, and
+a library which offers @acronym{ASN.1} parsing capabilities, is used
+for the @acronym{X.509} certificate parsing functions, and
 @acronym{Opencdk}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}}
-is used for the OpenPGP key support in @acronym{GnuTLS}.  The ``Crypto
-backend'' is provided by the
+is used for the @acronym{OpenPGP} key support in @acronym{GnuTLS}.
+The ``Crypto backend'' is provided by the
 @acronym{Libgcrypt}@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}}
 library.
 
@@ -177,17 +177,17 @@ having seen the examples (@pxref{examples}).
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
 structure, among others, contains the memory allocation functions
-used, and some structures needed for the ASN.1 parser.  This structure
+used, and some structures needed for the @acronym{ASN.1} parser.  This structure
 is never modified by any @acronym{GnuTLS} function, except for the
 deinitialization function which frees all memory allocated in the
 global structure and is called after the program has permanently
 finished using @acronym{GnuTLS}.
 
 The credentials structure is used by some authentication methods, such
-as certificate authentication (@pxref{certificate}).  A credentials
-structure may contain certificates, private keys, temporary parameters
-for diffie hellman or RSA key exchange, and other stuff that may be
-shared between several TLS sessions.
+as certificate authentication (@pxref{Certificate Authentication}).  A
+credentials structure may contain certificates, private keys,
+temporary parameters for diffie hellman or RSA key exchange, and other
+stuff that may be shared between several TLS sessions.
 
 This structure should be initialized using the appropriate
 initialization functions. For example an application which uses
@@ -232,7 +232,7 @@ test if an error code is a fatal one by using the
 
 If any non fatal errors, that require an action, are to be returned by
 a function, these error codes will be documented in the function's
-reference.  @xref{error_codes}, for all the error codes.
+reference.  @xref{Error Codes}, for all the error codes.
 
 @section Memory handling
 
@@ -314,13 +314,13 @@ authenticity, and optionally compression.
 
 The Alert protocol offers some signaling to the other protocols. It
 can help informing the peer for the cause of failures and other error
-conditions.  @xref{alert}, for more information.  The alert protocol
-is above the record protocol.
+conditions.  @xref{The Alert Protocol}, for more information.  The
+alert protocol is above the record protocol.
 
 The Handshake protocol is responsible for the security parameters'
-negotiation, the initial key exchange and authentication.
-@xref{handshake}, for more information about the handshake protocol.
-The protocol layering in TLS is shown in the figure below.
+negotiation, the initial key exchange and authentication.  @xref{The
+Handshake Protocol}, for more information about the handshake
+protocol.  The protocol layering in TLS is shown in the figure below.
 
 @image{layers,12cm,8cm}
 
@@ -424,10 +424,12 @@ Supported MAC algorithms:
 
 @itemize
 @item @code{MAC_MD5}
-MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs 128 bits of data.
+MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs
+128 bits of data.
 
 @item @code{MAC_SHA}
-SHA is a cryptographic hash algorithm designed by NSA. Outputs 160 bits of data.
+SHA is a cryptographic hash algorithm designed by NSA. Outputs 160
+bits of data.
 
 @item @code{MAC_RMD160}
 RIPEMD is a cryptographic hash algorithm developed in the framework of
@@ -472,9 +474,9 @@ and the private extensions are enabled.
 
 @subsection Weaknesses and countermeasures
 
-Some weaknesses that may affect the security of the Record layer have been
-found in @acronym{TLS} 1.0 protocol. These weaknesses can be exploited by active attackers,
-and exploit the facts that
+Some weaknesses that may affect the security of the Record layer have
+been found in @acronym{TLS} 1.0 protocol. These weaknesses can be
+exploited by active attackers, and exploit the facts that
 
 @enumerate
 
@@ -496,8 +498,8 @@ Those weaknesses were solved in @acronym{TLS} 1.1 which is implemented
 in @acronym{GnuTLS}. For a detailed discussion see the archives of the
 TLS Working Group mailing list and the paper @cite{CBCATT}.
 
-@section The TLS alert protocol
-@anchor{alert}
+@section The TLS Alert Protocol
+@anchor{The Alert Protocol}
 @cindex Alert protocol
 
 The Alert protocol is there to allow signals to be sent between peers.
@@ -530,8 +532,8 @@ Returns the name, in a character array, of the given alert.
 
 @end itemize
 
-@section The TLS handshake protocol
-@anchor{handshake}
+@section The TLS Handshake Protocol
+@anchor{The Handshake Protocol}
 @cindex Handshake protocol
 
 The Handshake protocol is responsible for the ciphersuite negotiation,
@@ -709,10 +711,10 @@ be useful to clients with constrained capabilities. See the
 @cindex TLS Extensions
 @cindex Server name indication
 
-A common problem in HTTPS servers is the fact that the @acronym{TLS}
-protocol is not aware of the hostname that a client connects to, when
-the handshake procedure begins. For that reason the @acronym{TLS}
-server has no way to know which certificate to send.
+A common problem in @acronym{HTTPS} servers is the fact that the
+@acronym{TLS} protocol is not aware of the hostname that a client
+connects to, when the handshake procedure begins. For that reason the
+@acronym{TLS} server has no way to know which certificate to send.
 
 This extension solves that problem within the @acronym{TLS} protocol,
 and allows a client to send the HTTP hostname before the handshake
@@ -726,7 +728,8 @@ client.
 
 The @acronym{TLS} protocol provides confidentiality and encryption,
 but also offers authentication, which is a prerequisite for a secure
-connection. The available authentication methods in @acronym{GnuTLS} are:
+connection. The available authentication methods in @acronym{GnuTLS}
+are:
 
 @itemize
 
@@ -740,33 +743,34 @@ connection. The available authentication methods in @acronym{GnuTLS} are:
 
 @section Certificate authentication
 
-@subsection Authentication using X.509 certificates
-@cindex X.509 certificates
+@subsection Authentication using @acronym{X.509} certificates
+@cindex @acronym{X.509} certificates
 
-X.509 certificates contain the public parameters, of a public key
-algorithm, and an authority's signature, which proves the authenticity
-of the parameters.  @xref{x509:trust}, for more information on X.509
-protocols.
+@acronym{X.509} certificates contain the public parameters, of a
+public key algorithm, and an authority's signature, which proves the
+authenticity of the parameters.  @xref{The X.509 trust model}, for
+more information on @acronym{X.509} protocols.
 
-@subsection Authentication using OpenPGPkeys
-@cindex OpenPGP Keys
+@subsection Authentication using @acronym{OpenPGP}keys
+@cindex @acronym{OpenPGP} Keys
 
-OpenPGP keys also contain public parameters of a public key algorithm,
-and signatures from several other parties. Depending on whether a
-signer is trusted the key is considered trusted or not.
-@acronym{GnuTLS}'s OpenPGP authentication implementation is based on
-the @cite{TLSPGP} proposal.
+@acronym{OpenPGP} keys also contain public parameters of a public key
+algorithm, and signatures from several other parties. Depending on
+whether a signer is trusted the key is considered trusted or not.
+@acronym{GnuTLS}'s @acronym{OpenPGP} authentication implementation is
+based on the @cite{TLSPGP} proposal.
 
-@xref{The OpenPGP trust model}, for more information about the OpenPGP
-trust model.  For a more detailed introduction to OpenPGP and GnuPG
-see Mike Ashley's @cite{The GNU Privacy
+@xref{The OpenPGP trust model}, for more information about the
+@acronym{OpenPGP} trust model.  For a more detailed introduction to
+@acronym{OpenPGP} and @acronym{GnuPG} see Mike Ashley's @cite{The GNU
+Privacy
 Handbook}@footnote{@url{http://www.gnupg.org/gph/en/manual.html}}.
 
 @subsection Using certificate authentication
 
-In @acronym{GnuTLS} both the OpenPGP and X.509 certificates are part
-of the certificate authentication and thus are handled using a common
-API.
+In @acronym{GnuTLS} both the @acronym{OpenPGP} and @acronym{X.509}
+certificates are part of the certificate authentication and thus are
+handled using a common API.
 
 When using certificates the server is required to have at least one
 certificate and private key pair. A client may or may not have such a
@@ -775,11 +779,12 @@ pair. The certificate and key pair should be loaded, before any
 structure. This should be done by using
 @code{gnutls_certificate_set_x509_key_file} or
 @code{gnutls_certificate_set_openpgp_key_file} depending on the
-certificate type.  In the X.509 case, the functions will also accept
-and use a certificate list that leads to a trusted authority. The
-certificate list must be ordered in such way that every certificate
-certifies the one before it. The trusted authority's certificate need
-not to be included, since the peer should possess it already.
+certificate type.  In the @acronym{X.509} case, the functions will
+also accept and use a certificate list that leads to a trusted
+authority. The certificate list must be ordered in such way that every
+certificate certifies the one before it. The trusted authority's
+certificate need not to be included, since the peer should possess it
+already.
 
 As an alternative, a callback may be used so the server or the client
 specify the certificate and the key at the handshake time.  That
@@ -803,7 +808,7 @@ after a successful handshake, to verify the signatures of the
 certificate.  An alternative way, which reports a more detailed
 verification output, is to use @code{gnutls_certificate_get_peers} to
 obtain the raw certificate of the peer and verify it using the
-functions discussed in @ref{x509:trust}.
+functions discussed in @ref{The X.509 trust model}.
 
 In a handshake, the negotiated cipher suite depends on the
 certificate's parameters, so not all key exchange methods will be
@@ -839,7 +844,8 @@ credentials structure.  See the functions:
 
 @end itemize
 
-Key exchange algorithms for OpenPGP and X.509 certificates:
+Key exchange algorithms for @acronym{OpenPGP} and @acronym{X.509}
+certificates:
 
 @itemize
 
@@ -1070,16 +1076,16 @@ int main()
 
 @node More on certificate authentication
 @chapter More on certificate authentication
-@anchor{certificate}
+@anchor{Certificate Authentication}
 @cindex Certificate authentication
 
-@section The X.509 trust model
-@anchor{x509:trust}
-@cindex X.509 certificates
+@section The @acronym{X.509} trust model
+@anchor{The X.509 trust model}
+@cindex @acronym{X.509} certificates
 
-The X.509 protocols rely on a hierarchical trust model. In this trust
-model Certification Authorities (CAs) are used to certify entities.
-Usually more than one certification authorities exist, and
+The @acronym{X.509} protocols rely on a hierarchical trust model. In
+this trust model Certification Authorities (CAs) are used to certify
+entities.  Usually more than one certification authorities exist, and
 certification authorities may certify other authorities to issue
 certificates as well, following a hierarchical model.
 
@@ -1088,12 +1094,12 @@ certificates as well, following a hierarchical model.
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
 acceptable.  See the figure above for a typical example.  The API for
-handling X.509 certificates is described at section @ref{sec:x509api}.
-Some examples are listed below.
+handling @acronym{X.509} certificates is described at section
+@ref{sec:x509api}.  Some examples are listed below.
 
-@subsection X.509 certificates
+@subsection @acronym{X.509} certificates
 
-An X.509 certificate usually contains information about the
+An @acronym{X.509} certificate usually contains information about the
 certificate holder, the signer, a unique serial number, expiration
 dates and some other fields @cite{RFC3280} as shown in the table
 below.
@@ -1121,10 +1127,10 @@ The extensions are fields only present in version 3 certificates.
 @end itemize
 
 The certificate's @emph{subject or issuer name} is not just a single
-string.  It is a Distinguished name and in the ASN.1 notation is a
-sequence of several object IDs with their corresponding values. Some
-of available OIDs to be used in an X.509 distinguished name are
-defined in @file{gnutls/x509.h}.
+string.  It is a Distinguished name and in the @acronym{ASN.1}
+notation is a sequence of several object IDs with their corresponding
+values. Some of available OIDs to be used in an @acronym{X.509}
+distinguished name are defined in @file{gnutls/x509.h}.
 
 The @emph{Version} field in a certificate has values either 1 or 3 for
 version 3 certificates.  Version 1 certificates do not support the
@@ -1138,8 +1144,8 @@ would be considered invalid.
 Certificate @emph{extensions} are there to include information about
 the certificate's subject that did not fit in the typical certificate
 fields. Those may be e-mail addresses, flags that indicate whether the
-belongs to a CA etc.  All the supported X.509 version 3 extensions are
-shown in the table below.
+belongs to a CA etc.  All the supported @acronym{X.509} version 3
+extensions are shown in the table below.
 
 @itemize
 
@@ -1166,17 +1172,17 @@ This extension is set by the CA, in order to inform about the issued CRLs.
 
 @end itemize
 
-In @acronym{GnuTLS} the X.509 certificate structures are handled using
+In @acronym{GnuTLS} the @acronym{X.509} certificate structures are handled using
 the @code{gnutls_x509_crt_t} type and the corresponding private keys
 with the @code{gnutls_x509_privkey_t} type.  All the available
-functions for X.509 certificate handling have their prototypes in
-@file{gnutls/x509.h}. An example program to demonstrate the X.509
+functions for @acronym{X.509} certificate handling have their prototypes in
+@file{gnutls/x509.h}. An example program to demonstrate the @acronym{X.509}
 parsing capabilities can be found at section @ref{ex:x509-info}.
 
-@subsection Verifying X.509 certificate paths
+@subsection Verifying @acronym{X.509} certificate paths
 @cindex Verifying certificate paths
 
-Verifying certificate paths is important in X.509 authentication. For
+Verifying certificate paths is important in @acronym{X.509} authentication. For
 this purpose the function @code{gnutls_x509_crt_verify} is
 provided. The output of this function is the bitwise OR of the
 elements of the @code{gnutls_certificate_status} enumeration.  A
@@ -1237,17 +1243,17 @@ for its data to be accessed.
 An example of a PKCS #12 structure generation can be found at section
 @ref{ex:pkcs12}.
 
-@section The OpenPGP trust model
+@section The @acronym{OpenPGP} trust model
 @anchor{The OpenPGP trust model}
-@cindex OpenPGP Keys
+@cindex @acronym{OpenPGP} Keys
 
-The OpenPGP key authentication relies on a distributed trust model,
-called the ``web of trust''. The ``web of trust'' uses a decentralized
-system of trusted introducers, which are the same as a CA. OpenPGP
-allows anyone to sign anyone's else public key. When Alice signs Bob's
-key, she is introducing Bob's key to anyone who trusts Alice. If
-someone trusts Alice to introduce keys, then Alice is a trusted
-introducer in the mind of that observer.
+The @acronym{OpenPGP} key authentication relies on a distributed trust
+model, called the ``web of trust''. The ``web of trust'' uses a
+decentralized system of trusted introducers, which are the same as a
+CA. @acronym{OpenPGP} allows anyone to sign anyone's else public
+key. When Alice signs Bob's key, she is introducing Bob's key to
+anyone who trusts Alice. If someone trusts Alice to introduce keys,
+then Alice is a trusted introducer in the mind of that observer.
 
 @image{pgp1,11cm,9cm}
 
@@ -1267,34 +1273,35 @@ only Kevin, for some reason. A reason could be that Bob is lazy
 enough, and signs other people's keys without being sure that they
 belong to the actual owner.
 
-@subsection OpenPGP keys
+@subsection @acronym{OpenPGP} keys
 
-In @acronym{GnuTLS} the OpenPGP key structures @cite{RFC2440} are
-handled using the @code{gnutls_openpgp_key_t} type and the
-corresponding private keys with the @code{gnutls_openpgp_privkey_t}
-type. All the prototypes for the key handling functions can be found
-at @file{gnutls/openpgp.h}.
+In @acronym{GnuTLS} the @acronym{OpenPGP} key structures
+@cite{RFC2440} are handled using the @code{gnutls_openpgp_key_t} type
+and the corresponding private keys with the
+@code{gnutls_openpgp_privkey_t} type. All the prototypes for the key
+handling functions can be found at @file{gnutls/openpgp.h}.
 
-@subsection Verifying an OpenPGP key
+@subsection Verifying an @acronym{OpenPGP} key
 
-The verification functions of OpenPGP keys, included in
+The verification functions of @acronym{OpenPGP} keys, included in
 @acronym{GnuTLS}, are simple ones, and do not use the features of the
 ``web of trust''.  For that reason, if the verification needs are
-complex, the assistance of external tools like GnuPG and GPGME
-(@url{http://www.gnupg.org/related_software/gpgme/}) is recommended.
+complex, the assistance of external tools like @acronym{GnuPG} and
+GPGME (@url{http://www.gnupg.org/related_software/gpgme/}) is
+recommended.
 
 There are two verification functions in @acronym{GnuTLS}, The
 @code{gnutls_openpgp_key_verify_ring} and the
 @code{gnutls_openpgp_key_verify_trustdb}.  The first one checks an
-OpenPGP key against a given set of public keys (keyring) and returns
-the key status. The key verification status is the same as in X.509
-certificates, although the meaning and interpretation are
-different. For example an OpenPGP key may be valid, if the self
-signature is ok, even if no signers were found.  The meaning of
+@acronym{OpenPGP} key against a given set of public keys (keyring) and
+returns the key status. The key verification status is the same as in
+@acronym{X.509} certificates, although the meaning and interpretation are
+different. For example an @acronym{OpenPGP} key may be valid, if the
+self signature is ok, even if no signers were found.  The meaning of
 verification status is shown in the figure below.  The latter function
-checks a GnuPG trust database for the given key. This function does
-not check the key signatures, only checks for disabled and revoked
-keys.
+checks a @acronym{GnuPG} trust database for the given key. This
+function does not check the key signatures, only checks for disabled
+and revoked keys.
 
 @itemize
 
@@ -1329,7 +1336,7 @@ for the secured ones. This has the benefit that if a user requests a
 secure session then the client will try to connect to the secure port
 and fail otherwise. The only possible attack with this method is a
 denial of service one. The most famous example of this method is the
-famous ``HTTP over TLS'' or HTTPS protocol @cite{RFC2818}.
+famous ``HTTP over TLS'' or @acronym{HTTPS} protocol @cite{RFC2818}.
 
 Despite its wide use, this method is not as good as it seems.  This
 approach starts the @acronym{TLS} Handshake procedure just after the
@@ -1579,10 +1586,10 @@ This section contains examples of @acronym{TLS} and @acronym{SSL}
 clients, using @acronym{GnuTLS}.  Note that these examples contain
 little or no error checking.
 
-@subsection Simple client example with X.509 certificate support
+@subsection Simple client example with @acronym{X.509} certificate support
 
 Let's assume now that we want to create a TCP client which
-communicates with servers that use X.509 or OpenPGP certificate
+communicates with servers that use @acronym{X.509} or @acronym{OpenPGP} certificate
 authentication. The following client is a very simple @acronym{TLS}
 client, it does not support session resuming, not even certificate
 verification. The TCP functions defined in this example are used in
@@ -1648,14 +1655,14 @@ certificate, and in that case it has to be verified.
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 servers, using @acronym{GnuTLS}.
 
-@subsection Echo Server with X.509 authentication
+@subsection Echo Server with @acronym{X.509} authentication
 
 This example is a very simple echo server which supports
 @acronym{X.509} authentication, using the RSA ciphersuites.
 
 @verbatiminclude examples/ex-serv1.c
 
-@subsection Echo Server with X.509 authentication II
+@subsection Echo Server with @acronym{X.509} authentication II
 
 The following example is a server which supports @acronym{X.509}
 authentication.  This server supports the export-grade cipher suites,
@@ -1663,13 +1670,13 @@ the DHE ciphersuites and session resuming.
 
 @verbatiminclude examples/ex-serv-export.c
 
-@subsection Echo Server with OpenPGPauthentication
-@cindex OpenPGP Server
+@subsection Echo Server with @acronym{OpenPGP}authentication
+@cindex @acronym{OpenPGP} Server
 
 The following example is an echo server which supports
-@acronym{OpenPGP} key authentication. You can easily combine this
-functionality --that is have a server that supports both X.509 and
-OpenPGP certificates-- but we separated them to keep these examples as
+@acronym{@acronym{OpenPGP}} key authentication. You can easily combine this
+functionality --that is have a server that supports both @acronym{X.509} and
+@acronym{OpenPGP} certificates-- but we separated them to keep these examples as
 simple as possible.
 
 @verbatiminclude examples/ex-serv-pgp.c
@@ -1691,10 +1698,10 @@ current session.
 
 @verbatiminclude examples/ex-alert.c
 
-@subsection X.509 certificate parsing example
+@subsection @acronym{X.509} certificate parsing example
 @anchor{ex:x509-info}
 
-To demonstrate the X.509 parsing capabilities an example program is
+To demonstrate the @acronym{X.509} parsing capabilities an example program is
 listed below.  That program reads the peer's certificate, and prints
 information about it.
 
@@ -1945,7 +1952,7 @@ Usage: gnutls-serv [options]
 @anchor{Invoking certtool}
 @cindex certtool
 
-This is a program to generate X.509 certificates, certificate
+This is a program to generate @acronym{X.509} certificates, certificate
 requests, CRLs and private keys. The program can be used interactively
 or non interactively by specifying the @code{--template} command line
 option. See @file{doc/certtool.cfg}, in the distribution, for an
@@ -2131,11 +2138,11 @@ The prototypes for the following functions lie in
 
 @include gnutls-api.texi
 
-@section X.509 certificate functions
+@section @acronym{X.509} certificate functions
 @anchor{sec:x509api}
-@cindex X.509 Functions
+@cindex @acronym{X.509} Functions
 
-The following functions are to be used for X.509 certificate handling.
+The following functions are to be used for @acronym{X.509} certificate handling.
 Their prototypes lie in @file{gnutls/x509.h}.
 
 @include x509-api.texi
@@ -2149,11 +2156,11 @@ called @code{gnutls-extra}. The prototypes for this library lie in
 
 @include gnutls-extra-api.texi
 
-@section OpenPGP functions
-@cindex OpenPGP functions
+@section @acronym{OpenPGP} functions
+@cindex @acronym{OpenPGP} functions
 @anchor{sec:openpgpapi}
 
-The following functions are to be used for OpenPGP certificate
+The following functions are to be used for @acronym{OpenPGP} certificate
 handling.  Their prototypes lie in @file{gnutls/openpgp.h}.
 
 @include pgp-api.texi
@@ -2172,7 +2179,7 @@ functions:
 
 @end itemize
 
-@section An X.509 certificate
+@section An @acronym{X.509} certificate
 
 @smallexample
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2374,7 +2381,7 @@ functions:
 </gnutls:x509:certificate>
 @end smallexample
 
-@section An OpenPGP key
+@section An @acronym{OpenPGP} key
 
 @smallexample
 <?xml version="1.0"?>
