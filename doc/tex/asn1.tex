@@ -1,9 +1,47 @@
+\documentclass{book}
+\usepackage{html}
+\usepackage{fancyheadings}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.4mm}}
+
+\begin{document}
+
+{\Large{ASN.1 structures parser}}
+\vspace{-.3cm}
+\\
+\HRule
+\vspace{-.6cm}
+\\
+\begin{flushright}
+This is part of the GnuTLS project\\
+\end{flushright}
+
+\vspace*{\stretch{2}}
+
+\begin{center}
+\par
+Copyright \copyright\ 2001, 2002 Fabio Fiorina\\
+\setlength{\parskip}{4mm}
+\par
+Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU Free Documentation License,
+Version 1.1 or any later version published by the Free Software
+Foundation; with no Invariant Sections, no Front-Cover Texts and
+no Back-Cover Texts.  A copy of the license is included in the
+chapter entitled "GNU Free Documentation License".
+\end{center}
+
+\setlength{\parindent}{2mm}
+
+\setlength{\parskip}{1mm}
+
+\tableofcontents
+
 \chapter{ASN.1 structures handling}
 
 \section{Introduction}
  This file describes the forth version of ASN.1 parser I
-developed\footnote{ASN.1 Structure handling in \gnutls{} is developed by Fabio
-Fiorina}.
+developed.
 The main difference from the first version is the use of pointers and the
 possibility to save/get ASN1 definitions in/from a C vector.
 Other differences are:
@@ -109,4 +147,9 @@ The name "?LAST" indicates the last element of a SET\_OF or SEQUENCE\_OF.
 
 \end{enumerate}
 
+\chapter{Function reference}
+\input{asn1-api}
 
+\input{fdl.tex}
+
+\end{document}
