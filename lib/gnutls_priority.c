@@ -129,6 +129,11 @@ int num=0, i;
   * Note that the priority is set on the client. The server does
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
+  *
+  * TLS 1.0 does not define any compression algorithms except
+  * NULL. Other compression algorithms are to be considered
+  * as gnutls extensions.
+  *
   **/
 int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
 GNUTLS_LIST _list = list;
