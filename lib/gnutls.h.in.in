@@ -79,6 +79,9 @@ typedef enum GNUTLS_CertificateType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP
 typedef enum GNUTLS_X509_CertificateFmt { GNUTLS_X509_FMT_DER, 
 	GNUTLS_X509_FMT_PEM } GNUTLS_X509_CertificateFmt;
 
+typedef enum GNUTLS_PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA
+} GNUTLS_PKAlgorithm;
+
 /* If you want to change this, then also change the 
  * define in gnutls_int.h, and recompile.
  */

@@ -1018,7 +1018,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	/* tmp now contains the decoded certificate list */
 	tmp.data = (void*)input_cert;
 	tmp.size = input_cert_size;
-
+#warning FIX THIS. Make it read the certificate the reverse order
 	j = 0;
 	do {
 		pcert_size = sizeof(pcert);
@@ -1697,6 +1697,8 @@ static int _read_dsa_pubkey(opaque * der, int dersize, MPI * params)
 
 }
 
+#define PKIX1_RSA_OID "1 2 840 113549 1 1 1"
+#define DSA_OID "1 2 840 10040 4 1"
 
 /* Extracts DSA and RSA parameters from a certificate.
  */
@@ -1704,23 +1706,23 @@ static
 int _gnutls_extract_x509_cert_mpi_params( const char* ALGO_OID, gnutls_cert * gCert,
 	node_asn* c2, char* tmpstr, int tmpstr_size) {
 int len, result;
+
+	len = tmpstr_size - 1;
+	result =
+	    asn1_read_value
+	    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+	     tmpstr, &len);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
 	
-	if (strcmp( ALGO_OID, "1 2 840 113549 1 1 1") == 0) {	/* pkix-1 1 - RSA */
+	if (strcmp( ALGO_OID, PKIX1_RSA_OID) == 0) {	/* pkix-1 1 - RSA */
 		/* params[0] is the modulus,
 		 * params[1] is the exponent
 		 */
 		gCert->subject_pk_algorithm = GNUTLS_PK_RSA;
-
-		len = tmpstr_size - 1;
-		result =
-		    asn1_read_value
-		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-		     tmpstr, &len);
-
-		if (result != ASN_OK) {
-			gnutls_assert();
-			return result;
-		}
 
 		if ((sizeof(gCert->params) / sizeof(MPI)) < RSA_PARAMS) {
 			gnutls_assert();
@@ -1738,24 +1740,13 @@ int len, result;
 		return 0;
 	}
 
-	if (strcmp( ALGO_OID, "1 2 840 10040 4 1") == 0) {	/* pkix-1 1 - DSA */
+	if (strcmp( ALGO_OID, DSA_OID) == 0) {
 		/* params[0] is p,
 		 * params[1] is q,
 		 * params[2] is q,
 		 * params[3] is pub.
 		 */
 		gCert->subject_pk_algorithm = GNUTLS_PK_DSA;
-
-		len = tmpstr_size - 1;
-		result =
-		    asn1_read_value
-		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-		     tmpstr, &len);
-
-		if (result != ASN_OK) {
-			gnutls_assert();
-			return result;
-		}
 
 		if ((sizeof(gCert->params) / sizeof(MPI)) < DSA_PUBLIC_PARAMS) {
 			gnutls_assert();
@@ -1793,7 +1784,6 @@ int len, result;
 	}
 
 
-
 	/* other types like DH
 	 * currently not supported
 	 */
@@ -1820,6 +1810,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	int result;
 	node_asn *c2;
 	opaque str[MAX_X509_CERT_SIZE];
+	char oid[128];
 	int len = sizeof(str);
 
 	memset(gCert, 0, sizeof(gnutls_cert));
@@ -1853,12 +1844,12 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 		return result;
 	}
 
-	len = sizeof(str) - 1;
+	len = sizeof(oid) - 1;
 	result =
 	    asn1_read_value
 	    (c2,
 	     "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
-	     str, &len);
+	     oid, &len);
 
 	if (result != ASN_OK) {
 		gnutls_assert();
@@ -1867,7 +1858,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 		return result;
 	}
 
-	if ( (result=_gnutls_extract_x509_cert_mpi_params( str, gCert, c2, str, sizeof(str))) < 0) {
+	if ( (result=_gnutls_extract_x509_cert_mpi_params( oid, gCert, c2, str, sizeof(str))) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		gnutls_free_datum( &gCert->raw);
@@ -2240,3 +2231,150 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 
 	return 0;
 }
+
+
+/**
+  * gnutls_x509_extract_certificate_pk_algorithm - This function returns the certificate's PublicKey algorithm
+  * @cert: is a DER encoded X.509 certificate
+  * @bits: if bits is non-null it will have enough space to hold the
+  * parameters size in bits.
+  *
+  * This function will return the public key algorithm of an X.509 
+  * certificate.
+  *
+  * If bits is non null, it should have enough size to hold the parameters
+  * size in bits. For RSA the bits returned is the modulus and the public
+  * exponent (in this order). For DSA the bits returned are of p, q, g,
+  * and the public exponent in this order.
+  *
+  * Returns a member of the GNUTLS_PKAlgorithm enumeration on success,
+  * or a negative value on error.
+  *
+  **/
+int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int* bits)
+{
+	int result;
+	node_asn *c2;
+	opaque str[MAX_X509_CERT_SIZE];
+	int algo;
+	int len = sizeof(str);
+	MPI params[MAX_PARAMS_SIZE];
+
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
+	     "certificate2"))
+	    != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_get_der(c2, cert->data, cert->size);
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+
+		_gnutls_log("CERT: Decoding error %d\n", result);
+
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+
+	len = sizeof(str) - 1;
+	result =
+	    asn1_read_value
+	    (c2,
+	     "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+	     str, &len);
+
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return result;
+	}
+
+	algo = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+
+	if ( strcmp( str, PKIX1_RSA_OID)==0)
+		algo = GNUTLS_PK_RSA;
+
+	if ( strcmp( str, DSA_OID)==0)
+		algo = GNUTLS_PK_DSA;
+
+	if ( bits==NULL) {
+		asn1_delete_structure(c2);
+		return algo;
+	}
+
+	/* Now read the parameters' bits */
+
+	len = sizeof(str) - 1;
+	result =
+	    asn1_read_value
+	    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
+	     str, &len);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+
+	if (algo==GNUTLS_PK_RSA) {
+		if ((result=_read_rsa_params( str, len/8, params)) < 0) {
+			gnutls_assert();
+			asn1_delete_structure(c2);
+			return result;
+		}
+
+		bits[0] = gcry_mpi_get_nbits( params[0]);
+		bits[1] = gcry_mpi_get_nbits( params[1]);
+	
+		_gnutls_mpi_release( &params[0]);
+		_gnutls_mpi_release( &params[1]);
+	}
+
+	if (algo==GNUTLS_PK_DSA) {
+
+		if ((result =
+		     _read_dsa_pubkey(str, len / 8, params)) < 0) {
+			gnutls_assert();
+			asn1_delete_structure(c2);
+			return result;
+		}
+
+		/* Now read the parameters
+		 */
+		len = sizeof(str) - 1;
+		result =
+		    asn1_read_value
+		    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters",
+		     str, &len);
+
+		if (result != ASN_OK) {
+			gnutls_assert();
+			asn1_delete_structure(c2);
+			return result;
+		}
+
+		if ((result=_read_dsa_params( str, len, params)) < 0) {
+			gnutls_assert();
+			asn1_delete_structure(c2);
+			return result;
+		}
+
+		bits[0] = gcry_mpi_get_nbits( params[0]);
+		bits[1] = gcry_mpi_get_nbits( params[1]);
+		bits[2] = gcry_mpi_get_nbits( params[2]);
+		bits[3] = gcry_mpi_get_nbits( params[3]);
+
+		_gnutls_mpi_release( &params[0]);
+		_gnutls_mpi_release( &params[1]);
+		_gnutls_mpi_release( &params[2]);
+		_gnutls_mpi_release( &params[3]);
+	}
+
+	asn1_delete_structure(c2);
+	return algo;
+}
+

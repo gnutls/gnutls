@@ -5,6 +5,8 @@ in order to avoid having people working on the same thing.
 Current list:
 + Audit the code
 * Precalculate signatures for DHE cipher suites
+* Precalculate the cipher suites to use (should increase the handshake 
+  speed about 8%)
 * Minimize footprint.
 * Improve support for compression
 - Add Kerberos support
