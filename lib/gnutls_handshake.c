@@ -95,8 +95,7 @@ static void resume_copy_required_values(GNUTLS_STATE state)
 	state->security_parameters.entity =
 	    state->gnutls_internals.resumed_security_parameters.entity;
 
-	state->security_parameters.version =
-	    state->gnutls_internals.resumed_security_parameters.version;
+	_gnutls_set_current_version( state, state->gnutls_internals.resumed_security_parameters.version);
 
 	state->security_parameters.cert_type =
 	    state->gnutls_internals.resumed_security_parameters.cert_type;
@@ -407,7 +406,7 @@ int _gnutls_send_finished(GNUTLS_STATE state, int again)
 			return ret;
 		}
 
-		if (state->security_parameters.version == GNUTLS_SSL3) {
+		if (gnutls_protocol_get_version( state) == GNUTLS_SSL3) {
 			ret =
 			    _gnutls_ssl3_finished(state,
 						  state->
@@ -457,7 +456,7 @@ int _gnutls_recv_finished(GNUTLS_STATE state)
 	}
 
 
-	if (state->security_parameters.version == GNUTLS_SSL3) {
+	if ( gnutls_protocol_get_version( state) == GNUTLS_SSL3) {
 		data_size = 36;
 	} else {
 		data_size = 12;
@@ -468,7 +467,7 @@ int _gnutls_recv_finished(GNUTLS_STATE state)
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
 
-	if (state->security_parameters.version == GNUTLS_SSL3) {
+	if (gnutls_protocol_get_version( state) == GNUTLS_SSL3) {
 		ret =
 		    _gnutls_ssl3_finished(state,
 					  (state->security_parameters.

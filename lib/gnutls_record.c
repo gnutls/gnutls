@@ -46,9 +46,7 @@
   *
   **/
 GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state) {
-GNUTLS_Version ver;
-	ver = state->security_parameters.version;
-	return ver;
+	return state->security_parameters.version;
 }
 
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
