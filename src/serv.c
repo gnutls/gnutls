@@ -51,7 +51,7 @@
  * pieces.
  */
 /* global stuff */
-static char http_buffer[16*1024];
+static char http_buffer[16 * 1024];
 static int generate = 0;
 static int http = 0;
 static int port = 0;
@@ -84,39 +84,54 @@ GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
 GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
 GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
 
-static int prime_nums[] = { 768, 1024, 2048, 0 };
 
-static int generate_dh_primes(void) {
-gnutls_datum prime, generator;
-int i=0;
+#define DEFAULT_PRIME_BITS 1024
 
-   do {
-   /* Generate Diffie Hellman parameters - for use with DHE
-    * kx algorithms. These should be discarded and regenerated
-    * once a day, once a week or once a month. Depends on the
-    * security requirements.
-    */
-   printf("Generating Diffie Hellman parameters [%d]. Please wait...", prime_nums[i]);
-   fflush(stdout);
-   if (gnutls_dh_generate_params( &prime, &generator, prime_nums[i]) < 0) {
-   	fprintf(stderr, "Error in prime generation\n");
-   	exit(1);
-   }
-   if (gnutls_dh_replace_params( prime, generator, prime_nums[i++]) < 0) {
-   	fprintf(stderr, "Error in prime replacement\n");
-   	exit(1);
-   }
-   free( prime.data);
-   free( generator.data);
-   
-   } while( prime_nums[i]!=0);
+/* we use primes up to 1024 in this server.
+ * otherwise we should add them here.
+ */
+static int prime_nums[] = { 768, 1024, 0 };
 
-   return 0;
+static int generate_dh_primes(void)
+{
+	gnutls_datum prime, generator;
+	int i = 0;
+
+	do {
+		/* Generate Diffie Hellman parameters - for use with DHE
+		 * kx algorithms. These should be discarded and regenerated
+		 * once a day, once a week or once a month. Depends on the
+		 * security requirements.
+		 */
+		printf
+		    ("Generating Diffie Hellman parameters [%d]. Please wait...",
+		     prime_nums[i]);
+		fflush(stdout);
+		if (gnutls_dh_generate_params
+		    (&prime, &generator, prime_nums[i]) < 0) {
+			fprintf(stderr, "Error in prime generation\n");
+			exit(1);
+		}
+		if (gnutls_dh_replace_params
+		    (prime, generator, prime_nums[i]) < 0) {
+			fprintf(stderr, "Error in prime replacement\n");
+			exit(1);
+		}
+		free(prime.data);
+		free(generator.data);
+
+	} while (prime_nums[++i] != 0);
+
+	return 0;
 }
 
 int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-int kx_priority[16] = { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
-int cipher_priority[16] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
+int kx_priority[16] =
+    { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
+GNUTLS_KX_ANON_DH, 0 };
+int cipher_priority[16] =
+    { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
+GNUTLS_CIPHER_ARCFOUR, 0 };
 int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
@@ -128,7 +143,9 @@ GNUTLS_STATE initialize_state(void)
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
-		fprintf(stderr, "*** DB error (%d). Resuming will not be possible.\n\n", ret);
+		fprintf(stderr,
+			"*** DB error (%d). Resuming will not be possible.\n\n",
+			ret);
 
 	/* null cipher is here only for debuging 
 	 * purposes.
@@ -136,19 +153,19 @@ GNUTLS_STATE initialize_state(void)
 	gnutls_cipher_set_priority(state, cipher_priority);
 	gnutls_compression_set_priority(state, comp_priority);
 	gnutls_kx_set_priority(state, kx_priority);
-	gnutls_protocol_set_priority( state, protocol_priority);
+	gnutls_protocol_set_priority(state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 	gnutls_cert_type_set_priority(state, cert_type_priority);
-	
-	gnutls_dh_set_prime_bits( state, 768);
-	
+
+	gnutls_dh_set_prime_bits(state, DEFAULT_PRIME_BITS);
+
 	gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
 	gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
 	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
 	gnutls_mac_set_priority(state, mac_priority);
 
-	gnutls_certificate_server_set_request( state, GNUTLS_CERT_REQUEST);
+	gnutls_certificate_server_set_request(state, GNUTLS_CERT_REQUEST);
 
 	return state;
 }
@@ -156,65 +173,67 @@ GNUTLS_STATE initialize_state(void)
 /* Creates html with the current state information.
  */
 #define tmp2 &http_buffer[strlen(http_buffer)]
-void peer_print_info( GNUTLS_STATE state)
+void peer_print_info(GNUTLS_STATE state)
 {
 	const char *tmp;
 	unsigned char sesid[32];
 	int sesid_size, i;
-	
+
 	/* print session_id */
-	gnutls_session_get_id( state, sesid, &sesid_size);
+	gnutls_session_get_id(state, sesid, &sesid_size);
 	sprintf(tmp2, "\n<p>Session ID: <i>");
-	for(i=0;i<sesid_size;i++)
+	for (i = 0; i < sesid_size; i++)
 		sprintf(tmp2, "%.2X", sesid[i]);
 	sprintf(tmp2, "</i></p>\n");
 
 	/* Here unlike print_info() we use the kx algorithm to distinguish
 	 * the functions to call.
-	 */ 
+	 */
 
 	/* print srp specific data */
 	if (gnutls_kx_get(state) == GNUTLS_KX_SRP) {
 		sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
-		       gnutls_srp_server_get_username( state));
+			gnutls_srp_server_get_username(state));
 	}
 
 	if (gnutls_kx_get(state) == GNUTLS_KX_ANON_DH) {
-		sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
-		       gnutls_dh_get_prime_bits( state));
+		sprintf(tmp2,
+			"<p> Connect using anonymous DH (prime of %d bits)</p>\n",
+			gnutls_dh_get_prime_bits(state));
 	}
 
 	/* print state information */
-	strcat( http_buffer, "<P>\n");
+	strcat(http_buffer, "<P>\n");
 
 	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
 	sprintf(tmp2, "Protocol version: <b>%s</b><br>\n", tmp);
 
-	if ( gnutls_auth_get_type( state) == GNUTLS_CRD_CERTIFICATE) {
-		tmp = gnutls_cert_type_get_name( gnutls_cert_type_get(state));
+	if (gnutls_auth_get_type(state) == GNUTLS_CRD_CERTIFICATE) {
+		tmp =
+		    gnutls_cert_type_get_name(gnutls_cert_type_get(state));
 		sprintf(tmp2, "Certificate Type: <b>%s</b><br>\n", tmp);
 	}
-	
+
 	tmp = gnutls_kx_get_name(gnutls_kx_get(state));
 	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
 
-	if (gnutls_kx_get(state) == GNUTLS_KX_DHE_RSA || gnutls_kx_get(state) == GNUTLS_KX_DHE_DSS) {
-		sprintf(tmp2, "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
-			        gnutls_dh_get_prime_bits( state));
+	if (gnutls_kx_get(state) == GNUTLS_KX_DHE_RSA
+	    || gnutls_kx_get(state) == GNUTLS_KX_DHE_DSS) {
+		sprintf(tmp2,
+			"Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
+			gnutls_dh_get_prime_bits(state));
 	}
-			
-	tmp =
-	    gnutls_compression_get_name
-	    (gnutls_compression_get(state));
+
+	tmp = gnutls_compression_get_name(gnutls_compression_get(state));
 	sprintf(tmp2, "Compression: <b>%s</b><br>\n", tmp);
-	
+
 	tmp = gnutls_cipher_get_name(gnutls_cipher_get(state));
 	sprintf(tmp2, "Cipher: <b>%s</b><br>\n", tmp);
-	
+
 	tmp = gnutls_mac_get_name(gnutls_mac_get(state));
 	sprintf(tmp2, "MAC: <b>%s</b><br>\n", tmp);
 
-	strcat( http_buffer, "</P>\n");
+	strcat(http_buffer, "</P>\n");
 
 	return;
 }
@@ -222,22 +241,24 @@ void peer_print_info( GNUTLS_STATE state)
 /* actually something like readline.
  * if rnl!=1 then reads an http request in the form REQ\n\n
  */
-int read_request( GNUTLS_STATE state, char *data, int data_size, int rnl)
+int read_request(GNUTLS_STATE state, char *data, int data_size, int rnl)
 {
 	int n, rc, nl = 0;
-	char c, *ptr, p1=0, p2=0;
+	char c, *ptr, p1 = 0, p2 = 0;
 
 	ptr = data;
 	for (n = 1; n < data_size; n++) {
 		do {
-			rc = gnutls_read( state, &c, 1);
-		} while( rc==GNUTLS_E_INTERRUPTED || rc==GNUTLS_E_AGAIN);
+			rc = gnutls_read(state, &c, 1);
+		} while (rc == GNUTLS_E_INTERRUPTED
+			 || rc == GNUTLS_E_AGAIN);
 
-		if ( rc == 1) {
+		if (rc == 1) {
 			*ptr++ = c;
-			if (c == '\n' && rnl==1) break;
+			if (c == '\n' && rnl == 1)
+				break;
 
-			if (c=='\n' && p1=='\r' && p2=='\n') {
+			if (c == '\n' && p1 == '\r' && p2 == '\n') {
 				nl++;
 				if (nl == 1)
 					break;
@@ -259,14 +280,17 @@ int read_request( GNUTLS_STATE state, char *data, int data_size, int rnl)
 	return n;
 }
 
-void check_alert( GNUTLS_STATE state, int ret) {
-int last_alert;
+void check_alert(GNUTLS_STATE state, int ret)
+{
+	int last_alert;
 
-	if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
+	if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
+	    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 		last_alert = gnutls_alert_get_last(state);
 		if (last_alert == GNUTLS_A_NO_RENEGOTIATION &&
-			ret == GNUTLS_E_WARNING_ALERT_RECEIVED)
-			printf("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
+		    ret == GNUTLS_E_WARNING_ALERT_RECEIVED)
+			printf
+			    ("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
 		else
 			printf("* Received alert '%d'.\n", ret);
 	}
@@ -290,13 +314,13 @@ int main(int argc, char **argv)
 	signal(SIGPIPE, SIG_IGN);
 
 	gaa_parser(argc, argv);
-	
-	if (http==1) {
+
+	if (http == 1) {
 		strcpy(name, "HTTP Server");
 	} else {
 		strcpy(name, "Echo Server");
 	}
-	
+
 	if (gnutls_global_init() < 0) {
 		fprintf(stderr, "global state initialization error\n");
 		exit(1);
@@ -306,40 +330,50 @@ int main(int argc, char **argv)
 	 * Diffie Hellman. See gnutls_dh_generate_params(), and
 	 * gnutls_dh_replace_params().
 	 */
-	if (generate!=0) generate_dh_primes();
+	if (generate != 0)
+		generate_dh_primes();
 
 	if (gnutls_certificate_allocate_server_sc(&cert_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_x509_trust_file( cert_cred, CAFILE, CRLFILE) < 0) {
-		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
+	if (gnutls_certificate_set_x509_trust_file
+	    (cert_cred, CAFILE, CRLFILE) < 0) {
+		fprintf(stderr,
+			"X509 PARSE ERROR\nDid you have ca.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_openpgp_key_file( cert_cred, PGP_CERTFILE, PGP_KEYFILE) < 0) {
-		fprintf(stderr, "PGP PARSE ERROR\nDid you have key.pem and cert.pem?\n");
+	if (gnutls_certificate_set_openpgp_key_file
+	    (cert_cred, PGP_CERTFILE, PGP_KEYFILE) < 0) {
+		fprintf(stderr,
+			"PGP PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_x509_key_file( cert_cred, CERTFILE1, KEYFILE1) < 0) {
-		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
+	if (gnutls_certificate_set_x509_key_file
+	    (cert_cred, CERTFILE1, KEYFILE1) < 0) {
+		fprintf(stderr,
+			"X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_certificate_set_x509_key_file( cert_cred, CERTFILE2, KEYFILE2) < 0) {
-		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
+	if (gnutls_certificate_set_x509_key_file
+	    (cert_cred, CERTFILE2, KEYFILE2) < 0) {
+		fprintf(stderr,
+			"X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
 	/* this is a password file (created with the included srpcrypt utility) 
 	 * Read README.crypt prior to using SRP.
 	 */
-	gnutls_srp_allocate_server_sc( &srp_cred);
-	gnutls_srp_set_server_cred_file( srp_cred, SRP_PASSWD, SRP_PASSWD_CONF);
+	gnutls_srp_allocate_server_sc(&srp_cred);
+	gnutls_srp_set_server_cred_file(srp_cred, SRP_PASSWD,
+					SRP_PASSWD_CONF);
 
-	gnutls_anon_allocate_server_sc( &dh_cred);
+	gnutls_anon_allocate_server_sc(&dh_cred);
 
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
@@ -359,7 +393,7 @@ int main(int argc, char **argv)
 	printf("%s ready. Listening to port '%d'.\n\n", name, port);
 
 	client_len = sizeof(sa_cli);
-	
+
 	for (;;) {
 		state = initialize_state();
 
@@ -370,17 +404,19 @@ int main(int argc, char **argv)
 				 sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
 
-		gnutls_transport_set_ptr( state, sd);
+		gnutls_transport_set_ptr(state, sd);
 		do {
-			ret = gnutls_handshake( state);
-		} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+			ret = gnutls_handshake(state);
+		} while (ret == GNUTLS_E_INTERRUPTED
+			 || ret == GNUTLS_E_AGAIN);
 
 		if (ret < 0) {
 			close(sd);
 			gnutls_deinit(state);
-			fprintf(stderr, "*** Handshake has failed (%s)\n\n",
+			fprintf(stderr,
+				"*** Handshake has failed (%s)\n\n",
 				gnutls_strerror(ret));
-			check_alert( state, ret);
+			check_alert(state, ret);
 			continue;
 		}
 		printf("- Handshake was completed\n");
@@ -390,7 +426,9 @@ int main(int argc, char **argv)
 		i = 0;
 		for (;;) {
 			bzero(buffer, MAX_BUF + 1);
-			ret = read_request( state, buffer, MAX_BUF, (http==0)?1:2);
+			ret =
+			    read_request(state, buffer, MAX_BUF,
+					 (http == 0) ? 1 : 2);
 
 			if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
 				fflush(stdout);
@@ -410,20 +448,37 @@ int main(int argc, char **argv)
 
 			if (ret > 0) {
 				if (http == 0) {
-					printf( "* Read %d bytes from client.\n", strlen(buffer));
+					printf
+					    ("* Read %d bytes from client.\n",
+					     strlen(buffer));
 					do {
-						ret = gnutls_write( state, buffer, strlen(buffer));
-					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
-					printf( "* Wrote %d bytes to client.\n", ret);
+						ret =
+						    gnutls_write(state,
+								 buffer,
+								 strlen
+								 (buffer));
+					} while (ret ==
+						 GNUTLS_E_INTERRUPTED
+						 || ret == GNUTLS_E_AGAIN);
+					printf
+					    ("* Wrote %d bytes to client.\n",
+					     ret);
 				} else {
-					strcpy( http_buffer, HTTP_BEGIN);
-					peer_print_info( state);
-					strcat( http_buffer, HTTP_END);
+					strcpy(http_buffer, HTTP_BEGIN);
+					peer_print_info(state);
+					strcat(http_buffer, HTTP_END);
 					do {
-						ret = gnutls_write( state, http_buffer, strlen(http_buffer));
-					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+						ret =
+						    gnutls_write(state,
+								 http_buffer,
+								 strlen
+								 (http_buffer));
+					} while (ret ==
+						 GNUTLS_E_INTERRUPTED
+						 || ret == GNUTLS_E_AGAIN);
 
-					printf("- Served request. Closing connection.\n");
+					printf
+					    ("- Served request. Closing connection.\n");
 					break;
 				}
 			}
@@ -431,19 +486,21 @@ int main(int argc, char **argv)
 #ifdef RENEGOTIATE
 			if (i == 20) {
 				do {
-					ret = gnutls_rehandshake( state);
-				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+					ret = gnutls_rehandshake(state);
+				} while (ret == GNUTLS_E_INTERRUPTED
+					 || ret == GNUTLS_E_AGAIN);
 
 				printf("* Requesting rehandshake.\n");
 				/* continue handshake proccess */
 				do {
-					ret = gnutls_handshake( state);
-				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+					ret = gnutls_handshake(state);
+				} while (ret == GNUTLS_E_INTERRUPTED
+					 || ret == GNUTLS_E_AGAIN);
 				printf("* Rehandshake returned %d\n", ret);
 			}
 #endif
-			
-			check_alert( state, ret);
+
+			check_alert(state, ret);
 
 			if (http != 0) {
 				break;	/* close the connection */
@@ -451,8 +508,9 @@ int main(int argc, char **argv)
 		}
 		printf("\n");
 		do {
-			ret = gnutls_bye( state, GNUTLS_SHUT_WR); 
-		} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+			ret = gnutls_bye(state, GNUTLS_SHUT_WR);
+		} while (ret == GNUTLS_E_INTERRUPTED
+			 || ret == GNUTLS_E_AGAIN);
 		/* do not wait for
 		 * the peer to close the connection.
 		 */
@@ -467,7 +525,7 @@ int main(int argc, char **argv)
 	gnutls_anon_free_server_sc(dh_cred);
 
 	gnutls_global_deinit();
-	
+
 	return 0;
 
 }
@@ -483,12 +541,16 @@ void gaa_parser(int argc, char **argv)
 		exit(1);
 	}
 
-	if (info.http==0) http=0;
-	else http=1;
+	if (info.http == 0)
+		http = 0;
+	else
+		http = 1;
 
-	if (info.generate==0) generate=0;
-	else generate=1;
-	
+	if (info.generate == 0)
+		generate = 0;
+	else
+		generate = 1;
+
 	port = info.port;
 
 	if (info.proto != NULL && info.nproto > 0) {
@@ -567,4 +629,3 @@ void gaa_parser(int argc, char **argv)
 	}
 
 }
-

@@ -457,7 +457,7 @@ int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bi
 			sprime = &dh_primes[i];
 			break;
 		}
-	} while(dh_primes[i].bits!=0);
+	} while(dh_primes[++i].bits!=0);
 		
 	siz = prime.size;
 	if (_gnutls_mpi_scan(&tmp_prime, prime.data, &siz)) {
