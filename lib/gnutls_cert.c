@@ -245,7 +245,9 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * This function specifies what we, in case of a client, are going
   * to do when we have to send a certificate. If this callback
   * function is not provided then gnutls will automaticaly try to
-  * find an appropriate certificate to send.
+  * find an appropriate certificate to send. The appropriate certificate
+  * is chosen based on the CAs sent by the server, and the requested
+  * public key algorithms.
   *
   * If the callback function is provided then gnutls will call it
   * once with NULL parameters. If the callback function returns
@@ -375,11 +377,11 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
   * @session: is a gnutls session
   *
-  * This function will try to verify the peer's certificate and return it's status (trusted, invalid etc.). 
-  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. 
+  * This function will try to verify the peer's certificate and return it's status (trusted, invalid etc.).
+  * However you must also check the peer's name in order to check if the verified certificate belongs to the
+  * actual peer.
   *
-  * The return value should be one or more of the gnutls_certificate_status 
+  * The return value should be one or more of the gnutls_certificate_status
   * enumerated elements bitwise or'd. This is the same as
   * gnutls_x509_verify_certificate().
   *
@@ -429,7 +431,7 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
 		gnutls_assert();
 		return (time_t) -1;
 	}
-	
+
 	if (info->raw_certificate_list == NULL || info->ncerts == 0) {
 		gnutls_assert();
 		return (time_t) -1;

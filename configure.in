@@ -162,10 +162,11 @@ AC_MSG_RESULT([***
 ])
 
 AC_CHECK_SIZEOF(unsigned long long, 8)
-AC_CHECK_SIZEOF(unsigned long int, 4)
+AC_CHECK_SIZEOF(unsigned long, 4)
 AC_CHECK_SIZEOF(unsigned int, 4)
-AC_CHECK_SIZEOF(unsigned short int, 2)
+AC_CHECK_SIZEOF(unsigned short, 2)
 AC_CHECK_SIZEOF(unsigned char, 1)
+AC_CHECK_SIZEOF(unsigned char*, 4)
 
 AC_CHECK_TYPES(ptrdiff_t,,, [
 # include <sys/types.h>
@@ -186,7 +187,6 @@ AC_SUBST( DEFINE_SIZE_T)
 # include <unistd.h>
 #endif
 ])
-
 
 AC_CHECK_TYPE(time_t,
  DEFINE_TIME_T="#include <time.h>"

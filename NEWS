@@ -3,6 +3,7 @@ Version 0.5.8
 - Added gnutls_record_get_direction() which replaces the obsolete
   gnutls_handshake_get_direction().
 - Added function to convert error codes to alert descriptions
+- Added LZO compression
 
 Version 0.5.7 (11/09/2002)
 - Some fixes in the memory allocation functions (realloc).
