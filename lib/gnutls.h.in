@@ -190,4 +190,14 @@ typedef struct {
 void gnutls_free_x509_sc( X509PKI_SERVER_CREDENTIALS sc);
 int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE, char *KEYFILE);
 
+/* global state functions 
+ */
+/* In this version global_init accepts two files (pkix.asn, pkcs1.asn).
+ * This will not be the case in the final version. These files 
+ * are located in the src/ directory of gnutls distribution.
+ */
+int gnutls_global_init(char* PKIX, char* PKCS1);
+void gnutls_global_deinit();
+
+
 /* error codes appended here */

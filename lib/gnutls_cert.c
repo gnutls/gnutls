@@ -233,7 +233,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	}
 
 	/* allocate size for the parameters (2) */
-	*params = gnutls_malloc(2 * sizeof(MPI));
+	*params = gnutls_calloc(1, 2 * sizeof(MPI));
 
 	if (gcry_mpi_scan(&(*params)[0], GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
@@ -270,30 +270,37 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 
 
 #define _READ( str, OID, NAME, res) \
-	if(!strcmp(str, OID)){ \
+	if(strcmp(str, OID)==0){ \
 	  strcpy( str, "PKIX1Explicit88.X520"); \
 	  strcat( str, NAME); \
-	  if (create_structure( NAME, str) != ASN_OK) \
+	  strcpy( name2, "temp-structure-"); \
+	  strcat( name2, NAME); \
+	  if ( (result = create_structure( name2, str)) != ASN_OK) { \
+	  	gnutls_assert(); \
 	  	return GNUTLS_E_ASN1_ERROR; \
+	  } \
 	  if (read_value(name3,str,&len) != ASN_OK) { \
-	  	delete_structure( NAME); \
-	  	return GNUTLS_E_ASN1_PARSING_ERROR; \
+	  	delete_structure( name2); \
+	  	continue; \
 	  } \
-      	  if (get_der( NAME, str, len) != ASN_OK) { \
-	  	delete_structure( NAME); \
-	  	return GNUTLS_E_ASN1_PARSING_ERROR; \
+      	  if (get_der( name2, str, len) != ASN_OK) { \
+	  	delete_structure( name2); \
+	  	continue; \
 	  } \
-	  strcpy( name3,NAME); \
-	  read_value( name3, str, &len);  /* CHOICE */ \
-	  strcat( name3, "."); \
+	  strcpy( name3,name2); \
+	  if (read_value( name3, str, &len) != ASN_OK) {  /* CHOICE */ \
+	  	delete_structure( name2); \
+	  	continue; \
+	  } \
+  	  strcat( name3, "."); \
 	  strcat( name3, str); \
 	  if (read_value(name3,str,&len) != ASN_OK) { \
-	  	delete_structure( NAME); \
-	  	return GNUTLS_E_ASN1_PARSING_ERROR; \
+	  	delete_structure( name2); \
+	  	continue; \
 	  } \
 	  str[len]=0; \
 	  res = strdup(str); \
-	  delete_structure(NAME); \
+	  delete_structure(name2); \
 	}
 
 /* This function will attempt to read a Name
@@ -311,6 +318,7 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 		strcat(name, ".rdnSequence.?");
 		ltostr(k, counter);
 		strcat(name, counter);
+
 		result = read_value(name, str, &len);
 		if (result == ASN_ELEMENT_NOT_FOUND)
 			break;
@@ -326,16 +334,20 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 			strcpy(name3, name2);
 			strcat(name3, ".type");
 			result = read_value(name3, str, &len);
+
 			if (result != ASN_OK) {
 				gnutls_assert();
 				return GNUTLS_E_ASN1_PARSING_ERROR;
 			}
 			strcpy(name3, name2);
 			strcat(name3, ".value");
+
 			if (result == ASN_OK) {
-				_READ(str, "2 5 4 6", "Country",
-				      gCert->country);
-				_READ(str, "2 5 4 10", "Organization",
+/*				_READ(str, "2 5 4 6", "countryName",
+ *				      gCert->country);
+ * This one fails (with SIGSEGV).
+ */
+				_READ(str, "2 5 4 10", "OrganizationName",
 				      gCert->organization);
 				_READ(str, "2 5 4 11",
 				      "OrganizationalUnitName",
@@ -399,7 +411,6 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		    read_value
 		    ("certificate3.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
 		     str, &len);
-		delete_structure("certificate3");
 
 		if (result != ASN_OK) {
 			gnutls_assert();
@@ -471,7 +482,7 @@ int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
 		}
 	}
 
-	*alg = gnutls_malloc(sizeof(KXAlgorithm) * i);
+	*alg = gnutls_calloc(1, sizeof(KXAlgorithm) * i);
 	if (*alg == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 

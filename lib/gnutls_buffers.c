@@ -25,6 +25,10 @@
  # include <errno.h>
 #endif
 
+extern ssize_t (*recv_func)( SOCKET, void*, size_t, int);
+extern ssize_t (*send_func)( SOCKET,const void*, size_t, int);
+
+
 int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
 	int old_buffer;
@@ -142,7 +146,7 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 
 	left = sizeOfPtr;
 	while (left > 0) {
-		i = recv(fd, &ptr[i], left, flag);
+		i = recv_func(fd, &ptr[i], left, flag);
 		if (i < 0) {
 			return (0-errno);
 		} else {
@@ -176,7 +180,7 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 /* This function is like write. But it does not return -1 on error.
  * It does return -errno instead.
  */
-ssize_t _gnutls_Write(int fd, const void *iptr, size_t n)
+ssize_t _gnutls_Write(int fd, const void *iptr, size_t n, int flags)
 {
 	size_t left;
 #ifdef WRITE_DEBUG
@@ -200,7 +204,7 @@ ssize_t _gnutls_Write(int fd, const void *iptr, size_t n)
 #endif
 	left = n;
 	while (left > 0) {
-		i = write(fd, &ptr[i], left);
+		i = send(fd, &ptr[i], left, flags);
 		if (i == -1) {
 			return (0-errno);
 		}

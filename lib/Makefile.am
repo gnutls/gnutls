@@ -25,6 +25,7 @@ libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	crypt_bcrypt.c crypt.c gnutls_random.c crypt_srpsha1.c gnutls_srp.c \
 	auth_srp.c auth_srp_passwd.c gnutls_v2_compat.c auth_srp_sb64.c \
 	cert_ASN.y cert_asn1.c cert_der.c gnutls_datum.c auth_rsa.c \
-	gnutls_gcry.c ext_dnsname.c gnutls_pk.c gnutls_cert.c
+	gnutls_gcry.c ext_dnsname.c gnutls_pk.c gnutls_cert.c \
+	gnutls_global.c
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

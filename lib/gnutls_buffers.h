@@ -21,8 +21,8 @@
 int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, int length);
 int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state);
 int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, int length);
-ssize_t _gnutls_Read(int fd, void *iptr, size_t n, int flag);
-ssize_t _gnutls_Write(int fd, const void *iptr, size_t n);
+ssize_t _gnutls_Read(int fd, void *iptr, size_t n, int);
+ssize_t _gnutls_Write(int fd, const void *iptr, size_t n, int );
 
 /* used in SSL3 */
 int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length);

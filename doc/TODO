@@ -3,10 +3,7 @@
 * Add Kerberos support (who wants that?)
 * Audit the code (volunteers?)
 * Fix renegotiate
-* Add certificate verification in order for clients to work
-* Optimize X509PKI_SERVER_CREDENTIALS so that there should be
-  only one parse of the der structures.
-* Create global variables that hold read/write and initialize
-  the ASN.1 parser's structures.
 * Create certificate verification function(s)
 * Modify SRP to conform the newest draft
+* make gnutls_allocate_x509_sc() work with certificate lists
+  ( now works with a single certificate)

@@ -10,6 +10,9 @@ real world programs)
 * Run the buildconf script before doing anything. This will create
 the needed configure, makefiles etc. using Automake, Autoconf, and libtool.
 
+* Documentation:
+ view the doc/ directory and the examples in the src/ directory.
+
 BUGS:
 
 There should be plenty, but if you think you found any 

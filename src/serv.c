@@ -29,8 +29,6 @@
 #include <unistd.h>
 #include "../lib/gnutls.h"
 #include <port.h>
-#include <signal.h>
-#include "pk.h"
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -72,10 +70,6 @@ GNUTLS_STATE initialize_state()
 	GNUTLS_STATE state;
 	int ret;
 
-	if (gnutls_allocate_x509_sc(&x509_cred, CERTFILE, KEYFILE) < 0) {
-		fprintf(stderr, "X509 PARSE ERROR\n");
-		exit(1);
-	}
 
 	/* this is a password file (created with the included crypt utility) 
 	 * Read README.crypt prior to using SRP.
@@ -287,7 +281,16 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	PARSE();
+	if (gnutls_global_init("pkix.asn", "pkcs1.asn") < 0) {
+		fprintf(stderr, "global state initialization error\n");
+		exit(1);
+	}
+
+	if (gnutls_allocate_x509_sc(&x509_cred, CERTFILE, KEYFILE) < 0) {
+		fprintf(stderr, "X509 PARSE ERROR\n");
+		exit(1);
+	}
+
 
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
@@ -389,6 +392,11 @@ int main(int argc, char **argv)
 		gnutls_deinit(state);
 	}
 	close(listen_sd);
+
+	gnutls_free_x509_sc(x509_cred);
+
+	gnutls_global_deinit();
+	
 	return 0;
 
 }

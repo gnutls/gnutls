@@ -57,10 +57,6 @@ void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
 	}
 }
 
-int gnutls_is_secure_memory(const void* mem) {
-	return 0;
-}
-
 /**
   * gnutls_set_lowat - Used to set the lowat value in order for select to check for pending data.
   * @state: is a &GNUTLS_STATE structure.
@@ -89,8 +85,6 @@ int gnutls_set_lowat(GNUTLS_STATE state, int num) {
   **/
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
-	/* for gcrypt in order to be able to allocate memory */
-	gcry_set_allocation_handler(gnutls_malloc, secure_malloc, gnutls_is_secure_memory, gnutls_realloc, free);
 
 	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
 	
@@ -122,7 +116,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 #define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
 /**
-  * gnutls_init - This function clears all buffers associated with the &state
+  * gnutls_deinit - This function clears all buffers associated with the &state
   * @state: is a &GNUTLS_STATE structure.
   *
   * This function clears all buffers associated with the &state.
@@ -541,14 +535,14 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
 		
 		WRITEuint16( cipher_size, &headers[3]);
 		
-		if (_gnutls_Write(cd, headers, HEADER_SIZE) != HEADER_SIZE) {
+		if (_gnutls_Write(cd, headers, HEADER_SIZE, flags) != HEADER_SIZE) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
 
-		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {
+		if (_gnutls_Write(cd, cipher, cipher_size, flags) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
@@ -580,7 +574,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
 		memmove( cipher, headers, HEADER_SIZE);
 
 		cipher_size += HEADER_SIZE;
-		if (_gnutls_Write(cd, cipher, cipher_size) != cipher_size) {
+		if (_gnutls_Write(cd, cipher, cipher_size, flags) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
@@ -628,14 +622,14 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 
 	WRITEuint16( 1, &headers[3]);
 	
-	if (_gnutls_Write(cd, headers, 5) != 5) {
+	if (_gnutls_Write(cd, headers, 5, 0) != 5) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNABLE_SEND_DATA;
 	}
 
-	if (_gnutls_Write(cd, &data, 1) != 1) {
+	if (_gnutls_Write(cd, &data, 1, 0) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();

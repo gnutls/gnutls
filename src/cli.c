@@ -28,7 +28,6 @@
 #include <string.h>
 #include <unistd.h>
 #include "../lib/gnutls.h"
-#include <signal.h>
 #include <sys/time.h>
 
 #define SA struct sockaddr
@@ -38,8 +37,6 @@
 #define RESUME
 
 #define MAX(X,Y) (X >= Y ? X : Y);
-
-#include "pk.h"
 
 static int print_info( GNUTLS_STATE state) {
 char *tmp;
@@ -60,17 +57,19 @@ const X509PKI_AUTH_INFO *x509_info;
 		if (x509_info != NULL) {
 			switch( x509_info->peer_certificate_status) {
 			case GNUTLS_NOT_VERIFIED:
-				printf("- Peer's Certificate was NOT verified\n");
+				printf("- Peer's X509 Certificate was NOT verified\n");
 				break;
 			case GNUTLS_EXPIRED:
-				printf("- Peer's Certificate was verified but is expired\n");
-				break;
-			case GNUTLS_INVALID:
-				printf("- Peer's Certificate was invalid\n");
+				printf("- Peer's X509 Certificate was verified but is expired\n");
 				break;
 			case GNUTLS_VERIFIED:
-				printf("- Peer's Certificate was verified\n");
+				printf("- Peer's X509 Certificate was verified\n");
 				break;
+			case GNUTLS_INVALID:
+			default:
+				printf("- Peer's X509 Certificate was invalid\n");
+				break;
+
 			}
 		}
 	}
@@ -115,13 +114,15 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Usage: cli [host] [port]\n");
 		exit(1);
 	}
-	PARSE();
+	
+	if (gnutls_global_init("pkix.asn", "pkcs1.asn") < 0) {
+		fprintf(stderr, "global state initialization error\n");
+		exit(1);
+	}
 		
 	cred.username = "test";
 	cred.password = "test";
 	
-	signal(SIGPIPE, SIG_IGN);
-
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
 
@@ -286,5 +287,8 @@ int main(int argc, char** argv)
 	close(sd);
 	
 	gnutls_deinit( state);
+
+	gnutls_global_deinit();
+	
 	return 0;
 }
