@@ -34,17 +34,8 @@ extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 LOG_FUNC _gnutls_log_func;
 int _gnutls_log_level = 2; /* default log level */
 
-static ASN1_TYPE PKIX1_ASN;
-static ASN1_TYPE GNUTLS_ASN;
-
-ASN1_TYPE _gnutls_get_pkix(void) {
-	return PKIX1_ASN;
-}
-
-ASN1_TYPE _gnutls_get_gnutls_asn(void) {
-	return GNUTLS_ASN;
-}
-
+ASN1_TYPE _gnutls_pkix1_asn;
+ASN1_TYPE _gnutls_gnutls_asn;
 
 /**
   * gnutls_global_set_log_function - This function sets the logging function
@@ -205,14 +196,14 @@ int gnutls_global_init( void)
 	 * version.
 	 */
 	
-	result=asn1_array2tree( pkix_asn1_tab, &PKIX1_ASN, NULL);
+	result=asn1_array2tree( pkix_asn1_tab, &_gnutls_pkix1_asn, NULL);
 	if (result != ASN1_SUCCESS) {
 		return _gnutls_asn2err(result);
 	}
 
-	result=asn1_array2tree( gnutls_asn1_tab, &GNUTLS_ASN, NULL);
+	result=asn1_array2tree( gnutls_asn1_tab, &_gnutls_gnutls_asn, NULL);
 	if (result != ASN1_SUCCESS) {
-		asn1_delete_structure(& PKIX1_ASN);
+		asn1_delete_structure(&_gnutls_pkix1_asn);
 		return _gnutls_asn2err(result);
 	}
 
@@ -232,8 +223,8 @@ void gnutls_global_deinit( void) {
 	_gnutls_init--;
 
 	if (_gnutls_init==0) {
-		asn1_delete_structure(& GNUTLS_ASN);
-		asn1_delete_structure(& PKIX1_ASN);
+		asn1_delete_structure(&_gnutls_gnutls_asn);
+		asn1_delete_structure(&_gnutls_pkix1_asn);
 	}
 	
 }

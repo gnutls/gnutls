@@ -139,6 +139,13 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 
 	gcry_sexp_release(key);
 
+	_gnutls_dump_mpi( "n: ", resarr[0]);
+	_gnutls_dump_mpi( "e: ", resarr[1]);
+	_gnutls_dump_mpi( "d: ", resarr[2]);
+	_gnutls_dump_mpi( "p: ", resarr[3]);
+	_gnutls_dump_mpi( "q: ", resarr[4]);
+	_gnutls_dump_mpi( "u: ", resarr[5]);
+
 	return 0;
 
 }
