@@ -87,7 +87,10 @@ void _gnutls_string_clear( gnutls_string* str)
 {
 	if (str==NULL || str->data == NULL) return;
 	str->free_func( str->data);
-	memset( str, 0, sizeof( gnutls_string));
+
+	str->data = NULL;
+	str->max_length = 0;
+	str->length = 0;
 }
 
 /* This one does not copy the string.
