@@ -470,7 +470,6 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * gnutls_x509_extract_subject_alt_name - This function returns the peer's alt name, if any
   * @cert: should contain an X.509 DER encoded certificate
   * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
-  * @type: Holds the alternative's name type
   * @ret: is the place where dns name will be copied to
   * @ret_size: holds the size of ret.
   *
@@ -481,13 +480,13 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * GNUTLS will return the Alternative name, or a negative
   * error code.
   * Returns GNUTLS_E_MEMORY_ERROR if ret_size is not enough to hold the alternative name,
-  * or the size of alternative name if everything was ok.
+  * or the type of alternative name if everything was ok. The type is one of the
+  * enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
   *
   * If the certificate does not have a Alternative name then returns GNUTLS_E_DATA_NOT_AVAILABLE;
   *
   **/
-int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, GNUTLS_X509_SUBJECT_ALT_NAME* type,
-					    char *ret, int *ret_size)
+int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, char *ret, int *ret_size)
 {
 	int result;
 	gnutls_datum dnsname;
@@ -496,6 +495,7 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, GNU
 	char ext_data[256];
 	int len;
 	char num[MAX_INT_DIGITS];
+	GNUTLS_SUBJECT_ALT_NAME type;
 
 	memset(ret, 0, *ret_size);
 
@@ -544,8 +544,8 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, GNU
 	}
 
 
-	*type = _find_type( ext_data);
-	if (*type == -1) {
+	type = _find_type( ext_data);
+	if (type == -1) {
 		gnutls_assert();
 		return GNUTLS_E_X509_UNKNOWN_SAN;
 	}
@@ -563,7 +563,7 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, GNU
 
 	asn1_delete_structure(c2);
 
-	return *ret_size;
+	return type;
 }
 
 /**

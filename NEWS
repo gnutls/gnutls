@@ -5,6 +5,8 @@ Version ?.?.?
 - Added DHE_DSS cipher suites
 - Added check for the requested TLS extensions
 - Added a minimal string library to assist in ASN.1 parsing
+- Added gnutls_x509_extract_subject_alt_name(), which deprecates 
+  gnutls_x509_extract_subject_dns_name()
 - gnutls_x509pki_set_trust_(file/mem) can now be called multiple times
 - Key exchange methods changed so they do not depend on the Certificate
   type (GNUTLS_KX_X509PKI_* renamed to GNUTLS_KX_*)

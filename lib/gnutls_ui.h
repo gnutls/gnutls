@@ -81,8 +81,7 @@ int gnutls_x509_extract_certificate_version( const gnutls_datum*);
 int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
 time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
 time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
-int gnutls_x509_extract_subject_alt_name( const gnutls_datum*, int seq, GNUTLS_X509_SUBJECT_ALT_NAME* type,
-	char*, int*);
+int gnutls_x509_extract_subject_alt_name( const gnutls_datum*, int seq, char*, int*);
 
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length);
 
