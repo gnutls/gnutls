@@ -161,6 +161,9 @@ int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt_t cert, int indx,
 int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt_t cert, 
     const char* oid, int indx,
     void* buf, size_t * sizeof_buf, unsigned int * critical);
+int gnutls_x509_crt_set_extension_by_oid(gnutls_x509_crt_t crt,
+    const char *oid, const void *buf, size_t sizeof_buf,
+    unsigned int critical);
 
 int gnutls_x509_crt_to_xml(gnutls_x509_crt_t cert, gnutls_datum_t* res, int detail);
 
