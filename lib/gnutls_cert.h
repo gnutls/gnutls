@@ -37,8 +37,6 @@ typedef struct gnutls_cert {
 
 	gnutls_datum   signature;
 
-	opaque	   fingerprint[20];
-	
 	time_t	   expiration_time;
 	time_t	   activation_time;
 

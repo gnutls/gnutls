@@ -16,3 +16,5 @@ gnutls.h
 x509_ASN.c
 gnutls-api.tex
 asn1-api.tex
+t-openpgp.c
+autogen.sh
