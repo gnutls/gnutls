@@ -1,3 +1,74 @@
+2004-10-30 11:47  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi:
+
+	Editorial fixes.  
+
+2004-10-30 11:12  Simon Josefsson <simon@josefsson.org>
+
+	* src/errcodes.c:
+
+	Fix.  
+
+2004-10-30 00:52  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, NEWS:
+
+	Add.  
+
+2004-10-30 00:13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Recurse into minitasn1/.  
+
+2004-10-30 00:11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Remove libgnutls.vers.  
+
+2004-10-30 00:11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Use AM_CPPFLAGS instead of obsoleted INCLUDES.  Use only one of
+	-Iminitasn1 or $(LIBTASN1_CFLAGS), depending on ENABLE_MINITASN1.  
+	Link with minitasn1/libminitasn1.la, instead of building files here.  
+	Don't use $(LIBTASN1_LIBS) unless ENABLE_MINITASN1.  
+
+2004-10-30 00:00  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Put .la libraries in LIBADD, not LDFLAGS, as recommended.  
+
+2004-10-29 23:55  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Build x509 files inside x509/, to avoid scattering *.o and *.lo for
+	every file in x509/ in lib/.  
+
+2004-10-29 23:32  Simon Josefsson <simon@josefsson.org>
+
+	* buildconf:
+
+	Fix.  
+
+2004-10-29 23:18  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am:
+
+	Remove SERV_LIBS (not used).  
+
+2004-10-29 23:18  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Use AS_HELP_STRING.  Remove SERV_LIBS (unused).  Various indentation
+	and cleanup.  
+
 2004-10-29 12:15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS, configure.in, lib/Makefile.am:
