@@ -160,17 +160,17 @@ void _gnutls_int2str(int k, char* data);
 #define MAX_DN_ELEM 1024
 
 /* This function checks if 'certs' issuer is 'issuer_cert'.
- * This does a compare of every element of the rdnSequence
+ * This does a straight (DER) compare of the issuer/subject fields in
+ * the given certificates.
  */
 static
 int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 {
 	node_asn *c2, *c3;
-	int result, len;
-	int issuer_len;
-	int i, ok, finish;
-	opaque issuer_dn[MAX_DN_ELEM];
-	opaque issuer_own_dn[MAX_DN_ELEM];
+	int result, len1;
+	int len2;
+	char tmpstr[512];
+	int start1, start2, end1, end2;
 
 	/* get the issuer of 'cert'
 	 */
@@ -205,61 +205,47 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	i=1;
-	ok=finish=0;
-	for (;;) {
-		char tmpstr[512];
-		char intstr[4];
-
-		strcpy( tmpstr, "certificate2.tbsCertificate.issuer.rdnSequence");
-		_gnutls_int2str( i, intstr);
-		strcat( tmpstr, intstr);
 		
-		issuer_len = sizeof(issuer_dn) - 1;
-		if ((result =
-		     asn1_read_value(c2, tmpstr, issuer_dn, &issuer_len)) != ASN_OK) {
-			if (result!=ASN_ELEMENT_NOT_FOUND) {
-				gnutls_assert();
-				ok = 1;
-				break;
-			}
-			finish = 1;
-		}
+	strcpy( tmpstr, "certificate2.tbsCertificate.issuer");
+	result = asn1_get_start_end_der( c2, cert->raw.data, cert->raw.size,
+	                tmpstr, &start1, &end1);
+	asn1_delete_structure( c2);
 	
-		len = sizeof(issuer_own_dn) - 1;
-		if ((result =
-		     asn1_read_value(c3, tmpstr, issuer_own_dn, &len)) != ASN_OK) {
-			if (result!=ASN_ELEMENT_NOT_FOUND) {
-				gnutls_assert();
-				ok = 1;
-				break;
-			}
-		}
-
-		if (finish!=0 && result==ASN_ELEMENT_NOT_FOUND)
-			break; /* finished comparing */
-				
-		if (memcmp(issuer_own_dn, issuer_dn, GMAX(len, issuer_len)) != 0) {
-			gnutls_assert();
-			ok = 1;
-			break;
-		}
+	if (result!=ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure( c3);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
 		
-		i++;
-		if (i>999) {
-			gnutls_assert();
-			ok=1;
-			break;
-		}
+	len1 = end1 - start1 + 1;
+		
+	strcpy( tmpstr, "certificate2.tbsCertificate.subject");
+	result = asn1_get_start_end_der( c3, issuer_cert->raw.data, issuer_cert->raw.size,
+	                tmpstr, &start2, &end2);
+	asn1_delete_structure( c3);
+	
+	if (result!=ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 	
-	asn1_delete_structure(c2);
-	asn1_delete_structure(c3);
+	len2 = end2 - start2 + 1;
 
-	if (ok==0) return 0;
-	
-	gnutls_assert();
-	return GNUTLS_E_UNKNOWN_ERROR;	/* do not match */
+	/* The error code returned does not really matter
+	 * here.
+	 */		
+	if (len1!=len2) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+	if (memcmp( &issuer_cert->raw.data[start2], 
+		&cert->raw.data[start1], len1) != 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+		
+	/* they match */
+	return 0;
 
 }
 
