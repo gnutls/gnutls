@@ -196,7 +196,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		 * the peer. Just use a random key. (in order to avoid
 		 * attack against pkcs-1 formating).
 		 */
-
+		ret = 0;
 		gnutls_assert();
 
 		_gnutls_log("RSA_AUTH: Possible PKCS-1 format attack\n");
@@ -204,12 +204,13 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		RANDOMIZE_KEY(state->gnutls_key->key,
 			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
 	} else {
+		ret = 0;
 		if (_gnutls_get_adv_version_major(state) !=
 		    plaintext.data[0]
 		    || _gnutls_get_adv_version_minor(state) !=
 		    plaintext.data[1]) {
 			gnutls_assert();
-			return GNUTLS_E_DECRYPTION_FAILED;
+			ret = GNUTLS_E_DECRYPTION_FAILED;
 		}
 
 		state->gnutls_key->key.data = plaintext.data;
@@ -219,7 +220,8 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	_gnutls_mpi_release(&state->gnutls_key->A);
 	_gnutls_mpi_release(&state->gnutls_key->B);
 	_gnutls_mpi_release(&state->gnutls_key->u);
-	return 0;
+
+	return ret;
 }
 
 
@@ -278,8 +280,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 			gnutls_free_datum(&sdata);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		WRITEuint16(sdata.size, *data);
-		memcpy(&(*data)[2], sdata.data, sdata.size);
+		WRITEdatum16( *data, sdata);
 		ret = sdata.size + 2;
 		gnutls_free_datum(&sdata);
 		return ret;

@@ -42,7 +42,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			      gnutls_datum plaintext, MPI* params,
 			      int btype)
 {
-	int k, psize, i, ret;
+	int k, psize, i, ret, pad;
 	MPI m, res;
 	opaque *edata, *ps;
 	MPI tmp_params[RSA_PARAMS];
@@ -75,7 +75,10 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		tmp_params[0] = params[0];
 		tmp_params[1] = params[1];
 		
-		_gnutls_get_random(ps, psize, GNUTLS_WEAK_RANDOM);
+		if ( (ret=_gnutls_get_random(ps, psize, GNUTLS_WEAK_RANDOM)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
 		for (i = 0; i < psize; i++) {
 			if (ps[i] == 0)
 				ps[i] = 0xff;
@@ -120,6 +123,12 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	}
 
 	_gnutls_mpi_print(NULL, &psize, res);
+	if (psize < k) {
+		/* padding psize */
+		pad = k - psize;
+		psize = k;
+	} else
+		pad = 0;
 
 	ciphertext->data = gnutls_malloc(psize);
 	if (ciphertext->data == NULL) {
@@ -127,8 +136,10 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		_gnutls_mpi_release(&res);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	_gnutls_mpi_print(ciphertext->data, &psize, res);
-	ciphertext->size = psize;
+	_gnutls_mpi_print( &ciphertext->data[pad], &psize, res);
+	for (i=0;i<pad;i++) ciphertext->data[i] = 0;
+
+	ciphertext->size = k;
 
 	_gnutls_mpi_release(&res);
 
