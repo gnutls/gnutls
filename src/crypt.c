@@ -183,6 +183,7 @@ int generate_create_conf(char *tpasswd_conf)
 			n.size = sizeof(srp_params_2048);
 		}
 
+		printf("\nGroup %d, of %d bits:\n", index, n.size*8);
 		print_num("Generator", &g);
 		print_num("Prime", &n);
 

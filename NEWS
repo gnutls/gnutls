@@ -1,5 +1,6 @@
 Version 0.9.8
-- Updated the SRP implementation to follow the latest draft.
+- Updated the SRP implementation to follow the latest draft
+  (draft-ietf-tls-srp-05).
 - Improved the gnutls-cli behaviour in error handling.
 - Use versioned symbols in the library (where available).
 
