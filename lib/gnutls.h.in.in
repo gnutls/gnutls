@@ -19,6 +19,17 @@
  *
  */
 
+/* This file contains the types and prototypes for all the
+ * high level functionality of gnutls main library. For the
+ * extra functionality (which is under the GNU GPL license) check
+ * the gnutls/extra.h header. The openssl compatibility layer is
+ * in gnutls/openssl.h.
+ *
+ * The low level cipher functionality is in libgcrypt. Check
+ * gcrypt.h
+ */
+
+
 #ifndef GNUTLS_H
 # define GNUTLS_H
 
