@@ -464,6 +464,8 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 	if ( peer_certificate_list[0].subjectAltName[0]!=0)
 	strcpy( info->subjectAltName, peer_certificate_list[0].subjectAltName);
 
+	info->keyUsage = peer_certificate_list[0].keyUsage;
+
 	info->peer_certificate_expiration_time = peer_certificate_list[0].expiration_time;
 	info->peer_certificate_activation_time = peer_certificate_list[0].activation_time;
 

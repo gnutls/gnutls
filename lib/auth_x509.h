@@ -41,6 +41,7 @@ typedef struct {
 	time_t		  peer_certificate_activation_time;
 	time_t		  peer_certificate_expiration_time;
 	char		  subjectAltName[X509_CN_SIZE];
+	unsigned char	  keyUsage;
 } X509PKI_CLIENT_AUTH_INFO;
 
 

@@ -201,6 +201,19 @@ typedef struct {
 	char state_or_province_name[X509_S_SIZE];
 } gnutls_DN;
 
+/* For key Usage, test as:
+ * if (st.keyUsage & X509KEY_DIGITAL_SIGNATURE) ...
+ */
+#define X509KEY_DIGITAL_SIGNATURE 	256
+#define X509KEY_NON_REPUDIATION		128
+#define X509KEY_KEY_ENCIPHERMENT	64
+#define X509KEY_DATA_ENCIPHERMENT	32
+#define X509KEY_KEY_AGREEMENT		16
+#define X509KEY_KEY_CERT_SIGN		8
+#define X509KEY_CRL_SIGN		4
+#define X509KEY_ENCIPHER_ONLY		2
+#define X509KEY_DECIPHER_ONLY		1
+
 typedef struct {
 	gnutls_DN	  peer_dn;
 	gnutls_DN	  issuer_dn;
@@ -208,7 +221,10 @@ typedef struct {
 	int		  peer_certificate_version;
 	time_t		  peer_certificate_activation_time;
 	time_t		  peer_certificate_expiration_time;
-        char              subjectAltName[X509_CN_SIZE];
+        char              subjectAltName[X509_CN_SIZE]; /* this only contains dnsName if present,
+                                                         * nothing else 
+                                                         */
+	unsigned char	  keyUsage; /* 8 bits */
 } X509PKI_CLIENT_AUTH_INFO;
 
 

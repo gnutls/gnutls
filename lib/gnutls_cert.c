@@ -30,6 +30,7 @@
 #include <gnutls_privkey.h>
 #include <gnutls_global.h>
 #include <cert_verify.h>
+#include <gnutls_num.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -589,19 +590,114 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 }
 
+/* Here we only read subjectAltName, in case of
+ * dnsName. Otherwise we read nothing.
+ */
+static int _extract_subjectAltName( char* subjectAltName, opaque* extnValue, int extnValueLen) {
+node_asn* ext;
+char counter[MAX_INT_DIGITS];
+char name[1024];
+char str[1024];
+int len, k, result;
+
+	subjectAltName[0] = 0;
+	
+	if (asn1_create_structure
+	    ( _gnutls_get_pkix(), "PKIX1Implicit88.GeneralNames", &ext, 
+	    	"san") != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	result = asn1_get_der ( ext, extnValue, extnValueLen);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(ext);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	k = 1;
+	for (;;) {
+		strcpy(name, "san.?");
+		_gnutls_int2str(k, counter);
+		strcat(name, counter);
+
+		len = sizeof(str) - 1;
+		result = asn1_read_value(ext, name, str, &len);
+		if (result == ASN_ELEMENT_NOT_FOUND) break;
+		
+		if (strcmp( str, "dNSName") == 0) {
+			strcat( name, "dNSName");
+			len = sizeof( str) -1;
+			result = asn1_read_value(ext, name, str, &len);
+
+			if (result != ASN_OK) {
+				gnutls_assert();
+				asn1_delete_structure(ext);
+				return GNUTLS_E_ASN1_PARSING_ERROR;
+			}
+			
+			strncpy( subjectAltName, str, GMIN( len, X509_CN_SIZE-1));
+			subjectAltName[X509_CN_SIZE-1] = 0;
+			
+			break;
+		}
+		k++;
+	}
+
+	asn1_delete_structure(ext);
+	return 0;
+}
+
+/* Here we only extract the KeyUsage field
+ */
+static int _extract_keyUsage( char* keyUsage, opaque* extnValue, int extnValueLen) {
+node_asn* ext;
+char str[128];
+int len, result;
+
+	
+	if (asn1_create_structure
+	    ( _gnutls_get_pkix(), "PKIX1Implicit88.KeyUsage", &ext, 
+	    	"ku") != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	result = asn1_get_der ( ext, extnValue, extnValueLen);
+
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(ext);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	len = sizeof(str) - 1;
+	result = asn1_read_value(ext, "ku", str, &len);
+	if (result != ASN_OK) {
+		gnutls_assert();
+		asn1_delete_structure(ext);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	keyUsage[0] = str[0];
+
+	asn1_delete_structure(ext);
+
+	return 0;
+}
+
 
 static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, char* extnValue, int extnValueLen) {
-#ifdef DEBUG
-	_gnutls_log("Extension: %s, %s\n", extnID, critical);
-#endif
+
 	if (strcmp( extnID, "2 5 29 14")==0) { /* subject Key ID */
 		/* we don't use it */
 		return 0;
 	}
 
 	if (strcmp( extnID, "2 5 29 15")==0) { /* Key Usage */
-		cert->KeyUsage = extnValue[0];
-		return 0;
+		return _extract_keyUsage( &cert->keyUsage, extnValue, extnValueLen);
 	}
 
 	if (strcmp( extnID, "2 5 29 19")==0) { /* Basic Constraints */
@@ -610,10 +706,12 @@ static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, ch
 	}
 
 	if (strcmp( extnID, "2 5 29 17")==0) { /* subjectAltName */
-		strncpy( cert->subjectAltName, extnValue, sizeof( cert->subjectAltName)-1);
-		return 0;
+		return _extract_subjectAltName( cert->subjectAltName, extnValue, extnValueLen);
 	}
-	
+
+#ifdef DEBUG
+	_gnutls_log("CERT[%s]: Extension: %s, %s\n", cert->cert_info.common_name, extnID, critical);
+#endif
 	
 	if (strcmp( critical, "TRUE")==0) {
 		gnutls_assert();

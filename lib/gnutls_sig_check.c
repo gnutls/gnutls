@@ -113,7 +113,7 @@ int len;
 	if ( strcmp(str, "1 2 840 113549 2 5")==0) { /* MD5 */
 		*hash = GNUTLS_MAC_MD5;
 	} else 
-	if ( strcmp(str, "xxxxxx")==0) { /* SHA1 ID */
+	if ( strcmp(str, "1 3 14 3 2 26")==0) { /* SHA1 ID */
 		*hash = GNUTLS_MAC_SHA;
 	}
 

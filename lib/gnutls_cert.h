@@ -32,7 +32,8 @@ typedef struct {
 	gnutls_DN  cert_info;
 	gnutls_DN  issuer_info;
 	opaque	   subjectAltName[X509_CN_SIZE];
-
+	int 	   subjectAltName_size;
+	
 	opaque	   signature[1024];
 	int	   signature_size;
 	
@@ -42,7 +43,7 @@ typedef struct {
 	int	   version; /* 1,2,3 
  	                     */
  	
- 	int	   KeyUsage; /* bits from X509KEY_* 
+ 	uint8	   keyUsage; /* bits from X509KEY_* 
  	                      */
  	
 	int        valid; /* 0 if the certificate looks good.

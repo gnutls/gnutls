@@ -1718,9 +1718,9 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	int alg_size;
 	KXAlgorithm kx;
 
-	/* FIXME: remove algorithms depending on the KeyUsage bits
+	/* FIXME: remove algorithms depending on the keyUsage bits
 	 * eg. 
-	 * if (cert.KeyUsage & X509KEY_DIGITAL_SIGNATURE) 
+	 * if (cert.keyUsage & X509KEY_DIGITAL_SIGNATURE) 
 	 * we've got a sign-only key... (ok we need to check
 	 * it more than that).
 	 */
