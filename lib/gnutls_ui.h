@@ -86,6 +86,9 @@ int gnutls_certificate_client_get_request_status(gnutls_session_t session);
 int gnutls_certificate_verify_peers2(gnutls_session_t session,
 				     unsigned int* status);
 
+/* this is obsolete (?). */
+int gnutls_certificate_verify_peers(gnutls_session_t session);
+
 int gnutls_pem_base64_encode(const char *msg, const gnutls_datum_t * data,
     char *result, size_t * result_size);
 int gnutls_pem_base64_decode(const char *header,
