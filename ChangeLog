@@ -1,3 +1,19 @@
+2002-06-29 08:42  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, gnutls_x509.c:
+
+	Better organization of cert2gnutls_cert function.  
+
+2002-06-28 19:09  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, auth_dhe.c, auth_rsa.c, gnutls_x509.c,
+	gnutls_x509.h, x509_xml.c:
+
+	Now certificate decoding makes use of partial DER decoding of the
+	libtasn1 library. It speedups a bit the handshake in client side,
+	which needs to decode the certificate, in order to read the public
+	key parameters.  
+
 2002-06-25 14:36  nmav <nmav@gnutls.org>
 
 	* lib/x509_xml.c:
