@@ -287,6 +287,12 @@ int _gnutls_x509_data2hex(const opaque * data, size_t data_size,
     char *res;
     char escaped[MAX_STRING_LEN];
 
+    if (2 * data_size + 1 > MAX_STRING_LEN)
+      {
+	gnutls_assert();
+	return GNUTLS_E_INTERNAL_ERROR;
+      }
+
     res = _gnutls_bin2hex(data, data_size, escaped, sizeof(escaped));
 
     if (res) {
