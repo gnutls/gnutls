@@ -19,13 +19,16 @@ gnutls.html: $(TEX_OBJECTS)
 	-latex2html gnutls.tex -no_navigation -split 0 \
 	-local_icons -html_version 3.2,math -info "" -white
 
+error_codes.tex:
+	-../../src/retcodes > error_codes.tex
+
 gnutls-api.tex: ../../lib/gnutls-api.tex
 	-../scripts/sort1.pl < ../../lib/gnutls-api.tex > gnutls-api.tex
 
 gnutls-extra-api.tex: ../../libextra/gnutls-extra-api.tex
 	-../scripts/sort1.pl < ../../libextra/gnutls-extra-api.tex > gnutls-extra-api.tex
 
-DOC_OBJECTS = gnutls-api.tex gnutls-extra-api.tex
+DOC_OBJECTS = gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
 gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 	-latex gnutls.tex
@@ -35,7 +38,7 @@ gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 clean:
 	@-rm *.log *.aux *.toc *.png *.old *.html *.css *~
 	@-rm *.pl gnutls.dvi
-	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex
+	@-rm WARNINGS gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
 examples: $(EXAMPLE_OBJECTS)
 	@echo "Generating example programs... "

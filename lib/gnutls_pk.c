@@ -638,7 +638,7 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 				     "(private-key(dsa(p%m)(q%m)(g%m)(y%m)(x%m)))",
 				     pkey[0], pkey[1], pkey[2],
 				     pkey[3], pkey[4]);
-		else gnutls_assert();
+		else gnutls_assert(); 
 
 		break;
 	case GCRY_PK_RSA:

@@ -17,9 +17,11 @@ gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(L
 
 
 
-noinst_PROGRAMS = prime
+noinst_PROGRAMS = prime retcodes
 prime_SOURCES = prime-gaa.c prime.c
-prime_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
+prime_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+retcodes_SOURCES = retcodes.c
+retcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
 
 crypt-gaa.c: crypt.gaa
