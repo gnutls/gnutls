@@ -1,4 +1,4 @@
-Version 1.1.15
+Version 1.1.15 (15/08/2004)
 - Certtool has simplistic --smime-to-p7 to translate RFC 2633 messages into
   PKCS #7 format.
 - Ported to Mac OS X / Darwin.
