@@ -209,7 +209,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		    || _gnutls_get_adv_version_minor(state) !=
 		    plaintext.data[1]) {
 			gnutls_assert();
-			ret = GNUTLS_E_DECRYPTION_FAILED;
+			return GNUTLS_E_DECRYPTION_FAILED;
 		}
 
 		state->gnutls_key->key.data = plaintext.data;
