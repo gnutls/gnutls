@@ -57,6 +57,14 @@ static const short port = 11371;
    int rc;
    CDK_KBNODE knode = NULL;
 
+int i;
+
+printf("must recv: ");
+for (i=0;i<keyfpr_length;i++) {
+printf("%x", keyfpr[i]);
+}
+printf("\n");
+
    /* The key fingerprint should be 20 bytes
     * in v4 keys.
     */
@@ -111,7 +119,6 @@ char *srp_passwd;
 char *srp_passwd_conf;
 char *pgp_keyring;
 char *pgp_trustdb;
-char *pgp_keyserver;
 char *pgp_keyfile;
 char *pgp_certfile;
 char *x509_keyfile;
@@ -614,8 +621,6 @@ int main(int argc, char **argv)
 		 ret, pgp_certfile, pgp_keyfile);
       }
 
-   gnutls_certificate_set_openpgp_keyserver(cert_cred, pgp_keyserver, 0);
-
    if (x509_certfile != NULL)
       if (gnutls_certificate_set_x509_key_file
 	  (cert_cred, x509_certfile, x509_keyfile, x509ctype) < 0) {
@@ -990,7 +995,6 @@ void gaa_parser(int argc, char **argv)
       srp_passwd_conf = info.srp_passwd_conf;
 #endif
 
-   pgp_keyserver = info.pgp_keyserver;
    pgp_keyring = info.pgp_keyring;
    pgp_trustdb = info.pgp_trustdb;
 

@@ -49,9 +49,6 @@ option (x509keyfile) STR "FILE" { $x509_keyfile = $1 } "X.509 key file to use."
 #char *x509_certfile;
 option (x509certfile) STR "FILE" { $x509_certfile = $1 } "X.509 Certificate file to use."
 
-#char *pgp_keyserver;
-option (pgpkeyserver) STR "FILE" { $pgp_keyserver = $1 } "PGP Keyserver to use."
-
 #char *srp_passwd;
 option (srppasswd) STR "FILE" { $srp_passwd = $1 } "SRP password file to use."
 
@@ -95,7 +92,7 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $nodb = 0;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
-	$x509_keyfile=NULL; $x509_certfile=NULL; $pgp_keyserver=NULL; 
+	$x509_keyfile=NULL; $x509_certfile=NULL;  
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
 	$pgp_trustdb=NULL; $pgp_keyring=NULL; $fmtder = 0; }
 

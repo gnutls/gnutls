@@ -42,7 +42,7 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
 
        cdk_kbnode_write_to_mem( knode, NULL, &len);
 
-       key->data = malloc( len);
+       key->data = gnutls_malloc( len);
        if (key->data==NULL) {
           rc = -1;
           goto finish;
