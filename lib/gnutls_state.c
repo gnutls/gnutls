@@ -184,7 +184,7 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session)
 	session->internals.adv_version_minor = 0;
 	session->internals.v2_hello = 0;
 	memset( &session->internals.handshake_header_buffer, 0, 
-		sizeof(HANDSHAKE_HEADER_BUFFER));
+		sizeof(handshake_header_buffer_st));
 	session->internals.adv_version_minor = 0;
 	session->internals.adv_version_minor = 0;
 	session->internals.direction = 0;
@@ -249,7 +249,7 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 	_gnutls_buffer_init( &(*session)->internals.handshake_send_buffer);
 	_gnutls_buffer_init( &(*session)->internals.handshake_recv_buffer);
 
-	(*session)->key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
+	(*session)->key = gnutls_calloc(1, sizeof(struct gnutls_key_st));
 	if ( (*session)->key == NULL) {
 		cleanup_session:
 		gnutls_free( *session); *session = NULL;
@@ -394,7 +394,7 @@ int _gnutls_dh_get_allowed_prime_bits( gnutls_session session)
 
 int _gnutls_dh_set_peer_public( gnutls_session session, mpi_t public)
 {
-dh_info_st * dh;
+dh_info_t * dh;
 int ret;
 
 	switch( gnutls_auth_get_type( session)) {
@@ -498,7 +498,7 @@ int _gnutls_rsa_export_set_pubkey( gnutls_session session, mpi_t exp, mpi_t mod)
  */
 int _gnutls_dh_set_group( gnutls_session session, mpi_t gen, mpi_t prime)
 {
-dh_info_st* dh;
+dh_info_t* dh;
 int ret;
 
 	switch( gnutls_auth_get_type( session)) {
@@ -630,7 +630,7 @@ void gnutls_handshake_set_private_extensions(gnutls_session session, int allow)
 inline
 static int _gnutls_cal_PRF_A( gnutls_mac_algorithm algorithm, const void *secret, int secret_size, const void *seed, int seed_size, void* result)
 {
-	GNUTLS_MAC_HANDLE td1;
+	mac_hd_t td1;
 
 	td1 = _gnutls_hmac_init(algorithm, secret, secret_size);
 	if (td1 == GNUTLS_MAC_FAILED) {
@@ -652,7 +652,7 @@ static int _gnutls_cal_PRF_A( gnutls_mac_algorithm algorithm, const void *secret
 static int _gnutls_P_hash( gnutls_mac_algorithm algorithm, const opaque * secret, int secret_size, const opaque * seed, int seed_size, int total_bytes, opaque* ret)
 {
 
-	GNUTLS_MAC_HANDLE td2;
+	mac_hd_t td2;
 	int i, times, how, blocksize, A_size;
 	opaque final[20], Atmp[MAX_SEED_SIZE];
 	int output_bytes, result;

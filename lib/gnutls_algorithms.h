@@ -36,16 +36,16 @@ int   _gnutls_mac_is_ok(gnutls_mac_algorithm algorithm);
 int   _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm algorithm);
 
 /* functions for cipher suites */
-int   _gnutls_supported_ciphersuites(gnutls_session session, GNUTLS_CipherSuite **ciphers);
-int   _gnutls_supported_ciphersuites_sorted(gnutls_session session, GNUTLS_CipherSuite **ciphers);
+int   _gnutls_supported_ciphersuites(gnutls_session session, cipher_suite_st **ciphers);
+int   _gnutls_supported_ciphersuites_sorted(gnutls_session session, cipher_suite_st **ciphers);
 int   _gnutls_supported_compression_methods(gnutls_session session, uint8 **comp);
 
-const char* _gnutls_cipher_suite_get_name(GNUTLS_CipherSuite *algorithm);
-gnutls_cipher_algorithm _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite *algorithm);
-gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite *algorithm);
-gnutls_mac_algorithm _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite *algorithm);
-gnutls_protocol_version _gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite *algorithm);
-GNUTLS_CipherSuite  _gnutls_cipher_suite_get_suite_name(GNUTLS_CipherSuite *algorithm);
+const char* _gnutls_cipher_suite_get_name(cipher_suite_st *algorithm);
+gnutls_cipher_algorithm _gnutls_cipher_suite_get_cipher_algo(const cipher_suite_st *algorithm);
+gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const cipher_suite_st *algorithm);
+gnutls_mac_algorithm _gnutls_cipher_suite_get_mac_algo(const cipher_suite_st *algorithm);
+gnutls_protocol_version _gnutls_cipher_suite_get_version(const cipher_suite_st *algorithm);
+cipher_suite_st  _gnutls_cipher_suite_get_suite_name(cipher_suite_st *algorithm);
 
 /* functions for ciphers */
 int _gnutls_cipher_priority(gnutls_session session, gnutls_cipher_algorithm algorithm);
@@ -63,7 +63,7 @@ int _gnutls_kx_needs_dh_params(gnutls_kx_algorithm algorithm);
 int _gnutls_kx_needs_rsa_params(gnutls_kx_algorithm algorithm);
 
 
-MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm);
+mod_auth_st * _gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm);
 const char *gnutls_kx_get_name(gnutls_kx_algorithm algorithm);
 int _gnutls_kx_is_ok(gnutls_kx_algorithm algorithm);
 
@@ -92,7 +92,7 @@ enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm algorithm);
 struct gnutls_kx_algo_entry {
 	const char *name;
 	gnutls_kx_algorithm algorithm;
-	MOD_AUTH_STRUCT *auth_struct;
+	mod_auth_st *auth_struct;
 	int needs_dh_params;
 	int needs_rsa_params;
 };

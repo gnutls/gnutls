@@ -63,7 +63,7 @@ is_read_comp_null( gnutls_session session) {
  */
 int _gnutls_encrypt(gnutls_session session, const opaque* headers, size_t headers_size,
 		const opaque *data, size_t data_size,
-		opaque * ciphertext, size_t ciphertext_size, ContentType type, int random_pad)
+		opaque * ciphertext, size_t ciphertext_size, content_type_t type, int random_pad)
 {
 	gnutls_datum plain;
 	gnutls_datum comp;
@@ -111,7 +111,7 @@ int _gnutls_encrypt(gnutls_session session, const opaque* headers, size_t header
  */
 int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 		    size_t ciphertext_size, uint8 * data, size_t max_data_size,
-		    ContentType type)
+		    content_type_t type)
 {
 	gnutls_datum gtxt;
 	gnutls_datum gcipher;
@@ -163,10 +163,10 @@ int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 }
 
 inline
-static GNUTLS_MAC_HANDLE 
+static mac_hd_t 
 mac_init( gnutls_mac_algorithm mac, opaque* secret, int secret_size, int ver) 
 {
-GNUTLS_MAC_HANDLE td;
+mac_hd_t td;
 
 	if (mac == GNUTLS_MAC_NULL) return GNUTLS_MAC_FAILED;
 
@@ -183,7 +183,7 @@ GNUTLS_MAC_HANDLE td;
 }
 
 inline
-static void mac_deinit( GNUTLS_MAC_HANDLE td, opaque* res, int ver) 
+static void mac_deinit( mac_hd_t td, opaque* res, int ver) 
 {
 	if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
 		_gnutls_mac_deinit_ssl3(td, res);
@@ -195,7 +195,7 @@ static void mac_deinit( GNUTLS_MAC_HANDLE td, opaque* res, int ver)
 inline
 static int calc_enc_length( 
 	gnutls_session session, int data_size, int hash_size, uint8* pad, 
-	int random_pad, CipherType block_algo, uint16 blocksize) 
+	int random_pad, cipher_type_t block_algo, uint16 blocksize) 
 {
 uint8 rand;
 int length;
@@ -252,14 +252,14 @@ int length;
  */
 int _gnutls_compressed2ciphertext(gnutls_session session,
 					opaque*	cipher_data, int cipher_size,
-					gnutls_datum compressed, ContentType _type, 
+					gnutls_datum compressed, content_type_t _type, 
 					int random_pad)
 {
 	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
 	uint8 pad;
 	int length,ret;
-	GNUTLS_MAC_HANDLE td;
+	mac_hd_t td;
 	uint8 type = _type;
 	uint8 major, minor;
 	int hash_size = _gnutls_hash_get_algo_len(session->security_parameters.write_mac_algorithm);
@@ -267,7 +267,7 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 	int blocksize =
 	    _gnutls_cipher_get_block_size(session->security_parameters.
 					  write_bulk_cipher_algorithm);
-	CipherType block_algo = _gnutls_cipher_is_block(session->security_parameters.write_bulk_cipher_algorithm);
+	cipher_type_t block_algo = _gnutls_cipher_is_block(session->security_parameters.write_bulk_cipher_algorithm);
 	opaque* data_ptr;
 
 
@@ -368,7 +368,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 	uint16 c_length;
 	uint8 pad;
 	int length;
-	GNUTLS_MAC_HANDLE td;
+	mac_hd_t td;
 	uint16 blocksize;
 	int ret, i, pad_failed = 0;
 	uint8 major, minor;

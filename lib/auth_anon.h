@@ -14,7 +14,7 @@ typedef struct {
 #define gnutls_anon_client_credentials void*
 
 typedef struct anon_client_auth_info_st {
-	dh_info_st dh;
+	dh_info_t dh;
 } *anon_client_auth_info_t;
 
 typedef anon_client_auth_info_t anon_server_auth_info_t;

@@ -137,7 +137,7 @@ time_t timestamp;
 	timestamp = time(0);
 
 	if (session_entry.data != NULL)
-		if ( timestamp - ((SecurityParameters*)(session_entry.data))->timestamp <= session->internals.expire_time || ((SecurityParameters*)(session_entry.data))->timestamp > timestamp|| ((SecurityParameters*)(session_entry.data))->timestamp == 0)
+		if ( timestamp - ((security_parameters_st*)(session_entry.data))->timestamp <= session->internals.expire_time || ((security_parameters_st*)(session_entry.data))->timestamp > timestamp|| ((security_parameters_st*)(session_entry.data))->timestamp == 0)
 			return GNUTLS_E_EXPIRED;
 	
 	return 0;

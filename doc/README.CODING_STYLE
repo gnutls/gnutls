@@ -44,6 +44,12 @@ The rules here are not always used, although we try to stick to them.
  Definitions, value defaults and enumerated values should be in
  capitals. E.g. GNUTLS_CIPHER_3DES_CBC
 
+ Structures should have the '_st' suffix in their name even
+ if they are a typedef. One can use the sizeof() on types with 
+ '_st' as suffix.
+
+ Other constructed types should have the '_t' suffix. A pointer
+ to a structure also has the '_t' suffix.
 
 *** Function parameters:
   The gnutls functions accept parameters in the order:

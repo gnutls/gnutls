@@ -44,7 +44,7 @@
 int _gnutls_gen_rsa_client_kx(gnutls_session, opaque **);
 int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, size_t);
 
-const MOD_AUTH_STRUCT rsa_auth_struct = {
+const mod_auth_st rsa_auth_struct = {
 	"RSA",
 	_gnutls_gen_cert_server_certificate,
 	_gnutls_gen_cert_client_certificate,

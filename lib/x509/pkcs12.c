@@ -744,7 +744,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass)
 	opaque salt[8], key[20];
 	int result;
 	const int iter = 1;
-	GNUTLS_MAC_HANDLE td1 = NULL;
+	mac_hd_t td1 = NULL;
 	gnutls_datum tmp = {NULL, 0};
 	opaque sha_mac[20];
 
@@ -851,7 +851,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char* pass)
 	opaque key[20];
 	int result;
 	unsigned int iter, len;
-	GNUTLS_MAC_HANDLE td1 = NULL;
+	mac_hd_t td1 = NULL;
 	gnutls_datum tmp = {NULL, 0}, salt = {NULL, 0};
 	opaque sha_mac[20];
 	opaque sha_mac_orig[20];

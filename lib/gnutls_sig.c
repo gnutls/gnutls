@@ -48,8 +48,8 @@ int _gnutls_tls_sign_hdata( gnutls_session session,
 gnutls_datum dconcat;
 int ret;
 opaque concat[36];
-GNUTLS_MAC_HANDLE td_md5;
-GNUTLS_MAC_HANDLE td_sha;
+mac_hd_t td_md5;
+mac_hd_t td_sha;
 gnutls_protocol_version ver = gnutls_protocol_get_version( session);
 
 	td_sha = _gnutls_hash_copy( session->internals.handshake_mac_handle_sha);
@@ -110,8 +110,8 @@ int _gnutls_tls_sign_params( gnutls_session session, gnutls_cert* cert, gnutls_p
 {
 gnutls_datum dconcat;
 int ret;
-GNUTLS_MAC_HANDLE td_md5;
-GNUTLS_MAC_HANDLE td_sha;
+mac_hd_t td_md5;
+mac_hd_t td_sha;
 opaque concat[36];
 
 
@@ -292,8 +292,8 @@ int _gnutls_verify_sig_hdata( gnutls_session session, gnutls_cert *cert, gnutls_
 {
 int ret;
 opaque concat[36];
-GNUTLS_MAC_HANDLE td_md5;
-GNUTLS_MAC_HANDLE td_sha;
+mac_hd_t td_md5;
+mac_hd_t td_sha;
 gnutls_datum dconcat;
 gnutls_protocol_version ver = gnutls_protocol_get_version( session);
 
@@ -344,8 +344,8 @@ int _gnutls_verify_sig_params( gnutls_session session, gnutls_cert *cert, const 
 {
 gnutls_datum dconcat;
 int ret;
-GNUTLS_MAC_HANDLE td_md5;
-GNUTLS_MAC_HANDLE td_sha;
+mac_hd_t td_md5;
+mac_hd_t td_sha;
 opaque concat[36];
 
 	td_md5 = _gnutls_hash_init( GNUTLS_MAC_MD5);

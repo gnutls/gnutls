@@ -1,7 +1,7 @@
 #ifndef AUTH_DH_COMMON
 # define AUTH_DH_COMMON
 
-typedef struct dh_info_st_int {
+typedef struct dh_info_st {
 	int secret_bits;
 
 	opaque prime[1024];
@@ -10,7 +10,7 @@ typedef struct dh_info_st_int {
 	size_t generator_size;
 	opaque public_key[1024];
 	size_t public_key_size;
-} dh_info_st;
+} dh_info_t;
 
 int _gnutls_gen_dh_common_client_kx(gnutls_session, opaque **);
 int _gnutls_proc_dh_common_client_kx(gnutls_session session, opaque * data,

@@ -25,10 +25,10 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
-GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, 
+cipher_hd_t _gnutls_cipher_init( gnutls_cipher_algorithm cipher, 
 	const gnutls_datum *key, const gnutls_datum *iv)
 {
-GNUTLS_CIPHER_HANDLE ret = NULL;
+cipher_hd_t ret = NULL;
 gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
 
 
@@ -67,7 +67,7 @@ gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
 	return ret;	
 }
 
-int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, 
+int _gnutls_cipher_encrypt(cipher_hd_t handle, void* text, 
 	int textlen) 
 {
 	if (handle!=GNUTLS_CIPHER_FAILED) {
@@ -79,7 +79,7 @@ int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text,
 	return 0;
 }
 
-int _gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, 
+int _gnutls_cipher_decrypt(cipher_hd_t handle, void* ciphertext, 
 	int ciphertextlen) 
 {
 	if (handle!=GNUTLS_CIPHER_FAILED) {
@@ -91,7 +91,7 @@ int _gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext,
 	return 0;
 }
 
-void _gnutls_cipher_deinit(GNUTLS_CIPHER_HANDLE handle) 
+void _gnutls_cipher_deinit(cipher_hd_t handle) 
 {
 	if (handle!=GNUTLS_CIPHER_FAILED) {
 		gcry_cipher_close(handle);

@@ -132,14 +132,14 @@ int _gnutls_session_pack(gnutls_session session, gnutls_datum * packed_session)
 
 	}
 
-	/* Auth_info structures copied. Now copy SecurityParameters. 
+	/* Auth_info structures copied. Now copy security_parameters_st. 
 	 */
-	packed_session->size += sizeof(SecurityParameters)+sizeof(uint32);
+	packed_session->size += sizeof(security_parameters_st)+sizeof(uint32);
 
-	_gnutls_write_uint32( sizeof(SecurityParameters), &packed_session->data[packed_session->size - sizeof(SecurityParameters) - sizeof(uint32)]);
+	_gnutls_write_uint32( sizeof(security_parameters_st), &packed_session->data[packed_session->size - sizeof(security_parameters_st) - sizeof(uint32)]);
 	memcpy(&packed_session->
-	       data[packed_session->size - sizeof(SecurityParameters)],
-	       &session->security_parameters, sizeof(SecurityParameters));
+	       data[packed_session->size - sizeof(security_parameters_st)],
+	       &session->security_parameters, sizeof(security_parameters_st));
 
 	return 0;
 }
@@ -166,9 +166,9 @@ uint _gnutls_session_size( gnutls_session session)
 		break;
 	}
 
-	/* Auth_info structures copied. Now copy SecurityParameters. 
+	/* Auth_info structures copied. Now copy security_parameters_st. 
 	 */
-	pack_size += sizeof(SecurityParameters) + sizeof(uint32);
+	pack_size += sizeof(security_parameters_st) + sizeof(uint32);
 
 	return pack_size;
 }
@@ -179,7 +179,7 @@ int _gnutls_session_unpack(gnutls_session session,
 	uint32 pack_size;
 	int ret;
 	time_t timestamp = time(0);
-	SecurityParameters sp;
+	security_parameters_st sp;
 
 	if (packed_session==NULL || packed_session->size == 0) {
 		gnutls_assert();
@@ -293,25 +293,25 @@ int _gnutls_session_unpack(gnutls_session session,
 
 	session->key->auth_info_type = packed_session->data[0];
 
-	/* Auth_info structures copied. Now copy SecurityParameters. 
+	/* Auth_info structures copied. Now copy security_parameters_st. 
 	 */
 	ret =
 	    _gnutls_read_uint32(&packed_session->
 		       data[PACK_HEADER_SIZE + sizeof(uint32) +
 			    pack_size]);
 
-	if (ret != sizeof(SecurityParameters)) {
+	if (ret != sizeof(security_parameters_st)) {
 		gnutls_assert();
 		return GNUTLS_E_DB_ERROR;
 	}
 	memcpy(&sp, &packed_session->data[PACK_HEADER_SIZE +
 				     2 * sizeof(uint32) + pack_size],
-	       				sizeof(SecurityParameters));
+	       				sizeof(security_parameters_st));
 
 	if ( timestamp - sp.timestamp <= session->internals.expire_time 
 		&& sp.timestamp <= timestamp) {
 
-		memcpy( &session->internals.resumed_security_parameters, &sp, sizeof(SecurityParameters));
+		memcpy( &session->internals.resumed_security_parameters, &sp, sizeof(security_parameters_st));
 	} else {
 		_gnutls_free_auth_info( session);
 		gnutls_assert();

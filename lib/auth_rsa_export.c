@@ -48,7 +48,7 @@ int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, size_t);
 static int gen_rsa_export_server_kx(gnutls_session, opaque **);
 static int proc_rsa_export_server_kx(gnutls_session, opaque *, size_t);
 
-const MOD_AUTH_STRUCT rsa_export_auth_struct = {
+const mod_auth_st rsa_export_auth_struct = {
 	"RSA EXPORT",
 	_gnutls_gen_cert_server_certificate,
 	_gnutls_gen_cert_client_certificate,

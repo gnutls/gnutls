@@ -164,7 +164,7 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	/* set the MOD_AUTH_STRUCT to the appropriate struct
+	/* set the mod_auth_st to the appropriate struct
 	 * according to the KX algorithm. This is needed since all the
 	 * handshake functions are read from there;
 	 */

@@ -94,9 +94,9 @@ static void resume_copy_required_values(gnutls_session session)
 	 * hello message.
 	 */
 	memcpy(session->security_parameters.current_cipher_suite.
-	       CipherSuite,
+	       suite,
 	       session->internals.resumed_security_parameters.
-	       current_cipher_suite.CipherSuite, 2);
+	       current_cipher_suite.suite, 2);
 
 	session->internals.compression_method = 
 		session->internals.resumed_security_parameters.read_compression_algorithm;
@@ -140,8 +140,8 @@ void _gnutls_set_client_random(gnutls_session session, uint8 * random)
 static int _gnutls_ssl3_finished(gnutls_session session, int type, opaque * ret)
 {
 	const int siz = SSL_MSG_LEN;
-	GNUTLS_MAC_HANDLE td_md5;
-	GNUTLS_MAC_HANDLE td_sha;
+	mac_hd_t td_md5;
+	mac_hd_t td_sha;
 	const char *mesg;
 
 	td_md5 = _gnutls_hash_copy( session->internals.handshake_mac_handle_md5);
@@ -182,8 +182,8 @@ int _gnutls_finished(gnutls_session session, int type, void *ret)
 	const int siz = TLS_MSG_LEN;
 	opaque concat[36];
 	const char *mesg;
-	GNUTLS_MAC_HANDLE td_md5;
-	GNUTLS_MAC_HANDLE td_sha;
+	mac_hd_t td_md5;
+	mac_hd_t td_sha;
 
 
 	td_md5 = _gnutls_hash_copy( session->internals.handshake_mac_handle_md5);
@@ -516,7 +516,7 @@ static int _gnutls_server_find_pk_algos_in_ciphersuites( const opaque* data, int
 int j;
 gnutls_pk_algorithm algo=GNUTLS_PK_NONE, prev_algo = 0;
 gnutls_kx_algorithm kx;
-GNUTLS_CipherSuite cs;
+cipher_suite_st cs;
 
 	if (datalen % 2 != 0) {
 		gnutls_assert();
@@ -524,7 +524,7 @@ GNUTLS_CipherSuite cs;
 	}
 
 	for (j = 0; j < datalen; j += 2) {
-		memcpy( &cs.CipherSuite, &data[j], 2);
+		memcpy( &cs.suite, &data[j], 2);
 		kx = _gnutls_cipher_suite_get_kx_algo( &cs);
 		
 		if ( _gnutls_map_kx_get_cred( kx, 1) == GNUTLS_CRD_CERTIFICATE) {
@@ -545,7 +545,7 @@ GNUTLS_CipherSuite cs;
 int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datalen)
 {
 	int x, i, j;
-	GNUTLS_CipherSuite *ciphers, cs;
+	cipher_suite_st *ciphers, cs;
 	int retval, err;
 	gnutls_pk_algorithm pk_algo; /* will hold the pk algorithms
 			      * supported by the peer.
@@ -584,7 +584,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 
 	_gnutls_handshake_log("HSK[%x]: Requested cipher suites: \n", session);
 	for (j = 0; j < datalen; j += 2) {
-		memcpy( &cs.CipherSuite, &data[j], 2);
+		memcpy( &cs.suite, &data[j], 2);
 		_gnutls_handshake_log("\t%s\n",
 			    _gnutls_cipher_suite_get_name(&cs));
 	}
@@ -593,19 +593,19 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		_gnutls_handshake_log("\t%s\n",
 			    _gnutls_cipher_suite_get_name(&ciphers[j]));
 #endif
-	memset(session->security_parameters.current_cipher_suite.CipherSuite, '\0', 2);
+	memset(session->security_parameters.current_cipher_suite.suite, '\0', 2);
 
 	retval = GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 
 	for (j = 0; j < datalen; j += 2) {
 		for (i = 0; i < x; i++) {
-			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
+			if (memcmp(ciphers[i].suite, &data[j], 2) ==
 			    0) {
-				memcpy( &cs.CipherSuite, &data[j], 2);
+				memcpy( &cs.suite, &data[j], 2);
 
 				_gnutls_handshake_log("HSK[%x]: Selected cipher suite: %s\n",
 					    session, _gnutls_cipher_suite_get_name(&cs));
-				memcpy(session->security_parameters.current_cipher_suite.CipherSuite, ciphers[i].CipherSuite, 2);
+				memcpy(session->security_parameters.current_cipher_suite.suite, ciphers[i].suite, 2);
 				retval = 0;
 				goto finish;
 			}
@@ -631,7 +631,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	}
 
 
-	/* set the MOD_AUTH_STRUCT to the appropriate struct
+	/* set the mod_auth_st to the appropriate struct
 	 * according to the KX algorithm. This is needed since all the
 	 * handshake functions are read from there;
 	 */
@@ -1112,7 +1112,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 					  opaque suite[2])
 {
 	uint8 z;
-	GNUTLS_CipherSuite *cipher_suites;
+	cipher_suite_st *cipher_suites;
 	int cipher_suite_num;
 	int i, err;
 
@@ -1137,7 +1137,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	}
 
 	memcpy(session->security_parameters.
-	       current_cipher_suite.CipherSuite, suite, 2);
+	       current_cipher_suite.suite, suite, 2);
 
 	_gnutls_handshake_log("HSK[%x]: Selected cipher suite: %s\n", session,
 		    _gnutls_cipher_suite_get_name(&session->
@@ -1158,7 +1158,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	}
 
 
-	/* set the MOD_AUTH_STRUCT to the appropriate struct
+	/* set the mod_auth_st to the appropriate struct
 	 * according to the KX algorithm. This is needed since all the
 	 * handshake functions are read from there;
 	 */
@@ -1362,7 +1362,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 				     opaque * ret_data, size_t ret_data_size)
 {
 	int ret, i;
-	GNUTLS_CipherSuite *cipher_suites;
+	cipher_suite_st *cipher_suites;
 	uint16 cipher_num;
 	int datalen, pos;
 
@@ -1410,7 +1410,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 	pos += 2;
 
 	for (i = 0; i < (cipher_num / 2); i++) {
-		memcpy( &ret_data[pos], cipher_suites[i].CipherSuite, 2);
+		memcpy( &ret_data[pos], cipher_suites[i].suite, 2);
 		pos += 2;
 	}
 	gnutls_free(cipher_suites);
@@ -1710,7 +1710,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 
 		memcpy(&data[pos],
 		       session->security_parameters.
-		       current_cipher_suite.CipherSuite, 2);
+		       current_cipher_suite.suite, 2);
 		pos += 2;
 
 		comp =
@@ -2436,13 +2436,13 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
  * by checking certificates etc.
  */
 int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
-					 GNUTLS_CipherSuite **
+					 cipher_suite_st **
 					 cipherSuites, int numCipherSuites, 
 					 gnutls_pk_algorithm requested_pk_algo)
 {
 
 	int ret = 0;
-	GNUTLS_CipherSuite *newSuite, cs;
+	cipher_suite_st *newSuite, cs;
 	int newSuiteSize = 0, i, remove;
 	const gnutls_certificate_credentials x509_cred;
 	gnutls_kx_algorithm kx;
@@ -2481,7 +2481,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	}
 
 	newSuite =
-	    gnutls_malloc(numCipherSuites * sizeof(GNUTLS_CipherSuite));
+	    gnutls_malloc(numCipherSuites * sizeof(cipher_suite_st));
 	if (newSuite == NULL) {
 		gnutls_assert();
 		gnutls_free(alg);
@@ -2510,15 +2510,15 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		
 		
 
-		memcpy( &cs.CipherSuite, &(*cipherSuites)[i].CipherSuite, 2);
+		memcpy( &cs.suite, &(*cipherSuites)[i].suite, 2);
 
 		if (remove == 0) {
 
 			_gnutls_handshake_log("HSK[%x]: Keeping ciphersuite: %s\n", session,
 				    _gnutls_cipher_suite_get_name(&cs));
 
-			memcpy(newSuite[newSuiteSize].CipherSuite,
-			       (*cipherSuites)[i].CipherSuite, 2);
+			memcpy(newSuite[newSuiteSize].suite,
+			       (*cipherSuites)[i].suite, 2);
 			newSuiteSize++;
 		} else {
 			_gnutls_handshake_log("HSK[%x]: Removing ciphersuite: %s\n", session, 

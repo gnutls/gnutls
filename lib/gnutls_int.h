@@ -184,25 +184,25 @@ typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, GNUTLS_COMP_DEFLATE
 
 typedef enum gnutls_connection_end { GNUTLS_SERVER=1, GNUTLS_CLIENT } gnutls_connection_end;
 
-typedef enum Extensions { GNUTLS_EXTENSION_SERVER_NAME=0, 
+typedef enum extensions_t { GNUTLS_EXTENSION_SERVER_NAME=0, 
    GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6, 
    GNUTLS_EXTENSION_CERT_TYPE=7 
-} Extensions;
+} extensions_t;
 
 typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type;
 
 typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
 } gnutls_certificate_type;
 
-typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
+typedef enum { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
 
-typedef enum ValidSession { VALID_TRUE, VALID_FALSE } ValidSession;
-typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
+typedef enum valid_session_t { VALID_TRUE, VALID_FALSE } valid_session_t;
+typedef enum resumable_session_t { RESUME_TRUE, RESUME_FALSE } resumable_session_t;
 
 /* Record Protocol */
-typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, 
+typedef enum content_type_t { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, 
 	GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA 
-} ContentType;
+} content_type_t;
 
 typedef enum gnutls_x509_crt_fmt { GNUTLS_X509_FMT_DER, 
 	GNUTLS_X509_FMT_PEM } gnutls_x509_crt_fmt;
@@ -234,17 +234,17 @@ typedef int (*gnutls_db_store_func)(void*, gnutls_datum key, gnutls_datum data);
 typedef int (*gnutls_db_remove_func)(void*, gnutls_datum key);
 typedef gnutls_datum (*gnutls_db_retr_func)(void*, gnutls_datum key);
 
-typedef struct auth_cred_t {
+typedef struct auth_cred_st {
 	gnutls_credentials_type algorithm;
 
 	/* the type of credentials depends on algorithm 
 	 */
 	void* credentials;
-	struct auth_cred_t* next;
-} auth_cred_t;
+	struct auth_cred_st* next;
+} auth_cred_st;
 
 
-struct GNUTLS_KEY_INT {
+struct gnutls_key_st {
 	/* For DH KX */
 	gnutls_datum			key;
 	mpi_t				KEY;
@@ -275,7 +275,7 @@ struct GNUTLS_KEY_INT {
 							 */
 	uint8				crypt_algo;
 
-	auth_cred_t*			cred; /* used to specify keys/certificates etc */
+	auth_cred_st*			cred; /* used to specify keys/certificates etc */
 	
 	int				certificate_requested;
 					/* some ciphersuites use this
@@ -287,7 +287,7 @@ struct GNUTLS_KEY_INT {
 					 * for a client certificate verify
 					 */
 };
-typedef struct GNUTLS_KEY_INT* GNUTLS_KEY;
+typedef struct gnutls_key_st* gnutls_key_st;
 
 
 /* STATE (cont) */
@@ -298,8 +298,8 @@ typedef struct GNUTLS_KEY_INT* GNUTLS_KEY;
 #include <gnutls_cert.h>
 
 typedef struct {
-	uint8 CipherSuite[2];
-} GNUTLS_CipherSuite;
+	uint8 suite[2];
+} cipher_suite_st;
 
 /* Versions should be in order of the oldest
  * (eg. SSL3 is before TLS1)
@@ -330,7 +330,7 @@ typedef struct {
 	                /* limit server_name extensions */
 	uint		server_names_size;
 	opaque 		srp_username[MAX_SRP_USERNAME];
-} TLSExtensions;
+} tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
  * elements.
@@ -369,14 +369,14 @@ typedef struct {
 	 * moved here from internals in order to be restored
 	 * on resume;
 	 */
-	GNUTLS_CipherSuite	current_cipher_suite;
+	cipher_suite_st	current_cipher_suite;
 	opaque 			master_secret[TLS_MASTER_SIZE];
 	opaque 			client_random[TLS_RANDOM_SIZE];
 	opaque 			server_random[TLS_RANDOM_SIZE];
 	opaque 			session_id[TLS_MAX_SESSION_ID_SIZE];
 	uint8 			session_id_size;
 	time_t 			timestamp;
-	TLSExtensions		extensions;
+	tls_ext_st		extensions;
 
 	/* The send size is the one requested by the programmer.
 	 * The recv size is the one negotiated with the peer.
@@ -386,7 +386,7 @@ typedef struct {
 	/* holds the negotiated certificate type */
 	gnutls_certificate_type		cert_type;	
 	gnutls_protocol_version		version; /* moved here */
-} SecurityParameters;
+} security_parameters_st;
 
 /* This structure holds the generated keys
  */
@@ -401,25 +401,25 @@ typedef struct {
 				      * been generated. Non zero
 				      * otherwise.
 				      */
-} CipherSpecs;
+} cipher_specs_st;
 
 
 typedef struct {
-	GNUTLS_CIPHER_HANDLE write_cipher_state;
-	GNUTLS_CIPHER_HANDLE read_cipher_state;
-	GNUTLS_COMP_HANDLE   read_compression_state;
-	GNUTLS_COMP_HANDLE   write_compression_state;
+	cipher_hd_t write_cipher_state;
+	cipher_hd_t read_cipher_state;
+	comp_hd_t   read_compression_state;
+	comp_hd_t   write_compression_state;
 	gnutls_datum 	read_mac_secret;
 	gnutls_datum 	write_mac_secret;
 	uint64		read_sequence_number;
 	uint64		write_sequence_number;
-} ConnectionState;
+} conn_stat_st;
 
 
 typedef struct {
 	unsigned int priority[MAX_ALGOS];
 	unsigned int algorithms;
-} GNUTLS_Priority;
+} priority_st;
 
 /* DH and RSA parameters types.
  */
@@ -427,20 +427,20 @@ typedef struct {
 	/* [0] is the prime, [1] is the generator.
 	 */
 	mpi_t params[2];
-} _gnutls_dh_params;
+} dh_params_st;
 
-#define gnutls_dh_params _gnutls_dh_params*
+#define gnutls_dh_params dh_params_st*
 
 #define gnutls_rsa_params gnutls_x509_privkey
 
-typedef struct gnutls_internal_params {
+typedef struct {
 	gnutls_dh_params	anon_dh_params;
 	int			free_anon_dh_params;
 	gnutls_dh_params	cert_dh_params;
 	int			free_cert_dh_params;
 	gnutls_rsa_params	rsa_params;
 	int 			free_rsa_params;
-} gnutls_internal_params;
+} internal_params_st;
 
 typedef struct gnutls_params_st {
 	gnutls_params_type type;
@@ -460,7 +460,7 @@ typedef struct {
 	/* this holds the length of the handshake packet */
 	size_t				packet_length;
 	HandshakeType			recv_type;
-} HANDSHAKE_HEADER_BUFFER;
+} handshake_header_buffer_st;
 
 /* Openpgp key retrieval callback */
 typedef int (*gnutls_openpgp_recv_key_func)(struct gnutls_session_int*,
@@ -470,11 +470,11 @@ typedef struct {
 	gnutls_buffer			application_data_buffer; /* holds data to be delivered to application layer */
 	gnutls_buffer			handshake_hash_buffer; /* used to keep the last received handshake 
 								* message */
-	GNUTLS_MAC_HANDLE		handshake_mac_handle_sha; /* hash of the handshake messages */
-	GNUTLS_MAC_HANDLE		handshake_mac_handle_md5; /* hash of the handshake messages */
+	mac_hd_t			handshake_mac_handle_sha; /* hash of the handshake messages */
+	mac_hd_t			handshake_mac_handle_md5; /* hash of the handshake messages */
 
 	gnutls_buffer			handshake_data_buffer; /* this is a buffer that holds the current handshake message */
-	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
+	resumable_session_t		resumable; /* TRUE or FALSE - if we can resume that session */
 	HandshakeState			handshake_state; /* holds
 					* a number which indicates where
 					* the handshake procedure has been
@@ -482,7 +482,7 @@ typedef struct {
 					* no interruption has happened.
 					*/
 	
-	ValidSession			valid_connection; /* true or FALSE - if this session is valid */
+	valid_session_t			valid_connection; /* true or FALSE - if this session is valid */
 
 	int				may_not_read; /* if it's 0 then we can read/write, otherwise it's forbiden to read/write
 	                                           */
@@ -499,16 +499,16 @@ typedef struct {
 	/* this is the compression method we are going to use */
 	gnutls_compression_method		compression_method;
 	/* priorities */
-	GNUTLS_Priority			cipher_algorithm_priority;
-	GNUTLS_Priority			mac_algorithm_priority;
-	GNUTLS_Priority			kx_algorithm_priority;
-	GNUTLS_Priority			compression_method_priority;
-	GNUTLS_Priority			protocol_priority;
-	GNUTLS_Priority			cert_type_priority;
+	priority_st			cipher_algorithm_priority;
+	priority_st			mac_algorithm_priority;
+	priority_st			kx_algorithm_priority;
+	priority_st			compression_method_priority;
+	priority_st			protocol_priority;
+	priority_st			cert_type_priority;
 
 	/* resumed session */
-	ResumableSession		resumed; /* RESUME_TRUE or FALSE - if we are resuming a session */
-	SecurityParameters		resumed_security_parameters;
+	resumable_session_t		resumed; /* RESUME_TRUE or FALSE - if we are resuming a session */
+	security_parameters_st		resumed_security_parameters;
 
 	/* sockets internals */
 	int				lowat;
@@ -518,9 +518,9 @@ typedef struct {
 	 */
 	gnutls_buffer 			handshake_send_buffer;
 	size_t	 			handshake_send_buffer_prev_size;
-	ContentType			handshake_send_buffer_type;
+	content_type_t			handshake_send_buffer_type;
 	HandshakeType			handshake_send_buffer_htype;
-	ContentType			handshake_recv_buffer_type;
+	content_type_t			handshake_recv_buffer_type;
 	HandshakeType			handshake_recv_buffer_htype;
 	gnutls_buffer 			handshake_recv_buffer;
 	
@@ -545,13 +545,13 @@ typedef struct {
 	int				have_peeked_data;
 
 	int				expire_time; /* after expire_time seconds this session will expire */
-	struct MOD_AUTH_STRUCT_INT*	auth_struct; /* used in handshake packets and KX algorithms */
+	struct mod_auth_st_int*		auth_struct; /* used in handshake packets and KX algorithms */
 	int				v2_hello; /* 0 if the client hello is v3+.
 						   * non-zero if we got a v2 hello.
 						   */
 	/* keeps the headers of the handshake packet 
 	 */
-	HANDSHAKE_HEADER_BUFFER		handshake_header_buffer;
+	handshake_header_buffer_st	handshake_header_buffer;
 
 	/* this is the highest version available
 	 * to the peer. (advertized version).
@@ -664,7 +664,7 @@ typedef struct {
 	 * credentials structure, or from a callback. That is to
 	 * minimize external calls.
 	 */
-	gnutls_internal_params  params;
+	internal_params_st	params;
 
 	/* This buffer is used by the record recv functions,
 	 * as a temporary store buffer.
@@ -673,14 +673,14 @@ typedef struct {
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
-} GNUTLS_INTERNALS;
+} internals_st;
 
 struct gnutls_session_int {
-	SecurityParameters security_parameters;
-	CipherSpecs cipher_specs;
-	ConnectionState connection_state;
-	GNUTLS_INTERNALS internals;
-	GNUTLS_KEY key;
+	security_parameters_st security_parameters;
+	cipher_specs_st cipher_specs;
+	conn_stat_st connection_state;
+	internals_st internals;
+	gnutls_key_st key;
 };
 
 typedef struct gnutls_session_int *gnutls_session;

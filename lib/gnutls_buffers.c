@@ -76,7 +76,7 @@ static int RET( int err) {
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
-int _gnutls_record_buffer_put(ContentType type, gnutls_session session, opaque *data, size_t length)
+int _gnutls_record_buffer_put(content_type_t type, gnutls_session session, opaque *data, size_t length)
 {
 	if (length==0) return 0;
 	switch( type) {
@@ -110,7 +110,7 @@ int _gnutls_record_buffer_put(ContentType type, gnutls_session session, opaque *
 
 }
 
-int _gnutls_record_buffer_get_size(ContentType type, gnutls_session session)
+int _gnutls_record_buffer_get_size(content_type_t type, gnutls_session session)
 {
 	switch( type) {
 		case GNUTLS_APPLICATION_DATA:
@@ -139,7 +139,7 @@ size_t gnutls_record_check_pending(gnutls_session session) {
 	return _gnutls_record_buffer_get_size(GNUTLS_APPLICATION_DATA, session);
 }
 
-int _gnutls_record_buffer_get(ContentType type, gnutls_session session, opaque *data, size_t length)
+int _gnutls_record_buffer_get(content_type_t type, gnutls_session session, opaque *data, size_t length)
 {
 	if (length==0 || data==NULL) {
 		gnutls_assert();
@@ -327,7 +327,7 @@ void _gnutls_io_clear_read_buffer( gnutls_session session) {
  * which are stored in a local (in the session) buffer. A pointer (iptr) to this buffer is returned.
  *
  */
-ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)
+ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t sizeOfPtr, content_type_t recv_type)
 {
 	ssize_t ret=0, ret2=0;
 	size_t min;
@@ -715,7 +715,7 @@ ssize_t _gnutls_handshake_io_write_flush( gnutls_session session)
 /* This is a send function for the gnutls handshake 
  * protocol. Just makes sure that all data have been sent.
  */
-ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type, HandshakeType htype, const void *iptr, size_t n)
+ssize_t _gnutls_handshake_io_send_int( gnutls_session session, content_type_t type, HandshakeType htype, const void *iptr, size_t n)
 {
 	size_t left;
 	ssize_t ret=0;
@@ -819,7 +819,7 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
  * protocol. Makes sure that we have received all data.
  */
 ssize_t _gnutls_handshake_io_recv_int( gnutls_session session, 
-	ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
+	content_type_t type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
 {
 	size_t left;
 	ssize_t i;

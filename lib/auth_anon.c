@@ -42,7 +42,7 @@ static int gen_anon_server_kx( gnutls_session, opaque**);
 static int proc_anon_client_kx( gnutls_session, opaque*, size_t);
 static int proc_anon_server_kx( gnutls_session, opaque*, size_t);
 
-const MOD_AUTH_STRUCT anon_auth_struct = {
+const mod_auth_st anon_auth_struct = {
 	"ANON",
 	NULL,
 	NULL,

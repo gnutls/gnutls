@@ -31,10 +31,10 @@
 
 GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 {
-	GNUTLS_MAC_HANDLE ret;
+	mac_hd_t ret;
 	gcry_error_t result;
 
-	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+	ret = gnutls_malloc(sizeof(mac_hd_t_INT));
 	if (ret == NULL) {
 		gnutls_assert();
 		return GNUTLS_HASH_FAILED;
@@ -100,7 +100,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
 	GNUTLS_HASH_HANDLE ret;
 	gcry_error_t result;
 
-	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+	ret = gnutls_malloc(sizeof(mac_hd_t_INT));
 
 	if (ret == NULL)
 		return GNUTLS_HASH_FAILED;
@@ -137,13 +137,13 @@ void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void *digest)
 }
 
 
-GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
+mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 				    const void *key, int keylen)
 {
-	GNUTLS_MAC_HANDLE ret;
+	mac_hd_t ret;
 	gcry_error_t result;
 
-	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+	ret = gnutls_malloc(sizeof(mac_hd_t_INT));
 	if (ret == NULL)
 		return GNUTLS_MAC_FAILED;
 
@@ -177,7 +177,7 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 	return ret;
 }
 
-void _gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle, void *digest)
+void _gnutls_hmac_deinit(mac_hd_t handle, void *digest)
 {
 	opaque *mac;
 	int maclen;
@@ -207,10 +207,10 @@ inline static int get_padsize( gnutls_mac_algorithm algorithm)
 	}
 }
 
-GNUTLS_MAC_HANDLE _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *key,
+mac_hd_t _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *key,
 					int keylen)
 {
-	GNUTLS_MAC_HANDLE ret;
+	mac_hd_t ret;
 	opaque ipad[48];
 	int padsize;
 
@@ -235,10 +235,10 @@ GNUTLS_MAC_HANDLE _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *ke
 	return ret;
 }
 
-void _gnutls_mac_deinit_ssl3(GNUTLS_MAC_HANDLE handle, void *digest)
+void _gnutls_mac_deinit_ssl3(mac_hd_t handle, void *digest)
 {
 	opaque ret[MAX_HASH_SIZE];
-	GNUTLS_MAC_HANDLE td;
+	mac_hd_t td;
 	opaque opad[48];
 	int padsize;
 	int block;
@@ -265,12 +265,12 @@ void _gnutls_mac_deinit_ssl3(GNUTLS_MAC_HANDLE handle, void *digest)
 	}
 }
 
-void _gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle,
+void _gnutls_mac_deinit_ssl3_handshake(mac_hd_t handle,
 				       void *digest, opaque * key,
 				       uint32 key_size)
 {
 	opaque ret[MAX_HASH_SIZE];
-	GNUTLS_MAC_HANDLE td;
+	mac_hd_t td;
 	opaque opad[48];
 	opaque ipad[48];
 	int padsize;
@@ -334,7 +334,7 @@ static int ssl3_md5(int i, opaque *secret, int secret_len, opaque *random,
 		    int random_len, void *digest)
 {
 	opaque tmp[MAX_HASH_SIZE];
-	GNUTLS_MAC_HANDLE td;
+	mac_hd_t td;
 	int ret;
 
 	td = _gnutls_hash_init(GNUTLS_MAC_MD5);
@@ -363,7 +363,7 @@ int _gnutls_ssl3_hash_md5(void *first, int first_len,
 			  opaque * ret)
 {
 	opaque digest[MAX_HASH_SIZE];
-	GNUTLS_MAC_HANDLE td;
+	mac_hd_t td;
 	int block = _gnutls_hash_get_algo_len(GNUTLS_MAC_MD5);
 
 	td = _gnutls_hash_init(GNUTLS_MAC_MD5);

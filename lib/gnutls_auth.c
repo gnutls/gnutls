@@ -43,7 +43,7 @@
   **/
 void gnutls_credentials_clear( gnutls_session session) {
 	if (session->key && session->key->cred) { /* beginning of the list */
-		auth_cred_t * ccred, *ncred;
+		auth_cred_st * ccred, *ncred;
 		ccred = session->key->cred;
 		while(ccred!=NULL) {
 			ncred = ccred->next;
@@ -84,12 +84,12 @@ void gnutls_credentials_clear( gnutls_session session) {
   *
   **/
 int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type, void* cred) {
-	auth_cred_t * ccred=NULL, *pcred=NULL;
+	auth_cred_st * ccred=NULL, *pcred=NULL;
 	int exists=0;	
 	
 	if (session->key->cred==NULL) { /* beginning of the list */
 		
-		session->key->cred = gnutls_malloc(sizeof(auth_cred_t));
+		session->key->cred = gnutls_malloc(sizeof(auth_cred_st));
 		if (session->key->cred == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
 		/* copy credentials locally */
@@ -111,7 +111,7 @@ int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type
 		 */
 
 		if (exists==0) { /* new entry */
-			pcred->next = gnutls_malloc(sizeof(auth_cred_t));
+			pcred->next = gnutls_malloc(sizeof(auth_cred_st));
 			if (pcred->next == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
 			ccred = pcred->next;
@@ -197,10 +197,10 @@ int server = session->security_parameters.entity==GNUTLS_SERVER?1:0;
 	return _gnutls_get_cred( session->key, _gnutls_map_kx_get_cred(algo, server), err);
 }
 
-const void *_gnutls_get_cred( GNUTLS_KEY key, gnutls_credentials_type type, int *err) {
+const void *_gnutls_get_cred( gnutls_key_st key, gnutls_credentials_type type, int *err) {
 	const void *retval = NULL;
 	int _err = -1;
-	auth_cred_t * ccred;
+	auth_cred_st * ccred;
 
 	if (key == NULL) goto out;
 
@@ -340,7 +340,7 @@ int _gnutls_auth_info_set( gnutls_session session,
 /* this function will copy an mpi_t key to 
  * opaque data.
  */
-int _gnutls_generate_session_key(GNUTLS_KEY key) {
+int _gnutls_generate_session_key(gnutls_key_st key) {
 size_t tmp;
 
         _gnutls_mpi_print( NULL, &tmp, key->KEY);

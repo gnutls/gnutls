@@ -45,12 +45,12 @@ LZO_FUNC _gnutls_lzo1x_1_compress = NULL;
 /* The flag d is the direction (compress, decompress). Non zero is
  * decompress.
  */
-GNUTLS_COMP_HANDLE _gnutls_comp_init( gnutls_compression_method method, int d)
+comp_hd_t _gnutls_comp_init( gnutls_compression_method method, int d)
 {
-GNUTLS_COMP_HANDLE ret;
+comp_hd_t ret;
 int err;
 
-	ret = gnutls_malloc( sizeof( struct GNUTLS_COMP_HANDLE_STRUCT));
+	ret = gnutls_malloc( sizeof( struct comp_hd_t_STRUCT));
 	if (ret==NULL) {
 		gnutls_assert();
 		return NULL;
@@ -121,7 +121,7 @@ int err;
 	return ret;
 }
 
-void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d) {
+void _gnutls_comp_deinit(comp_hd_t handle, int d) {
 int err;
 
 	if (handle!=NULL) {
@@ -146,7 +146,7 @@ int err;
 /* These functions are memory consuming 
  */
 
-int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const opaque* plain, size_t plain_size, 
+int _gnutls_compress( comp_hd_t handle, const opaque* plain, size_t plain_size, 
 	opaque** compressed, size_t max_comp_size) 
 {
 int compressed_size=GNUTLS_E_COMPRESSION_FAILED;
@@ -234,7 +234,7 @@ int err;
 
 
 
-int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, opaque* compressed, size_t compressed_size, 
+int _gnutls_decompress( comp_hd_t handle, opaque* compressed, size_t compressed_size, 
 	opaque** plain, size_t max_record_size) 
 {
 int plain_size=GNUTLS_E_DECOMPRESSION_FAILED, err;

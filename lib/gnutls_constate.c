@@ -393,7 +393,7 @@ int _gnutls_set_write_keys(gnutls_session session)
 
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
-	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(GNUTLS_CipherSuite)); \
+	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(cipher_suite_st)); \
 	memcpy( dst->master_secret, src->master_secret, TLS_MASTER_SIZE); \
 	memcpy( dst->client_random, src->client_random, TLS_RANDOM_SIZE); \
 	memcpy( dst->server_random, src->server_random, TLS_RANDOM_SIZE); \
@@ -404,10 +404,10 @@ int _gnutls_set_write_keys(gnutls_session session)
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \
 	dst->version = src->version; \
-	memcpy( &dst->extensions, &src->extensions, sizeof(TLSExtensions));
+	memcpy( &dst->extensions, &src->extensions, sizeof(tls_ext_st));
 
-static void _gnutls_cpy_read_security_parameters(SecurityParameters * dst,
-						 SecurityParameters * src)
+static void _gnutls_cpy_read_security_parameters(security_parameters_st * dst,
+						 security_parameters_st * src)
 {
 	CPY_COMMON;
 
@@ -416,8 +416,8 @@ static void _gnutls_cpy_read_security_parameters(SecurityParameters * dst,
 	dst->read_compression_algorithm = src->read_compression_algorithm;
 }
 
-static void _gnutls_cpy_write_security_parameters(SecurityParameters * dst,
-						  SecurityParameters * src)
+static void _gnutls_cpy_write_security_parameters(security_parameters_st * dst,
+						  security_parameters_st * src)
 {
 	CPY_COMMON;
 

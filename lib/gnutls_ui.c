@@ -72,7 +72,7 @@ void gnutls_dh_set_prime_bits(gnutls_session session, unsigned int bits)
 int gnutls_dh_get_group(gnutls_session session, 
 	gnutls_datum* raw_gen, gnutls_datum* raw_prime)
 {
-dh_info_st *dh;
+dh_info_t *dh;
 anon_server_auth_info_t anon_info;
 cert_auth_info_t cert_info;
 
@@ -116,7 +116,7 @@ cert_auth_info_t cert_info;
   **/
 int gnutls_dh_get_pubkey(gnutls_session session, gnutls_datum* key)
 {
-dh_info_st* dh;
+dh_info_t* dh;
 anon_server_auth_info_t anon_info;
 cert_auth_info_t cert_info;
 
@@ -227,7 +227,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
   **/
 int gnutls_dh_get_prime_bits(gnutls_session session)
 {
-dh_info_st *dh;
+dh_info_t *dh;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
@@ -289,7 +289,7 @@ cert_auth_info_t info;
   **/
 int gnutls_dh_get_peers_public_bits(gnutls_session session)
 {
-dh_info_st * dh;
+dh_info_t * dh;
 
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {

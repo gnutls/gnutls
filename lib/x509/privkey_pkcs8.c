@@ -1201,7 +1201,7 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn, const char *root,
 	int data_size;
 	opaque *data = NULL, *key = NULL;
 	gnutls_datum dkey, div;
-	GNUTLS_CIPHER_HANDLE ch = NULL;
+	cipher_hd_t ch = NULL;
 	int key_size;
 
 	data_size = 0;
@@ -1640,7 +1640,7 @@ static int encrypt_data( const gnutls_datum * plain,
 	int data_size;
 	opaque *data = NULL;
 	gnutls_datum div;
-	GNUTLS_CIPHER_HANDLE ch = NULL;
+	cipher_hd_t ch = NULL;
 	opaque pad, pad_size;
 
 	pad_size = _gnutls_cipher_get_block_size(enc_params->cipher);

@@ -256,7 +256,7 @@ gnutls_protocol_version lver;
 }
 
 /* This function behaves exactly like write(). The only difference is
- * that it accepts, the gnutls_session and the ContentType of data to
+ * that it accepts, the gnutls_session and the content_type_t of data to
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current session.    
  *
@@ -269,7 +269,7 @@ gnutls_protocol_version lver;
  * and only if the previous send was interrupted for some reason.
  *
  */
-ssize_t _gnutls_send_int( gnutls_session session, ContentType type, 
+ssize_t _gnutls_send_int( gnutls_session session, content_type_t type, 
 	HandshakeType htype, const void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
@@ -408,7 +408,7 @@ ssize_t _gnutls_send_change_cipher_spec( gnutls_session session, int again)
 	}
 }
 
-static int _gnutls_check_recv_type( ContentType recv_type) {
+static int _gnutls_check_recv_type( content_type_t recv_type) {
 	switch( recv_type) {
 	case GNUTLS_CHANGE_CIPHER_SPEC:
 	case GNUTLS_ALERT:
@@ -426,7 +426,7 @@ static int _gnutls_check_recv_type( ContentType recv_type) {
 /* Checks if there are pending data in the record buffers. If there are
  * then it copies the data.
  */
-static int _gnutls_check_buffers( gnutls_session session, ContentType type, opaque* data, int sizeofdata) {
+static int _gnutls_check_buffers( gnutls_session session, content_type_t type, opaque* data, int sizeofdata) {
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && _gnutls_record_buffer_get_size(type, session) > 0) {
 		int ret, ret2;
 		ret = _gnutls_record_buffer_get(type, session, data, sizeofdata);
@@ -455,8 +455,8 @@ static int _gnutls_check_buffers( gnutls_session session, ContentType type, opaq
 /* Checks the record headers and returns the length, version and
  * content type.
  */
-static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[RECORD_HEADER_SIZE], ContentType type, 
-	HandshakeType htype, /*output*/ ContentType *recv_type, opaque version[2], uint16 *length, uint16* header_size) {
+static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[RECORD_HEADER_SIZE], content_type_t type, 
+	HandshakeType htype, /*output*/ content_type_t *recv_type, opaque version[2], uint16 *length, uint16* header_size) {
 
 	/* Read the first two bytes to determine if this is a 
 	 * version 2 message 
@@ -525,8 +525,8 @@ static int _gnutls_check_record_version( gnutls_session session, HandshakeType h
 /* This function will check if the received record type is
  * the one we actually expect.
  */
-static int _gnutls_record_check_type( gnutls_session session, ContentType recv_type,
-	ContentType type, HandshakeType htype, opaque* data, int data_size) {
+static int _gnutls_record_check_type( gnutls_session session, content_type_t recv_type,
+	content_type_t type, HandshakeType htype, opaque* data, int data_size) {
 	
 	int ret;
 
@@ -664,20 +664,20 @@ inline static int get_temp_recv_buffer( gnutls_session session, gnutls_datum* tm
 #define MAX_EMPTY_PACKETS_SEQUENCE 4
 
 /* This function behaves exactly like read(). The only difference is
- * that it accepts the gnutls_session and the ContentType of data to
+ * that it accepts the gnutls_session and the content_type_t of data to
  * receive (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
  *
  * The HandshakeType was introduced to support SSL V2.0 client hellos.
  */
-ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, 
+ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type, 
 	HandshakeType htype, opaque *data, size_t sizeofdata)
 {
 	gnutls_datum tmp;
 	int decrypted_length;
 	opaque version[2];
 	uint8 *headers;
-	ContentType recv_type;
+	content_type_t recv_type;
 	uint16 length;
 	uint8 *ciphertext;
 	uint8 *recv_data;

@@ -41,7 +41,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session, opaque **);
 int _gnutls_proc_srp_server_kx(gnutls_session, opaque *, size_t);
 int _gnutls_proc_srp_client_kx(gnutls_session, opaque *, size_t);
 
-const MOD_AUTH_STRUCT srp_auth_struct = {
+const mod_auth_st srp_auth_struct = {
 	"SRP",
 	NULL,
 	NULL,

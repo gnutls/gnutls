@@ -42,7 +42,7 @@
 static int gen_srp_cert_server_kx(gnutls_session, opaque **);
 static int proc_srp_cert_server_kx(gnutls_session, opaque *, size_t);
 
-const MOD_AUTH_STRUCT srp_rsa_auth_struct = {
+const mod_auth_st srp_rsa_auth_struct = {
 	"SRP",
 	_gnutls_gen_cert_server_certificate,
 	NULL,
@@ -59,7 +59,7 @@ const MOD_AUTH_STRUCT srp_rsa_auth_struct = {
 	NULL
 };
 
-const MOD_AUTH_STRUCT srp_dss_auth_struct = {
+const mod_auth_st srp_dss_auth_struct = {
 	"SRP",
 	_gnutls_gen_cert_server_certificate,
 	NULL,

@@ -126,7 +126,7 @@ struct gnutls_cipher_entry {
 	gnutls_cipher_algorithm id;
 	uint16 blocksize;
 	uint16 keysize;
-	CipherType block;
+	cipher_type_t block;
 	uint16 iv;
 	int export_flag; /* 0 non export */
 };
@@ -211,11 +211,11 @@ gnutls_compression_entry _gnutls_compression_algorithms[MAX_COMP_METHODS] =
 /* Key Exchange Section */
 
 
-extern MOD_AUTH_STRUCT rsa_auth_struct;
-extern MOD_AUTH_STRUCT rsa_export_auth_struct;
-extern MOD_AUTH_STRUCT dhe_rsa_auth_struct;
-extern MOD_AUTH_STRUCT dhe_dss_auth_struct;
-extern MOD_AUTH_STRUCT anon_auth_struct;
+extern mod_auth_st rsa_auth_struct;
+extern mod_auth_st rsa_export_auth_struct;
+extern mod_auth_st dhe_rsa_auth_struct;
+extern mod_auth_st dhe_dss_auth_struct;
+extern mod_auth_st anon_auth_struct;
 
 
 #define MAX_KX_ALGOS 10
@@ -250,7 +250,7 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 
 typedef struct {
 	const char *name;
-	GNUTLS_CipherSuite id;
+	cipher_suite_st id;
 	gnutls_cipher_algorithm block_algorithm;
 	gnutls_kx_algorithm kx_algorithm;
 	gnutls_mac_algorithm mac_algorithm;
@@ -475,7 +475,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                 for(p = cs_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_CIPHER_SUITE_ALG_LOOP(a) \
-                        GNUTLS_CIPHER_SUITE_LOOP( if( (p->id.CipherSuite[0] == suite->CipherSuite[0]) && (p->id.CipherSuite[1] == suite->CipherSuite[1])) { a; break; } )
+                        GNUTLS_CIPHER_SUITE_LOOP( if( (p->id.suite[0] == suite->suite[0]) && (p->id.suite[1] == suite->suite[1])) { a; break; } )
 
 
 
@@ -721,9 +721,9 @@ int _gnutls_cipher_is_ok(gnutls_cipher_algorithm algorithm)
 
 
 /* Key EXCHANGE functions */
-MOD_AUTH_STRUCT *_gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm)
+mod_auth_st *_gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm)
 {
-	MOD_AUTH_STRUCT *ret = NULL;
+	mod_auth_st *ret = NULL;
 	GNUTLS_KX_ALG_LOOP(ret = p->auth_struct);
 	return ret;
 
@@ -931,7 +931,7 @@ gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm algorithm, i
 
 /* Cipher Suite's functions */
 gnutls_cipher_algorithm
-_gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite* suite)
+_gnutls_cipher_suite_get_cipher_algo(const cipher_suite_st* suite)
 {
 	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->block_algorithm);
@@ -939,14 +939,14 @@ _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite* suite)
 }
 
 gnutls_protocol_version
-_gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite* suite)
+_gnutls_cipher_suite_get_version(const cipher_suite_st* suite)
 {
 	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->version);
 	return ret;
 }
 
-gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite*
+gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const cipher_suite_st*
 					     suite)
 {
 	int ret = 0;
@@ -957,7 +957,7 @@ gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite*
 }
 
 gnutls_mac_algorithm
-_gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite *suite)
+_gnutls_cipher_suite_get_mac_algo(const cipher_suite_st *suite)
 {				/* In bytes */
 	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm);
@@ -965,7 +965,7 @@ _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite *suite)
 
 }
 
-const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite* suite)
+const char *_gnutls_cipher_suite_get_name(cipher_suite_st* suite)
 {
 	const char *ret = NULL;
 
@@ -1006,7 +1006,7 @@ const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm kx_algorithm,
 }
 
 inline
-static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite *suite)
+static int _gnutls_cipher_suite_is_ok(cipher_suite_st *suite)
 {
 	size_t ret;
 	const char *name = NULL;
@@ -1100,20 +1100,20 @@ _gnutls_compare_algo(gnutls_session session, const void *i_A1,
 		     const void *i_A2)
 {
 	gnutls_kx_algorithm kA1 =
-	    _gnutls_cipher_suite_get_kx_algo((const GNUTLS_CipherSuite *) i_A1);
+	    _gnutls_cipher_suite_get_kx_algo((const cipher_suite_st *) i_A1);
 	gnutls_kx_algorithm kA2 =
-	    _gnutls_cipher_suite_get_kx_algo((const GNUTLS_CipherSuite *) i_A2);
+	    _gnutls_cipher_suite_get_kx_algo((const cipher_suite_st *) i_A2);
 	gnutls_cipher_algorithm cA1 =
-	    _gnutls_cipher_suite_get_cipher_algo((const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_cipher_algo((const cipher_suite_st *)
 						 i_A1);
 	gnutls_cipher_algorithm cA2 =
-	    _gnutls_cipher_suite_get_cipher_algo((const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_cipher_algo((const cipher_suite_st *)
 						 i_A2);
 	gnutls_mac_algorithm mA1 =
-	    _gnutls_cipher_suite_get_mac_algo((const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_mac_algo((const cipher_suite_st *)
 					      i_A1);
 	gnutls_mac_algorithm mA2 =
-	    _gnutls_cipher_suite_get_mac_algo((const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_mac_algo((const cipher_suite_st *)
 					      i_A2);
 
 	int p1 = (_gnutls_kx_priority(session, kA1) + 1) * 64;
@@ -1157,7 +1157,7 @@ _gnutls_bsort(gnutls_session session, void *_base, size_t nmemb,
 
 int
 _gnutls_supported_ciphersuites_sorted(gnutls_session session,
-				      GNUTLS_CipherSuite ** ciphers)
+				      cipher_suite_st ** ciphers)
 {
 
 #ifdef SORT_DEBUG
@@ -1179,7 +1179,7 @@ _gnutls_supported_ciphersuites_sorted(gnutls_session session,
 #endif
 
 	_gnutls_qsort(session, *ciphers, count,
-		      sizeof(GNUTLS_CipherSuite), _gnutls_compare_algo);
+		      sizeof(cipher_suite_st), _gnutls_compare_algo);
 
 #ifdef SORT_DEBUG
 	_gnutls_debug_log( "Sorted: \n");
@@ -1193,24 +1193,24 @@ _gnutls_supported_ciphersuites_sorted(gnutls_session session,
 
 int
 _gnutls_supported_ciphersuites(gnutls_session session,
-			       GNUTLS_CipherSuite ** _ciphers)
+			       cipher_suite_st ** _ciphers)
 {
 
 	unsigned int i, ret_count, j;
 	unsigned int count = CIPHER_SUITES_COUNT;
-	GNUTLS_CipherSuite *tmp_ciphers;
-	GNUTLS_CipherSuite* ciphers;
+	cipher_suite_st *tmp_ciphers;
+	cipher_suite_st* ciphers;
 	gnutls_protocol_version version;
 
 	if (count == 0) {
 		return 0;
 	}
 
-	tmp_ciphers = gnutls_alloca(count * sizeof(GNUTLS_CipherSuite));
+	tmp_ciphers = gnutls_alloca(count * sizeof(cipher_suite_st));
 	if ( tmp_ciphers==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
+	ciphers = gnutls_malloc(count * sizeof(cipher_suite_st));
 	if ( ciphers==NULL) {
 		gnutls_afree( tmp_ciphers);
 		return GNUTLS_E_MEMORY_ERROR;
@@ -1219,13 +1219,13 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 	version = gnutls_protocol_get_version( session);
 
 	for (i = 0; i < count; i++) {
-		memcpy( &tmp_ciphers[i], &cs_algorithms[i].id, sizeof( GNUTLS_CipherSuite));
+		memcpy( &tmp_ciphers[i], &cs_algorithms[i].id, sizeof( cipher_suite_st));
 	}
 
 	for (i = j = 0; i < count; i++) {
 		/* remove private cipher suites, if requested.
 		 */
-		if ( tmp_ciphers[i].CipherSuite[0] == 0xFF && 
+		if ( tmp_ciphers[i].suite[0] == 0xFF && 
 			session->internals.enable_private == 0)
 				continue;
 
@@ -1250,7 +1250,7 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 		    < 0)
 			continue;
 
-		memcpy( &ciphers[j], &tmp_ciphers[i], sizeof( GNUTLS_CipherSuite));
+		memcpy( &ciphers[j], &tmp_ciphers[i], sizeof( cipher_suite_st));
 		j++;
 	}
 
@@ -1260,7 +1260,7 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 	if (ret_count > 0 && ret_count != count) {
 		ciphers =
 		    gnutls_realloc_fast(ciphers,
-				   ret_count * sizeof(GNUTLS_CipherSuite));
+				   ret_count * sizeof(cipher_suite_st));
 	} else {
 		if (ret_count != count) {
 			gnutls_free(ciphers);

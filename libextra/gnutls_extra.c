@@ -61,9 +61,9 @@ int i;
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
-extern MOD_AUTH_STRUCT srp_auth_struct;
-extern MOD_AUTH_STRUCT srp_rsa_auth_struct;
-extern MOD_AUTH_STRUCT srp_dss_auth_struct;
+extern mod_auth_st srp_auth_struct;
+extern mod_auth_st srp_rsa_auth_struct;
+extern mod_auth_st srp_dss_auth_struct;
 
 
 static int _gnutls_add_srp_auth_struct(void) {

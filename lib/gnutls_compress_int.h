@@ -27,15 +27,15 @@
 
 #define GNUTLS_COMP_FAILED NULL
 
-typedef struct GNUTLS_COMP_HANDLE_STRUCT {
+typedef struct comp_hd_t_STRUCT {
 	void* handle;
 	gnutls_compression_method algo;
-} *GNUTLS_COMP_HANDLE;
+} *comp_hd_t;
 
-GNUTLS_COMP_HANDLE _gnutls_comp_init( gnutls_compression_method, int d);
-void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d);
+comp_hd_t _gnutls_comp_init( gnutls_compression_method, int d);
+void _gnutls_comp_deinit(comp_hd_t handle, int d);
 
-int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, opaque* compressed, size_t compressed_size, opaque** plain, size_t max_record_size);
-int _gnutls_compress( GNUTLS_COMP_HANDLE, const opaque* plain, size_t plain_size, opaque** compressed, size_t max_comp_size);
+int _gnutls_decompress( comp_hd_t handle, opaque* compressed, size_t compressed_size, opaque** plain, size_t max_record_size);
+int _gnutls_compress( comp_hd_t, const opaque* plain, size_t plain_size, opaque** compressed, size_t max_comp_size);
 
 #endif

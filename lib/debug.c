@@ -46,7 +46,7 @@ void _gnutls_print_state(gnutls_session session)
 
 #endif
 
-const char* _gnutls_packet2str( ContentType packet) 
+const char* _gnutls_packet2str( content_type_t packet) 
 {
 	switch(packet) {
 		case GNUTLS_CHANGE_CIPHER_SPEC:
