@@ -1,29 +1,30 @@
-INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl -I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes -I$(top_srcdir)/lib/minitasn1 $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS) -I$(srcdir)/opencdk -I$(srcdir)/openpgp
-bin_SCRIPTS = libgnutls-extra-config
 DIST_SUBDIRS = openpgp opencdk
 
+INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl -I$(top_srcdir)/lib -I../includes -I$(top_srcdir)/includes -I$(top_srcdir)/lib/minitasn1 $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS) -I$(srcdir)/opencdk -I$(srcdir)/openpgp
+
+bin_SCRIPTS = libgnutls-extra-config
+
 m4datadir = $(datadir)/aclocal
-m4data_DATA = libgnutls-extra.m4
+dist_m4data_DATA = libgnutls-extra.m4
 
 # Pkg-config script.
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls-extra.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
-LIBGNUTLS_EXTRA_EXPORTS = -export-symbols-regex '^gnutls.*'
-
-EXTRA_DIST = openssl_compat.h gnutls-extra-api.texi gnutls_extra.h	\
-	libgnutls-extra-config.in libgnutls-extra.m4 lzoconf.h		\
-	minilzo.h
+EXTRA_DIST = gnutls-extra-api.texi
 
 lib_LTLIBRARIES = libgnutls-extra.la
+
+# OpenSSL
 
 if ENABLE_OPENSSL
 lib_LTLIBRARIES += libgnutls-openssl.la
 
 libgnutls_openssl_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.c
+libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
+	openssl_compat.c
 
 libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la ../crypto/libgc.la
 
@@ -33,6 +34,8 @@ else
 libgnutls_openssl_la_LDFLAGS += $(LIBTASN1_LIBS) 
 endif
 endif
+
+# OpenPGP
 
 if ENABLE_OPENPGP
 PGP_COBJECTS = gnutls_openpgp.c openpgp/xml.c \
@@ -57,24 +60,21 @@ endif
 
 endif
 
-if ENABLE_INCLUDED_LZO
-LZO_OBJECTS = minilzo.c
-else
+# LZO
 
 LZO_OBJECTS = 
+if ENABLE_INCLUDED_LZO
+LZO_OBJECTS += lzoconf.h minilzo.h minilzo.c
 endif
 
+COBJECTS_EXTRA = gnutls_extra.c
 
-COBJECTS_EXTRA = \
-	gnutls_extra.c
-
-
-libgnutls_extra_la_LDFLAGS = $(LIBGNUTLS_EXTRA_EXPORTS) \
+libgnutls_extra_la_LDFLAGS = -export-symbols-regex '^gnutls.*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LIBOPENCDK_LIBS) $(LZO_LIBS)
 
 libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS) \
-	$(PGP_COBJECTS) $(OPENCDK_COBJECTS)
+	$(PGP_COBJECTS) $(OPENCDK_COBJECTS) gnutls_extra.h
 
 libgnutls_extra_la_LIBADD = ../lib/libgnutls.la ../gl/libgnu.la
 
