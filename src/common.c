@@ -220,12 +220,27 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 
 		gnutls_openpgp_key_init(&crt);
 		ret =
-		    gnutls_openpgp_key_import(crt, &cert_list[0], 0);
+		    gnutls_openpgp_key_import(crt, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
 		if (ret < 0) {
 			const char* str = gnutls_strerror(ret);
 			if (str == NULL) str = str_unknown;
 			fprintf(stderr, "Decoding error: %s\n", str);
 			return;
+		}
+
+		if (print_cert) {
+			size_t size;
+			
+			size = sizeof(buffer);
+
+			ret = gnutls_openpgp_key_export( crt, GNUTLS_OPENPGP_FMT_BASE64, buffer, &size);
+			if (ret < 0) {
+				fprintf(stderr, "Encoding error: %s\n", gnutls_strerror(ret));
+				return;
+			}
+			fputs( "\n", stdout);
+			fputs( buffer, stdout);
+			fputs( "\n", stdout);
 		}
 
 		if (hostname != NULL) { /* Check the hostname of the first certificate
