@@ -304,9 +304,7 @@ void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
   * @state: is a gnutls state
   *
   * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
-  * The return value (status) should be one of the CertificateStatus enumerated elements.
-  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
+  * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
 int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
@@ -369,13 +367,18 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * The return value (status) should be one or more of the CertificateStatus 
   * enumerated elements bitwise or'd.
   *
-  * GNUTLS_CERT_TRUSTED: the peer's certificate is trusted.
-  * GNUTLS_CERT_NOT_TRUSTED: the peer's certificate is not trusted.
-  * GNUTLS_CERT_INVALID: the certificate chain is broken.
-  * GNUTLS_CERT_REVOKED: the certificate has been revoked
+  * GNUTLS_CERT_TRUSTED\: the peer's certificate is trusted.
+  *
+  * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
+  *
+  * GNUTLS_CERT_INVALID\: the certificate chain is broken.
+  *
+  * GNUTLS_CERT_REVOKED\: the certificate has been revoked
   *  (not implemented yet).
-  * GNUTLS_CERT_EXPIRED: the certificate has expired.
-  * GNUTLS_CERT_CORRUPTED: the certificate is corrupted.
+  *
+  * GNUTLS_CERT_EXPIRED\: the certificate has expired.
+  *
+  * GNUTLS_CERT_CORRUPTED\: the certificate is corrupted.
   *
   * A negative error code is returned in case of an error.
   * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that

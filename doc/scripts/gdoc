@@ -81,7 +81,7 @@
 #
 # 1. the symbol '->' will be replaced with a rightarrow
 # 2. x^y with ${x}^{y}$.
-#
+# 3. xxx\: with xxx:
 
 
 # match expressions used to find embedded type information
@@ -352,6 +352,7 @@ sub output_tex {
 
 	$sec = $args{'sections'}{$section};
 	$sec =~ s/_/\\_/g;
+	$sec =~ s/\\:/:/g;
 	$sec =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
 	$sec =~ s/->/\$\\rightarrow\$/g;
 	$sec =~ s/([0-9]+)\^([0-9]+)/\$\{\1\}\^\{\2\}\$/g;

@@ -826,9 +826,11 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
   * 
   * Returns:
   *
-  *   ASN_OK: DER encoding OK
-  *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *   ASN_VALUE_NOT_FOUND: there is an element without a value.
+  *   ASN_OK\: DER encoding OK
+  *
+  *   ASN_ELEMENT_NOT_FOUND\: NAME is not a valid element.
+  *
+  *   ASN_VALUE_NOT_FOUND\: there is an element without a value.
   **/
 int 
 asn1_create_der(node_asn *root,char *name,unsigned char *der,int *len)
@@ -979,9 +981,11 @@ asn1_create_der(node_asn *root,char *name,unsigned char *der,int *len)
   * 
   * Returns:
   *
-  *   ASN_OK: DER encoding OK
-  *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *   ASN_TAG_ERROR,ASN_DER_ERROR: the der encoding doesn't match the structure NAME.  
+  *   ASN_OK\: DER encoding OK
+  *
+  *   ASN_ELEMENT_NOT_FOUND\: NAME is not a valid element.
+  *
+  *   ASN_TAG_ERROR,ASN_DER_ERROR\: the der encoding doesn't match the structure NAME.  
   **/
 
 int 
@@ -1220,9 +1224,11 @@ asn1_get_der(node_asn *root,unsigned char *der,int len)
   *
   * Returns:
   *
-  *   ASN_OK: DER encoding OK
-  *   ASN_ELEMENT_NOT_FOUND: NAME or NAME_ELEMENT is not a valid element.
-  *   ASN_TAG_ERROR,ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
+  *   ASN_OK\: DER encoding OK
+  *
+  *   ASN_ELEMENT_NOT_FOUND\: NAME or NAME_ELEMENT is not a valid element.
+  *
+  *   ASN_TAG_ERROR,ASN_DER_ERROR\: the der encoding doesn't match the structure NAME.
   *
   **/
 int 

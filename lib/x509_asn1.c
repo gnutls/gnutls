@@ -456,8 +456,9 @@ _asn1_convert_integer(char *value,unsigned char *value_out,int value_out_size, i
   *
   * Returns:
   *
-  *  ASN_OK: structure created correctly. 
-  *  ASN_GENERIC_ERROR: an error occured while structure creation  
+  *  ASN_OK\: structure created correctly. 
+  *
+  *  ASN_GENERIC_ERROR\: an error occured while structure creation  
   **/
 int
 asn1_create_tree(const static_asn *root,node_asn **pointer)
@@ -797,8 +798,9 @@ asn1_visit_tree(node_asn *pointer,char *name)
   * 
   * Returns:
   *
-  *   ASN_OK: everything OK
-  *   ASN_ELEMENT_NOT_FOUND: pointer==NULL.
+  *   ASN_OK\: everything OK
+  *
+  *   ASN_ELEMENT_NOT_FOUND\: pointer==NULL.
   *
   **/
 int
@@ -929,8 +931,9 @@ _asn1_copy_structure2(node_asn *root,char *source_name)
   *
   * Returns:
   *
-  *  ASN_OK: creation OK
-  *  ASN_ELEMENT_NOT_FOUND: SOURCE_NAME isn't known
+  *  ASN_OK\: creation OK
+  *
+  *  ASN_ELEMENT_NOT_FOUND\: SOURCE_NAME isn't known
   * 
   * Example: using "pkix.asn"
   *  result=asn1_create_structure(cert_def,"PKIX1Implicit88.Certificate",&cert,"certificate1");
@@ -1011,9 +1014,11 @@ _asn1_append_sequence_set(node_asn *node)
   * 
   * Returns:
   * 
-  *   ASN_OK: set value OK
-  *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *   ASN_VALUE_NOT_VALID: VALUE has a wrong format.
+  *   ASN_OK\: set value OK
+  *
+  *   ASN_ELEMENT_NOT_FOUND\: NAME is not a valid element.
+  *
+  *   ASN_VALUE_NOT_VALID\: VALUE has a wrong format.
   * 
   * Examples:  
   *   description for each type
@@ -1331,9 +1336,11 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   * 
   * Returns:
   *
-  *   ASN_OK: set value OK
-  *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *   ASN_VALUE_NOT_FOUND: there isn't any value for the element selected.
+  *   ASN_OK\: set value OK
+  *
+  *   ASN_ELEMENT_NOT_FOUND\: NAME is not a valid element.
+  *
+  *   ASN_VALUE_NOT_FOUND\: there isn't any value for the element selected.
   * 
   * Examples: 
   *   a description for each type

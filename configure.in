@@ -210,7 +210,7 @@ LIBS="${LIBS} -lmhash")])
 
 AC_MSG_CHECKING([whether to check for external libraries])
 
-dnl if used --with-ext-libraries then we will not check
+dnl if used --without-ext-libraries then we will not check
 dnl for any library (libz, libgdbm, opencdk)
 
 AC_ARG_WITH( ext-libraries, [  --without-ext-libraries disable external libraries support],
@@ -221,7 +221,7 @@ if test x$ac_ext_libraries != xno; then
  AC_MSG_RESULT(yes)
  AC_CHECK_LIB(gdbm, gdbm_open,, AC_MSG_WARN(
 *** 
-*** GDBM was not found. You will not be able to use Server side session resuming.))
+*** GDBM was not found. You will not be able to use the default gdbm session resumption backend.))
  AC_CHECK_LIB(z, compress,,AC_MSG_WARN(
 *** 
 *** ZLIB was not found. You will not be able to use ZLIB compression.))

@@ -1817,8 +1817,8 @@ static int _gnutls_handshake_hash_init( GNUTLS_STATE state) {
   * GNUTLS_E_INTERRUPTED. In that case you may resume the handshake
   * (call this function again, until it returns ok)
   *
-  * If this function is called by a server after a rehandshake request
-  * then GNUTLS_E_GOT_APPLICATION_DATA or GNUTLS_E_WARNING_ALERT_RECEIVED 
+  * If this function is called by a server after a rehandshake request then
+  * GNUTLS_E_GOT_APPLICATION_DATA or GNUTLS_E_WARNING_ALERT_RECEIVED 
   * may be returned. Note that these are non fatal errors, only in the
   * case of a rehandshake. In that case they mean that the client
   * rejected the rehandshake request.

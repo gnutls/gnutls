@@ -1,3 +1,27 @@
+2002-03-03 09:28  nmav <nmav@gnutls.org>
+
+	* src/tls_test.c:
+
+	last minute changes for 0.3.91 release 
+
+2002-03-03 09:18  nmav <nmav@gnutls.org>
+
+	* ChangeLog, NEWS, configure.in, lib/auth_anon.c, lib/auth_cert.c,
+	lib/auth_dhe.c, lib/auth_srp.c, lib/gnutls_auth.c,
+	lib/gnutls_auth_int.h, lib/gnutls_errors.c, src/cli.c:
+
+	Added checks in authentication type renegotiation procedure.  
+
+2002-03-03 00:06  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, gnutls_auth.c, gnutls_handshake.c,
+	gnutls_int.h, gnutls_state.c, gnutls_state.h:
+
+	Changed behaviour in rehandshake procedure. Now can use rehandshake
+	with a different authentication method (ie. perform anonymous
+	authentication, and after that perform a certificate authentication,
+	or srp).  
+
 2002-03-01 13:13  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_mem.h, gnutls_x509.c:
