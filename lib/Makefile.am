@@ -11,8 +11,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnutls.pc
 DISTCLEANFILES = $(pkgconfig_DATA)
 
-LIBGNUTLS_EXPORTS = -export-symbols-regex '^(_gnutls|gnutls|_E_).*'
-
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 MINITASN1_COBJECTS = minitasn1/decoding.c minitasn1/gstr.c minitasn1/errors.c \
@@ -66,11 +64,11 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(MINITASN1_COBJECTS)	\
 	$(SRP_COBJECTS) gnutls.asn pkix.asn
 
-libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
-	../crypto/libgc.la \
-	x509/libgnutls_x509.la \
-	$(LIBGNUTLS_EXPORTS) \
+libgnutls_la_LDFLAGS = -export-symbols-regex '^(_gnutls|gnutls|_E_).*' \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+
+libgnutls_la_LIBADD = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS)	\
+	../crypto/libgc.la x509/libgnutls_x509.la
 
 pkix_asn1_tab.c: pkix.asn
 	-asn1Parser pkix.asn pkix_asn1_tab.c
