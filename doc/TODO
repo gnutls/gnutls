@@ -9,6 +9,8 @@ Current list:
   allow easy integration with TLS hardware.
 * Allow adding multiple subject alternative names.
 * Allow verifying of certificates on their reception.
+* Enforce the constraints for verify_peers() or similar, to openpgp 
+  verification functions as well. This needs to be checked a bit.
 * Verify added CRLs
 * Document the format for the supported DN attributes.
 * Add support for Certificate Extensions Profile for Qualified 

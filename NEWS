@@ -4,6 +4,9 @@ Version 1.1.12
   compatibility with previous versions.
 - Changed the makefiles to be more portable.
 - SRP ciphersuites were moved to the gnutls library.
+- Added some default limits in the verification of certificate
+  chains, to avoid denial of service attacks. Also added 
+  gnutls_certificate_set_verify_limits() to override them.
 
 Version 1.1.11 (16/07/2004)
 - Added the '_t' suffix to all exported symbols.

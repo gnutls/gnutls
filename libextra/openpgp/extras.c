@@ -28,6 +28,7 @@
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
 #include <gnutls_openpgp.h>
+#include <gnutls_num.h>
 #include <openpgp.h>
 
 /* Keyring stuff.

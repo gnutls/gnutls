@@ -33,6 +33,7 @@
  * gnutls_openpgp_verify_key - Verify all signatures on the key
  * @cert_list: the structure that holds the certificates.
  * @cert_list_lenght: the items in the cert_list.
+ * @status: the output of the verification function
  *
  * Verify all signatures in the certificate list. When the key
  * is not available, the signature is skipped.
@@ -47,10 +48,9 @@
  * NOTE: this function does not verify using any "web of trust". You
  * may use GnuPG for that purpose, or any other external PGP application.
  -*/
-int _gnutls_openpgp_verify_key(const char *trustdb,
-			       const gnutls_datum_t * keyring,
-			       const gnutls_datum_t * cert_list,
-			       int cert_list_length)
+int _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
+    const gnutls_datum_t * cert_list,
+    int cert_list_length, unsigned int *status)
 {
     int ret = 0;
     gnutls_openpgp_key_t key = NULL;
@@ -75,7 +75,7 @@ int _gnutls_openpgp_verify_key(const char *trustdb,
 	goto leave;
     }
 
-    if (keyring && keyring->data && keyring->size != 0) {
+    if (cred->keyring.data && cred->keyring.size != 0) {
 
 	/* use the keyring
 	 */
@@ -85,7 +85,7 @@ int _gnutls_openpgp_verify_key(const char *trustdb,
 	    goto leave;
 	}
 
-	ret = gnutls_openpgp_keyring_import(ring, keyring, 0);
+	ret = gnutls_openpgp_keyring_import(ring, &cred->keyring, 0);
 	if (ret < 0) {
 	    gnutls_assert();
 	    goto leave;
@@ -98,14 +98,14 @@ int _gnutls_openpgp_verify_key(const char *trustdb,
 	}
     }
 
-    if (trustdb) {		/* Use the trustDB */
+    if (cred->pgp_trustdb) { /* Use the trustDB */
 	ret = gnutls_openpgp_trustdb_init(&tdb);
 	if (ret < 0) {
 	    gnutls_assert();
 	    goto leave;
 	}
 
-	ret = gnutls_openpgp_trustdb_import_file(tdb, trustdb);
+	ret = gnutls_openpgp_trustdb_import_file(tdb, cred->pgp_trustdb);
 	if (ret < 0) {
 	    gnutls_assert();
 	    goto leave;
@@ -122,19 +122,21 @@ int _gnutls_openpgp_verify_key(const char *trustdb,
 	goto leave;
     }
 
-    ret = verify_self | verify_ring | verify_db;
+    *status = verify_self | verify_ring | verify_db;
 
     /* If we only checked the self signature.
      */
-    if (!trustdb && (!keyring || !keyring->data))
-	ret |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+    if (!cred->pgp_trustdb && !cred->keyring.data)
+	*status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
+
+  ret = 0;
 
   leave:
     gnutls_openpgp_key_deinit(key);
     gnutls_openpgp_trustdb_deinit(tdb);
     gnutls_openpgp_keyring_deinit(ring);
-    return ret;
 
+    return ret;
 }
 
 /*-

@@ -554,6 +554,23 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
 }
 
 /**
+  * gnutls_certificate_set_verify_limits - This function will set the upper limits to be used at certificate verification
+  * @res: is a gnutls_certificate_credentials structure
+  * @max_bits: is the number of bits of an acceptable certificate (default 8200)
+  * @max_depth: is maximum depth of the verification of a certificate chain (default 5)
+  *
+  * This function will set some upper limits for the default verification function
+  * (gnutls_certificate_verify_peers()) to avoid denial of service attacks.
+  *
+  **/
+void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res, unsigned int max_bits,
+    unsigned int max_depth)
+{
+	res->verify_depth = max_depth;
+	res->verify_bits = max_bits;
+}
+
+/**
   * gnutls_certificate_set_rsa_export_params - This function will set the RSA parameters for a server to use
   * @res: is a gnutls_certificate_credentials_t structure
   * @rsa_params: is a structure that holds temporary RSA parameters.

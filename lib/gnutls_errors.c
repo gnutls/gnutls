@@ -227,6 +227,7 @@ static gnutls_error_entry error_algorithms[] = {
 		GNUTLS_E_INVALID_PASSWORD, 1),
     ERROR_ENTRY("The Message Authentication Code verification failed.",
 		GNUTLS_E_MAC_VERIFY_FAILED, 1),
+    ERROR_ENTRY("Some constraint limits were reached.", GNUTLS_E_CONSTRAINT_ERROR, 1),
     {NULL, NULL, 0, 0}
 };
 

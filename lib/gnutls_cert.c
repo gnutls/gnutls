@@ -88,7 +88,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
   *
   * This function will delete all the CAs associated
   * with the given credentials. Servers that do not use
-  * gnutls_certificate_verify_peers() may call this to
+  * gnutls_certificate_verify_peers2() may call this to
   * save some memory.
   *
   **/
@@ -224,13 +224,15 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
   *
   * Returns 0 on success.
   **/
-int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t
-					    * res)
+int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t* res)
 {
     *res = gnutls_calloc(1, sizeof(certificate_credentials_st));
 
     if (*res == NULL)
 	return GNUTLS_E_MEMORY_ERROR;
+
+    (*res)->verify_bits = DEFAULT_VERIFY_BITS;
+    (*res)->verify_depth = DEFAULT_VERIFY_DEPTH;
 
     return 0;
 }
@@ -386,12 +388,11 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
   * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
-int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session)
+int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session, unsigned int* status)
 {
     cert_auth_info_t info;
     const gnutls_certificate_credentials_t cred;
-    int verify;
-    int peer_certificate_list_size;
+    int peer_certificate_list_size, ret;
 
     CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
@@ -426,33 +427,36 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session)
 	gnutls_assert();
 	return GNUTLS_E_INIT_LIBEXTRA;
     }
-    verify =
-	_E_gnutls_openpgp_verify_key(cred->pgp_trustdb, &cred->keyring,
-				     &info->raw_certificate_list[0],
-				     peer_certificate_list_size);
+    ret =
+	_E_gnutls_openpgp_verify_key(cred, &info->raw_certificate_list[0],
+				     peer_certificate_list_size, status);
 
-    if (verify < 0) {
+    if (ret < 0) {
 	gnutls_assert();
+        return ret;
     }
-
-    return verify;
+ 
+    return 0;
 }
 
+
 /**
-  * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
+  * gnutls_certificate_verify_peers2 - This function returns the peer's certificate verification status
   * @session: is a gnutls session
+  * @status: is the output of the verification
   *
   * This function will try to verify the peer's certificate and return its status (trusted, invalid etc.).
+  * The value of @status should be one or more of the gnutls_certificate_status_t
+  * enumerated elements bitwise or'd.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the
   * actual peer.
   *
-  * The return value should be one or more of the gnutls_certificate_status_t
-  * enumerated elements bitwise or'd.
+  * Returns a negative error code on error and zero on success.
   *
   * This is the same as gnutls_x509_verify_certificate().
   *
   **/
-int gnutls_certificate_verify_peers(gnutls_session_t session)
+int gnutls_certificate_verify_peers2(gnutls_session_t session, unsigned int *status)
 {
     cert_auth_info_t info;
 
@@ -468,12 +472,41 @@ int gnutls_certificate_verify_peers(gnutls_session_t session)
 
     switch (gnutls_certificate_type_get(session)) {
     case GNUTLS_CRT_X509:
-	return _gnutls_x509_cert_verify_peers(session);
+	return _gnutls_x509_cert_verify_peers(session, status);
     case GNUTLS_CRT_OPENPGP:
-	return _gnutls_openpgp_cert_verify_peers(session);
+	return _gnutls_openpgp_cert_verify_peers(session, status);
     default:
 	return GNUTLS_E_INVALID_REQUEST;
     }
+}
+
+/*-
+  * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
+  * @session: is a gnutls session
+  *
+  * This function will try to verify the peer's certificate and return its status (trusted, invalid etc.).
+  * However you must also check the peer's name in order to check if the verified certificate belongs to the
+  * actual peer.
+  *
+  * The return value should be one or more of the gnutls_certificate_status_t
+  * enumerated elements bitwise or'd, or a negative value on error.
+  *
+  * This is the same as gnutls_x509_verify_certificate().
+  *
+  -*/
+int gnutls_certificate_verify_peers(gnutls_session_t session)
+{
+unsigned int status;
+int ret;
+
+    ret = gnutls_certificate_verify_peers2( session, &status);
+    
+    if (ret < 0) {
+    	gnutls_assert();
+    	return ret;
+    }
+    
+    return status;
 }
 
 /**

@@ -1,6 +1,6 @@
 #include <libtasn1.h>
 
-int _gnutls_x509_cert_verify_peers(gnutls_session_t session);
+int _gnutls_x509_cert_verify_peers(gnutls_session_t session, unsigned int* status);
 
 #define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
 #define PEM_CERT_SEP "-----BEGIN CERTIFICATE"

@@ -87,10 +87,9 @@ keybox_blob* kbx_read_blob( const gnutls_datum_t* keyring, size_t pos );
 cdk_keydb_hd_t kbx_to_keydb( keybox_blob *blob );
 void kbx_blob_release( keybox_blob *ctx );
 
-int _gnutls_openpgp_verify_key(const char *trustdb,
-			  const gnutls_datum_t * keyring,
-			  const gnutls_datum_t * cert_list,
-			  int cert_list_length);
+int _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t,
+    const gnutls_datum_t * cert_list,
+    int cert_list_length, unsigned int* status);
 int _gnutls_openpgp_fingerprint(const gnutls_datum_t * cert,
 			   unsigned char *fpr, size_t * fprlen);
 time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum_t * cert);
