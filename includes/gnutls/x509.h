@@ -43,34 +43,71 @@ extern "C" {
 #define LDAP_DC				"0 9 2342 19200300 100 1 25"
 #define LDAP_UID			"0 9 2342 19200300 100 1 1"
 #define PKCS9_EMAIL 			"1 2 840 113549 1 9 1"
-                                                                        
 
-struct gnutls_crl_int;
-typedef struct gnutls_crl_int* gnutls_crl;
+/* Certificate handling functions */
+                      
+struct gnutls_x509_certificate_int;
+typedef struct gnutls_x509_certificate_int* gnutls_x509_certificate;
 
-int gnutls_x509_crl_init(gnutls_crl * crl);
-void gnutls_x509_crl_deinit(gnutls_crl crl);
+int gnutls_x509_certificate_init(gnutls_x509_certificate * cert);
+void gnutls_x509_certificate_deinit(gnutls_x509_certificate cert);
+int gnutls_x509_certificate_import(gnutls_x509_certificate cert, const gnutls_datum * data,
+	gnutls_x509_certificate_format format);
+int gnutls_x509_certificate_get_issuer_dn(gnutls_x509_certificate cert, char *buf,
+	 int *sizeof_buf);
+int gnutls_x509_certificate_get_issuer_dn_by_oid(gnutls_x509_certificate cert, 
+	const char* oid, char *buf, int *sizeof_buf);
+int gnutls_x509_certificate_get_dn(gnutls_x509_certificate cert, char *buf,
+	 int *sizeof_buf);
+int gnutls_x509_certificate_get_dn_by_oid(gnutls_x509_certificate cert, 
+	const char* oid, char *buf, int *sizeof_buf);
 
-int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data, 
+int gnutls_x509_certificate_get_signed_data(gnutls_x509_certificate cert, gnutls_datum *data);
+int gnutls_x509_certificate_get_signature(gnutls_x509_certificate cert, gnutls_datum *data);
+int gnutls_x509_certificate_get_signature_algorithm(gnutls_x509_certificate cert);
+int gnutls_x509_certificate_get_version(gnutls_x509_certificate cert);
+
+time_t gnutls_x509_certificate_get_activation_time(gnutls_x509_certificate cert);
+time_t gnutls_x509_certificate_get_expiration_time(gnutls_x509_certificate cert);
+int gnutls_x509_certificate_get_serial(gnutls_x509_certificate cert, char* result, int* result_size);
+
+int gnutls_x509_certificate_get_pk_algorithm( gnutls_x509_certificate cert, int* bits);
+int gnutls_x509_certificate_get_subject_alt_name(gnutls_x509_certificate cert, 
+	int seq, char *ret, int *ret_size);
+int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert);
+int gnutls_x509_certificate_get_extension_by_oid(gnutls_x509_certificate cert, const char* oid,
+	unsigned char* buf, int * sizeof_buf);
+
+
+
+/* CRL handling functions */
+
+struct gnutls_x509_crl_int;
+typedef struct gnutls_x509_crl_int* gnutls_x509_crl;
+
+int gnutls_x509_crl_init(gnutls_x509_crl * crl);
+void gnutls_x509_crl_deinit(gnutls_x509_crl crl);
+
+int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data, 
 	gnutls_x509_certificate_format format);
 
-int gnutls_x509_crl_get_issuer_dn(const gnutls_crl crl, 
+int gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl crl, 
 	char *buf, int *sizeof_buf);
-int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_crl crl, const char* oid, 
+int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, const char* oid, 
 	char *buf, int *sizeof_buf);
 
 
-int gnutls_x509_crl_get_signed_data(gnutls_crl crl, gnutls_datum *data);
+int gnutls_x509_crl_get_signed_data(gnutls_x509_crl crl, gnutls_datum *data);
 
-int gnutls_x509_crl_get_signature(gnutls_crl crl, gnutls_datum *data);
-int gnutls_x509_crl_get_signature_algorithm(gnutls_crl crl);
-int gnutls_x509_crl_get_version(gnutls_crl crl);
+int gnutls_x509_crl_get_signature(gnutls_x509_crl crl, gnutls_datum *data);
+int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl);
+int gnutls_x509_crl_get_version(gnutls_x509_crl crl);
 
-time_t gnutls_x509_crl_get_this_update(gnutls_crl crl);
-time_t gnutls_x509_crl_get_next_update(gnutls_crl crl);
+time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl crl);
+time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl);
 
-int gnutls_x509_crl_get_certificate_count(gnutls_crl crl);
-int gnutls_x509_crl_get_certificate(gnutls_crl crl, int index, unsigned char* serial,
+int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
+int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index, unsigned char* serial,
         int* serial_size, time_t* time);
 
 #ifdef __cplusplus

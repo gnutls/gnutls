@@ -2,6 +2,9 @@
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(unsigned int k, char *data);
 
+#define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
+#define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
+
 time_t _gnutls_x509_utcTime2gtime(char *ttime);
 time_t _gnutls_x509_generalTime2gtime(char *ttime);
 
@@ -16,3 +19,5 @@ int _gnutls_x509_oid_data_printable( const char* OID);
 gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid);
 
 time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when);
+
+gnutls_x509_subject_alt_name _gnutls_x509_san_find_type( char* str_type);

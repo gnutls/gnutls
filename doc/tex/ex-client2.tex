@@ -27,7 +27,7 @@ int main()
    struct sockaddr_in sa;
    gnutls_session session;
    char buffer[MAX_BUF + 1];
-   gnutls_certificate_client_credentials xcred;
+   gnutls_certificate_credentials xcred;
    /* Allow connections to servers that have OpenPGP keys as well.
     */
    const int cert_type_priority[2] = { GNUTLS_CRT_X509, 

@@ -33,7 +33,7 @@ int main()
    struct sockaddr_in sa;
    gnutls_session session;
    char buffer[MAX_BUF + 1];
-   gnutls_certificate_client_credentials xcred;
+   gnutls_certificate_credentials xcred;
    /* variables used in session resuming */
    int t;
    char *session_data;

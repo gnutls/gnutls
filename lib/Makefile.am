@@ -46,7 +46,8 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 
 libgnutls_la_SOURCES = $(COBJECTS) 
 
-libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/dn.lo x509/crl.lo x509/common.lo
+libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/dn.lo x509/crl.lo x509/common.lo \
+	x509/x509.lo
 
 libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \

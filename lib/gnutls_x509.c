@@ -358,13 +358,6 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 	return 0;
 }
 
-static gnutls_x509_subject_alt_name _find_type( char* str_type) {
-	if (strcmp( str_type, "dNSName")==0) return GNUTLS_SAN_DNSNAME;
-	if (strcmp( str_type, "rfc822Name")==0) return GNUTLS_SAN_RFC822NAME;
-	if (strcmp( str_type, "uniformResourceIdentifier")==0) return GNUTLS_SAN_URI;
-	if (strcmp( str_type, "iPAddress")==0) return GNUTLS_SAN_IPADDRESS;
-	return -1;
-}
 
 /**
   * gnutls_x509_extract_certificate_subject_alt_name - This function returns the certificate's alternative name, if any
@@ -452,7 +445,7 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 	}
 
 
-	type = _find_type( ext_data);
+	type = _gnutls_x509_san_find_type( ext_data);
 	if (type == (gnutls_x509_subject_alt_name)-1) {
 		gnutls_assert();
 		return GNUTLS_E_X509_UNKNOWN_SAN;
@@ -1651,7 +1644,7 @@ int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res,
 	return ret;
 }
 
-static int _read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
+int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 {
 	opaque str[MAX_PARAMETER_SIZE];
 	int result;
@@ -1761,7 +1754,7 @@ static int _read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
  * from the certificate 
  * params[3]
  */
-static int _read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
+int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 {
 	opaque str[MAX_PARAMETER_SIZE];
 	int result;
@@ -1832,7 +1825,7 @@ char name1[128];
 		}
 
 		if ((result =
-		     _read_rsa_params(tmpstr, len / 8, gCert->params)) < 0) {
+		     _gnutls_x509_read_rsa_params(tmpstr, len / 8, gCert->params)) < 0) {
 			gnutls_assert();
 			return result;
 		}
@@ -1854,7 +1847,7 @@ char name1[128];
 		}
 
 		if ((result =
-		     _read_dsa_pubkey(tmpstr, len / 8, gCert->params)) < 0) {
+		     _gnutls_x509_read_dsa_pubkey(tmpstr, len / 8, gCert->params)) < 0) {
 			gnutls_assert();
 			return result;
 		}
@@ -2362,7 +2355,7 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 
 
 	if (algo==GNUTLS_PK_RSA) {
-		if ((result=_read_rsa_params( str, len/8, params)) < 0) {
+		if ((result=_gnutls_x509_read_rsa_params( str, len/8, params)) < 0) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
 			return result;
@@ -2377,7 +2370,7 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 	if (algo==GNUTLS_PK_DSA) {
 
 		if ((result =
-		     _read_dsa_pubkey(str, len / 8, params)) < 0) {
+		     _gnutls_x509_read_dsa_pubkey(str, len / 8, params)) < 0) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
 			return result;
