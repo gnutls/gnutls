@@ -356,7 +356,7 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 	 */
 	if (_E_gnutls_openpgp_verify_key==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_INIT_LIBEXTRA;
 	}
 	verify = _E_gnutls_openpgp_verify_key( cred->pgp_trustdb, &cred->keyring, &info->raw_certificate_list[0],
 				      peer_certificate_list_size);

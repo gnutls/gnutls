@@ -155,8 +155,9 @@ int err;
 int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size) {
 int plain_size=GNUTLS_E_DECOMPRESSION_FAILED, err;
 #ifdef HAVE_LIBZ
-uLongf size;
+uLongf out_size;
 z_stream* zhandle;
+int cur_pos;
 #endif
 
 	if (compressed_size > max_record_size+EXTRA_COMP_SIZE) {
@@ -171,36 +172,41 @@ z_stream* zhandle;
 #ifdef HAVE_LIBZ
 		case GNUTLS_COMP_ZLIB:
 			*plain = NULL;
-			size = compressed_size;
+			out_size = compressed_size;;
 			plain_size = 0;
 			
 			zhandle = handle->handle;
 
 			zhandle->next_in = (Bytef*) compressed;
 			zhandle->avail_in = compressed_size;
-		
+
+			cur_pos = 0;
+			
 			do {
-				size*=2;
-				*plain = gnutls_realloc( *plain, size);
+				out_size += 128;
+				*plain = gnutls_realloc( *plain, out_size);
 				if (*plain==NULL) {
 					gnutls_assert();
 					return GNUTLS_E_MEMORY_ERROR;
 				}
 
-				zhandle->next_out = (Bytef*) *plain;
-				zhandle->avail_out = size;
+				zhandle->next_out = (Bytef*) (*plain + cur_pos);
+				zhandle->avail_out = out_size - cur_pos;
 
 			 	err = inflate( zhandle, Z_SYNC_FLUSH);
+			 	
+			 	cur_pos = out_size - zhandle->avail_out;
 
-			} while( err==Z_BUF_ERROR && zhandle->avail_out==0 && size < max_record_size);
-		
-		 	if (err!=Z_OK || zhandle->avail_in != 0) {
+			} while( (err==Z_BUF_ERROR && zhandle->avail_out==0 && out_size < max_record_size) 
+				|| ( err==Z_OK && zhandle->avail_in != 0));
+
+		 	if (err!=Z_OK) {
 		 		gnutls_assert();
 		 		gnutls_free( *plain);
 		 		return GNUTLS_E_DECOMPRESSION_FAILED;
 		 	}
 
-			plain_size = size - zhandle->avail_out;
+			plain_size = out_size - zhandle->avail_out;
 			break;
 #endif
 		default:

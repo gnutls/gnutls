@@ -322,8 +322,8 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	_gnutls_record_log( "REC: Sending Packet[%d] %s(%d) with length: %d\n",
 		(int) _gnutls_uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 
-	if ( sizeofdata > MAX_RECORD_SIZE)
-		data2send_size = MAX_RECORD_SIZE;
+	if ( sizeofdata > MAX_RECORD_SEND_SIZE)
+		data2send_size = MAX_RECORD_SEND_SIZE;
 	else 
 		data2send_size = sizeofdata;
 
@@ -858,81 +858,6 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 }
 
 
-/* Taken from libgcrypt */
-
-static const char*
-parse_version_number( const char *s, int *number )
-{
-    int val = 0;
-
-    if( *s == '0' && isdigit(s[1]) )
-	return NULL; /* leading zeros are not allowed */
-    for ( ; isdigit(*s); s++ ) {
-	val *= 10;
-	val += *s - '0';
-    }
-    *number = val;
-    return val < 0? NULL : s;
-}
-
-
-/* The parse version functions were copied from libgcrypt.
- */
-static const char *
-parse_version_string( const char *s, int *major, int *minor, int *micro )
-{
-    s = parse_version_number( s, major );
-    if( !s || *s != '.' )
-	return NULL;
-    s++;
-    s = parse_version_number( s, minor );
-    if( !s || *s != '.' )
-	return NULL;
-    s++;
-    s = parse_version_number( s, micro );
-    if( !s )
-	return NULL;
-    return s; /* patchlevel */
-}
-
-/****************
- * Check that the the version of the library is at minimum the requested one
- * and return the version string; return NULL if the condition is not
- * satisfied.  If a NULL is passed to this function, no check is done,
- * but the version string is simply returned.
- */
-const char *
-gnutls_check_version( const char *req_version )
-{
-    const char *ver = GNUTLS_VERSION;
-    int my_major, my_minor, my_micro;
-    int rq_major, rq_minor, rq_micro;
-    const char *my_plvl, *rq_plvl;
-
-    if ( !req_version )
-	return ver;
-
-    my_plvl = parse_version_string( ver, &my_major, &my_minor, &my_micro );
-    if ( !my_plvl )
-	return NULL;  /* very strange our own version is bogus */
-    rq_plvl = parse_version_string( req_version, &rq_major, &rq_minor,
-								&rq_micro );
-    if ( !rq_plvl )
-	return NULL;  /* req version string is invalid */
-
-    if ( my_major > rq_major
-	|| (my_major == rq_major && my_minor > rq_minor)
-	|| (my_major == rq_major && my_minor == rq_minor
-				 && my_micro > rq_micro)
-	|| (my_major == rq_major && my_minor == rq_minor
-				 && my_micro == rq_micro
-				 && strcmp( my_plvl, rq_plvl ) >= 0) ) {
-	return ver;
-    }
-    return NULL;
-}
-
-
 /**
   * gnutls_record_send - sends to the peer the specified data
   * @state: is a &GNUTLS_STATE structure.
@@ -986,7 +911,10 @@ ssize_t gnutls_record_recv( GNUTLS_STATE state, void *data, size_t sizeofdata) {
   *
   **/
 size_t gnutls_record_get_max_size( GNUTLS_STATE state) {
-	return state->security_parameters.max_record_size;
+	/* Recv will hold the negotiated max record size
+	 * always.
+	 */
+	return state->security_parameters.max_record_recv_size;
 }
 
 
@@ -1000,9 +928,9 @@ size_t gnutls_record_get_max_size( GNUTLS_STATE state) {
   * choose not to accept the requested size.
   *
   * Acceptable values are 2^9, 2^10, 2^11 and 2^12.
-  * Returns 0 on success. The requested record size does not
-  * get in effect immediately. It will be used after a successful
-  * handshake.
+  * Returns 0 on success. The requested record size does
+  * get in effect immediately only while sending data. The receive
+  * part will take effect after a successful handshake.
   *
   * This function uses a TLS extension called 'max record size'.
   * Not all TLS implementations use or even understand this extension.
@@ -1021,6 +949,8 @@ ssize_t new_size;
 		return new_size;
 	}
 	
+	state->security_parameters.max_record_send_size = size;
+
 	state->gnutls_internals.proposed_record_size = size;
 
 	return 0;

@@ -33,9 +33,9 @@
 #define READ_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
 #define X509_DEBUG
-#define RECORD_DEBUG
+#define RECORD_DEBUG*/
 #define DEBUG
-*/
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -81,11 +81,12 @@ typedef const int* GNUTLS_LIST;
 /* the maximum size of encrypted packets */
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define RECORD_HEADER_SIZE 5
-#define MAX_RECORD_SIZE state->security_parameters.max_record_size
+#define MAX_RECORD_SEND_SIZE state->security_parameters.max_record_send_size
+#define MAX_RECORD_RECV_SIZE state->security_parameters.max_record_recv_size
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
 #define MAX_RECORD_OVERHEAD MAX_PAD_SIZE+EXTRA_COMP_SIZE
-#define MAX_RECV_SIZE MAX_RECORD_OVERHEAD+MAX_RECORD_SIZE+RECORD_HEADER_SIZE
+#define MAX_RECV_SIZE MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE+RECORD_HEADER_SIZE
 
 #define HANDSHAKE_HEADER_SIZE 4
 
@@ -341,7 +342,12 @@ typedef struct {
 	uint8 			session_id_size;
 	time_t 			timestamp;
 	TLSExtensions		extensions;
-	uint16			max_record_size;
+
+	/* The send size is the one requested by the programmer.
+	 * The recv size is the one negotiated with the peer.
+	 */
+	uint16			max_record_send_size;
+	uint16			max_record_recv_size;
 	/* holds the negotiated certificate type */
 	CertificateType		cert_type;	
 	GNUTLS_Version		version; /* moved here */

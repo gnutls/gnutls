@@ -195,12 +195,17 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	 * the receive procedure slow.
 	 */
 	(*state)->gnutls_internals.record_recv_buffer.data = gnutls_malloc(INITIAL_RECV_BUFFER_SIZE);
+
+	/* set the socket pointers to -1;
+	 */
+	(*state)->gnutls_internals.transport_recv_ptr = -1;
+	(*state)->gnutls_internals.transport_send_ptr = -1;
 	
 	/* set the default maximum record size for TLS
 	 */
-	(*state)->security_parameters.max_record_size = DEFAULT_MAX_RECORD_SIZE;
+	(*state)->security_parameters.max_record_recv_size = DEFAULT_MAX_RECORD_SIZE;
+	(*state)->security_parameters.max_record_send_size = DEFAULT_MAX_RECORD_SIZE;
 
-	
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
 	 */

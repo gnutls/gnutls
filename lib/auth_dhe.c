@@ -403,7 +403,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 		case GNUTLS_CRT_OPENPGP:
 			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_INIT_LIBEXTRA;
 			}
 			if ((ret =
 			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,

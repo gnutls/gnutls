@@ -608,7 +608,7 @@ int _gnutls_gen_openpgp_certificate_fpr(GNUTLS_STATE state,
 
 	if (_E_gnutls_openpgp_fingerprint==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_INIT_LIBEXTRA;
 	}
 
 	if ( (ret=_E_gnutls_openpgp_fingerprint( &apr_cert_list[0].raw, pdata, &fpr_size)) < 0) {
@@ -861,7 +861,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		 */
 		if (_E_gnutls_openpgp_request_key==NULL) {
 			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
+			return GNUTLS_E_INIT_LIBEXTRA;
 		}
 		if ( (ret=_E_gnutls_openpgp_request_key( &akey, cred, p, 20)) < 0) {
 			gnutls_assert();
@@ -920,7 +920,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		gnutls_free_datum( &akey);
 		CLEAR_CERTS;
 		gnutls_afree(peer_certificate_list);
-		return GNUTLS_E_INVALID_REQUEST;
+		return GNUTLS_E_INIT_LIBEXTRA;
 	}
 	
 	if ((ret =
@@ -1163,7 +1163,7 @@ int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 	case GNUTLS_CRT_OPENPGP:
 		if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
 			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
+			return GNUTLS_E_INIT_LIBEXTRA;
 		}
 		ret =
 		    _E_gnutls_openpgp_cert2gnutls_cert(&peer_cert,

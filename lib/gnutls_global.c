@@ -250,3 +250,84 @@ void gnutls_transport_set_pull_function( GNUTLS_STATE state, GNUTLS_PULL_FUNC pu
 void gnutls_transport_set_push_function( GNUTLS_STATE state, GNUTLS_PUSH_FUNC push_func) {
 	state->gnutls_internals._gnutls_push_func = push_func;
 }
+
+
+/* Taken from libgcrypt. Needed to configure scripts.
+ */
+
+static const char*
+parse_version_number( const char *s, int *number )
+{
+    int val = 0;
+
+    if( *s == '0' && isdigit(s[1]) )
+	return NULL; /* leading zeros are not allowed */
+    for ( ; isdigit(*s); s++ ) {
+	val *= 10;
+	val += *s - '0';
+    }
+    *number = val;
+    return val < 0? NULL : s;
+}
+
+/* The parse version functions were copied from libgcrypt.
+ */
+static const char *
+parse_version_string( const char *s, int *major, int *minor, int *micro )
+{
+    s = parse_version_number( s, major );
+    if( !s || *s != '.' )
+	return NULL;
+    s++;
+    s = parse_version_number( s, minor );
+    if( !s || *s != '.' )
+	return NULL;
+    s++;
+    s = parse_version_number( s, micro );
+    if( !s )
+	return NULL;
+    return s; /* patchlevel */
+}
+
+/****************
+ * Check that the the version of the library is at minimum the requested one
+ * and return the version string; return NULL if the condition is not
+ * satisfied.  If a NULL is passed to this function, no check is done,
+ * but the version string is simply returned.
+ */
+const char *
+gnutls_check_version( const char *req_version )
+{
+    const char *ver = GNUTLS_VERSION;
+    int my_major, my_minor, my_micro;
+    int rq_major, rq_minor, rq_micro;
+    const char *my_plvl, *rq_plvl;
+
+    if ( !req_version )
+	return ver;
+
+    my_plvl = parse_version_string( ver, &my_major, &my_minor, &my_micro );
+    if ( !my_plvl )
+	return NULL;  /* very strange our own version is bogus */
+    rq_plvl = parse_version_string( req_version, &rq_major, &rq_minor,
+								&rq_micro );
+    if ( !rq_plvl )
+	return NULL;  /* req version string is invalid */
+
+    if ( my_major > rq_major
+	|| (my_major == rq_major && my_minor > rq_minor)
+	|| (my_major == rq_major && my_minor == rq_minor
+				 && my_micro > rq_micro)
+	|| (my_major == rq_major && my_minor == rq_minor
+				 && my_micro == rq_micro
+				 && strcmp( my_plvl, rq_plvl ) >= 0) ) {
+	return ver;
+    }
+    return NULL;
+}
+
+const char *
+_gnutls_return_version( void)
+{
+   return GNUTLS_VERSION;
+}

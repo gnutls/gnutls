@@ -1,10 +1,17 @@
-Version 0.5.?
+Version 0.5.1
 - Corrected the m4 macros which used <gnutls.h> instead of
   <gnutls/gnutls.h>
 - Documentation fixes
 - Added gnutls_transport_set_ptr2() function, which accepts two
   different pointers, to be used while receiving, and 
   while sending data.
+- Semantic changes in gnutls_record_set_max_size(). The requested
+  size is now immediately enforced at the output buffers.
+- gnutls_global_init_extra() now fails if the library versions do
+  not match.
+- Fixes in client and server example programs. Null encryption can
+  be used in these programs, to assist in debuging.
+- Fixes in zlib compression code.
 
 Version 0.5.0 (6/07/2002)
 - Added X.509 certificate tests in tests/ directory

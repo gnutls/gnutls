@@ -54,7 +54,8 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 				return new_size;
 			}
 
-			state->security_parameters.max_record_size = new_size;
+			state->security_parameters.max_record_send_size = new_size;
+			state->security_parameters.max_record_recv_size = new_size;
 		}
 	} else { /* CLIENT SIDE - we must check if the sent record size is the right one 
 	          */
@@ -70,8 +71,9 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 			if (new_size < 0 || new_size != state->gnutls_internals.proposed_record_size) {
 				gnutls_assert();
 				return GNUTLS_E_ILLEGAL_PARAMETER;
-			} else 
-				state->security_parameters.max_record_size = state->gnutls_internals.proposed_record_size;
+			} else {
+				state->security_parameters.max_record_recv_size = state->gnutls_internals.proposed_record_size;
+			}
 
 		}
 	
@@ -104,14 +106,14 @@ int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque* data, int data_s
 
 	} else { /* server side */
 
-		if (state->security_parameters.max_record_size != DEFAULT_MAX_RECORD_SIZE) {
+		if (state->security_parameters.max_record_recv_size != DEFAULT_MAX_RECORD_SIZE) {
 			len = 1;
 			if (data_size < len) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
 			
-			data[0] = _gnutls_mre_record2num( state->security_parameters.max_record_size);
+			data[0] = _gnutls_mre_record2num( state->security_parameters.max_record_recv_size);
 			return len;
 		}	
 	
