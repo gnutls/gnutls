@@ -507,7 +507,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 
 	if (gcipher.version.major != GNUTLS_VERSION_MAJOR
 	    || gcipher.version.minor != GNUTLS_VERSION_MINOR) {
-
+#ifdef DEBUG
+		fprintf(stderr, "Peer's Version: %d.%d\n", gcipher.version.major, gcipher.version.minor);
+#endif
 		_gnutls_send_alert(cd, state, GNUTLS_FATAL,
 				   GNUTLS_PROTOCOL_VERSION);
 		state->gnutls_internals.resumable = RESUME_FALSE;

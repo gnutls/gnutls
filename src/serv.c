@@ -52,7 +52,8 @@ int main()
 		if (ret<0) {
 			close(sd);
 			gnutls_deinit(&state);
-			fprintf(stderr, "Handshake has failed(%d)\n", ret);
+			fprintf(stderr, "Handshake has failed\n", ret);
+			gnutls_perror(ret);
 			continue;
 		}
 		fprintf(stderr, "Handshake was completed\n");
@@ -61,6 +62,7 @@ int main()
 		if (ret<0) {
 			close(sd);
 			gnutls_deinit(&state);
+			gnutls_perror(ret);
 			continue;
 		}
 		fprintf(stderr, "Data was send (%d)\n", ret);

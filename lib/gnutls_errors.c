@@ -1,33 +1,35 @@
+#include "defines.h"
 #include "gnutls_errors.h"
 
-int gnutls_is_fatal_error( int error) {
+void tolow(char *str, int size);
 
-	switch (error) {
-		case GNUTLS_E_MAC_FAILED:
-		case GNUTLS_E_UNKNOWN_CIPHER:
-		case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
-		case GNUTLS_E_UNKNOWN_MAC_ALGORITHM:
-		case GNUTLS_E_UNKNOWN_ERROR:
-		case GNUTLS_E_UNKNOWN_CIPHER_TYPE:
-		case GNUTLS_E_LARGE_PACKET:
-		case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
-		case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
-		case GNUTLS_E_INVALID_SESSION:
-		case GNUTLS_E_UNABLE_SEND_DATA:
-		case GNUTLS_E_FATAL_ALERT_RECEIVED:
-		case GNUTLS_E_RECEIVED_BAD_MESSAGE:
-		case GNUTLS_E_RECEIVED_MORE_DATA:
-		case GNUTLS_E_UNEXPECTED_PACKET:
-		case GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET:
-		case GNUTLS_E_CLOSURE_ALERT_RECEIVED:
-		case GNUTLS_E_ERROR_IN_FINISHED_PACKET:
-		case GNUTLS_E_UNIMPLEMENTED_FEATURE:
-		case GNUTLS_E_UNKNOWN_KX_ALGORITHM:
-			return 1;
-		case GNUTLS_E_WARNING_ALERT_RECEIVED:
-			return 0;
-		default:
-			return 0;
+int gnutls_is_fatal_error(int error)
+{
+	int ret = 0;
+	GNUTLS_ERROR_ALG_LOOP(ret = p->fatal);
+	return ret;
+}
 
-	}			
+void gnutls_perror(int error)
+{
+	char *ret = NULL;
+	char *pointerTo_;
+
+	/* avoid prefix */
+	GNUTLS_ERROR_ALG_LOOP(ret =
+			      strdup(p->name + sizeof("GNUTLS_E_") - 1));
+
+
+	if (ret != NULL) {
+		tolow(ret, strlen(ret));
+		pointerTo_ = strchr(ret, '_');
+
+		while (pointerTo_ != NULL) {
+			*pointerTo_ = ' ';
+			pointerTo_ = strchr(ret, '_');
+		}
+	}
+	fprintf(stderr, "GNUTLS ERROR: %s\n", ret);
+	
+	free( ret);
 }

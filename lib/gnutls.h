@@ -19,6 +19,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data
 int gnutls_close(int cd, GNUTLS_STATE state);
 int gnutls_handshake(int cd, GNUTLS_STATE state);
 
+int gnutls_is_fatal_error( int error);
+void gnutls_perror( int error);
+
 #define gnutls_send( x, y, z, w) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
 #define gnutls_recv( x, y, z, w) gnutls_recv_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
 
