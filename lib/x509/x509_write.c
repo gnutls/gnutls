@@ -715,10 +715,8 @@ int gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt cert, const void* id,
 int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt cert, 
 	const void *oid, unsigned int critical)
 {
-	char counter[MAX_INT_DIGITS];
-	char tmpstr[64];
-	int result, len;
-	gnutls_datum id, old_id, der_data;
+	int result;
+	gnutls_datum old_id, der_data;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
 	if (cert==NULL) {
@@ -779,7 +777,8 @@ int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt cert,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_crt_set_extension( cert, "2.5.29.37", &der_data, 0);
+	result = _gnutls_x509_crt_set_extension( cert, "2.5.29.37", 
+		&der_data, critical);
 
 	_gnutls_free_datum( &der_data);
 

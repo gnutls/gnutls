@@ -161,7 +161,6 @@ int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
 	char str[1024];
 	char extnID[128];
-	char extnValue[256];
 	int indx_counter = 0;
 
 	k = 0;
@@ -307,6 +306,8 @@ int result;
 		gnutls_assert();
 		return result;
 	}
+	
+	return 0;
 }
 
 /* This function will attempt to overwrite the requested extension with
@@ -318,13 +319,9 @@ int _gnutls_x509_crt_set_extension( gnutls_x509_crt cert, const char* ext_id,
 	const gnutls_datum* ext_data, unsigned int critical)
 {
 	int result;
-	const char *str;
 	int k, len;
 	char name[128], name2[128], counter[MAX_INT_DIGITS];
-	char str_critical[10];
 	char extnID[128];
-	gnutls_datum value;
-	int indx_counter = 0;
 
 	/* Find the index of the given extension.
 	 */
