@@ -67,10 +67,12 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session session);
 
 #include <gnutls/compat8.h>
 
+/* those should replaced with the functions that follow.
+ */
 void gnutls_certificate_client_set_select_function(gnutls_session,
-	gnutls_certificate_client_select_function *);
+	gnutls_certificate_client_select_function *) DEPRECATED;
 void gnutls_certificate_server_set_select_function(gnutls_session,
-	gnutls_certificate_server_select_function *);
+	gnutls_certificate_server_select_function *) DEPRECATED;
 
 /* These are set on the credentials structure.
  */

@@ -6,6 +6,8 @@ Version 1.0.9
   and gnutls_x509_privkey_cpy().
 - Corrected a compilation issue when opencdk was installed in a
   non standard directory.
+- Documented the changes need in multi-threaded application due
+  to the new libgcrypt.
 
 Version 1.0.8 (28/02/2004)
 - Corrected bug in mutual certificate authentication in SSL 3.0.

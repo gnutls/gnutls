@@ -1,16 +1,6 @@
 #ifndef GNUTLS_COMPAT8_H
 # define GNUTLS_COMPAT8_H
 
-/* Extra definitions */
-
-#define GNUTLS_X509_CN_SIZE 256
-#define GNUTLS_X509_C_SIZE 3
-#define GNUTLS_X509_O_SIZE 256
-#define GNUTLS_X509_OU_SIZE 256
-#define GNUTLS_X509_L_SIZE 256
-#define GNUTLS_X509_S_SIZE 256
-#define GNUTLS_X509_EMAIL_SIZE 256
-
 #ifdef __GNUC__
 
 #define _GT_GCC_VERSION (__GNUC__ * 10000 \
@@ -28,6 +18,17 @@
 #ifndef DEPRECATED
 # define DEPRECATED
 #endif
+
+
+/* Extra definitions */
+
+#define GNUTLS_X509_CN_SIZE 256
+#define GNUTLS_X509_C_SIZE 3
+#define GNUTLS_X509_O_SIZE 256
+#define GNUTLS_X509_OU_SIZE 256
+#define GNUTLS_X509_L_SIZE 256
+#define GNUTLS_X509_S_SIZE 256
+#define GNUTLS_X509_EMAIL_SIZE 256
 
 typedef struct {
 	char common_name[GNUTLS_X509_CN_SIZE];
