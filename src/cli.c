@@ -56,6 +56,9 @@
 #define CLIKEYFILE1 "x509/clikey.pem"
 #define CLICERTFILE1 "x509/clicert.pem"
 
+#define CLIKEYFILE_PGP "openpgp/cli_sec.asc"
+#define CLICERTFILE_PGP "openpgp/cli_pub.asc"
+
 static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
 
 	if (client_certs==NULL) {
@@ -142,6 +145,7 @@ int main(int argc, char** argv)
 	gnutls_certificate_set_x509_trust_file( xcred, CAFILE, CRLFILE);
 	gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE1, CLIKEYFILE1);
 	gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE2, CLIKEYFILE2);
+	gnutls_certificate_set_openpgp_key_file( xcred, CLICERTFILE_PGP, CLIKEYFILE_PGP);
 /*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 
 	/* SRP stuff */
