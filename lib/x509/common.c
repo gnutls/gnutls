@@ -218,8 +218,8 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
 	    _gnutls_str_cpy(res, *res_size, str);
 	*res_size = len;
     } else { /* CHOICE */
-        str[len] = 0;
-        int non_printable = 0, teletex = 0;
+      int non_printable = 0, teletex = 0;
+      str[len] = 0;
 
         /* Note that we do not support strings other than
          * UTF-8 (thus ASCII as well).
