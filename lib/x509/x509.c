@@ -1123,7 +1123,7 @@ int _gnutls_x509_crt_get_raw_dn2(gnutls_x509_crt_t cert,
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result, len1;
     int start1, end1;
-    gnutls_datum_t signed_data;
+    gnutls_datum_t signed_data = { NULL, 0 };
 
     /* get the issuer of 'cert'
      */

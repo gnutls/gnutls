@@ -612,10 +612,8 @@ int _gnutls_pk_decrypt(int algo, mpi_t * resarr, mpi_t data, mpi_t * pkey,
     case GCRY_PK_RSA:
 	if (pkey_len >= 6)
 	    rc = gcry_sexp_build(&s_pkey, NULL,
-				 "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
-				 pkey[0], pkey[1], pkey[2], pkey[3],
-				 pkey[4], pkey[5]);
-
+		"(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
+		pkey[0], pkey[1], pkey[2], pkey[3], pkey[4], pkey[5]);
 	break;
 
     default:

@@ -440,7 +440,7 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
 
 	*cert_list =
 	    (gnutls_cert *) gnutls_realloc_fast(*cert_list,
-						i * sizeof(gnutls_cert));
+		i * sizeof(gnutls_cert));
 
 	if (*cert_list == NULL) {
 	    gnutls_assert();
@@ -456,6 +456,7 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
 	    gnutls_assert();
 	    return ret;
 	}
+	_gnutls_free_datum( &tmp); /* free ptr2 */
 
 	/* now we move ptr after the pem header 
 	 */
@@ -1178,8 +1179,7 @@ static int parse_der_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
 
     *cert_list =
 	(gnutls_x509_crt_t *) gnutls_realloc_fast(*cert_list,
-						i *
-						sizeof(gnutls_x509_crt_t));
+	    i *	sizeof(gnutls_x509_crt_t));
 
     if (*cert_list == NULL) {
 	gnutls_assert();
@@ -1197,7 +1197,7 @@ static int parse_der_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
 
     ret =
 	gnutls_x509_crt_import(cert_list[0][i - 1],
-			       &tmp, GNUTLS_X509_FMT_DER);
+	    &tmp, GNUTLS_X509_FMT_DER);
     if (ret < 0) {
 	gnutls_assert();
 	return ret;
@@ -1236,10 +1236,10 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t
 
     if (type == GNUTLS_X509_FMT_DER)
 	return parse_der_ca_mem(&res->x509_ca_list, &res->x509_ncas,
-				ca->data, ca->size);
+	    ca->data, ca->size);
     else
 	return parse_pem_ca_mem(&res->x509_ca_list, &res->x509_ncas,
-				ca->data, ca->size);
+	    ca->data, ca->size);
 
     if ((ret2 = generate_rdn_seq(res)) < 0)
 	return ret2;
