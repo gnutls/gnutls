@@ -1,3 +1,4 @@
 #!/bin/sh
+gtkdocize
 autoreconf --force --install
 echo "You can now run \"./configure --enable-developer-mode\" and \"make\""
