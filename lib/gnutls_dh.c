@@ -68,10 +68,14 @@ mpi_t gnutls_calc_dh_secret(mpi_t * ret_x, mpi_t g, mpi_t prime)
 	return NULL;
     }
 
-    /* (x_size/8)*8 is there to overcome a bug in libgcrypt
+    /* FIXME: (x_size/8)*8 is there to overcome a bug in libgcrypt
      * which does not really check the bits given but the bytes.
      */
-    _gnutls_mpi_randomize(x, (x_size / 8) * 8, GCRY_STRONG_RANDOM);
+    do {
+        _gnutls_mpi_randomize(x, (x_size / 8) * 8, GCRY_STRONG_RANDOM);
+        /* Check whether x is zero. 
+         */
+    } while( _gnutls_mpi_cmp_ui( x, 0)==0);
 
     e = _gnutls_mpi_alloc_like(prime);
     if (e == NULL) {
