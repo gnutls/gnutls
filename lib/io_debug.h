@@ -42,7 +42,7 @@ static int recv_debug (int fd, char *buf, int len, int flags)
 {
     INITIALIZE_RAND;
     
-    if (!(rand % 2)) {
+    if (!(rand() % 2)) {
 	errno = EDUNNO;
 	return -1;
     }
@@ -53,7 +53,7 @@ static int recv_debug (int fd, char *buf, int len, int flags)
 
 #define recv recv_debug
 
-static int send_debug (int fd, char *buf, int len, int flags)
+static int send_debug (int fd, const char *buf, int len, int flags)
 {
     INITIALIZE_RAND;
     

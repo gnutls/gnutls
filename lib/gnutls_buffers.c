@@ -33,6 +33,10 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
+#ifdef IO_DEBUG
+# include <io_debug.h>
+#endif
+
 extern ssize_t (*_gnutls_pull_func)( SOCKET, void*, size_t);
 extern ssize_t (*_gnutls_push_func)( SOCKET,const void*, size_t);
 
