@@ -212,6 +212,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
   * by the given OID. 
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
+  * With this function you can only set the known OIDs.
   *
   * On success zero is returned.
   *

@@ -1024,16 +1024,14 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	} else { /* PEM */
 		opaque *tmp;
 		opaque *out;
-		int len;
+		int len = tmp_buf_size * 2 + 64;
 		
-		tmp = gnutls_alloca( tmp_buf_size);
+		tmp = gnutls_alloca( len);
 		if (tmp == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-asn1_print_structure( stderr, asn1_data, "", ASN1_PRINT_ALL);
-		len = tmp_buf_size - 1;
 		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			gnutls_afree(tmp);
