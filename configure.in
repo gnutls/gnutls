@@ -20,6 +20,8 @@ AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION")
 AM_INIT_AUTOMAKE(gnutls, $GNUTLS_VERSION)
 AM_CONFIG_HEADER(config.h)
 
+AM_MAINTAINER_MODE
+
 dnl This is the library version
 GNUTLS_MOST_RECENT_INTERFACE=5
 GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER=$GNUTLS_MICRO_VERSION
@@ -56,12 +58,12 @@ AC_ARG_ENABLE(efence-mode,
 opt_efence_mode=$enableval)
 AC_MSG_RESULT($opt_efence_mode)
 
-opt_maintainer_mode=no
+opt_developer_mode=no
 AC_MSG_CHECKING([whether in maintanance mode])
-AC_ARG_ENABLE(maintainer-mode,
-[  --enable-maintainer-mode   enable maintainer mode],
-opt_maintainer_mode=$enableval)
-AC_MSG_RESULT($opt_maintainer_mode)
+AC_ARG_ENABLE(developer-mode,
+[  --enable-developer-mode   enable developer mode],
+opt_developer_mode=$enableval)
+AC_MSG_RESULT($opt_developer_mode)
 
 opt_profiler_mode=no
 AC_MSG_CHECKING([whether in profile mode])
@@ -113,7 +115,7 @@ affect performance.])
 
 if test $ac_cv_c_compiler_gnu != no; then
 
-	if test x$opt_maintainer_mode = xyes; then
+	if test x$opt_developer_mode = xyes; then
 
 	  CFLAGS="${CFLAGS} -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
 	else
@@ -315,8 +317,8 @@ AC_CHECK_LIB( tasn1, asn1_array2tree,:,
 
 )
 
-dnl In maintainer mode we always use the included library
-if test x$opt_maintainer_mode = xyes; then
+dnl In developer mode we always use the included library
+if test x$opt_developer_mode = xyes; then
  libtasn1_enabled=yes
 fi
 

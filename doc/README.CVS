@@ -29,7 +29,7 @@ $ cd ..
 $ ./buildconf
 
 3. Compile the sources
-$ ./configure --enable-maintainer-mode
+$ ./configure --enable-developer-mode
 $ make
 
 * Create the ChangeLog
