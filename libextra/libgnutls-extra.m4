@@ -9,7 +9,7 @@ dnl $id$
 dnl AM_PATH_LIBGNUTLS_EXTRA([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ]]])
 dnl Test for libgnutls-extra, and define LIBGNUTLS_EXTRA_CFLAGS and LIBGNUTLS_EXTRA_LIBS
 dnl
-AC_DEFUN(AM_PATH_LIBGNUTLS_EXTRA,
+AC_DEFUN([AM_PATH_LIBGNUTLS_EXTRA],
 [dnl
 dnl Get the cflags and libraries from the libgnutls-extra-config script
 dnl

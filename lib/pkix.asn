@@ -853,7 +853,7 @@ TerminalType ::= INTEGER {
    g3-facsimile (5),
    g4-facsimile (6),
    ia5-terminal (7),
-   videotex (8) } (0..ub-integer-options)
+   videotex (8) } -- (0..ub-integer-options)
 
 --      Extension Domain-defined Attributes
 

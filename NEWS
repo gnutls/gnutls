@@ -6,6 +6,7 @@ Version 1.0.14
 - certtool has now support for more X.520 DN attribute types.
 - Opencdk library is being included if not found.
 - Corrected a serious bug in the included libtasn1 library.
+- Corrected session resuming in SRP ciphersuites.
 
 Version 1.0.13 (29/04/2004)
 - Some complilation fixes.
