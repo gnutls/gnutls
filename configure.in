@@ -11,9 +11,10 @@ AC_DEFINE_UNQUOTED(T_OS, "$target_os")
 
 GNUTLS_MAJOR_VERSION=0
 GNUTLS_MINOR_VERSION=1
-GNUTLS_MICRO_VERSION=1
+GNUTLS_MICRO_VERSION=3
 GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
+AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION")
 
 AM_INIT_AUTOMAKE(gnutls, $GNUTLS_VERSION)
 AM_CONFIG_HEADER(config.h)
@@ -23,7 +24,7 @@ GNUTLS_MOST_RECENT_INTERFACE=$GNUTLS_MINOR_VERSION
 GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER=$GNUTLS_MICRO_VERSION
 GNUTLS_OLDEST_INTERFACE=0
 
-AM_PATH_GCRYPT(1.1.2,,
+AM_PATH_LIBGCRYPT(1.1.2,,
  	AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from
@@ -145,4 +146,15 @@ AC_CHECK_SIZEOF(unsigned char, 1)
 
 AM_PROG_LIBTOOL
 
-AC_OUTPUT([Makefile src/Makefile lib/Makefile doc/Makefile ])
+LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls"
+LIBGNUTLS_CFLAGS=""
+AC_SUBST(LIBGNUTLS_LIBS)
+AC_SUBST(LIBGNUTLS_CFLAGS)
+
+AC_OUTPUT_COMMANDS([
+ chmod +x lib/libgnutls-config
+ cat lib/gnutls_errors_int.h >> lib/gnutls.h
+ echo "" >> lib/gnutls.h
+])
+
+AC_OUTPUT([Makefile src/Makefile lib/Makefile lib/libgnutls-config lib/gnutls.h doc/Makefile])

@@ -19,4 +19,5 @@
 #undef USE_DMALLOC
 
 #undef USE_GCRYPT
+#undef GNUTLS_VERSION
  

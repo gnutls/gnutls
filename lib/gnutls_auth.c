@@ -117,6 +117,6 @@ void *_gnutls_get_kx_cred( GNUTLS_KEY key, int kx, int *err) {
 	return ccred->credentials;
 }
 
-void* gnutls_get_auth_info( GNUTLS_STATE state) {
+const void* gnutls_get_auth_info( GNUTLS_STATE state) {
 	return &state->gnutls_key->auth_info;
 }

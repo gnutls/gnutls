@@ -41,6 +41,7 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
+const char* _gnutls_version = GNUTLS_VERSION;
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
@@ -882,3 +883,76 @@ MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state) {
 CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state) {
 	return state->security_parameters.compression_algorithm;
 }
+
+/* Taken from libgcrypt */
+
+static const char*
+parse_version_number( const char *s, int *number )
+{
+    int val = 0;
+
+    if( *s == '0' && isdigit(s[1]) )
+	return NULL; /* leading zeros are not allowed */
+    for ( ; isdigit(*s); s++ ) {
+	val *= 10;
+	val += *s - '0';
+    }
+    *number = val;
+    return val < 0? NULL : s;
+}
+
+
+static const char *
+parse_version_string( const char *s, int *major, int *minor, int *micro )
+{
+    s = parse_version_number( s, major );
+    if( !s || *s != '.' )
+	return NULL;
+    s++;
+    s = parse_version_number( s, minor );
+    if( !s || *s != '.' )
+	return NULL;
+    s++;
+    s = parse_version_number( s, micro );
+    if( !s )
+	return NULL;
+    return s; /* patchlevel */
+}
+
+/****************
+ * Check that the the version of the library is at minimum the requested one
+ * and return the version string; return NULL if the condition is not
+ * satisfied.  If a NULL is passed to this function, no check is done,
+ * but the version string is simply returned.
+ */
+const char *
+gcry_check_version( const char *req_version )
+{
+    const char *ver = _gnutls_version;
+    int my_major, my_minor, my_micro;
+    int rq_major, rq_minor, rq_micro;
+    const char *my_plvl, *rq_plvl;
+
+    if ( !req_version )
+	return ver;
+
+    my_plvl = parse_version_string( ver, &my_major, &my_minor, &my_micro );
+    if ( !my_plvl )
+	return NULL;  /* very strange our own version is bogus */
+    rq_plvl = parse_version_string( req_version, &rq_major, &rq_minor,
+								&rq_micro );
+    if ( !rq_plvl )
+	return NULL;  /* req version string is invalid */
+
+    if ( my_major > rq_major
+	|| (my_major == rq_major && my_minor > rq_minor)
+	|| (my_major == rq_major && my_minor == rq_minor
+				 && my_micro > rq_micro)
+	|| (my_major == rq_major && my_minor == rq_minor
+				 && my_micro == rq_micro
+				 && strcmp( my_plvl, rq_plvl ) >= 0) ) {
+	return ver;
+    }
+    return NULL;
+}
+

@@ -46,7 +46,7 @@ int main()
     char buffer[MAX_BUF+1];
     int optval = 1;
     SRP_SERVER_CREDENTIALS cred;
-    SRP_AUTH_INFO *info;
+    const SRP_AUTH_INFO *info;
  
     /* this is a password file (created with the included crypt utility) 
      * Read README.crypt prior to using SRP.
