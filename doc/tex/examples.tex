@@ -8,14 +8,15 @@ This section contains examples of \tls{} and \ssl{} clients, using \gnutls{}.
 Note that these examples contain little or no error checking.
 
 \subsection{Simple client example with X.509 certificate support}
-Let's assume now that we want to create a client which communicates
+Let's assume now that we want to create a TCP client which communicates
 with servers that use X.509 or OpenPGP certificate authentication. The following client
 is a very simple \tls{} client, it does not support session resuming, not
-even certificate verification.
+even certificate verification. The TCP functions defined in this example
+are used in most of the other examples below, without redefining them.
 \input{ex-client2}
 
 \subsection{Obtaining session information}
-The following function  prints some information about the current session.
+The following function prints information about the current \tls{} session.
 \par
 This function should be called after a successful
 \printfunc{gnutls_handshake}{gnutls\_handshake}
@@ -49,12 +50,6 @@ to assist in this purpose.
 This is a modification of the simple client above. Here we added support 
 for session resumption.
 \input{ex-client-resume}
-
-\subsection{Client with Resume capability example II}
-\label{resume-example2}
-This is also a client with resume capability, but also demonstrates
-the use of session IDs.
-\input{ex-client1}
 
 \subsection{Simple client example with SRP authentication}
 The following client

@@ -2,12 +2,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #include <gnutls/gnutls.h>
+
+/* Those functions are defined in other examples.
+ */
+extern void check_alert(gnutls_session session, int ret);
+extern int tcp_connect( void);
+void tcp_close( int sd);
 
 #define MAX_BUF 1024
 #define CRLFILE "crl.pem"
@@ -17,15 +18,14 @@
 
 int main()
 {
-   const char *PORT = "443";
-   const char *SERVER = "127.0.0.1";
-   int err, ret;
+   int ret;
    int sd, ii, alert;
-   struct sockaddr_in sa;
    gnutls_session session;
    char buffer[MAX_BUF + 1];
    gnutls_certificate_credentials xcred;
-   /* variables used in session resuming */
+
+   /* variables used in session resuming 
+    */
    int t;
    char *session_data;
    int session_data_size;
@@ -39,17 +39,8 @@ int main()
 
    for (t = 0; t < 2; t++) {    /* connect 2 times to the server */
 
-      sd = socket(AF_INET, SOCK_STREAM, 0);
-      memset(&sa, '\0', sizeof(sa));
-      sa.sin_family = AF_INET;
-      sa.sin_port = htons(atoi(PORT));
-      inet_pton(AF_INET, SERVER, &sa.sin_addr);
+      sd = tcp_connect();
 
-      err = connect(sd, (SA *) & sa, sizeof(sa));
-      if (err < 0) {
-         fprintf(stderr, "Connect error");
-         exit(1);
-      }
       gnutls_init(&session, GNUTLS_CLIENT);
 
       gnutls_set_default_priority(session);
@@ -117,8 +108,7 @@ int main()
 
     end:
 
-      shutdown(sd, SHUT_RDWR);  /* no more receptions */
-      close(sd);
+      tcp_close(sd);
 
       gnutls_deinit(session);
 

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -18,13 +19,45 @@
 #define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
-int main()
+/* Connects to the peer and returns a socket
+ * descriptor.
+ */
+int tcp_connect( void)
 {
    const char *PORT = "443";
    const char *SERVER = "127.0.0.1";
-   int err, ret;
-   int sd, ii;
+   int err, sd;
    struct sockaddr_in sa;
+
+   /* connects to server 
+    */
+   sd = socket(AF_INET, SOCK_STREAM, 0);
+
+   memset(&sa, '\0', sizeof(sa));
+   sa.sin_family = AF_INET;
+   sa.sin_port = htons(atoi(PORT));
+   inet_pton(AF_INET, SERVER, &sa.sin_addr);
+
+   err = connect(sd, (SA *) & sa, sizeof(sa));
+   if (err < 0) {
+      fprintf(stderr, "Connect error\n");
+      exit(1);
+   }
+
+   return sd;
+}
+
+/* closes the given socket descriptor.
+ */
+void tcp_close( int sd) 
+{
+   shutdown(sd, SHUT_RDWR);     /* no more receptions */
+   close(sd);
+}
+
+int main()
+{
+   int ret, sd, ii;
    gnutls_session session;
    char buffer[MAX_BUF + 1];
    gnutls_certificate_credentials xcred;
@@ -42,20 +75,6 @@ int main()
     */
    gnutls_certificate_set_x509_trust_file(xcred, CAFILE, GNUTLS_X509_FMT_PEM);
 
-   /* connects to server 
-    */
-   sd = socket(AF_INET, SOCK_STREAM, 0);
-
-   memset(&sa, '\0', sizeof(sa));
-   sa.sin_family = AF_INET;
-   sa.sin_port = htons(atoi(PORT));
-   inet_pton(AF_INET, SERVER, &sa.sin_addr);
-
-   err = connect(sd, (SA *) & sa, sizeof(sa));
-   if (err < 0) {
-      fprintf(stderr, "Connect error\n");
-      exit(1);
-   }
    /* Initialize TLS session 
     */
    gnutls_init(&session, GNUTLS_CLIENT);
@@ -67,6 +86,10 @@ int main()
    /* put the x509 credentials to the current session
     */
    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+   /* connect to the peer
+    */
+   sd = tcp_connect();
 
    gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
 
@@ -102,8 +125,7 @@ int main()
 
  end:
 
-   shutdown(sd, SHUT_RDWR);     /* no more receptions */
-   close(sd);
+   tcp_close( sd);
 
    gnutls_deinit(session);
 
