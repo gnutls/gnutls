@@ -481,6 +481,10 @@ typedef struct {
 	 * user.
 	 */
 	uint16			proposed_record_size;
+	
+	/* holds the index of the selected certificate.
+	 */
+	int			selected_cert_index; 
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

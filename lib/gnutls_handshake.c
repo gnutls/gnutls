@@ -1894,8 +1894,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	cert = NULL;
 
 	cert =
-	    _gnutls_server_find_cert(state, x509_cred->cert_list,
-						      x509_cred->ncerts);
+	    _gnutls_server_find_x509_cert(state);
 
 	if (cert == NULL) {
 		/* No certificate was found 
@@ -1918,29 +1917,42 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	    gnutls_malloc(numCipherSuites * sizeof(GNUTLS_CipherSuite));
 	if (newSuite==NULL) {
 		gnutls_assert();
+		gnutls_free(alg);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	for (i = 0; i < numCipherSuites; i++) {
+		/* finds the key exchange algorithm in
+		 * the ciphersuite
+		 */
 		kx = _gnutls_cipher_suite_get_kx_algo((*cipherSuites)[i]);
 
 		keep = 0;
+
+		/* If there was no credentials to use with the specified
+		 * key exchange method, then just remove it.
+		 */
 		if (_gnutls_map_kx_get_cred(kx) == GNUTLS_X509PKI) {
 			keep = 1;	/* do not keep */
 			if (x509_cred != NULL)
+				/* here we check if the KX algorithm 
+				 * is compatible with the X.509 certificate.
+				 */
 				for (j = 0; j < alg_size; j++) {
 					if (alg[j] == kx) {
 						keep = 0;
 						break;
 					}
 				}
-		} else
-			/* if it is defined but had no credentials 
-			 */
-		    if (_gnutls_get_kx_cred(state->gnutls_key, kx, NULL) ==
-			NULL)
-			keep = 1;
+		} else {
 
+		/* if it is defined but had no credentials 
+		 */
+
+		    if (_gnutls_get_kx_cred(state->gnutls_key, kx, NULL) == NULL)
+			keep = 1;
+		}
+				
 		if (keep == 0) {
 			memcpy(newSuite[newSuiteSize].CipherSuite,
 			       (*cipherSuites)[i].CipherSuite, 2);

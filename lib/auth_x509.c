@@ -104,7 +104,8 @@ static int _gnutls_get_private_rsa_params(GNUTLS_KEY key,
 	return 0;
 }
 
-/* Returns the issuer's Distinguished name in odn, of the certificate specified in cert.
+/* Returns the issuer's Distinguished name in odn, of the certificate 
+ * specified in cert.
  */
 int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 {
@@ -874,13 +875,9 @@ int _gnutls_find_apr_cert(GNUTLS_STATE state, gnutls_cert ** apr_cert_list,
 			gnutls_assert();	/* this is not allowed */
 			return GNUTLS_E_INSUFICIENT_CRED;
 		} else {
-
-			ind =
-			    _gnutls_server_find_cert_list_index(state,
-								cred->
-								cert_list,
-								cred->
-								ncerts);
+			/* find_cert_list_index() has been called before.
+			 */
+			ind = state->gnutls_internals.selected_cert_index;
 
 			if (ind < 0) {
 				*apr_cert_list = NULL;
@@ -1285,29 +1282,37 @@ int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
  * The 'appropriate' is defined by the user. 
  * (frontend to _gnutls_server_find_cert_index())
  */
-const gnutls_cert *_gnutls_server_find_cert(GNUTLS_STATE state,
-					    gnutls_cert ** cert_list,
-					    int cert_list_length)
+const gnutls_cert *_gnutls_server_find_x509_cert(GNUTLS_STATE state)
 {
 	int i;
+	const X509PKI_CREDENTIALS x509_cred;
 
-	i = _gnutls_server_find_cert_list_index(state, cert_list,
-					 cert_list_length);
+	x509_cred =
+            _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+        
+        if (x509_cred==NULL)
+        	return NULL;
+
+	i = _gnutls_server_find_x509_cert_list_index(state, x509_cred->cert_list,
+					 x509_cred->ncerts);
+
 	if (i < 0)
 		return NULL;
 
-	return &cert_list[i][0];
+	return &x509_cred->cert_list[i][0];
 }
 
 /* finds the most appropriate certificate in the cert list.
  * The 'appropriate' is defined by the user.
  */
-int _gnutls_server_find_cert_list_index(GNUTLS_STATE state,
+int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 					gnutls_cert ** cert_list,
 					int cert_list_length)
 {
 	int i, index = -1;
 	const X509PKI_CREDENTIALS cred;
+
+	state->gnutls_internals.selected_cert_index = 0;
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
 	if (cred == NULL) {
@@ -1339,5 +1344,9 @@ int _gnutls_server_find_cert_list_index(GNUTLS_STATE state,
 		gnutls_free(my_certs);
 	}
 
+	/* store the index for future use, in the handshake.
+	 * (This will allow not calling this callback again.)
+	 */
+	state->gnutls_internals.selected_cert_index = index;
 	return index;
 }

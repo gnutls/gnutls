@@ -1110,6 +1110,7 @@ void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
   * not attempt to choose the appropriate certificate and the caller function
   * will fail.
   *
+  * The callback function will only be called once per handshake.
   * The callback function should return the index of the certificate
   * choosen by the server (or -1 in case of an error)
   *
