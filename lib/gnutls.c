@@ -105,6 +105,12 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.CompressionMethodPriority.algorithm_priority=NULL;
 	(*state)->gnutls_internals.CompressionMethodPriority.algorithms=0;
 
+	/* Set default priorities */
+	gnutls_set_cipher_priority( (*state), 2, GNUTLS_RIJNDAEL, GNUTLS_3DES);
+	gnutls_set_compression_priority( (*state), 1, GNUTLS_COMPRESSION_NULL);
+	gnutls_set_kx_priority( (*state), 2, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
+	gnutls_set_mac_priority( (*state), 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
+
 	return 0;
 }
 
