@@ -1,0 +1,34 @@
+.TH gnutls\-srpcrypt 1 "October 26th 2003"
+.SH NAME
+gnutls\-srpcrypt \- Simple SRP password tool
+.SH SYNOPSIS
+gnutls\-srpcrypt [\fIoptions\fR]
+.SH DESCRIPTION
+SRP (Secure Remote Password) utility using GNU TLS.
+.SH OPTIONS
+.IP "\-u, \-\-username \fIusername\fR"
+Specify username.
+.IP "\-p, \-\-passwd \fIFILE\fR"
+Specify a password file.
+.IP "\-i, \-\-index \fIINDEX\fR"
+Specify the index of the parameters in tpasswd.conf to use.
+.IP "\-s, \-\-salt \fISALT\fR"
+Specify salt/cost size for crypt algorithm.
+.IP "\-\-verify"
+Just verify password.
+.IP "\-\-passwd\-conf \fIFILE\fR"
+Specify a password configuration file.
+.IP "\-\-create\-conf \fIFILE\fR"
+Generate a tpasswd.conf file.
+.IP "\-\-bits \fIBITS\fR"
+specify the number of bits for prime numbers (used only when the
+\fB\-\-create\-conf\fR option is used).
+.IP "\-h, \-\-help"
+Prints a short reminder of the command line options.
+.SH AUTHOR
+.PP
+Nikos Mavroyanopoulos <nmav@gnutls.org> and others; see
+/usr/share/doc/gnutls\-bin/AUTHORS for a complete list.
+.PP
+This manual page was written by Ivo Timmermans <ivo@debian.org>, for
+the Debian GNU/Linux system (but may be used by others).

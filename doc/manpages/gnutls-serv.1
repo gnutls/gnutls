@@ -1,0 +1,70 @@
+.TH gnutls\-serv 1 "October 26th 2003"
+.SH NAME
+gnutls\-serv \- GNU TLS test server
+.SH SYNOPSIS
+gnutls\-serv [\fIoptions\fR]
+.SH DESCRIPTION
+Simple server program that listens to incoming TLS connections.
+.SH OPTIONS
+.IP "\-g, \-\-generate"
+Generate Diffie Hellman Parameters.
+.IP "\-p, \-\-port \fIinteger\fR"
+The port to connect to.
+.IP "\-q, \-\-quiet"
+Suppress some messages.
+.IP "\-\-nodb"
+Does not use the resume database.
+.IP "\-\-http"
+Act as an HTTP Server.
+.IP "\-\-echo"
+Act as an Echo Server.
+.IP "\-\-x509fmtder"
+Use DER format for certificates
+.IP "\-\-x509cafile \fIFILE\fR"
+Certificate file to use.
+.IP "\-\-pgpkeyring \fIFILE\fR"
+PGP Key ring file to use.
+.IP "\-\-pgptrustdb \fIFILE\fR"
+PGP trustdb file to use.
+.IP "\-\-pgpkeyfile \fIFILE\fR"
+PGP Key file to use.
+.IP "\-\-pgpcertfile \fIFILE\fR"
+PGP Public Key (certificate) file to use.
+.IP "\-\-x509keyfile \fIFILE\fR"
+X.509 key file to use.
+.IP "\-\-x509certfile \fIFILE\fR"
+X.509 Certificate file to use.
+.IP "\-\-srppasswd \fIFILE\fR"
+SRP password file to use.
+.IP "\-\-srppasswdconf \fIFILE\fR"
+SRP password configuration file to use.
+.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
+Ciphers to enable.
+.IP "\-\-protocols \fIprotocol1 protocol2...\fR"
+Protocols to enable.
+.IP "\-\-comp \fIcomp1 comp2...\fR"
+Compression methods to enable.
+.IP "\-\-macs \fImac1 mac2...\fR"
+MACs to enable.
+.IP "\-\-kx \fIkx1 kx2...\fR"
+Key exchange methods to enable.
+.IP "\-\-ctypes \fIcertType1 certType2...\fR"
+Certificate types to enable.
+.IP "\-l, \-\-list"
+Print a list of the supported algorithms and modes.
+.IP "\-h, \-\-help"
+prints this help
+.IP "\-v, \-\-version"
+prints the program's version number
+.IP "\-\-copyright"
+prints the program's license
+.SH "SEE ALSO"
+.BR gnutls\-cli (1),
+.BR gnutls\-cli\-debug (1)
+.SH AUTHOR
+.PP
+Nikos Mavroyanopoulos <nmav@gnutls.org> and others; see
+/usr/share/doc/gnutls\-bin/AUTHORS for a complete list.
+.PP
+This manual page was written by Ivo Timmermans <ivo@debian.org>, for
+the Debian GNU/Linux system (but may be used by others).

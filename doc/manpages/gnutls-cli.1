@@ -1,0 +1,74 @@
+.TH gnutls\-cli 1 "October 26th 2003"
+.SH NAME
+gnutls\-cli \- GNU TLS test client
+.SH SYNOPSIS
+gnutls\-cli [\fIoptions\fR] \fIhostname\fI
+.SH DESCRIPTION
+Simple client program to set up a TLS connection to some other
+computer.
+.SH OPTIONS
+.IP "\-r, \-\-resume"
+Connect, establish a session.  Connect again and resume this session.
+.IP "\-s, \-\-starttls"
+Connect, establish a plain session and start TLS when EOF is sent from
+the keyboard.
+.IP "\-\-crlf"
+Send CR LF instead of LF.
+.IP "\-\-x509fmtder"
+Use DER format for certificates
+.IP "\-f, \-\-fingerprint"
+Send the openpgp fingerprint, instead of the key.
+.IP "\-\-xml"
+Print the certificate information in XML format.
+.IP "\-p, \-\-port \fIinteger\fR"
+The port to connect to.
+.IP "\-\-recordsize \fIinteger\fR"
+The maximum record size to advertize.
+.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
+Ciphers to enable.
+.IP "\-\-protocols \fIprotocol1 protocol2...\fR"
+Protocols to enable.
+.IP "\-\-comp \fIcomp1 comp2...\fR"
+Compression methods to enable.
+.IP "\-\-macs \fImac1 mac2...\fR"
+MACs to enable.
+.IP "\-\-kx \fIkx1 kx2...\fR"
+Key exchange methods to enable.
+.IP "\-\-ctypes \fIcertType1 certType2...\fR"
+Certificate types to enable.
+.IP "\-\-x509cafile \fIFILE\fR"
+Certificate file to use.
+.IP "\-\-pgpkeyfile \fIFILE\fR"
+PGP Key file to use.
+.IP "\-\-pgpkeyring \fIFILE\fR"
+PGP Key ring file to use.
+.IP "\-\-pgptrustdb \fIFILE\fR"
+PGP trustdb file to use.
+.IP "\-\-pgpcertfile \fIFILE\fR"
+PGP Public Key (certificate) file to use.
+.IP "\-\-x509keyfile \fIFILE\fR"
+X.509 key file to use.
+.IP "\-\-x509certfile \fIFILE\fR"
+X.509 Certificate file to use.
+.IP "\-\-srpusername \fINAME\fR"
+SRP username to use.
+.IP "\-\-srppasswd \fIPASSWD\fR"
+SRP password to use.
+.IP "\-l, \-\-list"
+Print a list of the supported algorithms and modes.
+.IP "\-h, \-\-help"
+Prints a short reminder of the command line options.
+.IP "\-v, \-\-version"
+Prints the program's version number.
+.IP "\-\-copyright"
+Prints the program's license.
+.SH "SEE ALSO"
+.BR gnutls\-cli\-debug (1),
+.BR gnutls\-serv (1)
+.SH AUTHOR
+.PP
+Nikos Mavroyanopoulos <nmav@gnutls.org> and others; see
+/usr/share/doc/gnutls\-bin/AUTHORS for a complete list.
+.PP
+This manual page was written by Ivo Timmermans <ivo@debian.org>, for
+the Debian GNU/Linux system (but may be used by others).

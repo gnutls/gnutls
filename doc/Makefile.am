@@ -1,3 +1,3 @@
 EXTRA_DIST = TODO README.CVS README.autoconf
-SUBDIRS = tex examples scripts
+SUBDIRS = tex examples scripts manpages
 
