@@ -32,3 +32,11 @@ endif
 if LIBGCRYPT
 libgc_la_SOURCES += gc-libgcrypt.c
 endif
+
+noinst_LTLIBRARIES += libutils.la
+libutils_la_SOURCES = utils.h utils.c
+
+test_gc_LDADD = libutils.la libgc.la
+
+TESTS = test-gc
+check_PROGRAMS = $(TESTS)
