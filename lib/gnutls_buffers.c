@@ -1,4 +1,3 @@
-#define READ_DEBUG
 /*
  *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
