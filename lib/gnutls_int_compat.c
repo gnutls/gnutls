@@ -4,6 +4,7 @@
  * with previous versions.
  */
 
+/* used in 0.3.x */
 int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits) {
 	return 0;
 }
@@ -28,4 +29,10 @@ int gnutls_anon_server_get_dh_bits(GNUTLS_STATE state)
 int gnutls_anon_client_get_dh_bits(GNUTLS_STATE state)
 {
 	return gnutls_dh_get_bits( state);
+}
+
+/* used in 0.3.x */
+int gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state);
+{
+	return 0;
 }

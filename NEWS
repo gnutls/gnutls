@@ -10,7 +10,7 @@ Version ?.?.?
 - Handshake messages are not kept in memory any more. Now we use less memory
   during a handshake.
 
-Version 0.3.5
+Version 0.3.5 (25/01/2002)
 - Corrected the RSA key exchange method, to avoid attacks against
   PKCS-1 formating.
 
