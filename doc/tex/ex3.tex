@@ -1,5 +1,13 @@
 \begin{verbatim}
 
+#define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
+#define PRINT_DN(X) PRINTX( "CN:", x509_info->X.common_name); \
+	PRINTX( "OU:", x509_info->X.organizational_unit_name); \
+	PRINTX( "O:", x509_info->X.organization); \
+	PRINTX( "L:", x509_info->X.locality_name); \
+	PRINTX( "S:", x509_info->X.state_or_province_name); \
+	PRINTX( "C:", x509_info->X.country);
+
 int print_info(GNUTLS_STATE state)
 {
    const char *tmp;
