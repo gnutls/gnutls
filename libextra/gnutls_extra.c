@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2001 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -134,7 +135,7 @@ int gnutls_global_init_extra(void)
      * libextra, then do not initialize the library.
      * This is because it may break things.
      */
-    if (strcmp(gnutls_check_version(NULL), GNUTLS_VERSION) != 0) {
+    if (strcmp(gnutls_check_version(NULL), VERSION) != 0) {
 	return GNUTLS_E_LIBRARY_VERSION_MISMATCH;
     }
 
@@ -213,7 +214,7 @@ static const char *parse_version_string(const char *s, int *major,
  */
 const char *gnutls_extra_check_version(const char *req_version)
 {
-    const char *ver = GNUTLS_VERSION;
+    const char *ver = VERSION;
     int my_major, my_minor, my_micro;
     int rq_major, rq_minor, rq_micro;
     const char *my_plvl, *rq_plvl;
