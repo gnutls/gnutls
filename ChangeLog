@@ -1,3 +1,9 @@
+2003-11-12 13:10  nmav <nmav@gnutls.org>
+
+	* src/certtool.c:
+
+	Prints certificate information before signing.  
+
 2003-11-11 21:00  nmav <nmav@gnutls.org>
 
 	* configure.in, lib/gnutls_random.c, src/crypt.c:
