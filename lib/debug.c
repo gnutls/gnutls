@@ -70,8 +70,6 @@ void _gnutls_print_state(GNUTLS_STATE state)
 		state->security_parameters.key_size);
 	fprintf(stderr, "Key Material: %d\n",
 		state->security_parameters.key_material_length);
-	fprintf(stderr, "Exportable: %d\n",
-		state->security_parameters.is_exportable);
 	fprintf(stderr, "MAC algorithm: %d\n",
 		state->security_parameters.mac_algorithm);
 	fprintf(stderr, "Hash size: %d\n",

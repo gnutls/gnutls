@@ -139,8 +139,7 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 			state->security_parameters.cipher_type =
 			    CIPHER_STREAM;
 		}
-		state->security_parameters.is_exportable =
-		    EXPORTABLE_FALSE;
+
 		state->security_parameters.key_material_length =
 		    state->security_parameters.key_size =
 		    _gnutls_cipher_get_key_size(algo);

@@ -3,7 +3,7 @@
 #define GNUTLS_INT_H
 
 //#define HANDSHAKE_DEBUG
-//#define HARD_DEBUG
+#define HARD_DEBUG
 //#define READ_DEBUG
 //#define WRITE_DEBUG
 #define DEBUG
@@ -87,7 +87,6 @@ enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTL
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
-enum IsExportable { EXPORTABLE_TRUE, EXPORTABLE_FALSE };
 enum MACAlgorithm { GNUTLS_MAC_NULL, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
 enum CompressionMethod { GNUTLS_COMPRESSION_NULL, GNUTLS_ZLIB=224 };
 
@@ -101,7 +100,6 @@ typedef enum ResumableSession ResumableSession;
 typedef enum ConnectionEnd ConnectionEnd;
 typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
 typedef enum CipherType CipherType;
-typedef enum IsExportable IsExportable;
 typedef enum MACAlgorithm MACAlgorithm;
 typedef enum CompressionMethod CompressionMethod;
 
@@ -112,13 +110,12 @@ typedef struct {
 	ConnectionEnd entity;
 	BulkCipherAlgorithm bulk_cipher_algorithm;
 	CipherType cipher_type;
+	MACAlgorithm mac_algorithm;
+	CompressionMethod compression_algorithm;
 	uint8 IV_size;
 	uint8 key_size;
 	uint8 key_material_length;
-	IsExportable is_exportable;
-	MACAlgorithm mac_algorithm;
 	uint8 hash_size;
-	CompressionMethod compression_algorithm;
 	opaque master_secret[48];
 	opaque client_random[32];
 	opaque server_random[32];
