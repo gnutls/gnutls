@@ -21,6 +21,19 @@ This function should be called after a successful
 
 \input{ex3}
 
+\subsection{Verifying peer's hostname in a certificate}
+\par HTTPS clients have to verify not only the peer's certificate,
+but also the hostname in this certificate. That is to know that
+they actually connected to the right site.
+RFC2818 specifies some hostname checking algorithm, and this (a simple form)
+is implemented in the following example.
+
+\par
+This function should be called after a successful
+\printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}
+
+\input{ex-rfc2818}
+
 \subsection{Client with Resume capability example}
 \label{resume-example}
 This is the same client as above, but here we add support for session

@@ -1,0 +1,116 @@
+\begin{verbatim}
+
+/* This example was written by Andrew McDonald <andrew@mcdonald.org.uk>
+ * and is licensed under the GNU GPL license.
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <gnutls/gnutls.h>
+
+static int hostname_compare(const char *certname, const char *hostname);
+
+/* This function will check if the given certificate's subject matches
+ * the given hostname. This is an implementation of the matching described
+ * in RFC2818 (HTTPS).
+ */
+int check_certificates_hostname(const gnutls_datum * cert,
+                                const char *hostname)
+{
+
+   char dnsname[GNUTLS_X509_CN_SIZE];
+   int dnsnamesize;
+   int found_dnsname = 0;
+   int ret;
+   gnutls_DN dn;
+   int i = 0;
+
+   /* try matching against:
+    *  1) a DNS name as an alternative name (subjectAltName) extension
+    *     in the certificate
+    *  2) the common name (CN) in the certificate
+    *
+    *  either of these may be of the form: *.domain.tld
+    *
+    *  only try (2) if there is no subjectAltName extension of
+    *  type dNSName
+    */
+
+
+   /* Check through all included subjectAltName extensions, comparing
+    * against all those of type dNSName.
+    */
+   for (i = 0; !(ret < 0); i++) {
+
+      dnsnamesize = GNUTLS_X509_CN_SIZE;
+      ret =
+          gnutls_x509_extract_certificate_subject_alt_name(cert, i,
+                                                           dnsname,
+                                                           &dnsnamesize);
+
+      if (ret == GNUTLS_SAN_DNSNAME) {
+         found_dnsname = 1;
+         if (hostname_compare(dnsname, hostname)) {
+            return 1;
+         }
+      }
+
+   }
+
+   if (!found_dnsname) {
+      /* not got the necessary extension, use CN instead 
+       */
+      if (gnutls_x509_extract_certificate_dn(cert, &dn) != 0) {
+         /* got an error, can't find a name 
+          */
+         return 0;
+      }
+
+      if (hostname_compare(dn.common_name, hostname)) {
+         return 1;
+      }
+   }
+
+   /* not found a matching name
+    */
+   return 0;
+}
+
+/* compare hostname against certificate, taking account of wildcards
+ * return 1 on success or 0 on error 
+ */
+static int hostname_compare(const char *certname, const char *hostname)
+{
+   const char *cmpstr1, *cmpstr2;
+
+   if (strlen(certname) == 0 || strlen(hostname) == 0)
+      return 0;
+
+   if (strlen(certname) > 2 && strncmp(certname, "*.", 2) == 0) {
+      /* a wildcard certificate */
+
+      cmpstr1 = certname + 1;
+
+      /* find the first dot in hostname, compare from there on */
+      cmpstr2 = strchr(hostname, '.');
+
+      if (cmpstr2 == NULL) {
+         /* error, the hostname we're connecting to is only a local part */
+         return 0;
+      }
+
+      if (strcmp(cmpstr1, cmpstr2) == 0) {
+         return 1;
+      }
+
+      return 0;
+   }
+
+   if (strcmp(certname, hostname) == 0) {
+      return 1;
+   }
+
+   return 0;
+}
+
+\end{verbatim}
