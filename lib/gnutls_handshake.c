@@ -130,6 +130,7 @@ int SelectSuite(opaque ret[2], char *data, int datalen)
 			    0) {
 				memmove(ret, &ciphers[i].CipherSuite, 2);
 				gnutls_free(ciphers);
+				
 				return 0;
 			}
 		}
@@ -137,7 +138,7 @@ int SelectSuite(opaque ret[2], char *data, int datalen)
 
 
 	gnutls_free(ciphers);
-	return GNUTLS_E_UNKNOWN_CIPHER;
+	return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 
 }
 
@@ -487,14 +488,11 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 
 #ifdef DEBUG
-		fprintf(stderr, "Server's major version: %d\n", data[pos]);
+		fprintf(stderr, "Server's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
 		if (data[pos++] != GNUTLS_VERSION_MAJOR)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 
-#ifdef DEBUG
-		fprintf(stderr, "Server's minor version: %d\n", data[pos]);
-#endif
 		if (data[pos++] != GNUTLS_VERSION_MINOR)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 
@@ -563,16 +561,12 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 
 #ifdef DEBUG
-		fprintf(stderr, "Client's major version: %d\n", data[pos]);
+		fprintf(stderr, "Client's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
 
 		if (data[pos++] != GNUTLS_VERSION_MAJOR)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 
-
-#ifdef DEBUG
-		fprintf(stderr, "Client's minor version: %d\n", data[pos]);
-#endif
 
 		if (data[pos++] != GNUTLS_VERSION_MINOR)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
@@ -595,16 +589,19 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifndef WORDS_BIGENDIAN
 		sizeOfSuites = byteswap16(sizeOfSuites);
 #endif
-		SelectSuite(state->gnutls_internals.
+		ret = SelectSuite(state->gnutls_internals.
 			    current_cipher_suite.CipherSuite, &data[pos],
 			    sizeOfSuites);
+
+		if (ret<0) return ret;
+		
 		pos += sizeOfSuites;
 
 		memmove(&z, &data[pos++], 1);
-		SelectCompMethod(&state->
+		ret = SelectCompMethod(&state->
 				 gnutls_internals.compression_method,
 				 &data[pos], z);
-
+		if (ret<0) return ret;
 	}
 
 	return ret;

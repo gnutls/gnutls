@@ -5,8 +5,8 @@
 #include "gnutls_cipher.h"
 #include "gnutls_algorithms.h"
 
-#define MD5_DIGEST 16
-#define SHA_DIGEST 20
+#define MD5_DIGEST mhash_get_block_size(MHASH_MD5)
+#define SHA_DIGEST mhash_get_block_size(MHASH_SHA1)
 
 /* Sets the specified cipher into the pending state */
 int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
@@ -86,6 +86,24 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 {
 	int rc;
 
+/* Set the keys since we have the master secret*/
+_gnutls_set_keys(state);
+
+/* Update internals from CipherSuite selected */
+rc = _gnutls_set_cipher( state, _gnutls_cipher_suite_get_cipher_algo(state->gnutls_internals.current_cipher_suite));
+if (rc<0) return rc;
+rc = _gnutls_set_mac( state, _gnutls_cipher_suite_get_mac_algo(state->gnutls_internals.current_cipher_suite));
+if (rc<0) return rc;
+
+/* FIXME: This is not implemented (no compression algorithms used)
+ * state->security_parameters.compression_algorithm = _gnutls_cipher_suite_get_mac_algo(state->gnutls_internals.current_cipher_suite);
+ */
+ 
+#ifdef DEBUG
+	fprintf(stderr, "Cipher Suite: %s\n", _gnutls_cipher_suite_get_name(state->gnutls_internals.current_cipher_suite));
+#endif
+
+
 	gnutls_free(state->connection_state.write_mac_secret);
 	gnutls_free(state->connection_state.read_mac_secret);
 
@@ -105,7 +123,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		state->connection_state.read_compression_state = NULL;
 		state->connection_state.write_compression_state = NULL;
 		break;
-	default:
+ 	default:
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
 
@@ -116,10 +134,8 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		state->connection_state.mac_secret_size = 0;
 		break;
 	case MAC_MD5:
-		state->connection_state.read_mac_secret =
-		    gnutls_malloc(MD5_DIGEST);
-		state->connection_state.write_mac_secret =
-		    gnutls_malloc(MD5_DIGEST);
+		state->connection_state.read_mac_secret = gnutls_malloc(MD5_DIGEST);
+		state->connection_state.write_mac_secret = gnutls_malloc(MD5_DIGEST);
 		state->connection_state.mac_secret_size = MD5_DIGEST;
 		break;
 	case MAC_SHA:
@@ -170,8 +186,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		}
 		if (state->connection_state.mac_secret_size > 0) {
 			memmove(state->connection_state.read_mac_secret,
-				state->cipher_specs.
-				client_write_mac_secret,
+				state->cipher_specs.client_write_mac_secret,
 				state->connection_state.mac_secret_size);
 			memmove(state->connection_state.write_mac_secret,
 				state->cipher_specs.
@@ -214,12 +229,10 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		}
 		if (state->connection_state.mac_secret_size > 0) {
 			memmove(state->connection_state.read_mac_secret,
-				state->cipher_specs.
-				server_write_mac_secret,
+				state->cipher_specs.server_write_mac_secret,
 				state->connection_state.mac_secret_size);
 			memmove(state->connection_state.write_mac_secret,
-				state->cipher_specs.
-				client_write_mac_secret,
+				state->cipher_specs.client_write_mac_secret,
 				state->connection_state.mac_secret_size);
 		}
 
