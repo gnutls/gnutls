@@ -4,4 +4,4 @@ EXTRA_DIST = ChangeLog NEWS INSTALL README THANKS COPYING PGPKEYS
 SUBDIRS = lib src doc
 
 ChangeLog:
-	cvs2cl --utc -t -U .cvsusers --fsf --tags -W 2400
+	cvs2cl --utc -U .cvsusers -F trunk --fsf -t -S
