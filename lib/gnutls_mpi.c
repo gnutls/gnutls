@@ -79,7 +79,7 @@ int ret;
 	if (nbytes == NULL || a == NULL) return GNUTLS_E_INVALID_REQUEST;
 
 	ret = gcry_mpi_print( GCRYMPI_FMT_USG, buffer, *nbytes, nbytes, a);
-	if (!ret) return ret;
+	if (!ret) return 0;
 	
 	return GNUTLS_E_MPI_PRINT_FAILED;
 }
@@ -92,7 +92,7 @@ int ret;
 	if (nbytes == NULL || a == NULL) return GNUTLS_E_INVALID_REQUEST;
 
 	ret = gcry_mpi_print( GCRYMPI_FMT_STD, buffer, *nbytes, nbytes, a);
-	if (!ret) return ret;
+	if (!ret) return 0;
 	
 	return GNUTLS_E_MPI_PRINT_FAILED;
 }

@@ -2,26 +2,8 @@ If you want to contribute (implement something from the current list, or
 anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
-Current list:
-* Add a callback function in certificate authentication, to receive
-  the certificate and the private key. This might require a rewrite
-  of the certificate selection part.
-* Add gnutls_certificate_set_openpgp_key() and gnutls_certificate_set_openpgp_keyring()
-  functions, similar to gnutls_certificate_set_x509_key().
-* Add gnutls_openpgp_key_get_key_usage().
-* Use subkeys with the 0x20 flag in openpgp keys (if present),
-  instead of the main key.
-* Add function to extract the signers of an openpgp key. Should
-  be similar to gnutls_x509_crt_get_dn_oid().
-* Add function to verify an openpgp key against a plain key.
-* Add support for generating and handling DSA keys
-* Add support for extracting CRL distribution points.
-* Add support for generating CRLs.
-* Convert documentation to texinfo format
-* Audit the code
-* Allow sending V2 Hello messages. It seems that some (old) broken 
-  implementations require that.
-* Add Kerberos support
+Current list for the stable 1.0.x branch:
+* Bugfixes only
 
 (+) Means high priority 
 (*) Means medium priority

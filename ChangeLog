@@ -1,3 +1,36 @@
+2004-05-31 20:05  nmav <nmav@gnutls.org>
+
+	* src/: cli.c, cli.c:
+
+	ciphers are sorted according to a strength order.  
+
+2004-05-31 12:15  nmav <nmav@gnutls.org>
+
+	* NEWS:
+
+	Updated to conform to the latest srp draft (draft-ietf-tls-srp-07).  
+
+2004-05-27 21:11  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_handshake.c, gnutls_v2_compat.c, gnutls_handshake.c,
+	gnutls_v2_compat.c:
+
+	added some extra checks in hello packet parsing.  
+
+2004-05-27 18:55  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/Makefile.am, src/Makefile.am,
+	src/certtool-cfg.h, src/retcodes.c, ChangeLog, acinclude.m4,
+	configure.in, lib/Makefile.am, src/Makefile.am, src/certtool-cfg.h:
+
+	some libtasn1 related compilation fixes 
+
+2004-05-27 11:17  nmav <nmav@gnutls.org>
+
+	* configure.in:
+
+	added dependency on opencdk 0.5.5 
+
 2004-05-26 14:26  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/README.autoconf, doc/certtool.cfg,
