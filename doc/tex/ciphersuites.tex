@@ -1,7 +1,8 @@
 \newpage
 \section{TLS Cipher suites}
 \par 
-\tlsI{} supports ciphersuites like {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
+The Handshake Protocol of \tlsI{} negotiates ciphersuites 
+like the {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
 These ciphersuites contain three parameters:
 \begin{itemize}
 \item The key exchange algorithm (DHE\_RSA in the example)
@@ -12,8 +13,9 @@ be described as a keyed hash algorithm. See RFC2104.} algorithm used for authent
 MAC\_SHA is used in the above example.
 \end{itemize}
 
-The ciphersuite that will be used in the connection is negotiated at
-the handshake procedure. However you must note that \tlsI does not always
+The ciphersuite negotiated in the handshake protocol, will affect 
+the Record Protocol, by enabling encryption and data authentication.
+Note that \tlsI does not always
 negotiate the strongest available cipher suite. There are cases where
 a man in the middle attacker could make the two entities negotiate
 the least secure method they support. For that reason do not enable
