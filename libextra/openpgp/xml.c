@@ -338,7 +338,7 @@ gnutls_openpgp_key_to_xml( gnutls_openpgp_key key,
                             gnutls_datum *xmlkey, int ext )
 {
     cdk_kbnode_t node, ctx = NULL;
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     char name[MAX_CN];
     size_t name_len;
     const char *s;

@@ -34,7 +34,7 @@ static int
 openpgp_get_key_trust( gnutls_openpgp_trustdb trustdb, 
      gnutls_openpgp_key key, unsigned int *r_trustval )
 {
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     cdk_pkt_pubkey_t pk = NULL;
     int flags = 0, ot = 0;
     int rc = 0;

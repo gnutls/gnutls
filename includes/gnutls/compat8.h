@@ -62,24 +62,11 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert) DEPRECA
 int gnutls_x509_extract_key_pk_algorithm( const gnutls_datum * key) DEPRECATED;
 
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length) DEPRECATED;
-int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
-                                const char *hostname) DEPRECATED;
 
 #define gnutls_x509_fingerprint gnutls_fingerprint
 #define gnutls_x509_certificate_format gnutls_x509_crt_fmt
 
 int gnutls_x509_extract_key_pk_algorithm( const gnutls_datum * key) DEPRECATED;
-
-int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
-	gnutls_datum m, gnutls_datum e, gnutls_datum d, 
-	gnutls_datum p, gnutls_datum q, gnutls_datum u,
-	int bits) DEPRECATED;
-int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
-	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
-	gnutls_datum* u, int bits) DEPRECATED;
-
-int gnutls_dh_params_set( gnutls_dh_params, gnutls_datum prime, gnutls_datum generator, int bits) DEPRECATED;
-int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits) DEPRECATED;
 
 #define gnutls_certificate_set_rsa_params gnutls_certificate_set_rsa_export_params
 

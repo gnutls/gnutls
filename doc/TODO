@@ -5,7 +5,6 @@ in order to avoid having people working on the same thing.
 Current list:
 * Add gnutls_certificate_set_openpgp_keyring()
   functions, similar to gnutls_certificate_set_openpgp_key().
-* Add gnutls_openpgp_key_get_key_usage().
 * Use subkeys with the 0x20 flag in openpgp keys (if present),
   instead of the main key.
 * Add function to extract the signers of an openpgp key. Should

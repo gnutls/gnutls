@@ -217,11 +217,10 @@ kbx_data_to_keyring( int type, int enc, const char *data,
 }
 
 
-CDK_PACKET*
-search_packet( const gnutls_datum *buf, int pkttype )
+cdk_packet_t search_packet( const gnutls_datum *buf, int pkttype )
 {
     static cdk_kbnode_t knode = NULL;
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
 
     if( !buf && !pkttype ) {
         cdk_kbnode_release( knode );
@@ -296,7 +295,7 @@ _gnutls_openpgp_raw_privkey_to_gkey( gnutls_privkey *pkey,
                                 const gnutls_datum *raw_key)
 {
     cdk_kbnode_t snode;
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     cdk_stream_t out;
     cdk_pkt_seckey_t sk = NULL;
     int pke_algo, i, j;
@@ -378,7 +377,7 @@ int
 _gnutls_openpgp_raw_key_to_gcert( gnutls_cert *cert, const gnutls_datum *raw )
 {
     cdk_kbnode_t knode = NULL;
-    CDK_PACKET *pkt = NULL;
+    cdk_packet_t pkt = NULL;
     int rc;
   
     if( !cert ) {
@@ -525,7 +524,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
 {
     gnutls_datum raw;
     cdk_kbnode_t knode = NULL, ctx = NULL, p;
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     int i = 0;
     int rc = 0;
     cdk_stream_t inp = NULL;
@@ -710,7 +709,7 @@ int
 gnutls_openpgp_count_key_names( const gnutls_datum *cert )
 {
     cdk_kbnode_t knode, p, ctx = NULL;
-    CDK_PACKET *pkt;
+    cdk_packet_t pkt;
     int nuids = 0;
 
     if( cert == NULL ) {

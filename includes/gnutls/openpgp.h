@@ -47,6 +47,10 @@ int gnutls_openpgp_key_export(gnutls_openpgp_key key,
 	gnutls_openpgp_key_fmt format, void* output_data,
 	size_t* output_data_size);
 
+/* The key_usage flags are defined in gnutls.h. They are
+ * the GNUTLS_KEY_* definitions.
+ */
+int gnutls_openpgp_key_get_key_usage( gnutls_openpgp_key cert, unsigned int* key_usage);
 int gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key key,
 	void* result, size_t* result_size);
 	
