@@ -1,3 +1,32 @@
+2003-10-01 18:43  nmav <nmav@gnutls.org>
+
+	* doc/scripts/gdoc, doc/tex/Makefile.am, lib/gnutls_errors.c:
+
+	Patch by Arne.  Fixes a linking problem with _gnutls_handshake2str()
+	and _gnutls_packet2str().  
+	
+	Some other fixes in the documentation creation.  
+
+2003-10-01 18:39  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_alert.c, lib/gnutls_errors.c, lib/gnutls_record.c,
+	lib/gnutls_state.c, src/cli.c, src/common.c, src/serv.c:
+
+	A new patch by Arne. More bug fixes and optimizations.  
+
+2003-10-01 15:11  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c:
+
+	Corrected some unaligned accesses in IA64. Initial patch by Ian
+	Wienand <ianw@gelato.unsw.edu.au>.  
+
+2003-10-01 14:06  nmav <nmav@gnutls.org>
+
+	* src/: cli.c, common.c:
+
+	Applied Simos' patch for the SIGALRM triggered handshake.  
+
 2003-09-17 20:56  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_errors.c, gnutls_pk.c:
