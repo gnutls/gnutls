@@ -97,13 +97,13 @@ void gnutls_free_cert(gnutls_cert cert)
 
 /**
   * gnutls_x509pki_free_sc - Used to free an allocated x509 SERVER CREDENTIALS structure
-  * @sc: is an &X509PKI_CREDENTIALS structure.
+  * @sc: is an &GNUTLS_X509PKI_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_x509pki_free_sc(X509PKI_CREDENTIALS sc)
+void gnutls_x509pki_free_sc(GNUTLS_X509PKI_CREDENTIALS sc)
 {
 	int i, j;
 
@@ -138,7 +138,7 @@ void gnutls_x509pki_free_sc(X509PKI_CREDENTIALS sc)
 
 /* Reads a base64 encoded certificate file
  */
-static int read_cert_file(X509PKI_CREDENTIALS res, char *certfile)
+static int read_cert_file(GNUTLS_X509PKI_CREDENTIALS res, char *certfile)
 {
 	int siz, i, siz2;
 	opaque *b64;
@@ -217,7 +217,7 @@ static int read_cert_file(X509PKI_CREDENTIALS res, char *certfile)
 /* Reads a base64 encoded CA file (file contains multiple certificate
  * authorities). This is to be called once.
  */
-static int read_ca_file(X509PKI_CREDENTIALS res, char *cafile)
+static int read_ca_file(GNUTLS_X509PKI_CREDENTIALS res, char *cafile)
 {
 	int siz, siz2, i;
 	opaque *b64;
@@ -289,7 +289,7 @@ static int read_ca_file(X509PKI_CREDENTIALS res, char *cafile)
 
 /* Reads a PEM encoded PKCS-1 RSA private key file
  */
-static int read_key_file(X509PKI_CREDENTIALS res, char *keyfile)
+static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
 {
 	int siz, ret;
 	opaque *b64;
@@ -332,7 +332,7 @@ static int read_key_file(X509PKI_CREDENTIALS res, char *keyfile)
 
 /**
   * gnutls_x509pki_allocate_sc - Used to allocate an x509 SERVER CREDENTIALS structure
-  * @res: is a pointer to an &X509PKI_CREDENTIALS structure.
+  * @res: is a pointer to an &GNUTLS_X509PKI_CREDENTIALS structure.
   * @ncerts: this is the number of certificate/private key pair you're going to use.
   * This should be 1 in common sites.
   *
@@ -340,7 +340,7 @@ static int read_key_file(X509PKI_CREDENTIALS res, char *keyfile)
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_x509pki_allocate_sc(X509PKI_CREDENTIALS * res, int ncerts)
+int gnutls_x509pki_allocate_sc(GNUTLS_X509PKI_CREDENTIALS * res, int ncerts)
 {
 	*res = gnutls_calloc(1, sizeof(X509PKI_CREDENTIALS_INT));
 
@@ -382,14 +382,14 @@ int gnutls_x509pki_allocate_sc(X509PKI_CREDENTIALS * res, int ncerts)
 }
 
 /**
-  * gnutls_x509pki_set_key_file - Used to set keys in a X509PKI_CREDENTIALS structure
-  * @res: is an &X509PKI_CREDENTIALS structure.
+  * gnutls_x509pki_set_key_file - Used to set keys in a GNUTLS_X509PKI_CREDENTIALS structure
+  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
   * @CERTFILE: is a PEM encoded file containing the certificate list (path) for
   * the specified private key
   * @KEYFILE: is a PEM encoded file containing a private key
   *
   * This function sets a certificate/private key pair in the 
-  * X509PKI_CREDENTIALS structure. This function may be called
+  * GNUTLS_X509PKI_CREDENTIALS structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
@@ -397,7 +397,7 @@ int gnutls_x509pki_allocate_sc(X509PKI_CREDENTIALS * res, int ncerts)
   * this function.
   *
   **/
-int gnutls_x509pki_set_key_file(X509PKI_CREDENTIALS res, char *CERTFILE,
+int gnutls_x509pki_set_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE,
 			   char *KEYFILE)
 {
 	int ret;
@@ -414,15 +414,15 @@ int gnutls_x509pki_set_key_file(X509PKI_CREDENTIALS res, char *CERTFILE,
 }
 
 /**
-  * gnutls_x509pki_set_trust_file - Used to set trusted CAs in a X509PKI_CREDENTIALS structure
-  * @res: is an &X509PKI_CREDENTIALS structure.
+  * gnutls_x509pki_set_trust_file - Used to set trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
+  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
   * @CAFILE: is a PEM encoded file containing trusted CAs
   * @CRLFILE: is a PEM encoded file containing CRLs (ignored for now)
   *
   * This function sets the trusted CAs in order to verify client
   * certificates.
   **/
-int gnutls_x509pki_set_trust_file(X509PKI_CREDENTIALS res, char *CAFILE,
+int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
 			     char *CRLFILE)
 {
 	int ret, size, i;
@@ -972,7 +972,7 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 			if (cert->keyUsage != 0) {
 				if (!
 				    (cert->
-				     keyUsage & X509KEY_KEY_ENCIPHERMENT))
+				     keyUsage & GNUTLS_X509KEY_KEY_ENCIPHERMENT))
 					return
 					    GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 				else
@@ -983,7 +983,7 @@ int _gnutls_check_x509pki_key_usage(const gnutls_cert * cert,
 			if (cert->keyUsage != 0) {
 				if (!
 				    (cert->
-				     keyUsage & X509KEY_DIGITAL_SIGNATURE))
+				     keyUsage & GNUTLS_X509KEY_DIGITAL_SIGNATURE))
 					return
 					    GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 				else

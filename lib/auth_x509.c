@@ -207,7 +207,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 	gnutls_datum odn;
 	opaque *data = _data;
 	int data_size = _data_size;
-	const X509PKI_CREDENTIALS cred;
+	const GNUTLS_X509PKI_CREDENTIALS cred;
 
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
@@ -470,7 +470,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	int size, len, ret;
 	opaque *p = data;
 	X509PKI_AUTH_INFO info;
-	const X509PKI_CREDENTIALS cred;
+	const GNUTLS_X509PKI_CREDENTIALS cred;
 	int dsize = data_size;
 	int i, j, x;
 	gnutls_cert *peer_certificate_list;
@@ -644,7 +644,7 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 {
 	int size, ret;
 	opaque *p = data;
-	const X509PKI_CREDENTIALS cred;
+	const GNUTLS_X509PKI_CREDENTIALS cred;
 	X509PKI_AUTH_INFO info;
 	int dsize = data_size;
 	int i;
@@ -808,7 +808,7 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 #define CERTTYPE_SIZE 2
 int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 {
-	const X509PKI_CREDENTIALS cred;
+	const GNUTLS_X509PKI_CREDENTIALS cred;
 	int size;
 	opaque *pdata;
 
@@ -857,7 +857,7 @@ int _gnutls_find_apr_cert(GNUTLS_STATE state, gnutls_cert ** apr_cert_list,
 			  int *apr_cert_list_length,
 			  gnutls_private_key ** apr_pkey)
 {
-	const X509PKI_CREDENTIALS cred;
+	const GNUTLS_X509PKI_CREDENTIALS cred;
 	int ind;
 
 	cred =
@@ -1218,7 +1218,7 @@ int gnutls_x509pki_extract_certificate_version(const gnutls_datum * cert)
 int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 {
 	X509PKI_AUTH_INFO info;
-	const X509PKI_CREDENTIALS cred;
+	const GNUTLS_X509PKI_CREDENTIALS cred;
 	CertificateStatus verify;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size, i, x, ret;
@@ -1290,7 +1290,7 @@ int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 const gnutls_cert *_gnutls_server_find_x509_cert(GNUTLS_STATE state)
 {
 	int i;
-	const X509PKI_CREDENTIALS x509_cred;
+	const GNUTLS_X509PKI_CREDENTIALS x509_cred;
 
 	x509_cred =
             _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
@@ -1315,7 +1315,7 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 					int cert_list_length)
 {
 	int i, index = -1;
-	const X509PKI_CREDENTIALS cred;
+	const GNUTLS_X509PKI_CREDENTIALS cred;
 
 	state->gnutls_internals.selected_cert_index = 0;
 

@@ -29,7 +29,7 @@ int main()
    struct sockaddr_in sa;
    GNUTLS_STATE state;
    char buffer[MAX_BUF + 1];
-   SRP_CLIENT_CREDENTIALS xcred;
+   GNUTLS_SRP_CLIENT_CREDENTIALS xcred;
 
    if (gnutls_global_init() < 0) {
       fprintf(stderr, "global state initialization error\n");

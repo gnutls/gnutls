@@ -31,7 +31,7 @@ int main()
    struct sockaddr_in sa;
    GNUTLS_STATE state;
    char buffer[MAX_BUF + 1];
-   X509PKI_CLIENT_CREDENTIALS xcred;
+   GNUTLS_X509PKI_CLIENT_CREDENTIALS xcred;
    /* variables used in session resuming */
    int t;
    char *session;

@@ -4,36 +4,36 @@
 
 /* Extra definitions */
 
-#define X509_CN_SIZE 256
-#define X509_C_SIZE 3
-#define X509_O_SIZE 256
-#define X509_OU_SIZE 256
-#define X509_L_SIZE 256
-#define X509_S_SIZE 256
-#define X509_EMAIL_SIZE 256
+#define GNUTLS_X509_CN_SIZE 256
+#define GNUTLS_X509_C_SIZE 3
+#define GNUTLS_X509_O_SIZE 256
+#define GNUTLS_X509_OU_SIZE 256
+#define GNUTLS_X509_L_SIZE 256
+#define GNUTLS_X509_S_SIZE 256
+#define GNUTLS_X509_EMAIL_SIZE 256
 
 typedef struct {
-	char common_name[X509_CN_SIZE];
-	char country[X509_C_SIZE];
-	char organization[X509_O_SIZE];
-	char organizational_unit_name[X509_OU_SIZE];
-	char locality_name[X509_L_SIZE];
-	char state_or_province_name[X509_S_SIZE];
-	char email[X509_EMAIL_SIZE];
+	char common_name[GNUTLS_X509_CN_SIZE];
+	char country[GNUTLS_X509_C_SIZE];
+	char organization[GNUTLS_X509_O_SIZE];
+	char organizational_unit_name[GNUTLS_X509_OU_SIZE];
+	char locality_name[GNUTLS_X509_L_SIZE];
+	char state_or_province_name[GNUTLS_X509_S_SIZE];
+	char email[GNUTLS_X509_EMAIL_SIZE];
 } gnutls_DN;
 
 /* For key Usage, test as:
  * if (st.keyUsage & X509KEY_DIGITAL_SIGNATURE) ...
  */
-#define X509KEY_DIGITAL_SIGNATURE 	256
-#define X509KEY_NON_REPUDIATION		128
-#define X509KEY_KEY_ENCIPHERMENT	64
-#define X509KEY_DATA_ENCIPHERMENT	32
-#define X509KEY_KEY_AGREEMENT		16
-#define X509KEY_KEY_CERT_SIGN		8
-#define X509KEY_CRL_SIGN		4
-#define X509KEY_ENCIPHER_ONLY		2
-#define X509KEY_DECIPHER_ONLY		1
+#define GNUTLS_X509KEY_DIGITAL_SIGNATURE 	256
+#define GNUTLS_X509KEY_NON_REPUDIATION		128
+#define GNUTLS_X509KEY_KEY_ENCIPHERMENT	64
+#define GNUTLS_X509KEY_DATA_ENCIPHERMENT	32
+#define GNUTLS_X509KEY_KEY_AGREEMENT		16
+#define GNUTLS_X509KEY_KEY_CERT_SIGN		8
+#define GNUTLS_X509KEY_CRL_SIGN		4
+#define GNUTLS_X509KEY_ENCIPHER_ONLY		2
+#define GNUTLS_X509KEY_DECIPHER_ONLY		1
 
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
@@ -57,9 +57,9 @@ int gnutls_anon_client_get_dh_bits( GNUTLS_STATE state);
 
 /* X509PKI */
 
-void gnutls_x509pki_set_client_cert_callback( X509PKI_CREDENTIALS, x509pki_client_cert_callback_func *);
+void gnutls_x509pki_set_client_cert_callback( GNUTLS_X509PKI_CREDENTIALS, x509pki_client_cert_callback_func *);
 
-void gnutls_x509pki_set_server_cert_callback( X509PKI_CREDENTIALS, x509pki_server_cert_callback_func *);
+void gnutls_x509pki_set_server_cert_callback( GNUTLS_X509PKI_CREDENTIALS, x509pki_server_cert_callback_func *);
 void gnutls_x509pki_server_set_cert_request( GNUTLS_STATE, CertificateRequest);
 
 void gnutls_x509pki_set_dh_bits( GNUTLS_STATE state, int bits);

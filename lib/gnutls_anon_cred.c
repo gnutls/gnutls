@@ -27,35 +27,35 @@
 #include "gnutls_gcry.h"
 
 /**
-  * gnutls_anon_free_server_sc - Used to free an allocated ANON_SERVER_CREDENTIALS structure
-  * @sc: is an &ANON_SERVER_CREDENTIALS structure.
+  * gnutls_anon_free_server_sc - Used to free an allocated GNUTLS_ANON_SERVER_CREDENTIALS structure
+  * @sc: is an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_anon_free_server_sc( ANON_SERVER_CREDENTIALS sc) {
+void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
 	gnutls_free(sc);
 }
 
 /**
-  * gnutls_anon_allocate_server_sc - Used to allocate an ANON_SERVER CREDENTIALS structure
-  * @sc: is a pointer to an &ANON_SERVER_CREDENTIALS structure.
+  * gnutls_anon_allocate_server_sc - Used to allocate an GNUTLS_ANON_SERVER CREDENTIALS structure
+  * @sc: is a pointer to an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_anon_allocate_server_sc( ANON_SERVER_CREDENTIALS *sc) {
-	*sc = gnutls_malloc(sizeof( ANON_SERVER_CREDENTIALS));
+int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
+	*sc = gnutls_malloc(sizeof( ANON_SERVER_CREDENTIALS_INT));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
 	return 0;
 }
 
 /**
-  * gnutls_anon_set_server_cred - Used to set the number of bits to use in DH, in a ANON_SERVER_CREDENTIALS structure
-  * @res: is an &ANON_SERVER_CREDENTIALS structure.
+  * gnutls_anon_set_server_cred - Used to set the number of bits to use in DH, in a GNUTLS_ANON_SERVER_CREDENTIALS structure
+  * @res: is an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
   * @dh_bits: is the number of bits in DH key exchange
   *
   * Used to set the number of bits to use in an anonymous Diffie-Hellman, 
@@ -63,34 +63,34 @@ int gnutls_anon_allocate_server_sc( ANON_SERVER_CREDENTIALS *sc) {
   *
   **/
 
-int gnutls_anon_set_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits) {
+int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits) {
 	res->dh_bits = dh_bits;
 	return 0;
 }
 
 /**
-  * gnutls_anon_free_client_sc - Used to free an allocated ANON_CLIENT_CREDENTIALS structure
-  * @sc: is an &ANON_CLIENT_CREDENTIALS structure.
+  * gnutls_anon_free_client_sc - Used to free an allocated GNUTLS_ANON_CLIENT_CREDENTIALS structure
+  * @sc: is an &GNUTLS_ANON_CLIENT_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_anon_free_client_sc( ANON_CLIENT_CREDENTIALS sc) {
+void gnutls_anon_free_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS sc) {
 	return;
 }
 
 const static int anon_tmp;
 
 /**
-  * gnutls_allocate_anon_client_sc - Used to allocate an ANON_CLIENT CREDENTIALS structure
-  * @sc: is a pointer to an &ANON_CLIENT_CREDENTIALS structure.
+  * gnutls_allocate_anon_client_sc - Used to allocate an GNUTLS_ANON_CLIENT CREDENTIALS structure
+  * @sc: is a pointer to an &GNUTLS_ANON_CLIENT_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_anon_allocate_client_sc( ANON_CLIENT_CREDENTIALS *sc) {
+int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
 	/* anon_tmp is only there for *sc not to be null.
 	 * it is not used at all;
 	 */

@@ -146,7 +146,7 @@ int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
 void gnutls_handshake_set_max_data_buffer_size( GNUTLS_STATE state, int max);
 
 /* returns libgnutls version */
-const char* gnutls_check_version();
+const char* gnutls_check_version(void);
 
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
@@ -161,40 +161,47 @@ int gnutls_cred_set( GNUTLS_STATE, CredType type, void* cred);
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 
 struct DSTRUCT;
-typedef struct DSTRUCT* X509PKI_CREDENTIALS;
-typedef X509PKI_CREDENTIALS X509PKI_CLIENT_CREDENTIALS;
-typedef X509PKI_CREDENTIALS X509PKI_SERVER_CREDENTIALS;
+typedef struct DSTRUCT* GNUTLS_X509PKI_CREDENTIALS;
+typedef GNUTLS_X509PKI_CREDENTIALS GNUTLS_X509PKI_CLIENT_CREDENTIALS;
+typedef GNUTLS_X509PKI_CREDENTIALS GNUTLS_X509PKI_SERVER_CREDENTIALS;
+#define X509PKI_CLIENT_CREDENTIALS GNUTLS_X509PKI_CLIENT_CREDENTIALS
+#define X509PKI_SERVER_CREDENTIALS GNUTLS_X509PKI_SERVER_CREDENTIALS
 
-typedef struct DSTRUCT* SRP_SERVER_CREDENTIALS;
-typedef struct DSTRUCT* SRP_CLIENT_CREDENTIALS;
+typedef struct DSTRUCT* GNUTLS_SRP_SERVER_CREDENTIALS;
+typedef struct DSTRUCT* GNUTLS_SRP_CLIENT_CREDENTIALS;
+#define SRP_SERVER_CREDENTIALS GNUTLS_SRP_SERVER_CREDENTIALS
+#define GNUTLS_SRP_CLIENT_CREDENTIALS GNUTLS_GNUTLS_SRP_CLIENT_CREDENTIALS
 
-typedef struct DSTRUCT* ANON_SERVER_CREDENTIALS;
-typedef struct DSTRUCT* ANON_CLIENT_CREDENTIALS;
+typedef struct DSTRUCT* GNUTLS_ANON_SERVER_CREDENTIALS;
+typedef struct DSTRUCT* GNUTLS_ANON_CLIENT_CREDENTIALS;
+#define ANON_SERVER_CREDENTIALS GNUTLS_ANON_SERVER_CREDENTIALS
+#define ANON_CLIENT_CREDENTIALS GNUTLS_ANON_CLIENT_CREDENTIALS
 
-void gnutls_srp_free_client_sc( SRP_CLIENT_CREDENTIALS sc);
-int gnutls_srp_allocate_client_sc( SRP_CLIENT_CREDENTIALS *sc);
-int gnutls_srp_set_client_cred( SRP_CLIENT_CREDENTIALS res, char *username, char* password);
 
-void gnutls_srp_free_server_sc( SRP_SERVER_CREDENTIALS sc);
-int gnutls_srp_allocate_server_sc( SRP_SERVER_CREDENTIALS *sc);
-int gnutls_srp_set_server_cred_file( SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
+void gnutls_srp_free_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS sc);
+int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc);
+int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char* password);
 
-void gnutls_anon_free_server_sc( ANON_SERVER_CREDENTIALS sc);
-int gnutls_anon_allocate_server_sc( ANON_SERVER_CREDENTIALS *sc);
-int gnutls_anon_set_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits);
+void gnutls_srp_free_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS sc);
+int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc);
+int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
 
-void gnutls_anon_free_client_sc( ANON_SERVER_CREDENTIALS sc);
-int gnutls_anon_allocate_client_sc( ANON_SERVER_CREDENTIALS *sc);
-int gnutls_anon_set_client_cred( ANON_SERVER_CREDENTIALS res, int dh_bits);
+void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
+int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
+int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits);
+
+void gnutls_anon_free_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
+int gnutls_anon_allocate_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
+int gnutls_anon_set_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits);
 
 
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
-void gnutls_x509pki_free_sc( X509PKI_CREDENTIALS sc);
-int gnutls_x509pki_allocate_sc( X509PKI_CREDENTIALS *sc, int ncerts);
-int gnutls_x509pki_set_key_file( X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
-int gnutls_x509pki_set_trust_file( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
+void gnutls_x509pki_free_sc( GNUTLS_X509PKI_CREDENTIALS sc);
+int gnutls_x509pki_allocate_sc( GNUTLS_X509PKI_CREDENTIALS *sc, int ncerts);
+int gnutls_x509pki_set_key_file( GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
+int gnutls_x509pki_set_trust_file( GNUTLS_X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
 
 #define gnutls_x509pki_free_server_sc gnutls_x509pki_free_sc
 #define gnutls_x509pki_allocate_server_sc gnutls_x509pki_allocate_sc
@@ -213,8 +220,8 @@ int gnutls_x509pki_set_trust_file( X509PKI_CREDENTIALS res, char* CAFILE, char* 
  * This will not be the case in the final version. These files 
  * are located in the src/ directory of gnutls distribution.
  */
-int gnutls_global_init();
-void gnutls_global_deinit();
+int gnutls_global_init(void);
+void gnutls_global_deinit(void);
 
 int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits);
 int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int bits);

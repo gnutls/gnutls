@@ -36,11 +36,11 @@ LOG_FUNC _gnutls_log_func;
 static node_asn *PKIX1_ASN;
 static node_asn *PKCS1_ASN;
 
-node_asn* _gnutls_get_pkix() {
+node_asn* _gnutls_get_pkix(void) {
 	return PKIX1_ASN;
 }
 
-node_asn* _gnutls_get_pkcs() {
+node_asn* _gnutls_get_pkcs(void) {
 	return PKCS1_ASN;
 }
 
@@ -78,7 +78,7 @@ static void dlog( const char* str) {
   * Returns zero on success.
   *
   **/
-int gnutls_global_init()
+int gnutls_global_init( void)
 {
 	int result;
 
@@ -118,9 +118,10 @@ int gnutls_global_init()
   * gnutls_global_deinit - This function deinitializes the global state 
   *
   * This function deinitializes the global state.
+  *
   **/
 
-void gnutls_global_deinit() {
+void gnutls_global_deinit( void) {
 
 	asn1_delete_structure( PKCS1_ASN);
 	asn1_delete_structure( PKIX1_ASN);

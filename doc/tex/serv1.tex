@@ -30,8 +30,8 @@
 #define PORT 5556               /* listen to 5556 port */
 
 /* These are global */
-SRP_SERVER_CREDENTIALS srp_cred;
-X509PKI_SERVER_CREDENTIALS x509_cred;
+GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
+GNUTLS_X509PKI_SERVER_CREDENTIALS x509_cred;
 
 GNUTLS_STATE initialize_state()
 {

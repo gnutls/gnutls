@@ -36,7 +36,7 @@ typedef struct {
 } X509PKI_CREDENTIALS_INT;
 
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
-#define X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
+#define GNUTLS_X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
 
 typedef struct X509PKI_AUTH_INFO_INT {
 	int		  certificate_requested; /* if the peer requested certificate

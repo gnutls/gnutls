@@ -194,7 +194,7 @@ int tmp_size;
 
 /* this function opens the tpasswd.conf file
  */
-static int pwd_read_conf( const SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_PWD_ENTRY* entry, int index) {
+static int pwd_read_conf( const GNUTLS_SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_PWD_ENTRY* entry, int index) {
 	FILE * fd;
 	char line[5*1024];
 	int i;
@@ -229,7 +229,7 @@ static int pwd_read_conf( const SRP_SERVER_CREDENTIALS cred, GNUTLS_SRP_PWD_ENTR
 
 
 GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username, int *err) {
-	const SRP_SERVER_CREDENTIALS cred;
+	const GNUTLS_SRP_SERVER_CREDENTIALS cred;
 	FILE * fd;
 	char line[5*1024];
 	int i, len;

@@ -2138,7 +2138,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	int ret = 0;
 	GNUTLS_CipherSuite *newSuite;
 	int newSuiteSize = 0, i, j, keep;
-	const X509PKI_CREDENTIALS x509_cred;
+	const GNUTLS_X509PKI_CREDENTIALS x509_cred;
 	const gnutls_cert *cert = NULL;
 	KXAlgorithm *alg;
 	int alg_size;

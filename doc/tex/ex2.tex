@@ -23,7 +23,7 @@ int main()
    struct sockaddr_in sa;
    GNUTLS_STATE state;
    char buffer[MAX_BUF + 1];
-   X509PKI_CLIENT_CREDENTIALS xcred;
+   GNUTLS_X509PKI_CLIENT_CREDENTIALS xcred;
    const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
    const int kx_priority[] = { GNUTLS_KX_X509PKI_RSA, 0 };
    const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};

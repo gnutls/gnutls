@@ -172,9 +172,9 @@ int main(int argc, char** argv)
 	int maxfd;
 	struct timeval tv;
 	int user_term = 0;
-	SRP_CLIENT_CREDENTIALS cred;
-	ANON_CLIENT_CREDENTIALS anon_cred;
-	X509PKI_CLIENT_CREDENTIALS xcred;
+	GNUTLS_SRP_CLIENT_CREDENTIALS cred;
+	GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
+	GNUTLS_X509PKI_CLIENT_CREDENTIALS xcred;
 	struct hostent* server_host;
 	
 	signal( SIGPIPE, SIG_IGN);
