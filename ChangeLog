@@ -1,3 +1,9 @@
+2003-06-10 08:06  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_priority.c:
+
+	added the most compatible ciphers in default priorities.  
+
 2003-06-09 09:10  nmav <nmav@gnutls.org>
 
 	* NEWS, src/cli.c, src/crypt.c:
