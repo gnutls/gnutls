@@ -1,67 +1,82 @@
-.TH gnutls\-cli 1 "October 26th 2003"
+.TH gnutls\-cli 1 "December 1st 2003"
 .SH NAME
 gnutls\-cli \- GNU TLS test client
 .SH SYNOPSIS
 gnutls\-cli [\fIoptions\fR] \fIhostname\fI
 .SH DESCRIPTION
 Simple client program to set up a TLS connection to some other
-computer.
+computer.  It sets up a TLS connection and forwards data from the
+standard input to the secured socket and vice versa.
 .SH OPTIONS
+.SS Program control options
+.IP "\-\-copyright"
+Prints the program's license.
+.IP "\-d, \-\-debug LEVEL"
+Specify the debug level. Default is 1.
+.IP "\-h, \-\-help"
+Prints a short reminder of the command line options.
+.IP "\-l, \-\-list"
+Print a list of the supported algorithms and modes.
 .IP "\-r, \-\-resume"
 Connect, establish a session.  Connect again and resume this session.
 .IP "\-s, \-\-starttls"
 Connect, establish a plain session and start TLS when EOF is sent from
 the keyboard.
+.IP "\-v, \-\-version"
+Prints the program's version number.
+
+.SS TLS/SSL control options
+.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
+Ciphers to enable (use \fBgnutls\-cli \-\-list\fR to show the
+supported ciphers).
+.IP "\-\-comp \fIcomp1 comp2...\fR"
+Compression methods to enable (use \fBgnutls\-cli \-\-list\fR to show
+the supported compression methods).
 .IP "\-\-crlf"
 Send CR LF instead of LF.
-.IP "\-\-x509fmtder"
-Use DER format for certificates
+.IP "\-\-ctypes \fIcertType1 certType2...\fR"
+Certificate types to enable (use \fBgnutls\-cli \-\-list\fR to show
+the supported certificate types).
 .IP "\-f, \-\-fingerprint"
 Send the openpgp fingerprint, instead of the key.
-.IP "\-\-xml"
-Print the certificate information in XML format.
+.IP "\-\-kx \fIkx1 kx2...\fR"
+Key exchange methods to enable (use \fBgnutls\-cli \-\-list\fR to show
+the supported key exchange methods).
+.IP "\-\-macs \fImac1 mac2...\fR"
+MACs (Message Authentication Codes) to enable (use \fBgnutls\-cli
+\-\-list\fR to show the supported MACs).
 .IP "\-p, \-\-port \fIinteger\fR"
 The port to connect to.
+.IP "\-\-protocols \fIprotocol1 protocol2...\fR"
+Protocols to enable (use \fBgnutls\-cli \-\-list\fR to show the
+supported protocols).
 .IP "\-\-recordsize \fIinteger\fR"
 The maximum record size to advertize.
-.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
-Ciphers to enable.
-.IP "\-\-protocols \fIprotocol1 protocol2...\fR"
-Protocols to enable.
-.IP "\-\-comp \fIcomp1 comp2...\fR"
-Compression methods to enable.
-.IP "\-\-macs \fImac1 mac2...\fR"
-MACs to enable.
-.IP "\-\-kx \fIkx1 kx2...\fR"
-Key exchange methods to enable.
-.IP "\-\-ctypes \fIcertType1 certType2...\fR"
-Certificate types to enable.
-.IP "\-\-x509cafile \fIFILE\fR"
-Certificate file to use.
+
+.SS Certificate options
+.IP "\-\-pgpcertfile \fIFILE\fR"
+PGP Public Key (certificate) file to use.
 .IP "\-\-pgpkeyfile \fIFILE\fR"
 PGP Key file to use.
 .IP "\-\-pgpkeyring \fIFILE\fR"
 PGP Key ring file to use.
 .IP "\-\-pgptrustdb \fIFILE\fR"
 PGP trustdb file to use.
-.IP "\-\-pgpcertfile \fIFILE\fR"
-PGP Public Key (certificate) file to use.
-.IP "\-\-x509keyfile \fIFILE\fR"
-X.509 key file to use.
-.IP "\-\-x509certfile \fIFILE\fR"
-X.509 Certificate file to use.
-.IP "\-\-srpusername \fINAME\fR"
-SRP username to use.
 .IP "\-\-srppasswd \fIPASSWD\fR"
 SRP password to use.
-.IP "\-l, \-\-list"
-Print a list of the supported algorithms and modes.
-.IP "\-h, \-\-help"
-Prints a short reminder of the command line options.
-.IP "\-v, \-\-version"
-Prints the program's version number.
-.IP "\-\-copyright"
-Prints the program's license.
+.IP "\-\-srpusername \fINAME\fR"
+SRP username to use.
+.IP "\-\-x509cafile \fIFILE\fR"
+Certificate file to use.
+.IP "\-\-x509certfile \fIFILE\fR"
+X.509 Certificate file to use.
+.IP "\-\-x509fmtder"
+Use DER format for certificates
+.IP "\-\-x509keyfile \fIFILE\fR"
+X.509 key file to use.
+.IP "\-\-xml"
+Print the certificate information in XML format.
+
 .SH "SEE ALSO"
 .BR gnutls\-cli\-debug (1),
 .BR gnutls\-serv (1)

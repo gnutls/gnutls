@@ -1,4 +1,4 @@
-.TH gnutls\-serv 1 "October 26th 2003"
+.TH gnutls\-serv 1 "December 1st 2003"
 .SH NAME
 gnutls\-serv \- GNU TLS test server
 .SH SYNOPSIS
@@ -6,58 +6,75 @@ gnutls\-serv [\fIoptions\fR]
 .SH DESCRIPTION
 Simple server program that listens to incoming TLS connections.
 .SH OPTIONS
-.IP "\-g, \-\-generate"
-Generate Diffie Hellman Parameters.
-.IP "\-p, \-\-port \fIinteger\fR"
-The port to connect to.
+.SS Program control options
+.IP "\-\-copyright"
+prints the program's license
+.IP "\-d, \-\-debug LEVEL"
+Specify the debug level. Default is 1.
+.IP "\-h, \-\-help"
+prints this help
+.IP "\-l, \-\-list"
+Print a list of the supported algorithms and modes.
 .IP "\-q, \-\-quiet"
 Suppress some messages.
+.IP "\-v, \-\-version"
+prints the program's version number
+
+.SS Server options
+.IP "\-p, \-\-port \fIinteger\fR"
+The port to listen on.
 .IP "\-\-nodb"
 Does not use the resume database.
 .IP "\-\-http"
 Act as an HTTP Server.
 .IP "\-\-echo"
 Act as an Echo Server.
-.IP "\-\-x509fmtder"
-Use DER format for certificates
-.IP "\-\-x509cafile \fIFILE\fR"
-Certificate file to use.
+
+.SS TLS/SSL control options
+.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
+Ciphers to enable (use \fBgnutls\-cli \-\-list\fR to show the
+supported ciphers).
+.IP "\-\-comp \fIcomp1 comp2...\fR"
+Compression methods to enable (use \fBgnutls\-cli \-\-list\fR to show
+the supported compression methods).
+.IP "\-\-ctypes \fIcertType1 certType2...\fR"
+Certificate types to enable.
+.IP "\-g, \-\-generate"
+Generate Diffie Hellman Parameters.
+.IP "\-\-kx \fIkx1 kx2...\fR"
+Key exchange methods to enable (use \fBgnutls\-cli \-\-list\fR to show
+the supported key exchange methods).
+.IP "\-\-macs \fImac1 mac2...\fR"
+MACs (Message Authentication Codes) to enable (use \fBgnutls\-cli
+\-\-list\fR to show the supported MACs).
+.IP "\-p, \-\-port \fIinteger\fR"
+The port to connect to.
+.IP "\-\-protocols \fIprotocol1 protocol2...\fR"
+Protocols to enable (use \fBgnutls\-cli \-\-list\fR to show the
+supported protocols).
+
+.SS Certificate options
+.IP "\-\-pgpcertfile \fIFILE\fR"
+PGP Public Key (certificate) file to use.
+.IP "\-\-pgpkeyfile \fIFILE\fR"
+PGP Key file to use.
 .IP "\-\-pgpkeyring \fIFILE\fR"
 PGP Key ring file to use.
 .IP "\-\-pgptrustdb \fIFILE\fR"
 PGP trustdb file to use.
-.IP "\-\-pgpkeyfile \fIFILE\fR"
-PGP Key file to use.
-.IP "\-\-pgpcertfile \fIFILE\fR"
-PGP Public Key (certificate) file to use.
-.IP "\-\-x509keyfile \fIFILE\fR"
-X.509 key file to use.
-.IP "\-\-x509certfile \fIFILE\fR"
-X.509 Certificate file to use.
 .IP "\-\-srppasswd \fIFILE\fR"
 SRP password file to use.
 .IP "\-\-srppasswdconf \fIFILE\fR"
 SRP password configuration file to use.
-.IP "\-\-ciphers \fIcipher1 cipher2...\fR"
-Ciphers to enable.
-.IP "\-\-protocols \fIprotocol1 protocol2...\fR"
-Protocols to enable.
-.IP "\-\-comp \fIcomp1 comp2...\fR"
-Compression methods to enable.
-.IP "\-\-macs \fImac1 mac2...\fR"
-MACs to enable.
-.IP "\-\-kx \fIkx1 kx2...\fR"
-Key exchange methods to enable.
-.IP "\-\-ctypes \fIcertType1 certType2...\fR"
-Certificate types to enable.
-.IP "\-l, \-\-list"
-Print a list of the supported algorithms and modes.
-.IP "\-h, \-\-help"
-prints this help
-.IP "\-v, \-\-version"
-prints the program's version number
-.IP "\-\-copyright"
-prints the program's license
+.IP "\-\-x509cafile \fIFILE\fR"
+Certificate file to use.
+.IP "\-\-x509certfile \fIFILE\fR"
+X.509 Certificate file to use.
+.IP "\-\-x509fmtder"
+Use DER format for certificates
+.IP "\-\-x509keyfile \fIFILE\fR"
+X.509 key file to use.
+
 .SH "SEE ALSO"
 .BR gnutls\-cli (1),
 .BR gnutls\-cli\-debug (1)

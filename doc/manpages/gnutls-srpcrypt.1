@@ -1,30 +1,64 @@
-.TH gnutls\-srpcrypt 1 "October 26th 2003"
+.TH gnutls\-srpcrypt 1 "December 1st 2003"
 .SH NAME
 gnutls\-srpcrypt \- Simple SRP password tool
 .SH SYNOPSIS
 gnutls\-srpcrypt [\fIoptions\fR]
 .SH DESCRIPTION
-SRP (Secure Remote Password) utility using GNU TLS.
+Very simple program that emulates the programs in the Stanford SRP
+(Secure Remote Password) libraries using GNU TLS.
+It is intended for use in places where you don't expect SRP
+authentication to be the used for system users.
 .SH OPTIONS
-.IP "\-u, \-\-username \fIusername\fR"
-Specify username.
-.IP "\-p, \-\-passwd \fIFILE\fR"
-Specify a password file.
-.IP "\-i, \-\-index \fIINDEX\fR"
-Specify the index of the parameters in tpasswd.conf to use.
-.IP "\-s, \-\-salt \fISALT\fR"
-Specify salt/cost size for crypt algorithm.
-.IP "\-\-verify"
-Just verify password.
-.IP "\-\-passwd\-conf \fIFILE\fR"
-Specify a password configuration file.
-.IP "\-\-create\-conf \fIFILE\fR"
-Generate a tpasswd.conf file.
 .IP "\-\-bits \fIBITS\fR"
 specify the number of bits for prime numbers (used only when the
 \fB\-\-create\-conf\fR option is used).
+.IP "\-\-create\-conf \fIFILE\fR"
+Generate a tpasswd.conf file.
 .IP "\-h, \-\-help"
 Prints a short reminder of the command line options.
+.IP "\-i, \-\-index \fIINDEX\fR"
+Specify the index of the parameters in tpasswd.conf to use.
+.IP "\-p, \-\-passwd \fIFILE\fR"
+Specify a password file.
+.IP "\-\-passwd\-conf \fIFILE\fR"
+Specify a password configuration file.
+.IP "\-s, \-\-salt \fISALT\fR"
+Specify salt/cost size for crypt algorithm.
+.IP "\-u, \-\-username \fIusername\fR"
+Specify username.
+.IP "\-\-verify"
+Just verify password.
+.SH EXAMPLES
+To create tpasswd.conf which holds the g and n values for SRP protocol
+(generator and a large prime), run:
+
+.RS
+.nf
+$ gnutls\-srpcrypt \-\-create\-conf /etc/tpasswd.conf
+.fi
+.RE
+
+This command will create /etc/tpasswd and will add user 'test' (you
+will also be prompted for a password). Verifiers are stored by default
+in the way libsrp expects.
+
+.RS
+.nf
+$ gnutls\-srpcrypt \-\-passwd /etc/tpasswd \\
+    \-\-passwd\-conf /etc/tpasswd.conf \-u test
+.fi
+.RE
+
+This command will check against a password. If the password matches
+the one in /etc/tpasswd you will get an ok.
+
+.RS
+.nf
+$ gnutls\-srpcrypt \-\-passwd /etc/tpasswd \\
+    \-\-passwd\-conf /etc/tpasswd.conf \-\-verify \-u test
+.fi
+.RE
+
 .SH AUTHOR
 .PP
 Nikos Mavroyanopoulos <nmav@gnutls.org> and others; see
