@@ -798,7 +798,7 @@ int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name_t
 	result = _gnutls_asn2err(result);
 	goto cleanup;
     }
-#if 0
+
     /* When used as type CHOICE.
      */
     result =
@@ -808,10 +808,9 @@ int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name_t
 	result = _gnutls_asn2err(result);
 	goto cleanup;
     }
-#endif
 
 #if 0
-    /* only needed in old code */
+    /* only needed in old code (SEQUENCE) */
     asn1_write_value(ext,
 		     "?LAST.distributionPoint.nameRelativeToCRLIssuer",
 		     NULL, 0);
