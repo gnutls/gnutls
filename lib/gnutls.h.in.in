@@ -70,6 +70,10 @@ typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS,
 	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS
 } gnutls_kx_algorithm;
 
+typedef enum gnutls_params_type { GNUTLS_PARAMS_RSA_EXPORT=1,
+	GNUTLS_PARAMS_DH 
+} gnutls_params_type;
+
 typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type;
 
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, 
@@ -436,12 +440,14 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	gnutls_x509_crt_fmt format, unsigned char* params_data, size_t* params_data_size);
 int gnutls_dh_params_export_raw(gnutls_dh_params params,
 	gnutls_datum * prime, gnutls_datum * generator, unsigned int *bits);
+int gnutls_dh_params_cpy(gnutls_dh_params dst, gnutls_dh_params src);
 
 
 /* RSA params 
  */
 int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params);
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params);
+int gnutls_rsa_params_cpy(gnutls_rsa_params dst, gnutls_rsa_params src);
 int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params, 
 	const gnutls_datum *m, const gnutls_datum *e,
 	const gnutls_datum *d, const gnutls_datum *p, 

@@ -29,6 +29,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
 #include "x509/x509.h"
+#include "x509/privkey.h"
 #include "debug.h"
 
 /* This function takes a number of bits and returns a supported
@@ -199,6 +200,20 @@ int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
 {
 	gnutls_x509_privkey_deinit(rsa_params);
+}
+
+/**
+  * gnutls_rsa_params_cpy - This function will copy an RSA parameters structure
+  * @dst: Is the destination structure, which should be initialized.
+  * @src: Is the source structure
+  *
+  * This function will copy the RSA parameters structure from source
+  * to destination.
+  *
+  **/
+int gnutls_rsa_params_cpy(gnutls_rsa_params dst, gnutls_rsa_params src)
+{
+	return gnutls_x509_privkey_cpy( dst, src);
 }
 
 /**

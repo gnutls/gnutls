@@ -40,13 +40,15 @@
 #include <auth_cert.h>
 #include <auth_anon.h>
 #include <gnutls_algorithms.h>
+#include <gnutls_rsa_export.h>
 
 #define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(session) != auth) { \
 	gnutls_assert(); \
 	return ret; \
 	}
 
-void _gnutls_session_cert_type_set( gnutls_session session, gnutls_certificate_type ct) {
+void _gnutls_session_cert_type_set( gnutls_session session, gnutls_certificate_type ct) 
+{
 	session->security_parameters.cert_type = ct;
 }
 
@@ -68,7 +70,8 @@ gnutls_cipher_algorithm gnutls_cipher_get( gnutls_session session) {
   * is by default X.509, unless it is negotiated as a TLS extension.
   *
   **/
-gnutls_certificate_type gnutls_certificate_type_get( gnutls_session session) {
+gnutls_certificate_type gnutls_certificate_type_get( gnutls_session session) 
+{
 	return session->security_parameters.cert_type;
 }
 
@@ -78,7 +81,8 @@ gnutls_certificate_type gnutls_certificate_type_get( gnutls_session session) {
   *
   * Returns the key exchange algorithm used in the last handshake.
   **/
-gnutls_kx_algorithm gnutls_kx_get( gnutls_session session) {
+gnutls_kx_algorithm gnutls_kx_get( gnutls_session session) 
+{
 	return session->security_parameters.kx_algorithm;
 }
 
@@ -88,7 +92,8 @@ gnutls_kx_algorithm gnutls_kx_get( gnutls_session session) {
   *
   * Returns the currently used mac algorithm.
   **/
-gnutls_mac_algorithm gnutls_mac_get( gnutls_session session) {
+gnutls_mac_algorithm gnutls_mac_get( gnutls_session session) 
+{
 	return session->security_parameters.read_mac_algorithm;
 }
 
@@ -98,11 +103,14 @@ gnutls_mac_algorithm gnutls_mac_get( gnutls_session session) {
   *
   * Returns the currently used compression method.
   **/
-gnutls_compression_method gnutls_compression_get( gnutls_session session) {
+gnutls_compression_method gnutls_compression_get( gnutls_session session) 
+{
 	return session->security_parameters.read_compression_algorithm;
 }
 
-int _gnutls_session_cert_type_supported( gnutls_session session, gnutls_certificate_type cert_type) {
+int _gnutls_session_cert_type_supported( gnutls_session session, 
+	gnutls_certificate_type cert_type) 
+{
 uint i;
 
 	if (session->internals.cert_type_priority.algorithms==0 && cert_type ==
@@ -118,11 +126,30 @@ uint i;
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 }
 
+/* this function deinitializes all the internal parameters stored
+ * in a session struct.
+ */
+inline 
+static void deinit_internal_params( gnutls_session session)
+{
+	if (session->internals.params.free_anon_dh_params)
+		gnutls_dh_params_deinit( session->internals.params.anon_dh_params);
+
+	if (session->internals.params.free_cert_dh_params)
+		gnutls_dh_params_deinit( session->internals.params.cert_dh_params);
+
+	if (session->internals.params.rsa_params)
+		gnutls_rsa_params_deinit( session->internals.params.rsa_params);
+	
+	memset( &session->internals.params, 0, sizeof( session->internals.params));
+}
+
 /* This function will clear all the variables in internals
  * structure within the session, which depend on the current handshake.
  * This is used to allow further handshakes.
  */
-void _gnutls_handshake_internal_state_clear( gnutls_session session) {
+void _gnutls_handshake_internal_state_clear( gnutls_session session) 
+{
 	session->internals.extensions_sent_size = 0;
 
 	/* by default no selected certificate */
@@ -145,6 +172,8 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 	session->internals.handshake_restarted = 0;
 
 	session->internals.resumable = RESUME_TRUE;
+	
+	deinit_internal_params( session);
 
 }
 
@@ -262,6 +291,7 @@ void _gnutls_deinit(gnutls_session session)
 	/* remove auth info firstly */
 	_gnutls_free_auth_info(session );
 
+	_gnutls_handshake_internal_state_clear( session);
 	_gnutls_handshake_io_buffer_clear( session);
 
 	_gnutls_free_datum(&session->connection_state.read_mac_secret);
@@ -348,11 +378,13 @@ void gnutls_deinit(gnutls_session session)
 }
 
 
-int _gnutls_dh_get_prime_bits( gnutls_session session) {
+int _gnutls_dh_get_prime_bits( gnutls_session session) 
+{
 	return session->internals.dh_prime_bits;
 }
 
-int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) {
+int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) 
+{
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -380,7 +412,8 @@ int _gnutls_dh_set_peer_public_bits( gnutls_session session, uint bits) {
 	return 0;
 }
 
-int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits) {
+int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits) 
+{
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -408,7 +441,8 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits) {
 	return 0;
 }
 
-int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits) {
+int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits) 
+{
 	CERTIFICATE_AUTH_INFO info;
 
 	info = _gnutls_get_auth_info(session);
@@ -462,7 +496,8 @@ int _gnutls_dh_set_prime_bits( gnutls_session session, uint bits)
   * server can obtain the client's key.
   *
   **/
-void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status) {
+void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status) 
+{
 	session->internals.pgp_fingerprint = status;
 }
 
@@ -480,11 +515,13 @@ void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status s
   * certificate with X.509 certificates.
   *
   **/
-void gnutls_certificate_send_x509_rdn_sequence(gnutls_session session, int status) {
+void gnutls_certificate_send_x509_rdn_sequence(gnutls_session session, int status) 
+{
 	session->internals.ignore_rdn_sequence = status;
 }
 
-int _gnutls_openpgp_send_fingerprint(gnutls_session session) {
+int _gnutls_openpgp_send_fingerprint(gnutls_session session) 
+{
 	return session->internals.pgp_fingerprint;
 }
 

@@ -1,4 +1,13 @@
-Version 1.0.8
+Version 1.0.9
+- Added gnutls_certificate_set_params_function() and 
+  gnutls_anon_set_params_function() that set the RSA or DH
+  parameters using a callback.
+- Added functions gnutls_rsa_params_cpy(), gnutls_dh_params_cpy()
+  and gnutls_x509_privkey_cpy().
+- Corrected a compilation issue when opencdk was installed in a
+  non standard directory.
+
+Version 1.0.8 (28/02/2004)
 - Corrected bug in mutual certificate authentication in SSL 3.0.
 
 Version 1.0.7 (25/02/2004)

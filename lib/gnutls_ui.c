@@ -319,7 +319,8 @@ int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data,
   * cipher suites.
   *
   **/
-void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutls_dh_params dh_params) {
+void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutls_dh_params dh_params)
+{
 	res->dh_params = dh_params;
 }
 
@@ -333,9 +334,43 @@ void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutl
   * cipher suites.
   *
   **/
-void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params dh_params) {
+void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params dh_params)
+{
 	res->dh_params = dh_params;
 }
+
+/**
+  * gnutls_certificate_set_params_function - This function will set the DH or RSA parameters callback
+  * @res: is a gnutls_certificate_credentials structure
+  * @func: is the function to be called
+  *
+  * This function will set a callback in order for the server to get the 
+  * diffie hellman or RSA parameters for certificate authentication. The callback
+  * should return zero on success.
+  *
+  **/
+void gnutls_certificate_set_params_function(gnutls_certificate_credentials res, 
+	gnutls_params_function* func)
+{
+	res->params_func = func;
+}
+
+/**
+  * gnutls_anon_set_params_function - This function will set the DH parameters callback
+  * @res: is a gnutls_certificate_credentials structure
+  * @func: is the function to be called
+  *
+  * This function will set a callback in order for the server to get the 
+  * diffie hellman parameters for anonymous authentication. The callback should
+  * return zero on success.
+  *
+  **/
+void gnutls_anon_set_params_function(gnutls_anon_server_credentials res, 
+	gnutls_params_function* func)
+{
+	res->params_func = func;
+}
+
 
 /**
   * gnutls_certificate_set_verify_flags - This function will set the flags to be used at certificate verification

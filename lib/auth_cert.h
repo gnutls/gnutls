@@ -35,6 +35,10 @@ typedef int gnutls_certificate_server_retrieve_function(
 typedef struct {
 	gnutls_dh_params dh_params;
 	gnutls_rsa_params rsa_params;
+	/* this callback is used to retrieve the DH or RSA
+	 * parameters.
+	 */
+	gnutls_params_function * params_func;
 
 	gnutls_cert ** cert_list; 
 			/* contains a list of a list of certificates.
@@ -126,6 +130,11 @@ void _gnutls_selected_certs_set( gnutls_session session,
         int need_free);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
+
+gnutls_rsa_params _gnutls_certificate_get_rsa_params(const gnutls_certificate_credentials sc,
+	gnutls_session session);
+gnutls_dh_params _gnutls_certificate_get_dh_params(const gnutls_certificate_credentials sc,
+	gnutls_session session);
 
 #endif
 

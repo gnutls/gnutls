@@ -67,7 +67,8 @@ const MOD_AUTH_STRUCT rsa_export_auth_struct = {
 
 static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 {
-	const GNUTLS_MPI *rsa_params;
+	gnutls_rsa_params rsa_params;
+	const GNUTLS_MPI *rsa_mpis;
 	size_t n_e, n_m;
 	uint8 *data_e, *data_m;
 	int ret = 0, data_size;
@@ -101,8 +102,9 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 		return GNUTLS_E_INT_RET_0;
 	}
 
-	rsa_params = _gnutls_get_rsa_params( cred->rsa_params);
-	if (rsa_params == NULL) {
+	rsa_params = _gnutls_certificate_get_rsa_params( cred, session);
+	rsa_mpis = _gnutls_get_rsa_params( rsa_params);
+	if (rsa_mpis == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
 	}
@@ -114,14 +116,14 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	}
 
 	info = _gnutls_get_auth_info( session);
-	ret=_gnutls_rsa_export_set_modulus_bits( session, _gnutls_mpi_get_nbits(rsa_params[0]));
+	ret=_gnutls_rsa_export_set_modulus_bits( session, _gnutls_mpi_get_nbits(rsa_mpis[0]));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	_gnutls_mpi_print( NULL, &n_m, rsa_params[0]);
-	_gnutls_mpi_print( NULL, &n_e, rsa_params[1]);
+	_gnutls_mpi_print( NULL, &n_m, rsa_mpis[0]);
+	_gnutls_mpi_print( NULL, &n_e, rsa_mpis[1]);
 
 	(*data) = gnutls_malloc(n_e + n_m + 4);
 	if (*data == NULL) {
@@ -129,12 +131,12 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	}
 
 	data_m = &(*data)[0];
-	_gnutls_mpi_print( &data_m[2], &n_m, rsa_params[0]);
+	_gnutls_mpi_print( &data_m[2], &n_m, rsa_mpis[0]);
 
 	_gnutls_write_uint16(n_m, data_m);
 
 	data_e = &data_m[2 + n_m];
-	_gnutls_mpi_print( &data_e[2], &n_e, rsa_params[1]);
+	_gnutls_mpi_print( &data_e[2], &n_e, rsa_mpis[1]);
 
 	_gnutls_write_uint16(n_e, data_e);
 

@@ -140,7 +140,7 @@ xml_add_key( gnutls_string *xmlkey, int ext, cdk_pkt_pubkey_t pk, int sub )
     const char *algo, *s;
     char keyid[16], fpr[41], tmp[32];
     uint8 fingerpr[20];
-    unsigned long kid[2];
+    unsigned int kid[2];
     int i = 0, rc = 0;
 
     if( !xmlkey || !pk ) {
@@ -254,7 +254,7 @@ xml_add_sig( gnutls_string *xmlkey, int ext, cdk_pkt_signature_t sig )
 {
     const char *algo, *s;
     char tmp[32], keyid[16];
-    unsigned long kid[2];
+    unsigned int kid[2];
     int rc = 0;
 
     if( !xmlkey || !sig ) {

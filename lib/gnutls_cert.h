@@ -98,5 +98,5 @@ int _gnutls_raw_cert_to_gcert(gnutls_cert * gcert, gnutls_certificate_type type,
         const gnutls_datum *raw_cert, int flags /* OR of ConvFlags */);
 int _gnutls_raw_privkey_to_gkey(gnutls_privkey * key, gnutls_certificate_type type,
 	const gnutls_datum *raw_key, int key_enc /* DER or PEM */);
-                                      
+
 #endif

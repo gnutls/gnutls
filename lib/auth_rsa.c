@@ -137,6 +137,7 @@ int _gnutls_get_private_rsa_params(gnutls_session session, GNUTLS_MPI **params, 
 {
 int bits;
 const gnutls_certificate_credentials cred;
+gnutls_rsa_params rsa_params;
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
@@ -155,8 +156,9 @@ const gnutls_certificate_credentials cred;
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	bits > 512) {
 
+		rsa_params = _gnutls_certificate_get_rsa_params( cred, session);
 		/* EXPORT case: */
-		if (cred->rsa_params == NULL) {
+		if (rsa_params == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
 		}
@@ -166,7 +168,7 @@ const gnutls_certificate_credentials cred;
 		 * used to sign this temporary stuff.
 		 */
 		*params_size = RSA_PRIVATE_PARAMS;
-		*params = cred->rsa_params->params;
+		*params = rsa_params->params;
 
 		return 0;
 	}

@@ -89,6 +89,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	gnutls_datum signature, ddata;
 	CERTIFICATE_AUTH_INFO info;
 	const gnutls_certificate_credentials cred;
+	gnutls_dh_params dh_params;
 
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
@@ -107,7 +108,8 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 		return ret;
 	}
 
-	mpis = _gnutls_get_dh_params( cred->dh_params);
+	dh_params = _gnutls_certificate_get_dh_params( cred, session);
+	mpis = _gnutls_get_dh_params( dh_params);
 	if (mpis == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
@@ -237,6 +239,7 @@ const gnutls_certificate_credentials cred;
 int ret;
 GNUTLS_MPI p, g;
 const GNUTLS_MPI *mpis;
+gnutls_dh_params dh_params;
 
 	bits = _gnutls_dh_get_prime_bits( session);
 
@@ -246,7 +249,8 @@ const GNUTLS_MPI *mpis;
 	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	mpis = _gnutls_get_dh_params( cred->dh_params);
+	dh_params = _gnutls_certificate_get_dh_params( cred, session);
+	mpis = _gnutls_get_dh_params( dh_params);
 	if (mpis == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;

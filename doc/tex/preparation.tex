@@ -69,3 +69,65 @@ specifying both options to `libgnutls-config':
 gcc -o foo foo.c `libgnutls-config --cflags --libs`
 \end{verbatim}
 
+
+\section{Multi-threaded applications}
+
+Although the \gnutls{} library is thread safe by design, some parts of the crypto
+backend, such as the random generator, are not. Since \emph{libgcrypt 1.1.92}
+there was an automatic detection of the thread library used by the
+application, so most applications wouldn't need to do any changes to
+ensure thread-safety. Due to the unportability of the automatic thread
+detection, this was removed from later releases of \emph{libgcrypt}, so
+applications have now to register callback functions to ensure proper locking
+in sensitive parts of \emph{libgcrypt}. 
+\par
+There are helper macros to help you properly initialize the libraries.
+Examples are shown below.
+\begin{itemize}
+
+\item POSIX threads
+\begin{verbatim}
+#include <gnutls.h>
+#include <gcrypt.h>
+#include <errno.h>
+#include <pthread.h>
+GCRY_THREAD_OPTION_PTHREAD_IMPL;
+
+int main() 
+{
+   /* The order matters.
+    */
+   gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+   gnutls_global_init();
+}
+\end{verbatim}
+
+\item GNU PTH threads
+\begin{verbatim}
+#include <gnutls.h>
+#include <gcrypt.h>
+#include <errno.h>
+#include <pth.h>
+GCRY_THREAD_OPTION_PTH_IMPL;
+
+int main() 
+{
+   gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pth);
+   gnutls_global_init();
+}
+\end{verbatim}
+
+\item Other thread packages
+\begin{verbatim}
+/* The gcry_thread_cbs structure must have been
+ * initialized.
+ */
+static struct gcry_thread_cbs gcry_threads_other = { ... };
+
+int main()
+{
+   gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_other);
+}
+\end{verbatim}
+\end{itemize}
+

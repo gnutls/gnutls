@@ -174,6 +174,10 @@ typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS,
 	GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS
 } gnutls_kx_algorithm;
 
+typedef enum gnutls_params_type { GNUTLS_PARAMS_RSA_EXPORT=1,
+	GNUTLS_PARAMS_DH 
+} gnutls_params_type;
+
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_UNKNOWN=0, GNUTLS_MAC_NULL=1, 
 GNUTLS_MAC_MD5, GNUTLS_MAC_SHA, GNUTLS_MAC_RMD160
 } gnutls_mac_algorithm;
@@ -427,6 +431,38 @@ typedef int certificate_server_select_func(struct gnutls_session_int*,
 typedef int srp_server_select_func(struct gnutls_session_int*, 
 	const char**, const char**, unsigned int);
 
+/* DH and RSA parameters types.
+ */
+typedef struct {
+	/* [0] is the prime, [1] is the generator.
+	 */
+	GNUTLS_MPI params[2];
+} _gnutls_dh_params;
+
+#define gnutls_dh_params _gnutls_dh_params*
+
+#define gnutls_rsa_params gnutls_x509_privkey
+
+typedef struct gnutls_internal_params {
+	gnutls_dh_params	anon_dh_params;
+	int			free_anon_dh_params;
+	gnutls_dh_params	cert_dh_params;
+	int			free_cert_dh_params;
+	gnutls_rsa_params	rsa_params;
+	int 			free_rsa_params;
+} gnutls_internal_params;
+
+typedef struct gnutls_params_st {
+	gnutls_params_type type;
+	union params {
+		gnutls_dh_params dh;
+		gnutls_rsa_params rsa_export;
+	} params;
+	int deinit;
+} gnutls_params_st;
+
+
+
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
 	/* this holds the number of bytes in the handshake_header[] */
@@ -631,7 +667,7 @@ typedef struct {
 
 	/* This is used to set an arbitary version in the RSA
 	 * PMS secret. Can be used by clients to test whether the
-	 * server checks that version.
+	 * server checks that version. (** only used in gnutls-cli-debug)
 	 */
 	opaque			rsa_pms_version[2];
 
@@ -642,6 +678,12 @@ typedef struct {
 	 * restarted if an username is not found.
 	 */
 	int			handshake_restarted;
+
+	/* Here we cache the DH or RSA parameters got from the
+	 * credentials structure, or from a callback. That is to
+	 * minimize external calls.
+	 */
+	gnutls_internal_params  params;
 
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
@@ -657,18 +699,10 @@ struct gnutls_session_int {
 
 typedef struct gnutls_session_int *gnutls_session;
 
-typedef struct {
-	/* [0] is the prime, [1] is the generator.
-	 */
-	GNUTLS_MPI params[2];
-} _gnutls_dh_params;
-
-#define gnutls_dh_params _gnutls_dh_params*
-
-#define gnutls_rsa_params gnutls_x509_privkey
 
 
-/* functions */
+/* functions 
+ */
 void _gnutls_set_current_version(gnutls_session session, gnutls_protocol_version version);
 gnutls_protocol_version gnutls_protocol_get_version(gnutls_session session);
 void _gnutls_free_auth_info( gnutls_session session);
@@ -691,5 +725,8 @@ gnutls_protocol_version _gnutls_get_adv_version( gnutls_session);
 
 int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, 
 	void* result, size_t* result_size);
+
+typedef int gnutls_params_function(gnutls_session, gnutls_params_type,
+	gnutls_params_st*);
 
 #endif /* GNUTLS_INT_H */

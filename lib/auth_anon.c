@@ -63,6 +63,7 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 	GNUTLS_MPI g, p;
 	const GNUTLS_MPI *mpis;
 	int ret;
+	gnutls_dh_params dh_params;
 	const gnutls_anon_server_credentials cred;
 	
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
@@ -71,7 +72,8 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	mpis = _gnutls_get_dh_params( cred->dh_params);
+	dh_params = _gnutls_anon_get_dh_params( cred, session);
+	mpis = _gnutls_get_dh_params( dh_params);
 	if (mpis == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
@@ -106,6 +108,7 @@ const gnutls_anon_server_credentials cred;
 int bits;
 int ret;
 GNUTLS_MPI p, g;
+gnutls_dh_params dh_params;
 const GNUTLS_MPI *mpis;
   	
 	bits = _gnutls_dh_get_prime_bits( session);
@@ -116,7 +119,8 @@ const GNUTLS_MPI *mpis;
 	        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	mpis = _gnutls_get_dh_params( cred->dh_params);
+	dh_params = _gnutls_anon_get_dh_params( cred, session);
+	mpis = _gnutls_get_dh_params( dh_params);
 	if (mpis == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;

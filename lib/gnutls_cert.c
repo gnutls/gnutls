@@ -124,6 +124,69 @@ void gnutls_certificate_free_ca_names(gnutls_certificate_credentials sc)
 	_gnutls_free_datum( &sc->x509_rdn_sequence);
 }
 
+/*-
+  * _gnutls_certificate_get_dh_params - Returns the DH parameters pointer
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will return the dh parameters pointer. This will read the
+  * credentials structure, and cache the output to the session, so later
+  * calls would not examine the credentials (or call a callback).
+  *
+  -*/
+gnutls_dh_params _gnutls_certificate_get_dh_params(const gnutls_certificate_credentials sc,
+	gnutls_session session)
+{
+gnutls_params_st params;
+int ret;
+
+	if (session->internals.params.cert_dh_params) {
+		return session->internals.params.cert_dh_params;
+	}
+
+	if (sc->dh_params) {
+		session->internals.params.cert_dh_params = sc->dh_params;
+	} else if (sc->params_func) {
+		ret = sc->params_func( session, GNUTLS_PARAMS_DH, &params);
+		if (ret == 0 && params.type == GNUTLS_PARAMS_DH) {
+			session->internals.params.cert_dh_params = params.params.dh;
+			session->internals.params.free_cert_dh_params = params.deinit;
+		}
+	}
+	
+	return session->internals.params.cert_dh_params;
+}
+
+/*-
+  * _gnutls_certificate_get_rsa_params - Returns the RSA parameters pointer
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will return the rsa parameters pointer.
+  *
+  -*/
+gnutls_rsa_params _gnutls_certificate_get_rsa_params(const gnutls_certificate_credentials sc,
+	gnutls_session session)
+{
+gnutls_params_st params;
+int ret;
+
+	if (session->internals.params.rsa_params) {
+		return session->internals.params.rsa_params;
+	}
+
+	if (sc->rsa_params) {
+		session->internals.params.rsa_params = sc->rsa_params;
+	} else if (sc->params_func) {
+		ret = sc->params_func( session, GNUTLS_PARAMS_RSA_EXPORT, &params);
+		if (ret == 0 && params.type == GNUTLS_PARAMS_RSA_EXPORT) {
+			session->internals.params.rsa_params = params.params.rsa_export;
+			session->internals.params.free_rsa_params = params.deinit;
+		}
+	}
+	
+	return session->internals.params.rsa_params;
+}
+
+
 /**
   * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials structure
   * @sc: is an &gnutls_certificate_credentials structure.
