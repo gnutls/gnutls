@@ -30,7 +30,7 @@ SCAN_OPTIONS=--source-dir ../../includes/gnutls \
 
 # Extra options to supply to gtkdoc-mkdb.
 # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
-MKDB_OPTIONS=--output-format=xml $(SCAN_OPTIONS)
+MKDB_OPTIONS=--sgml-mode --output-format=xml $(SCAN_OPTIONS)
 
 # Extra options to supply to gtkdoc-fixref. Not normally needed.
 # e.g. FIXXREF_OPTIONS=--extra-dir=../gdk-pixbuf/html --extra-dir=../gdk/html
