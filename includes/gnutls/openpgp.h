@@ -1,21 +1,23 @@
 /*
- *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
+ * Copyright (C) 2003 Nikos Mavroyanopoulos
  *
- *  This file is part of GNUTLS.
+ * This file is part of GNUTLS.
  *
- *  The GNUTLS library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public   
- *  License as published by the Free Software Foundation; either 
- *  version 2.1 of the License, or (at your option) any later version.
+ * The GNUTLS library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * USA
  *
  */
 
@@ -44,16 +46,16 @@ void gnutls_openpgp_key_deinit(gnutls_openpgp_key_t key); /* frees all memory */
 
 int gnutls_openpgp_key_import(gnutls_openpgp_key_t key,
     const gnutls_datum_t* data, gnutls_openpgp_key_fmt format);
-int gnutls_openpgp_key_export(gnutls_openpgp_key_t key, 
-    gnutls_openpgp_key_fmt format, void* output_data,
-    size_t* output_data_size);
+int gnutls_openpgp_key_export (gnutls_openpgp_key_t key,
+			       gnutls_openpgp_key_fmt_t format,
+			       void *output_data, size_t * output_data_size);
 
 /* The key_usage flags are defined in gnutls.h. They are
  * the GNUTLS_KEY_* definitions.
  */
 int gnutls_openpgp_key_get_key_usage( gnutls_openpgp_key_t cert, unsigned int* key_usage);
-int gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key_t key,
-    void* result, size_t* result_size);
+int gnutls_openpgp_key_get_fingerprint(gnutls_openpgp_key_t key,
+				       void *fpr, size_t * fprlen);
     
 int gnutls_openpgp_key_get_name( gnutls_openpgp_key_t key,
     int idx, char *buf, size_t *sizeof_buf);
