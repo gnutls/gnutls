@@ -291,7 +291,10 @@ int main(int argc, char **argv)
 
       ret = do_handshake(&hd);
 
-      if (handle_error(hd, ret) < 0) {
+      /* Note that every error on handshake is fatal.
+       */
+      if ( ret < 0) {
+         handle_error(hd, ret);
 	 fprintf(stderr, "*** Handshake has failed\n");
 	 gnutls_perror(ret);
 	 gnutls_deinit(hd.session);
@@ -559,9 +562,10 @@ void check_rehandshake(socket_st socket, int ret)
       } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
       if (ret == 0) {
-	 printf("* Rehandshake was performed\n");
+	 printf("* Rehandshake was performed.\n");
       } else {
-	 printf("* Rehandshake Failed [%d]\n", ret);
+         handle_error( socket, ret);
+	 printf("* Rehandshake Failed.\n");
       }
    }
 }

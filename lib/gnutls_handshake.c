@@ -1822,10 +1822,11 @@ static int _gnutls_handshake_hash_init( gnutls_session session) {
   *
   * This function will fail if any problem is encountered,
   * and will return a negative error code. In case of a client,
-  * if it has been asked to resume a session, but the server didn't, then
-  * a full handshake will be performed.
+  * if the client has asked to resume a session, but the server couldn't, 
+  * then a full handshake will be performed.
   *
-  * This function may also return the non-fatal errors GNUTLS_E_AGAIN and
+  * In a handshake all kind of errors should be considered as fatal
+  * except for the non-fatal errors GNUTLS_E_AGAIN and
   * GNUTLS_E_INTERRUPTED; in that case you may resume the handshake
   * (call this function again, until it returns ok); cf.
   * gnutls_record_get_direction().
@@ -1833,7 +1834,7 @@ static int _gnutls_handshake_hash_init( gnutls_session session) {
   * If this function is called by a server after a rehandshake request then
   * GNUTLS_E_GOT_APPLICATION_DATA or GNUTLS_E_WARNING_ALERT_RECEIVED 
   * may be returned. Note that these are non fatal errors, only in the
-  * case of a rehandshake. In that case they mean that the client
+  * specific case of a rehandshake. Their meaning is that the client
   * rejected the rehandshake request.
   *
   **/
