@@ -342,7 +342,7 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 	
 	/* Verify certificate 
 	 */
-	verify = gnutls_openpgp_verify_certificate( &info->raw_certificate_list[0],
+	verify = gnutls_openpgp_verify_key( &info->raw_certificate_list[0],
 				      peer_certificate_list_size);
 
 	if (verify < 0) {

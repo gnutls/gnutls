@@ -31,7 +31,7 @@
 
 /* Here we only extract the KeyUsage field
  */
-static int _extract_keyUsage(char *keyUsage, opaque * extnValue,
+static int _extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 			     int extnValueLen)
 {
 	node_asn *ext;

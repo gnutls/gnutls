@@ -42,10 +42,6 @@
 #include "gnutls_errors.h"
 #include "debug.h"
 
-#define rotl(x,n)   (((x) << ((uint32)(n))) | ((x) >> (32 - (uint32)(n))))
-#define rotr(x,n)   (((x) >> ((uint32)(n))) | ((x) << (32 - (uint32)(n))))
-#define byteswap(x)	((rotl(x, 8) & 0x00ff00ff) | (rotr(x, 8) & 0xff00ff00))
-
 typedef struct {
 	uint32 S[4][256], P[18];
 } blf_ctx;

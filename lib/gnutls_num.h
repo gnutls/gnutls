@@ -23,6 +23,14 @@
 #define GMIN(x,y) (x<y)?x:y
 #define GMAX(x,y) (x>y)?x:y
 
+#define rotl32(x,n)   (((x) << ((uint16)(n))) | ((x) >> (32 - (uint16)(n))))
+#define rotr32(x,n)   (((x) >> ((uint16)(n))) | ((x) << (32 - (uint16)(n))))
+#define rotl16(x,n)   (((x) << ((uint16)(n))) | ((x) >> (16 - (uint16)(n))))
+#define rotr16(x,n)   (((x) >> ((uint16)(n))) | ((x) << (16 - (uint16)(n))))
+
+#define byteswap16(x)  ((rotl16(x, 8) & 0x00ff) | (rotr16(x, 8) & 0xff00))
+#define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ffUL) | (rotr32(x, 8) & 0xff00ff00UL))
+
 uint32 uint24touint32( uint24 num);
 uint24 uint32touint24( uint32 num);
 uint32 READuint32( const opaque* data);

@@ -86,8 +86,6 @@ void print_openpgp_info(GNUTLS_STATE state)
 
 	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
 
-
-
 	if (cert_list_size > 0)
 		if (gnutls_openpgp_fingerprint
 		    (&cert_list[0], digest, &digest_size) >= 0) {
@@ -97,15 +95,18 @@ void print_openpgp_info(GNUTLS_STATE state)
 					(unsigned char) digest[i]);
 				print += 3;
 			}
-			printf(" - Certificate fingerprint: %s\n",
+
+			printf(" - PGP Key version: %d\n", 
+				gnutls_openpgp_extract_key_version(&cert_list[0]));
+
+			printf(" - PGP Key fingerprint: %s\n",
 			       printable);
 
-			gnutls_openpgp_extract_certificate_dn(&cert_list
+			gnutls_openpgp_extract_key_name(&cert_list
 							      [0], &pgp_name);
 			PRINT_PGP_NAME(pgp_name);
 
 		}
-
 
 
 }
