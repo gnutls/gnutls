@@ -4,6 +4,8 @@ Version 1.1.10
 - Corrected bug in OpenPGP key loading using a callback.
 - gnutls-srpcrypt was renamed to srptool
 - Allow handshake requests by the client.
+- Automatically disable certificate types that do not have corresponding
+  certificates.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage

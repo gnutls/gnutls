@@ -215,6 +215,8 @@ typedef enum gnutls_x509_crt_fmt { GNUTLS_X509_FMT_DER,
 typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
 	GNUTLS_PK_UNKNOWN = 0xff
 } gnutls_pk_algorithm;
+#define GNUTLS_PK_ANY (gnutls_pk_algorithm)-1
+#define GNUTLS_PK_NONE (gnutls_pk_algorithm)0
 
 typedef enum gnutls_sign_algorithm { GNUTLS_SIGN_RSA_SHA = 1, GNUTLS_SIGN_DSA_SHA,
 	GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2,

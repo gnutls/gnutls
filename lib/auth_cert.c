@@ -1564,26 +1564,26 @@ int _gnutls_server_select_cert(gnutls_session session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	/* If the callback which retrieves certificate has been
-	 * set use it and leave.
+	/* If the callback which retrieves certificate has been set,
+	 * use it and leave.
 	 */
-	if (cred->server_get_cert_callback != NULL) {
-
+	if (cred->server_get_cert_callback != NULL)
 		return call_get_cert_callback( session, NULL, 0, NULL, 0);
-	}
 
 	/* Otherwise... */
 
 	ret = 0;
 	index = -1;		/* default is use no certificate */
+	
 
 	for (i = 0; i < cred->ncerts; i++) {
 		/* find one compatible certificate 
 		 */
-		if (requested_algo == (gnutls_pk_algorithm) - 1 ||
+		if (requested_algo == GNUTLS_PK_ANY ||
 		    requested_algo ==
 		    cred->cert_list[i][0].subject_pk_algorithm) {
-			/* if cert type matches */
+			/* if cert type matches 
+			 */
 			if (session->security_parameters.cert_type ==
 			    cred->cert_list[i][0].cert_type) {
 				index = i;
@@ -1592,7 +1592,7 @@ int _gnutls_server_select_cert(gnutls_session session,
 		}
 	}
 	
-	/* store the index for future use, in the handshake.
+	/* store the certificate pointer for future use, in the handshake.
 	 * (This will allow not calling this callback again.)
 	 */
 	if (index >= 0 && ret == 0) {

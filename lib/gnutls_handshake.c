@@ -504,11 +504,12 @@ int _gnutls_recv_finished(gnutls_session session)
 }
 
 /* returns PK_RSA if the given cipher suite list only supports,
- * RSA algorithms, PK_DSA if DSS, and -1 if both or none.
+ * RSA algorithms, PK_DSA if DSS, and PK_ANY for both or PK_NONE for none.
  */
-int _gnutls_server_find_pk_algos_in_ciphersuites( opaque* data, int datalen) {
+static int _gnutls_server_find_pk_algos_in_ciphersuites( const opaque* data, int datalen) 
+{
 int j;
-gnutls_pk_algorithm algo=-1, prev_algo = 0;
+gnutls_pk_algorithm algo=GNUTLS_PK_NONE, prev_algo = 0;
 gnutls_kx_algorithm kx;
 GNUTLS_CipherSuite cs;
 
@@ -519,7 +520,7 @@ GNUTLS_CipherSuite cs;
 		if ( _gnutls_map_kx_get_cred( kx, 1) == GNUTLS_CRD_CERTIFICATE) {
 			algo = _gnutls_map_pk_get_pk( kx);
 	
-			if (algo!=prev_algo && prev_algo!=0) return -1;
+			if (algo!=prev_algo && prev_algo!=0) return GNUTLS_PK_ANY;
 			prev_algo = algo;
 		}
 	}
@@ -2346,7 +2347,7 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 	const gnutls_anon_server_credentials anon_cred;
 	gnutls_dh_params dh_params = NULL;
 	gnutls_rsa_params rsa_params = NULL;
-	int j, keep;
+	int j, remove;
 
 	cred_type = _gnutls_map_kx_get_cred( kx, 1);
 	
@@ -2362,15 +2363,15 @@ inline static int check_server_params( gnutls_session session, gnutls_kx_algorit
 		/* Check also if the certificate supports the
 		 * KX method.
 		 */
-		keep = 1;
+		remove = 1;
 		for (j = 0; j < alg_size; j++) {
 			if (alg[j] == kx) {
-				keep = 0;
+				remove = 0;
 				break;
 			}
 		}
 		
-		if (keep == 1) return 1;
+		if (remove == 1) return 1;
 
 
 	} else if ( cred_type == GNUTLS_CRD_ANON) {
@@ -2416,7 +2417,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 
 	int ret = 0;
 	GNUTLS_CipherSuite *newSuite, cs;
-	int newSuiteSize = 0, i, keep;
+	int newSuiteSize = 0, i, remove;
 	const gnutls_certificate_credentials x509_cred;
 	gnutls_kx_algorithm kx;
 	int server = session->security_parameters.entity==GNUTLS_SERVER?1:0;
@@ -2468,24 +2469,24 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		 * the ciphersuite
 		 */
 		kx = _gnutls_cipher_suite_get_kx_algo(&(*cipherSuites)[i]);
-		keep = 0;
+		remove = 0;
 
 		/* if it is defined but had no credentials 
 		 */
 		if (_gnutls_get_kx_cred(session, kx, NULL) == NULL) {
-			keep = 1;
+			remove = 1;
 		} else {
-			keep = 0;
+			remove = 0;
 
 			if (server)
-				keep = check_server_params( session, kx, alg, alg_size);
+				remove = check_server_params( session, kx, alg, alg_size);
 		}
 		
 		
 
 		memcpy( &cs.CipherSuite, &(*cipherSuites)[i].CipherSuite, 2);
 
-		if (keep == 0) {
+		if (remove == 0) {
 
 			_gnutls_handshake_log("HSK[%x]: Keeping ciphersuite: %s\n", session,
 				    _gnutls_cipher_suite_get_name(&cs));
