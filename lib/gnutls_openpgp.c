@@ -972,6 +972,7 @@ int
 gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert, int *r_bits)
 {
   KBNODE kb_pk = NULL, pkt;
+  int algo = 0;
   
   if ( !cert || !r_bits )
     return GNUTLS_E_INVALID_PARAMETERS;
@@ -981,9 +982,16 @@ gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert, int *r_bits)
   pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
   if ( pkt )
     *r_bits = cdk_pk_get_nbits( pkt->pkt->pkt.public_key );
+  algo = pkt->pkt->pkt.public_key->pubkey_algo;
+  if ( is_RSA( algo ) )
+    algo = GNUTLS_PK_RSA;
+  else if ( is_DSA( algo ) )
+    algo = GNUTLS_PK_DSA;
+  else
+    algo = GNUTLS_PK_UNKNOWN;
   cdk_kbnode_release( kb_pk );
   
-  return 0;
+  return algo;
 }
   
 
