@@ -130,7 +130,7 @@ inline static int decode(uint8 * result, const uint8 * data)
 /* encodes data and puts the result into result (localy alocated)
  * The result_size is the return value
  */
-int _gnutls_base64_encode(uint8 * data, int data_size, uint8 ** result)
+int _gnutls_base64_encode(const uint8 * data, int data_size, uint8 ** result)
 {
 	int i, ret, tmp, j;
 	char tmpres[4];
@@ -279,7 +279,7 @@ int size;
 /* decodes data and puts the result into result (localy alocated)
  * The result_size is the return value
  */
-int _gnutls_base64_decode(uint8 * data, int data_size, uint8 ** result)
+int _gnutls_base64_decode(const uint8 * data, int data_size, uint8 ** result)
 {
 	int i, ret, tmp, j;
 	uint8 tmpres[3];
@@ -309,7 +309,7 @@ int _gnutls_base64_decode(uint8 * data, int data_size, uint8 ** result)
 /* copies data to result but removes newlines and <CR>
  * returns the size of the data copied.
  */
-inline static int cpydata(uint8 * data, int data_size, uint8 ** result)
+inline static int cpydata(const uint8 * data, int data_size, uint8 ** result)
 {
 	int i, j;
 

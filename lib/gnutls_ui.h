@@ -80,6 +80,8 @@ time_t gnutls_x509pki_extract_certificate_activation_time( const gnutls_datum*);
 time_t gnutls_x509pki_extract_certificate_expiration_time( const gnutls_datum*);
 int gnutls_x509pki_extract_subject_dns_name( const gnutls_datum*, char*, int*);
 
+int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length);
+
 /* get data from the state */
 const gnutls_datum* gnutls_x509pki_get_peer_certificate_list( GNUTLS_STATE, int* list_size);
 int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE);
