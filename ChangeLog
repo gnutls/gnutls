@@ -1,3 +1,37 @@
+2004-02-12 09:57  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/tex/Makefile.am, doc/tex/auth.tex,
+	doc/tex/certificate.tex, doc/tex/ciphers.tex,
+	doc/tex/ciphersuites.tex, doc/tex/compression.tex,
+	doc/tex/ex-cert-select.tex, doc/tex/examples.tex,
+	doc/tex/gnutls.bib, doc/tex/handshake.tex, doc/tex/library.tex,
+	doc/tex/macros.tex, doc/tex/preparation.tex, doc/tex/programs.tex,
+	doc/tex/record_weaknesses.tex, doc/tex/tls_extensions.tex,
+	lib/Makefile.am, lib/auth_anon.c, lib/auth_cert.c, lib/auth_cert.h,
+	lib/auth_dh_common.c, lib/auth_dhe.c, lib/auth_rsa.c,
+	lib/auth_rsa_export.c, lib/debug.c, lib/dh_compat.c,
+	lib/ext_cert_type.c, lib/ext_max_record.c, lib/ext_server_name.c,
+	lib/gnutls.h.in.in, lib/gnutls_alert.c, lib/gnutls_algorithms.c,
+	lib/gnutls_algorithms.h, lib/gnutls_anon_cred.c, lib/gnutls_auth.c,
+	lib/gnutls_buffers.c, lib/gnutls_cert.c, lib/gnutls_cert.h,
+	lib/gnutls_cipher.c, lib/gnutls_cipher_int.c,
+	lib/gnutls_compress.c, lib/gnutls_compress_int.c,
+	lib/gnutls_constate.c, lib/gnutls_datum.c, lib/gnutls_db.c,
+	lib/gnutls_dh.c, lib/gnutls_dh.h, lib/gnutls_dh_primes.c,
+	lib/gnutls_errors.c, lib/gnutls_extensions.c, lib/gnutls_global.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_int_compat.c,
+	lib/gnutls_kx.c, lib/gnutls_mem.c, lib/gnutls_mpi.c,
+	lib/gnutls_num.c, lib/gnutls_pk.c, lib/gnutls_priority.c,
+	lib/gnutls_random.c, lib/gnutls_record.c, lib/gnutls_rsa_export.c,
+	lib/gnutls_session.c, lib/gnutls_session_pack.c, lib/gnutls_sig.c,
+	lib/gnutls_state.c, lib/gnutls_str.c, lib/gnutls_ui.c,
+	lib/gnutls_ui.h, lib/gnutls_v2_compat.c, lib/gnutls_x509.c,
+	lib/gnutls_x509.h, lib/rsa_compat.c, lib/strnstr.c, lib/x509_b64.c,
+	src/serv.c:
+
+	backported all the changes from the development branch to 1.0.x,
+	except for TLS 1.1 which is untested.  
+
 2004-02-11 21:32  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_mpi.h:
