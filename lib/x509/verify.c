@@ -247,6 +247,8 @@ int ret, issuer_version, result;
 	ret = _gnutls_x509_verify_signature(&cert_signed_data, &cert_signature, issuer);
 	if (ret < 0) {
 		gnutls_assert();
+	} else if (ret == 0) {
+		gnutls_assert();
 		/* error. ignore it */
 		if (output) *output |= GNUTLS_CERT_NOT_TRUSTED;
 		ret = 0;
@@ -765,7 +767,7 @@ int ret, result;
 
 
 	ret = _gnutls_x509_verify_signature(&crl_signed_data, &crl_signature, issuer);
-	if (ret < 0) {
+	if (ret <= 0) {
 		gnutls_assert();
 		/* error. ignore it */
 		ret = 0;
