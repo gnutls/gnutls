@@ -171,6 +171,9 @@ int ret;
 			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
+		/* set defaults to zero 
+		 */
+		memset( &res->cert_list[res->ncerts][i-1], 0, sizeof(gnutls_cert));
 		
 		tmp.data = b64;
 		tmp.size = siz2;
@@ -242,7 +245,8 @@ gnutls_datum tmp;
 			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		
+		memset( &res->ca_list[i-1], 0, sizeof(gnutls_cert));
+				
 		tmp.data = b64;
 		tmp.size = siz2;
 		if ((ret =
@@ -643,7 +647,7 @@ int len, result;
 }
 
 static int _gnutls_get_version( node_asn* c2, char* root) {
-opaque gversion[2];
+opaque gversion[5];
 char name[1024];
 int len, result;
 
@@ -656,7 +660,6 @@ int len, result;
 		gnutls_assert();
 		return (-1);
 	}
-
 	return (int) gversion[0]+1;
 }
 
