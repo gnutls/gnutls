@@ -76,7 +76,7 @@ leave:
 }
 
 /**
- * gnutls_openpgp_key_verify_ring - Verify all signatures on the key
+ * gnutls_openpgp_key_verify_ring - Verify all signatures in the key
  * @key: the structure that holds the key.
  * @keyring: holds the keyring to check against
  * @flags: unused (should be 0)
@@ -123,13 +123,21 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
         gnutls_assert();
         return rc;
     }
-      
+
     if (status & CDK_KEY_INVALID) *verify |= GNUTLS_CERT_INVALID;
     if (status & CDK_KEY_REVOKED) *verify |= GNUTLS_CERT_REVOKED;
-#warning CHECK HERE IF THE WAS ANY SIGNER
+
+    /* FIXME: CHECK HERE IF THE WAS ANY SIGNER
+     */
 
     return 0;
 }
+
+
+int _cdk_sig_check( cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
+                cdk_md_hd_t digest, int * r_expired );
+cdk_md_hd_t cdk_md_open( int algo, unsigned int flags );
+void cdk_md_close( cdk_md_hd_t hd );
 
 /**
  * gnutls_openpgp_key_verify_self - Verify the self signature on the key
@@ -142,24 +150,83 @@ int gnutls_openpgp_key_verify_ring( gnutls_openpgp_key key,
  * The certificate verification output will be put in 'verify' and will be
  * one or more of the gnutls_certificate_status enumerated elements bitwise or'd.
  *
- * GNUTLS_CERT_INVALID\: The signature on the key is invalid.
- *
- * GNUTLS_CERT_REVOKED\: The key has been revoked.
+ * GNUTLS_CERT_INVALID\: The self signature on the key is invalid.
  *
  * Returns 0 on success.
  **/
 int gnutls_openpgp_key_verify_self( gnutls_openpgp_key key,
                            unsigned int flags, unsigned int *verify)
 {
+    opaque key_id[8];
+    cdk_kbnode_t k;
+    int rc, expired;
+    cdk_packet_t packet = NULL;
+    cdk_md_hd_t md = NULL;
+    cdk_packet_t pk = NULL;
+
     *verify = 0;
+    
+    pk = cdk_kbnode_get_packet( key->knode);
+    if (!pk) {
+	gnutls_assert();
+	return GNUTLS_E_INTERNAL_ERROR;
+    }
 
-#warning PUT SOME ACTUAL CODE
+    rc = gnutls_openpgp_key_get_id( key, key_id);
+    if (rc < 0) {
+    	gnutls_assert();
+    	goto leave;
+    }
 
-    return 0;
+    k = key->knode;
+
+    while( (k = cdk_kbnode_find_next( k, CDK_PKT_SIGNATURE)) != NULL) {
+
+	    packet = cdk_kbnode_get_packet( k);
+    	    if (!packet) {
+		gnutls_assert();
+    		return GNUTLS_E_INTERNAL_ERROR;
+    	    }
+
+	    if (memcmp( key_id, packet->pkt.signature->keyid, 8)==0) {
+	    	/* found the self signature.
+	    	 */
+	    	md = cdk_md_open( packet->pkt.signature->digest_algo, 0);
+	    	if (!md) {
+	    		gnutls_assert();
+	    		rc = GNUTLS_E_INTERNAL_ERROR;
+	    		goto leave;
+	    	}
+	    	
+	    	cdk_kbnode_hash( key->knode, md, 0, 0, 0 );
+
+	    	rc = _cdk_sig_check( pk->pkt.public_key, packet->pkt.signature, 
+	    		md, &expired);
+
+		if (rc != 0) {
+			*verify |= GNUTLS_CERT_INVALID;
+		}
+
+	        break;
+	    }
+	    
+	    cdk_pkt_free( packet);
+	    packet = NULL;
+
+    }
+
+    rc = 0;
+
+    leave:
+    
+    cdk_pkt_free( packet);
+    cdk_pkt_free( pk);
+    cdk_md_close( md );
+    return rc;
 }
 
 /**
- * gnutls_openpgp_key_verify_trustdb - Verify all signatures on the key
+ * gnutls_openpgp_key_verify_trustdb - Verify all signatures in the key
  * @key: the structure that holds the key.
  * @trustdb: holds the trustdb to check against
  * @flags: unused (should be 0)
