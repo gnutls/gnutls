@@ -347,6 +347,8 @@ typedef struct {
 	time_t 			timestamp;
 	TLSExtensions		extensions;
 	uint16			max_record_size;
+	/* holds the negotiated certificate type */
+	CertType		cert_type;	
 	GNUTLS_Version		version; /* moved here */
 } SecurityParameters;
 
@@ -387,8 +389,8 @@ typedef struct {
 #define CompressionMethod_Priority GNUTLS_Priority
 #define Protocol_Priority GNUTLS_Priority
 
-typedef int x509pki_client_cert_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int x509pki_server_cert_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
+typedef int certificate_client_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int certificate_server_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
@@ -502,8 +504,8 @@ typedef struct {
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
 	 */
-	x509pki_client_cert_callback_func*	client_cert_callback;
-	x509pki_server_cert_callback_func*	server_cert_callback;
+	certificate_client_callback_func*	client_cert_callback;
+	certificate_server_callback_func*	server_cert_callback;
 
 	/* bits to use for DHE and DHA 
 	 * use _gnutls_dh_get_bits() and gnutls_dh_set_bits() 

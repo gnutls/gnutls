@@ -1374,7 +1374,7 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
 }
 
 /**
-  * gnutls_x509pki_set_client_cert_callback - Used to set a callback while selecting the proper (client) certificate
+  * gnutls_certificate_client_set_select_func - Used to set a callback while selecting the proper (client) certificate
   * @state: is a &GNUTLS_STATE structure.
   * @func: is the callback function
   *
@@ -1382,10 +1382,12 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
   * int (*callback)(GNUTLS_STATE, gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_cert, int nreqs);
   *
   * 'client_cert' contains 'ncerts' gnutls_datum structures which hold
-  * the DER encoded X.509 certificates of the client. 
+  * the raw certificates (DER for X.509 or binary for OpenPGP), of the
+  * client.
   *
-  * 'req_ca_cert' contains a list with the CA names that the server
-  * considers trusted. Normaly we should send a certificate that is signed
+  * 'req_ca_cert', is only used in X.509 certificates. 
+  * Contains a list with the CA names that the server considers trusted. 
+  * Normaly we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
   * meaningful value use the function gnutls_x509pki_extract_dn().
   *
@@ -1412,15 +1414,15 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
   *
   * This function returns 0 on success.
   **/
-void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
-					     x509pki_client_cert_callback_func
+void gnutls_certificate_client_set_select_func(GNUTLS_STATE state,
+					     certificate_client_callback_func
 					     * func)
 {
 	state->gnutls_internals.client_cert_callback = func;
 }
 
 /**
-  * gnutls_x509pki_set_server_cert_callback - Used to set a callback while selecting the proper (server) certificate
+  * gnutls_certificate_server_set_select_func - Used to set a callback while selecting the proper (server) certificate
   * @state: is a &GNUTLS_STATE structure.
   * @func: is the callback function
   *
@@ -1428,7 +1430,7 @@ void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
   * int (*callback)(GNUTLS_STATE, gnutls_datum *server_cert, int ncerts);
   *
   * 'server_cert' contains 'ncerts' gnutls_datum structures which hold
-  * the DER encoded X.509 certificates of the server. 
+  * the raw certificate (DER encoded in X.509) of the server. 
   *
   * This function specifies what we, in case of a server, are going
   * to do when we have to send a certificate. If this callback
@@ -1444,8 +1446,8 @@ void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
   * choosen by the server. -1 indicates an error.
   *
   **/
-void gnutls_x509pki_set_server_cert_callback(GNUTLS_STATE state,
-					     x509pki_server_cert_callback_func
+void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
+					     certificate_server_callback_func
 					     * func)
 {
 	state->gnutls_internals.server_cert_callback = func;

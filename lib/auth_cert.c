@@ -36,6 +36,7 @@
 #include <x509_verify.h>
 #include <gnutls_sig.h>
 #include <x509_extensions.h>
+#include <gnutls_state.h>
 #include <gnutls_pk.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
@@ -224,7 +225,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 {
 	int result, size;
 	int indx = -1;
-	int i, j, try = 0;
+	int i, j, try = 0, *ij_map = NULL;
 	gnutls_datum odn;
 	opaque *data = _data;
 	int data_size = _data_size;
@@ -279,7 +280,9 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 						   data, size) == 0) &&
 					(_gnutls_check_pk_algo_in_list( 
 						pk_algos, pk_algos_length,
-						cred->cert_list[i][0].subject_pk_algorithm)==0)) {
+						cred->cert_list[i][0].subject_pk_algorithm)==0)
+					&& (cred->cert_list[i][0].cert_type ==
+						_gnutls_state_cert_type_get( state))) {
 						indx = i;
 						break;
 					}
@@ -309,58 +312,84 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		if (my_certs == NULL)
 			goto clear;
 
-		/* put the requested DNs to req_dn
+		/* put the requested DNs to req_dn, only in case
+		 * of X509 certificates.
 		 */
-		data = _data;
-		data_size = _data_size;
-		count = 0;	/* holds the number of given CA's DN */
-		do {
-			data_size -= 2;
-			if (data_size <= 0)
-				goto clear;
-			size = READuint16(data);
-			data_size -= size;
-			if (data_size < 0)
-				goto clear;
-
-
-			data += 2;
-
-			issuers_dn =
-			    gnutls_realloc_fast(issuers_dn,
+		if ( _gnutls_state_cert_type_get(state) == GNUTLS_CRT_X509) {
+			data = _data;
+			data_size = _data_size;
+			count = 0;	/* holds the number of given CA's DN */
+			do {
+				data_size -= 2;
+				if (data_size <= 0)
+					goto clear;
+				size = READuint16(data);
+				data_size -= size;
+				if (data_size < 0)
+					goto clear;
+	
+	
+				data += 2;
+	
+				issuers_dn =
+				    gnutls_realloc_fast(issuers_dn,
 						(count +
 						 1) *
 						sizeof(gnutls_datum));
-			if (issuers_dn == NULL)
-				goto clear;
+				if (issuers_dn == NULL)
+					goto clear;
 
-			issuers_dn->data = data;
-			issuers_dn->size = size;
+				issuers_dn->data = data;
+				issuers_dn->size = size;
 
-			count++;	/* otherwise we have failed */
+				count++;	/* otherwise we have failed */
 
-			data += size;
+				data += size;
 
-			if (data_size == 0)
-				break;
+				if (data_size == 0)
+					break;
 
-		} while (1);
-
+			} while (1);
+		} else { /* Other certificate types */
+			count = 0;
+			issuers_dn = NULL;
+		}
+		
+		/* maps j -> i */
+		ij_map = gnutls_malloc(sizeof(int)*cred->ncerts);
+		
 		/* put our certificate's issuer and dn into cdn, idn
 		 */
-		for (i = 0; i < cred->ncerts; i++) {
-			my_certs[i] = cred->cert_list[i][0].raw;
+		for (j = i = 0; i < cred->ncerts; i++) {
+			if ( (cred->cert_list[i][0].cert_type ==
+			     _gnutls_state_cert_type_get( state)) &&
+			     (_gnutls_check_pk_algo_in_list( pk_algos, 
+			     pk_algos_length,
+			     cred->cert_list[i][0].subject_pk_algorithm)==0)) {
+				/* Add a certificate ONLY if it is allowed
+				 * by the peer.
+				 */
+				ij_map[j] = i;
+				my_certs[j++] = cred->cert_list[i][0].raw;
+			}
 		}
 		indx =
 		    state->gnutls_internals.client_cert_callback(state, my_certs,
-								 cred->
-								 ncerts,
+								 j,
 								 issuers_dn,
 								 count);
 
+		/* the indx returned by the user is relative
+		 * to the certificates we provided him.
+		 * This will make it relative to the certificates
+		 * we've got.
+		 */
+		indx = ij_map[indx];
+		
 	      clear:
 		gnutls_free(my_certs);
 		gnutls_free(issuers_dn);
+		gnutls_free(ij_map);
 	}
 	*ind = indx;
 	return 0;
@@ -1438,6 +1467,7 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 	int i, index = -1, j;
 	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int my_certs_length;
+	int * ij_map = NULL;
 
 	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
@@ -1445,22 +1475,25 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	if (cred->ncerts > 0) {
-		state->gnutls_internals.selected_cert_index = 0;
-		index = 0;	/* default is use the first certificate */
+	index = -1;	/* default is use no certificate */
 
+	for (i=0;i<cred->ncerts;i++) {
 		/* find one compatible certificate */
-		if (requested_algo>0) {
-			for (i = 0; i < cred->ncerts; i++) {
-				if (requested_algo==cred->cert_list[i][0].subject_pk_algorithm) {
-					state->gnutls_internals.selected_cert_index = i;
+		if (requested_algo==-1 ||
+			requested_algo==cred->cert_list[i][0].subject_pk_algorithm) {
+				
+				/* if cert type matches */
+				if ( _gnutls_state_cert_type_get( state) ==
+					cred->cert_list[i][0].cert_type) {
+
 					index = i;
+					break;
 				}
-			}
 		}
+
 	}
 
-	if (state->gnutls_internals.client_cert_callback != NULL && cred->ncerts > 0) {	/* use the callback to get certificate */
+	if (state->gnutls_internals.server_cert_callback != NULL && cred->ncerts > 0) {	/* use the callback to get certificate */
 		gnutls_datum *my_certs = NULL;
 
 		my_certs =
@@ -1471,24 +1504,34 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 
 		/* put our certificate's issuer and dn into cdn, idn
 		 */
+		ij_map = gnutls_malloc( sizeof(int) * cred->ncerts);
+		 
 		j=0;
-		for (i = 0; i < cred->ncerts; i++,j++) {
-			/* Does not add incompatible certificates */
-			if (requested_algo>0) {
-				if (requested_algo!=cred->cert_list[i][0].subject_pk_algorithm) {
-					my_certs_length--;
-					j--;
-					continue;
-				}
+		for (i = 0; i < cred->ncerts; i++) {
+			/* Add compatible certificates */
+			if (requested_algo==-1 ||
+				requested_algo==cred->cert_list[i][0].subject_pk_algorithm) {
+					
+					/* if cert type matches */
+					if ( _gnutls_state_cert_type_get( state) ==
+						cred->cert_list[i][0].cert_type) {
+
+						ij_map[j] = i;
+						my_certs[j++] = cred->cert_list[i][0].raw;
+					}
 			}
-			my_certs[j] = cred->cert_list[i][0].raw;
 		}
+		my_certs_length = j;
+		
 		index =
 		    state->gnutls_internals.server_cert_callback(state, my_certs,
 								 my_certs_length);
 
+	      	index = ij_map[index];
+	      	
 	      clear:
 		gnutls_free(my_certs);
+		gnutls_free(ij_map);
 	}
 
 	/* store the index for future use, in the handshake.

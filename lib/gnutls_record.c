@@ -119,6 +119,9 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	
 	(*state)->security_parameters.entity = con_end;
 
+	/* the default certificate type for TLS */
+	(*state)->security_parameters.cert_type = GNUTLS_CRT_X509;
+
 /* Set the defaults for initial handshake */
 	(*state)->security_parameters.read_bulk_cipher_algorithm = 
 	(*state)->security_parameters.write_bulk_cipher_algorithm = GNUTLS_CIPHER_NULL;
