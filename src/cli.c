@@ -184,7 +184,6 @@ int main(int argc, char **argv)
 						    CLIKEYFILE_PGP);
 	if (ret < 0) {
 		fprintf(stderr, "Error setting the OpenPGP key file\n");
-		exit(1);
 	}
 
 	ret =
@@ -193,7 +192,6 @@ int main(int argc, char **argv)
 	if (ret < 0) {
 		fprintf(stderr,
 			"Error setting the OpenPGP keyring file\n");
-		exit(1);
 	}
 /*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 

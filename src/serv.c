@@ -348,8 +348,7 @@ int main(int argc, char **argv)
 	if (gnutls_certificate_set_openpgp_key_file
 	    (cert_cred, PGP_CERTFILE, PGP_KEYFILE) < 0) {
 		fprintf(stderr,
-			"PGP PARSE ERROR\nDid you have key.pem and cert.pem?\n");
-		exit(1);
+			"Error while reading the OpenPGP key pair\n");
 	}
 
 	gnutls_certificate_set_openpgp_keyserver(cert_cred, "wwwkeys.pgp.net", 0);

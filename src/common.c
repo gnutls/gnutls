@@ -118,26 +118,26 @@ void print_cert_vrfy(GNUTLS_STATE state)
 	status = gnutls_certificate_verify_peers(state);
 	printf("\n");
 
+	if (status == GNUTLS_E_NO_CERTIFICATE_FOUND) {
+		printf("- Peer did not send any certificate.\n");
+		return;
+	}
 	if (status < 0) {
 		printf("- Could not verify certificate (err %d)\n", status);
 		return;
 	}
 
-	if (status & GNUTLS_CERT_VALID)
-		printf("- Peer's certificate is NOT trusted but valid\n");
 	if (status & GNUTLS_CERT_INVALID)
 		printf("- Peer's certificate is invalid\n");
 	if (status & GNUTLS_CERT_EXPIRED)
 		printf
-		    ("- Peer's certificate was verified but is expired\n");
+		    ("- Peer's certificate is expired\n");
 	if (status & GNUTLS_CERT_TRUSTED)
 		printf("- Peer's certificate is trusted\n");
 	if (status & GNUTLS_CERT_NOT_TRUSTED)
 		printf("- Peer's certificate is NOT trusted\n");
 	if (status & GNUTLS_CERT_CORRUPTED)
 		printf("- Peer's certificate is corrupted\n");
-	if (status & GNUTLS_CERT_NONE)
-		printf("- Peer did not send any certificate.\n");
 
 }
 
