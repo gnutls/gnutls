@@ -1,5 +1,6 @@
 /*
- *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
+ * Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -39,10 +40,7 @@ typedef int ssize_t;
 # include <strings.h>
 #endif
 
-#ifndef HAVE_STRNSTR
-char *strnstr(const char *haystack, const char *needle,
-	      size_t haystacklen);
-#endif
+#include <strnstr.h>
 
 #ifdef HAVE_STDDEF_H
 # include <stddef.h>

@@ -163,7 +163,7 @@ AC_CHECK_HEADERS(errno.h sys/time.h time.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h ctype.h)
 dnl opencdk
 AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_FUNCS(vasprintf isascii memmove strnstr mmap gmtime_r inet_ntop,,)
+AC_CHECK_FUNCS(vasprintf isascii memmove mmap gmtime_r inet_ntop,,)
 AC_FUNC_ALLOCA
 
 
@@ -466,7 +466,7 @@ AC_MSG_RESULT([***
 
 gl_SOURCE_BASE(gl)
 gl_M4_BASE(gl/m4)
-gl_MODULES(getline error exit progname getpass-gnu minmax)
+gl_MODULES(getline error exit progname getpass-gnu minmax strnstr)
 gl_INIT
 
 AC_MSG_RESULT([***
