@@ -25,11 +25,6 @@ int main()
     const char *_name;
     error_name names_to_sort[400];	/* up to 400 names  */
 
-    printf("@node Error codes and descriptions\n");
-    printf("@chapter Error codes and descriptions\n");
-    printf("@anchor{Error Codes}\n");
-    printf("@cindex Error codes\n");
-    printf("\n");
     printf("@itemize\n");
 
     memset(names_to_sort, 0, sizeof(names_to_sort));
