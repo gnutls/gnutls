@@ -1,3 +1,33 @@
+2003-11-13 09:31  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/auth_cert.c, lib/debug.c,
+	lib/ext_server_name.c, lib/gnutls_buffers.c, lib/gnutls_constate.c,
+	lib/gnutls_dh_primes.c, lib/gnutls_extensions.c,
+	lib/gnutls_extensions.h, lib/gnutls_global.c,
+	lib/gnutls_handshake.c, lib/gnutls_handshake.h,
+	lib/gnutls_hash_int.c, lib/gnutls_int.h, lib/gnutls_mem.c,
+	lib/gnutls_record.c, lib/gnutls_record.h, lib/gnutls_state.c,
+	lib/gnutls_state.h, lib/gnutls_v2_compat.c, lib/gnutls_x509.c,
+	lib/x509_b64.c, src/common.h:
+
+	Some bugfixes, and type corrections.  
+
+2003-11-13 07:24  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_hash_int.c, lib/gnutls_int.h, lib/gnutls_priority.c,
+	src/cli.c, src/common.c, src/serv.c:
+
+	Added the RIPEMD ciphersuites defined in
+	draft-ietf-tls-openpgp-keys-04.  
+
+2003-11-13 06:41  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/tex/openssl.tex:
+
+	The openssl compatibility layer was moved to gnutls-openssl to allow
+	the extension of it without bloating the libgnutls-extra.  
+
 2003-11-12 13:10  nmav <nmav@gnutls.org>
 
 	* src/certtool.c:
