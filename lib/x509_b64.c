@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2000,2001 Nikos Mavroyanopoulos <nmav@hellug.gr>
+ *  Copyright (C) 2000,2001,2003 Nikos Mavroyanopoulos <nmav@hellug.gr>
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   

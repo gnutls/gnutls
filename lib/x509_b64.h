@@ -5,7 +5,7 @@ int _gnutls_base64_decode(const uint8 * data, size_t data_size, uint8 ** result)
 int _gnutls_fbase64_decode( const opaque* header, const uint8 * data, size_t data_size,
 			   uint8 ** result);
 
-#define B64SIZE( data_size) ((data_size%3==0)?((data_size/3)*4):(4+((data_size/3)*4)))
+#define B64SIZE( data_size) ((data_size%3==0)?((data_size*4)/3):(4+((data_size*4)/3)))
 
 /* The size for B64 encoding + newlines plus header
  */
