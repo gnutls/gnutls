@@ -40,21 +40,32 @@
  * handshake procedure.
  */
 int _gnutls_generate_sig_from_hdata( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum *signature) {
-gnutls_datum data;
-int size = _gnutls_handshake_buffer_get_size( state);
+gnutls_datum dconcat;
 int ret;
+opaque concat[36];
+GNUTLS_MAC_HANDLE td_md5;
+GNUTLS_MAC_HANDLE td_sha;
 
-	data.data = gnutls_malloc(size);
-	data.size = size;
-	if (data.data==NULL) {
+	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	if (td_md5 == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_HASH_FAILED;
 	}
-			
-	_gnutls_handshake_buffer_peek( state, data.data, data.size);
 
-	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &data, signature);
-	gnutls_free_datum( &data);
+	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	if (td_sha == NULL) {
+		gnutls_assert();
+		gnutls_hash_deinit( td_md5, NULL);
+		return GNUTLS_E_HASH_FAILED;
+	}
+
+	gnutls_hash_deinit(td_md5, concat);
+	gnutls_hash_deinit(td_sha, &concat[16]);
+
+	dconcat.data = concat;
+	dconcat.size = 36;
+
+	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -69,24 +80,41 @@ int ret;
  */
 int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum* params, gnutls_datum *signature) 
 {
-	gnutls_datum sdata;
-	int size = 2*TLS_RANDOM_SIZE; 
-	int ret;
+gnutls_datum dconcat;
+int ret;
+GNUTLS_MAC_HANDLE td_md5;
+GNUTLS_MAC_HANDLE td_sha;
+opaque concat[36];
 
-	sdata.data = gnutls_malloc( size+params->size);
-	sdata.size = size + params->size;
-	if (sdata.data==NULL) {
+	td_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
+	if (td_md5 == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_HASH_FAILED;
 	}
+
+	td_sha = gnutls_hash_init( GNUTLS_MAC_SHA);
+	if (td_sha == NULL) {
+		gnutls_assert();
+		gnutls_hash_deinit( td_md5, NULL);
+		return GNUTLS_E_HASH_FAILED;
+	}
+
+	gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_md5, params->data, params->size);
+
+	gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_sha, params->data, params->size);
+
+	gnutls_hash_deinit(td_md5, concat);
+	gnutls_hash_deinit(td_sha, &concat[16]);
+
+	dconcat.data = concat;
+	dconcat.size = 36;
 	
-	memcpy( sdata.data, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	memcpy( &sdata.data[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	memcpy( &sdata.data[2*TLS_RANDOM_SIZE], params->data, params->size);
+	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &dconcat, signature);
 
-	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &sdata, signature);
-
-	gnutls_free_datum( &sdata);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -101,12 +129,10 @@ int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_cert* cert, gnutls_p
  * Cert is the certificate of the corresponding private key. It is only checked if
  * it supports signing.
  */
-int _gnutls_pkcs1_rsa_generate_sig( gnutls_cert* cert, gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) 
+int _gnutls_pkcs1_rsa_generate_sig( gnutls_cert* cert, gnutls_private_key *pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
 {
 int ret;
-opaque digest[20+16];
 gnutls_datum tmpdata;
-GNUTLS_HASH_HANDLE td;
 
 	/* If our certificate supports signing
 	 */
@@ -121,25 +147,8 @@ GNUTLS_HASH_HANDLE td;
 	switch(pkey->pk_algorithm) {
 		case GNUTLS_PK_RSA:
 			
-			td = gnutls_hash_init( GNUTLS_MAC_MD5);
-			if (td==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-			gnutls_hash( td, data->data, data->size);
-			gnutls_hash_deinit( td, digest);
-
-			td = gnutls_hash_init( GNUTLS_MAC_SHA);
-			if (td==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-			gnutls_hash( td, data->data, data->size);
-			gnutls_hash_deinit( td, &digest[16]);
-			
-
-			tmpdata.data = digest;
-			tmpdata.size = 20+16; /* md5 + sha */	
+			tmpdata.data = hash_concat->data;
+			tmpdata.size = hash_concat->size; /* md5 + sha */
 
 			break;
 		default:
@@ -158,11 +167,9 @@ GNUTLS_HASH_HANDLE td;
 	return 0;
 }
 
-int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, gnutls_datum *signature) {
+int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_concat, gnutls_datum *signature) {
 	int ret;
 	gnutls_datum plain, vdata;
-	opaque digest[20+16];
-	GNUTLS_HASH_HANDLE td;
 
 	if (cert->version == 0 || cert==NULL) {                /* this is the only way to check
 							       * if it is initialized
@@ -183,24 +190,8 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, g
 	switch(cert->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
 			
-			td = gnutls_hash_init( GNUTLS_MAC_MD5);
-			if (td==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-			gnutls_hash( td, data->data, data->size);
-			gnutls_hash_deinit( td, digest);
-
-			td = gnutls_hash_init( GNUTLS_MAC_SHA);
-			if (td==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
-			}
-			gnutls_hash( td, data->data, data->size);
-			gnutls_hash_deinit( td, &digest[16]);
-			
-			vdata.data = digest;
-			vdata.size = 20+16; /* md5 + sha */	
+			vdata.data = hash_concat->data;
+			vdata.size = hash_concat->size;
 
 			break;
 		default:
@@ -236,20 +227,32 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, g
  * in order to avoid hashing the last message.
  */
 int _gnutls_verify_sig_hdata( GNUTLS_STATE state, gnutls_cert *cert, gnutls_datum* signature, int ubuffer_size) {
-gnutls_datum data;
-int size = _gnutls_handshake_buffer_get_size( state) - ubuffer_size; /* do not get the last message */
 int ret;
+opaque concat[36];
+GNUTLS_MAC_HANDLE td_md5;
+GNUTLS_MAC_HANDLE td_sha;
+gnutls_datum dconcat;
 
-	data.data = gnutls_malloc(size);
-	data.size = size;
-	if (data.data==NULL) {
+	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	if (td_md5 == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_HASH_FAILED;
 	}
-			
-	_gnutls_handshake_buffer_peek( state, data.data, data.size);
 
-	ret = _gnutls_pkcs1_rsa_verify_sig( cert, &data, signature);
+	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	if (td_sha == NULL) {
+		gnutls_assert();
+		gnutls_hash_deinit( td_md5, NULL);
+		return GNUTLS_E_HASH_FAILED;
+	}
+
+	gnutls_hash_deinit(td_md5, concat);
+	gnutls_hash_deinit(td_sha, &concat[16]);
+	
+	dconcat.data = concat;
+	dconcat.size = 20+16; /* md5+ sha */
+
+	ret = _gnutls_pkcs1_rsa_verify_sig( cert, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -264,23 +267,40 @@ int ret;
  */
 int _gnutls_verify_sig_params( GNUTLS_STATE state, gnutls_cert *cert, const gnutls_datum* params, gnutls_datum *signature) 
 {
-	gnutls_datum sdata;
-	int size = 2*TLS_RANDOM_SIZE; 
-	int ret;
+gnutls_datum dconcat;
+int ret;
+GNUTLS_MAC_HANDLE td_md5;
+GNUTLS_MAC_HANDLE td_sha;
+opaque concat[36];
 
-	sdata.data = gnutls_malloc( size+params->size);
-	sdata.size = size + params->size;
-	if (sdata.data==NULL) {
+	td_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
+	if (td_md5 == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_HASH_FAILED;
 	}
 
-	memcpy( sdata.data, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	memcpy( &sdata.data[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	memcpy( &sdata.data[2*TLS_RANDOM_SIZE], params->data, params->size);
+	td_sha = gnutls_hash_init( GNUTLS_MAC_SHA);
+	if (td_sha == NULL) {
+		gnutls_assert();
+		gnutls_hash_deinit( td_md5, NULL);
+		return GNUTLS_E_HASH_FAILED;
+	}
 
-	ret = _gnutls_pkcs1_rsa_verify_sig( cert, &sdata, signature);
-	gnutls_free_datum( &sdata);
+	gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_md5, params->data, params->size);
+
+	gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td_sha, params->data, params->size);
+
+	gnutls_hash_deinit(td_md5, concat);
+	gnutls_hash_deinit(td_sha, &concat[16]);
+
+	dconcat.data = concat;
+	dconcat.size = 36;
+
+	ret = _gnutls_pkcs1_rsa_verify_sig( cert, &dconcat, signature);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

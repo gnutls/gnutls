@@ -106,6 +106,32 @@ int gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text, int textlen)
 	return 0;
 }
 
+GNUTLS_HASH_HANDLE gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
+{
+GNUTLS_HASH_HANDLE ret;
+
+	ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+
+	if (ret==NULL) return GNUTLS_HASH_FAILED;
+
+	ret->algorithm = handle->algorithm;
+	ret->key = NULL; /* it's a hash anyway */
+	ret->keysize = 0;
+
+#ifdef USE_MHASH
+	ret->handle = mhash_cp(handle->handle);
+#else
+	ret->handle = gcry_md_copy(handle->handle);
+#endif
+
+	if (ret->handle==NULL) {
+		gnutls_free( ret);
+		return GNUTLS_HASH_FAILED;
+	}
+	
+	return ret;
+}
+
 void gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void* digest)
 {
 	char *mac;
@@ -114,12 +140,19 @@ void gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void* digest)
 #ifdef USE_MHASH
 	opaque* ret;
 	
-	mhash_deinit(handle->handle, digest);
+	if (digest!=NULL)
+		mhash_deinit(handle->handle, digest);
+	else {
+		opaque* ret;
+		ret = mhash_end( handle->handle);
+		free(ret);
+	}
 #else
 	maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle->handle));
 	gcry_md_final(handle->handle);
 	mac = gcry_md_read(handle->handle, 0);
-	memcpy( digest, mac, gnutls_hash_get_algo_len(handle->algorithm));
+	if (digest!=NULL)
+		memcpy( digest, mac, gnutls_hash_get_algo_len(handle->algorithm));
 
 	gcry_md_close(handle->handle);
 #endif
@@ -229,13 +262,21 @@ void gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle, void* digest)
 #ifdef USE_MHASH
 	char *ret;
 
-	ret = mhash_hmac_deinit(handle->handle, digest);
+	if (digest!=NULL)
+		mhash_hmac_deinit(handle->handle, digest);
+	else {
+		opaque* ret;
+		ret = mhash_hmac_end( handle->handle);
+		free(ret);
+	}
 #else
 	maclen = gcry_md_get_algo_dlen(gcry_md_get_algo(handle->handle));
 
 	gcry_md_final(handle->handle);
 	mac = gcry_md_read(handle->handle, 0);
-	memcpy( digest, mac, maclen);
+
+	if (digest!=NULL)
+		memcpy( digest, mac, maclen);
 
 	gcry_md_close(handle->handle);
 #endif
@@ -270,20 +311,6 @@ GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3(MACAlgorithm algorithm, void *key,
 
 		if (keylen > 0) gnutls_hash(ret, key, keylen);
 		gnutls_hash(ret, ipad, padsize);
-	}
-
-	return ret;
-}
-
-GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3_handshake(MACAlgorithm algorithm, void *key,
-					int keylen)
-{
-	GNUTLS_MAC_HANDLE ret;
-
-	ret = gnutls_hash_init( algorithm);
-	if (ret!=GNUTLS_HASH_FAILED) {
-		ret->key = key;
-		ret->keysize = keylen;
 	}
 
 	return ret;
@@ -325,7 +352,7 @@ void gnutls_mac_deinit_ssl3(GNUTLS_MAC_HANDLE handle, void* digest)
 	return;
 }
 
-void gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle, void* digest)
+void gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle, void* digest, opaque* key, uint32 key_size)
 {
 	opaque ret[MAX_HASH_SIZE];
 	GNUTLS_MAC_HANDLE td;
@@ -351,12 +378,12 @@ void gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle, void* digest)
 
 	td = gnutls_hash_init( handle->algorithm);
 	if (td!=GNUTLS_HASH_FAILED) {
-		if (handle->keysize > 0) gnutls_hash(td, handle->key, handle->keysize);
+		if (key_size > 0) gnutls_hash(td, key, key_size);
 
 		gnutls_hash(td, opad, padsize);
 		block = gnutls_hmac_get_algo_len(handle->algorithm);
 		
-		if (handle->keysize > 0) gnutls_hash( handle, handle->key, handle->keysize);
+		if (key_size > 0) gnutls_hash( handle, key, key_size);
 		gnutls_hash(handle, ipad, padsize);
 		gnutls_hash_deinit(handle, ret);	/* get the previous hash */
 

@@ -24,11 +24,6 @@
 #include <gnutls_record.h>
 #include <gnutls_buffers.h>
 
-#ifdef DEBUG
-# warning HANDSHAKE HASH BUFFER CAN BE AVOIDED
-# warning NEEDS REWRITE
-#endif
-
 /* This is the only file that uses the berkeley sockets API.
  * 
  * Also holds all the buffering code used in gnutls.
@@ -44,10 +39,13 @@
  *  (see _gnutls_io_read_buffered(), _gnutls_io_write_buffered() etc.)
  * 
  * HANDSHAKE LAYER:
- *  Uses a buffer to hold data that was not sent or received
+ *  1. Uses a buffer to hold data that was not sent or received
  *  complete. (Ie. sent 10 bytes of a handshake packet that is 20 bytes
  *  long).
  * (see _gnutls_handshake_send_int(), _gnutls_handshake_recv_int())
+ *
+ *  2. Uses buffer to hold the last received handshake message.
+ *  (see _gnutls_handshake_buffer_put() etc.)
  *
  */
 

@@ -54,6 +54,18 @@ static int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int dat
 int _gnutls_server_select_comp_method(GNUTLS_STATE state,
 				    opaque * data, int datalen);
 
+
+/* Clears the handshake hash buffers and handles.
+ */
+inline static
+void _gnutls_handshake_hash_buffers_clear( GNUTLS_STATE state) {
+	gnutls_hash_deinit( state->gnutls_internals.handshake_mac_handle_md5, NULL);
+	gnutls_hash_deinit( state->gnutls_internals.handshake_mac_handle_sha, NULL);
+	state->gnutls_internals.handshake_mac_handle_md5 = NULL;
+	state->gnutls_internals.handshake_mac_handle_sha = NULL;
+	_gnutls_handshake_buffer_clear( state);
+}
+
 /* this will copy the required values for resuming to 
  * gnutls_internals, and to security_parameters.
  * this will keep as less data to security_parameters.
@@ -112,123 +124,80 @@ void _gnutls_set_client_random(GNUTLS_STATE state, uint8 * random)
 /* Calculate The SSL3 Finished message */
 #define SSL3_CLIENT_MSG "CLNT"
 #define SSL3_SERVER_MSG "SRVR"
-static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip,
-				 opaque * ret)
+#define SSL_MSG_LEN 4
+static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, opaque * ret)
 {
-	int siz;
-	GNUTLS_MAC_HANDLE td;
-	GNUTLS_MAC_HANDLE td2;
-	char tmp[MAX_HASH_SIZE];
-	char *mesg, *data;
+	const int siz = SSL_MSG_LEN;
+	GNUTLS_MAC_HANDLE td_md5;
+	GNUTLS_MAC_HANDLE td_sha;
+	char *mesg;
 
-	td = gnutls_mac_init_ssl3_handshake(GNUTLS_MAC_MD5,
-					    state->security_parameters.
-					    master_secret,
-					    TLS_MASTER_SIZE);
-	if (td == NULL) {
+	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	if (td_md5 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td2 =
-	    gnutls_mac_init_ssl3_handshake(GNUTLS_MAC_SHA,
-					   state->security_parameters.
-					   master_secret, TLS_MASTER_SIZE);
-	if (td2 == NULL) {
+	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_mac_deinit_ssl3_handshake(td, tmp);
+		gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
-
-	siz = _gnutls_handshake_buffer_get_size(state) - skip;
-	data = gnutls_malloc(siz);
-	if (data == NULL) {
-		gnutls_assert();
-		gnutls_mac_deinit_ssl3_handshake(td2, tmp);
-		gnutls_mac_deinit_ssl3_handshake(td, tmp);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	_gnutls_handshake_buffer_peek(state, data, siz);
-
-	gnutls_mac_ssl3(td, data, siz);
-	gnutls_mac_ssl3(td2, data, siz);
-	gnutls_free(data);
 
 	if (type == GNUTLS_SERVER) {
 		mesg = SSL3_SERVER_MSG;
 	} else {
 		mesg = SSL3_CLIENT_MSG;
 	}
-	siz = strlen(mesg);
-	gnutls_mac_ssl3(td, mesg, siz);
-	gnutls_mac_ssl3(td2, mesg, siz);
 
-	gnutls_mac_deinit_ssl3_handshake(td, tmp);
-	memcpy(ret, tmp, 16);
+	gnutls_hash(td_md5, mesg, siz);
+	gnutls_hash(td_sha, mesg, siz);
 
-	gnutls_mac_deinit_ssl3_handshake(td2, tmp);
+	gnutls_mac_deinit_ssl3_handshake(td_md5, ret, state->security_parameters.master_secret, TLS_MASTER_SIZE);
+	gnutls_mac_deinit_ssl3_handshake(td_sha, &ret[16], state->security_parameters.master_secret, TLS_MASTER_SIZE);
 
-	memcpy(&ret[16], tmp, 20);
 	return 0;
 }
 
 /* Hash the handshake messages as required by TLS 1.0 */
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
-int _gnutls_finished(GNUTLS_STATE state, int type, int skip, void *ret)
+#define TLS_MSG_LEN 15
+int _gnutls_finished(GNUTLS_STATE state, int type, void *ret)
 {
-	int siz;
-	GNUTLS_HASH_HANDLE td;
-	GNUTLS_HASH_HANDLE td2;
-	char tmp[MAX_HASH_SIZE];
+	const int siz = TLS_MSG_LEN;
 	opaque concat[36];
-	opaque *mesg, *data;
+	opaque *mesg;
+	GNUTLS_MAC_HANDLE td_md5;
+	GNUTLS_MAC_HANDLE td_sha;
 
-	td = gnutls_hash_init(GNUTLS_MAC_MD5);
-	if (td == GNUTLS_HASH_FAILED) {
+
+	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	if (td_md5 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td2 = gnutls_hash_init(GNUTLS_MAC_SHA);
-	if (td2 == GNUTLS_HASH_FAILED) {
+	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_hash_deinit(td2, tmp);
+		gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	siz = _gnutls_handshake_buffer_get_size(state) - skip;
 
-	data = gnutls_malloc(siz);
-	if (data == NULL) {
-		gnutls_assert();
-		gnutls_hash_deinit(td2, tmp);
-		gnutls_hash_deinit(td, tmp);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	_gnutls_handshake_buffer_peek(state, data, siz);
-
-	gnutls_hash(td, data, siz);
-	gnutls_hash(td2, data, siz);
-
-	gnutls_free(data);
-
-	gnutls_hash_deinit(td, tmp);
-	memcpy(concat, tmp, 16);
-
-	gnutls_hash_deinit(td2, tmp);
-
-	memcpy(&concat[16], tmp, 20);
+	gnutls_hash_deinit(td_md5, concat);
+	gnutls_hash_deinit(td_sha, &concat[16]);
 
 	if (type == GNUTLS_SERVER) {
 		mesg = SERVER_MSG;
 	} else {
 		mesg = CLIENT_MSG;
 	}
+
 	return gnutls_PRF(state->security_parameters.master_secret,
-			  TLS_MASTER_SIZE, mesg, strlen(mesg), concat, 36,
+			  TLS_MASTER_SIZE, mesg, siz, concat, 36,
 			  12, ret);
 }
 
@@ -380,6 +349,36 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	return ret;
 }
 
+/* here we hash all pending data. 
+ */
+inline static int
+_gnutls_handshake_hash_pending( GNUTLS_STATE state) {
+int siz;
+opaque * data;
+
+	/* We check if there are pending data to hash.
+	 */
+	siz = _gnutls_handshake_buffer_get_size(state);
+	
+	if (siz > 0) { /* if there are data to hash */
+		data = gnutls_malloc(siz);
+		if (data == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		_gnutls_handshake_buffer_get(state, data, siz);
+
+		gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, data, siz);
+		gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, data, siz);
+
+		gnutls_free(data);
+
+	}
+
+	return 0;
+}
+
 
 /* This is to be called after sending CHANGE CIPHER SPEC packet
  * and initializing encryption. This is the first encrypted message
@@ -391,19 +390,29 @@ int _gnutls_send_finished(GNUTLS_STATE state, int again)
 	int ret;
 	int data_size = 0;
 
+
 	if (again == 0) {
+
+		/* This needed in order to hash all the required
+		 * messages.
+		 */
+		if ((ret=_gnutls_handshake_hash_pending(state)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
 		if (state->security_parameters.version == GNUTLS_SSL3) {
 			ret =
 			    _gnutls_ssl3_finished(state,
 						  state->
 						  security_parameters.
-						  entity, 0, data);
+						  entity, data);
 			data_size = 36;
 		} else {	/* TLS 1.0 */
 			ret =
 			    _gnutls_finished(state,
 					     state->security_parameters.
-					     entity, 0, data);
+					     entity, data);
 			data_size = 12;
 		}
 	}
@@ -440,6 +449,8 @@ int _gnutls_recv_finished(GNUTLS_STATE state)
 		gnutls_assert();
 		return ret;
 	}
+
+
 	if (state->security_parameters.version == GNUTLS_SSL3) {
 		data_size = 36;
 	} else {
@@ -452,20 +463,15 @@ int _gnutls_recv_finished(GNUTLS_STATE state)
 	}
 
 	if (state->security_parameters.version == GNUTLS_SSL3) {
-		/* skip the bytes from the last message */
 		ret =
 		    _gnutls_ssl3_finished(state,
 					  (state->security_parameters.
-					   entity + 1) % 2,
-					  vrfysize +
-					  HANDSHAKE_HEADER_SIZE, data);
+					   entity + 1) % 2, data);
 	} else {		/* TLS 1.0 */
 		ret =
 		    _gnutls_finished(state,
 				     (state->security_parameters.entity +
-				      1) % 2,
-				     vrfysize + HANDSHAKE_HEADER_SIZE,
-				     data);
+				      1) % 2, data);
 	}
 
 	if (ret < 0) {
@@ -627,6 +633,28 @@ int _gnutls_send_empty_handshake(GNUTLS_STATE state, HandshakeType type,
 	return _gnutls_send_handshake(state, ptr, 0, type);
 }
 
+
+/* This function will hash the handshake message we sent.
+ */
+static
+int _gnutls_handshake_hash_add_sent( GNUTLS_STATE state, HandshakeType type,
+	opaque* dataptr, uint32 datalen) {
+int ret;
+
+	if ( (ret=_gnutls_handshake_hash_pending( state)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	if ( type != GNUTLS_HELLO_REQUEST) {
+		gnutls_hash( state->gnutls_internals.handshake_mac_handle_sha, dataptr, datalen);
+		gnutls_hash( state->gnutls_internals.handshake_mac_handle_md5, dataptr, datalen);
+	}
+
+	return 0;
+}
+
+
 /* This function sends a handshake message of type 'type' containing the
  * data specified here. If the previous _gnutls_send_handshake() returned
  * GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED, then it must be called again 
@@ -672,17 +700,13 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 	_gnutls_handshake_log("HSK: %s was send [%ld bytes]\n",
 		    _gnutls_handshake2str(type), datasize);
 
-	/* Here we keep the handshake messages in order to hash them later!
-	 */
-	if (type != GNUTLS_HELLO_REQUEST) {
 
-		if ((ret =
-		     _gnutls_handshake_buffer_put(state, data,
-						       datasize)) < 0) {
+	/* Here we keep the handshake messages in order to hash them...
+	 */
+	if ( (ret= _gnutls_handshake_hash_add_sent( state, type, data, datasize)) < 0) {
 			gnutls_assert();
 			gnutls_free(data);
 			return ret;
-		}
 	}
 
 	ret =
@@ -697,6 +721,8 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 /* This function will read the handshake header, and return it to the called. If the
  * received handshake packet is not the one expected then it buffers the header, and
  * returns UNEXPECTED_HANDSHAKE_PACKET.
+ *
+ * FIXME: This function is complex.
  */
 #define SSL2_HEADERS 1
 static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
@@ -818,19 +844,6 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 	state->gnutls_internals.handshake_header_buffer.recv_type =
 	    *recv_type;
 
-	if (*recv_type != GNUTLS_HELLO_REQUEST) {
-		if ((ret =
-		     _gnutls_handshake_buffer_put(state, dataptr,
-						       handshake_header_size))
-		    < 0) {
-			gnutls_assert();
-			return ret;
-		}
-	}
-
-	/* This MUST be after handshake_buffer_put(), because
-	 * of optional packets.
-	 */
 	if (*recv_type != type) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
@@ -842,12 +855,53 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 #define _gnutls_handshake_header_buffer_clear( state) state->gnutls_internals.handshake_header_buffer.header_size = 0
 
 
+
+/* This function will hash the handshake headers and the
+ * handshake data.
+ */
+static
+int _gnutls_handshake_hash_add_recvd( GNUTLS_STATE state, HandshakeType recv_type,
+	opaque* header, uint16 header_size, opaque* dataptr, uint32 datalen) {
+int ret;
+
+	/* The idea here is to hash the previous message we received,
+	 * and add the one we just received into the handshake_hash_buffer.
+	 */
+	
+	if ( (ret=_gnutls_handshake_hash_pending( state)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+	
+	/* here we buffer the handshake messages - needed at Finished message */
+	if ( recv_type != GNUTLS_HELLO_REQUEST) {
+
+		if ((ret =
+		     _gnutls_handshake_buffer_put(state, 
+			    header, header_size)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		if ( datalen > 0) {
+			if ((ret =
+			     _gnutls_handshake_buffer_put(state, dataptr,
+						       datalen)) < 0) {
+				gnutls_assert();
+				return ret;
+			}
+		}
+	}
+
+	return 0;
+}
+
+
 /* This function will receive handshake messages of the given types,
  * and will pass the message to the right place in order to be processed.
  * Eg. for the SERVER_HELLO message (if it is expected), it will be
  * send to _gnutls_recv_hello().
  */
-
 int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 			   int *datalen, HandshakeType type,
 			   Optional optional)
@@ -869,6 +923,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 		gnutls_assert();
 		return ret;
 	}
+
 
 	length32 = ret;
 
@@ -900,32 +955,34 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 		}
 	}
 
-	/* If we fail before this then we will reuse the handshake header
-	 * have have received above. if we get here the we clear the handshake
-	 * header we received.
-	 */
-	_gnutls_handshake_header_buffer_clear(state);
 
 	ret = GNUTLS_E_UNKNOWN_ERROR;
 
 	if (data != NULL && length32 > 0)
 		*data = dataptr;
 
-	/* here we buffer the handshake messages - needed at Finished message */
 
-	if (recv_type != GNUTLS_HELLO_REQUEST && length32 > 0) {
-		if ((ret =
-		     _gnutls_handshake_buffer_put(state, dataptr,
-						       length32)) < 0) {
-			gnutls_assert();
-			return ret;
-		}
+	if ( (ret=_gnutls_handshake_hash_add_recvd( state, recv_type, 
+		state->gnutls_internals.handshake_header_buffer.header,
+		state->gnutls_internals.handshake_header_buffer.header_size,
+		dataptr, length32)) < 0) {
+		gnutls_assert();
+		_gnutls_handshake_header_buffer_clear(state);
+		return ret;
 	}
+
+	/* If we fail before this then we will reuse the handshake header
+	 * have have received above. if we get here the we clear the handshake
+	 * header we received.
+	 */
+	_gnutls_handshake_header_buffer_clear(state);
 
 	switch (recv_type) {
 	case GNUTLS_CLIENT_HELLO:
 	case GNUTLS_SERVER_HELLO:
 		ret = _gnutls_recv_hello(state, dataptr, length32);
+		/* dataptr is freed because the called does not
+		 * need it */
 		gnutls_free(dataptr);
 		break;
 	case GNUTLS_CERTIFICATE:
@@ -952,8 +1009,10 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 		break;
 	default:
 		gnutls_assert();
+		gnutls_free(dataptr);
 		ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	}
+
 	return ret;
 }
 
@@ -1661,6 +1720,33 @@ static int _gnutls_abort_handshake( GNUTLS_STATE state, int ret) {
 	return GNUTLS_E_UNKNOWN_ERROR;
 }
 
+
+/* This function initialized the handshake hash state.
+ * required for finished messages.
+ */
+inline
+static int _gnutls_handshake_hash_init( GNUTLS_STATE state) {
+
+	if ( state->gnutls_internals.handshake_mac_handle_md5==NULL) {
+		state->gnutls_internals.handshake_mac_handle_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
+
+		if (state->gnutls_internals.handshake_mac_handle_md5==GNUTLS_HASH_FAILED) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+	}
+
+	if ( state->gnutls_internals.handshake_mac_handle_sha==NULL) {
+		state->gnutls_internals.handshake_mac_handle_sha = gnutls_hash_init( GNUTLS_MAC_SHA);
+		if (state->gnutls_internals.handshake_mac_handle_sha==GNUTLS_HASH_FAILED) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+	}
+
+	return 0;
+}		
+
 /**
   * gnutls_handshake - This the main function in the handshake protocol.
   * @state: is a a &GNUTLS_STATE structure.
@@ -1687,6 +1773,11 @@ static int _gnutls_abort_handshake( GNUTLS_STATE state, int ret) {
 int gnutls_handshake(GNUTLS_STATE state)
 {
 	int ret;
+
+	if ( (ret=_gnutls_handshake_hash_init( state)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		ret = gnutls_handshake_client(state);
@@ -1722,7 +1813,7 @@ int gnutls_handshake(GNUTLS_STATE state)
 		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
-		_gnutls_handshake_buffer_clear(state); \
+		_gnutls_handshake_hash_buffers_clear(state); \
 		return ret; \
 	}
 
@@ -2104,7 +2195,7 @@ int gnutls_handshake_common(GNUTLS_STATE state)
 	}
 
 	/* clear handshake buffer */
-	_gnutls_handshake_buffer_clear(state);
+	_gnutls_handshake_hash_buffers_clear(state);
 	return ret;
 
 }
@@ -2277,18 +2368,17 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 }
 
 /**
-  * gnutls_handshake_set_max_data_buffer_size - This function will set the maximum size of handshake message sequence
+  * gnutls_handshake_set_max_packet_length - This function will set the maximum length of a handshake message
   * @state: is a a &GNUTLS_STATE structure.
   * @max: is the maximum number.
   *
-  * This function will set the maximum size of the handshake message sequence.
-  * Since the handshake messages are kept into memory until the handshake is successful
-  * this function allows you to set the maximum number of bytes that will be kept.
-  * The default value is 128kb which is large enough. Set this to 0 if you do not want
+  * This function will set the maximum size of a handshake message.
+  * Handshake messages over this size are rejected.
+  * The default value is 16kb which is large enough. Set this to 0 if you do not want
   * to set an upper limit.
   *
   **/
-void gnutls_handshake_set_max_data_buffer_size(GNUTLS_STATE state, int max)
+void gnutls_handshake_set_max_packet_length(GNUTLS_STATE state, int max)
 {
 	state->gnutls_internals.max_handshake_data_buffer_size = max;
 }

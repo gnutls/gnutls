@@ -51,7 +51,7 @@ typedef const int* GNUTLS_LIST;
 /* The sequence of handshake messages should not
  * be larger than this value.
  */
-#define MAX_HANDSHAKE_DATA_BUFFER_SIZE 128*1024
+#define MAX_HANDSHAKE_PACKET_SIZE 16*1024
 
 #define TLS_RANDOM_SIZE 32
 #define TLS_MAX_SESSION_ID_SIZE 32
@@ -396,6 +396,9 @@ typedef struct {
 typedef struct {
 	gnutls_datum			application_data_buffer; /* holds data to be delivered to application layer */
 	gnutls_datum			handshake_hash_buffer; /* used to keep all handshake messages */
+	GNUTLS_MAC_HANDLE		handshake_mac_handle_sha; /* hash of the handshake messages */
+	GNUTLS_MAC_HANDLE		handshake_mac_handle_md5; /* hash of the handshake messages */
+
 	gnutls_datum			handshake_data_buffer; /* this is a buffer that holds the current handshake message */
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
 	HandshakeState			handshake_state; /* holds

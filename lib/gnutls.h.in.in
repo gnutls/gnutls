@@ -148,7 +148,7 @@ void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
 void* gnutls_db_get_ptr( GNUTLS_STATE);
 int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
 
-void gnutls_handshake_set_max_data_buffer_size( GNUTLS_STATE state, int max);
+void gnutls_handshake_set_max_length( GNUTLS_STATE state, int max);
 
 /* returns libgnutls version */
 const char* gnutls_check_version( const char*);

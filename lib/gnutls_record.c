@@ -147,7 +147,7 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 
 	gnutls_transport_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 
-	gnutls_handshake_set_max_data_buffer_size( (*state), MAX_HANDSHAKE_DATA_BUFFER_SIZE);
+	gnutls_handshake_set_max_packet_length( (*state), MAX_HANDSHAKE_PACKET_SIZE);
 
 	/* Allocate a minimum size for recv_data 
 	 * This is allocated in order to avoid small messages, makeing
