@@ -17,7 +17,10 @@ COBJECTS_EXTRA = crypt.c crypt_srpsha1.c ext_srp.c \
 	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
 	gnutls_openpgp.c gnutls_extra.c gnutls_openssl.c minilzo.c
 
-libgnutls_extra_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+libgnutls_extra_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+	$(LIBOPENCDK_LIBS)
+libgnutls_extra_la_LIBADD = ../lib/libgnutls.la
+
 
 libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) 
 
