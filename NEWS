@@ -3,6 +3,8 @@ Version 0.5.9
   the private key type.
 - Corrected some code which worked fine in gcc 3.2, but not with any
   other compiler.
+- Updated 'gnutls-cli' with the starttls parameter, to allow testing
+  starttls implementations.
 
 Version 0.5.8 (25/09/2002)
 - Updated documentation.

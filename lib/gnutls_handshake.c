@@ -2380,7 +2380,6 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		 * the ciphersuite
 		 */
 		kx = _gnutls_cipher_suite_get_kx_algo((*cipherSuites)[i]);
-
 		keep = 0;
 
 		/* if it is defined but had no credentials 

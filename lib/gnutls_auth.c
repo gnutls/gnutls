@@ -37,7 +37,7 @@
 int gnutls_clear_creds( gnutls_session session) {
 	AUTH_CRED * ccred, *ncred;
 	
-	if (session->gnutls_key->cred!=NULL) { /* begining of the list */
+	if (session->gnutls_key && session->gnutls_key->cred) { /* begining of the list */
 		ccred = session->gnutls_key->cred;
 		while(ccred!=NULL) {
 			ncred = ccred->next;

@@ -24,7 +24,7 @@
 #ifdef DEBUG
 # ifdef __FILE__
 #  ifdef __LINE__
-#   define gnutls_assert() fprintf(stderr, "GNUTLS_ASSERT: %s:%d\n", __FILE__,__LINE__);
+#   define gnutls_assert() _gnutls_log( "GNUTLS_ASSERT: %s:%d\n", __FILE__,__LINE__);
 #  else
 #   define gnutls_assert() 
 #  endif

@@ -13,6 +13,7 @@ Current list:
 * Add support for certificate CRLs in certificate verification
 * Audit the code
 * Add GPGSM certificate manager support
+* Allow unexpected Client Hello messages
 - Add Kerberos support
 
 (+) Means high priority 

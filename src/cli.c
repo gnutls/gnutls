@@ -103,6 +103,7 @@ void socket_bye(socket_st socket);
 void check_rehandshake(socket_st socket, int ret);
 void check_alert(socket_st socket, int ret);
 int do_handshake(socket_st *socket);
+void init_global_tls_stuff(void);
 
 
 #define MAX(X,Y) (X >= Y ? X : Y);
@@ -187,85 +188,8 @@ int main(int argc, char **argv)
 
    signal(SIGPIPE, SIG_IGN);
 
-   if (gnutls_global_init() < 0) {
-      fprintf(stderr, "global state initialization error\n");
-      exit(1);
-   }
+   init_global_tls_stuff();
 
-   if (gnutls_global_init_extra() < 0) {
-      fprintf(stderr, "global state (extra) initialization error\n");
-      exit(1);
-   }
-
-   /* X509 stuff */
-   if (gnutls_certificate_allocate_cred(&xcred) < 0) {
-      fprintf(stderr, "Certificate allocation memory error\n");
-      exit(1);
-   }
-
-   if (x509_cafile != NULL) {
-      ret =
-	  gnutls_certificate_set_x509_trust_file(xcred,
-						 x509_cafile, x509ctype);
-      if (ret < 0) {
-	 fprintf(stderr, "Error setting the x509 trust file\n");
-      } else {
-	 printf("Processed %d CA certificate(s).\n", ret);
-      }
-   }
-
-   if (x509_certfile != NULL) {
-      ret =
-	  gnutls_certificate_set_x509_key_file(xcred,
-					       x509_certfile,
-					       x509_keyfile, x509ctype);
-      if (ret < 0) {
-	 fprintf(stderr,
-		 "Error setting the x509 key files ('%s', '%s')\n",
-		 x509_certfile, x509_keyfile);
-      }
-   }
-
-   if (pgp_certfile != NULL) {
-      ret =
-	  gnutls_certificate_set_openpgp_key_file(xcred,
-						  pgp_certfile,
-						  pgp_keyfile);
-      if (ret < 0) {
-	 fprintf(stderr,
-		 "Error setting the x509 key files ('%s', '%s')\n",
-		 pgp_certfile, pgp_keyfile);
-      }
-   }
-
-   if (pgp_keyring != NULL) {
-      ret =
-	  gnutls_certificate_set_openpgp_keyring_file(xcred, pgp_keyring);
-      if (ret < 0) {
-	 fprintf(stderr, "Error setting the OpenPGP keyring file\n");
-      }
-   }
-
-   if (pgp_trustdb != NULL) {
-      ret = gnutls_certificate_set_openpgp_trustdb(xcred, pgp_trustdb);
-      if (ret < 0) {
-	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
-      }
-   }
-/*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
-
-   /* SRP stuff */
-   if (srp_username != NULL) {
-      if (gnutls_srp_allocate_client_cred(&cred) < 0) {
-	 fprintf(stderr, "SRP authentication error\n");
-      }
-      gnutls_srp_set_client_cred(cred, srp_username, srp_passwd);
-   }
-
-   /* ANON stuff */
-   if (gnutls_anon_allocate_client_cred(&anon_cred) < 0) {
-      fprintf(stderr, "Anonymous authentication error\n");
-   }
 
    printf("Resolving '%s'...\n", hostname);
    /* get server name */
@@ -309,7 +233,6 @@ int main(int argc, char **argv)
 
 /* This TLS extension may break old implementations.
  */
-
       ret = do_handshake(&hd);
 
       if (ret < 0) {
@@ -360,8 +283,6 @@ int main(int argc, char **argv)
       }
    }
 
-/* print some information */
-   print_info(hd.session);
 
  after_handshake:
 
@@ -395,6 +316,7 @@ int main(int argc, char **argv)
 	    for (ii = 0; ii < ret; ii++) {
 	       fputc(buffer[ii], stdout);
 	    }
+	    fflush(stdout);
 	 }
 
 	 if (user_term != 0)
@@ -409,7 +331,8 @@ int main(int argc, char **argv)
 	       if (ret < 0) {
  		 fprintf(stderr, "*** Handshake has failed\n");
 		 gnutls_perror(ret);
-		 gnutls_deinit(hd.session);
+		 socket_bye(hd);
+		 user_term = 1;
 	       }
 	       continue;
             } else {
@@ -710,6 +633,95 @@ int do_handshake(socket_st* socket)
       ret = gnutls_handshake(socket->session);
    } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
-   socket->secure = 1;
+   if (ret==0) {
+      socket->secure = 1;
+      /* print some information */
+      print_info(socket->session);
+   }
    return ret;
+}
+
+void init_global_tls_stuff()
+{
+int ret;
+
+   if (gnutls_global_init() < 0) {
+      fprintf(stderr, "global state initialization error\n");
+      exit(1);
+   }
+
+   if (gnutls_global_init_extra() < 0) {
+      fprintf(stderr, "global state (extra) initialization error\n");
+      exit(1);
+   }
+
+   /* X509 stuff */
+   if (gnutls_certificate_allocate_cred(&xcred) < 0) {
+      fprintf(stderr, "Certificate allocation memory error\n");
+      exit(1);
+   }
+
+   if (x509_cafile != NULL) {
+      ret =
+	  gnutls_certificate_set_x509_trust_file(xcred,
+						 x509_cafile, x509ctype);
+      if (ret < 0) {
+	 fprintf(stderr, "Error setting the x509 trust file\n");
+      } else {
+	 printf("Processed %d CA certificate(s).\n", ret);
+      }
+   }
+
+   if (x509_certfile != NULL) {
+      ret =
+	  gnutls_certificate_set_x509_key_file(xcred,
+					       x509_certfile,
+					       x509_keyfile, x509ctype);
+      if (ret < 0) {
+	 fprintf(stderr,
+		 "Error setting the x509 key files ('%s', '%s')\n",
+		 x509_certfile, x509_keyfile);
+      }
+   }
+
+   if (pgp_certfile != NULL) {
+      ret =
+	  gnutls_certificate_set_openpgp_key_file(xcred,
+						  pgp_certfile,
+						  pgp_keyfile);
+      if (ret < 0) {
+	 fprintf(stderr,
+		 "Error setting the x509 key files ('%s', '%s')\n",
+		 pgp_certfile, pgp_keyfile);
+      }
+   }
+
+   if (pgp_keyring != NULL) {
+      ret =
+	  gnutls_certificate_set_openpgp_keyring_file(xcred, pgp_keyring);
+      if (ret < 0) {
+	 fprintf(stderr, "Error setting the OpenPGP keyring file\n");
+      }
+   }
+
+   if (pgp_trustdb != NULL) {
+      ret = gnutls_certificate_set_openpgp_trustdb(xcred, pgp_trustdb);
+      if (ret < 0) {
+	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
+      }
+   }
+/*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
+
+   /* SRP stuff */
+   if (srp_username != NULL) {
+      if (gnutls_srp_allocate_client_cred(&cred) < 0) {
+	 fprintf(stderr, "SRP authentication error\n");
+      }
+      gnutls_srp_set_client_cred(cred, srp_username, srp_passwd);
+   }
+
+   /* ANON stuff */
+   if (gnutls_anon_allocate_client_cred(&anon_cred) < 0) {
+      fprintf(stderr, "Anonymous authentication error\n");
+   }
 }
