@@ -469,6 +469,20 @@ int ret;
 	return ret;
 }
 
+int test_arcfour_40( gnutls_session session) {
+int ret;
+	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	return ret;
+}
+
 int test_tls1( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);

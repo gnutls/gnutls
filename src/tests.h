@@ -14,6 +14,7 @@ int test_sha( gnutls_session state);
 int test_rmd( gnutls_session state);
 int test_3des( gnutls_session state);
 int test_arcfour( gnutls_session state);
+int test_arcfour_40( gnutls_session state);
 int test_tls1( gnutls_session state);
 int test_tls1_2( gnutls_session state);
 int test_rsa_pms( gnutls_session state);
