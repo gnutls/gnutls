@@ -2703,8 +2703,10 @@ void smime_to_pkcs7(void)
 
   do
     {
-      if (strcmp (lineptr, "\r\n") != 0 && strcmp (lineptr, "\n") != 0)
-	printf("%s", lineptr);
+      while (len > 0 && (lineptr[len-1] == '\r' || lineptr[len-1] == '\n'))
+	lineptr[--len] = '\0';
+      if (strcmp (lineptr, "") != 0)
+	printf("%s\n", lineptr);
       len = getline (&lineptr, &linesize, infile);
     }
   while (len != -1);
