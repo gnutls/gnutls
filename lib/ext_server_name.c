@@ -46,7 +46,7 @@ int _gnutls_server_name_recv_params(gnutls_session session,
    if (session->security_parameters.entity == GNUTLS_SERVER) {
       DECR_LENGTH_RET(data_size, 2, 0);
       len = _gnutls_read_uint16(data);
-      
+
       if ( len != data_size) {
          /* This is unexpected packet length, but
           * just ignore it, for now.
@@ -121,7 +121,8 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
    ssize_t data_size = _data_size;
    int total_size = 0;
 
-   /* this function sends the client extension data (dnsname) */
+   /* this function sends the client extension data (dnsname) 
+    */
    if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
       /* uint16 */
@@ -130,9 +131,12 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 	   i < session->security_parameters.extensions.server_names_size;
 	   i++) 
       {
-	   /* count the total size */
+	   /* count the total size 
+	    */
 	   len = session->security_parameters.extensions.server_names[i].name_length;
-	   /* uint8 + uint16 + size */
+
+	   /* uint8 + uint16 + size 
+	    */
 	   total_size += 1 + 2 + len;
       }
 
@@ -141,7 +145,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
       /* UINT16: write total size of all names 
        */
       DECR_LENGTH_RET( data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
-      _gnutls_write_uint16(total_size, p);
+      _gnutls_write_uint16(total_size-2, p);
       p += 2;
 
       for (i = 0;
@@ -175,12 +179,11 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 	    break;
 	 default:
 	    gnutls_assert();
-	    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	    return GNUTLS_E_INTERNAL_ERROR;
 	 }
       }
    }
-   if (total_size == 0)
-      return 0;
+
    return total_size;
 }
 
@@ -190,7 +193,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   * @data: will hold the data
   * @data_length: will hold the data length. Must hold the maximum size of data.
   * @type: will hold the server name indicator type
-  * @index: is the index of the server_name
+  * @indx: is the index of the server_name
   *
   * This function will allow you to get the name indication (if any),
   * a client has sent. The name indication may be any of the enumeration
@@ -210,7 +213,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   **/
 int gnutls_server_name_get(gnutls_session session, void *data,
 			   int *data_length,
-			   int * type, int index)
+			   int * type, int indx)
 {
    char *_data = data;
    
@@ -219,23 +222,23 @@ int gnutls_server_name_get(gnutls_session session, void *data,
       return GNUTLS_E_INVALID_REQUEST;
    }
 
-   if (index >
+   if (indx >
        session->security_parameters.extensions.server_names_size - 1) {
       gnutls_assert();
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
    }
 
    *type =
-       session->security_parameters.extensions.server_names[index].type;
+       session->security_parameters.extensions.server_names[indx].type;
 
    if (*data_length > /* greater since we need one extra byte for the null */
-       session->security_parameters.extensions.server_names[index].
+       session->security_parameters.extensions.server_names[indx].
        name_length) {
       *data_length =
-	  session->security_parameters.extensions.server_names[index].
+	  session->security_parameters.extensions.server_names[indx].
 	  name_length;
       memcpy(data,
-	     session->security_parameters.extensions.server_names[index].
+	     session->security_parameters.extensions.server_names[indx].
 	     name, *data_length);
 
       if (*type == GNUTLS_NAME_DNS)	/* null terminate */
@@ -243,7 +246,7 @@ int gnutls_server_name_get(gnutls_session session, void *data,
 
    } else {
       *data_length =
-	  session->security_parameters.extensions.server_names[index].
+	  session->security_parameters.extensions.server_names[indx].
 	  name_length;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
    }
