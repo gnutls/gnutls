@@ -58,7 +58,7 @@
 
 #define CLIKEYFILE_PGP "openpgp/cli_sec.asc"
 #define CLICERTFILE_PGP "openpgp/cli_pub.asc"
-#define CLIRINGFILE_PGP "openpgp/papa_ring.gpg"
+#define CLIRINGFILE_PGP "openpgp/cli_ring.gpg"
 
 static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
 
