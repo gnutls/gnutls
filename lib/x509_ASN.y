@@ -456,18 +456,15 @@ yylex()
 
 /**
   * asn1_parser_asn1 - function used to start the parse algorithm.
-  * @file_name: file name to parse
-  * @pointer: return the pointer to the structure
+  * @file_name: specify the path and the name of file that contains ASN.1 declarations.
+  * @pointer: return the pointer to the structure created from 
+  *   "file_name" ASN.1 declarations.  
+  * Description:
   *
   * Creates the structures needed to manage the definitions included in *FILE_NAME file.
   *
-  * Input Parameter: 
-  *   char *file_name: specify the path and the name of file that contains ASN.1 declarations.
-  * Output Parameter:
-  *   node_asn **pointer : return the pointer to the structure created from 
-  *   "file_name" ASN.1 declarations.  
+  * Returns:
   *
-  * Return Value:
   * ASN_OK: the file has a correct syntax and every identifier is known. 
   * ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
   * ASN_SYNTAX_ERROR: the syntax is not correct.
@@ -511,16 +508,15 @@ int asn1_parser_asn1(char *file_name,node_asn **pointer){
 
 /**
   * asn1_parser_asn1_file_c - function that generates a C structure from an ASN1 file
-  * @file_name : file name to parse
+  * @file_name: specify the path and the name of file that contains ASN.1 declarations.
+  * Description:
   *
   * Creates a file containing a C vector to use to manage the definitions included in
   * *FILE_NAME file. If *FILE_NAME is "/aa/bb/xx.yy" the file created is "/aa/bb/xx_asn1_tab.c",
   * and the vector is "xx_asn1_tab".
   *
-  * Input Parameter: 
-  *  char *file_name: specify the path and the name of file that contains ASN.1 declarations.
+  * Returns:
   *
-  * Return Value:
   *  ASN_OK: the file has a correct syntax and every identifier is known. 
   *  ASN_FILE_NOT_FOUND: an error occured while opening FILE_NAME.
   *  ASN_SYNTAX_ERROR: the syntax is not correct.

@@ -444,16 +444,13 @@ _asn1_convert_integer(char *value,unsigned char *value_out,int value_out_size, i
   * asn1_create_tree - Creates the structures needed to manage the ASN1 definitions.
   * @root: specify vector that contains ASN.1 declarations
   * @pointer: return the pointer to the structure created by *ROOT ASN.1 declarations
+  * Description:
   *
   * Creates the structures needed to manage the ASN1 definitions. ROOT is a vector created by
   * 'asn1_parser_asn1_file_c' function.
   *
-  * Input Parameter: 
-  *  static_asn *root: specify vector that contains ASN.1 declarations.
-  * Output Parameter:
-  *  node_asn **pointer : return the pointer to the structure created by *ROOT ASN.1 declarations.  
+  * Returns:
   *
-  * Return Value:
   *  ASN_OK: structure created correctly. 
   *  ASN_GENERIC_ERROR: an error occured while structure creation  
   **/
@@ -789,13 +786,12 @@ asn1_visit_tree(node_asn *pointer,char *name)
 /**
   * asn1_delete_structure - Deletes the structure *POINTER. 
   * @root: pointer to the structure that you want to delete.
+  * Description:
   * 
   * Deletes the structure *POINTER. 
   * 
-  * Input Parameters:
-  *   node_asn *pointer: pointer to the structure that you want to delete.
-  * 
-  * Return Value:
+  * Returns:
+  *
   *   ASN_OK: everything OK
   *   ASN_ELEMENT_NOT_FOUND: pointer==NULL.
   *
@@ -922,18 +918,12 @@ _asn1_copy_structure2(node_asn *root,char *source_name)
   * @source_name: the name of the type of the new structure (must be inside p_structure).
   * @pointer: pointer to the structure created. 
   * @dest_name: the name of the new structure.
+  * Description:
   *
   * Creates a structure called DEST_NAME of type SOURCE_NAME.
   *
-  * Input Parameters:
-  *  node_asn *p_structure: pointer to the structure returned by "parser_asn1" function 
-  *  char *source_name: the name of the type of the new structure (must be inside p_structure).
-  *  char *dest_name: the name of the new structure.
+  * Returns:
   *
-  * Output Parameter:
-  *  node_asn **pointer : pointer to the structure created. 
-  *
-  * Return Value:
   *  ASN_OK: creation OK
   *  ASN_ELEMENT_NOT_FOUND: SOURCE_NAME isn't known
   * 
@@ -1006,26 +996,23 @@ _asn1_append_sequence_set(node_asn *node)
   * asn1_write_value - Set the value of one element inside a structure.
   * @node_root: pointer to a structure
   * @name: the name of the element inside the structure that you want to set.
-  * @value: vector used to specify the value to set. 
-  * @len: number of bytes of *value to use
+  * @value: vector used to specify the value to set. If len is >0, 
+  * VALUE must be a two's complement form integer.
+  * if len=0 *VALUE must be a null terminated string with an integer value. 
+  * @len: number of bytes of *value to use to set the value: value[0]..value[len-1]
+  *  or 0 if value is a null terminated string
+  * Description:
   *
   * Set the value of one element inside a structure.
   * 
-  * Input Parameters:
-  *   node_asn *pointer: pointer to a structure
-  *   char *name: the name of the element inside the structure that you want to set.
-  *   unsigned char *value: vector used to specify the value to set. If len is >0, 
-  *                         *VALUE must be a two's complement form integer.
-  *                         if len=0 *VALUE must be a null terminated string with an integer value.
-  *   int len: number of bytes of *value to use to set the value: value[0]..value[len-1]
-  *            or 0 if value is a null terminated string
+  * Returns:
   * 
-  * Return Value:
   *   ASN_OK: set value OK
   *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
   *   ASN_VALUE_NOT_VALID: VALUE has a wrong format.
   * 
-  * Examples:  description for each type
+  * Examples:  
+  *   description for each type
   *   INTEGER: VALUE must contain a two's complement form integer.
   *            value[0]=0xFF ,               len=1 -> integer=-1
   *            value[0]=0xFF value[1]=0xFF , len=2 -> integer=-1
@@ -1312,25 +1299,20 @@ asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
   * @root: pointer to a structure
   * @name: the name of the element inside a structure that you want to read.
   * @value: vector that will contain the element's content. 
+  * VALUE must be a pointer to memory cells already allocated.
   * @len: number of bytes of *value: value[0]..value[len-1]
+  * Description:
   *
   * Returns the value of one element inside a structure.
   * 
-  * Input Parameters:
-  *   node_asn *pointer: pointer to a structure
-  *   char *name: the name of the element inside a structure that you want to read.
-  * 
-  * Output Parameters:
-  *   unsigned char *value: vector that will contain the element's content. 
-  *                         VALUE must be a pointer to memory cells already allocated.
-  *   int *len: number of bytes of *value: value[0]..value[len-1]
-  * 
-  * Return Value:
+  * Returns:
+  *
   *   ASN_OK: set value OK
   *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
   *   ASN_VALUE_NOT_FOUND: there isn't any value for the element selected.
   * 
-  * Examples: a description for each type
+  * Examples: 
+  *   a description for each type
   *   INTEGER: VALUE will contain a two's complement form integer.
   *            integer=-1  -> value[0]=0xFF , len=1
   *            integer=1   -> value[0]=0x01 , len=1

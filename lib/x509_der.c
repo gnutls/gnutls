@@ -808,22 +808,15 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
 /**
   * asn1_create_der - Creates the DER encoding for the NAME structure
   * @root: pointer to a structure
-  * @name: the name of the structure you want to encode
-  * @der: vector that will contain the DER encoding. 
+  * @name: the name of the structure you want to encode (it must be inside *POINTER).
+  * @der: vector that will contain the DER encoding. DER must be a pointer to memory cells already allocated.
   * @len: number of bytes of *der: der[0]..der[len-1]
+  * Description:
   *
   * Creates the DER encoding for the NAME structure (inside *POINTER structure).
   * 
-  * Input Parameters:
-  *   node_asn *pointer: pointer to a structure
-  *   char *name: the name of the structure you want to encode (it must be inside *POINTER).
-  * 
-  * Output Parameters:
-  *   unsigned char *der: vector that will contain the DER encoding. 
-  *                       DER must be a pointer to memory cells already allocated.
-  *   int *len: number of bytes of *der: der[0]..der[len-1]
-  * 
-  * Return Value:
+  * Returns:
+  *
   *   ASN_OK: DER encoding OK
   *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
   *   ASN_VALUE_NOT_FOUND: there is an element without a value.
@@ -970,19 +963,16 @@ asn1_create_der(node_asn *root,char *name,unsigned char *der,int *len)
   * @root: pointer to a structure
   * @der: vector that contains the DER encoding. 
   * @len: number of bytes of *der: der[0]..der[len-1]
+  * Description:
   *
   * Fill the structure *POINTER with values of a DER encoding string. The sructure must just be
   * created with function 'create_stucture'.
   * 
-  * Input Parameters:
-  *   node_asn *pointer: pointer to the structure that you want to fill.
-  *   unsigned char *der: vector that contains the DER encoding. 
-  *   int len: number of bytes of *der: der[0]..der[len-1]
-  * 
-  * Return Value:
+  * Returns:
+  *
   *   ASN_OK: DER encoding OK
   *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *   ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.  
+  *   ASN_TAG_ERROR,ASN_DER_ERROR: the der encoding doesn't match the structure NAME.  
   **/
 
 int 
@@ -1209,6 +1199,7 @@ asn1_get_der(node_asn *root,unsigned char *der,int len)
   * @name_element: an element of NAME structure.
   * @start: the position of the first byte of NAME_ELEMENT decoding (der[*start]) 
   * @end: the position of the last byte of NAME_ELEMENT decoding (der[*end])
+  * Description:
   * 
   * Find the start and end point of an element in a DER encoding string. I mean that if you
   * have a der encoding and you have already used the function "get_der" to fill a structure, it may
@@ -1216,20 +1207,11 @@ asn1_get_der(node_asn *root,unsigned char *der,int len)
   * 
   * Example: the sequence "tbsCertificate" inside an X509 certificate.
   *
-  * Input Parameters:
-  *   node_asn *pointer: the pointer to the structure that is already setted with DER string.
-  *   unsigned char *der: vector that contains the DER encoding. 
-  *   int len: number of bytes of *der: der[0]..der[len-1]
-  *   char *name_element: an element of NAME structure.
-  * 
-  * Output Parameters:
-  *   int *start: the position of the first byte of NAME_ELEMENT decoding (der[*start]) 
-  *   int *end: the position of the last byte of NAME_ELEMENT decoding (der[*end])
-  * 
-  * Return Value:
+  * Returns:
+  *
   *   ASN_OK: DER encoding OK
   *   ASN_ELEMENT_NOT_FOUND: NAME or NAME_ELEMENT is not a valid element.
-  *   ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
+  *   ASN_TAG_ERROR,ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
   *
   **/
 int 
