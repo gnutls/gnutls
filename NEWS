@@ -1,5 +1,6 @@
 Version 1.1.18
 - Added example client and server for anonymous authentication.
+- Added self test that tests anonymous TLS client and server.
 
 Version 1.1.17 (18/08/2004)
 - Bug fix of padding string in RSA PKCS#1 v1.5 type 2 encryption,

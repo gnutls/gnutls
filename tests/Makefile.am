@@ -24,7 +24,7 @@ LDADD = ../lib/libgnutls.la libutils.la
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
-TESTS = simple
+TESTS = simple anonself
 check_PROGRAMS = $(TESTS)
 
 # LIBS=`../lib/libgnutls-config --libs`  -lgcrypt
