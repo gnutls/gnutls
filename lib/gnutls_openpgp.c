@@ -730,7 +730,7 @@ leave:
  *
  * This funtion is used to load OpenPGP keys into the GnuTLS structure.
  * It doesn't matter whether the keys are armored or but, but the files
- * should only contain one key.
+ * should only contain one key which should not be encrypted.
  **/
 int
 gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
