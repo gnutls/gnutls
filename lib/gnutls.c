@@ -149,6 +149,10 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 /* This function clears all buffers associated with the state. */
 int gnutls_deinit(GNUTLS_STATE * state)
 {
+	/* if the session has failed abnormally it has to be removed from the db */
+	if ( (*state)->gnutls_internals.resumable==RESUME_FALSE) {
+		_gnutls_db_remove_session( (*state), (*state)->security_parameters.session_id, (*state)->security_parameters.session_id_size);
+	}
 	gnutls_free((*state)->connection_state.read_compression_state);
 	gnutls_free((*state)->connection_state.read_mac_secret);
 	gnutls_free((*state)->connection_state.write_compression_state);
