@@ -505,7 +505,7 @@ int gnutls_openpgp_key_check_hostname(gnutls_openpgp_key key,
                                         dnsname, &dnsnamesize);
 
       if (_gnutls_hostname_compare(dnsname, hostname)) {
-         return GNUTLS_E_NAME_DOES_NOT_MATCH;
+         return 1;
       }
    }
 
