@@ -347,7 +347,6 @@ int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 
 	gnutls_hash(td, salt, salt_size);
 	gnutls_hash(td, res, 20);	/* 20 bytes is the output of sha1 */
-	gnutls_free(res);
 
 	gnutls_hash_deinit(td, digest);
 
