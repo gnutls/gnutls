@@ -453,7 +453,7 @@ X520pseudonym ::=	DirectoryString
 id-at-streetAddress 	AttributeType   ::=     {id-at 9}
 X520streetAddress ::=	DirectoryString
 
-id-at-postalAddress ::=	{id-at 16}
+id-at-postalAddress	AttributeType	::=	{id-at 16}
 X520postalAddress ::= PostalAddress
 
 PostalAddress ::= SEQUENCE OF DirectoryString
