@@ -24,8 +24,8 @@
 #include "gnutls_errors.h"
 
 /* include all the kx handler's definitions */
-#include "gnutls_anon.h"
-#include "gnutls_dhe_dss.h"
+#include "auth_anon.h"
+#include "auth_dhe_dss.h"
 
 /* TLS Versions */
 
