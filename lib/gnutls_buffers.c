@@ -381,6 +381,9 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 	while (left > 0) {
 		i = _gnutls_send_func(fd, &ptr[i], left, flags);
 		if (i == -1) {
+#if 0 /* currently this is not right, since the functions
+       * above this, cannot handle interrupt, and eagain errors.
+       */
 			if (errno == EAGAIN || errno == EINTR) {
 				if (n-left > 0) {
 					gnutls_assert();
@@ -393,6 +396,10 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 				gnutls_assert();
 				return GNUTLS_E_UNKNOWN_ERROR;
 			}
+#endif
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+
 		}
 		left -= i;
 	}
