@@ -332,7 +332,7 @@ int gnutls_close(int cd, GNUTLS_STATE state)
 
 	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
-	/* receive pending data or the closure alert */
+	/* receive the closure alert */
 	gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0); 
 
 	state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -520,11 +520,11 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 	if ( _gnutls_Read(cd, &recv_type, 1) != 1) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;
+		if (type==GNUTLS_ALERT) return 0; /* we were expecting close notify */
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-
 	version.local = 0; /* TLS/SSL 3.0 */
 	
 	if (_gnutls_Read(cd, &version.major, 1) != 1) {
@@ -610,7 +610,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		return 0;
 	}
 
-	tmplen = _gnutls_decrypt( state, ciphertext, length, &tmpdata, type);
+	tmplen = _gnutls_decrypt( state, ciphertext, length, &tmpdata, recv_type);
 	if (tmplen < 0) {
 		switch (tmplen) {
 			case GNUTLS_E_MAC_FAILED:
@@ -637,7 +637,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	} else {
 		switch (recv_type) {
 		case GNUTLS_ALERT:
-#ifdef HARD_DEBUG
+#ifdef DEBUG
 			fprintf(stderr, "Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];

@@ -150,9 +150,6 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 	}
 
 	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_FINISHED);
-#ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Send finished\n");
-#endif
 	gnutls_free(data);
 
 	return ret;

@@ -46,7 +46,7 @@ char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 	if (!new)
 		return (new);
 
-	for (i = j = 0; j < oldlen; j+=2) {
+	for (i = j = 0; i < oldlen; j+=2) {
 		sprintf(&new[j], "%.2x", old[i]);
 		i++;
 	}
@@ -54,7 +54,6 @@ char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 
 	return (new);
 }
-
 
 void _gnutls_print_state(GNUTLS_STATE state)
 {

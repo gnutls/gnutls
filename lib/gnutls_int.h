@@ -2,7 +2,7 @@
 
 #define GNUTLS_INT_H
 
-#define HANDSHAKE_DEBUG
+//#define HANDSHAKE_DEBUG
 //#define HARD_DEBUG
 //#define READ_DEBUG
 //#define WRITE_DEBUG

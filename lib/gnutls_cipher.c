@@ -624,7 +624,6 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 		}
 		data = gnutls_malloc(length);
 		memmove(data, content, length);
-
 		compressed->fragment = data;
 		compressed->length = length;
 		compressed->type = ciphertext->type;
