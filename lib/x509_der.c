@@ -986,7 +986,6 @@ asn1_create_der(node_asn *root,char *name,unsigned char *der,int *len)
   *   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
   *   ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.  
   **/
-int 
 
 int 
 asn1_get_der(node_asn *root,unsigned char *der,int len)
