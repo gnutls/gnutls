@@ -118,14 +118,14 @@ void* gnutls_db_get_ptr( GNUTLS_STATE state) {
 }
 
 /**
-  * gnutls_set_cache_expiration - Sets the expiration time for resumed sessions.
+  * gnutls_db_set_cache_expiration - Sets the expiration time for resumed sessions.
   * @state: is a &GNUTLS_STATE structure.
   * @seconds: is the number of seconds.
   *
   * Sets the expiration time for resumed sessions. The default is 3600 (one hour)
   * at the time writing this.
   **/
-void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds) {
+void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds) {
 	state->gnutls_internals.expire_time = seconds;
 }
 

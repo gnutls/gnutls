@@ -54,7 +54,7 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
 }
 
 /**
-  * gnutls_set_lowat - Used to set the lowat value in order for select to check for pending data.
+  * gnutls_transport_set_lowat - Used to set the lowat value in order for select to check for pending data.
   * @state: is a &GNUTLS_STATE structure.
   * @num: is the low water value.
   *
@@ -66,7 +66,7 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
   * Otherwise it must be called and set lowat to zero.
   *
   **/
-void gnutls_set_lowat(GNUTLS_STATE state, int num) {
+void gnutls_transport_set_lowat(GNUTLS_STATE state, int num) {
 	state->gnutls_internals.lowat = num;
 }
 
