@@ -22,6 +22,7 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
+#include <ext_server_name.h>
 
 /* 
  * In case of a server: if a NAME_DNS extension type is received then it stores
@@ -34,16 +35,25 @@
  */
 
 int _gnutls_server_name_recv_params(gnutls_session session,
-				    const opaque * data, int data_size)
+				    const opaque * data, size_t _data_size)
 {
    int i;
    const char *p;
    uint16 len, type;
+   ssize_t data_size = _data_size;
    int server_names = 0;
 
    if (session->security_parameters.entity == GNUTLS_SERVER) {
       DECR_LENGTH_RET(data_size, 2, 0);
       len = _gnutls_read_uint16(data);
+      
+      if ( len != data_size) {
+         /* This is unexpected packet length, but
+          * just ignore it, for now.
+          */
+         gnutls_assert();
+         return 0;
+      }
 
       p = data + 2;
 
@@ -67,6 +77,8 @@ int _gnutls_server_name_recv_params(gnutls_session session,
       if (server_names == 0)
 	 return 0;		/* no names found */
 
+      /* we cannot accept more server names.
+       */
       if ( server_names > MAX_SERVER_NAME_EXTENSIONS)
          server_names = MAX_SERVER_NAME_EXTENSIONS;
 
@@ -102,11 +114,12 @@ int _gnutls_server_name_recv_params(gnutls_session session,
  * data is allocated localy
  */
 int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
-				    int data_size)
+				    size_t _data_size)
 {
    uint16 len;
    char *p;
    int i;
+   ssize_t data_size = _data_size;
    int total_size = 0;
 
    /* this function sends the client extension data (dnsname) */
@@ -116,19 +129,19 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
       total_size = 2;
       for (i = 0;
 	   i < session->security_parameters.extensions.server_names_size;
-	   i++) {
+	   i++) 
+      {
 	   /* count the total size */
 	   len = session->security_parameters.extensions.server_names[i].name_length;
 	   /* uint8 + uint16 + size */
-	   total_size += len + 1 + 2;
+	   total_size += 1 + 2 + len;
       }
-
-      /* UINT16: total size of all names */
-      if (data_size < 2) return GNUTLS_E_INVALID_REQUEST;
 
       p = data;
 
-      DECR_LEN( data_size, 2);
+      /* UINT16: write total size of all names 
+       */
+      DECR_LENGTH_RET( data_size, 2, GNUTLS_E_INVALID_REQUEST);
       _gnutls_write_uint16(total_size, p);
       p += 2;
 
@@ -146,9 +159,9 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 
 	       /* UINT8: type of this extension
 	        * UINT16: size of the first name
-	        * REST of the data ( we only send one name);
+	        * LEN: the actual server name.
 	        */
-               DECR_LEN( data_size, len + 3);
+               DECR_LENGTH_RET( data_size, len + 3, GNUTLS_E_INVALID_REQUEST);
 
 	       *p = 0;		/* NAME_DNS type */
 	       p++;
