@@ -30,6 +30,7 @@
 #include "../lib/gnutls.h"
 #include <common.h>
 #include <signal.h>
+#include <serv-gaa.h>
 
 #define KEYFILE1 "x509/key.pem"
 #define CERTFILE1 "x509/cert.pem"
@@ -52,6 +53,8 @@
 /* global stuff */
 static char http_buffer[16*1024];
 static int generate = 0;
+static int http = 0;
+static int port = 0;
 
 /* end of globals */
 
@@ -81,56 +84,47 @@ GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
 GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
 GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
 
+static int prime_nums[] = { 768, 1024, 2048, 0 };
+
 static int generate_dh_primes(void) {
 gnutls_datum prime, generator;
+int i=0;
 
+   do {
    /* Generate Diffie Hellman parameters - for use with DHE
     * kx algorithms. These should be discarded and regenerated
     * once a day, once a week or once a month. Depends on the
     * security requirements.
     */
-   printf("Generating Diffie Hellman parameters. Please wait...");
+   printf("Generating Diffie Hellman parameters [%d]. Please wait...", prime_nums[i]);
    fflush(stdout);
-   if (gnutls_dh_generate_params( &prime, &generator, 768) < 0) {
+   if (gnutls_dh_generate_params( &prime, &generator, prime_nums[i]) < 0) {
    	fprintf(stderr, "Error in prime generation\n");
    	exit(1);
    }
-   if (gnutls_dh_replace_params( prime, generator, 768) < 0) {
+   if (gnutls_dh_replace_params( prime, generator, prime_nums[i++]) < 0) {
    	fprintf(stderr, "Error in prime replacement\n");
    	exit(1);
    }
-
    free( prime.data);
    free( generator.data);
-
-   if (gnutls_dh_generate_params( &prime, &generator, 1024) < 0) {
-   	fprintf(stderr, "Error in prime generation\n");
-   	exit(1);
-   }
-   if (gnutls_dh_replace_params( prime, generator, 1024) < 0) {
-   	fprintf(stderr, "Error in prime replacement\n");
-   	exit(1);
-   }
-
-   /* do the same for 2048, 4096 etc. */
-
-   free( prime.data);
-   free( generator.data);
+   
+   } while( prime_nums[i]!=0);
 
    return 0;
 }
 
+int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+int kx_priority[16] = { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
+int cipher_priority[16] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
+int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 GNUTLS_STATE initialize_state(void)
 {
 	GNUTLS_STATE state;
 	int ret;
-	int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-	int kx_priority[] = { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
-	int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
-	int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
-	int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
-	int cert_type_priority[] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
@@ -278,6 +272,8 @@ int last_alert;
 	}
 }
 
+static void gaa_parser(int argc, char **argv);
+
 int main(int argc, char **argv)
 {
 	int err, listen_sd, i;
@@ -289,21 +285,16 @@ int main(int argc, char **argv)
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF + 1];
 	int optval = 1;
-	int http = 0;
 	char name[256];
 
 	signal(SIGPIPE, SIG_IGN);
+
+	gaa_parser(argc, argv);
 	
-	if (argc != 2) {
-		fprintf(stderr, "Usage: serv [-e] [-h]\n");
-		exit(1);
+	if (http==1) {
+		strcpy(name, "HTTP Server");
 	} else {
-		if (argv[1][strlen(argv[1])-1]=='h') {
-			http = 1;
-			strcpy(name, "HTTP Server");
-		} else {
-			strcpy(name, "Echo Server");
-		}
+		strcpy(name, "Echo Server");
 	}
 	
 	if (gnutls_global_init() < 0) {
@@ -356,7 +347,7 @@ int main(int argc, char **argv)
 	memset(&sa_serv, '\0', sizeof(sa_serv));
 	sa_serv.sin_family = AF_INET;
 	sa_serv.sin_addr.s_addr = INADDR_ANY;
-	sa_serv.sin_port = htons(PORT);	/* Server Port number */
+	sa_serv.sin_port = htons(port);	/* Server Port number */
 
 	setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, &optval,
 		   sizeof(int));
@@ -365,7 +356,7 @@ int main(int argc, char **argv)
 	err = listen(listen_sd, 1024);
 	ERR(err, "listen");
 
-	printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
+	printf("%s ready. Listening to port '%d'.\n\n", name, port);
 
 	client_len = sizeof(sa_cli);
 	
@@ -480,3 +471,100 @@ int main(int argc, char **argv)
 	return 0;
 
 }
+
+
+static gaainfo info;
+void gaa_parser(int argc, char **argv)
+{
+	int i, j;
+
+	if (gaa(argc, argv, &info) != -1) {
+		fprintf(stderr, "Error in the arguments.\n");
+		exit(1);
+	}
+
+	if (info.http==0) http=0;
+	else http=1;
+
+	if (info.generate==0) generate=0;
+	else generate=1;
+	
+	port = info.port;
+
+	if (info.proto != NULL && info.nproto > 0) {
+		for (j = i = 0; i < info.nproto; i++) {
+			if (strncasecmp(info.proto[i], "SSL", 3) == 0)
+				protocol_priority[j++] = GNUTLS_SSL3;
+			if (strncasecmp(info.proto[i], "TLS", 3) == 0)
+				protocol_priority[j++] = GNUTLS_TLS1;
+		}
+		protocol_priority[j] = 0;
+	}
+
+	if (info.ciphers != NULL && info.nciphers > 0) {
+		for (j = i = 0; i < info.nciphers; i++) {
+			if (strncasecmp(info.ciphers[i], "RIJ", 3) == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+			if (strncasecmp(info.ciphers[i], "TWO", 3) == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_TWOFISH_128_CBC;
+			if (strncasecmp(info.ciphers[i], "3DE", 3) == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_3DES_CBC;
+			if (strncasecmp(info.ciphers[i], "ARC", 3) == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_ARCFOUR;
+		}
+		cipher_priority[j] = 0;
+	}
+
+	if (info.macs != NULL && info.nmacs > 0) {
+		for (j = i = 0; i < info.nmacs; i++) {
+			if (strncasecmp(info.macs[i], "MD5", 3) == 0)
+				mac_priority[j++] = GNUTLS_MAC_MD5;
+			if (strncasecmp(info.macs[i], "SHA", 3) == 0)
+				mac_priority[j++] = GNUTLS_MAC_SHA;
+		}
+		mac_priority[j] = 0;
+	}
+
+	if (info.ctype != NULL && info.nctype > 0) {
+		for (j = i = 0; i < info.nctype; i++) {
+			if (strncasecmp(info.ctype[i], "OPE", 3) == 0)
+				cert_type_priority[j++] =
+				    GNUTLS_CRT_OPENPGP;
+			if (strncasecmp(info.ctype[i], "X", 1) == 0)
+				cert_type_priority[j++] = GNUTLS_CRT_X509;
+		}
+		cert_type_priority[j] = 0;
+	}
+
+	if (info.kx != NULL && info.nkx > 0) {
+		for (j = i = 0; i < info.nkx; i++) {
+			if (strncasecmp(info.kx[i], "SRP", 3) == 0)
+				kx_priority[j++] = GNUTLS_KX_SRP;
+			if (strncasecmp(info.kx[i], "RSA", 3) == 0)
+				kx_priority[j++] = GNUTLS_KX_RSA;
+			if (strncasecmp(info.kx[i], "DHE_RSA", 7) == 0)
+				kx_priority[j++] = GNUTLS_KX_DHE_RSA;
+			if (strncasecmp(info.kx[i], "DHE_DSS", 7) == 0)
+				kx_priority[j++] = GNUTLS_KX_DHE_DSS;
+			if (strncasecmp(info.kx[i], "ANON", 4) == 0)
+				kx_priority[j++] = GNUTLS_KX_ANON_DH;
+		}
+		kx_priority[j] = 0;
+	}
+
+	if (info.comp != NULL && info.ncomp > 0) {
+		for (j = i = 0; i < info.ncomp; i++) {
+			if (strncasecmp(info.comp[i], "NUL", 3) == 0)
+				comp_priority[j++] = GNUTLS_COMP_NULL;
+			if (strncasecmp(info.comp[i], "ZLI", 1) == 0)
+				comp_priority[j++] = GNUTLS_COMP_ZLIB;
+		}
+		comp_priority[j] = 0;
+	}
+
+}
+

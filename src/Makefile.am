@@ -1,11 +1,11 @@
 EXTRA_DIST = common.h prime.gaa crypt.gaa crypt-gaa.h README.srpcrypt prime-gaa.h \
-		README cli.gaa cli-gaa.h
+		README cli.gaa cli-gaa.h serv-gaa.h serv.gaa
 SUBDIRS = srp x509 openpgp
 
 INCLUDES = -I../lib
 
 noinst_PROGRAMS = serv cli srpcrypt prime asn1c CertificateExample CrlExample
-serv_SOURCES = serv.c common.c
+serv_SOURCES = serv.c common.c serv-gaa.c
 serv_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 srpcrypt_SOURCES = crypt-gaa.c crypt.c
 srpcrypt_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
@@ -28,4 +28,6 @@ prime-gaa.c: prime.gaa
 	gaa prime.gaa -o prime-gaa.c -i prime-gaa.h
 cli-gaa.c: cli.gaa
 	gaa cli.gaa -o cli-gaa.c -i cli-gaa.h
+serv-gaa.c: serv.gaa
+	gaa serv.gaa -o serv-gaa.c -i serv-gaa.h
 

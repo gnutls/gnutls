@@ -153,8 +153,6 @@ int print_info(GNUTLS_STATE state)
 	/* print the key exchange's algorithm name
 	 */
 	kx = gnutls_kx_get(state);
-	tmp = gnutls_kx_get_name(kx);
-	printf("- Key Exchange: %s\n", tmp);
 
 	cred = gnutls_auth_get_type(state);
 	switch (cred) {
@@ -206,8 +204,8 @@ int print_info(GNUTLS_STATE state)
 	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
 	printf("- Version: %s\n", tmp);
 
-	tmp = gnutls_compression_get_name(gnutls_compression_get(state));
-	printf("- Compression: %s\n", tmp);
+	tmp = gnutls_kx_get_name(kx);
+	printf("- Key Exchange: %s\n", tmp);
 
 	tmp = gnutls_cipher_get_name(gnutls_cipher_get(state));
 	printf("- Cipher: %s\n", tmp);
@@ -215,5 +213,46 @@ int print_info(GNUTLS_STATE state)
 	tmp = gnutls_mac_get_name(gnutls_mac_get(state));
 	printf("- MAC: %s\n", tmp);
 
+	tmp = gnutls_compression_get_name(gnutls_compression_get(state));
+	printf("- Compression: %s\n", tmp);
+
 	return 0;
+}
+
+void print_list(void)
+{
+	/* FIXME: This is hard coded. Make it print all the supported
+	 * algorithms.
+	 */
+	printf("\n");
+	printf("Certificate types:");
+	printf(" X.509");
+	printf(", OPENPGP\n");
+
+	printf("Protocols:");
+	printf(" TLS 1.0");
+	printf(", SSL 3.0\n");
+
+	printf("Ciphers:");
+	printf(" RIJNDAEL_128_CBC");
+	printf(", TWOFISH_128_CBC");
+	printf(", 3DES_CBC");
+	printf(", ARCFOUR\n");
+
+	printf("MACs:");
+	printf(" MD5");
+	printf(", SHA-1\n");
+
+	printf("Key exchange algorithms:");
+	printf(" RSA");
+	printf(", DHE_DSS");
+	printf(", DHE_RSA");
+	printf(", SRP");
+	printf(", ANON_DH\n");
+
+	printf("Compression methods:");
+	printf(" ZLIB");
+	printf(", NULL\n");
+
+	return;
 }
