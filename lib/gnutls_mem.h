@@ -1,3 +1,6 @@
+#ifndef GNUTLS_MEM_H
+# define GNUTLS_MEM_H
+
 #ifdef USE_DMALLOC
 # include <dmalloc.h>
 #endif
@@ -36,3 +39,4 @@ char* gnutls_strdup( const char* s);
 
 #endif
 
+#endif /* GNUTLS_MEM_H */

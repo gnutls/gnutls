@@ -929,7 +929,8 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
  * the given key parameters.
  */
 static int _gnutls_check_key_cert_match( GNUTLS_CERTIFICATE_CREDENTIALS res) {
-	if (res->pkey->pk_algorithm != res->cert_list[0]->subject_pk_algorithm) {
+	
+	if (res->pkey[res->ncerts-1].pk_algorithm != res->cert_list[res->ncerts-1][0].subject_pk_algorithm) {
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
 	}
@@ -1021,7 +1022,6 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 
 	res->cert_list_length[res->ncerts] = i - 1;
 
-	res->ncerts++;
 
 	return 0;
 }
@@ -1150,7 +1150,6 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 			break;	
 	}
 	gnutls_free(b64);
-
 	return 0;
 }
 
@@ -1249,6 +1248,8 @@ int gnutls_certificate_set_x509_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, cha
 
 	if ((ret = read_cert_file(res, CERTFILE)) < 0)
 		return ret;
+
+	res->ncerts++;
 
 	if ((ret=_gnutls_check_key_cert_match( res)) < 0) {
 		gnutls_assert();
