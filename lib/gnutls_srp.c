@@ -352,7 +352,7 @@ void gnutls_free_srp_client_sc( SRP_CLIENT_CREDENTIALS* sc) {
 
 /**
   * gnutls_allocate_srp_server_sc - Used to allocate an SRP_CLIENT_CREDENTIALS structure
-  * @res: is a pointer to an &SRP_CLIENT_CREDENTIALS structure.
+  * @sc: is a pointer to an &SRP_CLIENT_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
@@ -401,7 +401,7 @@ void gnutls_free_srp_server_sc( SRP_SERVER_CREDENTIALS* sc) {
 
 /**
   * gnutls_allocate_srp_server_sc - Used to allocate an SRP_SERVER_CREDENTIALS structure
-  * @res: is a pointer to an &SRP_SERVER_CREDENTIALS structure.
+  * @sc: is a pointer to an &SRP_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate

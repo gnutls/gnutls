@@ -40,7 +40,7 @@ void gnutls_free_anon_server_sc( ANON_SERVER_CREDENTIALS* sc) {
 
 /**
   * gnutls_allocate_anon_server_sc - Used to allocate an ANON_SERVER CREDENTIALS structure
-  * @res: is a pointer to an &ANON_SERVER_CREDENTIALS structure.
+  * @sc: is a pointer to an &ANON_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate

@@ -4,4 +4,4 @@ EXTRA_DIST = ChangeLog NEWS INSTALL README THANKS COPYING
 SUBDIRS = lib src doc
 
 ChangeLog:
-	cvs2cl --utc -t -P -U .cvsusers 
+	cvs2cl --utc -t -U .cvsusers 
