@@ -144,7 +144,7 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 
 	ret += (data_size * 4) / 3;
 
-	(*result) = gnutls_malloc( ret + 1);
+	(*result) = gnutls_calloc( 1, ret + 1);
 	if ((*result) == NULL)
 		return -1;
 
@@ -161,8 +161,7 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 		memcpy(&(*result)[0], tmpres, tmp);
 		i = mod;
 		j = tmp;
-		
-		(*result)[j] = 0;
+
 	}
 /* encode the rest
  */
@@ -173,7 +172,6 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 			return tmp;
 		}
 		memcpy(&(*result)[j], tmpres, tmp);
-		(*result)[j+tmp] = 0;
 	}
 
 	return strlen(*result);

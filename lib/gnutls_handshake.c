@@ -139,7 +139,7 @@ static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip,
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	siz = gnutls_get_handshake_buffer_size(state) - skip;
+	siz = _gnutls_handshake_buffer_get_size(state) - skip;
 	data = gnutls_malloc(siz);
 	if (data == NULL) {
 		gnutls_assert();
@@ -148,7 +148,7 @@ static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	gnutls_read_handshake_buffer(state, data, siz);
+	_gnutls_handshake_buffer_peek(state, data, siz);
 
 	gnutls_mac_ssl3(td, data, siz);
 	gnutls_mac_ssl3(td2, data, siz);
@@ -197,7 +197,7 @@ int _gnutls_finished(GNUTLS_STATE state, int type, int skip, void *ret)
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	siz = gnutls_get_handshake_buffer_size(state) - skip;
+	siz = _gnutls_handshake_buffer_get_size(state) - skip;
 
 	data = gnutls_malloc(siz);
 	if (data == NULL) {
@@ -207,7 +207,7 @@ int _gnutls_finished(GNUTLS_STATE state, int type, int skip, void *ret)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	gnutls_read_handshake_buffer(state, data, siz);
+	_gnutls_handshake_buffer_get(state, data, siz);
 
 	gnutls_hash(td, data, siz);
 	gnutls_hash(td2, data, siz);
@@ -650,7 +650,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 		/* we are resuming a previously interrupted
 		 * send.
 		 */
-		ret = _gnutls_handshake_write_flush(state);
+		ret = _gnutls_handshake_io_write_flush(state);
 		return ret;
 
 	}
@@ -685,7 +685,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 	if (type != GNUTLS_HELLO_REQUEST) {
 
 		if ((ret =
-		     gnutls_insert_to_handshake_buffer(state, data,
+		     _gnutls_handshake_buffer_put(state, data,
 						       datasize)) < 0) {
 			gnutls_assert();
 			gnutls_free(data);
@@ -694,7 +694,7 @@ int _gnutls_send_handshake(GNUTLS_STATE state, void *i_data,
 	}
 
 	ret =
-	    _gnutls_handshake_send_int(state, GNUTLS_HANDSHAKE, type,
+	    _gnutls_handshake_io_send_int(state, GNUTLS_HANDSHAKE, type,
 				       data, datasize);
 
 	gnutls_free(data);
@@ -744,7 +744,7 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 	if (state->gnutls_internals.handshake_header_buffer.header_size <
 	    SSL2_HEADERS) {
 		ret =
-		    _gnutls_handshake_recv_int(state, GNUTLS_HANDSHAKE,
+		    _gnutls_handshake_io_recv_int(state, GNUTLS_HANDSHAKE,
 					       type, dataptr,
 					       SSL2_HEADERS);
 
@@ -766,7 +766,7 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 	if (state->gnutls_internals.v2_hello == 0
 	    || type != GNUTLS_CLIENT_HELLO) {
 		ret =
-		    _gnutls_handshake_recv_int(state, GNUTLS_HANDSHAKE,
+		    _gnutls_handshake_io_recv_int(state, GNUTLS_HANDSHAKE,
 					       type,
 					       &dataptr[state->
 							gnutls_internals.
@@ -831,7 +831,7 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 
 	if (*recv_type != GNUTLS_HELLO_REQUEST) {
 		if ((ret =
-		     gnutls_insert_to_handshake_buffer(state, dataptr,
+		     _gnutls_handshake_buffer_put(state, dataptr,
 						       handshake_header_size))
 		    < 0) {
 			gnutls_assert();
@@ -839,7 +839,7 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 		}
 	}
 
-	/* This MUST be after insert_to_handshake_buffer(), because
+	/* This MUST be after handshake_buffer_put(), because
 	 * of optional packets.
 	 */
 	if (*recv_type != type) {
@@ -850,7 +850,7 @@ static int _gnutls_recv_handshake_header(GNUTLS_STATE state,
 	return length32;
 }
 
-#define _gnutls_clear_handshake_header_buffer( state) state->gnutls_internals.handshake_header_buffer.header_size = 0
+#define _gnutls_handshake_header_buffer_clear( state) state->gnutls_internals.handshake_header_buffer.header_size = 0
 
 
 /* This function will receive handshake messages of the given types,
@@ -900,7 +900,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 
 	if (length32 > 0) {
 		ret =
-		    _gnutls_handshake_recv_int(state, GNUTLS_HANDSHAKE,
+		    _gnutls_handshake_io_recv_int(state, GNUTLS_HANDSHAKE,
 					       type, dataptr, length32);
 		if (ret <= 0) {
 			gnutls_assert();
@@ -915,7 +915,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 	 * have have received above. if we get here the we clear the handshake
 	 * header we received.
 	 */
-	_gnutls_clear_handshake_header_buffer(state);
+	_gnutls_handshake_header_buffer_clear(state);
 
 	ret = GNUTLS_E_UNKNOWN_ERROR;
 
@@ -926,7 +926,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 
 	if (recv_type != GNUTLS_HELLO_REQUEST && length32 > 0) {
 		if ((ret =
-		     gnutls_insert_to_handshake_buffer(state, dataptr,
+		     _gnutls_handshake_buffer_put(state, dataptr,
 						       length32)) < 0) {
 			gnutls_assert();
 			return ret;
@@ -1704,7 +1704,7 @@ int gnutls_handshake(GNUTLS_STATE state)
 
 	STATE = STATE0;
 
-	_gnutls_clear_handshake_buffers(state);
+	_gnutls_handshake_io_buffer_clear(state);
 
 	return 0;
 }
@@ -1714,7 +1714,7 @@ int gnutls_handshake(GNUTLS_STATE state)
 		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
-		gnutls_clear_handshake_buffer(state); \
+		_gnutls_handshake_buffer_clear(state); \
 		return ret; \
 	}
 
@@ -2094,8 +2094,9 @@ int gnutls_handshake_common(GNUTLS_STATE state)
 		/* in order to support session resuming */
 		_gnutls_server_register_current_session(state);
 	}
+
 	/* clear handshake buffer */
-	gnutls_clear_handshake_buffer(state);
+	_gnutls_handshake_buffer_clear(state);
 	return ret;
 
 }

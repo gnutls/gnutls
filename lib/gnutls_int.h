@@ -144,7 +144,7 @@ typedef struct {
 
 /* STATE */
 typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
-typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_TWOFISH_CBC, GNUTLS_CIPHER_RIJNDAEL256_CBC } BulkCipherAlgorithm;
+typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC } BulkCipherAlgorithm;
 typedef enum Extensions { GNUTLS_EXTENSION_DNSNAME=0, GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6 } Extensions;
 typedef enum KXAlgorithm { GNUTLS_KX_X509PKI_RSA=1, GNUTLS_KX_X509PKI_DHE_DSS, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
@@ -345,9 +345,9 @@ typedef struct {
 } HANDSHAKE_HEADER_BUFFER;
 
 typedef struct {
-	gnutls_datum			buffer;
-	gnutls_datum			hash_buffer; /* used to keep all handshake messages */
-	gnutls_datum			buffer_handshake; /* this is a buffer that holds the current handshake message */
+	gnutls_datum			application_data_buffer; /* holds data to be delivered to application layer */
+	gnutls_datum			handshake_hash_buffer; /* used to keep all handshake messages */
+	gnutls_datum			handshake_data_buffer; /* this is a buffer that holds the current handshake message */
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
 	HandshakeState			handshake_state; /* holds
 					* a number which indicates where
@@ -380,7 +380,7 @@ typedef struct {
 	int				lowat;
 
 	/* These buffers are used in the handshake
-	 * protocol only. freed using _gnutls_clear_handshake_buffers();
+	 * protocol only. freed using _gnutls_handshake_io_buffer_clear();
 	 */
 	gnutls_datum 			handshake_send_buffer;
 	size_t	 			handshake_send_buffer_prev_size;
@@ -393,15 +393,15 @@ typedef struct {
 					/* this buffer holds a record packet -mostly used for
 					 * non blocking IO.
 					 */
-	gnutls_datum			recv_buffer;
-	gnutls_datum			send_buffer; /* holds cached data
-					* for the gnutls_write_buffered()
+	gnutls_datum			record_recv_buffer;
+	gnutls_datum			record_send_buffer; /* holds cached data
+					* for the gnutls_io_write_buffered()
 					* function.
 					*/ 
-	size_t				send_buffer_prev_size; /* holds the
+	size_t				record_send_buffer_prev_size; /* holds the
 	                                * data written in the previous runs.
 	                                */
-	size_t				send_buffer_user_size; /* holds the
+	size_t				record_send_buffer_user_size; /* holds the
 	                                * size of the user specified data to
 	                                * send.
 	                                */
@@ -508,15 +508,6 @@ void _gnutls_free_auth_info( GNUTLS_STATE state);
 
 #define _gnutls_get_adv_version_minor( state) \
 	state->gnutls_internals.adv_version_minor
-
-#define _gnutls_clear_handshake_buffers( state) \
-        gnutls_free( state->gnutls_internals.handshake_send_buffer.data); \
-        gnutls_free( state->gnutls_internals.handshake_recv_buffer.data); \
-        state->gnutls_internals.handshake_send_buffer.data = NULL; \
-        state->gnutls_internals.handshake_recv_buffer.data = NULL; \
-        state->gnutls_internals.handshake_send_buffer.size = 0; \
-        state->gnutls_internals.handshake_recv_buffer.size = 0; \
-        state->gnutls_internals.handshake_send_buffer_prev_size = 0
 
 #define set_adv_version( state, major, minor) \
 	state->gnutls_internals.adv_version_major = major; \

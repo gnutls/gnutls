@@ -31,21 +31,21 @@ GNUTLS_CIPHER_HANDLE ret;
 	case GNUTLS_CIPHER_NULL:
 		ret = GNUTLS_CIPHER_FAILED;
 		break;
-	case GNUTLS_CIPHER_RIJNDAEL_CBC:
+	case GNUTLS_CIPHER_RIJNDAEL_128_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_CIPHER_RIJNDAEL256_CBC:
+	case GNUTLS_CIPHER_RIJNDAEL_256_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_CIPHER_TWOFISH_CBC:
+	case GNUTLS_CIPHER_TWOFISH_128_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "twofish", NULL, "cbc", NULL);
 #else
@@ -74,7 +74,7 @@ GNUTLS_CIPHER_HANDLE ret;
 		/* ivsize is assumed to be blocksize */
 		if ( mcrypt_generic_init( ret, key.data, key.size, iv.data) < 0) {
 			return GNUTLS_CIPHER_FAILED;
-		}; 
+		};
 #else
 		gcry_cipher_setkey(ret, key.data, key.size);
 		if (iv.data!=NULL && iv.size>0) gcry_cipher_setiv(ret, iv.data, iv.size);

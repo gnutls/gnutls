@@ -150,7 +150,7 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	 * This is allocated in order to avoid small messages, makeing
 	 * the receive procedure slow.
 	 */
-	(*state)->gnutls_internals.recv_buffer.data = gnutls_malloc(INITIAL_RECV_BUFFER_SIZE);
+	(*state)->gnutls_internals.record_recv_buffer.data = gnutls_malloc(INITIAL_RECV_BUFFER_SIZE);
 	
 	/* set the default maximum record size for TLS
 	 */
@@ -186,16 +186,16 @@ void gnutls_deinit(GNUTLS_STATE state)
 		gdbm_close(state->gnutls_internals.db_reader);
 #endif
 
-	_gnutls_clear_handshake_buffers( state);
+	_gnutls_handshake_io_buffer_clear( state);
 
 	gnutls_sfree_datum(&state->connection_state.read_mac_secret);
 	gnutls_sfree_datum(&state->connection_state.write_mac_secret);
 
-	_gnutls_free(state->gnutls_internals.recv_buffer.data);
-	_gnutls_free(state->gnutls_internals.buffer.data);
-	_gnutls_free(state->gnutls_internals.buffer_handshake.data);
-	_gnutls_free(state->gnutls_internals.hash_buffer.data);
-	_gnutls_free(state->gnutls_internals.send_buffer.data);
+	_gnutls_free(state->gnutls_internals.application_data_buffer.data);
+	_gnutls_free(state->gnutls_internals.handshake_data_buffer.data);
+	_gnutls_free(state->gnutls_internals.handshake_hash_buffer.data);
+	_gnutls_free(state->gnutls_internals.record_recv_buffer.data);
+	_gnutls_free(state->gnutls_internals.record_send_buffer.data);
 
 	gnutls_clear_creds( state);
 
@@ -420,7 +420,7 @@ int gnutls_bye( GNUTLS_STATE state, CloseRequest how)
 		case STATE0:
 		case STATE60:
 			if (STATE==STATE60) {
-				ret = _gnutls_write_flush( state);
+				ret = _gnutls_io_write_flush( state);
 			} else {
 				ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
 				STATE = STATE60;
@@ -501,14 +501,14 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	/* Only encrypt if we don't have data to send 
 	 * from the previous run. - probably interrupted.
 	 */
-	if (state->gnutls_internals.send_buffer.size > 0) {
-		ret = _gnutls_write_flush( state);
+	if (state->gnutls_internals.record_send_buffer.size > 0) {
+		ret = _gnutls_io_write_flush( state);
 		if (ret > 0) cipher_size = ret;
 		else cipher_size = 0;
 		
 		cipher = NULL;
 
-		retval = state->gnutls_internals.send_buffer_user_size;
+		retval = state->gnutls_internals.record_send_buffer_user_size;
 	} else {
 		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, data, data2send, &cipher, type);
 		if (cipher_size <= 0) {
@@ -518,7 +518,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		}
 
 		retval = data2send;
-		state->gnutls_internals.send_buffer_user_size =	data2send;
+		state->gnutls_internals.record_send_buffer_user_size =	data2send;
 
 		/* increase sequence number
 		 */
@@ -530,7 +530,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			return GNUTLS_E_RECORD_LIMIT_REACHED;
 		}
 
-		ret = _gnutls_write_buffered( state, cipher, cipher_size);
+		ret = _gnutls_io_write_buffered( state, cipher, cipher_size);
 	}
 
 	if ( ret != cipher_size) {
@@ -554,7 +554,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		return ret;
 	}
 
-	state->gnutls_internals.send_buffer_user_size = 0;
+	state->gnutls_internals.record_send_buffer_user_size = 0;
 
 	gnutls_free(cipher);
 
@@ -580,7 +580,7 @@ ssize_t _gnutls_send_change_cipher_spec( GNUTLS_STATE state, int again)
 	if (again==0)
 		return gnutls_send_int( state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
 	else {
-		return _gnutls_write_flush( state);
+		return _gnutls_io_write_flush( state);
 	}
 }
 
@@ -635,16 +635,16 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	/* If we have enough data in the cache do not bother receiving
 	 * a new packet. (in order to flush the cache)
 	 */
-	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && gnutls_get_data_buffer_size(type, state) > 0) {
-		ret = gnutls_get_data_buffer(type, state, data, sizeofdata);
+	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && _gnutls_record_buffer_get_size(type, state) > 0) {
+		ret = _gnutls_record_buffer_get(type, state, data, sizeofdata);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 		
 		/* if the buffer just got empty */
-		if (gnutls_get_data_buffer_size(type, state)==0) {
-			if ( (ret2=_gnutls_clear_peeked_data( state)) < 0) {
+		if (_gnutls_record_buffer_get_size(type, state)==0) {
+			if ( (ret2=_gnutls_io_clear_peeked_data( state)) < 0) {
 				gnutls_assert();
 				return ret2;
 			}
@@ -656,7 +656,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
 	 * must be set to non blocking mode
 	 */
-	if ( (ret = _gnutls_read_buffered( state, &headers, header_size, -1)) != header_size) {
+	if ( (ret = _gnutls_io_read_buffered( state, &headers, header_size, -1)) != header_size) {
 		if (ret < 0 && gnutls_error_is_fatal(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -740,7 +740,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	/* check if we have that data into buffer. 
  	 */
-	if ( (ret = _gnutls_read_buffered( state, &recv_data, header_size+length, recv_type)) != length+header_size) {
+	if ( (ret = _gnutls_io_read_buffered( state, &recv_data, header_size+length, recv_type)) != length+header_size) {
 		if (ret<0 && gnutls_error_is_fatal(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -752,7 +752,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
-	_gnutls_clear_read_buffer( state);
+	_gnutls_io_clear_read_buffer( state);
 	ciphertext = &recv_data[header_size];
 	
 	/* decrypt the data we got
@@ -797,7 +797,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	}
 
 	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
-		gnutls_insert_to_data_buffer(type, state, (void *) tmpdata, tmplen);
+		_gnutls_record_buffer_put(type, state, (void *) tmpdata, tmplen);
 	} else {
 		switch (recv_type) {
 		case GNUTLS_ALERT:
@@ -848,7 +848,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
 			/* even if data is unexpected put it into the buffer */
-			if ( (ret=gnutls_insert_to_data_buffer(recv_type, state, (void *) tmpdata, tmplen)) < 0) {
+			if ( (ret=_gnutls_record_buffer_put(recv_type, state, (void *) tmpdata, tmplen)) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -884,15 +884,15 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	/* Get Application data from buffer */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
-		ret = gnutls_get_data_buffer(type, state, data, sizeofdata);
+		ret = _gnutls_record_buffer_get(type, state, data, sizeofdata);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
 		}
 
 		/* if the buffer just got empty */
-		if (gnutls_get_data_buffer_size(type, state)==0) {
-			if ( (ret2 = _gnutls_clear_peeked_data( state)) < 0) {
+		if (_gnutls_record_buffer_get_size(type, state)==0) {
+			if ( (ret2 = _gnutls_io_clear_peeked_data( state)) < 0) {
 				gnutls_assert();
 				return ret2;
 			}
