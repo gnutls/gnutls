@@ -1,4 +1,4 @@
-Version 0.?.?
+Version 0.5.12
 - Added "gnutls/compat4.h" header. This is included in gnutls.h
   to emulate the old 0.4.x API.
 - Example programs are now stored in doc/examples/
