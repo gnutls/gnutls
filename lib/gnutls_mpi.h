@@ -20,6 +20,7 @@
 #define _gnutls_mpi_mulm gcry_mpi_mulm
 #define _gnutls_mpi_mul gcry_mpi_mul
 #define _gnutls_mpi_add gcry_mpi_add
+#define _gnutls_mpi_mul_ui gcry_mpi_mul_ui
 
 # define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x)) 
 

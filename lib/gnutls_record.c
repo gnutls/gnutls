@@ -327,8 +327,8 @@ ssize_t gnutls_send_int( gnutls_session session, ContentType type, HandshakeType
 	headers[1]=_gnutls_version_get_major( lver);
 	headers[2]=_gnutls_version_get_minor( lver);
 
-	_gnutls_record_log( "REC: Sending Packet[%d] %s(%d) with length: %d\n",
-		(int) _gnutls_uint64touint32(&session->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
+	_gnutls_record_log( "REC[%x]: Sending Packet[%d] %s(%d) with length: %d\n",
+		session, (int) _gnutls_uint64touint32(&session->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 
 	if ( sizeofdata > MAX_RECORD_SEND_SIZE)
 		data2send_size = MAX_RECORD_SEND_SIZE;
@@ -428,8 +428,8 @@ ssize_t gnutls_send_int( gnutls_session session, ContentType type, HandshakeType
 
 	session->internals.record_send_buffer_user_size = 0;
 
-	_gnutls_record_log( "REC: Sent Packet[%d] %s(%d) with length: %d\n",
-	(int) _gnutls_uint64touint32(&session->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
+	_gnutls_record_log( "REC[%x]: Sent Packet[%d] %s(%d) with length: %d\n",
+	session, (int) _gnutls_uint64touint32(&session->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 
 	return retval;
 }
@@ -441,7 +441,7 @@ ssize_t _gnutls_send_change_cipher_spec( gnutls_session session, int again)
 {
 	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
-	_gnutls_handshake_log( "REC: Sent ChangeCipherSpec\n");
+	_gnutls_handshake_log( "REC[%x]: Sent ChangeCipherSpec\n", session);
 
 	if (again==0)
 		return gnutls_send_int( session, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
@@ -522,7 +522,7 @@ static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[R
 		 */
 		session->internals.v2_hello = *length;
 
-		_gnutls_record_log( "REC: V2 packet received. Length: %d\n", *length);
+		_gnutls_record_log( "REC[%x]: V2 packet received. Length: %d\n", session, *length);
 
 	} else {
 		/* version 3.x 
@@ -550,7 +550,8 @@ static int _gnutls_check_record_version( gnutls_session session, HandshakeType h
 	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_protocol_get_version(session) != version) {
 		gnutls_assert();
 
-		_gnutls_record_log( "REC: INVALID VERSION PACKET: (%d) %d.%d\n", htype, _gnutls_version_get_major(version), _gnutls_version_get_minor(version));
+		_gnutls_record_log( "REC[%x]: INVALID VERSION PACKET: (%d) %d.%d\n", 
+			session, htype, _gnutls_version_get_major(version), _gnutls_version_get_minor(version));
 
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
@@ -573,7 +574,8 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 		switch (recv_type) {
 		case GNUTLS_ALERT:
 
-			_gnutls_record_log( "REC: Alert[%d|%d] - %s - was received\n", data[0], data[1], gnutls_alert_get_name((int)data[1]));
+			_gnutls_record_log( "REC[%x]: Alert[%d|%d] - %s - was received\n", 
+				session, data[0], data[1], gnutls_alert_get_name((int)data[1]));
 
 			session->internals.last_alert = data[1];
 
@@ -649,7 +651,8 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 			break;
 		default:
 
-			_gnutls_record_log( "REC: Received Unknown packet %d expecting %d\n", recv_type, type);
+			_gnutls_record_log( "REC[%x]: Received Unknown packet %d expecting %d\n", 
+				session, recv_type, type);
 
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
@@ -746,14 +749,14 @@ ssize_t gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType
 		return ret;
 	}
 
-	_gnutls_record_log( "REC: Expected Packet[%d] %s(%d) with length: %d\n",
-		(int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
-	_gnutls_record_log( "REC: Received Packet[%d] %s(%d) with length: %d\n",
-		(int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, length);
+	_gnutls_record_log( "REC[%x]: Expected Packet[%d] %s(%d) with length: %d\n",
+		session, (int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
+	_gnutls_record_log( "REC[%x]: Received Packet[%d] %s(%d) with length: %d\n",
+		session, (int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, length);
 
 	if (length > MAX_RECV_SIZE) {
 
-		_gnutls_record_log( "REC: FATAL ERROR: Received packet with length: %d\n", length);
+		_gnutls_record_log( "REC[%x]: FATAL ERROR: Received packet with length: %d\n", session, length);
 
 		_gnutls_session_unresumable( session);
 		_gnutls_session_invalidate( session);
@@ -802,7 +805,7 @@ ssize_t gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType
 	 */
 	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
 
-		_gnutls_record_log( "REC: ChangeCipherSpec Packet was received\n");
+		_gnutls_record_log( "REC[%x]: ChangeCipherSpec Packet was received\n", session);
 
 		if ((size_t)tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
@@ -815,8 +818,8 @@ ssize_t gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType
 		return tmplen;
 	}
 
-	_gnutls_record_log( "REC: Decrypted Packet[%d] %s(%d) with length: %d\n",
-		(int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
+	_gnutls_record_log( "REC[%x]: Decrypted Packet[%d] %s(%d) with length: %d\n",
+		session, (int) _gnutls_uint64touint32(&session->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
 
 	/* increase sequence number */
 	if (_gnutls_uint64pp( &session->connection_state.read_sequence_number)!=0) {

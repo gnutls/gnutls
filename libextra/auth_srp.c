@@ -177,6 +177,8 @@ int _gnutls_gen_srp_server_kx0(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	_gnutls_write_uint16( n_b, data_b);
 
+	_gnutls_hard_log( "INT: SRP B[%d]: %s\n", n_b, _gnutls_bin2hex(&data_b[2], n_b));
+
 	_gnutls_srp_entry_free( pwd_entry);
 
 	return data_size;
@@ -229,12 +231,20 @@ int _gnutls_gen_srp_client_kx0(gnutls_session state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
+#ifdef HARD_DEBUG
+	_gnutls_dump_mpi( "SRP U: ", state->key->u);
+#endif
+
 	/* S = (B - g^x) ^ (a + u * x) % N */
 	S = _gnutls_calc_srp_S2( B, G, state->key->x, _a, state->key->u, N);
 	if (S==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
+#ifdef HARD_DEBUG
+	_gnutls_dump_mpi( "SRP B: ", B);
+#endif
 	
 	_gnutls_mpi_release(&_b);
 	_gnutls_mpi_release(&V);
@@ -264,6 +274,8 @@ int _gnutls_gen_srp_client_kx0(gnutls_session state, opaque ** data)
 		gnutls_free( *data);
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
+	_gnutls_hard_log( "INT: SRP A[%d]: %s\n", n_a, _gnutls_bin2hex(&data_a[2], n_a));
+
 	_gnutls_mpi_release(&A);
 
 	_gnutls_write_uint16( n_a, data_a);
@@ -288,6 +300,13 @@ int _gnutls_proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _dat
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
+#ifdef HARD_DEBUG
+	_gnutls_dump_mpi( "SRP A: ", A);
+#endif
+#ifdef HARD_DEBUG
+	_gnutls_dump_mpi( "SRP B: ", B);
+#endif
+
 	/* Start the SRP calculations.
 	 * - Calculate u 
 	 */
@@ -297,6 +316,10 @@ int _gnutls_proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _dat
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
+#ifdef HARD_DEBUG
+	_gnutls_dump_mpi( "SRP U: ", state->key->u);
+#endif
+
 	/* S = (A * v^u) ^ b % N 
 	 */
 	S = _gnutls_calc_srp_S1( A, _b, state->key->u, V, N);
@@ -304,6 +327,10 @@ int _gnutls_proc_srp_client_kx0(gnutls_session state, opaque * data, size_t _dat
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
+#ifdef HARD_DEBUG
+	_gnutls_dump_mpi( "SRP S: ", S);
+#endif
 
 	_gnutls_mpi_release(&A);
 	_gnutls_mpi_release(&_b);
@@ -389,7 +416,7 @@ int _gnutls_proc_srp_server_kx0(gnutls_session state, opaque * data, size_t _dat
 	/* Read B 
 	 */
 	DECR_LEN( data_size, 2);
-	n_b = data[i];
+	n_b = _gnutls_read_uint16( &data[i]);
 	i += 2;
 
 	DECR_LEN( data_size, n_b);
