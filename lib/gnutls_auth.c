@@ -36,7 +36,7 @@
 
 /**
   * gnutls_credentials_clear - Clears all the credentials previously set
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Clears all the credentials previously set in this session.
   *
@@ -61,7 +61,7 @@ void gnutls_credentials_clear(gnutls_session_t session)
  */
 /**
   * gnutls_credentials_set - Sets the needed credentials for the specified authentication algorithm.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @type: is the type of the credentials
   * @cred: is a pointer to a structure.
   *
@@ -137,7 +137,7 @@ int gnutls_credentials_set(gnutls_session_t session,
 
 /**
   * gnutls_auth_get_type - Returns the type of credentials for the current authentication schema.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns type of credentials for the current authentication schema.
   * The returned information is to be used to distinguish the function used
@@ -162,7 +162,7 @@ gnutls_credentials_type_t gnutls_auth_get_type(gnutls_session_t session)
 
 /**
   * gnutls_auth_server_get_type - Returns the type of credentials for the server authentication schema.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the type of credentials that were used for server authentication.
   * The returned information is to be used to distinguish the function used
@@ -180,7 +180,7 @@ gnutls_credentials_type_t gnutls_auth_server_get_type(gnutls_session_t
 
 /**
   * gnutls_auth_client_get_type - Returns the type of credentials for the client authentication schema.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the type of credentials that were used for client authentication.
   * The returned information is to be used to distinguish the function used
@@ -242,7 +242,7 @@ const void *_gnutls_get_cred(gnutls_key_st key,
 
 /*-
   * _gnutls_get_auth_info - Returns a pointer to authentication information.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function must be called after a succesful gnutls_handshake().
   * Returns a pointer to authentication information. That information
@@ -260,7 +260,7 @@ void *_gnutls_get_auth_info(gnutls_session_t session)
 
 /*-
   * _gnutls_free_auth_info - Frees the auth info structure
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function frees the auth info structure and sets it to
   * null. It must be called since some structures contain malloced

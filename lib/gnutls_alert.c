@@ -75,7 +75,7 @@ static const gnutls_alert_entry sup_alerts[] = {
 
 /**
   * gnutls_alert_get_name - Returns a string describing the alert number given
-  * @alert: is an alert number &gnutls_session_t structure.
+  * @alert: is an alert number #gnutls_session_t structure.
   *
   * Returns a string that describes the given alert number or NULL.
   * See gnutls_alert_get().
@@ -92,7 +92,7 @@ const char *gnutls_alert_get_name(gnutls_alert_level_t alert)
 
 /**
   * gnutls_alert_send - This function sends an alert message to the peer
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @level: is the level of the alert
   * @desc: is the alert description
   *
@@ -241,7 +241,7 @@ int gnutls_error_to_alert(int err, int *level)
 
 /**
  * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
- * @session: is a &gnutls_session_t structure.
+ * @session: is a #gnutls_session_t structure.
  * @err: is an integer
  *
  * This function is DEPRECATED, and may be removed.
@@ -270,7 +270,7 @@ int gnutls_alert_send_appropriate(gnutls_session_t session, int err)
 
 /**
   * gnutls_alert_get - Returns the last alert number received.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the last alert number received. This function
   * should be called if GNUTLS_E_WARNING_ALERT_RECEIVED or

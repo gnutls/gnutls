@@ -33,7 +33,7 @@
 
 /**
   * gnutls_db_set_retrieve_function - Sets the function that will be used to get data
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @retr_func: is the function.
   *
   * Sets the function that will be used to retrieve data from the resumed
@@ -55,7 +55,7 @@ void gnutls_db_set_retrieve_function(gnutls_session_t session,
 
 /**
   * gnutls_db_set_remove_function - Sets the function that will be used to remove data
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @rem_func: is the function.
   *
   * Sets the function that will be used to remove data from the resumed
@@ -73,7 +73,7 @@ void gnutls_db_set_remove_function(gnutls_session_t session,
 
 /**
   * gnutls_db_set_store_function - Sets the function that will be used to put data
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @store_func: is the function
   *
   * Sets the function that will be used to store data from the resumed
@@ -91,7 +91,7 @@ void gnutls_db_set_store_function(gnutls_session_t session,
 
 /**
   * gnutls_db_set_ptr - Sets a pointer to be sent to db functions
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @ptr: is the pointer
   *
   * Sets the pointer that will be provided to db store, retrieve and delete functions, as
@@ -105,7 +105,7 @@ void gnutls_db_set_ptr(gnutls_session_t session, void *ptr)
 
 /**
   * gnutls_db_get_ptr - Returns the pointer which is sent to db functions
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the pointer that will be sent to db store, retrieve and delete functions, as
   * the first argument. 
@@ -118,7 +118,7 @@ void *gnutls_db_get_ptr(gnutls_session_t session)
 
 /**
   * gnutls_db_set_cache_expiration - Sets the expiration time for resumed sessions.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @seconds: is the number of seconds.
   *
   * Sets the expiration time for resumed sessions. The default is 3600 (one hour)
@@ -131,7 +131,7 @@ void gnutls_db_set_cache_expiration(gnutls_session_t session, int seconds)
 
 /**
   * gnutls_db_check_entry - checks if the given db entry has expired
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @session_entry: is the session data (not key)
   *
   * This function returns GNUTLS_E_EXPIRED, if the database entry
@@ -356,7 +356,7 @@ int _gnutls_remove_session(gnutls_session_t session,
 
 /**
   * gnutls_db_remove_session - This function will remove the current session data from the database
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function will remove the current session data from the session
   * database. This will prevent future handshakes reusing these session

@@ -47,7 +47,7 @@ void gnutls_certificate_free_crls(gnutls_certificate_credentials_t sc);
 
 /**
   * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials_t structure
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the keys and the certificates associated
   * with the given credentials. This function must not be called when a
@@ -84,7 +84,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc)
 
 /**
   * gnutls_certificate_free_cas - Used to free all the CAs from a gnutls_certificate_credentials_t structure
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the CAs associated
   * with the given credentials. Servers that do not use
@@ -109,7 +109,7 @@ void gnutls_certificate_free_cas(gnutls_certificate_credentials_t sc)
 
 /**
   * gnutls_certificate_free_ca_names - Used to free all the CA names from a gnutls_certificate_credentials_t structure
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the CA name in the
   * given credentials. Clients may call this to save some memory
@@ -126,7 +126,7 @@ void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc)
 
 /*-
   * _gnutls_certificate_get_dh_params - Returns the DH parameters pointer
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This function will return the dh parameters pointer. This will read the
   * credentials structure, and cache the output to the session, so later
@@ -161,7 +161,7 @@ gnutls_dh_params_t _gnutls_certificate_get_dh_params(const
 
 /*-
   * _gnutls_certificate_get_rsa_params - Returns the RSA parameters pointer
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This function will return the rsa parameters pointer.
   *
@@ -196,7 +196,7 @@ gnutls_rsa_params_t _gnutls_certificate_get_rsa_params(const
 
 /**
   * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials_t structure
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
@@ -223,7 +223,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials_t
 
 /**
   * gnutls_certificate_allocate_credentials - Used to allocate a gnutls_certificate_credentials_t structure
-  * @res: is a pointer to an &gnutls_certificate_credentials_t structure.
+  * @res: is a pointer to an #gnutls_certificate_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate it.
@@ -301,7 +301,7 @@ int _gnutls_selected_cert_supported_kx(gnutls_session_t session,
 
 /**
   * gnutls_certificate_server_set_request - Used to set whether to request a client certificate
-  * @session: is an &gnutls_session_t structure.
+  * @session: is an #gnutls_session_t structure.
   * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
   *
   * This function specifies if we (in case of a server) are going
@@ -320,7 +320,7 @@ void gnutls_certificate_server_set_request(gnutls_session_t session,
 
 /**
   * gnutls_certificate_client_set_retrieve_function - Used to set a callback to retrieve the certificate
-  * @cred: is a &gnutls_certificate_credentials_t structure.
+  * @cred: is a #gnutls_certificate_credentials_t structure.
   * @func: is the callback function
   *
   * This function sets a callback to be called in order to retrieve the certificate
@@ -356,7 +356,7 @@ void gnutls_certificate_client_set_retrieve_function
 
 /**
   * gnutls_certificate_server_set_retrieve_function - Used to set a callback to retrieve the certificate
-  * @cred: is a &gnutls_certificate_credentials_t structure.
+  * @cred: is a #gnutls_certificate_credentials_t structure.
   * @func: is the callback function
   *
   * This function sets a callback to be called in order to retrieve the certificate

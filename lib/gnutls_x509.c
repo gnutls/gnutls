@@ -837,7 +837,7 @@ static int read_key_file(gnutls_certificate_credentials_t res,
 
 /**
   * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @cert: contains a certificate list (path) for the specified private key
   * @key: is the private key
   * @type: is PEM or DER
@@ -888,7 +888,7 @@ int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials_t
 
 /**
   * gnutls_certificate_set_x509_key - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @cert_list: contains a certificate list (path) for the specified private key
   * @cert_list_size: holds the size of the certificate list
   * @key: is a gnutls_x509_privkey_t key
@@ -966,7 +966,7 @@ int gnutls_certificate_set_x509_key(gnutls_certificate_credentials_t res,
 
 /**
   * gnutls_certificate_set_x509_key_file - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @CERTFILE: is a file that containing the certificate list (path) for
   * the specified private key, in PKCS7 format, or a list of certificates
   * @KEYFILE: is a file that contains the private key
@@ -1253,7 +1253,7 @@ static int parse_der_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
 
 /**
   * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @ca: is a list of trusted CAs or a DER certificate
   * @type: is DER or PEM
   *
@@ -1292,7 +1292,7 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials_t
 
 /**
   * gnutls_certificate_set_x509_trust - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @ca_list: is a list of trusted CAs
   * @ca_list_size: holds the size of the CA list
   *
@@ -1349,7 +1349,7 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 
 /**
   * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
   * @type: is PEM or DER
   *
@@ -1559,7 +1559,7 @@ int read_crl_mem(gnutls_certificate_credentials_t res, const void *crl,
 
 /**
   * gnutls_certificate_set_x509_crl_mem - Used to add CRLs in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @CRL: is a list of trusted CRLs. They should have been verified before.
   * @type: is DER or PEM
   *
@@ -1587,7 +1587,7 @@ int gnutls_certificate_set_x509_crl_mem(gnutls_certificate_credentials_t
 
 /**
   * gnutls_certificate_set_x509_crl - Used to add CRLs in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @crl_list: is a list of trusted CRLs. They should have been verified before.
   * @crl_list_size: holds the size of the crl_list
   *
@@ -1630,7 +1630,7 @@ int gnutls_certificate_set_x509_crl(gnutls_certificate_credentials_t res,
 
 /**
   * gnutls_certificate_set_x509_crl_file - Used to add CRLs in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @crlfile: is a file containing the list of verified CRLs (DER or PEM list)
   * @type: is PEM or DER
   *
@@ -1677,7 +1677,7 @@ int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials_t
 
 /**
   * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials_t structure
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This function will delete all the CRLs associated
   * with the given credentials.

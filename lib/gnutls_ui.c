@@ -37,7 +37,7 @@
 
 /**
   * gnutls_dh_set_prime_bits - Used to set the bits for a DH ciphersuite
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @bits: is the number of bits
   *
   * This function sets the number of bits, for use in an 

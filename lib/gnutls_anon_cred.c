@@ -35,7 +35,7 @@ static const int anon_dummy;
 
 /**
   * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials_t structure
-  * @sc: is an &gnutls_anon_server_credentials_t structure.
+  * @sc: is an #gnutls_anon_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
@@ -49,7 +49,7 @@ void gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t
 
 /*-
   * _gnutls_anon_get_dh_params - Returns the DH parameters pointer
-  * @sc: is an &gnutls_certificate_credentials_t structure.
+  * @sc: is an #gnutls_certificate_credentials_t structure.
   *
   * This function will return the dh parameters pointer.
   *
@@ -79,7 +79,7 @@ gnutls_dh_params_t _gnutls_anon_get_dh_params(const
 
 /**
   * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials_t structure
-  * @sc: is a pointer to an &gnutls_anon_server_credentials_t structure.
+  * @sc: is a pointer to an #gnutls_anon_server_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate it.
@@ -97,7 +97,7 @@ gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
 
 /**
   * gnutls_anon_free_client_credentials - Used to free an allocated gnutls_anon_client_credentials_t structure
-  * @sc: is an &gnutls_anon_client_credentials_t structure.
+  * @sc: is an #gnutls_anon_client_credentials_t structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
@@ -109,7 +109,7 @@ void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t
 
 /**
  * gnutls_anon_allocate_client_credentials - Used to allocate a credentials structure
- * @sc: is a pointer to an &gnutls_anon_client_credentials_t structure.
+ * @sc: is a pointer to an #gnutls_anon_client_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to allocate it.

@@ -30,7 +30,7 @@
 
 /**
   * gnutls_cipher_set_priority - Sets the priority on the ciphers supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @list: is a 0 terminated list of gnutls_cipher_algorithm_t elements.
   *
   * Sets the priority on the ciphers supported by gnutls.
@@ -59,7 +59,7 @@ int gnutls_cipher_set_priority(gnutls_session_t session, const int *list)
 
 /**
   * gnutls_kx_set_priority - Sets the priority on the key exchange algorithms supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @list: is a 0 terminated list of gnutls_kx_algorithm_t elements.
   *
   * Sets the priority on the key exchange algorithms supported by gnutls.
@@ -88,7 +88,7 @@ int gnutls_kx_set_priority(gnutls_session_t session, const int *list)
 
 /**
   * gnutls_mac_set_priority - Sets the priority on the mac algorithms supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @list: is a 0 terminated list of gnutls_mac_algorithm_t elements.
   *
   * Sets the priority on the mac algorithms supported by gnutls.
@@ -117,7 +117,7 @@ int gnutls_mac_set_priority(gnutls_session_t session, const int *list)
 
 /**
   * gnutls_compression_set_priority - Sets the priority on the compression algorithms supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @list: is a 0 terminated list of gnutls_compression_method_t elements.
   *
   * Sets the priority on the compression algorithms supported by gnutls.
@@ -152,7 +152,7 @@ int gnutls_compression_set_priority(gnutls_session_t session,
 
 /**
   * gnutls_protocol_set_priority - Sets the priority on the protocol versions supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @list: is a 0 terminated list of gnutls_protocol_t elements.
   *
   * Sets the priority on the protocol versions supported by gnutls.
@@ -185,7 +185,7 @@ int gnutls_protocol_set_priority(gnutls_session_t session, const int *list)
 
 /**
   * gnutls_certificate_type_set_priority - Sets the priority on the certificate types supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @list: is a 0 terminated list of gnutls_certificate_type_t elements.
   *
   * Sets the priority on the certificate types supported by gnutls.
@@ -223,7 +223,7 @@ int gnutls_certificate_type_set_priority(gnutls_session_t session,
 
 /**
   * gnutls_set_default_priority - Sets some default priority on the cipher suites supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Sets some default priority on the ciphers, key exchange methods, macs
   * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
@@ -261,7 +261,7 @@ int gnutls_set_default_priority(gnutls_session_t session)
 
 /**
   * gnutls_set_default_export_priority - Sets some default priority on the cipher suites supported by gnutls.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Sets some default priority on the ciphers, key exchange methods, macs
   * and compression methods. This is to avoid using the gnutls_*_priority() functions, if

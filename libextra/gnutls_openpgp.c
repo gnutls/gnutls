@@ -1104,7 +1104,7 @@ int _gnutls_openpgp_key_to_gcert(gnutls_cert * gcert,
 
 /**
   * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is an &gnutls_certificate_credentials_t structure.
+  * @res: is an #gnutls_certificate_credentials_t structure.
   * @key: contains an openpgp public key
   * @pkey: is an openpgp private key
   *

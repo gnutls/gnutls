@@ -198,7 +198,7 @@ int _gnutls_server_name_send_params(gnutls_session_t session,
 
 /**
   * gnutls_server_name_get - Used to get the server name indicator send by a client
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @data: will hold the data
   * @data_length: will hold the data length. Must hold the maximum size of data.
   * @type: will hold the server name indicator type
@@ -263,7 +263,7 @@ int gnutls_server_name_get(gnutls_session_t session, void *data,
 
 /**
   * gnutls_server_name_set - Used to set a name indicator to be sent as an extension
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @type: specifies the indicator type
   * @name: is a string that contains the server name.
   * @name_length: holds the length of name

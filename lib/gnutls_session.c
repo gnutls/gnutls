@@ -28,7 +28,7 @@
 
 /**
   * gnutls_session_get_data - Returns all session parameters.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @session_data: is a pointer to space to hold the session.
   * @session_data_size: is the session_data's size, or it will be set by the function.
   *
@@ -73,7 +73,7 @@ int gnutls_session_get_data(gnutls_session_t session,
 
 /**
   * gnutls_session_get_id - Returns session id.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @session_id: is a pointer to space to hold the session id.
   * @session_id_size: is the session id's size, or it will be set by the function.
   *
@@ -103,7 +103,7 @@ int gnutls_session_get_id(gnutls_session_t session,
 
 /**
   * gnutls_session_set_data - Sets all session parameters
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @session_data: is a pointer to space to hold the session.
   * @session_data_size: is the session's size
   *

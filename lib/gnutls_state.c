@@ -55,7 +55,7 @@ void _gnutls_session_cert_type_set(gnutls_session_t session,
 
 /**
   * gnutls_cipher_get - Returns the currently used cipher.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the currently used cipher.
   **/
@@ -66,7 +66,7 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
 
 /**
   * gnutls_certificate_type_get - Returns the currently used certificate type.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the currently used certificate type. The certificate type
   * is by default X.509, unless it is negotiated as a TLS extension.
@@ -80,7 +80,7 @@ gnutls_certificate_type_t gnutls_certificate_type_get(gnutls_session_t
 
 /**
   * gnutls_kx_get - Returns the key exchange algorithm.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the key exchange algorithm used in the last handshake.
   **/
@@ -91,7 +91,7 @@ gnutls_kx_algorithm_t gnutls_kx_get(gnutls_session_t session)
 
 /**
   * gnutls_mac_get - Returns the currently used mac algorithm.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the currently used mac algorithm.
   **/
@@ -102,7 +102,7 @@ gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
 
 /**
   * gnutls_compression_get - Returns the currently used compression algorithm.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the currently used compression method.
   **/
@@ -215,7 +215,7 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
   * gnutls_init - This function initializes the session to null (null encryption etc...).
   * @con_end: is used to indicate if this session is to be used for server or 
   * client. Can be one of GNUTLS_CLIENT and GNUTLS_SERVER. 
-  * @session: is a pointer to a &gnutls_session_t structure.
+  * @session: is a pointer to a #gnutls_session_t structure.
   *
   * This function initializes the current session to null. Every session
   * must be initialized before use, so internal structures can be allocated.
@@ -321,10 +321,10 @@ int _gnutls_session_is_resumable(gnutls_session_t session)
 
 
 /**
-  * gnutls_deinit - This function clears all buffers associated with the &session
-  * @session: is a &gnutls_session_t structure.
+  * gnutls_deinit - This function clears all buffers associated with a session
+  * @session: is a #gnutls_session_t structure.
   *
-  * This function clears all buffers associated with the &session.
+  * This function clears all buffers associated with the @session.
   * This function will also remove session data from the session database
   * if the session was terminated abnormally.
   *
@@ -567,7 +567,7 @@ int _gnutls_dh_set_group(gnutls_session_t session, mpi_t gen, mpi_t prime)
 
 /**
   * gnutls_openpgp_send_key - This function will order gnutls to send the openpgp fingerprint instead of the key
-  * @session: is a pointer to a &gnutls_session_t structure.
+  * @session: is a pointer to a #gnutls_session_t structure.
   * @status: is one of OPENPGP_KEY, or OPENPGP_KEY_FINGERPRINT
   *
   * This function will order gnutls to send the key fingerprint instead
@@ -584,7 +584,7 @@ void gnutls_openpgp_send_key(gnutls_session_t session,
 
 /**
   * gnutls_certificate_send_x509_rdn_sequence - This function will order gnutls to or not to send the x.509 rdn sequence
-  * @session: is a pointer to a &gnutls_session_t structure.
+  * @session: is a pointer to a #gnutls_session_t structure.
   * @status: is 0 or 1
   *
   * If status is non zero, this function will order gnutls not to send the rdnSequence 
@@ -609,7 +609,7 @@ int _gnutls_openpgp_send_fingerprint(gnutls_session_t session)
 
 /*-
   * _gnutls_record_set_default_version - Used to set the default version for the first record packet
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @major: is a tls major version
   * @minor: is a tls minor version
   *
@@ -628,7 +628,7 @@ void _gnutls_record_set_default_version(gnutls_session_t session,
 
 /**
   * gnutls_handshake_set_private_extensions - Used to enable the private cipher suites
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @allow: is an integer (0 or 1)
   *
   * This function will enable or disable the use of private
@@ -820,7 +820,7 @@ int _gnutls_PRF(const opaque * secret, int secret_size, const char *label,
 
 /**
   * gnutls_session_is_resumed - Used to check whether this session is a resumed one
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function will return non zero if this session is a resumed one,
   * or a zero if this is a new session.
@@ -847,7 +847,7 @@ int gnutls_session_is_resumed(gnutls_session_t session)
 
 /*-
   * _gnutls_session_is_export - Used to check whether this session is of export grade
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function will return non zero if this session is of export grade.
   *
@@ -868,7 +868,7 @@ int _gnutls_session_is_export(gnutls_session_t session)
 
 /**
   * gnutls_session_get_ptr - Used to get the user pointer from the session structure
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function will return the user given pointer from the session structure.
   * This is the pointer set with gnutls_session_set_ptr().
@@ -881,7 +881,7 @@ void *gnutls_session_get_ptr(gnutls_session_t session)
 
 /**
   * gnutls_session_set_ptr - Used to set the user pointer to the session structure
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @ptr: is the user pointer
   *
   * This function will set (associate) the user given pointer to the
@@ -897,7 +897,7 @@ void gnutls_session_set_ptr(gnutls_session_t session, void *ptr)
 
 /**
   * gnutls_record_get_direction - This function will return the direction of the last interrupted function call
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function provides information about the internals of the record
   * protocol and is only useful if a prior gnutls function call (e.g.
@@ -917,7 +917,7 @@ int gnutls_record_get_direction(gnutls_session_t session)
 
 /*-
   * _gnutls_rsa_pms_set_version - Sets a version to be used at the RSA PMS
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @major: is the major version to use
   * @minor: is the minor version to use
   *

@@ -1835,7 +1835,7 @@ int _gnutls_recv_hello(gnutls_session_t session, opaque * data,
 
 /**
   * gnutls_rehandshake - This function will renegotiate security parameters
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function will renegotiate security parameters with the
   * client. This should only be called in case of a server.
@@ -1921,7 +1921,7 @@ inline static int _gnutls_handshake_hash_init(gnutls_session_t session)
 
 /**
   * gnutls_handshake - This is the main function in the handshake protocol.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function does the handshake of the TLS/SSL protocol,
   * and initializes the TLS connection. 
@@ -2569,7 +2569,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
 
 /**
   * gnutls_handshake_set_max_packet_length - This function will set the maximum length of a handshake message
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @max: is the maximum number.
   *
   * This function will set the maximum size of a handshake message.
@@ -2599,7 +2599,7 @@ gnutls_protocol_t _gnutls_get_adv_version(gnutls_session_t session)
 
 /**
   * gnutls_handshake_get_last_in - Returns the last handshake message received.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the last handshake message received. This function is only useful
   * to check where the last performed handshake failed. If the previous handshake
@@ -2615,7 +2615,7 @@ gnutls_handshake_get_last_in(gnutls_session_t session)
 
 /**
   * gnutls_handshake_get_last_out - Returns the last handshake message sent.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the last handshake message sent. This function is only useful
   * to check where the last performed handshake failed. If the previous handshake

@@ -46,7 +46,7 @@
 
 /**
   * gnutls_protocol_get_version - Returns the version of the currently used protocol
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Returns the version of the currently used protocol. 
   *
@@ -64,7 +64,7 @@ void _gnutls_set_current_version(gnutls_session_t session,
 
 /**
   * gnutls_transport_set_lowat - Used to set the lowat value in order for select to check for pending data.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @num: is the low water value.
   *
   * Used to set the lowat value in order for select to check
@@ -82,7 +82,7 @@ void gnutls_transport_set_lowat(gnutls_session_t session, int num)
 
 /**
   * gnutls_transport_set_ptr - Used to set first argument of the transport functions
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @ptr: is the value.
   *
   * Used to set the first argument of the transport function (like PUSH and
@@ -100,7 +100,7 @@ void gnutls_transport_set_ptr(gnutls_session_t session,
 
 /**
   * gnutls_transport_set_ptr2 - Used to set first argument of the transport functions
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @recv_ptr: is the value for the pull function
   * @send_ptr: is the value for the push function
   *
@@ -120,7 +120,7 @@ void gnutls_transport_set_ptr2(gnutls_session_t session,
 
 /**
   * gnutls_transport_get_ptr - Used to return the first argument of the transport functions
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * Used to get the first argument of the transport function (like PUSH and
   * PULL). This must have been set using gnutls_transport_set_ptr().
@@ -133,7 +133,7 @@ gnutls_transport_ptr_t gnutls_transport_get_ptr(gnutls_session_t session)
 
 /**
   * gnutls_transport_get_ptr2 - Used to return the first argument of the transport functions
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @recv_ptr: will hold the value for the pull function
   * @send_ptr: will hold the value for the push function
   *
@@ -152,7 +152,7 @@ void gnutls_transport_get_ptr2(gnutls_session_t session,
 
 /**
   * gnutls_bye - This function terminates the current TLS/SSL connection.
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @how: is an integer
   *
   * Terminates the current TLS/SSL connection. The connection should
@@ -972,7 +972,7 @@ ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 
 /**
   * gnutls_record_send - sends to the peer the specified data
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
@@ -1003,7 +1003,7 @@ ssize_t gnutls_record_send(gnutls_session_t session, const void *data,
 
 /**
   * gnutls_record_recv - reads data from the TLS record protocol
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @data: contains the data to send
   * @sizeofdata: is the length of the data
   *
@@ -1032,7 +1032,7 @@ ssize_t gnutls_record_recv(gnutls_session_t session, void *data,
 
 /**
   * gnutls_record_get_max_size - returns the maximum record size
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   *
   * This function returns the maximum record packet size in this connection.
   * The maximum record size is negotiated by the client after the
@@ -1050,7 +1050,7 @@ size_t gnutls_record_get_max_size(gnutls_session_t session)
 
 /**
   * gnutls_record_set_max_size - sets the maximum record size
-  * @session: is a &gnutls_session_t structure.
+  * @session: is a #gnutls_session_t structure.
   * @size: is the new size
   *
   * This function sets the maximum record packet size in this connection.
