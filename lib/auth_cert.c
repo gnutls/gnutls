@@ -850,6 +850,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 		
 		DECR_LEN(dsize, 1);
 		len = (uint8) *p;
+                p++;
 		
 		if (len != 20) {
 			gnutls_assert();
