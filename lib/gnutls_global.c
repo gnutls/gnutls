@@ -80,6 +80,11 @@ static int _gnutls_init = 0;
   * You must call gnutls_global_deinit() when gnutls usage is no longer needed
   * Returns zero on success.
   *
+  * Note that this function will also initialize libgcrypt, if it has not
+  * been initialized before. Thus if you want to manualy initialize libgcrypt
+  * you must do it before calling this function. (useful in cases you want
+  * to disable internal lockings etc.)
+  *
   **/
 int gnutls_global_init( void)
 {
@@ -91,9 +96,15 @@ int gnutls_global_init( void)
 		return 0;
 	}
 	
-	/* for gcrypt in order to be able to allocate memory */
-	gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
+	if (gcry_control( GCRYCTL_ANY_INITIALIZATION_P) == 0) {
+		/* for gcrypt in order to be able to allocate memory */
+		gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
+		
+		/* gcry_control (GCRYCTL_DISABLE_INTERNAL_LOCKING, NULL, 0); */
 
+		gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL,0);
+	}
+	
 	/* set default recv/send functions
 	 */
 	gnutls_global_set_log_func( dlog);
