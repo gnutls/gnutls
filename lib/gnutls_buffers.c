@@ -179,7 +179,7 @@ static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
 				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 				else return GNUTLS_E_INTERRUPTED;
 			} else 
-				return GNUTLS_E_UNKNOWN_ERROR;
+				return GNUTLS_E_PULL_ERROR;
 		} else {
 #ifdef READ_DEBUG
 			_gnutls_log( "READ: Got %d bytes from %d\n", i, fd);
@@ -367,15 +367,63 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
  * This function may not cope right with interrupted system calls
  * and EAGAIN error. Ideas?
  *
+ * We need to push exactly the data in n, since we cannot send less
+ * data. In TLS the peer must receive the whole packet in order
+ * to decrypt and verify the integrity. 
+ *
  */
-ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
+ssize_t _gnutls_write(int fd, GNUTLS_STATE state, const void *iptr, size_t n, int flags)
 {
 	size_t left;
 #ifdef WRITE_DEBUG
 	int j,x, sum=0;
 #endif
 	ssize_t i = 0;
+	size_t start_pos = 0;
 	const char *ptr = iptr;
+
+	/* In case the previous write was interrupted, check if the
+	 * current data have the same size with the previous.
+	 * If they haven't return an error.
+	 */
+	if (state->gnutls_internals.send_buffer_ind[1] > 0 && state->gnutls_internals.send_buffer_ind[1] != n) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
+	} else if (state->gnutls_internals.send_buffer_ind[1] > 0) {
+		/* send only the data we haven't send before. 
+		 */
+		n -= state->gnutls_internals.send_buffer_ind[0];
+		start_pos = state->gnutls_internals.send_buffer_ind[0];
+	}
+
+	left = n;
+	while (left > 0) {
+		
+		if (_gnutls_push_func==NULL) 
+			i = send(fd, &ptr[start_pos+i], left, flags);
+		else
+			i = _gnutls_push_func(fd, &ptr[start_pos+i], left);
+
+		if (i == -1) {
+			if (errno == EAGAIN || errno == EINTR) {
+				state->gnutls_internals.send_buffer_ind[0] = n - left;
+				state->gnutls_internals.send_buffer_ind[1] = n;
+				gnutls_assert();
+#ifdef WRITE_DEBUG
+				_gnutls_log( "WRITE: Interrupted. wrote %d bytes to %d. Left %d\n", n-left, fd, left);
+#endif
+				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
+				else return GNUTLS_E_INTERRUPTED;
+
+			} else {
+				gnutls_assert();
+				return GNUTLS_E_PUSH_ERROR;
+			}
+		}
+		left -= i;
+	}
+
+	state->gnutls_internals.send_buffer_ind[0] = state->gnutls_internals.send_buffer_ind[1] = 0;
 
 #ifdef WRITE_DEBUG
 	_gnutls_log( "WRITE: wrote %d bytes to %d\n", n, fd);
@@ -390,29 +438,6 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 	
 	}
 #endif
-	left = n;
-	while (left > 0) {
-		
-		if (_gnutls_push_func==NULL) 
-			i = send(fd, &ptr[i], left, flags);
-		else
-			i = _gnutls_push_func(fd, &ptr[i], left);
-
-		if (i == -1) {
-			if (errno == EAGAIN || errno == EINTR) {
-				i = 0;
-				gnutls_assert();
-/*				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
- *				else return GNUTLS_E_INTERRUPTED;
- */
-			} else {
-				gnutls_assert();
-				return GNUTLS_E_UNKNOWN_ERROR;
-			}
-		}
-		left -= i;
-	}
-
 	return n;
 
 }

@@ -360,6 +360,11 @@ typedef struct {
 					 */
 	opaque				recv_buffer_data[MAX_RECV_SIZE];
 	int				recv_buffer_data_size;
+	int				send_buffer_ind[2]; /* 0 holds the
+	                                * position last write was interrupted,
+	                                * and 1 holds the size of the last
+	                                * data requested to send.
+	                                */
 
 					/* 0 if no peeked data was kept, 1 otherwise.
 					 */

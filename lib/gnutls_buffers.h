@@ -25,7 +25,7 @@ ssize_t _gnutls_read_buffered(int fd, GNUTLS_STATE, opaque **iptr, size_t n, Con
 void _gnutls_read_clear_buffer( GNUTLS_STATE);
 int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state);
 
-ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int );
+ssize_t _gnutls_write(int fd, GNUTLS_STATE, const void *iptr, size_t n, int );
 
 /* used in SSL3 */
 int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length);

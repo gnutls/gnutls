@@ -462,7 +462,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return cipher_size; /* error */
 		}
 		
-		if (_gnutls_write(cd, cipher, cipher_size, 0) != cipher_size) {
+		if (_gnutls_write(cd, state, cipher, cipher_size, 0) != cipher_size) {
 			gnutls_free( cipher);
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -499,7 +499,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return cipher_size;
 		}
 		
-		if (_gnutls_write(cd, cipher, cipher_size, 0) != cipher_size) {
+		if (_gnutls_write(cd, state, cipher, cipher_size, 0) != cipher_size) {
 			gnutls_free(cipher);
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -1013,7 +1013,10 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
   * difference is that is accepts a GNUTLS state.
   *
   * If the EINTR is returned by the internal push function (write())
-  * then GNUTLS_E_INTERRUPTED, will be returned.
+  * then GNUTLS_E_INTERRUPTED, will be returned. If GNUTLS_E_INTERRUPTED or
+  * GNUTLS_E_AGAIN is returned you must call this function again, with the 
+  * same (exactly) parameters. Otherwise the write operation will be 
+  * corrupted and the connection will be terminated.
   *
   * Returns the number of bytes received, zero on EOF, or
   * a negative error code.
