@@ -47,7 +47,7 @@ static void print_res( int x)
 		printf("- certificate is NOT trusted\n");
 	else
 		printf("- certificate is trusted\n");
-	if (x==GNUTLS_CERT_CORRUPTED)
+	if (x&GNUTLS_CERT_CORRUPTED)
 		printf("- Found a corrupted certificate.\n");
 	return;
 }

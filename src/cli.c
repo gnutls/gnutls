@@ -344,7 +344,6 @@ int main(int argc, char **argv)
       } else {
 	 break;
       }
-
    }
 
 /* print some information */
