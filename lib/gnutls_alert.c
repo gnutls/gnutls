@@ -54,6 +54,8 @@ static const gnutls_alert_entry sup_alerts[] = {
 	{ GNUTLS_A_USER_CANCELED,	 "User canceled" },
 	{ GNUTLS_A_NO_RENEGOTIATION,	 "No renegotiation is allowed" },
 	{ GNUTLS_A_CERTIFICATE_UNOBTAINABLE, "Could not retrieve the specified certificate" },
+	{ GNUTLS_A_UNSUPPORTED_EXTENSION, "An unsupported extension was sent" },
+	{ GNUTLS_A_UNRECOGNIZED_NAME, "The server name sent was not recognized" },
 	{0, NULL}
 };
 
@@ -193,6 +195,10 @@ int _level = -1;
 			break;
 		case GNUTLS_E_OPENPGP_GETKEY_FAILED:
 			ret = GNUTLS_A_CERTIFICATE_UNOBTAINABLE;
+			_level = GNUTLS_AL_FATAL;
+			break;
+		case GNUTLS_E_DH_PRIME_UNACCEPTABLE:
+			ret = GNUTLS_A_INSUFFICIENT_SECURITY;
 			_level = GNUTLS_AL_FATAL;
 			break;
 	}
