@@ -167,8 +167,8 @@ int main(int argc, char** argv)
 
 #ifdef RESUME
 	gnutls_init(&state, GNUTLS_CLIENT);
-	gnutls_set_current_version( state, GNUTLS_TLS1);
-
+	
+	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
@@ -220,8 +220,7 @@ int main(int argc, char** argv)
 	/* Begin handshake again */
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
-	gnutls_set_current_version( state, GNUTLS_TLS1);
-
+	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
