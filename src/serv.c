@@ -50,8 +50,10 @@ int main()
 
 		gnutls_handshake(sd, state);
 		fprintf(stderr, "Handshake was completed\n");
-//		ret = gnutls_send(sd, state, "hello\n", 5);
-//		fprintf(stderr, "Data was send (%d)\n", ret);
+
+		ret = gnutls_send(sd, state, "hello world\n", sizeof("hello world\n"));
+		fprintf(stderr, "Data was send (%d)\n", ret);
+		
 		gnutls_close(sd, state);
 		close(sd);
 		gnutls_deinit(&state);

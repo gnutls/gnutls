@@ -23,7 +23,7 @@ int gnutls_is_fatal_error( int error) {
 		case GNUTLS_E_WARNING_ALERT_RECEIVED:
 			return 0;
 		default:
-			return 1;
+			return 0;
 
 	}			
 }

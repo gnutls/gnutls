@@ -25,7 +25,9 @@ int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state)
 
 int gnutls_getDataFromBuffer(GNUTLS_STATE state, char *data, int length)
 {
-	length = state->gnutls_internals.bufferSize;
+	if (length > state->gnutls_internals.bufferSize) {
+		length = state->gnutls_internals.bufferSize;
+	}
 
 	state->gnutls_internals.bufferSize -= length;
 	memmove(data, state->gnutls_internals.buffer, length);

@@ -52,6 +52,17 @@ int main()
 	} else {
 		fprintf(stdout, "Received: %s\n", buffer);
 	}
+	
+	ret = gnutls_recv(sd, state, buffer, 10);
+	if (gnutls_is_fatal_error(ret)==1) {
+		if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
+			fprintf(stderr, "Peer has closed the GNUTLS connection\n");
+		} else {
+			fprintf(stderr, "Received corrupted data(%d)\n", ret);
+		}
+	} else {
+		fprintf(stdout, "Received: %s\n", buffer);
+	}
 	gnutls_close(sd, state);
 
 	close(sd);
