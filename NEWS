@@ -11,6 +11,7 @@ See the end for copying conditions.
   a key and no certificate to PKCS#12.
 - Fix objdir != srcdir builds, reported by "Gerrit P. Haase"
   <gp@familiehaase.de>.
+- Added gnutls_certificate_verify_peers to gnutls/compat.h.
 
 * Version 1.1.18 (2004-08-24)
 - Corrected handling of certificate with dates after year 2038.
