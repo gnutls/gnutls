@@ -557,6 +557,9 @@ static int _gnutls_check_record_version( GNUTLS_STATE state, HandshakeType htype
 	return 0;
 }
 
+/* This function will check if the received record type is
+ * the one we actually expecting for.
+ */
 static int _gnutls_record_check_type( GNUTLS_STATE state, ContentType recv_type,
 	ContentType type, HandshakeType htype, opaque* data, int data_size) {
 	
