@@ -204,6 +204,7 @@ typedef struct {
  */
 typedef struct {
 	opaque dnsname[MAX_DNSNAME_SIZE];
+	opaque srp_username[MAX_SRP_USERNAME];
 } TLSExtensions;
 
 /* AUTH_INFO structures MUST NOT contain malloced 
@@ -322,6 +323,16 @@ typedef struct {
 	/* sockets internals */
 	int				lowat;
 
+					/* this buffer holds a record packet -mostly used for
+					 * non blocking IO.
+					 */
+	opaque				recv_buffer_data[MAX_RECV_SIZE];
+	int				recv_buffer_data_size;
+
+					/* 0 if no peeked data was kept, 1 otherwise.
+					 */
+	int				have_peeked_data;
+
 	/* gdbm */
 	char*				db_name;
 	int				expire_time;
@@ -352,7 +363,6 @@ typedef struct {
 	int				peer_pk_algorithm;
 	/* holds the username got in the srp tls extension
 	 */
-	opaque				srp_username[MAX_SRP_USERNAME];
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

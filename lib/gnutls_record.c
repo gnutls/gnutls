@@ -35,13 +35,6 @@
 #include "gnutls_record.h"
 #include "gnutls_datum.h"
 
-#ifdef HAVE_ERRNO_H
-# include <errno.h>
-#endif
-
-#ifndef EAGAIN
-# define EAGAIN EWOULDBLOCK
-#endif
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
@@ -61,7 +54,9 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
   * Used to set the lowat value in order for select to check
   * if there are pending data to socket buffer. Used only   
   * if you have changed the default low water value (default is 1).
-  * Normally you will not need that function.
+  * Normally you will not need that function. 
+  * If you plan to use non standard recv() function you should set
+  * this to zero.
   **/
 int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	state->gnutls_internals.lowat = num;
@@ -449,7 +444,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		WRITEuint16( cipher_size-RECORD_HEADER_SIZE, &headers[3]);
 		memcpy( cipher, headers, RECORD_HEADER_SIZE);
 
-		if (_gnutls_Write(cd, cipher, cipher_size, flags) != cipher_size) {
+		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
@@ -476,12 +471,10 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
 		if (cipher_size<=0) return cipher_size;
 
-		WRITEuint16( cipher_size, &headers[3]);
-
+		WRITEuint16( cipher_size-RECORD_HEADER_SIZE, &headers[3]);
 		memcpy( cipher, headers, RECORD_HEADER_SIZE);
 
-		cipher_size += RECORD_HEADER_SIZE;
-		if (_gnutls_Write(cd, cipher, cipher_size, flags) != cipher_size) {
+		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
@@ -519,17 +512,6 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 
 }
 
-#define RCVLOWAT state->gnutls_internals.lowat /* this is the default for TCP - just don't change that! */
-
-static int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state) {
-char peekdata;
-
-	/* this was already read by using MSG_PEEK - so it shouldn't fail */
-	_gnutls_Read( cd, &peekdata, RCVLOWAT, 0); 
-
-	return 0;
-}
-
 #define CHECK_RECORD_VERSION
 
 /* This function behave exactly like read(). The only difference is 
@@ -537,7 +519,7 @@ char peekdata;
  * send (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current state.
  * flags is the sockets flags to use. Currently only MSG_DONTWAIT is
- * supported.
+ * supported, and should be used together with MSG_WAITALL.
  */
 ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata, int flags)
 {
@@ -548,20 +530,23 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	ContentType recv_type;
 	uint16 length;
 	uint8 *ciphertext;
+	uint8 *recv_data;
 	int ret = 0;
 	int header_size = RECORD_HEADER_SIZE;
+
+
+
 	/* If we have enough data in the cache do not bother receiving
 	 * a new packet. (in order to flush the cache)
 	 */
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && gnutls_getDataBufferSize(type, state) > 0) {
 		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
 
-		if (type==GNUTLS_APPLICATION_DATA) {
-			/* if the buffer just got empty */
-			if (gnutls_getDataBufferSize(type, state)==0) {
-				_gnutls_clear_peeked_data( cd, state);
-			}
+		/* if the buffer just got empty */
+		if (gnutls_getDataBufferSize(type, state)==0) {
+			_gnutls_clear_peeked_data( cd, state);
 		}
+
 		return ret;
 	}
 
@@ -572,8 +557,8 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
 	 * must be set to non blocking mode
 	 */
-	if ( (ret = _gnutls_Read(cd, headers, RECORD_HEADER_SIZE, MSG_PEEK|flags)) != RECORD_HEADER_SIZE) {
-		if (ret==(0-EAGAIN)) return GNUTLS_E_AGAIN;
+	if ( (ret = _gnutls_read_buffered(cd, state, headers, RECORD_HEADER_SIZE, flags, -1)) != RECORD_HEADER_SIZE) {
+		if (ret==GNUTLS_E_AGAIN) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) return 0; /* we were expecting close notify */
@@ -648,15 +633,14 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	ciphertext = gnutls_malloc(length+header_size);
+	recv_data = gnutls_malloc(length+header_size);
 
-/* check if we have that data into buffer. This seems to be
- * expensive - but this is the only way to handle Non Blocking IO.
- */
-	if ( (ret = _gnutls_Read(cd, ciphertext, header_size+length, MSG_PEEK|flags)) != length+header_size) {
-		gnutls_free(ciphertext);
-		
-		if (ret==(0-EAGAIN)) return GNUTLS_E_AGAIN;
+	/* check if we have that data into buffer. 
+ 	 */
+	if ( (ret = _gnutls_read_buffered(cd, state, recv_data, header_size+length, flags, recv_type)) != length+header_size) {
+		gnutls_free(recv_data);
+		if (ret==GNUTLS_E_AGAIN) return ret;
+
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -666,42 +650,8 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
-	if (_gnutls_Read(cd, headers, header_size, 0)!=header_size) {  /* read and clear the headers - again! */
-		gnutls_free(ciphertext);
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
-	}
-
-/* Read the whole packet - again? 
- * Here we keep RCVLOWAT bytes in the TCP buffers, only for
- * APPLICATION_DATA data.
- */	
-	if ( type==GNUTLS_APPLICATION_DATA && type==recv_type) {
-		/* get the data - but do not free the buffer in the kernel */
-		ret = _gnutls_Read(cd, ciphertext, length-RCVLOWAT, 0);
-		if (ret>=0)
-			ret += _gnutls_Read(cd, &ciphertext[length-RCVLOWAT], RCVLOWAT, MSG_PEEK);
-
-	} else { /* our - internal data */
-		ret = _gnutls_Read(cd, ciphertext, length, 0);
-	}
-
-	/* Oooops... very rare case since we know that the system HAD 
-	 * received that data.
-	 */
-	if (ret != length) {
-#ifdef RECORD_DEBUG
-		_gnutls_log( "Record: Received packet with length: %d\nExpected %d\n", ret, length);
-#endif
-		gnutls_free(ciphertext);
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
+	_gnutls_read_clear_buffer( state);
+	ciphertext = &recv_data[header_size];
 	
 	/* decrypt the data we got
 	 */
@@ -721,7 +671,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
-		gnutls_free(ciphertext);
+		gnutls_free(recv_data);
 		return tmplen;
 	}
 
@@ -732,7 +682,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		_gnutls_log( "Record: ChangeCipherSpec Packet was received\n");
 #endif
 
-		gnutls_free(ciphertext);
+		gnutls_free(recv_data);
 
 		if (tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
@@ -758,7 +708,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-	gnutls_free(ciphertext);
+	gnutls_free(recv_data);
 
 	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
 		gnutls_insertDataBuffer(type, state, (void *) tmpdata, tmplen);
@@ -782,9 +732,8 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 					gnutls_bye(cd, state, 1);
 				
 				gnutls_free(tmpdata);
-				
+
 				return 0; /* EOF */
-/*				return GNUTLS_E_CLOSURE_ALERT_RECEIVED; */
 			} else {
 			
 				/* if the alert is FATAL or WARNING
@@ -810,7 +759,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			gnutls_assert();
 	
 			gnutls_free(tmpdata);
-			
+
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
 #if 0			
@@ -830,7 +779,12 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 			break;
 		case GNUTLS_HANDSHAKE:
-			/* This is only legal if HELLO_REQUEST is received */
+			/* This is only legal if HELLO_REQUEST is received - and we are a client */
+			if (htype!=GNUTLS_HELLO_REQUEST && state->security_parameters.entity==GNUTLS_SERVER) {
+				gnutls_assert();
+				gnutls_free( tmpdata);
+				return GNUTLS_E_UNEXPECTED_PACKET;
+			}
 
 			break;
 		default:
@@ -846,13 +800,12 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* Get Application data from buffer */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
 		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
-		if (type==GNUTLS_APPLICATION_DATA) {
-			/* if the buffer just got empty */
-			if (gnutls_getDataBufferSize(type, state)==0) {
-				_gnutls_clear_peeked_data( cd, state);
-			}
 
+		/* if the buffer just got empty */
+		if (gnutls_getDataBufferSize(type, state)==0) {
+			_gnutls_clear_peeked_data( cd, state);
 		}
+
 		gnutls_free(tmpdata);
 	} else {
 		if (recv_type == GNUTLS_HANDSHAKE) {
@@ -861,7 +814,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			if (ret < 0) {
 				gnutls_assert();
 			} else /* inform the caller */
-				ret = GNUTLS_E_GOT_HELLO_REQUEST;
+				ret = GNUTLS_E_REHANDSHAKE;
 		} else {
 			gnutls_assert();
 			ret = GNUTLS_E_UNEXPECTED_PACKET; 

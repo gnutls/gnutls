@@ -288,8 +288,8 @@ int main(int argc, char** argv)
 
 		if (FD_ISSET(sd, &rset)) {
 			bzero(buffer, MAX_BUF+1);
-
 			ret = gnutls_read(sd, state, buffer, MAX_BUF);
+
 			/* remove new line */
 
 			if (gnutls_is_fatal_error(ret) == 1 || ret==0) {
@@ -304,8 +304,8 @@ int main(int argc, char** argv)
 			} else {
 				if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
 					printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
-				if (ret==GNUTLS_E_GOT_HELLO_REQUEST)
-					printf("* Received HelloRequest message (server asked to rehandshake)\n");
+				if (ret==GNUTLS_E_REHANDSHAKE)
+					printf("* Rehandshake was performed\n");
 
 				if (ret > 0) {
 					printf("- Received[%d]: ", ret);

@@ -41,12 +41,12 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 				gnutls_assert();
 				return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 			}
-			if ( sizeof( state->gnutls_internals.srp_username) <= len) {
+			if ( sizeof( state->security_parameters.extensions.srp_username) <= len) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
-			memcpy( state->gnutls_internals.srp_username, &data[1], len);
-			state->gnutls_internals.srp_username[len]=0; /* null terminated */
+			memcpy( state->security_parameters.extensions.srp_username, &data[1], len);
+			state->security_parameters.extensions.srp_username[len]=0; /* null terminated */
 		}
 	} else { /* client side reading server hello extensions */
 		if (state->gnutls_internals.resumed==RESUME_FALSE)

@@ -18,10 +18,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include "gnutls_int.h"
-#include "gnutls_errors.h"
+#include <gnutls_int.h>
+#include <gnutls_errors.h>
+#include <gnutls_num.h>
+
 #ifdef HAVE_ERRNO_H
- # include <errno.h>
+# include <errno.h>
+#endif
+
+#ifndef EAGAIN
+# define EAGAIN EWOULDBLOCK
 #endif
 
 extern ssize_t (*_gnutls_recv_func)( SOCKET, void*, size_t, int);
@@ -132,8 +138,9 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 	return length;
 }
 
+
 /* This function is like read. But it does not return -1 on error.
- * It does return -errno instead.
+ * It does return gnutls_errno instead.
  */
 ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 {
@@ -149,7 +156,10 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 	while (left > 0) {
 		i = _gnutls_recv_func(fd, &ptr[i], left, flag);
 		if (i < 0) {
-			return (0-errno);
+			if (errno == EAGAIN)
+				return GNUTLS_E_AGAIN;
+			else 
+				return GNUTLS_E_UNKNOWN_ERROR;
 		} else {
 			if (i == 0)
 				break;	/* EOF */
@@ -178,10 +188,105 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 }
 
 
+#define RCVLOWAT state->gnutls_internals.lowat 
+
+int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state) {
+char peekdata1;
+char *peekdata2;
+
+	if (state->gnutls_internals.have_peeked_data==0)
+		return 0;
+		
+	if (RCVLOWAT != 1) {
+		if (RCVLOWAT == 0)
+			return 0;
+			
+		peekdata2 = gnutls_malloc( RCVLOWAT);
+	
+	        /* this was already read by using MSG_PEEK - so it shouldn't fail */
+	        _gnutls_Read( cd, peekdata2, RCVLOWAT, 0); 
+        
+      		gnutls_free(peekdata2);
+        } else {
+	        _gnutls_Read( cd, &peekdata1, RCVLOWAT, 0); 
+        }
+	state->gnutls_internals.have_peeked_data=0;
+
+       	return 0;
+}
+
+
+void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
+	state->gnutls_internals.recv_buffer_data_size = 0;
+}
+                  	
+/* This function is like read. But it does not return -1 on error.
+ * It does return gnutls_errno instead.
+ */
+ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, int flag, ContentType recv_type)
+{
+	ssize_t ret=0, ret2=0;
+	int min;
+	char *ptr = iptr;
+	int recvlowat = RCVLOWAT;
+
+	/* leave peeked data to the kernel space only if application data
+	 * is received.
+	 */
+	if (recv_type != GNUTLS_APPLICATION_DATA)
+		recvlowat = 0;
+
+	/* copy peeked data to given buffer
+	 */
+	min = GMIN( state->gnutls_internals.recv_buffer_data_size, sizeOfPtr);
+	if ( min > 0) {
+		memcpy( iptr, state->gnutls_internals.recv_buffer_data, min);	
+		if ( min == sizeOfPtr)
+			return min;
+	}
+
+	/* since we are going to read data, we must clear any peeked.
+	 */
+	_gnutls_clear_peeked_data( fd, state);
+	
+	/* read fresh data - but leave RCVLOWAT bytes in the kernel buffer.
+	 */
+	if ( sizeOfPtr - min - recvlowat > 0)
+		ret = _gnutls_Read( fd, &ptr[min], sizeOfPtr - min - recvlowat, flag);
+		if (ret >= 0 && recvlowat > 0) {
+			ret2 = _gnutls_Read( fd, &ptr[min+ret], recvlowat, MSG_PEEK|flag);
+			state->gnutls_internals.have_peeked_data = 1;
+		}
+
+	if (ret < 0 || ret2 < 0)
+		return GMIN(ret, ret2);
+
+
+	ret += ret2;
+
+	if (ret < recvlowat) {
+		gnutls_assert();
+		return GNUTLS_E_AGAIN;
+	}
+
+	
+	/* copy fresh data to our buffer.
+	 */
+	if ( ret+state->gnutls_internals.recv_buffer_data_size > sizeof( state->gnutls_internals.recv_buffer_data)) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	memcpy( &state->gnutls_internals.recv_buffer_data[state->gnutls_internals.recv_buffer_data_size], &ptr[min], ret);
+	state->gnutls_internals.recv_buffer_data_size += ret;
+
+	return ret+min;
+}
+
+
 /* This function is like write. But it does not return -1 on error.
  * It does return -errno instead.
  */
-ssize_t _gnutls_Write(int fd, const void *iptr, size_t n, int flags)
+ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 {
 	size_t left;
 #ifdef WRITE_DEBUG

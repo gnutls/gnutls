@@ -86,7 +86,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	state->gnutls_key->auth_info_size = sizeof(SRP_SERVER_AUTH_INFO_INT);
 	
 	username = ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username;
-	strcpy( username, state->gnutls_internals.srp_username);
+	strcpy( username, state->security_parameters.extensions.srp_username);
 
 	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, username, &err);
 
