@@ -104,7 +104,7 @@ int next, ret;
 int pos=0;
 uint16 type;
 const opaque* sdata;
-int (*ext_func_recv)( gnutls_session, const opaque*, int);
+ext_recv_func ext_recv;
 uint16 size;
 
 #ifdef DEBUG
@@ -144,9 +144,9 @@ int i;
 		sdata = &data[pos];
 		pos+=size;
 		
-		ext_func_recv = _gnutls_ext_func_recv(type);
-		if (ext_func_recv == NULL) continue;
-		if ( (ret=ext_func_recv( session, sdata, size)) < 0) {
+		ext_recv = _gnutls_ext_func_recv(type);
+		if (ext_recv == NULL) continue;
+		if ( (ret=ext_recv( session, sdata, size)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
@@ -178,7 +178,7 @@ int next, size;
 uint16 pos=0;
 opaque sdata[1024];
 int sdata_size = sizeof(sdata);
-int (*ext_func_send)( gnutls_session, opaque*, int);
+ext_send_func ext_send;
 
 
 	(*data) = gnutls_malloc(2); /* allocate size for size */
@@ -191,9 +191,9 @@ int (*ext_func_send)( gnutls_session, opaque*, int);
 	next = MAX_EXT_TYPES; /* maximum supported extensions */
 	do {
 		next--;
-		ext_func_send = _gnutls_ext_func_send(next);
-		if (ext_func_send == NULL) continue;
-		size = ext_func_send( session, sdata, sdata_size);
+		ext_send = _gnutls_ext_func_send(next);
+		if (ext_send == NULL) continue;
+		size = ext_send( session, sdata, sdata_size);
 		if (size > 0) {
 			(*data) = gnutls_realloc_fast( (*data), pos+size+4);
 			if ((*data)==NULL) {

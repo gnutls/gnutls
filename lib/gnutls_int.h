@@ -230,7 +230,9 @@ typedef gnutls_datum (*gnutls_db_retr_func)(void*, gnutls_datum key);
 
 typedef struct AUTH_CRED {
 	gnutls_credentials_type algorithm;
-	/* the type of credentials depends on algorithm */
+
+	/* the type of credentials depends on algorithm 
+	 */
 	void* credentials;
 	struct AUTH_CRED* next;
 } AUTH_CRED;

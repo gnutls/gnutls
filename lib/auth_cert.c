@@ -1212,8 +1212,12 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session,
 }
 
 
-/* This function will return the appropriate certificate to use. The return
- * value depends on the side (client or server).
+/* This function will return the appropriate certificate to use. 
+ * Fills in the apr_cert_list, apr_cert_list_length and apr_pkey.
+ * The return value is a negative value on error.
+ *
+ * It is normal to return 0 with no certificates in client side.
+ *
  */
 int _gnutls_find_apr_cert(gnutls_session session,
 			  gnutls_cert ** apr_cert_list,

@@ -93,8 +93,6 @@ int _gnutls_max_record_send_params( gnutls_session session, opaque* data,
 	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
 		if (session->internals.proposed_record_size != DEFAULT_MAX_RECORD_SIZE) {
-			gnutls_assert();
-			
 			len = 1;
 			if (data_size < len) {
 				gnutls_assert();

@@ -595,6 +595,9 @@ ssize_t socket_send(socket_st socket, const void *buffer, int buffer_size)
 			ret = send(socket.fd, buffer, buffer_size, 0);
 		} while (ret == -1 && errno == EINTR);
 
+	if (ret > 0 && ret != buffer_size && quiet)
+		fprintf(stderr,
+			"*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
 
 	return ret;
 }
