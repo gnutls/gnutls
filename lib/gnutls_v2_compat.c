@@ -46,6 +46,8 @@ static int _gnutls_handshake_select_v2_suite(gnutls_session session, opaque *dat
 	int i, j, ret;
 	opaque* _data;
 	int _datalen;
+
+	_gnutls_handshake_log( "HSK[%x]: Parsing a version 2.0 client hello.\n", session);
 	
 	_data = gnutls_malloc( datalen);
 	if (_data==NULL) {
@@ -53,7 +55,10 @@ static int _gnutls_handshake_select_v2_suite(gnutls_session session, opaque *dat
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_handshake_log( "HSK[%x]: Parsing a version 2.0 client hello.\n", session);
+	if (datalen % 3 != 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
 
 	i = _datalen = 0;
 	for (j = 0; j < datalen; j += 3) {
@@ -182,7 +187,7 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 	/* read random new values -skip session id for now */
 	DECR_LEN(len, session_id_len); /* skip session id for now */
 	memcpy( session_id, &data[pos], session_id_len);
-	pos+=session_id_len;
+	pos += session_id_len;
 	
 	DECR_LEN(len, challenge);
 	memset( random, 0, TLS_RANDOM_SIZE);

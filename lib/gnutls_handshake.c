@@ -518,6 +518,11 @@ gnutls_pk_algorithm algo=GNUTLS_PK_NONE, prev_algo = 0;
 gnutls_kx_algorithm kx;
 GNUTLS_CipherSuite cs;
 
+	if (datalen % 2 != 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+
 	for (j = 0; j < datalen; j += 2) {
 		memcpy( &cs.CipherSuite, &data[j], 2);
 		kx = _gnutls_cipher_suite_get_kx_algo( &cs);
@@ -566,12 +571,20 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		else return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 	}
 
+	/* Data length should be zero mod 2 since
+	 * every ciphersuite is 2 bytes. (this check is needed
+	 * see below).
+	 */
+	if (datalen % 2 == 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+	}
+
 #ifdef HANDSHAKE_DEBUG
 
 	_gnutls_handshake_log("HSK[%x]: Requested cipher suites: \n", session);
 	for (j = 0; j < datalen; j += 2) {
 		memcpy( &cs.CipherSuite, &data[j], 2);
-
 		_gnutls_handshake_log("\t%s\n",
 			    _gnutls_cipher_suite_get_name(&cs));
 	}
