@@ -1,0 +1,50 @@
+Some things are mentioned here to help any potential gnutls coder.
+The rules here are not always used, although we try to stick to them.
+
+
+*** File names:
+  All file names are usually prefixed with "gnutls_", "auth_", or
+ "x509_", or something else that indicates the part of gnutls
+ where this file refers to. The suffix should be more
+ specific. Ie. "gnutls_record.c" refers to the TLS library
+ and more specific, to the TLS record protocol. "auth_rsa",
+ is the implementation of the RSA certificate authentication
+ method.
+
+
+*** Function names:
+  All the function names use underscore "_", to separate words,
+ functions like gnutlsDoThat, are not used. The function names
+ usually start with "gnutls_" prefix, and the words that follow
+ specify the exact part of gnutls that this function refers to.
+ Ie "gnutls_x509_extract_certificate_dn", refers to the X.509 
+ certificate parsing part of gnutls. Currently used prefixes are:
+ "gnutls_x509_" for the X.509 certificate part
+ "gnutls_openpgp_" for the openpgp key part
+ "gnutls_session_" for the TLS session part (but this may be omited)
+ "gnutls_handshake_" for the TLS handshake part
+ "gnutls_record_" for the TLS record part
+ "gnutls_alert_" for the TLS alert protocol part
+ "gnutls_credentials_" for the credentials structures
+ "gnutls_global_" for the global structures handling
+ and probably more.
+
+
+*** Constructed types:
+  The constructed types in gnutls always have the "gnutls_" prefix.
+
+
+*** Function parameters:
+  The gnutls functions accept parameters in the order:
+  1. Input parameters.
+  2. Output parameters
+
+
+*** Return values:
+  Functions in gnutls return an int type, when possible. In that
+ case 0 should be returned in case of success, or maybe a positive
+ value, if some other indication is needed.
+ 
+ A negative value, always indicates failure. All the available 
+ error codes are defined in gnutls_errors_int.h and a description
+ is available in gnutls_errors.c
