@@ -274,6 +274,35 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid,
 }
 
 /**
+  * gnutls_x509_crt_get_issuer_dn_oid - This function returns the Certificate's issuer distinguished name OIDs
+  * @cert: should contain a gnutls_x509_crt structure
+  * @indx: This specifies which OID to return. Use zero to get the first one.
+  * @oid: a pointer to a buffer to hold the OID (may be null)
+  * @sizeof_oid: initialy holds the size of 'oid'
+  *
+  * This function will extract the OIDs of the name of the Certificate issuer specified
+  * by the given index.
+  *
+  * If oid is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_oid will be updated with the required size.
+  * On success 0 is returned.
+  *
+  **/
+int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt cert, 
+	int indx, void *oid, size_t *sizeof_oid)
+{
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn_oid( cert->cert, "tbsCertificate.issuer.rdnSequence", 
+		indx, oid, sizeof_oid);
+}
+
+/**
   * gnutls_x509_crt_get_dn - This function returns the Certificate's distinguished name
   * @cert: should contain a gnutls_x509_crt structure
   * @buf: a pointer to a structure to hold the name (may be null)
@@ -335,6 +364,35 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid,
 
 	return _gnutls_x509_parse_dn_oid( cert->cert, "tbsCertificate.subject.rdnSequence", oid,
 		indx, raw_flag, buf, sizeof_buf);
+}
+
+/**
+  * gnutls_x509_crt_get_dn_oid - This function returns the Certificate's subject distinguished name OIDs
+  * @cert: should contain a gnutls_x509_crt structure
+  * @indx: This specifies which OID to return. Use zero to get the first one.
+  * @oid: a pointer to a buffer to hold the OID (may be null)
+  * @sizeof_oid: initialy holds the size of 'oid'
+  *
+  * This function will extract the OIDs of the name of the Certificate subject specified
+  * by the given index.
+  *
+  * If oid is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_oid will be updated with the required size.
+  * On success 0 is returned.
+  *
+  **/
+int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt cert, 
+	int indx, void *oid, size_t *sizeof_oid)
+{
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn_oid( cert->cert, "tbsCertificate.subject.rdnSequence", 
+		indx, oid, sizeof_oid);
 }
 
 /**
@@ -527,7 +585,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
   * given certificate.
   * 
   * This is specified in X509v3 Certificate Extensions. 
-  * GNUTLS will return the Alternative name, or a negative
+  * GNUTLS will return the Alternative name (2.5.29.17), or a negative
   * error code.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative 
@@ -643,7 +701,7 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
   * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return certificates CA status, by reading the
-  * basicConstraints X.509 extension. If the certificate is a CA a positive
+  * basicConstraints X.509 extension (2.5.29.19). If the certificate is a CA a positive
   * value will be returned, or zero if the certificate does not have
   * CA flag set. 
   *
@@ -693,7 +751,7 @@ int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical)
   * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return certificate's key usage, by reading the 
-  * keyUsage X.509 extension. The key usage value will ORed values of the:
+  * keyUsage X.509 extension (2.5.29.15). The key usage value will ORed values of the:
   * GNUTLS_KEY_DIGITAL_SIGNATURE, GNUTLS_KEY_NON_REPUDIATION,
   * GNUTLS_KEY_KEY_ENCIPHERMENT, GNUTLS_KEY_DATA_ENCIPHERMENT,
   * GNUTLS_KEY_KEY_AGREEMENT, GNUTLS_KEY_KEY_CERT_SIGN,
@@ -760,7 +818,7 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
   *
   **/
 int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
-	int indx, unsigned char* buf, size_t * sizeof_buf, unsigned int * critical)
+	int indx, void* buf, size_t * sizeof_buf, unsigned int * critical)
 {
 	int result;
 	gnutls_datum output;
@@ -794,6 +852,41 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
 
 	_gnutls_free_datum( &output);
 	
+	return 0;
+	
+}
+
+/**
+  * gnutls_x509_crt_get_extension_oid - This function returns the specified extension OID
+  * @cert: should contain a gnutls_x509_crt structure
+  * @indx: Specifies which extension OID to send. Use zero to get the first one.
+  * @oid: a pointer to a structure to hold the OID (may be null)
+  * @sizeof_oid: initialy holds the size of 'oid'
+  *
+  * This function will return the requested extension OID in the certificate.
+  * The extension OID will be stored as a string in the provided buffer.
+  *
+  * A negative value may be returned in case of parsing error.
+  * If your have reached the last extension available 
+  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+  *
+  **/
+int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx, 
+	void* oid, size_t * sizeof_oid)
+{
+	int result;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if ((result =
+	     _gnutls_x509_crt_get_extension_oid(cert, indx, oid, sizeof_oid)) < 0) {
+	     	gnutls_assert();
+		return result;
+	}
+
 	return 0;
 	
 }

@@ -615,10 +615,20 @@ const char* get_algorithm( int a)
 	}
 }
 
+static inline int known_oid( const char* oid)
+{
+	if (strcmp(oid, "2.5.29.17") == 0 ||
+		strcmp( oid, "2.5.29.19") == 0 ||
+		strcmp( oid, "2.5.29.15") == 0)
+			return 1;
+	
+	return 0;
+}
+
 void certificate_info( void)
 {
 	gnutls_x509_crt crt;
-	int ret, i;
+	int ret, i, indx, j;
 	unsigned int critical, key_usage;
 	time_t tim;
 	gnutls_datum pem;
@@ -628,6 +638,8 @@ void certificate_info( void)
 	char *print;
 	const char* cprint;
 	char dn[256];
+	char oid[128] = "";
+	char old_oid[128] = "";
 		
 	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 	buffer[size] = 0;
@@ -707,6 +719,7 @@ void certificate_info( void)
 	
 	/* subject alternative name
 	 */
+	ret = 0;
 	for (i = 0; !(ret < 0); i++) {
 		size = sizeof(buffer);
 		ret = gnutls_x509_crt_get_subject_alt_name(crt, i, buffer, &size, &critical);
@@ -756,6 +769,48 @@ void certificate_info( void)
 	if (ret >= 0) {
 		fprintf(outfile, "\tKey usage:\n");
 		print_key_usage(key_usage);
+	}
+
+	/* other extensions:
+	 */
+	indx = 0;
+	ret = 0;
+	for (i = 0; !(ret < 0); i++) {
+
+		size = sizeof(oid);
+		ret = gnutls_x509_crt_get_extension_oid( crt, i, oid, &size);
+
+		if (ret >= 0) {
+			if (known_oid( oid)) continue;
+
+			if (strcmp( oid, old_oid) == 0) {
+				indx++;
+			} else {
+				indx = 0;
+			}
+
+			fprintf( outfile, "\n\t%s: ", oid);
+			
+			size = sizeof(buffer);
+			ret = gnutls_x509_crt_get_extension_by_oid( crt, oid, indx, buffer, &size, &critical);
+			if (ret >= 0) {
+				if (critical)
+					fprintf(outfile, "(critical)\n");
+				else
+					fprintf(outfile, "\n");
+
+				print = printable;
+				for (j = 0; j < size; j++) {
+					sprintf(print, "%.2x ", (unsigned char) buffer[j]);
+					print += 3;
+				}
+				fprintf(outfile, "\t\tDER Data: %s\n", printable);
+			
+			}
+	
+			ret = 0;
+			strcpy( old_oid, oid);
+		}
 	}
 
 

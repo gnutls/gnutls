@@ -221,6 +221,35 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 		oid, indx, raw_flag, buf, sizeof_buf);
 }
 
+/**
+  * gnutls_x509_crq_get_dn_oid - This function returns the Certificate request subject's distinguished name OIDs
+  * @crq: should contain a gnutls_x509_crq structure
+  * @indx: Specifies which DN OID to send. Use zero to get the first one.
+  * @oid: a pointer to a structure to hold the name (may be null)
+  * @sizeof_oid: initialy holds the size of 'oid'
+  *
+  * This function will extract the requested OID of the name of the Certificate request subject, specified
+  * by the given index. 
+  *
+  * If oid is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_oid will be updated with the required size.
+  * On success 0 is returned.
+  *
+  **/
+int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq crq,
+	int indx, void *oid, size_t *sizeof_oid)
+{
+	if (crq==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn_oid( crq->crq, "certificationRequestInfo.subject.rdnSequence", 
+		indx, oid, sizeof_oid);
+}
+
 /* Parses an Attribute list in the asn1_struct, and searches for the
  * given OID. The index indicates the attribute value to be returned.
  *

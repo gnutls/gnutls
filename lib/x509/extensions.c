@@ -161,6 +161,131 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 	}
 }
 
+/* This function will attempt to return the requested extension OID found in
+ * the given X509v3 certificate. 
+ *
+ * If you have passed the last extension, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
+ * be returned.
+ */
+int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
+	int indx, void* oid, size_t* sizeof_oid)
+{
+	int k, result, len;
+	char name[128], name2[128], counter[MAX_INT_DIGITS];
+	char str[1024];
+	char str_critical[10];
+	int critical = 0;
+	char extnID[128];
+	char extnValue[256];
+	int indx_counter = 0;
+
+	k = 0;
+	do {
+		k++;
+
+		_gnutls_str_cpy(name, sizeof(name), "tbsCertificate.extensions.?"); 
+		_gnutls_int2str(k, counter); 
+		_gnutls_str_cat(name, sizeof(name), counter); 
+
+		len = sizeof(str) - 1;
+		result = asn1_read_value(cert->cert, name, str, &len);
+
+		/* move to next
+		 */
+
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			break;
+		}
+
+		do {
+
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnID"); 
+
+			len = sizeof(extnID) - 1;
+			result =
+			    asn1_read_value(cert->cert, name2, extnID, &len);
+
+			if (result == ASN1_ELEMENT_NOT_FOUND) {
+				gnutls_assert();
+				break;
+			} else if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				return _gnutls_asn2err(result);
+			}
+
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
+
+			len = sizeof(str_critical);
+			result =
+			    asn1_read_value(cert->cert, name2, str_critical, &len);
+
+			if (result == ASN1_ELEMENT_NOT_FOUND) {
+				gnutls_assert();
+				break;
+			} else if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				return _gnutls_asn2err(result);
+			}
+
+			if (strcmp( str_critical, "TRUE")==0)
+				critical = 1;
+			else critical = 0;
+
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
+
+			len = sizeof(extnValue) - 1;
+			result =
+			    asn1_read_value(cert->cert, name2, extnValue, &len);
+
+			if (result == ASN1_ELEMENT_NOT_FOUND)
+				break;
+			else {
+				if (result == ASN1_MEM_ERROR
+				    && critical == 0) {
+
+					_gnutls_x509_log
+					    ("X509_EXT: Cannot parse extension: %s. Too small buffer.",
+					     extnID);
+
+					continue;
+				}
+				if (result != ASN1_SUCCESS) {
+					gnutls_assert();
+					return _gnutls_asn2err(result);
+				}
+			}
+
+			/* Handle Extension */
+			if ( indx == indx_counter++) { 
+				len = strlen( extnID) + 1;
+
+				if ( *sizeof_oid < len) {
+					*sizeof_oid = len;
+					gnutls_assert();
+					return GNUTLS_E_SHORT_MEMORY_BUFFER;
+				}
+				
+				memcpy( oid, extnID, len);
+				*sizeof_oid = len - 1;
+
+				return 0;
+			}
+
+
+		} while (0);
+	} while (1);
+
+	if (result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	} else {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+}
+
 /* This function will attempt to set the requested extension in
  * the given X509v3 certificate. 
  *

@@ -55,11 +55,15 @@ int gnutls_x509_crt_export( gnutls_x509_crt cert,
 	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size);
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
 	 size_t *sizeof_buf);
+int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt cert, 
+	int indx, void *oid, size_t *sizeof_oid);
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, 
 	const char* oid, int indx, unsigned int raw_flag,
 	void *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
 	 size_t *sizeof_buf);
+int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt cert, 
+	int indx, void *oid, size_t *sizeof_oid);
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, unsigned int raw_flag, void *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
@@ -97,9 +101,11 @@ int gnutls_x509_oid_known(const char* oid);
 #define GNUTLS_KEY_ENCIPHER_ONLY		2
 #define GNUTLS_KEY_DECIPHER_ONLY		1
 
+int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx, 
+	void* oid, size_t * sizeof_oid);
 int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, 
 	const char* oid, int indx,
-	unsigned char* buf, size_t * sizeof_buf, unsigned int * critical);
+	void* buf, size_t * sizeof_buf, unsigned int * critical);
 
 int gnutls_x509_crt_to_xml(gnutls_x509_crt cert, gnutls_datum* res, int detail);
 
@@ -131,6 +137,8 @@ int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial
  */
 int gnutls_x509_rdn_get(const gnutls_datum * idn,
 				  char *buf, size_t *sizeof_buf);
+int gnutls_x509_rdn_get_oid(const gnutls_datum * idn, 
+	int indx, void *buf, size_t * sizeof_buf);
 
 int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid,
 	int indx, unsigned int raw_flag, void *buf, size_t *sizeof_buf);
@@ -152,6 +160,8 @@ int gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl crl,
 int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, 
 	const char* oid, int indx, 
 	unsigned int raw_flag, void *buf, size_t *sizeof_buf);
+int gnutls_x509_crl_get_dn_oid(gnutls_x509_crl crl, 
+	int indx, void *oid, size_t *sizeof_oid);
 
 int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_version(gnutls_x509_crl crl);
@@ -293,6 +303,8 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 int gnutls_x509_crq_get_pk_algorithm( gnutls_x509_crq crq, unsigned int* bits);
 int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
 					 size_t *sizeof_buf);
+int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq crq,
+	int indx, void *oid, size_t *sizeof_oid);
 int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
 	int indx, unsigned int raw_flag, void *buf, size_t *sizeof_buf);
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 

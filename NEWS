@@ -8,6 +8,8 @@ Version 0.9.98
 - gnutls8 function usage yelds a deprecation warning in gcc3.
 - gnutls_x509_*_set_dn_by_oid() and gnutls_x509_*_get_*_dn_by_oid()
   functions have a raw_flag parameter added.
+- Added gnutls_x509_*_get_dn_oid() and gnutls_x509_crt_get_extension_oid()
+  functions which return the available OIDs.
 
 Version 0.9.97 (11/11/2003)
 - The certtool utility can now generate PKCS #12 structures

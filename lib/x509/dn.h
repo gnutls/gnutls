@@ -25,5 +25,9 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
 	const char* asn1_rdn_name, const char* oid, int raw_flag, 
 	const char *name, int sizeof_name);
 
+int _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
+      const char *asn1_rdn_name,
+      int indx, 
+      void *_oid, size_t * sizeof_oid);
 
 #endif

@@ -141,7 +141,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			break;
 		}
 
-		if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_MEM_ERROR) {
+		if (result != ASN1_VALUE_NOT_FOUND) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
 			goto cleanup;
@@ -174,7 +174,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 
 			if (result == ASN1_ELEMENT_NOT_FOUND)
 				break;
-			if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_MEM_ERROR) {
+			if (result != ASN1_VALUE_NOT_FOUND) {
 				gnutls_assert();
 				result = _gnutls_asn2err(result);
 				goto cleanup;
@@ -392,7 +392,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 			break;
 		}
 
-		if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_MEM_ERROR) {
+		if (result != ASN1_VALUE_NOT_FOUND) {
 			gnutls_assert();
 			result = _gnutls_asn2err(result);
 			goto cleanup;
@@ -427,7 +427,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 			if (result == ASN1_ELEMENT_NOT_FOUND) {
 				break;
 			}
-			if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_MEM_ERROR) {
+			if (result != ASN1_VALUE_NOT_FOUND) {
 				gnutls_assert();
 				result = _gnutls_asn2err(result);
 				goto cleanup;
@@ -539,6 +539,142 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 						}
 					}
 				}	/* raw_flag == 0 */
+			}
+		} while (1);
+
+	} while (1);
+
+	gnutls_assert();
+
+	result = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+      cleanup:
+	return result;
+}
+
+/* Parses an X509 DN in the asn1_struct, and returns the requested
+ * DN OID.
+ *
+ * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
+ * That is to point in the rndSequence.
+ *
+ * indx specifies which OID to return. Ie 0 means return the first specified
+ * OID found, 1 the second etc.
+ */
+int _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
+      const char *asn1_rdn_name,
+      int indx, void *_oid, size_t * sizeof_oid)
+{
+	int k2, k1, result;
+	char tmpbuffer1[64];
+	char tmpbuffer2[64];
+	char tmpbuffer3[64];
+	char counter[MAX_INT_DIGITS];
+	char value[256];
+	char oid[128];
+	int len;
+	int i = 0;
+
+	k1 = 0;
+	do {
+
+		k1++;
+		/* create a string like "tbsCertList.issuer.rdnSequence.?1"
+		 */
+		_gnutls_int2str(k1, counter);
+		_gnutls_str_cpy(tmpbuffer1, sizeof(tmpbuffer1),
+				asn1_rdn_name);
+
+		if (strlen(tmpbuffer1) > 0)
+			_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1),
+					".");
+		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), "?");
+		_gnutls_str_cat(tmpbuffer1, sizeof(tmpbuffer1), counter);
+
+		len = sizeof(value) - 1;
+		result =
+		    asn1_read_value(asn1_struct, tmpbuffer1, value, &len);
+
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			gnutls_assert();
+			break;
+		}
+
+		if (result != ASN1_VALUE_NOT_FOUND) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		k2 = 0;
+
+		do {		/* Move to the attibute type and values
+				 */
+			k2++;
+
+			_gnutls_int2str(k2, counter);
+			_gnutls_str_cpy(tmpbuffer2, sizeof(tmpbuffer2),
+					tmpbuffer1);
+
+			if (strlen(tmpbuffer2) > 0)
+				_gnutls_str_cat(tmpbuffer2,
+						sizeof(tmpbuffer2), ".");
+			_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2),
+					"?");
+			_gnutls_str_cat(tmpbuffer2, sizeof(tmpbuffer2),
+					counter);
+
+			/* Try to read the RelativeDistinguishedName attributes.
+			 */
+
+			len = sizeof(value) - 1;
+			result =
+			    asn1_read_value(asn1_struct, tmpbuffer2, value,
+					    &len);
+
+			if (result == ASN1_ELEMENT_NOT_FOUND) {
+				break;
+			}
+			if (result != ASN1_VALUE_NOT_FOUND) {
+				gnutls_assert();
+				result = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+
+			/* Read the OID 
+			 */
+			_gnutls_str_cpy(tmpbuffer3, sizeof(tmpbuffer3),
+					tmpbuffer2);
+			_gnutls_str_cat(tmpbuffer3, sizeof(tmpbuffer3),
+					".type");
+
+			len = sizeof(oid) - 1;
+			result =
+			    asn1_read_value(asn1_struct, tmpbuffer3, oid,
+					    &len);
+
+			if (result == ASN1_ELEMENT_NOT_FOUND)
+				break;
+			else if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				result = _gnutls_asn2err(result);
+				goto cleanup;
+			}
+
+			if ( indx == i++) {	/* Found the OID */
+
+				len = strlen( oid) + 1;
+
+				if ( *sizeof_oid < len) {
+					*sizeof_oid = len;
+					gnutls_assert();
+					return GNUTLS_E_SHORT_MEMORY_BUFFER;
+				}
+				
+				memcpy( oid, _oid, len);
+				*sizeof_oid = len - 1;
+
+				return 0;
 			}
 		} while (1);
 
@@ -940,6 +1076,54 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char *oid,
 	result =
 	    _gnutls_x509_parse_dn_oid(dn, "rdnSequence", oid, indx, 
 	    	raw_flag, buf, sizeof_buf);
+
+	asn1_delete_structure(&dn);
+	return result;
+
+}
+
+/**
+  * gnutls_x509_rdn_get_oid - This function parses an RDN sequence and returns an OID.
+  * @idn: should contain a DER encoded RDN sequence
+  * @indx: Indicates which OID to return. Use 0 for the first one.
+  * @oid: a pointer to a structure to hold the peer's name OID
+  * @sizeof_oid: holds the size of 'oid'
+  *
+  * This function will return the specified Object identifier, 
+  * of the RDN sequence.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
+  * and 0 on success.
+  *
+  **/
+int gnutls_x509_rdn_get_oid(const gnutls_datum * idn, 
+	int indx, void *buf, size_t * sizeof_buf)
+{
+	int result;
+	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
+
+	if (sizeof_buf == 0) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+				 "PKIX1.Name", &dn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&dn, idn->data, idn->size, NULL);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+
+	result =
+	    _gnutls_x509_get_dn_oid(dn, "rdnSequence", indx, 
+	    	buf, sizeof_buf);
 
 	asn1_delete_structure(&dn);
 	return result;

@@ -215,6 +215,36 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
 }
 
 /**
+  * gnutls_x509_crl_get_issuer_dn_oid - This function returns the Certificate request issuer's distinguished name OIDs
+  * @crl: should contain a gnutls_x509_crl structure
+  * @indx: Specifies which DN OID to send. Use zero to get the first one.
+  * @oid: a pointer to a structure to hold the name (may be null)
+  * @sizeof_oid: initialy holds the size of 'oid'
+  *
+  * This function will extract the requested OID of the name of the CRL issuer, specified
+  * by the given index. 
+  *
+  * If oid is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_oid will be updated with the required size.
+  * On success 0 is returned.
+  *
+  **/
+int gnutls_x509_crl_get_dn_oid(gnutls_x509_crl crl, 
+	int indx, void *oid, size_t *sizeof_oid)
+{
+	if (crl==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	return _gnutls_x509_get_dn_oid( crl->crl, 
+		 "tbsCertList.issuer.rdnSequence", indx, oid, sizeof_oid);
+}
+
+
+/**
   * gnutls_x509_crl_get_signature_algorithm - This function returns the CRL's signature algorithm
   * @crl: should contain a gnutls_x509_crl structure
   *
