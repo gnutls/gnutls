@@ -22,7 +22,7 @@ int gnutls_insert_to_data_buffer(ContentType type, GNUTLS_STATE state, char *dat
 int gnutls_get_data_buffer_size(ContentType type, GNUTLS_STATE state);
 int gnutls_get_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int length);
 ssize_t _gnutls_read_buffered(int fd, GNUTLS_STATE, opaque **iptr, size_t n, ContentType);
-void _gnutls_read_clear_buffer( GNUTLS_STATE);
+void _gnutls_clear_read_buffer( GNUTLS_STATE);
 int _gnutls_clear_peeked_data( SOCKET cd, GNUTLS_STATE state);
 
 ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE, const void *iptr, size_t n );

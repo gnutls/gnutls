@@ -107,6 +107,7 @@ void *gnutls_realloc(void *_ptr, size_t size)
 
 void *gnutls_realloc_fast(void *ptr, size_t size)
 {
+
 	if (ptr != NULL && size <= _gnutls_malloc_ptr_size(ptr)) {
 		/* do nothing, just return the pointer.
 		   * It's much faster.

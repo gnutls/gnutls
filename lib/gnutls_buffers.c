@@ -264,8 +264,8 @@ int ret, sum;
 }
 
 
-void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
-	state->gnutls_internals.recv_buffer_data_size = 0;
+void _gnutls_clear_read_buffer( GNUTLS_STATE state) {
+	state->gnutls_internals.recv_buffer.size = 0;
 }
                   	
 /* This function is like recv(with MSG_PEEK). But it does not return -1 on error.
@@ -289,7 +289,8 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 	*iptr = NULL;
 
-	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0 || (state->gnutls_internals.recv_buffer_data_size+sizeOfPtr) > MAX_RECV_SIZE) {
+	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0 
+	|| (state->gnutls_internals.recv_buffer.size+sizeOfPtr) > MAX_RECV_SIZE) {
 		gnutls_assert(); /* internal error */
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
@@ -302,15 +303,11 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 		&& state->gnutls_internals.have_peeked_data==0)
 		recvlowat = 0;
 
-	buf = state->gnutls_internals.recv_buffer_data;
-	buf_pos = state->gnutls_internals.recv_buffer_data_size;
-
-	*iptr = buf;
 	
 	/* calculate the actual size, ie. get the minimum of the
 	 * buffered data and the requested data.
 	 */
-	min = GMIN( state->gnutls_internals.recv_buffer_data_size, sizeOfPtr);
+	min = GMIN( state->gnutls_internals.recv_buffer.size, sizeOfPtr);
 	if ( min > 0) {
 		/* if we have enough buffered data
 		 * then just return them.
@@ -324,7 +321,19 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 * receive in order to return the requested data.
 	 */
 	recvdata = sizeOfPtr - min;
+	
+	/* Allocate the data required to store the new packet.
+	 */
+	state->gnutls_internals.recv_buffer.data = gnutls_realloc_fast(
+		state->gnutls_internals.recv_buffer.data, recvdata+state->gnutls_internals.recv_buffer.size);
+	if ( state->gnutls_internals.recv_buffer.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
+	buf_pos = state->gnutls_internals.recv_buffer.size;
+	buf = state->gnutls_internals.recv_buffer.data;
+	*iptr = buf;
 
 	/* READ DATA - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
@@ -346,10 +355,10 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	/* copy fresh data to our buffer.
 	 */
 	if (ret > 0)
-		state->gnutls_internals.recv_buffer_data_size += ret;
+		state->gnutls_internals.recv_buffer.size += ret;
 
 
-	buf_pos = state->gnutls_internals.recv_buffer_data_size;
+	buf_pos = state->gnutls_internals.recv_buffer.size;
 	
 	/* This is hack in order for select to work. Just leave recvlowat data,
 	 * into the kernel buffer (using a read with MSG_PEEK), thus making
@@ -371,7 +380,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 		if (ret2 > 0) {
 			state->gnutls_internals.have_peeked_data = 1;
-			state->gnutls_internals.recv_buffer_data_size += ret2;
+			state->gnutls_internals.recv_buffer.size += ret2;
 
 		}
 	}
@@ -394,7 +403,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 		return 0;
 	}
 
-	ret = state->gnutls_internals.recv_buffer_data_size;
+	ret = state->gnutls_internals.recv_buffer.size;
 
 	if ((ret > 0) && (ret < sizeOfPtr)) {
 		/* Short Read */
@@ -547,7 +556,6 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 		 * the data field so send_int() will proceed normally.
 		 */
 		return _gnutls_flush( fd, state);
-//		return gnutls_send_int( fd, state, type, htype, &sdata, 1);
 	}
 
 	left = n;
@@ -622,7 +630,6 @@ int gnutls_insert_to_handshake_buffer( GNUTLS_STATE state, char *data, int lengt
 	state->gnutls_internals.hash_buffer.data =
 		    gnutls_realloc_fast(state->gnutls_internals.hash_buffer.data,
 			   state->gnutls_internals.hash_buffer.size);
-			   
 	if (state->gnutls_internals.hash_buffer.data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

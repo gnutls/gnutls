@@ -371,8 +371,7 @@ typedef struct {
 					/* this buffer holds a record packet -mostly used for
 					 * non blocking IO.
 					 */
-	opaque				recv_buffer_data[MAX_RECV_SIZE];
-	int				recv_buffer_data_size;
+	gnutls_datum			recv_buffer;
 	gnutls_datum			send_buffer; /* holds cached data
 					* for the gnutls_write_buffered()
 					* function.

@@ -95,7 +95,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
 	gnutls_set_protocol_priority( *state, GNUTLS_TLS1, 0); /* default */
-
+	
 	(*state)->gnutls_key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
 	if ( (*state)->gnutls_key == NULL) {
 		gnutls_free( *state);
@@ -109,6 +109,12 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 
 	gnutls_set_max_handshake_data_buffer_size( (*state), MAX_HANDSHAKE_DATA_BUFFER_SIZE);
+
+	/* Allocate a minimum size for recv_data 
+	 * This is allocated in order to avoid small messages, makeing
+	 * the receive procedure slow.
+	 */
+	(*state)->gnutls_internals.recv_buffer.data = gnutls_malloc(256);
 
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
@@ -143,6 +149,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 	gnutls_sfree_datum(&state->connection_state.read_mac_secret);
 	gnutls_sfree_datum(&state->connection_state.write_mac_secret);
 
+	GNUTLS_FREE(state->gnutls_internals.recv_buffer.data);
 	GNUTLS_FREE(state->gnutls_internals.buffer.data);
 	GNUTLS_FREE(state->gnutls_internals.buffer_handshake.data);
 	GNUTLS_FREE(state->gnutls_internals.hash_buffer.data);
@@ -751,7 +758,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
-	_gnutls_read_clear_buffer( state);
+	_gnutls_clear_read_buffer( state);
 	ciphertext = &recv_data[header_size];
 	
 	/* decrypt the data we got

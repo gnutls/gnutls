@@ -166,12 +166,15 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 
 	*data = gnutls_realloc( *data, data_size+signature.size+2);
 	if (*data==NULL) {
+		gnutls_free_datum( &signature);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
 	WRITEdatum16( &(*data)[data_size], signature);
 	data_size += signature.size+2;
+
+	gnutls_free_datum( &signature);
 
 	return data_size;
 }
