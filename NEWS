@@ -4,7 +4,7 @@ Version 0.4.0
   gnutls_openpgp_extract_key_pk_algorithm().
 - Several optimizations in the Handshake protocol
 - Several optimizations in RSA algorithm
-- Made the return values because of small buffers given uniform.
+- Unified the return values because of small buffers.
 
 Version 0.3.92 (23/03/2002)
 - Updated documentation
