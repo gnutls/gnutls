@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation
  *
- * Author: Nikos Mavroyanopoulos <nmav@hellug.gr>
+ * Author: Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
