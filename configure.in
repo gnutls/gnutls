@@ -28,7 +28,7 @@ AM_PATH_LIBGCRYPT(1.1.2,,
  	AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from
-*** ftp://ftp.gnupg.org/pub/gcrypt/alpha/gnupg/
+*** ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/
 ***
 ]]))
 dnl Can't disable for now
