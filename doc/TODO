@@ -21,7 +21,6 @@ Current list:
 * Audit the code
 * Allow sending V2 Hello messages. It seems that some (old) broken 
   implementations require that.
-* Allow unexpected Client Hello messages
 * Add Kerberos support
 
 (+) Means high priority 
