@@ -31,11 +31,12 @@ Free Documentation License".
 
 @dircategory Network Applications
 @direntry
+* GnuTLS: (gnutls).			Package for Transport Layer Security.
 * certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
+* srptool: (gnutls)Invoking srptool.	Simple SRP password tool.
+* gnutls-serv: (gnutls)Invoking gnutls-serv.	GNU TLS test server.
 * gnutls-cli: (gnutls)Invoking gnutls-cli.	GNU TLS test client.
 * gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GNU TLS debug client.
-* gnutls-serv: (gnutls)Invoking gnutls-serv.	GNU TLS test server.
-* srptool: (gnutls)Invoking srptool.		Simple SRP password tool.
 @end direntry
 
 @titlepage
