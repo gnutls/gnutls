@@ -202,7 +202,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 	root = _asn1_find_node(structure, name);
 
 	if (root == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 
 	ret = asn1_expand_any_defined_by( _gnutls_get_pkix(),
 					&structure);

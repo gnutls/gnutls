@@ -86,7 +86,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 	if (list == NULL) {
         	gnutls_assert();
         	gcry_sexp_release( key);
-                return GNUTLS_E_UNKNOWN_ERROR;
+                return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	resarr[0] = gcry_sexp_nth_mpi(list, 1, 0);
@@ -96,7 +96,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 	if (list == NULL) {
         	gnutls_assert();
         	gcry_sexp_release( key);
-                return GNUTLS_E_UNKNOWN_ERROR;
+                return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	resarr[1] = gcry_sexp_nth_mpi(list, 1, 0);
@@ -106,7 +106,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 	if (list == NULL) {
         	gnutls_assert();
         	gcry_sexp_release( key);
-                return GNUTLS_E_UNKNOWN_ERROR;
+                return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	resarr[2] = gcry_sexp_nth_mpi(list, 1, 0);
@@ -116,7 +116,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 	if (list == NULL) {
         	gnutls_assert();
         	gcry_sexp_release( key);
-                return GNUTLS_E_UNKNOWN_ERROR;
+                return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	resarr[3] = gcry_sexp_nth_mpi(list, 1, 0);
@@ -127,7 +127,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 	if (list == NULL) {
         	gnutls_assert();
         	gcry_sexp_release( key);
-                return GNUTLS_E_UNKNOWN_ERROR;
+                return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	resarr[4] = gcry_sexp_nth_mpi(list, 1, 0);
@@ -138,7 +138,7 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 	if (list == NULL) {
         	gnutls_assert();
         	gcry_sexp_release( key);
-                return GNUTLS_E_UNKNOWN_ERROR;
+                return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	resarr[5] = gcry_sexp_nth_mpi(list, 1, 0);

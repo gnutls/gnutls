@@ -137,7 +137,7 @@ ASN1_TYPE tmpasn;
 	
 	if ( _gnutls_x509_oid_data_printable( OID) == 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	ANAME = _gnutls_x509_oid2string( OID);
@@ -145,7 +145,7 @@ ASN1_TYPE tmpasn;
 
 	if (ANAME==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	_gnutls_str_cpy(str, sizeof(str), "PKIX1."); 

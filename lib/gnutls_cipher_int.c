@@ -93,7 +93,7 @@ int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen)
 #else
 		if (gcry_cipher_encrypt( handle, text, textlen, NULL, textlen)!=0) {
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 #endif
 	}
@@ -107,7 +107,7 @@ int _gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int ci
 #else
 		if (gcry_cipher_decrypt( handle, ciphertext, ciphertextlen, NULL, ciphertextlen)!=0) {
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 #endif
 	}

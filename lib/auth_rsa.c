@@ -83,7 +83,7 @@ int i;
 
 	if (info==NULL || info->ncerts==0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
 	switch( session->security_parameters.cert_type) {
@@ -171,7 +171,7 @@ const gnutls_certificate_credentials cred;
 
 	if ( (index=session->internals.selected_cert_index) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if ( _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite)

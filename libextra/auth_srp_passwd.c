@@ -393,7 +393,7 @@ int _gnutls_srp_generate_prime(opaque ** ret_g, opaque ** ret_n, int bits)
 
 		if (_gnutls_sbase64_encode(tmp, siz, ret_g) < 0) {
 			gnutls_free(tmp);
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		gnutls_free(tmp);
 	}
@@ -407,7 +407,7 @@ int _gnutls_srp_generate_prime(opaque ** ret_g, opaque ** ret_n, int bits)
 		_gnutls_mpi_print( tmp, &siz, prime);
 		if (_gnutls_sbase64_encode(tmp, siz, ret_n) < 0) {
 			gnutls_free(tmp);
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		gnutls_free(tmp);

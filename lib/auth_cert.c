@@ -641,7 +641,7 @@ int _gnutls_gen_cert_client_certificate(gnutls_session session, opaque ** data)
 
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 }
 
@@ -654,7 +654,7 @@ int _gnutls_gen_cert_server_certificate(gnutls_session session, opaque ** data)
 		return _gnutls_gen_x509_certificate(session, data);
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 }
 
@@ -975,7 +975,7 @@ int _gnutls_proc_cert_server_certificate(gnutls_session session, opaque * data,
 							    data_size);
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 }
 
@@ -1143,7 +1143,7 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session, opaque * data,
 	if (info == NULL || info->ncerts == 0) {
 		gnutls_assert();
 		/* we need this in order to get peer's certificate */
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	DECR_LEN(dsize, 2);
@@ -1175,7 +1175,7 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session, opaque * data,
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (ret < 0) {

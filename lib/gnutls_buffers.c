@@ -469,7 +469,7 @@ static int _gnutls_buffer_insert( gnutls_buffer * buffer, const opaque* _data, s
 		if (data_size > buffer->length) {
 			gnutls_assert();
 			/* this shouldn't have happened */
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 		
 		if (_data==buffer->data) { /* then don't even memmove */
@@ -711,7 +711,7 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 
 	} else if (session->internals.handshake_send_buffer.length > 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	} else {
 #ifdef WRITE_DEBUG
 		size_t sum=0, x, j;
@@ -740,7 +740,7 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 		return 0;
 	} else if (ptr==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
 
@@ -751,7 +751,7 @@ ssize_t _gnutls_handshake_io_send_int( gnutls_session session, ContentType type,
 		if (ret <= 0) {
 			if (ret==0) {
 				gnutls_assert();
-				ret = GNUTLS_E_UNKNOWN_ERROR;
+				ret = GNUTLS_E_INTERNAL_ERROR;
 			}
 
 			if ( left > 0 && (ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN)) { 

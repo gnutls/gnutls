@@ -600,7 +600,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 
 	default:		/* this check is useless */
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	session->connection_state.read_compression_state =
@@ -779,7 +779,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 

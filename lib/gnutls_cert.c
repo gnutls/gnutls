@@ -356,7 +356,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 
 	if (peer_certificate_list_size != 1) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
 	/* Verify certificate 

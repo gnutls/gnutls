@@ -1012,7 +1012,7 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 	}
 
 
-	ret = GNUTLS_E_UNKNOWN_ERROR;
+	ret = GNUTLS_E_INTERNAL_ERROR;
 
 	if (data != NULL && length32 > 0)
 		*data = dataptr;
@@ -1467,7 +1467,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 		if (hver <= 0) {
 			if (hver == 0)
-				hver = GNUTLS_E_UNKNOWN_ERROR;
+				hver = GNUTLS_E_INTERNAL_ERROR;
 			gnutls_assert();
 			return hver;
 		}
@@ -1533,7 +1533,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 		} else {
 			if (extdatalen == 0)
-				extdatalen = GNUTLS_E_UNKNOWN_ERROR;
+				extdatalen = GNUTLS_E_INTERNAL_ERROR;
 			gnutls_free(data);
 			gnutls_assert();
 			return extdatalen;
@@ -1558,7 +1558,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 
 		} else {
 			if (extdatalen == 0)
-				extdatalen = GNUTLS_E_UNKNOWN_ERROR;
+				extdatalen = GNUTLS_E_INTERNAL_ERROR;
 			gnutls_free(data);
 			gnutls_assert();
 			return extdatalen;
@@ -1783,7 +1783,7 @@ static int _gnutls_abort_handshake( gnutls_session session, int ret) {
 			return 0;
 
 	/* this doesn't matter */
-	return GNUTLS_E_UNKNOWN_ERROR;
+	return GNUTLS_E_INTERNAL_ERROR;
 }
 
 

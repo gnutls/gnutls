@@ -66,7 +66,7 @@ int gnutls_dh_get_prime_bits(gnutls_session session)
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
-				return GNUTLS_E_UNKNOWN_ERROR;
+				return GNUTLS_E_INTERNAL_ERROR;
 			return info->dh_prime_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -74,7 +74,7 @@ int gnutls_dh_get_prime_bits(gnutls_session session)
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
-				return GNUTLS_E_UNKNOWN_ERROR;
+				return GNUTLS_E_INTERNAL_ERROR;
 
 			return info->dh_prime_bits;
 		}
@@ -101,7 +101,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
-				return GNUTLS_E_UNKNOWN_ERROR;
+				return GNUTLS_E_INTERNAL_ERROR;
 			return info->dh_secret_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -109,7 +109,7 @@ int gnutls_dh_get_secret_bits(gnutls_session session)
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
-				return GNUTLS_E_UNKNOWN_ERROR;
+				return GNUTLS_E_INTERNAL_ERROR;
 
 			return info->dh_secret_bits;
 		}
@@ -135,7 +135,7 @@ CERTIFICATE_AUTH_INFO info;
 
 	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 
 	return info->rsa_export_modulus_bits;
 }
@@ -157,7 +157,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
-				return GNUTLS_E_UNKNOWN_ERROR;
+				return GNUTLS_E_INTERNAL_ERROR;
 			return info->dh_peer_public_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -165,7 +165,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
 
 			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
-				return GNUTLS_E_UNKNOWN_ERROR;
+				return GNUTLS_E_INTERNAL_ERROR;
 
 			return info->dh_peer_public_bits;
 		}
@@ -255,7 +255,7 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
 
 	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	return info->certificate_requested;
 }
 

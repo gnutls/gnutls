@@ -45,7 +45,6 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("The certificate and the given key do not match.", GNUTLS_E_CERTIFICATE_KEY_MISMATCH, 1 ), 
 	ERROR_ENTRY("Could not negotiate a supported compression method.", GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM, 1 ), 
 	ERROR_ENTRY("An unknown public key algorithm was encountered.", GNUTLS_E_UNKNOWN_PK_ALGORITHM, 1 ), 
-	ERROR_ENTRY("Unspecified error.", GNUTLS_E_UNKNOWN_ERROR, 1 ), 
 
 	ERROR_ENTRY("An algorithm that is not enabled was negotiated.", GNUTLS_E_UNWANTED_ALGORITHM, 1 ), 
 	ERROR_ENTRY("A large TLS record packet was received.", GNUTLS_E_LARGE_PACKET, 1 ), 

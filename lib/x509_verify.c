@@ -156,12 +156,12 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	 */
 	if (len1 != len2) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	if (memcmp(&issuer_cert->raw.data[start2],
 		   &cert->raw.data[start1], len1) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* they match */

@@ -257,7 +257,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 		break;
 	default:
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	i++;
 
@@ -532,7 +532,7 @@ static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 	if (gcry_sexp_build(&s_data, NULL, "%m", data)) {
 		gnutls_assert();
 		gcry_sexp_release(s_pkey);
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* pass it to libgcrypt */
@@ -549,7 +549,7 @@ static int _gnutls_pk_encrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 		if (list == NULL) {
 			gnutls_assert();
 			gcry_sexp_release(s_ciph);
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		resarr[0] = gcry_sexp_nth_mpi(list, 1, 0);
@@ -588,14 +588,14 @@ static int _gnutls_pk_decrypt(int algo, GNUTLS_MPI * resarr, GNUTLS_MPI data, GN
 
 	if (rc != 0) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* put the data into a simple list */
 	if (gcry_sexp_build(&s_data, NULL, "(enc-val(rsa(a%m)))", data)) {
 		gnutls_assert();
 		gcry_sexp_release(s_pkey);
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* pass it to libgcrypt */
@@ -663,7 +663,7 @@ int _gnutls_pk_sign(int algo, GNUTLS_MPI* data, GNUTLS_MPI hash, GNUTLS_MPI * pk
 	/* put the data into a simple list */
 	if (gcry_sexp_build(&s_hash, NULL, "%m", hash)) {
 		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* pass it to libgcrypt */
@@ -750,7 +750,7 @@ static int _gnutls_pk_verify(int algo, GNUTLS_MPI hash, GNUTLS_MPI* data, GNUTLS
 	if (gcry_sexp_build(&s_hash, NULL, "%m", hash)) {
 		gnutls_assert();
 		gcry_sexp_release(s_pkey);
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	switch (algo) {

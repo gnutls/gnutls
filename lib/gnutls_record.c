@@ -417,7 +417,7 @@ ssize_t gnutls_send_int( gnutls_session session, ContentType type, HandshakeType
 		
 		if (ret > 0) {
 			gnutls_assert();
-			ret = GNUTLS_E_UNKNOWN_ERROR;
+			ret = GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		_gnutls_session_unresumable( session);
@@ -652,7 +652,7 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 			_gnutls_record_log( "REC: Received Unknown packet %d expecting %d\n", recv_type, type);
 
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 	}
 	

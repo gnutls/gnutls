@@ -256,7 +256,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	if (info == NULL || info->ncerts==0) {
 		gnutls_assert();
 		/* we need this in order to get peer's certificate */
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 
@@ -343,7 +343,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 
 		default:
 			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_ERROR;
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	ret =
