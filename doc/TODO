@@ -3,12 +3,14 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-* Audit the code
-* Add PKCS-12 support
++ Add PKCS-12 support
++ Add some support for the so called EXPORT ciphersuites
+* Add function to return cipher suite names
 * Convert documentation to texinfo format
 * Merge common stuff in DHE and DHA key exchange
 * Add GPGSM certificate manager support
 * Add support for certificate CRLs
+* Audit the code
 - Add Kerberos support
 
 (+) Means high priority 
