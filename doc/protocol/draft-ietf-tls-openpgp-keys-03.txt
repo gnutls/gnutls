@@ -1,13 +1,13 @@
 
 
 TLS Working Group                                     N. Mavroyanopoulos
-Internet-Draft                                           August 16, 2002
-Expires: February 15, 2003
+Internet-Draft                                             April 2, 2003
+Expires: October 1, 2003
 
 
                 Using OpenPGP keys for TLS authentication
 
-                  <draft-ietf-tls-openpgp-keys-02.txt>
+                  <draft-ietf-tls-openpgp-keys-03.txt>
 
 Status of this Memo
 
@@ -53,9 +53,9 @@ Abstract
 
 
 
-N. Mavroyanopoulos         Expires February 15, 2003           [Page 1]
+N. Mavroyanopoulos          Expires October 1, 2003            [Page 1]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
+Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
 
 
 1. Introduction
@@ -110,9 +110,9 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
 
-N. Mavroyanopoulos         Expires February 15, 2003           [Page 2]
+N. Mavroyanopoulos          Expires October 1, 2003            [Page 2]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
+Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
 
 
    The "extension_data" field of this extension will contain a
@@ -134,17 +134,17 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 2.1.1.3 Server Hello
 
    Servers that receive an extended client hello containing the
-   "cert_type" extension MUST select a certificate type from the
+   "cert_type" extension, and have chosen a cipher suite that supports
+   certificates, then they MUST select a certificate type from the
    certificate_types field in the extended client hello, or terminate
    the connection with a fatal alert of type "unsupported_certificate".
 
    The certificate type selected by the server, is encoded in a
    CertificateTypeExtension structure, which is included in the 
    extended server hello message, using an extension of type 
-   "cert_type".
-
-   Servers that only support X.509 certificates MAY omit including
-   the "cert_type" extension in the extended server hello.
+   "cert_type". Servers that only support X.509 certificates MAY 
+   omit including the "cert_type" extension in the extended server 
+   hello.
 
 2.1.2 Server certificate 
 
@@ -154,7 +154,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
    If the OpenPGP certificate type is negotiated then it is required 
    to present an OpenPGP key in the Certificate message. The OpenPGP
-   key must contain a public key that matches the selected key exchange
+   key must contain a public key that matches the selected key exchange 
    algorithm, as shown below.
 
    Key Exchange Algorithm  OpenPGP Key Type
@@ -167,25 +167,30 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    DHE_RSA                 RSA public key which can be used for
                            signing.
 
-N. Mavroyanopoulos         Expires February 15, 2003           [Page 3]
+N. Mavroyanopoulos          Expires October 1, 2003            [Page 3]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
+Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
 
 
-   An OpenPGP key appearing in the Certificate message will be sent 
-   in binary OpenPGP format. The option is also available to send an 
-   OpenPGP fingerprint, instead of sending the entire key.  The
-   process of fingerprint generation is described in [OpenPGP].  The
-   peer shall respond with a "certificate_unobtainable" fatal alert if
-   the key with the given key fingerprint cannot be found.  The 
-   "certificate_unobtainable" fatal alert is defined in section 4 of
-   [TLSEXT].
+   An OpenPGP public key appearing in the Certificate message will be sent 
+   using the binary OpenPGP format.  The term public key is used to describe 
+   a composition of OpenPGP packets to form a block of data which contains 
+   all information needed by the peer. This includes public key packets, 
+   user ID packets and all the fields described in "Transferable Public Keys"
+   section in [OpenPGP].
+   
+   The option is also available to send an OpenPGP fingerprint, instead 
+   of sending the entire key.  The process of fingerprint generation is
+   described in [OpenPGP].  The peer shall respond with a 
+   "certificate_unobtainable" fatal alert if the key with the given key
+   fingerprint cannot be found.  The "certificate_unobtainable" fatal 
+   alert is defined in section 4 of [TLSEXT].
 
    If the key is not valid, expired, revoked, corrupt, the appropriate
    fatal alert message is sent from section A.3 of the TLS
    specification. If a key is valid and neither expired nor revoked, 
    it is accepted by the protocol. The key validation procedure is a 
-   local matter ouside the scope of this document.
+   local matter outside the scope of this document.
 
    enum {
         key_fingerprint (0), key (1), (255)
@@ -218,16 +223,14 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
        ClientCertificateParamsType certificate_params_types<1..2^8-1>;
    } PGPCertificateRequest;
 
+
+N. Mavroyanopoulos          Expires October 1, 2003            [Page 4]
+
+Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+
+
    certificate_params_types is a list of accepted client certificate 
    parameter types, sorted in order of the server's preference.
-
-
-
-
-N. Mavroyanopoulos         Expires February 15, 2003           [Page 4]
-
-Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
-
 
 2.1.4 Client certificate
 
@@ -277,15 +280,13 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    CipherSuite TLS_DHE_RSA_WITH_CAST_128_CBC_RMD      = { 0x00, 0x76 };
    CipherSuite TLS_DHE_RSA_WITH_3DES_EDE_CBC_RMD      = { 0x00, 0x77 };
    CipherSuite TLS_DHE_RSA_WITH_AES_128_CBC_RMD       = { 0x00, 0x78 };
-   CipherSuite TLS_DHE_RSA_WITH_AES_256_CBC_RMD       = { 0x00, 0x79 };
 
-
-
-N. Mavroyanopoulos         Expires February 15, 2003           [Page 5]
+N. Mavroyanopoulos          Expires October 1, 2003            [Page 5]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
+Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
 
 
+   CipherSuite TLS_DHE_RSA_WITH_AES_256_CBC_RMD       = { 0x00, 0x79 };
    CipherSuite TLS_RSA_WITH_CAST_128_CBC_SHA          = { 0x00, 0x7A };
    CipherSuite TLS_RSA_WITH_CAST_128_CBC_RMD          = { 0x00, 0x7B };
    CipherSuite TLS_RSA_WITH_3DES_EDE_CBC_RMD          = { 0x00, 0x7C };
@@ -298,10 +299,20 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    to support the above cipher suites. 
 
 
-4. Acknowledgments
+4. Security considerations
 
- The author wishes to thank Werner Koch for his suggestions on 
- improving this document.
+   This document adds support for OpenPGP keys in TLS 1.0. Since the
+   OpenPGP keys can be viewed as an other format to hold public key
+   parameters, no extra threats are introduced to the TLS protocol.
+
+   All the security considerations in the TLS [TLS] and the OpenPGP 
+   [OpenPGP] specifications still apply.
+
+
+5. Acknowledgments
+
+ The author wishes to thank Werner Koch, David Taylor and Timo Schulz for 
+ their suggestions on improving this document.
 
 
 5. References
@@ -326,21 +337,14 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
  [CAST]     Adams, C., "The CAST-128 Encryption Algorithm", RFC 2144,
             May 1997.
 
- [AES]      Daemen, J., Rijmen, V., "The Rijndael Block Cipher"
-            http://csrc.nist.gov/encryption/aes/rijndael/Rijndael.pdf
-            3rd September 1999.
 
-
-
-
-
-
-
-
-
-N. Mavroyanopoulos         Expires February 15, 2003           [Page 6]
+N. Mavroyanopoulos          Expires October 1, 2003            [Page 6]
 
-Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
+Internet-Draft  Using OpenPGP keys for TLS Authentication    April 2003
+
+
+ [AES]      Chown, P. "Advanced Encryption Standard (AES) Ciphersuites 
+            for Transport Layer Security (TLS)", RFC 3268, June 2002.
 
 
 Author's Address
@@ -355,7 +359,7 @@ Author's Address
 
 Full Copyright Statement
 
-   Copyright (C) The Internet Society (2002).  All Rights Reserved.
+   Copyright (C) The Internet Society (2003).  All Rights Reserved.
 
    This document and translations of it may be copied and furnished to
    others, and derivative works that comment on or otherwise explain it
@@ -391,9 +395,6 @@ Acknowledgement
 
 
 
-
-
-
-
-N. Mavroyanopoulos         Expires February 15, 2003           [Page 7]
+N. Mavroyanopoulos          Expires October 1, 2003            [Page 7]
 
+
