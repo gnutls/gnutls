@@ -585,7 +585,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
     }
 
     /* CHOICE */
-    if (strcmp(ttime, "GeneralizedTime") == 0) {
+    if (strcmp(ttime, "generalTime") == 0) {
 
 	_gnutls_str_cat(name, sizeof(name), ".generalTime");
 	len = sizeof(ttime) - 1;
