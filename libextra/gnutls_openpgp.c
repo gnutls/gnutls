@@ -292,7 +292,7 @@ openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdk_pkt_pubkey_t pk )
  -*/
 int
 _gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
-                                gnutls_datum *raw_key )
+                                const gnutls_datum *raw_key )
 {
     cdk_kbnode_t snode;
     CDK_PACKET *pkt;

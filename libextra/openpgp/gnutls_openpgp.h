@@ -73,6 +73,10 @@ int _gnutls_openpgp_cert2gnutls_cert(
     const gnutls_datum *raw );
 
 int
+_gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
+                                const gnutls_datum *raw_key);
+
+int
 _gnutls_openpgp_request_key(
     gnutls_session,
     gnutls_datum* ret, 
@@ -93,6 +97,9 @@ int gnutls_openpgp_fingerprint(const gnutls_datum * cert,
 time_t gnutls_openpgp_extract_key_creation_time(const gnutls_datum * cert);
 time_t gnutls_openpgp_extract_key_expiration_time(const gnutls_datum * cert);
 
+int
+_gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
+                                const gnutls_datum *raw_key);
 
 #endif /*GNUTLS_OPENPGP_H*/
 

@@ -273,6 +273,7 @@ void _gnutls_deinit(gnutls_session session)
 	_gnutls_buffer_clear( &session->internals.record_send_buffer);
 
 	gnutls_credentials_clear( session);
+	_gnutls_selected_certs_deinit( session);
 
 	if (session->connection_state.read_cipher_state != NULL)
 		_gnutls_cipher_deinit(session->connection_state.read_cipher_state);

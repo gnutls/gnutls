@@ -153,6 +153,7 @@ extern OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_extract_key_creation_tim
 extern OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_extract_key_expiration_time;
 extern OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key;
 extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
+extern OPENPGP_KEY2GNUTLS_KEY _E_gnutls_openpgp_key2gnutls_key;
 extern OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint;
 extern OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key;
 
@@ -164,6 +165,7 @@ static void _gnutls_add_openpgp_functions(void) {
 	_E_gnutls_openpgp_fingerprint = gnutls_openpgp_fingerprint;
 	_E_gnutls_openpgp_request_key = _gnutls_openpgp_request_key;
 	_E_gnutls_openpgp_cert2gnutls_cert = _gnutls_openpgp_cert2gnutls_cert;
+	_E_gnutls_openpgp_key2gnutls_key = _gnutls_openpgp_key2gnutls_key;
 #endif
 }
 

@@ -221,6 +221,7 @@ typedef void (*LOG_FUNC)( int, const char*);
 typedef ssize_t (*gnutls_pull_func)(gnutls_transport_ptr, void*, size_t);
 typedef ssize_t (*gnutls_push_func)(gnutls_transport_ptr, const void*, size_t);
 
+
 /* Store & Retrieve functions defines: 
  */
 typedef int (*gnutls_db_store_func)(void*, gnutls_datum key, gnutls_datum data);
@@ -419,6 +420,16 @@ typedef int certificate_server_select_func(struct gnutls_session_int*,
 typedef int srp_server_select_func(struct gnutls_session_int*, 
 	const char**, const char**, unsigned int);
 
+/* authentication function definitions:
+ */
+typedef int gnutls_certificate_client_retrieve_function(
+   struct gnutls_session_int*, const gnutls_datum* req_ca_cert, int nreqs,
+   gnutls_datum** certs, unsigned int* ncerts, gnutls_datum* key);
+
+typedef int gnutls_certificate_server_retrieve_function(
+   struct gnutls_session_int*, gnutls_datum **server_certs, unsigned int* ncerts,
+   gnutls_datum* key);
+
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
 	/* this holds the number of bytes in the handshake_header[] */
@@ -538,6 +549,9 @@ typedef struct {
 	certificate_client_select_func*	client_cert_callback;
 	certificate_server_select_func*	server_cert_callback;
 
+	gnutls_certificate_client_retrieve_function*	client_get_cert_callback;
+	gnutls_certificate_server_retrieve_function*	server_get_cert_callback;
+
 	/* Callback to select the proper password file
 	 */
 	srp_server_select_func*		server_srp_callback;
@@ -573,13 +587,15 @@ typedef struct {
 	 */
 	uint16			proposed_record_size;
 	
-	/* holds the index of the selected certificate.
-	 * -1 if none.
+	/* holds the the selected certificate and key.
+	 * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
+	 * to change them.
 	 */
 	gnutls_cert*		selected_cert_list;
 	int			selected_cert_list_length;
 	gnutls_privkey*		selected_key;
-	
+	int			selected_need_free;
+
 	/* holds the extensions we sent to the peer
 	 * (in case of a client)
 	 */

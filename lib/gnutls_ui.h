@@ -17,6 +17,14 @@ typedef int gnutls_certificate_client_select_function(
 typedef int gnutls_certificate_server_select_function(
    gnutls_session, const gnutls_datum *server_certs, int ncerts);
 
+typedef int gnutls_certificate_client_retrieve_function(
+   gnutls_session, const gnutls_datum* req_ca_cert, int nreqs,
+   gnutls_datum** certs, unsigned int* ncerts, gnutls_datum* key);
+typedef int gnutls_certificate_server_retrieve_function(
+   gnutls_session, gnutls_datum **server_certs, unsigned int* ncerts
+   gnutls_datum* key);
+
+
 /* Functions that allow AUTH_INFO structures handling
  */
 
@@ -38,6 +46,9 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session session);
 
 void gnutls_certificate_client_set_select_function( gnutls_session, gnutls_certificate_client_select_function *);
 void gnutls_certificate_server_set_select_function( gnutls_session, gnutls_certificate_server_select_function *);
+
+void gnutls_certificate_client_set_retrieve_function( gnutls_session, gnutls_certificate_client_retrieve_function *);
+void gnutls_certificate_server_set_retrieve_function( gnutls_session, gnutls_certificate_server_retrieve_function *);
 
 void gnutls_certificate_server_set_request( gnutls_session, gnutls_certificate_request);
 

@@ -92,6 +92,10 @@ int _gnutls_proc_cert_server_certificate(gnutls_session, opaque *, size_t);
 int _gnutls_get_selected_cert( gnutls_session session, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_privkey** apr_pkey);
 
 int _gnutls_server_select_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
+void _gnutls_selected_certs_deinit( gnutls_session session);
+void _gnutls_selected_certs_set( gnutls_session session,
+        gnutls_cert* certs, int ncerts, gnutls_privkey* key,
+        int need_free);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 

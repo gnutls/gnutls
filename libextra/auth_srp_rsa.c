@@ -203,7 +203,7 @@ opaque* p;
 				      &peer_cert,
 				      &vparams, &signature);
 	
-	_gnutls_free_cert( &peer_cert);
+	_gnutls_cert_deinit( &peer_cert);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

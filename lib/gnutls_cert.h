@@ -85,12 +85,16 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 	int flags);
 int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
 	unsigned int flags);
-void _gnutls_free_cert(gnutls_cert* cert);
 int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn);
 
 void _gnutls_privkey_deinit(gnutls_privkey *key);
+void _gnutls_cert_deinit(gnutls_cert *cert);
 
 int _gnutls_selected_cert_supported_kx(struct gnutls_session_int* session, 
 	gnutls_kx_algorithm ** alg, int *alg_size);
-                              
+int _gnutls_cert2gnutls_cert(gnutls_cert * gcert, gnutls_certificate_type type,
+        const gnutls_datum *raw_cert, int flags /* OR of ConvFlags */);
+int _gnutls_key2gnutls_key(gnutls_privkey * key, gnutls_certificate_type type,
+	const gnutls_datum *raw_key, int key_enc /* DER or PEM */);
+                                      
 #endif

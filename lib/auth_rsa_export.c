@@ -64,9 +64,6 @@ const MOD_AUTH_STRUCT rsa_export_auth_struct = {
 	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
-extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
-
-
 static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 {
 	const GNUTLS_MPI *rsa_params;
@@ -191,47 +188,26 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( session);
 		return 0;
 	}
 
-	switch( session->security_parameters.cert_type) {
-		case GNUTLS_CRT_X509:
-			if ((ret =
-			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-					     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
-				gnutls_assert();
-				return 0;
-			}
-			break;
-
-		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_INIT_LIBEXTRA;
-			}
-			if ((ret =
-			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
-					     &info->raw_certificate_list[0])) < 0) {
-				gnutls_assert();
-				return 0;
-			}
-			break;
-
-		default:
-			gnutls_assert();
-			return 0;
+	if ((ret =
+	     _gnutls_cert2gnutls_cert( &peer_cert, session->security_parameters.cert_type,
+			     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
+		gnutls_assert();
+		return 0;
 	}
 
 	if (peer_cert.subject_pk_algorithm != GNUTLS_PK_RSA) {
 		gnutls_assert();
-		_gnutls_free_cert( &peer_cert);
+		_gnutls_cert_deinit( &peer_cert);
 		return 0;
 	}
 
 	if ( _gnutls_mpi_get_nbits( peer_cert.params[0]) 
 		<= 512) {
-		_gnutls_free_cert( &peer_cert);
+		_gnutls_cert_deinit( &peer_cert);
 		return 1;
 	}
 	
-	_gnutls_free_cert( &peer_cert);
+	_gnutls_cert_deinit( &peer_cert);
 	
 	return 0;
 }
@@ -308,32 +284,11 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	signature.data = &data[vparams.size + 2];
 	signature.size = sigsize;
 
-	switch( session->security_parameters.cert_type) {
-		case GNUTLS_CRT_X509:
-			if ((ret =
-			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-					     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
-				gnutls_assert();
-				return ret;
-			}
-			break;
-
-		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
-				gnutls_assert();
-				return GNUTLS_E_INIT_LIBEXTRA;
-			}
-			if ((ret =
-			     _E_gnutls_openpgp_cert2gnutls_cert( &peer_cert,
-					     &info->raw_certificate_list[0])) < 0) {
-				gnutls_assert();
-				return ret;
-			}
-			break;
-
-		default:
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
+	if ((ret =
+	     _gnutls_cert2gnutls_cert( &peer_cert, session->security_parameters.cert_type,
+			     &info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	ret =
@@ -341,7 +296,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 				      &peer_cert,
 				      &vparams, &signature);
 	
-	_gnutls_free_cert( &peer_cert);
+	_gnutls_cert_deinit( &peer_cert);
 	if (ret < 0) {
 		gnutls_assert();
 	}

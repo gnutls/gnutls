@@ -550,12 +550,43 @@ int i, ret;
 void _gnutls_privkey_deinit(gnutls_privkey *key)
 {
 int i;
+	if (key == NULL) return;
 
 	for (i = 0; i < key->params_size; i++) {
 		_gnutls_mpi_release( &key->params[i]);
 	}
 }
 
+int _gnutls_x509_key2gnutls_key( gnutls_privkey* privkey, const gnutls_datum* raw_key,
+	gnutls_x509_crt_fmt type)
+{
+gnutls_x509_privkey tmpkey;
+int ret;
+
+	ret = gnutls_x509_privkey_init( &tmpkey);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = gnutls_x509_privkey_import( tmpkey, raw_key, type);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_privkey_deinit( tmpkey);
+		return ret;
+	}
+
+	ret = privkey_cpy( privkey, tmpkey);
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_x509_privkey_deinit( tmpkey);
+		return ret;
+	}
+
+	gnutls_x509_privkey_deinit( tmpkey);
+	
+	return 0;
+}
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
@@ -566,7 +597,6 @@ static int read_key_mem(gnutls_certificate_credentials res, const void *key, int
 {
 	int ret;
 	gnutls_datum tmp;
-	gnutls_x509_privkey tmpkey;
 
 	/* allocate space for the pkey list
 	 */
@@ -576,32 +606,14 @@ static int read_key_mem(gnutls_certificate_credentials res, const void *key, int
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = gnutls_x509_privkey_init( &tmpkey); //res->pkey[res->ncerts]);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
 	tmp.data = (opaque*)key;
 	tmp.size = key_size;
 
-	ret = gnutls_x509_privkey_import( tmpkey, &tmp, type);
+	ret = _gnutls_x509_key2gnutls_key( &res->pkey[res->ncerts], &tmp, type);
 	if (ret < 0) {
 		gnutls_assert();
-		gnutls_x509_privkey_deinit( tmpkey);
-
 		return ret;
 	}
-
-	ret = privkey_cpy( &res->pkey[res->ncerts], tmpkey);
-	if (ret < 0) {
-		gnutls_assert();
-		gnutls_x509_privkey_deinit( tmpkey);
-
-		return ret;
-	}
-
-	gnutls_x509_privkey_deinit( tmpkey);
 
 	return 0;
 }

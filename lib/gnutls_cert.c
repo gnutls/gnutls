@@ -59,7 +59,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 
 	for (i = 0; i < sc->ncerts; i++) {
 		for (j = 0; j < sc->cert_list_length[i]; j++) {
-			_gnutls_free_cert( &sc->cert_list[i][j]);
+			_gnutls_cert_deinit( &sc->cert_list[i][j]);
 		}
 		gnutls_free( sc->cert_list[i]);
 	}
@@ -255,7 +255,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * the raw certificates (DER for X.509 or binary for OpenPGP), of the
   * client.
   *
-  * @req_ca_cert, is only used in X.509 certificates. 
+  * @req_ca_dn, is only used in X.509 certificates. 
   * Contains a list with the CA names that the server considers trusted. 
   * Normally we should send a certificate that is signed
   * by one of these CAs. These names are DER encoded. To get a more
@@ -316,6 +316,75 @@ void gnutls_certificate_server_set_select_function(gnutls_session session,
 {
 	session->internals.server_cert_callback = func;
 }
+
+/**
+  * gnutls_certificate_client_set_retrieve_function - Used to set a callback to retrieve the certificate
+  * @session: is a &gnutls_session structure.
+  * @func: is the callback function
+  *
+  * This function sets a callback to be called in order to retrieve the certificate
+  * to be used in the handshake.
+  * The callback's function prototype is:
+  * int (*callback)(gnutls_session, const gnutls_datum* req_ca_dn, int nreqs, 
+  * gnutls_datum **cert, unsigned int *ncerts, gnutls_key* key);
+  *
+  * @cert should contain @ncerts gnutls_datum structures which hold
+  * the raw certificates (DER for X.509 or binary for OpenPGP), of the
+  * client. Those should be allocated with gnutls_malloc(). The certificate
+  * type to be sent should be obtained using gnutls_certificate_type_get();
+  *
+  * @key should contain a private key.
+  *
+  * @req_ca_cert, is only used in X.509 certificates. 
+  * Contains a list with the CA names that the server considers trusted. 
+  * Normally we should send a certificate that is signed
+  * by one of these CAs. These names are DER encoded. To get a more
+  * meaningful value use the function gnutls_x509_rdn_get().
+  *
+  * If the callback function is provided then gnutls will call it, in the
+  * handshake, after the certificate request message has been received.
+  *
+  * The callback function should set the certificate list to be sent, and
+  * return 0 on success.  The value (-1) indicates error and the handshake
+  * will be terminated.
+  **/
+void gnutls_certificate_client_set_retrieve_function(gnutls_session session,
+			gnutls_certificate_client_retrieve_function * func)
+{
+	session->internals.client_get_cert_callback = func;
+}
+
+/**
+  * gnutls_certificate_server_set_retrieve_function - Used to set a callback to retrieve the certificate
+  * @session: is a &gnutls_session structure.
+  * @func: is the callback function
+  *
+  * This function sets a callback to be called in order to retrieve the certificate
+  * to be used in the handshake.
+  * The callback's function prototype is:
+  * int (*callback)(gnutls_session, gnutls_datum **cert, unsigned int *ncerts
+  * gnutls_key* key);
+  *
+  * @cert should contain @ncerts gnutls_datum structures which hold
+  * the raw certificates (DER for X.509 or binary for OpenPGP), of the
+  * server. Those should be allocated with gnutls_malloc(). The certificate
+  * type to be sent should be obtained using gnutls_certificate_type_get();
+  *
+  * @key should contain a private key.
+  *
+  * If the callback function is provided then gnutls will call it, in the
+  * handshake, after the certificate request message has been received.
+  *
+  * The callback function should set the certificate list to be sent, and
+  * return 0 on success.  The value (-1) indicates error and the handshake
+  * will be terminated.
+  **/
+void gnutls_certificate_server_set_retrieve_function(gnutls_session session,
+			gnutls_certificate_server_retrieve_function * func)
+{
+	session->internals.server_get_cert_callback = func;
+}
+
 
 /* These are set by the gnutls_extra library's initialization function.
  */
@@ -499,6 +568,51 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 	}
 }
 
+/* in auth_dhe.c */
+OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
+OPENPGP_KEY2GNUTLS_KEY _E_gnutls_openpgp_key2gnutls_key;
+
+int _gnutls_cert2gnutls_cert(gnutls_cert * gcert, gnutls_certificate_type type,
+	const gnutls_datum *raw_cert, int flags /* OR of ConvFlags */)
+{
+	switch( type) {
+		case GNUTLS_CRT_X509:
+			return _gnutls_x509_cert2gnutls_cert( gcert,
+					     raw_cert, flags);
+		case GNUTLS_CRT_OPENPGP:
+			if (_E_gnutls_openpgp_cert2gnutls_cert==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INIT_LIBEXTRA;
+			}
+			return
+			     _E_gnutls_openpgp_cert2gnutls_cert( gcert,
+					     raw_cert);
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+	}
+}
+
+int _gnutls_key2gnutls_key(gnutls_privkey * key, gnutls_certificate_type type,
+	const gnutls_datum *raw_key, int key_enc /* DER or PEM */)
+{
+	switch( type) {
+		case GNUTLS_CRT_X509:
+			return _gnutls_x509_key2gnutls_key( key,
+					     raw_key, key_enc);
+		case GNUTLS_CRT_OPENPGP:
+			if (_E_gnutls_openpgp_key2gnutls_key==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_INIT_LIBEXTRA;
+			}
+			return
+			     _E_gnutls_openpgp_key2gnutls_key( key, raw_key);
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+	}
+}
+
 
 /* This function will convert a der certificate to a format
  * (structure) that gnutls can understand and use. Actually the
@@ -593,9 +707,11 @@ int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
 
 }
 
-void _gnutls_free_cert(gnutls_cert *cert)
+void _gnutls_cert_deinit(gnutls_cert *cert)
 {
 	int i;
+
+	if (cert == NULL) return;
 
 	for (i = 0; i < cert->params_size; i++) {
 		_gnutls_mpi_release( &cert->params[i]);

@@ -2,6 +2,10 @@ Version 1.1.0
 - The error codes GNUTLS_E_NO_TEMPORARY_DH_PARAMS and GNUTLS_E_NO_TEMPORARY_RSA_PARAMS
   are no longer returned by the handshake function. Ciphersuites that
   require temporary parameters are removed when such parameters do not exist.
+- Added the callbacks gnutls_certificate_client_retrieve_function() and
+  gnutls_certificate_server_retrieve_function(), to allow a client or a server
+  to specify certificates for the handshake without storing them to the
+  credentials structure.
 
 Version 1.0.1 (10/12/2003)
 - Some minor fixes in the makefiles. They now include CFLAGS
