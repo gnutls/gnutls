@@ -70,7 +70,7 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 #define S state->gnutls_key->KEY
 
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
- * Data is allocated by the called, and should have data_size size.
+ * Data is allocated by the caller, and should have data_size size.
  */
 int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 {
