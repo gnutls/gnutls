@@ -883,7 +883,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 		len = _gnutls_read_uint24(p);
 		p += 3;
 
-		if (size == 0) {
+		if (len == 0) {
 			gnutls_assert();
 			/* no certificate was sent */
 			return GNUTLS_E_NO_CERTIFICATE_FOUND;
