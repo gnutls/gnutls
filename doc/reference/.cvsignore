@@ -11,6 +11,7 @@ gnutls.hierarchy
 gnutls.interfaces
 gnutls.prerequisites
 gnutls.signals
+gnutls.types
 html
 html-build.stamp
 html.stamp
