@@ -12,27 +12,27 @@ is a very simple \tls{} client, it does not support session resuming nor
 any other fancy features.
 \input{ex2}
 
-\subsection{Getting peer's information}
-\par The above example was the simplest form of a client, it didn't even check
-the result of the peer's certificate verification function. The lack of
-this check may result to an unauthenticated connection.
-The following function does check the peer's
-X.509 certificate, and prints some information about the current session.
+\subsection{Verifying peer's certificate}
+\par A TLS connection is not secure just after the handshake has finished.
+It must be considered secure, after the peer's identity has been
+verified. That is, you usually have to verify not only the peer's 
+certificate, but also the hostname in the certificate, expiration dates etc. 
+After this step you should treat the connection as being a secure one.
+
+\par
+The following function is an example on how to verify a certificate.
+
+\input{ex-rfc2818}
+
+\subsection{Parsing peer's certificate, and obtaining session information}
+The following function reads the peer's certificate,
+and prints some information about the certificate and the current session.
 \par
 This function should be called after a successful
 \printfunc{gnutls_handshake}{gnutls\_handshake}
 
 \input{ex3}
 
-\subsection{Verifying peer's hostname in a certificate}
-\par HTTPS clients have to verify not only the peer's certificate,
-but also the hostname in this certificate. That is to know that
-they actually connected to the right site.
-
-\par
-The following function is an example on how to fully verify a certificate.
-
-\input{ex-rfc2818}
 
 \subsection{Client with Resume capability example}
 \label{resume-example}

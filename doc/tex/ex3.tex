@@ -22,7 +22,6 @@ int print_info(gnutls_session session)
 {
    const char *tmp;
    gnutls_credentials_type cred;
-   int status;
    gnutls_kx_algorithm kx;
 
    /* print the key exchange's algorithm name
@@ -43,30 +42,7 @@ int print_info(gnutls_session session)
       break;
 
    case GNUTLS_CRD_CERTIFICATE:        /* certificate authentication */
-
-      /* try to verify the peer's certificate (if any)
-       */
-      status = gnutls_certificate_verify_peers(session);
-
-      if (status < 0) {
-         if (status == GNUTLS_E_NO_CERTIFICATE_FOUND)
-            printf("- Peer did not send any X509 Certificate.\n");
-         else
-            printf("- Could not verify certificate\n");
-      } else {
-
-         if (status & GNUTLS_CERT_INVALID)
-            printf("- Peer's certificate is invalid\n");
-         if (status & GNUTLS_CERT_CORRUPTED)
-            printf("- Peer's certificate is corrupted.\n");
-         if (status & GNUTLS_CERT_REVOKED)
-            printf("- Peer's certificate is revoked\n");
-         if (status & GNUTLS_CERT_NOT_TRUSTED)
-            printf("- Peer's certificate is not trusted\n");
-         else
-            printf("- Peer's certificate is trusted\n");
-      }
-
+      
       /* Check if we have been using ephemeral Diffie Hellman.
        */
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {

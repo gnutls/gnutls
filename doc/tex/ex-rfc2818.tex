@@ -10,7 +10,12 @@
  */
 void verify_certificate( gnutls_session session, const char* hostname)
 {
-   int status = gnutls_certificate_verify_peers(session);
+   int status;
+
+   /* This verification function uses the trusted CAs in the credentials
+    * structure. So you must have installed one or more CAs.
+    */
+   status = gnutls_certificate_verify_peers(session);
 
    if (status == GNUTLS_E_NO_CERTIFICATE_FOUND) {
       printf("No certificate was sent");
@@ -43,7 +48,7 @@ void verify_certificate( gnutls_session session, const char* hostname)
          return;
       }
       if ( !gnutls_x509_check_certificates_hostname( &cert_list[0], hostname)) {
-         printf("The certificate does not matches hostname\n");
+         printf("The certificate does not match hostname\n");
          return;
       }
    }
