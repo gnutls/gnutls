@@ -74,8 +74,8 @@ int main()
 	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 2, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH);
 	
-	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL, 0);
-	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred, sizeof(cred));
+	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL);
+	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
 	
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);

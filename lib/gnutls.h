@@ -104,7 +104,7 @@ int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt);
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
-int gnutls_set_kx_cred( GNUTLS_STATE, int kx, void* cred, int cred_size);
+int gnutls_set_kx_cred( GNUTLS_STATE, int kx, void* cred);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 typedef struct {
