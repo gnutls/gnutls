@@ -22,12 +22,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../lib/defines.h"
-#include "../lib/gnutls_int.h"
-#include "../lib/gnutls_srp.h"
-#include "../lib/crypt.h"
-#include "../lib/x509_b64.h"
 #include "prime-gaa.h"
+#include <gcrypt.h>
+#include "../lib/gnutls.h"
+#include "../lib/defines.h"
 
 MPI _gcry_generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
 	                MPI g, MPI **ret_factors );
@@ -48,7 +46,7 @@ int main(int argc, char **argv)
 	gnutls_global_init();
 
 	fprintf(stderr, "Generating prime...");
-//	gcry_control (GCRYCTL_SET_VERBOSITY, (int)0);
+	gcry_control (GCRYCTL_SET_VERBOSITY, (int)0);
 	
 	/* this is an emulation of Michael Wiener's table
 	 * bad emulation.

@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 
 extern GNUTLS_SRP_CLIENT_CREDENTIALS srp_cred;
 extern GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;

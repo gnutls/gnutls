@@ -1,35 +1,37 @@
 This is the GNU TLS library. More up to date information can be found
-at http://www.gnu.org/software/gnutls and http://www.gnutls.org
+at http://www.gnu.org/software/gnutls/ and http://www.gnutls.org/
 
-It is a TLS implementation for the GNU project. 
-It is currently under heavy development. (and still not ready for 
-real world programs)
+It is a TLS 1.0 and SSL 3.0 implementation for the GNU project. 
+It is currently under heavy development.
 
-* The library needs libgcrypt. Libgcrypt is part of gnupg (ftp.gnupg.org)
+- The library needs libgcrypt. You can find libgcrypt at
+ ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/
 
-* Documentation:
+- Documentation:
  view the doc/ directory and the examples in the src/ directory.
 
 
+****************************
 LICENSE ISSUES:
 
-The latest release of the gnutls library is covered under the GNU Lesser 
-GPL License, unlike previously released versions which were licensed under 
-the GPL. 
+Since the 0.4.2 version the gnutls library is covered under both the 
+GNU Lesser GPL, and GNU GPL Licenses. Previously released versions were 
+licensed under the GPL. (see COPYING and COPYING.LIB for the licenses)
 
-The LGPL license (found in COPYING.LIB) applies to all parts of the gnutls 
-library except for the "OPENPGP authentication" part, and the "SRP 
-authentication" part, which stay GPL (see the COPYING file).  Both of these 
-parts can be disabled at compile time.
+The LGPL license applies to all parts of the gnutls library except for the 
+"OPENPGP authentication" part, and the "SRP authentication" part, which are 
+only available under the GPL.  Both of these parts can be disabled at compile 
+time.
 
 In order to create a library under the LGPL run the configure script with 
 the following parameters:
     --disable-srp-authentication
     --disable-openpgp-authentication
 
-or the library will be under the GPL. In both cases the libraries are
-binary compatible. In the LGPL case the functions are replaced with
-stubs that always fail.
+This will disable the above authentication methods. If this is not done 
+the library will be only available under the GPL. In both cases the generated
+libraries are binary compatible. In the LGPL case the missing functions are 
+replaced with stubs that always fail.
 
 The rationale behind this license change is that given the fact that other 
 free libraries with similar functionality exist, keeping the gnutls library 
@@ -42,6 +44,7 @@ the users of the code that it covers.
 See http://www.gnu.org/philosophy/why-not-lgpl.html for more explanation.
 
 
+****************************
 BUGS:
 
 Currently gnuTLS needs a lot of testing. By notifying the developers
@@ -49,5 +52,4 @@ about a possible bug you may help a lot, since testing is really
 important and expensive. If you think you found a bug,
 report it to bug-gnutls@gnu.org, together with the needed information,
 in order for developers to reproduce it. 
-
 

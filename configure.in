@@ -336,13 +336,13 @@ AC_CONFIG_COMMANDS([lib/gnutls.h],[[
 ]],[[]])
 
 AC_CONFIG_COMMANDS_POST( 
-	echo "*****************"
+	echo "***************************"
 if test x$ac_enable_srp = xno && test x$ac_enable_openpgp = xno;then
-	echo "* License: LGPL *"
+	echo "* License: GNU Lesser GPL *"
 else
-	echo "* License: GPL  *"
+	echo "* License: GNU GPL        *"
 fi
-	echo "*****************"
+	echo "***************************"
 	echo "(see the README file)"
 	echo ""
 )
