@@ -1,7 +1,5 @@
 #ifndef GNUTLS_INT_H
 
-#define USE_MHASH
-#include <mhash.h>
 #include <gcrypt.h>
 
 #define GNUTLS_INT_H
