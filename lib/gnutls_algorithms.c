@@ -65,7 +65,7 @@ static gnutls_cipher_entry algorithms[] = {
 	GNUTLS_CIPHER_ENTRY(GNUTLS_3DES, 8, 24, 1, 8),
 	GNUTLS_CIPHER_ENTRY(GNUTLS_RIJNDAEL, 16, 16, 1, 16),
 #ifdef USE_MCRYPT
-	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0,),
+	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0),
 #else
 	GNUTLS_CIPHER_ENTRY(GNUTLS_ARCFOUR, 1, 16, 0, 0),
 #endif
@@ -178,84 +178,84 @@ typedef struct {
 	CompressionMethod compression_algorithm;
 } gnutls_cipher_suite_entry;
 
-#define GNUTLS_DH_anon_WITH_3DES_EDE_CBC_SHA { 0x00, 0x1B }
-#define GNUTLS_DH_anon_WITH_ARCFOUR_MD5 { 0x00, 0x18 }
-#define GNUTLS_DH_anon_WITH_RIJNDAEL_SHA { 0x00, 0x34 }
+#define GNUTLS_DH_anon_3DES_EDE_CBC_SHA { 0x00, 0x1B }
+#define GNUTLS_DH_anon_ARCFOUR_MD5 { 0x00, 0x18 }
+#define GNUTLS_DH_anon_RIJNDAEL_128_CBC_SHA { 0x00, 0x34 }
 
-#define GNUTLS_DH_DSS_WITH_3DES_EDE_CBC_SHA { 0x00, 0x0D }
-#define GNUTLS_DH_RSA_WITH_3DES_EDE_CBC_SHA { 0x00, 0x10 }
-#define GNUTLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA { 0x00, 0x13 }
-#define GNUTLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA { 0x00, 0x16 }
-#define GNUTLS_RSA_WITH_ARCFOUR_SHA { 0x00, 0x05 }
-#define GNUTLS_RSA_WITH_ARCFOUR_MD5 { 0x00, 0x04 }
-#define GNUTLS_RSA_WITH_3DES_EDE_CBC_SHA { 0x00, 0x0A }
-#define GNUTLS_RSA_WITH_DES_CBC_SHA { 0x00, 0x09 }
-#define GNUTLS_DH_DSS_WITH_DES_CBC_SHA { 0x00, 0x0C }
-#define GNUTLS_DH_RSA_WITH_DES_CBC_SHA { 0x00, 0x0F }
-#define GNUTLS_DHE_DSS_WITH_DES_CBC_SHA { 0x00, 0x12 }
-#define GNUTLS_DHE_RSA_WITH_DES_CBC_SHA { 0x00, 0x15 }
+#define GNUTLS_DH_DSS_3DES_EDE_CBC_SHA { 0x00, 0x0D }
+#define GNUTLS_DH_RSA_3DES_EDE_CBC_SHA { 0x00, 0x10 }
+#define GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA { 0x00, 0x13 }
+#define GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA { 0x00, 0x16 }
+#define GNUTLS_RSA_ARCFOUR_SHA { 0x00, 0x05 }
+#define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
+#define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
+#define GNUTLS_RSA_DES_CBC_SHA { 0x00, 0x09 }
+#define GNUTLS_DH_DSS_DES_CBC_SHA { 0x00, 0x0C }
+#define GNUTLS_DH_RSA_DES_CBC_SHA { 0x00, 0x0F }
+#define GNUTLS_DHE_DSS_DES_CBC_SHA { 0x00, 0x12 }
+#define GNUTLS_DHE_RSA_DES_CBC_SHA { 0x00, 0x15 }
 
-#define GNUTLS_RSA_WITH_RIJNDAEL_128_CBC_SHA { 0x00, 0x2F }
-#define GNUTLS_DH_DSS_WITH_RIJNDAEL_128_CBC_SHA { 0x00, 0x30 }
-#define GNUTLS_DH_RSA_WITH_RIJNDAEL_128_CBC_SHA { 0x00, 0x31 }
-#define GNUTLS_DHE_DSS_WITH_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
-#define GNUTLS_DHE_RSA_WITH_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 }
+#define GNUTLS_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x2F }
+#define GNUTLS_DH_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x30 }
+#define GNUTLS_DH_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x31 }
+#define GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA { 0x00, 0x32 }
+#define GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA { 0x00, 0x33 }
 
 
 static gnutls_cipher_suite_entry cs_algorithms[] = {
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_WITH_ARCFOUR_MD5,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_ARCFOUR_MD5,
 				  GNUTLS_ARCFOUR,
 				  GNUTLS_KX_ANON_DH, GNUTLS_MAC_MD5,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_WITH_3DES_EDE_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES, GNUTLS_KX_ANON_DH,
 				  GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_DSS_WITH_3DES_EDE_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_DSS_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES,
 				  GNUTLS_KX_DH_DSS, GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_RSA_WITH_3DES_EDE_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES,
 				  GNUTLS_KX_DH_RSA, GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES, GNUTLS_KX_DHE_DSS,
 				  GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES, GNUTLS_KX_DHE_RSA,
 				  GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_WITH_ARCFOUR_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_SHA,
 				  GNUTLS_ARCFOUR,
 				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_WITH_ARCFOUR_MD5,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_MD5,
 				  GNUTLS_ARCFOUR,
 				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_WITH_3DES_EDE_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_3DES_EDE_CBC_SHA,
 				  GNUTLS_3DES,
 				  GNUTLS_KX_RSA, GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_WITH_RIJNDAEL_128_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_RSA,
 				  GNUTLS_MAC_SHA,
 				  GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_DSS_WITH_RIJNDAEL_128_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_DSS_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DH_DSS,
 				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_RSA_WITH_RIJNDAEL_128_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DH_RSA,
 				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_WITH_RIJNDAEL_128_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_DSS_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DHE_DSS,
 				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_WITH_RIJNDAEL_128_CBC_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DHE_RSA_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_DHE_RSA,
 				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_WITH_RIJNDAEL_SHA,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_DH_anon_RIJNDAEL_128_CBC_SHA,
 				  GNUTLS_RIJNDAEL, GNUTLS_KX_ANON_DH,
 				  GNUTLS_MAC_SHA, GNUTLS_NULL_COMPRESSION),
 	{0}
@@ -291,16 +291,15 @@ int _gnutls_mac_get_digest_size(MACAlgorithm algorithm)
 
 }
 
-inline
-int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
+inline int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
 {				/* actually returns the priority */
 	int i;
 	for (i = 0;
 	     i < state->gnutls_internals.MACAlgorithmPriority.algorithms;
 	     i++) {
-		if (state->gnutls_internals.MACAlgorithmPriority.
-		    algorithm_priority[i] == algorithm)
-			return i;
+		if (state->gnutls_internals.
+		    MACAlgorithmPriority.algorithm_priority[i] ==
+		    algorithm) return i;
 	}
 	return -1;
 }
@@ -350,17 +349,17 @@ int _gnutls_mac_is_ok(MACAlgorithm algorithm)
 
 /* Compression Functions */
 inline
-int _gnutls_compression_priority(GNUTLS_STATE state,
-			     CompressionMethod algorithm)
+    int _gnutls_compression_priority(GNUTLS_STATE state,
+				     CompressionMethod algorithm)
 {				/* actually returns the priority */
 	int i;
 	for (i = 0;
 	     i <
 	     state->gnutls_internals.CompressionMethodPriority.algorithms;
 	     i++) {
-		if (state->gnutls_internals.CompressionMethodPriority.
-		    algorithm_priority[i] == algorithm)
-			return i;
+		if (state->gnutls_internals.
+		    CompressionMethodPriority.algorithm_priority[i] ==
+		    algorithm) return i;
 	}
 	return -1;
 }
@@ -422,17 +421,17 @@ int _gnutls_cipher_get_block_size(BulkCipherAlgorithm algorithm)
 
  /* returns the priority */
 inline
-int
+    int
 _gnutls_cipher_priority(GNUTLS_STATE state, BulkCipherAlgorithm algorithm)
 {
 	int i;
 	for (i = 0;
 	     i <
-	     state->gnutls_internals.BulkCipherAlgorithmPriority.
-	     algorithms; i++) {
-		if (state->gnutls_internals.BulkCipherAlgorithmPriority.
-		    algorithm_priority[i] == algorithm)
-			return i;
+	     state->gnutls_internals.
+	     BulkCipherAlgorithmPriority.algorithms; i++) {
+		if (state->gnutls_internals.
+		    BulkCipherAlgorithmPriority.algorithm_priority[i] ==
+		    algorithm) return i;
 	}
 	return -1;
 }
@@ -516,15 +515,14 @@ int _gnutls_kx_server_certificate(KXAlgorithm algorithm)
 
 }
 
-inline
-int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
+inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
 {
 	int i;
 	for (i = 0;
 	     i < state->gnutls_internals.KXAlgorithmPriority.algorithms;
 	     i++) {
-		if (state->gnutls_internals.KXAlgorithmPriority.
-		    algorithm_priority[i] == algorithm)
+		if (state->gnutls_internals.
+		    KXAlgorithmPriority.algorithm_priority[i] == algorithm)
 			return i;
 	}
 	return -1;
@@ -723,162 +721,150 @@ int _gnutls_cipher_suite_count()
 	return counter;
 }
 
-#define MAX_ELEM_SIZE 4
-inline 
-static int partition(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
-      int (*compar) (GNUTLS_STATE, const void *, const void *))
-{
-	char *base = _base;
-	char tmp[MAX_ELEM_SIZE];
-	int pivot = 0;
-	int i = 0, j;
-	int full = nmemb*size;
+#define SWAP(x, y) memcpy(tmp,x,size); \
+		   memcpy(x,y,size); \
+		   memcpy(y,tmp,size)
 
-	j = full;
-	
-	memcpy(tmp, &base[pivot * size], size);
+#define MAX_ELEM_SIZE 4
+inline
+    static int _gnutls_partition(GNUTLS_STATE state, void *_base, size_t nmemb,
+			 size_t size, int (*compar) (GNUTLS_STATE,
+						     const void *,
+						     const void *))
+{
+	uint8 *base = _base;
+	uint8 tmp[MAX_ELEM_SIZE];
+	uint8 ptmp[MAX_ELEM_SIZE];
+	int pivot;
+	int i, j;
+	int full;
+
+	i = pivot = 0;
+	j = full = (nmemb - 1) * size;
+
+	memcpy(ptmp, &base[pivot], size);	/* set pivot item */
 
 	while (i < j) {
-		while ( (compar(state, &base[i], tmp) <=0) && (i < full))
-			i+=size;
-		while ( (compar(state, &base[j],  tmp) >= 0) && (j > 0))
-			j-=size;
+		while ((compar(state, &base[i], ptmp) <= 0) && (i < full))
+			i += size;
+		while ((compar(state, &base[j], ptmp) >= 0) && (j > 0))
+			j -= size;
 
 		if (i < j) {
-			memcpy( tmp, &base[j], size);
-			memcpy( &base[j], &base[i], size);
-			memcpy( &base[i], tmp, size);
+			SWAP(&base[j], &base[i]);
 		}
 	}
 
 	if (j > pivot) {
-		memcpy( tmp, &base[j], size);
-		memcpy( &base[j], &base[pivot], size);
-		memcpy( &base[pivot], tmp, size);
+		SWAP(&base[pivot], &base[j]);
 		pivot = j;
 	} else if (i < pivot) {
-		memcpy( tmp, &base[i], size);
-		memcpy( &base[i], &base[pivot], size);
-		memcpy( &base[pivot], tmp, size);
+		fprintf(stderr, "HERE!");
+		SWAP(&base[pivot], &base[i]);
 		pivot = i;
 	}
-
-	return pivot/size;
-
+	return pivot / size;
 }
 
 static void
-qsort2(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
-      int (*compar) (GNUTLS_STATE, const void *, const void *))
+_gnutls_qsort(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
+	      int (*compar) (GNUTLS_STATE, const void *, const void *))
 {
 	int pivot;
-	char* base = _base;
+	char *base = _base;
 	int snmemb = nmemb;
-	
-	if (size > MAX_ELEM_SIZE > 5) {
+
+#ifdef DEBUG
+	if (size > MAX_ELEM_SIZE) {
 		gnutls_assert();
 		exit(1);
 	}
+#endif
 
-	if (snmemb <= 1) return;
-	pivot = partition( state, _base, nmemb, size, compar);
+	if (snmemb <= 1)
+		return;
+	pivot = _gnutls_partition(state, _base, nmemb, size, compar);
+#ifdef SORT_DEBUG
+	fprintf(stderr, "pivot: %d\n", pivot);
+#endif
 
-	qsort2( state, _base, pivot-1, size, compar);
-	qsort2( state, &base[(pivot+1)*size], nmemb-pivot-1, size, compar);
-	
-}
-
-
-/* a compare function for hash(mac) algorithms (using priorities). For use with qsort */
-static int
-_gnutls_compare_mac_algo(GNUTLS_STATE state, const void *i_A1,
-			 const void *i_A2)
-{
-	MACAlgorithm A1 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
-					      i_A1);
-	MACAlgorithm A2 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
-					      i_A2);
-	int p1 = _gnutls_mac_priority(state, A1);
-	int p2 = _gnutls_mac_priority(state, A2);
-
-	if (p1 > p2) {
-		return -1;
-	} else {
-		if (p1 == p2) {
-			/* compare the addresses */
-			/* since it is in a list... if A1 is before A2 then it is greater */
-			if ((int) A1 < (int) A2)
-				return 1;
-			else
-				return -1;
-		}
-		return 1;
-	}
-}
-
-
-/* a compare function for block algorithms (using priorities). For use with qsort */
-static int
-_gnutls_compare_cipher_algo(GNUTLS_STATE state, const void *i_A1,
-			    const void *i_A2)
-{
-	BulkCipherAlgorithm A1 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
-						 i_A1);
-	BulkCipherAlgorithm A2 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
-						 i_A2);
-	int p1 = _gnutls_cipher_priority(state, A1);
-	int p2 = _gnutls_cipher_priority(state, A2);
-
-	if (p1 > p2) {
-		return -1;	/* we actually want descending order */
-	} else {
-		if (p1 == p2) {
-			/* compare the addresses */
-			/* since it is in a list... if A1 is before A2 then it is greater */
-			if ((int) A1 < (int) A2)
-				return 1;
-			else
-				return -1;
-		}
-		return 1;
-	}
+	_gnutls_qsort(state, base, pivot+1, size, compar);
+	_gnutls_qsort(state, &base[(pivot + 1) * size], nmemb - pivot - 1,
+		      size, compar);
 }
 
 
 /* a compare function for KX algorithms (using priorities). For use with qsort */
 static int
-_gnutls_compare_kx_algo(GNUTLS_STATE state, const void *i_A1,
+_gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 			const void *i_A2)
 {
-	KXAlgorithm A1 =
+	KXAlgorithm kA1 =
 	    _gnutls_cipher_suite_get_kx_algo(*(GNUTLS_CipherSuite *) i_A1);
-	KXAlgorithm A2 =
+	KXAlgorithm kA2 =
 	    _gnutls_cipher_suite_get_kx_algo(*(GNUTLS_CipherSuite *) i_A2);
-	int p1 = _gnutls_kx_priority(state, A1);
-	int p2 = _gnutls_kx_priority(state, A2);
+	BulkCipherAlgorithm cA1 =
+	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
+						 i_A1);
+	BulkCipherAlgorithm cA2 =
+	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
+						 i_A2);
+	MACAlgorithm mA1 =
+	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
+					      i_A1);
+	MACAlgorithm mA2 =
+	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
+					      i_A2);
+
+	int p1 = _gnutls_kx_priority(state, kA1)*100;
+	int p2 = _gnutls_kx_priority(state, kA2)*100;
+	p1 += _gnutls_cipher_priority(state, cA1)*10;
+	p2 += _gnutls_cipher_priority(state, cA2)*10;
+	p1 += _gnutls_mac_priority(state, mA1);
+	p2 += _gnutls_mac_priority(state, mA2);
 
 	if (p1 > p2) {
-		return -1;
+		return 1;
 	} else {
 		if (p1 == p2) {
 			/* compare the addresses */
 			/* since it is in a list... if A1 is before A2 then it is greater */
-			if ((int) A1 < (int) A2)
+			if ((uint32) i_A1 < (uint32) i_A2)
 				return 1;
-			else
-				return -1;
+			return -1;
 		}
-		return 1;
+		return -1;
 	}
 }
 
+#if 0
+static void 
+_gnutls_bsort(GNUTLS_STATE state, void *_base, size_t nmemb,
+		  size_t size, int (*compar) (GNUTLS_STATE, const void *,
+					      const void *))
+{
+	int i, j;
+	int full = nmemb * size;
+	char *base = _base;
+	char *tmp = gnutls_malloc(size);
+
+	for (i = 0; i < full; i += size) {
+		for (j = 0; j < full; j += size) {
+			if (compar(state, &base[i], &base[j]) < 0) {
+				memcpy(tmp, &base[i], size);
+				memcpy(&base[i], &base[j], size);
+				memcpy(&base[j], tmp, size);
+			}
+		}
+	}
+	free(tmp);
+
+}
+#endif
+
 int
 _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
-			       GNUTLS_CipherSuite ** ciphers)
+				      GNUTLS_CipherSuite ** ciphers)
 {
 
 	int i, ret_count, j = 0;
@@ -901,20 +887,17 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 		    cs_algorithms[i].id.CipherSuite[1];
 	}
 
-/* First sort using MAC priority (lowest) */
-	qsort2(state, tmp_ciphers, count, sizeof(GNUTLS_CipherSuite),
-	      _gnutls_compare_mac_algo);
+#ifdef SORT_DEBUG
+	fprintf(stderr, "Unsorted: \n");
+	for (i = 0; i < count; i++)
+		fprintf(stderr, "\t%d: %s\n", i,
+			_gnutls_cipher_suite_get_name((tmp_ciphers)[i]));
+#endif
 
-/* then sort using block algorithm's priorities */
-	qsort2(state, tmp_ciphers, count, sizeof(GNUTLS_CipherSuite),
-	      _gnutls_compare_cipher_algo);
-
-/* Last try KX algorithms priority (highest) */
-	qsort2(state, tmp_ciphers, count, sizeof(GNUTLS_CipherSuite),
-	      _gnutls_compare_kx_algo);
+	_gnutls_qsort(state, tmp_ciphers, count,
+		      sizeof(GNUTLS_CipherSuite), _gnutls_compare_algo);
 
 	for (i = 0; i < count; i++) {
-
 		if (_gnutls_kx_priority
 		    (state,
 		     _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0)
@@ -933,10 +916,13 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 		(*ciphers)[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
 		j++;
 	}
-/*
+
+#ifdef SORT_DEBUG
 	fprintf(stderr, "Sorted: \n");
-	for (i=0;i<j;i++) fprintf(stderr, "\t%s\n", _gnutls_cipher_suite_get_name((*ciphers)[i]));
-*/
+	for (i = 0; i < j; i++)
+		fprintf(stderr, "\t%d: %s\n", i,
+			_gnutls_cipher_suite_get_name((*ciphers)[i]));
+#endif
 
 	ret_count = j;
 
@@ -1030,8 +1016,8 @@ _gnutls_supported_compression_methods(GNUTLS_STATE state,
 	for (i = 0; i < SUPPORTED_COMPRESSION_METHODS; i++) {
 
 		(*comp)[i] =
-		    state->gnutls_internals.CompressionMethodPriority.
-		    algorithm_priority[i];
+		    state->gnutls_internals.
+		    CompressionMethodPriority.algorithm_priority[i];
 	}
 
 	return SUPPORTED_COMPRESSION_METHODS;
