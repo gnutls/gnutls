@@ -11,7 +11,7 @@ gnutls_cflags="@LIBGNUTLS_CFLAGS@"
 usage()
 {
 	cat <<EOF
-Usage: gnutls-config [OPTIONS]
+Usage: libgnutls-config [OPTIONS]
 Options:
 	[--prefix[=DIR]]
 	[--exec-prefix[=DIR]]
