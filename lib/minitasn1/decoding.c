@@ -719,7 +719,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 	counter+=len3+len2;
 	move=RIGHT;
 	break;
-      case TYPE_SEQUENCE:  case TYPE_SET:;
+      case TYPE_SEQUENCE:  case TYPE_SET:
 	if(move==UP){
 	  len2=strtol(p->value,NULL,10);
 	  _asn1_set_value(p,NULL,0);
@@ -860,7 +860,7 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 	  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
 	     a indefinite length method. */
 	  if(indefinite){
-	    if(!der[counter] && !der[counter+1]){
+	    if(!der[counter] && !der[counter+1]){ 
 	      counter+=2;
 	    }
 	    else{
@@ -1368,7 +1368,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
 	     a indefinite length method. */
 	  if(indefinite){
-	    if(!der[counter] && !der[counter+1]){
+	    if(!der[counter] && !der[counter+1]){ 
 	      counter+=2;
 	    }
 	    else{
@@ -1695,7 +1695,7 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
 	    indefinite=1;
 	  else
 	    indefinite=0;
-
+	  
 	  len2=len-counter;
 	  ris=_asn1_get_indefinite_length_string(der+counter,&len2);
 	  if(ris != ASN1_SUCCESS)
