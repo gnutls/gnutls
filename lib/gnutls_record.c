@@ -637,7 +637,8 @@ static int record_check_type(gnutls_session session,
 	     * if expecting client hello (for rehandshake
 	     * reasons). Otherwise it is an unexpected packet
 	     */
-	    if (htype == GNUTLS_CLIENT_HELLO && type == GNUTLS_HANDSHAKE)
+	    if (htype == GNUTLS_CLIENT_HELLO && (type == GNUTLS_HANDSHAKE || 
+	        type == GNUTLS_ALERT))
 		return GNUTLS_E_GOT_APPLICATION_DATA;
 	    else
 		return GNUTLS_E_UNEXPECTED_PACKET;

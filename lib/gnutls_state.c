@@ -834,10 +834,12 @@ int _gnutls_PRF(const opaque * secret, int secret_size, const char *label,
 int gnutls_session_is_resumed(gnutls_session session)
 {
     if (session->security_parameters.entity == GNUTLS_CLIENT) {
-	if (memcmp(session->security_parameters.session_id,
-		   session->internals.resumed_security_parameters.
-		   session_id,
-		   session->security_parameters.session_id_size) == 0)
+	if (session->security_parameters.session_id_size > 0 &&
+	    session->security_parameters.session_id_size ==
+	        session->internals.resumed_security_parameters.session_id_size &&
+	    memcmp(session->security_parameters.session_id,
+		session->internals.resumed_security_parameters.
+		session_id, session->security_parameters.session_id_size) == 0)
 	    return 1;
     } else {
 	if (session->internals.resumed == RESUME_TRUE)

@@ -1255,27 +1255,24 @@ static int _gnutls_client_check_if_resuming(gnutls_session session,
 {
     opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
 
-    _gnutls_handshake_log("HSK[%x]: SessionID length: %d\n", session,
-			  session_id_len);
+    _gnutls_handshake_log("HSK[%x]: SessionID length: %d\n", session, session_id_len);
     _gnutls_handshake_log("HSK[%x]: SessionID: %s\n", session,
-			  _gnutls_bin2hex(session_id, session_id_len, buf,
-					  sizeof(buf)));
+	  _gnutls_bin2hex(session_id, session_id_len, buf, sizeof(buf)));
 
-    if ((session->internals.resumed_security_parameters.
-	 session_id_size > 0)
-	&& memcmp(session_id,
-		  session->internals.
-		  resumed_security_parameters.session_id,
-		  session_id_len) == 0) {
+    if (session_id_len > 0 &&
+        session->internals.resumed_security_parameters.session_id_size == session_id_len &&
+	memcmp(session_id, session->internals.resumed_security_parameters.session_id,
+	session_id_len) == 0) 
+    {
 	/* resume session */
 	memcpy(session->internals.
-	       resumed_security_parameters.server_random,
-	       session->security_parameters.server_random,
-	       TLS_RANDOM_SIZE);
+	    resumed_security_parameters.server_random,
+	    session->security_parameters.server_random,
+	    TLS_RANDOM_SIZE);
 	memcpy(session->internals.
-	       resumed_security_parameters.client_random,
-	       session->security_parameters.client_random,
-	       TLS_RANDOM_SIZE);
+	    resumed_security_parameters.client_random,
+	    session->security_parameters.client_random,
+	    TLS_RANDOM_SIZE);
 	session->internals.resumed = RESUME_TRUE;	/* we are resuming */
 
 	return 0;
@@ -2395,7 +2392,9 @@ inline static int check_server_params(gnutls_session session,
     int j, remove;
 
     cred_type = _gnutls_map_kx_get_cred(kx, 1);
-
+    
+    /* Read the Diffie Hellman parameters, if any.
+     */
     if (cred_type == GNUTLS_CRD_CERTIFICATE) {
 	x509_cred = _gnutls_get_cred(session->key, cred_type, NULL);
 
