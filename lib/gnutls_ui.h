@@ -99,6 +99,9 @@ int gnutls_certificate_verify_peers( GNUTLS_STATE);
 int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size);
 int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size);
 
+int gnutls_b64_encode_fmt2( const char* msg, const gnutls_datum *data, const gnutls_datum * result);
+int gnutls_b64_decode_fmt2( const gnutls_datum *b64_data, const gnutls_datum* result);
+
 # endif /* LIBGNUTLS_VERSION */
 
 #endif /* GNUTLS_UI_H */
