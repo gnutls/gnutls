@@ -68,11 +68,11 @@ static void dlog( const char* str) {
 #endif
 }
 
-extern ALLOC_FUNC gnutls_secure_malloc;
-extern ALLOC_FUNC gnutls_malloc;
-extern FREE_FUNC gnutls_free;
+extern gnutls_alloc_function gnutls_secure_malloc;
+extern gnutls_alloc_function gnutls_malloc;
+extern gnutls_free_function gnutls_free;
 extern int (*_gnutls_is_secure_memory)(const void*);
-extern REALLOC_FUNC gnutls_realloc;
+extern gnutls_realloc_function gnutls_realloc;
 extern char* (*gnutls_strdup)(const char*);
 extern void* (*gnutls_calloc)(size_t, size_t);
 
@@ -342,5 +342,31 @@ gnutls_check_version( const char *req_version )
 	return ver;
     }
     return NULL;
+}
+
+/**
+  * gnutls_global_get_malloc_function - Returns a malloc() like function
+  * @session: is a &gnutls_session structure.
+  *
+  * This function will return a malloc() compatible function to be
+  * used by callbacks.
+  *
+  **/
+gnutls_alloc_function gnutls_global_get_malloc_function()
+{
+	return gnutls_malloc;
+}
+
+/**
+  * gnutls_global_get_free_function - Returns a free() like function
+  * @session: is a &gnutls_session structure.
+  *
+  * This function will return a free() compatible function to be
+  * used by callbacks.
+  *
+  **/
+gnutls_alloc_function gnutls_global_get_free_function()
+{
+	return gnutls_free;
 }
 

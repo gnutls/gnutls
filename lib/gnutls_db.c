@@ -39,6 +39,9 @@
   * sessions database. This function must return a gnutls_datum containing the
   * data on success, or a gnutls_datum containing null and 0 on failure.
   *
+  * The datum's data must be allocated using the function returned by
+  * gnutls_get_malloc_function().
+  *
   * The first argument to store_function() will be null unless gnutls_db_set_ptr() 
   * has been called.
   *
@@ -222,10 +225,8 @@ int ret;
 		gnutls_assert();
 		return ret;
 	}
-	
-	/* Note: Data is not allocated with gnutls_malloc
-	 */
-	free(data.data);
+
+	gnutls_free(data.data);
 
 	return 0;
 }
@@ -305,7 +306,6 @@ int ret = 0;
 	/* if we can't read why bother writing? */
 	if (session->internals.db_remove_func!=NULL)
 		ret = session->internals.db_remove_func( session->internals.db_ptr, session_id);
-
 
 	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
 

@@ -1,0 +1,24 @@
+\section{Callback functions}
+\index{Callback functions}
+
+There are several cases where \gnutls{} may need some out of band input from
+your program. This is now implemented using some callback functions,
+which your program is expected to register.
+
+An example of this type of functions are the push and pull callbacks
+which are used to specify the functions that will retrieve and send
+data to the transport layer.
+\begin{itemize}
+\item \printfunc{gnutls_transport_set_push_function}{gnutls\_transport\_set\_push\_function}
+\item \printfunc{gnutls_transport_set_pull_function}{gnutls\_transport\_set\_pull\_function}
+\end{itemize}
+
+Other callback functions such as the one set by
+\printfunc{gnutls_srp_set_server_credentials_function}{gnutls\_srp\_set\_server\_credentials\_function},
+may require more complicated input, including data to be allocated.
+These callbacks should use the following function to get a malloc()
+and a free() like functions, to allocate data.
+\begin{itemize}
+\item \printfunc{gnutls_global_get_malloc_function}{gnutls\_global\_get\_malloc\_function}
+\item \printfunc{gnutls_global_get_free_function}{gnutls\_global\_get\_free\_function}
+\end{itemize}

@@ -42,6 +42,59 @@
 #include <config.h>
 #include <list.h>
 
+#define ENA 1
+#if ENA
+
+#include <opencdk.h>
+
+
+int
+recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr, 
+       unsigned int keyfpr_length, gnutls_datum * key)
+{
+static const char *hostname = "hkp://wwwkeys.pgp.net";
+static const short port = 11371;
+   int rc;
+   CDK_KBNODE knode = NULL;
+
+   /* The key fingerprint should be 20 bytes
+    * in v4 keys.
+    */
+   if (keyfpr_length != 20)
+      return -1;
+
+   rc = cdk_keyserver_recv_key( hostname, port, keyfpr, 
+      CDK_DBSEARCH_FPR, &knode );
+
+   if( !rc ) {
+       size_t len;
+
+       cdk_kbnode_write_to_mem( knode, NULL, &len);
+
+       key->data = malloc( len);
+       if (key->data==NULL) {
+          rc = -1;
+          goto finish;
+       }
+
+       cdk_kbnode_write_to_mem( knode, key->data, &len);
+
+       rc = 0; /* success */
+
+   } else {
+       rc = -1;
+   }
+
+   finish:
+
+   cdk_kbnode_release( knode );
+   return rc;
+
+}
+
+
+#endif
+
 /* konqueror cannot handle sending the page in multiple
  * pieces.
  */
@@ -254,6 +307,10 @@ gnutls_session initialize_session (void)
    /* allow the use of private ciphersuites.
     */
    gnutls_handshake_set_private_extensions( session, 1);
+
+#if ENA
+gnutls_openpgp_set_recv_key_function( session, recv_openpgp_key);
+#endif
 
    if (nodb==0) {
     gnutls_db_set_retrieve_function( session, wrap_db_fetch);
@@ -590,7 +647,6 @@ int main(int argc, char **argv)
 	 */
    	fprintf(stderr, "Error while setting SRP parameters\n");
    }
-
 
    gnutls_anon_allocate_server_credentials(&dh_cred);
    if (generate != 0)

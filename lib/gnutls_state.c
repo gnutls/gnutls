@@ -764,3 +764,4 @@ void gnutls_session_set_ptr(gnutls_session session, void* ptr)
 int gnutls_record_get_direction(gnutls_session session) {
 	return session->internals.direction;
 }
+

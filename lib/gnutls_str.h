@@ -11,12 +11,12 @@ typedef struct {
 	opaque * data;
 	size_t max_length;
 	size_t length;
-	REALLOC_FUNC realloc_func;
-	ALLOC_FUNC alloc_func;
-	FREE_FUNC free_func;
+	gnutls_realloc_function realloc_func;
+	gnutls_alloc_function alloc_func;
+	gnutls_free_function free_func;
 } gnutls_string;
 
-void _gnutls_string_init( gnutls_string*, ALLOC_FUNC, REALLOC_FUNC, FREE_FUNC);
+void _gnutls_string_init( gnutls_string*, gnutls_alloc_function, gnutls_realloc_function, gnutls_free_function);
 void _gnutls_string_clear( gnutls_string*);
 
 /* Beware, do not clear the string, after calling this

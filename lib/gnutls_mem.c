@@ -23,10 +23,10 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 
-ALLOC_FUNC gnutls_secure_malloc = malloc;
-ALLOC_FUNC gnutls_malloc = malloc;
-FREE_FUNC gnutls_free = free;
-REALLOC_FUNC gnutls_realloc = realloc;
+gnutls_alloc_function gnutls_secure_malloc = malloc;
+gnutls_alloc_function gnutls_malloc = malloc;
+gnutls_free_function gnutls_free = free;
+gnutls_realloc_function gnutls_realloc = realloc;
 
 void* (*gnutls_calloc)(size_t, size_t) = calloc;
 char* (*gnutls_strdup)(const char*) = strdup;

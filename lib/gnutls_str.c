@@ -69,9 +69,9 @@ void _gnutls_mem_cpy( char* dest, size_t dest_tot_size, const char* src, size_t 
 	}
 }
 
-void _gnutls_string_init( gnutls_string* str, ALLOC_FUNC alloc_func, 
-	REALLOC_FUNC realloc_func,
-	FREE_FUNC free_func) 
+void _gnutls_string_init( gnutls_string* str, gnutls_alloc_function alloc_func, 
+	gnutls_realloc_function realloc_func,
+	gnutls_free_function free_func) 
 {
 	str->data = NULL;
 	str->max_length = 0;

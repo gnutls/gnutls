@@ -7,10 +7,6 @@ typedef struct {
 	gnutls_datum v;
 	gnutls_datum g;
 	gnutls_datum n;
-	
-	int malloced; /* if non zero, use free() instead of gnutls_free()
-		       */
-
 } SRP_PWD_ENTRY;
 
 /* this is localy alocated. It should be freed using the provided function */

@@ -119,9 +119,6 @@ void init_global_tls_stuff(void);
 #define DEFAULT_PGP_CERTFILE "openpgp/cli_pub.asc"
 #define DEFAULT_PGP_KEYRING "openpgp/cli_ring.gpg"
 
-#define DEFAULT_SRP_USERNAME "test"
-#define DEFAULT_SRP_PASSWD "test"
-
 /* initializes a gnutls_session with some defaults.
  */
 static gnutls_session init_tls_session( const char* hostname)
@@ -428,13 +425,9 @@ void gaa_parser(int argc, char **argv)
 
    if (info.srp_passwd != NULL)
       srp_passwd = info.srp_passwd;
-   else
-      srp_passwd = DEFAULT_SRP_PASSWD;
 
    if (info.srp_username != NULL)
       srp_username = info.srp_username;
-   else
-      srp_username = DEFAULT_SRP_USERNAME;
 #else
    srp_username = info.srp_username;
    srp_passwd = info.srp_passwd;
@@ -653,7 +646,10 @@ int ret;
       if (gnutls_srp_allocate_client_credentials(&cred) < 0) {
 	 fprintf(stderr, "SRP authentication error\n");
       }
-      gnutls_srp_set_client_credentials(cred, srp_username, srp_passwd);
+
+      if ((ret=gnutls_srp_set_client_credentials(cred, srp_username, srp_passwd)) < 0) {
+	 fprintf(stderr, "SRP credentials set error [%d]\n", ret);
+      }
    }
 
    /* ANON stuff */

@@ -49,7 +49,7 @@ void _gnutls_write_datum8( opaque* dest, gnutls_datum dat) {
 
 
 int _gnutls_set_datum_m( gnutls_datum* dat, const void* data, int data_size, 
-	ALLOC_FUNC galloc_func) {
+	gnutls_alloc_function galloc_func) {
 	dat->data = galloc_func(data_size);
 	if (dat->data==NULL) return GNUTLS_E_MEMORY_ERROR;
 
@@ -60,7 +60,7 @@ int _gnutls_set_datum_m( gnutls_datum* dat, const void* data, int data_size,
 }
 
 int _gnutls_datum_append_m( gnutls_datum* dst, const void* data, int data_size,
-	REALLOC_FUNC grealloc_func) {
+	gnutls_realloc_function grealloc_func) {
 
 	dst->data = grealloc_func(dst->data, data_size+dst->size);
 	if (dst->data==NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -71,7 +71,7 @@ int _gnutls_datum_append_m( gnutls_datum* dst, const void* data, int data_size,
 	return 0;
 }
 
-void _gnutls_free_datum_m( gnutls_datum* dat, FREE_FUNC gfree_func) {
+void _gnutls_free_datum_m( gnutls_datum* dat, gnutls_free_function gfree_func) {
 	if (dat->data!=NULL && dat->size!=0)
 		gfree_func( dat->data);
 

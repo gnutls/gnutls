@@ -14,6 +14,10 @@ Version 0.5.12
   than password files.
 - Added the function gnutls_openpgp_set_recv_key_function()
   which can be used to set a callback, to get OpenPGP keys.
+- Added the new functions:
+   gnutls_get_malloc_function()
+   gnutls_get_free_function()
+  to be used in callbacks.
 
 Version 0.5.11 (5/11/2002)
 - Some fixes in 'gnutls-cli' client program to prevent some segmentation 

@@ -243,7 +243,6 @@ SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	if (cred->pwd_callback != NULL) {
 		ret = cred->pwd_callback( state, username, &entry->salt,
 			&entry->v, &entry->g, &entry->n);
-		entry->malloced = 1;
 		
 		if (ret < 0) {
 			gnutls_assert();
@@ -359,17 +358,10 @@ SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 }
 
 void _gnutls_srp_entry_free( SRP_PWD_ENTRY * entry) {
-	if (entry->malloced) {
-		free( entry->v.data); entry->v.data = NULL;
-		free( entry->g.data); entry->g.data = NULL;
-		free( entry->n.data); entry->n.data = NULL;
-		free( entry->salt.data); entry->salt.data = NULL;
-	} else {
-		_gnutls_free_datum(&entry->v);
-		_gnutls_free_datum(&entry->g);
-		_gnutls_free_datum(&entry->n);
-		_gnutls_free_datum(&entry->salt);
-	}
+	_gnutls_free_datum(&entry->v);
+	_gnutls_free_datum(&entry->g);
+	_gnutls_free_datum(&entry->n);
+	_gnutls_free_datum(&entry->salt);
 
 	gnutls_free(entry->username);
 	gnutls_free(entry);
