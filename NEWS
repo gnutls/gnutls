@@ -1,15 +1,15 @@
 Version 0.5.9
-- Added gnutls_x509_extract_key_pk_algorithm() function which extracts
-  the private key type.
 - Corrected some code which worked fine in gcc 3.2, but not with any
   other compiler.
-- Updated 'gnutls-cli' with the starttls parameter, to allow testing
+- Updated 'gnutls-cli' with the '--starttls' option, to allow testing
   starttls implementations.
-- Added gnutls_x509_extract_certificate_dn_string() which returns the peer's
-  Distinguished name in a single string.
+- Added gnutls_x509_extract_key_pk_algorithm() function which extracts
+  the private key type, of a DER encoded key.
+- Added gnutls_x509_extract_certificate_dn_string() which returns the 
+  certificate's distinguished name in a single string.
 - Added gnutls_set_default_priority() and gnutls_set_default_export_priority()
   functions, to avoid calling all the *_priority() functions if the defaults
-  are ok.
+  are acceptable.
 
 Version 0.5.8 (25/09/2002)
 - Updated documentation.
