@@ -1,4 +1,4 @@
-Version 0.5.2
+Version 0.5.2 (22/08/2002)
 - Added an error code that is returned in clients which connect
   to export only servers. This must be enabled using the
   gnutls_handshake_set_exportable_detection() function.
