@@ -70,10 +70,10 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
 
     cur_keylen = 0;
 
-    if (pw==NULL) return GNUTLS_E_INVALID_REQUEST;
+    if (pw==NULL) pwlen = 0;
+    else pwlen = strlen(pw);
 
-    pwlen = strlen(pw);
-    if (pwlen==0 || pwlen > 63 / 2) {
+    if (pwlen > 63 / 2) {
 	gnutls_assert();
 	return GNUTLS_E_INVALID_REQUEST;
     }
