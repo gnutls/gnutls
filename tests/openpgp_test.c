@@ -1,4 +1,4 @@
-/* t-openpgp.c -- OpenPGP regression test */
+/** t-openpgp.c -- OpenPGP regression test **/
   
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
