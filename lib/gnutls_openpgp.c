@@ -1130,11 +1130,15 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
 
   if (flags & TRUST_FLAG_DISABLED)
     {
-      trustval = GNUTLS_CERT_INVALID;
+      trustval |= GNUTLS_CERT_NOT_TRUSTED;
+      trustval |= GNUTLS_CERT_INVALID;
       goto leave;
     }
-  if (flags & TRUST_FLAG_REVOKED)
+  if (flags & TRUST_FLAG_REVOKED) 
+   {
+    trustval |= GNUTLS_CERT_NOT_TRUSTED;
     trustval |= GNUTLS_CERT_REVOKED;
+   }
   switch (ot)
     {
     case TRUST_NEVER:
@@ -1179,18 +1183,18 @@ gnutls_openpgp_verify_key( const char *trustdb,
   int status = 0;
   
   if (!cert_list || !cert_list_length || !keyring)
-    return GNUTLS_CERT_INVALID;
+    return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
   if (cert_list_length != 1 || !keyring->size)
-    return GNUTLS_CERT_INVALID;
+    return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
   blob = kbx_read_blob(keyring, 0);
   if (!blob)
-    return GNUTLS_CERT_INVALID;
+    return GNUTLS_CERT_INVALID|GNUTLS_CERT_NOT_TRUSTED;
   khd = kbx_to_keydb(blob);
   if (!khd)
     {
-      rc = GNUTLS_CERT_INVALID;
+      rc = GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
       goto leave;
     }
 
@@ -1206,7 +1210,7 @@ gnutls_openpgp_verify_key( const char *trustdb,
   if (rc)
     {
       goto leave;
-      return GNUTLS_CERT_INVALID;
+      return GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
     }
 
   rc = cdk_key_check_sigs( kb_pk, khd, &status );
@@ -1216,11 +1220,11 @@ gnutls_openpgp_verify_key( const char *trustdb,
   switch (status)
     {
     case CDK_KEY_INVALID:
-      rc = GNUTLS_CERT_INVALID;
+      rc = GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
       break;
       
     case CDK_KEY_REVOKED:
-      rc = GNUTLS_CERT_REVOKED;
+      rc = GNUTLS_CERT_REVOKED | GNUTLS_CERT_NOT_TRUSTED;
       break;
       
     }
