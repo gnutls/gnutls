@@ -78,7 +78,7 @@ libgnutls_la_LIBADD = ../crypto/libgc.la x509/libgnutls_x509.la	\
 if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
-libgnutls_la_LIBADD += $(LIBTASN1_LIBS) 
+libgnutls_la_LDFLAGS += $(LIBTASN1_LIBS) 
 endif
 
 pkix_asn1_tab.c: pkix.asn
