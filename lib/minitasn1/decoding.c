@@ -815,12 +815,6 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 	move=RIGHT;
 	break;
       case TYPE_ANY:
-	/* Check indefinite lenth method in a EXPLICIT TAG */
-	if((p->type&CONST_TAG) && (der[counter-1]==0x80))
-	  indefinite=1;
-	else
-	  indefinite=0;
-
 	tag=_asn1_get_tag_der(der+counter,&class,&len2);
 	len4=_asn1_get_length_der(der+counter+len2,&len3);
 	
@@ -839,6 +833,12 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 	  counter+=len2+len3;
 	}
 	else{ /* indefinite length */
+	  /* Check indefinite lenth method in a EXPLICIT TAG */
+	  if((p->type&CONST_TAG) && (der[counter-1]==0x80))
+	    indefinite=1;
+	  else
+	    indefinite=0;
+
 	  len2=len-counter;
 	  ris=_asn1_get_indefinite_length_string(der+counter,&len2);
 	  if(ris != ASN1_SUCCESS){
@@ -856,17 +856,17 @@ asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 	  _asn1_set_value(p,temp2,len4);
 	  _asn1_afree(temp2);
 	  counter+=len2;
-	}
 
-	/* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
-	   a indefinite length method. */
-	if(indefinite){
-	  if(!der[counter] && !der[counter+1]){ 
-	    counter+=2;
-	  }
-	  else{
-	    asn1_delete_structure(element);
-	    return ASN1_DER_ERROR;
+	  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
+	     a indefinite length method. */
+	  if(indefinite){
+	    if(!der[counter] && !der[counter+1]){
+	      counter+=2;
+	    }
+	    else{
+	      asn1_delete_structure(element);
+	      return ASN1_DER_ERROR;
+	    }
 	  }
 	}
 	move=RIGHT;
@@ -1313,12 +1313,6 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	
 	break;
       case TYPE_ANY:
-	/* Check indefinite lenth method in a EXPLICIT TAG */
-	if((p->type&CONST_TAG) && (der[counter-1]==0x80))
-	  indefinite=1;
-	else
-	  indefinite=0;
-
 	tag=_asn1_get_tag_der(der+counter,&class,&len2);
 	len4=_asn1_get_length_der(der+counter+len2,&len3);
 	
@@ -1341,6 +1335,12 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	  counter+=len2+len3;
 	}
 	else{ /* indefinite length */
+	  /* Check indefinite lenth method in a EXPLICIT TAG */
+	  if((p->type&CONST_TAG) && (der[counter-1]==0x80))
+	    indefinite=1;
+	  else
+	    indefinite=0;
+
 	  len2=len-counter;
 	  ris=_asn1_get_indefinite_length_string(der+counter,&len2);
 	  if(ris != ASN1_SUCCESS){
@@ -1364,17 +1364,17 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	  }
 
 	  counter+=len2;
-	}
 
-	/* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
-	   a indefinite length method. */
-	if(indefinite){
-	  if(!der[counter] && !der[counter+1]){ 
-	    counter+=2;
-	  }
-	  else{
-	    asn1_delete_structure(structure);
-	    return ASN1_DER_ERROR;
+	  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
+	     a indefinite length method. */
+	  if(indefinite){
+	    if(!der[counter] && !der[counter+1]){
+	      counter+=2;
+	    }
+	    else{
+	      asn1_delete_structure(structure);
+	      return ASN1_DER_ERROR;
+	    }
 	  }
 	}
 	move=RIGHT;
@@ -1683,12 +1683,6 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
 	move=RIGHT;
 	break;
       case TYPE_ANY:
-	/* Check indefinite lenth method in a EXPLICIT TAG */
-	if((p->type&CONST_TAG) && (der[counter-1]==0x80))
-	  indefinite=1;
-	else
-	  indefinite=0;
-
 	tag=_asn1_get_tag_der(der+counter,&class,&len2);
 	len4=_asn1_get_length_der(der+counter+len2,&len3);
 	
@@ -1696,20 +1690,26 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
 	  counter+=len2+len4+len3;
 	}
 	else{ /* indefinite length */
+	  /* Check indefinite lenth method in a EXPLICIT TAG */
+	  if((p->type&CONST_TAG) && (der[counter-1]==0x80))
+	    indefinite=1;
+	  else
+	    indefinite=0;
+
 	  len2=len-counter;
 	  ris=_asn1_get_indefinite_length_string(der+counter,&len2);
 	  if(ris != ASN1_SUCCESS)
 	    return ris;
 	  counter+=len2;
-	}
 
-	/* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
-	   a indefinite length method. */
-	if(indefinite){
-	  if(!der[counter] && !der[counter+1])
-	    counter+=2;
-	  else
-	    return ASN1_DER_ERROR;
+	  /* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
+	     a indefinite length method. */
+	  if(indefinite){
+	    if(!der[counter] && !der[counter+1])
+	      counter+=2;
+	    else
+	      return ASN1_DER_ERROR;
+	  }
 	}
 	move=RIGHT;
 	break;
