@@ -120,7 +120,7 @@ int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 	int ret = 0;
 	KXAlgorithm algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 
 	if (_gnutls_kx_server_key_exchange2(algorithm) != 0) {
@@ -161,7 +161,7 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	int ret = 0;
 	KXAlgorithm algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 	if (_gnutls_kx_client_key_exchange(algorithm) == 0) return 0;
 
@@ -205,7 +205,7 @@ int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 	int ret = 0;
 	KXAlgorithm algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 	if (_gnutls_kx_client_key_exchange0(algorithm) == 0) return 0;
 
@@ -241,7 +241,7 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 	int data_size;
 	KXAlgorithm algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 	/* if certificate verify is not needed just exit */
 	if (state->gnutls_internals.certificate_verify_needed==0) return 0;
@@ -278,7 +278,7 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 #endif
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
 		ret =
@@ -310,7 +310,7 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 #endif
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 	if (_gnutls_kx_server_key_exchange2(algorithm) != 0) {
 		ret =
@@ -351,7 +351,7 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 	/* Do key exchange only if the algorithm permits it */
 	if (_gnutls_kx_client_key_exchange(algorithm) != 0) {
@@ -395,7 +395,7 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 
 	algorithm =
 	    _gnutls_cipher_suite_get_kx_algo
-	    (state->gnutls_internals.current_cipher_suite);
+	    (state->security_parameters.current_cipher_suite);
 
 	/* Do key exchange only if the algorithm permits it */
 	if (_gnutls_kx_client_key_exchange0(algorithm) != 0) {

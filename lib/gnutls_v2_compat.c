@@ -163,7 +163,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	/* find an appropriate cipher suite */
 
 	DECR_LEN(len, sizeOfSuites);
-	ret = SelectSuite_v2(state, state->gnutls_internals.
+	ret = SelectSuite_v2(state, state->security_parameters.
 				  current_cipher_suite.CipherSuite,
 				  &data[pos], sizeOfSuites);
 
@@ -175,7 +175,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* check if the credentials (username, public key etc. are ok)
 	 */
-	if (_gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.current_cipher_suite), &err) == NULL && err != 0) {
+	if (_gnutls_get_kx_cred( state->gnutls_key, _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite), &err) == NULL && err != 0) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
@@ -186,7 +186,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	 */
 	state->gnutls_internals.auth_struct =
 	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (state->gnutls_internals.
+				   (state->security_parameters.
 				    current_cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
 #ifdef DEBUG

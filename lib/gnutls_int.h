@@ -185,13 +185,24 @@ typedef GNUTLS_KEY_A* GNUTLS_KEY;
 #include <gnutls_cipher_int.h>
 #include <gnutls_auth.h>
 
+typedef struct {
+	uint8 CipherSuite[2];
+} GNUTLS_CipherSuite;
 
+/* This structure and AUTH_INFO, are stored in the resume database,
+ * and are restored, in case of resume.
+ */
 typedef struct {
 	ConnectionEnd entity;
 	BulkCipherAlgorithm bulk_cipher_algorithm;
 	KXAlgorithm kx_algorithm;
 	MACAlgorithm mac_algorithm;
 	CompressionMethod compression_algorithm;
+	/* this is the ciphersuite we are going to use 
+	 * moved here from gnutls_internals in order to be restored
+	 * on resume;
+	 */
+	GNUTLS_CipherSuite		current_cipher_suite;
 	uint8 IV_size;
 	uint8 key_size;
 	uint8 key_material_length;
@@ -228,9 +239,6 @@ typedef struct {
 	uint64		write_sequence_number;
 } ConnectionState;
 
-typedef struct {
-	uint8 CipherSuite[2];
-} GNUTLS_CipherSuite;
 
 typedef struct {
 	int* algorithm_priority;
@@ -249,8 +257,6 @@ typedef struct {
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
 	ValidSession			valid_connection; /* true or FALSE - if this session is valid */
 	AlertDescription		last_alert; /* last alert received */
-	/* this is the ciphersuite we are going to use */
-	GNUTLS_CipherSuite		current_cipher_suite;
 	/* this is the compression method we are going to use */
 	CompressionMethod		compression_method;
 	/* priorities */

@@ -198,20 +198,20 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		rc =
 		    _gnutls_set_cipher(state,
 			       _gnutls_cipher_suite_get_cipher_algo
-			       (state->gnutls_internals.current_cipher_suite));
+			       (state->security_parameters.current_cipher_suite));
 		if (rc < 0)
 			return rc;
 		rc =
 		    _gnutls_set_mac(state,
 			    _gnutls_cipher_suite_get_mac_algo
-			    (state->gnutls_internals.current_cipher_suite));
+			    (state->security_parameters.current_cipher_suite));
 		if (rc < 0)
 			return rc;
 
 		rc =
 		    _gnutls_set_kx(state,
 			    _gnutls_cipher_suite_get_kx_algo
-			    (state->gnutls_internals.current_cipher_suite));
+			    (state->security_parameters.current_cipher_suite));
 		if (rc < 0)
 			return rc;
 
@@ -237,7 +237,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 #ifdef DEBUG
 	fprintf(stderr, "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
-					      gnutls_internals.current_cipher_suite));
+					      security_parameters.current_suite));
 #endif
 
 	if (state->connection_state.write_mac_secret!=NULL)

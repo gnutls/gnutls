@@ -250,6 +250,17 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 		       client_random,
 		       state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
+		/* keep the ciphersuite and compression 
+		 * That is because the client must see these in our
+		 * hello message.
+		 */
+		memcpy( state->security_parameters.current_cipher_suite.CipherSuite,
+			state->gnutls_internals.resumed_security_parameters.current_cipher_suite.CipherSuite,
+			2);
+		state->gnutls_internals.compression_method =
+			state->gnutls_internals.resumed_security_parameters.compression_algorithm;
+			
+
 		state->gnutls_internals.resumed = RESUME_TRUE;
 		return 0;
 	} else {
@@ -266,7 +277,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 2;
 
 	DECR_LEN(len, sizeOfSuites);
-	ret = SelectSuite(state, state->gnutls_internals.
+	ret = SelectSuite(state, state->security_parameters.
 			  current_cipher_suite.CipherSuite, &data[pos],
 			  sizeOfSuites);
 
@@ -281,7 +292,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	 */
 	if (_gnutls_get_kx_cred
 	    (state->gnutls_key,
-	     _gnutls_cipher_suite_get_kx_algo(state->gnutls_internals.
+	     _gnutls_cipher_suite_get_kx_algo(state->security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
@@ -294,7 +305,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	 */
 	state->gnutls_internals.auth_struct =
 	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (state->gnutls_internals.
+				   (state->security_parameters.
 				    current_cipher_suite));
 	if (state->gnutls_internals.auth_struct == NULL) {
 #ifdef DEBUG
@@ -559,10 +570,10 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	if (type == GNUTLS_CERTIFICATE) {
 		/* If the ciphersuite does not support certificate just quit */
 		if (state->security_parameters.entity == GNUTLS_CLIENT) {
-			if (_gnutls_kx_server_certificate( _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite) ) == 0)
+			if (_gnutls_kx_server_certificate( _gnutls_cipher_suite_get_kx_algo( state->security_parameters.current_cipher_suite) ) == 0)
 				return 0;
 		} else {	/* server */
-			if (_gnutls_kx_client_certificate( _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite) ) == 0)
+			if (_gnutls_kx_client_certificate( _gnutls_cipher_suite_get_kx_algo( state->security_parameters.current_cipher_suite) ) == 0)
 				return 0;
 		}
 	}
@@ -844,7 +855,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 		}
 		pos += session_id_len;
 		DECR_LEN(len, 2);
-	memcpy(&cipher_suite.CipherSuite, &data[pos], 2);
+	memcpy(cipher_suite.CipherSuite, &data[pos], 2);
 	pos += 2;
 
 	z = 1;
@@ -861,7 +872,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
-	memcpy(state->gnutls_internals.
+	memcpy(state->security_parameters.
 		current_cipher_suite.CipherSuite,
 		cipher_suite.CipherSuite, 2);
 
@@ -869,7 +880,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 	fprintf(stderr, "Selected cipher suite: ");
 	fprintf(stderr, "%s\n",
 		_gnutls_cipher_suite_get_name(state->
-			      gnutls_internals.
+			      security_parameters.
 			      current_cipher_suite));
 #endif
 
@@ -878,7 +889,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 	if (_gnutls_get_kx_cred
 	    (state->gnutls_key,
 	     _gnutls_cipher_suite_get_kx_algo(state->
-					      gnutls_internals.
+					      security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
@@ -995,7 +1006,7 @@ int _gnutls_send_hello(SOCKET cd, GNUTLS_STATE state)
 		data = gnutls_realloc(data, datalen);
 
 		for (i = 0; i < x / 2; i++) {
-			memcpy(&data[pos], &cipher_suites[i].CipherSuite,
+			memcpy(&data[pos], cipher_suites[i].CipherSuite,
 				2);
 			pos += 2;
 		}
@@ -1058,8 +1069,9 @@ int _gnutls_send_hello(SOCKET cd, GNUTLS_STATE state)
 
 		datalen += 2;
 		data = gnutls_realloc(data, datalen);
+		
 		memcpy(&data[pos],
-			&state->gnutls_internals.
+			state->security_parameters.
 			current_cipher_suite.CipherSuite, 2);
 		pos += 2;
 
@@ -1088,7 +1100,7 @@ int _gnutls_send_hello(SOCKET cd, GNUTLS_STATE state)
 }
 
 /* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake_int only if a
- * hello message is expected. It uses the gnutls_internals.current_cipher_suite
+ * hello message is expected. It uses the security_parameters.current_cipher_suite
  * and gnutls_internals.compression_method.
  */
 int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data, int datalen)
