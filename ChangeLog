@@ -1,3 +1,10 @@
+2003-11-07 09:23  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in:
+
+	Corrected the types in gnutls_anon_free_client_credentials() and
+	gnutls_anon_allocate_client_credentials(). Reported by Ivo.  
+
 2003-11-06 19:57  nmav <nmav@gnutls.org>
 
 	* configure.in, libgcrypt.m4, lib/gnutls_buffers.c,
