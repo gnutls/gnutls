@@ -18,6 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+/* Note the libgnutls-extra is not a standalone library. It requires
+ * to link also against libgnutls.
+ */
+
 #ifndef GNUTLS_EXTRA_H
 # define GNUTLS_EXTRA_H
 

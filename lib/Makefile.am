@@ -1,4 +1,5 @@
-include_HEADERS = gnutls.h gnutls-extra.h
+INCLUDES = -I../libextra
+include_HEADERS = gnutls.h 
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
@@ -9,9 +10,9 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h gnutls_dh.h \
 	gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h gnutls_db.h \
 	gnutls_compress_int.h gnutls_session.h gnutls_priority.h gnutls_auth.h \
-	auth_anon.h gnutls_extensions.h ext_srp.h \
-	gnutls_auth_int.h crypt_bcrypt.h gnutls_random.h crypt_srpsha1.h \
-	x509_b64.h gnutls_srp.h auth_srp.h auth_srp_passwd.h gnutls_v2_compat.h \
+	auth_anon.h gnutls_extensions.h \
+	gnutls_auth_int.h crypt_bcrypt.h gnutls_random.h \
+	x509_b64.h auth_srp.h gnutls_v2_compat.h \
 	crypt.h libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
 	x509_asn1.h x509_der.h gnutls_datum.h auth_cert.h gnutls_mpi.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
@@ -19,9 +20,9 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
 	gnutls-api.tex io_debug.h ext_max_record.h gnutls_session_pack.h \
 	gnutls_alert.h asn1-api.tex gnutls_str.h gnutls_state.h gnutls_x509.h \
-	gnutls_openpgp.h ext_cert_type.h gnutls-extra-api.tex gnutls_extra.h
+	ext_cert_type.h 
 
-lib_LTLIBRARIES = libgnutls.la libgnutls-extra.la
+lib_LTLIBRARIES = libgnutls.la
 
 
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
@@ -39,18 +40,12 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_str.c gnutls_state.c gnutls_x509.c \
 	ext_cert_type.c 
 
-COBJECTS_EXTRA = crypt_bcrypt.c crypt.c crypt_srpsha1.c ext_srp.c \
-	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
-	gnutls_openpgp.c ext_cert_type.c gnutls_extra.c
-
 # Separate so we can create the documentation
 COBJECTS2 = x509_ASN.y x509_asn1.c x509_der.c
 
 libgnutls_la_SOURCES = $(COBJECTS) $(COBJECTS2) 
-libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA)
 
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
-libgnutls_extra_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 pkix_asn1_tab.c: pkix.asn
 	-../src/asn1c pkix.asn pkix_asn1_tab.c
@@ -65,13 +60,6 @@ gnutls-api.tex: $(COBJECTS)
 	&& echo "ok"; \
 	done
 
-gnutls-extra-api.tex: $(COBJECTS_EXTRA)
-	@echo "" > gnutls-extra-api.tex
-	@for i in $(COBJECTS_EXTRA); \
-	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> gnutls-extra-api.tex \
-	&& echo "ok"; \
-	done
-
 asn1-api.tex: $(COBJECTS2)
 	@echo "" > asn1-api.tex
 	@for i in $(COBJECTS2); \
@@ -79,4 +67,4 @@ asn1-api.tex: $(COBJECTS2)
 	&& echo "ok"; \
 	done
 
-all-local: gnutls-api.tex gnutls-extra-api.tex asn1-api.tex
+all-local: gnutls-api.tex asn1-api.tex
