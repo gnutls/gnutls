@@ -287,7 +287,7 @@ int main(int argc, char **argv)
 	}
 
 	if (gnutls_allocate_x509_sc(&x509_cred, CERTFILE, KEYFILE) < 0) {
-		fprintf(stderr, "X509 PARSE ERROR\n");
+		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
