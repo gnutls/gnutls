@@ -1,6 +1,7 @@
-Version 0.2.10
-- Corrected bugs in non blocking IO
-- Added hooks to use external database to store sessions.
+Version 0.2.10 (5/11/2001)
+- Corrected bugs and improved non blocking IO
+- Added hooks to use external database to store sessions
+- Usual cleanups
 
 Version 0.2.9 (27/10/2001)
 - AUTH_INFO types and structures were moved to library internals

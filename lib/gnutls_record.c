@@ -436,7 +436,6 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 			if (ret2 < 0)
 				return ret2;
 
-		default:
 	}
 
 	STATE = STATE0;

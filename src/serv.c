@@ -77,7 +77,7 @@ GNUTLS_STATE initialize_state()
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
-		fprintf(stderr, "*** DB error (%d)\n\n", ret);
+		fprintf(stderr, "*** DB error (%d). Resuming will not be possible.\n\n", ret);
 
 	/* null cipher is here only for debuging 
 	 * purposes.

@@ -1520,7 +1520,6 @@ int gnutls_handshake_client(SOCKET cd, GNUTLS_STATE state)
 		IMED_RET("send client certificate verify", ret);
 
 		STATE = STATE0;
-	default:
 	}
 
 		
@@ -1574,7 +1573,6 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 		}
 
 		STATE = STATE0;
-	default:
 	}
 
 	return 0;
@@ -1627,7 +1625,6 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 			return ret;
 		}
 		STATE = STATE0;
-	default:
 	}
 
 	
@@ -1730,7 +1727,6 @@ int gnutls_handshake_server(SOCKET cd, GNUTLS_STATE state)
 		IMED_RET("recv client certificate verify", ret);
 
 		STATE = STATE0; /* finished thus clear state */
-	default:
 	}
 	
 	return 0;

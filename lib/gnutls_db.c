@@ -294,6 +294,9 @@ int ret;
 
 	/* expiration check is performed inside */
 	ret = gnutls_set_current_session( state, data.data, data.size);
+
+	/* Note: Data is not allocated with gnutls_malloc
+	 */
 	free(data.data);
 
 	return 0;
