@@ -29,13 +29,13 @@ asn1c_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
 
 crypt-gaa.c: crypt.gaa
-	gaa crypt.gaa -o crypt-gaa.c -i crypt-gaa.h
+	-gaa crypt.gaa -o crypt-gaa.c -i crypt-gaa.h
 prime-gaa.c: prime.gaa
-	gaa prime.gaa -o prime-gaa.c -i prime-gaa.h
+	-gaa prime.gaa -o prime-gaa.c -i prime-gaa.h
 cli-gaa.c: cli.gaa
-	gaa cli.gaa -o cli-gaa.c -i cli-gaa.h
+	-gaa cli.gaa -o cli-gaa.c -i cli-gaa.h
 tls_test-gaa.c: tls_test.gaa
-	gaa tls_test.gaa -o tls_test-gaa.c -i tls_test-gaa.h
+	-gaa tls_test.gaa -o tls_test-gaa.c -i tls_test-gaa.h
 serv-gaa.c: serv.gaa
-	gaa serv.gaa -o serv-gaa.c -i serv-gaa.h
+	-gaa serv.gaa -o serv-gaa.c -i serv-gaa.h
 
