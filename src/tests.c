@@ -403,6 +403,9 @@ int ret;
 
 }
 
+/* Advertize both TLS 1.0 and SSL 3.0 if the connection fails,
+ * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
+ */
 int test_tls1_2( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
@@ -506,7 +509,7 @@ int ret;
 
 	ret = do_handshake( session);
 	if (ret!=SUCCEED) return ret;
-	
+
 	if (tls1_ok!=0 && gnutls_protocol_get_version( session)==GNUTLS_SSL3)
 		return FAILED;
 	
