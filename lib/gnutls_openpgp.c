@@ -1358,7 +1358,7 @@ leave:
 }
 
 /**
- * gnutls_certificate_set_openpgp_key_server - Used to set an OpenPGP key server
+ * gnutls_certificate_set_openpgp_keyserver - Used to set an OpenPGP key server
  * @res: the destination context to save the data.
  * @server: is the key server address
  * @port: is the key server port to connect to
@@ -1370,7 +1370,7 @@ leave:
  *
  **/
 void
-gnutls_certificate_set_openpgp_key_server(GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                           char* keyserver,
                                           int port)
 {
