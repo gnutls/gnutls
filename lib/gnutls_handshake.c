@@ -395,7 +395,7 @@ char * data;
 int _gnutls_send_finished(GNUTLS_STATE state, int again)
 {
 	uint8 data[36];
-	int ret;
+	int ret=0;
 	int data_size = 0;
 
 

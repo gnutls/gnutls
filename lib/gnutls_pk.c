@@ -46,10 +46,10 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 			      int params_len,
 			      int btype)
 {
-	int k, psize, i, ret, pad;
+	int i, ret, pad;
 	GNUTLS_MPI m, res;
 	opaque *edata, *ps;
-
+	size_t k, psize;
 	
 	k = _gnutls_mpi_get_nbits(params[0]) / 8;
 
@@ -165,9 +165,10 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
 			      gnutls_datum ciphertext, GNUTLS_MPI* params, int params_len,
 			      int btype)
 {
-	int k, esize, i, ret;
+	int k, i, ret;
 	GNUTLS_MPI c, res;
 	opaque *edata;
+	size_t esize;
 
 	k = _gnutls_mpi_get_nbits(params[0]) / 8;
 	esize = ciphertext.size;
@@ -303,8 +304,8 @@ static int encode_ber_rs( gnutls_datum* sig_value, GNUTLS_MPI r, GNUTLS_MPI s) {
 node_asn* sig;
 int result;
 opaque str[MAX_PARAMETER_SIZE];
-int len = sizeof(str);
-int tot_len = 0;
+size_t len = sizeof(str);
+size_t tot_len = 0;
 
 	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", 
 		&sig, "sig"))!=ASN_OK) {
@@ -369,7 +370,8 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
 		     GNUTLS_MPI * params, int params_len)
 {
 	GNUTLS_MPI rs[2], mdata;
-	int k, ret;
+	int ret;
+	size_t k;
 
 	k = hash->size;
 	if (k!=20) { /* SHA only */

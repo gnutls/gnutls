@@ -330,7 +330,6 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 	if (indx == -1 && state->gnutls_internals.client_cert_callback != NULL && cred->ncerts > 0) {	/* use a callback to get certificate */
 		gnutls_datum *my_certs = NULL;
 		gnutls_datum *issuers_dn = NULL;
-		int count;
 		int issuers_dn_len = 0;
 		opaque* dataptr = data;
 		int dataptr_size = data_size;
@@ -388,8 +387,8 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 
 				data += 2;
 
-				issuers_dn[count].data = data;
-				issuers_dn[count].size = size;
+				issuers_dn[i].data = data;
+				issuers_dn[i].size = size;
 
 				data += size;
 

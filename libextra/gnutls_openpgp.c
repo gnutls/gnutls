@@ -46,7 +46,7 @@ typedef struct {
     int type;
     int armored;
     size_t size;
-    byte *data;
+    uint8 *data;
 } keybox_blob;
 
 typedef enum {
@@ -67,9 +67,9 @@ release_mpi_array( GNUTLS_MPI *arr, size_t n )
 }
 
 static u32
-buffer_to_u32( const byte *buffer )
+buffer_to_u32( const uint8 *buffer )
 {
-    const byte *p = buffer;
+    const uint8 *p = buffer;
 
     if ( !p )
         return 0;
@@ -193,7 +193,7 @@ static byte*
 kbx_data_to_keyring( int type, int enc, const char *data,
                      size_t size, size_t *r_size )
 {
-    byte *p = NULL;
+    uint8 *p = NULL;
 
     if ( !data )
         return NULL;
@@ -1216,7 +1216,7 @@ int
 gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
 {
     CDK_IOBUF inp = NULL;
-    byte *blob;
+    uint8 *blob;
     size_t nbytes;
     int enc = 0;
     int rc = 0;
@@ -1256,7 +1256,7 @@ int
 gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
                                const char *data, size_t len)
 {
-    byte *blob;
+    uint8 *blob;
     size_t nbytes = 0;
   
     if (!keyring || !data || !len)

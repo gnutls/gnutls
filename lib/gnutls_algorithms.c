@@ -759,7 +759,7 @@ int
 _gnutls_version_is_supported(GNUTLS_STATE state,
 			     const GNUTLS_Version version)
 {
-int ret;
+int ret=0;
 
 	GNUTLS_VERSION_ALG_LOOP(ret = p->supported);
 	if (ret == 0) return 0;

@@ -81,7 +81,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
   * of a server.
   **/
 int gnutls_cred_set( GNUTLS_STATE state, GNUTLS_CredType type, void* cred) {
-	AUTH_CRED * ccred, *pcred;
+	AUTH_CRED * ccred=NULL, *pcred=NULL;
 	int exists=0;	
 	
 	if (state->gnutls_key->cred==NULL) { /* begining of the list */
@@ -104,7 +104,9 @@ int gnutls_cred_set( GNUTLS_STATE state, GNUTLS_CredType type, void* cred) {
 			pcred = ccred;
 			ccred = ccred->next;
 		}
-		
+		/* After this, pcred is not null.
+		 */
+
 		if (exists==0) { /* new entry */
 			pcred->next = gnutls_malloc(sizeof(AUTH_CRED));
 			if (pcred->next == NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -268,7 +270,7 @@ int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size, int allo
 			 * to passive eavesdropers.
 			 */
 			if ( gnutls_auth_get_type( state) != state->gnutls_key->auth_info_type) {
-				state->gnutls_key->auth_info = gnutls_realloc_fast( 
+				state->gnutls_key->auth_info = gnutls_realloc( 
 					state->gnutls_key->auth_info, size);
 				if (state->gnutls_key->auth_info == NULL) {
 					gnutls_assert();

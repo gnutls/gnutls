@@ -100,20 +100,18 @@ if test $ac_cv_c_compiler_gnu != no; then
 
 	if test x$opt_maintainer_mode = xyes; then
 
-	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
+	  CFLAGS="${CFLAGS} -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
 	else
-	  CFLAGS="${CFLAGS} -O2 -fexpensive-optimizations -fomit-frame-pointer"
+	  CFLAGS="${CFLAGS} -O2 -finline-functions -fexpensive-optimizations -fomit-frame-pointer"
 	fi
 
 	if test x$opt_dmalloc_mode = xyes; then
 	  AC_CHECK_LIB( dmalloc, main)
 	  AC_DEFINE(USE_DMALLOC)
-	  AC_DEFINE(USE_LIBCALLOC)
 	else
 		if test x$opt_efence_mode = xyes; then
 		  AC_CHECK_LIB( efence, main)
 		  AC_DEFINE(USE_EFENCE)
-		  AC_DEFINE(USE_LIBCALLOC)
 		fi
 	fi
 
@@ -308,7 +306,7 @@ AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
 if test $ac_cv_c_compiler_gnu != no; then
 
 	if test x$opt_profiler_mode = xyes; then
-	  CFLAGS="${CFLAGS} -O0 `fc-config --cflags`"
+	  CFLAGS="${CFLAGS} `fc-config --cflags`"
 	  AC_CHECK_PROG(FC_OK, fc-config, yes, no)
 	  if test x$FC_OK = xyes; then
 		LIBS="$LIBS `fc-config --libs`"

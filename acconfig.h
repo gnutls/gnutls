@@ -17,7 +17,6 @@
 #undef LT_AGE
 #undef USE_DMALLOC
 #undef USE_EFENCE
-#undef USE_LIBCALLOC
 
 #undef USE_GCRYPT
 #undef GNUTLS_VERSION

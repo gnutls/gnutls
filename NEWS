@@ -1,3 +1,11 @@
+Version 0.4.3
+- The gnutls-extra library now compiles fine, if the opencdk library is
+  not present.
+- Several bug fixes.
+- Added gnutls_global_set_mem_func() function, to set the memory allocation
+  functions, if other than the defaults are to be used.
+- The default memory allocation functions are now the ones in libc.
+
 Version 0.4.2 (21/05/2002)
 - Separated ASN.1 structures parser documentation and TLS library
   documentation.

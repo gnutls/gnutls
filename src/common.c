@@ -33,7 +33,8 @@ void print_x509_info(GNUTLS_STATE state)
 	int cert_list_size = 0;
 	char digest[20];
 	char serial[40];
-	int digest_size = sizeof(digest), i;
+	size_t digest_size = sizeof(digest);
+	int i;
 	int serial_size = sizeof(serial);
 	char printable[120];
 	char *print;

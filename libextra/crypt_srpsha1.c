@@ -35,7 +35,7 @@ static const char magic[] = "";
 char *crypt_srpsha1(const char *username, const char *passwd,
 		    const char *salt, GNUTLS_MPI g, GNUTLS_MPI n)
 {
-	unsigned char *sp, r1[MAX_HASH_SIZE];
+	unsigned char *sp, *spe, r1[MAX_HASH_SIZE];
 	int salt_size = strlen(salt);
 	unsigned char *local_salt, *v;
 	int passwd_len;
@@ -43,7 +43,8 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	int vsize, hash_len = _gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
 	opaque *tmp;
 	uint8 *rtext, *csalt;
-	int rsalt_size, len, tmpsize;
+	int rsalt_size, tmpsize;
+	size_t len;
 
 	passwd_len = strlen(passwd);	/* we do not want the null */
 
@@ -69,11 +70,11 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	}
 	sp++;
 	
-	len = (int)rindex(sp, ':');
-	if (len==0) { /* parse error */
+	spe = rindex(sp, ':');
+	if (spe==NULL) { /* parse error */
 		len = strlen(sp);
 	} else
-		len -= (int)sp;
+		len = (unsigned long int)spe - (unsigned long int)sp;
 	
 	rsalt_size = _gnutls_sbase64_decode(sp, len, &csalt);
 	if (rsalt_size < 0) {

@@ -254,7 +254,7 @@ time_t _gnutls_x509_get_time(node_asn * c2, char *root, char *when)
 {
 	opaque ttime[MAX_TIME];
 	char name[1024];
-	time_t ctime;
+	time_t ctime = (time_t)-1;
 	int len, result;
 
 	_gnutls_str_cpy(name, sizeof(name), root);
@@ -1109,6 +1109,9 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	gnutls_datum tmp;
 	int ret, count;
 
+	ptr = input_cert;
+	siz = input_cert_size;
+
 	if (strstr( input_cert, "-----BEGIN PKCS7")!=NULL) {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
 
@@ -1120,9 +1123,6 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		return ret;
 	}
 
-	
-	ptr = input_cert;
-	siz = input_cert_size;
 	i = *ncerts + 1;
 	count = 0;
 

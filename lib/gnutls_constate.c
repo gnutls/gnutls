@@ -72,7 +72,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	
 	if (ret<0) {
 		gnutls_assert();
-		gnutls_secure_free(key_block);
+		gnutls_free(key_block);
 		return ret;
 	}
 	
@@ -81,13 +81,13 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	pos = 0;
 	if (hash_size > 0) {
 		if (gnutls_sset_datum( &state->cipher_specs.client_write_mac_secret, &key_block[pos], hash_size) < 0 ) {
-			gnutls_secure_free(key_block);
+			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		pos+=hash_size;
 
 		if (gnutls_sset_datum( &state->cipher_specs.server_write_mac_secret, &key_block[pos], hash_size) < 0 ) {
-			gnutls_secure_free(key_block);
+			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		pos+=hash_size;
@@ -95,32 +95,32 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	
 	if (key_size > 0) {
 		if (gnutls_sset_datum( &state->cipher_specs.client_write_key, &key_block[pos], key_size) < 0 ) {
-			gnutls_secure_free(key_block);
+			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		pos+=key_size;
 
 		if (gnutls_sset_datum( &state->cipher_specs.server_write_key, &key_block[pos], key_size) < 0 ) {
-			gnutls_secure_free(key_block);
+			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		pos+=key_size;
 	}
 	if (IV_size > 0) {
 		if (gnutls_sset_datum( &state->cipher_specs.client_write_IV, &key_block[pos], IV_size) < 0 ) {
-			gnutls_secure_free(key_block);
+			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		pos+=IV_size;
 	
 		if (gnutls_sset_datum( &state->cipher_specs.server_write_IV, &key_block[pos], IV_size) < 0 ) {
-			gnutls_secure_free(key_block);
+			gnutls_free(key_block);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		pos+=IV_size;
 	}
 	
-	gnutls_secure_free(key_block);
+	gnutls_free(key_block);
 
 	state->cipher_specs.generated_keys = 1;
 

@@ -87,7 +87,7 @@ void gnutls_free_datum( gnutls_datum* dat) {
 
 void gnutls_sfree_datum( gnutls_datum* dat) {
 	if (dat->data!=NULL && dat->size!=0)
-		gnutls_secure_free( dat->data);
+		gnutls_free( dat->data);
 
 	dat->data = NULL;
 	dat->size = 0;

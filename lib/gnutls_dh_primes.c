@@ -338,7 +338,8 @@ void _gnutls_dh_clear_mpis(void)
  */
 int _gnutls_dh_calc_mpis(void)
 {
-	int i, n;
+	int i;
+	size_t n;
 
 	if (_gnutls_dh_default_params == NULL) {
 		gnutls_assert();
@@ -536,8 +537,9 @@ int gnutls_dh_params_set(GNUTLS_DH_PARAMS dh_params, gnutls_datum prime,
 			 gnutls_datum generator, int bits)
 {
 	GNUTLS_MPI tmp_prime, tmp_g;
-	int siz = 0, i = 0;
-	GNUTLS_DH_PARAMS sprime;
+	int i = 0;
+	GNUTLS_DH_PARAMS sprime=NULL;
+	size_t siz = 0;
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();
@@ -551,6 +553,9 @@ int gnutls_dh_params_set(GNUTLS_DH_PARAMS dh_params, gnutls_datum prime,
 			break;
 		}
 	} while (dh_params[++i].bits != 0);
+	/* sprime is not null, because of the check_bits()
+	 * above.
+	 */
 
 	siz = prime.size;
 	if (_gnutls_mpi_scan(&tmp_prime, prime.data, &siz)) {
@@ -672,7 +677,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
 {
 
 	GNUTLS_MPI tmp_prime, tmp_g;
-	int siz;
+	size_t siz;
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();

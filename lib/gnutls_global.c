@@ -70,6 +70,49 @@ static void dlog( const char* str) {
 #endif
 }
 
+extern void* (*gnutls_secure_malloc)(size_t);
+extern void* (*gnutls_malloc)(size_t);
+extern void (*gnutls_free)(void*);
+extern int (*_gnutls_is_secure_memory)(const void*);
+extern void* (*gnutls_realloc)(void*, size_t);
+
+int _gnutls_is_secure_mem_null( const void*);
+
+/**
+  * gnutls_global_set_mem_func - This function sets the memory allocation functions
+  * @alloc_func: it's the default memory allocation function. Like malloc().
+  * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
+  * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
+  * @realloc_func: A realloc function
+  * @free_func: The function that frees allocated data.
+  *
+  * This is the function were you set the memory allocation functions gnutls
+  * is going to use. By default the libc's allocation functions (malloc(), free()),
+  * are used by gnutls, to allocate both sensitive and not sensitive data.
+  * This function is provided to set the memory allocation functions to
+  * something other than the defaults (ie the gcrypt allocation functions). 
+  *
+  * This function must be called before gnutls_global_init() is called.
+  *
+  **/
+void gnutls_global_set_mem_func( 
+	void *(*gnutls_alloc_func)(size_t), void* (*gnutls_secure_alloc_func)(size_t),
+	int (*gnutls_is_secure_func)(const void*), void *(*gnutls_realloc_func)(void *, size_t),
+	void (*gnutls_free_func)(void*))
+{
+	gnutls_secure_malloc = gnutls_secure_alloc_func;
+	gnutls_malloc = gnutls_alloc_func;
+	gnutls_realloc = gnutls_realloc_func;
+	gnutls_free = gnutls_free_func;
+
+	if (gnutls_is_secure_func==NULL)
+		_gnutls_is_secure_memory = gnutls_is_secure_func;
+	else
+		_gnutls_is_secure_memory = _gnutls_is_secure_mem_null;
+
+	return;
+}
+
 static int _gnutls_init = 0;
 
 /**
@@ -96,7 +139,7 @@ int gnutls_global_init( void)
 	if (_gnutls_init!=1) {
 		return 0;
 	}
-	
+
 	if (gcry_control( GCRYCTL_ANY_INITIALIZATION_P) == 0) {
 		/* for gcrypt in order to be able to allocate memory */
 		gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
@@ -132,6 +175,7 @@ int gnutls_global_init( void)
 		gnutls_assert();
 		return result;
 	}
+
 	
 	return 0;
 }

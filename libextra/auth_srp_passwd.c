@@ -44,6 +44,7 @@ int len;
 opaque *verifier;
 int verifier_size;
 int indx;
+size_t xx;
 
 	p = rindex( str, ':'); /* we have index */
 	if (p==NULL) {
@@ -112,11 +113,12 @@ int indx;
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	if (_gnutls_mpi_scan(&entry->v, verifier, &verifier_size) || entry->v == NULL) {
+	if (_gnutls_mpi_scan(&entry->v, verifier, &xx)) {
 		gnutls_assert();
 		gnutls_free( entry->salt);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+	verifier_size = xx;
 
 	gnutls_free( verifier);
 
@@ -141,7 +143,8 @@ static int pwd_put_values2( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size
 char * p;
 int len;
 opaque * tmp;
-int tmp_size;
+int ret;
+size_t tmp_size;
 
 	p = rindex( str, ':'); /* we have g */
 	if (p==NULL) {
@@ -155,13 +158,15 @@ int tmp_size;
 	/* read the generator */
 	len = strlen(p);
 	if (p[len-1]=='\n' || p[len-1]==' ') len--;
-	tmp_size = _gnutls_sbase64_decode( p, len, &tmp);
+	ret = _gnutls_sbase64_decode( p, len, &tmp);
 
-	if (tmp_size < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
-	if (_gnutls_mpi_scan(&entry->g, tmp, &tmp_size) || entry->g==NULL) {
+
+	tmp_size = ret;
+	if (_gnutls_mpi_scan(&entry->g, tmp, &tmp_size)) {
 		gnutls_assert();
 		gnutls_free(tmp);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -182,14 +187,15 @@ int tmp_size;
 	p++;
 	
 	len = strlen(p);
-	tmp_size = _gnutls_sbase64_decode( p, len, &tmp);
+	ret = _gnutls_sbase64_decode( p, len, &tmp);
 
-	if (tmp_size < 0) {
+	if (ret < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&entry->g);
 		return GNUTLS_E_PARSING_ERROR;
 	}
-	if (_gnutls_mpi_scan(&entry->n, tmp, &tmp_size) || entry->n==NULL) {
+	tmp_size = ret;
+	if (_gnutls_mpi_scan(&entry->n, tmp, &tmp_size)) {
 		gnutls_assert();
 		gnutls_free(tmp);
 		_gnutls_mpi_release(&entry->g);
@@ -385,7 +391,7 @@ int _gnutls_srp_generate_prime(opaque ** ret_g, opaque ** ret_n, int bits)
 {
 
 	GNUTLS_MPI prime, g;
-	int siz;
+	size_t siz;
 	char *tmp;
 
 	if ( _gnutls_dh_generate_prime(&g, &prime, bits) < 0) {

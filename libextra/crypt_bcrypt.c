@@ -602,13 +602,14 @@ static const char magic[] = "$2$";
 
 char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, GNUTLS_MPI g, GNUTLS_MPI n)
 {
-	unsigned char *sp;
+	unsigned char *sp, *spe;
 	blf_ctx *ctx;
 	unsigned char text[24];
 	uint8 *csalt;
 	uint8 *rtext;
 	uint8 cost;
-	int i, salt_size = strlen(salt), len;
+	int i, salt_size = strlen(salt);
+	size_t len;
 	unsigned char *local_salt, *v;
 	int passwd_len, vsize, tmpsize;
 	opaque *tmp;
@@ -636,11 +637,11 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, G
 	}
 	sp++;
 
-	len = (int)rindex(sp, ':');
-	if (len==0) { /* no ':' was found */
+	spe = rindex(sp, ':');
+	if (spe == NULL) { /* no ':' was found */
 		len = strlen(sp);
-	} else 
-		len -= (int) sp;
+	} else
+		len = (unsigned long int)spe - (unsigned long int)sp;
 
 	if (_gnutls_sbase64_decode(sp, len, &csalt) < 0) {
 		gnutls_assert();

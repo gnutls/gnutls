@@ -39,14 +39,14 @@
 int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, GNUTLS_MPI g,
 		   GNUTLS_MPI prime)
 {
-
 	GNUTLS_MPI x, e;
-	int result_size;
+	size_t result_size;
 
-	if (_gnutls_mpi_scan(&x, text, &textsize)) {
+	if (_gnutls_mpi_scan(&x, text, &result_size)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+	textsize = result_size;
 
 	e = _gnutls_mpi_alloc_like(prime);
 	if (e==NULL) {
@@ -124,7 +124,7 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 
 GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI B)
 {
-	int b_size;
+	size_t b_size;
 	opaque *b_holder, hd[MAX_HASH_SIZE];
 	GNUTLS_HASH_HANDLE td;
 	uint32 u;

@@ -351,7 +351,7 @@ int _gnutls_fbase64_decode( const uint8 * data, int data_size,
 		gnutls_assert();
 		return -1;
 	}
-	data_size -= (int)rdata-(int)data;
+	data_size -= (unsigned long int)rdata-(unsigned long int)data;
 
 	if (data_size < 4 + strlen(bottom)) {
 		gnutls_assert();
@@ -364,7 +364,7 @@ int _gnutls_fbase64_decode( const uint8 * data, int data_size,
 		return -1;
 	}
 	data_size -= strlen(ENDSTR);
-	data_size -= (int)kdata-(int)rdata;
+	data_size -= (unsigned long int)kdata-(unsigned long int)rdata;
 	
 	rdata = kdata + strlen(ENDSTR);
 	
@@ -377,7 +377,7 @@ int _gnutls_fbase64_decode( const uint8 * data, int data_size,
 	}
 	/* position of kdata is before the ----END--- footer 
 	 */
-	rdata_size = (int)kdata-(int)rdata;
+	rdata_size = (unsigned long int)kdata-(unsigned long int)rdata;
 
 	if (rdata_size < 4) {
 		gnutls_assert();
