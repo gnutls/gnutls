@@ -67,7 +67,7 @@ AC_MSG_RESULT($opt_maintainer_mode)
 opt_profiler_mode=no
 AC_MSG_CHECKING([whether in profile mode])
 AC_ARG_ENABLE(profile-mode,
-[  --enable-profile-mode enable profiler (gcov/gprof)],
+[  --enable-profile-mode enable profiler],
 opt_profiler_mode=$enableval)
 AC_MSG_RESULT($opt_profiler_mode)
 
@@ -104,10 +104,15 @@ if test $ac_cv_c_compiler_gnu != no; then
 	CFLAGS=""
 
 	if test $opt_profiler_mode = yes; then
-	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -ftest-coverage -pg"
+	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -finstrument-functions -ftest-coverage"
+	  AC_CHECK_LIB(fnccheck, main,
+		LIBS="$LIBS -lfnccheck",
+		AC_MSG_ERROR("You must install libfnccheck in order to enable profiling. http://www710.univ-lyon1.fr/~yperret/fnccheck/profiler.html")
+	  )
 	fi
 
 	if test $opt_maintainer_mode = yes; then
+
 	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith"
 	else
 	  CFLAGS="${CFLAGS} -O2"
