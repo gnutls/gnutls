@@ -260,8 +260,6 @@ int main(int argc, char **argv)
 	 free(session_data);
       }
 
-/* This TLS extension may break old implementations.
- */
       ret = do_handshake(&hd);
 
       if (ret < 0) {
@@ -287,6 +285,7 @@ int main(int argc, char **argv)
 
 	 gnutls_session_get_data(hd.session, NULL, &session_data_size);
 	 session_data = malloc(session_data_size);
+
 	 gnutls_session_get_data(hd.session, session_data,
 				 &session_data_size);
 
@@ -307,6 +306,9 @@ int main(int argc, char **argv)
 
 	 err = connect(sd, (SA *) & sa, sizeof(sa));
 	 ERR(err, "connect");
+	 
+	 hd.fd = sd;
+	 hd.secure = 0;
       } else {
 	 break;
       }
