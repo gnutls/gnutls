@@ -45,7 +45,7 @@
  */
 static
 int _decode_pkcs12_auth_safe(ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
-			     gnutls_datum_t * raw)
+    gnutls_datum_t * raw)
 {
     char oid[128];
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -130,8 +130,7 @@ int gnutls_pkcs12_init(gnutls_pkcs12_t * pkcs12)
 
     if (*pkcs12) {
 	int result = asn1_create_element(_gnutls_get_pkix(),
-					 "PKIX1.pkcs-12-PFX",
-					 &(*pkcs12)->pkcs12);
+  	    "PKIX1.pkcs-12-PFX", &(*pkcs12)->pkcs12);
 	if (result != ASN1_SUCCESS) {
 	    gnutls_assert();
 	    gnutls_free(*pkcs12);
@@ -176,8 +175,8 @@ void gnutls_pkcs12_deinit(gnutls_pkcs12_t pkcs12)
   *
   **/
 int gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
-			 const gnutls_datum_t * data,
-			 gnutls_x509_crt_fmt_t format, unsigned int flags)
+    const gnutls_datum_t * data,
+    gnutls_x509_crt_fmt_t format, unsigned int flags)
 {
     int result = 0, need_free = 0;
     gnutls_datum_t _data;
@@ -251,8 +250,8 @@ int gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
   *
   **/
 int gnutls_pkcs12_export(gnutls_pkcs12_t pkcs12,
-			 gnutls_x509_crt_fmt_t format, void *output_data,
-			 size_t * output_data_size)
+    gnutls_x509_crt_fmt_t format, void *output_data,
+    size_t * output_data_size)
 {
     if (pkcs12 == NULL) {
 	gnutls_assert();
@@ -309,7 +308,7 @@ static inline char *ucs2_to_ascii(char *data, int size)
  */
 int
 _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
-			     gnutls_pkcs12_bag_t bag)
+     gnutls_pkcs12_bag_t bag)
 {
     char oid[128], root[128];
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -471,7 +470,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 
 static
 int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
-			 gnutls_pkcs12_bag_t bag)
+    gnutls_pkcs12_bag_t bag)
 {
     gnutls_datum_t content = { NULL, 0 };
     int result;
@@ -515,7 +514,7 @@ int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
   *
   **/
 int gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
-			  int indx, gnutls_pkcs12_bag_t bag)
+    int indx, gnutls_pkcs12_bag_t bag)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result, len;
@@ -991,7 +990,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
 
 static int write_attributes(gnutls_pkcs12_bag_t bag, int elem,
-			    ASN1_TYPE c2, const char *where)
+    ASN1_TYPE c2, const char *where)
 {
     int result;
     char root[128];
@@ -1091,7 +1090,7 @@ static int write_attributes(gnutls_pkcs12_bag_t bag, int elem,
  */
 int
 _pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, ASN1_TYPE * contents,
-			     int *enc)
+     int *enc)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result;

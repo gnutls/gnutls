@@ -10,6 +10,7 @@ See the end for copying conditions.
 - Corrected the write of CRL distribution points.
 - The certificate chain verification function now checks certificates
   in the reverse order to minimize the spent resources.
+- Corrected several bugs found by Marcin Garski <mgarski@post.pl>
 
 * Version 1.1.22 (2004-11-04)
 - Replace GNU LD version script with Libtool -export-symbols-regex,
