@@ -28,23 +28,30 @@
 #include <unistd.h>
 #include "../lib/gnutls.h"
 #include <signal.h>
-#include <port.h>
+#include "port.h"
+#include <sys/time.h>
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
 #define MAX_BUF 100
 
+#define MAX(X,Y) (X >= Y ? X : Y);
+
 int main()
 {
 	int err, ret;
-	int sd, pid;
+	int sd;
 	struct sockaddr_in sa;
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF];
 	char *session;
 	int session_size;
-
-//      signal(SIGPIPE, SIG_IGN);
+	fd_set rset;
+	int maxfd;
+	struct timeval tv;
+	int user_term = 0;
+	
+//	signal(SIGPIPE, SIG_IGN);
 
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
@@ -61,7 +68,7 @@ int main()
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
 	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
-	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_COMPRESSION_NULL);
+	gnutls_set_compression_priority( state, 1, GNUTLS_COMPRESSION_NULL);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 	ret = gnutls_handshake(sd, state);
@@ -84,7 +91,7 @@ int main()
 	close(sd);	
 	gnutls_deinit( &state);	
 	
-	fprintf(stderr, "\nConnecting again\n");
+	fprintf(stderr, "\n\nConnecting again- trying to resume previous session\n");
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
 
@@ -107,7 +114,7 @@ int main()
 	ret = gnutls_handshake(sd, state);
 
 	if (ret < 0) {
-		fprintf(stderr, "Handshake has failed\n");
+		fprintf(stderr, "Handshake failed\n");
 		gnutls_perror(ret);
 		gnutls_deinit(&state);
 		return 1;
@@ -115,13 +122,29 @@ int main()
 		fprintf(stderr, "Handshake was completed\n");
 	}
 
+	FD_ZERO(&rset);
+	for(;;) {
+		FD_SET(fileno(stdin), &rset);
+		FD_SET(sd, &rset);
+		
+		maxfd = MAX(fileno(stdin), sd);
+		tv.tv_sec = 3;
+		tv.tv_usec = 0;
+		select(maxfd+1, &rset, NULL, NULL, &tv);
 
-	if ( pid = fork() == 0) {
-		for(;;) {
+		if (FD_ISSET(sd, &rset)) {
 			bzero(buffer, MAX_BUF);
-			ret=gnutls_recv(sd, state, buffer, MAX_BUF);
+
+			ret = gnutls_recv(sd, state, buffer, MAX_BUF);
+			/* remove new line */
+			if (buffer[strlen(buffer)-1]=='\n') buffer[strlen(buffer)-1]='\0';
+			if (ret==0) {
+				fprintf(stderr,
+					"Peer has abnormaly closed the GNUTLS connection\n");
+				break;
+			}
 			if (gnutls_is_fatal_error(ret) == 1) {
-				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
+				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED || ret == GNUTLS_E_INVALID_SESSION) {
 					fprintf(stderr,
 						"Peer has closed the GNUTLS connection\n");
 					break;
@@ -133,19 +156,21 @@ int main()
 			} else {
 				fprintf(stdout, "Received: %s\n", buffer);
 			}
+			if (user_term!=0) break;
 		}
-		kill(getppid(), SIGTERM);
-		return 0;
-	}
-	/* parent */
+		if (FD_ISSET(fileno(stdin), &rset)) {
 	
-	while( fgets(buffer, MAX_BUF, stdin) != NULL) {
-		buffer[strlen(buffer)-1] = '\0';
-		gnutls_send( sd, state, buffer, strlen(buffer));
+			if( fgets(buffer, MAX_BUF, stdin) == NULL) {
+				gnutls_close(sd, state);
+				user_term = 1;
+				continue;
+			}
+			gnutls_send( sd, state, buffer, strlen(buffer));
+		}
 	}
-	gnutls_close(sd, state);
+	if (user_term!=0) gnutls_close(sd, state);
 	
-	shutdown( sd, SHUT_WR);
+	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);
 	
 	gnutls_deinit(&state);
