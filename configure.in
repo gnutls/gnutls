@@ -20,7 +20,7 @@ dnl License along with GNU TLS; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA
 
-AC_INIT(gnutls, [1.1.20], [bug-gnutls@gnu.org])
+AC_INIT(gnutls, [1.1.21], [bug-gnutls@gnu.org])
 AC_PREREQ(2.57)
 
 AC_CANONICAL_TARGET
@@ -34,7 +34,7 @@ AB_INIT
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 LT_CURRENT=13
-LT_REVISION=20
+LT_REVISION=21
 LT_AGE=1
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
