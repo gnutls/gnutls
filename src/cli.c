@@ -378,8 +378,13 @@ int main(int argc, char **argv)
 
 	signal (SIGALRM, &starttls_alarm);
 
-	FD_ZERO(&rset);
+	/* do not buffer */
+	setbuf(stdin, NULL);
+	setbuf(stdout, NULL);
+	setbuf(stderr, NULL);
+
 	for (;;) {
+		FD_ZERO(&rset);
 		FD_SET(fileno(stdin), &rset);
 		FD_SET(sd, &rset);
 
