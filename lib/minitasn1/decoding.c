@@ -200,7 +200,9 @@ _asn1_extract_tag_der(node_asn *node,const unsigned char *der,int *der_len)
   unsigned long tag,tag_implicit=0;
   unsigned char class,class2,class_implicit=0;
 
+
   counter=is_tag_implicit=0;
+
   if(node->type&CONST_TAG){
     p=node->down;
     while(p){
@@ -388,9 +390,7 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
   int counter,len2,len3,len4,move,ris;
   unsigned char class,*temp2;
   unsigned int tag;
-
-  if (errorDescription!=NULL)
-  	errorDescription[0] = 0;
+  int indefinite;
 
   node=*element;
 
@@ -566,20 +566,15 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
       case TYPE_SEQUENCE:  case TYPE_SET:;
 	if(move==UP){
 	  len2=strtol(p->value,NULL,10);
-
 	  _asn1_set_value(p,NULL,0);
-	  if(len2==-1){ 
-	    /* indefinite length method 
-	     */
-
-	    if((der[counter]) || der[counter+1]) {
+	  if(len2==-1){ /* indefinite length method */
+	    if((der[counter]) || der[counter+1]){
 	      asn1_delete_structure(element);
 	      return ASN1_DER_ERROR;
 	    }
 	    counter+=2;
-	  } else { 
-	    /* definite length method 
-	     */
+	  }
+	  else{ /* definite length method */
 	    if(len2!=counter){
 	      asn1_delete_structure(element);
 	      return ASN1_DER_ERROR;
@@ -593,11 +588,25 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
 	  if(len3>0){
 	    _asn1_ltostr(counter+len3,temp);
 	    _asn1_set_value(p,temp,strlen(temp)+1);
+	    move=DOWN; 
+	  }
+	  else if(len3==0){
+	    p2=p->down;
+	    while(p2){
+	      if(type_field(p2->type)!=TYPE_TAG){
+		p3=p2->right;
+		asn1_delete_structure(&p2);
+		p2=p3;
+	      }
+	      else
+		p2=p2->right;
+	    }
+	    move=RIGHT;
 	  }
 	  else{ /* indefinite length method */
 	    _asn1_set_value(p,"-1",3);
+	    move=DOWN; 
 	  }
-	  move=DOWN; 
 	}
 	break;
       case TYPE_SEQUENCE_OF: case TYPE_SET_OF:
@@ -650,6 +659,12 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
 	move=RIGHT;
 	break;
       case TYPE_ANY:
+	/* Check indefinite lenth method in a EXPLICIT TAG */
+	if((p->type&CONST_TAG) && (der[counter-1]==0x80))
+	  indefinite=1;
+	else
+	  indefinite=0;
+
 	tag=_asn1_get_tag_der(der+counter,&class,&len2);
 	len2+=_asn1_get_length_der(der+counter+len2,&len3);
 	_asn1_length_der(len2+len3,NULL,&len4);
@@ -663,6 +678,16 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
 	_asn1_set_value(p,temp2,len4);
 	_asn1_afree(temp2);
 	counter+=len2+len3;
+	/* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
+           a indefinite length method. */
+	if(indefinite){
+	  if(!der[counter] && !der[counter+1]) 
+	    counter+=2;
+	  else{
+	    asn1_delete_structure(element);
+	    return ASN1_DER_ERROR;
+	  }
+	}
 	move=RIGHT;
 	break;
       default:
@@ -735,6 +760,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
   int counter,len2,len3,len4,move,ris;
   unsigned char class,*temp2;
   unsigned int tag;
+  int indefinite;
 
   node=*structure;
 
@@ -981,14 +1007,21 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
       case TYPE_SEQUENCE:  case TYPE_SET:
 	if(move==UP){
      	  len2=strtol(p->value,NULL,10);
-	   _asn1_set_value(p,NULL,0);
-	  if(len2!=counter){
-	    asn1_delete_structure(structure);
-	    return ASN1_DER_ERROR;
+	  _asn1_set_value(p,NULL,0);
+	  if(len2==-1){ /* indefinite length method */
+	    if((der[counter]) || der[counter+1]){
+	      asn1_delete_structure(structure);
+	      return ASN1_DER_ERROR;
+	    }
+	    counter+=2;
 	  }
-	  
-	  if(p==nodeFound) state=EXIT;
-
+	  else{ /* definite length method */
+	    if(len2!=counter){
+	      asn1_delete_structure(structure);
+	      return ASN1_DER_ERROR;
+	    }
+	  }
+	  if(p==nodeFound) state=EXIT;	  
 	  move=RIGHT;
 	}
 	else{   /* move==DOWN || move==RIGHT */
@@ -1000,11 +1033,29 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	  else { /*  state==SAME_BRANCH or state==FOUND */
 	    len3=_asn1_get_length_der(der+counter,&len2);
 	    counter+=len2;
-	    _asn1_ltostr(counter+len3,temp);
-	    _asn1_set_value(p,temp,strlen(temp)+1);
-	    move=DOWN;
+	    if(len3>0){
+	      _asn1_ltostr(counter+len3,temp);
+	      _asn1_set_value(p,temp,strlen(temp)+1);
+	      move=DOWN;
+	    }
+	    else if(len3==0){
+	      p2=p->down;
+	      while(p2){
+		if(type_field(p2->type)!=TYPE_TAG){
+		  p3=p2->right;
+		  asn1_delete_structure(&p2);
+		p2=p3;
+		}
+		else
+		  p2=p2->right;
+	      }
+	      move=RIGHT;
+	    }
+	    else{ /* indefinite length method */
+	      _asn1_set_value(p,"-1",3);
+	      move=DOWN;
+	    } 
 	  }
-
 	}
 	break;
       case TYPE_SEQUENCE_OF: case TYPE_SET_OF:
@@ -1048,6 +1099,12 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	
 	break;
       case TYPE_ANY:
+	/* Check indefinite lenth method in a EXPLICIT TAG */
+	if((p->type&CONST_TAG) && (der[counter-1]==0x80))
+	  indefinite=1;
+	else
+	  indefinite=0;
+
 	tag=_asn1_get_tag_der(der+counter,&class,&len2);
 	len2+=_asn1_get_length_der(der+counter+len2,&len3);
 	if(state==FOUND){
@@ -1061,6 +1118,17 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 	_asn1_octet_der(der+counter,len2+len3,temp2,&len4);
 	_asn1_set_value(p,temp2,len4);
 	_asn1_afree(temp2);
+
+	/* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
+           a indefinite length method. */
+	if(indefinite){
+	  if(!der[counter] && !der[counter+1]) 
+	    counter+=2;
+	  else{
+	    asn1_delete_structure(structure);
+	    return ASN1_DER_ERROR;
+	  }
+	}
        
 	if(p==nodeFound) state=EXIT;
 	}
@@ -1207,6 +1275,7 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const unsigned char *der,int len,
   int counter,len2,len3,move,ris;
   unsigned char class;
   unsigned int tag;
+  int indefinite;
 
   node=element;
 
@@ -1338,7 +1407,8 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const unsigned char *der,int len,
 	if(move!=UP){
 	  len3=_asn1_get_length_der(der+counter,&len2);
 	  counter+=len2;
-	  move=DOWN; 
+	  if(len3==0) move=RIGHT;
+	  else move=DOWN; 
 	}
 	else{
 	  if(!der[counter] && !der[counter+1]) /* indefinite length method */
@@ -1366,9 +1436,23 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const unsigned char *der,int len,
 	move=RIGHT;
 	break;
       case TYPE_ANY:
+	/* Check indefinite lenth method in a EXPLICIT TAG */
+	if((p->type&CONST_TAG) && (der[counter-1]==0x80))
+	  indefinite=1;
+	else
+	  indefinite=0;
+
 	tag=_asn1_get_tag_der(der+counter,&class,&len2);
 	len2+=_asn1_get_length_der(der+counter+len2,&len3);
 	counter+=len3+len2;
+	/* Check if a couple of 0x00 are present due to an EXPLICIT TAG with
+           a indefinite length method. */
+	if(indefinite){
+	  if(!der[counter] && !der[counter+1]) 
+	    counter+=2;
+	  else
+	    return ASN1_DER_ERROR;
+	}
  	move=RIGHT;
 	break;
       default:

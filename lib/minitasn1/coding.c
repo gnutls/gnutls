@@ -740,7 +740,7 @@ asn1_retCode
 asn1_der_coding(ASN1_TYPE element,const char *name,unsigned char *der,int *len,
                 char *ErrorDescription)
 {
-  node_asn *node,*p;
+  node_asn *node,*p,*p2;
   char temp[SIZEOF_UNSIGNED_LONG_INT*3+1];
   int counter,counter_old,len2,len3,move,max_len,max_len_old;
   asn1_retCode ris;
@@ -875,7 +875,21 @@ asn1_der_coding(ASN1_TYPE element,const char *name,unsigned char *der,int *len,
       if(move!=UP){
 	_asn1_ltostr(counter,temp);
 	_asn1_set_value(p,temp,strlen(temp)+1);
-	move=DOWN;
+	if(p->down==NULL){
+	  move=UP;
+	  continue;
+	}
+	else{
+	  p2=p->down;
+	  while(p2 && (type_field(p2->type)==TYPE_TAG)) p2=p2->right;
+	  if(p2){
+	    p=p2;
+	    move=RIGHT;
+	    continue;
+	  }
+	  move=UP;
+	  continue;
+	}
       }
       else{   /* move==UP */
 	len2=strtol(p->value,NULL,10);
@@ -892,7 +906,7 @@ asn1_der_coding(ASN1_TYPE element,const char *name,unsigned char *der,int *len,
 	move=RIGHT;
       }
       break;
-    case TYPE_SEQUENCE_OF: case TYPE_SET_OF: 
+    case TYPE_SEQUENCE_OF: case TYPE_SET_OF:
       if(move!=UP){
 	_asn1_ltostr(counter,temp);
 	_asn1_set_value(p,temp,strlen(temp)+1);
