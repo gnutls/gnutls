@@ -100,11 +100,13 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */
 
-	(*state)->gnutls_internals.KEY = NULL;
-	(*state)->gnutls_internals.client_Y = NULL;
-	(*state)->gnutls_internals.client_p = NULL;
-	(*state)->gnutls_internals.client_g = NULL;
-	(*state)->gnutls_internals.dh_secret = NULL;
+	(*state)->gnutls_key = gnutls_malloc(sizeof(GNUTLS_KEY_A));
+	
+	(*state)->gnutls_key->KEY = NULL;
+	(*state)->gnutls_key->client_Y = NULL;
+	(*state)->gnutls_key->client_p = NULL;
+	(*state)->gnutls_key->client_g = NULL;
+	(*state)->gnutls_key->dh_secret = NULL;
 	
 	(*state)->gnutls_internals.certificate_requested = 0;
 	(*state)->gnutls_internals.certificate_verify_needed = 0;
@@ -170,11 +172,12 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	secure_free((*state)->cipher_specs.server_write_key);
 	secure_free((*state)->cipher_specs.client_write_key);
 
-	mpi_release((*state)->gnutls_internals.KEY);
-	mpi_release((*state)->gnutls_internals.client_Y);
-	mpi_release((*state)->gnutls_internals.client_p);
-	mpi_release((*state)->gnutls_internals.client_g);
-	mpi_release((*state)->gnutls_internals.dh_secret);
+	mpi_release((*state)->gnutls_key->KEY);
+	mpi_release((*state)->gnutls_key->client_Y);
+	mpi_release((*state)->gnutls_key->client_p);
+	mpi_release((*state)->gnutls_key->client_g);
+	mpi_release((*state)->gnutls_key->dh_secret);
+	gnutls_free((*state)->gnutls_key);
 
 	/* free priorities */
 	if ((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
@@ -605,7 +608,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 
 	if (_gnutls_version_is_supported(state, version) == 0) {
 #ifdef DEBUG
-		fprintf(stderr, "INVALID VERSION PACKET: %d.%d\n", version.major, version.minor);
+		fprintf(stderr, "INVALID VERSION PACKET: %d.%d\n", headers[1], headers[2]);
 #endif
 		_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
 		state->gnutls_internals.resumable = RESUME_FALSE;

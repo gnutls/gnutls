@@ -23,6 +23,10 @@
 #include "gnutls_algorithms.h"
 #include "gnutls_errors.h"
 
+/* include all the kx handler's definitions */
+#include "gnutls_anon.h"
+#include "gnutls_dhe_dss.h"
+
 /* TLS Versions */
 
 typedef struct {
@@ -129,8 +133,8 @@ static gnutls_compression_entry compression_algorithms[] = {
 
 
 /* Key Exchange Section */
-#define GNUTLS_KX_ALGO_ENTRY(name, server_cert, server_kx, client_cert, RSA_premaster, DH_public_value) \
-	{ #name, name, server_cert, server_kx, client_cert, RSA_premaster, DH_public_value }
+#define GNUTLS_KX_ALGO_ENTRY(name, server_cert, server_kx, client_cert, RSA_premaster, DH_public_value, auth_struct) \
+	{ #name, name, server_cert, server_kx, client_cert, RSA_premaster, DH_public_value, auth_struct }
 
 struct gnutls_kx_algo_entry {
 	char *name;
@@ -140,16 +144,17 @@ struct gnutls_kx_algo_entry {
 	int client_cert;
 	int RSA_premaster;
 	int DH_public_value;
+	MOD_AUTH_STRUCT *auth_struct;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static gnutls_kx_algo_entry kx_algorithms[] = {
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 1, 0, 0, 1),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 0, 1, 1, 0),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 1, 0, 0),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 0, 1, 0, 0),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 0, 1, 0, 0),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 1, 0, 0, 1, &anon_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 0, 1, 1, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 1, 0, 0, &dhe_dss_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 1, 0, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 0, 1, 0, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 0, 1, 0, 0, NULL),
 	{0}
 };
 
@@ -526,6 +531,14 @@ int _gnutls_kx_server_certificate(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
 	GNUTLS_KX_ALG_LOOP(ret = p->server_cert);
+	return ret;
+
+}
+
+MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(KXAlgorithm algorithm)
+{
+	MOD_AUTH_STRUCT * ret = NULL;
+	GNUTLS_KX_ALG_LOOP(ret = p->auth_struct);
 	return ret;
 
 }

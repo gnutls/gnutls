@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#include "gnutls_auth.h"
+
 /* functions for version */
 int _gnutls_version_is_supported(GNUTLS_STATE state, const GNUTLS_Version version);
 int _gnutls_version_get_major( GNUTLS_Version ver);
@@ -61,6 +63,7 @@ int _gnutls_kx_server_key_exchange(KXAlgorithm algorithm);
 int _gnutls_kx_client_certificate(KXAlgorithm algorithm);
 int _gnutls_kx_RSA_premaster(KXAlgorithm algorithm);
 int _gnutls_kx_DH_public_value(KXAlgorithm algorithm);
+MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(KXAlgorithm algorithm);
 char *_gnutls_kx_get_name(KXAlgorithm algorithm);
 int _gnutls_kx_is_ok(KXAlgorithm algorithm);
 int _gnutls_kx_count();

@@ -689,6 +689,21 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 				fprintf(stderr, "Selected cipher suite: ");
 				fprintf(stderr, "%s\n", _gnutls_cipher_suite_get_name(state->gnutls_internals.current_cipher_suite ) );
 #endif
+		/* set the MOD_AUTH_STRUCT to the appropriate struct
+		 * according to the KX algorithm. This is needed since all the
+		 * handshake functions are read from there;
+		 */
+		state->gnutls_internals.auth_struct = _gnutls_kx_auth_struct( _gnutls_cipher_suite_get_kx_algo( cipher_suite));
+		if (state->gnutls_internals.auth_struct==NULL) {
+#ifdef DEBUG
+			fprintf(stderr, "Cannot find the appropriate handler for the KX algorithm\n");
+#endif
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		}
+
+		
+		/* move to compression */
 		z = 1;
 		memmove(&compression_method, &data[pos++], 1);
 		z =
@@ -778,6 +793,19 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 			    sizeOfSuites); 
 
 		if (ret<0) return ret;
+
+		/* set the MOD_AUTH_STRUCT to the appropriate struct
+		 * according to the KX algorithm. This is needed since all the
+		 * handshake functions are read from there;
+		 */
+		state->gnutls_internals.auth_struct = _gnutls_kx_auth_struct( _gnutls_cipher_suite_get_kx_algo( state->gnutls_internals.current_cipher_suite));
+		if (state->gnutls_internals.auth_struct==NULL) {
+#ifdef DEBUG
+			fprintf(stderr, "Cannot find the appropriate handler for the KX algorithm\n");
+#endif
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+		}
 		
 		pos += sizeOfSuites;
 

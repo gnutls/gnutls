@@ -110,6 +110,16 @@ typedef struct {
 	AlertDescription description;
 } Alert;
 
+typedef struct {
+	/* For DH KX */
+	MPI				KEY;
+	MPI				client_Y;
+	MPI				client_g;
+	MPI				client_p;
+	MPI				dh_secret;
+} GNUTLS_KEY_A;
+typedef GNUTLS_KEY_A* GNUTLS_KEY;
+
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
@@ -135,6 +145,7 @@ typedef enum CompressionMethod CompressionMethod;
 
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
+#include <gnutls_auth.h>
 
 typedef struct {
 	ConnectionEnd entity;
@@ -217,12 +228,7 @@ typedef struct {
 	/* resumed session */
 	ResumableSession	resumed; /* TRUE or FALSE - if we are resuming a session */
 	SecurityParameters  resumed_security_parameters;
-	/* For DH KX */
-	MPI				KEY;
-	MPI				client_Y;
-	MPI				client_g;
-	MPI				client_p;
-	MPI				dh_secret;
+
 	int				certificate_requested; /* non zero if client certificate was requested */
 	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
 	/* sockets internals */
@@ -230,6 +236,7 @@ typedef struct {
 	/* gdbm */
 	char*				db_name;
 	int				expire_time;
+	MOD_AUTH_STRUCT*		auth_struct; /* used in handshake packets and KX algorithms */
 } GNUTLS_INTERNALS;
 
 typedef struct {
@@ -237,6 +244,7 @@ typedef struct {
 	CipherSpecs cipher_specs;
 	ConnectionState connection_state;
 	GNUTLS_INTERNALS gnutls_internals;
+	GNUTLS_KEY gnutls_key;
 } GNUTLS_STATE_INT;
 
 typedef GNUTLS_STATE_INT *GNUTLS_STATE;
