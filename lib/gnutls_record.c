@@ -559,7 +559,6 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	}
 
 	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_write != 0) {
-		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
@@ -716,7 +715,6 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	ret = 0;
 
 	if (sizeofdata == 0 || data == NULL) {
-		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 

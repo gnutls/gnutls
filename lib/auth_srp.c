@@ -346,10 +346,6 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	DECR_LEN( data_size, n_n);
 	data_n = &data[i];
 	i += n_n;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
 	
 	DECR_LEN( data_size, 2);
 	n_s = READuint16( &data[i]);
@@ -358,10 +354,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	DECR_LEN( data_size, n_s);
 	data_s = &data[i];
 	i += n_s;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+
 	_n_s = n_s;
 	_n_g = n_g;
 	_n_n = n_n;

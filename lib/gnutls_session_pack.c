@@ -84,12 +84,11 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 			if (info == NULL && state->gnutls_key->auth_info_size!=0)
 				return GNUTLS_E_INVALID_PARAMETERS;
 
-			pack_size = state->gnutls_key->auth_info_size;
 			packed_session->size =
-			    PACK_HEADER_SIZE + pack_size + sizeof(uint32);
+			    PACK_HEADER_SIZE + state->gnutls_key->auth_info_size + sizeof(uint32);
 
 			packed_session->data[0] = GNUTLS_ANON;
-			WRITEuint32(pack_size,
+			WRITEuint32(state->gnutls_key->auth_info_size,
 				    &packed_session->
 				    data[PACK_HEADER_SIZE]);
 			
@@ -97,7 +96,7 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 				memcpy(&packed_session->
 				       data[PACK_HEADER_SIZE + sizeof(uint32)],
 				       info, state->gnutls_key->auth_info_size);
-
+			
 		}
 		break;
 	case GNUTLS_X509PKI:{
@@ -196,9 +195,8 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			}
 			
 			state->gnutls_key->auth_info =
-			    gnutls_calloc(1,
-					  sizeof
-					  (SRP_SERVER_AUTH_INFO_INT));
+			    gnutls_malloc( pack_size);
+
 			if (state->gnutls_key->auth_info == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
@@ -210,7 +208,7 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			memcpy(state->gnutls_key->auth_info,
 			       &packed_session->data[PACK_HEADER_SIZE +
 						     sizeof(uint32)],
-			       sizeof(SRP_SERVER_AUTH_INFO_INT));
+			       pack_size);
 		}
 		break;
 	case GNUTLS_ANON:{
@@ -226,19 +224,17 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			}
 
 			state->gnutls_key->auth_info =
-			    gnutls_calloc(1,
-					  sizeof
-					  (ANON_CLIENT_AUTH_INFO_INT));
+			    gnutls_malloc( pack_size);
+
 			if (state->gnutls_key->auth_info == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
-			state->gnutls_key->auth_info_size =
-			    sizeof(ANON_CLIENT_AUTH_INFO_INT);
+			state->gnutls_key->auth_info_size = pack_size;
 
 			memcpy(state->gnutls_key->auth_info,
-			       &packed_session->data[PACK_HEADER_SIZE],
-			       sizeof(ANON_CLIENT_AUTH_INFO_INT));
+			       &packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
+			       pack_size);
 		}
 		break;
 	case GNUTLS_X509PKI:{
@@ -254,8 +250,8 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			}
 
 			state->gnutls_key->auth_info =
-			    gnutls_calloc(1,
-					  sizeof(X509PKI_AUTH_INFO_INT));
+			    gnutls_malloc( sizeof(X509PKI_AUTH_INFO_INT));
+			    
 			if (state->gnutls_key->auth_info == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
