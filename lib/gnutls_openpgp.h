@@ -1,6 +1,14 @@
 #ifndef GNUTLS_OPENPGP_H
 #define GNUTLS_OPENPGP_H
 
+/* OpenCDK compatible */
+typedef enum {
+  KEY_ATTR_NONE = 0,
+  KEY_ATTR_SHORT_KEYID = 3,
+  KEY_ATTR_KEYID = 4,
+  KEY_ATTR_FPR = 5
+} key_attr_t;
+
 int gnutls_certificate_set_openpgp_key_file(
                                             GNUTLS_CERTIFICATE_CREDENTIALS res,
                                             char* CERTFILE,
@@ -35,6 +43,13 @@ int gnutls_certificate_set_openpgp_keyring_file(
 int gnutls_certificate_set_openpgp_keyring_mem(
                                             GNUTLS_CERTIFICATE_CREDENTIALS c,
                                             const char *file);
+
+int gnutls_openpgp_get_key(gnutls_cert **r_key, const gnutls_datum *keyring,
+                           key_attr_t by, opaque *pattern);
+
+int gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
+                            gnutls_datum *key);
+     
 /* internal */
 int _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw);
 

@@ -27,6 +27,10 @@
 #include <opencdk.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #include "gnutls_errors.h"
 #include "gnutls_gcry.h"
@@ -34,6 +38,7 @@
 #include "gnutls_datum.h"
 #include "gnutls_global.h"
 #include "auth_cert.h"
+#include "gnutls_openpgp.h"
 
 static void
 release_mpi_array(MPI *arr, size_t n)
@@ -47,6 +52,127 @@ release_mpi_array(MPI *arr, size_t n)
       gcry_mpi_release(x);
       *arr = NULL; arr++;
     }
+}
+
+static u32
+buffer_to_u32(const byte *buffer)
+{
+  u32 u;
+
+  if (!buffer)
+    return 0;
+  u = (buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3];
+  return u;    
+}
+/* buffer_to_u32 */
+
+typedef struct {
+  int type;
+  size_t size;
+  byte *data;
+} keyring_blob;
+
+int
+keyring_blob_new(keyring_blob **r_ctx)
+{
+  keyring_blob *c;
+  
+  if (!r_ctx)
+    return GNUTLS_E_INVALID_PARAMETERS;
+  c = cdk_alloc_clear( sizeof * c);
+  *r_ctx = c;
+
+  return 0;
+}
+
+static void
+keyring_blob_release(keyring_blob *ctx)
+{
+  if (!ctx)
+    return;
+  cdk_free(ctx->data);
+  cdk_free(ctx);
+}
+
+static KEYDB_HD
+keyring_to_keydb(keyring_blob *blob)
+{
+  KEYDB_HD khd;
+
+  khd = cdk_alloc_clear(sizeof *khd);
+  khd->used = 1;
+  if (blob->type == 0x00) /* file */
+    {
+      khd->name = cdk_strdup(blob->data);   
+    }
+  else if (blob->type == 0x01) /* data */
+    {
+      cdk_iobuf_new(&khd->buf, blob->size);
+      cdk_iobuf_write(khd->buf, blob->data, blob->size);
+    }
+  else /* error */
+    {
+      cdk_free(khd);
+      khd = NULL;
+    }
+  
+  return khd;
+}
+
+                     
+/* Extract a keyring blob from the given position. */
+static keyring_blob*
+read_keyring_blob(const gnutls_datum* keyring, size_t pos)
+{
+  keyring_blob *blob;
+  
+  if (!keyring)
+    return NULL;
+
+  if (pos > keyring->size)
+    return NULL;
+
+  keyring_blob_new(&blob);
+  blob->type = keyring->data[pos];
+  if (blob->type < 0 || blob->type > 1)
+    return NULL;
+  blob->size = keyring->data[pos+1] << 24 | keyring->data[pos+2] << 16
+    | keyring->data[pos+3] <<  8 | keyring->data[pos+4];
+  if (!blob->size)
+    return NULL;
+  blob->data = cdk_alloc_clear(blob->size + 1);
+  memcpy(blob->data, keyring->data+(pos+5), blob->size);
+
+  blob->data[blob->size] = '\0';
+  return blob;    
+}
+
+/* Creates a keyring blob from raw data
+ *
+ * Format:
+ * 1 octet  type
+ * 4 octet  size of blob
+ * n octets data
+ */
+static byte*
+conv_data_to_keyring(int type, const char *data, size_t size, size_t *r_size)
+{
+
+  byte *p;
+
+  if (!data)
+    return NULL;
+  
+  p = gnutls_malloc( 1+4+size );
+  p[0] = type; /* type: keyring name */
+  p[1] = (size >> 24) & 0xff;
+  p[2] = (size >> 16) & 0xff;
+  p[3] = (size >>  8) & 0xff;
+  p[4] = (size      ) & 0xff;
+  memcpy(p+5, data, size);
+  *r_size = 1+4+size;
+  
+  return p; 
 }
 
 static int
@@ -402,6 +528,81 @@ leave:
 }
 
 /**
+ * gnutls_openpgp_get_key - Retrieve a key from the keyring.
+ *
+ * @r_key: the destination context to save the key.
+ * @keyring: the datum struct that contains all keyring information.
+ * @attr: The attribute (keyid, fingerprint, ...).
+ * @by: What attribute is used.
+ *
+ * This function can be used to retrieve keys by different pattern
+ * from a binary or a file keyring.
+ **/
+int
+gnutls_openpgp_get_key(gnutls_cert **r_key, const gnutls_datum *keyring,
+                       key_attr_t by, opaque *pattern)
+{
+  int rc = 0;
+  keyring_blob *blob = NULL;
+  gnutls_cert *key = NULL;
+  KEYDB_HD khd = NULL;
+  PKT pk = NULL;
+  KEYDB_SEARCH ks;
+  struct packet_s *p;
+  
+  if (!r_key || !keyring)
+    return GNUTLS_E_INVALID_PARAMETERS;
+
+  if (by == KEY_ATTR_NONE)
+    return GNUTLS_E_INVALID_PARAMETERS;
+
+  blob = read_keyring_blob(keyring, 0);
+  if (!blob)
+    return GNUTLS_E_MEMORY_ERROR;
+  khd = keyring_to_keydb(blob);
+  ks.type = by;
+  switch (by)
+    {
+    case KEY_ATTR_SHORT_KEYID:
+      ks.u.keyid[1] = buffer_to_u32(pattern);
+      break;
+
+    case KEY_ATTR_KEYID:
+      ks.u.keyid[0] = buffer_to_u32(pattern);
+      ks.u.keyid[1] = buffer_to_u32(pattern+4);
+      break;
+
+    case KEY_ATTR_FPR:
+      memcpy(ks.u.fpr, pattern, 20);
+      break;
+
+    case KEY_ATTR_NONE:
+      break; /* just to make the (strict) compiler happy */
+    }
+  if ( (rc = cdk_keydb_search_key(khd, &pk, &ks)) )
+    goto leave;
+
+  for (p=pk; p && p->id; p=p->next)
+    {
+      if (p->id == PKT_PUBKEY)
+        {
+          key = gnutls_malloc( sizeof *key );
+          openpgp_pk_to_gnutls_cert(key, p->p.pk);
+          rc = 0;
+        }
+    }
+  
+leave:
+  cdk_free(khd);
+  cdk_pkt_release(pk);
+  keyring_blob_release(blob);
+  if (!rc)
+    *r_key = key;
+  
+  return 0;
+}
+
+/**
  * gnutls_certificate_set_openpgp_key_file - Used to set OpenPGP keys
  *
  * @res: the destination context to save the data.
@@ -675,29 +876,6 @@ gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
   return expiredate;
 }
 
-static char*
-read_keyring_blob(const gnutls_datum* keyring, size_t pos,
-                  int *r_type, size_t *r_size)
-{
-  byte *blob;
-  
-  if (!keyring)
-    return NULL;
-
-  *r_type = keyring->data[pos];
-  if (*r_type < 0 || *r_type > 1)
-    return NULL;
-  *r_size = keyring->data[pos+1] << 24 | keyring->data[pos+2] << 16
-          | keyring->data[pos+3] <<  8 | keyring->data[pos+4];
-  if (!*r_size)
-    return NULL;
-  blob = gnutls_malloc(*r_size + 1);
-  memcpy(blob, keyring->data+(pos+5), *r_size);
-  blob[*r_size] = '\0';
-
-  return blob;
-}
-                   
 /**
  * gnutls_openpgp_verify_key - Verify all signatures on the key
  *
@@ -715,10 +893,9 @@ gnutls_openpgp_verify_key( const gnutls_datum* keyring,
 {
   PKT pkt = NULL;
   KEYDB_HD khd = NULL;
+  keyring_blob *blob = NULL;
   int rc = 0;
-  size_t size = 0;
-  int status = 0, type = -1;
-  char *data;
+  int status = 0;
   
   if (!cert_list || !cert_list_length || !keyring)
     return GNUTLS_CERT_CORRUPTED;
@@ -726,21 +903,11 @@ gnutls_openpgp_verify_key( const gnutls_datum* keyring,
   if (cert_list_length != 1 || !keyring->size)
     return GNUTLS_CERT_CORRUPTED;
 
-  data = read_keyring_blob(keyring, 0, &type, &size);
-  if (!data)
+  blob = read_keyring_blob(keyring, 0);
+  if (!blob)
     return GNUTLS_CERT_CORRUPTED;
-  khd = cdk_alloc_clear(sizeof *khd);
-  khd->used = 1;
-  if (type == 0x00) /* file */
-    {
-      khd->name = cdk_strdup(data);
-    }
-  else if (type == 0x01) /* data */
-    {
-      cdk_iobuf_new(&khd->buf, size);
-      cdk_iobuf_write(khd->buf, data, size);
-    }
-  else /* error */
+  khd = keyring_to_keydb(blob);
+  if (!khd)
     {
       rc = GNUTLS_CERT_CORRUPTED;
       goto leave;
@@ -772,7 +939,8 @@ gnutls_openpgp_verify_key( const gnutls_datum* keyring,
     }
 
 leave:
-  cdk_free(khd); khd = NULL;
+  keyring_blob_release(blob);
+  cdk_free(khd);
   return rc;
 }
 
@@ -825,7 +993,7 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr,size_t *fprlen )
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_keyid( const gnutls_datum *cert, u32 *keyid )
+gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid )
 {
   PKT pkt;
   PKT_public_key *pk = NULL;
@@ -842,35 +1010,11 @@ gnutls_openpgp_keyid( const gnutls_datum *cert, u32 *keyid )
       if (p->id == PKT_PUBKEY)
         {
           pk = p->p.pk;
-          cdk_key_keyid_from_pk(pk, keyid);
+          cdk_key_keyid_from_pk(pk, (u32*)keyid);
         }
     }
 
   return 0;
-}
-
-/* Creates a keyring blob from raw data
- *
- * Format:
- * 1 octet  type
- * 4 octet  size of blob
- * n octets data
- */
-static byte*
-conv_data_to_keyring(int type, const char *data, size_t size, size_t *r_size)
-{
-  byte *p;
-  
-  p = gnutls_malloc( 1+4+size );
-  p[0] = type; /* type: keyring name */
-  p[1] = (size >> 24) & 0xff;
-  p[2] = (size >> 16) & 0xff;
-  p[3] = (size >>  8) & 0xff;
-  p[4] = (size      ) & 0xff;
-  memcpy(p+5, data, size);
-  *r_size = 1+4+size;
-
-  return p;
 }
 
 /**
@@ -975,6 +1119,103 @@ gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
   cdk_iobuf_close(a);
   
   return rc;
+}
+
+/**
+ * gnutls_openpgp_recv_key - Receives a key from a HKP keyserver.
+ *
+ * @host - the hostname of the keyserver.
+ * @port - the service port (if not set use 11371).
+ * @keyid - The 32-bit keyID (rightmost bits keyid[1])
+ * @key - Context to store the raw (dearmored) key.
+ *
+ * Try to connect to a public keyserver to get the specified key.
+ **/
+int
+gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
+                        gnutls_datum *key)
+{
+  int rc = 0, state = 0;
+  struct hostent *hp;
+  struct sockaddr_in sock;
+  char *request = NULL;
+  char buf[4096];
+  IOBUF ibuf, raw;
+  int fd = -1;
+  byte *data;
+  ssize_t n = 0, nbytes = 0;
+  
+  if (!host || !key)
+    return GNUTLS_E_INVALID_PARAMETERS;
+
+  if (!port)
+    port = 11371;
+  
+  if ( (hp = gethostbyname(host)) == NULL )
+      return -1;
+  
+  memset(&sock, 0, sizeof sock);
+  memcpy(&sock.sin_addr, hp->h_addr, hp->h_length);
+  sock.sin_family = hp->h_addrtype;
+  sock.sin_port = htons(port);
+
+  if ( (fd = socket(AF_INET, SOCK_STREAM, 0)) == -1 )
+      return -1;
+  setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)1, 1);
+  if ( connect(fd, (struct sockaddr*)&sock, sizeof(sock)) == -1 )
+    {
+      close(fd);
+      return -1;
+    }
+
+  request = cdk_alloc_clear(strlen(host)+100);
+  sprintf(request, "GET /pks/lookup?op=get&search=0x%08X HTTP/1.0\r\n"
+          "Host: %s:%d\r\n", (u32)keyid, host, port);
+  if ( write(fd, request, strlen(request)) == -1)
+    {
+      cdk_free(request);
+      close(fd);
+      return -1;
+    }
+  cdk_free(request);
+
+  ibuf = cdk_iobuf_temp();
+  while ( (n = read(fd, buf, sizeof(buf)-1)) > 0 )
+    {
+      buf[n] = '\0';
+      nbytes += n;
+      if (nbytes > cdk_iobuf_get_size(ibuf))
+        cdk_iobuf_expand(ibuf, n);
+      cdk_iobuf_write(ibuf, buf, n);
+      if ( strstr(buf, "<pre>") || strstr(buf, "</pre>") )
+        state++;
+    }
+  if (n ==-1)
+    perror("read");
+  
+  if ( state != 2 )
+    {
+      rc = GNUTLS_E_UNKNOWN_ERROR;
+      goto leave;
+    }
+  if (cdk_armor_decode_iobuf(ibuf, &raw))
+    {
+      rc = GNUTLS_E_UNKNOWN_ERROR;
+      goto leave;
+    }
+  data = cdk_iobuf_get_data_as_buffer(raw, &n);
+  if (data && n)
+    { 
+      gnutls_set_datum(key, data, n);
+      cdk_free(data);
+    }
+  cdk_iobuf_close(raw);
+  
+leave:
+  cdk_iobuf_close(ibuf);
+  close(fd);
+  
+  return 0;
 }
 
 #endif /* HAVE_LIBOPENCDK */
