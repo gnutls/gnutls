@@ -61,6 +61,8 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
 	 int *sizeof_buf);
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, 
 	const char* oid, int indx, char *buf, int *sizeof_buf);
+int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
+                                const char *hostname);
 
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);

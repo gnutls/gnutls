@@ -100,6 +100,7 @@ typedef struct {
 	int fd;
 	gnutls_session session;
 	int secure;
+	const char* hostname;
 } socket_st;
 
 ssize_t socket_recv(socket_st socket, void *buffer, int buffer_size);
@@ -130,7 +131,6 @@ static int cert_callback(gnutls_session session,
 		printf
 		    ("- Server did not send us any trusted authorities names.\n");
 
-//	gnutls_alert_send(session, GNUTLS_AL_WARNING, GNUTLS_A_BAD_CERTIFICATE);
 	/* print the names (if any) */
 	for (i = 0; i < nreqs; i++) {
 		len = sizeof(issuer_dn);
@@ -286,6 +286,7 @@ int main(int argc, char **argv)
 
 	hd.secure = 0;
 	hd.fd = sd;
+	hd.hostname = hostname;
 
 	hd.session = init_tls_session(hostname);
 	if (starttls)
@@ -332,7 +333,7 @@ int main(int argc, char **argv)
 					      &session_id_size);
 
 			/* print some information */
-			print_info(hd.session);
+			print_info(hd.session, hostname);
 
 			printf("- Disconnecting\n");
 			socket_bye(&hd);
@@ -609,7 +610,7 @@ static int do_handshake(socket_st * socket)
 	if (ret == 0) {
 		socket->secure = 1;
 		/* print some information */
-		print_info(socket->session);
+		print_info(socket->session, socket->hostname);
 	}
 	return ret;
 }

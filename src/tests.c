@@ -630,6 +630,8 @@ int tmp_session_id_size;
 
 }
 
+extern char* hostname;
+
 int test_certificate( gnutls_session session) {
 int ret;
 
@@ -646,7 +648,7 @@ int ret;
 	if (ret == FAILED) return ret;
 
 	printf("\n");
-	print_cert_info( session);
+	print_cert_info( session, hostname);
 
 	return SUCCEED;
 }

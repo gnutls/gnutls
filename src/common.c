@@ -5,11 +5,11 @@
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <time.h>
+#include <common.h>
 
 #define TEST_STRING
 
 int xml = 0;
-void print_cert_info(gnutls_session session);
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
@@ -27,7 +27,7 @@ static const char *my_ctime(time_t * tv)
 
 }
 
-void print_x509_info(gnutls_session session)
+void print_x509_info(gnutls_session session, const char* hostname)
 {
 	gnutls_x509_crt crt;
 	const gnutls_datum *cert_list;
@@ -67,8 +67,19 @@ void print_x509_info(gnutls_session session)
 			return;
 		}
 
-
 		printf(" - Certificate[%d] info:\n", j);
+		
+		if (j==0 && hostname != NULL) { /* Check the hostname of the first certificate
+		             * if it matches the name of the host we
+		             * connected to.
+		             */
+		             if (gnutls_x509_crt_check_hostname( crt, hostname)==0) {
+		             	printf(" # The hostname in the certificate does NOT match '%s'.\n", hostname);
+		             } else {
+		             	printf(" # The hostname in the certificate matches '%s'.\n", hostname);
+		             }
+		}
+
 
 		if (xml) {
 #ifdef ENABLE_PKI
@@ -268,10 +279,12 @@ void print_cert_vrfy(gnutls_session session)
 		printf("- Peer's certificate is trusted\n");
 	if (status & GNUTLS_CERT_CORRUPTED)
 		printf("- Peer's certificate is corrupted\n");
+		
+	
 
 }
 
-int print_info(gnutls_session session)
+int print_info(gnutls_session session, const char* hostname)
 {
 	const char *tmp;
 	gnutls_credentials_type cred;
@@ -317,7 +330,7 @@ int print_info(gnutls_session session)
 			}
 		}
 
-		print_cert_info(session);
+		print_cert_info(session, hostname);
 
 		print_cert_vrfy(session);
 
@@ -352,14 +365,14 @@ int print_info(gnutls_session session)
 	return 0;
 }
 
-void print_cert_info(gnutls_session session)
+void print_cert_info(gnutls_session session, const char* hostname)
 {
 
 	printf("- Certificate type: ");
 	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
 		printf("X.509\n");
-		print_x509_info(session);
+		print_x509_info(session, hostname);
 		break;
 	case GNUTLS_CRT_OPENPGP:
 		printf("OpenPGP\n");
@@ -384,7 +397,7 @@ void print_list(void)
 	printf(", SSL3.0\n");
 
 	printf("Ciphers:");
-	printf(" RIJNDAEL-128-CBC");
+	printf(" AES-128-CBC");
 	printf(", TWOFISH-128-CBC");
 	printf(", 3DES-CBC");
 	printf(", ARCFOUR\n");
@@ -448,9 +461,9 @@ void parse_ciphers(char **ciphers, int nciphers, int *cipher_priority)
 
 	if (ciphers != NULL && nciphers > 0) {
 		for (j = i = 0; i < nciphers; i++) {
-			if (strncasecmp(ciphers[i], "RIJ", 3) == 0)
+			if (strncasecmp(ciphers[i], "AES", 3) == 0)
 				cipher_priority[j++] =
-				    GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+				    GNUTLS_CIPHER_AES_128_CBC;
 			if (strncasecmp(ciphers[i], "TWO", 3) == 0)
 				cipher_priority[j++] =
 				    GNUTLS_CIPHER_TWOFISH_128_CBC;

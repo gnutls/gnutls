@@ -3,9 +3,9 @@
 
 #include <gnutls/gnutls.h>
 
-int print_info( gnutls_session state);
-void print_cert_info( gnutls_session state);
-int print_list(void);
+int print_info( gnutls_session state, const char* hostname);
+void print_cert_info( gnutls_session state, const char* hostname);
+void print_list(void);
 
 void parse_comp( char** comp, int ncomp, int* comp_priority);
 void parse_kx( char** kx, int nkx, int* kx_priority);

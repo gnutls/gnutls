@@ -476,7 +476,7 @@ static void get_response(gnutls_session session, char *request,
 	 goto unimplemented;
       *p = '\0';
    }
-//    *response = peer_print_info(session, request+4, h, response_length);
+/*    *response = peer_print_info(session, request+4, h, response_length); */
    if (http != 0) {
       *response = peer_print_info(session, response_length, h);
    } else {
@@ -526,7 +526,6 @@ int main(int argc, char **argv)
 {
    int ret, n, h;
    char topbuf[512];
-//   int optval = 1;
    char name[256];
    int accept_fd;
    struct sockaddr_in client_address;
@@ -785,7 +784,7 @@ int main(int argc, char **argv)
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
 			    ntohs(client_address.sin_port));
-		     print_info(j->tls_session);
+		     print_info(j->tls_session, NULL);
 		  }
 		  j->handshake_ok = 1;
 	       }
@@ -859,7 +858,7 @@ int main(int argc, char **argv)
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
 			    ntohs(client_address.sin_port));
-		     print_info(j->tls_session);
+		     print_info(j->tls_session, NULL);
 		  }
 		  j->handshake_ok = 1;
 	       }
