@@ -1,3 +1,11 @@
+2002-04-08 18:16  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/Makefile.am, doc/tex/asn1.tex,
+	doc/tex/cover.tex.in, doc/tex/funcs.tex, doc/tex/gnutls.tex,
+	lib/Makefile.am:
+
+	separated asn1 parser library and tls library documentation 
+
 2002-04-08 17:28  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_pk.c (utags: gnutls_0_4_1):
