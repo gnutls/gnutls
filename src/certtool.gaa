@@ -11,7 +11,7 @@ option (p, generate-privkey) { $action=1; } "Generate a private key."
 
 option (q, generate-request) { $action=3; } "Generate a PKCS #10 certificate request."
 
-option (e, verify-chain) { $action=5; } "Verify a certificate chain. The last certificate in the chain must be a self signed one."
+option (e, verify-chain) { $action=5; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
 
 #char *privkey;
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."

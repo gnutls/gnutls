@@ -122,7 +122,7 @@ void gaa_help(void)
 	__gaa_helpsingle('u', "update-certificate", "", "Update a signed certificate.");
 	__gaa_helpsingle('p', "generate-privkey", "", "Generate a private key.");
 	__gaa_helpsingle('q', "generate-request", "", "Generate a PKCS #10 certificate request.");
-	__gaa_helpsingle('e', "verify-chain", "", "Verify a certificate chain. The last certificate in the chain must be a self signed one.");
+	__gaa_helpsingle('e', "verify-chain", "", "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one.");
 	__gaa_helpsingle(0, "load-privkey", "FILE ", "Private key file to use.");
 	__gaa_helpsingle(0, "load-request", "FILE ", "Certificate request file to use.");
 	__gaa_helpsingle(0, "load-certificate", "FILE ", "Certificate file to use.");

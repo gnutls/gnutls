@@ -46,7 +46,7 @@ char input[128];
 int ret;
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), infile);
+	fgets( input, sizeof(input), stdin);
 	
 	if (strlen(input)==1) /* only newline */ return;
 
@@ -63,7 +63,7 @@ char input[128];
 int ret;
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), infile);
+	fgets( input, sizeof(input), stdin);
 	
 	if (strlen(input)==1) /* only newline */ return;
 
@@ -79,7 +79,7 @@ static int read_int( const char* input_str)
 char input[128];
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), infile);
+	fgets( input, sizeof(input), stdin);
 	
 	if (strlen(input)==1) /* only newline */ return 0;
 
@@ -91,7 +91,7 @@ static const char* read_str( const char* input_str)
 static char input[128];
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), infile);
+	fgets( input, sizeof(input), stdin);
 	
 	input[strlen(input)-1] = 0;
 
@@ -105,7 +105,7 @@ static int read_yesno( const char* input_str)
 char input[128];
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), infile);
+	fgets( input, sizeof(input), stdin);
 	
 	if (strlen(input)==1) /* only newline */ return 0;
 
