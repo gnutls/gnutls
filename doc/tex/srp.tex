@@ -42,14 +42,23 @@ authenticated using a certificate with RSA parameters.
 
 \end{figure}
 
-The default behaviour of \gnutls{} is to read the usernames and
-SRP verifiers from password files. These password files are the ones used
+If clients supporting SRP know the username and password before the connection,
+should initialize the client credentials and call the
+function \printfunc{gnutls_srp_set_client_credentials}{gnutls\_srp\_set\_client\_credentials}.
+Alternatively they could probe the server for SRP support, by enabling
+the SRP key exchange method, and specifying empty credentials. If the server
+supports SRP an alert of type GNUTLS\_A\_MISSING\_SRP\_USERNAME will be
+received, which allows the client to read the username and password from the 
+user, set the credentials and repeat the handshake procedure.
+\par
+In server side the default behaviour of \gnutls{} is to read the usernames 
+and SRP verifiers from password files. These password files are the ones used
 by the \emph{srp libraries} and can be specified using the
 \printfunc{gnutls_srp_set_server_credentials_file}{gnutls\_srp\_set\_server\_credentials\_file}.
 If a different password file format is to be used, then the 
 function \printfunc{gnutls_srp_set_server_credentials_function}{gnutls\_srp\_set\_server\_credentials\_function},
 should be called, in order to set an appropriate callback.
-
+\par
 Some helper functions such as
 \begin{itemize}
 \item \printfunc{gnutls_srp_verifier}{gnutls\_srp\_verifier}

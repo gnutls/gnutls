@@ -394,9 +394,9 @@ static const unsigned char srp_params_1024[] = {
 static const unsigned char srp_generator = 0x02;
 
 const gnutls_datum gnutls_srp_1024_group_prime = {
-	srp_params_1024, sizeof(srp_params_1024) };
+	(void*)srp_params_1024, sizeof(srp_params_1024) };
 const gnutls_datum gnutls_srp_1024_group_generator = {
-	&srp_generator, sizeof(srp_generator) };
+	(void*)&srp_generator, sizeof(srp_generator) };
 
 static const unsigned char srp_params_1536[] = {
  0x9D, 0xEF, 0x3C, 0xAF, 0xB9, 0x39, 0x27, 0x7A, 0xB1,
@@ -424,9 +424,9 @@ static const unsigned char srp_params_1536[] = {
 };
 
 const gnutls_datum gnutls_srp_1536_group_prime = {
-	srp_params_1536, sizeof(srp_params_1536) };
+	(void*)srp_params_1536, sizeof(srp_params_1536) };
 const gnutls_datum gnutls_srp_1536_group_generator = {
-	&srp_generator, sizeof(srp_generator) };
+	(void*)&srp_generator, sizeof(srp_generator) };
 
 static const unsigned char srp_params_2048[] = {
  0xAC, 0x6B, 0xDB, 0x41, 0x32, 0x4A, 0x9A, 0x9B, 0xF1,
@@ -461,9 +461,9 @@ static const unsigned char srp_params_2048[] = {
 };
 
 const gnutls_datum gnutls_srp_2048_group_prime = {
-	srp_params_2048, sizeof(srp_params_2048) };
+	(void*)srp_params_2048, sizeof(srp_params_2048) };
 const gnutls_datum gnutls_srp_2048_group_generator = {
-	&srp_generator, sizeof(srp_generator) };
+	(void*)&srp_generator, sizeof(srp_generator) };
 
 
 /* Check if G and N are parameters from the SRP draft.
@@ -647,7 +647,9 @@ int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data
 	}
 	
 
-	return 0;
+    return i; /* return the processed data
+               * needed in auth_srp_rsa.
+               */
 }
 
 #endif /* ENABLE_SRP */

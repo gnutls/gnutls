@@ -1,5 +1,6 @@
 Version 1.0.0
 - Exported the static SRP group parameters.
+- Some fixes in the certificate authenticated SRP ciphersuites.
 
 Version 0.9.99 (28/11/2003)
 - Some fixes in the gnutls.h header for the gnutls_server_name_set()

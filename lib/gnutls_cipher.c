@@ -408,7 +408,6 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		if ( ver == GNUTLS_TLS1)
 		for (i=2;i<pad;i++) {
 			if (ciphertext.data[ciphertext.size-i] != ciphertext.data[ciphertext.size - 1]) {
-				gnutls_assert();
 				pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 			}
 		}
@@ -419,15 +418,14 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-
 	/* copy the decrypted stuff to compress_data.
 	 */
 	if (compress_size < length) {
 		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
-	memcpy( compress_data, ciphertext.data, length);
 
+	memcpy( compress_data, ciphertext.data, length);
 
 	c_length = _gnutls_conv_uint16((uint16) length);
 
