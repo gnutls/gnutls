@@ -3,6 +3,8 @@ Version 0.?.?
   to emulate the old 0.4.x API.
 - Example programs are now stored in doc/examples/
 - Added the certificate authenticated SRP cipher suites.
+- gnutls_x509_extract_certificate_dn_string() was updated to return
+  an RFC2253 conforming string.
 
 Version 0.5.11 (5/11/2002)
 - Some fixes in 'gnutls-cli' client program to prevent some segmentation 
