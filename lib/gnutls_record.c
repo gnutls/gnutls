@@ -449,7 +449,7 @@ ssize_t _gnutls_send_int( gnutls_session session, ContentType type, HandshakeTyp
  */
 ssize_t _gnutls_send_change_cipher_spec( gnutls_session session, int again)
 {
-	opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
+	static const opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
 	_gnutls_handshake_log( "REC[%x]: Sent ChangeCipherSpec\n", session);
 
@@ -679,7 +679,7 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 
 /* This function behaves exactly like read(). The only difference is
  * that it accepts the gnutls_session and the ContentType of data to
- * send (if called by the user the Content is Userdata only)
+ * receive (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current session.
  */
 ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
@@ -707,11 +707,6 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 		return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
 	}
 	
-	/* default headers for TLS 1.0
-	 */
-	header_size = RECORD_HEADER_SIZE;
-	ret = 0;
-
 	if ( _gnutls_session_is_valid(session)!=0 || session->internals.may_read!=0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
@@ -724,6 +719,10 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 	if (ret != 0)
 		return ret;
 
+
+	/* default headers for TLS 1.0
+	 */
+	header_size = RECORD_HEADER_SIZE;
 
 	if ( (ret = _gnutls_io_read_buffered( session, &headers, header_size, -1)) != header_size) {
 		if (ret < 0 && gnutls_error_is_fatal(ret)==0) return ret;
@@ -778,7 +777,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 
 	/* check if we have that data into buffer. 
  	 */
-	if ( (ret = _gnutls_io_read_buffered( session, &recv_data, header_size+length, recv_type)) != length+header_size) {
+	if ( (ret = _gnutls_io_read_buffered( session, &recv_data, header_size+length, recv_type)) != header_size+length) {
 		if (ret<0 && gnutls_error_is_fatal(ret)==0) return ret;
 
 		_gnutls_session_unresumable( session);
@@ -869,7 +868,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
 		}
 	} else {
 		gnutls_assert();
-		ret = GNUTLS_E_UNEXPECTED_PACKET; 
+		return GNUTLS_E_UNEXPECTED_PACKET;
 		/* we didn't get what we wanted to 
 		 */
 	}

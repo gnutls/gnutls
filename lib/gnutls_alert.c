@@ -74,8 +74,8 @@ static const gnutls_alert_entry sup_alerts[] = {
   * gnutls_alert_get_name - Returns a string describing the alert number given
   * @alert: is an alert number &gnutls_session structure.
   *
-  * Returns a string that describes the given alert number.
-  * See. gnutls_alert_get().
+  * Returns a string that describes the given alert number or NULL.
+  * See gnutls_alert_get().
   *
   **/
 const char* gnutls_alert_get_name( gnutls_alert_level alert) 

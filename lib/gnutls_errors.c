@@ -189,7 +189,7 @@ void gnutls_perror(int error)
 
 	/* avoid prefix */
 	GNUTLS_ERROR_ALG_LOOP(ret = p->desc);
-
+	if (ret == NULL) ret = "(unknown)";
 	fprintf(stderr,  "GNUTLS ERROR: %s\n", ret);
 }
 

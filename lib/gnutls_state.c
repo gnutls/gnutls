@@ -146,7 +146,6 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 }
 
 #define MIN_DH_BITS 727
-#define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_init - This function initializes the session to null (null encryption etc...).
   * @con_end: is used to indicate if this session is to be used for server or 
@@ -308,7 +307,7 @@ void _gnutls_deinit(gnutls_session session)
 		_gnutls_mpi_release(&session->key->rsa[1]);
 
 		_gnutls_mpi_release(&session->key->dh_secret);
-		_gnutls_free(session->key);
+		gnutls_free(session->key);
 
 		session->key = NULL;
 	}

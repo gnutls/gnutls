@@ -15,13 +15,14 @@ int xml = 0;
 #define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
 	PRINTX( "EMAIL:", X.email)
 
-static const char *my_ctime(time_t * tv)
+static const char *my_ctime(const time_t * tv)
 {
 	static char buf[256];
 	struct tm *tp;
 
-	tp = localtime(tv);
-	strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp);
+	if ( ( (tp = localtime(tv)) == NULL ) ||
+	     (!strftime(buf, sizeof buf, "%a %b %e %H:%M:%S %Z %Y\n", tp)) )
+		strcpy(buf, "unknown"); /* make sure buf text isn't garbage */
 
 	return buf;
 
@@ -62,8 +63,9 @@ void print_x509_info(gnutls_session session, const char* hostname)
 		    gnutls_x509_crt_import(crt, &cert_list[j],
 					   GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
-			fprintf(stderr, "Decoding error: %s\n",
-				gnutls_strerror(ret));
+			const char* str = gnutls_strerror(ret);
+			if (str == NULL) str = "(unknown)";
+			fprintf(stderr, "Decoding error: %s\n", str);
 			return;
 		}
 
@@ -87,8 +89,10 @@ void print_x509_info(gnutls_session session, const char* hostname)
 
 			ret = gnutls_x509_crt_to_xml( crt, &xml_data, 0);
 			if (ret < 0) {
+				const char* str = gnutls_strerror(ret);
+				if (str == NULL) str = "(unknown)";
 				fprintf(stderr, "XML encoding error: %s\n",
-					gnutls_strerror(ret));
+					str);
 				return;
 			}
 			
@@ -122,7 +126,9 @@ void print_x509_info(gnutls_session session, const char* hostname)
 			digest_size = sizeof(digest);
 			if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, digest, &digest_size))
 			    < 0) {
-			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
+				const char* str = gnutls_strerror(ret);
+				if (str == NULL) str = "(unknown)";
+			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", str);
 			} else {
 				print = printable;
 				for (i = 0; i < digest_size; i++) {

@@ -47,7 +47,7 @@
 #endif
 
 #define SA struct sockaddr
-#define ERR(err,s) if (err==-1) {perror(s);return(1);}
+#define ERR(err,s) do { if (err==-1) {perror(s);return(1);} } while (0)
 #define MAX_BUF 4096
 
 /* global stuff here */
@@ -78,20 +78,20 @@ static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
 static gnutls_certificate_credentials xcred;
 
-int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-int kx_priority[16] =
+static const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+static const int kx_priority[] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
 	/* Do not use anonymous authentication, unless you know what that means */
 	GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
 };
-int cipher_priority[16] =
+static const int cipher_priority[] =
     { GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_AES_128_CBC,
 	GNUTLS_CIPHER_3DES_CBC,
 	GNUTLS_CIPHER_ARCFOUR_40, 0
 };
-int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
-int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
-int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
+static const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+static const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+static const int cert_type_priority[] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 /* end of global stuff */
 
@@ -104,13 +104,14 @@ typedef struct {
 } socket_st;
 
 ssize_t socket_recv(socket_st socket, void *buffer, int buffer_size);
-ssize_t socket_send(socket_st socket, void *buffer, int buffer_size);
+ssize_t socket_send(socket_st socket, const void *buffer, int buffer_size);
 void socket_bye(socket_st * socket);
 static void check_rehandshake(socket_st socket, int ret);
 static int do_handshake(socket_st * socket);
 static void init_global_tls_stuff(void);
 
 
+#undef MAX
 #define MAX(X,Y) (X >= Y ? X : Y);
 
 /* A callback function to be used at the certificate selection time.
@@ -208,7 +209,7 @@ static void gaa_parser(int argc, char **argv);
 static int handle_error(socket_st hd, int err)
 {
 	int alert, ret;
-	const char *err_type;
+	const char *err_type, *str;
 
 	if (err >= 0) return 0;
 
@@ -220,14 +221,17 @@ static int handle_error(socket_st hd, int err)
 		err_type = "Fatal";
 	}
 
+	str = gnutls_strerror(err);
+	if (str == NULL) str = "(unknown)";
 	fprintf(stderr,
-		"*** %s error: %s\n", err_type, gnutls_strerror(err));
+		"*** %s error: %s\n", err_type, str);
 
 	if (err == GNUTLS_E_WARNING_ALERT_RECEIVED
 	    || err == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 		alert = gnutls_alert_get(hd.session);
-		printf("*** Received alert [%d]: %s\n",
-		       alert, gnutls_alert_get_name(alert));
+		str = gnutls_alert_get_name(alert);
+		if (str == NULL) str = "(unknown)";
+		printf("*** Received alert [%d]: %s\n", alert, str);
 
 	}
 
@@ -261,6 +265,10 @@ int main(int argc, char **argv)
 	socket_st hd;
 
 	gaa_parser(argc, argv);
+	if (hostname == NULL) {
+		fprintf(stderr, "No hostname given\n");
+		exit(1);
+	}
 
 	signal(SIGPIPE, SIG_IGN);
 
@@ -284,7 +292,11 @@ int main(int argc, char **argv)
 
 	sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr);
 
-	inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF);
+	if (inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF) == NULL) {
+		perror("inet_ntop()");
+		return(1);
+	}
+
 	fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port);
 
 	err = connect(sd, (SA *) & sa, sizeof(sa));
@@ -433,11 +445,10 @@ int main(int argc, char **argv)
 						socket_bye(&hd);
 						user_term = 1;
 					}
-					continue;
 				} else {
 					user_term = 1;
-					continue;
 				}
+				continue;
 			}
 
 			if (crlf != 0) {
@@ -559,7 +570,7 @@ ssize_t socket_recv(socket_st socket, void *buffer, int buffer_size)
 	return ret;
 }
 
-ssize_t socket_send(socket_st socket, void *buffer, int buffer_size)
+ssize_t socket_send(socket_st socket, const void *buffer, int buffer_size)
 {
 	int ret;
 
@@ -648,7 +659,7 @@ static void tls_log_func(int level, const char *str)
 	fprintf(stderr, "|<%d>| %s", level, str);
 }
 
-static void init_global_tls_stuff()
+static void init_global_tls_stuff(void)
 {
 	int ret;
 

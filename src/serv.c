@@ -245,21 +245,21 @@ static int generate_rsa_params(void)
    return 0;
 }
 
-int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-int kx_priority[16] =
+static const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+static const int kx_priority[] =
     { GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
    /* Do not use anonymous authentication, unless you know what that means */
    GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
 };
-int cipher_priority[16] =
+static const int cipher_priority[] =
     { GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_3DES_CBC,
    GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_ARCFOUR_40, 0
 };
 
-int comp_priority[16] =
+static const int comp_priority[] =
     { GNUTLS_COMP_ZLIB, GNUTLS_COMP_LZO, GNUTLS_COMP_NULL, 0 };
-int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
-int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
+static const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+static const int cert_type_priority[] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
 LIST_DECLARE_INIT(listener_list, listener_item, listener_free);
 
@@ -301,7 +301,7 @@ gnutls_session initialize_session(void)
    return session;
 }
 
-static char DEFAULT_DATA[] = "This is the default message reported "
+static const char DEFAULT_DATA[] = "This is the default message reported "
     "by GnuTLS TLS version 1.0 implementation. For more information "
     "please visit http://www.gnutls.org or even http://www.gnu.org/software/gnutls.";
 
@@ -315,6 +315,7 @@ char *peer_print_info(gnutls_session session, int *ret_length,
    unsigned char sesid[32];
    int sesid_size, i;
    char *http_buffer = malloc(5 * 1024 + strlen(header));
+   gnutls_kx_algorithm kx_alg;
 
    if (http_buffer == NULL)
       return NULL;
@@ -356,24 +357,25 @@ char *peer_print_info(gnutls_session session, int *ret_length,
 
    }
 
+   kx_alg = gnutls_kx_get(session);
+
    /* print srp specific data */
 #ifdef ENABLE_SRP
-   if (gnutls_kx_get(session) == GNUTLS_KX_SRP) {
+   if (kx_alg == GNUTLS_KX_SRP) {
       sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
 	      gnutls_srp_server_get_username(session));
    }
 #endif
 
 #ifdef ENABLE_ANON
-   if (gnutls_kx_get(session) == GNUTLS_KX_ANON_DH) {
+   if (kx_alg == GNUTLS_KX_ANON_DH) {
       sprintf(tmp2,
 	      "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
 	      gnutls_dh_get_prime_bits(session));
    }
 #endif
 
-   if (gnutls_kx_get(session) == GNUTLS_KX_DHE_RSA
-       || gnutls_kx_get(session) == GNUTLS_KX_DHE_DSS) {
+   if (kx_alg == GNUTLS_KX_DHE_RSA || kx_alg == GNUTLS_KX_DHE_DSS) {
       sprintf(tmp2,
 	      "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
 	      gnutls_dh_get_prime_bits(session));
@@ -395,7 +397,7 @@ char *peer_print_info(gnutls_session session, int *ret_length,
 	      tmp);
    }
 
-   tmp = gnutls_kx_get_name(gnutls_kx_get(session));
+   tmp = gnutls_kx_get_name(kx_alg);
    sprintf(tmp2, "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
 
    tmp = gnutls_compression_get_name(gnutls_compression_get(session));
@@ -407,7 +409,7 @@ char *peer_print_info(gnutls_session session, int *ret_length,
    tmp = gnutls_mac_get_name(gnutls_mac_get(session));
    sprintf(tmp2, "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
 
-   tmp = gnutls_cipher_suite_get_name(gnutls_kx_get(session),
+   tmp = gnutls_cipher_suite_get_name(kx_alg,
 				      gnutls_cipher_get(session),
 				      gnutls_mac_get(session));
    sprintf(tmp2, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
@@ -417,14 +419,14 @@ char *peer_print_info(gnutls_session session, int *ret_length,
    strcat(http_buffer, header);
    strcat(http_buffer, "</PRE></P>");
 
-   strcat(http_buffer, "</P>\n" HTTP_END);
+   strcat(http_buffer, "\n" HTTP_END);
 
    *ret_length = strlen(http_buffer);
 
    return http_buffer;
 }
 
-static int listen_socket(char *name, int listen_port)
+static int listen_socket(const char *name, int listen_port)
 {
    struct sockaddr_in a;
    int s;
@@ -436,9 +438,10 @@ static int listen_socket(char *name, int listen_port)
    }
    yes = 1;
 
-   if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *) &yes, sizeof(yes))
+   if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const void *)&yes, sizeof(yes))
        < 0) {
       perror("setsockopt() failed");
+      failed:
       close(s);
       return -1;
    }
@@ -447,12 +450,15 @@ static int listen_socket(char *name, int listen_port)
    a.sin_family = AF_INET;
    if (bind(s, (struct sockaddr *) &a, sizeof(a)) < 0) {
       perror("bind() failed");
-      close(s);
-      return -1;
+      goto failed;
+   }
+
+   if (listen(s, 10) < 0) {
+      perror("listen() failed");
+      goto failed;
    }
 
    printf("%s ready. Listening to port '%d'.\n\n", name, listen_port);
-   listen(s, 10);
    return s;
 }
 
@@ -481,34 +487,32 @@ static void get_response(gnutls_session session, char *request,
       *response = peer_print_info(session, response_length, h);
    } else {
       *response = strdup(request);
-      *response_length = strlen(*response);
+      *response_length = ( (*response) ? strlen(*response) : 0 );
    }
 
    return;
 
  unimplemented:
    *response = strdup(HTTP_UNIMPLEMENTED);
-   *response_length = strlen(*response);
+   *response_length = ( (*response) ? strlen(*response) : 0 );
 }
 
 void terminate(int sig)
 {
    fprintf(stderr, "Exiting via signal %d\n", sig);
-   exit(0);
+   exit(1);
 }
 
 
-void check_alert(gnutls_session session, int ret)
+static void check_alert(gnutls_session session, int ret)
 {
-   int last_alert;
-
    if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
        || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-      last_alert = gnutls_alert_get(session);
+      int last_alert = gnutls_alert_get(session);
       if (last_alert == GNUTLS_A_NO_RENEGOTIATION &&
 	  ret == GNUTLS_E_WARNING_ALERT_RECEIVED)
 	 printf
-	     ("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
+	     ("* Received NO_RENEGOTIATION alert. Client does not support renegotiation.\n");
       else
 	 printf("* Received alert '%d': %s.\n", last_alert,
 		gnutls_alert_get_name(last_alert));
@@ -534,6 +538,7 @@ int main(int argc, char **argv)
    signal(SIGHUP, SIG_IGN);
    signal(SIGTERM, terminate);
    signal(SIGINT, terminate);
+   /* CHECKME: background processes shouldn't handle SIGINT! */
 
    gaa_parser(argc, argv);
 
@@ -686,7 +691,7 @@ int main(int argc, char **argv)
       lloopstart(listener_list, j) {
 
 	 val = fcntl(j->fd, F_GETFL, 0);
-	 if (fcntl(j->fd, F_SETFL, val | O_NONBLOCK) < 0) {
+	 if ( (val == -1) || (fcntl(j->fd, F_SETFL, val | O_NONBLOCK) < 0) ) {
 	    perror("fcntl()");
 	    exit(1);
 	 }
@@ -703,7 +708,7 @@ int main(int argc, char **argv)
       lloopend(listener_list, j);
 
 /* core operation */
-      n = select(n + 1, &rd, &wr, 0, 0);
+      n = select(n + 1, &rd, &wr, NULL, NULL);
       if (n == -1 && errno == EINTR)
 	 continue;
       if (n < 0) {
@@ -718,7 +723,8 @@ int main(int argc, char **argv)
 
 	 tls_session = initialize_session();
 
-	 memset(&client_address, 0, l = sizeof(client_address));
+	 l = sizeof(client_address);
+	 memset(&client_address, 0, l);
 	 accept_fd = accept(h, (struct sockaddr *) &client_address, &l);
 
 	 if (accept_fd < 0) {
@@ -795,7 +801,7 @@ int main(int argc, char **argv)
 				      min(1024, SMALL_READ_TEST));
 	       if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
 		  /* do nothing */
-	       } else if (r < 0 || r == 0) {
+	       } else if (r <= 0) {
 		  j->http_state = HTTP_STATE_CLOSING;
 		  if (r < 0 && r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH) {
 		     check_alert(j->tls_session, r);
@@ -865,6 +871,7 @@ int main(int argc, char **argv)
 	    }
 
 	    if (j->handshake_ok == 1) {
+	       /* FIXME if j->http_response == NULL? */
 	       r = gnutls_record_send(j->tls_session,
 				      j->http_response +
 				      j->response_written,
@@ -873,7 +880,7 @@ int main(int argc, char **argv)
 					  SMALL_READ_TEST));
 	       if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
 		  /* do nothing */
-	       } else if (r < 0 || r == 0) {
+	       } else if (r <= 0) {
 		  if (http != 0)
 		     j->http_state = HTTP_STATE_CLOSING;
 		  else {
@@ -1100,7 +1107,7 @@ static int
 recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
 		 unsigned int keyfpr_length, gnutls_datum * key)
 {
-   static const char *hostname = "hkp://wwwkeys.pgp.net";
+   static const char hostname[] = "hkp://wwwkeys.pgp.net";
    static const short port = 11371;
    int rc;
    CDK_KBNODE knode = NULL;
