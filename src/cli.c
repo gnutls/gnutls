@@ -76,7 +76,7 @@ int main()
 	gnutls_init(&state, GNUTLS_CLIENT);
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, 4, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH);
+	gnutls_set_cipher_priority( state, 4, GNUTLS_TWOFISH, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL);
 	gnutls_set_compression_priority( state, 1, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);

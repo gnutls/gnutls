@@ -1,5 +1,6 @@
-Version 0.0.7
+Version 0.0.7 (11/01/2001)
 - Added server side session resuming (using gdbm)
+- Added twofish algorithm
 
 Version 0.0.6 (20/12/2000)
 - Added client side session resuming
