@@ -137,9 +137,8 @@ typedef struct
     GCRY_MD_HD handle;
 } MD_CTX;
 
-typedef struct
-{
-} RSA;
+struct RSA;
+typedef struct RSA RSA;
 
 #define MD5_CTX MD_CTX
 #define RIPEMD160_CTX MD_CTX
