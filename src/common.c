@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
+ *
+ * This file is part of GNUTLS.
+ *
+ * GNUTLS is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * GNUTLS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ */
+
 #include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,9 +90,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 		    gnutls_x509_crt_import(crt, &cert_list[j],
 					   GNUTLS_X509_FMT_DER);
 		if (ret < 0) {
-			const char* str = gnutls_strerror(ret);
-			if (str == NULL) str = str_unknown;
-			fprintf(stderr, "Decoding error: %s\n", str);
+			fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 			return;
 		}
 
@@ -110,10 +129,8 @@ void print_x509_info(gnutls_session session, const char* hostname)
 
 			ret = gnutls_x509_crt_to_xml( crt, &xml_data, 0);
 			if (ret < 0) {
-				const char* str = gnutls_strerror(ret);
-				if (str == NULL) str = str_unknown;
 				fprintf(stderr, "XML encoding error: %s\n",
-					str);
+					gnutls_strerror(ret));
 				return;
 			}
 			
@@ -147,9 +164,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 			digest_size = sizeof(digest);
 			if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, digest, &digest_size))
 			    < 0) {
-				const char* str = gnutls_strerror(ret);
-				if (str == NULL) str = str_unknown;
-			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", str);
+			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
 			} else {
 				print = printable;
 				for (i = 0; i < digest_size; i++) {
@@ -225,9 +240,7 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 		ret =
 		    gnutls_openpgp_key_import(crt, &cert_list[0], GNUTLS_OPENPGP_FMT_RAW);
 		if (ret < 0) {
-			const char* str = gnutls_strerror(ret);
-			if (str == NULL) str = str_unknown;
-			fprintf(stderr, "Decoding error: %s\n", str);
+			fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
 			return;
 		}
 
@@ -262,10 +275,8 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 
 			ret = gnutls_openpgp_key_to_xml( crt, &xml_data, 0);
 			if (ret < 0) {
-				const char* str = gnutls_strerror(ret);
-				if (str == NULL) str = str_unknown;
 				fprintf(stderr, "XML encoding error: %s\n",
-					str);
+					gnutls_strerror(ret));
 				return;
 			}
 			
@@ -511,19 +522,19 @@ void print_list(void)
 
 void print_license(void)
 {
-	fprintf(stdout,
-		"\nCopyright (C) 2001-2003 Nikos Mavroyanopoulos\n"
-		"This program is free software; you can redistribute it and/or modify \n"
-		"it under the terms of the GNU General Public License as published by \n"
-		"the Free Software Foundation; either version 2 of the License, or \n"
-		"(at your option) any later version. \n" "\n"
-		"This program is distributed in the hope that it will be useful, \n"
-		"but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
-		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
-		"GNU General Public License for more details. \n" "\n"
-		"You should have received a copy of the GNU General Public License \n"
-		"along with this program; if not, write to the Free Software \n"
-		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
+fputs(	"\nCopyright (C) 2004 Free Software Foundation\n"
+	"This program is free software; you can redistribute it and/or modify \n"
+	"it under the terms of the GNU General Public License as published by \n"
+	"the Free Software Foundation; either version 2 of the License, or \n"
+	"(at your option) any later version. \n" "\n"
+	"This program is distributed in the hope that it will be useful, \n"
+	"but WITHOUT ANY WARRANTY; without even the implied warranty of \n"
+	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the \n"
+	"GNU General Public License for more details. \n" "\n"
+	"You should have received a copy of the GNU General Public License \n"
+	"along with this program; if not, write to the Free Software \n"
+	"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n",
+	stdout);
 }
 
 void parse_protocols(char **protocols, int protocols_size,
@@ -665,11 +676,11 @@ char* ret;
 
 	ret = inet_ntoa( *((struct in_addr*)src));
 	
-	if (strlen(ret) > cnt) {
+	if (ret == NULL || strlen(ret) > cnt) {
 		return NULL;
 	}
 	strcpy( dst, ret);
-	
+
 	return dst;
 }
 #endif

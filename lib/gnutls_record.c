@@ -877,10 +877,10 @@ ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t siz
   * @sizeofdata: is the length of the data
   *
   * This function has the similar semantics to send(). The only
-  * difference is that is accepts a GNUTLS session.
+  * difference is that it accepts a GNUTLS session.
   *
-  * If the server requests a renegotiation the client may receive
-  * and error code of GNUTLS_E_REHANDSHAKE. This message may be
+  * If the server requests a renegotiation, the client may receive
+  * an error code of GNUTLS_E_REHANDSHAKE. This message may be
   * simply ignored, replied with an alert containing NO_RENEGOTIATION, 
   * or replied with a new handshake. 
   *

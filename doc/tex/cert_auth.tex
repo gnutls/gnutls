@@ -55,7 +55,7 @@ into the credentials structure by using
 \printfunc{gnutls_certificate_set_x509_trust_file}{gnutls\_certificate\_set\_x509\_trust\_file}
 or
 \printfunc{gnutls_certificate_set_openpgp_keyring_file}{gnutls\_certificate\_set\_openpgp\_keyring\_file}
-for openpgp keys. Note however that the peer's certificate is not automaticaly verified,
+for openpgp keys. Note however that the peer's certificate is not automatically verified,
 you should call \printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers},
 after a successful handshake,
 to verify the signatures of the certificate. An alternative way, which reports
@@ -72,7 +72,7 @@ the enabled authentication methods. For example keys marked as sign-only, will n
 access the plain RSA ciphersuites, but only the DHE\_RSA ones. It is
 recommended not to use RSA keys for both signing and encryption. If possible
 use the same key for the DHE\_RSA and RSA\_EXPORT ciphersuites, which use signing,
-and a different key for the plain RSA ciphersuites, which uses encryption.
+and a different key for the plain RSA ciphersuites, which use encryption.
 All the key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
 available in certificate authentication. 
 

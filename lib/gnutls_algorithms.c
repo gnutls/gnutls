@@ -160,16 +160,15 @@ static const gnutls_cipher_entry algorithms[] = {
 struct gnutls_hash_entry {
 	const char *name;
 	gnutls_mac_algorithm id;
-	size_t digestsize;
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-	{"SHA", GNUTLS_MAC_SHA, 20},
-	{"MD5", GNUTLS_MAC_MD5, 16},
-	{"RIPEMD160", GNUTLS_MAC_RMD160, 20},
-	{"NULL", GNUTLS_MAC_NULL, 0},
-	{0, 0, 0}
+	{"SHA", GNUTLS_MAC_SHA},
+	{"MD5", GNUTLS_MAC_MD5},
+	{"RIPEMD160", GNUTLS_MAC_RMD160},
+	{"NULL", GNUTLS_MAC_NULL},
+	{0, 0}
 };
 
 #define GNUTLS_HASH_LOOP(b) \
@@ -481,15 +480,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 
 
 /* Generic Functions */
-
-/* HASHES */
-int _gnutls_mac_get_digest_size(gnutls_mac_algorithm algorithm)
-{
-	size_t ret = 0;
-	GNUTLS_HASH_ALG_LOOP(ret = p->digestsize);
-	return ret;
-
-}
 
 inline int _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm algorithm)
 {				/* actually returns the priority */
@@ -1364,7 +1354,7 @@ gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm)
 	return ret;
 }
 
-/* Returns the encipher type for the the given key exchange algorithm.
+/* Returns the encipher type for the given key exchange algorithm.
  * That one of CIPHER_ENCRYPT, CIPHER_SIGN, CIPHER_IGN.
  *
  * ex. GNUTLS_KX_RSA requires a certificate able to encrypt... so returns CIPHER_ENCRYPT.

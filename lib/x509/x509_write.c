@@ -123,15 +123,14 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid,
 int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
 {
 int result;
-char null = version;
+unsigned char null = version;
 
 	if (crt==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	null -= 1;
-	if (null < 0) null = 0;
+	if (null > 0) null--;
 
 	result = asn1_write_value( crt->cert, "tbsCertificate.version", &null, 1);
 	if (result != ASN1_SUCCESS) {

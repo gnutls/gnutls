@@ -1,9 +1,12 @@
+Version 1.1.6
+- Several bug fixes, by Arne Thomassen.
+
 Version 1.1.5 (06/01/2004)
 - Added the gnutls_sign_algorithm type.
 
 Version 1.1.4 (04/01/2004)
 - Improved gnutls-cli's SRP behaviour in SRP ciphersuites.
-  If they are of highest priority then the abreviated handshake
+  If they are of highest priority then the abbreviated handshake
   is used.
 - Removed all references of missing files.
 - Changed handshake behaviour to send the lowest TLS version
@@ -355,7 +358,7 @@ Version 0.5.4 (27/08/2002)
 - Added the TLS_RSA_EXPORT_ARCFOUR_40_MD5 ciphersuite.
 
 Version 0.5.3 (23/08/2002)
-- No changes. Replaces the tarball of 0.5.2 which accidentaly contained
+- No changes. Replaces the tarball of 0.5.2 which accidentally contained
   code from the unstable branch.
 
 Version 0.5.2 (22/08/2002)
@@ -530,7 +533,7 @@ Version 0.2.11 (16/11/2001)
 - Changed the meaning of GNUTLS_E_REHANDSHAKE value. If this value
   is returned, then the caller should perform a handshake or send
   an alert to the peer.
-- Made receive buffer dynamic. Normaly if no large chunks are received
+- Made receive buffer dynamic. Normally if no large chunks are received
   it occupies less space.
 - Added max_record_size extension
 - Bugfixes in session handling

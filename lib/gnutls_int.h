@@ -581,7 +581,7 @@ typedef struct {
 	 */
 	uint16			proposed_record_size;
 	
-	/* holds the the selected certificate and key.
+	/* holds the selected certificate and key.
 	 * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
 	 * to change them.
 	 */

@@ -31,7 +31,6 @@ int _gnutls_version_get_minor( gnutls_protocol_version ver);
 gnutls_protocol_version _gnutls_version_get( int major, int minor);
 
 /* functions for macs */
-int   _gnutls_mac_get_digest_size(gnutls_mac_algorithm algorithm);
 const char* gnutls_mac_get_name(gnutls_mac_algorithm algorithm);
 int   _gnutls_mac_is_ok(gnutls_mac_algorithm algorithm);
 int   _gnutls_mac_priority(gnutls_session session, gnutls_mac_algorithm algorithm);

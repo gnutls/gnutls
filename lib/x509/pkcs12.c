@@ -130,6 +130,7 @@ int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12)
 				     &(*pkcs12)->pkcs12);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_free( *pkcs12);
 			return _gnutls_asn2err(result);
 		}
 		return 0;		/* success */

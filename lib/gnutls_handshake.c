@@ -1784,7 +1784,7 @@ int _gnutls_recv_hello(gnutls_session session, opaque *data, int datalen)
 
 /**
   * gnutls_rehandshake - This function will renegotiate security parameters
-  * @session: is a a &gnutls_session structure.
+  * @session: is a &gnutls_session structure.
   *
   * This function will renegotiate security parameters with the
   * client. This should only be called in case of a server.
@@ -2518,7 +2518,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 
 /**
   * gnutls_handshake_set_max_packet_length - This function will set the maximum length of a handshake message
-  * @session: is a a &gnutls_session structure.
+  * @session: is a &gnutls_session structure.
   * @max: is the maximum number.
   *
   * This function will set the maximum size of a handshake message.

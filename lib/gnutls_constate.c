@@ -362,7 +362,7 @@ int _gnutls_set_read_keys(gnutls_session session)
 	mac_algo = session->security_parameters.read_mac_algorithm;
 	algo = session->security_parameters.read_bulk_cipher_algorithm;
 
-	hash_size = _gnutls_mac_get_digest_size(mac_algo);
+	hash_size = _gnutls_hash_get_algo_len(mac_algo);
 	IV_size = _gnutls_cipher_get_iv_size(algo);
 	key_size = gnutls_cipher_get_key_size(algo);
 	export_flag = _gnutls_cipher_get_export_flag(algo);
@@ -382,7 +382,7 @@ int _gnutls_set_write_keys(gnutls_session session)
 	mac_algo = session->security_parameters.write_mac_algorithm;
 	algo = session->security_parameters.write_bulk_cipher_algorithm;
 
-	hash_size = _gnutls_mac_get_digest_size(mac_algo);
+	hash_size = _gnutls_hash_get_algo_len(mac_algo);
 	IV_size = _gnutls_cipher_get_iv_size(algo);
 	key_size = gnutls_cipher_get_key_size(algo);
 	export_flag = _gnutls_cipher_get_export_flag(algo);
@@ -535,7 +535,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 
 
 	mac_size =
-	    _gnutls_mac_get_digest_size(session->security_parameters.
+	    _gnutls_hash_get_algo_len(session->security_parameters.
 					read_mac_algorithm);
 
 	_gnutls_handshake_log
@@ -718,7 +718,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 				    write_compression_state, 0);
 
 	mac_size =
-	    _gnutls_mac_get_digest_size(session->security_parameters.
+	    _gnutls_hash_get_algo_len(session->security_parameters.
 					write_mac_algorithm);
 
 	_gnutls_handshake_log

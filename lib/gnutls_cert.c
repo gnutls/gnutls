@@ -264,7 +264,7 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   *
   * This function specifies what we, in case of a client, are going
   * to do when we have to send a certificate. If this callback
-  * function is not provided then gnutls will automaticaly try to
+  * function is not provided then gnutls will automatically try to
   * find an appropriate certificate to send. The appropriate certificate
   * is chosen based on the CAs sent by the server, and the requested
   * public key algorithms.
@@ -299,7 +299,7 @@ void gnutls_certificate_client_set_select_function(gnutls_session session,
   *
   * This function specifies what we, in case of a server, are going
   * to do when we have to send a certificate. If this callback
-  * function is not provided then gnutls will automaticaly try to
+  * function is not provided then gnutls will automatically try to
   * find an appropriate certificate to send. (actually send the first in the list)
   *
   * In case the callback returned a negative number then gnutls will

@@ -21,7 +21,7 @@
  */
 
 /* Functions to manipulate the session (gnutls_int.h), and some other stuff
- * are included here. The file's name is traditionaly gnutls_state even if the
+ * are included here. The file's name is traditionally gnutls_state even if the
  * state has been renamed to session.
  */
 
@@ -755,7 +755,7 @@ void gnutls_session_set_ptr(gnutls_session session, void* ptr)
 
 /**
   * gnutls_record_get_direction - This function will return the direction of the last interrupted function call
-  * @session: is a a &gnutls_session structure.
+  * @session: is a &gnutls_session structure.
   *
   * This function provides information about the internals of the record
   * protocol and is only useful if a prior gnutls function call (e.g.

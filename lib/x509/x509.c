@@ -58,6 +58,7 @@ int gnutls_x509_crt_init(gnutls_x509_crt * cert)
 				     &(*cert)->cert);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_free( *cert);
 			return _gnutls_asn2err(result);
 		}
 		return 0;		/* success */
@@ -215,7 +216,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
   * gnutls_x509_crt_get_issuer_dn - This function returns the Certificate's issuer distinguished name
   * @cert: should contain a gnutls_x509_crt structure
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of 'buf'
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will copy the name of the Certificate issuer in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
@@ -247,7 +248,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate issuer specified
   * by the given OID. The output will be encoded as described in RFC2253. The output
@@ -282,7 +283,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid,
   * @cert: should contain a gnutls_x509_crt structure
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
-  * @sizeof_oid: initialy holds the size of @oid
+  * @sizeof_oid: initially holds the size of @oid
   *
   * This function will extract the OIDs of the name of the Certificate issuer specified
   * by the given index.
@@ -310,7 +311,7 @@ int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt cert,
   * gnutls_x509_crt_get_dn - This function returns the Certificate's distinguished name
   * @cert: should contain a gnutls_x509_crt structure
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will copy the name of the Certificate in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
@@ -342,7 +343,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate subject, specified
   * by the given OID. The output
@@ -377,7 +378,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid,
   * @cert: should contain a gnutls_x509_crt structure
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
-  * @sizeof_oid: initialy holds the size of @oid
+  * @sizeof_oid: initially holds the size of @oid
   *
   * This function will extract the OIDs of the name of the Certificate subject specified
   * by the given index.
@@ -903,7 +904,7 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use zero to get the first one.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return the extension specified by the OID in the certificate.
@@ -959,7 +960,7 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
   * @cert: should contain a gnutls_x509_crt structure
   * @indx: Specifies which extension OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the OID (may be null)
-  * @sizeof_oid: initialy holds the size of @oid
+  * @sizeof_oid: initially holds the size of @oid
   *
   * This function will return the requested extension OID in the certificate.
   * The extension OID will be stored as a string in the provided buffer.
@@ -1084,7 +1085,7 @@ int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
   * @cert: should contain a gnutls_x509_crt structure
   * @algo: is a digest algorithm
   * @buf: a pointer to a structure to hold the fingerprint (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will calculate and copy the certificate's fingerprint
   * in the provided buffer.

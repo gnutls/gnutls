@@ -60,6 +60,7 @@ int gnutls_x509_crq_init(gnutls_x509_crq * crq)
 				     &((*crq)->crq));
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_free( *crq);
 			return _gnutls_asn2err(result);
 		}
 		return 0;		/* success */
@@ -147,9 +148,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 		goto cleanup;
 	}
 
-	if (need_free) _gnutls_free_datum( &_data);
-
-	return 0;
+	result = 0;
 
       cleanup:
 	if (need_free) _gnutls_free_datum( &_data);
@@ -162,7 +161,7 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
   * gnutls_x509_crq_get_dn - This function returns the Certificate request subject's distinguished name
   * @crq: should contain a gnutls_x509_crq structure
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will copy the name of the Certificate request subject in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
@@ -194,7 +193,7 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate request subject, specified
   * by the given OID. The output will be encoded as described in RFC2253. The output
@@ -229,7 +228,7 @@ int gnutls_x509_crq_get_dn_by_oid(gnutls_x509_crq crq, const char* oid,
   * @crq: should contain a gnutls_x509_crq structure
   * @indx: Specifies which DN OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the name (may be null)
-  * @sizeof_oid: initialy holds the size of @oid
+  * @sizeof_oid: initially holds the size of @oid
   *
   * This function will extract the requested OID of the name of the Certificate request subject, specified
   * by the given index. 
@@ -396,7 +395,7 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
   * gnutls_x509_crq_get_challenge_password - This function will get the challenge password 
   * @crq: should contain a gnutls_x509_crq structure
   * @pass: will hold a null terminated password
-  * @sizeof_pass: Initialy holds the size of pass.
+  * @sizeof_pass: Initially holds the size of @pass.
   *
   * This function will return the challenge password in the
   * request.
@@ -461,15 +460,14 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid,
 int gnutls_x509_crq_set_version(gnutls_x509_crq crq, unsigned int version)
 {
 int result;
-char null = version;
+unsigned char null = version;
 
 	if (crq==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	null -= 1;
-	if (null < 0) null = 0;
+	if (null > 0) null--;
 	
 	result = asn1_write_value( crq->crq, "certificationRequestInfo.version", &null, 1);
 	if (result != ASN1_SUCCESS) {
@@ -700,7 +698,6 @@ int result;
 		bits);
 	if (result < 0) {
 		gnutls_assert();
-		return result;
 	}
 	
 	return result;

@@ -126,13 +126,14 @@ char input[128];
 static const char* read_str( const char* input_str)
 {
 static char input[128];
+int len;
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
+	if (fgets( input, sizeof(input), stdin) == NULL) return NULL;
 	
-	input[strlen(input)-1] = 0;
-
-	if (strlen(input)==0) return NULL;
+	len = strlen(input);
+	if ( (len > 0) && (input[len-1] == '\n') ) input[len-1] = 0;
+	if (input[0] == 0) return NULL;
 
 	return input;
 }
@@ -1055,9 +1056,7 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 
 	if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 	{
-		const char* str = gnutls_strerror(ret);
-		if (str == NULL) str = "unknown error";
-	    	fprintf(out, "Error getting subject key id: %s\n", str);
+	    	fprintf(out, "Error getting subject key id: %s\n", gnutls_strerror(ret));
 	}
 	
 	if (ret >= 0) {
@@ -1120,9 +1119,7 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 		size = sizeof(buffer);
 		if ((ret=gnutls_x509_crt_get_fingerprint(crt, GNUTLS_DIG_MD5, buffer, &size)) < 0) 
 		{
-			const char* str = gnutls_strerror(ret);
-			if (str == NULL) str = "unknown error";
-		    	fprintf(out, "Error in fingerprint calculation: %s\n", str);
+		    	fprintf(out, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
 		} else {
 			print = printable;
 			for (i = 0; i < size; i++) {
@@ -1136,9 +1133,7 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 	size = sizeof(buffer);
 	if ((ret=gnutls_x509_crt_get_key_id(crt, 0, buffer, &size)) < 0) 
 	{
-		const char* str = gnutls_strerror(ret);
-		if (str == NULL) str = "unknown error";
-	    	fprintf(out, "Error in key id calculation: %s\n", str);
+	    	fprintf(out, "Error in key id calculation: %s\n", gnutls_strerror(ret));
 	} else {
 		print = printable;
 		for (i = 0; i < size; i++) {
@@ -1306,9 +1301,7 @@ void privkey_info( void)
 	size = sizeof(buffer);
 	if ((ret=gnutls_x509_privkey_get_key_id(key, 0, buffer, &size)) < 0) 
 	{
-		const char* str = gnutls_strerror(ret);
-		if (str == NULL) str = "unknown error";
-	    	fprintf(stderr, "Error in key id calculation: %s\n", str);
+	    	fprintf(stderr, "Error in key id calculation: %s\n", gnutls_strerror(ret));
 	} else {
 		print = printable;
 		for (i = 0; i < size; i++) {
@@ -2493,8 +2486,7 @@ void certtool_version(void)
 
 void print_license(void)
 {
-	fprintf(stdout,
-		"\nCopyright (C) 2001-2003 Nikos Mavroyanopoulos\n"
+	fputs(	"\nCopyright (C) 2004 Free Software Foundation\n"
 		"This program is free software; you can redistribute it and/or modify \n"
 		"it under the terms of the GNU General Public License as published by \n"
 		"the Free Software Foundation; either version 2 of the License, or \n"
@@ -2505,5 +2497,5 @@ void print_license(void)
 		"GNU General Public License for more details. \n" "\n"
 		"You should have received a copy of the GNU General Public License \n"
 		"along with this program; if not, write to the Free Software \n"
-		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
+		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n", stdout);
 }

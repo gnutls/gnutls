@@ -56,6 +56,7 @@ int gnutls_x509_crl_init(gnutls_x509_crl * crl)
 				     &(*crl)->crl);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_free( *crl);
 			return _gnutls_asn2err(result);
 		}
 		return 0;	/* success */
@@ -155,7 +156,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
   * gnutls_x509_crl_get_issuer_dn - This function returns the CRL's issuer distinguished name
   * @crl: should contain a gnutls_x509_crl structure
   * @buf: a pointer to a structure to hold the peer's name (may be null)
-  * @sizeof_buf: initialy holds the size of 'buf'
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will copy the name of the CRL issuer in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
@@ -188,7 +189,7 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the peer's name (may be null)
-  * @sizeof_buf: initialy holds the size of 'buf'
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the CRL issuer specified
   * by the given OID. The output will be encoded as described in RFC2253. The output
@@ -225,7 +226,7 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
   * @crl: should contain a gnutls_x509_crl structure
   * @indx: Specifies which DN OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the name (may be null)
-  * @sizeof_oid: initialy holds the size of 'oid'
+  * @sizeof_oid: initially holds the size of 'oid'
   *
   * This function will extract the requested OID of the name of the CRL issuer, specified
   * by the given index. 
@@ -398,7 +399,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl)
   * @crl: should contain a gnutls_x509_crl structure
   * @index: the index of the certificate to extract (starting from 0)
   * @serial: where the serial number will be copied
-  * @serial_size: initialy holds the size of serial
+  * @serial_size: initially holds the size of serial
   * @time: if non null, will hold the time this certificate was revoked
   *
   * This function will return the serial number of the specified, by the index, 

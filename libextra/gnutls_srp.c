@@ -530,7 +530,7 @@ int i;
   *
   * This function specifies what we, in case of a server, are going
   * to do when we have to use a password file. If this callback
-  * function is not provided then gnutls will automaticaly select the
+  * function is not provided then gnutls will automatically select the
   * first password file
   *
   * In case the callback returned a negative number then gnutls will

@@ -7,9 +7,11 @@
 
 static const char* bin2hex( const void* bin, size_t bin_size)
 {
-static char printable[120];
-unsigned char *_bin;
+static char printable[110];
+unsigned char *_bin = bin;
 char* print;
+
+   if (bin_size > 50) bin_size = 50;
 
    print = printable;
    for (i = 0; i < bin_size; i++) {
@@ -65,8 +67,9 @@ static void print_x509_certificate_info(gnutls_session session)
       size = sizeof(serial);
       gnutls_x509_crt_get_serial(cert, serial, &size);
 
+      size = sizeof( serial);
       printf("\tCertificate serial number: %s\n", 
-         bin2hex( serial, serial_size));
+         bin2hex( serial, size));
 
       /* Extract some of the public key algorithm's parameters
        */

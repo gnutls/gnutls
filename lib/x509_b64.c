@@ -164,12 +164,14 @@ int _gnutls_base64_encode(const uint8 * data, size_t data_size, uint8 ** result)
 }
 
 #define INCR(what, size) \
+	do { \
 	what+=size; \
 	if (what > ret) { \
 		gnutls_assert(); \
 		gnutls_free( (*result)); *result = NULL; \
 		return GNUTLS_E_INTERNAL_ERROR; \
-	}
+	} \
+	} while(0) 
 
 /* encodes data and puts the result into result (locally allocated)
  * The result_size (including the null terminator) is the return value.

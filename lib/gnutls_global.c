@@ -328,7 +328,7 @@ parse_version_string( const char *s, int *major, int *minor, int *micro )
   * gnutls_check_version - This function checks the library's version
   * @req_version: the version to check
   *
-  * Check that the the version of the library is at minimum the requested one
+  * Check that the version of the library is at minimum the requested one
   * and return the version string; return NULL if the condition is not
   * satisfied.  If a NULL is passed to this function, no check is done,
   * but the version string is simply returned.
