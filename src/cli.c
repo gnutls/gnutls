@@ -76,13 +76,14 @@ static gnutls_certificate_credentials xcred;
 
 int protocol_priority[PRI_MAX] = { GNUTLS_TLS1_1, GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
 int kx_priority[PRI_MAX] =
-    { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP,
-	/* Do not use anonymous authentication, unless you know what that means */
-	GNUTLS_KX_ANON_DH, GNUTLS_KX_RSA_EXPORT, 0
+    { GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_SRP_RSA, GNUTLS_KX_SRP_DSS, 
+    GNUTLS_KX_RSA, GNUTLS_KX_SRP,
+    /* Do not use anonymous authentication, unless you know what that means */
+    GNUTLS_KX_RSA_EXPORT, GNUTLS_KX_ANON_DH, 0
 };
 int cipher_priority[PRI_MAX] =
-    { GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_AES_128_CBC,
-	GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_AES_256_CBC,
+    { GNUTLS_CIPHER_AES_256_CBC, GNUTLS_CIPHER_AES_128_CBC,
+	GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128,
 	GNUTLS_CIPHER_ARCFOUR_40, 0
 };
 int comp_priority[PRI_MAX] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
