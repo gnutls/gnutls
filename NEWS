@@ -3,6 +3,9 @@ Version 0.9.6
   functions which return a unique (per public key) ID. These can
   be used to check if the private key corresponds to a given certificate.
 - Corrections in the TLS layer openpgp certificate packet parser.
+- Corrected a bug in the record layer buffering, which affected
+  the case where external pull function was used. Report and patch
+  by Sergey Poznyakoff <gray@Mirddin.farlep.net>.
 
 Version 0.9.5 (06/04/2003)
 - Several improvements in the PKCS #7 handling
@@ -80,7 +83,7 @@ Version 0.9.0 (03/03/2003)
 - Added protection against the new TLS 1.0 record layer timing attack.
 - Added support for Certificate revocation lists. Functions defined
   in gnutls/x509.h
-- The only functions were removed are:
+- The only functions that were removed are:
   gnutls_x509_certificate_to_xml()
   gnutls_x509_extract_dn_string()
 - Ported to libtasn1 0.2.x
