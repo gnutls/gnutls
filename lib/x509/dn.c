@@ -570,7 +570,7 @@ int _gnutls_x509_get_dn_oid(ASN1_TYPE asn1_struct,
                return GNUTLS_E_SHORT_MEMORY_BUFFER;
             }
 
-            memcpy(oid, _oid, len);
+            memcpy(_oid, oid, len);
             *sizeof_oid = len - 1;
 
             return 0;
