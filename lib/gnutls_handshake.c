@@ -20,6 +20,7 @@
 #define HASH_TRUE 1
 #define HASH_FALSE 0
 
+#define MASTER_SECRET "master secret"
 
 int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 {
@@ -157,9 +158,11 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 			ret = GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 	}
 
-	master = gnutls_PRF( premaster, premaster_size, "master secret", strlen("master secret"),
+	master = gnutls_PRF( premaster, premaster_size, MASTER_SECRET, strlen(MASTER_SECRET),
 						random, 64 ,48);
-	fprintf(stderr, "master: %s\n", bin2hex(master, 48));
+
+
+	fprintf(stderr, "master secret: %s\n", bin2hex(master, 48));
 	memmove( state->security_parameters.master_secret, master, 48);
 
 	secure_free(master);
@@ -287,9 +290,11 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 		}
 	}
 
-	master = gnutls_PRF( premaster, premaster_size, "master secret", strlen("master secret"),
+	master = gnutls_PRF( premaster, premaster_size, MASTER_SECRET, strlen(MASTER_SECRET),
 						random, 64 ,48);
-	fprintf(stderr, "master: %s\n", bin2hex(master, 48));
+
+
+	fprintf(stderr, "master secret: %s\n", bin2hex(master, 48));
 
 	memmove( state->security_parameters.master_secret, master, 48);
 

@@ -67,6 +67,22 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	gnutls_free(*state);
 }
 
+
+void* _gnutls_cal_PRF_A(hashid algorithm, void* secret, int secret_size, void* seed, int seed_size) {
+MHASH td1;
+void *A;
+
+	td1 =
+	    mhash_hmac_init(algorithm, secret, secret_size, mhash_get_hash_pblock(algorithm));
+
+	mhash(td1, seed, seed_size);
+
+	A = mhash_hmac_end(td1);
+
+	return A;
+}
+
+
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
@@ -75,37 +91,36 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 {
 
 	MHASH td1, td2;
-	char *ret = secure_malloc(total_bytes);
-	void *A;
-	int i = 0, times, copy_bytes = 0, how;
+	char *ret = secure_calloc(1, total_bytes);
+	void *A, *Atmp;
+	int i = 0, times, copy_bytes = 0, how, blocksize, A_size;
 	void *final;
 
+	blocksize = mhash_get_block_size(algorithm);
 	do {
-		i += mhash_get_block_size(algorithm);
+		i += blocksize;
 	} while (i < total_bytes);
 
-	A = seed;
-	times = i / mhash_get_block_size(algorithm);
+	A = _gnutls_cal_PRF_A( algorithm, secret, secret_size, seed, seed_size);
+	A_size = blocksize;
 
+	times = i / blocksize;
 	for (i = 0; i < times; i++) {
 		td2 =
 		    mhash_hmac_init(algorithm, secret, secret_size,
 				    mhash_get_hash_pblock(algorithm));
 
-		td1 =
-		    mhash_hmac_init(algorithm, secret, secret_size,
-				    mhash_get_hash_pblock(algorithm));
-		mhash(td1, A, seed_size);
-
-		A = mhash_hmac_end(td1);
-
-		mhash(td2, A, mhash_get_block_size(algorithm));
+		Atmp = _gnutls_cal_PRF_A( algorithm, secret, secret_size, A, A_size);
+		free(A);
+		A = Atmp;
+		
+		mhash(td2, A, A_size);
 		mhash(td2, seed, seed_size);
 		final = mhash_hmac_end(td2);
 
-		copy_bytes = mhash_get_block_size(algorithm);
+		copy_bytes = blocksize;
 		if ((i + 1) * copy_bytes < total_bytes) {
-			how = mhash_get_block_size(algorithm);
+			how = blocksize;
 		} else {
 			how = total_bytes - (i) * copy_bytes;
 		}
@@ -114,8 +129,6 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 			memmove(&ret[i * copy_bytes], final, how);
 		}
 		free(final);
-		if (i > 0)
-			free(A);
 	}
 
 	return ret;
@@ -157,7 +170,7 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 	    gnutls_P_hash(MHASH_SHA1, s2, l_s2, s_seed, s_seed_size,
 			  total_bytes);
 
-	ret = secure_malloc(total_bytes);
+	ret = secure_calloc(1, total_bytes);
 	gnutls_free(s_seed);
 	for (i = 0; i < total_bytes; i++) {
 		ret[i] = o1[i] ^ o2[i];
