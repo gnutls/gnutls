@@ -27,7 +27,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include <malloc.h>
 
 #include "opencdk.h"
 #include "main.h"
