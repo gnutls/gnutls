@@ -89,7 +89,7 @@ main ()
                 cdk_check_version(NULL) );
         printf("*** You need a version of LIBOPENCDK newer than %s. The latest version of\n",
                "$min_libopencdk_version" );
-        printf("*** LIBOPENCDK is always available from ftp://ftp.gnupg.org/pub/libopencdk/gnupg.\n");
+        printf("*** LIBOPENCDK is always available from ftp://ftp.gnutls.org/pub/gnutls/opencdk/.\n");
         printf("*** (It is distributed along with GnuPG).\n");
         printf("*** \n");
         printf("*** If you have already installed a sufficiently new version, this error\n");
