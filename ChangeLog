@@ -1,3 +1,31 @@
+2003-10-03 12:16  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/tex/Makefile.am, doc/tex/funcs.tex,
+	src/common.c:
+
+	Updated the openpgp key API.  
+
+2003-10-03 11:14  nmav <nmav@gnutls.org>
+
+	* configure.in:
+
+	Converted the pgp verification functions to the new API.  
+
+2003-10-03 09:09  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_alert.c, lib/gnutls_algorithms.c, src/cli.c,
+	src/common.c, src/common.h, src/serv.c:
+
+	Applied patch by Arne that fixes several possible NULL pointer
+	dereferences.  
+
+2003-10-03 09:05  nmav <nmav@gnutls.org>
+
+	* src/cli.c:
+
+	Disable buffering.  Clear FD set.  Patch by Simon Josefsson 
+	<jas@extundo.com> 
+
 2003-10-02 15:02  nmav <nmav@gnutls.org>
 
 	* src/: cli.c, common.h, serv.c (utags: gnutls_0_9_8):
