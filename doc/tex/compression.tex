@@ -2,8 +2,8 @@
 \index{Compression algorithms}
 The TLS' record layer also supports compression. The algorithms
 implemented in \gnutls{} can found in figure \ref{fig:compression}.
-All the algorithms should be considered as \gnutls' extensions\footnote{
-You should use \printfunc{gnutls_handshake_set_private_extensions}{gnutls\_handshake\_set\_private\_extensions}
+All the algorithms except for the ones referenced in \cite{TLSCOMP}, should be 
+considered as \gnutls' extensions\footnote{You should use \printfunc{gnutls_handshake_set_private_extensions}{gnutls\_handshake\_set\_private\_extensions}
 to enable private extensions.}, and
 should be advertised only when the peer is known to have a compliant client,
 to avoid interoperability problems.
@@ -17,7 +17,7 @@ compression increases latency.
 
 \par
 The record layer compression in \gnutls{} is implemented based on
-the \cite{TLSCOMP} paper.
+the paper \cite{TLSCOMP}.
 
 \begin{figure}[hbtp]
 \begin{tabular}{|l|p{9cm}|}
