@@ -638,15 +638,24 @@ int start, end;
 }
 
 /* Finds the appropriate certificate depending on the cA Distinguished name
- * advertized by the server
+ * advertized by the server. If none matches then returns -1 as index.
  */
 static int _gnutls_find_acceptable_client_cert( const X509PKI_CREDENTIALS cred, const opaque* data, 
 	int data_size, int *ind) {
 int result, size;
 int indx = -1;
-int i, j;
+int i, j, try=0;
 gnutls_datum odn;
 
+	if (cred->client_cert_callback!=NULL) {
+		/* if try>=0 then the client wants automatic
+		 * choose of certificate, otherwise (-1), he
+		 * will be prompted to choose one.
+		 */
+		try = cred->client_cert_callback( NULL, NULL, 0);
+	}
+	
+	if (try>=0)
 	do {
 
 		DECR_LEN(data_size, 2);
@@ -686,9 +695,26 @@ gnutls_datum odn;
 
 	} while (1);
 
-	if (indx==-1 && cred->ncerts > 0) /* use the first certificate */
-		indx = 0;
+	if (indx==-1 && cred->client_cert_callback!=NULL && cred->ncerts > 0) {/* use a callback to get certificate */
+		gnutls_DN *cdn=NULL;
+		gnutls_DN *idn=NULL;
 		
+		cdn = gnutls_malloc( cred->ncerts* sizeof(gnutls_DN));
+		if (cdn==NULL) goto clear;
+		
+		idn = gnutls_malloc( cred->ncerts* sizeof(gnutls_DN));
+		if (idn==NULL) goto clear;
+
+		for(i=0;i<cred->ncerts;i++) {
+			memcpy( &cdn[i], &cred->cert_list[i][0].cert_info, sizeof(gnutls_DN));
+			memcpy( &idn[i], &cred->cert_list[i][0].issuer_info, sizeof(gnutls_DN));
+		}
+		indx = cred->client_cert_callback( cdn, idn, cred->ncerts);
+	
+		clear:
+			gnutls_free(cdn);
+			gnutls_free(idn);
+	}
 	*ind = indx;
 	return 0;
 }

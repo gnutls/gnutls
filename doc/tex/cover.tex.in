@@ -8,7 +8,7 @@
  \HRule
  \begin{flushright}
   a Transport Layer Security Library\\[1mm]
-  This document applies to \gnutls 0.2.0
+  This document applies to \gnutls @VERSION@
  \end{flushright}
 
  \vspace*{\stretch{2}}

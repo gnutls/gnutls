@@ -56,7 +56,7 @@ GNUTLS_STATE initialize_state()
 
    /* request client certificate if any.
     */
-   gnutls_set_certificate_request( state, GNUTLS_CERT_REQUEST);
+   gnutls_x509pki_set_cert_request( state, GNUTLS_CERT_REQUEST);
    
    return state;
 }

@@ -97,7 +97,7 @@ GNUTLS_STATE initialize_state()
 
 	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
-	gnutls_set_certificate_request( state, GNUTLS_CERT_REQUEST);
+	gnutls_x509pki_set_cert_request( state, GNUTLS_CERT_REQUEST);
 
 	return state;
 }

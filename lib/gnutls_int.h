@@ -369,6 +369,11 @@ typedef struct {
 	int				peer_pk_algorithm;
 	/* holds the username got in the srp tls extension
 	 */
+
+	/* this is a callback function to call if no appropriate
+	 * client certificates were found.
+	 */
+	int				(*x509_client_cert_callback)(void*,void*,int);
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

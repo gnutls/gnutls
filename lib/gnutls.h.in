@@ -119,7 +119,6 @@ int gnutls_set_mac_priority( GNUTLS_STATE state, LIST);
 int gnutls_set_compression_priority( GNUTLS_STATE state, LIST);
 int gnutls_set_kx_priority( GNUTLS_STATE state, LIST);
 int gnutls_set_protocol_priority( GNUTLS_STATE state, LIST);
-int gnutls_set_certificate_request( GNUTLS_STATE, CertificateRequest);
 
 /* set our version - 0 for TLS 1.0 and 1 for SSL3 */
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);

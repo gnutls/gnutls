@@ -1,5 +1,6 @@
 Version 0.2.3 (21/08/2001)
 - Fixed several memory leaks
+- Added ability to specify callback for x509 client certificate selection
 
 Version 0.2.2 (21/08/2001)
 - Several bugfixes (library and documentation)

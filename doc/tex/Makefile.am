@@ -1,6 +1,7 @@
 EXTRA_DIST = gnutls-api.tex gnutls.tex gnutls.ps gnutls.html  \
 	ex1.tex ex2.tex ex3.tex srp1.tex serv1.tex gnutls.css \
-	nx_grp_g.png  prev_g.png  up_g.png fdl.tex macros.tex
+	nx_grp_g.png  prev_g.png  up_g.png fdl.tex macros.tex \
+	cover.tex.in
 
 gnutls-api: gnutls.html gnutls.ps
 gnutls-api.tex: 

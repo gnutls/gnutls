@@ -26,6 +26,11 @@ typedef struct {
 	gnutls_cert * ca_list;
 	int ncas;	/* number of CAs in the ca_list 
 			 */
+
+	/* this is a callback function to call if no appropriate
+	 * client certificates were found.
+	 */
+	int		(*client_cert_callback)(gnutls_DN*, gnutls_DN*, int);
 } X509PKI_CREDENTIALS_INT;
 
 /* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */

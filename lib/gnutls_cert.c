@@ -904,7 +904,7 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
 }
 
 /**
-  * gnutls_set_certificate_request - Used to set whether to request a client certificate
+  * gnutls_x509pki_set_cert_request - Used to set whether to request a client certificate
   * @state: is an &GNUTLS_STATE structure.
   * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
   *
@@ -915,7 +915,44 @@ int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
   * call this function then the client will not be asked to
   * send a certificate.
   **/
-int gnutls_set_certificate_request( GNUTLS_STATE state, CertificateRequest req) {
+int gnutls_x509pki_set_cert_request( GNUTLS_STATE state, CertificateRequest req) {
 	state->gnutls_internals.send_cert_req = req;
+	return 0;
+}
+
+/**
+  * gnutls_x509pki_set_cert_callback - Used to set a callback while selecting the proper (client) certificate
+  * @cred: is an &X509PKI_CLIENT_CREDENTIALS structure.
+  * @x509_cert_callback: is the callback function
+  *
+  * The callback's function form is:
+  * int (*callback)(gnutls_DN *client_cert, gnutls_DN *issuer_cert, int ncerts);
+  * where client_cert contains ncerts gnutls_DN structures which hold
+  * DN data from the client certificate, and issuer_cert holds DN data
+  * for the issuer of the certificate. Ie issuer_cert[i] is the issuer of
+  * client_cert[i]. (i < ncerts)
+  *
+  * This function specifies what we (in case of a client) are going
+  * to do when we have to send a certificate. If this callback
+  * function is not provided then gnutls will automaticaly try to
+  * find an appropriate certificate to send.
+  *
+  * If the callback function is provided then gnutls will call it
+  * once with NULL parameters. If the callback function returns
+  * a positive or zero number then gnutls will attempt to automaticaly
+  * choose the appropriate certificate. If this fails then it will
+  * call the callback function.
+  *
+  * In case the callback returned a negative number then gnutls will
+  * not attempt to choose the appropriate certificate and will rely
+  * only to the return value of the callback function.
+  *
+  * The callback function should return the index of the certificate
+  * choosen by the user.
+  *
+  * This function returns 0 on success.
+  **/
+int gnutls_x509pki_set_cert_callback( X509PKI_CREDENTIALS cred, int (*x509_cert_callback)(gnutls_DN*, gnutls_DN*, int)) {
+	cred->client_cert_callback = x509_cert_callback;
 	return 0;
 }
