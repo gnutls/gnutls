@@ -25,8 +25,8 @@
 #include <defines.h>
 
 /*
-#define WRITE_DEBUG
 #define BUFFERS_DEBUG
+#define WRITE_DEBUG
 #define HARD_DEBUG
 #define HANDSHAKE_DEBUG
 #define RECORD_DEBUG
@@ -360,10 +360,12 @@ typedef struct {
 					 */
 	opaque				recv_buffer_data[MAX_RECV_SIZE];
 	int				recv_buffer_data_size;
-	int				send_buffer_ind[2]; /* 0 holds the
-	                                * position last write was interrupted,
-	                                * and 1 holds the size of the last
-	                                * data requested to send.
+	gnutls_datum			send_buffer; /* holds cached data
+					* for the gnutls_write_buffered()
+					* function.
+					*/ 
+	int				send_buffer_prev_size; /* holds the
+	                                * data written in the previous runs.
 	                                */
 
 					/* 0 if no peeked data was kept, 1 otherwise.

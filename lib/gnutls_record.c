@@ -147,6 +147,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 	GNUTLS_FREE(state->gnutls_internals.buffer.data);
 	GNUTLS_FREE(state->gnutls_internals.buffer_handshake.data);
 	GNUTLS_FREE(state->gnutls_internals.hash_buffer.data);
+	GNUTLS_FREE(state->gnutls_internals.send_buffer.data);
 
 	gnutls_clear_creds( state);
 
@@ -407,10 +408,10 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
-	int i, cipher_size;
-	int ret = 0;
-	int iterations;
-	int Size;
+	const uint8 *ptr;
+	int cipher_size;
+	int ret = 0, retval = 0;
+	int Size, data2send;
 	uint8 headers[5];
 	const uint8 *data=_data;
 	GNUTLS_Version lver;
@@ -423,14 +424,6 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		return GNUTLS_E_INVALID_SESSION;
 	}
 	
-	if (sizeofdata < MAX_ENC_LEN) {
-		iterations = 1;
-		Size = sizeofdata;
-	} else {
-		iterations = sizeofdata / MAX_ENC_LEN;
-		Size = MAX_ENC_LEN;
-	}
-
 	headers[0]=type;
 	
 	if (htype==GNUTLS_CLIENT_HELLO) { /* then send the lowest 
@@ -454,22 +447,61 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
-	for (i = 0; i < iterations; i++) {
-		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, &data[i*Size], Size, &cipher, type);
-		if (cipher_size <= 0) {
-			gnutls_assert();
-			if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-			return cipher_size; /* error */
+	/* in this loop we encrypt all data that are a multiple
+	 * of the MAC_ENC_LEN;
+	 */
+	data2send = sizeofdata;
+	ptr = data;
+	retval = 0;
+
+	while( data2send != 0) {
+	
+		if (data2send - MAX_ENC_LEN >= 0) {
+			data2send -= MAX_ENC_LEN;
+			Size = MAX_ENC_LEN;
+		} else {
+			Size = data2send;
+			data2send = 0;
 		}
-		
-		if (_gnutls_write(cd, state, cipher, cipher_size, 0) != cipher_size) {
+
+		/* Only encrypt if we don't have data to send 
+		 * from the previous run. - probably interrupted.
+		 */
+		if (state->gnutls_internals.send_buffer.size == 0) {
+			cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, ptr, Size, &cipher, type);
+			if (cipher_size <= 0) {
+				gnutls_assert();
+				if (cipher_size==0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
+				return cipher_size; /* error */
+			}
+		} else {
+			/* order write buffered to write
+			 * the buffered data.
+			 */
+			cipher = NULL;
+			cipher_size = state->gnutls_internals.send_buffer.size +
+				state->gnutls_internals.send_buffer_prev_size;
+		}
+
+		ptr += Size;
+
+		if ( (ret=_gnutls_write_buffered(cd, state, cipher, cipher_size)) != cipher_size) {
 			gnutls_free( cipher);
+			if ( ret<0 && gnutls_is_fatal_error(ret)==0) {
+				/* If we have sent any data then return
+				 * that value.
+				 */
+				gnutls_assert();
+				if (retval > 0) return retval;
+				return ret;
+			}
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			gnutls_assert();
-			return GNUTLS_E_UNABLE_SEND_DATA;
+			return ret;
 		}
 
+		retval += Size;
 		gnutls_free(cipher);
 
 #ifdef RECORD_DEBUG
@@ -487,40 +519,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 	}
 
-
-	/* rest of data 
-	 */
-	if (iterations > 1) {
-		Size = sizeofdata % MAX_ENC_LEN;
-		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, &data[i*Size], Size, &cipher, type);
-		if (cipher_size<=0) {
-			if (cipher_size == 0) cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-			gnutls_assert();
-			return cipher_size;
-		}
-		
-		if (_gnutls_write(cd, state, cipher, cipher_size, 0) != cipher_size) {
-			gnutls_free(cipher);
-			state->gnutls_internals.valid_connection = VALID_FALSE;
-			state->gnutls_internals.resumable = RESUME_FALSE;
-			gnutls_assert();
-			return GNUTLS_E_UNABLE_SEND_DATA;
-		}
-
-		gnutls_free(cipher);
-
-		/* increase sequence number
-		 */
-		if (uint64pp( &state->connection_state.write_sequence_number)!=0) {
-			state->gnutls_internals.valid_connection = VALID_FALSE;
-			gnutls_assert();
-			return GNUTLS_E_RECORD_LIMIT_REACHED;
-		}
-	}
-
-	ret += sizeofdata;
-
-	return ret;
+	return retval;
 }
 
 /* This function is to be called if the handshake was successfully 

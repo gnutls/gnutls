@@ -360,7 +360,6 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	}
 }
 
-
 /* This function is like write. But it does not return -1 on error.
  * It does return gnutls_errno instead.
  *
@@ -372,43 +371,58 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
  * to decrypt and verify the integrity. 
  *
  */
-ssize_t _gnutls_write(int fd, GNUTLS_STATE state, const void *iptr, size_t n, int flags)
+ssize_t _gnutls_write_buffered(int fd, GNUTLS_STATE state, const void *iptr, size_t n)
 {
 	size_t left;
 #ifdef WRITE_DEBUG
 	int j,x, sum=0;
 #endif
-	ssize_t i = 0;
-	size_t start_pos = 0;
-	const char *ptr = iptr;
+	ssize_t retval, i;
+	const opaque * ptr;
 
+	ptr = iptr;
+	
 	/* In case the previous write was interrupted, check if the
-	 * current data have the same size with the previous.
-	 * If they haven't return an error.
+	 * iptr != NULL and we have data in the buffer.
+	 * If this is true then return an error.
 	 */
-	if (state->gnutls_internals.send_buffer_ind[1] > 0 && state->gnutls_internals.send_buffer_ind[1] != n) {
+	if (state->gnutls_internals.send_buffer.size > 0 && iptr != NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
-	} else if (state->gnutls_internals.send_buffer_ind[1] > 0) {
-		/* send only the data we haven't send before. 
-		 */
-		n -= state->gnutls_internals.send_buffer_ind[0];
-		start_pos = state->gnutls_internals.send_buffer_ind[0];
 	}
 
+	/* If data in the buffer exist
+	 */
+	if (iptr == NULL) {
+		if ( state->gnutls_internals.send_buffer.size == 0) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_PARAMETERS;
+		} else {
+			ptr = state->gnutls_internals.send_buffer.data;
+			n = state->gnutls_internals.send_buffer.size;
+		}
+	}
+
+	i = 0;
 	left = n;
 	while (left > 0) {
 		
 		if (_gnutls_push_func==NULL) 
-			i = send(fd, &ptr[start_pos+i], left, flags);
+			i = send(fd, &ptr[i], left, 0);
 		else
-			i = _gnutls_push_func(fd, &ptr[start_pos+i], left);
+			i = _gnutls_push_func(fd, &ptr[i], left);
 
 		if (i == -1) {
 			if (errno == EAGAIN || errno == EINTR) {
-				state->gnutls_internals.send_buffer_ind[0] = n - left;
-				state->gnutls_internals.send_buffer_ind[1] = n;
-				gnutls_assert();
+				state->gnutls_internals.send_buffer_prev_size += n - left;
+
+				state->gnutls_internals.send_buffer.data = gnutls_realloc_fast( state->gnutls_internals.send_buffer.data, left);
+				if (state->gnutls_internals.send_buffer.data == NULL) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+				state->gnutls_internals.send_buffer.size = left;
+				memcpy( state->gnutls_internals.send_buffer.data, &ptr[n-left], left);
 #ifdef WRITE_DEBUG
 				_gnutls_log( "WRITE: Interrupted. wrote %d bytes to %d. Left %d\n", n-left, fd, left);
 #endif
@@ -423,7 +437,10 @@ ssize_t _gnutls_write(int fd, GNUTLS_STATE state, const void *iptr, size_t n, in
 		left -= i;
 	}
 
-	state->gnutls_internals.send_buffer_ind[0] = state->gnutls_internals.send_buffer_ind[1] = 0;
+	retval = n + state->gnutls_internals.send_buffer_prev_size;
+
+	state->gnutls_internals.send_buffer.size = 0;
+	state->gnutls_internals.send_buffer_prev_size = 0;
 
 #ifdef WRITE_DEBUG
 	_gnutls_log( "WRITE: wrote %d bytes to %d\n", n, fd);
@@ -438,7 +455,7 @@ ssize_t _gnutls_write(int fd, GNUTLS_STATE state, const void *iptr, size_t n, in
 	
 	}
 #endif
-	return n;
+	return retval;
 
 }
 

@@ -444,8 +444,10 @@ int main(int argc, char **argv)
 
 			if (ret > 0) {
 				if (http == 0) {
-					gnutls_write(sd, state, buffer,
+					do {
+						ret = gnutls_write(sd, state, buffer,
 						     strlen(buffer));
+					} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 				} else {
 					strcpy( http_buffer, HTTP_BEGIN);
 					peer_print_info(sd, state);
