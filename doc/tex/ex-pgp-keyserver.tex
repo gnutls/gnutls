@@ -8,6 +8,11 @@
 
 /* A callback function that tries to connect
  * to a public keyserver to get the specified key.
+ * The callback should be set as:
+ *
+ * gnutls_openpgp_set_recv_key_function( session, recv_openpgp_key);
+ *
+ * in the initialization of a gnutls session.
  */
 
 static const char *hostname = "keyserver.somewhere.com";
