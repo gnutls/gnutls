@@ -455,8 +455,11 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 							    GNUTLS_E_SHORT_MEMORY_BUFFER;
 						}
 						*sizeof_buf = size; /* -1 for the null +1 for the '#' */
-						strcpy(buf, "#");
-						strcat(buf, res);
+						
+						if (buf) {
+							strcpy(buf, "#");
+							strcat(buf, res);
+						}
 
 						return 0;
 					} else {

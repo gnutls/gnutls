@@ -776,7 +776,9 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
 	}
 
 	*sizeof_buf = output.size;
-	memcpy( buf, output.data, output.size);
+	
+	if (buf)
+		memcpy( buf, output.data, output.size);
 
 	_gnutls_free_datum( &output);
 	
@@ -999,5 +1001,6 @@ gnutls_datum tmp;
 	
 	tmp.data = cert_buf;
 	tmp.size = cert_buf_size;
+
 	return gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
 }

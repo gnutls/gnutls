@@ -151,7 +151,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
   *
   **/
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, 
-	int indx, char* certificate, int* certificate_size)
+	int indx, unsigned char* certificate, int* certificate_size)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len;
@@ -260,13 +260,14 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 			
 		end = end-start+1;
 		
-		if (certificate!=NULL && end <= *certificate_size)
-			memcpy( certificate, &tmp[start], end);
-		else {
+		if ( end > *certificate_size) {
 			*certificate_size = end;
 			result = GNUTLS_E_SHORT_MEMORY_BUFFER;
 			goto cleanup;
 		}
+
+		if (certificate)
+			memcpy( certificate, &tmp[start], end);
 
 		*certificate_size = end;
 

@@ -269,7 +269,7 @@ int gnutls_certificate_client_get_request_status(gnutls_session session)
   * gnutls_fingerprint - This function calculates the fingerprint of the given data
   * @algo: is a digest algorithm
   * @data: is the data
-  * @result: is the place where the result will be copied. 
+  * @result: is the place where the result will be copied (may be null). 
   * @result_size: should hold the size of the result. The actual size
   * of the returned result will also be copied there.
   *
@@ -297,13 +297,15 @@ int gnutls_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, c
 		return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	}
 	*result_size = hash_len;
+
+	if (result) {
+		td = _gnutls_hash_init( algo);
+		if (td==NULL) return GNUTLS_E_HASH_FAILED;
 	
-	td = _gnutls_hash_init( algo);
-	if (td==NULL) return GNUTLS_E_HASH_FAILED;
+		_gnutls_hash( td, data->data, data->size);
 	
-	_gnutls_hash( td, data->data, data->size);
-	
-	_gnutls_hash_deinit( td, result);
+		_gnutls_hash_deinit( td, result);
+	}
 		
 	return 0;
 }
