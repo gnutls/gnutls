@@ -30,8 +30,8 @@ static int hostname_compare(const char *certname, const char *hostname);
   * @hostname: A null terminated string that contains a DNS name
   *
   * This function will check if the given certificate's subject matches
-  * the given hostname. This is a basic implementation of the matching described
-  * in RFC2818 (HTTPS).
+  * the given hostname. This is a basic implementation of the matching 
+  * described in RFC2818 (HTTPS), which takes into account wildcards.
   *
   * Returns non zero on success, and zero on failure.
   *

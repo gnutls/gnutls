@@ -38,6 +38,6 @@ examples: $(EXAMPLE_OBJECTS)
 	@mkdir examples/ && \
 	for i in $(EXAMPLE_OBJECTS); do \
 		out=`echo -n $$i|sed s/\.tex//`; \
-		cat $$i|grep -v verbatim > examples/$$out.c; \
+		cat $$i|grep -v "^\\\\" > examples/$$out.c; \
 		done
 

@@ -18,7 +18,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
 	gnutls-api.tex io_debug.h ext_max_record.h gnutls_session_pack.h \
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h \
-	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h
+	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h auth_dh_common.h
 lib_LTLIBRARIES = libgnutls.la
 
 
@@ -36,7 +36,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_dh_primes.c ext_max_record.c gnutls_alert.c gnutls_int_compat.c \
 	gnutls_str.c gnutls_state.c gnutls_x509.c ext_cert_type.c \
 	x509_xml.c gnutls_rsa_export.c auth_rsa_export.c rfc2818_hostname.c \
-	ext_server_name.c
+	ext_server_name.c auth_dh_common.c
 
 # Separate so we can create the documentation
 
