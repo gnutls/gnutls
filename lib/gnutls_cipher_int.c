@@ -28,7 +28,7 @@ GNUTLS_CIPHER_HANDLE gnutls_cipher_init( BulkCipherAlgorithm cipher, void* key, 
 GNUTLS_CIPHER_HANDLE ret;
 
 	switch (cipher) {
-	case GNUTLS_NULL:
+	case GNUTLS_NULL_CIPHER:
 		ret = GNUTLS_CIPHER_FAILED;
 		break;
 	case GNUTLS_RIJNDAEL:

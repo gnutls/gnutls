@@ -32,7 +32,7 @@ uLongf size;
 int err;
 
 	switch (algorithm) {
-	case GNUTLS_COMPRESSION_NULL:
+	case GNUTLS_NULL_COMPRESSION:
 		*compressed = gnutls_malloc(plain_size);
 		memmove(*compressed, plain, plain_size);
 		compressed_size = plain_size;
@@ -72,7 +72,7 @@ uLongf size;
 
 	if (compressed_size > MAX_COMP_SIZE) return GNUTLS_E_DECOMPRESSION_FAILED;
 	switch (algorithm) {
-	case GNUTLS_COMPRESSION_NULL:
+	case GNUTLS_NULL_COMPRESSION:
 		*plain = gnutls_malloc(compressed_size);
 		memmove(*plain, compressed, compressed_size);
 		plain_size = compressed_size;

@@ -34,7 +34,9 @@
 
 #define SA struct sockaddr
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
-#define MAX_BUF 50
+#define MAX_BUF 4096
+
+#define RESUME
 
 #define MAX(X,Y) (X >= Y ? X : Y);
 
@@ -70,11 +72,12 @@ int main()
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");
 
+#ifdef RESUME
 	gnutls_init(&state, GNUTLS_CLIENT);
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
 	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
-	gnutls_set_compression_priority( state, 1, GNUTLS_COMPRESSION_NULL);
+	gnutls_set_compression_priority( state, 1, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 	ret = gnutls_handshake(sd, state);
@@ -107,14 +110,16 @@ int main()
 
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");
-	
+
+#endif
+
 	/* Begin handshake again */
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
 	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
-	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_COMPRESSION_NULL);
+	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 3, GNUTLS_KX_ANON_DH, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 

@@ -22,13 +22,13 @@ enum ContentType { GNUTLS_APPLICATION_DATA=23 };
 typedef enum ContentType ContentType;
 #define GNUTLS_AES GNUTLS_RIJNDAEL
 
-enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
+enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL };
 typedef enum BulkCipherAlgorithm BulkCipherAlgorithm;
 enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH };
 typedef enum KXAlgorithm KXAlgorithm;
-enum MACAlgorithm { GNUTLS_MAC_NULL, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
+enum MACAlgorithm { GNUTLS_NULL_MAC, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
 typedef enum MACAlgorithm MACAlgorithm;
-enum CompressionMethod { GNUTLS_COMPRESSION_NULL, GNUTLS_ZLIB=224 };
+enum CompressionMethod { GNUTLS_NULL_COMPRESSION, GNUTLS_ZLIB=224 };
 typedef enum CompressionMethod CompressionMethod;
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 typedef enum ConnectionEnd ConnectionEnd;
