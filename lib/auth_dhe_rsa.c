@@ -184,17 +184,22 @@ static int gen_dhe_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 
 	X = gnutls_calc_dh_secret(&x, state->gnutls_key->client_g,
 				  state->gnutls_key->client_p);
-	if (X==NULL)
+	if (X==NULL || x==NULL) {
+		gnutls_assert();
+		_gnutls_mpi_release( &x);
+		_gnutls_mpi_release( &X);
 		return GNUTLS_E_MEMORY_ERROR;
-
+	}
+	
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_X + 2);
-	if (*data == NULL)
+	if (*data == NULL) {
+		_gnutls_mpi_release( &x);
+		_gnutls_mpi_release( &X);
 		return GNUTLS_E_MEMORY_ERROR;
-
+	}
+	
 	gcry_mpi_print(GCRYMPI_FMT_USG, &(*data)[2], &n_X, X);
-	(*data)[0] = 1;		/* extern - explicit since we do not have
-				   certificate */
 	_gnutls_mpi_release(&X);
 
 	WRITEuint16(n_X, &(*data)[0]);
@@ -203,9 +208,12 @@ static int gen_dhe_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	state->gnutls_key->KEY =
 	    gnutls_calc_dh_key(state->gnutls_key->client_Y, x,
 			       state->gnutls_key->client_p);
-	if (state->gnutls_key->KEY==NULL)
-		return GNUTLS_E_MEMORY_ERROR;
 
+	_gnutls_mpi_release(&x);
+	if (state->gnutls_key->KEY==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	/* THESE SHOULD BE DISCARDED */
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);
@@ -337,20 +345,23 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	}
 
 	g = gnutls_get_dh_params(&p, bits);
-	if (g==NULL) {
+	if (g==NULL || p==NULL) {
 		gnutls_assert();
+		_gnutls_mpi_release( &g);
+		_gnutls_mpi_release( &p);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	state->gnutls_key->KEY =
 	    gnutls_calc_dh_key(state->gnutls_key->client_Y,
 			       state->gnutls_key->dh_secret, p);
-	if (state->gnutls_key->KEY==NULL)
-		return GNUTLS_E_MEMORY_ERROR;
-
-
 	_gnutls_mpi_release(&g);
 	_gnutls_mpi_release(&p);
+
+	if (state->gnutls_key->KEY==NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);
 	_gnutls_mpi_release(&state->gnutls_key->dh_secret);

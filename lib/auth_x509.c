@@ -32,6 +32,7 @@
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_global.h>
+#include <gnutls_record.h>
 #include <x509_verify.h>
 #include <gnutls_sig.h>
 
