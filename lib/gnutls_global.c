@@ -21,13 +21,13 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <x509_asn1.h>
+#include <libasn1.h>
 #include <gnutls_dh.h>
 
 
 /* created by asn1c */
-extern const static_asn gnutls_asn1_tab[];
-extern const static_asn pkix_asn1_tab[];
+extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
+extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 
 
 typedef void (*LOG_FUNC)( const char*);
@@ -35,14 +35,14 @@ typedef void (*LOG_FUNC)( const char*);
 
 LOG_FUNC _gnutls_log_func;
 
-static node_asn *PKIX1_ASN;
-static node_asn *GNUTLS_ASN;
+static ASN1_TYPE PKIX1_ASN;
+static ASN1_TYPE GNUTLS_ASN;
 
-node_asn* _gnutls_get_pkix(void) {
+ASN1_TYPE _gnutls_get_pkix(void) {
 	return PKIX1_ASN;
 }
 
-node_asn* _gnutls_get_gnutls_asn(void) {
+ASN1_TYPE _gnutls_get_gnutls_asn(void) {
 	return GNUTLS_ASN;
 }
 
@@ -171,14 +171,14 @@ int gnutls_global_init( void)
 	 * version.
 	 */
 	
-	result=asn1_create_tree( (void*)pkix_asn1_tab, &PKIX1_ASN);
-	if (result != ASN_OK) {
+	result=asn1_array2tree( pkix_asn1_tab, &PKIX1_ASN, NULL);
+	if (result != ASN1_SUCCESS) {
 		return _gnutls_asn2err(result);
 	}
 
-	result=asn1_create_tree( (void*)gnutls_asn1_tab, &GNUTLS_ASN);
-	if (result != ASN_OK) {
-		asn1_delete_structure( PKIX1_ASN);
+	result=asn1_array2tree( gnutls_asn1_tab, &GNUTLS_ASN, NULL);
+	if (result != ASN1_SUCCESS) {
+		asn1_delete_structure(& PKIX1_ASN);
 		return _gnutls_asn2err(result);
 	}
 
@@ -204,8 +204,8 @@ void gnutls_global_deinit( void) {
 	_gnutls_init--;
 
 	if (_gnutls_init==0) {
-		asn1_delete_structure( GNUTLS_ASN);
-		asn1_delete_structure( PKIX1_ASN);
+		asn1_delete_structure(& GNUTLS_ASN);
+		asn1_delete_structure(& PKIX1_ASN);
 	
 		_gnutls_dh_clear_mpis();
 	}

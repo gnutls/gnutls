@@ -25,8 +25,7 @@
 #include <x509_b64.h>
 #include <auth_cert.h>
 #include <gnutls_cert.h>
-#include <x509_asn1.h>
-#include <x509_der.h>
+#include <libasn1.h>
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>
@@ -41,14 +40,14 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 {
 	int result;
 	opaque str[MAX_PARAMETER_SIZE];
-	node_asn *pkey_asn;
+	ASN1_TYPE pkey_asn;
 
 	pkey->pk_algorithm = GNUTLS_PK_RSA;
 
 	if ((result =
-	     asn1_create_structure(_gnutls_get_gnutls_asn(),
+	     _gnutls_asn1_create_element(_gnutls_get_gnutls_asn(),
 				   "GNUTLS.RSAPrivateKey", &pkey_asn,
-				   "rsakey")) != ASN_OK) {
+				   "rsakey")) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -59,8 +58,8 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	result = asn1_get_der(pkey_asn, raw_key.data, raw_key.size);
-	if (result != ASN_OK) {
+	result = asn1_der_decoding(&pkey_asn, raw_key.data, raw_key.size, NULL);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -69,7 +68,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 					    str, sizeof(str) - 1,
 					    &pkey->params[0])) < 0) {
 		gnutls_assert();
-		asn1_delete_structure(pkey_asn);
+		asn1_delete_structure(&pkey_asn);
 		return result;
 	}
 
@@ -78,7 +77,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 				   sizeof(str) - 1,
 				   &pkey->params[1])) < 0) {
 		gnutls_assert();
-		asn1_delete_structure(pkey_asn);
+		asn1_delete_structure(&pkey_asn);
 		_gnutls_mpi_release(&pkey->params[0]);
 		return result;
 	}
@@ -90,7 +89,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		gnutls_assert();
 		_gnutls_mpi_release(&pkey->params[0]);
 		_gnutls_mpi_release(&pkey->params[1]);
-		asn1_delete_structure(pkey_asn);
+		asn1_delete_structure(&pkey_asn);
 		return result;
 	}
 
@@ -101,7 +100,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		_gnutls_mpi_release(&pkey->params[0]);
 		_gnutls_mpi_release(&pkey->params[1]);
 		_gnutls_mpi_release(&pkey->params[2]);
-		asn1_delete_structure(pkey_asn);
+		asn1_delete_structure(&pkey_asn);
 		return result;
 	}
 
@@ -113,7 +112,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		_gnutls_mpi_release(&pkey->params[1]);
 		_gnutls_mpi_release(&pkey->params[2]);
 		_gnutls_mpi_release(&pkey->params[3]);
-		asn1_delete_structure(pkey_asn);
+		asn1_delete_structure(&pkey_asn);
 		return result;
 	}
 
@@ -140,14 +139,14 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		_gnutls_mpi_release( &pkey->params[2]);
 		_gnutls_mpi_release( &pkey->params[3]);
 		_gnutls_mpi_release( &pkey->params[4]);
-		asn1_delete_structure(pkey_asn);
+		asn1_delete_structure(&pkey_asn);
 		return result;
 	}
 #endif
 
 	pkey->params_size = RSA_PRIVATE_PARAMS;
 
-	asn1_delete_structure(pkey_asn);
+	asn1_delete_structure(&pkey_asn);
 
 	if (gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
 		_gnutls_mpi_release(&pkey->params[0]);
@@ -170,14 +169,14 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 {
 	int result;
 	opaque str[MAX_PARAMETER_SIZE];
-	node_asn *dsa_asn;
+	ASN1_TYPE dsa_asn;
 
 	pkey->pk_algorithm = GNUTLS_PK_DSA;
 
 	if ((result =
-	     asn1_create_structure(_gnutls_get_gnutls_asn(),
+	     _gnutls_asn1_create_element(_gnutls_get_gnutls_asn(),
 				   "GNUTLS.DSAPrivateKey", &dsa_asn,
-				   "dsakey")) != ASN_OK) {
+				   "dsakey")) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -188,8 +187,8 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	result = asn1_get_der(dsa_asn, raw_key.data, raw_key.size);
-	if (result != ASN_OK) {
+	result = asn1_der_decoding(&dsa_asn, raw_key.data, raw_key.size, NULL);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -198,7 +197,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 					    str, sizeof(str) - 1,
 					    &pkey->params[0])) < 0) {
 		gnutls_assert();
-		asn1_delete_structure(dsa_asn);
+		asn1_delete_structure(&dsa_asn);
 		return result;
 	}
 
@@ -206,7 +205,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 					    str, sizeof(str) - 1,
 					    &pkey->params[1])) < 0) {
 		gnutls_assert();
-		asn1_delete_structure(dsa_asn);
+		asn1_delete_structure(&dsa_asn);
 		_gnutls_mpi_release(&pkey->params[0]);
 		return result;
 	}
@@ -215,7 +214,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 					    str, sizeof(str) - 1,
 					    &pkey->params[2])) < 0) {
 		gnutls_assert();
-		asn1_delete_structure(dsa_asn);
+		asn1_delete_structure(&dsa_asn);
 		_gnutls_mpi_release(&pkey->params[0]);
 		_gnutls_mpi_release(&pkey->params[1]);
 		return result;
@@ -225,7 +224,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 					    str, sizeof(str) - 1,
 					    &pkey->params[3])) < 0) {
 		gnutls_assert();
-		asn1_delete_structure(dsa_asn);
+		asn1_delete_structure(&dsa_asn);
 		_gnutls_mpi_release(&pkey->params[0]);
 		_gnutls_mpi_release(&pkey->params[1]);
 		_gnutls_mpi_release(&pkey->params[2]);
@@ -236,7 +235,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 					    str, sizeof(str) - 1,
 					    &pkey->params[4])) < 0) {
 		gnutls_assert();
-		asn1_delete_structure(dsa_asn);
+		asn1_delete_structure(&dsa_asn);
 		_gnutls_mpi_release(&pkey->params[0]);
 		_gnutls_mpi_release(&pkey->params[1]);
 		_gnutls_mpi_release(&pkey->params[2]);
@@ -245,7 +244,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 	}
 	pkey->params_size = DSA_PRIVATE_PARAMS;
 
-	asn1_delete_structure(dsa_asn);
+	asn1_delete_structure(&dsa_asn);
 
 	if (gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0) {
 		_gnutls_mpi_release(&pkey->params[0]);

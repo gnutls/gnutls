@@ -25,8 +25,7 @@
 #include <auth_cert.h>
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
-#include "x509_asn1.h"
-#include "x509_der.h"
+#include "libasn1.h"
 #include "gnutls_datum.h"
 #include <gnutls_random.h>
 #include <gnutls_pk.h>
@@ -100,36 +99,36 @@ int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info,
  */
 int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 {
-	node_asn *dn;
+	ASN1_TYPE dn;
 	int len, result;
 	int start, end;
 
-	if ((result=asn1_create_structure
+	if ((result=_gnutls_asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn,
-	     "dn")) != ASN_OK) {
+	     "dn")) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_get_der(dn, cert->raw.data, cert->raw.size);
-	if (result != ASN_OK) {
+	result = asn1_der_decoding(&dn, cert->raw.data, cert->raw.size, NULL);
+	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();
-		asn1_delete_structure(dn);
+		asn1_delete_structure(&dn);
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_get_start_end_der(dn, cert->raw.data, cert->raw.size,
+	result = asn1_der_decoding_startEnd(dn, cert->raw.data, cert->raw.size,
 					"dn.tbsCertificate.issuer", &start,
 					&end);
 
-	if (result != ASN_OK) {
+	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();
-		asn1_delete_structure(dn);
+		asn1_delete_structure(&dn);
 		return _gnutls_asn2err(result);
 	}
-	asn1_delete_structure(dn);
+	asn1_delete_structure(&dn);
 
 	len = end - start + 1;
 

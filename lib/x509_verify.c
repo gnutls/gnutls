@@ -22,8 +22,7 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"
-#include "x509_asn1.h"
-#include "x509_der.h"
+#include "libasn1.h"
 #include "gnutls_global.h"
 #include "gnutls_num.h"		/* GMAX */
 #include <gnutls_sig.h>
@@ -73,7 +72,7 @@ void _gnutls_int2str(int k, char *data);
 static
 int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 {
-	node_asn *c2, *c3;
+	ASN1_TYPE c2, c3;
 	int result, len1;
 	int len2;
 	char tmpstr[512];
@@ -82,17 +81,17 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	/* get the issuer of 'cert'
 	 */
 	if ((result =
-	     asn1_create_structure(_gnutls_get_pkix(), "PKIX1.Certificate",
-				   &c2, "certificate2")) != ASN_OK) {
+	     _gnutls_asn1_create_element(_gnutls_get_pkix(), "PKIX1.Certificate",
+				   &c2, "certificate2")) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_get_der(c2, cert->raw.data, cert->raw.size);
-	if (result != ASN_OK) {
+	result = asn1_der_decoding(&c2, cert->raw.data, cert->raw.size, NULL);
+	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();
-		asn1_delete_structure(c2);
+		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
 
@@ -101,19 +100,19 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	/* get the 'subject' info of 'issuer_cert'
 	 */
 	if ((result =
-	     asn1_create_structure(_gnutls_get_pkix(), "PKIX1.Certificate",
-				   &c3, "certificate2")) != ASN_OK) {
+	     _gnutls_asn1_create_element(_gnutls_get_pkix(), "PKIX1.Certificate",
+				   &c3, "certificate2")) != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(c2);
+		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
 
 	result =
-	    asn1_get_der(c3, issuer_cert->raw.data, issuer_cert->raw.size);
-	if (result != ASN_OK) {
+	    asn1_der_decoding(&c3, issuer_cert->raw.data, issuer_cert->raw.size, NULL);
+	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 		gnutls_assert();
-		asn1_delete_structure(c2);
+		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
 
@@ -121,13 +120,13 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	_gnutls_str_cpy(tmpstr, sizeof(tmpstr),
 			"certificate2.tbsCertificate.issuer");
 	result =
-	    asn1_get_start_end_der(c2, cert->raw.data, cert->raw.size,
+	    asn1_der_decoding_startEnd(c2, cert->raw.data, cert->raw.size,
 				   tmpstr, &start1, &end1);
-	asn1_delete_structure(c2);
+	asn1_delete_structure(&c2);
 
-	if (result != ASN_OK) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(c3);
+		asn1_delete_structure(&c3);
 		return _gnutls_asn2err(result);
 	}
 
@@ -136,12 +135,12 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	_gnutls_str_cpy(tmpstr, sizeof(tmpstr),
 			"certificate2.tbsCertificate.subject");
 	result =
-	    asn1_get_start_end_der(c3, issuer_cert->raw.data,
+	    asn1_der_decoding_startEnd(c3, issuer_cert->raw.data,
 				   issuer_cert->raw.size, tmpstr, &start2,
 				   &end2);
-	asn1_delete_structure(c3);
+	asn1_delete_structure(&c3);
 
-	if (result != ASN_OK) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}

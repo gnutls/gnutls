@@ -1,4 +1,4 @@
-INCLUDES = -I../libextra
+INCLUDES = -I../libextra -I../libasn1/lib/
 include_HEADERS = gnutls.h 
 bin_SCRIPTS = libgnutls-config
 
@@ -13,7 +13,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	auth_anon.h gnutls_extensions.h \
 	gnutls_auth_int.h gnutls_random.h x509_b64.h gnutls_v2_compat.h \
 	libgnutls-config.in libgnutls.m4 gnutls.h.in.in gnutls_errors_int.h \
-	x509_asn1.h x509_der.h gnutls_datum.h auth_cert.h gnutls_mpi.h \
+	gnutls_datum.h auth_cert.h gnutls_mpi.h \
 	gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
@@ -40,17 +40,16 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	ext_cert_type.c 
 
 # Separate so we can create the documentation
-COBJECTS2 = x509_ASN.y x509_asn1.c x509_der.c
 
-libgnutls_la_SOURCES = $(COBJECTS) $(COBJECTS2) 
+libgnutls_la_SOURCES = $(COBJECTS)
 
-libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+libgnutls_la_LDFLAGS = ../libasn1/lib/libasn1.la -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 pkix_asn1_tab.c: pkix.asn
-	-../src/asn1c pkix.asn pkix_asn1_tab.c
+	-../libasn1/src/asn1c pkix.asn pkix_asn1_tab.c
 
 gnutls_asn1_tab.c: gnutls.asn
-	-../src/asn1c gnutls.asn gnutls_asn1_tab.c
+	-../libasn1/src/asn1c gnutls.asn gnutls_asn1_tab.c
 
 gnutls-api.tex: $(COBJECTS)
 	@echo "" > gnutls-api.tex

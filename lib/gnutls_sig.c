@@ -24,8 +24,7 @@
 #include <x509_b64.h>
 #include <auth_cert.h>
 #include <gnutls_cert.h>
-#include <x509_asn1.h>
-#include <x509_der.h>
+#include <libasn1.h>
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_privkey.h>

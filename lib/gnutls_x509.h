@@ -1,3 +1,5 @@
+#include <libasn1.h>
+
 int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state);
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert);
 
@@ -12,3 +14,4 @@ time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
 
 time_t _gnutls_x509_utcTime2gtime(char *ttime);
 time_t _gnutls_x509_generalTime2gtime(char *ttime);
+

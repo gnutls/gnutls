@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -20,7 +20,7 @@
  */
 
 #include <gnutls_int.h>
-#include <x509_asn1.h>
+#include <libasn1.h>
 #include <gnutls_errors.h>
 
 /* Functions that refer to the libgcrypt library.
@@ -54,12 +54,12 @@ int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a ) {
  * from asn1 structs. Combines the read and mpi_scan
  * steps.
  */
-int _gnutls_x509_read_int( node_asn* node, char* value, char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi) {
+int _gnutls_x509_read_int( ASN1_TYPE node, char* value, char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi) {
 int len, result;
 
 	len = tmpstr_size - 1;
-	result = asn1_read_value(node, value, tmpstr, &len);
-	if (result != ASN_OK) {
+	result = asn1_read_value( node, value, tmpstr, &len);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -70,4 +70,15 @@ int len, result;
 	}
 
 	return 0;
+}
+
+/* front end for asn1_create_element.
+ */
+asn1_retCode _gnutls_asn1_create_element(ASN1_TYPE definitions,char *source_name,
+                                 ASN1_TYPE *element, char *dest_name) {
+
+	*element = ASN1_TYPE_EMPTY;
+	
+	return asn1_create_element( definitions, source_name, element, dest_name);
+                                 
 }

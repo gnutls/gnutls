@@ -24,8 +24,7 @@
 #include <x509_b64.h>
 #include <auth_cert.h>
 #include <gnutls_cert.h>
-#include <x509_asn1.h>
-#include <x509_der.h>
+#include <libasn1.h>
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_privkey.h>
@@ -37,29 +36,29 @@
 /* returns DER tbsCertificate
  */
 static gnutls_datum _gnutls_get_tbs( gnutls_cert* cert) {
-node_asn *c2;
+ASN1_TYPE c2;
 gnutls_datum ret = {NULL, 0};
 opaque *str;
 int result, len;
 int start, end;
 
-	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1.Certificate", &c2, "certificate")!=ASN_OK) {
+	if (_gnutls_asn1_create_element( _gnutls_get_pkix(), "PKIX1.Certificate", &c2, "certificate")!=ASN1_SUCCESS) {
 		gnutls_assert();
 		return ret;
 	}
 	
-	result = asn1_get_der( c2, cert->raw.data, cert->raw.size);
-	if (result != ASN_OK) {
+	result = asn1_der_decoding( &c2, cert->raw.data, cert->raw.size, NULL);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(c2);
+		asn1_delete_structure(&c2);
 		return ret;
 	}
 	
-	result = asn1_get_start_end_der( c2, cert->raw.data, cert->raw.size, 
+	result = asn1_der_decoding_startEnd( c2, cert->raw.data, cert->raw.size, 
 		"certificate.tbsCertificate", &start, &end);
-	asn1_delete_structure(c2);
+	asn1_delete_structure(&c2);
 		
-	if (result != ASN_OK) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return ret;
 	}
@@ -79,29 +78,29 @@ int start, end;
 /* we use DER here -- FIXME: use BER
  */
 static int _gnutls_get_ber_digest_info( const gnutls_datum *info, MACAlgorithm *hash, opaque* digest, int *digest_size) {
-node_asn* dinfo;
+ASN1_TYPE dinfo;
 int result;
 opaque str[1024];
 int len;
 
-	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DigestInfo", &dinfo, "digest_info"))!=ASN_OK) {
+	if ((result=_gnutls_asn1_create_element( _gnutls_get_gnutls_asn(), "GNUTLS.DigestInfo", &dinfo, "digest_info"))!=ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_get_der( dinfo, info->data, info->size);
-	if (result != ASN_OK) {
+	result = asn1_der_decoding( &dinfo, info->data, info->size, NULL);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(dinfo);
+		asn1_delete_structure(&dinfo);
 		return _gnutls_asn2err(result);
 	}
 	
 	len = sizeof(str)-1;
 	result =
 	    asn1_read_value( dinfo, "digest_info.digestAlgorithm.algorithm", str, &len);
-	if (result != ASN_OK) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(dinfo);
+		asn1_delete_structure(&dinfo);
 		return _gnutls_asn2err(result);
 	}
 
@@ -124,13 +123,13 @@ int len;
 	
 	result =
 	    asn1_read_value( dinfo, "digest_info.digest", digest, digest_size);
-	if (result != ASN_OK) {
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		asn1_delete_structure(dinfo);
+		asn1_delete_structure(&dinfo);
 		return _gnutls_asn2err(result);
 	}
 
-	asn1_delete_structure(dinfo);
+	asn1_delete_structure(&dinfo);
 		
 	return 0;
 }

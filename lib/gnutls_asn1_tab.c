@@ -1,7 +1,7 @@
 
-#include "x509_asn1.h"
+#include "libasn1.h"
 
-const static_asn gnutls_asn1_tab[]={
+const ASN1_ARRAY_TYPE gnutls_asn1_tab[]={
   {"GNUTLS",536872976,0},
   {0,1073741836,0},
   {"RSAPublicKey",1610612741,0},

@@ -23,8 +23,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
-#include "x509_asn1.h"
-#include "x509_der.h"
+#include "libasn1.h"
 #include "gnutls_datum.h"
 #include "auth_cert.h"
 #include <gnutls_random.h>
