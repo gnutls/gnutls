@@ -97,14 +97,12 @@ keyring_blob_release(keyring_blob *ctx)
 static KEYDB_HD
 keyring_to_keydb(keyring_blob *blob)
 {
-  KEYDB_HD khd;
+  KEYDB_HD khd = NULL;
 
   khd = cdk_alloc_clear(sizeof *khd);
   khd->used = 1;
   if (blob->type == 0x00) /* file */
-    {
       khd->name = cdk_strdup(blob->data);   
-    }
   else if (blob->type == 0x01) /* data */
     {
       cdk_iobuf_new(&khd->buf, blob->size);
@@ -124,27 +122,30 @@ keyring_to_keydb(keyring_blob *blob)
 static keyring_blob*
 read_keyring_blob(const gnutls_datum* keyring, size_t pos)
 {
-  keyring_blob *blob;
+  keyring_blob *blob = NULL;
   
-  if (!keyring)
-    return NULL;
-
-  if (pos > keyring->size)
+  if (!keyring || pos > keyring->size)
     return NULL;
 
   keyring_blob_new(&blob);
   blob->type = keyring->data[pos];
   if (blob->type < 0 || blob->type > 1)
-    return NULL;
+    {
+      keyring_blob_release(blob);
+      return NULL;
+    }
   blob->size = keyring->data[pos+1] << 24 | keyring->data[pos+2] << 16
-    | keyring->data[pos+3] <<  8 | keyring->data[pos+4];
+             | keyring->data[pos+3] <<  8 | keyring->data[pos+4];
   if (!blob->size)
-    return NULL;
+    {
+      keyring_blob_release(blob);
+      return NULL;
+    }
   blob->data = cdk_alloc_clear(blob->size + 1);
   memcpy(blob->data, keyring->data+(pos+5), blob->size);
-
   blob->data[blob->size] = '\0';
-  return blob;    
+  
+  return blob;
 }
 
 /* Creates a keyring blob from raw data
@@ -157,8 +158,7 @@ read_keyring_blob(const gnutls_datum* keyring, size_t pos)
 static byte*
 conv_data_to_keyring(int type, const char *data, size_t size, size_t *r_size)
 {
-
-  byte *p;
+  byte *p = NULL;
 
   if (!data)
     return NULL;
@@ -198,7 +198,7 @@ is_file_armored(char *file)
            && strstr(data, "-----END PGP") )
         armored = 1;
       fclose(fp);
-      cdk_free(data); data = NULL;      
+      cdk_free(data);
     }
 
 leave:
@@ -249,12 +249,12 @@ iobuf_to_datum(IOBUF buf, gnutls_datum *raw)
     {
       if ( gnutls_set_datum(raw, data, nbytes) < 0 )
         return GNUTLS_E_MEMORY_ERROR;
-      cdk_free(data); data = NULL;
+      cdk_free(data);
     }
   else
     rc = GNUTLS_E_UNKNOWN_ERROR;
   
-  return 0;
+  return rc;
 }
 
 static PKT_signature *
@@ -263,7 +263,7 @@ openpgp_pkt_to_sig(PKT pkt, size_t idx)
   struct packet_s *p = NULL;
   size_t n = 0;
 
-  for (p=pkt; p && pkt; p=p->next)
+  for (p=pkt; p && p->id && pkt; p=p->next)
     {
       if (p->id == PKT_SIG && n == idx)
         return p->p.sig;
@@ -280,7 +280,7 @@ openpgp_pkt_to_pk(PKT pkt, size_t idx)
   struct packet_s *p = NULL;
   size_t n = 0;
 
-  for (p=pkt; p && pkt; p=p->next)
+  for (p=pkt; p && p->id && pkt; p=p->next)
     {
       if (p->id == PKT_PUBKEY && n == idx)
         return p->p.pk;
@@ -297,7 +297,7 @@ openpgp_pkt_to_uid(PKT pkt, size_t idx)
   struct packet_s *p = NULL;
   size_t n = 0;
 
-  for (p=pkt; p && pkt; p=p->next)
+  for (p=pkt; p && p->id && pkt; p=p->next)
     {
       if (p->id == PKT_USERID && n == idx)
         return p->p.uid;
@@ -311,11 +311,15 @@ openpgp_pkt_to_uid(PKT pkt, size_t idx)
 static int
 openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
 {
-  int algo, i, rc = 0;
+  int algo, i;
+  int rc = 0;
   size_t nbytes = 0;
   
   if (!cert || !pk)
     return GNUTLS_E_INVALID_PARAMETERS;
+
+  if (is_ELG(pk->pke_algo)) /* GnuTLS OpenPGP doesn't support ELG keys */
+    return GNUTLS_E_UNWANTED_ALGORITHM;
 
   algo = is_DSA(pk->pke_algo)? GNUTLS_PK_DSA : GNUTLS_PK_RSA;
   cert->subject_pk_algorithm = algo;
@@ -326,9 +330,9 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
 
   if (is_DSA(pk->pke_algo) || pk->pke_algo == PKE_RSA_S)
     cert->keyUsage = GNUTLS_X509KEY_DIGITAL_SIGNATURE;
-  else if (pk->pke_algo == PKE_ELG_E || pk->pke_algo == PKE_RSA_E)
+  else if (pk->pke_algo == PKE_RSA_E)
     cert->keyUsage = GNUTLS_X509KEY_ENCIPHER_ONLY;
-  else if (pk->pke_algo == PKE_ELG_ES || pk->pke_algo == PKE_RSA_ES)
+  else if (pk->pke_algo == PKE_RSA_ES)
     cert->keyUsage = GNUTLS_X509KEY_DIGITAL_SIGNATURE
                    | GNUTLS_X509KEY_ENCIPHER_ONLY;
 
@@ -359,12 +363,14 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
   IOBUF buf = NULL;
   int rc = 0;
   size_t nbytes = 0;
+  size_t sigsize = 0;
   byte *data = NULL;
   
   if (!cert || !sig)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  cdk_iobuf_new(&buf, 9216); /* enough to hold the biggest signature */
+  sigsize = 20 + sig->hashed_size + sig->unhashed_size + 2*MAX_MPI_BYTES;
+  cdk_iobuf_new(&buf, sigsize);
   if ( (rc=cdk_pkt_write_signature(buf, sig)) )
     goto leave;
   data = cdk_iobuf_get_data_as_buffer(buf, &nbytes);
@@ -375,7 +381,7 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
           gnutls_assert();
           return GNUTLS_E_MEMORY_ERROR;
         }
-      cdk_free(data); data = NULL;
+      cdk_free(data);
     }
   else
     rc = GNUTLS_E_UNKNOWN_ERROR;
@@ -403,10 +409,11 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
   PKT_secret_key *sk = NULL;
   PKT pkt = NULL;
   IOBUF buf;
-  int pke_algo, i, j, rc = 0, eof = 0;
+  int pke_algo, i, j, eof = 0;
+  int rc = 0;
   size_t nbytes = 0;
 
-  if (!pkey)
+  if (!pkey || raw_key.size <= 0)
     return GNUTLS_E_INVALID_PARAMETERS;
 
   cdk_secure_memory_init(); 
@@ -460,12 +467,12 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
           goto leave;
         }
     }
-  if (is_DSA(pke_algo))
+  if (is_ELG(pke_algo))
+    return GNUTLS_E_UNWANTED_ALGORITHM;
+  else if (is_DSA(pke_algo))
     pkey->pk_algorithm = GNUTLS_PK_DSA;
   else if (is_RSA(pke_algo))
     pkey->pk_algorithm = GNUTLS_PK_RSA;
-  else
-    return GNUTLS_E_UNKNOWN_CIPHER;
   if ( gnutls_set_datum(&pkey->raw, raw_key.data, raw_key.size) < 0 )
     {
       release_mpi_array(pkey->params, i);
@@ -580,7 +587,10 @@ gnutls_openpgp_get_key(gnutls_cert **r_key, const gnutls_datum *keyring,
       break; /* just to make the (strict) compiler happy */
     }
   if ( (rc = cdk_keydb_search_key(khd, &pk, &ks)) )
-    goto leave;
+    {
+      rc = GNUTLS_E_NO_CERTIFICATE_FOUND; 
+      goto leave;
+    }    
 
   for (p=pk; p && p->id; p=p->next)
     {
@@ -599,7 +609,7 @@ leave:
   if (!rc)
     *r_key = key;
   
-  return 0;
+  return rc;
 }
 
 /**
@@ -622,7 +632,8 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   PKT pkt = NULL;
   gnutls_datum raw;
   struct packet_s *p = NULL;
-  int eof = 0, rc = 0, i;
+  int eof = 0, i;
+  int rc = 0;
   
   if (!res || !KEYFILE || !CERTFILE)
     return GNUTLS_E_INVALID_PARAMETERS;
@@ -646,15 +657,15 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     }
   cdk_pkt_new(&pkt);
 
-  res->cert_list = gnutls_realloc( res->cert_list,
-                                   (1+res->ncerts)*sizeof(gnutls_cert*));
+  res->cert_list = gnutls_realloc(res->cert_list,
+                                  (1+res->ncerts)*sizeof(gnutls_cert*));
   if (res->cert_list == NULL)
     {
       gnutls_assert();
       return GNUTLS_E_MEMORY_ERROR;
     }
-  res->cert_list_length = gnutls_realloc( res->cert_list_length,
-                                          (1+res->ncerts)*sizeof(int) );
+  res->cert_list_length = gnutls_realloc(res->cert_list_length,
+                                         (1+res->ncerts)*sizeof(int));
   if (res->cert_list_length == NULL)
     {
       gnutls_assert();
@@ -663,12 +674,11 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
 
   res->cert_list[res->ncerts] = gnutls_calloc(1, sizeof(gnutls_cert)); 
   if (res->cert_list[res->ncerts] == NULL)
-   {
-     gnutls_assert();
-     return GNUTLS_E_MEMORY_ERROR;
-   }
-
-
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  
   do {
     rc = cdk_keydb_enum_pk(buf, &pkt, &eof);
     if ( (eof == 1 && !pkt) || rc)
@@ -683,7 +693,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
             res->cert_list_length[n] = 1;
             iobuf_to_datum(buf, &res->cert_list[n][0].raw);
             openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], p->p.pk );
-	    i++;
+            i++;
           }
         else if (p->id == PKT_SIG)
           {
@@ -723,9 +733,8 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   cdk_iobuf_close(buf);
   
   res->ncerts++;
-  
-  res->pkey = gnutls_realloc( res->pkey, (res->ncerts)*
-                              sizeof(gnutls_private_key));
+  res->pkey = gnutls_realloc(res->pkey, (res->ncerts)*
+                             sizeof(gnutls_private_key));
   if (res->pkey == NULL)
     {
       gnutls_assert();
@@ -770,7 +779,7 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
       goto leave;
     }
   memset(dn, 0, sizeof *dn);
-  strcpy( dn->name, uid->name );
+  strcpy(dn->name, uid->name);
 
   /*
    * Extract the email address from the userID string and save it to
@@ -784,8 +793,8 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
     pos2 = p-uid->name+1;
   if (pos1 && pos2)
     {
-      memcpy( dn->email, uid->name+pos1, pos2-pos1 );
-      dn->email[ pos2-pos1-1 ] = '\0';
+      memcpy(dn->email, uid->name+pos1, pos2-pos1);
+      dn->email[pos2-pos1-1] = '\0'; /* make sure it's a string */
     }
   
 leave:
@@ -919,7 +928,7 @@ gnutls_openpgp_verify_key( const gnutls_datum* keyring,
       return GNUTLS_CERT_CORRUPTED;
     }
   rc = cdk_key_check_sigs(pkt, khd, &status);
-  if (rc == CDKERR_NOKEY)
+  if (rc == CDKERR_NOKEY || rc == CDKERR_BAD_SIGNATURE)
     rc = 0; /* fixme */
       
   switch (status)
@@ -927,12 +936,15 @@ gnutls_openpgp_verify_key( const gnutls_datum* keyring,
     case CDK_KEY_INVALID:
       rc = GNUTLS_CERT_CORRUPTED;
       break;
+      
     case CDK_KEY_REVOKED:
       rc = GNUTLS_CERT_REVOKED;
       break;
+      
     case CDK_KEY_EXPIRED:
       rc = GNUTLS_CERT_EXPIRED;
       break;
+      
     case CDK_KEY_VALID:
       rc = GNUTLS_CERT_TRUSTED;
       break;
@@ -955,7 +967,7 @@ leave:
  * the fingerprint can be 16 oder 20 bytes.
  **/
 int
-gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr,size_t *fprlen )
+gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr,size_t *fprlen)
 {
   PKT pkt = NULL;
   PKT_public_key *pk = NULL;
@@ -1149,10 +1161,10 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
     return GNUTLS_E_INVALID_PARAMETERS;
 
   if (!port)
-    port = 11371;
+    port = 11371; /* standard service port */
   
   if ( (hp = gethostbyname(host)) == NULL )
-      return -1;
+    return -1;
   
   memset(&sock, 0, sizeof sock);
   memcpy(&sock.sin_addr, hp->h_addr, hp->h_length);
@@ -1160,7 +1172,7 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
   sock.sin_port = htons(port);
 
   if ( (fd = socket(AF_INET, SOCK_STREAM, 0)) == -1 )
-      return -1;
+    return -1;
   setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (char *)1, 1);
   if ( connect(fd, (struct sockaddr*)&sock, sizeof(sock)) == -1 )
     {
@@ -1190,10 +1202,8 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
       if ( strstr(buf, "<pre>") || strstr(buf, "</pre>") )
         state++;
     }
-  if (n ==-1)
-    perror("read");
   
-  if ( state != 2 )
+  if (state != 2)
     {
       rc = GNUTLS_E_UNKNOWN_ERROR;
       goto leave;
