@@ -3,16 +3,13 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-* Add function to update the fixed Diffie Hellman primes
++ Make gnutls independent of the Certificate Manager (in order to support
+ other x.509 certificate managers)
 * Audit the code (volunteers?)
 * Add support for PKCS8 encrypted private keys
-* Add support for PKCS12
 * Add support for certificates with DSS parameters
-* Add function to return the certificate verification path
-* Add TLS more extensions
-* Design a Private/Public key database
-* Tools for processing/generating certificates
-* OpenPGP certificate support (through libgcrypt)
+* Add more TLS extensions
+* OpenPGP certificate support
 - Add Kerberos support
 
 (+) Means high priority 
