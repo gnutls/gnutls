@@ -479,6 +479,37 @@ char null = version - 1;
 }
 
 /**
+  * gnutls_x509_crq_get_version - This function returns the Certificate request's version number
+  * @crq: should contain a gnutls_x509_crq structure
+  *
+  * This function will return the version of the specified Certificate request.
+  *
+  * Returns a negative value on error.
+  *
+  **/
+int gnutls_x509_crq_get_version(gnutls_x509_crq crq)
+{
+	opaque version[5];
+	int len, result;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	len = sizeof(version);
+	if ((result = asn1_read_value(crq->crq, "certificationRequestInfo.version", version, &len)) !=
+		ASN1_SUCCESS) {
+		
+		if (result == ASN1_ELEMENT_NOT_FOUND) return 1; /* the DEFAULT version */
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return (int) version[0] + 1;
+}
+
+/**
   * gnutls_x509_crq_set_key - This function will associate the Certificate request with a key
   * @crq: should contain a gnutls_x509_crq structure
   * @key: holds a private key
