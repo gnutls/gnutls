@@ -27,7 +27,6 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
 {
    int rc;
    CDK_KBNODE knode = NULL;
-   unsigned char* buf = NULL;
 
    /* The key fingerprint should be 20 bytes
     * in v4 keys.
@@ -59,7 +58,6 @@ recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr,
 
    finish:
 
-   cdk_free( buf );
    cdk_kbnode_release( knode );
    return rc;
 
