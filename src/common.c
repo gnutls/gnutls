@@ -44,6 +44,25 @@ static char buffer[5*1024];
 
 const char str_unknown[] = "(unknown)";
 
+/* Hex encodes the given data.
+ */
+const char *raw_to_string(const unsigned char *raw, size_t raw_size)
+{
+	static char buf[1024];
+	size_t i;
+	if (raw_size == 0) return NULL;
+
+	if (raw_size * 3 + 1 >= sizeof(buf))
+		return NULL;
+
+	for (i = 0; i < raw_size; i++) {
+		sprintf(&(buf[i * 3]), "%02X%s", raw[i], (i==raw_size-1)?"":":");
+	}
+	buf[sizeof(buf) - 1] = '\0';
+
+	return buf;
+}
+
 static const char *my_ctime(const time_t * tv)
 {
 	static char buf[256];
@@ -67,10 +86,9 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	char dn[256];
 	size_t dn_size;
 	size_t digest_size = sizeof(digest);
-	unsigned int i, j;
+	unsigned int j;
 	size_t serial_size = sizeof(serial);
-	char printable[256];
-	char *print;
+	const char *print;
 	const char* cstr;
 	unsigned int bits, algo;
 	time_t expiret, activet;
@@ -153,13 +171,9 @@ void print_x509_info(gnutls_session session, const char* hostname)
 			 */
 			if (gnutls_x509_crt_get_serial(crt, serial, &serial_size)
 			    >= 0) {
-				print = printable;
-				for (i = 0; i < serial_size; i++) {
-					sprintf(print, "%.2x ",
-						(unsigned char) serial[i]);
-					print += 3;
-				}
-				printf(" # serial number: %s\n", printable);
+				print = raw_to_string( serial, serial_size);
+				if (print!=NULL)
+					printf(" # serial number: %s\n", print);
 			}
 
 			/* Print the fingerprint of the certificate
@@ -169,13 +183,9 @@ void print_x509_info(gnutls_session session, const char* hostname)
 			    < 0) {
 			    	fprintf(stderr, "Error in fingerprint calculation: %s\n", gnutls_strerror(ret));
 			} else {
-				print = printable;
-				for (i = 0; i < digest_size; i++) {
-					sprintf(print, "%.2x ",
-						(unsigned char) digest[i]);
-					print += 3;
-				}
-				printf(" # fingerprint: %s\n", printable);
+				print = raw_to_string( digest, digest_size);
+				if (print != NULL)
+					printf(" # fingerprint: %s\n", print);
 			}
 
 			/* Print the version of the X.509 
@@ -217,10 +227,8 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 
 	char digest[20];
 	size_t digest_size = sizeof(digest);
-	unsigned int i;
 	int ret;
-	char printable[120];
-	char *print;
+	const char *print;
 	const char* cstr;
 	char name[256];
 	size_t name_len = sizeof(name);
@@ -297,12 +305,7 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 
 		if (gnutls_openpgp_key_get_fingerprint(crt, digest, &digest_size) >= 0) 
 		{
-			print = printable;
-			for (i = 0; i < digest_size; i++) {
-				sprintf(print, "%.2x ",
-					(unsigned char) digest[i]);
-				print += 3;
-			}
+			print = raw_to_string( digest, digest_size);
 
 			printf(" # PGP Key version: %d\n",
 			       gnutls_openpgp_key_get_version(crt));
@@ -315,7 +318,8 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 			cstr = SU(gnutls_pk_algorithm_get_name( algo));
 			printf("%s (%d bits)\n", cstr, bits);
 
-			printf(" # PGP Key fingerprint: %s\n", printable);
+			if (print != NULL)
+				printf(" # PGP Key fingerprint: %s\n", print);
 
 			name_len = sizeof(name);
 			if (gnutls_openpgp_key_get_name(crt, 0, name, &name_len) < 0) {
@@ -418,16 +422,6 @@ int print_info(gnutls_session session, const char* hostname)
 
 		print_cert_vrfy(session);
  
-		/* Check if we have been using ephemeral Diffie Hellman.
-		 */
-		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
-			printf
-			    ("- Ephemeral DH using prime of %d bits, secret key "
-			     "of %d bits, and peer's public key is %d bits.\n",
-			     gnutls_dh_get_prime_bits(session),
-			     gnutls_dh_get_secret_bits(session),
-			     gnutls_dh_get_peers_public_bits(session));
-		}
 	}
 
 	tmp =

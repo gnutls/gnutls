@@ -475,6 +475,7 @@ int _gnutls_rsa_export_set_pubkey( gnutls_session session, mpi_t exp, mpi_t mod)
 		return GNUTLS_E_INTERNAL_ERROR;
 
 	info->rsa_export.modulus_size = sizeof( info->rsa_export.modulus);
+
 	ret = _gnutls_mpi_print_lz( info->rsa_export.modulus, &info->rsa_export.modulus_size, mod);
 	if (ret < 0) {
 		gnutls_assert();

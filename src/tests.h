@@ -4,9 +4,10 @@
 
 int test_srp( gnutls_session state);
 int test_export( gnutls_session state);
+int test_export_info( gnutls_session state);
 int test_hello_extension( gnutls_session state);
 int test_dhe( gnutls_session state);
-int test_dhe_bits( gnutls_session state);
+int test_dhe_group( gnutls_session state);
 int test_ssl3( gnutls_session state);
 int test_aes( gnutls_session state);
 int test_md5( gnutls_session state);
@@ -36,5 +37,4 @@ int test_lzo( gnutls_session session);
 int _test_srp_username_callback( gnutls_session session, unsigned int times,
 	char** username, char** password);
 
-#define GERR(ret) fprintf(stderr, "*** Error: %s\n", gnutls_strerror(ret))
 

@@ -35,6 +35,7 @@ void parse_ctypes( char** ctype, int nctype, int * cert_type_priority);
 void parse_macs( char** macs, int nmacs, int *mac_priority);
 void parse_ciphers( char** ciphers, int nciphers, int* cipher_priority);
 void parse_protocols( char** protocols, int protocols_size, int* protocol_priority);
+const char *raw_to_string(const unsigned char *raw, size_t raw_size);
 
 void sockets_init( void);
 #ifndef HAVE_INET_NTOP

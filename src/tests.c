@@ -66,15 +66,13 @@ int ret, alert;
 		handshake_output = ret;
 
 		if (ret < 0 && more_info != 0) {
-			printf("\n");
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 				alert = gnutls_alert_get( session);
+				printf("\n");
 				printf("*** Received alert [%d]: %s\n",
 				       alert, gnutls_alert_get_name( alert));
 			}
-			printf( "*** Handshake has failed\n");
-			GERR(ret);
 		}
 
 		if (ret < 0) return GFAILED;
@@ -220,7 +218,13 @@ int ret;
 }
 #endif
 
-int test_export( gnutls_session session) {
+static int export_true = 0;
+static gnutls_datum exp = { NULL, 0 }, mod = {NULL, 0};
+
+int test_export( gnutls_session session) 
+{
+int ret;
+
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
 	ADD_ALL_PROTOCOLS(session);
@@ -230,10 +234,64 @@ int test_export( gnutls_session session) {
 	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
 	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	return do_handshake( session);
+	ret = do_handshake( session);
+	
+	if (ret == SUCCEED) {
+		export_true = 1;
+		gnutls_rsa_export_get_pubkey( session, &exp, &mod);
+	}
+	
+	return ret;
 }
 
-int test_dhe( gnutls_session session) {
+int test_export_info( gnutls_session session) 
+{
+int ret2, ret;
+gnutls_datum exp2, mod2;
+const char* print;
+
+	if (more_info == 0) return SUCCEED;
+	if (export_true == 0) return GFAILED;
+
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+
+	ADD_KX(session, GNUTLS_KX_RSA_EXPORT);
+	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+
+	printf("\n");
+	if (ret == SUCCEED) {
+		ret2 = gnutls_rsa_export_get_pubkey( session, &exp2, &mod2);
+		if (ret2 >= 0) {
+			print = raw_to_string( exp2.data, exp2.size);
+			if (print)
+				printf(" Exponent [%d bits]: %s\n", exp2.size*8, print);
+
+			print = raw_to_string( mod2.data, mod2.size);
+			if (print)
+				printf(" Modulus [%d bits]: %s\n", mod2.size*8, print);
+			
+			if (mod2.size != mod.size || exp2.size != exp.size ||
+				memcmp( mod2.data, mod.data, mod.size) != 0 ||
+				memcmp( exp2.data, exp.data, exp.size) != 0) {
+				printf(" (server uses different public keys per connection)\n");
+			}
+		}
+	}
+	
+	return ret;
+	
+}
+
+static gnutls_datum pubkey = { NULL , 0 };
+
+int test_dhe( gnutls_session session) 
+{
 int ret;
 
 	ADD_ALL_CIPHERS(session);
@@ -248,16 +306,53 @@ int ret;
 	ret = do_handshake( session);
 	dh_bits = gnutls_dh_get_prime_bits( session);
 	if (dh_bits < 0) dh_bits = 0;
+	
+	gnutls_dh_get_pubkey( session, &pubkey);
 
 	return ret;
 }
 
-int test_dhe_bits( gnutls_session session) {
+int test_dhe_group( gnutls_session session) 
+{
+int ret, ret2;
+gnutls_datum gen, prime, pubkey2;
+const char* print;
 
-	if (dh_bits == 0) return GFAILED;
+	if (more_info == 0) return SUCCEED;
 
-	printf( " %d", dh_bits);
-	return SUCCEED;
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+
+	ADD_KX2(session, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	
+	printf("\n");
+	ret2 = gnutls_dh_get_group( session, &gen, &prime);
+	if (ret2 >= 0) {
+		print = raw_to_string( gen.data, gen.size);
+		if (print)
+			printf(" Generator [%d bits]: %s\n", gen.size*8, print);
+
+		print = raw_to_string( prime.data, prime.size);
+		if (print)
+			printf(" Prime [%d bits]: %s\n", prime.size*8, print);
+
+		gnutls_dh_get_pubkey( session, &pubkey2);
+		print = raw_to_string( pubkey2.data, pubkey2.size);
+		if (print)
+			printf(" Pubkey [%d bits]: %s\n", pubkey2.size*8, print);
+
+		if (pubkey2.data && pubkey2.size == pubkey.size && 
+			memcmp( pubkey.data, pubkey2.data, pubkey.size)==0) {
+			printf(" (public key seems to be static among sessions)\n");
+		}
+	}
+	return ret;
 }
 
 int test_ssl3( gnutls_session session) 
@@ -789,6 +884,8 @@ extern char* hostname;
 int test_certificate( gnutls_session session) {
 int ret;
 
+	if (more_info == 0) return SUCCEED;
+
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
@@ -817,6 +914,8 @@ static int cert_callback(gnutls_session session,
 char issuer_dn[256];
 int i, ret;
 size_t len;
+
+	if (more_info == 0) return -1;
 
 	/* Print the server's trusted CAs
 	 */
@@ -847,6 +946,8 @@ int test_server_cas( gnutls_session session)
 {
 int ret;
 
+	if (more_info == 0) return SUCCEED;
+
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
@@ -858,8 +959,9 @@ int ret;
         gnutls_certificate_client_set_retrieve_function( xcred, cert_callback);
 
 	ret = do_handshake( session);
-	if (ret ==GFAILED) return ret;
+        gnutls_certificate_client_set_retrieve_function( xcred, NULL);
 
+	if (ret ==GFAILED) return ret;
 	return SUCCEED;
 }
 

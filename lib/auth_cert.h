@@ -97,9 +97,9 @@ typedef struct {
 #define gnutls_certificate_credentials certificate_credentials_st*
 
 typedef struct rsa_info_st {
-	opaque	modulus[64];
+	opaque	modulus[65];
 	size_t	modulus_size;
-	opaque	exponent[64];
+	opaque	exponent[65];
 	size_t	exponent_size;
 } rsa_info_t;
 

@@ -4,11 +4,11 @@
 typedef struct dh_info_st {
 	int secret_bits;
 
-	opaque prime[1024];
+	opaque prime[1025];
 	size_t prime_size;
 	opaque generator[16];
 	size_t generator_size;
-	opaque public_key[1024];
+	opaque public_key[1025];
 	size_t public_key_size;
 } dh_info_t;
 

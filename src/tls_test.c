@@ -103,12 +103,13 @@ static const TLS_TEST tls_tests[] = {
 	 */
 	{ "whether the server supports session resumption", test_session_resume2, "yes", "no", "dunno"},
 	{ "for export-grade ciphersuite support", test_export, "yes", "no", "dunno" },
+	{ "for export-grade ciphersuite info", test_export_info, "", "N/A", "N/A" },
 #ifdef ENABLE_ANON
 	{ "for anonymous authentication support", test_anonymous, "yes", "no", "dunno"},
-	{ "for anonymous Diffie Hellman prime size", test_dhe_bits, "", "N/A", "N/A" },
+	{ "for anonymous Diffie Hellman group info", test_dhe_group, "", "N/A", "N/A" },
 #endif
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
-	{ "for ephemeral Diffie Hellman prime size", test_dhe_bits, "", "N/A", "N/A" },
+	{ "for ephemeral Diffie Hellman group info", test_dhe_group, "", "N/A", "N/A" },
 	{ "for AES cipher support (TLS extension)", test_aes, "yes", "no", "dunno"},
 	{ "for 3DES cipher support", test_3des, "yes", "no", "dunno"},
 	{ "for ARCFOUR 128 cipher support", test_arcfour, "yes", "no", "dunno"},
@@ -216,7 +217,7 @@ int main(int argc, char **argv)
 		/* if neither of SSL3 and TLSv1 are supported, exit
 		 */
 		if (i > 3 && tls1_1_ok == 0 && tls1_ok == 0 && ssl3_ok == 0) {
-			fprintf(stderr, "%d %d %d\n", tls1_1_ok,tls1_ok,ssl3_ok);
+			fprintf(stderr, "\nServer does not support none of SSL 3.0, TLS 1.0 and TLS 1.1\n");
 			break;
 		}
 

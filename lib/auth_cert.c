@@ -1211,7 +1211,6 @@ int _gnutls_gen_cert_client_cert_vrfy(gnutls_session session,
 			return ret;
 		}
 	} else {
-		gnutls_assert();
 		return 0;
 	}
 

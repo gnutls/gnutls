@@ -114,9 +114,8 @@ int err;
 		
 		break;
 #endif
-	   default:
-	        gnutls_free(ret);
-		return NULL;	
+	case GNUTLS_COMP_NULL:
+		break;
 	}
 	return ret;
 }
