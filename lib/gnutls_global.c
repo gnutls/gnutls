@@ -123,6 +123,14 @@ void gnutls_global_set_mem_functions(
 	return;
 }
 
+#ifdef DEBUG
+static void _gnutls_gcry_log_handler( void* dummy, int level, const char* fmt, 
+	va_list list)
+{
+	_gnutls_log( fmt, list);
+}
+#endif
+
 static int _gnutls_init = 0;
 
 /**
@@ -157,7 +165,12 @@ int gnutls_global_init( void)
 		/* gcry_control (GCRYCTL_DISABLE_INTERNAL_LOCKING, NULL, 0); */
 
 		gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL,0);
+
+#ifdef DEBUG
+		gcry_set_log_handler( _gnutls_gcry_log_handler, NULL);
+#else
 		gcry_control (GCRYCTL_SET_VERBOSITY, (int)0);
+#endif
 	}
 	
 	/* set default recv/send functions
