@@ -81,7 +81,7 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq crq)
 	gnutls_free(crq);
 }
 
-#define PEM_CRQ "CERTIFICATE REQUEST"
+#define PEM_CRQ "NEW CERTIFICATE REQUEST"
 
 /**
   * gnutls_x509_crq_import - This function will import a DER or PEM encoded Certificate request
@@ -92,7 +92,7 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq crq)
   * This function will convert the given DER or PEM encoded Certificate
   * to the native gnutls_x509_crq format. The output will be stored in 'cert'.
   *
-  * If the Certificate is PEM encoded it should have a header of "CERTIFICATE REQUEST".
+  * If the Certificate is PEM encoded it should have a header of "NEW CERTIFICATE REQUEST".
   *
   * Returns 0 on success.
   *
@@ -609,7 +609,7 @@ gnutls_datum signature;
   * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
   *
   * If the structure is PEM encoded, it will have a header
-  * of "BEGIN CERTIFICATE REQUEST".
+  * of "BEGIN NEW CERTIFICATE REQUEST".
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.
