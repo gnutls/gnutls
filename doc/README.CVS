@@ -16,6 +16,7 @@ Those are optional:
 * cvs2cl (in order to create ChangeLog) (http://www.red-bean.com/cvs2cl/)
 * gaa (to handle example programs' parameters) (http://gaa.sf.net)
 * gtk-doc (to generate reference HTML manual in doc/reference/)
+  with patch from <http://bugs.debian.org/267789>
 
 1. Download the cvs tree
 $ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls login
