@@ -33,5 +33,7 @@ EXTRA_DIST += getndelim2.h getndelim2.c
 
 libgnu_la_SOURCES += gettext.h
 
+libgnu_la_SOURCES += progname.h progname.c
+
 libgnu_la_SOURCES += unlocked-io.h
 
