@@ -2,7 +2,7 @@ INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/gl -I$(top_srcdir)/libextra -I
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
-m4data_DATA = libgnutls.m4
+dist_m4data_DATA = libgnutls.m4
 
 if HAVE_LD_VERSION_SCRIPT
   libgnutls_version_script_cmd = -Wl,--version-script=$(srcdir)/libgnutls.vers
@@ -21,7 +21,7 @@ SUBDIRS = x509
 MINITASN1_COBJECTS = 
 endif
 
-EXTRA_DIST = libgnutls.vers libgnutls.m4 gnutls-api.texi
+EXTRA_DIST = libgnutls.vers gnutls-api.texi
 lib_LTLIBRARIES = libgnutls.la
 
 X509_COBJECTS = x509/crl.c x509/dn.c x509/common.c x509/x509.c	\
