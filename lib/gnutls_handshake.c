@@ -538,10 +538,9 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	pk_algo = _gnutls_find_pk_algos_in_ciphersuites( data, datalen);
 
 	x = _gnutls_supported_ciphersuites(session, &ciphers);
-	if (x<=0) {
+	if (x < 0) { /* the case x==0 is handled within the function. */
 		gnutls_assert();
-		if (x<0) return x; 
-		else return GNUTLS_E_INVALID_REQUEST;
+		return x; 
 	}
 
 	/* Here we remove any ciphersuite that does not conform
@@ -635,6 +634,11 @@ int _gnutls_server_select_comp_method(gnutls_session session, opaque * data,
 	uint8 *ciphers;
 
 	x = _gnutls_supported_compression_methods(session, &ciphers);
+	if (x < 0) {
+		gnutls_assert();
+		return x;
+	}
+
 	memset( &session->internals.compression_method, '\0', sizeof(gnutls_compression_method));
 
 	for (j = 0; j < datalen; j++) {
@@ -1065,12 +1069,17 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 {
 	uint8 z;
 	GNUTLS_CipherSuite *cipher_suites;
-	uint16 x;
+	int cipher_suite_num;
 	int i, err;
 
 	z = 1;
-	x = _gnutls_supported_ciphersuites(session, &cipher_suites);
-	for (i = 0; i < x; i++) {
+	cipher_suite_num = _gnutls_supported_ciphersuites(session, &cipher_suites);
+	if (cipher_suite_num < 0) {
+		gnutls_assert();
+		return cipher_suite_num;
+	}
+	
+	for (i = 0; i < cipher_suite_num; i++) {
 		if (memcmp(&cipher_suites[i], suite, 2) == 0) {
 			z = 0;
 		}
@@ -1133,21 +1142,26 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 static int _gnutls_client_set_comp_method(gnutls_session session,
 					  opaque comp_method)
 {
-	uint8 z;
+	int comp_methods_num;
 	uint8 *compression_methods;
 	int i;
 
-	z = _gnutls_supported_compression_methods(session,
+	comp_methods_num = _gnutls_supported_compression_methods(session,
 						  &compression_methods);
-	for (i = 0; i < z; i++) {
+	if ( comp_methods_num < 0) {
+		gnutls_assert();
+		return comp_methods_num;
+	}
+	
+	for (i = 0; i < comp_methods_num; i++) {
 		if (compression_methods[i] == comp_method) {
-			z = 0;
+			comp_methods_num = 0;
 		}
 	}
 
 	gnutls_free(compression_methods);
 
-	if (z != 0) {
+	if (comp_methods_num != 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
@@ -1309,10 +1323,9 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 	int datalen, pos;
 
 	ret = _gnutls_supported_ciphersuites_sorted(session, &cipher_suites);
-	if (ret <= 0) {
+	if (ret < 0) {
 		gnutls_assert();
-		if (ret==0) return GNUTLS_E_INVALID_REQUEST;
-		else return ret;
+		return ret;
 	}
 
 	/* Here we remove any ciphersuite that does not conform

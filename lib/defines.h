@@ -93,7 +93,7 @@ typedef long ptrdiff_t;
 # define USE_MCRYPT
 #endif
 
-#if SIZEOF_UNSIGNED_LONG_INT == 8
+#if SIZEOF_UNSIGNED_LONG == 8
 # define HAVE_UINT64
 /* only used native uint64 in 64 bit machines */
 typedef unsigned long int uint64;
@@ -107,7 +107,7 @@ typedef struct {
 #endif
 
 
-#if SIZEOF_UNSIGNED_LONG_INT == 4
+#if SIZEOF_UNSIGNED_LONG == 4
 typedef unsigned long int uint32;
 typedef signed long int sint32;
 #elif SIZEOF_UNSIGNED_INT == 4
@@ -120,7 +120,7 @@ typedef signed int sint32;
 #if SIZEOF_UNSIGNED_INT == 2
 typedef unsigned int uint16;
 typedef signed int sint16;
-#elif SIZEOF_UNSIGNED_SHORT_INT == 2
+#elif SIZEOF_UNSIGNED_SHORT == 2
 typedef unsigned short int uint16;
 typedef signed short int sint16;
 #else

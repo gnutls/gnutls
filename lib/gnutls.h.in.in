@@ -58,9 +58,8 @@ typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS
  */
 #define GNUTLS_MAX_ALGORITHM_NUM 8
 
-#define GNUTLS_COMP_ZLIB GNUTLS_COMP_ZLIB_DEFAULT
 typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, 
-	GNUTLS_COMP_ZLIB_DEFAULT, GNUTLS_COMP_ZLIB_CONSTRAINED
+	GNUTLS_COMP_ZLIB, GNUTLS_COMP_LZO
 } gnutls_compression_method;
 
 typedef enum gnutls_connection_end { GNUTLS_SERVER=1, GNUTLS_CLIENT } gnutls_connection_end;

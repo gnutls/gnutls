@@ -239,7 +239,7 @@ int cipher_priority[16] =
    GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_ARCFOUR_40, 0
 };
 
-int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_LZO, GNUTLS_COMP_NULL, 0 };
 int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
@@ -994,8 +994,10 @@ void gaa_parser(int argc, char **argv)
       for (j = i = 0; i < info.ncomp; i++) {
 	 if (strncasecmp(info.comp[i], "NUL", 3) == 0)
 	    comp_priority[j++] = GNUTLS_COMP_NULL;
-	 if (strncasecmp(info.comp[i], "ZLI", 1) == 0)
+	 if (strncasecmp(info.comp[i], "ZLI", 3) == 0)
 	    comp_priority[j++] = GNUTLS_COMP_ZLIB;
+	 if (strncasecmp(info.comp[i], "LZO", 3) == 0)
+	    comp_priority[j++] = GNUTLS_COMP_LZO;
       }
       comp_priority[j] = 0;
    }

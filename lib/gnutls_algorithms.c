@@ -135,30 +135,24 @@ static const gnutls_hash_entry hash_algorithms[] = {
 #define GNUTLS_COMPRESSION_ENTRY(name, id, wb, ml, cl) \
 	{ #name, name, id, wb, ml, cl}
 
-struct gnutls_compression_entry {
-	const char *name;
-	gnutls_compression_method id;
-	int num; /* the number reserved in TLS for the specific compression method */
 
-	/* used in zlib compressor */
-	int window_bits;
-	int mem_level;
-	int comp_level;
-};
+#define MAX_COMP_METHODS 5
+const int _gnutls_comp_algorithms_size = MAX_COMP_METHODS;
 
-typedef struct gnutls_compression_entry gnutls_compression_entry;
-static const gnutls_compression_entry compression_algorithms[] = {
+/* the compression entry is defined in gnutls_algorithms.h */
+
+gnutls_compression_entry _gnutls_compression_algorithms[MAX_COMP_METHODS] = 
+{
 	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_NULL, 0x00, 0, 0, 0),
 #ifdef HAVE_LIBZ
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB_DEFAULT, 0xf1, 15, 8, 3),
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB_CONSTRAINED, 0xf2, 12, 5, 3),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB, 0xf1, 15, 8, 3),
 #endif
 	{0}
 };
 
 #define GNUTLS_COMPRESSION_LOOP(b) \
         const gnutls_compression_entry *p; \
-                for(p = compression_algorithms; p->name != NULL; p++) { b ; }
+                for(p = _gnutls_compression_algorithms; p->name != NULL; p++) { b ; }
 #define GNUTLS_COMPRESSION_ALG_LOOP(a) \
                         GNUTLS_COMPRESSION_LOOP( if(p->id == algorithm) { a; break; } )
 #define GNUTLS_COMPRESSION_ALG_LOOP_NUM(a) \
@@ -1176,6 +1170,15 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 
 	*_ciphers = ciphers;
 	gnutls_afree(tmp_ciphers);
+
+	/* This function can no longer return 0 cipher suites.
+	 * It returns an error code instead.
+	 */
+	if (ret_count == 0) {
+		gnutls_assert();
+		gnutls_free( ciphers);
+		return GNUTLS_E_NO_CIPHER_SUITES;
+	}
 	return ret_count;
 }
 
@@ -1191,7 +1194,7 @@ _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 {
 	int i, tmp, j=0;
 
-	*comp = gnutls_malloc(SUPPORTED_COMPRESSION_METHODS);
+	*comp = gnutls_malloc( sizeof(uint8) * SUPPORTED_COMPRESSION_METHODS);
 	if (*comp == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
@@ -1199,7 +1202,7 @@ _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 		tmp = _gnutls_compression_get_num(session->internals.
 						  compression_method_priority.
 						  priority[i]);
-		
+
 		/* remove private compression algorithms, if requested.
 		 */
 		if (tmp == -1 || (session->internals.enable_private == 0 &&
@@ -1213,6 +1216,11 @@ _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 		j++;
 	}
 
+	if (j==0) {
+		gnutls_assert();
+		gnutls_free( *comp);
+		return GNUTLS_E_NO_COMPRESSION_ALGORITHMS;
+	}
 	return j;
 }
 

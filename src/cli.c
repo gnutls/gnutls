@@ -607,8 +607,10 @@ void gaa_parser(int argc, char **argv)
       for (j = i = 0; i < info.ncomp; i++) {
 	 if (strncasecmp(info.comp[i], "NUL", 3) == 0)
 	    comp_priority[j++] = GNUTLS_COMP_NULL;
-	 if (strncasecmp(info.comp[i], "ZLI", 1) == 0)
+	 if (strncasecmp(info.comp[i], "ZLI", 3) == 0)
 	    comp_priority[j++] = GNUTLS_COMP_ZLIB;
+	 if (strncasecmp(info.comp[i], "LZO", 3) == 0)
+	    comp_priority[j++] = GNUTLS_COMP_LZO;
       }
       comp_priority[j] = 0;
    }

@@ -23,6 +23,15 @@
 #include <gnutls_compress.h>
 #include <gnutls_algorithms.h>
 #include "gnutls_errors.h"
+#include "../libextra/minilzo.h" /* get the prototypes only.
+      *	Since LZO is a GPLed library, the gnutls_global_init_extra() has
+      *	to be called, before LZO compression can be used.
+      */
+	
+typedef int (*LZO_FUNC)();
+
+LZO_FUNC _gnutls_lzo1x_decompress_safe = NULL;
+LZO_FUNC _gnutls_lzo1x_1_compress = NULL;
 
 /* The flag d is the direction (compressed, decompress). Non zero is
  * decompress.
@@ -43,8 +52,7 @@ int err;
 
 #ifdef HAVE_LIBZ
 	switch( method) {
-	    case GNUTLS_COMP_ZLIB_DEFAULT:
-	    case GNUTLS_COMP_ZLIB_CONSTRAINED: {
+	    case GNUTLS_COMP_ZLIB: {
 		int window_bits, mem_level;
 		int comp_level;
 		z_stream* zhandle;
@@ -80,6 +88,20 @@ int err;
 		}
 		break;
 	    }
+	    case GNUTLS_COMP_LZO:
+	        if (d) /* LZO does not use memory on decompressor */
+	           ret->handle = NULL;
+	        else {
+  		   ret->handle = gnutls_malloc( LZO1X_1_MEM_COMPRESS);
+  		  
+ 		   if (ret->handle==NULL) {
+			gnutls_assert();
+			return NULL;
+		   }
+		}
+		
+		break;
+
 	    default:
 	}
 #endif
@@ -91,9 +113,10 @@ int err;
 
 	if (handle!=NULL) {
 		switch( handle->algo) {
+			case GNUTLS_COMP_LZO:
+				break;
 #ifdef HAVE_LIBZ
-			case GNUTLS_COMP_ZLIB_CONSTRAINED:
-			case GNUTLS_COMP_ZLIB_DEFAULT:
+			case GNUTLS_COMP_ZLIB:
 				if (d)
 					err = inflateEnd( handle->handle);
 				else
@@ -113,22 +136,23 @@ int err;
 /* These functions are memory consuming 
  */
 
-int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const char* plain, int plain_size, char** compressed, int max_comp_size) {
+int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const char* plain, int plain_size, char** compressed, int max_comp_size) 
+{
 int compressed_size=GNUTLS_E_COMPRESSION_FAILED;
-#ifdef HAVE_LIBZ
-uLongf size;
-z_stream *zhandle;
-#endif
 int err;
 
 	/* NULL compression is not handled here
 	 */
 	
 	switch( handle->algo) {
-#ifdef HAVE_LIBZ
-		case GNUTLS_COMP_ZLIB_DEFAULT:
-		case GNUTLS_COMP_ZLIB_CONSTRAINED:
-			size = (plain_size*2)+10;
+		case GNUTLS_COMP_LZO: {
+			lzo_uint out_len;
+			size_t size;
+			
+			if ( _gnutls_lzo1x_1_compress == NULL)
+				return GNUTLS_E_COMPRESSION_FAILED;
+			
+			size = plain_size + plain_size / 64 + 16 + 3;
 			*compressed=NULL;
 
 			*compressed = gnutls_malloc(size);
@@ -136,7 +160,33 @@ int err;
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;
 			}
+
+		 	err = _gnutls_lzo1x_1_compress( plain, plain_size, *compressed,
+		 	        &out_len, handle->handle);
+
+		 	if (err!=LZO_E_OK) {
+		 		gnutls_assert();
+		 		gnutls_free( *compressed);
+		 		return GNUTLS_E_COMPRESSION_FAILED;
+		 	}
+
+			compressed_size = out_len;
+			break;
+		}		
+#ifdef HAVE_LIBZ
+		case GNUTLS_COMP_ZLIB: {
+			uLongf size;
+			z_stream *zhandle;
 			
+			size = (plain_size+plain_size)+10;
+			*compressed=NULL;
+
+			*compressed = gnutls_malloc(size);
+			if (*compressed==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+
 			zhandle = handle->handle;
 
 			zhandle->next_in = (Bytef*) plain;
@@ -154,11 +204,16 @@ int err;
 
 			compressed_size = size - zhandle->avail_out;
 			break;
+		}
 #endif
 		default:
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 	} /* switch */
+
+#ifdef COMPRESSION_DEBUG
+	_gnutls_log("Compression ratio: %f\n", (float)((float)compressed_size / (float)plain_size));
+#endif
 
 	if (compressed_size > max_comp_size) {
 		gnutls_free(*compressed);
@@ -168,13 +223,13 @@ int err;
 	return compressed_size;
 }
 
-int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size) {
+
+
+int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, 
+	char** plain, int max_record_size) 
+{
 int plain_size=GNUTLS_E_DECOMPRESSION_FAILED, err;
-#ifdef HAVE_LIBZ
-uLongf out_size;
-z_stream* zhandle;
 int cur_pos;
-#endif
 
 	if (compressed_size > max_record_size+EXTRA_COMP_SIZE) {
 		gnutls_assert();
@@ -185,13 +240,50 @@ int cur_pos;
 	 */
 	
 	switch(handle->algo) {
-#ifdef HAVE_LIBZ
-		case GNUTLS_COMP_ZLIB_DEFAULT:
-		case GNUTLS_COMP_ZLIB_CONSTRAINED:
-			*plain = NULL;
-			out_size = compressed_size;;
-			plain_size = 0;
+		case GNUTLS_COMP_LZO: {
+			lzo_uint out_size;
+			lzo_uint new_size;
 			
+			if (_gnutls_lzo1x_decompress_safe == NULL)
+				return GNUTLS_E_DECOMPRESSION_FAILED;
+
+			*plain = NULL;
+			out_size = compressed_size + compressed_size;
+			plain_size = 0;
+
+			do {
+				out_size += 512;
+				*plain = gnutls_realloc_fast( *plain, out_size);
+				if (*plain==NULL) {
+					gnutls_assert();
+					return GNUTLS_E_MEMORY_ERROR;
+				}
+
+			 	new_size = out_size;
+			 	err = _gnutls_lzo1x_decompress_safe(compressed,compressed_size,
+			 		*plain, &new_size,NULL);
+
+			} while( (err==LZO_E_OUTPUT_OVERRUN && out_size < max_record_size));
+
+		 	if (err!=LZO_E_OK) {
+		 		gnutls_assert();
+		 		gnutls_free( *plain);
+		 		return GNUTLS_E_DECOMPRESSION_FAILED;
+		 	}
+
+			plain_size = new_size;
+			break;
+		}
+
+#ifdef HAVE_LIBZ
+		case GNUTLS_COMP_ZLIB: {
+			uLongf out_size;
+			z_stream* zhandle;
+
+			*plain = NULL;
+			out_size = compressed_size + compressed_size;
+			plain_size = 0;
+
 			zhandle = handle->handle;
 
 			zhandle->next_in = (Bytef*) compressed;
@@ -200,7 +292,7 @@ int cur_pos;
 			cur_pos = 0;
 			
 			do {
-				out_size += 128;
+				out_size += 512;
 				*plain = gnutls_realloc_fast( *plain, out_size);
 				if (*plain==NULL) {
 					gnutls_assert();
@@ -225,6 +317,7 @@ int cur_pos;
 
 			plain_size = out_size - zhandle->avail_out;
 			break;
+		}
 #endif
 		default:
 			gnutls_assert();

@@ -81,17 +81,23 @@
 #define GNUTLS_E_UNKNOWN_PK_ALGORITHM -80
 #define GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED -81
 
+
 /* returned if libextra functionality was requested but
  * gnutls_global_init_extra() was not called.
  */
 #define GNUTLS_E_INIT_LIBEXTRA -82
-#define GNUTLS_E_LIBRARY_VERSION_MISMATCH -82
-#define GNUTLS_E_EXPORT_CIPHER_SUITE -83
+#define GNUTLS_E_LIBRARY_VERSION_MISMATCH -83
+
 
 /* returned if you need to generate temporary RSA 
  * parameters. These are needed for export cipher suites.
  */
 #define GNUTLS_E_NO_TEMPORARY_RSA_PARAMS -84
+
+#define GNUTLS_E_LZO_INIT_FAILED -85
+#define GNUTLS_E_NO_COMPRESSION_ALGORITHMS -86
+#define GNUTLS_E_NO_CIPHER_SUITES -87
+
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -250
 

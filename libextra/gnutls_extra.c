@@ -25,6 +25,7 @@
 #include <gnutls_openpgp.h>
 #include <gnutls_extra.h>
 #include <gnutls_algorithms.h>
+#include <minilzo.h>
 
 extern gnutls_extension_entry _gnutls_extensions[];
 extern const int _gnutls_extensions_size;
@@ -74,6 +75,46 @@ int i;
 	
 		return 0; /* ok */
 	}
+
+	return GNUTLS_E_MEMORY_ERROR;
+}
+
+/* the number of the compression algorithms available in the compression
+ * structure.
+ */
+extern int _gnutls_comp_algorithms_size;
+
+/* Functions in gnutls that have not been initialized.
+ */
+typedef int (*LZO_FUNC)();
+extern LZO_FUNC _gnutls_lzo1x_decompress_safe;
+extern LZO_FUNC _gnutls_lzo1x_1_compress;
+
+extern gnutls_compression_entry _gnutls_compression_algorithms[];
+
+static int _gnutls_add_lzo_comp(void) 
+{
+int i;
+
+	/* find the last element */
+	for(i=0;i<_gnutls_comp_algorithms_size;i++) {
+		if (_gnutls_compression_algorithms[i].name==NULL) break;
+	}
+
+	if (_gnutls_compression_algorithms[i].name==NULL && (i < _gnutls_comp_algorithms_size-1)) {
+		_gnutls_compression_algorithms[i].name = "GNUTLS_COMP_LZO";
+		_gnutls_compression_algorithms[i].id = GNUTLS_COMP_LZO;
+		_gnutls_compression_algorithms[i].num = 0xf2;
+
+		_gnutls_compression_algorithms[i+1].name = 0;
+
+		/* Now enable the lzo functions: */
+		_gnutls_lzo1x_decompress_safe = lzo1x_decompress_safe;
+		_gnutls_lzo1x_1_compress = lzo1x_1_compress;
+	
+		return 0; /* ok */
+	}
+	
 
 	return GNUTLS_E_MEMORY_ERROR;
 }
@@ -128,18 +169,41 @@ int ret;
 		return 0;
 	}
 
+	/* Initialize the LZO library
+	 */
+	if (lzo_init() != LZO_E_OK) {
+		return GNUTLS_E_LZO_INIT_FAILED;
+	}
+
+	/* Add the LZO compression method in the list of compression
+	 * methods.
+	 */
+	ret = _gnutls_add_lzo_comp();
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* Add the SRP authentication to the list of authentication
+	 * methods.
+	 */
 	ret = _gnutls_add_srp_auth_struct();
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
+	/* Do the same of the extension
+	 */
 	ret = _gnutls_add_srp_extension();
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
+	/* Register the openpgp functions. This is because some
+	 * of them are defined to be NULL in the main library.
+	 */
 	_gnutls_add_openpgp_functions();
 
 	return 0;

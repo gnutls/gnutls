@@ -86,3 +86,15 @@ struct gnutls_kx_algo_entry {
 	MOD_AUTH_STRUCT *auth_struct;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
+
+struct gnutls_compression_entry {
+	const char *name;
+	gnutls_compression_method id;
+	int num; /* the number reserved in TLS for the specific compression method */
+
+	/* used in zlib compressor */
+	int window_bits;
+	int mem_level;
+	int comp_level;
+};
+typedef struct gnutls_compression_entry gnutls_compression_entry;
