@@ -2156,5 +2156,13 @@ gnutls_openpgp_extract_key_name_string( const gnutls_datum *cert,
 {
 	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
+
+int
+gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
+                        key_attr_t by, opaque *pattern )
+{
+	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}
+
 #endif /* HAVE_LIBOPENCDK */
 
