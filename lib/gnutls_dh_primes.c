@@ -22,6 +22,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_gcry.h>
 #include <gnutls_datum.h>
+#include "debug.h"
 
 static uint8 DH_G_1024[] = { 0x02 };
 static uint8 DH_G_4096[] = { 0x05 };
@@ -234,6 +235,10 @@ typedef struct {
  * Initialy the MPIs are not calculated (must call global_init, or _gnutls_dh_calc_mpis()).
  */
 static PRIME dh_primes[] = {
+	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
+	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
+	 , 0}
+	,
 	{1024, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
 	 , {diffie_hellman_group1_prime, sizeof diffie_hellman_group1_prime}
 	 , 0}
@@ -259,11 +264,13 @@ static PRIME dh_primes[] = {
  * number of bits. Ie a number of bits that we have a prime in the
  * dh_primes structure.
  */
-static int supported_bits[] = { 1024, 2048, 3072, 4096, 0 };
+static int supported_bits[] = { 768, 1024, 2048, 3072, 4096, 0 };
 static int normalize_bits(int bits)
 {
 	if (bits >= 4096)
 		bits = 4096;
+	else if (bits <= 768)
+		bits = 768;
 	else if (bits <= 1024)
 		bits = 1024;
 	else if (bits <= 2048)
@@ -411,6 +418,7 @@ int i=0;
 		i++;
 	} while(supported_bits[i]!=0);
 
+	gnutls_assert();
 	return GNUTLS_E_INVALID_PARAMETERS;
 }
 
@@ -428,7 +436,7 @@ int i=0;
   * appropriate gnutls_datum. This function should not be called while a key 
   * exchange is in progress. 
   * 
-  * Note that the bits value should be one of 1024, 2048, 3072 or 4096.
+  * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
   *
   **/
 int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits)
@@ -501,12 +509,13 @@ int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bi
   * @bits: is the prime's number of bits
   *
   * This function will generate a new pair of prime and generator for use in 
-  * the Diffie-Hellman key exchange. The new parameters will be stored in the
-  * appropriate gnutls_datum. This function is normally very slow. An other function
-  * (gnutls_dh_replace_params()) should be called in order to replace the included 
-  * DH primes in the gnutls library.
+  * the Diffie-Hellman key exchange. The new parameters will be allocated using
+  * malloc and will be stored in the appropriate datum.
+  * This function is normally very slow. An other function
+  * (gnutls_dh_replace_params()) should be called in order to replace the 
+  * included DH primes in the gnutls library.
   * 
-  * Note that the bits value should be one of 1024, 2048, 3072 or 4096.
+  * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
   * Also note that the generation of new DH parameters is only usefull
   * to servers. Clients use the parameters sent by the server, thus it's
   * no use calling this in client side.
@@ -518,7 +527,7 @@ int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int
 	MPI tmp_prime, tmp_g;
 	int siz;
 
-	if (check_bits(bits)<0) {
+	if (check_bits(bits) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
@@ -531,7 +540,7 @@ int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int
 	siz = 0;
 	_gnutls_mpi_print( NULL, &siz, tmp_g);
 
-	generator->data = gnutls_malloc(siz);
+	generator->data = malloc(siz);
 	if (generator->data == NULL) {
 		_gnutls_mpi_release(&tmp_g);
 		_gnutls_mpi_release(&tmp_prime);
@@ -545,7 +554,7 @@ int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int
 	siz = 0;
 	_gnutls_mpi_print( NULL, &siz, tmp_prime);
 
-	prime->data = gnutls_malloc(siz);
+	prime->data = malloc(siz);
 	if (prime->data == NULL) {
 		gnutls_free( generator->data);
 		_gnutls_mpi_release(&tmp_g);
@@ -554,6 +563,10 @@ int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int
 	}
 	prime->size = siz;
 	_gnutls_mpi_print( prime->data, &siz, tmp_prime);
+
+	_gnutls_log( "Generated %d bits prime %s, generator %s.\n", 
+		bits, _gnutls_bin2hex( prime->data, prime->size),
+		_gnutls_bin2hex( generator->data, generator->size));
 
 	return 0;
 

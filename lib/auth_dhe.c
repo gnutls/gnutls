@@ -29,6 +29,7 @@
 #include <auth_cert.h>
 #include <gnutls_x509.h>
 #include <gnutls_openpgp.h>
+#include <gnutls_state.h>
 
 static int gen_dhe_server_kx(GNUTLS_STATE, opaque **);
 static int gen_dhe_client_kx(GNUTLS_STATE, opaque **);
@@ -92,7 +93,7 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 	gnutls_datum signature, ddata;
 	CERTIFICATE_AUTH_INFO info;
 
-	bits = _gnutls_dh_get_bits( state);
+	bits = _gnutls_dh_get_prime_bits( state);
 
 	/* find the appropriate certificate */
 	if ((ret =
@@ -115,7 +116,11 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 	}
 
 	info = _gnutls_get_auth_info( state);
-	info->dh_bits = gcry_mpi_get_nbits(p);
+	ret=_gnutls_dh_set_prime_bits( state, gcry_mpi_get_nbits(p));
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	X = gnutls_calc_dh_secret(&x, g, p);
 	if (X == NULL) {
@@ -125,6 +130,12 @@ static int gen_dhe_server_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	state->gnutls_key->dh_secret = x;
+	ret=_gnutls_dh_set_secret_bits( state, gcry_mpi_get_nbits(x));
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
+
 
 	_gnutls_mpi_print( NULL, &n_g, g);
 	_gnutls_mpi_print( NULL, &n_p, p);
@@ -207,6 +218,12 @@ static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
+	ret=_gnutls_dh_set_secret_bits( state, gcry_mpi_get_nbits(x));
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	_gnutls_mpi_print( NULL, &n_X, X);
 	(*data) = gnutls_malloc(n_X + 2);
 	if (*data == NULL) {
@@ -230,6 +247,14 @@ static int gen_dhe_client_kx(GNUTLS_STATE state, opaque ** data)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
+	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(
+		state->gnutls_key->client_Y));
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
+
 
 	/* THESE SHOULD BE DISCARDED */
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);
@@ -318,7 +343,28 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	info->dh_bits = gcry_mpi_get_nbits( state->gnutls_key->client_p);
+	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(
+		state->gnutls_key->client_Y));
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	if ( gcry_mpi_get_nbits( state->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( state)) {
+		/* the prime used by the peer is not acceptable
+		 */
+		gnutls_assert();
+		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
+	}
+
+	ret=_gnutls_dh_set_prime_bits( state, gcry_mpi_get_nbits(
+		state->gnutls_key->client_p));
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
+
+//	info->dh_bits = gcry_mpi_get_nbits( state->gnutls_key->client_p);
 
 	/* VERIFY SIGNATURE */
 
@@ -378,7 +424,7 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 	MPI g, p;
 	int bits, ret;
 
-	bits = _gnutls_dh_get_bits( state);
+	bits = _gnutls_dh_get_prime_bits( state);
 
 	DECR_LEN( data_size, 2);
 	n_Y = READuint16(&data[0]);
@@ -388,6 +434,13 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y, &data[2], &_n_Y)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	ret=_gnutls_dh_set_peer_public_bits( state, gcry_mpi_get_nbits(
+		state->gnutls_key->client_Y));
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	g = gnutls_get_dh_params(&p, bits);
@@ -407,7 +460,6 @@ static int proc_dhe_client_kx(GNUTLS_STATE state, opaque * data,
 	if (state->gnutls_key->KEY == NULL) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
 
 	_gnutls_mpi_release(&state->gnutls_key->client_Y);
 	_gnutls_mpi_release(&state->gnutls_key->dh_secret);

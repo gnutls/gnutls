@@ -158,8 +158,10 @@ int print_info(GNUTLS_STATE state)
 	cred = gnutls_auth_get_type(state);
 	switch (cred) {
 	case GNUTLS_CRD_ANON:
-		printf("- Anonymous DH using prime of %d bits\n",
-		       gnutls_dh_get_bits(state));
+		printf("- Anonymous DH using prime of %d bits, secret key "
+			"of %d bits, and peer's public key is %d bits.\n",
+		       gnutls_dh_get_prime_bits(state), gnutls_dh_get_secret_bits(state),
+		       gnutls_dh_get_peers_public_bits(state));
 		break;
 	case GNUTLS_CRD_SRP:
 		/* This should be only called in server
@@ -193,8 +195,10 @@ int print_info(GNUTLS_STATE state)
 		/* Check if we have been using ephemeral Diffie Hellman.
 		 */
 		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
-			printf("\n- Ephemeral DH using prime of %d bits\n",
-			       gnutls_dh_get_bits(state));
+			printf("- Ephemeral DH using prime of %d bits, secret key "
+				"of %d bits, and peer's public key is %d bits.\n",
+			       gnutls_dh_get_prime_bits(state), gnutls_dh_get_secret_bits(state),
+			       gnutls_dh_get_peers_public_bits(state));
 		}
 	}
 

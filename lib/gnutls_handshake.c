@@ -532,12 +532,22 @@ int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int datalen)
 	pk_algo = _gnutls_find_pk_algos_in_ciphersuites( data, datalen);
 
 	x = _gnutls_supported_ciphersuites(state, &ciphers);
+	if (x<=0) {
+		gnutls_assert();
+		if (x<0) return x; 
+		else return GNUTLS_E_INVALID_REQUEST;
+	}
 
 	/* Here we remove any ciphersuite that does not conform
 	 * the certificate requested, or to the
 	 * authentication requested (eg SRP).
 	 */
 	x = _gnutls_remove_unwanted_ciphersuites(state, &ciphers, x, pk_algo);
+	if (x<=0) {
+		gnutls_assert();
+		if (x<0) return x;
+		else return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
 #ifdef HANDSHAKE_DEBUG
 	_gnutls_handshake_log("HSK: Requested cipher suites: \n");
@@ -1298,9 +1308,10 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 	int datalen, pos;
 
 	ret = _gnutls_supported_ciphersuites_sorted(state, &cipher_suites);
-	if (ret < 0) {
+	if (ret <= 0) {
 		gnutls_assert();
-		return ret;
+		if (ret==0) return GNUTLS_E_INVALID_REQUEST;
+		else return ret;
 	}
 
 	/* Here we remove any ciphersuite that does not conform
@@ -1313,6 +1324,10 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
+	}
+	if (ret==0) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
 

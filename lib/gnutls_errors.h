@@ -100,5 +100,5 @@ int gnutls_error_is_fatal( int error);
 # define _gnutls_read_log( ...)
 # define _gnutls_write_log( ...)
 # define _gnutls_x509_log( ...)
-#endif
+#endif /* DEBUG */
 

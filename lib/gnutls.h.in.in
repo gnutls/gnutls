@@ -192,11 +192,11 @@ int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *pa
 
 void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
 int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
-int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits);
+int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
 
 void gnutls_anon_free_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
 int gnutls_anon_allocate_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
-int gnutls_anon_set_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS res, int dh_bits);
+int gnutls_anon_set_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
 
 
 /* CERTFILE is an x509 certificate in PEM form.

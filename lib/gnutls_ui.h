@@ -65,10 +65,12 @@ const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
 
 void gnutls_srp_server_set_select_func( GNUTLS_SRP_SERVER_CREDENTIALS, gnutls_srp_server_select_func *);
 
-/* ANON */
+/* DH */
 
-void gnutls_dh_set_bits( GNUTLS_STATE state, int bits);
-int gnutls_dh_get_bits( GNUTLS_STATE);
+void gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
+int gnutls_dh_get_prime_bits( GNUTLS_STATE);
+int gnutls_dh_get_secret_bits( GNUTLS_STATE);
+int gnutls_dh_get_peers_public_bits( GNUTLS_STATE);
 
 /* X509PKI */
 

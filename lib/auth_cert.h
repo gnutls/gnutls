@@ -53,7 +53,9 @@ typedef struct CERTIFICATE_AUTH_INFO_INT {
 	int		  certificate_requested; /* if the peer requested certificate
 						  * this is non zero;
 						  */
-	int		  dh_bits; /* bits of the DH (if DHE_RSA is used) */
+	int		  dh_secret_bits; /* bits of the DH (if DHE_RSA is used) */
+	int		  dh_prime_bits;
+	int		  dh_peer_public_bits; 
 	gnutls_datum*	  raw_certificate_list; /* holds the raw certificate of the
 					         * peer.
 					         */

@@ -49,7 +49,11 @@
 /* konqueror cannot handle sending the page in multiple
  * pieces.
  */
+/* global stuff */
 static char http_buffer[16*1024];
+static int generate = 0;
+
+/* end of globals */
 
 /* This is a sample TCP echo server.
  * This will behave as an http server if any argument in the
@@ -77,6 +81,45 @@ GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
 GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
 GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
 
+static int generate_dh_primes(void) {
+gnutls_datum prime, generator;
+
+   /* Generate Diffie Hellman parameters - for use with DHE
+    * kx algorithms. These should be discarded and regenerated
+    * once a day, once a week or once a month. Depends on the
+    * security requirements.
+    */
+   printf("Generating Diffie Hellman parameters. Please wait...");
+   fflush(stdout);
+   if (gnutls_dh_generate_params( &prime, &generator, 768) < 0) {
+   	fprintf(stderr, "Error in prime generation\n");
+   	exit(1);
+   }
+   if (gnutls_dh_replace_params( prime, generator, 768) < 0) {
+   	fprintf(stderr, "Error in prime replacement\n");
+   	exit(1);
+   }
+
+   free( prime.data);
+   free( generator.data);
+
+   if (gnutls_dh_generate_params( &prime, &generator, 1024) < 0) {
+   	fprintf(stderr, "Error in prime generation\n");
+   	exit(1);
+   }
+   if (gnutls_dh_replace_params( prime, generator, 1024) < 0) {
+   	fprintf(stderr, "Error in prime replacement\n");
+   	exit(1);
+   }
+
+   /* do the same for 2048, 4096 etc. */
+
+   free( prime.data);
+   free( generator.data);
+
+   return 0;
+}
+
 
 GNUTLS_STATE initialize_state(void)
 {
@@ -102,6 +145,8 @@ GNUTLS_STATE initialize_state(void)
 	gnutls_protocol_set_priority( state, protocol_priority);
 	gnutls_mac_set_priority(state, mac_priority);
 	gnutls_cert_type_set_priority(state, cert_type_priority);
+	
+	gnutls_dh_set_prime_bits( state, 768);
 	
 	gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
 	gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
@@ -142,7 +187,7 @@ void peer_print_info( GNUTLS_STATE state)
 
 	if (gnutls_kx_get(state) == GNUTLS_KX_ANON_DH) {
 		sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
-		       gnutls_dh_get_bits( state));
+		       gnutls_dh_get_prime_bits( state));
 	}
 
 	/* print state information */
@@ -161,7 +206,7 @@ void peer_print_info( GNUTLS_STATE state)
 
 	if (gnutls_kx_get(state) == GNUTLS_KX_DHE_RSA || gnutls_kx_get(state) == GNUTLS_KX_DHE_DSS) {
 		sprintf(tmp2, "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
-			        gnutls_dh_get_bits( state));
+			        gnutls_dh_get_prime_bits( state));
 	}
 			
 	tmp =
@@ -265,6 +310,12 @@ int main(int argc, char **argv)
 		fprintf(stderr, "global state initialization error\n");
 		exit(1);
 	}
+
+	/* Remember that servers must generate parameters for
+	 * Diffie Hellman. See gnutls_dh_generate_params(), and
+	 * gnutls_dh_replace_params().
+	 */
+	if (generate!=0) generate_dh_primes();
 
 	if (gnutls_certificate_allocate_server_sc(&cert_cred) < 0) {
 		fprintf(stderr, "memory error\n");

@@ -52,22 +52,23 @@ const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
 /* ANON */
 
 /**
-  * gnutls_dh_set_bits - Used to set the bits for a DH ciphersuite
+  * gnutls_dh_set_prime_bits - Used to set the bits for a DH ciphersuite
   * @state: is a &GNUTLS_STATE structure.
   * @bits: is the number of bits
   *
   * This function sets the number of bits, for use in an 
   * Diffie Hellman key exchange. This is used both in DH ephemeral and
-  * DH anonymous cipher suites.
+  * DH anonymous cipher suites. This will set the
+  * minimum size of the prime that will be used for the handshake.
   *
   **/
-void gnutls_dh_set_bits(GNUTLS_STATE state, int bits)
+void gnutls_dh_set_prime_bits(GNUTLS_STATE state, int bits)
 {
-	state->gnutls_internals.dh_bits = bits;
+	state->gnutls_internals.dh_prime_bits = bits;
 }
 
 /**
-  * gnutls_dh_get_bits - This function returns the bits used in DH authentication
+  * gnutls_dh_get_prime_bits - This function returns the bits used in DH authentication
   * @state: is a gnutls state
   *
   * This function will return the bits used in the last Diffie Hellman authentication
@@ -75,7 +76,7 @@ void gnutls_dh_set_bits(GNUTLS_STATE state, int bits)
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_bits(GNUTLS_STATE state)
+int gnutls_dh_get_prime_bits(GNUTLS_STATE state)
 {
 	switch( gnutls_auth_get_type( state)) {
 		case GNUTLS_CRD_ANON: {
@@ -84,7 +85,7 @@ int gnutls_dh_get_bits(GNUTLS_STATE state)
 			info = _gnutls_get_auth_info(state);
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
-			return info->dh_bits;
+			return info->dh_prime_bits;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
 			CERTIFICATE_AUTH_INFO info;
@@ -93,7 +94,77 @@ int gnutls_dh_get_bits(GNUTLS_STATE state)
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
 
-			return info->dh_bits;
+			return info->dh_prime_bits;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+	}
+}
+
+/**
+  * gnutls_dh_get_secret_bits - This function returns the bits used in DH authentication
+  * @state: is a gnutls state
+  *
+  * This function will return the bits used in the last Diffie Hellman authentication
+  * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_dh_get_secret_bits(GNUTLS_STATE state)
+{
+	switch( gnutls_auth_get_type( state)) {
+		case GNUTLS_CRD_ANON: {
+			ANON_SERVER_AUTH_INFO info;
+
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+			return info->dh_secret_bits;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+			CERTIFICATE_AUTH_INFO info;
+
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+
+			return info->dh_secret_bits;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+	}
+}
+
+/**
+  * gnutls_dh_get_peers_public_bits - This function returns the bits used in DH authentication
+  * @state: is a gnutls state
+  *
+  * This function will return the bits used in the last Diffie Hellman authentication
+  * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_dh_get_peers_public_bits(GNUTLS_STATE state)
+{
+	switch( gnutls_auth_get_type( state)) {
+		case GNUTLS_CRD_ANON: {
+			ANON_SERVER_AUTH_INFO info;
+
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+			return info->dh_peer_public_bits;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+			CERTIFICATE_AUTH_INFO info;
+
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+
+			return info->dh_peer_public_bits;
 		}
 		default:
 			gnutls_assert();

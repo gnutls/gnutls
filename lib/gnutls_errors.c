@@ -18,6 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#include <gnutls_int.h>
 #include "gnutls_errors.h"
 #ifdef STDC_HEADERS
 # include <stdarg.h>
@@ -48,6 +49,7 @@ static gnutls_error_entry error_algorithms[] = {
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_UNWANTED_ALGORITHM, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_LARGE_PACKET, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_UNSUPPORTED_VERSION_PACKET, 1),
+	GNUTLS_ERROR_ENTRY( GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_UNEXPECTED_PACKET_LENGTH, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_INVALID_SESSION, 1),
 	GNUTLS_ERROR_ENTRY( GNUTLS_E_INTERNAL, 1),
@@ -175,7 +177,7 @@ void _gnutls_log( const char *fmt, ...) {
  va_list args;
  char str[MAX_LOG_SIZE];
  void (*log_func)(const char*) = _gnutls_log_func;
- 
+
  if (_gnutls_log_func==NULL) return;
 
  va_start(args,fmt);

@@ -43,7 +43,7 @@
 
 typedef const int* GNUTLS_LIST;
 
-#define MIN_BITS 1023
+#define MIN_BITS 767
 
 #define MAX32 4294967295
 #define MAX24 16777215
@@ -513,10 +513,10 @@ typedef struct {
 	srp_server_select_func*		server_srp_callback;
 
 	/* bits to use for DHE and DHA 
-	 * use _gnutls_dh_get_bits() and gnutls_dh_set_bits() 
+	 * use _gnutls_dh_get_prime_bits() and gnutls_dh_set_prime_bits() 
 	 * to access it.
 	 */
-	int				dh_bits;
+	int				dh_prime_bits;
 	
 	int				max_handshake_data_buffer_size;
 

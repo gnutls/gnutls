@@ -216,6 +216,8 @@ int main(int argc, char** argv)
 	gnutls_mac_set_priority(state, mac_priority);
 	gnutls_cert_type_set_priority(state, cert_type_priority);
 
+	gnutls_dh_set_prime_bits( state, 1024);
+	
 	gnutls_cred_set( state, GNUTLS_CRD_ANON, anon_cred);
 	gnutls_cred_set( state, GNUTLS_CRD_SRP, cred);
 	gnutls_cred_set( state, GNUTLS_CRD_CERTIFICATE, xcred);
@@ -282,7 +284,9 @@ int main(int argc, char** argv)
 	gnutls_mac_set_priority(state, mac_priority);
 	gnutls_cert_type_set_priority(state, cert_type_priority);
 
-	gnutls_cred_set( state, GNUTLS_CRD_ANON, NULL);
+	gnutls_dh_set_prime_bits( state, 1024);
+
+	gnutls_cred_set( state, GNUTLS_CRD_ANON, anon_cred);
 	gnutls_cred_set( state, GNUTLS_CRD_SRP, cred);
 	gnutls_cred_set( state, GNUTLS_CRD_CERTIFICATE, xcred);
 
@@ -482,7 +486,7 @@ int i,j;
 				kx_priority[j++] = GNUTLS_KX_DHE_RSA;
 			if (strncasecmp( info.kx[i], "DHE_DSS", 7)==0)
 				kx_priority[j++] = GNUTLS_KX_DHE_DSS;
-			if (strncasecmp( info.kx[i], "ANON_DH", 7)==0)
+			if (strncasecmp( info.kx[i], "ANON", 4)==0)
 				kx_priority[j++] = GNUTLS_KX_ANON_DH;
 		}
 		kx_priority[j] = 0;
@@ -523,7 +527,14 @@ void print_list(void) {
 	printf(" MD5");
 	printf(", SHA-1\n");
 
-	printf("Compression Methods:");
+	printf("Key exchange algorithms:");
+	printf(" RSA");
+	printf(", DHE_DSS");
+	printf(", DHE_RSA");
+	printf(", SRP");
+	printf(", ANON_DH\n");
+
+	printf("Compression methods:");
 	printf(" ZLIB");
 	printf(", NULL\n");
 

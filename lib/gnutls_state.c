@@ -30,6 +30,8 @@
 #include <gnutls_dh.h>
 #include <gnutls_buffers.h>
 #include <gnutls_state.h>
+#include <auth_cert.h>
+#include <auth_anon.h>
 
 #define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \
 	gnutls_assert(); \
@@ -156,7 +158,7 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 
 	(*state)->gnutls_internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
-	gnutls_dh_set_bits( (*state), MIN_BITS);
+	gnutls_dh_set_prime_bits( (*state), MIN_BITS);
 
 	gnutls_transport_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
 
@@ -256,3 +258,93 @@ void gnutls_deinit(GNUTLS_STATE state)
 
 	return;
 }
+
+int _gnutls_dh_get_prime_bits( GNUTLS_STATE state) {
+	return state->gnutls_internals.dh_prime_bits;
+}
+
+int _gnutls_dh_set_peer_public_bits( GNUTLS_STATE state, int bits) {
+	switch( gnutls_auth_get_type( state)) {
+		case GNUTLS_CRD_ANON: {
+			ANON_SERVER_AUTH_INFO info;
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+			info->dh_peer_public_bits = bits;
+			break;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+			CERTIFICATE_AUTH_INFO info;
+
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+
+			info->dh_peer_public_bits = bits;
+			break;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
+	return 0;
+}
+
+int _gnutls_dh_set_secret_bits( GNUTLS_STATE state, int bits) {
+	switch( gnutls_auth_get_type( state)) {
+		case GNUTLS_CRD_ANON: {
+			ANON_SERVER_AUTH_INFO info;
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+			info->dh_secret_bits = bits;
+			break;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+			CERTIFICATE_AUTH_INFO info;
+
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+
+			info->dh_secret_bits = bits;
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+	}
+
+	return 0;
+}
+
+int _gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits) {
+	switch( gnutls_auth_get_type( state)) {
+		case GNUTLS_CRD_ANON: {
+			ANON_SERVER_AUTH_INFO info;
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+			info->dh_prime_bits = bits;
+			break;
+		}
+		case GNUTLS_CRD_CERTIFICATE: {
+			CERTIFICATE_AUTH_INFO info;
+
+			info = _gnutls_get_auth_info(state);
+			if (info == NULL)
+				return GNUTLS_E_UNKNOWN_ERROR;
+
+			info->dh_prime_bits = bits;
+			break;
+		}
+		default:
+			gnutls_assert();
+			return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
+	
+	return 0;
+}
+

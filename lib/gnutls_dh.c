@@ -32,7 +32,7 @@
 	your_key = Y ^ x mod p;
 	his_key  = X ^ y mod p;
 
-//      generate our secret and the public value for it
+//      generate our secret and the public value (X) for it
 	X = gnutls_calc_dh_secret(&x, g, p);
 //      now we can calculate the shared secret
 	key = gnutls_calc_dh_key(Y, x, g, p);
@@ -55,6 +55,8 @@ static int get_x_size(int bits)
 	return 1024;
 }
 
+/* returns the public value (X), and the secret (ret_x).
+ */
 MPI gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 {
 	MPI e, x;
@@ -97,12 +99,3 @@ MPI gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 	return k;
 }
 
-/* returns the bits the user requested for DH key exchange.
- */
-int _gnutls_dh_get_bits(GNUTLS_STATE state)
-{
-	if (state->gnutls_internals.dh_bits>=MIN_BITS)
-		return state->gnutls_internals.dh_bits;
-	else 
-		return MIN_BITS;
-}

@@ -5,7 +5,9 @@
 #define GNUTLS_ANON_CLIENT_CREDENTIALS void*
 
 typedef struct ANON_CLIENT_AUTH_INFO_INT {
-	int dh_bits;
+	int dh_prime_bits;
+	int dh_secret_bits;
+	int dh_peer_public_bits;
 } *ANON_CLIENT_AUTH_INFO;
 
 typedef ANON_CLIENT_AUTH_INFO ANON_SERVER_AUTH_INFO;
