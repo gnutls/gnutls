@@ -25,7 +25,7 @@
 #include "gnutls_datum.h"
 #include "gnutls_global.h"
 #include "auth_cert.h"
-#include "gnutls_openpgp.h"
+#include <openpgp/gnutls_openpgp.h>
 
 #ifdef HAVE_LIBOPENCDK
 #include <gnutls/compat8.h>

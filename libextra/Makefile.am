@@ -22,7 +22,7 @@ lib_LTLIBRARIES = libgnutls-extra.la
 COBJECTS_EXTRA = ext_srp.c \
 	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
 	gnutls_extra.c gnutls_openssl.c \
-	auth_srp_rsa.c
+	auth_srp_rsa.c gnutls_openpgp.c
 
 libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
@@ -32,7 +32,7 @@ libgnutls_extra_la_DEPENDENCIES = $(LZO_OBJECTS)
 libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) 
 
 libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) \
-	openpgp/openpgp.lo openpgp/xml.lo openpgp/gnutls_openpgp.lo \
+	openpgp/openpgp.lo openpgp/xml.lo \
 	openpgp/extras.lo openpgp/verify.lo openpgp/compat.lo \
 	../lib/libgnutls.la
 
