@@ -29,7 +29,7 @@ char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, i
 	switch(algo) {
 	case BLOWFISH_CRYPT: /* bcrypt */
 		/* salt in bcrypt is actually the cost */
-		return crypt_bcrypt_wrapper(passwd, salt, g, n);
+		return crypt_bcrypt_wrapper(username, passwd, salt, g, n);
 	case SRPSHA1_CRYPT: /* bcrypt */
 		/* salt in bcrypt is the salt size */
 		return crypt_srpsha1_wrapper(username, passwd, salt, g, n);
@@ -44,7 +44,7 @@ int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt, MPI 
 	case '$':
 		switch(salt[1]) {
 		case '2':
-			cr = crypt_bcrypt(passwd, salt, g, n);
+			cr = crypt_bcrypt(username, passwd, salt, g, n);
 			if (cr==NULL) return 1;
 			if (strncmp(cr, salt, strlen(cr))==0) return 0;
 			break;

@@ -64,10 +64,9 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	
 	len = (int)rindex(sp, ':');
 	if (len==0) { /* parse error */
-		gnutls_assert();
-		return NULL;
-	}
-	len -= (int)sp;
+		len = strlen(sp);
+	} else
+		len -= (int)sp;
 	
 	rsalt_size = _gnutls_sbase64_decode(sp, len, &csalt);
 	if (rsalt_size < 0) {

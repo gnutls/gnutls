@@ -26,7 +26,7 @@
 #include "../lib/gnutls_int.h"
 #include "../lib/gnutls_srp.h"
 #include "../lib/crypt.h"
-#include "../lib/cert_b64.h"
+#include "../lib/auth_srp_passwd.h"
 #include "crypt-gaa.h"
 #include <pwd.h>
 #include <sys/types.h>

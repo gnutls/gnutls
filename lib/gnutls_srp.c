@@ -23,7 +23,7 @@
 #include <gnutls_errors.h>
 #include <crypt_bcrypt.h>
 #include <gnutls_srp.h>
-#include <cert_b64.h>
+#include <auth_srp_passwd.h>
 #include "debug.h"
 
 /* These should be added in gcrypt.h */
@@ -286,7 +286,7 @@ void *_gnutls_calc_srp_x(char *username, char *password, opaque * salt,
 		return _gnutls_calc_srp_sha(username, password, salt,
 					    salt_size, size);
 	case BLOWFISH_CRYPT:
-		return _gnutls_calc_srp_bcrypt(password, salt, salt_size,
+		return _gnutls_calc_srp_bcrypt(username, password, salt, salt_size,
 					       size);
 	}
 	return NULL;

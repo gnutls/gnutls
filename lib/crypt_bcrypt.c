@@ -26,13 +26,22 @@
  * (includes a modified version of b64.c)
  */
 
+/* The differences here from the original openbsd bcrypt algorithm are:
+ * 1. we use a different b64 hash function 
+ * (the one used in SRP password files),
+ * 2. we use all the bytes from the encryption step (openbsd omited one byte),
+ * 3. we use the first 24 bytes of CONCAT(username,NULL,"Orphean...") as the 
+ * encryption string.
+ */
+ 
 #include "defines.h"
 #include "gnutls_int.h"
 #include "crypt_bcrypt.h"
 #include "gnutls_random.h"
 #include "auth_srp_passwd.h"
 #include "gnutls_srp.h"
-#include <gnutls_errors.h>
+#include "gnutls_errors.h"
+#include "debug.h"
 
 #define rotl(x,n)   (((x) << ((uint32)(n))) | ((x) >> (32 - (uint32)(n))))
 #define rotr(x,n)   (((x) >> ((uint32)(n))) | ((x) << (32 - (uint32)(n))))
@@ -588,11 +597,13 @@ static void _blf_deinit(blf_ctx * ctx)
 }
 static const char magic[] = "$2$";
 
-char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
+#define B64TEXT "OrpheanBeholderScryDoubt"
+
+char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, MPI g, MPI n)
 {
 	unsigned char *sp;
 	blf_ctx *ctx;
-	unsigned char text[24] = "OrpheanBeholderScryDoubt";
+	unsigned char text[24];
 	uint8 *csalt;
 	uint8 *rtext;
 	uint8 cost;
@@ -601,6 +612,11 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 	int passwd_len, vsize;
 	opaque *tmp;
 
+	/* copy username+null+B64TEXT to text */
+	strncpy( text, username, sizeof(text));
+	if ( ( sizeof(text)-strlen(username) - 1 ) > 0)
+		strncpy( &text[strlen(username)+1], B64TEXT, sizeof(text)-strlen(username)-1);
+		
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
 	if (passwd_len > 56)
 		passwd_len = 56;
@@ -617,17 +633,16 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 
 	len = (int)rindex(sp, ':');
 	if (len==0) { /* no ':' was found */
-		gnutls_assert();
-		return NULL;
-	}
-	len -= (int) sp;
-	
+		len = strlen(sp);
+	} else 
+		len -= (int) sp;
+
 	if (_gnutls_sbase64_decode(sp, len, &csalt) < 0) {
 		gnutls_assert();
 		return NULL;
 	}
 
-	cost = (uint8) csalt[0];
+	cost = (int) csalt[0];
 	ctx = _blf_init(&csalt[1], passwd, passwd_len, cost);
 	gnutls_free(csalt);
 
@@ -664,12 +679,14 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 	return tmp;
 }
 
-/* cost is stored as the first byte in salt (thus < 255) which is fine! */
-char *crypt_bcrypt_wrapper(const char *pass_new, int cost, MPI g, MPI n)
+/* cost is stored as the first byte in salt (thus < 255) which is 
+ * just fine! 
+ */
+char *crypt_bcrypt_wrapper(const char* username, const char *pass_new, int cost, MPI g, MPI n)
 {
-	unsigned char *result;
+	opaque *result;
 	char *tcp;
-	unsigned char *rand;
+	uint8 *rand;
 	char *e = NULL;
 	int result_size;
 
@@ -681,9 +698,13 @@ char *crypt_bcrypt_wrapper(const char *pass_new, int cost, MPI g, MPI n)
 		cost = 1;
 
 	rand[0] = (uint8) cost;
-	result_size = _gnutls_sbase64_encode(rand, 17, &result);
+	result_size = _gnutls_sbase64_encode( &rand[0], 17, &result);
+
+	_gnutls_free_rand(rand);
+
+	_gnutls_sbase64_decode( result, strlen(result), &rand);
+
 	if (result_size < 0) {
-		_gnutls_free_rand(rand);
 		gnutls_assert();
 		return NULL;
 	}
@@ -693,20 +714,23 @@ char *crypt_bcrypt_wrapper(const char *pass_new, int cost, MPI g, MPI n)
 
 	gnutls_free(result);
 
-	_gnutls_free_rand(rand);
 
-	e = crypt_bcrypt(pass_new, (const char *) tcp, g, n);
+	e = crypt_bcrypt(username, pass_new, (const char *) tcp, g, n);
 	gnutls_free(tcp);
 
 	return e;
 }
 
-void *_gnutls_calc_srp_bcrypt(char *passwd, opaque * salt, int salt_size, int* size)
+void *_gnutls_calc_srp_bcrypt(const char* username, const char *passwd, opaque * salt, int salt_size, int* size)
 {
 	blf_ctx *ctx;
-	opaque text[24] = "OrpheanBeholderScryDoubt";
+	opaque text[24];
 	int passwd_len, i;
 	opaque *tmp;
+
+	strncpy( text, username, sizeof(text));
+	if ( (sizeof(text)-strlen(username)-1) > 0)
+		strncpy( &text[strlen(username)+1], B64TEXT, sizeof(text)-strlen(username)-1);
 
 	*size = sizeof(text);
 	
@@ -717,7 +741,7 @@ void *_gnutls_calc_srp_bcrypt(char *passwd, opaque * salt, int salt_size, int* s
 	if (passwd_len > 56)
 		passwd_len = 56;
 
-	ctx = _blf_init(&salt[1], passwd, passwd_len, (uint32)salt[0]);
+	ctx = _blf_init(&salt[1], passwd, passwd_len, (int)(salt[0]));
 
 	tmp = malloc(sizeof(text));
 	memcpy(tmp, text, sizeof(text));

@@ -145,7 +145,7 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 
 	ret += (data_size * 4) / 3;
 
-	(*result) = gnutls_malloc(ret + 1);
+	(*result) = gnutls_malloc( ret + 1);
 	if ((*result) == NULL)
 		return -1;
 
@@ -175,7 +175,7 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 		(*result)[j+tmp] = 0;
 	}
 
-	return ret;
+	return strlen(*result);
 }
 
 
@@ -200,13 +200,13 @@ inline static int decode(uint8 * result, const uint8 * data)
 	a2 = TOASCII(data[1]);
 	if (a1 != 0xff) result[1] = ((a1 & 0x3c) >> 2);
 	if (a2 != 0xff) result[1] |= ((a2 & 0x0f) << 4);
-	else ret--;
+	else if (a1==0xff || result[1] == 0) ret--;
 	
 	a1 = a2;
 	a2 = TOASCII(data[0]);
 	if (a1 != 0xff) result[0] = (((a1 & 0x30) >> 4) & 0xff);
 	if (a2 != 0xff) result[0] |= ((a2 << 2) & 0xff);
-	else ret--;
+	else if (a1==0xff || result[0] == 0) ret--;
 
 	return ret;
 }
@@ -246,7 +246,8 @@ int _gnutls_sbase64_decode(uint8 * data, int idata_size, uint8 ** result)
 			gnutls_free( (*result));
 			return tmp;
 		}
-		memcpy(&(*result)[0], &tmpres[3-tmp], tmp);
+
+		memcpy( *result, &tmpres[3-tmp], tmp);
 		if (tmp < 3)
 			ret -= (3 - tmp);
 	}
@@ -290,7 +291,7 @@ int main()
 	siz = fread(x, 1, sizeof(x), stdin);
 
 //	siz = _gnutls_sbase64_encode(x, siz, &b64);
-    siz = _gnutls_sbase64_decode(x, siz, &b64);
+	siz = _gnutls_sbase64_decode(x, siz, &b64);
 
 
 	if (siz < 0) {
