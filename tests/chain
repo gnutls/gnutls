@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Copyright (C) 2004 Free Software Foundation
+#
+# This file is part of GNUTLS.
+#
+# GNUTLS is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# GNUTLS is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+
+CERTTOOL=../src/certtool
+
+SUCCESS=" 1 4 7 12 15 16 17 18 24 26 27 30 33 56 57 62 63 "
+FAILURE=" 2 3 5 6 8 9 10 11 13 14 19 20 21 22 23 25 28 29 31 32 54 55 58 59 60 61 "
+
+tar xfz x509tests.tgz
+
+i=1
+while test -d X509tests/test$i; do
+    find X509tests/test$i -name E*.crt -print0 |sort -r -z|xargs -n1 --null certtool -i --inder --infile > chain$i.pem
+    find X509tests/test$i -name I*.crt -print0 |sort -r -z|xargs -n1 --null certtool -i --inder --infile >> chain$i.pem
+    find X509tests/test$i -name T*.crt -print0 |sort -r -z|xargs -n1 --null certtool -i --inder --infile >> chain$i.pem
+    $CERTTOOL -e --infile chain$i.pem > out 2>&1
+    rc=$?
+    if test $rc != 0; then
+	echo "Chain $i FATAL failure."
+    else
+	if echo "$SUCCESS" | grep -q " $i "; then
+	    if grep 'Verification output:' out | grep -q -v 'Verification output: Verified\.$'; then
+		echo "Chain $i verification failure UNEXPECTED."
+	    else
+		echo "Chain $i verification success as expected."
+	    fi
+	elif echo "$FAILURE" | grep -q " $i "; then
+	    if grep 'Verification output:' out | grep -q -v 'Verification output: Verified\.$'; then
+		echo "Chain $i verification failure as expected."
+	    else
+		echo "Chain $i verification success UNEXPECTED. "
+	    fi
+	else
+	    echo "Chain $i unclassified."
+	fi
+    fi
+    i=`expr $i + 1`
+done
