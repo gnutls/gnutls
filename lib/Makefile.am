@@ -42,7 +42,8 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 
 libgnutls_la_SOURCES = $(COBJECTS)
 
-libgnutls_la_LDFLAGS = $(LIBASN1_LINK) -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 pkix_asn1_tab.c: pkix.asn
 	-../libtasn1/src/asn1c pkix.asn pkix_asn1_tab.c
