@@ -832,8 +832,8 @@ const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
 	return ret;
 }
 
-
-int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
+inline
+static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
 {
 	size_t ret;
 	char *name = NULL;
@@ -855,6 +855,9 @@ int _gnutls_cipher_suite_count()
 
 	for (j = 0; j < MAX_CIPHERSUITE; j++) {
 		suite.CipherSuite[0] = j;
+#ifdef DEBUG
+# warning CHECK SUPPORTED CIPHER SUITES HERE
+#endif
 		if (j != 0x00 && j != 0xF6)
 			continue;
 
@@ -1001,6 +1004,9 @@ _gnutls_bsort(GNUTLS_STATE state, void *_base, size_t nmemb,
 }
 #endif
 
+#ifdef DEBUG
+# warning Optimize this, by combining with remove_unwanted_algorithms.
+#endif
 int
 _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 				      GNUTLS_CipherSuite ** ciphers)
