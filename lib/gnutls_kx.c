@@ -356,17 +356,34 @@ int _gnutls_send_client_certificate( gnutls_session session, int again)
 	data_size = 0;
 
 	if (again == 0) {
-		data_size = session->internals.auth_struct->gnutls_generate_client_certificate( session, &data);
+		if (gnutls_protocol_get_version( session) != GNUTLS_SSL3 ||
+			session->internals.selected_cert_index >= 0) {
+			/* TLS 1.0 or SSL 3.0 with a valid certificate
+			 */
+			data_size = session->internals.auth_struct->gnutls_generate_client_certificate( session, &data);
 
-		if (data_size < 0) {
-			gnutls_assert();
-			return data_size;
+			if (data_size < 0) {
+				gnutls_assert();
+				return data_size;
+			}
 		}
 	}
-	ret = _gnutls_send_handshake( session, data, data_size, GNUTLS_CERTIFICATE_PKT);
-	gnutls_free(data);
+
+	/* In the SSL 3.0 protocol we need to send a
+	 * no certificate alert instead of an
+	 * empty certificate.
+	 */
+	if (gnutls_protocol_get_version( session) == GNUTLS_SSL3 &&
+		session->internals.selected_cert_index < 0)
+	{
+		ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_SSL3_NO_CERTIFICATE);
+	} else { /* TLS 1.0 or SSL 3.0 with a valid certificate
+	          */
+		ret = _gnutls_send_handshake( session, data, data_size, GNUTLS_CERTIFICATE_PKT);
+		gnutls_free(data);
+	}
 	
-	if (ret<0) {
+	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}

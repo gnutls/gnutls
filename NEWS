@@ -1,3 +1,9 @@
+Version 0.8.6
+- Corrected a parsing error in the Certificate request message.
+- Corrected behaviour when a certificate request message is received.
+  Now a certificate packet is always sent, and in SSL 3.0 cipher suites
+  a no_certificate alert is sent instead.
+
 Version 0.8.5 (22/03/2003)
 - Allow larger MPI parameters in certificates.
 - Implemented the counter measure discussed in the paper "Attacking
