@@ -1,3 +1,9 @@
+2004-02-13 10:15  nmav <nmav@gnutls.org>
+
+	* lib/: pkix.asn, pkix_asn1_tab.c:
+
+	fixed CRLDistpoints ASN.1 definitions.  
+
 2004-02-12 09:57  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/tex/Makefile.am, doc/tex/auth.tex,
