@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Nikos Mavroyanopoulos <nmav@hellug.gr>
+ * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos <nmav@hellug.gr>
  *
  * This file is part of GNUTLS.
  *
