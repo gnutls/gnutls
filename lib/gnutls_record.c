@@ -446,15 +446,8 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return cipher_size; /* error */
 		}
 		
-		WRITEuint16( cipher_size, &headers[3]);
-		
-#warning "CHECK if the double write breaks other implementations"
-		if (_gnutls_Write(cd, headers, RECORD_HEADER_SIZE, flags) != RECORD_HEADER_SIZE) {
-			state->gnutls_internals.valid_connection = VALID_FALSE;
-			state->gnutls_internals.resumable = RESUME_FALSE;
-			gnutls_assert();
-			return GNUTLS_E_UNABLE_SEND_DATA;
-		}
+		WRITEuint16( cipher_size-RECORD_HEADER_SIZE, &headers[3]);
+		memcpy( cipher, headers, RECORD_HEADER_SIZE);
 
 		if (_gnutls_Write(cd, cipher, cipher_size, flags) != cipher_size) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;

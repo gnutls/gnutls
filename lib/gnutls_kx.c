@@ -98,11 +98,6 @@ int _gnutls_send_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_generate_server_kx==NULL) 
 		return 0;
 
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending server KX message\n");
-#endif
-
-
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx( state, &data);
 
 	if (data_size < 0) {
@@ -135,11 +130,6 @@ int _gnutls_send_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.send_cert_req <= 0)
 		return 0;
 		
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending server Certificate request message\n");
-#endif
-
-
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_certificate_request( state, &data);
 
 	if (data_size < 0) {
@@ -166,10 +156,6 @@ int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 
 	if (state->gnutls_internals.auth_struct->gnutls_generate_server_kx2 != NULL) {
 		data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx2( state, &data);
-
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log( "Sending server KX message2\n");
-#endif
 
 		if (data_size<0) {
 			gnutls_assert();
@@ -199,10 +185,6 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_generate_client_kx==NULL) 
 		return 0;
 
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending client KX message\n");
-#endif
-
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_kx( state, &data);
 	if (data_size < 0) {
 		gnutls_assert();
@@ -230,10 +212,6 @@ int _gnutls_send_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 
 	if ( state->gnutls_internals.auth_struct->gnutls_generate_client_kx0 == NULL)
 		return 0;
-
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending client KX message0\n");
-#endif
 
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_kx0( state, &data);
 	if (data_size < 0) {
@@ -273,9 +251,6 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 		           */
 	}
 	
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending client certificate verify message\n");
-#endif
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_cert_vrfy( state, &data);
 	if (data_size < 0) {
 		gnutls_assert();
@@ -302,10 +277,6 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx!=NULL) {
 
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log( "Receiving Server KX message\n");
-#endif
-
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
@@ -330,10 +301,6 @@ int _gnutls_recv_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
 	int ret = 0;
 
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_certificate_request!=NULL) {
-
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log( "Receiving Server Certificate request message\n");
-#endif
 
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
@@ -363,10 +330,6 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 
 	if (state->gnutls_internals.auth_struct->gnutls_process_server_kx2 != NULL) {
 
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log( "Receiving Server KX message2\n");
-#endif
-
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
@@ -394,10 +357,6 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 	/* Do key exchange only if the algorithm permits it */
 	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx != NULL) {
 
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log( "Receiving client KX message\n");
-#endif
-
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 					   &datasize,
@@ -424,10 +383,6 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 
 	/* Do key exchange only if the algorithm permits it */
 	if (state->gnutls_internals.auth_struct->gnutls_process_client_kx0 != NULL) {
-
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log( "Receiving client KX message0\n");
-#endif
 
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
@@ -460,9 +415,6 @@ int _gnutls_send_client_certificate(SOCKET cd, GNUTLS_STATE state)
 	if (state->gnutls_internals.auth_struct->gnutls_generate_client_certificate==NULL) 
 		return 0;
 
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending client certificate message\n");
-#endif
 
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_client_certificate( state, &data);
 
@@ -494,10 +446,6 @@ int _gnutls_send_server_certificate(SOCKET cd, GNUTLS_STATE state)
 
 	if (state->gnutls_internals.auth_struct->gnutls_generate_server_certificate==NULL) 
 		return 0;
-
-#ifdef HANDSHAKE_DEBUG
-	_gnutls_log( "Sending certificate message\n");
-#endif
 
 	data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_certificate( state, &data);
 
@@ -627,10 +575,6 @@ int _gnutls_recv_client_certificate_verify_message(SOCKET cd, GNUTLS_STATE state
 
 
 	if (state->gnutls_internals.auth_struct->gnutls_process_client_cert_vrfy != NULL) {
-
-#ifdef HANDSHAKE_DEBUG
-		_gnutls_log( "Receiving client certificate verify message\n");
-#endif
 
 		if ( state->gnutls_internals.send_cert_req == 0 ||
 			state->gnutls_key->certificate_requested == 0) {
