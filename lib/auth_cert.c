@@ -240,6 +240,8 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 	const gnutls_certificate_credentials cred;
 	opaque *data = _data;
 	ssize_t data_size = _data_size;
+	gnutls_datum *my_certs = NULL;
+	gnutls_datum *issuers_dn = NULL;
 
 	cred =
 	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -275,8 +277,6 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 	if (session->internals.client_cert_callback != NULL) {
 		/* use a callback to get certificate 
 		 */
-		gnutls_datum *my_certs = NULL;
-		gnutls_datum *issuers_dn = NULL;
 		uint issuers_dn_len = 0;
 		opaque *dataptr = data;
 		ssize_t dataptr_size = data_size;
@@ -286,11 +286,14 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		 * using realloc().
 		 */
 		do {
-			/* This works like DECR_LEN() */
-			DECR_LENGTH_COM(dataptr_size, 2, goto clear);
-			size = _gnutls_read_uint16(data);
+			/* This works like DECR_LEN() 
+			 */
+			result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+			DECR_LENGTH_COM(dataptr_size, 2, goto error);
+			size = _gnutls_read_uint16(dataptr);
 
-			DECR_LENGTH_COM(dataptr_size, size, goto clear);
+			result = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+			DECR_LENGTH_COM(dataptr_size, size, goto error);
 
 			dataptr += 2;
 
@@ -307,8 +310,11 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 
 		my_certs =
 		    gnutls_alloca(cred->ncerts * sizeof(gnutls_datum));
-		if (my_certs == NULL)
-			goto clear;
+		if (my_certs == NULL) {
+			result = GNUTLS_E_MEMORY_ERROR;
+			gnutls_assert();
+			goto error;
+		}
 
 		/* put the requested DNs to req_dn, only in case
 		 * of X509 certificates.
@@ -321,8 +327,11 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 			issuers_dn =
 			    gnutls_alloca(issuers_dn_len *
 					  sizeof(gnutls_datum));
-			if (issuers_dn == NULL)
-				goto clear;
+			if (issuers_dn == NULL) {
+				result = GNUTLS_E_MEMORY_ERROR;
+				gnutls_assert();
+				goto error;
+			}
 
 			for (i = 0; i < issuers_dn_len; i++) {
 				/* The checks here for the buffer boundaries
@@ -350,8 +359,9 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		/* maps j -> i */
 		ij_map = gnutls_alloca(sizeof(int) * cred->ncerts);
 		if (ij_map == NULL) {
+			result = GNUTLS_E_MEMORY_ERROR;
 			gnutls_assert();
-			goto clear;
+			goto error;
 		}
 
 		/* put our certificate's issuer and dn into cdn, idn
@@ -392,7 +402,6 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		if (indx != -1)
 			indx = ij_map[indx];
 
-	      clear:
 		gnutls_afree(my_certs);
 		gnutls_afree(ij_map);
 		gnutls_afree(issuers_dn);
@@ -400,6 +409,13 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 
 	*ind = indx;
 	return 0;
+
+	error:
+		if (my_certs != NULL) { gnutls_afree(my_certs); }
+		if (ij_map != NULL) { gnutls_afree(ij_map); }
+		if (issuers_dn != NULL) { gnutls_afree(issuers_dn); }
+		return result;
+
 }
 
 /* Generate client certificate
