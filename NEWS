@@ -4,10 +4,10 @@ Version ?.?.?
   gnutls_set_transport_ptr().
 - introduced gnutls_x509pki_get_peer_certificate_list(). This function returns
   a list containing peer's certificate and issuers DER encoded.
-- Added callback to select the server certificate
 - Updated X.509 certificate handling API
+- Added callback to select the server certificate
+- More consistent function naming (changes in several function names)
 - Buffer overflow checking in ASN.1 structures parser
-- More consistent function naming (changes several function names)
 
 Version 0.2.11 (16/11/2001)
 - Changed the meaning of GNUTLS_E_REHANDSHAKE value. If this value

@@ -94,14 +94,14 @@ int gnutls_rehandshake( GNUTLS_STATE state);
 
 
 AlertDescription gnutls_get_last_alert( GNUTLS_STATE state);
-int gnutls_send_alert(GNUTLS_SOCKET_PTR, GNUTLS_STATE, AlertLevel, AlertDescription);
-int gnutls_send_appropriate_alert(  GNUTLS_STATE state, int err);
+int 		 gnutls_send_alert(GNUTLS_SOCKET_PTR, GNUTLS_STATE, AlertLevel, AlertDescription);
+int 		 gnutls_send_appropriate_alert(  GNUTLS_STATE state, int err);
 
 /* get information on the current state */
-BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state);
-KXAlgorithm gnutls_get_current_kx( GNUTLS_STATE state);
-MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state);
-CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state);
+BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state);
+KXAlgorithm 	    gnutls_kx_get_algo( GNUTLS_STATE state);
+MACAlgorithm	    gnutls_mac_get_algo( GNUTLS_STATE state);
+CompressionMethod   gnutls_compression_get_algo( GNUTLS_STATE state);
 
 /* the name of the specified algorithms */
 const char *gnutls_cipher_get_name( BulkCipherAlgorithm);
@@ -119,16 +119,16 @@ ssize_t gnutls_write( GNUTLS_STATE state, void *data, size_t sizeofdata);
 ssize_t gnutls_read( GNUTLS_STATE state, void *data, size_t sizeofdata);
 
 /* functions to set priority of cipher suites */
-int gnutls_set_cipher_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_set_mac_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_set_compression_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_set_kx_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_set_protocol_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 
 /* set our version - 0 for TLS 1.0 and 1 for SSL3 */
-GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
+GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
 
-const char *gnutls_version_get_name(GNUTLS_Version version);
+const char *gnutls_protocol_get_name(GNUTLS_Version version);
 
 
 /* get/set session */
@@ -231,16 +231,14 @@ void gnutls_global_deinit();
 int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits);
 int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int bits);
 
-typedef ssize_t (*PULL_FUNC)(GNUTLS_SOCKET_PTR, void*, size_t);
-typedef ssize_t (*PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
-void gnutls_set_transport_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr);
+typedef ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_SOCKET_PTR, void*, size_t);
+typedef ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
+void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr);
 
 typedef void (*LOG_FUNC)( const char*);
 
-void gnutls_set_push_function( GNUTLS_STATE, PUSH_FUNC push_func);
-void gnutls_set_pull_function( GNUTLS_STATE, PULL_FUNC pull_func);
-#define gnutls_set_push_func gnutls_set_push_function
-#define gnutls_set_pull_func gnutls_set_pull_function
+void gnutls_transport_set_push_function( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
+void gnutls_transport_set_pull_function( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 
 size_t gnutls_get_max_record_size( GNUTLS_STATE state);
 size_t gnutls_set_max_record_size( GNUTLS_STATE state, size_t size);

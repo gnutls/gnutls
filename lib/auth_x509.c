@@ -602,7 +602,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 
 	if ((ret =
 	     _gnutls_check_x509pki_key_usage(&peer_certificate_list[0],
-					     gnutls_get_current_kx(state)))
+					     gnutls_kx_get_algo(state)))
 	    < 0) {
 		gnutls_assert();
 		CLEAR_CERTS;
@@ -1280,4 +1280,65 @@ int gnutls_x509pki_get_peer_certificate_status(GNUTLS_STATE state)
 
 
 	return verify;
+}
+
+/* finds the most appropriate certificate in the cert list.
+ * The 'appropriate' is defined by the user.
+ * FIXME: provide user callback.
+ */
+const gnutls_cert *_gnutls_server_find_cert(GNUTLS_STATE state,
+					    gnutls_cert ** cert_list,
+					    int cert_list_length)
+{
+	int i;
+
+	i = _gnutls_server_find_cert_list_index(state, cert_list,
+					 cert_list_length);
+	if (i < 0)
+		return NULL;
+
+	return &cert_list[i][0];
+}
+
+/* finds the most appropriate certificate in the cert list.
+ * The 'appropriate' is defined by the user.
+ */
+int _gnutls_server_find_cert_list_index(GNUTLS_STATE state,
+					gnutls_cert ** cert_list,
+					int cert_list_length)
+{
+	int i, index = -1;
+	const X509PKI_CREDENTIALS cred;
+
+	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
+
+	if (cred->ncerts > 0)
+		index = 0;	/* default is use the first certificate */
+
+	if (state->gnutls_internals.client_cert_callback != NULL && cred->ncerts > 0) {	/* use the callback to get certificate */
+		gnutls_datum *my_certs = NULL;
+
+		my_certs =
+		    gnutls_malloc(cred->ncerts * sizeof(gnutls_datum));
+		if (my_certs == NULL)
+			goto clear;
+
+		/* put our certificate's issuer and dn into cdn, idn
+		 */
+		for (i = 0; i < cred->ncerts; i++) {
+			my_certs[i] = cred->cert_list[i][0].raw;
+		}
+		index =
+		    state->gnutls_internals.server_cert_callback(my_certs,
+								 cred->ncerts);
+
+	      clear:
+		gnutls_free(my_certs);
+	}
+
+	return index;
 }

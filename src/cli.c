@@ -61,7 +61,7 @@ const gnutls_datum* cert_list;
 CertificateStatus status;
 int cert_list_size = 0;
 
-	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
+	tmp = gnutls_kx_get_name(gnutls_kx_get_algo( state));
 	printf("- Key Exchange: %s\n", tmp);
 
 	cred = gnutls_get_auth_type(state);
@@ -105,16 +105,16 @@ int cert_list_size = 0;
 			}
 	}
 
-	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
 	printf("- Version: %s\n", tmp);
 
-	tmp = gnutls_compression_get_name(gnutls_get_current_compression_method( state));
+	tmp = gnutls_compression_get_name(gnutls_compression_get_algo( state));
 	printf("- Compression: %s\n", tmp);
 
-	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher( state));
+	tmp = gnutls_cipher_get_name(gnutls_cipher_get_algo( state));
 	printf("- Cipher: %s\n", tmp);
 
-	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
+	tmp = gnutls_mac_get_name(gnutls_mac_get_algo( state));
 	printf("- MAC: %s\n", tmp);
 
 	return 0;
@@ -222,11 +222,11 @@ int main(int argc, char** argv)
 #ifdef RESUME
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
-	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
-	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
-	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
+	gnutls_protocol_set_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
+	gnutls_cipher_set_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
+	gnutls_compression_set_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_kx_set_priority( state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_mac_set_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 	gnutls_set_cred( state, GNUTLS_SRP, cred);
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
  */
 	gnutls_ext_set_name_ind( state, GNUTLS_DNSNAME, "localhost"); 
 
-	gnutls_set_transport_ptr( state, sd);
+	gnutls_transport_set_ptr( state, sd);
 	do {
 		ret = gnutls_handshake( state);
 	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
@@ -285,10 +285,11 @@ int main(int argc, char** argv)
 	/* Begin handshake again */
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
-	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, 0);
-	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_protocol_set_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
+	gnutls_cipher_set_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
+	gnutls_compression_set_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_kx_set_priority( state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_mac_set_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 	gnutls_set_cred( state, GNUTLS_SRP, cred);
@@ -296,14 +297,12 @@ int main(int argc, char** argv)
 
 	gnutls_ext_set_name_ind( state, GNUTLS_DNSNAME, "hello.server.org");
 
-	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
-
 #ifdef RESUME
 	gnutls_session_set_data( state, session, session_size);
 	free(session);
 #endif
 
-	gnutls_set_transport_ptr( state, sd);
+	gnutls_transport_set_ptr( state, sd);
 	do {
 		ret = gnutls_handshake( state);
 	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);

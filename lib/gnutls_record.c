@@ -36,7 +36,14 @@
 #include "gnutls_datum.h"
 #include "ext_max_record.h"
 
-GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
+/**
+  * gnutls_protocol_get_version - Returns the version of the currently used protocol
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the version of the currently used protocol. 
+  *
+  **/
+GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
 	ver = state->security_parameters.version;
 	return ver;
@@ -64,7 +71,7 @@ void gnutls_set_lowat(GNUTLS_STATE state, int num) {
 }
 
 /**
-  * gnutls_set_transport_ptr - Used to set first argument of the transport functions
+  * gnutls_transport_set_ptr - Used to set first argument of the transport functions
   * @state: is a &GNUTLS_STATE structure.
   * @ptr: is the value.
   *
@@ -73,7 +80,7 @@ void gnutls_set_lowat(GNUTLS_STATE state, int num) {
   * handle.
   *
   **/
-void gnutls_set_transport_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr) {
+void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr) {
 	state->gnutls_internals.transport_ptr = ptr;
 }
 
@@ -109,7 +116,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	gnutls_set_protocol_priority( *state, GNUTLS_TLS1, 0); /* default */
+	gnutls_protocol_set_priority( *state, GNUTLS_TLS1, 0); /* default */
 	
 	(*state)->gnutls_key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
 	if ( (*state)->gnutls_key == NULL) {
@@ -547,7 +554,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 		}
 	} else { /* send the current */
-		lver = gnutls_get_current_version( state);
+		lver = gnutls_protocol_get_version( state);
 	}
 
 	headers[1]=_gnutls_version_get_major( lver);
@@ -778,7 +785,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	 * negotiated in the handshake.
 	 */
 #ifdef CHECK_RECORD_VERSION
-	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_get_current_version(state) != version) {
+	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_protocol_get_version(state) != version) {
 		gnutls_assert();
 # ifdef RECORD_DEBUG
 		_gnutls_log( "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
@@ -993,42 +1000,42 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 }
 
 /**
-  * gnutls_get_current_cipher - Returns the currently used cipher.
+  * gnutls_cipher_get_algo - Returns the currently used cipher.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the currently used cipher.
   **/
-BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state) {
+BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.read_bulk_cipher_algorithm;
 }
 
 /**
-  * gnutls_get_current_kx - Returns the key exchange algorithm.
+  * gnutls_kx_get_algo - Returns the key exchange algorithm.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the key exchange algorithm used in the last handshake.
   **/
-KXAlgorithm gnutls_get_current_kx( GNUTLS_STATE state) {
+KXAlgorithm gnutls_kx_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.kx_algorithm;
 }
 
 /**
-  * gnutls_get_current_mac_algorithm - Returns the currently used mac algorithm.
+  * gnutls_mac_get_algo - Returns the currently used mac algorithm.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the currently used mac algorithm.
   **/
-MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state) {
+MACAlgorithm gnutls_mac_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.read_mac_algorithm;
 }
 
 /**
-  * gnutls_get_current_compression_method - Returns the currently used compression algorithm.
+  * gnutls_compression_get_algo - Returns the currently used compression algorithm.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the currently used compression method.
   **/
-CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state) {
+CompressionMethod gnutls_compression_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.read_compression_algorithm;
 }
 

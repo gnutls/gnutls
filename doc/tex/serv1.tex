@@ -45,11 +45,11 @@ GNUTLS_STATE initialize_state()
    if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
       fprintf(stderr, "*** DB error (%d)\n\n", ret);
 
-   gnutls_set_cipher_priority(state, GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
-   gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-   gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, 0);
-   gnutls_set_protocol_priority(state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-   gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
+   gnutls_cipher_set_priority(state, GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
+   gnutls_compression_set_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+   gnutls_kx_set_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, 0);
+   gnutls_protocol_set_priority(state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
+   gnutls_mac_set_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
    gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
    gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
@@ -68,7 +68,7 @@ void print_info(GNUTLS_STATE state)
    int sesid_size, i;
 
    /* print session_id specific data */
-   gnutls_get_session_get_id(state, sesid, &sesid_size);
+   gnutls_session_get_id(state, sesid, &sesid_size);
    printf("\n- Session ID: ");
    for (i = 0; i < sesid_size; i++)
       printf("%.2X", sesid[i]);
@@ -81,21 +81,21 @@ void print_info(GNUTLS_STATE state)
    }
 
    /* print state information */
-   tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
    printf("- Version: %s\n", tmp);
 
-   tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
+   tmp = gnutls_kx_get_name(gnutls_kx_get_algo(state));
    printf("- Key Exchange: %s\n", tmp);
 
    tmp =
        gnutls_compression_get_name
-       (gnutls_get_current_compression_method(state));
+       (gnutls_compression_get_algo(state));
    printf("- Compression: %s\n", tmp);
 
-   tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
+   tmp = gnutls_cipher_get_name(gnutls_cipher_get_algo(state));
    printf("- Cipher: %s\n", tmp);
 
-   tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
+   tmp = gnutls_mac_get_name(gnutls_mac_get_algo(state));
    printf("- MAC: %s\n", tmp);
 
 }
@@ -172,8 +172,8 @@ int main()
              inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-
-      ret = gnutls_handshake(sd, state);
+      gnutls_transport_set_ptr( state, sd);
+      ret = gnutls_handshake( state);
       if (ret < 0) {
          close(sd);
          gnutls_deinit(state);
@@ -188,7 +188,7 @@ int main()
       i = 0;
       for (;;) {
          bzero(buffer, MAX_BUF + 1);
-         ret = gnutls_read(sd, state, buffer, MAX_BUF);
+         ret = gnutls_read( state, buffer, MAX_BUF);
 
          if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
             if (ret == 0) {
@@ -206,7 +206,7 @@ int main()
          if (ret > 0) {
             /* echo data back to the client
              */
-            gnutls_write(sd, state, buffer,
+            gnutls_write( state, buffer,
                          strlen(buffer));
          }
          if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
@@ -215,7 +215,7 @@ int main()
          }
       }
       printf("\n");
-      gnutls_bye(sd, state, 1); /* do not wait for
+      gnutls_bye( state, 1); /* do not wait for
                                  * the peer to close the connection.
                                  */
 

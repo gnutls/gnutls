@@ -33,7 +33,6 @@
 #include <x509_extensions.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_dh.h>
-#include <gnutls_auth_int.h>
 
 #ifdef DEBUG
 # warning MAX ALGORITHM PARAMS == 2, ok for RSA
@@ -1026,66 +1025,6 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 	return 0;
 }
 
-/* finds the most appropriate certificate in the cert list.
- * The 'appropriate' is defined by the user.
- * FIXME: provide user callback.
- */
-const gnutls_cert *_gnutls_server_find_cert(GNUTLS_STATE state,
-					    gnutls_cert ** cert_list,
-					    int cert_list_length)
-{
-	int i;
-
-	i = _gnutls_server_find_cert_list_index(state, cert_list,
-					 cert_list_length);
-	if (i < 0)
-		return NULL;
-
-	return &cert_list[i][0];
-}
-
-/* finds the most appropriate certificate in the cert list.
- * The 'appropriate' is defined by the user.
- */
-int _gnutls_server_find_cert_list_index(GNUTLS_STATE state,
-					gnutls_cert ** cert_list,
-					int cert_list_length)
-{
-	int i, index = -1;
-	const X509PKI_CREDENTIALS cred;
-
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_X509PKI, NULL);
-	if (cred == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INSUFICIENT_CRED;
-	}
-
-	if (cred->ncerts > 0)
-		index = 0;	/* default is use the first certificate */
-
-	if (state->gnutls_internals.client_cert_callback != NULL && cred->ncerts > 0) {	/* use the callback to get certificate */
-		gnutls_datum *my_certs = NULL;
-
-		my_certs =
-		    gnutls_malloc(cred->ncerts * sizeof(gnutls_datum));
-		if (my_certs == NULL)
-			goto clear;
-
-		/* put our certificate's issuer and dn into cdn, idn
-		 */
-		for (i = 0; i < cred->ncerts; i++) {
-			my_certs[i] = cred->cert_list[i][0].raw;
-		}
-		index =
-		    state->gnutls_internals.server_cert_callback(my_certs,
-								 cred->ncerts);
-
-	      clear:
-		gnutls_free(my_certs);
-	}
-
-	return index;
-}
 
 /**
   * gnutls_x509pki_server_set_cert_request - Used to set whether to request a client certificate

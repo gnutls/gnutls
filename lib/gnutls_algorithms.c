@@ -761,13 +761,13 @@ GNUTLS_Version _gnutls_version_max(GNUTLS_STATE state)
 
 
 /**
-  * gnutls_version_get_name - Returns a string with the name of the specified SSL/TLS version
+  * gnutls_protocol_get_name - Returns a string with the name of the specified SSL/TLS version
   * @version: is a (gnutls) version number
   *
   * Returns a string that contains the name 
   * of the specified TLS version.
   **/
-const char *gnutls_version_get_name(GNUTLS_Version version)
+const char *gnutls_protocol_get_name(GNUTLS_Version version)
 {
 	char *ret = NULL;
 

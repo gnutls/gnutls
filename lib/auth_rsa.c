@@ -80,7 +80,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	gnutls_datum ciphertext;
 	int ret, dsize;
 
-	if ( gnutls_get_current_version(state) == GNUTLS_SSL3) {
+	if ( gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		ciphertext.data = data;
 		ciphertext.size = data_size;

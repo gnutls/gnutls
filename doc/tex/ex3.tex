@@ -15,7 +15,7 @@ int print_info(GNUTLS_STATE state)
 
    /* print the key exchange's algorithm name
     */
-   tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
+   tmp = gnutls_kx_get_name( gnutls_kx_get_algo( state));
    printf("- Key Exchange: %s\n", tmp);
 
    /* in case of X509 PKI
@@ -27,7 +27,7 @@ int print_info(GNUTLS_STATE state)
       CertificateStatus status;
       KXAlgorithm kx;
 
-      kx = gnutls_get_current_kx(state);
+      kx = gnutls_kx_get_algo(state);
 
       /* Check if we have been using ephemeral Diffie Hellman.
        */
@@ -72,16 +72,16 @@ int print_info(GNUTLS_STATE state)
       }
    }
 
-   tmp = gnutls_version_get_name(gnutls_get_current_version( state));
+   tmp = gnutls_protocol_get_name( gnutls_protocol_get_version( state));
    printf("- Version: %s\n", tmp);
 
-   tmp = gnutls_compression_get_name(gnutls_get_current_compression_method( state));
+   tmp = gnutls_compression_get_name( gnutls_compression_get_algo( state));
    printf("- Compression: %s\n", tmp);
 
-   tmp = gnutls_cipher_get_name(gnutls_get_current_cipher( state));
+   tmp = gnutls_cipher_get_name( gnutls_cipher_get_algo( state));
    printf("- Cipher: %s\n", tmp);
 
-   tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
+   tmp = gnutls_mac_get_name(gnutls_mac_get_algo( state));
    printf("- MAC: %s\n", tmp);
 
    return 0;

@@ -502,7 +502,7 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
-GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
+GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
 void _gnutls_free_auth_info( GNUTLS_STATE state);
 
 /* These two macros return the advertized TLS version of

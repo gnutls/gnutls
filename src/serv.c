@@ -83,17 +83,17 @@ GNUTLS_STATE initialize_state()
 	/* null cipher is here only for debuging 
 	 * purposes.
 	 */
-	gnutls_set_cipher_priority(state, GNUTLS_NULL_CIPHER, 
+	gnutls_cipher_set_priority(state, GNUTLS_NULL_CIPHER, 
 				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, 0);
-	gnutls_set_compression_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
-	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
+	gnutls_compression_set_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_kx_set_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_protocol_set_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	
 	gnutls_set_cred(state, GNUTLS_ANON, dh_cred);
 	gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
 	gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
 
-	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
+	gnutls_mac_set_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
 	gnutls_x509pki_server_set_cert_request( state, GNUTLS_CERT_REQUEST);
 
@@ -162,7 +162,7 @@ void print_info(GNUTLS_STATE state)
 				break;
 			}
 		
-			if (gnutls_get_current_kx(state) == GNUTLS_KX_DHE_RSA || gnutls_get_current_kx(state) == GNUTLS_KX_DHE_DSS) {
+			if (gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_RSA || gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_DSS) {
 				printf("\n- Ephemeral DH using prime of %d bits\n",
 			        gnutls_x509pki_server_get_dh_bits( state));
 			}
@@ -185,21 +185,21 @@ void print_info(GNUTLS_STATE state)
 
 	/* print state information */
 
-	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+	tmp = gnutls_protocol_get_name( gnutls_protocol_get_version(state));
 	printf("- Version: %s\n", tmp);
 
-	tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
+	tmp = gnutls_kx_get_name(gnutls_kx_get_algo(state));
 	printf("- Key Exchange: %s\n", tmp);
 
 	tmp =
 	    gnutls_compression_get_name
-	    (gnutls_get_current_compression_method(state));
+	    (gnutls_compression_get_algo(state));
 	printf("- Compression: %s\n", tmp);
 
-	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
+	tmp = gnutls_cipher_get_name(gnutls_cipher_get_algo(state));
 	printf("- Cipher: %s\n", tmp);
 
-	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
+	tmp = gnutls_mac_get_name(gnutls_mac_get_algo(state));
 	printf("- MAC: %s\n", tmp);
 
 
@@ -234,12 +234,12 @@ void peer_print_info( GNUTLS_STATE state)
 	 */ 
 
 	/* print srp specific data */
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
+	if (gnutls_kx_get_algo(state) == GNUTLS_KX_SRP) {
 		sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
 		       gnutls_srp_server_get_username( state));
 	}
 
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+	if (gnutls_kx_get_algo(state) == GNUTLS_KX_DH_ANON) {
 		sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
 		       gnutls_anon_server_get_dh_bits( state));
 	}
@@ -247,26 +247,26 @@ void peer_print_info( GNUTLS_STATE state)
 	/* print state information */
 	strcat( http_buffer, "<P>\n");
 
-	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
 	sprintf(tmp2, "Protocol version: <b>%s</b><br>\n", tmp);
 
-	tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
+	tmp = gnutls_kx_get_name(gnutls_kx_get_algo(state));
 	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
 
-	if (gnutls_get_current_kx(state) == GNUTLS_KX_DHE_RSA || gnutls_get_current_kx(state) == GNUTLS_KX_DHE_DSS) {
+	if (gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_RSA || gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_DSS) {
 		sprintf(tmp2, "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
 			        gnutls_x509pki_server_get_dh_bits( state));
 	}
 			
 	tmp =
 	    gnutls_compression_get_name
-	    (gnutls_get_current_compression_method(state));
+	    (gnutls_compression_get_algo(state));
 	sprintf(tmp2, "Compression: <b>%s</b><br>\n", tmp);
 	
-	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
+	tmp = gnutls_cipher_get_name(gnutls_cipher_get_algo(state));
 	sprintf(tmp2, "Cipher: <b>%s</b><br>\n", tmp);
 	
-	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
+	tmp = gnutls_mac_get_name(gnutls_mac_get_algo(state));
 	sprintf(tmp2, "MAC: <b>%s</b><br>\n", tmp);
 
 	strcat( http_buffer, "</P>\n");
@@ -410,7 +410,7 @@ int main(int argc, char **argv)
 				 sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
 
-		gnutls_set_transport_ptr( state, sd);
+		gnutls_transport_set_ptr( state, sd);
 		do {
 			ret = gnutls_handshake( state);
 		} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);

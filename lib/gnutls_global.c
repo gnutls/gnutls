@@ -135,7 +135,7 @@ void gnutls_global_deinit() {
  */
 
 /**
-  * gnutls_set_pull_function - This function sets a read like function
+  * gnutls_transport_set_pull_function - This function sets a read like function
   * @pull_func: it's a function like read
   * @state: gnutls state
   *
@@ -147,12 +147,12 @@ void gnutls_global_deinit() {
   * PULL_FUNC is of the form, 
   * ssize_t (*PULL_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
   **/
-void gnutls_set_pull_function( GNUTLS_STATE state, PULL_FUNC pull_func) {
+void gnutls_transport_set_pull_function( GNUTLS_STATE state, PULL_FUNC pull_func) {
 	state->gnutls_internals._gnutls_pull_func = pull_func;
 }
 
 /**
-  * gnutls_set_push_function - This function sets the function to send data
+  * gnutls_transport_set_push_function - This function sets the function to send data
   * @push_func: it's a function like write
   * @state: gnutls state
   *
@@ -166,6 +166,6 @@ void gnutls_set_pull_function( GNUTLS_STATE state, PULL_FUNC pull_func) {
   * PUSH_FUNC is of the form, 
   * ssize_t (*PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
   **/
-void gnutls_set_push_function( GNUTLS_STATE state, PUSH_FUNC push_func) {
+void gnutls_transport_set_push_function( GNUTLS_STATE state, PUSH_FUNC push_func) {
 	state->gnutls_internals._gnutls_push_func = push_func;
 }
