@@ -1,3 +1,7 @@
+Version 0.5.2
+- Added an error code that is returned in clients which connect
+  to export only servers.
+
 Version 0.5.1 (17/07/2002)
 - Corrected the m4 macros which used <gnutls.h> instead of
   <gnutls/gnutls.h>

@@ -1465,7 +1465,7 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 
 /* Reads a certificate file
  */
-static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile,
+static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *certfile,
 	GNUTLS_X509_CertificateFmt type)
 {
 	int siz;
@@ -1488,7 +1488,7 @@ static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile,
 /* Reads a base64 encoded CA file (file contains multiple certificate
  * authorities). This is to be called once.
  */
-static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile, 
+static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cafile, 
 	GNUTLS_X509_CertificateFmt type)
 {
 	int siz;
@@ -1513,7 +1513,7 @@ static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile,
 /* Reads PKCS-1 RSA private key file or a DSA file (in the format openssl
  * stores it).
  */
-static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile,
+static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *keyfile,
 	GNUTLS_X509_CertificateFmt type)
 {
 	int siz;
@@ -1550,8 +1550,8 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile,
   * this function.
   *
   **/
-int gnutls_certificate_set_x509_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE,
-			   char *KEYFILE, GNUTLS_X509_CertificateFmt type)
+int gnutls_certificate_set_x509_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *CERTFILE,
+			   const char *KEYFILE, GNUTLS_X509_CertificateFmt type)
 {
 	int ret;
 
@@ -1661,7 +1661,7 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
   *
   **/
 int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, 
-		char *CAFILE, GNUTLS_X509_CertificateFmt type)
+		const char *CAFILE, GNUTLS_X509_CertificateFmt type)
 {
 	int ret, ret2;
 
