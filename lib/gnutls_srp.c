@@ -23,8 +23,10 @@
 #include <gnutls_errors.h>
 #include <crypt_bcrypt.h>
 #include <gnutls_srp.h>
+#include <cert_b64.h>
+#include "debug.h"
 
-// temp here ---
+/* These should be added in gcrypt.h */
 #define gcry_mpi_add mpi_add
 #define gcry_mpi_subm mpi_subm
 #define gcry_mpi_addm mpi_addm
@@ -51,12 +53,13 @@ const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, char** ret_g, char** ret_n) {
+int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, opaque** ret_g, opaque** ret_n) {
 
 	MPI g, prime, x, e;
 	size_t n = sizeof diffie_hellman_group1_prime;
 	int result_size, siz;
-	
+	char* tmp;
+
 	if (gcry_mpi_scan(&prime, GCRYMPI_FMT_USG,
 			  diffie_hellman_group1_prime, &n)) {
 		gnutls_assert();
@@ -75,7 +78,6 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, char** ret_g, ch
 
 	/* e = g^x mod prime (n) */
 	gcry_mpi_powm(e, g, x, prime);
-
 	gcry_mpi_release(x);
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
@@ -85,21 +87,31 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, char** ret_g, ch
 	}
 
 	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_HEX, NULL, &siz, g);
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, g);
 	if (ret_g!=NULL) {
-		*ret_g = gnutls_malloc(siz+1);
-		gcry_mpi_print(GCRYMPI_FMT_HEX, *ret_g, &siz, g);
-		(*ret_g)[siz] = 0;
+		tmp = gnutls_malloc(siz);
+		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, g);
+
+		if (_gnutls_base64_encode( tmp, siz, ret_g) < 0)  {
+			gnutls_free(tmp);
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+		gnutls_free(tmp);
 	}
 
 	siz = 0;
-	gcry_mpi_print(GCRYMPI_FMT_HEX, NULL, &siz, prime);
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, prime);
 	if (ret_n!=NULL) {
-		*ret_n = gnutls_malloc(siz+1);
-		gcry_mpi_print(GCRYMPI_FMT_HEX, *ret_n, &siz, prime);
-		(*ret_n)[siz] = 0;
-	}
+		tmp = gnutls_malloc(siz);
+		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, prime);
+		if (_gnutls_base64_encode( tmp, siz, ret_n) < 0) {
+			gnutls_free(tmp);
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
 
+		gnutls_free(tmp);
+	}
+	
 	gcry_mpi_release(e);
 	gcry_mpi_release(g);
 	gcry_mpi_release(prime);

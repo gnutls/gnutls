@@ -538,7 +538,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 	uint8 *dataptr=NULL; /* for realloc */
 	uint24 num;
 	int handshake_headers = HANDSHAKE_HEADERS_SIZE;
-	int recv_type;
+	HandshakeType recv_type;
 
 	if (type == GNUTLS_CERTIFICATE) {
 		/* If the ciphersuite does not support certificate just quit */
@@ -1340,6 +1340,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_server_kx_message(cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("recv server kx message", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1352,6 +1353,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_send_client_kx_message0(cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("send client kx0", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1361,6 +1363,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_server_kx_message2(cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("recv server kx message2", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1375,6 +1378,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			    _gnutls_recv_handshake(cd, state, NULL, NULL,
 						   GNUTLS_SERVER_HELLO_DONE);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("recv server hello done", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1384,6 +1388,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_send_client_certificate(cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("send client certificate", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1392,6 +1397,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_send_client_kx_message(cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("send client kx", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1403,6 +1409,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			    _gnutls_send_client_certificate_verify(cd,
 								   state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("send client certificate verify", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1416,6 +1423,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			    _gnutls_send_handshake(cd, state, NULL, 0,
 						   GNUTLS_SERVER_HELLO_DONE);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("send server hello done", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1427,6 +1435,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		if (state->gnutls_internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 			ret = _gnutls_recv_client_kx_message(cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("recv client kx", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;

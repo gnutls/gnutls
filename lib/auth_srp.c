@@ -25,6 +25,7 @@
 #include "auth_srp.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_srp.h"
+#include "debug.h"
 
 int gen_srp_server_kx(GNUTLS_KEY, opaque **);
 int gen_srp_server_kx2(GNUTLS_KEY, opaque **);
@@ -84,8 +85,10 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 
 	pwd_algo = (uint8) pwd_entry->algorithm;
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, pwd_entry->g);
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_n, pwd_entry->n);
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, pwd_entry->g)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_n, pwd_entry->n)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
 
 	/* copy from pwd_entry to local variables (actually in state) */
 	G = gcry_mpi_alloc_like(pwd_entry->g);
@@ -105,7 +108,8 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	memcpy( data_g, &pwd_algo, 1);
 	data_g++;
 	
-	gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, G);
+	if(gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, G)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
 	_n_g = n_g;
 #ifndef WORDS_BIGENDIAN
 	_n_g = byteswap16(_n_g);
@@ -116,7 +120,8 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 
 	/* copy N (mod n) */
 	data_n = &data_g[2 + n_g];
-	gcry_mpi_print(GCRYMPI_FMT_USG, &data_n[2], &n_n, N);
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_n[2], &n_n, N)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
 	_n_n = n_n;
 #ifndef WORDS_BIGENDIAN
 	_n_n = byteswap16(_n_n);
@@ -154,13 +159,15 @@ int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 	/* calculate:  B = (v + g^b) % N */
 	B = _gnutls_calc_srp_B( &_b, G, N, V);
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_b, B);
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_b, B)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
 
 	(*data) = gnutls_malloc(n_b + 2);
 
 	/* copy B */
 	data_b = (*data);
-	gcry_mpi_print(GCRYMPI_FMT_USG, &data_b[2], &n_b, B);
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_b[2], &n_b, B)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
 
 	_n_b = n_b;
 #ifndef WORDS_BIGENDIAN
@@ -209,13 +216,16 @@ int gen_srp_client_kx0(GNUTLS_KEY key, opaque ** data)
 	/* calc A = g^a % N */
 	A = _gnutls_calc_srp_A( &_a, G, N);
 
-	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_a, A);
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_a, A)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
 
 	(*data) = gnutls_malloc(n_a + 2);
 
 	/* copy A */
 	data_a = (*data);
-	gcry_mpi_print(GCRYMPI_FMT_USG, &data_a[2], &n_a, A);
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_a[2], &n_a, A)!=0)
+		return GNUTLS_E_MPI_PRINT_FAILED;
+
 	_n_a = n_a;
 #ifndef WORDS_BIGENDIAN
 	_n_a = byteswap16(_n_a);
@@ -252,9 +262,10 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 		return GNUTLS_E_INSUFICIENT_CRED;
 
 /* read the algorithm used to generate V */
+	i = 0;
 	memcpy( &pwd_algo, data, 1);
 
-	i = 1;
+	i++;
 	memcpy(&n_g, &data[i], 2);
 	i += 2;
 #ifndef WORDS_BIGENDIAN
@@ -267,6 +278,7 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
+
 	memcpy(&n_n, &data[i], 2);
 #ifndef WORDS_BIGENDIAN
 	n_n = byteswap16(n_n);

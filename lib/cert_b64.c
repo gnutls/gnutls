@@ -120,11 +120,11 @@ inline static int decode(uint8 * result, const uint8 * data)
 		return -1;
 	result[2] = ((a1 << 6) & 0xff) | (a2 & 0xff);
 
-	if (data[3] == '=')
-		ret--;
-	if (data[4] == '=')
+	if (data[2] == '=')
 		ret--;
 
+	if (data[3] == '=')
+		ret--;
 	return ret;
 }
 
@@ -253,7 +253,7 @@ int _gnutls_base64_decode(uint8 * data, int data_size, uint8 ** result)
 	data_size *= 4;
 
 	ret = data_size / 4 * 3;
-	(*result) = gnutls_malloc(ret);
+	(*result) = gnutls_malloc(ret+1);
 	if ((*result) == NULL)
 		return -1;
 
@@ -364,7 +364,7 @@ int _gnutls_fbase64_decode(char *msg, uint8 * data, int data_size,
 #ifdef B64_TEST
 int main()
 {
-	char x[99024];
+	char x[100*1024];
 	int siz;
 	uint8 *b64;
 
@@ -381,11 +381,11 @@ int main()
 
 	}
 	return 0;*/
-	siz = fread(x, 1, 9004, stdin);
+	siz = fread(x, 1, sizeof(x), stdin);
 
 //      siz = _gnutls_fbase64_encode("CERTIFICATE", x, siz, &b64);
-//      siz = _gnutls_base64_encode(x, siz, &b64);
-      siz = _gnutls_base64_decode(x, siz, &b64);
+      siz = _gnutls_base64_encode(x, siz, &b64);
+//      siz = _gnutls_base64_decode(x, siz, &b64);
 //	siz = _gnutls_fbase64_decode("CERTIFICATE", x, siz, &b64);
 
 

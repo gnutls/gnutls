@@ -39,7 +39,7 @@ char *
 	int passwd_len;
 	GNUTLS_MAC_HANDLE h1;
 	int vsize, hash_len = gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
-	char *tmp, *g, *n;
+	opaque *tmp, *g, *n;
 	uint8 *rtext, * csalt;
 			
 	passwd_len = strlen(passwd);	/* we do not want the null */

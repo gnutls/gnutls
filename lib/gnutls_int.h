@@ -26,10 +26,10 @@
 #define READ_DEBUG
 #define WRITE_DEBUG
 #define BUFFERS_DEBUG
-#define HARD_DEBUG
 #define HANDSHAKE_DEBUG
-#define DEBUG
+#define HARD_DEBUG
 */
+#define DEBUG
 
 #define MAX32 4294967295
 #define MAX24 16777215

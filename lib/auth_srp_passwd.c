@@ -29,12 +29,15 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_srp.h"
 #include "gnutls_random.h"
+#include "debug.h"
 
 static int pwd_put_values( GNUTLS_SRP_PWD_ENTRY *entry, char *str, int str_size) {
 char * p;
 int len;
 opaque *verifier;
 int verifier_size;
+opaque * tmp;
+int tmp_size;
 
 	p = rindex( str, '$'); /* we have n */
 	if (p==NULL) return -1;
@@ -43,34 +46,53 @@ int verifier_size;
 	p++;
 	
 	len = strlen(p);
-	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_HEX, p, NULL)) {
-		gnutls_assert();
-		return -1;
+	tmp_size = _gnutls_base64_decode( p, len, &tmp);
+	if (tmp_size < 0) {
+		gnutls_free(tmp);
+		return GNUTLS_E_PARSING_ERROR;
 	}
+	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
+		gnutls_assert();
+		gnutls_free(tmp);
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+	gnutls_free(tmp);
 
 	/* now go for g */
 	p = rindex( str, '$'); /* we have g */
 	if (p==NULL) {
 		mpi_release(entry->n);
-		return -1;
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
 	}
 	
 	*p='\0';
 	p++;
 	
 	len = strlen(p);
-	if (gcry_mpi_scan(&entry->g, GCRYMPI_FMT_HEX, p, NULL)) {
+	tmp_size = _gnutls_base64_decode( p, len, &tmp);
+
+	if (tmp_size < 0) {
 		gnutls_assert();
 		mpi_release(entry->n);
-		return -1;
+		gnutls_free(tmp);
+		return GNUTLS_E_PARSING_ERROR;
 	}
+	if (gcry_mpi_scan(&entry->g, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
+		gnutls_assert();
+		gnutls_free(tmp);
+		mpi_release(entry->n);
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	gnutls_free(tmp);
 
 	/* now go for verifier */
 	p = rindex( str, '$'); /* we have verifier */
 	if (p==NULL) {
 		mpi_release(entry->n);
 		mpi_release(entry->g);
-		return -1;
+		return GNUTLS_E_PARSING_ERROR;
 	}
 	
 	*p='\0';
@@ -82,14 +104,14 @@ int verifier_size;
 		gnutls_assert();
 		mpi_release(entry->n);
 		mpi_release(entry->g);
-		return -1;
+		return GNUTLS_E_PARSING_ERROR;
 	}
 
 	if (gcry_mpi_scan(&entry->v, GCRYMPI_FMT_USG, verifier, &verifier_size)) {
 		gnutls_assert();
 		mpi_release(entry->n);
 		mpi_release(entry->g);
-		return -1;
+		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 
@@ -136,7 +158,7 @@ int verifier_size;
 		mpi_release(entry->g);
 		mpi_release(entry->v);
 		gnutls_free(entry->salt);
-		return -1;
+		return GNUTLS_E_PARSING_ERROR;
 	}
 	*p='\0';
 

@@ -604,7 +604,7 @@ char *
 	int i, salt_size = strlen(salt);
 	unsigned char *local_salt, *v;
 	int passwd_len, vsize;
-	char *tmp, *g, *n;
+	opaque *tmp, *g, *n;
 
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
 	if (passwd_len > 56)

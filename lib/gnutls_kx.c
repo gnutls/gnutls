@@ -340,7 +340,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	    (state->gnutls_internals.current_cipher_suite);
 
 	/* Do key exchange only if the algorithm permits it */
-	if (_gnutls_kx_server_key_exchange(algorithm) != 0) {
+	if (_gnutls_kx_client_key_exchange(algorithm) != 0) {
 
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,

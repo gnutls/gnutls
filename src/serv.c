@@ -46,6 +46,8 @@ int main()
     int optval = 1;
     SRP_SERVER_CREDENTIALS cred;
     
+    /* this is a password file (created with the included crypt utility) 
+     */
     cred.password_file="/tmp/pwd";
     
     listen_sd = socket(AF_INET, SOCK_STREAM, 0);
