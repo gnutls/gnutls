@@ -25,6 +25,17 @@ get_pkalgo( int algo )
     return NULL;
 }
 
+static const char *
+get_pktime( long timestamp )
+{
+    static char buf[128];
+    struct tm * tb;
+    
+    tb = localtime( &timestamp );
+    sprintf( buf, "%04d-%02d-%02d", tb->tm_year+1900, tb->tm_mon+1, tb->tm_mday );
+    return buf;
+}
+
 int
 get_pubkey( gnutls_datum *pk, const gnutls_datum *kr, unsigned long kid )
 {
@@ -74,7 +85,7 @@ main( int argc, char ** argv )
     printf( "pk-algorithm %s %d bits\n", get_pkalgo( rc ), nbits );
 
     rc = gnutls_openpgp_extract_key_creation_time( &dat );
-    printf( "creation time %lu\n", rc );
+    printf( "creation time %s\n", get_pktime( rc ) );
 
     rc = gnutls_openpgp_extract_key_expiration_time( &dat );
     printf( "expiration time %lu\n", rc );
@@ -82,8 +93,8 @@ main( int argc, char ** argv )
     printf( "key fingerprint: " );
     rc = gnutls_openpgp_fingerprint( &dat, fpr, &fprlen );
     assert( rc == 0 );
-    for( i = 0; i < fprlen; i++ )
-        printf( "%02X ", fpr[i] );
+    for( i = 0; i < fprlen/2; i++ )
+        printf( "%02X%02X ", fpr[2*i], fpr[2*i+1] );
     printf( "\n" );
 
     printf( "key id: " );
@@ -126,8 +137,8 @@ main( int argc, char ** argv )
 
     printf( "key fingerprint: " );
     gnutls_openpgp_fingerprint( &pk, fpr, &fprlen );
-    for( i = 0; i < fprlen; i++ )
-        printf( "%02X ", fpr[i] );
+    for( i = 0; i < fprlen/2; i++ )
+        printf( "%02X%02X ", fpr[2*i], fpr[2*i+1] );
     printf( "\n" );
     gnutls_free_datum( &pk );
     
