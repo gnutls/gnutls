@@ -1465,6 +1465,44 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value, int *len)
   return ASN_OK;
 }
 
+/**
+  * asn1_number_of_elements - Counts the number of elements of a structure.
+  * @root: pointer to the root of an ASN1 structure. 
+  * @name: the name of a sub-structure of ROOT.
+  * @num: pointer to an integer where the result will be stored 
+  * Description:
+  *
+  * Counts the number of elements of a sub-structure called NAME with names equal to "?1","?2", ...
+  *
+  * Returns:
+  *
+  *  ASN_OK: creation OK
+  *  ASN_ELEMENT_NOT_FOUND: NAME isn't known
+  *  ASN_GENERIC_ERROR: parameter num equal to NULL
+  *
+  **/
+int 
+asn1_number_of_elements(node_asn *root,char *name,int *num)
+{
+  node_asn *node,*p;
+
+  if(num==NULL) return ASN_GENERIC_ERROR;
+
+  *num=0;
+
+  node=_asn1_find_node(root,name);
+  if(node==NULL) return ASN_ELEMENT_NOT_FOUND;
+
+  p=node->down;
+
+  while(p){
+    if((p->name) && (p->name[0]=='?')) (*num)++; 
+    p=p->right;
+  }
+
+  return ASN_OK;
+}
+
 
 int 
 _asn1_set_default_tag(node_asn *node)
