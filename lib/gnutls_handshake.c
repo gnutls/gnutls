@@ -764,7 +764,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		gnutls_free(cipher_suites);
 		gnutls_free(compression_methods);
 
-		ret = _gnutls_parse_extensions( state, &data[pos], datalen); /* datalen is the rest of the parsed length */
+		ret = _gnutls_parse_extensions( state, &data[pos], len); /* len is the rest of the parsed length */
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -879,7 +879,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 			return ret;
 		}
 		
-		ret = _gnutls_parse_extensions( state, &data[pos], datalen); /* datalen is the rest of the parsed length */
+		ret = _gnutls_parse_extensions( state, &data[pos], len); /* len is the rest of the parsed length */
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

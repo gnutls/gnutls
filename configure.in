@@ -114,7 +114,7 @@ if test $ac_cv_prog_gcc != no; then
 	fi
 		
 	if test $opt_maintainer_mode = yes; then
-	  CFLAGS="${CFLAGS} -g -Wall -Wpointer-arith"
+	  CFLAGS="${CFLAGS} -ggdb3 -Wall -Wpointer-arith"
 	fi
 	if test $opt_dmalloc_mode = yes; then
 	  AC_CHECK_LIB( dmalloc, main)

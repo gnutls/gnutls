@@ -24,6 +24,13 @@
 #include <crypt_bcrypt.h>
 #include <gnutls_srp.h>
 
+// temp here ---
+#define gcry_mpi_add mpi_add
+#define gcry_mpi_subm mpi_subm
+#define gcry_mpi_addm mpi_addm
+#define gcry_mpi_mul mpi_mul
+#define gcry_mpi_mulm mpi_mulm
+
 /* Here functions for SRP (like g^x mod n) are defined 
  */
 

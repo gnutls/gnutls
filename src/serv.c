@@ -44,7 +44,10 @@ int main()
     GNUTLS_STATE state;
     char buffer[MAX_BUF+1];
     int optval = 1;
-
+    SRP_SERVER_CREDENTIALS cred;
+    
+    cred.password_file="/tmp/pwd";
+    
     listen_sd = socket(AF_INET, SOCK_STREAM, 0);
     ERR(listen_sd, "socket");
 
@@ -67,7 +70,11 @@ int main()
 	gnutls_set_db_name(state, "/tmp/gdb");
 	gnutls_set_cipher_priority( state, 4, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR);
 	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
-	gnutls_set_kx_priority( state, 1, GNUTLS_KX_ANON_DH);
+	gnutls_set_kx_priority( state, 2, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH);
+	
+	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL, 0);
+	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred, sizeof(cred));
+	
 	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 	sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 

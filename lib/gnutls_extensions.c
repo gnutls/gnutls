@@ -35,7 +35,7 @@ typedef struct {
 	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque**); /* send data */
 } gnutls_extension_entry;
 
-#define MAX_EXT 256 /* maximum supported extension */
+#define MAX_EXT 20 /* maximum supported extension */
 static gnutls_extension_entry extensions[] = {
 	GNUTLS_EXTENSION_ENTRY(GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
 	{0}
@@ -88,25 +88,35 @@ char *_gnutls_extension_get_name(int type)
 }
 
 int _gnutls_parse_extensions( GNUTLS_STATE state, const opaque* data, int data_size) {
-int next, size, pos=0;
-int type;
+int next;
+int pos=0;
+uint8 type;
 const opaque* sdata;
 int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
+uint16 size, next1;
 
 	if (data_size < 2) return 0;
-	next = *((uint16*) &data);
+	memcpy( &next1, data, 2);
+#ifndef WORDS_BIGENDIAN
+	next = byteswap16(next1);
+#else
+	next = next1;
+#endif
 	if (data_size < next) return 0;
 	
 	pos+=2;
 	
 	do {
 		next--; if (next < 0) return 0;
-		type = *((uint8*)&data[pos]);
+		memcpy( &type, &data[pos], 1);
 		pos++;
 
 		next-=2; if (next < 0) return 0;
-		size = *((uint16*)&data[pos]);
+		memcpy( &size, &data[pos], 2);
 		pos+=2;
+#ifndef WORDS_BIGENDIAN
+		size = byteswap16(size);
+#endif
 		
 		sdata = &data[pos];
 		pos+=size;
@@ -126,6 +136,7 @@ int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data) {
 int next, size;
 uint16 pos=0;
 opaque* sdata;
+uint16 ssize;
 int (*ext_func_send)( GNUTLS_STATE, opaque**);
 
 
@@ -139,7 +150,16 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 		if (ext_func_send == NULL) continue;
 		size = ext_func_send( state, &sdata);
 		if (size > 0) {
-			(*data) = gnutls_realloc( (*data), pos+size);
+			(*data) = gnutls_realloc( (*data), pos+size+3);
+			(*data)[pos++] = (uint8) next; /* set type */
+#ifndef WORDS_BIGENDIAN
+			ssize = byteswap16( (uint16)size);
+#else
+			ssize = size;
+#endif
+			memcpy( &(*data)[pos], &ssize, 2);
+			pos+=2;
+			
 			memcpy( &(*data)[pos], sdata, size);
 			pos+=size;
 			gnutls_free(sdata);

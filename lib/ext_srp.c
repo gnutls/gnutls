@@ -47,8 +47,10 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 		if (cred==NULL) return 0;
 
 		if (cred->username!=NULL) { /* send username */
-			(*data) = strdup( cred->username);
-			return strlen( cred->username);
+			int len = strlen(cred->username);
+			(*data) = gnutls_malloc(len);
+			memcpy( (*data), cred->username, len);
+			return len;
 		}
 	}
 	return 0;

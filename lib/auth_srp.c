@@ -358,6 +358,9 @@ int proc_srp_server_kx2(GNUTLS_KEY key, opaque * data, int data_size)
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
+	/* calculate u */
+	key->u = _gnutls_calc_srp_u( B);
+
 	/* S = (B - g^x) ^ (a + u * x) % N */
 	S = _gnutls_calc_srp_S2( B, G, key->x, _a, key->u, N);
 

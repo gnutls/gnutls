@@ -36,20 +36,20 @@ int len;
 opaque *verifier;
 int verifier_size;
 
-	p = strrchr( str, '$'); /* we have n */
+	p = rindex( str, '$'); /* we have n */
 	if (p==NULL) return -1;
 	
 	*p='\0';
 	p++;
 	
 	len = strlen(p);
-	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_HEX, p, &len)) {
+	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_HEX, p, NULL)) {
 		gnutls_assert();
 		return -1;
 	}
 
 	/* now go for g */
-	p = strrchr( str, '$'); /* we have g */
+	p = rindex( str, '$'); /* we have g */
 	if (p==NULL) {
 		mpi_release(entry->n);
 		return -1;
@@ -59,14 +59,14 @@ int verifier_size;
 	p++;
 	
 	len = strlen(p);
-	if (gcry_mpi_scan(&entry->g, GCRYMPI_FMT_HEX, p, &len)) {
+	if (gcry_mpi_scan(&entry->g, GCRYMPI_FMT_HEX, p, NULL)) {
 		gnutls_assert();
 		mpi_release(entry->n);
 		return -1;
 	}
 
 	/* now go for verifier */
-	p = strrchr( str, '$'); /* we have verifier */
+	p = rindex( str, '$'); /* we have verifier */
 	if (p==NULL) {
 		mpi_release(entry->n);
 		mpi_release(entry->g);
@@ -94,7 +94,7 @@ int verifier_size;
 
 
 	/* now go for salt */
-	p = strrchr( str, '$'); /* we have salt */
+	p = rindex( str, '$'); /* we have salt */
 	if (p==NULL) {
 		mpi_release(entry->n);
 		mpi_release(entry->g);
@@ -115,7 +115,7 @@ int verifier_size;
 	}
 
 	/* now go for algorithm */
-	p = strrchr( str, '$'); /* we have algorithm */
+	p = rindex( str, '$'); /* we have algorithm */
 	if (p==NULL) {
 		mpi_release(entry->n);
 		mpi_release(entry->g);
@@ -130,7 +130,7 @@ int verifier_size;
 	entry->algorithm = atoi(p);
 
 	/* now go for username */
-	p = strchr( str, ':'); /* we have algorithm */
+	p = index( str, ':'); /* we have algorithm */
 	if (p==NULL) {
 		mpi_release(entry->n);
 		mpi_release(entry->g);
@@ -151,7 +151,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	char line[5*1024];
 	int i;
 	GNUTLS_SRP_PWD_ENTRY * entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
-	
+
 	cred = _gnutls_get_kx_cred( key, GNUTLS_KX_SRP, NULL);
 	if (cred==NULL) {
 		gnutls_assert();
@@ -173,7 +173,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 	            i++;
 	    }
 	    if (strncmp( username, line, i) == 0) {
-			if (pwd_put_values( entry, line, sizeof(line)-i)==0)
+			if (pwd_put_values( entry, line, strlen(line))==0)
 				return entry;
 			else {
 				gnutls_free(entry);
@@ -181,19 +181,22 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 			}
 	    }
     }
-	return NULL;
+    return NULL;
 	
 }
-
+#define RNDUSER "rnd"
 #define RND_SALT_SIZE 16
 GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	GNUTLS_SRP_PWD_ENTRY * pwd_entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	size_t n = sizeof diffie_hellman_group1_prime;
 	opaque * rand;
 	
+	pwd_entry->username = gnutls_malloc(strlen(RNDUSER)+1);
+	strcpy( pwd_entry->username, RNDUSER);
+	
 	pwd_entry->g = gcry_mpi_set_ui(NULL, SRP_G);
 	pwd_entry->v = gcry_mpi_new(160);
-    gcry_mpi_randomize( pwd_entry->v, 160, GCRY_WEAK_RANDOM);
+        gcry_mpi_randomize( pwd_entry->v, 160, GCRY_WEAK_RANDOM);
 
 	if (gcry_mpi_scan(&pwd_entry->n, GCRYMPI_FMT_USG,
                           diffie_hellman_group1_prime, &n)) {

@@ -78,8 +78,6 @@ void gnutls_set_mac_priority( GNUTLS_STATE state, int num, ...);
 void gnutls_set_compression_priority( GNUTLS_STATE state, int num, ...);
 void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
 
-/* cred is a structure defined by the kx algorithm */
-int gnutls_set_kx_cred( GNUTLS_STATE, int kx, void* cred);
 
 /* set our version - 0 for TLS 1.0 and 1 for SSL3 */
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
@@ -105,7 +103,8 @@ int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt);
 
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
-int gnutls_set_kx_cred( GNUTLS_STATE state, int kx, void* cred);
+/* cred is a structure defined by the kx algorithm */
+int gnutls_set_kx_cred( GNUTLS_STATE, int kx, void* cred, int cred_size);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 typedef struct {

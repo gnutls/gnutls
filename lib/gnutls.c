@@ -99,12 +99,12 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.buffer_handshake = NULL;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	(*state)->gnutls_key->cred = NULL; /* no credentials by default */
-	(*state)->gnutls_key->username = NULL; /* no default username */
-
 	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */
 
 	(*state)->gnutls_key = gnutls_malloc(sizeof(GNUTLS_KEY_A));
+
+	(*state)->gnutls_key->username = NULL; /* no default username */
+	(*state)->gnutls_key->cred = NULL; /* no credentials by default */
 	
 	(*state)->gnutls_key->KEY = NULL;
 	(*state)->gnutls_key->client_Y = NULL;
