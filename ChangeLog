@@ -1,3 +1,16 @@
+2003-06-26 21:59  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_state.c, pkix.asn, pkix_asn1_tab.c:
+
+	some cleanups.  
+
+2003-06-26 09:41  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_dh_primes.c, gnutls_int.h:
+
+	Several more additions to PKCS #12 to allow encrypting bags. Still
+	not interoperable.  
+
 2003-06-25 14:30  nmav <nmav@gnutls.org>
 
 	* configure.in, lib/gnutls_algorithms.c, lib/gnutls_cipher_int.c,
