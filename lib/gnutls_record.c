@@ -204,7 +204,7 @@ static void _gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_
 	return;
 }
 
-#define MAX_SEED_SIZE 40
+#define MAX_SEED_SIZE 140
 
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
@@ -214,7 +214,6 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 
 	GNUTLS_MAC_HANDLE td2;
 	opaque *ret;
-	void *A;
 	int i = 0, times, how, blocksize, A_size;
 	opaque final[20], Atmp[MAX_SEED_SIZE];
 
@@ -231,9 +230,8 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 	} while (i < total_bytes);
 
 	/* calculate A(0) */
-	A = Atmp;
 
-	memcpy( A, seed, seed_size);
+	memcpy( Atmp, seed, seed_size);
 	A_size = seed_size;
 
 	times = i / blocksize;
@@ -241,13 +239,11 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 		td2 = gnutls_hmac_init(algorithm, secret, secret_size);
 
 		/* here we calculate A(i+1) */
-		_gnutls_cal_PRF_A( algorithm, secret, secret_size, A, A_size, Atmp);
+		_gnutls_cal_PRF_A( algorithm, secret, secret_size, Atmp, A_size, Atmp);
 
 		A_size = blocksize;
-		gnutls_free(A);
-		A = Atmp;
 
-		gnutls_hmac(td2, A, A_size);
+		gnutls_hmac(td2, Atmp, A_size);
 		gnutls_hmac(td2, seed, seed_size);
 		gnutls_hmac_deinit(td2, final);
 
