@@ -1,3 +1,135 @@
+2004-08-22 21:48  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS:
+
+	Add copying conditions, and PGP release key.  
+
+2004-08-22 21:41  Simon Josefsson <simon@josefsson.org>
+
+	* README, THANKS:
+
+	Add copying conditions.  
+
+2004-08-22 21:40  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add copying conditions.  Markup.  
+
+2004-08-22 21:27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-22 16:10  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am:
+
+	Remove stale -I.  
+
+2004-08-22 15:59  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Need newer libtasn1.  
+
+2004-08-22 13:54  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	(print_certificate_info): Don't crash on large X.509 extensions 
+	(thanks to PKITS test suite).  Also output ASCII representation of 
+	printable extension data (some extension contain humanly readable 
+	strings).  
+
+2004-08-22 13:15  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	(smime_to_pkcs7): Make sure PKCS#7 output use LF EOL.  
+
+2004-08-22 12:52  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	(smime_to_pkcs7): Handle LF EOF.  
+
+2004-08-22 12:42  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c:
+
+	Fix --password.  
+
+2004-08-22 10:52  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-22 10:29  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Want gzip too.  
+
+2004-08-22 10:27  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, Makefile.am:
+
+	Use bz2.  
+
+2004-08-22 10:24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-22 10:16  Simon Josefsson <simon@josefsson.org>
+
+	* doc/scripts/gdoc:
+
+	Support -include.  
+
+2004-08-22 08:45  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/gnutls.h.in.in:
+
+	Revert ssize_t change.  
+
+2004-08-22 08:39  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/gnutls.h.in.in:
+
+	Assume POSIX system (which we already do), so it has ssize_t.  
+	Redefining ssize_t locally, if it doesn't exist, already handled by
+	gnulib.  
+
+2004-08-22 08:31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/: Makefile.am, Makefile.am:
+
+	Simplify further.  
+
+2004-08-22 08:29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Move things from EXTRA_DIST, to improve dependency tracking.  
+
+2004-08-22 08:23  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am:
+
+	Move things from EXTRA_DIST to *_SOURCES, to improve dependency
+	tracking.  Simplify.  
+
+2004-08-21 23:11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Remove pkcs5.  
+
 2004-08-21 21:32  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS:
