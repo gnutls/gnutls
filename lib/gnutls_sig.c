@@ -41,7 +41,7 @@
  */
 int _gnutls_generate_sig_from_hdata( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum *signature) {
 gnutls_datum data;
-int size = gnutls_getHashDataBufferSize( state);
+int size = gnutls_get_handshake_buffer_size( state);
 int ret;
 
 	data.data = gnutls_malloc(size);
@@ -51,7 +51,7 @@ int ret;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 			
-	gnutls_readHashDataFromBuffer( state, data.data, data.size);
+	gnutls_read_handshake_buffer( state, data.data, data.size);
 
 	ret = _gnutls_pkcs1_rsa_generate_sig( cert, pkey, &data, signature);
 	gnutls_free_datum( &data);
@@ -234,7 +234,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, g
  */
 int _gnutls_verify_sig_hdata( GNUTLS_STATE state, gnutls_cert *cert, gnutls_datum* signature, int ubuffer_size) {
 gnutls_datum data;
-int size = gnutls_getHashDataBufferSize( state) - ubuffer_size; /* do not get the last message */
+int size = gnutls_get_handshake_buffer_size( state) - ubuffer_size; /* do not get the last message */
 int ret;
 
 	data.data = gnutls_malloc(size);
@@ -244,7 +244,7 @@ int ret;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 			
-	gnutls_readHashDataFromBuffer( state, data.data, data.size);
+	gnutls_read_handshake_buffer( state, data.data, data.size);
 
 	ret = _gnutls_pkcs1_rsa_verify_sig( cert, &data, signature);
 	if (ret < 0) {

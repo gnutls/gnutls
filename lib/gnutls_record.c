@@ -640,11 +640,11 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* If we have enough data in the cache do not bother receiving
 	 * a new packet. (in order to flush the cache)
 	 */
-	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && gnutls_getDataBufferSize(type, state) > 0) {
-		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
+	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && gnutls_get_data_buffer_size(type, state) > 0) {
+		ret = gnutls_get_data_buffer(type, state, data, sizeofdata);
 
 		/* if the buffer just got empty */
-		if (gnutls_getDataBufferSize(type, state)==0) {
+		if (gnutls_get_data_buffer_size(type, state)==0) {
 			if ( (ret2=_gnutls_clear_peeked_data( cd, state)) < 0) {
 				gnutls_assert();
 				return ret2;
@@ -807,7 +807,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	}
 
 	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
-		gnutls_insertDataBuffer(type, state, (void *) tmpdata, tmplen);
+		gnutls_insert_to_data_buffer(type, state, (void *) tmpdata, tmplen);
 	} else {
 		switch (recv_type) {
 		case GNUTLS_ALERT:
@@ -858,7 +858,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
 			/* even if data is unexpected put it into the buffer */
-			if ( (ret=gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen)) < 0) {
+			if ( (ret=gnutls_insert_to_data_buffer(recv_type, state, (void *) tmpdata, tmplen)) < 0) {
 				gnutls_assert();
 				return ret;
 			}
@@ -894,10 +894,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 	/* Get Application data from buffer */
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
-		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
+		ret = gnutls_get_data_buffer(type, state, data, sizeofdata);
 
 		/* if the buffer just got empty */
-		if (gnutls_getDataBufferSize(type, state)==0) {
+		if (gnutls_get_data_buffer_size(type, state)==0) {
 			if ( (ret2 = _gnutls_clear_peeked_data( cd, state)) < 0) {
 				gnutls_assert();
 				return ret2;

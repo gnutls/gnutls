@@ -41,7 +41,7 @@
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
-int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, int length)
+int gnutls_insert_to_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
 	int old_buffer;
 
@@ -75,7 +75,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 
 }
 
-int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state)
+int gnutls_get_data_buffer_size(ContentType type, GNUTLS_STATE state)
 {
 	if (type == GNUTLS_APPLICATION_DATA)
 		return state->gnutls_internals.buffer.size;
@@ -96,10 +96,10 @@ int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state)
   * to work).
   **/
 int gnutls_check_pending(GNUTLS_STATE state) {
-	return gnutls_getDataBufferSize(GNUTLS_APPLICATION_DATA, state);
+	return gnutls_get_data_buffer_size(GNUTLS_APPLICATION_DATA, state);
 }
 
-int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, int length)
+int gnutls_get_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
 	if (type == GNUTLS_APPLICATION_DATA) {
 	
@@ -603,7 +603,7 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 /* Buffer for handshake packets. Keeps the packets in order
  * for finished messages to use them.
  */
-int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
+int gnutls_insert_to_handshake_buffer( GNUTLS_STATE state, char *data, int length)
 {
 	int old_buffer;
 
@@ -632,13 +632,13 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 	return 0;
 }
 
-int gnutls_getHashDataBufferSize( GNUTLS_STATE state)
+int gnutls_get_handshake_buffer_size( GNUTLS_STATE state)
 {
 
 	return state->gnutls_internals.hash_buffer.size;
 }
 
-int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
+int gnutls_get_handshake_buffer( GNUTLS_STATE state, char *data, int length)
 {
 	if (length > state->gnutls_internals.hash_buffer.size) {
 		length = state->gnutls_internals.hash_buffer.size;
@@ -666,8 +666,9 @@ int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 }
 
 /* this function does not touch the buffer
+ * and returns data from it (peek mode!)
  */
-int gnutls_readHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
+int gnutls_read_handshake_buffer( GNUTLS_STATE state, char *data, int length)
 {
 	if (length > state->gnutls_internals.hash_buffer.size) {
 		length = state->gnutls_internals.hash_buffer.size;
@@ -681,7 +682,7 @@ int gnutls_readHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 
 
 
-int gnutls_clearHashDataBuffer( GNUTLS_STATE state)
+int gnutls_clear_handshake_buffer( GNUTLS_STATE state)
 {
 
 #ifdef BUFFERS_DEBUG

@@ -134,14 +134,14 @@ void *_gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip)
 					   state->security_parameters.
 					   master_secret, 48);
 
-	siz = gnutls_getHashDataBufferSize(state) - skip;
+	siz = gnutls_get_handshake_buffer_size(state) - skip;
 	data = gnutls_malloc(siz);
 	if (data==NULL) {
 		gnutls_assert();
 		return NULL;
 	}
 
-	gnutls_readHashDataFromBuffer(state, data, siz);
+	gnutls_read_handshake_buffer(state, data, siz);
 
 	gnutls_mac_ssl3(td, data, siz);
 	gnutls_mac_ssl3(td2, data, siz);
@@ -181,14 +181,14 @@ void *_gnutls_finished(GNUTLS_STATE state, int type, int skip)
 	td = gnutls_hash_init(GNUTLS_MAC_MD5);
 	td2 = gnutls_hash_init(GNUTLS_MAC_SHA);
 
-	siz = gnutls_getHashDataBufferSize(state) - skip;
+	siz = gnutls_get_handshake_buffer_size(state) - skip;
 	data = gnutls_malloc(siz);
 	if (data==NULL) {
 		gnutls_assert();
 		return NULL;
 	}
 
-	gnutls_readHashDataFromBuffer(state, data, siz);
+	gnutls_read_handshake_buffer(state, data, siz);
 
 	gnutls_hash(td, data, siz);
 	gnutls_hash(td2, data, siz);
@@ -621,7 +621,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 	if (type != GNUTLS_HELLO_REQUEST) {
 
 		if ((ret =
-		     gnutls_insertHashDataBuffer(state, data,
+		     gnutls_insert_to_handshake_buffer(state, data,
 						 datasize)) < 0) {
 			gnutls_assert();
 			gnutls_free(data);
@@ -735,7 +735,7 @@ static int _gnutls_recv_handshake_header(SOCKET cd, GNUTLS_STATE state,
 
 	if (*recv_type != GNUTLS_HELLO_REQUEST) {
 		if ((ret =
-		     gnutls_insertHashDataBuffer(state, dataptr,
+		     gnutls_insert_to_handshake_buffer(state, dataptr,
 						 handshake_header_size)) <
 		    0) {
 			gnutls_assert();
@@ -828,7 +828,7 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 
 	if (recv_type != GNUTLS_HELLO_REQUEST && length32 > 0) {
 		if ((ret =
-		     gnutls_insertHashDataBuffer(state, dataptr,
+		     gnutls_insert_to_handshake_buffer(state, dataptr,
 						 length32)) < 0) {
 			gnutls_assert();
 			return ret;
@@ -1405,7 +1405,7 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 		if (gnutls_is_fatal_error(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
-		gnutls_clearHashDataBuffer(state); \
+		gnutls_clear_handshake_buffer(state); \
 		return ret; \
 	}
 
@@ -1767,7 +1767,7 @@ int gnutls_handshake_common(SOCKET cd, GNUTLS_STATE state)
 		_gnutls_server_register_current_session(state);
 	}
 	/* clear handshake buffer */
-	gnutls_clearHashDataBuffer(state);
+	gnutls_clear_handshake_buffer(state);
 	return ret;
 
 }
