@@ -189,6 +189,8 @@ typedef struct {
 	MPI			client_g;
 	MPI			client_p;
 	MPI			dh_secret;
+	int			certificate_requested;
+	int			certificate_verify_needed;
 } GNUTLS_INTERNALS;
 
 typedef struct {

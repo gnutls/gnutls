@@ -1,3 +1,4 @@
+* x509 Certificate API
 * Add support for v2.0 init packet
-* Add a transparent support for TLS versions (so we can add SSL 3.0)
-* Certificate API
+* Add a transparent support for multiple versions (so we can add SSL 3.0)
+* Resume old sessions

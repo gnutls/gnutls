@@ -210,20 +210,25 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
 /* This is the function for the client to send the certificate
  * verify message
- * FIXME: this function does almost nothing except sending shit to
+ * FIXME: this function does almost nothing except sending garbage to
  * peer.
  */
 int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
 {
 	uint8 *data;
 	int ret = 0;
+
+	/* if certificate verify is not needed just exit */
+	if (state->gnutls_internals.certificate_verify_needed==0) return 0;
+
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Sending client certificate verify message\n");
 #endif
+	
 	switch (_gnutls_cipher_suite_get_kx_algo
 		(state->gnutls_internals.current_cipher_suite)) {
 	case GNUTLS_KX_DHE_DSS:
-		data=gnutls_malloc(20);
+		data=gnutls_calloc(1, 20);
 		ret =
 		    _gnutls_send_handshake(cd, state, data,
 					   20,
@@ -231,7 +236,7 @@ int _gnutls_send_client_certificate_verify(int cd, GNUTLS_STATE state)
 		gnutls_free(data);
 		break;
 	case GNUTLS_KX_DHE_RSA:
-		data=gnutls_malloc(20+16);
+		data=gnutls_calloc(1, 20+16);
 		ret =
 		    _gnutls_send_handshake(cd, state, data,
 					   20+16,

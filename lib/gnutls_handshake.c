@@ -351,6 +351,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	if (length32 > 0 && data!=NULL)
 		memmove( *data, &dataptr[4], length32);
 
+	/* here we do the hashing work needed at finished messages */
 	if (state->gnutls_internals.client_hash == HASH_TRUE) {
 		gnutls_hash(state->gnutls_internals.client_td_md5, dataptr,
 		      length32 + 4);
@@ -388,6 +389,19 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	case GNUTLS_CLIENT_KEY_EXCHANGE:
 		ret = length32;
 		break;
+	case GNUTLS_CERTIFICATE_REQUEST:
+#ifdef HARD_DEBUG
+		fprintf(stderr, "Requested Client Certificate!\n");
+#endif
+	/* FIXME: just ignore that message for the time being 
+	 * we have to parse it and the store the needed information
+	 */
+		state->gnutls_internals.certificate_requested = 1;
+		ret = length32;
+		break;
+	default:
+		gnutls_assert();
+		ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	}
 	gnutls_free(dataptr);
 	return ret;
@@ -397,6 +411,29 @@ int _gnutls_send_hello_request(int cd, GNUTLS_STATE state)
 {
 	return _gnutls_send_handshake(cd, state, NULL, 0,
 				      GNUTLS_HELLO_REQUEST);
+}
+
+int _gnutls_send_client_certificate(int cd, GNUTLS_STATE state)
+{
+	char data[1];
+	int ret;
+	
+	if (state->gnutls_internals.certificate_requested==0) return 0;
+
+	/* we do not have that functionality yet */
+	state->gnutls_internals.certificate_verify_needed = 0;
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Sending Client Certificate\n");
+#endif
+
+/* Here since we do not support certificates yet we
+ * do not have that functionality.
+ */
+	data[0] = 0;
+	ret = _gnutls_send_handshake(cd, state, &data, 1,
+				      GNUTLS_CERTIFICATE);
+				      
+	return ret;
 }
 
 
@@ -820,6 +857,16 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 		}
 
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
+		HASH(client_hash);
+		HASH(server_hash);
+		ret = _gnutls_send_client_certificate(cd, state);
+		NOT_HASH(client_hash);
+		NOT_HASH(server_hash);
+		if (ret < 0) {
+			ERR("send client certificate", ret);
+			return ret;
+		}
+
 
 		HASH(client_hash);
 		HASH(server_hash);

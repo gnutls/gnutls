@@ -359,9 +359,9 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			    _gnutls_make_mul(length,
 				     _gnutls_cipher_get_block_size
 				     (state->security_parameters.bulk_cipher_algorithm));
-			pad =
+			pad = (uint8)
 			    length - compressed->length -
-			    state->connection_state.mac_secret_size - 1;
+			    state->connection_state.mac_secret_size;
 			
 			/* set pad bytes pad */
 			padding = gnutls_malloc(pad);
@@ -374,10 +374,6 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			memmove(&data
 				[state->connection_state.mac_secret_size +
 				 compressed->length], padding, pad);
-			memmove(&data
-				[pad +
-				 state->connection_state.mac_secret_size +
-				 compressed->length], &pad, 1);
 
 			gnutls_free(padding);
 
@@ -422,7 +418,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	uint64 seq_num;
 	uint16 length;
 	GNUTLS_MAC_HANDLE td;
-
+	int blocksize = _gnutls_cipher_get_block_size(state->security_parameters.cipher_type);
 
 	content = gnutls_malloc(ciphertext->length);
 	memmove(content, ciphertext->fragment, ciphertext->length);
@@ -463,6 +459,12 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			    ciphertext->version.minor;
 		break;
 	case CIPHER_BLOCK:
+
+fprintf(stderr, "LEN: %d-%d\n", ciphertext->length, blocksize);
+			if ( ciphertext->length < blocksize || ciphertext->length % blocksize != 0) {
+				gnutls_assert();
+				return GNUTLS_E_DECRYPTION_FAILED;
+			}
 			gnutls_cipher_decrypt(state->
 					    connection_state.read_cipher_state,
 					    content, ciphertext->length);
@@ -470,8 +472,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			pad = content[ciphertext->length - 1];	/* pad */
 			length =
 			    ciphertext->length -
-			    state->connection_state.mac_secret_size - pad -
-			    1;
+			    state->connection_state.mac_secret_size - pad;
 
 			if (pad > ciphertext->length - state->connection_state.mac_secret_size) {
 				gnutls_assert();

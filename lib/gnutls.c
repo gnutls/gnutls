@@ -89,6 +89,9 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.client_p = NULL;
 	(*state)->gnutls_internals.client_g = NULL;
 	(*state)->gnutls_internals.dh_secret = NULL;
+	
+	(*state)->gnutls_internals.certificate_requested = 0;
+	(*state)->gnutls_internals.certificate_verify_needed = 0;
 
 	return 0;
 }
