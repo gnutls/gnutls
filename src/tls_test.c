@@ -211,7 +211,7 @@ void gaa_parser(int argc, char **argv)
 	int i, j;
 
 	if (gaa(argc, argv, &info) != -1) {
-		fprintf(stderr, "Error in the arguments.\n");
+		fprintf(stderr, "Error in the arguments. Use the -h or --help parameters to get more info.\n");
 		exit(1);
 	}
 
