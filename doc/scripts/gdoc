@@ -120,8 +120,6 @@ use POSIX qw(strftime);
 # match expressions used to find embedded type information
 $type_constant = "\\\%(\\w+)";
 $type_func = "(\\w+\\(\\))";
-#$type_func = "((\\w|\\\\)+\\(\\))";
-#$type_func = "(\\(w||\\\\)+\\(\\))";
 $type_param = "\\\@(\\w+)";
 $type_struct = "\\\&(\\w+)";
 $type_env = "(\\\$\\w+)";
@@ -431,7 +429,7 @@ sub output_tex {
 
     print "{\\it ".$type."}\n";
     print "{\\bf ".$func."}\n";
-    print "(\n";
+    print "(";
     $count = 0;
     foreach $parameter (@{$args{'parameterlist'}}) {
         $param = $args{'parametertypes'}{$parameter};
@@ -439,7 +437,7 @@ sub output_tex {
 	$param =~ s/_/\\_/g;
         $param2 =~ s/_/\\_/g;
 
-	print "{\\it ".$param."} {\\bf ".$param2."}\n";
+	print "{\\it ".$param."} {\\bf ".$param2."}";
 	if ($count != $#{$args{'parameterlist'}}) {
 	    $count++;
 	    print ", ";
@@ -478,7 +476,7 @@ sub output_tex {
 	$sec =~ s/_/\\_/g;
 	$sec =~ s/&([a-zA-Z\_]+)/{\\it \1}/g;
 
-	print "\n\\par{\\large{$sec}}\\par\n";
+	print "\n{\\large{$sec}}\\\\\n";
 	print "\\begin{rmfamily}\n";
 
 	$sec = $args{'sections'}{$section};
