@@ -393,7 +393,7 @@ int len;
 
 	*hash = _gnutls_x509_oid2mac_algorithm( str);
 
-	if (*hash==(gnutls_mac_algorithm)-1) {
+	if (*hash==GNUTLS_MAC_UNKNOWN) {
 
 		_gnutls_x509_log( "X509_SIG: HASH OID: %s\n", str);
 

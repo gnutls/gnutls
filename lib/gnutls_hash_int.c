@@ -55,17 +55,6 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 		}
 		break;
 
-	case GNUTLS_MAC_MD2:
-		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
-		if (ret == NULL)
-			return GNUTLS_HASH_FAILED;
-		ret->handle = gcry_md_open(GCRY_MD_MD2, 0);
-		if (!ret->handle) {
-			gnutls_free(ret);
-			ret = GNUTLS_HASH_FAILED;
-		}
-		break;
-
 	default:
 		ret = GNUTLS_HASH_FAILED;
 	}

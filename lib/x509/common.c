@@ -41,7 +41,6 @@ typedef struct _oid2string {
 #define DSA_OID "1.2.840.10040.4.1"
 
 #define DSA_SHA1_OID "1.2.840.10040.4.3"
-#define RSA_MD2_OID "1.2.840.113549.1.1.2"
 #define RSA_MD5_OID "1.2.840.113549.1.1.4"
 #define RSA_SHA1_OID "1.2.840.113549.1.1.5"
 
@@ -61,7 +60,6 @@ static const oid2string OID2STR[] = {
 	{"1.2.840.113549.1.9.1", "Pkcs9email", "EMAIL", 0, 1},
 	{"1.2.840.113549.1.9.7", "Pkcs9challengePassword", NULL, 1, 1},
 	{PKIX1_RSA_OID, "rsaEncryption", NULL, 0, 0},
-	{RSA_MD2_OID, "md2WithRSAEncryption", NULL, 0, 0},
 
 	{RSA_MD5_OID, "md5WithRSAEncryption", NULL, 0, 0},
 	{RSA_SHA1_OID, "sha1WithRSAEncryption", NULL, 0, 0},
@@ -244,17 +242,14 @@ gnutls_mac_algorithm _gnutls_x509_oid2mac_algorithm( const char* oid)
 		return GNUTLS_MAC_SHA;
 	else if (strcmp( oid, OID_MD5) == 0)
 		return GNUTLS_MAC_MD5;
-	else if (strcmp( oid, OID_MD2) == 0)
-		return GNUTLS_MAC_MD2;
 
-	return (gnutls_mac_algorithm)-1;
+	return GNUTLS_MAC_UNKNOWN;
 }
 
 const char* _gnutls_x509_mac2oid( gnutls_mac_algorithm mac)
 {
 	if (mac == GNUTLS_MAC_SHA) return OID_SHA1;
 	else if (mac == GNUTLS_MAC_MD5) return OID_MD5;
-	else if (mac == GNUTLS_MAC_MD2) return OID_MD2;
 	else return NULL;
 }
 
@@ -270,7 +265,6 @@ const char* _gnutls_x509_sign2oid( gnutls_pk_algorithm pk, gnutls_mac_algorithm 
 	if (pk == GNUTLS_PK_RSA) {
 		if (mac == GNUTLS_MAC_SHA) return RSA_SHA1_OID;
 		else if (mac == GNUTLS_MAC_MD5) return RSA_MD5_OID;
-		else if (mac == GNUTLS_MAC_MD2) return RSA_MD2_OID;
 	} else if (pk == GNUTLS_PK_DSA) {
 		if (mac == GNUTLS_MAC_SHA) return DSA_SHA1_OID;
 	}
