@@ -13,9 +13,9 @@
 int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 {
 
-	if (_gnutls_is_algorithm(algo) == 0) {
+	if (_gnutls_cipher_is_ok(algo) == 0) {
 		state->security_parameters.bulk_cipher_algorithm = algo;
-		if (_gnutls_is_block_algorithm(algo) == 0) {
+		if (_gnutls_cipher_is_block(algo) == 0) {
 			state->security_parameters.cipher_type =
 			    CIPHER_BLOCK;
 		} else {
@@ -26,9 +26,9 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 		    EXPORTABLE_FALSE;
 		state->security_parameters.key_material_length =
 		    state->security_parameters.key_size =
-		    _gnutls_get_key_size(algo);
+		    _gnutls_cipher_get_key_size(algo);
 		state->security_parameters.IV_size =
-		    _gnutls_get_iv_size(algo);
+		    _gnutls_cipher_get_iv_size(algo);
 	} else {
 		return GNUTLS_E_UNKNOWN_CIPHER;
 	}
@@ -359,8 +359,8 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 			    rand[0] + 1;
 			length =
 			    (length /
-			     _gnutls_get_block_size(CIPHER_3DES)) *
-			    _gnutls_get_block_size(CIPHER_3DES);
+			     _gnutls_cipher_get_block_size(CIPHER_3DES)) *
+			    _gnutls_cipher_get_block_size(CIPHER_3DES);
 			pad =
 			    length - compressed->length -
 			    state->connection_state.mac_secret_size - 1;

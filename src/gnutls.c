@@ -606,7 +606,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 
 			if (type == GNUTLS_HANDSHAKE) {
 				ret =
-				    _gnutls_recv_handshake
+				    _gnutls_recv_handshake_int
 				    (cd, state, tmpdata, tmplen, data, sizeofdata);
 				
 				gnutls_free(tmpdata);

@@ -48,7 +48,7 @@ enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HE
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
 		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
 		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
-		     GNUTLS_FINISHED=20 };
+		     GNUTLS_FINISHED=20, GNUTLS_NONE=255 };
 			
 typedef enum HandshakeType HandshakeType;
 
@@ -66,6 +66,7 @@ typedef struct {
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
 enum BulkCipherAlgorithm { CIPHER_NULL, CIPHER_3DES = 4 };
+enum KX_Algorithm { KX_RSA, KX_DHE_DSS, KX_DHE_RSA, KX_DH_DSS, KX_DH_RSA, KX_ANON_DH };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
 enum IsExportable { EXPORTABLE_TRUE, EXPORTABLE_FALSE };
 enum MACAlgorithm { MAC_NULL, MAC_MD5, MAC_SHA };
@@ -74,6 +75,7 @@ enum CompressionMethod { COMPRESSION_NULL };
 enum ValidSession { VALID_TRUE, VALID_FALSE };
 enum ResumableSession { RESUME_TRUE, RESUME_FALSE };
 
+typedef enum KX_Algorithm KX_Algorithm;
 typedef enum ValidSession ValidSession;
 typedef enum ResumableSession ResumableSession;
 typedef enum ConnectionEnd ConnectionEnd;

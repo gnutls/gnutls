@@ -49,6 +49,15 @@ int ret;
 	return ret;
 }
 
+int _gnutls_recv_handshake( int cd, GNUTLS_STATE state, void* data, uint32 datalen, HandshakeType type) {
+int ret;
+	state->gnutls_internals.next_handshake_type = type;
+	ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, data, datalen);
+	state->gnutls_internals.next_handshake_type = GNUTLS_NONE;
+
+	return ret;
+}
+
 _gnutls_recv_finished( int cd, GNUTLS_STATE state) {
 uint8* data, vrfy[12];
 uint8 concat[36]; /* md5+sha1 */
@@ -59,8 +68,7 @@ int ret=0;
 	memmove( concat, state->gnutls_internals.md_md5, 16);
 	memmove( &concat[16], state->gnutls_internals.md_sha1, 20);
 
-	state->gnutls_internals.next_handshake_type = GNUTLS_FINISHED;
-	ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, vrfy, 12);
+	ret = _gnutls_recv_handshake( cd, state, vrfy, 12, GNUTLS_FINISHED);
 	if (ret<0) {
 		ERR("recv finished int", ret);
 		return ret;
@@ -202,7 +210,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_da
 	return ret;
 }
 
-int _gnutls_recv_handshake( int cd, GNUTLS_STATE state, void* data, uint32 datasize, void* output_data, uint32 output_datasize) {
+int _gnutls_recv_handshake_int( int cd, GNUTLS_STATE state, void* data, uint32 datasize, void* output_data, uint32 output_datasize) {
 	int ret;
 	uint32 length32=0;
 	int pos=0;
@@ -371,7 +379,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 }
 
 
-/* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake only if a
+/* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake_int only if a
  * hello message is expected. It uses the gnutls_internals.current_cipher_suite
  * and gnutls_internals.compression_method.
  */
@@ -493,8 +501,7 @@ uint8 session_id_size;
 		}
 
 		/* receive the server hello */
-		state->gnutls_internals.next_handshake_type = GNUTLS_SERVER_HELLO;
-		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
+		ret = _gnutls_recv_handshake( cd, state, NULL, 0, GNUTLS_SERVER_HELLO);
 		if (ret<0) {
 			ERR("recv hello", ret);
 			return ret;
@@ -503,8 +510,7 @@ uint8 session_id_size;
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
 		
 		/* receive the server hello done */
-		state->gnutls_internals.next_handshake_type = GNUTLS_SERVER_HELLO_DONE;
-		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
+		ret = _gnutls_recv_handshake( cd, state, NULL, 0, GNUTLS_SERVER_HELLO_DONE);
 		if (ret<0) {
 			ERR("recv server hello done", ret);
 			return ret;
@@ -549,8 +555,7 @@ uint8 session_id_size;
 
 	} else { /* SERVER */
 		
-		state->gnutls_internals.next_handshake_type = GNUTLS_CLIENT_HELLO;
-		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
+		ret = _gnutls_recv_handshake( cd, state, NULL, 0, GNUTLS_CLIENT_HELLO);
 		if (ret<0) {
 			ERR("recv hello", ret);
 			return ret;
