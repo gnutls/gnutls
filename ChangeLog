@@ -1,3 +1,11 @@
+2004-05-15 06:37  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/certtool.cfg, lib/pkix.asn,
+	src/certtool-cfg.c, src/certtool.c, NEWS, configure.in,
+	doc/certtool.cfg, lib/pkix.asn, src/certtool-cfg.c, src/certtool.c:
+
+	certtool has now support for more X.520 DN attribute types.  
+
 2004-05-14 12:35  nmav <nmav@gnutls.org>
 
 	* src/: certtool-cfg.c, certtool-cfg.h, certtool.c, certtool-cfg.c,
