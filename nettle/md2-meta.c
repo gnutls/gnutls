@@ -1,11 +1,8 @@
-/* md5-compat.c
- *
- * The md5 hash function, RFC 1321-style interface.
- */
+/* md2-meta.c */
 
 /* nettle, low-level cryptographics library
  *
- * Copyright (C) 2001 Niels Möller
+ * Copyright (C) 2003 Niels Möller
  *  
  * The nettle library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -27,22 +24,9 @@
 # include "config.h"
 #endif
 
-#include "md5-compat.h"
+#include "nettle-meta.h"
 
-void
-MD5Init(MD5_CTX *ctx)
-{
-  md5_init(ctx);
-}
+#include "md2.h"
 
-void
-MD5Update(MD5_CTX *ctx, const unsigned char *data, unsigned int length)
-{
-  md5_update(ctx, length, data);
-}
-
-void
-MD5Final(unsigned char *out, MD5_CTX *ctx)
-{
-  md5_digest(ctx, MD5_DIGEST_SIZE, out);
-}
+const struct nettle_hash nettle_md2
+= _NETTLE_HASH(md2, MD2);

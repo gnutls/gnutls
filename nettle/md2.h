@@ -1,11 +1,11 @@
-/* md5-compat.h
+/* md2.h
  *
- * The md5 hash function, RFC 1321-style interface.
+ * The MD2 hash function, described in RFC 1319.
  */
 
 /* nettle, low-level cryptographics library
  *
- * Copyright (C) 2001 Niels Möller
+ * Copyright (C) 2003 Niels Möller
  *  
  * The nettle library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,21 +22,40 @@
  * the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
  */
+ 
+#ifndef NETTLE_MD2_H_INCLUDED
+#define NETTLE_MD2_H_INCLUDED
 
-#ifndef NETTLE_MD5_COMPAT_H_INCLUDED
-#define NETTLE_MD5_COMPAT_H_INCLUDED
-
-#include "md5.h"
+#include "nettle-types.h"
 
 /* Name mangling */
-#define MD5Init nettle_MD5Init
-#define MD5Update nettle_MD5Update
-#define MD5Final nettle_MD5Final
+#define md2_init nettle_md2_init
+#define md2_update nettle_md2_update
+#define md2_digest nettle_md2_digest
 
-typedef struct md5_ctx MD5_CTX;
+#define MD2_DIGEST_SIZE 16
+#define MD2_DATA_SIZE 16
 
-void MD5Init(MD5_CTX *ctx);
-void MD5Update(MD5_CTX *ctx, const unsigned char *data, unsigned int length);
-void MD5Final(unsigned char *out, MD5_CTX *ctx);
+struct md2_ctx
+{
+  uint8_t C[MD2_DATA_SIZE];
+  uint8_t X[3 * MD2_DATA_SIZE];
+  uint8_t block[MD2_DATA_SIZE]; /* Block buffer */
+  unsigned index;               /* Into buffer */
+};
 
-#endif /* NETTLE_MD5_COMPAT_H_INCLUDED */
+void
+md2_init(struct md2_ctx *ctx);
+
+void
+md2_update(struct md2_ctx *ctx,
+	   unsigned length,
+	   const uint8_t *data);
+
+void
+md2_digest(struct md2_ctx *ctx,
+	   unsigned length,
+	   uint8_t *digest);
+
+
+#endif /* NETTLE_MD2_H_INCLUDED */
