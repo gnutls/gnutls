@@ -71,13 +71,13 @@ GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
 GNUTLS_X509PKI_SERVER_CREDENTIALS x509_cred;
 
 
-GNUTLS_STATE initialize_state()
+GNUTLS_STATE initialize_state(void)
 {
 	GNUTLS_STATE state;
 	int ret;
 	int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-	int kx_priority[] = { GNUTLS_KX_X509PKI_RSA, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
-	int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
+	int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
+	int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 	int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 	int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
@@ -145,7 +145,7 @@ void peer_print_info( GNUTLS_STATE state)
 	tmp = gnutls_kx_get_name(gnutls_kx_get_algo(state));
 	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
 
-	if (gnutls_kx_get_algo(state) == GNUTLS_KX_X509PKI_DHE_RSA || gnutls_kx_get_algo(state) == GNUTLS_KX_X509PKI_DHE_DSS) {
+	if (gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_RSA || gnutls_kx_get_algo(state) == GNUTLS_KX_DHE_DSS) {
 		sprintf(tmp2, "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
 			        gnutls_dh_get_dhe_bits( state));
 	}

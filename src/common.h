@@ -13,7 +13,7 @@
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
 GNUTLS_CredType cred;
-gnutls_DN dn;
+gnutls_dn dn;
 const gnutls_datum* cert_list;
 GNUTLS_CertificateStatus status;
 int cert_list_size = 0;
@@ -30,7 +30,7 @@ GNUTLS_KXAlgorithm kx;
 	switch(cred) {
 		case GNUTLS_ANON:
 			printf("- Anonymous DH using prime of %d bits\n",
-			       gnutls_anon_client_get_dh_bits( state));
+			       gnutls_dh_get_dha_bits( state));
 			break;
 		case GNUTLS_X509PKI:
 		   /* in case of X509 PKI
@@ -58,7 +58,7 @@ GNUTLS_KXAlgorithm kx;
 
 			/* Check if we have been using ephemeral Diffie Hellman.
 			 */
-		        if (kx == GNUTLS_KX_X509PKI_DHE_RSA || kx == GNUTLS_KX_X509PKI_DHE_DSS) {
+		        if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
 		         printf("\n- Ephemeral DH using prime of %d bits\n",
         		    gnutls_dh_get_dhe_bits( state));
       			}

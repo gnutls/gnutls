@@ -19,7 +19,7 @@
  */
 
 void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
-int gnutls_db_set_name( GNUTLS_STATE state, char* filename);
+int gnutls_db_set_name( GNUTLS_STATE state, const char* filename);
 int _gnutls_server_register_current_session( GNUTLS_STATE state);
 int _gnutls_server_restore_session( GNUTLS_STATE state, uint8* session_id, int session_id_size);
 int gnutls_db_clean( GNUTLS_STATE state);

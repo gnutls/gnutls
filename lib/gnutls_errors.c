@@ -170,7 +170,7 @@ const char* gnutls_strerror(int error)
 void _gnutls_log( const char *fmt, ...) {
  va_list args;
  char str[MAX_LOG_SIZE];
- void (*log_func)() = _gnutls_log_func;
+ void (*log_func)(const char*) = _gnutls_log_func;
  
  if (_gnutls_log_func==NULL) return;
 

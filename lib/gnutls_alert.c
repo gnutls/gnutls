@@ -36,7 +36,7 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_alert_send( GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
+int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_AlertDescription desc)
 {
 	uint8 data[2];
 	int ret;
@@ -122,6 +122,6 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   * The peer may send alerts if he thinks some things were not 
   * right. Check gnutls.h for the available alert descriptions.
   **/
-AlertDescription gnutls_alert_get_last( GNUTLS_STATE state) {
+GNUTLS_AlertDescription gnutls_alert_get_last( GNUTLS_STATE state) {
 	return state->gnutls_internals.last_alert;
 }

@@ -137,14 +137,6 @@ size_t gnutls_record_check_pending(GNUTLS_STATE state) {
 	return _gnutls_record_buffer_get_size(GNUTLS_APPLICATION_DATA, state);
 }
 
-#ifdef DEBUG
-# warning REMOVE THIS ON API UPDATE
-#endif
-
-int gnutls_check_pending( GNUTLS_STATE state) {
-	return gnutls_record_check_pending( state);
-}
-
 int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
 	if (length < 0 || data==NULL) {

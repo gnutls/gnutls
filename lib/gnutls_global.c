@@ -30,6 +30,7 @@ extern const static_asn pkix_asn1_tab[];
 
 
 typedef void (*LOG_FUNC)( const char*);
+#define GNUTLS_LOG_FUNC LOG_FUNC
 
 LOG_FUNC _gnutls_log_func;
 
@@ -56,7 +57,7 @@ node_asn* _gnutls_get_pkcs(void) {
   * LOG_FUNC is of the form, 
   * void (*LOG_FUNC)( const char*);
   **/
-void gnutls_global_set_log_func( LOG_FUNC log_func) {
+void gnutls_global_set_log_func( GNUTLS_LOG_FUNC log_func) {
 	_gnutls_log_func = log_func;
 }
 
@@ -158,9 +159,9 @@ void gnutls_global_deinit( void) {
   * probably be ok.
   * This function should be called once and after gnutls_global_init().
   * PULL_FUNC is of the form, 
-  * ssize_t (*PULL_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
+  * ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
   **/
-void gnutls_transport_set_pull_func( GNUTLS_STATE state, PULL_FUNC pull_func) {
+void gnutls_transport_set_pull_func( GNUTLS_STATE state, GNUTLS_PULL_FUNC pull_func) {
 	state->gnutls_internals._gnutls_pull_func = pull_func;
 }
 
@@ -177,8 +178,8 @@ void gnutls_transport_set_pull_func( GNUTLS_STATE state, PULL_FUNC pull_func) {
   *  
   * This function should be called once and after gnutls_global_init().
   * PUSH_FUNC is of the form, 
-  * ssize_t (*PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
+  * ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
   **/
-void gnutls_transport_set_push_func( GNUTLS_STATE state, PUSH_FUNC push_func) {
+void gnutls_transport_set_push_func( GNUTLS_STATE state, GNUTLS_PUSH_FUNC push_func) {
 	state->gnutls_internals._gnutls_push_func = push_func;
 }

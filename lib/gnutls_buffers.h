@@ -46,3 +46,5 @@ ssize_t _gnutls_handshake_io_recv_int( GNUTLS_STATE, ContentType, HandshakeType,
 ssize_t _gnutls_handshake_io_send_int( GNUTLS_STATE, ContentType, HandshakeType, const void *, size_t);
 ssize_t _gnutls_io_write_flush( GNUTLS_STATE state);
 ssize_t _gnutls_handshake_io_write_flush( GNUTLS_STATE state);
+
+size_t gnutls_record_check_pending(GNUTLS_STATE state);

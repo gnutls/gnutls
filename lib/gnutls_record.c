@@ -109,7 +109,7 @@ GNUTLS_SOCKET_PTR gnutls_transport_get_ptr(GNUTLS_STATE state) {
   * This function allocates structures which can only be free'd
   * by calling gnutls_deinit(). Returns zero on success.
   **/
-int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
+int gnutls_init(GNUTLS_STATE * state, GNUTLS_ConnectionEnd con_end)
 {
 int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 
@@ -412,7 +412,7 @@ int gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size,
   * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
   *
   **/
-int gnutls_bye( GNUTLS_STATE state, CloseRequest how)
+int gnutls_bye( GNUTLS_STATE state, GNUTLS_CloseRequest how)
 {
 	int ret = 0, ret2 = 0;
 
@@ -923,7 +923,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
   *
   * Returns the currently used cipher.
   **/
-BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state) {
+GNUTLS_BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.read_bulk_cipher_algorithm;
 }
 
@@ -933,7 +933,7 @@ BulkCipherAlgorithm gnutls_cipher_get_algo( GNUTLS_STATE state) {
   *
   * Returns the key exchange algorithm used in the last handshake.
   **/
-KXAlgorithm gnutls_kx_get_algo( GNUTLS_STATE state) {
+GNUTLS_KXAlgorithm gnutls_kx_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.kx_algorithm;
 }
 
@@ -943,7 +943,7 @@ KXAlgorithm gnutls_kx_get_algo( GNUTLS_STATE state) {
   *
   * Returns the currently used mac algorithm.
   **/
-MACAlgorithm gnutls_mac_get_algo( GNUTLS_STATE state) {
+GNUTLS_MACAlgorithm gnutls_mac_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.read_mac_algorithm;
 }
 
@@ -953,7 +953,7 @@ MACAlgorithm gnutls_mac_get_algo( GNUTLS_STATE state) {
   *
   * Returns the currently used compression method.
   **/
-CompressionMethod gnutls_compression_get_algo( GNUTLS_STATE state) {
+GNUTLS_CompressionMethod gnutls_compression_get_algo( GNUTLS_STATE state) {
 	return state->security_parameters.read_compression_algorithm;
 }
 

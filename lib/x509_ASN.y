@@ -39,7 +39,7 @@ node_asn *p_tree;        /* pointer to the root of the structure
                             created by the parser*/     
 
 int yyerror (char *);
-int yylex();
+int yylex(void);
 
 %}
 

@@ -52,7 +52,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert);
 
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(int k, char* data);
-int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_DN * dn);
+int _gnutls_get_name_type( node_asn *rasn, char *root, gnutls_dn * dn);
 void gnutls_free_cert(gnutls_cert cert);
 int _gnutls_check_x509pki_key_usage( const gnutls_cert * cert, KXAlgorithm alg);
 int _gnutls_get_version(node_asn * c2, char *root);

@@ -20,7 +20,8 @@ typedef struct {
 	char locality_name[GNUTLS_X509_L_SIZE];
 	char state_or_province_name[GNUTLS_X509_S_SIZE];
 	char email[GNUTLS_X509_EMAIL_SIZE];
-} gnutls_DN;
+} gnutls_dn;
+#define gnutls_DN gnutls_dn
 
 /* For key Usage, test as:
  * if (st.keyUsage & X509KEY_DIGITAL_SIGNATURE) ...
@@ -38,13 +39,13 @@ typedef struct {
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
 
-typedef int x509pki_client_cert_callback_func(GNUTLS_STATE, const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int x509pki_server_cert_callback_func(GNUTLS_STATE, const gnutls_datum *, int);
+typedef int gnutls_x509pki_client_cert_callback_func(GNUTLS_STATE, const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int gnutls_x509pki_server_cert_callback_func(GNUTLS_STATE, const gnutls_datum *, int);
 
 /* Functions that allow AUTH_INFO structures handling
  */
 
-CredType gnutls_auth_get_type( GNUTLS_STATE state);
+GNUTLS_CredType gnutls_auth_get_type( GNUTLS_STATE state);
 
 /* SRP */
 
@@ -54,26 +55,20 @@ const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
 
 int gnutls_dh_get_dha_bits( GNUTLS_STATE state);
 
-#define gnutls_anon_server_get_dh_bits gnutls_dh_get_dha_bits
-#define gnutls_anon_client_get_dh_bits gnutls_dh_get_dha_bits
-
 void gnutls_dh_set_dhe_bits( GNUTLS_STATE state, int bits);
 int gnutls_dh_get_dhe_bits( GNUTLS_STATE);
 
-#define gnutls_x509pki_set_dh_bits gnutls_dh_set_dhe_bits
-#define gnutls_x509pki_get_dh_bits gnutls_dh_get_dhe_bits
-
 /* X509PKI */
 
-void gnutls_x509pki_set_client_cert_callback( GNUTLS_X509PKI_CREDENTIALS, x509pki_client_cert_callback_func *);
+void gnutls_x509pki_set_client_cert_callback( GNUTLS_X509PKI_CREDENTIALS, gnutls_x509pki_client_cert_callback_func *);
 
-void gnutls_x509pki_set_server_cert_callback( GNUTLS_X509PKI_CREDENTIALS, x509pki_server_cert_callback_func *);
-void gnutls_x509pki_server_set_cert_request( GNUTLS_STATE, CertificateRequest);
+void gnutls_x509pki_set_server_cert_callback( GNUTLS_X509PKI_CREDENTIALS, gnutls_x509pki_server_cert_callback_func *);
+void gnutls_x509pki_server_set_cert_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 
 /* X.509 certificate handling functions */
-int gnutls_x509pki_extract_dn( const gnutls_datum*, gnutls_DN*);
-int gnutls_x509pki_extract_certificate_dn( const gnutls_datum*, gnutls_DN*);
-int gnutls_x509pki_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_DN *);
+int gnutls_x509pki_extract_dn( const gnutls_datum*, gnutls_dn*);
+int gnutls_x509pki_extract_certificate_dn( const gnutls_datum*, gnutls_dn*);
+int gnutls_x509pki_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_dn *);
 int gnutls_x509pki_extract_certificate_version( const gnutls_datum*);
 int gnutls_x509pki_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
 time_t gnutls_x509pki_extract_certificate_activation_time( const gnutls_datum*);

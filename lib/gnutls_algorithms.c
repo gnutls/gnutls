@@ -380,7 +380,7 @@ inline int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
   * Returns a string that contains the name 
   * of the specified MAC algorithm.
   **/
-const char *gnutls_mac_get_name(MACAlgorithm algorithm)
+const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm algorithm)
 {
 	char *ret = NULL;
 
@@ -391,7 +391,7 @@ const char *gnutls_mac_get_name(MACAlgorithm algorithm)
 	return ret;
 }
 
-int _gnutls_mac_count()
+int _gnutls_mac_count(void)
 {
 	uint8 i, counter = 0;
 	for (i = 0; i < MAX_MAC_ALGOS; i++) {
@@ -437,7 +437,7 @@ inline
   * Returns a pointer to a string that contains the name 
   * of the specified compression algorithm.
   **/
-const char *gnutls_compression_get_name(CompressionMethod algorithm)
+const char *gnutls_compression_get_name( GNUTLS_CompressionMethod algorithm)
 {
 	char *ret = NULL;
 
@@ -473,7 +473,7 @@ CompressionMethod _gnutls_compression_get_id(int num)
 	return ret;
 }
 
-int _gnutls_compression_count()
+int _gnutls_compression_count(void)
 {
 	uint8 i, counter = 0;
 	for (i = 0; i < MAX_COMPRESSION_ALGOS; i++) {
@@ -556,7 +556,7 @@ int _gnutls_cipher_get_iv_size(BulkCipherAlgorithm algorithm)
   * Returns a pointer to a string that contains the name 
   * of the specified cipher.
   **/
-const char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
+const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm algorithm)
 {
 	char *ret = NULL;
 
@@ -566,7 +566,7 @@ const char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 	return ret;
 }
 
-int _gnutls_cipher_count()
+int _gnutls_cipher_count(void)
 {
 	uint8 i, counter = 0;
 	for (i = 0; i < MAX_CIPHER_ALGOS; i++) {
@@ -618,7 +618,7 @@ inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
   * Returns a pointer to a string that contains the name 
   * of the specified key exchange algorithm.
   **/
-const char *gnutls_kx_get_name(KXAlgorithm algorithm)
+const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm)
 {
 	char *ret = NULL;
 
@@ -628,7 +628,7 @@ const char *gnutls_kx_get_name(KXAlgorithm algorithm)
 	return ret;
 }
 
-int _gnutls_kx_count()
+int _gnutls_kx_count(void)
 {
 	uint8 i, counter = 0;
 	for (i = 0; i < MAX_KX_ALGOS; i++) {
@@ -715,7 +715,7 @@ GNUTLS_Version _gnutls_version_max(GNUTLS_STATE state)
   * Returns a string that contains the name 
   * of the specified TLS version.
   **/
-const char *gnutls_protocol_get_name(GNUTLS_Version version)
+const char *gnutls_protocol_get_name( GNUTLS_Version version)
 {
 	char *ret = NULL;
 
@@ -841,7 +841,7 @@ static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
 }
 
 /* quite expensive */
-int _gnutls_cipher_suite_count()
+int _gnutls_cipher_suite_count(void)
 {
 	GNUTLS_CipherSuite suite;
 	int i, counter = 0, j;

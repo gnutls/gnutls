@@ -101,7 +101,11 @@ typedef struct { opaque pint[3]; } uint24;
 
 typedef enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 } crypt_algo;
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
-typedef enum AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } AlertLevel;
+
+typedef enum AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL 
+} AlertLevel;
+#define GNUTLS_AlertLevel AlertLevel
+
 typedef enum AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE=10, GNUTLS_A_BAD_RECORD_MAC=20,
 			GNUTLS_A_DECRYPTION_FAILED, GNUTLS_A_RECORD_OVERFLOW,  GNUTLS_A_DECOMPRESSION_FAILURE=30,
 			GNUTLS_A_HANDSHAKE_FAILURE=40, GNUTLS_A_NETSCAPE_NO_CLIENT_CERTIFICATE=41,
@@ -112,9 +116,22 @@ typedef enum AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSA
 			GNUTLS_A_INSUFFICIENT_SECURITY, GNUTLS_A_INTERNAL_ERROR=80, GNUTLS_A_USER_CANCELED=90,
 			GNUTLS_A_NO_RENEGOTIATION=100
 } AlertDescription;
-typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID, GNUTLS_CERT_NONE } CertificateStatus;
-typedef enum CertificateRequest { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
-typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
+#define GNUTLS_AlertDescription AlertDescription
+
+typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, 
+	GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, 
+	GNUTLS_CERT_INVALID, GNUTLS_CERT_NONE 
+} CertificateStatus;
+#define GNUTLS_CertificateStatus CertificateStatus
+
+typedef enum CertificateRequest { GNUTLS_CERT_IGNORE, 
+	GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE 
+} CertificateRequest;
+#define GNUTLS_CertificateRequest CertificateRequest
+
+typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 
+} CloseRequest;
+#define GNUTLS_CloseRequest CloseRequest
 
 typedef enum HandshakeState { STATE0=0, STATE1, STATE2, STATE3, STATE4, STATE5,
 	STATE6, STATE7, STATE8, STATE9, STATE10, STATE11, STATE20=20, STATE21,
@@ -145,21 +162,44 @@ typedef struct {
 #define MAX_VERSIONS 4
 
 /* STATE */
-typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
-typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC } BulkCipherAlgorithm;
+typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT 
+} ConnectionEnd;
+#define GNUTLS_ConnectionEnd ConnectionEnd
+
+typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, 
+	GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
+	GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC 
+} BulkCipherAlgorithm;
+#define GNUTLS_BulkCipherAlgorithm BulkCipherAlgorithm
+	
 typedef enum Extensions { GNUTLS_EXTENSION_DNSNAME=0, GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6 } Extensions;
-typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
-typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
+typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
+	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP 
+} KXAlgorithm;
+#define GNUTLS_KXAlgorithm KXAlgorithm
+
+typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP 
+} CredType;
+#define GNUTLS_CredType CredType
+
 typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
-typedef enum CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } CompressionMethod;
-typedef enum MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
+
+typedef enum CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB 
+} CompressionMethod;
+#define GNUTLS_CompressionMethod CompressionMethod
+
+typedef enum MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, 
+	GNUTLS_MAC_SHA 
+} MACAlgorithm;
+#define GNUTLS_MACAlgorithm MACAlgorithm
 
 typedef enum ValidSession { VALID_TRUE, VALID_FALSE } ValidSession;
 typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
 
 /* Record Protocol */
-typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
-		GNUTLS_APPLICATION_DATA } ContentType;
+typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, 
+	GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA 
+} ContentType;
 
 /* STATE (stop) */
 
@@ -168,11 +208,17 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HA
  */
 typedef ssize_t (*PULL_FUNC)(GNUTLS_SOCKET_PTR, void*, size_t);
 typedef ssize_t (*PUSH_FUNC)(GNUTLS_SOCKET_PTR, const void*, size_t);
+#define GNUTLS_PULL_FUNC PULL_FUNC
+#define GNUTLS_PUSH_FUNC PUSH_FUNC
+
 /* Store & Retrieve functions defines: 
  */
 typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
 typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
 typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
+#define GNUTLS_DB_STORE_FUNC DB_STORE_FUNC
+#define GNUTLS_DB_REMOVE_FUNC DB_REMOVE_FUNC
+#define GNUTLS_DB_RETR_FUNC DB_RETR_FUNC
 
 typedef struct AUTH_CRED {
 	KXAlgorithm algorithm;

@@ -52,7 +52,7 @@
   * has been called.
   *
   **/
-void gnutls_db_set_retrieve_function( GNUTLS_STATE state, DB_RETR_FUNC retr_func) {
+void gnutls_db_set_retrieve_function( GNUTLS_STATE state, GNUTLS_DB_RETR_FUNC retr_func) {
 	state->gnutls_internals.db_retrieve_func = retr_func;
 }
 
@@ -70,7 +70,7 @@ void gnutls_db_set_retrieve_function( GNUTLS_STATE state, DB_RETR_FUNC retr_func
   * has been called.
   *
   **/
-void gnutls_db_set_remove_function( GNUTLS_STATE state, DB_REMOVE_FUNC rem_func) {
+void gnutls_db_set_remove_function( GNUTLS_STATE state, GNUTLS_DB_REMOVE_FUNC rem_func) {
 	state->gnutls_internals.db_remove_func = rem_func;
 }
 
@@ -88,7 +88,7 @@ void gnutls_db_set_remove_function( GNUTLS_STATE state, DB_REMOVE_FUNC rem_func)
   * has been called.
   *
   **/
-void gnutls_db_set_store_function( GNUTLS_STATE state, DB_STORE_FUNC store_func) {
+void gnutls_db_set_store_function( GNUTLS_STATE state, GNUTLS_DB_STORE_FUNC store_func) {
 	state->gnutls_internals.db_store_func = store_func;
 }
 
@@ -141,7 +141,7 @@ void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds) {
   * than gdbm (ie. called function gnutls_db_set_store_func() etc.)
   *
   **/
-int gnutls_db_set_name( GNUTLS_STATE state, char* filename) {
+int gnutls_db_set_name( GNUTLS_STATE state, const char* filename) {
 #ifdef HAVE_LIBGDBM
 GDBM_FILE dbf;
 
@@ -161,7 +161,7 @@ GDBM_FILE dbf;
 		/* maybe it does not exist - so try to
 		 * create it.
 		 */
-		dbf = gdbm_open( filename, 0, GDBM_WRCREAT, 0600, NULL);
+		dbf = gdbm_open( (char*)filename, 0, GDBM_WRCREAT, 0600, NULL);
 		if (dbf==NULL) return GNUTLS_E_DB_ERROR;
 		gdbm_close(dbf);
 

@@ -74,19 +74,6 @@ int gnutls_dh_get_dha_bits(GNUTLS_STATE state)
 	return info->dh_bits;
 }
 
-#ifdef DEBUG
-# warning REMOVE THESE ON LIBRARY UPGRADE
-#endif
-int gnutls_anon_server_get_dh_bits(GNUTLS_STATE state)
-{
-	return gnutls_dh_get_dha_bits( state);
-}
-int gnutls_anon_client_get_dh_bits(GNUTLS_STATE state)
-{
-	return gnutls_dh_get_dha_bits( state);
-}
-
-
 /* X509PKI */
 
 /**

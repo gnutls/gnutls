@@ -32,18 +32,13 @@ extern "C" {
 
 #define GNUTLS_CIPHER_AES_128_CBC GNUTLS_CIPHER_RIJNDAEL_128_CBC
 #define GNUTLS_CIPHER_AES_256_CBC GNUTLS_CIPHER_RIJNDAEL_256_CBC
+#define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_RIJNDAEL_128_CBC
 
 typedef enum GNUTLS_BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC } GNUTLS_BulkCipherAlgorithm;
-#define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_RIJNDAEL_128_CBC
-#define GNUTLS_CIPHER_RIJNDAEL256_CBC GNUTLS_CIPHER_RIJNDAEL_256_CBC
 
 typedef enum GNUTLS_KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } GNUTLS_KXAlgorithm;
-#define GNUTLS_KX_X509PKI_RSA GNUTLS_KX_RSA
-#define GNUTLS_KX_X509PKI_DHE_RSA GNUTLS_KX_DHE_RSA
-#define GNUTLS_KX_X509PKI_DHE_DSS GNUTLS_KX_DHE_DSS
 
 typedef enum GNUTLS_CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } GNUTLS_CredType;
-#define CredType GNUTLS_CredType
 
 typedef enum GNUTLS_MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } GNUTLS_MACAlgorithm;
 typedef enum GNUTLS_DigestAlgorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } GNUTLS_DigestAlgorithm;
@@ -62,10 +57,7 @@ typedef enum GNUTLS_AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTE
 } GNUTLS_AlertDescription;
 
 typedef enum GNUTLS_CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID, GNUTLS_CERT_NONE } GNUTLS_CertificateStatus;
-#define CertificateStatus GNUTLS_CertificateStatus
-
 typedef enum GNUTLS_CertificateRequest { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } GNUTLS_CertificateRequest;
-#define CertificateRequest GNUTLS_CertificateRequest
 
 typedef enum GNUTLS_CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } GNUTLS_CloseRequest;
 
@@ -115,7 +107,6 @@ const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm);
 
 /* error functions */
 int gnutls_error_is_fatal( int error);
-#define gnutls_is_fatal_error(x) gnutls_error_is_fatal(x)
 
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
@@ -148,7 +139,7 @@ typedef gnutls_datum (*GNUTLS_DB_RETR_FUNC)(void*, gnutls_datum key);
 
 void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds);
 
-int  gnutls_db_set_name( GNUTLS_STATE state, char* filename);	
+int  gnutls_db_set_name( GNUTLS_STATE state, const char* filename);	
 int  gnutls_db_clean( GNUTLS_STATE state);
 void gnutls_db_set_retrieve_func( GNUTLS_STATE, GNUTLS_DB_RETR_FUNC);
 void gnutls_db_set_remove_func( GNUTLS_STATE, GNUTLS_DB_REMOVE_FUNC);
@@ -254,9 +245,6 @@ typedef void (*GNUTLS_LOG_FUNC)( const char*);
 
 void gnutls_transport_set_push_func( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
 void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
-
-#define gnutls_transport_set_push_function gnutls_transport_set_push_func
-#define gnutls_transport_set_pull_function gnutls_transport_set_pull_func
 
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
 size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);

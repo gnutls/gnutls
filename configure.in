@@ -12,7 +12,7 @@ AC_DEFINE_UNQUOTED(T_OS, "$target_os")
 dnl Gnutls Version
 GNUTLS_MAJOR_VERSION=0
 GNUTLS_MINOR_VERSION=3
-GNUTLS_MICRO_VERSION=2
+GNUTLS_MICRO_VERSION=90
 GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
 AC_DEFINE_UNQUOTED(GNUTLS_VERSION, "$GNUTLS_VERSION")
@@ -21,7 +21,7 @@ AM_INIT_AUTOMAKE(gnutls, $GNUTLS_VERSION)
 AM_CONFIG_HEADER(config.h)
 
 dnl This is the library version
-GNUTLS_MOST_RECENT_INTERFACE=3
+GNUTLS_MOST_RECENT_INTERFACE=4
 GNUTLS_CURRENT_INTERFACE_IMPLEMENTATION_NUMBER=$GNUTLS_MICRO_VERSION
 GNUTLS_OLDEST_INTERFACE=3
 
@@ -137,40 +137,6 @@ AC_MSG_RESULT([***
 AC_C_CONST
 AC_C_INLINE
 
-if test $ac_cv_c_compiler_gnu != no; then
-	CFLAGS=""
-
-
-	if test x$opt_profiler_mode = xyes; then
-	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -finstrument-functions -ftest-coverage"
-	  AC_CHECK_LIB(fnccheck, main,
-		LIBS="$LIBS -lfnccheck",
-		AC_MSG_ERROR("You must install libfnccheck in order to enable profiling. http://www710.univ-lyon1.fr/~yperret/fnccheck/profiler.html")
-	  )
-	fi
-
-	if test x$opt_maintainer_mode = xyes; then
-
-	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith"
-	else
-	  CFLAGS="${CFLAGS} -O2"
-	fi
-
-	if test x$opt_dmalloc_mode = xyes; then
-	  AC_CHECK_LIB( dmalloc, main)
-	  AC_DEFINE(USE_DMALLOC)
-	fi
-
-	AC_MSG_CHECKING([whether we have GNU assembler])
-	
-	GAS=`as --version < /dev/null|grep GNU`
-	if test "$GAS"; then
-	  CFLAGS="${CFLAGS} -pipe"
-	  AC_MSG_RESULT(yes)
-	else
-	  AC_MSG_RESULT(no)
-	fi
-fi
 
 AC_MSG_RESULT([***
 *** Detecting C library capabilities...
@@ -179,8 +145,8 @@ AC_MSG_RESULT([***
 AC_HEADER_STDC
 AC_CHECK_HEADERS(unistd.h pwd.h locale.h strings.h stdarg.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
-AC_CHECK_HEADERS(utime.h errno.h sys/time.h time.h)
-AC_CHECK_FUNCS(bzero memset utime memmove bcopy,,)
+AC_CHECK_HEADERS(errno.h sys/time.h time.h)
+AC_CHECK_FUNCS(bzero memset memmove bcopy,,)
 
 
 
@@ -245,6 +211,41 @@ LIBGNUTLS_LIBS="$LIBS -L${libdir} -lgnutls $LIBGCRYPT_LIBS"
 LIBGNUTLS_CFLAGS="$LIBGCRYPT_CFLAGS -I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
+
+if test $ac_cv_c_compiler_gnu != no; then
+	CFLAGS=""
+
+
+	if test x$opt_profiler_mode = xyes; then
+	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -finstrument-functions -ftest-coverage"
+	  AC_CHECK_LIB(fnccheck, main,
+		LIBS="$LIBS -lfnccheck",
+		AC_MSG_ERROR("You must install libfnccheck in order to enable profiling. http://www710.univ-lyon1.fr/~yperret/fnccheck/profiler.html")
+	  )
+	fi
+
+	if test x$opt_maintainer_mode = xyes; then
+
+	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
+	else
+	  CFLAGS="${CFLAGS} -O2"
+	fi
+
+	if test x$opt_dmalloc_mode = xyes; then
+	  AC_CHECK_LIB( dmalloc, main)
+	  AC_DEFINE(USE_DMALLOC)
+	fi
+
+	AC_MSG_CHECKING([whether we have GNU assembler])
+	
+	GAS=`as --version < /dev/null|grep GNU`
+	if test "$GAS"; then
+	  CFLAGS="${CFLAGS} -pipe"
+	  AC_MSG_RESULT(yes)
+	else
+	  AC_MSG_RESULT(no)
+	fi
+fi
 
 AC_CONFIG_FILES(lib/gnutls.h.in)
 

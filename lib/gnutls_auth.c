@@ -79,7 +79,7 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
   * in case of a client, and X509PKI_SERVER_CREDENTIALS, in case
   * of a server.
   **/
-int gnutls_cred_set( GNUTLS_STATE state, CredType type, void* cred) {
+int gnutls_cred_set( GNUTLS_STATE state, GNUTLS_CredType type, void* cred) {
 	AUTH_CRED * ccred, *pcred;
 	int exists=0;	
 	
@@ -135,8 +135,7 @@ int gnutls_cred_set( GNUTLS_STATE state, CredType type, void* cred) {
   * Eg. for X509PKI ciphersuites (key exchange algorithms: KX_RSA, KX_DHE_RSA),
   * the same function are to be used to access the authentication data.
   **/
-
-CredType gnutls_auth_get_type( GNUTLS_STATE state) {
+GNUTLS_CredType gnutls_auth_get_type( GNUTLS_STATE state) {
 
 	return _gnutls_map_kx_get_cred(
 		 _gnutls_cipher_suite_get_kx_algo

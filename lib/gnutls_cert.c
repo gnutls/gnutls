@@ -618,13 +618,6 @@ void gnutls_dh_set_dhe_bits(GNUTLS_STATE state, int bits)
 	state->gnutls_internals.dhe_bits = bits;
 }
 
-#ifdef DEBUG
-# warning REMOVE THIS ON LIBRARY VERSION CHANGE
-#endif
-void gnutls_x509pki_set_dh_bits(GNUTLS_STATE state, int bits) {
-	gnutls_dh_set_dhe_bits( state, bits);
-}
-
 static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 {
 	opaque str[MAX_X509_CERT_SIZE];

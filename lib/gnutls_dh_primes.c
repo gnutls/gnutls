@@ -278,7 +278,7 @@ static int normalize_bits(int bits)
 
 /* Clears allocated MPIs and data. Only to be called at exit.
  */
-void _gnutls_dh_clear_mpis() {
+void _gnutls_dh_clear_mpis(void) {
 int i;
 
 	i = 0;
@@ -297,7 +297,7 @@ int i;
 /* Generates MPIs from opaque integer data. Initializes the dh_primes to
  * be used.
  */
-int _gnutls_dh_calc_mpis()
+int _gnutls_dh_calc_mpis(void)
 {
 int i, n;
 
