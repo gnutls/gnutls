@@ -168,7 +168,7 @@ GNUTLS_STATE initialize_state(void)
    gnutls_dh_set_prime_bits(state, DEFAULT_PRIME_BITS);
 
    gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
-//   gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
+   gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
    gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
    gnutls_mac_set_priority(state, mac_priority);
