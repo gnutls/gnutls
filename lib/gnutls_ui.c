@@ -171,3 +171,36 @@ int gnutls_x509pki_get_certificate_request_status(GNUTLS_STATE state)
 }
 
 
+/**
+  * gnutls_fingerprint_calc - This function calculates the fingerprint of the given data
+  * @algo: is a digest algorithm
+  * @data: is the data
+  * @result: is the place where the result will be copied. 
+  * @result_size: should hold the size of the result. The actual size
+  * of the returned result will also be copied there.
+  *
+  * This function will calculate a fingerprint (actually hash), of the
+  * given data. The result is not printable data. You should convert
+  * it to hex, or something else printable.
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_fingerprint_calc(DigestAlgorithm algo, gnutls_datum data, char* result, int* result_size)
+{
+	GNUTLS_HASH_HANDLE td;
+	
+	if (gnutls_hash_get_algo_len(algo) > *result_size) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	*result_size = gnutls_hash_get_algo_len(algo);
+	
+	td = gnutls_hash_init( algo);
+	if (td==NULL) return GNUTLS_E_HASH_FAILED;
+	
+	gnutls_hash( td, data.data, data.size);
+	
+	gnutls_hash_deinit( td, result);
+		
+	return 0;
+}
+

@@ -122,7 +122,7 @@ MPI _gnutls_calc_srp_u(MPI B)
 {
 	int b_size;
 	opaque *b_holder, hd[MAX_HASH_SIZE];
-	GNUTLS_MAC_HANDLE td;
+	GNUTLS_HASH_HANDLE td;
 	uint32 u;
 	MPI ret;
 
@@ -133,7 +133,7 @@ MPI _gnutls_calc_srp_u(MPI B)
 	_gnutls_mpi_print( b_holder, &b_size, B);
 
 
-	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	td = gnutls_hash_init(GNUTLS_DIG_SHA);
 	if (td==NULL) {
 		gnutls_free(b_holder);
 		gnutls_assert();
@@ -226,12 +226,12 @@ MPI _gnutls_calc_srp_A(MPI * a, MPI g, MPI n)
 int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 			   int salt_size, int *size, void* digest)
 {
-	GNUTLS_MAC_HANDLE td;
+	GNUTLS_HASH_HANDLE td;
 	opaque res[MAX_HASH_SIZE];
 
 	*size = 20;
 
-	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	td = gnutls_hash_init(GNUTLS_DIG_SHA);
 	if (td==NULL) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -241,7 +241,7 @@ int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
 	
 	gnutls_hash_deinit(td, res);
 
-	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	td = gnutls_hash_init(GNUTLS_DIG_SHA);
 	if (td==NULL) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}

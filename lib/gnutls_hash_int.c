@@ -27,16 +27,14 @@
  * the gcrypt library that this can be easily changed.
  */
 
-GNUTLS_MAC_HANDLE gnutls_hash_init(MACAlgorithm algorithm)
+GNUTLS_HASH_HANDLE gnutls_hash_init(DigestAlgorithm algorithm)
 {
 	GNUTLS_MAC_HANDLE ret;
 
 	switch (algorithm) {
-	case GNUTLS_MAC_NULL:
-		ret = GNUTLS_HASH_FAILED;
-		break;
-	case GNUTLS_MAC_SHA:
+	case GNUTLS_DIG_SHA:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+		if (ret==NULL) return GNUTLS_HASH_FAILED;
 #ifdef USE_MHASH
 		ret->handle = mhash_init(MHASH_SHA1);
 #else
@@ -47,8 +45,10 @@ GNUTLS_MAC_HANDLE gnutls_hash_init(MACAlgorithm algorithm)
 			ret = GNUTLS_HASH_FAILED;
 		}
 		break;
-	case GNUTLS_MAC_MD5:
+
+	case GNUTLS_DIG_MD5:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+		if (ret==NULL) return GNUTLS_HASH_FAILED;
 #ifdef USE_MHASH
 		ret->handle = mhash_init(MHASH_MD5);
 #else
@@ -59,6 +59,7 @@ GNUTLS_MAC_HANDLE gnutls_hash_init(MACAlgorithm algorithm)
 			ret = GNUTLS_HASH_FAILED;
 		}
 		break;
+
 	default:
 		ret = GNUTLS_HASH_FAILED;
 	}
@@ -68,22 +69,19 @@ GNUTLS_MAC_HANDLE gnutls_hash_init(MACAlgorithm algorithm)
 	return ret;
 }
 
-int gnutls_hash_get_algo_len(MACAlgorithm algorithm)
+int gnutls_hash_get_algo_len(DigestAlgorithm algorithm)
 {
 	int ret;
 
 	switch (algorithm) {
-	case GNUTLS_MAC_NULL:
-		ret = 0;
-		break;
-	case GNUTLS_MAC_SHA:
+	case GNUTLS_DIG_SHA:
 #ifdef USE_MHASH
 		ret = mhash_get_block_size(MHASH_SHA1);
 #else
 		ret = gcry_md_get_algo_dlen(GCRY_MD_SHA1);
 #endif
 		break;
-	case GNUTLS_MAC_MD5:
+	case GNUTLS_DIG_MD5:
 #ifdef USE_MHASH
 		ret = mhash_get_block_size(MHASH_MD5);
 #else
@@ -98,7 +96,7 @@ int gnutls_hash_get_algo_len(MACAlgorithm algorithm)
 
 }
 
-int gnutls_hash(GNUTLS_MAC_HANDLE handle, const void *text, int textlen)
+int gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text, int textlen)
 {
 #ifdef USE_MHASH
 	mhash(handle->handle, text, textlen);
@@ -108,7 +106,7 @@ int gnutls_hash(GNUTLS_MAC_HANDLE handle, const void *text, int textlen)
 	return 0;
 }
 
-void gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle, void* digest)
+void gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void* digest)
 {
 	char *mac;
 	int maclen;
@@ -141,6 +139,7 @@ GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, void *key,
 		break;
 	case GNUTLS_MAC_SHA:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+		if (ret==NULL) return GNUTLS_MAC_FAILED;
 #ifdef USE_MHASH
 		ret->handle = mhash_hmac_init(MHASH_SHA1, key, keylen, 0);
 #else
@@ -152,6 +151,7 @@ GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, void *key,
 		break;
 	case GNUTLS_MAC_MD5:
 		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+		if (ret==NULL) return GNUTLS_MAC_FAILED;
 #ifdef USE_MHASH
 		ret->handle = mhash_hmac_init(MHASH_MD5, key, keylen, 0);
 #else

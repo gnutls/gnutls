@@ -74,7 +74,7 @@ int start, end;
 
 /* we use DER here -- FIXME: use BER
  */
-static int _gnutls_get_ber_digest_info( const gnutls_datum *info, MACAlgorithm *hash, opaque* digest, int *digest_size) {
+static int _gnutls_get_ber_digest_info( const gnutls_datum *info, DigestAlgorithm *hash, opaque* digest, int *digest_size) {
 node_asn* dinfo;
 int result;
 opaque str[1024];
@@ -104,10 +104,10 @@ int len;
 	*hash = -1;
 	
 	if ( strcmp(str, "1 2 840 113549 2 5")==0) { /* MD5 */
-		*hash = GNUTLS_MAC_MD5;
+		*hash = GNUTLS_DIG_MD5;
 	} else 
 	if ( strcmp(str, "1 3 14 3 2 26")==0) { /* SHA1 ID */
-		*hash = GNUTLS_MAC_SHA;
+		*hash = GNUTLS_DIG_SHA;
 	}
 
 	if (*hash==-1) {
@@ -139,7 +139,7 @@ int len;
 int
 _pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e, MPI m)
 {
-	MACAlgorithm hash;
+	DigestAlgorithm hash;
 	int ret;
 	opaque digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE];
 	int digest_size; 
@@ -265,7 +265,7 @@ int result;
 	return 0;
 }
 
-int _pkcs1_rsa_generate_sig( MACAlgorithm hash_algo, gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) {
+int _pkcs1_rsa_generate_sig( DigestAlgorithm hash_algo, gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) {
 	int ret;
 	GNUTLS_HASH_HANDLE hd;
 	opaque digest[MAX_HASH_SIZE];
@@ -273,9 +273,9 @@ int _pkcs1_rsa_generate_sig( MACAlgorithm hash_algo, gnutls_private_key *pkey, c
 	int digest_size =  gnutls_hash_get_algo_len( hash_algo);
 	gnutls_datum der;
 	
-	if (hash_algo==GNUTLS_MAC_MD5)
+	if (hash_algo==GNUTLS_DIG_MD5)
 		strcpy(OID, "1 2 840 113549 2 5");
-	else if (hash_algo==GNUTLS_MAC_SHA)
+	else if (hash_algo==GNUTLS_DIG_SHA)
 		strcpy(OID, "1 3 14 3 2 26");
 	else {
 		gnutls_assert();

@@ -93,7 +93,22 @@ int cert_list_size = 0;
 			}
 			
 			if (cert_list_size > 0) {
+				char digest[20];
+				int digest_size = sizeof(digest), i;
+				char printable[120];
+				char* print;
+
 				printf(" - Certificate info:\n");
+				
+				if ( gnutls_fingerprint_calc( GNUTLS_DIG_MD5, cert_list[0], digest, &digest_size) >= 0) {
+					print = printable;
+					for (i=0;i<digest_size;i++) {
+						sprintf( print, "%.2x ", (unsigned char)digest[i]);
+						print += 3;
+					}
+					printf(" - Certificate fingerprint: %s\n", printable);
+				}
+
 				printf(" - Certificate version: #%d\n", gnutls_x509pki_extract_certificate_version( &cert_list[0]));
 
 				gnutls_x509pki_extract_certificate_dn( &cert_list[0], &dn);

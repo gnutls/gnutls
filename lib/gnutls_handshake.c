@@ -178,19 +178,19 @@ static int _gnutls_ssl3_finished(GNUTLS_STATE state, int type, int skip,
 int _gnutls_finished(GNUTLS_STATE state, int type, int skip, void *ret)
 {
 	int siz;
-	GNUTLS_MAC_HANDLE td;
-	GNUTLS_MAC_HANDLE td2;
+	GNUTLS_HASH_HANDLE td;
+	GNUTLS_HASH_HANDLE td2;
 	char tmp[MAX_HASH_SIZE];
 	opaque concat[36];
 	opaque *mesg, *data;
 
-	td = gnutls_hash_init(GNUTLS_MAC_MD5);
+	td = gnutls_hash_init(GNUTLS_DIG_MD5);
 	if (td == GNUTLS_HASH_FAILED) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td2 = gnutls_hash_init(GNUTLS_MAC_SHA);
+	td2 = gnutls_hash_init(GNUTLS_DIG_SHA);
 	if (td2 == GNUTLS_HASH_FAILED) {
 		gnutls_assert();
 		gnutls_hash_deinit(td2, tmp);

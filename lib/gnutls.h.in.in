@@ -36,6 +36,7 @@ typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, GNUTLS_CIPHER_ARCFOUR, 
 typedef enum KXAlgorithm { GNUTLS_KX_X509PKI_RSA=1, GNUTLS_KX_X509PKI_DHE_DSS, GNUTLS_KX_X509PKI_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
 typedef enum MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
+typedef enum DigestAlgorithm { GNUTLS_DIG_MD5=1, GNUTLS_DIG_SHA } DigestAlgorithm;
 typedef enum CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } CompressionMethod;
 typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
 typedef enum AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } AlertLevel;
@@ -244,3 +245,4 @@ void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
 size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
 
+int gnutls_fingerprint_calc(DigestAlgorithm algo, gnutls_datum data, char* result, int* result_size);
