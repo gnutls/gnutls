@@ -134,7 +134,7 @@ include:
 
 @item Support for handling and verification of certificates.
 
-@item Support for SRP for TLS authentication.
+@item Support for @acronym{SRP} for TLS authentication.
 
 @item Support for TLS Extension mechanism.
 
@@ -737,7 +737,7 @@ are:
 
 @item Anonymous authentication
 
-@item SRP authentication
+@item @acronym{SRP} authentication
 
 @end itemize
 
@@ -898,67 +898,70 @@ This algorithm exchanges Diffie Hellman parameters.
 
 @end itemize
 
-@section Authentication using SRP
-@cindex SRP authentication
+@section Authentication using @acronym{SRP}
+@cindex @acronym{SRP} authentication
 
-Authentication using the SRP@footnote{SRP stands for Secure Remote
-Password, and is described in @cite{RFC2945}}. The SRP key exchange is
-an extension to the @acronym{TLS} 1.0 protocol protocol is actually
-password authentication. The two peers can be identified using a
-single password, or there can be combinations where the client is
-authenticated using SRP and the server using a certificate.
+Authentication using the @acronym{SRP}@footnote{@acronym{SRP} stands
+for Secure Remote Password, and is described in @cite{RFC2945}}. The
+@acronym{SRP} key exchange is an extension to the @acronym{TLS} 1.0
+protocol protocol is actually password authentication. The two peers
+can be identified using a single password, or there can be
+combinations where the client is authenticated using @acronym{SRP} and
+the server using a certificate.
 
-The advantage of SRP authentication, over other proposed secure
-password authentication schemas, is that SRP does not require the
-server to hold the user's password.  This kind of protection is
-similar to the one used traditionally in the @emph{UNIX}
+The advantage of @acronym{SRP} authentication, over other proposed
+secure password authentication schemas, is that @acronym{SRP} does not
+require the server to hold the user's password.  This kind of
+protection is similar to the one used traditionally in the @emph{UNIX}
 @file{/etc/passwd} file, where the contents of this file did not cause
-harm to the system security if they were revealed.  The SRP needs
-instead of the plain password something called a verifier, which is
-calculated using the user's password, and if stolen cannot be used to
-impersonate the user. See @cite{TOMSRP} for a detailed description of
-the SRP protocol and the Stanford SRP libraries, which includes a PAM
-module that synchronizes the system's users passwords with the SRP
-password files. That way SRP authentication could be used for all the
-system's users.
+harm to the system security if they were revealed.  The @acronym{SRP}
+needs instead of the plain password something called a verifier, which
+is calculated using the user's password, and if stolen cannot be used
+to impersonate the user. See @cite{TOMSRP} for a detailed description
+of the @acronym{SRP} protocol and the Stanford @acronym{SRP}
+libraries, which includes a PAM module that synchronizes the system's
+users passwords with the @acronym{SRP} password files. That way
+@acronym{SRP} authentication could be used for all the system's users.
 
 The implementation in @acronym{GnuTLS} is based on paper
-@cite{TLSSRP}.  The supported SRP key exchange methods are:
+@cite{TLSSRP}.  The supported @acronym{SRP} key exchange methods are:
 
 @itemize
 
 @item @code{SRP}:
-Authentication using the SRP protocol.
+Authentication using the @acronym{SRP} protocol.
 
 @item @code{SRP_DSS}:
-Client authentication using the SRP protocol. Server is 
+Client authentication using the @acronym{SRP} protocol. Server is
 authenticated using a certificate with DSA parameters.
 
 @item @code{SRP_RSA}:
-Client authentication using the SRP protocol. Server is 
+Client authentication using the @acronym{SRP} protocol. Server is
 authenticated using a certificate with RSA parameters.
 
 @end itemize
 
-If clients supporting SRP know the username and password before the
-connection, should initialize the client credentials and call the
-function @code{gnutls_srp_set_client_credentials}.  Alternatively they
-could specify a callback function by using the function
-@code{gnutls_srp_set_client_credentials_function}.  This has the
-advantage that allows probing the server for SRP support.  In that
-case the callback function will be called twice per handshake.  The
-first time is before the ciphersuite is negotiated, and if the
-callback returns a negative error code, the callback will be called
-again if SRP has been negotiated.  This uses a special TLS-SRP
-handshake idiom in order to avoid, in interactive applications, to ask
-the user for SRP password and username if the server does not
-negotiate an SRP ciphersuite.
+If clients supporting @acronym{SRP} know the username and password
+before the connection, should initialize the client credentials and
+call the function @code{gnutls_srp_set_client_credentials}.
+Alternatively they could specify a callback function by using the
+function @code{gnutls_srp_set_client_credentials_function}.  This has
+the advantage that allows probing the server for @acronym{SRP}
+support.  In that case the callback function will be called twice per
+handshake.  The first time is before the ciphersuite is negotiated,
+and if the callback returns a negative error code, the callback will
+be called again if @acronym{SRP} has been negotiated.  This uses a
+special @acronym{TLS}-@acronym{SRP} handshake idiom in order to avoid,
+in interactive applications, to ask the user for @acronym{SRP}
+password and username if the server does not negotiate an
+@acronym{SRP} ciphersuite.
 
 In server side the default behaviour of @acronym{GnuTLS} is to read
-the usernames and SRP verifiers from password files. These password
-files are the ones used by the @emph{Stanford srp libraries} and can
-be specified using the @code{gnutls_srp_set_server_credentials_file}.
-If a different password file format is to be used, then the function
+the usernames and @acronym{SRP} verifiers from password files. These
+password files are the ones used by the @emph{Stanford srp libraries}
+and can be specified using the
+@code{gnutls_srp_set_server_credentials_file}.  If a different
+password file format is to be used, then the function
 @code{gnutls_srp_set_server_credentials_function}, should be called,
 in order to set an appropriate callback.
 
@@ -975,9 +978,9 @@ Some helper functions such as:
 @end itemize
 
 Are included in @acronym{GnuTLS}, and may be used to generate, and
-maintain SRP verifiers, and password files.  A program to manipulate
-the required parameters for SRP authentication is also included.
-@xref{srptool}, for more information.
+maintain @acronym{SRP} verifiers, and password files.  A program to
+manipulate the required parameters for @acronym{SRP} authentication is
+also included.  @xref{srptool}, for more information.
 
 @section Authentication and credentials
 
@@ -1211,37 +1214,37 @@ about the peer's identity. It is required to verify if the
 certificate's owner is the one you expect. See @cite{RFC2818} and
 section @ref{ex:verify} for an example.
 
-@subsection PKCS #10 certificate requests
+@subsection @acronym{PKCS} #10 certificate requests
 @cindex Certificate requests
-@cindex PKCS #10
+@cindex @acronym{PKCS} #10
 
 A certificate request is a structure, which contain information about
 an applicant of a certificate service.  It usually contains a private
 key, a distinguished name and secondary data such as a challenge
-password. @acronym{GnuTLS} supports the requests defined in PKCS #10
-@cite{RFC2986}. Other certificate request's format such as PKIX's
-@cite{RFC2511} are not currently supported.
+password. @acronym{GnuTLS} supports the requests defined in
+@acronym{PKCS} #10 @cite{RFC2986}. Other certificate request's format
+such as PKIX's @cite{RFC2511} are not currently supported.
 
-In @acronym{GnuTLS} the PKCS #10 structures are handled using the
-@code{gnutls_x509_crq_t} type.  An example of a certificate request
-generation can be found at section @ref{ex:crq}.
+In @acronym{GnuTLS} the @acronym{PKCS} #10 structures are handled
+using the @code{gnutls_x509_crq_t} type.  An example of a certificate
+request generation can be found at section @ref{ex:crq}.
 
-@subsection PKCS #12 structures
-@cindex PKCS #12
+@subsection @acronym{PKCS} #12 structures
+@cindex @acronym{PKCS} #12
 
-A PKCS #12 structure @cite{PKCS12} usually contains a user's private
-keys and certificates. It is commonly used in browsers to export and
-import the user's identities.
+A @acronym{PKCS} #12 structure @cite{PKCS12} usually contains a user's
+private keys and certificates. It is commonly used in browsers to
+export and import the user's identities.
 
-In @acronym{GnuTLS} the PKCS #12 structures are handled using the
-@code{gnutls_pkcs12_t} type. This is an abstract type that may hold
-several @code{gnutls_pkcs12_bag_t} types.  The Bag types are the
-holders of the actual data, which may be certificates, private keys or
-encrypted data.  An Bag of type encrypted should be decrypted in order
-for its data to be accessed.
+In @acronym{GnuTLS} the @acronym{PKCS} #12 structures are handled
+using the @code{gnutls_pkcs12_t} type. This is an abstract type that
+may hold several @code{gnutls_pkcs12_bag_t} types.  The Bag types are
+the holders of the actual data, which may be certificates, private
+keys or encrypted data.  An Bag of type encrypted should be decrypted
+in order for its data to be accessed.
 
-An example of a PKCS #12 structure generation can be found at section
-@ref{ex:pkcs12}.
+An example of a @acronym{PKCS} #12 structure generation can be found
+at section @ref{ex:pkcs12}.
 
 @section The @acronym{OpenPGP} trust model
 @anchor{The OpenPGP trust model}
@@ -1440,7 +1443,8 @@ traditional method, and the security properties remain the same, since
 only denial of service is possible. The benefit is that the server may
 request additional data before the @acronym{TLS} Handshake protocol
 starts, in order to send the correct certificate, use the correct
-password file@footnote{in SRP authentication}, or anything else!
+password file@footnote{in @acronym{SRP} authentication}, or anything
+else!
 
 @chapter How to use @acronym{GnuTLS} in applications
 @anchor{examples}
@@ -1641,12 +1645,12 @@ establish a new connection using the previously negotiated data.
 
 @verbatiminclude examples/ex-client-resume.c
 
-@subsection Simple client example with SRP authentication
+@subsection Simple client example with @acronym{SRP} authentication
 
-The following client is a very simple SRP @acronym{TLS} client which
-connects to a server and authenticates using a @emph{username} and a
-@emph{password}. The server may authenticate itself using a
-certificate, and in that case it has to be verified.
+The following client is a very simple @acronym{SRP} @acronym{TLS}
+client which connects to a server and authenticates using a
+@emph{username} and a @emph{password}. The server may authenticate
+itself using a certificate, and in that case it has to be verified.
 
 @verbatiminclude examples/ex-client-srp.c
 
@@ -1681,7 +1685,7 @@ simple as possible.
 
 @verbatiminclude examples/ex-serv-pgp.c
 
-@subsection Echo Server with SRP authentication
+@subsection Echo Server with @acronym{SRP} authentication
 
 This is a server which supports @acronym{SRP} authentication. It is
 also possible to combine this functionality with a certificate
@@ -1716,10 +1720,11 @@ which should return a signed certificate.
 
 @verbatiminclude examples/ex-crq.c
 
-@subsection PKCS #12 structure generation
+@subsection @acronym{PKCS} #12 structure generation
 @anchor{ex:pkcs12}
 
-The following example is about generating a PKCS #12 structure.
+The following example is about generating a @acronym{PKCS} #12
+structure.
 
 @verbatiminclude examples/ex-pkcs12.c
 
@@ -1753,20 +1758,20 @@ Current limitations imposed by the compatibility layer include:
 @anchor{srptool}
 @cindex srptool
 
-The ``srptool'' is a very simple program that emulates the programs in
-the @emph{Stanford SRP libraries}.  It is intended for use in places
-where you don't expect SRP authentication to be the used for system
-users.  Traditionally @emph{libsrp} used two files. One called
-'tpasswd' which holds usernames and verifiers, and 'tpasswd.conf'
-which holds generators and primes.
+The @file{srptool} is a very simple program that emulates the programs
+in the @emph{Stanford SRP libraries}.  It is intended for use in
+places where you don't expect @acronym{SRP} authentication to be the
+used for system users.  Traditionally @emph{libsrp} used two
+files. One called 'tpasswd' which holds usernames and verifiers, and
+'tpasswd.conf' which holds generators and primes.
 
 How to use srptool:
 
 @itemize
 
 @item
-To create tpasswd.conf which holds the g and n values for SRP protocol
-(generator and a large prime), run:
+To create tpasswd.conf which holds the g and n values for
+@acronym{SRP} protocol (generator and a large prime), run:
 
 @example
 $ srptool --create-conf /etc/tpasswd.conf
@@ -2005,7 +2010,7 @@ $ certtool --certificate-info --infile cert.pem
 @end example
 
 @item
-To generate a PKCS #12 structure using the previous key and
+To generate a @acronym{PKCS} #12 structure using the previous key and
 certificate, use the command:
 
 @example
