@@ -1,3 +1,50 @@
+2002-06-22 14:52  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, auth_dhe.c, auth_rsa.c, gnutls_cert.h,
+	gnutls_record.c, gnutls_str.h, gnutls_x509.c, gnutls_x509.h,
+	x509_extensions.c, x509_extensions.h, x509_sig_check.c:
+
+	The TLS handshake no longer fails if the X.509 extensions in the
+	Certificate are critical and unsupported. The unsupported critical
+	extensions are now only catched by the verification functions.  
+
+2002-06-22 14:22  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_str.c, gnutls_str.h, x509_xml.c:
+
+	Added new string functions to handle the XML string stuff.  
+
+2002-06-22 06:51  nmav <nmav@gnutls.org>
+
+	* doc/TODO, doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/ex4.tex,
+	doc/tex/serv1.tex, doc/tex/srp1.tex, lib/gnutls.h.in.in,
+	lib/gnutls_algorithms.c, lib/gnutls_anon_cred.c, lib/gnutls_cert.c,
+	lib/gnutls_x509.c, lib/gnutls_x509.h, lib/x509_xml.c, src/cli.c,
+	src/serv.c, src/tls_test.c:
+
+	Renamed credential allocation functions from *_sc() to *_cred().  
+
+2002-06-21 12:20  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	corrected countryName 
+
+2002-06-21 08:34  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_algorithms.c, gnutls_algorithms.h,
+	gnutls_constate.c, gnutls_int.h:
+
+	Exported gnutls_cipher_get_key_size(). Better name printing for MAC
+	algorithms.  
+
+2002-06-20 19:11  nmav <nmav@gnutls.org>
+
+	* configure.in, doc/tex/ex1.tex, doc/tex/ex2.tex, doc/tex/ex4.tex,
+	doc/tex/funcs.tex, doc/tex/serv1.tex, doc/tex/srp1.tex:
+
+	New install directory for headers is /gnutls 
+
 2002-06-19 19:57  nmav <nmav@gnutls.org>
 
 	* lib/gnutls.h.in.in, lib/gnutls_cert.c, lib/gnutls_db.c,
