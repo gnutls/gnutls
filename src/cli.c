@@ -366,9 +366,9 @@ int main(int argc, char **argv)
 
 
    if (srp_username != NULL)
-      gnutls_srp_free_client_cred(cred);
-   gnutls_certificate_free_cred(xcred);
-   gnutls_anon_free_client_cred(anon_cred);
+      gnutls_srp_free_client_credentials(cred);
+   gnutls_certificate_free_credentials(xcred);
+   gnutls_anon_free_client_credentials(anon_cred);
 
    gnutls_global_deinit();
 
@@ -662,7 +662,7 @@ int ret;
    }
 
    /* X509 stuff */
-   if (gnutls_certificate_allocate_cred(&xcred) < 0) {
+   if (gnutls_certificate_allocate_credentials(&xcred) < 0) {
       fprintf(stderr, "Certificate allocation memory error\n");
       exit(1);
    }
@@ -720,14 +720,14 @@ int ret;
 
    /* SRP stuff */
    if (srp_username != NULL) {
-      if (gnutls_srp_allocate_client_cred(&cred) < 0) {
+      if (gnutls_srp_allocate_client_credentials(&cred) < 0) {
 	 fprintf(stderr, "SRP authentication error\n");
       }
-      gnutls_srp_set_client_cred(cred, srp_username, srp_passwd);
+      gnutls_srp_set_client_credentials(cred, srp_username, srp_passwd);
    }
 
    /* ANON stuff */
-   if (gnutls_anon_allocate_client_cred(&anon_cred) < 0) {
+   if (gnutls_anon_allocate_client_credentials(&anon_cred) < 0) {
       fprintf(stderr, "Anonymous authentication error\n");
    }
 }

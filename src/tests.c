@@ -82,14 +82,14 @@ int ret, alert;
 }
 
 static int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-const static int kx_priority[16] =
+static const int kx_priority[16] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, 
     GNUTLS_KX_RSA_EXPORT, 0 };
-const static int cipher_priority[16] =
+static const int cipher_priority[16] =
     { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_ARCFOUR_40, 0 };
-const static int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
-const static int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
-const static int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
+static const int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
+static const int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+static const int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
 
 #define ADD_ALL_CIPHERS(session) gnutls_cipher_set_priority(session, cipher_priority)
 #define ADD_ALL_COMP(session) gnutls_compression_set_priority(session, comp_priority)

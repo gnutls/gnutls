@@ -269,9 +269,9 @@ gnutls_session initialize_session (void)
     gnutls_mac_set_priority(session, mac_priority);
     gnutls_certificate_type_set_priority(session, cert_type_priority);
 
-    gnutls_cred_set(session, GNUTLS_CRD_ANON, dh_cred);
-    gnutls_cred_set(session, GNUTLS_CRD_SRP, srp_cred);
-    gnutls_cred_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
+    gnutls_credentials_set(session, GNUTLS_CRD_ANON, dh_cred);
+    gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
+    gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
     gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
 
@@ -519,7 +519,7 @@ int main(int argc, char **argv)
       generate_dh_primes();
    }
 
-   if (gnutls_certificate_allocate_cred(&cert_cred) < 0) {
+   if (gnutls_certificate_allocate_credentials(&cert_cred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
    }
@@ -582,10 +582,10 @@ int main(int argc, char **argv)
    /* this is a password file (created with the included srpcrypt utility) 
     * Read README.crypt prior to using SRP.
     */
-   gnutls_srp_allocate_server_cred(&srp_cred);
+   gnutls_srp_allocate_server_credentials(&srp_cred);
 
    if (srp_passwd!=NULL)
-   if ((ret=gnutls_srp_set_server_cred_file(srp_cred, srp_passwd, srp_passwd_conf)) < 0) {
+   if ((ret=gnutls_srp_set_server_credentials_file(srp_cred, srp_passwd, srp_passwd_conf)) < 0) {
 	/* only exit is this function is not disabled 
 	 */
    	fprintf(stderr, "Error while setting SRP parameters\n");
@@ -830,9 +830,9 @@ int main(int argc, char **argv)
     }
 
 
-   gnutls_certificate_free_cred(cert_cred);
-   gnutls_srp_free_server_cred(srp_cred);
-   gnutls_anon_free_server_cred(dh_cred);
+   gnutls_certificate_free_credentials(cert_cred);
+   gnutls_srp_free_server_credentials(srp_cred);
+   gnutls_anon_free_server_credentials(dh_cred);
 
    if (nodb==0) wrap_db_deinit();
    gnutls_global_deinit();
