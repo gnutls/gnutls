@@ -171,8 +171,7 @@ static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 
 #define XML_HEADER "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 
-/* FIXME: This function is way too expensive.
- */
+
 static int
 _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 			 gnutls_datum * res)

@@ -1869,14 +1869,17 @@ static int _read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
  */
 static 
 int _gnutls_extract_x509_cert_mpi_params( const char* ALGO_OID, gnutls_cert * gCert,
-	ASN1_TYPE c2, char* tmpstr, int tmpstr_size) {
+	ASN1_TYPE c2, const char* name, char* tmpstr, int tmpstr_size) {
 int len, result;
+char name1[128];
+
+	_gnutls_str_cpy( name1, sizeof(name1), name);
+	_gnutls_str_cat( name1, sizeof(name1), ".tbsCertificate.subjectPublicKeyInfo.subjectPublicKey");
 
 	len = tmpstr_size - 1;
 	result =
 	    asn1_read_value
-	    (c2, "certificate2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
-	     tmpstr, &len);
+	    (c2, name1, tmpstr, &len);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -1975,7 +1978,7 @@ int len, result;
  * The critical extensions will be catched by the verification functions.
  */
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
-	int no_critical_ext /* if non zero do not parse X.509 extensions */)
+	ConvFlags fast /* if non zero do not parse the whole certificate */)
 {
 	int result;
 	ASN1_TYPE c2;
@@ -1987,21 +1990,27 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 
 	gCert->cert_type = GNUTLS_CRT_X509;
 
-	if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
+	if ( !(fast & CERT_NO_COPY))
+		if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 
 	if ((result=_gnutls_asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
-	     "certificate2"))
+	     "cert"))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
 		gnutls_free_datum( &gCert->raw);
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_der_decoding(&c2, derCert.data, derCert.size, NULL);
+	if (fast & CERT_ONLY_PUBKEY)
+		result = asn1_der_decoding_element( &c2, "cert.tbsCertificate.subjectPublicKeyInfo",
+			derCert.data, derCert.size, NULL);
+	else
+		result = asn1_der_decoding(&c2, derCert.data, derCert.size, 
+			NULL);
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
@@ -2013,11 +2022,28 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		return _gnutls_asn2err(result);
 	}
 
+	if (fast & CERT_ONLY_EXTENSIONS) {
+		result = asn1_der_decoding_element( &c2, "cert.tbsCertificate.extensions",
+			derCert.data, derCert.size, NULL);
+
+		if (result != ASN1_SUCCESS) {
+			/* couldn't decode DER */
+	
+			_gnutls_log("CERT: Decoding error %d\n", result);
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			return _gnutls_asn2err(result);
+		}
+	}
+
+
+
 	len = sizeof(oid) - 1;
 	result =
 	    asn1_read_value
 	    (c2,
-	     "certificate2.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+	     "cert.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
 	     oid, &len);
 
 	if (result != ASN1_SUCCESS) {
@@ -2027,59 +2053,62 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		return _gnutls_asn2err(result);
 	}
 
-	if ( (result=_gnutls_extract_x509_cert_mpi_params( oid, gCert, c2, str, sizeof(str))) < 0) {
+	if ( (result=_gnutls_extract_x509_cert_mpi_params( oid, gCert, c2, "cert", str, sizeof(str))) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		gnutls_free_datum( &gCert->raw);
 		return result;
 	}
 
-	len = gCert->signature.size = X509_SIG_SIZE;
-	gCert->signature.data = gnutls_malloc( gCert->signature.size);
-	if (gCert->signature.data==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
+	if (!(fast & CERT_ONLY_PUBKEY)) {
+		len = gCert->signature.size = X509_SIG_SIZE;
+		gCert->signature.data = gnutls_malloc( gCert->signature.size);
+		if (gCert->signature.data==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		result =
+		    asn1_read_value
+		    (c2, "cert.signature", gCert->signature.data, &len);
+
+		if ((len % 8) != 0) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			gnutls_free_datum( &gCert->signature);
+			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		}
+	
+		len /= 8;		/* convert to bytes */
+		gCert->signature.size = len; /* put the actual sig size */
+
+		gCert->expiration_time =
+		    _gnutls_x509_get_time(c2, "cert", "notAfter");
+		gCert->activation_time =
+		    _gnutls_x509_get_time(c2, "cert", "notBefore");
+
+		gCert->version = _gnutls_x509_get_version(c2, "cert");
+		if (gCert->version < 0) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			return GNUTLS_E_ASN1_GENERIC_ERROR;  
+		}	 
+
 	}
 
-	result =
-	    asn1_read_value
-	    (c2, "certificate2.signature", gCert->signature.data, &len);
-
-	if ((len % 8) != 0) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		gnutls_free_datum( &gCert->raw);
-		gnutls_free_datum( &gCert->signature);
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	if (fast & CERT_ONLY_EXTENSIONS) {
+		if ((result =
+		     _gnutls_get_ext_type(c2,
+					  "cert.tbsCertificate.extensions",
+					  gCert, fast)) < 0) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			return result;
+		}
 	}
-
-	len /= 8;		/* convert to bytes */
-	gCert->signature.size = len; /* put the actual sig size */
-
-
-	gCert->expiration_time =
-	    _gnutls_x509_get_time(c2, "certificate2", "notAfter");
-	gCert->activation_time =
-	    _gnutls_x509_get_time(c2, "certificate2", "notBefore");
-
-	gCert->version = _gnutls_x509_get_version(c2, "certificate2");
-	if (gCert->version < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		gnutls_free_datum( &gCert->raw);
-		return GNUTLS_E_ASN1_GENERIC_ERROR;  
-	}	 
-
-	if ((result =
-	     _gnutls_get_ext_type(c2,
-				  "certificate2.tbsCertificate.extensions",
-				  gCert, no_critical_ext)) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		gnutls_free_datum( &gCert->raw);
-		return result;
-	}
-
 	asn1_delete_structure(&c2);
 
 	return 0;

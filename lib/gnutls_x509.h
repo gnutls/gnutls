@@ -1,7 +1,14 @@
 #include <libtasn1.h>
 
 int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state);
-int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert, int noext);
+
+typedef enum ConvFlags { 
+	CERT_NO_COPY=2, 
+	CERT_ONLY_PUBKEY=4,
+	CERT_ONLY_EXTENSIONS=16
+} ConvFlags;
+
+int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert, ConvFlags flags);
 
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(unsigned int k, char *data);
