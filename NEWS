@@ -11,6 +11,7 @@ See the end for copying conditions.
 - Added self test that tests anonymous TLS client and server.
 - Added self tests of Nettle and generic crypto layer.
 - Added API reference manual in HTML format in doc/reference/ using GTK-DOC.
+  Online version at <http://www.gnu.org/software/gnutls/reference/>.
 - Assume C89 or better; removed checks for size_t, ptrdiff_t and time_t.
 - Man pages for API functions are included.
 
