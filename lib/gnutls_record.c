@@ -480,8 +480,6 @@ static int check_buffers(gnutls_session_t session, content_type_t type,
 }
 
 
-#define CHECK_RECORD_VERSION
-
 /* Checks the record headers and returns the length, version and
  * content type.
  */
@@ -540,15 +538,26 @@ int record_check_headers(gnutls_session_t session,
 /* Here we check if the advertized version is the one we
  * negotiated in the handshake.
  */
-#ifdef CHECK_RECORD_VERSION
 inline
     static int record_check_version(gnutls_session_t session,
 				    handshake_t htype, opaque version[2])
 {
-    if ((htype != GNUTLS_CLIENT_HELLO && htype != GNUTLS_SERVER_HELLO) &&
-	gnutls_protocol_get_version(session) !=
-	_gnutls_version_get(version[0], version[1])) {
-
+    if (hype == GNUTLS_CLIENT_HELLO) {
+        /* Reject hello packets with major version higher than 3.
+         */
+        if (version[0] > 3) {
+        	gnutls_assert();
+        	_gnutls_record_log("REC[%x]: INVALID VERSION PACKET: (%d) %d.%d\n",
+        	    session, htype, version[0], version[1]);
+        	return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+        }
+    } else if (htype != GNUTLS_SERVER_HELLO &&
+	gnutls_protocol_get_version(session) != _gnutls_version_get(version[0], version[1])) 
+    {
+        /* Reject record packets that have a different version than the
+         * one negotiated. Note that this version is not protected by any
+         * mac. I don't really think that this check serves any purpose.
+         */
 	gnutls_assert();
 	_gnutls_record_log("REC[%x]: INVALID VERSION PACKET: (%d) %d.%d\n",
 			   session, htype, version[0], version[1]);
@@ -558,9 +567,6 @@ inline
 
     return 0;
 }
-#else
-# define record_check_version(x,y,z) 0
-#endif
 
 /* This function will check if the received record type is
  * the one we actually expect.
