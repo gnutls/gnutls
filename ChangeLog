@@ -1,3 +1,17 @@
+2004-09-29 17:52  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am:
+
+	Link with gnulib.  Currently only minmax.h and strnstr are used,
+	which are under LGPL.  The license templates in gl/ will be fixed as
+	soon as gnulib-tool support combined GPL/LGPL projects.  
+
+2004-09-29 17:46  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/defines.h, lib/strnstr.c:
+
+	Use strnstr from gnulib.  Gnulib sync.  
+
 2004-09-21 13:11  Simon Josefsson <simon@josefsson.org>
 
 	* THANKS:
