@@ -251,4 +251,4 @@ void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
 size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
 
-int gnutls_fingerprint_calc(GNUTLS_DigestAlgorithm algo, gnutls_datum data, char* result, int* result_size);
+int gnutls_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* data, char* result, int* result_size);

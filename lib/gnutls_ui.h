@@ -69,6 +69,7 @@ int gnutls_x509pki_extract_dn( const gnutls_datum*, gnutls_DN*);
 int gnutls_x509pki_extract_certificate_dn( const gnutls_datum*, gnutls_DN*);
 int gnutls_x509pki_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_DN *);
 int gnutls_x509pki_extract_certificate_version( const gnutls_datum*);
+int gnutls_x509pki_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
 time_t gnutls_x509pki_extract_certificate_activation_time( const gnutls_datum*);
 time_t gnutls_x509pki_extract_certificate_expiration_time( const gnutls_datum*);
 int gnutls_x509pki_extract_subject_dns_name( const gnutls_datum*, char*, int*);

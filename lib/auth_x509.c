@@ -1355,3 +1355,52 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 	state->gnutls_internals.selected_cert_index = index;
 	return index;
 }
+
+/**
+  * gnutls_x509pki_extract_certificate_serial - This function returns the certificate's serial number
+  * @cert: is an X.509 DER encoded certificate
+  * @result: The place where the serial number will be copied
+  * @result_size: Holds the size of the result field.
+  *
+  * This function will return the X.509 certificate's serial number. 
+  * This is obtained by the X509 Certificate serialNumber
+  * field. Serial is not always a 32 or 64bit number. Some CAs use
+  * large serial numbers, thus it may be wise to handle it as something
+  * opaque. 
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_x509pki_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size)
+{
+	node_asn *c2;
+	int ret;
+
+	if (asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
+	     "certificate2")
+	    != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	ret = asn1_get_der(c2, cert->data, cert->size);
+	if (ret != ASN_OK) {
+		/* couldn't decode DER */
+#ifdef DEBUG
+		_gnutls_log("Decoding error %d\n", result);
+#endif
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	if ((ret = asn1_read_value(c2, "certificate2.tbsCertificate.serialNumber", result, result_size)) < 0) {
+		gnutls_assert();
+		asn1_delete_structure(c2);
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	asn1_delete_structure(c2);
+
+	return 0;
+
+}
