@@ -20,7 +20,7 @@ $ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls login
 $ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls checkout gnutls
 
 $ cd gnutls
-$ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls checkout libasn1
+$ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls checkout libtasn1
 
 2. Create configure script
 $ cd gnutls
