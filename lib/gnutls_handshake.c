@@ -45,6 +45,7 @@
 #include <gnutls_record.h>
 #include <gnutls_alert.h>
 #include <gnutls_state.h>
+#include <ext_srp.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_handshake_log( "HSK[%x]: %s (%d)\n", session, x,y)
@@ -969,6 +970,18 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 
 	ret = _gnutls_recv_handshake_header(session, type, &recv_type);
 	if (ret < 0) {
+
+		/* In SRP when expecting the server hello we may receive
+		 * an alert instead. Do as the draft demands.
+		 */
+		if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
+			gnutls_alert_get( session) == GNUTLS_A_MISSING_SRP_USERNAME &&
+			type == GNUTLS_SERVER_HELLO)
+		{
+			gnutls_assert();
+			return GNUTLS_E_INT_HANDSHAKE_AGAIN;
+		}
+
 		if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET
 		    && optional == OPTIONAL_PACKET) {
 			if (datalen != NULL)
@@ -977,7 +990,7 @@ int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 				*data = NULL;
 			return 0;	/* ok just ignore the packet */
 		}
-		/* gnutls_assert(); */
+		
 		return ret;
 	}
 
@@ -1611,6 +1624,27 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 
 	datalen = 0;
 
+	if (IS_SRP_KX(
+		_gnutls_cipher_suite_get_kx_algo(
+			session->security_parameters.current_cipher_suite)))
+	{
+		if (session->security_parameters.extensions.srp_username[0] == 0) {
+			/* The peer didn't send a valid SRP extension with the
+			 * SRP username. The draft requires that we send an
+			 * alert and start the handshake again.
+			 */
+			gnutls_assert();
+			ret = gnutls_alert_send( session, GNUTLS_AL_WARNING,
+				GNUTLS_A_MISSING_SRP_USERNAME);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+
+			return GNUTLS_E_INT_HANDSHAKE_AGAIN;
+		}
+	}
+
 	if (again == 0) {
 		datalen = 2 + session_id_len + 1 + TLS_RANDOM_SIZE + 3;
 		extdatalen = _gnutls_gen_extensions(session, &extdata);
@@ -1882,11 +1916,20 @@ int gnutls_handshake(gnutls_session session)
 	return 0;
 }
 
+/* Here if GNUTLS_E_INT_HANDSHAKE_AGAIN is received we go to
+ * restart. This works because this error code may only be
+ * received on the first 2 handshake packets. If for some reason
+ * this changes we should return GNUTLS_E_AGAIN.
+ */
 #define IMED_RET( str, ret) do { \
 	if (ret < 0) { \
+		if (ret == GNUTLS_E_INT_HANDSHAKE_AGAIN && \
+			session->internals.handshake_restarted == 1) \
+			ret = GNUTLS_E_INTERNAL_ERROR; \
 		if (ret == GNUTLS_E_INT_HANDSHAKE_AGAIN) { \
 			STATE = STATE0; \
-			return GNUTLS_E_AGAIN; \
+			session->internals.handshake_restarted = 1; \
+			goto restart; \
 		} \
 		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
@@ -1918,6 +1961,7 @@ int _gnutls_handshake_client(gnutls_session session)
 					    resumed_security_parameters.
 					    session_id_size, buf, sizeof(buf)));
 #endif
+	restart:
 
 	switch (STATE) {
 	case STATE0:
@@ -2124,6 +2168,8 @@ static int _gnutls_recv_handshake_final(gnutls_session session, int init)
 int _gnutls_handshake_server(gnutls_session session)
 {
 	int ret = 0;
+	
+	restart:
 
 	switch (STATE) {
 	case STATE0:
@@ -2217,6 +2263,7 @@ int _gnutls_handshake_common(gnutls_session session)
 {
 	int ret = 0;
 
+	restart:
 
 	/* send and recv the change cipher spec and finished messages */
 	if ((session->internals.resumed == RESUME_TRUE

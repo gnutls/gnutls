@@ -623,6 +623,14 @@ typedef struct {
 	 */
 	opaque			rsa_pms_version[2];
 
+	char*			srp_username;
+	char*			srp_password;
+	
+	/* This is only set in SRP, when the handshake is
+	 * restarted if an username is not found.
+	 */
+	int			handshake_restarted;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } GNUTLS_INTERNALS;

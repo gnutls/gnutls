@@ -409,6 +409,7 @@ void gnutls_global_set_mem_functions(
 extern gnutls_alloc_function gnutls_malloc;
 extern gnutls_calloc_function gnutls_calloc;
 extern gnutls_free_function gnutls_free;
+extern char* (*gnutls_strdup)( const char*);
 
 typedef void (*gnutls_log_func)( int, const char*);
 void gnutls_global_set_log_function( gnutls_log_func log_func);

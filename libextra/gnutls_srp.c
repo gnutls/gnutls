@@ -455,7 +455,9 @@ FILE* fd;
   * Returns 0 on success.
   *
   **/
-int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, char *password_file, char * password_conf_file) {
+int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, 
+	const char *password_file, const char * password_conf_file) 
+{
 int i;
 	
 	if (password_file==NULL || password_conf_file==NULL) {
@@ -577,6 +579,42 @@ void gnutls_srp_set_server_credentials_function(
 	gnutls_srp_server_credentials_function * func)
 {
 	cred->pwd_callback = func;
+}
+
+/**
+  * gnutls_srp_set_client_credentials_function - Used to set a callback to retrieve the username and password
+  * @cred: is a &gnutls_srp_server_credentials structure.
+  * @func: is the callback function
+  *
+  * This function can be used to set a callback to retrieve the username and
+  * password for client SRP authentication.
+  * The callback's function form is:
+  * int (*callback)(gnutls_session, unsigned int times, char** username,
+  *  char** password);
+  *
+  * The @username and @password must be allocated using gnutls_malloc().
+  * @times will be 0 the first time called, and 1 the second.
+  *
+  * The callback function will be called once or twice per handshake.
+  * The first time called, is before the ciphersuite is negotiated.
+  * At that time if the callback returns a negative error code,
+  * the callback will be called again if SRP has been
+  * negotiated. This uses a special TLS-SRP idiom in order to avoid
+  * asking the user for SRP password and username if the server does
+  * not support SRP.
+  * 
+  * The callback should not return a negative error code the second
+  * time called, since the handshake procedure will be aborted.
+  *
+  * The callback function should return 0 on success.
+  * -1 indicates an error.
+  *
+  **/
+void gnutls_srp_set_client_credentials_function(
+	gnutls_srp_client_credentials cred, 
+	gnutls_srp_client_credentials_function * func)
+{
+	cred->get_function = func;
 }
 
 

@@ -671,6 +671,21 @@ static int do_handshake(socket_st * socket)
 	return ret;
 }
 
+static int srp_username_callback( gnutls_session session, unsigned int times,
+	char** username, char** password)
+{
+	/* We should ask here the user for his SRP username
+	 * and password.
+	 */
+	if (times == 1 && srp_username && srp_passwd) {
+		*username = gnutls_strdup( srp_username);
+		*password = gnutls_strdup( srp_passwd);
+		
+		return 0;
+	}
+	
+	return -1;
+}
 
 static void tls_log_func(int level, const char *str)
 {
@@ -786,15 +801,9 @@ static void init_global_tls_stuff(void)
 		fprintf(stderr, "SRP authentication error\n");
 	}
 
-	if (srp_username != NULL) {
-		if ((ret =
-		     gnutls_srp_set_client_credentials(srp_cred,
-						       srp_username,
-						       srp_passwd)) < 0) {
-			fprintf(stderr, "SRP credentials set error [%d]\n",
-				ret);
-		}
-	}
+
+	gnutls_srp_set_client_credentials_function(srp_cred,
+				srp_username_callback);
 #endif
 
 

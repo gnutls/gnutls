@@ -38,15 +38,16 @@ int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *
 
 void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials sc);
 int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials *sc);
-int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, char *password_file, char* password_conf_file);
+int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, 
+	const char *password_file, const char* password_conf_file);
 
 const char* gnutls_srp_server_get_username( gnutls_session state);
 
 typedef int gnutls_srp_server_select_function(gnutls_session, const char **, const char**, unsigned int);
-
 void gnutls_srp_server_set_select_function( gnutls_session, gnutls_srp_server_select_function *);
 
-int gnutls_srp_verifier( char* username, char* password, const gnutls_datum *salt, 
+
+int gnutls_srp_verifier( const char* username, const char* password, const gnutls_datum *salt, 
 	const gnutls_datum* g, const gnutls_datum* n, 
 	gnutls_datum * res);
 
@@ -68,10 +69,14 @@ typedef int gnutls_srp_server_credentials_function(
 	gnutls_datum* verifier, gnutls_datum* generator,
 	gnutls_datum* prime
 );
-
 void gnutls_srp_set_server_credentials_function( 
 	gnutls_srp_server_credentials, 
 	gnutls_srp_server_credentials_function *);
+
+typedef int gnutls_srp_client_credentials_function(gnutls_session, unsigned int,
+	char **, char**);
+void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials, 
+	gnutls_srp_client_credentials_function *);
 
 
 /* Openpgp certificate stuff 

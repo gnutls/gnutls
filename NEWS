@@ -1,6 +1,9 @@
 Version 1.0.0
 - Exported the static SRP group parameters.
 - Some fixes in the certificate authenticated SRP ciphersuites.
+- Improved the support for draft-ietf-tls-srp-05. The two-phase
+  handshake is now fully supported without any interaction with
+  the application layer (except for a callback).
 
 Version 0.9.99 (28/11/2003)
 - Some fixes in the gnutls.h header for the gnutls_server_name_set()

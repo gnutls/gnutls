@@ -12,6 +12,8 @@ Current list:
 * Use subkeys with the 0x20 flag in openpgp keys (if present),
   instead of the main key.
 * Add support for generating and handling DSA keys
+* Add support for extracting CRL distribution points.
+* Add support for generating CRLs.
 * Convert documentation to texinfo format
 * Audit the code
 * Allow sending V2 Hello messages. It seems that some (old) broken 

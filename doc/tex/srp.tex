@@ -11,7 +11,7 @@ authentication schemas, is that SRP does not require the server to hold
 the user's password. This kind of protection is similar to the one used traditionally
 in the \emph{UNIX} ``passwd'' file, where the contents of this file did not cause
 harm to the system security if they were revealed.
-The SRP holds instead of the plain password something called a verifier, 
+The SRP needs instead of the plain password something called a verifier, 
 which is calculated using the user's password, and if stolen cannot
 be used to impersonate the user. See \cite{TOMSRP} for a detailed description
 of the SRP protocol, and for the Stanford SRP libraries.
@@ -45,11 +45,16 @@ authenticated using a certificate with RSA parameters.
 If clients supporting SRP know the username and password before the connection,
 should initialize the client credentials and call the
 function \printfunc{gnutls_srp_set_client_credentials}{gnutls\_srp\_set\_client\_credentials}.
-Alternatively they could probe the server for SRP support, by enabling
-the SRP key exchange method, and specifying empty credentials. If the server
-supports SRP an alert of type GNUTLS\_A\_MISSING\_SRP\_USERNAME will be
-received, which allows the client to read the username and password from the 
-user, set the credentials and repeat the handshake procedure.
+Alternatively they could specify a callback function by using the
+function \printfunc{gnutls_srp_set_client_credentials_function}{gnutls\_srp\_set\_client\_credentials\_function}.
+This has the advantage that allows probing the server for SRP support.
+In that case the callback function will be called twice per handshake.
+The first time is before the ciphersuite is negotiated, and 
+if the callback returns a negative error code, the callback will be 
+called again if SRP has been negotiated. 
+This uses a special TLS-SRP handshake idiom in order to avoid, in
+interactive applications, to ask the user for SRP password and username 
+if the server does not negotiate an SRP ciphersuite.
 \par
 In server side the default behaviour of \gnutls{} is to read the usernames 
 and SRP verifiers from password files. These password files are the ones used

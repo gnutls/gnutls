@@ -5,17 +5,17 @@
 
 
 typedef int gnutls_srp_server_credentials_function(gnutls_session,
-						   char *username,
-						   gnutls_datum * salt,
-						   gnutls_datum * verifier,
-						   gnutls_datum *
-						   generator,
-						   gnutls_datum * prime);
+   const char *username, gnutls_datum * salt, gnutls_datum * verifier,
+   gnutls_datum * generator, gnutls_datum * prime);
+
+typedef int gnutls_srp_client_credentials_function(gnutls_session,
+   unsigned int times, char **username, char** password);
 
 
 typedef struct {
    char *username;
    char *password;
+   gnutls_srp_client_credentials_function *get_function;
 } SRP_CLIENT_CREDENTIALS_INT;
 
 #define gnutls_srp_client_credentials SRP_CLIENT_CREDENTIALS_INT*

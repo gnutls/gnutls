@@ -141,6 +141,8 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 	session->internals.last_handshake_in = -1;
 	session->internals.last_handshake_out = -1;
 
+	session->internals.handshake_restarted = 0;
+
 	session->internals.resumable = RESUME_TRUE;
 
 }
@@ -311,6 +313,9 @@ void _gnutls_deinit(gnutls_session session)
 
 		session->key = NULL;
 	}
+
+	gnutls_free( session->internals.srp_username);
+	gnutls_free( session->internals.srp_password);
 
 	memset( session, 0, sizeof(struct gnutls_session_int));
 	gnutls_free(session);

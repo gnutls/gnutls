@@ -58,19 +58,19 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 };
 
 
-#define _b state->key->b
-#define B state->key->B
-#define _a state->key->a
-#define A state->key->A
-#define N state->key->client_p
-#define G state->key->client_g
-#define V state->key->x
-#define S state->key->KEY
+#define _b session->key->b
+#define B session->key->B
+#define _a session->key->a
+#define A session->key->A
+#define N session->key->client_p
+#define G session->key->client_g
+#define V session->key->x
+#define S session->key->KEY
 
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
  */
-int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
+int _gnutls_gen_srp_server_kx(gnutls_session session, opaque ** data)
 {
 	int ret;
 	uint8 *data_n, *data_s;
@@ -83,40 +83,24 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 	char buf[64];
 	uint8 *data_b;
 
-	if (state->security_parameters.extensions.srp_username[0] == 0) {
-		/* The peer didn't send a valid SRP extension with the
-		 * SRP username. The draft requires that we send an
-		 * alert and start the handshake again.
-		 */
-		gnutls_assert();
-		ret = gnutls_alert_send( state, GNUTLS_AL_WARNING,
-			GNUTLS_A_MISSING_SRP_USERNAME);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
-		return GNUTLS_E_INT_HANDSHAKE_AGAIN;
-	}
-
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT), 1)) < 0) {
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info( state);
+	info = _gnutls_get_auth_info( session);
 	username = info->username;
 
-	_gnutls_str_cpy( username, MAX_SRP_USERNAME, state->security_parameters.extensions.srp_username);
+	_gnutls_str_cpy( username, MAX_SRP_USERNAME, session->security_parameters.extensions.srp_username);
 
-	ret = _gnutls_srp_pwd_read_entry( state, username, &pwd_entry);
+	ret = _gnutls_srp_pwd_read_entry( session, username, &pwd_entry);
 
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	/* copy from pwd_entry to local variables (actually in state) */
+	/* copy from pwd_entry to local variables (actually in session) */
 	if (_gnutls_mpi_scan( &G, pwd_entry->g.data, &pwd_entry->g.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -194,7 +178,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 }
 
 /* return A = g^a % N */
-int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
+int _gnutls_gen_srp_client_kx(gnutls_session session, opaque ** data)
 {
 	size_t n_a;
 	int ret;
@@ -203,15 +187,20 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 	char buf[64];
 	char *password;
 	const gnutls_srp_client_credentials cred =
-	    _gnutls_get_cred(state->key, GNUTLS_CRD_SRP, NULL);
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 	
-	username = cred->username;
-	password = cred->password;
+	if (session->internals.srp_username == NULL) {
+		username = cred->username;
+		password = cred->password;
+	} else {
+		username = session->internals.srp_username;
+		password = session->internals.srp_password;
+	}
 
 	if (username == NULL || password == NULL) {
 		gnutls_assert();
@@ -235,16 +224,16 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 	 */
 
 	/* calculate u */
-	state->key->u = _gnutls_calc_srp_u(A, B);
-	if ( state->key->u == NULL) {
+	session->key->u = _gnutls_calc_srp_u(A, B);
+	if ( session->key->u == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_dump_mpi( "SRP U: ", state->key->u);
+	_gnutls_dump_mpi( "SRP U: ", session->key->u);
 
 	/* S = (B - g^x) ^ (a + u * x) % N */
-	S = _gnutls_calc_srp_S2( B, G, state->key->x, _a, state->key->u, N);
+	S = _gnutls_calc_srp_S2( B, G, session->key->x, _a, session->key->u, N);
 	if (S==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -254,10 +243,10 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 	
 	_gnutls_mpi_release(&_b);
 	_gnutls_mpi_release(&V);
-	_gnutls_mpi_release(&state->key->u);
+	_gnutls_mpi_release(&session->key->u);
 	_gnutls_mpi_release(&B);
 
-	ret = _gnutls_generate_session_key( state->key);
+	ret = _gnutls_generate_session_key( session->key);
 	_gnutls_mpi_release(&S);
 
 	if (ret < 0)
@@ -290,8 +279,8 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 }
 
 
-/* just read A and put it to state */
-int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data_size)
+/* just read A and put it to session */
+int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _data_size)
 {
 	size_t _n_A;
 	ssize_t data_size = _data_size;
@@ -312,17 +301,17 @@ int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data
 	/* Start the SRP calculations.
 	 * - Calculate u 
 	 */
-	state->key->u = _gnutls_calc_srp_u(A, B);
-	if (state->key->u==NULL) {
+	session->key->u = _gnutls_calc_srp_u(A, B);
+	if (session->key->u==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	_gnutls_dump_mpi( "SRP U: ", state->key->u);
+	_gnutls_dump_mpi( "SRP U: ", session->key->u);
 
 	/* S = (A * v^u) ^ b % N 
 	 */
-	S = _gnutls_calc_srp_S1( A, _b, state->key->u, V, N);
+	S = _gnutls_calc_srp_S1( A, _b, session->key->u, V, N);
 	if ( S==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -333,10 +322,10 @@ int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data
 	_gnutls_mpi_release(&A);
 	_gnutls_mpi_release(&_b);
 	_gnutls_mpi_release(&V);
-	_gnutls_mpi_release(&state->key->u);
+	_gnutls_mpi_release(&session->key->u);
 	_gnutls_mpi_release(&B);
 
-	ret = _gnutls_generate_session_key( state->key);
+	ret = _gnutls_generate_session_key( session->key);
 	_gnutls_mpi_release( &S);
 
 	if (ret < 0) {
@@ -520,7 +509,7 @@ static int group_check_g_n( GNUTLS_MPI g, GNUTLS_MPI n)
 
 /* receive the key exchange message ( n, g, s, B) 
  */
-int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data_size)
+int _gnutls_proc_srp_server_kx(gnutls_session session, opaque * data, size_t _data_size)
 {
 	uint8 n_s;
 	uint16 n_g, n_n, n_b;
@@ -535,15 +524,20 @@ int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data
 	ssize_t data_size = _data_size;
 
 	const gnutls_srp_client_credentials cred =
-	    _gnutls_get_cred(state->key, GNUTLS_CRD_SRP, NULL);
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 	
-	username = cred->username;
-	password = cred->password;
+	if (session->internals.srp_username == NULL) {
+		username = cred->username;
+		password = cred->password;
+	} else {
+		username = session->internals.srp_username;
+		password = session->internals.srp_password;
+	}
 
 	if (username == NULL || password == NULL) {
 		gnutls_assert();
@@ -641,7 +635,7 @@ int _gnutls_proc_srp_server_kx(gnutls_session state, opaque * data, size_t _data
 		return ret;
 	}
 
-	if (_gnutls_mpi_scan(&state->key->x, hd, &_n_g) != 0) {
+	if (_gnutls_mpi_scan(&session->key->x, hd, &_n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
