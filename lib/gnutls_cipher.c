@@ -332,7 +332,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
 	uint8 pad;
-	uint16 length;
+	int length;
 	GNUTLS_MAC_HANDLE td;
 	uint16 blocksize;
 	int ret, i, pad_failed = 0;
@@ -407,7 +407,8 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		 */
 		if ( ver == GNUTLS_TLS1)
 		for (i=2;i<pad;i++) {
-			if (ciphertext.data[ciphertext.size-i] != ciphertext.data[ciphertext.size - 1]) {
+			if (ciphertext.data[ciphertext.size-i] != ciphertext.data[ciphertext.size - 1]) 
+			{
 				pad_failed = GNUTLS_E_DECRYPTION_FAILED;
 			}
 		}
@@ -418,15 +419,7 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	/* copy the decrypted stuff to compress_data.
-	 */
-	if (compress_size < length) {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-	memcpy( compress_data, ciphertext.data, length);
-
+	if (length < 0) length = 0;
 	c_length = _gnutls_conv_uint16((uint16) length);
 
 	/* Pass the type, version, length and compressed through
@@ -442,11 +435,16 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		}
 		_gnutls_hmac(td, &c_length, 2);
 		
-		if (length!=0)
-			_gnutls_hmac(td, compress_data, length);
+		if (length > 0)
+			_gnutls_hmac(td, ciphertext.data, length);
 
 		mac_deinit( td, MAC, ver);
 	}
+
+	/* This one was introduced to avoid a timing attack against the TLS
+	 * 1.0 protocol.
+	 */
+	if (pad_failed != 0) return pad_failed;
 
 	/* HMAC was not the same. 
 	 */
@@ -455,11 +453,14 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 		gnutls_assert();
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
-	
-	/* This one was introduced to avoid a timing attack against the TLS
-	 * 1.0 protocol.
+
+	/* copy the decrypted stuff to compress_data.
 	 */
-	if (pad_failed != 0) return pad_failed;
+	if (compress_size < length) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
+	memcpy( compress_data, ciphertext.data, length);
 
 	return length;
 }

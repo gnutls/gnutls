@@ -66,7 +66,9 @@ gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
 	return ret;	
 }
 
-int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen) {
+int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, 
+	int textlen) 
+{
 	if (handle!=GNUTLS_CIPHER_FAILED) {
 		if (gcry_cipher_encrypt( handle, text, textlen, NULL, textlen)!=0) {
 			gnutls_assert();
@@ -76,7 +78,9 @@ int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen)
 	return 0;
 }
 
-int _gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int ciphertextlen) {
+int _gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, 
+	int ciphertextlen) 
+{
 	if (handle!=GNUTLS_CIPHER_FAILED) {
 		if (gcry_cipher_decrypt( handle, ciphertext, ciphertextlen, NULL, ciphertextlen)!=0) {
 			gnutls_assert();
@@ -86,7 +90,8 @@ int _gnutls_cipher_decrypt(GNUTLS_CIPHER_HANDLE handle, void* ciphertext, int ci
 	return 0;
 }
 
-void _gnutls_cipher_deinit(GNUTLS_CIPHER_HANDLE handle) {
+void _gnutls_cipher_deinit(GNUTLS_CIPHER_HANDLE handle) 
+{
 	if (handle!=GNUTLS_CIPHER_FAILED) {
 		gcry_cipher_close(handle);
 	}
