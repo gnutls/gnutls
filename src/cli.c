@@ -40,6 +40,31 @@
 
 #define MAX(X,Y) (X >= Y ? X : Y);
 
+static int print_info( GNUTLS_STATE state) {
+char *tmp;
+const DH_ANON_AUTH_INFO *dh_info;
+
+	tmp = _gnutls_kx_get_name(gnutls_get_current_kx( state));
+	printf("- Key Exchange: %s\n", tmp); free(tmp);
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+		dh_info = gnutls_get_auth_info(state);
+		if (dh_info != NULL)
+			printf("- Anonymous DH using prime of %d bits\n",
+			       dh_info->bits);
+	}
+
+	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
+	printf("- Compression: %s\n", tmp); free(tmp);
+
+	tmp = _gnutls_cipher_get_name(gnutls_get_current_cipher( state));
+	printf("- Cipher: %s\n", tmp); free(tmp);
+
+	tmp = _gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
+	printf("- MAC: %s\n", tmp); free(tmp);
+
+	return 0;
+}
+
 int main()
 {
 	int err, ret;
@@ -82,8 +107,8 @@ int main()
 
 	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0);
-	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL);
+	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_kx_cred( state, GNUTLS_KX_DH_ANON, NULL);
 	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
 
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
@@ -106,18 +131,7 @@ int main()
 	gnutls_get_current_session_id( state, session_id, &session_id_size);
 
 /* print some information */
-	tmp = _gnutls_kx_get_name(gnutls_get_current_kx( state));
-	printf("- Key Exchange: %s\n", tmp); free(tmp);
-
-	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
-	printf("- Compression: %s\n", tmp); free(tmp);
-
-	tmp = _gnutls_cipher_get_name(gnutls_get_current_cipher( state));
-	printf("- Cipher: %s\n", tmp); free(tmp);
-
-	tmp = _gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
-	printf("- MAC: %s\n", tmp); free(tmp);
-
+	print_info( state);
 
 	printf("- Disconnecting\n");
 	gnutls_close(sd, state);
@@ -141,8 +155,8 @@ int main()
 
 	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_TWOFISH , GNUTLS_RIJNDAEL, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0);
-	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL);
+	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_kx_cred( state, GNUTLS_KX_DH_ANON, NULL);
 	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
 
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
@@ -176,18 +190,8 @@ int main()
 	free(session_id);
 
 /* print some information */
-	tmp = _gnutls_kx_get_name(gnutls_get_current_kx( state));
-	printf("- Key Exchange: %s\n", tmp); free(tmp);
-
-	tmp = _gnutls_compression_get_name(gnutls_get_current_compression_method( state));
-	printf("- Compression: %s\n", tmp); free(tmp);
-
-	tmp = _gnutls_cipher_get_name(gnutls_get_current_cipher( state));
-	printf("- Cipher: %s\n", tmp); free(tmp);
-
-	tmp = _gnutls_mac_get_name(gnutls_get_current_mac_algorithm( state));
-	printf("- MAC: %s\n", tmp); free(tmp);
-
+	print_info( state);
+	
 	printf("\n- Simple Client Mode:\n\n");
 
 	FD_ZERO(&rset);

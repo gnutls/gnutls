@@ -29,29 +29,59 @@
 #include "../lib/cert_b64.h"
 #include "prime-gaa.h"
 
-MPI generate_public_prime( unsigned  nbits );
+MPI generate_elg_prime( int mode, unsigned pbits, unsigned qbits,
+	                MPI g, MPI **ret_factors );
 
 int main(int argc, char **argv)
 {
 	gaainfo info;
-	int size, i;
+	int size, i, qbits;
 	MPI prime;
 	uint8 * tmp;
-	
+	MPI g;
+
 	if (gaa(argc, argv, &info) != -1) {
 		fprintf(stderr, "Error in the arguments.\n");
 		return -1;
 	}
 
-	prime = generate_public_prime( info.bits);
+	/* this is an emulation of Michael Wiener's table
+	 * bad emulation.
+	 */
+	qbits = 120 + ( ((info.bits/256)-1)*20 );
+	if( qbits & 1 ) /* better have a even one */
+	qbits++;
 
+	g = mpi_new(16);
+	prime = generate_elg_prime( 0, info.bits, qbits, g, NULL);
+
+	/* print generator */
+	size = 0;
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &size, g);
+
+	tmp = malloc(size);
+   	gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &size, g);
+
+	printf( "/* generator - %d bits */\n", gcry_mpi_get_nbits(g)); 
+	printf( "\nconst uint8 g[%d] = { ", size);
+	
+	for (i=0;i<size;i++) {
+		if (i%7==0) printf("\n\t");
+		printf( "0x%.2x", tmp[i]);
+		if (i!=size-1) printf( ", ");
+	}
+
+	printf("\n};\n\n");
+	free(tmp);
+
+	/* print prime */
 	size = 0;
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &size, prime);
-	
+
 	tmp = malloc(size);
    	gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &size, prime);
 
-	printf( "/* prime - %d bits */\n", info.bits); 
+	printf( "/* prime - %d bits */\n",  gcry_mpi_get_nbits(prime)); 
 	printf( "\nconst uint8 prime[%d] = { ", size);
 	
 	for (i=0;i<size;i++) {
@@ -62,6 +92,6 @@ int main(int argc, char **argv)
 
 	printf("\n};\n");
 	free(tmp);
-	
+
 	return 0;
 }

@@ -47,15 +47,19 @@ int main()
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF + 1];
 	int optval = 1;
-	SRP_SERVER_CREDENTIALS cred;
-	const SRP_AUTH_INFO *info;
+	SRP_SERVER_CREDENTIALS srp_cred;
+	const SRP_AUTH_INFO *srp_info;
+	DH_ANON_SERVER_CREDENTIALS dh_cred;
+	const DH_ANON_AUTH_INFO *dh_info;
 
 	/* this is a password file (created with the included crypt utility) 
 	 * Read README.crypt prior to using SRP.
 	 */
-	cred.password_file = "tpasswd";
-	cred.password_conf_file = "tpasswd.conf";
+	srp_cred.password_file = "tpasswd";
+	srp_cred.password_conf_file = "tpasswd.conf";
 
+	dh_cred.bits = 1024;
+	
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
 
@@ -85,10 +89,10 @@ int main()
 						GNUTLS_NULL_COMPRESSION,
 						0);
 		gnutls_set_kx_priority(state, GNUTLS_KX_SRP,
-				       GNUTLS_KX_ANON_DH, 0);
+				       GNUTLS_KX_DH_ANON, 0);
 
-		gnutls_set_kx_cred(state, GNUTLS_KX_ANON_DH, NULL);
-		gnutls_set_kx_cred(state, GNUTLS_KX_SRP, &cred);
+		gnutls_set_kx_cred(state, GNUTLS_KX_DH_ANON, &dh_cred);
+		gnutls_set_kx_cred(state, GNUTLS_KX_SRP, &srp_cred);
 
 		gnutls_set_mac_priority(state, GNUTLS_MAC_SHA,
 					GNUTLS_MAC_MD5, 0);
@@ -115,10 +119,16 @@ int main()
 
 		/* print srp specific data */
 		if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
-			info = gnutls_get_auth_info(state);
-			if (info != NULL)
+			srp_info = gnutls_get_auth_info(state);
+			if (srp_info != NULL)
 				printf("\n- User '%s' connected\n",
-				       info->username);
+				       srp_info->username);
+		}
+		if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+			dh_info = gnutls_get_auth_info(state);
+			if (dh_info != NULL)
+				printf("\n- Anonymous DH using prime of %d bits\n",
+				       dh_info->bits);
 		}
 
 		/* print state information */
