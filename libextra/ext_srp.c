@@ -96,7 +96,7 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_siz
 
 			if (data_size < len+1) {
 				gnutls_assert();
-				return GNUTLS_E_INVALID_REQUEST;
+				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 
 			data[0] = (uint8) len;

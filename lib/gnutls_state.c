@@ -774,11 +774,14 @@ void gnutls_session_set_ptr(gnutls_session session, void* ptr)
   * @session: is a a &gnutls_session structure.
   *
   * This function provides information about the internals of the record
-  * protocol and is only useful if any gnutls function call was 
-  * interrupted for some reason.
-  *
-  * Returns 0 if the function was interrupted while receiving data, and 
-  * 1 otherwise. 
+  * protocol and is only useful if a prior gnutls function call (e.g.
+  * gnutls_handshake()) was interrupted for some reason, that is, if a function
+  * returned GNUTLS_E_INTERRUPTED or GNUTLS_E_AGAIN. In such a case, you might
+  * want to call select() (or poll()) before calling the interrupted gnutls
+  * function again. To tell you whether a file descriptor should be selected
+  * for either reading or writing, gnutls_record_get_direction() returns 0 if
+  * the interrupted function was trying to read data, and 1 if it was trying to
+  * write data.
   *
   **/
 int gnutls_record_get_direction(gnutls_session session) {

@@ -239,9 +239,8 @@ int _gnutls_create_random(opaque * dst)
 int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 			      int datalen)
 {
-	uint8 session_id_len = 0, z;
-	int pos = 0;
-	int ret = 0;
+	uint8 session_id_len, z;
+	int pos = 0, ret;
 	uint16 sizeOfSuites;
 	gnutls_protocol_version version;
 	int len = datalen;
@@ -308,7 +307,7 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 		session->internals.resumed = RESUME_FALSE;
 	}
 
-	/* Select a ciphersuite 
+	/* Remember ciphersuites for later
 	 */
 	DECR_LEN(len, 2);
 	sizeOfSuites = _gnutls_read_uint16(&data[pos]);
@@ -392,13 +391,13 @@ char * data;
 int _gnutls_send_finished(gnutls_session session, int again)
 {
 	uint8 data[36];
-	int ret=0;
+	int ret;
 	int data_size = 0;
 
 
 	if (again == 0) {
 
-		/* This needed in order to hash all the required
+		/* This is needed in order to hash all the required
 		 * messages.
 		 */
 		if ((ret=_gnutls_handshake_hash_pending(session)) < 0) {
@@ -420,11 +419,12 @@ int _gnutls_send_finished(gnutls_session session, int again)
 					     entity, data);
 			data_size = 12;
 		}
-	}
 
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
 	}
 
 	ret =
@@ -444,8 +444,6 @@ int _gnutls_recv_finished(gnutls_session session)
 	int ret;
 	int vrfysize;
 
-	ret = 0;
-
 	ret =
 	    _gnutls_recv_handshake(session, &vrfy, &vrfysize,
 				   GNUTLS_FINISHED, MANDATORY_PACKET);
@@ -464,6 +462,7 @@ int _gnutls_recv_finished(gnutls_session session)
 
 	if (vrfysize != data_size) {
 		gnutls_assert();
+		gnutls_free(vrfy);
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
 
@@ -481,6 +480,7 @@ int _gnutls_recv_finished(gnutls_session session)
 
 	if (ret < 0) {
 		gnutls_assert();
+		gnutls_free(vrfy);
 		return ret;
 	}
 
@@ -516,8 +516,8 @@ gnutls_kx_algorithm kx;
 }
 
 
-/* This selects the best supported ciphersuite from the ones supported. Then
- * it adds the suite into the session and performs some checks. 
+/* This selects the best supported ciphersuite from the given ones. Then
+ * it adds the suite to the session and performs some checks.
  */
 int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datalen)
 {
@@ -538,11 +538,12 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 
 	/* Here we remove any ciphersuite that does not conform
 	 * the certificate requested, or to the
-	 * authentication requested (eg SRP).
+	 * authentication requested (e.g. SRP).
 	 */
 	x = _gnutls_remove_unwanted_ciphersuites(session, &ciphers, x, pk_algo);
 	if (x<=0) {
 		gnutls_assert();
+		gnutls_free(ciphers);
 		if (x<0) return x;
 		else return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 	}
@@ -622,24 +623,24 @@ int _gnutls_server_select_comp_method(gnutls_session session, opaque * data,
 				    int datalen)
 {
 	int x, i, j;
-	uint8 *ciphers;
+	uint8 *comps;
 
-	x = _gnutls_supported_compression_methods(session, &ciphers);
+	x = _gnutls_supported_compression_methods(session, &comps);
 	if (x < 0) {
 		gnutls_assert();
 		return x;
 	}
 
-	memset( &session->internals.compression_method, '\0', sizeof(gnutls_compression_method));
+	memset( &session->internals.compression_method, 0, sizeof(gnutls_compression_method));
 
 	for (j = 0; j < datalen; j++) {
 		for (i = 0; i < x; i++) {
-			if (ciphers[i] == data[j]) {
+			if (comps[i] == data[j]) {
 			        gnutls_compression_method method = 
-				    _gnutls_compression_get_id(ciphers[i]);
+				    _gnutls_compression_get_id(comps[i]);
 
 				session->internals.compression_method = method;
-				gnutls_free(ciphers);
+				gnutls_free(comps);
 
 				_gnutls_handshake_log("HSK: Selected Compression Method: %s\n",
 				    gnutls_compression_get_name(session->internals.
@@ -654,7 +655,7 @@ int _gnutls_server_select_comp_method(gnutls_session session, opaque * data,
 	/* we were not able to find a compatible compression
 	 * algorithm
 	 */
-	gnutls_free(ciphers);
+	gnutls_free(comps);
 	gnutls_assert();
 	return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 
@@ -767,7 +768,7 @@ int _gnutls_send_handshake(gnutls_session session, void *i_data,
 	return ret;
 }
 
-/* This function will read the handshake header, and return it to the called. If the
+/* This function will read the handshake header and return it to the caller. If the
  * received handshake packet is not the one expected then it buffers the header, and
  * returns UNEXPECTED_HANDSHAKE_PACKET.
  *
@@ -820,7 +821,7 @@ static int _gnutls_recv_handshake_header(gnutls_session session,
 			return ret;
 		}
 
-		/* The case ret==0 is catched here.
+		/* The case ret==0 is caught here.
 		 */
 		if (ret != SSL2_HEADERS) {
 			gnutls_assert();
@@ -948,8 +949,8 @@ int ret;
 
 /* This function will receive handshake messages of the given types,
  * and will pass the message to the right place in order to be processed.
- * Eg. for the SERVER_HELLO message (if it is expected), it will be
- * send to _gnutls_recv_hello().
+ * E.g. for the SERVER_HELLO message (if it is expected), it will be
+ * passed to _gnutls_recv_hello().
  */
 int _gnutls_recv_handshake(gnutls_session session, uint8 ** data,
 			   int *datalen, HandshakeType type,
@@ -1097,7 +1098,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 						  current_cipher_suite));
 
 
-	/* check if the credentials (username, public key etc. are ok). 
+	/* check if the credentials (username, public key etc.) are ok.
 	 * Actually checks if they exist.
 	 */
 	if (_gnutls_get_kx_cred
@@ -1212,7 +1213,7 @@ char buf[64];
 }
 
 
-/* This function read and parse the server hello handshake message.
+/* This function reads and parses the server hello handshake message.
  * This function also restores resumed parameters if we are resuming a
  * session.
  */
@@ -1332,6 +1333,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 						 ret, -1);
 	if (ret < 0) {
 		gnutls_assert();
+		gnutls_free(cipher_suites);
 		return ret;
 	}
 
@@ -1339,6 +1341,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 	 */
 	if (ret == 0) {
 		gnutls_assert();
+		gnutls_free(cipher_suites);
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
@@ -1353,6 +1356,7 @@ static int _gnutls_copy_ciphersuites(gnutls_session session,
 	*ret_data = gnutls_malloc(datalen);
 	if (*ret_data == NULL) {
 		gnutls_assert();
+		gnutls_free(cipher_suites);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -1810,8 +1814,8 @@ static int _gnutls_handshake_hash_init( gnutls_session session) {
 }		
 
 /**
-  * gnutls_handshake - This the main function in the handshake protocol.
-  * @session: is a a &gnutls_session structure.
+  * gnutls_handshake - This is the main function in the handshake protocol.
+  * @session: is a &gnutls_session structure.
   *
   * This function does the handshake of the TLS/SSL protocol,
   * and initializes the TLS connection. 
@@ -1821,9 +1825,10 @@ static int _gnutls_handshake_hash_init( gnutls_session session) {
   * if it has been asked to resume a session, but the server didn't, then
   * a full handshake will be performed.
   *
-  * This function may also return the non-fatal errors GNUTLS_E_AGAIN, or 
-  * GNUTLS_E_INTERRUPTED. In that case you may resume the handshake
-  * (call this function again, until it returns ok)
+  * This function may also return the non-fatal errors GNUTLS_E_AGAIN and
+  * GNUTLS_E_INTERRUPTED; in that case you may resume the handshake
+  * (call this function again, until it returns ok); cf.
+  * gnutls_record_get_direction().
   *
   * If this function is called by a server after a rehandshake request then
   * GNUTLS_E_GOT_APPLICATION_DATA or GNUTLS_E_WARNING_ALERT_RECEIVED 
@@ -2276,7 +2281,7 @@ int _gnutls_recv_hello_request(gnutls_session session, void *data,
 }
 
 /* This function will remove algorithms that are not supported by
- * the requested authentication method. We remove algorithm if
+ * the requested authentication method. We remove an algorithm if
  * we have a certificate with keyUsage bits set.
  *
  * This does a more high level check than  gnutls_supported_ciphersuites(),

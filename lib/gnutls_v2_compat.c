@@ -150,7 +150,7 @@ int _gnutls_read_client_hello_v2(gnutls_session session, opaque * data,
 		return ret;
 	}
 
-	/* check if the credentials (username, public key etc. are ok)
+	/* check if the credentials (username, public key etc.) are ok
 	 */
 	if (_gnutls_get_kx_cred( session, _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite), &err) == NULL && err != 0) {
 		gnutls_assert();

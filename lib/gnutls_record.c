@@ -163,7 +163,8 @@ void gnutls_transport_get_ptr2(gnutls_session session,
   * you should wait for an EOF from the peer.
   * GNUTLS_SHUT_WR sends an alert containing a close request.
   *
-  * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
+  * This function may also return GNUTLS_E_AGAIN or GNUTLS_E_INTERRUPTED; cf.
+  * gnutls_record_get_direction().
   *
   **/
 int gnutls_bye( gnutls_session session, gnutls_close_request how)
@@ -901,9 +902,9 @@ ssize_t _gnutls_recv_int( gnutls_session session, ContentType type, HandshakeTyp
   *
   * If the EINTR is returned by the internal push function (write())
   * then GNUTLS_E_INTERRUPTED will be returned. If GNUTLS_E_INTERRUPTED or
-  * GNUTLS_E_AGAIN is returned you must call this function again, with the 
-  * same parameters. Otherwise the write operation will be 
-  * corrupted and the connection will be terminated.
+  * GNUTLS_E_AGAIN is returned, you must call this function again, with the
+  * same parameters; cf. gnutls_record_get_direction(). Otherwise the write
+  * operation will be corrupted and the connection will be terminated.
   *
   * This function may accept a NULL pointer for data, and 0 for size, if
   * and only if the previous send was interrupted for some reason.

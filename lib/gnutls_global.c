@@ -167,6 +167,7 @@ int gnutls_global_init( void)
 	if (_gnutls_init) goto out;
 	_gnutls_init++;
 
+	(void) gcry_check_version(NULL);
 	if (gcry_control( GCRYCTL_ANY_INITIALIZATION_P) == 0) {
 		/* for gcrypt in order to be able to allocate memory */
 		gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
