@@ -1,11 +1,6 @@
 Version 1.1.17
-- Initiated move from Libgcrypt to generic crypto API, with fallback on Nettle.
-  If you specify --with-nettle, Nettle will be used for encryption,
-  decryption, and hashing.  Furthermore, gathering randomness will read
-  system device files (e.g., /dev/urandom) directly.
-  A copy of Nettle is included with GnuTLS.  The goal here is to make
-  GnuTLS build standalone, in case Libgcrypt is not available, but
-  also to allow easy use of other crypto libraries or crypto hardware.
+- Generic crypto interface for secret key ciphers, hashes and randomness added.
+  See section "Experimental" within section "COMPILATION ISSUES" in README.
 - Removed length limit on passwords read by 'certtool'.
 - Documentation fixes.
 

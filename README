@@ -31,8 +31,8 @@ If you specify --with-nettle, the copy of some files from Nettle that
 are included in nettle/ will be used.  It is used via the generic
 crypto interface in crypto/, which would normally invoke Libgcrypt.
 
-Currently the generic crypto interface only support encryption,
-decryption, hashing and gathering of random data.  Supporting
+Currently the generic crypto interface only support secret key
+ciphering, hashing and gathering of random data.  Supporting
 RSA/DSA/DH/SEXP/MPI in the generic crypto interface is pending.
 
 As Nettle do not include a randomness gatherer, if --with-nettle is
