@@ -1,3 +1,39 @@
+2003-02-12 13:30  nmav <nmav@gnutls.org>
+
+	* lib/Makefile.am, src/tests.c, src/tests.h, src/tls_test.c:
+
+	Added test which prints the Diffie Hellman prime bits used.  
+
+2003-02-12 12:48  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls.h.in.in, lib/gnutls_dh_primes.c,
+	lib/gnutls_int.h, lib/gnutls_privkey.c, lib/gnutls_ui.h,
+	lib/gnutls_x509.c:
+
+	Added some private key handling functions. They are primitive enough
+	for now.  
+
+2003-02-12 11:48  nmav <nmav@gnutls.org>
+
+	* doc/protocol/: draft-ietf-tls-extensions-05.txt,
+	draft-ietf-tls-extensions-06.txt:
+
+	added new extensions draft.  
+
+2003-02-12 11:46  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_cert.c, lib/auth_cert.h, lib/gnutls.h.in.in,
+	lib/gnutls_cert.c, lib/gnutls_dh_primes.c, lib/gnutls_int.h,
+	lib/gnutls_ui.h, lib/gnutls_x509.c:
+
+	gnutls_x509_certificate_* were renamed gnutls_x509_crt_*.  
+
+2003-02-12 11:26  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_int.h, gnutls_ui.c:
+
+	added gnutls_x509_certificate_get_fingerprint(). Untested yet.  
+
 2003-02-10 16:51  nmav <nmav@gnutls.org>
 
 	* lib/: debug.c, debug.h, gnutls.h.in.in, gnutls_errors.c,
