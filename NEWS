@@ -12,6 +12,7 @@ Version 0.9.1
 - Added an strnstr() function and the requirement in some functions to
   use null terminated PEM structures is no more.
 - Use mmap() if available to read files.
+- Fixed a memory leak in SRP code reported by Rupert Kittinger <r.kittinger@efkon.com>.
 
 Version 0.9.0 (03/03/2003)
 - This version is not binary compatible with the previous ones.
