@@ -48,7 +48,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	size_t serial_size = sizeof(serial);
 	char printable[256];
 	char *print;
-	int bits, algo;
+	unsigned int bits, algo;
 	time_t expiret, activet;
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
@@ -203,7 +203,8 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 {
 
 	char digest[20];
-	int digest_size = sizeof(digest), i, ret;
+	size_t digest_size = sizeof(digest);
+	int i, ret;
 	char printable[120];
 	char *print;
 	char name[256];
@@ -217,7 +218,7 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
 	if (cert_list_size > 0) {
-		int algo, bits;
+		unsigned int algo, bits;
 
 		gnutls_openpgp_key_init(&crt);
 		ret =

@@ -169,7 +169,7 @@ AC_HEADER_TIME
 AC_CHECK_HEADERS(unistd.h strings.h stddef.h alloca.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
 AC_CHECK_HEADERS(errno.h sys/time.h time.h)
-AC_CHECK_FUNCS(memmove strnstr mmap gmtime_r inet_ntop,,)
+AC_CHECK_FUNCS(isascii memmove strnstr mmap gmtime_r inet_ntop,,)
 AC_FUNC_ALLOCA
 
 

@@ -249,9 +249,9 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   * by the given OID. The output will be encoded as described in RFC2253.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * This function will only return known OIDs as text. Other OIDs will
-  * be returned DER encoded. You can check about known OIDs using
-  * gnutls_x509_oid_known().
+  * This function will only return known OIDs as text. For other OIDs the output
+  * will be DER encoded, as described in RFC2253 -- in hex format with a '#' prefix.
+  * You can check about known OIDs using gnutls_x509_oid_known().
   *
   * If buf is null then only the size will be filled.
   *
@@ -309,12 +309,12 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   * @sizeof_buf: initialy holds the size of 'buf'
   *
   * This function will extract the part of the name of the Certificate subject, specified
-  * by the given OID. The output will be encoded as described in RFC2253.
+  * by the given OID.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * This function will only return known OIDs as text. Other OIDs will
-  * be returned DER encoded. You can check about known OIDs using
-  * gnutls_x509_oid_known().
+  * This function will only return known OIDs as text. For other OIDs the output
+  * will be DER encoded, as described in RFC2253 -- in hex format with a '#' prefix.
+  * You can check about known OIDs using gnutls_x509_oid_known().
   *
   * If buf is null then only the size will be filled.
   *
@@ -456,7 +456,7 @@ time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert)
   * Returns 0 on success and a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, 
+int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result, 
 	size_t* result_size)
 {
 	int ret;
@@ -537,7 +537,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
   *
   **/
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, char *ret, size_t *ret_size, unsigned int *critical)
+	int seq, void *ret, size_t *ret_size, unsigned int *critical)
 {
 	int result;
 	gnutls_datum dnsname;
@@ -905,7 +905,7 @@ int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
   *
   **/
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
-	gnutls_digest_algorithm algo, unsigned char *buf,
+	gnutls_digest_algorithm algo, void *buf,
 	 size_t *sizeof_buf)
 {
 opaque *cert_buf;
@@ -964,7 +964,7 @@ gnutls_datum tmp;
   *
   **/
 int gnutls_x509_crt_export( gnutls_x509_crt cert,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size)
 {
 	if (cert==NULL) {
 		gnutls_assert();

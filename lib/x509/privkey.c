@@ -485,7 +485,7 @@ int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key)
   *
   **/
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size)
 {
 	char * msg;
 

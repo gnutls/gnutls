@@ -44,7 +44,8 @@
 int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 {
 	ASN1_TYPE dn = ASN1_TYPE_EMPTY;
-	int result, len;
+	int result;
+	size_t len;
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -103,7 +104,8 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 					  gnutls_x509_dn * ret)
 {
 	gnutls_x509_crt xcert;
-	int len, result;
+	int result;
+	size_t len;
 	
 	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
@@ -162,8 +164,9 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 						 gnutls_x509_dn * ret)
 {
 	gnutls_x509_crt xcert;
-	int len, result;
-	
+	int result;
+	size_t len;
+
 	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
 	
@@ -232,6 +235,7 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 {
 	gnutls_x509_crt xcert;
 	int result;
+	size_t size = *ret_size;
 	
 	result = gnutls_x509_crt_init( &xcert);
 	if (result < 0) return result;
@@ -242,7 +246,8 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 		return result;
 	}
 	
-	result = gnutls_x509_crt_get_subject_alt_name( xcert, seq, ret, ret_size, NULL);
+	result = gnutls_x509_crt_get_subject_alt_name( xcert, seq, ret, &size, NULL);
+	*ret_size = size;
 	
 	gnutls_x509_crt_deinit( xcert);
 	
@@ -395,6 +400,7 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size)
 {
 	gnutls_x509_crt xcert;
+	size_t size = *result_size;
 	int ret;
 
 	ret = gnutls_x509_crt_init( &xcert);
@@ -406,7 +412,8 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
 		return ret;
 	}
 	
-	ret = gnutls_x509_crt_get_serial( xcert, result, result_size);
+	ret = gnutls_x509_crt_get_serial( xcert, result, &size);
+	*result_size = size;
 	
 	gnutls_x509_crt_deinit( xcert);
 	
@@ -733,6 +740,7 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 {
 	gnutls_pkcs7 pkcs7;
 	int result;
+	size_t size = *certificate_size;
 
 	result = gnutls_pkcs7_init( &pkcs7);
 	if (result < 0) return result;
@@ -743,8 +751,9 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 		return result;
 	}
 	
-	result = gnutls_pkcs7_get_crt_raw( pkcs7, indx, certificate, certificate_size);
-	
+	result = gnutls_pkcs7_get_crt_raw( pkcs7, indx, certificate, &size);
+	*certificate_size = size;
+
 	gnutls_pkcs7_deinit( pkcs7);
 	
 	return result;

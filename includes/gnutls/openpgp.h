@@ -44,11 +44,11 @@ void gnutls_openpgp_key_deinit(gnutls_openpgp_key key); /* frees all memory */
 int gnutls_openpgp_key_import(gnutls_openpgp_key key,
 	const gnutls_datum* data, gnutls_openpgp_key_fmt format);
 int gnutls_openpgp_key_export(gnutls_openpgp_key key, 
-	gnutls_openpgp_key_fmt format, unsigned char* output_data,
+	gnutls_openpgp_key_fmt format, void* output_data,
 	size_t* output_data_size);
 
 int gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key key,
-	char* result, size_t* result_size);
+	void* result, size_t* result_size);
 	
 int gnutls_openpgp_key_get_name( gnutls_openpgp_key key,
 	int idx, char *buf, size_t *sizeof_buf);

@@ -197,9 +197,9 @@ int gnutls_x509_crq_get_dn(gnutls_x509_crq crq, char *buf,
   * by the given OID. The output will be encoded as described in RFC2253.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * This function will only return known OIDs as text. Other OIDs will
-  * be returned DER encoded. You can check about known OIDs using
-  * gnutls_x509_oid_known().
+  * This function will only return known OIDs as text. For other OIDs the output
+  * will be DER encoded, as described in RFC2253 -- in hex format with a '#' prefix.
+  * You can check about known OIDs using gnutls_x509_oid_known().
   *
   * If buf is null then only the size will be filled.
   *
@@ -387,6 +387,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
   * gnutls_x509_crq_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
   * @crq: should contain a gnutls_x509_crq structure
   * @oid: holds an Object Identifier in a null terminated string
+  * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @data: a pointer to the input data
   * @sizeof_data: holds the size of 'data'
   *
@@ -396,21 +397,21 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test
   * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
-  * not known (by gnutls) you should properly DER encode your data before
-  * calling this function.
+  * not known (by gnutls) you should properly DER encode your data, and
+  * call this function with raw_flag set.
   *
   * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
-	const void *data, unsigned int sizeof_data)
+	unsigned int raw_flag, const void *data, unsigned int sizeof_data)
 {
 	if (sizeof_data == 0 || data == NULL || crq == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
-	return _gnutls_x509_set_dn_oid( crq->crq, "certificationRequestInfo.subject", oid,
-		data, sizeof_data);
+	return _gnutls_x509_set_dn_oid( crq->crq, "certificationRequestInfo.subject", 
+		oid, raw_flag, data, sizeof_data);
 }
 
 /**
@@ -612,7 +613,7 @@ const char* pk;
   *
   **/
 int gnutls_x509_crq_export( gnutls_x509_crq crq,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size)
 {
 	if (crq==NULL) {
 		gnutls_assert();

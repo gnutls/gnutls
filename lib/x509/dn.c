@@ -33,6 +33,12 @@
  * Name (you need a parser just to read a name in the X.509 protoocols!!!)
  */
 
+#ifndef HAVE_ISASCII
+# ifndef isascii
+#  define isascii(x) (x<128?1:0)
+# endif
+#endif
+
 
 /* Converts the given OID to an ldap acceptable string or
  * a dotted OID. 
@@ -500,7 +506,7 @@ int result;
 	val_name = asn1_find_structure_from_oid( _gnutls_get_pkix(), given_oid);
 	if (val_name == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_GENERIC_ERROR;
+		return GNUTLS_E_X509_UNSUPPORTED_OID;
 	}
 
 	_gnutls_str_cpy( tmp, sizeof(tmp), "PKIX1.");
@@ -590,6 +596,57 @@ int result;
 	return 0;
 }
 
+/* This will write the AttributeTypeAndValue field. The data must be already DER encoded.
+ * 'multi' must be zero if writing an AttributeTypeAndValue, and 1 if Attribute.
+ * In all cases only one value is written.
+ */
+int _gnutls_x509_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
+	const char* where, const void* _data, int sizeof_data, int multi) 
+{
+const opaque* data = _data;
+char tmp[128];
+int result;
+
+	/* write the data (value)
+	 */
+
+	_gnutls_str_cpy(tmp, sizeof(tmp), where);
+	_gnutls_str_cat(tmp, sizeof(tmp), ".value");
+
+	if (multi != 0) { /* if not writing an AttributeTypeAndValue, but an Attribute */
+		_gnutls_str_cat(tmp, sizeof(tmp), "s"); /* values */
+
+		result = asn1_write_value( asn1_struct, tmp, "NEW", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+		_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST");
+	
+	}
+
+	result = asn1_write_value( asn1_struct, tmp, _data, sizeof_data);
+	if (result < 0) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* write the type
+	 */
+	_gnutls_str_cpy(tmp, sizeof(tmp), where);
+	_gnutls_str_cat(tmp, sizeof(tmp), ".type");
+
+	result = asn1_write_value( asn1_struct, tmp, given_oid, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+
 /* Decodes an X.509 Attribute (if multi==1) or an AttributeTypeAndValue
  * otherwise.
  */
@@ -640,9 +697,8 @@ int len, result;
  *
  */
 int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
-			      const char *asn1_name,
-			      const char *given_oid, const char *name,
-			      int sizeof_name)
+		      const char *asn1_name, const char *given_oid, 
+		      int raw_flag, const char *name, int sizeof_name)
 {
 	int result;
 	char tmp[64], asn1_rdn_name[64];
@@ -688,8 +744,14 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
 	_gnutls_str_cpy(tmp, sizeof(tmp), asn1_rdn_name);
 	_gnutls_str_cat(tmp, sizeof(tmp), ".?LAST.?LAST");
 
-	result = _gnutls_x509_encode_and_write_attribute( given_oid, asn1_struct, tmp,
-		name, sizeof_name, 0);
+	if (!raw_flag) {
+		result = _gnutls_x509_encode_and_write_attribute( given_oid, asn1_struct,
+			tmp, name, sizeof_name, 0);
+	} else {
+		result = _gnutls_x509_write_attribute( given_oid, asn1_struct,
+			tmp, name, sizeof_name, 0);
+	}
+
 	if (result < 0) {
 		gnutls_assert();
 		return result;

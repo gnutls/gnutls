@@ -509,7 +509,7 @@ cleanup:
   *
   **/
 int gnutls_x509_crl_export( gnutls_x509_crl crl,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size)
 {
 	if (crl == NULL) {
 		gnutls_assert();

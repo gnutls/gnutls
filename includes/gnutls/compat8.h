@@ -37,12 +37,12 @@ typedef struct {
 	char locality_name[GNUTLS_X509_L_SIZE];
 	char state_or_province_name[GNUTLS_X509_S_SIZE];
 	char email[GNUTLS_X509_EMAIL_SIZE];
-} gnutls_x509_dn DEPRECATED;
+} gnutls_x509_dn;
 
 typedef struct {
 	char name[GNUTLS_X509_CN_SIZE];
 	char email[GNUTLS_X509_CN_SIZE];
-} gnutls_openpgp_name DEPRECATED;
+} gnutls_openpgp_name;
 
 int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_x509_dn*) DEPRECATED;
 int gnutls_x509_extract_dn_string(const gnutls_datum * idn,

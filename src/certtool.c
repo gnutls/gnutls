@@ -82,7 +82,7 @@ int ret;
 	
 	if (strlen(input)==1) /* only newline */ return;
 
-	ret = gnutls_x509_crt_set_dn_by_oid(crt, oid, input, strlen(input)-1);
+	ret = gnutls_x509_crt_set_dn_by_oid(crt, oid, 0, input, strlen(input)-1);
 	if (ret < 0) {
 		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -99,7 +99,7 @@ int ret;
 	
 	if (strlen(input)==1) /* only newline */ return;
 
-	ret = gnutls_x509_crq_set_dn_by_oid(crq, oid, input, strlen(input)-1);
+	ret = gnutls_x509_crq_set_dn_by_oid(crq, oid, 0, input, strlen(input)-1);
 	if (ret < 0) {
 		fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -213,7 +213,9 @@ static void print_key_usage( unsigned int x)
 
 static void print_private_key( gnutls_x509_privkey key)
 {
-int size, ret;
+int ret;
+size_t size;
+
 	if (!key) return;
 
 	if (!info.pkcs8) {
@@ -410,7 +412,7 @@ void generate_self_signed( void)
 {
 	gnutls_x509_crt crt;
 	gnutls_x509_privkey key;
-	int size;
+	size_t size;
 	int result;
 
 	fprintf(stderr, "Generating a self signed certificate...\n");
@@ -444,7 +446,8 @@ void generate_signed_certificate( void)
 {
 	gnutls_x509_crt crt;
 	gnutls_x509_privkey key;
-	int size, result;
+	size_t size;
+	int result;
 	gnutls_x509_privkey ca_key;
 	gnutls_x509_crt ca_crt;
 
@@ -481,7 +484,8 @@ void generate_signed_certificate( void)
 void update_signed_certificate( void)
 {
 	gnutls_x509_crt crt;
-	int size, result;
+	size_t size;
+	int result;
 	gnutls_x509_privkey ca_key;
 	gnutls_x509_crt ca_crt;
 
@@ -614,12 +618,12 @@ const char* get_algorithm( int a)
 void certificate_info( void)
 {
 	gnutls_x509_crt crt;
-	int size, ret, i;
+	int ret, i;
 	unsigned int critical, key_usage;
 	time_t tim;
 	gnutls_datum pem;
 	char serial[40];
-	size_t serial_size = sizeof(serial), dn_size;
+	size_t serial_size = sizeof(serial), dn_size, size;
 	char printable[256];
 	char *print;
 	const char* cprint;
@@ -792,11 +796,11 @@ void certificate_info( void)
 
 static void print_certificate_info( gnutls_x509_crt crt)
 {
-	int size, ret, i;
+	int ret, i;
 	unsigned int critical, key_usage;
 	time_t tim;
 	char serial[40];
-	size_t serial_size = sizeof(serial), dn_size;
+	size_t serial_size = sizeof(serial), dn_size, size;
 	char printable[256];
 	char *print;
 	const char* cprint;
@@ -911,10 +915,11 @@ static void print_certificate_info( gnutls_x509_crt crt)
 void crl_info(void)
 {
 	gnutls_x509_crl crl;
-	int size, ret, i, rc;
+	int ret, i, rc;
+	size_t size;
 	time_t tim;
 	gnutls_datum pem;
-	char serial[40];
+	unsigned char serial[40];
 	size_t serial_size = sizeof(serial), dn_size;
 	char printable[256];
 	char *print;
@@ -990,7 +995,8 @@ void crl_info(void)
 void privkey_info( void)
 {
 	gnutls_x509_privkey key;
-	int size, ret, i;
+	size_t size;
+	int ret, i;
 	gnutls_datum pem;
 	char printable[256];
 	char *print;
@@ -1355,7 +1361,7 @@ static void print_verification_res( gnutls_x509_crt crt, gnutls_x509_crt issuer,
 
 #define CERT_SEP "-----BEGIN CERT"
 #define CRL_SEP "-----BEGIN X509 CRL"
-int _verify_x509_mem( const char* cert, int cert_size)
+int _verify_x509_mem( const void* cert, int cert_size)
 {
 	int siz, i;
 	const char *ptr;

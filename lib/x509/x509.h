@@ -61,7 +61,7 @@ typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey;
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, void *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, char *ret, size_t *ret_size, unsigned int* critical);
+	int seq, void *ret, size_t *ret_size, unsigned int* critical);
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid, 
 	int indx, void *buf, size_t *sizeof_buf);
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
@@ -73,7 +73,7 @@ int _gnutls_x509_crt_get_raw_issuer_dn( gnutls_x509_crt cert,
 int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
 	gnutls_datum* start);
 
-int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, size_t* result_size);
+int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result, size_t* result_size);
 
 int _gnutls_x509_compare_raw_dn(const gnutls_datum * dn1,
 	const gnutls_datum * dn2);
@@ -94,14 +94,14 @@ int gnutls_x509_crl_init(gnutls_x509_crl * crl);
 int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 			   gnutls_x509_crt_fmt format);
 int gnutls_x509_crl_export( gnutls_x509_crl crl,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size);
 
 int gnutls_x509_crt_init(gnutls_x509_crt * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt cert);
 int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
 int gnutls_x509_crt_export( gnutls_x509_crt cert,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size);
 
 int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
 	unsigned int *critical);
@@ -125,6 +125,6 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
 	gnutls_datum* u);
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size);
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size);
 
 #endif

@@ -46,6 +46,7 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
   * gnutls_x509_crt_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
   * @crt: should contain a gnutls_x509_crt structure
   * @oid: holds an Object Identifier in a null terminated string
+  * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @name: a pointer to the name
   * @sizeof_name: holds the size of 'name'
   *
@@ -55,27 +56,28 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test
   * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
-  * not known (by gnutls) you should properly DER encode your data before
-  * calling this function.
+  * not known (by gnutls) you should properly DER encode your data, and
+  * call this function with raw_flag set.
   *
   * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
-	const void *name, unsigned int sizeof_name)
+	unsigned int raw_flag, const void *name, unsigned int sizeof_name)
 {
 	if (sizeof_name == 0 || name == NULL || crt == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	return _gnutls_x509_set_dn_oid( crt->cert, "tbsCertificate.subject", oid,
-		name, sizeof_name);
+		raw_flag, name, sizeof_name);
 }
 
 /**
   * gnutls_x509_crt_set_issuer_dn_by_oid - This function will set the Certificate request issuer's distinguished name
   * @crt: should contain a gnutls_x509_crt structure
   * @oid: holds an Object Identifier in a null terminated string
+  * @raw_flag: must be 0, or 1 if the data are DER encoded
   * @name: a pointer to the name
   * @sizeof_name: holds the size of 'name'
   *
@@ -85,21 +87,21 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid,
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
   * With this function you can only set the known OIDs. You can test
   * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
-  * not known (by gnutls) you should properly DER encode your data before
-  * calling this function.
+  * not known (by gnutls) you should properly DER encode your data, and
+  * call this function with raw_flag set.
   *
   * Returns 0 on success.
   *
   **/
 int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
-	const void *name, unsigned int sizeof_name)
+	unsigned int raw_flag, const void *name, unsigned int sizeof_name)
 {
 	if (sizeof_name == 0 || name == NULL || crt == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	return _gnutls_x509_set_dn_oid( crt->cert, "tbsCertificate.issuer", oid,
-		name, sizeof_name);
+		raw_flag, name, sizeof_name);
 }
 
 /**

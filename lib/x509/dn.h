@@ -22,8 +22,8 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 	size_t* sizeof_buf);
 
 int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct, 
-	const char* asn1_rdn_name, const char* oid, const char *name,
-	int sizeof_name);
+	const char* asn1_rdn_name, const char* oid, int raw_flag, 
+	const char *name, int sizeof_name);
 
 
 #endif

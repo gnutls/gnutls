@@ -236,7 +236,7 @@ int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
   *
   **/
 int gnutls_pkcs12_export( gnutls_pkcs12 pkcs12,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size)
 {
 	if (pkcs12==NULL) {
 		gnutls_assert();

@@ -137,7 +137,7 @@ int rc;
   *
   **/
 int gnutls_openpgp_key_export(gnutls_openpgp_key key, 
-	gnutls_openpgp_key_fmt format, unsigned char* output_data,
+	gnutls_openpgp_key_fmt format, void* output_data,
 	size_t* output_data_size)
 {
 int rc;
@@ -205,7 +205,7 @@ size_t input_data_size = *output_data_size;
  **/
 int
 gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key key, 
-                            unsigned char *fpr, size_t *fprlen )
+                            void *fpr, size_t *fprlen )
 {
     CDK_PACKET *pkt;
     cdk_pkt_pubkey_t pk = NULL;

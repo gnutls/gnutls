@@ -6,6 +6,8 @@ Version 0.9.98
 - gnutls4 compatibility header is no longer included by default in
   gnutls.h.
 - gnutls8 function usage yelds a deprecation warning in gcc3.
+- gnutls_x509_*_set_dn_by_oid() functions have a raw_flag parameter
+  added.
 
 Version 0.9.97 (11/11/2003)
 - The certtool utility can now generate PKCS #12 structures

@@ -248,7 +248,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
   *
   **/
 int gnutls_pkcs7_get_crt_raw(gnutls_pkcs7 pkcs7, 
-	int indx, unsigned char* certificate, size_t* certificate_size)
+	int indx, void* certificate, size_t* certificate_size)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len;
@@ -390,7 +390,7 @@ int gnutls_pkcs7_get_crt_count(gnutls_pkcs7 pkcs7)
   *
   **/
 int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
+	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size)
 {
 	if (pkcs7 == NULL) 
 		return GNUTLS_E_INVALID_REQUEST;
@@ -666,7 +666,7 @@ int gnutls_pkcs7_delete_crt(gnutls_pkcs7 pkcs7, int indx)
   *
   **/
 int gnutls_pkcs7_get_crl_raw(gnutls_pkcs7 pkcs7, 
-	int indx, unsigned char* crl, size_t* crl_size)
+	int indx, void* crl, size_t* crl_size)
 {
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result;
