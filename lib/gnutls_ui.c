@@ -217,12 +217,14 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
   * @session: is a gnutls session
   * @list_size: is the length of the certificate list
   *
-  * This function will return the peer's raw certificate (list) as 
-  * sent by the peer.
-  * These certificates are in raw format (DER encoded for X.509). 
+  * This function will return the peer's raw certificate (chain) as 
+  * sent by the peer. These certificates are in raw format (DER encoded for X.509). 
   * In case of a X.509 then a certificate list may be present. 
   * The first certificate in the list is the peer's certificate,
   * following the issuer's certificate, then the issuer's issuer etc.
+  *
+  * In case of OpenPGP keys a single raw encoded key is returned.
+  *
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/

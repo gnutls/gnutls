@@ -18,7 +18,7 @@ extern gnutls_x509_crt* ca_list;
 extern int ca_list_size;
 
 static void verify_cert2(gnutls_x509_crt crt,
-	gnutls_x509_crt issuer, gnutls_x509_crl * crl_list, int crl_list_size);
+   gnutls_x509_crt issuer, gnutls_x509_crl * crl_list, int crl_list_size);
 static void verify_last_cert(gnutls_x509_crt crt,
    gnutls_x509_crt *ca_list, int ca_list_size,
    gnutls_x509_crl * crl_list, int crl_list_size);
@@ -107,28 +107,30 @@ static void verify_cert2(gnutls_x509_crt crt,
    if (output & GNUTLS_CERT_INVALID) {
       fprintf(stderr, "Not trusted");
 
+      if (output & GNUTLS_CERT_SIGNER_NOT_FOUND)
+         fprintf(stderr, ": no issuer was found");
       if (output & GNUTLS_CERT_SIGNER_NOT_CA)
-         fprintf(stderr, ": Issuer is not a CA\n");
-      else
-         fprintf(stderr, "\n");
+         fprintf(stderr, ": issuer is not a CA");
+
+      fprintf(stderr, "\n");
    } else
       fprintf(stderr, "Trusted\n");
 
 
     /* Now check the expiration dates.
      */
-    if (gnutls_x509_crt_get_activation_time(crt) > now)
-	fprintf(stderr, "Not yet activated\n");
+   if (gnutls_x509_crt_get_activation_time(crt) > now)
+      fprintf(stderr, "Not yet activated\n");
 
-    if (gnutls_x509_crt_get_expiration_time(crt) < now)
-	fprintf(stderr, "Expired\n");
+   if (gnutls_x509_crt_get_expiration_time(crt) < now)
+      fprintf(stderr, "Expired\n");
 
     /* Check if the certificate is revoked.
      */
-    ret = gnutls_x509_crt_check_revocation(crt, crl_list, crl_list_size);
-    if (ret == 1) {		/* revoked */
-	fprintf(stderr, "Revoked\n");
-    }
+   ret = gnutls_x509_crt_check_revocation(crt, crl_list, crl_list_size);
+   if (ret == 1) { /* revoked */
+      fprintf(stderr, "Revoked\n");
+   }
 }
 
 
@@ -175,18 +177,18 @@ static void verify_last_cert(gnutls_x509_crt crt,
 
     /* Now check the expiration dates.
      */
-    if (gnutls_x509_crt_get_activation_time(crt) > now)
-	fprintf(stderr, "Not yet activated\n");
+   if (gnutls_x509_crt_get_activation_time(crt) > now)
+      fprintf(stderr, "Not yet activated\n");
 
-    if (gnutls_x509_crt_get_expiration_time(crt) < now)
-	fprintf(stderr, "Expired\n");
+   if (gnutls_x509_crt_get_expiration_time(crt) < now)
+      fprintf(stderr, "Expired\n");
 
-    /* Check if the certificate is revoked.
-     */
-    ret = gnutls_x509_crt_check_revocation(crt, crl_list, crl_list_size);
-    if (ret == 1) {		/* revoked */
-	fprintf(stderr, "Revoked\n");
-    }
+   /* Check if the certificate is revoked.
+    */
+   ret = gnutls_x509_crt_check_revocation(crt, crl_list, crl_list_size);
+   if (ret == 1) {		/* revoked */
+      fprintf(stderr, "Revoked\n");
+   }
 }
 
 \end{verbatim}
