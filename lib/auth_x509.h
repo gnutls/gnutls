@@ -1,5 +1,5 @@
 /* this is not to be included by gnutls_anon.c */
-extern MOD_AUTH_STRUCT x509pki_auth_struct;
+extern MOD_AUTH_STRUCT rsa_auth_struct;
 
 /* This structure may be complex but, it's the only way to
  * support a server that has multiple certificates
@@ -12,7 +12,7 @@ typedef struct {
 			 *       [1] certificate2, certificate22, ...
 			 */
 	int * cert_list_length;
-			/* contains the number of the certificates in one
+			/* contains the number of the certificates in a
 			 * row.
 			 */
 	int ncerts;     /* contains the number of columns in cert_list.

@@ -116,18 +116,22 @@ char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
 {
 	unsigned char *result;
 	char *tcp;
-	unsigned char *rand;
+	opaque *rand;
 	char *e = NULL;
 	int result_size;
 
 	if (salt > 50 || salt <= 0)
 		return NULL;	/* wow that's pretty long salt */
 
-	rand = _gnutls_get_random(salt, GNUTLS_WEAK_RANDOM);
+	rand = gnutls_malloc(salt);
+	if (rand==NULL || _gnutls_get_random(rand, salt, GNUTLS_WEAK_RANDOM) < 0) {
+		gnutls_assert();
+		return NULL;
+	}
 
 	result_size = _gnutls_sbase64_encode(rand, salt, &result);
 	if (result_size < 0) {
-		_gnutls_free_rand(rand);
+		gnutls_free(rand);
 		gnutls_assert();
 		return NULL;
 	}
@@ -136,7 +140,7 @@ char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
 	sprintf(tcp, ":%s", result);
 
 	gnutls_free(result);
-	_gnutls_free_rand(rand);
+	gnutls_free(rand);
 	/* no longer need cleartext */
 
 	e = crypt_srpsha1(username, pass_new, (const char *) tcp, g, n);

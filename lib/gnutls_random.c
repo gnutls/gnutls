@@ -18,9 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include "defines.h"
-#include "gnutls_int.h"
-#include "gnutls_random.h"
+#include <defines.h>
+#include <gnutls_int.h>
+#include <gnutls_random.h>
+#include <gnutls_errors.h>
 #ifndef USE_GCRYPT
 # include <unistd.h>
 # include <sys/types.h>
@@ -29,15 +30,14 @@
 # include <sys/time.h>
 #endif
 
-char *_gnutls_get_random(int bytes, int dev)
+int _gnutls_get_random(opaque * res, int bytes, int dev)
 {
 #ifndef USE_GCRYPT
     int fd;
     struct timeval tv;
     char prand[16];
-    char * buf = gnutls_malloc(bytes);
     char *device;
-    
+        
     switch(dev) {
     	case 1:
     		device = "/dev/random";
@@ -54,25 +54,28 @@ char *_gnutls_get_random(int bytes, int dev)
 	memcpy(&prand[8], &fd, sizeof(fd));
 	fd = clock();
 	memcpy(&prand[12], &fd, sizeof(fd));
-	memset(buf, 0, bytes);
+	memset(res, 0, bytes);
 	if (bytes > 16)
 	    bytes = 16;
-	memcpy(buf, prand, bytes);
+	memcpy(res, prand, bytes);
     } else {
-	read(fd, buf, bytes);
+	read(fd, res, bytes);
 	close(fd);
     }
-    return buf;
+    return 0;
 #else				/* using gcrypt */
-    return gcry_random_bytes(bytes, dev);
+    char* buf;
+    buf = gcry_random_bytes(bytes, dev);
+    if (buf==NULL) {
+    	gnutls_assert();
+    	return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    memcpy( res, buf, bytes);
+    gnutls_free(buf);
+    
+    return 0;
 #endif
 
 }
 
-void _gnutls_free_rand(void* rand) {
-#ifndef USE_GCRYPT
-	gnutls_free(rand);
-#else
-	gcry_free(rand);
-#endif
-}

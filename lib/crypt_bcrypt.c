@@ -686,11 +686,14 @@ char *crypt_bcrypt_wrapper(const char* username, const char *pass_new, int cost,
 {
 	opaque *result;
 	char *tcp;
-	uint8 *rand;
+	uint8 rand[17];
 	char *e = NULL;
 	int result_size;
 
-	rand = _gnutls_get_random(17, GNUTLS_WEAK_RANDOM);
+	if (_gnutls_get_random(&rand[1], 17, GNUTLS_WEAK_RANDOM) < 0 ) {
+		gnutls_assert();
+		return NULL;
+	}
 	/* cost should be <32 and >6 */
 	if (cost >= 32)
 		cost = 31;
@@ -698,11 +701,7 @@ char *crypt_bcrypt_wrapper(const char* username, const char *pass_new, int cost,
 		cost = 1;
 
 	rand[0] = (uint8) cost;
-	result_size = _gnutls_sbase64_encode( &rand[0], 17, &result);
-
-	_gnutls_free_rand(rand);
-
-	_gnutls_sbase64_decode( result, strlen(result), &rand);
+	result_size = _gnutls_sbase64_encode( rand, 17, &result);
 
 	if (result_size < 0) {
 		gnutls_assert();

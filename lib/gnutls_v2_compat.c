@@ -48,12 +48,11 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 	x = _gnutls_supported_ciphersuites(state, &ciphers);
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Requested cipher suites: \n");
-	for (j = 0; j < datalen; j += 2) {
+	for (j = 0; j < datalen; j += 3) {
 		if (data[j] == 0) {	/* only print if in v2 compat mode */
-			j++;
 			fprintf(stderr, "\t%s\n",
 				_gnutls_cipher_suite_get_name(*
-							      ((GNUTLS_CipherSuite *) & data[j])));
+							      ((GNUTLS_CipherSuite *) & data[j+1])));
 		}
 	}
 	fprintf(stderr, "Supported cipher suites: \n");
@@ -61,13 +60,12 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 		fprintf(stderr, "\t%s\n",
 			_gnutls_cipher_suite_get_name(ciphers[j]));
 #endif
-	memset(ret, '\0', sizeof(GNUTLS_CipherSuite));
+	memset(ret, '\0', 2);
 
-	for (j = 0; j < datalen; j += 2) {
+	for (j = 0; j < datalen; j += 3) {
 		for (i = 0; i < x; i++) {
-			if (data[j++] == 0)
-				if (memcmp
-				    (&ciphers[i].CipherSuite, &data[j],
+			if (data[j] == 0)
+				if ( memcmp(ciphers[i].CipherSuite, &data[j+1],
 				     2) == 0) {
 #ifdef HARD_DEBUG
 					fprintf(stderr,
@@ -76,10 +74,10 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 						_gnutls_cipher_suite_get_name
 						(*
 						 ((GNUTLS_CipherSuite *) &
-						  data[j])));
+						  data[j+1])));
 #endif
 					memmove(ret,
-						&ciphers[i].CipherSuite,
+						ciphers[i].CipherSuite,
 						2);
 					gnutls_free(ciphers);
 
@@ -109,7 +107,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	int ret = 0;
 	uint16 sizeOfSuites;
 	GNUTLS_Version version;
-	char *rand;
+	opaque random[32];
 	int len = datalen;
 	int err;
 	uint16 challenge;
@@ -149,9 +147,10 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	session_id_len = READuint16( &data[pos]);
 	pos += 2;
 
-	if (session_id_len > 32)
+	if (session_id_len > 32) {
+		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-
+	}
 
 	/* read challenge length */
 	DECR_LEN(len, 2);
@@ -172,9 +171,10 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 				  &data[pos], sizeOfSuites);
 
 	pos += sizeOfSuites;
-	if (ret < 0)
+	if (ret < 0) {
+		gnutls_assert();
 		return ret;
-
+	}
 
 	/* check if the credentials (username, public key etc. are ok)
 	 */
@@ -207,17 +207,17 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	pos+=session_id_len;
 	
 	DECR_LEN(len, challenge);
-	memset( state->security_parameters.client_random, 0, 32);
+	memset( random, 0, 32);
+	memcpy( random, &data[challenge > 32 ? (pos+challenge-32) : pos], challenge < 32 ? challenge : 32);
 
 	/* read the last 32 bytes */
-	memcpy( state->security_parameters.client_random, &data[challenge > 32 ? (pos+challenge-32) : pos], challenge < 32 ? challenge : 32);
+	_gnutls_set_client_random( state, random);
 
 	/* generate server random value */
-	WRITEuint32( time(NULL), state->security_parameters.server_random);
 
-	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
-	memmove(&state->security_parameters.server_random[4], rand, 28);
-	_gnutls_free_rand(rand);
+	_gnutls_create_random( random);
+	_gnutls_set_server_random( state, random);
+	
 	state->security_parameters.timestamp = time(NULL);
 
 
@@ -249,5 +249,5 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 		state->gnutls_internals.resumed = RESUME_FALSE;
 	}
 
-	return ret;
+	return 0;
 }

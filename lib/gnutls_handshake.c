@@ -50,13 +50,15 @@
 static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data, int datalen);
 static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret, opaque * data, int datalen);
 
-static void set_server_random( GNUTLS_STATE state, uint8* random) {
+void _gnutls_set_server_random( GNUTLS_STATE state, uint8* random) {
 	memcpy( state->security_parameters.server_random, random, 32);
-	memcpy( state->gnutls_key->server_random, random, 32);
+	if (state->gnutls_key!=NULL)
+		memcpy( state->gnutls_key->server_random, random, 32);
 }
-static void set_client_random( GNUTLS_STATE state, uint8* random) {
+void _gnutls_set_client_random( GNUTLS_STATE state, uint8* random) {
 	memcpy( state->security_parameters.client_random, random, 32);
-	memcpy( state->gnutls_key->client_random, random, 32);
+	if (state->gnutls_key!=NULL)
+		memcpy( state->gnutls_key->client_random, random, 32);
 }
 
 /* Calculate The SSL3 Finished message */
@@ -156,18 +158,19 @@ void *_gnutls_finished(GNUTLS_STATE state, int type, int skip)
 /* this function will produce 32 bytes of random data
  * and put it to dst.
  */
-static int create_random( opaque* dst) {
+int _gnutls_create_random( opaque* dst) {
 uint32 tim;
-opaque* rand;
+opaque rand[28];
 
 	tim = time(NULL);
 	/* generate server random value */
 	WRITEuint32( tim, dst);
 
-	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
+	if (_gnutls_get_random(rand, 28, GNUTLS_STRONG_RANDOM) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 	memcpy( &dst[4], rand, 28);
-
-	_gnutls_free_rand(rand);
 
 	return 0;
 }
@@ -216,11 +219,11 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 2;
 
 	DECR_LEN(len, 32);
-	set_client_random( state, &data[pos]);
+	_gnutls_set_client_random( state, &data[pos]);
 	pos += 32;
 
-	create_random( random);
-	set_server_random( state, random);
+	_gnutls_create_random( random);
+	_gnutls_set_server_random( state, random);
 
 	state->security_parameters.timestamp = time(NULL);
 
@@ -228,9 +231,11 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	memcpy(&session_id_len, &data[pos++], 1);
 
 	/* RESUME SESSION */
-	if (session_id_len > 32)
+	if (session_id_len > 32) {
+		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-
+	}
+	
 	DECR_LEN(len, session_id_len);
 	ret =
 	    _gnutls_server_restore_session(state, &data[pos],
@@ -253,9 +258,9 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 					    session_id,
 					    &state->security_parameters.
 					    session_id_size);
+
 		state->gnutls_internals.resumed = RESUME_FALSE;
 	}
-
 	/* Select a ciphersuite */
 	DECR_LEN(len, 2);
 	sizeOfSuites = READuint16( &data[pos]);
@@ -267,8 +272,10 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 			  sizeOfSuites);
 
 	pos += sizeOfSuites;
-	if (ret < 0)
+	if (ret < 0) {
+		gnutls_assert();
 		return ret;
+	}
 
 
 	/* check if the credentials (username, public key etc. are ok)
@@ -281,6 +288,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
+
 
 	/* set the MOD_AUTH_STRUCT to the appropriate struct
 	 * according to the KX algorithm. This is needed since all the
@@ -372,6 +380,7 @@ int _gnutls_recv_finished(int cd, GNUTLS_STATE state)
 				   GNUTLS_FINISHED);
 	if (ret < 0) {
 		ERR("recv finished int", ret);
+		gnutls_assert();
 		return ret;
 	}
 
@@ -439,7 +448,7 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
 
 	for (j = 0; j < datalen; j += 2) {
 		for (i = 0; i < x; i++) {
-			if (memcmp(&ciphers[i].CipherSuite, &data[j], 2) ==
+			if (memcmp(ciphers[i].CipherSuite, &data[j], 2) ==
 			    0) {
 #ifdef HARD_DEBUG
 				fprintf(stderr, "Selected cipher suite: ");
@@ -447,7 +456,7 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
 					_gnutls_cipher_suite_get_name(*
 								      ((GNUTLS_CipherSuite *) & data[j])));
 #endif
-				memcpy(ret, &ciphers[i].CipherSuite, 2);
+				memcpy(ret, ciphers[i].CipherSuite, 2);
 				gnutls_free(ciphers);
 
 				return 0;
@@ -785,7 +794,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 	pos += 2;
 
 	DECR_LEN(len, 32);
-	set_server_random( state, &data[pos]);
+	_gnutls_set_server_random( state, &data[pos]);
 	pos += 32;
 
 	DECR_LEN(len, 1);
@@ -955,8 +964,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 		    _gnutls_version_get_minor(state->connection_state.
 					      version);
 
-		create_random( random);
-		set_client_random( state, random);
+		_gnutls_create_random( random);
+		_gnutls_set_client_random( state, random);
 		
 		state->security_parameters.timestamp = time(0);
 
@@ -1551,15 +1560,17 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 
 int _gnutls_generate_session_id(char *session_id, uint8 * len)
 {
-	char *rand;
-	rand = _gnutls_get_random(32, GNUTLS_WEAK_RANDOM);
+	opaque rand[32];
+	if (_gnutls_get_random(rand, 32, GNUTLS_WEAK_RANDOM) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	memcpy(session_id, rand, 32);
-	_gnutls_free_rand(rand);
 	*len = 32;
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "SessionID: %s\n",
+	fprintf(stderr, "Generated SessionID: %s\n",
 		_gnutls_bin2hex(session_id, 32));
 #endif
 	return 0;

@@ -20,6 +20,7 @@
 
 #include "defines.h"
 #include "gnutls_int.h"
+#include "gnutls_errors.h"
 
 const static uint8 b64table[64] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -296,12 +297,13 @@ inline static int cpydata(uint8 * data, int data_size, uint8 ** result)
 
 /* decodes data and puts the result into result (localy alocated)
  * The result_size is the return value
+ * FIXME: This function is a mess
  */
-int _gnutls_fbase64_decode(char *msg, uint8 * data, int data_size,
+#define ENDSTR "-----\n"
+int _gnutls_fbase64_decode( uint8 * data, int data_size,
 			   uint8 ** result)
 {
-	int i, ret, tmp, j;
-	uint8 tmpres[3];
+	int i, ret;
 	char top[80];
 	char bottom[80];
 	uint8 *rdata;
@@ -310,59 +312,52 @@ int _gnutls_fbase64_decode(char *msg, uint8 * data, int data_size,
 	int kdata_size;
 
 	strcpy(top, "-----BEGIN ");
-	strcat(top, msg);
-	strcat(top, "-----");
 
 	strcpy(bottom, "\n-----END ");
-	strcat(bottom, msg);
-	strcat(bottom, "-----");
 
 	i = 0;
 	do {
 		rdata = &data[i];
-		data_size -= i;
+		data_size --;
 		i++;
 	} while (data_size > 0 && strncmp(rdata, top, strlen(top)) != 0);
 
-	if (data_size < 4 + strlen(bottom))
+	if (data_size < 4 + strlen(bottom)) {
+		gnutls_assert();
 		return -1;
-	data_size -= strlen(top);
-	rdata += strlen(top);
+	}
+	
+	do {
+		data_size--;
+		rdata++;
+	} while( ( strncmp( rdata, ENDSTR, strlen(ENDSTR)) != 0) && data_size > 0) ;
+
+	data_size -= strlen(ENDSTR);
+	rdata += strlen(ENDSTR);
 
 	rdata_size = 0;
 	do {
 		rdata_size++;
 	} while (rdata_size < data_size
-		 && strncmp(&rdata[rdata_size], bottom,
-			    strlen(bottom)) != 0);
+		 && strncmp(&rdata[rdata_size], bottom, strlen(bottom)) != 0);
 
-	if (rdata_size < 4)
+	if (rdata_size < 4) {
+		gnutls_assert();
 		return -1;
+	}
 
 	kdata_size = cpydata(rdata, rdata_size, &kdata);
 
-	if (kdata_size < 4)
+	if (kdata_size < 4) {
+		gnutls_assert();
 		return -1;
-
-	kdata_size /= 4;
-	kdata_size *= 4;
-
-	ret = (kdata_size / 4) * 3;
-	(*result) = gnutls_malloc(ret);
-	if ((*result) == NULL)
-		return -1;
-
-	for (i = j = 0; i < kdata_size; i += 4) {
-		tmp = decode(tmpres, &kdata[i]);
-		if (tmp < 0) {
-			gnutls_free( *result);
-			return tmp;
-		}
-		memcpy(&(*result)[j], tmpres, tmp);
-		if (tmp < 3)
-			ret -= (3 - tmp);
-		j += 3;
 	}
+
+	if ((ret = _gnutls_base64_decode( kdata, kdata_size, result)) < 0) {
+		gnutls_assert();
+		gnutls_free(kdata);
+		return GNUTLS_E_PARSING_ERROR;
+	} 
 	gnutls_free(kdata);
 	return ret;
 }

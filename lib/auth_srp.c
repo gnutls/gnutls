@@ -103,9 +103,9 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	N = gcry_mpi_alloc_like(pwd_entry->n);
 	V = gcry_mpi_alloc_like(pwd_entry->v);
 
-	mpi_set(G, pwd_entry->g);
-	mpi_set(N, pwd_entry->n);
-	mpi_set(V, pwd_entry->v);
+	gcry_mpi_set(G, pwd_entry->g);
+	gcry_mpi_set(N, pwd_entry->n);
+	gcry_mpi_set(V, pwd_entry->v);
 
 	(*data) = gnutls_malloc(n_n + n_g + pwd_entry->salt_size + 6 + 1);
 

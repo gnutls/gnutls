@@ -29,3 +29,6 @@ int _gnutls_generate_session_id( char* session_id, uint8* len);
 int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data, int datalen);
 int gnutls_handshake_begin(int cd, GNUTLS_STATE state);
 int gnutls_handshake_finish(int cd, GNUTLS_STATE state);
+void _gnutls_set_server_random( GNUTLS_STATE state, uint8* random);
+void _gnutls_set_client_random( GNUTLS_STATE state, uint8* random);
+int _gnutls_create_random( opaque* dst);

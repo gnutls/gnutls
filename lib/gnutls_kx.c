@@ -104,7 +104,11 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 
 	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_SERVER_KEY_EXCHANGE);
 	gnutls_free(data);
-	
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 	return data_size;
 }
 
@@ -118,12 +122,13 @@ int _gnutls_send_server_kx_message2(int cd, GNUTLS_STATE state)
 	    _gnutls_cipher_suite_get_kx_algo
 	    (state->gnutls_internals.current_cipher_suite);
 
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Sending server KX message2\n");
-#endif
 
 	if (_gnutls_kx_server_key_exchange2(algorithm) != 0) {
 		data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx2( state->gnutls_key, &data);
+
+#ifdef HARD_DEBUG
+		fprintf(stderr, "Sending server KX message2\n");
+#endif
 
 		if (data_size<0) {
 			gnutls_assert();
@@ -176,6 +181,11 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 
     	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CLIENT_KEY_EXCHANGE);
 	gnutls_free(data);
+
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	ret = generate_master( state);
 	if (ret<0) {
@@ -432,5 +442,10 @@ int _gnutls_send_certificate(int cd, GNUTLS_STATE state)
 	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CERTIFICATE);
 	gnutls_free(data);
 	
+	if (ret<0) {
+		gnutls_assert();
+		return ret;
+	}
+
 	return data_size;
 }

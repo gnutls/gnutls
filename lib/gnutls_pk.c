@@ -23,15 +23,177 @@
 #include <gnutls_gcry.h>
 #include <gnutls_pk.h>
 #include <gnutls_errors.h>
+#include <gnutls_random.h>
+#include <gnutls_datum.h>
+
+/* Do PKCS-1 RSA encryption. 
+ * pkey is the public key and n the modulus.
+ */
+
+int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
+		      MPI pkey, MPI n)
+{
+	int k, psize, i, ret;
+	MPI m, res;
+	opaque *edata, *ps;
+	MPI *_pkey[2];
+
+	k = gcry_mpi_get_nbits(n) / 8;
+
+	if (plaintext.size > k - 11) {
+		gnutls_assert();
+		return GNUTLS_E_ENCRYPTION_FAILED;
+	}
+
+	edata = gnutls_malloc(k);
+	if (edata == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	/* EB = 00||BT||PS||00||D 
+	 * (use block type 2)
+	 */
+
+	edata[0] = 0;
+	edata[1] = 2;
+	psize = k - 3 - plaintext.size;
+
+	ps = &edata[2];
+	_gnutls_get_random(ps, psize, GNUTLS_WEAK_RANDOM);
+	for (i = 0; i < psize; i++) {
+		if (ps[i] == 0)
+			ps[i] = 0xff;
+	}
+	ps[psize] = 0;
+	memcpy(&ps[psize + 1], plaintext.data, plaintext.size);
+
+	if (gcry_mpi_scan(&m, GCRYMPI_FMT_USG, edata, &k) != 0) {
+		gnutls_assert();
+		gnutls_free(edata);
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+	gnutls_free(edata);
+
+	_pkey[0] = &n;
+	_pkey[1] = &pkey;
+	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, m, _pkey);
+	gcry_mpi_release(m);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &psize, res);
+	ciphertext->data = gnutls_malloc(psize);
+	if (ciphertext->data == NULL) {
+		gnutls_assert();
+		gcry_mpi_release(res);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	gcry_mpi_print(GCRYMPI_FMT_USG, ciphertext->data, &psize, res);
+	ciphertext->size = psize;
+
+	gcry_mpi_release(res);
+
+	return 0;
+}
+
+
+/* Do PKCS-1 RSA decryption. 
+ * pkey is the private key and n the modulus.
+ */
+
+int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
+		      MPI pkey, MPI n)
+{
+	int k, esize, i, ret;
+	MPI c, res;
+	opaque *edata;
+	MPI *_pkey[2];
+
+	k = gcry_mpi_get_nbits(n) / 8;
+	
+	esize = ciphertext.size;
+
+	if (esize!=k) {
+		gnutls_assert();
+		return GNUTLS_E_DECRYPTION_FAILED;
+	}
+	
+	if (gcry_mpi_scan(&c, GCRYMPI_FMT_USG, ciphertext.data, &esize) != 0) {
+		gnutls_assert();
+		gnutls_free(edata);
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	_pkey[0] = &n;
+	_pkey[1] = &pkey;
+
+	ret = _gnutls_pk_encrypt(GCRY_PK_RSA, &res, c, _pkey);
+	gcry_mpi_release(c);
+
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &esize, res);
+	edata = gnutls_malloc(esize);
+	if (edata == NULL) {
+		gnutls_assert();
+		gcry_mpi_release(res);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	gcry_mpi_print(GCRYMPI_FMT_USG, edata, &esize, res);
+
+	gcry_mpi_release(res);
+
+	/* EB = 00||BT||PS||00||D 
+	 * (use block type 2)
+	 */
+
+	if (edata[0] != 0 || edata[1] != 2) {
+		gnutls_assert();
+		gnutls_free(edata);
+		return GNUTLS_E_DECRYPTION_FAILED;
+	}
+
+	ret = GNUTLS_E_DECRYPTION_FAILED;
+	for (i=2;i<esize;i++) {
+		if (edata[i]==0) { 
+			ret = 0;
+			break;
+		}
+	}
+	i++;
+	
+	if (ret < 0) {
+		gnutls_assert();
+		gnutls_free(edata);
+		return GNUTLS_E_DECRYPTION_FAILED;
+	}
+	
+	if (gnutls_set_datum( plaintext, &edata[i], esize - i) < 0) {
+		gnutls_assert();
+		gnutls_free(edata);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	gnutls_free(edata);
+
+	return 0;
+}
 
 /* this is taken from gnupg 
  */
- 
+
 /****************
  * Emulate our old PK interface here - sometime in the future we might
  * change the internal design to directly fit to libgcrypt.
  */
-int _gnutls_pk_encrypt(enum gcry_pk_algos algo, MPI * resarr, MPI data, MPI * pkey)
+int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI **pkey)
 {
 	GCRY_SEXP s_ciph, s_data, s_pkey;
 	int rc;
@@ -39,14 +201,14 @@ int _gnutls_pk_encrypt(enum gcry_pk_algos algo, MPI * resarr, MPI data, MPI * pk
 	/* make a sexp from pkey */
 	if (algo == GCRY_PK_RSA) {
 		rc = gcry_sexp_build(&s_pkey, NULL,
-				     "(public-key(rsa(p%m)(e%m)))", 
-				     pkey[0], pkey[1] );
+				     "(public-key(rsa(p%m)(e%m)))",
+				     *pkey[0], *pkey[1]);
 	} else {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
 	}
 
-	if (rc!=0) {
+	if (rc != 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
@@ -62,14 +224,26 @@ int _gnutls_pk_encrypt(enum gcry_pk_algos algo, MPI * resarr, MPI data, MPI * pk
 	gcry_sexp_release(s_data);
 	gcry_sexp_release(s_pkey);
 
-	if (rc);
-	else {			/* add better error handling or make gnupg use S-Exp directly */
+	if (rc != 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+		
+	} else {		/* add better error handling or make gnupg use S-Exp directly */
 		GCRY_SEXP list = gcry_sexp_find_token(s_ciph, "a", 0);
-		/* assert(list); */
+		if (list == NULL) {
+			gnutls_assert();
+			gcry_sexp_release(s_ciph);
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
+
 		resarr[0] = gcry_sexp_nth_mpi(list, 1, 0);
-		/* assert(resarr[0]); */
 		gcry_sexp_release(list);
 
+		if (resarr[0] == NULL) {
+			gnutls_assert();
+			gcry_sexp_release(s_ciph);
+			return GNUTLS_E_UNKNOWN_ERROR;
+		}
 	}
 
 	gcry_sexp_release(s_ciph);

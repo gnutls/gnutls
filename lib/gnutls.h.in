@@ -159,4 +159,10 @@ typedef struct {
 				*/
 } X509PKI_SERVER_CREDENTIALS;
 
+/* CERTFILE is an x509 certificate in PEM form.
+ * KEYFILE is a pkcs-1 private key in PEM form.
+ */
+int gnutls_read_certs(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
+		      char *KEYFILE);
+
 /* error codes appended here */

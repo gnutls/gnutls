@@ -173,5 +173,7 @@ create_structure(char *dest_name,char *source_name);
 int
 delete_structure(char *root_name);
 
+int parser_asn1(char *file_name);
+
 #endif
 

@@ -8,5 +8,4 @@
 # define GNUTLS_STRONG_RANDOM GCRY_STRONG_RANDOM
 #endif
 
-char *_gnutls_get_random(int bytes, int);
-void _gnutls_free_rand(void* rand);
+int _gnutls_get_random(opaque* res, int bytes, int);

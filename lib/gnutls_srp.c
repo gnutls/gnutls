@@ -90,6 +90,8 @@ int _gnutls_srp_gn(opaque ** ret_g, opaque ** ret_n, int bits)
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, g);
 	if (ret_g != NULL) {
 		tmp = gnutls_malloc(siz);
+		if (tmp==NULL) return GNUTLS_E_MEMORY_ERROR;
+		
 		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, g);
 
 		if (_gnutls_sbase64_encode(tmp, siz, ret_g) < 0) {
@@ -103,6 +105,8 @@ int _gnutls_srp_gn(opaque ** ret_g, opaque ** ret_n, int bits)
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &siz, prime);
 	if (ret_n != NULL) {
 		tmp = gnutls_malloc(siz);
+		if (tmp==NULL) return GNUTLS_E_MEMORY_ERROR;
+
 		gcry_mpi_print(GCRYMPI_FMT_USG, tmp, &siz, prime);
 		if (_gnutls_sbase64_encode(tmp, siz, ret_n) < 0) {
 			gnutls_free(tmp);
@@ -141,6 +145,8 @@ int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
 	if (result != NULL) {
 		*result = gnutls_malloc(result_size);
+		if ((*result)==NULL) return GNUTLS_E_MEMORY_ERROR;
+
 		gcry_mpi_print(GCRYMPI_FMT_USG, *result, &result_size, e);
 	}
 
@@ -191,11 +197,17 @@ MPI _gnutls_calc_srp_u(MPI B)
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &b_size, B);
 	b_holder = gnutls_malloc(b_size);
+	if (b_holder==NULL) return NULL;
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, b_holder, &b_size, B);
 
 
 	td = gnutls_hash_init(GNUTLS_MAC_SHA);
+	if (td==NULL) {
+		gnutls_free(b_holder);
+		gnutls_assert();
+		return NULL;
+	}
 	gnutls_hash(td, b_holder, b_size);
 	hd = gnutls_hash_deinit(td);
 	memcpy(&u, hd, sizeof(u));

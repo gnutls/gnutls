@@ -20,6 +20,9 @@
 
 #include <gnutls_int.h>
 
+#define GMIN(x,y) (x<y)?x:y
+#define GMAX(x,y) (x>y)?x:y
+
 uint32 uint24touint32( uint24 num);
 uint24 uint32touint24( uint32 num);
 uint32 READuint32( const opaque* data);

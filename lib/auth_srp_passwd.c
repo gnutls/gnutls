@@ -283,7 +283,6 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_KEY key, char* username
 GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	GNUTLS_SRP_PWD_ENTRY * pwd_entry = gnutls_malloc(sizeof(GNUTLS_SRP_PWD_ENTRY));
 	size_t n = sizeof diffie_hellman_group1_prime;
-	opaque * rand;
 	
 	pwd_entry->username = gnutls_malloc(strlen(RNDUSER)+1);
 	strcpy( pwd_entry->username, RNDUSER);
@@ -299,10 +298,12 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	}
 
 	pwd_entry->salt_size = RND_SALT_SIZE;
-	rand = _gnutls_get_random(RND_SALT_SIZE, GNUTLS_WEAK_RANDOM);
+	
 	pwd_entry->salt = gnutls_malloc(RND_SALT_SIZE);
-	memcpy( pwd_entry->salt, rand, RND_SALT_SIZE);
-	_gnutls_free_rand( rand);
+	if (_gnutls_get_random(pwd_entry->salt, RND_SALT_SIZE, GNUTLS_WEAK_RANDOM) < 0) {
+		gnutls_assert();
+		return NULL;
+	}
 	
 	pwd_entry->algorithm = 0;
 

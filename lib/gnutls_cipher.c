@@ -435,7 +435,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	uint16 c_length;
 	uint8 *data;
 	uint8 pad;
-	uint8 *rand;
+	uint8 rand;
 	uint64 seq_num;
 	int length;
 	GNUTLS_MAC_HANDLE td;
@@ -515,24 +515,27 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 
 		break;
 	case CIPHER_BLOCK:
-		rand = _gnutls_get_random(1, GNUTLS_WEAK_RANDOM);
+		if (_gnutls_get_random(&rand, 1, GNUTLS_WEAK_RANDOM) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 
 		/* make rand a multiple of blocksize */
 		if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
-			rand[0] = 0;
+			rand = 0;
 		} else {
-			rand[0] = (rand[0] / blocksize) * blocksize;
+			rand = (rand / blocksize) * blocksize;
 			/* added to avoid the case of pad calculated 0
 			 * seen below for pad calculation.
 			 */
-			if (rand[0] > blocksize) rand[0]-=blocksize;
+			if (rand > blocksize) rand-=blocksize;
 		}
 
 		length =
 		    compressed->length +
 		    state->security_parameters.hash_size;
 
-		pad = (uint8) (blocksize - (length % blocksize)) + rand[0];
+		pad = (uint8) (blocksize - (length % blocksize)) + rand;
 
 		length += pad;
 		data = gnutls_malloc(length);
@@ -551,7 +554,6 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		ciphertext->version.major = compressed->version.major;
 		ciphertext->version.minor = compressed->version.minor;
 
-		_gnutls_free_rand(rand);
 		break;
 	default:
 		gnutls_free(*cipher);

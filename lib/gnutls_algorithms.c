@@ -191,7 +191,7 @@ typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 static const gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_ANON, 0, 0, 0, 1,
 			     &anon_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, &x509pki_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, &rsa_auth_struct),
 /*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 0,
 			     &dhe_dss_auth_struct),*/
 /*	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 0, NULL),*/
@@ -1093,6 +1093,7 @@ _gnutls_qsort(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
 #ifdef DEBUG
 	if (size > MAX_ELEM_SIZE) {
 		gnutls_assert();
+		fprintf(stderr, "QSORT BUG\n");
 		exit(1);
 	}
 #endif
@@ -1232,6 +1233,7 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 	for (i = 0; i < j; i++)
 		fprintf(stderr, "\t%d: %s\n", i,
 			_gnutls_cipher_suite_get_name((*ciphers)[i]));
+	fprintf(stderr, "SORT BUG\n");
 	exit(0);
 #endif
 

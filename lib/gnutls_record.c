@@ -50,8 +50,10 @@ GNUTLS_Version ver;
 
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
 	state->connection_state.version = version;
-	state->gnutls_key->version.major = _gnutls_version_get_major(version);
-	state->gnutls_key->version.minor = _gnutls_version_get_minor(version);
+	if (state->gnutls_key!=NULL) {
+		state->gnutls_key->version.major = _gnutls_version_get_major(version);
+		state->gnutls_key->version.minor = _gnutls_version_get_minor(version);
+	}
 }
 
 int gnutls_is_secure_memory(const void* mem) {
@@ -426,6 +428,19 @@ int gnutls_bye(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
+/* This function will check the input buffer for 
+ * any pending alert.
+ */
+int _gnutls_check_for_pending_alert(int cd, GNUTLS_STATE state)
+{
+	int ret;
+
+	/* receive the closure alert */
+	ret = gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0, 0|MSG_DONTWAIT); 
+
+	return ret;
+}
+
 int gnutls_close_nowait(int cd, GNUTLS_STATE state)
 {
 	int ret;
@@ -457,7 +472,12 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
 		return GNUTLS_E_INVALID_SESSION;
 	}
-
+	
+	if (type==GNUTLS_HANDSHAKE) {
+		if ((ret = _gnutls_check_for_pending_alert(cd, state)) < 0)
+			return ret;
+	}
+	
 	if (sizeofdata < MAX_ENC_LEN) {
 		iterations = 1;
 		Size = sizeofdata;
@@ -637,6 +657,14 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	 * must be set to non blocking mode
 	 */
 	if ( _gnutls_Read(cd, headers, HEADER_SIZE, MSG_PEEK|flags) != HEADER_SIZE) {
+		if (type==GNUTLS_ALERT && flags==MSG_DONTWAIT) 
+			return 0;                 /* we expected an alert
+		                                   * but nothing came thus success.
+		                                   * we only wait for an alert
+		                                   * in check_pending_alert().
+		                                   */
+		/* How do we handle errno in a multithread environment? 
+		 */
 		if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) return 0; /* we were expecting close notify */
@@ -653,10 +681,11 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	/* if msb set and expecting handshake message
 	 * it should be SSL 2 hello 
 	 */
-		version = GNUTLS_SSL3; /* assume ssl 3.0 */
+		version = GNUTLS_SSL3; /* assume ssl 3.0 - not really needed */
 		length = (((headers[0] & 0x7f) << 8)) | headers[1];
 		header_size = 2;
-		recv_type = GNUTLS_HANDSHAKE; /* only v2 client hello we accept */
+		recv_type = GNUTLS_HANDSHAKE; /* we accept only v2 client hello
+					       */
 		state->gnutls_internals.v2_hello = length;
 #ifdef DEBUG
 		fprintf(stderr, "Record: V2 packet received. Length: %d\n", length);
@@ -671,7 +700,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		length = READuint16( &headers[3]);
 	}
 	
-	if ( gnutls_get_current_version(state) != version) {
+	if ( gnutls_get_current_version(state) != version && recv_type != GNUTLS_HANDSHAKE) {
 #ifdef DEBUG
 		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d) %d.%d\n", headers[0], headers[1], headers[2]);
 #endif
