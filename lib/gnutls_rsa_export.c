@@ -220,6 +220,57 @@ int gnutls_rsa_params_generate2(gnutls_rsa_params params, unsigned int bits)
 }
 
 /**
+  * gnutls_rsa_params_import_pkcs1 - This function will import RSA params from a pkcs1 structure
+  * @params: A structure where the parameters will be copied to
+  * @pkcs1_params: should contain a PKCS1 RSAPublicKey structure PEM or DER encoded
+  * @format: the format of params. PEM or DER.
+  *
+  * This function will extract the RSAPublicKey found in a PKCS1 formatted
+  * structure. 
+  *
+  * If the structure is PEM encoded, it should have a header
+  * of "BEGIN RSA PRIVATE KEY".
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_rsa_params_import_pkcs1(gnutls_rsa_params params, 
+	const gnutls_datum * pkcs1_params, gnutls_x509_crt_fmt format)
+{
+	return gnutls_x509_privkey_import( params, pkcs1_params,
+		format);
+}
+
+
+/**
+  * gnutls_rsa_params_export_pkcs1 - This function will export RSA params to a pkcs1 structure
+  * @params: Holds the RSA parameters
+  * @format: the format of output params. One of PEM or DER.
+  * @params_data: will contain a PKCS1 RSAPublicKey structure PEM or DER encoded
+  * @params_data_size: holds the size of params_data (and will be replaced by the actual size of parameters)
+  *
+  * This function will export the given RSA parameters to a PKCS1
+  * RSAPublicKey structure. If the buffer provided is not long enough to 
+  * hold the output, then GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  *
+  * If the structure is PEM encoded, it will have a header
+  * of "BEGIN RSA PRIVATE KEY".
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_rsa_params_export_pkcs1( gnutls_rsa_params params,
+	   gnutls_x509_crt_fmt format, unsigned char* params_data, 
+	   size_t* params_data_size)
+{
+	return gnutls_x509_privkey_export( params, format,
+		params_data, params_data_size);
+}
+
+
+/**
   * gnutls_rsa_params_export_raw - This function will export the RSA parameters
   * @params: a structure that holds the rsa parameters
   * @m: will hold the modulus
