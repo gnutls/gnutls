@@ -1048,36 +1048,69 @@ gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
   return expiredate;
 }
 
-static int
-is_trusted_key(const char *trustdb, PKT_public_key *pk)
+int
+_gnutls_openpgp_get_key_trust(const char *trustdb,
+                              const gnutls_datum *key,
+                              int *r_success)
 {
   int flags = 0;
-  int trustval = 0;
+  int ot = 0, trustval = 0;
   int rc = 0;
+  PKT pkt;
+  PKT_public_key *pk = NULL;
   IOBUF buf;
 
-  if (!trustdb || !pk)
-    return TRUST_UNKNOWN;
+  if (!trustdb || !key || !r_success)
+    return GNUTLS_CERT_NONE;
+
+  *r_success = 0;
+  rc = datum_to_openpgp_pkt(key, &pkt);
+  if (rc)
+    return GNUTLS_CERT_NONE;
+  
+  pk = openpgp_pkt_to_pk(pkt, 0);
+  if (!pk)
+    return GNUTLS_CERT_NONE;
 
   rc = cdk_iobuf_open( &buf, trustdb, IOBUF_MODE_RD );
   if (rc == -1)
     {
-      trustval = 0;
+      trustval = GNUTLS_CERT_NONE;
       goto leave;
     }
-  rc = cdk_trustdb_find_ownertrust(buf, pk, &trustval, &flags);
+  rc = cdk_trustdb_find_ownertrust(buf, pk, &ot, &flags);
   cdk_iobuf_close(buf);
   if (rc)
-    goto leave;
+    {
+      rc = GNUTLS_CERT_NONE;
+      goto leave;
+    }
 
-  /* fixme: how shall we handle revoked or disabled keys? */
-  if (flags || trustval == TRUST_UNKNOWN || trustval == TRUST_UNDEFINED)
-    trustval = -1;
+  if (flags & TRUST_FLAG_DISABLED)
+    {
+      trustval = GNUTLS_CERT_INVALID;
+      goto leave;
+    }
+  if (flags & TRUST_FLAG_REVOKED)
+    trustval |= GNUTLS_CERT_REVOKED;
+  if (ot == TRUST_EXPIRED)
+      trustval |= GNUTLS_CERT_EXPIRED;
+  switch (ot)
+    {
+    case TRUST_NEVER:
+      trustval |= GNUTLS_CERT_NOT_TRUSTED;
+      break;
 
-  if (trustval >= TRUST_MARGINAL)
-    trustval = 1;
-  else if (trustval == TRUST_NEVER)
-    trustval = 0;
+    case TRUST_UNKNOWN:
+    case TRUST_UNDEFINED:
+    case TRUST_MARGINAL:
+      
+    case TRUST_FULLY:
+    case TRUST_ULTIMATE:
+      trustval |= GNUTLS_CERT_TRUSTED;
+      *r_success = 1;
+      break;
+    }      
 
 leave:
   return trustval;
@@ -1093,7 +1126,7 @@ leave:
  * The return value is one of the CertificateStatus entries.
  **/
 int
-gnutls_openpgp_verify_key( char *trustdb,
+gnutls_openpgp_verify_key( const char *trustdb,
                            const gnutls_datum* keyring,
                            const gnutls_datum* cert_list,
                            int cert_list_length )
@@ -1119,6 +1152,14 @@ gnutls_openpgp_verify_key( char *trustdb,
       rc = GNUTLS_CERT_INVALID;
       goto leave;
     }
+
+  if ( trustdb )
+    {
+      int success = 0;
+      rc = _gnutls_openpgp_get_key_trust(trustdb, cert_list, &success);
+      if (!success)
+        goto leave;
+    }
   
   rc = datum_to_openpgp_pkt(cert_list, &pkt);
   if (rc)
@@ -1127,23 +1168,26 @@ gnutls_openpgp_verify_key( char *trustdb,
       return GNUTLS_CERT_INVALID;
     }
   
-  if (trustdb)
-    {
-      PKT_public_key *pk = NULL;
-
-      pk = openpgp_pkt_to_pk(pkt, 0);
-      if (!pk)
-        goto leave;
-      
-      if ( !is_trusted_key(trustdb, pk) )
-        {
-          rc = GNUTLS_CERT_INVALID;
-          goto leave;
-        }
-    }
-            
+  {
+    struct packet_s *p;
+    PKT_userid *id = NULL;
+    PKT_signature *sig = NULL;
+    for (p=pkt; p && p->id; p=p->next)
+      {
+        if (p->id == PKT_SIG)
+          sig = p->p.sig;
+        if (p->id == PKT_USERID && sig && !sig->userid_hash)
+          {
+            id = p->p.uid;
+            if (sig->type >= 0x10 && sig->type <= 0x13)
+              sig->userid_hash  = cdk_userid_create_hash(id);
+            id = NULL;
+          }
+      }
+  }
+  
   rc = cdk_key_check_sigs(pkt, khd, &status);
-  if (rc == CDKERR_NOKEY || rc == CDKERR_BAD_SIGNATURE)
+  if (rc == CDKERR_NOKEY)
     rc = 0; /* fixme */
       
   switch (status)

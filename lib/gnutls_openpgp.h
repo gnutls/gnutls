@@ -23,7 +23,7 @@ time_t gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert );
 
 time_t gnutls_openpgp_extract_key_expiration_time( const gnutls_datum  *cert );
 
-int gnutls_openpgp_verify_key( char *trust,
+int gnutls_openpgp_verify_key( const char *trustdb,
                                const gnutls_datum *keyring,
                                const gnutls_datum* cert_list,
                                int cert_list_length );
@@ -47,6 +47,9 @@ int gnutls_certificate_set_openpgp_keyring_mem(
 
 int gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
                            key_attr_t by, opaque *pattern);
+
+int gnutls_openpgp_get_key_trust(const char *trustdb, gnutls_datum *key);
+     
 
 int gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
                             gnutls_datum *key);
