@@ -424,8 +424,18 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 		schema = PBES2;
 
 
-	if (!(flags & GNUTLS_PKCS8_PLAIN) || password == NULL) {
+	if ((flags & GNUTLS_PKCS8_PLAIN) || password == NULL) 
+	{
+		_gnutls_free_datum(&tmp);
 
+		ret =
+		    _gnutls_x509_export_int(pkey_info, format,
+					    PEM_UNENCRYPTED_PKCS8,
+					    *output_data_size, output_data,
+					    output_data_size);
+
+		asn1_delete_structure(&pkey_info);
+	} else {
 		asn1_delete_structure(&pkey_info);	/* we don't need it */
 
 		ret = encode_to_pkcs8_key(schema, &tmp, password, &pkcs8_asn);
@@ -442,17 +452,6 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 					    output_data_size);
 
 		asn1_delete_structure(&pkcs8_asn);
-
-	} else {
-		_gnutls_free_datum(&tmp);
-
-		ret =
-		    _gnutls_x509_export_int(pkey_info, format,
-					    PEM_UNENCRYPTED_PKCS8,
-					    *output_data_size, output_data,
-					    output_data_size);
-
-		asn1_delete_structure(&pkey_info);
 	}
 
 	return ret;

@@ -38,10 +38,10 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	char digest[20];
 	char serial[40];
 	char dn[256];
-	int dn_size;
+	size_t dn_size;
 	size_t digest_size = sizeof(digest);
 	int i, j;
-	int serial_size = sizeof(serial);
+	size_t serial_size = sizeof(serial);
 	char printable[256];
 	char *print;
 	int bits, algo;
