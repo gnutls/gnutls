@@ -2,12 +2,16 @@
 
 This document tries to demonstrate and explain the \gnutls{} library API.
 A brief introduction to the protocols and the technology involved, is
-also included. This is also important for a \tls{} application programmer
-to know, because security and cryptographic protocols are involved. 
-Those require the programmer
-to make correct use of these protocols, or risks to offer a false feeling
-of security, on an unsecured application.
-
-Although this document tries to be self contained, basic 
-network programming and PKI knowlegde is assumed in most of this document. 
+also included. That way a \tls{} application programmer can better understand
+the \gnutls{} purpose and actual offerings. 
+Even if \gnutls{} is a typical library software, it operates over several
+security and cryptographic protocols, which require the programmer
+to make careful and correct usage of them. Otherwise he risks to offer
+just a false sense of security. Also note that a program should not be
+considered secure just because it uses \gnutls{} or any other cryptographic library.
+There are several ways to compromise a program or a communication line
+and \gnutls{} only helps with some of them. 
+\par
+This document tries to be self contained, although basic 
+network programming and PKI knowlegde is assumed in most of it. 
 \cite{GUTPKI} is a good introduction to Public Key Infrastructure.
