@@ -1191,3 +1191,20 @@ _gnutls_supported_compression_methods(GNUTLS_STATE state, uint8 ** comp)
 
 	return SUPPORTED_COMPRESSION_METHODS;
 }
+
+/**
+  * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
+  * @type: is a certificate type
+  *
+  * Returns a string that contains the name 
+  * of the specified MAC algorithm.
+  **/
+const char *gnutls_certificate_type_get_name( GNUTLS_CertificateType type)
+{
+	char *ret = NULL;
+
+	if (type==GNUTLS_CRT_X509) ret = "X.509";
+	if (type==GNUTLS_CRT_OPENPGP) ret = "OPENPGP";
+
+	return ret;
+}
