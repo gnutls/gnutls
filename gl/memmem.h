@@ -17,34 +17,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.  */
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
+#ifndef MEMMEM_H
+# define MEMMEM_H
 
-/* Get strlen, strncmp, size_t. */
-#include <string.h>
+/* Get memmem, if available. */
+# include <string.h>
 
-/* Locate first occurance of zero terminated string LITTLE in the
-   first LEN characters of the string BIG.  The terminating zero in
-   LITTLE is not used for comparison.  Return pointer to match within
-   BIG, or NULL if no match is found.  If LITTLE is the empty string,
-   BIG is returned.  */
-char *
-memstr (const char *big, const char *little, size_t len)
-{
-  size_t littlelen = strlen (little);
-  char *p = (char*) big;
-  size_t i;
+# if defined HAVE_DECL_MEMMEM && !HAVE_DECL_MEMMEM
+void *
+memmem (const void *haystack, size_t haystack_len,
+	const void *needle, size_t needle_len);
+# endif
 
-  if (*little == '\0')
-    return p;
-
-  if (len < littlelen)
-    return NULL;
-
-  for (i = 0; i <= len - littlelen; i++)
-    if (memcmp (&p[i], little, littlelen) == 0)
-      return &p[i];
-
-  return NULL;
-}
+#endif /* MEMMEM_H */

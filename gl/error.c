@@ -40,7 +40,7 @@
 # define mbsrtowcs __mbsrtowcs
 #endif
 
-#if !_LIBC
+#if USE_UNLOCKED_IO
 # include "unlocked-io.h"
 #endif
 

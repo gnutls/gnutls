@@ -40,7 +40,7 @@ typedef int ssize_t;
 # include <strings.h>
 #endif
 
-#include <memstr.h>
+#include <memmem.h>
 
 #ifdef HAVE_STDDEF_H
 # include <stddef.h>
