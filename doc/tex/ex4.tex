@@ -1,0 +1,160 @@
+\begin{verbatim}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <gnutls.h>
+
+#define MAX_BUF 1024
+#define CRLFILE "crl.pem"
+#define CAFILE "ca.pem"
+#define SA struct sockaddr
+#define MSG "GET / HTTP/1.0\r\n\r\n"
+
+const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, 0 };
+const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
+const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
+
+int main()
+{
+   const char *PORT = "443";
+   const char *SERVER = "127.0.0.1";
+   int err, ret;
+   int sd, ii, alert;
+   struct sockaddr_in sa;
+   GNUTLS_STATE state;
+   char buffer[MAX_BUF + 1];
+   GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
+   /* variables used in session resuming */
+   int t;
+   char *session;
+   int session_size;
+
+   if (gnutls_global_init() < 0) {
+      fprintf(stderr, "global state initialization error\n");
+      exit(1);
+   }
+   /* X509 stuff */
+   if (gnutls_certificate_allocate_client_sc(&xcred) < 0) {
+      fprintf(stderr, "memory error\n");
+      exit(1);
+   }
+   gnutls_certificate_set_x509_trust_file(xcred, CAFILE, GNUTLS_X509_FMT_PEM);
+
+   for (t = 0; t < 2; t++) {    /* connect 2 times to the server */
+
+      sd = socket(AF_INET, SOCK_STREAM, 0);
+      memset(&sa, '\0', sizeof(sa));
+      sa.sin_family = AF_INET;
+      sa.sin_port = htons(atoi(PORT));
+      inet_pton(AF_INET, SERVER, &sa.sin_addr);
+
+      err = connect(sd, (SA *) & sa, sizeof(sa));
+      if (err < 0) {
+         fprintf(stderr, "Connect error");
+         exit(1);
+      }
+      gnutls_init(&state, GNUTLS_CLIENT);
+
+      gnutls_protocol_set_priority(state, protocol_priority);
+      gnutls_cipher_set_priority(state, cipher_priority);
+      gnutls_compression_set_priority(state, comp_priority);
+      gnutls_kx_set_priority(state, kx_priority);
+      gnutls_mac_set_priority(state, mac_priority);
+
+      gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+
+      if (t > 0) { /* if this is not the first time we connect */
+         gnutls_session_set_data(state, session, session_size);
+         free(session);
+      }
+      
+      gnutls_transport_set_ptr( state, sd);
+
+      /* Perform the TLS handshake
+       */
+      ret = gnutls_handshake( state);
+
+      if (ret < 0) {
+         fprintf(stderr, "*** Handshake failed\n");
+         gnutls_perror(ret);
+         goto end;
+      } else {
+         printf("- Handshake was completed\n");
+      }
+
+      if (t == 0) { /* the first time we connect */
+         /* get the session data size */
+         gnutls_session_get_data(state, NULL, &session_size);
+         session = malloc(session_size);
+
+         /* put session data to the session variable */
+         gnutls_session_get_data(state, session, &session_size);
+
+      } else { /* the second time we connect */
+
+         /* check if we actually resumed the previous session */
+         if (gnutls_session_resumed( state) == 0) {
+            printf("- Previous session was resumed\n");
+         } else {
+            fprintf(stderr, "*** Previous session was NOT resumed\n");
+         }
+      }
+
+      /* This function was defined in a previous example
+       */
+      print_info(state);
+
+      gnutls_record_send( state, MSG, strlen(MSG));
+
+      ret = gnutls_record_recv( state, buffer, MAX_BUF);
+      if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
+         if (ret == 0) {
+            printf("- Peer has closed the GNUTLS connection\n");
+            goto end;
+         } else {
+            fprintf(stderr, "*** Received corrupted data(%d) - server has terminated the connection abnormally\n",
+                    ret);
+            goto end;
+         }
+      } else {
+         if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
+            alert = gnutls_alert_get(state);
+            printf("* Received alert [%d]: %s\n", alert, gnutls_alert_get_name(alert));
+         if (ret == GNUTLS_E_REHANDSHAKE) {
+            printf("* Received HelloRequest message (server asked to rehandshake)\n");
+            gnutls_alert_send_appropriate( state, ret); /* we don't want rehandshake */
+         }
+      }
+
+      if (ret > 0) {
+         printf("- Received %d bytes: ", ret);
+         for (ii = 0; ii < ret; ii++) {
+            fputc(buffer[ii], stdout);
+         }
+         fputs("\n", stdout);
+      }
+      gnutls_bye( state, GNUTLS_SHUT_RDWR);
+
+    end:
+
+      shutdown(sd, SHUT_RDWR);  /* no more receptions */
+      close(sd);
+
+      gnutls_deinit(state);
+
+   }  /* for() */
+
+   gnutls_certificate_free_client_sc(xcred);
+
+   gnutls_global_deinit();
+
+   return 0;
+}
+
+\end{verbatim}
