@@ -8,6 +8,7 @@ Current list:
 * Add PKCS-12 support
 * Convert documentation to texinfo format
 * Merge common stuff in DHE and DHA key exchange
+* Add GPGSM certificate manager support
 - Add Kerberos support
 
 (+) Means high priority 

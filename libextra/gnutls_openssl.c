@@ -112,7 +112,7 @@ SSL *SSL_new(SSL_CTX *ctx)
     if (!ssl)
         return NULL;
 
-    err = gnutls_certificate_allocate_sc(&ssl->gnutls_cred);
+    err = gnutls_certificate_allocate_cred(&ssl->gnutls_cred);
     if (err < 0)
     {
         last_error = err;
@@ -146,7 +146,7 @@ SSL *SSL_new(SSL_CTX *ctx)
 
 void SSL_free(SSL *ssl)
 {
-    gnutls_certificate_free_sc(ssl->gnutls_cred);
+    gnutls_certificate_free_cred(ssl->gnutls_cred);
     gnutls_deinit(ssl->gnutls_state);
     free(ssl);
     return;

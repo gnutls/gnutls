@@ -90,14 +90,14 @@ void _gnutls_free_cert(gnutls_cert cert)
 }
 
 /**
-  * gnutls_certificate_free_sc - Used to free an allocated CERTIFICATE CREDENTIALS structure
+  * gnutls_certificate_free_cred - Used to free an allocated CERTIFICATE CREDENTIALS structure
   * @sc: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_certificate_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
+void gnutls_certificate_free_cred(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 {
 	int i, j;
 
@@ -130,14 +130,14 @@ void gnutls_certificate_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 
 
 /**
-  * gnutls_certificate_allocate_sc - Used to allocate an x509 SERVER CREDENTIALS structure
+  * gnutls_certificate_allocate_cred - Used to allocate an x509 SERVER CREDENTIALS structure
   * @res: is a pointer to an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_certificate_allocate_sc(GNUTLS_CERTIFICATE_CREDENTIALS * res)
+int gnutls_certificate_allocate_cred(GNUTLS_CERTIFICATE_CREDENTIALS * res)
 {
 	*res = gnutls_calloc(1, sizeof(CERTIFICATE_CREDENTIALS_INT));
 

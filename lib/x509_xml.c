@@ -441,7 +441,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, char *name,
 								 &len3);
 
 					if (len2 > 0 && strcmp( p->name, "type")==0) {
-						ret = _gnutls_x509_attribute_type2string( up->left->value, up->value+len3, len2, tmp, sizeof(tmp));
+						ret = _gnutls_x509_oid_data2string( up->left->value, up->value+len3, len2, tmp, sizeof(tmp));
 	
 						if (ret >= 0) {
 							STR_APPEND( tmp);

@@ -96,6 +96,9 @@ typedef enum GNUTLS_PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA
 
 typedef const int* GNUTLS_LIST;
 
+/* STATE is not really descriptive. Think of it as
+ * as session.
+ */
 struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
@@ -173,7 +176,7 @@ int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
 
-/* set our version - 0 for TLS 1.0 and 1 for SSL3 */
+/* get the currently used protocol version */
 GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
 
 const char *gnutls_protocol_get_name(GNUTLS_Version version);
@@ -209,9 +212,12 @@ void gnutls_handshake_set_max_packet_length( GNUTLS_STATE state, int max);
 /* returns libgnutls version */
 const char* gnutls_check_version( const char*);
 
-/* Functions for setting/clearing credentials */
+/* Functions for setting/clearing credentials 
+ */
 int gnutls_clear_creds( GNUTLS_STATE state);
-/* cred is a structure defined by the kx algorithm */
+
+/* cred is a structure defined by the kx algorithm 
+ */
 int gnutls_cred_set( GNUTLS_STATE, GNUTLS_CredType type, void* cred);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
@@ -224,21 +230,29 @@ typedef GNUTLS_CERTIFICATE_CREDENTIALS GNUTLS_CERTIFICATE_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* GNUTLS_ANON_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* GNUTLS_ANON_CLIENT_CREDENTIALS;
 
-void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
-int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
+void gnutls_anon_free_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS sc);
+int gnutls_anon_allocate_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
+#define gnutls_anon_free_server_sc gnutls_anon_free_server_cred
+#define gnutls_anon_allocate_server_sc gnutls_anon_allocate_server_cred
+
 int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
 void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTLS_DH_PARAMS);
 
-void gnutls_anon_free_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc);
-int gnutls_anon_allocate_client_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
+void gnutls_anon_free_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS sc);
+int gnutls_anon_allocate_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
+#define gnutls_anon_free_client_sc gnutls_anon_free_client_cred
+#define gnutls_anon_allocate_client_sc gnutls_anon_allocate_client_cred
+
 int gnutls_anon_set_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
 
 
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
-void gnutls_certificate_free_sc( GNUTLS_CERTIFICATE_CREDENTIALS sc);
-int gnutls_certificate_allocate_sc( GNUTLS_CERTIFICATE_CREDENTIALS *sc);
+void gnutls_certificate_free_cred( GNUTLS_CERTIFICATE_CREDENTIALS sc);
+int gnutls_certificate_allocate_cred( GNUTLS_CERTIFICATE_CREDENTIALS *sc);
+#define gnutls_certificate_free_sc gnutls_certificate_free_cred
+#define gnutls_certificate_allocate_sc gnutls_certificate_allocate_cred
 
 int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS);
 

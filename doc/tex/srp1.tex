@@ -44,7 +44,7 @@ int main()
       exit(1);
    }
 
-   if (gnutls_srp_allocate_client_sc(&xcred) < 0) {
+   if (gnutls_srp_allocate_client_cred(&xcred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
    }
@@ -143,7 +143,7 @@ int main()
 
    gnutls_deinit(state);
 
-   gnutls_srp_free_client_sc(xcred);
+   gnutls_srp_free_client_cred(xcred);
 
    gnutls_global_deinit();
 

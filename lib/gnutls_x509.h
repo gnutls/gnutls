@@ -15,7 +15,7 @@ time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
 time_t _gnutls_x509_utcTime2gtime(char *ttime);
 time_t _gnutls_x509_generalTime2gtime(char *ttime);
 
-int _gnutls_x509_attribute_type2string( const char* OID, void* value, 
+int _gnutls_x509_oid_data2string( const char* OID, void* value, 
 	int value_size, char * res, int res_size);
 
 const char* _gnutls_x509_oid2string( const char* OID);

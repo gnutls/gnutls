@@ -463,7 +463,7 @@ int main(int argc, char **argv)
    if (generate != 0)
       generate_dh_primes();
 
-   if (gnutls_certificate_allocate_sc(&cert_cred) < 0) {
+   if (gnutls_certificate_allocate_cred(&cert_cred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
    }
@@ -521,7 +521,7 @@ int main(int argc, char **argv)
    /* this is a password file (created with the included srpcrypt utility) 
     * Read README.crypt prior to using SRP.
     */
-   gnutls_srp_allocate_server_sc(&srp_cred);
+   gnutls_srp_allocate_server_cred(&srp_cred);
 
    if (srp_passwd!=NULL)
    if ((ret=gnutls_srp_set_server_cred_file(srp_cred, srp_passwd, srp_passwd_conf)) < 0) {
@@ -531,7 +531,7 @@ int main(int argc, char **argv)
    }
 
 
-   gnutls_anon_allocate_server_sc(&dh_cred);
+   gnutls_anon_allocate_server_cred(&dh_cred);
    if (generate != 0)
       gnutls_anon_set_server_dh_params(dh_cred, dh_params);
 
@@ -759,9 +759,9 @@ int main(int argc, char **argv)
     }
 
 
-   gnutls_certificate_free_sc(cert_cred);
-   gnutls_srp_free_server_sc(srp_cred);
-   gnutls_anon_free_server_sc(dh_cred);
+   gnutls_certificate_free_cred(cert_cred);
+   gnutls_srp_free_server_cred(srp_cred);
+   gnutls_anon_free_server_cred(dh_cred);
 
 #ifdef HAVE_LIBGDBM
    if (nodb==0) wrap_gdbm_deinit();

@@ -33,27 +33,27 @@
 static int anon_tmp;
 
 /**
-  * gnutls_anon_free_server_sc - Used to free an allocated GNUTLS_ANON_SERVER_CREDENTIALS structure
+  * gnutls_anon_free_server_cred - Used to free an allocated GNUTLS_ANON_SERVER_CREDENTIALS structure
   * @sc: is an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_anon_free_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
+void gnutls_anon_free_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
 
 	gnutls_free( sc);
 }
 
 /**
-  * gnutls_anon_allocate_server_sc - Used to allocate an GNUTLS_ANON_SERVER CREDENTIALS structure
+  * gnutls_anon_allocate_server_cred - Used to allocate an GNUTLS_ANON_SERVER CREDENTIALS structure
   * @sc: is a pointer to an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
+int gnutls_anon_allocate_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
 
 	*sc = gnutls_calloc( 1, sizeof(ANON_SERVER_CREDENTIALS_INT));
 	(*sc)->dh_params = &_gnutls_dh_default_params;
@@ -63,27 +63,27 @@ int gnutls_anon_allocate_server_sc( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
 
 
 /**
-  * gnutls_anon_free_client_sc - Used to free an allocated GNUTLS_ANON_CLIENT_CREDENTIALS structure
+  * gnutls_anon_free_client_cred - Used to free an allocated GNUTLS_ANON_CLIENT_CREDENTIALS structure
   * @sc: is an &GNUTLS_ANON_CLIENT_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_anon_free_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS sc) {
+void gnutls_anon_free_client_cred( GNUTLS_ANON_CLIENT_CREDENTIALS sc) {
 	return;
 }
 
 
 /**
-  * gnutls_allocate_anon_client_sc - Used to allocate an GNUTLS_ANON_CLIENT CREDENTIALS structure
+  * gnutls_allocate_anon_client_cred - Used to allocate an GNUTLS_ANON_CLIENT CREDENTIALS structure
   * @sc: is a pointer to an &GNUTLS_ANON_CLIENT_CREDENTIALS structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_anon_allocate_client_sc( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
+int gnutls_anon_allocate_client_cred( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) {
 	/* anon_tmp is only there for *sc not to be null.
 	 * it is not used at all;
 	 */

@@ -146,20 +146,20 @@ int main(int argc, char **argv)
 	}
 
 	/* X509 stuff */
-	if (gnutls_certificate_allocate_sc(&xcred) < 0) {	/* space for 2 certificates */
+	if (gnutls_certificate_allocate_cred(&xcred) < 0) {	/* space for 2 certificates */
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 
 	/* SRP stuff */
-	if (gnutls_srp_allocate_client_sc(&srp_cred) < 0) {
+	if (gnutls_srp_allocate_client_cred(&srp_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 	gnutls_srp_set_client_cred( srp_cred, "test", "test");
 
 	/* ANON stuff */
-	if (gnutls_anon_allocate_client_sc(&anon_cred) < 0) {
+	if (gnutls_anon_allocate_client_cred(&anon_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
@@ -197,9 +197,9 @@ int main(int argc, char **argv)
 		i++;
 	} while(1);
 
-	gnutls_srp_free_client_sc(srp_cred);
-	gnutls_certificate_free_sc(xcred);
-	gnutls_anon_free_client_sc(anon_cred);
+	gnutls_srp_free_client_cred(srp_cred);
+	gnutls_certificate_free_cred(xcred);
+	gnutls_anon_free_client_cred(anon_cred);
 
 	gnutls_global_deinit();
 

@@ -563,7 +563,7 @@ int _gnutls_cipher_is_block(BulkCipherAlgorithm algorithm)
   * Returns 0 if the given cipher is invalid.
   *
   **/
-size_t gnutls_cipher_get_key_size(BulkCipherAlgorithm algorithm)
+size_t gnutls_cipher_get_key_size( GNUTLS_BulkCipherAlgorithm algorithm)
 {				/* In bytes */
 	size_t ret = 0;
 	GNUTLS_ALG_LOOP(ret = p->keysize);

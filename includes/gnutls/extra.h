@@ -30,12 +30,18 @@
 typedef struct DSTRUCT* GNUTLS_SRP_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* GNUTLS_SRP_CLIENT_CREDENTIALS;
 
-void gnutls_srp_free_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS sc);
-int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc);
+void gnutls_srp_free_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS sc);
+int gnutls_srp_allocate_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS *sc);
+#define gnutls_srp_free_client_sc gnutls_srp_free_client_cred
+#define gnutls_srp_allocate_client_sc gnutls_srp_allocate_client_cred
+
 int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char* password);
 
-void gnutls_srp_free_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS sc);
-int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc);
+void gnutls_srp_free_server_cred( GNUTLS_SRP_SERVER_CREDENTIALS sc);
+int gnutls_srp_allocate_server_cred( GNUTLS_SRP_SERVER_CREDENTIALS *sc);
+#define gnutls_srp_free_server_sc gnutls_srp_free_server_cred
+#define gnutls_srp_allocate_server_sc gnutls_srp_allocate_server_cred
+
 int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
 
 const char* gnutls_srp_server_get_username( GNUTLS_STATE state);

@@ -119,7 +119,7 @@ int i = 0;
 /* This function will convert an attribute value, specified by the OID,
  * to a string.
  */
-int _gnutls_x509_attribute_type2string( const char* OID, void* value, 
+int _gnutls_x509_oid_data2string( const char* OID, void* value, 
 	int value_size, char * res, int res_size) {
 
 int result;
@@ -134,6 +134,11 @@ ASN1_TYPE tmpasn;
 	}
 	
 	res[0] = 0;
+	
+	if ( _gnutls_x509_oid_data_printable( OID) == 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
 
 	ANAME = _gnutls_x509_oid2string( OID);
 	CHOICE = _gnutls_x509_oid_data_choice( OID);
@@ -236,7 +241,7 @@ static int _IREAD(ASN1_TYPE rasn, char* name, const char *OID,
 		return 1;
 	}
 	
-	result = _gnutls_x509_attribute_type2string( OID, str, len, res, res_size);
+	result = _gnutls_x509_oid_data2string( OID, str, len, res, res_size);
 	if (result < 0) return 1;
 	else return 0;
 }
@@ -1442,7 +1447,11 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 				gnutls_free(b64);
 				return ret;
 			}
-			break;	
+			break;
+		default:
+			gnutls_assert();
+			gnutls_free(b64);
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* this doesn't hurt in the DER case, since
