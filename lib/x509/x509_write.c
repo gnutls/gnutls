@@ -62,7 +62,7 @@ static void disable_optional_stuff( gnutls_x509_crt cert);
   *
   **/
 int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
-	const char *name, unsigned int sizeof_name)
+	const void *name, unsigned int sizeof_name)
 {
 	if (sizeof_name == 0 || name == NULL || crt == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
@@ -92,7 +92,7 @@ int gnutls_x509_crt_set_dn_by_oid(gnutls_x509_crt crt, const char* oid,
   *
   **/
 int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid, 
-	const char *name, unsigned int sizeof_name)
+	const void *name, unsigned int sizeof_name)
 {
 	if (sizeof_name == 0 || name == NULL || crt == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;

@@ -82,6 +82,8 @@ int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
 int gnutls_x509_crt_get_key_usage( gnutls_x509_crt cert, unsigned int* key_usage,
 	unsigned int* critical);
 
+int gnutls_x509_oid_known(const char* oid);
+
 /* key_usage will be an OR of the following values:
  */
 #define GNUTLS_KEY_DIGITAL_SIGNATURE 		256

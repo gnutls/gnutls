@@ -383,21 +383,24 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
 /**
   * gnutls_x509_crq_set_dn_by_oid - This function will set the Certificate request subject's distinguished name
   * @crq: should contain a gnutls_x509_crq structure
-  * @oid: holds an Object Identified in null terminated string
-  * @name: a pointer to the name
-  * @sizeof_name: holds the size of 'name'
+  * @oid: holds an Object Identifier in a null terminated string
+  * @data: a pointer to the input data
+  * @sizeof_data: holds the size of 'data'
   *
   * This function will set the part of the name of the Certificate request subject, specified
   * by the given OID. 
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * With this function you can only set the known OIDs.
+  * With this function you can only set the known OIDs. You can test
+  * for known OIDs using gnutls_x509_oid_known(). For OIDs that are
+  * not known (by gnutls) you should properly DER encode your data before
+  * calling this function.
   *
   * Returns 0 on success.
   *
   **/
 int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq crq, const char* oid, 
-	const char *name, unsigned int sizeof_name)
+	const void *data, unsigned int sizeof_data)
 {
 	if (sizeof_name == 0 || name == NULL || crq == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
