@@ -735,12 +735,6 @@ ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
 	res->data = data;
 	res->size = size;
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
 	return 0;
 
 	cleanup:
@@ -751,7 +745,7 @@ ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 }
 
 /* DER Encodes the src ASN1_TYPE and stores it to
- * dest in dest_name. Usefull to encode something and store it
+ * dest in dest_name. Useful to encode something and store it
  * as OCTET. If str is non null then the data are encoded as
  * an OCTET STRING.
  */

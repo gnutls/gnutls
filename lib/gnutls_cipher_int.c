@@ -61,6 +61,9 @@ gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
 	if (err == 0) {
 		gcry_cipher_setkey(ret, key->data, key->size);
 		if (iv->data!=NULL && iv->size>0) gcry_cipher_setiv(ret, iv->data, iv->size);
+	} else if (cipher != GNUTLS_CIPHER_NULL) {
+		gnutls_assert();
+		_gnutls_x509_log("Gcrypt cipher[%d] error: %s\n", cipher, gcry_strerror(err));
 	}
 
 	return ret;	

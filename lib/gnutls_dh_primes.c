@@ -34,8 +34,6 @@
 int _gnutls_get_dh_params(gnutls_dh_params dh_primes,
 				GNUTLS_MPI * ret_p, GNUTLS_MPI * ret_g)
 {
-	GNUTLS_MPI g = NULL, prime = NULL;
-
 	if (dh_primes == NULL || dh_primes->_prime == NULL ||
 		dh_primes->_generator == NULL) 
 	{
@@ -43,21 +41,23 @@ int _gnutls_get_dh_params(gnutls_dh_params dh_primes,
 		return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
 	}
 
-	prime = _gnutls_mpi_copy(dh_primes->_prime);
-	g = _gnutls_mpi_copy(dh_primes->_generator);
-
-	if (prime == NULL || g == NULL) {	/* if not prime was found */
-		gnutls_assert();
-		_gnutls_mpi_release(&g);
-		_gnutls_mpi_release(&prime);
-		*ret_p = NULL;
-		return GNUTLS_E_MEMORY_ERROR;
+	if (ret_p != NULL) { /* caller wants the prime */
+		*ret_p = _gnutls_mpi_copy(dh_primes->_prime);
+		if (*ret_p == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 	}
 
-	if (ret_p)
-		*ret_p = prime;
-	if (ret_g)
-		*ret_g = g;
+	if (ret_g != NULL) { /* caller wants the generator */
+		*ret_g = _gnutls_mpi_copy(dh_primes->_generator);
+		if (*ret_g == NULL) {
+			gnutls_assert();
+			if (ret_p) _gnutls_mpi_release(ret_p);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+	}
+
 	return 0;
 }
 
@@ -69,7 +69,6 @@ GNUTLS_MPI _gcry_generate_elg_prime(int mode, unsigned pbits,
 int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 			      int bits)
 {
-
 	GNUTLS_MPI g, prime;
 	int qbits;
 
@@ -84,21 +83,24 @@ int _gnutls_dh_generate_prime(GNUTLS_MPI * ret_g, GNUTLS_MPI * ret_n,
 	 * bad emulation.
 	 */
 	qbits = 120 + (((bits / 256) - 1) * 20);
-	if (qbits & 1)		/* better have a even one */
+	if (qbits & 1)		/* better have an even number */
 		qbits++;
 
 	prime = _gcry_generate_elg_prime(0, bits, qbits, g, NULL);
-	if (prime == NULL || g == NULL) {
-		_gnutls_mpi_release(&g);
-		_gnutls_mpi_release(&prime);
+	if (prime == NULL) {
 		gnutls_assert();
+		_gnutls_mpi_release(&g);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	if (ret_g)
 		*ret_g = g;
+	else
+		_gnutls_mpi_release(&g);
 	if (ret_n)
 		*ret_n = prime;
+	else
+		_gnutls_mpi_release(&prime);
 
 	return 0;
 
@@ -122,7 +124,7 @@ int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *
 			const gnutls_datum* generator)
 {
 	GNUTLS_MPI tmp_prime, tmp_g;
-	size_t siz = 0;
+	size_t siz;
 
 	siz = prime->size;
 	if (_gnutls_mpi_scan(&tmp_prime, prime->data, &siz)) {
@@ -137,7 +139,7 @@ int gnutls_dh_params_import_raw(gnutls_dh_params dh_params, const gnutls_datum *
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	/* copy the generated values to the structure
+	/* store the generated values
 	 */
 	dh_params->_prime = tmp_prime;
 	dh_params->_generator = tmp_g;
@@ -196,9 +198,9 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
   * This function is normally slow. 
   * 
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
-  * Also note that the DH parameters are only usefull to servers. 
-  * Since clients use the parameters sent by the server, thus it's
-  * no use calling this in client side.
+  * Also note that the DH parameters are only useful to servers.
+  * Since clients use the parameters sent by the server, it's of
+  * no use to call this in client side.
   *
   **/
 int gnutls_dh_params_generate2(gnutls_dh_params params, int bits)
@@ -215,7 +217,7 @@ int gnutls_dh_params_generate2(gnutls_dh_params params, int bits)
 
 /**
   * gnutls_dh_params_import_pkcs3 - This function will import DH params from a pkcs3 structure
-  * @params: A structure were the parameters will be copied to
+  * @params: A structure where the parameters will be copied to
   * @pkcs3_params: should contain a PKCS3 DHParams structure PEM or DER encoded
   * @format: the format of params. PEM or DER.
   *
@@ -265,13 +267,18 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
 	     (_gnutls_get_gnutls_asn(), "GNUTLS.DHParameter", &c2))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
+		if (need_free != 0) {
+			gnutls_free( _params.data); _params.data = NULL;
+		}
 		return _gnutls_asn2err(result);
 	}
 
 	result =
 	    asn1_der_decoding(&c2, _params.data, _params.size, NULL);
 	    
-	if (need_free != 0) gnutls_free( _params.data);
+	if (need_free != 0) {
+		gnutls_free( _params.data); _params.data = NULL;
+	}
 
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
@@ -416,9 +423,10 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 		tmp = gnutls_alloca( len);
 		if (tmp == NULL) {
 			gnutls_assert();
+			asn1_delete_structure(&c2);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		
+
 		if ((result=asn1_der_coding( c2, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			gnutls_afree( tmp);
@@ -440,6 +448,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 
 		if (result == 0) {	/* oooops */
 			gnutls_assert();
+			gnutls_free(out);
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 

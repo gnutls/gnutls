@@ -60,8 +60,7 @@ const MOD_AUTH_STRUCT anon_auth_struct = {
 
 static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 	GNUTLS_MPI g, p;
-	int bits, ret;
-	ANON_SERVER_AUTH_INFO info;
+	int ret;
 	const gnutls_anon_server_credentials cred;
 	
 	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_ANON, NULL);
@@ -70,8 +69,6 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	bits = _gnutls_dh_get_prime_bits( session);
-
 	if ( (ret=_gnutls_get_dh_params( cred->dh_params, &p, &g)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -79,13 +76,15 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 
 	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT), 1)) < 0) {
 		gnutls_assert();
+		cleanup_gp:
+		_gnutls_mpi_release(&g);
+		_gnutls_mpi_release(&p);
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info( session);	
 	if ((ret=_gnutls_dh_set_prime_bits( session, _gnutls_mpi_get_nbits(p))) < 0) {
 		gnutls_assert();
-		return ret;
+		goto cleanup_gp;
 	}
 	
 	ret = _gnutls_dh_common_print_server_kx( session, g, p, data);
@@ -94,7 +93,6 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 
 	if (ret < 0) {
 		gnutls_assert();
-		return ret;
 	}
 
 	return ret;

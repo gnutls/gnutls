@@ -66,7 +66,6 @@ void *ret;
 	ret = gnutls_realloc( ptr, size);
 	if ( ret == NULL) {
 		gnutls_free( ptr);
-		return NULL;
 	}
 
 	return ret;

@@ -67,7 +67,7 @@ void _gnutls_set_current_version(gnutls_session session, gnutls_protocol_version
   * if there are pending data to socket buffer. Used only   
   * if you have changed the default low water value (default is 1).
   * Normally you will not need that function. 
-  * This function is only usefull if using berkeley style sockets.
+  * This function is only useful if using berkeley style sockets.
   * Otherwise it must be called and set lowat to zero.
   *
   **/

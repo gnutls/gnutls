@@ -90,7 +90,10 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, size_t data_siz
 		if (cred==NULL) return 0;
 
 		if (cred->username!=NULL) { /* send username */
-			len = strlen(cred->username) % 256;
+			len = strlen(cred->username);
+			
+			if (len > 255) len = 255;
+
 			if (data_size < len+1) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;

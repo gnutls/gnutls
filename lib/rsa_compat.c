@@ -46,13 +46,13 @@ static int check_bits(int bits)
 	return 0;
 }
 
-#define FREE_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
-		_gnutls_mpi_release(&rsa_params->params[i])
 
+#define FREE_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
+               _gnutls_mpi_release(&rsa_params->params[i]);
 
 /*-
   * gnutls_rsa_params_set - This function will replace the old RSA parameters
-  * @rsa_params: Is a structure will hold the parameters
+  * @rsa_params: Is a structure which will hold the parameters
   * @m: holds the modulus
   * @e: holds the public exponent
   * @d: holds the private exponent
@@ -75,58 +75,52 @@ int gnutls_rsa_params_set(gnutls_rsa_params rsa_params,
 	gnutls_datum d, gnutls_datum p, gnutls_datum q, gnutls_datum u,
 	int bits) 
 {
-	int i = 0;
-	size_t siz = 0;
+	int i;
+	size_t siz;
 
 	if (check_bits(bits) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	for (i=0;i<RSA_PRIVATE_PARAMS;i++) {
-		_gnutls_mpi_release(&rsa_params->params[i]);
-	}
+	FREE_PRIVATE_PARAMS
 
 	siz = m.size;
 	if (_gnutls_mpi_scan(&rsa_params->params[0], m.data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		failed:
+		FREE_PRIVATE_PARAMS
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = e.size;
 	if (_gnutls_mpi_scan(&rsa_params->params[1], e.data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		goto failed;
 	}
 
 	siz = d.size;
 	if (_gnutls_mpi_scan(&rsa_params->params[2], d.data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		goto failed;
 	}
 
 	siz = p.size;
 	if (_gnutls_mpi_scan(&rsa_params->params[3], p.data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		goto failed;
 	}
 
 	siz = q.size;
 	if (_gnutls_mpi_scan(&rsa_params->params[4], q.data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		goto failed;
 	}
 
 	siz = u.size;
 	if (_gnutls_mpi_scan(&rsa_params->params[5], u.data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
+		goto failed;
 	}
 
 	return 0;
@@ -155,7 +149,7 @@ int gnutls_rsa_params_set(gnutls_rsa_params rsa_params,
   * generated RSA parameters.
   * 
   * Note that the bits value should be 512.
-  * Also note that the generation of new RSA parameters is only usefull
+  * Also note that the generation of new RSA parameters is only useful
   * to servers. Clients use the parameters sent by the server, thus it's
   * no use calling this in client side.
   *

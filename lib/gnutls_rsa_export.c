@@ -209,7 +209,7 @@ void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
   * 
   * Note that if the parameters are to be used in export cipher suites the 
   * bits value should be 512 or less.
-  * Also note that the generation of new RSA parameters is only usefull
+  * Also note that the generation of new RSA parameters is only useful
   * to servers. Clients use the parameters sent by the server, thus it's
   * no use calling this in client side.
   *

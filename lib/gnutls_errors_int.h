@@ -117,6 +117,8 @@
 #define GNUTLS_E_INVALID_PASSWORD -99
 #define GNUTLS_E_MAC_VERIFY_FAILED -100 /* for PKCS #12 MAC */
 
+#define GNUTLS_E_BASE64_ENCODING_ERROR -101
+
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -250
 
 /* _INT_ internal errors. Not exported */

@@ -83,12 +83,12 @@ int gnutls_dh_params_set(gnutls_dh_params dh_params, gnutls_datum prime,
   * This function will generate a new pair of prime and generator for use in 
   * the Diffie-Hellman key exchange. The new parameters will be allocated using
   * gnutls_malloc() and will be stored in the appropriate datum.
-  * This function is normally very slow. An other function
+  * This function is normally very slow. Another function
   * (gnutls_dh_params_set()) should be called in order to replace the 
   * included DH primes in the gnutls library.
   * 
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
-  * Also note that the generation of new DH parameters is only usefull
+  * Also note that the generation of new DH parameters is only useful
   * to servers. Clients use the parameters sent by the server, thus it's
   * no use calling this in client side.
   *
