@@ -515,7 +515,7 @@ void print_list(void)
 	printf(", ANON-DH\n");
 
 	printf("Compression methods:");
-	printf(" ZLIB");
+	printf(" DEFLATE");
 	printf(", LZO");
 	printf(", NULL\n");
 }
@@ -649,10 +649,13 @@ void parse_comp(char **comp, int ncomp, int *comp_priority)
 		for (j = i = 0; i < ncomp; i++) {
 			if (strncasecmp(comp[i], "NUL", 3) == 0)
 				comp_priority[j++] = GNUTLS_COMP_NULL;
-			if (strncasecmp(comp[i], "ZLI", 3) == 0)
-				comp_priority[j++] = GNUTLS_COMP_ZLIB;
-			if (strncasecmp(comp[i], "LZO", 3) == 0)
+			else if (strncasecmp(comp[i], "ZLI", 3) == 0)
+				comp_priority[j++] = GNUTLS_COMP_DEFLATE;
+			else if (strncasecmp(comp[i], "DEF", 3) == 0)
+				comp_priority[j++] = GNUTLS_COMP_DEFLATE;
+			else if (strncasecmp(comp[i], "LZO", 3) == 0)
 				comp_priority[j++] = GNUTLS_COMP_LZO;
+			else fprintf(stderr, "Unknown compression: '%s'\n", comp[i]);
 		}
 		comp_priority[j] = 0;
 	}
