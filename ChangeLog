@@ -1,3 +1,28 @@
+2003-02-14 15:48  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/gnutls.h.in.in, lib/gnutls_cert.c,
+	lib/gnutls_ui.h, src/cli.c, src/common.c, src/tests.c, src/tests.h,
+	src/tls_test.c:
+
+	Corrected bugs in gnutls_x509_rdn_get(). Added a test to print the
+	server's trusted CAs in gnutls-cli-debug, and in gnutls-cli.  
+
+2003-02-14 10:10  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, lib/gnutls_cert.c, lib/gnutls_dh_primes.c,
+	lib/gnutls_mpi.c, lib/gnutls_mpi.h, lib/gnutls_pk.c,
+	lib/gnutls_privkey.c, lib/gnutls_x509.c:
+
+	ported to libtasn1 0.2.x. Also the included minitasn1 was replaced
+	by the 0.2.1 version of libtasn1.  
+
+2003-02-14 08:42  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_int.h:
+
+	gnutls_const_datum was removed from exported types, for the time
+	being.  
+
 2003-02-13 09:23  nmav <nmav@gnutls.org>
 
 	* README, doc/TODO, lib/auth_cert.c, lib/gnutls_int.h,
