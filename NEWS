@@ -1,17 +1,18 @@
-Version 0.3.2
+Version 0.3.2 (5/01/2001)
 - Corrected bug which did not allow a client to accept multiple CA names
 - Added gnutls_fingerprint()
 - Added gnutls_x509pki_extract_certificate_serial()
 - Added gnutls_b64_encode_fmt() and gnutls_b64_decode_fmt()
 - Corrected behaviour in version advertizing
 - Updated documentation
+- Prefixed all types in gnutls.h with 'GNUTLS_' to avoid namespace collisions
 
 Version 0.3.1 (21/12/2001)
 - Corrections in the configuration files
 - Fixes a bug in anonymous authentication
 
 Version 0.3.0 (17/12/2001)
-- Corrected bug in new integer formatting (now we use the old again)
+- Corrected bug in new integer formatting (now we use the old format again)
 - Several corrections and usual cleanups
 
 Version 0.2.91 (10/12/2001)

@@ -129,8 +129,8 @@ int gnutls_error_is_fatal(int error)
   * gnutls_perror - prints a string to stderr with a description of an error
   * @error: is an error returned by a gnutls function. Error is always a negative value.
   *
-  * This function is like perror(). However it accepts an error returned by a gnutls
-  * function. 
+  * This function is like perror(). The only difference is that it accepts an 
+  * error returned by a gnutls function. 
   **/
 void gnutls_perror(int error)
 {
