@@ -159,7 +159,7 @@ static gnutls_session init_tls_session( const char* hostname)
       gnutls_handshake_set_private_extensions(session, 1);
 
    if (disable_extensions == 0)
-      gnutls_set_server_name( session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
+      gnutls_server_name_set( session, GNUTLS_NAME_DNS, hostname, strlen(hostname));
 
    gnutls_cipher_set_priority(session, cipher_priority);
    gnutls_compression_set_priority(session, comp_priority);

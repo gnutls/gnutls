@@ -310,7 +310,7 @@ int print_info(gnutls_session session)
 			int type;
 
 			/* This fails in client side */
-			if (gnutls_get_server_name
+			if (gnutls_server_name_get
 			    (session, dns, &dns_size, &type, 0) == 0) {
 				printf("- Given server name[%d]: %s\n",
 				       type, dns);

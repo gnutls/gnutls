@@ -350,7 +350,7 @@ char *peer_print_info(gnutls_session session, int *ret_length,
       int dns_size = sizeof(dns);
       int type;
 
-      if (gnutls_get_server_name(session, dns, &dns_size, &type, 0) == 0) {
+      if (gnutls_server_name_get(session, dns, &dns_size, &type, 0) == 0) {
 	 sprintf(tmp2, "\n<p>Server Name: %s</p>\n", dns);
       }
 
