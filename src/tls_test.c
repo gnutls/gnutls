@@ -139,6 +139,11 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	if (gnutls_global_init_extra() < 0) {
+		fprintf(stderr, "global state initialization error\n");
+		exit(1);
+	}
+
 	printf("Resolving '%s'...\n", hostname);
 	/* get server name */
 	server_host = gethostbyname(hostname);

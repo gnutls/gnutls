@@ -159,19 +159,20 @@ int test_srp( gnutls_session session) {
 		ADD_ALL_MACS(session);
 
 		ADD_KX(session, GNUTLS_KX_SRP);
+
 		gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
 
 		return do_handshake( session);
 }
 
 int test_export( gnutls_session session) {
-		ADD_ALL_CIPHERS(session);
 		ADD_ALL_COMP(session);
 		ADD_ALL_CERTTYPES(session);
 		ADD_ALL_PROTOCOLS(session);
 		ADD_ALL_MACS(session);
 
 		ADD_KX(session, GNUTLS_KX_RSA_EXPORT);
+		ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
 		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 		return do_handshake( session);
