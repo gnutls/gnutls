@@ -1,3 +1,40 @@
+2003-04-01 19:13  nmav <nmav@gnutls.org>
+
+	* src/: cli.c, common.c, crypt.c, serv.c, tests.c, tls_test.c:
+
+	Some fixes to allow proper compiling when
+	--disable-srp-authentication and --disable-anon-authentication are
+	specified. Patch by Paul Sheer.  
+
+2003-04-01 18:50  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_cert.c, lib/gnutls_x509.c, src/cli.c,
+	src/common.c, src/serv.c:
+
+	Added the --disable-extra-pki configure option, which disables all
+	extra PKI stuff like PKCS #7, PKCS #10 etc. To be used in constraint
+	systems.  
+
+2003-04-01 08:47  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_mpi.c:
+
+	several bug fixes in the certificate parsing, and some in the asn1
+	parser.  
+
+2003-03-31 23:05  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_int.h, gnutls_x509.c:
+
+	More fixes to eliminate constants.  
+
+2003-03-31 22:46  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_algorithms.c, gnutls_dh_primes.c, gnutls_mpi.c,
+	gnutls_mpi.h, gnutls_pk.c:
+
+	Eliminated the need for a hard coded max MPI parameter size.  
+
 2003-03-29 10:59  nmav <nmav@gnutls.org>
 
 	* src/common.c:
