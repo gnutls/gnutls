@@ -7,3 +7,6 @@ void _gnutls_int2str(int k, char *data);
 int _gnutls_check_x509_key_usage( const gnutls_cert * cert, KXAlgorithm alg);
 time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
 time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
+
+time_t _gnutls_x509_utcTime2gtime(char *ttime);
+time_t _gnutls_x509_generalTime2gtime(char *ttime);

@@ -276,7 +276,7 @@ time_t _gnutls_x509_get_time(node_asn * c2, char *root, char *when)
 		len = sizeof(ttime) - 1;
 		result = asn1_read_value(c2, name, ttime, &len);
 		if (result == ASN_OK)
-			ctime = _gnutls_generalTime2gtime(ttime);
+			ctime = _gnutls_x509_generalTime2gtime(ttime);
 	} else {		/* UTCTIME */
 
 		_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.validity."); 
@@ -285,7 +285,7 @@ time_t _gnutls_x509_get_time(node_asn * c2, char *root, char *when)
 		len = sizeof(ttime) - 1;
 		result = asn1_read_value(c2, name, ttime, &len);
 		if (result == ASN_OK)
-			ctime = _gnutls_utcTime2gtime(ttime);
+			ctime = _gnutls_x509_utcTime2gtime(ttime);
 	}
 
 	/* We cannot handle dates after 2031 in 32 bit machines.
@@ -2511,4 +2511,186 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 	}
 
 	return count;
+}
+
+/* TIME functions 
+ * Convertions between generalized or UTC time to time_t
+ *
+ */
+
+/* This is an emulations of the struct tm.
+ * Since we do not use libc's functions, we don't need to
+ * depend on the libc structure.
+ */
+typedef struct fake_tm {
+	int tm_mon;
+	int tm_year; /* FULL year - ie 1971 */
+	int tm_mday;
+	int tm_hour;
+	int tm_min;
+	int tm_sec;
+} fake_tm;
+
+/* The mktime_utc function is due to Russ Allbery (rra@stanford.edu),
+ * who placed it under public domain:
+ */
+ 
+/* The number of days in each month. 
+ */
+static const int MONTHDAYS[] = {
+	31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+};
+
+    /* Whether a given year is a leap year. */
+#define ISLEAP(year) \
+        (((year) % 4) == 0 && (((year) % 100) != 0 || ((year) % 400) == 0))
+
+/*
+ **  Given a struct tm representing a calendar time in UTC, convert it to
+ **  seconds since epoch.  Returns (time_t) -1 if the time is not
+ **  convertable.  Note that this function does not canonicalize the provided
+ **  struct tm, nor does it allow out of range values or years before 1970.
+ */
+static time_t mktime_utc(const struct fake_tm *tm)
+{
+	time_t result = 0;
+	int i;
+
+/* We do allow some ill-formed dates, but we don't do anything special
+ * with them and our callers really shouldn't pass them to us.  Do
+ * explicitly disallow the ones that would cause invalid array accesses
+ * or other algorithm problems. 
+ */
+	if (tm->tm_mon < 0 || tm->tm_mon > 11 || tm->tm_year < 1970)
+		return (time_t) - 1;
+
+/* Convert to a time_t. 
+ */
+	for (i = 1970; i < tm->tm_year; i++)
+		result += 365 + ISLEAP(i);
+	for (i = 0; i < tm->tm_mon; i++)
+		result += MONTHDAYS[i];
+	if (tm->tm_mon > 1 && ISLEAP(tm->tm_year))
+		result++;
+	result = 24 * (result + tm->tm_mday - 1) + tm->tm_hour;
+	result = 60 * result + tm->tm_min;
+	result = 60 * result + tm->tm_sec;
+	return result;
+}
+
+
+/* this one will parse dates of the form:
+ * month|day|hour|minute (2 chars each)
+ * and year is given. Returns a time_t date.
+ */
+static time_t _gnutls_x509_time2gtime(char *ttime, int year)
+{
+	char xx[3];
+	struct fake_tm etime;
+	time_t ret;
+
+	if (strlen( ttime) < 8) {
+		gnutls_assert();
+		return (time_t) -1;
+	}
+
+	etime.tm_year = year;
+
+	/* In order to work with 32 bit
+	 * time_t.
+	 */
+	if (sizeof (time_t) <= 4 && etime.tm_year >= 2038)
+	      return (time_t)2145914603; /* 2037-12-31 23:23:23 */
+
+	xx[2] = 0;
+
+/* get the month
+ */
+	memcpy(xx, ttime, 2);	/* month */
+	etime.tm_mon = atoi(xx) - 1;
+	ttime += 2;
+
+/* get the day
+ */
+	memcpy(xx, ttime, 2);	/* day */
+	etime.tm_mday = atoi(xx);
+	ttime += 2;
+
+/* get the hour
+ */
+	memcpy(xx, ttime, 2);	/* hour */
+	etime.tm_hour = atoi(xx);
+	ttime += 2;
+
+/* get the minutes
+ */
+	memcpy(xx, ttime, 2);	/* minutes */
+	etime.tm_min = atoi(xx);
+	ttime += 2;
+
+	etime.tm_sec = 0;
+
+	ret = mktime_utc(&etime);
+
+	return ret;
+}
+
+/* returns a time_t value that contains the given time.
+ * The given time is expressed as:
+ * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
+ */
+time_t _gnutls_x509_utcTime2gtime(char *ttime)
+{
+	char xx[3];
+	int year;
+
+	if (strlen( ttime) < 10) {
+		gnutls_assert();
+		return (time_t) -1;
+	}
+	xx[2] = 0;
+/* get the year
+ */
+	memcpy(xx, ttime, 2);	/* year */
+	year = atoi(xx);
+	ttime += 2;
+
+	if (year > 49)
+		year += 1900;
+	else
+		year += 2000;
+
+	return _gnutls_x509_time2gtime( ttime, year);
+}
+
+/* returns a time_t value that contains the given time.
+ * The given time is expressed as:
+ * YEAR(4)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)
+ */
+time_t _gnutls_x509_generalTime2gtime(char *ttime)
+{
+	char xx[5];
+	int year;
+
+	if (strlen( ttime) < 12) {
+		gnutls_assert();
+		return (time_t) -1;
+	}
+
+	if (strchr(ttime, 'Z') == 0) {
+		gnutls_assert();
+		/* sorry we don't support it yet
+		 */
+		return (time_t)-1;
+	}
+	xx[4] = 0;
+
+/* get the year
+ */
+	memcpy(xx, ttime, 4);	/* year */
+	year = atoi(xx);
+	ttime += 4;
+
+	return _gnutls_x509_time2gtime( ttime, year);
+
 }
