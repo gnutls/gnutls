@@ -139,7 +139,6 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 	opaque *holder, hd[MAX_HASH_SIZE];
 	size_t holder_size;
 	GNUTLS_HASH_HANDLE td;
-	uint32 u;
 	int ret;
 	GNUTLS_MPI res;
 

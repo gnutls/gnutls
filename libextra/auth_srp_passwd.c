@@ -358,25 +358,16 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
  */
 static int _randomize_pwd_entry(SRP_PWD_ENTRY* entry) 
 {
-char rnduser[64];
-unsigned char rndsuffix[5];
+unsigned char rnd;
 
 	if (entry->g.size == 0 || entry->n.size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
-	_gnutls_get_random( rndsuffix, sizeof(rndsuffix), GNUTLS_WEAK_RANDOM);
-	sprintf( rnduser, "__invalid%x%x%x%x", rndsuffix[0], 
-		rndsuffix[1], rndsuffix[2], rndsuffix[3]);
-	entry->salt.size = (rndsuffix[4] % 10) + 9;
+	_gnutls_get_random( &rnd, 1, GNUTLS_WEAK_RANDOM);
+	entry->salt.size = (rnd % 10) + 9;
 
-	entry->username = gnutls_strdup(rnduser);
-	if (entry->username == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	
 	entry->v.data = gnutls_malloc(20);
 	entry->v.size = 20;
 	if (entry->v.data==NULL) {
