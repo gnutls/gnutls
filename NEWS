@@ -5,6 +5,8 @@ Version 0.5.9
   other compiler.
 - Updated 'gnutls-cli' with the starttls parameter, to allow testing
   starttls implementations.
+- Added gnutls_x509_extract_certificate_dn_string() which returns the peer's
+  Distinguished name in a single string.
 
 Version 0.5.8 (25/09/2002)
 - Updated documentation.

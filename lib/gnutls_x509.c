@@ -2827,3 +2827,50 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
 	return _gnutls_x509_time2gtime( ttime, year);
 
 }
+
+/**
+  * gnutls_x509_extract_certificate_dn_string - This function returns the certificate's distinguished name
+  * @cert: should contain an X.509 DER encoded certificate
+  * @buf: a pointer to a structure to hold the peer's name
+  * @sizeof_buf: holds the size of 'buf'
+  * @issuer: if non zero, then extract the name of the issuer, instead of the holder
+  *
+  * This function will copy the name of the certificate holder in the provided buffer. The name 
+  * will be in the form "/C=xxxx/O=yyyy/CN=zzzz".
+  *
+  * Returns GNUTLS_E_INVALID_REQUEST if the provided buffer is not long enough.
+  *
+  **/
+int gnutls_x509_extract_certificate_dn_string(char *buf, int sizeof_buf, 
+   const gnutls_datum * cert, int issuer)
+{
+   gnutls_x509_dn dn;
+   int len = 0;
+
+   buf[0] = 0;
+
+#define PRINTX(buf, bufsize, x, y) { \
+   if (y[0]!=0 && (strlen(x)+strlen(y)+4 < bufsize)) \
+      sprintf(buf, "/%s=%s", x, y); \
+}
+   if (!issuer)
+      gnutls_x509_extract_certificate_dn(cert, &dn);
+   else
+      gnutls_x509_extract_certificate_issuer_dn( cert, &dn);
+
+   PRINTX(buf, sizeof_buf, "C", dn.country);
+   len = strlen(buf);
+   PRINTX(buf + len, sizeof_buf - len - 1, "ST",
+	  dn.state_or_province_name);
+   len = strlen(buf);
+   PRINTX(buf + len, sizeof_buf - len - 1, "L", dn.locality_name);
+   len = strlen(buf);
+   PRINTX(buf + len, sizeof_buf - len - 1, "O", dn.organization);
+   len = strlen(buf);
+   PRINTX(buf + len, sizeof_buf - len - 1, "OU",
+	  dn.organizational_unit_name);
+   len = strlen(buf);
+   PRINTX(buf + len, sizeof_buf - len - 1, "E", dn.email);
+
+   return;
+}

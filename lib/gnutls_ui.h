@@ -84,6 +84,8 @@ int gnutls_x509_certificate_to_xml(const gnutls_datum * cert, gnutls_datum* res,
 
 int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_x509_dn*);
 int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);
+int gnutls_x509_extract_certificate_dn_string(char *buf, int sizeof_buf,
+   const gnutls_datum * cert, int issuer);
 int gnutls_x509_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_x509_dn *);
 int gnutls_x509_extract_certificate_version( const gnutls_datum*);
 int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
