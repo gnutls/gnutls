@@ -1,5 +1,6 @@
 /*
  *      Copyright (C) 2002 Fabio Fiorina
+ *      Copyright (C) 2004 Simon Josefsson
  *
  * This file is part of LIBTASN1.
  *
@@ -28,7 +29,7 @@
 extern "C" {
 #endif
 
-#define LIBTASN1_VERSION "0.2.11"
+#define LIBTASN1_VERSION "0.2.13"
 
 #include <sys/types.h>
 #include <time.h>
@@ -147,10 +148,10 @@ asn1_retCode asn1_delete_structure(ASN1_TYPE *structure);
 
 asn1_retCode asn1_delete_element(ASN1_TYPE structure,const char *element_name);
 
-asn1_retCode asn1_write_value(ASN1_TYPE *node_root,const char *name,
+asn1_retCode asn1_write_value(ASN1_TYPE node_root,const char *name,
 			      const void *ivalue,int len);
 
-asn1_retCode asn1_read_value(ASN1_TYPE *root,const char *name,
+asn1_retCode asn1_read_value(ASN1_TYPE root,const char *name,
 			     void* ivalue,int *len);
 
 asn1_retCode asn1_number_of_elements(ASN1_TYPE element,const char *name,int *num);

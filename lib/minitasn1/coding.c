@@ -1,5 +1,6 @@
 /*
  *      Copyright (C) 2002  Fabio Fiorina
+ *      Copyright (C) 2004  Simon Josefsson
  *
  * This file is part of LIBASN1.
  *
@@ -716,27 +717,31 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
 /**
   * asn1_der_coding - Creates the DER encoding for the NAME structure
   * @element: pointer to an ASN1 element
-  * @name: the name of the structure you want to encode (it must be inside *POINTER).
-  * @ider: vector that will contain the DER encoding. DER must be a pointer to memory cells already allocated.
-  * @len: number of bytes of *der: der[0]..der[len-1], Initialy holds the sizeof of der vector.
-  * @errorDescription : return the error description or an empty string if success.
-  * Description:
+  * @name: the name of the structure you want to encode (it must be
+  *   inside *POINTER).
+  * @ider: vector that will contain the DER encoding. DER must be a
+  *   pointer to memory cells already allocated.
+  * @len: number of bytes of *@ider: @ider[0]..@ider[len-1], Initialy
+  *   holds the sizeof of der vector.
+  * @errorDescription : return the error description or an empty
+  *   string if success.
   *
-  * Creates the DER encoding for the NAME structure (inside *POINTER structure).
-  * 
+  * Creates the DER encoding for the NAME structure (inside *POINTER
+  * structure).
+  *
   * Returns:
   *
-  *   ASN1_SUCCESS\: DER encoding OK
+  *   ASN1_SUCCESS: DER encoding OK.
   *
-  *   ASN1_ELEMENT_NOT_FOUND\: NAME is not a valid element.
+  *   ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
   *
-  *   ASN1_VALUE_NOT_FOUND\: there is an element without a value.
+  *   ASN1_VALUE_NOT_FOUND: There is an element without a value.
   *
-  *   ASN1_MEM_ERROR\: der vector isn't big enough. Also in this case LEN
-  *   will contain the length needed.
+  *   ASN1_MEM_ERROR: @ider vector isn't big enough. Also in this case
+  *     LEN will contain the length needed.
   *
   **/
-asn1_retCode 
+asn1_retCode
 asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
                 char *ErrorDescription)
 {

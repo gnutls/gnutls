@@ -66,10 +66,10 @@ static libtasn1_error_entry error_algorithms[] = {
 
 /**
   * libtasn1_perror - prints a string to stderr with a description of an error
-  * @error: is an error returned by a libasn1 function. 
+  * @error: is an error returned by a libasn1 function.
   *
-  * This function is like perror(). The only difference is that it accepts an 
-  * error returned by a libasn1 function. 
+  * This function is like perror(). The only difference is that it
+  * accepts an error returned by a libasn1 function.
   **/
 void libtasn1_perror(asn1_retCode error)
 {
@@ -88,8 +88,8 @@ void libtasn1_perror(asn1_retCode error)
   * libtasn1_strerror - Returns a string with a description of an error
   * @error: is an error returned by a libtasn1 function.
   *
-  * This function is similar to strerror(). The only difference is that it
-  * accepts an error (number) returned by a libasn1 function.
+  * This function is similar to strerror(). The only difference is
+  * that it accepts an error (number) returned by a libasn1 function.
   *
   * Returns: Pointer to static zero-terminated string describing error
   *   code.
@@ -114,7 +114,7 @@ void _libtasn1_log( const char *fmt, ...) {
 
  va_start(args,fmt);
  vsprintf( str,fmt,args); /* Flawfinder: ignore */
- va_end(args);   
+ va_end(args);
 
  fprintf(stderr, str);
 

@@ -1,5 +1,6 @@
 /*
  *      Copyright (C) 2000,2001 Fabio Fiorina
+ *      Copyright (C) 2004 Simon Josefsson
  *
  * This file is part of LIBASN1.
  *
@@ -872,17 +873,19 @@ parse_version_string( const char *s, int *major, int *minor, int *micro )
 }
 
 /**
-  * asn1_check_version - This function checks the library's version
-  * @req_version: the version to check
-  *
-  * Check library version.
-  *
-  * Return value: Check that the the version of the library is at
-  *   minimum the one given as a string in @req_version and return the
-  *   actual version string of the library; return NULL if the
-  *   condition is not met.  If %NULL is passed to this function no
-  *   check is done and only the version string is returned.
-  **/
+ * asn1_check_version - check for library version
+ * @req_version: Required version number, or NULL.
+ *
+ * Check that the the version of the library is at minimum the
+ * requested one and return the version string; return %NULL if the
+ * condition is not satisfied.  If a %NULL is passed to this function,
+ * no check is done, but the version string is simply returned.
+ *
+ * See %LIBTASN1_VERSION for a suitable @req_version string.
+ *
+ * Return value: Version string of run-time library, or %NULL if the
+ *   run-time library does not meet the required version number.
+ */
 const char *
 asn1_check_version( const char *req_version )
 {
