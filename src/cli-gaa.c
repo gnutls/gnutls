@@ -129,7 +129,7 @@ void gaa_help(void)
 	printf("GNU TLS test client\nUsage:  gnutls-cli [options] hostname\n\n\n");
 	__gaa_helpsingle('d', "debug", "integer ", "Enable debugging");
 	__gaa_helpsingle('r', "resume", "", "Connect, establish a session. Connect again and resume this session.");
-	__gaa_helpsingle('s', "starttls", "", "Connect, establish a plain session and start TLS when EOF is sent from the keyboard.");
+	__gaa_helpsingle('s', "starttls", "", "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received.");
 	__gaa_helpsingle(0, "crlf", "", "Send CR LF instead of LF.");
 	__gaa_helpsingle(0, "x509fmtder", "", "Use DER format for certificates to read from.");
 	__gaa_helpsingle('f', "fingerprint", "", "Send the openpgp fingerprint, instead of the key.");

@@ -18,7 +18,7 @@ option (d, debug) INT "integer" { $debug = $1 } "Enable debugging"
 option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again and resume this session."
 
 #int starttls;
-option (s, starttls) { $starttls = 1 } "Connect, establish a plain session and start TLS when EOF is sent from the keyboard."
+option (s, starttls) { $starttls = 1 } "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received."
 
 #int crlf;
 option (crlf) { $crlf = 1 } "Send CR LF instead of LF."
