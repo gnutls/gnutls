@@ -714,9 +714,47 @@ static int read_key_file(gnutls_certificate_credentials res, const char *keyfile
 	}
 
 	ret = read_key_mem( res, x, size, type);
+	memset( x, 0, size);
 	gnutls_free(x);
 	
 	return ret;
+}
+
+/**
+  * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the keys and the certificates associated
+  * with the given credentials. This function must not be called when a
+  * TLS negotiation that uses the credentials is in progress.
+  *
+  **/
+void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
+{
+	uint i, j;
+
+	for (i = 0; i < sc->ncerts; i++) {
+		for (j = 0; j < sc->cert_list_length[i]; j++) {
+			_gnutls_free_cert( &sc->cert_list[i][j]);
+		}
+		gnutls_free( sc->cert_list[i]);
+	}
+
+	gnutls_free(sc->cert_list_length);
+	sc->cert_list_length = NULL;
+
+	gnutls_free(sc->cert_list);
+	sc->cert_list = NULL;
+
+	for (i = 0; i < sc->ncerts; i++) {
+		_gnutls_free_private_key(sc->pkey[i]);
+	}
+
+	gnutls_free( sc->pkey);
+	sc->pkey = NULL;
+	
+	sc->ncerts = 0;
+
 }
 
 /**

@@ -212,7 +212,9 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 	   return NULL; /* no certificate */
 	}
 	
-	return &cred->cert_list[index][0].raw;
+	if (cred->ncerts > index)
+		return &cred->cert_list[index][0].raw;
+	return NULL;
 }
 
 /**

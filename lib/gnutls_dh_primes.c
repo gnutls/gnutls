@@ -397,7 +397,6 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 	}
 
 	if (format == GNUTLS_X509_FMT_DER) {
-#warning FIX THIS
 		if ((result=asn1_der_coding( c2, "", params_data, params_data_size, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);

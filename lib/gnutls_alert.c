@@ -94,6 +94,10 @@ const char* ret = NULL;
   * him of something important (eg. his Certificate could not be verified).
   * If the alert level is Fatal then the peer is expected to close the
   * connection, otherwise he may ignore the alert and continue.
+  *
+  * The error code of the underlying record send function will be returned,
+  * so you may also receive GNUTLS_E_INTERRUPTED or GNUTLS_E_AGAIN as well.
+  *
   * Returns 0 on success.
   *
   **/

@@ -620,14 +620,8 @@ int main(int argc, char **argv)
       }
 
    if (generate != 0 || read_dh_params != NULL) {
-      if (gnutls_certificate_set_dh_params(cert_cred, dh_params) < 0) {
-	 fprintf(stderr, "Error while setting DH parameters\n");
-	 exit(1);
-      }
-      if (gnutls_certificate_set_rsa_params(cert_cred, rsa_params) < 0) {
-	 fprintf(stderr, "Error while setting RSA parameters\n");
-	 exit(1);
-      }
+      gnutls_certificate_set_dh_params(cert_cred, dh_params);
+      gnutls_certificate_set_rsa_params(cert_cred, rsa_params);
    }
 
    /* this is a password file (created with the included srpcrypt utility) 
