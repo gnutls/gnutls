@@ -31,9 +31,9 @@
 #define READ_DEBUG
 #define WRITE_DEBUG
 #define HANDSHAKE_DEBUG
-#define RECORD_DEBUG
+#define RECORD_DEBUG*/
 #define DEBUG
-*/
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -368,6 +368,10 @@ typedef struct {
 					*/ 
 	int				send_buffer_prev_size; /* holds the
 	                                * data written in the previous runs.
+	                                */
+	int				send_buffer_user_size; /* holds the
+	                                * size of the user specified data to
+	                                * send.
 	                                */
 
 					/* 0 if no peeked data was kept, 1 otherwise.
