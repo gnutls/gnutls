@@ -6,6 +6,7 @@ See the end for copying conditions.
 * Version 1.1.21
 - Print DN of certificates with unknown characters in them, but in hexform
   only.
+- Add second precision to the X.509 parsing and generation functions.
 
 * Version 1.1.20 (2004-10-12)
 - Fix compile problem in gl/getpass.c on some systems.
