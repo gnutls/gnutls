@@ -479,10 +479,10 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * gnutls_x509_extract_certificate_subject_alt_name - This function returns the peer's alt name, if any
   * @cert: should contain an X.509 DER encoded certificate
   * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
-  * @ret: is the place where dns name will be copied to
+  * @ret: is the place where the alternative name will be copied to
   * @ret_size: holds the size of ret.
   *
-  * This function will return the alternative name (the dns part of it), contained in the
+  * This function will return the alternative names, contained in the
   * given certificate.
   * 
   * This is specified in X509v3 Certificate Extensions. 
