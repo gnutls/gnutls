@@ -575,7 +575,7 @@ leave:
  **/
 int
 gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
-                                       gnutls_dn *dn )
+                                       gnutls_openpgp_name *dn )
 {
   PKT pkt = NULL;
   PKT_userid *uid = NULL;
@@ -593,8 +593,9 @@ gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
     {
       rc = GNUTLS_E_UNKNOWN_ERROR;
       goto leave;
-    }    
-  strcpy( dn->common_name, uid->name );
+    }
+  memset(dn, 0, sizeof *dn);
+  strcpy( dn->name, uid->name );
 
   /*
    * Extract the email address from the userID string and save it to

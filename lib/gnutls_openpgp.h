@@ -6,7 +6,7 @@ int gnutls_certificate_set_openpgp_key_file(
                                             char* CERTFILE,
                                             char* KEYFILE);
 int gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
-                                                  gnutls_dn *dn);
+                                                  gnutls_openpgp_name *dn);
 int gnutls_openpgp_extract_certificate_version( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_certificate_activation_time(
                                                           const gnutls_datum

@@ -23,6 +23,11 @@ typedef struct {
 } gnutls_x509_dn;
 #define gnutls_DN gnutls_x509_dn
 
+typedef struct {
+	char name[GNUTLS_X509_CN_SIZE];
+	char email[GNUTLS_X509_CN_SIZE];
+} gnutls_openpgp_name;	
+
 /* For key Usage, test as:
  * if (st.keyUsage & X509KEY_DIGITAL_SIGNATURE) ...
  */
