@@ -57,7 +57,8 @@ case "${target}" in
       ;;
 esac
 
-dnl In order to use the reentrant libc functions
+dnl In order to use the reentrant libc functions.
+dnl I hope it is portable enough.
 CFLAGS="${CFLAGS} -D_REENTRANT -D_THREAD_SAFE"
 
 opt_dmalloc_mode=no
@@ -77,7 +78,7 @@ AC_MSG_RESULT($opt_efence_mode)
 opt_developer_mode=no
 AC_MSG_CHECKING([whether in maintanance mode])
 AC_ARG_ENABLE(developer-mode,
-[  --enable-developer-mode   enable developer mode],
+[  --enable-developer-mode    enable developer mode],
 opt_developer_mode=$enableval)
 AC_MSG_RESULT($opt_developer_mode)
 
@@ -172,6 +173,8 @@ AC_CHECK_HEADERS(unistd.h strings.h stddef.h alloca.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
 AC_CHECK_HEADERS(errno.h sys/time.h time.h)
 AC_CHECK_HEADERS(math.h limits.h float.h stdarg.h)
+dnl opencdk
+AC_CHECK_HEADERS(netdb.h)
 AC_CHECK_FUNCS(isascii memmove strnstr mmap gmtime_r inet_ntop,,)
 AC_FUNC_ALLOCA
 
@@ -299,22 +302,48 @@ else
 fi
 
 
+ac_enable_openpgp=yes
 AC_MSG_CHECKING([whether to disable OpenPGP Certificate authentication support])
 AC_ARG_ENABLE( openpgp-authentication, [  --disable-openpgp-authentication Disable the OpenPGP authentication support],
  ac_enable_openpgp=no
 )
+
 if test x$ac_enable_openpgp != xno; then
  AC_MSG_RESULT(no)
- AM_PATH_LIBOPENCDK( 0.5.2, AC_DEFINE(HAVE_LIBOPENCDK, 1, [have libopencdk]),
- AC_MSG_ERROR([[
+else
+ AC_DEFINE(HAVE_LIBOPENCDK, 1, [have libopencdk])
+ AC_MSG_RESULT(yes)
+fi
+
+AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
+
+if test x$ac_enable_openpgp != xno; then
+ AC_ARG_WITH(included-opencdk,
+ 	[  --with-included-opencdk Use the included opencdk],
+  ac_enable_included_opencdk=$withval, 
+  ac_enable_included_opencdk=no
+  )
+
+if test x$ac_enable_included_opencdk = xno;then 
+  AM_PATH_LIBOPENCDK( 0.5.2, ,
+   ac_enable_included_opencdk=yes
+   AC_MSG_WARN([[
 ***
 *** libopencdk 0.5.2 was not found. You may want to get it from
 *** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
 ***
-]]))
-else
- AC_MSG_RESULT(yes)
+*** Will use the included opencdk.
+***
+]])
+)
 fi
+fi
+
+AC_MSG_CHECKING([whether to use the included opencdk])
+AC_MSG_RESULT($ac_enable_included_opencdk)
+
+AM_CONDITIONAL(ENABLE_INCLUDED_OPENCDK, test "$ac_enable_included_opencdk" = "yes")
+
 
 ac_enable_openssl=yes
 AC_MSG_CHECKING([whether to disable OpenSSL compatibility layer])
@@ -348,8 +377,15 @@ if test x$opt_developer_mode = xyes; then
  minitasn1_enabled=yes
 fi
 
+SAVED_LIBS=$LIBS
+
 AC_MSG_CHECKING([whether to use the included minitasn1])
 AC_MSG_RESULT($minitasn1_enabled)
+
+dnl CHECK FOR THE LIBTASN1 LIBRARY or use the included one
+dnl
+
+AM_CONDITIONAL(ENABLE_MINITASN1, test "$minitasn1_enabled" = "yes")
 
 
 dnl Check for libcfg+
@@ -398,6 +434,21 @@ fi
 dnl CHECK FOR LZO SUPPORT (whether to use the included one)
 dnl
 
+minilzo_enabled=no
+use_lzo=yes
+AC_ARG_WITH(lzo,
+	[  --without-lzo           do not use lzo compression],
+ use_lzo=no,
+ use_lzo=yes
+)
+
+AC_MSG_CHECKING([whether to include lzo compression support])
+AC_MSG_RESULT($use_lzo)
+
+if test x$use_lzo = xyes; then
+
+AC_DEFINE(USE_LZO, 1, [whether to use the lzo compression])
+
 if test x$opt_developer_mode = xyes; then
  minilzo_enabled=yes
 fi
@@ -421,30 +472,15 @@ AC_CHECK_LIB( lzo, lzo1x_1_compress, minilzo_enabled=no,
 fi
 
 if test x"$minilzo_enabled" = xyes; then
+ 
  AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
- LZO_OBJECTS="minilzo.lo"
-else
- LZO_LINK=-llzo
 fi
 
-AC_SUBST(LZO_OBJECTS)
-AC_SUBST(LZO_LINK)
-
-dnl CHECK FOR THE LIBTASN1 LIBRARY or use the included one
-dnl
-
-if test x"$minitasn1_enabled" = xyes; then
- MINITASN1_OBJECTS="minitasn1/coding.lo minitasn1/decoding.lo minitasn1/element.lo \
-	minitasn1/errors.lo minitasn1/gstr.lo minitasn1/parser_aux.lo minitasn1/structure.lo"
- MINITASN1_DIR=minitasn1
-else
- LIBASN1_LINK=-ltasn1
+dnl use lzo
 fi
 
-AC_SUBST(MINITASN1_OBJECTS)
-AC_SUBST(MINITASN1_DIR)
-AC_SUBST(LIBASN1_LINK)
-
+AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
+AM_CONDITIONAL(ENABLE_INCLUDED_LZO, test "$minilzo_enabled" = "yes")
 
 
 AC_MSG_RESULT([***
@@ -524,17 +560,12 @@ AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
 ]],[[]])
 
 AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
-libextra/openpgp/Makefile lib/libgnutls-config libextra/libgnutls-extra-config \
-src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
+libextra/openpgp/Makefile libextra/opencdk/Makefile \
+lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
+src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
 doc/examples/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile])
 
 AC_OUTPUT
-
-echo ""
-echo "*** Note that libgcrypt's handling of multithreading"
-echo "*** applications has changed. Please check the 'Multi-threaded"
-echo "*** applications' section of the gnutls manual, and the libgcrypt manual."
-echo ""

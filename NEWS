@@ -3,6 +3,7 @@ Version 1.0.14
   certificates.
 - Updates in the documentation.
 - certtool can now add ip address SAN extension.
+- Opencdk library is being included if not found.
 
 Version 1.0.13 (29/04/2004)
 - Some complilation fixes.

@@ -1,6 +1,6 @@
-INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
+INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) -Iopencdk/
 bin_SCRIPTS = libgnutls-extra-config
-SUBDIRS = openpgp
+DIST_SUBDIRS = openpgp opencdk
 
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls-extra.m4
@@ -12,7 +12,7 @@ else
 endif
 
 EXTRA_DIST = ext_srp.h gnutls_srp.h libgnutls-extra.vers \
-	auth_srp.h auth_srp_passwd.h \
+	auth_srp.h auth_srp_passwd.h openssl_compat.h \
 	gnutls-extra-api.tex gnutls_extra.h libgnutls-extra-config.in \
 	libgnutls-extra.m4 lzoconf.h minilzo.h
 
@@ -22,7 +22,7 @@ lib_LTLIBRARIES = libgnutls-extra.la libgnutls-openssl.la
 
 libgnutls_openssl_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_openssl_la_SOURCES = gnutls_openssl.c
+libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.c
 
 libgnutls_openssl_la_LIBADD = \
 	../lib/libgnutls.la
@@ -30,24 +30,40 @@ else
 lib_LTLIBRARIES = libgnutls-extra.la
 endif
 
+if ENABLE_OPENPGP
+if ENABLE_INCLUDED_OPENCDK
+SUBDIRS = openpgp opencdk
+PGP_OBJECTS = openpgp/libpgp.la opencdk/libopencdk.la
+else
+SUBDIRS = openpgp
+PGP_OBJECTS = openpgp/libpgp.la
+endif
+endif
+
+if ENABLE_INCLUDED_LZO
+LZO_OBJECTS = minilzo.c
+else
+
+if USE_LZO
+LZO_LIBS = -llzo
+endif
+LZO_OBJECTS = 
+endif
+
+
 COBJECTS_EXTRA = ext_srp.c \
 	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
-	gnutls_extra.c \
-	auth_srp_rsa.c gnutls_openpgp.c
+	gnutls_extra.c auth_srp_rsa.c gnutls_openpgp.c
+
 
 libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
-	$(LIBOPENCDK_LIBS) $(LZO_LINK)
-libgnutls_extra_la_DEPENDENCIES = $(LZO_OBJECTS)
+	$(LIBOPENCDK_LIBS) $(LZO_LIBS)
 
-libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) 
+libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS)
 
-libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) \
-	openpgp/openpgp.lo openpgp/xml.lo openpgp/privkey.lo \
-	openpgp/extras.lo openpgp/verify.lo openpgp/compat.lo \
+libgnutls_extra_la_LIBADD = $(PGP_OBJECTS) \
 	../lib/libgnutls.la
-
-EXTRA_libgnutls_extra_la_SOURCES = minilzo.c
 
 
 gnutls-extra-api.tex: $(COBJECTS_EXTRA)
