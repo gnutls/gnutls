@@ -10,7 +10,7 @@
 /* parameters should not be larger than this limit */
 #define MAX_PARAMETER_SIZE 1200
 #define DSA_PARAMS 5
-#define RSA_PARAMS 2
+#define RSA_PARAMS 3
 
 #if MAX_PARAMS_SIZE - RSA_PARAMS < 0
 # error INCREASE RSA_PARAMS
@@ -28,7 +28,7 @@ typedef struct gnutls_cert {
 				 * DSA: [0] is p
 				 *      [1] is q
 				 *      [2] is g
-				 *      [3] is pub
+				 *      [3] is public key
 				 */
 	PKAlgorithm subject_pk_algorithm;
 
@@ -58,11 +58,14 @@ typedef struct {
 				 * key algorithm 
 				 */
 				/*
+				 * RSA: [0] is modulus
+				 *      [1] is public exponent
+				 *	[2] is private exponent
 				 * DSA: [0] is p
 				 *      [1] is q
 				 *      [2] is g
-				 *      [3] is Y (public)
-				 *      [4] is priv
+				 *      [3] is y (public key)
+				 *      [4] is x (private key)
 				 */
 
 	PKAlgorithm pk_algorithm;

@@ -50,8 +50,11 @@
 #define MAX(X,Y) (X >= Y ? X : Y);
 #define CAFILE "x509/ca.pem"
 #define CRLFILE NULL
-#define CLIKEYFILE "x509/clikey.pem"
-#define CLICERTFILE "x509/clicert.pem"
+#define CLIKEYFILE1 "x509/clikey-dsa.pem"
+#define CLICERTFILE1 "x509/clicert-dsa.pem"
+
+#define CLIKEYFILE2 "x509/clikey.pem"
+#define CLICERTFILE2 "x509/clicert.pem"
 
 static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
 
@@ -130,12 +133,13 @@ int main(int argc, char** argv)
 	}
 
 	/* X509 stuff */
-	if (gnutls_x509pki_allocate_client_sc( &xcred, 1) < 0) {  /* space for 1 certificate */
+	if (gnutls_x509pki_allocate_client_sc( &xcred, 2) < 0) {  /* space for 2 certificates */
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 	gnutls_x509pki_set_client_trust_file( xcred, CAFILE, CRLFILE);
-	gnutls_x509pki_set_client_key_file( xcred, CLICERTFILE, CLIKEYFILE);
+	gnutls_x509pki_set_client_key_file( xcred, CLICERTFILE1, CLIKEYFILE1);
+	gnutls_x509pki_set_client_key_file( xcred, CLICERTFILE2, CLIKEYFILE2);
 	gnutls_x509pki_set_client_cert_callback( xcred, cert_callback);
 
 	/* SRP stuff */

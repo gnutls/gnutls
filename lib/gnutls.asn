@@ -68,6 +68,11 @@ DSAParameters ::= SEQUENCE {
         g                   INTEGER
 }
 
+DSASignatureValue ::= SEQUENCE {
+        r                   INTEGER,
+        s                   INTEGER
+}
+
 DSAPrivateKey ::= SEQUENCE {
         version          	INTEGER, -- should be zero
         p          		INTEGER,

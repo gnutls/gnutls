@@ -71,29 +71,6 @@ PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
 	return ret;
 }
 
-/* this function reads an integer
- * from asn1 structs. Combines the read and mpi_scan
- * steps.
- */
-static
-int _gnutls_x509_read_int( node_asn* node, char* value, char* tmpstr, int tmpstr_size, MPI* ret_mpi) {
-int len, result;
-
-	len = tmpstr_size - 1;
-	result = asn1_read_value(node, value, tmpstr, &len);
-	if (result != ASN_OK) {
-		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	if (_gnutls_mpi_scan( ret_mpi, tmpstr, &len) != 0) {
-		gnutls_assert();
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	return 0;
-}
-
 void gnutls_free_cert(gnutls_cert cert)
 {
 	int n, i;

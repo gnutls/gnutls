@@ -89,17 +89,19 @@ int _gnutls_copy_x509_auth_info(X509PKI_AUTH_INFO info, gnutls_cert * cert,
 }
 
 /* This function reads the RSA parameters from the given private key
- * cert is not a certificate but a der structure containing the private
- * key(s).
- * Ok this is no longer the case. We now precompile the pkcs1 key
- * to the gnutls_private_key structure.
  */
 static int _gnutls_get_private_rsa_params(GNUTLS_KEY key,
 					  gnutls_private_key * pkey)
 {
 
-	key->u = gcry_mpi_copy(pkey->params[0]);
-	key->A = gcry_mpi_copy(pkey->params[1]);
+	key->u = gcry_mpi_copy(pkey->params[2]);
+	if (key->u==NULL) return GNUTLS_E_MEMORY_ERROR;
+	
+	key->A = gcry_mpi_copy(pkey->params[0]);
+	if (key->A==NULL) {
+		_gnutls_mpi_release( &key->u);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return 0;
 }

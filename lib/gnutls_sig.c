@@ -35,6 +35,8 @@
 #include <gnutls_sig.h>
 
 
+int _gnutls_generate_sig( gnutls_cert* cert, gnutls_private_key *pkey, const gnutls_datum* hash_concat, gnutls_datum *signature);
+
 
 /* Generates a signature of all the previous sent packets in the 
  * handshake procedure.
@@ -46,25 +48,36 @@ opaque concat[36];
 GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 
-	td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
-	if (td_md5 == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_HASH_FAILED;
-	}
 
 	td_sha = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
 	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	gnutls_hash_deinit(td_md5, concat);
 	gnutls_hash_deinit(td_sha, &concat[16]);
 
-	dconcat.data = concat;
-	dconcat.size = 36;
+	switch (cert->subject_pk_algorithm) {
+		case GNUTLS_PK_RSA:
+			td_md5 = gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+			if (td_md5 == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_HASH_FAILED;
+			}
+			gnutls_hash_deinit(td_md5, concat);
 
+			dconcat.data = concat;
+			dconcat.size = 36;
+			break;
+		case GNUTLS_PK_DSA:
+			dconcat.data = &concat[16];
+			dconcat.size = 20;
+			break;
+		
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL;
+	}
 	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
 	if (ret < 0)
 		gnutls_assert();
@@ -84,33 +97,46 @@ GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 opaque concat[36];
 
-	td_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
-	if (td_md5 == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_HASH_FAILED;
-	}
 
 	td_sha = gnutls_hash_init( GNUTLS_MAC_SHA);
 	if (td_sha == NULL) {
 		gnutls_assert();
-		gnutls_hash_deinit( td_md5, NULL);
 		return GNUTLS_E_HASH_FAILED;
 	}
-
-	gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	gnutls_hash( td_md5, params->data, params->size);
 
 	gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
 	gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
 	gnutls_hash( td_sha, params->data, params->size);
 
-	gnutls_hash_deinit(td_md5, concat);
 	gnutls_hash_deinit(td_sha, &concat[16]);
 
-	dconcat.data = concat;
-	dconcat.size = 36;
+	switch (cert->subject_pk_algorithm) {
+		case GNUTLS_PK_RSA:
+			td_md5 = gnutls_hash_init( GNUTLS_MAC_MD5);
+			if (td_md5 == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_HASH_FAILED;
+			}
+
+			gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+			gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+			gnutls_hash( td_md5, params->data, params->size);
+
+			gnutls_hash_deinit(td_md5, concat);
+
+			dconcat.data = concat;
+			dconcat.size = 36;
+			break;
 	
+		case GNUTLS_PK_DSA:
+			dconcat.data = &concat[16];
+			dconcat.size = 20;
+			break;
+		
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL;
+	}
 	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
 	if (ret < 0)
 		gnutls_assert();
@@ -139,27 +165,23 @@ gnutls_datum tmpdata;
 			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;
 		}
 
+	tmpdata.data = hash_concat->data;
+	tmpdata.size = hash_concat->size;
+
 	switch(pkey->pk_algorithm) {
 		case GNUTLS_PK_RSA:
-			tmpdata.data = hash_concat->data;
-			tmpdata.size = hash_concat->size; /* md5 + sha */
 
 			/* encrypt */
-			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params[0], pkey->params[1], 1)) < 0) {
+			if ((ret=_gnutls_pkcs1_rsa_encrypt( signature, tmpdata, pkey->params, 1)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
 
 			break;
 		case GNUTLS_PK_DSA:
-			/* Ok this is silly. We have calculated
-			 * md5 also!
-			 */
-			tmpdata.data = &hash_concat->data[16];
-			tmpdata.size = 20; /* sha */
 
 			/* sign */
-			if ((ret=_gnutls_dsa_sign( signature, tmpdata, pkey->params[0], pkey->params[1], pkey->params[2], pkey->params[3])) < 0) {
+			if ((ret=_gnutls_dsa_sign( signature, &tmpdata, pkey->params)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
@@ -204,7 +226,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 			vdata.size = hash_concat->size;
 
 			/* verify signature */
-			if ( (ret=_gnutls_rsa_verify( &vdata, signature, cert->params[1], cert->params[0], 1)) < 0) {
+			if ( (ret=_gnutls_rsa_verify( &vdata, signature, cert->params, 1)) < 0) {
 			     gnutls_assert();
 			     return ret;
 			}
@@ -216,13 +238,13 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 			vdata.size = 20; /* sha1 */
 
 			/* decrypt signature */
-			if ( (ret=_gnutls_dsa_verify( &vdata, *signature, cert->params[0], 
-				cert->params[1], cert->params[2], cert->params[3])) < 0) {
+			if ( (ret=_gnutls_dsa_verify( &vdata, signature, cert->params)) < 0) { 
 			     gnutls_assert();
 			     return ret;
 			}
 
 			break;
+
 		default:
 			gnutls_assert();
 			return GNUTLS_E_UNIMPLEMENTED_FEATURE;

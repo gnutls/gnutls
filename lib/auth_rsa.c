@@ -79,6 +79,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
+	MPI params[2];
 
 	if ( gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
@@ -95,9 +96,10 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		ciphertext.size = dsize;
 	}
 
+	params[0] = state->gnutls_key->A;
+	params[1] = state->gnutls_key->u;
 	ret =
-	    _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, state->gnutls_key->u,
-				      state->gnutls_key->A, 2);		/* btype==2 */
+	    _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 2);		/* btype==2 */
 
 	if (ret < 0) {
 		/* in case decryption fails then don't inform
@@ -146,7 +148,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 {
 	X509PKI_AUTH_INFO auth = state->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */
-	MPI pkey, n;
+	MPI params[RSA_PARAMS];
 	int ret;
 	GNUTLS_Version ver;
 
@@ -164,11 +166,11 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	state->gnutls_key->key.data[0] = _gnutls_version_get_major(ver);
 	state->gnutls_key->key.data[1] = _gnutls_version_get_minor(ver);
 
+	params[0] = state->gnutls_key->a;
+	params[1] = state->gnutls_key->x;
 	if ((ret =
-	     _gnutls_pkcs1_rsa_encrypt(&sdata, state->gnutls_key->key, state->gnutls_key->x, state->gnutls_key->a, 2)) < 0) {
+	     _gnutls_pkcs1_rsa_encrypt(&sdata, state->gnutls_key->key, params, 2)) < 0) {
 		gnutls_assert();
-		_gnutls_mpi_release(&pkey);
-		_gnutls_mpi_release(&n);
 		return ret;
 	}
 	_gnutls_mpi_release(&state->gnutls_key->a);
