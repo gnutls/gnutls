@@ -17,7 +17,7 @@ struct _gaainfo
 #line 42 "certtool.gaa"
 	int bits;
 #line 39 "certtool.gaa"
-	int cert_format;
+	int incert_format;
 #line 36 "certtool.gaa"
 	int pkcs8;
 #line 28 "certtool.gaa"

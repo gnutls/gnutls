@@ -36,8 +36,8 @@ option (k, key-info) { $action = 6; } "Print information on a private key."
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 
-#int cert_format;
-option (der) { $cert_format=1 } "Use DER format for certificates and private keys."
+#int incert_format;
+option (inder) { $incert_format=1 } "Use DER format for input certificates and private keys."
 
 #int bits;
 option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key generation."
@@ -57,5 +57,5 @@ option (v, version) { certtool_version(); exit(0); } "shows the program version"
 
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
-	$cert_format = 0; }
+	$incert_format = 0; }
 

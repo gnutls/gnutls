@@ -131,7 +131,7 @@ void gaa_help(void)
 	__gaa_helpsingle('i', "certificate-info", "", "Print information on a certificate.");
 	__gaa_helpsingle('k', "key-info", "", "Print information on a private key.");
 	__gaa_helpsingle('8', "pkcs8", "", "Use PKCS #8 format for private keys.");
-	__gaa_helpsingle(0, "der", "", "Use DER format for certificates and private keys.");
+	__gaa_helpsingle(0, "inder", "", "Use DER format for input certificates and private keys.");
 	__gaa_helpsingle(0, "bits", "BITS ", "specify the number of bits for key generation.");
 	__gaa_helpsingle(0, "outfile", "FILE ", "Output file.");
 	__gaa_helpsingle(0, "infile", "FILE ", "Output file.");
@@ -161,7 +161,7 @@ struct _gaainfo
 #line 42 "certtool.gaa"
 	int bits;
 #line 39 "certtool.gaa"
-	int cert_format;
+	int incert_format;
 #line 36 "certtool.gaa"
 	int pkcs8;
 #line 28 "certtool.gaa"
@@ -237,7 +237,7 @@ int gaa_error = 0;
 #define GAAOPTID_infile	4
 #define GAAOPTID_outfile	5
 #define GAAOPTID_bits	6
-#define GAAOPTID_der	7
+#define GAAOPTID_inder	7
 #define GAAOPTID_pkcs8	8
 #define GAAOPTID_key_info	9
 #define GAAOPTID_certificate_info	10
@@ -534,7 +534,7 @@ int gaa_get_option_num(char *str, int status)
 #line 375 "gaa.skel"
 			GAA_CHECK1STR("v", GAAOPTID_version);
 			GAA_CHECK1STR("h", GAAOPTID_help);
-			GAA_CHECK1STR("", GAAOPTID_der);
+			GAA_CHECK1STR("", GAAOPTID_inder);
 			GAA_CHECK1STR("8", GAAOPTID_pkcs8);
 			GAA_CHECK1STR("k", GAAOPTID_key_info);
 			GAA_CHECK1STR("i", GAAOPTID_certificate_info);
@@ -554,7 +554,7 @@ int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("infile", GAAOPTID_infile);
 			GAA_CHECKSTR("outfile", GAAOPTID_outfile);
 			GAA_CHECKSTR("bits", GAAOPTID_bits);
-			GAA_CHECKSTR("der", GAAOPTID_der);
+			GAA_CHECKSTR("inder", GAAOPTID_inder);
 			GAA_CHECKSTR("pkcs8", GAAOPTID_pkcs8);
 			GAA_CHECKSTR("key-info", GAAOPTID_key_info);
 			GAA_CHECKSTR("certificate-info", GAAOPTID_certificate_info);
@@ -664,10 +664,10 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 
 		return GAA_OK;
 		break;
-	case GAAOPTID_der:
+	case GAAOPTID_inder:
 	OK = 0;
 #line 40 "certtool.gaa"
-{ gaaval->cert_format=1 ;};
+{ gaaval->incert_format=1 ;};
 
 		return GAA_OK;
 		break;
@@ -811,7 +811,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 #line 58 "certtool.gaa"
 { gaaval->bits = 1024; gaaval->pkcs8 = 0; gaaval->privkey = NULL; gaaval->ca=NULL; gaaval->ca_privkey = NULL; 
 	gaaval->debug=1; gaaval->request = NULL; gaaval->infile = NULL; gaaval->outfile = NULL; gaaval->cert = NULL; 
-	gaaval->cert_format = 0; ;};
+	gaaval->incert_format = 0; ;};
 
     }
     inited = 1;
