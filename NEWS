@@ -1,4 +1,4 @@
-Version ?.?.?
+Version 0.5.0 (6/07/2002)
 - Added X.509 certificate tests in tests/ directory
 - Removed stubs for SRP and Anonymous authentication. They served
   no purpose since they are always included, unless it was requested
@@ -13,6 +13,8 @@ Version ?.?.?
   session resuming backend. The gnutls-serv application contains an
   simple example on how to use gdbm for resuming.
 - Headers for the gnutls library are now installed in $(includedir)/gnutls
+- Added an OpenSSL compatible interface (with some limitations).
+- Added functions to convert DER encoded certificates to XML format.
 
 Version 0.4.4 (24/06/2002)
 - Corrected bug in PKCS-1 RSA encryption which prevented gnutls to encrypt
