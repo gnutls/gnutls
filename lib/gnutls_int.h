@@ -555,6 +555,8 @@ typedef struct {
 	int			cbc_protection_hack;
 	int			rsa_pms_check; /* 0 means enabled */
 
+	void*			user_ptr;
+
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } GNUTLS_INTERNALS;
