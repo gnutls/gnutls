@@ -18,13 +18,13 @@ The certificate must allow the key to be used for encryption.
 \\
 \hline
 DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are send to the peer. The key in the certificate must allow
+parameters which are sent to the peer. The key in the certificate must allow
 the key to be used for signing. Note that key exchange algorithms which use
 Ephemeral Diffie Hellman parameters, offer perfect forward secrecy.
 \\
 \hline
 DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
-parameters which are send to the peer. 
+parameters which are sent to the peer. 
 \\
 \hline
 \end{tabular}
@@ -42,8 +42,9 @@ parameters which are send to the peer.
 
 
 \section{Anonymous authentication\index{Anonymous authentication}}
-The anonymous key exchange perform encryption but there is no indication of the 
-identity of the peer. This kind of authentication is vulnerable to man in the middle attack, 
+The anonymous key exchange perform encryption but there is no indication of 
+the identity of the peer. This kind of authentication is vulnerable to a
+man in the middle attack, 
 but this protocol can be used even if there is no prior communication or common trusted
 parties with the peer. Unless really required, do not use anonymous authentication.
 Available key exchange methods are shown in \hyperref{figure}{figure }{}{fig:anon}.
@@ -103,7 +104,7 @@ SRP & Authentication using the SRP protocol.
 The ``gnutls-srpcrypt'' is a very simple program that emulates the programs in the libsrp 
 found in \htmladdnormallink{http://srp.stanford.edu}{http://srp.stanford.edu}.
 It is intended for use in places where you don't expect srp
-authentication to be the performed to system users.
+authentication to be the performed for system users.
 
 Traditionaly libsrp used two files. One called 'tpasswd' which holds usernames 
 and verifiers, and 'tpasswd.conf' which holds generators and primes.
