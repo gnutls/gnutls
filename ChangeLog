@@ -1,3 +1,54 @@
+2004-07-09 12:57  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in:
+
+	gnutls 1.0.16 
+
+2004-07-09 08:31  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_x509.c, gnutls_pk.c, gnutls_x509.c:
+
+	eliminated some memory leaks. Reported by Yoann Vandoorselaere
+	<yoann@prelude-ids.org>.  
+
+2004-07-02 19:23  nmav <nmav@gnutls.org>
+
+	* doc/protocol/draft-ietf-tls-ssl-mods-00.txt:
+
+	added draft-ietf-tls-ssl-mods 
+
+2004-06-29 08:52  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, lib/auth_anon.h, lib/auth_cert.h,
+	lib/auth_dh_common.h, lib/gnutls_cert.c, lib/gnutls_cert.h,
+	lib/gnutls_datum.c, lib/gnutls_datum.h, lib/gnutls_record.c,
+	lib/gnutls_session_pack.c, lib/gnutls_sig.c, lib/gnutls_state.c,
+	lib/gnutls_ui.c, lib/gnutls_x509.c, src/serv.c:
+
+	The ephemeral DH and RSA parameters are no longer stored in the 
+	session resume DB. This saves space, but will cause resumed sessions 
+	not to be able to access the original session parameters (which is
+	ok).  
+
+2004-06-29 08:13  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_record.c:
+
+	Reject hello packets with major version higher than 3.  
+
+2004-06-28 22:56  nmav <nmav@gnutls.org>
+
+	* ChangeLog, NEWS, configure.in:
+
+	released 1.0.15 
+
+2004-06-28 22:52  nmav <nmav@gnutls.org>
+
+	* src/x509/: ca.pem, cert-dsa.pem, cert.pem, clicert-dsa.pem,
+	clicert.pem, key-dsa.pem, key.pem:
+
+	added some new certificates.  
+
 2004-06-24 19:02  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/certificate.tex, doc/tex/gnutls.bib,

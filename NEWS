@@ -1,4 +1,4 @@
-Version 1.0.16 (09/07/2004)
+Version 1.0.16 (10/07/2004)
 - Do not free the SRP (prime and generator) parameters obtained from the 
   callback if they are the static ones defined in extra.h.
 - Eliminated some memory leaks. Reported by Yoann Vandoorselaere.

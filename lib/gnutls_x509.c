@@ -964,9 +964,7 @@ opaque *pdata;
 	for (i = 0; i < res->x509_ncas; i++) {
 		ret = _gnutls_x509_crt_get_raw_issuer_dn( res->x509_ca_list[i], &tmp);
 		if (ret < 0) {
-			gnutls_free(res->x509_rdn_sequence.data);
-			res->x509_rdn_sequence.size = 0;
-			res->x509_rdn_sequence.data = NULL;
+			_gnutls_free_datum( &res->x509_rdn_sequence);
 			gnutls_assert();
 			return ret;
 		}
