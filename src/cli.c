@@ -901,7 +901,7 @@ static void init_global_tls_stuff(void)
 	exit(1);
     }
 
-    /* there are some intermediate CAs that have a v1 certificate *%&@#*%&
+    /* there are some CAs that have a v1 certificate *%&@#*%&
      */
     gnutls_certificate_set_verify_flags(xcred,
 					GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
