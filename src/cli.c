@@ -58,6 +58,7 @@
 
 #define CLIKEYFILE_PGP "openpgp/cli_sec.asc"
 #define CLICERTFILE_PGP "openpgp/cli_pub.asc"
+#define CLIRINGFILE_PGP "openpgp/papa_ring.gpg"
 
 static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
 
@@ -88,12 +89,11 @@ static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, 
 }
 
 const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
-const int kx_priority[] = { GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
+const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0 };
 const int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
 const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 const int cert_type_priority[] = { GNUTLS_CRT_OPENPGP, GNUTLS_CRT_X509, 0 };
-
 
 int main(int argc, char** argv)
 {
@@ -141,10 +141,35 @@ int main(int argc, char** argv)
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_certificate_set_x509_trust_file( xcred, CAFILE, CRLFILE);
-	gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE1, CLIKEYFILE1);
-	gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE2, CLIKEYFILE2);
-	gnutls_certificate_set_openpgp_key_file( xcred, CLICERTFILE_PGP, CLIKEYFILE_PGP);
+	ret=gnutls_certificate_set_x509_trust_file( xcred, CAFILE, CRLFILE);
+	if (ret < 0) {
+		fprintf(stderr, "Error setting the x509 trust file\n");
+		exit(1);
+	}
+	
+	ret=gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE1, CLIKEYFILE1);
+	if (ret < 0) {
+		fprintf(stderr, "Error setting the x509 key file\n");
+		exit(1);
+	}
+
+	ret=gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE2, CLIKEYFILE2);
+	if (ret < 0) {
+		fprintf(stderr, "Error setting the x509 key file\n");
+		exit(1);
+	}
+
+	ret=gnutls_certificate_set_openpgp_key_file( xcred, CLICERTFILE_PGP, CLIKEYFILE_PGP);
+	if (ret < 0) {
+		fprintf(stderr, "Error setting the OpenPGP key file\n");
+		exit(1);
+	}
+
+	ret=gnutls_certificate_set_openpgp_keyring_file( xcred, CLIRINGFILE_PGP);
+	if (ret < 0) {
+		fprintf(stderr, "Error setting the OpenPGP keyring file\n");
+		exit(1);
+	}
 /*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 
 	/* SRP stuff */
