@@ -2228,9 +2228,9 @@ void print_bag_data(gnutls_pkcs12_bag bag)
 {
 int result;
 int count, i, type;
-gnutls_const_datum cdata;
+gnutls_datum cdata;
 const char* str;
-gnutls_datum out, data;
+gnutls_datum out;
 
 	count = gnutls_pkcs12_bag_get_count( bag);
 	if (count < 0) {
@@ -2274,14 +2274,8 @@ gnutls_datum out, data;
 			str = NULL;
 		}		
 	
-		/* we have to cast gnutls_const_datum to a
-		 * plain datum.
-		 */
-		data.data = (unsigned char*)cdata.data;
-		data.size = cdata.size;
-
 		if (str != NULL) {
-			gnutls_pem_base64_encode_alloc( str, &data, &out);
+			gnutls_pem_base64_encode_alloc( str, &cdata, &out);
 			fprintf( outfile, "%s\n", out.data);
 		
 			gnutls_free(out.data);

@@ -29,7 +29,6 @@ int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
    gnutls_datum key_id = { "\x00\x00\x07", 3 };
 
    gnutls_global_init();
-   gnutls_global_set_log_level(2);
 
    /* Firstly we create two helper bags, which hold the certificate,
     * and the (encrypted) key.
@@ -58,7 +57,9 @@ int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
     */
    gnutls_pkcs12_bag_set_key_id(bag, bag_index, &key_id);
 
-   gnutls_pkcs12_bag_encrypt(bag, password, 0);
+   /* use weak encryption for the certificate. 
+    */
+   gnutls_pkcs12_bag_encrypt(bag, password, GNUTLS_PKCS_USE_PKCS12_RC2_40);
 
    /* Now the key.
     */
@@ -71,8 +72,8 @@ int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
       exit(1);
    }
 
-   /* Note that since the PKCS #8 key is encrypted we don't
-    * bother encrypting the bag.
+   /* Note that since the PKCS #8 key is already encrypted we don't
+    * bother encrypting that bag.
     */
    bag_index = ret;
 
