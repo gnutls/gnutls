@@ -1,3 +1,41 @@
+2004-08-31 08:16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Ad.  
+
+2004-08-31 08:16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-31 08:12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c:
+
+	Fix mem leak (tiny patch).  From Simon Posnjak 
+	<simon.posnjak@cetrtapot.si>.  
+
+2004-08-31 08:10  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS:
+
+	Pull up from trunk.  
+
+2004-08-31 08:09  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS:
+
+	Add.  
+
+2004-08-31 08:08  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cert.c:
+
+	Fix mem leak (tiny patch).  From Simon Posnjak 
+	<simon.posnjak@cetrtapot.si>.  
+
 2004-08-27 10:52  Simon Josefsson <simon@josefsson.org>
 
 	* lib/gnutls_state.c:
