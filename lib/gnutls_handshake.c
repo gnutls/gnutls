@@ -504,11 +504,13 @@ int _gnutls_recv_finished(gnutls_session session)
 }
 
 /* returns PK_RSA if the given cipher suite list only supports,
- * RSA algorithms, PK_DSA if DSS, and -1 if both or none.
+ * RSA algorithms, PK_DSA if DSS, and GNUTLS_PK_ANY if both or 
+ * GNUTLS_PK_NONE for none.
  */
-int _gnutls_server_find_pk_algos_in_ciphersuites( opaque* data, int datalen) {
+static int _gnutls_server_find_pk_algos_in_ciphersuites( opaque* data, int datalen) 
+{
 int j;
-gnutls_pk_algorithm algo=-1, prev_algo = 0;
+gnutls_pk_algorithm algo=GNUTLS_PK_NONE, prev_algo = 0;
 gnutls_kx_algorithm kx;
 GNUTLS_CipherSuite cs;
 
@@ -519,7 +521,7 @@ GNUTLS_CipherSuite cs;
 		if ( _gnutls_map_kx_get_cred( kx, 1) == GNUTLS_CRD_CERTIFICATE) {
 			algo = _gnutls_map_pk_get_pk( kx);
 	
-			if (algo!=prev_algo && prev_algo!=0) return -1;
+			if (algo!=prev_algo && prev_algo!=0) return GNUTLS_PK_ANY;
 			prev_algo = algo;
 		}
 	}

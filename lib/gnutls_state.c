@@ -108,10 +108,35 @@ gnutls_compression_method gnutls_compression_get( gnutls_session session)
 	return session->security_parameters.read_compression_algorithm;
 }
 
+/* Check if the given certificate type is supported.
+ * This means that it is enabled by the priority functions,
+ * and a matching certificate exists.
+ */
 int _gnutls_session_cert_type_supported( gnutls_session session, 
 	gnutls_certificate_type cert_type) 
 {
 uint i;
+uint cert_found = 0;
+const gnutls_certificate_credentials cred;
+		
+	if (session->security_parameters.entity==GNUTLS_SERVER) {
+		cred =
+		    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+		
+		if (cred == NULL)
+			return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+
+		for (i = 0; i < cred->ncerts; i++) {
+			if (cred->cert_list[i][0].cert_type == cert_type) {
+				cert_found = 1;
+				break;
+			}
+		}
+		if (cert_found == 0)
+			/* no certificate is of that type.
+			 */
+			return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
+	}
 
 	if (session->internals.cert_type_priority.algorithms==0 && cert_type ==
 		DEFAULT_CERT_TYPE) return 0;

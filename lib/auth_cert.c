@@ -1701,7 +1701,7 @@ int _gnutls_server_select_cert(gnutls_session session,
 		j = 0;
 		for (i = 0; i < cred->ncerts; i++) {
 			/* Add compatible certificates */
-			if (requested_algo == (gnutls_pk_algorithm) - 1 ||
+			if (requested_algo == GNUTLS_PK_ANY ||
 			    requested_algo ==
 			    cred->cert_list[i][0].subject_pk_algorithm) {
 
