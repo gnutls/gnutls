@@ -1980,7 +1980,7 @@ char name1[128];
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 	ConvFlags fast /* if non zero do not parse the whole certificate */)
 {
-	int result;
+	int result = 0;
 	ASN1_TYPE c2;
 	opaque str[MAX_X509_CERT_SIZE];
 	char oid[128];
@@ -1990,34 +1990,21 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 
 	gCert->cert_type = GNUTLS_CRT_X509;
 
-	if ( !(fast & CERT_NO_COPY))
+	if ( !(fast & CERT_NO_COPY)) {
 		if (gnutls_set_datum(&gCert->raw, derCert.data, derCert.size) < 0) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
+	} else
+		/* now we have 0 or a bitwise or of things to decode */
+		fast ^= CERT_NO_COPY;
+
 
 	if ((result=_gnutls_asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.Certificate", &c2,
 	     "cert"))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
-		gnutls_free_datum( &gCert->raw);
-		return _gnutls_asn2err(result);
-	}
-
-	if (fast & CERT_ONLY_PUBKEY)
-		result = asn1_der_decoding_element( &c2, "cert.tbsCertificate.subjectPublicKeyInfo",
-			derCert.data, derCert.size, NULL);
-	else
-		result = asn1_der_decoding(&c2, derCert.data, derCert.size, 
-			NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-
-		_gnutls_log("CERT: Decoding error %d\n", result);
-
-		gnutls_assert();
-		asn1_delete_structure(&c2);
 		gnutls_free_datum( &gCert->raw);
 		return _gnutls_asn2err(result);
 	}
@@ -2037,30 +2024,38 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		}
 	}
 
+	if (fast & CERT_ONLY_PUBKEY) {
+		result = asn1_der_decoding_element( &c2, "cert.tbsCertificate.subjectPublicKeyInfo",
+			derCert.data, derCert.size, NULL);
 
+		if (result != ASN1_SUCCESS) {
+			/* couldn't decode DER */
+	
+			_gnutls_log("CERT: Decoding error %d\n", result);
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			return _gnutls_asn2err(result);
+		}
+	}
+	
+	if (fast==0) {
+		result = asn1_der_decoding(&c2, derCert.data, derCert.size, 
+			NULL);
 
-	len = sizeof(oid) - 1;
-	result =
-	    asn1_read_value
-	    (c2,
-	     "cert.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
-	     oid, &len);
+		if (result != ASN1_SUCCESS) {
+			/* couldn't decode DER */
+			_gnutls_log("CERT: Decoding error %d\n", result);
 
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		gnutls_free_datum( &gCert->raw);
-		return _gnutls_asn2err(result);
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			return _gnutls_asn2err(result);
+		}
 	}
 
-	if ( (result=_gnutls_extract_x509_cert_mpi_params( oid, gCert, c2, "cert", str, sizeof(str))) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		gnutls_free_datum( &gCert->raw);
-		return result;
-	}
-
-	if (!(fast & CERT_ONLY_PUBKEY)) {
+	
+	if (fast==0) { /* decode all */
 		len = gCert->signature.size = X509_SIG_SIZE;
 		gCert->signature.data = gnutls_malloc( gCert->signature.size);
 		if (gCert->signature.data==NULL) {
@@ -2094,11 +2089,33 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 			asn1_delete_structure(&c2);
 			gnutls_free_datum( &gCert->raw);
 			return GNUTLS_E_ASN1_GENERIC_ERROR;  
-		}	 
-
+		}
 	}
 
-	if (fast & CERT_ONLY_EXTENSIONS) {
+	if (fast & CERT_ONLY_PUBKEY || fast == 0) {
+		len = sizeof(oid) - 1;
+		result =
+		    asn1_read_value
+		    (c2,
+		     "cert.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+		     oid, &len);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			return _gnutls_asn2err(result);
+		}
+
+		if ( (result=_gnutls_extract_x509_cert_mpi_params( oid, gCert, c2, "cert", str, sizeof(str))) < 0) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			gnutls_free_datum( &gCert->raw);
+			return result;
+		}
+	}
+
+	if (fast & CERT_ONLY_EXTENSIONS || fast == 0) {
 		if ((result =
 		     _gnutls_get_ext_type(c2,
 					  "cert.tbsCertificate.extensions",
@@ -2108,7 +2125,9 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 			gnutls_free_datum( &gCert->raw);
 			return result;
 		}
+
 	}
+
 	asn1_delete_structure(&c2);
 
 	return 0;

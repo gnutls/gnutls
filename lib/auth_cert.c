@@ -750,7 +750,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 
 		if ((ret =
 		     _gnutls_x509_cert2gnutls_cert(&peer_certificate_list
-						   [j], tmp, CERT_ONLY_PUBKEY|CERT_ONLY_EXTENSIONS)) < 0) {
+						   [j], tmp, CERT_ONLY_EXTENSIONS)) < 0) {
 			gnutls_assert();
 			CLEAR_CERTS;
 			gnutls_afree(peer_certificate_list);
