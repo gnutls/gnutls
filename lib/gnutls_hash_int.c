@@ -244,7 +244,7 @@ int padsize;
 
 void* gnutls_hmac_deinit_ssl3( GNUTLS_MAC_HANDLE handle) {
 void *ret;
-GNUTLS_MAC_HANDLE td=gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+GNUTLS_HASH_HANDLE td;
 char* opad;
 int padsize;
 	switch(handle->algorithm) {
@@ -260,13 +260,15 @@ int padsize;
 
 	td = gnutls_hash_init(handle->algorithm);
 	gnutls_hash(td, handle->key, handle->keysize);
+
 	gnutls_hash(td, opad, padsize);
-	gnutls_hash(td, ret, gnutls_hmac_get_algo_len(handle->algorithm));
-	ret = gnutls_hash_deinit(td);
-	
-	ret = gnutls_hash_deinit(handle);
-	gnutls_free(td);
 	gnutls_free(opad);
+
+	ret = gnutls_hash_deinit(handle); /* get the previous hash */
+	gnutls_hash(td, ret, gnutls_hmac_get_algo_len(handle->algorithm));
+	gnutls_free(ret);
+		
+	ret = gnutls_hash_deinit(handle);
 	
      return ret;
 }
