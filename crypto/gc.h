@@ -21,14 +21,12 @@
  */
 
 #ifndef GC_H
-#define GC_H
+# define GC_H
 
 /* Get size_t. */
-#include <stddef.h>
+# include <stddef.h>
 
-#define GC_MD5_LEN 16
-#define GC_SHA1_LEN 20
-
+/* Error codes. */
 enum Gc_rc
 {
   GC_OK = 0,
@@ -43,14 +41,7 @@ enum Gc_rc
 };
 typedef enum Gc_rc Gc_rc;
 
-enum Gc_hash
-{
-  GC_MD5,
-  GC_SHA1,
-  GC_RMD160
-};
-typedef enum Gc_hash Gc_hash;
-
+/* Cipher types. */
 enum Gc_cipher
 {
   GC_AES128,
@@ -70,6 +61,17 @@ enum Gc_cipher_mode
 };
 typedef enum Gc_cipher_mode Gc_cipher_mode;
 
+typedef void *gc_cipher;
+
+/* Hash types. */
+enum Gc_hash
+  {
+    GC_MD5,
+    GC_SHA1,
+    GC_RMD160
+  };
+typedef enum Gc_hash Gc_hash;
+
 enum Gc_hash_mode
 {
   GC_HMAC = 1
@@ -77,8 +79,23 @@ enum Gc_hash_mode
 typedef enum Gc_hash_mode Gc_hash_mode;
 
 typedef void *gc_hash;
-typedef void *gc_cipher;
 
+#define GC_MD5_LEN 16
+#define GC_SHA1_LEN 20
+
+/* Public-key types. */
+enum Gc_pk
+  {
+    /* Incidentally, this matches libgcrypt values. */
+    GC_RSA   = 1,
+    GC_RSA_E = 2,
+    GC_RSA_S = 3,
+    GC_ELG_E = 16,
+    GC_DSA   = 17,
+    GC_ELG   = 20
+  };
+
+/* Setup. */
 extern int gc_init (void);
 extern void gc_done (void);
 
