@@ -310,11 +310,11 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		}
 
 		if (state->connection_state.mac_secret_size > 0) {
-			memmove(state->connection_state.read_mac_secret,
+			memcpy(state->connection_state.read_mac_secret,
 				state->
 				cipher_specs.client_write_mac_secret,
 				state->connection_state.mac_secret_size);
-			memmove(state->connection_state.write_mac_secret,
+			memcpy(state->connection_state.write_mac_secret,
 				state->cipher_specs.
 				server_write_mac_secret,
 				state->connection_state.mac_secret_size);
@@ -356,11 +356,11 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		}
 
 		if (state->connection_state.mac_secret_size > 0) {
-			memmove(state->connection_state.read_mac_secret,
+			memcpy(state->connection_state.read_mac_secret,
 				state->
 				cipher_specs.server_write_mac_secret,
 				state->connection_state.mac_secret_size);
-			memmove(state->connection_state.write_mac_secret,
+			memcpy(state->connection_state.write_mac_secret,
 				state->
 				cipher_specs.client_write_mac_secret,
 				state->connection_state.mac_secret_size);
@@ -470,8 +470,8 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		memmove(data, compressed.data, compressed.size);
-		memmove(&data[compressed.size], MAC,
+		memcpy(data, compressed.data, compressed.size);
+		memcpy(&data[compressed.size], MAC,
 			state->security_parameters.hash_size);
 
 		gnutls_cipher_encrypt(state->connection_state.
@@ -510,8 +510,8 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		memset(&data[length - pad], pad - 1, pad);
-		memmove(data, compressed.data, compressed.size);
-		memmove(&data[compressed.size], MAC,
+		memcpy(data, compressed.data, compressed.size);
+		memcpy(&data[compressed.size], MAC,
 			state->security_parameters.hash_size);
 
 		gnutls_cipher_encrypt(state->connection_state.
@@ -587,7 +587,11 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		memmove(data, ciphertext.data, length);
+		gnutls_cipher_decrypt(state->connection_state.
+				      read_cipher_state, ciphertext.data,
+				      ciphertext.size);
+
+		memcpy(data, ciphertext.data, length);
 
 		compress->data = data;
 		compress->size = length;
@@ -619,7 +623,7 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		memmove(data, ciphertext.data, length);
+		memcpy(data, ciphertext.data, length);
 		compress->data = data;
 		compress->size = length;
 		break;
