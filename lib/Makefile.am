@@ -16,9 +16,13 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
 	x509_asn1.h x509_der.h gnutls_datum.h auth_x509.h gnutls_gcry.h \
 	ext_dnsname.h gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
-	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h
+	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
+	gnutls-api.tex
+
 lib_LTLIBRARIES = libgnutls.la
-libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
+
+
+COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c \
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c \
@@ -32,6 +36,8 @@ libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	x509_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c gnutls_mem.c \
 	x509_extensions.c auth_x509.c gnutls_ui.c gnutls_sig.c
 
+libgnutls_la_SOURCES = $(COBJECTS)
+
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 pkix_asn1_tab.c: pkix.asn
@@ -40,3 +46,12 @@ pkix_asn1_tab.c: pkix.asn
 pkcs1_asn1_tab.c: pkcs1.asn
 	-../src/asn1c pkcs1.asn pkcs1_asn1_tab.c
 
+gnutls-api.tex: $(COBJECTS)
+	@echo "\\newpage" > gnutls-api.tex
+	@echo "\\section{Function Reference}" >> gnutls-api.tex
+	for i in $(COBJECTS); \
+	do echo -n "Creating documentation for file $$i... " && ../doc/scripts/gdoc -tex $$i >> gnutls-api.tex \
+	&& echo "ok"; \
+	done
+
+all-local: gnutls-api.tex
