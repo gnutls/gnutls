@@ -55,9 +55,10 @@ typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
 	GNUTLS_PK_DH
 } PKAlgorithm;
 
-/* You cannot use this structure directly
+/* You cannot use these structures directly
  */
 typedef struct gnutls_cert gnutls_cert;
+typedef struct gnutls_private_key gnutls_private_key;
 
 
 /* internal functions */
@@ -179,7 +180,7 @@ typedef struct {
 			 */
 	int ncerts;     /* contains the number of columns in cert_list.
 			 */
-	gnutls_datum * pkey;   /* private keys. It contains ncerts private
+	gnutls_private_key * pkey;   /* private keys. It contains ncerts private
 				* keys. 
 				*/
 } X509PKI_SERVER_CREDENTIALS;

@@ -111,7 +111,10 @@ int i,j;
 		gnutls_free( sc.cert_list[i]);
 	}
 	gnutls_free( sc.cert_list );
-	gnutls_free_datum( sc.pkey);
+	for (i=0;i<sc.ncerts;i++) {
+		_gnutls_free_private_key( sc.pkey[i]);
+	}
+	gnutls_free(sc.pkey);
 }
 
 /* FIXME: this function is a mess 
@@ -185,6 +188,8 @@ int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
 /* second file - PKCS-1 private key */
 
 	siz = fread(x, 1, sizeof(x), fd2);
+	fclose(fd2);
+
 	siz = _gnutls_fbase64_decode(x, siz, &b64);
 
 	if (siz < 0) {
@@ -196,10 +201,13 @@ int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
 	if (res->pkey == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
-	res->pkey[0].data = b64;
-	res->pkey[0].size = siz;
+	tmp.data = b64;
+	tmp.size = siz;
+	if ( (ret =_gnutls_pkcs1key2gnutlsKey(&res->pkey[0], tmp)) < 0) {
+		gnutls_assert();
+		return ret;
+	} 
 
-	fclose(fd2);
 
 	return 0;
 }
@@ -512,3 +520,92 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 	}
 	return cert;
 }
+/* Converts an RSA PKCS#1 key to
+ * an internal structure (gnutls_private_key)
+ */
+int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
+	int ret = 0, result;
+	opaque str[5*1024];
+	int len = sizeof(str);
+
+	pkey->pk_algorithm = GNUTLS_PK_RSA;
+	
+	/* we do return 2 MPIs 
+	 */
+	pkey->params = gnutls_malloc(2*sizeof(MPI));
+	
+	if (create_structure("rsakey", "PKCS-1.RSAPrivateKey")!=ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_ERROR;
+	}
+
+	result = get_der("rsakey", cert.data, cert.size);
+	if (result != ASN_OK) {
+		gnutls_assert();
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	len = sizeof(str);
+	result =
+	    read_value("rsakey.privateExponent", str, &len);
+	if (result != ASN_OK) {
+		gnutls_assert();
+		delete_structure("rsakey");
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+	if (gcry_mpi_scan(&pkey->params[0], /* u */
+		  GCRYMPI_FMT_USG, str, &len) != 0) {
+		gnutls_assert();
+		delete_structure("rsakey");
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+
+	len = sizeof(str);
+	result =
+	    read_value("rsakey.modulus", str, &len);
+	if (result != ASN_OK) {
+		gnutls_assert();
+		delete_structure("rsakey");
+		_gnutls_mpi_release(&pkey->params[0]);
+		return GNUTLS_E_ASN1_PARSING_ERROR;
+	}
+
+	if (gcry_mpi_scan(&pkey->params[1], /* A */
+		  GCRYMPI_FMT_USG, str, &len) != 0) {
+		gnutls_assert();
+		delete_structure("rsakey");
+		_gnutls_mpi_release(&pkey->params[0]);
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	delete_structure("rsakey");
+
+	if (gnutls_set_datum( &pkey->raw, cert.data, cert.size) < 0) {
+		_gnutls_mpi_release(&pkey->params[0]);
+		_gnutls_mpi_release(&pkey->params[1]);
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	return ret;
+
+
+}
+
+void _gnutls_free_private_key( gnutls_private_key pkey) {
+int n, i;
+
+	switch( pkey.pk_algorithm) {
+	case GNUTLS_PK_RSA:
+		n = 2;/* the number of parameters in MPI* */
+		break;
+	default:
+		n=0;
+	}
+	for (i=0;i<n;i++) {
+		_gnutls_mpi_release( &pkey.params[i]);
+	}
+	gnutls_free_datum( &pkey.raw);
+
+}
+

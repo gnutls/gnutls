@@ -23,7 +23,7 @@ typedef struct {
 			 */
 	/* FIXME: replace datum with an internal type 
 	 */
-	gnutls_datum * pkey;   /* private keys. It contains ncerts private
+	gnutls_private_key * pkey;   /* private keys. It contains ncerts private
 				* keys. pkey[i] corresponds to certificate in
 				* cert_list[i][0].
 				*/
