@@ -1,5 +1,6 @@
-Version 0.9.96
-- Some changes to allow compiling with mingw32.
+Version 0.9.96 (09/11/2003)
+- Some changes to allow compilation with mingw32.
+- Several code cleanups.
 
 Version 0.9.95 (02/11/2003)
 - Improved the verification functions. Added new verification
