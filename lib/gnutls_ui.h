@@ -89,8 +89,8 @@ int gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
 #define gnutls_x509pki_client_get_peer_certificate_status gnutls_x509pki_get_peer_certificate_status
 #define gnutls_x509pki_client_get_peer_certificate_list gnutls_x509pki_get_peer_certificate_list
 
-int gnutls_b64_encode( const char* msg, const gnutls_datum *data, char* result, int* result_size);
-int gnutls_b64_decode( const gnutls_datum *b64_data, char* result, int* result_size);
+int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size);
+int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size);
 
 # endif /* LIBGNUTLS_VERSION */
 

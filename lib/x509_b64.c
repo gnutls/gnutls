@@ -160,38 +160,6 @@ int _gnutls_base64_encode(uint8 * data, int data_size, uint8 ** result)
 	return ret;
 }
 
-/**
-  * gnutls_b64_encode - This function will convert DER data to Base64 encoded
-  * @msg: is a message to be put in the header
-  * @data: contain the DER data
-  * @result: the place where base64 data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will convert the given data to printable data, using the base64 
-  * encoding.
-  * 
-  **/
-int gnutls_b64_encode( const char* msg, const gnutls_datum *data, char* result, int* result_size) {
-opaque* ret;
-int size;
-
-	size = _gnutls_fbase64_encode( msg, pem_data->data, pem_data->size, &ret);
-	if (size < 0)
-		return size;
-
-	if (result==NULL || *result_size < size) {
-		gnutls_free(ret);
-		*result_size = size;
-		return GNUTLS_E_INVALID_REQUEST;
-	} else {
-		memcpy( result, ret, size);
-		gnutls_free(ret);
-		*result_size = size;
-	}
-
-	return 0;
-}
-
 /* encodes data and puts the result into result (localy alocated)
  * The result_size is the return value
  */
@@ -275,6 +243,38 @@ int _gnutls_fbase64_encode(const char *msg, const uint8 * data, int data_size,
 	return ret;
 }
 
+/**
+  * gnutls_b64_encode_fmt - This function will convert raw data to Base64 encoded
+  * @msg: is a message to be put in the header
+  * @data: contain the raw data
+  * @result: the place where base64 data will be copied
+  * @result_size: holds the size of the result
+  *
+  * This function will convert the given data to printable data, using the base64 
+  * encoding. This is the encoding used in PEM messages.
+  * 
+  **/
+int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size) {
+opaque* ret;
+int size;
+
+	size = _gnutls_fbase64_encode( msg, data->data, data->size, &ret);
+	if (size < 0)
+		return size;
+
+	if (result==NULL || *result_size < size) {
+		gnutls_free(ret);
+		*result_size = size;
+		return GNUTLS_E_INVALID_REQUEST;
+	} else {
+		memcpy( result, ret, size);
+		gnutls_free(ret);
+		*result_size = size;
+	}
+
+	return 0;
+}
+
 
 /* decodes data and puts the result into result (localy alocated)
  * The result_size is the return value
@@ -324,36 +324,6 @@ inline static int cpydata(uint8 * data, int data_size, uint8 ** result)
 		j++;
 	}
 	return j;
-}
-
-/**
-  * gnutls_b64_decode - This function will decode base64 encoded data
-  * @b64_data: contain the encoded data
-  * @result: the place where decoded data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will decode the given encoded data.
-  * 
-  **/
-int gnutls_b64_decode( const gnutls_datum *b64_data, char* result, int* result_size) {
-opaque* ret;
-int size;
-
-	size = _gnutls_fbase64_decode( pem_data->data, pem_data->size, &ret);
-	if (size < 0)
-		return size;
-
-	if (result==NULL || *result_size < size) {
-		gnutls_free(ret);
-		*result_size = size;
-		return GNUTLS_E_INVALID_REQUEST;
-	} else {
-		memcpy( result, ret, size);
-		gnutls_free(ret);
-		*result_size = size;
-	}
-
-	return 0;
 }
 
 /* decodes data and puts the result into result (localy alocated)
@@ -424,6 +394,36 @@ int _gnutls_fbase64_decode( uint8 * data, int data_size,
 	gnutls_free(kdata);
 	
 	return ret;
+}
+
+/**
+  * gnutls_b64_decode_fmt - This function will decode base64 encoded data
+  * @b64_data: contain the encoded data
+  * @result: the place where decoded data will be copied
+  * @result_size: holds the size of the result
+  *
+  * This function will decode the given encoded data.
+  * 
+  **/
+int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size) {
+opaque* ret;
+int size;
+
+	size = _gnutls_fbase64_decode( b64_data->data, b64_data->size, &ret);
+	if (size < 0)
+		return size;
+
+	if (result==NULL || *result_size < size) {
+		gnutls_free(ret);
+		*result_size = size;
+		return GNUTLS_E_INVALID_REQUEST;
+	} else {
+		memcpy( result, ret, size);
+		gnutls_free(ret);
+		*result_size = size;
+	}
+
+	return 0;
 }
 
 
