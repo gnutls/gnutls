@@ -1,30 +1,5 @@
-Version 0.9.0
-- This version is not binary compatible with the previous ones.
-- The library notifies the application on empty and illegal SRP usernames, 
-  so that proper notification (via an alert) is sent to the peer.
-- Added ability to send some messages back to the application using
-  the gnutls_global_set_log_function().
-- gnutls_dh_params_generate() and gnutls_rsa_params_generate() now use 
-  gnutls_malloc() to allocate the output parameters.
-- Added support for MD2 algorithm in certificate signature verification.
-- The RSA and DH parameter generation interface was changed. Added
-  ability to import and export from and to PKCS3 structures. This 
-  was needed to read parameters generated using the openssl dhparam tool.
-- Several changes in the temporary (DH/RSA) parameter codebase. No DH 
-  parameters are now included in the library. Also the credentials structure 
-  can now hold only one temporary parameter of a kind.
-- Added a new Certificate, CRL, Private key and PKCS7 structures handling 
-  API, defined in gnutls/x509.h
-- Added gnutls_certificate_set_verify_flags() function to allow setting the 
-  verification flags in the credentials structure. They will be used in the
-  *verify_peers functions.
+Version 0.8.2
 - Added protection against the new TLS 1.0 record layer timing attack.
-- Added support for Certificate revocation lists. Functions defined
-  in gnutls/x509.h
-- The only functions were removed are:
-  gnutls_x509_certificate_to_xml()
-  gnutls_x509_extract_dn_string()
-- Ported to libtasn1 0.2.x
 
 Version 0.8.1 (22/01/2003)
 - Improved the SRP support, to prevent attackers guessing the
