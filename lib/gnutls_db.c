@@ -27,9 +27,10 @@
 #include <gnutls_db.h>
 #include "debug.h"
 
+#define GNUTLS_DBNAME state->gnutls_internals.db_name
+
 #ifdef HAVE_LIBGDBM
 # define GNUTLS_DBF state->gnutls_internals.db_reader
-# define GNUTLS_DBNAME state->gnutls_internals.db_name
 # define GNUTLS_REOPEN_DB() if (GNUTLS_DBF!=NULL) \
 	gdbm_close( GNUTLS_DBF); \
 	GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
@@ -41,7 +42,8 @@
   * @retr_func: is the function.
   *
   * Sets the function that will be used to retrieve data from the resumed
-  * sessions database. This function must return 0 on success.
+  * sessions database. This function must return a gnutls_datum containing the
+  * data on success, or a gnutls_datum containing null and 0 on failure.
   * This function should only be used if you do
   * not plan to use the included gdbm backend.
   *
@@ -94,8 +96,8 @@ void gnutls_set_db_store_function( GNUTLS_STATE state, DB_STORE_FUNC store_func)
   * @state: is a &GNUTLS_STATE structure.
   * @ptr: is the pointer
   *
-  * Sets the pointer that will be sent to store and retrieve functions, as
-  * the first argument.
+  * Sets the pointer that will be sent to db store, retrieve and delete functions, as
+  * the first argument. Should only be called if not using the gdbm backend.
   *
   **/
 void gnutls_set_db_ptr( GNUTLS_STATE state, void* ptr) {
@@ -140,7 +142,6 @@ GDBM_FILE dbf;
 	/* set name */
 	GNUTLS_DBNAME = gnutls_strdup(filename);
 	if (GNUTLS_DBNAME==NULL) return GNUTLS_E_MEMORY_ERROR;
-
 
 	/* open for reader */
 	GNUTLS_DBF = gdbm_open(GNUTLS_DBNAME, 0, GDBM_READER, 0600, NULL);
@@ -317,12 +318,9 @@ int ret = 0;
 		return GNUTLS_E_INVALID_SESSION;
 
 	/* if we can't read why bother writing? */
-	if (GNUTLS_DBF==NULL) { /* use external backend. */
-		
-		ret = state->gnutls_internals.db_store_func( state->gnutls_internals.db_ptr, session_id, session_data);
-	
-	} else { /* use gdbm */
+
 #ifdef HAVE_LIBGDBM
+	if (GNUTLS_DBF!=NULL) { /* use gdbm */
 		dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
 		if (dbf==NULL) {
 			/* cannot open db for writing. This may happen if multiple
@@ -333,10 +331,13 @@ int ret = 0;
 		ret = gdbm_store( dbf, key, content, GDBM_INSERT);
 
 		gdbm_close(dbf);
-#else
+
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#endif
 	}
+	else 
+#endif
+		if (state->gnutls_internals.db_store_func!=NULL)
+			ret = state->gnutls_internals.db_store_func( state->gnutls_internals.db_ptr, session_id, session_data);
 
 
 	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
@@ -361,19 +362,15 @@ gnutls_datum ret = { NULL, 0 };
 		return ret;
 
 	/* if we can't read why bother writing? */
-	if (GNUTLS_DBF==NULL) { /* use external backend. */
-		
-		ret = state->gnutls_internals.db_retrieve_func( state->gnutls_internals.db_ptr, session_id);
-	
-	} else { /* use gdbm */
 #ifdef HAVE_LIBGDBM
+	if (GNUTLS_DBF!=NULL) { /* use gdbm */
 		content = gdbm_fetch( GNUTLS_DBF, key);
 		ret.data = content.dptr;
 		ret.size = content.dsize;
-#else
-		return ret;
+	} else
 #endif
-	}
+		if (state->gnutls_internals.db_retrieve_func!=NULL)
+			ret = state->gnutls_internals.db_retrieve_func( state->gnutls_internals.db_ptr, session_id);
 
 
 	return ret;
@@ -398,12 +395,9 @@ int ret = 0;
 		return GNUTLS_E_INVALID_SESSION;
 
 	/* if we can't read why bother writing? */
-	if (GNUTLS_DBF==NULL) { /* use external backend. */
-		
-		ret = state->gnutls_internals.db_remove_func( state->gnutls_internals.db_ptr, session_id);
-	
-	} else { /* use gdbm */
 #ifdef HAVE_LIBGDBM
+	if (GNUTLS_DBF!=NULL) { /* use gdbm */
+
 		dbf = gdbm_open(GNUTLS_DBNAME, 0, GDBM_WRITER, 0600, NULL);
 		if (dbf==NULL) {
 			/* cannot open db for writing. This may happen if multiple
@@ -414,10 +408,10 @@ int ret = 0;
 		ret = gdbm_delete( dbf, key);
 
 		gdbm_close(dbf);
-#else
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+	} else
 #endif
-	}
+		if (state->gnutls_internals.db_remove_func!=NULL)
+			ret = state->gnutls_internals.db_remove_func( state->gnutls_internals.db_ptr, session_id);
 
 
 	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
