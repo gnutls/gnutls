@@ -346,7 +346,7 @@ gc_hash_buffer (int hash, const char *in, size_t inlen, char *out)
       return GC_INVALID_HASH;
     }
 
-  gcry_md_hash_buffer(gcryalg, out, in, inlen);
+  gcry_md_hash_buffer (gcryalg, out, in, inlen);
 
   return GC_OK;
 }
@@ -380,8 +380,7 @@ gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN])
 
 int
 gc_hmac_md5 (const char *key, size_t keylen,
-	     const char *in, size_t inlen,
-	     char outhash[GC_MD5_LEN])
+	     const char *in, size_t inlen, char outhash[GC_MD5_LEN])
 {
   size_t hlen = gcry_md_get_algo_dlen (GCRY_MD_MD5);
   gcry_md_hd_t mdh;
@@ -413,8 +412,7 @@ gc_hmac_md5 (const char *key, size_t keylen,
 
 int
 gc_hmac_sha1 (const char *key, size_t keylen,
-	     const char *in, size_t inlen,
-	     char outhash[GC_SHA1_LEN])
+	      const char *in, size_t inlen, char outhash[GC_SHA1_LEN])
 {
   size_t hlen = gcry_md_get_algo_dlen (GCRY_MD_SHA1);
   gcry_md_hd_t mdh;

@@ -131,6 +131,7 @@ extern int gc_hmac_sha1 (const char *key, size_t keylen,
 /* PKCS5 KDF. */
 extern int gc_pkcs5_pbkdf2_sha1 (const char *P, size_t Plen,
 				 const char *S, size_t Slen,
-				 unsigned int c, unsigned int dkLen, char *DK);
+				 unsigned int c, unsigned int dkLen,
+				 char *DK);
 
 #endif /* GC_H */

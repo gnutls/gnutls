@@ -583,8 +583,7 @@ gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN])
  **/
 int
 gc_hmac_md5 (const char *key, size_t keylen,
-	     const char *in, size_t inlen,
-	     char outhash[GC_MD5_LEN])
+	     const char *in, size_t inlen, char outhash[GC_MD5_LEN])
 {
   struct hmac_md5_ctx ctx;
 
@@ -609,8 +608,7 @@ gc_hmac_md5 (const char *key, size_t keylen,
  **/
 int
 gc_hmac_sha1 (const char *key, size_t keylen,
-	      const char *in, size_t inlen,
-	      char outhash[SHA1_DIGEST_SIZE])
+	      const char *in, size_t inlen, char outhash[SHA1_DIGEST_SIZE])
 {
   struct hmac_sha1_ctx ctx;
 

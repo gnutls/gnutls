@@ -23,10 +23,17 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "utils.h"
 
 #include "gc.h"
+
+int
+is_secure_mem (const void *ign)
+{
+  return 0;
+}
 
 void
 doit (void)
@@ -37,6 +44,8 @@ doit (void)
   err = gc_init ();
   if (err)
     fail ("gc_init() failed: %d\n", err);
+
+  gc_set_allocators (malloc, malloc, is_secure_mem, realloc, free);
 
   err = gc_md5 ("abcdefgh", 8, digest);
   if (err)
@@ -74,7 +83,8 @@ doit (void)
   else
     {
       if (memcmp (digest, "\x42\x5a\xf1\x2a\x07\x43\x50\x2b"
-		  "\x32\x2e\x93\xa0\x15\xbc\xf8\x68\xe3\x24\xd5\x6a", 20) == 0)
+		  "\x32\x2e\x93\xa0\x15\xbc\xf8\x68\xe3\x24\xd5\x6a",
+		  20) == 0)
 	success ("gc_hash_buffer(GC_SHA1) OK\n");
       else
 	{
@@ -104,7 +114,8 @@ doit (void)
   else
     {
       if (memcmp (digest, "\x58\x93\x7a\x58\xfe\xea\x82\xf8"
-		  "\x0e\x64\x62\x01\x40\x2b\x2c\xed\x5d\x54\xc1\xfa", 20) == 0)
+		  "\x0e\x64\x62\x01\x40\x2b\x2c\xed\x5d\x54\xc1\xfa",
+		  20) == 0)
 	success ("gc_hmac_sha1() OK\n");
       else
 	{
@@ -113,9 +124,7 @@ doit (void)
 	}
     }
 
-  err = gc_pkcs5_pbkdf2_sha1 ("password", 8,
-			      "salt", 4,
-			      4711, 16, digest);
+  err = gc_pkcs5_pbkdf2_sha1 ("password", 8, "salt", 4, 4711, 16, digest);
   if (err)
     fail ("gc_pkcs5_pbkdf2_sha1() failed: %d\n", err);
   else
