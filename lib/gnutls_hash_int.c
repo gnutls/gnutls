@@ -119,10 +119,10 @@ int ret;
 			ret = 0;
 			break;
 		case GNUTLS_MAC_SHA:
-			ret = mhash_get_hash_pblock(MHASH_SHA1);
+			ret = mhash_get_block_size(MHASH_SHA1);
 			break;
 		case GNUTLS_MAC_MD5:
-			ret = mhash_get_hash_pblock(MHASH_MD5);
+			ret = mhash_get_block_size(MHASH_MD5);
 			break;
 		default:
 			ret = 0;

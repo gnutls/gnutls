@@ -48,6 +48,7 @@ int gnutls_is_secure_memory(const void* mem) {
 /* This function initializes the state to null (null encryption etc...) */
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
+	/* for gcrypt in order to be able to allocate memory */
 	gcry_set_allocation_handler(gnutls_malloc, secure_malloc,  gnutls_is_secure_memory, gnutls_realloc, free);
 
 	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
@@ -135,9 +136,7 @@ void *_gnutls_cal_PRF_A(MACAlgorithm algorithm, void *secret, int secret_size, v
 	GNUTLS_MAC_HANDLE td1;
 
 	td1 = gnutls_hmac_init(algorithm, secret, secret_size);
-
 	gnutls_hmac(td1, seed, seed_size);
-
 	return gnutls_hmac_deinit(td1);
 }
 
@@ -161,6 +160,7 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 		i += blocksize;
 	} while (i < total_bytes);
 
+	/* calculate A(0) */
 	A = _gnutls_cal_PRF_A(algorithm, secret, secret_size, seed, seed_size);
 	A_size = blocksize;
 
@@ -168,7 +168,7 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 	for (i = 0; i < times; i++) {
 		td2 = gnutls_hmac_init(algorithm, secret, secret_size);
 
-		/* here we calculate A[i+1] */
+		/* here we calculate A(i+1) */
 		Atmp = _gnutls_cal_PRF_A(algorithm, secret, secret_size, A, A_size);
 		gnutls_free(A);
 		A = Atmp;
@@ -195,6 +195,8 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 
 /* The PRF function expands a given secret 
  * needed by the TLS specification
+ * Nov 8 2000: This seems to be BROKEN! We do not return the same values
+ * as openssl is... #^$@#$% the protocol which didn't use test vectors!
  */
 svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
 {

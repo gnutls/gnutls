@@ -1,5 +1,7 @@
 #ifndef GNUTLS_INT_H
 
+#define USE_MHASH
+#include <mhash.h>
 #include <gcrypt.h>
 
 #define GNUTLS_INT_H
@@ -12,8 +14,14 @@
 #define MAX16 65535
 
 /* for message digests */
+#ifndef USE_MHASH
 #define GNUTLS_HASH_HANDLE GCRY_MD_HD
 #define GNUTLS_MAC_HANDLE GCRY_MD_HD
+#else
+#define GNUTLS_HASH_HANDLE MHASH
+#define GNUTLS_MAC_HANDLE MHASH
+#endif
+
 #define GNUTLS_HASH_FAILED NULL
 #define GNUTLS_MAC_FAILED NULL
 

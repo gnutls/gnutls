@@ -132,6 +132,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	char *random = gnutls_malloc(64);
 
 #ifdef HARD_DEBUG
+	int i;
 	fprintf(stderr, "Sending client KX message\n");
 #endif
 
@@ -184,6 +185,12 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 			       &premaster_size,
 			       state->gnutls_internals.KEY);
 
+#ifdef HARD_DEBUG
+		fprintf(stderr, "PREMASTER SECRET: ");
+		for (i=0;i<premaster_size;i++) fprintf(stderr, "%x",premaster[i]);
+		fprintf(stderr, "\n");
+#endif
+
 		/* THIS SHOULD BE DISCARDED */
 		gnutls_mpi_release(state->gnutls_internals.KEY);
 		gnutls_mpi_release(state->gnutls_internals.client_Y);
@@ -205,7 +212,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 		       48);
 	secure_free(premaster);
 #ifdef HARD_DEBUG
-	fprintf(stderr, "master secret: %s\n", bin2hex(master, 48));
+	fprintf(stderr, "MASTER SECRET: %s\n", bin2hex(master, 48));
 #endif
 	memmove(state->security_parameters.master_secret, master, 48);
 	secure_free(master);
