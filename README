@@ -1,3 +1,7 @@
+This is the GNUTLS library. It is a TLS implementation under GNU General
+Public License. It is currently under heavy development. (and still
+not ready for real world programs)
+
 * The library needs libgcrypt. Libgcrypt is part of gnupg (cvs.gnupg.org)
 
 * Run the buildconf script before doing anything. This will create
