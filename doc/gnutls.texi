@@ -7,12 +7,12 @@
 @syncodeindex pg cp
 @comment %**end of header
 @copying
-This manual is for GNU TLS
-(version @value{VERSION}, @value{UPDATED}),
-a Transport Layer Security Library.
+This manual is last updated @value{UPDATED} for version
+@value{VERSION} of GNU TLS.
 
-Copyright @copyright{} 2001,2002,2003,2004 Nikos Mavroyanopoulos
 Copyright @copyright{} 2004 Free Software Foundation, Inc.
+
+Copyright @copyright{} 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -31,6 +31,7 @@ Free Documentation License".
 
 @titlepage
 @title GNU TLS
+@subtitle Transport Layer Security Library for the GNU system
 @subtitle for version @value{VERSION}, @value{UPDATED}
 @author Nikos Mavroyanopoulos (@email{bug-gnutls@@gnu.org})
 @page
