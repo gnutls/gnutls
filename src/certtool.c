@@ -1628,9 +1628,7 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 			
 			size = sizeof(buffer);
 			ret = gnutls_x509_crt_get_extension_by_oid( crt, oid, indx, buffer, &size, &critical);
-if (ret < 0) {
-	fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-}
+
 			if (ret >= 0) {
 				if (critical)
 					fprintf(out, "(critical)\n");
