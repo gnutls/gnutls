@@ -1481,7 +1481,7 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
   
     hp = gethostbyname( host );
     if( hp == NULL )
-        return -1;
+        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
   
     memset( &sock, 0, sizeof sock );
     memcpy( &sock.sin_addr, hp->h_addr, hp->h_length );
@@ -1490,22 +1490,23 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
 
     fd = socket( AF_INET, SOCK_STREAM, 0 );
     if( fd == -1 )
-        return -1;
+        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+
     setsockopt( fd, SOL_SOCKET, SO_REUSEADDR, (char *)1, 1 );
     if( connect( fd, (struct sockaddr*)&sock, sizeof sock ) == -1 ) {
         close( fd );
-        return -1;
+        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
 
     n = strlen( host ) + 100;
     request = cdk_calloc( 1, n + 1 );
     if( !request ) {
         close( fd );
-        return -1;
+        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
     snprintf( request, n,
               "GET /pks/lookup?op=get&search=0x%08lX HTTP/1.0\r\n"
-              "Host: %s:%d\r\n", keyid, host, port );
+              "Host: %s:%d\r\n\r\n", keyid, host, port );
     
     if( write( fd, request, strlen( request ) ) == -1 ) {
         cdk_free( request );
@@ -1588,6 +1589,9 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
     rc = gnutls_openpgp_recv_key( cred->pgp_key_server,
                                   cred->pgp_key_server_port,
                                   keyid, ret );
+
+    if (rc == GNUTLS_E_INVALID_REQUEST)
+    	return GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
     return rc;
 }
