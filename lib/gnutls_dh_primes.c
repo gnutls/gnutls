@@ -472,7 +472,8 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-		if ((result=asn1_der_coding( c2, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
+		if ((result=asn1_der_coding( c2, "", tmp, &len, NULL)) != ASN1_SUCCESS) 
+		{
 			gnutls_assert();
 			gnutls_free( tmp);
 			asn1_delete_structure(&c2);
@@ -500,7 +501,7 @@ int gnutls_dh_params_export_pkcs3( gnutls_dh_params params,
 		if ((uint)result + 1 > *params_data_size) {
 			gnutls_assert();
 			gnutls_free(out);
-			*params_data_size = result;
+			*params_data_size = result + 1;
 			return GNUTLS_E_SHORT_MEMORY_BUFFER;
 		}
 

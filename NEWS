@@ -1,4 +1,4 @@
-Version 1.0.1
+Version 1.0.1 (10/12/2003)
 - Some minor fixes in the makefiles. They now include CFLAGS
   from libgcrypt or opencdk if installed in a non standard directory.
 - Fixed the SRP detection test in gnutls-cli-debug.
