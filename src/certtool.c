@@ -1,7 +1,31 @@
+/*
+ * Copyright (C) 2003 Nikos Mavroyanopoulos
+ *
+ * This file is part of GNUTLS.
+ *
+ * GNUTLS is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * GNUTLS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ */
+
+#include <config.h>
+#include <gnutls/gnutls.h>
+
+#ifdef ENABLE_PKI
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <time.h>
 #include "certtool-gaa.h"
@@ -530,12 +554,6 @@ void gaa_parser(int argc, char **argv)
 	fclose(outfile);
 }
 
-void certtool_version(void)
-{
-	fprintf(stderr, "certtool, ");
-	fprintf(stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
-		gnutls_check_version(NULL));
-}
 
 const char* get_algorithm( int a) 
 {
@@ -1583,3 +1601,21 @@ void pkcs12_info( void)
 	
 }
 
+#else /* ENABLE_PKI */
+
+#include <stdio.h>
+
+int main (int argc, char **argv)
+{
+    printf ("\nX.509 PKI not supported. This program is a dummy.\n\n");
+    return 1;
+};
+
+#endif
+
+void certtool_version(void)
+{
+	fprintf(stderr, "certtool, ");
+	fprintf(stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
+		gnutls_check_version(NULL));
+}
