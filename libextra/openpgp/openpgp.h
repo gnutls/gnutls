@@ -1,3 +1,7 @@
+#include <config.h>
+
+#ifdef HAVE_LIBOPENCDK
+
 #ifndef OPENPGP_H
 # define OPENPGP_H
 
@@ -63,3 +67,5 @@ int gnutls_openpgp_key_verify_trustdb( gnutls_openpgp_key key,
         unsigned int flags, unsigned int *verify);
 
 #endif
+
+#endif /* HAVE_LIBOPENCDK */
