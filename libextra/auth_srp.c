@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -247,7 +247,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session state, opaque ** data)
 	_gnutls_mpi_release(&state->key->u);
 	_gnutls_mpi_release(&B);
 
-	ret = _gnutls_generate_key( state->key);
+	ret = _gnutls_generate_session_key( state->key);
 	_gnutls_mpi_release(&S);
 
 	if (ret < 0)
@@ -326,7 +326,7 @@ int _gnutls_proc_srp_client_kx(gnutls_session state, opaque * data, size_t _data
 	_gnutls_mpi_release(&state->key->u);
 	_gnutls_mpi_release(&B);
 
-	ret = _gnutls_generate_key( state->key);
+	ret = _gnutls_generate_session_key( state->key);
 	_gnutls_mpi_release( &S);
 
 	if (ret < 0) {
