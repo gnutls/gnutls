@@ -86,7 +86,7 @@ int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *sessi
   *
   * Sets all session parameters - in order to support resuming
   * session must be the one returned by gnutls_get_current_session();
-  * This function should be called before gnutls_handshake_begin() or gnutls_handshake().
+  * This function should be called before gnutls_handshake().
   * Keep in mind that session resuming is advisory. The server may
   * choose not to resume the session, thus a full handshake will be
   * performed.

@@ -138,6 +138,15 @@ void print_info(GNUTLS_STATE state)
 	const SRP_AUTH_INFO *srp_info;
 	const ANON_AUTH_INFO *dh_info;
 	char *tmp;
+	unsigned char sesid[32];
+	int sesid_size, i;
+	
+	/* print session_id specific data */
+	gnutls_get_current_session_id( state, sesid, &sesid_size);
+	printf("\n- Session ID: ");
+	for(i=0;i<sesid_size;i++)
+		printf("%.2X", sesid[i]);
+	printf("\n");
 
 	/* print srp specific data */
 	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
@@ -177,13 +186,24 @@ void print_info(GNUTLS_STATE state)
 
 }
 
+/* Creates html with the current state information.
+ */
 #define tmp2 &http_buffer[strlen(http_buffer)]
 void peer_print_info(int cd, GNUTLS_STATE state)
 {
 	const SRP_AUTH_INFO *srp_info;
 	const ANON_AUTH_INFO *dh_info;
 	char *tmp;
+	unsigned char sesid[32];
+	int sesid_size, i;
 	
+	/* print session_id */
+	gnutls_get_current_session_id( state, sesid, &sesid_size);
+	sprintf(tmp2, "\n<p>Session ID: <i>");
+	for(i=0;i<sesid_size;i++)
+		sprintf(tmp2, "%.2X", sesid[i]);
+	sprintf(tmp2, "</i></p>\n");
+
 	/* print srp specific data */
 	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
 		srp_info = gnutls_get_auth_info(state);
@@ -231,23 +251,29 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 	return;
 }
 
+/* actually something like readline.
+ * if rnl!=1 then reads an http request in the form REQ\n\n
+ */
 int read_request(int cd, GNUTLS_STATE state, char *data, int data_size, int rnl)
 {
-	/* rnl is the requested new lines. Eg. return if 3 newlines
-	 * were given 
-	 */
 	int n, rc, nl = 0;
-	char c, *ptr;
+	char c, *ptr, p1=0, p2=0;
 
 	ptr = data;
 	for (n = 1; n < data_size; n++) {
 		if ((rc = gnutls_read(cd, state, &c, 1)) == 1) {
+
 			*ptr++ = c;
-			if (c == '\n') {
+			if (c == '\n' && rnl==1) break;
+
+			if (c=='\n' && p1=='\r' && p2=='\n') {
 				nl++;
-				if (nl == rnl)
+				if (nl == 1)
 					break;
 			}
+			p2 = p1;
+			p1 = c;
+
 		} else if (rc == 0) {
 			if (n == 1)
 				return 0;
@@ -257,6 +283,7 @@ int read_request(int cd, GNUTLS_STATE state, char *data, int data_size, int rnl)
 			return rc;
 		}
 	}
+fprintf(stderr, "\n");
 	*ptr = 0;
 	return n;
 }
@@ -384,7 +411,7 @@ int main(int argc, char **argv)
 			}
 		}
 		printf("\n");
-		gnutls_bye(sd, state);
+		gnutls_bye_nowait(sd, state);
 		close(sd);
 		gnutls_deinit(state);
 	}

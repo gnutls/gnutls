@@ -74,8 +74,8 @@ int _gnutls_calc_rsa_signature( GNUTLS_KEY key, const opaque* data, int data_siz
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	gnutls_hash( td, key->client_random, 32);
-	gnutls_hash( td, key->server_random, 32);
+	gnutls_hash( td, key->client_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td, key->server_random, TLS_RANDOM_SIZE);
 	gnutls_hash( td, data, data_size);
 	
 	md5 = gnutls_hash_deinit(td);
@@ -92,8 +92,8 @@ int _gnutls_calc_rsa_signature( GNUTLS_KEY key, const opaque* data, int data_siz
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	gnutls_hash( td, key->client_random, 32);
-	gnutls_hash( td, key->server_random, 32);
+	gnutls_hash( td, key->client_random, TLS_RANDOM_SIZE);
+	gnutls_hash( td, key->server_random, TLS_RANDOM_SIZE);
 	gnutls_hash( td, data, data_size);
 	
 	sha = gnutls_hash_deinit(td);
@@ -388,7 +388,7 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 	return pdatasize;
 }
 
-#define RANDOMIZE_X(x) x.size=48; x.data=gnutls_malloc(x.size); \
+#define RANDOMIZE_X(x) x.size=TLS_MASTER_SIZE; x.data=gnutls_malloc(x.size); \
 		if (x.data==NULL) return GNUTLS_E_MEMORY_ERROR; \
 		if (_gnutls_get_random( key->key.data, key->key.size, GNUTLS_WEAK_RANDOM) < 0) { \
 			return GNUTLS_E_MEMORY_ERROR; \
@@ -419,7 +419,7 @@ int proc_rsa_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 		RANDOMIZE_X(key->key);
 	} else {
 		ret = 0;
-		if (plaintext.size != 48) { /* WOW */
+		if (plaintext.size != TLS_MASTER_SIZE) { /* WOW */
 			RANDOMIZE_X(key->key);
 		} else {
 			if (key->version.major != plaintext.data[0]) ret = GNUTLS_E_DECRYPTION_FAILED;

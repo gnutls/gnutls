@@ -27,10 +27,11 @@
 #define READ_DEBUG
 #define WRITE_DEBUG
 #define BUFFERS_DEBUG
-#define HANDSHAKE_DEBUG
+*/#define HANDSHAKE_DEBUG
+/*#define RECORD_DEBUG
 #define HARD_DEBUG
-#define DEBUG
 */
+#define DEBUG
 
 #define SOCKET int
 #define LIST ...
@@ -41,6 +42,7 @@
 
 #define TLS_RANDOM_SIZE 32
 #define TLS_MAX_SESSION_ID_SIZE 32
+#define TLS_MASTER_SIZE 48
 
 /* the default for TCP */
 #define DEFAULT_LOWAT 1
@@ -207,7 +209,7 @@ typedef struct {
 	uint8 key_size;
 	uint8 key_material_length;
 	uint8 hash_size;
-	opaque master_secret[48];
+	opaque master_secret[TLS_MASTER_SIZE];
 	opaque client_random[TLS_RANDOM_SIZE];
 	opaque server_random[TLS_RANDOM_SIZE];
 	opaque session_id[TLS_MAX_SESSION_ID_SIZE];

@@ -4,6 +4,7 @@ Version 0.1.4
 - Added RSA Ciphersuites (server side only).
 - Fixes in SSL 2.0 client hello parsing.
 - Added ASN.1 and DER parsers.
+- Bugfixes in session resuming
 
 Version 0.1.3 (01/06/2001)
 - Updated API (and the way it is documented - we use inline documentation)

@@ -8,4 +8,3 @@
   only one parse of the der structures.
 * Create global variables that hold read/write and initialize
   the ASN.1 parser's structures.
-* Fix session resuming

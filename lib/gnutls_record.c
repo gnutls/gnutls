@@ -34,6 +34,7 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_num.h"
 #include "gnutls_record.h"
+
 #ifdef HAVE_ERRNO_H
 # include <errno.h>
 #endif
@@ -189,6 +190,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 
 	GNUTLS_FREE(state->gnutls_internals.db_name);
 
+	memset( state, 0, sizeof(GNUTLS_STATE_INT));
 	GNUTLS_FREE(state);
 	return 0;
 }
@@ -356,24 +358,32 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	int hash_size;
 	int IV_size;
 	int key_size;
-
+	int block_size;
+	
 	hash_size = state->security_parameters.hash_size;
 	IV_size = state->security_parameters.IV_size;
 	key_size = state->security_parameters.key_material_length;
 
 	memmove(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, 32);
+	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
+
+	block_size = 2 * hash_size + 2 * key_size + 2 * IV_size;
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3 */
-		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, 48, random, 64,
-			2 * hash_size + 2 * key_size + 2 * IV_size);
+		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
+			block_size);
 	} else { /* TLS 1.0 */
 		key_block =
-		    gnutls_PRF( state->security_parameters.master_secret, 48,
-			       keyexp, strlen(keyexp), random, 64, 2 * hash_size + 2 * key_size + 2 * IV_size);
+		    gnutls_PRF( state->security_parameters.master_secret, TLS_MASTER_SIZE,
+			       keyexp, strlen(keyexp), random, 2*TLS_RANDOM_SIZE, 
+			       block_size);
 	}
 	
 	if (key_block==NULL) return GNUTLS_E_MEMORY_ERROR;
+
+#ifdef HARD_DEBUG
+	fprintf(stderr, "KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
+#endif
 
 	if (hash_size>0) {
 		state->cipher_specs.client_write_mac_secret = secure_malloc(hash_size);
@@ -451,6 +461,27 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state)
 	return ret;
 }
 
+/**
+  * gnutls_bye_nowait - This function terminates the current TLS/SSL connection.
+  * @cd: is a connection descriptor.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Terminates the current TLS/SSL connection. The connection should
+  * have been initiated using gnutls_handshake() or similar function.
+  * This function does not wait for the other peer to close the TLS
+  * connection.
+  **/
+int gnutls_bye_nowait(SOCKET cd, GNUTLS_STATE state)
+{
+	int ret;
+
+	ret = _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+
+	state->gnutls_internals.valid_connection = VALID_FALSE;
+
+	return ret;
+}
+
 int gnutls_close_nowait(SOCKET cd, GNUTLS_STATE state)
 {
 	int ret;
@@ -496,7 +527,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
 	headers[1]=_gnutls_version_get_major(state->connection_state.version);
 	headers[2]=_gnutls_version_get_minor(state->connection_state.version);
 
-#ifdef HARD_DEBUG
+#ifdef RECORD_DEBUG
 	fprintf(stderr, "Record: Sending Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
@@ -523,7 +554,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
 			gnutls_assert();
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
-#ifdef HARD_DEBUG
+#ifdef RECORD_DEBUG
 		fprintf(stderr, "Record: Sended Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 #endif
@@ -592,7 +623,7 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 	headers[2] = _gnutls_version_get_minor(state->connection_state.version);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "ChangeCipherSpec was sent\n");
+	fprintf(stderr, "Record: ChangeCipherSpec was sent\n");
 #endif
 
 	WRITEuint16( 1, &headers[3]);
@@ -722,7 +753,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 	}
 
 
-#ifdef HARD_DEBUG
+#ifdef RECORD_DEBUG
 	fprintf(stderr, "Record: Expected Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 	fprintf(stderr, "Record: Received Packet[%d] %s(%d) with length: %d\n",
@@ -795,7 +826,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 	}
 	
 	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
-#ifdef HARD_DEBUG
+#ifdef RECORD_DEBUG
 		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
 #endif
 		gnutls_free(ciphertext);
@@ -826,7 +857,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		return tmplen;
 	}
 
-#ifdef HARD_DEBUG
+#ifdef RECORD_DEBUG
 	fprintf(stderr, "Record: Decrypted Packet[%d] %s(%d) with length: %d\n",
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
 #endif

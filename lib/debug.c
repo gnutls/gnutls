@@ -77,46 +77,6 @@ void _gnutls_print_state(GNUTLS_STATE state)
 
 }
 
-void _gnutls_print_TLSCompressed(GNUTLSCompressed * compressed)
-{
-	fprintf(stderr, "TLSCompressed packet:\n");
-	fprintf(stderr, "type: %d\n", compressed->type);
-	fprintf(stderr, "version: %d,%d\n", compressed->version.major,
-		compressed->version.minor);
-	fprintf(stderr, "length: %d\n", compressed->length);
-	fprintf(stderr, "fragment: %s\n",
-		_gnutls_bin2hex(compressed->fragment, compressed->length));
-	fprintf(stderr, "\n");
-}
-
-
-void _gnutls_print_TLSPlaintext(GNUTLSPlaintext * plaintext)
-{
-	fprintf(stderr, "TLSPlaintext packet:\n");
-	fprintf(stderr, "type: %d\n", plaintext->type);
-	fprintf(stderr, "version: %d,%d\n", plaintext->version.major,
-		plaintext->version.minor);
-	fprintf(stderr, "length: %d\n", plaintext->length);
-	fprintf(stderr, "fragment: %s\n",
-		_gnutls_bin2hex(plaintext->fragment, plaintext->length));
-	fprintf(stderr, "\n");
-}
-
-
-void _gnutls_print_TLSCiphertext(GNUTLSCiphertext * ciphertext)
-{
-
-	fprintf(stderr, "TLSCiphertext packet:\n");
-	fprintf(stderr, "type: %d\n", ciphertext->type);
-	fprintf(stderr, "version: %d,%d\n", ciphertext->version.major,
-		ciphertext->version.minor);
-	fprintf(stderr, "length: %d\n", ciphertext->length);
-
-	fprintf(stderr, "fragment: %s\n",
-		_gnutls_bin2hex(ciphertext->fragment, ciphertext->length));
-	fprintf(stderr, "\n");
-}
-
 char* _gnutls_alert2str( int alert) {
 static char str[512];
 

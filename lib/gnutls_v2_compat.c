@@ -207,9 +207,6 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	DECR_LEN(len, challenge);
 	memset( random, 0, TLS_RANDOM_SIZE);
 	
-	/* Well, I think that this is not what TLS 1.0 defines,
-	 * but with this, we are compatible with netscape browser!
-	 */
 	memcpy( &random[TLS_RANDOM_SIZE-challenge], &data[pos], challenge);
 
 	_gnutls_set_client_random( state, random);

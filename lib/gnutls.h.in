@@ -56,6 +56,8 @@ typedef struct {
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE state);
 int gnutls_bye(SOCKET cd, GNUTLS_STATE state);
+int gnutls_bye_nowait(SOCKET cd, GNUTLS_STATE state);
+
 int gnutls_handshake(SOCKET cd, GNUTLS_STATE state);
 int gnutls_check_pending(GNUTLS_STATE state);
 int gnutls_rehandshake(SOCKET cd, GNUTLS_STATE state);

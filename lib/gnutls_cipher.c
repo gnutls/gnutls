@@ -30,6 +30,7 @@
 #include "gnutls_random.h"
 #include "gnutls_num.h"
 #include "gnutls_datum.h"
+#include "gnutls_kx.h"
 
 int _gnutls_encrypt(GNUTLS_STATE state, const char *data, size_t data_size,
 		    uint8 ** ciphertext, ContentType type)
@@ -186,7 +187,7 @@ int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
  */
 int _gnutls_connection_state_init(GNUTLS_STATE state)
 {
-	int rc, mac_size;
+	int rc, mac_size, ret;
 
 	uint64zero(&state->connection_state.write_sequence_number);
 	uint64zero(&state->connection_state.read_sequence_number);
@@ -225,19 +226,20 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 
 		/* clear the resumed security parameters */
 		 memset( &state->gnutls_internals.resumed_security_parameters, 0, sizeof(SecurityParameters));
-#ifdef HARD_DEBUG
-		 fprintf(stderr, "Master Secret: %s\n", _gnutls_bin2hex(state->security_parameters.master_secret, 48));
-#endif
 	}
 /* Setup the keys since we have the master secret 
  */
-	_gnutls_set_keys(state);
+	if ( (ret=_gnutls_generate_master(state)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
+	_gnutls_set_keys(state);
 
 #ifdef DEBUG
 	fprintf(stderr, "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->
-					      security_parameters.current_suite));
+					      security_parameters.current_cipher_suite));
 #endif
 
 	if (state->connection_state.write_mac_secret!=NULL)

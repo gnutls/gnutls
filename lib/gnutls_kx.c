@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -29,52 +29,105 @@
 #include "gnutls_gcry.h"
 
 #define MASTER_SECRET "master secret"
+static int generate_normal_master( GNUTLS_STATE state);
+static int generate_resumed_master( GNUTLS_STATE state);
 
+int _gnutls_generate_master( GNUTLS_STATE state) {
+	if (state->gnutls_internals.resumed==RESUME_FALSE)
+		return generate_normal_master(state);
+	return 0;
+}
 
-static int generate_master( GNUTLS_STATE state) {
+static int generate_normal_master( GNUTLS_STATE state) {
 int premaster_size;
 #ifdef HARD_DEBUG
 int i;
 #endif
 opaque* premaster, *master;
 int ret = 0;
-char random[64];
+char random[2*TLS_RANDOM_SIZE];
 
-	memmove(random, state->security_parameters.client_random, 32);
-	memmove(&random[32], state->security_parameters.server_random, 32);
+	memmove(random, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
 
 	/* generate premaster */
         premaster_size = state->gnutls_key->key.size;
 	premaster = state->gnutls_key->key.data;
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "PREMASTER SECRET: ");
-	for (i=0;i<premaster_size;i++) fprintf(stderr, "%x",premaster[i]);
-	fprintf(stderr, "\n");
+	fprintf(stderr, "PREMASTER SECRET[%d]: %s\n", premaster_size, _gnutls_bin2hex(premaster, premaster_size));
+	fprintf(stderr, "CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
+	fprintf(stderr, "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
 #endif
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
 		master =
 		    gnutls_ssl3_generate_random( premaster, premaster_size,
-			       random, 64, 48);
+			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE);
 
 	} else {
 		master =
 		    gnutls_PRF( premaster, premaster_size,
 			       MASTER_SECRET, strlen(MASTER_SECRET),
-			       random, 64, 48); 
+			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE); 
 	}
 	secure_free(premaster);
 	state->gnutls_key->key.size = 0;
 	state->gnutls_key->key.data = NULL;
 	
+	if (master==NULL) return GNUTLS_E_MEMORY_ERROR;
+	
 #ifdef HARD_DEBUG
-	fprintf(stderr, "MASTER SECRET: %s\n", _gnutls_bin2hex(master, 48));
+	fprintf(stderr, "MASTER SECRET: %s\n", _gnutls_bin2hex(master, TLS_MASTER_SIZE));
 #endif
-	memmove(state->security_parameters.master_secret, master, 48);
+	memmove(state->security_parameters.master_secret, master, TLS_MASTER_SIZE);
 	secure_free(master);
 	return ret;
+}
 
+static int generate_resumed_master( GNUTLS_STATE state) {
+int premaster_size;
+#ifdef HARD_DEBUG
+int i;
+#endif
+opaque* premaster, *master;
+int ret = 0;
+char random[2*TLS_RANDOM_SIZE];
+
+	memmove(random, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
+
+	/* generate premaster */
+        premaster_size = sizeof(state->security_parameters.master_secret);
+	premaster = state->security_parameters.master_secret;
+
+#ifdef HARD_DEBUG
+	fprintf(stderr, "RESUME...\n");
+	fprintf(stderr, "PREMASTER SECRET[%d]: %s\n", premaster_size, _gnutls_bin2hex(premaster, premaster_size));
+	fprintf(stderr, "CLIENT RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.client_random,32));
+	fprintf(stderr, "SERVER RANDOM[%d]: %s\n", 32, _gnutls_bin2hex(state->security_parameters.server_random,32));
+#endif
+
+	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+		master =
+		    gnutls_ssl3_generate_random( premaster, premaster_size,
+			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE);
+
+	} else {
+		master =
+		    gnutls_PRF( premaster, premaster_size,
+			       MASTER_SECRET, strlen(MASTER_SECRET),
+			       random, 2*TLS_RANDOM_SIZE, TLS_MASTER_SIZE); 
+	}
+	
+#ifdef HARD_DEBUG
+	fprintf(stderr, "MASTER SECRET: %s\n", _gnutls_bin2hex(master, TLS_MASTER_SIZE));
+#endif
+	if (master==NULL) return GNUTLS_E_MEMORY_ERROR;
+
+	memmove(state->security_parameters.master_secret, master, TLS_MASTER_SIZE);
+	secure_free(master);
+	return ret;
 }
 
 /* This is called when we want to receive the key exchange message of the
@@ -142,11 +195,6 @@ int _gnutls_send_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 			return ret;
 		}
 		
-		ret = generate_master( state);
-		if (ret<0) {
-			gnutls_assert();
-			return ret;
-		}
 	}
 	return data_size;
 }
@@ -182,12 +230,6 @@ int _gnutls_send_client_kx_message(SOCKET cd, GNUTLS_STATE state)
     	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_CLIENT_KEY_EXCHANGE);
 	gnutls_free(data);
 
-	if (ret<0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = generate_master( state);
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -326,11 +368,6 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 		if (ret < 0)
 			return ret;
 
-		ret = generate_master( state);
-		if (ret<0) {
-			gnutls_assert();
-			return ret;
-		}
 	}
 	return ret;
 }
@@ -368,11 +405,6 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 		if (ret < 0)
 			return ret;
 
-		ret = generate_master( state);
-		if (ret<0) {
-			gnutls_assert();
-			return ret;
-		}
 	}
 
 	return ret;
