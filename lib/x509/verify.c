@@ -285,7 +285,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 				    int crls_size, unsigned int flags)
 {
 	int i = 0, ret;
-	unsigned int status = 0;
+	unsigned int status = 0, output;
 
 	/* Check for revoked certificates in the chain
 	 */
@@ -330,7 +330,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 	 */
 	ret =
 	    _gnutls_verify_certificate2(certificate_list[i], trusted_cas,
-				       tcas_size, flags, NULL);
+				       tcas_size, flags, &output);
 
 	if (ret == 0) {
 		/* if the last certificate in the certificate
@@ -338,6 +338,8 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 		 * trusted.
 		 */
 		gnutls_assert();
+		status |= output;
+
 		status |= GNUTLS_CERT_INVALID;
 	}
 
