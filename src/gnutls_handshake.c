@@ -46,25 +46,26 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_da
 	char *data;
 	uint24 length;
 	uint32 datasize;
+	int pos=0;
 	
 #ifdef WORDS_BIGENDIAN
-	datasize = i_datalen;
+	datasize = i_datasize;
 #else 
-	datasize = byteswap32(i_datalen);
+	datasize = byteswap32(i_datasize);
 #endif	
 	
-	length.pint[0] = ((uint8*)i_datalen)[1];
-	length.pint[1] = ((uint8*)i_datalen)[2];
-	length.pint[2] = ((uint8*)i_datalen)[3];
+	length.pint[0] = ((uint8*)i_datasize)[1];
+	length.pint[1] = ((uint8*)i_datasize)[2];
+	length.pint[2] = ((uint8*)i_datasize)[3];
 	
 	data = gnutls_malloc( i_datasize + 3 + 1);
 	memmove( &data[pos++], &type, 1);
 	memmove( &data[pos++], &length.pint[0], 1);
 	memmove( &data[pos++], &length.pint[1], 1);
 	memmove( &data[pos++], &length.pint[2], 1);
-	memmove( &data[pos], i_data, i_datalen);
+	memmove( &data[pos], i_data, i_datasize);
 
-	ret = gnutls_send_int( cd, state, GNUTLS_HANDSHAKE, data, i_datalen);
+	ret = gnutls_send_int( cd, state, GNUTLS_HANDSHAKE, data, i_datasize);
 	
 	return ret;
 }

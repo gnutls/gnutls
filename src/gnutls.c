@@ -19,8 +19,10 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->security_parameters.mac_algorithm = MAC_NULL;
 	(*state)->security_parameters.compression_algorithm = COMPRESSION_NULL;
 
-	(*state)->connection_state.compression_state = NULL;
-	(*state)->connection_state.mac_secret = NULL;
+	(*state)->connection_state.read_compression_state = NULL;
+	(*state)->connection_state.read_mac_secret = NULL;
+	(*state)->connection_state.write_compression_state = NULL;
+	(*state)->connection_state.write_mac_secret = NULL;
 
 	(*state)->cipher_specs.server_write_mac_secret = NULL;
 	(*state)->cipher_specs.client_write_mac_secret = NULL;
@@ -35,9 +37,11 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 int gnutls_deinit(GNUTLS_STATE * state)
 {
-	gnutls_free((*state)->connection_state.compression_state);
-	gnutls_free((*state)->connection_state.mac_secret);
-
+	gnutls_free((*state)->connection_state.read_compression_state);
+	gnutls_free((*state)->connection_state.read_mac_secret);
+	gnutls_free((*state)->connection_state.write_compression_state);
+	gnutls_free((*state)->connection_state.write_mac_secret);
+	
 	secure_free((*state)->cipher_specs.server_write_mac_secret);
 	secure_free((*state)->cipher_specs.client_write_mac_secret);
 	secure_free((*state)->cipher_specs.server_write_IV);

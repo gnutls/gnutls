@@ -99,9 +99,12 @@ typedef struct {
 } CipherSpecs;
 
 typedef struct {
-	opaque* compression_state;
-	GCRY_CIPHER_HD cipher_state;
-	opaque* mac_secret;
+	opaque* read_compression_state;
+	opaque* write_compression_state;
+	GCRY_CIPHER_HD write_cipher_state;
+	GCRY_CIPHER_HD read_cipher_state;
+	opaque* read_mac_secret;
+	opaque* write_mac_secret;
 	uint8   mac_secret_size;
 	uint64	read_sequence_number;
 	uint64	write_sequence_number;
