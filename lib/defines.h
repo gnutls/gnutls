@@ -54,6 +54,10 @@ typedef unsigned int size_t;
 typedef int ssize_t;
 #endif
 
+#ifndef HAVE_PTRDIFF_T
+typedef long ptrdiff_t;
+#endif
+
 #ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif

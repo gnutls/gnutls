@@ -1055,6 +1055,12 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 	}
 
 	for (i = j = 0; i < count; i++) {
+		/* remove private cipher suites, if requested.
+		 */
+		if ( state->gnutls_internals.enable_experimental == 0 &&
+			tmp_ciphers[i].CipherSuite[0] == 0xFF)
+				continue;
+
 		/* remove cipher suites which do not support the
 		 * protocol version used.
 		 */
@@ -1107,12 +1113,14 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 
 /* For compression  */
 
+#define MIN_PRIVATE_COMP_ALGO 0x0F
+
 /* returns the TLS numbers of the compression methods we support */
 #define SUPPORTED_COMPRESSION_METHODS state->gnutls_internals.CompressionMethodPriority.algorithms
 int
 _gnutls_supported_compression_methods(GNUTLS_STATE state, uint8 ** comp)
 {
-	int i, tmp;
+	int i, tmp, j=0;
 
 	*comp = gnutls_malloc(SUPPORTED_COMPRESSION_METHODS);
 	if (*comp == NULL)
@@ -1122,16 +1130,21 @@ _gnutls_supported_compression_methods(GNUTLS_STATE state, uint8 ** comp)
 		tmp = _gnutls_compression_get_num(state->gnutls_internals.
 						  CompressionMethodPriority.
 						  algorithm_priority[i]);
-		if (tmp == -1) {
+		
+		/* remove private compression algorithms, if requested.
+		 */
+		if (tmp == -1 || (state->gnutls_internals.enable_experimental == 0 &&
+			tmp >= MIN_PRIVATE_COMP_ALGO)) {
+
 			gnutls_assert();
-			/* we shouldn't get here */
-			(*comp)[i] = 0;
 			continue;
 		}
-		(*comp)[i] = (uint8) tmp;
+
+		(*comp)[j] = (uint8) tmp;
+		j++;
 	}
 
-	return SUPPORTED_COMPRESSION_METHODS;
+	return j;
 }
 
 /**

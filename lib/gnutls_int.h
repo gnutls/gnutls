@@ -559,6 +559,10 @@ typedef struct {
 
 	void*			user_ptr;
 
+	int			enable_experimental; /* non zero to
+						* enable cipher suites
+						* which have 0xFF status.
+						*/
 	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
 	 */
 } GNUTLS_INTERNALS;

@@ -168,6 +168,7 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	(*state)->security_parameters.read_compression_algorithm = GNUTLS_COMP_NULL;
 	(*state)->security_parameters.write_compression_algorithm = GNUTLS_COMP_NULL;
 
+	(*state)->gnutls_internals.enable_experimental = 0;
 
 	gnutls_protocol_set_priority( *state, default_protocol_list); /* default */
 	
@@ -425,6 +426,22 @@ void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version versi
 void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
 {
 	state->gnutls_internals.cbc_protection_hack = prot;
+}
+
+/**
+  * gnutls_state_allow_private_ciphersuites - Used to enable the private cipher suites
+  * @state: is a &GNUTLS_STATE structure.
+  * @allow: is an integer (0 or 1)
+  *
+  * This function will enable or disable the use of private
+  * cipher suites (the ones that start with 0xFF). By default 
+  * or if 'allow' is 0 then these cipher suites will not be
+  * advertized nor used.
+  *
+  **/
+void gnutls_state_allow_private_ciphersuites(GNUTLS_STATE state, int allow)
+{
+	state->gnutls_internals.enable_experimental = allow;
 }
 
 /**

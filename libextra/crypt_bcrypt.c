@@ -34,7 +34,7 @@
  * encryption string.
  */
  
-#include "gnutls_int.h"
+#include <gnutls_int.h>
 
 #ifdef ENABLE_SRP
 
