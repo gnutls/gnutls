@@ -1,3 +1,20 @@
+2003-06-09 09:10  nmav <nmav@gnutls.org>
+
+	* NEWS, src/cli.c, src/crypt.c:
+
+	Corrected bug in SRP where a non allocated value was freed.  
+	Reported by Hiroshi Hayakawa <deuva@rapid.ocn.ne.jp>.  
+	
+	Also the SRP programs are now build by default (they weren't due to
+	a bug).  
+
+2003-06-09 09:10  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, src/crypt.c, src/serv.c:
+
+	Corrected bug in SRP where a non allocated value was freed.  
+	Reported by Hiroshi Hayakawa <deuva@rapid.ocn.ne.jp>.  
+
 2003-05-28 09:50  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_buffers.c, NEWS, lib/gnutls_buffers.c:
