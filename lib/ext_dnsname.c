@@ -74,6 +74,7 @@ int _gnutls_name_ind_send_params( GNUTLS_STATE state, opaque** data) {
 			case GNUTLS_DNSNAME:
 				if ( (len = strlen(state->security_parameters.extensions.name.dnsname)) > 0) { /* send dnsname */
 					(*data) = gnutls_malloc(len+3); /* hold the size and the type also */
+					if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
 					
 					WRITEuint16( len+1, *data);
 					(*data)[2] = 0;

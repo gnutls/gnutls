@@ -4,6 +4,8 @@ Version 0.2.11
    an alert to the peer.
 - Made receive buffer dynamic. Normaly if no large chunks are receive
   it occupies less space.
+- Added max_record_size extension
+- Bugfixes session handling
 
 Version 0.2.10 (5/11/2001)
 - Corrected bugs and improved non blocking IO

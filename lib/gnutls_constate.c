@@ -151,6 +151,7 @@ int _gnutls_set_write_keys(GNUTLS_STATE state)
 	memcpy( dst->session_id, src->session_id, TLS_MAX_SESSION_ID_SIZE); \
 	dst->session_id_size = src->session_id_size; \
 	dst->timestamp = src->timestamp; \
+	dst->max_record_size = src->max_record_size; \
 	memcpy( &dst->extensions, &src->extensions, sizeof(TLSExtensions));
 	
 static void _gnutls_cpy_read_security_parameters( SecurityParameters * dst, SecurityParameters* src) {

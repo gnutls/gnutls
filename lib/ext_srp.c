@@ -74,6 +74,8 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 		if (cred->username!=NULL) { /* send username */
 			len = strlen(cred->username);
 			(*data) = gnutls_malloc(len+1); /* hold the size also */
+			if (*data==NULL) return GNUTLS_E_MEMORY_ERROR;
+			
 			(*data)[0] = len;
 			memcpy( &(*data)[1], cred->username, len);
 			return len + 1;

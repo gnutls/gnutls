@@ -30,6 +30,8 @@
 #include "../lib/gnutls.h"
 #include <sys/time.h>
 
+#include <dmalloc.h>
+
 #ifndef SHUT_WR
 # define SHUT_WR 1
 #endif

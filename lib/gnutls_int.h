@@ -63,6 +63,12 @@
 
 #define MAX_DNSNAME_SIZE 256
 
+/* The initial size of the receive
+ * buffer size. This will grow if larger
+ * packets are received.
+ */
+#define INITIAL_RECV_BUFFER_SIZE 256
+
 /* the default for TCP */
 #define DEFAULT_LOWAT 1
 
@@ -70,7 +76,8 @@
 #define DEFAULT_EXPIRE_TIME 3600
 
 /* the maximum size of encrypted packets */
-#define MAX_ENC_LEN 16384
+#define DEFAULT_MAX_RECORD_SIZE 16384
+#define MAX_ENC_LEN state->security_parameters.max_record_size
 #define RECORD_HEADER_SIZE 5
 #define MAX_RECV_SIZE 18432+RECORD_HEADER_SIZE 	/* 2^14+2048+RECORD_HEADER_SIZE */
 
@@ -133,7 +140,7 @@ typedef struct {
 /* STATE */
 typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL256_CBC } BulkCipherAlgorithm;
-typedef enum Extensions { GNUTLS_EXTENSION_DNSNAME=0, GNUTLS_EXTENSION_SRP=6 } Extensions;
+typedef enum Extensions { GNUTLS_EXTENSION_DNSNAME=0, GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6 } Extensions;
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
 typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
@@ -280,6 +287,7 @@ typedef struct {
 	uint8 			session_id_size;
 	time_t 			timestamp;
 	TLSExtensions		extensions;
+	uint16			max_record_size;
 } SecurityParameters;
 
 /* This structure holds the generated keys

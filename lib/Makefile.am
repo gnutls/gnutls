@@ -17,7 +17,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
 	ext_dnsname.h gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
-	gnutls-api.tex io_debug.h
+	gnutls-api.tex io_debug.h ext_max_record.h
 
 lib_LTLIBRARIES = libgnutls.la
 
@@ -35,7 +35,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
 	x509_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c gnutls_mem.c \
 	x509_extensions.c auth_x509.c gnutls_ui.c gnutls_sig.c auth_dhe_rsa.c \
-	gnutls_dh_primes.c
+	gnutls_dh_primes.c ext_max_record.c
 
 libgnutls_la_SOURCES = $(COBJECTS)
 

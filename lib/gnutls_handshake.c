@@ -1270,6 +1270,24 @@ int ret;
 	return ret;
 }
 
+/* Sends the appropriate alert, depending
+ * on the error message.
+ */
+static int _gnutls_handshake_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err) {
+int ret;
+	switch (err) { /* send appropriate alert */
+		case GNUTLS_E_ILLEGAL_PARAMETER:
+			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
+			break;
+		default:
+			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);
+			break;
+	}
+
+	return ret;
+}
+
+
 /* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake_int only if a
  * hello message is expected. It uses the security_parameters.current_cipher_suite
  * and gnutls_internals.compression_method.
@@ -1282,7 +1300,7 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		ret = _gnutls_read_server_hello(state, data, datalen);
 		if (ret < 0) {
-			gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);	/* send handshake failure */
+			_gnutls_handshake_send_appropriate_alert( cd, state, ret);
 			gnutls_assert();
 			return ret;
 		}
@@ -1290,7 +1308,7 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 
 		ret = _gnutls_read_client_hello(state, data, datalen);
 		if (ret < 0) {
-			gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);	/* send handshake failure */
+			_gnutls_handshake_send_appropriate_alert( cd, state, ret);
 			gnutls_assert();
 			return ret;
 		}
@@ -1405,6 +1423,7 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
 		if (gnutls_is_fatal_error(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
+		_gnutls_handshake_send_appropriate_alert( cd, state, ret); \
 		gnutls_clear_handshake_buffer(state); \
 		return ret; \
 	}
@@ -1786,28 +1805,9 @@ int _gnutls_generate_session_id(char *session_id, uint8 * len)
 	return 0;
 }
 
-#define RENEGOTIATE
 int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
 			       uint32 data_size)
 {
-#ifndef RENEGOTIATE
-	int ret;
-
-	/* only client should receive that */
-	if (state->security_parameters.entity == GNUTLS_SERVER)
-		return GNUTLS_E_UNEXPECTED_PACKET;
-
-	/* just return an alert that we don't like that */
-	ret =
-	    gnutls_send_alert(cd, state, GNUTLS_WARNING,
-			      GNUTLS_NO_RENEGOTIATION);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	return 0;
-
-#else	/* this does seem to work - now */
 	uint8 type;
 
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
@@ -1825,7 +1825,6 @@ int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET;
 	}
-#endif
 }
 
 /* This function will remove algorithms that are not supported by

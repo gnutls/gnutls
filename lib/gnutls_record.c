@@ -34,6 +34,7 @@
 #include "gnutls_num.h"
 #include "gnutls_record.h"
 #include "gnutls_datum.h"
+#include "ext_max_record.h"
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
@@ -114,7 +115,11 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	 * This is allocated in order to avoid small messages, makeing
 	 * the receive procedure slow.
 	 */
-	(*state)->gnutls_internals.recv_buffer.data = gnutls_malloc(256);
+	(*state)->gnutls_internals.recv_buffer.data = gnutls_malloc(INITIAL_RECV_BUFFER_SIZE);
+	
+	/* set the default maximum record size for TLS
+	 */
+	(*state)->security_parameters.max_record_size = DEFAULT_MAX_RECORD_SIZE;
 
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
@@ -1089,4 +1094,49 @@ ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t siz
   **/
 ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
 	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
+}
+
+/**
+  * gnutls_get_max_record_size - returns the maximum record size
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function returns the maximum record size in this connection.
+  * The maximum record size is negotiated by the client after the
+  * first handshake message.
+  *
+  **/
+size_t gnutls_get_max_record_size( GNUTLS_STATE state) {
+	return state->security_parameters.max_record_size;
+}
+
+
+/**
+  * gnutls_set_max_record_size - sets the maximum record size
+  * @state: is a &GNUTLS_STATE structure.
+  * @size: is the new size
+  *
+  * This function sets the maximum record size in this connection.
+  * This property can only be set to clients. The server may
+  * choose not to accept the requested size.
+  *
+  * Acceptable values are 2^9, 2^10, 2^11 and 2^12.
+  * Returns the new record size.
+  *
+  **/
+size_t gnutls_set_max_record_size( GNUTLS_STATE state, size_t size) {
+size_t new_size;
+
+	if (state->security_parameters.entity==GNUTLS_SERVER)
+		return GNUTLS_E_INVALID_REQUEST;
+
+	new_size = _gnutls_mre_record2num( size);
+
+	if (new_size < 0) {
+		gnutls_assert();
+		return new_size;
+	}
+	
+	state->security_parameters.max_record_size = size;
+
+	return state->security_parameters.max_record_size;
 }
