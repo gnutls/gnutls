@@ -1,3 +1,16 @@
+2003-04-14 07:40  nmav <nmav@gnutls.org>
+
+	* lib/ext_server_name.c:
+
+	Corrected bug in server_name extension which made the client to send
+	the wrong size of data.  
+
+2003-04-14 07:38  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_state.c:
+
+	Increased the default DH bits limit.  
+
 2003-04-01 19:13  nmav <nmav@gnutls.org>
 
 	* src/: cli.c, common.c, crypt.c, serv.c, tests.c, tls_test.c
