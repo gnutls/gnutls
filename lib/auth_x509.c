@@ -427,8 +427,19 @@ int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 		/* hold size
 		 * for uint24 */
 	}
+	
+	/* if no certificate were found then send:
+	 * 00 00 03 00 00 00    // Certificate with no certs
+	 * instead of:
+	 * 00 00 00		// empty certificate handshake
+	 *
+	 * Althought I prefer the second method, it seems that 
+	 * everybody is using the first one.
+	 */
+	if (ret==3) ret+=3;
+	
 
-	(*data) = gnutls_malloc(ret);
+	(*data) = gnutls_calloc(1, ret);
 	pdata = (*data);
 
 	if (pdata == NULL) {
@@ -446,7 +457,7 @@ int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 	/* read the rsa parameters now, since later we will
 	 * not know which certificate we used!
 	 */
-	if (i != 0)		/* if we parsed at least one certificate */
+	if (i != 0)	/* if we parsed at least one certificate */
 		ret = _gnutls_get_private_rsa_params(state->gnutls_key, apr_pkey);
 	else
 		ret = 0;
