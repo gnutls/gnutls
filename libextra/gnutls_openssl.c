@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  * Copyright (C) 2004 Free Software Foundation
+ * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  *
  * GNUTLS-EXTRA is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -26,11 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gnutls/openssl.h>
-
-struct MD_CTX
-{
-  gc_hash handle;
-};
 
 /* WARNING: Error functions aren't currently thread-safe */
 
