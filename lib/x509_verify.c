@@ -79,7 +79,6 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	ASN1_TYPE c2, c3;
 	int result, len1;
 	int len2;
-	char tmpstr[512];
 	int start1, start2, end1, end2;
 
 	/* get the issuer of 'cert'
@@ -121,11 +120,9 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	}
 
 
-	_gnutls_str_cpy(tmpstr, sizeof(tmpstr),
-			"certificate2.tbsCertificate.issuer");
 	result =
 	    asn1_der_decoding_startEnd(c2, cert->raw.data, cert->raw.size,
-				   tmpstr, &start1, &end1);
+		   "certificate2.tbsCertificate.issuer", &start1, &end1);
 	asn1_delete_structure(&c2);
 
 	if (result != ASN1_SUCCESS) {
@@ -136,12 +133,11 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 
 	len1 = end1 - start1 + 1;
 
-	_gnutls_str_cpy(tmpstr, sizeof(tmpstr),
-			"certificate2.tbsCertificate.subject");
 	result =
 	    asn1_der_decoding_startEnd(c3, issuer_cert->raw.data,
-				   issuer_cert->raw.size, tmpstr, &start2,
-				   &end2);
+				   issuer_cert->raw.size, 
+				   "certificate2.tbsCertificate.subject",
+				    &start2, &end2);
 	asn1_delete_structure(&c3);
 
 	if (result != ASN1_SUCCESS) {

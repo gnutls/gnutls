@@ -306,8 +306,7 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	do {
 		k++;
 
-		_gnutls_str_cpy(name, sizeof(name), "certificate2.tbsCertificate.extensions"); 
-		_gnutls_str_cat(name, sizeof(name), ".?"); 
+		_gnutls_str_cpy(name, sizeof(name), "certificate2.tbsCertificate.extensions.?"); 
 		_gnutls_int2str(k, counter); 
 		_gnutls_str_cat(name, sizeof(name), counter); 
 
