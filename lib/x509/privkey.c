@@ -1181,8 +1181,7 @@ static int _encode_dsa(ASN1_TYPE * c2, mpi_t * params)
   *
   **/
 int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
-				 gnutls_pk_algorithm_t algo,
-				 unsigned int bits, unsigned int flags)
+    gnutls_pk_algorithm_t algo, unsigned int bits, unsigned int flags)
 {
     int ret, params_len;
     int i;
