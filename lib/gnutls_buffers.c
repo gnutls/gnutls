@@ -625,6 +625,7 @@ ssize_t _gnutls_io_write_buffered( GNUTLS_STATE state, const void *iptr, size_t 
 ssize_t _gnutls_io_write_buffered2( GNUTLS_STATE state, const void *iptr, size_t n, const void* iptr2, size_t n2)
 {
 opaque* sptr;
+ssize_t ret;
 
 	sptr = gnutls_malloc( n+n2);
 	if (sptr==NULL) {
@@ -635,7 +636,10 @@ opaque* sptr;
 	memcpy( sptr, iptr, n);
 	memcpy( &sptr[n], iptr2, n2);
 
-	return _gnutls_io_write_buffered( state, sptr, n+n2);
+	ret = _gnutls_io_write_buffered( state, sptr, n+n2);
+	gnutls_free( sptr);
+	
+	return ret;
 }
 
 
