@@ -26,7 +26,9 @@
 #include <openpgp/gnutls_openpgp.h>
 #include <gnutls_extra.h>
 #include <gnutls_algorithms.h>
-#include <minilzo.h>
+#ifdef USE_LZO
+# include <minilzo.h>
+#endif
 
 extern gnutls_extension_entry _gnutls_extensions[];
 extern const int _gnutls_extensions_size;
@@ -116,6 +118,7 @@ extern int _gnutls_comp_algorithms_size;
 
 /* Functions in gnutls that have not been initialized.
  */
+#ifdef USE_LZO
 typedef int (*LZO_FUNC)();
 extern LZO_FUNC _gnutls_lzo1x_decompress_safe;
 extern LZO_FUNC _gnutls_lzo1x_1_compress;
@@ -148,7 +151,7 @@ int i;
 
 	return GNUTLS_E_MEMORY_ERROR;
 }
-
+#endif
 
 extern OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_creation_time;
 extern OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_expiration_time;
@@ -215,6 +218,7 @@ int ret;
 
 	/* Initialize the LZO library
 	 */
+#ifdef USE_LZO
 	if (lzo_init() != LZO_E_OK) {
 		return GNUTLS_E_LZO_INIT_FAILED;
 	}
@@ -227,6 +231,7 @@ int ret;
 		gnutls_assert();
 		return ret;
 	}
+#endif
 
 #ifdef ENABLE_SRP
 	/* Add the SRP authentication to the list of authentication

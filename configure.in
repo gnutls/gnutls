@@ -434,6 +434,21 @@ fi
 dnl CHECK FOR LZO SUPPORT (whether to use the included one)
 dnl
 
+minilzo_enabled=no
+use_lzo=yes
+AC_ARG_WITH(lzo,
+	[  --without-lzo           do not use lzo compression],
+ use_lzo=no,
+ use_lzo=yes
+)
+
+AC_MSG_CHECKING([whether to include lzo compression support])
+AC_MSG_RESULT($use_lzo)
+
+if test x$use_lzo = xyes; then
+
+AC_DEFINE(USE_LZO, 1, [whether to use the lzo compression])
+
 if test x$opt_developer_mode = xyes; then
  minilzo_enabled=yes
 fi
@@ -457,15 +472,15 @@ AC_CHECK_LIB( lzo, lzo1x_1_compress, minilzo_enabled=no,
 fi
 
 if test x"$minilzo_enabled" = xyes; then
+ 
  AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
- LZO_OBJECTS="minilzo.lo"
-else
- LZO_LINK=-llzo
 fi
 
-AC_SUBST(LZO_OBJECTS)
-AC_SUBST(LZO_LINK)
+dnl use lzo
+fi
 
+AM_CONDITIONAL(USE_LZO, test "$use_lzo" = "yes")
+AM_CONDITIONAL(ENABLE_INCLUDED_LZO, test "$minilzo_enabled" = "yes")
 
 
 AC_MSG_RESULT([***

@@ -40,6 +40,17 @@ PGP_LIBS = openpgp/libpgp.la
 endif
 endif
 
+if ENABLE_INCLUDED_LZO
+LZO_OBJECTS = minilzo.c
+else
+
+if USE_LZO
+LZO_LIBS = -llzo
+endif
+LZO_OBJECTS = 
+endif
+
+
 COBJECTS_EXTRA = ext_srp.c \
 	gnutls_srp.c auth_srp.c auth_srp_passwd.c auth_srp_sb64.c \
 	gnutls_extra.c auth_srp_rsa.c gnutls_openpgp.c
@@ -48,14 +59,11 @@ COBJECTS_EXTRA = ext_srp.c \
 libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LIBOPENCDK_LIBS) $(LZO_LINK)
-libgnutls_extra_la_DEPENDENCIES = $(LZO_OBJECTS)
 
-libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) 
+libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS)
 
-libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) $(PGP_LIBS) \
+libgnutls_extra_la_LIBADD = $(LZO_LIBS) $(PGP_LIBS) \
 	../lib/libgnutls.la
-
-EXTRA_libgnutls_extra_la_SOURCES = minilzo.c
 
 
 gnutls-extra-api.tex: $(COBJECTS_EXTRA)
