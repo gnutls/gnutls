@@ -28,6 +28,10 @@ typedef struct {
 				* cert_list[i][0].
 				*/
 
+	/* OpenPGP specific stuff */
+
+	gnutls_datum keyring;
+    
 	/* X509 specific stuff */
 
 	gnutls_cert * x509_ca_list;

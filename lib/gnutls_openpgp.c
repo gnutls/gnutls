@@ -35,8 +35,6 @@
 #include "gnutls_global.h"
 #include "auth_cert.h"
 
-#define DEBUG_OPENPGP 1
-
 static void
 release_mpi_array(MPI *arr, size_t n)
 {
@@ -45,7 +43,8 @@ release_mpi_array(MPI *arr, size_t n)
   while (arr && n--)
     {
       x = *arr;
-      _gnutls_mpi_release(&x);
+      /*_gnutls_mpi_release(&x);*/
+      gcry_mpi_release(x);
       *arr = NULL; arr++;
     }
 }
@@ -76,10 +75,6 @@ is_file_armored(char *file)
       cdk_free(data); data = NULL;      
     }
 
-#ifdef DEBUG_OPENPGP
-  fprintf(stderr, "is_file_armored(%s) = %d\n", file, armored);
-#endif
-
 leave:
   return armored;
 }    
@@ -103,10 +98,6 @@ datum_to_openpgp_pkt( const gnutls_datum *raw, PKT *r_pkt )
     }
   else
     rc = 0;
-
-#ifdef DEBUG_OPENPGP
-  fprintf(stderr, "datum_to_openpgp_pkt(%p, %p) = %d\n", raw, *r_pkt, rc);
-#endif
 
 leave:
   cdk_iobuf_close(buf);
@@ -233,10 +224,6 @@ leave:
   if (rc)
     release_mpi_array(cert->params, i-1);
 
-#ifdef DEBUG_OPENPGP
-  fprintf(stderr, "openpgp_pk_to_gnutls_cert(%p, %p) = %d\n", cert, pk, rc);
-#endif
-  
   return rc;
 }
 
@@ -256,8 +243,12 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
     goto leave;
   data = cdk_iobuf_get_data_as_buffer(buf, &n);
   if (data && n)
-    {      
-      gnutls_datum_append( &cert->signature, data, n);
+    {
+      if ( gnutls_datum_append( &cert->signature, data, n) < 0 )
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
       cdk_free(data); data = NULL;
     }
   else
@@ -266,10 +257,6 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
 leave:
   cdk_iobuf_close(buf);
 
-#ifdef DEBUG_OPENPGP
-  fprintf(stderr, "openpgp_sig_to_gnutls_cert(%p, %p) = %d\n", cert, sig, rc);
-#endif
-  
   return rc;
 }
 
@@ -363,11 +350,6 @@ leave:
   cdk_iobuf_close(buf);
   cdk_pkt_release(pkt);
 
-#ifdef DEBUG_OPENPGP
-  fprintf(stderr, "_gnutls_openpgp_key2gnutls_key(%p, %p) = %d\n",
-          pkey, raw_key, rc);
-#endif
-  
   return rc;
 }
 
@@ -414,11 +396,6 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
       goto leave;
     }
   rc = openpgp_pk_to_gnutls_cert(cert, p->p.pk);
-
-#if DEBUG_OPENPGP
-  fprintf(stderr, "_gnutls_openpgp_cert2gnutls_cert (%p, %p) = %d\n",
-          cert, raw, 0);
-#endif
 
 leave:
   return rc;
@@ -557,10 +534,6 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   rc =_gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], raw);
 
 leave:
-#ifdef DEBUG_OPENPGP
-  fprintf(stderr, "gnutls_certificate_set_openpgp_key_file(%p, %s, %s) = %d\n",
-          res, CERTFILE, KEYFILE, rc);
-#endif
   
   return rc;
 }
@@ -701,6 +674,29 @@ gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
   return expiredate;
 }
 
+static char*
+read_keyring_blob(const gnutls_datum* keyring, size_t pos,
+                  int *r_type, size_t *r_size)
+{
+  byte *blob;
+  
+  if (!keyring)
+    return NULL;
+
+  *r_type = keyring->data[pos];
+  if (*r_type < 0 || *r_type > 1)
+    return NULL;
+  *r_size = keyring->data[pos+1] << 24 | keyring->data[pos+2] << 16
+          | keyring->data[pos+3] <<  8 | keyring->data[pos+4];
+  if (!*r_size)
+    return NULL;
+  blob = gnutls_malloc(*r_size + 1);
+  memcpy(blob, keyring->data+(pos+5), *r_size);
+  blob[*r_size] = '\0';
+
+  return blob;
+}
+                   
 /**
  * gnutls_openpgp_verify_key - Verify all signatures on the key
  *
@@ -709,30 +705,73 @@ gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
  *
  * Verify all signatures in the certificate list. When the key
  * is not available, the signature is skipped.
- * A return value of '0' means that all checked signatures are good.
+ * The return value is one of the CertificateStatus entries.
  **/
 int
-gnutls_openpgp_verify_key( const gnutls_datum* cert_list,
+gnutls_openpgp_verify_key( const gnutls_datum* keyring,
+                           const gnutls_datum* cert_list,
                            int cert_list_length)
-
 {
   PKT pkt = NULL;
+  KEYDB_HD khd = NULL;
   int rc = 0;
+  size_t size = 0;
+  int status = 0, type = -1;
+  char *data;
   
-  if (!cert_list || !cert_list_length )
-    return GNUTLS_E_INVALID_PARAMETERS;
+  if (!cert_list || !cert_list_length || !keyring)
+    return GNUTLS_CERT_CORRUPTED;
 
-  if (cert_list_length != 1)
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+  if (cert_list_length != 1 || !keyring->size)
+    return GNUTLS_CERT_CORRUPTED;
+
+  data = read_keyring_blob(keyring, 0, &type, &size);
+  if (!data)
+    return GNUTLS_CERT_CORRUPTED;
+  khd = cdk_alloc_clear(sizeof *khd);
+  khd->used = 1;
+  if (type == 0x00) /* file */
+    {
+      khd->name = cdk_strdup(data);
+    }
+  else if (type == 0x01) /* data */
+    {
+      cdk_iobuf_new(&khd->buf, size);
+      cdk_iobuf_write(khd->buf, data, size);
+    }
+  else /* error */
+    {
+      rc = GNUTLS_CERT_CORRUPTED;
+      goto leave;
+    }
   
   if ( (rc = datum_to_openpgp_pkt(cert_list, &pkt)) )
-    return rc;
-  rc = cdk_key_check_sigs(pkt);
+    {
+      goto leave;
+      return GNUTLS_CERT_CORRUPTED;
+    }
+  rc = cdk_key_check_sigs(pkt, khd, &status);
   if (rc == CDKERR_NOKEY)
     rc = 0; /* fixme */
-  else if (rc == CDKERR_BAD_SIGNATURE)
-    rc = GNUTLS_E_PK_SIGNATURE_FAILED;
-  
+      
+  switch (status)
+    {
+    case CDK_KEY_INVALID:
+      rc = GNUTLS_CERT_CORRUPTED;
+      break;
+    case CDK_KEY_REVOKED:
+      rc = GNUTLS_CERT_REVOKED;
+      break;
+    case CDK_KEY_EXPIRED:
+      rc = GNUTLS_CERT_EXPIRED;
+      break;
+    case CDK_KEY_VALID:
+      rc = GNUTLS_CERT_TRUSTED;
+      break;
+    }
+
+leave:
+  cdk_free(khd); khd = NULL;
   return rc;
 }
 
@@ -809,23 +848,94 @@ gnutls_openpgp_keyid( const gnutls_datum *cert, u32 *keyid )
   return 0;
 }
 
-/**
- * gnutls_openpgp_add_keyring - Adds a global keyring for OpenPGP
+/* Creates a keyring blob from raw data
  *
- * @fname: the filename of the keyring.
- * @is_secret: if the keyring contains secret keys or not.
+ * Format:
+ * 1 octet  type
+ * 4 octet  size of blob
+ * n octets data
+ */
+static byte*
+conv_data_to_keyring(int type, const char *data, size_t size, size_t *r_size)
+{
+  byte *p;
+  
+  p = gnutls_malloc( 1+4+size );
+  p[0] = type; /* type: keyring name */
+  p[1] = (size >> 24) & 0xff;
+  p[2] = (size >> 16) & 0xff;
+  p[3] = (size >>  8) & 0xff;
+  p[4] = (size      ) & 0xff;
+  memcpy(p+5, data, size);
+  *r_size = 1+4+size;
+
+  return p;
+}
+
+/**
+ * gnutls_openpgp_add_keyring_file - Adds a keyring file for OpenPGP
+ *
+ * @keyring: data buffer to store the file.
+ * @name: filename of the keyring.
  *
  * The function is used to set keyrings that will be used internally
  * by various OpenCDK functions. For example to find a key when it
- * is need for an operations.
+ * is needed for an operations.
  **/
 int
-gnutls_openpgp_add_keyring(const char *fname, int is_secret)
+gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
 {
+  byte *blob;
+  size_t n;
   
-  if ( cdk_keydb_add_resource(fname, is_secret) )
-    return GNUTLS_E_UNKNOWN_ERROR;
+  if (!keyring || !name)
+    return GNUTLS_E_INVALID_PARAMETERS;
 
+  blob = conv_data_to_keyring(0x00, name, strlen(name), &n);
+  if (blob && n)
+    { 
+      if ( gnutls_datum_append( keyring, blob, n ) < 0 )
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+      gnutls_free(blob);
+    }
+  
+  return 0;
+}
+
+/**
+ * gnutls_openpgp_add_keyring_mem - Adds keyring data for OpenPGP
+ *
+ * @keyring: data buffer to store the file.
+ * @data: the binary data of the keyring.
+ * @len: the size of the binary buffer.
+ *
+ * Same as gnutls_openpgp_add_keyring_mem but now we store the
+ * data instead of the filename.
+ **/
+int
+gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
+                               const char *data, size_t len)
+{
+  byte *blob;
+  size_t n = 0;
+  
+  if (!keyring || !data || !len)
+    return GNUTLS_E_INVALID_PARAMETERS;
+  
+  blob = conv_data_to_keyring(0x01, data, len, &n);
+  if (blob && n)
+    {
+      if ( gnutls_datum_append( keyring, blob, n ) < 0 )
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+      gnutls_free(blob);
+    }
+  
   return 0;
 }
 
