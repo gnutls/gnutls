@@ -94,7 +94,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 			   gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
-	int start, end;
+	int start, end, bits, len;
 	gnutls_datum _data = { data->data, data->size };
 	opaque *signature = NULL;
 
@@ -150,71 +150,63 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 	}
 
 	/* Read the signature */
-	{
-		int len;
-
-		len = 0;
-		result = asn1_read_value( crl->crl, "signature", NULL, &len);
+	bits = 0;
+	result = asn1_read_value( crl->crl, "signature", NULL, &bits);
 		
-		if (result != ASN1_MEM_ERROR) {
-			result = _gnutls_asn2err(result);
-			gnutls_assert();
-			goto cleanup;
-		}
-		
-		signature = gnutls_malloc( len);
-		if (signature == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-
-		/* read the bit string of the signature
-		 */
-		result =
-		    asn1_read_value(crl->crl, "signature", signature,
-				    &len);
-
-		if (result != ASN1_SUCCESS) {
-			result = _gnutls_asn2err(result);
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		if (len % 8 != 0) {
-			gnutls_assert();
-			result = GNUTLS_E_CERTIFICATE_ERROR;
-			goto cleanup;
-		}
-
-		if ((result =
-		     _gnutls_set_datum(&crl->signature, signature,
-				       len / 8)) < 0) {
-			gnutls_assert();
-			goto cleanup;
-		}
-
-		/* Read the signature algorithm. Note that parameters are not
-		 * read. They will be read from the issuer's certificate if needed.
-		 */
-
-		result =
-		    asn1_read_value(crl->crl,
-				    "signatureAlgorithm.algorithm",
-				    signature, &len);
-
-		if (result != ASN1_SUCCESS) {
-			result = _gnutls_asn2err(result);
-			gnutls_assert();
-			goto cleanup;
-		}
-		
-		crl->signature_algorithm =
-		    _gnutls_x509_oid2pk_algorithm(signature);
-
-		gnutls_free( signature);
-		signature = NULL;
-
+	if (result != ASN1_MEM_ERROR) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		goto cleanup;
 	}
+
+	if (bits % 8 != 0) {
+		gnutls_assert();
+		result = GNUTLS_E_CERTIFICATE_ERROR;
+		goto cleanup;
+	}
+
+	len = bits/8;
+	signature = gnutls_malloc( len);
+	if (signature == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+		
+	/* read the bit string of the signature
+	 */
+	bits = len;
+	result = asn1_read_value( crl->crl, "signature", signature,
+		&bits);
+
+	if (result != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		goto cleanup;
+	}
+		
+		
+	if ((result=_gnutls_set_datum(&crl->signature, signature, len)) < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+		
+	/* Read the signature algorithm. Note that parameters are not
+	 * read. They will be read from the issuer's certificate if needed.
+	 */
+		
+	result = asn1_read_value( crl->crl, "signatureAlgorithm.algorithm",
+		signature, &len);
+		
+	if (result != ASN1_SUCCESS) {
+		result = _gnutls_asn2err(result);
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	crl->signature_algorithm = _gnutls_x509_oid2pk_algorithm( signature);
+		
+	gnutls_free( signature);
+	signature = NULL;
 
 	if (need_free)
 		_gnutls_free_datum(&_data);

@@ -170,16 +170,17 @@ _asn1_get_bit_der(const unsigned char *der,int *der_len,unsigned char *str, int 
 {
   int len_len,len_byte;
 
-  if(str==NULL) return ASN1_SUCCESS;
+  /* if(str==NULL) return ASN1_SUCCESS; */
   len_byte=_asn1_get_length_der(der,&len_len)-1;
 
   *der_len=len_byte+len_len+1;  
+  *bit_len=len_byte*8-der[len_len];
+
   if (str_size >= len_byte)
  	memcpy(str,der+len_len+1,len_byte);
   else {
   	return ASN1_MEM_ERROR;
   }
-  *bit_len=len_byte*8-der[len_len];
 
   return ASN1_SUCCESS;
 }

@@ -1,5 +1,6 @@
 Version 0.9.5
 - Several improvments in the PKCS #7 handling
+- Eliminated several hard coded constants in MPI parameters.
 
 Version 0.9.4 (28/03/2003)
 - Corrected a parsing error in the Certificate request message.

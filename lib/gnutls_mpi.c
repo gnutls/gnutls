@@ -87,7 +87,7 @@ int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a ) {
 int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, 
 	GNUTLS_MPI* ret_mpi)
 {
-int len, result;
+int result;
 size_t s_len;
 opaque* tmpstr = NULL;
 int tmpstr_size;
@@ -112,7 +112,7 @@ int tmpstr_size;
 		return _gnutls_asn2err(result);
 	}
 
-	s_len = len;
+	s_len = tmpstr_size;
 	if (_gnutls_mpi_scan( ret_mpi, tmpstr, &s_len) != 0) {
 		gnutls_assert();
 		gnutls_afree( tmpstr);

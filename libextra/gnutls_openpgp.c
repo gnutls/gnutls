@@ -1950,7 +1950,7 @@ _gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
 }
 
 int
-_gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, gnutls_datum raw )
+_gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, const gnutls_datum *raw )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;  
 }
