@@ -49,8 +49,8 @@ libgnutls_la_SOURCES = $(COBJECTS)
 libgnutls_la_LIBADD = $(MINITASN1_OBJECTS)
 
 libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
-	-export-symbols gnutls.sym
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+#-export-symbols gnutls.sym
 
 pkix_asn1_tab.c: pkix.asn
 	-../libtasn1/src/asn1c pkix.asn pkix_asn1_tab.c

@@ -1,3 +1,6 @@
+Version 0.8.7
+- Some corrections in the Makefiles.
+
 Version 0.8.6 (25/03/2003)
 - Corrected a parsing error in the Certificate request message.
 - Corrected behaviour when a certificate request message is received.
