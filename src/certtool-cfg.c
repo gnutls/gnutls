@@ -39,6 +39,7 @@ typedef struct _cfg_ctx
 	char *locality;
 	char *state;
 	char *cn;
+	char *uid;
 	char *challenge_password;
 	char *pkcs9_email;
 	char *country;
@@ -87,6 +88,7 @@ int template_parse(const char *template)
 		{NULL, '\0', "locality", CFG_STR, (void *) &cfg.locality, 0},
 		{NULL, '\0', "state", CFG_STR, (void *) &cfg.state, 0},
 		{NULL, '\0', "cn", CFG_STR, (void *) &cfg.cn, 0},
+		{NULL, '\0', "uid", CFG_STR, (void *) &cfg.uid, 0},
 		{NULL, '\0', "challenge_password", CFG_STR, (void *) &cfg.challenge_password, 0},
 		{NULL, '\0', "password", CFG_STR, (void *) &cfg.password, 0},
 		{NULL, '\0', "pkcs9_email", CFG_STR, (void *) &cfg.pkcs9_email, 0},
@@ -348,6 +350,25 @@ int ret;
 	}
 
 }
+
+void get_uid_crt_set( gnutls_x509_crt crt)
+{
+int ret;
+
+	if (batch) {
+		if (!cfg.uid) return;
+		ret = gnutls_x509_crt_set_dn_by_oid(crt, GNUTLS_OID_LDAP_UID, 0, 
+			cfg.uid, strlen(cfg.uid));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crt_set( crt, "UID: ", GNUTLS_OID_LDAP_UID);
+	}
+
+}
+
 
 void get_pkcs9_email_crt_set( gnutls_x509_crt crt)
 {
@@ -655,6 +676,24 @@ int ret;
 		}
 	} else {
 		read_crq_set( crq, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+	}
+
+}
+
+void get_uid_crq_set( gnutls_x509_crq crq)
+{
+int ret;
+
+	if (batch) {
+		if (!cfg.uid) return;
+		ret = gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_LDAP_UID, 0, 
+			cfg.uid, strlen(cfg.uid));
+		if (ret < 0) {
+			fprintf(stderr, "set_dn: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
+	} else {
+		read_crq_set( crq, "UID: ", GNUTLS_OID_LDAP_UID);
 	}
 
 }
