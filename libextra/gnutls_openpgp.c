@@ -1020,13 +1020,6 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
     if ( !pk )
         return GNUTLS_E_UNKNOWN_ERROR;
 
-    if ( cdk_trustdb_check( trustdb, 3 ) ) {
-        /* The trustdb version is less then 3 and this mean the old
-           format is still used. We don't support this format. */
-        trustval = GNUTLS_E_UNKNOWN_ERROR;
-        goto leave;
-    }
-        
     rc = cdk_iobuf_open( &buf, trustdb, IOBUF_MODE_RD );
     if ( rc ) {
         trustval = GNUTLS_E_FILE_ERROR;
@@ -1507,14 +1500,19 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 int
-gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
-                                       char* trustdb)
+gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
+                                        char* trustdb )
 {
     if ( !res || !trustdb )
         return GNUTLS_E_ILLEGAL_PARAMETER;
 
-    res->pgp_trustdb = gnutls_strdup(trustdb);
-    if (res->pgp_trustdb==NULL)
+    if ( cdk_trustdb_check( trustdb, 3 ) ) {
+        /* The trustdb version is less then 3 and this mean the old
+           format is still used. We don't support this format. */
+        return GNUTLS_E_UNKNOWN_ERROR;
+    }
+    res->pgp_trustdb = gnutls_strdup( trustdb );
+    if ( res->pgp_trustdb==NULL )
         return GNUTLS_E_MEMORY_ERROR;
         
     return 0;
