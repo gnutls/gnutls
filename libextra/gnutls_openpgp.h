@@ -50,7 +50,7 @@ int gnutls_openpgp_fingerprint(
 
 int gnutls_openpgp_keyid(
     const gnutls_datum *cert,
-    uint32 *keyid );
+    unsigned char keyid[8] );
 
 int gnutls_openpgp_add_keyring_mem(
     gnutls_datum *keyring,

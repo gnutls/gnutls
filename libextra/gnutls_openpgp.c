@@ -515,7 +515,7 @@ fail:
     return rc;
 }
 
-/**
+/*-
  * gnutls_openpgp_get_key - Retrieve a key from the keyring.
  * @key: the destination context to save the key.
  * @keyring: the datum struct that contains all keyring information.
@@ -524,7 +524,7 @@ fail:
  *
  * This function can be used to retrieve keys by different pattern
  * from a binary or a file keyring.
- **/
+ -*/
 int
 gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
                        key_attr_t by, opaque *pattern)
@@ -1180,7 +1180,7 @@ gnutls_openpgp_fingerprint(const gnutls_datum *cert, char *fpr, size_t *fprlen)
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid )
+gnutls_openpgp_keyid( const gnutls_datum *cert, unsigned char keyid[8] )
 {
     CDK_KBNODE kb_pk = NULL, pkt;
     PKT_public_key *pk = NULL;
@@ -1203,7 +1203,7 @@ gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid )
     return 0;
 }
 
-/**
+/*-
  * gnutls_openpgp_add_keyring_file - Adds a keyring file for OpenPGP
  * @keyring: data buffer to store the file.
  * @name: filename of the keyring.
@@ -1211,7 +1211,7 @@ gnutls_openpgp_keyid( const gnutls_datum *cert, uint32 *keyid )
  * The function is used to set keyrings that will be used internally
  * by various OpenCDK functions. For example to find a key when it
  * is needed for an operations.
- **/
+ -*/
 int
 gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
 {
@@ -1243,7 +1243,7 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
     return 0;
 }
 
-/**
+/*-
  * gnutls_openpgp_add_keyring_mem - Adds keyring data for OpenPGP
  * @keyring: data buffer to store the file.
  * @data: the binary data of the keyring.
@@ -1251,7 +1251,7 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
  *
  * Same as gnutls_openpgp_add_keyring_mem but now we store the
  * data instead of the filename.
- **/
+ -*/
 int
 gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
                                const char *data, size_t len)
@@ -1274,6 +1274,16 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
     return 0;
 }
 
+/**
+ * gnutls_certificate_set_openpgp_keyring_file - Adds a keyring file for OpenPGP * @c: A certificate credentials structure
+ * @file: filename of the keyring.
+ *
+ * The function is used to set keyrings that will be used internally
+ * by various OpenPGP functions. For example to find a key when it
+ * is needed for an operations. The keyring will also be used at the
+ * verification functions.
+ *
+ **/
 int
 gnutls_certificate_set_openpgp_keyring_file(GNUTLS_CERTIFICATE_CREDENTIALS c,
                                             const char *file)
@@ -1508,7 +1518,8 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
  * This funtion will set a GnuPG trustdb which will be used in key
  * verification functions. Only version 3 trustdb files are supported.
  *
- **/int
+ **/
+int
 gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
                                         char* trustdb )
 {
