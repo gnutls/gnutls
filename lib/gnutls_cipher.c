@@ -24,6 +24,7 @@
 #include "gnutls_compress.h"
 #include "gnutls_cipher.h"
 #include "gnutls_algorithms.h"
+#include "gnutls_hash.h"
 
 int _gnutls_make_mul(int x, int y)
 {
@@ -306,7 +307,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	uint8 *rand;
 	uint64 seq_num;
 	int length;
-	MHASH td;
+	GNUTLS_MAC_HANDLE td;
 
 	content = gnutls_malloc(compressed->length);
 	memmove(content, compressed->fragment, compressed->length);
@@ -319,29 +320,11 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	*cipher = gnutls_malloc(sizeof(GNUTLSCiphertext));
 	ciphertext = *cipher;
 
-	switch (state->security_parameters.mac_algorithm) {
-	case GNUTLS_MAC_NULL:
-		td = MHASH_FAILED;
-		break;
-	case GNUTLS_MAC_SHA:
-		td =
-		    mhash_hmac_init(MHASH_SHA1,
-				    state->
-				    connection_state.write_mac_secret,
-				    state->
-				    connection_state.mac_secret_size,
-				    mhash_get_hash_pblock(MHASH_SHA1));
-		break;
-	case GNUTLS_MAC_MD5:
-		td =
-		    mhash_hmac_init(MHASH_MD5,
-				    state->
-				    connection_state.write_mac_secret,
-				    state->
-				    connection_state.mac_secret_size,
-				    mhash_get_hash_pblock(MHASH_MD5));
-		break;
-	default:
+	td = gnutls_hmac_init( state->security_parameters.mac_algorithm, 
+		state->connection_state.write_mac_secret,
+		state->connection_state.mac_secret_size);
+
+	if (td == GNUTLS_MAC_FAILED && state->security_parameters.mac_algorithm!=GNUTLS_MAC_NULL) {
 		gnutls_free(*cipher);
 		gnutls_free(content);
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
@@ -355,14 +338,14 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	seq_num =
 	    byteswap64(state->connection_state.write_sequence_number);
 #endif
-	if (td != MHASH_FAILED) {
-		mhash(td, &seq_num, 8);
-		mhash(td, &compressed->type, 1);
-		mhash(td, &compressed->version.major, 1);
-		mhash(td, &compressed->version.minor, 1);
-		mhash(td, &c_length, 2);
-		mhash(td, compressed->fragment, compressed->length);
-		MAC = mhash_hmac_end(td);
+	if (td != GNUTLS_MAC_FAILED) { /* actually when the algorithm in not the NULL one */
+		gnutls_hmac(td, &seq_num, 8);
+		gnutls_hmac(td, &compressed->type, 1);
+		gnutls_hmac(td, &compressed->version.major, 1);
+		gnutls_hmac(td, &compressed->version.minor, 1);
+		gnutls_hmac(td, &c_length, 2);
+		gnutls_hmac(td, compressed->fragment, compressed->length);
+		MAC = gnutls_hmac_deinit(td);
 	}
 	switch (state->security_parameters.cipher_type) {
 	case CIPHER_STREAM:
@@ -455,9 +438,8 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
-//      gnutls_free( MAC);
-	if (td != MHASH_FAILED)
-		free(MAC);
+	if (td != GNUTLS_MAC_FAILED)
+		gnutls_free(MAC);
 	gnutls_free(content);
 
 	return 0;
@@ -475,7 +457,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	uint8 pad;
 	uint64 seq_num;
 	uint16 length;
-	MHASH td;
+	GNUTLS_MAC_HANDLE td;
 
 
 	content = gnutls_malloc(ciphertext->length);
@@ -489,29 +471,10 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	compressed = *compress;
 
 
-	switch (state->security_parameters.mac_algorithm) {
-	case GNUTLS_MAC_NULL:
-		td = MHASH_FAILED;
-		break;
-	case GNUTLS_MAC_SHA:
-		td =
-		    mhash_hmac_init(MHASH_SHA1,
-				    state->
-				    connection_state.read_mac_secret,
-				    state->
-				    connection_state.mac_secret_size,
-				    mhash_get_hash_pblock(MHASH_SHA1));
-		break;
-	case GNUTLS_MAC_MD5:
-		td =
-		    mhash_hmac_init(MHASH_MD5,
-				    state->
-				    connection_state.read_mac_secret,
-				    state->
-				    connection_state.mac_secret_size,
-				    mhash_get_hash_pblock(MHASH_MD5));
-		break;
-	default:
+	td = gnutls_hmac_init( state->security_parameters.mac_algorithm,
+	    state->connection_state.read_mac_secret,
+	    state->connection_state.mac_secret_size);
+	if (td==GNUTLS_MAC_FAILED && state->security_parameters.mac_algorithm!=GNUTLS_MAC_NULL) {
 		gnutls_free(*compress);
 		gnutls_free(content);
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
@@ -592,14 +555,14 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 #endif
 
 
-	if (td != MHASH_FAILED) {
-		mhash(td, &seq_num, 8);
-		mhash(td, &compressed->type, 1);
-		mhash(td, &compressed->version.major, 1);
-		mhash(td, &compressed->version.minor, 1);
-		mhash(td, &c_length, 2);
-		mhash(td, data, compressed->length);
-		MAC = mhash_hmac_end(td);
+	if (td != GNUTLS_MAC_FAILED) {
+		gnutls_hmac(td, &seq_num, 8);
+		gnutls_hmac(td, &compressed->type, 1);
+		gnutls_hmac(td, &compressed->version.major, 1);
+		gnutls_hmac(td, &compressed->version.minor, 1);
+		gnutls_hmac(td, &c_length, 2);
+		gnutls_hmac(td, data, compressed->length);
+		MAC = gnutls_hmac_deinit(td);
 	}
 	/* HMAC was not the same. */
 	if (memcmp
@@ -612,8 +575,8 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	}
 
 
-	if (td != MHASH_FAILED)
-		mhash_free(MAC);
+	if (td != GNUTLS_MAC_FAILED)
+		gnutls_free(MAC);
 	gnutls_free(content);
 
 	return 0;

@@ -1,8 +1,13 @@
 #include <gcrypt.h>
-#include <mhash.h>
 
 #define HARD_DEBUG
 #define DEBUG
+
+/* for message digests */
+#define GNUTLS_HASH_HANDLE GCRY_MD_HD
+#define GNUTLS_MAC_HANDLE GCRY_MD_HD
+#define GNUTLS_HASH_FAILED NULL
+#define GNUTLS_MAC_FAILED NULL
 
 #define svoid void /* for functions that allocate using secure_free */
 #define secure_free(x) if (x!=NULL) free(x)
@@ -152,12 +157,12 @@ typedef struct {
 	GNUTLS_CipherSuite	current_cipher_suite;
 	CompressionMethod	compression_method;
 	/* for the handshake protocol */
-	MHASH			client_td_md5;
-	MHASH			client_td_sha1;
+	GNUTLS_HASH_HANDLE	client_td_md5;
+	GNUTLS_HASH_HANDLE	client_td_sha1;
 	void*			client_md_md5;
 	void*			client_md_sha1;
-	MHASH			server_td_md5;
-	MHASH			server_td_sha1;
+	GNUTLS_HASH_HANDLE	server_td_md5;
+	GNUTLS_HASH_HANDLE	server_td_sha1;
 	void*			server_md_md5;
 	void*			server_md_sha1;
 	int			server_hash;

@@ -27,6 +27,7 @@
 #include "gnutls_cipher.h"
 #include "gnutls_buffers.h"
 #include "gnutls_handshake.h"
+#include "gnutls_hash.h"
 
 /* This function should check if we support the version of the peer.
  * However now we only support version 3.1 
@@ -120,19 +121,18 @@ int gnutls_deinit(GNUTLS_STATE * state)
 }
 
 
-void *_gnutls_cal_PRF_A(hashid algorithm, void *secret, int secret_size,
+void *_gnutls_cal_PRF_A(MACAlgorithm algorithm, void *secret, int secret_size,
 			void *seed, int seed_size)
 {
-	MHASH td1;
+	GNUTLS_MAC_HANDLE td1;
 	void *A;
 
 	td1 =
-	    mhash_hmac_init(algorithm, secret, secret_size,
-			    mhash_get_hash_pblock(algorithm));
+	    gnutls_hmac_init(algorithm, secret, secret_size);
 
-	mhash(td1, seed, seed_size);
+	gnutls_hmac(td1, seed, seed_size);
 
-	A = mhash_hmac_end(td1);
+	A = gnutls_hmac_deinit(td1);
 
 	return A;
 }
@@ -141,11 +141,11 @@ void *_gnutls_cal_PRF_A(hashid algorithm, void *secret, int secret_size,
 /* Produces "total_bytes" bytes using the hash algorithm specified.
  * (used in the PRF function)
  */
-svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
+svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size,
 		     opaque * seed, int seed_size, int total_bytes)
 {
 
-	MHASH td2;
+	GNUTLS_MAC_HANDLE td2;
 	opaque *ret;
 	void *A, *Atmp;
 	int i = 0, times, copy_bytes = 0, how, blocksize, A_size;
@@ -153,7 +153,7 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 
 	ret = secure_calloc(1, total_bytes);
 
-	blocksize = mhash_get_block_size(algorithm);
+	blocksize = gnutls_hmac_get_algo_len(algorithm);
 	do {
 		i += blocksize;
 	} while (i < total_bytes);
@@ -166,18 +166,17 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 	times = i / blocksize;
 	for (i = 0; i < times; i++) {
 		td2 =
-		    mhash_hmac_init(algorithm, secret, secret_size,
-				    mhash_get_hash_pblock(algorithm));
+		    gnutls_hmac_init(algorithm, secret, secret_size);
 
 		Atmp =
 		    _gnutls_cal_PRF_A(algorithm, secret, secret_size, A,
 				      A_size);
-		free(A);
+		gnutls_free(A);
 		A = Atmp;
 
-		mhash(td2, A, A_size);
-		mhash(td2, seed, seed_size);
-		final = mhash_hmac_end(td2);
+		gnutls_hmac(td2, A, A_size);
+		gnutls_hmac(td2, seed, seed_size);
+		final = gnutls_hmac_deinit(td2);
 
 		copy_bytes = blocksize;
 		if ((i + 1) * copy_bytes < total_bytes) {
@@ -189,7 +188,7 @@ svoid *gnutls_P_hash(hashid algorithm, opaque * secret, int secret_size,
 		if (how > 0) {
 			memmove(&ret[i * copy_bytes], final, how);
 		}
-		free(final);
+		gnutls_free(final);
 	}
 
 	return ret;
@@ -227,10 +226,10 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 	}
 
 	o1 =
-	    gnutls_P_hash(MHASH_MD5, s1, l_s1, s_seed, s_seed_size,
+	    gnutls_P_hash(GNUTLS_MAC_MD5, s1, l_s1, s_seed, s_seed_size,
 			  total_bytes);
 	o2 =
-	    gnutls_P_hash(MHASH_SHA1, s2, l_s2, s_seed, s_seed_size,
+	    gnutls_P_hash(GNUTLS_MAC_SHA, s2, l_s2, s_seed, s_seed_size,
 			  total_bytes);
 
 	ret = secure_calloc(1, total_bytes);
