@@ -98,9 +98,11 @@ static void resume_copy_required_values(gnutls_session session)
 	       session->internals.resumed_security_parameters.
 	       current_cipher_suite.CipherSuite, 2);
 
-	session->internals.compression_method = session->internals.resumed_security_parameters.read_compression_algorithm;	/* or write_compression_algorithm
-																	 * they are the same
-																	 */
+	session->internals.compression_method = 
+		session->internals.resumed_security_parameters.read_compression_algorithm;
+		/* or write_compression_algorithm
+		 * they are the same
+		 */
 
 	session->security_parameters.entity =
 	    session->internals.resumed_security_parameters.entity;
@@ -1634,6 +1636,10 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 		_gnutls_cipher_suite_get_kx_algo(
 			&session->security_parameters.current_cipher_suite)))
 	{
+		/* While resuming we cannot check the username extension since it is
+		 * not available at this point. It will be copied on connection
+		 * state activation.
+		 */
 		if (session->internals.resumed == RESUME_FALSE &&
 			session->security_parameters.extensions.srp_username[0] == 0) 
 		{
