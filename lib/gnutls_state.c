@@ -60,14 +60,14 @@ gnutls_cipher_algorithm gnutls_cipher_get( gnutls_session session) {
 }
 
 /**
-  * gnutls_cert_type_get - Returns the currently used certificate type.
+  * gnutls_certificate_type_get - Returns the currently used certificate type.
   * @session: is a &gnutls_session structure.
   *
   * Returns the currently used certificate type. The certificate type
   * is by default X.509, unless it is negotiated as a TLS extension.
   *
   **/
-gnutls_certificate_type gnutls_cert_type_get( gnutls_session session) {
+gnutls_certificate_type gnutls_certificate_type_get( gnutls_session session) {
 	return session->security_parameters.cert_type;
 }
 

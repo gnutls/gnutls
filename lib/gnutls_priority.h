@@ -23,4 +23,4 @@ int gnutls_kx_set_priority( gnutls_session session, gnutls_list);
 int gnutls_mac_set_priority( gnutls_session session, gnutls_list);
 int gnutls_compression_set_priority( gnutls_session session, gnutls_list);
 int gnutls_protocol_set_priority( gnutls_session session, gnutls_list);
-int gnutls_cert_type_set_priority( gnutls_session session, gnutls_list);
+int gnutls_certificate_type_set_priority( gnutls_session session, gnutls_list);

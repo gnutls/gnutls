@@ -96,7 +96,7 @@ const static int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
 #define ADD_ALL_MACS(session) gnutls_mac_set_priority(session, mac_priority)
 #define ADD_ALL_KX(session) gnutls_kx_set_priority(session, kx_priority)
 #define ADD_ALL_PROTOCOLS(session) gnutls_protocol_set_priority(session, protocol_priority)
-#define ADD_ALL_CERTTYPES(session) gnutls_cert_type_set_priority(session, cert_type_priority)
+#define ADD_ALL_CERTTYPES(session) gnutls_certificate_type_set_priority(session, cert_type_priority)
 
 static void ADD_KX(gnutls_session session, int kx) {
 	static int _kx_priority[] = { 0, 0 };
@@ -140,7 +140,7 @@ static void ADD_CERTTYPE(gnutls_session session, int ctype) {
 	static int _ct_priority[] = { 0, 0 };
 	_ct_priority[0] = ctype;
 
-	gnutls_cert_type_set_priority(session, _ct_priority);
+	gnutls_certificate_type_set_priority(session, _ct_priority);
 }
 
 static void ADD_PROTOCOL(gnutls_session session, int protocol) {
@@ -274,7 +274,7 @@ int ret;
 	ret = do_handshake( session);
 	if (ret==FAILED) return ret;
 
-	if ( gnutls_cert_type_get(session) == GNUTLS_CRT_OPENPGP)
+	if ( gnutls_certificate_type_get(session) == GNUTLS_CRT_OPENPGP)
 		return SUCCEED;
 
 	return FAILED;

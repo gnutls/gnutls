@@ -261,7 +261,7 @@ void print_cert_info(gnutls_session session)
 {
 
 	printf( " - Certificate type: ");
-	switch (gnutls_cert_type_get(session)) {
+	switch (gnutls_certificate_type_get(session)) {
 	case GNUTLS_CRT_X509:
 		printf("X.509\n");
 		print_x509_info(session);

@@ -684,7 +684,7 @@ SSL_CIPHER *SSL_get_current_cipher(SSL *ssl)
     ssl->ciphersuite.kx = gnutls_kx_get(ssl->gnutls_state);
     ssl->ciphersuite.mac = gnutls_mac_get(ssl->gnutls_state);
     ssl->ciphersuite.compression = gnutls_compression_get(ssl->gnutls_state);
-    ssl->ciphersuite.cert = gnutls_cert_type_get(ssl->gnutls_state);
+    ssl->ciphersuite.cert = gnutls_certificate_type_get(ssl->gnutls_state);
 
     return &(ssl->ciphersuite);
 }

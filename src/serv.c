@@ -275,7 +275,7 @@ gnutls_session initialize_session (void)
     gnutls_kx_set_priority(session, kx_priority);
     gnutls_protocol_set_priority( session, protocol_priority);
     gnutls_mac_set_priority(session, mac_priority);
-    gnutls_cert_type_set_priority(session, cert_type_priority);
+    gnutls_certificate_type_set_priority(session, cert_type_priority);
 
     gnutls_cred_set(session, GNUTLS_CRD_ANON, dh_cred);
     gnutls_cred_set(session, GNUTLS_CRD_SRP, srp_cred);
@@ -351,7 +351,7 @@ char* peer_print_info(gnutls_session session, int *ret_length, const char* heade
    sprintf(tmp2, "<TABLE border=1><TR><TD>Protocol version:</TD><TD>%s</TD></TR>\n", tmp);
 
    if (gnutls_auth_get_type(session) == GNUTLS_CRD_CERTIFICATE) {
-      tmp = gnutls_cert_type_get_name(gnutls_cert_type_get(session));
+      tmp = gnutls_certificate_type_get_name(gnutls_certificate_type_get(session));
       sprintf(tmp2, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n", tmp);
    }
 

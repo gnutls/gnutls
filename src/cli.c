@@ -246,7 +246,7 @@ int main(int argc, char **argv)
       gnutls_kx_set_priority(session, kx_priority);
       gnutls_protocol_set_priority(session, protocol_priority);
       gnutls_mac_set_priority(session, mac_priority);
-      gnutls_cert_type_set_priority(session, cert_type_priority);
+      gnutls_certificate_type_set_priority(session, cert_type_priority);
 
       gnutls_dh_set_prime_bits(session, 512);
 

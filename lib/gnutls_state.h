@@ -8,7 +8,7 @@ void _gnutls_record_set_default_version(gnutls_session session, gnutls_protocol_
 void _gnutls_session_cert_type_set( gnutls_session session, gnutls_certificate_type);
 gnutls_kx_algorithm gnutls_kx_get( gnutls_session session);
 gnutls_cipher_algorithm	gnutls_cipher_get( gnutls_session session);
-gnutls_certificate_type gnutls_cert_type_get( gnutls_session session);
+gnutls_certificate_type gnutls_certificate_type_get( gnutls_session session);
 
 #include <gnutls_auth_int.h>
 

@@ -370,7 +370,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		/* put the requested DNs to req_dn, only in case
 		 * of X509 certificates.
 		 */
-		if (gnutls_cert_type_get(session) == GNUTLS_CRT_X509) {
+		if (gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
 			data = _data;
 			data_size = _data_size;
 
@@ -416,7 +416,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		 */
 		for (j = i = 0; i < cred->ncerts; i++) {
 			if ((cred->cert_list[i][0].cert_type ==
-			     gnutls_cert_type_get(session)) &&
+			     gnutls_certificate_type_get(session)) &&
 			    (_gnutls_check_pk_algo_in_list(pk_algos,
 							   pk_algos_length,
 							   cred->

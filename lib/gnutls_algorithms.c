@@ -1187,13 +1187,13 @@ _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)
 }
 
 /**
-  * gnutls_cert_type_get_name - Returns a string with the name of the specified certificate type
+  * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
   * @type: is a certificate type
   *
   * Returns a string that contains the name 
   * of the specified MAC algorithm.
   **/
-const char *gnutls_cert_type_get_name( gnutls_certificate_type type)
+const char *gnutls_certificate_type_get_name( gnutls_certificate_type type)
 {
 	const char *ret = NULL;
 

@@ -399,7 +399,7 @@ int gnutls_certificate_verify_peers(gnutls_session session)
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-	switch( gnutls_cert_type_get( session)) {
+	switch( gnutls_certificate_type_get( session)) {
 		case GNUTLS_CRT_X509:
 			return _gnutls_x509_cert_verify_peers( session);
 		case GNUTLS_CRT_OPENPGP:
@@ -435,7 +435,7 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
 		return (time_t) -1;
 	}
 
-	switch( gnutls_cert_type_get( session)) {
+	switch( gnutls_certificate_type_get( session)) {
 		case GNUTLS_CRT_X509:
 			return gnutls_x509_extract_certificate_expiration_time(
 				&info->raw_certificate_list[0]);
@@ -476,7 +476,7 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 		return (time_t) -1;
 	}
 
-	switch( gnutls_cert_type_get( session)) {
+	switch( gnutls_certificate_type_get( session)) {
 		case GNUTLS_CRT_X509:
 			return gnutls_x509_extract_certificate_activation_time(
 				&info->raw_certificate_list[0]);

@@ -142,7 +142,7 @@ gnutls_cipher_algorithm		gnutls_cipher_get( gnutls_session session);
 gnutls_kx_algorithm 		gnutls_kx_get( gnutls_session session);
 gnutls_mac_algorithm		gnutls_mac_get( gnutls_session session);
 gnutls_compression_method	gnutls_compression_get( gnutls_session session);
-gnutls_certificate_type		gnutls_cert_type_get( gnutls_session session);
+gnutls_certificate_type		gnutls_certificate_type_get( gnutls_session session);
 
 size_t gnutls_cipher_get_key_size( gnutls_cipher_algorithm algorithm);
 
@@ -151,7 +151,7 @@ const char *gnutls_cipher_get_name( gnutls_cipher_algorithm);
 const char *gnutls_mac_get_name( gnutls_mac_algorithm);
 const char *gnutls_compression_get_name( gnutls_compression_method);
 const char *gnutls_kx_get_name( gnutls_kx_algorithm algorithm);
-const char *gnutls_cert_type_get_name( gnutls_certificate_type type);
+const char *gnutls_certificate_type_get_name( gnutls_certificate_type type);
 
 
 /* error functions */
@@ -185,7 +185,7 @@ int gnutls_mac_set_priority( gnutls_session session, const int*);
 int gnutls_compression_set_priority( gnutls_session session, const int*);
 int gnutls_kx_set_priority( gnutls_session session, const int*);
 int gnutls_protocol_set_priority( gnutls_session session, const int*);
-int gnutls_cert_type_set_priority( gnutls_session session, const int*);
+int gnutls_certificate_type_set_priority( gnutls_session session, const int*);
 
 /* Returns the name of a cipher suite */
 const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm kx_algorithm,
@@ -385,3 +385,7 @@ int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* da
 #define gnutls_deinit gnutls_session_deinit
 #define _gnutls_deinit _gnutls_session_deinit
 #define gnutls_handshake_set_exportable_detection(x,y) 0
+#define gnutls_cert_type_get gnutls_certificate_type_get
+#define gnutls_cert_type_set_priority gnutls_certificate_type_set_priority
+#define gnutls_cert_type_get_name gnutls_certificate_type_get_name
+

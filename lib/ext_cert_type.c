@@ -31,7 +31,7 @@
 
 /* 
  * In case of a server: if a CERT_TYPE extension type is received then it stores
- * into the session security parameters the new value. The server may use gnutls_session_cert_type_get(),
+ * into the session security parameters the new value. The server may use gnutls_session_certificate_type_get(),
  * to access it.
  *
  * In case of a client: If a cert_types have been specified then we send the extension.

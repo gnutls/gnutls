@@ -43,6 +43,22 @@ void gnutls_deinit(gnutls_session session)
 	gnutls_session_deinit( session);
 }
 
+#undef gnutls_cert_type_get
+gnutls_certificate_type gnutls_cert_type_get( gnutls_session session) {
+	return gnutls_certificate_type_get( session);
+}
+
+#undef gnutls_cert_type_set_priority
+int gnutls_cert_type_set_priority( gnutls_session session, const int* list) {
+	return gnutls_certificate_type_set_priority( session, list);
+}
+
+#undef gnutls_cert_type_get_name
+const char *gnutls_cert_type_get_name( gnutls_certificate_type type)
+{
+	return gnutls_certificate_type_get_name( type);
+}
+
 /* nothing here */
 
 #endif /* GNUTLS_BACKWARDS_COMPATIBLE */

@@ -194,7 +194,7 @@ int num=0, i;
 }
 
 /**
-  * gnutls_cert_type_set_priority - Sets the priority on the certificate types supported by gnutls.
+  * gnutls_certificate_type_set_priority - Sets the priority on the certificate types supported by gnutls.
   * @session: is a &gnutls_session structure.
   * @list: is a 0 terminated list of gnutls_certificate_type elements.
   *
@@ -205,7 +205,7 @@ int num=0, i;
   * The server does not use the cert type priority except for disabling
   * types that were not specified.
   **/
-int gnutls_cert_type_set_priority( gnutls_session session, gnutls_list list) {
+int gnutls_certificate_type_set_priority( gnutls_session session, gnutls_list list) {
 #ifdef HAVE_LIBOPENCDK
 gnutls_list _list = list;
 int num=0, i;
