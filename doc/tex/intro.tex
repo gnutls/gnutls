@@ -1,6 +1,13 @@
 \section{Introduction}
+
 \par
-\gnutls{} is a portable library which implements the \tlsI{} and 
+In brief \gnutls{} can be described as a portable library which offers
+an API to access secure communication protocols. These protocols provide
+privacy over insecure lines, and were designed to prevent 
+eavesdropping, tampering, or message forgery.
+
+\par
+Technically \gnutls{} is a library which implements the \tlsI{} and 
 \sslIII{} protocols.
 \tls{} stands for 'Transport Layer Security' and is the sucessor of \ssl{}, 
 the Secure Sockets Layer protocol designed by Netscape. 
@@ -12,24 +19,26 @@ designers, operators, vendors, and researchers concerned with the evolution of
 the Internet architecture and the smooth operation of the Internet. It is open to any interested individual.}, 
 that provides confidentiality, and authentication layers over any reliable
 transport layer.
+The above protocols are implemented in a reentrant way. 
+This allows multiple threads of execution, without the need for critical 
+sections and locks. 
 
 \par
-\gnutls{} implements the above
-protocols in a reentrant way. This allows multiple threads of
-execution, without the need for critical sections and locks. See
-\htmladdnormallink{http://www.gnutls.org/}{http://www.gnutls.org/}
+See \htmladdnormallink{http://www.gnutls.org/}{http://www.gnutls.org/}
 and \htmladdnormallink{http://www.gnu.org/software/gnutls/}{http://www.gnu.org/software/gnutls/} 
 for updated versions of the \gnutls{} software and this document.
 
-\par
+\subsection{Current state}
+
 Currently \gnutls{} implements:
 \begin{itemize}
- \item the \tlsI{} and \sslIII{} protocols, without any weak algorithms\footnote{
+\item the \tlsI{} and \sslIII{} protocols, without any weak algorithms\footnote{
 There are ciphersuites in \tlsI{} that are considered weak. These
 ciphersuites are deliberately weak in order to be able to export encryption
 software from some countries.}
- \item {\bf X.509} Public Key Infrastructure.
- \item {\bf OpenPGP} Public Key Infrastructure.
- \item {\bf SRP} for \tls{} authentication.
- \item \tls{} {\bf Extension mechanism}.
+\item {\bf X.509} Public Key Infrastructure.
+\item {\bf OpenPGP} Public Key Infrastructure.
+\item {\bf SRP} for \tls{} authentication.
+\item \tls{} {\bf Extension mechanism}.
 \end{itemize}
+
