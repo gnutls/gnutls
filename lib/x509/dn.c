@@ -422,6 +422,8 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 
 		if (result != ASN1_SUCCESS) {
 		    gnutls_assert();
+		    if (result==ASN1_MEM_ERROR)
+		        *sizeof_buf = len;
 		    result = _gnutls_asn2err(result);
 		    goto cleanup;
 		}
@@ -429,7 +431,8 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 		if (raw_flag != 0) {
 		    if ((uint) len > *sizeof_buf) {
 			*sizeof_buf = len;
-			return GNUTLS_E_SHORT_MEMORY_BUFFER;
+			result = GNUTLS_E_SHORT_MEMORY_BUFFER;
+			goto cleanup;
 		    }
 		    *sizeof_buf = len;
 
