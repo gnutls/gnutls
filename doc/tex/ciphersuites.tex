@@ -1,7 +1,7 @@
 \newpage
 \section{TLS Cipher suites}
 \par 
-% \tls 1.0 supports ciphersuites like {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
+\tls 1.0 supports ciphersuites like {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
 These ciphersuites contain three parameters:
 \begin{itemize}
 \item The key exchange algorithm (DHE\_RSA in the example)
@@ -34,6 +34,7 @@ parameters which are send to the peer. Currently \gnutls does not support this c
 \hline
 DH\_DSS & Static Diffie Hellman parameters signed by a DSS certificate.
 Currently \gnutls does not support this ciphersuite.
+\\
 \hline
 DH\_RSA & Static Diffie Hellman parameters signed by an RSA certificate.
 Currently \gnutls does not support this ciphersuite.
@@ -51,6 +52,7 @@ protocol
 
 \addvspace{1.5cm}
 \par
+
  The Bulk Cipher algorithms used in \gnutls are: 
 \par
 \begin{tabular}{|l|p{9cm}|}
@@ -79,6 +81,7 @@ TWOFISH\_CBC & TWOFISH is a block cipher algorithm by Counterpane. Has
 \par
  The MAC\footnote{see RFC2104} algorithms used in \gnutls are: 
 \par
+
 \begin{tabular}{|l|p{9cm}|}
 
 \hline
