@@ -325,15 +325,15 @@ if test x$opt_developer_mode = xyes; then
 fi
 
 if test x"$libtasn1_enabled" = xyes; then
- AC_CONFIG_SUBDIRS(libtasn1)
- AC_DEFINE(USE_MINITASN1, 1, [use the included tasn1])
  MINITASN1_OBJECTS="minitasn1/coding.lo minitasn1/decoding.lo minitasn1/element.lo \
 	minitasn1/errors.lo minitasn1/gstr.lo minitasn1/parser_aux.lo minitasn1/structure.lo"
+ MINITASN1_DIR=minitasn1
 else
  LIBASN1_LINK=-ltasn1
 fi
 
 AC_SUBST(MINITASN1_OBJECTS)
+AC_SUBST(MINITASN1_DIR)
 AC_SUBST(LIBASN1_LINK)
 
 
