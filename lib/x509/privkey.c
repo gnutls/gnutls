@@ -621,20 +621,22 @@ int gnutls_x509_privkey_get_pk_algorithm(gnutls_x509_privkey_t key)
   * @key: Holds the key
   * @format: the format of output params. One of PEM or DER.
   * @output_data: will contain a private key PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  * @output_data_size: holds the size of output_data (and will be
+  *   replaced by the actual size of parameters)
   *
-  * This function will export the private key to a PKCS1 structure for RSA keys,
-  * or an integer sequence for DSA keys. The DSA keys are in the same format
-  * with the parameters used by openssl.
+  * This function will export the private key to a PKCS1 structure for
+  * RSA keys, or an integer sequence for DSA keys. The DSA keys are in
+  * the same format with the parameters used by openssl.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN RSA PRIVATE KEY".
   *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
+  * Return value: In case of failure a negative value will be
+  *   returned, and 0 on success.
   *
   **/
 int gnutls_x509_privkey_export(gnutls_x509_privkey_t key,
@@ -1245,22 +1247,25 @@ int gnutls_x509_privkey_generate(gnutls_x509_privkey_t key,
 }
 
 /**
-  * gnutls_x509_privkey_get_key_id - This function will return a unique ID of the key's parameters
+  * gnutls_x509_privkey_get_key_id - This function will return a unique ID
+  *                                  of the key's parameters
   * @key: Holds the key
   * @flags: should be 0 for now
   * @output_data: will contain the key ID
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  * @output_data_size: holds the size of output_data (and will be
+  *   replaced by the actual size of parameters)
   *
   * This function will return a unique ID the depends on the public key
   * parameters. This ID can be used in checking whether a certificate
   * corresponds to the given key.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. The output will normally
-  * be a SHA-1 hash output, which is 20 bytes.
+  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.  The output will normally be a SHA-1 hash output,
+  * which is 20 bytes.
   *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
+  * Return value: In case of failure a negative value will be
+  *   returned, and 0 on success.
   *
   **/
 int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
@@ -1331,15 +1336,17 @@ int gnutls_x509_privkey_get_key_id(gnutls_x509_privkey_t key,
   * @flags: should be 0 for now
   * @data: holds the data to be signed
   * @signature: will contain the signature
-  * @signature_size: holds the size of signature (and will be replaced by the new size)
+  * @signature_size: holds the size of signature (and will be replaced
+  *   by the new size)
   *
-  * This function will sign the given data using a signature algorithm supported by
-  * the private key. Signature algorithms are always used together with a hash functions.
-  * Different hash functions may be used for the RSA algorithm, but only
-  * SHA-1 for the DSA keys.
+  * This function will sign the given data using a signature algorithm
+  * supported by the private key. Signature algorithms are always used
+  * together with a hash functions.  Different hash functions may be
+  * used for the RSA algorithm, but only SHA-1 for the DSA keys.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &signature_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * *signature_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.
   *
   * In case of failure a negative value will be returned, and
   * 0 on success.

@@ -389,18 +389,20 @@ int gnutls_pkcs7_get_crt_count(gnutls_pkcs7_t pkcs7)
   * @pkcs7: Holds the pkcs7 structure
   * @format: the format of output params. One of PEM or DER.
   * @output_data: will contain a structure PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  * @output_data_size: holds the size of output_data (and will be
+  *   replaced by the actual size of parameters)
   *
   * This function will export the pkcs7 structure to DER or PEM format.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN PKCS7".
   *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
+  * Return value: In case of failure a negative value will be
+  *   returned, and 0 on success.
   *
   **/
 int gnutls_pkcs7_export(gnutls_pkcs7_t pkcs7,

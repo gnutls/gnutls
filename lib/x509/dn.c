@@ -889,13 +889,13 @@ int _gnutls_x509_set_dn_oid(ASN1_TYPE asn1_struct,
   * @buf: a pointer to a structure to hold the peer's name
   * @sizeof_buf: holds the size of @buf
   *
-  * This function will return the name of the given RDN sequence.
-  * The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described 
-  * in RFC2253.
+  * This function will return the name of the given RDN sequence.  The
+  * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
+  * RFC2253.
   *
-  * If the provided buffer is not long enough, returns GNUTLS_E_SHORT_MEMORY_BUFFER 
-  * and &sizeof_buf will be updated.
-  * On success 0 is returned.
+  * If the provided buffer is not long enough, returns
+  * GNUTLS_E_SHORT_MEMORY_BUFFER and *sizeof_buf will be updated.  On
+  * success 0 is returned.
   *
   **/
 int gnutls_x509_rdn_get(const gnutls_datum_t * idn,
@@ -939,17 +939,18 @@ int gnutls_x509_rdn_get(const gnutls_datum_t * idn,
   * gnutls_x509_rdn_get_by_oid - This function parses an RDN sequence and returns a string
   * @idn: should contain a DER encoded RDN sequence
   * @oid: an Object Identifier
-  * @indx: In case multiple same OIDs exist in the RDN indicates which to send. Use 0 for the first one.
+  * @indx: In case multiple same OIDs exist in the RDN indicates which
+  *   to send. Use 0 for the first one.
   * @raw_flag: If non zero then the raw DER data are returned.
   * @buf: a pointer to a structure to hold the peer's name
   * @sizeof_buf: holds the size of @buf
   *
-  * This function will return the name of the given Object identifier, 
-  * of the RDN sequence.
-  * The name will be encoded using the rules from RFC2253.
+  * This function will return the name of the given Object identifier,
+  * of the RDN sequence.  The name will be encoded using the rules
+  * from RFC2253.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates &sizeof_buf if the provided buffer is not long enough,
-  * and 0 on success.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates *sizeof_buf if
+  * the provided buffer is not long enough, and 0 on success.
   *
   **/
 int gnutls_x509_rdn_get_by_oid(const gnutls_datum_t * idn, const char *oid,
@@ -994,11 +995,11 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum_t * idn, const char *oid,
   * @oid: a pointer to a structure to hold the peer's name OID
   * @sizeof_oid: holds the size of @oid
   *
-  * This function will return the specified Object identifier, 
-  * of the RDN sequence.
+  * This function will return the specified Object identifier, of the
+  * RDN sequence.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates &sizeof_buf if the provided buffer is not long enough,
-  * and 0 on success.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER and updates *sizeof_buf if
+  * the provided buffer is not long enough, and 0 on success.
   *
   **/
 int gnutls_x509_rdn_get_oid(const gnutls_datum_t * idn,

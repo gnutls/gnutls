@@ -228,15 +228,16 @@ int gnutls_x509_crt_import(gnutls_x509_crt_t cert,
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
-  * This function will copy the name of the Certificate issuer in the provided buffer. The name 
-  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
+  * This function will copy the name of the Certificate issuer in the
+  * provided buffer. The name will be in the form
+  * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
+  * will be ASCII or UTF-8 encoded, depending on the certificate data.
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_buf will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_buf will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
@@ -261,20 +262,22 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt_t cert, char *buf,
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
-  * This function will extract the part of the name of the Certificate issuer specified
-  * by the given OID. The output will be encoded as described in RFC2253. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
+  * This function will extract the part of the name of the Certificate
+  * issuer specified by the given OID. The output will be encoded as
+  * described in RFC2253. The output string will be ASCII or UTF-8
+  * encoded, depending on the certificate data.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * If raw flag is zero, this function will only return known OIDs as text. Other OIDs
-  * will be DER encoded, as described in RFC2253 -- in hex format with a '\#' prefix.
-  * You can check about known OIDs using gnutls_x509_dn_oid_known().
+  * If raw flag is zero, this function will only return known OIDs as
+  * text. Other OIDs will be DER encoded, as described in RFC2253 --
+  * in hex format with a '\#' prefix.  You can check about known OIDs
+  * using gnutls_x509_dn_oid_known().
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_buf will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_buf will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
@@ -299,14 +302,14 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt_t cert,
   * @oid: a pointer to a buffer to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
   *
-  * This function will extract the OIDs of the name of the Certificate issuer specified
-  * by the given index.
+  * This function will extract the OIDs of the name of the Certificate
+  * issuer specified by the given index.
   *
   * If @oid is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_oid will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_oid will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
@@ -329,15 +332,16 @@ int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt_t cert,
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
-  * This function will copy the name of the Certificate in the provided buffer. The name 
-  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
+  * This function will copy the name of the Certificate in the
+  * provided buffer. The name will be in the form
+  * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
+  * will be ASCII or UTF-8 encoded, depending on the certificate data.
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_buf will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_buf will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
@@ -362,20 +366,21 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt_t cert, char *buf,
   * @buf: a pointer to a structure to hold the name (may be null)
   * @sizeof_buf: initially holds the size of @buf
   *
-  * This function will extract the part of the name of the Certificate subject, specified
-  * by the given OID. The output
-  * string will be ASCII or UTF-8 encoded, depending on the certificate data.
+  * This function will extract the part of the name of the Certificate
+  * subject, specified by the given OID. The output string will be
+  * ASCII or UTF-8 encoded, depending on the certificate data.
   *
   * Some helper macros with popular OIDs can be found in gnutls/x509.h
-  * If raw flag is zero, this function will only return known OIDs as text. Other OIDs
-  * will be DER encoded, as described in RFC2253 -- in hex format with a '\#' prefix.
-  * You can check about known OIDs using gnutls_x509_dn_oid_known().
+  * If raw flag is zero, this function will only return known OIDs as
+  * text. Other OIDs will be DER encoded, as described in RFC2253 --
+  * in hex format with a '\#' prefix.  You can check about known OIDs
+  * using gnutls_x509_dn_oid_known().
   *
   * If @buf is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_buf will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_buf will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert, const char *oid,
@@ -399,14 +404,14 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt_t cert, const char *oid,
   * @oid: a pointer to a buffer to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
   *
-  * This function will extract the OIDs of the name of the Certificate subject specified
-  * by the given index.
+  * This function will extract the OIDs of the name of the Certificate
+  * subject specified by the given index.
   *
   * If oid is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_oid will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_oid will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt_t cert,
@@ -1227,9 +1232,9 @@ int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert,
   *
   * If the buffer is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_buf will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_buf will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt_t cert,
@@ -1277,18 +1282,20 @@ int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt_t cert,
   * @cert: Holds the certificate
   * @format: the format of output params. One of PEM or DER.
   * @output_data: will contain a certificate PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  * @output_data_size: holds the size of output_data (and will be
+  *   replaced by the actual size of parameters)
   *
   * This function will export the certificate to DER or PEM format.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN CERTIFICATE".
   *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
+  * Return value: In case of failure a negative value will be
+  *   returned, and 0 on success.
   *
   **/
 int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
@@ -1307,22 +1314,25 @@ int gnutls_x509_crt_export(gnutls_x509_crt_t cert,
 
 
 /**
-  * gnutls_x509_crt_get_key_id - This function will return a unique ID of the public key's parameters
+  * gnutls_x509_crt_get_key_id - This function will return a unique ID of
+  *                              the public key's parameters
   * @crt: Holds the certificate
   * @flags: should be 0 for now
   * @output_data: will contain the key ID
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  * @output_data_size: holds the size of output_data (and will be
+  *   replaced by the actual size of parameters)
   *
   * This function will return a unique ID the depends on the public key
   * parameters. This ID can be used in checking whether a certificate
   * corresponds to the given private key.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned. 
-  * The output will normally be a SHA-1 hash output, which is 20 bytes.
+  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.  The output will normally be a SHA-1 hash output,
+  * which is 20 bytes.
   *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
+  * Return value: In case of failure a negative value will be
+  *   returned, and 0 on success.
   *
   **/
 int gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt, unsigned int flags,
@@ -1666,15 +1676,16 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt_t cert,
   * @oid: a pointer to a buffer to hold the OID (may be null)
   * @sizeof_oid: initially holds the size of @oid
   *
-  * This function will extract the key purpose OIDs of the Certificate specified
-  * by the given index. These are stored in the Extended Key Usage extension (2.5.29.37)
-  * See the GNUTLS_KP_* definitions for human readable names.
+  * This function will extract the key purpose OIDs of the Certificate
+  * specified by the given index. These are stored in the Extended Key
+  * Usage extension (2.5.29.37) See the GNUTLS_KP_* definitions for
+  * human readable names.
   *
   * If @oid is null then only the size will be filled.
   *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
-  * in that case the &sizeof_oid will be updated with the required size.
-  * On success 0 is returned.
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+  * long enough, and in that case the *sizeof_oid will be updated with
+  * the required size.  On success 0 is returned.
   *
   **/
 int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt_t cert,

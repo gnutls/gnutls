@@ -381,7 +381,8 @@ int encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
   * @password: the password that will be used to encrypt the key. 
   * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
   * @output_data: will contain a private key PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
+  * @output_data_size: holds the size of output_data (and will be
+  *   replaced by the actual size of parameters)
   *
   * This function will export the private key to a PKCS8 structure.
   * Currently only RSA keys can be exported since there is no documented
@@ -393,14 +394,15 @@ int encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
   * encryption schemas, or ASCII for the PKCS12 schemas.
   *
   * If the buffer provided is not long enough to hold the output, then
-  * &output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+  * be returned.
   *
   * If the structure is PEM encoded, it will have a header
   * of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if
   * encryption is not used.
   *
-  * In case of failure a negative value will be returned, and
-  * 0 on success.
+  * Return value: In case of failure a negative value will be
+  *   returned, and 0 on success.
   *
   **/
 int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
