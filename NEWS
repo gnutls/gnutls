@@ -1,5 +1,6 @@
-Version 0.1.2
+Version 0.1.2 (14/05/2001)
 - Updated API
+- Fixes in extension handling
 
 Version 0.1.1 (13/05/2001)
 - Added compatibility with Stanford's libsrp library
