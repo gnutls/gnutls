@@ -568,7 +568,6 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
 
     i = 1;
     rc = cdk_keydb_get_keyblock( inp, &knode );
-#warning FIX THIS
 
     while( knode && (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
 	pkt = cdk_kbnode_get_packet( p );

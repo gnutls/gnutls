@@ -97,13 +97,13 @@ keybox_blob *blob = NULL;
 	blob = kbx_read_blob( data, 0);
 	if( !blob ) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+		return GNUTLS_E_OPENPGP_KEYRING_ERROR;
 	}
 	
 	keyring->hd = kbx_to_keydb( blob);
 	if( !keyring->hd ) {
 		gnutls_assert();
-		rc = GNUTLS_E_INTERNAL_ERROR;
+		rc = GNUTLS_E_OPENPGP_KEYRING_ERROR;
 		goto leave;
 	}
 	

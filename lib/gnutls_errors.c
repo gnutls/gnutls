@@ -130,6 +130,8 @@ static gnutls_error_entry error_algorithms[] = {
 		GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY, 1 ), 
 	ERROR_ENTRY("The specified GnuPG TrustDB version is not supported. TrustDB v4 is supported.", 
 		GNUTLS_E_OPENPGP_TRUSTDB_VERSION_UNSUPPORTED, 1 ),
+	
+	ERROR_ENTRY("Error loading the keyring.", GNUTLS_E_OPENPGP_KEYRING_ERROR, 1 ),
 	ERROR_ENTRY("The initialization of LZO has failed.", GNUTLS_E_LZO_INIT_FAILED, 1 ), 
 	ERROR_ENTRY("No supported compression algorithms have been found.", GNUTLS_E_NO_COMPRESSION_ALGORITHMS, 1 ), 
 	ERROR_ENTRY("No supported cipher suites have been found.", GNUTLS_E_NO_CIPHER_SUITES, 1 ),
