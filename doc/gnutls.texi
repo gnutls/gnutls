@@ -1111,7 +1111,7 @@ Key exchange algorithms and the corresponding credential types:
 Several parameters such as the ones used for Diffie-Hellman
 authentication are stored within the credentials structures, so all
 sessions can access them. Those parameters are stored in structures
-such as @code{gnutls_dh_params} and @code{gnutls_rsa_params}, and
+such as @code{gnutls_dh_params_t} and @code{gnutls_rsa_params_t}, and
 functions like @code{gnutls_certificate_set_dh_params} and
 @code{gnutls_certificate_set_rsa_export_params} can be used to
 associate those parameters with the given credentials structure.
@@ -1126,14 +1126,14 @@ below.
 @example
 #include <gnutls.h>
 
-gnutls_rsa_params rsa_params;
-gnutls_dh_params dh_params;
+gnutls_rsa_params_t rsa_params;
+gnutls_dh_params_t dh_params;
 
 /* This function will be called once a session requests DH
  * or RSA parameters. The parameters returned (if any) will
  * be used for the first handshake only.
  */
-static int get_params( gnutls_session session,
+static int get_params( gnutls_session_t session,
         gnutls_params_type_t type,
         gnutls_params_st *st)
 @{
@@ -1289,7 +1289,7 @@ parsing capabilities can be found at section @ref{ex:x509-info}.
 Verifying certificate paths is important in @acronym{X.509} authentication. For
 this purpose the function @code{gnutls_x509_crt_verify} is
 provided. The output of this function is the bitwise OR of the
-elements of the @code{gnutls_certificate_status} enumeration.  A
+elements of the @code{gnutls_certificate_status_t} enumeration.  A
 detailed description of these elements can be found in figure below.
 The function @code{gnutls_certificate_verify_peers2} is equivalent to
 the previous one, and will verify the peer's certificate in a TLS
