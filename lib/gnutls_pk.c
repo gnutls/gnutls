@@ -57,7 +57,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 	size_t k, psize;
 	size_t mod_bits;
 
-	mod_bits = _gnutls_mpi_get_nbits(params[0]);	
+	mod_bits = _gnutls_mpi_get_nbits(params[0]);
 	k = mod_bits / 8;
 	if ( mod_bits % 8 != 0) k++;
 
