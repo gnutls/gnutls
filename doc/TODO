@@ -1,6 +1,7 @@
 * x509 Certificate API
 * Add a transparent support for multiple versions (so we can add SSL 3.0
-  and future versions of TLS)
+  and future versions of TLS or even WTLS)
 * Make server work (we need certificate API for that!)
 * Add support for v2.0 init packet
 * Resume old sessions
+* Move algorithm priority to state (now is global)
