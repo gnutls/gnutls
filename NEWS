@@ -1,3 +1,8 @@
+Version 0.2.11
+-  Changed the meaning of GNUTLS_E_REHANDSHAKE value. If this value
+  is returned, then the caller should perform a handshake or send
+  an alert to the peer.
+
 Version 0.2.10 (5/11/2001)
 - Corrected bugs and improved non blocking IO
 - Added hooks to use external database to store sessions

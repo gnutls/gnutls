@@ -348,9 +348,15 @@ int main(int argc, char** argv)
 			} else {
 				if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
 					printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
-				if (ret==GNUTLS_E_REHANDSHAKE)
-					printf("* Rehandshake was performed\n");
-
+				if (ret==GNUTLS_E_REHANDSHAKE) {
+					do {
+						ret = gnutls_handshake( sd, state);
+					} while( ret==GNUTLS_E_AGAIN || ret==GNUTLS_E_INTERRUPTED);
+					if (ret==0) printf("* Rehandshake was performed\n");
+					else {
+						printf("* Rehandshake Failed [%d]\n", ret);
+					}
+				}
 				if (ret > 0) {
 					printf("- Received[%d]: ", ret);
 					for (ii=0;ii<ret;ii++) {

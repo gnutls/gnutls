@@ -899,10 +899,6 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		if (recv_type == GNUTLS_HANDSHAKE) {
 			/* we may get a hello request */
 			ret = _gnutls_recv_hello_request( cd, state, tmpdata, tmplen);
-			if (ret < 0) {
-				gnutls_assert();
-			} else /* inform the caller */
-				ret = GNUTLS_E_REHANDSHAKE;
 		} else {
 			gnutls_assert();
 			ret = GNUTLS_E_UNEXPECTED_PACKET; 
@@ -1078,6 +1074,11 @@ ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t siz
   * difference is that is accepts a GNUTLS state. 
   * Returns the number of bytes received, zero on EOF, or
   * a negative error code.
+  *
+  * If this function returns GNUTLS_E_REHANDSHAKE, then you must
+  * either send an alert containing NO_RENEGOTIATION, or perform a
+  * handshake. (only a client may receive this message)
+  *
   **/
 ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
 	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);

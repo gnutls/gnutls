@@ -1807,7 +1807,7 @@ int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
 	}
 	return 0;
 
-#else				/* this does not seem to work - yet */
+#else	/* this does seem to work - now */
 	uint8 type;
 
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
@@ -1820,7 +1820,7 @@ int _gnutls_recv_hello_request(SOCKET cd, GNUTLS_STATE state, void *data,
 	}
 	type = ((uint8 *) data)[0];
 	if (type == GNUTLS_HELLO_REQUEST)
-		return gnutls_handshake(cd, state);
+		return GNUTLS_E_REHANDSHAKE;
 	else {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET;
