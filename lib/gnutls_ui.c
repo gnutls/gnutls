@@ -211,40 +211,6 @@ const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 }
 
 /**
-  * gnutls_certificate_get_our_issuer - This function returns the raw certificate sent in the last handshake
-  * @session: is a gnutls session
-  *
-  * This function will return the raw certificate of our issuer as sent to the peer,
-  * in the last handshake. This certificate is in raw format. 
-  * This has no meaning for OpenPGP keys.
-  * Returns NULL in case of an error, or if no certificate was found.
-  *
-  **/
-const gnutls_datum *gnutls_certificate_get_our_issuer(gnutls_session session)
-{
-	const gnutls_certificate_credentials cred;
-	int index;
-
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
-
-	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
-	if (cred == NULL) {
-		gnutls_assert();
-		return NULL;
-	}
-
-	index = session->internals.selected_cert_index;
-	if (index < 0) {
-	   gnutls_assert();
-	   return NULL; /* no certificate */
-	}
-
-	if (cred->cert_list_length[index]-1 > 0)
-   	   return &cred->cert_list[index][cred->cert_list_length[index]-1].raw;
-   	else return NULL;
-}
-
-/**
   * gnutls_certificate_get_peers - This function returns the peer's raw certificate
   * @session: is a gnutls session
   * @list_size: is the length of the certificate list
