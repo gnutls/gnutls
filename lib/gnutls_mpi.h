@@ -3,6 +3,7 @@
 
 # include <gcrypt.h>
 # include <libtasn1.h>
+# include <gnutls_int.h>
 
 #define GNUTLS_MPI gcry_mpi_t
 
@@ -40,5 +41,7 @@ int _gnutls_mpi_scan_pgp( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nby
 int _gnutls_mpi_print( void *buffer, size_t *nbytes, const GNUTLS_MPI a );
 int _gnutls_mpi_print_lz( void *buffer, size_t *nbytes, const GNUTLS_MPI a );
 
+int _gnutls_mpi_dprint_lz( gnutls_datum* dest, const GNUTLS_MPI a );
+#define _gnutls_mpi_dprint _gnutls_mpi_dprint_lz
 
 #endif

@@ -1682,4 +1682,136 @@ int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt cert,
 
 }
 
+/**
+  * gnutls_x509_crt_get_pk_rsa_raw - This function will export the RSA public key
+  * @crt: Holds the certificate
+  * @m: will hold the modulus
+  * @e: will hold the public exponent
+  *
+  * This function will export the RSA private key's parameters found in the given
+  * structure. The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  * 
+  **/
+int gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt crt,
+	gnutls_datum * m, gnutls_datum *e)
+{
+int ret;
+GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
+int params_size = MAX_PUBLIC_PARAMS_SIZE;
+int i;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = _gnutls_x509_crt_get_mpis( crt, params, &params_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = _gnutls_mpi_dprint(m, params[0]);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	ret = _gnutls_mpi_dprint(e, params[1]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(m);
+		goto cleanup;
+	}
+
+	ret = 0;
+
+cleanup:
+	for (i = 0; i < params_size; i++) {
+		_gnutls_mpi_release( &params[i]);
+	}
+	return ret;
+}
+
+/**
+  * gnutls_x509_crt_get_pk_dsa_raw - This function will export the DSA private key
+  * @crt: Holds the certificate
+  * @p: will hold the p
+  * @q: will hold the q
+  * @g: will hold the g
+  * @y: will hold the y
+  *
+  * This function will export the DSA private key's parameters found in the given
+  * certificate. The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  * 
+  **/
+int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt crt,
+	gnutls_datum * p, gnutls_datum *q,
+	gnutls_datum *g, gnutls_datum *y) 
+{
+int ret;
+GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
+int params_size = MAX_PUBLIC_PARAMS_SIZE;
+int i;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	ret = _gnutls_x509_crt_get_mpis( crt, params, &params_size);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+
+	/* P */
+	ret = _gnutls_mpi_dprint(p, params[0]);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	/* Q */
+	ret = _gnutls_mpi_dprint(q, params[1]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(p);
+		goto cleanup;
+	}
+
+
+	/* G */
+	ret = _gnutls_mpi_dprint(g, params[2]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(p);
+		_gnutls_free_datum(q);
+		goto cleanup;
+	}
+
+
+	/* Y */
+	ret = _gnutls_mpi_dprint(y, params[3]);
+	if (ret < 0) {
+		gnutls_assert();
+		_gnutls_free_datum(p);
+		_gnutls_free_datum(g);
+		_gnutls_free_datum(q);
+		goto cleanup;
+	}
+
+	ret = 0;
+
+cleanup:
+	for (i = 0; i < params_size; i++) {
+		_gnutls_mpi_release( &params[i]);
+	}
+	return ret;
+
+}
+
 #endif

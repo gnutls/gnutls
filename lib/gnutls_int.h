@@ -102,6 +102,11 @@ typedef void * gnutls_transport_ptr;
 typedef unsigned char opaque;
 typedef struct { opaque pint[3]; } uint24;
 
+typedef struct {
+	opaque * data;
+	unsigned int size;
+} gnutls_datum;
+
 #include <gnutls_mpi.h>
 
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
@@ -140,11 +145,6 @@ typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_S
 		     GNUTLS_FINISHED=20 } HandshakeType;
 
 typedef HandshakeType gnutls_handshake_description;
-
-typedef struct {
-	opaque * data;
-	unsigned int size;
-} gnutls_datum;
 
 #include <gnutls_buffer.h>
 

@@ -8,6 +8,8 @@ Version 1.0.14
 - Corrected a serious bug in the included libtasn1 library.
 - Corrected session resuming in SRP ciphersuites.
 - Updated to conform to the latest srp draft (draft-ietf-tls-srp-07)
+- Added the functions gnutls_x509_crt_get_pk_rsa_raw() and
+  gnutls_x509_crt_get_pk_dsa_raw() to retrieve parameters from certificates.
 
 Version 1.0.13 (29/04/2004)
 - Some complilation fixes.

@@ -132,6 +132,12 @@ time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result, size_t* result_size);
 
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
+int gnutls_x509_crt_get_pk_rsa_raw(gnutls_x509_crt crt,
+	gnutls_datum * m, gnutls_datum *e);
+int gnutls_x509_crt_get_pk_dsa_raw(gnutls_x509_crt crt,
+	gnutls_datum * p, gnutls_datum *q,
+	gnutls_datum *g, gnutls_datum *y);
+
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
 	unsigned int seq, void *ret, size_t *ret_size, unsigned int* critical);
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
