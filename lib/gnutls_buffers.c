@@ -156,12 +156,25 @@ static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 	while (left > 0) {
 		i = _gnutls_recv_func(fd, &ptr[i], left, flag);
 		if (i < 0) {
+#ifdef READ_DEBUG
+			_gnutls_log( "READ: %d returned from %d, errno=%d\n", i, fd, errno);
+#endif
 			if (errno == EAGAIN || errno == EINTR) {
+				if (sizeOfPtr-left > 0) {
+#ifdef READ_DEBUG
+					_gnutls_log( "READ: returning %d bytes from %d\n", sizeOfPtr-left, fd);
+#endif
+					return sizeOfPtr-left;
+				}
 				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 				else return GNUTLS_E_INTERRUPTED;
 			} else 
 				return GNUTLS_E_UNKNOWN_ERROR;
 		} else {
+#ifdef READ_DEBUG
+			_gnutls_log( "READ: Got %d bytes from %d\n", i, fd);
+#endif
+
 			if (i == 0)
 				break;	/* EOF */
 		}
@@ -243,10 +256,10 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	}
 	
 	/* leave peeked data to the kernel space only if application data
-	 * (NEW: or handshake data) is received and we don't have any peeked 
+	 * is received and we don't have any peeked 
 	 * data in gnutls state.
 	 */
-	if ( (recv_type != GNUTLS_APPLICATION_DATA && recv_type != GNUTLS_HANDSHAKE)
+	if ( (recv_type != GNUTLS_APPLICATION_DATA)
 		&& state->gnutls_internals.have_peeked_data==0)
 		recvlowat = 0;
 
@@ -258,8 +271,9 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 */
 	min = GMIN( state->gnutls_internals.recv_buffer_data_size, sizeOfPtr);
 	if ( min > 0) {
-		if ( min == sizeOfPtr)
+		if ( min == sizeOfPtr) {
 			return min;
+		}
 	}
 
 	/* min is over zero */
@@ -284,6 +298,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	}
 
 	if (ret < 0 || ret2 < 0) {
+		gnutls_assert();
 		/* that's because they are initilized to 0 */
 		return GMIN(ret, ret2);
 	}
@@ -299,7 +314,13 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 */
 	state->gnutls_internals.recv_buffer_data_size += ret;
 
-	return ret+min;
+	ret+=min;
+	
+	if ((ret > 0) && (ret < sizeOfPtr)) {
+		/* Short Read */
+		return GNUTLS_E_AGAIN;
+	} else
+		return ret;
 }
 
 

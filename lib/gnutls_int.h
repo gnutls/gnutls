@@ -25,12 +25,12 @@
 #include <defines.h>
 
 /*
-#define READ_DEBUG
 #define WRITE_DEBUG
+#define READ_DEBUG
 #define BUFFERS_DEBUG
 #define HARD_DEBUG
-#define RECORD_DEBUG
-#define HANDSHAKE_DEBUG*/
+#define HANDSHAKE_DEBUG
+#define RECORD_DEBUG*/
 #define DEBUG
 
 
