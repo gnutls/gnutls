@@ -1,3 +1,9 @@
+2003-03-26 23:05  nmav <nmav@gnutls.org>
+
+	* lib/: pkix.asn, pkix_asn1_tab.c, x509_b64.c, x509_b64.h:
+
+	Several fixes to allow exporting the PKCS #7 structures.  
+
 2003-03-26 13:53  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_algorithms.c, gnutls_handshake.c,
