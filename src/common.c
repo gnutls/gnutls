@@ -13,7 +13,7 @@
 void print_x509_info(GNUTLS_STATE state)
 {
 
-	gnutls_dn dn;
+	gnutls_x509_dn dn;
 	const gnutls_datum *cert_list;
 	int cert_list_size = 0;
 	char digest[20];
@@ -74,7 +74,7 @@ void print_x509_info(GNUTLS_STATE state)
 void print_openpgp_info(GNUTLS_STATE state)
 {
 
-	gnutls_dn dn;
+	gnutls_x509_dn dn;
 	char digest[20];
 	int digest_size = sizeof(digest), i;
 	char printable[120];

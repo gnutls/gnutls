@@ -20,8 +20,8 @@ typedef struct {
 	char locality_name[GNUTLS_X509_L_SIZE];
 	char state_or_province_name[GNUTLS_X509_S_SIZE];
 	char email[GNUTLS_X509_EMAIL_SIZE];
-} gnutls_dn;
-#define gnutls_DN gnutls_dn
+} gnutls_x509_dn;
+#define gnutls_DN gnutls_x509_dn
 
 /* For key Usage, test as:
  * if (st.keyUsage & X509KEY_DIGITAL_SIGNATURE) ...
@@ -64,9 +64,9 @@ void gnutls_certificate_server_set_select_func( GNUTLS_CERTIFICATE_CREDENTIALS, 
 void gnutls_certificate_server_set_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 
 /* X.509 certificate handling functions */
-int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_dn*);
-int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_dn*);
-int gnutls_x509_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_dn *);
+int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_x509_dn*);
+int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);
+int gnutls_x509_extract_certificate_issuer_dn(  const gnutls_datum*, gnutls_x509_dn *);
 int gnutls_x509_extract_certificate_version( const gnutls_datum*);
 int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* result, int* result_size);
 time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
@@ -77,7 +77,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 
 /* Openpgp certificate stuff */
 int gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
-                                                  gnutls_dn *dn);
+                                                  gnutls_x509_dn *dn);
 int gnutls_openpgp_extract_certificate_version( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_certificate_activation_time( const gnutls_datum *cert );
 time_t gnutls_openpgp_extract_certificate_expiration_time( const gnutls_datum *cert );

@@ -318,11 +318,11 @@ int _gnutls_x509_get_version(node_asn * c2, char *root)
   * @rdn: a pointer to a structure to hold the name
   *
   * This function will return the name of the given RDN sequence.
-  * The name will be returned as a gnutls_dn structure.
+  * The name will be returned as a gnutls_x509_dn structure.
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_dn * rdn)
+int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 {
 	node_asn *dn;
 	int result;
@@ -360,19 +360,19 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_dn * rdn)
   * @cert: should contain an X.509 DER encoded certificate
   * @ret: a pointer to a structure to hold the peer's name
   *
-  * This function will return the name of the certificate holder. The name is gnutls_dn structure and 
+  * This function will return the name of the certificate holder. The name is gnutls_x509_dn structure and 
   * is a obtained by the peer's certificate. If the certificate send by the
   * peer is invalid, or in any other failure this function returns error.
   * Returns a negative error code in case of an error.
   *
   **/
 int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
-					  gnutls_dn * ret)
+					  gnutls_x509_dn * ret)
 {
 	node_asn *c2;
 	int result;
 
-	memset(ret, 0, sizeof(gnutls_dn));
+	memset(ret, 0, sizeof(gnutls_x509_dn));
 
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
@@ -412,19 +412,19 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
   * @cert: should contain an X.509 DER encoded certificate
   * @ret: a pointer to a structure to hold the issuer's name
   *
-  * This function will return the name of the issuer stated in the certificate. The name is a gnutls_dn structure and 
+  * This function will return the name of the issuer stated in the certificate. The name is a gnutls_x509_dn structure and 
   * is a obtained by the peer's certificate. If the certificate send by the
   * peer is invalid, or in any other failure this function returns error.
   * Returns a negative error code in case of an error.
   *
   **/
 int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
-						 gnutls_dn * ret)
+						 gnutls_x509_dn * ret)
 {
 	node_asn *c2;
 	int result;
 
-	memset(ret, 0, sizeof(gnutls_dn));
+	memset(ret, 0, sizeof(gnutls_x509_dn));
 
 	if (asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,

@@ -253,3 +253,4 @@ size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
 size_t gnutls_record_check_pending(GNUTLS_STATE state);
 
 int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* data, char* result, size_t* result_size);
+int gnutls_openpgp_fingerprint( const gnutls_datum* data, char* result, size_t* result_size);
