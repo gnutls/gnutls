@@ -1,0 +1,32 @@
+\section{Resuming Sessions}
+\par
+The 
+\hyperref{gnutls\_handshake()}{gnutls\_handshake() (see Section }{ for more information)}{gnutls_handshake}
+ function, is expensive since a lot of calculations are performed. In order to support many fast connections to
+the same server a client may use session resuming. {\bf Session resuming} is a
+feature of the {\bf TLS} protocol which allows a client to connect to a server,
+after a successful handshake, without the expensive calculations (by using the previously
+established keys). \gnutls supports this feature, and the
+example \hyperref{resume client}{resume client (see Section }{ for more
+information)}{resume-example} illustrates a typical use of it (This is a modification of the simple client example).
+\par
+Keep in mind that sessions are expired after some time (for security reasons), thus
+it may be normal for a server not to resume a session even if you requested that.
+
+\subsection{Resuming internals}
+The resuming capability (mostly in the server side) is one of the problems of a thread-safe TLS
+implementations. The problem is that all threads must share information in
+order to be able to resume sessions. The gnutls approach is, in case of a
+client, to leave all the burden of resuming to the client (ie. copy and keep the
+nesessary parameters etc.).
+\par
+The server side is different\footnote{Future versions of gnutls may be
+different}. 
+Here the server only specifies a DB file to be
+used. This DB file is used to store the sessions' required parameters for
+resuming (and this means that this file contains very sensitive information,
+such as encryption keys). In a multi-threaded application every thread can
+read from the DB file and access all previously established sessions, but
+only one thread can write at a time. The current behaviour of gnutls is
+not to block and wait for the DB to be ready for writing, but continue the
+process normally (and do not save the parameters).  

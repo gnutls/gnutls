@@ -69,6 +69,8 @@ The following authentication schemas are supported in \gnutls:
 
 \input{ciphersuites}
 
+\input{resumedb}
+
 \section{Client Examples}
 This section contains examples of TLS and SSL clients, using \gnutls. 
 
@@ -89,22 +91,6 @@ This function should be called after a successful
 \hyperref{gnutls\_handshake()}{gnutls\_handshake() (see Section }{ for more information)}{gnutls_handshake}
 
 \input{ex3}
-
-\subsection{Resuming Sessions}
-\par
-The 
-\hyperref{gnutls\_handshake()}{gnutls\_handshake() (see Section }{ for more information)}{gnutls_handshake}
- function, is expensive since
-a lot of calculations are performed. In order to support many fast connections to
-the same server a client may use session resuming. {\bf Session resuming} is a
-feature of the {\bf TLS} protocol which allows a client to connect to a server,
-after a successful handshake, without the expensive calculations (ie. use the previously
-established keys). \gnutls supports this feature, and this example illustrates a
-typical use of it (This is a modification of the simple client example).
-
-\par
-Keep in mind that sessions are expired after some time (for security reasons), thus
-it may be normal for a server not to resume a session even if you requested that.
 
 \input{ex1}
 
