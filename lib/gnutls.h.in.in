@@ -69,7 +69,9 @@ typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1,
 
 /* The enumerations here should have the same value with gnutls_mac_algorithm.
  */
-typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA, GNUTLS_DIG_MD2 } gnutls_digest_algorithm;
+typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, 
+	GNUTLS_DIG_SHA, GNUTLS_DIG_RIPEMD160 
+} gnutls_digest_algorithm;
 
 /* exported for other gnutls headers. This is the maximum number
  * of algorithms (ciphers, kx or macs). 
