@@ -135,6 +135,7 @@ AC_MSG_RESULT([***
 ])
 
 AC_HEADER_STDC
+AC_HEADER_TIME
 AC_CHECK_HEADERS(unistd.h pwd.h locale.h strings.h stdarg.h)
 AC_CHECK_HEADERS(sys/stat.h sys/types.h sys/socket.h)
 AC_CHECK_HEADERS(errno.h sys/time.h time.h)
