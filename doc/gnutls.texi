@@ -10,7 +10,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
-Copyright @copyright{} 2004 Free Software Foundation, Inc.
+Copyright @copyright{} 2004 Simon Josefsson
 
 Copyright @copyright{} 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 
