@@ -331,7 +331,6 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 	*iptr = session->internals.record_recv_buffer.data;
 
 	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0) { 
-	{
 		gnutls_assert(); /* internal error */
 		return GNUTLS_E_INVALID_REQUEST;
 	}
