@@ -3,8 +3,8 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-+ Add PKCS-12 support
-+ Add some support for the so called EXPORT ciphersuites
++ Add ability to read PKCS-12 structures (certificate and private key)
++ Add support for temporary RSA keys (needed in EXPORT ciphersuites)
 * Add function to return cipher suite names
 * Convert documentation to texinfo format
 * Merge common stuff in DHE and DHA key exchange
