@@ -259,27 +259,28 @@ void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
 ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)
 {
 	ssize_t ret=0, ret2=0;
-	int min;
+	int min, buf_pos;
 	char *buf;
 	int recvlowat = RCVLOWAT;
 	int recvdata;
 
 	*iptr = NULL;
 
-	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0) {
+	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0 || (state->gnutls_internals.recv_buffer_data_size+sizeOfPtr) > MAX_RECV_SIZE) {
 		gnutls_assert(); /* internal error */
-		return GNUTLS_E_UNKNOWN_ERROR;
+		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 	
 	/* leave peeked data to the kernel space only if application data
 	 * is received and we don't have any peeked 
 	 * data in gnutls state.
 	 */
-	if ( (recv_type != GNUTLS_APPLICATION_DATA)
+	if ( recv_type != GNUTLS_APPLICATION_DATA
 		&& state->gnutls_internals.have_peeked_data==0)
 		recvlowat = 0;
 
 	buf = state->gnutls_internals.recv_buffer_data;
+	buf_pos = state->gnutls_internals.recv_buffer_data_size;
 
 	*iptr = buf;
 	
@@ -301,26 +302,55 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 */
 	recvdata = sizeOfPtr - min;
 
-	/* read fresh data - but leave RCVLOWAT bytes in the kernel buffer.
+
+	/* READ DATA - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
 	if ( recvdata - recvlowat > 0) {
-		ret = _gnutls_read( fd, &buf[min], recvdata - recvlowat, 0);
+		ret = _gnutls_read( fd, &buf[buf_pos], recvdata - recvlowat, 0);
 
 		/* return immediately if we got an interrupt or eagain
 		 * error.
 		 */
-		if (ret < 0 && gnutls_is_fatal_error(ret)==0) 
+		if (ret < 0 && gnutls_is_fatal_error(ret)==0) {
 			return ret;
+		}
 	}
 
+#ifdef READ_DEBUG
+	if (ret > 0)
+		_gnutls_log("RB: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer_data_size, ret, sizeOfPtr);
+#endif
+	/* copy fresh data to our buffer.
+	 */
+	if (ret > 0)
+		state->gnutls_internals.recv_buffer_data_size += ret;
+
+
+	buf_pos = state->gnutls_internals.recv_buffer_data_size;
+	
+	/* This is hack in order for select to work. Just leave recvlowat data,
+	 * into the kernel buffer (using a read with MSG_PEEK), thus making
+	 * select think, that the socket is ready for reading
+	 */
 	if (ret >= 0 && recvlowat > 0) {
-		ret2 = _gnutls_read( fd, &buf[min+ret], recvlowat, MSG_PEEK);
+		ret2 = _gnutls_read( fd, &buf[buf_pos], recvlowat, MSG_PEEK);
 
-		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) 
+		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) {
 			return ret2;
+		}
 
-		if (ret2 > 0)
+#ifdef READ_DEBUG
+		if (ret2 > 0) {
+			_gnutls_log("RB-PEEK: Read %d bytes in PEEK MODE.\n", ret2); 
+			_gnutls_log("RB-PEEK: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer_data_size, ret2, sizeOfPtr);
+		}
+#endif
+
+		if (ret2 > 0) {
 			state->gnutls_internals.have_peeked_data = 1;
+			state->gnutls_internals.recv_buffer_data_size += ret2;
+
+		}
 	}
 
 	if (ret < 0 || ret2 < 0) {
@@ -331,19 +361,11 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 	ret += ret2;
 
-#ifdef READ_DEBUG
-	_gnutls_log("RB: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer_data_size, ret, sizeOfPtr);
-#endif
-
 	if (ret > 0 && ret < recvlowat) {
 		gnutls_assert();
 		return GNUTLS_E_AGAIN;
 	}
 	
-	/* copy fresh data to our buffer.
-	 */
-	state->gnutls_internals.recv_buffer_data_size += ret;
-
 	if (ret==0) { /* EOF */
 		gnutls_assert();
 		return 0;

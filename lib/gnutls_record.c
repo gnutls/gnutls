@@ -366,6 +366,26 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
 		return ret;
 }
 
+/* Sends the appropriate alert, depending
+ * on the error message.
+ */
+int _gnutls_send_appropriate_alert( SOCKET cd, GNUTLS_STATE state, int err) {
+int ret;
+	switch (err) { /* send appropriate alert */
+		case GNUTLS_E_MAC_FAILED:
+			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
+			break;
+		case GNUTLS_E_DECRYPTION_FAILED:
+			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECRYPTION_FAILED);
+			break;
+		case GNUTLS_E_DECOMPRESSION_FAILED:
+			ret = gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
+			break;
+	}
+
+	return ret;
+}
+
 /**
   * gnutls_bye - This function terminates the current TLS/SSL connection.
   * @cd: is a connection descriptor.
@@ -712,17 +732,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 */
 	tmplen = _gnutls_decrypt( state, ciphertext, length, &tmpdata, recv_type);
 	if (tmplen < 0) {
-		switch (tmplen) { /* send appropriate alert */
-			case GNUTLS_E_MAC_FAILED:
-				gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
-				break;
-			case GNUTLS_E_DECRYPTION_FAILED:
-				gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECRYPTION_FAILED);
-				break;
-			case GNUTLS_E_DECOMPRESSION_FAILED:
-				gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
-				break;
-		}
+		_gnutls_send_appropriate_alert( cd, state, tmplen);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
