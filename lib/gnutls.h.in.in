@@ -1,7 +1,7 @@
 /*
  *  Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -270,7 +270,7 @@ const char* gnutls_check_version( const char*);
 
 /* Functions for setting/clearing credentials 
  */
-int gnutls_clear_creds( gnutls_session session);
+int gnutls_credentials_clear( gnutls_session session);
 
 /* cred is a structure defined by the kx algorithm 
  */

@@ -11,7 +11,7 @@ AC_DEFINE_UNQUOTED(T_OS, "$target_os", [OS name])
 
 dnl Gnutls Version
 GNUTLS_MAJOR_VERSION=0
-GNUTLS_MINOR_VERSION=7
+GNUTLS_MINOR_VERSION=8
 GNUTLS_MICRO_VERSION=0
 GNUTLS_VERSION=$GNUTLS_MAJOR_VERSION.$GNUTLS_MINOR_VERSION.$GNUTLS_MICRO_VERSION
 
@@ -77,8 +77,6 @@ AC_MSG_RESULT([***
 ])
 
 AC_PROG_CC
-
-AC_PROG_YACC
 
 AC_PROG_LN_S
 
@@ -229,22 +227,6 @@ AM_PATH_LIBGCRYPT(1.1.8,,
 dnl Can't disable - gnutls depends on gcrypt
 AC_DEFINE(USE_GCRYPT, 1, [use gcrypt])
 
-dnl MCRYPT
-
-AC_ARG_WITH( mcrypt, [  --with-mcrypt           enable libmcrypt support],
- [AM_PATH_LIBMCRYPT( 2.4.0,, 
- 	AC_MSG_ERROR([[*** libmcrypt was not found]])
-    AC_MSG_ERROR([[*** You need libmcrypt 2.4.x to compile this program. http://mcrypt.hellug.gr]])
- )
- ]
-)
-
-LIBS="${LIBS} ${LIBMCRYPT_LIBS}"
-
-AC_ARG_WITH( mhash, [  --with-mhash            enable libmhash support],
- [AC_CHECK_LIB(mhash, mhash_init, AC_DEFINE(USE_MHASH, 1, [Whether to use mhash]) 
-LIBS="${LIBS} -lmhash")])
-
 
 
 AC_MSG_CHECKING([whether to disable SRP authentication support])
@@ -287,22 +269,21 @@ fi
 
 AC_ARG_WITH(included-libtasn1,
 	[  --with-included-libtasn1 Use the included libtasn1],
-libtasn1_enabled=yes, 
-libtasn1_enabled=no
+minitasn1_enabled=$withval, 
+minitasn1_enabled=no
 
 AC_CHECK_LIB( tasn1, asn1_array2tree,:, 
- libtasn1_enabled=yes
- AC_MSG_WARN(
+ minitasn1_enabled=yes
 *** 
 *** LibtASN1 was not found. Will use the included one.))
 
-)
 
 if test x$opt_developer_mode = xyes; then
- libtasn1_enabled=yes
-else
- libtasn1_enabled=no
+ minitasn1_enabled=yes
 fi
+
+AC_MSG_CHECKING([whether to use the included minitasn1])
+AC_MSG_RESULT($minitasn1_enabled)
 
 
 dnl CHECK FOR ZLIB SUPPORT
@@ -363,7 +344,7 @@ AC_SUBST(LZO_LINK)
 dnl CHECK FOR THE LIBTASN1 LIBRARY or use the included one
 dnl
 
-if test x"$libtasn1_enabled" = xyes; then
+if test x"$minitasn1_enabled" = xyes; then
  MINITASN1_OBJECTS="minitasn1/coding.lo minitasn1/decoding.lo minitasn1/element.lo \
 	minitasn1/errors.lo minitasn1/gstr.lo minitasn1/parser_aux.lo minitasn1/structure.lo"
  MINITASN1_DIR=minitasn1

@@ -21,14 +21,8 @@
 #ifndef GNUTLS_CIPHER_INT
 # define GNUTLS_CIPHER_INT
 
-#ifdef USE_MCRYPT
-# include <mcrypt.h>
-# define GNUTLS_CIPHER_HANDLE MCRYPT
-# define GNUTLS_CIPHER_FAILED MCRYPT_FAILED
-#else
-# define GNUTLS_CIPHER_HANDLE GCRY_CIPHER_HD
-# define GNUTLS_CIPHER_FAILED NULL
-#endif
+#define GNUTLS_CIPHER_HANDLE GCRY_CIPHER_HD
+#define GNUTLS_CIPHER_FAILED NULL
 
 GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, gnutls_datum key, gnutls_datum iv);
 int _gnutls_cipher_encrypt(GNUTLS_CIPHER_HANDLE handle, void* text, int textlen);

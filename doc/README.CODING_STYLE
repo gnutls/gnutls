@@ -32,6 +32,8 @@ The rules here are not always used, although we try to stick to them.
  Internal functions -- that are not exported in the API -- should
  be prefixed with an underscore. Ie. _gnutls_handshake_begin()
 
+ All exported functions must be listed in gnutls.sym and gnutls-extra.sym,
+ in order to be exported.
 
 *** Constructed types:
   The constructed types in gnutls always have the "gnutls_" prefix.

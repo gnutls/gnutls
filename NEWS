@@ -1,4 +1,4 @@
-Version 0.7.0
+Version 0.8.0
 - Added gnutls_x509_extract_dn_string() which returns a 
   distinguished name in a single string.
 - Added gnutls_openpgp_extract_key_name_string() which returns

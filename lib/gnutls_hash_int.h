@@ -23,18 +23,10 @@
 
 #include <gnutls_int.h>
 
-#ifdef USE_MHASH
-# include <mhash.h>
-#endif
-
 /* for message digests */
 
 typedef struct {
-#ifdef USE_MHASH
-	MHASH handle;
-#else
 	GCRY_MD_HD handle;
-#endif
 	gnutls_mac_algorithm algorithm;
 	const void* key;
 	int keysize;

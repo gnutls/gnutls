@@ -33,8 +33,14 @@
  * key etc.
  */
 
-/* This clears the whole linked list */
-int gnutls_clear_creds( gnutls_session session) {
+/**
+  * gnutls_credentials_clear - Clears all the credentials previously set
+  * @session: is a &gnutls_session structure.
+  *
+  * Clears all the credentials previously set in this session.
+  *
+  **/
+void gnutls_credentials_clear( gnutls_session session) {
 	AUTH_CRED * ccred, *ncred;
 	
 	if (session->key && session->key->cred) { /* begining of the list */
@@ -47,7 +53,7 @@ int gnutls_clear_creds( gnutls_session session) {
 		session->key->cred = NULL;
 	}
 
-	return 0;
+	return;
 }
 
 /* 

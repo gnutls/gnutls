@@ -89,10 +89,6 @@ typedef long ptrdiff_t;
 # include <sys/socket.h>
 #endif
 
-#ifdef LIBMCRYPT24
-# define USE_MCRYPT
-#endif
-
 #ifndef HAVE_UINT
 typedef unsigned int uint;
 typedef signed int sint;

@@ -7,7 +7,7 @@ m4data_DATA = libgnutls-extra.m4
 EXTRA_DIST = ext_srp.h gnutls_srp.h \
 	auth_srp.h auth_srp_passwd.h gnutls_openpgp.h \
 	gnutls-extra-api.tex gnutls_extra.h libgnutls-extra-config.in \
-	libgnutls-extra.m4 lzoconf.h minilzo.h
+	libgnutls-extra.m4 lzoconf.h minilzo.h gnutls-extra.sym
 
 
 lib_LTLIBRARIES = libgnutls-extra.la
@@ -18,7 +18,7 @@ COBJECTS_EXTRA = ext_srp.c \
 	auth_srp_rsa.c
 
 libgnutls_extra_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
-	$(LIBOPENCDK_LIBS) $(LZO_LINK)
+	$(LIBOPENCDK_LIBS) $(LZO_LINK) -export-symbols gnutls-extra.sym
 libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) ../lib/libgnutls.la
 libgnutls_extra_la_DEPENDENCIES = $(LZO_OBJECTS)
 
