@@ -438,6 +438,11 @@ void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
   * or if 'allow' is 0 then these cipher suites will not be
   * advertized nor used.
   *
+  * Unless this function is called with the option to allow (1), then
+  * no compression algorithms, like ZLIB, and encryption algorithms,
+  * like TWOFISH, will be available. This is because these algorithms
+  * are not yet defined in any RFC or even internet draft.
+  *
   **/
 void gnutls_state_allow_private_ciphersuites(GNUTLS_STATE state, int allow)
 {
