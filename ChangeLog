@@ -1,3 +1,10 @@
+2003-03-21 16:46  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_global.c, gnutls_mpi.c, gnutls_mpi.h, pkix.asn,
+	pkix_asn1_tab.c:
+
+	Added ability to import PKCS8 encrypted keys.  
+
 2003-03-20 18:20  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/tex/ex-serv-export.tex, lib/gnutls.h.in.in,
