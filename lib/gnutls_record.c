@@ -74,7 +74,8 @@ void _gnutls_set_current_version(gnutls_session session, gnutls_protocol_version
   * Otherwise it must be called and set lowat to zero.
   *
   **/
-void gnutls_transport_set_lowat(gnutls_session session, int num) {
+void gnutls_transport_set_lowat(gnutls_session session, int num) 
+{
 	session->internals.lowat = num;
 }
 
@@ -216,20 +217,22 @@ int gnutls_bye( gnutls_session session, gnutls_close_request how)
 }
 
 inline
-static void _gnutls_session_invalidate( gnutls_session session) {
+static void session_invalidate( gnutls_session session) 
+{
 	session->internals.valid_connection = VALID_FALSE;
 }
 
 
 inline
-static void _gnutls_session_unresumable( gnutls_session session) {
+static void session_unresumable( gnutls_session session) 
+{
 	session->internals.resumable = RESUME_FALSE;
 }
 
 /* returns 0 if session is valid
  */
 inline
-static int _gnutls_session_is_valid( gnutls_session session) {
+static int session_is_valid( gnutls_session session) {
 	if (session->internals.valid_connection==VALID_FALSE)
 		return GNUTLS_E_INVALID_SESSION;
 	
@@ -239,7 +242,8 @@ static int _gnutls_session_is_valid( gnutls_session session) {
 /* Copies the record version into the headers. The 
  * version must have 2 bytes at least.
  */
-inline static void copy_record_version( gnutls_session session, HandshakeType htype, 
+inline static 
+void copy_record_version( gnutls_session session, HandshakeType htype, 
 	opaque version[2])
 {
 gnutls_protocol_version lver;
@@ -292,7 +296,7 @@ ssize_t _gnutls_send_int( gnutls_session session, content_type_t type,
 	}
 
 	if (type!=GNUTLS_ALERT) /* alert messages are sent anyway */
-		if ( _gnutls_session_is_valid( session) || session->internals.may_not_write != 0) {
+		if ( session_is_valid( session) || session->internals.may_not_write != 0) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_SESSION;
 		}
@@ -353,7 +357,7 @@ ssize_t _gnutls_send_int( gnutls_session session, content_type_t type,
 		/* increase sequence number
 		 */
 		if (_gnutls_uint64pp( &session->connection_state.write_sequence_number) != 0) {
-			_gnutls_session_invalidate( session);
+			session_invalidate( session);
 			gnutls_assert();
 			gnutls_afree( erecord);
 			gnutls_free( cipher);
@@ -378,8 +382,8 @@ ssize_t _gnutls_send_int( gnutls_session session, content_type_t type,
 			gnutls_assert();
 			ret = GNUTLS_E_INTERNAL_ERROR;
 		}
-		_gnutls_session_unresumable( session);
-		_gnutls_session_invalidate( session);
+		session_unresumable( session);
+		session_invalidate( session);
 		gnutls_assert();
 		return ret;
 	}
@@ -408,7 +412,8 @@ ssize_t _gnutls_send_change_cipher_spec( gnutls_session session, int again)
 	}
 }
 
-static int _gnutls_check_recv_type( content_type_t recv_type) {
+static int check_recv_type( content_type_t recv_type) 
+{
 	switch( recv_type) {
 	case GNUTLS_CHANGE_CIPHER_SPEC:
 	case GNUTLS_ALERT:
@@ -426,7 +431,8 @@ static int _gnutls_check_recv_type( content_type_t recv_type) {
 /* Checks if there are pending data in the record buffers. If there are
  * then it copies the data.
  */
-static int _gnutls_check_buffers( gnutls_session session, content_type_t type, opaque* data, int sizeofdata) {
+static int check_buffers( gnutls_session session, content_type_t type, opaque* data, int sizeofdata) 
+{
 	if ( (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && _gnutls_record_buffer_get_size(type, session) > 0) {
 		int ret, ret2;
 		ret = _gnutls_record_buffer_get(type, session, data, sizeofdata);
@@ -455,8 +461,10 @@ static int _gnutls_check_buffers( gnutls_session session, content_type_t type, o
 /* Checks the record headers and returns the length, version and
  * content type.
  */
-static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[RECORD_HEADER_SIZE], content_type_t type, 
-	HandshakeType htype, /*output*/ content_type_t *recv_type, opaque version[2], uint16 *length, uint16* header_size) {
+static 
+int record_check_headers( gnutls_session session, uint8 headers[RECORD_HEADER_SIZE], content_type_t type, 
+	HandshakeType htype, /*output*/ content_type_t *recv_type, opaque version[2], uint16 *length, uint16* header_size) 
+{
 
 	/* Read the first two bytes to determine if this is a 
 	 * version 2 message 
@@ -504,7 +512,7 @@ static int _gnutls_check_record_headers( gnutls_session session, uint8 headers[R
  */
 #ifdef CHECK_RECORD_VERSION
 inline
-static int _gnutls_check_record_version( gnutls_session session, HandshakeType htype, opaque version[2]) 
+static int record_check_version( gnutls_session session, HandshakeType htype, opaque version[2]) 
 {
 	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && 
 		gnutls_protocol_get_version(session) != _gnutls_version_get( version[0], version[1])) {
@@ -519,14 +527,15 @@ static int _gnutls_check_record_version( gnutls_session session, HandshakeType h
 	return 0;
 }
 #else
-# define _gnutls_check_record_version(x,y,z) 0
+# define record_check_version(x,y,z) 0
 #endif
 
 /* This function will check if the received record type is
  * the one we actually expect.
  */
-static int _gnutls_record_check_type( gnutls_session session, content_type_t recv_type,
-	content_type_t type, HandshakeType htype, opaque* data, int data_size) {
+static int record_check_type( gnutls_session session, content_type_t recv_type,
+	content_type_t type, HandshakeType htype, opaque* data, int data_size) 
+{
 	
 	int ret;
 
@@ -558,8 +567,8 @@ static int _gnutls_record_check_type( gnutls_session session, content_type_t rec
 				gnutls_assert();		
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
 				if (data[0] == GNUTLS_AL_FATAL) {
-					_gnutls_session_unresumable( session);
-					_gnutls_session_invalidate( session);
+					session_unresumable( session);
+					session_invalidate( session);
 					ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
 				}
 
@@ -630,7 +639,8 @@ static int _gnutls_record_check_type( gnutls_session session, content_type_t rec
  * recv buffer. If the buffer was not initialized before it will
  * also initialize it.
  */
-inline static int get_temp_recv_buffer( gnutls_session session, gnutls_datum* tmp) 
+inline 
+static int get_temp_recv_buffer( gnutls_session session, gnutls_datum* tmp) 
 {
 
 	/* We allocate MAX_RECORD_RECV_SIZE length
@@ -700,7 +710,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 		/* if we have already read an EOF
 		 */
 		return 0;
-	} else if ( _gnutls_session_is_valid(session)!=0 || session->internals.may_not_read!=0) {
+	} else if ( session_is_valid(session)!=0 || session->internals.may_not_read!=0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
@@ -708,7 +718,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 /* If we have enough data in the cache do not bother receiving
  * a new packet. (in order to flush the cache)
  */
-	ret = _gnutls_check_buffers( session, type, data, sizeofdata);
+	ret = check_buffers( session, type, data, sizeofdata);
 	if (ret != 0)
 		return ret;
 
@@ -720,17 +730,17 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 	if ( (ret = _gnutls_io_read_buffered( session, &headers, header_size, -1)) != header_size) {
 		if (ret < 0 && gnutls_error_is_fatal(ret)==0) return ret;
 
-		_gnutls_session_invalidate( session);
+		session_invalidate( session);
 		if (type==GNUTLS_ALERT) {
 			gnutls_assert();
 			return 0; /* we were expecting close notify */
 		}
-		_gnutls_session_unresumable( session);
+		session_unresumable( session);
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	if ( (ret=_gnutls_check_record_headers( session, headers, type, htype, &recv_type, version, &length, &header_size)) < 0) {
+	if ( (ret=record_check_headers( session, headers, type, htype, &recv_type, version, &length, &header_size)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -738,7 +748,7 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 /* Here we check if the Type of the received packet is
  * ok. 
  */
-	if ( (ret = _gnutls_check_recv_type( recv_type)) < 0) {
+	if ( (ret = check_recv_type( recv_type)) < 0) {
 		
 		gnutls_assert();
 		return ret;
@@ -747,9 +757,9 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 /* Here we check if the advertized version is the one we
  * negotiated in the handshake.
  */
-	if ( (ret=_gnutls_check_record_version( session, htype, version)) < 0) {
+	if ( (ret=record_check_version( session, htype, version)) < 0) {
 		gnutls_assert();
-		_gnutls_session_invalidate( session);
+		session_invalidate( session);
 		return ret;
 	}
 
@@ -762,8 +772,8 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 
 		_gnutls_record_log( "REC[%x]: FATAL ERROR: Received packet with length: %d\n", session, length);
 
-		_gnutls_session_unresumable( session);
-		_gnutls_session_invalidate( session);
+		session_unresumable( session);
+		session_invalidate( session);
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
@@ -773,8 +783,8 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 	if ( (ret = _gnutls_io_read_buffered( session, &recv_data, header_size+length, recv_type)) != header_size+length) {
 		if (ret<0 && gnutls_error_is_fatal(ret)==0) return ret;
 
-		_gnutls_session_unresumable( session);
-		_gnutls_session_invalidate( session);
+		session_unresumable( session);
+		session_invalidate( session);
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;		
 	}
@@ -795,8 +805,8 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
  */
 	ret = _gnutls_decrypt( session, ciphertext, length, tmp.data, tmp.size, recv_type);
 	if (ret < 0) {
-		_gnutls_session_unresumable( session);
-		_gnutls_session_invalidate( session);
+		session_unresumable( session);
+		session_invalidate( session);
 		gnutls_assert();
 		return ret;
 	}
@@ -823,12 +833,12 @@ ssize_t _gnutls_recv_int( gnutls_session session, content_type_t type,
 /* increase sequence number 
  */
 	if (_gnutls_uint64pp( &session->connection_state.read_sequence_number)!=0) {
-		_gnutls_session_invalidate( session);
+		session_invalidate( session);
 		gnutls_assert();
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-	ret=_gnutls_record_check_type( session, recv_type, type, htype, tmp.data, decrypted_length);
+	ret= record_check_type( session, recv_type, type, htype, tmp.data, decrypted_length);
 	if (ret < 0) {
 		if (ret==GNUTLS_E_INT_RET_0) return 0;
 		gnutls_assert();
@@ -941,7 +951,8 @@ ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdat
   * first handshake message.
   *
   **/
-size_t gnutls_record_get_max_size( gnutls_session session) {
+size_t gnutls_record_get_max_size( gnutls_session session) 
+{
 	/* Recv will hold the negotiated max record size
 	 * always.
 	 */
@@ -967,7 +978,8 @@ size_t gnutls_record_get_max_size( gnutls_session session) {
   * Not all TLS implementations use or even understand this extension.
   *
   **/
-ssize_t gnutls_record_set_max_size( gnutls_session session, size_t size) {
+ssize_t gnutls_record_set_max_size( gnutls_session session, size_t size) 
+{
 ssize_t new_size;
 
 	if (session->security_parameters.entity==GNUTLS_SERVER)
