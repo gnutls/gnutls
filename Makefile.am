@@ -1,7 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
 EXTRA_DIST = ChangeLog NEWS INSTALL README THANKS COPYING COPYING.LIB
-SUBDIRS = gl crypto includes lib libextra src doc tests
+SUBDIRS = gl 
+if NETTLE
+SUBDIRS += nettle
+endif
+SUBDIRS += crypto includes lib libextra src doc tests
 
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
