@@ -123,9 +123,55 @@ static int _gnutls_check_pk_algo_in_list(const gnutls_pk_algorithm *pk_algos,
 }
 
 
+/* Returns the issuer's Distinguished name in odn, of the certificate 
+ * specified in cert.
+ */
+static int _gnutls_cert_get_issuer_dn(gnutls_cert * cert, gnutls_datum * odn)
+{
+	ASN1_TYPE dn;
+	int len, result;
+	int start, end;
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&dn, cert->raw.data, cert->raw.size, NULL);
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding_startEnd(dn, cert->raw.data, cert->raw.size,
+					"tbsCertificate.issuer", &start,
+					&end);
+
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+		gnutls_assert();
+		asn1_delete_structure(&dn);
+		return _gnutls_asn2err(result);
+	}
+	asn1_delete_structure(&dn);
+
+	len = end - start + 1;
+
+	odn->size = len;
+	odn->data = &cert->raw.data[start];
+
+	return 0;
+}
+
 
 /* Locates the most appropriate x509 certificate using the
  * given DN. If indx == -1 then no certificate was found.
+ *
+ * That is to guess which certificate to use, based on the 
+ * CAs and sign algorithms supported by the peer server.
  */
 static int _find_x509_cert(const gnutls_certificate_credentials cred,
 			   opaque * _data, size_t _data_size,
@@ -151,7 +197,7 @@ static int _find_x509_cert(const gnutls_certificate_credentials cred,
 		for (i = 0; i < cred->ncerts; i++) {
 			for (j = 0; j < cred->cert_list_length[i]; j++) {
 				if ((result =
-				     _gnutls_cert_get_dn(&cred->
+				     _gnutls_cert_get_issuer_dn(&cred->
 							 cert_list[i][j],
 							 &odn)) < 0) {
 					gnutls_assert();

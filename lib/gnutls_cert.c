@@ -637,26 +637,39 @@ int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt cert,
 	gcert->cert_type = GNUTLS_CRT_X509;
 
 	if ( !(flags & CERT_NO_COPY)) {
+		#define SMALL_DER 512
 		opaque* der;
-		size_t der_size = 0;
-		
-		ret = gnutls_x509_crt_export( cert, GNUTLS_X509_FMT_DER, NULL, &der_size);
-		if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-			gnutls_assert();
-			return ret;
-		}
-		
-		der = gnutls_malloc( der_size);
+		size_t der_size = SMALL_DER;
+
+		/* initially allocate a bogus size, just in case the certificate
+		 * fits in it. That way we minimize the DER encodings performed.
+		 */
+		der = gnutls_malloc( SMALL_DER);
 		if (der == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-
+		
 		ret = gnutls_x509_crt_export( cert, GNUTLS_X509_FMT_DER, der, &der_size);
-		if (ret < 0) {
+		if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 			gnutls_assert();
 			gnutls_free(der);
 			return ret;
+		}
+		
+		if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+			der = gnutls_realloc( der, der_size);
+			if (der == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+
+			ret = gnutls_x509_crt_export( cert, GNUTLS_X509_FMT_DER, der, &der_size);
+			if (ret < 0) {
+				gnutls_assert();
+				gnutls_free(der);
+				return ret;
+			}
 		}
 
 		gcert->raw.data = der;
@@ -698,45 +711,3 @@ void _gnutls_gcert_deinit(gnutls_cert *cert)
 	_gnutls_free_datum(&cert->raw);
 }
 
-/* Returns the issuer's Distinguished name in odn, of the certificate 
- * specified in cert.
- */
-int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn )
-{
-	ASN1_TYPE dn;
-	int len, result;
-	int start, end;
-
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding(&dn, cert->raw.data, cert->raw.size, NULL);
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		asn1_delete_structure(&dn);
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_der_decoding_startEnd(dn, cert->raw.data, cert->raw.size,
-					"tbsCertificate.issuer", &start,
-					&end);
-
-	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-		gnutls_assert();
-		asn1_delete_structure(&dn);
-		return _gnutls_asn2err(result);
-	}
-	asn1_delete_structure(&dn);
-
-	len = end - start + 1;
-
-	odn->size = len;
-	odn->data = &cert->raw.data[start];
-
-	return 0;
-}
