@@ -15,9 +15,10 @@ See the end for copying conditions.
 - Corrected several bugs found by Marcin Garski <mgarski@post.pl>
 - The functions gnutls_x509_crl_get_issuer_dn, gnutls_x509_crq_get_dn,
   gnutls_x509_crt_get_issuer_dn, gnutls_x509_crt_get_dn, and
-  gnutls_x509_rdn_get now set *sizeof_buf to the string length instead
-  of the buffer length (i.e., +1), reported by Martin Lambers
-  <marlam@web.de>.
+  gnutls_x509_rdn_get now set *sizeof_buf to the buffer length that is
+  required, instead of the string length.  That is, the value has been
+  incremented by 1 to account for the terminating zero. Reported by
+  Martin Lambers <marlam@web.de>.
 - Debug output shouldn't crash on platforms that doesn't handle NULL
   printf %s values.  Reported by Michael.Ringe@aachen.utimaco.de.
 
