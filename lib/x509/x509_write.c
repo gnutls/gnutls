@@ -749,9 +749,6 @@ int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt cert,
 			return _gnutls_asn2err(result);
 		}
 
-#warning check here
-//		_gnutls_x509_crt_delete_extension(cert, "2.5.29.37");
-
 	}
 
 	/* generate the extension.
@@ -765,7 +762,7 @@ int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt cert,
 		return _gnutls_asn2err(result);
 	}
 
-	/* Add the OID.
+	/* 2. Add the OID.
 	 */
 	result = asn1_write_value(c2, "?LAST", oid, 1);
 	if (result != ASN1_SUCCESS) {

@@ -1,7 +1,6 @@
 int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_id, 
 	int indx, gnutls_datum* ret, unsigned int* critical);
-int _gnutls_x509_crt_delete_extension( gnutls_x509_crt cert, const char* extension_id);
- 
+
 int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
 	int indx, void* ret, size_t * ret_size);
 int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,

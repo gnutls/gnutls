@@ -148,85 +148,6 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 	}
 }
 
-#warning does not work yet
-/* This function will attempt to delete the requested extension found in
- * the given X509v3 certificate. 
- *
- * If the extension does not exist, GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will
- * be returned.
- */
-int _gnutls_x509_crt_delete_extension( gnutls_x509_crt cert, const char* extension_id) 
-{
-	int k, result, len;
-	char name[128], name2[128], counter[MAX_INT_DIGITS];
-	char str[1024];
-	char str_critical[10];
-	int critical = 0;
-	char extnID[128];
-	char extnValue[256];
-	int indx_counter = 0;
-
-	k = 0;
-	do {
-		k++;
-
-		_gnutls_str_cpy(name, sizeof(name), "tbsCertificate.extensions.?"); 
-		_gnutls_int2str(k, counter); 
-		_gnutls_str_cat(name, sizeof(name), counter); 
-
-		len = sizeof(str) - 1;
-		result = asn1_read_value(cert->cert, name, str, &len);
-
-		/* move to next
-		 */
-
-		if (result == ASN1_ELEMENT_NOT_FOUND) {
-			break;
-		}
-
-		do {
-
-			_gnutls_str_cpy(name2, sizeof(name2), name);
-			_gnutls_str_cat(name2, sizeof(name2), ".extnID"); 
-
-			len = sizeof(extnID) - 1;
-			result =
-			    asn1_read_value(cert->cert, name2, extnID, &len);
-
-			if (result == ASN1_ELEMENT_NOT_FOUND) {
-				gnutls_assert();
-				break;
-			} else if (result != ASN1_SUCCESS) {
-				gnutls_assert();
-				return _gnutls_asn2err(result);
-			}
-
-			/* Delete Extension 
-			 */
-			if ( strcmp(extnID, extension_id)==0) { 
-				/* extension was found 
-				 */
-				result = asn1_write_value( cert->cert, name2, NULL, 0);
-				if (result != ASN1_SUCCESS) {
-					gnutls_assert();
-					return _gnutls_asn2err(result);
-				}
-				
-				return 0;
-			}
-
-
-		} while (0);
-	} while (1);
-
-	if (result == ASN1_ELEMENT_NOT_FOUND) {
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	} else {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-}
-
 /* This function will attempt to return the requested extension OID found in
  * the given X509v3 certificate. 
  *
@@ -312,7 +233,7 @@ int _gnutls_x509_crt_get_extension_oid( gnutls_x509_crt cert,
  *
  * Critical will be either 0 or 1.
  */
-int _gnutls_x509_crt_set_extension( gnutls_x509_crt cert, const char* extension_id, 
+static int set_extension( ASN1_TYPE asn, const char* extension_id, 
 	const gnutls_datum* ext_data, unsigned int critical)
 {
 	int result;
@@ -320,13 +241,13 @@ int _gnutls_x509_crt_set_extension( gnutls_x509_crt cert, const char* extension_
 
 	/* Add a new extension in the list.
 	 */
-	result = asn1_write_value(cert->cert, "tbsCertificate.extensions", "NEW", 1);
+	result = asn1_write_value(asn, "tbsCertificate.extensions", "NEW", 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	result = asn1_write_value(cert->cert, "tbsCertificate.extensions.?LAST.extnID", extension_id, 1);
+	result = asn1_write_value(asn, "tbsCertificate.extensions.?LAST.extnID", extension_id, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -336,18 +257,131 @@ int _gnutls_x509_crt_set_extension( gnutls_x509_crt cert, const char* extension_
 	else str = "TRUE";
 	
 
-	result = asn1_write_value(cert->cert, "tbsCertificate.extensions.?LAST.critical", str, 1);
+	result = asn1_write_value(asn, "tbsCertificate.extensions.?LAST.critical", str, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_write_value( cert->cert, "tbsCertificate.extensions.?LAST.extnValue",
+	result = _gnutls_x509_write_value( asn, "tbsCertificate.extensions.?LAST.extnValue",
 		ext_data, 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
+	
+	return 0;
+}
+
+/* Overwrite the given extension (using the index)
+ * index here starts from one.
+ */
+static int overwrite_extension( ASN1_TYPE asn, unsigned int indx,
+	const gnutls_datum *ext_data, unsigned int critical)
+{
+char name[128], name2[128], counter[MAX_INT_DIGITS];
+const char* str;
+int result;
+
+	_gnutls_str_cpy(name, sizeof(name), "tbsCertificate.extensions.?"); 
+	_gnutls_int2str(indx, counter); 
+	_gnutls_str_cat(name, sizeof(name), counter); 
+
+	if (critical==0) str = "FALSE";
+	else str = "TRUE";
+
+	_gnutls_str_cpy(name2, sizeof(name2), name);
+	_gnutls_str_cat(name2, sizeof(name2), ".critical"); 
+
+	result = asn1_write_value(asn, name2, str, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	_gnutls_str_cpy(name2, sizeof(name2), name);
+	_gnutls_str_cat(name2, sizeof(name2), ".extnValue"); 
+
+	result = _gnutls_x509_write_value( asn, name2, ext_data, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+}
+
+/* This function will attempt to overwrite the requested extension with
+ * the given one. 
+ *
+ * Critical will be either 0 or 1.
+ */
+int _gnutls_x509_crt_set_extension( gnutls_x509_crt cert, const char* ext_id,
+	const gnutls_datum* ext_data, unsigned int critical)
+{
+	int result;
+	const char *str;
+	int k, len;
+	char name[128], name2[128], counter[MAX_INT_DIGITS];
+	char str_critical[10];
+	char extnID[128];
+	gnutls_datum value;
+	int indx_counter = 0;
+
+	/* Find the index of the given extension.
+	 */
+	k = 0;
+	do {
+		k++;
+
+		_gnutls_str_cpy(name, sizeof(name), "tbsCertificate.extensions.?"); 
+		_gnutls_int2str(k, counter); 
+		_gnutls_str_cat(name, sizeof(name), counter); 
+
+		len = sizeof(extnID) - 1;
+		result = asn1_read_value(cert->cert, name, extnID, &len);
+
+		/* move to next
+		 */
+
+		if (result == ASN1_ELEMENT_NOT_FOUND) {
+			break;
+		}
+
+		do {
+
+			_gnutls_str_cpy(name2, sizeof(name2), name);
+			_gnutls_str_cat(name2, sizeof(name2), ".extnID"); 
+
+			len = sizeof(extnID) - 1;
+			result =
+			    asn1_read_value(cert->cert, name2, extnID, &len);
+
+			if (result == ASN1_ELEMENT_NOT_FOUND) {
+				gnutls_assert();
+				break;
+			} else if (result != ASN1_SUCCESS) {
+				gnutls_assert();
+				return _gnutls_asn2err(result);
+			}
+
+			/* Handle Extension 
+			 */
+			if ( strcmp(extnID, ext_id)==0) { 
+				/* extension was found 
+				 */
+				return overwrite_extension( cert->cert, k, ext_data, critical);
+			}
+
+
+		} while (0);
+	} while (1);
+
+	if (result == ASN1_ELEMENT_NOT_FOUND) {
+		return set_extension( cert->cert, ext_id, ext_data, critical);
+	} else {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
 	
 	return 0;
 }

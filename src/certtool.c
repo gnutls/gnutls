@@ -286,7 +286,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 {
 	gnutls_x509_crt crt;
 	gnutls_x509_privkey key = NULL;
-	int size, serial;
+	int size, serial, client;
 	int days, result, ca_status;
 	const char* str;
 	int vers = 3; /* the default version in the certificate 
@@ -372,7 +372,16 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 		exit(1);
 	}
 
-	server = read_yesno( "Is this a web server certificate? (Y/N): ");
+	client = read_yesno( "Is this a TLS web client certificate? (Y/N): ");
+	if (client != 0) {
+		result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_CLIENT, 0);
+		if (result < 0) {
+			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+	}
+
+	server = read_yesno( "Is this also a TLS web server certificate? (Y/N): ");
 	if (server != 0) {
 		str = read_str( "Enter the dnsName of the subject of the certificate: ");
 		if (str != NULL) {
@@ -382,6 +391,13 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 				exit(1);
 			}
 		}
+
+		result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
+		if (result < 0) {
+			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+		
 	} else {
 
 		str = read_str( "Enter the e-mail of the subject of the certificate: ");
@@ -425,6 +441,33 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 
 		result = read_yesno( "Will the certificate be used to sign CRLs? (Y/N): ");
 		if (result) usage |= GNUTLS_KEY_CRL_SIGN;
+
+		result = read_yesno( "Will the certificate be used to sign code? (Y/N): ");
+		if (result) {
+			result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_CODE_SIGNING, 0);
+			if (result < 0) {
+				fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+				exit(1);
+			}
+		}
+
+		result = read_yesno( "Will the certificate be used to sign OCSP requests? (Y/N): ");
+		if (result) {
+			result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_OCSP_SIGNING, 0);
+			if (result < 0) {
+				fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+				exit(1);
+			}
+		}
+
+		result = read_yesno( "Will the certificate be used for time stamping? (Y/N): ");
+		if (result) {
+			result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TIME_STAMPING, 0);
+			if (result < 0) {
+				fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
+				exit(1);
+			}
+		}
 	}
 
 	if (usage != 0) {
@@ -434,24 +477,6 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 			exit(1);
 		}
 	}
-/* ---------------------- */
-result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_SERVER, 0);
-		if (result < 0) {
-			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
-			exit(1);
-		}
-result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_TLS_WWW_CLIENT, 0);
-		if (result < 0) {
-			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
-			exit(1);
-		}
-
-result = gnutls_x509_crt_set_key_purpose_oid( crt, GNUTLS_KP_CODE_SIGNING, 0);
-		if (result < 0) {
-			fprintf(stderr, "key_kp: %s\n", gnutls_strerror(result));
-			exit(1);
-		}
-
 
 	/* Version.
 	 */
