@@ -55,6 +55,7 @@
 #define gnutls_malloc malloc
 #define gnutls_realloc realloc
 #define gnutls_calloc calloc
+#define gnutls_free free
 
 typedef struct {
 	uint8	pint[3];
@@ -360,8 +361,6 @@ typedef struct {
 } GNUTLS_ServerHello;
 
 /* functions */
-//void gnutls_free(void* ptr);
-#define gnutls_free free
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
 int gnutls_close(int cd, GNUTLS_STATE state);
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,

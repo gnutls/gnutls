@@ -41,10 +41,6 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
-void agnutls_free(void *ptr) {
-	if (ptr!=NULL) free(ptr);
-}
-
 
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state) {
 GNUTLS_Version ver;
@@ -157,8 +153,8 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	
 	return 0;
 }
-#undef gnutls_free
-#define gnutls_free(x) if(x!=NULL) free(x)
+
+#define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
 /* This function clears all buffers associated with the state. */
 int gnutls_deinit(GNUTLS_STATE * state)
 {
@@ -166,13 +162,13 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	if ( (*state)->gnutls_internals.resumable==RESUME_FALSE) {
 		_gnutls_db_remove_session( (*state), (*state)->security_parameters.session_id, (*state)->security_parameters.session_id_size);
 	}
-	gnutls_free((*state)->connection_state.read_compression_state);
-	gnutls_free((*state)->connection_state.read_mac_secret);
-	gnutls_free((*state)->connection_state.write_compression_state);
-	gnutls_free((*state)->connection_state.write_mac_secret);
+	GNUTLS_FREE((*state)->connection_state.read_compression_state);
+	GNUTLS_FREE((*state)->connection_state.read_mac_secret);
+	GNUTLS_FREE((*state)->connection_state.write_compression_state);
+	GNUTLS_FREE((*state)->connection_state.write_mac_secret);
 
-	gnutls_free((*state)->gnutls_internals.buffer);
-	gnutls_free((*state)->gnutls_internals.buffer_handshake);
+	GNUTLS_FREE((*state)->gnutls_internals.buffer);
+	GNUTLS_FREE((*state)->gnutls_internals.buffer_handshake);
 
 	gnutls_clear_creds( *state);
 
@@ -201,19 +197,19 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	mpi_release((*state)->gnutls_key->b);
 
 	mpi_release((*state)->gnutls_key->dh_secret);
-	gnutls_free((*state)->gnutls_key->username);
-	gnutls_free((*state)->gnutls_key);
+	GNUTLS_FREE((*state)->gnutls_key->username);
+	GNUTLS_FREE((*state)->gnutls_key);
 
 
 	/* free priorities */
-	gnutls_free((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
-	gnutls_free((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
-	gnutls_free((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
-	gnutls_free((*state)->gnutls_internals.CompressionMethodPriority.algorithm_priority);
+	GNUTLS_FREE((*state)->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
+	GNUTLS_FREE((*state)->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
+	GNUTLS_FREE((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
+	GNUTLS_FREE((*state)->gnutls_internals.CompressionMethodPriority.algorithm_priority);
 
-	gnutls_free((*state)->gnutls_internals.db_name);
+	GNUTLS_FREE((*state)->gnutls_internals.db_name);
 
-	gnutls_free(*state);
+	GNUTLS_FREE(*state);
 	return 0;
 }
 
@@ -249,6 +245,12 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 
 	/* calculate A(0) */
 	A = gnutls_malloc(seed_size);
+	if (A==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+	
+	
 	memmove( A, seed, seed_size);
 	A_size = seed_size;
 
@@ -258,6 +260,10 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 
 		/* here we calculate A(i+1) */
 		Atmp = _gnutls_cal_PRF_A( algorithm, secret, secret_size, A, A_size);
+		if (Atmp==NULL) {
+			gnutls_assert();
+			return NULL;
+		}
 		A_size = blocksize;
 		gnutls_free(A);
 		A = Atmp;
@@ -265,6 +271,10 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 		gnutls_hmac(td2, A, A_size);
 		gnutls_hmac(td2, seed, seed_size);
 		final = gnutls_hmac_deinit(td2);
+		if (final==NULL) {
+			gnutls_assert();
+			return NULL;
+		}
 
 		if ( (1+i) * blocksize < total_bytes) {
 			how = blocksize;
@@ -314,6 +324,11 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 	/* label+seed = s_seed */
 	s_seed_size = seed_size + label_size;
 	s_seed = gnutls_malloc(s_seed_size);
+	if (s_seed==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
 	memmove(s_seed, label, label_size);
 	memmove(&s_seed[label_size], seed, seed_size);
 
@@ -326,7 +341,17 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 	}
 
 	o1 = gnutls_P_hash( GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size, total_bytes);
+	if (o1==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
 	o2 = gnutls_P_hash( GNUTLS_MAC_SHA, s2, l_s, s_seed, s_seed_size, total_bytes);
+	if (o2==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
+
 
 	gnutls_free(s_seed);
 
