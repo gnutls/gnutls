@@ -234,11 +234,6 @@ int gnutls_pkcs12_export( gnutls_pkcs12 pkcs12,
 		output_data, output_data_size);
 }
 
-#define BAG_PKCS8_KEY "1.2.840.113549.1.12.10.1.1"
-#define BAG_PKCS8_ENCRYPTED_KEY "1.2.840.113549.1.12.10.1.2"
-#define BAG_CERTIFICATE "1.2.840.113549.1.12.10.1.3"
-#define BAG_CRL "1.2.840.113549.1.12.10.1.4"
-
 static int _oid2bag( const char* oid)
 {
 	if (strcmp(oid, BAG_PKCS8_KEY)==0) 
@@ -254,26 +249,18 @@ static int _oid2bag( const char* oid)
 
 }
 
-
-static
-int _parse_safe_contents( ASN1_TYPE sc, const char* sc_name, gnutls_pkcs12_bag bag) 
+/* Decodes the SafeContents, and puts the output in
+ * the given bag.
+ */
+int
+_pkcs12_decode_safe_contents( const gnutls_datum* content, gnutls_pkcs12_bag bag)
 {
 char oid[128];
 ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-gnutls_datum content = { NULL, 0 };
 int len, result;
 int bag_type;
 
-	/* Step 1. Extract the content.
-	 */
-
-	result = _gnutls_x509_read_value(sc, sc_name, &content, 1);
-	if (result < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
-
-	/* Step 2. Extract the SEQUENCE.
+	/* Step 1. Extract the SEQUENCE.
 	 */
 
 	if ((result=asn1_create_element
@@ -283,13 +270,12 @@ int bag_type;
 		goto cleanup;	
 	}
 
-	result = asn1_der_decoding(&c2, content.data, content.size, NULL);
+	result = asn1_der_decoding(&c2, content->data, content->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;	
 	}
-	_gnutls_free_datum(&content);
 
 	len = sizeof(oid);
 	result = asn1_read_value(c2, "?1.bagId", oid, &len);
@@ -310,7 +296,6 @@ int bag_type;
 
 	/* Read the Bag Value
 	 */
-
 	result = _gnutls_x509_read_value( c2, "?1.bagValue", &bag->data, 0);
 	if (result < 0) {
 		gnutls_assert();
@@ -325,6 +310,37 @@ int bag_type;
 
 	cleanup:
 		if (c2) asn1_delete_structure(&c2);
+		return result;
+
+}
+
+
+static
+int _parse_safe_contents( ASN1_TYPE sc, const char* sc_name, gnutls_pkcs12_bag bag) 
+{
+gnutls_datum content = { NULL, 0 };
+int result;
+
+	/* Step 1. Extract the content.
+	 */
+
+	result = _gnutls_x509_read_value(sc, sc_name, &content, 1);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _pkcs12_decode_safe_contents( &content, bag);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	_gnutls_free_datum( &content);
+
+	return 0;
+	
+	cleanup:
 		_gnutls_free_datum( &content);
 		return result;
 }

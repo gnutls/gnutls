@@ -43,7 +43,8 @@
 
 typedef enum schema_id {
 	PBES2,			/* the stuff in PKCS #5 */
-	PKCS12_3DES_SHA1 /* the fucking stuff in PKCS #12 */
+	PKCS12_3DES_SHA1, /* the fucking stuff in PKCS #12 */
+	PKCS12_ARCFOUR_SHA1
 } schema_id;
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
@@ -51,7 +52,8 @@ typedef enum schema_id {
 #define DES_EDE3_CBC_OID "1.2.840.113549.3.7"
 
 /* oid_pbeWithSHAAnd3_KeyTripleDES_CBC */
-#define PBE_3DES_SHA1_OID "1.2.840.113549.1.12.1.3"
+#define PKCS12_PBE_3DES_SHA1_OID "1.2.840.113549.1.12.1.3"
+#define PKCS12_PBE_ARCFOUR_SHA1_OID "1.2.840.113549.1.12.1.1"
 
 struct pbkdf2_params {
 	opaque salt[32];
@@ -105,8 +107,11 @@ inline static int check_schema(const char *oid)
 	if (strcmp(oid, PBES2_OID) == 0)
 		return PBES2;
 
-	if (strcmp(oid, PBE_3DES_SHA1_OID) == 0)
+	if (strcmp(oid, PKCS12_PBE_3DES_SHA1_OID) == 0)
 		return PKCS12_3DES_SHA1;
+
+	if (strcmp(oid, PKCS12_PBE_ARCFOUR_SHA1_OID) == 0)
+		return PKCS12_ARCFOUR_SHA1;
 
 	_gnutls_x509_log("PKCS encryption schema OID '%s' is unsupported.\n", oid);
 
@@ -472,6 +477,16 @@ int read_pkcs_schema_params(schema_id schema, const char* password,
 		break;
 
 	case PKCS12_3DES_SHA1:
+	case PKCS12_ARCFOUR_SHA1:
+
+		if ((schema) == PKCS12_3DES_SHA1) {
+			enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
+			enc_params->iv_size = 8;
+		} else {
+			enc_params->cipher = GNUTLS_CIPHER_ARCFOUR_128;
+			enc_params->iv_size = 0;
+		}
+
 		if ((result =
 		     asn1_create_element(_gnutls_get_pkix(),
 					 "PKIX1.pkcs-12-PbeParams",
@@ -499,10 +514,9 @@ int read_pkcs_schema_params(schema_id schema, const char* password,
 			goto error;
 		}
 
-		enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
-		enc_params->iv_size = 8;
-		_pkcs12_string_to_key( 2/*IV*/, kdf_params->salt, kdf_params->salt_size,
-			kdf_params->iter_count, password, 8, enc_params->iv);
+		if (enc_params->iv_size)
+			_pkcs12_string_to_key( 2/*IV*/, kdf_params->salt, kdf_params->salt_size,
+				kdf_params->iter_count, password, enc_params->iv_size, enc_params->iv);
 
 		asn1_delete_structure(&pbes2_asn);
 
@@ -1520,8 +1534,6 @@ int _gnutls_x509_decrypt_pkcs7_encrypted_data(const gnutls_datum * data,
 		goto error;
 	}
 
-	/* we only support PBES2 
-	 */
 	if ((result = check_schema(enc_oid)) < 0) {
 		gnutls_assert();
 		goto error;

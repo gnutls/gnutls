@@ -107,20 +107,31 @@ int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass)
 {
 int ret;
 gnutls_datum dec;
+ASN1_TYPE sc = ASN1_TYPE_EMPTY;
 	
 	ret = _gnutls_x509_decrypt_pkcs7_encrypted_data( 
 		&bag->data, pass, &dec);
 
         if (ret < 0) {
-        	gnutls_assert();
+		gnutls_assert();
         	return ret;
         }
-        
-        /* decryption succeeded */
-        
+
+        /* decryption succeeded. Now decode the SafeContents
+         * stuff, and parse it.
+         */
+
         _gnutls_free_datum( &bag->data);
-        
-        bag->data = dec;
+
+	ret = _pkcs12_decode_safe_contents( &dec, bag);
+
+        _gnutls_free_datum( &dec);
+
+        if (ret < 0) {
+		gnutls_assert();
+        	return ret;
+        }
+	                
 
 	return 0;
 }

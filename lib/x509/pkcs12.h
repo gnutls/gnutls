@@ -18,6 +18,11 @@ typedef struct gnutls_pkcs12_bag_int {
 	gnutls_pkcs12_bag_type type;
 } gnutls_pkcs12_bag_int;
 
+#define BAG_PKCS8_KEY "1.2.840.113549.1.12.10.1.1"
+#define BAG_PKCS8_ENCRYPTED_KEY "1.2.840.113549.1.12.10.1.2"
+#define BAG_CERTIFICATE "1.2.840.113549.1.12.10.1.3"
+#define BAG_CRL "1.2.840.113549.1.12.10.1.4"
+
 typedef struct gnutls_pkcs12_int *gnutls_pkcs12;
 typedef struct gnutls_pkcs12_bag_int *gnutls_pkcs12_bag;
 
@@ -35,3 +40,7 @@ void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag);
 int 
 _pkcs12_string_to_key (int id, const char *salt, int salt_size, int iter, const char *pw,
                int req_keylen, unsigned char *keybuf);
+
+int _gnutls_x509_decrypt_pkcs7_encrypted_data( const gnutls_datum* data,
+        const char* password, gnutls_datum* dec);
+int _pkcs12_decode_safe_contents( const gnutls_datum* content, gnutls_pkcs12_bag bag);
