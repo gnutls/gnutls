@@ -1,17 +1,9 @@
 
 #include "x509_asn1.h"
 
-const static_asn pkcs1_asn1_tab[]={
-  {"PKCS-1",536872976,0},
-  {0,1610612748,0},
-  {"iso",1073741825,"1"},
-  {"member-body",1073741825,"2"},
-  {"us",1073741825,"840"},
-  {"rsadsi",1073741825,"113549"},
-  {"pkcs",1073741825,"1"},
-  {"pkcs-1",1073741825,"1"},
-  {"modules",1073741825,"0"},
-  {"pkcs-1",1,"1"},
+const static_asn gnutls_asn1_tab[]={
+  {"GNUTLS",536872976,0},
+  {0,1073741836,0},
   {"RSAPublicKey",1610612741,0},
   {"modulus",1073741827,0},
   {"publicExponent",3,0},
@@ -44,6 +36,21 @@ const static_asn pkcs1_asn1_tab[]={
   {"digestAlgorithm",1073741826,"DigestAlgorithmIdentifier"},
   {"digest",2,"Digest"},
   {"DigestAlgorithmIdentifier",1073741826,"AlgorithmIdentifier"},
-  {"Digest",7,0},
+  {"Digest",1073741831,0},
+  {"DSAPublicKey",1073741827,0},
+  {"DSAParameters",1610612741,0},
+  {"p",1073741827,0},
+  {"q",1073741827,0},
+  {"g",3,0},
+  {"DSASignatureValue",1610612741,0},
+  {"r",1073741827,0},
+  {"s",3,0},
+  {"DSAPrivateKey",536870917,0},
+  {"version",1073741827,0},
+  {"p",1073741827,0},
+  {"q",1073741827,0},
+  {"g",1073741827,0},
+  {"Y",1073741827,0},
+  {"priv",3,0},
   {0,0,0}
 };
