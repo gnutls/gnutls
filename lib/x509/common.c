@@ -562,7 +562,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
 {
     char ttime[MAX_TIME];
     char name[1024];
-    time_t ctime = (time_t) - 1;
+    time_t c_time = (time_t) - 1;
     int len, result;
 
     _gnutls_str_cpy(name, sizeof(name), when);
@@ -580,14 +580,14 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
 	len = sizeof(ttime) - 1;
 	result = asn1_read_value(c2, name, ttime, &len);
 	if (result == ASN1_SUCCESS)
-	    ctime = _gnutls_x509_generalTime2gtime(ttime);
+	    c_time = _gnutls_x509_generalTime2gtime(ttime);
     } else {			/* UTCTIME */
 
 	_gnutls_str_cat(name, sizeof(name), ".utcTime");
 	len = sizeof(ttime) - 1;
 	result = asn1_read_value(c2, name, ttime, &len);
 	if (result == ASN1_SUCCESS)
-	    ctime = _gnutls_x509_utcTime2gtime(ttime);
+	    c_time = _gnutls_x509_utcTime2gtime(ttime);
     }
 
     /* We cannot handle dates after 2031 in 32 bit machines.
@@ -598,7 +598,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
 	gnutls_assert();
 	return (time_t) (-1);
     }
-    return ctime;
+    return c_time;
 }
 
 /* Sets the time in time_t in the ASN1_TYPE given. Where should

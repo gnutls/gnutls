@@ -533,7 +533,7 @@ typedef struct cdk_packet_s *cdk_packet_t;
 /* memory routines */
 typedef void (*cdk_log_fnc_t) (void *, int, const char *, va_list);
 void cdk_set_log_level (int lvl);
-void cdk_set_log_handler (cdk_log_fnc_t logfnc, void * opaque);
+void cdk_set_log_handler (cdk_log_fnc_t logfnc, void * opaq);
 const char* cdk_strerror (int ec);
 void cdk_set_malloc_hooks (void *(*new_alloc_func) (size_t n),
                            void *(*new_alloc_secure_func) (size_t n),

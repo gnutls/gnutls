@@ -431,10 +431,16 @@ int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq, const char* pa
 int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq_t crq, 
     const char* pass, size_t* sizeof_pass);
 
+int gnutls_x509_crq_set_attribute_by_oid(gnutls_x509_crq_t crq,
+    const char* oid, void* buf, size_t sizeof_buf);
+int gnutls_x509_crq_get_attribute_by_oid(gnutls_x509_crq_t crq,
+    const char* oid, int indx, void* buf, size_t* sizeof_buf);
+
 int gnutls_x509_crq_export( gnutls_x509_crq_t crq,
     gnutls_x509_crt_fmt_t format, void* output_data, size_t* output_data_size);
 
 int gnutls_x509_crt_set_crq(gnutls_x509_crt_t crt, gnutls_x509_crq_t crq);
+
 
 
 #ifdef __cplusplus

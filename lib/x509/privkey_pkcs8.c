@@ -1198,7 +1198,7 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
     int result;
     int data_size;
     opaque *data = NULL, *key = NULL;
-    gnutls_datum_t dkey, div;
+    gnutls_datum_t dkey, d_iv;
     cipher_hd_t ch = NULL;
     int key_size;
 
@@ -1265,9 +1265,9 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
     dkey.data = key;
     dkey.size = key_size;
 
-    div.data = (opaque *) enc_params->iv;
-    div.size = enc_params->iv_size;
-    ch = _gnutls_cipher_init(enc_params->cipher, &dkey, &div);
+    d_iv.data = (opaque *) enc_params->iv;
+    d_iv.size = enc_params->iv_size;
+    ch = _gnutls_cipher_init(enc_params->cipher, &dkey, &d_iv);
 
     gnutls_afree(key);
     key = NULL;
@@ -1638,7 +1638,7 @@ static int encrypt_data(const gnutls_datum_t * plain,
     int result;
     int data_size;
     opaque *data = NULL;
-    gnutls_datum_t div;
+    gnutls_datum_t d_iv;
     cipher_hd_t ch = NULL;
     opaque pad, pad_size;
 
@@ -1665,9 +1665,9 @@ static int encrypt_data(const gnutls_datum_t * plain,
 
     data_size = plain->size + pad;
 
-    div.data = (opaque *) enc_params->iv;
-    div.size = enc_params->iv_size;
-    ch = _gnutls_cipher_init(enc_params->cipher, key, &div);
+    d_iv.data = (opaque *) enc_params->iv;
+    d_iv.size = enc_params->iv_size;
+    ch = _gnutls_cipher_init(enc_params->cipher, key, &d_iv);
 
     if (ch == GNUTLS_CIPHER_FAILED) {
 	gnutls_assert();

@@ -668,50 +668,6 @@ int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
 }
 
 /**
-  * gnutls_x509_crq_set_attribute_by_oid - This function will set a challenge password 
-  * @crq: should contain a gnutls_x509_crq_t structure
-  * @pass: holds a null terminated password
-  *
-  * This function will set a challenge password to be used when revoking the request.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int gnutls_x509_crq_set_challenge_password(gnutls_x509_crq_t crq,
-					   const char *pass)
-{
-    int result;
-
-    if (crq == NULL) {
-	gnutls_assert();
-	return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    /* Add the attribute.
-     */
-    result =
-	asn1_write_value(crq->crq, "certificationRequestInfo.attributes",
-			 "NEW", 1);
-    if (result != ASN1_SUCCESS) {
-	gnutls_assert();
-	return _gnutls_asn2err(result);
-    }
-
-    result =
-	_gnutls_x509_encode_and_write_attribute("1.2.840.113549.1.9.7",
-						crq->crq,
-						"certificationRequestInfo.attributes.?LAST",
-						pass, strlen(pass), 1);
-
-    if (result < 0) {
-	gnutls_assert();
-	return result;
-    }
-
-    return 0;
-}
-
-/**
   * gnutls_x509_crq_sign2 - This function will sign a Certificate request with a key
   * @crq: should contain a gnutls_x509_crq_t structure
   * @key: holds a private key
