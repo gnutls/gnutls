@@ -1,3 +1,10 @@
+2004-06-10 10:03  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_handshake.c, gnutls_state.c, gnutls_handshake.c,
+	gnutls_record.c, gnutls_state.c:
+
+	some fixes in the session resuming code.  
+
 2004-06-07 10:05  nmav <nmav@gnutls.org>
 
 	* lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.c,
