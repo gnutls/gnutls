@@ -31,8 +31,8 @@
 #define WRITE_DEBUG
 #define READ_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define RECORD_DEBUG*/
 #define X509_DEBUG
+#define RECORD_DEBUG*/
 #define DEBUG
 
 
@@ -156,12 +156,8 @@ typedef struct {
 	AlertDescription description;
 } Alert;
 
-#define MAX_KX_ALGOS 16
-#define MAX_CIPHER_ALGOS 16
-#define MAX_MAC_ALGOS 16
+#define MAX_ALGOS 8
 #define MAX_CIPHERSUITES 256
-#define MAX_COMPRESSION_ALGOS 4
-#define MAX_VERSIONS 4
 
 /* STATE */
 typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT 
@@ -174,7 +170,9 @@ typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1,
 } BulkCipherAlgorithm;
 #define GNUTLS_BulkCipherAlgorithm BulkCipherAlgorithm
 	
-typedef enum Extensions { GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6 } Extensions;
+typedef enum Extensions { GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6, GNUTLS_EXTENSION_CERT_TYPE=7 
+} Extensions;
+
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
 	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP 
 } KXAlgorithm;
@@ -379,7 +377,7 @@ typedef struct {
 
 
 typedef struct {
-	int* algorithm_priority;
+	int algorithm_priority[MAX_ALGOS];
 	int algorithms;
 } GNUTLS_Priority;
 
@@ -388,6 +386,7 @@ typedef struct {
 #define KXAlgorithm_Priority GNUTLS_Priority
 #define CompressionMethod_Priority GNUTLS_Priority
 #define Protocol_Priority GNUTLS_Priority
+#define CertType_Priority GNUTLS_Priority
 
 typedef int certificate_client_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
 typedef int certificate_server_callback_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
@@ -431,6 +430,7 @@ typedef struct {
 	KXAlgorithm_Priority		KXAlgorithmPriority;
 	CompressionMethod_Priority	CompressionMethodPriority;
 	Protocol_Priority		ProtocolPriority;
+	CertType_Priority		cert_type_priority;
 	
 	/* resumed session */
 	ResumableSession		resumed; /* TRUE or FALSE - if we are resuming a session */
