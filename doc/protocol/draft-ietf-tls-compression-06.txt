@@ -2,12 +2,12 @@
 
 Network Working Group                                      S. Hollenbeck
 Internet-Draft                                            VeriSign, Inc.
-Updates: 2246 (if approved)                                 May 27, 2003
-Expires: November 25, 2003
+Updates: 2246 (if approved)                            November 20, 2003
+Expires: May 20, 2004
 
 
          Transport Layer Security Protocol Compression Methods
-                   draft-ietf-tls-compression-05.txt
+                   draft-ietf-tls-compression-06.txt
 
 Status of this Memo
 
@@ -29,7 +29,7 @@ Status of this Memo
    The list of Internet-Draft Shadow Directories can be accessed at
    http://www.ietf.org/shadow.html.
 
-   This Internet-Draft will expire on November 25, 2003.
+   This Internet-Draft will expire on May 20, 2004.
 
 Copyright Notice
 
@@ -52,9 +52,9 @@ Abstract
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 1]
+Hollenbeck                Expires May 20, 2004                  [Page 1]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 Conventions Used In This Document
@@ -108,9 +108,9 @@ Table of Contents
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 2]
+Hollenbeck                Expires May 20, 2004                  [Page 2]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 1. Introduction
@@ -164,9 +164,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 3]
+Hollenbeck                Expires May 20, 2004                  [Page 3]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 2. Compression Methods
@@ -220,9 +220,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 4]
+Hollenbeck                Expires May 20, 2004                  [Page 4]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
    input data.  A compression method that exceeds the expansion limits
@@ -276,9 +276,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 5]
+Hollenbeck                Expires May 20, 2004                  [Page 5]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 3. Intellectual Property Considerations
@@ -332,9 +332,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 6]
+Hollenbeck                Expires May 20, 2004                  [Page 6]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 4. Internationalization Considerations
@@ -388,9 +388,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 7]
+Hollenbeck                Expires May 20, 2004                  [Page 7]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 5. IANA Considerations
@@ -444,9 +444,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-Hollenbeck             Expires November 25, 2003                [Page 8]
+Hollenbeck                Expires May 20, 2004                  [Page 8]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 6. Security Considerations
@@ -455,11 +455,21 @@ Internet-Draft          TLS Compression Methods                 May 2003
    model addressed by TLS.  The security considerations described
    throughout RFC 2246 [2] apply here as well.
 
-   Some symmetric encryption ciphersuites do not hide the length of
-   symmetrically encrypted data at all.  Others hide it to some extent,
-   but still don't hide it fully.  Use of TLS compression SHOULD take
-   into account that the length of compressed data may leak more
-   information than the length of the original uncompressed data.
+   However, combining compression with encryption can sometimes reveal
+   information that would not have been revealed without compression:
+   data that is the same length before compression might be a different
+   length after compression, so adversaries that observe the length of
+   the compressed data might be able to derive information about the
+   corresponding uncompressed data.  Some symmetric encryption
+   ciphersuites do not hide the length of symmetrically encrypted data
+   at all.  Others hide it to some extent, but still don't hide it
+   fully.  For example, ciphersuites that use stream cipher encryption
+   without padding do not hide length at all; ciphersuites that use
+   Cipher Block Chaining (CBC) encryption with padding provide some
+   length hiding, depending on how the amount of padding is chosen.  Use
+   of TLS compression SHOULD take into account that the length of
+   compressed data may leak more information than the length of the
+   original uncompressed data.
 
 
 
@@ -490,19 +500,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-
-
-
-
-
-
-
-
-
-
-Hollenbeck             Expires November 25, 2003                [Page 9]
+Hollenbeck                Expires May 20, 2004                  [Page 9]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 7. Acknowledgements
@@ -513,7 +513,7 @@ Internet-Draft          TLS Compression Methods                 May 2003
    Jeffrey Altman, Eric Rescorla, and Marc Van Heyningen.  Later
    suggestions that have been incorporated into this document were
    provided by Tim Dierks, Pasi Eronen, Peter Gutmann, Elgin Lee, Nikos
-   Mavroyanopoulos, Alexey Melnikov, and Bodo Moeller.
+   Mavroyanopoulos, Alexey Melnikov, Bodo Moeller, and Win Treese.
 
 
 
@@ -556,9 +556,9 @@ Internet-Draft          TLS Compression Methods                 May 2003
 
 
 
-Hollenbeck             Expires November 25, 2003               [Page 10]
+Hollenbeck                Expires May 20, 2004                 [Page 10]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 Normative References
@@ -612,9 +612,9 @@ Normative References
 
 
 
-Hollenbeck             Expires November 25, 2003               [Page 11]
+Hollenbeck                Expires May 20, 2004                 [Page 11]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 Informative References
@@ -668,9 +668,9 @@ Author's Address
 
 
 
-Hollenbeck             Expires November 25, 2003               [Page 12]
+Hollenbeck                Expires May 20, 2004                 [Page 12]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
 Intellectual Property Statement
@@ -724,16 +724,16 @@ Full Copyright Statement
 
 
 
-Hollenbeck             Expires November 25, 2003               [Page 13]
+Hollenbeck                Expires May 20, 2004                 [Page 13]
 
-Internet-Draft          TLS Compression Methods                 May 2003
+Internet-Draft          TLS Compression Methods            November 2003
 
 
    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 
 
-Acknowledgement
+Acknowledgment
 
    Funding for the RFC Editor function is currently provided by the
    Internet Society.
@@ -780,4 +780,4 @@ Acknowledgement
 
 
 
-Hollenbeck             Expires November 25, 2003               [Page 14]
+Hollenbeck                Expires May 20, 2004                 [Page 14]
