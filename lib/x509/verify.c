@@ -48,7 +48,7 @@ static
 int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_crt issuer_cert);
 static int _gnutls_verify_crl2(gnutls_x509_crl crl,
 			       gnutls_x509_crt *trusted_cas, int tcas_size, 
-			       unsigned int flags);
+			       unsigned int flags, unsigned int *output);
 
 
 /* Checks if the issuer of a certificate is a
@@ -593,9 +593,14 @@ int gnutls_x509_crt_verify( gnutls_x509_crt cert,
 	gnutls_x509_crt *CA_list, int CA_list_length,
 	unsigned int flags, unsigned int *verify)
 {
+int ret;
 	/* Verify certificate 
 	 */
-	_gnutls_verify_certificate2( cert, CA_list, CA_list_length, flags, verify);
+	ret = _gnutls_verify_certificate2( cert, CA_list, CA_list_length, flags, verify);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0;
 }
@@ -658,10 +663,14 @@ int gnutls_x509_crl_verify( gnutls_x509_crl crl,
 	gnutls_x509_crt *CA_list, int CA_list_length,
 	unsigned int flags, unsigned int *verify)
 {
+int ret;
 	/* Verify crl 
 	 */
-	*verify =
-	    _gnutls_verify_crl2( crl, CA_list, CA_list_length, flags);
+	ret = _gnutls_verify_crl2( crl, CA_list, CA_list_length, flags, verify);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return 0;
 }
@@ -719,10 +728,13 @@ gnutls_x509_crt find_crl_issuer(gnutls_x509_crl crl,
  * was successfuly verified.
  *
  * 'flags': an OR of the gnutls_certificate_verify_flags enumeration.
+ *
+ * Output will hold information about the verification
+ * procedure. 
  */
 static int _gnutls_verify_crl2(gnutls_x509_crl crl,
 			       gnutls_x509_crt *trusted_cas, int tcas_size, 
-			       unsigned int flags)
+			       unsigned int flags, unsigned int* output)
 {
 /* CRL is ignored for now */
 gnutls_datum crl_signed_data = { NULL, 0 };
@@ -730,10 +742,13 @@ gnutls_datum crl_signature = { NULL, 0 };
 gnutls_x509_crt issuer;
 int ret, result;
 
+	if (output) *output = 0;
+
 	if (tcas_size >= 1)
 		issuer = find_crl_issuer(crl, trusted_cas, tcas_size);
 	else {
 		gnutls_assert();
+		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
 		return 0;
 	}
 
@@ -742,6 +757,7 @@ int ret, result;
 	 */
 	if (issuer == NULL) {
 		gnutls_assert();
+		if (output) *output |= GNUTLS_CERT_ISSUER_NOT_FOUND | GNUTLS_CERT_NOT_TRUSTED;
 		return 0;
 	}
 
@@ -749,6 +765,7 @@ int ret, result;
 		if (gnutls_x509_crt_get_ca_status(issuer, NULL) != 1) 
 		{
 			gnutls_assert();
+			if (output) *output |= GNUTLS_CERT_ISSUER_NOT_CA | GNUTLS_CERT_NOT_TRUSTED;
 			return 0;
 		}
 	}
@@ -765,11 +782,13 @@ int ret, result;
 		goto cleanup;
 	}
 
-
 	ret = _gnutls_x509_verify_signature(&crl_signed_data, &crl_signature, issuer);
-	if (ret <= 0) {
+	if (ret < 0) {
+		gnutls_assert();
+	} else if (ret == 0) {
 		gnutls_assert();
 		/* error. ignore it */
+		if (output) *output |= GNUTLS_CERT_NOT_TRUSTED;
 		ret = 0;
 	}
 
