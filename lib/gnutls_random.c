@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -39,27 +39,14 @@
  */
 int _gnutls_get_random(opaque * res, int bytes, int level)
 {
-#ifndef USE_GCRYPT
-    int fd;
-    char *device;
-
-    device = "/dev/urandom";
-
-    fd = open(device, O_RDONLY);
-    if (fd < 0) {
-	_gnutls_log( "Could not open random device\n");
-	return GNUTLS_E_FILE_ERROR;
-    } else {
-	ssize_t err = read(fd, res, bytes);
-	/* IMPLEMENTME: handle EINTR etc. nicely! */
-	close(fd);
-	if ( (err < 0) || (err < bytes) ) return GNUTLS_E_FILE_ERROR;
+#ifdef HAVE_GCRY_CREATE_NONCE
+    if (level == GNUTLS_WEAK_RANDOM) {
+      gcry_create_nonce( res, bytes);
+      return 0;
     }
-    return 0;
-#else				/* using gcrypt */
+#endif
+
     gcry_randomize( res, bytes, level);
 
     return 0;
-#endif
-
 }

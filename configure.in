@@ -246,6 +246,15 @@ AM_PATH_LIBGCRYPT($GNUTLS_GCRYPT_VERSION,,
 dnl Can't disable - gnutls depends on gcrypt
 AC_DEFINE(USE_GCRYPT, 1, [use gcrypt])
 
+# Since libgcrypt 1.1.90 we have a new function to create nonces etc.
+# it is useful to use this one instead of the the standard random
+# functions.  As a temporary solution we check for that function and
+# don't require an unrelease libgcrypt.  This should be changed after
+# libgcrypt 1.2 has been released.
+save_LIBS="$LIBS"
+LIBS="$LIBS $LIBGCRYPT_LIBS"
+AC_CHECK_FUNCS(gcry_create_nonce)
+LIBS="$save_LIBS"
 
 
 AC_MSG_CHECKING([whether to disable SRP authentication support])

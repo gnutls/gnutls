@@ -524,8 +524,13 @@ gnutls_datum verifier, txt_verifier;
 	if ((unsigned)salt_size > sizeof(salt))
 		return NULL;
 
-	/* generate the salt */
-	gcry_randomize( salt, salt_size, GCRY_WEAK_RANDOM);
+	/* generate the salt 
+	 */
+#ifdef HAVE_GCRY_CREATE_NONCE
+        gcry_create_nonce( salt, salt_size);
+#else
+        gcry_randomize( salt, salt_size, GCRY_WEAK_RANDOM);
+#endif
 
 	dat_salt.data = salt;
 	dat_salt.size = salt_size;
