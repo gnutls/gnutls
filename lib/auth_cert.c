@@ -282,7 +282,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 						pk_algos, pk_algos_length,
 						cred->cert_list[i][0].subject_pk_algorithm)==0)
 					&& (cred->cert_list[i][0].cert_type ==
-						_gnutls_state_cert_type_get( state))) {
+						gnutls_cert_type_get( state))) {
 						indx = i;
 						break;
 					}
@@ -315,7 +315,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		/* put the requested DNs to req_dn, only in case
 		 * of X509 certificates.
 		 */
-		if ( _gnutls_state_cert_type_get(state) == GNUTLS_CRT_X509) {
+		if ( gnutls_cert_type_get(state) == GNUTLS_CRT_X509) {
 			data = _data;
 			data_size = _data_size;
 			count = 0;	/* holds the number of given CA's DN */
@@ -362,7 +362,7 @@ static int _gnutls_find_acceptable_client_cert(GNUTLS_STATE state,
 		 */
 		for (j = i = 0; i < cred->ncerts; i++) {
 			if ( (cred->cert_list[i][0].cert_type ==
-			     _gnutls_state_cert_type_get( state)) &&
+			     gnutls_cert_type_get( state)) &&
 			     (_gnutls_check_pk_algo_in_list( pk_algos, 
 			     pk_algos_length,
 			     cred->cert_list[i][0].subject_pk_algorithm)==0)) {
@@ -867,7 +867,7 @@ int _gnutls_gen_x509_server_cert_req(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	size = CERTTYPE_SIZE + 2;	/* 2 for CertType + 2 for size of rdn_seq 
+	size = CERTTYPE_SIZE + 2;	/* 2 for CertificateType + 2 for size of rdn_seq 
 					 */
 
 	size += cred->x509_rdn_sequence.size;
@@ -1483,7 +1483,7 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 			requested_algo==cred->cert_list[i][0].subject_pk_algorithm) {
 				
 				/* if cert type matches */
-				if ( _gnutls_state_cert_type_get( state) ==
+				if ( gnutls_cert_type_get( state) ==
 					cred->cert_list[i][0].cert_type) {
 
 					index = i;
@@ -1513,7 +1513,7 @@ int _gnutls_server_find_x509_cert_list_index(GNUTLS_STATE state,
 				requested_algo==cred->cert_list[i][0].subject_pk_algorithm) {
 					
 					/* if cert type matches */
-					if ( _gnutls_state_cert_type_get( state) ==
+					if ( gnutls_cert_type_get( state) ==
 						cred->cert_list[i][0].cert_type) {
 
 						ij_map[j] = i;

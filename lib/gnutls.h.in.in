@@ -66,6 +66,10 @@ typedef enum GNUTLS_CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } GNUTLS
 
 typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
+typedef enum GNUTLS_CertificateType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
+} GNUTLS_CertificateType;
+
+
 /* If you want to change this, then also change the 
  * define in gnutls_int.h, and recompile.
  */
@@ -97,10 +101,11 @@ int 		 gnutls_alert_send( GNUTLS_STATE, GNUTLS_AlertLevel, GNUTLS_AlertDescripti
 int 		 gnutls_alert_send_appropriate(  GNUTLS_STATE state, int err);
 
 /* get information on the current state */
-GNUTLS_BulkCipherAlgorithm gnutls_cipher_get( GNUTLS_STATE state);
-GNUTLS_KXAlgorithm 	    gnutls_kx_get( GNUTLS_STATE state);
-GNUTLS_MACAlgorithm	    gnutls_mac_get( GNUTLS_STATE state);
-GNUTLS_CompressionMethod   gnutls_compression_get( GNUTLS_STATE state);
+GNUTLS_BulkCipherAlgorithm	gnutls_cipher_get( GNUTLS_STATE state);
+GNUTLS_KXAlgorithm 		gnutls_kx_get( GNUTLS_STATE state);
+GNUTLS_MACAlgorithm		gnutls_mac_get( GNUTLS_STATE state);
+GNUTLS_CompressionMethod	gnutls_compression_get( GNUTLS_STATE state);
+GNUTLS_CertificateType		gnutls_cert_type_get( GNUTLS_STATE state);
 
 /* the name of the specified algorithms */
 const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm);

@@ -180,9 +180,9 @@ typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS,
 } KXAlgorithm;
 #define GNUTLS_KXAlgorithm KXAlgorithm
 
-typedef enum CertType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
-} CertType;
-#define GNUTLS_CertType CertType
+typedef enum CertificateType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
+} CertificateType;
+#define GNUTLS_CertificateType CertificateType
 
 typedef enum CredType { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP 
 } CredType;
@@ -348,7 +348,7 @@ typedef struct {
 	TLSExtensions		extensions;
 	uint16			max_record_size;
 	/* holds the negotiated certificate type */
-	CertType		cert_type;	
+	CertificateType		cert_type;	
 	GNUTLS_Version		version; /* moved here */
 } SecurityParameters;
 

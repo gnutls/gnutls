@@ -52,7 +52,7 @@ typedef struct gnutls_cert {
 
 			/* holds the type (PGP, X509)
 			 */
-	CertType     cert_type;
+	CertificateType     cert_type;
 	gnutls_datum raw; /* the raw certificate */
 } gnutls_cert;
 

@@ -19,11 +19,66 @@
  */
 
 #include <gnutls_int.h>
+#include <gnutls_errors.h>
+#include <gnutls_auth_int.h>
 
-CertType _gnutls_state_cert_type_get( GNUTLS_STATE state) {
+#define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \
+	gnutls_assert(); \
+	return ret; \
+	}
+
+void _gnutls_state_cert_type_set( GNUTLS_STATE state, CertificateType ct) {
+	state->security_parameters.cert_type = ct;
+}
+
+/**
+  * gnutls_cipher_get - Returns the currently used cipher.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the currently used cipher.
+  **/
+GNUTLS_BulkCipherAlgorithm gnutls_cipher_get( GNUTLS_STATE state) {
+	return state->security_parameters.read_bulk_cipher_algorithm;
+}
+
+/**
+  * gnutls_cert_type_get - Returns the currently used certificate type.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the currently used certificate type. The certificate type
+  * is by default X.509, unless it is negotiated as a TLS extension.
+  *
+  **/
+GNUTLS_CertificateType gnutls_cert_type_get( GNUTLS_STATE state) {
 	return state->security_parameters.cert_type;
 }
 
-void _gnutls_state_cert_type_set( GNUTLS_STATE state, CertType ct) {
-	state->security_parameters.cert_type = ct;
+/**
+  * gnutls_kx_get - Returns the key exchange algorithm.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the key exchange algorithm used in the last handshake.
+  **/
+GNUTLS_KXAlgorithm gnutls_kx_get( GNUTLS_STATE state) {
+	return state->security_parameters.kx_algorithm;
+}
+
+/**
+  * gnutls_mac_get - Returns the currently used mac algorithm.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the currently used mac algorithm.
+  **/
+GNUTLS_MACAlgorithm gnutls_mac_get( GNUTLS_STATE state) {
+	return state->security_parameters.read_mac_algorithm;
+}
+
+/**
+  * gnutls_compression_get - Returns the currently used compression algorithm.
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * Returns the currently used compression method.
+  **/
+GNUTLS_CompressionMethod gnutls_compression_get( GNUTLS_STATE state) {
+	return state->security_parameters.read_compression_algorithm;
 }
