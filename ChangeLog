@@ -1,3 +1,12 @@
+2002-05-17 09:28  nmav <nmav@gnutls.org>
+
+	* README, configure.in, lib/auth_anon.c, lib/auth_dhe.c,
+	lib/auth_rsa.c, lib/auth_srp.c, lib/libgnutls-config.in,
+	src/prime.c:
+
+	Added --modules option to libgnutls-config. This option prints the
+	extra modules that have been enabled into the library.  
+
 2002-05-14 12:22  nmav <nmav@gnutls.org>
 
 	* configure.in:
