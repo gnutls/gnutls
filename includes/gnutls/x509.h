@@ -268,57 +268,6 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq crq,
 int gnutls_x509_crq_export( gnutls_x509_crq crq,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
 
-/* PKCS12 structures handling 
- */
-struct gnutls_pkcs12_int;
-typedef struct gnutls_pkcs12_int* gnutls_pkcs12;
-
-struct gnutls_pkcs12_bag_int;
-typedef struct gnutls_pkcs12_bag_int* gnutls_pkcs12_bag;
-
-int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12);
-void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12);
-int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
-	gnutls_x509_crt_fmt format, unsigned int flags);
-int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12, 
-	int indx, gnutls_pkcs12_bag bag);
-int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag);
-
-int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass);
-int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char* pass);
-
-int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass);
-int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag bag, const char* pass, unsigned int flags);
-
-typedef enum gnutls_pkcs12_bag_type {
-	GNUTLS_BAG_EMPTY = 0,
-
-	GNUTLS_BAG_PKCS8_ENCRYPTED_KEY=1,
-	GNUTLS_BAG_PKCS8_KEY,
-	GNUTLS_BAG_CERTIFICATE,
-	GNUTLS_BAG_CRL,
-	GNUTLS_BAG_ENCRYPTED=10,
-	GNUTLS_BAG_UNKNOWN=20
-} gnutls_pkcs12_bag_type;
-
-gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag, int indx);
-int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum* data);
-int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag bag, gnutls_pkcs12_bag_type type,
-        const gnutls_datum* data);
-
-int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag);
-void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag);
-int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag);
-
-int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag bag, int indx, 
-	gnutls_datum* id);
-int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag bag, int indx, 
-	const gnutls_datum* id);
-
-int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag bag, int indx, 
-	char **name);
-int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag bag, int indx, 
-	const char* name);
 
 
 #ifdef __cplusplus

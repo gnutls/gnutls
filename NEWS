@@ -1,4 +1,4 @@
-Version 0.9.6
+Version 0.9.6 (28/06/2003)
 - Added gnutls_x509_privkey_get_key_id() and gnutls_x509_crt_get_key_id()
   functions which return a unique (per public key) ID. These can
   be used to check if the private key corresponds to a given certificate.
@@ -9,8 +9,9 @@ Version 0.9.6
 - Corrected a bug in gnutls-srpcrypt where a non allocated variable
   was freed.
 - SRP programs are now built by default.
-- Added API to read and write to PKCS #12 structures.
-- The gnutls_transport_ptr type was changed to a pointer type.
+- Added API to read and write to PKCS #12 structures. Prototypes
+  in gnutls/pkcs12.h.
+- The gnutls_transport_ptr type was changed to a pointer type (void*).
 
 Version 0.9.5 (06/04/2003)
 - Several improvements in the PKCS #7 handling
