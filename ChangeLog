@@ -1,3 +1,16 @@
+2002-11-06 13:00  nmav <nmav@gnutls.org>
+
+	* doc/protocol/: draft-ietf-tls-rfc2246-bis-01.txt,
+	draft-ietf-tls-rfc2246-bis-02.txt:
+
+	added new rfc2246bis draft 
+
+2002-11-06 08:24  nmav <nmav@gnutls.org>
+
+	* opencdk.m4:
+
+	updated url for opencdk 
+
 2002-11-05 21:41  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_algorithms.c, gnutls_buffers.c, gnutls_db.c,
