@@ -55,7 +55,7 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
   * if there are pending data to socket buffer. Used only   
   * if you have changed the default low water value (default is 1).
   * Normally you will not need that function. 
-  * If you plan to use non standard recv() function you should set
+  * However, if you plan to use non standard recv() function you should set
   * this to zero.
   **/
 int gnutls_set_lowat(GNUTLS_STATE state, int num) {

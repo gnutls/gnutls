@@ -318,6 +318,13 @@ typedef struct {
 	gnutls_datum			hash_buffer; /* used to keep all handshake messages */
 	gnutls_datum			buffer_handshake; /* this is a buffer that holds the current handshake message */
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
+/*	jmp_buf				handshake_nb_state; /* holds
+					* a number which indicates where
+					* the handshake procedure has been
+					* interrupted. If it is 0 then
+					* no interruption has happened.
+					*/
+	
 	ValidSession			valid_connection; /* true or FALSE - if this session is valid */
 
 	int				may_read; /* if it's 0 then we can read/write, otherwise it's forbiden to read/write

@@ -234,13 +234,13 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 	*iptr = NULL;
 
-	if ( sizeOfPtr > MAX_RECV_SIZE) {
+	if ( sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr <= 0) {
 		gnutls_assert(); /* internal error */
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 	
 	/* leave peeked data to the kernel space only if application data
-	 * is received and we don't have any peeked data in there.
+	 * is received and we don't have any peeked data in gnutls state.
 	 */
 	if (recv_type != GNUTLS_APPLICATION_DATA && state->gnutls_internals.have_peeked_data==0)
 		recvlowat = 0;
@@ -249,7 +249,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 	*iptr = buf;
 	
-	/* copy peeked data to given buffer
+	/* calculate the actual size
 	 */
 	min = GMIN( state->gnutls_internals.recv_buffer_data_size, sizeOfPtr);
 	if ( min > 0) {
@@ -257,20 +257,31 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 			return min;
 	}
 
+	/* min is over zero */
 	sizeOfPtr -= min;
 	
 	/* read fresh data - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
-	if ( sizeOfPtr - recvlowat > 0)
+	if ( sizeOfPtr - recvlowat > 0) {
 		ret = _gnutls_Read( fd, &buf[min], sizeOfPtr - recvlowat, flag);
-	if (ret >= 0 && recvlowat > 0) {
-		ret2 = _gnutls_Read( fd, &buf[min+ret], recvlowat, MSG_PEEK|flag);
-		state->gnutls_internals.have_peeked_data = 1;
+		if (ret==GNUTLS_E_AGAIN) 
+			return ret;
 	}
 
-	if (ret < 0 || ret2 < 0)
-		return GMIN(ret, ret2);
+	if (ret >= 0 && recvlowat > 0) {
+		ret2 = _gnutls_Read( fd, &buf[min+ret], recvlowat, MSG_PEEK|flag);
 
+		if (ret2==GNUTLS_E_AGAIN) 
+			return ret2;
+
+		if (ret2 > 0)
+			state->gnutls_internals.have_peeked_data = 1;
+	}
+
+	if (ret < 0 || ret2 < 0) {
+		/* that's because they are initilized to 0 */
+		return GMIN(ret, ret2);
+	}
 
 	ret += ret2;
 
@@ -324,7 +335,11 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 	return n;
 
 }
-ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t n)
+
+/* This is a send function for the gnutls handshake 
+ * protocol. Just makes sure that all data have been sent.
+ */
+ssize_t _gnutls_handshake_send_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t n)
 {
 	size_t left;
 	ssize_t i = 0;
@@ -343,7 +358,10 @@ ssize_t _gnutls_Send_int(int fd, GNUTLS_STATE state, ContentType type, Handshake
 
 }
 
-ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
+/* This is a receive function for the gnutls handshake 
+ * protocol. Makes sure that we have received all data.
+ */
+ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type, HandshakeType htype, void *iptr, size_t sizeOfPtr)
 {
 	size_t left;
 	ssize_t i=0;
