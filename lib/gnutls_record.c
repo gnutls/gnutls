@@ -202,16 +202,21 @@ int gnutls_bye(gnutls_session_t session, gnutls_close_request_t how)
 
     case STATE62:
 	if (how == GNUTLS_SHUT_RDWR) {
-	    ret = _gnutls_recv_int(session, GNUTLS_ALERT, -1, NULL, 0);
+	    do {
+	        _gnutls_io_clear_peeked_data( session);
+	        ret = _gnutls_recv_int(session, GNUTLS_ALERT, -1, NULL, 0);
+            } while( ret == GNUTLS_E_GOT_APPLICATION_DATA);
+
 	    if (ret >= 0)
 		session->internals.may_not_read = 1;
+
+	    if (ret < 0) {
+	        gnutls_assert();
+	        return ret;
+  	    }
 	}
 	STATE = STATE62;
 
-	if (ret < 0) {
-	    gnutls_assert();
-	    return ret;
-	}
 	break;
     default:
 	gnutls_assert();
@@ -437,6 +442,7 @@ ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session,
     }
 }
 
+inline
 static int check_recv_type(content_type_t recv_type)
 {
     switch (recv_type) {
@@ -488,11 +494,9 @@ static int check_buffers(gnutls_session_t session, content_type_t type,
  */
 static
 int record_check_headers(gnutls_session_t session,
-			 uint8 headers[RECORD_HEADER_SIZE],
-			 content_type_t type, handshake_t htype,
-			 /*output */ content_type_t * recv_type,
-			 opaque version[2], uint16 * length,
-			 uint16 * header_size)
+    uint8 headers[RECORD_HEADER_SIZE], content_type_t type, handshake_t htype,
+    /*output */ content_type_t * recv_type, opaque version[2], uint16 * length,
+    uint16 * header_size)
 {
 
     /* Read the first two bytes to determine if this is a 
@@ -576,9 +580,8 @@ inline
  * the one we actually expect.
  */
 static int record_check_type(gnutls_session_t session,
-			     content_type_t recv_type, content_type_t type,
-			     handshake_t htype, opaque * data,
-			     int data_size)
+    content_type_t recv_type, content_type_t type,
+    handshake_t htype, opaque * data, int data_size)
 {
 
     int ret;
@@ -641,17 +644,17 @@ static int record_check_type(gnutls_session_t session,
 		return ret;
 	    }
 
-	    gnutls_assert();
-
 	    /* the got_application data is only returned
 	     * if expecting client hello (for rehandshake
 	     * reasons). Otherwise it is an unexpected packet
 	     */
-	    if (htype == GNUTLS_CLIENT_HELLO
-		&& (type == GNUTLS_HANDSHAKE || type == GNUTLS_ALERT))
+	    if (type==GNUTLS_ALERT || (htype == GNUTLS_CLIENT_HELLO
+		&& type == GNUTLS_HANDSHAKE))
 		return GNUTLS_E_GOT_APPLICATION_DATA;
-	    else
+	    else {
+	        gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET;
+            }
 
 	    break;
 	case GNUTLS_HANDSHAKE:
@@ -811,7 +814,6 @@ ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
  * ok. 
  */
     if ((ret = check_recv_type(recv_type)) < 0) {
-
 	gnutls_assert();
 	return ret;
     }
@@ -837,7 +839,6 @@ ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 	 _gnutls_packet2str(recv_type), recv_type, length);
 
     if (length > MAX_RECV_SIZE) {
-
 	_gnutls_record_log
 	    ("REC[%x]: FATAL ERROR: Received packet with length: %d\n",
 	     session, length);
@@ -890,8 +891,8 @@ ssize_t _gnutls_recv_int(gnutls_session_t session, content_type_t type,
 
 /* Check if this is a CHANGE_CIPHER_SPEC
  */
-    if (type == GNUTLS_CHANGE_CIPHER_SPEC
-	&& recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
+    if (type == GNUTLS_CHANGE_CIPHER_SPEC &&
+      recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
 
 	_gnutls_record_log
 	    ("REC[%x]: ChangeCipherSpec Packet was received\n", session);
