@@ -105,6 +105,7 @@ GNUTLS_KXAlgorithm kx;
 					
 					printf("- Peer requested OpenPGP certificate authentication.\n");
 
+					if (cert_list_size > 0)
 					if ( gnutls_openpgp_fingerprint( &cert_list[0], digest, &digest_size) >= 0) {
 						print = printable;
 						for (i=0;i<digest_size;i++) {
@@ -112,10 +113,11 @@ GNUTLS_KXAlgorithm kx;
 							print += 3;
 						}
 						printf(" - Certificate fingerprint: %s\n", printable);
+
+						gnutls_openpgp_extract_certificate_dn( &cert_list[0], &dn);
+						PRINT_DN( dn);
+					
 					}
-			
-					gnutls_openpgp_extract_certificate_dn( &cert_list[0], &dn);
-					PRINT_DN( dn);
 
 					break;
 				}
