@@ -43,6 +43,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 
 typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
 typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
+typedef enum CloseRequest { GNUTLS_BYE_RW=0, GNUTLS_BYE_W=1, GNUTLS_BYE_R=2 } CloseRequest;
 
 typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
@@ -71,7 +72,7 @@ typedef struct gnutls_private_key gnutls_private_key;
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE state);
-int gnutls_bye(SOCKET cd, GNUTLS_STATE state, int wait);
+int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how);
 
 int gnutls_handshake(SOCKET cd, GNUTLS_STATE state);
 int gnutls_check_pending(GNUTLS_STATE state);

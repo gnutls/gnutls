@@ -354,29 +354,32 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
   * gnutls_bye - This function terminates the current TLS/SSL connection.
   * @cd: is a connection descriptor.
   * @state: is a &GNUTLS_STATE structure.
-  * @wait: is an integer
+  * @how: is an integer
   *
-  * Terminates the current TLS/SSL connection. If the return value is 0
-  * you may continue using the TCP connection. The connection should
+  * Terminates the current TLS/SSL connection. The connection should
   * have been initiated using gnutls_handshake() or similar function.
-  * If 'wait' is non-zero then we will not wait for the other peer to 
-  * close the TLS connection.
+  * 'how' is one of GNUTLS_BYE_R, GNUTLS_BYE_RW, GNUTLS_BYE_W.
   *
-  * This function actually sends the peer a closure alert, and if 'wait'
-  * is zero, will wait for the peer to reply (with a closure alert too).
+  * Note that if the return value is zero and 'how' was GNUTLS_BYE_RW, you
+  * may continue using the TCP connection.
   *
   **/
-int gnutls_bye(SOCKET cd, GNUTLS_STATE state, int wait)
+int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 {
-	int ret;
+	int ret = 0;
 
-	ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
-	/* receive the closure alert */
-	if (wait==0) gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
+	if (how == GNUTLS_BYE_R || how == GNUTLS_BYE_RW) {
+		ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
-	state->gnutls_internals.valid_connection = VALID_FALSE;
-
+		state->gnutls_internals.may_read = 1;
+		gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
+	}
+	
+	if (how == GNUTLS_BYE_W || how == GNUTLS_BYE_RW) {
+		state->gnutls_internals.may_write = 1;
+	}
+	
 	return ret;
 }
 
@@ -398,7 +401,8 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 	if (sizeofdata == 0)
 		return 0;
-	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
+
+	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_write != 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
@@ -531,11 +535,22 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	uint16 length;
 	uint8 *ciphertext;
 	uint8 *recv_data;
-	int ret = 0;
-	int header_size = RECORD_HEADER_SIZE;
+	int ret;
+	int header_size;
 
+	begin:
+	
+	header_size = RECORD_HEADER_SIZE;
+	ret = 0;
 
+	if (sizeofdata == 0)
+		return 0;
 
+	if (state->gnutls_internals.valid_connection == VALID_FALSE || state->gnutls_internals.may_read!=0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_SESSION;
+	}
+	
 	/* If we have enough data in the cache do not bother receiving
 	 * a new packet. (in order to flush the cache)
 	 */
@@ -549,11 +564,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 		return ret;
 	}
-
-	if (state->gnutls_internals.valid_connection == VALID_FALSE || sizeofdata==0) {
-		return 0; /* EOF */
-	}
-
+	
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
 	 * must be set to non blocking mode
 	 */
@@ -561,7 +572,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		if (ret==GNUTLS_E_AGAIN) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
-		if (type==GNUTLS_ALERT) return 0; /* we were expecting close notify */
+		if (type==GNUTLS_ALERT) {
+			gnutls_assert();
+			return 0; /* we were expecting close notify */
+		}
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -762,21 +776,17 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 			return GNUTLS_E_UNEXPECTED_PACKET;
 		case GNUTLS_APPLICATION_DATA:
-#if 0			
 			/* even if data is unexpected put it into the buffer */
 			gnutls_insertDataBuffer(recv_type, state, (void *) tmpdata, tmplen);
-			/* no peeked data to clear since this packet was unexpected */
-#endif
-			/* We no longer assume this as normal, since
-			 * in this case we don't leave data into kernel
-			 * buffer, thus select() will not return.
-			 * Return an error for now, and we'll handle
-			 * it if there is a need for it.
-			 */
+
 			gnutls_assert();
 			gnutls_free(tmpdata);
-			return GNUTLS_E_UNEXPECTED_PACKET;
-
+			
+			goto begin; /* ok we received the packet, 
+			             * and now we should get the one
+			             * we expected.
+			             */
+			
 			break;
 		case GNUTLS_HANDSHAKE:
 			/* This is only legal if HELLO_REQUEST is received - and we are a client */

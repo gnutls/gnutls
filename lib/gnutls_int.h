@@ -92,6 +92,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			} AlertDescription;
 typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
 typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
+typedef enum CloseRequest { GNUTLS_BYE_RW=0, GNUTLS_BYE_W=1, GNUTLS_BYE_R=2 } CloseRequest;
 
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
@@ -306,6 +307,11 @@ typedef struct {
 	gnutls_datum			buffer_handshake; /* this is a buffer that holds the current handshake message */
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
 	ValidSession			valid_connection; /* true or FALSE - if this session is valid */
+
+	int				may_read; /* if it's 0 then we can read/write, otherwise it's forbiden to read/write
+	                                           */
+	int				may_write;
+
 	AlertDescription		last_alert; /* last alert received */
 	/* this is the compression method we are going to use */
 	CompressionMethod		compression_method;

@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -142,7 +142,7 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 /* This function is like read. But it does not return -1 on error.
  * It does return gnutls_errno instead.
  */
-ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
+static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 {
 	size_t left;
 	ssize_t i=0;
@@ -231,9 +231,9 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, void *iptr, size_t si
 	int recvlowat = RCVLOWAT;
 
 	/* leave peeked data to the kernel space only if application data
-	 * is received.
+	 * is received and we don't have any peeked data in there.
 	 */
-	if (recv_type != GNUTLS_APPLICATION_DATA)
+	if (recv_type != GNUTLS_APPLICATION_DATA && state->gnutls_internals.have_peeked_data==0)
 		recvlowat = 0;
 
 	/* copy peeked data to given buffer
@@ -268,7 +268,6 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, void *iptr, size_t si
 		gnutls_assert();
 		return GNUTLS_E_AGAIN;
 	}
-
 	
 	/* copy fresh data to our buffer.
 	 */
