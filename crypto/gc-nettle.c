@@ -304,6 +304,14 @@ gc_cipher_close (gc_cipher handle)
 #include "md5.h"
 #include "sha.h"
 
+#if MD5_DIGEST_SIZE != GC_MD5_LEN
+# error MD5 length mismatch
+#endif
+
+#if SHA1_DIGEST_SIZE != GC_SHA1_LEN
+# error SHA1 length mismatch
+#endif
+
 #define MAX_DIGEST_SIZE 20
 
 typedef struct hash_info
