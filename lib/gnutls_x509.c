@@ -974,7 +974,6 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 
 		if (siz2 < 0) {
 			gnutls_assert();
-			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
@@ -1047,7 +1046,6 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 
 		if (siz2 < 0) {
 			gnutls_assert();
-			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
@@ -1121,7 +1119,6 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 
 	if (siz < 0) {
 		gnutls_assert();
-		gnutls_free(b64);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
@@ -1806,3 +1803,100 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 	}
 	return 0;
 }
+
+
+#ifdef DEBUG
+/* Reads a base64 encoded CA list from memory 
+ * This is to be called once.
+ */
+int _gnutls_verify_x509_mem( const char *ca, int ca_size)
+{
+	int siz, siz2, i;
+	opaque *b64;
+	const char *ptr;
+	int ret;
+	gnutls_datum tmp;
+	gnutls_cert* x509_ca_list=NULL;
+	int x509_ncas;
+
+	siz = ca_size;
+
+	ptr = ca;
+
+	i = 1;
+
+	do {
+		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
+		siz -= siz2;	/* FIXME: this is not enough
+				 */
+
+		if (siz2 < 0) {
+			gnutls_assert();
+			return GNUTLS_E_PARSING_ERROR;
+		}
+
+		x509_ca_list =
+		    (gnutls_cert *) gnutls_realloc( x509_ca_list,
+						   i *
+						   sizeof(gnutls_cert));
+		if (x509_ca_list == NULL) {
+			gnutls_assert();
+			gnutls_free(b64);
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		memset(&x509_ca_list[i - 1], 0, sizeof(gnutls_cert));
+
+		tmp.data = b64;
+		tmp.size = siz2;
+
+		if ((ret =
+		     _gnutls_x509_cert2gnutls_cert(&x509_ca_list[i - 1],
+					     tmp)) < 0) {
+			gnutls_assert();
+			gnutls_free(b64);
+			return ret;
+		}
+		gnutls_free(b64);
+
+		/* now we move ptr after the pem header */
+		ptr = strstr(ptr, CERT_SEP);
+		if (ptr!=NULL)
+			ptr++;
+
+		i++;
+	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
+
+	x509_ncas = i - 1;
+
+	siz = _gnutls_x509_verify_certificate( x509_ca_list, x509_ncas-1,
+		&x509_ca_list[x509_ncas-1], 1, NULL, 0);
+
+	return siz;
+}
+
+
+
+/* Reads a base64 encoded CA file (file contains multiple certificate
+ * authorities). This is to be called once.
+ */
+int _gnutls_verify_x509_file( char *cafile)
+{
+	int siz;
+	char x[MAX_FILE_SIZE];
+	FILE *fd1;
+
+	fd1 = fopen(cafile, "r");
+	if (fd1 == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+
+	siz = fread(x, 1, sizeof(x), fd1);
+	fclose(fd1);
+
+	x[siz-1] = 0;
+
+	return _gnutls_verify_x509_mem( x, siz);
+}
+
+#endif

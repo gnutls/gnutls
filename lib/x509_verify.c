@@ -141,6 +141,8 @@ time_t _gnutls_generalTime2gtime(char *ttime)
 	return ret;
 }
 
+/* Returns VALID or EXPIRED. 
+ */
 static int check_if_expired(gnutls_cert * cert)
 {
 	CertificateStatus ret = GNUTLS_CERT_EXPIRED;
@@ -149,7 +151,32 @@ static int check_if_expired(gnutls_cert * cert)
 	 */
 
 	if (time(NULL) < cert->expiration_time)
-		ret = GNUTLS_CERT_TRUSTED;
+		ret = GNUTLS_CERT_VALID;
+
+	return ret;
+}
+
+/* Return GNUTLS_CERT_VALID or INVALID, if the issuer is a CA,
+ * or not.
+ */
+static int check_if_ca(const gnutls_cert * cert, const gnutls_cert* issuer)
+{
+	CertificateStatus ret = GNUTLS_CERT_INVALID;
+	
+	/* Check if the issuer is the same with the
+	 * certificate. This is added in order for trusted
+	 * certificates to be able to verify themselves.
+	 */
+	if (cert->raw.size == issuer->raw.size) {
+		if ( memcmp( cert->raw.data, issuer->raw.data, cert->raw.size)==0) {
+			return GNUTLS_CERT_VALID;
+		}
+	}
+
+	if (issuer->CA==1) {
+		ret = GNUTLS_CERT_VALID;
+	} else
+		gnutls_assert();
 
 	return ret;
 }
@@ -289,32 +316,38 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 		gnutls_assert();
 		return GNUTLS_CERT_INVALID;
 	}
+
+	ret = check_if_ca( cert, issuer);
+	if (ret != GNUTLS_CERT_VALID) {
+		gnutls_assert();
+		return ret;
+	}
 	
         ret = gnutls_x509_verify_signature(cert, issuer);
         if (ret != GNUTLS_CERT_TRUSTED)
               return ret;
 
-	/* Check CRL --not done yet.
+	/* FIXME: Check CRL --not done yet.
 	 */
 
 	ret = check_if_expired( cert);
-
-	if (ret == GNUTLS_CERT_EXPIRED)
+	if (ret != GNUTLS_CERT_VALID) {
+		gnutls_assert();
 		return ret;
+	}
 
 	return GNUTLS_CERT_TRUSTED;
 }
 
 /* The algorithm used is:
  * 1. Check the certificate chain given by the peer, if it is ok.
- * 2. If any certificate in the chain are expired, revoked or not
- *    valid, then the certificate is not trusted.
+ * 2. If any certificate in the chain are expired, revoked, not
+ *    valid, or they are not CAs then the certificate is invalid.
  * 3. If 1 is ok, then find a certificate in the trusted CAs file
  *    that has the DN of the issuer field in the last certificate
  *    in the peer's certificate chain.
  * 4. If it does exist then verify it. If verification is ok then
- *    it is trusted.
- * 5. In all other cases the certificate is not trusted.
+ *    it is trusted. Otherwise it is just valid (but not trusted).
  */
 /* This function verifies a X.509 certificate list. The certificate list should
  * lead to a trusted CA in order to be trusted.
@@ -338,7 +371,7 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 
 		if ((ret = gnutls_verify_certificate2(&certificate_list[i], &certificate_list[i + 1], 1, NULL, 0)) != GNUTLS_CERT_TRUSTED) {
 			 /*
-			 * We only accept the given certificate to be
+			 * We only accept the first certificate to be
 			 * expired. If any of the certificates in the
 			 * certificate chain is expired then the certificate
 			 * is not valid.
@@ -367,7 +400,7 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 			return ret;
 
 		/* Since the certificate chain is ok,
-		 * the certificate is valid.
+		 * the certificate is valid (but not trusted).
 		 */
 		if (ret != GNUTLS_CERT_TRUSTED)
 			return GNUTLS_CERT_VALID;
