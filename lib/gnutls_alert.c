@@ -159,6 +159,7 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
                         ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
+		case GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM:
                         ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_HANDSHAKE_FAILURE);
                         break;
 		case GNUTLS_E_UNEXPECTED_PACKET:
@@ -175,6 +176,9 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 			break;
 		case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
 			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
+			break;
+		case GNUTLS_E_INTERNAL_ERROR:
+			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_INTERNAL_ERROR);
 			break;
 	}
 	return ret;

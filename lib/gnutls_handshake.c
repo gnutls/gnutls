@@ -640,8 +640,10 @@ int _gnutls_server_select_comp_method(gnutls_session session, opaque * data,
 	for (j = 0; j < datalen; j++) {
 		for (i = 0; i < x; i++) {
 			if (ciphers[i] == data[j]) {
-				session->internals.compression_method =
+			        gnutls_compression_method method = 
 				    _gnutls_compression_get_id(ciphers[i]);
+
+				session->internals.compression_method = method;
 				gnutls_free(ciphers);
 
 				_gnutls_handshake_log("HSK: Selected Compression Method: %s\n",

@@ -21,6 +21,7 @@
 
 #include <gnutls_int.h>
 #include <gnutls_compress.h>
+#include <gnutls_algorithms.h>
 #include "gnutls_errors.h"
 
 /* The flag d is the direction (compressed, decompress). Non zero is
@@ -41,8 +42,16 @@ int err;
 	ret->handle = NULL;
 
 #ifdef HAVE_LIBZ
-	if (method==GNUTLS_COMP_ZLIB) {
+	switch( method) {
+	    case GNUTLS_COMP_ZLIB_DEFAULT:
+	    case GNUTLS_COMP_ZLIB_CONSTRAINED: {
+		int window_bits, mem_level;
+		int comp_level;
 		z_stream* zhandle;
+
+		window_bits = _gnutls_compression_get_wbits( method);
+		mem_level = _gnutls_compression_get_mem_level( method);
+		comp_level = _gnutls_compression_get_comp_level( method);
 
 		ret->handle = gnutls_malloc( sizeof( z_stream));
 		if (ret->handle==NULL) {
@@ -57,16 +66,21 @@ int err;
 		zhandle->opaque = (voidpf)0;
 
 		if (d)
-			err = inflateInit(zhandle);
-		else
-			err = deflateInit(zhandle, Z_DEFAULT_COMPRESSION);
+			err = inflateInit2(zhandle, window_bits);
+		else {
+			err = deflateInit2(zhandle, 
+				comp_level, Z_DEFLATED,
+				window_bits, mem_level, Z_DEFAULT_STRATEGY);
+		}
 		if (err!=Z_OK) {
 			gnutls_assert();
 			gnutls_free( ret);
 			gnutls_free( ret->handle);
 			return NULL;
 		}
-		
+		break;
+	    }
+	    default:
 	}
 #endif
 	return ret;
@@ -78,7 +92,8 @@ int err;
 	if (handle!=NULL) {
 		switch( handle->algo) {
 #ifdef HAVE_LIBZ
-			case GNUTLS_COMP_ZLIB:
+			case GNUTLS_COMP_ZLIB_CONSTRAINED:
+			case GNUTLS_COMP_ZLIB_DEFAULT:
 				if (d)
 					err = inflateEnd( handle->handle);
 				else
@@ -111,7 +126,8 @@ int err;
 	
 	switch( handle->algo) {
 #ifdef HAVE_LIBZ
-		case GNUTLS_COMP_ZLIB:
+		case GNUTLS_COMP_ZLIB_DEFAULT:
+		case GNUTLS_COMP_ZLIB_CONSTRAINED:
 			size = (plain_size*2)+10;
 			*compressed=NULL;
 
@@ -170,7 +186,8 @@ int cur_pos;
 	
 	switch(handle->algo) {
 #ifdef HAVE_LIBZ
-		case GNUTLS_COMP_ZLIB:
+		case GNUTLS_COMP_ZLIB_DEFAULT:
+		case GNUTLS_COMP_ZLIB_CONSTRAINED:
 			*plain = NULL;
 			out_size = compressed_size;;
 			plain_size = 0;

@@ -72,6 +72,10 @@ int _gnutls_compression_get_num(gnutls_compression_method algorithm);
 gnutls_compression_method _gnutls_compression_get_id(int num);
 const char *gnutls_compression_get_name(gnutls_compression_method algorithm);
 
+int _gnutls_compression_get_mem_level(gnutls_compression_method algorithm);
+int _gnutls_compression_get_comp_level(gnutls_compression_method algorithm);
+int _gnutls_compression_get_wbits(gnutls_compression_method algorithm);
+
 /* Type to KX mappings */
 gnutls_kx_algorithm _gnutls_map_kx_get_kx(gnutls_credentials_type type);
 gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm algorithm);

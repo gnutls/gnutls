@@ -132,20 +132,26 @@ static const gnutls_hash_entry hash_algorithms[] = {
 
 
 /* Compression Section */
-#define GNUTLS_COMPRESSION_ENTRY(name, id) \
-	{ #name, name, id }
+#define GNUTLS_COMPRESSION_ENTRY(name, id, wb, ml, cl) \
+	{ #name, name, id, wb, ml, cl}
 
 struct gnutls_compression_entry {
 	const char *name;
 	gnutls_compression_method id;
 	int num; /* the number reserved in TLS for the specific compression method */
+
+	/* used in zlib compressor */
+	int window_bits;
+	int mem_level;
+	int comp_level;
 };
 
 typedef struct gnutls_compression_entry gnutls_compression_entry;
 static const gnutls_compression_entry compression_algorithms[] = {
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_NULL, 0),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_NULL, 0x00, 0, 0, 0),
 #ifdef HAVE_LIBZ
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB, 0xfc),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB_DEFAULT, 0xf1, 15, 8, 3),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_COMP_ZLIB_CONSTRAINED, 0xf2, 12, 5, 3),
 #endif
 	{0}
 };
@@ -485,6 +491,30 @@ int _gnutls_compression_get_num(gnutls_compression_method algorithm)
 	/* avoid prefix */
 	GNUTLS_COMPRESSION_ALG_LOOP(ret = p->num);
 
+	return ret;
+}
+
+int _gnutls_compression_get_wbits(gnutls_compression_method algorithm)
+{
+	int ret = -1;
+	/* avoid prefix */
+	GNUTLS_COMPRESSION_ALG_LOOP(ret = p->window_bits);
+	return ret;
+}
+
+int _gnutls_compression_get_mem_level(gnutls_compression_method algorithm)
+{
+	int ret = -1;
+	/* avoid prefix */
+	GNUTLS_COMPRESSION_ALG_LOOP(ret = p->mem_level);
+	return ret;
+}
+
+int _gnutls_compression_get_comp_level(gnutls_compression_method algorithm)
+{
+	int ret = -1;
+	/* avoid prefix */
+	GNUTLS_COMPRESSION_ALG_LOOP(ret = p->comp_level);
 	return ret;
 }
 
@@ -1152,7 +1182,7 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 
 /* For compression  */
 
-#define MIN_PRIVATE_COMP_ALGO 0x0F
+#define MIN_PRIVATE_COMP_ALGO 0xEF
 
 /* returns the TLS numbers of the compression methods we support */
 #define SUPPORTED_COMPRESSION_METHODS session->internals.compression_method_priority.algorithms
