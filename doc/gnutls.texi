@@ -33,6 +33,8 @@ Free Documentation License".
 @title GNU TLS
 @subtitle Transport Layer Security Library for the GNU system
 @subtitle for version @value{VERSION}, @value{UPDATED}
+@sp 7
+@image{gnutls-logo,6cm,6cm}
 @author Nikos Mavroyanopoulos (@email{bug-gnutls@@gnu.org})
 @page
 @vskip 0pt plus 1filll
