@@ -1,3 +1,26 @@
+2002-11-12 13:29  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, ex-serv-pgp.tex, examples.tex:
+
+	added example with an openpgp server 
+
+2002-11-12 11:11  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_cert.c, auth_dh_common.c, auth_dhe.c,
+	auth_rsa.c, auth_rsa_export.c, gnutls_auth.c, gnutls_cert.c,
+	gnutls_handshake.c, gnutls_int.h, gnutls_kx.c,
+	gnutls_session_pack.c, gnutls_state.c, gnutls_ui.c,
+	gnutls_v2_compat.c, gnutls_x509.c:
+
+	The session->gnutls_key was renamed to session->key.  
+
+2002-11-12 10:59  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_int.h:
+
+	The gnutls_openpgp_recv_key_func() callback function now accepts a 
+	key fingerprint, instead of the key id.  
+
 2002-11-11 17:20  nmav <nmav@gnutls.org>
 
 	* src/: cli.c, serv.c, tests.c:
