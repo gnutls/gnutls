@@ -65,6 +65,12 @@ GNUTLS_STATE initialize_state()
    gnutls_certificate_server_set_request( state, GNUTLS_CERT_REQUEST);
 
    gnutls_dh_set_prime_bits( state, DH_BITS);
+
+   /* some broken clients may require this in order to connect. 
+    * This may weaken security though.
+    */
+   /* gnutls_handshake_set_rsa_pms_check( state, 1); */
+
    
    return state;
 }

@@ -447,9 +447,9 @@ void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot)
   * 20 or more bytes per record packet.
   *
   **/
-void gnutls_handshake_set_rsa_pms_check(GNUTLS_STATE state, int prot)
+void gnutls_handshake_set_rsa_pms_check(GNUTLS_STATE state, int check)
 {
-	state->gnutls_internals.rsa_pms_check = prot;
+	state->gnutls_internals.rsa_pms_check = check;
 }
 
 inline
