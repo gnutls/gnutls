@@ -32,7 +32,6 @@ int gnutls_anon_client_get_dh_bits(GNUTLS_STATE state)
 }
 
 /* used in 0.3.x */
-int gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state);
-{
+int gnutls_set_max_handshake_data_buffer_size( GNUTLS_STATE state) {
 	return 0;
 }

@@ -78,6 +78,22 @@ const char *_gnutls_extension_get_name(int type)
 	return ret;
 }
 
+/* Checks if the extension we just received is one of the 
+ * requested ones. Otherwise it's a fatal error.
+ */
+static int _gnutls_extension_list_check( GNUTLS_STATE state, uint8 type) {
+int i;
+	if (state->security_parameters.entity==GNUTLS_CLIENT) {
+		for(i=0;i<state->gnutls_internals.extensions_sent_size;i++) {
+			if (type==state->gnutls_internals.extensions_sent[i])
+				return 0; /* ok found */
+		}
+		return GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION;
+	}
+
+	return 0;
+}
+
 int _gnutls_parse_extensions( GNUTLS_STATE state, const opaque* data, int data_size) {
 int next, ret;
 int pos=0;
@@ -85,6 +101,15 @@ uint8 type;
 const opaque* sdata;
 int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
 uint16 size;
+
+#ifdef DEBUG
+int i;
+
+	if (state->security_parameters.entity==GNUTLS_CLIENT)
+		for (i=0;i<state->gnutls_internals.extensions_sent_size;i++) {
+			_gnutls_log("EXT: expecting extension %d\n", state->gnutls_internals.extensions_sent[i]);
+		}
+#endif
 
 	DECR_LENGTH_RET( data_size, 2, 0);
 	next = READuint16( data);
@@ -95,6 +120,11 @@ uint16 size;
 	do {
 		DECR_LENGTH_RET( next, 1, 0);
 		type = data[pos++];
+		
+		if ( (ret=_gnutls_extension_list_check( state, type)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
 
 		DECR_LENGTH_RET( next, 2, 0);
 		size = READuint16(&data[pos]);
@@ -117,6 +147,29 @@ uint16 size;
 
 }
 
+/* Adds the extension we want to send in the extensions list.
+ * This list is used to check whether the (later) received
+ * extensions are the ones we requested.
+ */
+static void _gnutls_extension_list_add( GNUTLS_STATE state, uint8 type) {
+
+	if (state->security_parameters.entity==GNUTLS_CLIENT) {
+		if (state->gnutls_internals.extensions_sent_size <
+			sizeof(state->gnutls_internals.extensions_sent)) {
+	
+			state->gnutls_internals.extensions_sent[state->gnutls_internals.extensions_sent_size] = type;
+			state->gnutls_internals.extensions_sent_size++;
+		} else {
+#ifdef DEBUG
+			_gnutls_log("EXT: Increase MAX_EXT_TYPES\n");
+			exit(1);
+#endif
+		}
+	}
+
+	return;
+}
+
 int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data) {
 int next, size;
 uint16 pos=0;
@@ -127,14 +180,25 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 	(*data) = gnutls_malloc(2); /* allocate size for size */
 	pos+=2;
 	
+	if ((*data)==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 	next = MAX_EXT; /* maximum supported extensions */
 	do {
 		next--;
 		ext_func_send = _gnutls_ext_func_send(next);
 		if (ext_func_send == NULL) continue;
 		size = ext_func_send( state, &sdata);
+
 		if (size > 0) {
 			(*data) = gnutls_realloc( (*data), pos+size+3);
+			if ((*data)==NULL) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+
 			(*data)[pos++] = (uint8) next; /* set type */
 
 			WRITEuint16( size, &(*data)[pos]);
@@ -143,6 +207,10 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 			memcpy( &(*data)[pos], sdata, size);
 			pos+=size;
 			gnutls_free(sdata);
+			
+			/* add this extension to the extension list
+			 */
+			_gnutls_extension_list_add( state, next);
 		}
 		
 	} while(next >= 0);

@@ -62,7 +62,7 @@ typedef const int* GNUTLS_LIST;
 #define MAX_LOG_SIZE 1024 /* maximum number of log message */
 #define MAX_SRP_USERNAME 256
 
-#define MAX_DNSNAME_SIZE 256
+#define MAX_EXT_TYPES 16
 
 /* The initial size of the receive
  * buffer size. This will grow if larger
@@ -536,6 +536,12 @@ typedef struct {
 	/* holds the index of the selected certificate.
 	 */
 	int			selected_cert_index; 
+	
+	/* holds the extensions we sent to the peer
+	 * (in case of a client)
+	 */
+	uint8			extensions_sent[MAX_EXT_TYPES];
+	uint8			extensions_sent_size;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

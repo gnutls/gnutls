@@ -8,7 +8,8 @@ Version ?.?.?
 - gnutls_x509pki_set_trust_(file/mem) can now be called multiple times
 - Added a minimal string library to assist in ASN.1 parsing
 - Handshake messages are not kept in memory any more. Now we use less memory
-  during a handshake.
+  during a handshake
+- Added check for the requested TLS extensions
 
 Version 0.3.5 (25/01/2002)
 - Corrected the RSA key exchange method, to avoid attacks against
