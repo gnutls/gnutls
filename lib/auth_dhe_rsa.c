@@ -102,7 +102,14 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 		info = state->gnutls_key->auth_info;
 		info->dh_bits = gcry_mpi_get_nbits(p);
 		info->peer_certificate_status = GNUTLS_CERT_NONE;
-	}
+		state->gnutls_key->auth_info_type = GNUTLS_X509PKI;
+
+	} else
+		if (gnutls_get_auth_type( state) != state->gnutls_key->auth_info_type) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+
 	info = state->gnutls_key->auth_info;
 	
 	X = gnutls_calc_dh_secret(&x, g, p);

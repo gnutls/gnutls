@@ -17,7 +17,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
 	ext_dnsname.h gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
-	gnutls-api.tex io_debug.h ext_max_record.h
+	gnutls-api.tex io_debug.h ext_max_record.h gnutls_session_pack.h
 
 lib_LTLIBRARIES = libgnutls.la
 
@@ -30,7 +30,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 	auth_anon.c auth_dhe_dss.c gnutls_extensions.c ext_srp.c gnutls_auth.c \
 	crypt_bcrypt.c crypt.c gnutls_random.c crypt_srpsha1.c gnutls_srp.c \
 	auth_srp.c auth_srp_passwd.c gnutls_v2_compat.c auth_srp_sb64.c \
-	 gnutls_datum.c auth_rsa.c \
+	gnutls_datum.c auth_rsa.c gnutls_session_pack.c \
 	gnutls_gcry.c ext_dnsname.c gnutls_pk.c gnutls_cert.c x509_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
 	x509_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c gnutls_mem.c \

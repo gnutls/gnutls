@@ -675,7 +675,7 @@ const char *gnutls_kx_get_name(KXAlgorithm algorithm)
 	char *ret = NULL;
 
 	/* avoid prefix */
-	GNUTLS_KX_ALG_LOOP(ret = p->name + sizeof("GNUTLS_") - 1);
+	GNUTLS_KX_ALG_LOOP(ret = p->name + sizeof("GNUTLS_KX_") - 1);
 
 	return ret;
 }

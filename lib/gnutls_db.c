@@ -26,6 +26,7 @@
 #include "gnutls_session.h"
 #include <gnutls_db.h>
 #include "debug.h"
+#include <gnutls_session_pack.h>
 
 #define GNUTLS_DBNAME state->gnutls_internals.db_name
 
@@ -242,13 +243,13 @@ gnutls_datum _key;
 }
 
 /* The format of storing data is:
- * SECURITY_PARAMETERS + AUTH_INFO_SIZE + AUTH_INFO
+ * (forget it). Check gnutls_session_pack.c
  */
 int _gnutls_server_register_current_session( GNUTLS_STATE state)
 {
 gnutls_datum key = { state->security_parameters.session_id, state->security_parameters.session_id_size };
 gnutls_datum content;
-int ret = 0, pos;
+int ret = 0;
 
 	if (state->gnutls_internals.resumable==RESUME_FALSE) 
 		return GNUTLS_E_INVALID_SESSION;
@@ -257,20 +258,17 @@ int ret = 0, pos;
 		return GNUTLS_E_INVALID_SESSION;
 
 /* allocate space for data */
-	content.size = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size
-		+ sizeof(state->gnutls_key->auth_info_size);
+	content.size = _gnutls_session_size( state);
 	content.data = gnutls_malloc( content.size);
 	if (content.data==NULL) return GNUTLS_E_MEMORY_ERROR;
 
 /* copy data */
-	pos = 0;
-	memcpy( &content.data[0], (void*)&state->security_parameters, sizeof(SecurityParameters));
-	pos+=sizeof(SecurityParameters);
-
-	memcpy( &content.data[pos], &state->gnutls_key->auth_info_size,  sizeof(state->gnutls_key->auth_info_size));
-	pos+=sizeof(state->gnutls_key->auth_info_size);
-
-	memcpy( &content.data[pos], state->gnutls_key->auth_info, state->gnutls_key->auth_info_size);
+	ret = _gnutls_session_pack( state, &content);
+	if (ret < 0) {
+		gnutls_free( content.data);
+		gnutls_assert();
+		return ret;
+	}
 
 	ret = _gnutls_store_session( state, key, content);
 

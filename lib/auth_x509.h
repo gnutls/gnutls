@@ -46,13 +46,18 @@ typedef struct X509PKI_AUTH_INFO_INT {
 	time_t		  peer_certificate_expiration_time;
 	char		  subjectAltDNSName[X509_CN_SIZE];
 	unsigned char	  keyUsage;
-	int		  certificate_requested;
+	int		  certificate_requested; /* if the peer requested certificate
+						  * this is non zero;
+						  */
 	int		  dh_bits; /* bits of the DH (if DHE_RSA is used) */
+	gnutls_datum	  raw_certificate; /* holds the raw certificate of the
+					    * peer.
+					    */
 } *X509PKI_AUTH_INFO;
 
 typedef struct X509PKI_AUTH_INFO_INT X509PKI_AUTH_INFO_INT;
 
-void _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
+int _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
 
 /* AUTH X509 functions */
 int _gnutls_gen_x509_server_certificate(GNUTLS_STATE, opaque **);

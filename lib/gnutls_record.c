@@ -157,7 +157,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 	}
 
 	/* remove auth info firstly */
-	_gnutls_free(state->gnutls_key->auth_info);
+	_gnutls_free_auth_info(state );
 
 #ifdef HAVE_LIBGDBM
 	/* close the database - resuming sessions */
@@ -190,21 +190,24 @@ int gnutls_deinit(GNUTLS_STATE state)
 	gnutls_sfree_datum( &state->cipher_specs.server_write_key);
 	gnutls_sfree_datum( &state->cipher_specs.client_write_key);
 
-	_gnutls_mpi_release(&state->gnutls_key->KEY);
-	_gnutls_mpi_release(&state->gnutls_key->client_Y);
-	_gnutls_mpi_release(&state->gnutls_key->client_p);
-	_gnutls_mpi_release(&state->gnutls_key->client_g);
+	if (state->gnutls_key != NULL) {
+		_gnutls_mpi_release(&state->gnutls_key->KEY);
+		_gnutls_mpi_release(&state->gnutls_key->client_Y);
+		_gnutls_mpi_release(&state->gnutls_key->client_p);
+		_gnutls_mpi_release(&state->gnutls_key->client_g);
 
-	_gnutls_mpi_release(&state->gnutls_key->u);
-	_gnutls_mpi_release(&state->gnutls_key->a);
-	_gnutls_mpi_release(&state->gnutls_key->x);
-	_gnutls_mpi_release(&state->gnutls_key->A);
-	_gnutls_mpi_release(&state->gnutls_key->B);
-	_gnutls_mpi_release(&state->gnutls_key->b);
+		_gnutls_mpi_release(&state->gnutls_key->u);
+		_gnutls_mpi_release(&state->gnutls_key->a);
+		_gnutls_mpi_release(&state->gnutls_key->x);
+		_gnutls_mpi_release(&state->gnutls_key->A);
+		_gnutls_mpi_release(&state->gnutls_key->B);
+		_gnutls_mpi_release(&state->gnutls_key->b);
 
-	_gnutls_mpi_release(&state->gnutls_key->dh_secret);
-	_gnutls_free(state->gnutls_key);
+		_gnutls_mpi_release(&state->gnutls_key->dh_secret);
+		_gnutls_free(state->gnutls_key);
 
+		state->gnutls_key = NULL;
+	}
 
 	/* free priorities */
 	_gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
@@ -246,7 +249,7 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 	int i = 0, times, how, blocksize, A_size;
 	opaque final[20], Atmp[MAX_SEED_SIZE];
 
-	if (seed_size > MAX_SEED_SIZE) {
+	if (seed_size > MAX_SEED_SIZE || total_bytes<=0) {
 		gnutls_assert();
 		return NULL;
 	}

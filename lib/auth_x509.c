@@ -40,9 +40,11 @@
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (X509PKI_AUTH_INFO)
  */
-void _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify) {
+int _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify) {
  /* Copy peer's information to AUTH_INFO
   */
+int ret;
+
   	memcpy( &info->peer_dn, &cert->cert_info, sizeof(gnutls_DN));
   	memcpy( &info->issuer_dn, &cert->issuer_info, sizeof(gnutls_DN));
   	
@@ -59,7 +61,15 @@ void _gnutls_copy_x509_client_auth_info( X509PKI_AUTH_INFO info, gnutls_cert* ce
 	info->peer_certificate_expiration_time = cert->expiration_time;
 	info->peer_certificate_activation_time = cert->activation_time;
 
-	return;
+	if (cert->raw.size > 0) {
+		ret = gnutls_set_datum( &info->raw_certificate, cert->raw.data, cert->raw.size);
+		if ( ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+	}
+	
+	return 0;
 }
 
 typedef struct {
@@ -536,6 +546,8 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
+	
+	
 	if (state->gnutls_key->auth_info == NULL) {
 		state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
 		if (state->gnutls_key->auth_info == NULL) {
@@ -546,7 +558,14 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 
 		info = state->gnutls_key->auth_info;
 		info->peer_certificate_status = GNUTLS_CERT_NONE;
-	}
+
+		state->gnutls_key->auth_info_type = GNUTLS_X509PKI;
+	} else
+		if (gnutls_get_auth_type( state) != state->gnutls_key->auth_info_type) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+
 	info = state->gnutls_key->auth_info;
 
 	DECR_LEN(dsize, 3);
@@ -647,7 +666,10 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data, int 
 	/* keep the PK algorithm */
 	state->gnutls_internals.peer_pk_algorithm = peer_certificate_list[0].subject_pk_algorithm;
 
-	_gnutls_copy_x509_client_auth_info(info, &peer_certificate_list[0], verify);
+	if ( (ret = _gnutls_copy_x509_client_auth_info(info, &peer_certificate_list[0], verify)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	if ( (ret=_gnutls_check_x509_key_usage( &peer_certificate_list[0], gnutls_get_current_kx( state))) < 0) {
 		gnutls_assert();

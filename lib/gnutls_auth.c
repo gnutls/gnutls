@@ -23,6 +23,7 @@
 #include "gnutls_auth.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_algorithms.h"
+#include "auth_x509.h"
 
 #include "auth_anon.h"
 /* The functions here are used in order for authentication algorithms
@@ -135,8 +136,10 @@ int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
   **/
 
 CredType gnutls_get_auth_type( GNUTLS_STATE state) {
+
 	return _gnutls_map_kx_get_cred(
-		state->security_parameters.kx_algorithm);
+		 _gnutls_cipher_suite_get_kx_algo
+                         (state->security_parameters.current_cipher_suite));
 }
 
 /* 
@@ -180,5 +183,45 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
   -*/
 void* _gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;
+}
+
+/*-
+  * _gnutls_free_auth_info - Frees the auth info structure
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * this function frees the auth info structure and sets it to
+  * null. It must be called since some structures contain malloced
+  * elements.
+  -*/
+void _gnutls_free_auth_info( GNUTLS_STATE state) {
+	if (state==NULL || state->gnutls_key==NULL) {
+		gnutls_assert();
+		return;
+	}
+	
+	switch ( state->gnutls_key->auth_info_type) {
+	case GNUTLS_SRP:
+	case GNUTLS_ANON:
+		
+		break;
+	case GNUTLS_X509PKI: {
+		X509PKI_AUTH_INFO info =
+		            _gnutls_get_auth_info(state);
+
+		if (info==NULL) break;
+		gnutls_free( info->raw_certificate.data);
+
+		}
+		break;
+	default:
+		return;
+
+	}
+
+	gnutls_free( state->gnutls_key->auth_info);
+	state->gnutls_key->auth_info = NULL;
+	state->gnutls_key->auth_info_size = 0;
+	state->gnutls_key->auth_info_type = 0;
+
 }
 

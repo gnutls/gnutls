@@ -70,6 +70,7 @@ MOD_AUTH_STRUCT rsa_auth_struct =
 #define RANDOMIZE_KEY(x, galloc) x.size=TLS_MASTER_SIZE; x.data=galloc(x.size); \
 		if (x.data==NULL) return GNUTLS_E_MEMORY_ERROR; \
 		if (_gnutls_get_random( x.data, x.size, GNUTLS_WEAK_RANDOM) < 0) { \
+			gnutls_assert(); \
 			return GNUTLS_E_MEMORY_ERROR; \
 		}
 

@@ -145,11 +145,30 @@ X509PKI_AUTH_INFO info;
 CertificateStatus gnutls_x509pki_get_peer_certificate_status(  GNUTLS_STATE state) {
 X509PKI_AUTH_INFO info;
 
-	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
+	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_CERT_NONE);
 
 	info = _gnutls_get_auth_info(state);	
 	if (info==NULL) return GNUTLS_CERT_NONE;
 	return info->peer_certificate_status;
+}
+
+/**
+  * gnutls_x509pki_get_peer_certificate - This function returns the peer's raw (DER encoded) certificate
+  * @state: is a gnutls state
+  *
+  * This function will return the peer's raw certificate as sent by the peer.
+  * This certificate is DER encoded.
+  * Returns NULL in case of an error, or if no certificate was sent.
+  *
+  **/
+const gnutls_datum * gnutls_x509pki_get_peer_certificate(  GNUTLS_STATE state) {
+X509PKI_AUTH_INFO info;
+
+	CHECK_AUTH(GNUTLS_X509PKI, NULL);
+
+	info = _gnutls_get_auth_info(state);	
+	if (info==NULL) return NULL;
+	return &info->raw_certificate;
 }
 
 /**

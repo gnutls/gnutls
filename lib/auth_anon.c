@@ -87,11 +87,18 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_SERVER_AUTH_INFO));
-	if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
+	if ( state->gnutls_key->auth_info == NULL) {
+		state->gnutls_key->auth_info = gnutls_malloc(sizeof(ANON_SERVER_AUTH_INFO));
+		if (state->gnutls_key->auth_info==NULL) return GNUTLS_E_MEMORY_ERROR;
+		state->gnutls_key->auth_info_type = GNUTLS_ANON;
+		state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO_INT);
+	} else 
+		if (gnutls_get_auth_type( state) != state->gnutls_key->auth_info_type) {
+	        	gnutls_assert();
+	                return GNUTLS_E_INVALID_REQUEST;
+		}	                         	 			 			
 
 	((ANON_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->dh_bits = gcry_mpi_get_nbits(p);
-	state->gnutls_key->auth_info_size = sizeof(ANON_SERVER_AUTH_INFO_INT);
 
 	X = gnutls_calc_dh_secret(&x, g, p);
 	if (X==NULL || x==NULL) {

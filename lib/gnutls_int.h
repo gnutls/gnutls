@@ -31,9 +31,9 @@
 #define WRITE_DEBUG
 #define READ_DEBUG
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
-#define RECORD_DEBUG
+#define RECORD_DEBUG*/
 #define DEBUG
-*/
+
 
 /* It might be a good idea to replace int with void*
  * here.
@@ -201,10 +201,12 @@ struct GNUTLS_KEY_INT {
 	
 	/* this is used to hold the peers authentication data 
 	 */
-	/* AUTH_INFO structures MUST NOT contain malloced 
-	 * elements.
+	/* AUTH_INFO structures MAY contain malloced 
+	 * elements. Check gnutls_session_pack.c, and gnutls_auth.c.
+	 * Rememember that this should be calloced!
 	 */
 	void*				auth_info;
+	CredType			auth_info_type;
 	int				auth_info_size; /* needed in order to store to db for restoring 
 							 */
 	uint8				crypt_algo;
@@ -494,6 +496,7 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int total_bytes);
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
+void _gnutls_free_auth_info( GNUTLS_STATE state);
 
 /* These two macros return the advertized TLS version of
  * the peer.
