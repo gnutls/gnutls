@@ -1,6 +1,10 @@
 /* Taken from minip12
  */
 
+#include <gnutls_int.h>
+
+#ifdef ENABLE_PKI
+
 #include <gcrypt.h>
 #include <gnutls_errors.h>
 
@@ -90,3 +94,5 @@ _pkcs12_string_to_key (int id, const char *salt, int salt_size, int iter, const 
         }
     }
 }
+
+#endif /* ENABLE_PKI */

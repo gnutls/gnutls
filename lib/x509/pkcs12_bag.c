@@ -64,34 +64,59 @@ int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag)
   **/
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag)
 {
+int i;
+
+	for (i=0;i<bag->bag_elements;i++)
+		_gnutls_free_datum( &bag->data[i]);
+
 	gnutls_free(bag);
 }
 
 /**
   * gnutls_pkcs12_bag_get_type - This function returns the bag's type
   * @bag: The bag
+  * @indx: The element of the bag to get the type
   *
   * This function will return the bag's type. One of the gnutls_pkcs12_bag_type
   * enumerations.
   *
   **/
-gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag)
+gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag, int indx)
 {
-	return bag->type;
+	if (indx >= bag->bag_elements) 
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	return bag->type[indx];
+}
+
+/**
+  * gnutls_pkcs12_bag_get_count - This function returns the bag's elements count
+  * @bag: The bag
+  *
+  * This function will return the number of the elements withing the bag. 
+  *
+  **/
+int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag)
+{
+	return bag->bag_elements;
 }
 
 /**
   * gnutls_pkcs12_bag_get_data - This function returns the bag's data
   * @bag: The bag
+  * @indx: The element of the bag to get the data from
   * @data: where the data will be copied to. Should be treated as constant.
   *
   * This function will return the bag's data. 
   *
   **/
-int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, gnutls_datum* data)
+int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum* data)
 {
-	data->data = bag->data.data;
-	data->size = bag->data.size;
+	if (indx >= bag->bag_elements) 
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+	data->data = bag->data[indx].data;
+	data->size = bag->data[indx].size;
+
 	return 0;
 }
 
@@ -107,10 +132,14 @@ int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass)
 {
 int ret;
 gnutls_datum dec;
-ASN1_TYPE sc = ASN1_TYPE_EMPTY;
+	
+	if (bag->type[0] != GNUTLS_BAG_ENCRYPTED) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 	
 	ret = _gnutls_x509_decrypt_pkcs7_encrypted_data( 
-		&bag->data, pass, &dec);
+		&bag->data[0], pass, &dec);
 
         if (ret < 0) {
 		gnutls_assert();
@@ -121,7 +150,7 @@ ASN1_TYPE sc = ASN1_TYPE_EMPTY;
          * stuff, and parse it.
          */
 
-        _gnutls_free_datum( &bag->data);
+        _gnutls_free_datum( &bag->data[0]);
 
 	ret = _pkcs12_decode_safe_contents( &dec, bag);
 

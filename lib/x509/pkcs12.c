@@ -30,6 +30,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
+#include <gnutls_num.h>
 #include <common.h>
 #include <x509_b64.h>
 #include <pkcs12.h>
@@ -250,15 +251,17 @@ static int _oid2bag( const char* oid)
 }
 
 /* Decodes the SafeContents, and puts the output in
- * the given bag.
+ * the given bag. FIXME: 
  */
 int
 _pkcs12_decode_safe_contents( const gnutls_datum* content, gnutls_pkcs12_bag bag)
 {
-char oid[128];
+char oid[128], root[128];
 ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 int len, result;
 int bag_type;
+int count = 0, i;
+char counter[MAX_INT_DIGITS];
 
 	/* Step 1. Extract the SEQUENCE.
 	 */
@@ -277,34 +280,61 @@ int bag_type;
 		goto cleanup;	
 	}
 
-	len = sizeof(oid);
-	result = asn1_read_value(c2, "?1.bagId", oid, &len);
+	/* Count the number of bags
+	 */
+	result = asn1_number_of_elements( c2, "", &count);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
-		goto cleanup;
+		goto cleanup;	
 	}
 
-	/* Read the Bag type
-	 */
-	bag_type = _oid2bag( oid);
+	bag->bag_elements = GMIN(MAX_BAG_ELEMENTS, count);
+
+	for (i=0;i<bag->bag_elements;i++) {
+
+		_gnutls_str_cpy( root, sizeof(root), "?"); 
+		_gnutls_int2str( i+1, counter);
+		_gnutls_str_cat( root, sizeof(root), counter); 
+		_gnutls_str_cat( root, sizeof(root), ".bagId"); 
+
+		len = sizeof(oid);
+		result = asn1_read_value(c2, root, oid, &len);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		/* Read the Bag type
+		 */
+		bag_type = _oid2bag( oid);
 	
-	if (bag_type < 0) {
-		gnutls_assert();
-		goto cleanup;
-	}
+		if (bag_type < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 
-	/* Read the Bag Value
-	 */
-	result = _gnutls_x509_read_value( c2, "?1.bagValue", &bag->data, 0);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
+		/* Read the Bag Value
+		 */
+
+		_gnutls_str_cpy( root, sizeof(root), "?"); 
+		_gnutls_int2str( i+1, counter);
+		_gnutls_str_cat( root, sizeof(root), counter); 
+		_gnutls_str_cat( root, sizeof(root), ".bagValue"); 
+
+		result = _gnutls_x509_read_value( c2, root, &bag->data[i], 0);
+		if (result < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+
+		bag->type[i] = bag_type;
+		
 	}
 
 	asn1_delete_structure(&c2);
 
-	bag->type = bag_type;
 
 	return 0;
 
@@ -416,9 +446,10 @@ int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12,
 	
 	/* ENC_DATA_OID needs decryption */
 
-	bag->type = GNUTLS_BAG_ENCRYPTED;
+	bag->type[0] = GNUTLS_BAG_ENCRYPTED;
+	bag->bag_elements = 1;
 
-	result = _gnutls_x509_read_value( c2, root2, &bag->data, 0);
+	result = _gnutls_x509_read_value( c2, root2, &bag->data[0], 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

@@ -280,6 +280,7 @@ int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format, const char* password, unsigned int flags);
 int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12, 
 	int indx, gnutls_pkcs12_bag bag);
+int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag bag, const char* pass);
 
 typedef enum gnutls_pkcs12_bag_type {
 	GNUTLS_BAG_EMPTY = 0,
@@ -291,11 +292,12 @@ typedef enum gnutls_pkcs12_bag_type {
 	GNUTLS_BAG_ENCRYPTED=10
 } gnutls_pkcs12_bag_type;
 
-gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag);
-int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, gnutls_datum* data);
+gnutls_pkcs12_bag_type gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag bag, int indx);
+int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag bag, int indx, gnutls_datum* data);
 
 int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag);
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag);
+int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag);
 
 #ifdef __cplusplus
 }

@@ -13,9 +13,12 @@ typedef enum gnutls_pkcs12_bag_type {
 	GNUTLS_BAG_ENCRYPTED=10
 } gnutls_pkcs12_bag_type;
 
+#define MAX_BAG_ELEMENTS 32
+
 typedef struct gnutls_pkcs12_bag_int {
-	gnutls_datum data;
-	gnutls_pkcs12_bag_type type;
+	gnutls_datum data[MAX_BAG_ELEMENTS];
+	gnutls_pkcs12_bag_type type[MAX_BAG_ELEMENTS];
+	int bag_elements;
 } gnutls_pkcs12_bag_int;
 
 #define BAG_PKCS8_KEY "1.2.840.113549.1.12.10.1.1"
