@@ -39,6 +39,7 @@ libnettle_la_SOURCES = aes.c aes.h aes-internal.h \
 		      hmac.c hmac.h hmac-md5.c hmac-sha1.c \
 		      knuth-lfib.h knuth-lfib.c \
 		      md5.c md5.h md5-meta.c \
+		      md2.c md2.h md2-meta.c \
 		      sha.h sha1.c sha1-compress.c sha1-meta.c \
 		      nettle-meta.h \
 		      nettle-internal.c nettle-internal.h \
