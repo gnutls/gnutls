@@ -18,6 +18,14 @@
 
 /* WARNING: Error functions aren't currently thread-safe */
 
+/* This file contains prototypes about the OPENSSL compatibility
+ * layer in GNUTLS. GNUTLS is not a replacement of OPENSSL so
+ * this compatibility layer only support limited OPENSSL functionality.
+ *
+ * New programs should avoid using this compatibility layer, and
+ * use the native GNUTLS API.
+ */
+
 #ifndef GNUTLS_OPENSSL_H
 #define GNUTLS_OPENSSL_H
 
