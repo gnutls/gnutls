@@ -12,11 +12,9 @@ DISTCLEANFILES = $(pkgconfig_DATA)
 
 LIBGNUTLS_EXTRA_EXPORTS = -export-symbols-regex '^gnutls.*'
 
-EXTRA_DIST = libgnutls-extra.vers \
-	openssl_compat.h gnutls-extra-api.texi \
-	gnutls_extra.h libgnutls-extra-config.in \
-	libgnutls-extra.m4 lzoconf.h minilzo.h
-
+EXTRA_DIST = openssl_compat.h gnutls-extra-api.texi gnutls_extra.h	\
+	libgnutls-extra-config.in libgnutls-extra.m4 lzoconf.h		\
+	minilzo.h
 
 if ENABLE_OPENSSL
 lib_LTLIBRARIES = libgnutls-extra.la libgnutls-openssl.la
