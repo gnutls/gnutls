@@ -8,7 +8,7 @@ Current list:
 * Audit the code
 * Add GPGSM certificate manager support
 * Allow unexpected Client Hello messages
-- Add Kerberos support
+* Add Kerberos support
 
 (+) Means high priority 
 (*) Means medium priority
