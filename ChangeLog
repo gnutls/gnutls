@@ -1,3 +1,9 @@
+2004-10-26 12:46  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	some minor fixes.  
+
 2004-10-25 19:12  Simon Josefsson <simon@josefsson.org>
 
 	* configure.in:
