@@ -1,11 +1,9 @@
 \section{Transport Layer}
 \par
-\gnutls can be used above any transport layer. To do this you will only 
+\gnutls can be used above any reliable transport layer. To do this you will only 
 need to set up the 
-\hyperref{gnutls\_transport\_set\_push\_function()}{gnutls\_transport\_set\_push\_function() (see Section }{
-for more information)}{gnutls_transport_set_push_function} and
-\hyperref{gnutls\_transport\_set\_pull\_function()}{gnutls\_transport\_set\_pull\_function() (see Section }{
-for more information)}{gnutls_transport_set_pull_function}
+\hyperref{gnutls\_transport\_set\_push\_function()}{gnutls\_transport\_set\_push\_function() (see Section }{)}{gnutls_transport_set_push_function} and
+\hyperref{gnutls\_transport\_set\_pull\_function()}{gnutls\_transport\_set\_pull\_function() (see Section }{)}{gnutls_transport_set_pull_function}
 functions. These functions will then be used by gnutls in order to send and receive data.
 The functions specified should return -1 on error and should set errno appropriately.
 \gnutls supports EINTR and EAGAIN errno values. These values are
@@ -14,7 +12,7 @@ The corresponding values (GNUTLS\_E\_INTERRUPTED, GNUTLS\_E\_AGAIN)
 will be returned to the caller of the gnutls function. \gnutls functions
 can be resumed (called again), if any of these values is returned.
 \par
-By default (if none of the above functions are not called), gnutls will use
+By default, if none of the above functions are called, gnutls will use
 the berkeley sockets functions recv() and send(). In this case
 gnutls will use some hacks in order for select() to work, thus
 making easy to add \tls support to existing servers.

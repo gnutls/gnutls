@@ -1662,7 +1662,9 @@ int gnutls_rehandshake(GNUTLS_STATE state)
   * and initializes the TLS connection. Here the identity of the peer
   * is checked automatically.
   * This function will fail if any problem is encountered,
-  * and the connection should be terminated. 
+  * and will return a negative error code. In case of a client,
+  * if it has been asked to resume a session, but the server didn't, then
+  * a full handshake will be performed.
   *
   * This function may also return the non-fatal errors GNUTLS_E_AGAIN, or 
   * GNUTLS_E_INTERRUPTED. In that case you may resume the handshake

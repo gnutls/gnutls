@@ -1,10 +1,13 @@
 \newpage
 \section{TLS Cipher suites}
 \par 
-\tls 1.0 supports ciphersuites like {\bf TLS\_X509PKI\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
+\tlsI supports ciphersuites like {\bf TLS\_X509PKI\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
 These ciphersuites contain three parameters:
 \begin{itemize}
-\item The authentication method (X.509 PKI in the example)
+\item The authentication method (X.509 PKI in the example)\footnote{
+This field should be considered as a \gnutls extension. \tlsI only defines
+the X.509 PKI authentication method. \gnutls supports other authentication
+methods as well.}
 \item The key exchange algorithm (DHE\_RSA in the example)
 \item The Symmetric encryption algorithm and mode (3DES\_CBC in this
 example)
