@@ -33,10 +33,10 @@ endif
 if ENABLE_OPENPGP
 if ENABLE_INCLUDED_OPENCDK
 SUBDIRS = openpgp opencdk
-PGP_LIBS = openpgp/libpgp.la opencdk/libopencdk.la
+PGP_OBJECTS = openpgp/libpgp.la opencdk/libopencdk.la
 else
 SUBDIRS = openpgp
-PGP_LIBS = openpgp/libpgp.la
+PGP_OBJECTS = openpgp/libpgp.la
 endif
 endif
 
@@ -58,11 +58,11 @@ COBJECTS_EXTRA = ext_srp.c \
 
 libgnutls_extra_la_LDFLAGS = $(libgnutls_extra_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
-	$(LIBOPENCDK_LIBS) $(LZO_LINK)
+	$(LIBOPENCDK_LIBS) $(LZO_LIBS)
 
 libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA) $(LZO_OBJECTS)
 
-libgnutls_extra_la_LIBADD = $(LZO_LIBS) $(PGP_LIBS) \
+libgnutls_extra_la_LIBADD = $(PGP_OBJECTS) \
 	../lib/libgnutls.la
 
 

@@ -78,7 +78,7 @@ AC_MSG_RESULT($opt_efence_mode)
 opt_developer_mode=no
 AC_MSG_CHECKING([whether in maintanance mode])
 AC_ARG_ENABLE(developer-mode,
-[  --enable-developer-mode   enable developer mode],
+[  --enable-developer-mode    enable developer mode],
 opt_developer_mode=$enableval)
 AC_MSG_RESULT($opt_developer_mode)
 
@@ -332,7 +332,7 @@ if test x$ac_enable_included_opencdk = xno;then
 *** libopencdk 0.5.2 was not found. You may want to get it from
 *** ftp://ftp.gnutls.org/pub/gnutls/opencdk/
 ***
-*** Will use the included one.
+*** Will use the included opencdk.
 ***
 ]])
 )
