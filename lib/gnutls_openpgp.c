@@ -42,22 +42,34 @@
 
 #define OPENPGP_NAME_SIZE GNUTLS_X509_CN_SIZE
 
+typedef struct {
+  int type;
+  int armored;
+  size_t size;
+  byte *data;
+} keybox_blob;
+
+typedef enum {
+  KBX_BLOB_FILE = 0x00,
+  KBX_BLOB_DATA = 0x01
+} keyring_blob_types;
+
 static void
-release_mpi_array(MPI *arr, size_t n)
+release_mpi_array( MPI *arr, size_t n )
 {
   MPI x;
   
-  while (arr && n--)
+  while ( arr && n-- )
     {
       x = *arr;
-      /*_gnutls_mpi_release(&x);*/
-      gcry_mpi_release(x);
+      /*_gnutls_mpi_release( &x );*/
+      gcry_mpi_release (x);
       *arr = NULL; arr++;
     }
 }
 
 static u32
-buffer_to_u32(const byte *buffer)
+buffer_to_u32( const byte *buffer )
 {
   u32 u;
 
@@ -84,18 +96,6 @@ file_exist(const char *file)
 
   return 0;
 } 
-
-typedef struct {
-  int type;
-  int armored;
-  size_t size;
-  byte *data;
-} keybox_blob;
-
-typedef enum {
-  KBX_BLOB_FILE = 0x00,
-  KBX_BLOB_DATA = 0x01
-} keyring_blob_types;
 
 static int
 kbx_blob_new( keybox_blob **r_ctx )
@@ -134,13 +134,13 @@ kbx_to_keydb( keybox_blob *blob )
   if ( !khd )
     return NULL;
   khd->used = 1;
-  if ( blob->type == KBX_BLOB_FILE )
-    { /* file */
+  if ( blob->type == KBX_BLOB_FILE ) /* file */
+    {
       khd->name = cdk_strdup( blob->data );
       khd->type = blob->armored? KEYDB_TYPE_ARMORED: KEYDB_TYPE_KEYRING;
     }
-  else if ( blob->type == KBX_BLOB_DATA )
-    { /* data */
+  else if ( blob->type == KBX_BLOB_DATA ) /* data */
+    {
       cdk_iobuf_new( &khd->buf, blob->size );
       cdk_iobuf_write( khd->buf, blob->data, blob->size );
       khd->type = KEYDB_TYPE_DATA;
@@ -224,39 +224,6 @@ kbx_data_to_keyring( int type, int enc, const char *data,
 } /* kbx_data_to_keyring */
 
 static int
-is_file_armored(char *file)
-{
-  int armored = 0;
-  char *data = NULL;
-  struct stat f_stat;
-  FILE *fp;
-
-  fp = fopen(file, "r");
-  if (fp)
-    {
-      fstat(fileno(fp), &f_stat);
-      if (f_stat.st_size == 0)
-        {
-          fclose(fp);
-          armored = 0;
-          goto leave;
-        }
-      data = cdk_alloc_clear(f_stat.st_size+1);
-      if ( !data )
-        return 0;
-      fread(data, 1, f_stat.st_size, fp);
-      if ( strstr(data, "-----BEGIN PGP")
-           && strstr(data, "-----END PGP") )
-        armored = 1;
-      fclose(fp);
-      cdk_free(data);
-    }
-
-leave:
-  return armored;
-}
-
-static int
 kbnode_to_datum( KBNODE kb_pk, gnutls_datum *raw )
 {
   KBNODE p = NULL;
@@ -280,7 +247,7 @@ kbnode_to_datum( KBNODE kb_pk, gnutls_datum *raw )
           rc = cdk_pkt_build( a, &pkt );
           if (rc)
             return GNUTLS_E_UNKNOWN_ERROR;
-          data = cdk_iobuf_get_data(a, &n);
+          data = cdk_iobuf_getdata(a, &n);
           if (data && n)
             { 
               rc = gnutls_set_datum(raw, data, n);
@@ -309,7 +276,6 @@ datum_to_kbnode( const gnutls_datum *raw, KBNODE *r_pkt )
   cdk_iobuf_new( &buf, raw->size );
   cdk_iobuf_write( buf, raw->data, raw->size );
   rc = cdk_keydb_get_keyblock( buf, &pkt, &dummy );
-  /*rc = cdk_pkt_parse(buf, &pkt);*/
   if ( rc && rc != CDKERR_EOF )
     {
       rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
@@ -335,7 +301,7 @@ iobuf_to_datum(IOBUF buf, gnutls_datum *raw)
   if (!buf || !raw)
     return GNUTLS_E_INVALID_PARAMETERS;
   
-  data = cdk_iobuf_get_data(buf, &nbytes);
+  data = cdk_iobuf_getdata(buf, &nbytes);
   if (data && nbytes)
     {
       rc = gnutls_set_datum(raw, data, nbytes);
@@ -406,19 +372,20 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
   size_t nbytes = 0;
   size_t sigsize = 0;
   byte *data = NULL;
-  PACKET pkt = {0};
+  PACKET pkt;
   
   if (!cert || !sig)
     return GNUTLS_E_INVALID_PARAMETERS;
 
   sigsize = 20 + sig->hashed_size + sig->unhashed_size + 2*MAX_MPI_BYTES;
   cdk_iobuf_new(&buf, sigsize);
+  memset( &pkt, 0, sizeof pkt );
   pkt.pkttype = PKT_SIGNATURE;
   pkt.pkt.signature = sig;
   rc = cdk_pkt_build( buf, &pkt );
   if (rc)
     goto leave;
-  data = cdk_iobuf_get_data(buf, &nbytes);
+  data = cdk_iobuf_getdata(buf, &nbytes);
   if (data && nbytes)
     {
       rc = gnutls_datum_append( &cert->signature, data, nbytes);
@@ -471,14 +438,12 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
       goto leave;
     }
   p = cdk_kbnode_find( kb_sk, PKT_SECRET_KEY );
-  if ( p )
-    sk = p->pkt->pkt.secret_key;
-  if ( sk == NULL )
+  if ( !p )
     {
       rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
-  
+  sk = p->pkt->pkt.secret_key;
   pke_algo = sk->pk->pubkey_algo;
   pkey->params_size = cdk_pk_get_npkey( pke_algo );
   for (i=0; i<pkey->params_size; i++)
@@ -546,18 +511,16 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
 
   memset(cert, 0, sizeof *cert);
   rc = datum_to_kbnode( &raw, &kb_pk );
-  if (rc)
+  if ( rc )
     return rc;
   p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( p )
-    pk = p->pkt->pkt.public_key;
-  if (pk == NULL)
+  if ( !p )
     {
       rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
       goto leave;
     }
-
-  rc = gnutls_set_datum(&cert->raw, raw.data, raw.size);
+  pk = p->pkt->pkt.public_key;
+  rc = gnutls_set_datum( &cert->raw, raw.data, raw.size );
   if (rc < 0)
     {
       rc = GNUTLS_E_MEMORY_ERROR;
@@ -737,11 +700,11 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                         char* CERTFILE,
                                         char* KEYFILE)
 {
-  IOBUF buf = NULL;
+  IOBUF inp = NULL;
   KBNODE kb_pk = NULL, pkt;
-  gnutls_datum raw;
   armor_filter_s afx;
-  int eof = 0, i;
+  gnutls_datum raw;
+  int eof = 0, i = 0;
   int rc = 0;
   
   if (!res || !KEYFILE || !CERTFILE)
@@ -750,27 +713,22 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   if ( !file_exist(CERTFILE) || !file_exist(KEYFILE) )
     return GNUTLS_E_FILE_ERROR;
   
-  if ( is_file_armored(CERTFILE) )
+  rc = cdk_iobuf_open(&inp, CERTFILE, IOBUF_MODE_RD);
+  if ( rc )
+    return GNUTLS_E_FILE_ERROR;
+  if ( cdk_armor_filter_use( inp ) )
     {
-      rc = cdk_iobuf_open(&buf, CERTFILE, IOBUF_MODE_RD);
+      memset( &afx, 0, sizeof afx );
+      rc = cdk_iobuf_push_filter( inp, &afx, cdk_armor_filter );
       if ( rc )
-        return GNUTLS_E_FILE_ERROR;
-      memset(&afx, 0, sizeof afx);
-      rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
-      if (rc)
         {
-          cdk_iobuf_close(buf);
+          cdk_iobuf_close( inp );
           rc = GNUTLS_E_ASCII_ARMOR_ERROR;
           goto leave;          
         }
-      /*cdk_iobuf_close(buf);*/
+      /*cdk_iobuf_close( inp );*/
     }
-  else
-    {
-      rc = cdk_iobuf_open(&buf, CERTFILE, IOBUF_MODE_RD);
-      if ( rc )
-        return GNUTLS_E_FILE_ERROR;
-    }
+
   res->cert_list = gnutls_realloc(res->cert_list,
                                   (1+res->ncerts)*sizeof(gnutls_cert*));
   if (res->cert_list == NULL)
@@ -795,7 +753,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     }
 
   do {
-    rc = cdk_keydb_get_keyblock( buf, &kb_pk, &eof );
+    rc = cdk_keydb_get_keyblock( inp, &kb_pk, &eof );
     if ( !kb_pk || rc )
       break;
     for (i=1, pkt=kb_pk; pkt && pkt->pkt->pkttype; pkt=pkt->next)
@@ -807,7 +765,7 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
             int n = res->ncerts;
             PKT_public_key *pk = pkt->pkt->pkt.public_key;
             res->cert_list_length[n] = 1;
-            iobuf_to_datum(buf, &res->cert_list[n][0].raw);
+            iobuf_to_datum(inp, &res->cert_list[n][0].raw);
             openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
             i++;
           }
@@ -820,8 +778,8 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
       }
   } while (!eof && !rc);
 
-  cdk_iobuf_close(buf);
-  if (rc)
+  cdk_iobuf_close(inp);
+  if ( rc )
     {
       cdk_kbnode_release( kb_pk );
       rc = GNUTLS_E_UNKNOWN_ERROR;
@@ -829,29 +787,24 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     }
   cdk_kbnode_release( kb_pk );
 
-  if ( is_file_armored(KEYFILE) )
-    {
-      rc = cdk_iobuf_open(&buf, KEYFILE, IOBUF_MODE_RD);
+  rc = cdk_iobuf_open( &inp, KEYFILE, IOBUF_MODE_RD );
+  if ( rc )
+    return GNUTLS_E_FILE_ERROR;
+  if ( cdk_armor_filter_use( inp ) )
+    {      
+      memset( &afx, 0, sizeof afx );
+      rc = cdk_iobuf_push_filter( inp, &afx, cdk_armor_filter );
       if ( rc )
-        return GNUTLS_E_FILE_ERROR;
-      memset(&afx, 0, sizeof afx);
-      rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
-      if (rc)
         {
-          cdk_iobuf_close(buf);
+          cdk_iobuf_close( inp );
           rc = GNUTLS_E_ASCII_ARMOR_ERROR;
           goto leave;
         }
-      /*cdk_iobuf_close(buf);*/
+      /*cdk_iobuf_close( inp );*/
     }
-  else
-    {
-      rc = cdk_iobuf_open(&buf, KEYFILE, IOBUF_MODE_RD);
-      if ( rc )
-        return GNUTLS_E_FILE_ERROR;
-    }
-  iobuf_to_datum(buf, &raw);
-  cdk_iobuf_close(buf);
+
+  iobuf_to_datum( inp, &raw );
+  cdk_iobuf_close( inp );
   
   res->pkey = gnutls_realloc(res->pkey,
                              (res->ncerts+1)*sizeof(gnutls_private_key));
@@ -1319,12 +1272,19 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
 {
   byte *blob;
   size_t nbytes;
+  IOBUF inp = NULL;
   int enc = 0;
+  int rc = 0;
   
   if (!keyring || !name)
     return GNUTLS_E_INVALID_PARAMETERS;
 
-  enc = is_file_armored( (char*)name );
+  rc = cdk_iobuf_open( &inp, name, IOBUF_MODE_RD );
+  if ( rc )
+    return GNUTLS_E_FILE_ERROR;
+  enc = cdk_armor_filter_use( inp );
+  cdk_iobuf_close( inp );
+  
   blob = kbx_data_to_keyring( KBX_BLOB_FILE, enc, name, strlen(name), &nbytes);
   if (blob && nbytes)
     { 
@@ -1389,7 +1349,7 @@ int
 gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
                                            const char *file)
 {
-  IOBUF buf = NULL;
+  IOBUF inp = NULL;
   byte *data = NULL;
   size_t nbytes = 0;
   armor_filter_s afx;
@@ -1401,33 +1361,29 @@ gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
   if ( !file_exist(file) )
     return GNUTLS_E_FILE_ERROR;
 
-  if ( is_file_armored( (char*)file) )
+  rc = cdk_iobuf_open(&inp, file, IOBUF_MODE_RD);
+  if ( rc )
+    return GNUTLS_E_FILE_ERROR;
+  if ( cdk_armor_filter_use( inp ) )
     {
-      rc = cdk_iobuf_open(&buf, file, IOBUF_MODE_RD);
-      if ( rc )
-        return GNUTLS_E_FILE_ERROR;
-      rc = cdk_iobuf_push_filter(buf, &afx, cdk_armor_filter);
+      memset( &afx, 0, sizeof afx );
+      rc = cdk_iobuf_push_filter( inp, &afx, cdk_armor_filter );
       if ( rc )
         {
-          cdk_iobuf_close(buf);
+          cdk_iobuf_close( inp );
           return GNUTLS_E_ASCII_ARMOR_ERROR;
         }
     }
-  else
-    {
-      rc = cdk_iobuf_open(&buf, file, IOBUF_MODE_RD);
-      if ( rc )
-        return GNUTLS_E_FILE_ERROR;
-    }
-  data = cdk_iobuf_get_data(buf, &nbytes);
+
+  data = cdk_iobuf_getdata( inp, &nbytes );
   if (data && nbytes)
     {
-      rc = gnutls_openpgp_add_keyring_mem(&c->keyring, data, nbytes);
+      rc = gnutls_openpgp_add_keyring_mem( &c->keyring, data, nbytes );
       cdk_free(data);
     }
   else
     rc = GNUTLS_E_UNKNOWN_ERROR;
-  cdk_iobuf_close(buf);
+  cdk_iobuf_close(inp);
   
   return rc;
 }
@@ -1502,7 +1458,7 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
     {
       buffer[n] = '\0';
       nbytes += n;
-      if (nbytes > cdk_iobuf_get_size(buf))
+      if ( nbytes > cdk_iobuf_getsize( buf ) )
         cdk_iobuf_expand(buf, n);
       cdk_iobuf_write(buf, buffer, n);
       if ( strstr(buffer, "<pre>") || strstr(buffer, "</pre>") )
@@ -1521,7 +1477,7 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
       rc = GNUTLS_E_ASCII_ARMOR_ERROR;
       goto leave;
     }
-  data = cdk_iobuf_get_data(buf, &n);
+  data = cdk_iobuf_getdata(buf, &n);
   if (data && n)
     { 
       gnutls_set_datum(key, data, n);
