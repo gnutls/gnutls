@@ -4,6 +4,7 @@
  * to retrieve an OpenPGP key from a key server.
  */
 
+#include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <opencdk.h>
@@ -35,7 +36,7 @@ recv_openpgp_key(const unsigned char *keyfpr, unsigned int
 
    /* The key id is the last 4 bytes of the key fingerprint
     */
-   keyid = keyfpr[16];
+   keyid = &keyfpr[16];
 
    if (key == NULL) {
       return -1;
