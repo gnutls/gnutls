@@ -1,3 +1,31 @@
+2003-03-03 17:48  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_cipher.c, NEWS:
+
+	Commited the TLS 1.0 record layer, timing attack fix in the 0.8.x
+	branch.  
+
+2003-03-03 16:08  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cipher.c, lib/gnutls_cipher_int.c:
+
+	Added protection against the new TLS 1.0 record layer timing attack.  
+
+2003-03-03 16:02  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.h, lib/gnutls.h.in.in, lib/gnutls_ui.c,
+	lib/gnutls_x509.c, src/cli.c, src/common.c:
+
+	Added a flag to allow signing by v1 X.509 certificates. Also added a
+	function to allow setting the verification flags in the credentials
+	structure.  
+
+2003-03-03 15:34  nmav <nmav@gnutls.org>
+
+	* src/: tests.c, tls_test.c:
+
+	some fixes in tests 
+
 2003-02-27 23:40  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
