@@ -11,9 +11,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
-Copyright @copyright{} 2004 Simon Josefsson
-
-Copyright @copyright{} 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
+Copyright (C) 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -46,7 +44,8 @@ Free Documentation License''.
 @subtitle for version @value{VERSION}, @value{UPDATED}
 @sp 7
 @image{gnutls-logo,6cm,6cm}
-@author Nikos Mavroyanopoulos (@email{bug-gnutls@@gnu.org})
+@author Nikos Mavroyanopoulos
+@author Simon Josefsson (@email{bug-gnutls@@gnu.org})
 @page
 @vskip 0pt plus 1filll
 @insertcopying
@@ -118,7 +117,7 @@ privacy over insecure lines, and were designed to prevent
 eavesdropping, tampering, or message forgery.
 
 Technically @acronym{GnuTLS} is a portable ANSI C based library which
-implements the TLS 1.0 (@xref{Introduction to TLS}, for a more
+implements the TLS 1.1 (@xref{Introduction to TLS}, for a more
 detailed description of the protocols) and SSL 3.0 protocols,
 accompanied with the required framework for authentication and public
 key infrastructure.  The library is available under the GNU Lesser GPL
@@ -299,20 +298,19 @@ should allocate and free memory using the functions shown below.
 
 @acronym{TLS} stands for ``Transport Layer Security'' and is the
 successor of SSL, the Secure Sockets Layer protocol@footnote{Described
-in @cite{SSL3}} designed by Netscape.  @acronym{TLS} 1.0 is an
-Internet protocol, defined by @acronym{IETF}@footnote{IETF, or
-Internet Engineering Task Force, is a large open international
-community of network designers, operators, vendors, and researchers
-concerned with the evolution of the Internet architecture and the
-smooth operation of the Internet.  It is open to any interested
-individual.}, described in @acronym{RFC} 2246 and also in
-@cite{RESCOLA}. The protocol provides confidentiality, and
-authentication layers over any reliable transport layer. The
-description, below, refers to @acronym{TLS} 1.0 but also applies to
-@acronym{SSL} 3.0 since the differences of these protocols are
-minor. Older protocols such as @acronym{SSL} 2.0 are not discussed nor
-implemented in @acronym{GnuTLS} since they are not considered secure
-today.
+in @cite{SSL3}} designed by Netscape.  @acronym{TLS} is an Internet
+protocol, defined by @acronym{IETF}@footnote{IETF, or Internet
+Engineering Task Force, is a large open international community of
+network designers, operators, vendors, and researchers concerned with
+the evolution of the Internet architecture and the smooth operation of
+the Internet.  It is open to any interested individual.}, described in
+@acronym{RFC} 2246 and also in @cite{RESCOLA}. The protocol provides
+confidentiality, and authentication layers over any reliable transport
+layer. The description, below, refers to @acronym{TLS} 1.0 but also
+applies to @acronym{TLS} 1.1 and @acronym{SSL} 3.0, since the
+differences of these protocols are minor. Older protocols such as
+@acronym{SSL} 2.0 are not discussed nor implemented in
+@acronym{GnuTLS} since they are not considered secure today.
 
 @menu
 * TLS layers::
@@ -327,7 +325,7 @@ today.
 @section TLS layers
 @cindex TLS Layers
 
-@acronym{TLS} 1.0 is a layered protocol, and consists of the Record
+@acronym{TLS} is a layered protocol, and consists of the Record
 Protocol, the Handshake Protocol and the Alert Protocol. The Record
 Protocol is to serve all other protocols and is above the transport
 layer.  The Record protocol offers symmetric encryption, data
@@ -424,8 +422,8 @@ algorithm with RSA's RC4 algorithm, which is considered to be a trade
 secret.}. Ciphers are encryption algorithms that use a single, secret,
 key to encrypt and decrypt data. Block algorithms in TLS also provide
 protection against statistical analysis of the data.  Thus, if you're
-using the @acronym{TLS} 1.0 protocol, a random number of blocks will
-be appended to data, to prevent eavesdroppers from guessing the actual
+using the @acronym{TLS} protocol, a random number of blocks will be
+appended to data, to prevent eavesdroppers from guessing the actual
 data size.
 
 Supported cipher algorithms:
@@ -614,9 +612,9 @@ To initiate the handshake.
 
 @subsection TLS cipher suites
 
-The Handshake Protocol of @acronym{TLS} 1.0 negotiates cipher suites 
-of the form @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA}.
-The usual cipher suites contain these parameters:
+The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
+the form @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA}.  The usual cipher
+suites contain these parameters:
 
 @itemize
 
@@ -735,9 +733,9 @@ discussed in the subsections that follow.
 @cindex TLS Extensions
 @cindex Maximum fragment length
 
-This extension allows a @acronym{TLS} 1.0 implementation to negotiate
-a smaller value for record packet maximum length. This extension may
-be useful to clients with constrained capabilities. See the
+This extension allows a @acronym{TLS} implementation to negotiate a
+smaller value for record packet maximum length. This extension may be
+useful to clients with constrained capabilities. See the
 @code{gnutls_record_set_max_size} and the
 @code{gnutls_record_get_max_size} functions.
 
@@ -966,11 +964,11 @@ This algorithm exchanges Diffie Hellman parameters.
 
 Authentication using the @acronym{SRP}@footnote{@acronym{SRP} stands
 for Secure Remote Password, and is described in @cite{RFC2945}}. The
-@acronym{SRP} key exchange is an extension to the @acronym{TLS} 1.0
-protocol protocol is actually password authentication. The two peers
-can be identified using a single password, or there can be
-combinations where the client is authenticated using @acronym{SRP} and
-the server using a certificate.
+@acronym{SRP} key exchange is an extension to the @acronym{TLS}
+protocol, and is actually password authentication.  The two peers can
+be identified using a single password, or there can be combinations
+where the client is authenticated using @acronym{SRP} and the server
+using a certificate.
 
 The advantage of @acronym{SRP} authentication, over other proposed
 secure password authentication schemas, is that @acronym{SRP} does not
