@@ -203,18 +203,18 @@ int gnutls_anon_set_client_cred( ANON_SERVER_CREDENTIALS res, int dh_bits);
  */
 void gnutls_x509pki_free_sc( X509PKI_CREDENTIALS sc);
 int gnutls_x509pki_allocate_sc( X509PKI_CREDENTIALS *sc, int ncerts);
-int gnutls_x509pki_set_key( X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
-int gnutls_x509pki_set_trust( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
+int gnutls_x509pki_set_key_file( X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
+int gnutls_x509pki_set_trust_file( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
 
 #define gnutls_x509pki_free_server_sc gnutls_x509pki_free_sc
 #define gnutls_x509pki_allocate_server_sc gnutls_x509pki_allocate_sc
-#define gnutls_x509pki_set_server_key gnutls_x509pki_set_key
-#define gnutls_x509pki_set_server_trust gnutls_x509pki_set_trust
+#define gnutls_x509pki_set_server_key_file gnutls_x509pki_set_key_file
+#define gnutls_x509pki_set_server_trust_file gnutls_x509pki_set_trust_file
 
 #define gnutls_x509pki_free_client_sc gnutls_x509pki_free_sc
 #define gnutls_x509pki_allocate_client_sc gnutls_x509pki_allocate_sc
-#define gnutls_x509pki_set_client_key gnutls_x509pki_set_key
-#define gnutls_x509pki_set_client_trust gnutls_x509pki_set_trust
+#define gnutls_x509pki_set_client_key_file gnutls_x509pki_set_key_file
+#define gnutls_x509pki_set_client_trust_file gnutls_x509pki_set_trust_file
 
 
 /* global state functions 

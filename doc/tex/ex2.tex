@@ -42,7 +42,7 @@ int main()
    }
    /* set's the trusted cas file
     */
-   gnutls_x509pki_set_client_trust(xcred, CAFILE, CRLFILE);
+   gnutls_x509pki_set_client_trust_file(xcred, CAFILE, CRLFILE);
 
    /* connects to server 
     */

@@ -201,8 +201,8 @@ int main(int argc, char** argv)
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_x509pki_set_client_trust( xcred, CAFILE, CRLFILE);
-	gnutls_x509pki_set_client_key( xcred, CLICERTFILE, CLIKEYFILE);
+	gnutls_x509pki_set_client_trust_file( xcred, CAFILE, CRLFILE);
+	gnutls_x509pki_set_client_key_file( xcred, CLICERTFILE, CLIKEYFILE);
 	gnutls_x509pki_set_client_cert_callback( xcred, cert_callback);
 
 	/* SRP stuff */

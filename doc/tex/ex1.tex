@@ -50,7 +50,7 @@ int main()
       fprintf(stderr, "memory error\n");
       exit(1);
    }
-   gnutls_x509pki_set_client_trust(xcred, CAFILE, CRLFILE);
+   gnutls_x509pki_set_client_trust_file(xcred, CAFILE, CRLFILE);
 
    for (t = 0; t < 2; t++) {    /* connect 2 times to the server */
 

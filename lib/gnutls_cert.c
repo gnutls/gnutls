@@ -382,7 +382,7 @@ int gnutls_x509pki_allocate_sc(X509PKI_CREDENTIALS * res, int ncerts)
 }
 
 /**
-  * gnutls_x509pki_set_key - Used to set keys in a X509PKI_CREDENTIALS structure
+  * gnutls_x509pki_set_key_file - Used to set keys in a X509PKI_CREDENTIALS structure
   * @res: is an &X509PKI_CREDENTIALS structure.
   * @CERTFILE: is a PEM encoded file containing the certificate list (path) for
   * the specified private key
@@ -397,7 +397,7 @@ int gnutls_x509pki_allocate_sc(X509PKI_CREDENTIALS * res, int ncerts)
   * this function.
   *
   **/
-int gnutls_x509pki_set_key(X509PKI_CREDENTIALS res, char *CERTFILE,
+int gnutls_x509pki_set_key_file(X509PKI_CREDENTIALS res, char *CERTFILE,
 			   char *KEYFILE)
 {
 	int ret;
@@ -414,7 +414,7 @@ int gnutls_x509pki_set_key(X509PKI_CREDENTIALS res, char *CERTFILE,
 }
 
 /**
-  * gnutls_x509pki_set_trust - Used to set trusted CAs in a X509PKI_CREDENTIALS structure
+  * gnutls_x509pki_set_trust_file - Used to set trusted CAs in a X509PKI_CREDENTIALS structure
   * @res: is an &X509PKI_CREDENTIALS structure.
   * @CAFILE: is a PEM encoded file containing trusted CAs
   * @CRLFILE: is a PEM encoded file containing CRLs (ignored for now)
@@ -422,7 +422,7 @@ int gnutls_x509pki_set_key(X509PKI_CREDENTIALS res, char *CERTFILE,
   * This function sets the trusted CAs in order to verify client
   * certificates.
   **/
-int gnutls_x509pki_set_trust(X509PKI_CREDENTIALS res, char *CAFILE,
+int gnutls_x509pki_set_trust_file(X509PKI_CREDENTIALS res, char *CAFILE,
 			     char *CRLFILE)
 {
 	int ret, size, i;

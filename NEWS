@@ -1,5 +1,6 @@
 Version ?.?.?
 - Corrected bug in new integer formatting (now we use the old again)
+- Several corrections and usual cleanups
 
 Version 0.2.91 (10/12/2001)
 - Fixes in MPI handling (fixes possible bug with signed integers)
