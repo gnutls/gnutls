@@ -5,19 +5,31 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+static const char* bin2hex( const void* bin, size_t bin_size)
+{
+static char printable[120];
+unsigned char *_bin;
+char* print;
+
+   print = printable;
+   for (i = 0; i < bin_size; i++) {
+      sprintf(print, "%.2x ", _bin[i]);
+      print += 2;
+   }
+
+   return printable;
+}
+
 /* This function will print information about this session's peer
  * certificate. 
  */
 static void print_x509_certificate_info(gnutls_session session)
 {
-   char digest[20];
    char serial[40];
-   int digest_size, i;
-   int serial_size;
-   char printable[120];
-   int printable_size;
-   char *print;
-   int algo, bits;
+   char dn[128];
+   int i;
+   size_t size;
+   unsigned int algo, bits;
    time_t expiration_time, activation_time;
    const gnutls_datum *cert_list;
    int cert_list_size = 0;
@@ -42,31 +54,13 @@ static void print_x509_certificate_info(gnutls_session session)
       printf(" - Certificate is valid since: %s", ctime(&activation_time));
       printf(" - Certificate expires: %s", ctime(&expiration_time));
 
-      /* Print the fingerprint of the certificate
-       */
-      digest_size = sizeof(digest);
-      if (gnutls_x509_fingerprint
-          (GNUTLS_DIG_MD5, &cert_list[0], digest, &digest_size) >= 0) {
-         print = printable;
-         for (i = 0; i < digest_size; i++) {
-            sprintf(print, "%.2x ", (unsigned char) digest[i]);
-            print += 3;
-         }
-         printf(" - Certificate fingerprint: %s\n", printable);
-      }
-
       /* Print the serial number of the certificate.
        */
-      serial_size = sizeof(serial);
-      if (gnutls_x509_crt_get_serial(cert, serial, &serial_size) >= 0) 
-      {
-         print = printable;
-         for (i = 0; i < serial_size; i++) {
-            sprintf(print, "%.2x ", (unsigned char) serial[i]);
-            print += 3;
-         }
-         printf(" - Certificate serial number: %s\n", printable);
-      }
+      size = sizeof(serial);
+      gnutls_x509_crt_get_serial(cert, serial, &size);
+
+      printf(" - Certificate serial number: %s\n", 
+         bin2hex( serial, serial_size));
 
       /* Extract some of the public key algorithm's parameters
        */
@@ -91,13 +85,13 @@ static void print_x509_certificate_info(gnutls_session session)
       printf(" - Certificate version: #%d\n",
              gnutls_x509_crt_get_version( cert));
 
-      printable_size = sizeof(printable);
-      gnutls_x509_crt_get_dn( cert, printable, &printable_size);
-      printf(" - DN: %s\n", printable);
+      size = sizeof(dn);
+      gnutls_x509_crt_get_dn( cert, dn, &size);
+      printf(" - DN: %s\n", dn);
 
-      printable_size = sizeof(printable);
-      gnutls_x509_crt_get_issuer_dn( cert, printable, &printable_size);
-      printf(" - Certificate Issuer's DN: %s\n", printable);
+      size = sizeof(dn);
+      gnutls_x509_crt_get_issuer_dn( cert, dn, &size);
+      printf(" - Certificate Issuer's DN: %s\n", dn);
 
       gnutls_x509_crt_deinit( cert);
 
