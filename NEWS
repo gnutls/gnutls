@@ -9,6 +9,7 @@ Version 1.1.10
 - Added gnutls_auth_client_get_type() and gnutls_auth_server_get_type()
 - Opencdk library is being included if not found.
 - certtool can now add ip address SAN extension.
+- Fixes in openpgp signature verification.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage
