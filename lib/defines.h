@@ -1,5 +1,4 @@
 #include <config.h>
-#include <dmalloc.h>
 
 #ifdef STDC_HEADERS
 # include <string.h>

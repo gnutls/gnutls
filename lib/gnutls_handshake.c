@@ -255,9 +255,9 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	dataptr = gnutls_malloc(4);
 	
 	ret = _gnutls_Recv_int(cd, state, GNUTLS_HANDSHAKE, dataptr, 4);
-	if (ret!=4) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	if (ret < 0) return ret;
-	
+	if (ret!=4) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Received HANDSHAKE[%d]\n", dataptr[0]);
 #endif
