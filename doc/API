@@ -35,6 +35,10 @@ int gnutls_close(int cd, GNUTLS_STATE state);
 int gnutls_send_hello_request(int cd, GNUTLS_STATE state);
 	This function will renegotiate security parameters with the
 	client. This should only be called in case of a server.
+	If the client does not wish to renegotiate parameters he
+	will reply with an alert message, thus the return code will be
+	GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
+	GNUTLS_NO_RENEGOTIATION.
 
 AlertDescription gnutls_get_last_alert( GNUTLS_STATE state);
 	Returns the last alert number received. This function
