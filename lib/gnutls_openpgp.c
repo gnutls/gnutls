@@ -195,11 +195,11 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
   cdk_key_create_fpr(pk, cert->fingerprint);
 
   if (is_DSA(pk->pke_algo) || pk->pke_algo == PKE_RSA_S)
-    cert->keyUsage = GNUTLS_X509KEY_KEY_CERT_SIGN;
+    cert->keyUsage = GNUTLS_X509KEY_DIGITAL_SIGNATURE;
   else if (pk->pke_algo == PKE_ELG_E || pk->pke_algo == PKE_RSA_E)
     cert->keyUsage = GNUTLS_X509KEY_ENCIPHER_ONLY;
   else if (pk->pke_algo == PKE_ELG_ES || pk->pke_algo == PKE_RSA_ES)
-    cert->keyUsage = GNUTLS_X509KEY_KEY_CERT_SIGN
+    cert->keyUsage = GNUTLS_X509KEY_DIGITAL_SIGNATURE
                    | GNUTLS_X509KEY_ENCIPHER_ONLY;
 
   for (i=0; i<cdk_key_pk_get_nmpis(pk->pke_algo, 0); i++)
@@ -212,6 +212,7 @@ openpgp_pk_to_gnutls_cert(gnutls_cert *cert, PKT_public_key *pk)
           goto leave;
         }
     }
+  cert->params_size = i;
   cert->expiration_time = pk->expiredate;
   cert->activation_time = pk->timestamp;
 
@@ -315,6 +316,8 @@ _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
           goto leave;
         }
     }
+  pkey->params_size = i;
+
   for (j=0; j<cdk_key_sk_get_nmpis(pke_algo); j++, i++)
     {
       n = sk->mpi[j]->bytes+2;
@@ -367,6 +370,8 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
   
   if (!cert)
     return GNUTLS_E_INVALID_PARAMETERS;
+  
+  memset( cert, 0, sizeof(gnutls_cert));
   
   datum_to_openpgp_pkt(&raw, &pkt);
   for (p=pkt; p && p->id; p=p->next)
