@@ -1,3 +1,39 @@
+2004-05-26 14:26  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/README.autoconf, doc/certtool.cfg,
+	lib/gnutls_handshake.c, lib/pkix.asn, lib/pkix_asn1_tab.c, NEWS,
+	lib/gnutls_handshake.c, lib/pkix.asn, lib/pkix_asn1_tab.c:
+
+	Corrected session resuming in SRP ciphersuites.  
+
+2004-05-23 07:31  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls.h.in.in, lib/gnutls_state.c:
+
+	_gnutls_deinit() is no longer used. Sessions are not automatically
+	removed any more, on abnormal termination.  
+
+2004-05-22 19:37  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_int.h, gnutls_record.c:
+
+	some cleanups and better handling of EOF in record_recv.  
+
+2004-05-16 15:15  nmav <nmav@gnutls.org>
+
+	* acinclude.m4, configure.in, libtasn1.m4, ChangeLog, NEWS,
+	acinclude.m4, configure.in, libtasn1.m4:
+
+	added proper libtasn1 version detection.  
+
+2004-05-15 06:37  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/certtool.cfg, lib/pkix.asn,
+	src/certtool-cfg.c, src/certtool.c, NEWS, configure.in,
+	doc/certtool.cfg, lib/pkix.asn, src/certtool-cfg.c, src/certtool.c:
+
+	certtool has now support for more X.520 DN attribute types.  
+
 2004-05-14 12:35  nmav <nmav@gnutls.org>
 
 	* src/: certtool-cfg.c, certtool-cfg.h, certtool.c, certtool-cfg.c,

@@ -1,4 +1,4 @@
-INCLUDES = -I../libextra -Iminitasn1/ -I../includes $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS)
+INCLUDES = -I../libextra -Iminitasn1/ -I../includes $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS)
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
@@ -14,11 +14,9 @@ DIST_SUBDIRS = minitasn1 x509
 if ENABLE_MINITASN1
 SUBDIRS = minitasn1 x509
 MINITASN1_OBJECTS = minitasn1/libminitasn1.la
-LIBASN1_LINK = 
 else
 SUBDIRS = x509
 MINITASN1_OBJECTS = 
-LIBASN1_LINK = -ltasn1
 endif
 
 EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
@@ -62,7 +60,7 @@ libgnutls_la_SOURCES = $(COBJECTS)
 
 libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/libx509.la
 
-libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
+libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
 	$(libgnutls_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

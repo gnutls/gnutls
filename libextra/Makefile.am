@@ -1,4 +1,4 @@
-INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) -Iopencdk/
+INCLUDES = -I../lib -I../includes -I../lib/minitasn1/ $(LIBOPENCDK_CFLAGS) $(LIBGCRYPT_CFLAGS) $(LIBTASN1_CFLAGS) -Iopencdk/
 bin_SCRIPTS = libgnutls-extra-config
 DIST_SUBDIRS = openpgp opencdk
 

@@ -27,6 +27,7 @@ void get_locality_crt_set( gnutls_x509_crt crt);
 void get_cn_crt_set( gnutls_x509_crt crt);
 void get_uid_crt_set( gnutls_x509_crt crt);
 void get_pkcs9_email_crt_set( gnutls_x509_crt crt);
+void get_oid_crt_set( gnutls_x509_crt crt);
 int get_serial( void);
 int get_days( void);
 int get_ca_status( void);
@@ -53,4 +54,5 @@ void get_state_crq_set( gnutls_x509_crq crq);
 void get_unit_crq_set( gnutls_x509_crq crq);
 void get_organization_crq_set( gnutls_x509_crq crq);
 void get_country_crq_set( gnutls_x509_crq crq);
+void get_oid_crq_set( gnutls_x509_crq crq);
 
