@@ -63,7 +63,7 @@ GNUTLS_CredType gnutls_auth_get_type( GNUTLS_STATE state);
 
 const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
 
-void gnutls_srp_server_set_select_func( GNUTLS_SRP_SERVER_CREDENTIALS, gnutls_srp_server_select_func *);
+void gnutls_srp_server_set_select_func( GNUTLS_STATE, gnutls_srp_server_select_func *);
 
 /* DH */
 
@@ -74,8 +74,8 @@ int gnutls_dh_get_peers_public_bits( GNUTLS_STATE);
 
 /* X509PKI */
 
-void gnutls_certificate_client_set_select_func( GNUTLS_CERTIFICATE_CREDENTIALS, gnutls_certificate_client_select_func *);
-void gnutls_certificate_server_set_select_func( GNUTLS_CERTIFICATE_CREDENTIALS, gnutls_certificate_server_select_func *);
+void gnutls_certificate_client_set_select_func( GNUTLS_STATE, gnutls_certificate_client_select_func *);
+void gnutls_certificate_server_set_select_func( GNUTLS_STATE, gnutls_certificate_server_select_func *);
 
 void gnutls_certificate_server_set_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 
