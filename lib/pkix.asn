@@ -196,21 +196,14 @@ id-ce-cRLDistributionPoints     OBJECT IDENTIFIER  ::=  {id-ce 31}
 CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
 
 DistributionPoint ::= SEQUENCE {
-     distributionPoint       [0]     DistributionPointName OPTIONAL,
+     distributionPoint       [0]     EXPLICIT DistributionPointName OPTIONAL,
      reasons                 [1]     ReasonFlags OPTIONAL,
      cRLIssuer               [2]     GeneralNames OPTIONAL
 }
 
--- original definition:
--- DistributionPointName ::= CHOICE {
---     fullName                [0]     GeneralNames,
---     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
---}
--- This does not work since it does not tag elements.
-
-DistributionPointName ::= SEQUENCE {
-     fullName                [0]     GeneralNames OPTIONAL,
-     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName OPTIONAL
+DistributionPointName ::= CHOICE {
+    fullName                [0]     GeneralNames,
+    nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
 }
 
 ReasonFlags ::= BIT STRING {
