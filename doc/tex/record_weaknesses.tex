@@ -6,12 +6,15 @@ found in \tlsI{} protocol. These weaknesses can be exploited by active attackers
 and exploit the facts that \tls{} 
 \begin{enumerate}
 \item has separate alerts for ``decryption\_failed'' and ``bad\_record\_mac''
+\item the decryption failure reason can be detected by timing the responce time
 \item the IV for CBC encrypted packets is the last block of the previous encrypted packet
 \end{enumerate}
 
 \gnutls{} implements all the known counter-measures for these attacks. For the first
-case, \gnutls{} does only have one error code for both of the decryption failures.
-For the latter, an empty record is send before every record packet, and this is
+two cases, \gnutls{} does only have one error code for both of the decryption failures,
+and processes the message normaly even if a padding error occured. This avoids
+both of these attacks.
+For the latter, an empty record can be sent before every record packet, and this is
 believed to avoid the known attacks in CBC encrypted packets. See the function
 \printfunc{gnutls_record_set_cbc_protection}{gnutls\_record\_set\_cbc\_protection}
 for more information.
