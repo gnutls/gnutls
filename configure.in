@@ -476,6 +476,6 @@ libextra/openpgp/Makefile lib/libgnutls-config libextra/libgnutls-extra-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
 doc/examples/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
-includes/Makefile includes/gnutls/Makefile])
+includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile])
 
 AC_OUTPUT

@@ -97,3 +97,45 @@ Checking for OpenPGP authentication support (TLS extension)... no
 
 \end{verbatim}
 
+\section{The ``certtool'' program}
+
+This is a program to generate X.509 certificates, certificate requests, and
+private keys.
+
+How to use certtool:
+
+\begin{itemize}
+
+\item To create a self signed certificate, use the command:
+\begin{verbatim}
+$ certtool --generate-self-signed --outfile ca.pem
+\end{verbatim}
+Note that a self-signed certificate usually belongs to a certificate
+authority, that signs other certificates.
+
+\item To create a private key, run:
+\begin{verbatim}
+$ certtool --generate-privkey --outfile key.pem
+\end{verbatim}
+
+\item To create a certificate request, run:
+\begin{verbatim}
+$ certtool --generate-request --load-privkey key.pem --outfile request.pem
+\end{verbatim}
+Note that `request.pem' will hold both the private key and the certificate
+request.
+
+\item To generate a certificate using the previous request, use the command:
+\begin{verbatim}
+$ certtool --generate-certificate --load-request request.pem --outfile cert.pem \
+   --load-ca-certificate ca.pem --load-ca-privkey ca.pem
+\end{verbatim}
+
+\item To view the certificate information, use:
+\begin{verbatim}
+$ certtool --certificate-info --infile cert.pem
+\end{verbatim}
+
+
+\end{itemize}
+

@@ -35,8 +35,8 @@ extern "C" {
 struct gnutls_openpgp_key_int; /* object to hold (parsed) openpgp keys */
 typedef struct gnutls_openpgp_key_int* gnutls_openpgp_key;
 
-typedef enum gnutls_openpgp_key_fmt { GNUTLS_X509_FMT_RAW,
-        GNUTLS_X509_FMT_BASE64 } gnutls_openpgp_key_fmt;
+typedef enum gnutls_openpgp_key_fmt { GNUTLS_OPENPGP_FMT_RAW,
+        GNUTLS_OPENPGP_FMT_BASE64 } gnutls_openpgp_key_fmt;
 
 int gnutls_openpgp_key_init( gnutls_openpgp_key* key); /* initializes the memory for gnutls_openpgp_key struct */
 void gnutls_openpgp_key_deinit(gnutls_openpgp_key key); /* frees all memory */

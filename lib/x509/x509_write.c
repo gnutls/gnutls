@@ -172,14 +172,14 @@ int pk_algorithm;
 	}
 	
 	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.subject",
-		crq->crq, "subject");
+		crq->crq, "certificationRequestInfo.subject");
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
 	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.subjectPublicKeyInfo",
-		crq->crq, "subjectPKInfo");
+		crq->crq, "certificationRequestInfo.subjectPKInfo");
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -336,7 +336,10 @@ const char* pk;
 	/* disable parameters, which are not used in RSA.
 	 */
 	result = asn1_write_value( crt->cert, "tbsCertificate.signature.parameters", NULL, 0);
-	if (result != ASN1_SUCCESS) {
+	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
+		/* Here we ignore the element not found error, since this
+		 * may have been disabled before.
+		 */
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -379,7 +382,10 @@ const char* pk;
 	/* disable parameters, which are not used in RSA.
 	 */
 	result = asn1_write_value( crt->cert, "signatureAlgorithm.parameters", NULL, 0);
-	if (result != ASN1_SUCCESS) {
+	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
+		/* Here we ignore the element not found error, since this
+		 * may have been disabled before.
+		 */
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}

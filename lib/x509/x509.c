@@ -187,7 +187,9 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 		goto cleanup;
 	}
 
-
+	/* Since we do not want to disable any extension
+	 */
+	cert->use_extensions = 1;
 	if (need_free) _gnutls_free_datum( &_data);
 
 	return 0;

@@ -8,8 +8,10 @@
 
 void verify_chain(void);
 gnutls_x509_privkey load_private_key(void);
+gnutls_x509_crq load_request(void);
 gnutls_x509_privkey load_ca_private_key(void);
 gnutls_x509_crt load_ca_cert(void);
+gnutls_x509_crt load_cert(void);
 void certificate_info( void);
 void privkey_info( void);
 static void gaa_parser(int argc, char **argv);
@@ -17,6 +19,8 @@ void generate_self_signed( void);
 void generate_request(void);
 
 static gaainfo info;
+FILE* outfile;
+FILE* infile;
 
 static unsigned char buffer[40*1024];
 static const int buffer_size = sizeof(buffer);
@@ -41,7 +45,7 @@ char input[128];
 int ret;
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
+	fgets( input, sizeof(input), infile);
 	
 	if (strlen(input)==1) /* only newline */ return;
 
@@ -58,7 +62,7 @@ char input[128];
 int ret;
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
+	fgets( input, sizeof(input), infile);
 	
 	if (strlen(input)==1) /* only newline */ return;
 
@@ -74,7 +78,7 @@ static int read_int( const char* input_str)
 char input[128];
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
+	fgets( input, sizeof(input), infile);
 	
 	if (strlen(input)==1) /* only newline */ return 0;
 
@@ -86,7 +90,7 @@ static const char* read_str( const char* input_str)
 static char input[128];
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
+	fgets( input, sizeof(input), infile);
 	
 	input[strlen(input)-1] = 0;
 
@@ -100,7 +104,7 @@ static int read_yesno( const char* input_str)
 char input[128];
 
 	fputs( input_str, stderr);
-	fgets( input, sizeof(input), stdin);
+	fgets( input, sizeof(input), infile);
 	
 	if (strlen(input)==1) /* only newline */ return 0;
 
@@ -137,28 +141,29 @@ int ret;
 static void print_key_usage( unsigned int x) 
 {
 	if (x&GNUTLS_KEY_DIGITAL_SIGNATURE)
-		printf("\t\tDigital signature.\n");
+		fprintf(outfile,"\t\tDigital signature.\n");
 	if (x&GNUTLS_KEY_NON_REPUDIATION)
-		printf("\t\tNon repudiation.\n");
+		fprintf(outfile,"\t\tNon repudiation.\n");
 	if (x&GNUTLS_KEY_KEY_ENCIPHERMENT)
-		printf("\t\tKey encipherment.\n");
+		fprintf(outfile,"\t\tKey encipherment.\n");
 	if (x&GNUTLS_KEY_DATA_ENCIPHERMENT)
-		printf("\t\tData encipherment.\n");
+		fprintf(outfile,"\t\tData encipherment.\n");
 	if (x&GNUTLS_KEY_KEY_AGREEMENT)
-		printf("\t\tKey agreement.\n");
+		fprintf(outfile,"\t\tKey agreement.\n");
 	if (x&GNUTLS_KEY_KEY_CERT_SIGN)
-		printf("\t\tCertificate signing.\n");
+		fprintf(outfile,"\t\tCertificate signing.\n");
 	if (x&GNUTLS_KEY_CRL_SIGN)
-		printf("\t\tCRL signing.\n");
+		fprintf(outfile,"\t\tCRL signing.\n");
 	if (x&GNUTLS_KEY_ENCIPHER_ONLY)
-		printf("\t\tKey encipher only.\n");
+		fprintf(outfile,"\t\tKey encipher only.\n");
 	if (x&GNUTLS_KEY_DECIPHER_ONLY)
-		printf("\t\tKey decipher only.\n");
+		fprintf(outfile,"\t\tKey decipher only.\n");
 }
 
 static void print_private_key( gnutls_x509_privkey key)
 {
 int size, ret;
+	if (!key) return;
 
 	if (!info.pkcs8) {
 		size = sizeof(buffer);
@@ -176,7 +181,7 @@ int size, ret;
 		}
 	}
 
-	printf("Private key: \n%s\n", buffer);
+	fprintf(outfile,"Private key: \n%s\n", buffer);
 }
 
 void generate_private_key( void)
@@ -196,10 +201,11 @@ gnutls_x509_privkey key;
 gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 {
 	gnutls_x509_crt crt;
-	gnutls_x509_privkey key;
+	gnutls_x509_privkey key = NULL;
 	int size, serial;
 	int days, result, ca_status;
 	const char* str;
+	gnutls_x509_crq crq; /* request */
 
 	size = gnutls_x509_crt_init(&crt);
 	if (size < 0) {
@@ -207,24 +213,42 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		exit(1);
 	}
 
-	key = generate_private_key_int();
 
-	fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
-	"Just press enter to ignore a field.\n");
-
-	read_crt_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
-	read_crt_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
-	read_crt_set( crt, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
-	read_crt_set( crt, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-	read_crt_set( crt, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
-	read_crt_set( crt, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+	crq = load_request();
 	
-	fprintf(stderr, "This field should not be used in new certificates.\n");
-	read_crt_set( crt, "E-mail: ", GNUTLS_OID_PKCS9_EMAIL);
+	if (crq == NULL) {
+		fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
+		"Just press enter to ignore a field.\n");
 
-	size = gnutls_x509_crt_set_version( crt, 2);
-	if (size < 0) {
-		fprintf(stderr, "set_version: %s\n", gnutls_strerror(size));
+		key = generate_private_key_int();
+
+		read_crt_set( crt, "Country name (2 chars): ", GNUTLS_OID_X520_COUNTRY_NAME);
+		read_crt_set( crt, "Organization name: ", GNUTLS_OID_X520_ORGANIZATION_NAME);
+		read_crt_set( crt, "Organizational unit name: ", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME);
+		read_crt_set( crt, "Locality name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+		read_crt_set( crt, "State or province name: ", GNUTLS_OID_X520_LOCALITY_NAME);
+		read_crt_set( crt, "Common name: ", GNUTLS_OID_X520_COMMON_NAME);
+	
+		fprintf(stderr, "This field should not be used in new certificates.\n");
+		read_crt_set( crt, "E-mail: ", GNUTLS_OID_PKCS9_EMAIL);
+
+		result = gnutls_x509_crt_set_key( crt, key);
+		if (result < 0) {
+			fprintf(stderr, "set_key: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+
+	} else {
+		result = gnutls_x509_crt_set_crq( crt, crq);
+		if (result < 0) {
+			fprintf(stderr, "set_crq: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+	}
+
+	result = gnutls_x509_crt_set_version( crt, 2);
+	if (result < 0) {
+		fprintf(stderr, "set_version: %s\n", gnutls_strerror(result));
 		exit(1);
 	}
 
@@ -239,11 +263,6 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		exit(1);
 	}
 
-	size = gnutls_x509_crt_set_key( crt, key);
-	if (size < 0) {
-		fprintf(stderr, "set_key: %s\n", gnutls_strerror(size));
-		exit(1);
-	}
 
 	fprintf(stderr, "\n\nActivation/Expiration time.\n");	
 	gnutls_x509_crt_set_activation_time( crt, time(NULL));
@@ -269,7 +288,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 		exit(1);
 	}
 
-	result = read_yesno( "Is this a server certificate? (Y/N): ");
+	result = read_yesno( "Is this a web server certificate? (Y/N): ");
 	if (result != 0) {
 		str = read_str( "Enter the dnsName of the subject of the certificate: ");
 		if (str != NULL) {
@@ -296,6 +315,38 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 	return crt;
 
 }
+
+gnutls_x509_crt update_certificate( void)
+{
+	gnutls_x509_crt crt;
+	int size;
+	int days, result;
+
+	size = gnutls_x509_crt_init(&crt);
+	if (size < 0) {
+		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(size));
+		exit(1);
+	}
+
+	crt = load_cert();
+
+	fprintf(stderr, "Activation/Expiration time.\n");	
+	gnutls_x509_crt_set_activation_time( crt, time(NULL));
+	
+	do {
+		days = read_int( "The updated certificate will expire in (days): ");
+	} while( days==0);
+	
+	result = gnutls_x509_crt_set_expiration_time( crt, time(NULL)+days*24*60*60);
+	if (result < 0) {
+		fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+	
+	return crt;
+
+}
+
 
 void generate_self_signed( void)
 {
@@ -325,12 +376,12 @@ void generate_self_signed( void)
 		exit(1);
 	}
 
-	printf("Certificate: \n%s", buffer);
+	fprintf(outfile, "Certificate: \n%s", buffer);
 
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
-
+	fclose(outfile);
 }
 
 void generate_signed_certificate( void)
@@ -365,11 +416,44 @@ void generate_signed_certificate( void)
 		exit(1);
 	}
 
-	printf("Certificate: \n%s", buffer);
+	fprintf(outfile, "Certificate: \n%s", buffer);
 
 	gnutls_x509_crt_deinit(crt);
 	gnutls_x509_privkey_deinit(key);
+}
 
+void update_signed_certificate( void)
+{
+	gnutls_x509_crt crt;
+	int size, result;
+	gnutls_x509_privkey ca_key;
+	gnutls_x509_crt ca_crt;
+
+	fprintf(stderr, "Generating a signed certificate...\n");
+
+	ca_key = load_ca_private_key();
+	ca_crt = load_ca_cert();
+
+	crt = update_certificate();
+	
+	fprintf(stderr, "\n\nSigning certificate...\n");
+
+	result = gnutls_x509_crt_sign( crt, ca_crt, ca_key);
+	if (result < 0) {
+		fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	size = sizeof(buffer);
+	result = gnutls_x509_crt_export( crt, GNUTLS_X509_FMT_PEM, buffer, &size);	
+	if (result < 0) {
+		fprintf(stderr, "crt_export: %s\n", gnutls_strerror(result));
+		exit(1);
+	}
+
+	fprintf(outfile, "Certificate: \n%s", buffer);
+
+	gnutls_x509_crt_deinit(crt);
 }
 
 void gaa_parser(int argc, char **argv)
@@ -379,6 +463,22 @@ void gaa_parser(int argc, char **argv)
 			"Error in the arguments. Use the --help or -h parameters to get more information.\n");
 		exit(1);
 	}
+	
+	if (info.outfile) {
+		outfile = fopen(info.outfile, "w");
+		if (outfile == NULL) {
+			fprintf(stderr, "error: could not open %s.\n", info.outfile);
+			exit(1);
+		}
+	} else outfile = stdout;
+
+	if (info.infile) {
+		infile = fopen(info.infile, "r");
+		if (infile == NULL) {
+			fprintf(stderr, "error: could not open %s.\n", info.infile);
+			exit(1);
+		}
+	} else infile = stdin;
 
 	gnutls_global_init();
 	gnutls_global_set_log_function( tls_log_func);
@@ -387,26 +487,30 @@ void gaa_parser(int argc, char **argv)
 	switch( info.action) {
 		case 0:
 			generate_self_signed();
-			return;
+			break;
 		case 1:
 			generate_private_key();
-			return;
+			break;
 		case 2:
 			certificate_info();
-			return;
+			break;
 		case 3:
 			generate_request();
-			return;
+			break;
 		case 4:
 			generate_signed_certificate();
-			return;
+			break;
 		case 5:
 			verify_chain();
-			return;
+			break;
 		case 6:
 			privkey_info();
-			return;
+			break;
+		case 7:
+			update_signed_certificate();
+			break;
 	}
+	fclose(outfile);
 }
 
 void certtool_version(void)
@@ -443,7 +547,7 @@ void certificate_info( void)
 	const char* cprint;
 	char dn[256];
 		
-	size = fread( buffer, 1, sizeof(buffer)-1, stdin);
+	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 	buffer[size] = 0;
 
 	gnutls_x509_crt_init(&crt);
@@ -457,7 +561,7 @@ void certificate_info( void)
 		exit(1);
 	}
 	
-	printf("Version: %d\n", gnutls_x509_crt_get_version(crt));
+	fprintf(outfile, "Version: %d\n", gnutls_x509_crt_get_version(crt));
 
 	/* serial number
 	 */
@@ -468,7 +572,7 @@ void certificate_info( void)
 				(unsigned char) serial[i]);
 			print += 3;
 		}
-		printf("Serial Number: %s\n", printable);
+		fprintf(outfile, "Serial Number: %s\n", printable);
 	}
 	
 
@@ -479,43 +583,43 @@ void certificate_info( void)
 
 	ret = gnutls_x509_crt_get_issuer_dn(crt, dn, &dn_size);
 	if (ret >= 0)
-		printf("Issuer: %s\n", dn);
+		fprintf(outfile, "Issuer: %s\n", dn);
 
-	printf("Signature Algorithm: ");
+	fprintf(outfile, "Signature Algorithm: ");
 	ret = gnutls_x509_crt_get_signature_algorithm(crt);
 
 	cprint = get_algorithm( ret);
-	printf( "%s\n", cprint);
+	fprintf(outfile,  "%s\n", cprint);
 
 	/* Validity
 	 */
-	printf("Validity:\n");
+	fprintf(outfile, "Validity:\n");
 
 	tim = gnutls_x509_crt_get_activation_time(crt);
-	printf("\tNot Before: %s", ctime(&tim));
+	fprintf(outfile, "\tNot Before: %s", ctime(&tim));
 
 	tim = gnutls_x509_crt_get_expiration_time(crt);
-	printf("\tNot After: %s", ctime(&tim));
+	fprintf(outfile, "\tNot After: %s", ctime(&tim));
 
 	/* Subject
 	 */
 	dn_size = sizeof(dn);
 	ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
 	if (ret >= 0)
-		printf("Subject: %s\n", dn);
+		fprintf(outfile, "Subject: %s\n", dn);
 
 	/* Public key algorithm
 	 */
-	printf("Subject Public Key Info:\n");
+	fprintf(outfile, "Subject Public Key Info:\n");
 	ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
-	printf("\tPublic Key Algorithm: ");
+	fprintf(outfile, "\tPublic Key Algorithm: ");
 
 	cprint = get_algorithm( ret);
-	printf( "%s\n", cprint);
+	fprintf(outfile,  "%s\n", cprint);
 
 
 	
-	printf("\nX.509 Extensions:\n");
+	fprintf(outfile, "\nX.509 Extensions:\n");
 	
 	/* subject alternative name
 	 */
@@ -524,25 +628,25 @@ void certificate_info( void)
 		ret = gnutls_x509_crt_get_subject_alt_name(crt, i, buffer, &size, &critical);
 
 		if (i==0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			printf("\tSubject Alternative name:");
-			if (critical) printf(" (critical)");
-			printf("\n");
+			fprintf(outfile, "\tSubject Alternative name:");
+			if (critical) fprintf(outfile, " (critical)");
+			fprintf(outfile, "\n");
 		}
 		
 		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			printf("\t\tFound unsupported alternative name.\n");
+			fprintf(outfile, "\t\tFound unsupported alternative name.\n");
 		} else switch (ret) {
 			case GNUTLS_SAN_DNSNAME:
-				printf("\t\tDNSname: %s\n", buffer);
+				fprintf(outfile, "\t\tDNSname: %s\n", buffer);
 				break;
 			case GNUTLS_SAN_RFC822NAME:
-				printf("\t\tRFC822name: %s\n", buffer);
+				fprintf(outfile, "\t\tRFC822name: %s\n", buffer);
 				break;
 			case GNUTLS_SAN_URI:
-				printf("\t\tURI: %s\n", buffer);
+				fprintf(outfile, "\t\tURI: %s\n", buffer);
 				break;
 			case GNUTLS_SAN_IPADDRESS:
-				printf("\t\tIPAddress: %s\n", buffer);
+				fprintf(outfile, "\t\tIPAddress: %s\n", buffer);
 				break;
 		}
 	}
@@ -552,12 +656,12 @@ void certificate_info( void)
 	ret = gnutls_x509_crt_get_ca_status( crt, &critical);
 	
 	if (ret >= 0) {
-		printf("\tBasic Constraints:");
-		if (critical) printf(" (critical)");
-		printf("\n");		
+		fprintf(outfile, "\tBasic Constraints:");
+		if (critical) fprintf(outfile, " (critical)");
+		fprintf(outfile, "\n");		
 
-		if (ret==0) printf("\t\tCA:FALSE\n");
-		else printf("\t\tCA:TRUE\n");
+		if (ret==0) fprintf(outfile, "\t\tCA:FALSE\n");
+		else fprintf(outfile, "\t\tCA:TRUE\n");
 		
 	}
 
@@ -566,7 +670,7 @@ void certificate_info( void)
 	ret = gnutls_x509_crt_get_key_usage( crt, &key_usage, &critical);
 	
 	if (ret >= 0) {
-		printf("\tKey usage:\n");
+		fprintf(outfile, "\tKey usage:\n");
 		print_key_usage(key_usage);
 	}
 
@@ -585,7 +689,7 @@ void certificate_info( void)
 			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
 			print += 3;
 		}
-		printf("\nFingerprint: %s\n", printable);
+		fprintf(outfile, "\nFingerprint: %s\n", printable);
 	}
 
 	size = sizeof(buffer);
@@ -600,10 +704,10 @@ void certificate_info( void)
 			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
 			print += 3;
 		}
-		printf("Public Key ID: %s\n", printable);
+		fprintf(outfile, "Public Key ID: %s\n", printable);
 	}
 
-	printf("\n");
+	fprintf(outfile, "\n");
 }
 
 void privkey_info( void)
@@ -615,7 +719,7 @@ void privkey_info( void)
 	char *print;
 	const char* cprint;
 		
-	size = fread( buffer, 1, sizeof(buffer)-1, stdin);
+	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 	buffer[size] = 0;
 
 	gnutls_x509_privkey_init(&key);
@@ -636,12 +740,12 @@ void privkey_info( void)
 	
 	/* Public key algorithm
 	 */
-	printf("Public Key Info:\n");
+	fprintf(outfile, "Public Key Info:\n");
 	ret = gnutls_x509_privkey_get_pk_algorithm(key);
-	printf("\tPublic Key Algorithm: ");
+	fprintf(outfile, "\tPublic Key Algorithm: ");
 
 	cprint = get_algorithm( ret);
-	printf( "%s\n", cprint);
+	fprintf(outfile,  "%s\n", cprint);
 
 
 	size = sizeof(buffer);
@@ -656,10 +760,10 @@ void privkey_info( void)
 			sprintf(print, "%.2x ", (unsigned char) buffer[i]);
 			print += 3;
 		}
-		printf("Public Key ID: %s\n", printable);
+		fprintf(outfile, "Public Key ID: %s\n", printable);
 	}
 
-	printf("\n");
+	fprintf(outfile, "\n");
 }
 
 
@@ -703,6 +807,46 @@ size_t size;
 	}	
 
 	return key;
+}
+
+gnutls_x509_crq load_request()
+{
+FILE* fd;
+gnutls_x509_crq crq;
+int ret;
+gnutls_datum dat;
+size_t size;
+
+	if (!info.request) return NULL;
+
+	fd = fopen(info.request, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "File %s does not exist.\n", info.request);
+		exit(1);
+	}
+
+	size = fread(buffer, 1, sizeof(buffer)-1, fd);
+	buffer[size] = 0;
+
+	fclose(fd);
+
+	ret = gnutls_x509_crq_init(&crq);
+	if (ret < 0) {
+		fprintf(stderr, "crq_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	dat.data = buffer;
+	dat.size = size;
+	
+	ret = gnutls_x509_crq_import( crq, &dat, GNUTLS_X509_FMT_PEM);
+	
+	if (ret < 0) {
+		fprintf(stderr, "crq_import: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}	
+
+	return crq;
 }
 
 gnutls_x509_privkey load_ca_private_key()
@@ -800,6 +944,52 @@ size_t size;
 	return crt;
 }
 
+/* Loads the certificate
+ */
+gnutls_x509_crt load_cert()
+{
+FILE* fd;
+gnutls_x509_crt crt;
+int ret;
+gnutls_datum dat;
+size_t size;
+
+	fprintf(stderr, "Loading certificate...\n");
+
+	if (info.cert==NULL) {
+		fprintf(stderr, "You must specify a certificate.\n");
+		exit(1);
+	}
+
+	fd = fopen(info.cert, "r");
+	if (fd == NULL) {
+		fprintf(stderr, "File %s does not exist.\n", info.cert);
+		exit(1);
+	}
+
+	size = fread(buffer, 1, sizeof(buffer)-1, fd);
+	buffer[size] = 0;
+
+	fclose(fd);
+
+	ret = gnutls_x509_crt_init(&crt);
+	if (ret < 0) {
+		fprintf(stderr, "crt_init: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	dat.data = buffer;
+	dat.size = size;
+	
+	ret = gnutls_x509_crt_import( crt, &dat, GNUTLS_X509_FMT_PEM);
+	if (ret < 0) {
+		fprintf(stderr, "crt_import: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}	
+
+	return crt;
+}
+
 
 /* Generate a PKCS #10 certificate request.
  */
@@ -868,7 +1058,7 @@ void generate_request(void)
 		exit(1);
 	}
 
-	printf("Request: \n%s", buffer);
+	fprintf(outfile, "Request: \n%s", buffer);
 
 	gnutls_x509_crq_deinit(crq);
 	gnutls_x509_privkey_deinit(key);
@@ -1015,22 +1205,22 @@ int _verify_x509_mem( const char* cert, int cert_size)
 
 static void print_verification_res( unsigned int x) 
 {
-	printf( "Verification output:\n");
+	fprintf(outfile,  "Verification output:\n");
 	if (x&GNUTLS_CERT_INVALID)
-		printf("\tcertificate chain is invalid.\n");
+		fprintf(outfile, "\tcertificate chain is invalid.\n");
 	else
-	 	printf("\tcertificate chain is valid.\n");
+	 	fprintf(outfile, "\tcertificate chain is valid.\n");
 
 	if (x&GNUTLS_CERT_NOT_TRUSTED)
-		printf("\tThe certificate chain was NOT verified.\n");
+		fprintf(outfile, "\tThe certificate chain was NOT verified.\n");
 	else
-		printf("\tThe certificate chain was verified.\n");
+		fprintf(outfile, "\tThe certificate chain was verified.\n");
 
 	if (x&GNUTLS_CERT_CORRUPTED)
-		printf("\tA certificate is corrupt.\n");
+		fprintf(outfile, "\tA certificate is corrupt.\n");
 
 	if (x&GNUTLS_CERT_REVOKED)
-		printf("\tA certificate has been revoked.\n");
+		fprintf(outfile, "\tA certificate has been revoked.\n");
 }
 
 void verify_chain( void)
@@ -1038,7 +1228,7 @@ void verify_chain( void)
 unsigned int output;
 size_t size;
 
-	size = fread( buffer, 1, sizeof(buffer)-1, stdin);
+	size = fread( buffer, 1, sizeof(buffer)-1, infile);
 
 	output = _verify_x509_mem( buffer, size);
 	

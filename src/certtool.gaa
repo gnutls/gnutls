@@ -5,6 +5,8 @@ option (s, generate-self-signed) { $action=0; } "Generate a self-signed certific
 
 option (c, generate-certificate) { $action=4; } "Generate a signed certificate."
 
+option (u, update-certificate) { $action=7; } "Update a signed certificate."
+
 option (p, generate-privkey) { $action=1; } "Generate a private key."
 
 option (q, generate-request) { $action=3; } "Generate a PKCS #10 certificate request."
@@ -14,13 +16,19 @@ option (e, verify-chain) { $action=5; } "Verify a certificate chain. The last ce
 #char *privkey;
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."
 
+#char *request;
+option (load-request) STR "FILE" { $request = $1 } "Certificate request file to use."
+
+#char *cert;
+option (load-certificate) STR "FILE" { $cert = $1 } "Certificate file to use."
+
 #char *ca_privkey;
 option (load-ca-privkey) STR "FILE" { $ca_privkey = $1 } "Certificate authority's private key file to use."
 
 #char *ca;
-option (load-ca-cert) STR "FILE" { $ca = $1 } "Certificate authority's certificate file to use."
+option (load-ca-certificate) STR "FILE" { $ca = $1 } "Certificate authority's certificate file to use."
 
-option (i, cert-info) { $action = 2; } "Print information on a certificate."
+option (i, certificate-info) { $action = 2; } "Print information on a certificate."
 
 option (k, key-info) { $action = 6; } "Print information on a private key."
 
@@ -31,6 +39,12 @@ option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 #int bits;
 option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key generation."
 
+#char *outfile;
+option (outfile) STR "FILE" { $outfile = $1 } "Output file."
+
+#char *infile;
+option (infile) STR "FILE" { $infile = $1 } "Output file."
+
 #int debug;
 option (d, debug) INT "LEVEL" { $debug = $1 } "specify the debug level. Default is 1."
 
@@ -39,5 +53,5 @@ option (h, help) { gaa_help(); exit(0); } "shows this help text"
 option (v, version) { certtool_version(); exit(0); } "shows the program version"
 
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
-	$debug=1; }
+	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; }
 
