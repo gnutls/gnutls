@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -40,7 +41,6 @@ int main(int argc, char **argv)
 #include <gnutls/extra.h>
 #include <gcrypt.h>		/* for randomize */
 #include <crypt-gaa.h>
-#include <getpass.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -51,6 +51,9 @@ int main(int argc, char **argv)
 #else
 # include <windows.h>
 #endif
+
+/* Gnulib portability files. */
+#include <getpass.h>
 
 #define _MAX(x,y) (x>y?x:y)
 
@@ -409,7 +412,7 @@ int main(int argc, char **argv)
 
     salt = 16;
 
-    passwd = read_pass("Enter password: ");
+    passwd = getpass("Enter password: ");
 
 /* not ready yet */
     if (info.verify != 0) {

@@ -30,6 +30,9 @@
 #include <gnutls/x509.h>
 #include <string.h>
 
+/* Gnulib portability files. */
+#include <getpass.h>
+
 extern int batch;
 
 typedef struct _cfg_ctx {
@@ -255,7 +258,7 @@ const char *get_pass(void)
     if (batch)
 	return cfg.password;
     else
-	return read_pass("Enter password: ");
+	return getpass("Enter password: ");
 }
 
 const char *get_challenge_pass(void)
@@ -263,7 +266,7 @@ const char *get_challenge_pass(void)
     if (batch)
 	return cfg.challenge_password;
     else
-	return read_pass("Enter a challenge password: ");
+	return getpass("Enter a challenge password: ");
 }
 
 const char *get_crl_dist_point_url(void)

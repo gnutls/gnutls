@@ -31,9 +31,22 @@ libgnu_la_SOURCES += exit.h
 libgnu_la_SOURCES += getline.h
 EXTRA_DIST += getndelim2.h getndelim2.c
 
+libgnu_la_SOURCES += getpass.h
+
 libgnu_la_SOURCES += gettext.h
 
 libgnu_la_SOURCES += progname.h progname.c
+
+BUILT_SOURCES += $(STDBOOL_H)
+EXTRA_DIST += stdbool_.h
+
+# We need the following in order to create an <stdbool.h> when the system
+# doesn't have one that works.
+all-local $(libgnu_la_OBJECTS): $(STDBOOL_H)
+stdbool.h: stdbool_.h
+	sed -e 's/@''HAVE__BOOL''@/$(HAVE__BOOL)/g' < $(srcdir)/stdbool_.h > $@-t
+	mv $@-t $@
+MOSTLYCLEANFILES += stdbool.h stdbool.h-t
 
 libgnu_la_SOURCES += unlocked-io.h
 

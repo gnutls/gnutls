@@ -33,7 +33,6 @@
 #include "certtool-gaa.h"
 #include <gnutls/pkcs12.h>
 #include <unistd.h>
-#include <getpass.h>
 #include <certtool-cfg.h>
 
 /* Gnulib portability files. */
