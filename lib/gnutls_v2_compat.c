@@ -249,7 +249,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 		state->gnutls_internals.resumed = RESUME_FALSE;
 	}
 
-	state->gnutls_internals.compression_method = GNUTLS_NULL_COMPRESSION;
+	state->gnutls_internals.compression_method = GNUTLS_COMP_NULL;
 
 	return 0;
 }

@@ -532,7 +532,7 @@ int _gnutls_recv_client_certificate( GNUTLS_STATE state)
 		if (ret < 0) {
 			if (optional == OPTIONAL_PACKET &&
 			        ret==GNUTLS_E_WARNING_ALERT_RECEIVED && 
-				gnutls_get_last_alert(state)==GNUTLS_NETSCAPE_NO_CLIENT_CERTIFICATE) {
+				gnutls_get_last_alert(state)==GNUTLS_A_NETSCAPE_NO_CLIENT_CERTIFICATE) {
 
 				/* netscape does not send an empty certificate,
 				 * but this alert. So we just ignore it.

@@ -284,7 +284,7 @@ int rc;
 		if (state->connection_state.read_cipher_state ==
 		    GNUTLS_CIPHER_FAILED
 		    && state->security_parameters.read_bulk_cipher_algorithm !=
-		    GNUTLS_NULL_CIPHER) {
+		    GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
@@ -313,7 +313,7 @@ int rc;
 		if (state->connection_state.read_cipher_state ==
 		    GNUTLS_CIPHER_FAILED
 		    && state->security_parameters.read_bulk_cipher_algorithm !=
-		    GNUTLS_NULL_CIPHER) {
+		    GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
@@ -428,7 +428,7 @@ int rc;
 				       state->cipher_specs.server_write_IV);
 
 		if (state->connection_state.write_cipher_state == GNUTLS_CIPHER_FAILED
-		    && state->security_parameters.write_bulk_cipher_algorithm != GNUTLS_NULL_CIPHER) {
+		    && state->security_parameters.write_bulk_cipher_algorithm != GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}
@@ -456,7 +456,7 @@ int rc;
 		if (state->connection_state.write_cipher_state ==
 		    GNUTLS_CIPHER_FAILED
 		    && state->security_parameters.write_bulk_cipher_algorithm !=
-		    GNUTLS_NULL_CIPHER) {
+		    GNUTLS_CIPHER_NULL) {
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER;
 		}

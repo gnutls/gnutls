@@ -28,38 +28,38 @@ GNUTLS_CIPHER_HANDLE gnutls_cipher_init( BulkCipherAlgorithm cipher, gnutls_datu
 GNUTLS_CIPHER_HANDLE ret;
 
 	switch (cipher) {
-	case GNUTLS_NULL_CIPHER:
+	case GNUTLS_CIPHER_NULL:
 		ret = GNUTLS_CIPHER_FAILED;
 		break;
-	case GNUTLS_RIJNDAEL_CBC:
+	case GNUTLS_CIPHER_RIJNDAEL_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_RIJNDAEL256_CBC:
+	case GNUTLS_CIPHER_RIJNDAEL256_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_TWOFISH_CBC:
+	case GNUTLS_CIPHER_TWOFISH_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "twofish", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_TWOFISH, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_3DES_CBC:
+	case GNUTLS_CIPHER_3DES_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "tripledes", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_ARCFOUR:
+	case GNUTLS_CIPHER_ARCFOUR:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "arcfour", NULL, "stream", NULL);
 #else

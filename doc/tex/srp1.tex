@@ -60,11 +60,11 @@ int main()
    /* allow only ARCFOUR and 3DES ciphers
     * (3DES has the highest priority)
     */
-   gnutls_cipher_set_priority(state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, 0);
+   gnutls_cipher_set_priority(state, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0);
 
    /* only allow null compression
     */
-   gnutls_compression_set_priority(state, GNUTLS_NULL_COMPRESSION, 0);
+   gnutls_compression_set_priority(state, GNUTLS_COMP_NULL, 0);
 
    /* use GNUTLS_KX_RSA
     */

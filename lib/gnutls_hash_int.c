@@ -32,7 +32,7 @@ GNUTLS_MAC_HANDLE gnutls_hash_init(MACAlgorithm algorithm)
 	GNUTLS_MAC_HANDLE ret;
 
 	switch (algorithm) {
-	case GNUTLS_NULL_MAC:
+	case GNUTLS_MAC_NULL:
 		ret = GNUTLS_HASH_FAILED;
 		break;
 	case GNUTLS_MAC_SHA:
@@ -73,7 +73,7 @@ int gnutls_hash_get_algo_len(MACAlgorithm algorithm)
 	int ret;
 
 	switch (algorithm) {
-	case GNUTLS_NULL_MAC:
+	case GNUTLS_MAC_NULL:
 		ret = 0;
 		break;
 	case GNUTLS_MAC_SHA:
@@ -136,7 +136,7 @@ GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, void *key,
 	GNUTLS_MAC_HANDLE ret;
 
 	switch (algorithm) {
-	case GNUTLS_NULL_MAC:
+	case GNUTLS_MAC_NULL:
 		ret = GNUTLS_MAC_FAILED;
 		break;
 	case GNUTLS_MAC_SHA:
@@ -184,7 +184,7 @@ int gnutls_hmac_get_algo_len(MACAlgorithm algorithm)
 	int ret;
 
 	switch (algorithm) {
-	case GNUTLS_NULL_MAC:
+	case GNUTLS_MAC_NULL:
 		ret = 0;
 		break;
 	case GNUTLS_MAC_SHA:

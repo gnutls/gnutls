@@ -83,9 +83,9 @@ GNUTLS_STATE initialize_state()
 	/* null cipher is here only for debuging 
 	 * purposes.
 	 */
-	gnutls_cipher_set_priority(state, GNUTLS_NULL_CIPHER, 
-				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, 0);
-	gnutls_compression_set_priority(state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_cipher_set_priority(state, GNUTLS_CIPHER_NULL, 
+				   GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0);
+	gnutls_compression_set_priority(state, GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0);
 	gnutls_kx_set_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_protocol_set_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	
@@ -317,7 +317,7 @@ int read_request( GNUTLS_STATE state, char *data, int data_size, int rnl)
 void check_alert( GNUTLS_STATE state, int ret) {
 	if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 		ret = gnutls_get_last_alert(state);
-		if (ret == GNUTLS_NO_RENEGOTIATION)
+		if (ret == GNUTLS_A_NO_RENEGOTIATION)
 			printf("* Received NO_RENEGOTIATION alert. Client Does not support renegotiation.\n");
 		else
 			printf("* Received alert '%d'.\n", ret);
@@ -474,7 +474,7 @@ int main(int argc, char **argv)
 					ret = gnutls_rehandshake( state);
 				} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 
-				if (gnutls_get_last_alert(state)!=GNUTLS_NO_RENEGOTIATION) {
+				if (gnutls_get_last_alert(state)!=GNUTLS_A_NO_RENEGOTIATION) {
 					printf("* Requesting rehandshake.\n");
 					/* continue handshake proccess */
 					do {

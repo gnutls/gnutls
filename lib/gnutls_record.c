@@ -106,13 +106,13 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 /* Set the defaults for initial handshake */
 	(*state)->security_parameters.read_bulk_cipher_algorithm = 
-	(*state)->security_parameters.write_bulk_cipher_algorithm = GNUTLS_NULL_CIPHER;
+	(*state)->security_parameters.write_bulk_cipher_algorithm = GNUTLS_CIPHER_NULL;
 
 	(*state)->security_parameters.read_mac_algorithm = 
-	(*state)->security_parameters.write_mac_algorithm = GNUTLS_NULL_MAC;
+	(*state)->security_parameters.write_mac_algorithm = GNUTLS_MAC_NULL;
 
-	(*state)->security_parameters.read_compression_algorithm = GNUTLS_NULL_COMPRESSION;
-	(*state)->security_parameters.write_compression_algorithm = GNUTLS_NULL_COMPRESSION;
+	(*state)->security_parameters.read_compression_algorithm = GNUTLS_COMP_NULL;
+	(*state)->security_parameters.write_compression_algorithm = GNUTLS_COMP_NULL;
 
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
@@ -429,31 +429,36 @@ int gnutls_send_appropriate_alert( GNUTLS_STATE state, int err) {
 int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	switch (err) { /* send appropriate alert */
 		case GNUTLS_E_MAC_FAILED:
-			ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
+			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
 			break;
 		case GNUTLS_E_DECRYPTION_FAILED:
-			ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_DECRYPTION_FAILED);
+			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_DECRYPTION_FAILED);
 			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
-			ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_DECOMPRESSION_FAILURE);
+			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_DECOMPRESSION_FAILURE);
 			break;
 		case GNUTLS_E_ILLEGAL_PARAMETER:
-                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_ILLEGAL_PARAMETER);
+                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_ILLEGAL_PARAMETER);
                         break;
 		case GNUTLS_E_ASN1_PARSING_ERROR:
 		case GNUTLS_E_NO_CERTIFICATE_FOUND:
-                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
+                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
-                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_HANDSHAKE_FAILURE);
+                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_HANDSHAKE_FAILURE);
                         break;
 		case GNUTLS_E_UNEXPECTED_PACKET:
-                        ret = gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_UNEXPECTED_MESSAGE);
+                        ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
                         break;
 		case GNUTLS_E_REHANDSHAKE:
-                        ret = gnutls_send_alert( state, GNUTLS_WARNING, GNUTLS_NO_RENEGOTIATION);
+                        ret = gnutls_send_alert( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION);
                         break;
-                                                              
+		case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
+                        ret = gnutls_send_alert( state, GNUTLS_AL_WARNING, GNUTLS_A_PROTOCOL_VERSION);
+			break;
+		case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
+			ret = gnutls_send_alert( state, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
+			break;
 	}
 	return ret;
 }
@@ -488,7 +493,7 @@ int gnutls_bye( GNUTLS_STATE state, CloseRequest how)
 			if (STATE==STATE60) {
 				ret = _gnutls_write_flush( state);
 			} else {
-				ret = gnutls_send_alert( state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+				ret = gnutls_send_alert( state, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
 				STATE = STATE60;
 			}
 
@@ -551,7 +556,6 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 		lver = _gnutls_version_lowest(state);
 		if (lver==GNUTLS_VERSION_UNKNOWN) {
 			gnutls_assert();
-			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 		}
 	} else { /* send the current */
 		lver = gnutls_protocol_get_version( state);
@@ -790,13 +794,6 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 # ifdef RECORD_DEBUG
 		_gnutls_log( "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
 # endif
-		if (type!=GNUTLS_ALERT) {
-			/* some browsers return garbage, when
-			 * we send them a close notify. 
-			 * silently ignore that.
-			 */
-			gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
-		}
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
@@ -813,7 +810,6 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 #ifdef RECORD_DEBUG
 		_gnutls_log( "Record: FATAL ERROR: Received packet with length: %d\n", length);
 #endif
-		gnutls_send_alert( state, GNUTLS_FATAL, GNUTLS_RECORD_OVERFLOW);
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
@@ -891,7 +887,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 			/* if close notify is received and
 			 * the alert is not fatal
 			 */
-			if (tmpdata[1] == GNUTLS_CLOSE_NOTIFY && tmpdata[0] != GNUTLS_FATAL) {
+			if (tmpdata[1] == GNUTLS_A_CLOSE_NOTIFY && tmpdata[0] != GNUTLS_AL_FATAL) {
 				/* If we have been expecting for an alert do 
 				 * not call close().
 				 */
@@ -908,7 +904,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 				 */
 			
 				ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
-				if (tmpdata[0] == GNUTLS_FATAL) {
+				if (tmpdata[0] == GNUTLS_AL_FATAL) {
 					state->gnutls_internals.valid_connection = VALID_FALSE;
 					state->gnutls_internals.resumable = RESUME_FALSE;
 					

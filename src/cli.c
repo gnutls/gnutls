@@ -223,8 +223,8 @@ int main(int argc, char** argv)
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
 	gnutls_protocol_set_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_cipher_set_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
-	gnutls_compression_set_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_cipher_set_priority( state, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_CBC, 0);
+	gnutls_compression_set_priority( state, GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0);
 	gnutls_kx_set_priority( state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_mac_set_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
@@ -286,8 +286,8 @@ int main(int argc, char** argv)
 	gnutls_init(&state, GNUTLS_CLIENT);
 	
 	gnutls_protocol_set_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
-	gnutls_cipher_set_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
-	gnutls_compression_set_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_cipher_set_priority( state, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_CBC, 0);
+	gnutls_compression_set_priority( state, GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0);
 	gnutls_kx_set_priority( state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_mac_set_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 

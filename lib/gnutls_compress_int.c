@@ -35,13 +35,13 @@ uLongf size;
 int err;
 
 	switch (algorithm) {
-	case GNUTLS_NULL_COMPRESSION:
+	case GNUTLS_COMP_NULL:
 		*compressed = gnutls_malloc(plain_size);
 		memcpy(*compressed, plain, plain_size);
 		compressed_size = plain_size;
 		break;
 #ifdef HAVE_LIBZ
-	case GNUTLS_ZLIB:
+	case GNUTLS_COMP_ZLIB:
 		size = (plain_size*1.2)+12;
 		*compressed=NULL;
 		do {
@@ -77,7 +77,7 @@ uLongf size;
 
 	if (compressed_size > MAX_COMP_SIZE) return GNUTLS_E_DECOMPRESSION_FAILED;
 	switch (algorithm) {
-	case GNUTLS_NULL_COMPRESSION:
+	case GNUTLS_COMP_NULL:
 		*plain = gnutls_malloc(compressed_size);
 		if (*plain==NULL) {
 			gnutls_assert();
@@ -88,7 +88,7 @@ uLongf size;
 		plain_size = compressed_size;
 		break;
 #ifdef HAVE_LIBZ
-	case GNUTLS_ZLIB:
+	case GNUTLS_COMP_ZLIB:
 		*plain = NULL;
 		size = compressed_size;
 		do {

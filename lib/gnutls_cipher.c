@@ -153,7 +153,7 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 				     write_mac_secret.size);
 	}
 	if (td == GNUTLS_MAC_FAILED
-	    && state->security_parameters.write_mac_algorithm != GNUTLS_NULL_MAC) {
+	    && state->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
@@ -286,7 +286,7 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	}
 
 	if (td == GNUTLS_MAC_FAILED
-	    && state->security_parameters.read_mac_algorithm != GNUTLS_NULL_MAC) {
+	    && state->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
