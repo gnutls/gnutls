@@ -4,12 +4,12 @@
 /* This function will try to verify the peer's certificate, and
  * also check if the hostname matches, and the activation, expiration dates.
  */
-void verify_certificate( gnutls_session session, const char* hostname)
+void verify_certificate( gnutls_session_t session, const char* hostname)
 {
    unsigned int status;
-   const gnutls_datum* cert_list;
+   const gnutls_datum_t* cert_list;
    int cert_list_size, ret;
-   gnutls_x509_crt cert;
+   gnutls_x509_crt_t cert;
 
 
    /* This verification function uses the trusted CAs in the credentials
