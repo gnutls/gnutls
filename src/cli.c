@@ -211,9 +211,9 @@ int main(int argc, char** argv)
 	print_info( state);
 
 	printf("- Disconnecting\n");
-	gnutls_bye(sd, state, 0);
+	gnutls_bye(sd, state, GNUTLS_SHUT_WR);
 	shutdown( sd, SHUT_WR);
-	close(sd);	
+	close(sd);
 	gnutls_deinit( state);	
 	
 
@@ -320,15 +320,16 @@ int main(int argc, char** argv)
 		if (FD_ISSET(fileno(stdin), &rset)) {
 	
 			if( fgets(buffer, MAX_BUF, stdin) == NULL) {
-				gnutls_bye(sd, state, 0);
+				gnutls_bye(sd, state, GNUTLS_SHUT_W);
 				user_term = 1;
 				continue;
 			}
 			gnutls_write( sd, state, buffer, strlen(buffer));
 			printf("- Sent: %d bytes\n", strlen(buffer));
+
 		}
 	}
-	if (user_term!=0) gnutls_bye(sd, state, 0);
+	if (user_term!=0) gnutls_bye(sd, state, GNUTLS_SHUT_WR);
 	
 	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);

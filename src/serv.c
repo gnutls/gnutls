@@ -310,7 +310,7 @@ int read_request(int cd, GNUTLS_STATE state, char *data, int data_size, int rnl)
 			return rc;
 		}
 	}
-fprintf(stderr, "\n");
+
 	*ptr = 0;
 	return n;
 }

@@ -92,7 +92,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			} AlertDescription;
 typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
 typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
-typedef enum CloseRequest { GNUTLS_BYE_RW=0, GNUTLS_BYE_W=1, GNUTLS_BYE_R=2 } CloseRequest;
+typedef enum CloseRequest { GNUTLS_SHUT_WR=0, GNUTLS_SHUT_W=1 } CloseRequest;
 
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,

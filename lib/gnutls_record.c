@@ -334,12 +334,14 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
   * him of something important (eg. his Certificate could not be verified).
   * If the alert level is Fatal then the peer is expected to close the
   * connection, otherwise he may ignore the alert and continue.
+  * Returns 0 on success.
   *
   **/
 int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
 {
 	uint8 data[2];
-
+	int ret;
+	
 	memcpy(&data[0], &level, 1);
 	memcpy(&data[1], &desc, 1);
 
@@ -347,7 +349,10 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
 	_gnutls_log( "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
 #endif
 
-	return gnutls_send_int(cd, state, GNUTLS_ALERT, -1, data, 2, 0);
+	if ( (ret = gnutls_send_int(cd, state, GNUTLS_ALERT, -1, data, 2, 0)) >= 0)
+		return 0;
+	else
+		return ret;
 }
 
 /**
@@ -357,30 +362,31 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
   * @how: is an integer
   *
   * Terminates the current TLS/SSL connection. The connection should
-  * have been initiated using gnutls_handshake() or similar function.
-  * 'how' is one of GNUTLS_BYE_R, GNUTLS_BYE_RW, GNUTLS_BYE_W.
+  * have been initiated using gnutls_handshake().
+  * 'how' should be one of GNUTLS_SHUT_WR, GNUTLS_SHUT_W.
   *
-  * Note that if the return value is zero and 'how' was GNUTLS_BYE_RW, you
-  * may continue using the TCP connection.
+  * in case of GNUTLS_SHUT_WR then the connection gets terminated and
+  * further receives and sends will be disallowed. If the return
+  * value is zero you may continue using the TCP connection.
+  *
+  * in case of GNUTLS_SHUT_W then the connection gets terminated and
+  * further sends will be disallowed. In order to reuse the TCP connection
+  * you should wait for an EOF from the peer.
   *
   **/
 int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 {
-	int ret = 0;
+	int ret = 0, ret2 = 0;
 
+	ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
-	if (how == GNUTLS_BYE_R || how == GNUTLS_BYE_RW) {
-		ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
-
+	if ( how == GNUTLS_SHUT_WR && ret == 0) {
+		ret2 = gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
 		state->gnutls_internals.may_read = 1;
-		gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
 	}
+	state->gnutls_internals.may_write = 1;
 	
-	if (how == GNUTLS_BYE_W || how == GNUTLS_BYE_RW) {
-		state->gnutls_internals.may_write = 1;
-	}
-	
-	return ret;
+	return GMIN(ret, ret2);
 }
 
 /* This function behave exactly like write(). The only difference is 
@@ -738,13 +744,12 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			 * the alert is not fatal
 			 */
 			if (tmpdata[1] == GNUTLS_CLOSE_NOTIFY && tmpdata[0] != GNUTLS_FATAL) {
-
 				/* If we have been expecting for an alert do 
 				 * not call close().
 				 */
 				if (type != GNUTLS_ALERT)
-					gnutls_bye(cd, state, 1);
-				
+					gnutls_bye( cd, state, GNUTLS_SHUT_W);
+
 				gnutls_free(tmpdata);
 
 				return 0; /* EOF */
