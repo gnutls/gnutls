@@ -48,7 +48,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	ext_max_record.c gnutls_alert.c gnutls_int_compat.c		\
 	gnutls_str.c gnutls_state.c gnutls_x509.c ext_cert_type.c	\
 	gnutls_rsa_export.c auth_rsa_export.c ext_server_name.c		\
-	auth_dh_common.c
+	auth_dh_common.c memmem.c
 
 HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
@@ -65,7 +65,7 @@ HFILES = debug.h gnutls_compress.h defines.h gnutls_cipher.h		\
 	gnutls_alert.h gnutls_str.h gnutls_state.h gnutls_x509.h	\
 	ext_cert_type.h gnutls_rsa_export.h ext_server_name.h		\
 	auth_dh_common.h ext_srp.h gnutls_srp.h auth_srp.h		\
-	auth_srp_passwd.h
+	auth_srp_passwd.h memmem.h
 
 # Separate so we can create the documentation
 
@@ -76,8 +76,6 @@ libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
 	../crypto/libgc.la \
 	$(libgnutls_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
-
-libgnutls_la_LIBADD = ../gl/libgnu.la
 
 pkix_asn1_tab.c: pkix.asn
 	-asn1Parser pkix.asn pkix_asn1_tab.c
