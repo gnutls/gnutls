@@ -6,6 +6,8 @@ Current list:
 * Add a callback function in certificate authentication, to receive
   the certificate and the private key. This might require a rewrite
   of the certificate selection part.
+* Add gnutls_certificate_set_openpgp_key() and gnutls_certificate_set_openpgp_keyring()
+  functions, similar to gnutls_certificate_set_x509_key().
 * Add support for generating and handling DSA keys
 * Convert documentation to texinfo format
 * Audit the code
