@@ -8,6 +8,7 @@ int test_srp( gnutls_session state);
 int test_export( gnutls_session state);
 int test_hello_extension( gnutls_session state);
 int test_dhe( gnutls_session state);
+int test_dhe_bits( gnutls_session state);
 int test_ssl3( gnutls_session state);
 int test_aes( gnutls_session state);
 int test_md5( gnutls_session state);

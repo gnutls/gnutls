@@ -33,6 +33,7 @@ extern gnutls_certificate_credentials xcred;
 
 extern int more_info;
 static int srp = 0;
+static int dh_bits;
 
 extern int tls1_ok;
 extern int ssl3_ok;
@@ -183,29 +184,43 @@ int ret;
 }
 
 int test_export( gnutls_session session) {
-		ADD_ALL_COMP(session);
-		ADD_ALL_CERTTYPES(session);
-		ADD_ALL_PROTOCOLS(session);
-		ADD_ALL_MACS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
 
-		ADD_KX(session, GNUTLS_KX_RSA_EXPORT);
-		ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
-		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_KX(session, GNUTLS_KX_RSA_EXPORT);
+	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-		return do_handshake( session);
+	return do_handshake( session);
 }
 
 int test_dhe( gnutls_session session) {
-		ADD_ALL_CIPHERS(session);
-		ADD_ALL_COMP(session);
-		ADD_ALL_CERTTYPES(session);
-		ADD_ALL_PROTOCOLS(session);
-		ADD_ALL_MACS(session);
+int ret;
 
-		ADD_KX2(session, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS);
-		gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
 
-		return do_handshake( session);
+	ADD_KX2(session, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	dh_bits = gnutls_dh_get_prime_bits( session);
+	
+	return ret;
+}
+
+int test_dhe_bits( gnutls_session session) {
+int ret;
+
+	if (dh_bits == 0) return FAILED;
+
+	printf( " %d", dh_bits);
+	return SUCCEED;
 }
 
 int test_ssl3( gnutls_session session) {
@@ -498,6 +513,8 @@ int ret;
 
 
 int test_anonymous( gnutls_session session) {
+int ret;
+
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
 	ADD_ALL_CERTTYPES(session);
@@ -506,8 +523,10 @@ int test_anonymous( gnutls_session session) {
 	ADD_KX(session, GNUTLS_KX_ANON_DH);
 	gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
 
-	return do_handshake( session);
-
+	ret = do_handshake( session);
+	dh_bits = gnutls_dh_get_prime_bits( session);
+	
+	return ret;
 }
 
 
