@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -145,6 +146,7 @@ int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7)
 				     &(*pkcs7)->pkcs7);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_free( *pkcs7);
 			return _gnutls_asn2err(result);
 		}
 		return 0;		/* success */

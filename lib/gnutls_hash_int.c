@@ -78,7 +78,7 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm)
 		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
 		break;
 	case GNUTLS_MAC_RMD160:
-		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
+		ret = gcry_md_get_algo_dlen(GCRY_MD_RMD160);
 		break;
 	default:
 		ret = 0; break;

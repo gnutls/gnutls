@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -57,6 +58,7 @@ int gnutls_x509_crt_init(gnutls_x509_crt * cert)
 				     &(*cert)->cert);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_free( *cert);
 			return _gnutls_asn2err(result);
 		}
 		return 0;		/* success */
@@ -214,7 +216,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
   * gnutls_x509_crt_get_issuer_dn - This function returns the Certificate's issuer distinguished name
   * @cert: should contain a gnutls_x509_crt structure
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of 'buf'
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will copy the name of the Certificate issuer in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
@@ -246,7 +248,7 @@ int gnutls_x509_crt_get_issuer_dn(gnutls_x509_crt cert, char *buf,
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate issuer specified
   * by the given OID. The output will be encoded as described in RFC2253. The output
@@ -281,7 +283,7 @@ int gnutls_x509_crt_get_issuer_dn_by_oid(gnutls_x509_crt cert, const char* oid,
   * @cert: should contain a gnutls_x509_crt structure
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
-  * @sizeof_oid: initialy holds the size of @oid
+  * @sizeof_oid: initially holds the size of @oid
   *
   * This function will extract the OIDs of the name of the Certificate issuer specified
   * by the given index.
@@ -309,7 +311,7 @@ int gnutls_x509_crt_get_issuer_dn_oid(gnutls_x509_crt cert,
   * gnutls_x509_crt_get_dn - This function returns the Certificate's distinguished name
   * @cert: should contain a gnutls_x509_crt structure
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will copy the name of the Certificate in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output
@@ -341,7 +343,7 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
   * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
   * @raw_flag: If non zero returns the raw DER data of the DN part.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will extract the part of the name of the Certificate subject, specified
   * by the given OID. The output
@@ -376,7 +378,7 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid,
   * @cert: should contain a gnutls_x509_crt structure
   * @indx: This specifies which OID to return. Use zero to get the first one.
   * @oid: a pointer to a buffer to hold the OID (may be null)
-  * @sizeof_oid: initialy holds the size of @oid
+  * @sizeof_oid: initially holds the size of @oid
   *
   * This function will extract the OIDs of the name of the Certificate subject specified
   * by the given index.
@@ -404,7 +406,7 @@ int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt cert,
   * gnutls_x509_crt_get_signature_algorithm - This function returns the Certificate's signature algorithm
   * @cert: should contain a gnutls_x509_crt structure
   *
-  * This function will return a value of the gnutls_pk_algorithm enumeration that 
+  * This function will return a value of the gnutls_sign_algorithm enumeration that 
   * is the signature algorithm. 
   *
   * Returns a negative value on error.
@@ -430,7 +432,7 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert)
 		return result;
 	}
 	
-	result = _gnutls_x509_oid2sign_algorithm( sa.data, NULL);
+	result = _gnutls_x509_oid2sign_algorithm( sa.data);
 
 	_gnutls_free_datum( &sa);
 
@@ -537,7 +539,82 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result,
 	}
 
 	return 0;
+}
 
+/**
+  * gnutls_x509_crt_get_subject_key_id - This function returns the certificate's key identifier
+  * @cert: should contain a gnutls_x509_crt structure
+  * @result: The place where the identifier will be copied
+  * @result_size: Holds the size of the result field.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the X.509v3 certificate's subject key identifier.
+  * This is obtained by the X.509 Subject Key identifier extension
+  * field (2.5.29.14). 
+  *
+  * Returns 0 on success and a negative value in case of an error.
+  *
+  **/
+int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void* ret, 
+	size_t* ret_size, unsigned int* critical)
+{
+	int result, len;
+	gnutls_datum id;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+
+	if (ret) memset(ret, 0, *ret_size);
+	else *ret_size = 0;
+
+	if ((result =
+	     _gnutls_x509_crt_get_extension(cert, "2.5.29.14", 0, &id, critical)) < 0) {
+		return result;
+	}
+
+	if (id.size == 0 || id.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.SubjectKeyIdentifier", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_free_datum( &id);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, id.data, id.size, NULL);
+	_gnutls_free_datum( &id);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	len = *ret_size;
+	result =
+	     asn1_read_value(c2, "", ret, &len);
+
+	*ret_size = len;
+	asn1_delete_structure(&c2);
+
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
 }
 
 /**
@@ -578,6 +655,66 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
 
 }
 
+/* returns the type and the name.
+ */
+static int parse_general_name( ASN1_TYPE src, const char* src_name,
+	int seq, void* name, size_t *name_size)
+{
+int len;
+char num[MAX_INT_DIGITS];
+char nptr[128];
+int result;
+opaque choice_type[128];
+gnutls_x509_subject_alt_name type;
+
+	seq++; /* 0->1, 1->2 etc */
+	_gnutls_int2str( seq, num);
+
+	_gnutls_str_cpy( nptr, sizeof(nptr), src_name);
+	if (src_name[0] != 0) _gnutls_str_cat( nptr, sizeof(nptr), ".");
+
+	_gnutls_str_cat( nptr, sizeof(nptr), "?");
+	_gnutls_str_cat( nptr, sizeof(nptr), num);
+
+	len = sizeof(choice_type);
+	result =
+	     asn1_read_value(src, nptr, choice_type, &len);
+
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+
+	type = _gnutls_x509_san_find_type( choice_type);
+	if (type == (gnutls_x509_subject_alt_name)-1) {
+		gnutls_assert();
+		return GNUTLS_E_X509_UNKNOWN_SAN;
+	}
+
+	_gnutls_str_cat( nptr, sizeof(nptr), ".");
+	_gnutls_str_cat( nptr, sizeof(nptr), choice_type);
+
+	len = *name_size;
+	result =
+	     asn1_read_value(src, nptr, name, &len);
+	*name_size = len;
+
+	if (result==ASN1_MEM_ERROR)
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return type;
+}
+
 /**
   * gnutls_x509_crt_get_subject_alt_name - This function returns the certificate's alternative name, if any
   * @cert: should contain a gnutls_x509_crt structure
@@ -602,15 +739,11 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
   *
   **/
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, void *ret, size_t *ret_size, unsigned int *critical)
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int *critical)
 {
 	int result;
 	gnutls_datum dnsname;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	char nptr[128];
-	char ext_data[256];
-	int len;
-	char num[MAX_INT_DIGITS];
 	gnutls_x509_subject_alt_name type;
 
 	if (cert==NULL) {
@@ -623,7 +756,6 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 
 	if ((result =
 	     _gnutls_x509_crt_get_extension(cert, "2.5.29.17", 0, &dnsname, critical)) < 0) {
-	     	gnutls_assert();
 		return result;
 	}
 
@@ -632,9 +764,9 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SubjectAltName", &c2))
-	    != ASN1_SUCCESS) {
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.SubjectAltName", &c2);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		_gnutls_free_datum( &dnsname);
 		return _gnutls_asn2err(result);
@@ -644,58 +776,20 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 	_gnutls_free_datum( &dnsname);
 
 	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-
-		_gnutls_x509_log("X509 certificate: Decoding error %d\n", result);
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
 
-	seq++; /* 0->1, 1->2 etc */
-	_gnutls_int2str( seq, num);
-	_gnutls_str_cpy( nptr, sizeof(nptr), "?");
-	_gnutls_str_cat( nptr, sizeof(nptr), num);
+	result = parse_general_name( c2, "", seq, ret, ret_size);
 
-	len = sizeof(ext_data);
-	result =
-	     asn1_read_value(c2, nptr, ext_data, &len);
-
-	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
-		asn1_delete_structure(&c2);
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		return _gnutls_asn2err(result);
-	}
-
-
-	type = _gnutls_x509_san_find_type( ext_data);
-	if (type == (gnutls_x509_subject_alt_name)-1) {
-		asn1_delete_structure(&c2);
-		gnutls_assert();
-		return GNUTLS_E_X509_UNKNOWN_SAN;
-	}
-
-	_gnutls_str_cat( nptr, sizeof(nptr), ".");
-	_gnutls_str_cat( nptr, sizeof(nptr), ext_data);
-
-	len = *ret_size;
-	result =
-	     asn1_read_value(c2, nptr, ret, &len);
 	asn1_delete_structure(&c2);
-	*ret_size = len;
 
-	if (result==ASN1_MEM_ERROR)
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
+	if (result < 0) {
+		return result;
 	}
+
+	type = result;
 
 	return type;
 }
@@ -810,7 +904,7 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
   * @oid: holds an Object Identified in null terminated string
   * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use zero to get the first one.
   * @buf: a pointer to a structure to hold the name (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   * @critical: will be non zero if the extension is marked as critical
   *
   * This function will return the extension specified by the OID in the certificate.
@@ -866,7 +960,7 @@ int gnutls_x509_crt_get_extension_by_oid(gnutls_x509_crt cert, const char* oid,
   * @cert: should contain a gnutls_x509_crt structure
   * @indx: Specifies which extension OID to send. Use zero to get the first one.
   * @oid: a pointer to a structure to hold the OID (may be null)
-  * @sizeof_oid: initialy holds the size of @oid
+  * @sizeof_oid: initially holds the size of @oid
   *
   * This function will return the requested extension OID in the certificate.
   * The extension OID will be stored as a string in the provided buffer.
@@ -886,9 +980,9 @@ int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if ((result =
-	     _gnutls_x509_crt_get_extension_oid(cert, indx, oid, sizeof_oid)) < 0) {
-	     	gnutls_assert();
+	result =
+	     _gnutls_x509_crt_get_extension_oid(cert, indx, oid, sizeof_oid);
+	if (result < 0) {
 		return result;
 	}
 
@@ -923,7 +1017,6 @@ int _gnutls_x509_crt_get_raw_dn2( gnutls_x509_crt cert,
 
 	result = asn1_der_decoding(&c2, signed_data.data, signed_data.size, NULL);
 	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		result = _gnutls_asn2err(result);
@@ -992,7 +1085,7 @@ int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
   * @cert: should contain a gnutls_x509_crt structure
   * @algo: is a digest algorithm
   * @buf: a pointer to a structure to hold the fingerprint (may be null)
-  * @sizeof_buf: initialy holds the size of @buf
+  * @sizeof_buf: initially holds the size of @buf
   *
   * This function will calculate and copy the certificate's fingerprint
   * in the provided buffer.
@@ -1136,7 +1229,7 @@ GNUTLS_HASH_HANDLE hd;
 			goto cleanup;
 		}
  	} else if (pk == GNUTLS_PK_DSA) {
-		result = _gnutls_x509_write_dsa_params( params, params_size, &der);
+		result = _gnutls_x509_write_dsa_public_key( params, params_size, &der);
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;
@@ -1303,6 +1396,124 @@ int result;
 	}
 	
 	return result;
+}
+
+/**
+  * gnutls_x509_crt_get_crl_dist_points - This function returns the CRL distribution points
+  * @cert: should contain a gnutls_x509_crt structure
+  * @seq: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
+  * @ret: is the place where the distribution point will be copied to
+  * @ret_size: holds the size of ret.
+  * @reason_flags: Revocation reasons flags.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the CRL distribution points (2.5.29.31), contained in the
+  * given certificate.
+  *
+  * @reason_flags should be an ORed sequence of GNUTLS_CRL_REASON_UNUSED,
+  * GNUTLS_CRL_REASON_KEY_COMPROMISE, GNUTLS_CRL_REASON_CA_COMPROMISE,
+  * GNUTLS_CRL_REASON_AFFILIATION_CHANGED, GNUTLS_CRL_REASON_SUPERSEEDED,
+  * GNUTLS_CRL_REASON_CESSATION_OF_OPERATION, GNUTLS_CRL_REASON_CERTIFICATE_HOLD,
+  * GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN, GNUTLS_CRL_REASON_AA_COMPROMISE,
+  * or zero for all possible reasons.
+  * 
+  * This is specified in X509v3 Certificate Extensions. GNUTLS will return the 
+  * distribution point type, or a negative error code on error.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the distribution
+  * point, or the type of the distribution point if everything was ok. The type is 
+  * one of the enumerated gnutls_x509_subject_alt_name.
+  *
+  * If the certificate does not have an Alternative name with the specified 
+  * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  *
+  **/
+int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert, 
+	unsigned int seq, void *ret, size_t *ret_size, 
+	unsigned int* reason_flags, unsigned int *critical)
+{
+	int result;
+	gnutls_datum dist_points = {NULL, 0};
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	char name[128];
+	int len;
+	char num[MAX_INT_DIGITS];
+	gnutls_x509_subject_alt_name type;
+	uint8 reasons[2];
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (ret) memset(ret, 0, *ret_size);
+	else *ret_size = 0;
+	
+	if (reason_flags) *reason_flags = 0;
+
+	result =
+	     _gnutls_x509_crt_get_extension(cert, "2.5.29.31", 0, &dist_points, critical);
+	if (result < 0) {
+		return result;
+	}
+
+	if (dist_points.size == 0 || dist_points.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.CRLDistributionPoints", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_free_datum( &dist_points);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, dist_points.data, dist_points.size, NULL);
+	_gnutls_free_datum( &dist_points);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	/* Return the different names from the first CRLDistr. point.
+	 * The whole thing is a mess.
+	 */
+	_gnutls_str_cpy( name, sizeof(name), "?1.distributionPoint.fullName");
+
+	result = parse_general_name( c2, name, seq, ret, ret_size);
+	if (result < 0) {
+		asn1_delete_structure(&c2);
+		return result;
+	}
+	
+	type = result;
+
+
+	/* Read the CRL reasons.
+	 */
+	if (reason_flags) {
+		_gnutls_str_cpy( name, sizeof(name), "?");
+		_gnutls_str_cat( name, sizeof(name), num);
+		_gnutls_str_cat( name, sizeof(name), ".reasons");
+
+		len = sizeof(reasons);
+		result =
+		     asn1_read_value(c2, name, reasons, &len);
+
+		if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			return _gnutls_asn2err(result);
+		}
+		
+		*reason_flags = reasons[0] | (reasons[1] << 8);
+	}
+
+	return type;
 }
 
 #endif

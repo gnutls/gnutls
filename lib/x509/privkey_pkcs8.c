@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -605,7 +606,7 @@ int decode_pkcs8_key(const gnutls_datum * raw_key,
 				  gnutls_x509_privkey pkey, ASN1_TYPE* out)
 {
 	int result, len;
-	opaque enc_oid[64];
+	char enc_oid[64];
 	gnutls_datum tmp;
 	ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY, pkcs8_asn = ASN1_TYPE_EMPTY;
 	ASN1_TYPE ret_asn;
@@ -1701,7 +1702,7 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum * data,
 					      gnutls_datum * dec)
 {
 	int result, len;
-	opaque enc_oid[64];
+	char enc_oid[64];
 	gnutls_datum tmp;
 	ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY, pkcs7_asn = ASN1_TYPE_EMPTY;
 	int params_start, params_end, params_len;

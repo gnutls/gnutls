@@ -26,6 +26,7 @@
 #define _gnutls_mpi_mul_ui gcry_mpi_mul_ui
 
 # define _gnutls_mpi_alloc_like(x) _gnutls_mpi_new(_gnutls_mpi_get_nbits(x)) 
+# define _gnutls_mpi_salloc_like(x) _gnutls_mpi_snew(_gnutls_mpi_get_nbits(x)) 
 
 void _gnutls_mpi_release( GNUTLS_MPI* x);
 

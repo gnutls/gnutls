@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -129,6 +130,7 @@ int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12)
 				     &(*pkcs12)->pkcs12);
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();
+			gnutls_free( *pkcs12);
 			return _gnutls_asn2err(result);
 		}
 		return 0;		/* success */
@@ -264,7 +266,7 @@ static int oid2bag( const char* oid)
 	return GNUTLS_BAG_UNKNOWN;
 }
 
-static const char* bag2oid( int bag)
+static const char* bag_to_oid( int bag)
 {
 	switch (bag) {
 		case GNUTLS_BAG_PKCS8_KEY:
@@ -1050,7 +1052,7 @@ const char* oid;
 
 	for (i=0;i<bag->bag_elements;i++) {
 
-		oid = bag2oid( bag->element[i].type);
+		oid = bag_to_oid( bag->element[i].type);
 		if (oid==NULL) {
 			gnutls_assert();
 			continue;

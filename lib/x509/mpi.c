@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -141,7 +142,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 /* reads DSA's Y
  * from the certificate 
- * params[3]
+ * only sets params[3]
  */
 int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 {
@@ -163,7 +164,7 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 		return _gnutls_asn2err(result);
 	}
 
-	/* Read p */
+	/* Read Y */
 
 	if ( (result=_gnutls_x509_read_int( spk, "", &params[3])) < 0) {
 		gnutls_assert();
@@ -331,7 +332,69 @@ cleanup:
 }
 
 /*
- * This function writes the BIT STRING subjectPublicKey for DSS keys.
+ * This function writes and encodes the parameters for DSS or RSA keys.
+ * This is the "signatureAlgorithm" fields.
+ */
+int _gnutls_x509_write_sig_params( ASN1_TYPE dst, const char* dst_name,
+	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI * params, int params_size)
+{
+gnutls_datum der;
+int result;
+char name[128];
+const char* pk;
+
+	_gnutls_str_cpy( name, sizeof(name), dst_name);
+	_gnutls_str_cat( name, sizeof(name), ".algorithm");
+
+	pk = _gnutls_x509_sign_to_oid( pk_algorithm, GNUTLS_MAC_SHA);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	/* write the OID.
+	 */
+	result = asn1_write_value( dst, name, pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+
+	_gnutls_str_cpy( name, sizeof(name), dst_name);
+	_gnutls_str_cat( name, sizeof(name), ".parameters");
+	
+	if (pk_algorithm == GNUTLS_PK_DSA) {
+		result = _gnutls_x509_write_dsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+		
+		result = asn1_write_value( dst, name, der.data, der.size);
+		_gnutls_free_datum( &der);
+		
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+	} else { /* RSA */
+		result = asn1_write_value( dst, name, NULL, 0);
+
+		if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
+			/* Here we ignore the element not found error, since this
+			 * may have been disabled before.
+			 */
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * This function writes the parameters for DSS keys.
  * Needs 3 parameters (p,q,g).
  *
  * Allocates the space used to store the DER data.
@@ -371,6 +434,54 @@ int _gnutls_x509_write_dsa_params( GNUTLS_MPI * params, int params_size,
 	}
 
 	result = _gnutls_x509_write_int( spk, "g", params[2], 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode( spk, "", der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&spk);
+	return 0;
+	
+cleanup:
+	asn1_delete_structure(&spk);
+	return result;
+}
+
+/*
+ * This function writes the public parameters for DSS keys.
+ * Needs 1 parameter (y).
+ *
+ * Allocates the space used to store the DER data.
+ */
+int _gnutls_x509_write_dsa_public_key( GNUTLS_MPI * params, int params_size,
+	gnutls_datum* der)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+	der->data = NULL;
+	der->size = 0;
+
+	if (params_size < 3) {
+		gnutls_assert();
+		result = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &spk))
+	     != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_write_int( spk, "", params[3], 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;

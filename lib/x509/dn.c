@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -244,7 +245,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			ldap_desc = oid2ldap_string(oid);
 			printable = _gnutls_x509_oid_data_printable(oid);
 
-			sizeof_escaped = 2*len;
+			sizeof_escaped = 2*len + 1;
 
 			escaped = gnutls_malloc( sizeof_escaped);
 			if (escaped == NULL) {
@@ -272,6 +273,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 								  len,
 								  string,
 								  &sizeof_string);
+
 				if (result < 0) {
 					gnutls_assert();
 					_gnutls_x509_log
@@ -290,10 +292,13 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 				res =
 				    _gnutls_bin2hex(value2, len, escaped,
 						    sizeof_escaped);
+
+				STR_APPEND(ldap_desc);
+				STR_APPEND("=#");
 				if (res) {
-					STR_APPEND(ldap_desc);
-					STR_APPEND("=#");
 					STR_APPEND(res);
+				} else {
+					STR_APPEND("(null)");
 				}
 			}
 			

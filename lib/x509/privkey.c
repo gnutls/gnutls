@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -32,9 +33,11 @@
 #include <mpi.h>
 #include <extensions.h>
 #include <sign.h>
+#include <dsa.h>
 #include <verify.h>
 
 static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params);
+static int _encode_dsa( ASN1_TYPE* c2, GNUTLS_MPI* params);
 
 /**
   * gnutls_x509_privkey_init - This function initializes a gnutls_crl structure
@@ -356,7 +359,9 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
 	return result;
 }
 
-#define FREE_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
+#define FREE_RSA_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
+		_gnutls_mpi_release(&key->params[i])
+#define FREE_DSA_PRIVATE_PARAMS for (i=0;i<DSA_PRIVATE_PARAMS;i++) \
 		_gnutls_mpi_release(&key->params[i])
 
 /**
@@ -389,54 +394,129 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key,
 	siz = m->size;
 	if (_gnutls_mpi_scan(&key->params[0], m->data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		FREE_RSA_PRIVATE_PARAMS;
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = e->size;
 	if (_gnutls_mpi_scan(&key->params[1], e->data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		FREE_RSA_PRIVATE_PARAMS;
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = d->size;
 	if (_gnutls_mpi_scan(&key->params[2], d->data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		FREE_RSA_PRIVATE_PARAMS;
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = p->size;
 	if (_gnutls_mpi_scan(&key->params[3], p->data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		FREE_RSA_PRIVATE_PARAMS;
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = q->size;
 	if (_gnutls_mpi_scan(&key->params[4], q->data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		FREE_RSA_PRIVATE_PARAMS;
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = u->size;
 	if (_gnutls_mpi_scan(&key->params[5], u->data, &siz)) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		FREE_RSA_PRIVATE_PARAMS;
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	ret = _encode_rsa( &key->key, key->params);
 	if (ret < 0) {
 		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
+		FREE_RSA_PRIVATE_PARAMS;
 		return ret;
 	}
 
 	key->params_size = RSA_PRIVATE_PARAMS;
 	key->pk_algorithm = GNUTLS_PK_RSA;
+
+	return 0;
+
+}
+
+/**
+  * gnutls_x509_privkey_import_dsa_raw - This function will import a raw DSA key
+  * @key: The structure to store the parsed key
+  * @p: holds the p
+  * @q: holds the q
+  * @g: holds the g
+  * @y: holds the y
+  * @x: holds the x
+  *
+  * This function will convert the given DSA raw parameters
+  * to the native gnutls_x509_privkey format. The output will be stored in @key.
+  * 
+  **/
+int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey key, 
+	const gnutls_datum* p, const gnutls_datum* q,
+	const gnutls_datum* g, const gnutls_datum* y, 
+	const gnutls_datum* x)
+{
+	int i = 0, ret;
+	size_t siz = 0;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	siz = p->size;
+	if (_gnutls_mpi_scan(&key->params[0], p->data, &siz)) {
+		gnutls_assert();
+		FREE_DSA_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = q->size;
+	if (_gnutls_mpi_scan(&key->params[1], q->data, &siz)) {
+		gnutls_assert();
+		FREE_DSA_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = g->size;
+	if (_gnutls_mpi_scan(&key->params[2], g->data, &siz)) {
+		gnutls_assert();
+		FREE_DSA_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = y->size;
+	if (_gnutls_mpi_scan(&key->params[3], y->data, &siz)) {
+		gnutls_assert();
+		FREE_DSA_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = x->size;
+	if (_gnutls_mpi_scan(&key->params[4], x->data, &siz)) {
+		gnutls_assert();
+		FREE_DSA_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	ret = _encode_dsa( &key->key, key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		FREE_DSA_PRIVATE_PARAMS;
+		return ret;
+	}
+
+	key->params_size = DSA_PRIVATE_PARAMS;
+	key->pk_algorithm = GNUTLS_PK_DSA;
 
 	return 0;
 
@@ -623,6 +703,106 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 
 }
 
+/**
+  * gnutls_x509_privkey_export_dsa_raw - This function will export the DSA private key
+  * @params: a structure that holds the DSA parameters
+  * @p: will hold the p
+  * @q: will hold the q
+  * @g: will hold the g
+  * @y: will hold the y
+  * @x: will hold the x
+  *
+  * This function will export the DSA private key's parameters found in the given
+  * structure. The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  * 
+  **/
+int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey key,
+	gnutls_datum * p, gnutls_datum *q,
+	gnutls_datum *g, gnutls_datum *y, gnutls_datum* x) 
+{
+	size_t siz;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* P */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[0]);
+
+	p->data = gnutls_malloc(siz);
+	if (p->data == NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	p->size = siz;
+	_gnutls_mpi_print( p->data, &siz, key->params[0]);
+
+	/* Q */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[1]);
+
+	q->data = gnutls_malloc(siz);
+	if (q->data == NULL) {
+		_gnutls_free_datum( p);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	q->size = siz;
+	_gnutls_mpi_print( q->data, &siz, key->params[1]);
+
+	/* G */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[2]);
+
+	g->data = gnutls_malloc(siz);
+	if (g->data == NULL) {
+		_gnutls_free_datum( q);
+		_gnutls_free_datum( p);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	g->size = siz;
+	_gnutls_mpi_print( g->data, &siz, key->params[2]);
+
+	/* Y */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[3]);
+
+	y->data = gnutls_malloc(siz);
+	if (y->data == NULL) {
+		_gnutls_free_datum( g);
+		_gnutls_free_datum( q);
+		_gnutls_free_datum( p);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	y->size = siz;
+	_gnutls_mpi_print(y->data, &siz, key->params[3]);
+
+	/* X */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[4]);
+
+	x->data = gnutls_malloc(siz);
+	if (x->data == NULL) {
+		_gnutls_free_datum( p);
+		_gnutls_free_datum( q);
+		_gnutls_free_datum( g);
+		_gnutls_free_datum( y);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	x->size = siz;
+	_gnutls_mpi_print(x->data, &siz, key->params[4]);
+
+	return 0;
+
+}
+
+
 /* Encodes the RSA parameters into an ASN.1 RSA private key structure.
  */
 static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
@@ -644,28 +824,28 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 
 	/* Now generate exp1 and exp2
 	 */
-	exp1 = _gnutls_mpi_alloc_like( params[0]); /* like modulus */
+	exp1 = _gnutls_mpi_salloc_like( params[0]); /* like modulus */
 	if (exp1 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
 
-	exp2 = _gnutls_mpi_alloc_like( params[0]);
+	exp2 = _gnutls_mpi_salloc_like( params[0]);
 	if (exp2 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
 
-	q1 = _gnutls_mpi_alloc_like( params[4]);
+	q1 = _gnutls_mpi_salloc_like( params[4]);
 	if (q1 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
 
-	p1 = _gnutls_mpi_alloc_like( params[3]);
+	p1 = _gnutls_mpi_salloc_like( params[3]);
 	if (p1 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
@@ -689,13 +869,13 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 	/* Encoding phase.
 	 * allocate data enough to hold everything
 	 */
-	all_data = gnutls_alloca( total);
+	all_data = gnutls_secure_malloc( total);
 	if (all_data == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
-
+	
 	p = all_data;
 	m_data = p; p+= size[0];
 	pube_data = p; p+= size[1];
@@ -704,7 +884,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 	p2_data = p; p+= size[4];
 	u_data = p; p+= size[5];
 	exp1_data = p; p+= size[6];
-        exp2_data = p;
+	exp2_data = p;
 
 	_gnutls_mpi_print_lz( m_data, &size[0], params[0]);
 	_gnutls_mpi_print_lz( pube_data, &size[1], params[1]);
@@ -792,7 +972,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 		goto cleanup;
 	}
 
-	gnutls_afree(all_data);
+	gnutls_free(all_data);
 
 	if ((result = asn1_write_value(*c2, "otherPrimeInfos",
 					    NULL, 0)) != ASN1_SUCCESS) {
@@ -816,7 +996,118 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 		_gnutls_mpi_release( &q1);
 		_gnutls_mpi_release( &p1);
 		asn1_delete_structure(c2);
-		gnutls_afree( all_data);
+		gnutls_free( all_data);
+		
+		return result;
+}
+
+/* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
+ */
+static int _encode_dsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
+{
+	int result, i;
+	size_t size[DSA_PRIVATE_PARAMS], total;
+	opaque* p_data, *q_data, *g_data, *x_data, *y_data;
+	opaque * all_data = NULL, *p;
+	opaque null = '\0';
+
+	/* Read all the sizes */
+	total = 0;
+	for (i=0;i<DSA_PRIVATE_PARAMS;i++) {
+		_gnutls_mpi_print_lz( NULL, &size[i], params[i]);
+		total += size[i];
+	}
+
+	/* Encoding phase.
+	 * allocate data enough to hold everything
+	 */
+	all_data = gnutls_secure_malloc( total);
+	if (all_data == NULL) {
+		gnutls_assert();
+		result = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+	
+	p = all_data;
+	p_data = p; p += size[0];
+	q_data = p; p += size[1];
+	g_data = p; p += size[2];
+	y_data = p; p += size[3];
+	x_data = p;
+
+	_gnutls_mpi_print_lz( p_data, &size[0], params[0]);
+	_gnutls_mpi_print_lz( q_data, &size[1], params[1]);
+	_gnutls_mpi_print_lz( g_data, &size[2], params[2]);
+	_gnutls_mpi_print_lz( y_data, &size[3], params[3]);
+	_gnutls_mpi_print_lz( x_data, &size[4], params[4]);
+
+	/* Ok. Now we have the data. Create the asn1 structures
+	 */	
+
+	if ((result = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", c2))
+	    != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* Write PRIME 
+	 */
+	if ((result = asn1_write_value(*c2, "p",
+					    p_data, size[0])) != ASN1_SUCCESS) 
+	{
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(*c2, "q",
+					    q_data, size[1])) != ASN1_SUCCESS) 
+	{
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(*c2, "g",
+					    g_data, size[2])) != ASN1_SUCCESS) 
+	{
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(*c2, "Y",
+					    y_data, size[3])) != ASN1_SUCCESS) 
+	{
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if ((result = asn1_write_value(*c2, "priv",
+					    x_data, size[4])) != ASN1_SUCCESS) 
+	{
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	gnutls_free(all_data);
+
+	if ((result = asn1_write_value(*c2, "version",
+					    &null, 1)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	return 0;
+	
+	cleanup:
+		asn1_delete_structure(c2);
+		gnutls_free( all_data);
 		
 		return result;
 }
@@ -830,8 +1121,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
   * @flags: unused for now. Must be 0.
   *
   * This function will generate a random private key. Note that
-  * this function must be called on an empty private key. Currently only RSA
-  * keys can be generated.
+  * this function must be called on an empty private key. 
   *
   * Returns 0 on success or a negative value on error.
   *
@@ -839,7 +1129,8 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
 	unsigned int bits, unsigned int flags)
 {
-int ret;
+int ret, params_len;
+int i;
 
 	if (key == NULL) {
 		gnutls_assert();
@@ -848,10 +1139,23 @@ int ret;
 
 	switch( algo) {
 		case GNUTLS_PK_DSA:
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-		case GNUTLS_PK_RSA:
-			ret = _gnutls_rsa_generate_params( key->params, bits);
+			ret = _gnutls_dsa_generate_params( key->params, &params_len, bits);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
 			
+			ret = _encode_dsa( &key->key, key->params);
+			if (ret < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+			key->params_size = params_len;
+			key->pk_algorithm = GNUTLS_PK_DSA;
+
+			break;
+		case GNUTLS_PK_RSA:
+			ret = _gnutls_rsa_generate_params( key->params, &params_len, bits);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;
@@ -862,7 +1166,7 @@ int ret;
 				gnutls_assert();
 				goto cleanup;
 			}
-			key->params_size = 6;
+			key->params_size = params_len;
 			key->pk_algorithm = GNUTLS_PK_RSA;
 			
 			break;
@@ -876,12 +1180,8 @@ int ret;
 	cleanup:
 		key->pk_algorithm = GNUTLS_PK_UNKNOWN;
 		key->params_size = 0;
-		_gnutls_mpi_release(&key->params[0]);
-		_gnutls_mpi_release(&key->params[1]);
-		_gnutls_mpi_release(&key->params[2]);
-		_gnutls_mpi_release(&key->params[3]);
-		_gnutls_mpi_release(&key->params[4]);
-		_gnutls_mpi_release(&key->params[5]);
+		for (i=0;i<params_len;i++)
+			_gnutls_mpi_release(&key->params[i]);
 
 		return ret;
 }
@@ -930,7 +1230,7 @@ gnutls_datum der = { NULL, 0 };
 			goto cleanup;
 		}
  	} else if (key->pk_algorithm == GNUTLS_PK_DSA) {
-		result = _gnutls_x509_write_dsa_params( key->params, key->params_size, &der);
+		result = _gnutls_x509_write_dsa_public_key( key->params, key->params_size, &der);
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;

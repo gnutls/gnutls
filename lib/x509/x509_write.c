@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -19,7 +20,7 @@
  *
  */
 
-/* This file contains functions to handle PKCS #10 certificate requests.
+/* This file contains functions to handle X.509 certificate generation.
  */
 
 #include <gnutls_int.h>
@@ -122,15 +123,14 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt crt, const char* oid,
 int gnutls_x509_crt_set_version(gnutls_x509_crt crt, unsigned int version)
 {
 int result;
-char null = version;
+unsigned char null = version;
 
 	if (crt==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	null -= 1;
-	if (null < 0) null = 0;
+	if (null > 0) null--;
 
 	result = asn1_write_value( crt->cert, "tbsCertificate.version", &null, 1);
 	if (result != ASN1_SUCCESS) {
@@ -196,11 +196,6 @@ int pk_algorithm;
 
 	pk_algorithm = gnutls_x509_crq_get_pk_algorithm( crq, NULL);
 
-	if (pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-	
 	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.subject",
 		crq->crq, "certificationRequestInfo.subject");
 	if (result < 0) {
@@ -222,7 +217,7 @@ int pk_algorithm;
 /**
   * gnutls_x509_crt_set_ca_status - This function will set the basicConstraints extension
   * @crt: should contain a gnutls_x509_crt structure
-  * @ca: true(1) or false(0). Depending on the Certificat authority status.
+  * @ca: true(1) or false(0). Depending on the Certificate authority status.
   *
   * This function will set the basicConstraints certificate extension. 
   *
@@ -248,6 +243,48 @@ gnutls_datum der_data;
 	}
 
 	result = _gnutls_x509_crt_set_extension( crt, "2.5.29.19", &der_data, 1);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt->use_extensions = 1;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crt_set_key_usage - This function will set the keyUsage extension
+  * @crt: should contain a gnutls_x509_crt structure
+  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
+  *
+  * This function will set the keyUsage certificate extension. 
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crt_set_key_usage(gnutls_x509_crt crt, unsigned int usage)
+{
+int result;
+gnutls_datum der_data;
+
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_keyUsage( (uint16)usage, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( crt, "2.5.29.15", &der_data, 1);
 
 	_gnutls_free_datum( &der_data);
 
@@ -336,105 +373,23 @@ int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer,
 	gnutls_x509_privkey issuer_key)
 {
 int result;
-gnutls_datum signature;
-const char* pk;
 
 	if (crt==NULL || issuer == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (issuer_key->pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-	
 	/* disable all the unneeded OPTIONAL fields.
 	 */
 	disable_optional_stuff( crt);
-	
-	/* Step 1. Copy the issuer's name into the certificate.
-	 */
-	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.issuer",
-		issuer->cert, "tbsCertificate.subject");
+
+	result = _gnutls_x509_pkix_sign( crt->cert, "tbsCertificate", issuer,
+		issuer_key);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
-
-	/* Step 1.5. Write the signature stuff in the tbsCertificate.
-	 */
-	/* write the RSA OID
-	 */
-	pk = _gnutls_x509_sign2oid( issuer_key->pk_algorithm, GNUTLS_MAC_SHA);
-	if (pk == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	result = asn1_write_value( crt->cert, "tbsCertificate.signature.algorithm", pk, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* disable parameters, which are not used in RSA.
-	 */
-	result = asn1_write_value( crt->cert, "tbsCertificate.signature.parameters", NULL, 0);
-	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
-		/* Here we ignore the element not found error, since this
-		 * may have been disabled before.
-		 */
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-
-	/* Step 2. Sign the certificate.
-	 */
-	result = _gnutls_x509_sign_tbs( crt->cert, "tbsCertificate", GNUTLS_MAC_SHA,
-		issuer_key, &signature);
 	
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	/* write the signature (bits)
-	 */
-	result = asn1_write_value( crt->cert, "signature", signature.data, signature.size*8);
-
-	_gnutls_free_datum( &signature);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* Step 2. Move up and write the AlgorithmIdentifier, which is also
-	 * the same. 
-	 */
-
-
-	/* write the RSA OID
-	 */
-	result = asn1_write_value( crt->cert, "signatureAlgorithm.algorithm", pk, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* disable parameters, which are not used in RSA.
-	 */
-	result = asn1_write_value( crt->cert, "signatureAlgorithm.parameters", NULL, 0);
-	if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
-		/* Here we ignore the element not found error, since this
-		 * may have been disabled before.
-		 */
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
 	return 0;
 }
 
@@ -481,7 +436,7 @@ int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time)
   * gnutls_x509_crt_set_serial - This function will set the certificate's serial number
   * @cert: should contain a gnutls_x509_crt structure
   * @serial: The serial number
-  * @result_size: Holds the size of the serial field.
+  * @serial_size: Holds the size of the serial field.
   *
   * This function will set the X.509 certificate's serial number. 
   * Serial is not always a 32 or 64bit number. Some CAs use
@@ -491,7 +446,7 @@ int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time)
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial, 
+int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const void* serial, 
 	size_t serial_size)
 {
 	int ret;
@@ -501,8 +456,8 @@ int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if ((ret = asn1_write_value(cert->cert, "tbsCertificate.serialNumber", serial, serial_size)) < 0) 
-	{
+	ret = asn1_write_value(cert->cert, "tbsCertificate.serialNumber", serial, serial_size);
+	if (ret != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(ret);
 	}
@@ -529,5 +484,161 @@ static void disable_optional_stuff( gnutls_x509_crt cert)
 	return;
 }
 
+/**
+  * gnutls_x509_crt_set_crl_dist_points - This function will set the CRL dist points
+  * @crt: should contain a gnutls_x509_crt structure
+  * @type: is one of the gnutls_x509_subject_alt_name enumerations
+  * @data_string: The data to be set
+  * @reason_flags: revocation reasons
+  *
+  * This function will set the CRL distribution points certificate extension. 
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
+	const void* data_string, unsigned int reason_flags)
+{
+int result;
+gnutls_datum der_data;
+gnutls_datum oldname;
+unsigned int critical;
+
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(crt, "2.5.29.31", 0, &oldname, &critical);
+
+	if (result >= 0) _gnutls_free_datum( &oldname);
+	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_crl_dist_points( type, data_string, reason_flags, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( crt, "2.5.29.31", &der_data, 0);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt->use_extensions = 1;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crt_cpy_crl_dist_points - This function will copy the CRL dist points
+  * @dst: should contain a gnutls_x509_crt structure
+  * @src: the certificate where the dist points will be copied from
+  *
+  * This function will copy the CRL distribution points certificate 
+  * extension, from the source to the destination certificate.
+  * This may be useful to copy from a CA certificate to issued ones.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt dst, 
+	gnutls_x509_crt src)
+{
+int result;
+gnutls_datum der_data;
+unsigned int critical;
+
+	if (dst==NULL || src == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(src, "2.5.29.31", 0, &der_data, &critical);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( dst, "2.5.29.31", &der_data, critical);
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	dst->use_extensions = 1;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crt_set_subject_key_id - This function will set the certificate's subject key id
+  * @cert: should contain a gnutls_x509_crt structure
+  * @id: The key ID
+  * @id_size: Holds the size of the serial field.
+  *
+  * This function will set the X.509 certificate's subject key ID extension.
+  *
+  * Returns 0 on success, or a negative value in case of an error.
+  *
+  **/
+int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert, const void* id,
+	size_t id_size)
+{
+	int result;
+	gnutls_datum old_id, der_data;
+	unsigned int critical;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(cert, "2.5.29.14", 0, &old_id, &critical);
+
+	if (result >= 0) _gnutls_free_datum( &old_id);
+	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_key_id( id, id_size, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( cert, "2.5.29.14", &der_data, 0);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	cert->use_extensions = 1;
+
+	return 0;
+}
 
 #endif /* ENABLE_PKI */

@@ -212,6 +212,11 @@ typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
 	GNUTLS_PK_UNKNOWN = 0xff
 } gnutls_pk_algorithm;
 
+typedef enum gnutls_sign_algorithm { GNUTLS_SIGN_RSA_SHA = 1, GNUTLS_SIGN_DSA_SHA,
+	GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2,
+	GNUTLS_SIGN_UNKNOWN = 0xff
+} gnutls_sign_algorithm;
+
 /* STATE (stop) */
 
 typedef void (*LOG_FUNC)( int, const char*);

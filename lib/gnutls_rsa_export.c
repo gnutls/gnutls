@@ -54,7 +54,7 @@ const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params rsa_params)
 /* resarr will contain: modulus(0), public exponent(1), private exponent(2),
  * prime1 - p (3), prime2 - q(4), u (5).
  */
-int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
+int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int* resarr_len, int bits)
 {
 
 	int ret;
@@ -145,6 +145,8 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 	_gnutls_dump_mpi( "p: ", resarr[3]);
 	_gnutls_dump_mpi( "q: ", resarr[4]);
 	_gnutls_dump_mpi( "u: ", resarr[5]);
+	
+	*resarr_len = 6;
 
 	return 0;
 

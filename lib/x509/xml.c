@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -603,7 +604,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure,
   * @detail: The detail level (must be GNUTLS_XML_SHOW_ALL or GNUTLS_XML_NORMAL)
   *
   * This function will return the XML structures of the given X.509 certificate.
-  * The XML structures are allocated internaly (with malloc) and stored into res.
+  * The XML structures are allocated internally (with malloc) and stored into res.
   * Returns a negative error code in case of an error.
   *
   **/

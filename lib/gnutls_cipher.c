@@ -157,7 +157,8 @@ int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 }
 
 inline
-static GNUTLS_MAC_HANDLE mac_init( gnutls_mac_algorithm mac, opaque* secret, int secret_size, int ver) {
+static GNUTLS_MAC_HANDLE mac_init( gnutls_mac_algorithm mac, opaque* secret, int secret_size, int ver) 
+{
 GNUTLS_MAC_HANDLE td;
 
 	if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
@@ -173,7 +174,8 @@ GNUTLS_MAC_HANDLE td;
 }
 
 inline
-static void mac_deinit( GNUTLS_MAC_HANDLE td, opaque* res, int ver) {
+static void mac_deinit( GNUTLS_MAC_HANDLE td, opaque* res, int ver) 
+{
 	if ( ver == GNUTLS_SSL3) { /* SSL 3.0 */
 		_gnutls_mac_deinit_ssl3(td, res);
 	} else {

@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -35,7 +36,7 @@
 typedef struct _oid2string {
 	const char * oid;
 	const char * ldap_desc;
-	int choice;
+	int choice; /* of type DirectoryString */
 	int printable;
 } oid2string;
 
@@ -43,18 +44,34 @@ typedef struct _oid2string {
  * contained in a rdnSequence and are printable.
  */
 static const oid2string _oid2str[] = {
+	/* PKIX
+	 */
+	{"1.3.6.1.5.5.7.9.1", "dateOfBirth", 0, 1},
+	{"1.3.6.1.5.5.7.9.2", "placeOfBirth", 0, 1},
+	{"1.3.6.1.5.5.7.9.3", "gender", 0, 1},
+	{"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", 0, 1},
+	{"1.3.6.1.5.5.7.9.5", "countryOfResidence", 0, 1},
+
 	{"2.5.4.6", "C", 0, 1},
+	{"2.5.4.9", "STREET", 1, 1},
 	{"2.5.4.12", "T", 1, 1},
 	{"2.5.4.10", "O", 1, 1},
 	{"2.5.4.11", "OU", 1, 1},
 	{"2.5.4.3", "CN", 1, 1},
 	{"2.5.4.7", "L", 1, 1},
 	{"2.5.4.8", "ST", 1, 1},
+
 	{"2.5.4.5", "serialNumber", 0, 1},
 	{"2.5.4.20", "telephoneNumber", 0, 1},
+	{"2.5.4.4", "surName", 1, 1},
+	{"2.5.4.43", "initials", 1, 1},
+	{"2.5.4.44", "generationQualifier", 1, 1},
+	{"2.5.4.42", "givenName", 1, 1},
+	{"2.5.4.65", "pseudonym", 1, 1},
+	{"2.5.4.46", "dnQualifier", 0, 1},
 
 	{"0.9.2342.19200300.100.1.25", "DC", 0, 1},
-	{"0.9.2342.19200300.100.1.1", "UID", 0, 1}, /* FIXME: CHOICE? */
+	{"0.9.2342.19200300.100.1.1", "UID", 0, 1},
 	{"1.2.840.113549.1.9.1", "EMAIL", 0, 1},
 	{"1.2.840.113549.1.9.7", NULL, 1, 1},
 
@@ -244,23 +261,21 @@ gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid)
 	return GNUTLS_PK_UNKNOWN;
 }
 
-gnutls_pk_algorithm _gnutls_x509_oid2sign_algorithm( const char* oid, 
-	gnutls_mac_algorithm * mac)
+gnutls_sign_algorithm _gnutls_x509_oid2sign_algorithm( const char* oid)
 {
 	if (strcmp( oid, RSA_MD5_OID) == 0) {
-		if (mac) *mac = GNUTLS_MAC_MD5;
-		return GNUTLS_PK_RSA;
+		return GNUTLS_SIGN_RSA_MD5;
 	} else if (strcmp( oid, RSA_SHA1_OID) == 0) {
-		if (mac) *mac = GNUTLS_MAC_SHA;
-		return GNUTLS_PK_RSA;
+		return GNUTLS_SIGN_RSA_SHA;
+	} else if (strcmp( oid, RSA_MD2_OID) == 0) {
+		return GNUTLS_SIGN_RSA_MD2;
 	} else if (strcmp( oid, DSA_SHA1_OID) == 0) {
-		if (mac) *mac = GNUTLS_MAC_SHA;
-		return GNUTLS_PK_DSA;
+		return GNUTLS_SIGN_DSA_SHA;
 	}
 
 	_gnutls_x509_log("Unknown SIGN OID: '%s'\n", oid);
 
-	return GNUTLS_PK_UNKNOWN;
+	return GNUTLS_SIGN_UNKNOWN;
 }
 
 
@@ -276,28 +291,41 @@ gnutls_mac_algorithm _gnutls_x509_oid2mac_algorithm( const char* oid)
 	return GNUTLS_MAC_UNKNOWN;
 }
 
-const char* _gnutls_x509_mac2oid( gnutls_mac_algorithm mac)
+const char* _gnutls_x509_mac_to_oid( gnutls_mac_algorithm mac)
 {
 	if (mac == GNUTLS_MAC_SHA) return OID_SHA1;
 	else if (mac == GNUTLS_MAC_MD5) return OID_MD5;
 	else return NULL;
 }
 
-const char* _gnutls_x509_pk2oid( gnutls_pk_algorithm pk)
+const char* _gnutls_x509_pk_to_oid( gnutls_pk_algorithm pk)
 {
 	if (pk == GNUTLS_PK_RSA) return PKIX1_RSA_OID;
 	else if (pk == GNUTLS_PK_DSA) return DSA_OID;
 	else return NULL;
 }
 
-const char* _gnutls_x509_sign2oid( gnutls_pk_algorithm pk, gnutls_mac_algorithm mac)
+gnutls_sign_algorithm _gnutls_x509_pk_to_sign(
+	gnutls_pk_algorithm pk, gnutls_mac_algorithm mac)
 {
 	if (pk == GNUTLS_PK_RSA) {
-		if (mac == GNUTLS_MAC_SHA) return RSA_SHA1_OID;
-		else if (mac == GNUTLS_MAC_MD5) return RSA_MD5_OID;
+		if (mac == GNUTLS_MAC_SHA) return GNUTLS_SIGN_RSA_SHA;
+		else if (mac == GNUTLS_MAC_MD5) return GNUTLS_SIGN_RSA_MD5;
 	} else if (pk == GNUTLS_PK_DSA) {
-		if (mac == GNUTLS_MAC_SHA) return DSA_SHA1_OID;
+		if (mac == GNUTLS_MAC_SHA) return GNUTLS_SIGN_DSA_SHA;
 	}
+	return GNUTLS_SIGN_UNKNOWN;
+}
+
+const char* _gnutls_x509_sign_to_oid( gnutls_pk_algorithm pk, gnutls_mac_algorithm mac)
+{
+gnutls_sign_algorithm sign;
+
+	sign = _gnutls_x509_pk_to_sign( pk, mac);
+
+	if (sign == GNUTLS_SIGN_RSA_SHA) return RSA_SHA1_OID;
+	else if (sign == GNUTLS_SIGN_RSA_MD5) return RSA_MD5_OID;
+	else if (sign == GNUTLS_SIGN_DSA_SHA) return DSA_SHA1_OID;
 	
 	return NULL;
 }
@@ -569,7 +597,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
  */
 int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim)
 {
-	opaque str_time[MAX_TIME];
+	char str_time[MAX_TIME];
 	char name[1024];
 	int result, len;
 
@@ -598,12 +626,13 @@ int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim)
 }
 
 
-gnutls_x509_subject_alt_name _gnutls_x509_san_find_type( char* str_type) {
+gnutls_x509_subject_alt_name _gnutls_x509_san_find_type( char* str_type) 
+{
 	if (strcmp( str_type, "dNSName")==0) return GNUTLS_SAN_DNSNAME;
 	if (strcmp( str_type, "rfc822Name")==0) return GNUTLS_SAN_RFC822NAME;
 	if (strcmp( str_type, "uniformResourceIdentifier")==0) return GNUTLS_SAN_URI;
 	if (strcmp( str_type, "iPAddress")==0) return GNUTLS_SAN_IPADDRESS;
-	return -1;
+	return (gnutls_x509_subject_alt_name)-1;
 }
 
 /* A generic export function. Will export the given ASN.1 encoded data
@@ -626,7 +655,6 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 		{
 			*output_data_size = len;
 			if (result == ASN1_MEM_ERROR) {
-				gnutls_assert();
 				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
 			gnutls_assert();
@@ -949,7 +977,6 @@ gnutls_datum val;
 /* Encodes and copies the private key parameters into a
  * subjectPublicKeyInfo structure.
  *
- * FIXME: can only support RSA parameters.
  */
 int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name,
 	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size)
@@ -959,18 +986,13 @@ gnutls_datum der = {NULL, 0};
 int result;
 char name[128];
 
-	if (pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-
-	pk = _gnutls_x509_pk2oid( pk_algorithm);
+	pk = _gnutls_x509_pk_to_oid( pk_algorithm);
 	if (pk == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 	}
 
-	/* write the RSA OID
+	/* write the OID
 	 */
 	_gnutls_str_cpy( name, sizeof(name), dst_name);
 	_gnutls_str_cat( name, sizeof(name), ".algorithm.algorithm");
@@ -980,34 +1002,74 @@ char name[128];
 		return _gnutls_asn2err(result);
 	}
 
-	/* disable parameters, which are not used in RSA.
-	 */
-	_gnutls_str_cpy( name, sizeof(name), dst_name);
-	_gnutls_str_cat( name, sizeof(name), ".algorithm.parameters");
-	result = asn1_write_value( dst, name, NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
+	if (pk_algorithm == GNUTLS_PK_RSA) {
+		/* disable parameters, which are not used in RSA.
+		 */
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".algorithm.parameters");
+		result = asn1_write_value( dst, name, NULL, 0);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 
-	result = _gnutls_x509_write_rsa_params( params, params_size, &der);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
+		result = _gnutls_x509_write_rsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
 
-	/* Write the DER parameters. (in bits)
-	 */
-	_gnutls_str_cpy( name, sizeof(name), dst_name);
-	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
-	result = asn1_write_value( dst, name, der.data, der.size*8);
+		/* Write the DER parameters. (in bits)
+		 */
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
+		result = asn1_write_value( dst, name, der.data, der.size*8);
 
-	_gnutls_free_datum(&der);
+		_gnutls_free_datum(&der);
 
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+	} else if (pk_algorithm == GNUTLS_PK_DSA) {
+
+		result = _gnutls_x509_write_dsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		/* Write the DER parameters.
+		 */
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".algorithm.parameters");
+		result = asn1_write_value( dst, name, der.data, der.size);
+
+		_gnutls_free_datum(&der);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+		result = _gnutls_x509_write_dsa_public_key( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
+		result = asn1_write_value( dst, name, der.data, der.size*8);
+
+		_gnutls_free_datum(&der);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+	} else return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
 	return 0;
 }
@@ -1044,7 +1106,8 @@ char name[128];
 		return algo;
 	}
 
-	/* Now read the parameters' bits */
+	/* Now read the parameters' bits 
+	 */
 	_gnutls_str_cpy( name, sizeof(name), src_name);
 	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
 

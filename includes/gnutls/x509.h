@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -32,7 +33,8 @@ extern "C" {
 
 #include <gnutls/gnutls.h>
 
-/* Some OIDs usually found in Distinguished names
+/* Some OIDs usually found in Distinguished names, or
+ * in Subject Directory Attribute extensions.
  */
 #define GNUTLS_OID_X520_COUNTRY_NAME		"2.5.4.6"
 #define GNUTLS_OID_X520_ORGANIZATION_NAME	"2.5.4.10"
@@ -40,6 +42,21 @@ extern "C" {
 #define GNUTLS_OID_X520_COMMON_NAME 		"2.5.4.3"
 #define GNUTLS_OID_X520_LOCALITY_NAME 		"2.5.4.7"
 #define GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME 	"2.5.4.8"
+
+#define GNUTLS_OID_X520_INITIALS 		"2.5.4.43"
+#define GNUTLS_OID_X520_GENERATION_QUALIFIER	"2.5.4.44"
+#define GNUTLS_OID_X520_SURNAME 		"2.5.4.4"
+#define GNUTLS_OID_X520_GIVEN_NAME 		"2.5.4.42"
+#define GNUTLS_OID_X520_TITLE	 		"2.5.4.12"
+#define GNUTLS_OID_X520_DN_QUALIFIER 		"2.5.4.46"
+#define GNUTLS_OID_X520_PSEUDONYM 		"2.5.4.65"
+
+#define GNUTLS_OID_PKIX_DATE_OF_BIRTH		"1.3.6.1.5.5.7.9.1"
+#define GNUTLS_OID_PKIX_PLACE_OF_BIRTH		"1.3.6.1.5.5.7.9.2"
+#define GNUTLS_OID_PKIX_GENDER			"1.3.6.1.5.5.7.9.3"
+#define GNUTLS_OID_PKIX_COUNTRY_OF_CITIZENSHIP	"1.3.6.1.5.5.7.9.4"
+#define GNUTLS_OID_PKIX_COUNTRY_OF_RESIDENCE	"1.3.6.1.5.5.7.9.5"
+
 #define GNUTLS_OID_LDAP_DC			"0.9.2342.19200300.100.1.25"
 #define GNUTLS_OID_LDAP_UID			"0.9.2342.19200300.100.1.1"
 #define GNUTLS_OID_PKCS9_EMAIL 			"1.2.840.113549.1.9.1"
@@ -74,6 +91,26 @@ int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
 	unsigned char* output_data, size_t* output_data_size);
 
+int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void* ret,
+        size_t* ret_size, unsigned int* critical);
+
+#define GNUTLS_CRL_REASON_UNUSED 128
+#define GNUTLS_CRL_REASON_KEY_COMPROMISE 64
+#define GNUTLS_CRL_REASON_CA_COMPROMISE 32
+#define GNUTLS_CRL_REASON_AFFILIATION_CHANGED 16
+#define GNUTLS_CRL_REASON_SUPERSEEDED 8
+#define GNUTLS_CRL_REASON_CESSATION_OF_OPERATION 4
+#define GNUTLS_CRL_REASON_CERTIFICATE_HOLD 2
+#define GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN 1
+#define GNUTLS_CRL_REASON_AA_COMPROMISE 32768
+
+int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert, 
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int* reason_flags,
+	unsigned int *critical);
+int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
+	const void* data_string, unsigned int reason_flags);
+int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt dst, 
+	gnutls_x509_crt src);
 
 time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert);
 time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);
@@ -81,29 +118,17 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result, size_t* resul
 
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, void *ret, size_t *ret_size, unsigned int* critical);
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int* critical);
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
 
+/* The key_usage flags are defined in gnutls.h. They are
+ * the GNUTLS_KEY_* definitions.
+ */
 int gnutls_x509_crt_get_key_usage( gnutls_x509_crt cert, unsigned int* key_usage,
 	unsigned int* critical);
+int gnutls_x509_crt_set_key_usage(gnutls_x509_crt crt, unsigned int usage);
 
 int gnutls_x509_dn_oid_known(const char* oid);
-
-/* key_usage will be an OR of the following values:
- */
-#define GNUTLS_KEY_DIGITAL_SIGNATURE 		128 /* when the key is to be
-						     * used for signing.
-						     */
-#define GNUTLS_KEY_NON_REPUDIATION		64
-#define GNUTLS_KEY_KEY_ENCIPHERMENT		32 /* when the key is to be 
-						    * used for encryption.
-						    */
-#define GNUTLS_KEY_DATA_ENCIPHERMENT		16
-#define GNUTLS_KEY_KEY_AGREEMENT		8
-#define GNUTLS_KEY_KEY_CERT_SIGN		4
-#define GNUTLS_KEY_CRL_SIGN			2
-#define GNUTLS_KEY_ENCIPHER_ONLY		1
-#define GNUTLS_KEY_DECIPHER_ONLY		32768
 
 int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx, 
 	void* oid, size_t * sizeof_oid);
@@ -133,8 +158,11 @@ int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer,
 	gnutls_x509_privkey issuer_key);
 int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time);
 int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time);
-int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial, 
+int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const void* serial, 
 	size_t serial_size);
+
+int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert, const void* id, 
+	size_t id_size);
 
 
 /* RDN handling 
@@ -181,6 +209,19 @@ int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index, unsigned char
 
 int gnutls_x509_crl_check_issuer( gnutls_x509_crl crl,
 	gnutls_x509_crt issuer);
+
+/* CRL writing.
+ */
+int gnutls_x509_crl_set_version(gnutls_x509_crl crl, unsigned int version);
+int gnutls_x509_crl_sign(gnutls_x509_crl crl, gnutls_x509_crt issuer, 
+	gnutls_x509_privkey issuer_key);
+int gnutls_x509_crl_set_this_update(gnutls_x509_crl crl, time_t act_time);
+int gnutls_x509_crl_set_next_update(gnutls_x509_crl crl, time_t exp_time);
+int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl crl, const void* serial, 
+	size_t serial_size, time_t revocation_time);
+int gnutls_x509_crl_set_crt(gnutls_x509_crl crl, gnutls_x509_crt crt,
+	time_t revocation_time);
+
 
 /* PKCS7 structures handling 
  */
@@ -278,6 +319,15 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey privkey,
 	const gnutls_datum *m, const gnutls_datum *e,
 	const gnutls_datum *d, const gnutls_datum *p, const gnutls_datum *q, 
 	const gnutls_datum *u);
+
+int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey key,
+	gnutls_datum * p, gnutls_datum *q,
+	gnutls_datum *g, gnutls_datum *y, gnutls_datum* x);
+int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey key, 
+	const gnutls_datum* p, const gnutls_datum* q,
+	const gnutls_datum* g, const gnutls_datum* y, 
+	const gnutls_datum* x);
+
 int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key);
 int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key, unsigned int flags,
 	unsigned char* output_data, size_t* output_data_size);

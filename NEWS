@@ -1,3 +1,15 @@
+Version 1.0.5
+- Backported several things from the development branch:
+ - Added CRL verification functionality to certtool.
+ - Corrected the CRL distribution point extension handling.
+ - Added PKCS #7 support to certtool utility.
+ - Added support for reading and generating CRL distribution
+   points extensions in certificates.
+ - Added support for generating CRLs in the library and the
+   certtool utility.
+ - Added support for the Subject Key ID PKIX extension.
+ - Added the gnutls_sign_algorithm type.
+
 Version 1.0.4 (04/01/2004)
 - Changed handshake behaviour to send the lowest TLS version
   when an unsupported version was advertized. The current behaviour

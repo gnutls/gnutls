@@ -19,6 +19,8 @@ option (s, generate-self-signed) { $action=0; } "Generate a self-signed certific
 
 option (c, generate-certificate) { $action=4; } "Generate a signed certificate."
 
+option (generate-crl) { $action=13; } "Generate a CRL."
+
 option (u, update-certificate) { $action=7; } "Update a signed certificate."
 
 option (p, generate-privkey) { $action=1; } "Generate a private key."
@@ -26,6 +28,8 @@ option (p, generate-privkey) { $action=1; } "Generate a private key."
 option (q, generate-request) { $action=3; } "Generate a PKCS #10 certificate request."
 
 option (e, verify-chain) { $action=5; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
+
+option (verify-crl) { $action=14; } "Verify a CRL."
 
 option (generate-dh-params) { $action=10; } "Generate PKCS #3 encoded Diffie Hellman parameters."
 
@@ -53,12 +57,17 @@ option (l, crl-info) { $action = 11; } "Print information on a CRL."
 
 option (p12-info) { $action = 9; } "Print information on a PKCS #12 structure."
 
+option (p7-info) { $action = 12; } "Print information on a PKCS #7 structure."
+
 option (k, key-info) { $action = 6; } "Print information on a private key."
 
 option (to-p12) { $action = 8; } "Generate a PKCS #12 structure."
 
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
+
+#int dsa;
+option (dsa) { $dsa=1 } "Use DSA keys."
 
 #int export;
 option (export-ciphers) { $export=1 } "Use weak encryption algorithms."
