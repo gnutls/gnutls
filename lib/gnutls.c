@@ -341,7 +341,6 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	if (sizeofdata == 0)
 		return 0;
 	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
-		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
@@ -513,7 +512,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	}
 
 	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
-		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
