@@ -145,7 +145,7 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 
 }
 
-#define MIN_DH_BITS 511
+#define MIN_DH_BITS 727
 #define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_init - This function initializes the session to null (null encryption etc...).
