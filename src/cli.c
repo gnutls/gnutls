@@ -157,19 +157,18 @@ static gnutls_session init_tls_session(const char *hostname)
 
 	/* allow the use of private ciphersuites.
 	 */
-	if (disable_extensions == 0)
+	if (disable_extensions == 0) {
 		gnutls_handshake_set_private_extensions(session, 1);
-
-	if (disable_extensions == 0)
 		gnutls_server_name_set(session, GNUTLS_NAME_DNS, hostname,
 				       strlen(hostname));
+		gnutls_certificate_type_set_priority(session, cert_type_priority);
+	}
 
 	gnutls_cipher_set_priority(session, cipher_priority);
 	gnutls_compression_set_priority(session, comp_priority);
 	gnutls_kx_set_priority(session, kx_priority);
 	gnutls_protocol_set_priority(session, protocol_priority);
 	gnutls_mac_set_priority(session, mac_priority);
-	gnutls_certificate_type_set_priority(session, cert_type_priority);
 
 	gnutls_dh_set_prime_bits(session, 512);
 
