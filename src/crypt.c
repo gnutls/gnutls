@@ -22,6 +22,8 @@
 
 #include <config.h>
 
+
+
 #ifndef ENABLE_SRP
 
 #include <stdio.h>
@@ -31,6 +33,11 @@ int main(int argc, char **argv)
     printf("\nSRP not supported. This program is a dummy.\n\n");
     return 1;
 };
+
+void srptool_version(void)
+{
+    fprintf(stderr, "GNU TLS dummy srptool.\n");
+}
 
 #else
 
@@ -67,6 +74,13 @@ static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str);
 static int _verify_passwd_int(const char *username, const char *passwd,
     char *verifier, char *salt,
     const gnutls_datum * g, const gnutls_datum * n);
+
+void srptool_version(void)
+{
+    fprintf(stderr, "GNU TLS srptool, ");
+    fprintf(stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION,
+	    gnutls_check_version(NULL));
+}
 
 
 static void print_num(const char *msg, const gnutls_datum * num)
