@@ -5,7 +5,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, const gnutls_datum *pla
 		      GNUTLS_MPI * params, uint params_len, uint btype);
 int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *plaintext,
 		      GNUTLS_MPI *params, uint params_len);
-int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
+int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, const gnutls_datum* ciphertext,
 		      GNUTLS_MPI * params, uint params_len, uint btype);
 int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertext, 
 	GNUTLS_MPI* params, int params_len, int btype);

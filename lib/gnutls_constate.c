@@ -466,20 +466,20 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 	if (session->internals.resumed == RESUME_FALSE) {
 		rc = _gnutls_set_read_cipher(session,
 					     _gnutls_cipher_suite_get_cipher_algo
-					     (session->security_parameters.
+					     (&session->security_parameters.
 					      current_cipher_suite));
 		if (rc < 0)
 			return rc;
 		rc = _gnutls_set_read_mac(session,
 					  _gnutls_cipher_suite_get_mac_algo
-					  (session->security_parameters.
+					  (&session->security_parameters.
 					   current_cipher_suite));
 		if (rc < 0)
 			return rc;
 
 		rc = _gnutls_set_kx(session,
 				    _gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
+				    (&session->security_parameters.
 				     current_cipher_suite));
 		if (rc < 0)
 			return rc;
@@ -503,7 +503,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 		return rc;
 
 	_gnutls_handshake_log("HSK[%x]: Cipher Suite: %s\n",
-			      session, _gnutls_cipher_suite_get_name(session->
+			      session, _gnutls_cipher_suite_get_name(&session->
 							    security_parameters.
 							    current_cipher_suite));
 
@@ -648,20 +648,20 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 	if (session->internals.resumed == RESUME_FALSE) {
 		rc = _gnutls_set_write_cipher(session,
 					      _gnutls_cipher_suite_get_cipher_algo
-					      (session->security_parameters.
+					      (&session->security_parameters.
 					       current_cipher_suite));
 		if (rc < 0)
 			return rc;
 		rc = _gnutls_set_write_mac(session,
 					   _gnutls_cipher_suite_get_mac_algo
-					   (session->security_parameters.
+					   (&session->security_parameters.
 					    current_cipher_suite));
 		if (rc < 0)
 			return rc;
 
 		rc = _gnutls_set_kx(session,
 				    _gnutls_cipher_suite_get_kx_algo
-				    (session->security_parameters.
+				    (&session->security_parameters.
 				     current_cipher_suite));
 		if (rc < 0)
 			return rc;
@@ -684,7 +684,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 		return rc;
 
 	_gnutls_handshake_log("HSK[%x]: Cipher Suite: %s\n", session,
-			      _gnutls_cipher_suite_get_name(session->
+			      _gnutls_cipher_suite_get_name(&session->
 							    security_parameters.
 							    current_cipher_suite));
 

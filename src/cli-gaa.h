@@ -89,7 +89,7 @@ extern "C"
 
     void gaa_help(void);
     
-    int gaa_file(char *name, gaainfo *gaaval);
+    int gaa_file(const char *name, gaainfo *gaaval);
     
 #ifdef __cplusplus
 }

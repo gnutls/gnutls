@@ -149,8 +149,8 @@ gnutls_credentials_type gnutls_auth_get_type( gnutls_session session)
 int server = session->security_parameters.entity==GNUTLS_SERVER?0:1;
 
 	return _gnutls_map_kx_get_cred(
-		 _gnutls_cipher_suite_get_kx_algo
-                         (session->security_parameters.current_cipher_suite), server);
+		 _gnutls_cipher_suite_get_kx_algo(
+                         &session->security_parameters.current_cipher_suite), server);
 }
 
 /* 

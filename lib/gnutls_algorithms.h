@@ -40,12 +40,12 @@ int   _gnutls_supported_ciphersuites(gnutls_session session, GNUTLS_CipherSuite 
 int   _gnutls_supported_ciphersuites_sorted(gnutls_session session, GNUTLS_CipherSuite **ciphers);
 int   _gnutls_supported_compression_methods(gnutls_session session, uint8 **comp);
 
-const char* _gnutls_cipher_suite_get_name(GNUTLS_CipherSuite algorithm);
-gnutls_cipher_algorithm _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite algorithm);
-gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite algorithm);
-gnutls_mac_algorithm _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite algorithm);
-gnutls_protocol_version _gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite algorithm);
-GNUTLS_CipherSuite  _gnutls_cipher_suite_get_suite_name(GNUTLS_CipherSuite algorithm);
+const char* _gnutls_cipher_suite_get_name(GNUTLS_CipherSuite *algorithm);
+gnutls_cipher_algorithm _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite *algorithm);
+gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite *algorithm);
+gnutls_mac_algorithm _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite *algorithm);
+gnutls_protocol_version _gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite *algorithm);
+GNUTLS_CipherSuite  _gnutls_cipher_suite_get_suite_name(GNUTLS_CipherSuite *algorithm);
 
 /* functions for ciphers */
 int _gnutls_cipher_priority(gnutls_session session, gnutls_cipher_algorithm algorithm);

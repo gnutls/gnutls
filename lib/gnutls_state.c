@@ -755,7 +755,7 @@ int _gnutls_session_is_export(gnutls_session session)
 {
 	gnutls_cipher_algorithm cipher;
 	
-	cipher = _gnutls_cipher_suite_get_cipher_algo( session->security_parameters.current_cipher_suite);
+	cipher = _gnutls_cipher_suite_get_cipher_algo( &session->security_parameters.current_cipher_suite);
 	
 	if (_gnutls_cipher_get_export_flag( cipher) != 0)
 		return 1;

@@ -60,8 +60,9 @@ int _gnutls_srp_recv_params( gnutls_session session, const opaque* data, size_t 
 
 /* Checks if the given cipher suite is an SRP one
  */
-inline static int is_srp( GNUTLS_CipherSuite suite) {
-	int kx = _gnutls_cipher_suite_get_kx_algo( suite);
+inline static int is_srp( GNUTLS_CipherSuite suite) 
+{
+	int kx = _gnutls_cipher_suite_get_kx_algo( &suite);
 	
 	if (IS_SRP_KX(kx)) return 1;
 	return 0;

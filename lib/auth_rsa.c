@@ -91,7 +91,7 @@ int i;
 
 
 	/* EXPORT case: */
-	if ( _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite)
+	if ( _gnutls_cipher_suite_get_kx_algo(&session->security_parameters.current_cipher_suite)
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	_gnutls_mpi_get_nbits(peer_cert.params[0]) > 512) {
 
@@ -152,7 +152,7 @@ gnutls_rsa_params rsa_params;
 
 	bits = _gnutls_mpi_get_nbits(session->internals.selected_cert_list[0].params[0]);
 
-	if ( _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite)
+	if ( _gnutls_cipher_suite_get_kx_algo(&session->security_parameters.current_cipher_suite)
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	bits > 512) {
 
@@ -225,7 +225,7 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 		return ret;
 	}
 
-	ret = _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 
+	ret = _gnutls_pkcs1_rsa_decrypt(&plaintext, &ciphertext, params, 
 		params_len, 2);	/* btype==2 */
 
 	if (ret < 0 || plaintext.size != TLS_MASTER_SIZE) {

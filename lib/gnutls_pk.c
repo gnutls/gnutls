@@ -200,8 +200,8 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
  * Can decrypt block type 1 and type 2 packets.
  */
 int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
-			      gnutls_datum ciphertext, GNUTLS_MPI* params, uint params_len,
-			      uint btype)
+	const gnutls_datum *ciphertext, GNUTLS_MPI* params, uint params_len,
+	uint btype)
 {
 	uint k, i;
 	int ret;
@@ -213,14 +213,14 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 	k = mod_bits / 8;
 	if ( mod_bits % 8 != 0) k++;
 
-	esize = ciphertext.size;
+	esize = ciphertext->size;
 
 	if (esize != k) {
 		gnutls_assert();
 		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}
 
-	if (_gnutls_mpi_scan(&c, ciphertext.data, &esize) != 0) {
+	if (_gnutls_mpi_scan(&c, ciphertext->data, &esize) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -319,7 +319,7 @@ int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertex
 	int ret;
 
 	/* decrypt signature */
-	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &plain, *ciphertext, params, params_len, btype)) < 0) {
+	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &plain, ciphertext, params, params_len, btype)) < 0) {
 	     gnutls_assert();
 	     return ret;
 	}

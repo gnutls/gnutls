@@ -116,7 +116,7 @@ int template_parse(const char *template)
 		exit(1);
 	}
 
-	cfg_set_cfgfile_context(con, 0, -1, template);
+	cfg_set_cfgfile_context(con, 0, -1, (char*)template);
 
 	/* Parsing command line */
 	ret = cfg_parse(con);

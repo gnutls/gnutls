@@ -421,7 +421,8 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
 	GNUTLS_HASH_HANDLE hd;
 	gnutls_datum decrypted;
 
-	if ( (ret=_gnutls_pkcs1_rsa_decrypt( &decrypted, *signature, params, params_len, 1)) < 0) {
+	ret=_gnutls_pkcs1_rsa_decrypt( &decrypted, signature, params, params_len, 1);
+	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}

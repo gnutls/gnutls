@@ -475,7 +475,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                 for(p = cs_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_CIPHER_SUITE_ALG_LOOP(a) \
-                        GNUTLS_CIPHER_SUITE_LOOP( if( (p->id.CipherSuite[0] == suite.CipherSuite[0]) && (p->id.CipherSuite[1] == suite.CipherSuite[1])) { a; break; } )
+                        GNUTLS_CIPHER_SUITE_LOOP( if( (p->id.CipherSuite[0] == suite->CipherSuite[0]) && (p->id.CipherSuite[1] == suite->CipherSuite[1])) { a; break; } )
 
 
 
@@ -931,7 +931,7 @@ gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm algorithm, i
 
 /* Cipher Suite's functions */
 gnutls_cipher_algorithm
-_gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite suite)
+_gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite* suite)
 {
 	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->block_algorithm);
@@ -939,14 +939,14 @@ _gnutls_cipher_suite_get_cipher_algo(const GNUTLS_CipherSuite suite)
 }
 
 gnutls_protocol_version
-_gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite suite)
+_gnutls_cipher_suite_get_version(const GNUTLS_CipherSuite* suite)
 {
 	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->version);
 	return ret;
 }
 
-gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite
+gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite*
 					     suite)
 {
 	int ret = 0;
@@ -957,7 +957,7 @@ gnutls_kx_algorithm _gnutls_cipher_suite_get_kx_algo(const GNUTLS_CipherSuite
 }
 
 gnutls_mac_algorithm
-_gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite suite)
+_gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite *suite)
 {				/* In bytes */
 	int ret = 0;
 	GNUTLS_CIPHER_SUITE_ALG_LOOP(ret = p->mac_algorithm);
@@ -965,7 +965,7 @@ _gnutls_cipher_suite_get_mac_algo(const GNUTLS_CipherSuite suite)
 
 }
 
-const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
+const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite* suite)
 {
 	const char *ret = NULL;
 
@@ -1006,7 +1006,7 @@ const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm kx_algorithm,
 }
 
 inline
-static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite suite)
+static int _gnutls_cipher_suite_is_ok(GNUTLS_CipherSuite *suite)
 {
 	size_t ret;
 	const char *name = NULL;
@@ -1100,20 +1100,20 @@ _gnutls_compare_algo(gnutls_session session, const void *i_A1,
 		     const void *i_A2)
 {
 	gnutls_kx_algorithm kA1 =
-	    _gnutls_cipher_suite_get_kx_algo(*(const GNUTLS_CipherSuite *) i_A1);
+	    _gnutls_cipher_suite_get_kx_algo((const GNUTLS_CipherSuite *) i_A1);
 	gnutls_kx_algorithm kA2 =
-	    _gnutls_cipher_suite_get_kx_algo(*(const GNUTLS_CipherSuite *) i_A2);
+	    _gnutls_cipher_suite_get_kx_algo((const GNUTLS_CipherSuite *) i_A2);
 	gnutls_cipher_algorithm cA1 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_cipher_algo((const GNUTLS_CipherSuite *)
 						 i_A1);
 	gnutls_cipher_algorithm cA2 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_cipher_algo((const GNUTLS_CipherSuite *)
 						 i_A2);
 	gnutls_mac_algorithm mA1 =
-	    _gnutls_cipher_suite_get_mac_algo(*(const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_mac_algo((const GNUTLS_CipherSuite *)
 					      i_A1);
 	gnutls_mac_algorithm mA2 =
-	    _gnutls_cipher_suite_get_mac_algo(*(const GNUTLS_CipherSuite *)
+	    _gnutls_cipher_suite_get_mac_algo((const GNUTLS_CipherSuite *)
 					      i_A2);
 
 	int p1 = (_gnutls_kx_priority(session, kA1) + 1) * 64;
@@ -1232,21 +1232,21 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 		/* remove cipher suites which do not support the
 		 * protocol version used.
 		 */
-		if ( _gnutls_cipher_suite_get_version(tmp_ciphers[i]) > version)
+		if ( _gnutls_cipher_suite_get_version(&tmp_ciphers[i]) > version)
 			continue;
 
 		if (_gnutls_kx_priority
 		    (session,
-		     _gnutls_cipher_suite_get_kx_algo(tmp_ciphers[i])) < 0)
+		     _gnutls_cipher_suite_get_kx_algo(&tmp_ciphers[i])) < 0)
 			continue;
 		if (_gnutls_mac_priority
 		    (session,
-		     _gnutls_cipher_suite_get_mac_algo(tmp_ciphers[i])) <
+		     _gnutls_cipher_suite_get_mac_algo(&tmp_ciphers[i])) <
 		    0)
 			continue;
 		if (_gnutls_cipher_priority
 		    (session,
-		     _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i]))
+		     _gnutls_cipher_suite_get_cipher_algo(&tmp_ciphers[i]))
 		    < 0)
 			continue;
 

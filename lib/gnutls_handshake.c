@@ -514,7 +514,7 @@ GNUTLS_CipherSuite cs;
 
 	for (j = 0; j < datalen; j += 2) {
 		memcpy( &cs.CipherSuite, &data[j], 2);
-		kx = _gnutls_cipher_suite_get_kx_algo( cs);
+		kx = _gnutls_cipher_suite_get_kx_algo( &cs);
 		
 		if ( _gnutls_map_kx_get_cred( kx, 1) == GNUTLS_CRD_CERTIFICATE) {
 			algo = _gnutls_map_pk_get_pk( kx);
@@ -567,12 +567,12 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 		memcpy( &cs.CipherSuite, &data[j], 2);
 
 		_gnutls_handshake_log("\t%s\n",
-			    _gnutls_cipher_suite_get_name(cs));
+			    _gnutls_cipher_suite_get_name(&cs));
 	}
 	_gnutls_handshake_log("HSK[%x]: Supported cipher suites: \n", session);
 	for (j = 0; j < x; j++)
 		_gnutls_handshake_log("\t%s\n",
-			    _gnutls_cipher_suite_get_name(ciphers[j]));
+			    _gnutls_cipher_suite_get_name(&ciphers[j]));
 #endif
 	memset(session->security_parameters.current_cipher_suite.CipherSuite, '\0', 2);
 
@@ -585,7 +585,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 				memcpy( &cs.CipherSuite, &data[j], 2);
 
 				_gnutls_handshake_log("HSK[%x]: Selected cipher suite: %s\n",
-					    session, _gnutls_cipher_suite_get_name(cs));
+					    session, _gnutls_cipher_suite_get_name(&cs));
 				memcpy(session->security_parameters.current_cipher_suite.CipherSuite, ciphers[i].CipherSuite, 2);
 				retval = 0;
 				goto finish;
@@ -604,7 +604,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	/* check if the credentials (username, public key etc.) are ok
 	 */
 	if (_gnutls_get_kx_cred
-	    (session, _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
+	    (session, _gnutls_cipher_suite_get_kx_algo(&session->security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
 		gnutls_assert();
@@ -618,7 +618,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	 */
 	session->internals.auth_struct =
 	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (session->security_parameters.
+				   (&session->security_parameters.
 				    current_cipher_suite));
 	if (session->internals.auth_struct == NULL) {
 
@@ -1120,7 +1120,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	       current_cipher_suite.CipherSuite, suite, 2);
 
 	_gnutls_handshake_log("HSK[%x]: Selected cipher suite: %s\n", session,
-		    _gnutls_cipher_suite_get_name(session->
+		    _gnutls_cipher_suite_get_name(&session->
 						  security_parameters.
 						  current_cipher_suite));
 
@@ -1129,7 +1129,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	 * Actually checks if they exist.
 	 */
 	if (_gnutls_get_kx_cred
-	    (session, _gnutls_cipher_suite_get_kx_algo(session->
+	    (session, _gnutls_cipher_suite_get_kx_algo(&session->
 					      security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
@@ -1144,7 +1144,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	 */
 	session->internals.auth_struct =
 	    _gnutls_kx_auth_struct(_gnutls_cipher_suite_get_kx_algo
-				   (session->security_parameters.
+				   (&session->security_parameters.
 				    current_cipher_suite));
 
 	if (session->internals.auth_struct == NULL) {
@@ -1627,7 +1627,7 @@ static int _gnutls_send_server_hello(gnutls_session session, int again)
 
 	if (IS_SRP_KX(
 		_gnutls_cipher_suite_get_kx_algo(
-			session->security_parameters.current_cipher_suite)))
+			&session->security_parameters.current_cipher_suite)))
 	{
 		if (session->security_parameters.extensions.srp_username[0] == 0) {
 			/* The peer didn't send a valid SRP extension with the
@@ -2467,7 +2467,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		/* finds the key exchange algorithm in
 		 * the ciphersuite
 		 */
-		kx = _gnutls_cipher_suite_get_kx_algo((*cipherSuites)[i]);
+		kx = _gnutls_cipher_suite_get_kx_algo(&(*cipherSuites)[i]);
 		keep = 0;
 
 		/* if it is defined but had no credentials 
@@ -2488,14 +2488,14 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		if (keep == 0) {
 
 			_gnutls_handshake_log("HSK[%x]: Keeping ciphersuite: %s\n", session,
-				    _gnutls_cipher_suite_get_name(cs));
+				    _gnutls_cipher_suite_get_name(&cs));
 
 			memcpy(newSuite[newSuiteSize].CipherSuite,
 			       (*cipherSuites)[i].CipherSuite, 2);
 			newSuiteSize++;
 		} else {
 			_gnutls_handshake_log("HSK[%x]: Removing ciphersuite: %s\n", session, 
-				    _gnutls_cipher_suite_get_name(cs));
+				    _gnutls_cipher_suite_get_name(&cs));
 
 		}
 	}
