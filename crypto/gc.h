@@ -29,6 +29,7 @@
 enum Gc_rc
 {
   GC_OK = 0,
+  GC_MALLOC_ERROR,
   GC_INIT_ERROR,
   GC_INVALID_CIPHER
 };
