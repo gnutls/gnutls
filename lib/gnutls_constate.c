@@ -450,7 +450,7 @@ int _gnutls_read_connection_state_init(gnutls_session session)
 	int mac_size;
 	int rc;
 
-	_gnutls_uint64zero(&session->connection_state.read_sequence_number);
+	_gnutls_uint64zero(session->connection_state.read_sequence_number);
 
 /* Update internals from CipherSuite selected.
  * If we are resuming just copy the connection session
@@ -632,7 +632,7 @@ int _gnutls_write_connection_state_init(gnutls_session session)
 	int mac_size;
 	int rc;
 
-	_gnutls_uint64zero(&session->connection_state.write_sequence_number);
+	_gnutls_uint64zero(session->connection_state.write_sequence_number);
 
 /* Update internals from CipherSuite selected.
  * If we are resuming just copy the connection session

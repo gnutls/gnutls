@@ -96,19 +96,12 @@ typedef signed int sint;
 
 #define SIZEOF_UNSIGNED_LONG_INT SIZEOF_UNSIGNED_LONG
 
-#if SIZEOF_UNSIGNED_LONG == 8
-# define HAVE_UINT64
-/* only used native uint64 in 64 bit machines */
-typedef unsigned long int uint64;
-#else
 /* some systems had problems with long long int, thus,
  * it is not used.
  */
 typedef struct {
 	unsigned char i[8];
 } uint64;
-#endif
-
 
 #if SIZEOF_UNSIGNED_LONG == 4
 typedef unsigned long int uint32;

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -27,16 +27,8 @@
 #include <gnutls_num.h>
 #include <gnutls_errors.h>
 
-
-#ifndef HAVE_UINT64
-
 /* This function will set the uint64 x to zero 
  */
-int _gnutls_uint64zero( uint64 *x) {
-
-	memset( x->i, 0, 8);
-	return 0;
-}
 
 /* This function will add one to uint64 x.
  * Returns 0 on success, or -1 if the uint64 max limit
@@ -58,8 +50,6 @@ register int i, y=0;
 
 	return 0;
 }
-
-#endif /* HAVE_UINT64 */
 
 uint32 _gnutls_uint24touint32( uint24 num) {
 uint32 ret=0;
@@ -163,34 +153,13 @@ uint16 _gnutls_conv_uint16( uint16 data) {
 #endif
 }
 
-uint64 _gnutls_conv_uint64( const uint64* data) {
-#ifdef HAVE_UINT64
-# ifndef WORDS_BIGENDIAN
-	return byteswap64(*data);
-# else
-	return *data;
-# endif /* WORDS_BIGENDIAN */
-#else
-	uint64 ret;
-
-	memcpy( ret.i, data->i, 8);
-	return ret;
-#endif /* HAVE_UINT64 */
-}
-
 uint32 _gnutls_uint64touint32( const uint64* num) {
 uint32 ret;
 
-#ifdef HAVE_UINT64
-	ret = (uint32) *num;
-
-#else /* no native uint64 */
-
 	memcpy( &ret, &num->i[4], 4);
-# ifndef WORDS_BIGENDIAN
+#ifndef WORDS_BIGENDIAN
 	ret = byteswap32(ret);
-# endif
-#endif /* HAVE_UINT64 */
+#endif
 
  return ret;
 }

@@ -241,7 +241,6 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
 	uint8 pad;
-	uint64 seq_num;
 	int length,ret;
 	GNUTLS_MAC_HANDLE td;
 	uint8 type = _type;
@@ -271,11 +270,9 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 	}
 
 	c_length = _gnutls_conv_uint16(compressed.size);
-	seq_num =
-	    _gnutls_conv_uint64(&session->connection_state.write_sequence_number);
 
 	if (td != GNUTLS_MAC_FAILED) {	/* actually when the algorithm in not the NULL one */
-		_gnutls_hmac(td, UINT64DATA(seq_num), 8);
+		_gnutls_hmac(td, UINT64DATA(session->connection_state.write_sequence_number), 8);
 		
 		_gnutls_hmac(td, &type, 1);
 		if ( ver != GNUTLS_SSL3) { /* TLS 1.0 only */
@@ -332,7 +329,6 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 	uint8 MAC[MAX_HASH_SIZE];
 	uint16 c_length;
 	uint8 pad;
-	uint64 seq_num;
 	uint16 length;
 	GNUTLS_MAC_HANDLE td;
 	uint16 blocksize;
@@ -431,13 +427,12 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 
 
 	c_length = _gnutls_conv_uint16((uint16) length);
-	seq_num = _gnutls_conv_uint64( &session->connection_state.read_sequence_number);
 
 	/* Pass the type, version, length and compressed through
 	 * MAC.
 	 */
 	if (td != GNUTLS_MAC_FAILED) {
-		_gnutls_hmac(td, UINT64DATA(seq_num), 8);
+		_gnutls_hmac(td, UINT64DATA(session->connection_state.read_sequence_number), 8);
 		
 		_gnutls_hmac(td, &type, 1);
 		if ( ver != GNUTLS_SSL3) { /* TLS 1.0 only */
