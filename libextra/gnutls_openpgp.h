@@ -97,6 +97,7 @@ int _gnutls_openpgp_cert2gnutls_cert(
 
 int
 _gnutls_openpgp_request_key(
+    gnutls_session,
     gnutls_datum* ret, 
     const gnutls_certificate_credentials cred,
     opaque* key_fpr,

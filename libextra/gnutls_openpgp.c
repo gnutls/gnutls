@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2002 Timo Schulz <twoaday@freakmail.de>
+ * Copyright (C) 2002 Timo Schulz <twoaday@freakmail.de>
  *
  * This file is part of GNUTLS.
  *
@@ -300,12 +300,12 @@ openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdkPKT_public_key *pk )
     cert->cert_type = GNUTLS_CRT_OPENPGP;
 
     if( is_DSA(pk->pubkey_algo) || pk->pubkey_algo == GCRY_PK_RSA_S )
-        cert->keyUsage = GNUTLS_X509KEY_DIGITAL_SIGNATURE;
+        cert->keyUsage = KEY_DIGITAL_SIGNATURE;
     else if( pk->pubkey_algo == GCRY_PK_RSA_E )
-        cert->keyUsage = GNUTLS_X509KEY_ENCIPHER_ONLY;
+        cert->keyUsage = KEY_ENCIPHER_ONLY;
     else if( pk->pubkey_algo == GCRY_PK_RSA )
-        cert->keyUsage = GNUTLS_X509KEY_DIGITAL_SIGNATURE
-            | GNUTLS_X509KEY_ENCIPHER_ONLY;
+        cert->keyUsage = KEY_DIGITAL_SIGNATURE
+            | KEY_ENCIPHER_ONLY;
 
     cert->params_size = cdk_pk_get_npkey( pk->pubkey_algo );
     for( i = 0; i < cert->params_size; i++ ) {
@@ -1377,36 +1377,6 @@ gnutls_certificate_set_openpgp_keyring_mem( gnutls_certificate_credentials c,
     return rc;
 }
 
-
-/*-
- * gnutls_openpgp_recv_key - Receives a key from a HKP keyserver.
- * @host - the hostname of the keyserver.
- * @port - the service port (if not set use 11371).
- * @keyid - The 32-bit keyID (rightmost bits keyid[1])
- * @key - Context to store the raw (dearmored) key.
- *
- * Try to connect to a public keyserver to get the specified key.
- -*/
-int
-gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
-                        gnutls_datum *key)
-{
-    int rc;
-    CDK_KBNODE knode = NULL;
-    
-    rc = cdk_keyserver_recv_key( host, port, &keyid, &knode );
-    if( !rc ) {
-        unsigned char *buf = cdk_calloc( 1, 20001 );
-        size_t len = 20000;
-        cdk_kbnode_write_to_mem( knode, buf, &len);
-        datum_append( key, buf, len );
-        cdk_free( buf );
-    }
-    cdk_kbnode_release( knode );
-    return map_cdk_rc( rc );
-}
-
-
 /*-
  * _gnutls_openpgp_request_key - Receives a key from a database, key server etc
  * @ret - a pointer to gnutls_datum structure.
@@ -1419,12 +1389,11 @@ gnutls_openpgp_recv_key(const char *host, short port, uint32 keyid,
  *
  -*/
 int
-_gnutls_openpgp_request_key( gnutls_datum* ret, 
+_gnutls_openpgp_request_key( gnutls_session session, gnutls_datum* ret, 
                              const gnutls_certificate_credentials cred,
                              opaque* key_fpr,
                              int key_fpr_size)
 {
-    uint32 keyid;
     int rc = 0;
 
     if( !ret || !cred || !key_fpr ) {
@@ -1436,18 +1405,21 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
         return GNUTLS_E_HASH_FAILED; /* only MD5 and SHA1 are supported */
   
     rc = gnutls_openpgp_get_key( ret, &cred->keyring, KEY_ATTR_FPR, key_fpr );
-    if( rc >= 0 )
+    if( rc >= 0 ) /* key was found */
         return rc;
+    else rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
 
-    keyid = buftou32( key_fpr + (key_fpr_size - 4) );
-
-    /* fixme: we should use the internal callback. */
-    rc = gnutls_openpgp_recv_key( cred->pgp_key_server,
-                                  cred->pgp_key_server_port,
-                                  keyid, ret );
-
-    if( rc == GNUTLS_E_INVALID_REQUEST )
-    	return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+    /* If the callback function was set, then try this one.
+     */
+    if (session->internals.openpgp_recv_key_func != NULL) {
+	rc = session->internals.openpgp_recv_key_func( session, 
+		key_fpr, key_fpr_size, ret);
+	
+	if (rc < 0) {
+		gnutls_assert();
+		return GNUTLS_E_OPENPGP_GETKEY_FAILED;
+	}
+    }
 
     return rc;
 }
@@ -1645,7 +1617,7 @@ xml_add_key( gnutls_string *xmlkey, int ext, cdkPKT_public_key *pk, int sub )
         return rc;
 
     if( pk->expiredate > 0 ) {
-        sprintf( tmp, "%lu", pk->expiredate );
+        sprintf( tmp, "%lu", (unsigned long)pk->expiredate );
         rc = xml_add_tag( xmlkey, "EXPIREDATE", tmp );
 	if( rc )
             return rc;
@@ -2035,7 +2007,7 @@ gnutls_certificate_set_openpgp_keyring_mem( gnutls_certificate_credentials c,
 }
 
 int
-_gnutls_openpgp_request_key( gnutls_datum* ret,
+_gnutls_openpgp_request_key( gnutls_session session, gnutls_datum* ret,
                              const gnutls_certificate_credentials cred,
                              opaque* key_fpr,
                              int key_fpr_size )

@@ -866,7 +866,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 			gnutls_assert();
 			return GNUTLS_E_INIT_LIBEXTRA;
 		}
-		if ( (ret=_E_gnutls_openpgp_request_key( &akey, cred, p, 20)) < 0) {
+		if ( (ret=_E_gnutls_openpgp_request_key( session, &akey, cred, p, 20)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
