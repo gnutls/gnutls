@@ -3,7 +3,7 @@ EXTRA_DIST = common.h crypt.gaa crypt-gaa.h README.srpcrypt \
 	tls_test-gaa.h tests.h gnutls-http-serv list.h certtool-gaa.h \
 	certtool.gaa getpass.h certtool-cfg.h
 
-SUBDIRS = srp x509 openpgp
+SUBDIRS = srp x509 openpgp cfg
 
 INCLUDES = -I../lib -I../libtasn1/lib -I../includes $(LIBOPENCDK_CFLAGS)
 

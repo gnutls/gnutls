@@ -482,6 +482,9 @@ const gnutls_certificate_credentials cred;
 		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
+	if (st.ncerts == 0)
+		return 0; /* no certificate was selected */
+	
 	if (type != st.type) {
 		gnutls_assert();
 		ret = GNUTLS_E_INVALID_REQUEST;

@@ -1,4 +1,4 @@
-Version 1.0.12
+Version 1.0.12 (23/04/2004)
 - Corrected bug in OpenPGP key loading using a callback.
 - Renamed gnutls-srpcrypt to srptool
 - Allow handshake requests by the client.
