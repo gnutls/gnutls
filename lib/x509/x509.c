@@ -405,7 +405,7 @@ int gnutls_x509_crt_get_dn_oid(gnutls_x509_crt cert,
   * gnutls_x509_crt_get_signature_algorithm - This function returns the Certificate's signature algorithm
   * @cert: should contain a gnutls_x509_crt structure
   *
-  * This function will return a value of the gnutls_pk_algorithm enumeration that 
+  * This function will return a value of the gnutls_sign_algorithm enumeration that 
   * is the signature algorithm. 
   *
   * Returns a negative value on error.
@@ -431,7 +431,7 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert)
 		return result;
 	}
 	
-	result = _gnutls_x509_oid2sign_algorithm( sa.data, NULL);
+	result = _gnutls_x509_oid2sign_algorithm( sa.data);
 
 	_gnutls_free_datum( &sa);
 

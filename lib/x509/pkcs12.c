@@ -265,7 +265,7 @@ static int oid2bag( const char* oid)
 	return GNUTLS_BAG_UNKNOWN;
 }
 
-static const char* bag2oid( int bag)
+static const char* bag_to_oid( int bag)
 {
 	switch (bag) {
 		case GNUTLS_BAG_PKCS8_KEY:
@@ -1051,7 +1051,7 @@ const char* oid;
 
 	for (i=0;i<bag->bag_elements;i++) {
 
-		oid = bag2oid( bag->element[i].type);
+		oid = bag_to_oid( bag->element[i].type);
 		if (oid==NULL) {
 			gnutls_assert();
 			continue;

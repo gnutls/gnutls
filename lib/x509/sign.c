@@ -53,7 +53,7 @@ ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
 int result;
 const char* algo;
 
-	algo = _gnutls_x509_mac2oid( hash);
+	algo = _gnutls_x509_mac_to_oid( hash);
 	if (algo == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;

@@ -1,3 +1,6 @@
+Version 1.1.5
+- Added the gnutls_sign_algorithm type.
+
 Version 1.1.4 (04/01/2004)
 - Improved gnutls-cli's SRP behaviour in SRP ciphersuites.
   If they are of highest priority then the abreviated handshake

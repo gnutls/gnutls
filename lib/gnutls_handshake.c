@@ -269,6 +269,8 @@ int _gnutls_read_client_hello(gnutls_session session, opaque * data,
 		 */
 		ver = _gnutls_version_max(session);
 		if (ver==GNUTLS_VERSION_UNKNOWN) {
+			/* this check is not really needed.
+			 */
 			gnutls_assert();
 			return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 		}

@@ -33,7 +33,8 @@ extern "C" {
 
 #include <gnutls/gnutls.h>
 
-/* Some OIDs usually found in Distinguished names
+/* Some OIDs usually found in Distinguished names, or
+ * in Subject Directory Attribute extensions.
  */
 #define GNUTLS_OID_X520_COUNTRY_NAME		"2.5.4.6"
 #define GNUTLS_OID_X520_ORGANIZATION_NAME	"2.5.4.10"
@@ -41,6 +42,21 @@ extern "C" {
 #define GNUTLS_OID_X520_COMMON_NAME 		"2.5.4.3"
 #define GNUTLS_OID_X520_LOCALITY_NAME 		"2.5.4.7"
 #define GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME 	"2.5.4.8"
+
+#define GNUTLS_OID_X520_INITIALS 		"2.5.4.43"
+#define GNUTLS_OID_X520_GENERATION_QUALIFIER	"2.5.4.44"
+#define GNUTLS_OID_X520_SURNAME 		"2.5.4.4"
+#define GNUTLS_OID_X520_GIVEN_NAME 		"2.5.4.42"
+#define GNUTLS_OID_X520_TITLE	 		"2.5.4.12"
+#define GNUTLS_OID_X520_DN_QUALIFIER 		"2.5.4.46"
+#define GNUTLS_OID_X520_PSEUDONYM 		"2.5.4.65"
+
+#define GNUTLS_OID_PKIX_DATE_OF_BIRTH		"1.3.6.1.5.5.7.9.1"
+#define GNUTLS_OID_PKIX_PLACE_OF_BIRTH		"1.3.6.1.5.5.7.9.2"
+#define GNUTLS_OID_PKIX_GENDER			"1.3.6.1.5.5.7.9.3"
+#define GNUTLS_OID_PKIX_COUNTRY_OF_CITIZENSHIP	"1.3.6.1.5.5.7.9.4"
+#define GNUTLS_OID_PKIX_COUNTRY_OF_RESIDENCE	"1.3.6.1.5.5.7.9.5"
+
 #define GNUTLS_OID_LDAP_DC			"0.9.2342.19200300.100.1.25"
 #define GNUTLS_OID_LDAP_UID			"0.9.2342.19200300.100.1.1"
 #define GNUTLS_OID_PKCS9_EMAIL 			"1.2.840.113549.1.9.1"

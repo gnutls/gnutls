@@ -600,7 +600,6 @@ int gnutls_x509_crq_sign(gnutls_x509_crq crq, gnutls_x509_privkey key)
 {
 int result;
 gnutls_datum signature;
-const char* pk;
 
 	if (crq==NULL) {
 		gnutls_assert();

@@ -254,7 +254,7 @@ int gnutls_x509_crl_get_dn_oid(gnutls_x509_crl crl,
   * gnutls_x509_crl_get_signature_algorithm - This function returns the CRL's signature algorithm
   * @crl: should contain a gnutls_x509_crl structure
   *
-  * This function will return a value of the gnutls_pk_algorithm enumeration that 
+  * This function will return a value of the gnutls_sign_algorithm enumeration that 
   * is the signature algorithm. 
   *
   * Returns a negative value on error.
@@ -281,7 +281,7 @@ int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl)
 		return result;
 	}
 	
-	result = _gnutls_x509_oid2sign_algorithm( (const char*)sa.data, NULL);
+	result = _gnutls_x509_oid2sign_algorithm( (const char*)sa.data);
 
 	_gnutls_free_datum( &sa);
 

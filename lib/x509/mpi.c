@@ -346,7 +346,7 @@ const char* pk;
 	_gnutls_str_cpy( name, sizeof(name), dst_name);
 	_gnutls_str_cat( name, sizeof(name), ".algorithm");
 
-	pk = _gnutls_x509_sign2oid( pk_algorithm, GNUTLS_MAC_SHA);
+	pk = _gnutls_x509_sign_to_oid( pk_algorithm, GNUTLS_MAC_SHA);
 	if (pk == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
