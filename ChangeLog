@@ -1,3 +1,37 @@
+2003-08-11 18:29  nmav <nmav@gnutls.org>
+
+	* doc/tex/alert.tex, doc/tex/ciphersuites.tex,
+	doc/tex/ex-cert-select.tex, doc/tex/howto.tex, doc/tex/record.tex,
+	doc/tex/record_weaknesses.tex, doc/tex/srp.tex,
+	doc/tex/translayer.tex, lib/auth_cert.c, lib/auth_cert.h,
+	lib/auth_dh_common.c, lib/auth_rsa_export.c, lib/dh_compat.c,
+	lib/gnutls_algorithms.c, lib/gnutls_anon_cred.c, lib/gnutls_auth.c,
+	lib/gnutls_cert.c, lib/gnutls_compress_int.c,
+	lib/gnutls_dh_primes.c, lib/gnutls_errors.c,
+	lib/gnutls_extensions.c, lib/gnutls_global.c,
+	lib/gnutls_handshake.c, lib/gnutls_hash_int.c, lib/gnutls_mem.c,
+	lib/gnutls_num.c, lib/gnutls_pk.c, lib/gnutls_record.c,
+	lib/gnutls_state.c, lib/gnutls_x509.c, lib/io_debug.h,
+	src/retcodes.c:
+
+	still more patches by Arne Thomassen 
+
+2003-08-11 18:10  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_buffers.c, gnutls_compress_int.c, gnutls_record.c:
+
+	some more cleanups.  
+
+2003-08-11 17:56  nmav <nmav@gnutls.org>
+
+	* doc/tex/record_weaknesses.tex, lib/gnutls_anon_cred.c,
+	lib/gnutls_auth.c, lib/gnutls_buffers.c, lib/gnutls_cert.c,
+	lib/gnutls_compress_int.c, lib/gnutls_db.c, lib/gnutls_global.c,
+	lib/gnutls_handshake.c, lib/gnutls_mem.c, lib/gnutls_record.c,
+	lib/x509_b64.c:
+
+	more patches by Arne Thomassen.  
+
 2003-08-09 19:17  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in (utags: gnutls_0_8_10):
