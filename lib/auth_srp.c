@@ -113,9 +113,9 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	}
 	
 	/* copy from pwd_entry to local variables (actually in state) */
-	G = gcry_mpi_alloc_like(pwd_entry->g);
-	N = gcry_mpi_alloc_like(pwd_entry->n);
-	V = gcry_mpi_alloc_like(pwd_entry->v);
+	G = _gnutls_mpi_alloc_like(pwd_entry->g);
+	N = _gnutls_mpi_alloc_like(pwd_entry->n);
+	V = _gnutls_mpi_alloc_like(pwd_entry->v);
 
 	if (G==NULL || N == NULL || V == NULL) {
 		gnutls_assert();
@@ -356,12 +356,12 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 	_n_g = n_g;
 	_n_n = n_n;
 
-	if (gcry_mpi_scan(&N, GCRYMPI_FMT_USG, data_n, &_n_n) != 0 || N == NULL) {
+	if (_gnutls_mpi_scan(&N, GCRYMPI_FMT_USG, data_n, &_n_n) != 0 || N == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (gcry_mpi_scan(&G, GCRYMPI_FMT_USG, data_g, &_n_g) != 0 || G == NULL) {
+	if (_gnutls_mpi_scan(&G, GCRYMPI_FMT_USG, data_g, &_n_g) != 0 || G == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -374,7 +374,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 		return ret;
 	}
 
-	if (gcry_mpi_scan(&state->gnutls_key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0 || state->gnutls_key->x==NULL) {
+	if (_gnutls_mpi_scan(&state->gnutls_key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0 || state->gnutls_key->x==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -389,7 +389,7 @@ int proc_srp_client_kx0(GNUTLS_STATE state, opaque * data, int data_size)
 
 	_n_A = READuint16( &data[0]);
 
-	if (gcry_mpi_scan(&A, GCRYMPI_FMT_USG, &data[2], &_n_A) || A == NULL) {
+	if (_gnutls_mpi_scan(&A, GCRYMPI_FMT_USG, &data[2], &_n_A) || A == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -405,7 +405,7 @@ int proc_srp_server_kx2(GNUTLS_STATE state, opaque * data, int data_size)
 	
 	_n_B = READuint16( &data[0]);
 
-	if (gcry_mpi_scan(&B, GCRYMPI_FMT_USG, &data[2], &_n_B) || B==NULL) {
+	if (_gnutls_mpi_scan(&B, GCRYMPI_FMT_USG, &data[2], &_n_B) || B==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}

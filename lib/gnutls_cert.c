@@ -479,8 +479,12 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 
 	/* allocate size for the parameters (2) */
 	*params = gnutls_calloc(1, 2 * sizeof(MPI));
+	if (*params==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
-	if (gcry_mpi_scan(&(*params)[0], GCRYMPI_FMT_USG, str, &len) != 0) {
+	if (_gnutls_mpi_scan(&(*params)[0], GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
 		gnutls_free((*params));
 		asn1_delete_structure(spk);
@@ -500,7 +504,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	}
 
 
-	if (gcry_mpi_scan(&(*params)[1], GCRYMPI_FMT_USG, str, &len) != 0) {
+	if (_gnutls_mpi_scan(&(*params)[1], GCRYMPI_FMT_USG, str, &len) != 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&(*params)[0]);
 		gnutls_free((*params));

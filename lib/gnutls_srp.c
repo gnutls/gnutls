@@ -39,12 +39,12 @@ int _gnutls_srp_gx(opaque * text, int textsize, opaque ** result, MPI g,
 	MPI x, e;
 	int result_size;
 
-	if (gcry_mpi_scan(&x, GCRYMPI_FMT_USG, text, &textsize)) {
+	if (_gnutls_mpi_scan(&x, GCRYMPI_FMT_USG, text, &textsize)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	e = gcry_mpi_alloc_like(prime);
+	e = _gnutls_mpi_alloc_like(prime);
 	if (e==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release(&x);
@@ -82,7 +82,7 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 
 	/* calculate:  B = (v + g^b) % N */
 	bits = gcry_mpi_get_nbits(n);
-	b = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	b = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	if (b==NULL) {
 		gnutls_assert();
 		return NULL;
@@ -90,14 +90,14 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 	
 	gcry_mpi_randomize(b, bits, GCRY_STRONG_RANDOM);
 
-	tmpB = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	tmpB = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	if (tmpB==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &b);
 		return NULL;
 	}
 
-	B = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	B = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	if (tmpB==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &b);
@@ -163,12 +163,12 @@ MPI _gnutls_calc_srp_S1(MPI A, MPI b, MPI u, MPI v, MPI n)
 	MPI tmp1, tmp2;
 	MPI S;
 
-	S = gcry_mpi_alloc_like(n);
+	S = _gnutls_mpi_alloc_like(n);
 	if (S==NULL)
 		return NULL;
 
-	tmp1 = gcry_mpi_alloc_like(n);
-	tmp2 = gcry_mpi_alloc_like(n);
+	tmp1 = _gnutls_mpi_alloc_like(n);
+	tmp2 = _gnutls_mpi_alloc_like(n);
 
 	if (tmp1 == NULL || tmp2 == NULL) {
 		_gnutls_mpi_release(&tmp1);
@@ -196,7 +196,7 @@ MPI _gnutls_calc_srp_A(MPI * a, MPI g, MPI n)
 	int bits;
 
 	bits = gcry_mpi_get_nbits(n);
-	tmpa = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	tmpa = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	if (tmpa==NULL) {
 		gnutls_assert();
 		return NULL;
@@ -204,7 +204,7 @@ MPI _gnutls_calc_srp_A(MPI * a, MPI g, MPI n)
 	
 	gcry_mpi_randomize(tmpa, bits, GCRY_STRONG_RANDOM);
 
-	A = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	A = _gnutls_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	if (A==NULL) {
 		gnutls_assert();
 		_gnutls_mpi_release( &tmpa);
@@ -277,12 +277,12 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
 {
 	MPI S, tmp1, tmp2, tmp4;
 
-	S = gcry_mpi_alloc_like(n);
+	S = _gnutls_mpi_alloc_like(n);
 	if (S==NULL)
 		return NULL;
 		
-	tmp1 = gcry_mpi_alloc_like(n);
-	tmp2 = gcry_mpi_alloc_like(n);
+	tmp1 = _gnutls_mpi_alloc_like(n);
+	tmp2 = _gnutls_mpi_alloc_like(n);
 	if (tmp1 == NULL || tmp2 == NULL) {
 		_gnutls_mpi_release(&tmp1);
 		_gnutls_mpi_release(&tmp2);
@@ -293,7 +293,7 @@ MPI _gnutls_calc_srp_S2(MPI B, MPI g, MPI x, MPI a, MPI u, MPI n)
 
 	gcry_mpi_subm(tmp2, B, tmp1, n);
 
-	tmp4 = gcry_mpi_alloc_like(n);
+	tmp4 = _gnutls_mpi_alloc_like(n);
 	if (tmp4==NULL)
 		return NULL;
 

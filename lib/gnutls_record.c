@@ -64,6 +64,7 @@ int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	return 0;
 }
 
+#define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_init - This function initializes the state to null (null encryption etc...).
   * @con_end: is used to indicate if this state is to be used for server or 
@@ -128,7 +129,6 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	return 0;
 }
 
-#define GNUTLS_FREE(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_deinit - This function clears all buffers associated with the &state
   * @state: is a &GNUTLS_STATE structure.
@@ -143,7 +143,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 	}
 
 	/* remove auth info firstly */
-	GNUTLS_FREE(state->gnutls_key->auth_info);
+	_gnutls_free(state->gnutls_key->auth_info);
 
 #ifdef HAVE_LIBGDBM
 	/* close the database - resuming sessions */
@@ -154,11 +154,11 @@ int gnutls_deinit(GNUTLS_STATE state)
 	gnutls_sfree_datum(&state->connection_state.read_mac_secret);
 	gnutls_sfree_datum(&state->connection_state.write_mac_secret);
 
-	GNUTLS_FREE(state->gnutls_internals.recv_buffer.data);
-	GNUTLS_FREE(state->gnutls_internals.buffer.data);
-	GNUTLS_FREE(state->gnutls_internals.buffer_handshake.data);
-	GNUTLS_FREE(state->gnutls_internals.hash_buffer.data);
-	GNUTLS_FREE(state->gnutls_internals.send_buffer.data);
+	_gnutls_free(state->gnutls_internals.recv_buffer.data);
+	_gnutls_free(state->gnutls_internals.buffer.data);
+	_gnutls_free(state->gnutls_internals.buffer_handshake.data);
+	_gnutls_free(state->gnutls_internals.hash_buffer.data);
+	_gnutls_free(state->gnutls_internals.send_buffer.data);
 
 	gnutls_clear_creds( state);
 
@@ -174,34 +174,34 @@ int gnutls_deinit(GNUTLS_STATE state)
 	gnutls_sfree_datum( &state->cipher_specs.server_write_key);
 	gnutls_sfree_datum( &state->cipher_specs.client_write_key);
 
-	mpi_release(state->gnutls_key->KEY);
-	mpi_release(state->gnutls_key->client_Y);
-	mpi_release(state->gnutls_key->client_p);
-	mpi_release(state->gnutls_key->client_g);
+	_gnutls_mpi_release(&state->gnutls_key->KEY);
+	_gnutls_mpi_release(&state->gnutls_key->client_Y);
+	_gnutls_mpi_release(&state->gnutls_key->client_p);
+	_gnutls_mpi_release(&state->gnutls_key->client_g);
 
-	mpi_release(state->gnutls_key->u);
-	mpi_release(state->gnutls_key->a);
-	mpi_release(state->gnutls_key->x);
-	mpi_release(state->gnutls_key->A);
-	mpi_release(state->gnutls_key->B);
-	mpi_release(state->gnutls_key->b);
+	_gnutls_mpi_release(&state->gnutls_key->u);
+	_gnutls_mpi_release(&state->gnutls_key->a);
+	_gnutls_mpi_release(&state->gnutls_key->x);
+	_gnutls_mpi_release(&state->gnutls_key->A);
+	_gnutls_mpi_release(&state->gnutls_key->B);
+	_gnutls_mpi_release(&state->gnutls_key->b);
 
-	mpi_release(state->gnutls_key->dh_secret);
-	GNUTLS_FREE(state->gnutls_key);
+	_gnutls_mpi_release(&state->gnutls_key->dh_secret);
+	_gnutls_free(state->gnutls_key);
 
 
 	/* free priorities */
-	GNUTLS_FREE(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
-	GNUTLS_FREE(state->gnutls_internals.ProtocolPriority.algorithm_priority);
-	GNUTLS_FREE(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
-	GNUTLS_FREE(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
-	GNUTLS_FREE(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);
+	_gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);
+	_gnutls_free(state->gnutls_internals.ProtocolPriority.algorithm_priority);
+	_gnutls_free(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
+	_gnutls_free(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
+	_gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);
 
-	GNUTLS_FREE(state->gnutls_internals.db_name);
+	_gnutls_free(state->gnutls_internals.db_name);
 	gnutls_free_cert( state->gnutls_internals.peer_cert);
 
 	memset( state, 0, sizeof(struct GNUTLS_STATE_INT));
-	GNUTLS_FREE(state);
+	gnutls_free(state);
 	return 0;
 }
 

@@ -32,23 +32,23 @@
 #include <gnutls_pk.h>
 #include <debug.h>
 
-static gnutls_datum* _gnutls_get_tbs( gnutls_cert* cert) {
+static gnutls_datum _gnutls_get_tbs( gnutls_cert* cert) {
 node_asn *c2;
-gnutls_datum * ret;
+gnutls_datum ret = {NULL, 0};
 opaque *str;
 int result, len;
 int start, end;
 
 	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate")!=ASN_OK) {
 		gnutls_assert();
-		return NULL;
+		return ret;
 	}
 	
 	result = asn1_get_der( c2, cert->raw.data, cert->raw.size);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return NULL;
+		return ret;
 	}
 	
 	result = asn1_get_start_end_der( c2, cert->raw.data, cert->raw.size, 
@@ -57,22 +57,15 @@ int start, end;
 		
 	if (result != ASN_OK) {
 		gnutls_assert();
-		return NULL;
+		return ret;
 	}
 
 	len = end - start + 1;
 	str = &cert->raw.data[start];
 
-	ret = gnutls_malloc(sizeof(gnutls_datum));
-	if (ret==NULL) {
+	if (gnutls_set_datum( &ret, str, len) < 0) {
 		gnutls_assert();
-		return NULL;
-	}
-
-	if (gnutls_set_datum( ret, str, len) < 0) {
-		gnutls_assert();
-		gnutls_free(ret);
-		return NULL;
+		return ret;
 	}
 	
 	return ret;
@@ -165,10 +158,11 @@ _pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e, MPI m
 	digest_size = sizeof(digest);	
 	if ( (ret = _gnutls_get_ber_digest_info( &decrypted, &hash, digest, &digest_size )) != 0) {
 		gnutls_assert();
+		gnutls_sfree_datum( &decrypted);
 		return ret;
 	}
 
-	gnutls_free_datum( &decrypted);
+	gnutls_sfree_datum( &decrypted);
 
 	if (digest_size != gnutls_hash_get_algo_len(hash)) {
 		gnutls_assert();
@@ -189,24 +183,24 @@ _pkcs1_rsa_verify_sig( gnutls_datum* signature, gnutls_datum* text, MPI e, MPI m
 
 CertificateStatus gnutls_x509_verify_signature(gnutls_cert* cert, gnutls_cert* issuer) {
 gnutls_datum signature;
-gnutls_datum* tbs;
+gnutls_datum tbs;
 
 	if ( issuer->subject_pk_algorithm == GNUTLS_PK_RSA) {
 		signature.data = cert->signature;
 		signature.size = cert->signature_size;
 		
 		tbs = _gnutls_get_tbs( cert);
-		if (tbs==NULL) {
+		if (tbs.data==NULL) {
 			gnutls_assert();
 			return GNUTLS_CERT_INVALID;
 		}
 		
-		if (_pkcs1_rsa_verify_sig( &signature, tbs, issuer->params[1], issuer->params[0])!=0) {
+		if (_pkcs1_rsa_verify_sig( &signature, &tbs, issuer->params[1], issuer->params[0])!=0) {
 			gnutls_assert();
-			gnutls_free_datum( tbs);
+			gnutls_free_datum( &tbs);
 			return GNUTLS_CERT_NOT_TRUSTED;
 		}
-		gnutls_free_datum(tbs);
+		gnutls_free_datum(&tbs);
 		return GNUTLS_CERT_TRUSTED;
 	}
 #ifdef DEBUG

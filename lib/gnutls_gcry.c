@@ -28,4 +28,13 @@ void _gnutls_mpi_release( MPI* x) {
 	gcry_mpi_release(*x);
 	*x=NULL;
 }
-	
+
+MPI _gnutls_mpi_new( int bits) {
+	return gcry_mpi_new( bits);
+}
+
+int _gnutls_mpi_scan( GCRY_MPI *ret_mpi, enum gcry_mpi_format format,
+                                       const char *buffer, size_t *nbytes ) {
+	return gcry_mpi_scan( ret_mpi, format, buffer, nbytes);
+
+}

@@ -136,7 +136,7 @@ static int _gnutls_get_rsa_params(RSA_Params * params,
 			asn1_delete_structure(spk);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
-		if (gcry_mpi_scan(mod, GCRYMPI_FMT_USG, str, &len) != 0) {
+		if (_gnutls_mpi_scan(mod, GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
 			asn1_delete_structure(spk);
 			return GNUTLS_E_MPI_SCAN_FAILED;
@@ -159,7 +159,7 @@ static int _gnutls_get_rsa_params(RSA_Params * params,
 			_gnutls_mpi_release(mod);
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
-		if (gcry_mpi_scan(exp, GCRYMPI_FMT_USG, str, &len) != 0) {
+		if (_gnutls_mpi_scan(exp, GCRYMPI_FMT_USG, str, &len) != 0) {
 			gnutls_assert();
 			_gnutls_mpi_release(mod);
 			if (params != NULL)

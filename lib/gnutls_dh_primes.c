@@ -306,7 +306,7 @@ int i, n;
  		n = dh_primes[i].prime.size;
 		_gnutls_mpi_release( &dh_primes[i]._prime);
 
-		if (gcry_mpi_scan(&dh_primes[i]._prime, GCRYMPI_FMT_USG,
+		if (_gnutls_mpi_scan(&dh_primes[i]._prime, GCRYMPI_FMT_USG,
 				  dh_primes[i].prime.data, &n)
 		    || dh_primes[i]._prime == NULL) {
 			gnutls_assert();
@@ -317,7 +317,7 @@ int i, n;
 		n = dh_primes[i].generator.size;
 		_gnutls_mpi_release( &dh_primes[i]._generator);
 
-		if (gcry_mpi_scan(&dh_primes[i]._generator, GCRYMPI_FMT_USG,
+		if (_gnutls_mpi_scan(&dh_primes[i]._generator, GCRYMPI_FMT_USG,
 				  dh_primes[i].generator.data, &n)
 		    || dh_primes[i]._generator == NULL) {
 			gnutls_assert();
@@ -454,14 +454,14 @@ int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bi
 	} while(dh_primes[i].bits!=0);
 		
 	siz = prime.size;
-	if (gcry_mpi_scan(&tmp_prime, GCRYMPI_FMT_USG,
+	if (_gnutls_mpi_scan(&tmp_prime, GCRYMPI_FMT_USG,
 			  prime.data, &siz)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	siz = generator.size;
-	if (gcry_mpi_scan(&tmp_g, GCRYMPI_FMT_USG,
+	if (_gnutls_mpi_scan(&tmp_g, GCRYMPI_FMT_USG,
 			  generator.data, &siz)) {
 		_gnutls_mpi_release( &tmp_prime);
 		gnutls_assert();

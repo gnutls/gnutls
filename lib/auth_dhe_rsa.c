@@ -279,18 +279,18 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	_n_g = n_g;
 	_n_p = n_p;
 
-	if (gcry_mpi_scan(&state->gnutls_key->client_Y,
+	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y,
 			  GCRYMPI_FMT_USG, data_Y, &_n_Y) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (gcry_mpi_scan(&state->gnutls_key->client_g,
+	if (_gnutls_mpi_scan(&state->gnutls_key->client_g,
 			  GCRYMPI_FMT_USG, data_g, &_n_g) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	if (gcry_mpi_scan(&state->gnutls_key->client_p,
+	if (_gnutls_mpi_scan(&state->gnutls_key->client_p,
 			  GCRYMPI_FMT_USG, data_p, &_n_p) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -341,7 +341,7 @@ static int proc_dhe_rsa_client_kx(GNUTLS_STATE state, opaque * data,
 	n_Y = READuint16(&data[0]);
 	_n_Y = n_Y;
 
-	if (gcry_mpi_scan(&state->gnutls_key->client_Y,
+	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y,
 			  GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;

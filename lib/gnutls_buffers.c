@@ -277,7 +277,6 @@ void _gnutls_clear_read_buffer( GNUTLS_STATE state) {
  *
  * This is not a general purpose function. It returns EXACTLY the data requested.
  *
- * FIXME: make the buffer, be dynamically allocated.
  */
 ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)
 {
@@ -557,21 +556,25 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 		return _gnutls_flush( fd, state);
 	}
 
-	/* Fixme: Potential problem here. If ie one message has been
-	 * sent, and the next send_int() gets an interrupt.
-	 * This might be more dangerous with small message fragments.
-	 * (setting max_record_size to a smaller value)
+	/* FIXME: Potential problem here. If ie one message has been
+	 * sent, and the next send_int() gets an interrupt (or e_again).
+	 * This might be more dangerous, since a non blocking server may
+	 * block here. Should a buffer be used here?
 	 */
 	left = n;
 	while (left > 0) {
 		i = gnutls_send_int(fd, state, type, htype, &ptr[i], left);
 		if (i <= 0) {
-			gnutls_assert();
-			if (n-left > 0)  {
+			if (i==GNUTLS_E_INTERRUPTED || i==GNUTLS_E_AGAIN) {
+				i = 0;
+			} else {
 				gnutls_assert();
-				return n-left;
+				if (n-left > 0)  {
+					gnutls_assert();
+					return n-left;
+				}
+				return i;
 			}
-			return i;
 		}
 		left -= i;
 	}

@@ -38,7 +38,7 @@
   **/
 int gnutls_get_current_session( GNUTLS_STATE state, opaque* session, int *session_size) {
 
-	if (*session_size < SESSION_SIZE) {
+	if (*session_size < SESSION_SIZE || session==NULL) {
 		*session_size = SESSION_SIZE;
 		session = NULL; /* return with the new session_size value */
 	}

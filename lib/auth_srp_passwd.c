@@ -108,7 +108,7 @@ int indx;
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	if (gcry_mpi_scan(&entry->v, GCRYMPI_FMT_USG, verifier, &verifier_size) || entry->v == NULL) {
+	if (_gnutls_mpi_scan(&entry->v, GCRYMPI_FMT_USG, verifier, &verifier_size) || entry->v == NULL) {
 		gnutls_assert();
 		gnutls_free(entry->salt);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -151,7 +151,7 @@ int tmp_size;
 		gnutls_assert();
 		return GNUTLS_E_PARSING_ERROR;
 	}
-	if (gcry_mpi_scan(&entry->g, GCRYMPI_FMT_USG, tmp, &tmp_size) || entry->g==NULL) {
+	if (_gnutls_mpi_scan(&entry->g, GCRYMPI_FMT_USG, tmp, &tmp_size) || entry->g==NULL) {
 		gnutls_assert();
 		gnutls_free(tmp);
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -179,7 +179,7 @@ int tmp_size;
 		_gnutls_mpi_release(&entry->g);
 		return GNUTLS_E_PARSING_ERROR;
 	}
-	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size) || entry->n==NULL) {
+	if (_gnutls_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size) || entry->n==NULL) {
 		gnutls_assert();
 		gnutls_free(tmp);
 		_gnutls_mpi_release(&entry->g);
@@ -309,7 +309,7 @@ GNUTLS_SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	}
 	strcpy( pwd_entry->username, RNDUSER); /* Flawfinder: ignore */
 	
-	pwd_entry->v = gcry_mpi_new(160);
+	pwd_entry->v = _gnutls_mpi_new(160);
 	if (pwd_entry->v==NULL) {
 		gnutls_assert();
 		_gnutls_srp_clear_pwd_entry( pwd_entry);

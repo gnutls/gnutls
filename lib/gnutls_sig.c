@@ -216,13 +216,16 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *data, g
 
 	if (plain.size != vdata.size) {
 		gnutls_assert();
+		gnutls_sfree_datum( &plain);
 		return GNUTLS_E_PK_SIGNATURE_FAILED;
 	}
 
 	if ( memcmp(plain.data, vdata.data, plain.size)!=0) {
 		gnutls_assert();
+		gnutls_sfree_datum( &plain);
 		return GNUTLS_E_PK_SIGNATURE_FAILED;
 	}
+	gnutls_sfree_datum( &plain);
 
 	return 0;
 }

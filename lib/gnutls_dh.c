@@ -60,7 +60,7 @@ MPI gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 	MPI e, x;
 	int x_size = get_x_size(gcry_mpi_get_nbits(prime));
 
-	x = gcry_mpi_new(x_size);	/* FIXME: allocate in secure memory */
+	x = _gnutls_mpi_new(x_size);	/* FIXME: allocate in secure memory */
 	if (x == NULL) {
 		if (ret_x)
 			*ret_x = NULL;
@@ -70,7 +70,7 @@ MPI gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 	gcry_mpi_randomize(x, x_size, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
-	e = gcry_mpi_alloc_like(prime);
+	e = _gnutls_mpi_alloc_like(prime);
 	if (e == NULL) {
 		if (ret_x)
 			*ret_x = NULL;
@@ -90,7 +90,7 @@ MPI gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 {
 	MPI k;
 
-	k = gcry_mpi_alloc_like(prime);
+	k = _gnutls_mpi_alloc_like(prime);
 	if (k == NULL)
 		return NULL;
 	gcry_mpi_powm(k, f, x, prime);
