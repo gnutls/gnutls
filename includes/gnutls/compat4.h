@@ -91,3 +91,7 @@
 #define gnutls_srp_free_server_cred gnutls_srp_free_server_credentials
 #define gnutls_srp_allocate_server_cred gnutls_srp_allocate_server_credentials
 #define gnutls_srp_set_server_cred_file gnutls_srp_set_server_credentials_file
+
+#define gnutls_set_server_name gnutls_server_name_set
+#define gnutls_get_server_name gnutls_server_name_get
+

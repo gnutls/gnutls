@@ -184,7 +184,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
 }
 
 /**
-  * gnutls_get_server_name - Used to get the server name indicator send by a client
+  * gnutls_server_name_get - Used to get the server name indicator send by a client
   * @session: is a &gnutls_session structure.
   * @data: will hold the data
   * @data_length: will hold the data length. Must hold the maximum size of data.
@@ -207,7 +207,7 @@ int _gnutls_server_name_send_params(gnutls_session session, opaque * data,
   * index exists GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
   *
   **/
-int gnutls_get_server_name(gnutls_session session, void *data,
+int gnutls_server_name_get(gnutls_session session, void *data,
 			   int *data_length,
 			   int * type, int index)
 {
@@ -247,7 +247,7 @@ int gnutls_get_server_name(gnutls_session session, void *data,
 }
 
 /**
-  * gnutls_set_server_name - Used to set a name indicator to be sent as an extension
+  * gnutls_server_name_set - Used to set a name indicator to be sent as an extension
   * @session: is a &gnutls_session structure.
   * @name: is a string that contains the server name.
   * @name_length: holds the length of name
@@ -262,7 +262,7 @@ int gnutls_get_server_name(gnutls_session session, void *data,
   * a null terminated string is expected. 
   *
   **/
-int gnutls_set_server_name(gnutls_session session,
+int gnutls_server_name_set(gnutls_session session,
 			   gnutls_server_name_type type,
 			   const void *name, int name_length)
 {

@@ -124,4 +124,21 @@ gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
 	return 0;
 }
 
+#undef gnutls_get_server_name
+int gnutls_get_server_name(gnutls_session session, void *data,
+			   int *data_length,
+			   int * type, int index)
+{
+	return gnutls_server_name_get( session, data, data_length, type, index);
+}
+
+#undef gnutls_set_server_name
+int gnutls_set_server_name(gnutls_session session,
+			   gnutls_server_name_type type,
+			   const void *name, int name_length)
+{
+	return gnutls_server_name_set( session, type, name, name_length);
+}
+
+
 #endif /* GNUTLS_BACKWARDS_COMPATIBLE */

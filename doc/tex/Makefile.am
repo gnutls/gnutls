@@ -15,8 +15,9 @@ TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex \
 	funcs.tex examples.tex ../../libextra/gnutls-extra-api.tex \
 	memory.tex openpgp.tex x509.tex howto.tex openssl.tex \
 	appendix.tex x509cert.xml.tex pgpcert.xml.tex \
-	programs.tex library.tex certificate.tex \
-	tlsintro.tex compression.tex $(EXAMPLE_OBJECTS)
+	programs.tex library.tex certificate.tex record_weaknesses.tex \
+	tlsintro.tex compression.tex $(EXAMPLE_OBJECTS) \
+	tls_extensions.tex
 
 gnutls.html: $(TEX_OBJECTS)            
 	-latex2html gnutls.tex -no_navigation -split 0 \
