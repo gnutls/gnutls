@@ -32,7 +32,7 @@
 #include <signal.h>
 #include <netdb.h>
 #include <tests.h>
-#include <stest-gaa.h>
+#include <tls_test-gaa.h>
 
 #ifndef SHUT_WR
 # define SHUT_WR 1
