@@ -4,7 +4,8 @@ EXTRA_DIST = gnutls.tex gnutls.ps \
 
 EXAMPLE_OBJECTS = ex-alert.tex ex-client-srp.tex ex-serv-export.tex \
 	ex-client1.tex ex-client2.tex ex-info.tex ex-rfc2818.tex \
-	ex-serv1.tex ex-client-resume.tex ex-serv-srp.tex
+	ex-serv1.tex ex-client-resume.tex ex-serv-srp.tex \
+	ex-serv-pgp.tex
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex \
@@ -44,7 +45,7 @@ examples: $(EXAMPLE_OBJECTS)
 	@echo "Generating example programs... "
 	@echo "They will be placed in examples/ directory."
 	@echo ""
-	@mkdir examples/ && \
+	@-mkdir examples/ && \
 	for i in $(EXAMPLE_OBJECTS); do \
 		out=`echo -n $$i|sed s/\.tex//`; \
 		cat $$i|grep -v "^\\\\" > examples/$$out.c; \
