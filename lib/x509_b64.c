@@ -301,7 +301,7 @@ int gnutls_pem_base64_encode_alloc( const char* msg, const gnutls_datum *data,
    gnutls_datum* result) 
 {
 opaque* ret;
-int size, res;
+int size;
 
 	size = _gnutls_fbase64_encode( msg, data->data, data->size, &ret);
 	if (size < 0)
@@ -516,7 +516,7 @@ int gnutls_pem_base64_decode_alloc( const char* header, const gnutls_datum *b64_
    gnutls_datum* result) 
 {
 opaque* ret;
-int size, res;
+int size;
 
 	size = _gnutls_fbase64_decode( header, b64_data->data, b64_data->size, &ret);
 	if (size < 0)

@@ -87,7 +87,7 @@ static gnutls_error_entry error_algorithms[] = {
 	ERROR_ENTRY("Error in the pull function.", GNUTLS_E_PULL_ERROR, 1 ), 
 	ERROR_ENTRY("Error in the push function.", GNUTLS_E_PUSH_ERROR, 1 ), 
 	ERROR_ENTRY("The upper limit in record packet sequence number has been reached. Wow!", GNUTLS_E_RECORD_LIMIT_REACHED, 1 ), 
-	ERROR_ENTRY("Error in the X.509 certificate.", GNUTLS_E_X509_CERTIFICATE_ERROR, 1 ), 
+	ERROR_ENTRY("Error in the certificate.", GNUTLS_E_CERTIFICATE_ERROR, 1 ), 
 	ERROR_ENTRY("Unknown Subject Alternative name in X.509 certificate.", GNUTLS_E_X509_UNKNOWN_SAN, 1 ), 
 
 	ERROR_ENTRY("Unsupported critical extension in X.509 certificate.", GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION, 1 ), 

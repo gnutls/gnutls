@@ -151,7 +151,7 @@ int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, size_t 
 				gnutls_assert();
 				return GNUTLS_E_SHORT_MEMORY_BUFFER;
 			}
-			
+
 			data[0] = _gnutls_cert_type2num( session->security_parameters.cert_type);
 			return len;
 		}	

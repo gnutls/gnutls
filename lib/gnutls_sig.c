@@ -206,7 +206,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 							       * if it is initialized
 							       */
 		gnutls_assert();
-		return GNUTLS_E_X509_CERTIFICATE_ERROR;
+		return GNUTLS_E_CERTIFICATE_ERROR;
 	}
 
 	/* If the certificate supports signing continue.
