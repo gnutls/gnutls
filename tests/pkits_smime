@@ -22,16 +22,22 @@ CERTTOOL=../src/certtool
 
 test -d smime || unzip PKITS_data.zip
 
+ret=0
 for msg in smime/*; do
     $CERTTOOL --smime-to-p7 --infile $msg > out 2>&1
     rc=$?
     if test $rc != 0; then
 	echo "S/MIME FATAL $msg"
+	ret=1
     fi
     $CERTTOOL --p7-info --infile out > out2 2>&1
     rc=$?
     if test $rc != 0; then
 	echo "PKCS#7 FATAL $msg."
+	ret=1
     fi
 done
 rm -f out out2
+
+echo "Done (exit code $ret)"
+exit $ret

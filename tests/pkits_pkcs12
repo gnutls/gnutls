@@ -22,11 +22,16 @@ CERTTOOL=../src/certtool
 
 test -d pkcs12 || unzip PKITS_data.zip
 
+ret=0
 for p12 in pkcs12/*; do
     $CERTTOOL --p12-info --inder --password password --infile $p12 > out 2>&1
     rc=$?
     if test $rc != 0; then
 	echo "PKCS12 $p12 FATAL failure."
+	ret=1
     fi
 done
 rm -f out
+
+echo "Done (exit code $ret)"
+exit $ret
