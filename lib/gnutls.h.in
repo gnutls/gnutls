@@ -25,7 +25,7 @@ typedef enum ContentType ContentType;
 #define GNUTLS_AES GNUTLS_RIJNDAEL
 
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 } BulkCipherAlgorithm;
-typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP } KXAlgorithm;
+typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum MACAlgorithm { GNUTLS_NULL_MAC=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } MACAlgorithm;
 typedef enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB } CompressionMethod;
 typedef enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT } ConnectionEnd;
@@ -105,6 +105,8 @@ int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
 int gnutls_set_db_name( GNUTLS_STATE state, char* filename);	
 int gnutls_clean_db( GNUTLS_STATE state);
 
+/* returns libgnutls version */
+const char* gnutls_check_version();
 
 /* Functions for setting/clearing credentials */
 int gnutls_clear_creds( GNUTLS_STATE state);
@@ -127,9 +129,15 @@ typedef struct {
 	char* username;
 } SRP_AUTH_INFO;
 
+/* Credential structures for DH_ANON */
 
-/* check gnutls version */
-const char* gnutls_check_version();
+typedef struct {
+	int bits;
+} DH_ANON_SERVER_CREDENTIALS;
+
+typedef struct {
+	int bits;
+} DH_ANON_AUTH_INFO;
 
 
 /* error codes appended here */

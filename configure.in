@@ -155,6 +155,7 @@ AC_OUTPUT_COMMANDS([
  chmod +x lib/libgnutls-config
  cat lib/gnutls_errors_int.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
+ chmod -w lib/gnutls.h
 ])
 
 AC_OUTPUT([Makefile src/Makefile lib/Makefile lib/libgnutls-config lib/gnutls.h doc/Makefile])
