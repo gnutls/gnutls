@@ -2,8 +2,8 @@
 
 #define GNUTLS_INT_H
 
-//#define HANDSHAKE_DEBUG
-#define HARD_DEBUG
+#define HANDSHAKE_DEBUG
+//#define HARD_DEBUG
 //#define READ_DEBUG
 //#define WRITE_DEBUG
 #define DEBUG
@@ -47,7 +47,7 @@ typedef unsigned char opaque;
 
 
 enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 };
-enum AlertLevel { GNUTLS_WARNING, GNUTLS_FATAL };
+enum AlertLevel { GNUTLS_WARNING=1, GNUTLS_FATAL };
 enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTLS_BAD_RECORD_MAC=20,
 			GNUTLS_DECRYPTION_FAILED, GNUTLS_RECORD_OVERFLOW,  GNUTLS_DECOMPRESSION_FAILURE=30,
 			GNUTLS_HANDSHAKE_FAILURE=40, GNUTLS_BAD_CERTIFICATE=42, GNUTLS_UNSUPPORTED_CERTIFICATE,
@@ -119,6 +119,8 @@ typedef struct {
 	opaque master_secret[48];
 	opaque client_random[32];
 	opaque server_random[32];
+	opaque session_id[32];
+	uint8 session_id_size;
 } SecurityParameters;
 
 typedef struct {
@@ -160,35 +162,35 @@ typedef struct {
 typedef struct {
 	int* algorithm_priority;
 	int algorithms;
-} BulkCipherAlgorithm_Priority;
+} GNUTLS_Priority;
 
-typedef struct {
-	int* algorithm_priority;
-	int algorithms;
-} MACAlgorithm_Priority;
-
-typedef struct {
-	int* algorithm_priority;
-	int algorithms;
-} KXAlgorithm_Priority;
-
-typedef struct {
-	int* algorithm_priority;
-	int algorithms;
-} CompressionMethod_Priority;
+#define BulkCipherAlgorithm_Priority GNUTLS_Priority
+#define MACAlgorithm_Priority GNUTLS_Priority
+#define KXAlgorithm_Priority GNUTLS_Priority
+#define CompressionMethod_Priority GNUTLS_Priority
 
 typedef struct {
 	char*			buffer;
 	uint32			bufferSize;
-	char*			hash_buffer; /* used in SSL3 */
-	uint32			hash_bufferSize; /* used in SSL3 */
-	char*			buffer_handshake;
+	char*			hash_buffer; /* used to keep all handshake messages */
+	uint32			hash_bufferSize;
+	char*			buffer_handshake; /* this is a buffer that holds the current handshake message */
 	uint32			bufferSize_handshake;
-	ResumableSession	resumable; /* TRUE or FALSE */
-	ValidSession		valid_connection; /* true or FALSE */
+	ResumableSession	resumable; /* TRUE or FALSE - if we can resume that session */
+	ValidSession		valid_connection; /* true or FALSE - if this session is valid */
 	AlertDescription	last_alert; /* last alert received */
+	/* this is the ciphersuite we are going to use */
 	GNUTLS_CipherSuite	current_cipher_suite;
+	/* this is the compression method we are going to use */
 	CompressionMethod	compression_method;
+	/* priorities */
+	BulkCipherAlgorithm_Priority	BulkCipherAlgorithmPriority;
+	MACAlgorithm_Priority		MACAlgorithmPriority;
+	KXAlgorithm_Priority		KXAlgorithmPriority;
+	CompressionMethod_Priority	CompressionMethodPriority;
+	/* resumed session */
+	ResumableSession	resumed; /* TRUE or FALSE - if we are resuming a session */
+	SecurityParameters  resumed_security_parameters;
 	/* For DH KX */
 	MPI				KEY;
 	MPI				client_Y;
@@ -197,10 +199,6 @@ typedef struct {
 	MPI				dh_secret;
 	int				certificate_requested; /* non zero if client certificate was requested */
 	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
-	BulkCipherAlgorithm_Priority	BulkCipherAlgorithmPriority;
-	MACAlgorithm_Priority		MACAlgorithmPriority;
-	KXAlgorithm_Priority		KXAlgorithmPriority;
-	CompressionMethod_Priority	CompressionMethodPriority;
 } GNUTLS_INTERNALS;
 
 typedef struct {
@@ -217,9 +215,6 @@ typedef GNUTLS_STATE_INT *GNUTLS_STATE;
 enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT, GNUTLS_HANDSHAKE,
 		GNUTLS_APPLICATION_DATA };
 typedef enum ContentType ContentType;
-
-#define GNUTLS_DEFAULT_VERSION_MAJOR 3
-#define GNUTLS_DEFAULT_VERSION_MINOR 1
 
 typedef struct {
 	uint8 major;
@@ -281,7 +276,7 @@ typedef struct {
 
 
 typedef struct {
-	ProtocolVersion		client_version;
+	ProtocolVersion	client_version;
 	GNUTLS_random		random;
 	opaque*			session_id;
 	GNUTLS_CipherSuite*	cipher_suites;
@@ -289,7 +284,7 @@ typedef struct {
 } GNUTLS_ClientHello;
 
 typedef struct {
-	ProtocolVersion		server_version;
+	ProtocolVersion	server_version;
 	GNUTLS_random		random;
 	opaque*			session_id;
 	GNUTLS_CipherSuite	cipher_suite;

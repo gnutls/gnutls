@@ -148,6 +148,9 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 	}
 
 	ret = _gnutls_send_handshake(cd, state, data, data_size, GNUTLS_FINISHED);
+#ifdef HANDSHAKE_DEBUG
+	fprintf(stderr, "Send finished\n");
+#endif
 	gnutls_free(data);
 
 	return ret;
@@ -400,7 +403,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	case GNUTLS_CLIENT_HELLO:
 	case GNUTLS_SERVER_HELLO:
 		ret = _gnutls_recv_hello(cd, state, &dataptr[HANDSHAKE_HEADERS_SIZE],
-					       length32, NULL, 0);
+					       length32);
 		break;
 	case GNUTLS_CERTIFICATE:
 		ret = _gnutls_recv_certificate(cd, state, &dataptr[HANDSHAKE_HEADERS_SIZE],
@@ -613,8 +616,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
  * hello message is expected. It uses the gnutls_internals.current_cipher_suite
  * and gnutls_internals.compression_method.
  */
-int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
-		       opaque ** SessionID, int SessionIDnum)
+int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 {
 	uint8 session_id_len = 0, z;
 	int pos = 0;
@@ -659,11 +661,23 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		fprintf(stderr, "SessionID: %s\n",
 			_gnutls_bin2hex(&data[pos], session_id_len));
 #endif
-		pos += session_id_len;
+		if ( (state->gnutls_internals.resumed_security_parameters.session_id_size>0) 
+			&& memcmp(&data[pos], state->gnutls_internals.resumed_security_parameters.session_id, session_id_len)==0) {
+			/* resume session */
+			
+#ifdef DEBUG
+			fprintf(stderr, "Resuming session\n");
+#endif
+			 state->gnutls_internals.resumed=RESUME_TRUE; /* we are resuming */
+			 return 0;
+		} else {
+			/* keep the session id */
+			state->gnutls_internals.resumed=RESUME_FALSE; /* we are not resuming */
+			state->security_parameters.session_id_size = session_id_len;
+			memcpy( state->security_parameters.session_id, &data[pos], session_id_len);
+		}
 
-		/* We should resume an old connection here. This is not
-		 * implemented yet.
-		 */
+		pos += session_id_len;
 
 		memmove(&cipher_suite.CipherSuite, &data[pos], 2);
 		pos += 2;
@@ -844,7 +858,11 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 	uint8 session_id_size;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		ret = _gnutls_send_hello(cd, state, NULL, 0);
+#ifdef HARD_DEBUG
+		if (state->gnutls_internals.resumed_security_parameters.session_id_size>0) 
+		fprintf(stderr, "Ask to resume: %s\n", _gnutls_bin2hex(state->gnutls_internals.resumed_security_parameters.session_id, state->gnutls_internals.resumed_security_parameters.session_id_size));
+#endif
+		ret = _gnutls_send_hello(cd, state, state->gnutls_internals.resumed_security_parameters.session_id, state->gnutls_internals.resumed_security_parameters.session_id_size);
 		if (ret < 0) {
 			ERR("send hello", ret);
 			gnutls_clearHashDataBuffer( state);
@@ -861,6 +879,7 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 		}
 
 		/* RECV CERTIFICATE */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret =
 		    _gnutls_recv_handshake(cd, state, NULL, NULL, GNUTLS_CERTIFICATE);
 		if (ret < 0) {
@@ -911,13 +930,14 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
  */
 int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 {
-	int ret;
+	int ret=0;
 	char *session_id;
 	uint8 session_id_size;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 
 		/* receive the server key exchange */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret = _gnutls_recv_server_kx_message(cd, state);
 		if (ret < 0) {
 			ERR("recv server kx message", ret);
@@ -928,6 +948,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		/* FIXME: receive certificate request */
 
 		/* receive the server hello done */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret =
 		    _gnutls_recv_handshake(cd, state, NULL, NULL,
 					   GNUTLS_SERVER_HELLO_DONE);
@@ -938,6 +959,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		}
 
 		/* send our certificate - if any */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret = _gnutls_send_client_certificate(cd, state);
 		if (ret < 0) {
 			ERR("send client certificate", ret);
@@ -945,6 +967,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret = _gnutls_send_client_kx_message(cd, state);
 		if (ret < 0) {
 			ERR("send client kx", ret);
@@ -953,6 +976,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		}
 
 		/* send client certificate verify */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret = _gnutls_send_client_certificate_verify( cd, state);
 		if (ret < 0) {
 			ERR("send client certificate verify", ret);
@@ -968,10 +992,10 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-
 		/* Initialize the connection state (start encryption) */
 		ret = _gnutls_connection_state_init(state);
 		if (ret<0) {
+			gnutls_assert();
 			gnutls_clearHashDataBuffer( state);
 			return ret;
 		}

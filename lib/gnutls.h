@@ -66,6 +66,10 @@ void gnutls_set_compression_priority( GNUTLS_STATE state, int num, ...);
 /* set our version - local is 0x00 for TLS 1.0 and SSL3 */
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 
 
+/* get/set session */
+int gnutls_set_current_session( GNUTLS_STATE state, void* session, int session_size);
+int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_size);
+
 /* these are deprecated must be replaced by gnutls_errors.h */
 #define GNUTLS_E_MAC_FAILED -1
 #define GNUTLS_E_UNKNOWN_CIPHER -2

@@ -111,6 +111,9 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	gnutls_set_kx_priority( (*state), 2, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA);
 	gnutls_set_mac_priority( (*state), 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
 
+	(*state)->security_parameters.session_id_size = 0;
+	(*state)->gnutls_internals.resumed_security_parameters.session_id_size = 0;
+	(*state)->gnutls_internals.resumed = RESUME_FALSE;
 	return 0;
 }
 
@@ -269,7 +272,7 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 {
 	char *key_block;
 	char keyexp[] = "key expansion";
-	char *random = gnutls_malloc(64);
+	char random[64];
 	int hash_size;
 	int IV_size;
 	int key_size;
@@ -458,7 +461,7 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	headers[1] = state->connection_state.version.major;
 	headers[2] = state->connection_state.version.minor;
 
-#ifdef HARD_DEBUG
+#ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Send Change Cipher Spec\n");
 #endif
 

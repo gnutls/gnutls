@@ -203,27 +203,34 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	state->connection_state.write_sequence_number = 0;
 	state->connection_state.read_sequence_number = 0;
 
-/* Update internals from CipherSuite selected */
-
-	rc =
-	    _gnutls_set_cipher(state,
+/* Update internals from CipherSuite selected.
+ * If we are resuming just copy the connection state
+ */
+ 	if (state->gnutls_internals.resumed==RESUME_FALSE) {
+		rc =
+		    _gnutls_set_cipher(state,
 			       _gnutls_cipher_suite_get_cipher_algo
 			       (state->gnutls_internals.current_cipher_suite));
-	if (rc < 0)
-		return rc;
-	rc =
-	    _gnutls_set_mac(state,
+		if (rc < 0)
+			return rc;
+		rc =
+		    _gnutls_set_mac(state,
 			    _gnutls_cipher_suite_get_mac_algo
 			    (state->gnutls_internals.current_cipher_suite));
-	if (rc < 0)
-		return rc;
+		if (rc < 0)
+			return rc;
 
-	rc =
-	    _gnutls_set_compression(state,
-			    state->gnutls_internals.compression_method);
-	if (rc < 0)
-		return rc;
-
+		rc =
+		    _gnutls_set_compression(state,
+				    state->gnutls_internals.compression_method);
+		if (rc < 0)
+			return rc;
+	} else {
+		 memcpy( &state->security_parameters, &state->gnutls_internals.resumed_security_parameters, sizeof(SecurityParameters));
+#ifdef HARD_DEBUG
+		 fprintf(stderr, "Master Secret: %s\n", _gnutls_bin2hex(state->security_parameters.master_secret, 48));
+#endif
+	}
 /* Setup the keys since we have the master secret 
  */
 	_gnutls_set_keys(state);
@@ -242,8 +249,10 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	fprintf(stderr, "Compression: %s\n", _gnutls_compression_get_name(state->security_parameters.compression_algorithm));
 #endif
 
-	gnutls_free(state->connection_state.write_mac_secret);
-	gnutls_free(state->connection_state.read_mac_secret);
+	if (state->connection_state.write_mac_secret!=NULL)
+		gnutls_free(state->connection_state.write_mac_secret);
+	if (state->connection_state.read_mac_secret!=NULL)
+		gnutls_free(state->connection_state.read_mac_secret);
 
 	if (state->connection_state.read_cipher_state != NULL)
 		gnutls_cipher_deinit(state->connection_state.
@@ -253,8 +262,10 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		gnutls_cipher_deinit(state->connection_state.
 				     write_cipher_state);
 
-	gnutls_free(state->connection_state.read_compression_state);
-	gnutls_free(state->connection_state.write_compression_state);
+	if (state->connection_state.read_compression_state!=NULL)
+		gnutls_free(state->connection_state.read_compression_state);
+	if (state->connection_state.write_compression_state!=NULL)
+		gnutls_free(state->connection_state.write_compression_state);
 
 	if (_gnutls_compression_is_ok(state->security_parameters.compression_algorithm) == 0) {
 		state->connection_state.read_compression_state = NULL;
@@ -264,8 +275,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 	}
 
-	if (_gnutls_mac_is_ok(state->security_parameters.mac_algorithm) ==
-	    0) {
+	if (_gnutls_mac_is_ok(state->security_parameters.mac_algorithm) == 0) {
 
 		mac_size =
 		    _gnutls_mac_get_digest_size(state->security_parameters.
@@ -499,7 +509,6 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 
 		memset(&data[length - pad], pad - 1, pad);
 		memmove(data, content, compressed->length);
-
 
 		memmove(&data[compressed->length], MAC,
 			state->security_parameters.hash_size);
