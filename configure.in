@@ -566,6 +566,7 @@ doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
 doc/examples/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
-includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile])
+includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile \
+tests/Makefile])
 
 AC_OUTPUT

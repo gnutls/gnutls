@@ -1,3 +1,6 @@
+Version 1.1.13
+- Added simple self test suite.
+
 Version 1.1.12 (02/08/2004)
 - Updated the SRP authentication to conform to the
   latest (yet unreleased) draft. Unfortunately this breaks
