@@ -236,17 +236,16 @@ typedef enum gnutls_x509_crt_fmt {
 } gnutls_x509_crt_fmt_t;
 
 typedef enum gnutls_pk_algorithm {
-    GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
-    GNUTLS_PK_UNKNOWN = 0xff
+    GNUTLS_PK_UNKNOWN = 0, GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA
 } gnutls_pk_algorithm_t;
 
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t)-1
-#define GNUTLS_PK_NONE (gnutls_pk_algorithm_t)0
+#define GNUTLS_PK_NONE (gnutls_pk_algorithm_t)-2
 
 typedef enum gnutls_sign_algorithm {
+    GNUTLS_SIGN_UNKNOWN = 0,
     GNUTLS_SIGN_RSA_SHA = 1, GNUTLS_SIGN_DSA_SHA,
-    GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2, GNUTLS_SIGN_RSA_RMD160,
-    GNUTLS_SIGN_UNKNOWN = 0xff
+    GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2, GNUTLS_SIGN_RSA_RMD160
 } gnutls_sign_algorithm_t;
 
 /* STATE (stop) */

@@ -1538,7 +1538,7 @@ void _gnutls_selected_certs_set(gnutls_session_t session,
  *
  */
 int _gnutls_server_select_cert(gnutls_session_t session,
-			       gnutls_pk_algorithm_t requested_algo)
+    gnutls_pk_algorithm_t requested_algo)
 {
     uint i;
     int index, ret;
@@ -1582,9 +1582,8 @@ int _gnutls_server_select_cert(gnutls_session_t session,
      */
     if (index >= 0 && ret == 0) {
 	_gnutls_selected_certs_set(session,
-				   &cred->cert_list[index][0],
-				   cred->cert_list_length[index],
-				   &cred->pkey[index], 0);
+	    &cred->cert_list[index][0], cred->cert_list_length[index],
+            &cred->pkey[index], 0);
     }
 
     return ret;

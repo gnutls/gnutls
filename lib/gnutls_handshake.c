@@ -2462,10 +2462,8 @@ inline static int check_server_params(gnutls_session_t session,
  * by checking certificates etc.
  */
 int _gnutls_remove_unwanted_ciphersuites(gnutls_session_t session,
-					 cipher_suite_st **
-					 cipherSuites, int numCipherSuites,
-					 gnutls_pk_algorithm_t
-					 requested_pk_algo)
+   cipher_suite_st **cipherSuites, int numCipherSuites,
+   gnutls_pk_algorithm_t requested_pk_algo)
 {
 
     int ret = 0;
