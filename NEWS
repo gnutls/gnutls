@@ -8,6 +8,9 @@ Version 1.1.11
   verification functions.
 - The ephemeral DH and RSA parameters are no longer stored in the
   session resume DB.
+- Do not free the SRP (prime and generator) parameters obtained from the 
+  callback if they are the static ones defined in extra.h
+- Eliminated some memory leaks. Reported by Yoann Vandoorselaere.
 
 Version 1.1.10 (12/06/2004)
 - Added gnutls_sign_algorithm_get_name() and gnutls_pk_algorithm_get_name()
