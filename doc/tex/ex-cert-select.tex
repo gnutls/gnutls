@@ -1,0 +1,45 @@
+\begin{verbatim}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
+
+/* This callback should be associated with a session by calling
+ * gnutls_certificate_client_set_select_function( session, cert_callback),
+ * before a handshake.
+ */
+
+static int cert_callback(gnutls_session session,
+			 const gnutls_datum * client_certs, int client_certs_num,
+			 const gnutls_datum * req_ca_rdn, int nreqs)
+{
+   char issuer_dn[256];
+   int len, i, ret;
+
+   /* Print the server's trusted CAs
+    */
+   if (nreqs > 0)
+      printf("- Server's trusted authorities:\n");
+   else
+      printf("- Server did not send us any trusted authorities names.\n");
+
+   /* print the names (if any) */
+   for (i = 0; i < nreqs; i++) {
+      len = sizeof(issuer_dn);
+      ret = gnutls_x509_rdn_get(&req_ca_rdn[i], issuer_dn, &len);
+      if (ret >= 0) {
+	 printf("   [%d]: ", i);
+	 printf("%s\n", issuer_dn);
+      }
+   }
+
+   /* Select a certificate from the client_certs and return it's
+    * index.
+    */
+
+   return -1;
+
+}
+
+\end{verbatim}
