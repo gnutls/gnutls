@@ -2,6 +2,7 @@ Version ?.?.?
 - Corrected bug which did not allow a client to accept multiple CA names
 - Added gnutls_fingerprint()
 - Added gnutls_x509pki_extract_certificate_serial()
+- Added gnutls_b64_encode() and gnutls_b64_decode()
 - Corrected behaviour in version advertizing
 - Updated documentation
 
