@@ -83,10 +83,10 @@ int gnutls_x509_certificate_get_key_usage( gnutls_x509_certificate cert, unsigne
  */
 #define GNUTLS_KEY_DIGITAL_SIGNATURE 		256
 #define GNUTLS_KEY_NON_REPUDIATION		128
-#define GNUTLS_KEY_GNUTLS_KEY_ENCIPHERMENT	64
+#define GNUTLS_KEY_KEY_ENCIPHERMENT		64
 #define GNUTLS_KEY_DATA_ENCIPHERMENT		32
-#define GNUTLS_KEY_GNUTLS_KEY_AGREEMENT		16
-#define GNUTLS_KEY_GNUTLS_KEY_CERT_SIGN		8
+#define GNUTLS_KEY_KEY_AGREEMENT		16
+#define GNUTLS_KEY_KEY_CERT_SIGN		8
 #define GNUTLS_KEY_CRL_SIGN			4
 #define GNUTLS_KEY_ENCIPHER_ONLY		2
 #define GNUTLS_KEY_DECIPHER_ONLY		1
@@ -137,6 +137,8 @@ int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index, unsigned char* serial,
         int* serial_size, time_t* time);
 
+int gnutls_x509_crl_check_issuer( gnutls_x509_crl crl,
+	gnutls_x509_certificate issuer);
 
 /* PKCS7 structures handling 
  */
@@ -166,7 +168,7 @@ typedef enum gnutls_certificate_verify_flags {
 					 */
 } gnutls_certificate_verify_flags;
 
-int gnutls_x509_certificate_is_issuer( gnutls_x509_certificate cert,
+int gnutls_x509_certificate_check_issuer( gnutls_x509_certificate cert,
 	gnutls_x509_certificate issuer);
 
 int gnutls_x509_certificate_list_verify( gnutls_x509_certificate* cert_list, int cert_list_length, 
@@ -180,6 +182,10 @@ int gnutls_x509_certificate_verify( gnutls_x509_certificate cert,
 int gnutls_x509_crl_verify( gnutls_x509_crl crl,
 	gnutls_x509_certificate *CA_list, int CA_list_length,
 	unsigned int flags, unsigned int *verify);
+
+int gnutls_x509_certificate_check_revocation(gnutls_x509_certificate cert,
+					     gnutls_x509_crl * crl_list,
+					     int crl_list_length);
 
 
 #ifdef __cplusplus

@@ -32,8 +32,8 @@
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
+#include <dn.h>
 #include <x509.h>
-#include <crl.h>
 #include <mpi.h>
 #include <verify.h>
 
@@ -83,8 +83,6 @@ static int check_if_ca(gnutls_x509_certificate cert,
  * This does a straight (DER) compare of the issuer/subject fields in
  * the given certificates.
  *
- * FIXME: use a real DN comparison algorithm.
- *
  * Returns 1 if the match and zero if they don't match. Otherwise
  * a negative value is returned to indicate error.
  */
@@ -106,17 +104,7 @@ int is_issuer(gnutls_x509_certificate cert, gnutls_x509_certificate issuer_cert)
 		return ret;
 	}
 
-	if (dn1.size != dn2.size) {
-		gnutls_assert();
-		return 0;
-	}
-	if (memcmp(dn1.data, dn2.data, dn2.size) != 0) {
-		gnutls_assert();
-		return 0;
-	}
-
-	/* they match */
-	return 1;
+	return _gnutls_x509_compare_raw_dn( &dn1, &dn2);
 
 }
 
@@ -140,17 +128,7 @@ int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_certificate issuer_cert)
 		return ret;
 	}
 
-	if (dn1.size != dn2.size) {
-		gnutls_assert();
-		return 0;
-	}
-	if (memcmp(dn1.data, dn2.data, dn2.size) != 0) {
-		gnutls_assert();
-		return 0;
-	}
-
-	/* they match */
-	return 1;
+	return _gnutls_x509_compare_raw_dn( &dn1, &dn2);
 
 }
 
@@ -224,7 +202,7 @@ static int _gnutls_verify_certificate2(gnutls_x509_certificate cert,
 		return 0;
 	}
 
-	if (flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) {
+	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN)) {
 		if (check_if_ca(cert, issuer)==0) {
 			gnutls_assert();
 			return 0;
@@ -271,7 +249,7 @@ static int _gnutls_verify_crl2(gnutls_x509_crl crl,
 		return 0;
 	}
 
-	if (flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) {
+	if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN)) {
 		if (gnutls_x509_certificate_get_ca_status(issuer, NULL) != 1) 
 		{
 			gnutls_assert();
@@ -313,7 +291,18 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_certificate * certifica
 	int i = 0, ret;
 	unsigned int status = 0;
 
-	/* Verify the certificate path */
+	/* Check for revoked certificates in the chain
+	 */
+	for (i = 0; i < clist_size; i++) {
+		ret = gnutls_x509_certificate_check_revocation( certificate_list[i],
+			CRLs, crls_size);
+		if (ret == 1) { /* revoked */
+			status |= GNUTLS_CERT_REVOKED;
+		}
+	}
+
+	/* Verify the certificate path 
+	 */
 	for (i = 0; i < clist_size; i++) {
 		if (i + 1 >= clist_size)
 			break;
@@ -326,10 +315,12 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_certificate * certifica
 		}
 	}
 
-	if (status != 0) { /* If there is any problem in the
-			   * certificate chain then mark as not trusted
-			   * and return immediately.
-			   */
+	if (status != 0) {
+		  /* If there is any problem in the
+		   * certificate chain then mark as not trusted
+		   * and return immediately.
+		   */
+		gnutls_assert();
 		return (status | GNUTLS_CERT_NOT_TRUSTED);
 	}
 	
@@ -624,7 +615,7 @@ int gnutls_x509_certificate_verify( gnutls_x509_certificate cert,
 }
 
 /**
-  * gnutls_x509_certificate_is_issuer - This function checks if the certificate given has the given issuer
+  * gnutls_x509_certificate_check_issuer - This function checks if the certificate given has the given issuer
   * @cert: is the certificate to be checked
   * @issuer: is the certificate of a possible issuer
   *
@@ -635,14 +626,14 @@ int gnutls_x509_certificate_verify( gnutls_x509_certificate cert,
   * A negative value is returned in case of an error.
   *
   **/
-int gnutls_x509_certificate_is_issuer( gnutls_x509_certificate cert,
+int gnutls_x509_certificate_check_issuer( gnutls_x509_certificate cert,
 	gnutls_x509_certificate issuer)
 {
 	return is_issuer(cert, issuer);
 }
 
 /**
-  * gnutls_x509_crl_is_issuer - This function checks if the CRL given has the given issuer
+  * gnutls_x509_crl_check_issuer - This function checks if the CRL given has the given issuer
   * @crl: is the CRL to be checked
   * @issuer: is the certificate of a possible issuer
   *
@@ -653,7 +644,7 @@ int gnutls_x509_certificate_is_issuer( gnutls_x509_certificate cert,
   * A negative value is returned in case of an error.
   *
   **/
-int gnutls_x509_crl_is_issuer( gnutls_x509_crl cert,
+int gnutls_x509_crl_check_issuer( gnutls_x509_crl cert,
 	gnutls_x509_certificate issuer)
 {
 	return is_crl_issuer(cert, issuer);

@@ -43,7 +43,10 @@ int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7)
 {
 	*pkcs7 = gnutls_calloc( 1, sizeof(gnutls_pkcs7_int));
 
-	if (*pkcs7) return 0;		/* success */
+	if (*pkcs7) {
+		(*pkcs7)->pkcs7 = ASN1_TYPE_EMPTY;
+		return 0;		/* success */
+	}
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
@@ -150,7 +153,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, 
 	int indx, char* certificate, int* certificate_size)
 {
-	ASN1_TYPE c2 = NULL;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len;
 	char oid[128];
 	opaque *tmp = NULL;
@@ -205,7 +208,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 
 	/* Step 1. In case of a signed structure extract certificate set.
 	 */
-	if ((result=_gnutls_asn1_create_element
+	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2, "c2")) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -292,7 +295,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
   **/
 int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 {
-	ASN1_TYPE c2;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	int result, len, count;
 	char oid[64];
 	opaque *tmp = NULL;
@@ -344,7 +347,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 
 	/* Step 1. In case of a signed structure count the certificate set.
 	 */
-	if ((result=_gnutls_asn1_create_element
+	if ((result=asn1_create_element
 	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2, "c2")) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);

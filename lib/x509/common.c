@@ -122,7 +122,7 @@ int result;
 char str[1024], tmpname[1024];
 const char* ANAME = NULL;
 int CHOICE = -1, len = -1;
-ASN1_TYPE tmpasn;
+ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 
 	if (value==NULL || value_size <=0 || res_size == NULL) {
 		gnutls_assert();
@@ -150,7 +150,7 @@ ASN1_TYPE tmpasn;
 	_gnutls_str_cat( tmpname, sizeof(tmpname), ANAME);
 
 	if ((result =
-	     _gnutls_asn1_create_element(_gnutls_get_pkix(), str,
+	     asn1_create_element(_gnutls_get_pkix(), str,
 				   &tmpasn, tmpname)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);

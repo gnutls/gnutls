@@ -1,5 +1,5 @@
 INCLUDES = -I../ -I../minitasn1/ -I../../includes/
-EXTRA_DIST = crl.h dn.h common.h x509.h extensions.h pkcs7.h \
+EXTRA_DIST = dn.h common.h x509.h extensions.h pkcs7.h \
 	x509-api.tex compat.h verify.h mpi.h
 
 noinst_LTLIBRARIES = libx509.la

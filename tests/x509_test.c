@@ -3,8 +3,6 @@
 #include <string.h>
 #include <gnutls/x509.h>
 
-#include <dmalloc.h>
-
 #define MAX_FILE_SIZE 16*1024
 
 struct file_res {
@@ -18,6 +16,8 @@ static struct file_res test_files[] = {
 	{ "test3.pem", GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED },
 	{ "test10.pem", 0 },
 	{ "test13.pem", GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED },
+	{ "test20.pem", GNUTLS_CERT_REVOKED | GNUTLS_CERT_NOT_TRUSTED },
+	{ "test21.pem", GNUTLS_CERT_REVOKED | GNUTLS_CERT_NOT_TRUSTED },
 	{ "test22.pem", GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED },
 	{ "test23.pem", GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED },
 	{ "test24.pem", 0 },
@@ -41,8 +41,13 @@ static void print_res( int x)
 		printf("- certificate is NOT trusted\n");
 	else
 		printf("- certificate is trusted\n");
+
 	if (x&GNUTLS_CERT_CORRUPTED)
 		printf("- Found a corrupted certificate.\n");
+
+	if (x&GNUTLS_CERT_REVOKED)
+		printf("- certificate is revoked.\n");
+
 	return;
 }
 
@@ -92,13 +97,13 @@ int i = 0, exp_result;
 
 }
 
-#define PEM_SEP "-----BEGIN CERT"
-#define PEM_SEP_SIZE (sizeof(PEM_SEP)-1)
+#define CERT_SEP "-----BEGIN CERT"
+#define CRL_SEP "-----BEGIN X509 CRL"
 
 /* Verifies a base64 encoded certificate list from memory 
  */
 int _verify_x509_mem( const char* cert, int cert_size,
-	const char *ca, int ca_size)
+	const char *ca, int ca_size, const char* crl, int crl_size)
 {
 	int siz, i;
 	const char *ptr;
@@ -107,7 +112,8 @@ int _verify_x509_mem( const char* cert, int cert_size,
 	gnutls_datum tmp;
 	gnutls_x509_certificate *x509_cert_list = NULL;
 	gnutls_x509_certificate x509_ca;
-	int x509_ncerts;
+	gnutls_x509_crl *x509_crl_list = NULL;
+	int x509_ncerts, x509_ncrls;
 
 	/* Decode the CA certificate
 	 */
@@ -126,6 +132,50 @@ int _verify_x509_mem( const char* cert, int cert_size,
 		fprintf(stderr, "Error parsing the CA certificate: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
+
+	/* Decode the CRL list
+	 */
+	siz = crl_size;
+	ptr = crl;
+
+	i = 1;
+
+	if (strstr(ptr, CRL_SEP)!=NULL) /* if CRLs exist */
+	do {
+		x509_crl_list =
+		    (gnutls_x509_crl *) realloc( x509_crl_list,
+						   i *
+						   sizeof(gnutls_x509_crl));
+		if (x509_crl_list == NULL) {
+			fprintf(stderr, "memory error\n");
+			exit(1);
+		}
+
+		tmp.data = (char*)ptr;
+		tmp.size = siz;
+
+		ret = gnutls_x509_crl_init( &x509_crl_list[i-1]);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the CRL[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
+		}
+	
+		ret = gnutls_x509_crl_import( x509_crl_list[i-1], &tmp, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the CRL[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		/* now we move ptr after the pem header */
+		ptr = strstr(ptr, CRL_SEP);
+		if (ptr!=NULL)
+			ptr++;
+
+		i++;
+	} while ((ptr = strstr(ptr, CRL_SEP)) != NULL);
+
+	x509_ncrls = i - 1;
+
 
 	/* Decode the certificate chain. 
 	 */
@@ -160,23 +210,30 @@ int _verify_x509_mem( const char* cert, int cert_size,
 		}
 
 		/* now we move ptr after the pem header */
-		ptr = strstr(ptr, PEM_SEP);
+		ptr = strstr(ptr, CERT_SEP);
 		if (ptr!=NULL)
 			ptr++;
 
 		i++;
-	} while ((ptr = strstr(ptr, PEM_SEP)) != NULL);
+	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
 
 	x509_ncerts = i - 1;
 
 	ret  = gnutls_x509_certificate_list_verify( x509_cert_list, x509_ncerts,
-		&x509_ca, 1, NULL, 0, &output);
+		&x509_ca, 1, x509_crl_list, x509_ncrls, 0, &output);
 
 	gnutls_x509_certificate_deinit( x509_ca);
+
 	for (i=0;i<x509_ncerts;i++) {
 		gnutls_x509_certificate_deinit( x509_cert_list[i]);
 	}
+
+	for (i=0;i<x509_ncrls;i++) {
+		gnutls_x509_crl_deinit( x509_crl_list[i]);
+	}
+
 	free( x509_cert_list);
+	free( x509_crl_list);
 
 	if ( ret < 0) {
 		fprintf(stderr, "Error in verification: %s\n", gnutls_strerror(ret));
@@ -220,6 +277,6 @@ int _verify_x509_file( const char* certfile, const char *cafile)
 	
 	ca[ca_size] = 0;
 
-	return _verify_x509_mem( cert, cert_size, ca, ca_size);
+	return _verify_x509_mem( cert, cert_size, ca, ca_size, cert, cert_size);
 }
 

@@ -44,7 +44,10 @@ int gnutls_x509_certificate_init(gnutls_x509_certificate * cert)
 {
 	*cert = gnutls_calloc( 1, sizeof(gnutls_x509_certificate_int));
 
-	if (*cert) return 0;		/* success */
+	if (*cert) {
+		(*cert)->cert = ASN1_TYPE_EMPTY;
+		return 0;		/* success */
+	}
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
@@ -726,8 +729,8 @@ int gnutls_x509_certificate_get_ca_status(gnutls_x509_certificate cert, int* cri
   * This function will return certificate's key usage, by reading the 
   * keyUsage X.509 extension. The key usage value will ORed values of the:
   * GNUTLS_KEY_DIGITAL_SIGNATURE, GNUTLS_KEY_NON_REPUDIATION,
-  * GNUTLS_KEY_GNUTLS_KEY_ENCIPHERMENT, GNUTLS_KEY_DATA_ENCIPHERMENT,
-  * GNUTLS_KEY_GNUTLS_KEY_AGREEMENT, GNUTLS_KEY_GNUTLS_KEY_CERT_SIGN,
+  * GNUTLS_KEY_KEY_ENCIPHERMENT, GNUTLS_KEY_DATA_ENCIPHERMENT,
+  * GNUTLS_KEY_KEY_AGREEMENT, GNUTLS_KEY_KEY_CERT_SIGN,
   * GNUTLS_KEY_CRL_SIGN, GNUTLS_KEY_ENCIPHER_ONLY,
   * GNUTLS_KEY_DECIPHER_ONLY.
   *
@@ -895,4 +898,100 @@ int _gnutls_x509_certificate_get_raw_dn( gnutls_x509_certificate cert,
 	gnutls_const_datum * start)
 {
 	return _gnutls_x509_certificate_get_raw_dn2( cert, "c2.subject", start);
+}
+
+
+/**
+  * gnutls_x509_certificate_check_revocation - This function checks if the given certificate is revoked
+  * @cert: should contain a gnutls_x509_certificate structure
+  * @crl_list: should contain a list of gnutls_x509_crl structures
+  * @crl_list_length: the length of the crl_list
+  *
+  * This function will return check if the given certificate is revoked.
+  * It is assumed that the CRLs have been verified before.
+  *
+  * Returns 0 if the certificate is NOT revoked, and 1 if it is.
+  * A negative value is returned on error. 
+  *
+  **/
+int gnutls_x509_certificate_check_revocation(gnutls_x509_certificate cert,
+					     gnutls_x509_crl * crl_list,
+					     int crl_list_length)
+{
+	opaque serial[64];
+	opaque cert_serial[64];
+	int serial_size, cert_serial_size;
+	int ncerts, ret, i, j;
+	gnutls_const_datum dn1, dn2;
+
+	for (j = 0; j < crl_list_length; j++) {	/* do for all the crls */
+
+		/* Step 1. check if issuer's DN match
+		 */
+		ret = _gnutls_x509_crl_get_raw_issuer_dn(crl_list[j], &dn1);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		ret =
+		    _gnutls_x509_certificate_get_raw_issuer_dn(cert, &dn2);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		ret = _gnutls_x509_compare_raw_dn(&dn1, &dn2);
+		if (ret == 0) {
+			/* issuers do not match so don't even
+			 * bother checking.
+			 */
+			continue;
+		}
+
+		/* Step 2. Read the certificate's serial number
+		 */
+		cert_serial_size = sizeof(cert_serial);
+		ret =
+		    gnutls_x509_certificate_get_serial(cert, cert_serial,
+						       &cert_serial_size);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		/* Step 3. cycle through the CRL serials and compare with
+		 *   certificate serial we have.
+		 */
+
+		ncerts = gnutls_x509_crl_get_certificate_count(crl_list[j]);
+		if (ncerts < 0) {
+			gnutls_assert();
+			return ncerts;
+		}
+
+		for (i = 0; i < ncerts; i++) {
+			serial_size = sizeof(serial);
+			ret =
+			    gnutls_x509_crl_get_certificate(crl_list[j], i, serial,
+							    &serial_size,
+							    NULL);
+
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+
+			if (serial_size == cert_serial_size) {
+				if (memcmp
+				    (serial, cert_serial,
+				     serial_size) == 0) {
+					/* serials match */
+					return 1;	/* revoked! */
+				}
+			}
+		}
+
+	}
+	return 0;		/* not revoked. */
 }
