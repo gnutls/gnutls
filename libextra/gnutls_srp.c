@@ -83,6 +83,10 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 	GNUTLS_MPI tmpB = NULL, tmpV = NULL;
 	GNUTLS_MPI b = NULL, B = NULL, k = NULL;
 	int bits;
+	size_t n_size = 0;
+
+	/* get the size of n in bytes */
+	_gnutls_mpi_print( NULL, &n_size, n);
 
 	/* calculate:  B = (k*v + g^b) % N 
 	 */
@@ -114,7 +118,7 @@ GNUTLS_MPI _gnutls_calc_srp_B(GNUTLS_MPI * ret_b, GNUTLS_MPI g, GNUTLS_MPI n, GN
 		goto error;
 	}
 
-	k = _gnutls_calc_srp_u( n, g);
+	k = _gnutls_calc_srp_u( n, g, n_size);
 	if (k == NULL) {
 		gnutls_assert();
 		goto error;
@@ -146,7 +150,7 @@ error:
 
 /* This calculates the SHA1(A | B)
  */
-GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
+GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B, size_t n_size)
 {
 	size_t b_size, a_size;
 	opaque *holder, hd[MAX_HASH_SIZE];
@@ -158,17 +162,23 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 	_gnutls_mpi_print( NULL, &a_size, A);
 	_gnutls_mpi_print( NULL, &b_size, B);
 
-	holder_size = a_size + b_size;
+	holder_size = n_size + n_size;
 
-	holder = gnutls_alloca(holder_size);
-	if (holder==NULL) return NULL;
+        if (a_size > n_size || b_size > n_size) {
+    		gnutls_assert();
+    		return NULL; /* internal error */
+        }
+
+	holder = gnutls_calloc(1, holder_size);
+	if (holder == NULL)
+		return NULL;
 	
-	_gnutls_mpi_print( holder, &a_size, A);
-	_gnutls_mpi_print( &holder[a_size], &b_size, B);
+	_gnutls_mpi_print(&holder[n_size - a_size], &a_size, A);
+	_gnutls_mpi_print(&holder[n_size + n_size - b_size], &b_size, B);
 
 	td = _gnutls_hash_init(GNUTLS_MAC_SHA);
 	if (td==NULL) {
-		gnutls_afree(holder);
+		gnutls_free(holder);
 		gnutls_assert();
 		return NULL;
 	}
@@ -179,7 +189,7 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 	 */
 	hash_size = 20; /* SHA */
 	ret = _gnutls_mpi_scan( &res, hd, &hash_size);
-	gnutls_afree(holder);
+	gnutls_free(holder);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -306,6 +316,10 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 {
 	GNUTLS_MPI S=NULL, tmp1=NULL, tmp2=NULL;
 	GNUTLS_MPI tmp4=NULL, tmp3=NULL, k = NULL;
+	size_t n_size = 0;
+
+	/* get the size of n in bytes */
+	_gnutls_mpi_print( NULL, &n_size, n);
 
 	S = _gnutls_mpi_alloc_like(n);
 	if (S==NULL)
@@ -318,7 +332,7 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 		goto freeall;
 	}
 	
-	k = _gnutls_calc_srp_u( n, g);
+	k = _gnutls_calc_srp_u( n, g, n_size);
 	if (k==NULL) {
 		gnutls_assert();
 		goto freeall;

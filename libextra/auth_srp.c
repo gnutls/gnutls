@@ -246,6 +246,7 @@ int _gnutls_gen_srp_client_kx(gnutls_session session, opaque ** data)
 	char *password;
 	const gnutls_srp_client_credentials cred =
 	    _gnutls_get_cred(session->key, GNUTLS_CRD_SRP, NULL);
+	size_t n_size = 0;
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -281,8 +282,11 @@ int _gnutls_gen_srp_client_kx(gnutls_session session, opaque ** data)
 	/* Rest of SRP calculations 
 	 */
 
+	/* get the size of n in bytes */
+	_gnutls_mpi_print( NULL, &n_size, N);
+
 	/* calculate u */
-	session->key->u = _gnutls_calc_srp_u(A, B);
+	session->key->u = _gnutls_calc_srp_u(A, B, n_size);
 	if ( session->key->u == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -343,6 +347,7 @@ int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _da
 	size_t _n_A;
 	ssize_t data_size = _data_size;
 	int ret;
+	size_t n_size = 0;
 
 	DECR_LEN( data_size, 2);
 	_n_A = _gnutls_read_uint16( &data[0]);
@@ -366,7 +371,10 @@ int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _da
 	/* Start the SRP calculations.
 	 * - Calculate u 
 	 */
-	session->key->u = _gnutls_calc_srp_u(A, B);
+	/* get the size of n in bytes */
+	_gnutls_mpi_print( NULL, &n_size, N);
+
+	session->key->u = _gnutls_calc_srp_u(A, B, n_size);
 	if (session->key->u==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
