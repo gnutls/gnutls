@@ -449,7 +449,7 @@ gnutls_openpgp_key_get_id( gnutls_openpgp_key key,
 {
     cdk_packet_t pkt;
     cdk_pkt_pubkey_t pk = NULL;
-    unsigned long kid[2];
+    unsigned int kid[2];
   
     if( !key || !keyid ) {
         gnutls_assert( );

@@ -4,6 +4,8 @@ Version 1.1.7
   parameters using a callback.
 - Added functions gnutls_rsa_params_cpy(), gnutls_dh_params_cpy()
   and gnutls_x509_privkey_cpy().
+- Corrected a compilation issue when opencdk was installed in a
+  non standard directory.
 
 Version 1.1.6 (24/02/2004)
 - Several bug fixes, by Arne Thomassen.
