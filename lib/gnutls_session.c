@@ -20,6 +20,7 @@
 #include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
+#include "debug.h"
 
 /* Returns all session parameters - in order to support resuming.
  * The client should call this - and keep the returned session - if he wants to resume his 
@@ -65,7 +66,10 @@ int gnutls_set_current_session( GNUTLS_STATE state, void* session, int session_s
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
 
-	memcpy( &state->gnutls_internals.resumed_security_parameters, session, sizeof(SecurityParameters));
-	
+	if ( time(0) - ((SecurityParameters*)session)->timestamp <= state->gnutls_internals.expire_time) {
+		memcpy( &state->gnutls_internals.resumed_security_parameters, session, sizeof(SecurityParameters));
+	} else {
+		return GNUTLS_E_EXPIRED;
+	}
 	return 0;
 }

@@ -58,9 +58,12 @@ int main()
     err = listen(listen_sd, 1024);
     ERR(err, "listen");
 
+
+
     client_len = sizeof(sa_cli);
     for (;;) {
 	gnutls_init(&state, GNUTLS_SERVER);
+	gnutls_set_db_name(state, "/tmp/gdb");
 	gnutls_set_cipher_priority( state, 4, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL, GNUTLS_3DES, GNUTLS_ARCFOUR);
 	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
 	gnutls_set_kx_priority( state, 1, GNUTLS_KX_ANON_DH);

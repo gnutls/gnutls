@@ -93,6 +93,9 @@ int gnutls_get_current_session( GNUTLS_STATE state, void* session, int *session_
 int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size);
 
 int gnutls_set_lowat( GNUTLS_STATE state, int num);
+int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
+int gnutls_set_db_name( GNUTLS_STATE state, char* filename);	
+int gnutls_clean_db( GNUTLS_STATE state);
 
 /* these are deprecated must be replaced by gnutls_errors.h */
 #define	GNUTLS_E_MAC_FAILED  -1

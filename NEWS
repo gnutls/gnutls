@@ -1,4 +1,7 @@
-Version 0.0.6
+Version 0.0.7
+- Added server side session resuming (using gdbm)
+
+Version 0.0.6 (20/12/2000)
 - Added client side session resuming
 - Better documentation (check doc/API)
 - Better socket handling (gnutls can be used with select())

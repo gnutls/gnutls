@@ -126,6 +126,7 @@ typedef struct {
 	opaque server_random[32];
 	opaque session_id[32];
 	uint8 session_id_size;
+	time_t timestamp;
 } SecurityParameters;
 
 typedef struct {
@@ -206,6 +207,9 @@ typedef struct {
 	int				certificate_verify_needed; /* non zero if we should expect for certificate verify */
 	/* sockets internals */
 	int				lowat;
+	/* gdbm */
+	char*				db_name;
+	int				expire_time;
 } GNUTLS_INTERNALS;
 
 typedef struct {

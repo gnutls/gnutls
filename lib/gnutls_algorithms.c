@@ -935,7 +935,7 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 		tmp_ciphers[i].CipherSuite[1] =
 		    cs_algorithms[i].id.CipherSuite[1];
 	}
-fprintf(stderr, "COUNT: %d\n",count);
+
 	for (i = 0; i < count; i++) {
 		if (_gnutls_kx_priority
 		    (state,

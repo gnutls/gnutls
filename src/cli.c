@@ -204,7 +204,7 @@ int main()
 				continue;
 			}
 			gnutls_write( sd, state, buffer, strlen(buffer));
-			fprintf(stdout, "- Sended: %d bytes\n", strlen(buffer));
+			fprintf(stdout, "- Sent: %d bytes\n", strlen(buffer));
 		}
 	}
 	if (user_term!=0) gnutls_close(sd, state);

@@ -32,6 +32,7 @@
 #include "gnutls_handshake.h"
 #include "gnutls_num.h"
 #include "gnutls_hash_int.h"
+#include "gnutls_db.h"
 
 #ifdef DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
@@ -278,7 +279,6 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 	uint32 datasize;
 	int pos = 0;
 
-
 #ifdef WORDS_BIGENDIAN
 	datasize = i_datasize;
 #else
@@ -473,7 +473,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	char *rand;
 	char *data = NULL;
 	uint8 session_id_len, z;
-	uint32 cur_time;
+	time_t cur_time;
 	int pos = 0;
 	GNUTLS_CipherSuite *cipher_suites;
 	uint8 *compression_methods;
@@ -484,7 +484,6 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 	if (SessionID == NULL)
 		session_id_len = 0;
 
-	rand = gcry_random_bytes(28, GCRY_STRONG_RANDOM);
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 
@@ -503,8 +502,13 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 #endif
 		memmove(state->security_parameters.client_random,
 			&cur_time, 4);
+
+		rand = gcry_random_bytes(28, GCRY_STRONG_RANDOM);
 		memmove(&state->security_parameters.client_random[4], rand,
 			28);
+		gcry_free(rand);
+		
+		state->security_parameters.timestamp = time(0);
 
 		memmove(&data[pos], state->security_parameters.client_random, 32);
 		pos += 32;
@@ -558,25 +562,14 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 
 
 	} else {		/* SERVER */
-		datalen = 2 + sizeof(uint32) + session_id_len + 1 + 28;
+		datalen = 2 + session_id_len + 1 + 32;
 		data = gnutls_malloc(datalen);
 
 		data[pos++] = state->connection_state.version.major;
 		data[pos++] = state->connection_state.version.minor;
-#ifdef WORDS_BIGENDIAN
-		cur_time = time(NULL);
-#else
-		cur_time = byteswap32(time(NULL));
-#endif
-		memmove(state->security_parameters.server_random,
-			&cur_time, 4);
-		memmove(&state->security_parameters.server_random[4], rand,
-			28);
 
-		memmove(&data[pos], &cur_time, sizeof(uint32));
-		pos += sizeof(uint32);
-		memmove(&data[pos], rand, 28);
-		pos += 28;
+		memmove( &data[pos], state->security_parameters.server_random, 32);
+		pos += 32;
 
 		memmove(&data[pos++], &session_id_len, sizeof(uint8));
 		if (session_id_len > 0) {
@@ -603,8 +596,6 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 
 	}
 
-	gcry_free(rand);
-
 	return ret;
 }
 
@@ -622,7 +613,9 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 	int i, ret=0;
 	uint16 x, sizeOfSuites;
 	GNUTLS_Version version;
-
+	time_t cur_time;
+	char* rand;
+	
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		if (datalen < 38) {
 			gnutls_assert();
@@ -661,10 +654,6 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		if ( (state->gnutls_internals.resumed_security_parameters.session_id_size > 0) 
 			&& memcmp(&data[pos], state->gnutls_internals.resumed_security_parameters.session_id, session_id_len)==0) {
 			/* resume session */
-			
-#ifdef DEBUG
-			fprintf(stderr, "Resuming session\n");
-#endif
 			memcpy( state->gnutls_internals.resumed_security_parameters.server_random, state->security_parameters.server_random, 32);
 			memcpy( state->gnutls_internals.resumed_security_parameters.client_random, state->security_parameters.client_random, 32);
 
@@ -675,6 +664,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 			state->gnutls_internals.resumed=RESUME_FALSE; /* we are not resuming */
 			state->security_parameters.session_id_size = session_id_len;
 			memcpy( state->security_parameters.session_id, &data[pos], session_id_len);
+
 		}
 
 		pos += session_id_len;
@@ -745,16 +735,42 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen)
 		
 		memmove(state->security_parameters.client_random,
 			&data[pos], 32);
-		pos += 32;
+		pos+=32;
+
+		/* generate server random value */
+#ifdef WORDS_BIGENDIAN
+		cur_time = time(NULL);
+#else
+		cur_time = byteswap32(time(NULL));
+#endif
+		memmove(state->security_parameters.server_random,
+			&cur_time, 4);
+		rand = gcry_random_bytes(28, GCRY_STRONG_RANDOM);
+		memmove(&state->security_parameters.server_random[4], rand,
+			28);
+		gcry_free(rand);
+		state->security_parameters.timestamp = time(NULL);
 
 		memmove(&session_id_len, &data[pos++], 1);
+
+		/* RESUME SESSION */
+		if (session_id_len > 32) return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+
+		ret = _gnutls_server_restore_session( state, &data[pos], session_id_len);
 		pos += session_id_len;
+		
+		if (ret==0) { /* resumed! */
+			/* get the new random values */
+			memcpy( state->gnutls_internals.resumed_security_parameters.server_random, state->security_parameters.server_random, 32);
+			memcpy( state->gnutls_internals.resumed_security_parameters.client_random, state->security_parameters.client_random, 32);
 
-		/* We should resume an old connection here. This is not
-		 * implemented yet.
-		 */
-
-
+			state->gnutls_internals.resumed = RESUME_TRUE;
+			return 0;
+		} else {
+			_gnutls_generate_session_id(state->security_parameters.session_id, &state->security_parameters.session_id_size);
+			state->gnutls_internals.resumed = RESUME_FALSE;
+		}
+		
 		/* Select a ciphersuite */
 		memmove(&sizeOfSuites, &data[pos], 2);
 		pos += 2;
@@ -852,8 +868,6 @@ int gnutls_handshake(int cd, GNUTLS_STATE state) {
 int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 {
 	int ret;
-	char *session_id;
-	uint8 session_id_size;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 #ifdef HARD_DEBUG
@@ -897,20 +911,20 @@ int gnutls_handshake_begin(int cd, GNUTLS_STATE state)
 			return ret;
 		}
 
-		_gnutls_generate_session_id(&session_id, &session_id_size);
 		ret =
-		    _gnutls_send_hello(cd, state, session_id,
-				       session_id_size);
+		    _gnutls_send_hello(cd, state, state->security_parameters.session_id,
+				       state->security_parameters.session_id_size);
 		if (ret < 0) {
 			ERR("send hello", ret);
 			gnutls_clearHashDataBuffer( state);
 			return ret;
 		}
-		gnutls_free(session_id);
 
 		/* FIXME: send our certificate - if required */
-
+		/* NOTE: these should not be send if we are resuming */
+	
 		/* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
+		if (state->gnutls_internals.resumed==RESUME_FALSE)
 		ret = _gnutls_send_server_kx_message(cd, state);
 		if (ret < 0) {
 			ERR("send server kx", ret);
@@ -1047,6 +1061,7 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 	} else { /* SERVER SIDE */
 
 		/* send the server hello done */
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret =
 		    _gnutls_send_handshake(cd, state, NULL, 0,
 					   GNUTLS_SERVER_HELLO_DONE);
@@ -1058,12 +1073,14 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 
 		/* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
 		
+		if (state->gnutls_internals.resumed==RESUME_FALSE) /* if we are not resuming */
 		ret = _gnutls_recv_client_kx_message(cd, state);
 		if (ret < 0) {
 			ERR("recv client kx", ret);
 			gnutls_clearHashDataBuffer( state);
 			return ret;
 		}
+
 
 	}
 
@@ -1102,6 +1119,10 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 		}
 	}
 
+	if (state->security_parameters.entity == GNUTLS_SERVER) {
+		/* in order to support session resuming */
+		_gnutls_server_register_current_session( state);
+	}
 
 	/* clear handshake buffer */
 	gnutls_clearHashDataBuffer( state);
@@ -1109,18 +1130,17 @@ int gnutls_handshake_finish(int cd, GNUTLS_STATE state)
 
 }
 
-int _gnutls_generate_session_id(char **session_id, uint8 * len)
+int _gnutls_generate_session_id(char *session_id, uint8 * len)
 {
 	char *rand;
-	*session_id = gnutls_malloc(32);
 	rand = gcry_random_bytes(32, GCRY_WEAK_RANDOM);
 
-	memmove(*session_id, rand, 32);
+	memmove(session_id, rand, 32);
 	gcry_free(rand);
 	*len = 32;
 
 #ifdef HARD_DEBUG
-	fprintf(stderr, "SessionID: %s\n", _gnutls_bin2hex(*session_id, 32));
+	fprintf(stderr, "SessionID: %s\n", _gnutls_bin2hex(session_id, 32));
 #endif
 	return 0;
 }

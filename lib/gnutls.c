@@ -133,6 +133,13 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->security_parameters.session_id_size = 0;
 	(*state)->gnutls_internals.resumed_security_parameters.session_id_size = 0;
 	(*state)->gnutls_internals.resumed = RESUME_FALSE;
+	
+	(*state)->gnutls_internals.expire_time = 3600; /* one hour default */
+
+	(*state)->security_parameters.timestamp = 0;
+
+	/* gdbm db */
+	(*state)->gnutls_internals.db_name = NULL;
 
 	gnutls_set_lowat((*state), 1); /* the default for tcp */
 	
@@ -176,6 +183,7 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	if ((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free((*state)->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
 
+	gnutls_free((*state)->gnutls_internals.db_name);
 
 	gnutls_free(*state);
 	return 0;

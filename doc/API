@@ -130,3 +130,14 @@ int gnutls_set_lowat( GNUTLS_STATE state, int num);
 	if there are pending data to socket buffer. Used only
 	if you have changed the default low water value (default is 1).
 	Normally you will not need that function.
+
+int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
+	Sets the expiration time for resumed sessions.
+
+int gnutls_set_db_name( GNUTLS_STATE state, char* filename);
+	Sets the name of the (gdbm) database to be used to keep
+        the sessions to be resumed.
+
+int gnutls_clean_db( GNUTLS_STATE state);
+	Deletes all the records in the db. This db may become huge
+	if this is not called.
