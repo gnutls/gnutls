@@ -18,3 +18,7 @@ stamp-h.in
 changelog-update.sh
 gnutls-0.0.2.tar.gz
 .cvsignore
+INSTALL
+mkinstalldirs
+missing
+install-sh
