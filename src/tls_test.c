@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
- * Copyright (C) 2004 Free Software Foundation
+ * Copyright (C) 2004,2005 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -82,7 +82,7 @@ typedef struct {
 
 static const TLS_TEST tls_tests[] = {
     {"for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno"},
-    {"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "",
+    {"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "failed",
      "SSL 3.0"},
     {"for TLS 1.0 support", test_tls1, "yes", "no", "dunno"},
     {"for SSL 3.0 support", test_ssl3, "yes", "no", "dunno"},
