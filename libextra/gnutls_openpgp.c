@@ -1936,8 +1936,8 @@ gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 int
-gnutls_openpgp_get_key_xml( const gnutls_datum *cert, int ext,
-                            gnutls_datum *xmlkey )
+gnutls_openpgp_get_key_xml( const gnutls_datum *cert,
+                            gnutls_datum *xmlkey, int ext )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;   
 }

@@ -53,8 +53,8 @@ void gnutls_srp_server_set_select_function( GNUTLS_STATE, gnutls_srp_server_sele
 /* Openpgp certificate stuff */
 int gnutls_openpgp_fingerprint( const gnutls_datum* data, char* result, size_t* result_size);
 
-int gnutls_openpgp_get_key_xml( const gnutls_datum *cert, int ext,
-    gnutls_datum *xmlkey);
+int gnutls_openpgp_key_to_xml( const gnutls_datum *cert, gnutls_datum *xmlkey,
+	int ext);
 
 int gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
                                  int idx,
