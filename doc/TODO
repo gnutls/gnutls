@@ -1,5 +1,4 @@
-* x509 Certificate API 
+* x509 Certificate API (probably use snacc)
 * Make server work (we need certificate API for that!)
-* Resume old sessions (server side)
 * Add support for v2.0 init packet (why do that anyway ???)
 * OpenPGP certificate support (through libgcrypt)
