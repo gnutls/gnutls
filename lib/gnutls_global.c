@@ -225,7 +225,7 @@ int gnutls_global_init( void)
 	/* initialize the random functions.
 	 */
 	_gnutls_get_random( &c, 1, GNUTLS_WEAK_RANDOM);
-	_gnutls_get_random( &c, 1, GNUTLS_VERY_STRONG_RANDOM);
+	_gnutls_get_random( &c, 1, GNUTLS_STRONG_RANDOM);
 
 	out:
 	return result;

@@ -32,6 +32,8 @@
 
 #define TEST_STRING
 
+#define SU(x) (x!=NULL?x:"Unknown")
+
 int xml = 0;
 int print_cert;
 
@@ -69,6 +71,7 @@ void print_x509_info(gnutls_session session, const char* hostname)
 	size_t serial_size = sizeof(serial);
 	char printable[256];
 	char *print;
+	const char* cstr;
 	unsigned int bits, algo;
 	time_t expiret, activet;
 
@@ -181,17 +184,12 @@ void print_x509_info(gnutls_session session, const char* hostname)
 			printf(" # version: #%d\n",
 			       gnutls_x509_crt_get_version(crt));
 
+			bits = 0;
 			algo = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
 			printf(" # public key algorithm: ");
-			if (algo == GNUTLS_PK_RSA) {
-				printf("RSA\n");
-				printf(" #   Modulus: %d bits\n", bits);
-			} else if (algo == GNUTLS_PK_DSA) {
-				printf("DSA\n");
-				printf(" #   Exponent: %d bits\n", bits);
-			} else {
-				printf("UNKNOWN\n");
-			}
+
+			cstr = SU(gnutls_pk_algorithm_get_name( algo));
+			printf("%s (%d bits)\n", cstr, bits);
 
 			dn_size = sizeof(dn);
 			ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
@@ -223,6 +221,7 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 	int ret;
 	char printable[120];
 	char *print;
+	const char* cstr;
 	char name[256];
 	size_t name_len = sizeof(name);
 	gnutls_openpgp_key crt;
@@ -308,20 +307,13 @@ void print_openpgp_info(gnutls_session session, const char* hostname)
 			printf(" # PGP Key version: %d\n",
 			       gnutls_openpgp_key_get_version(crt));
 
+			bits = 0;
 			algo =
 			    gnutls_openpgp_key_get_pk_algorithm(crt, &bits);
 
 			printf(" # PGP Key public key algorithm: ");
-
-			if (algo == GNUTLS_PK_RSA) {
-				printf("RSA\n");
-				printf(" #   Modulus: %d bits\n", bits);
-			} else if (algo == GNUTLS_PK_DSA) {
-				printf("DSA\n");
-				printf(" #   Exponent: %d bits\n", bits);
-			} else {
-				printf("UNKNOWN\n");
-			}
+			cstr = SU(gnutls_pk_algorithm_get_name( algo));
+			printf("%s (%d bits)\n", cstr, bits);
 
 			printf(" # PGP Key fingerprint: %s\n", printable);
 
@@ -439,20 +431,20 @@ int print_info(gnutls_session session, const char* hostname)
 	}
 
 	tmp =
-	    gnutls_protocol_get_name(gnutls_protocol_get_version(session));
-	if (tmp != NULL) printf("- Version: %s\n", tmp);
+	    SU(gnutls_protocol_get_name(gnutls_protocol_get_version(session)));
+	printf("- Version: %s\n", tmp);
 
-	tmp = gnutls_kx_get_name(kx);
-	if (tmp != NULL) printf("- Key Exchange: %s\n", tmp);
+	tmp = SU(gnutls_kx_get_name(kx));
+	printf("- Key Exchange: %s\n", tmp);
 
-	tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
-	if (tmp != NULL) printf("- Cipher: %s\n", tmp);
+	tmp = SU(gnutls_cipher_get_name(gnutls_cipher_get(session)));
+	printf("- Cipher: %s\n", tmp);
 
-	tmp = gnutls_mac_get_name(gnutls_mac_get(session));
-	if (tmp != NULL) printf("- MAC: %s\n", tmp);
+	tmp = SU(gnutls_mac_get_name(gnutls_mac_get(session)));
+	printf("- MAC: %s\n", tmp);
 
-	tmp = gnutls_compression_get_name(gnutls_compression_get(session));
-	if (tmp != NULL) printf("- Compression: %s\n", tmp);
+	tmp = SU(gnutls_compression_get_name(gnutls_compression_get(session)));
+	printf("- Compression: %s\n", tmp);
 
 	fflush (stdout);
 
