@@ -1547,9 +1547,39 @@ xml_add_tag( gnutls_datum *xmlkey, const char *tag, const char *val )
     gnutls_datum_append( xmlkey, p, strlen( p ) );
     gnutls_free( p ); p = NULL;
 }
-    
+
 static void
-xml_add_key( gnutls_datum *xmlkey, PKT_public_key *pk, int sub )
+xml_add_mpi( gnutls_datum *xmlkey, CDK_MPI *m, const char *tag )
+{
+    char *p = NULL;
+    int i = 0;
+
+    p = gnutls_calloc( 1, 2 * ( m->bytes + 3 ) );
+    for ( i = 0; i < m->bytes + 2; i++ )
+        sprintf( p + 2 * i, "%02X", m->data[i] );
+    p[2 * m->bytes] = '\0';
+    xml_add_tag( xmlkey, tag, p );
+    gnutls_free( p );
+}
+
+void
+xml_add_key_mpi( gnutls_datum *xmlkey, PKT_public_key *pk )
+{
+    if ( is_RSA( pk->pubkey_algo ) ) {
+        printf("RSA! ");
+        xml_add_mpi( xmlkey, pk->mpi[0], "RSA-N" );
+        xml_add_mpi( xmlkey, pk->mpi[1], "RSA-E" );
+    }
+    else if ( is_DSA( pk->pubkey_algo ) ) {
+        xml_add_mpi( xmlkey, pk->mpi[0], "DSA-P" );
+        xml_add_mpi( xmlkey, pk->mpi[1], "DSA-Q" );
+        xml_add_mpi( xmlkey, pk->mpi[2], "DSA-G" );
+        xml_add_mpi( xmlkey, pk->mpi[2], "DSA-Y" );
+    }
+}
+
+static void
+xml_add_key( gnutls_datum *xmlkey, int ext, PKT_public_key *pk, int sub )
 {
     const char *algo, *s;
     char keyid[16], fpr[41], tmp[32];
@@ -1588,13 +1618,16 @@ xml_add_key( gnutls_datum *xmlkey, PKT_public_key *pk, int sub )
     sprintf( tmp, "%d", pk->is_revoked );
     xml_add_tag( xmlkey, "REVOKED", tmp );
 
+    if ( ext )
+        xml_add_key_mpi( xmlkey, pk );
+    
     s = sub? "  </SUBKEY>\n" : "  </MAINKEY>\n";
     gnutls_datum_append( xmlkey, s, strlen( s ) );
 }
 
 static void
-xml_add_userid( gnutls_datum *xmlkey, gnutls_openpgp_name *dn,
-                PKT_user_id *id )
+xml_add_userid( gnutls_datum *xmlkey, int ext,
+                gnutls_openpgp_name *dn, PKT_user_id *id )
 {
     const char *s;
     char *p, *name, tmp[32];
@@ -1614,18 +1647,20 @@ xml_add_userid( gnutls_datum *xmlkey, gnutls_openpgp_name *dn,
         xml_add_tag( xmlkey, "NAME", dn->name );
     xml_add_tag( xmlkey, "EMAIL", dn->email );
 
-    sprintf( tmp, "%d", id->is_primary );
-    xml_add_tag( xmlkey, "PRIMARY", tmp );
+    if ( ext ) {
+        sprintf( tmp, "%d", id->is_primary );
+        xml_add_tag( xmlkey, "PRIMARY", tmp );
 
-    sprintf( tmp, "%d", id->is_revoked );
-    xml_add_tag( xmlkey, "REVOKED", tmp );
+        sprintf( tmp, "%d", id->is_revoked );
+        xml_add_tag( xmlkey, "REVOKED", tmp );
+    }    
 
     s = "  </USERID>\n";
     gnutls_datum_append( xmlkey, s, strlen( s ) );
 }
 
 static void
-xml_add_sig( gnutls_datum *xmlkey, PKT_signature *sig )
+xml_add_sig( gnutls_datum *xmlkey, int ext, PKT_signature *sig )
 {
     const char *algo, *s;
     char tmp[32], keyid[16];
@@ -1637,19 +1672,23 @@ xml_add_sig( gnutls_datum *xmlkey, PKT_signature *sig )
     sprintf( tmp, "%d", sig->version );
     xml_add_tag( xmlkey, "VERSION", tmp );
 
-    sprintf( tmp, "%d", sig->sig_class );
-    xml_add_tag( xmlkey, "SIGCLASS", tmp );
-
+    if ( ext ) {
+        sprintf( tmp, "%d", sig->sig_class );
+        xml_add_tag( xmlkey, "SIGCLASS", tmp );
+    }
+    
     sprintf( tmp, "%d", sig->flags.expired );
     xml_add_tag( xmlkey, "EXPIRED", tmp );
 
-    if ( is_DSA( sig->pubkey_algo ) ) algo = "DSA";
-    else algo = "RSA";
-    xml_add_tag( xmlkey, "PKALGO", algo );
+    if ( ext ) {
+        if ( is_DSA( sig->pubkey_algo ) ) algo = "DSA";
+        else algo = "RSA";
+        xml_add_tag( xmlkey, "PKALGO", algo );
 
-    if ( sig->digest_algo == GCRY_MD_SHA1 ) algo = "SHA1";
-    else algo = "MD5";
-    xml_add_tag( xmlkey, "MDALGO", algo );
+        if ( sig->digest_algo == GCRY_MD_SHA1 ) algo = "SHA1";
+        else algo = "MD5";
+        xml_add_tag( xmlkey, "MDALGO", algo );
+    }    
 
     sprintf( tmp, "%u", sig->timestamp );
     xml_add_tag( xmlkey, "CREATED", tmp );
@@ -1665,7 +1704,7 @@ xml_add_sig( gnutls_datum *xmlkey, PKT_signature *sig )
 /**
  * gnutls_certificate_openpgp_get_as_xml - Return a certificate as a XML fragment
  * @cert: the certificate which holds the whole OpenPGP key.
- * @ext: extension mode (1/0), 1 means include key signatures.
+ * @ext: extension mode (1/0), 1 means include key signatures and key data.
  * @xmlkey: he datum struct to store the XML result.
  *
  * This function will return the all OpenPGP key information encapsulated as
@@ -1697,21 +1736,21 @@ gnutls_certificate_openpgp_get_as_xml( const gnutls_datum *cert, int ext,
         pkt = p->pkt;
         switch ( pkt->pkttype ) {
         case PKT_PUBLIC_KEY:
-            xml_add_key( xmlkey, pkt->pkt.public_key, 0 );
+            xml_add_key( xmlkey, ext, pkt->pkt.public_key, 0 );
             break;
 
         case PKT_PUBLIC_SUBKEY:
-            xml_add_key( xmlkey, pkt->pkt.public_key, 1 );
+            xml_add_key( xmlkey, ext, pkt->pkt.public_key, 1 );
             break;
 
         case PKT_USER_ID:
             gnutls_openpgp_extract_key_name( cert, idx, &dn );
-            xml_add_userid( xmlkey, &dn, pkt->pkt.user_id ); idx++;
+            xml_add_userid( xmlkey, ext, &dn, pkt->pkt.user_id );
+            idx++;
             break;
 
         case PKT_SIGNATURE:
-            if ( ext )
-                xml_add_sig( xmlkey, pkt->pkt.signature );
+            xml_add_sig( xmlkey, ext, pkt->pkt.signature );
             break;
         }
     }
