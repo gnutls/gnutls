@@ -687,6 +687,11 @@ int _gnutls_recv_handshake(SOCKET cd, GNUTLS_STATE state, uint8 ** data,
 	}
 
 	dataptr = gnutls_realloc(dataptr, length32 + handshake_headers);
+	if (dataptr == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 	if (length32 > 0 && data != NULL)
 		*data = gnutls_malloc(length32);
 

@@ -20,6 +20,7 @@
 
 #include "gnutls_int.h"
 #include "gnutls_algorithms.h"
+#include "gnutls_errors.h"
 
 /* the prototypes for these are in gnutls.h */
 
@@ -35,31 +36,35 @@
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-void gnutls_set_cipher_priority( GNUTLS_STATE state, LIST) {
+int gnutls_set_cipher_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
-	int i, num=0;
-	BulkCipherAlgorithm* _ap;
-	
+	int i,num=0;
+	va_list _ap;
+
 	va_start( ap, state);
 
 	_ap = ap;
 
-	i=0;
 	do {
 		num++;
-	} while( _ap[++i] != 0);
+	} while( va_arg(ap, BulkCipherAlgorithm) != 0);
 
 	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
 	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+		
 	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithms = num;
 	
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority[i] = _ap[i];
+		state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority[i] = va_arg(_ap, BulkCipherAlgorithm);
 	}
 	
 	va_end(ap);
+
+	return 0;
 }
 
 /**
@@ -74,31 +79,32 @@ void gnutls_set_cipher_priority( GNUTLS_STATE state, LIST) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
  **/
-void gnutls_set_kx_priority( GNUTLS_STATE state, LIST) {
+int gnutls_set_kx_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
-	int i, num=0;
-	KXAlgorithm *_ap;
+	va_list _ap;
+	int i,num=0;
 	
 	va_start( ap, state);
-
 	_ap = ap;
 
-	i=0;
 	do {
 		num++;
-	} while( _ap[++i] != 0);
+	} while( va_arg(ap, KXAlgorithm) != 0);
 
 	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
 	state->gnutls_internals.KXAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
 	state->gnutls_internals.KXAlgorithmPriority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.KXAlgorithmPriority.algorithm_priority[i] = _ap[i];
+		state->gnutls_internals.KXAlgorithmPriority.algorithm_priority[i] = va_arg( _ap, KXAlgorithm);
 	}
 
 	va_end(ap);
+	return 0;
 }
 
 /**
@@ -113,31 +119,32 @@ void gnutls_set_kx_priority( GNUTLS_STATE state, LIST) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-void gnutls_set_mac_priority( GNUTLS_STATE state, LIST) {
+int gnutls_set_mac_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
 	int i, num=0;
-	MACAlgorithm *_ap;
+	va_list _ap;
 	
 	va_start( ap, state);
 
 	_ap = ap;
-
-	i=0;
 	do {
 		num++;
-	} while( _ap[++i] != 0);
+	} while( va_arg(ap, MACAlgorithm) != 0);
 	
 	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);	
 	state->gnutls_internals.MACAlgorithmPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority ==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
 	state->gnutls_internals.MACAlgorithmPriority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.MACAlgorithmPriority.algorithm_priority[i] = _ap[i];
+		state->gnutls_internals.MACAlgorithmPriority.algorithm_priority[i] = va_arg(_ap, MACAlgorithm);
 	}
 
 	va_end(ap);
+	return 0;
 }
 
 /**
@@ -152,27 +159,29 @@ void gnutls_set_mac_priority( GNUTLS_STATE state, LIST) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-void gnutls_set_compression_priority( GNUTLS_STATE state, LIST) {
+int gnutls_set_compression_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
-	int i, num=0;
-	CompressionMethod *_ap;
+	int i,num=0;
+	va_list _ap;
 	
 	va_start( ap, state);
-
 	_ap = ap;
 
-	i=0;
 	do {
 		num++;
-	} while( _ap[++i] != 0);
-	
+	} while( va_arg( ap, CompressionMethod) != 0);
+
 	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);	
 	state->gnutls_internals.CompressionMethodPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);
+	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
+
 	state->gnutls_internals.CompressionMethodPriority.algorithms = num;
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.CompressionMethodPriority.algorithm_priority[i] = _ap[i];
+		state->gnutls_internals.CompressionMethodPriority.algorithm_priority[i] = va_arg( _ap, CompressionMethod);
 	}
 	va_end(ap);
+	return 0;
 }
