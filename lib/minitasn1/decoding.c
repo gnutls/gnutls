@@ -485,7 +485,7 @@ _asn1_get_indefinite_length_string(const unsigned char* der,int* len)
 /**
   * asn1_der_decoding - Fill the structure *ELEMENT with values of a DER encoding string.
   * @element: pointer to an ASN1 structure
-  * @der: vector that contains the DER encoding. 
+  * @ider: vector that contains the DER encoding. 
   * @len: number of bytes of *der: der[0]..der[len-1]
   * Description:
   *
@@ -504,7 +504,7 @@ _asn1_get_indefinite_length_string(const unsigned char* der,int* len)
   **/
 
 asn1_retCode
-asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
+asn1_der_decoding(ASN1_TYPE *element,const void *ider,int len,
 		  char *errorDescription)
 {
   node_asn *node,*p,*p2,*p3;
@@ -513,6 +513,7 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
   unsigned char class,*temp2;
   unsigned int tag;
   int indefinite;
+  const unsigned char* der = ider;
 
   node=*element;
 
@@ -900,7 +901,7 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
   * asn1_der_decoding_element - Fill the element named ELEMENTNAME of the structure STRUCTURE with values of a DER encoding string.
   * @structure: pointer to an ASN1 structure
   * @elementName: name of the element to fill
-  * @der: vector that contains the DER encoding of the whole structure. 
+  * @ider: vector that contains the DER encoding of the whole structure. 
   * @len: number of bytes of *der: der[0]..der[len-1]
   * @errorDescription: null-terminated string contains details when an arror accured.
   * 
@@ -923,7 +924,7 @@ asn1_der_decoding(ASN1_TYPE *element,const unsigned char *der,int len,
   **/
 asn1_retCode
 asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
-			  const unsigned char *der,int len,char *errorDescription)
+			  const void *ider,int len,char *errorDescription)
 {
   node_asn *node,*p,*p2,*p3,*nodeFound=ASN1_TYPE_EMPTY;
   char temp[128],currentName[MAX_NAME_SIZE*10],*dot_p,*char_p;
@@ -932,6 +933,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
   unsigned char class,*temp2;
   unsigned int tag;
   int indefinite;
+  const unsigned char* der = ider;
 
   node=*structure;
 
@@ -1473,7 +1475,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
 /**
   * asn1_der_decoding_startEnd - Find the start and end point of an element in a DER encoding string.
   * @element: pointer to an ASN1 element
-  * @der: vector that contains the DER encoding. 
+  * @ider: vector that contains the DER encoding. 
   * @len: number of bytes of *der: der[0]..der[len-1]
   * @name_element: an element of NAME structure.
   * @start: the position of the first byte of NAME_ELEMENT decoding (der[*start]) 
@@ -1496,7 +1498,7 @@ asn1_der_decoding_element(ASN1_TYPE *structure,const char *elementName,
   *
   **/
 asn1_retCode
-asn1_der_decoding_startEnd(ASN1_TYPE element,const unsigned char *der,int len,
+asn1_der_decoding_startEnd(ASN1_TYPE element,const void *ider,int len,
 			   const char *name_element,int *start, int *end)
 {
   node_asn *node,*node_to_find,*p,*p2,*p3;
@@ -1504,6 +1506,7 @@ asn1_der_decoding_startEnd(ASN1_TYPE element,const unsigned char *der,int len,
   unsigned char class;
   unsigned int tag;
   int indefinite;
+  const unsigned char* der = ider;
 
   node=element;
 

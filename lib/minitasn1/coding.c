@@ -717,7 +717,7 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
   * asn1_der_coding - Creates the DER encoding for the NAME structure
   * @element: pointer to an ASN1 element
   * @name: the name of the structure you want to encode (it must be inside *POINTER).
-  * @der: vector that will contain the DER encoding. DER must be a pointer to memory cells already allocated.
+  * @ider: vector that will contain the DER encoding. DER must be a pointer to memory cells already allocated.
   * @len: number of bytes of *der: der[0]..der[len-1], Initialy holds the sizeof of der vector.
   * @errorDescription : return the error description or an empty string if success.
   * Description:
@@ -737,13 +737,14 @@ _asn1_ordering_set_of(unsigned char *der,node_asn *node)
   *
   **/
 asn1_retCode 
-asn1_der_coding(ASN1_TYPE element,const char *name,unsigned char *der,int *len,
+asn1_der_coding(ASN1_TYPE element,const char *name,void *ider,int *len,
                 char *ErrorDescription)
 {
   node_asn *node,*p,*p2;
   char temp[SIZEOF_UNSIGNED_LONG_INT*3+1];
   int counter,counter_old,len2,len3,move,max_len,max_len_old;
   asn1_retCode ris;
+  unsigned char* der = ider;
 
   node=_asn1_find_node(element,name);
   if(node==NULL) return ASN1_ELEMENT_NOT_FOUND;
