@@ -44,4 +44,6 @@ void* gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle);
 
 void *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random, int random_len, int bytes);
 
+GNUTLS_MAC_HANDLE gnutls_mac_init_ssl3_handshake(MACAlgorithm algorithm, void *key, int keylen);
+void *gnutls_mac_deinit_ssl3_handshake(GNUTLS_MAC_HANDLE handle);
 #endif /* GNUTLS_HASH_INT_H */

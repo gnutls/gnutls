@@ -51,8 +51,8 @@ void* _gnutls_ssl3_finished( GNUTLS_STATE state, int type, int skip) {
 	char* concat=gnutls_malloc(36);
 	char *mesg;
 	
-	td = gnutls_mac_init_ssl3( GNUTLS_MAC_MD5, state->security_parameters.master_secret, 48);
-	td2 = gnutls_mac_init_ssl3( GNUTLS_MAC_SHA, state->security_parameters.master_secret, 48);
+	td = gnutls_mac_init_ssl3_handshake( GNUTLS_MAC_MD5, state->security_parameters.master_secret, 48);
+	td2 = gnutls_mac_init_ssl3_handshake( GNUTLS_MAC_SHA, state->security_parameters.master_secret, 48);
 			
 	siz = gnutls_getHashDataBufferSize( state) - skip;
 	data = gnutls_malloc( siz);
@@ -61,27 +61,25 @@ void* _gnutls_ssl3_finished( GNUTLS_STATE state, int type, int skip) {
 
 	gnutls_mac_ssl3(td, data, siz);
 	gnutls_mac_ssl3(td2, data, siz);
-			
 	gnutls_free(data);
+	
 	if (type==GNUTLS_SERVER) {
 		mesg = SSL3_SERVER_MSG;
 	} else {
 		mesg = SSL3_CLIENT_MSG;
 	}
-
 	siz = strlen(mesg);
 	gnutls_mac_ssl3(td, mesg, siz);
 	gnutls_mac_ssl3(td2, mesg, siz);
-	
-	data = gnutls_mac_deinit_ssl3(td);
+
+	data = gnutls_mac_deinit_ssl3_handshake(td);
 	memcpy( concat, data, 16);
 	gnutls_free(data);
 			
-	data = gnutls_mac_deinit_ssl3(td2);
+	data = gnutls_mac_deinit_ssl3_handshake(td2);
 
 	memcpy( &concat[16], data, 20);
 	gnutls_free(data);
-			
 	return concat;
 }
 
@@ -397,7 +395,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 **data,
 	if (length32 > 0 && data!=NULL)
 		memmove( *data, &dataptr[HANDSHAKE_HEADERS_SIZE], length32);
 
-	/* here we do the hashing work needed at Finished message */
+	/* here we buffer the handshake messages - needed at Finished message */
 	gnutls_insertHashDataBuffer( state, dataptr, length32+HANDSHAKE_HEADERS_SIZE);
 
 	switch (dataptr[0]) {

@@ -49,14 +49,14 @@ int main()
 
 	memset(&sa, '\0', sizeof(sa));
 	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = inet_addr("127.0.0.1");
+	sa.sin_addr.s_addr = inet_addr(SERVER);
 	sa.sin_port = htons(PORT);
 
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");
 
 	gnutls_init(&state, GNUTLS_CLIENT);
-	gnutls_set_current_version( state, GNUTLS_TLS1); /* SSL3 */
+	gnutls_set_current_version( state, GNUTLS_TLS1);
 
 	gnutls_set_cipher_priority( state, 2, GNUTLS_ARCFOUR, GNUTLS_3DES);
 //	gnutls_set_kx_priority( state, 1, GNUTLS_KX_ANON_DH);
