@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	printf("Connecting to %s...\n", hostname);
+	printf("Resolving '%s'...\n", hostname);
 	/* get server name */
 	server_host = gethostbyname(hostname);
 	if (server_host == NULL) {

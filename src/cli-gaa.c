@@ -110,7 +110,7 @@ void gaa_help()
 	__gaa_helpsingle(0, "comp", """comp1 comp2..."" ", "Compression methods to enable.");
 	__gaa_helpsingle(0, "macs", """mac1 mac2..."" ", "MACs to enable.");
 	__gaa_helpsingle(0, "kx", """kx1 kx2..."" ", "Key exchange methods to enable.");
-	__gaa_helpsingle(0, "certtype", """certtype1 certtype2..."" ", "Certificate types to enable.");
+	__gaa_helpsingle(0, "certtypes", """certtype1 certtype2..."" ", "Certificate types to enable.");
 	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms  and modes.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 
@@ -216,7 +216,7 @@ int gaa_error = 0;
 #define GAA_NB_OPTION           10
 #define GAAOPTID_help	1
 #define GAAOPTID_list	2
-#define GAAOPTID_certtype	3
+#define GAAOPTID_certtypes	3
 #define GAAOPTID_kx	4
 #define GAAOPTID_macs	5
 #define GAAOPTID_comp	6
@@ -406,7 +406,7 @@ float gaa_getfloat(char *arg)
 }
 /* option structures */
 
-struct GAAOPTION_certtype 
+struct GAAOPTION_certtypes 
 {
 	char** arg1;
 	int size1;
@@ -484,7 +484,7 @@ int gaa_get_option_num(char *str, int status)
     switch(status)
         {
         case GAA_LETTER_OPTION:
-			GAA_CHECK1STR("", GAAOPTID_certtype);
+			GAA_CHECK1STR("", GAAOPTID_certtypes);
 			GAA_CHECK1STR("", GAAOPTID_kx);
 			GAA_CHECK1STR("", GAAOPTID_macs);
 			GAA_CHECK1STR("", GAAOPTID_comp);
@@ -502,7 +502,7 @@ int gaa_get_option_num(char *str, int status)
         case GAA_WORD_OPTION:
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("list", GAAOPTID_list);
-			GAA_CHECKSTR("certtype", GAAOPTID_certtype);
+			GAA_CHECKSTR("certtypes", GAAOPTID_certtypes);
 			GAA_CHECKSTR("kx", GAAOPTID_kx);
 			GAA_CHECKSTR("macs", GAAOPTID_macs);
 			GAA_CHECKSTR("comp", GAAOPTID_comp);
@@ -522,7 +522,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 {
     int OK = 0;
     int gaa_last_non_option;
-	struct GAAOPTION_certtype GAATMP_certtype;
+	struct GAAOPTION_certtypes GAATMP_certtypes;
 	struct GAAOPTION_kx GAATMP_kx;
 	struct GAAOPTION_macs GAATMP_macs;
 	struct GAAOPTION_comp GAATMP_comp;
@@ -563,11 +563,11 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 
 		return GAA_OK;
 		break;
-	case GAAOPTID_certtype:
+	case GAAOPTID_certtypes:
 	OK = 0;
-		GAA_LIST_FILL(GAATMP_certtype.arg1, gaa_getstr, char*, GAATMP_certtype.size1);
+		GAA_LIST_FILL(GAATMP_certtypes.arg1, gaa_getstr, char*, GAATMP_certtypes.size1);
 #line 32 "cli.gaa"
-{ gaaval->ctype = GAATMP_certtype.arg1; gaaval->nctype = GAATMP_certtype.size1 ;};
+{ gaaval->ctype = GAATMP_certtypes.arg1; gaaval->nctype = GAATMP_certtypes.size1 ;};
 
 		return GAA_OK;
 		break;
