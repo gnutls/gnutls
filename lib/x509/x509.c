@@ -1136,7 +1136,7 @@ GNUTLS_HASH_HANDLE hd;
 			goto cleanup;
 		}
  	} else if (pk == GNUTLS_PK_DSA) {
-		result = _gnutls_x509_write_dsa_params( params, params_size, &der);
+		result = _gnutls_x509_write_dsa_public_key( params, params_size, &der);
 		if (result < 0) {
 			gnutls_assert();
 			goto cleanup;

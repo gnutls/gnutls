@@ -6,6 +6,7 @@ Version 1.1.0
   gnutls_certificate_server_retrieve_function(), to allow a client or a server
   to specify certificates for the handshake without storing them to the
   credentials structure.
+- Added support for generating and exporting DSA private keys.
 
 Version 1.0.1 (10/12/2003)
 - Some minor fixes in the makefiles. They now include CFLAGS

@@ -160,6 +160,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 {
 
 	GNUTLS_MPI rsa_params[RSA_PRIVATE_PARAMS];
+	int rsa_params_len;
 	size_t siz;
 	uint i;
 	int ret;
@@ -169,7 +170,7 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	ret = _gnutls_rsa_generate_params( rsa_params, bits);
+	ret = _gnutls_rsa_generate_params( rsa_params, &rsa_params_len, bits);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

@@ -10,6 +10,8 @@ int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
 	gnutls_datum* der);
 int _gnutls_x509_write_dsa_params( GNUTLS_MPI * params, int params_size,
         gnutls_datum* der);
+int _gnutls_x509_write_dsa_public_key( GNUTLS_MPI * params, int params_size,
+	gnutls_datum* der);
 
 int _gnutls_x509_read_uint( ASN1_TYPE node, const char* value, 
 	unsigned int* ret);

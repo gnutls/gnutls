@@ -21,7 +21,7 @@ typedef int gnutls_certificate_client_retrieve_function(
    gnutls_session, const gnutls_datum* req_ca_cert, int nreqs,
    gnutls_datum** certs, unsigned int* ncerts, gnutls_datum* key);
 typedef int gnutls_certificate_server_retrieve_function(
-   gnutls_session, gnutls_datum **server_certs, unsigned int* ncerts
+   gnutls_session, gnutls_datum **server_certs, unsigned int* ncerts,
    gnutls_datum* key);
 
 

@@ -116,7 +116,7 @@ const char* algo;
  * params[1] is public key
  */
 static int
-_pkcs1_rsa_sign( gnutls_mac_algorithm hash, const gnutls_datum* text,  
+pkcs1_rsa_sign( gnutls_mac_algorithm hash, const gnutls_datum* text,  
 	GNUTLS_MPI *params, int params_len, gnutls_datum* signature)
 {
 	int ret;
@@ -154,6 +154,35 @@ _pkcs1_rsa_sign( gnutls_mac_algorithm hash, const gnutls_datum* text,
 	return 0;		
 }
 
+static int
+dsa_sign( const gnutls_datum* text,  
+	GNUTLS_MPI *params, int params_len, gnutls_datum* signature)
+{
+	int ret;
+	opaque _digest[MAX_HASH_SIZE];
+	GNUTLS_HASH_HANDLE hd;
+	gnutls_datum digest;
+
+	hd = _gnutls_hash_init( GNUTLS_MAC_SHA);
+	if (hd == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+	
+	_gnutls_hash( hd, text->data, text->size);
+	_gnutls_hash_deinit( hd, _digest);
+
+	digest.data = _digest;
+	digest.size = 20;
+
+	if ( (ret=_gnutls_sign( GNUTLS_PK_DSA, params, params_len, &digest, signature)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	return 0;		
+}
+
 /* Signs the given data using the parameters from the signer's
  * private key.
  *
@@ -171,7 +200,7 @@ int ret;
 	switch( signer->pk_algorithm)
 	{
 		case GNUTLS_PK_RSA:
-			ret = _pkcs1_rsa_sign( hash, tbs, signer->params, signer->params_size,
+			ret = pkcs1_rsa_sign( hash, tbs, signer->params, signer->params_size,
 				signature);
 			if (ret < 0) {
 				gnutls_assert();
@@ -180,7 +209,7 @@ int ret;
 			return 0;
 			break;
 		case GNUTLS_PK_DSA:
-			ret = _gnutls_dsa_sign( signature, tbs, signer->params, signer->params_size);
+			ret = dsa_sign( tbs, signer->params, signer->params_size, signature);
 			if (ret < 0) {
 				gnutls_assert();
 				return ret;

@@ -60,6 +60,9 @@ option (to-p12) { $action = 8; } "Generate a PKCS #12 structure."
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 
+#int dsa;
+option (dsa) { $dsa=1 } "Use DSA keys."
+
 #int export;
 option (export-ciphers) { $export=1 } "Use weak encryption algorithms."
 

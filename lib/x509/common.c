@@ -948,7 +948,6 @@ gnutls_datum val;
 /* Encodes and copies the private key parameters into a
  * subjectPublicKeyInfo structure.
  *
- * FIXME: can only support RSA parameters.
  */
 int _gnutls_x509_encode_and_copy_PKI_params( ASN1_TYPE dst, const char* dst_name,
 	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI* params, int params_size)
@@ -958,18 +957,13 @@ gnutls_datum der = {NULL, 0};
 int result;
 char name[128];
 
-	if (pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-
 	pk = _gnutls_x509_pk2oid( pk_algorithm);
 	if (pk == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
 	}
 
-	/* write the RSA OID
+	/* write the OID
 	 */
 	_gnutls_str_cpy( name, sizeof(name), dst_name);
 	_gnutls_str_cat( name, sizeof(name), ".algorithm.algorithm");
@@ -979,34 +973,74 @@ char name[128];
 		return _gnutls_asn2err(result);
 	}
 
-	/* disable parameters, which are not used in RSA.
-	 */
-	_gnutls_str_cpy( name, sizeof(name), dst_name);
-	_gnutls_str_cat( name, sizeof(name), ".algorithm.parameters");
-	result = asn1_write_value( dst, name, NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
+	if (pk_algorithm == GNUTLS_PK_RSA) {
+		/* disable parameters, which are not used in RSA.
+		 */
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".algorithm.parameters");
+		result = asn1_write_value( dst, name, NULL, 0);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 
-	result = _gnutls_x509_write_rsa_params( params, params_size, &der);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
+		result = _gnutls_x509_write_rsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
 
-	/* Write the DER parameters. (in bits)
-	 */
-	_gnutls_str_cpy( name, sizeof(name), dst_name);
-	_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
-	result = asn1_write_value( dst, name, der.data, der.size*8);
+		/* Write the DER parameters. (in bits)
+		 */
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
+		result = asn1_write_value( dst, name, der.data, der.size*8);
 
-	_gnutls_free_datum(&der);
+		_gnutls_free_datum(&der);
 
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+	} else if (pk_algorithm == GNUTLS_PK_DSA) {
+
+		result = _gnutls_x509_write_dsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		/* Write the DER parameters.
+		 */
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".algorithm.parameters");
+		result = asn1_write_value( dst, name, der.data, der.size);
+
+		_gnutls_free_datum(&der);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+		result = _gnutls_x509_write_dsa_public_key( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		_gnutls_str_cpy( name, sizeof(name), dst_name);
+		_gnutls_str_cat( name, sizeof(name), ".subjectPublicKey");
+		result = asn1_write_value( dst, name, der.data, der.size*8);
+
+		_gnutls_free_datum(&der);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+
+	} else return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
 	return 0;
 }

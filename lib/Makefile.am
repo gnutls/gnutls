@@ -53,7 +53,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 libgnutls_la_SOURCES = $(COBJECTS) 
 
 libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/dn.lo x509/crl.lo x509/common.lo \
-	x509/x509.lo x509/extensions.lo x509/compat.lo x509/verify.lo \
+	x509/x509.lo x509/extensions.lo x509/compat.lo x509/verify.lo x509/dsa.lo \
 	x509/mpi.lo x509/privkey.lo x509/pkcs7.lo x509/crq.lo x509/xml.lo x509/sign.lo \
 	x509/pkcs5.lo x509/privkey_pkcs8.lo x509/pkcs12.lo x509/pkcs12_bag.lo \
 	x509/pkcs12_encr.lo x509/rfc2818_hostname.lo x509/rc2.lo x509/x509_write.lo

@@ -331,7 +331,7 @@ cleanup:
 }
 
 /*
- * This function writes the BIT STRING subjectPublicKey for DSS keys.
+ * This function writes the parameters for DSS keys.
  * Needs 3 parameters (p,q,g).
  *
  * Allocates the space used to store the DER data.
@@ -371,6 +371,54 @@ int _gnutls_x509_write_dsa_params( GNUTLS_MPI * params, int params_size,
 	}
 
 	result = _gnutls_x509_write_int( spk, "g", params[2], 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode( spk, "", der, 0);
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	asn1_delete_structure(&spk);
+	return 0;
+	
+cleanup:
+	asn1_delete_structure(&spk);
+	return result;
+}
+
+/*
+ * This function writes the public parameters for DSS keys.
+ * Needs 1 parameter (y).
+ *
+ * Allocates the space used to store the DER data.
+ */
+int _gnutls_x509_write_dsa_public_key( GNUTLS_MPI * params, int params_size,
+	gnutls_datum* der)
+{
+	int result;
+	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+
+	der->data = NULL;
+	der->size = 0;
+
+	if (params_size < 3) {
+		gnutls_assert();
+		result = GNUTLS_E_INVALID_REQUEST;
+		goto cleanup;
+	}
+
+	if ((result=asn1_create_element
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &spk))
+	     != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_write_int( spk, "", params[3], 0);
 	if (result < 0) {
 		gnutls_assert();
 		goto cleanup;

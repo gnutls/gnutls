@@ -196,11 +196,6 @@ int pk_algorithm;
 
 	pk_algorithm = gnutls_x509_crq_get_pk_algorithm( crq, NULL);
 
-	if (pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-	
 	result = _gnutls_asn1_copy_node( &crt->cert, "tbsCertificate.subject",
 		crq->crq, "certificationRequestInfo.subject");
 	if (result < 0) {
@@ -344,11 +339,6 @@ const char* pk;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (issuer_key->pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-	
 	/* disable all the unneeded OPTIONAL fields.
 	 */
 	disable_optional_stuff( crt);

@@ -274,6 +274,15 @@ int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey privkey,
 	const gnutls_datum *m, const gnutls_datum *e,
 	const gnutls_datum *d, const gnutls_datum *p, const gnutls_datum *q, 
 	const gnutls_datum *u);
+
+int gnutls_x509_privkey_export_dsa_raw(gnutls_x509_privkey key,
+	gnutls_datum * p, gnutls_datum *q,
+	gnutls_datum *g, gnutls_datum *y, gnutls_datum* x);
+int gnutls_x509_privkey_import_dsa_raw(gnutls_x509_privkey key, 
+	const gnutls_datum* p, const gnutls_datum* q,
+	const gnutls_datum* g, const gnutls_datum* y, 
+	const gnutls_datum* x);
+
 int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key);
 int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key, unsigned int flags,
 	unsigned char* output_data, size_t* output_data_size);

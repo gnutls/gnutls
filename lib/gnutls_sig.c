@@ -147,30 +147,6 @@ opaque concat[36];
 }
 
 
-/* This will create a PKCS1 or DSA signature, as defined in the TLS protocol.
- * Cert is the certificate of the corresponding private key. It is only checked if
- * it supports signing.
- */
-static
-int _gnutls_tls_sign( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
-{
-
-	/* If our certificate supports signing
-	 */
-
-	if ( cert != NULL)
-	   if ( cert->keyUsage != 0)
-		if ( !(cert->keyUsage & KEY_DIGITAL_SIGNATURE)) {
-			gnutls_assert();
-			return GNUTLS_E_KEY_USAGE_VIOLATION;
-		}
-
-	return _gnutls_sign( pkey->pk_algorithm, pkey->params, pkey->params_size, 
-		hash_concat, signature);
-		
-}
-
-
 /* This will create a PKCS1 or DSA signature, using the given parameters, and the
  * given data. The output will be allocated and be put in signature.
  */
@@ -204,6 +180,30 @@ int ret;
 	}
 
 	return 0;
+}
+
+/* This will create a PKCS1 or DSA signature, as defined in the TLS protocol.
+ * Cert is the certificate of the corresponding private key. It is only checked if
+ * it supports signing.
+ */
+static
+int _gnutls_tls_sign( gnutls_cert* cert, gnutls_privkey* pkey, 
+	const gnutls_datum* hash_concat, gnutls_datum *signature)
+{
+
+	/* If our certificate supports signing
+	 */
+
+	if ( cert != NULL)
+	   if ( cert->keyUsage != 0)
+		if ( !(cert->keyUsage & KEY_DIGITAL_SIGNATURE)) {
+			gnutls_assert();
+			return GNUTLS_E_KEY_USAGE_VIOLATION;
+		}
+
+	return _gnutls_sign( pkey->pk_algorithm, pkey->params, pkey->params_size, 
+		hash_concat, signature);
+		
 }
 
 

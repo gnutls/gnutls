@@ -20,5 +20,5 @@
 
 const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params);
 int _gnutls_peers_cert_less_512( gnutls_session session);
-int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits);
+int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int* resarr_len, int bits);
 

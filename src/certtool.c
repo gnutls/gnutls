@@ -176,7 +176,16 @@ char input[128];
 static gnutls_x509_privkey generate_private_key_int( void)
 {
 gnutls_x509_privkey key;
-int ret;
+int ret, key_type;
+const char* msg;
+	
+	if (info.dsa) { 
+		msg = "DSA";
+		key_type = GNUTLS_PK_DSA;
+	} else {
+		msg = "RSA";
+		key_type = GNUTLS_PK_RSA;
+	}
 
 	if (info.privkey)
 		return load_private_key(1);
@@ -187,8 +196,9 @@ int ret;
 		exit(1);
 	}
 
-	fprintf(stderr, "Generating a %d bit RSA private key...\n", info.bits);
-	ret = gnutls_x509_privkey_generate( key, GNUTLS_PK_RSA, info.bits, 0);
+	fprintf(stderr, "Generating a %d bit %s private key...\n", info.bits, msg);
+
+	ret = gnutls_x509_privkey_generate( key, key_type, info.bits, 0);
 	if (ret < 0) {
 		fprintf(stderr, "privkey_generate: %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -1082,11 +1092,11 @@ void privkey_info( void)
 	pem.data = buffer;
 	pem.size = size;
 	
-	pass = read_pass("Enter password: ");
 
 	if (!info.pkcs8) {
 		ret = gnutls_x509_privkey_import(key, &pem, in_cert_format);
 	} else {
+		pass = read_pass("Enter password: ");
 		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, in_cert_format, pass, 0);
 	}
 

@@ -606,11 +606,6 @@ const char* pk;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if (key->pk_algorithm != GNUTLS_PK_RSA) {
-		gnutls_assert();
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-	}
-
 	/* Step 1. Self sign the request.
 	 */
 	result = _gnutls_x509_sign_tbs( crq->crq, "certificationRequestInfo", GNUTLS_MAC_SHA,
@@ -648,12 +643,31 @@ const char* pk;
 		return _gnutls_asn2err(result);
 	}
 
-	/* disable parameters, which are not used in RSA.
-	 */
-	result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", NULL, 0);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
+	if (key->pk_algorithm == GNUTLS_PK_DSA) {
+		gnutls_datum der;
+
+		result = _gnutls_x509_write_dsa_params( key->params, key->params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+
+		result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", der.data, der.size);
+		_gnutls_free_datum( &der);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+		
+	} else {
+		/* RSA so disable the parameters.
+		 */
+		result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", NULL, 0);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 	}
 
 	return 0;
