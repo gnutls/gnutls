@@ -22,8 +22,8 @@ static const char *hostname = "keyserver.somewhere.com";
 static const short port = 11371;
 
 int
-recv_openpgp_key(const unsigned char *keyfpr, unsigned int
-                 keyfpr_length, gnutls_datum * key)
+recv_openpgp_key(gnutls_session session, const unsigned char *keyfpr, 
+       unsigned int keyfpr_length, gnutls_datum * key)
 {
    const unsigned char *keyid;
    int rc;
@@ -53,9 +53,14 @@ recv_openpgp_key(const unsigned char *keyfpr, unsigned int
        memcpy( key->data, buf, len);
 
        cdk_free( buf );
+       cdk_kbnode_release( knode );
+
+       return 0; /* success */
+
+   } else {
+       cdk_kbnode_release( knode );
+       return -1; /* failure */
    }
-   cdk_kbnode_release( knode );
-   return map_cdk_rc( rc );
 
 }
 
