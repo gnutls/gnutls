@@ -33,7 +33,7 @@ void _gnutls_dump_mpi(char* prefix, GNUTLS_MPI a)
 	
 	if (gcry_mpi_print(GCRYMPI_FMT_HEX, buf, &n, a))
 		strcpy(buf, "[can't print value]"); /* Flawfinder: ignore */
-	_gnutls_log( "GNUTLS_MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
+	_gnutls_debug_log( "GNUTLS_MPI: length: %d\n\t%s%s\n", (n-1)/2, prefix, buf);
 }
 
 
@@ -58,16 +58,16 @@ char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 void _gnutls_print_state(gnutls_session session)
 {
 
-	_gnutls_log( "GNUTLS State:\n");
-	_gnutls_log( "Connection End: %d\n",
+	_gnutls_debug_log( "GNUTLS State:\n");
+	_gnutls_debug_log( "Connection End: %d\n",
 		session->security_parameters.entity);
-	_gnutls_log( "Cipher Algorithm: %d\n",
+	_gnutls_debug_log( "Cipher Algorithm: %d\n",
 		session->security_parameters.read_bulk_cipher_algorithm);
-	_gnutls_log( "MAC algorithm: %d\n",
+	_gnutls_debug_log( "MAC algorithm: %d\n",
 		session->security_parameters.read_mac_algorithm);
-	_gnutls_log( "Compression Algorithm: %d\n",
+	_gnutls_debug_log( "Compression Algorithm: %d\n",
 		session->security_parameters.read_compression_algorithm);
-	_gnutls_log( "\n");
+	_gnutls_debug_log( "\n");
 
 }
 

@@ -675,7 +675,7 @@ int gnutls_dh_params_generate(gnutls_datum * prime,
 	prime->size = siz;
 	_gnutls_mpi_print(prime->data, &siz, tmp_prime);
 
-	_gnutls_log("Generated %d bits prime %s, generator %s.\n",
+	_gnutls_log("dh_params_generate: Generated %d bits prime %s, generator %s.\n",
 		    bits, _gnutls_bin2hex(prime->data, prime->size),
 		    _gnutls_bin2hex(generator->data, generator->size));
 

@@ -1056,7 +1056,7 @@ _gnutls_qsort(gnutls_session session, void *_base, size_t nmemb, size_t size,
 #ifdef DEBUG
 	if (size > MAX_ELEM_SIZE) {
 		gnutls_assert();
-		_gnutls_log( "QSORT BUG\n");
+		_gnutls_debug_log( "QSORT BUG\n");
 		exit(1);
 	}
 #endif
@@ -1152,9 +1152,9 @@ _gnutls_supported_ciphersuites_sorted(gnutls_session session,
 	}
 
 #ifdef SORT_DEBUG
-	_gnutls_log( "Unsorted: \n");
+	_gnutls_debug_log( "Unsorted: \n");
 	for (i = 0; i < count; i++)
-		_gnutls_log( "\t%d: %s\n", i,
+		_gnutls_debug_log( "\t%d: %s\n", i,
 			_gnutls_cipher_suite_get_name((*ciphers)[i]));
 #endif
 
@@ -1162,9 +1162,9 @@ _gnutls_supported_ciphersuites_sorted(gnutls_session session,
 		      sizeof(GNUTLS_CipherSuite), _gnutls_compare_algo);
 
 #ifdef SORT_DEBUG
-	_gnutls_log( "Sorted: \n");
+	_gnutls_debug_log( "Sorted: \n");
 	for (i = 0; i < count; i++)
-		_gnutls_log( "\t%d: %s\n", i,
+		_gnutls_debug_log( "\t%d: %s\n", i,
 			_gnutls_cipher_suite_get_name((*ciphers)[i]));
 #endif
 

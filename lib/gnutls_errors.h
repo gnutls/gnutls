@@ -24,7 +24,7 @@
 #ifdef DEBUG
 # ifdef __FILE__
 #  ifdef __LINE__
-#   define gnutls_assert() _gnutls_log( "GNUTLS_ASSERT: %s:%d\n", __FILE__,__LINE__);
+#   define gnutls_assert() _gnutls_debug_log( "GNUTLS_ASSERT: %s:%d\n", __FILE__,__LINE__);
 #  else
 #   define gnutls_assert() 
 #  endif
@@ -40,8 +40,10 @@ const char* gnutls_strerror(int error);
 void gnutls_perror(int error);
 int gnutls_error_is_fatal( int error);
 
+void _gnutls_log( const char *fmt, ...);
+
 #ifdef DEBUG
- void _gnutls_log( const char *fmt, ...);
+# define _gnutls_debug_log _gnutls_log
 
 # ifdef HANDSHAKE_DEBUG
 #  define _gnutls_handshake_log _gnutls_log
@@ -96,7 +98,7 @@ int gnutls_error_is_fatal( int error);
 /* FIXME: These macros only work with C99 compliant compilers
  */
 # ifdef C99_MACROS
-#  define _gnutls_log(...)
+#  define _gnutls_debug_log(...)
 #  define _gnutls_handshake_log( ...)
 #  define _gnutls_io_log( ...)
 #  define _gnutls_buffers_log( ...)
@@ -106,7 +108,7 @@ int gnutls_error_is_fatal( int error);
 #  define _gnutls_write_log( ...)
 #  define _gnutls_x509_log( ...)
 # else
-#  define _gnutls_log _gnutls_null_log
+#  define _gnutls_debug_log _gnutls_null_log
 #  define _gnutls_handshake_log _gnutls_null_log
 #  define _gnutls_io_log _gnutls_null_log
 #  define _gnutls_buffers_log _gnutls_null_log

@@ -111,7 +111,7 @@ int i;
 
 	if (session->security_parameters.entity==GNUTLS_CLIENT)
 		for (i=0;i<session->internals.extensions_sent_size;i++) {
-			_gnutls_log("EXT: expecting extension %d\n", session->internals.extensions_sent[i]);
+			_gnutls_log("extensions: expecting extension %d\n", session->internals.extensions_sent[i]);
 		}
 #endif
 
@@ -164,7 +164,7 @@ static void _gnutls_extension_list_add( gnutls_session session, uint16 type) {
 			session->internals.extensions_sent_size++;
 		} else {
 #ifdef DEBUG
-			_gnutls_log("EXT: Increase MAX_EXT_TYPES\n");
+			_gnutls_log("extensions: Increase MAX_EXT_TYPES\n");
 #endif
 		}
 	}

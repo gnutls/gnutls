@@ -496,7 +496,7 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 		gnutls_assert();
 		asn1_delete_structure(&c2);
@@ -547,7 +547,7 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 		gnutls_assert();
 		asn1_delete_structure(&c2);
@@ -634,7 +634,7 @@ int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, 
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
@@ -736,7 +736,7 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum * cert)
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
@@ -786,7 +786,7 @@ time_t gnutls_x509_extract_certificate_activation_time(const
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 		gnutls_assert();
 		return (time_t)-1;
@@ -828,7 +828,7 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 		gnutls_assert();
 		return (time_t)-1;
@@ -866,7 +866,7 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -1114,7 +1114,7 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
 	if (ret != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 		gnutls_assert();
 		return ret;
@@ -2096,13 +2096,11 @@ char name1[128];
 		return 0;
 	}
 
-
 	/* other types like DH
 	 * currently not supported
 	 */
 	gnutls_assert();
-
-	_gnutls_log("CERT: ALGORITHM: %s\n", ALGO_OID);
+	_gnutls_log("X509 certificate: Found algorithm: %s\n", ALGO_OID);
 
 	gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 
@@ -2161,7 +2159,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		if (result != ASN1_SUCCESS) {
 			/* couldn't decode DER */
 	
-			_gnutls_log("CERT: Decoding error %d\n", result);
+			_gnutls_log("X509 certificate: Decoding error %d\n", result);
 			gnutls_assert();
 			asn1_delete_structure(&c2);
 			_gnutls_free_datum( &gCert->raw);
@@ -2176,7 +2174,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		if (result != ASN1_SUCCESS) {
 			/* couldn't decode DER */
 	
-			_gnutls_log("CERT: Decoding error %d\n", result);
+			_gnutls_log("X509 certificate: Decoding error %d\n", result);
 			gnutls_assert();
 			asn1_delete_structure(&c2);
 			_gnutls_free_datum( &gCert->raw);
@@ -2190,7 +2188,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 
 		if (result != ASN1_SUCCESS) {
 			/* couldn't decode DER */
-			_gnutls_log("CERT: Decoding error %d\n", result);
+			_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 			gnutls_assert();
 			asn1_delete_structure(&c2);
@@ -2532,7 +2530,7 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
 	if (result != ASN1_SUCCESS) {
 		/* couldn't decode DER */
 
-		_gnutls_log("CERT: Decoding error %d\n", result);
+		_gnutls_log("X509 certificate: Decoding error %d\n", result);
 
 		gnutls_assert();
 		asn1_delete_structure(&c2);

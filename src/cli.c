@@ -568,6 +568,11 @@ int do_handshake(socket_st* socket)
    return ret;
 }
 
+static void tls_log_func( const char* str)
+{
+	fprintf(stderr, "|** %s", str);
+}
+
 void init_global_tls_stuff()
 {
 int ret;
@@ -576,6 +581,7 @@ int ret;
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
+   gnutls_global_set_log_function( tls_log_func);
 
    if (gnutls_global_init_extra() < 0) {
       fprintf(stderr, "global state (extra) initialization error\n");

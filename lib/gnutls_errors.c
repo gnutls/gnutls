@@ -251,7 +251,6 @@ int _gnutls_asn2err( int asn_err) {
 /* this function will output a message using the
  * caller provided function 
  */
-#ifdef DEBUG
 void _gnutls_log( const char *fmt, ...) {
  va_list args;
  char str[MAX_LOG_SIZE];
@@ -267,7 +266,7 @@ void _gnutls_log( const char *fmt, ...) {
 
  return;
 }
-#else /* not DEBUG */
+#ifndef DEBUG
 # ifndef C99_MACROS
 
 /* Without C99 macros these functions have to

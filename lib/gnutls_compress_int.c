@@ -219,7 +219,7 @@ int err;
 	} /* switch */
 
 #ifdef COMPRESSION_DEBUG
-	_gnutls_log("Compression ratio: %f\n", (float)((float)compressed_size / (float)plain_size));
+	_gnutls_debug_log("Compression ratio: %f\n", (float)((float)compressed_size / (float)plain_size));
 #endif
 
 	if ((size_t)compressed_size > max_comp_size) {
