@@ -364,7 +364,23 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
   * The return value (status) should be one of the CertificateStatus enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. Returns a negative error code in case of an error, or GNUTLS_CERT_NONE if no certificate was sent.
+  * actual peer. 
+  *
+  * The return values are:
+  *
+  * GNUTLS_CERT_NONE: No certificate was sent by the peer.
+  * GNUTLS_CERT_TRUSTED: the peer's certificate is trusted.
+  * GNUTLS_CERT_VALID: the certificate is not trusted,
+  *  but the certificate chain is ok.
+  * GNUTLS_CERT_INVALID: the certificate is not trusted, and
+  *  the certificate chain is broken..
+  * GNUTLS_CERT_REVOKED: the certificate has been revoked
+  *  (not implemented yet).
+  * GNUTLS_CERT_EXPIRED: the certificate has expired.
+  * GNUTLS_CERT_CORRUPTED: the certificate is corrupted.
+  *
+  * A negative error code is returned in case of an error.
+  *
   *
   **/
 int gnutls_certificate_verify_peers(GNUTLS_STATE state)

@@ -362,10 +362,18 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 		 * trusted.
 		 */
 		return GNUTLS_CERT_INVALID;
-	} else
-		if (ret != GNUTLS_CERT_TRUSTED)
+	} else {
+		if (ret == GNUTLS_CERT_REVOKED) 
 			return ret;
 
+		/* Since the certificate chain is ok,
+		 * the certificate is valid.
+		 */
+		if (ret != GNUTLS_CERT_TRUSTED)
+			return GNUTLS_CERT_VALID;
+
+	}
+	
 	if (expired != 0)
 		return GNUTLS_CERT_EXPIRED;
 
