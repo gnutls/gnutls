@@ -2046,6 +2046,10 @@ static int _gnutls_send_handshake_final(GNUTLS_STATE state, int init)
 {
 	int ret = 0;
 
+	/* to know where the procedure was interrupted.
+	 */
+	state->gnutls_internals.handshake_direction = 1; /* write */
+
 	/* Send the CHANGE CIPHER SPEC PACKET */
 
 	switch (STATE) {
@@ -2101,6 +2105,10 @@ static int _gnutls_recv_handshake_final(GNUTLS_STATE state, int init)
 {
 	int ret = 0;
 	uint8 ch;
+
+	/* to know where the procedure was interrupted.
+	 */
+	state->gnutls_internals.handshake_direction = 0; /* recv */
 
 	switch (STATE) {
 	case STATE0:
