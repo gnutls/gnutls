@@ -9,15 +9,17 @@
  */
 extern void check_alert(gnutls_session session, int ret);
 extern int tcp_connect( void);
-void tcp_close( int sd);
+extern void tcp_close( int sd);
 
 #define MAX_BUF 1024
 #define USERNAME "user"
 #define PASSWORD "pass"
+#define CAFILE "ca.pem"
 #define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
-const int kx_priority[] = { GNUTLS_KX_SRP, 0 };
+const int kx_priority[] = { GNUTLS_KX_SRP, GNUTLS_KX_SRP_DSS, 
+   GNUTLS_KX_SRP_RSA, 0 };
 
 int main()
 {
@@ -25,25 +27,21 @@ int main()
    int sd, ii;
    gnutls_session session;
    char buffer[MAX_BUF + 1];
-   gnutls_srp_client_credentials xcred;
+   gnutls_srp_client_credentials srp_cred;
+   gnutls_certificate_client_credentials cert_cred;
 
-   if (gnutls_global_init() < 0) {
-      fprintf(stderr, "global state initialization error\n");
-      exit(1);
-   }
+   gnutls_global_init();
 
    /* now enable the gnutls-extra library which contains the
-    * SRP stuff. */
-   if (gnutls_global_init_extra() < 0) {
-      fprintf(stderr, "global state initialization error\n");
-      exit(1);
-   }
+    * SRP stuff. 
+    */
+   gnutls_global_init_extra();
 
-   if (gnutls_srp_allocate_client_credentials(&xcred) < 0) {
-      fprintf(stderr, "memory error\n");
-      exit(1);
-   }
-   gnutls_srp_set_client_credentials(xcred, USERNAME, PASSWORD);
+   gnutls_srp_allocate_client_credentials(&srp_cred);
+   gnutls_certificate_allocate_client_credentials(&cert_cred);
+
+   gnutls_certificate_set_x509_trust_file(cert_cred, CAFILE, GNUTLS_X509_FMT_PEM);
+   gnutls_srp_set_client_credentials(srp_cred, USERNAME, PASSWORD);
 
    /* connects to server 
     */
@@ -62,7 +60,8 @@ int main()
 
    /* put the SRP credentials to the current session
     */
-   gnutls_credentials_set(session, GNUTLS_CRD_SRP, xcred);
+   gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
+   gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
    gnutls_transport_set_ptr( session, (gnutls_transport_ptr)sd);
 
@@ -107,7 +106,8 @@ int main()
 
    gnutls_deinit(session);
 
-   gnutls_srp_free_client_credentials(xcred);
+   gnutls_srp_free_client_credentials(srp_cred);
+   gnutls_certificate_free_credentials(cert_cred);
 
    gnutls_global_deinit();
 

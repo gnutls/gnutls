@@ -15,7 +15,8 @@ static int cert_callback(gnutls_session session,
 			 const gnutls_datum * req_ca_rdn, int nreqs)
 {
    char issuer_dn[256];
-   int len, i, ret;
+   int i, ret;
+   size_t len;
 
    /* Print the server's trusted CAs
     */

@@ -16,21 +16,22 @@ are used in most of the other examples below, without redefining them.
 \input{ex-client2}
 
 \subsection{Obtaining session information}
-The following function prints information about the current \tls{} session.
-This function should be called after a successful
-\printfunc{gnutls_handshake}{gnutls\_handshake}
+Most of the times it is desirable to know the security properties of
+the current established session. This includes the underlying ciphers and
+the protocols involved. That is the purpose of the following function.
+Note that this function will print meaningful values only if
+called after a successful \printfunc{gnutls_handshake}{gnutls\_handshake}
 
 \input{ex-session-info}
 
 \subsection{Verifying peer's certificate}
-A TLS connection is not secure just after the handshake has finished.
-It must be considered secure, after the peer's certificate and identity have been
-verified. That is, you usually have to verify not only the signature in peer's 
-certificate, but also the hostname in the certificate, expiration dates etc. 
-After this step you should treat the connection as being a secure one.
-
-\par
-The following function is an example on how to verify a certificate.
+A \tls{} session is not secure just after the handshake procedure has finished.
+It must be considered secure, only after the peer's certificate and identity have been
+verified. That is, you have to verify the signature in peer's 
+certificate, the hostname in the certificate, and expiration dates.
+Just after this step you should treat the connection as being a secure one.
+The following function is a simple example on how to verify a single certificate.
+Real world programs should be able to handle certificate chains as well.
 
 \input{ex-rfc2818}
 
@@ -46,41 +47,56 @@ to assist in this purpose.
 
 \subsection{Client with Resume capability example}
 \label{resume-example}
-This is a modification of the simple client above. Here we added support 
-for session resumption.
+This is a modification of the simple client example. Here we demonstrate
+the use of session resumption. The client tries to connect once using
+\tls{}, close the connection and then try to establish a new connection
+using the previously negotiated data.
 \input{ex-client-resume}
 
 \subsection{Simple client example with SRP authentication}
 The following client
-is a very simple SRP-TLS client which connects to a server 
-and authenticates using {\it username} and {\it password}.
-
+is a very simple SRP \tls{} client which connects to a server 
+and authenticates using a {\it username} and a {\it password}. The
+server may authenticate itself using a certificate, and in that case it
+has to be verified.
 \input{ex-client-srp}
 
 \section{Server examples}
 This section contains examples of \tls{} and \ssl{} servers, using \gnutls{}.
 
 \subsection{Echo Server with X.509 authentication}
-This example is a server which supports {\bf X.509} authentication.
+This example is a very simple echo server which supports {\bf X.509} authentication,
+using the RSA ciphersuites.
 \input{ex-serv1}
 
 \subsection{Echo Server with X.509 authentication II}
 The following example is a server which supports {\bf X.509} authentication.
-This server also supports export-grade cipher suites and session resuming.
+This server supports the export-grade cipher suites, the DHE ciphersuites
+and session resuming.
 \input{ex-serv-export}
 
 \subsection{Echo Server with OpenPGP\index{OpenPGP!Server} authentication}
-The following example is a server which supports {\bf OpenPGP} key authentication.
+The following example is an echo server which supports {\bf OpenPGP} key 
+authentication. You can easily combine this functionality --that is have
+a server that supports both X.509 and OpenPGP certificates-- but we
+separated them to keep these examples as simple as possible.
 \input{ex-serv-pgp}
+
+
+\subsection{Echo Server with SRP authentication}
+This is a server which supports {\bf SRP} authentication. It is also
+possible to combine this functionality with a certificate server. Here it
+is separate for simplicity.
+\input{ex-serv-srp}
+
+\section{Miscellaneous examples}
 
 \subsection{A callback which\index{OpenPGP!Key retrieval} retrieves OpenPGP keys}
 The following example is a callback function which retrieves {\bf OpenPGP} keys from
-a public key server.
+a public key server. This is useful when a client connected to an OpenPGP \tls{} server
+and sent its key fingerprint instead of the whole key. With this callback the \tls{}
+server can retrieve the key from a public key server.
 \input{ex-pgp-keyserver}
-
-\subsection{Echo Server with SRP authentication}
-This is a server which supports {\bf SRP} authentication.
-\input{ex-serv-srp}
 
 \subsection{Checking for an alert}
 This is a function that checks if an alert has been received

@@ -71,7 +71,7 @@ gnutls_dh_params dh_params;
  */
 gnutls_rsa_params rsa_params;
 
-static int generate_dh_params(void)
+int generate_dh_params(void)
 {
    /* Generate Diffie Hellman parameters - for use with DHE
     * kx algorithms. These should be discarded and regenerated

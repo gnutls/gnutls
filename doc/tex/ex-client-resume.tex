@@ -8,7 +8,7 @@
  */
 extern void check_alert(gnutls_session session, int ret);
 extern int tcp_connect( void);
-void tcp_close( int sd);
+extern void tcp_close( int sd);
 
 #define MAX_BUF 1024
 #define CRLFILE "crl.pem"
@@ -28,7 +28,7 @@ int main()
     */
    int t;
    char *session_data;
-   int session_data_size;
+   size_t session_data_size;
 
    gnutls_global_init();
 
