@@ -1,3 +1,18 @@
+2003-10-23 19:16  nmav <nmav@gnutls.org>
+
+	* NEWS, THANKS, configure.in, libgcrypt.m4, lib/Makefile.am,
+	lib/pkix.asn, lib/pkix_asn1_tab.c:
+
+	Added some support for writable gnutls_x509_crt structures. Not
+	ready yet.  
+
+2003-10-23 13:24  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_mem.h:
+
+	some alloca-related fixes. Patch by Philip Brown
+	<phil@bolthole.com>.  
+
 2003-10-17 07:02  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/gnutls_handshake.c (tags: gnutls_0_9_91):
