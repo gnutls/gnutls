@@ -63,7 +63,7 @@ GNUTLS_STATE initialize_state()
 
 void print_info(GNUTLS_STATE state)
 {
-   const SRP_SERVER_AUTH_INFO *srp_info;
+   SRP_SERVER_AUTH_INFO srp_info;
    const char *tmp;
    unsigned char sesid[32];
    int sesid_size, i;

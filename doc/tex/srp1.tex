@@ -10,7 +10,7 @@
 
 #define MAX_BUF 1024
 #define USERNAME "user"
-#define PASSWORD "password"
+#define PASSWORD "pass"
 #define SA struct sockaddr
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
@@ -107,7 +107,7 @@ int main()
    } else {
       if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
          printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
-      if (ret == GNUTLS_E_GOT_HELLO_REQUEST)
+      if (ret == GNUTLS_E_REHANDSHAKE)
          printf("* Received HelloRequest message (server asked to rehandshake)\n");
    }
 

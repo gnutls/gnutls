@@ -134,7 +134,7 @@ int main()
       } else {
          if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
             printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
-         if (ret == GNUTLS_E_GOT_HELLO_REQUEST)
+         if (ret == GNUTLS_E_REHANDSHAKE)
             printf("* Received HelloRequest message (server asked to rehandshake)\n");
       }
 
@@ -145,7 +145,7 @@ int main()
          }
          fputs("\n", stdout);
       }
-      gnutls_bye(sd, state, 0);
+      gnutls_bye(sd, state, GNUTLS_SHUT_RDWR);
 
     end:
 
