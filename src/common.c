@@ -9,6 +9,8 @@
 	PRINTX( "S:", X.state_or_province_name); \
 	PRINTX( "C:", X.country); \
 	PRINTX( "E:", X.email)
+#define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
+	PRINTX( "EMAIL:", X.email)
 
 void print_x509_info(GNUTLS_STATE state)
 {
@@ -74,7 +76,7 @@ void print_x509_info(GNUTLS_STATE state)
 void print_openpgp_info(GNUTLS_STATE state)
 {
 
-	gnutls_x509_dn dn;
+	gnutls_openpgp_name pgp_name;
 	char digest[20];
 	int digest_size = sizeof(digest), i;
 	char printable[120];
@@ -99,8 +101,8 @@ void print_openpgp_info(GNUTLS_STATE state)
 			       printable);
 
 			gnutls_openpgp_extract_certificate_dn(&cert_list
-							      [0], &dn);
-			PRINT_DN(dn);
+							      [0], &pgp_name);
+			PRINT_PGP_NAME(pgp_name);
 
 		}
 

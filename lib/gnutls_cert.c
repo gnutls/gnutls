@@ -325,9 +325,11 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	if (info->raw_certificate_list == NULL || info->ncerts == 0)
+	if (info->raw_certificate_list == NULL || info->ncerts == 0) {
+		gnutls_assert();
 		return GNUTLS_CERT_NONE;
-
+	}
+	
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
 	 */
@@ -369,9 +371,11 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(state);
-	if (info == NULL)
+	if (info == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
-
+	}
+	
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
 		return GNUTLS_CERT_NONE;
 
