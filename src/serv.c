@@ -179,11 +179,14 @@ void print_info(GNUTLS_STATE state)
 			printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
 
 			dn = gnutls_x509pki_client_get_peer_dn( x509_info);
-			PRINT_DN( dn);
+			if (dn!=NULL)
+				PRINT_DN( dn);
 
 			dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
-			printf(" - Certificate Issuer's info:\n");
-			PRINT_DN( dn);
+			if (dn!=NULL) {
+				printf(" - Certificate Issuer's info:\n");
+				PRINT_DN( dn);
+			}
 		}
 	}
 

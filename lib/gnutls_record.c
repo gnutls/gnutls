@@ -530,7 +530,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	uint8 *tmpdata;
 	int tmplen;
 	GNUTLS_Version version;
-	uint8 headers[RECORD_HEADER_SIZE];
+	uint8 *headers;
 	ContentType recv_type;
 	uint16 length;
 	uint8 *ciphertext;
@@ -568,7 +568,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
 	 * must be set to non blocking mode
 	 */
-	if ( (ret = _gnutls_read_buffered(cd, state, headers, RECORD_HEADER_SIZE, flags, -1)) != RECORD_HEADER_SIZE) {
+	if ( (ret = _gnutls_read_buffered(cd, state, &headers, header_size, flags, -1)) != header_size) {
 		if (ret==GNUTLS_E_AGAIN) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -647,12 +647,9 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	recv_data = gnutls_malloc(length+header_size);
-
 	/* check if we have that data into buffer. 
  	 */
-	if ( (ret = _gnutls_read_buffered(cd, state, recv_data, header_size+length, flags, recv_type)) != length+header_size) {
-		gnutls_free(recv_data);
+	if ( (ret = _gnutls_read_buffered(cd, state, &recv_data, header_size+length, flags, recv_type)) != length+header_size) {
 		if (ret==GNUTLS_E_AGAIN) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -671,7 +668,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 */
 	tmplen = _gnutls_decrypt( state, ciphertext, length, &tmpdata, recv_type);
 	if (tmplen < 0) {
-		switch (tmplen) {
+		switch (tmplen) { /* send appropriate alert */
 			case GNUTLS_E_MAC_FAILED:
 				gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_BAD_RECORD_MAC);
 				break;
@@ -685,7 +682,6 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();
-		gnutls_free(recv_data);
 		return tmplen;
 	}
 
@@ -695,8 +691,6 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 #ifdef RECORD_DEBUG
 		_gnutls_log( "Record: ChangeCipherSpec Packet was received\n");
 #endif
-
-		gnutls_free(recv_data);
 
 		if (tmplen!=sizeofdata) { /* sizeofdata should be 1 */
 			gnutls_assert();
@@ -721,8 +715,6 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		gnutls_assert();
 		return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
-
-	gnutls_free(recv_data);
 
 	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
 		gnutls_insertDataBuffer(type, state, (void *) tmpdata, tmplen);

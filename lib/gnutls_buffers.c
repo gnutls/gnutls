@@ -220,43 +220,53 @@ void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
 	state->gnutls_internals.recv_buffer_data_size = 0;
 }
                   	
-/* This function is like read. But it does not return -1 on error.
+/* This function is like recv(with MSG_PEEK). But it does not return -1 on error.
  * It does return gnutls_errno instead.
+ * This function reads data from the socket and keeps them in a buffer, of up to
+ * MAX_RECV_SIZE. 
  */
-ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, int flag, ContentType recv_type)
+ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, int flag, ContentType recv_type)
 {
 	ssize_t ret=0, ret2=0;
 	int min;
-	char *ptr = iptr;
+	char *buf;
 	int recvlowat = RCVLOWAT;
 
+	*iptr = NULL;
+
+	if ( sizeOfPtr > MAX_RECV_SIZE) {
+		gnutls_assert(); /* internal error */
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+	
 	/* leave peeked data to the kernel space only if application data
 	 * is received and we don't have any peeked data in there.
 	 */
 	if (recv_type != GNUTLS_APPLICATION_DATA && state->gnutls_internals.have_peeked_data==0)
 		recvlowat = 0;
 
+	buf = state->gnutls_internals.recv_buffer_data;
+
+	*iptr = buf;
+	
 	/* copy peeked data to given buffer
 	 */
 	min = GMIN( state->gnutls_internals.recv_buffer_data_size, sizeOfPtr);
 	if ( min > 0) {
-		memcpy( iptr, state->gnutls_internals.recv_buffer_data, min);	
 		if ( min == sizeOfPtr)
 			return min;
 	}
 
-	/* since we are going to read data, we must clear any peeked.
-	 */
-	_gnutls_clear_peeked_data( fd, state);
+	sizeOfPtr -= min;
 	
 	/* read fresh data - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
-	if ( sizeOfPtr - min - recvlowat > 0)
-		ret = _gnutls_Read( fd, &ptr[min], sizeOfPtr - min - recvlowat, flag);
-		if (ret >= 0 && recvlowat > 0) {
-			ret2 = _gnutls_Read( fd, &ptr[min+ret], recvlowat, MSG_PEEK|flag);
-			state->gnutls_internals.have_peeked_data = 1;
-		}
+	if ( sizeOfPtr - recvlowat > 0)
+		ret = _gnutls_Read( fd, &buf[min], sizeOfPtr - recvlowat, flag);
+	if (ret >= 0 && recvlowat > 0) {
+		ret2 = _gnutls_Read( fd, &buf[min+ret], recvlowat, MSG_PEEK|flag);
+		state->gnutls_internals.have_peeked_data = 1;
+	}
 
 	if (ret < 0 || ret2 < 0)
 		return GMIN(ret, ret2);
@@ -271,11 +281,6 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, void *iptr, size_t si
 	
 	/* copy fresh data to our buffer.
 	 */
-	if ( ret+state->gnutls_internals.recv_buffer_data_size > sizeof( state->gnutls_internals.recv_buffer_data)) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	memcpy( &state->gnutls_internals.recv_buffer_data[state->gnutls_internals.recv_buffer_data_size], &ptr[min], ret);
 	state->gnutls_internals.recv_buffer_data_size += ret;
 
 	return ret+min;

@@ -74,7 +74,8 @@ int gnutls_anon_client_get_dh_bits(  ANON_CLIENT_AUTH_INFO info) {
   * @info: is an X509PKI_CLIENT_AUTH_INFO structure
   *
   * This function will return the name of the peer. The name is gnutls_DN structure and 
-  * is a obtained by the peer's certificate.
+  * is a obtained by the peer's certificate. If the certificate send by the
+  * peer is invalid, or in any other failure this function returns NULL.
   *
   **/
 const gnutls_DN* gnutls_x509pki_client_get_peer_dn(  X509PKI_CLIENT_AUTH_INFO info) {
@@ -87,7 +88,8 @@ const gnutls_DN* gnutls_x509pki_client_get_peer_dn(  X509PKI_CLIENT_AUTH_INFO in
   * @info: is an X509PKI_CLIENT_AUTH_INFO structure
   *
   * This function will return the name of the peer's certificate issuer. The name is gnutls_DN structure and 
-  * is a obtained by the peer's certificate.
+  * is a obtained by the peer's certificate. If the certificate send by the
+  * peer is invalid, or in any other failure this function returns NULL.
   *
   **/
 const gnutls_DN* gnutls_x509pki_client_get_issuer_dn(  X509PKI_CLIENT_AUTH_INFO info) {
@@ -114,7 +116,7 @@ CertificateStatus gnutls_x509pki_client_get_peer_certificate_status(  X509PKI_CL
   * @info: is an X509PKI_CLIENT_AUTH_INFO structure
   *
   * This function will return the peer's certificate version (1, 2, 3). This is obtained by the X509 Certificate
-  * Version field.
+  * Version field. If the certificate is invalid then version will be zero.
   *
   **/
 int gnutls_x509pki_client_get_peer_certificate_version(  X509PKI_CLIENT_AUTH_INFO info) {
