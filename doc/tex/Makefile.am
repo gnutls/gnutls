@@ -7,7 +7,7 @@ EXTRA_DIST = gnutls.tex gnutls.ps \
 EXAMPLE_OBJECTS = ex-alert.tex ex-client-srp.tex ex-serv-export.tex \
 	ex-client2.tex ex-x509-info.tex ex-rfc2818.tex \
 	ex-serv1.tex ex-client-resume.tex ex-serv-srp.tex \
-	ex-serv-pgp.tex ex-cert-select.tex \
+	ex-serv-pgp.tex ex-cert-select.tex cert_auth.tex \
 	ex-crq.tex ex-session-info.tex ex-pkcs12.tex
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex ../../lib/x509/x509-api.tex \

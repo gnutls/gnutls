@@ -27,8 +27,7 @@ about the client, and popular methods like the host advertising in
 HTTP do not work\footnote{see also the Server Name Indication extension on \ref{serverind}, page \pageref{serverind}.}. 
 There is no way for the client to say ``I connected
 to YYY server'' before the Handshake starts, so the server cannot
-possibly know which certificate to use\footnote{There is some effort to solve
-this problem within \tls{}}.
+possibly know which certificate to use.
 
 \par
 Other than that it requires two separate ports to run a single service, which is 
@@ -123,7 +122,7 @@ CLIENT: BYE
 \par
 This method, if implemented properly, is far better than the
 traditional method, and the security properties remain the same, since only
-denial of service is possible. The benefit is the server may request
+denial of service is possible. The benefit is that the server may request
 additional data before the \tls{} Handshake protocol
 starts, in order to send the correct certificate, use the correct
 password file\footnote{in SRP authentication}, or anything else!
