@@ -282,46 +282,6 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
 }
 
 /**
-  * gnutls_x509_crl_get_signed_data - This function returns the CRL's signed portion
-  * @crl: should contain a gnutls_x509_crl structure
-  * @data: a datum which points to the signed data
-  *
-  * This function will return a datum that points on the CRL signed portion.
-  * The output on data should be treated as constant and must not be freed.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int gnutls_x509_crl_get_signed_data(gnutls_x509_crl crl,
-				    gnutls_const_datum * data)
-{
-	data->data = crl->signed_data.data;
-	data->size = crl->signed_data.size;
-
-	return 0;
-}
-
-/**
-  * gnutls_x509_crl_get_signature - This function returns the CRL's signature data
-  * @crl: should contain a gnutls_x509_crl structure
-  * @data: a datum which points to the signed data
-  *
-  * This function will return a datum that points on the CRL signature portion.
-  * The output on data should be treated as constant and must not be freed.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int gnutls_x509_crl_get_signature(gnutls_x509_crl crl,
-				  gnutls_const_datum * data)
-{
-	data->data = crl->signature.data;
-	data->size = crl->signature.size;
-
-	return 0;
-}
-
-/**
   * gnutls_x509_crl_get_signature_algorithm - This function returns the CRL's signature algorithm
   * @crl: should contain a gnutls_x509_crl structure
   *

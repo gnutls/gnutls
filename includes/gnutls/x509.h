@@ -62,8 +62,6 @@ int gnutls_x509_crt_get_dn(gnutls_x509_crt cert, char *buf,
 int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, 
 	const char* oid, int indx, char *buf, int *sizeof_buf);
 
-int gnutls_x509_crt_get_signed_data(gnutls_x509_crt cert, gnutls_const_datum *data);
-int gnutls_x509_crt_get_signature(gnutls_x509_crt cert, gnutls_const_datum *data);
 int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
 
@@ -123,10 +121,6 @@ int gnutls_x509_crl_get_issuer_dn(const gnutls_x509_crl crl,
 int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl, 
 	const char* oid, int indx, char *buf, int *sizeof_buf);
 
-
-int gnutls_x509_crl_get_signed_data(gnutls_x509_crl crl, gnutls_const_datum *data);
-
-int gnutls_x509_crl_get_signature(gnutls_x509_crl crl, gnutls_const_datum *data);
 int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_version(gnutls_x509_crl crl);
 

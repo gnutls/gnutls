@@ -136,12 +136,12 @@ typedef struct {
 	opaque * data;
 	unsigned int size;
 } gnutls_datum;
-typedef gnutls_datum gnutls_sdatum;
 
 typedef struct {
 	const opaque * data;
 	unsigned int size;
 } gnutls_const_datum;
+typedef gnutls_datum gnutls_sdatum;
 
 #include <gnutls_buffer.h>
 

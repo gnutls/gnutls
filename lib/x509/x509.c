@@ -339,44 +339,6 @@ int gnutls_x509_crt_get_dn_by_oid(gnutls_x509_crt cert, const char* oid,
 }
 
 /**
-  * gnutls_x509_crt_get_signed_data - This function returns the Certificate's signed portion
-  * @cert: should contain a gnutls_x509_crt structure
-  * @data: a datum which points to the signed data
-  *
-  * This function will return a datum that points on the Certificate signed portion.
-  * The output on data should be treated as constant and must not be freed.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int gnutls_x509_crt_get_signed_data(gnutls_x509_crt cert, gnutls_const_datum *data)
-{
-	data->data = cert->signed_data.data;
-	data->size = cert->signed_data.size;
-
-	return 0;
-}
-
-/**
-  * gnutls_x509_crt_get_signature - This function returns the Certificate's signature data
-  * @cert: should contain a gnutls_x509_crt structure
-  * @data: a datum which points to the signed data
-  *
-  * This function will return a datum that points on the Certificate signature portion.
-  * The output on data should be treated as constant and must not be freed.
-  *
-  * Returns 0 on success.
-  *
-  **/
-int gnutls_x509_crt_get_signature(gnutls_x509_crt cert, gnutls_const_datum *data)
-{
-	data->data = cert->signature.data;
-	data->size = cert->signature.size;
-
-	return 0;
-}
-
-/**
   * gnutls_x509_crt_get_signature_algorithm - This function returns the Certificate's signature algorithm
   * @cert: should contain a gnutls_x509_crt structure
   *
