@@ -10,16 +10,16 @@ Certification Authorities (CAs) are used to certify entities.
 Usually more than one certification authorities exist, and certification
 authorities may certify other authorities to issue certificates as well,
 following a hierarchical model. 
-One needs to trust one or more CAs for his secure
-communications. In that case only the certificates issued by the trusted
-authorities are acceptable. See figure \ref{fig:x509-1} for a typical example.
 
 \begin{figure}[hbtp]
-\includegraphics[height=9.5cm,width=9cm]{x509-1}
+\caption{X.509 certification}
+\includegraphics[height=9.5cm,width=7cm]{x509-1}
 \label{fig:x509-1}
 \end{figure}
 
-
+One needs to trust one or more CAs for his secure
+communications. In that case only the certificates issued by the trusted
+authorities are acceptable. See figure \ref{fig:x509-1} for a typical example.
 The API for handling X.509 certificates is described at section \ref{sec:x509api}
 on page \pageref{sec:x509api}. Some examples are listed below.
 
@@ -28,22 +28,60 @@ on page \pageref{sec:x509api}. Some examples are listed below.
 \subsection{X.509 certificates}
 An X.509 certificate usually contains information about the certificate
 holder, the signer, a unique serial number, expiration dates and several other 
-fields\cite{RFC3280}. Several functions exist to generate and handle X.509
-certificates, all listed in \emph{gnutls/x509.h}. Some of them are:
-\begin{itemize}
-\item \printfunc{gnutls_x509_crt_init}{gnutls\_x509\_crt\_init}
-\item \printfunc{gnutls_x509_crt_import}{gnutls\_x509\_crt\_import}
-\item \printfunc{gnutls_x509_crt_get_dn}{gnutls\_x509\_crt\_get\_dn}
-\item \printfunc{gnutls_x509_crt_get_serial}{gnutls\_x509\_crt\_get\_serial}
-\item \printfunc{gnutls_x509_crt_get_subject_alt_name}{gnutls\_x509\_crt\_get\_subject\_alt\_name}
-\end{itemize}
+fields \cite{RFC3280} as shown in figure \ref{fig:x509}. Several functions exist to assist
+generating and handling X.509 certificates, all listed in \emph{gnutls/x509.h}. 
 
-\par
-To demonstrate the X.509 parsing capabilities an example program is listed below.
-That program reads the peer's certificate, and prints information about it.
+\begin{figure}[hbtp]
+\caption{A typical X.509 certificate}
+\label{fig:x509}
+\begin{tabular}{|l||l|}
+\hline
+version & the field that indicates the version of the certificate.
+\\
+\hline
+serialNumber & this field holds a unique serial number per certificate.
+\\
+\hline
+issuer & holds the issuer's distinguished name
+\\
+\hline
+validity & the activation and expiration dates.
+\\
+\hline
+subject & the subject's distinguished name of the certificate.
+\\
+\hline
+\rowcolor[gray]{0.9}
+extensions & The extensions are fields only present in version 3 certificates.
+\\
+\hline
+\end{tabular}
+\end{figure}
 
-\input{ex-x509-info}
+\begin{figure}[hbtp]
+\caption{Typical extensions of an X.509 certificate}
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+subject key ID & 2.5.29.14 & A unique ID of the subject's key.
+\\
+\hline
+key usage & 2.5.29.15 & Constraints the key's usage of the certificate.
+\\
+\hline
+subject alternative name & 2.5.29.17 & Alternative names to subject's distinguished name.
+\\
+\hline
+basic constraints & 2.5.29.19 & Indicates whether this is a CA certificate or not.
+\\
+\hline
+CRL distribution points & 2.5.29.31 & This extension is set by the CA, in order to inform about the issued CRLs.
+\\
+\hline
+\end{tabular}
+\end{figure}
 
+An example program to demonstrate the X.509 parsing capabilities can be found at section
+\ref{ex:x509-info} on page \pageref{ex:x509-info}.
 
 \subsection{Verifying X.509 certificate paths}
 Verifying certificate\index{Verifying certificate paths} paths is important 
@@ -56,7 +94,7 @@ The function \printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_ve
 is equivalent to the previous one, and will verify the peer's certificate in a TLS session.
 
 \begin{figure}[hbtp]
-\begin{tabular}{|l|p{9cm}|}
+\begin{tabular}{|l|p{7cm}|}
 
 \hline
 CERT\_INVALID & The certificate is not signed by one of the known authorities, or
@@ -90,12 +128,9 @@ It usually contains a private key, a distinguished name and secondary
 data such as a challenge password. \gnutls{} supports the requests
 defined in PKCS \#10. Other certificate request's format such as
 PKIX's RFC2511 are not currently supported.
-\par
-The following example is about generating a certificate request, and
-a private key. A certificate request can be later be processed by a CA,
-which should return a signed certificate.
 
-\input{ex-crq}
+An example of a certificate request generation can be found at section \ref{ex:crq}
+on page \pageref{ex:crq}.
 
 \subsection{PKCS \#12 structures\index{PKCS \#12}}
 A PKCS \#12 structure usually contains a user's private keys and
@@ -108,11 +143,9 @@ may hold several \emph{gnutls\_pkcs12\_bag} types. The Bag types are the
 holders of the actual data, which may be certificates, private
 keys or encrypted data. An Bag of type encrypted should be decrypted
 in order for its data to be accessed. 
-\par
-The following example is about generating a PKCS \#12 structure.
 
-\input{ex-pkcs12}
-
+An example of a PKCS \#12 structure generation can be found at section \ref{ex:pkcs12}
+on page \pageref{ex:pkcs12}.
 
 \section{The OpenPGP\index{OpenPGP!Keys} trust model}
 \label{pgp:trust}
@@ -165,7 +198,7 @@ The latter function checks a GnuPG trust database for the given key. This functi
 check the key signatures, only checks for disabled and revoked keys.
 
 \begin{figure}[hbtp]
-\begin{tabular}{|l|p{9cm}|}
+\begin{tabular}{|l|p{7cm}|}
 
 \hline
 CERT\_INVALID & A signature on the key is invalid. That means that the key was modified
