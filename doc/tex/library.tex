@@ -9,10 +9,8 @@ eavesdropping, tampering, or message forgery.
 
 \par
 Technically \gnutls{} is a library which implements the \tlsI{} and 
-\sslIII{} protocols.
-\tls{} stands for 'Transport Layer Security' and is the sucessor of \ssl{}, 
+\sslIII{} protocols. \tls{} stands for 'Transport Layer Security' and is the sucessor of \ssl{}, 
 the Secure Sockets Layer protocol designed by Netscape. 
-
 \tlsI{}\footnote{described in {\it RFC 2246}} is an Internet protocol,
 defined by {IETF}\footnote{IETF or Internet Engineering Task Force 
 is a large open international community of network
@@ -29,6 +27,12 @@ See \htmladdnormallink{http://www.gnutls.org/}{http://www.gnutls.org/}
 and \htmladdnormallink{http://www.gnu.org/software/gnutls/}{http://www.gnu.org/software/gnutls/} 
 for updated versions of the \gnutls{} software and this document.
 
+\par Note that \gnutls{} does not provide direct access to crypto algorithms.
+\gnutls{} is based on the 
+libgcrypt\htmladdnormallink{\footnote{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}}{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}
+crypto library, and this library should be used for direct access to crypto
+algorithms.
+
 \section{Current state}
 
 Currently \gnutls{} implements:
@@ -38,6 +42,7 @@ Currently \gnutls{} implements:
 \item {\bf OpenPGP} Public Key Infrastructure.
 \item {\bf SRP} for \tls{} authentication.
 \item \tls{} {\bf Extension mechanism}.
+\item \tls{} {\bf Compression}.
 \end{itemize}
 
 
@@ -67,7 +72,7 @@ such as certificate authentication\footnote{see section \ref{certificate} on \pa
 This structure should be initialized using the appropriate initialization
 functions. For example an application which uses certificate authentication
 would probably call: 
-\printfunc{gnutls_certificate_allocate_credentials}{gnutls\_credentials\_allocate\_credentials},
+\printfunc{gnutls_certificate_allocate_credentials}{gnutls\_certificate\_allocate\_credentials},
 \printfunc{gnutls_certificate_set_x509_trust_file}{gnutls\_certificate\_set\_x509\_trust\_file}
 and
 \printfunc{gnutls_credentials_set}{gnutls\_credentials\_set},
