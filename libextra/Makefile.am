@@ -25,8 +25,7 @@ libgnutls_openssl_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_A
 
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = \
-	../lib/libgnutls.la
+libgnutls_openssl_la_LIBADD = ../lib/libgnutls.la ../crypto/libgc.la
 else
 lib_LTLIBRARIES = libgnutls-extra.la
 endif
