@@ -319,7 +319,7 @@ void gnutls_certificate_server_set_select_function(gnutls_session session,
 
 /**
   * gnutls_certificate_client_set_retrieve_function - Used to set a callback to retrieve the certificate
-  * @session: is a &gnutls_session structure.
+  * @cred: is a &gnutls_certificate_credentials structure.
   * @func: is the callback function
   *
   * This function sets a callback to be called in order to retrieve the certificate
@@ -348,15 +348,15 @@ void gnutls_certificate_server_set_select_function(gnutls_session session,
   * return 0 on success.  The value (-1) indicates error and the handshake
   * will be terminated.
   **/
-void gnutls_certificate_client_set_retrieve_function(gnutls_session session,
+void gnutls_certificate_client_set_retrieve_function(gnutls_certificate_credentials cred,
 			gnutls_certificate_client_retrieve_function * func)
 {
-	session->internals.client_get_cert_callback = func;
+	cred->client_get_cert_callback = func;
 }
 
 /**
   * gnutls_certificate_server_set_retrieve_function - Used to set a callback to retrieve the certificate
-  * @session: is a &gnutls_session structure.
+  * @cred: is a &gnutls_certificate_credentials structure.
   * @func: is the callback function
   *
   * This function sets a callback to be called in order to retrieve the certificate
@@ -379,10 +379,10 @@ void gnutls_certificate_client_set_retrieve_function(gnutls_session session,
   * return 0 on success.  The value (-1) indicates error and the handshake
   * will be terminated.
   **/
-void gnutls_certificate_server_set_retrieve_function(gnutls_session session,
+void gnutls_certificate_server_set_retrieve_function(gnutls_certificate_credentials cred,
 			gnutls_certificate_server_retrieve_function * func)
 {
-	session->internals.server_get_cert_callback = func;
+	cred->server_get_cert_callback = func;
 }
 
 

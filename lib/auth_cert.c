@@ -412,15 +412,23 @@ retr_st st;
 int ret;
 gnutls_certificate_type type =
     gnutls_certificate_type_get(session);
+const gnutls_certificate_credentials cred;
+
+	cred =
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+	}
 
 	memset( &st, 0, sizeof(st));
 
 	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		ret =
-		    session->internals.server_get_cert_callback(session, &st);
+		    cred->server_get_cert_callback(session, &st);
 	} else { /* CLIENT */
 		ret =
-		    session->internals.client_get_cert_callback(session,
+		    cred->client_get_cert_callback(session,
 		    		issuers_dn, issuers_dn_length,
 				&st);
 	}
@@ -454,7 +462,7 @@ gnutls_certificate_type type =
 
 	}
 
-	_gnutls_selected_certs_set(session, local_certs, st.ncerts,
+	_gnutls_selected_certs_set(session, local_certs, (local_certs!=NULL)?st.ncerts:0,
 				   local_key, 1);
 
 	ret = 0;
@@ -462,7 +470,7 @@ gnutls_certificate_type type =
 cleanup:
 
 	if (st.type == GNUTLS_CRT_X509) {
-		if (st.deinit_all_keys) {
+		if (st.deinit_all) {
 			for (i = 0; i < st.ncerts; i++) {
 				gnutls_x509_crt_deinit(st.cert.x509[i]);
 			}
@@ -470,7 +478,7 @@ cleanup:
 			gnutls_x509_privkey_deinit(st.key.x509);
 		}
 	} else {
-		if (st.deinit_all_keys) {
+		if (st.deinit_all) {
 			if (_E_gnutls_openpgp_key_deinit == NULL ||
 				_E_gnutls_openpgp_privkey_deinit == NULL) {
 				gnutls_assert();
@@ -512,7 +520,7 @@ static int _select_client_cert(gnutls_session session,
 		return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 	}
 
-	if (session->internals.client_get_cert_callback != NULL ||
+	if (cred->client_get_cert_callback != NULL ||
 		session->internals.client_cert_callback != NULL) {
 
 		/* use a callback to get certificate 
@@ -537,7 +545,7 @@ static int _select_client_cert(gnutls_session session,
 			}
 		}
 
-		if (session->internals.client_get_cert_callback) {
+		if (cred->client_get_cert_callback) {
 			result = call_get_cert_callback( session, issuers_dn, issuers_dn_length);
 			goto cleanup;
 		}
@@ -1610,7 +1618,7 @@ int _gnutls_server_select_cert(gnutls_session session,
 	/* If the callback which retrieves certificate has been
 	 * set use it.
 	 */
-	if (session->internals.server_get_cert_callback != NULL) {
+	if (cred->server_get_cert_callback != NULL) {
 
 		return call_get_cert_callback( session, NULL, 0);
 

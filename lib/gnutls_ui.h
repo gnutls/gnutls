@@ -43,12 +43,12 @@ typedef struct gnutls_retr_st {
 		gnutls_openpgp_privkey pgp;
 	} key;
 
-	uint deinit_all_keys;	/* if non zero all keys will be deinited */
+	uint deinit_all;	/* if non zero all keys will be deinited */
 } gnutls_retr_st;
 
 typedef int gnutls_certificate_client_retrieve_function(gnutls_session,
 							const gnutls_datum
-							* req_ca_cert,
+							* req_ca_rdn,
 							int nreqs,
 							gnutls_retr_st *);
 typedef int gnutls_certificate_server_retrieve_function(gnutls_session,
@@ -72,8 +72,6 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session session);
 
 /* X509PKI */
 
-#include <gnutls/compat8.h>
-
 void gnutls_certificate_client_set_select_function(gnutls_session,
 						   gnutls_certificate_client_select_function
 						   *);
@@ -81,10 +79,12 @@ void gnutls_certificate_server_set_select_function(gnutls_session,
 						   gnutls_certificate_server_select_function
 						   *);
 
-void gnutls_certificate_client_set_retrieve_function(gnutls_session,
+/* These are set on the credentials structure.
+ */
+void gnutls_certificate_client_set_retrieve_function(gnutls_certificate_client_credentials,
 						     gnutls_certificate_client_retrieve_function
 						     *);
-void gnutls_certificate_server_set_retrieve_function(gnutls_session,
+void gnutls_certificate_server_set_retrieve_function(gnutls_certificate_server_credentials,
 						     gnutls_certificate_server_retrieve_function
 						     *);
 

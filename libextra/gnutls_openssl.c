@@ -19,6 +19,7 @@
 #include <config.h>
 
 #include <gnutls/gnutls.h>
+#include <gnutls/compat8.h>
 #include <gcrypt.h>
 #include <stdio.h>
 #include <stdlib.h>

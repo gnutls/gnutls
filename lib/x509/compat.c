@@ -30,6 +30,7 @@
 #include <dn.h>
 #include <libtasn1.h>
 #include <gnutls/x509.h>
+#include <gnutls/compat8.h>
 
 /**
   * gnutls_x509_extract_dn - This function parses an RDN sequence

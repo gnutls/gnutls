@@ -420,33 +420,6 @@ typedef int certificate_server_select_func(struct gnutls_session_int*,
 typedef int srp_server_select_func(struct gnutls_session_int*, 
 	const char**, const char**, unsigned int);
 
-/* authentication function definitions:
- */
-#include "../libextra/openpgp/openpgp.h"
-
-typedef struct retr_st {
-	gnutls_certificate_type type;
-	union cert {
-		gnutls_x509_crt* x509;
-		gnutls_openpgp_key pgp;
-	} cert;
-	uint ncerts;
-
-	union key {
-		gnutls_x509_privkey x509;
-		gnutls_openpgp_privkey pgp;
-	} key;
-	
-	uint deinit_all_keys;
-} retr_st;
-
-typedef int gnutls_certificate_client_retrieve_function(
-   struct gnutls_session_int*, const gnutls_datum* req_ca_cert, int nreqs,
-   retr_st*);
-
-typedef int gnutls_certificate_server_retrieve_function(
-   struct gnutls_session_int*, retr_st*);
-
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
 	/* this holds the number of bytes in the handshake_header[] */
@@ -565,9 +538,6 @@ typedef struct {
 	 */
 	certificate_client_select_func*	client_cert_callback;
 	certificate_server_select_func*	server_cert_callback;
-
-	gnutls_certificate_client_retrieve_function*	client_get_cert_callback;
-	gnutls_certificate_server_retrieve_function*	server_get_cert_callback;
 
 	/* Callback to select the proper password file
 	 */
