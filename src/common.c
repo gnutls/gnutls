@@ -399,7 +399,7 @@ int print_info(gnutls_session session, const char* hostname)
 		{
 			char dns[256];
 			size_t dns_size = sizeof(dns);
-			gnutls_server_name_type type;
+			unsigned int type;
 
 			/* This fails in client side */
 			if (gnutls_server_name_get

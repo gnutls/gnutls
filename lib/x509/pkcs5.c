@@ -1,5 +1,5 @@
 /* pkcs5.c	Implementation of Password-Based Cryptography as per PKCS#5
- * Copyright (C) 2002  Simon Josefsson
+ * Copyright (C) 2002,2003 Simon Josefsson
  *
  * This file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

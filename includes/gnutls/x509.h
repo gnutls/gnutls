@@ -20,7 +20,7 @@
  */
 
 /* This file contains the types and prototypes for the X.509
- * certificate and CRL parsing functions.
+ * certificate and CRL handling functions.
  */
 
 #ifndef GNUTLS_X509_H
@@ -237,8 +237,8 @@ int gnutls_x509_crl_verify( gnutls_x509_crl crl,
 	unsigned int flags, unsigned int *verify);
 
 int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
-					     gnutls_x509_crl * crl_list,
-					     int crl_list_length);
+	gnutls_x509_crl * crl_list,
+	int crl_list_length);
 
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
 	gnutls_digest_algorithm algo, void *buf,
