@@ -325,7 +325,7 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 	size_t min;
 	int buf_pos;
 	char *buf;
-	int recvlowat = RCVLOWAT;
+	int recvlowat;
 	int recvdata, alloc_size;
 
 	*iptr = session->internals.record_recv_buffer.data;
@@ -335,13 +335,22 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
-	/* leave peeked data to the kernel space only if application data
-	 * is received and we don't have any peeked 
-	 * data in gnutls session.
+	/* If an external pull function is used, then do not leave
+	 * any data into the kernel buffer.
 	 */
-	if ( recv_type != GNUTLS_APPLICATION_DATA
-		&& session->internals.have_peeked_data==0)
+	if (session->internals._gnutls_pull_func != NULL) {
 		recvlowat = 0;
+	} else {
+		/* leave peeked data to the kernel space only if application data
+		 * is received and we don't have any peeked 
+		 * data in gnutls session.
+		 */
+		if ( recv_type != GNUTLS_APPLICATION_DATA
+			&& session->internals.have_peeked_data==0)
+			recvlowat = 0;
+		else recvlowat = RCVLOWAT;
+	}
+	
 
 	
 	/* calculate the actual size, ie. get the minimum of the

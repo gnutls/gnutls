@@ -1,3 +1,8 @@
+Version 0.8.8
+- Corrected a bug in the record layer buffering, which affected
+  the case where external pull function was used. Report and patch
+  by Sergey Poznyakoff <gray@Mirddin.farlep.net>.
+
 Version 0.8.7 (12/05/2003)
 - Some corrections in the Makefiles, to prevent some build errors
   in solaris.
