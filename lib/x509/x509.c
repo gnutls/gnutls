@@ -1954,7 +1954,7 @@ int gnutls_x509_crt_list_import(gnutls_x509_crt_t *certs, unsigned int* cert_max
 
     do {
         if (count >= *cert_max) {
-            if (!(flags & GNUTLS_X509_CRT_IMPORT_LIST_FAIL_IF_EXCEED))
+            if (!(flags & GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED))
                 break;
             else
                 nocopy = 1;
