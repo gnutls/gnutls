@@ -147,7 +147,7 @@ int _gnutls_gen_srp_server_hello(gnutls_session state, opaque * data, size_t _da
 
 	ret = pwd_entry->g.size + pwd_entry->n.size + 
 		pwd_entry->salt.size + 5;
-	_gnutls_srp_clear_pwd_entry( pwd_entry);
+	_gnutls_srp_entry_free( pwd_entry);
 
 	return ret;
 }

@@ -32,7 +32,6 @@
 #include "debug.h"
 
 
-
 /* Here functions for SRP (like g^x mod n) are defined 
  */
 
@@ -515,7 +514,7 @@ void gnutls_srp_server_set_select_function(gnutls_session session,
   * 'username' contains the actual username.
   *
   * The 'salt', 'verifier', 'generator' and 'prime' must be filled
-  * in.
+  * in (using malloc).
   *
   * In case the callback returned a negative number then gnutls will
   * assume that the username does not exist.

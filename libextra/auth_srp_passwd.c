@@ -109,6 +109,7 @@ int indx;
 	entry->username = gnutls_strdup(str);
 	if (entry->username==NULL) {
 		_gnutls_free_datum( &entry->salt);
+		_gnutls_free_datum( &entry->v);
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -232,7 +233,7 @@ SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	if (cred==NULL) {
 		*err = 1;
 		gnutls_assert();
-		gnutls_free(entry);
+		_gnutls_srp_entry_free(entry);
 		return NULL;
 	}
 
@@ -242,10 +243,11 @@ SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	if (cred->pwd_callback != NULL) {
 		ret = cred->pwd_callback( state, username, &entry->salt,
 			&entry->v, &entry->g, &entry->n);
+		entry->malloced = 1;
 		
 		if (ret < 0) {
 			gnutls_assert();
-			gnutls_free(entry);
+			_gnutls_srp_entry_free(entry);
 			return NULL;
 		}
 		
@@ -273,7 +275,7 @@ SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	if (fd==NULL) {
 		*err = 1; /* failed due to critical error */
 		gnutls_assert();
-		gnutls_free(entry);
+		_gnutls_srp_entry_free(entry);
 		return NULL;
 	}
 
@@ -289,11 +291,11 @@ SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 				if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, index)==0) {
 					return entry;
 				} else {
-					gnutls_free(entry);
+					_gnutls_srp_entry_free(entry);
 					return NULL;
 				}
 			else {
-				gnutls_free(entry);
+				_gnutls_srp_entry_free(entry);
 				return NULL;
 			}
 	    }
@@ -315,14 +317,14 @@ SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	ret = _gnutls_get_rnd_srp_params( &pwd_entry->g, &pwd_entry->n, 1024);
 	if (ret < 0) {
 		gnutls_assert();
-		_gnutls_srp_clear_pwd_entry( pwd_entry);
+		_gnutls_srp_entry_free( pwd_entry);
 		return NULL;
 	}
 	
 	pwd_entry->username = gnutls_malloc(strlen(RNDUSER)+1);
 	if (pwd_entry->username == NULL) {
 		gnutls_assert();
-		_gnutls_srp_clear_pwd_entry( pwd_entry);
+		_gnutls_srp_entry_free( pwd_entry);
 		return NULL;
 	}
 	_gnutls_str_cpy( pwd_entry->username, MAX_SRP_USERNAME, RNDUSER); /* Flawfinder: ignore */
@@ -331,7 +333,7 @@ SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	pwd_entry->v.size = 20;
 	if (pwd_entry->v.data==NULL) {
 		gnutls_assert();
-		_gnutls_srp_clear_pwd_entry( pwd_entry);
+		_gnutls_srp_entry_free( pwd_entry);
 		return NULL;
 	}
 
@@ -342,13 +344,13 @@ SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 	pwd_entry->salt.data = gnutls_malloc(RND_SALT_SIZE);
 	if (pwd_entry->salt.data==NULL) {
 		gnutls_assert();
-		_gnutls_srp_clear_pwd_entry( pwd_entry);
+		_gnutls_srp_entry_free( pwd_entry);
 		return NULL;
 	}
 	
 	if (_gnutls_get_random(pwd_entry->salt.data, RND_SALT_SIZE, GNUTLS_WEAK_RANDOM) < 0) {
 		gnutls_assert();
-		_gnutls_srp_clear_pwd_entry( pwd_entry);
+		_gnutls_srp_entry_free( pwd_entry);
 		return NULL;
 	}
 	
@@ -356,11 +358,18 @@ SRP_PWD_ENTRY* _gnutls_randomize_pwd_entry() {
 
 }
 
-void _gnutls_srp_clear_pwd_entry( SRP_PWD_ENTRY * entry) {
-	_gnutls_free_datum(&entry->v);
-	_gnutls_free_datum(&entry->g);
-	_gnutls_free_datum(&entry->n);
-	_gnutls_free_datum(&entry->salt);
+void _gnutls_srp_entry_free( SRP_PWD_ENTRY * entry) {
+	if (entry->malloced) {
+		free( entry->v.data); entry->v.data = NULL;
+		free( entry->g.data); entry->g.data = NULL;
+		free( entry->n.data); entry->n.data = NULL;
+		free( entry->salt.data); entry->salt.data = NULL;
+	} else {
+		_gnutls_free_datum(&entry->v);
+		_gnutls_free_datum(&entry->g);
+		_gnutls_free_datum(&entry->n);
+		_gnutls_free_datum(&entry->salt);
+	}
 
 	gnutls_free(entry->username);
 	gnutls_free(entry);
