@@ -880,8 +880,9 @@ void *gnutls_session_get_ptr(gnutls_session_t session)
   * @session: is a &gnutls_session_t structure.
   * @ptr: is the user pointer
   *
-  * This function will set (assosiate) the user given pointer to the session structure.
-  * This is pointer can be accessed with gnutls_session_get_ptr().
+  * This function will set (associate) the user given pointer to the
+  * session structure.  This is pointer can be accessed with
+  * gnutls_session_get_ptr().
   *
   **/
 void gnutls_session_set_ptr(gnutls_session_t session, void *ptr)
