@@ -243,9 +243,11 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	}
 	
 	/* leave peeked data to the kernel space only if application data
-	 * is received and we don't have any peeked data in gnutls state.
+	 * (NEW: or handshake data) is received and we don't have any peeked 
+	 * data in gnutls state.
 	 */
-	if (recv_type != GNUTLS_APPLICATION_DATA && state->gnutls_internals.have_peeked_data==0)
+	if ( (recv_type != GNUTLS_APPLICATION_DATA && recv_type != GNUTLS_HANDSHAKE)
+		&& state->gnutls_internals.have_peeked_data==0)
 		recvlowat = 0;
 
 	buf = state->gnutls_internals.recv_buffer_data;
