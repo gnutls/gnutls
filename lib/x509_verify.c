@@ -190,6 +190,8 @@ void _gnutls_int2str(int k, char* data);
 /* This function checks if 'certs' issuer is 'issuer_cert'.
  * This does a straight (DER) compare of the issuer/subject fields in
  * the given certificates.
+ *
+ * FIXME: use a real DN comparison algorithm.
  */
 static
 int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)

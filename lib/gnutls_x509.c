@@ -1806,8 +1806,7 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 
 
 #ifdef DEBUG
-/* Reads a base64 encoded CA list from memory 
- * This is to be called once.
+/* Verifies a base64 encoded certificate list from memory 
  */
 int _gnutls_verify_x509_mem( const char *ca, int ca_size)
 {
@@ -1876,8 +1875,7 @@ int _gnutls_verify_x509_mem( const char *ca, int ca_size)
 
 
 
-/* Reads a base64 encoded CA file (file contains multiple certificate
- * authorities). This is to be called once.
+/* Reads and verifies a base64 encoded certificate file 
  */
 int _gnutls_verify_x509_file( char *cafile)
 {
