@@ -222,6 +222,11 @@ CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
 			return 0;
 	}
 
+	if (peer_cert.subject_pk_algorithm != GNUTLS_PK_RSA) {
+		gnutls_assert();
+		return 0;
+	}
+
 	if ( _gnutls_mpi_get_nbits( peer_cert.params[0]) 
 		<= 512) {
 		_gnutls_free_cert( peer_cert);
