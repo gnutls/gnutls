@@ -1,3 +1,9 @@
+2004-09-30 21:37  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/defines.h, lib/gnutls_x509.c, lib/x509_b64.c:
+
+	Replace strnstr with memstr.  See discussion on bug-gnulib list.  
+
 2004-09-29 17:52  Simon Josefsson <simon@josefsson.org>
 
 	* lib/Makefile.am:
