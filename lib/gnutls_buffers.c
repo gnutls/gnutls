@@ -201,9 +201,7 @@ static ssize_t _gnutls_read( gnutls_session session, void *iptr, size_t sizeOfPt
 	size_t left;
 	ssize_t i=0;
 	char *ptr = iptr;
-#ifdef READ_DEBUG
-	int j,x, sum=0;
-#endif
+	uint j,x, sum=0;
 	gnutls_transport_ptr fd = session->internals.transport_recv_ptr;
 
 	session->internals.direction = 0;
@@ -246,21 +244,29 @@ static ssize_t _gnutls_read( gnutls_session session, void *iptr, size_t sizeOfPt
 	}
 
 	finish:
-	
-#ifdef READ_DEBUG
-	_gnutls_read_log( "READ: read %d bytes from %d\n", (sizeOfPtr-left), fd);
-	for (x=0;x<((sizeOfPtr-left)/16)+1;x++) {
-		_gnutls_read_log( "%.4x - ",x);
-		for (j=0;j<16;j++) {
-			if (sum<(sizeOfPtr-left)) {
-				_gnutls_read_log( "%.2x ", ((unsigned char*)ptr)[sum++]);
-			}
-		}
-		_gnutls_read_log( "\n");
-	
-	}
-#endif
 
+	if (_gnutls_log_level >= 7) {
+		char line[128];
+		char tmp[16];
+		
+
+		_gnutls_read_log( "READ: read %d bytes from %d\n", (sizeOfPtr-left), fd);
+		
+		for (x=0;x<((sizeOfPtr-left)/16)+1;x++) {
+			line[0] = 0;
+			
+			sprintf( tmp, "%.4x - ",x);
+			_gnutls_str_cat( line, sizeof(line), tmp);
+
+			for (j=0;j<16;j++) {
+				if (sum<(sizeOfPtr-left)) {
+					sprintf( tmp, "%.2x ", ((unsigned char*)ptr)[sum++]);
+					_gnutls_str_cat( line, sizeof(line), tmp);
+				}
+			}
+			_gnutls_read_log( "%s\n", line);
+		}
+	}
 
 	return (sizeOfPtr - left);
 }
@@ -522,9 +528,7 @@ static int _gnutls_buffer_get( gnutls_buffer * buffer, const opaque ** ptr, size
 ssize_t _gnutls_io_write_buffered( gnutls_session session, const void *iptr, size_t n)
 {
 	size_t left;
-#ifdef WRITE_DEBUG
-	int j,x, sum=0;
-#endif
+	uint j,x, sum=0;
 	ssize_t retval, i;
 	const opaque * ptr;
 	int ret;
@@ -591,23 +595,31 @@ ssize_t _gnutls_io_write_buffered( gnutls_session session, const void *iptr, siz
 		}
 		left -= i;
 
-#ifdef WRITE_DEBUG
-		_gnutls_write_log( "WRITE: wrote %d bytes to %d. Left %d bytes. Total %d bytes.\n", i, fd, left, n);
-		for (x=0;x<((i)/16)+1;x++) {
-			if (sum>n-left)
-				break;
 
-			_gnutls_write_log( "%.4x - ",x);
-			for (j=0;j<16;j++) {
-				if (sum<n-left) {
-					_gnutls_write_log( "%.2x ", ((unsigned char*)ptr)[sum++]);
-				} else break;
+		if (_gnutls_log_level >= 7) {
+			char line[128];
+			char tmp[16];
+			
+
+			_gnutls_write_log( "WRITE: wrote %d bytes to %d. Left %d bytes. Total %d bytes.\n", i, fd, left, n);
+			for (x=0;x<(uint)((i)/16)+1;x++) {
+				line[0] = 0;
+
+				if (sum>n-left)
+					break;
+
+				sprintf( tmp, "%.4x - ",x);
+				_gnutls_str_cat( line, sizeof(line), tmp);
+				
+				for (j=0;j<16;j++) {
+					if (sum<n-left) {
+						sprintf( tmp, "%.2x ", ((unsigned char*)ptr)[sum++]);
+						_gnutls_str_cat( line, sizeof(line), tmp);
+					} else break;
+				}
+				_gnutls_write_log( "%s\n", line);
 			}
-			_gnutls_write_log( "\n");
 		}
-		_gnutls_write_log( "\n");
-#endif
-
 	}
 
 	retval = n + session->internals.record_send_buffer_prev_size;

@@ -429,7 +429,8 @@ int _gnutls_gen_x509_crt(gnutls_session session, opaque ** data)
 	gnutls_privkey *apr_pkey;
 	int apr_cert_list_length;
 
-	/* find the appropriate certificate */
+	/* find the appropriate certificate 
+	 */
 	if ((ret =
 	     _gnutls_find_apr_cert(session, &apr_cert_list,
 				   &apr_cert_list_length,
@@ -1043,8 +1044,10 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 	 */
 	session->internals.selected_cert_index = ind;
 
-	if (ind >= 0)
-		session->key->certificate_requested = 1;
+	/* We should reply with a certificate message, 
+	 * even if we have no certificate to send.
+	 */
+	session->key->certificate_requested = 1;
 
 	return 0;
 }

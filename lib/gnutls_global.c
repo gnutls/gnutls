@@ -32,7 +32,7 @@ extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
 
 LOG_FUNC _gnutls_log_func;
-int _gnutls_log_level = 2; /* default log level */
+int _gnutls_log_level = 0; /* default log level */
 
 ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
@@ -60,10 +60,10 @@ void gnutls_global_set_log_function( gnutls_log_func log_func)
   *
   * This is the function that allows you to set the log level.
   * The level is an integer between 0 and 9. Higher values mean
-  * more verbosity. The default value is 2. Larger values should
+  * more verbosity. The default value is 0. Larger values should
   * only be used with care, since they may reveal sensitive information.
   *
-  * Use the log level '0' to disable logging.
+  * Use a log level over 10 to enable all debugging options.
   *
   **/
 void gnutls_global_set_log_level( int level)
