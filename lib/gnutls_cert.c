@@ -220,10 +220,8 @@ static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_si
 	siz = ca_size;
 
 	ptr = ca;
-	res->ncas = 0;
-	i = 1;
 
-	res->ca_list = NULL;
+	i = res->ncas + 1;
 
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
@@ -446,24 +444,10 @@ int gnutls_x509pki_set_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *CERTFILE,
 	return 0;
 }
 
-/**
-  * gnutls_x509pki_set_trust_file - Used to set trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
-  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
-  * @CAFILE: is a PEM encoded file containing trusted CAs
-  * @CRLFILE: is a PEM encoded file containing CRLs (ignored for now)
-  *
-  * This function sets the trusted CAs in order to verify client
-  * certificates.
-  **/
-int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
-			     char *CRLFILE)
-{
-	int ret, size, i;
-	opaque *pdata;
-	gnutls_datum tmp;
-
-	if ((ret = read_ca_file(res, CAFILE)) < 0)
-		return ret;
+static int generate_rdn_seq( GNUTLS_X509PKI_CREDENTIALS res) {
+gnutls_datum tmp;
+int ret, size, i;
+opaque *pdata;
 
 	/* Generate the RDN sequence 
 	 * This will be sent to clients when a certificate
@@ -484,6 +468,9 @@ int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
 		}
 		size += (2 + tmp.size);
 	}
+
+	if (res->rdn_sequence.data != NULL)
+		gnutls_free( res->rdn_sequence.data);
 
 	res->rdn_sequence.data = gnutls_malloc(size);
 	if (res->rdn_sequence.data == NULL) {
@@ -508,6 +495,55 @@ int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
 
 	return 0;
 }
+
+/**
+  * gnutls_x509pki_set_trust_mem - Used to add trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
+  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * @CA: is a PEM encoded list of trusted CAs
+  * @CRL: is a PEM encoded list of CRLs (ignored for now)
+  *
+  * This function adds the trusted CAs in order to verify client
+  * certificates. This function may be called multiple times.
+  *
+  **/
+int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum *CA,
+			     const gnutls_datum *CRL)
+{
+	int ret;
+
+	if ((ret = read_ca_mem(res, CA->data, CA->size)) < 0)
+		return ret;
+
+	if ((ret = generate_rdn_seq(res)) < 0)
+		return ret;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509pki_set_trust_file - Used to add trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
+  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
+  * @CAFILE: is a PEM encoded file containing trusted CAs
+  * @CRLFILE: is a PEM encoded file containing CRLs (ignored for now)
+  *
+  * This function sets the trusted CAs in order to verify client
+  * certificates. This function may be called multiple times.
+  *
+  **/
+int gnutls_x509pki_set_trust_file(GNUTLS_X509PKI_CREDENTIALS res, char *CAFILE,
+			     char *CRLFILE)
+{
+	int ret;
+
+	if ((ret = read_ca_file(res, CAFILE)) < 0)
+		return ret;
+
+	if ((ret = generate_rdn_seq(res)) < 0)
+		return ret;
+
+	return 0;
+}
+
 
 /**
   * gnutls_x509pki_set_key_mem - Used to set keys in a GNUTLS_X509PKI_CREDENTIALS structure
@@ -541,82 +577,6 @@ int gnutls_x509pki_set_key_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datu
 	return 0;
 }
 
-/**
-  * gnutls_x509pki_set_trust_mem - Used to set trusted CAs in a GNUTLS_X509PKI_CREDENTIALS structure
-  * @res: is an &GNUTLS_X509PKI_CREDENTIALS structure.
-  * @CA: is a PEM encoded list of trusted CAs
-  * @CRL: is a PEM encoded list of CRLs (ignored for now)
-  *
-  * This function sets the trusted CAs in order to verify client
-  * certificates.
-  **/
-int gnutls_x509pki_set_trust_mem(GNUTLS_X509PKI_CREDENTIALS res, const gnutls_datum *CA,
-			     const gnutls_datum *CRL)
-{
-	int ret, size, i;
-	opaque *pdata;
-	gnutls_datum tmp;
-
-	if ((ret = read_ca_mem(res, CA->data, CA->size)) < 0)
-		return ret;
-
-	/* Generate the RDN sequence 
-	 * This will be sent to clients when a certificate
-	 * request message is sent.
-	 */
-
-	/* FIXME: in case of a client it is not needed
-	 * to do that. This would save time and memory.
-	 * However we don't have that information available
-	 * here.
-	 */
-
-	size = 0;
-	for (i = 0; i < res->ncas; i++) {
-		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
-			gnutls_assert();
-			return ret;
-		}
-		size += (2 + tmp.size);
-	}
-
-	res->rdn_sequence.data = gnutls_malloc(size);
-	if (res->rdn_sequence.data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	res->rdn_sequence.size = size;
-
-	pdata = res->rdn_sequence.data;
-
-	for (i = 0; i < res->ncas; i++) {
-		if ((ret = _gnutls_find_dn(&tmp, &res->ca_list[i])) < 0) {
-			gnutls_free(res->rdn_sequence.data);
-			res->rdn_sequence.size = 0;
-			res->rdn_sequence.data = NULL;
-			gnutls_assert();
-			return ret;
-		}
-		WRITEdatum16(pdata, tmp);
-		pdata += (2 + tmp.size);
-	}
-
-	return 0;
-}
-
-/**
-  * gnutls_dh_set_dhe_bits - Used to set the bits for a DHE_* ciphersuite
-  * @state: is a &GNUTLS_STATE structure.
-  * @bits: is the number of bits
-  *
-  * This function sets the number of bits, for use in a Diffie Hellman key exchange.
-  * This value will only be used in case of DHE ciphersuite.
-  *
-  **/
-void gnutls_dh_set_dhe_bits(GNUTLS_STATE state, int bits)
-{
-	state->gnutls_internals.dhe_bits = bits;
-}
 
 static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 {
