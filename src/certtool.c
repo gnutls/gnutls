@@ -1433,6 +1433,8 @@ gnutls_datum out;
 		fprintf(stderr, "get_count: %s\n", gnutls_strerror(count));
 		exit(1);
 	}
+
+	fprintf( outfile, "\tElements: %d\n", count);
 	
 	for (i=0;i<count;i++) {
 		type = gnutls_pkcs12_bag_get_type( bag, i);
@@ -1440,8 +1442,8 @@ gnutls_datum out;
 			fprintf(stderr, "get_type: %s\n", gnutls_strerror(type));
 			exit(1);
 		}
-		
-		fprintf( stderr, "\tType: %s\n", BAGTYPE( type));
+
+		fprintf( outfile, "\tType: %s\n", BAGTYPE( type));
 		
 		result = gnutls_pkcs12_bag_get_data( bag, i, &data);
 		if (result < 0) {
@@ -1470,7 +1472,7 @@ gnutls_datum out;
 	
 		if (str != NULL) {
 			gnutls_pem_base64_encode_alloc( str, &data, &out);
-			fprintf( stderr, "%s\n", out.data);
+			fprintf( outfile, "%s\n", out.data);
 		
 			gnutls_free(out.data);
 		}
@@ -1536,8 +1538,7 @@ void pkcs12_info( void)
 			exit(1);
 		}
 	
-		fprintf( stderr, "BAG #%d\n", index);
-		fprintf( stderr, "\tElements: %d\n", result);
+		fprintf( outfile, "BAG #%d\n", index);
 		
 		result = gnutls_pkcs12_bag_get_type( bag, 0);
 		if (result < 0) {
@@ -1563,8 +1564,6 @@ void pkcs12_info( void)
 				exit(1);
 			}
 	
-			fprintf( stderr, "\tElements: %d\n", result);
-		
 		}
 
 		print_bag_data( bag);
