@@ -1,3 +1,37 @@
+2005-01-07 20:22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2005-01-07 20:14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_constate.c:
+
+	(_gnutls_set_keys): Use larger buffer, to hold entire hex output.  
+	Reported by Michael.Ringe@aachen.utimaco.de.  
+
+2005-01-07 20:13  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_kx.c:
+
+	(generate_normal_master): Use larger buffer, to hold entire hex 
+	output.  Reported by Michael.Ringe@aachen.utimaco.de.  
+
+2005-01-07 20:13  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS:
+
+	Add.  
+
+2005-01-07 20:12  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.c:
+
+	(_gnutls_bin2hex): Return truncated string instead of NULL, to make
+	it easier to use directly as a parameter to printf.  Reported by 
+	Michael.Ringe@aachen.utimaco.de.  
+
 2005-01-05 19:04  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS:
