@@ -1,6 +1,8 @@
 Version 0.2.4
 - Better handling of X.509 certificate extensions
 - Added DHE_RSA ciphersuites
+- Updated the Name Indication (dnsname) extension
+- Improvements in Diffie Hellman primes handling
 
 Version 0.2.3 (19/09/2001)
 - Memory optimizations in gnutls_recv()

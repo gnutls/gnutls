@@ -227,9 +227,8 @@ int main(int argc, char** argv)
 	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
 
 /* This TLS extension may break old implementations.
- *
- *	gnutls_ext_set_dnsname( state, "localhost"); 
  */
+	gnutls_ext_set_name_ind( state, GNUTLS_DNSNAME, "localhost"); 
 
 	ret = gnutls_handshake(sd, state);
 
@@ -280,7 +279,7 @@ int main(int argc, char** argv)
 	gnutls_set_cred( state, GNUTLS_SRP, cred);
 	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
 
-	gnutls_ext_set_dnsname( state, "hello.server.org");
+	gnutls_ext_set_name_ind( state, GNUTLS_DNSNAME, "hello.server.org");
 
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 

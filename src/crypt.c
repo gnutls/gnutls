@@ -39,6 +39,8 @@ int crypt_int(char *username, char *passwd, int crypt, int salt,
 static int read_conf_values(MPI * g, MPI * n, char *str, int str_size);
 static int _verify_passwd_int(char* username, char* passwd, char* salt, MPI g, MPI n);
 
+int _gnutls_srp_generate_prime(unsigned char ** ret_g, unsigned char ** ret_n, int bits);
+
 int generate_create_conf(char *tpasswd_conf, int bits)
 {
 	FILE *fd;

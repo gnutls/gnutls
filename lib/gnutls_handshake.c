@@ -38,6 +38,7 @@
 #include "auth_x509.h"
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
+#include <ext_dnsname.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_log( "GNUTLS Error: %s (%d)\n", x,y)
@@ -1738,6 +1739,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	KXAlgorithm *alg;
 	int alg_size;
 	KXAlgorithm kx;
+	const char* dnsname;
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
 		 return 0;
@@ -1758,12 +1760,13 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	 */
 
 	cert = NULL;
-	if (state->security_parameters.extensions.dnsname[0] != 0) {
+	dnsname = gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME);
+	
+	if (dnsname!=NULL && dnsname[0] != 0) {
 		cert =
 		    (gnutls_cert *) _gnutls_find_cert(x509_cred->cert_list,
 						      x509_cred->ncerts,
-					      state->security_parameters.
-						      extensions.dnsname);
+					              dnsname);
 	}
 	if (cert == NULL && x509_cred->cert_list != NULL) {	/* if no such cert, use the first in the list 
 								 */

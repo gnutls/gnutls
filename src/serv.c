@@ -128,9 +128,9 @@ void print_info(GNUTLS_STATE state)
 		printf("%.2X", sesid[i]);
 	printf("\n");
 
-	if ( gnutls_ext_get_dnsname(state) != NULL) {
+	if ( gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME) != NULL) {
 		printf("- DNSNAME: ");
-		printf("%s\n", gnutls_ext_get_dnsname(state));
+		printf("%s\n", (char*)gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME));
 	}
 	
 	/* print srp specific data */
@@ -231,9 +231,9 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 	/* if the client supports dnsname extension then
 	 * print the hostname he connected to.
 	 */
-	if (gnutls_ext_get_dnsname(state)!=NULL) {
+	if (gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME)!=NULL) {
 		sprintf(tmp2, "\n<p>DNSNAME: ");
-		sprintf(tmp2, "<b>%s</b></p>\n", gnutls_ext_get_dnsname(state));
+		sprintf(tmp2, "<b>%s</b></p>\n", (char*)gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME));
 	}
 
 	/* print srp specific data */

@@ -994,7 +994,7 @@ int _gnutls_cert_supported_kx(gnutls_cert * cert, KXAlgorithm ** alg,
  * common_name (or subjectAltDNSName) field similar to name
  */
 gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
-			       int cert_list_length, char *name)
+			       int cert_list_length, const char *name)
 {
 	gnutls_cert *cert = NULL;
 	int i;
@@ -1019,7 +1019,7 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
  * common_name (or subjectAltDNSName) field similar to name
  */
 int _gnutls_find_cert_list_index(gnutls_cert ** cert_list,
-				 int cert_list_length, char *name)
+				 int cert_list_length, const char *name)
 {
 	int index = 0;
 	int i;

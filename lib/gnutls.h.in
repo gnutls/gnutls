@@ -49,7 +49,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
 
-
+typedef enum GNUTLS_NAME_IND { GNUTLS_DNSNAME=1 } GNUTLS_NAME_IND; 
 typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID, GNUTLS_CERT_NONE } CertificateStatus;
 typedef enum CertificateRequest { GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } CertificateRequest;
 typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } CloseRequest;
@@ -154,8 +154,8 @@ void* gnutls_get_auth_info( GNUTLS_STATE);
  * This will only exist if the client supports the dnsname
  * TLS extension. (draft-ietf-tls-extensions)
  */
-const char* gnutls_ext_get_dnsname( GNUTLS_STATE);
-int gnutls_ext_set_dnsname( GNUTLS_STATE, const char* dnsname);
+const void* gnutls_ext_get_name_ind( GNUTLS_STATE state, GNUTLS_NAME_IND ind);
+int gnutls_ext_set_name_ind( GNUTLS_STATE state, GNUTLS_NAME_IND ind, const void* name);
 
 /* This will set the Common Name field in case of X509PKI
  * authentication. This will be used while verifying the
@@ -174,7 +174,6 @@ typedef struct DSTRUCT* SRP_CLIENT_CREDENTIALS;
 
 typedef struct DSTRUCT* ANON_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* ANON_CLIENT_CREDENTIALS;
-
 
 void gnutls_free_srp_client_sc( SRP_CLIENT_CREDENTIALS sc);
 int gnutls_allocate_srp_client_sc( SRP_CLIENT_CREDENTIALS *sc);

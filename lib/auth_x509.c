@@ -35,7 +35,7 @@
 #include <gnutls_record.h>
 #include <x509_verify.h>
 #include <gnutls_sig.h>
-
+#include <ext_dnsname.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (X509PKI_CLIENT_AUTH_INFO)
@@ -891,12 +891,13 @@ int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int 
 			*apr_cert_list_length = 0;
 			*apr_pkey = NULL;
 		} else {
+			const char* dnsname = gnutls_ext_get_name_ind( state, GNUTLS_DNSNAME);
+			if (dnsname==NULL) dnsname="";
+			
 			ind =
 			    _gnutls_find_cert_list_index(cred->cert_list,
 							 cred->ncerts,
-							 state->
-							 security_parameters.
-							 extensions.dnsname);
+							 dnsname);
 
 			if (ind < 0) {
 				*apr_cert_list = NULL;

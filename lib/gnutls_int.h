@@ -104,7 +104,6 @@ typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_S
 		     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
 		     GNUTLS_CERTIFICATE_VERIFY, GNUTLS_CLIENT_KEY_EXCHANGE,
 		     GNUTLS_FINISHED=20 } HandshakeType;
-			
 
 typedef struct {
 	ChangeCipherSpecType type;
@@ -209,9 +208,16 @@ typedef struct {
  * mechanism. (some extensions may hold parameters in AUTH_INFO
  * structures instead - see SRP).
  */
+typedef enum GNUTLS_NAME_IND { GNUTLS_DNSNAME=1 } GNUTLS_NAME_IND; 
+
 typedef struct {
 	opaque dnsname[MAX_DNSNAME_SIZE];
-	opaque srp_username[MAX_SRP_USERNAME];
+	GNUTLS_NAME_IND type;
+} name_ind;
+
+typedef struct {
+	name_ind	name;
+	opaque 		srp_username[MAX_SRP_USERNAME];
 } TLSExtensions;
 
 /* AUTH_INFO structures MUST NOT contain malloced 
