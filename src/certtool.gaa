@@ -1,3 +1,13 @@
+#{
+
+/* C declarations */
+
+#ifndef _WIN32
+# include <windows.h>
+#endif
+
+#}
+
 helpnode "Certtool help\nUsage : certtool [options]"
 
 #int action;

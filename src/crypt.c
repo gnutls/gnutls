@@ -35,10 +35,10 @@ int main (int argc, char **argv)
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "crypt-gaa.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <gcrypt.h> /* for randomize */
+#include <crypt-gaa.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -46,6 +46,8 @@ int main (int argc, char **argv)
 #ifndef _WIN32
 # include <pwd.h>
 # include <unistd.h>
+#else
+# include <windows.h>
 #endif
 
 #ifdef _WIN32

@@ -1,3 +1,13 @@
+#{
+
+/* C declarations */
+
+#ifndef _WIN32
+# include <windows.h>
+#endif
+
+#}
+
 helpnode "Srpcrypt help\nUsage : srpcrypt [options]"
 
 #char *username;

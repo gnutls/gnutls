@@ -390,8 +390,10 @@ _gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, const gnutls_datum *raw )
     rc = cdk_kbnode_read_from_mem( &knode, raw->data, raw->size );
     if( !(rc = _gnutls_map_cdk_rc( rc )) )
         pkt = cdk_kbnode_find_packet( knode, CDK_PKT_PUBLIC_KEY );
-    if( !pkt )
-        rc = GNUTLS_E_INTERNAL_ERROR;
+    if( !pkt ) {
+        gnutls_assert();
+        rc = _gnutls_map_cdk_rc( rc);
+    }
     if( !rc )
         rc = _gnutls_set_datum( &cert->raw, raw->data, raw->size );
     if( !rc )
