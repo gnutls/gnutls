@@ -337,7 +337,6 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	/* Parse the extensions (if any)
 	 */
 	if (ver >= GNUTLS_TLS1) {
-		gnutls_assert();
 		ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
 		if (ret < 0) {
 			gnutls_assert();
@@ -1290,7 +1289,6 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	/* Parse extensions.
 	 */
 	if (version >= GNUTLS_TLS1) {
-		gnutls_assert();
 		ret = _gnutls_parse_extensions(state, &data[pos], len);	/* len is the rest of the parsed length */
 		if (ret < 0) {
 			gnutls_assert();
@@ -1554,7 +1552,6 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 		/* Generate and copy TLS extensions.
 		 */
 		if (hver >= GNUTLS_TLS1) {
-			gnutls_assert();
 			extdatalen = _gnutls_gen_extensions(state, &extdata);
 			if (extdatalen > 0) {
 				datalen += extdatalen;
@@ -1861,6 +1858,7 @@ int gnutls_handshake(GNUTLS_STATE state)
 	STATE = STATE0;
 
 	_gnutls_handshake_io_buffer_clear(state);
+	_gnutls_handshake_internal_state_clear(state);
 
 	return 0;
 }

@@ -233,6 +233,9 @@ void _gnutls_free_auth_info( GNUTLS_STATE state) {
 
 }
 
+/* This function will set the auth info structure in the gnutls_key
+ * structure.
+ */
 int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size) {
 	if ( state->gnutls_key->auth_info == NULL) {
 		state->gnutls_key->auth_info = gnutls_calloc( 1, size);
@@ -242,7 +245,9 @@ int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size) {
 		}
 		state->gnutls_key->auth_info_type = type;
 		state->gnutls_key->auth_info_size = size;
-	} else
+	} else {
+#if 0
+		/* 20020303: This is the old behaviour */
 		/* If the credentials for the current authentication scheme,
 		 * are not the one we want to set, then it's an error.
 		 * This may happen if a rehandshake is performed an the
@@ -253,6 +258,25 @@ int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size) {
 			gnutls_assert();
 			return GNUTLS_E_INVALID_REQUEST;
 		}
+#endif
+		/* The new behaviour: Here we reallocate the auth info structure
+		 * in order to be able to negotiate different authentication
+		 * types. Ie. perform an auth_anon and then authenticate again using a
+		 * certificate (in order to prevent revealing the certificate's contents,
+		 * to passive eavesdropers.
+		 */
+		if ( gnutls_auth_get_type( state) != state->gnutls_key->auth_info_type) {
+			state->gnutls_key->auth_info = gnutls_realloc_fast( 
+				state->gnutls_key->auth_info, size);
+			if (state->gnutls_key->auth_info == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_MEMORY_ERROR;
+			}
+			memset( state->gnutls_key->auth_info, 0, size);
+			state->gnutls_key->auth_info_type = type;
+			state->gnutls_key->auth_info_size = size;
+		}
+	}
 
 	return 0;
 }

@@ -812,10 +812,6 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	}
 
 
-	/* keep the PK algorithm */
-	state->gnutls_internals.peer_pk_algorithm =
-	    peer_certificate_list[0].subject_pk_algorithm;
-
 	if ((ret =
 	     _gnutls_copy_certificate_auth_info(info,
 						peer_certificate_list,
@@ -965,10 +961,6 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		return ret;
 	}
 	gnutls_free_datum( &akey);
-
-	/* keep the PK algorithm */
-	state->gnutls_internals.peer_pk_algorithm =
-	    peer_certificate_list[0].subject_pk_algorithm;
 
 	if ((ret =
 	     _gnutls_copy_certificate_auth_info(info,

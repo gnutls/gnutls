@@ -110,6 +110,32 @@ int i;
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 }
 
+/* This function will clear all the variables in gnutls_internals
+ * structure within the state, which depend on the current handshake.
+ * This is used to allow further handshakes.
+ */
+void _gnutls_handshake_internal_state_clear( GNUTLS_STATE state) {
+	state->gnutls_internals.pgp_fingerprint = 0;
+	state->gnutls_internals.extensions_sent_size = 0;
+
+	/* by default no selected certificate */
+	state->gnutls_internals.selected_cert_index = -1;
+	state->gnutls_internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
+	state->gnutls_internals.send_cert_req;
+	state->gnutls_internals.adv_version_major = 0;
+	state->gnutls_internals.adv_version_minor = 0;
+	state->gnutls_internals.v2_hello = 0;
+	memset( &state->gnutls_internals.handshake_header_buffer, 0, 
+		sizeof(HANDSHAKE_HEADER_BUFFER));
+	state->gnutls_internals.adv_version_minor = 0;
+	state->gnutls_internals.adv_version_minor = 0;
+
+	state->gnutls_internals.resumed = RESUME_FALSE;
+	state->gnutls_internals.resumable = RESUME_TRUE;
+
+}
+
+
 #define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_init - This function initializes the state to null (null encryption etc...).
@@ -144,7 +170,6 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	(*state)->security_parameters.read_compression_algorithm = GNUTLS_COMP_NULL;
 	(*state)->security_parameters.write_compression_algorithm = GNUTLS_COMP_NULL;
 
-	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
 	gnutls_protocol_set_priority( *state, default_protocol_list); /* default */
 	
@@ -153,8 +178,6 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 		gnutls_free( *state);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
-	(*state)->gnutls_internals.resumed = RESUME_FALSE;
 
 	(*state)->gnutls_internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
@@ -173,14 +196,13 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	/* set the default maximum record size for TLS
 	 */
 	(*state)->security_parameters.max_record_size = DEFAULT_MAX_RECORD_SIZE;
-	(*state)->gnutls_internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
 
-	/* by default no selected certificate */
-	(*state)->gnutls_internals.selected_cert_index = -1;
 	
 	/* everything else not initialized here is initialized
 	 * as NULL or 0. This is why calloc is used.
 	 */
+
+	_gnutls_handshake_internal_state_clear( *state);
 
 	return 0;
 }
@@ -377,3 +399,4 @@ void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version versi
 {
 	state->gnutls_internals.default_record_version = version;
 }
+

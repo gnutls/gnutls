@@ -483,9 +483,6 @@ typedef struct {
 	 * supports it.
 	 */
 	int				send_cert_req;
-	int				peer_pk_algorithm;
-	/* holds the username got in the srp tls extension
-	 */
 
 	/* this is a callback function to call if no appropriate
 	 * client certificates were found.
@@ -546,6 +543,9 @@ typedef struct {
 	/* This holds the default version that our first
 	 * record packet will have. */
 	GNUTLS_Version		default_record_version;
+
+	/* If you add anything here, check _gnutls_handshake_internal_state_clear().
+	 */
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {

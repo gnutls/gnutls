@@ -22,6 +22,7 @@ int _gnutls_dh_set_secret_bits( GNUTLS_STATE state, int bits);
 int _gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
 int _gnutls_dh_get_prime_bits( GNUTLS_STATE state);
 void gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
+void _gnutls_handshake_internal_state_clear( GNUTLS_STATE);
 
 int _gnutls_openpgp_send_fingerprint( GNUTLS_STATE state);
 
