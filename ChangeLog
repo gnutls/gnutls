@@ -1,3 +1,60 @@
+2002-04-19 17:53  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, doc/tex/ex4.tex, lib/gnutls.h.in.in,
+	lib/gnutls_state.c, src/cli.c, src/serv.c:
+
+	gnutls_session_resumed() was renamed to gnutls_session_is_resumed(),
+	and changed semantics, to make the return value be the obvious one.  
+
+2002-04-18 18:56  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, ex4.tex, examples.tex:
+
+	updated documentation for the new resumption check function 
+
+2002-04-18 18:41  nmav <nmav@gnutls.org>
+
+	* doc/TODO, lib/gnutls.h.in.in, lib/gnutls_int.h,
+	lib/gnutls_privkey.c, lib/gnutls_state.c, src/cli.c, src/serv.c:
+
+	Added function to report if a session is a resumed one. See
+	gnutls_session_resumed().  
+
+2002-04-18 18:16  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Applied the fixes for the new code.  
+
+2002-04-18 13:31  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/auth_srp.c, lib/auth_srp.h,
+	lib/auth_srp_passwd.c, lib/ext_cert_type.c, lib/ext_cert_type.h,
+	lib/ext_max_record.c, lib/ext_max_record.h, lib/ext_srp.c,
+	lib/ext_srp.h, lib/gnutls_extensions.c, lib/gnutls_srp.c,
+	src/gnutls-http-serv, src/serv.c:
+
+	Some minor fixes in SRP support. Changed extension generation. Now
+	less allocation with malloc are done.  
+
+2002-04-17 09:47  nmav <nmav@gnutls.org>
+
+	* lib/: auth_anon.c, auth_dhe.c, auth_rsa.c, auth_srp.c,
+	auth_srp_passwd.c, crypt.c, crypt_bcrypt.c, crypt_srpsha1.c,
+	debug.c, gnutls_auth.c, gnutls_dh.c, gnutls_dh_primes.c,
+	gnutls_gcry.c, gnutls_gcry.h, gnutls_openpgp.c, gnutls_openpgp.h,
+	gnutls_pk.c, gnutls_privkey.c, gnutls_srp.c, gnutls_x509.c,
+	x509_sig_check.c:
+
+	first changes for libgmp support 
+
+2002-04-14 19:26  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c:
+
+	Fixed description of
+	gnutls_x509_extract_certificate_subject_alt_name().  
+
 2002-04-13 19:59  twoaday <twoaday@gnutls.org>
 
 	* lib/gnutls_openpgp.c:
