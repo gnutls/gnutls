@@ -91,7 +91,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	char tmpbuffer2[64];
 	char tmpbuffer3[64];
 	char counter[MAX_INT_DIGITS];
-	char value[200];
+	char value[256];
 	char escaped[256];
 	const char *ldap_desc;
 	char oid[128];
@@ -590,6 +590,47 @@ fprintf(stderr, "%s %s\n", given_oid, val_name);
 	return 0;
 }
 
+/* Decodes an X.509 Attribute (if multi==1) or an AttributeTypeAndValue
+ * otherwise.
+ */
+int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct, const char* where,
+	char* oid, int oid_size, gnutls_datum* value, int multi) 
+{
+char tmpbuffer[128];
+int len, result;
+
+	/* Read the OID 
+	 */
+	_gnutls_str_cpy(tmpbuffer, sizeof(tmpbuffer), where);
+	_gnutls_str_cat(tmpbuffer, sizeof(tmpbuffer), ".type");
+
+	len = oid_size - 1;
+	result = asn1_read_value(asn1_struct, tmpbuffer, oid, &len);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		return result;
+	}
+
+	/* Read the Value 
+	 */
+
+	_gnutls_str_cpy(tmpbuffer, sizeof(tmpbuffer), where);
+	_gnutls_str_cat(tmpbuffer, sizeof(tmpbuffer), ".value");
+
+	if (multi)
+		_gnutls_str_cat(tmpbuffer, sizeof(tmpbuffer), "s.?1"); /* .values.?1 */
+
+	result = _gnutls_x509_read_value( asn1_struct, tmpbuffer, value, 0);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+
+}
 
 /* Sets an X509 DN in the asn1_struct, and puts the given OID in the DN.
  * The input is assumed to be raw data.

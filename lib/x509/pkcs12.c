@@ -263,6 +263,17 @@ static const char* bag2oid( int bag)
 	return NULL;
 }
 
+static inline
+char* ucs2_to_ascii( char* data, int size) {
+int i;
+
+	for (i=0;i<size/2;i++)
+		data[i] = data[i*2 + 1];
+	data[i] = 0;
+	
+	return data;
+}
+
 /* Decodes the SafeContents, and puts the output in
  * the given bag. 
  */
@@ -273,7 +284,8 @@ char oid[128], root[128];
 ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 int len, result;
 int bag_type;
-int count = 0, i;
+gnutls_datum attr_val;
+int count = 0, i, attributes, j;
 char counter[MAX_INT_DIGITS];
 
 	/* Step 1. Extract the SEQUENCE.
@@ -354,6 +366,49 @@ char counter[MAX_INT_DIGITS];
 			
 			_gnutls_free_datum( &tmp);
 		}
+
+		/* read the bag attributes
+		 */
+		_gnutls_str_cpy( root, sizeof(root), "?"); 
+		_gnutls_int2str( i+1, counter);
+		_gnutls_str_cat( root, sizeof(root), counter); 
+		_gnutls_str_cat( root, sizeof(root), ".bagAttributes"); 
+
+		result = asn1_number_of_elements( c2, root, &attributes);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+		
+		if (attributes < 0) attributes = 1;
+		
+		for (j=0;j<attributes;j++) {
+
+			_gnutls_str_cpy( root, sizeof(root), "?"); 
+			_gnutls_int2str( i+1, counter);
+			_gnutls_str_cat( root, sizeof(root), counter); 
+			_gnutls_str_cat( root, sizeof(root), ".bagAttributes.?"); 
+			_gnutls_int2str( j+1, counter);
+			_gnutls_str_cat( root, sizeof(root), counter); 
+
+			result = _gnutls_x509_decode_and_read_attribute( 
+				c2, root, oid, sizeof(oid), &attr_val, 1);
+			if (result < 0) {
+				gnutls_assert();
+				goto cleanup;
+			}
+
+			
+			if (strcmp( oid, KEY_ID_OID)==0)
+				bag->element[i].local_key_id = attr_val;
+			else if (strcmp( oid, FRIENDLY_NAME_OID)==0)
+				bag->element[i].friendly_name = ucs2_to_ascii( attr_val.data, attr_val.size);
+			else { 		
+				_gnutls_x509_log( "Unknown PKCS12 Bag Attribute OID '%s'\n", oid);
+			}
+		}
+		
 
 		bag->element[i].type = bag_type;
 		
@@ -747,8 +802,6 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass)
 		return result;
 }
 
-#define FRIENDLY_NAME_OID "1.2.840.113549.1.9.20"
-#define KEY_ID_OID "1.2.840.113549.1.9.21"
 
 static int write_attributes( gnutls_pkcs12_bag bag, int elem, ASN1_TYPE c2, const char* where) {
 int result;

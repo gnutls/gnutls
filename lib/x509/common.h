@@ -52,3 +52,8 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 
 int _gnutls_x509_read_value( ASN1_TYPE c, const char* root, gnutls_datum *ret, int str);
 int _gnutls_x509_write_value( ASN1_TYPE c, const char* root, const gnutls_datum* data, int str);
+
+int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
+	const char* where, const unsigned char* data, int sizeof_data, int multi);
+int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct, const char* where,
+        char* oid, int oid_size, gnutls_datum* value, int multi);

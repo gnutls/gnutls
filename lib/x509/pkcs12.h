@@ -38,6 +38,11 @@ typedef struct gnutls_pkcs12_bag_int {
 #define DATA_OID "1.2.840.113549.1.7.1"
 #define ENC_DATA_OID "1.2.840.113549.1.7.6"
 
+/* Bag attributes
+ */
+#define FRIENDLY_NAME_OID "1.2.840.113549.1.9.20"
+#define KEY_ID_OID "1.2.840.113549.1.9.21"
+
 typedef struct gnutls_pkcs12_int *gnutls_pkcs12;
 typedef struct gnutls_pkcs12_bag_int *gnutls_pkcs12_bag;
 

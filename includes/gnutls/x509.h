@@ -309,6 +309,17 @@ int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag * bag);
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag);
 int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag bag);
 
+int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag bag, int indx, 
+	gnutls_datum* id);
+int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag bag, int indx, 
+	const gnutls_datum* id);
+
+int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag bag, int indx, 
+	char **name);
+int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag bag, int indx, 
+	const char* name);
+
+
 #ifdef __cplusplus
 }
 #endif
