@@ -22,7 +22,9 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <cert_asn1.h>
-#include <signal.h>
+#ifdef HAVE_SIGNAL_H
+# include <signal.h>
+#endif
 
 static void* old_sig_handler;
 ssize_t (*recv_func)( SOCKET, void*, size_t, int);
@@ -49,7 +51,9 @@ int gnutls_global_init(char* PKIX, char* PKCS1)
 	gcry_set_allocation_handler(gnutls_malloc, secure_malloc, gnutls_is_secure_memory, gnutls_realloc, free);
 
 	/* we need this */
+#ifdef HAVE_SIGNAL
 	old_sig_handler = signal( SIGPIPE, SIG_IGN);
+#endif
 
 	/* set default recv/send functions
 	 */
@@ -85,8 +89,9 @@ int gnutls_global_init(char* PKIX, char* PKCS1)
 void gnutls_global_deinit() {
 
 	/* restore signal handler  */
+#ifdef HAVE_SIGNAL
 	signal( SIGPIPE, old_sig_handler);
-
+#endif
 
 
 }
