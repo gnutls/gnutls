@@ -1,4 +1,4 @@
-Version 0.5.10
+Version 0.5.10 (13/10/2002)
 - Updated documentation.
 - Added server name extension. This allows clients to specify the
   name of the server they connect to. Useful to HTTPS.
