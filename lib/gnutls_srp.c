@@ -169,8 +169,8 @@ S = gcry_mpi_alloc_like(n);
 tmp1 = gcry_mpi_alloc_like(n);
 tmp2 = gcry_mpi_alloc_like(n);
 
-gcry_mpi_pow(tmp1, v, u);
-gcry_mpi_mul(tmp2, A, tmp1);
+gcry_mpi_powm(tmp1, v, u, n);
+gcry_mpi_mulm(tmp2, A, tmp1, n);
 gcry_mpi_release(tmp1);
 
 gcry_mpi_powm(S, tmp2, b, n);
@@ -249,12 +249,12 @@ MPI S, tmp1, tmp2, tmp4;
 	tmp1 = gcry_mpi_alloc_like(n);
 	tmp2 = gcry_mpi_alloc_like(n);
 
-	gcry_mpi_pow(tmp1, g, x);
-	gcry_mpi_sub(tmp2, B, tmp1);
+	gcry_mpi_powm(tmp1, g, x, n);
+	gcry_mpi_subm(tmp2, B, tmp1, n);
 
 	tmp4 = gcry_mpi_alloc_like(n);
 
-	gcry_mpi_add(tmp1, u, x);
+	gcry_mpi_mul(tmp1, u, x);
 	gcry_mpi_add(tmp4, a, tmp1);
 	gcry_mpi_release(tmp1);
 
