@@ -3,7 +3,6 @@
 * Add Kerberos support (who wants that?)
 * Audit the code (volunteers?)
 * Create certificate verification function(s)
-* Modify SRP to conform the newest draft
 * make gnutls_allocate_x509_sc() work with certificate lists
   ( now works with a single certificate)
 * Add capability to request (and provide) client certificates
