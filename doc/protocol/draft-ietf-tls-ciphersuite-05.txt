@@ -6,7 +6,7 @@
 
 Network Working Group                                         Pete Chown
 INTERNET DRAFT                                        Skygate Technology
-<draft-ietf-tls-ciphersuite-03.txt>                      22 January 2001
+<draft-ietf-tls-ciphersuite-05.txt>                       14 August 2001
 
                         AES Ciphersuites for TLS
 
@@ -21,7 +21,7 @@ Status of this Memo
      Drafts.
 
      Internet-Drafts are draft documents valid for a maximum of six
-     months and may be updated, replaced, or obsoleted by other docu­
+     months and may be updated, replaced, or obsoleted by other docu¡
      ments at any time. It is inappropriate to use Internet-Drafts as
      reference material or to cite them other than as ``work in
      progress.''
@@ -49,7 +49,7 @@ Overview
 
      2.  Triple DES is much less efficient than more modern ciphers.
 
-     3.  Now the AES process is completed there will be commercial pres­
+     3.  Now the AES process is completed there will be commercial pres¡
          sure to use the selected cipher.  The AES is efficient and has
          withstood extensive cryptanalytic efforts.  The AES is
 
@@ -57,7 +57,7 @@ Overview
 
 Chown                                                           [Page 1]
 
-ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+ietf-tls-ciphersuite-05 AES Ciphersuites for TLS          14 August 2001
 
 
          therefore a desirable choice.
@@ -72,7 +72,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
 
 Cipher Usage
 
-     The new ciphersuites proposed here are very similar to the follow­
+     The new ciphersuites proposed here are very similar to the follow¡
      ing, defined in [TLS]:
 
      TLS_RSA_WITH_3DES_EDE_CBC_SHA
@@ -113,7 +113,7 @@ Cipher Usage
 
 Chown                                                           [Page 2]
 
-ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+ietf-tls-ciphersuite-05 AES Ciphersuites for TLS          14 August 2001
 
 
      CipherSuite                           Certificate type (if applicable)
@@ -138,7 +138,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
 
      The AES supports key lengths of 128, 192 and 256 bits.  However,
      this document only defines ciphersuites for 128- and 256-bit keys.
-     This is to avoid unnecessary proliferation of ciphersuites.  Rijn­
+     This is to avoid unnecessary proliferation of ciphersuites.  Rijn¡
      dael actually allows for 192- and 256-bit block sizes as well as
      the 128-bit blocks mandated by the AES process.  The ciphersuites
      defined here all use 128-bit blocks.
@@ -169,7 +169,7 @@ Security Considerations
 
 Chown                                                           [Page 3]
 
-ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+ietf-tls-ciphersuite-05 AES Ciphersuites for TLS          14 August 2001
 
 
      secure, and it has withstood extensive cryptanalytic attack.
@@ -178,7 +178,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
      without any known reduction in security in other areas.  To obtain
      the maximum benefit from these ciphersuites:
 
-     1.  The ephemeral keys should only be used once.  With the TLS pro­
+     1.  The ephemeral keys should only be used once.  With the TLS pro¡
          tocol as currently defined there is no significant efficiency
          gain from reusing ephemeral keys.
 
@@ -186,7 +186,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
          longer required.
 
      3.  The random number generator used to create ephemeral keys must
-         not reveal past output even when its internal state is compro­
+         not reveal past output even when its internal state is compro¡
          mised.
 
      [TLS] describes the anonymous Diffie-Hellman (ADH) ciphersuites as
@@ -198,7 +198,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
          parties must authenticate to each other by some means other
          than TLS.
 
-     2.  ADH is vulnerable to man-in-the-middle attacks, as a conse­
+     2.  ADH is vulnerable to man-in-the-middle attacks, as a conse¡
          quence of the lack of authentication.  The parties must have a
          way of determining whether they are participating in the same
          TLS connection.  If they are not, they can deduce that they are
@@ -225,21 +225,21 @@ Copyright
 
 Chown                                                           [Page 4]
 
-ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+ietf-tls-ciphersuite-05 AES Ciphersuites for TLS          14 August 2001
 
 
      Copyright (C) The Internet Society 2001. All Rights Reserved.
 
      This document and translations of it may be copied and furnished to
      others, and derivative works that comment on or otherwise explain
-     it or assist in its implementation may be prepared, copied, pub­
+     it or assist in its implementation may be prepared, copied, pub¡
      lished and distributed, in whole or in part, without restriction of
-     any kind, provided that the above copyright notice and this para­
-     graph are included on all such copies and derivative works. How­
+     any kind, provided that the above copyright notice and this para¡
+     graph are included on all such copies and derivative works. How¡
      ever, this document itself may not be modified in any way, such as
      by removing the copyright notice or references to the Internet
      Society or other Internet organizations, except as needed for the
-     purpose of developing Internet standards in which case the proce­
+     purpose of developing Internet standards in which case the proce¡
      dures for copyrights defined in the Internet Standards process must
      be followed, or as required to translate it into languages other
      than English.
@@ -248,16 +248,16 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
      revoked by the Internet Society or its successors or assignees.
 
      This document and the information contained herein is provided on
-     an "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGI­
+     an "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGI¡
      NEERING TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED,
      INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
-     INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WAR­
+     INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WAR¡
      RANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 
 Intellectual Property
 
      The IETF takes no position regarding the validity or scope of any
-     intellectual property or other rights that might be claimed to per­
+     intellectual property or other rights that might be claimed to per¡
      tain to the implementation or use other technology described in
      this document or the extent to which any license under such rights
      might or might not be available; neither does it represent that it
@@ -266,7 +266,7 @@ Intellectual Property
      standards-related documentation can be found in BCP-11. Copies of
      claims of rights made available for publication and any assurances
      of licenses to be made available, or the result of an attempt made
-     to obtain a general license or permission for the use of such pro­
+     to obtain a general license or permission for the use of such pro¡
      prietary rights by implementors or users of this specification can
      be obtained from the IETF Secretariat.
 
@@ -281,7 +281,7 @@ Intellectual Property
 
 Chown                                                           [Page 5]
 
-ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+ietf-tls-ciphersuite-05 AES Ciphersuites for TLS          14 August 2001
 
 
      During the development of the AES, NIST published the following
@@ -292,7 +292,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
           NIST reminds all interested parties that the adoption of
           AES is being conducted as an open standards-setting
           activity. Specifically, NIST has requested that all
-          interested parties identify to NIST any patents or inven­
+          interested parties identify to NIST any patents or inven¡
           tions that may be required for the use of AES. NIST
           hereby gives public notice that it may seek redress under
           the antitrust laws of the United States against any party
@@ -301,20 +301,20 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
           NIST in response to this request for information.
 
      One of the authors of Rijndael signed the following disclaimer when
-     submitting the algorithm to NIST for consideration in the AES pro­
+     submitting the algorithm to NIST for consideration in the AES pro¡
      cess:
 
           I, Joan Daemen, do hereby declare that to the best of my
-          knowledge the practice of the algorithm, reference imple­
+          knowledge the practice of the algorithm, reference imple¡
           mentation, and mathematically optimized implementations,
           I have submitted, known as Rijndael may be covered by the
           following U.S. and/or foreign patents:
 
           none
 
-          I do hereby declare that I am aware of no patent applica­
-          tions which may cover the practice of my submitted algo­
-          rithm, reference implementation or mathematically opti­
+          I do hereby declare that I am aware of no patent applica¡
+          tions which may cover the practice of my submitted algo¡
+          rithm, reference implementation or mathematically opti¡
           mized implementations.
 
           I do hereby understand that my submitted algorithm may
@@ -329,7 +329,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
           best of my knowledge, I have fully disclosed all patents
           and patent applications relating to my algorithm.  I also
           understand that the U.S. Government may, during the
-          course of the lifetime of the AES or during the FIPS pub­
+          course of the lifetime of the AES or during the FIPS pub¡
           lic review process, modify the algorithm's specifications
           (e.g., to protect against a newly discovered
 
@@ -337,7 +337,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
 
 Chown                                                           [Page 6]
 
-ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+ietf-tls-ciphersuite-05 AES Ciphersuites for TLS          14 August 2001
 
 
           vulnerability).  Should my submission be selected for
@@ -348,12 +348,12 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
 
           I do hereby agree to provide the statements for any
           patent or patent application identified to cover practice
-          of my algorithm, reference implementation or mathemati­
+          of my algorithm, reference implementation or mathemati¡
           cally optimized implementations and the right to use such
           implementations for the purposes of the AES evaluation
           process.
 
-          I understand that NIST will announce the selected algo­
+          I understand that NIST will announce the selected algo¡
           rithm(s) and proceed to publish the draft FIPS for public
           comment.  If my algorithm (or the derived algorithm) is
           not selected for inclusion in the FIPS (including those
@@ -383,7 +383,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
           application information, as provided to NIST with our
           original submission in June 1998, has not changed.  To
           the best of our knowledge, there are no patents or patent
-          applications covering the practice of the algorithm, ref­
+          applications covering the practice of the algorithm, ref¡
           erence implementation or the mathematically optimized
           implementations.
 
@@ -393,7 +393,7 @@ ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
 
 Chown                                                           [Page 7]
 
-ietf-tls-ciphersuite-03 AES Ciphersuites for TLS         22 January 2001
+ietf-tls-ciphersuite-05 AES Ciphersuites for TLS          14 August 2001
 
 
           [signed]
@@ -426,7 +426,7 @@ Author's Address
      SW19 3TZ
      United Kingdom
 
-     Phone: +44 20 8542 0176
+     Phone: +44 20 8542 7856
      Email: pc@skygate.co.uk
 
 
