@@ -1,5 +1,6 @@
-Version 1.0.13
+Version 1.0.13 (29/04/2004)
 - Some complilation fixes.
+- Added the --xml parameter to the certtool utility.
 
 Version 1.0.12 (23/04/2004)
 - Corrected bug in OpenPGP key loading using a callback.
