@@ -122,8 +122,6 @@ $ certtool --generate-privkey --outfile key.pem
 \begin{verbatim}
 $ certtool --generate-request --load-privkey key.pem --outfile request.pem
 \end{verbatim}
-Note that `request.pem' will hold both the private key and the certificate
-request.
 
 \item To generate a certificate using the previous request, use the command:
 \begin{verbatim}
@@ -134,6 +132,12 @@ $ certtool --generate-certificate --load-request request.pem --outfile cert.pem 
 \item To view the certificate information, use:
 \begin{verbatim}
 $ certtool --certificate-info --infile cert.pem
+\end{verbatim}
+
+\item To generate a PKCS #12 structure using the previous key and certificate, use the command:
+\begin{verbatim}
+$ certtool --load-certificate cert.pem --load-privkey key.pem --to-p12 \
+   --outder --outfile key.p12
 \end{verbatim}
 
 
