@@ -111,7 +111,7 @@ libgnutls_extra_la_LIBADD += ../lib/libgnutls.la ../gl/libgnu.la
 
 gnutls-extra-api.texi: $(COBJECTS)
 	@echo "" > gnutls-extra-api.texi
-	@for i in $(COBJECTS_EXTRA); do \
+	@for i in $(COBJECTS); do \
 		echo -n "Creating documentation for file $$i... " && \
 		../doc/scripts/gdoc -texinfo $$i >> gnutls-extra-api.texi && \
 		echo "ok"; \
