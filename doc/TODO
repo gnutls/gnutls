@@ -2,3 +2,4 @@
 * OpenPGP certificate support (through libgcrypt)
 * Document API using texi (any volunteers?)
 * Add Kerberos support (who wants that?)
+* Audit the code (volunteers?)
