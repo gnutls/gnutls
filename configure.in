@@ -67,6 +67,7 @@ AC_PROG_CC
 AC_TYPE_SIZE_T
 
 AC_C_CONST
+AC_C_INLINE
 
 dnl Checks for programs.
 AC_PROG_INSTALL
@@ -99,12 +100,12 @@ if test $ac_cv_prog_gcc != no; then
 
 	if test $opt_profiler_mode = yes; then
 	  CFLAGS="${CFLAGS} -O0 -fprofile-arcs -ftest-coverage"
+	else
+	  CFLAGS="${CFLAGS} -O2 -ffast-math"
 	fi
 		
 	if test $opt_maintainer_mode = yes; then
 	  CFLAGS="${CFLAGS} -g -Wall -Wpointer-arith"
-	else
-	  CFLAGS="${CFLAGS} -O2 -g -ffast-math"
 	fi
 fi
 
