@@ -4,6 +4,7 @@ Version 0.5.5
   for other hash algorithms except for the srpsha. 
 - Renamed all the constructed types in order to have more consistent
   names. 
+- Improved the certificate and key read functions.
 
 Version 0.5.4 (27/08/2002)
 - Fixes in TLS 1.0 PRF and SSL3 random functions.

@@ -1207,11 +1207,11 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	gnutls_datum tmp;
 	int ret, count;
 
-	ptr = input_cert;
-	siz = input_cert_size;
+	if ( (ptr = strstr( input_cert, PEM_PKCS7_SEP)) != NULL) 
+	{
+		siz = strlen( ptr);
 
-	if (strstr( input_cert, "-----BEGIN PKCS7")!=NULL) {
-		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
+		siz2 = _gnutls_fbase64_decode( ptr, siz, &b64);
 
 		ret = parse_pkcs7_cert_mem( cert_list, ncerts, b64,
 			siz2);
@@ -1220,6 +1220,15 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		
 		return ret;
 	}
+
+	/* move to the certificate
+	 */
+	ptr = strstr( input_cert, PEM_CERT_SEP);
+	if (ptr == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_PARSING_ERROR;
+	}
+	siz = strlen( ptr);
 
 	i = *ncerts + 1;
 	count = 0;
@@ -1274,7 +1283,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 
 
-/* Reads a base64 encoded certificate from memory
+/* Reads a DER or PEM certificate from memory
  */
 static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size, 
 	gnutls_x509_certificate_fmt type)
@@ -1412,10 +1421,23 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 		/* If we find the "DSA PRIVATE" string in the
 		 * pem encoded certificate then it's a DSA key.
 		 */
-		if (strstr( key, "DSA PRIVATE")!=NULL) 
+		if (strstr( key, "DSA PRIVATE")!=NULL) {
 			pk = GNUTLS_PK_DSA;
-		else
+			key = strstr( key, PEM_KEY_DSA_SEP);
+			if (key == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_PARSING_ERROR;
+			}			key_size = strlen( key);
+		} else {
 			pk = GNUTLS_PK_RSA;
+			key = strstr( key, PEM_KEY_RSA_SEP);
+			if (key == NULL) {
+				gnutls_assert();
+				return GNUTLS_E_PARSING_ERROR;
+			}
+			key_size = strlen( key);
+		}
+			
 
 		ret = _gnutls_fbase64_decode(key, key_size, &b64);
 
@@ -1691,6 +1713,9 @@ int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   *
   * DSA private keys are encoded the OpenSSL way, which is an ASN.1
   * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
+  *
+  * If the certificate and the private key are given in PEM encoding
+  * then the strings that hold their values must be null terminated.
   *
   **/
 int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,

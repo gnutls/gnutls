@@ -13,7 +13,11 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert, Con
 #define MAX_INT_DIGITS 4
 void _gnutls_int2str(unsigned int k, char *data);
 
-#define PEM_CERT_SEP "-----BEGIN"
+#define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
+#define PEM_PKCS7_SEP "-----BEGIN PKCS7"
+
+#define PEM_KEY_RSA_SEP "-----BEGIN RSA"
+#define PEM_KEY_DSA_SEP "-----BEGIN DSA"
 
 int _gnutls_check_x509_key_usage( const gnutls_cert * cert, gnutls_kx_algorithm alg);
 time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
