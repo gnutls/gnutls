@@ -40,6 +40,7 @@
 #include <gnutls_pk.h>
 #include <gnutls_x509.h>
 #include <gnutls_openpgp.h>
+#include "debug.h"
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (CERTIFICATE_AUTH_INFO)
@@ -668,8 +669,8 @@ int _gnutls_gen_x509_server_certificate(GNUTLS_STATE state, opaque ** data)
 	ret = 3;
 	for (i = 0; i < apr_cert_list_length; i++) {
 		ret += apr_cert_list[i].raw.size + 3;
-		/* hold size
-		 * for uint24 */
+		/* hold size for uint24
+		 * and the certificate */
 	}
 
 	(*data) = gnutls_malloc(ret);
@@ -686,23 +687,6 @@ int _gnutls_gen_x509_server_certificate(GNUTLS_STATE state, opaque ** data)
 		pdata += (3 + apr_cert_list[i].raw.size);
 	}
 	pdatasize = ret;
-
-#if 0
-	/* read the rsa parameters now, since later we will
-	 * not know which certificate we used!
-	 */
-	if (i != 0)		/* if we parsed at least one certificate */
-		ret =
-		    _gnutls_get_private_rsa_params(state->gnutls_key,
-						   apr_pkey);
-	else
-		ret = 0;
-
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-#endif
 
 	return pdatasize;
 }
