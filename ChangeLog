@@ -1,3 +1,11 @@
+2003-05-08 20:03  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cipher.c, src/serv-gaa.c, src/serv.c,
+	src/serv.gaa:
+
+	Several fixes in several places. Patch by Sean Gao
+	<sean.gao@sun.com>.  
+
 2003-05-03 09:01  nmav <nmav@gnutls.org>
 
 	* lib/: auth_cert.c, auth_cert.c:
