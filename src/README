@@ -1,0 +1,9 @@
+In this directory you will find example applications
+that use gnutls and libgcrypt.
+
+serv.c:
+  an example TLS/SSL server application.
+
+cli.c:
+  a TLS client application.
+
