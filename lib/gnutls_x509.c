@@ -54,24 +54,25 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 typedef struct _oid2string {
 	const char * OID;
 	const char * DESC;
+	int choice;
 	int printable;
 } oid2string;
 
 static oid2string OID2STR[] = {
-	{"2 5 4 6", "X520countryName", 1},
-	{"2 5 4 10", "X520OrganizationName", 1},
-	{"2 5 4 11", "X520OrganizationalUnitName", 1},
-	{"2 5 4 3", "X520CommonName", 1},
-	{"2 5 4 7", "X520LocalityName", 1},
-	{"2 5 4 8", "X520StateOrProvinceName", 1},
-	{"1 2 840 113549 1 9 1", "Pkcs9email", 1},
-	{"1 2 840 113549 1 1 1", "rsaEncryption", 0},
-	{"1 2 840 113549 1 1 2", "md2WithRSAEncryption", 0},
-	{"1 2 840 113549 1 1 4", "md5WithRSAEncryption", 0},
-	{"1 2 840 113549 1 1 5", "sha1WithRSAEncryption", 0},
-	{"1 2 840 10040 4 3", "id-dsa-with-sha1", 0},
-	{"1 2 840 10040 4 1", "id-dsa", 0},
-	{NULL, NULL}
+	{"2 5 4 6", "X520countryName", 0, 1},
+	{"2 5 4 10", "X520OrganizationName", 1, 1},
+	{"2 5 4 11", "X520OrganizationalUnitName", 1, 1},
+	{"2 5 4 3", "X520CommonName", 1, 1},
+	{"2 5 4 7", "X520LocalityName", 1, 1},
+	{"2 5 4 8", "X520StateOrProvinceName", 1, 1},
+	{"1 2 840 113549 1 9 1", "Pkcs9email", 0, 1},
+	{"1 2 840 113549 1 1 1", "rsaEncryption", 0, 0},
+	{"1 2 840 113549 1 1 2", "md2WithRSAEncryption", 0, 0},
+	{"1 2 840 113549 1 1 4", "md5WithRSAEncryption", 0, 0},
+	{"1 2 840 113549 1 1 5", "sha1WithRSAEncryption", 0, 0},
+	{"1 2 840 10040 4 3", "id-dsa-with-sha1", 0, 0},
+	{"1 2 840 10040 4 1", "id-dsa", 0, 0},
+	{NULL}
 };
 
 int _gnutls_x509_oid_data_printable( const char* OID) {
@@ -80,6 +81,18 @@ int i = 0;
 	do {
 		if ( strcmp(OID2STR[i].OID, OID)==0)
 			return OID2STR[i].printable;
+		i++;
+	} while( OID2STR[i].OID != NULL);
+
+	return 0;
+}
+
+int _gnutls_x509_oid_data_choice( const char* OID) {
+int i = 0;
+
+	do {
+		if ( strcmp(OID2STR[i].OID, OID)==0)
+			return OID2STR[i].choice;
 		i++;
 	} while( OID2STR[i].OID != NULL);
 
@@ -98,12 +111,15 @@ int i = 0;
 	return NULL;
 }
 
+/* This function will convert an attribute value, specified by the OID,
+ * to a string.
+ */
 int _gnutls_x509_attribute_type2string( const char* OID, void* value, 
 	int value_size, char * res, int res_size) {
 
 int result;
 char str[1024], tmpname[1024];
-char* TYPE = NULL, *ANAME = NULL;
+const char* ANAME = NULL;
 int CHOICE = -1, len = -1;
 ASN1_TYPE tmpasn;
 
@@ -114,37 +130,10 @@ ASN1_TYPE tmpasn;
 	
 	res[0] = 0;
 
-	if (strcmp( OID, "2 5 4 6") == 0) {
-		ANAME = "X520countryName";
-		TYPE = "countryName";
-		CHOICE = 0;
-	} else 	if (strcmp( OID, "2 5 4 10") == 0) {
-		ANAME = "X520OrganizationName";
-		TYPE = "OrganizationName";
-		CHOICE = 1;
-	} else 	if (strcmp( OID, "2 5 4 11") == 0) {
-		ANAME = "X520OrganizationalUnitName";
-		TYPE = "OrganizationalUnitName",
-		CHOICE = 1;
-	} else 	if (strcmp( OID, "2 5 4 3") == 0) {
-		ANAME = "X520CommonName";
-		TYPE = "CommonName";
-		CHOICE = 1;
-	} else 	if (strcmp( OID, "2 5 4 7") == 0) {
-		ANAME = "X520LocalityName";
-		TYPE = "LocalityName";
-		CHOICE = 1;
-	} else 	if (strcmp( OID, "2 5 4 8") == 0) {
-		ANAME = "X520StateOrProvinceName";
-		TYPE = "StateOrProvinceName";
-		CHOICE = 1;
-	} else 	if (strcmp( OID, "1 2 840 113549 1 9 1") == 0) {
-		ANAME = "Pkcs9email";
-		TYPE = "emailAddress";
-		CHOICE = 0;
-	}
+	ANAME = _gnutls_x509_oid2string( OID);
+	CHOICE = _gnutls_x509_oid_data_choice( OID);
 
-	if (ANAME==NULL || TYPE == NULL) {
+	if (ANAME==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
@@ -152,7 +141,7 @@ ASN1_TYPE tmpasn;
 	_gnutls_str_cpy(str, sizeof(str), "PKIX1."); 
 	_gnutls_str_cat(str, sizeof(str), ANAME); 
 	_gnutls_str_cpy( tmpname, sizeof(tmpname), "temp-structure-"); 
-	_gnutls_str_cat( tmpname, sizeof(tmpname), TYPE); 
+	_gnutls_str_cat( tmpname, sizeof(tmpname), ANAME);
 
 	if ((result =
 	     _gnutls_asn1_create_element(_gnutls_get_pkix(), str,
