@@ -101,5 +101,8 @@ MPI gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
  */
 int _gnutls_dh_get_bits(GNUTLS_STATE state)
 {
-	return state->gnutls_internals.dh_bits;
+	if (state->gnutls_internals.dh_bits>=MIN_BITS)
+		return state->gnutls_internals.dh_bits;
+	else 
+		return MIN_BITS;
 }
