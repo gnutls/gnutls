@@ -551,7 +551,6 @@ void print_list(void)
     printf(", AES-128-CBC");
     printf(", 3DES-CBC");
     printf(", ARCFOUR");
-    printf(", DES-CBC");
     printf(", ARCFOUR-40\n");
 
     printf("MACs:");
@@ -624,8 +623,6 @@ void parse_ciphers(char **ciphers, int nciphers, int *cipher_priority)
 		cipher_priority[j++] = GNUTLS_CIPHER_AES_128_CBC;
 	    else if (strncasecmp(ciphers[i], "3DE", 3) == 0)
 		cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
-	    else if (strncasecmp(ciphers[i], "DES", 3) == 0)
-		cipher_priority[j++] = GNUTLS_CIPHER_DES_CBC;
 	    else if (strcasecmp(ciphers[i], "ARCFOUR-40") == 0)
 		cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
 	    else if (strcasecmp(ciphers[i], "ARCFOUR") == 0)
