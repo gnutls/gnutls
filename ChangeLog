@@ -1,4 +1,18 @@
-2002-07-06 15:35  admcd
+2002-07-10 12:07  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_db.c, gnutls_state.c:
+
+	Now gnutls_deinit() removes abnormally terminated sessions. Added
+	the _gnutls_deinit() function which has the behaviour of the older
+	gnutls_deinit().  
+
+2002-07-10 12:01  nmav <nmav@gnutls.org>
+
+	* src/serv.c:
+
+	corrected possible bug in http server 
+
+2002-07-06 15:35  admcd <admcd@gnutls.org>
 
 	* doc/tex/openssl.tex (tags: gnutls_0_5_0):
 
@@ -1054,13 +1068,13 @@
 
 	read PKCS7 certificate chains in the reverse order.  
 
-2002-03-26 21:05  fiorinaf <ffiorina@gnutls.org>
+2002-03-26 21:05  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/: x509_asn1.c (tags: gnutls_0_4_0), x509_asn1.h:
 
 	add asn1_number_of_elements function 
 
-2002-03-26 21:02  fiorinaf <ffiorina@gnutls.org>
+2002-03-26 21:02  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/x509_der.c:
 
@@ -1219,7 +1233,7 @@
 	Improved compression support. Corrected several bugs in empty 
 	fragment sending and receiving.  
 
-2002-03-19 21:08  fiorinaf <ffiorina@gnutls.org>
+2002-03-19 21:08  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/x509_asn1.c:
 
@@ -1952,7 +1966,7 @@
 	Added GNUTLS_CERT_INVALID and GNUTLS_CERT_VALID of CertificateStatus
 	flags, which replace GNUTLS_CERT_NOT_TRUSTED.  
 
-2002-02-13 19:48  fiorinaf <ffiorina@gnutls.org>
+2002-02-13 19:48  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/x509_ASN.y (tags: gnutls_0_3_91, gnutls_0_3_90):
 
@@ -2511,19 +2525,19 @@
 	changed some buffering code, to use the cleaner
 	gnutls_datum_append().  Leads to a much cleaner code.  
 
-2002-01-28 22:03  fiorinaf <ffiorina@gnutls.org>
+2002-01-28 22:03  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/x509_ASN.y:
 
 	Modules without OID 
 
-2002-01-28 22:02  fiorinaf <ffiorina@gnutls.org>
+2002-01-28 22:02  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/x509_der.c:
 
 	gnutls_str_... functions substitution 
 
-2002-01-28 22:02  fiorinaf <ffiorina@gnutls.org>
+2002-01-28 22:02  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/x509_asn1.c:
 
@@ -3935,13 +3949,13 @@
 	generated and cached into a x509pki_credentials structure.  This
 	would save a lot of time in the server side.  
 
-2001-11-29 20:30  fiorinaf <ffiorina@gnutls.org>
+2001-11-29 20:30  fiorinaf <fiorinaf@gnutls.org>
 
 	* doc/ASN1.readme.txt (tags: gnutls_0_2_91, gnutls_0_2_90):
 
 	overflow buffers check 
 
-2001-11-29 20:22  fiorinaf <ffiorina@gnutls.org>
+2001-11-29 20:22  fiorinaf <fiorinaf@gnutls.org>
 
 	* doc/ASN1.readme.txt, lib/x509_asn1.c, lib/x509_asn1.h,
 	lib/x509_ASN.y:
@@ -5292,13 +5306,13 @@
 
 	changed gnutls_read() semantics 
 
-2001-07-26 20:23  fiorinaf <ffiorina@gnutls.org>
+2001-07-26 20:23  fiorinaf <fiorinaf@gnutls.org>
 
 	* doc/TODO (tags: gnutls_0_1_9):
 
 	Tools for Certificate 
 
-2001-07-26 20:18  fiorinaf <ffiorina@gnutls.org>
+2001-07-26 20:18  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/cert_der.c (tags: gnutls_0_1_9):
 
@@ -5487,13 +5501,13 @@
 
 	added some kind of certificate checking 
 
-2001-07-19 20:43  fiorinaf <ffiorina@gnutls.org>
+2001-07-19 20:43  fiorinaf <fiorinaf@gnutls.org>
 
 	* src/pkcs1.asn:
 
 	"" 
 
-2001-07-19 20:39  fiorinaf <ffiorina@gnutls.org>
+2001-07-19 20:39  fiorinaf <fiorinaf@gnutls.org>
 
 	* doc/ASN1.readme.txt (tags: gnutls_0_2_10, gnutls_0_2_9,
 	gnutls_0_2_3, gnutls_0_2_2, gnutls_0_2_1, gnutls_0_2_0,
@@ -5503,13 +5517,13 @@
 
 	"" 
 
-2001-07-19 20:36  fiorinaf <ffiorina@gnutls.org>
+2001-07-19 20:36  fiorinaf <fiorinaf@gnutls.org>
 
 	* lib/: pkcs1_asn1_tab.c, pkix_asn1_tab.c (tags: gnutls_0_1_9):
 
 	C structure management 
 
-2001-07-19 19:29  fiorinaf <ffiorina@gnutls.org>
+2001-07-19 19:29  fiorinaf <fiorinaf@gnutls.org>
 
 	* src/PkixTabExample.c:
 
