@@ -173,8 +173,10 @@ static int normalize_name( ASN1_TYPE p, char* output, int output_size)
 	return 0;
 }
 
-#define XML_HEADER "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+#define XML_HEADER "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" \
+	"<gnutls:x509:certificate version=\"1.0\">\n"
 
+#define XML_FOOTER "</gnutls:x509:certificate>\n"
 
 static int
 _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
@@ -195,6 +197,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 	_gnutls_string_init( &str, malloc, realloc, free);
 
 	STR_APPEND(XML_HEADER);
+	indent = 1;
 
 	root = _asn1_find_node(structure, name);
 
@@ -551,8 +554,9 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 		}
 	}
 	
+	STR_APPEND(XML_FOOTER);
 	APPEND( "\n\0", 2);
-	
+
 	*res = _gnutls_string2datum( &str);
 	
 	return 0;

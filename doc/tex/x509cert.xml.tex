@@ -1,7 +1,9 @@
 \begin{verbatim}
 
 <?xml version="1.0" encoding="UTF-8"?>
-<certificate type="SEQUENCE">
+
+<gnutls:certificate version="1.0">
+ <certificate type="SEQUENCE">
   <tbsCertificate type="SEQUENCE">
     <version type="INTEGER" encoding="HEX">02</version>
     <serialNumber type="INTEGER" encoding="HEX">01</serialNumber>
@@ -182,6 +184,7 @@
     </parameters>
   </signatureAlgorithm>
   <signature type="BIT STRING" encoding="HEX" length="1024">B73945273AF2A395EC54BF5DC669D953885A9D811A3B92909D24792D36A44EC27E1C463AF8738BEFD29B311CCE8C6D9661BEC30911DAABB39B8813382B32D2E259581EBCD26C495C083984763966FF35D1DEFE432891E610C85072578DA7423244A8F5997B41A1F44E61F4F22C94375775055A5E72F25D5E4557467A91BD4251</signature>
-</certificate>
+ </certificate>
+</gnutls:certificate>
 
 \end{verbatim}

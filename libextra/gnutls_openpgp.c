@@ -1851,8 +1851,12 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
     s = "<?xml version=\"1.0\"?>\n\n";
     rc = _gnutls_string_append_str( &string_xml_key, s );
     if ( rc < 0 ) return rc;
+
+    s = "<gnutls:openpgp:key version=\"1.0\">\n";
+    rc = _gnutls_string_append_str( &string_xml_key, s );
+    if ( rc < 0 ) return rc;
     
-    s = "<OPENPGPKEY>\n";
+    s = " <OPENPGPKEY>\n";
     rc = _gnutls_string_append_str( &string_xml_key, s );
     if ( rc < 0 ) return rc;
 
@@ -1885,7 +1889,12 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
             break;
         }
     }
-    s = "</OPENPGPKEY>\n";
+    s = " </OPENPGPKEY>\n";
+    rc = _gnutls_string_append_str( &string_xml_key, s );
+    if ( rc < 0 ) return rc;
+
+
+    s = "</gnutls:openpgp:key>\n";
     rc = _gnutls_string_append_str( &string_xml_key, s );
     if ( rc < 0 ) return rc;
 

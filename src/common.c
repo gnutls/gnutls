@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <time.h>
 
 void print_cert_info(gnutls_session session);
+
+#define XML
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
@@ -48,6 +51,19 @@ void print_x509_info(gnutls_session session)
 
 	if (cert_list_size <= 0)
 		return;
+
+#ifdef XML
+		{
+			gnutls_datum res;
+	
+			gnutls_x509_certificate_to_xml( &cert_list[0], &res, 0);
+			printf( res.data);
+			
+			free(res.data);
+	
+			return;
+	}
+#endif
 
 	printf(" - Certificate info:\n");
 
@@ -124,6 +140,19 @@ void print_openpgp_info(gnutls_session session)
 
 	if (cert_list_size > 0) {
 		int algo, bits;
+
+#ifdef XML
+		{
+			gnutls_datum res;
+	
+			gnutls_openpgp_key_to_xml( &cert_list[0], &res, 0);
+			printf( res.data);
+			
+			free(res.data);
+	
+			return;
+	}
+#endif
 
 		printf(" # Key was created at: %s", my_ctime( &activet));
 		printf(" # Key expires: ");
