@@ -5,7 +5,7 @@ aclocal.m4:
  include(libgnutls.m4)
 
 configure.in:
- AM_PATH_LIBGNUTLS( 0.3.0,, AC_MSG_ERROR([[
+ AM_PATH_LIBGNUTLS( 0.3.90,, AC_MSG_ERROR([[
 ***
 *** libgnutls was not found. You may want to get it from
 *** ftp://ftp.gnutls.org/pub/gnutls/
