@@ -1,7 +1,7 @@
 Version 1.1.17
-- Initiated move from Libgcrypt to generic crypto API.
-  However, currently only Libgcrypt is supported, and only the
-  encryption/decryption calls go through generic API.
+- Initiated move from Libgcrypt to generic crypto API, with fallback on Nettle.
+  Currently Libgcrypt is still required.  If you specify --with-nettle,
+  Nettle will be used for encryption/decryption functions.
 - Removed length limit on passwords read by 'certtool'.
 - Documentation fixes.
 
