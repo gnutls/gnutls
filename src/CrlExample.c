@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "../lib/x509_asn1.h"
+#include "../lib/gnutls.h"
 #include "../lib/x509_der.h"
 
 extern static_asn pkix_asn1_tab[];
