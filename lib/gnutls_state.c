@@ -374,7 +374,12 @@ void gnutls_deinit(gnutls_session session)
 	}
 
 	gnutls_free( session->internals.srp_username);
-	gnutls_free( session->internals.srp_password);
+
+	if (session->internals.srp_password) {
+		memset( session->internals.srp_password, 0, 
+			strlen(session->internals.srp_password));
+		gnutls_free( session->internals.srp_password);
+	}
 
 	memset( session, 0, sizeof(struct gnutls_session_int));
 	gnutls_free(session);
