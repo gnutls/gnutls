@@ -180,7 +180,6 @@ int main(int argc, char **argv)
 						 x509_crlfile);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the x509 trust file\n");
-	 exit(1);
       }
    }
 
@@ -189,9 +188,8 @@ int main(int argc, char **argv)
 	  gnutls_certificate_set_x509_key_file(xcred, x509_certfile,
 					       x509_keyfile);
       if (ret < 0) {
-	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s'\n",
+	 fprintf(stderr, "Error setting the x509 key files ('%s', '%s')\n",
 		 x509_certfile, x509_keyfile);
-	 exit(1);
       }
    }
 

@@ -7,10 +7,10 @@
 
 typedef void svoid; /* for functions that allocate using gnutls_secure_free */
 
-#ifdef USE_DMALLOC
+#ifdef USE_LIBCALLOC
 # define gnutls_malloc malloc
 # define gnutls_realloc realloc
-# define gnutls_realloc_fast realloc
+# define gnutls_realloc_fast(x, y) (y==0?x:realloc(x, y))
 # define gnutls_free free
 # define gnutls_calloc calloc
 # define gnutls_secure_malloc malloc

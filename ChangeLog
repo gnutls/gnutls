@@ -1,3 +1,10 @@
+2002-03-12 14:13  nmav <nmav@gnutls.org>
+
+	* ChangeLog, NEWS, acconfig.h, configure.in, lib/gnutls_int.h,
+	lib/gnutls_record.c, lib/gnutls_state.c:
+
+	made CBC chosen plaintext protection configurable 
+
 2002-03-11 12:45  twoaday <twoaday@gnutls.org>
 
 	* lib/gnutls_openpgp.c:

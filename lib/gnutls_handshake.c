@@ -2331,13 +2331,13 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	 */
 
 	cert = NULL;
-
 	if (state->security_parameters.entity == GNUTLS_SERVER)
 		cert = _gnutls_server_find_cert(state, requested_pk_algo);
 
 	if (cert == NULL) {
 		/* No certificate was found 
 		 */
+		gnutls_assert();
 		alg_size = 0;
 		alg = NULL;
 	} else {
@@ -2373,9 +2373,9 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 		/* if it is defined but had no credentials 
 		 */
 		if (_gnutls_get_kx_cred
-		    (state->gnutls_key, kx, NULL) == NULL)
+		    (state->gnutls_key, kx, NULL) == NULL) {
 			keep = 1;
-		else
+		} else
 		/* If there was no credentials to use with the specified
 		 * key exchange method, then just remove it.
 		 */
@@ -2385,7 +2385,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 				if (state->security_parameters.entity ==
 				    GNUTLS_SERVER) {
 					/* here we check if the KX algorithm 
-					 * is compatible with the X.509 certificate.
+					 * is compatible with the certificate.
 					 */
 					for (j = 0; j < alg_size; j++) {
 						if (alg[j] == kx) {

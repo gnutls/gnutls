@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2001 Nikos Mavroyanopoulos
+ *      Copyright (C) 2001,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -22,7 +22,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 
-#ifdef USE_DMALLOC
+#ifdef USE_LIBCALLOC
 
 int _gnutls_is_secure_memory(const void *ign)
 {
@@ -224,5 +224,5 @@ char *gnutls_strdup(const char *s)
 
 	return ret;
 }
-#endif				/* USE_DMALLOC */
+#endif	/* USE_LIBCALLOC */
 
