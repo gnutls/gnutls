@@ -1,3 +1,17 @@
+2002-10-02 12:43  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/gnutls_buffers.c:
+
+	some fixes to compile with gcc-2.95.  
+
+2002-10-01 12:19  nmav <nmav@gnutls.org>
+
+	* configure.in, doc/TODO, lib/gnutls.h.in.in, lib/gnutls_privkey.c,
+	lib/gnutls_privkey.h, lib/gnutls_ui.h:
+
+	Added function to extract the public key algorithm of a DER encoded
+	private key.  
+
 2002-09-20 14:51  nmav <nmav@gnutls.org>
 
 	* lib/gnutls_global.c (tags: gnutls_0_5_8):
