@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -42,6 +42,8 @@ int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 {
 
 	if (_gnutls_cipher_is_ok(algo) == 0) {
+		if (_gnutls_is_cipher_selected(algo) < 0) return GNUTLS_E_UNWANTED_ALGORITHM;
+
 		state->security_parameters.bulk_cipher_algorithm = algo;
 		if (_gnutls_cipher_is_block(algo) == 1) {
 			state->security_parameters.cipher_type =
@@ -89,7 +91,7 @@ int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
 	} else {
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
-	
+	if (_gnutls_is_hash_selected(algo) < 0) return GNUTLS_E_UNWANTED_ALGORITHM;
 	state->security_parameters.hash_size = _gnutls_hash_get_digest_size(algo);
 	
 	return 0;
@@ -294,7 +296,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 					GNUTLSCompressed * compressed)
 {
 	GNUTLSCiphertext *ciphertext;
-	uint8 *padding, *content, *MAC;
+	uint8 *padding, *content, *MAC=NULL;
 	uint16 c_length;
 	uint8 *data;
 	uint8 pad;
@@ -464,7 +466,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 					GNUTLSCiphertext * ciphertext)
 {
 	GNUTLSCompressed *compressed;
-	uint8 *content, *MAC;
+	uint8 *content, *MAC=NULL;
 	uint16 c_length;
 	uint8 *data;
 	uint8 pad;

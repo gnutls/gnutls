@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ * Copyright (C) 2000 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -126,8 +126,8 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	uint16 _n_X;
 	uint8 *data;
 	int ret=0;
-	uint8 *premaster;
-	int premaster_size;
+	uint8 *premaster=NULL;
+	int premaster_size=0;
 	svoid* master;
 	char* random = gnutls_malloc(64);
 	
@@ -288,8 +288,8 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 	uint8 *data;
 	int datasize;
 	int ret=0;
-	uint8 *premaster;
-	int premaster_size;
+	uint8 *premaster=NULL;
+	int premaster_size=0;
 	svoid* master;
 	uint8* random = gnutls_malloc(64);
 	

@@ -52,7 +52,7 @@ int _gnutls_send_finished(int cd, GNUTLS_STATE state)
 
 	memset(concat, 0, 36);
 
-	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+	if (state->security_parameters.entity == GNUTLS_CLIENT) { /* we are a CLIENT */
 		memmove(concat, state->gnutls_internals.client_md_md5, 16);
 		memmove(&concat[16],
 			state->gnutls_internals.client_md_sha1, 20);
@@ -133,12 +133,21 @@ int SelectSuite(opaque ret[2], char *data, int datalen)
 	GNUTLS_CipherSuite *ciphers;
 
 	x = _gnutls_supported_ciphersuites(&ciphers);
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Requested cipher suites: \n");
+	for (j=0;j<datalen;j+=2) fprintf(stderr, "\t%s\n", _gnutls_cipher_suite_get_name( *((GNUTLS_CipherSuite*)&data[j]) ));
+	fprintf(stderr, "Supported cipher suites: \n");
+	for (j=0;j<x;j++) fprintf(stderr, "\t%s\n", _gnutls_cipher_suite_get_name(ciphers[j]));
+#endif
 	memset(ret, '\0', sizeof(GNUTLS_CipherSuite));
 
 	for (j = 0; j < datalen; j += 2) {
 		for (i = 0; i < x; i++) {
-			if (memcmp(&ciphers[i].CipherSuite, &data[j], 2) ==
-			    0) {
+			if (memcmp(&ciphers[i].CipherSuite, &data[j], 2) == 0) {
+#ifdef HARD_DEBUG
+				fprintf(stderr, "Selected cipher suite: ");
+				fprintf(stderr, "%s\n", _gnutls_cipher_suite_get_name( *((GNUTLS_CipherSuite*)&data[j]) ));
+#endif
 				memmove(ret, &ciphers[i].CipherSuite, 2);
 				gnutls_free(ciphers);
 				
@@ -177,25 +186,6 @@ int SelectCompMethod(CompressionMethod * ret, char *data, int datalen)
 
 }
 
-
-int _gnutls_supported_ciphersuites(GNUTLS_CipherSuite ** ciphers)
-{
-
-	int i;
-	int count = _gnutls_cipher_suite_count();
-	*ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
-
-
-	for (i = 0; i < count; i++) {
-
-		(*ciphers)[i].CipherSuite[0] =
-		    cipher_suite_algorithms[i].suite.CipherSuite[0];
-		(*ciphers)[i].CipherSuite[1] =
-		    cipher_suite_algorithms[i].suite.CipherSuite[1];
-	}
-
-	return count;
-}
 
 
 #define SUPPORTED_COMPRESSION_METHODS 1
@@ -500,7 +490,6 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		       opaque ** SessionID, int SessionIDnum)
 {
 	uint8 session_id_len = 0, z;
-	uint32 cur_time;
 	int pos = 0;
 	GNUTLS_CipherSuite cipher_suite, *cipher_suites;
 	CompressionMethod compression_method, *compression_methods;
@@ -637,6 +626,9 @@ int gnutls_handshake(int cd, GNUTLS_STATE state)
 	char *session_id;
 	uint8 session_id_size;
 
+	/* These are in order to hash the messages transmitted and received.
+	 * (needed by the protocol)
+	 */
 	state->gnutls_internals.client_td_md5 = mhash_init(MHASH_MD5);
 	state->gnutls_internals.client_td_sha1 = mhash_init(MHASH_SHA1);
 	state->gnutls_internals.server_td_md5 = mhash_init(MHASH_MD5);

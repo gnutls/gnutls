@@ -77,7 +77,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.client_g = NULL;
 	(*state)->gnutls_internals.dh_secret = NULL;
 
-
+	return 0;
 }
 
 int gnutls_deinit(GNUTLS_STATE * state)
@@ -111,7 +111,7 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	mpi_release((*state)->gnutls_internals.dh_secret);
 
 	gnutls_free(*state);
-
+	return 0;
 }
 
 

@@ -1,8 +1,8 @@
 #include <gcrypt.h>
 #include <mhash.h>
 
-#undef HARD_DEBUG
-#undef DEBUG
+#define HARD_DEBUG
+#define DEBUG
 
 #define svoid void /* for functions that allocate using secure_free */
 #define secure_free(x) if (x!=NULL) free(x)
@@ -69,7 +69,7 @@ typedef struct {
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
-enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_3DES = 4 };
+enum BulkCipherAlgorithm { GNUTLS_NULL, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4 };
 enum KX_Algorithm { KX_RSA, KX_DHE_DSS, KX_DHE_RSA, KX_DH_DSS, KX_DH_RSA, KX_ANON_DH };
 enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
