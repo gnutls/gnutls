@@ -17,13 +17,9 @@ gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(L
 
 
 
-noinst_PROGRAMS = prime asn1c CertificateExample CrlExample 
+noinst_PROGRAMS = prime asn1c
 prime_SOURCES = prime-gaa.c prime.c
 prime_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
-CertificateExample_SOURCES = CertificateExample.c  
-CertificateExample_LDADD = ../lib/libgnutls.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
-CrlExample_SOURCES = CrlExample.c  
-CrlExample_LDADD = ../lib/libgnutls.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
 asn1c_SOURCES = asn1c.c
 asn1c_LDADD = ../lib/libgnutls.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
 

@@ -53,7 +53,7 @@ option (pgpkeyfile) STR "FILE" { $pgp_keyfile = $1 } "PGP Key file to use."
 option (pgpkeyring) STR "FILE" { $pgp_keyring = $1 } "PGP Key ring file to use."
 
 #char *pgp_trustdb;
-option (pgptrustdb) STR "FILE" { $pgp_keyring = $1 } "PGP trustdb file to use."
+option (pgptrustdb) STR "FILE" { $pgp_trustdb = $1 } "PGP trustdb file to use."
 
 #char *pgp_certfile;
 option (pgpcertfile) STR "FILE" { $pgp_certfile = $1 } "PGP Public Key (certificate) file to use."

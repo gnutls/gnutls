@@ -24,9 +24,9 @@
 #include <unistd.h>
 #include "../lib/defines.h"
 #include "../lib/gnutls_int.h"
+#include "../lib/gnutls_mem.h"
 #include "../libextra/gnutls_srp.h"
 #include "../libextra/crypt.h"
-#include "../lib/gnutls_mem.h"
 #include "../libextra/auth_srp_passwd.h"
 #include "crypt-gaa.h"
 #include <pwd.h>
