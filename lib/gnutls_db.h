@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
+void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
 int gnutls_set_db_name( GNUTLS_STATE state, char* filename);
 int _gnutls_server_register_current_session( GNUTLS_STATE state);
 int _gnutls_server_restore_session( GNUTLS_STATE state, uint8* session_id, int session_id_size);
