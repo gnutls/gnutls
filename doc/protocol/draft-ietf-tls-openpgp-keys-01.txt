@@ -132,7 +132,8 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 2.1.1.3 Server Hello
 
    Servers that receive an extended client hello containing the
-   "cert_type" extension MUST select a certificate type, or terminate
+   "cert_type" extension MUST select a certificate type, from the
+   certificate_types field in the extended client hello, or terminate
    the connection with a fatal alert of type "unsupported_certificate".
 
    The certificate type selected by the server, is encoded in a
@@ -182,8 +183,8 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    If the key is not valid, expired, revoked, corrupt, the appropriate 
    fatal alert message is sent from section A.3 of the TLS 
    specification. If a key is valid and neither expired nor revoked, 
-   it is accepted by the protocol. The validation procedure is a local
-   matter ouside the scope of this document.
+   it is accepted by the protocol. The key validation procedure is a 
+   local matter ouside the scope of this document.
 
    enum {
         key_fingerprint (0), key (1), (255)
@@ -209,14 +210,14 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
    enum {
        rsa_sign(1), dss_sign(2), (255)
-   } ClientCertificateSignatureType;
+   } ClientCertificateSignType;
 
    struct {
-       ClientCertificateType certificate_types<1..2^8-1>;
+       ClientCertificateSignType certificate_sign_types<1..2^8-1>;
    } CertificateRequest;
 
-   certificate_types is a list of the types of certificates requested,
-   sorted in order of the server's preference.
+   certificate_sign_types is a list of accepted certificate signature
+   algorithms, sorted in order of the server's preference.
 
 2.1.4 Client certificate
 
@@ -230,9 +231,9 @@ N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 4]
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
-   returned.  The server may respond with a "handshake_failure" fatal 
-   alert if client authentication is required. This transaction follows
-   the TLS specification.
+   sent.  The server may respond with a "handshake_failure" fatal alert
+   if client authentication is required. This transaction follows the
+   TLS specification.
 
 2.1.5 Server key exchange
 
@@ -280,13 +281,14 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    CipherSuite TLS_RSA_WITH_AES_128_CBC_RMD           = { 0x00, 0x7D };
    CipherSuite TLS_RSA_WITH_AES_256_CBC_RMD           = { 0x00, 0x7E };
 
-   All of the above cipher suites use either the CAST [CAST], 
+
 
 N. Mavroyanopoulos         Expires ???? ??, 200?               [Page 5]
 
 Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
 
 
+   All of the above cipher suites use either the CAST [CAST], 
    AES [AES], or 3DES block ciphers in CBC mode.  The choice of hash
    is either SHA-1 or RIPEMD-160. Implementations are not required
    to support the above cipher suites. 
@@ -318,8 +320,7 @@ References
 Author's Address
 
    Nikos Mavroyanopoulos
-   nmav@gnu.org
-
+   nmav@gnutls.org
 
 
 
