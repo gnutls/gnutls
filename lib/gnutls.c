@@ -492,15 +492,29 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	return ret;
 }
 
+static int _gnutls_clear_peeked_data( int cd, GNUTLS_STATE state) {
+int sizeofdata;
+char* peekdata;
+
+	sizeofdata = state->gnutls_internals.peek_data_size;
+	peekdata = gnutls_malloc(sizeofdata);
+	/* these were already read by using MSG_PEEK - so it shouldn't fail */
+	_gnutls_Read( cd, peekdata, sizeofdata, 0); 
+	gnutls_free(peekdata);
+	state->gnutls_internals.peek_data_size = 0;
+
+	return 0;
+}
+
 /* This function behave exactly like read(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
- * send (if called by the user the Content is specific)
+ * send (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current state.
  */
 #define MAX_RECV_SIZE 18432 	/* 2^14+2048 */
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data, size_t sizeofdata)
 {
-	uint8 *tmpdata, *peekdata;
+	uint8 *tmpdata;
 	int tmplen;
 	GNUTLS_Version version;
 	uint8 recv_type;
@@ -515,15 +529,10 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
 
 		if (type==GNUTLS_APPLICATION_DATA) {
+			/* if the buffer just got empty */
 			if (gnutls_getDataBufferSize(type, state)==0) {
-				sizeofdata = state->gnutls_internals.peek_data_size;
+				_gnutls_clear_peeked_data( cd, state);
 			}
-			peekdata = gnutls_malloc(sizeofdata);
-			/* these were already read by using MSG_PEEK - so it shouldn't fail */
-			_gnutls_Read( cd, peekdata, sizeofdata, 0); 
-			gnutls_free(peekdata);			
-
-			state->gnutls_internals.peek_data_size -= sizeofdata;
 		}
 		return ret;
 	}
@@ -600,8 +609,8 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	/* read ciphertext */
 
 	if ( type==GNUTLS_APPLICATION_DATA) {
-		state->gnutls_internals.peek_data_size = _gnutls_Read(cd, ciphertext, length, MSG_PEEK);
-		ret = state->gnutls_internals.peek_data_size;
+		/* get the data - but do not free the buffer in the kernel */
+		ret = state->gnutls_internals.peek_data_size = _gnutls_Read(cd, ciphertext, length, MSG_PEEK);
 	} else {
 		ret = _gnutls_Read(cd, ciphertext, length, 0);
 	}
@@ -703,15 +712,11 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	if ((type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE) && (recv_type == type)) {
 		ret = gnutls_getDataFromBuffer(type, state, data, sizeofdata);
 		if (type==GNUTLS_APPLICATION_DATA) {
+			/* if the buffer just got empty */
 			if (gnutls_getDataBufferSize(type, state)==0) {
-				sizeofdata = state->gnutls_internals.peek_data_size;
-			}				
-			peekdata = gnutls_malloc(sizeofdata);
-			/* these were already read by using MSG_PEEK - so it shouldn't fail */
-			_gnutls_Read( cd, peekdata, sizeofdata, 0); 
-			gnutls_free(peekdata);			
+				_gnutls_clear_peeked_data( cd, state);
+			}
 
-			state->gnutls_internals.peek_data_size -= sizeofdata;
 		}
 		gnutls_free(tmpdata);
 	} else {
