@@ -161,7 +161,6 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	int ret = 0;
 	uint16 sizeOfSuites;
 	GNUTLS_Version version;
-	time_t cur_time;
 	char *rand;
 	int len = datalen;
 	int err;
@@ -194,9 +193,8 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 32;
 
 	/* generate server random value */
-	cur_time = CONVuint32( (uint32)time(NULL));
+	WRITEuint32( time(NULL), state->security_parameters.server_random);
 
-	memcpy(state->security_parameters.server_random, &cur_time, 4);
 	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
 	memcpy(&state->security_parameters.server_random[4], rand, 28);
 	_gnutls_free_rand(rand);
@@ -475,21 +473,17 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 {
 	int ret;
 	uint8 *data;
-	uint24 length24;
 	uint32 datasize;
 	int pos = 0;
 
-	datasize = CONVuint32( i_datasize);
-
-	length24 = uint32touint24( datasize);
+	datasize = i_datasize;
 
 	i_datasize += HANDSHAKE_HEADERS_SIZE;
 	data = gnutls_malloc(i_datasize);
 
 	memcpy(&data[pos++], &type, 1);
-	memcpy(&data[pos++], &length24.pint[0], 1);
-	memcpy(&data[pos++], &length24.pint[1], 1);
-	memcpy(&data[pos++], &length24.pint[2], 1);
+	WRITEuint24( datasize, &data[pos]);
+	pos+=3;
 
 	if (i_datasize > 4)
 		memcpy(&data[pos], i_data, i_datasize - 4);
@@ -901,7 +895,6 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 	opaque *extdata;
 	int extdatalen;
 	uint8 z;
-	uint32 cur_time;
 	int pos = 0;
 	GNUTLS_CipherSuite *cipher_suites;
 	uint8 *compression_methods;
@@ -927,10 +920,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 		    _gnutls_version_get_minor(state->connection_state.
 					      version);
 
-		cur_time = CONVuint32( (uint32)time(NULL));
-
-		memcpy(state->security_parameters.client_random,
-			&cur_time, 4);
+		WRITEuint32( time(NULL), state->security_parameters.client_random);
 
 		rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
 		memcpy(&state->security_parameters.client_random[4], rand,
@@ -954,12 +944,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 							  &cipher_suites);
 		x *= sizeof(uint16);	/* in order to get bytes */
 
-		x = CONVuint16( x);
-
-		memcpy(&data[pos], &x, sizeof(uint16));
-
-		x = CONVuint16( x);
-
+		WRITEuint16( x, &data[pos]);
 		pos += sizeof(uint16);
 
 		datalen += x;

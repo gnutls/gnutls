@@ -48,7 +48,6 @@ MOD_AUTH_STRUCT anon_auth_struct = {
 int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 	GNUTLS_MPI x, X, g, p;
 	size_t n_X, n_g, n_p;
-	uint16 _n_X, _n_g, _n_p;
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_X;
@@ -64,22 +63,19 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_p[2], &n_p, p);
 	gnutls_mpi_release(p);
 
-	_n_p = CONVuint16( (uint16)n_p);
-	memmove(data_p, &_n_p, 2);
+	WRITEuint16( n_p, data_p);
 
 	data_g = &data_p[2 + n_p];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, g);
 	gnutls_mpi_release(g);
 	
-	_n_g = CONVuint16( (uint16)n_g);
-	memmove(data_g, &_n_g, 2);
+	WRITEuint16( n_g, data_g);
 
 	data_X = &data_g[2 + n_g];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_X[2], &n_X, X);
 	gnutls_mpi_release(X);
 
-	_n_X = CONVuint16( (uint16)n_X);
-	memmove(data_X, &_n_X, 2);
+	WRITEuint16( n_X, data_X);
 
 	return n_p+n_g+n_X+6;
 }
@@ -87,7 +83,6 @@ int gen_anon_server_kx( GNUTLS_KEY key, opaque** data) {
 int gen_anon_client_kx( GNUTLS_KEY key, opaque** data) {
 GNUTLS_MPI x, X;
 size_t n_X;
-uint16 _n_X;
 
 	X =  _gnutls_calc_dh_secret(&x, key->client_g,
 		   key->client_p);
@@ -100,8 +95,7 @@ uint16 _n_X;
 				   certificate */
 	gnutls_mpi_release(X);
 	
-	_n_X = CONVuint16( (uint16)n_X);
-	memmove(&(*data)[0], &_n_X, 2);
+	WRITEuint16( n_X, &(*data)[0]);
 	
 	/* calculate the key after calculating the message */
 	key->KEY = _gnutls_calc_dh_key(key->client_Y, x, key->client_p);

@@ -94,16 +94,14 @@ int pos=0;
 uint8 type;
 const opaque* sdata;
 int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
-uint16 size, next1;
+uint16 size;
 
 	if (data_size < 2) return 0;
-	memcpy( &next1, data, 2);
 
-	next = CONVuint16(next1);
+	next = READuint16( data);
+	pos+=2;
 
 	if (data_size < next) return 0;
-	
-	pos+=2;
 	
 	do {
 		next--; if (next < 0) return 0;
@@ -133,7 +131,6 @@ int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data) {
 int next, size;
 uint16 pos=0;
 opaque* sdata;
-uint16 ssize;
 int (*ext_func_send)( GNUTLS_STATE, opaque**);
 
 
@@ -150,9 +147,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 			(*data) = gnutls_realloc( (*data), pos+size+3);
 			(*data)[pos++] = (uint8) next; /* set type */
 
-			ssize = CONVuint16( (uint16)size);
-
-			memcpy( &(*data)[pos], &ssize, 2);
+			WRITEuint16( size, &(*data)[pos]);
 			pos+=2;
 			
 			memcpy( &(*data)[pos], sdata, size);
@@ -165,8 +160,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 	size = pos;
 	pos-=2; /* remove the size of the size header! */
 
-	pos = CONVuint16(pos);
-	memcpy( (*data), &pos, sizeof(uint16));
+	WRITEuint16( pos, (*data));
 
 	if (size==2) { /* empty */
 		size = 0;

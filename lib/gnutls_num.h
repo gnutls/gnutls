@@ -27,3 +27,8 @@ uint16 CONVuint16( uint16 data);
 uint16 READuint64( const opaque* data);
 uint32 CONVuint64( uint64 data);
 uint32 READuint24( const opaque* data);
+void WRITEuint24( uint32 num, opaque* data);
+void WRITEuint32( uint32 num, opaque* data);
+void WRITEuint16( uint16 num, opaque* data);
+void WRITEuint64( uint64 num, opaque* data);
+

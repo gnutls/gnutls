@@ -109,7 +109,6 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	int ret = 0;
 	uint16 sizeOfSuites;
 	GNUTLS_Version version;
-	time_t cur_time;
 	char *rand;
 	int len = datalen;
 	int err;
@@ -214,9 +213,8 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	memcpy( state->security_parameters.client_random, &data[challenge > 32 ? (pos+challenge-32) : pos], challenge < 32 ? challenge : 32);
 
 	/* generate server random value */
-	cur_time = CONVuint32((uint32)time(NULL));
+	WRITEuint32( time(NULL), state->security_parameters.server_random);
 
-	memmove(state->security_parameters.server_random, &cur_time, 4);
 	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
 	memmove(&state->security_parameters.server_random[4], rand, 28);
 	_gnutls_free_rand(rand);

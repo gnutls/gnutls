@@ -414,7 +414,6 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 	int i, cipher_size;
 	int ret = 0;
 	int iterations;
-	uint16 length;
 	int Size;
 	uint8 headers[5];
 	uint8 *data=_data;
@@ -446,9 +445,8 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
 		if (cipher_size <= 0) return cipher_size; /* error */
 
-		length = CONVuint16( cipher_size);		
-
-		memmove( &headers[3], &length, sizeof(uint16));
+		WRITEuint16( cipher_size, &headers[3]);
+		
 		/* cipher does not have headers 
 		 * and DOES have size for them
 		 */
@@ -474,9 +472,8 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
 		if (cipher_size<=0) return cipher_size;
 
-		length = CONVuint16( cipher_size);
+		WRITEuint16( cipher_size, &headers[3]);
 
-		memmove( &headers[3], &length, sizeof(uint16));
 		memmove( cipher, headers, HEADER_SIZE);
 
 		cipher_size += HEADER_SIZE;
@@ -502,7 +499,6 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
  */
 ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 {
-	uint16 length;
 	int ret = 0;
 	uint8 type=GNUTLS_CHANGE_CIPHER_SPEC;
 	char data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
@@ -520,9 +516,7 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	fprintf(stderr, "ChangeCipherSpec was sent\n");
 #endif
 
-	length = CONVuint16( 1);
-
-	memmove( &headers[3], &length, sizeof(uint16));
+	WRITEuint16( 1, &headers[3]);
 	
 	if (_gnutls_Write(cd, headers, 5) != 5) {
 		state->gnutls_internals.valid_connection = VALID_FALSE;

@@ -65,8 +65,7 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number */
 int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 {
-	size_t n_g, n_n;
-	uint16 _n_n, _n_g, _n_s;
+	size_t n_g, n_n, n_s;
 	size_t ret;
 	uint8 *data_n, *data_s;
 	uint8 *data_g;
@@ -121,8 +120,7 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
 	
-	_n_g = CONVuint16( n_g);
-	memcpy(data_g, &_n_g, 2);
+	WRITEuint16( n_g, data_g);
 
 	/* copy N (mod n) */
 	data_n = &data_g[2 + n_g];
@@ -132,16 +130,14 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
 	
-	_n_n = CONVuint16( n_n);
-	memcpy(data_n, &_n_n, 2);
+	WRITEuint16( n_n, data_n);
 
 	/* copy the salt */
 	data_s = &data_n[2 + n_n];
-	_n_s = pwd_entry->salt_size;
-	memcpy(&data_s[2], pwd_entry->salt, _n_s);
+	n_s = pwd_entry->salt_size;
+	memcpy(&data_s[2], pwd_entry->salt, n_s);
 
-	_n_s = CONVuint16( _n_s);
-	memcpy(data_s, &_n_s, 2);
+	WRITEuint16( n_s, data_s);
 
 	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
 	_gnutls_srp_clear_pwd_entry(pwd_entry);
@@ -153,7 +149,6 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 {
 	size_t n_b;
-	uint16 _n_b;
 	uint8 *data_b;
 
 	/* calculate:  B = (v + g^b) % N */
@@ -169,8 +164,7 @@ int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_b[2], &n_b, B)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 
-	_n_b = CONVuint16( n_b);
-	memcpy(data_b, &_n_b, 2);
+	WRITEuint16( n_b, data_b);
 
 	/* calculate u */
 	key->u = _gnutls_calc_srp_u(B);
@@ -192,7 +186,6 @@ int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 int gen_srp_client_kx0(GNUTLS_KEY key, opaque ** data)
 {
 	size_t n_a;
-	uint16 _n_a;
 	uint8 *data_a;
 	char *username;
 	char *password;
@@ -221,8 +214,7 @@ int gen_srp_client_kx0(GNUTLS_KEY key, opaque ** data)
 	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_a[2], &n_a, A)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 
-	_n_a = CONVuint16( (uint16)n_a);
-	memcpy(data_a, &_n_a, 2);
+	WRITEuint16( n_a, data_a);
 
 	return n_a + 2;
 }

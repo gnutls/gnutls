@@ -71,6 +71,21 @@ return res;
 }
 
 inline
+void WRITEuint24( uint32 num, opaque* data) {
+uint24 tmp;
+	
+#ifndef WORDS_BIGENDIAN
+	num = byteswap32( num);
+#endif
+	tmp = uint32touint24( num);
+
+	data[0] = tmp.pint[0];
+	data[1] = tmp.pint[1];
+	data[2] = tmp.pint[2];
+	return;
+}
+
+inline
 uint32 READuint32( const opaque* data) {
 uint32 res;
 
@@ -82,6 +97,16 @@ return res;
 }
 
 inline
+void WRITEuint32( uint32 num, opaque* data) {
+
+#ifndef WORDS_BIGENDIAN
+	num = byteswap32( num);
+#endif
+	memcpy( data, &num, sizeof(uint32));
+	return;
+}
+
+inline
 uint16 READuint16( const opaque* data) {
 uint16 res;
 	memcpy( &res, data, sizeof(uint16));
@@ -89,6 +114,16 @@ uint16 res;
 	res = byteswap16( res);
 #endif
 return res;
+}
+
+inline
+void WRITEuint16( uint16 num, opaque* data) {
+
+#ifndef WORDS_BIGENDIAN
+	num = byteswap16( num);
+#endif
+	memcpy( data, &num, sizeof(uint16));
+	return;
 }
 
 inline
@@ -118,6 +153,16 @@ uint64 res;
 	res = byteswap64( res);
 #endif
 return res;
+}
+
+inline
+void WRITEuint64( uint64 num, opaque* data) {
+
+#ifndef WORDS_BIGENDIAN
+	num = byteswap64( num);
+#endif
+	memcpy( data, &num, sizeof(uint64));
+	return;
 }
 
 inline
