@@ -3,6 +3,8 @@ Version ?.?.?
   documentation.
 - Added gnutls_handshake_set_rsa_pms() function, which disables the
   version check in RSA premaster secret.
+- Added gnutls_session_is_resumed() function, which reports if a session
+  is a resumpted one.
 
 Version 0.4.1 (7/04/2002)
 - Now uses alloca() for temporary variables

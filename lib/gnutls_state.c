@@ -598,24 +598,24 @@ int _gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size
 }
 
 /**
-  * gnutls_session_resumed - Used to check whether this session is a resumed one
+  * gnutls_session_is_resumed - Used to check whether this session is a resumed one
   * @state: is a &GNUTLS_STATE structure.
   *
-  * This function will return 0 if this session is a resumed one,
-  * or a negative number if this is a new session.
+  * This function will return non zero if this session is a resumed one,
+  * or a zero if this is a new session.
   *
   **/
-int gnutls_session_resumed(GNUTLS_STATE state)
+int gnutls_session_is_resumed(GNUTLS_STATE state)
 {
 	if (state->security_parameters.entity==GNUTLS_CLIENT) {
 		if (memcmp( state->security_parameters.session_id,
 			state->gnutls_internals.resumed_security_parameters.session_id,
 			state->security_parameters.session_id_size)==0)
-			return 0;
+			return 1;
 	} else {
 		if (state->gnutls_internals.resumed==RESUME_TRUE)
-			return 0;
+			return 1;
 	}
 
-	return GNUTLS_E_UNKNOWN_ERROR;
+	return 0;
 }

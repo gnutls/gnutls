@@ -451,7 +451,7 @@ int main(int argc, char **argv)
 	 continue;
       }
       printf("- Handshake was completed\n");
-      if ( gnutls_session_resumed( state)==0)
+      if ( gnutls_session_is_resumed( state)!=0)
          printf("*** This is a resumed session\n");
 
       print_info(state);

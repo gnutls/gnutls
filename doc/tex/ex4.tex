@@ -99,7 +99,7 @@ int main()
       } else { /* the second time we connect */
 
          /* check if we actually resumed the previous session */
-         if (gnutls_session_resumed( state) == 0) {
+         if (gnutls_session_is_resumed( state) != 0) {
             printf("- Previous session was resumed\n");
          } else {
             fprintf(stderr, "*** Previous session was NOT resumed\n");
