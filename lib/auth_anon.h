@@ -4,9 +4,9 @@
 typedef struct {
 	gnutls_dh_params dh_params;
 } ANON_SERVER_CREDENTIALS_INT;
-#define GNUTLS_ANON_SERVER_CREDENTIALS ANON_SERVER_CREDENTIALS_INT*
+#define gnutls_anon_server_credentials ANON_SERVER_CREDENTIALS_INT*
 
-#define GNUTLS_ANON_CLIENT_CREDENTIALS void*
+#define gnutls_anon_client_credentials void*
 
 typedef struct ANON_CLIENT_AUTH_INFO_INT {
 	int dh_prime_bits;

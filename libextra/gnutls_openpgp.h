@@ -12,7 +12,7 @@ typedef enum {
 } key_attr_t;
 
 int gnutls_certificate_set_openpgp_key_file(
-    GNUTLS_CERTIFICATE_CREDENTIALS res,
+    gnutls_certificate_credentials res,
     char* CERTFILE,
     char* KEYFILE);
 
@@ -62,11 +62,11 @@ int gnutls_openpgp_add_keyring_file(
     const char *name );
 
 int gnutls_certificate_set_openpgp_keyring_file( 
-    GNUTLS_CERTIFICATE_CREDENTIALS c,
+    gnutls_certificate_credentials c,
     const char *file );
 
 int gnutls_certificate_set_openpgp_keyring_mem(
-    GNUTLS_CERTIFICATE_CREDENTIALS c,
+    gnutls_certificate_credentials c,
     const opaque *data,
     size_t dlen );    
 
@@ -98,7 +98,7 @@ int _gnutls_openpgp_cert2gnutls_cert(
 int
 _gnutls_openpgp_request_key(
     gnutls_datum* ret, 
-    const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+    const gnutls_certificate_credentials cred,
     opaque* key_fpr,
     int key_fpr_size );
 

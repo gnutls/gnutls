@@ -121,9 +121,9 @@ int main(int argc, char **argv)
    int maxfd;
    struct timeval tv;
    int user_term = 0;
-   GNUTLS_SRP_CLIENT_CREDENTIALS cred;
-   GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
-   GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
+   gnutls_srp_client_credentials cred;
+   gnutls_anon_client_credentials anon_cred;
+   gnutls_certificate_credentials xcred;
    struct hostent *server_host;
 
    gaa_parser(argc, argv);

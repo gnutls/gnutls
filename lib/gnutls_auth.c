@@ -69,16 +69,15 @@ int gnutls_clear_creds( gnutls_session session) {
   * structure. Thus you will have to keep the structure allocated until   
   * you call gnutls_deinit(). ]
   *
-  * For GNUTLS_CRD_ANON cred should be ANON_CLIENT_CREDENTIALS in case of a client.
-  * In case of a server it should be ANON_SERVER_CREDENTIALS.
+  * For GNUTLS_CRD_ANON cred should be gnutls_anon_client_credentials in case of a client.
+  * In case of a server it should be gnutls_anon_server_credentials.
   * 
-  * For GNUTLS_CRD_SRP cred should be SRP_CLIENT_CREDENTIALS
-  * in case of a client, and SRP_SERVER_CREDENTIALS, in case
+  * For GNUTLS_CRD_SRP cred should be gnutls_srp_client_credentials
+  * in case of a client, and gnutls_srp_server_credentials, in case
   * of a server.
   *
-  * For GNUTLS_CRD_CERTIFICATE cred should be CERTIFICATE_CLIENT_CREDENTIALS
-  * in case of a client, and CERTIFICATE_SERVER_CREDENTIALS, in case
-  * of a server.
+  * For GNUTLS_CRD_CERTIFICATE cred should be gnutls_certificate_credentials.
+  *
   **/
 int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type, void* cred) {
 	AUTH_CRED * ccred=NULL, *pcred=NULL;

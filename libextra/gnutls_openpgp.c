@@ -586,7 +586,7 @@ leave:
 }
 
 int
-gnutls_certificate_set_openpgp_key_mem( GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
                                         gnutls_datum *cert,
                                         gnutls_datum *key )
 {
@@ -671,7 +671,7 @@ leave:
  * should only contain one key which should not be encrypted.
  **/
 int
-gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_key_file(gnutls_certificate_credentials res,
                                         char* CERTFILE,
                                         char* KEYFILE)
 {
@@ -1314,7 +1314,7 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
  *
  **/
 int
-gnutls_certificate_set_openpgp_keyring_file(GNUTLS_CERTIFICATE_CREDENTIALS c,
+gnutls_certificate_set_openpgp_keyring_file(gnutls_certificate_credentials c,
                                             const char *file)
 {
     if (!c || !file)
@@ -1327,7 +1327,7 @@ gnutls_certificate_set_openpgp_keyring_file(GNUTLS_CERTIFICATE_CREDENTIALS c,
 }
 
 int
-gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
+gnutls_certificate_set_openpgp_keyring_mem( gnutls_certificate_credentials c,
                                             const opaque *data, size_t dlen )
 {
     CDK_IOBUF out = NULL;
@@ -1475,7 +1475,7 @@ leave:
 /*-
  * _gnutls_openpgp_request_key - Receives a key from a database, key server etc
  * @ret - a pointer to gnutls_datum structure.
- * @cred - a GNUTLS_CERTIFICATE_CREDENTIALS structure.
+ * @cred - a gnutls_certificate_credentials structure.
  * @key_fingerprint - The keyFingerprint
  * @key_fingerprint_size - the size of the fingerprint
  *
@@ -1485,7 +1485,7 @@ leave:
  -*/
 int
 _gnutls_openpgp_request_key( gnutls_datum* ret, 
-                             const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+                             const gnutls_certificate_credentials cred,
                              opaque* key_fpr,
                              int key_fpr_size)
 {
@@ -1525,7 +1525,7 @@ leave:
  *
  **/
 int
-gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
                                          char* keyserver,
                                          int port)
 {
@@ -1907,7 +1907,7 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
  *
  **/
 int
-gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
                                         char* trustdb )
 {
     if ( !res || !trustdb )
@@ -1943,7 +1943,7 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
 }
 
 int
-gnutls_certificate_set_openpgp_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_key_mem(gnutls_certificate_credentials res,
                                        gnutls_datum *cert,
                                        gnutls_datum *key)
 {
@@ -1951,7 +1951,7 @@ gnutls_certificate_set_openpgp_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 int
-gnutls_certificate_set_openpgp_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
                                          char* CERTFILE,
                                          char* KEYFILE )
 {
@@ -2017,14 +2017,14 @@ gnutls_openpgp_add_keyring_mem( gnutls_datum *keyring,
 }
 
 int
-gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS c,
+gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials c,
                                              const char *file )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 int
-gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
+gnutls_certificate_set_openpgp_keyring_mem( gnutls_certificate_credentials c,
 						const opaque* data,
                                             size_t dlen)
 {
@@ -2033,7 +2033,7 @@ gnutls_certificate_set_openpgp_keyring_mem( GNUTLS_CERTIFICATE_CREDENTIALS c,
 
 int
 _gnutls_openpgp_request_key( gnutls_datum* ret,
-                             const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+                             const gnutls_certificate_credentials cred,
                              opaque* key_fpr,
                              int key_fpr_size )
 {
@@ -2041,7 +2041,7 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
 }
 
 int
-gnutls_certificate_set_openpgp_keyserver( GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_keyserver( gnutls_certificate_credentials res,
                                           char* keyserver,
                                           int port )
 {
@@ -2049,7 +2049,7 @@ gnutls_certificate_set_openpgp_keyserver( GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 int
-gnutls_certificate_set_openpgp_trustdb( GNUTLS_CERTIFICATE_CREDENTIALS res,
+gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
                                         char* trustdb )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;

@@ -75,7 +75,7 @@ int _gnutls_srp_send_params( gnutls_session state, opaque* data, int data_size) 
 
 	/* this function sends the client extension data (username) */
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-		const GNUTLS_SRP_CLIENT_CREDENTIALS cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_CRD_SRP, NULL);
+		const gnutls_srp_client_credentials cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_CRD_SRP, NULL);
 
 		if (cred==NULL) return 0;
 

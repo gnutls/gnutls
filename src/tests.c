@@ -27,9 +27,9 @@
 #include <string.h>
 #include <common.h>
 
-extern GNUTLS_SRP_CLIENT_CREDENTIALS srp_cred;
-extern GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
-extern GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
+extern gnutls_srp_client_credentials srp_cred;
+extern gnutls_anon_client_credentials anon_cred;
+extern gnutls_certificate_credentials xcred;
 
 extern int more_info;
 

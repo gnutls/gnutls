@@ -97,7 +97,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	int apr_cert_list_length;
 	gnutls_datum signature, ddata;
 	CERTIFICATE_AUTH_INFO info;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 
 	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
@@ -439,7 +439,7 @@ static int proc_dhe_client_kx(gnutls_session session, opaque * data,
 	size_t _n_Y;
 	GNUTLS_MPI g, p;
 	int bits, ret;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 
 	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {

@@ -304,28 +304,28 @@ GNUTLS_MPI _gnutls_calc_srp_S2(GNUTLS_MPI B, GNUTLS_MPI g, GNUTLS_MPI x, GNUTLS_
 }
 
 /**
-  * gnutls_srp_free_server_credentials - Used to free an allocated GNUTLS_SRP_CLIENT_CREDENTIALS structure
-  * @sc: is an &GNUTLS_SRP_CLIENT_CREDENTIALS structure.
+  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_client_credentials structure
+  * @sc: is an &gnutls_srp_client_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_srp_free_client_credentials( GNUTLS_SRP_CLIENT_CREDENTIALS sc) {
+void gnutls_srp_free_client_credentials( gnutls_srp_client_credentials sc) {
 	gnutls_free( sc->username);
 	gnutls_free( sc->password);
 	gnutls_free( sc);
 }
 
 /**
-  * gnutls_srp_allocate_server_credentials - Used to allocate an GNUTLS_SRP_SERVER_CREDENTIALS structure
-  * @sc: is a pointer to an &GNUTLS_SRP_SERVER_CREDENTIALS structure.
+  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials structure
+  * @sc: is a pointer to an &gnutls_srp_server_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_srp_allocate_client_credentials( GNUTLS_SRP_CLIENT_CREDENTIALS *sc) {
+int gnutls_srp_allocate_client_credentials( gnutls_srp_client_credentials *sc) {
 	*sc = gnutls_calloc( 1, sizeof(SRP_CLIENT_CREDENTIALS_INT));
   
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -334,13 +334,13 @@ int gnutls_srp_allocate_client_credentials( GNUTLS_SRP_CLIENT_CREDENTIALS *sc) {
 }
 
 /**
-  * gnutls_srp_set_client_credentials - Used to set the username/password, in a GNUTLS_SRP_CLIENT_CREDENTIALS structure
-  * @res: is an &GNUTLS_SRP_CLIENT_CREDENTIALS structure.
+  * gnutls_srp_set_client_credentials - Used to set the username/password, in a gnutls_srp_client_credentials structure
+  * @res: is an &gnutls_srp_client_credentials structure.
   * @username: is the user's userid
   * @password: is the user's password
   *
   **/
-int gnutls_srp_set_client_credentials( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char * password) {
+int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *username, char * password) {
 
 	if (username==NULL || password == NULL) {
 		gnutls_assert();
@@ -360,14 +360,14 @@ int gnutls_srp_set_client_credentials( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *
 }
 
 /**
-  * gnutls_srp_free_server_credentials - Used to free an allocated GNUTLS_SRP_SERVER_CREDENTIALS structure
-  * @sc: is an &GNUTLS_SRP_SERVER_CREDENTIALS structure.
+  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_server_credentials structure
+  * @sc: is an &gnutls_srp_server_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_srp_free_server_credentials( GNUTLS_SRP_SERVER_CREDENTIALS sc) {
+void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials sc) {
 int i;
 	for (i=0;i<sc->password_files;i++) {
 		gnutls_free( sc->password_file[i]);
@@ -380,14 +380,14 @@ int i;
 }
 
 /**
-  * gnutls_srp_allocate_server_credentials - Used to allocate an GNUTLS_SRP_SERVER_CREDENTIALS structure
-  * @sc: is a pointer to an &GNUTLS_SRP_SERVER_CREDENTIALS structure.
+  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials structure
+  * @sc: is a pointer to an &gnutls_srp_server_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_srp_allocate_server_credentials( GNUTLS_SRP_SERVER_CREDENTIALS *sc) {
+int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials *sc) {
 	*sc = gnutls_calloc( 1, sizeof(SRP_SERVER_CREDENTIALS_INT));
 	
 	if (*sc==NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -407,13 +407,13 @@ FILE* fd;
 }
 
 /**
-  * gnutls_srp_set_server_credentials_file - Used to set the password files, in a GNUTLS_SRP_SERVER_CREDENTIALS structure
-  * @res: is an &GNUTLS_SRP_SERVER_CREDENTIALS structure.
+  * gnutls_srp_set_server_credentials_file - Used to set the password files, in a gnutls_srp_server_credentials structure
+  * @res: is an &gnutls_srp_server_credentials structure.
   * @password_file: is the SRP password file (tpasswd)
   * @password_conf_file: is the SRP password conf file (tpasswd.conf)
   *
   **/
-int gnutls_srp_set_server_credentials_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
+int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, char *password_file, char * password_conf_file) {
 int i;
 	
 	if (password_file==NULL || password_conf_file==NULL) {
@@ -521,29 +521,29 @@ const char *gnutls_srp_server_get_username(gnutls_session session)
 /* FIXME: Functions for backwards compatibility 
  */
 
-void gnutls_srp_free_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS sc) {
+void gnutls_srp_free_client_cred( gnutls_srp_client_credentials sc) {
 	return gnutls_srp_free_client_credentials( sc);
 }
 
-void gnutls_srp_free_server_cred( GNUTLS_SRP_SERVER_CREDENTIALS sc) {
+void gnutls_srp_free_server_cred( gnutls_srp_server_credentials sc) {
 	return gnutls_srp_free_server_credentials( sc);
 }
 
-int gnutls_srp_allocate_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS *sc) {
+int gnutls_srp_allocate_client_cred( gnutls_srp_client_credentials *sc) {
 	return gnutls_srp_allocate_client_credentials( sc);
 }
 
-int gnutls_srp_allocate_server_cred( GNUTLS_SRP_SERVER_CREDENTIALS *sc) 
+int gnutls_srp_allocate_server_cred( gnutls_srp_server_credentials *sc) 
 {
 	return gnutls_srp_allocate_server_credentials( sc);
 }
 
-int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) 
+int gnutls_srp_set_server_cred_file( gnutls_srp_server_credentials res, char *password_file, char * password_conf_file) 
 {
 	return gnutls_srp_set_server_credentials_file( res, password_file, password_conf_file);
 }
 
-int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char * password) 
+int gnutls_srp_set_client_cred( gnutls_srp_client_credentials res, char *username, char * password) 
 {
 	return gnutls_srp_set_client_credentials( res, username, password);
 }

@@ -54,9 +54,9 @@ int port;
 int record_max_size;
 int fingerprint;
 
-GNUTLS_SRP_CLIENT_CREDENTIALS srp_cred;
-GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
-GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
+gnutls_srp_client_credentials srp_cred;
+gnutls_anon_client_credentials anon_cred;
+gnutls_certificate_credentials xcred;
 
 /* end of global stuff */
 

@@ -95,14 +95,14 @@ void _gnutls_free_cert(gnutls_cert cert)
 }
 
 /**
-  * gnutls_certificate_free_credentials - Used to free an allocated CERTIFICATE CREDENTIALS structure
-  * @sc: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_certificate_free_credentials(GNUTLS_CERTIFICATE_CREDENTIALS sc)
+void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 {
 	int i, j;
 
@@ -135,14 +135,14 @@ void gnutls_certificate_free_credentials(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 
 
 /**
-  * gnutls_certificate_allocate_credentials - Used to allocate an x509 SERVER CREDENTIALS structure
-  * @res: is a pointer to an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * gnutls_certificate_allocate_credentials - Used to allocate an gnutls_certificate_credentials structure
+  * @res: is a pointer to an &gnutls_certificate_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_certificate_allocate_credentials(GNUTLS_CERTIFICATE_CREDENTIALS * res)
+int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res)
 {
 	*res = gnutls_calloc(1, sizeof(CERTIFICATE_CREDENTIALS_INT));
 
@@ -322,7 +322,7 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
 int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	gnutls_certificate_status verify;
 	int peer_certificate_list_size;
 

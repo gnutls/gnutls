@@ -2341,7 +2341,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	int ret = 0;
 	GNUTLS_CipherSuite *newSuite;
 	int newSuiteSize = 0, i, j, keep;
-	const GNUTLS_CERTIFICATE_CREDENTIALS x509_cred;
+	const gnutls_certificate_credentials x509_cred;
 	const gnutls_cert *cert = NULL;
 	gnutls_kx_algorithm *alg;
 	int alg_size;

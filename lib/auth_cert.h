@@ -53,7 +53,7 @@ typedef struct {
 } CERTIFICATE_CREDENTIALS_INT;
 
 /* typedef CERTIFICATE_CREDENTIALS_INT * CERTIFICATE_CREDENTIALS; */
-#define GNUTLS_CERTIFICATE_CREDENTIALS CERTIFICATE_CREDENTIALS_INT*
+#define gnutls_certificate_credentials CERTIFICATE_CREDENTIALS_INT*
 
 typedef struct CERTIFICATE_AUTH_INFO_INT {
 	int		  certificate_requested; /* if the peer requested certificate

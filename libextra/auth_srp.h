@@ -6,7 +6,7 @@ typedef struct {
 	char* password;
 } SRP_CLIENT_CREDENTIALS_INT;
 
-#define GNUTLS_SRP_CLIENT_CREDENTIALS SRP_CLIENT_CREDENTIALS_INT*
+#define gnutls_srp_client_credentials SRP_CLIENT_CREDENTIALS_INT*
 
 typedef struct {
 	char** password_file;
@@ -14,7 +14,7 @@ typedef struct {
 	int password_files;
 } SRP_SERVER_CREDENTIALS_INT;
 
-#define GNUTLS_SRP_SERVER_CREDENTIALS SRP_SERVER_CREDENTIALS_INT*
+#define gnutls_srp_server_credentials SRP_SERVER_CREDENTIALS_INT*
 
 /* these structures should not use allocated data */
 typedef struct SRP_SERVER_AUTH_INFO_INT {

@@ -161,7 +161,7 @@ int i;
 int _gnutls_get_private_rsa_params(gnutls_session session, GNUTLS_MPI **params, int* params_size)
 {
 int index;
-const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+const gnutls_certificate_credentials cred;
 
 	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {

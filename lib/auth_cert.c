@@ -164,7 +164,7 @@ inline
 /* Locates the most appropriate x509 certificate using the
  * given DN. If indx == -1 then no certificate was found.
  */
-static int _find_x509_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+static int _find_x509_cert(const gnutls_certificate_credentials cred,
 			   opaque * _data, int _data_size,
 			   gnutls_pk_algorithm * pk_algos, int pk_algos_length,
 			   int *indx)
@@ -234,7 +234,7 @@ static int _find_x509_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 
 /* Locates the most appropriate openpgp cert
  */
-static int _find_openpgp_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
+static int _find_openpgp_cert(const gnutls_certificate_credentials cred,
 			      gnutls_pk_algorithm * pk_algos, int pk_algos_length,
 			      int *indx)
 {
@@ -281,7 +281,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 	int result, size;
 	int indx = -1;
 	int i, j, try = 0, *ij_map = NULL;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	opaque *data = _data;
 	int data_size = _data_size;
 
@@ -666,7 +666,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session, opaque * data,
 	int size, len, ret;
 	opaque *p = data;
 	CERTIFICATE_AUTH_INFO info;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	int dsize = data_size;
 	int i, j, x;
 	gnutls_cert *peer_certificate_list;
@@ -800,7 +800,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 	int size, ret, len;
 	opaque *p = data;
 	CERTIFICATE_AUTH_INFO info;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	int dsize = data_size;
 	int i, x;
 	gnutls_cert *peer_certificate_list;
@@ -1003,7 +1003,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 {
 	int size, ret;
 	opaque *p = data;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	CERTIFICATE_AUTH_INFO info;
 	int dsize = data_size;
 	int i, j, ind;
@@ -1197,7 +1197,7 @@ int _gnutls_proc_cert_client_cert_vrfy(gnutls_session session, opaque * data,
 #define CERTTYPE_SIZE 3
 int _gnutls_gen_cert_server_cert_req(gnutls_session session, opaque ** data)
 {
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	int size;
 	opaque *pdata;
 
@@ -1250,7 +1250,7 @@ int _gnutls_find_apr_cert(gnutls_session session, gnutls_cert ** apr_cert_list,
 			  int *apr_cert_list_length,
 			  gnutls_private_key ** apr_pkey)
 {
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	int ind;
 
 	cred =
@@ -1329,7 +1329,7 @@ const gnutls_cert *_gnutls_server_find_cert(gnutls_session session,
 					    gnutls_pk_algorithm requested_algo)
 {
 	int i;
-	const GNUTLS_CERTIFICATE_CREDENTIALS x509_cred;
+	const gnutls_certificate_credentials x509_cred;
 
 	x509_cred =
 	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
@@ -1361,7 +1361,7 @@ int _gnutls_server_find_cert_list_index(gnutls_session session,
 					gnutls_pk_algorithm requested_algo)
 {
 	int i, index = -1, j;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	int my_certs_length;
 	int *ij_map = NULL;
 

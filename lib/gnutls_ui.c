@@ -190,7 +190,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session session)
   **/
 const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 {
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	int index;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
@@ -295,7 +295,7 @@ int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* dat
 
 /**
   * gnutls_anon_set_server_dh_params - This function will set the DH parameters for a server to use
-  * @res: is a GNUTLS_ANON_SERVER_CREDENTIALS structure
+  * @res: is a gnutls_anon_server_credentials structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
   * This function will set the diffie hellman parameters for an anonymous
@@ -303,13 +303,13 @@ int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* dat
   * cipher suites.
   *
   **/
-void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, gnutls_dh_params dh_params) {
+void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutls_dh_params dh_params) {
 	res->dh_params = dh_params;
 }
 
 /**
   * gnutls_certificate_set_dh_params - This function will set the DH parameters for a server to use
-  * @res: is a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is a gnutls_certificate_credentials structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
   * This function will set the diffie hellman parameters for a certificate
@@ -317,14 +317,14 @@ void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, gnutl
   * cipher suites.
   *
   **/
-int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, gnutls_dh_params dh_params) {
+int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params dh_params) {
 	res->dh_params = dh_params;
 	return 0;
 }
 
 /**
   * gnutls_certificate_set_rsa_params - This function will set the RSA parameters for a server to use
-  * @res: is a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @res: is a gnutls_certificate_credentials structure
   * @rsa_params: is a structure that holds temporary RSA parameters.
   *
   * This function will set the temporary RSA parameters for a certificate
@@ -332,7 +332,7 @@ int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, gnutls_
   * cipher suites.
   *
   **/
-int gnutls_certificate_set_rsa_params(GNUTLS_CERTIFICATE_CREDENTIALS res, gnutls_rsa_params rsa_params) {
+int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params) {
 	res->rsa_params = rsa_params;
 	return 0;
 }

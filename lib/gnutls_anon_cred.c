@@ -33,27 +33,27 @@
 static int anon_tmp;
 
 /**
-  * gnutls_anon_free_server_credentials - Used to free an allocated GNUTLS_ANON_SERVER_CREDENTIALS structure
-  * @sc: is an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
+  * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials structure
+  * @sc: is an &gnutls_anon_server_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_anon_free_server_credentials( GNUTLS_ANON_SERVER_CREDENTIALS sc) {
+void gnutls_anon_free_server_credentials( gnutls_anon_server_credentials sc) {
 
 	gnutls_free( sc);
 }
 
 /**
-  * gnutls_anon_allocate_server_credentials - Used to allocate an GNUTLS_ANON_SERVER CREDENTIALS structure
-  * @sc: is a pointer to an &GNUTLS_ANON_SERVER_CREDENTIALS structure.
+  * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials structure
+  * @sc: is a pointer to an &gnutls_anon_server_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_anon_allocate_server_credentials( GNUTLS_ANON_SERVER_CREDENTIALS *sc) {
+int gnutls_anon_allocate_server_credentials( gnutls_anon_server_credentials *sc) {
 
 	*sc = gnutls_calloc( 1, sizeof(ANON_SERVER_CREDENTIALS_INT));
 	(*sc)->dh_params = &_gnutls_dh_default_params;
@@ -63,26 +63,26 @@ int gnutls_anon_allocate_server_credentials( GNUTLS_ANON_SERVER_CREDENTIALS *sc)
 
 
 /**
-  * gnutls_anon_free_client_credentials - Used to free an allocated GNUTLS_ANON_CLIENT_CREDENTIALS structure
-  * @sc: is an &GNUTLS_ANON_CLIENT_CREDENTIALS structure.
+  * gnutls_anon_free_client_credentials - Used to free an allocated gnutls_anon_client_credentials structure
+  * @sc: is an &gnutls_anon_client_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_anon_free_client_credentials( GNUTLS_ANON_CLIENT_CREDENTIALS sc) {
+void gnutls_anon_free_client_credentials( gnutls_anon_client_credentials sc) {
 	return;
 }
 
 /**
   * gnutls_allocate_anon_client_credentials - Used to allocate an GNUTLS_ANON_CLIENT CREDENTIALS structure
-  * @sc: is a pointer to an &GNUTLS_ANON_CLIENT_CREDENTIALS structure.
+  * @sc: is a pointer to an &gnutls_anon_client_credentials structure.
   *
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_anon_allocate_client_credentials( GNUTLS_ANON_CLIENT_CREDENTIALS *sc) 
+int gnutls_anon_allocate_client_credentials( gnutls_anon_client_credentials *sc) 
 {
 	/* anon_tmp is only there for *sc not to be null.
 	 * it is not used at all;

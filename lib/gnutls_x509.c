@@ -825,7 +825,7 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 int _gnutls_x509_cert_verify_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
-	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
+	const gnutls_certificate_credentials cred;
 	gnutls_certificate_status verify;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size, i, x, ret;
@@ -1070,7 +1070,7 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
 /* returns error if the certificate has different algorithm than
  * the given key parameters.
  */
-static int _gnutls_check_key_cert_match( GNUTLS_CERTIFICATE_CREDENTIALS res) {
+static int _gnutls_check_key_cert_match( gnutls_certificate_credentials res) {
 	
 	if (res->pkey[res->ncerts-1].pk_algorithm != res->cert_list[res->ncerts-1][0].subject_pk_algorithm) {
 		gnutls_assert();
@@ -1298,7 +1298,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 /* Reads a DER or PEM certificate from memory
  */
-static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size, 
+static int read_cert_mem(gnutls_certificate_credentials res, const char *cert, int cert_size, 
 	gnutls_x509_certificate_format type)
 {
 	int ret;
@@ -1339,7 +1339,7 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 /* Reads a base64 encoded CA list from memory 
  * This is to be called once.
  */
-static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int ca_size,
+static int read_ca_mem(gnutls_certificate_credentials res, const char *ca, int ca_size,
 	gnutls_x509_certificate_format type)
 {
 
@@ -1396,7 +1396,7 @@ int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
  * 2002-01-26: Added ability to read DSA keys.
  * type indicates the certificate format.
  */
-static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size, 
+static int read_key_mem(gnutls_certificate_credentials res, const char *key, int key_size, 
 	gnutls_x509_certificate_format type)
 {
 	int ret;
@@ -1499,7 +1499,7 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 
 /* Reads a certificate file
  */
-static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *certfile,
+static int read_cert_file(gnutls_certificate_credentials res, const char *certfile,
 	gnutls_x509_certificate_format type)
 {
 	int siz;
@@ -1522,7 +1522,7 @@ static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *certfi
 /* Reads a base64 encoded CA file (file contains multiple certificate
  * authorities). This is to be called once.
  */
-static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cafile, 
+static int read_ca_file(gnutls_certificate_credentials res, const char *cafile, 
 	gnutls_x509_certificate_format type)
 {
 	int siz;
@@ -1547,7 +1547,7 @@ static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cafile,
 /* Reads PKCS-1 RSA private key file or a DSA file (in the format openssl
  * stores it).
  */
-static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *keyfile,
+static int read_key_file(gnutls_certificate_credentials res, const char *keyfile,
 	gnutls_x509_certificate_format type)
 {
 	int siz;
@@ -1567,14 +1567,14 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *keyfile
 }
 
 /**
-  * gnutls_certificate_set_x509_key_mem - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
-  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * gnutls_certificate_set_x509_key_mem - Used to set keys in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
   * @CERT: contains a certificate list (path) for the specified private key
   * @KEY: is the private key
   * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
-  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
+  * gnutls_certificate_credentials structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
@@ -1592,7 +1592,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *keyfile
   * then the strings that hold their values must be null terminated.
   *
   **/
-int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
+int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, const gnutls_datum* CERT,
 			   const gnutls_datum* KEY, gnutls_x509_certificate_format type)
 {
 	int ret;
@@ -1614,15 +1614,15 @@ int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, cons
 }
 
 /**
-  * gnutls_certificate_set_x509_key_file - Used to set keys in a GNUTLS_CERTIFICATE_CREDENTIALS structure
-  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * gnutls_certificate_set_x509_key_file - Used to set keys in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
   * @CERTFILE: is a file that containing the certificate list (path) for
   * the specified private key, in PKCS7 format, or a list of certificates
   * @KEYFILE: is a file that contains the private key
   * @type: is PEM or DER
   *
   * This function sets a certificate/private key pair in the 
-  * GNUTLS_CERTIFICATE_CREDENTIALS structure. This function may be called
+  * gnutls_certificate_credentials structure. This function may be called
   * more than once (in case multiple keys/certificates exist for the
   * server).
   *
@@ -1630,7 +1630,7 @@ int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, cons
   * this function.
   *
   **/
-int gnutls_certificate_set_x509_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *CERTFILE,
+int gnutls_certificate_set_x509_key_file(gnutls_certificate_credentials res, const char *CERTFILE,
 			   const char *KEYFILE, gnutls_x509_certificate_format type)
 {
 	int ret;
@@ -1653,7 +1653,7 @@ int gnutls_certificate_set_x509_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, con
 	return 0;
 }
 
-static int generate_rdn_seq( GNUTLS_CERTIFICATE_CREDENTIALS res) {
+static int generate_rdn_seq( gnutls_certificate_credentials res) {
 gnutls_datum tmp;
 int ret, size, i;
 opaque *pdata;
@@ -1706,8 +1706,8 @@ opaque *pdata;
 }
 
 /**
-  * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
-  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
   * @CA: is a list of trusted CAs or a DER certificate
   * @type: is DER or PEM
   *
@@ -1715,7 +1715,7 @@ opaque *pdata;
   * certificates. This function may be called multiple times.
   *
   **/
-int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
+int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum *CA, gnutls_x509_certificate_format type)
 {
 	int ret, ret2;
@@ -1730,8 +1730,8 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
 }
 
 /**
-  * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a GNUTLS_CERTIFICATE_CREDENTIALS structure
-  * @res: is an &GNUTLS_CERTIFICATE_CREDENTIALS structure.
+  * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials structure
+  * @res: is an &gnutls_certificate_credentials structure.
   * @CAFILE: is a file containing the list of trusted CAs (DER or PEM list)
   * @type: is PEM or DER
   *
@@ -1740,7 +1740,7 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
   * Returns the number of certificate processed.
   *
   **/
-int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, 
+int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res, 
 		const char *CAFILE, gnutls_x509_certificate_format type)
 {
 	int ret, ret2;

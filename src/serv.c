@@ -100,9 +100,9 @@ char *x509_crlfile = NULL;
 #define RENEGOTIATE
 
 /* These are global */
-GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
-GNUTLS_ANON_SERVER_CREDENTIALS dh_cred;
-GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
+gnutls_srp_server_credentials srp_cred;
+gnutls_anon_server_credentials dh_cred;
+gnutls_certificate_credentials cert_cred;
 
 
 #ifdef HAVE_LIBGDBM
@@ -153,8 +153,8 @@ static void listener_free (listener_item * j)
  */
 static int prime_nums[] = { 768, 1024, 0 };
 
-GNUTLS_DH_PARAMS dh_params;
-GNUTLS_RSA_PARAMS rsa_params;
+gnutls_dh_params dh_params;
+gnutls_rsa_params rsa_params;
 
 static int generate_dh_primes(void)
 {
