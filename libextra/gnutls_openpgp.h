@@ -1,6 +1,7 @@
 #ifndef GNUTLS_OPENPGP_H
 #define GNUTLS_OPENPGP_H
 
+#include <gnutls/compat8.h>
 #include <auth_cert.h>
 
 /* OpenCDK compatible */

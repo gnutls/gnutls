@@ -28,6 +28,7 @@
 #include "gnutls_openpgp.h"
 
 #ifdef HAVE_LIBOPENCDK
+#include <gnutls/compat8.h>
 #include <gnutls_str.h>
 #include <stdio.h>
 #include <gcrypt.h>
@@ -40,7 +41,7 @@
 #include <netdb.h>
 #include <assert.h>
 
-#define OPENPGP_NAME_SIZE GNUTLS_X509_CN_SIZE
+#define OPENPGP_NAME_SIZE 256
 
 #define datum_append(x, y, z) _gnutls_datum_append_m( x, y, z, gnutls_realloc )
 
