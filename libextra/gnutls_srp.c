@@ -28,6 +28,7 @@
 #include <gnutls_srp.h>
 #include <auth_srp_passwd.h>
 #include <gnutls_mpi.h>
+#include <gnutls_num.h>
 #include "debug.h"
 
 
@@ -144,7 +145,9 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI B)
 	_gnutls_hash(td, b_holder, b_size);
 	_gnutls_hash_deinit(td, hd);
 	
-	memcpy(&u, hd, sizeof(u));
+	/* convert the first 4 bytes of hd to uint32
+	 */
+	u = _gnutls_read_uint32( hd);
 
 	gnutls_free(b_holder);
 

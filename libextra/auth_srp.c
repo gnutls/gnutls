@@ -127,7 +127,7 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 	_gnutls_mpi_set(N, pwd_entry->n);
 	_gnutls_mpi_set(V, pwd_entry->v);
 
-	if (data_size < n_n + n_g + pwd_entry->salt_size + 6) {
+	if (data_size < n_n + n_g + pwd_entry->salt_size + 5) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -137,12 +137,12 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 	data_s = data;
 
 	n_s = pwd_entry->salt_size;
-	memcpy(&data_s[2], pwd_entry->salt, n_s);
+	memcpy(&data_s[1], pwd_entry->salt, n_s);
 
-	_gnutls_write_uint16( n_s, data_s);
+	data_s[0] = (uint8) n_s;
 
 	/* copy N (mod n) */
-	data_n = &data_s[2 + n_s];
+	data_n = &data_s[1 + n_s];
 
 	if (_gnutls_mpi_print( &data_n[2], &n_n, N)!=0) {
 		gnutls_assert();
@@ -151,7 +151,7 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 	
 	_gnutls_write_uint16( n_n, data_n);
 
-	data_g = &data_n[2 + n_n]; 
+	data_g = &data_n[2 + n_n];
 
 	/* copy G (generator) to data */
 
@@ -162,7 +162,7 @@ int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 	
 	_gnutls_write_uint16( n_g, data_g);
 
-	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
+	ret = n_g + n_n + pwd_entry->salt_size + 5 + 1;
 	_gnutls_srp_clear_pwd_entry( pwd_entry);
 
 	return ret;
@@ -287,7 +287,8 @@ int gen_srp_client_kx0(gnutls_session state, opaque ** data)
 /* receive the first key exchange message ( g, n, s) */
 int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_size)
 {
-	uint16 n_s, n_g, n_n;
+	uint8 n_s;
+	uint16 n_g, n_n;
 	size_t _n_s, _n_g, _n_n;
 	const uint8 *data_n;
 	const uint8 *data_g;
@@ -314,9 +315,9 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_si
 
 	i = 0;
 
-	DECR_LEN( data_size, 2);
-	n_s = _gnutls_read_uint16( &data[i]);
-	i += 2;
+	DECR_LEN( data_size, 1);
+	n_s = data[i];
+	i += 1;
 
 	DECR_LEN( data_size, n_s);
 	data_s = &data[i];
