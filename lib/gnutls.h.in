@@ -140,8 +140,9 @@ int gnutls_ext_set_dnsname( GNUTLS_STATE, const char* dnsname);
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 
 struct DSTRUCT;
-typedef struct DSTRUCT* X509PKI_SERVER_CREDENTIALS;
-typedef struct DSTRUCT* X509PKI_CLIENT_CREDENTIALS;
+typedef struct DSTRUCT* X509PKI_CREDENTIALS;
+typedef X509PKI_CREDENTIALS X509PKI_CLIENT_CREDENTIALS;
+typedef X509PKI_CREDENTIALS X509PKI_SERVER_CREDENTIALS;
 
 typedef struct DSTRUCT* SRP_SERVER_CREDENTIALS;
 typedef struct DSTRUCT* SRP_CLIENT_CREDENTIALS;
@@ -188,10 +189,21 @@ typedef struct {
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
-void gnutls_free_x509_sc( X509PKI_SERVER_CREDENTIALS sc);
-int gnutls_allocate_x509_sc( X509PKI_SERVER_CREDENTIALS *sc, int vsites);
-int gnutls_set_x509_key( X509PKI_SERVER_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
-int gnutls_set_x509_trust( X509PKI_SERVER_CREDENTIALS res, char* CAFILE, char* CRLFILE);
+void gnutls_free_x509_sc( X509PKI_CREDENTIALS sc);
+int gnutls_allocate_x509_sc( X509PKI_CREDENTIALS *sc, int vsites);
+int gnutls_set_x509_key( X509PKI_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
+int gnutls_set_x509_trust( X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE);
+
+#define gnutls_free_x509_server_sc gnutls_free_x509_sc
+#define gnutls_allocate_x509_server_sc gnutls_allocate_x509_sc
+#define gnutls_set_x509_server_key gnutls_set_x509_key
+#define gnutls_set_x509_server_trust gnutls_set_x509_trust
+
+#define gnutls_free_x509_client_sc gnutls_free_x509_sc
+#define gnutls_allocate_x509_client_sc gnutls_allocate_x509_sc
+#define gnutls_set_x509_client_key gnutls_set_x509_key
+#define gnutls_set_x509_client_trust gnutls_set_x509_trust
+
 
 /* global state functions 
  */

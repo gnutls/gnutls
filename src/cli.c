@@ -37,6 +37,8 @@
 #define RESUME
 
 #define MAX(X,Y) (X >= Y ? X : Y);
+#define CAFILE "ca.pem"
+#define CRLFILE NULL
 
 static int print_info( GNUTLS_STATE state) {
 char *tmp;
@@ -119,8 +121,21 @@ int main(int argc, char** argv)
 		fprintf(stderr, "global state initialization error\n");
 		exit(1);
 	}
-		
-	gnutls_allocate_srp_client_sc( &cred);
+
+
+
+	/* X509 stuff */
+	if (gnutls_allocate_x509_client_sc( &xcred, 0) < 0) { /* no priv key */
+		fprintf(stderr, "memory error\n");
+		exit(1);
+	}
+	gnutls_set_x509_client_trust( xcred, CAFILE, CRLFILE);
+
+	/* SRP stuff */
+	if (gnutls_allocate_srp_client_sc( &cred)<0) {
+		fprintf(stderr, "memory error\n");
+		exit(1);
+	}
 	gnutls_set_srp_client_cred( cred, "test", "test");
 	
 	sd = socket(AF_INET, SOCK_STREAM, 0);
@@ -144,6 +159,7 @@ int main(int argc, char** argv)
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 
 	gnutls_set_cred( state, GNUTLS_SRP, &cred);
+
 	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);
 	gnutls_ext_set_dnsname( state, "hello.server.org");
 	
@@ -293,6 +309,8 @@ int main(int argc, char** argv)
 	shutdown( sd, SHUT_RDWR); /* no more receptions */
 	close(sd);
 	
+	gnutls_free_srp_client_sc( cred);
+	gnutls_free_x509_client_sc( xcred);
 	gnutls_deinit( state);
 
 	gnutls_global_deinit();

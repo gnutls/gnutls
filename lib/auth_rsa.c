@@ -72,7 +72,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 	int len = sizeof(str);
 	node_asn *srsa, *spk;
 	
-	if (asn1_create_structure( _gnutls_get_pkcs(), "PKIX1Implicit88.Certificate", &srsa, "rsa_params")
+	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &srsa, "rsa_params")
 	    != ASN_OK) {
 		gnutls_assert();
 		return GNUTLS_E_ASN1_ERROR;
@@ -112,8 +112,8 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 		}
 
 		if (asn1_create_structure
-		    ( _gnutls_get_pkix(),
-		     "PKIX1Implicit88.RSAPublicKey", &spk, "rsa_public_key") != ASN_OK) {
+		    ( _gnutls_get_pkcs(),
+		     "PKCS-1.RSAPublicKey", &spk, "rsa_public_key") != ASN_OK) {
 			gnutls_assert();
 			return GNUTLS_E_ASN1_ERROR;
 		}
@@ -223,7 +223,7 @@ static int _gnutls_get_private_rsa_params(GNUTLS_KEY key,
 
 int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 {
-	const X509PKI_SERVER_CREDENTIALS *cred;
+	const X509PKI_CREDENTIALS *cred;
 	int ret, i, pdatasize;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
@@ -348,11 +348,21 @@ int proc_rsa_client_kx(GNUTLS_KEY key, opaque * data, int data_size)
 
 int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 {
-	int size, len;
+	int size, len, ret;
 	opaque *p = data;
 	X509PKI_CLIENT_AUTH_INFO *info;
+	const X509PKI_CREDENTIALS *cred;
 	int dsize = data_size;
 	int i, j;
+	gnutls_cert* peer_certificate_list;
+	int peer_certificate_list_size = 0;
+	gnutls_datum tmp;
+
+	cred = _gnutls_get_cred(key, GNUTLS_X509PKI, NULL);
+	if (cred == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INSUFICIENT_CRED;
+	}
 
 	key->auth_info = gnutls_calloc(1, sizeof(X509PKI_CLIENT_AUTH_INFO));
 	if (key->auth_info == NULL) {
@@ -378,22 +388,24 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 
 	for (; i > 0; len = READuint24(p), p += 3) {
 		DECR_LEN(dsize, (len + 3));
-		info->peer_certificate_list_size++;
+		peer_certificate_list_size++;
 		p += len;
 		i -= len + 3;
 	}
 
-	if (info->peer_certificate_list_size == 0) {
+	if (peer_certificate_list_size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
+
 	dsize = data_size;
 	i = dsize;
-	info->peer_certificate_list =
-	    gnutls_malloc(sizeof(gnutls_datum) *
-			  (info->peer_certificate_list_size));
-	if (info->peer_certificate_list == NULL) {
+	peer_certificate_list =
+	    gnutls_malloc( sizeof(gnutls_cert) *
+			  ( peer_certificate_list_size));
+
+	if ( peer_certificate_list == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -405,27 +417,48 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 	len = READuint24(p);
 	p += 3;
 	for (; i > 0; len = READuint24(p), p += 3) {
-		if (j >= info->peer_certificate_list_size)
+		if (j >= peer_certificate_list_size)
 			break;
 
-		info->peer_certificate_list[j].size = len;
-		info->peer_certificate_list[j].data = gnutls_malloc(len);
-		if (info->peer_certificate_list[j].data == NULL) {
+		tmp.size = len;
+		tmp.data = p;
+
+		if ( (ret=_gnutls_cert2gnutlsCert( &peer_certificate_list[j], tmp)) < 0) {
 			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
+			gnutls_free( peer_certificate_list);
+			return ret;
 		}
 
-		memcpy(info->peer_certificate_list[j].data, p, len);
 		p += len;
 		i -= len + 3;
 		j++;
 	}
 
+	/* store the required parameters for the handshake
+	 */
+	if ((ret =
+	     _gnutls_get_rsa_params(key, NULL, &key->A, &key->u,
+				    peer_certificate_list[0].raw)) < 0) {
+		gnutls_assert();
+		gnutls_free( peer_certificate_list);
+		return ret;
+	}
+ 
+	gnutls_free( peer_certificate_list);
 
-#warning "WE DO NOT VERIFY RSA CERTIFICATES"
+
 	/* FIXME: Verify certificate 
 	 */
-	info->peer_certificate_status = GNUTLS_NOT_VERIFIED;
+	ret = GNUTLS_NOT_VERIFIED;
+
+#warning "WE DO NOT VERIFY RSA CERTIFICATES"
+
+/*	ret = gnutls_verify_certificate( peer_certificate_list, peer_certificate_list_size,
+		cred->ca_list, cred->ncas, NULL);
+ */
+
+
+	info->peer_certificate_status = ret;
 
 	return 0;
 }
@@ -457,22 +490,15 @@ int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 	key->key.data[1] = key->version.minor;
 
 	if ((ret =
-	     _gnutls_get_rsa_params(key, NULL, &n, &pkey,
-				    auth->peer_certificate_list[0])) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	if ((ret =
-	     _gnutls_pkcs1_rsa_encrypt(&sdata, key->key, pkey, n)) < 0) {
+	     _gnutls_pkcs1_rsa_encrypt(&sdata, key->key, key->u, key->A)) < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&pkey);
 		_gnutls_mpi_release(&n);
 		return ret;
 	}
 
-	_gnutls_mpi_release(&pkey);
-	_gnutls_mpi_release(&n);
+	_gnutls_mpi_release(&key->A);
+	_gnutls_mpi_release(&key->u);
 
 	if (_gnutls_version_ssl3
 	    (_gnutls_version_get(key->version.major, key->version.minor))

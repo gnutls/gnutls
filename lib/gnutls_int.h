@@ -172,6 +172,9 @@ typedef struct {
 	
 	/* this is used to hold the peers authentication data 
 	 */
+	/* AUTH_INFO structures MUST NOT contain malloced 
+	 * elements.
+	 */
 	void*				auth_info;
 	int				auth_info_size; /* needed in order to store to db for restoring 
 							 */
@@ -206,6 +209,10 @@ typedef struct {
 	opaque dnsname[MAX_DNSNAME_SIZE];
 } TLSExtensions;
 
+/* AUTH_INFO structures MUST NOT contain malloced 
+ * elements.
+ */
+ 
 /* This structure and AUTH_INFO, are stored in the resume database,
  * and are restored, in case of resume.
  * Holds all the required parameters to resume the current 

@@ -28,16 +28,10 @@ typedef struct {
 	gnutls_cert * ca_list;
 	int ncas;	/* number of CAs in the ca_list 
 			 */
-} X509PKI_SERVER_CREDENTIALS;
-
-typedef struct {
-	int ne;
-} X509PKI_CLIENT_CREDENTIALS;
+} X509PKI_CREDENTIALS;
 
 
 typedef struct {
-	gnutls_datum *peer_certificate_list; /* In DER format */
-	int peer_certificate_list_size;
 	CertificateStatus peer_certificate_status;
 } X509PKI_CLIENT_AUTH_INFO;
 

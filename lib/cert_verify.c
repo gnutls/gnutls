@@ -55,17 +55,25 @@ int gnutls_verify_certificate( gnutls_cert* certificate_list,
 	int clist_size, gnutls_cert* trusted_cas, int tcas_size, void* CRLs, 
 	int crls_size) 
 {
-	int i=0;
+	int i=0, int expired=0;
 	CertificateStatus ret;
 		
 	for( i=0;i<clist_size;i++) {
 		if (i+1 > clist_size) break;
 		
-		/* FIXME: expired problem
-		 */
-		if ( (ret=gnutls_verify_certificate2( certificate_list[i], certificate_list[i+1], 1, NULL, 0)) != GNUTLS_VERIFIED)
-			return ret;
+		if ( (ret=gnutls_verify_certificate2( certificate_list[i], certificate_list[i+1], 1, NULL, 0)) != GNUTLS_VERIFIED) {
+			/* we do that because expired means that
+			 * it was verified but it was also expired.
+			 */
+			if (ret==GNUTLS_EXPIRED) expired=1;
+			else return ret;
+		}
 	}
 	
-	return gnutls_verify_certificate2( certificate_list[i], trysted_cas, tcas_size, CRLs, crls_size);
+	ret = gnutls_verify_certificate2( certificate_list[i], trysted_cas, tcas_size, CRLs, crls_size);
+
+	if (ret!=GNUTLS_VERIFIED) return ret;
+	
+	if (expired!=0) return GNUTLS_EXPIRED;
+	return GNUTLS_VERIFIED;
 }

@@ -46,9 +46,9 @@ int gnutls_set_cipher_priority( GNUTLS_STATE state, LIST) {
 
 	_ap = ap;
 
-	do {
+	while( va_arg(ap, BulkCipherAlgorithm) != 0) {
 		num++;
-	} while( va_arg(ap, BulkCipherAlgorithm) != 0);
+	} 
 
 	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority);
@@ -88,9 +88,9 @@ int gnutls_set_kx_priority( GNUTLS_STATE state, LIST) {
 	va_start( ap, state);
 	_ap = ap;
 
-	do {
+	while( va_arg(ap, KXAlgorithm) != 0) {
 		num++;
-	} while( va_arg(ap, KXAlgorithm) != 0);
+	}
 
 	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
@@ -128,9 +128,9 @@ int gnutls_set_mac_priority( GNUTLS_STATE state, LIST) {
 	va_start( ap, state);
 
 	_ap = ap;
-	do {
+	while( va_arg(ap, MACAlgorithm) != 0) {
 		num++;
-	} while( va_arg(ap, MACAlgorithm) != 0);
+	}
 	
 	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);	
@@ -168,10 +168,10 @@ int gnutls_set_compression_priority( GNUTLS_STATE state, LIST) {
 	va_start( ap, state);
 	_ap = ap;
 
-	do {
+	while( va_arg( ap, CompressionMethod) != 0) {
 		num++;
-	} while( va_arg( ap, CompressionMethod) != 0);
-
+	}
+	
 	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);	
 	state->gnutls_internals.CompressionMethodPriority.algorithm_priority = gnutls_malloc(sizeof(int*)*num);

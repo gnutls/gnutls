@@ -374,11 +374,15 @@ int gnutls_allocate_srp_client_sc( SRP_CLIENT_CREDENTIALS **sc) {
   *
   **/
 int gnutls_set_srp_client_cred( SRP_CLIENT_CREDENTIALS* res, char *username, char * password) {
-	if (strlen(username) > sizeof(res->username)) return GNUTLS_E_MEMORY_ERROR;
-	if (strlen(password) > sizeof(res->password)) return GNUTLS_E_MEMORY_ERROR;
 
-	strcpy( res->username, username);
-	strcpy( res->password, password);
+	res->username = gnutls_strdup( username);
+	if (res->username == NULL) return GNUTLS_E_MEMORY_ERROR;
+
+	res->password = gnutls_strdup( password);
+	if (res->password==NULL) {
+		gnutls_free(res->username);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return 0;
 }
@@ -420,13 +424,15 @@ int gnutls_allocate_srp_server_sc( SRP_SERVER_CREDENTIALS **sc) {
   *
   **/
 int gnutls_set_srp_server_cred( SRP_SERVER_CREDENTIALS* res, char *password_file, char * password_conf_file) {
-	if (strlen(password_file) > sizeof(res->password_file)) 
-		return GNUTLS_E_MEMORY_ERROR;
-	if (strlen(password_conf_file) > sizeof(res->password_conf_file)) 
-		return GNUTLS_E_MEMORY_ERROR;
 
-	strcpy( res->password_file, password_file);
-	strcpy( res->password_conf_file, password_conf_file);
+	res->password_file = gnutls_strdup( password_file);
+	if (res->password_file==NULL) return GNUTLS_E_MEMORY_ERROR;
+	
+	res->password_conf_file = gnutls_strdup( password_conf_file);
+	if (res->password_conf_file==NULL) {
+		gnutls_free(res->password_file);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return 0;
 }

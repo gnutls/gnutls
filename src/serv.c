@@ -302,16 +302,16 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_allocate_x509_sc(&x509_cred, 1) < 0) {
+	if (gnutls_allocate_x509_server_sc(&x509_cred, 1) < 0) {
 		exit(1);
 	}
 
-	if (gnutls_set_x509_key( x509_cred, CERTFILE, KEYFILE) < 0) {
+	if (gnutls_set_x509_server_key( x509_cred, CERTFILE, KEYFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_set_x509_trust( x509_cred, CAFILE, CRLFILE) < 0) {
+	if (gnutls_set_x509_server_trust( x509_cred, CAFILE, CRLFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
 		exit(1);
 	}
@@ -418,7 +418,7 @@ int main(int argc, char **argv)
 	}
 	close(listen_sd);
 
-	gnutls_free_x509_sc(x509_cred);
+	gnutls_free_x509_server_sc(x509_cred);
 	gnutls_free_srp_server_sc(x509_cred);
 	gnutls_free_anon_server_sc(x509_cred);
 
