@@ -1,3 +1,17 @@
+2003-12-23 21:47  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/TODO, lib/pkix.asn, lib/pkix_asn1_tab.c,
+	src/certtool.c:
+
+	Added support for reading and generating CRL distribution points
+	extensions in certificates (not working yet).  
+
+2003-12-23 11:53  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_mpi.h:
+
+	Added checks (in SRP) for A%n==0,1,-1 in server side.  
+
 2003-12-22 11:36  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, doc/TODO, src/certtool-gaa.c,
