@@ -58,7 +58,12 @@ int result, len;
 		asn1_delete_structure(c2);
 		return NULL;
 	}
-
+{
+FILE* fd;
+fd = fopen("/tmp/der", "w");
+fwrite( str, len, 1, fd);
+fclose(fd);
+}
 	asn1_delete_structure(c2);
 
 	ret = gnutls_malloc(sizeof(gnutls_cert));

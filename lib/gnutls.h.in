@@ -138,6 +138,12 @@ const void* gnutls_get_auth_info( GNUTLS_STATE);
 const char* gnutls_ext_get_dnsname( GNUTLS_STATE);
 int gnutls_ext_set_dnsname( GNUTLS_STATE, const char* dnsname);
 
+/* This will set the Common Name field in case of X509PKI
+ * authentication. This will be used while verifying the
+ * certificate
+ */
+int gnutls_x509_set_cn( GNUTLS_STATE, const char* cn);
+
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 
@@ -179,7 +185,7 @@ typedef struct {
 	char username[256];
 } SRP_SERVER_AUTH_INFO;
 
-typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
+typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_WRONG_CN, GNUTLS_CERT_INVALID } CertificateStatus;
 
 typedef struct {
 	char common_name[256];

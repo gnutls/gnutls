@@ -75,6 +75,9 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 			case GNUTLS_CERT_TRUSTED:
 				printf("- Peer's X509 Certificate was verified\n");
 				break;
+			case GNUTLS_CERT_WRONG_CN:
+				printf("- Peer's X509 Certificate was verified but it does not match the server's name\n");
+				break;
 			case GNUTLS_CERT_INVALID:
 			default:
 				printf("- Peer's X509 Certificate was invalid\n");
@@ -172,14 +175,15 @@ int main(int argc, char** argv)
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
-	gnutls_set_cred( state, GNUTLS_ANON, NULL);
-
-	gnutls_set_cred( state, GNUTLS_SRP, cred);
-
-	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
-	gnutls_ext_set_dnsname( state, "hello.server.org");
-	
 	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
+
+	gnutls_set_cred( state, GNUTLS_ANON, NULL);
+	gnutls_set_cred( state, GNUTLS_SRP, cred);
+	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
+
+	gnutls_ext_set_dnsname( state, "localhost");
+	gnutls_x509_set_cn( state, "localhost");
+
 	ret = gnutls_handshake(sd, state);
 
 	if (ret < 0) {

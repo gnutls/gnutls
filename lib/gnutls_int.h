@@ -61,6 +61,14 @@
 #define HEADER_SIZE 5
 #define MAX_RECV_SIZE 18432+HEADER_SIZE 	/* 2^14+2048+HEADER_SIZE */
 
+/* X509 */
+#define X509_CN_SIZE 256
+#define X509_C_SIZE 3
+#define X509_O_SIZE 256
+#define X509_OU_SIZE 256
+#define X509_L_SIZE 256
+#define X509_S_SIZE 256
+
 #ifdef USE_DMALLOC
 # include <dmalloc.h>
 #endif
@@ -99,7 +107,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_INSUFFICIENT_SECURITY, GNUTLS_INTERNAL_ERROR=80, GNUTLS_USER_CANCELED=90,
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
-typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
+typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_WRONG_CN, GNUTLS_CERT_INVALID } CertificateStatus;
 		
 typedef enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
@@ -187,6 +195,8 @@ typedef struct {
 	opaque				server_random[TLS_RANDOM_SIZE];
 	opaque				client_random[TLS_RANDOM_SIZE];
 	ProtocolVersion			version;
+	
+	opaque				x509_cn[X509_CN_SIZE];
 	
 	AUTH_CRED*			cred; /* used to specify keys/certificates etc */
 } GNUTLS_KEY_A;

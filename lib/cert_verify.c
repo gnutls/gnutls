@@ -318,9 +318,9 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	return GNUTLS_CERT_TRUSTED;
 }
 
-int gnutls_verify_certificate(gnutls_cert * certificate_list,
+int gnutls_verify_certificate( gnutls_cert * certificate_list,
     int clist_size, gnutls_cert * trusted_cas, int tcas_size, void *CRLs,
-			      int crls_size)
+			      int crls_size, char* cn)
 {
 	int i = 0;
 	int expired = 0;
@@ -346,11 +346,18 @@ int gnutls_verify_certificate(gnutls_cert * certificate_list,
 	}
 
 	ret = gnutls_verify_certificate2(&certificate_list[i], trusted_cas, tcas_size, CRLs, crls_size);
+	
+	if (ret==GNUTLS_CERT_EXPIRED) {
+		expired = 1;
+	} else
+		if (ret != GNUTLS_CERT_TRUSTED)
+			return ret;
 
-	if (ret != GNUTLS_CERT_TRUSTED)
-		return ret;
+	if ( strcmp( certificate_list[0].cert_info.common_name, cn) != 0) 
+			return GNUTLS_CERT_WRONG_CN;
 
 	if (expired != 0)
 		return GNUTLS_CERT_EXPIRED;
+
 	return GNUTLS_CERT_TRUSTED;
 }

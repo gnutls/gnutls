@@ -4,12 +4,12 @@
 #include <gnutls_pk.h>
 
 typedef struct {
-	char common_name[256];
-	char country[3];
-	char organization[256];
-	char organizational_unit_name[256];
-	char locality_name[256];
-	char state_or_province_name[256];
+	char common_name[X509_CN_SIZE];
+	char country[X509_C_SIZE];
+	char organization[X509_O_SIZE];
+	char organizational_unit_name[X509_OU_SIZE];
+	char locality_name[X509_L_SIZE];
+	char state_or_province_name[X509_S_SIZE];
 } gnutls_DN;
 
 

@@ -455,7 +455,7 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 	ret = GNUTLS_CERT_NOT_TRUSTED;
 
 	ret = gnutls_verify_certificate( peer_certificate_list, peer_certificate_list_size, 
-		cred->ca_list, cred->ncas, NULL, 0);
+		cred->ca_list, cred->ncas, NULL, 0, key->x509_cn);
 
 	info->peer_certificate_status = ret;
 

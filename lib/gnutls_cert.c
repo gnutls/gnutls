@@ -221,25 +221,10 @@ gnutls_datum tmp;
 
 	res->ca_list = NULL;
 
-{FILE* fd;
-fd = fopen("/tmp/aaa1", "w");
-fwrite( ptr, siz, 1, fd);
-fclose(fd);
-
-}
-
-
 	do {
 		siz2 = _gnutls_fbase64_decode(ptr, siz, &b64);
 		siz-=siz2; /* FIXME: this is not enough
 			    */
-
-{FILE* fd;
-fd = fopen("/tmp/test1", "w");
-fwrite( b64, siz2, 1, fd);
-fclose(fd);
-
-}
 
 		if (siz2 < 0) {
 			gnutls_assert();
@@ -523,6 +508,7 @@ void _gnutls_int2str(int k, char* data) {
  * ASN.1 structure. (Taken from Fabio's samples!)
  * --nmav
  */
+#warning "Fix COUNTRY/EMAIL"
 static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 {
 	int k, k2, result, len;
