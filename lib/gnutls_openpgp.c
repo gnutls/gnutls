@@ -316,10 +316,10 @@ datum_to_kbnode( const gnutls_datum *raw, KBNODE *r_pkt )
       goto leave;
     }
   else
-    rc = 0;  
+    rc = 0;
 
 leave:
-  cdk_iobuf_close(buf);
+  cdk_iobuf_close( buf );
   *r_pkt = (!rc)? pkt : NULL;
 
   return rc;
@@ -915,7 +915,8 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
 
   if ( idx < 0 || idx > gnutls_openpgp_count_key_names( cert ) )
     return GNUTLS_E_UNKNOWN_ERROR;
-    
+
+  memset(dn, 0, sizeof *dn);
   rc = datum_to_kbnode( cert, &kb_pk );
   if ( rc )
     return rc;
@@ -925,26 +926,23 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
     {
       for ( pos=0, pkt=kb_pk; pkt; pkt=pkt->next )
         {
-          if ( pkt->pkt->pkttype == PKT_USER_ID && pos == idx )
+          if ( pkt->pkt->pkttype == PKT_USER_ID && ++pos == idx )
             break;
         }
     }
   if ( pkt )
     uid = pkt->pkt->pkt.user_id;
-  if (!uid)
+  if ( !uid )
     {
       rc = GNUTLS_E_UNKNOWN_ERROR;
       goto leave;
     }
-  memset(dn, 0, sizeof *dn);
-  size = uid->len < OPENPGP_NAME_SIZE? uid->len : OPENPGP_NAME_SIZE;
+  size = uid->len < OPENPGP_NAME_SIZE? uid->len : OPENPGP_NAME_SIZE-1;
   memcpy(dn->name, uid->name, size);
   dn->name[size] = '\0'; /* make sure it's a string */
 
-  /*
-   * Extract the email address from the userID string and save it to
-   * the email field.
-   */
+  /* Extract the email address from the userID string and save
+     it to the email field. */
   email = strchr(uid->name, '<');
   if ( email )
     pos1 = email-uid->name+1;
@@ -957,6 +955,11 @@ gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
       size = pos2 < OPENPGP_NAME_SIZE? pos2 : OPENPGP_NAME_SIZE;
       memcpy(dn->email, uid->name+pos1, size);
       dn->email[size-1] = '\0'; /* make sure it's a string */
+    }
+  if ( uid->is_revoked )
+    {
+      rc = GNUTLS_E_OPENPGP_UID_REVOKED;
+      goto leave; 
     }
   
 leave:
