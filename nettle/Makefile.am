@@ -23,8 +23,7 @@ DISTCLEANFILES = nettle-types.h
 
 noinst_LTLIBRARIES = libnettle.la
 
-libnettle_la_SOURCES = nettle-types.h \
-		      aes.c aes.h aes-internal.h \
+libnettle_la_SOURCES = aes.c aes.h aes-internal.h \
 		      aes-decrypt-table.c aes-decrypt.c \
 		      aes-encrypt-table.c aes-encrypt.c \
 		      aes-set-encrypt-key.c aes-set-decrypt-key.c aes-meta.c \
