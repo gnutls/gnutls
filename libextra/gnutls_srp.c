@@ -497,6 +497,8 @@ int i;
 	return 0;
 }
 
+#define gnutls_srp_server_select_function srp_server_select_func
+
 /**
   * gnutls_srp_server_set_select_function - Used to set a callback to assist in selecting the proper password file
   * @session: is a &gnutls_session structure.
@@ -523,7 +525,7 @@ int i;
   *
   **/
 void gnutls_srp_server_set_select_function(gnutls_session session,
-					     srp_server_select_func
+					     gnutls_srp_server_select_function
 					     * func)
 {
 	session->internals.server_srp_callback = func;

@@ -212,6 +212,9 @@ void gnutls_certificate_server_set_request(gnutls_session session,
 	session->internals.send_cert_req = req;
 }
 
+
+#define gnutls_certificate_client_select_function certificate_client_select_func
+
 /**
   * gnutls_certificate_client_set_select_function - Used to set a callback while selecting the proper (client) certificate
   * @session: is a &gnutls_session structure.
@@ -246,12 +249,13 @@ void gnutls_certificate_server_set_request(gnutls_session session,
   * does not want to use client authentication.
   **/
 void gnutls_certificate_client_set_select_function(gnutls_session session,
-					     certificate_client_select_func
+					     gnutls_certificate_client_select_function
 					     * func)
 {
 	session->internals.client_cert_callback = func;
 }
 
+#define gnutls_certificate_server_select_function certificate_server_select_func
 /**
   * gnutls_certificate_server_set_select_function - Used to set a callback while selecting the proper (server) certificate
   * @session: is a &gnutls_session structure.
@@ -278,7 +282,7 @@ void gnutls_certificate_client_set_select_function(gnutls_session session,
   *
   **/
 void gnutls_certificate_server_set_select_function(gnutls_session session,
-					     certificate_server_select_func
+					     gnutls_certificate_server_select_function
 					     * func)
 {
 	session->internals.server_cert_callback = func;
