@@ -1789,7 +1789,7 @@ int gnutls_rehandshake(GNUTLS_STATE state)
 }
 
 /**
-  * gnutls_handshake_check_direction - This function will return the state of the handshake protocol
+  * gnutls_handshake_get_direction - This function will return the state of the handshake protocol
   * @state: is a a &GNUTLS_STATE structure.
   *
   * This function provides information about the handshake procedure, and
@@ -1800,7 +1800,7 @@ int gnutls_rehandshake(GNUTLS_STATE state)
   * 1 otherwise. 
   *
   **/
-int gnutls_handshake_check_direction(GNUTLS_STATE state) {
+int gnutls_handshake_get_direction(GNUTLS_STATE state) {
 	return state->gnutls_internals.handshake_direction;
 }
 
