@@ -101,6 +101,7 @@ typedef struct {
 int gnutls_init(GNUTLS_STATE * state, GNUTLS_ConnectionEnd con_end);
 void gnutls_deinit(GNUTLS_STATE state);
 int gnutls_bye( GNUTLS_STATE state, GNUTLS_CloseRequest how);
+#define gnutls_close gnutls_bye
 
 int gnutls_handshake( GNUTLS_STATE state);
 int gnutls_rehandshake( GNUTLS_STATE state);
