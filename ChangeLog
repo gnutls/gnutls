@@ -1,3 +1,59 @@
+2002-04-04 20:52  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_x509.c, gnutls_x509.h, x509_verify.c, x509_verify.h:
+
+	Improved X.509 time convertion functions 
+
+2002-04-04 20:21  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_x509.c:
+
+	GNUTLS_E_UNIX_TIME_LIMIT_REACHED error code was removed 
+
+2002-04-04 10:51  nmav <nmav@gnutls.org>
+
+	* lib/x509_verify.c:
+
+	Added kludge in order to work with dates over 2036 
+
+2002-04-04 09:35  nmav <nmav@gnutls.org>
+
+	* lib/gnutls.h.in.in, lib/gnutls_cert.c, lib/gnutls_int.h,
+	lib/gnutls_int_compat.c, lib/gnutls_openpgp.c, lib/gnutls_ui.h,
+	lib/gnutls_x509.c, lib/gnutls_x509.h, lib/x509_verify.c,
+	src/common.c:
+
+	GNUTLS_CERT_EXPIRED is no longer returned by verification functions.
+	Added functions to check the expiration and activation date of
+	peer's certificate. See gnutls_certificate_expiration_time_peers().  
+
+2002-04-04 08:38  nmav <nmav@gnutls.org>
+
+	* ChangeLog, configure.in, lib/defines.h, lib/x509_verify.c:
+
+	Replaced mktime() with mktime_utc(). This corrects a bug with the
+	localtime returned by mktime().  
+
+2002-04-03 20:00  nmav <nmav@gnutls.org>
+
+	* lib/: auth_cert.c, defines.h, gnutls_algorithms.c,
+	gnutls_buffers.c, gnutls_handshake.c, gnutls_mem.h, gnutls_x509.c,
+	x509_asn1.c, x509_der.c:
+
+	merged changes from gnutls_0_4_with_alloca.  
+
+2002-04-03 19:56  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in:
+
+	merged changes from gnutls_0_4_with_alloca.  
+
+2002-04-03 18:11  nmav <nmav@gnutls.org>
+
+	* doc/TODO, lib/gnutls_cert.h, lib/gnutls_pk.c:
+
+	Optimized RSA signature calculation 
+
 2002-04-03 14:54  nmav <nmav@gnutls.org>
 
 	* lib/auth_cert.c:

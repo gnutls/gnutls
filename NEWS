@@ -1,6 +1,10 @@
 Version 0.4.1
 - Now uses alloca() for temporary variables
 - Optimized RSA signing
+- Added functions to return the peer's certificate activation and
+  expiration time.
+- Corrected time function's behaviour (the time value returned no longer
+  relate to local timezone).
 
 Version 0.4.0 (1/04/2002)
 - Added support for RFC2630 (PKCS7) X.509 certificate sets
