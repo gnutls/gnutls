@@ -7,7 +7,13 @@
 #include "gnutls_cipher.h"
 #include "gnutls_buffers.h"
 #include "gnutls_handshake.h"
+#include "gnutls_num.h"
 
+#ifdef DEBUG
+#define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
+#else
+#define ERR(x, y)
+#endif
 
 int SelectSuite( opaque ret[2], char* data, int datalen) {
 int x, pos=0, i,j;
@@ -92,7 +98,7 @@ int _gnutls_supported_compression_methods(CompressionMethod **comp) {
 
 int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_datasize, HandshakeType type) {
 	int ret;
-	char *data;
+	uint8* data; 
 	uint24 length;
 	uint32 datasize;
 	int pos=0;
@@ -103,19 +109,48 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void* i_data, uint32 i_da
 	datasize = byteswap32(i_datasize);
 #endif	
 	
-	length.pint[0] = ((uint8*)&datasize)[1];
-	length.pint[1] = ((uint8*)&datasize)[2];
-	length.pint[2] = ((uint8*)&datasize)[3];
+	length = uint32touint24( datasize);
+//	length.pint[0] = ((uint8*)&datasize)[1];
+//	length.pint[1] = ((uint8*)&datasize)[2];
+//	length.pint[2] = ((uint8*)&datasize)[3];
 
-	data = gnutls_malloc( i_datasize + 3 + 1);
+	i_datasize += 4;
+	data = gnutls_malloc( i_datasize);
 	memmove( &data[pos++], &type, 1);
 	memmove( &data[pos++], &length.pint[0], 1);
 	memmove( &data[pos++], &length.pint[1], 1);
 	memmove( &data[pos++], &length.pint[2], 1);
-	if (i_datasize > 0) memmove( &data[pos], i_data, i_datasize);
+	if (i_datasize > 0) memmove( &data[pos], i_data, i_datasize-4);
 
 	ret = gnutls_send_int( cd, state, GNUTLS_HANDSHAKE, data, i_datasize);
 	
+	return ret;
+}
+
+int _gnutls_recv_handshake( int cd, GNUTLS_STATE state, void* data, uint32 datasize) {
+	int ret;
+	uint32 length32=0;
+	int pos=0;
+	char *dataptr=data;
+	uint24 num;
+
+	num.pint[0] = dataptr[1];
+	num.pint[1] = dataptr[2];
+	num.pint[2] = dataptr[3];
+	length32 = uint24touint32( num);
+
+#ifndef WORDS_BIGENDIAN	
+	length32 = byteswap32(length32);
+#endif
+
+
+	switch(dataptr[0]) {
+		case GNUTLS_CLIENT_HELLO:
+		case GNUTLS_SERVER_HELLO:
+			ret = _gnutls_recv_hello( cd, state, &dataptr[4], length32, NULL, 0);
+			break;
+	}
+
 	return ret;
 }
 
@@ -132,7 +167,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 	int pos=0;
 	GNUTLS_CipherSuite* cipher_suites;
 	CompressionMethod* compression_methods;
-	int i, datalen, ret;
+	int i, datalen, ret=0;
 	uint16 x;
 	
 	session_id_len = SessionIDLen;
@@ -238,9 +273,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 		memmove( &data[pos++], &state->gnutls_internals.compression_method, 1);
 
 		gcry_free(rand);
-		gnutls_free(cipher_suites);
-		gnutls_free(compression_methods);
-		ret = _gnutls_send_handshake( cd, state, data, datalen, GNUTLS_CLIENT_HELLO);
+		ret = _gnutls_send_handshake( cd, state, data, datalen, GNUTLS_SERVER_HELLO);
 		gnutls_free(data);
 
 	}
@@ -249,7 +282,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque* SessionID, uint8 Sess
 }
 
 
-/* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_int only if a
+/* RECEIVE A HELLO MESSAGE. This should be called from gnutls_recv_handshake only if a
  * hello message is expected. It uses the gnutls_internals.current_cipher_suite
  * and gnutls_internals.compression_method.
  */
@@ -263,11 +296,11 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char* data, int datalen, opaq
 	uint16 x, sizeOfSuites;
 	
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
-
 		if (datalen < 38) return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-		
+
 		if (data[pos++] != GNUTLS_VERSION_MAJOR) 
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+
 		if (data[pos++] != GNUTLS_VERSION_MINOR)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 
@@ -314,11 +347,11 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char* data, int datalen, opaq
 		gnutls_free(compression_methods);
 
 	} else { /* Server side reading a client hello */
-
 		if (datalen < 35) return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 
 		if (data[pos++] != GNUTLS_VERSION_MAJOR)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+
 		if (data[pos++] != GNUTLS_VERSION_MINOR)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 
@@ -345,8 +378,6 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char* data, int datalen, opaq
 		memmove( &z, &data[pos++], 1);
 		SelectCompMethod( &state->gnutls_internals.compression_method, &data[pos], z);
 		
-		gnutls_free(cipher_suites);
-		gnutls_free(compression_methods);	
 	}
 
 	return ret;
@@ -359,30 +390,48 @@ int ret;
 	if (state->security_parameters.entity == GNUTLS_CLIENT) {
 		ret = _gnutls_send_hello( cd, state, NULL, 0);
 		if (ret<0) {
-			fprintf(stderr, "handshake error(%d)\n", ret);
+			ERR("send hello", ret);
 			return ret;
 		}
 		/* receive the server handshake */
 		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
 		if (ret<0) {
-			fprintf(stderr, "handshake error(%d)\n", ret);
+			ERR("recv hello", ret);
 			return ret;
-		}		
+		}
+		ret = gnutls_recv_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, NULL, 0);
+		if (ret<0) {
+			ERR("recv ChangeCipherSpec", ret);
+			return ret;
+		}
 		ret = _gnutls_send_change_cipher_spec( cd, state);
+		if (ret<0) {
+			ERR("send ChangeCipherSpec", ret);
+			return ret;
+		}
 
 	} else { /* SERVER */
-
+		
 		ret = gnutls_recv_int( cd, state, GNUTLS_HANDSHAKE, NULL, 0);
 		if (ret<0) {
-			fprintf(stderr, "handshake error(%d)\n", ret);
+			ERR("recv hello", ret);
 			return ret;
 		}
 		ret = _gnutls_send_hello( cd, state, NULL, 0);
 		if (ret<0) {
-			fprintf(stderr, "handshake error(%d)\n", ret);
+			ERR("send hello", ret);
 			return ret;
 		}
 		ret = _gnutls_send_change_cipher_spec( cd, state);
+		if (ret<0) {
+			ERR("send ChangeCipherSpec", ret);
+			return ret;
+		}
+		ret = gnutls_recv_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, NULL, 0);
+		if (ret<0) {
+			ERR("recv ChangeCipherSpec", ret);
+			return ret;
+		}
 	}
 
 	return ret;

@@ -233,6 +233,13 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level,
 
 }
 
+int gnutls_close(int cd, GNUTLS_STATE state) {
+
+	state->gnutls_internals.valid_connection = VALID_FALSE;
+	return _gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
+
+}
+
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 		    char *data, size_t sizeofdata)
 {
@@ -284,7 +291,6 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type,
 		}
 
 		_gnutls_freeTLSCompressed(gcomp);
-fprintf(stderr, "size: %d\ntype: %d\n", gcipher->length, type);
 
 		if (Write(cd, &gcipher->type, sizeof(ContentType)) !=
 		    sizeof(ContentType)) {
@@ -293,12 +299,14 @@ fprintf(stderr, "size: %d\ntype: %d\n", gcipher->length, type);
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
+		
 		if (Write(cd, &gcipher->version.major, 1) != 1) {
 			state->gnutls_internals.valid_connection =
 			    VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
+		
 		if (Write(cd, &gcipher->version.minor, 1) != 1) {
 			state->gnutls_internals.valid_connection =
 			    VALID_FALSE;
@@ -421,17 +429,18 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 	if (state->gnutls_internals.valid_connection == VALID_FALSE)
 		return GNUTLS_E_INVALID_SESSION;
 
-	while (gnutls_getDataBufferSize(type, state) < sizeofdata) {
+	do {
 
 		if (Read(cd, &gcipher.type, sizeof(ContentType)) !=
 		    sizeof(ContentType)) {
-			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
-					   GNUTLS_INTERNAL_ERROR);
+//			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
+//					   GNUTLS_INTERNAL_ERROR);
 			state->gnutls_internals.valid_connection =
 			    VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
+
 		if (Read(cd, &gcipher.version.major, 1) != 1) {
 			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
 					   GNUTLS_INTERNAL_ERROR);
@@ -440,6 +449,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
+		
 		if (Read(cd, &gcipher.version.minor, 1) != 1) {
 			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
 					   GNUTLS_INTERNAL_ERROR);
@@ -448,8 +458,10 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 			state->gnutls_internals.resumable = RESUME_FALSE;
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 		}
+
 		if (gcipher.version.major != GNUTLS_VERSION_MAJOR
 		    || gcipher.version.minor != GNUTLS_VERSION_MINOR) {
+
 			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
 					   GNUTLS_PROTOCOL_VERSION);
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -467,8 +479,11 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 #ifndef WORDS_BIGENDIAN
 		gcipher.length = byteswap16(gcipher.length);
 #endif
+		
 		if (gcipher.length > 18432) {	/* 2^14+2048 */
+#ifdef DEBUG
 			fprintf(stderr, "Received packet with length: %d\n", gcipher.length);
+#endif
 			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
 					   GNUTLS_RECORD_OVERFLOW);
 			state->gnutls_internals.valid_connection =
@@ -479,12 +494,16 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 		gcipher.fragment = gnutls_malloc(gcipher.length);
 
 		/* read ciphertext */
-		if (ret=Read(cd, gcipher.fragment, gcipher.length) !=
-		    gcipher.length) {
+
+		ret=Read(cd, gcipher.fragment, gcipher.length);
+
+		if (ret != gcipher.length) {
+#ifdef DEBUG
 			fprintf(stderr, "Received packet with length: %d\nExpecting %d\n", ret, gcipher.length);
+#endif
 			gnutls_free(gcipher.fragment);
-			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
-					   GNUTLS_INTERNAL_ERROR);
+//			_gnutls_send_alert(cd, state, GNUTLS_FATAL,
+//					   GNUTLS_INTERNAL_ERROR);
 			state->gnutls_internals.valid_connection =
 			    VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -530,14 +549,17 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 			return ret;
 		}
 		tmplen = gtxt->length;
-fprintf(stderr, "size: %d\ntype: %d\n", tmplen, type);
+
 		_gnutls_freeTLSPlaintext(gtxt);
 
-		if (gcipher.type == type == GNUTLS_APPLICATION_DATA) {
+		if (gcipher.type == type && type == GNUTLS_APPLICATION_DATA) {
 			gnutls_insertDataBuffer(state, tmpdata, tmplen);
 		} else {
 			switch (gcipher.type) {
 			case GNUTLS_ALERT:
+#ifdef DEBUG
+				fprintf(stderr, "Alert was received\n");
+#endif
 				state->gnutls_internals.last_alert =
 				    ((Alert *) tmpdata)->description;
 
@@ -565,25 +587,29 @@ fprintf(stderr, "size: %d\ntype: %d\n", tmplen, type);
 				}
 				break;
 			case GNUTLS_CHANGE_CIPHER_SPEC:
-				if (((ChangeCipherSpecType) tmpdata) ==
+				if (type != GNUTLS_CHANGE_CIPHER_SPEC) return GNUTLS_E_UNEXPECTED_PACKET;
+				if (((ChangeCipherSpecType) tmpdata[0]) ==
 				    GNUTLS_TYPE_CHANGE_CIPHER_SPEC
 				    && tmplen == 1) {
-					_gnutls_connection_state_init
+					ret = _gnutls_connection_state_init
 					    (state);
+					
 				} else {
 					state->gnutls_internals.
 					    valid_connection = VALID_FALSE;
 					state->gnutls_internals.resumable =
 					    RESUME_FALSE;
-					return
+					ret = 
 					    GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 				}
+				state->connection_state.read_sequence_number++;
+				return ret;
 				break;
 			case GNUTLS_HANDSHAKE:
 				if (type == GNUTLS_HANDSHAKE) {
-				fprintf(stderr, "HANDSHAKE\n");
-					ret = _gnutls_recv_hello( cd, state, tmpdata, sizeofdata, NULL, 0);
+					ret = _gnutls_recv_handshake( cd, state, tmpdata, tmplen);
 					gnutls_free(tmpdata);
+					state->connection_state.read_sequence_number++;
 					return ret;
 				}
 			}
@@ -593,20 +619,31 @@ fprintf(stderr, "size: %d\ntype: %d\n", tmplen, type);
 
 		/* Incread sequence number */
 		state->connection_state.read_sequence_number++;
-
-	}
-
+		
+	} while (gnutls_getDataBufferSize(type, state) < sizeofdata);
+	
+	
 	/* Insert Application data to buffer */
 	if (gcipher.type == type == GNUTLS_APPLICATION_DATA) {
 		ret = gnutls_getDataFromBuffer(state, data, sizeofdata);
 		gnutls_free(tmpdata);
 	} else {
-		if (gcipher.type != type)
+		if (gcipher.type != type) {
 			return GNUTLS_E_RECEIVED_BAD_MESSAGE;
+#ifdef DEBUG
+			fprintf(stderr, "Received unexpected packet type\n");
+#endif
+		}
 		/* this is an error because we have messages of fixed
 		 * length */
-		if (sizeofdata != tmplen)
+#if 0 /* this is not a fatal error */
+		if (sizeofdata != tmplen) {
 			return GNUTLS_E_RECEIVED_MORE_DATA;
+#ifdef DEBUG
+			fprintf(stderr, "Received more data than expected\n");
+#endif
+		}
+#endif
 		memmove(data, tmpdata, sizeofdata);
 		gnutls_free(tmpdata);
 		ret = sizeofdata;

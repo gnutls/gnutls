@@ -1,3 +1,5 @@
+#define DEBUG
+
 #define svoid void /* for functions that allocate using secure_free */
 #define secure_free free
 #define secure_malloc malloc
@@ -229,3 +231,4 @@ typedef struct {
 
 /* functions */
 int _gnutls_send_alert( int cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
+int gnutls_close(int cd, GNUTLS_STATE state);

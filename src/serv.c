@@ -7,13 +7,12 @@
 #include "gnutls.h"
 
 #define SA struct sockaddr
-#define ERR(err,s) if(err==-1) {perror(s);exit(1);}
+#define ERR(err,s) if(err==-1) {perror(s);return(1);}
 
 int main()
 {
-	int err;
-	int listen_sd;
-	int sd;
+	int err, listen_sd;
+	int sd, ret;
 	struct sockaddr_in sa_serv;
 	struct sockaddr_in sa_cli;
 	int client_len, i;
@@ -29,19 +28,17 @@ int main()
 	memset(&sa_serv, '\0', sizeof(sa_serv));
 	sa_serv.sin_family = AF_INET;
 	sa_serv.sin_addr.s_addr = INADDR_ANY;
-	sa_serv.sin_port = htons(6666);	/* Server Port number */
+	sa_serv.sin_port = htons(2222);	/* Server Port number */
 
-	err = bind(listen_sd, (SA*) &sa_serv,
-		   sizeof(sa_serv)); ERR(err, "bind");
+	err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
+	ERR(err, "bind");
 	err = listen(listen_sd, 1024);
 	ERR(err, "listen");
 
 	client_len = sizeof(sa_cli);
 	for (;;) {
 		gnutls_init(&state, GNUTLS_SERVER);
-		sd =
-		    accept(listen_sd, (SA*) &sa_cli,
-			   &client_len);
+		sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
 
 		fprintf(stderr, "connection from %s, port %d\n",
@@ -50,13 +47,11 @@ int main()
 
 
 
-//		gnutls_handshake(sd, state);
-//		fprintf(stderr, "Handshake was completed\n");
-//		gnutls_send(sd, state, "hello\n", 5);
-		gnutls_recv(sd, state, buf, 10);
-//		fprintf(stderr, "buf: %s\n", bin2hex(buf,100));
-		_print_TLSCiphertext( buf);
-		fprintf(stderr, "Data was send\n");
+		gnutls_handshake(sd, state);
+		fprintf(stderr, "Handshake was completed\n");
+		ret = gnutls_send(sd, state, "hello\n", 5);
+		fprintf(stderr, "Data was send (%d)\n", ret);
+		gnutls_close(sd, state);
 		close(sd);
 		gnutls_deinit(&state);
 	}

@@ -16,6 +16,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
 int gnutls_deinit(GNUTLS_STATE * state);
 ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
 ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata);
+int gnutls_close(int cd, GNUTLS_STATE state);
 int gnutls_handshake(int cd, GNUTLS_STATE state);
 
 #define gnutls_send( x, y, z, w) gnutls_send_int( x, y, GNUTLS_APPLICATION_DATA, z, w)
