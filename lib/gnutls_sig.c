@@ -75,7 +75,7 @@ int ret;
 
 			data.data = digest;
 			data.size = 20+16; /* md5 + sha */	
-			ret = _gnutls_pkcs1_rsa_generate_sig( GNUTLS_MAC_MD5, pkey, &data, signature);
+			ret = _gnutls_pkcs1_rsa_generate_sig( pkey, &data, signature);
 
 			break;
 		default:
@@ -88,94 +88,9 @@ int ret;
 
 }
 
-#ifdef NO_SSL_SIGS
-/* This is not used in SSL signatures
- */
-static int _gnutls_digestinfo_encode( opaque* data, int data_size, char* OID, gnutls_datum* der) {
-node_asn *di;
-int result;
 
-	if (asn1_create_structure( _gnutls_get_pkcs(),
-                    "PKCS-1.DigestInfo", &di, "di") != ASN_OK) {
-        	gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
-	}
-	
-	result = asn1_write_value( di, "di.digestAlgorithm.algorithm", OID, 1);
-	if (result!=ASN_OK) {
-        	gnutls_assert();
-		asn1_delete_structure( di);
-		return GNUTLS_E_ASN1_ERROR;
-	}
-
-	result = asn1_write_value( di, "di.digestAlgorithm.parameters", NULL, 0);
-	if (result!=ASN_OK) {
-        	gnutls_assert();
-		asn1_delete_structure( di);
-		return GNUTLS_E_ASN1_ERROR;
-	}
-
-	result = asn1_write_value( di, "di.digest", data, data_size);
-	if (result!=ASN_OK) {
-        	gnutls_assert();
-		asn1_delete_structure( di);
-		return GNUTLS_E_ASN1_ERROR;
-	}
-
-	der->size = data_size + 200;
-	der->data = gnutls_malloc( der->size);
-	if (der->data==NULL) {
-		gnutls_assert();
-		asn1_delete_structure( di);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	
-	result = asn1_create_der( di, "di", der->data, &der->size);
-	if (result!=ASN_OK) {
-        	gnutls_assert();
-		asn1_delete_structure( di);
-        	gnutls_free_datum( der);
-		return GNUTLS_E_ASN1_ERROR;
-	}
-	asn1_delete_structure( di);
-
-	return 0;
-}
-#endif
-
-int _gnutls_pkcs1_rsa_generate_sig( MACAlgorithm hash_algo, gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) {
+int _gnutls_pkcs1_rsa_generate_sig( gnutls_private_key *pkey, const gnutls_datum *data, gnutls_datum *signature) {
 	int ret;
-#ifdef NO_SSL_SIGS	
-	GNUTLS_HASH_HANDLE hd;
-	opaque digest[MAX_HASH_SIZE];
-	char OID[40];
-	int digest_size =  gnutls_hash_get_algo_len( hash_algo);
-	gnutls_datum der;
-	
-	if (hash_algo==GNUTLS_MAC_MD5)
-		strcpy(OID, "1 2 840 113549 2 5");
-	else if (hash_algo==GNUTLS_MAC_SHA)
-		strcpy(OID, "1 3 14 3 2 26");
-	else {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
-	}
-	
-	/* hash data */
-	hd = gnutls_hash_init( hash_algo);
-	if (hd==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	gnutls_hash( hd, data->data, data->size);
-	gnutls_hash_deinit( hd, digest);
-
-	/* encode digest to DigestInfo (der) */
-	if ( (ret=_gnutls_digestinfo_encode( digest, digest_size, OID, &der)) < 0) {
-		gnutls_assert();
-		return ret;
-	}	
-#endif
 
 	/* encrypt der */
 	if ( (ret=_gnutls_pkcs1_rsa_encrypt( signature, *data, pkey->params[0], pkey->params[1], 1)) < 0) {
@@ -183,8 +98,5 @@ int _gnutls_pkcs1_rsa_generate_sig( MACAlgorithm hash_algo, gnutls_private_key *
 	     return ret;
 	}
 
-#ifdef NO_SSL_SIGS
-	gnutls_free_datum( &der);
-#endif
 	return 0;
 }
