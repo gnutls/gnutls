@@ -37,7 +37,7 @@ The rules here are not always used, although we try to stick to them.
  be prefixed with an underscore. E.g. _gnutls_handshake_begin()
 
  All exported functions must be listed in gnutls.sym and gnutls-extra.sym
- in order to be exported.
+ in order to be exported. [this is not true for now]
 
 *** Constructed types:
   The constructed types in gnutls always have the "gnutls_" prefix.
