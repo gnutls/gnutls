@@ -1,6 +1,5 @@
 If you just want to browse the cvs tree, you may visit
 http://cvs.gnupg.org/cgi-bin/viewcvs.cgi/gnutls/?cvsroot=GNU+TLS+Library
-or http://cvs.hellug.gr/cgi-bin/viewcvs.cgi/gnutls-read-only/ .
 
 Otherwise, if you want to get and built the tree, you should have the 
 following software:
