@@ -347,6 +347,11 @@ int gnutls_srp_allocate_client_sc( GNUTLS_SRP_CLIENT_CREDENTIALS *sc) {
   **/
 int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char * password) {
 
+	if (username==NULL || password == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+	
 	res->username = gnutls_strdup( username);
 	if (res->username == NULL) return GNUTLS_E_MEMORY_ERROR;
 
@@ -404,6 +409,12 @@ int gnutls_srp_allocate_server_sc( GNUTLS_SRP_SERVER_CREDENTIALS *sc) {
   **/
 int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char * password_conf_file) {
 int i;
+	
+	if (password_file==NULL || password_conf_file==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
+	}
+	
 	res->password_file = gnutls_realloc( res->password_file,
 		sizeof(char*)*(res->password_files+1));
 	if (res->password_file==NULL) {
