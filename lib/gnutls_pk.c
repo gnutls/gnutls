@@ -127,8 +127,12 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		/* padding psize */
 		pad = k - psize;
 		psize = k;
-	} else
+	} else if (psize==k) {
 		pad = 0;
+	} else { /* psize > k !!! */
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL;
+	}
 
 	ciphertext->data = gnutls_malloc(psize);
 	if (ciphertext->data == NULL) {
