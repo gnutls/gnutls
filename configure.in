@@ -349,6 +349,31 @@ if test x$opt_developer_mode = xyes; then
  minitasn1_enabled=yes
 fi
 
+SAVED_LIBS=$LIBS
+
+AC_MSG_CHECKING([whether to use the included minitasn1])
+AC_MSG_RESULT($minitasn1_enabled)
+
+AC_ARG_WITH(included-libcfg,
+	[  --with-included-libcfg   Use the included libcfg+],
+libcfg_enabled=$withval, 
+libcfg_enabled=no
+
+dnl We search for libcfg+ which is used by certtool
+dnl
+AC_CHECK_LIB( cfg+, cfg_get_context,:, 
+ libcfg_enabled=yes
+AC_MSG_WARN([[
+*** 
+*** Libcfg+ was not found. Will use the included one.]])))
+
+AM_CONDITIONAL(HAVE_LIBCFG, test "$libcfg_enabled" = "no")
+LIBS=$SAVED_LIBS
+
+if test x$opt_developer_mode = xyes; then
+ minitasn1_enabled=yes
+fi
+
 AC_MSG_CHECKING([whether to use the included minitasn1])
 AC_MSG_RESULT($minitasn1_enabled)
 
