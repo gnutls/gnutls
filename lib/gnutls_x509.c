@@ -67,10 +67,6 @@ ASN1_TYPE tmpasn;
 	
 	res[0] = 0;
 
-fprintf(stderr, "OID: %s\n", OID);
-fprintf(stderr, "len: %d\n", value_size);
-fprintf( stderr, "val: %.02x%.02x\n", ((unsigned char*)value)[0], ((unsigned char*)value)[1]);
-
 	if (strcmp( OID, "2 5 4 6") == 0) {
 #ifdef DEBUG
 # warning " FIX COUNTRY HERE"
