@@ -85,7 +85,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	CERTIFICATE_AUTH_INFO info;
 	const gnutls_certificate_credentials cred;
 
-	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
 	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
@@ -289,18 +289,18 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 	_n_e = n_e;
 	_n_m = n_m;
 
-	if (_gnutls_mpi_scan(&session->gnutls_key->rsa[0], data_m, &_n_m) != 0) {
+	if (_gnutls_mpi_scan(&session->key->rsa[0], data_m, &_n_m) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan(&session->gnutls_key->rsa[1], data_e, &_n_e) != 0) {
+	if (_gnutls_mpi_scan(&session->key->rsa[1], data_e, &_n_e) != 0) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 	ret=_gnutls_rsa_export_set_modulus_bits( session, _gnutls_mpi_get_nbits(
-		session->gnutls_key->rsa[0]));
+		session->key->rsa[0]));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;

@@ -596,7 +596,7 @@ struct gnutls_session_int {
 	CipherSpecs cipher_specs;
 	ConnectionState connection_state;
 	GNUTLS_INTERNALS internals;
-	GNUTLS_KEY gnutls_key;
+	GNUTLS_KEY key;
 };
 
 typedef struct gnutls_session_int *gnutls_session;

@@ -246,7 +246,7 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* us
 
 	*err = 0; /* normal exit */
 	
-	cred = _gnutls_get_cred( state->gnutls_key, GNUTLS_CRD_SRP, NULL);
+	cred = _gnutls_get_cred( state->key, GNUTLS_CRD_SRP, NULL);
 	if (cred==NULL) {
 		*err = 1;
 		gnutls_assert();

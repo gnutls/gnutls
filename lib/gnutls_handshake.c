@@ -597,7 +597,7 @@ int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datale
 	/* check if the credentials (username, public key etc. are ok)
 	 */
 	if (_gnutls_get_kx_cred
-	    (session->gnutls_key,
+	    (session->key,
 	     _gnutls_cipher_suite_get_kx_algo(session->security_parameters.
 					      current_cipher_suite),
 	     &err) == NULL && err != 0) {
@@ -1108,7 +1108,7 @@ static int _gnutls_client_set_ciphersuite(gnutls_session session,
 	 * Actually checks if they exist.
 	 */
 	if (_gnutls_get_kx_cred
-	    (session->gnutls_key,
+	    (session->key,
 	     _gnutls_cipher_suite_get_kx_algo(session->
 					      security_parameters.
 					      current_cipher_suite),
@@ -2344,7 +2344,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	 */
 
 	x509_cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 
 	/* if x509_cred==NULL we should remove all X509 ciphersuites
 	 */
@@ -2391,7 +2391,7 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 		/* if it is defined but had no credentials 
 		 */
 		if (_gnutls_get_kx_cred
-		    (session->gnutls_key, kx, NULL) == NULL) {
+		    (session->key, kx, NULL) == NULL) {
 			keep = 1;
 		} else
 		/* If there was no credentials to use with the specified

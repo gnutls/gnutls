@@ -60,14 +60,14 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 };
 
 
-#define _b state->gnutls_key->b
-#define B state->gnutls_key->B
-#define _a state->gnutls_key->a
-#define A state->gnutls_key->A
-#define N state->gnutls_key->client_p
-#define G state->gnutls_key->client_g
-#define V state->gnutls_key->x
-#define S state->gnutls_key->KEY
+#define _b state->key->b
+#define B state->key->B
+#define _a state->key->a
+#define A state->key->A
+#define N state->key->client_p
+#define G state->key->client_g
+#define V state->key->x
+#define S state->key->KEY
 
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
@@ -200,15 +200,15 @@ int gen_srp_server_kx2(gnutls_session state, opaque ** data)
 	_gnutls_write_uint16( n_b, data_b);
 
 	/* calculate u */
-	state->gnutls_key->u = _gnutls_calc_srp_u(B);
-	if (state->gnutls_key->u==NULL) {
+	state->key->u = _gnutls_calc_srp_u(B);
+	if (state->key->u==NULL) {
 		gnutls_assert();
 		gnutls_free( *data);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	/* S = (A * v^u) ^ b % N */
-	S = _gnutls_calc_srp_S1( A, _b, state->gnutls_key->u, V, N);
+	S = _gnutls_calc_srp_S1( A, _b, state->key->u, V, N);
 	if ( S==NULL) {
 		gnutls_assert();
 		gnutls_free( *data);
@@ -218,10 +218,10 @@ int gen_srp_server_kx2(gnutls_session state, opaque ** data)
 	_gnutls_mpi_release(&A);
 	_gnutls_mpi_release(&_b);
 	_gnutls_mpi_release(&V);
-	_gnutls_mpi_release(&state->gnutls_key->u);
+	_gnutls_mpi_release(&state->key->u);
 	_gnutls_mpi_release(&B);
 
-	ret = _gnutls_generate_key( state->gnutls_key);
+	ret = _gnutls_generate_key( state->key);
 	_gnutls_mpi_release( &S);
 
 	if (ret < 0)
@@ -239,7 +239,7 @@ int gen_srp_client_kx0(gnutls_session state, opaque ** data)
 	char *username;
 	char *password;
 	const gnutls_srp_client_credentials cred =
-	    _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_SRP, NULL);
+	    _gnutls_get_cred(state->key, GNUTLS_CRD_SRP, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -300,7 +300,7 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, size_t _dat
 	ssize_t data_size = _data_size;
 
 	const gnutls_srp_client_credentials cred =
-	    _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_SRP, NULL);
+	    _gnutls_get_cred(state->key, GNUTLS_CRD_SRP, NULL);
 
 	if (cred == NULL) {
 		gnutls_assert();
@@ -363,7 +363,7 @@ int proc_srp_server_hello(gnutls_session state, const opaque * data, size_t _dat
 		return ret;
 	}
 
-	if (_gnutls_mpi_scan(&state->gnutls_key->x, hd, &_n_g) != 0 || state->gnutls_key->x==NULL) {
+	if (_gnutls_mpi_scan(&state->key->x, hd, &_n_g) != 0 || state->key->x==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -406,14 +406,14 @@ int proc_srp_server_kx2(gnutls_session state, opaque * data, size_t _data_size)
 	}
 
 	/* calculate u */
-	state->gnutls_key->u = _gnutls_calc_srp_u( B);
-	if ( state->gnutls_key->u == NULL) {
+	state->key->u = _gnutls_calc_srp_u( B);
+	if ( state->key->u == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 	/* S = (B - g^x) ^ (a + u * x) % N */
-	S = _gnutls_calc_srp_S2( B, G, state->gnutls_key->x, _a, state->gnutls_key->u, N);
+	S = _gnutls_calc_srp_S2( B, G, state->key->x, _a, state->key->u, N);
 	if (S==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -423,10 +423,10 @@ int proc_srp_server_kx2(gnutls_session state, opaque * data, size_t _data_size)
 	_gnutls_mpi_release(&A);
 	_gnutls_mpi_release(&_b);
 	_gnutls_mpi_release(&V);
-	_gnutls_mpi_release(&state->gnutls_key->u);
+	_gnutls_mpi_release(&state->key->u);
 	_gnutls_mpi_release(&B);
 
-	ret = _gnutls_generate_key( state->gnutls_key);
+	ret = _gnutls_generate_key( state->key);
 	_gnutls_mpi_release(&S);
 
 	if (ret < 0)

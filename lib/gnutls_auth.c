@@ -37,14 +37,14 @@
 int gnutls_clear_creds( gnutls_session session) {
 	AUTH_CRED * ccred, *ncred;
 	
-	if (session->gnutls_key && session->gnutls_key->cred) { /* begining of the list */
-		ccred = session->gnutls_key->cred;
+	if (session->key && session->key->cred) { /* begining of the list */
+		ccred = session->key->cred;
 		while(ccred!=NULL) {
 			ncred = ccred->next;
 			if (ccred!=NULL) gnutls_free(ccred);
 			ccred = ncred;
 		}
-		session->gnutls_key->cred = NULL;
+		session->key->cred = NULL;
 	}
 
 	return 0;
@@ -83,18 +83,18 @@ int gnutls_credentials_set( gnutls_session session, gnutls_credentials_type type
 	AUTH_CRED * ccred=NULL, *pcred=NULL;
 	int exists=0;	
 	
-	if (session->gnutls_key->cred==NULL) { /* begining of the list */
+	if (session->key->cred==NULL) { /* begining of the list */
 		
-		session->gnutls_key->cred = gnutls_malloc(sizeof(AUTH_CRED));
-		if (session->gnutls_key->cred == NULL) return GNUTLS_E_MEMORY_ERROR;
+		session->key->cred = gnutls_malloc(sizeof(AUTH_CRED));
+		if (session->key->cred == NULL) return GNUTLS_E_MEMORY_ERROR;
 		
 		/* copy credentials localy */
-		session->gnutls_key->cred->credentials = cred;
+		session->key->cred->credentials = cred;
 		
-		session->gnutls_key->cred->next = NULL;
-		session->gnutls_key->cred->algorithm = type;
+		session->key->cred->next = NULL;
+		session->key->cred->algorithm = type;
 	} else {
-		ccred = session->gnutls_key->cred;
+		ccred = session->key->cred;
 		while(ccred!=NULL) {
 			if (ccred->algorithm==type) {
 				exists=1;
@@ -186,7 +186,7 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, gnutls_credentials_type type, int 
   * In case of GNUTLS_CRD_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
   -*/
 void* _gnutls_get_auth_info( gnutls_session session) {
-	return session->gnutls_key->auth_info;
+	return session->key->auth_info;
 }
 
 /*-
@@ -198,12 +198,12 @@ void* _gnutls_get_auth_info( gnutls_session session) {
   * elements.
   -*/
 void _gnutls_free_auth_info( gnutls_session session) {
-	if (session==NULL || session->gnutls_key==NULL) {
+	if (session==NULL || session->key==NULL) {
 		gnutls_assert();
 		return;
 	}
 	
-	switch ( session->gnutls_key->auth_info_type) {
+	switch ( session->key->auth_info_type) {
 	case GNUTLS_CRD_SRP:
 	case GNUTLS_CRD_ANON:
 		
@@ -230,27 +230,27 @@ void _gnutls_free_auth_info( gnutls_session session) {
 
 	}
 
-	gnutls_free( session->gnutls_key->auth_info);
-	session->gnutls_key->auth_info = NULL;
-	session->gnutls_key->auth_info_size = 0;
-	session->gnutls_key->auth_info_type = 0;
+	gnutls_free( session->key->auth_info);
+	session->key->auth_info = NULL;
+	session->key->auth_info_size = 0;
+	session->key->auth_info_type = 0;
 
 }
 
-/* This function will set the auth info structure in the gnutls_key
+/* This function will set the auth info structure in the key
  * structure.
  * If allow change is !=0 then this will allow changing the auth
  * info structure to a different type.
  */
 int _gnutls_auth_info_set( gnutls_session session, gnutls_credentials_type type, int size, int allow_change) {
-	if ( session->gnutls_key->auth_info == NULL) {
-		session->gnutls_key->auth_info = gnutls_calloc( 1, size);
-		if (session->gnutls_key->auth_info == NULL) {
+	if ( session->key->auth_info == NULL) {
+		session->key->auth_info = gnutls_calloc( 1, size);
+		if (session->key->auth_info == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		session->gnutls_key->auth_info_type = type;
-		session->gnutls_key->auth_info_size = size;
+		session->key->auth_info_type = type;
+		session->key->auth_info_size = size;
 	} else {
 		if (allow_change==0) {
 			/* If the credentials for the current authentication scheme,
@@ -259,7 +259,7 @@ int _gnutls_auth_info_set( gnutls_session session, gnutls_credentials_type type,
 			 * ciphersuite which is negotiated has different authentication
 			 * schema.
 			 */
-			if ( gnutls_auth_get_type( session) != session->gnutls_key->auth_info_type) {
+			if ( gnutls_auth_get_type( session) != session->key->auth_info_type) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
@@ -270,16 +270,16 @@ int _gnutls_auth_info_set( gnutls_session session, gnutls_credentials_type type,
 			 * certificate (in order to prevent revealing the certificate's contents,
 			 * to passive eavesdropers.
 			 */
-			if ( gnutls_auth_get_type( session) != session->gnutls_key->auth_info_type) {
-				session->gnutls_key->auth_info = gnutls_realloc_fast( 
-					session->gnutls_key->auth_info, size);
-				if (session->gnutls_key->auth_info == NULL) {
+			if ( gnutls_auth_get_type( session) != session->key->auth_info_type) {
+				session->key->auth_info = gnutls_realloc_fast( 
+					session->key->auth_info, size);
+				if (session->key->auth_info == NULL) {
 					gnutls_assert();
 					return GNUTLS_E_MEMORY_ERROR;
 				}
-				memset( session->gnutls_key->auth_info, 0, size);
-				session->gnutls_key->auth_info_type = type;
-				session->gnutls_key->auth_info_size = size;
+				memset( session->key->auth_info, 0, size);
+				session->key->auth_info_type = type;
+				session->key->auth_info_size = size;
 			}
 		}
 	}

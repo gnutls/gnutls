@@ -288,7 +288,7 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 	ssize_t data_size = _data_size;
 
 	cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
@@ -676,7 +676,7 @@ int _gnutls_proc_x509_server_certificate(gnutls_session session, opaque * data,
 	gnutls_datum tmp;
 
 	cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
@@ -810,7 +810,7 @@ int _gnutls_proc_openpgp_server_certificate(gnutls_session session,
 	gnutls_datum tmp, akey = { NULL, 0 };
 
 	cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
@@ -1014,7 +1014,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 	int pk_algos_length;
 
 	cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
@@ -1078,7 +1078,7 @@ int _gnutls_proc_cert_cert_req(gnutls_session session, opaque * data,
 	session->internals.selected_cert_index = ind;
 
 	if (ind >= 0)
-		session->gnutls_key->certificate_requested = 1;
+		session->key->certificate_requested = 1;
 
 	return 0;
 }
@@ -1208,7 +1208,7 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session, opaque ** data)
 	 */
 
 	cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();
@@ -1255,7 +1255,7 @@ int _gnutls_find_apr_cert(gnutls_session session, gnutls_cert ** apr_cert_list,
 	int ind;
 
 	cred =
-	    _gnutls_get_kx_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_kx_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 				NULL);
 
 	if (cred == NULL) {
@@ -1333,7 +1333,7 @@ const gnutls_cert *_gnutls_server_find_cert(gnutls_session session,
 	const gnutls_certificate_credentials x509_cred;
 
 	x509_cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 			     NULL);
 
 	if (x509_cred == NULL)
@@ -1364,7 +1364,7 @@ static int _gnutls_server_find_cert_list_index(gnutls_session session,
 	int *ij_map = NULL;
 
 	cred =
-	    _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE,
+	    _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE,
 			     NULL);
 	if (cred == NULL) {
 		gnutls_assert();

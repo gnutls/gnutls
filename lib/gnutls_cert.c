@@ -338,7 +338,7 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 	if (info == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CREDENTIALS;

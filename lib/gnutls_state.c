@@ -185,8 +185,8 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 	_gnutls_buffer_init( &(*session)->internals.handshake_send_buffer);
 	_gnutls_buffer_init( &(*session)->internals.handshake_recv_buffer);
 
-	(*session)->gnutls_key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
-	if ( (*session)->gnutls_key == NULL) {
+	(*session)->key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
+	if ( (*session)->key == NULL) {
 		gnutls_free( *session);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
@@ -279,27 +279,27 @@ void _gnutls_deinit(gnutls_session session)
 	gnutls_sfree_datum( &session->cipher_specs.server_write_key);
 	gnutls_sfree_datum( &session->cipher_specs.client_write_key);
 
-	if (session->gnutls_key != NULL) {
-		_gnutls_mpi_release(&session->gnutls_key->KEY);
-		_gnutls_mpi_release(&session->gnutls_key->client_Y);
-		_gnutls_mpi_release(&session->gnutls_key->client_p);
-		_gnutls_mpi_release(&session->gnutls_key->client_g);
+	if (session->key != NULL) {
+		_gnutls_mpi_release(&session->key->KEY);
+		_gnutls_mpi_release(&session->key->client_Y);
+		_gnutls_mpi_release(&session->key->client_p);
+		_gnutls_mpi_release(&session->key->client_g);
 
-		_gnutls_mpi_release(&session->gnutls_key->u);
-		_gnutls_mpi_release(&session->gnutls_key->a);
-		_gnutls_mpi_release(&session->gnutls_key->x);
-		_gnutls_mpi_release(&session->gnutls_key->A);
-		_gnutls_mpi_release(&session->gnutls_key->B);
-		_gnutls_mpi_release(&session->gnutls_key->b);
+		_gnutls_mpi_release(&session->key->u);
+		_gnutls_mpi_release(&session->key->a);
+		_gnutls_mpi_release(&session->key->x);
+		_gnutls_mpi_release(&session->key->A);
+		_gnutls_mpi_release(&session->key->B);
+		_gnutls_mpi_release(&session->key->b);
 
 		/* RSA */
-		_gnutls_mpi_release(&session->gnutls_key->rsa[0]);
-		_gnutls_mpi_release(&session->gnutls_key->rsa[1]);
+		_gnutls_mpi_release(&session->key->rsa[0]);
+		_gnutls_mpi_release(&session->key->rsa[1]);
 
-		_gnutls_mpi_release(&session->gnutls_key->dh_secret);
-		_gnutls_free(session->gnutls_key);
+		_gnutls_mpi_release(&session->key->dh_secret);
+		_gnutls_free(session->key);
 
-		session->gnutls_key = NULL;
+		session->key = NULL;
 	}
 
 	memset( session, 0, sizeof(struct gnutls_session_int));

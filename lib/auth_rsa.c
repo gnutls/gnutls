@@ -122,8 +122,8 @@ int i;
 
 		_gnutls_free_cert( peer_cert);
 
-		if (session->gnutls_key->rsa[0] == NULL ||
-			session->gnutls_key->rsa[1] == NULL) {
+		if (session->key->rsa[0] == NULL ||
+			session->key->rsa[1] == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
@@ -134,7 +134,7 @@ int i;
 		}
 		*params_len = 2;
 		for (i=0;i<*params_len;i++) {
-			params[i] = _gnutls_mpi_copy(session->gnutls_key->rsa[i]);
+			params[i] = _gnutls_mpi_copy(session->key->rsa[i]);
 		}
 
 		return 0;
@@ -163,7 +163,7 @@ int _gnutls_get_private_rsa_params(gnutls_session session, GNUTLS_MPI **params, 
 int index;
 const gnutls_certificate_credentials cred;
 
-	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
 	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
@@ -255,7 +255,7 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 
 		_gnutls_log("RSA_AUTH: Possible PKCS-1 format attack\n");
 
-		RANDOMIZE_KEY(session->gnutls_key->key,
+		RANDOMIZE_KEY(session->key->key,
 			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
 	} else {
 		ret = 0;
@@ -268,8 +268,8 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 				ret = GNUTLS_E_DECRYPTION_FAILED;
 			}
 
-		session->gnutls_key->key.data = plaintext.data;
-		session->gnutls_key->key.size = plaintext.size;
+		session->key->key.data = plaintext.data;
+		session->key->key.size = plaintext.size;
 	}
 
 	return ret;
@@ -281,7 +281,7 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
  */
 int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 {
-	CERTIFICATE_AUTH_INFO auth = session->gnutls_key->auth_info;
+	CERTIFICATE_AUTH_INFO auth = session->key->auth_info;
 	gnutls_datum sdata;	/* data to send */
 	GNUTLS_MPI params[MAX_PARAMS_SIZE];
 	int params_len = MAX_PARAMS_SIZE;
@@ -295,14 +295,14 @@ int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CREDENTIALS;
 	}
-	RANDOMIZE_KEY(session->gnutls_key->key, gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
+	RANDOMIZE_KEY(session->key->key, gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
 
 	ver = _gnutls_get_adv_version(session);
 
-	session->gnutls_key->key.data[0] = _gnutls_version_get_major(ver);
-	session->gnutls_key->key.data[1] = _gnutls_version_get_minor(ver);
+	session->key->key.data[0] = _gnutls_version_get_major(ver);
+	session->key->key.data[1] = _gnutls_version_get_minor(ver);
 
-	/* move RSA parameters to gnutls_key (session).
+	/* move RSA parameters to key (session).
 	 */
 	if ((ret =
 	     _gnutls_get_public_rsa_params(session, params, &params_len)) < 0) {
@@ -311,7 +311,7 @@ int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 	}
 
 	if ((ret =
-	     _gnutls_pkcs1_rsa_encrypt(&sdata, session->gnutls_key->key,
+	     _gnutls_pkcs1_rsa_encrypt(&sdata, session->key->key,
 				       params, params_len, 2)) < 0) {
 		gnutls_assert();
 		return ret;

@@ -96,7 +96,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	CERTIFICATE_AUTH_INFO info;
 	const gnutls_certificate_credentials cred;
 
-	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
 	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
@@ -268,7 +268,7 @@ GNUTLS_MPI p, g;
 
 	bits = _gnutls_dh_get_prime_bits( session);
 
-	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
 	        return GNUTLS_E_INSUFICIENT_CREDENTIALS;
