@@ -13,3 +13,4 @@ Makefile
 libgnutls-config
 gnutls.h
 x509_ASN.c
+gnutls-api.tex
