@@ -4,12 +4,13 @@ SUBDIRS = tex examples scripts manpages
 
 info_TEXINFOS = gnutls.texi
 gnutls_TEXINFOS = gnutls.texi fdl.texi error_codes.texi \
-	build_api_pgp build_api_lib build_api_x509 build_api_extra examples \
 	gnutls-api.texi gnutls-extra-api.texi x509-api.texi pgp-api.texi \
 	internals.eps internals.png layers.eps layers.png \
 	pgp1.eps pgp1.png x509-1.eps x509-1.png
 
 AM_MAKEINFOHTMLFLAGS = --no-split
+
+gnutls.info: build_api_pgp build_api_lib build_api_x509 build_api_extra examples
 
 build_api_lib:
 	cd ../lib && make gnutls-api.texi
