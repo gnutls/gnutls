@@ -1,3 +1,12 @@
+2004-02-22 08:39  nmav <nmav@gnutls.org>
+
+	* NEWS, opencdk.m4, doc/tex/alert.tex, doc/tex/ciphers.tex,
+	doc/tex/howto.tex, doc/tex/srp.tex, lib/gnutls_errors.c,
+	lib/gnutls_errors_int.h, ChangeLog, NEWS, opencdk.m4,
+	lib/gnutls_errors.c, lib/gnutls_errors_int.h:
+
+	Corrected the return values of gnutls_x509_crt_check_hostname().  
+
 2004-02-13 10:15  nmav <nmav@gnutls.org>
 
 	* lib/: pkix.asn, pkix_asn1_tab.c:
