@@ -137,7 +137,7 @@ int main()
    }
 
    gnutls_certificate_set_dh_params(x509_cred, dh_params);
-   gnutls_certificate_set_rsa_params(x509_cred, rsa_params);
+   gnutls_certificate_set_rsa_export_params(x509_cred, rsa_params);
 
    /* Socket operations
     */

@@ -1,7 +1,7 @@
 helpnode "Crypt help\nUsage : prime [options]"
 
 #int bits;
-option (b, bits) INT "BITS" { $bits = $1 } "specify the number of bits for prime numbers (used only when create_conf option is specified)."
+option (b, bits) INT "BITS" { $bits = $1 } "specify the number of bits for prime numbers."
 
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 

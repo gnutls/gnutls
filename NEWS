@@ -12,6 +12,8 @@ Version 0.9.3
   same paper.
 - Added the functions: gnutls_handshake_get_last_in(), 
   gnutls_handshake_get_last_out().
+- The gnutls_certificate_set_rsa_params() was renamed to 
+  gnutls_certificate_set_rsa_export_params().
 
 Version 0.9.2 (15/03/2003)
 - Some corrections in the memory mapping code (file is unmapped after 

@@ -117,7 +117,7 @@ void __gaa_helpsingle(char short_name, char *name,
 void gaa_help(void)
 {
 	printf("Crypt help\nUsage : prime [options]\n");
-	__gaa_helpsingle('b', "bits", "BITS ", "specify the number of bits for prime numbers (used only when create_conf option is specified).");
+	__gaa_helpsingle('b', "bits", "BITS ", "specify the number of bits for prime numbers.");
 	__gaa_helpsingle('h', "help", "", "shows this help text");
 	__gaa_helpsingle(0, "c", "", "Print the prime in C language format.");
 

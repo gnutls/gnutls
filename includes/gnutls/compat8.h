@@ -63,4 +63,6 @@ int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 int gnutls_dh_params_set( gnutls_dh_params, gnutls_datum prime, gnutls_datum generator, int bits);
 int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits);
 
+#define gnutls_certificate_set_rsa_params gnutls_certificate_set_rsa_export_params
+
 #endif

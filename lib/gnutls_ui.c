@@ -356,7 +356,7 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, uns
 }
 
 /**
-  * gnutls_certificate_set_rsa_params - This function will set the RSA parameters for a server to use
+  * gnutls_certificate_set_rsa_export_params - This function will set the RSA parameters for a server to use
   * @res: is a gnutls_certificate_credentials structure
   * @rsa_params: is a structure that holds temporary RSA parameters.
   *
@@ -365,7 +365,7 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, uns
   * cipher suites.
   *
   **/
-void gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params) 
+void gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params) 
 {
 	res->rsa_params = rsa_params;
 }
