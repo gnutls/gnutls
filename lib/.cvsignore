@@ -1,5 +1,6 @@
 .deps
 .libs
+*.lo
 gnutls.lo
 gnutls_priority.lo
 gnutls_dh.lo
