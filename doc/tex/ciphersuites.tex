@@ -1,0 +1,90 @@
+\newpage
+\section{TLS Cipher suites}
+\par 
+% \tls 1.0 supports ciphersuites like {\bf TLS\_DHE\_RSA\_WITH\_3DES\_CBC\_SHA}.
+These ciphersuites contain three parameters:
+\begin{itemize}
+\item The key exchange algorithm (DHE\_RSA in the example)
+\item The Symmetric encryption algorithm and mode (3DES\_CBC in this
+example)
+\item The MAC\footnote{MAC stands for Message Authentication Code. It can
+be described as a keyed hash algorithm} algorithm used for authentication.
+MAC-SHA is used in the above example.
+\end{itemize}
+
+\par The key exchange algorithms currently in the \tls protocol
+are:
+
+\par
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+RSA & The RSA algorithm is used to encrypt a key and send it to the peer.
+The certificate must allow the key to be used for encryption.
+\\
+\hline
+DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
+parameters which are send to the peer. The key in the certificate must allow
+the key to be used for signing 
+\\
+\hline
+DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
+parameters which are send to the peer \\
+\hline
+DH\_DSS & Static Diffie Hellman parameters signed by a DSS certificate.
+\\
+\hline
+DH\_RSA & Static Diffie Hellman parameters signed by an RSA certificate.
+\\
+\hline
+DH\_ANON & Diffie Hellman parameters not signed. This key exchange method is
+vulnerable to man in the middle attack.
+\\
+\hline
+SRP\footnote{The SRP key exchange is not a part of the TLS 1.0 protocol} & Authentication using the SRP\footnote{SRP stands for Secure Remote Password protocol}
+protocol
+\\
+\hline
+\end{tabular}
+
+\addvspace{1.5cm}
+\par
+ The Bulk Cipher algorithms used in \gnutls are: 
+\par
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+3DES\_CBC & 3DES\_CBC is the DES block cipher algorithm used with multiple (triple)
+encryption (EDE). Has 64 bits block size and is used in CBC mode.
+\\
+\hline
+ARCFOUR & ARCFOUR\footnote{A compatible cipher with RC4 of RSADSI} is a
+fast stream cipher.
+\\
+\hline
+AES\_CBC & AES or RIJNDAEL is the block cipher algorithm that replaces the old 
+(and insecure\footnote{due to small key length}) DES algorithm. Has
+128 bits block size and is used in CBC mode.
+\\
+\hline
+TWOFISH\_CBC & TWOFISH is a block cipher algorithm by Counterpane. Has
+128 bits block size and is used in CBC mode.
+\\
+\hline
+\end{tabular}
+
+\addvspace{1.5cm}
+\par
+ The MAC\footnote{see RFC2104} algorithms used in \gnutls are: 
+\par
+\begin{tabular}{|l|p{9cm}|}
+
+\hline
+MAC\_MD5 & MD5 is a hash algorithm by Ron Rivest. Outputs 128 bits of data.
+\\
+\hline
+MAC\_SHA & SHA is a hash algorithm by NSA. Outputs 160 bits of data.
+\\
+\hline
+\end{tabular}
+
