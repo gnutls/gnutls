@@ -19,9 +19,15 @@ gnutls.html: $(TEX_OBJECTS)
 	-latex2html gnutls.tex -no_navigation -split 0 \
 	-local_icons -html_version 3.2,math -info "" -white
 
-gnutls.ps: $(TEX_OBJECTS)
-	-$(LN_S) ../../lib/gnutls-api.tex .
-	-$(LN_S) ../../libextra/gnutls-extra-api.tex .
+gnutls-api.tex: ../../lib/gnutls-api.tex
+	-../scripts/sort1.pl < ../../lib/gnutls-api.tex > gnutls-api.tex
+
+gnutls-extra-api.tex: ../../libextra/gnutls-extra-api.tex
+	-../scripts/sort1.pl < ../../libextra/gnutls-extra-api.tex > gnutls-extra-api.tex
+
+DOC_OBJECTS = gnutls-api.tex gnutls-extra-api.tex
+
+gnutls.ps: $(TEX_OBJECTS) $(DOC_OBJECTS)
 	-latex gnutls.tex
 	-makeindex gnutls.idx
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps

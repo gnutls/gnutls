@@ -113,8 +113,8 @@ $blankline_texinfo = "";
 %highlights_tex = ( $type_constant, "{\\\\it \$1}",
 		     $type_func, "{\\\\bf \$1}",
 		     $type_struct, "{\\\\it \$1}",
-		     $type_param, "{\\\\bf \$1}" );
-$blankline_tex = "\\par";
+		     $type_param, "{\\\\bf \$1}");
+$blankline_tex = "\\";
 
 # sgml, docbook format
 %highlights_sgml = ( $type_constant, "<replaceable class=\"option\">\$1</replaceable>",
