@@ -19,21 +19,9 @@ authorities are acceptable. See figure \ref{fig:x509-1} for a typical example.
 \label{fig:x509-1}
 \end{figure}
 
-\par The use of X.509 certificates requires some functions which will 
-assist in parsing them. \gnutls{} includes functions which extract 
-parameters from given X.509 certificates. Some of them are:
-\begin{itemize}
-\item \printfunc{gnutls_x509_crt_init}{gnutls\_x509\_crt\_init}
-\item \printfunc{gnutls_x509_crt_import}{gnutls\_x509\_crt\_import}
-\item \printfunc{gnutls_x509_crt_get_dn}{gnutls\_x509\_crt\_get\_dn}
-\item \printfunc{gnutls_x509_crt_get_serial}{gnutls\_x509\_crt\_get\_serial}
-\item \printfunc{gnutls_x509_crt_get_subject_alt_name}{gnutls\_x509\_crt\_get\_subject\_alt\_name}
-\end{itemize}
 
 The API for handling X.509 certificates is described at section \ref{sec:x509api}
-on page \pageref{sec:x509api}. A function which converts an X.509 DER certificate
-to an XML form is also provided. See appendix \ref{ap:xml} on page \pageref{ap:xml} for
-more information.
+on page \pageref{sec:x509api}. Some examples are listed below.
 
 
 \subsection{Verifying an X.509 certificate}
@@ -74,9 +62,6 @@ about the peer's identity. It is required to verify if the certificate's
 owner is the one you expect. See section \ref{ex:rfc2818} on page \pageref{ex:rfc2818},
 for an example.
 
-
-
-
 \par
 Client certificate authentication\index{Certificate authentication!Client} is 
 optional in \tls{}. A server may request a certificate from the client -- using the
@@ -88,6 +73,48 @@ request of a certificate. The client may then send a certificate, signed
 by one of the server's acceptable signers. In \gnutls{} the server's acceptable
 signers list is constructed using the trusted CA certificates in the
 credentials structure.
+
+\section{Using X.509\index{X.509 certificates} certificates and other structures}
+
+\subsection{Parsing an X.509 certificate}
+An X.509 certificate usually contains information about the certificate
+holder, the signer, a unique serial number, expiration dates etc. Some
+function of the \gnutls{} API for certificate parsing are:
+\begin{itemize}
+\item \printfunc{gnutls_x509_crt_init}{gnutls\_x509\_crt\_init}
+\item \printfunc{gnutls_x509_crt_import}{gnutls\_x509\_crt\_import}
+\item \printfunc{gnutls_x509_crt_get_dn}{gnutls\_x509\_crt\_get\_dn}
+\item \printfunc{gnutls_x509_crt_get_serial}{gnutls\_x509\_crt\_get\_serial}
+\item \printfunc{gnutls_x509_crt_get_subject_alt_name}{gnutls\_x509\_crt\_get\_subject\_alt\_name}
+\end{itemize}
+
+\par
+An example is shown below, that reads the peer's certificate,
+and prints some information about the peer's certificate in a TLS session.
+
+\input{ex-x509-info}
+
+\subsection{Using certificate requests}
+A certificate request is a structure, defined in PKCS \#10, which
+is contains information about an applicant of a certificate service.
+It usually contains a private key, a distinguished name and secondary
+data such as a challenge password.
+\par
+The following example is about generating a certificate request, and
+a private key. A certificate request can be later be processed by a CA,
+which should return a signed certificate.
+
+\input{ex-crq}
+
+\subsection{Using PKCS \#12 structures}
+A PKCS \#12 structure usually contains a user's private keys and
+certificates. It is commonly used in browsers to export and import
+the user's identities.
+
+\par
+The following example is about generating a PKCS \#12 structure.
+
+\input{ex-pkcs12}
 
 
 \section{The OpenPGP\index{OpenPGP!Keys} trust model}

@@ -10,8 +10,8 @@ Note that these examples contain little or no error checking.
 \subsection{Simple client example with X.509 certificate support}
 Let's assume now that we want to create a client which communicates
 with servers that use X.509 or OpenPGP certificate authentication. The following client
-is a very simple \tls{} client, it does not support session resuming nor
-any other fancy features.
+is a very simple \tls{} client, it does not support session resuming, not
+even certificate verification.
 \input{ex-client2}
 
 \subsection{Obtaining session information}
@@ -92,27 +92,5 @@ This is a server which supports {\bf SRP} authentication.
 This is a function that checks if an alert has been received
 in the current session.
 \input{ex-alert}
-
-% CERTIFICATE STUFF
-
-\section{Certificate API examples}
-This section contains examples that make use of the \gnutls{} certificate API.
-
-
-\subsection{Parsing peer's certificate, and obtaining session information}
-The following function reads the peer's certificate,
-and prints some information about the certificate and the current session.
-\par
-This function should be called after a successful
-\printfunc{gnutls_handshake}{gnutls\_handshake}
-
-\input{ex-x509-info}
-
-\subsection{Generating a certificate request}
-The following example is about generating a certificate request, and
-a private key. A certificate request can be later be processed by a CA,
-which should return a signed certificate.
-
-\input{ex-crq}
 
 \input{openssl}

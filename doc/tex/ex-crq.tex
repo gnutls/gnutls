@@ -23,87 +23,43 @@ int main()
    /* Initialize an empty certificate request, and
     * an empty private key.
     */
-   ret = gnutls_x509_crq_init(&crq);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
+   gnutls_x509_crq_init(&crq);
 
-   ret = gnutls_x509_privkey_init(&key);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
+   gnutls_x509_privkey_init(&key);
 
    /* Generate a 1024 bit RSA private key.
     */
-   ret = gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 1024, 0);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
-
+   gnutls_x509_privkey_generate(key, GNUTLS_PK_RSA, 1024, 0);
 
    /* Add stuff to the distinguished name
     */
-   ret =
-       gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COUNTRY_NAME,
+   gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COUNTRY_NAME,
 				     "GR", 2);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
 
-   ret =
-       gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COMMON_NAME,
+   gnutls_x509_crq_set_dn_by_oid(crq, GNUTLS_OID_X520_COMMON_NAME,
 				     "Nikos", strlen("Nikos"));
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
 
    /* Set the request version.
     */
-   ret = gnutls_x509_crq_set_version(crq, 0);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
+   gnutls_x509_crq_set_version(crq, 0);
 
    /* Set a challenge password.
     */
-   ret = gnutls_x509_crq_set_challenge_password(crq, "fuck you");
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
+   gnutls_x509_crq_set_challenge_password(crq, "something to remember here");
 
    /* Associate the request with the private key
     */
-   ret = gnutls_x509_crq_set_key(crq, key);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
+   gnutls_x509_crq_set_key(crq, key);
 
    /* Self sign the certificate request.
     */
-   ret = gnutls_x509_crq_sign(crq, key);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
+   gnutls_x509_crq_sign(crq, key);
 
    /* Export the PEM encoded certificate request, and
     * display it.
     */
-   ret =
-       gnutls_x509_crq_export(crq, GNUTLS_X509_FMT_PEM, buffer,
+   gnutls_x509_crq_export(crq, GNUTLS_X509_FMT_PEM, buffer,
 			      &buffer_size);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
 
    printf("Certificate Request: \n%s", buffer);
 
@@ -112,13 +68,8 @@ int main()
     * display it.
     */
    buffer_size = sizeof(buffer);
-   ret =
-       gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM, buffer,
+   gnutls_x509_privkey_export(key, GNUTLS_X509_FMT_PEM, buffer,
 				  &buffer_size);
-   if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
-      exit(1);
-   }
 
    printf("\n\nPrivate key: \n%s", buffer);
 
