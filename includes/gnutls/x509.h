@@ -45,6 +45,16 @@ int gnutls_x509_crl_get_issuer_dn(const gnutls_crl crl,
 	char *buf, int *sizeof_buf);
 int gnutls_x509_crl_get_signed_data(gnutls_crl crl, gnutls_datum *data);
 
+int gnutls_x509_crl_get_signature(gnutls_crl crl, gnutls_datum *data);
+int gnutls_x509_crl_get_signature_algorithm(gnutls_crl crl);
+int gnutls_x509_crl_get_version(gnutls_crl crl);
+
+time_t gnutls_x509_crl_get_this_update(gnutls_crl crl);
+time_t gnutls_x509_crl_get_next_update(gnutls_crl crl);
+
+int gnutls_x509_crl_get_certificate_count(gnutls_crl crl);
+int gnutls_x509_crl_get_certificate(gnutls_crl crl, int index, unsigned char* serial,
+        int* serial_size, time_t* time);
 
 #ifdef __cplusplus
 }

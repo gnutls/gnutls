@@ -362,18 +362,18 @@ int _gnutls_x509_get_name_type(ASN1_TYPE rasn, const char *root, gnutls_x509_dn 
 }
 
 
-
+/* Extracts the time in time_t from the ASN1_TYPE given. When should
+ * be something like "crl2.tbsCertList.thisUpdate".
+ */
 #define MAX_TIME 1024
-time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *root, const char *when)
+time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
 {
 	opaque ttime[MAX_TIME];
 	char name[1024];
 	time_t ctime = (time_t)-1;
 	int len, result;
 
-	_gnutls_str_cpy(name, sizeof(name), root);
-	_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.validity."); 
-	_gnutls_str_cat(name, sizeof(name), when);
+	_gnutls_str_cpy(name, sizeof(name), when);
 
 	len = sizeof(ttime) - 1;
 	if ((result = asn1_read_value(c2, name, ttime, &len)) < 0) {
@@ -382,12 +382,8 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *root, const char *when)
 	}
 
 	/* CHOICE */
-	_gnutls_str_cpy(name, sizeof(name), root);
-
 	if (strcmp(ttime, "GeneralizedTime") == 0) {
 
-		_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.validity."); 
-		_gnutls_str_cat(name, sizeof(name), when);
 		_gnutls_str_cat(name, sizeof(name), ".generalTime"); 
 		len = sizeof(ttime) - 1;
 		result = asn1_read_value(c2, name, ttime, &len);
@@ -395,8 +391,6 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *root, const char *when)
 			ctime = _gnutls_x509_generalTime2gtime(ttime);
 	} else {		/* UTCTIME */
 
-		_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.validity."); 
-		_gnutls_str_cat(name, sizeof(name), when);
 		_gnutls_str_cat(name, sizeof(name), ".utcTime"); 
 		len = sizeof(ttime) - 1;
 		result = asn1_read_value(c2, name, ttime, &len);
@@ -425,9 +419,9 @@ int _gnutls_x509_get_version(ASN1_TYPE c2, const char *root)
 	_gnutls_str_cat(name, sizeof(name), ".tbsCertificate.version"); 
 
 	len = sizeof(gversion) - 1;
-	if ((result = asn1_read_value(c2, name, gversion, &len)) < 0) {
+	if ((result = asn1_read_value(c2, name, gversion, &len)) != ASN1_SUCCESS) {
 		gnutls_assert();
-		return result;
+		return _gnutls_asn2err(result);
 	}
 	return (int) gversion[0] + 1;
 }
@@ -807,7 +801,7 @@ time_t gnutls_x509_extract_certificate_activation_time(const
 		return (time_t)-1;
 	}
 
-	ret = _gnutls_x509_get_time(c2, "certificate2", "notBefore");
+	ret = _gnutls_x509_get_time(c2, "certificate2.tbsCertificate.validity.notBefore");
 
 	asn1_delete_structure(&c2);
 
@@ -849,7 +843,7 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
 		return (time_t)-1;
 	}
 
-	ret = _gnutls_x509_get_time(c2, "certificate2", "notAfter");
+	ret = _gnutls_x509_get_time(c2, "certificate2.tbsCertificate.validity.notAfter");
 
 	asn1_delete_structure(&c2);
 
@@ -1227,7 +1221,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 
 	count = gnutls_x509_pkcs7_extract_certificate_count( &tmp);
 
-	if (count < 0) {
+	if (count <= 0) {
 		gnutls_assert();
 		/* if we failed to read the count,
 		 * then just try to decode a plain DER
@@ -1236,7 +1230,6 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		return parse_der_cert_mem( cert_list, ncerts,
 			input_cert, input_cert_size);
 	}
-	
 	
 	j = count - 1;
 	do {
@@ -2024,6 +2017,16 @@ static int _read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 #define PKIX1_RSA_OID "1 2 840 113549 1 1 1"
 #define DSA_OID "1 2 840 10040 4 1"
 
+gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid)
+{
+	if (strcmp( oid, PKIX1_RSA_OID) == 0) /* pkix-1 1 - RSA */
+		return GNUTLS_PK_RSA;
+	else if (strcmp( oid, DSA_OID) == 0)
+		return GNUTLS_PK_DSA;
+		
+	return GNUTLS_PK_UNKNOWN;
+}
+
 /* Extracts DSA and RSA parameters from a certificate.
  */
 static 
@@ -2044,13 +2047,14 @@ char name1[128];
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
+
+	gCert->subject_pk_algorithm = _gnutls_x509_oid2pk_algorithm( ALGO_OID);
 	
-	if (strcmp( ALGO_OID, PKIX1_RSA_OID) == 0) {	/* pkix-1 1 - RSA */
+	switch( gCert->subject_pk_algorithm) {
+	case GNUTLS_PK_RSA:
 		/* params[0] is the modulus,
 		 * params[1] is the exponent
 		 */
-		gCert->subject_pk_algorithm = GNUTLS_PK_RSA;
-
 		if ((sizeof(gCert->params) / sizeof(GNUTLS_MPI)) < RSA_PUBLIC_PARAMS) {
 			gnutls_assert();
 			/* internal error. Increase the GNUTLS_MPIs in params */
@@ -2065,15 +2069,13 @@ char name1[128];
 		gCert->params_size = RSA_PUBLIC_PARAMS;
 		
 		return 0;
-	}
-
-	if (strcmp( ALGO_OID, DSA_OID) == 0) {
+		break;
+	case GNUTLS_PK_DSA:
 		/* params[0] is p,
 		 * params[1] is q,
 		 * params[2] is q,
 		 * params[3] is pub.
 		 */
-		gCert->subject_pk_algorithm = GNUTLS_PK_DSA;
 
 		if ((sizeof(gCert->params) / sizeof(GNUTLS_MPI)) < DSA_PUBLIC_PARAMS) {
 			gnutls_assert();
@@ -2109,17 +2111,19 @@ char name1[128];
 		gCert->params_size = DSA_PUBLIC_PARAMS;
 		
 		return 0;
+		break;
+
+	default:
+		/* other types like DH
+		 * currently not supported
+		 */
+		gnutls_assert();
+		_gnutls_log("X509 certificate: Found algorithm: %s\n", ALGO_OID);
+
+		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
+
+		return GNUTLS_E_X509_CERTIFICATE_ERROR;
 	}
-
-	/* other types like DH
-	 * currently not supported
-	 */
-	gnutls_assert();
-	_gnutls_log("X509 certificate: Found algorithm: %s\n", ALGO_OID);
-
-	gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
-
-	return GNUTLS_E_INVALID_REQUEST;
 }
 
 
@@ -2237,9 +2241,9 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 		gCert->signature.size = len; /* put the actual sig size */
 
 		gCert->expiration_time =
-		    _gnutls_x509_get_time(c2, "cert", "notAfter");
+		    _gnutls_x509_get_time(c2, "cert.tbsCertificate.validity.notAfter");
 		gCert->activation_time =
-		    _gnutls_x509_get_time(c2, "cert", "notBefore");
+		    _gnutls_x509_get_time(c2, "cert.tbsCertificate.validity.notBefore");
 
 		gCert->version = _gnutls_x509_get_version(c2, "cert");
 		if (gCert->version < 0) {
@@ -2628,7 +2632,9 @@ int gnutls_x509_extract_certificate_pk_algorithm( const gnutls_datum * cert, int
   * gnutls_x509_pkcs7_extract_certificate_count - This function returns the number of certificates in a PKCS7 certificate set
   * @pkcs7_struct: should contain a PKCS7 DER formatted structure
   *
-  * This function will return the certificate number of the PKCS7 or RFC2630 certificate set.
+  * This function will return the number of certifcates in the PKCS7 or 
+  * RFC2630 certificate set.
+  *
   * Returns a negative value on failure.
   *
   **/
@@ -2650,7 +2656,7 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 	
 	if (pkcs7_str_size == 0 || pkcs7_str == NULL) {
 		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 	_gnutls_str_cpy( root1, sizeof(root1), "PKIX1.ContentInfo");
@@ -2733,7 +2739,7 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 	
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		return 0; /* no certificates */
 	}
 
 	return count;

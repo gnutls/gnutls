@@ -24,6 +24,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
+#include <gnutls_x509.h>
 #include <x509_b64.h>
 #include <crl.h>
 #include <dn.h>
@@ -57,6 +58,7 @@ void gnutls_x509_crl_deinit(gnutls_crl crl)
 {
 	asn1_delete_structure(&crl->crl);
 	_gnutls_free_datum(&crl->signed_data);
+	_gnutls_free_datum(&crl->signature);
 
 	gnutls_free(crl);
 }
@@ -139,6 +141,51 @@ int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data,
 		gnutls_assert();
 		goto cleanup;
 	}
+	
+	/* Read the signature */
+	{
+		opaque signature[640];
+		int len;
+		
+		/* read the bit string of the signature
+		 */
+		len = sizeof(signature);
+		result = asn1_read_value( crl->crl, "crl2.signature", signature,
+			&len);
+		
+		if (result != ASN1_SUCCESS) {
+			result = _gnutls_asn2err(result);
+			gnutls_assert();
+			goto cleanup;
+		}
+		
+		if (len % 8 != 0) {
+			gnutls_assert();
+			result = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+			goto cleanup;
+		}
+		
+		if ((result=_gnutls_set_datum(&crl->signature, signature, len/8)) < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
+		
+		/* Read the signature algorithm. Note that parameters are not
+		 * read. They will be read from the issuer's certificate if needed.
+		 */
+		
+		len = sizeof(signature);
+		result = asn1_read_value( crl->crl, "crl2.signatureAlgorithm.algorithm",
+			signature, &len);
+		
+		if (result != ASN1_SUCCESS) {
+			result = _gnutls_asn2err(result);
+			gnutls_assert();
+			goto cleanup;
+		}
+		
+		crl->signature_algorithm = _gnutls_x509_oid2pk_algorithm( signature);
+	}
 
 	if (need_free) _gnutls_free_datum( &_data);
 
@@ -147,6 +194,7 @@ int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data,
       cleanup:
 	asn1_delete_structure(&crl->crl);
 	_gnutls_free_datum(&crl->signed_data);
+	_gnutls_free_datum(&crl->signature);
 	if (need_free) _gnutls_free_datum( &_data);
 	return result;
 }
@@ -195,5 +243,168 @@ int gnutls_x509_crl_get_signed_data(gnutls_crl crl, gnutls_datum *data)
 	data->data = crl->signed_data.data;
 	data->size = crl->signed_data.size;
 
+	return 0;
+}
+
+/**
+  * gnutls_x509_crl_get_signature - This function returns the CRL's signature data
+  * @crl: should contain a gnutls_crl structure
+  * @data: a datum which points to the signed data
+  *
+  * This function will return a datum that points on the CRL signature portion.
+  * The output on data should be treated as constant and must not be freed.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crl_get_signature(gnutls_crl crl, gnutls_datum *data)
+{
+	data->data = crl->signature.data;
+	data->size = crl->signature.size;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crl_get_signature_algorithm - This function returns the CRL's signature algorithm
+  * @crl: should contain a gnutls_crl structure
+  *
+  * This function will return a value of the gnutls_pk_algorithm enumeration that 
+  * is the signature algorithm. 
+  *
+  * Returns a negative value on error.
+  *
+  **/
+int gnutls_x509_crl_get_signature_algorithm(gnutls_crl crl)
+{
+	return crl->signature_algorithm;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crl_get_version - This function returns the CRL's version number
+  * @crl: should contain a gnutls_crl structure
+  *
+  * This function will return the version of the specified CRL.
+  *
+  * Returns a negative value on error.
+  *
+  **/
+int gnutls_x509_crl_get_version(gnutls_crl crl)
+{
+	opaque version[5];
+	int len, result;
+	
+	len = sizeof(version);
+	if ((result = asn1_read_value(crl->crl, "crl2.tbsCertList.version", version, &len)) !=
+		ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return (int) version[0] + 1;
+}
+
+/**
+  * gnutls_x509_crl_get_this_update - This function returns the CRL's thisUpdate time
+  * @crl: should contain a gnutls_crl structure
+  *
+  * This function will return the time this CRL was issued.
+  *
+  * Returns (time_t)-1 on error.
+  *
+  **/
+time_t gnutls_x509_crl_get_this_update(gnutls_crl crl)
+{
+	return _gnutls_x509_get_time( crl->crl, "crl2.tbsCertList.thisUpdate");
+}
+
+/**
+  * gnutls_x509_crl_get_next_update - This function returns the CRL's nextUpdate time
+  * @crl: should contain a gnutls_crl structure
+  *
+  * This function will return the time the next CRL will be issued.
+  * This field is optional in a CRL so it might be normal to get
+  * an error instead.
+  *
+  * Returns (time_t)-1 on error.
+  *
+  **/
+time_t gnutls_x509_crl_get_next_update(gnutls_crl crl)
+{
+	return _gnutls_x509_get_time( crl->crl, "crl2.tbsCertList.nextUpdate");
+}
+
+/**
+  * gnutls_x509_crl_get_certificate_count - This function returns the number of revoked certificates in a CRL
+  * @crl: should contain a gnutls_crl structure
+  *
+  * This function will return the number of revoked certificates in the
+  * given CRL.
+  *
+  * Returns a negative value on failure.
+  *
+  **/
+int gnutls_x509_crl_get_certificate_count(gnutls_crl crl)
+{
+
+	int count, result;
+	
+	result = asn1_number_of_elements( crl->crl, "crl2.tbsCertList.revokedCertificates", &count);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return 0; /* no certificates */
+	}
+
+	return count;
+}
+
+/**
+  * gnutls_x509_crl_get_certificate - This function returns the serial number of a revoked certificate
+  * @crl: should contain a gnutls_crl structure
+  * @index: the index of the certificate to extract (starting from 0)
+  * @serial: where the serial number will be copied
+  * @serial_size: initialy holds the size of serial
+  * @time: if non null, will hold the time this certificate was revoked
+  *
+  * This function will return the serial number of the specified, by the index, 
+  * revoked certificate.
+  *
+  * Returns a negative value on failure.
+  *
+  **/
+int gnutls_x509_crl_get_certificate(gnutls_crl crl, int index, unsigned char* serial,
+	int* serial_size, time_t* time)
+{
+
+	int result;
+	char str_index[MAX_INT_DIGITS];
+	char serial_name[64];
+	char date_name[64];
+	
+	_gnutls_int2str(index+1, str_index);
+	_gnutls_str_cpy( serial_name, sizeof(serial_name), "crl2.tbsCertList.revokedCertificates.?");
+	_gnutls_str_cat( serial_name, sizeof(serial_name), str_index);
+	_gnutls_str_cat( serial_name, sizeof(serial_name), ".userCertificate");
+
+	_gnutls_str_cpy( date_name, sizeof(date_name), "crl2.tbsCertList.revokedCertificates.?");
+	_gnutls_str_cat( date_name, sizeof(date_name), str_index);
+	_gnutls_str_cat( date_name, sizeof(date_name), ".revocationDate");
+
+
+	if ((result = asn1_read_value(crl->crl, serial_name, serial, serial_size)) != ASN1_SUCCESS)
+	{
+		gnutls_assert();
+		if (result == ASN1_ELEMENT_NOT_FOUND)
+			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		return _gnutls_asn2err(result);
+	}
+	
+	if (time) {
+		*time = _gnutls_x509_get_time( crl->crl, date_name);
+	}
+	
 	return 0;
 }

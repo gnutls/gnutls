@@ -35,6 +35,9 @@ const char* _gnutls_x509_oid2string( const char* OID);
 const char* _gnutls_x509_oid2ldap_string( const char* OID);
 
 int _gnutls_x509_oid_data_printable( const char* OID);
+gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid);
+
+time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when);
 
 int gnutls_x509_extract_certificate_subject_alt_name( const gnutls_datum*, int seq, char*, int*);
 int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);
