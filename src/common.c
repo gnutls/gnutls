@@ -115,7 +115,7 @@ void print_openpgp_info(GNUTLS_STATE state)
 			printf(" # PGP Key version: %d\n", 
 				gnutls_openpgp_extract_key_version(&cert_list[0]));
 
-			algo = gnutls_x509_extract_certificate_pk_algorithm( &cert_list[0], &bits);
+			algo = gnutls_openpgp_extract_key_pk_algorithm( &cert_list[0], &bits);
 		
 			printf(" # PGP Key public key algorithm: ");
 

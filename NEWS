@@ -1,6 +1,8 @@
 Version 0.3.93 
 - Added support for RFC2630 (PKCS7) X.509 certificate sets
-- Added new function: gnutls_x509_extract_certificate_pk_algorithm()
+- Added new functions: gnutls_x509_extract_certificate_pk_algorithm(),
+  gnutls_openpgp_extract_key_pk_algorithm().
+- Several optimizations in the Handshake protocol
 
 Version 0.3.92 (23/03/2002)
 - Updated documentation
