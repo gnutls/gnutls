@@ -1,3 +1,9 @@
+2004-07-02 19:23  nmav <nmav@gnutls.org>
+
+	* doc/protocol/draft-ietf-tls-ssl-mods-00.txt:
+
+	added draft-ietf-tls-ssl-mods 
+
 2004-06-29 08:52  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, lib/auth_anon.h, lib/auth_cert.h,
