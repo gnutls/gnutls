@@ -28,6 +28,9 @@ extern "C" {
 
 #define LIBGNUTLS_VERSION "@VERSION@"
 
+/* For backwards compatibility */
+#include <gnutls/compat4.h>
+
 @DEFINE_SIZE_T@
 @DEFINE_TIME_T@
 
