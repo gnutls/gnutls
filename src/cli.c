@@ -449,10 +449,10 @@ void gaa_parser(int argc, char **argv)
 
    crlf = info.crlf;
 
-   if (info.nrest_args == 0)
+   if (info.rest_args == NULL)
       hostname = "localhost";
    else
-      hostname = info.rest_args[0];
+      hostname = info.rest_args;
 
    if (info.proto != NULL && info.nproto > 0) {
       for (j = i = 0; i < info.nproto; i++) {

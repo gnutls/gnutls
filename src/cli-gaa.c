@@ -167,10 +167,8 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 95 "cli.gaa"
-	char **rest_args;
 #line 94 "cli.gaa"
-	int nrest_args;
+	char *rest_args;
 #line 84 "cli.gaa"
 	char *srp_passwd;
 #line 81 "cli.gaa"
@@ -599,7 +597,7 @@ struct GAAOPTION_port
 
 struct GAAREST
 {
-	char** arg1;
+	char* arg1;
 	int size1;
 };
          
@@ -961,9 +959,11 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		return GAA_OK;
 		break;
 	case GAA_REST:
-		GAA_LIST_FILL(GAAREST_tmp.arg1, gaa_getstr, char*, GAAREST_tmp.size1);
-#line 96 "cli.gaa"
-{ gaaval->rest_args = GAAREST_tmp.arg1; gaaval->nrest_args = GAAREST_tmp.size1 ;};
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAAREST_tmp.arg1, gaa_getstr, GAAREST_tmp.size1);
+		gaa_index++;
+#line 95 "cli.gaa"
+{ gaaval->rest_args = GAAREST_tmp.arg1; ;};
 
 		return GAA_OK;
 		break;
@@ -991,8 +991,8 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 98 "cli.gaa"
-{ gaaval->resume=0; gaaval->port=443; gaaval->rest_args=NULL; gaaval->nrest_args=0; gaaval->ciphers=NULL;
+#line 97 "cli.gaa"
+{ gaaval->resume=0; gaaval->port=443; gaaval->rest_args=NULL; gaaval->ciphers=NULL;
 	gaaval->kx=NULL; gaaval->comp=NULL; gaaval->macs=NULL; gaaval->ctype=NULL; gaaval->nciphers=0;
 	gaaval->nkx=0; gaaval->ncomp=0; gaaval->nmacs=0; gaaval->nctype = 0; gaaval->record_size=0; 
 	gaaval->fingerprint=0; gaaval->pgp_trustdb=NULL; gaaval->pgp_keyring=NULL;

@@ -91,11 +91,10 @@ option (h, help) { gaa_help(); exit(0); } "prints this help"
 option (v, version) { cli_version(); exit(0); } "prints the program's version number"
 option ( copyright) { print_license(); exit(0); } "prints the program's license"
 
-#int nrest_args;
-#char **rest_args;
-rest *STR "hostname" { $rest_args = $1; $nrest_args = @1 }
+#char *rest_args;
+rest STR "hostname" { $rest_args = $1; }
 
-init { $resume=0; $port=443; $rest_args=NULL; $nrest_args=0; $ciphers=NULL;
+init { $resume=0; $port=443; $rest_args=NULL; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $record_size=0; 
 	$fingerprint=0; $pgp_trustdb=NULL; $pgp_keyring=NULL;
