@@ -2419,6 +2419,171 @@ draft-ietf-tls-56-bit-ciphersuites
 
 @end itemize
 
+@c @node References
+@c @chapter References
+
+@c @Misc{RFC2246,
+@c   author =       "Tim Dierks and Christopher Allen",
+@c   title =        "The TLS Protocol Version 1.0",
+@c   month =        "January",
+@c   year =         {1999},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2246.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2246.txt"
+@c }
+
+@c @Misc{RFC2440,
+@c   author =       "Jon Callas and Lutz Donnerhacke and Hal Finney and Rodney Thayer",
+@c   title =        "OpenPGP Message Format",
+@c   month =        "November",
+@c   year =         {1998},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2440.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2440.txt"
+@c }
+
+@c @Misc{RFC2511,
+@c   author =       "Michael Myers and Carlisle Adams and Dave Solo and David Kemp",
+@c   title =        "Internet X.509 Certificate Request Message Format",
+@c   month =        "March",
+@c   year =         {1999},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2511.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2511.txt"
+@c }
+
+@c @Misc{RFC2817,
+@c   author =       "Rohit Khare and Scott Lawrence",
+@c   title =        "Upgrading to TLS Within HTTP/1.1",
+@c   month =        "May",
+@c   year =         {2000},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2817.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2817.txt"
+@c }
+
+@c @Misc{RFC2818,
+@c   author =       "Eric Rescola",
+@c   title =        "HTTP Over TLS",
+@c   month =        "May",
+@c   year =         {2000},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2818.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2818.txt"
+@c }
+
+
+@c @Misc{RFC2945,
+@c   author =       "Tom Wu",
+@c   title =        "The SRP Authentication and Key Exchange System",
+@c   month =        "September",
+@c   year =         {2000},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2945.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2945.txt"
+@c }
+
+@c @Misc{RFC2986,
+@c   author =       "Magnus Nystrom and Burt Kaliski",
+@c   title =        "PKCS 10 v1.7: Certification Request Syntax Specification",
+@c   month =        "November",
+@c   year =         {2000},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2986.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc2986.txt"
+@c }
+
+@c @Misc{RFC3280,
+@c   author =       "Russell Housley and Tim Polk and Warwick Ford and David Solo",
+@c   title =        "Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile",
+@c   month =        "April",
+@c   year =         {2002},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3280.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3280.txt"
+@c }
+
+@c @Misc{SSL3,
+@c   author =       "Alan Freier and Philip Karlton and Paul Kocher",
+@c   title =        "The SSL Protocol Version 3.0",
+@c   month =        "November",
+@c   year =         {1996},
+@c   note =         "Available from http://wp.netscape.com/eng/ssl3/draft302.txt",
+@c   url =          "http://wp.netscape.com/eng/ssl3/draft302.txt"
+@c }
+
+@c @Misc{PKCS12,
+@c   author =       "RSA Laboratories",
+@c   title =        "PKCS 12 v1.0: Personal Information Exchange Syntax",
+@c   month =        "June",
+@c   year =         {1999},
+@c }
+
+@c @Misc{RESCOLA,
+@c   author =       "Eric Rescola",
+@c   title =        "SSL and TLS: Designing and Building Secure Systems",
+@c   year =         {2001},
+@c }
+
+@c @Misc{TLSEXT,
+@c   author =       "Simon Blake-Wilson and Magnus Nystrom and David Hopwood and Jan Mikkelsen and Tim Wright",
+@c   title =        "Transport Layer Security (TLS) Extensions",
+@c   month =        "June",
+@c   year =         {2003},
+@c   note =         "Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3546.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3546.txt"
+@c }
+
+@c @Misc{TLSSRP,
+@c   author =       "David Taylor and Trevor Perrin and Tom Wu and Nikos Mavroyanopoulos",
+@c   title =        "Using SRP for TLS Authentication",
+@c   month =        "June",
+@c   year =         {2004},
+@c   note =         "Internet draft, work in progress. Available from http://www.normos.org/ietf/draft/draft-ietf-tls-srp-07.txt",
+@c   url =          "http://www.normos.org/ietf/draft/draft-ietf-tls-srp-07.txt"
+@c }
+
+@c @Misc{TLSPGP,
+@c   author =       "Nikos Mavroyanopoulos",
+@c   title =        "Using OpenPGP keys for TLS authentication",
+@c   month =        "April",
+@c   year =         {2004},
+@c   note =         "Internet draft, work in progress. Available from http://www.normos.org/ietf/draft/draft-ietf-tls-openpgp-keys-05.txt",
+@c   url =          "http://www.normos.org/ietf/draft/draft-ietf-tls-openpgp-keys-05.txt"
+@c }
+
+@c @Misc{TLSCOMP,
+@c   author =       "Scott Hollenbeck",
+@c   title =        "Transport Layer Security Protocol Compression Methods",
+@c   month =        "January",
+@c   year =         {2004},
+@c   note =         "Internet draft, work in progress. Available from http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3749.txt",
+@c   url =          "http://kaizi.viagenie.qc.ca/ietf/rfc/rfc3749.txt"
+@c }
+
+@c @Misc{CBCATT,
+@c   author =       "Bodo Moeller",
+@c   title =        "Security of CBC Ciphersuites in SSL/TLS: Problems and Countermeasures",
+@c   year =         {2002},
+@c   note =         "Available from http://www.openssl.org/\~\ bodo/tls-cbc.txt",
+@c   url =          "http://www.openssl.org/~bodo/tls-cbc.txt"
+@c }
+
+@c @Misc{GUTPKI,
+@c   author =       "Peter Gutmann",
+@c   title =        "Everything you never wanted to know about PKI but were forced to find out",
+@c   year =          {2002},
+@c   note =         "Available from http://www.cs.auckland.ac.nz/\~\ pgut001/pubs/pkitutorial.pdf",
+@c   url =          "http://www.cs.auckland.ac.nz/~pgut001/pubs/pkitutorial.pdf"
+@c }
+
+@c @Misc{GPGH,
+@c   author =       "Mike Ashley",
+@c   title =        "The GNU Privacy Handbook",
+@c   year =          {2002},
+@c   note =         "Available from http://www.gnupg.org/gph/en/manual.pdf",
+@c   url =          "http://www.gnupg.org/gph/en/manual.pdf"
+@c }
+
+@c @Misc{TOMSRP,
+@c   author =       "Tom Wu",
+@c   title =        "The Stanford SRP Authentication Project",
+@c   note =         "Available at http://srp.stanford.edu/",
+@c   url =          "http://srp.stanford.edu/"
+@c }
+
 @node Copying This Manual
 @appendix Copying This Manual
 
