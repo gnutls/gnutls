@@ -204,8 +204,14 @@ int size, ret;
 			exit(1);
 		}
 	} else {
+		unsigned int flags;
+		
+		if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+		else flags = GNUTLS_PKCS_USE_PKCS12_3DES;
+		if (info.pass == NULL) flags = GNUTLS_PKCS_PLAIN;
+
 		size = sizeof(buffer);
-		ret = gnutls_x509_privkey_export_pkcs8( key, out_cert_format, NULL, GNUTLS_PKCS8_PLAIN, buffer, &size);
+		ret = gnutls_x509_privkey_export_pkcs8( key, out_cert_format, info.pass, flags, buffer, &size);
 		if (ret < 0) {
 			fprintf(stderr, "privkey_export_pkcs8: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -779,7 +785,7 @@ void privkey_info( void)
 	if (!info.pkcs8) {
 		ret = gnutls_x509_privkey_import(key, &pem, in_cert_format);
 	} else {
-		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, in_cert_format, NULL, GNUTLS_PKCS8_PLAIN);
+		ret = gnutls_x509_privkey_import_pkcs8(key, &pem, in_cert_format, info.pass, 0);
 	}
 
 	if (ret < 0) {
@@ -850,7 +856,7 @@ size_t size;
 		ret = gnutls_x509_privkey_import( key, &dat, in_cert_format);
 	else
 		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, in_cert_format,
-			NULL, 0);
+			info.pass, 0);
 	
 	if (ret < 0) {
 		fprintf(stderr, "privkey_import: %s\n", gnutls_strerror(ret));
@@ -939,7 +945,7 @@ size_t size;
 		ret = gnutls_x509_privkey_import( key, &dat, in_cert_format);
 	else
 		ret = gnutls_x509_privkey_import_pkcs8( key, &dat, in_cert_format,
-			NULL, 0);
+			info.pass, 0);
 	
 	if (ret < 0) {
 		fprintf(stderr, "privkey_import: %s\n", gnutls_strerror(ret));
@@ -1410,6 +1416,7 @@ void generate_pkcs12( void)
 	gnutls_datum data;
 	char* password;
 	const char* name;
+	unsigned int flags;
 	gnutls_datum key_id;
 	unsigned char _key_id[20];
 	int index;
@@ -1463,7 +1470,10 @@ void generate_pkcs12( void)
 		exit(1);
 	}
 
-	result = gnutls_pkcs12_bag_encrypt( bag, password, 0);
+	if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+	else flags = GNUTLS_PKCS8_USE_PKCS12_3DES;
+
+	result = gnutls_pkcs12_bag_encrypt( bag, password, flags);
 	if (result < 0) {
 		fprintf(stderr, "bag_encrypt: %s\n", gnutls_strerror(result));
 		exit(1);
@@ -1477,9 +1487,12 @@ void generate_pkcs12( void)
 		exit(1);
 	}
 
+	if (info.export) flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+	else flags = GNUTLS_PKCS_USE_PKCS12_3DES;
+
 	size = sizeof(buffer);
 	result = gnutls_x509_privkey_export_pkcs8( key, GNUTLS_X509_FMT_DER, password,
-		GNUTLS_PKCS8_USE_PKCS12_3DES, buffer, &size);
+		flags, buffer, &size);
 	if (result < 0) {
 		fprintf(stderr, "key_export: %s\n", gnutls_strerror(result));
 		exit(1);

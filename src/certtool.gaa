@@ -44,6 +44,9 @@ option (to-p12) { $action = 8; } "Generate a PKCS #12 structure."
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 
+#int export;
+option (export-ciphers) { $export=1 } "Use weak encryption algorithms."
+
 #int incert_format;
 option (inder) { $incert_format=1 } "Use DER format for input certificates and private keys."
 
@@ -69,5 +72,6 @@ option ( copyright) { print_license(); exit(0); } "shows the program's license"
 
 init { $bits = 1024; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
-	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; }
+	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; 
+	$export = 0; }
 
