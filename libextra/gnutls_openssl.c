@@ -346,24 +346,7 @@ int SSL_CIPHER_get_bits(SSL_CIPHER *cipher, int *bits)
     if (!cipher)
         return 0;
 
-    /* FIXME: ought to do this by parsing data returned by cipher_get_name */
-    switch(cipher->cipher)
-    {
-    case GNUTLS_CIPHER_ARCFOUR:
-    case GNUTLS_CIPHER_RIJNDAEL_128_CBC:
-    case GNUTLS_CIPHER_TWOFISH_128_CBC:
-        bit_result = 128;
-        break;
-    case GNUTLS_CIPHER_3DES_CBC:
-        bit_result = 168;
-        break;
-    case GNUTLS_CIPHER_RIJNDAEL_256_CBC:
-        bit_result = 256;
-        break;
-    default:
-        bit_result = 0;
-        break;
-    }
+    bit_result = gnutls_cipher_get_key_size(cipher->cipher);
 
     if (bits)
         *bits = bit_result;
