@@ -32,7 +32,8 @@ extern "C" {
 
 #include <gnutls/gnutls.h>
 
-struct gnutls_openpgp_key; /* object to hold (parsed) openpgp keys */
+struct gnutls_openpgp_key_int; /* object to hold (parsed) openpgp keys */
+typedef struct gnutls_openpgp_key_int* gnutls_openpgp_key;
 
 typedef enum gnutls_openpgp_key_fmt { GNUTLS_X509_FMT_RAW,
         GNUTLS_X509_FMT_BASE64 } gnutls_openpgp_key_fmt;
@@ -47,8 +48,7 @@ int gnutls_openpgp_key_get_fingerprint( gnutls_openpgp_key key,
 	char* result, size_t* result_size);
 	
 int gnutls_openpgp_key_get_name( gnutls_openpgp_key key,
-                                 int idx,
-                                 char *buf, size_t *sizeof_buf);
+	int idx, char *buf, size_t *sizeof_buf);
 
 int gnutls_openpgp_key_get_pk_algorithm(gnutls_openpgp_key key,
                                             int *r_bits);
@@ -62,12 +62,13 @@ int gnutls_openpgp_key_get_id( gnutls_openpgp_key key, unsigned char keyid[8]);
 
 int gnutls_openpgp_key_check_hostname( gnutls_openpgp_key key, const char *hostname);
 
-int gnutls_openpgp_key_to_xml( gnutls_openpgp_key key key, gnutls_datum *xmlkey,
+int gnutls_openpgp_key_to_xml( gnutls_openpgp_key key, gnutls_datum *xmlkey,
 	int ext);
 
 /* Keyring stuff.
  */
-struct gnutls_openpgp_keyring;
+struct gnutls_openpgp_keyring_int; /* object to hold (parsed) openpgp keyrings */
+typedef struct gnutls_openpgp_keyring_int* gnutls_openpgp_keyring;
 
 int gnutls_openpgp_keyring_init( gnutls_openpgp_keyring* ring);
 void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring ring);
@@ -77,7 +78,8 @@ int gnutls_openpgp_keyring_import(gnutls_openpgp_keyring ring,
 
 /* Trustdb functions.
  */
-struct gnutls_openpgp_trustdb;
+struct gnutls_openpgp_trustdb_int; /* object to hold (parsed) openpgp trustdbs */
+typedef struct gnutls_openpgp_trustdb_int* gnutls_openpgp_trustdb;
 
 int gnutls_openpgp_trustdb_init( gnutls_openpgp_trustdb* db);
 void gnutls_openpgp_trustdb_deinit(gnutls_openpgp_trustdb db);
@@ -89,13 +91,13 @@ int gnutls_openpgp_trustdb_import(gnutls_openpgp_trustdb db,
 int gnutls_openpgp_key_verify_ring( 
 	gnutls_openpgp_key key, 
 	gnutls_openpgp_keyring ring,
-	unsigned int flags /* if not used reserved for future use,
+	unsigned int flags,
 	unsigned int * verify /* the output of the verification */);
 
 int gnutls_openpgp_key_verify_trustdb( 
 	gnutls_openpgp_key key, 
 	gnutls_openpgp_trustdb db,
-	unsigned int flags /* if not used reserved for future use,
+	unsigned int flags,
 	unsigned int * verify /* the output of the verification */);
 
 

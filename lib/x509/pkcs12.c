@@ -145,6 +145,8 @@ int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12)
   **/
 void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12)
 {
+	if (!pkcs12) return;
+
 	if (pkcs12->pkcs12)
 		asn1_delete_structure(&pkcs12->pkcs12);
 

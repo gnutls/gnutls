@@ -33,7 +33,7 @@ libgnutls_extra_la_SOURCES = $(COBJECTS_EXTRA)
 
 libgnutls_extra_la_LIBADD = $(LZO_OBJECTS) ../lib/libgnutls.la \
 	openpgp/openpgp.lo openpgp/xml.lo openpgp/gnutls_openpgp.lo \
-	openpgp/extras.lo openpgp/verify.lo
+	openpgp/extras.lo openpgp/verify.lo openpgp/compat.lo
 
 EXTRA_libgnutls_extra_la_SOURCES = minilzo.c
 

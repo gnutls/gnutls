@@ -79,6 +79,8 @@ int i;
   **/
 void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag bag)
 {
+	if (!bag) return;
+
 	_pkcs12_bag_free_data( bag);
 
 	gnutls_free(bag);

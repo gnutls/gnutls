@@ -11,6 +11,7 @@ EXAMPLE_OBJECTS = ex-alert.tex ex-client-srp.tex ex-serv-export.tex \
 	ex-crq.tex ex-session-info.tex ex-pkcs12.tex
 
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex fdl.tex ../../lib/x509/x509-api.tex \
+	../../libextra/openpgp/pgp-api.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex \
 	auth.tex ciphers.tex errors.tex layers.tex alert.tex record.tex \
 	funcs.tex examples.tex ../../libextra/gnutls-extra-api.tex \
@@ -30,6 +31,9 @@ build_api_lib:
 build_api_x509:
 	cd ../../lib/x509 && make x509-api.tex
 
+build_api_pgp:
+	cd ../../libextra/openpgp && make pgp-api.tex
+
 build_api_extra:
 	cd ../../libextra && make gnutls-extra-api.tex
 
@@ -45,7 +49,10 @@ gnutls-extra-api.tex: ../../libextra/gnutls-extra-api.tex
 x509-api.tex: ../../lib/x509/x509-api.tex
 	-../scripts/sort1.pl < ../../lib/x509/x509-api.tex > x509-api.tex
 
-DOC_OBJECTS = x509-api.tex gnutls-api.tex gnutls-extra-api.tex error_codes.tex
+pgp-api.tex: ../../libextra/openpgp/pgp-api.tex
+	-../scripts/sort1.pl < ../../libextra/openpgp/pgp-api.tex > pgp-api.tex
+
+DOC_OBJECTS = pgp-api.tex x509-api.tex gnutls-api.tex gnutls-extra-api.tex error_codes.tex
 
 gnutls.ps: build_api_lib build_api_x509 build_api_extra $(TEX_OBJECTS) $(DOC_OBJECTS)
 	-latex gnutls.tex

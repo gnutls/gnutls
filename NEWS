@@ -1,3 +1,6 @@
+Version 0.9.90
+- Updated the openpgp key API.
+
 Version 0.9.8 (02/10/2003)
 - Updated the SRP implementation to follow the latest draft
   (draft-ietf-tls-srp-05).

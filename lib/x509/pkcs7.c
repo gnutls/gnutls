@@ -161,6 +161,8 @@ int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7)
   **/
 void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7)
 {
+	if (!pkcs7) return;
+
 	if (pkcs7->pkcs7)
 		asn1_delete_structure(&pkcs7->pkcs7);
 

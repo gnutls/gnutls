@@ -3,7 +3,7 @@ EXTRA_DIST = openpgp.h gnutls_openpgp.h
 
 noinst_LTLIBRARIES = libpgp.la
 
-COBJECTS = openpgp.c xml.c gnutls_openpgp.c verify.c extras.c
+COBJECTS = openpgp.c xml.c gnutls_openpgp.c verify.c extras.c compat.c
 
 libpgp_la_SOURCES = $(COBJECTS)
 

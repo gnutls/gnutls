@@ -4,6 +4,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
+#include <gnutls/openpgp.h>
 #include <time.h>
 #include <common.h>
 
@@ -12,8 +13,7 @@
 int xml = 0;
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
-#define PRINT_PGP_NAME(X) PRINTX( "NAME:", X.name); \
-	PRINTX( "EMAIL:", X.email)
+#define PRINT_PGP_NAME(X) PRINTX( "NAME:", name)
 
 const char str_unknown[] = "(unknown)";
 
@@ -178,36 +178,67 @@ void print_x509_info(gnutls_session session, const char* hostname)
 
 }
 
-void print_openpgp_info(gnutls_session session)
+void print_openpgp_info(gnutls_session session, const char* hostname)
 {
 
-	gnutls_openpgp_name pgp_name;
 	char digest[20];
-	int digest_size = sizeof(digest), i;
+	int digest_size = sizeof(digest), i, ret;
 	char printable[120];
 	char *print;
+	char name[256];
+	size_t name_len = sizeof(name);
+	gnutls_openpgp_key crt;
 	const gnutls_datum *cert_list;
 	int cert_list_size = 0;
-	time_t expiret = gnutls_certificate_expiration_time_peers(session);
-	time_t activet = gnutls_certificate_activation_time_peers(session);
-
+	time_t expiret;
+	time_t activet;
+	
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
 	if (cert_list_size > 0) {
 		int algo, bits;
 
-#if 0
+		gnutls_openpgp_key_init(&crt);
+		ret =
+		    gnutls_openpgp_key_import(crt, &cert_list[0], 0);
+		if (ret < 0) {
+			const char* str = gnutls_strerror(ret);
+			if (str == NULL) str = str_unknown;
+			fprintf(stderr, "Decoding error: %s\n", str);
+			return;
+		}
+
+		if (hostname != NULL) { /* Check the hostname of the first certificate
+		             * if it matches the name of the host we
+		             * connected to.
+		             */
+		             if (gnutls_openpgp_key_check_hostname( crt, hostname)==0) {
+		             	printf(" # The hostname in the key does NOT match '%s'.\n", hostname);
+		             } else {
+		             	printf(" # The hostname in the key matches '%s'.\n", hostname);
+		             }
+		}
+
 		if (xml) {
-			gnutls_datum res;
+			gnutls_datum xml_data;
 
-			gnutls_openpgp_key_to_xml(&cert_list[0], &res, 0);
-			puts(res.data);
-
-			free(res.data);
+			ret = gnutls_openpgp_key_to_xml( crt, &xml_data, 0);
+			if (ret < 0) {
+				const char* str = gnutls_strerror(ret);
+				if (str == NULL) str = str_unknown;
+				fprintf(stderr, "XML encoding error: %s\n",
+					str);
+				return;
+			}
+			
+			printf("%s", xml_data.data);
+			gnutls_free( xml_data.data);
 
 			return;
 		}
-#endif
+
+		activet = gnutls_openpgp_key_get_creation_time( crt);
+		expiret = gnutls_openpgp_key_get_expiration_time( crt);
 
 		printf(" # Key was created at: %s", my_ctime(&activet));
 		printf(" # Key expires: ");
@@ -216,8 +247,8 @@ void print_openpgp_info(gnutls_session session)
 		else
 			printf("Never\n");
 
-		if (gnutls_openpgp_fingerprint
-		    (&cert_list[0], digest, &digest_size) >= 0) {
+		if (gnutls_openpgp_key_get_fingerprint(crt, digest, &digest_size) >= 0) 
+		{
 			print = printable;
 			for (i = 0; i < digest_size; i++) {
 				sprintf(print, "%.2x ",
@@ -226,12 +257,10 @@ void print_openpgp_info(gnutls_session session)
 			}
 
 			printf(" # PGP Key version: %d\n",
-			       gnutls_openpgp_extract_key_version
-			       (&cert_list[0]));
+			       gnutls_openpgp_key_get_version(crt));
 
 			algo =
-			    gnutls_openpgp_extract_key_pk_algorithm
-			    (&cert_list[0], &bits);
+			    gnutls_openpgp_key_get_pk_algorithm(crt, &bits);
 
 			printf(" # PGP Key public key algorithm: ");
 
@@ -247,14 +276,12 @@ void print_openpgp_info(gnutls_session session)
 
 			printf(" # PGP Key fingerprint: %s\n", printable);
 
-			if (gnutls_openpgp_extract_key_name(&cert_list[0],
-							    0,
-							    &pgp_name) <
-			    0) {
+			name_len = sizeof(name);
+			if (gnutls_openpgp_key_get_name(crt, 0, name, &name_len) < 0) {
 				fprintf(stderr,
 					"Could not extract name\n");
 			} else {
-				PRINT_PGP_NAME(pgp_name);
+				PRINT_PGP_NAME(name);
 			}
 
 		}
@@ -386,7 +413,7 @@ void print_cert_info(gnutls_session session, const char* hostname)
 		break;
 	case GNUTLS_CRT_OPENPGP:
 		printf("OpenPGP\n");
-		print_openpgp_info(session);
+		print_openpgp_info(session, hostname);
 		break;
 	}
 

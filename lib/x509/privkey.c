@@ -67,6 +67,8 @@ void gnutls_x509_privkey_deinit(gnutls_x509_privkey key)
 {
 int i;
 
+	if (!key) return;
+
 	for (i = 0; i < key->params_size; i++) {
 		_gnutls_mpi_release( &key->params[i]);
 	}

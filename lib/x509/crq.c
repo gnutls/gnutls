@@ -75,6 +75,8 @@ int gnutls_x509_crq_init(gnutls_x509_crq * crq)
   **/
 void gnutls_x509_crq_deinit(gnutls_x509_crq crq)
 {
+	if (!crq) return;
+
 	if (crq->crq)
 		asn1_delete_structure(&crq->crq);
 

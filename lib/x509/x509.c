@@ -123,6 +123,8 @@ gnutls_datum tmp;
   **/
 void gnutls_x509_crt_deinit(gnutls_x509_crt cert)
 {
+	if (!cert) return;
+
 	if (cert->cert)
 		asn1_delete_structure(&cert->cert);
 	_gnutls_free_datum(&cert->signed_data);

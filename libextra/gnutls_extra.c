@@ -22,7 +22,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
 #include <ext_srp.h>
-#include <gnutls_openpgp.h>
+#include <openpgp/gnutls_openpgp.h>
 #include <gnutls_extra.h>
 #include <gnutls_algorithms.h>
 #include <minilzo.h>
@@ -151,12 +151,14 @@ extern OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint;
 extern OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key;
 
 static void _gnutls_add_openpgp_functions(void) {
+#ifdef HAVE_LIBOPENCDK
 	_E_gnutls_openpgp_verify_key = gnutls_openpgp_verify_key;
 	_E_gnutls_openpgp_extract_key_expiration_time = gnutls_openpgp_extract_key_expiration_time;
 	_E_gnutls_openpgp_extract_key_creation_time = gnutls_openpgp_extract_key_creation_time;
 	_E_gnutls_openpgp_fingerprint = gnutls_openpgp_fingerprint;
 	_E_gnutls_openpgp_request_key = _gnutls_openpgp_request_key;
 	_E_gnutls_openpgp_cert2gnutls_cert = _gnutls_openpgp_cert2gnutls_cert;
+#endif
 }
 
 extern const char* gnutls_check_version( const char*);

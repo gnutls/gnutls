@@ -62,6 +62,8 @@ int gnutls_openpgp_key_init(gnutls_openpgp_key * key)
   **/
 void gnutls_openpgp_key_deinit(gnutls_openpgp_key key)
 {
+	if (!key) return;
+
 	if (key->knode) {
 		cdk_kbnode_release( key->knode);
 		key->knode = NULL;
@@ -275,7 +277,7 @@ gnutls_openpgp_key_get_pk_algorithm( gnutls_openpgp_key key, int *r_bits)
  * Extract the version of the OpenPGP key.
  **/
 int
-gnutls_openpgp_extract_key_version( gnutls_openpgp_key key)
+gnutls_openpgp_key_get_version( gnutls_openpgp_key key)
 {
     CDK_PACKET *pkt;
     int version = 0;
@@ -298,7 +300,7 @@ gnutls_openpgp_extract_key_version( gnutls_openpgp_key key)
  * Returns the timestamp when the OpenPGP key was created.
  **/
 time_t
-gnutls_openpgp_extract_key_creation_time( gnutls_openpgp_key key)
+gnutls_openpgp_key_get_creation_time( gnutls_openpgp_key key)
 {
     CDK_PACKET *pkt;
     time_t timestamp = 0;

@@ -71,6 +71,8 @@ int gnutls_x509_crl_init(gnutls_x509_crl * crl)
   **/
 void gnutls_x509_crl_deinit(gnutls_x509_crl crl)
 {
+	if (!crl) return;
+
 	if (crl->crl)
 		asn1_delete_structure(&crl->crl);
 	_gnutls_free_datum(&crl->signed_data);
