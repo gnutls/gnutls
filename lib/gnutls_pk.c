@@ -131,7 +131,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
 		pad = 0;
 	} else { /* psize > k !!! */
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	ciphertext->data = gnutls_malloc(psize);
@@ -445,7 +445,7 @@ int _gnutls_dsa_verify( const gnutls_datum* vdata, const gnutls_datum *sig_value
 
 	if (vdata->size != 20) { /* sha-1 only */
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (decode_ber_rs( sig_value, &rs[0], &rs[1])!=0) {
@@ -531,7 +531,7 @@ int _gnutls_pk_encrypt(int algo, MPI * resarr, MPI data, MPI * pkey)
 		if (resarr[0] == NULL) {
 			gnutls_assert();
 			gcry_sexp_release(s_ciph);
-			return GNUTLS_E_INTERNAL;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 	}
 
@@ -563,7 +563,7 @@ int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey)
 
 	if (rc != 0) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* put the data into a simple list */
@@ -586,7 +586,7 @@ int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey)
 		if (list == NULL) {
 			gnutls_assert();
 			gcry_sexp_release(s_sig);
-			return GNUTLS_E_INTERNAL;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		data[0] = gcry_sexp_nth_mpi( list, 1, 0 );
@@ -596,7 +596,7 @@ int _gnutls_pk_sign(int algo, MPI* data, MPI hash, MPI * pkey)
 		if (list == NULL) {
 			gnutls_assert();
 			gcry_sexp_release(s_sig);
-			return GNUTLS_E_INTERNAL;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		data[1] = gcry_sexp_nth_mpi( list, 1, 0 );
@@ -624,12 +624,12 @@ static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey)
 
 	default:
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (rc != 0) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* put the data into a simple list */
@@ -650,14 +650,14 @@ static int _gnutls_pk_verify(int algo, MPI hash, MPI* data, MPI *pkey)
 		gnutls_assert();
 		gcry_sexp_release(s_pkey);
 		gcry_sexp_release(s_hash);
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	if (rc != 0) {
 		gnutls_assert();
 		gcry_sexp_release(s_pkey);
 		gcry_sexp_release(s_hash);
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	rc = gcry_pk_verify( s_sig, s_hash, s_pkey );

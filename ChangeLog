@@ -1,3 +1,20 @@
+2002-03-09 21:06  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_openpgp.c, x509_ASN.c:
+
+	Patches for the new OpenCDK version and some stricter checks for
+	memory leaks.  
+
+2002-03-09 19:08  nmav <nmav@gnutls.org>
+
+	* ChangeLog, NEWS, doc/tex/ex3.tex, lib/gnutls.h.in.in,
+	lib/gnutls_algorithms.c, lib/gnutls_cert.c, lib/gnutls_constate.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_kx.c,
+	lib/gnutls_record.c, lib/gnutls_state.c, lib/gnutls_state.h,
+	lib/x509_verify.c, src/common.c:
+
+	removed GNUTLS_CERT_TRUSTED enumeration 
+
 2002-03-08 22:42  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_record.c:

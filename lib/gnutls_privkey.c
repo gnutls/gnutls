@@ -49,7 +49,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) 
 	if ((sizeof( pkey->params)/sizeof(MPI)) < RSA_PARAMS) {
 		gnutls_assert();
 		/* internal error. Increase the MPIs in params */
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	result = asn1_get_der( pkey_asn, raw_key.data, raw_key.size);
@@ -113,7 +113,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) {
 	if ((sizeof( pkey->params)/sizeof(MPI)) < DSA_PRIVATE_PARAMS) {
 		gnutls_assert();
 		/* internal error. Increase the MPIs in params */
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	result = asn1_get_der( dsa_asn, raw_key.data, raw_key.size);

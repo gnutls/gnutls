@@ -424,7 +424,7 @@ static int gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret_si
 
 	if (seed_size > MAX_SEED_SIZE || total_bytes<=0) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	
 	blocksize = gnutls_hmac_get_algo_len(algorithm);
@@ -503,14 +503,14 @@ int _gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size
 
 	if (total_bytes > MAX_PRF_BYTES) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 	/* label+seed = s_seed */
 	s_seed_size = seed_size + label_size;
 
 	if (s_seed_size > MAX_SEED_SIZE) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	memcpy(s_seed, label, label_size);

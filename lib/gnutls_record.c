@@ -198,7 +198,7 @@ ssize_t gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
 	lver = gnutls_protocol_get_version(state);
 	if (lver==GNUTLS_VERSION_UNKNOWN) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	headers[1]=_gnutls_version_get_major( lver);
@@ -267,7 +267,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	lver = gnutls_protocol_get_version(state);
 	if (lver==GNUTLS_VERSION_UNKNOWN) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	headers[1]=_gnutls_version_get_major( lver);

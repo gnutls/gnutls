@@ -1575,7 +1575,7 @@ int len, result;
 		if ((sizeof(gCert->params) / sizeof(MPI)) < RSA_PARAMS) {
 			gnutls_assert();
 			/* internal error. Increase the MPIs in params */
-			return GNUTLS_E_INTERNAL;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		if ((result =
@@ -1610,7 +1610,7 @@ int len, result;
 		if ((sizeof(gCert->params) / sizeof(MPI)) < DSA_PUBLIC_PARAMS) {
 			gnutls_assert();
 			/* internal error. Increase the MPIs in params */
-			return GNUTLS_E_INTERNAL;
+			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
 		if ((result =

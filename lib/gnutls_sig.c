@@ -76,7 +76,7 @@ GNUTLS_MAC_HANDLE td_sha;
 		
 		default:
 			gnutls_assert();
-			return GNUTLS_E_INTERNAL;
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
 	if (ret < 0)
@@ -134,7 +134,7 @@ opaque concat[36];
 		
 		default:
 			gnutls_assert();
-			return GNUTLS_E_INTERNAL;
+			return GNUTLS_E_INTERNAL_ERROR;
 	}
 	ret = _gnutls_generate_sig( cert, pkey, &dconcat, signature);
 	if (ret < 0)

@@ -366,7 +366,7 @@ char * data;
 	if (state->gnutls_internals.handshake_mac_handle_sha==NULL ||
 		state->gnutls_internals.handshake_mac_handle_md5==NULL) {
 		gnutls_assert();
-		return GNUTLS_E_INTERNAL;
+		return GNUTLS_E_INTERNAL_ERROR;
 	}
 
 	/* We check if there are pending data to hash.

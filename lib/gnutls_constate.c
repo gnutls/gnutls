@@ -25,6 +25,7 @@
 #include <gnutls_algorithms.h>
 #include <gnutls_num.h>
 #include <gnutls_datum.h>
+#include <gnutls_state.h>
 
 /* This function is to be called after handshake, when master_secret,
  *  client_random and server_random have been initialized. 
