@@ -191,7 +191,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	params[1] = state->gnutls_key->u;
 	ret = _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, params, 2);	/* btype==2 */
 
-	if (ret < 0) {
+	if (ret < 0 || plaintext.size != TLS_MASTER_SIZE) {
 		/* in case decryption fails then don't inform
 		 * the peer. Just use a random key. (in order to avoid
 		 * attack against pkcs-1 formating).
@@ -204,28 +204,16 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		RANDOMIZE_KEY(state->gnutls_key->key,
 			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
 	} else {
-		ret = 0;
-		if (plaintext.size != TLS_MASTER_SIZE) {	/* WOW */
-			RANDOMIZE_KEY(state->gnutls_key->key,
-				      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
-		} else {
-			if (_gnutls_get_adv_version_major(state) !=
-			    plaintext.data[0]
-			    || _gnutls_get_adv_version_minor(state) !=
-			    plaintext.data[1]) {
-				gnutls_assert();
-				ret = GNUTLS_E_DECRYPTION_FAILED;
-			}
-			if (ret != 0) {
-				_gnutls_mpi_release(&state->gnutls_key->B);
-				_gnutls_mpi_release(&state->gnutls_key->u);
-				_gnutls_mpi_release(&state->gnutls_key->A);
-				gnutls_assert();
-				return ret;
-			}
-			state->gnutls_key->key.data = plaintext.data;
-			state->gnutls_key->key.size = plaintext.size;
+		if (_gnutls_get_adv_version_major(state) !=
+		    plaintext.data[0]
+		    || _gnutls_get_adv_version_minor(state) !=
+		    plaintext.data[1]) {
+			gnutls_assert();
+			ret = GNUTLS_E_DECRYPTION_FAILED;
 		}
+
+		state->gnutls_key->key.data = plaintext.data;
+		state->gnutls_key->key.size = plaintext.size;
 	}
 
 	_gnutls_mpi_release(&state->gnutls_key->A);
