@@ -162,13 +162,6 @@ int gnutls_clear_creds( GNUTLS_STATE state);
 /* cred is a structure defined by the kx algorithm */
 int gnutls_set_cred( GNUTLS_STATE, CredType type, void* cred);
 
-/* A null terminated string containing the dnsname.
- * This will only exist if the client supports the dnsname
- * TLS extension. (draft-ietf-tls-extensions)
- */
-const void* gnutls_ext_get_name_ind( GNUTLS_STATE state, GNUTLS_NAME_IND ind);
-        int gnutls_ext_set_name_ind( GNUTLS_STATE state, GNUTLS_NAME_IND ind, const void* name);
-
 /* This will set the Common Name field in case of X509PKI
  * authentication. This will be used while verifying the
  * certificate

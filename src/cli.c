@@ -120,7 +120,7 @@ int cert_list_size = 0;
 	return 0;
 }
 
-int cert_callback( const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
+static int cert_callback( GNUTLS_STATE state, const gnutls_datum *client_certs, int ncerts, const gnutls_datum* req_ca_cert, int nreqs) {
 
 	if (client_certs==NULL) {
 		return 0; /* means the we will only be called again
@@ -241,8 +241,6 @@ int main(int argc, char** argv)
 
 /* This TLS extension may break old implementations.
  */
-	gnutls_ext_set_name_ind( state, GNUTLS_DNSNAME, "localhost"); 
-
 	gnutls_transport_set_ptr( state, sd);
 	do {
 		ret = gnutls_handshake( state);
@@ -301,8 +299,6 @@ int main(int argc, char** argv)
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 	gnutls_set_cred( state, GNUTLS_SRP, cred);
 	gnutls_set_cred( state, GNUTLS_X509PKI, xcred);
-
-	gnutls_ext_set_name_ind( state, GNUTLS_DNSNAME, "hello.server.org");
 
 #ifdef RESUME
 	gnutls_session_set_data( state, session, session_size);

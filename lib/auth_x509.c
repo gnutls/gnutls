@@ -35,7 +35,6 @@
 #include <gnutls_record.h>
 #include <x509_verify.h>
 #include <gnutls_sig.h>
-#include <ext_dnsname.h>
 #include <x509_extensions.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 

@@ -124,11 +124,6 @@ void print_info(GNUTLS_STATE state)
 		printf("%.2X", sesid[i]);
 	printf("\n");
 
-	if ( gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME) != NULL) {
-		printf("- DNSNAME: ");
-		printf("%s\n", (char*)gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME));
-	}
-	
 	/* we could also use the KX algorithm to distinguish the functions
 	 * to call, but this is easier.
 	 */
@@ -225,14 +220,6 @@ void peer_print_info( GNUTLS_STATE state)
 	for(i=0;i<sesid_size;i++)
 		sprintf(tmp2, "%.2X", sesid[i]);
 	sprintf(tmp2, "</i></p>\n");
-
-	/* if the client supports dnsname extension then
-	 * print the hostname he connected to.
-	 */
-	if (gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME)!=NULL) {
-		sprintf(tmp2, "\n<p>DNSNAME: ");
-		sprintf(tmp2, "<b>%s</b></p>\n", (char*)gnutls_ext_get_name_ind(state, GNUTLS_DNSNAME));
-	}
 
 	/* Here unlike print_info() we use the kx algorithm to distinguish
 	 * the functions to call.

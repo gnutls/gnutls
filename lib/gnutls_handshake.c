@@ -38,7 +38,6 @@
 #include "auth_x509.h"
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
-#include <ext_dnsname.h>
 #include <gnutls_record.h>
 
 #ifdef HANDSHAKE_DEBUG
@@ -496,7 +495,7 @@ static int _gnutls_server_SelectSuite(GNUTLS_STATE state, opaque ret[2],
 	x = _gnutls_supported_ciphersuites(state, &ciphers);
 
 	/* Here we remove any ciphersuite that does not conform
-	 * the certificate requested (using dnsname), or to the
+	 * the certificate requested, or to the
 	 * authentication requested (eg SRP).
 	 */
 	x = _gnutls_remove_unwanted_ciphersuites(state, &ciphers, x);
@@ -1858,8 +1857,7 @@ int _gnutls_recv_hello_request( GNUTLS_STATE state, void *data,
 
 /* This function will remove algorithms that are not supported by
  * the requested authentication method. We only remove algorithm if
- * we receive client hello extensions (dnsname),
- * or if we have a certificate with keyUsage bits set.
+ * we have a certificate with keyUsage bits set.
  */
 int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 					 GNUTLS_CipherSuite **

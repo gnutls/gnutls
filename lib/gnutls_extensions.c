@@ -22,7 +22,6 @@
 #include "gnutls_extensions.h"
 #include "gnutls_errors.h"
 #include "ext_srp.h"
-#include "ext_dnsname.h"
 #include "ext_max_record.h"
 #include "gnutls_num.h"
 
@@ -40,7 +39,6 @@ typedef struct {
 #define MAX_EXT 20 /* maximum supported extension */
 static gnutls_extension_entry extensions[] = {
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_SRP, _gnutls_srp_recv_params, _gnutls_srp_send_params),
-	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_DNSNAME, _gnutls_name_ind_recv_params, _gnutls_name_ind_send_params),
 	GNUTLS_EXTENSION_ENTRY( GNUTLS_EXTENSION_MAX_RECORD_SIZE, _gnutls_max_record_recv_params, _gnutls_max_record_send_params),
 	{0}
 };
