@@ -25,6 +25,8 @@
 /* These function are like strcat, strcpy. They only
  * do bound checking (they shouldn't cause buffer overruns),
  * and they always produce null terminated strings.
+ *
+ * They should be used only with null terminated strings.
  */
 void _gnutls_str_cat( char* dest, size_t dest_tot_size, const char* src) {
 size_t str_size = strlen(src);
