@@ -429,10 +429,12 @@ int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 	}
 	
 	/* if no certificates were found then send:
-	 * 00 00 03 00 00 00    // Certificate with no certs
+	 * 0B 00 00 03 00 00 00    // Certificate with no certs
 	 * instead of:
-	 * 00 00 00		// empty certificate handshake
-	 *
+	 * 0B 00 00 00		// empty certificate handshake
+         *
+	 * ( the above is the whole handshake message, not 
+	 * the one produced here )
 	 */
 
 	(*data) = gnutls_malloc(ret);

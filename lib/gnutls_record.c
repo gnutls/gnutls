@@ -430,7 +430,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 		case STATE0:
 		case STATE60:
 			if (STATE==STATE60) {
-				ret = _gnutls_flush( cd, state);
+				ret = _gnutls_write_flush( cd, state);
 			} else {
 				ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 				STATE = STATE60;
@@ -519,7 +519,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	 * from the previous run. - probably interrupted.
 	 */
 	if (state->gnutls_internals.send_buffer.size != 0) {
-		ret = _gnutls_flush(cd, state);
+		ret = _gnutls_write_flush(cd, state);
 	} else {
 		cipher_size = _gnutls_encrypt( state, headers, RECORD_HEADER_SIZE, data, data2send, &cipher, type);
 		if (cipher_size <= 0) {
@@ -586,7 +586,7 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state, int again
 	if (again==0)
 		return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
 	else {
-		return _gnutls_flush( cd, state);
+		return _gnutls_write_flush( cd, state);
 	}
 }
 
@@ -1119,7 +1119,7 @@ size_t gnutls_get_max_record_size( GNUTLS_STATE state) {
   * This property can only be set to clients. The server may
   * choose not to accept the requested size.
   *
-  * Acceptable values are 2^9, 2^10, 2^11 and 2^12.
+  * Acceptable values are $2^{9}, 2^{10}, 2^{11}$ and $2^{12}$.
   * Returns the new record size.
   *
   **/

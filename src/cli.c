@@ -242,6 +242,7 @@ int main(int argc, char** argv)
 	} else {
 		printf("- Handshake was completed\n");
 	}
+	
 	gnutls_get_current_session( state, NULL, &session_size);
 	session = malloc(session_size);
 	gnutls_get_current_session( state, session, &session_size);
@@ -251,12 +252,13 @@ int main(int argc, char** argv)
 	gnutls_get_current_session_id( state, session_id, &session_id_size);
 
 /* print some information */
-	print_info( state);
+ 	print_info( state);
 
 	printf("- Disconnecting\n");
 	do {
 		ret = gnutls_bye(sd, state, GNUTLS_SHUT_RDWR);
 	} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
+	
 	shutdown( sd, SHUT_WR);
 	close(sd);
 	gnutls_deinit( state);	

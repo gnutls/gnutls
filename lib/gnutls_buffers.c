@@ -1,3 +1,4 @@
+#define READ_DEBUG
 /*
  *      Copyright (C) 2000,2001 Nikos Mavroyanopoulos
  *
@@ -46,7 +47,8 @@ int gnutls_insert_to_data_buffer(ContentType type, GNUTLS_STATE state, char *dat
 	int old_buffer;
 
 	if (length==0) return 0;
-	if (type == GNUTLS_APPLICATION_DATA) {
+	switch( type) {
+	case GNUTLS_APPLICATION_DATA:
 		old_buffer = state->gnutls_internals.buffer.size;
 
 		state->gnutls_internals.buffer.size += length;
@@ -57,8 +59,8 @@ int gnutls_insert_to_data_buffer(ContentType type, GNUTLS_STATE state, char *dat
 		    gnutls_realloc_fast(state->gnutls_internals.buffer.data,
 			   state->gnutls_internals.buffer.size);
 		memcpy(&state->gnutls_internals.buffer.data[old_buffer], data, length);
-	}
-	if (type == GNUTLS_HANDSHAKE) {
+		break;
+	case GNUTLS_HANDSHAKE:
 		old_buffer = state->gnutls_internals.buffer_handshake.size;
 
 		state->gnutls_internals.buffer_handshake.size += length;
@@ -69,6 +71,11 @@ int gnutls_insert_to_data_buffer(ContentType type, GNUTLS_STATE state, char *dat
 		    gnutls_realloc_fast(state->gnutls_internals.buffer_handshake.data,
 			   state->gnutls_internals.buffer_handshake.size);
 		memcpy(&state->gnutls_internals.buffer_handshake.data[old_buffer], data, length);
+		break;
+	
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 
 	return 0;
@@ -77,10 +84,16 @@ int gnutls_insert_to_data_buffer(ContentType type, GNUTLS_STATE state, char *dat
 
 int gnutls_get_data_buffer_size(ContentType type, GNUTLS_STATE state)
 {
-	if (type == GNUTLS_APPLICATION_DATA)
-		return state->gnutls_internals.buffer.size;
-	if (type == GNUTLS_HANDSHAKE)
-		return state->gnutls_internals.buffer_handshake.size;
+	switch( type) {
+		case GNUTLS_APPLICATION_DATA:
+			return state->gnutls_internals.buffer.size;
+	
+		case GNUTLS_HANDSHAKE:
+			return state->gnutls_internals.buffer_handshake.size;
+		
+		default:
+			return GNUTLS_E_INVALID_PARAMETERS;
+	}
 	return 0;
 }
 
@@ -101,7 +114,8 @@ int gnutls_check_pending(GNUTLS_STATE state) {
 
 int gnutls_get_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
-	if (type == GNUTLS_APPLICATION_DATA) {
+	switch(type) {
+	case GNUTLS_APPLICATION_DATA:
 	
 		if (length > state->gnutls_internals.buffer.size) {
 			length = state->gnutls_internals.buffer.size;
@@ -119,8 +133,9 @@ int gnutls_get_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int
 		state->gnutls_internals.buffer.data =
 		    gnutls_realloc_fast(state->gnutls_internals.buffer.data,
 				   state->gnutls_internals.buffer.size);
-	}
-	if (type == GNUTLS_HANDSHAKE) {
+		break;
+		
+	case GNUTLS_HANDSHAKE:
 		if (length > state->gnutls_internals.buffer_handshake.size) {
 			length = state->gnutls_internals.buffer_handshake.size;
 		}
@@ -137,6 +152,10 @@ int gnutls_get_data_buffer(ContentType type, GNUTLS_STATE state, char *data, int
 		state->gnutls_internals.buffer_handshake.data =
 		    gnutls_realloc_fast(state->gnutls_internals.buffer_handshake.data,
 				   state->gnutls_internals.buffer_handshake.size);
+		break;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 
 
@@ -349,7 +368,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 #ifdef READ_DEBUG
 	if (ret > 0)
-		_gnutls_log("RB: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer_data_size, ret, sizeOfPtr);
+		_gnutls_log("RB: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer.size, ret, sizeOfPtr);
 #endif
 	/* copy fresh data to our buffer.
 	 */
@@ -373,7 +392,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 #ifdef READ_DEBUG
 		if (ret2 > 0) {
 			_gnutls_log("RB-PEEK: Read %d bytes in PEEK MODE.\n", ret2); 
-			_gnutls_log("RB-PEEK: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer_data_size, ret2, sizeOfPtr);
+			_gnutls_log("RB-PEEK: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer.size, ret2, sizeOfPtr);
 		}
 #endif
 
@@ -526,7 +545,7 @@ ssize_t _gnutls_write_buffered(SOCKET fd, GNUTLS_STATE state, const void *iptr, 
  * TLS write buffer (ie. because the previous write was
  * interrupted.
  */
-ssize_t _gnutls_flush(SOCKET fd, GNUTLS_STATE state)
+ssize_t _gnutls_write_flush(SOCKET fd, GNUTLS_STATE state)
 {
     ssize_t ret;
 
@@ -553,7 +572,7 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 	if (iptr==NULL && n == 0) {
 		/* resuming interrupted write. 
 		 */
-		return _gnutls_flush( fd, state);
+		return _gnutls_write_flush( fd, state);
 	}
 
 	/* FIXME: Potential problem here. If ie one message has been
@@ -565,16 +584,12 @@ ssize_t _gnutls_handshake_send_int( SOCKET fd, GNUTLS_STATE state, ContentType t
 	while (left > 0) {
 		i = gnutls_send_int(fd, state, type, htype, &ptr[i], left);
 		if (i <= 0) {
-			if (i==GNUTLS_E_INTERRUPTED || i==GNUTLS_E_AGAIN) {
-				i = 0;
-			} else {
+			gnutls_assert();
+			if (n-left > 0)  {
 				gnutls_assert();
-				if (n-left > 0)  {
-					gnutls_assert();
-					return n-left;
-				}
-				return i;
+				return n-left;
 			}
+			return i;
 		}
 		left -= i;
 	}

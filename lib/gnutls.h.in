@@ -234,8 +234,10 @@ typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
 
 typedef void (*LOG_FUNC)( const char*);
 
-void gnutls_set_push_func( GNUTLS_STATE, PUSH_FUNC push_func);
-void gnutls_set_pull_func( GNUTLS_STATE, PULL_FUNC pull_func);
+void gnutls_set_push_function( GNUTLS_STATE, PUSH_FUNC push_func);
+void gnutls_set_pull_function( GNUTLS_STATE, PULL_FUNC pull_func);
+#define gnutls_set_push_func gnutls_set_push_function
+#define gnutls_set_pull_func gnutls_set_pull_function
 
 size_t gnutls_get_max_record_size( GNUTLS_STATE state);
 size_t gnutls_set_max_record_size( GNUTLS_STATE state, size_t size);

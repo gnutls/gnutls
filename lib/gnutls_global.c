@@ -203,7 +203,7 @@ static Sigfunc *
  */
 
 /**
-  * gnutls_set_pull_func - This function sets a read like function
+  * gnutls_set_pull_function - This function sets a read like function
   * @pull_func: it's a function like read
   * @state: gnutls state
   *
@@ -215,12 +215,12 @@ static Sigfunc *
   * PULL_FUNC is of the form, 
   * ssize_t (*PULL_FUNC)(SOCKET, const void*, size_t);
   **/
-void gnutls_set_pull_func( GNUTLS_STATE state, PULL_FUNC pull_func) {
+void gnutls_set_pull_function( GNUTLS_STATE state, PULL_FUNC pull_func) {
 	state->gnutls_internals._gnutls_pull_func = pull_func;
 }
 
 /**
-  * gnutls_set_push_func - This function sets the function to send data
+  * gnutls_set_push_function - This function sets the function to send data
   * @push_func: it's a function like write
   * @state: gnutls state
   *
@@ -234,6 +234,6 @@ void gnutls_set_pull_func( GNUTLS_STATE state, PULL_FUNC pull_func) {
   * PUSH_FUNC is of the form, 
   * ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
   **/
-void gnutls_set_push_func( GNUTLS_STATE state, PUSH_FUNC push_func) {
+void gnutls_set_push_function( GNUTLS_STATE state, PUSH_FUNC push_func) {
 	state->gnutls_internals._gnutls_push_func = push_func;
 }

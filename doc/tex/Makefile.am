@@ -11,7 +11,7 @@ gnutls.ps: $(TEX_OBJECTS)
 	-latex gnutls.tex && latex gnutls.tex && dvips gnutls.dvi -o gnutls.ps
 
 gnutls.html: $(TEX_OBJECTS)
-	-latex2html gnutls.tex -no_subdir 1 -split 0 -local_icons -prefix ./ \
+	-latex2html gnutls.tex -no_subdir 1 -split 0 -local_icons -html_version 3.2,math \
 	-info "" 
 
 

@@ -588,7 +588,7 @@ int _gnutls_send_handshake(SOCKET cd, GNUTLS_STATE state, void *i_data,
 		/* we are resuming a previously interrupted
 		 * send.
 		 */
-		return _gnutls_flush( cd, state);
+		return _gnutls_write_flush( cd, state);
 	}
 
 	if (i_data==NULL && i_datasize > 0) {
