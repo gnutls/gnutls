@@ -4,3 +4,4 @@
 * Tools for processing/generating certificates
 * Add certificate extensions support (x509v3)
 * Documentation (of existing functions + Manual)
+* fix get_Name_type() to return the country too

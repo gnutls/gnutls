@@ -121,8 +121,6 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
 	esize = ciphertext.size;
 
 	if (esize!=k) {
-#warning "REMOVE ME"
-fprintf(stderr, "ESIZE: %d/%d\n", esize, k);
 		gnutls_assert();
 		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}

@@ -609,9 +609,10 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	}
 
 #ifdef CHECK_RECORD_VERSION
-	if ( htype!=GNUTLS_CLIENT_HELLO && gnutls_get_current_version(state) != version) {
+	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_get_current_version(state) != version) {
+		gnutls_assert();
 # ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d) %d.%d\n", headers[0], headers[1], headers[2]);
+		fprintf(stderr, "Record: INVALID VERSION PACKET: (%d/%d) %d.%d\n", headers[0], htype, headers[1], headers[2]);
 # endif
 		if (type!=GNUTLS_ALERT) {
 			/* some browsers return garbage, when
@@ -621,7 +622,6 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			_gnutls_send_alert(cd, state, GNUTLS_FATAL, GNUTLS_PROTOCOL_VERSION);
 		}
 		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
 		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
 	}
 #endif
