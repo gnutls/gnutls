@@ -623,10 +623,10 @@ int gnutls_dh_params_init(GNUTLS_DH_PARAMS * dh_params)
 }
 
 /**
-  * gnutls_dh_params_deinit - This function will initialize the DH parameters
-  * @dh_params: Is a structure that will hold the prime numbers
+  * gnutls_dh_params_deinit - This function will deinitialize the DH parameters
+  * @dh_params: Is a structure that holds the prime numbers
   *
-  * This function will initialize the DH parameters structure.
+  * This function will deinitialize the DH parameters structure.
   *
   **/
 void gnutls_dh_params_deinit(GNUTLS_DH_PARAMS dh_params)
@@ -663,7 +663,7 @@ void gnutls_dh_params_deinit(GNUTLS_DH_PARAMS dh_params)
   * the Diffie-Hellman key exchange. The new parameters will be allocated using
   * malloc and will be stored in the appropriate datum.
   * This function is normally very slow. An other function
-  * (gnutls_dh_replace_params()) should be called in order to replace the 
+  * (gnutls_dh_params_set()) should be called in order to replace the 
   * included DH primes in the gnutls library.
   * 
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.

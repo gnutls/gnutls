@@ -8,6 +8,7 @@
  */
 typedef struct {
 	GNUTLS_DH_PARAMS dh_params;
+	GNUTLS_RSA_PARAMS rsa_params;
 
 	gnutls_cert ** cert_list; 
 			/* contains a list of a list of certificates.
@@ -46,7 +47,7 @@ typedef struct {
 			/* holds a sequence of the
 			 * RDNs of the CAs above.
 			 * This is better than
-			 * generating it every time.
+			 * generating on every handshake.
 			 */
 	gnutls_datum	x509_rdn_sequence;
 } CERTIFICATE_CREDENTIALS_INT;
@@ -61,6 +62,8 @@ typedef struct CERTIFICATE_AUTH_INFO_INT {
 	int		  dh_secret_bits; /* bits of the DH (if DHE_RSA is used) */
 	int		  dh_prime_bits;
 	int		  dh_peer_public_bits; 
+
+	int		  rsa_export_modulus_bits;
 	gnutls_datum*	  raw_certificate_list; /* holds the raw certificate of the
 					         * peer.
 					         */

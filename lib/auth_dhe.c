@@ -394,7 +394,7 @@ static int proc_dhe_server_kx(GNUTLS_STATE state, opaque * data,
 		case GNUTLS_CRT_X509:
 			if ((ret =
 			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
-					     info->raw_certificate_list[0], CERT_ONLY_PUBKEY|CERT_NO_COPY)) < 0) {
+					     info->raw_certificate_list[0], CERT_NO_COPY)) < 0) {
 				gnutls_assert();
 				return ret;
 			}

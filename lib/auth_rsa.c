@@ -41,9 +41,8 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 
-int gen_rsa_client_kx(GNUTLS_STATE, opaque **);
-int proc_rsa_client_kx(GNUTLS_STATE, opaque *, int);
-
+int _gnutls_gen_rsa_client_kx(GNUTLS_STATE, opaque **);
+int _gnutls_proc_rsa_client_kx(GNUTLS_STATE, opaque *, int);
 
 const MOD_AUTH_STRUCT rsa_auth_struct = {
 	"RSA",
@@ -52,7 +51,7 @@ const MOD_AUTH_STRUCT rsa_auth_struct = {
 	NULL,			/* gen server kx */
 	NULL,			/* gen server kx2 */
 	NULL,			/* gen client kx0 */
-	gen_rsa_client_kx,
+	_gnutls_gen_rsa_client_kx,
 	_gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
 	_gnutls_gen_cert_server_cert_req,	/* server cert request */
 
@@ -61,7 +60,7 @@ const MOD_AUTH_STRUCT rsa_auth_struct = {
 	NULL,			/* proc server kx */
 	NULL,			/* proc server kx2 */
 	NULL,			/* proc client kx0 */
-	proc_rsa_client_kx,	/* proc client kx */
+	_gnutls_proc_rsa_client_kx,	/* proc client kx */
 	_gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
 	_gnutls_proc_cert_cert_req	/* proc server cert request */
 };
@@ -71,12 +70,36 @@ extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-static int _gnutls_get_public_rsa_params(GNUTLS_STATE state, GNUTLS_MPI params[MAX_PARAMS_SIZE], int* params_len)
+int _gnutls_get_public_rsa_params(GNUTLS_STATE state, GNUTLS_MPI params[MAX_PARAMS_SIZE], int* params_len)
 {
 int ret;
-CERTIFICATE_AUTH_INFO info = _gnutls_get_auth_info( state);
+CERTIFICATE_AUTH_INFO info;
 gnutls_cert peer_cert;
 int i;
+
+	if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite)
+		 == GNUTLS_KX_RSA_EXPORT) {
+		/* EXPORT case: */
+
+		if (state->gnutls_key->rsa[0] == NULL ||
+			state->gnutls_key->rsa[1] == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		*params_len = 2;
+		for (i=0;i<*params_len;i++) {
+			params[i] = _gnutls_mpi_copy(state->gnutls_key->rsa[i]);
+		}
+
+		return 0;
+	}
+
+
+	/* normal non export case */
+
+	info = _gnutls_get_auth_info( state);
+
 	if (info==NULL || info->ncerts==0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
@@ -126,7 +149,7 @@ int i;
 
 /* This function reads the RSA parameters from the private key
  */
-static int _gnutls_get_private_rsa_params(GNUTLS_STATE state, GNUTLS_MPI **params, int* params_size)
+int _gnutls_get_private_rsa_params(GNUTLS_STATE state, GNUTLS_MPI **params, int* params_size)
 {
 int index;
 const GNUTLS_CERTIFICATE_CREDENTIALS cred;
@@ -136,6 +159,23 @@ const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	        gnutls_assert();
 	        return GNUTLS_E_INSUFICIENT_CRED;
 	}
+
+	if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite)
+		 == GNUTLS_KX_RSA_EXPORT) {
+		/* EXPORT case: */
+		if (cred->rsa_params == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
+		}
+
+		*params_size = RSA_PRIVATE_PARAMS;
+		*params = cred->rsa_params->params;
+
+		return 0;
+	}
+
+	/* non export cipher suites. */	
+
 
 	if ( (index=state->gnutls_internals.selected_cert_index) < 0) {
 		gnutls_assert();
@@ -157,7 +197,7 @@ const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 			return GNUTLS_E_MEMORY_ERROR; \
 		}
 
-int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
+int _gnutls_proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 {
 	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
@@ -224,7 +264,7 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 
 /* return RSA(random) using the peers public key 
  */
-int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
+int _gnutls_gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 {
 	CERTIFICATE_AUTH_INFO auth = state->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */

@@ -102,7 +102,7 @@ int _gnutls_send_server_kx_message( GNUTLS_STATE state, int again)
 
 	if (again == 0) {
 		data_size = state->gnutls_internals.auth_struct->gnutls_generate_server_kx( state, &data);
-
+		
 		if (data_size < 0) {
 			gnutls_assert();
 			return data_size;
@@ -315,9 +315,9 @@ int _gnutls_recv_server_kx_message( GNUTLS_STATE state)
 		if (ret < 0)
 			return ret;
 
-
 		ret = state->gnutls_internals.auth_struct->gnutls_process_server_kx( state, data, datasize);
 		gnutls_free(data);
+
 		if (ret < 0)
 			return ret;
 		

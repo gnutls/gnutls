@@ -42,7 +42,8 @@ typedef enum GNUTLS_BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1,
 } GNUTLS_BulkCipherAlgorithm;
 
 typedef enum GNUTLS_KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
-	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP
+	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
+	GNUTLS_KX_RSA_EXPORT
 } GNUTLS_KXAlgorithm;
 
 typedef enum GNUTLS_CredType { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } GNUTLS_CredType;
@@ -110,6 +111,9 @@ typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
 
 struct GNUTLS_DH_PARAMS_INT;
 typedef struct GNUTLS_DH_PARAMS_INT* GNUTLS_DH_PARAMS;
+
+struct GNUTLS_RSA_PARAMS_INT;
+typedef struct GNUTLS_RSA_PARAMS_INT* GNUTLS_RSA_PARAMS;
 
 typedef struct {
 	unsigned char * data;
@@ -266,6 +270,7 @@ int gnutls_certificate_allocate_cred( GNUTLS_CERTIFICATE_CREDENTIALS *sc);
 #define gnutls_certificate_allocate_sc gnutls_certificate_allocate_cred
 
 int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS);
+int gnutls_certificate_set_rsa_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_RSA_PARAMS rsa_params);
 
 int gnutls_certificate_set_x509_trust_file( GNUTLS_CERTIFICATE_CREDENTIALS res, const char* CAFILE, 
 	GNUTLS_X509_CertificateFmt);
@@ -297,10 +302,23 @@ typedef void (*GNUTLS_LOG_FUNC)( const char*);
 void gnutls_global_set_log_function( GNUTLS_LOG_FUNC log_func);
 #define gnutls_global_set_log_func gnutls_global_set_log_function
 
+/* DH params */
 int gnutls_dh_params_set( GNUTLS_DH_PARAMS, gnutls_datum prime, gnutls_datum generator, int bits);
 int gnutls_dh_params_init( GNUTLS_DH_PARAMS*);
 void gnutls_dh_params_deinit( GNUTLS_DH_PARAMS);
 int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits);
+
+/* RSA params */
+int gnutls_rsa_params_set(GNUTLS_RSA_PARAMS rsa_params, 
+	gnutls_datum m, gnutls_datum e, gnutls_datum d, 
+	gnutls_datum p, gnutls_datum q, gnutls_datum u,
+	int bits);
+int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
+	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
+	gnutls_datum* u, int bits);
+int gnutls_rsa_params_init(GNUTLS_RSA_PARAMS * rsa_params);
+void gnutls_rsa_params_deinit(GNUTLS_RSA_PARAMS rsa_params);
+
 
 typedef ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_TRANSPORT_PTR, void*, size_t);
 typedef ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);

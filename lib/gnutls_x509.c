@@ -2166,6 +2166,10 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 					return 0;
 			}
 			return 0;
+
+		case GNUTLS_KX_RSA_EXPORT:
+			return 0;
+
 		default:
 			gnutls_assert();
 			return GNUTLS_E_X509_KEY_USAGE_VIOLATION;

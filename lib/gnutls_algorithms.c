@@ -34,6 +34,7 @@ typedef struct {
 static const gnutls_cred_map cred_mappings[] = {
 	{ GNUTLS_KX_ANON_DH, GNUTLS_CRD_ANON    },
 	{ GNUTLS_KX_RSA,     GNUTLS_CRD_CERTIFICATE },
+	{ GNUTLS_KX_RSA_EXPORT,     GNUTLS_CRD_CERTIFICATE },
 	{ GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE },
 	{ GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE },
 	{ GNUTLS_KX_SRP,     GNUTLS_CRD_SRP     },
@@ -162,6 +163,7 @@ static const gnutls_compression_entry compression_algorithms[] = {
 
 
 extern MOD_AUTH_STRUCT rsa_auth_struct;
+extern MOD_AUTH_STRUCT rsa_export_auth_struct;
 extern MOD_AUTH_STRUCT dhe_rsa_auth_struct;
 extern MOD_AUTH_STRUCT dhe_dss_auth_struct;
 extern MOD_AUTH_STRUCT anon_auth_struct;
@@ -175,6 +177,7 @@ gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
 #endif
 	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
+	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct },
 	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
 	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
 	{0}
@@ -243,7 +246,7 @@ typedef struct {
 #define GNUTLS_RSA_ARCFOUR_MD5 { 0x00, 0x04 }
 #define GNUTLS_RSA_3DES_EDE_CBC_SHA { 0x00, 0x0A }
 
-#define GNUTLS_RSA_ARCFOUR_EXPORT_MD5 { 0x00, 0x03 }
+#define GNUTLS_RSA_EXPORT_ARCFOUR_EXPORT_MD5 { 0x00, 0x03 }
 
 /* draft-ietf-tls-ciphersuite-05: 
  */
@@ -363,9 +366,9 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 				  GNUTLS_CIPHER_NULL,
 				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5, GNUTLS_SSL3),
 
-	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_EXPORT_MD5,
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_EXPORT_ARCFOUR_EXPORT_MD5,
 				  GNUTLS_CIPHER_ARCFOUR_EXPORT,
-				  GNUTLS_KX_RSA, GNUTLS_MAC_MD5, GNUTLS_SSL3),
+				  GNUTLS_KX_RSA_EXPORT, GNUTLS_MAC_MD5, GNUTLS_SSL3),
 
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_RSA_ARCFOUR_SHA,
 				  GNUTLS_CIPHER_ARCFOUR,

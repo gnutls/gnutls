@@ -66,6 +66,9 @@ int gnutls_dh_get_prime_bits( GNUTLS_STATE);
 int gnutls_dh_get_secret_bits( GNUTLS_STATE);
 int gnutls_dh_get_peers_public_bits( GNUTLS_STATE);
 
+/* RSA */
+int gnutls_rsa_export_get_modulus_bits(GNUTLS_STATE state);
+
 /* X509PKI */
 
 void gnutls_certificate_client_set_select_function( GNUTLS_STATE, gnutls_certificate_client_select_function *);

@@ -119,6 +119,27 @@ int gnutls_dh_get_secret_bits(GNUTLS_STATE state)
 	}
 }
 
+
+/**
+  * gnutls_rsa_export_get_modulus_bits - This function returns the bits used in RSA-export key exchange
+  * @state: is a gnutls state
+  *
+  * This function will return the bits used in the last RSA-EXPORT key exchange
+  * with the peer. 
+  * Returns a negative value in case of an error.
+  *
+  **/
+int gnutls_rsa_export_get_modulus_bits(GNUTLS_STATE state)
+{
+CERTIFICATE_AUTH_INFO info;
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
+
+	return info->rsa_export_modulus_bits;
+}
+
 /**
   * gnutls_dh_get_peers_public_bits - This function returns the bits used in DH authentication
   * @state: is a gnutls state
@@ -287,7 +308,7 @@ void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTL
 }
 
 /**
-  * gnutls_certificate_set_server_dh_params - This function will set the DH parameters for a server to use
+  * gnutls_certificate_set_dh_params - This function will set the DH parameters for a server to use
   * @res: is a GNUTLS_CERTIFICATE_CREDENTIALS structure
   * @dh_params: is a structure that holds diffie hellman parameters.
   *
@@ -298,5 +319,20 @@ void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTL
   **/
 int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS dh_params) {
 	res->dh_params = dh_params;
+	return 0;
+}
+
+/**
+  * gnutls_certificate_set_rsa_params - This function will set the RSA parameters for a server to use
+  * @res: is a GNUTLS_CERTIFICATE_CREDENTIALS structure
+  * @rsa_params: is a structure that holds temporary RSA parameters.
+  *
+  * This function will set the temporary RSA parameters for a certificate
+  * server to use. These parameters will be used in RSA-EXPORT
+  * cipher suites.
+  *
+  **/
+int gnutls_certificate_set_rsa_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_RSA_PARAMS rsa_params) {
+	res->rsa_params = rsa_params;
 	return 0;
 }

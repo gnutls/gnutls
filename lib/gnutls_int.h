@@ -37,6 +37,9 @@
 #define DEBUG
 */
 
+#define HANDSHAKE_DEBUG // Prints some information on handshake 
+#define DEBUG
+
 /* It might be a good idea to replace int with void*
  * here.
  */
@@ -165,7 +168,8 @@ typedef enum Extensions { GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_S
 } Extensions;
 
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
-	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP
+	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
+	GNUTLS_KX_RSA_EXPORT
 } KXAlgorithm;
 #define GNUTLS_KXAlgorithm KXAlgorithm
 
@@ -247,9 +251,9 @@ struct GNUTLS_KEY_INT {
 	MPI				b;
 	MPI				a;
 	MPI				x;
-
-	/* RSA: does not use these.
+	/* RSA: e, m
 	 */
+	MPI 				rsa[2];
 	
 	/* this is used to hold the peers authentication data 
 	 */
@@ -315,6 +319,11 @@ typedef struct {
 
 /* if you add anything in Security_Parameters struct, then
  * also modify CPY_COMMON in gnutls_constate.c
+ */
+
+/* Note that the security parameters structure is set up after the
+ * handshake has finished. The only value you may depend on while
+ * the handshake is in progress is the cipher suite value.
  */
 typedef struct {
 	ConnectionEnd entity;
@@ -603,6 +612,15 @@ typedef struct {
 } _GNUTLS_DH_PARAMS;
 
 #define GNUTLS_DH_PARAMS _GNUTLS_DH_PARAMS*
+
+
+typedef struct {
+	int bits;
+	MPI params[RSA_PRIVATE_PARAMS];
+} _GNUTLS_RSA_PARAMS;
+
+#define GNUTLS_RSA_PARAMS _GNUTLS_RSA_PARAMS*
+
 
 /* functions */
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);

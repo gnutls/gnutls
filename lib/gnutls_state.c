@@ -283,6 +283,10 @@ void _gnutls_deinit(GNUTLS_STATE state)
 		_gnutls_mpi_release(&state->gnutls_key->B);
 		_gnutls_mpi_release(&state->gnutls_key->b);
 
+		/* RSA */
+		_gnutls_mpi_release(&state->gnutls_key->rsa[0]);
+		_gnutls_mpi_release(&state->gnutls_key->rsa[1]);
+
 		_gnutls_mpi_release(&state->gnutls_key->dh_secret);
 		_gnutls_free(state->gnutls_key);
 
@@ -379,6 +383,19 @@ int _gnutls_dh_set_secret_bits( GNUTLS_STATE state, int bits) {
 
 	return 0;
 }
+
+int _gnutls_rsa_export_set_modulus_bits( GNUTLS_STATE state, int bits) {
+	CERTIFICATE_AUTH_INFO info;
+
+	info = _gnutls_get_auth_info(state);
+	if (info == NULL)
+		return GNUTLS_E_UNKNOWN_ERROR;
+
+	info->rsa_export_modulus_bits = bits;
+
+	return 0;
+}
+
 
 int _gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits) {
 	switch( gnutls_auth_get_type( state)) {
