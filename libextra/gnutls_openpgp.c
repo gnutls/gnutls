@@ -270,7 +270,7 @@ datum_to_kbnode( const gnutls_datum *raw, CDK_KBNODE *r_pkt )
     cdk_iobuf_write( buf, raw->data, raw->size );
     rc = cdk_keydb_get_keyblock( buf, &pkt, &dummy );
     if ( rc && rc != CDKERR_EOF ) {
-        rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+        rc = GNUTLS_E_UNKNOWN_ERROR;
         goto fail;
     }
     else
@@ -428,7 +428,7 @@ _gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
     }
     p = cdk_kbnode_find( kb_sk, PKT_SECRET_KEY );
     if ( !p ) {
-        rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+        rc = GNUTLS_E_UNKNOWN_ERROR;
         goto leave;
     }
     sk = p->pkt->pkt.secret_key;
@@ -498,7 +498,7 @@ _gnutls_openpgp_cert2gnutls_cert(gnutls_cert *cert, gnutls_datum raw)
         return rc;
     p = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
     if ( !p ) {
-        rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+        rc = GNUTLS_E_UNKNOWN_ERROR;
         goto fail;
     }
     pk = p->pkt->pkt.public_key;
@@ -563,12 +563,12 @@ gnutls_openpgp_get_key(gnutls_datum *key, const gnutls_datum *keyring,
   
     rc = cdk_keydb_search( khd, &ks, &pk );
     if ( rc ) {
-        rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+        rc = GNUTLS_E_UNKNOWN_ERROR;
         goto leave;
     }    
 
     if ( !cdk_kbnode_find( pk, PKT_PUBLIC_KEY ) ) {
-        rc = GNUTLS_E_NO_CERTIFICATE_FOUND;
+        rc = GNUTLS_E_UNKNOWN_ERROR;
         goto leave;
     }
 
@@ -1007,22 +1007,29 @@ _gnutls_openpgp_get_key_trust(const char *trustdb,
     int rc = 0;
 
     if ( !trustdb || !key || !r_success )
-        return GNUTLS_E_NO_CERTIFICATE_FOUND;
+        return GNUTLS_E_INVALID_REQUEST;
 
     *r_success = 0;
     rc = datum_to_kbnode( key, &kb_pk );
     if ( rc )
-        return GNUTLS_E_NO_CERTIFICATE_FOUND;
+        return GNUTLS_E_UNKNOWN_ERROR;
 
     pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
     if ( pkt )
         pk = pkt->pkt->pkt.public_key;
     if ( !pk )
-        return GNUTLS_E_NO_CERTIFICATE_FOUND;
+        return GNUTLS_E_UNKNOWN_ERROR;
 
+    if ( cdk_trustdb_check( trustdb, 3 ) ) {
+        /* The trustdb version is less then 3 and this mean the old
+           format is still used. We don't support this format. */
+        trustval = GNUTLS_E_UNKNOWN_ERROR;
+        goto leave;
+    }
+        
     rc = cdk_iobuf_open( &buf, trustdb, IOBUF_MODE_RD );
     if ( rc ) {
-        trustval = GNUTLS_E_NO_CERTIFICATE_FOUND;
+        trustval = GNUTLS_E_FILE_ERROR;
         goto leave;
     }
     rc = cdk_trustdb_get_ownertrust( buf, pk, &ot, &flags );
@@ -1084,11 +1091,11 @@ gnutls_openpgp_verify_key( const char *trustdb,
     int rc = 0;
     int status = 0;
   
-    if (!cert_list || !cert_list_length || !keyring)
+    if (!cert_list || cert_list_length != 1 || !keyring)
         return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-    if (cert_list_length != 1 || !keyring->size)
-        return GNUTLS_E_NO_CERTIFICATE_FOUND;
+    if ( !keyring->size && !trustdb)
+        return GNUTLS_E_INVALID_REQUEST;
 
     blob = kbx_read_blob(keyring, 0);
     if (!blob)
@@ -1302,7 +1309,7 @@ gnutls_certificate_set_openpgp_keyring_mem(GNUTLS_CERTIFICATE_CREDENTIALS c,
     if ( !file_exist(file) )
         return GNUTLS_E_FILE_ERROR;
 
-    rc = cdk_iobuf_open(&inp, file, IOBUF_MODE_RD);
+    rc = cdk_iobuf_open( &inp, file, IOBUF_MODE_RD );
     if ( rc )
         return GNUTLS_E_FILE_ERROR;
     if ( cdk_armor_filter_use( inp ) ) {
@@ -1479,29 +1486,38 @@ leave:
  * process.
  *
  **/
-void
+int
 gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                          char* keyserver,
                                          int port)
 {
     if ( !res || !keyserver )
-        return;
+        return GNUTLS_E_ILLEGAL_PARAMETER;
 
     if (!port)
         port = 11371;
   
     res->pgp_key_server = gnutls_strdup( keyserver );
+    if ( res->pgp_key_server == NULL)
+    	return GNUTLS_E_MEMORY_ERROR;
+
     res->pgp_key_server_port = port;
+
+   return 0;
 }
 
-void
+int
 gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                        char* trustdb)
 {
     if ( !res || !trustdb )
-        return;
+        return GNUTLS_E_ILLEGAL_PARAMETER;
 
     res->pgp_trustdb = gnutls_strdup(trustdb);
+    if (res->pgp_trustdb==NULL)
+        return GNUTLS_E_MEMORY_ERROR;
+        
+    return 0;
 } 
 
 #else /*!HAVE_LIBOPENCDK*/
@@ -1616,7 +1632,7 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
     return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
 }
 
-void
+int
 gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                          char* keyserver,
                                          int port)
@@ -1624,7 +1640,7 @@ gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
     return;
 }
 
-void
+int
 gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
                                        char* trustdb)
 {
