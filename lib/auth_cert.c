@@ -171,11 +171,13 @@ static int _find_x509_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 	int data_size = _data_size, i, j;
 	int result;
 
+	*indx = -1;
+
 	do {
 
-		DECR_LEN(data_size, 2);
+		DECR_LENGTH_RET(data_size, 2, 0);
 		size = READuint16(data);
-		DECR_LEN(data_size, size);
+		DECR_LENGTH_RET(data_size, size, 0);
 		data += 2;
 
 		for (i = 0; i < cred->ncerts; i++) {

@@ -40,18 +40,18 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	unsigned char *local_salt, *v;
 	int passwd_len;
 	GNUTLS_HASH_HANDLE h1;
-	int vsize, hash_len = gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
+	int vsize, hash_len = _gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
 	opaque *tmp;
 	uint8 *rtext, *csalt;
 	int rsalt_size, len, tmpsize;
 
 	passwd_len = strlen(passwd);	/* we do not want the null */
 
-	h1 = gnutls_hash_init(GNUTLS_MAC_SHA);
-	gnutls_hash(h1, (char *) username, strlen(username));
-	gnutls_hash(h1, ":", 1);
-	gnutls_hash(h1, (char *) passwd, passwd_len);
-	gnutls_hash_deinit(h1, r1);
+	h1 = _gnutls_hash_init(GNUTLS_MAC_SHA);
+	_gnutls_hash(h1, (char *) username, strlen(username));
+	_gnutls_hash(h1, ":", 1);
+	_gnutls_hash(h1, (char *) passwd, passwd_len);
+	_gnutls_hash_deinit(h1, r1);
 
 	
 	local_salt = gnutls_malloc(salt_size + 1);
@@ -82,18 +82,18 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 		return NULL;
 	}
 
-	h1 = gnutls_hash_init(GNUTLS_MAC_SHA);
+	h1 = _gnutls_hash_init(GNUTLS_MAC_SHA);
 	if (h1==NULL) {
 		gnutls_assert();
 		gnutls_free(local_salt);
 		return NULL;
 	}
-	gnutls_hash(h1, csalt, rsalt_size);
+	_gnutls_hash(h1, csalt, rsalt_size);
 	gnutls_free(csalt);
 
-	gnutls_hash(h1, r1, hash_len);
+	_gnutls_hash(h1, r1, hash_len);
 
-	gnutls_hash_deinit(h1, r1);
+	_gnutls_hash_deinit(h1, r1);
 
 	/* v = g^x mod n */
 	vsize = _gnutls_srp_gx(r1, hash_len, &v, g, n);

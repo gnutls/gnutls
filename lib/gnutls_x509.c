@@ -990,7 +990,7 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	memset( &cert_list[0][i - 1], 0,
 	       sizeof(gnutls_cert));
 
-	tmp.data = (void*) input_cert;
+	tmp.data = (opaque*) input_cert;
 	tmp.size = input_cert_size;
 
 	if ((ret =
@@ -1023,10 +1023,11 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	i = *ncerts + 1;
 
 	/* tmp now contains the decoded certificate list */
-	tmp.data = (void*)input_cert;
+	tmp.data = (opaque*)input_cert;
 	tmp.size = input_cert_size;
 
 	count = gnutls_x509_pkcs7_extract_certificate_count( &tmp);
+
 	if (count < 0) {
 		gnutls_assert();
 		/* if we failed to read the count,
@@ -1090,7 +1091,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 /* Reads a base64 encoded certificate list from memory and stores it to
  * a gnutls_cert structure. Returns the number of certificate parsed.
  */
-static int parse_cert_mem( gnutls_cert** cert_list, int* ncerts, 
+static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts, 
 	const char *input_cert, int input_cert_size)
 {
 	int siz, i, siz2;
@@ -1200,7 +1201,7 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
 		ret = parse_pkcs7_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
 		cert, cert_size);
 	else
-		ret = parse_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
+		ret = parse_pem_cert_mem( &res->cert_list[res->ncerts], &res->cert_list_length[res->ncerts],
 		cert, cert_size);
 
 	if (ret < 0) {
@@ -1222,10 +1223,49 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 		return parse_pkcs7_cert_mem( &res->x509_ca_list, &res->x509_ncas,
 			ca, ca_size);
 	else
-		return parse_cert_mem( &res->x509_ca_list, &res->x509_ncas,
+		return parse_pem_cert_mem( &res->x509_ca_list, &res->x509_ncas,
 			ca, ca_size);
 
 }
+
+
+/* This will check if the given DER key is a PKCS-1 RSA key.
+ */
+int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
+{
+	node_asn *c2;
+	int result;
+	char root2[128];
+
+	/* Step 1. Parse content and content info */
+	
+	if (key_struct->size == 0 || key_struct->data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	_gnutls_str_cpy( root2, sizeof(root2), "GNUTLS.RSAPrivateKey");
+	if ((result=asn1_create_structure
+	    (_gnutls_get_gnutls_asn(), root2, &c2, "rsakey")) != ASN_OK) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_get_der(c2, key_struct->data, key_struct->size);
+	asn1_delete_structure(c2);
+
+	if (result != ASN_OK) {
+		/* couldn't decode DER */
+	
+		gnutls_assert();
+		return result;
+	}
+
+	return 0;
+}
+
+
+
 
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
@@ -1235,8 +1275,8 @@ static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int c
 static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size, 
 	GNUTLS_X509_CertificateFmt type)
 {
-	int siz, ret;
-	opaque *b64;
+	int ret;
+	opaque *b64 = NULL;
 	gnutls_datum tmp;
 	PKAlgorithm pk;
 
@@ -1249,22 +1289,22 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 	}
 
 	/* read PKCS-1 private key */
-	siz = key_size;
 
 	if (type==GNUTLS_X509_FMT_DER) { /* DER */
-
-		/* FIXME: only RSA keys supported 
-		 */
+		int cv;
+		
 		tmp.data = (opaque*)key;
 		tmp.size = key_size;
-		
-		if ((ret =
-		     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
-					tmp)) < 0) {
-			gnutls_assert();
-			return ret;
-		}
-		
+
+		/* The only way to distinguish the keys
+		 * is to count the sequence of integers.
+		 */
+		cv = _gnutls_der_check_if_rsa_key( &tmp);
+		if (cv==0)
+			pk = GNUTLS_PK_RSA;
+		else
+			pk = GNUTLS_PK_DSA;
+
 	} else { /* PEM */
 
 		/* If we find the "DSA PRIVATE" string in the
@@ -1275,39 +1315,42 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 		else
 			pk = GNUTLS_PK_RSA;
 
-		siz = _gnutls_fbase64_decode(key, siz, &b64);
+		ret = _gnutls_fbase64_decode(key, key_size, &b64);
 
-		if (siz < 0) {
+		if (ret < 0) {
 			gnutls_assert();
 			return GNUTLS_E_PARSING_ERROR;
 		}
 
 		tmp.data = b64;
-		tmp.size = siz;
-	
-		switch (pk) { /* decode the key */
-			case GNUTLS_PK_RSA:
-				if ((ret =
-				     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
-							tmp)) < 0) {
-					gnutls_assert();
-					gnutls_free(b64);
-					return ret;
-				}
-				break;
-			case GNUTLS_PK_DSA:
-				if ((ret =
-				     _gnutls_DSAkey2gnutlsKey(&res->pkey[res->ncerts],
-								tmp)) < 0) {
-					gnutls_assert();
-					gnutls_free(b64);
-					return ret;
-				}
-				break;	
-		}
-	
-		gnutls_free(b64);
+		tmp.size = ret;
 	}
+
+	switch (pk) { /* decode the key */
+		case GNUTLS_PK_RSA:
+			if ((ret =
+			     _gnutls_PKCS1key2gnutlsKey(&res->pkey[res->ncerts],
+						tmp)) < 0) {
+				gnutls_assert();
+				gnutls_free(b64);
+				return ret;
+			}
+			break;
+		case GNUTLS_PK_DSA:
+			if ((ret =
+			     _gnutls_DSAkey2gnutlsKey(&res->pkey[res->ncerts],
+							tmp)) < 0) {
+				gnutls_assert();
+				gnutls_free(b64);
+				return ret;
+			}
+			break;	
+	}
+
+	/* this doesn't hurt in the DER case, since
+	 * b64 is NULL
+	 */
+	gnutls_free(b64);
 	
 	return 0;
 }
@@ -1326,10 +1369,10 @@ static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *certfile,
 	if (fd1 == NULL)
 		return GNUTLS_E_FILE_ERROR;
 
-	siz = fread(x, 1, sizeof(x), fd1);
+	siz = fread(x, 1, sizeof(x)-1, fd1);
 	fclose(fd1);
 
-	x[siz-1] = 0;
+	x[siz] = 0;
 
 	return read_cert_mem( res, x, siz, type);
 
@@ -1351,10 +1394,10 @@ static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *cafile,
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	siz = fread(x, 1, sizeof(x), fd1);
+	siz = fread(x, 1, sizeof(x)-1, fd1);
 	fclose(fd1);
 
-	x[siz-1] = 0;
+	x[siz] = 0;
 
 	return read_ca_mem( res, x, siz, type);
 }
@@ -1374,10 +1417,10 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, char *keyfile,
 	if (fd2 == NULL)
 		return GNUTLS_E_FILE_ERROR;
 
-	siz = fread(x, 1, sizeof(x), fd2);
+	siz = fread(x, 1, sizeof(x)-1, fd2);
 	fclose(fd2);
 
-	x[siz-1] = 0;
+	x[siz] = 0;
 
 	return read_key_mem( res, x, siz, type);
 }
@@ -2072,10 +2115,10 @@ int _gnutls_verify_x509_file( char *cafile)
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	siz = fread(x, 1, sizeof(x), fd1);
+	siz = fread(x, 1, sizeof(x)-1, fd1);
 	fclose(fd1);
 
-	x[siz-1] = 0;
+	x[siz] = 0;
 
 	return _gnutls_verify_x509_mem( x, siz);
 }
@@ -2127,8 +2170,6 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 	result = asn1_get_der(c1, pkcs7_str, pkcs7_str_size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-
-		_gnutls_log("X509_auth: Decoding error %d\n");
 
 		gnutls_assert();
 		asn1_delete_structure(c1);
@@ -2184,8 +2225,6 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 	
-		_gnutls_log("X509_auth: Decoding error %d\n");
-
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
@@ -2408,8 +2447,6 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 
-		_gnutls_log("X509_auth: Decoding error %d\n");
-
 		gnutls_assert();
 		asn1_delete_structure(c1);
 		return result;
@@ -2464,8 +2501,6 @@ int gnutls_x509_pkcs7_extract_certificate_count(const gnutls_datum * pkcs7_struc
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
 	
-		_gnutls_log("X509_auth: Decoding error %d\n");
-
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return result;
