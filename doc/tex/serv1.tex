@@ -10,6 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls.h>
+#include <gnutls-extra.h>
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -154,6 +155,11 @@ int main()
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
+   if (gnutls_global_init_extra() < 0) { /* for SRP */
+      fprintf(stderr, "global state initialization error\n");
+      exit(1);
+   }
+
    if (gnutls_certificate_allocate_server_sc(&x509_cred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);

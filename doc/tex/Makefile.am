@@ -9,6 +9,10 @@ TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.
 
 ASN1_TEX_OBJECTS = fdl.tex asn1.tex ../../lib/asn1-api.tex
 
+gnutls.html: $(TEX_OBJECTS)            
+	-latex2html gnutls.tex -no_navigation -no_subdir 1 -split 0 \
+	-local_icons -html_version 3.2,math -info "" -white
+
 gnutls.ps: $(TEX_OBJECTS)
 	-$(LN_S) ../../lib/gnutls-api.tex .
 	-$(LN_S) ../../libextra/gnutls-extra-api.tex .

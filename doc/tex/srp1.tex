@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <gnutls.h>
+#include <gnutls-extra.h>
 
 #define MAX_BUF 1024
 #define USERNAME "user"
@@ -35,6 +36,14 @@ int main()
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
+
+   /* now enable the gnutls-extra library which contains the
+    * SRP stuff. */
+   if (gnutls_global_init_extra() < 0) {
+      fprintf(stderr, "global state initialization error\n");
+      exit(1);
+   }
+
    if (gnutls_srp_allocate_client_sc(&xcred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
