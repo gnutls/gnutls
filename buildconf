@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 gtkdocize
 autoreconf --force --install
-echo "You can now run \"./configure --enable-developer-mode --enable-gtk-doc\" and \"make\""
+: 'Run "./configure --enable-developer-mode --enable-gtk-doc && make" now.'
