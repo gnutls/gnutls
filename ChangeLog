@@ -1,3 +1,39 @@
+2004-08-10 16:20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-10 15:28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Add.  
+
+2004-08-10 12:19  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am:
+
+	(release): Remove ChangeLog stuff.  
+
+2004-08-10 12:08  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Bump version.  
+
+2004-08-10 12:07  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	If socklen_t doesn't exist, use size_t (needed for Darwin).  
+
+2004-08-10 11:39  Simon Josefsson <simon@josefsson.org>
+
+	* doc/TODO:
+
+	Add.  
+
 2004-08-09 01:30  Simon Josefsson <simon@josefsson.org>
 
 	* src/Makefile.am:
