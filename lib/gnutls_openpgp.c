@@ -28,7 +28,7 @@
 #include <time.h>
 #include <sys/stat.h>
 
-#include "gnutls_errors_int.h"
+#include "gnutls_errors.h"
 #include "gnutls_gcry.h"
 #include "gnutls_cert.h"
 #include "gnutls_datum.h"
@@ -232,7 +232,7 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
   if ( (rc=cdk_pkt_write_signature(buf, sig)) )
     goto leave;
   data = cdk_iobuf_get_data_as_buffer(buf, &n);
-  gnutls_datum_append(&cert->signature, data, n);
+  gnutls_datum_append( &cert->signature, data, n);
   cdk_free(data); data = NULL;
 
 leave:
@@ -384,9 +384,21 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
         return GNUTLS_E_UNKNOWN_ERROR;
     }
   cdk_pkt_new(&pkt);
-  res->ncerts = 0;
-  res->cert_list = gnutls_malloc(sizeof(gnutls_cert));
-  res->cert_list_length = gnutls_malloc( sizeof(int) );
+
+  res->cert_list = gnutls_realloc( res->cert_list,
+                                   (1+res->ncerts)*sizeof(gnutls_cert*));
+  if (res->cert_list == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  res->cert_list_length = gnutls_realloc( res->cert_list_length,
+                                          (1+res->ncerts)*sizeof(int) );
+  if (res->cert_list_length == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
   do {
     rc = cdk_keydb_enum_pk(buf, &pkt, &eof);
     if ( (eof == 1 && !pkt) || rc)
@@ -395,26 +407,28 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
       {
         if (i > MAX_PARAMS_SIZE)
           break;
-        if (!res->cert_list[res->ncerts])
-          {
-            int n = res->ncerts;
-            res->cert_list_length = gnutls_realloc(res->cert_list_length,
-                                                   i*sizeof(int));
-            res->cert_list[n] = gnutls_realloc(res->cert_list[n],
-                                               i*sizeof(gnutls_cert)); 
-          }
+        /*if (!res->cert_list[res->ncerts])*/
+        {
+          int n = res->ncerts;
+          res->cert_list[n] = gnutls_calloc(1, sizeof(gnutls_cert)); 
+          if (res->cert_list[n] == NULL)
+            {
+              gnutls_assert();
+              return GNUTLS_E_MEMORY_ERROR;
+            }
+        }
         if (p->id == PKT_PUBKEY)
           {
             int n = res->ncerts;
             res->cert_list_length[n] = 1;
-            iobuf_to_datum(buf, &res->cert_list[n]->raw);
-            openpgp_pk_to_gnutls_cert( res->cert_list[n], p->p.pk );
+            iobuf_to_datum(buf, &res->cert_list[n][0].raw);
+            openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], p->p.pk );
             res->ncerts++; i++;
           }
         else if (p->id == PKT_SIG)
           {
             int n = res->ncerts;
-            openpgp_sig_to_gnutls_cert( res->cert_list[n], p->p.sig );
+            openpgp_sig_to_gnutls_cert( &res->cert_list[n][0], p->p.sig );
           }
       }
   } while (!eof && !rc);
@@ -448,8 +462,16 @@ gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
     }
   iobuf_to_datum(buf, &raw);
   cdk_iobuf_close(buf);
-  res->pkey = gnutls_calloc(1, sizeof *res->pkey);
-  rc =_gnutls_openpgp_key2gnutls_key(res->pkey, raw);
+  res->pkey = gnutls_realloc( res->pkey, (res->ncerts)*
+                              sizeof(gnutls_private_key));
+  if (res->pkey == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  
+  /* ncerts has been incremented before */
+  rc =_gnutls_openpgp_key2gnutls_key( &res->pkey[res->ncerts-1], raw);
 
 leave:
 #ifdef DEBUG_OPENPGP
