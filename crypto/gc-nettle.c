@@ -1,4 +1,4 @@
-/* gc-libgcrypt.c --- Crypto wrappers around Libgcrypt for GC.
+/* gc-nettle.c --- Crypto wrappers around Nettle for GC.
  * Copyright (C) 2002, 2003, 2004  Simon Josefsson
  *
  * This file is part of GC.
@@ -27,13 +27,15 @@
 /* Get prototype. */
 #include <gc.h>
 
-/* Get libgcrypt API. */
+/* XXX GnuTLS still need Libgcrypt. */
 #include <gcrypt.h>
 
 int
 gc_init (void)
 {
   gcry_error_t err;
+
+  /* XXX GnuTLS still need Libgcrypt. */
 
   err = gcry_control (GCRYCTL_ANY_INITIALIZATION_P);
   if (err == GPG_ERR_NO_ERROR)
@@ -61,6 +63,7 @@ gc_set_allocators (gc_malloc_t func_malloc,
 		   gc_secure_check_t secure_check,
 		   gc_realloc_t func_realloc, gc_free_t func_free)
 {
+  /* XXX GnuTLS still need Libgcrypt. */
   gcry_set_allocation_handler (func_malloc, secure_malloc, secure_check,
 			       func_realloc, func_free);
 }
