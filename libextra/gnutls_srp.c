@@ -406,14 +406,9 @@ int gnutls_srp_set_client_credentials( gnutls_srp_client_credentials res, char *
   *
   **/
 void gnutls_srp_free_server_credentials( gnutls_srp_server_credentials sc) {
-int i;
-	for (i=0;i<sc->password_files;i++) {
-		gnutls_free( sc->password_file[i]);
-		gnutls_free( sc->password_conf_file[i]);
-	}
-	gnutls_free(sc->password_file);
-	gnutls_free(sc->password_conf_file);
-	
+	gnutls_free( sc->password_file);
+	gnutls_free( sc->password_conf_file);
+
 	gnutls_free(sc);
 }
 
@@ -460,7 +455,6 @@ FILE* fd;
 int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials res, 
 	const char *password_file, const char * password_conf_file) 
 {
-int i;
 	
 	if (password_file==NULL || password_conf_file==NULL) {
 		gnutls_assert();
@@ -478,37 +472,19 @@ int i;
 		return GNUTLS_E_FILE_ERROR;
 	}
 	
-	res->password_file = gnutls_realloc_fast( res->password_file,
-		sizeof(char*)*(res->password_files+1));
+	res->password_file = gnutls_strdup( password_file);
 	if (res->password_file==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
-	res->password_conf_file = gnutls_realloc_fast( res->password_conf_file,
-		sizeof(char*)*(res->password_files+1));
+	
+	res->password_conf_file = gnutls_strdup( password_conf_file);
 	if (res->password_conf_file==NULL) {
 		gnutls_assert();
+		gnutls_free(res->password_file);
+		res->password_file = NULL;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
-	i = res->password_files;
-	
-	res->password_file[i] = gnutls_strdup( password_file);
-	if (res->password_file[i]==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	
-	res->password_conf_file[i] = gnutls_strdup( password_conf_file);
-	if (res->password_conf_file[i]==NULL) {
-		gnutls_assert();
-		gnutls_free(res->password_file[i]);
-		res->password_file[i] = NULL;
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	res->password_files++;
 
 	return 0;
 }

@@ -225,7 +225,7 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	char line[2*1024];
 	uint i, len;
 	int ret;
-	int index, pwd_index = 0, last_index;
+	int index, last_index;
 	SRP_PWD_ENTRY* entry;
 
 	*_entry = gnutls_calloc(1, sizeof(SRP_PWD_ENTRY));
@@ -275,14 +275,14 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 	/* The callback was not set. Proceed.
 	 */
 
-	if (cred->password_files<=0) {
+	if (cred->password_file==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_SRP_PWD_ERROR;
 	}
 	
 	/* Open the selected password file.
 	 */
-	fd = fopen( cred->password_file[pwd_index], "r");
+	fd = fopen( cred->password_file, "r");
 	if (fd==NULL) {
 		gnutls_assert();
 		_gnutls_srp_entry_free(entry);
@@ -305,7 +305,7 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
 				 * when the user does not exist.
 				 */
 				last_index = index;
-				if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, index)==0) {
+				if (pwd_read_conf( cred->password_conf_file, entry, index)==0) {
 					return 0;
 				} else {
 					gnutls_assert();
@@ -323,7 +323,7 @@ int _gnutls_srp_pwd_read_entry( gnutls_session state, char* username,
     /* user was not found. Fake him. Actually read the g,n values from
      * the last index found and randomize the entry.
      */
-    if (pwd_read_conf( cred->password_conf_file[pwd_index], entry, last_index)==0) {
+    if (pwd_read_conf( cred->password_conf_file, entry, last_index)==0) {
 	ret = _randomize_pwd_entry( entry);
 	if (ret < 0) {
 		gnutls_assert();

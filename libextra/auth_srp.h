@@ -21,9 +21,8 @@ typedef struct {
 #define gnutls_srp_client_credentials SRP_CLIENT_CREDENTIALS_INT*
 
 typedef struct {
-   char **password_file;
-   char **password_conf_file;
-   int password_files;
+   char *password_file;
+   char *password_conf_file;
    /* callback function, instead of reading the
     * password files.
     */
