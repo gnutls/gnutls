@@ -543,6 +543,51 @@ unsigned int critical;
 }
 
 /**
+  * gnutls_x509_crt_cpy_crl_dist_points - This function will copy the CRL dist points
+  * @dst: should contain a gnutls_x509_crt structure
+  * @src: the certificate where the dist points will be copied from
+  *
+  * This function will copy the CRL distribution points certificate 
+  * extension, from the source to the destination certificate.
+  * This may be useful to copy from a CA certificate to issued ones.
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt dst, 
+	gnutls_x509_crt src)
+{
+int result;
+gnutls_datum der_data;
+unsigned int critical;
+
+	if (dst==NULL || src == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(src, "2.5.29.31", 0, &der_data, &critical);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( dst, "2.5.29.31", &der_data, critical);
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	dst->use_extensions = 1;
+
+	return 0;
+}
+
+/**
   * gnutls_x509_crt_set_subject_key_id - This function will set the certificate's subject key id
   * @cert: should contain a gnutls_x509_crt structure
   * @id: The key ID

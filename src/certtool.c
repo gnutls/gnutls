@@ -607,6 +607,12 @@ void generate_signed_certificate( void)
 	ca_crt = load_ca_cert();
 
 	crt = generate_certificate( &key);
+	
+	/* Copy the CRL distribution points.
+	 */
+	gnutls_x509_crt_cpy_crl_dist_points( crt, ca_crt);
+	/* it doesn't matter if we couldn't copy the CRL dist points.
+	 */
 
 	print_certificate_info( crt, stderr, 0);
 	

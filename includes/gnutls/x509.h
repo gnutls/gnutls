@@ -93,6 +93,8 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 	unsigned int *critical);
 int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
 	const void* data_string, unsigned int reason_flags);
+int gnutls_x509_crt_cpy_crl_dist_points(gnutls_x509_crt dst, 
+	gnutls_x509_crt src);
 
 time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert);
 time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);

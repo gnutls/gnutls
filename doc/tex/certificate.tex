@@ -28,7 +28,8 @@ on page \pageref{sec:x509api}. Some examples are listed below.
 \subsection{X.509 certificates}
 An X.509 certificate usually contains information about the certificate
 holder, the signer, a unique serial number, expiration dates and several other 
-fields\cite{RFC3280}. Some functions of \gnutls{}' API for certificate parsing are:
+fields\cite{RFC3280}. Several functions exist to generate and handle X.509
+certificates, all listed in \emph{gnutls/x509.h}. Some of them are:
 \begin{itemize}
 \item \printfunc{gnutls_x509_crt_init}{gnutls\_x509\_crt\_init}
 \item \printfunc{gnutls_x509_crt_import}{gnutls\_x509\_crt\_import}
@@ -38,9 +39,8 @@ fields\cite{RFC3280}. Some functions of \gnutls{}' API for certificate parsing a
 \end{itemize}
 
 \par
-An example program that reads the peer's certificate,
-and prints some information about the peer's certificate in a TLS session,
-is listed below.
+To demonstrate the X.509 parsing capabilities an example program is listed below.
+That program reads the peer's certificate, and prints information about it.
 
 \input{ex-x509-info}
 

@@ -785,7 +785,6 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 	asn1_delete_structure(&c2);
 
 	if (result < 0) {
-		gnutls_assert();
 		return result;
 	}
 
@@ -980,9 +979,9 @@ int gnutls_x509_crt_get_extension_oid(gnutls_x509_crt cert, int indx,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	if ((result =
-	     _gnutls_x509_crt_get_extension_oid(cert, indx, oid, sizeof_oid)) < 0) {
-	     	gnutls_assert();
+	result =
+	     _gnutls_x509_crt_get_extension_oid(cert, indx, oid, sizeof_oid);
+	if (result < 0) {
 		return result;
 	}
 

@@ -35,31 +35,37 @@ static void print_x509_certificate_info(gnutls_session session)
    int cert_list_size = 0;
    gnutls_x509_crt cert;
 
+   /* This function only works for X.509 certificates.
+    */
+   if (gnutls_certificate_type_get(session) != GNUTLS_CRT_X509)
+      return;
+
    cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
-   if (cert_list_size > 0
-       && gnutls_certificate_type_get(session) == GNUTLS_CRT_X509) {
+   printf("Peer provided %d certificates.\n", cert_list_size);
 
-      /* no error checking
+   if (cert_list_size > 0) {
+
+      /* we only print information about the first certificate.
        */
       gnutls_x509_crt_init( &cert);
 
       gnutls_x509_crt_import( cert, &cert_list[0]);
 
-      printf(" - Certificate info:\n");
+      printf("Certificate info:\n");
 
       expiration_time = gnutls_x509_crt_get_expiration_time( cert);
       activation_time = gnutls_x509_crt_get_activation_time( cert);
 
-      printf(" - Certificate is valid since: %s", ctime(&activation_time));
-      printf(" - Certificate expires: %s", ctime(&expiration_time));
+      printf("\tCertificate is valid since: %s", ctime(&activation_time));
+      printf("\tCertificate expires: %s", ctime(&expiration_time));
 
       /* Print the serial number of the certificate.
        */
       size = sizeof(serial);
       gnutls_x509_crt_get_serial(cert, serial, &size);
 
-      printf(" - Certificate serial number: %s\n", 
+      printf("\tCertificate serial number: %s\n", 
          bin2hex( serial, serial_size));
 
       /* Extract some of the public key algorithm's parameters
@@ -82,16 +88,16 @@ static void print_x509_certificate_info(gnutls_session session)
       /* Print the version of the X.509 
        * certificate.
        */
-      printf(" - Certificate version: #%d\n",
+      printf("\tCertificate version: #%d\n",
              gnutls_x509_crt_get_version( cert));
 
       size = sizeof(dn);
       gnutls_x509_crt_get_dn( cert, dn, &size);
-      printf(" - DN: %s\n", dn);
+      printf("\tDN: %s\n", dn);
 
       size = sizeof(dn);
       gnutls_x509_crt_get_issuer_dn( cert, dn, &size);
-      printf(" - Certificate Issuer's DN: %s\n", dn);
+      printf("\tIssuer's DN: %s\n", dn);
 
       gnutls_x509_crt_deinit( cert);
 

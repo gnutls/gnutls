@@ -37,14 +37,19 @@ in a certificate credentials structure. This should be done by using
 \printfunc{gnutls_certificate_set_x509_key_file}{gnutls\_certificate\_set\_x509\_key\_file}
 or
 \printfunc{gnutls_certificate_set_openpgp_key_file}{gnutls\_certificate\_set\_openpgp\_key\_file}
-depending on the certificate type. As an alternative, a callback may be used
-so the server or the client set the certificate at the handshake time.
-That callback can be set using
-\printfunc{gnutls_certificate_server_set_retrieve_function}{gnutls\_certificate\_server\_set\_retrieve\_function}
-or
-\printfunc{gnutls_certificate_client_set_retrieve_function}{gnutls\_certificate\_client\_set\_retrieve\_function}
-in case of a client.
+depending on the certificate type. 
+In the X.509 case, the functions will also accept and use a certificate list 
+that leads to a trusted authority. The certificate list must be ordered in such
+way that every certificate certifies the one before it. The trusted authority's
+certificate need not to be included, since the peer should possess it already.
 \par
+As an alternative, a callback may be used
+so the server or the client specify the certificate and the key at the handshake time.
+That callback can be set using the functions:
+\begin{itemize}
+\item \printfunc{gnutls_certificate_server_set_retrieve_function}{gnutls\_certificate\_server\_set\_retrieve\_function}
+\item \printfunc{gnutls_certificate_client_set_retrieve_function}{gnutls\_certificate\_client\_set\_retrieve\_function}
+\end{itemize}
 Certificate verification is possible by loading the trusted authorities
 into the credentials structure by using
 \printfunc{gnutls_certificate_set_x509_trust_file}{gnutls\_certificate\_set\_x509\_trust\_file}
