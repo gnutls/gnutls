@@ -223,7 +223,6 @@ int _gnutls_send_client_certificate_verify(SOCKET cd, GNUTLS_STATE state)
 	/* if certificate verify is not needed just exit 
 	 */
 	if (state->gnutls_key->certificate_requested==0) {
-		gnutls_assert();
 		return 0;
 	}
 
