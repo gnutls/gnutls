@@ -154,6 +154,8 @@ const void *_gnutls_get_kx_cred( GNUTLS_KEY key, KXAlgorithm algo, int *err) {
 }
 const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
 	AUTH_CRED * ccred;
+
+	if (key == NULL) return NULL;
 	
 	ccred = key->cred;
 	while(ccred!=NULL) {
