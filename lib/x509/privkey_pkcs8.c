@@ -382,7 +382,8 @@ int encode_to_pkcs8_key(schema_id schema, const gnutls_datum_t * der_key,
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
   * This function will export the private key to a PKCS8 structure.
-  * Currently only RSA keys can be exported. If the flags do not
+  * Currently only RSA keys can be exported since there is no documented
+  * standard for other keys. If the flags do not
   * specify the encryption cipher, then the default 3DES (PBES2) will
   * be used.
   *
