@@ -38,6 +38,7 @@ LT_AGE=2
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
+ac_full=1
 
 GNUTLS_GCRYPT_VERSION=1:1.2.0
 GNUTLS_LIBTASN1_VERSION=0.2.11
@@ -244,6 +245,7 @@ if test x$ac_enable_srp != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_SRP, 1, [enable SRP authentication])
 else
+ ac_full=0
  AC_MSG_RESULT(yes)
 fi
 
@@ -256,6 +258,7 @@ if test x$ac_enable_anon != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_ANON, 1, [enable anonymous authentication])
 else
+ ac_full=0
  AC_MSG_RESULT(yes)
 fi
 
@@ -268,6 +271,7 @@ if test x$ac_enable_pki != xno; then
  AC_MSG_RESULT(no)
  AC_DEFINE(ENABLE_PKI, 1, [whether to include all the PKCS #x stuff and other PKI stuff])
 else
+ ac_full=0
  AC_MSG_RESULT(yes)
 fi
 
@@ -282,6 +286,7 @@ AC_ARG_ENABLE(openpgp-authentication,
 	ac_enable_openpgp=no)
 if test x$ac_enable_openpgp = xno; then
  AC_MSG_RESULT(yes)
+ ac_full=0
 else
  AC_DEFINE(ENABLE_OPENPGP, 1, [use openpgp authentication])
  AC_MSG_RESULT(no)
@@ -469,6 +474,7 @@ LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LIBOPENCDK_LIBS $LZO_LIBS $LIB
 LIBGNUTLS_EXTRA_CFLAGS="$LIBOPENCDK_CFLAGS -I${includedir}"
 AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
 AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
+export ac_full
 
 CFLAGS="${CFLAGS} ${LIBGCRYPT_CFLAGS}"
 
@@ -498,6 +504,13 @@ AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
  echo "#ifdef __cplusplus" >> includes/gnutls/gnutls.h
  echo "}" >> includes/gnutls/gnutls.h
  echo "#endif" >> includes/gnutls/gnutls.h
+
+if test $ac_full -eq 0; then
+ echo "#ifdef __GNUC__" >> includes/gnutls/gnutls.h
+ echo "#warning This is not the official GnuTLS library. Several features were disabled at compilation." >> includes/gnutls/gnutls.h
+ echo "#endif /* __GNUC__ */" >> includes/gnutls/gnutls.h
+fi
+
  echo "#endif /* GNUTLS_H */" >> includes/gnutls/gnutls.h
  echo "" >> includes/gnutls/gnutls.h
  chmod +x lib/libgnutls-config
