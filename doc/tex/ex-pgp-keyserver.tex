@@ -28,7 +28,7 @@ recv_openpgp_key(const unsigned char *keyfpr, unsigned int
    char *request = NULL;
    char buffer[4096];
    int fd = -1;
-   int rc = 0, state = 0, nread = 0;
+   int rc = -1, state = 0, nread = 0;
    size_t nbytes = 0, n = 0;
    const unsigned char *keyid;
 
@@ -85,7 +85,7 @@ recv_openpgp_key(const unsigned char *keyfpr, unsigned int
 
    buf = cdk_stream_tmp();
    if (!buf) {
-      rc = GNUTLS_E_MEMORY_ERROR;
+      rc = -1;
       goto leave;
    }
 
@@ -112,17 +112,21 @@ recv_openpgp_key(const unsigned char *keyfpr, unsigned int
       if (nread == EOF)
          break;
       key->data = realloc(key->data, key->size + nread);
-      if (key->data == NULL)
-         return -1;
+      if (key->data == NULL) {
+         rc = -1;
+         goto leave;
+      }
 
       memcpy(&key->data[key->size], buf, nread);
       key->size += nread;
    }
 
+   rc = 0;
+
  leave:
    cdk_stream_close(buf);
    close(fd);
-   return 0;
+   return rc;
 }
 
 
