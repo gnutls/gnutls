@@ -30,6 +30,7 @@
 #include "../lib/gnutls.h"
 #include <sys/time.h>
 #include <signal.h>
+#include <netdb.h>
 
 #ifndef SHUT_WR
 # define SHUT_WR 1
@@ -172,11 +173,12 @@ int main(int argc, char** argv)
 	int user_term = 0;
 	SRP_CLIENT_CREDENTIALS cred;
 	X509PKI_CLIENT_CREDENTIALS xcred;
-
+	struct hostent* server_host;
+	
 	signal( SIGPIPE, SIG_IGN);
 	
 	if (argc!=3) {
-		fprintf(stderr, "Usage: cli [IP] [PORT]\n");
+		fprintf(stderr, "Usage: cli [HOST] [PORT]\n");
 		exit(1);
 	}
 	
@@ -185,7 +187,12 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 
-
+	/* get server name */
+	server_host = gethostbyname( argv[1]);
+	if (server_host==NULL) {
+		fprintf(stderr, "Cannot resolve %s\n", argv[1]);
+		exit(1);
+	}
 
 	/* X509 stuff */
 	if (gnutls_allocate_x509_client_sc( &xcred, 1) < 0) {  /* space for 1 certificate */
@@ -209,15 +216,17 @@ int main(int argc, char** argv)
 	memset(&sa, '\0', sizeof(sa));
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(atoi(argv[2]));
-	inet_pton( AF_INET, argv[1], &sa.sin_addr); 
 
+	sa.sin_addr.s_addr = *((unsigned int*)server_host->h_addr);
+
+	inet_ntop( AF_INET, &sa.sin_addr, buffer, MAX_BUF);
+	fprintf(stderr, "Connecting to '%s'...\n", buffer);
+	
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");
 
 #ifdef RESUME
 	gnutls_init(&state, GNUTLS_CLIENT);
-	
-	gnutls_set_max_record_size( state, 512);
 	
 	gnutls_set_protocol_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, 0);
