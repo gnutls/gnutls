@@ -39,10 +39,6 @@
  typedef int ssize_t;
 #endif
 
-#ifdef HAVE_STDARG_H
-# include <stdarg.h>
-#endif
-
 #ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
@@ -119,14 +115,6 @@
 #  define memmove(d, s, n) bcopy ((s), (d), (n))
 # else
 #  error "Neither memmove nor bcopy exists on your system."
-# endif
-#endif
-
-#ifdef USE_VA_COPY
-# ifndef HAVE_VA_COPY
-# define VA_COPY __va_copy
-# else
-# define VA_COPY va_copy
 # endif
 #endif
 

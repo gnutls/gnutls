@@ -40,7 +40,7 @@
  */
 #define GNUTLS_SOCKET_PTR int
 
-#define GNUTLS_LIST ...
+typedef const int* GNUTLS_LIST;
 
 #define MIN_BITS 1023
 

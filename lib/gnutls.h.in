@@ -62,7 +62,7 @@ typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
  */
 #define GNUTLS_SOCKET_PTR int
 
-#define GNUTLS_LIST ...
+typedef const int* GNUTLS_LIST;
 
 struct GNUTLS_STATE_INT;
 typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;

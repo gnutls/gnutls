@@ -27,7 +27,7 @@
 /**
   * gnutls_cipher_set_priority - Sets the priority on the ciphers supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @GNUTLS_LIST: is a 0 terminated list of BulkCipherAlgorithm elements.
+  * @list: is a 0 terminated list of BulkCipherAlgorithm elements.
   *
   * Sets the priority on the ciphers supported by gnutls.
   * Priority is higher for ciphers specified before others.
@@ -36,22 +36,13 @@
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
-	
-	va_list ap;
-	int i,num=0;
-	va_list _ap;
+int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+GNUTLS_LIST _list = list;
+int num=0, i;
 
-	va_start( ap, state);
-
-#ifdef USE_VA_COPY
-	VA_COPY( _ap, ap);
-#else
-	_ap = ap;
-#endif
-
-	while( va_arg(ap, BulkCipherAlgorithm) != 0) {
+	while( *_list != 0) {
 		num++;
+		++_list;
 	} 
 
 	if (state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority!=NULL)
@@ -64,18 +55,16 @@ int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithms = num;
 	
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority[i] = va_arg(_ap, BulkCipherAlgorithm);
+		state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority[i] = list[i];
 	}
 	
-	va_end(ap);
-
 	return 0;
 }
 
 /**
   * gnutls_kx_set_priority - Sets the priority on the key exchange algorithms supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @GNUTLS_LIST: is a 0 terminated list of KXAlgorithm elements.
+  * @list: is a 0 terminated list of KXAlgorithm elements.
   *
   * Sets the priority on the key exchange algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -84,23 +73,15 @@ int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
  **/
-int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
-	
-	va_list ap;
-	va_list _ap;
-	int i,num=0;
-	
-	va_start( ap, state);
+int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+GNUTLS_LIST _list = list;
+int num=0, i;
 
-#ifdef USE_VA_COPY
-	VA_COPY( _ap, ap);
-#else
-	_ap = ap;
-#endif
-
-	while( va_arg(ap, KXAlgorithm) != 0) {
+	while( *_list != 0) {
 		num++;
-	}
+		++_list;
+	} 
+
 
 	if (state->gnutls_internals.KXAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.KXAlgorithmPriority.algorithm_priority);
@@ -110,17 +91,16 @@ int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	state->gnutls_internals.KXAlgorithmPriority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.KXAlgorithmPriority.algorithm_priority[i] = va_arg( _ap, KXAlgorithm);
+		state->gnutls_internals.KXAlgorithmPriority.algorithm_priority[i] = list[i];
 	}
 
-	va_end(ap);
 	return 0;
 }
 
 /**
   * gnutls_mac_set_priority - Sets the priority on the mac algorithms supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @GNUTLS_LIST: is a 0 terminated list of MACAlgorithm elements.
+  * @list: is a 0 terminated list of MACAlgorithm elements.
   *
   * Sets the priority on the mac algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -129,23 +109,15 @@ int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
-	
-	va_list ap;
-	int i, num=0;
-	va_list _ap;
-	
-	va_start( ap, state);
+int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+GNUTLS_LIST _list = list;
+int num=0, i;
 
-#ifdef USE_VA_COPY
-	VA_COPY( _ap, ap);
-#else
-	_ap = ap;
-#endif
-
-	while( va_arg(ap, MACAlgorithm) != 0) {
+	while( *_list != 0) {
 		num++;
-	}
+		++_list;
+	} 
+
 	
 	if (state->gnutls_internals.MACAlgorithmPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.MACAlgorithmPriority.algorithm_priority);	
@@ -155,17 +127,16 @@ int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	state->gnutls_internals.MACAlgorithmPriority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.MACAlgorithmPriority.algorithm_priority[i] = va_arg(_ap, MACAlgorithm);
+		state->gnutls_internals.MACAlgorithmPriority.algorithm_priority[i] = list[i];
 	}
 
-	va_end(ap);
 	return 0;
 }
 
 /**
   * gnutls_compression_set_priority - Sets the priority on the compression algorithms supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @GNUTLS_LIST: is a 0 terminated list of CompressionMethod elements.
+  * @list: is a 0 terminated list of CompressionMethod elements.
   *
   * Sets the priority on the compression algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -174,23 +145,14 @@ int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
-	
-	va_list ap;
-	int i,num=0;
-	va_list _ap;
-	
-	va_start( ap, state);
+int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+GNUTLS_LIST _list = list;
+int num=0, i;
 
-#ifdef USE_VA_COPY
-	VA_COPY( _ap, ap);
-#else
-	_ap = ap;
-#endif
-
-	while( va_arg( ap, CompressionMethod) != 0) {
+	while( *_list != 0) {
 		num++;
-	}
+		++_list;
+	} 
 	
 	if (state->gnutls_internals.CompressionMethodPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.CompressionMethodPriority.algorithm_priority);	
@@ -200,16 +162,15 @@ int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 
 	state->gnutls_internals.CompressionMethodPriority.algorithms = num;
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.CompressionMethodPriority.algorithm_priority[i] = va_arg( _ap, CompressionMethod);
+		state->gnutls_internals.CompressionMethodPriority.algorithm_priority[i] = list[i];
 	}
-	va_end(ap);
 	return 0;
 }
 
 /**
   * gnutls_protocol_set_priority - Sets the priority on the protocol versions supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @GNUTLS_LIST: is a 0 terminated list of GNUTLS_Version elements.
+  * @list: is a 0 terminated list of GNUTLS_Version elements.
   *
   * Sets the priority on the protocol versions supported by gnutls.
   * Priority is higher for protocols specified before others.
@@ -218,23 +179,16 @@ int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
   * not use the protocols's priority except for disabling
   * protocols that were not specified.
   **/
-int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
-	
-	va_list ap;
-	int i,num=0;
-	va_list _ap;
-	
-	va_start( ap, state);
+int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+GNUTLS_LIST _list = list;
+int num=0, i;
+GNUTLS_Version ver;
 
-#ifdef USE_VA_COPY
-	VA_COPY( _ap, ap);
-#else
-	_ap = ap;
-#endif
-
-	while( va_arg( ap, int) != 0) {
+	while( *_list != 0) {
 		num++;
-	}
+		++_list;
+	} 
+
 	
 	if (state->gnutls_internals.ProtocolPriority.algorithm_priority!=NULL)
 		gnutls_free(state->gnutls_internals.ProtocolPriority.algorithm_priority);
@@ -248,12 +202,16 @@ int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST) {
 	
 	state->gnutls_internals.ProtocolPriority.algorithms = num;
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = va_arg( _ap, GNUTLS_Version);
+		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = list[i];
 	}
-	va_end(ap);
 
-	/* set the current version to the lowest
+	/* set the current version to the first chosen by the peer.
 	 */
-	_gnutls_set_current_version( state, state->gnutls_internals.ProtocolPriority.algorithm_priority[num-1]);
+	ver = _gnutls_version_lowest( state);
+	if (ver < 0) {
+		gnutls_assert();
+		return GNUTLS_E_UNKNOWN_ERROR;
+	}
+	_gnutls_set_current_version( state, ver);
 	return 0;
 }

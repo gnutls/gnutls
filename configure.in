@@ -186,56 +186,6 @@ AC_CHECK_HEADERS(utime.h errno.h sys/time.h time.h)
 AC_CHECK_FUNCS(bzero memset utime memmove bcopy,,)
 
 
-dnl Defines USE_VA_COPY
-AC_MSG_CHECKING([whether we have va_copy or __va_copy])
-AC_TRY_RUN( 
-changequote(<<, >>)dnl
-<<
-#ifdef HAVE_STDARG_H
-# include <stdarg.h> 
-#endif
-int main() {
-va_list a,b;
-va_copy(a, b);  
-return 0;
-}
->>
-changequote([, ])dnl
-,
-dnl	************ HAVE_VA_COPY
-AC_DEFINE(HAVE_VA_COPY)
-AC_DEFINE(USE_VA_COPY)
-AC_MSG_RESULT(va_copy)
-,
-dnl	 ************ NO VA_COPY
- dnl Defines USE_VA_COPY
- AC_TRY_RUN(
- changequote(<<, >>)dnl
- <<#ifdef HAVE_STDARG_H
-   # include <stdarg.h> 
-   #endif
- int main() {
- va_list a,b;
- __va_copy(a, b);  
- return 0;
- }
- >>
- changequote([, ])dnl
- ,
- dnl	************ HAVE___VA_COPY
- AC_DEFINE(HAVE___VA_COPY)
- AC_DEFINE(USE_VA_COPY)
- AC_MSG_RESULT(__va_copy)
- ,
- dnl	 ************ NO __VA_COPY
- AC_MSG_RESULT(none)
- )
-,
-dnl **** CROSS COMPILING
-AC_MSG_RESULT(none)
-)
-
-
 
 AC_MSG_RESULT([***
 *** Detecting system's parameters...

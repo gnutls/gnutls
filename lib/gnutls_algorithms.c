@@ -438,7 +438,7 @@ const char *gnutls_mac_get_name(MACAlgorithm algorithm)
 
 	/* avoid prefix */
 	GNUTLS_HASH_ALG_LOOP(ret =
-			     p->name + sizeof("GNUTLS_") - 1);
+			     p->name + sizeof("GNUTLS_MAC_") - 1);
 
 	return ret;
 }
@@ -495,7 +495,7 @@ const char *gnutls_compression_get_name(CompressionMethod algorithm)
 
 	/* avoid prefix */
 	GNUTLS_COMPRESSION_ALG_LOOP(ret =
-				    p->name + sizeof("GNUTLS_") -
+				    p->name + sizeof("GNUTLS_COMP_") -
 					   1);
 
 	return ret;
@@ -613,7 +613,7 @@ const char *gnutls_cipher_get_name(BulkCipherAlgorithm algorithm)
 	char *ret = NULL;
 
 	/* avoid prefix */
-	GNUTLS_ALG_LOOP(ret = p->name + sizeof("GNUTLS_") - 1);
+	GNUTLS_ALG_LOOP(ret = p->name + sizeof("GNUTLS_CIPHER_") - 1);
 
 	return ret;
 }

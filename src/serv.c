@@ -75,6 +75,11 @@ GNUTLS_STATE initialize_state()
 {
 	GNUTLS_STATE state;
 	int ret;
+	int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
+	int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0 };
+	int cipher_priority[] = { GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0};
+	int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
+	int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
 	gnutls_init(&state, GNUTLS_SERVER);
 	if ((ret = gnutls_db_set_name(state, "gnutls-rsm.db")) < 0)
@@ -83,17 +88,17 @@ GNUTLS_STATE initialize_state()
 	/* null cipher is here only for debuging 
 	 * purposes.
 	 */
-	gnutls_cipher_set_priority(state, GNUTLS_CIPHER_NULL, 
-				   GNUTLS_CIPHER_RIJNDAEL_CBC, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR, 0);
-	gnutls_compression_set_priority(state, GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0);
-	gnutls_kx_set_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
-	gnutls_protocol_set_priority( state, GNUTLS_TLS1, GNUTLS_SSL3, 0);
+	gnutls_cipher_set_priority(state, cipher_priority);
+	gnutls_compression_set_priority(state, comp_priority);
+	gnutls_kx_set_priority(state, kx_priority);
+	gnutls_protocol_set_priority( state, protocol_priority);
+	gnutls_mac_set_priority(state, mac_priority);
 	
 	gnutls_set_cred(state, GNUTLS_ANON, dh_cred);
 	gnutls_set_cred(state, GNUTLS_SRP, srp_cred);
 	gnutls_set_cred(state, GNUTLS_X509PKI, x509_cred);
 
-	gnutls_mac_set_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
+	gnutls_mac_set_priority(state, mac_priority);
 
 	gnutls_x509pki_server_set_cert_request( state, GNUTLS_CERT_REQUEST);
 

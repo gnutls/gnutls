@@ -98,6 +98,7 @@ void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_SOCKET_PTR ptr) {
   **/
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
+int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 
 	*state = gnutls_calloc(1, sizeof(struct GNUTLS_STATE_INT));
 	if (*state==NULL) return GNUTLS_E_MEMORY_ERROR;
@@ -116,7 +117,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	gnutls_protocol_set_priority( *state, GNUTLS_TLS1, 0); /* default */
+	gnutls_protocol_set_priority( *state, default_protocol_list); /* default */
 	
 	(*state)->gnutls_key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
 	if ( (*state)->gnutls_key == NULL) {
