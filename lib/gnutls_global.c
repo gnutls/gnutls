@@ -168,6 +168,11 @@ int gnutls_global_init( void)
 	_gnutls_init++;
 
 	if (gcry_control( GCRYCTL_ANY_INITIALIZATION_P) == 0) {
+		if (gcry_check_version(GNUTLS_GCRYPT_VERSION)==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
+		}
+
 		/* for gcrypt in order to be able to allocate memory */
 		gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
 		
@@ -183,11 +188,6 @@ int gnutls_global_init( void)
 #endif
 	}
 
-	if (gcry_check_version(GNUTLS_GCRYPT_VERSION)==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
-	}
-	
 	result = _gnutls_register_rc2_cipher();
 	if (result < 0) {
 		gnutls_assert();
