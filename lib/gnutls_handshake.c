@@ -2325,7 +2325,6 @@ int _gnutls_remove_unwanted_ciphersuites(gnutls_session session,
 	if (cert == NULL) {
 		/* No certificate was found 
 		 */
-		gnutls_assert();
 		alg_size = 0;
 		alg = NULL;
 	} else {

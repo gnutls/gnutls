@@ -75,12 +75,19 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 	uint8 *data_n, *data_s;
 	uint8 *data_g, *username;
 	SRP_PWD_ENTRY *pwd_entry;
-	int err;
 	SRP_SERVER_AUTH_INFO info;
 	ssize_t data_size;
 	size_t n_b;
 	uint8 *data_b;
-	
+
+	if (state->security_parameters.extensions.srp_username[0] == 0) {
+		/* The peer didn't send a valid SRP extension with the
+		 * SRP username.
+		 */
+		gnutls_assert();
+		return GNUTLS_E_EMPTY_SRP_USERNAME;
+	}
+
 	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT), 1)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -88,7 +95,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session state, opaque ** data)
 
 	info = _gnutls_get_auth_info( state);
 	username = info->username;
-	
+
 	_gnutls_str_cpy( username, MAX_SRP_USERNAME, state->security_parameters.extensions.srp_username);
 
 	ret = _gnutls_srp_pwd_read_entry( state, username, &pwd_entry);

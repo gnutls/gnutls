@@ -47,7 +47,7 @@ int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, size_t _d
 
 			if ( sizeof( state->security_parameters.extensions.srp_username) <= len) {
 				gnutls_assert();
-				return GNUTLS_E_MEMORY_ERROR;
+				return GNUTLS_E_ILLEGAL_SRP_USERNAME;
 			}
 			memcpy( state->security_parameters.extensions.srp_username, &data[1], len);
 			state->security_parameters.extensions.srp_username[len]=0; /* null terminated */

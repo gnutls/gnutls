@@ -70,7 +70,7 @@ char *x509_cafile;
 char *x509_crlfile = NULL;
 static int x509ctype;
 
-static gnutls_srp_client_credentials cred;
+static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
 static gnutls_certificate_credentials xcred;
 
@@ -143,8 +143,7 @@ static gnutls_session init_tls_session( const char* hostname)
    gnutls_dh_set_prime_bits(session, 512);
 
    gnutls_credentials_set(session, GNUTLS_CRD_ANON, anon_cred);
-   if (srp_username != NULL)
-      gnutls_credentials_set(session, GNUTLS_CRD_SRP, cred);
+   gnutls_credentials_set(session, GNUTLS_CRD_SRP, srp_cred);
    gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
    /* send the fingerprint */
@@ -362,8 +361,7 @@ int main(int argc, char **argv)
       socket_bye(&hd);
 
 
-   if (srp_username != NULL)
-      gnutls_srp_free_client_credentials(cred);
+   gnutls_srp_free_client_credentials(srp_cred);
    gnutls_certificate_free_credentials(xcred);
    gnutls_anon_free_client_credentials(anon_cred);
 
@@ -642,12 +640,12 @@ int ret;
 /*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 
    /* SRP stuff */
-   if (srp_username != NULL) {
-      if (gnutls_srp_allocate_client_credentials(&cred) < 0) {
-	 fprintf(stderr, "SRP authentication error\n");
-      }
+   if (gnutls_srp_allocate_client_credentials(&srp_cred) < 0) {
+	fprintf(stderr, "SRP authentication error\n");
+   }
 
-      if ((ret=gnutls_srp_set_client_credentials(cred, srp_username, srp_passwd)) < 0) {
+   if (srp_username != NULL) {
+      if ((ret=gnutls_srp_set_client_credentials(srp_cred, srp_username, srp_passwd)) < 0) {
 	 fprintf(stderr, "SRP credentials set error [%d]\n", ret);
       }
    }

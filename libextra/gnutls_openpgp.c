@@ -911,8 +911,7 @@ gnutls_openpgp_extract_key_name_string( const gnutls_datum *cert,
     CDK_KBNODE knode = NULL, ctx = NULL, p;
     CDK_PACKET *pkt = NULL;
     cdkPKT_user_id *uid = NULL;
-    char *email;
-    int pos = 0, pos1 = 0, pos2 = 0;
+    int pos = 0;
     size_t size = 0;
     int rc = 0;
 

@@ -369,7 +369,7 @@ unsigned char rndsuffix[5];
 	_gnutls_get_random( rndsuffix, sizeof(rndsuffix), GNUTLS_WEAK_RANDOM);
 	sprintf( rnduser, "__invalid%x%x%x%x", rndsuffix[0], 
 		rndsuffix[1], rndsuffix[2], rndsuffix[3]);
-	entry->salt.size = (rndsuffix[4] % 10) + 7;
+	entry->salt.size = (rndsuffix[4] % 10) + 9;
 
 	entry->username = gnutls_strdup(rnduser);
 	if (entry->username == NULL) {
