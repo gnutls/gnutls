@@ -25,6 +25,7 @@ int main()
     const char *_name;
     error_name names_to_sort[400];	/* up to 400 names  */
 
+    printf("@node Error codes and descriptions\n");
     printf("@chapter Error codes and descriptions\n");
     printf("@cindex Error codes\n");
     printf("\n");
