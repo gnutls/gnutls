@@ -44,7 +44,7 @@ GNUTLS_KXAlgorithm kx;
 		   /* in case of X509 PKI
 		    */
 			cert_list = gnutls_certificate_get_peers( state, &cert_list_size);
-			status = gnutls_x509pki_verify_peers( state);
+			status = gnutls_certificate_verify_peers( state);
 			
 			switch( status) {
 			case GNUTLS_CERT_NOT_TRUSTED:

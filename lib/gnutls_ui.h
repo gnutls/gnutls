@@ -81,7 +81,7 @@ const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state);
 int gnutls_certificate_get_ours_index(GNUTLS_STATE state);
 
 int gnutls_certificate_client_get_request_status(  GNUTLS_STATE);
-int gnutls_x509pki_verify_peers( GNUTLS_STATE);
+int gnutls_certificate_verify_peers( GNUTLS_STATE);
 
 int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size);
 int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size);

@@ -64,7 +64,8 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    At the time of writing, TLS [TLS] uses the X.509 protocols, to
    provide certificate services. However these protocols, are limited
    to hierarchical key management. This leads to a problem when 
-   de-centralized application protocols are to be supported.  
+   applications, which do not have the concept of a central authority,
+   are to be supported.  
 
    OpenPGP keys (sometimes called OpenPGP certificates), provide 
    security services for electronic communications. They are widely

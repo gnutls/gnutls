@@ -27,7 +27,7 @@
 #include <gnutls_global.h>
 #include "debug.h"
 #include <gnutls_str.h>
-
+#include <gnutls_x509.h>
 
 /* Here we only extract the KeyUsage field
  */

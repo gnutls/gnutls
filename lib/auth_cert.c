@@ -38,11 +38,13 @@
 #include <x509_extensions.h>
 #include <gnutls_state.h>
 #include <gnutls_pk.h>
+#include <gnutls_x509.h>
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (CERTIFICATE_AUTH_INFO)
  */
-int _gnutls_copy_x509_auth_info(CERTIFICATE_AUTH_INFO info, gnutls_cert * cert,
+static
+int _gnutls_copy_certificate_auth_info(CERTIFICATE_AUTH_INFO info, gnutls_cert * cert,
 				int ncerts)
 {
 	/* Copy peer's information to AUTH_INFO
@@ -595,7 +597,7 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	    peer_certificate_list[0].subject_pk_algorithm;
 
 	if ((ret =
-	     _gnutls_copy_x509_auth_info(info, peer_certificate_list,
+	     _gnutls_copy_certificate_auth_info(info, peer_certificate_list,
 					 peer_certificate_list_size)) <
 	    0) {
 		gnutls_assert();

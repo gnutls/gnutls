@@ -19,6 +19,7 @@ typedef struct {
 			 * row (should be 1 for OpenPGP keys).
 			 */
 	int ncerts;     /* contains the number of columns in cert_list.
+	                 * This is the same with the number of pkeys.
 			 */
 
 	gnutls_private_key * pkey; 
@@ -56,8 +57,6 @@ typedef struct CERTIFICATE_AUTH_INFO_INT {
 } *CERTIFICATE_AUTH_INFO;
 
 typedef struct CERTIFICATE_AUTH_INFO_INT CERTIFICATE_AUTH_INFO_INT;
-
-int _gnutls_copy_x509_client_auth_info( CERTIFICATE_AUTH_INFO info, gnutls_cert* cert, CertificateStatus verify);
 
 /* AUTH X509 functions */
 int _gnutls_gen_x509_server_certificate(GNUTLS_STATE, opaque **);

@@ -129,15 +129,15 @@ int main()
       fprintf(stderr, "global state initialization error\n");
       exit(1);
    }
-   if (gnutls_certificate_allocate_server_sc(&x509_cred, 1) < 0) {
+   if (gnutls_certificate_allocate_server_sc(&x509_cred) < 0) {
       fprintf(stderr, "memory error\n");
       exit(1);
    }
-   if (gnutls_x509pki_set_server_trust_file(x509_cred, CAFILE, CRLFILE) < 0) {
+   if (gnutls_certificate_set_x509_trust_file(x509_cred, CAFILE, CRLFILE) < 0) {
       fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
       exit(1);
    }
-   if (gnutls_x509pki_set_server_key_file(x509_cred, CERTFILE, KEYFILE) < 0) {
+   if (gnutls_certifcate_set_x509_key_file(x509_cred, CERTFILE, KEYFILE) < 0) {
       fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
       exit(1);
    }

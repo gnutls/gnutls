@@ -256,22 +256,22 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	if (gnutls_certificate_allocate_server_sc(&x509_cred, 2) < 0) {
+	if (gnutls_certificate_allocate_server_sc(&x509_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 
-	if (gnutls_x509pki_set_trust_file( x509_cred, CAFILE, CRLFILE) < 0) {
+	if (gnutls_certificate_set_x509_trust_file( x509_cred, CAFILE, CRLFILE) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have ca.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_x509pki_set_key_file( x509_cred, CERTFILE1, KEYFILE1) < 0) {
+	if (gnutls_certificate_set_x509_key_file( x509_cred, CERTFILE1, KEYFILE1) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}
 
-	if (gnutls_x509pki_set_key_file( x509_cred, CERTFILE2, KEYFILE2) < 0) {
+	if (gnutls_certificate_set_x509_key_file( x509_cred, CERTFILE2, KEYFILE2) < 0) {
 		fprintf(stderr, "X509 PARSE ERROR\nDid you have key.pem and cert.pem?\n");
 		exit(1);
 	}

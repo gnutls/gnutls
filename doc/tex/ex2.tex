@@ -36,13 +36,13 @@ int main()
       exit(1);
    }
    /* X509 stuff */
-   if (gnutls_certificate_allocate_client_sc(&xcred, 0) < 0) {  /* no client private key */
+   if (gnutls_certificate_allocate_client_sc(&xcred) < 0) {  
       fprintf(stderr, "memory error\n");
       exit(1);
    }
    /* set's the trusted cas file
     */
-   gnutls_x509pki_set_client_trust_file(xcred, CAFILE, CRLFILE);
+   gnutls_certificate_set_x509_trust_file(xcred, CAFILE, CRLFILE);
 
    /* connects to server 
     */

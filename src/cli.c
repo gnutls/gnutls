@@ -133,14 +133,14 @@ int main(int argc, char** argv)
 	}
 
 	/* X509 stuff */
-	if (gnutls_certificate_allocate_client_sc( &xcred, 2) < 0) {  /* space for 2 certificates */
+	if (gnutls_certificate_allocate_client_sc( &xcred) < 0) {  /* space for 2 certificates */
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-	gnutls_x509pki_set_trust_file( xcred, CAFILE, CRLFILE);
-	gnutls_x509pki_set_key_file( xcred, CLICERTFILE1, CLIKEYFILE1);
-	gnutls_x509pki_set_key_file( xcred, CLICERTFILE2, CLIKEYFILE2);
-/*	gnutls_certificate_client_callback_callback( xcred, cert_callback); */
+	gnutls_certificate_set_x509_trust_file( xcred, CAFILE, CRLFILE);
+	gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE1, CLIKEYFILE1);
+	gnutls_certificate_set_x509_key_file( xcred, CLICERTFILE2, CLIKEYFILE2);
+/*	gnutls_certificate_client_callback_func( xcred, cert_callback); */
 
 	/* SRP stuff */
 	if (gnutls_srp_allocate_client_sc( &cred)<0) {
