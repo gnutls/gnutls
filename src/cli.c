@@ -442,7 +442,8 @@ int main(int argc, char **argv)
 	 do {
 	    if ( crlf != 0) {
 	        char* b=strchr( buffer, '\n');
-	    	strcpy( b, "\r\n");
+	        if (b!=NULL)
+		    	strcpy( b, "\r\n");
 	    }
 	    	
 	    ret = gnutls_record_send(state, buffer, strlen(buffer));
