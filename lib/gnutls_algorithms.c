@@ -847,8 +847,12 @@ const char *_gnutls_cipher_suite_get_name(GNUTLS_CipherSuite suite)
   * @cipher_algorithm: is a cipher algorithm
   * @mac_algorithm: is a MAC algorithm
   *
-  * Returns a string that contains the name 
-  * of the specified MAC algorithm.
+  * Returns a string that contains the name of a TLS
+  * cipher suite, specified by the given algorithms.
+  *
+  * Note that the full cipher suite name must be prepended
+  * by TLS or SSL depending of the protocol in use.
+  *
   **/
 const char *gnutls_cipher_suite_get_name(GNUTLS_KXAlgorithm kx_algorithm,
 	GNUTLS_BulkCipherAlgorithm cipher_algorithm, GNUTLS_MACAlgorithm mac_algorithm)
