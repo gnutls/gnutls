@@ -41,9 +41,15 @@ int _gnutls_valid_version(GNUTLS_STATE state, int major, int minor)
 	return 1;
 }
 
+int gnutls_is_secure_memory(const void* mem) {
+	return 0;
+}
+
 /* This function initializes the state to null (null encryption etc...) */
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
+	gcry_set_allocation_handler(gnutls_malloc, secure_malloc,  gnutls_is_secure_memory, gnutls_realloc, free);
+
 	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
 	memset(*state, 0, sizeof(GNUTLS_STATE));
 	(*state)->security_parameters.entity = con_end;
