@@ -13,8 +13,7 @@ configure
 .cvsignore
 .cvsusers
 depcomp
-gnutls*.tar.gz
-gnutls*.tar.gz.sig
+gnutls*.tar.*
 INSTALL
 install-sh
 libtool
