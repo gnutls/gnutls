@@ -15,13 +15,17 @@ These functions accept a callback function as a parameter.
 The callback functions should return -1 on error and should set errno 
 appropriately.
 \par
-\gnutls{} currently only interprets the EINTR and EAGAIN errno values. 
-These values are usually used in non blocking IO and interrupted system calls.
-The corresponding values (GNUTLS\_E\_INTERRUPTED, GNUTLS\_E\_AGAIN) 
-will be returned to the caller of the gnutls function. \gnutls{} functions
-can be resumed (called again), if any of these values is returned.
+\gnutls{} currently only interprets the EINTR and EAGAIN errno values and
+returns the corresponding gnutls error codes GNUTLS\_E\_INTERRUPTED and
+GNUTLS\_E\_AGAIN.
+These values are usually returned by interrupted system calls, or 
+when non blocking IO is used. All \gnutls{} functions
+can be resumed (called again), if any of these error codes is returned.
+The error codes above refer to the system call, not the \gnutls{} function,
+since signals do not interrupt gnutls' functions.
+
 \par
-By default, if none of the above functions are called, gnutls will use
-the Berkeley Sockets functions \emph{recv()} and \emph{send()}. In this case
+By default, if the transport functions are not set, \gnutls{} will use
+the Berkeley Sockets functions. In this case
 gnutls will use some hacks in order for \emph{select()} to work, thus
 making easy to add \tls{} support to existing TCP/IP servers.

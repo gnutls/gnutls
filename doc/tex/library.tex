@@ -2,49 +2,52 @@
 
 \section{Description}
 \par
-In brief \gnutls{} can be described as a portable library which offers
+In brief \gnutls{} can be described as a library which offers
 an API to access secure communication protocols. These protocols provide
 privacy over insecure lines, and were designed to prevent 
 eavesdropping, tampering, or message forgery.
 
 \par
-Technically \gnutls{} is a library which implements the \tlsI{} and 
-\sslIII{} protocols. \tls{} stands for 'Transport Layer Security' and is the sucessor of \ssl{}, 
-the Secure Sockets Layer protocol designed by Netscape. 
-\tlsI{}\footnote{described in {\it RFC 2246}} is an Internet protocol,
-defined by {IETF}\footnote{IETF or Internet Engineering Task Force 
-is a large open international community of network
-designers, operators, vendors, and researchers concerned with the evolution of 
-the Internet architecture and the smooth operation of the Internet. It is open to any interested individual.}, 
-that provides confidentiality, and authentication layers over any reliable
-transport layer.
-The above protocols are implemented in a reentrant way. 
-This allows multiple threads of execution, without the need for critical 
-sections and locks. 
+Technically \gnutls{} is a portable ANSI {\bf C} based library which implements the 
+\tlsI{}\footnote{See section \ref{sec:tlsintro} on page \pageref{sec:tlsintro} for
+a more detailed description of the protocols.} and \sslIII{} protocols. 
+Important features of the \gnutls{} library include:
+
+\begin{itemize}
+\item Thread safety
+\item Support for both \tlsI{} and \sslIII{} protocols.
+\item Support for both {\bf X.509} and {\bf OpenPGP} certificates.
+\item Support for basic parsing and verification of certificates
+\item Support for {\bf SRP} for \tls{} authentication.
+\item Support for \tls{} {\bf Extension mechanism}.
+\item Support for \tls{} {\bf Compression Methods}.
+\end{itemize}
+
+Additionaly \gnutls{} provides an emulation API for the widely used
+OpenSSL\footnote{\htmladdnormallink{http://www.openssl.org/}{http://www.openssl.org/}} 
+library, to ease integration with existing applications.
+
+\par 
+\gnutls{} consists of three
+independent parts, namely the ``TLS protocol part'', the ``Certificate part'', and 
+the ``Crypto backend'' part.
+The `TLS protocol part' is the actual protocol implementation, and is entirely
+implemented within the \gnutls{} library.
+The `Certificate part' consists of the certificate parsing, and verification
+functions which is partially implemented in the \gnutls{} library. The
+Libtasn1\footnote{\htmladdnormallink{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/libtasn1/}{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/libtasn1/}}
+a library which offers ASN.1 parsing capabilities, is used for the
+X.509 certificate parsing functions, and
+Opencdk\footnote{\htmladdnormallink{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/opencdk/}}
+is used for the OpenPGP key support in \gnutls{}.
+The `Crypto backend' is provided by the 
+libgcrypt\footnote{\htmladdnormallink{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}}
+library. 
 
 \par
 See \htmladdnormallink{http://www.gnutls.org/}{http://www.gnutls.org/}
 and \htmladdnormallink{http://www.gnu.org/software/gnutls/}{http://www.gnu.org/software/gnutls/} 
 for updated versions of the \gnutls{} software and this document.
-
-\par 
-\gnutls{} is based on the fine 
-libgcrypt\htmladdnormallink{\footnote{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}}{ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/}
-crypto library. This library should be used, if direct access to crypto
-algorithms is required.
-
-\section{Current state}
-
-Currently \gnutls{} implements:
-\begin{itemize}
-\item the \tlsI{} and \sslIII{} protocols.
-\item {\bf X.509} Public Key Infrastructure.
-\item {\bf OpenPGP} Public Key Infrastructure.
-\item {\bf SRP} for \tls{} authentication.
-\item \tls{} {\bf Extension mechanism}.
-\item \tls{} {\bf Compression}.
-\end{itemize}
-
 
 \section{General Idea}
 % explain how it works
@@ -68,8 +71,8 @@ the global structure and is called after the program has permanently finished
 using \gnutls{}.
 
 \par
-The credentials structure is used within some authentication methods,
-such as certificate authentication\footnote{see section \ref{certificate} on \pageref{certificate}}.
+The credentials structure is used by some authentication methods,
+such as certificate authentication\footnote{see section \ref{certificate} on page \pageref{certificate}}.
 A credentials structure may contain certificates, private keys, temporary parameters 
 for diffie hellman or RSA key exchange, and other stuff that may be shared
 by several TLS sessions. 
