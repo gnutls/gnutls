@@ -171,7 +171,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
     {"MD5", OID_MD5, GNUTLS_MAC_MD5},
     {"MD2", OID_MD2, 0/*GNUTLS_MAC_MD2*/},
     {"RIPEMD160", OID_RMD160, GNUTLS_MAC_RMD160},
-    {"NULL", "", GNUTLS_MAC_NULL},
+    {"NULL", NULL, GNUTLS_MAC_NULL},
     {0, 0, 0}
 };
 
@@ -1484,9 +1484,11 @@ const char *_gnutls_x509_sign_to_oid(gnutls_pk_algorithm_t pk,
     gnutls_mac_algorithm_t mac)
 {
 gnutls_sign_algorithm_t sign;
-const char* ret;
+const char* ret = NULL;
 
     sign = _gnutls_x509_pk_to_sign(pk, mac);
+    if (sign == GNUTLS_SIGN_UNKNOWN)
+        return NULL;
 
     GNUTLS_SIGN_ALG_LOOP(ret=p->oid);
     return ret;

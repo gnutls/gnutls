@@ -633,7 +633,7 @@ void generate_self_signed(void)
     print_certificate_info(crt, stderr, 0);
 
     fprintf(stderr, "\n\nSigning certificate...\n");
-fprintf(stderr, "DIG: %d\n",dig);
+
     result = gnutls_x509_crt_sign2(crt, crt, key, dig, 0);
     if (result < 0) {
 	fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
@@ -679,7 +679,6 @@ void generate_signed_certificate(void)
 
     fprintf(stderr, "\n\nSigning certificate...\n");
 
-fprintf(stderr, "DIG: %d\n",dig);
     result = gnutls_x509_crt_sign2(crt, ca_crt, ca_key, dig, 0);
     if (result < 0) {
 	fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
@@ -753,7 +752,6 @@ void update_signed_certificate(void)
 
     fprintf(stderr, "\n\nSigning certificate...\n");
 
-fprintf(stderr, "DIG: %d\n",dig);
     result = gnutls_x509_crt_sign2(crt, ca_crt, ca_key, dig, 0);
     if (result < 0) {
 	fprintf(stderr, "crt_sign: %s\n", gnutls_strerror(result));
