@@ -1,3 +1,25 @@
+2002-04-21 14:21  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_openpgp.c:
+
+	Adjust the code for the new OpenCDK version.  
+
+2002-04-21 11:22  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_buffers.c, gnutls_cipher.c, gnutls_cipher.h,
+	gnutls_compress.c, gnutls_compress.h, gnutls_compress_int.c,
+	gnutls_int.h, gnutls_record.c, gnutls_srp.c, gnutls_state.h:
+
+	Optimized memory handling in the record protocol.  
+
+2002-04-21 08:09  nmav <nmav@gnutls.org>
+
+	* lib/auth_srp.h, lib/gnutls_anon_cred.c, lib/gnutls_srp.c,
+	lib/gnutls_ui.c, src/cli.c, src/serv.c:
+
+	Added stubs when SRP or anonymous authentication are disabled, to
+	preserve binary compatibility 
+
 2002-04-19 17:53  nmav <nmav@gnutls.org>
 
 	* NEWS, doc/TODO, doc/tex/ex4.tex, lib/gnutls.h.in.in,
