@@ -105,6 +105,7 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session);
 
 int gnutls_certificate_client_get_request_status(gnutls_session);
 int gnutls_certificate_verify_peers(gnutls_session);
+int gnutls_certificate_verify_peers2(gnutls_session, unsigned int* status);
 
 int gnutls_pem_base64_encode(const char *header, const gnutls_datum * data,
 	char *result, size_t * result_size);

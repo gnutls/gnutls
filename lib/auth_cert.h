@@ -81,6 +81,8 @@ typedef struct {
 	unsigned int    verify_flags; /* flags to be used at 
 				       * certificate verification.
 				       */
+	unsigned int    verify_depth;
+	unsigned int    verify_bits;
 
 			/* holds a sequence of the
 			 * RDNs of the CAs above.

@@ -227,6 +227,9 @@ int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials * res
 
 	if (*res == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
+		
+	(*res)->verify_bits = DEFAULT_VERIFY_BITS;
+	(*res)->verify_depth = DEFAULT_VERIFY_DEPTH;
 
 	return 0;
 }
@@ -482,6 +485,11 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
 	
+	if (info->ncerts > cred->verify_depth) {
+		gnutls_assert();
+		return GNUTLS_E_CONSTRAINT_ERROR;
+	}
+	
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
 	 */
@@ -509,6 +517,59 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 }
 
 /**
+  * gnutls_certificate_verify_peers2 - This function returns the peer's certificate verification status
+  * @session: is a gnutls session
+  * @status: is the output of the verification
+  *
+  * This function will try to verify the peer's certificate and return its status (trusted, invalid etc.).
+  * The value of @status should be one or more of the gnutls_certificate_status_t
+  * enumerated elements bitwise or'd.
+  * However you must also check the peer's name in order to check if the verified certificate belongs to the
+  * actual peer.
+  *
+  * Returns a negative error code on error and zero on success.
+  *
+  * This is the same as gnutls_x509_verify_certificate().
+  *
+  **/
+int gnutls_certificate_verify_peers2(gnutls_session session, unsigned int *status)
+{
+    CERTIFICATE_AUTH_INFO info;
+    int ret;
+    
+    CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
+
+    info = _gnutls_get_auth_info(session);
+    if (info == NULL) {
+	return GNUTLS_E_NO_CERTIFICATE_FOUND;
+    }
+
+    if (info->raw_certificate_list == NULL || info->ncerts == 0)
+	return GNUTLS_E_NO_CERTIFICATE_FOUND;
+
+    switch (gnutls_certificate_type_get(session)) {
+    case GNUTLS_CRT_X509: {
+	ret = _gnutls_x509_cert_verify_peers(session);
+	*status = ret;
+
+	if (ret < 0)
+	    return ret;
+	return 0;
+    }
+    case GNUTLS_CRT_OPENPGP: {
+	ret = _gnutls_openpgp_cert_verify_peers(session);
+	*status = ret;
+
+	if (ret < 0)
+	    return ret;
+	return 0;
+    }
+    default:
+	return GNUTLS_E_INVALID_REQUEST;
+    }
+}
+
+/**
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
   * @session: is a gnutls session
   *
@@ -517,33 +578,20 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
   * actual peer.
   *
   * The return value should be one or more of the gnutls_certificate_status
-  * enumerated elements bitwise or'd.
+  * enumerated elements bitwise or'd, or a negative error code on error.
   *
   * This is the same as gnutls_x509_verify_certificate().
   *
   **/
 int gnutls_certificate_verify_peers(gnutls_session session)
 {
-	CERTIFICATE_AUTH_INFO info;
+unsigned int status;
+int ret;
 
-	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
-
-	info = _gnutls_get_auth_info(session);
-	if (info == NULL) {
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-	}
+	ret = gnutls_certificate_verify_peers2( session, &status);
+	if (ret < 0) return ret;
 	
-	if (info->raw_certificate_list == NULL || info->ncerts == 0)
-		return GNUTLS_E_NO_CERTIFICATE_FOUND;
-
-	switch( gnutls_certificate_type_get( session)) {
-		case GNUTLS_CRT_X509:
-			return _gnutls_x509_cert_verify_peers( session);
-		case GNUTLS_CRT_OPENPGP:
-			return _gnutls_openpgp_cert_verify_peers( session);
-		default:
-			return GNUTLS_E_INVALID_REQUEST;
-	}
+	return status;
 }
 
 /**

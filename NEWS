@@ -3,6 +3,9 @@ Version 1.0.17
   latest (yet unreleased) draft. Unfortunately this breaks
   compatibility with previous versions.
 - Changed the makefiles to be more portable.
+- Added some default limits in the verification of certificate
+  chains, to avoid denial of service attacks. Also added 
+  gnutls_certificate_set_verify_limits() to override them.
 
 Version 1.0.16 (10/07/2004)
 - Do not free the SRP (prime and generator) parameters obtained from the 

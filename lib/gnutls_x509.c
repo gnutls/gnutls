@@ -53,6 +53,29 @@
  * some x509 certificate parsing functions.
  */
 
+/* Check if the number of bits of the key in the certificate
+ * is unacceptable.
+ */
+inline 
+static int check_bits( gnutls_x509_crt crt, unsigned int max_bits)
+{
+int ret;
+unsigned int bits;
+
+    ret = gnutls_x509_crt_get_pk_algorithm( crt, &bits);
+    if (ret < 0) {
+    	gnutls_assert();
+    	return ret;
+    }
+
+    if ( bits > max_bits) {
+        gnutls_assert();
+        return GNUTLS_E_CONSTRAINT_ERROR;
+    }
+    
+    return 0;
+}
+
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) { \
 	if (peer_certificate_list[x]) \
 		gnutls_x509_crt_deinit(peer_certificate_list[x]); \
@@ -93,6 +116,12 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
+	
+	if (info->ncerts > cred->verify_depth) {
+		gnutls_assert();
+		return GNUTLS_E_CONSTRAINT_ERROR;
+	}
+		
 
 	/* generate a list of gnutls_certs based on the auth info
 	 * raw certs.
@@ -117,6 +146,13 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
 		     gnutls_x509_crt_import(peer_certificate_list[i],
 				&info->raw_certificate_list[i], 
 				GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			gnutls_assert();
+			CLEAR_CERTS;
+			return ret;
+		}
+
+		ret = check_bits( peer_certificate_list[i], cred->verify_bits);
 		if (ret < 0) {
 			gnutls_assert();
 			CLEAR_CERTS;

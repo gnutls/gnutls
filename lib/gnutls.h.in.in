@@ -363,7 +363,8 @@ void gnutls_certificate_free_crls(gnutls_certificate_credentials sc);
 void gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params);
 void gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
 void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials res, unsigned int flags);
-
+void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials res, unsigned int max_bits,
+    unsigned int max_depth);
 
 int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials res, const char* CAFILE, 
 	gnutls_x509_crt_fmt);
