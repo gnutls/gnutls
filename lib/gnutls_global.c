@@ -45,12 +45,12 @@ extern const static_asn pkcs1_asn1_tab[];
 extern const static_asn pkix_asn1_tab[];
 
 
-typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
-typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
+typedef ssize_t (*PULL_FUNC)(SOCKET, void*, size_t);
+typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
 typedef void (*LOG_FUNC)( const char*);
 
-RECV_FUNC _gnutls_recv_func;
-SEND_FUNC _gnutls_send_func;
+PULL_FUNC _gnutls_pull_func;
+PUSH_FUNC _gnutls_push_func;
 LOG_FUNC _gnutls_log_func;
 
 static node_asn *PKIX1_ASN;
@@ -65,37 +65,37 @@ node_asn* _gnutls_get_pkcs() {
 }
 
 /**
-  * gnutls_global_set_recv_func - This function sets the recv() function
-  * @recv_func: it's a recv(2) like function
+  * gnutls_global_set_pull_func - This function sets a read like function
+  * @pull_func: it's a function like read
   *
-  * This is the function were you set the recv() function gnutls
-  * is going to use. Normaly you may not use this function since
-  * the default (recv(2)) will probably be ok, unless you use
-  * some external library (like gnu pthreads), which provide
-  * a front end to this function. This function should be
-  * called once and after gnutls_global_init().
-  * RECV_FUNC is of the form, 
-  * ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
+  * This is the function where you set a function for gnutls 
+  * to receive data. Normaly, if you use berkeley style sockets,
+  * you may not use this function since the default (recv(2)) will 
+  * probably be ok.
+  * This function should be called once and after gnutls_global_init().
+  * PULL_FUNC is of the form, 
+  * ssize_t (*PULL_FUNC)(SOCKET, const void*, size_t);
   **/
-void gnutls_global_set_recv_func( RECV_FUNC recv_func) {
-	_gnutls_recv_func = recv_func;
+void gnutls_global_set_pull_func( PULL_FUNC pull_func) {
+	_gnutls_pull_func = pull_func;
 }
 
 /**
-  * gnutls_global_set_send_func - This function sets the send() function
-  * @send_func: it's a send(2) like function
+  * gnutls_global_set_push_func - This function sets the function to send data
+  * @push_func: it's a function like write
   *
-  * This is the function were you set the send() function gnutls
-  * is going to use. Normaly you may not use this function since
-  * the default (send(2)) will probably be ok, unless you use
-  * some external library (like gnu pthreads), which provide
-  * a front end to this function. This function should be
-  * called once and after gnutls_global_init().
-  * SEND_FUNC is of the form, 
-  * ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
+  * This is the function where you set a push function for gnutls
+  * to use in order to send data. If you are going to use berkeley style
+  * sockets, you may not use this function since
+  * the default (send(2)) will probably be ok. Otherwise you should
+  * specify this function for gnutls to be able to send data.
+  *  
+  * This function should be called once and after gnutls_global_init().
+  * PUSH_FUNC is of the form, 
+  * ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
   **/
-void gnutls_global_set_send_func( SEND_FUNC send_func) {
-	_gnutls_send_func = send_func;
+void gnutls_global_set_push_func( PUSH_FUNC push_func) {
+	_gnutls_push_func = push_func;
 }
 
 /**
@@ -149,8 +149,8 @@ int gnutls_global_init()
 
 	/* set default recv/send functions
 	 */
-	_gnutls_recv_func = recv;
-	_gnutls_send_func = send;
+	_gnutls_pull_func = NULL;
+	_gnutls_push_func = NULL;
 	gnutls_global_set_log_func( dlog);
 
 	/* initialize parser 

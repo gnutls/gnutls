@@ -1487,7 +1487,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	case STATE30:
 		ret =
 		    gnutls_recv_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1,
-				    &ch, 1, 0);
+				    &ch, 1);
 		STATE = STATE30;
 		if (ret <= 0) {
 			ERR("recv ChangeCipherSpec", ret);

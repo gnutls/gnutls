@@ -34,7 +34,7 @@ that provides confidentiality, and authentication layers over a {reliable
 transport layer}\footnote{TLS is mostly used over {\emph TCP/IP} although this is not restrictive, you may
 use it over any reliable transport layer.}. \gnutls implements the
 above protocols in reentrant way in order to be used in multiple threads of 
-execution (without the need for Critical Sections).
+execution (without the need for Critical Sections and locks).
 
 \par
 Currently \gnutls implements:
@@ -70,6 +70,8 @@ The following authentication schemas are supported in \gnutls:
 \input{ciphersuites}
 
 \input{resumedb}
+
+\input{translayer}
 
 \section{Client Examples}
 This section contains examples of TLS and SSL clients, using \gnutls. 

@@ -109,8 +109,8 @@ int gnutls_is_fatal_error( int error);
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
 
-ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags);
-ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags);
+#define gnutls_send gnutls_write
+#define gnutls_recv gnutls_read
 ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata);
 ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata);
 
@@ -216,11 +216,11 @@ void gnutls_global_deinit();
 int gnutls_dh_replace_params( gnutls_datum prime, gnutls_datum generator, int bits);
 int gnutls_dh_generate_params( gnutls_datum* prime, gnutls_datum* generator, int bits);
 
-typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
-typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
+typedef ssize_t (*PULL_FUNC)(SOCKET, void*, size_t);
+typedef ssize_t (*PUSH_FUNC)(SOCKET, const void*, size_t);
 typedef void (*LOG_FUNC)( const char*);
 
-void gnutls_global_set_send_func( SEND_FUNC send_func);
-void gnutls_global_set_recv_func( RECV_FUNC recv_func);
+void gnutls_global_set_push_func( PUSH_FUNC push_func);
+void gnutls_global_set_pull_func( PULL_FUNC pull_func);
 
 

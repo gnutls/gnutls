@@ -22,6 +22,9 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 
+/* This is the only file that uses the berkeley sockets API.
+ */
+
 #ifdef HAVE_ERRNO_H
 # include <errno.h>
 #endif
@@ -30,8 +33,8 @@
 # define EAGAIN EWOULDBLOCK
 #endif
 
-extern ssize_t (*_gnutls_recv_func)( SOCKET, void*, size_t, int);
-extern ssize_t (*_gnutls_send_func)( SOCKET,const void*, size_t, int);
+extern ssize_t (*_gnutls_pull_func)( SOCKET, void*, size_t);
+extern ssize_t (*_gnutls_push_func)( SOCKET,const void*, size_t);
 
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
@@ -141,8 +144,10 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 
 /* This function is like read. But it does not return -1 on error.
  * It does return gnutls_errno instead.
+ *
+ * Flags are only used if the default recv() function is being used.
  */
-static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
+static ssize_t _gnutls_read(SOCKET fd, void *iptr, size_t sizeOfPtr, int flags)
 {
 	size_t left;
 	ssize_t i=0;
@@ -154,7 +159,12 @@ static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 
 	left = sizeOfPtr;
 	while (left > 0) {
-		i = _gnutls_recv_func(fd, &ptr[i], left, flag);
+		
+		if (_gnutls_pull_func==NULL)
+			i = recv(fd, &ptr[i], left, flags);
+		else
+			i = _gnutls_pull_func(fd, &ptr[i], left);
+				
 		if (i < 0) {
 #ifdef READ_DEBUG
 			_gnutls_log( "READ: %d returned from %d, errno=%d\n", i, fd, errno);
@@ -165,7 +175,6 @@ static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 					_gnutls_log( "READ: returning %d bytes from %d\n", sizeOfPtr-left, fd);
 #endif
 					goto finish;
-					//return sizeOfPtr-left;
 				}
 				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 				else return GNUTLS_E_INTERRUPTED;
@@ -221,11 +230,11 @@ char *peekdata2;
 		peekdata2 = gnutls_malloc( RCVLOWAT);
 	
 	        /* this was already read by using MSG_PEEK - so it shouldn't fail */
-	        _gnutls_Read( cd, peekdata2, RCVLOWAT, 0); 
+	        _gnutls_read( cd, peekdata2, RCVLOWAT, 0); 
         
       		gnutls_free(peekdata2);
         } else {
-	        _gnutls_Read( cd, &peekdata1, RCVLOWAT, 0); 
+	        _gnutls_read( cd, &peekdata1, RCVLOWAT, 0); 
         }
 	state->gnutls_internals.have_peeked_data=0;
 
@@ -247,7 +256,7 @@ void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
  * This is not a general purpose function. It returns EXACTLY the data requested.
  *
  */
-ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, int flag, ContentType recv_type)
+ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, ContentType recv_type)
 {
 	ssize_t ret=0, ret2=0;
 	int min;
@@ -295,7 +304,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	/* read fresh data - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
 	if ( recvdata - recvlowat > 0) {
-		ret = _gnutls_Read( fd, &buf[min], recvdata - recvlowat, flag);
+		ret = _gnutls_read( fd, &buf[min], recvdata - recvlowat, 0);
 
 		/* return immediately if we got an interrupt or eagain
 		 * error.
@@ -305,7 +314,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	}
 
 	if (ret >= 0 && recvlowat > 0) {
-		ret2 = _gnutls_Read( fd, &buf[min+ret], recvlowat, MSG_PEEK|flag);
+		ret2 = _gnutls_read( fd, &buf[min+ret], recvlowat, MSG_PEEK);
 
 		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) 
 			return ret2;
@@ -379,7 +388,12 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 #endif
 	left = n;
 	while (left > 0) {
-		i = _gnutls_send_func(fd, &ptr[i], left, flags);
+		
+		if (_gnutls_push_func==NULL) 
+			i = send(fd, &ptr[i], left, flags);
+		else
+			i = _gnutls_push_func(fd, &ptr[i], left);
+
 		if (i == -1) {
 #if 0 /* currently this is not right, since the functions
        * above this, cannot handle interrupt, and eagain errors.
@@ -419,7 +433,7 @@ ssize_t _gnutls_handshake_send_int(int fd, GNUTLS_STATE state, ContentType type,
 
 	left = n;
 	while (left > 0) {
-		i = gnutls_send_int(fd, state, type, htype, &ptr[i], left, 0);
+		i = gnutls_send_int(fd, state, type, htype, &ptr[i], left);
 		if (i <= 0) {
 			return i;
 		}
@@ -441,7 +455,7 @@ ssize_t _gnutls_handshake_recv_int(int fd, GNUTLS_STATE state, ContentType type,
 
 	left = sizeOfPtr;
 	while (left > 0) {
-		i = gnutls_recv_int(fd, state, type, htype, &ptr[i], left, 0);
+		i = gnutls_recv_int(fd, state, type, htype, &ptr[i], left);
 		if (i < 0) {
 			return i;
 		} else {

@@ -55,13 +55,16 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
   * if there are pending data to socket buffer. Used only   
   * if you have changed the default low water value (default is 1).
   * Normally you will not need that function. 
-  * However, if you plan to use non standard recv() function you should set
-  * this to zero.
+  * This function is only usefull if using berkeley style sockets.
+  * Otherwise it does nothing.
+  *
   **/
 int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 	state->gnutls_internals.lowat = num;
 	return 0;
 }
+
+extern ssize_t (*_gnutls_pull_func)( SOCKET, void*, size_t);
 
 /**
   * gnutls_init - This function initializes the state to null (null encryption etc...).
@@ -101,7 +104,10 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
-	gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
+	if (_gnutls_pull_func==NULL)
+		gnutls_set_lowat((*state), DEFAULT_LOWAT); /* the default for tcp */
+	else
+		gnutls_set_lowat((*state), 0);
 
 	gnutls_set_max_handshake_data_buffer_size( (*state), MAX_HANDSHAKE_DATA_BUFFER_SIZE);
 
@@ -353,7 +359,7 @@ int gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDesc
 	_gnutls_log( "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
 #endif
 
-	if ( (ret = gnutls_send_int(cd, state, GNUTLS_ALERT, -1, data, 2, 0)) >= 0)
+	if ( (ret = gnutls_send_int(cd, state, GNUTLS_ALERT, -1, data, 2)) >= 0)
 		return 0;
 	else
 		return ret;
@@ -385,7 +391,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
 	ret = gnutls_send_alert(cd, state, GNUTLS_WARNING, GNUTLS_CLOSE_NOTIFY);
 
 	if ( how == GNUTLS_SHUT_RDWR && ret == 0) {
-		ret2 = gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0, 0); 
+		ret2 = gnutls_recv_int(cd, state, GNUTLS_ALERT, -1, NULL, 0); 
 		state->gnutls_internals.may_read = 1;
 	}
 	state->gnutls_internals.may_write = 1;
@@ -398,7 +404,7 @@ int gnutls_bye(SOCKET cd, GNUTLS_STATE state, CloseRequest how)
  * send (if called by the user the Content is specific)
  * It is intended to transfer data, under the current state.    
  */
-ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata, int flags)
+ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void *_data, size_t sizeofdata)
 {
 	uint8 *cipher;
 	int i, cipher_size;
@@ -456,7 +462,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return cipher_size; /* error */
 		}
 		
-		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
+		if (_gnutls_write(cd, cipher, cipher_size, 0) != cipher_size) {
 			gnutls_free( cipher);
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -493,7 +499,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			return cipher_size;
 		}
 		
-		if (_gnutls_write(cd, cipher, cipher_size, flags) != cipher_size) {
+		if (_gnutls_write(cd, cipher, cipher_size, 0) != cipher_size) {
 			gnutls_free(cipher);
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
@@ -528,7 +534,7 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 	_gnutls_log( "Record: Sent ChangeCipherSpec\n");
 #endif
 
-	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1, 0);
+	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
 
 }
 
@@ -552,10 +558,8 @@ static int _gnutls_check_recv_type( ContentType recv_type) {
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is Userdata only)
  * It is intended to receive data, under the current state.
- * flags is the sockets flags to use. Currently only MSG_DONTWAIT is
- * supported, and should be used together with MSG_WAITALL.
  */
-ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata, int flags)
+ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, char *data, size_t sizeofdata)
 {
 	uint8 *tmpdata;
 	int tmplen;
@@ -598,7 +602,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
 	 * must be set to non blocking mode
 	 */
-	if ( (ret = _gnutls_read_buffered(cd, state, &headers, header_size, flags, -1)) != header_size) {
+	if ( (ret = _gnutls_read_buffered(cd, state, &headers, header_size, -1)) != header_size) {
 		if (ret<0 && gnutls_is_fatal_error(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -690,7 +694,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 
 	/* check if we have that data into buffer. 
  	 */
-	if ( (ret = _gnutls_read_buffered(cd, state, &recv_data, header_size+length, flags, recv_type)) != length+header_size) {
+	if ( (ret = _gnutls_read_buffered(cd, state, &recv_data, header_size+length, recv_type)) != length+header_size) {
 		if (ret<0 && gnutls_is_fatal_error(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
@@ -999,47 +1003,6 @@ AlertDescription gnutls_get_last_alert( GNUTLS_STATE state) {
 }
 
 /**
-  * gnutls_send - sends to the peer the specified data
-  * @cd: is a connection descriptor
-  * @state: is a &GNUTLS_STATE structure.
-  * @data: contains the data to send
-  * @sizeofdata: is the length of the data
-  * @flags: contains the flags to pass to send() function.
-  *
-  * This function has the same semantics as send() has. The only
-  * difference is that is accepts a GNUTLS state. Currently flags cannot
-  * be anything except 0.
-  **/
-ssize_t gnutls_send(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata, int flags) {
-	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, flags);
-}
-
-/**
-  * gnutls_recv - receives data from the TLS connection
-  * @cd: is a connection descriptor
-  * @state: is a &GNUTLS_STATE structure.
-  * @data: contains the data to send
-  * @sizeofdata: is the length of the data
-  * @flags: contains the flags to pass to recv() function.
-  *
-  * This function has the same semantics as recv() has. The only
-  * difference is that is accepts a GNUTLS state. Flags are the flags
-  * passed to recv() and should be used with care in gnutls.  
-  * The only acceptable flag is currently MSG_DONTWAIT. In that case,
-  * if the socket is set to non blocking IO it will return GNUTLS_E_AGAIN,
-  * if there are no data in the socket. 
-  *
-  * If the recv() operation is interrupted then GNUTLS_E_INTERRUPTED, will be
-  * returned.
-  *
-  * Returns the number of bytes received, zero on EOF, or
-  * a negative error code.
-  **/
-ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata, int flags) {
-	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, flags);
-}
-
-/**
   * gnutls_write - sends to the peer the specified data
   * @cd: is a connection descriptor
   * @state: is a &GNUTLS_STATE structure.
@@ -1048,9 +1011,16 @@ ssize_t gnutls_recv(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata
   *
   * This function has the same semantics as write() has. The only
   * difference is that is accepts a GNUTLS state.
+  *
+  * If the EINTR is returned by the internal push function (write())
+  * then GNUTLS_E_INTERRUPTED, will be returned.
+  *
+  * Returns the number of bytes received, zero on EOF, or
+  * a negative error code.
+  *
   **/
 ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t sizeofdata) {
-	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, 0);
+	return gnutls_send_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
 
 /**
@@ -1066,5 +1036,5 @@ ssize_t gnutls_write(SOCKET cd, GNUTLS_STATE state, const void *data, size_t siz
   * a negative error code.
   **/
 ssize_t gnutls_read(SOCKET cd, GNUTLS_STATE state, void *data, size_t sizeofdata) {
-	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata, 0);
+	return gnutls_recv_int( cd, state, GNUTLS_APPLICATION_DATA, -1, data, sizeofdata);
 }
