@@ -19,6 +19,14 @@ implementation for the GNU project.
 
 
 ****************************
+COMPILATION ISSUES:
+
+Nothing special here. In case you are compiling for embedded systems
+you should check the configure options (that is run: 'configure --help'),
+and disable unneeded features of gnutls.
+
+
+****************************
 LICENSE ISSUES:
 
 Since the 0.4.2 version the gnutls library is covered under the GNU 
