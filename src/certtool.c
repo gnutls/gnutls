@@ -31,6 +31,7 @@
 #include <time.h>
 #include "certtool-gaa.h"
 #include <gnutls/pkcs12.h>
+#include <fileio.h>
 #include <unistd.h>
 
 static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all);
@@ -552,10 +553,21 @@ void generate_self_signed( void)
 	gnutls_x509_privkey key;
 	size_t size;
 	int result;
+	const char *uri;
 
 	fprintf(stderr, "Generating a self signed certificate...\n");
 
 	crt = generate_certificate( &key);
+
+	uri = read_str( "Enter the URI of the CRL distribution point: ");
+	if (uri) {
+		result = gnutls_x509_crt_set_crl_dist_points( crt, GNUTLS_SAN_URI,
+			uri, 0 /* all reasons */);
+		if (result < 0) {
+			fprintf(stderr, "crl_dist_points: %s\n", gnutls_strerror(result));
+			exit(1);
+		}
+	}
 
 	print_certificate_info( crt, stderr, 0);
 
@@ -954,25 +966,25 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 		ret = gnutls_x509_crt_get_crl_dist_points(crt, i, buffer, &size, NULL, &critical);
 
 		if (i==0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			fprintf(outfile, "\tCRL Distribution points:");
-			if (critical) fprintf(outfile, " (critical)");
-			fprintf(outfile, "\n");
+			fprintf(out, "\tCRL Distribution points:");
+			if (critical) fprintf(out, " (critical)");
+			fprintf(out, "\n");
 		}
 		
 		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
-			fprintf(outfile, "\t\tError decoding: %s\n", gnutls_strerror(ret));
+			fprintf(out, "\t\tError decoding: %s\n", gnutls_strerror(ret));
 		} else switch (ret) {
 			case GNUTLS_SAN_DNSNAME:
-				fprintf(outfile, "\t\tDNSname: %s\n", buffer);
+				fprintf(out, "\t\tDNSname: %s\n", buffer);
 				break;
 			case GNUTLS_SAN_RFC822NAME:
-				fprintf(outfile, "\t\tRFC822name: %s\n", buffer);
+				fprintf(out, "\t\tRFC822name: %s\n", buffer);
 				break;
 			case GNUTLS_SAN_URI:
-				fprintf(outfile, "\t\tURI: %s\n", buffer);
+				fprintf(out, "\t\tURI: %s\n", buffer);
 				break;
 			case GNUTLS_SAN_IPADDRESS:
-				fprintf(outfile, "\t\tIPAddress: %s\n", buffer);
+				fprintf(out, "\t\tIPAddress: %s\n", buffer);
 				break;
 		}
 	}

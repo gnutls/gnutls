@@ -654,6 +654,66 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
 
 }
 
+/* returns the type and the name.
+ */
+static int parse_general_name( ASN1_TYPE src, const char* src_name,
+	int seq, void* name, size_t *name_size)
+{
+int len;
+char num[MAX_INT_DIGITS];
+char nptr[128];
+int result;
+opaque choice_type[128];
+gnutls_x509_subject_alt_name type;
+
+	seq++; /* 0->1, 1->2 etc */
+	_gnutls_int2str( seq, num);
+
+	_gnutls_str_cpy( nptr, sizeof(nptr), src_name);
+	if (src_name[0] != 0) _gnutls_str_cat( nptr, sizeof(nptr), ".");
+
+	_gnutls_str_cat( nptr, sizeof(nptr), "?");
+	_gnutls_str_cat( nptr, sizeof(nptr), num);
+
+	len = sizeof(choice_type);
+	result =
+	     asn1_read_value(src, nptr, choice_type, &len);
+
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+
+	type = _gnutls_x509_san_find_type( choice_type);
+	if (type == (gnutls_x509_subject_alt_name)-1) {
+		gnutls_assert();
+		return GNUTLS_E_X509_UNKNOWN_SAN;
+	}
+
+	_gnutls_str_cat( nptr, sizeof(nptr), ".");
+	_gnutls_str_cat( nptr, sizeof(nptr), choice_type);
+
+	len = *name_size;
+	result =
+	     asn1_read_value(src, nptr, name, &len);
+	*name_size = len;
+
+	if (result==ASN1_MEM_ERROR)
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return type;
+}
+
 /**
   * gnutls_x509_crt_get_subject_alt_name - This function returns the certificate's alternative name, if any
   * @cert: should contain a gnutls_x509_crt structure
@@ -678,15 +738,11 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits)
   *
   **/
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, void *ret, size_t *ret_size, unsigned int *critical)
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int *critical)
 {
 	int result;
 	gnutls_datum dnsname;
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	char nptr[128];
-	char ext_data[256];
-	int len;
-	char num[MAX_INT_DIGITS];
 	gnutls_x509_subject_alt_name type;
 
 	if (cert==NULL) {
@@ -724,50 +780,16 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 		return _gnutls_asn2err(result);
 	}
 
-	seq++; /* 0->1, 1->2 etc */
-	_gnutls_int2str( seq, num);
-	_gnutls_str_cpy( nptr, sizeof(nptr), "?");
-	_gnutls_str_cat( nptr, sizeof(nptr), num);
+	result = parse_general_name( c2, "", seq, ret, ret_size);
 
-	len = sizeof(ext_data);
-	result =
-	     asn1_read_value(c2, nptr, ext_data, &len);
-
-	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
-		asn1_delete_structure(&c2);
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		return _gnutls_asn2err(result);
-	}
-
-
-	type = _gnutls_x509_san_find_type( ext_data);
-	if (type == (gnutls_x509_subject_alt_name)-1) {
-		asn1_delete_structure(&c2);
-		gnutls_assert();
-		return GNUTLS_E_X509_UNKNOWN_SAN;
-	}
-
-	_gnutls_str_cat( nptr, sizeof(nptr), ".");
-	_gnutls_str_cat( nptr, sizeof(nptr), ext_data);
-
-	len = *ret_size;
-	result =
-	     asn1_read_value(c2, nptr, ret, &len);
 	asn1_delete_structure(&c2);
-	*ret_size = len;
 
-	if (result==ASN1_MEM_ERROR)
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	
-	if (result != ASN1_SUCCESS) {
+	if (result < 0) {
 		gnutls_assert();
-		return _gnutls_asn2err(result);
+		return result;
 	}
+
+	type = result;
 
 	return type;
 }
@@ -1407,7 +1429,6 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 	gnutls_datum dist_points = {NULL, 0};
 	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 	char name[128];
-	char ext_data[256];
 	int len;
 	char num[MAX_INT_DIGITS];
 	gnutls_x509_subject_alt_name type;
@@ -1426,7 +1447,6 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 	result =
 	     _gnutls_x509_crt_get_extension(cert, "2.5.29.31", 0, &dist_points, critical);
 	if (result < 0) {
-	     	gnutls_assert();
 		return result;
 	}
 
@@ -1452,32 +1472,24 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 		return _gnutls_asn2err(result);
 	}
 
-	seq++; /* 0->1, 1->2 etc */
-	_gnutls_int2str( seq, num);
-	_gnutls_str_cpy( name, sizeof(name), "dn.?");
-	_gnutls_str_cat( name, sizeof(name), num);
-	_gnutls_str_cat( name, sizeof(name), ".distributionPoint.fullName");
+	/* Return the different names from the first CRLDistr. point.
+	 * The whole thing is a mess.
+	 */
+	_gnutls_str_cpy( name, sizeof(name), "?1.distributionPoint.fullName");
 
-	len = sizeof(ext_data);
-	result =
-	     asn1_read_value(c2, name, ext_data, &len);
-
-	if (result == ASN1_VALUE_NOT_FOUND) {
+	result = parse_general_name( c2, name, seq, ret, ret_size);
+	if (result < 0) {
 		asn1_delete_structure(&c2);
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		return result;
 	}
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		asn1_delete_structure(&c2);
-		return _gnutls_asn2err(result);
-	}
+	
+	type = result;
 
 
 	/* Read the CRL reasons.
 	 */
 	if (reason_flags) {
-		_gnutls_str_cpy( name, sizeof(name), "dn.?");
+		_gnutls_str_cpy( name, sizeof(name), "?");
 		_gnutls_str_cat( name, sizeof(name), num);
 		_gnutls_str_cat( name, sizeof(name), ".reasons");
 
@@ -1492,32 +1504,6 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 		}
 		
 		*reason_flags = reasons[0] | (reasons[1] << 8);
-	}
-	
-
-	type = _gnutls_x509_san_find_type( ext_data);
-	if (type == (gnutls_x509_subject_alt_name)-1) {
-		asn1_delete_structure(&c2);
-		gnutls_assert();
-		return GNUTLS_E_X509_UNKNOWN_SAN;
-	}
-
-	_gnutls_str_cat( name, sizeof(name), ".");
-	_gnutls_str_cat( name, sizeof(name), ext_data);
-
-	len = *ret_size;
-	result =
-	     asn1_read_value(c2, name, ret, &len);
-	asn1_delete_structure(&c2);
-	
-	*ret_size = len;
-	
-	if (result==ASN1_MEM_ERROR)
-		return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
 	}
 
 	return type;

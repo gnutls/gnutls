@@ -106,7 +106,7 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 				return _gnutls_asn2err(result);
 			}
 
-			if (strcmp( str_critical, "TRUE")==0)
+			if (str_critical[0] == 'T')
 				critical = 1;
 			else critical = 0;
 
@@ -360,7 +360,7 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&ext);
-		return 0;
+		return _gnutls_asn2err(result);
 	}
 
 	len = sizeof(str);
@@ -401,13 +401,14 @@ int _gnutls_x509_ext_extract_basicConstraints(int *CA, opaque * extnValue,
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&ext);
-		return 0;
+		return _gnutls_asn2err(result);
 	}
 
 	len = sizeof(str) - 1;
+	/* the default value of cA is false.
+	 */
 	result = asn1_read_value(ext, "cA", str, &len);
 	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
 		asn1_delete_structure(&ext);
 		return 0;
 	}
@@ -499,23 +500,14 @@ int _gnutls_x509_ext_gen_keyUsage(uint16 usage, gnutls_datum* der_ext)
 	return 0;
 }
 
-/* generate the subject alternative name in a DER encoded extension
- */
-int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name type, 
-	const char* data_string, gnutls_datum* der_ext)
+static int write_new_general_name( ASN1_TYPE ext, const char* ext_name,
+	gnutls_x509_subject_alt_name type, const char* data_string)
 {
-	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	const char *str;
-	char name[128];
-	int result;
+const char* str;
+int result;
+char name[128];
 
-	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.SubjectAltName", &ext);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	result = asn1_write_value( ext, "", "NEW", 1);
+	result = asn1_write_value( ext, ext_name, "NEW", 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -539,13 +531,20 @@ int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name type,
 			return GNUTLS_E_INTERNAL_ERROR;
 	}
 
-	result = asn1_write_value( ext, "?LAST", str, 1);
+	if (ext_name[0] == 0) { /* no dot */
+		_gnutls_str_cpy( name, sizeof(name), "?LAST");
+	} else {
+		_gnutls_str_cpy( name, sizeof(name), ext_name);
+		_gnutls_str_cat( name, sizeof(name), ".?LAST");
+	}
+	
+	result = asn1_write_value( ext, name, str, 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	_gnutls_str_cpy( name, sizeof(name), "?LAST.");
+	_gnutls_str_cat( name, sizeof(name), ".");
 	_gnutls_str_cat( name, sizeof(name), str);
 
 	result = asn1_write_value(ext, name, data_string, strlen(data_string));
@@ -553,6 +552,31 @@ int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name type,
 		gnutls_assert();
 		asn1_delete_structure(&ext);
 		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+/* Convert the given name to GeneralNames in a DER encoded extension.
+ * This is the same as subject alternative name.
+ */
+int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name type, 
+	const char* data_string, gnutls_datum* der_ext)
+{
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+	int result;
+
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.GeneralNames", &ext);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = write_new_general_name(ext, "", type, data_string);
+	if (result < 0) {
+		gnutls_assert();
+		asn1_delete_structure(&ext);
+		return result;
 	}
 
 	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
@@ -599,25 +623,23 @@ int _gnutls_x509_ext_gen_key_id(const void* id, size_t id_size, gnutls_datum* de
 	return 0;
 }
 
-
+/* Creates and encodes the CRL Distribution points. data_string should be a name
+ * and type holds the type of the name. 
+ * reason_flags should be an or'ed sequence of GNUTLS_CRL_REASON_*.
+ *
+ */
 int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name type, 
 	const void* data_string, unsigned int reason_flags, gnutls_datum* der_ext)
 {
 	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
-	gnutls_datum name = {NULL, 0};
+	gnutls_datum gnames = {NULL, 0};
 	int result;
 	uint8 reasons[2];
 
 	reasons[0] = reason_flags & 0xff;
 	reasons[1] = reason_flags >> 8;
 
-	result = _gnutls_x509_ext_gen_subject_alt_name( type, data_string, &name);
-	if (result < 0) {
-		gnutls_assert();
-		return result;
-	}
-
-	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.WritableCRLDistributionPoints", &ext);
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.CRLDistributionPoints", &ext);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
@@ -654,17 +676,20 @@ int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name type,
 		goto cleanup;
 	}
 
+#if 0
+	/* When used as type CHOICE.
+	 */
 	result = asn1_write_value( ext, "?LAST.distributionPoint", "fullName", 1);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
+#endif
 
-	result = asn1_write_value( ext, "?LAST.distributionPoint.fullName", name.data, name.size);
-	if (result != ASN1_SUCCESS) {
+	result = write_new_general_name(ext, "?LAST.distributionPoint.fullName", type, data_string);
+	if (result < 0) {
 		gnutls_assert();
-		result = _gnutls_asn2err(result);
 		goto cleanup;
 	}
 
@@ -678,7 +703,7 @@ int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name type,
 	result = 0;
 
 cleanup:
-	_gnutls_free_datum( &name);
+	_gnutls_free_datum( &gnames);
 	asn1_delete_structure(&ext);
 
 	return result;

@@ -1,5 +1,6 @@
 /*
  *  Copyright (C) 2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2004 Free Software Foundation
  *
  *  This file is part of GNUTLS.
  *
@@ -99,7 +100,7 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result, size_t* resul
 
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, unsigned int* bits);
 int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert, 
-	int seq, void *ret, size_t *ret_size, unsigned int* critical);
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int* critical);
 int gnutls_x509_crt_get_ca_status(gnutls_x509_crt cert, unsigned int* critical);
 
 /* The key_usage flags are defined in gnutls.h. They are

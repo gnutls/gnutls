@@ -189,24 +189,20 @@ CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
 DistributionPoint ::= SEQUENCE {
      distributionPoint       [0]     DistributionPointName OPTIONAL,
      reasons                 [1]     ReasonFlags OPTIONAL,
-     cRLIssuer               [2]     GeneralNames OPTIONAL }
+     cRLIssuer               [2]     GeneralNames OPTIONAL
+}
 
-DistributionPointName ::= CHOICE {
-     fullName                [0]     GeneralNames,
-     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
+-- original definition:
+-- DistributionPointName ::= CHOICE {
+--     fullName                [0]     GeneralNames,
+--     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
+--}
+-- This does not work since it does not tag elements.
 
--- Those are used to raw write a fullname.
-
-WritableCRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF WritableDistributionPoint
-
-WritableDistributionPoint ::= SEQUENCE {
-     distributionPoint       [0]     WriteableDistributionPointName OPTIONAL,
-     reasons                 [1]     ReasonFlags OPTIONAL,
-     cRLIssuer               [2]     GeneralNames OPTIONAL }
-
-WriteableDistributionPointName ::= CHOICE {
-     fullName                [0]     ANY,
-     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
+DistributionPointName ::= SEQUENCE {
+     fullName                [0]     GeneralNames
+--     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
+}
 
 ReasonFlags ::= BIT STRING {
      unused                  (0),
