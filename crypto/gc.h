@@ -26,6 +26,8 @@
 /* Get size_t. */
 #include <stddef.h>
 
+#define GC_MD5_LEN 16
+
 enum Gc_rc
 {
   GC_OK = 0,
@@ -76,6 +78,7 @@ typedef void *gc_cipher;
 extern int gc_init (void);
 extern void gc_done (void);
 
+/* Randomness. */
 extern int gc_nonce (char *data, size_t datalen);
 extern int gc_pseudo_random (char *data, size_t datalen);
 extern int gc_random (char *data, size_t datalen);
@@ -110,5 +113,12 @@ extern void gc_hash_hmac_setkey (gc_hash handle, size_t len, const char *key);
 extern void gc_hash_write (gc_hash handle, size_t len, const char *data);
 extern const char *gc_hash_read (gc_hash handle);
 extern void gc_hash_close (gc_hash handle);
+
+/* One-call interface. */
+extern int gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN]);
+
+extern int gc_hmac_md5 (const char *key, size_t keylen,
+			const char *in, size_t inlen,
+			char outhash[GC_MD5_LEN]);
 
 #endif /* GC_H */

@@ -32,6 +32,8 @@
 /* Get libgcrypt API. */
 #include <gcrypt.h>
 
+#include <assert.h>
+
 /* Initialization. */
 
 int
@@ -317,4 +319,64 @@ void
 gc_hash_close (gc_hash handle)
 {
   gcry_md_close ((gcry_md_hd_t) handle);
+}
+
+int
+gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN])
+{
+  size_t outlen = gcry_md_get_algo_dlen (GCRY_MD_MD5);
+  gcry_md_hd_t hd;
+  gpg_error_t err;
+  unsigned char *p;
+
+  assert (outlen == GC_MD5_LEN);
+
+  err = gcry_md_open (&hd, GCRY_MD_MD5, 0);
+  if (err != GPG_ERR_NO_ERROR)
+    return GC_INVALID_HASH;
+
+  gcry_md_write (hd, in, inlen);
+
+  p = gcry_md_read (hd, GCRY_MD_MD5);
+  if (p == NULL)
+    return GC_INVALID_HASH;
+
+  memcpy (out, p, outlen);
+
+  gcry_md_close (hd);
+
+  return GC_OK;
+}
+
+int
+gc_hmac_md5 (const char *key, size_t keylen,
+	     const char *in, size_t inlen,
+	     char outhash[GC_MD5_LEN])
+{
+  size_t hlen = gcry_md_get_algo_dlen (GCRY_MD_MD5);
+  gcry_md_hd_t mdh;
+  unsigned char *hash;
+  gpg_error_t err;
+
+  assert (hlen == GC_MD5_LEN);
+
+  err = gcry_md_open (&mdh, GCRY_MD_MD5, GCRY_MD_FLAG_HMAC);
+  if (err != GPG_ERR_NO_ERROR)
+    return GC_INVALID_HASH;
+
+  err = gcry_md_setkey (mdh, key, keylen);
+  if (err != GPG_ERR_NO_ERROR)
+    return GC_INVALID_HASH;
+
+  gcry_md_write (mdh, in, inlen);
+
+  hash = gcry_md_read (mdh, GCRY_MD_MD5);
+  if (hash == NULL)
+    return GC_INVALID_HASH;
+
+  memcpy (outhash, hash, hlen);
+
+  gcry_md_close (mdh);
+
+  return GC_OK;
 }

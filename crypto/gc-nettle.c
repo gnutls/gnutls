@@ -502,3 +502,53 @@ gc_hash_close (gc_hash handle)
   free (hinf->context);
   free (hinf);
 }
+
+/**
+ * gc_md5:
+ * @in: input character array of data to hash.
+ * @inlen: length of input character array of data to hash.
+ * @out: newly allocated character array with hash of data.
+ *
+ * Compute hash of data using MD5.  The @out buffer must be
+ * deallocated by the caller.
+ *
+ * Return value: Returns %GC_OK iff successful.
+ **/
+int
+gc_md5 (const char *in, size_t inlen, char out[GC_MD5_LEN])
+{
+  struct md5_ctx md5;
+
+  md5_init (&md5);
+  md5_update (&md5, inlen, in);
+  md5_digest (&md5, GC_MD5_LEN, out);
+
+  return GC_OK;
+}
+
+/**
+ * gc_hmac_md5:
+ * @key: input character array with key to use.
+ * @keylen: length of input character array with key to use.
+ * @in: input character array of data to hash.
+ * @inlen: length of input character array of data to hash.
+ * @outhash: newly allocated character array with keyed hash of data.
+ *
+ * Compute keyed checksum of data using HMAC-MD5.  The @outhash buffer
+ * must be deallocated by the caller.
+ *
+ * Return value: Returns %GC_OK iff successful.
+ **/
+int
+gc_hmac_md5 (const char *key, size_t keylen,
+	     const char *in, size_t inlen,
+	     char outhash[GC_MD5_LEN])
+{
+  struct hmac_md5_ctx ctx;
+
+  hmac_md5_set_key (&ctx, keylen, key);
+  hmac_md5_update (&ctx, inlen, in);
+  hmac_md5_digest (&ctx, GC_MD5_LEN, outhash);
+
+  return GC_OK;
+}
