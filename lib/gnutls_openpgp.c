@@ -968,19 +968,35 @@ leave:
   return rc;
 }
 
+/**
+  * gnutls_openpgp_extract_key_pk_algorithm - This function returns the key's PublicKey algorithm
+  * @cert: is an OpenPGP key
+  * @bits: if bits is non null it will hold the size of the parameters' in bits
+  *
+  * This function will return the public key algorithm of an OpenPGP
+  * certificate.
+  *
+  * If bits is non null, it should have enough size to hold the parameters
+  * size in bits. For RSA the bits returned is the modulus. 
+  * For DSA the bits returned are of the public exponent.
+  *
+  * Returns a member of the GNUTLS_PKAlgorithm enumeration on success,
+  * or a negative value on error.
+  *
+  **/
 int
 gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert, int *r_bits)
 {
   KBNODE kb_pk = NULL, pkt;
   int algo = 0;
   
-  if ( !cert || !r_bits )
+  if ( !cert )
     return GNUTLS_E_INVALID_PARAMETERS;
 
   if ( datum_to_kbnode( cert, &kb_pk ) )
     return 0;
   pkt = cdk_kbnode_find( kb_pk, PKT_PUBLIC_KEY );
-  if ( pkt )
+  if ( pkt && r_bits)
     *r_bits = cdk_pk_get_nbits( pkt->pkt->pkt.public_key );
   algo = pkt->pkt->pkt.public_key->pubkey_algo;
   if ( is_RSA( algo ) )
