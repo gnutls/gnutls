@@ -3,6 +3,8 @@ Copyright (C) 2004, 2005 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 See the end for copying conditions.
 
+* Version 1.2.1
+
 * Version 1.2.0 (2005-01-27)
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
 - Introduced gnutls_x509_crt_sign2(), gnutls_x509_crq_sign2() and 
