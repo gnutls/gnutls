@@ -116,6 +116,10 @@ char input[128];
 	return atoi(input);
 }
 
+#ifdef _WIN32
+# define getpass read_str
+#endif
+
 static const char* read_str( const char* input_str)
 {
 static char input[128];

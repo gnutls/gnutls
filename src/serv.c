@@ -27,15 +27,25 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+
+#ifdef _WIN32
+# include <winsock.h>
+# include <io.h>
+# include <winbase.h>
+# define socklen_t int
+# define close closesocket
+#else
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+#endif
+
 #include <string.h>
-#include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include "common.h"
-#include <signal.h>
 #include "serv-gaa.h"
 #include <sys/time.h>
 #include <fcntl.h>
@@ -546,12 +556,23 @@ int main(int argc, char **argv)
    char name[256];
    int accept_fd;
    struct sockaddr_in client_address;
+#ifdef _WIN32
+   WORD wVersionRequested;
+   WSADATA wsaData;
+#endif
 
+#ifndef _WIN32
    signal(SIGPIPE, SIG_IGN);
    signal(SIGHUP, SIG_IGN);
    signal(SIGTERM, terminate);
    if (signal(SIGINT, terminate) == SIG_IGN)
       signal(SIGINT, SIG_IGN); /* e.g. background process */
+#else
+   wVersionRequested = MAKEWORD(1, 1);
+   if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+       perror("WSA_STARTUP_ERROR");
+   }
+#endif
 
    gaa_parser(argc, argv);
 
@@ -706,11 +727,13 @@ int main(int argc, char **argv)
 /* flag which connections we are reading or writing to within the fd sets */
       lloopstart(listener_list, j) {
 
+#ifndef _WIN32
 	 val = fcntl(j->fd, F_GETFL, 0);
 	 if ( (val == -1) || (fcntl(j->fd, F_SETFL, val | O_NONBLOCK) < 0) ) {
 	    perror("fcntl()");
 	    exit(1);
 	 }
+#endif
 
 	 if (j->http_state == HTTP_STATE_REQUEST) {
 	    FD_SET(j->fd, &rd);
@@ -802,10 +825,16 @@ int main(int argc, char **argv)
 		     printf("*** This is a resumed session\n");
 
 		  if (quiet == 0) {
+#ifdef HAVE_INET_NTOP
 		     printf("\n* connection from %s, port %d\n",
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
 			    ntohs(client_address.sin_port));
+#else
+		     printf("\n* connection from %s, port %d\n",
+			    inet_ntoa(((struct sockaddr_in*)&client_address)->sin_addr),
+			    ntohs(client_address.sin_port));
+#endif
 		     print_info(j->tls_session, NULL);
 		  }
 		  j->handshake_ok = 1;
@@ -876,10 +905,17 @@ int main(int argc, char **argv)
 		      && quiet == 0)
 		     printf("*** This is a resumed session\n");
 		  if (quiet == 0) {
+#ifdef HAVE_INET_NTOP
 		     printf("- connection from %s, port %d\n",
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
 			    ntohs(client_address.sin_port));
+#else
+		     printf("\n* connection from %s, port %d\n",
+			    inet_ntoa(((struct sockaddr_in*)&client_address)->sin_addr),
+			    ntohs(client_address.sin_port));
+#endif
+
 		     print_info(j->tls_session, NULL);
 		  }
 		  j->handshake_ok = 1;

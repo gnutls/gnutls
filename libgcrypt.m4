@@ -60,7 +60,7 @@ AC_DEFUN(AM_PATH_LIBGCRYPT,
         fi
     fi
   fi
-  if test $ok = yes; then
+  if test x$ok = xyes; then
     LIBGCRYPT_CFLAGS=`$LIBGCRYPT_CONFIG $libgcrypt_config_args --cflags`
     LIBGCRYPT_LIBS=`$LIBGCRYPT_CONFIG $libgcrypt_config_args --libs`
     AC_MSG_RESULT(yes)

@@ -49,7 +49,7 @@ opaque *verifier;
 size_t verifier_size;
 int indx;
 
-	p = rindex( str, ':'); /* we have index */
+	p = strrchr( str, ':'); /* we have index */
 	if (p==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
@@ -66,7 +66,7 @@ int indx;
 	}
 	
 	/* now go for salt */
-	p = rindex( str, ':'); /* we have salt */
+	p = strrchr( str, ':'); /* we have salt */
 	if (p==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
@@ -85,7 +85,7 @@ int indx;
 	}
 
 	/* now go for verifier */
-	p = rindex( str, ':'); /* we have verifier */
+	p = strrchr( str, ':'); /* we have verifier */
 	if (p==NULL) {
 		_gnutls_free_datum(&entry->salt);
 		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
@@ -131,7 +131,7 @@ int len;
 opaque * tmp;
 int ret;
 
-	p = rindex( str, ':'); /* we have g */
+	p = strrchr( str, ':'); /* we have g */
 	if (p==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_SRP_PWD_PARSING_ERROR;
@@ -154,7 +154,7 @@ int ret;
 	entry->g.size = ret;
 
 	/* now go for n - modulo */
-	p = rindex( str, ':'); /* we have n */
+	p = strrchr( str, ':'); /* we have n */
 	if (p==NULL) {
 		_gnutls_free_datum( &entry->g);
 		gnutls_assert();

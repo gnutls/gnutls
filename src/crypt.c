@@ -40,11 +40,14 @@ int main (int argc, char **argv)
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <gcrypt.h> /* for randomize */
-#include <pwd.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
+#ifndef _WIN32
+# include <pwd.h>
+# include <unistd.h>
+#endif
 
 #define _MAX(x,y) (x>y?x:y)
 
@@ -229,7 +232,7 @@ char *pos;
 
 	/* copy salt, and null terminate after the ':' */
 	strcpy( _salt, salt);
-	pos = index(_salt, ':');
+	pos = strchr(_salt, ':');
 	if (pos!=NULL) *pos = 0;
 
 	/* convert salt to binary. */
@@ -302,7 +305,7 @@ char *p;
 }
 
 /* accepts password file */
-static int find_index(char* username, char* file) {
+static int find_strchr(char* username, char* file) {
 FILE * fd;
 char *pos;
 char line[5*1024];
@@ -323,7 +326,7 @@ unsigned int i;
 		}
 		if (strncmp(username, line, _MAX(i,strlen(username)) )  == 0) {
 			/* find the index */
-			pos = rindex(line, ':');
+			pos = strrchr(line, ':');
 			pos++;
 			fclose(fd);
 			return atoi(pos);
@@ -346,7 +349,7 @@ int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 	int iindex;
 	char *p, *pos;
 
-	iindex = find_index( username, tpasswd);
+	iindex = find_strchr( username, tpasswd);
 	if (iindex==-1) {
 		fprintf(stderr, "Cannot find '%s' in %s\n", username, tpasswd);
 		return -1;
@@ -393,7 +396,7 @@ int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 		if (strncmp(username, line, _MAX(i,strlen(username)) )  == 0) {
 			char* verifier_pos, *salt_pos;
 
-			pos = index(line, ':');
+			pos = strchr(line, ':');
 			fclose(fd);
 			if (pos==NULL) {
 				fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
@@ -403,7 +406,7 @@ int verify_passwd(char *conffile, char *tpasswd, char *username, char *passwd)
 			verifier_pos = pos;
 
 			/* Move to the salt */
-			pos = index(pos, ':');
+			pos = strchr(pos, ':');
 			if (pos==NULL) {
 				fprintf(stderr, "Cannot parse conf file '%s'\n", conffile);
 				return -1;
@@ -459,6 +462,7 @@ int main(int argc, char **argv)
 		info.passwd_conf = KPASSWD_CONF;
 
 	if (info.username == NULL) {
+#ifndef _WIN32
 		pwd = getpwuid(getuid());
 
 		if (pwd == NULL) {
@@ -467,6 +471,10 @@ int main(int argc, char **argv)
 		}
 
 		info.username = pwd->pw_name;
+#else
+		fprintf(stderr, "Please specify a user\n");
+		return -1;
+#endif
 	}
 
 	salt = 16;
@@ -614,7 +622,7 @@ int crypt_int(char *username, char *passwd, int salt_size,
 			p = fgets( line, sizeof(line)-1, fd2);
 			if (p==NULL) break;
 			
-			pp = index( line, ':');
+			pp = strchr( line, ':');
 			if (pp==NULL) continue;
 			
 			if ( strncmp( p, username, _MAX(strlen(username), (unsigned int)(pp-p)) ) == 0 ) {
@@ -654,7 +662,7 @@ static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str)
 
 	index = atoi(str);
 
-	p = rindex(str, ':');	/* we have g */
+	p = strrchr(str, ':');	/* we have g */
 	if (p == NULL) {
 		return -1;
 	}
@@ -676,7 +684,7 @@ static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str)
 	}
 
 	/* now go for n - modulo */
-	p = rindex(str, ':');	/* we have n */
+	p = strrchr(str, ':');	/* we have n */
 	if (p == NULL) {
 		return -1;
 	}

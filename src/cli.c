@@ -24,17 +24,27 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+
+#ifdef _WIN32
+# include <winsock.h>
+# include <io.h>
+# include <winbase.h>
+# define socklen_t int
+# define close closesocket
+#else
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <netdb.h>
+# include <signal.h>
+#endif
+
 #include <string.h>
-#include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <sys/time.h>
-#include <signal.h>
-#include <netdb.h>
 #include "common.h"
 #include "cli-gaa.h"
 
@@ -264,6 +274,10 @@ int main(int argc, char **argv)
 	int user_term = 0;
 	struct hostent *server_host;
 	socket_st hd;
+#ifdef _WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+#endif
 
 	gaa_parser(argc, argv);
 	if (hostname == NULL) {
@@ -271,7 +285,16 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+#ifdef _WIN32
+        wVersionRequested = MAKEWORD(1, 1);
+        if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+              perror("WSA_STARTUP_ERROR");
+        }
+#endif
+
+#ifndef _WIN32
 	signal(SIGPIPE, SIG_IGN);
+#endif
 
 	init_global_tls_stuff();
 
@@ -293,12 +316,17 @@ int main(int argc, char **argv)
 
 	sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr);
 
+#ifdef HAVE_INET_NTOP
 	if (inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF) == NULL) {
 		perror("inet_ntop()");
 		return(1);
 	}
-
 	fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port);
+#else /* use inet_ntoa */
+	fprintf(stderr, "Connecting to '%s:%d'...\n", inet_ntoa( ((struct sockaddr_in*)&sa)->sin_addr), 
+		port);
+#endif
+
 
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");
@@ -377,7 +405,9 @@ int main(int argc, char **argv)
 
 	printf("\n- Simple Client Mode:\n\n");
 
+#ifndef _WIN32
 	signal (SIGALRM, &starttls_alarm);
+#endif
 
 	/* do not buffer */
 	setbuf(stdin, NULL);

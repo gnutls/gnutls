@@ -23,8 +23,13 @@
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <tests.h>
-#include <unistd.h>
-#include <signal.h>
+
+#ifndef _WIN32
+# include <unistd.h>
+# include <signal.h>
+#endif
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <common.h>
@@ -254,7 +259,10 @@ int test_bye( gnutls_session session) {
 int ret;
 char data[20];
 int old;
+
+#ifndef _WIN32
 	signal( SIGALRM, got_alarm);
+#endif
 
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -270,14 +278,18 @@ int old;
 	ret = gnutls_bye( session, GNUTLS_SHUT_WR);
 	if (ret<0) return FAILED;
 	
+#ifndef _WIN32
 	old = siginterrupt( SIGALRM, 1);
 	alarm(6);
+#endif
 	
 	do {
 		ret = gnutls_record_recv( session, data, sizeof(data));
 	} while( ret > 0);
 
+#ifndef _WIN32
 	siginterrupt( SIGALRM, old);
+#endif
 	if (ret==0) return SUCCEED;
 	
 	if (alrm == 0) return UNSURE;

@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #define SUCCEED 1
 #define FAILED 0
 #define UNSURE -1

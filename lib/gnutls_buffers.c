@@ -54,6 +54,10 @@
 # include <errno.h>
 #endif
 
+#ifdef _WIN32
+# include <winsock2.h>
+#endif
+
 #ifndef EAGAIN
 # define EAGAIN EWOULDBLOCK
 #endif

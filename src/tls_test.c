@@ -23,16 +23,26 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+
+#ifdef _WIN32
+# include <winsock.h>
+# include <io.h>
+# include <winbase.h>
+# define socklen_t int
+# define close closesocket
+#else
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <unistd.h>
+# include <signal.h>
+# include <netdb.h>
+#endif
+
 #include <string.h>
-#include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <sys/time.h>
-#include <signal.h>
-#include <netdb.h>
 #include <tests.h>
 #include <tls_test-gaa.h>
 
@@ -124,6 +134,13 @@ static const TLS_TEST tls_tests[] = {
 };
 
 static int tt = 0;
+char* ip;
+
+#ifdef HAVE_INET_NTOP
+# define IP inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF)
+#else
+# define IP inet_ntoa( ((struct sockaddr_in*)&sa)->sin_addr)
+#endif
 
 #define CONNECT() \
 		sd = socket(AF_INET, SOCK_STREAM, 0); \
@@ -132,8 +149,8 @@ static int tt = 0;
 		sa.sin_family = AF_INET; \
 		sa.sin_port = htons(port); \
 		sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr); \
-		inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF); \
-		if (tt++ == 0) printf("Connecting to '%s:%d'...\n", buffer, port); \
+		ip = IP; \
+		if (tt++ == 0) printf("Connecting to '%s:%d'...\n", ip, port); \
 		err = connect(sd, (SA *) & sa, sizeof(sa)); \
 		ERR(err, "connect")
 
@@ -149,10 +166,21 @@ int main(int argc, char **argv)
 	struct hostent *server_host;
 	int ssl3_ok = 0;
 	int tls1_ok = 0;
+#ifdef _WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+#endif
 
 	gaa_parser(argc, argv);
 
+#ifndef _WIN32
 	signal(SIGPIPE, SIG_IGN);
+#else
+        wVersionRequested = MAKEWORD(1, 1);
+        if (WSAStartup(wVersionRequested, &wsaData) != 0) {
+              perror("WSA_STARTUP_ERROR");
+        }
+#endif
 
 	if (gnutls_global_init() < 0) {
 		fprintf(stderr, "global state initialization error\n");

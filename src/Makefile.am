@@ -13,9 +13,9 @@ gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la $(LIBGCRY
 gnutls_srpcrypt_SOURCES = crypt-gaa.c crypt.c
 gnutls_srpcrypt_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
 gnutls_cli_SOURCES = cli-gaa.c cli.c common.c 
-gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
+gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS) $(SERV_LIBS)
 gnutls_cli_debug_SOURCES = tls_test-gaa.c tls_test.c tests.c common.c
-gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS)
+gnutls_cli_debug_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la  $(LIBGCRYPT_LIBS) $(LIBOPENCDK_LIBS) $(SERV_LIBS)
 
 
 noinst_PROGRAMS = retcodes
