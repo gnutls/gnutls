@@ -134,6 +134,7 @@ static gnutls_error_entry error_algorithms[] = {
         ERROR_ENTRY("The OpenPGP fingerprint is not supported.", GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED, 1),
         ERROR_ENTRY("The certificate has unsupported attributes.", GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE, 1),
         ERROR_ENTRY("The hash algorithm is unknown.", GNUTLS_E_UNKNOWN_HASH_ALGORITHM, 1),
+        ERROR_ENTRY("The PKCS7 structure's content type is unknown.", GNUTLS_E_UNKNOWN_PKCS7_CONTENT_TYPE, 1),
 	{0, 0, 0, 0}
 };
 

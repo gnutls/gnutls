@@ -64,6 +64,9 @@ typedef struct gnutls_x509_privkey_int {
 	ASN1_TYPE key;
 } gnutls_x509_privkey_int;
 
+int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
+	ASN1_TYPE dest, const char* dest_name);
+
 typedef struct gnutls_x509_crt_int *gnutls_x509_crt;
 typedef struct gnutls_x509_crl_int *gnutls_x509_crl;
 typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey;

@@ -142,16 +142,17 @@ typedef struct gnutls_pkcs7_int* gnutls_pkcs7;
 
 
 int gnutls_pkcs7_init(gnutls_pkcs7 * pkcs7);
-
 void gnutls_pkcs7_deinit(gnutls_pkcs7 pkcs7);
-
 int gnutls_pkcs7_get_certificate_count( gnutls_pkcs7 pkcs7);
-
 int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
+int gnutls_pkcs7_export( gnutls_pkcs7 pkcs7,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
 
 int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx, 
 	unsigned char* certificate, int* certificate_size);
+int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, 
+	const gnutls_datum* crt);
 
 /* X.509 Certificate verification functions.
  */

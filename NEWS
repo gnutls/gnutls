@@ -3,6 +3,7 @@ Version 0.9.4
 - Corrected behaviour when a certificate request message is received.
   Now a certificate packet is always sent, and in SSL 3.0 cipher suites
   a no_certificate alert is sent instead.
+- Added functionality to generate PKCS #7 structures (with certificates).
 
 Version 0.9.3 (24/03/2003)
 - Support for MD2 was dropped. 

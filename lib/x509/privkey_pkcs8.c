@@ -68,8 +68,6 @@ static int decrypt_data( ASN1_TYPE pkcs8_asn, char* password,
 static ASN1_TYPE decode_private_key_info( const gnutls_datum* der, gnutls_x509_privkey pkey);
 static int write_pbe2_params( ASN1_TYPE pkcs8_asn, const struct pbkdf2_params* kdf_params,
 	const struct pbe_enc_params* enc_params);
-static int _der_encode_and_copy( ASN1_TYPE src, const char* src_name,
-	ASN1_TYPE dest, const char* dest_name);
 static int encrypt_data( const gnutls_datum* plain, 
 	const struct pbe_enc_params *enc_params, 
 	gnutls_datum* key, gnutls_datum* encrypted);
@@ -901,7 +899,7 @@ int key_size;
  * dest in dest_name. Usefull to encode something and store it
  * as OCTET.
  */
-static int _der_encode_and_copy( ASN1_TYPE src, const char* src_name,
+int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
 	ASN1_TYPE dest, const char* dest_name)
 {
 int size, result;
@@ -1019,7 +1017,7 @@ char tmp[64];
 	/* now encode them an put the DER output
 	 * in the keyDerivationFunc.parameters
 	 */
-	result = _der_encode_and_copy( pbkdf2_asn, "", 
+	result = _gnutls_x509_der_encode_and_copy( pbkdf2_asn, "", 
 		pbes2_asn, "keyDerivationFunc.parameters");
 	if (result < 0) {
 		gnutls_assert();
@@ -1070,7 +1068,7 @@ ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
 	/* now encode them an put the DER output
 	 * in the encryptionScheme.parameters
 	 */
-	result = _der_encode_and_copy( pbe_asn, "", 
+	result = _gnutls_x509_der_encode_and_copy( pbe_asn, "", 
 		pbes2_asn, "encryptionScheme.parameters");
 	if (result < 0) {
 		gnutls_assert();
@@ -1159,7 +1157,7 @@ ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY;
 		goto error;
 	}
 
-	result = _der_encode_and_copy( pbes2_asn, "", 
+	result = _gnutls_x509_der_encode_and_copy( pbes2_asn, "", 
 		pkcs8_asn, "encryptionAlgorithm.parameters");
 	if (result < 0) {
 		gnutls_assert();

@@ -1068,7 +1068,7 @@ gnutls_datum tmp;
   * gnutls_x509_crt_export - This function will export the certificate
   * @cert: Holds the certificate
   * @format: the format of output params. One of PEM or DER.
-  * @output_data: will contain a private key PEM or DER encoded
+  * @output_data: will contain a certificate PEM or DER encoded
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
   * This function will export the certificate to DER or PEM format.
