@@ -9,6 +9,7 @@ Current list:
 * Add function(s) to get the DHE/A parameters
 * Add function(s) to extract the certificate key's parameters
 * Add PKCS-12 support
+* Convert documentation to texinfo format
 - Add Kerberos support
 
 (+) Means high priority 
