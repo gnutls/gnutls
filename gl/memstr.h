@@ -17,14 +17,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA.  */
 
-#ifndef STRNSTR_H
-# define STRNSTR_H
+#ifndef MEMSTR_H
+# define MEMSTR_H
 
-/* Get strnstr, if available. */
+/* Get memstr, if available. */
 # include <string.h>
 
-# if defined HAVE_DECL_STRNSTR && !HAVE_DECL_STRNSTR
-char *strnstr (const char *big, const char *little, size_t len);
+# if defined HAVE_DECL_MEMSTR && !HAVE_DECL_MEMSTR
+char *memstr (const char *big, const char *little, size_t len);
 # endif
 
-#endif /* STRNSTR_H */
+#endif /* MEMSTR_H */

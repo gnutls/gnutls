@@ -21,20 +21,17 @@
 # include <config.h>
 #endif
 
-/* Get MIN. */
-#include <minmax.h>
-
-/* Get strlen, strncmp. */
+/* Get strlen, strncmp, size_t. */
 #include <string.h>
 
-/* Locate first occurance of zero terminated string LITLE in the first
-   MIN(LEN, strlen(BIG)) characters of the string BIG.  Returns
-   pointer to match within BIG, or NULL if no match is found.  If
-   LITTLE is the empty string, BIG is returned.  */
+/* Locate first occurance of zero terminated string LITTLE in the
+   first LEN characters of the string BIG.  The terminating zero in
+   LITTLE is not used for comparison.  Return pointer to match within
+   BIG, or NULL if no match is found.  If LITTLE is the empty string,
+   BIG is returned.  */
 char *
-strnstr (const char *big, const char *little, size_t len)
+memstr (const char *big, const char *little, size_t len)
 {
-  size_t searchlen = MIN (len, strlen (big));
   size_t littlelen = strlen (little);
   char *p = (char*) big;
   size_t i;
@@ -42,11 +39,11 @@ strnstr (const char *big, const char *little, size_t len)
   if (*little == '\0')
     return p;
 
-  if (searchlen < littlelen)
+  if (len < littlelen)
     return NULL;
 
-  for (i = 0; i <= searchlen - littlelen; i++)
-    if (strncmp (&p[i], little, littlelen) == 0)
+  for (i = 0; i <= len - littlelen; i++)
+    if (memcmp (&p[i], little, littlelen) == 0)
       return &p[i];
 
   return NULL;
