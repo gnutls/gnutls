@@ -478,8 +478,9 @@ AC_CHECK_LIB( lzo, lzo1x_1_compress, minilzo_enabled=no,
 fi
 
 if test x"$minilzo_enabled" = xyes; then
- 
- AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
+AC_DEFINE(USE_MINILZO, 1, [whether to use the included minilzo])
+else
+LZO_LIBS=-llzo
 fi
 
 dnl use lzo
@@ -525,7 +526,7 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 SERV_LIBS="$LIBS $SERV_LIBS"
 AC_SUBST(SERV_LIBS)
 
-LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra -lgnutls $LIBOPENCDK_LIBS $LZO_LINK"
+LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra -lgnutls $LIBOPENCDK_LIBS $LZO_LIBS"
 LIBGNUTLS_EXTRA_CFLAGS="$LIBOPENCDK_CFLAGS -I${includedir}"
 
 AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
