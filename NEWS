@@ -1,5 +1,7 @@
 Version 1.1.1
 - Added PKCS #7 support to certtool utility.
+- Added support for reading and generating CRL distribution
+  points extensions in certificates.
 
 Version 1.1.0 (21/12/2003)
 - The error codes GNUTLS_E_NO_TEMPORARY_DH_PARAMS and GNUTLS_E_NO_TEMPORARY_RSA_PARAMS

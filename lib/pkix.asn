@@ -184,7 +184,7 @@ SkipCerts ::= INTEGER (0..MAX)
 
 id-ce-cRLDistributionPoints     OBJECT IDENTIFIER  ::=  {id-ce 31}
 
-CRLDistPointsSyntax ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
+CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
 
 DistributionPoint ::= SEQUENCE {
      distributionPoint       [0]     DistributionPointName OPTIONAL,
@@ -194,6 +194,21 @@ DistributionPoint ::= SEQUENCE {
 DistributionPointName ::= CHOICE {
      fullName                [0]     GeneralNames,
      nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
+
+-- Those are used to raw write a fullname.
+
+WritableCRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF WritableDistributionPoint
+
+WritableDistributionPoint ::= SEQUENCE {
+     distributionPoint       [0]     WriteableDistributionPointName OPTIONAL,
+     reasons                 [1]     ReasonFlags OPTIONAL,
+     cRLIssuer               [2]     GeneralNames OPTIONAL }
+
+WriteableDistributionPointName ::= CHOICE {
+     fullName                [0]     ANY,
+     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
+
+
 
 
 

@@ -183,6 +183,11 @@ const char* msg;
 	if (info.dsa) { 
 		msg = "DSA";
 		key_type = GNUTLS_PK_DSA;
+		
+		if (info.bits > 1024) {
+			fprintf(stderr, "The DSA algorithm cannot be used with primes over 1024 bits.\n");
+			exit(1);
+		}
 	} else {
 		msg = "RSA";
 		key_type = GNUTLS_PK_RSA;
@@ -685,10 +690,13 @@ const char* get_algorithm( int a)
 	}
 }
 
+/* OIDs that are handled by the gnutls' functions.
+ */
 static inline int known_oid( const char* oid)
 {
 	if (strcmp(oid, "2.5.29.17") == 0 ||
 		strcmp( oid, "2.5.29.19") == 0 ||
+		strcmp( oid, "2.5.29.31") == 0 ||
 		strcmp( oid, "2.5.29.15") == 0)
 			return 1;
 	
@@ -803,6 +811,37 @@ void certificate_info( void)
 		
 		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
 			fprintf(outfile, "\t\tFound unsupported alternative name.\n");
+		} else switch (ret) {
+			case GNUTLS_SAN_DNSNAME:
+				fprintf(outfile, "\t\tDNSname: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_RFC822NAME:
+				fprintf(outfile, "\t\tRFC822name: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_URI:
+				fprintf(outfile, "\t\tURI: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_IPADDRESS:
+				fprintf(outfile, "\t\tIPAddress: %s\n", buffer);
+				break;
+		}
+	}
+
+	/* CRL dist points.
+	 */
+	ret = 0;
+	for (i = 0; !(ret < 0); i++) {
+		size = sizeof(buffer);
+		ret = gnutls_x509_crt_get_crl_dist_points(crt, i, buffer, &size, &critical);
+
+		if (i==0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			fprintf(outfile, "\tCRL Distribution points:");
+			if (critical) fprintf(outfile, " (critical)");
+			fprintf(outfile, "\n");
+		}
+		
+		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			fprintf(outfile, "\t\tFound unsupported name.\n");
 		} else switch (ret) {
 			case GNUTLS_SAN_DNSNAME:
 				fprintf(outfile, "\t\tDNSname: %s\n", buffer);

@@ -623,7 +623,6 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 
 	if ((result =
 	     _gnutls_x509_crt_get_extension(cert, "2.5.29.17", 0, &dnsname, critical)) < 0) {
-	     	gnutls_assert();
 		return result;
 	}
 
@@ -632,9 +631,9 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SubjectAltName", &c2))
-	    != ASN1_SUCCESS) {
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.SubjectAltName", &c2);
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		_gnutls_free_datum( &dnsname);
 		return _gnutls_asn2err(result);
@@ -1303,6 +1302,129 @@ int result;
 	}
 	
 	return result;
+}
+
+/**
+  * gnutls_x509_crt_get_crl_dist_points - This function returns the CRL distribution points
+  * @cert: should contain a gnutls_x509_crt structure
+  * @seq: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
+  * @ret: is the place where the distribution point will be copied to
+  * @ret_size: holds the size of ret.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the CRL distribution points (2.5.29.31), contained in the
+  * given certificate.
+  * 
+  * This is specified in X509v3 Certificate Extensions. GNUTLS will return the 
+  * distribution point type, or a negative error code on error.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the distribution
+  * point, or the type of the distribution point if everything was ok. The type is 
+  * one of the enumerated gnutls_x509_subject_alt_name.
+  *
+  * If the certificate does not have an Alternative name with the specified 
+  * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  *
+  **/
+int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert, 
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int *critical)
+{
+	int result;
+	gnutls_datum dist_points = {NULL, 0};
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	char name[128];
+	char ext_data[256];
+	int len;
+	char num[MAX_INT_DIGITS];
+	gnutls_x509_subject_alt_name type;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (ret) memset(ret, 0, *ret_size);
+	else *ret_size = 0;
+
+	result =
+	     _gnutls_x509_crt_get_extension(cert, "2.5.29.31", 0, &dist_points, critical);
+	if (result < 0) {
+	     	gnutls_assert();
+		return result;
+	}
+
+	if (dist_points.size == 0 || dist_points.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.CRLDistributionPoints", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_free_datum( &dist_points);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, dist_points.data, dist_points.size, NULL);
+	_gnutls_free_datum( &dist_points);
+
+	if (result != ASN1_SUCCESS) {
+		/* couldn't decode DER */
+
+		_gnutls_x509_log("X509 certificate: Decoding error %d\n", result);
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	seq++; /* 0->1, 1->2 etc */
+	_gnutls_int2str( seq, num);
+	_gnutls_str_cpy( name, sizeof(name), "dn.?");
+	_gnutls_str_cat( name, sizeof(name), num);
+	_gnutls_str_cat( name, sizeof(name), ".distributionPoint.fullName");
+
+	len = sizeof(ext_data);
+	result =
+	     asn1_read_value(c2, name, ext_data, &len);
+
+	if (result == ASN1_VALUE_NOT_FOUND) {
+		asn1_delete_structure(&c2);
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	type = _gnutls_x509_san_find_type( ext_data);
+	if (type == (gnutls_x509_subject_alt_name)-1) {
+		asn1_delete_structure(&c2);
+		gnutls_assert();
+		return GNUTLS_E_X509_UNKNOWN_SAN;
+	}
+
+	_gnutls_str_cat( name, sizeof(name), ".");
+	_gnutls_str_cat( name, sizeof(name), ext_data);
+
+	len = *ret_size;
+	result =
+	     asn1_read_value(c2, name, ret, &len);
+	asn1_delete_structure(&c2);
+	
+	*ret_size = len;
+	
+	if (result==ASN1_MEM_ERROR)
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return type;
 }
 
 #endif

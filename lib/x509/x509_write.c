@@ -561,5 +561,61 @@ static void disable_optional_stuff( gnutls_x509_crt cert)
 	return;
 }
 
+/**
+  * gnutls_x509_crt_set_crl_dist_points - This function will set the CRL dist points
+  * @crt: should contain a gnutls_x509_crt structure
+  * @type: is one of the gnutls_x509_subject_alt_name enumerations
+  * @data_string: The data to be set
+  *
+  * This function will set the CRL distribution points certificate extension. 
+  *
+  * Returns 0 on success.
+  *
+  **/
+int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
+	const char* data_string)
+{
+int result;
+gnutls_datum der_data;
+gnutls_datum oldname;
+unsigned int critical;
+
+	if (crt==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(crt, "2.5.29.31", 0, &oldname, &critical);
+
+	if (result >= 0) _gnutls_free_datum( &oldname);
+	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_crl_dist_points( type, data_string, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( crt, "2.5.29.31", &der_data, 0);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	crt->use_extensions = 1;
+
+	return 0;
+}
+
 
 #endif /* ENABLE_PKI */

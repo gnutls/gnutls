@@ -73,7 +73,8 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
 	unsigned char* output_data, size_t* output_data_size);
-
+int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert, 
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int *critical);
 
 time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert);
 time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);

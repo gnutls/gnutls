@@ -29,6 +29,7 @@
 #include <common.h>
 #include <x509.h>
 #include <extensions.h>
+#include <gnutls_datum.h>
 
 /* This function will attempt to return the requested extension found in
  * the given X509v3 certificate. The return value is allocated and stored into
@@ -563,4 +564,75 @@ int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name type,
 	}
 
 	return 0;
+}
+
+int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name type, 
+	const char* data_string, gnutls_datum* der_ext)
+{
+	ASN1_TYPE ext = ASN1_TYPE_EMPTY;
+	gnutls_datum name = {NULL, 0};
+	int result;
+
+	result = _gnutls_x509_ext_gen_subject_alt_name( type, data_string, &name);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = asn1_create_element(_gnutls_get_pkix(), "PKIX1.WritableCRLDistributionPoints", &ext);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value( ext, "", "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value( ext, "?LAST.reasons", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value( ext, "?LAST.cRLIssuer", NULL, 0);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value( ext, "?LAST.distributionPoint", "fullName", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = asn1_write_value( ext, "?LAST.distributionPoint.fullName", name.data, name.size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	result = _gnutls_x509_der_encode( ext, "", der_ext, 0);
+
+	if (result < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	result = 0;
+
+cleanup:
+	_gnutls_free_datum( &name);
+	asn1_delete_structure(&ext);
+
+	return result;
 }
