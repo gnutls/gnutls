@@ -276,7 +276,7 @@ type_assig : IDENTIFIER type_assig_right_tag_default  {$$=_asn1_set_name($2,$1);
 
 type_assig_list : type_assig                   {$$=$1;}
                 | type_assig_list','type_assig {$$=$1;
-                                                _asn1_set_right(_asn1_get_last_right($1),$3)}
+                                                _asn1_set_right(_asn1_get_last_right($1),$3);}
 ;
 
 sequence_def : SEQUENCE'{'type_assig_list'}' {$$=_asn1_add_node(TYPE_SEQUENCE);
@@ -336,9 +336,9 @@ type_constant_list :   type_constant    {$$=$1;}
 
 definitions_id  :  IDENTIFIER  '{' obj_constant_list '}' {$$=_asn1_add_node(TYPE_OBJECT_ID);
                                                           _asn1_set_down($$,$3);
-                                                          _asn1_set_name($$,$1)}
+                                                          _asn1_set_name($$,$1);}
                  | IDENTIFIER  '{' '}'                   {$$=_asn1_add_node(TYPE_OBJECT_ID);
-                                                          _asn1_set_name($$,$1)}
+                                                          _asn1_set_name($$,$1);}
 ;
 
 imports_def :   /* empty */  {$$=NULL;}
