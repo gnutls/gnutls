@@ -17,7 +17,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
 	ext_dnsname.h gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h x509_verify.h \
 	gnutls_sig.h gnutls_mem.h x509_extensions.h gnutls_ui.h \
-	gnutls-api.tex
+	gnutls-api.tex io_debug.h
 
 lib_LTLIBRARIES = libgnutls.la
 
