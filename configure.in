@@ -21,7 +21,6 @@ dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA
 
 AC_INIT
-AB_INIT
 
 AC_PREREQ(2.57)
 
@@ -45,6 +44,7 @@ AC_DEFINE_UNQUOTED(GNUTLS_LIBTASN1_VERSION, "$GNUTLS_LIBTASN1_VERSION", [version
 
 AM_INIT_AUTOMAKE(gnutls, $GNUTLS_VERSION, [version of gnutls])
 AM_CONFIG_HEADER(config.h)
+AB_INIT
 
 dnl This is the library version
 GNUTLS_MOST_RECENT_INTERFACE=13
