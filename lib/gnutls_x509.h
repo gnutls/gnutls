@@ -10,10 +10,6 @@ typedef enum ConvFlags {
 
 int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert, ConvFlags flags);
 
-/* for int2str */
-#define MAX_INT_DIGITS 4
-void _gnutls_int2str(unsigned int k, char *data);
-
 #define PEM_CERT_SEP2 "-----BEGIN X509 CERTIFICATE"
 #define PEM_CERT_SEP "-----BEGIN CERTIFICATE"
 #define PEM_PKCS7_SEP "-----BEGIN PKCS7"
@@ -25,19 +21,6 @@ int _gnutls_check_x509_key_usage( const gnutls_cert * cert, gnutls_kx_algorithm 
 time_t gnutls_x509_extract_certificate_activation_time( const gnutls_datum*);
 time_t gnutls_x509_extract_certificate_expiration_time( const gnutls_datum*);
 
-time_t _gnutls_x509_utcTime2gtime(char *ttime);
-time_t _gnutls_x509_generalTime2gtime(char *ttime);
-
-int _gnutls_x509_oid_data2string( const char* OID, void* value, 
-	int value_size, char * res, int res_size);
-
-const char* _gnutls_x509_oid2string( const char* OID);
-const char* _gnutls_x509_oid2ldap_string( const char* OID);
-
-int _gnutls_x509_oid_data_printable( const char* OID);
-gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid);
-
-time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when);
 
 int gnutls_x509_extract_certificate_subject_alt_name( const gnutls_datum*, int seq, char*, int*);
 int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);

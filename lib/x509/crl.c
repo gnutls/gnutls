@@ -24,7 +24,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
-#include <gnutls_x509.h>
+#include <common.h>
 #include <x509_b64.h>
 #include <crl.h>
 #include <dn.h>
@@ -203,11 +203,13 @@ int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data,
 /**
   * gnutls_x509_crl_get_issuer_dn - This function returns the CRL's issuer distinguished name
   * @crl: should contain a gnutls_crl structure
-  * @buf: a pointer to a structure to hold the peer's name
+  * @buf: a pointer to a structure to hold the peer's name (may be null)
   * @sizeof_buf: initialy holds the size of 'buf'
   *
   * This function will copy the name of the CRL issuer in the provided buffer. The name 
   * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253.
+  *
+  * If buf is null then only the size will be filled.
   *
   * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
   * in that case the sizeof_buf will be updated with the required size.
@@ -217,11 +219,43 @@ int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data,
 int gnutls_x509_crl_get_issuer_dn(gnutls_crl crl, char *buf,
 					 int *sizeof_buf)
 {
-	if (buf == NULL || sizeof_buf == 0 || crl == NULL) {
+	if (sizeof_buf == 0 || crl == NULL) {
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	return _gnutls_x509_parse_dn( crl->crl, "crl2.tbsCertList.issuer.rdnSequence",
+		buf, sizeof_buf);
+
+		
+}
+
+/**
+  * gnutls_x509_crl_get_issuer_dn_by_oid - This function returns the CRL's issuer distinguished name
+  * @crl: should contain a gnutls_crl structure
+  * @oid: holds an Object Identified in null terminated string
+  * @buf: a pointer to a structure to hold the peer's name (may be null)
+  * @sizeof_buf: initialy holds the size of 'buf'
+  *
+  * This function will extract the part of the name of the CRL issuer specified
+  * by the given OID. The output will be encoded as described in RFC2253.
+  *
+  * Some helper macros with popular OIDs can be found in gnutls/x509.h
+  *
+  * If buf is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_buf will be updated with the required size.
+  * On success zero is returned.
+  *
+  **/
+int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_crl crl, const char* oid, char *buf,
+					 int *sizeof_buf)
+{
+	if (sizeof_buf == 0 || crl == NULL) {
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	return _gnutls_x509_parse_dn_oid( crl->crl, "crl2.tbsCertList.issuer.rdnSequence", oid,
 		buf, sizeof_buf);
 
 		

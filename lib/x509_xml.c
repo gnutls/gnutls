@@ -38,6 +38,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_str.h>
 #include <gnutls_x509.h>
+#include "x509/common.h"
 
 static int _gnutls_x509_expand_extensions(ASN1_TYPE* rasn, const char *root);
 

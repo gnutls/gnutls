@@ -31,6 +31,7 @@
 #include "debug.h"
 #include <gnutls_str.h>
 #include <gnutls_x509.h>
+#include "x509/common.h"
 
 /* This file contains code to parse the X.509 certificate
  * extensions. Not all the PKIX extensions are supported.

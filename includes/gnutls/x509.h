@@ -32,6 +32,19 @@ extern "C" {
 
 #include <gnutls/gnutls.h>
 
+/* Some OIDs usually found in Distinguished names
+ */
+#define X520_COUNTRY_NAME		"2 5 4 6"
+#define X520_ORGANIZATION_NAME 		"2 5 4 10"
+#define X520_ORGANIZATIONAL_UNIT_NAME 	"2 5 4 11"
+#define X520_COMMON_NAME 		"2 5 4 3"
+#define X520_LOCALITY_NAME 		"2 5 4 7"
+#define X520_STATE_OR_PROVINCE_NAME 	"2 5 4 8"
+#define LDAP_DC				"0 9 2342 19200300 100 1 25"
+#define LDAP_UID			"0 9 2342 19200300 100 1 1"
+#define PKCS9_EMAIL 			"1 2 840 113549 1 9 1"
+                                                                        
+
 struct gnutls_crl_int;
 typedef struct gnutls_crl_int* gnutls_crl;
 
@@ -43,6 +56,10 @@ int gnutls_x509_crl_import(gnutls_crl crl, const gnutls_datum * data,
 
 int gnutls_x509_crl_get_issuer_dn(const gnutls_crl crl, 
 	char *buf, int *sizeof_buf);
+int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_crl crl, const char* oid, 
+	char *buf, int *sizeof_buf);
+
+
 int gnutls_x509_crl_get_signed_data(gnutls_crl crl, gnutls_datum *data);
 
 int gnutls_x509_crl_get_signature(gnutls_crl crl, gnutls_datum *data);
