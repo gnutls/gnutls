@@ -845,7 +845,7 @@ authorities into the credentials structure by using
 @code{gnutls_certificate_set_x509_trust_file} or
 @code{gnutls_certificate_set_openpgp_keyring_file} for openpgp
 keys. Note however that the peer's certificate is not automatically
-verified, you should call @code{gnutls_certificate_verify_peers},
+verified, you should call @code{gnutls_certificate_verify_peers2},
 after a successful handshake, to verify the signatures of the
 certificate.  An alternative way, which reports a more detailed
 verification output, is to use @code{gnutls_certificate_get_peers} to
@@ -1267,7 +1267,7 @@ this purpose the function @code{gnutls_x509_crt_verify} is
 provided. The output of this function is the bitwise OR of the
 elements of the @code{gnutls_certificate_status} enumeration.  A
 detailed description of these elements can be found in figure below.
-The function @code{gnutls_certificate_verify_peers} is equivalent to
+The function @code{gnutls_certificate_verify_peers2} is equivalent to
 the previous one, and will verify the peer's certificate in a TLS
 session.
 
