@@ -1,5 +1,4 @@
-/* this is not to be included by gnutls_anon.c */
-extern MOD_AUTH_STRUCT srp_auth_struct;
+#include <gnutls_auth.h>
 
 typedef struct {
 	char* username;
@@ -20,5 +19,5 @@ typedef struct {
 	char username[256];
 } SRP_SERVER_AUTH_INFO;
 
-int gen_srp_server_hello(GNUTLS_KEY, opaque **);
-int proc_srp_server_hello(GNUTLS_KEY, const opaque *, int);
+int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size);
+int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data);

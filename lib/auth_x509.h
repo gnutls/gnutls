@@ -1,9 +1,7 @@
 #ifndef AUTH_X509_H
 # define AUTH_X509_H
 # include "gnutls_cert.h"
-
-/* this is not to be included by gnutls_anon.c */
-extern MOD_AUTH_STRUCT rsa_auth_struct;
+# include "gnutls_auth.h"
 
 /* This structure may be complex but, it's the only way to
  * support a server that has multiple certificates
@@ -42,6 +40,7 @@ typedef struct {
 	time_t		  peer_certificate_expiration_time;
 	char		  subjectAltName[X509_CN_SIZE];
 	unsigned char	  keyUsage;
+	int		  certificate_requested;
 } X509PKI_CLIENT_AUTH_INFO;
 
 void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO* info, gnutls_cert* cert, CertificateStatus verify);

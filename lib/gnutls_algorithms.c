@@ -23,12 +23,6 @@
 #include "gnutls_errors.h"
 #include "gnutls_cert.h"
 
-/* include all the kx handler's definitions */
-#include "auth_anon.h"
-/* #include "auth_dhe_dss.h" */
-#include "auth_srp.h"
-#include "auth_x509.h"
-
 #define MAX_CIPHER 256
 #define MAX_MAC 256
 #define MAX_KX 256
@@ -186,6 +180,10 @@ struct gnutls_kx_algo_entry {
 	MOD_AUTH_STRUCT *auth_struct;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
+
+extern MOD_AUTH_STRUCT rsa_auth_struct;
+extern MOD_AUTH_STRUCT anon_auth_struct;
+extern MOD_AUTH_STRUCT srp_auth_struct;
 
 static const gnutls_kx_algo_entry kx_algorithms[] = {
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_ANON, &anon_auth_struct),
@@ -787,12 +785,6 @@ int _gnutls_version_get_major(GNUTLS_Version version)
 }
 
 /* Version Functions */
-int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2)
-{
-	if (ver1 != ver2)
-		return 1;
-	return 0;
-}
 
 int
 _gnutls_version_is_supported(GNUTLS_STATE state,

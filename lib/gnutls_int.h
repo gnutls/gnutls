@@ -30,9 +30,9 @@
 #define HARD_DEBUG
 #define BUFFERS_DEBUG
 #define RECORD_DEBUG
-#define HANDSHAKE_DEBUG
+#define HANDSHAKE_DEBUG*/
 #define DEBUG
-*/
+
 
 #define SOCKET int
 #define LIST ...
@@ -71,6 +71,7 @@
 #endif
 
 #include <gnutls_mem.h>
+#include <gnutls_ui.h>
 
 #define DECR_LEN(len, x) len-=x; if (len<0) {gnutls_assert(); return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;}
 
@@ -141,7 +142,7 @@ typedef struct {
 	uint8 minor;
 } ProtocolVersion;
 
-typedef struct {
+struct GNUTLS_KEY_INT {
 	/* For DH KX */
 	gnutls_datum			key;
 	MPI				KEY;
@@ -172,22 +173,24 @@ typedef struct {
 							 */
 	uint8				crypt_algo;
 
-	/* These are needed in RSA and DH signature calculation 
-	 */
-	opaque				server_random[TLS_RANDOM_SIZE];
-	opaque				client_random[TLS_RANDOM_SIZE];
-	ProtocolVersion			version;
-	
 	AUTH_CRED*			cred; /* used to specify keys/certificates etc */
-} GNUTLS_KEY_A;
-typedef GNUTLS_KEY_A* GNUTLS_KEY;
+	
+	int				certificate_requested;
+					/* some ciphersuites use this
+					 * to provide client authentication.
+					 * 1 if client auth was requested
+					 * by the peer, 0 otherwise
+					 */
+};
+typedef struct GNUTLS_KEY_INT* GNUTLS_KEY;
 
 
 /* STATE (cont) */
 
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
-#include <gnutls_auth.h>
+
+//#include <gnutls_auth.h>
 
 typedef struct {
 	uint8 CipherSuite[2];
@@ -305,28 +308,27 @@ typedef struct {
 	ResumableSession		resumed; /* TRUE or FALSE - if we are resuming a session */
 	SecurityParameters		resumed_security_parameters;
 
-	int				certificate_requested; /* non zero if client certificate was requested */
 	/* sockets internals */
 	int				lowat;
 	/* gdbm */
 	char*				db_name;
 	int				expire_time;
-	MOD_AUTH_STRUCT*		auth_struct; /* used in handshake packets and KX algorithms */
+	struct MOD_AUTH_STRUCT_INT*		auth_struct; /* used in handshake packets and KX algorithms */
 	int				v2_hello; /* set 0 normally - 1 if v2 hello was received - server side only */
 #ifdef HAVE_LIBGDBM
 	GDBM_FILE			db_reader;
 #endif
 } GNUTLS_INTERNALS;
 
-typedef struct {
+struct GNUTLS_STATE_INT {
 	SecurityParameters security_parameters;
 	CipherSpecs cipher_specs;
 	ConnectionState connection_state;
 	GNUTLS_INTERNALS gnutls_internals;
 	GNUTLS_KEY gnutls_key;
-} GNUTLS_STATE_INT;
+};
 
-typedef GNUTLS_STATE_INT *GNUTLS_STATE;
+typedef struct GNUTLS_STATE_INT *GNUTLS_STATE;
 
 
 /* Record Protocol */
@@ -345,7 +347,8 @@ GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void* data, size_t sizeofdata, int flags);
 ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType, char* data, size_t sizeofdata, int flags);
 int _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
-int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);
+
+#define _gnutls_version_cmp( ver1, ver2) ver1==ver2?0:1
 #define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)
 
 #endif /* GNUTLS_INT_H */

@@ -162,6 +162,19 @@ unsigned char gnutls_x509pki_client_get_key_usage( const X509PKI_CLIENT_AUTH_INF
 	return info->keyUsage;
 }
 
+/**
+  * gnutls_x509pki_client_get_certificate_request_status - This function returns the certificate request status
+  * @info: is an X509PKI_CLIENT_AUTH_INFO structure
+  *
+  * This function will return 0 if the peer (server) did not requested client
+  * authentication or 1 otherwise.
+  *
+  **/
+unsigned char gnutls_x509pki_client_get_certificate_request_status( const X509PKI_CLIENT_AUTH_INFO* info) {
+	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	return info->certificate_requested;
+}
+
 
 /**
   * gnutls_x509pki_client_get_subject_alt_name - This function returns the peer's alternative name

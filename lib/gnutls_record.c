@@ -51,10 +51,6 @@ GNUTLS_Version ver;
 
 void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version) {
 	state->connection_state.version = version;
-	if (state->gnutls_key!=NULL) {
-		state->gnutls_key->version.major = _gnutls_version_get_major(version);
-		state->gnutls_key->version.minor = _gnutls_version_get_minor(version);
-	}
 }
 
 /**
@@ -86,7 +82,7 @@ int gnutls_set_lowat(GNUTLS_STATE state, int num) {
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
 
-	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
+	*state = gnutls_calloc(1, sizeof(struct GNUTLS_STATE_INT));
 	
 	(*state)->security_parameters.entity = con_end;
 
@@ -104,7 +100,7 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	gnutls_set_protocol_priority( *state, GNUTLS_TLS1, 0); /* default */
 
-	(*state)->gnutls_key = gnutls_calloc(1, sizeof(GNUTLS_KEY_A));
+	(*state)->gnutls_key = gnutls_calloc(1, sizeof(struct GNUTLS_KEY_INT));
 
 	(*state)->gnutls_internals.resumed = RESUME_FALSE;
 
@@ -187,7 +183,7 @@ int gnutls_deinit(GNUTLS_STATE state)
 
 	GNUTLS_FREE(state->gnutls_internals.db_name);
 
-	memset( state, 0, sizeof(GNUTLS_STATE_INT));
+	memset( state, 0, sizeof(struct GNUTLS_STATE_INT));
 	GNUTLS_FREE(state);
 	return 0;
 }
@@ -452,6 +448,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		
 		WRITEuint16( cipher_size, &headers[3]);
 		
+#warning "CHECK if the double write breaks other implementations"
 		if (_gnutls_Write(cd, headers, HEADER_SIZE, flags) != HEADER_SIZE) {
 			state->gnutls_internals.valid_connection = VALID_FALSE;
 			state->gnutls_internals.resumable = RESUME_FALSE;
