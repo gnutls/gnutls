@@ -236,6 +236,12 @@ static int handle_error(socket_st hd, int err)
 	return ret;
 }
 
+int starttls_alarmed;
+
+void starttls_alarm (int signum)
+{
+  starttls_alarmed = 1;
+}
 
 int main(int argc, char **argv)
 {
@@ -358,6 +364,8 @@ int main(int argc, char **argv)
 
 	printf("\n- Simple Client Mode:\n\n");
 
+	signal (SIGALRM, &starttls_alarm);
+
 	FD_ZERO(&rset);
 	for (;;) {
 		FD_SET(fileno(stdin), &rset);
@@ -366,7 +374,26 @@ int main(int argc, char **argv)
 		maxfd = MAX(fileno(stdin), sd);
 		tv.tv_sec = 3;
 		tv.tv_usec = 0;
-		select(maxfd + 1, &rset, NULL, NULL, &tv);
+		err = select(maxfd + 1, &rset, NULL, NULL, &tv);
+
+		if (err < 0) {
+		  if (errno == EINTR && starttls_alarmed) {
+		    if (hd.secure == 0) {
+		      fprintf(stderr,
+			      "*** Starting TLS handshake\n");
+		      ret = do_handshake(&hd);
+		      if (ret < 0) {
+			fprintf(stderr,
+				"*** Handshake has failed\n");
+			socket_bye(&hd);
+			user_term = 1;
+		      }
+		    } else {
+		      user_term = 1;
+		    }
+		  }
+		  continue;
+		}
 
 		if (FD_ISSET(sd, &rset)) {
 			bzero(buffer, MAX_BUF + 1);

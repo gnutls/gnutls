@@ -362,6 +362,8 @@ int print_info(gnutls_session session, const char* hostname)
 	tmp = gnutls_compression_get_name(gnutls_compression_get(session));
 	printf("- Compression: %s\n", tmp);
 
+	fflush (stdout);
+
 	return 0;
 }
 
