@@ -5,3 +5,4 @@ Makefile.in
 simple
 *.lo
 *.la
+chain*.pem
