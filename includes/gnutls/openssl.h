@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2004 Free Software Foundation
  * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  *
  * GNUTLS-EXTRA is free software; you can redistribute it and/or modify it
@@ -161,8 +162,10 @@ struct _SSL
 
 #define rbio gnutls_state
 
-struct MD_CTX;
-typedef struct MD_CTX MD_CTX;
+typedef struct
+{
+    void *handle;
+} MD_CTX;
 
 struct RSA;
 typedef struct RSA RSA;
@@ -302,6 +305,8 @@ int RAND_egd_bytes(const char *path, int bytes);
 #define RAND_egd(p) RAND_egd_bytes((p), 255)
 
 /* message digest functions */
+
+#define MD5_DIGEST_LENGTH 16
 
 void MD5_Init(MD5_CTX *ctx);
 void MD5_Update(MD5_CTX *ctx, const void *buf, int len);
