@@ -1,3 +1,4 @@
+* Add support for PKCS8 encrypted private keys
 * Add DHE_* ciphersuites
 * Tools for processing/generating certificates (fabio.fiorina@alcatel.it is working on that)
 * Documentation (of existing functions + Manual)
