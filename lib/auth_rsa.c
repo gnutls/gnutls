@@ -461,7 +461,6 @@ int proc_rsa_certificate(GNUTLS_STATE state, opaque * data, int data_size)
  
         _gnutls_copy_x509_client_auth_info( info, &peer_certificate_list[0], verify);
 
-
 	gnutls_free( peer_certificate_list);
 
 	return 0;

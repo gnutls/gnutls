@@ -22,8 +22,16 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 
+#ifdef USE_DMALLOC
+
+int _gnutls_is_secure_memory(const void* ign) {
+	return 0;
+}
+
+#else
+
 /* #define MALLOC_DEBUG */
-#define EXTRA_SIZE sizeof(size_t)+1
+# define EXTRA_SIZE sizeof(size_t)+1
 
 int _gnutls_is_secure_memory(const svoid* mem) {
         return *((opaque*)mem-1);
@@ -147,3 +155,4 @@ char* ret;
 	
 	return ret;
 }
+#endif /* USE_DMALLOC */

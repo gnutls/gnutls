@@ -269,7 +269,12 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 	state->gnutls_internals.hash_buffer.data =
 		    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
 			   state->gnutls_internals.hash_buffer.size);
-		memcpy(&state->gnutls_internals.hash_buffer.data[old_buffer], data, length);
+			   
+	if (state->gnutls_internals.hash_buffer.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	memcpy(&state->gnutls_internals.hash_buffer.data[old_buffer], data, length);
 
 	return 0;
 }
@@ -297,6 +302,11 @@ int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 	state->gnutls_internals.hash_buffer.data =
 	    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
 			   state->gnutls_internals.hash_buffer.size);
+
+	if (state->gnutls_internals.hash_buffer.data == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return length;	
 

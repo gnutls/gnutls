@@ -263,7 +263,7 @@ int _gnutls_recv_server_kx_message(SOCKET cd, GNUTLS_STATE state)
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
-				   GNUTLS_SERVER_KEY_EXCHANGE);
+				   GNUTLS_SERVER_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
 			return ret;
 
@@ -292,7 +292,7 @@ int _gnutls_recv_server_certificate_request(SOCKET cd, GNUTLS_STATE state)
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
-				   GNUTLS_CERTIFICATE_REQUEST);
+				   GNUTLS_CERTIFICATE_REQUEST, OPTIONAL_PACKET);
 		if (ret <= 0)
 			return ret;
 
@@ -322,7 +322,7 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 				   &datasize,
-				   GNUTLS_SERVER_KEY_EXCHANGE);
+				   GNUTLS_SERVER_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
 			return ret;
 
@@ -353,7 +353,7 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 					   &datasize,
-					   GNUTLS_CLIENT_KEY_EXCHANGE);
+					   GNUTLS_CLIENT_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
 			return ret;
 
@@ -384,7 +384,7 @@ int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 					   &datasize,
-					   GNUTLS_CLIENT_KEY_EXCHANGE);
+					   GNUTLS_CLIENT_KEY_EXCHANGE, MANDATORY_PACKET);
 		if (ret < 0)
 			return ret;
 
@@ -442,7 +442,7 @@ int _gnutls_recv_certificate(SOCKET cd, GNUTLS_STATE state)
 		ret =
 		    _gnutls_recv_handshake(cd, state, &data,
 					   &datasize,
-					   GNUTLS_CERTIFICATE);
+					   GNUTLS_CERTIFICATE, MANDATORY_PACKET);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

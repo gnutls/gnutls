@@ -758,6 +758,7 @@ return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		return result;
 	}
 
+	memset( &gCert->subjectAltName, 0, sizeof(gCert->subjectAltName));
 	if ((result =
 	     _gnutls_get_ext_type( c2, "certificate2.tbsCertificate.extensions", gCert)) < 0) {
 		gnutls_assert();

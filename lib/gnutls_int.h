@@ -59,12 +59,10 @@
 
 /* the maximum size of encrypted packets */
 #define MAX_ENC_LEN 16384
-#define HEADER_SIZE 5
-#define MAX_RECV_SIZE 18432+HEADER_SIZE 	/* 2^14+2048+HEADER_SIZE */
+#define RECORD_HEADER_SIZE 5
+#define MAX_RECV_SIZE 18432+RECORD_HEADER_SIZE 	/* 2^14+2048+RECORD_HEADER_SIZE */
 
-#ifdef USE_DMALLOC
-# include <dmalloc.h>
-#endif
+#define HANDSHAKE_HEADER_SIZE 4
 
 #ifdef USE_GCRYPT
 # include <gnutls_gcry.h>
@@ -190,8 +188,6 @@ typedef struct GNUTLS_KEY_INT* GNUTLS_KEY;
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
 
-//#include <gnutls_auth.h>
-
 typedef struct {
 	uint8 CipherSuite[2];
 } GNUTLS_CipherSuite;
@@ -289,6 +285,15 @@ typedef struct {
 #define Protocol_Priority GNUTLS_Priority
 
 typedef struct {
+	opaque				header[HANDSHAKE_HEADER_SIZE];
+	/* this holds the number of bytes in the handshake_header[] */
+	int				header_size;
+	/* this holds the length of the handshake packet */
+	int				packet_length;
+	HandshakeType			recv_type;
+} HANDSHAKE_HEADER_BUFFER;
+
+typedef struct {
 	gnutls_datum			buffer;
 	gnutls_datum			hash_buffer; /* used to keep all handshake messages */
 	gnutls_datum			buffer_handshake; /* this is a buffer that holds the current handshake message */
@@ -318,6 +323,9 @@ typedef struct {
 #ifdef HAVE_LIBGDBM
 	GDBM_FILE			db_reader;
 #endif
+	/* keeps the headers of the handshake packet 
+	 */
+	HANDSHAKE_HEADER_BUFFER		handshake_header_buffer;
 } GNUTLS_INTERNALS;
 
 struct GNUTLS_STATE_INT {
