@@ -1571,7 +1571,7 @@ gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
                                          int port)
 {
     if ( !res || !keyserver )
-        return GNUTLS_E_ILLEGAL_PARAMETER;
+        return GNUTLS_E_INVALID_REQUEST;
 
     if( !port )
         port = 11371;
@@ -1984,7 +1984,7 @@ gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
                                         char* trustdb )
 {
     if ( !res || !trustdb )
-        return GNUTLS_E_ILLEGAL_PARAMETER;
+        return GNUTLS_E_INVALID_REQUEST;
 
     /* the old v2 format was used with 1.0.6, do we still need to check
        it now because GPG 1.0.7, 1.2.0, 1.21 and even 1.3.0 is out? */
