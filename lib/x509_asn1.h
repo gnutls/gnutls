@@ -86,6 +86,8 @@
 #define ASN_ERROR_TYPE_ANY       10
 #define ASN_SYNTAX_ERROR         11
 #define ASN_MEM_ERROR		 12
+#define ASN_DER_OVERFLOW         13
+
 
 /******************************************************/
 /* Structure definition used for the node of the tree */

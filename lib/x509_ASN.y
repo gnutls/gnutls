@@ -25,16 +25,18 @@
 /*   The output file is a parser (in C language) for */
 /*   ASN.1 syntax                                    */
 /*****************************************************/
+ 
 
-
-%{
+%{ 
 #include <gnutls_int.h>
 #include "x509_asn1.h"
 
-FILE *file_asn1;  /* Pointer to file to parse */
-extern int parse_mode;
-int result_parse;
-node_asn *p_tree;
+FILE *file_asn1;         /* Pointer to file to parse */
+extern int parse_mode;   /* PARSE_MODE_CHECK  = only syntax check
+                            PARSE_MODE_CREATE = structure creation */ 
+int result_parse;        /* result of the parser algorithm */
+node_asn *p_tree;        /* pointer to the root of the structure 
+                            created by the parser*/     
 %}
 
 
@@ -121,14 +123,14 @@ pos_neg_identifier :  pos_neg_num    {strcpy($$,$1);}
                     | IDENTIFIER     {strcpy($$,$1);}
 ;
 
-constant: '(' pos_neg_num ')'   {$$=_asn1_add_node(TYPE_CONSTANT); 
-                         _asn1_set_value($$,$2,strlen($2)+1);}
+constant: '(' pos_neg_num ')'         {$$=_asn1_add_node(TYPE_CONSTANT); 
+                                       _asn1_set_value($$,$2,strlen($2)+1);}
         | IDENTIFIER'('pos_neg_num')' {$$=_asn1_add_node(TYPE_CONSTANT);
-	                         _asn1_set_name($$,$1); 
-                               _asn1_set_value($$,$3,strlen($3)+1);}
+	                               _asn1_set_name($$,$1); 
+                                       _asn1_set_value($$,$3,strlen($3)+1);}
 ;
 
-constant_list:  constant   {$$=$1;}
+constant_list:  constant                   {$$=$1;}
               | constant_list ',' constant {$$=$1;
                                             _asn1_set_right(_asn1_get_last_right($1),$3);}
 ;
@@ -148,7 +150,7 @@ obj_constant:  num_identifier     {$$=_asn1_add_node(TYPE_CONSTANT);
                                     _asn1_set_value($$,$3,strlen($3)+1);}
 ;
 
-obj_constant_list:  obj_constant        {$$=$1;}
+obj_constant_list:  obj_constant                   {$$=$1;}
                   | obj_constant_list obj_constant {$$=$1;
                                                     _asn1_set_right(_asn1_get_last_right($1),$2);}
 ;
@@ -170,12 +172,12 @@ tag :  tag_type           {$$=$1;}
 ;
 
 default :  DEFAULT pos_neg_identifier {$$=_asn1_add_node(TYPE_DEFAULT); 
-                                   _asn1_set_value($$,$2,strlen($2)+1);}
+                                       _asn1_set_value($$,$2,strlen($2)+1);}
          | DEFAULT TRUE           {$$=_asn1_add_node(TYPE_DEFAULT|CONST_TRUE);}
          | DEFAULT FALSE          {$$=_asn1_add_node(TYPE_DEFAULT|CONST_FALSE);}
 ;
 
-integer_def: INTEGER   {$$=_asn1_add_node(TYPE_INTEGER);}
+integer_def: INTEGER                    {$$=_asn1_add_node(TYPE_INTEGER);}
            | INTEGER'{'constant_list'}' {$$=_asn1_add_node(TYPE_INTEGER|CONST_LIST);
 	                                 _asn1_set_down($$,$3);}
            | integer_def'('num_identifier'.''.'num_identifier')'
@@ -195,22 +197,22 @@ Time:   UTCTime          {$$=_asn1_add_node(TYPE_TIME|CONST_UTC);}
 size_def2: SIZE'('num_identifier')'  {$$=_asn1_add_node(TYPE_SIZE|CONST_1_PARAM);
 	                              _asn1_set_value($$,$3,strlen($3)+1);}
         | SIZE'('num_identifier'.''.'num_identifier')'  
-                                    {$$=_asn1_add_node(TYPE_SIZE|CONST_MIN_MAX);
-	                               _asn1_set_value($$,$3,strlen($3)+1);
-                                     _asn1_set_name($$,$6);}
+                                     {$$=_asn1_add_node(TYPE_SIZE|CONST_MIN_MAX);
+	                              _asn1_set_value($$,$3,strlen($3)+1);
+                                      _asn1_set_name($$,$6);}
 ;
 
 size_def:   size_def2          {$$=$1;}
           | '(' size_def2 ')'  {$$=$2;}
 ;
 
-octet_string_def : OCTET STRING   {$$=_asn1_add_node(TYPE_OCTET_STRING);}
+octet_string_def : OCTET STRING           {$$=_asn1_add_node(TYPE_OCTET_STRING);}
                  | OCTET STRING size_def  {$$=_asn1_add_node(TYPE_OCTET_STRING|CONST_SIZE);
                                            _asn1_set_down($$,$3);}
 ;
 
 bit_element :  IDENTIFIER'('NUM')' {$$=_asn1_add_node(TYPE_CONSTANT);
-	                              _asn1_set_name($$,$1); 
+	                           _asn1_set_name($$,$1); 
                                     _asn1_set_value($$,$3,strlen($3)+1);}
 ;
 
@@ -233,36 +235,36 @@ enumerated_def : ENUMERATED'{'bit_element_list'}'
 object_def :  OBJECT STR_IDENTIFIER {$$=_asn1_add_node(TYPE_OBJECT_ID);}
 ;
 
-type_assig_right: IDENTIFIER         {$$=_asn1_add_node(TYPE_IDENTIFIER);
-                                      _asn1_set_value($$,$1,strlen($1)+1);}
+type_assig_right: IDENTIFIER          {$$=_asn1_add_node(TYPE_IDENTIFIER);
+                                       _asn1_set_value($$,$1,strlen($1)+1);}
                 | IDENTIFIER size_def {$$=_asn1_add_node(TYPE_IDENTIFIER|CONST_SIZE);
-                                      _asn1_set_value($$,$1,strlen($1)+1);
-                                      _asn1_set_down($$,$2);}
-                | integer_def        {$$=$1;}
-                | enumerated_def     {$$=$1;}
-                | boolean_def        {$$=$1;}
-                | Time            
-                | octet_string_def   {$$=$1;}
-                | bit_string_def     {$$=$1;}
-                | sequence_def       {$$=$1;}
-                | object_def         {$$=$1;}
-                | choise_def         {$$=$1;}
-                | any_def            {$$=$1;}
-                | set_def            {$$=$1;}
-                | TOKEN_NULL         {$$=_asn1_add_node(TYPE_NULL);}
+                                       _asn1_set_value($$,$1,strlen($1)+1);
+                                       _asn1_set_down($$,$2);}
+                | integer_def         {$$=$1;}
+                | enumerated_def      {$$=$1;}
+                | boolean_def         {$$=$1;}
+                | Time             
+                | octet_string_def    {$$=$1;}
+                | bit_string_def      {$$=$1;}
+                | sequence_def        {$$=$1;}
+                | object_def          {$$=$1;}
+                | choise_def          {$$=$1;}
+                | any_def             {$$=$1;}
+                | set_def             {$$=$1;}
+                | TOKEN_NULL          {$$=_asn1_add_node(TYPE_NULL);}
 ;
 
-type_assig_right_tag :   type_assig_right  {$$=$1;}
+type_assig_right_tag :   type_assig_right     {$$=$1;}
                        | tag type_assig_right {$$=_asn1_mod_type($2,CONST_TAG);
-                                                   _asn1_set_right($1,_asn1_get_down($$));
-                                                   _asn1_set_down($$,$1);}
+                                               _asn1_set_right($1,_asn1_get_down($$));
+                                               _asn1_set_down($$,$1);}
 ;
 
-type_assig_right_tag_default : type_assig_right_tag  {$$=$1;}
+type_assig_right_tag_default : type_assig_right_tag   {$$=$1;}
                       | type_assig_right_tag default  {$$=_asn1_mod_type($1,CONST_DEFAULT);
                                                        _asn1_set_right($2,_asn1_get_down($$));
 						       _asn1_set_down($$,$2);}
-                      | type_assig_right_tag OPTIONAL   {$$=_asn1_mod_type($1,CONST_OPTION);}
+                      | type_assig_right_tag OPTIONAL {$$=_asn1_mod_type($1,CONST_OPTION);}
 ;
  
 type_assig : IDENTIFIER type_assig_right_tag_default  {$$=_asn1_set_name($2,$1);}
@@ -275,8 +277,8 @@ type_assig_list : type_assig                   {$$=$1;}
 
 sequence_def : SEQUENCE'{'type_assig_list'}' {$$=_asn1_add_node(TYPE_SEQUENCE);
                                               _asn1_set_down($$,$3);}
-   | SEQUENCE OF type_assig_right  {$$=_asn1_add_node(TYPE_SEQUENCE_OF);
-                                    _asn1_set_down($$,$3);}
+   | SEQUENCE OF type_assig_right            {$$=_asn1_add_node(TYPE_SEQUENCE_OF);
+                                              _asn1_set_down($$,$3);}
    | SEQUENCE size_def OF type_assig_right {$$=_asn1_add_node(TYPE_SEQUENCE_OF|CONST_SIZE);
                                             _asn1_set_right($2,$4);
                                             _asn1_set_down($$,$2);}
@@ -284,15 +286,15 @@ sequence_def : SEQUENCE'{'type_assig_list'}' {$$=_asn1_add_node(TYPE_SEQUENCE);
 
 set_def :  SET'{'type_assig_list'}' {$$=_asn1_add_node(TYPE_SET);
                                      _asn1_set_down($$,$3);}
-   | SET OF type_assig_right  {$$=_asn1_add_node(TYPE_SET_OF);
-                               _asn1_set_down($$,$3);}
+   | SET OF type_assig_right        {$$=_asn1_add_node(TYPE_SET_OF);
+                                     _asn1_set_down($$,$3);}
    | SET size_def OF type_assig_right {$$=_asn1_add_node(TYPE_SET_OF|CONST_SIZE);
                                        _asn1_set_right($2,$4);
                                        _asn1_set_down($$,$2);}
 ; 
 
 choise_def :   CHOICE'{'type_assig_list'}'  {$$=_asn1_add_node(TYPE_CHOICE);
-                                              _asn1_set_down($$,$3);}
+                                             _asn1_set_down($$,$3);}
 ;
 
 any_def :  ANY                         {$$=_asn1_add_node(TYPE_ANY);}
@@ -396,7 +398,7 @@ int
 yylex() 
 {
   int c,counter=0,k;
-  char string[129];  
+  char string[129]; /* will contain the next token */  
   while(1)
     {
     while((c=fgetc(file_asn1))==' ' || c=='\t' || c=='\n');
@@ -404,20 +406,21 @@ yylex()
     if(c=='(' || c==')' || c=='[' || c==']' || 
        c=='{' || c=='}' || c==',' || c=='.' ||
        c=='+') return c;
-    if(c=='-'){
+    if(c=='-'){  /* Maybe the first '-' of a comment */
       if((c=fgetc(file_asn1))!='-'){
 	ungetc(c,file_asn1);
 	return '-';
       }
-      else{
-	/* A comment finishes at the end of line */
+      else{ /* Comments */
 	counter=0;
+	/* A comment finishes at the end of line */
 	while((c=fgetc(file_asn1))!=EOF && c!='\n');
 	if(c==EOF) return 0;
-	else continue; /* repeat the search */
+	else continue; /* next char, please! (repeat the search) */
       }
     }
     string[counter++]=c;
+    /* Till the end of the token */
     while(!((c=fgetc(file_asn1))==EOF || c==' '|| c=='\t' || c=='\n' || 
 	     c=='(' || c==')' || c=='[' || c==']' || 
 	     c=='{' || c=='}' || c==',' || c=='.'))
@@ -433,7 +436,7 @@ yylex()
     if(k>=counter)
       {
       strcpy(yylval.str,string);  
-      return NUM;
+      return NUM; /* return the number */
       }
  
     /* Is STRING a keyword? */
@@ -466,29 +469,28 @@ yylex()
   * ASN_SYNTAX_ERROR: the syntax is not correct.
   * ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
   **/
-int 
-asn1_parser_asn1(char *file_name,node_asn **pointer)
-{
-  /*  yydebug=1;  */
-
+int asn1_parser_asn1(char *file_name,node_asn **pointer){
   p_tree=NULL;
   *pointer=NULL;
   
+  /* open the file to parse */
   file_asn1=fopen(file_name,"r");
-
   if(file_asn1==NULL) return ASN_FILE_NOT_FOUND;
 
   result_parse=ASN_OK;
 
+  /* only syntax check */
   parse_mode=PARSE_MODE_CHECK;
   yyparse();
 
-  if(result_parse==ASN_OK){
+  if(result_parse==ASN_OK){ /* syntax OK */
     fclose(file_asn1);
     file_asn1=fopen(file_name,"r");
 
+    /* structure creation */
     parse_mode=PARSE_MODE_CREATE;
     yyparse();
+
     _asn1_change_integer_value(p_tree);
     _asn1_expand_object_id(p_tree);
   }
@@ -501,6 +503,7 @@ asn1_parser_asn1(char *file_name,node_asn **pointer)
 
   return result_parse;
 }
+
 
 /**
   * asn1_parser_asn1_file_c - function that generates a C structure from an ASN1 file
@@ -519,33 +522,33 @@ asn1_parser_asn1(char *file_name,node_asn **pointer)
   *  ASN_SYNTAX_ERROR: the syntax is not correct.
   *  ASN_IDENTIFIER_NOT_FOUND: in the file there is an identifier that is not defined.
   **/
-int 
-asn1_parser_asn1_file_c(char *file_name)
-{
+int asn1_parser_asn1_file_c(char *file_name){
   int result;
-
-  /*  yydebug=1;  */
 
   p_tree=NULL;
     
+  /* open the file to parse */
   file_asn1=fopen(file_name,"r");
-
   if(file_asn1==NULL) return ASN_FILE_NOT_FOUND;
 
   result_parse=ASN_OK;
 
+  /* syntax check */
   parse_mode=PARSE_MODE_CHECK;
   yyparse();
 
-  if(result_parse==ASN_OK){
+  if(result_parse==ASN_OK){ /* syntax OK */
     fclose(file_asn1);
     file_asn1=fopen(file_name,"r");
 
+    /* structure creation */
     parse_mode=PARSE_MODE_CREATE;
     yyparse();
 
+    /* structure saved in a file */
     result=_asn1_create_static_structure(p_tree,file_name);
 
+    /* delete structure in memory */
     asn1_delete_structure(p_tree);
    }
 
@@ -559,7 +562,7 @@ asn1_parser_asn1_file_c(char *file_name)
 
 /*************************************************************/
 /*  Function: yyerror                                        */
-/*  Description: function used with syntax errors            */
+/*  Description: function called when there are syntax errors*/
 /*  Parameters:                                              */
 /*    char *s : error description                            */
 /*  Return: int                                              */
@@ -571,6 +574,7 @@ int yyerror (char *s)
   /*  printf("%s\n",s); */
   result_parse=ASN_SYNTAX_ERROR;
 }
+
 
 
 

@@ -27,26 +27,26 @@
 
 #include <gnutls_int.h> 
 
-#include "x509_asn1.h"
+#include "x509_asn1.h" 
 #include "x509_der.h"
 
-
+/* define used for visiting trees */
 #define UP     1
 #define RIGHT  2
 #define DOWN   3
 
 
-int parse_mode;
+int parse_mode;  /* PARSE_MODE_CHECK  = only syntax check
+                    PARSE_MODE_CREATE = structure creation */
 
 
 /******************************************************/
-/* Function : add_node                                */
-/* Description: adds an element to the list of nodes. */
+/* Function : _asn1_add_node                          */
+/* Description: creates a new NODE_ASN element.       */
 /* Parameters:                                        */
-/*   unsigned int type: node description (see TYPE_   */
-/*                      and CONST_ constants)         */
-/* Return: node_asn                                   */
-/*   Pointer to the new element                       */
+/*   type: type of the new element (see TYPE_         */
+/*         and CONST_ constants).                     */
+/* Return: pointer to the new element.                */
 /******************************************************/
 node_asn *
 _asn1_add_node(unsigned int type)
@@ -62,12 +62,21 @@ _asn1_add_node(unsigned int type)
   punt->type=type; 
   punt->value=NULL;
   punt->down=NULL;
-  punt->right=NULL;
+  punt->right=NULL; 
 
   return punt;
 }
 
-
+/******************************************************************/
+/* Function : _asn1_set_value                                     */
+/* Description: sets the field VALUE in a NODE_ASN element. The   */
+/*              previus value (if exist) will be lost             */
+/* Parameters:                                                    */
+/*   node: element pointer.                                       */
+/*   value: pointer to the value that you want to set.            */
+/*   len: character number of value.                              */
+/* Return: pointer to the NODE_ASN element.                       */
+/******************************************************************/
 node_asn *
 _asn1_set_value(node_asn *node,unsigned char *value,unsigned int len)
 {
@@ -84,6 +93,16 @@ _asn1_set_value(node_asn *node,unsigned char *value,unsigned int len)
   return node;
 }
 
+/******************************************************************/
+/* Function : _asn1_set_name                                      */
+/* Description: sets the field NAME in a NODE_ASN element. The    */
+/*              previus value (if exist) will be lost             */
+/* Parameters:                                                    */
+/*   node: element pointer.                                       */
+/*   name: a null terminated string with the name that you want   */
+/*         to set.                                                */
+/* Return: pointer to the NODE_ASN element.                       */
+/******************************************************************/
 node_asn *
 _asn1_set_name(node_asn *node,char *name)
 {
@@ -107,7 +126,15 @@ _asn1_set_name(node_asn *node,char *name)
   return node;
 }
 
-
+/******************************************************************/
+/* Function : _asn1_set_right                                     */
+/* Description: sets the field RIGHT in a NODE_ASN element.       */
+/* Parameters:                                                    */
+/*   node: element pointer.                                       */
+/*   right: pointer to a NODE_ASN element that you want be pointed*/
+/*          by NODE.                                              */
+/* Return: pointer to *NODE.                                      */
+/******************************************************************/
 node_asn *
 _asn1_set_right(node_asn *node,node_asn *right)
 {
@@ -119,7 +146,14 @@ _asn1_set_right(node_asn *node,node_asn *right)
   return node;
 }
 
-
+/******************************************************************/
+/* Function : _asn1_get_right                                     */
+/* Description: returns the element pointed by the RIGHT field of */
+/*              a NODE_ASN element.                               */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: field RIGHT of NODE.                                   */
+/******************************************************************/
 node_asn *
 _asn1_get_right(node_asn *node)
 {
@@ -129,6 +163,13 @@ _asn1_get_right(node_asn *node)
   return node->right;
 }
 
+/******************************************************************/
+/* Function : _asn1_get_last_right                                */
+/* Description: return the last element along the right chain.    */
+/* Parameters:                                                    */
+/*   node: starting element pointer.                              */
+/* Return: pointer to the last element along the right chain.     */
+/******************************************************************/
 node_asn *
 _asn1_get_last_right(node_asn *node)
 {
@@ -141,6 +182,15 @@ _asn1_get_last_right(node_asn *node)
   return p;
 }
 
+/******************************************************************/
+/* Function : _asn1_set_down                                      */
+/* Description: sets the field DOWN in a NODE_ASN element.        */
+/* Parameters:                                                    */
+/*   node: element pointer.                                       */
+/*   down: pointer to a NODE_ASN element that you want be pointed */
+/*          by NODE.                                              */
+/* Return: pointer to *NODE.                                      */
+/******************************************************************/
 node_asn *
 _asn1_set_down(node_asn *node,node_asn *down)
 {
@@ -152,6 +202,14 @@ _asn1_set_down(node_asn *node,node_asn *down)
   return node;
 }
 
+/******************************************************************/
+/* Function : _asn1_get_down                                      */
+/* Description: returns the element pointed by the DOWN field of  */
+/*              a NODE_ASN element.                               */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: field DOWN of NODE.                                    */
+/******************************************************************/
 node_asn *
 _asn1_get_down(node_asn *node)
 {
@@ -161,6 +219,13 @@ _asn1_get_down(node_asn *node)
   return node->down;
 }
 
+/******************************************************************/
+/* Function : _asn1_get_name                                      */
+/* Description: returns the name of a NODE_ASN element.           */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: a null terminated string.                              */
+/******************************************************************/
 char *
 _asn1_get_name(node_asn *node)
 {
@@ -170,6 +235,17 @@ _asn1_get_name(node_asn *node)
   return node->name;
 }
 
+/******************************************************************/
+/* Function : _asn1_mod_type                                      */
+/* Description: change the field TYPE of an NODE_ASN element.     */
+/*              The new value is the old one | (bitwise or) the   */
+/*              paramener VALUE.                                  */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/*   value: the integer value that must be or-ed with the current */
+/*          value of field TYPE.                                  */
+/* Return: NODE pointer.                                          */
+/******************************************************************/
 node_asn *
 _asn1_mod_type(node_asn *node,unsigned int value)
 {
@@ -180,6 +256,13 @@ _asn1_mod_type(node_asn *node,unsigned int value)
   return node;
 }
 
+/******************************************************************/
+/* Function : _asn1_remove_node                                   */
+/* Description: gets free the memory allocated for an NODE_ASN    */
+/*              element (not the elements pointed by it).         */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/******************************************************************/
 void
 _asn1_remove_node(node_asn *node)
 {
@@ -195,7 +278,17 @@ _asn1_remove_node(node_asn *node)
 }
 
 
-
+/******************************************************************/
+/* Function : _asn1_find_mode                                     */
+/* Description: searches an element called NAME starting from     */
+/*              POINTER. The name is composed by differents       */
+/*              identifiers separated by dot.The first identifier */
+/*              must be the name of *POINTER.                     */
+/* Parameters:                                                    */
+/*   pointer: NODE_ASN element pointer.                           */
+/*   name: null terminated string with the element's name to find.*/
+/* Return: the searching result. NULL if not find.                */
+/******************************************************************/
 node_asn *
 _asn1_find_node(node_asn *pointer,char *name)
 {
@@ -205,7 +298,7 @@ _asn1_find_node(node_asn *pointer,char *name)
   if((name==NULL) || (name[0]==0)) return NULL;
 
   n_start=name;
-  n_end=strchr(n_start,'.');
+  n_end=strchr(n_start,'.');     /* search the first dot */
   if(n_end){
     memcpy(n,n_start,n_end-n_start);
     n[n_end-n_start]=0;
@@ -221,12 +314,12 @@ _asn1_find_node(node_asn *pointer,char *name)
   while(p){
     if((p->name) && (!strcmp(p->name,n))) break;
     else p=p->right;
-  }
+  } /* while */
 
   if(p==NULL) return NULL;
 
-  while(n_start){
-    n_end=strchr(n_start,'.');
+  while(n_start){   /* Has the end of NAME been reached? */
+    n_end=strchr(n_start,'.');    /* search the next dot */
     if(n_end){
       memcpy(n,n_start,n_end-n_start);
       n[n_end-n_start]=0;
@@ -242,23 +335,32 @@ _asn1_find_node(node_asn *pointer,char *name)
 
     p=p->down;
 
+    /* The identifier "?LAST" indicates the last element 
+       in the right chain. */
     if(!strcmp(n,"?LAST")){
       if(p==NULL) return NULL;
       while(p->right) p=p->right;
     }
-    else{
+    else{   /* no "?LAST" */
       while(p){
 	if((p->name) && (!strcmp(p->name,n))) break;
 	else p=p->right;
       }
       if(p==NULL) return NULL;
     }
-  }
+  } /* while */
 
   return p;
 }
 
-
+/******************************************************************/
+/* Function : _asn1_find_left                                     */
+/* Description: returns the NODE_ASN element with RIGHT field that*/
+/*              points the element NODE.                          */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: NULL if not found.                                     */
+/******************************************************************/
 node_asn *
 _asn1_find_left(node_asn *node)
 {
@@ -268,7 +370,13 @@ _asn1_find_left(node_asn *node)
   return node->left;  
 }
 
-
+/******************************************************************/
+/* Function : _asn1_find_up                                       */
+/* Description: return the father of the NODE_ASN element.        */
+/* Parameters:                                                    */
+/*   node: NODE_ASN element pointer.                              */
+/* Return: Null if not found.                                     */ 
+/******************************************************************/
 node_asn *
 _asn1_find_up(node_asn *node)
 {
@@ -283,6 +391,20 @@ _asn1_find_up(node_asn *node)
   return p->left;
 }
 
+/******************************************************************/
+/* Function : _asn1_convert_integer                               */
+/* Description: converts an integer from a null terminated string */
+/*              to der decoding. The convertion from a null       */
+/*              terminated string to an integer is made with      */
+/*              the 'strtol' function.                            */
+/* Parameters:                                                    */
+/*   value: null terminated string to convert.                    */
+/*   value_out: convertion result (memory must be already         */
+/*              allocated).                                       */
+/*   value_out_size: number of bytes of value_out.                */
+/*   len: number of significant byte of value_out.                */
+/* Return: ASN_MEM_ERROR or ASN_OK                                */
+/******************************************************************/
 int
 _asn1_convert_integer(char *value,unsigned char *value_out,int value_out_size, int *len)
 {
@@ -309,8 +431,9 @@ _asn1_convert_integer(char *value,unsigned char *value_out,int value_out_size, i
      (!negative && (val[k]&0x80))) k--; 
 
   for(k2=k;k2<4;k2++) {
-  	if (k2-k > value_out_size-1) return ASN_MEM_ERROR;
-  	value_out[k2-k]=val[k2];
+    if (k2-k > value_out_size-1) return ASN_MEM_ERROR;
+    /* VALUE_OUT is too short to contain the value convertion */
+    value_out[k2-k]=val[k2];
   }
   *len=4-k;
 
@@ -372,10 +495,10 @@ asn1_create_tree(const static_asn *root,node_asn **pointer)
 	  move=RIGHT;
 	  break;
 	}
-      }
+      }  /* while */
     }
     k++;
-  }
+  }  /* while */
 
   if(p_last==*pointer){
     _asn1_change_integer_value(*pointer);
@@ -473,6 +596,7 @@ _asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name)
  return ASN_OK;
 }
 
+
 /**
   * asn1_visit_tree - Prints on the standard output the structure's tree
   * @pointer: pointer to the structure that you want to delete.
@@ -481,7 +605,6 @@ _asn1_create_static_structure(node_asn *pointer,char *file_name, char* out_name)
   * Prints on the standard output the structure's tree starting from the NAME element inside
   * the structure *POINTER. 
   **/
-
 void
 asn1_visit_tree(node_asn *pointer,char *name)
 {
@@ -518,6 +641,7 @@ asn1_visit_tree(node_asn *pointer,char *name)
     case TYPE_INTEGER:
       printf("INTEGER");
       if(p->value){
+	len2=-1;
 	len=_asn1_get_length_der(p->value,&len2);
 	printf("  value:0x");
 	for(k=0;k<len;k++) printf("%02x",(p->value)[k+len2]);
@@ -526,6 +650,7 @@ asn1_visit_tree(node_asn *pointer,char *name)
     case TYPE_ENUMERATED:
       printf("ENUMERATED");
       if(p->value){
+	len2=-1;
 	len=_asn1_get_length_der(p->value,&len2);
 	printf("  value:0x");
 	for(k=0;k<len;k++) printf("%02x",(p->value)[k+len2]);
@@ -548,6 +673,7 @@ asn1_visit_tree(node_asn *pointer,char *name)
     case TYPE_BIT_STRING:
       printf("BIT_STR");
       if(p->value){
+	len2=-1;
 	len=_asn1_get_length_der(p->value,&len2);
 	printf("  value(%i):",(len-1)*8-(p->value[len2]));
 	for(k=1;k<len;k++) printf("%02x",(p->value)[k+len2]);
@@ -556,6 +682,7 @@ asn1_visit_tree(node_asn *pointer,char *name)
     case TYPE_OCTET_STRING:
       printf("OCT_STR");
       if(p->value){
+	len2=-1;
 	len=_asn1_get_length_der(p->value,&len2);
 	printf("  value:");
 	for(k=0;k<len;k++) printf("%02x",(p->value)[k+len2]);
@@ -583,6 +710,7 @@ asn1_visit_tree(node_asn *pointer,char *name)
     case TYPE_ANY:
       printf("ANY");
       if(p->value){
+	len3=-1;
 	len2=_asn1_get_length_der(p->value,&len3);
 	printf("  value:");
 	for(k=0;k<len2;k++) printf("%02x",(p->value)[k+len3]);
@@ -659,6 +787,7 @@ asn1_visit_tree(node_asn *pointer,char *name)
   }
 }
 
+
 /**
   * asn1_delete_structure - Deletes the structure *POINTER. 
   * @root: pointer to the structure that you want to delete.
@@ -734,6 +863,7 @@ _asn1_copy_structure3(node_asn *source_node)
 	switch(type_field(p_s->type)){
 	case TYPE_OCTET_STRING: case TYPE_BIT_STRING: 
 	case TYPE_INTEGER: case TYPE_DEFAULT:
+	  len2=-1;
 	  len=_asn1_get_length_der(p_s->value,&len2);
 	  _asn1_set_value(p_d,p_s->value,len+len2);
 	  break;
@@ -786,6 +916,7 @@ _asn1_copy_structure2(node_asn *root,char *source_name)
   return _asn1_copy_structure3(source_node);
 
 }
+
 
 /**
   * asn1_create_structure - Creates a structure called DEST_NAME of type SOURCE_NAME.
@@ -872,6 +1003,7 @@ _asn1_append_sequence_set(node_asn *node)
   return ASN_OK;
 }
 
+
 /**
   * asn1_write_value - Set the value of one element inside a structure.
   * @node_root: pointer to a structure
@@ -946,7 +1078,6 @@ _asn1_append_sequence_set(node_asn *node)
   *           result=asn1_write_value(cert,"certificate1.tbsCertificate.issuerUniqueID",NULL,0);
   * 
   **/
-
 int 
 asn1_write_value(node_asn *node_root,char *name,unsigned char *value,int len)
 {
@@ -1273,7 +1404,10 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
       while(type_field(p->type)!=TYPE_DEFAULT) p=p->right;
       if (_asn1_convert_integer(p->value,value,value_size, len)!=ASN_OK) return ASN_MEM_ERROR;
     }
-    else if (_asn1_get_octet_der(node->value,&len2,value, value_size, len)!=ASN_OK) return ASN_MEM_ERROR;
+    else{
+      len2=-1;
+      if (_asn1_get_octet_der(node->value,&len2,value, value_size, len)!=ASN_OK) return ASN_MEM_ERROR;
+    }
     break;
   case TYPE_OBJECT_ID:
     if(node->type&CONST_ASSIGN){
@@ -1282,7 +1416,7 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
       while(p){
 	if(type_field(p->type)==TYPE_CONSTANT){
 	  ADD_STR_VALUE( value, value_size, p->value);
-	  ADD_STR_VALUE( value, value_size, " ");
+	  if(p->right) ADD_STR_VALUE( value, value_size, " ");
 	}
 	p=p->right;
       }
@@ -1295,15 +1429,18 @@ asn1_read_value(node_asn *root,char *name,unsigned char *value,int *len)
     PUT_STR_VALUE( value, value_size, node->value);
     break;
   case TYPE_OCTET_STRING:
+    len2=-1;
     if (_asn1_get_octet_der(node->value,&len2,value, value_size, len)!=ASN_OK) return ASN_MEM_ERROR;
     break;
   case TYPE_BIT_STRING:
+    len2=-1;
     if (_asn1_get_bit_der(node->value,&len2,value,value_size,len)!=ASN_OK) return ASN_MEM_ERROR;
     break;
   case TYPE_CHOICE:
     PUT_STR_VALUE( value, value_size, node->down->name);
     break; 
   case TYPE_ANY:
+    len3=-1;
     len2=_asn1_get_length_der(node->value,&len3);
     PUT_VALUE( value, value_size, node->value+len3, len2);
     break;
@@ -1750,6 +1887,7 @@ _asn1_expand_object_id(node_asn *node)
 
   return ASN_OK;
 }
+
 
 
 

@@ -4,11 +4,7 @@
 --                                            --
 --   Originator:  Fabio Fiorina               --
 --   e-mail:      Fabio.Fiorina@alcatel.it    --
---                fiorinaf@bgonline.it        --
 ------------------------------------------------
-
-** Most of the documentation here has been moved to inline comments and
-** the tex documentation --nmav
 
 
 
@@ -316,6 +312,8 @@ Input Parameters:
 Return Value:
   ASN_OK: DER encoding OK
   ASN_ELEMENT_NOT_FOUND: NAME is not a valid element.
+  ASN_DER_OVERFLOW: the buffer DER contains a NOT valid encoding: one ASN.1 
+                    element's length overflows the buffer. 
   ASN_TAG_ERROR, ASN_DER_ERROR: the der encoding doesn't match the structure NAME.
 
 
