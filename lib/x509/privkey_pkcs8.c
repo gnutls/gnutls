@@ -167,7 +167,7 @@ static int encode_to_private_key_info(gnutls_x509_privkey_t pkey,
      */
     result =
 	asn1_write_value(*pkey_info, "privateKeyAlgorithm.algorithm",
-			 PKIX1_RSA_OID, 1);
+			 PK_PKIX1_RSA_OID, 1);
     if (result != ASN1_SUCCESS) {
 	gnutls_assert();
 	result = _gnutls_asn2err(result);
@@ -746,7 +746,7 @@ int decode_private_key_info(const gnutls_datum_t * der,
 
     /* we only support RSA private keys.
      */
-    if (strcmp(oid, PKIX1_RSA_OID) != 0) {
+    if (strcmp(oid, PK_PKIX1_RSA_OID) != 0) {
 	gnutls_assert();
 	_gnutls_x509_log
 	    ("PKCS #8 private key OID '%s' is unsupported.\n", oid);

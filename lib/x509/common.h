@@ -41,16 +41,22 @@ void _gnutls_int2str(unsigned int k, char *data);
 #define PEM_PKCS7 "PKCS7"
 #define PEM_PKCS12 "PKCS12"
 
-#define PKIX1_RSA_OID "1.2.840.113549.1.1.1"
-#define DSA_OID "1.2.840.10040.4.1"
+/* public key algorithm's OIDs
+ */
+#define PK_PKIX1_RSA_OID "1.2.840.113549.1.1.1"
+#define PK_DSA_OID "1.2.840.10040.4.1"
+#define PK_GOST_R3410_94_OID "1.2.643.2.2.20"
+#define PK_GOST_R3410_2001_OID "1.2.643.2.2.19"
 
 /* signature OIDs
  */
-#define DSA_SHA1_OID "1.2.840.10040.4.3"
-#define RSA_MD5_OID "1.2.840.113549.1.1.4"
-#define RSA_MD2_OID "1.2.840.113549.1.1.2"
-#define RSA_SHA1_OID "1.2.840.113549.1.1.5"
-#define RSA_RMD160_OID "1.3.36.3.3.1.2"
+#define SIG_DSA_SHA1_OID "1.2.840.10040.4.3"
+#define SIG_RSA_MD5_OID "1.2.840.113549.1.1.4"
+#define SIG_RSA_MD2_OID "1.2.840.113549.1.1.2"
+#define SIG_RSA_SHA1_OID "1.2.840.113549.1.1.5"
+#define SIG_RSA_RMD160_OID "1.3.36.3.3.1.2"
+#define SIG_GOST_R3410_94_OID "1.2.643.2.2.4"
+#define SIG_GOST_R3410_2001_OID "1.2.643.2.2.3"
 
 time_t _gnutls_x509_utcTime2gtime(const char *ttime);
 time_t _gnutls_x509_generalTime2gtime(const char *ttime);

@@ -874,7 +874,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 
     result =
 	asn1_write_value(pkcs12->pkcs12,
-			 "macData.mac.digestAlgorithm.algorithm", OID_SHA1,
+			 "macData.mac.digestAlgorithm.algorithm", HASH_OID_SHA1,
 			 1);
     if (result != ASN1_SUCCESS) {
 	gnutls_assert();

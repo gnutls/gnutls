@@ -25,10 +25,10 @@
 #ifndef X509_H
 # define X509_H
 
-#define OID_SHA1 "1.3.14.3.2.26"
-#define OID_MD5 "1.2.840.113549.2.5"
-#define OID_MD2 "1.2.840.113549.2.2"
-#define OID_RMD160 "1.3.36.3.2.1"
+#define HASH_OID_SHA1 "1.3.14.3.2.26"
+#define HASH_OID_MD5 "1.2.840.113549.2.5"
+#define HASH_OID_MD2 "1.2.840.113549.2.2"
+#define HASH_OID_RMD160 "1.3.36.3.2.1"
 
 typedef struct gnutls_x509_crl_int {
     ASN1_TYPE crl;

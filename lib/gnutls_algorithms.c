@@ -169,10 +169,10 @@ struct gnutls_hash_entry {
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-    {"SHA", OID_SHA1, GNUTLS_MAC_SHA1},
-    {"MD5", OID_MD5, GNUTLS_MAC_MD5},
-    {"MD2", OID_MD2, 0/*GNUTLS_MAC_MD2*/},
-    {"RIPEMD160", OID_RMD160, GNUTLS_MAC_RMD160},
+    {"SHA", HASH_OID_SHA1, GNUTLS_MAC_SHA1},
+    {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5},
+    {"MD2", HASH_OID_MD2, 0/*GNUTLS_MAC_MD2*/},
+    {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160},
     {"NULL", NULL, GNUTLS_MAC_NULL},
     {0, 0, 0}
 };
@@ -1425,11 +1425,13 @@ struct gnutls_sign_entry {
 typedef struct gnutls_sign_entry gnutls_sign_entry;
 
 static const gnutls_sign_entry sign_algorithms[] = {
-    {"RSA-SHA", RSA_SHA1_OID, GNUTLS_SIGN_RSA_SHA1, GNUTLS_PK_RSA, GNUTLS_MAC_SHA1},
-    {"RSA-RMD160", RSA_RMD160_OID, GNUTLS_SIGN_RSA_RMD160, GNUTLS_PK_RSA, GNUTLS_MAC_RMD160},
-    {"DSA-SHA", DSA_SHA1_OID, GNUTLS_SIGN_DSA_SHA1, GNUTLS_PK_DSA, GNUTLS_MAC_SHA1},
-    {"RSA-MD5", RSA_MD5_OID, GNUTLS_SIGN_RSA_MD5, GNUTLS_PK_RSA, GNUTLS_MAC_MD5},
-    {"RSA-MD2", RSA_MD2_OID, GNUTLS_SIGN_RSA_MD2, GNUTLS_PK_RSA, 0/*GNUTLS_MAC_MD2*/},
+    {"RSA-SHA", SIG_RSA_SHA1_OID, GNUTLS_SIGN_RSA_SHA1, GNUTLS_PK_RSA, GNUTLS_MAC_SHA1},
+    {"RSA-RMD160", SIG_RSA_RMD160_OID, GNUTLS_SIGN_RSA_RMD160, GNUTLS_PK_RSA, GNUTLS_MAC_RMD160},
+    {"DSA-SHA", SIG_DSA_SHA1_OID, GNUTLS_SIGN_DSA_SHA1, GNUTLS_PK_DSA, GNUTLS_MAC_SHA1},
+    {"RSA-MD5", SIG_RSA_MD5_OID, GNUTLS_SIGN_RSA_MD5, GNUTLS_PK_RSA, GNUTLS_MAC_MD5},
+    {"RSA-MD2", SIG_RSA_MD2_OID, GNUTLS_SIGN_RSA_MD2, GNUTLS_PK_RSA, 0/*GNUTLS_MAC_MD2*/},
+    {"GOST R 34.10-2001", SIG_GOST_R3410_2001_OID, 0, 0, 0},
+    {"GOST R 34.10-94", SIG_GOST_R3410_94_OID, 0, 0, 0},
     {0, 0, 0, 0, 0}
 };
 
@@ -1511,8 +1513,10 @@ struct gnutls_pk_entry {
 typedef struct gnutls_pk_entry gnutls_pk_entry;
 
 static const gnutls_pk_entry pk_algorithms[] = {
-    {"RSA", PKIX1_RSA_OID, GNUTLS_PK_RSA},
-    {"DSA", DSA_OID, GNUTLS_PK_DSA},
+    {"RSA", PK_PKIX1_RSA_OID, GNUTLS_PK_RSA},
+    {"DSA", PK_DSA_OID, GNUTLS_PK_DSA},
+    {"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, 0},
+    {"GOST R 34.10-94", PK_GOST_R3410_94_OID, 0},
     {0, 0, 0}
 };
 
