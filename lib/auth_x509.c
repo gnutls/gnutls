@@ -428,18 +428,14 @@ int _gnutls_gen_x509_client_certificate(GNUTLS_STATE state, opaque ** data)
 		 * for uint24 */
 	}
 	
-	/* if no certificate were found then send:
+	/* if no certificates were found then send:
 	 * 00 00 03 00 00 00    // Certificate with no certs
 	 * instead of:
 	 * 00 00 00		// empty certificate handshake
 	 *
-	 * Althought I prefer the second method, it seems that 
-	 * everybody is using the first one.
 	 */
-	if (ret==3) ret+=3;
-	
 
-	(*data) = gnutls_calloc(1, ret);
+	(*data) = gnutls_malloc(ret);
 	pdata = (*data);
 
 	if (pdata == NULL) {
