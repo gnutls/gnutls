@@ -6,6 +6,8 @@ Current list:
 * Add ability to read PKCS-12 structures (certificate and private key)
 * Convert documentation to texinfo format
 * Audit the code
+* Allow sending V2 Hello messages. It seems that some broken 
+  implementations require that.
 * Add GPGSM certificate manager support
 * Allow unexpected Client Hello messages
 * Add Kerberos support
