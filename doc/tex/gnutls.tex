@@ -8,18 +8,29 @@
 \maketitle
 
 \tableofcontents
+\newpage
 
 \section{Introduction}
 \par
 gnuTLS is a library which implements the {\bf TLS 1.0} and {\bf SSL 3.0} protocols.
-TLS stands for 'Transport Layer Security' and is the sucessor of SSL (Secure Sockets Layer).
-{\bf TLS 1.0} is described is {\it RFC 2246} and is an Internet protocol (thus it's mostly used over TCP/IP),
-that provides confidentiality, and authentication layers. Currently {\bf gnuTLS} implements:
+TLS stands for 'Transport Layer Security' and is the sucessor of SSL\footnote{
+SSL or Secure Sockets Layer is a protocol designed by Netscape. TLS 1.0 is based on
+{\bf SSL 3.0} protocol. {\bf SSL 2.0} is very old protocol which is vulnerable to several attacks. SSL 2.0 is not
+implemented in gnuTLS}.
+{\bf TLS 1.0} is described is {\it RFC 2246} and is an Internet protocol,
+defined by IETF\footnote{IETF or Internet Engineering Task Force 
+is a large open international community of network
+designers, operators, vendors, and researchers concerned with the evolution of 
+the Internet architecture and the smooth operation of the Internet. It is open to any interested individual.}
+that provides confidentiality, and authentication layers. 
+TLS is mostly used over {\bf TCP/IP} although this is not restrictive, you may
+use it over any reliable transport layer.
+Currently gnuTLS implements:
 \begin{itemize}
  \item the {\bf TLS 1.0} and {\bf{ SSL 3.0}} protocols, without any (US) export-controlled algorithms
  \item {\bf X509} Public Key Infrastructure (with several limitations).
  \item {\bf SRP} for TLS authentication.
- \item {\bf TLS Extensions}
+ \item TLS {\bf Extensions}
 \end{itemize}
 
 \subsection{Confidentiality}

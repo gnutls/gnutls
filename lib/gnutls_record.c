@@ -988,8 +988,8 @@ gnutls_check_version( const char *req_version )
   * @state: is a &GNUTLS_STATE structure.
   *
   * Returns the last alert number received. This function
-  * should be called if %GNUTLS_E_WARNING_ALERT_RECEIVED or
-  * %GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls function.
+  * should be called if GNUTLS_E_WARNING_ALERT_RECEIVED or
+  * GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls function.
   * The peer may send alerts if he thinks some things were not 
   * right. Check gnutls.h for the available alert descriptions.
   **/

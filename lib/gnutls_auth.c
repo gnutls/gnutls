@@ -66,11 +66,15 @@ int gnutls_clear_creds( GNUTLS_STATE state) {
   * structure. Thus you will have to keep the structure allocated until   
   * you call gnutls_deinit(). ]
   *
-  * For %GNUTLS_ANON cred should be NULL in case of a client.
-  * In case of a server it should be &ANON_SERVER_CREDENTIALS.   
+  * For GNUTLS_ANON cred should be NULL in case of a client.
+  * In case of a server it should be ANON_SERVER_CREDENTIALS.   
   * 
-  * For %GNUTLS_SRP cred should be &SRP_CLIENT_CREDENTIALS
-  * in case of a client, and &SRP_SERVER_CREDENTIALS, in case
+  * For GNUTLS_SRP cred should be SRP_CLIENT_CREDENTIALS
+  * in case of a client, and SRP_SERVER_CREDENTIALS, in case
+  * of a server.
+  *
+  * For GNUTLS_X509PKI cred should be X509PKI_CLIENT_CREDENTIALS
+  * in case of a client, and X509PKI_SERVER_CREDENTIALS, in case
   * of a server.
   **/
 int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
@@ -170,9 +174,9 @@ const void *_gnutls_get_cred( GNUTLS_KEY key, CredType type, int *err) {
   * is data obtained by the handshake protocol, the key exchange algorithm,
   * and the TLS extensions messages.
   *
-  * In case of %GNUTLS_ANON returns a pointer to &ANON_(SERVER/CLIENT)_AUTH_INFO;
-  * In case of %GNUTLS_X509PKI returns a pointer to structure &X509PKI_(SERVER/CLIENT)_AUTH_INFO;
-  * In case of %GNUTLS_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
+  * In case of GNUTLS_ANON returns a pointer to &ANON_(SERVER/CLIENT)_AUTH_INFO;
+  * In case of GNUTLS_X509PKI returns a pointer to structure &X509PKI_(SERVER/CLIENT)_AUTH_INFO;
+  * In case of GNUTLS_SRP returns a pointer to structure &SRP_(SERVER/CLIENT)_AUTH_INFO;
   **/
 const void* gnutls_get_auth_info( GNUTLS_STATE state) {
 	return state->gnutls_key->auth_info;

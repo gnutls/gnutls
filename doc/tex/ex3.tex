@@ -1,66 +1,66 @@
-\begin {verbatim}
+\begin{verbatim}
 
 int print_info(GNUTLS_STATE state)
 {
-       const char *tmp;
-       const X509PKI_CLIENT_AUTH_INFO *x509_info;
+   const char *tmp;
+   const X509PKI_CLIENT_AUTH_INFO *x509_info;
 
-       /* print the key exchange's algorithm name
-        */
-       tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
-       printf("- Key Exchange: %s\n", tmp);
+   /* print the key exchange's algorithm name
+    */
+   tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
+   printf("- Key Exchange: %s\n", tmp);
 
-       /* in case of X509 PKI
-        */
-       if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
-	      x509_info = gnutls_get_auth_info(state);
-	      if (x509_info != NULL) {
-		     switch (x509_info->peer_certificate_status) {
-		     case GNUTLS_CERT_NOT_TRUSTED:
-			    printf("- Peer's X509 Certificate was NOT verified\n");
-			    break;
-		     case GNUTLS_CERT_EXPIRED:
-			    printf("- Peer's X509 Certificate was verified but is expired\n");
-			    break;
-		     case GNUTLS_CERT_TRUSTED:
-			    printf("- Peer's X509 Certificate was verified\n");
-			    break;
-		     case GNUTLS_CERT_WRONG_CN:
-			    /* the server's name
-			     * is set by using the gnutls_set_x509_cn() function.
-			     */
-			    printf("- Peer's X509 Certificate was verified but it does not match the server's name\n");
-			    break;
-		     case GNUTLS_CERT_INVALID:
-		     default:
-			    printf("- Peer's X509 Certificate was invalid\n");
-			    break;
+   /* in case of X509 PKI
+    */
+   if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
+      x509_info = gnutls_get_auth_info(state);
+      if (x509_info != NULL) {
+         switch (x509_info->peer_certificate_status) {
+         case GNUTLS_CERT_NOT_TRUSTED:
+            printf("- Peer's X509 Certificate was NOT verified\n");
+            break;
+         case GNUTLS_CERT_EXPIRED:
+            printf("- Peer's X509 Certificate was verified but is expired\n");
+            break;
+         case GNUTLS_CERT_TRUSTED:
+            printf("- Peer's X509 Certificate was verified\n");
+            break;
+         case GNUTLS_CERT_WRONG_CN:
+            /* the server's name
+             * is set by using the gnutls_set_x509_cn() function.
+             */
+            printf("- Peer's X509 Certificate was verified but it does not match the server's name\n");
+            break;
+         case GNUTLS_CERT_INVALID:
+         default:
+            printf("- Peer's X509 Certificate was invalid\n");
+            break;
 
-		     }
-	      }
-       }
-       printf(" - Certificate info:\n");
-       printf(" - Certificate version: #%d\n", x509_info->peer_certificate_version);
+         }
+      }
+   }
+   printf(" - Certificate info:\n");
+   printf(" - Certificate version: #%d\n", x509_info->peer_certificate_version);
 
-       PRINT_DN(peer_dn);
+   PRINT_DN(peer_dn);
 
-       printf(" - Certificate Issuer's info:\n");
-       PRINT_DN(issuer_dn);
+   printf(" - Certificate Issuer's info:\n");
+   PRINT_DN(issuer_dn);
 
 
-       tmp = gnutls_version_get_name(gnutls_get_current_version(state));
-       printf("- Version: %s\n", tmp);
+   tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+   printf("- Version: %s\n", tmp);
 
-       tmp = gnutls_compression_get_name(gnutls_get_current_compression_method(state));
-       printf("- Compression: %s\n", tmp);
+   tmp = gnutls_compression_get_name(gnutls_get_current_compression_method(state));
+   printf("- Compression: %s\n", tmp);
 
-       tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
-       printf("- Cipher: %s\n", tmp);
+   tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
+   printf("- Cipher: %s\n", tmp);
 
-       tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
-       printf("- MAC: %s\n", tmp);
+   tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
+   printf("- MAC: %s\n", tmp);
 
-       return 0;
+   return 0;
 }
 
 \end{verbatim}
