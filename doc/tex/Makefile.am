@@ -5,7 +5,8 @@ EXTRA_DIST = gnutls.tex gnutls.ps asn1.ps \
 TEX_OBJECTS = gnutls.tex ../../lib/gnutls-api.tex serv1.tex ex1.tex ex2.tex ex3.tex fdl.tex \
 	macros.tex cover.tex ciphersuites.tex handshake.tex translayer.tex asn1.tex ../../lib/asn1-api.tex \
 	auth.tex ciphers.tex errors.tex layers.tex alert.tex record.tex \
-	funcs.tex examples.tex ex4.tex ../../libextra/gnutls-extra-api.tex
+	funcs.tex examples.tex ex4.tex ../../libextra/gnutls-extra-api.tex \
+	memory.tex
 
 ASN1_TEX_OBJECTS = fdl.tex asn1.tex ../../lib/asn1-api.tex
 
