@@ -391,9 +391,15 @@ int main(int argc, char **argv)
       socket_bye(&hd);
 
 
+#ifdef ENABLE_SRP
    gnutls_srp_free_client_credentials(srp_cred);
+#endif
+
    gnutls_certificate_free_credentials(xcred);
+
+#ifdef ENABLE_ANON
    gnutls_anon_free_client_credentials(anon_cred);
+#endif
 
    gnutls_global_deinit();
 
@@ -658,7 +664,7 @@ int ret;
       }
    }
 
-
+#ifdef ENABLE_SRP
    /* SRP stuff */
    if (gnutls_srp_allocate_client_credentials(&srp_cred) < 0) {
 	fprintf(stderr, "SRP authentication error\n");
@@ -669,9 +675,14 @@ int ret;
 	 fprintf(stderr, "SRP credentials set error [%d]\n", ret);
       }
    }
+#endif
 
+
+#ifdef ENABLE_ANON
    /* ANON stuff */
    if (gnutls_anon_allocate_client_credentials(&anon_cred) < 0) {
       fprintf(stderr, "Anonymous authentication error\n");
    }
+#endif
+
 }

@@ -18,6 +18,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#ifndef ENABLE_SRP
+
+#include <stdio.h>
+
+int main (int argc, char **argv)
+{
+    printf ("\nSRP not supported. This program is a dummy.\n\n");
+    return 1;
+};
+
+#else
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -30,6 +42,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 
 #define _MAX(x,y) (x>y?x:y)
 
@@ -564,3 +577,5 @@ static int read_conf_values(gnutls_datum * g, gnutls_datum * n, char *str)
 
 	return index;
 }
+
+#endif /* ENABLE_SRP */

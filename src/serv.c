@@ -357,16 +357,20 @@ char *peer_print_info(gnutls_session session, int *ret_length,
    }
 
    /* print srp specific data */
+#ifdef ENABLE_SRP
    if (gnutls_kx_get(session) == GNUTLS_KX_SRP) {
       sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
 	      gnutls_srp_server_get_username(session));
    }
+#endif
 
+#ifdef ENABLE_ANON
    if (gnutls_kx_get(session) == GNUTLS_KX_ANON_DH) {
       sprintf(tmp2,
 	      "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
 	      gnutls_dh_get_prime_bits(session));
    }
+#endif
 
    if (gnutls_kx_get(session) == GNUTLS_KX_DHE_RSA
        || gnutls_kx_get(session) == GNUTLS_KX_DHE_DSS) {
@@ -577,6 +581,7 @@ int main(int argc, char **argv)
       if ((ret = gnutls_certificate_set_x509_trust_file
 	   (cert_cred, x509_cafile, x509ctype)) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_cafile);
+	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
 	 exit(1);
       } else {
 	 printf("Processed %d CA certificate(s).\n", ret);
@@ -588,6 +593,7 @@ int main(int argc, char **argv)
       if ((ret = gnutls_certificate_set_x509_crl_file
 	   (cert_cred, x509_crlfile, x509ctype)) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_crlfile);
+	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
 	 exit(1);
       } else {
 	 printf("Processed %d CRL(s).\n", ret);
@@ -601,6 +607,7 @@ int main(int argc, char **argv)
 						      pgp_keyring);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the OpenPGP keyring file\n");
+	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
       }
    }
 
@@ -608,6 +615,7 @@ int main(int argc, char **argv)
       ret = gnutls_certificate_set_openpgp_trustdb(cert_cred, pgp_trustdb);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
+	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
       }
    }
 
@@ -617,6 +625,7 @@ int main(int argc, char **argv)
 	 fprintf(stderr,
 		 "Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
 		 ret, pgp_certfile, pgp_keyfile);
+	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
       }
 
    if (x509_certfile != NULL)
@@ -625,6 +634,7 @@ int main(int argc, char **argv)
 	 fprintf(stderr,
 		 "Error reading '%s' or '%s'\n", x509_certfile,
 		 x509_keyfile);
+	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
 	 exit(1);
       }
 
@@ -636,6 +646,7 @@ int main(int argc, char **argv)
    /* this is a password file (created with the included srpcrypt utility) 
     * Read README.crypt prior to using SRP.
     */
+#ifdef ENABLE_SRP
    gnutls_srp_allocate_server_credentials(&srp_cred);
 
    if (srp_passwd != NULL)
@@ -645,12 +656,15 @@ int main(int argc, char **argv)
 	 /* only exit is this function is not disabled 
 	  */
 	 fprintf(stderr, "Error while setting SRP parameters\n");
+	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
       }
+#endif
 
+#ifdef ENABLE_ANON
    gnutls_anon_allocate_server_credentials(&dh_cred);
    if (generate != 0)
       gnutls_anon_set_server_dh_params(dh_cred, dh_params);
-
+#endif
 
    h = listen_socket(name, port);
    if (h < 0)
@@ -902,8 +916,14 @@ int main(int argc, char **argv)
 
 
    gnutls_certificate_free_credentials(cert_cred);
+
+#ifdef ENABLE_SRP
    gnutls_srp_free_server_credentials(srp_cred);
+#endif
+
+#ifdef ENABLE_ANON
    gnutls_anon_free_server_credentials(dh_cred);
+#endif
 
    if (nodb == 0)
       wrap_db_deinit();

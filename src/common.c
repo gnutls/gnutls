@@ -284,6 +284,7 @@ int print_info(gnutls_session session)
 
 	cred = gnutls_auth_get_type(session);
 	switch (cred) {
+#ifdef ENABLE_ANON
 	case GNUTLS_CRD_ANON:
 		printf("- Anonymous DH using prime of %d bits, secret key "
 		       "of %d bits, and peer's public key is %d bits.\n",
@@ -291,6 +292,8 @@ int print_info(gnutls_session session)
 		       gnutls_dh_get_secret_bits(session),
 		       gnutls_dh_get_peers_public_bits(session));
 		break;
+#endif
+#ifdef ENABLE_SRP
 	case GNUTLS_CRD_SRP:
 		/* This should be only called in server
 		 * side.
@@ -299,6 +302,7 @@ int print_info(gnutls_session session)
 			printf("- SRP authentication. Connected as '%s'\n",
 			       gnutls_srp_server_get_username(session));
 		break;
+#endif
 	case GNUTLS_CRD_CERTIFICATE:
 		{
 			char dns[256];

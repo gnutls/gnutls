@@ -30,8 +30,12 @@
 extern gnutls_extension_entry _gnutls_extensions[];
 extern const int _gnutls_extensions_size;
 
+extern const int _gnutls_kx_algorithms_size;
+extern gnutls_kx_algo_entry _gnutls_kx_algorithms[];
+
 #define TOSTR(x) #x
 
+#ifdef ENABLE_SRP
 static int _gnutls_add_srp_extension(void) {
 int i;
 
@@ -54,11 +58,10 @@ int i;
 	return GNUTLS_E_MEMORY_ERROR;
 }
 
-extern const int _gnutls_kx_algorithms_size;
-extern gnutls_kx_algo_entry _gnutls_kx_algorithms[];
 extern MOD_AUTH_STRUCT srp_auth_struct;
 extern MOD_AUTH_STRUCT srp_rsa_auth_struct;
 extern MOD_AUTH_STRUCT srp_dss_auth_struct;
+
 
 static int _gnutls_add_srp_auth_struct(void) {
 int i;
@@ -95,6 +98,9 @@ int i;
 
 	return GNUTLS_E_MEMORY_ERROR;
 }
+
+#endif
+
 
 /* the number of the compression algorithms available in the compression
  * structure.
@@ -201,6 +207,7 @@ int ret;
 		return ret;
 	}
 
+#ifdef ENABLE_SRP
 	/* Add the SRP authentication to the list of authentication
 	 * methods.
 	 */
@@ -217,6 +224,7 @@ int ret;
 		gnutls_assert();
 		return ret;
 	}
+#endif
 
 	/* Register the openpgp functions. This is because some
 	 * of them are defined to be NULL in the main library.

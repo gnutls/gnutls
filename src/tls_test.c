@@ -95,8 +95,10 @@ static const TLS_TEST tls_tests[] = {
 	{ "whether the server understands TLS closure alerts", test_bye, "yes", "no", "partially"},
 	{ "whether the server supports session resumption", test_session_resume2, "yes", "no", "dunno"},
 	{ "for export-grade ciphersuite support", test_export, "yes", "no", "dunno" },
+#ifdef ENABLE_ANON
 	{ "for anonymous authentication support", test_anonymous, "yes", "no", "dunno"},
 	{ "for anonymous Diffie Hellman prime size", test_dhe_bits, "", "N/A", "N/A" },
+#endif
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
 	{ "for ephemeral Diffie Hellman prime size", test_dhe_bits, "", "N/A", "N/A" },
 	{ "for AES cipher support", test_aes, "yes", "no", "dunno"},
@@ -105,7 +107,9 @@ static const TLS_TEST tls_tests[] = {
 	{ "for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{ "for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
 	{ "for max record size (TLS extension)", test_max_record_size, "yes", "no", "dunno" },
+#ifdef ENABLE_SRP
 	{ "for SRP authentication support (TLS extension)", test_srp, "yes", "no", "dunno" },
+#endif
 	{ "for OpenPGP authentication support (TLS extension)", test_openpgp1, "yes", "no", "dunno" },
 	{ NULL }
 };
@@ -166,18 +170,21 @@ int main(int argc, char **argv)
 	}
 
 	/* SRP stuff */
+#ifdef ENABLE_SRP
 	if (gnutls_srp_allocate_client_credentials(&srp_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 	gnutls_srp_set_client_credentials( srp_cred, "guest", "guest");
+#endif
 
+#ifdef ENABLE_ANON
 	/* ANON stuff */
 	if (gnutls_anon_allocate_client_credentials(&anon_cred) < 0) {
 		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
-
+#endif
 
 	i = 0;
 
@@ -211,10 +218,13 @@ int main(int argc, char **argv)
 		i++;
 	} while(1);
 
+#ifdef ENABLE_SRP
 	gnutls_srp_free_client_credentials(srp_cred);
+#endif
 	gnutls_certificate_free_credentials(xcred);
+#ifdef ENABLE_ANON
 	gnutls_anon_free_client_credentials(anon_cred);
-
+#endif
 	gnutls_global_deinit();
 
 	return 0;

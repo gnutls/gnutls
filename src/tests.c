@@ -166,7 +166,7 @@ static void ADD_PROTOCOL(gnutls_session session, int protocol) {
 	gnutls_protocol_set_priority(session, _proto_priority);
 }
 
-
+#ifdef ENABLE_SRP
 int test_srp( gnutls_session session) {
 int ret;
 
@@ -186,6 +186,7 @@ int ret;
 		
 		return ret;
 }
+#endif
 
 int test_export( gnutls_session session) {
 	ADD_ALL_COMP(session);
@@ -568,7 +569,7 @@ int ret;
 
 }
 
-
+#ifdef ENABLE_ANON
 int test_anonymous( gnutls_session session) {
 int ret;
 
@@ -586,7 +587,7 @@ int ret;
 
 	return ret;
 }
-
+#endif
 
 int test_session_resume2( gnutls_session session) {
 int ret;
