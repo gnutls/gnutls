@@ -560,7 +560,8 @@ void check_alert(socket_st socket, int ret)
 int do_handshake(socket_st* socket)
 {
    int ret;
-   gnutls_transport_set_ptr(socket->session, socket->fd);
+   gnutls_transport_set_ptr(socket->session, 
+   	(gnutls_transport_ptr)socket->fd);
    do {
       ret = gnutls_handshake(socket->session);
    } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
