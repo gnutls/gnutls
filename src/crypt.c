@@ -61,12 +61,31 @@ int main(int argc, char** argv) {
 gaainfo info;
 char* passwd;
 char* cr=NULL;
+int crypt, salt;
 
 	if ( gaa(argc, argv, &info) != -1) {
         	fprintf(stderr, "Error in the arguments.\n");
 	        return -1;
     }
-       
+    
+    salt = info.salt;
+    
+    if(info.crypt==NULL) crypt = SRPSHA1_CRYPT;
+    else {
+    	if (strcasecmp( info.crypt, "bcrypt")==0) {
+    		crypt = BLOWFISH_CRYPT;
+    		if (salt==0) salt = 6; /* cost is 6 */
+    	}
+    	else if (strcasecmp( info.crypt, "srpsha")==0) {
+    		crypt = SRPSHA1_CRYPT;
+		if (salt==0) salt = 16; /* 16 bytes salt */
+	}
+	else {
+		fprintf(stderr, "Unknown algorithm\n");
+		return -1;
+	}
+    }    	
+
     passwd = getpass("Enter password: ");
         
     if (info.passwd != NULL) {
@@ -75,7 +94,8 @@ char* cr=NULL;
      	return 0;
     }
 
-    cr = gnutls_crypt( info.username, passwd, BLOWFISH_CRYPT);
+
+    cr = gnutls_crypt( info.username, passwd, crypt, salt);
     printf("%s:%s\n", info.username, cr);
     free(cr);
 	return 0;

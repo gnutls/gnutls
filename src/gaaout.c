@@ -105,6 +105,8 @@ void gaa_help()
 	printf("Crypt help\nUsage : crypt [-u user] [-p password file]""\n");
 	__gaa_helpsingle('u', "username", """username"" ", "specify username.");
 	__gaa_helpsingle('p', "passwd", """passwd"" ", "specify a password file.");
+	__gaa_helpsingle('c', "crypt", """crypt"" ", "specify crypt algorithm (bcrypt/srpsha).");
+	__gaa_helpsingle('s', "salt", """salt"" ", "specify salt/cost size for crypt algorithm.");
 	__gaa_helpsingle('h', "help", "", "shows this help text");
 
 #line 100 "gaa.skel"
@@ -120,6 +122,10 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
+#line 12 "crypt.gaa"
+	int salt;
+#line 9 "crypt.gaa"
+	char *crypt;
 #line 6 "crypt.gaa"
 	char *passwd;
 #line 3 "crypt.gaa"
@@ -178,10 +184,12 @@ int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           3
+#define GAA_NB_OPTION           5
 #define GAAOPTID_help	1
-#define GAAOPTID_passwd	2
-#define GAAOPTID_username	3
+#define GAAOPTID_salt	2
+#define GAAOPTID_crypt	3
+#define GAAOPTID_passwd	4
+#define GAAOPTID_username	5
 
 #line 168 "gaa.skel"
 
@@ -364,6 +372,18 @@ float gaa_getfloat(char *arg)
 }
 /* option structures */
 
+struct GAAOPTION_salt 
+{
+	int arg1;
+	int size1;
+};
+
+struct GAAOPTION_crypt 
+{
+	char* arg1;
+	int size1;
+};
+
 struct GAAOPTION_passwd 
 {
 	char* arg1;
@@ -405,6 +425,8 @@ int gaa_get_option_num(char *str, int status)
     switch(status)
         {
         case GAA_LETTER_OPTION:
+			GAA_CHECK1STR("s", GAAOPTID_salt);
+			GAA_CHECK1STR("c", GAAOPTID_crypt);
 			GAA_CHECK1STR("p", GAAOPTID_passwd);
 			GAA_CHECK1STR("u", GAAOPTID_username);
         case GAA_MULTIPLE_OPTION:
@@ -415,6 +437,8 @@ int gaa_get_option_num(char *str, int status)
         break;
         case GAA_WORD_OPTION:
 			GAA_CHECKSTR("help", GAAOPTID_help);
+			GAA_CHECKSTR("salt", GAAOPTID_salt);
+			GAA_CHECKSTR("crypt", GAAOPTID_crypt);
 			GAA_CHECKSTR("passwd", GAAOPTID_passwd);
 			GAA_CHECKSTR("username", GAAOPTID_username);
 
@@ -429,6 +453,8 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 {
     int OK = 0;
     int gaa_last_non_option;
+	struct GAAOPTION_salt GAATMP_salt;
+	struct GAAOPTION_crypt GAATMP_crypt;
 	struct GAAOPTION_passwd GAATMP_passwd;
 	struct GAAOPTION_username GAATMP_username;
 
@@ -453,8 +479,28 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 9 "crypt.gaa"
+#line 15 "crypt.gaa"
 { gaa_help(); exit(0); ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_salt:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_salt.arg1, gaa_getint, GAATMP_salt.size1);
+		gaa_index++;
+#line 13 "crypt.gaa"
+{ gaaval->salt = GAATMP_salt.arg1 ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_crypt:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_crypt.arg1, gaa_getstr, GAATMP_crypt.size1);
+		gaa_index++;
+#line 10 "crypt.gaa"
+{ gaaval->crypt = GAATMP_crypt.arg1 ;};
 
 		return GAA_OK;
 		break;
@@ -501,8 +547,8 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 11 "crypt.gaa"
-{ gaaval->username=NULL; gaaval->passwd=NULL; ;};
+#line 17 "crypt.gaa"
+{ gaaval->username=NULL; gaaval->passwd=NULL; gaaval->crypt=NULL; gaaval->salt=0; ;};
 
     }
     inited = 1;

@@ -6,8 +6,14 @@ option (u,username) STR "username" { $username = $1 } "specify username."
 #char *passwd;
 option (p, passwd) STR "passwd" { $passwd = $1 } "specify a password file."
 
+#char *crypt;
+option (c, crypt) STR "crypt" { $crypt = $1 } "specify crypt algorithm (bcrypt/srpsha)."
+
+#int salt;
+option (s, salt) INT "salt" { $salt = $1 } "specify salt/cost size for crypt algorithm."
+
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
-init { $username=NULL; $passwd=NULL; }
+init { $username=NULL; $passwd=NULL; $crypt=NULL; $salt=0; }
 
 OBLIGAT u

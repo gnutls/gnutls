@@ -97,10 +97,10 @@ int gnutls_clean_db( GNUTLS_STATE state);
 
 
 /* crypt functions */
-enum crypt_algo { MD5_CRYPT, BLOWFISH_CRYPT };
+enum crypt_algo { BLOWFISH_CRYPT, SRPSHA1_CRYPT };
 typedef enum crypt_algo crypt_algo;
 
-char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo);
+char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt);
 int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt);
 
 /* these are deprecated must be replaced by gnutls_errors.h */

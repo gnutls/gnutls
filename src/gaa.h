@@ -8,6 +8,10 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
+#line 12 "crypt.gaa"
+	int salt;
+#line 9 "crypt.gaa"
+	char *crypt;
 #line 6 "crypt.gaa"
 	char *passwd;
 #line 3 "crypt.gaa"

@@ -25,6 +25,8 @@
 
 /* Taken from gsti */
 
+#define DH_G 2
+
 static const uint8 diffie_hellman_group1_prime[130] = { 0x04, 0x00,
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA, 0xA2,
 	0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1,
@@ -77,7 +79,7 @@ MPI gnutls_calc_dh_secret(MPI * ret_x)
 	}
 	/*_gnutls_dump_mpi(stderr, "prime=", prime ); */
 
-	g = mpi_set_ui(NULL, 2);
+	g = mpi_set_ui(NULL, DH_G);
 	x = mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
 	gcry_mpi_randomize(x, X_SIZE, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
@@ -128,7 +130,7 @@ MPI gnutls_get_dh_params(MPI * ret_p)
 		abort();
 	}
 
-	g = mpi_set_ui(NULL, 2);
+	g = mpi_set_ui(NULL, DH_G);
 
 	if (ret_p)
 		*ret_p = prime;

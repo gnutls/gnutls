@@ -20,19 +20,22 @@
 
 #include "defines.h"
 #include "crypt_bcrypt.h"
+#include "crypt_srpsha1.h"
 #include "gnutls_random.h"
 
-enum crypt_algo { MD5_CRYPT, BLOWFISH_CRYPT };      
+enum crypt_algo { BLOWFISH_CRYPT, SRPSHA1_CRYPT };
+
 typedef enum crypt_algo crypt_algo;
                                                       
-char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo) {
+char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt) {
 	
 	switch(algo) {
-	case MD5_CRYPT:
-		break;
 	case BLOWFISH_CRYPT: /* bcrypt */
-		return crypt_bcrypt_wrapper(passwd, 6);
-		break;
+		/* salt in bcrypt is actually the cost */
+		return crypt_bcrypt_wrapper(passwd, salt);
+	case SRPSHA1_CRYPT: /* bcrypt */
+		/* salt in bcrypt is the salt size */
+		return crypt_srpsha1_wrapper(username, passwd, salt);
 	}
 	return NULL;
 }
@@ -46,6 +49,11 @@ int gnutls_crypt_vrfy(const char* username, const char *passwd, char* salt) {
 		case '2':
 			cr = crypt_bcrypt(passwd, salt);
 			if (strncmp(cr, salt, strlen(cr))==0) return 0;
+			break;
+		case '4':
+			cr = crypt_srpsha1(username, passwd, salt);
+			if (strncmp(cr, salt, strlen(cr))==0) return 0;
+			break;
 		}
 	}
 	return 1;

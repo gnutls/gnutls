@@ -27,174 +27,12 @@
  */
 
 #include "defines.h"
+#include "gnutls_int.h"
 #include "crypt_bcrypt.h"
 #include "gnutls_random.h"
-
-const static uint8 b64table[64] =
-    "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-const static uint8 asciitable[128] = {
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0x00, 0x01,
-	0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b,
-	0x3c, 0x3d, 0x3e, 0x3f, 0xff, 0xff,
-	0xff, 0xff, 0xff, 0xff, 0xff, 0x02,
-	0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-	0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
-	0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
-	0x15, 0x16, 0x17, 0x18, 0x19, 0x1a,
-	0x1b, 0xff, 0xff, 0xff, 0xff, 0xff,
-	0xff, 0x1c, 0x1d, 0x1e, 0x1f, 0x20,
-	0x21, 0x22, 0x23, 0x24, 0x25, 0x26,
-	0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c,
-	0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
-	0x33, 0x34, 0x35, 0xff, 0xff, 0xff,
-	0xff, 0xff
-};
-
-inline static int encode(uint8 * result, const uint8 * data, int left)
-{
-
-	int data_len;
-
-	if (left > 3)
-		data_len = 3;
-	else
-		data_len = left;
-
-	switch (data_len) {
-	case 3:
-		result[0] = b64table[(data[0] >> 2)];
-		result[1] =
-		    b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-			      (data[1] >> 4))];
-		result[2] =
-		    b64table[((((data[1] & 0x0f) << 2) & 0xff) |
-			      (data[2] >> 6))];
-		result[3] = b64table[(((data[2] << 2) & 0xff) >> 2)];
-		break;
-	case 2:
-		result[0] = b64table[(data[0] >> 2)];
-		result[1] =
-		    b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-			      (data[1] >> 4))];
-		result[2] = b64table[(((data[1] << 4) & 0xff) >> 2)];
-		result[3] = '\0';
-		break;
-	case 1:
-		result[0] = b64table[(data[0] >> 2)];
-		result[1] =
-		    b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff))];
-		result[2] = '\0';
-		result[3] = '\0';
-		break;
-	default:
-		return -1;
-	}
-
-	return 4;
-
-}
-
-/* data must be 4 bytes
- * result should be 3 bytes
- */
-#define TOASCII(c) (c<127 ? asciitable[c] : 0xff)
-inline static int decode(uint8 * result, const uint8 * data)
-{
-	uint8 a1, a2;
-	int ret = 3;
-
-	a1 = TOASCII(data[0]);
-	a2 = TOASCII(data[1]);
-	if (a1 == 0xff || a2 == 0xff)
-		return -1;
-	result[0] = ((a1 << 2) & 0xff) | ((a2 >> 4) & 0xff);
-
-	a1 = a2;
-	a2 = TOASCII(data[2]);
-	if (a2 == 0xff)
-		return -1;
-	result[1] = ((a1 << 4) & 0xff) | ((a2 >> 2) & 0xff);
-
-	a1 = a2;
-	a2 = TOASCII(data[3]);
-	if (a2 == 0xff)
-		return -1;
-	result[2] = ((a1 << 6) & 0xff) | (a2 & 0xff);
-
-	if (data[3] == '=')
-		ret--;
-	if (data[4] == '=')
-		ret--;
-
-	return ret;
-}
-
-
-/* encodes data and puts the result into result (result should have 4/3 of the original size)
- * The result_size is the return value
- */
-static int _crypt_encode_base64(uint8 * result, const uint8 * data,
-		  const uint16 data_size)
-{
-	int i, ret, tmp, j;
-	uint8 tmpres[4];
-
-	ret = data_size % 3;
-	if (ret != 0)
-		ret = 4;
-	else
-		ret = 0;
-
-	ret += (data_size / 3) * 4;
-
-	if ((result) == NULL)
-		return ret;
-
-	for (i = j = 0; i < data_size; i += 3, j += 4) {
-		tmp = encode(tmpres, &data[i], data_size - i);
-		if (tmp == -1)
-			return -1;
-		memcpy(&result[j], tmpres, tmp);
-	}
-
-	return ret;
-}
-
-
-/* decodes data and puts the result into result
- * The result_size is the return value
- */
-static int _crypt_decode_base64(uint8 * result, const uint16 result_size,
-		  const uint8 * data)
-{
-	int i, ret, tmp, j;
-	uint8 tmpres[3];
-
-	ret = result_size;
-
-	if (result == NULL)
-		return ret;
-
-	for (i = j = 0; j < result_size; i += 4) {
-		tmp = decode(tmpres, &data[i]);
-		if (tmp < 0)
-			return tmp;
-		memcpy(&result[j], tmpres, tmp);
-		if (tmp < 3)
-			ret -= (3 - tmp);
-		j += 3;
-	}
-	return ret;
-}
-
-
+#include "cert_b64.h"
+#include "gnutls_srp.h"
+#include <gnutls_errors.h>
 
 #define rotl(x,n)   (((x) << ((uint32)(n))) | ((x) >> (32 - (uint32)(n))))
 #define rotr(x,n)   (((x) >> ((uint32)(n))) | ((x) << (32 - (uint32)(n))))
@@ -667,7 +505,7 @@ static short _blf_ExpandKey(blf_ctx * c, const uint8 * key, short keybytes, cons
 {
 	short i, j;
 	int k;
-	uint32 data, *temp;
+	uint32 data, temp[2];
 	uint32 wsalt[4];
 
 	if (bsalt!=NULL) {
@@ -683,7 +521,6 @@ static short _blf_ExpandKey(blf_ctx * c, const uint8 * key, short keybytes, cons
 		}
 	}
 
-	temp = malloc(8);
 	temp[0] = temp[1] = 0x00000000;
 
 	j = 0;
@@ -753,22 +590,21 @@ static void _blf_deinit(blf_ctx *ctx)
 {
 	free(ctx);
 }
+static const char magic[] = "$2$";
 
 char *
  crypt_bcrypt(const char *passwd, const char *salt)
 {
 	unsigned char *sp, *tsp;
-	const char *magic = "$2a$";
 	blf_ctx *ctx;
-	const unsigned char text[24] = "OrpheanBeholderScryDoubt";
-	uint8 csalt[16];
-	uint8 rtext[120];
-	int cost;
+	unsigned char text[24] = "OrpheanBeholderScryDoubt";
+	uint8 *csalt;
+	uint8 *rtext;
+	int cost, vsize;
 	int i, salt_size = strlen(salt);
-	unsigned char *local_salt;
+	unsigned char *local_salt, *v;
 	int passwd_len;
-	char * password;
-	char tmp[200];
+	char *tmp;
 
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
 	if (passwd_len > 56)
@@ -785,47 +621,76 @@ char *
 	cost = atoi((char *) sp);
 	do {			/* move to salt */
 		sp++;
-	} while (*sp != '$' && *sp != '\0');
+	} while (*sp != '$');
 	sp++;
+
 	tsp = sp;
-	tsp += 22;
+	while((*tsp)!='$') tsp++;
 	*tsp = '\0';		/* put a null after the end of salt */
 
-	_crypt_decode_base64( csalt, 16, sp);
+	_gnutls_base64_decode( sp, strlen(sp), &csalt);
 
 	ctx = _blf_init( csalt, passwd, passwd_len, cost);
+	gnutls_free(csalt);
+	
 	for (i = 0; i < 64; i++) {
 		_blf_encrypt(ctx, (uint8 *) text);
 		_blf_encrypt(ctx, (uint8 *) &text[8]);
 		_blf_encrypt(ctx, (uint8 *) &text[16]);
 	}
 
-	_crypt_encode_base64(rtext, text, 23);
+	/* v = g^x mod n */
+	vsize = _gnutls_srp_gx(text, 8*3, &v);
+	if (vsize==-1 || v==NULL) {
+		gnutls_assert();
+		return NULL;
+	}
 	
-	sprintf( tmp, "$2a$%.2u$%s%s", (unsigned int) cost, sp, rtext);
-	password = strdup(tmp);
+	_gnutls_base64_encode(v, vsize, &rtext);
+	gnutls_free(v);
 
+	tmp = gnutls_calloc( 1, strlen(magic)+3+strlen(sp)+1+strlen(rtext)+1);
+
+	sprintf( tmp, "%s%.2u$%s$%s", magic, (unsigned int) cost, sp, rtext);
+
+	gnutls_free(local_salt);
+	gnutls_free(rtext);
+	
 	_blf_deinit(ctx);
-	return password;
+	return tmp;
 }
 
 char *crypt_bcrypt_wrapper(const char *pass_new, int cost)
 {
-       unsigned char result[40];
-       char *cp = (char *) result;
-       unsigned char* tmp;
+       unsigned char *result;
+       char* tcp;
+       unsigned char* rand;
        char *e = NULL;
-
-       tmp = _gnutls_get_random( 16, GNUTLS_WEAK_RANDOM);
+	   int result_size;
+	   
+       rand = _gnutls_get_random( 16, GNUTLS_WEAK_RANDOM);
        /* cost should be <32 and >6 */
-       sprintf(cp, "$2a$%.2u$", cost); /* magic for the BCRYPT */
-       cp += strlen(cp);
-       _crypt_encode_base64( cp, tmp, 16);
+       if (cost >=32) cost=31;
+       if (cost < 1) cost = 1;
 
-	   _gnutls_free_rand(tmp);
+	   result_size = _gnutls_base64_encode( rand, 16, &result);
+	   if (result_size < 0) {
+	   	gnutls_assert();
+	   	return NULL;
+	   }
+
+		/* base64 encoded text is 4/3 times larger than orignal */
+	   tcp = gnutls_calloc( 1, strlen(magic)+ 3 + result_size +1+1);
+       sprintf(tcp, "%s%.2u$%s$", magic, cost, result); /* magic for the BCRYPT */
+
+	   gnutls_free(result);
+
+	   _gnutls_free_rand(rand);
+	   
        /* no longer need cleartext */
-       e = crypt_bcrypt(pass_new, (const char *) result);
-
+       e = crypt_bcrypt(pass_new, (const char *) tcp);
+	   gnutls_free(tcp);
+	   	   
        return e;
 }
 
