@@ -23,6 +23,7 @@
 #include <gnutls_num.h>
 #include <gnutls_record.h>
 #include <gnutls_buffers.h>
+#include <gnutls_datum.h>
 
 /* This is the only file that uses the berkeley sockets API.
  * 
@@ -72,33 +73,27 @@ static int RET( int err) {
  */
 int _gnutls_record_buffer_put(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
-	int old_buffer;
-
 	if (length==0) return 0;
 	switch( type) {
 	case GNUTLS_APPLICATION_DATA:
-		old_buffer = state->gnutls_internals.application_data_buffer.size;
 
-		state->gnutls_internals.application_data_buffer.size += length;
+		if ( gnutls_datum_append( &state->gnutls_internals.application_data_buffer,
+			data, length) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		_gnutls_buffers_log( "BUF[REC]: Inserted %d bytes of Data(%d)\n", length, type);
 
-	_gnutls_buffers_log( "BUF[REC]: Inserted %d bytes of Data(%d)\n", length, type);
-
-		state->gnutls_internals.application_data_buffer.data =
-		    gnutls_realloc_fast(state->gnutls_internals.application_data_buffer.data,
-			   state->gnutls_internals.application_data_buffer.size);
-		memcpy(&state->gnutls_internals.application_data_buffer.data[old_buffer], data, length);
 		break;
 	case GNUTLS_HANDSHAKE:
-		old_buffer = state->gnutls_internals.handshake_data_buffer.size;
+		if ( gnutls_datum_append( &state->gnutls_internals.handshake_data_buffer,
+			data, length) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 
-		state->gnutls_internals.handshake_data_buffer.size += length;
+		_gnutls_buffers_log( "BUF[HSK]: Inserted %d bytes of Data(%d)\n", length, type);
 
-	_gnutls_buffers_log( "BUF[REC]: Inserted %d bytes of Data(%d)\n", length, type);
-
-		state->gnutls_internals.handshake_data_buffer.data =
-		    gnutls_realloc_fast(state->gnutls_internals.handshake_data_buffer.data,
-			   state->gnutls_internals.handshake_data_buffer.size);
-		memcpy(&state->gnutls_internals.handshake_data_buffer.data[old_buffer], data, length);
 		break;
 	
 	default:
@@ -163,6 +158,7 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 		memmove(state->gnutls_internals.application_data_buffer.data,
 			&state->gnutls_internals.application_data_buffer.data[length],
 			state->gnutls_internals.application_data_buffer.size);
+		/* this does not fail */
 		state->gnutls_internals.application_data_buffer.data =
 		    gnutls_realloc_fast(state->gnutls_internals.application_data_buffer.data,
 				   state->gnutls_internals.application_data_buffer.size);
@@ -182,6 +178,8 @@ int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, 
 		memmove(state->gnutls_internals.handshake_data_buffer.data,
 			&state->gnutls_internals.handshake_data_buffer.data[length],
 			state->gnutls_internals.handshake_data_buffer.size);
+
+		/* does not fail */
 		state->gnutls_internals.handshake_data_buffer.data =
 		    gnutls_realloc_fast(state->gnutls_internals.handshake_data_buffer.data,
 				   state->gnutls_internals.handshake_data_buffer.size);
@@ -489,8 +487,9 @@ static int _gnutls_buffer_insert( gnutls_datum * buffer, const opaque* _data, in
 		buffer->size = data_size;
 
 		return 0;		
+
 	}
-	
+
 	buffer->data = gnutls_realloc_fast( buffer->data, data_size);
 	buffer->size = data_size;
 	
@@ -860,27 +859,23 @@ ssize_t _gnutls_handshake_io_recv_int( GNUTLS_STATE state, ContentType type, Han
  */
 int _gnutls_handshake_buffer_put( GNUTLS_STATE state, char *data, int length)
 {
-	int old_buffer;
 
 	if (length==0) return 0;	
-	old_buffer = state->gnutls_internals.handshake_hash_buffer.size;
 
-	state->gnutls_internals.handshake_hash_buffer.size += length;
-	if (state->gnutls_internals.max_handshake_data_buffer_size > 0 && state->gnutls_internals.handshake_hash_buffer.size > state->gnutls_internals.max_handshake_data_buffer_size) {
+	if ( (state->gnutls_internals.max_handshake_data_buffer_size > 0) &&
+		((length+state->gnutls_internals.handshake_hash_buffer.size) >
+			state->gnutls_internals.max_handshake_data_buffer_size)) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-
+	
 	_gnutls_buffers_log( "BUF[HSK]: Inserted %d bytes of Data\n", length);
 
-	state->gnutls_internals.handshake_hash_buffer.data =
-		    gnutls_realloc_fast(state->gnutls_internals.handshake_hash_buffer.data,
-			   state->gnutls_internals.handshake_hash_buffer.size);
-	if (state->gnutls_internals.handshake_hash_buffer.data == NULL) {
+	if ( gnutls_datum_append( &state->gnutls_internals.handshake_hash_buffer,
+		data, length) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	memcpy(&state->gnutls_internals.handshake_hash_buffer.data[old_buffer], data, length);
 
 	return 0;
 }
