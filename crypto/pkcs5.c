@@ -1,4 +1,4 @@
-/* pkcs5.c --- Implementation of Password-Based Cryptography as per PKCS#5
+/* pkcs5.c --- Implementation of Password-Based Cryptography a'la PKCS#5/RFC2898
  * Copyright (C) 2002,2003,2004 Simon Josefsson
  * Copyright (C) 2004 Free Software Foundation
  *
