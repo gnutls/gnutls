@@ -1531,7 +1531,7 @@ xml_add_tag( gnutls_datum *xmlkey, const char *tag, const char *val )
 {
     char *p = NULL;
 
-    p = gnutls_calloc( 1, strlen( tag ) + 6 );
+    p = gnutls_calloc( 1, strlen( tag ) + 6 + 1 ); /* 6 chars + null */
     strcat( p, "    <" );
     strcat( p, tag );
     strcat( p, ">" );
@@ -1540,7 +1540,7 @@ xml_add_tag( gnutls_datum *xmlkey, const char *tag, const char *val )
 
     gnutls_datum_append( xmlkey, val, strlen( val ) );
 
-    p = gnutls_calloc( 1, strlen( tag ) + 4 );
+    p = gnutls_calloc( 1, strlen( tag ) + 4 + 1 );
     strcat( p, "</" );
     strcat( p, tag );
     strcat( p, ">\n" );
@@ -1687,6 +1687,8 @@ gnutls_certificate_openpgp_get_as_xml( const gnutls_datum *cert, int ext,
     rc = datum_to_kbnode( cert, &kb_pk );
     if ( rc )
         return rc;
+
+    memset( xmlkey, 0, sizeof *xmlkey );
 
     s = "<OPENPGPKEY>\n";
     gnutls_datum_append( xmlkey, s, strlen( s ) );
