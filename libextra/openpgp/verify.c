@@ -29,6 +29,7 @@
 #include <gnutls_openpgp.h>
 #include <gnutls_num.h>
 #include <openpgp.h>
+#include <x509/verify.h> /* lib/x509/verify.h */
 
 static int
 openpgp_get_key_trust(gnutls_openpgp_trustdb_t trustdb,

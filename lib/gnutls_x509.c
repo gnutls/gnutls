@@ -1036,7 +1036,7 @@ static int generate_rdn_seq(gnutls_certificate_credentials_t res)
 int _gnutls_check_key_usage(const gnutls_cert * cert,
 			    gnutls_kx_algorithm_t alg)
 {
-    unsigned int keyUsage = 0;
+    unsigned int key_usage = 0;
     int encipher_type;
 
     if (cert == NULL) {
@@ -1047,12 +1047,12 @@ int _gnutls_check_key_usage(const gnutls_cert * cert,
     if (_gnutls_map_kx_get_cred(alg, 1) == GNUTLS_CRD_CERTIFICATE ||
 	_gnutls_map_kx_get_cred(alg, 0) == GNUTLS_CRD_CERTIFICATE) {
 
-	keyUsage = cert->keyUsage;
+	key_usage = cert->key_usage;
 
 	encipher_type = _gnutls_kx_encipher_type(alg);
 
-	if (keyUsage != 0 && encipher_type != CIPHER_IGN) {
-	    /* If keyUsage has been set in the certificate
+	if (key_usage != 0 && encipher_type != CIPHER_IGN) {
+	    /* If key_usage has been set in the certificate
 	     */
 
 	    if (encipher_type == CIPHER_ENCRYPT) {
@@ -1060,7 +1060,7 @@ int _gnutls_check_key_usage(const gnutls_cert * cert,
 		 * type algorithm, and key's usage does not permit
 		 * encipherment, then fail.
 		 */
-		if (!(keyUsage & KEY_KEY_ENCIPHERMENT)) {
+		if (!(key_usage & KEY_KEY_ENCIPHERMENT)) {
 		    gnutls_assert();
 		    return GNUTLS_E_KEY_USAGE_VIOLATION;
 		}
@@ -1069,7 +1069,7 @@ int _gnutls_check_key_usage(const gnutls_cert * cert,
 	    if (encipher_type == CIPHER_SIGN) {
 		/* The same as above, but for sign only keys
 		 */
-		if (!(keyUsage & KEY_DIGITAL_SIGNATURE)) {
+		if (!(key_usage & KEY_DIGITAL_SIGNATURE)) {
 		    gnutls_assert();
 		    return GNUTLS_E_KEY_USAGE_VIOLATION;
 		}

@@ -259,11 +259,11 @@ openpgp_pk_to_gnutls_cert(gnutls_cert * cert, cdk_pkt_pubkey_t pk)
     cert->cert_type = GNUTLS_CRT_OPENPGP;
 
     if (is_DSA(pk->pubkey_algo) || pk->pubkey_algo == GCRY_PK_RSA_S)
-	cert->keyUsage = KEY_DIGITAL_SIGNATURE;
+	cert->key_usage = KEY_DIGITAL_SIGNATURE;
     else if (pk->pubkey_algo == GCRY_PK_RSA_E)
-	cert->keyUsage = KEY_KEY_ENCIPHERMENT;
+	cert->key_usage = KEY_KEY_ENCIPHERMENT;
     else if (pk->pubkey_algo == GCRY_PK_RSA)
-	cert->keyUsage = KEY_DIGITAL_SIGNATURE | KEY_KEY_ENCIPHERMENT;
+	cert->key_usage = KEY_DIGITAL_SIGNATURE | KEY_KEY_ENCIPHERMENT;
 
     cert->params_size = cdk_pk_get_npkey(pk->pubkey_algo);
     for (i = 0; i < cert->params_size; i++) {

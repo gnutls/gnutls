@@ -228,8 +228,8 @@ int _gnutls_tls_sign(gnutls_cert * cert, gnutls_privkey * pkey,
      */
 
     if (cert != NULL)
-	if (cert->keyUsage != 0)
-	    if (!(cert->keyUsage & KEY_DIGITAL_SIGNATURE)) {
+	if (cert->key_usage != 0)
+	    if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE)) {
 		gnutls_assert();
 		return GNUTLS_E_KEY_USAGE_VIOLATION;
 	    }
@@ -258,8 +258,8 @@ int _gnutls_pkcs1_rsa_verify_sig(gnutls_cert * cert,
     /* If the certificate supports signing continue.
      */
     if (cert != NULL)
-	if (cert->keyUsage != 0)
-	    if (!(cert->keyUsage & KEY_DIGITAL_SIGNATURE)) {
+	if (cert->key_usage != 0)
+	    if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE)) {
 		gnutls_assert();
 		return GNUTLS_E_KEY_USAGE_VIOLATION;
 	    }

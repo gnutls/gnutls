@@ -696,7 +696,7 @@ int _gnutls_x509_crt_to_gcert(gnutls_cert * gcert, gnutls_x509_crt_t cert,
 
 
     if (flags & CERT_ONLY_EXTENSIONS || flags == 0) {
-	gnutls_x509_crt_get_key_usage(cert, &gcert->keyUsage, NULL);
+	gnutls_x509_crt_get_key_usage(cert, &gcert->key_usage, NULL);
 	gcert->version = gnutls_x509_crt_get_version(cert);
     }
     gcert->subject_pk_algorithm =

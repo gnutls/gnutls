@@ -6,6 +6,8 @@ Version 1.1.11
   Yoann Vandoorselaere <yoann@prelude-ids.org>
 - Added the GNUTLS_VERIFY_DO_NOT_ALLOW_SAME flags to the
   verification functions.
+- The ephemeral DH and RSA parameters are no longer stored in the
+  session resume DB.
 
 Version 1.1.10 (12/06/2004)
 - Added gnutls_sign_algorithm_get_name() and gnutls_pk_algorithm_get_name()

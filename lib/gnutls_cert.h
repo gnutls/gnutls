@@ -13,7 +13,7 @@
 #define RSA_PUBLIC_PARAMS 2
 
 /* For key Usage, test as:
- * if (st.keyUsage & KEY_DIGITAL_SIGNATURE) ...
+ * if (st.key_usage & KEY_DIGITAL_SIGNATURE) ...
  */
 #define KEY_DIGITAL_SIGNATURE 		128
 #define KEY_NON_REPUDIATION		64
@@ -39,7 +39,7 @@ typedef struct gnutls_cert {
 
     gnutls_pk_algorithm_t subject_pk_algorithm;
 
-    unsigned int keyUsage;	/* bits from KEY_* 
+    unsigned int key_usage;	/* bits from KEY_* 
 				 */
 
     unsigned int version;

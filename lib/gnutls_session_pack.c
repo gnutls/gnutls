@@ -35,11 +35,10 @@
 #include <gnutls_num.h>
 
 #define PACK_HEADER_SIZE 1
-int _gnutls_pack_certificate_auth_info(cert_auth_info_t info,
-				       gnutls_datum_t * packed_session);
-int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
-					 const gnutls_datum_t *
-					 packed_session);
+static int _gnutls_pack_certificate_auth_info(cert_auth_info_t info,
+    gnutls_datum_t * packed_session);
+static int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
+    const gnutls_datum_t * packed_session);
 static int _gnutls_pack_certificate_auth_info_size(cert_auth_info_t info);
 
 
@@ -88,7 +87,7 @@ int _gnutls_session_pack(gnutls_session_t session,
 	break;
 #endif
     case GNUTLS_CRD_ANON:{
-	    anon_client_auth_info_t info = _gnutls_get_auth_info(session);
+	    anon_auth_info_t info = _gnutls_get_auth_info(session);
 	    if (info == NULL && session->key->auth_info_size != 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
@@ -220,7 +219,9 @@ int _gnutls_session_unpack(gnutls_session_t session,
 	}
 	break;
 #endif
-    case GNUTLS_CRD_ANON:{
+    case GNUTLS_CRD_ANON: {
+            anon_auth_info_t info;
+            
 	    pack_size =
 		_gnutls_read_uint32(&packed_session->
 				    data[PACK_HEADER_SIZE]);
@@ -242,8 +243,13 @@ int _gnutls_session_unpack(gnutls_session_t session,
 	    session->key->auth_info_size = pack_size;
 
 	    memcpy(session->key->auth_info,
-		   &packed_session->data[PACK_HEADER_SIZE +
-					 sizeof(uint32)], pack_size);
+                &packed_session->data[PACK_HEADER_SIZE +
+	        sizeof(uint32)], pack_size);
+	    
+	    /* Delete the DH parameters. (this might need to be moved to a function)
+	     */
+	    info = session->key->auth_info;
+	    memset( &info->dh, 0, sizeof(dh_info_st));
 	}
 	break;
     case GNUTLS_CRD_CERTIFICATE:{
@@ -321,7 +327,7 @@ int _gnutls_session_unpack(gnutls_session_t session,
 }
 
 int _gnutls_pack_certificate_auth_info(cert_auth_info_t info,
-				       gnutls_datum_t * packed_session)
+    gnutls_datum_t * packed_session)
 {
     unsigned int pos, i;
     int info_size;
@@ -378,8 +384,7 @@ static int _gnutls_pack_certificate_auth_info_size(cert_auth_info_t info)
 
 
 int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
-					 const gnutls_datum_t *
-					 packed_session)
+    const gnutls_datum_t *packed_session)
 {
     unsigned int i, j, pos;
     int ret;
@@ -388,6 +393,11 @@ int _gnutls_unpack_certificate_auth_info(cert_auth_info_t info,
     memcpy(info,
 	   &packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
 	   sizeof(cert_auth_info_st));
+    
+    /* Delete the dh_info_st and rsa_info_st fields.
+     */
+    memset( &info->dh, 0, sizeof(dh_info_st));
+    memset( &info->rsa_export, 0, sizeof(rsa_info_st));
 
     pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(cert_auth_info_st);
     if (info->ncerts > 0) {

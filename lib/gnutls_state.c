@@ -411,7 +411,7 @@ int _gnutls_dh_get_allowed_prime_bits(gnutls_session_t session)
 
 int _gnutls_dh_set_peer_public(gnutls_session_t session, mpi_t public)
 {
-    dh_info_t *dh;
+    dh_info_st *dh;
     int ret;
 
     switch (gnutls_auth_get_type(session)) {
@@ -439,12 +439,10 @@ int _gnutls_dh_set_peer_public(gnutls_session_t session, mpi_t public)
 	return GNUTLS_E_INTERNAL_ERROR;
     }
 
-    dh->public_key_size = sizeof(dh->public_key);
     ret =
-	_gnutls_mpi_print_lz(dh->public_key, &dh->public_key_size, public);
+	_gnutls_mpi_dprint_lz(&dh->public_key, public);
     if (ret < 0) {
 	gnutls_assert();
-	dh->public_key_size = 0;
 	return ret;
     }
 
@@ -493,24 +491,18 @@ int _gnutls_rsa_export_set_pubkey(gnutls_session_t session, mpi_t exp,
     if (info == NULL)
 	return GNUTLS_E_INTERNAL_ERROR;
 
-    info->rsa_export.modulus_size = sizeof(info->rsa_export.modulus);
-
     ret =
-	_gnutls_mpi_print_lz(info->rsa_export.modulus,
-			     &info->rsa_export.modulus_size, mod);
+	_gnutls_mpi_dprint_lz(&info->rsa_export.modulus, mod);
     if (ret < 0) {
 	gnutls_assert();
-	info->rsa_export.modulus_size = 0;
 	return ret;
     }
 
-    info->rsa_export.exponent_size = sizeof(info->rsa_export.exponent);
     ret =
-	_gnutls_mpi_print_lz(info->rsa_export.exponent,
-			     &info->rsa_export.exponent_size, exp);
+	_gnutls_mpi_dprint_lz(&info->rsa_export.exponent, exp);
     if (ret < 0) {
 	gnutls_assert();
-	info->rsa_export.exponent_size = 0;
+	_gnutls_free_datum( &info->rsa_export.modulus);
 	return ret;
     }
 
@@ -522,7 +514,7 @@ int _gnutls_rsa_export_set_pubkey(gnutls_session_t session, mpi_t exp,
  */
 int _gnutls_dh_set_group(gnutls_session_t session, mpi_t gen, mpi_t prime)
 {
-    dh_info_t *dh;
+    dh_info_st *dh;
     int ret;
 
     switch (gnutls_auth_get_type(session)) {
@@ -550,22 +542,22 @@ int _gnutls_dh_set_group(gnutls_session_t session, mpi_t gen, mpi_t prime)
 	return GNUTLS_E_INTERNAL_ERROR;
     }
 
-    dh->prime_size = sizeof(dh->prime);
-    ret = _gnutls_mpi_print_lz(dh->prime, &dh->prime_size, prime);
+    /* prime
+     */
+    ret = _gnutls_mpi_dprint_lz(&dh->prime, prime);
     if (ret < 0) {
 	gnutls_assert();
-	dh->prime_size = 0;
 	return ret;
     }
 
-    dh->generator_size = sizeof(dh->generator);
-    ret = _gnutls_mpi_print_lz(dh->generator, &dh->generator_size, gen);
+    /* generator
+     */
+    ret = _gnutls_mpi_dprint_lz(&dh->generator, gen);
     if (ret < 0) {
 	gnutls_assert();
-	dh->generator_size = 0;
+	_gnutls_free_datum( &dh->prime);
 	return ret;
     }
-
 
     return 0;
 }

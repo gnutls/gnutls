@@ -542,7 +542,7 @@ inline
     static int record_check_version(gnutls_session_t session,
 				    handshake_t htype, opaque version[2])
 {
-    if (hype == GNUTLS_CLIENT_HELLO) {
+    if (htype == GNUTLS_CLIENT_HELLO) {
         /* Reject hello packets with major version higher than 3.
          */
         if (version[0] > 3) {

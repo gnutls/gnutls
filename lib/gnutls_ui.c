@@ -72,9 +72,9 @@ void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
   *
   **/
 int gnutls_dh_get_group(gnutls_session_t session,
-			gnutls_datum_t * raw_gen, gnutls_datum_t * raw_prime)
+    gnutls_datum_t * raw_gen, gnutls_datum_t * raw_prime)
 {
-    dh_info_t *dh;
+    dh_info_st *dh;
     int ret;
     anon_server_auth_info_t anon_info;
     cert_auth_info_t cert_info;
@@ -97,13 +97,13 @@ int gnutls_dh_get_group(gnutls_session_t session,
 	return GNUTLS_E_INVALID_REQUEST;
     }
 
-    ret = _gnutls_set_datum(raw_prime, dh->prime, dh->prime_size);
+    ret = _gnutls_set_datum(raw_prime, dh->prime.data, dh->prime.size);
     if (ret < 0) {
 	gnutls_assert();
 	return ret;
     }
 
-    ret = _gnutls_set_datum(raw_gen, dh->generator, dh->generator_size);
+    ret = _gnutls_set_datum(raw_gen, dh->generator.data, dh->generator.size);
     if (ret < 0) {
 	gnutls_assert();
 	_gnutls_free_datum(raw_prime);
@@ -127,7 +127,7 @@ int gnutls_dh_get_group(gnutls_session_t session,
   **/
 int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 {
-    dh_info_t *dh;
+    dh_info_st *dh;
     anon_server_auth_info_t anon_info;
     cert_auth_info_t cert_info;
 
@@ -152,7 +152,7 @@ int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 	return GNUTLS_E_INVALID_REQUEST;
     }
 
-    return _gnutls_set_datum(raw_key, dh->public_key, dh->public_key_size);
+    return _gnutls_set_datum(raw_key, dh->public_key.data, dh->public_key.size);
 }
 
 /**
@@ -178,15 +178,15 @@ int gnutls_rsa_export_get_pubkey(gnutls_session_t session,
 	if (info == NULL)
 	    return GNUTLS_E_INTERNAL_ERROR;
 
-	ret = _gnutls_set_datum(mod, info->rsa_export.modulus,
-				info->rsa_export.modulus_size);
+	ret = _gnutls_set_datum(mod, info->rsa_export.modulus.data,
+				info->rsa_export.modulus.size);
 	if (ret < 0) {
 	    gnutls_assert();
 	    return ret;
 	}
 
-	ret = _gnutls_set_datum(exp, info->rsa_export.exponent,
-				info->rsa_export.exponent_size);
+	ret = _gnutls_set_datum(exp, info->rsa_export.exponent.data,
+				info->rsa_export.exponent.size);
 	if (ret < 0) {
 	    gnutls_assert();
 	    _gnutls_free_datum(mod);
@@ -247,7 +247,7 @@ int gnutls_dh_get_secret_bits(gnutls_session_t session)
   **/
 int gnutls_dh_get_prime_bits(gnutls_session_t session)
 {
-    dh_info_t *dh;
+    dh_info_st *dh;
 
     switch (gnutls_auth_get_type(session)) {
     case GNUTLS_CRD_ANON:{
@@ -274,7 +274,7 @@ int gnutls_dh_get_prime_bits(gnutls_session_t session)
 	return GNUTLS_E_INVALID_REQUEST;
     }
 
-    return (dh->prime_size) * 8;
+    return (dh->prime.size) * 8;
 
 }
 
@@ -295,7 +295,7 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session_t session)
     if (info == NULL)
 	return GNUTLS_E_INTERNAL_ERROR;
 
-    return info->rsa_export.modulus_size * 8;
+    return info->rsa_export.modulus.size * 8;
 }
 
 /**
@@ -309,7 +309,7 @@ int gnutls_rsa_export_get_modulus_bits(gnutls_session_t session)
   **/
 int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 {
-    dh_info_t *dh;
+    dh_info_st *dh;
 
     switch (gnutls_auth_get_type(session)) {
     case GNUTLS_CRD_ANON:{
@@ -337,7 +337,7 @@ int gnutls_dh_get_peers_public_bits(gnutls_session_t session)
 	return GNUTLS_E_INVALID_REQUEST;
     }
 
-    return dh->public_key_size * 8;
+    return dh->public_key.size * 8;
 
 }
 
