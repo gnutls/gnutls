@@ -1,3 +1,36 @@
+2002-06-15 10:49  nmav <nmav@gnutls.org>
+
+	* acconfig.h, configure.in, doc/TODO, src/Makefile.am:
+
+	Corrected libgdbm issues 
+
+2002-06-15 09:46  nmav <nmav@gnutls.org>
+
+	* NEWS, configure.in, doc/TODO, doc/tex/handshake.tex,
+	doc/tex/serv1.tex, lib/defines.h, lib/gnutls.h.in.in,
+	lib/gnutls_db.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_int_compat.c, lib/gnutls_state.c, lib/x509_xml.c,
+	src/Makefile.am, src/common.c, src/serv.c:
+
+	Removed the gdbm backend for resuming TLS sessions. Program
+	gnutls-serv was modified to include support for resuming sessions
+	with the callback api.  
+
+2002-06-14 21:42  nmav <nmav@gnutls.org>
+
+	* doc/tex/: Makefile.am, alert.tex, auth.tex, errors.tex,
+	examples.tex, funcs.tex, gnutls.tex, handshake.tex, layers.tex,
+	openpgp.tex, record.tex, x509.tex:
+
+	Added index.  
+
+2002-06-14 20:43  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, gnutls_ui.h, x509_xml.c:
+
+	Added XML extraction from an X.509 certificate. Only some basic
+	functionality is now available.  
+
 2002-06-11 08:39  nmav <nmav@gnutls.org>
 
 	* lib/: Makefile.am, auth_cert.c, auth_rsa.c, gnutls_asn1_tab.c,
