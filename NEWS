@@ -1,3 +1,6 @@
+Version 0.8.5
+- Allow larger MPI parameters.
+
 Version 0.8.4 (10/03/2003)
 - Corrected a broken buffer check in _gnutls_io_read_buffered(),
   which caused some unexpected packet length errors. Report and patch
