@@ -1,3 +1,17 @@
+2002-12-07 11:46  nmav <nmav@gnutls.org>
+
+	* lib/ext_server_name.c:
+
+	some fixes in server_name extension 
+
+2002-12-07 11:19  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/callbacks.tex, lib/gnutls.h.in.in, lib/gnutls_db.c,
+	lib/gnutls_global.c, lib/gnutls_mem.c, lib/x509_b64.c:
+
+	Exported the more convenient gnutls_malloc() and gnutls_free()
+	functions. Actually pointers to functions.  
+
 2002-12-06 17:28  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/x509_b64.c:
