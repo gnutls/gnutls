@@ -338,8 +338,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 		 * trusted.
 		 */
 		gnutls_assert();
-		if (!(status & GNUTLS_CERT_INVALID))
-			status |= GNUTLS_CERT_INVALID;
+		status |= GNUTLS_CERT_INVALID;
 	}
 
 	return status;
