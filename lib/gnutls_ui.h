@@ -49,8 +49,8 @@ typedef enum GNUTLS_X509_SUBJECT_ALT_NAME {
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
 
-typedef int gnutls_certificate_client_select_func(GNUTLS_STATE, const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int gnutls_certificate_server_select_func(GNUTLS_STATE, const gnutls_datum *, int);
+typedef int gnutls_certificate_client_select_function(GNUTLS_STATE, const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int gnutls_certificate_server_select_function(GNUTLS_STATE, const gnutls_datum *, int);
 
 /* Functions that allow AUTH_INFO structures handling
  */
@@ -66,8 +66,8 @@ int gnutls_dh_get_peers_public_bits( GNUTLS_STATE);
 
 /* X509PKI */
 
-void gnutls_certificate_client_set_select_func( GNUTLS_STATE, gnutls_certificate_client_select_func *);
-void gnutls_certificate_server_set_select_func( GNUTLS_STATE, gnutls_certificate_server_select_func *);
+void gnutls_certificate_client_set_select_function( GNUTLS_STATE, gnutls_certificate_client_select_function *);
+void gnutls_certificate_server_set_select_function( GNUTLS_STATE, gnutls_certificate_server_select_function *);
 
 void gnutls_certificate_server_set_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 

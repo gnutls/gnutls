@@ -473,7 +473,7 @@ int i;
 }
 
 /**
-  * gnutls_srp_server_set_select_func - Used to set a callback to assist in selecting the proper password file
+  * gnutls_srp_server_set_select_function - Used to set a callback to assist in selecting the proper password file
   * @state: is a &GNUTLS_STATE structure.
   * @func: is the callback function
   *
@@ -498,7 +498,7 @@ int i;
   * choosen by the server. -1 indicates an error.
   *
   **/
-void gnutls_srp_server_set_select_func(GNUTLS_STATE state,
+void gnutls_srp_server_set_select_function(GNUTLS_STATE state,
 					     srp_server_select_func
 					     * func)
 {

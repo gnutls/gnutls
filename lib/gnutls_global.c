@@ -24,14 +24,12 @@
 #include <libtasn1.h>
 #include <gnutls_dh.h>
 
+typedef void (*LOG_FUNC)( const char*);
+#define GNUTLS_LOG_FUNC LOG_FUNC
 
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
-
-
-typedef void (*LOG_FUNC)( const char*);
-#define GNUTLS_LOG_FUNC LOG_FUNC
 
 LOG_FUNC _gnutls_log_func;
 
@@ -48,7 +46,7 @@ ASN1_TYPE _gnutls_get_gnutls_asn(void) {
 
 
 /**
-  * gnutls_global_set_log_func - This function sets the logging function
+  * gnutls_global_set_log_function - This function sets the logging function
   * @log_func: it's a log function
   *
   * This is the function were you set the logging function gnutls
@@ -58,7 +56,7 @@ ASN1_TYPE _gnutls_get_gnutls_asn(void) {
   * LOG_FUNC is of the form, 
   * void (*LOG_FUNC)( const char*);
   **/
-void gnutls_global_set_log_func( GNUTLS_LOG_FUNC log_func) {
+void gnutls_global_set_log_function( GNUTLS_LOG_FUNC log_func) {
 	_gnutls_log_func = log_func;
 }
 
@@ -81,7 +79,7 @@ extern void* (*gnutls_calloc)(size_t, size_t);
 int _gnutls_is_secure_mem_null( const void*);
 
 /**
-  * gnutls_global_set_mem_func - This function sets the memory allocation functions
+  * gnutls_global_set_mem_function - This function sets the memory allocation functions
   * @alloc_func: it's the default memory allocation function. Like malloc().
   * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
   * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
@@ -97,7 +95,7 @@ int _gnutls_is_secure_mem_null( const void*);
   * This function must be called before gnutls_global_init() is called.
   *
   **/
-void gnutls_global_set_mem_func( 
+void gnutls_global_set_mem_function( 
 	void *(*gnutls_alloc_func)(size_t), void* (*gnutls_secure_alloc_func)(size_t),
 	int (*gnutls_is_secure_func)(const void*), void *(*gnutls_realloc_func)(void *, size_t),
 	void (*gnutls_free_func)(void*))
@@ -164,7 +162,7 @@ int gnutls_global_init( void)
 	
 	/* set default recv/send functions
 	 */
-	gnutls_global_set_log_func( dlog);
+	gnutls_global_set_log_function( dlog);
 
 	/* initialize parser 
 	 * This should not deal with files in the final
@@ -218,7 +216,7 @@ void gnutls_global_deinit( void) {
  */
 
 /**
-  * gnutls_transport_set_pull_func - This function sets a read like function
+  * gnutls_transport_set_pull_function - This function sets a read like function
   * @pull_func: it's a function like read
   * @state: gnutls state
   *
@@ -230,12 +228,12 @@ void gnutls_global_deinit( void) {
   * PULL_FUNC is of the form, 
   * ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
   **/
-void gnutls_transport_set_pull_func( GNUTLS_STATE state, GNUTLS_PULL_FUNC pull_func) {
+void gnutls_transport_set_pull_function( GNUTLS_STATE state, GNUTLS_PULL_FUNC pull_func) {
 	state->gnutls_internals._gnutls_pull_func = pull_func;
 }
 
 /**
-  * gnutls_transport_set_push_func - This function sets the function to send data
+  * gnutls_transport_set_push_function - This function sets the function to send data
   * @push_func: it's a function like write
   * @state: gnutls state
   *
@@ -249,6 +247,6 @@ void gnutls_transport_set_pull_func( GNUTLS_STATE state, GNUTLS_PULL_FUNC pull_f
   * PUSH_FUNC is of the form, 
   * ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
   **/
-void gnutls_transport_set_push_func( GNUTLS_STATE state, GNUTLS_PUSH_FUNC push_func) {
+void gnutls_transport_set_push_function( GNUTLS_STATE state, GNUTLS_PUSH_FUNC push_func) {
 	state->gnutls_internals._gnutls_push_func = push_func;
 }

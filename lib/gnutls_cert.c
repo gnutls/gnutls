@@ -220,7 +220,7 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
 }
 
 /**
-  * gnutls_certificate_client_set_select_func - Used to set a callback while selecting the proper (client) certificate
+  * gnutls_certificate_client_set_select_function - Used to set a callback while selecting the proper (client) certificate
   * @state: is a &GNUTLS_STATE structure.
   * @func: is the callback function
   *
@@ -260,7 +260,7 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
   *
   * This function returns 0 on success.
   **/
-void gnutls_certificate_client_set_select_func(GNUTLS_STATE state,
+void gnutls_certificate_client_set_select_function(GNUTLS_STATE state,
 					     certificate_client_select_func
 					     * func)
 {
@@ -268,7 +268,7 @@ void gnutls_certificate_client_set_select_func(GNUTLS_STATE state,
 }
 
 /**
-  * gnutls_certificate_server_set_select_func - Used to set a callback while selecting the proper (server) certificate
+  * gnutls_certificate_server_set_select_function - Used to set a callback while selecting the proper (server) certificate
   * @state: is a &GNUTLS_STATE structure.
   * @func: is the callback function
   *
@@ -292,7 +292,7 @@ void gnutls_certificate_client_set_select_func(GNUTLS_STATE state,
   * choosen by the server. -1 indicates an error.
   *
   **/
-void gnutls_certificate_server_set_select_func(GNUTLS_STATE state,
+void gnutls_certificate_server_set_select_function(GNUTLS_STATE state,
 					     certificate_server_select_func
 					     * func)
 {

@@ -222,9 +222,9 @@ GNUTLS_STATE initialize_state (void)
 
 #ifdef HAVE_LIBGDBM
    if (nodb==0) {
-    gnutls_db_set_retrieve_func( state, wrap_gdbm_fetch);
-    gnutls_db_set_remove_func( state, wrap_gdbm_delete);
-    gnutls_db_set_store_func( state, wrap_gdbm_store);
+    gnutls_db_set_retrieve_function( state, wrap_gdbm_fetch);
+    gnutls_db_set_remove_function( state, wrap_gdbm_delete);
+    gnutls_db_set_store_function( state, wrap_gdbm_store);
     gnutls_db_set_ptr( state, NULL);
    }
 #endif

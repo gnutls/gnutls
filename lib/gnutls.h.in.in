@@ -189,9 +189,9 @@ typedef gnutls_datum (*GNUTLS_DB_RETR_FUNC)(void*, gnutls_datum key);
 void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds);
 
 void gnutls_db_remove_session( GNUTLS_STATE state);
-void gnutls_db_set_retrieve_func( GNUTLS_STATE, GNUTLS_DB_RETR_FUNC);
-void gnutls_db_set_remove_func( GNUTLS_STATE, GNUTLS_DB_REMOVE_FUNC);
-void gnutls_db_set_store_func( GNUTLS_STATE, GNUTLS_DB_STORE_FUNC);
+void gnutls_db_set_retrieve_function( GNUTLS_STATE, GNUTLS_DB_RETR_FUNC);
+void gnutls_db_set_remove_function( GNUTLS_STATE, GNUTLS_DB_REMOVE_FUNC);
+void gnutls_db_set_store_function( GNUTLS_STATE, GNUTLS_DB_STORE_FUNC);
 void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
 void* gnutls_db_get_ptr( GNUTLS_STATE);
 int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
@@ -254,13 +254,13 @@ int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
 int gnutls_global_init(void);
 void gnutls_global_deinit(void);
 
-void gnutls_global_set_mem_func( 
+void gnutls_global_set_mem_function( 
 	void *(*gnutls_alloc_func)(size_t), void* (*gnutls_secure_alloc_func)(size_t),
 	int (*gnutls_is_secure_func)(const void*), void *(*gnutls_realloc_func)(void *, size_t),
 	void (*gnutls_free_func)(void*));
 
 typedef void (*GNUTLS_LOG_FUNC)( const char*);
-void gnutls_global_set_log_func( GNUTLS_LOG_FUNC log_func);
+void gnutls_global_set_log_function( GNUTLS_LOG_FUNC log_func);
 
 int gnutls_dh_params_set( GNUTLS_DH_PARAMS, gnutls_datum prime, gnutls_datum generator, int bits);
 int gnutls_dh_params_init( GNUTLS_DH_PARAMS*);
@@ -275,8 +275,8 @@ GNUTLS_TRANSPORT_PTR gnutls_transport_get_ptr(GNUTLS_STATE state);
 void gnutls_transport_set_lowat( GNUTLS_STATE state, int num);
 
 
-void gnutls_transport_set_push_func( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
-void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
+void gnutls_transport_set_push_function( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
+void gnutls_transport_set_pull_function( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
 
 /* state specific 
  */
