@@ -12,4 +12,4 @@ gnutls.ps: gnutls.tex gnutls-api.tex
 	dvips gnutls.dvi -o gnutls.ps
 
 gnutls.html: gnutls.tex gnutls-api.tex
-	latex2html gnutls.tex
+	latex2html -no_subdir 1 -split 0 gnutls.tex
