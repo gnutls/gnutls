@@ -1,3 +1,48 @@
+2004-08-17 17:00  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c:
+
+	Fix mem leak.  
+
+2004-08-17 09:30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_pk.c:
+
+	Typo.  
+
+2004-08-17 09:25  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS:
+
+	Pull up from trunk.  
+
+2004-08-17 09:24  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, THANKS, NEWS:
+
+	Add.  
+
+2004-08-17 09:22  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Bump version.  
+
+2004-08-17 09:09  Simon Josefsson <simon@josefsson.org>
+
+	* lib/: gnutls_pk.c, gnutls_pk.c:
+
+	Simplify computation of PKCS#1 version 1.5 type 2 non-zero pad
+	bytes, reported by Robey Pointer <robey@danger.com>.  
+
+2004-08-17 08:45  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in, lib/Makefile.am, lib/auth_srp_passwd.c,
+	lib/ext_srp.c, lib/gnutls_buffers.c, lib/gnutls_num.h,
+	lib/gnutls_pk.c, lib/gnutls_str.c:
+
+	Use minmax.h from gnulib instead of GMIN/GMAX.  
+
 2004-08-16 21:02  Simon Josefsson <simon@josefsson.org>
 
 	* src/common.c:
