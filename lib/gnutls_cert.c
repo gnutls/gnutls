@@ -134,9 +134,10 @@ void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc)
   *
   -*/
 gnutls_dh_params_t _gnutls_certificate_get_dh_params(const
-						   gnutls_certificate_credentials_t
-						   sc,
-						   gnutls_session_t session)
+						     gnutls_certificate_credentials_t
+						     sc,
+						     gnutls_session_t
+						     session)
 {
     gnutls_params_st params;
     int ret;
@@ -166,7 +167,10 @@ gnutls_dh_params_t _gnutls_certificate_get_dh_params(const
   *
   -*/
 gnutls_rsa_params_t _gnutls_certificate_get_rsa_params(const
-    gnutls_certificate_credentials_t sc, gnutls_session_t session)
+						       gnutls_certificate_credentials_t
+						       sc,
+						       gnutls_session_t
+						       session)
 {
     gnutls_params_st params;
     int ret;
@@ -201,7 +205,8 @@ gnutls_rsa_params_t _gnutls_certificate_get_rsa_params(const
   * with this structure (ie RSA and DH parameters are not freed by
   * this function).
   **/
-void gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
+void gnutls_certificate_free_credentials(gnutls_certificate_credentials_t
+					 sc)
 {
     gnutls_certificate_free_keys(sc);
     gnutls_certificate_free_cas(sc);
@@ -225,7 +230,9 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
   *
   * Returns 0 on success.
   **/
-int gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t* res)
+int
+gnutls_certificate_allocate_credentials(gnutls_certificate_credentials_t *
+					res)
 {
     *res = gnutls_calloc(1, sizeof(certificate_credentials_st));
 
@@ -305,7 +312,8 @@ int _gnutls_selected_cert_supported_kx(gnutls_session_t session,
   * send a certificate.
   **/
 void gnutls_certificate_server_set_request(gnutls_session_t session,
-					   gnutls_certificate_request_t req)
+					   gnutls_certificate_request_t
+					   req)
 {
     session->internals.send_cert_req = req;
 }
@@ -389,7 +397,8 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
   * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
-int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session, unsigned int* status)
+int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session,
+				      unsigned int *status)
 {
     cert_auth_info_t info;
     const gnutls_certificate_credentials_t cred;
@@ -434,9 +443,9 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session, unsigned int* st
 
     if (ret < 0) {
 	gnutls_assert();
-        return ret;
+	return ret;
     }
- 
+
     return 0;
 }
 
@@ -460,7 +469,8 @@ int _gnutls_openpgp_cert_verify_peers(gnutls_session_t session, unsigned int* st
   * This is the same as gnutls_x509_verify_certificate() and
   * uses the loaded CAs in the credentials as trusted CAs.
   **/
-int gnutls_certificate_verify_peers2(gnutls_session_t session, unsigned int *status)
+int gnutls_certificate_verify_peers2(gnutls_session_t session,
+				     unsigned int *status)
 {
     cert_auth_info_t info;
 
@@ -500,16 +510,16 @@ int gnutls_certificate_verify_peers2(gnutls_session_t session, unsigned int *sta
   -*/
 int gnutls_certificate_verify_peers(gnutls_session_t session)
 {
-unsigned int status;
-int ret;
+    unsigned int status;
+    int ret;
 
-    ret = gnutls_certificate_verify_peers2( session, &status);
-    
+    ret = gnutls_certificate_verify_peers2(session, &status);
+
     if (ret < 0) {
-    	gnutls_assert();
-    	return ret;
+	gnutls_assert();
+	return ret;
     }
-    
+
     return status;
 }
 
@@ -650,7 +660,8 @@ int _gnutls_raw_privkey_to_gkey(gnutls_privkey * key,
  * The critical extensions will be catched by the verification functions.
  */
 int _gnutls_x509_raw_cert_to_gcert(gnutls_cert * gcert,
-    const gnutls_datum_t * derCert, int flags /* OR of ConvFlags */ )
+				   const gnutls_datum_t * derCert,
+				   int flags /* OR of ConvFlags */ )
 {
     int ret;
     gnutls_x509_crt_t cert;

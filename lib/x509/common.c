@@ -158,7 +158,8 @@ const char *_gnutls_x509_oid2ldap_string(const char *oid)
  * hold the string.
  */
 int _gnutls_x509_oid_data2string(const char *oid, void *value,
-	 int value_size, char *res, size_t * res_size)
+				 int value_size, char *res,
+				 size_t * res_size)
 {
     char str[MAX_STRING_LEN], tmpname[128];
     const char *ANAME = NULL;
@@ -205,31 +206,31 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
      * is the value;
      */
     len = sizeof(str) - 1;
-    if ((result = asn1_read_value(tmpasn, "", str, &len)) != ASN1_SUCCESS) { /* CHOICE */
+    if ((result = asn1_read_value(tmpasn, "", str, &len)) != ASN1_SUCCESS) {	/* CHOICE */
 	gnutls_assert();
 	asn1_delete_structure(&tmpasn);
 	return _gnutls_asn2err(result);
     }
-        
+
     if (CHOICE == 0) {
-        str[len] = 0;
-	
-        if (res)
+	str[len] = 0;
+
+	if (res)
 	    _gnutls_str_cpy(res, *res_size, str);
 	*res_size = len;
-    } else { /* CHOICE */
-      int non_printable = 0, teletex = 0;
-      str[len] = 0;
+    } else {			/* CHOICE */
+	int non_printable = 0, teletex = 0;
+	str[len] = 0;
 
-        /* Note that we do not support strings other than
-         * UTF-8 (thus ASCII as well).
-         */
-        if ( strcmp( str, "printableString")!=0 && 
-            strcmp( str, "utf8String")!=0 ) {
-            non_printable = 1;
-        }
-        if (strcmp( str, "teletexString")==0)
-            teletex = 1;
+	/* Note that we do not support strings other than
+	 * UTF-8 (thus ASCII as well).
+	 */
+	if (strcmp(str, "printableString") != 0 &&
+	    strcmp(str, "utf8String") != 0) {
+	    non_printable = 1;
+	}
+	if (strcmp(str, "teletexString") == 0)
+	    teletex = 1;
 
 
 	_gnutls_str_cpy(tmpname, sizeof(tmpname), str);
@@ -242,32 +243,34 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
 	    return _gnutls_asn2err(result);
 	}
 
-        asn1_delete_structure(&tmpasn);
+	asn1_delete_structure(&tmpasn);
 
-        if (teletex != 0) {
-          int ascii = 0, i;
-          /* HACK: if the teletex string contains only ascii
-           * characters then treat it as printable.
-           */
-          for(i=0;i<len;i++)
-            if(!isascii(str[i])) ascii=1;
-            
-          if (ascii==0) non_printable = 0;
-        }
+	if (teletex != 0) {
+	    int ascii = 0, i;
+	    /* HACK: if the teletex string contains only ascii
+	     * characters then treat it as printable.
+	     */
+	    for (i = 0; i < len; i++)
+		if (!isascii(str[i]))
+		    ascii = 1;
+
+	    if (ascii == 0)
+		non_printable = 0;
+	}
 
 	if (res) {
-            if (non_printable==0) {
-                str[len] = 0;
-	        _gnutls_str_cpy(res, *res_size, str);
-                 *res_size = len;
-            } else {
-                result = _gnutls_x509_data2hex( str, len, res, res_size);
-                if (result < 0) {
-                    gnutls_assert();
-                    return result;
-                }
-            }
-        }
+	    if (non_printable == 0) {
+		str[len] = 0;
+		_gnutls_str_cpy(res, *res_size, str);
+		*res_size = len;
+	    } else {
+		result = _gnutls_x509_data2hex(str, len, res, res_size);
+		if (result < 0) {
+		    gnutls_assert();
+		    return result;
+		}
+	    }
+	}
 
     }
 
@@ -279,7 +282,7 @@ int _gnutls_x509_oid_data2string(const char *oid, void *value,
  * something like '#01020304'
  */
 int _gnutls_x509_data2hex(const opaque * data, size_t data_size,
-                          opaque * out, size_t * sizeof_out)
+			  opaque * out, size_t * sizeof_out)
 {
     char *res;
     char escaped[MAX_STRING_LEN];
@@ -287,22 +290,22 @@ int _gnutls_x509_data2hex(const opaque * data, size_t data_size,
     res = _gnutls_bin2hex(data, data_size, escaped, sizeof(escaped));
 
     if (res) {
-        unsigned int size = strlen(res) + 1;
-        if (size + 1 > *sizeof_out) {
-            *sizeof_out = size;
-            return GNUTLS_E_SHORT_MEMORY_BUFFER;
-        }
-        *sizeof_out = size;     /* -1 for the null +1 for the '#' */
+	unsigned int size = strlen(res) + 1;
+	if (size + 1 > *sizeof_out) {
+	    *sizeof_out = size;
+	    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+	*sizeof_out = size;	/* -1 for the null +1 for the '#' */
 
-        if (out) {
-            strcpy(out, "#");
-            strcat(out, res);
-        }
+	if (out) {
+	    strcpy(out, "#");
+	    strcat(out, res);
+	}
 
-        return 0;
+	return 0;
     } else {
-        gnutls_assert();
-        return GNUTLS_E_INTERNAL_ERROR;
+	gnutls_assert();
+	return GNUTLS_E_INTERNAL_ERROR;
     }
 
     return 0;
@@ -385,7 +388,7 @@ const char *_gnutls_x509_pk_to_oid(gnutls_pk_algorithm_t pk)
 }
 
 gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign(gnutls_pk_algorithm_t pk,
-					      gnutls_mac_algorithm_t mac)
+						gnutls_mac_algorithm_t mac)
 {
     if (pk == GNUTLS_PK_RSA) {
 	if (mac == GNUTLS_MAC_SHA)
@@ -533,11 +536,11 @@ time_t _gnutls_x509_time2gtime(const char *ttime, int year)
     ttime += 2;
 
     if (strlen(ttime) >= 2) {
-        memcpy(xx, ttime, 2);
-        etime.tm_sec = atoi(xx);
-        ttime += 2;
+	memcpy(xx, ttime, 2);
+	etime.tm_sec = atoi(xx);
+	ttime += 2;
     } else
-        etime.tm_sec = 0;
+	etime.tm_sec = 0;
 
     ret = mktime_utc(&etime);
 
@@ -580,7 +583,7 @@ time_t _gnutls_x509_utcTime2gtime(const char *ttime)
  * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)
  */
 int _gnutls_x509_gtime2utcTime(time_t gtime, char *str_time,
-    int str_time_size)
+			       int str_time_size)
 {
     size_t ret;
 
@@ -1372,7 +1375,7 @@ int _gnutls_x509_get_signed_data(ASN1_TYPE src, const char *src_name,
  * returns them into signed_data.
  */
 int _gnutls_x509_get_signature(ASN1_TYPE src, const char *src_name,
-     gnutls_datum_t * signature)
+			       gnutls_datum_t * signature)
 {
     int bits, result, len;
 

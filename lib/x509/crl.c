@@ -96,7 +96,8 @@ void gnutls_x509_crl_deinit(gnutls_x509_crl_t crl)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_import(gnutls_x509_crl_t crl, const gnutls_datum_t * data,
+int gnutls_x509_crl_import(gnutls_x509_crl_t crl,
+			   const gnutls_datum_t * data,
 			   gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;

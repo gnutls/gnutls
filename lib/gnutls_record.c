@@ -420,7 +420,8 @@ ssize_t _gnutls_send_int(gnutls_session_t session, content_type_t type,
 /* This function is to be called if the handshake was successfully 
  * completed. This sends a Change Cipher Spec packet to the peer.
  */
-ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session, int again)
+ssize_t _gnutls_send_change_cipher_spec(gnutls_session_t session,
+					int again)
 {
     static const opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
 
@@ -543,21 +544,22 @@ inline
 				    handshake_t htype, opaque version[2])
 {
     if (htype == GNUTLS_CLIENT_HELLO) {
-        /* Reject hello packets with major version higher than 3.
-         */
-        if (version[0] > 3) {
-        	gnutls_assert();
-        	_gnutls_record_log("REC[%x]: INVALID VERSION PACKET: (%d) %d.%d\n",
-        	    session, htype, version[0], version[1]);
-        	return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-        }
+	/* Reject hello packets with major version higher than 3.
+	 */
+	if (version[0] > 3) {
+	    gnutls_assert();
+	    _gnutls_record_log
+		("REC[%x]: INVALID VERSION PACKET: (%d) %d.%d\n", session,
+		 htype, version[0], version[1]);
+	    return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+	}
     } else if (htype != GNUTLS_SERVER_HELLO &&
-	gnutls_protocol_get_version(session) != _gnutls_version_get(version[0], version[1])) 
-    {
-        /* Reject record packets that have a different version than the
-         * one negotiated. Note that this version is not protected by any
-         * mac. I don't really think that this check serves any purpose.
-         */
+	       gnutls_protocol_get_version(session) !=
+	       _gnutls_version_get(version[0], version[1])) {
+	/* Reject record packets that have a different version than the
+	 * one negotiated. Note that this version is not protected by any
+	 * mac. I don't really think that this check serves any purpose.
+	 */
 	gnutls_assert();
 	_gnutls_record_log("REC[%x]: INVALID VERSION PACKET: (%d) %d.%d\n",
 			   session, htype, version[0], version[1]);
@@ -643,8 +645,8 @@ static int record_check_type(gnutls_session_t session,
 	     * if expecting client hello (for rehandshake
 	     * reasons). Otherwise it is an unexpected packet
 	     */
-	    if (htype == GNUTLS_CLIENT_HELLO && (type == GNUTLS_HANDSHAKE || 
-	        type == GNUTLS_ALERT))
+	    if (htype == GNUTLS_CLIENT_HELLO
+		&& (type == GNUTLS_HANDSHAKE || type == GNUTLS_ALERT))
 		return GNUTLS_E_GOT_APPLICATION_DATA;
 	    else
 		return GNUTLS_E_UNEXPECTED_PACKET;

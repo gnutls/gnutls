@@ -274,7 +274,8 @@ int _gnutls_db_remove_session(gnutls_session_t session, uint8 * session_id,
 
 /* Stores session data to the db backend.
  */
-int _gnutls_store_session(gnutls_session_t session, gnutls_datum_t session_id,
+int _gnutls_store_session(gnutls_session_t session,
+			  gnutls_datum_t session_id,
 			  gnutls_datum_t session_data)
 {
     int ret = 0;
@@ -311,7 +312,7 @@ int _gnutls_store_session(gnutls_session_t session, gnutls_datum_t session_id,
 /* Retrieves session data from the db backend.
  */
 gnutls_datum_t _gnutls_retrieve_session(gnutls_session_t session,
-				      gnutls_datum_t session_id)
+					gnutls_datum_t session_id)
 {
     gnutls_datum_t ret = { NULL, 0 };
 
@@ -331,7 +332,8 @@ gnutls_datum_t _gnutls_retrieve_session(gnutls_session_t session,
 
 /* Removes session data from the db backend.
  */
-int _gnutls_remove_session(gnutls_session_t session, gnutls_datum_t session_id)
+int _gnutls_remove_session(gnutls_session_t session,
+			   gnutls_datum_t session_id)
 {
     int ret = 0;
 

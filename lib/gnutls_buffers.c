@@ -77,8 +77,9 @@ inline static int RET(int err)
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
-int _gnutls_record_buffer_put(content_type_t type, gnutls_session_t session,
-			      opaque * data, size_t length)
+int _gnutls_record_buffer_put(content_type_t type,
+			      gnutls_session_t session, opaque * data,
+			      size_t length)
 {
     if (length == 0)
 	return 0;
@@ -149,8 +150,9 @@ size_t gnutls_record_check_pending(gnutls_session_t session)
 					  session);
 }
 
-int _gnutls_record_buffer_get(content_type_t type, gnutls_session_t session,
-			      opaque * data, size_t length)
+int _gnutls_record_buffer_get(content_type_t type,
+			      gnutls_session_t session, opaque * data,
+			      size_t length)
 {
     if (length == 0 || data == NULL) {
 	gnutls_assert();
@@ -577,8 +579,8 @@ inline
  * to decrypt and verify the integrity. 
  *
  */
-ssize_t _gnutls_io_write_buffered(gnutls_session_t session, const void *iptr,
-				  size_t n)
+ssize_t _gnutls_io_write_buffered(gnutls_session_t session,
+				  const void *iptr, size_t n)
 {
     size_t left;
     uint j, x, sum = 0;

@@ -413,7 +413,7 @@ int _gnutls_fbase64_decode(const char *header, const opaque * data,
     if (header != NULL)
 	_gnutls_str_cat(pem_header, sizeof(pem_header), header);
 
-    rdata = memmem(data, data_size, pem_header, strlen (pem_header));
+    rdata = memmem(data, data_size, pem_header, strlen(pem_header));
 
     if (rdata == NULL) {
 	gnutls_assert();
@@ -428,11 +428,11 @@ int _gnutls_fbase64_decode(const char *header, const opaque * data,
 	return GNUTLS_E_BASE64_DECODING_ERROR;
     }
 
-    kdata = memmem(rdata, data_size, ENDSTR, sizeof (ENDSTR) - 1);
+    kdata = memmem(rdata, data_size, ENDSTR, sizeof(ENDSTR) - 1);
     /* allow CR as well.
      */
     if (kdata == NULL)
-	kdata = memmem(rdata, data_size, ENDSTR2, sizeof (ENDSTR2) - 1);
+	kdata = memmem(rdata, data_size, ENDSTR2, sizeof(ENDSTR2) - 1);
 
     if (kdata == NULL) {
 	gnutls_assert();
@@ -446,7 +446,7 @@ int _gnutls_fbase64_decode(const char *header, const opaque * data,
 
     /* position is now after the ---BEGIN--- headers */
 
-    kdata = memmem(rdata, data_size, bottom, strlen (bottom));
+    kdata = memmem(rdata, data_size, bottom, strlen(bottom));
     if (kdata == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_BASE64_DECODING_ERROR;

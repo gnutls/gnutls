@@ -747,9 +747,10 @@ int _gnutls_x509_ext_gen_auth_key_id(const void *id, size_t id_size,
  * reason_flags should be an or'ed sequence of GNUTLS_CRL_REASON_*.
  *
  */
-int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name_t type,
-    const void *data_string, unsigned int reason_flags,
-    gnutls_datum_t * der_ext)
+int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name_t
+					 type, const void *data_string,
+					 unsigned int reason_flags,
+					 gnutls_datum_t * der_ext)
 {
     ASN1_TYPE ext = ASN1_TYPE_EMPTY;
     gnutls_datum_t gnames = { NULL, 0 };

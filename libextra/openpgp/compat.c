@@ -49,8 +49,8 @@
  * may use GnuPG for that purpose, or any other external PGP application.
  -*/
 int _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
-    const gnutls_datum_t * cert_list,
-    int cert_list_length, unsigned int *status)
+			       const gnutls_datum_t * cert_list,
+			       int cert_list_length, unsigned int *status)
 {
     int ret = 0;
     gnutls_openpgp_key_t key = NULL;
@@ -98,7 +98,7 @@ int _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
 	}
     }
 
-    if (cred->pgp_trustdb) { /* Use the trustDB */
+    if (cred->pgp_trustdb) {	/* Use the trustDB */
 	ret = gnutls_openpgp_trustdb_init(&tdb);
 	if (ret < 0) {
 	    gnutls_assert();
@@ -129,7 +129,7 @@ int _gnutls_openpgp_verify_key(const gnutls_certificate_credentials_t cred,
     if (!cred->pgp_trustdb && !cred->keyring.data)
 	*status |= GNUTLS_CERT_SIGNER_NOT_FOUND;
 
-  ret = 0;
+    ret = 0;
 
   leave:
     gnutls_openpgp_key_deinit(key);
@@ -183,7 +183,8 @@ int _gnutls_openpgp_fingerprint(const gnutls_datum_t * cert,
  *
  * Returns the timestamp when the OpenPGP key was created.
  -*/
-time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum_t * cert)
+time_t _gnutls_openpgp_get_raw_key_creation_time(const gnutls_datum_t *
+						 cert)
 {
     gnutls_openpgp_key_t key;
     int ret;

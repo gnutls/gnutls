@@ -109,8 +109,10 @@ int _gnutls_is_secure_mem_null(const void *);
   *
   **/
 void gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
-				     gnutls_alloc_function secure_alloc_func,
-				     gnutls_is_secure_function is_secure_func,
+				     gnutls_alloc_function
+				     secure_alloc_func,
+				     gnutls_is_secure_function
+				     is_secure_func,
 				     gnutls_realloc_function realloc_func,
 				     gnutls_free_function free_func)
 {
@@ -170,12 +172,11 @@ int gnutls_global_init(void)
 	goto out;
     _gnutls_init++;
 
-    if (gc_init () != GC_OK)
-      {
+    if (gc_init() != GC_OK) {
 	gnutls_assert();
 	_gnutls_debug_log("Initializing crypto backend failed\n");
 	return GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY;
-      }
+    }
 
 
     /* for gcrypt in order to be able to allocate memory */

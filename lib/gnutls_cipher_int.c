@@ -33,37 +33,36 @@ cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
     cipher_hd_t ret = NULL;
     int err = GC_INVALID_CIPHER;	/* doesn't matter */
 
-    switch (cipher)
-      {
-      case GNUTLS_CIPHER_AES_128_CBC:
+    switch (cipher) {
+    case GNUTLS_CIPHER_AES_128_CBC:
 	err = gc_cipher_open(GC_AES128, GC_CBC, &ret);
 	break;
 
-      case GNUTLS_CIPHER_AES_256_CBC:
+    case GNUTLS_CIPHER_AES_256_CBC:
 	err = gc_cipher_open(GC_AES256, GC_CBC, &ret);
 	break;
 
-      case GNUTLS_CIPHER_3DES_CBC:
+    case GNUTLS_CIPHER_3DES_CBC:
 	err = gc_cipher_open(GC_3DES, GC_CBC, &ret);
 	break;
 
-      case GNUTLS_CIPHER_DES_CBC:
+    case GNUTLS_CIPHER_DES_CBC:
 	err = gc_cipher_open(GC_DES, GC_CBC, &ret);
 	break;
 
-      case GNUTLS_CIPHER_ARCFOUR_128:
+    case GNUTLS_CIPHER_ARCFOUR_128:
 	err = gc_cipher_open(GC_ARCFOUR128, GC_STREAM, &ret);
 	break;
 
-      case GNUTLS_CIPHER_ARCFOUR_40:
+    case GNUTLS_CIPHER_ARCFOUR_40:
 	err = gc_cipher_open(GC_ARCFOUR40, GC_STREAM, &ret);
 	break;
 
-      case GNUTLS_CIPHER_RC2_40_CBC:
+    case GNUTLS_CIPHER_RC2_40_CBC:
 	err = gc_cipher_open(GC_ARCTWO40, GC_CBC, &ret);
 	break;
 
-      default:
+    default:
 	return NULL;
     }
 
@@ -83,7 +82,7 @@ cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
 int _gnutls_cipher_encrypt(cipher_hd_t handle, void *text, int textlen)
 {
     if (handle != GNUTLS_CIPHER_FAILED) {
-	if (gc_cipher_encrypt_inline (handle, textlen, text) != 0) {
+	if (gc_cipher_encrypt_inline(handle, textlen, text) != 0) {
 	    gnutls_assert();
 	    return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -95,7 +94,8 @@ int _gnutls_cipher_decrypt(cipher_hd_t handle, void *ciphertext,
 			   int ciphertextlen)
 {
     if (handle != GNUTLS_CIPHER_FAILED) {
-	if (gc_cipher_decrypt_inline (handle, ciphertextlen, ciphertext) != 0) {
+	if (gc_cipher_decrypt_inline(handle, ciphertextlen, ciphertext) !=
+	    0) {
 	    gnutls_assert();
 	    return GNUTLS_E_INTERNAL_ERROR;
 	}

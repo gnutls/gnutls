@@ -86,7 +86,7 @@ static void tls_log_func(int level, const char *str)
 
 int main(int argc, char **argv)
 {
-    set_program_name (argv[0]);
+    set_program_name(argv[0]);
     cfg_init();
     gaa_parser(argc, argv);
 
@@ -868,8 +868,8 @@ void gaa_parser(int argc, char **argv)
 	verify_crl();
 	break;
     case 15:
-      smime_to_pkcs7();
-      break;
+	smime_to_pkcs7();
+	break;
     default:
 	fprintf(stderr, "GnuTLS' certtool utility.\n");
 	fprintf(stderr,
@@ -1028,7 +1028,8 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
     if (cprint == NULL)
 	cprint = UNKNOWN;
     fprintf(out, "%s", cprint);
-    if (bits) fprintf(out,  " (%u bits)", bits);
+    if (bits)
+	fprintf(out, " (%u bits)", bits);
     fprintf(out, "\n");
 
 
@@ -1231,15 +1232,15 @@ static void print_certificate_info(gnutls_x509_crt crt, FILE * out,
 
 		fprintf(out, "\t\tDER Data: ");
 		for (j = 0; j < size; j++) {
-		  fprintf(out, "%.2x", (unsigned char) buffer[j]);
+		    fprintf(out, "%.2x", (unsigned char) buffer[j]);
 		}
 		fprintf(out, "\n");
 		fprintf(out, "\t\tASCII: ");
 		for (j = 0; j < size; j++) {
-		  if (isprint (buffer[j]))
-		    fprintf(out, "%c", (unsigned char) buffer[j]);
-		  else
-		    fprintf(out, ".");
+		    if (isprint(buffer[j]))
+			fprintf(out, "%c", (unsigned char) buffer[j]);
+		    else
+			fprintf(out, ".");
 		}
 		fprintf(out, "\n");
 	    }
@@ -1951,8 +1952,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 		gnutls_x509_crt_get_dn(x509_cert_list[i - 2], name,
 				       &name_size);
 	    if (ret < 0) {
-		fprintf(stderr, "get_dn: %s\n",
-			gnutls_strerror(ret));
+		fprintf(stderr, "get_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	    }
 
@@ -1980,8 +1980,7 @@ int _verify_x509_mem(const void *cert, int cert_size)
 		gnutls_x509_crt_get_dn(x509_cert_list[i - 1], name,
 				       &name_size);
 	    if (ret < 0) {
-		fprintf(stderr, "get_dn: %s\n",
-			gnutls_strerror(ret));
+		fprintf(stderr, "get_dn: %s\n", gnutls_strerror(ret));
 		exit(1);
 	    }
 
@@ -2258,9 +2257,9 @@ void generate_pkcs12(void)
     name = get_pkcs12_key_name();
 
     if (info.pass)
-      password = info.pass;
+	password = info.pass;
     else
-      password = get_pass();
+	password = get_pass();
 
     result = gnutls_pkcs12_bag_init(&bag);
     if (result < 0) {
@@ -2497,9 +2496,9 @@ void pkcs12_info(void)
     data.size = size;
 
     if (info.pass)
-      password = info.pass;
+	password = info.pass;
     else
-      password = get_pass();
+	password = get_pass();
 
     result = gnutls_pkcs12_init(&pkcs12);
     if (result < 0) {
@@ -2683,43 +2682,43 @@ void pkcs7_info(void)
 
 void smime_to_pkcs7(void)
 {
-  size_t linesize = 0;
-  char *lineptr = NULL;
-  ssize_t len;
+    size_t linesize = 0;
+    char *lineptr = NULL;
+    ssize_t len;
 
-  /* Find body.  FIXME: Handle non-b64 Content-Transfer-Encoding.
-     Reject non-S/MIME tagged Content-Type's? */
-  do
-    {
-      len = getline (&lineptr, &linesize, infile);
-      if (len == -1)
-	error (EXIT_FAILURE, 0, "Cannot find RFC 2822 header/body separator");
+    /* Find body.  FIXME: Handle non-b64 Content-Transfer-Encoding.
+       Reject non-S/MIME tagged Content-Type's? */
+    do {
+	len = getline(&lineptr, &linesize, infile);
+	if (len == -1)
+	    error(EXIT_FAILURE, 0,
+		  "Cannot find RFC 2822 header/body separator");
     }
-  while (strcmp (lineptr, "\r\n") != 0 && strcmp (lineptr, "\n") != 0);
+    while (strcmp(lineptr, "\r\n") != 0 && strcmp(lineptr, "\n") != 0);
 
-  do
-    {
-      len = getline (&lineptr, &linesize, infile);
-      if (len == -1)
-	error (EXIT_FAILURE, 0, "Message has RFC 2822 header but no body");
+    do {
+	len = getline(&lineptr, &linesize, infile);
+	if (len == -1)
+	    error(EXIT_FAILURE, 0,
+		  "Message has RFC 2822 header but no body");
     }
-  while (strcmp (lineptr, "\r\n") == 0 && strcmp (lineptr, "\n") == 0);
+    while (strcmp(lineptr, "\r\n") == 0 && strcmp(lineptr, "\n") == 0);
 
-  printf ("-----BEGIN PKCS7-----\n");
+    printf("-----BEGIN PKCS7-----\n");
 
-  do
-    {
-      while (len > 0 && (lineptr[len-1] == '\r' || lineptr[len-1] == '\n'))
-	lineptr[--len] = '\0';
-      if (strcmp (lineptr, "") != 0)
-	printf("%s\n", lineptr);
-      len = getline (&lineptr, &linesize, infile);
+    do {
+	while (len > 0
+	       && (lineptr[len - 1] == '\r' || lineptr[len - 1] == '\n'))
+	    lineptr[--len] = '\0';
+	if (strcmp(lineptr, "") != 0)
+	    printf("%s\n", lineptr);
+	len = getline(&lineptr, &linesize, infile);
     }
-  while (len != -1);
+    while (len != -1);
 
-  printf ("-----END PKCS7-----\n");
+    printf("-----END PKCS7-----\n");
 
-  free (lineptr);
+    free(lineptr);
 }
 
 #else				/* ENABLE_PKI */

@@ -49,7 +49,8 @@ static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt_t * certs,
 					      uint);
 static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey_t key);
 static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key_t cert);
-static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey_t
+static gnutls_privkey *alloc_and_load_pgp_key(const
+					      gnutls_openpgp_privkey_t
 					      key);
 
 
@@ -614,7 +615,8 @@ int _gnutls_gen_x509_crt(gnutls_session_t session, opaque ** data)
 
 enum PGPKeyDescriptorType { PGP_KEY_FINGERPRINT, PGP_KEY };
 
-int _gnutls_gen_openpgp_certificate(gnutls_session_t session, opaque ** data)
+int _gnutls_gen_openpgp_certificate(gnutls_session_t session,
+				    opaque ** data)
 {
     int ret;
     opaque *pdata;
@@ -1463,8 +1465,8 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key_t cert)
 /* converts the given raw key to gnutls_privkey* and allocates
  * space for it.
  */
-static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey_t
-					      key)
+static gnutls_privkey *alloc_and_load_pgp_key(const
+					      gnutls_openpgp_privkey_t key)
 {
     gnutls_privkey *local_key;
     int ret = 0;

@@ -113,8 +113,8 @@ int _gnutls_server_name_recv_params(gnutls_session_t session,
 
 /* returns data_size or a negative number on failure
  */
-int _gnutls_server_name_send_params(gnutls_session_t session, opaque * data,
-				    size_t _data_size)
+int _gnutls_server_name_send_params(gnutls_session_t session,
+				    opaque * data, size_t _data_size)
 {
     uint16 len;
     opaque *p;

@@ -14,6 +14,7 @@ int _gnutls_rsa_verify(const gnutls_datum_t * vdata,
 		       const gnutls_datum_t * ciphertext, mpi_t * params,
 		       int params_len, int btype);
 int _gnutls_dsa_verify(const gnutls_datum_t * vdata,
-     const gnutls_datum_t * sig_value, mpi_t * params, int params_len);
+		       const gnutls_datum_t * sig_value, mpi_t * params,
+		       int params_len);
 
 #endif				/* GNUTLS_PK_H */

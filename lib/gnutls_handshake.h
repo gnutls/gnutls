@@ -26,7 +26,8 @@ int gnutls_send_hello_request(gnutls_session_t session);
 int _gnutls_recv_hello_request(gnutls_session_t session, void *data,
 			       uint32 data_size);
 int _gnutls_send_hello(gnutls_session_t session, int again);
-int _gnutls_recv_hello(gnutls_session_t session, opaque * data, int datalen);
+int _gnutls_recv_hello(gnutls_session_t session, opaque * data,
+		       int datalen);
 int gnutls_handshake(gnutls_session_t session);
 int _gnutls_recv_handshake(gnutls_session_t session, uint8 **, int *,
 			   handshake_t, Optional optional);

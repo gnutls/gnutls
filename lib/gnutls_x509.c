@@ -128,7 +128,8 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
     peer_certificate_list_size = info->ncerts;
     peer_certificate_list =
 	gnutls_calloc(1,
-	    peer_certificate_list_size * sizeof(gnutls_x509_crt_t));
+		      peer_certificate_list_size *
+		      sizeof(gnutls_x509_crt_t));
     if (peer_certificate_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
@@ -144,7 +145,8 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
 
 	ret =
 	    gnutls_x509_crt_import(peer_certificate_list[i],
-		&info->raw_certificate_list[i], GNUTLS_X509_FMT_DER);
+				   &info->raw_certificate_list[i],
+				   GNUTLS_X509_FMT_DER);
 	if (ret < 0) {
 	    gnutls_assert();
 	    CLEAR_CERTS;
@@ -164,10 +166,10 @@ int _gnutls_x509_cert_verify_peers(gnutls_session_t session,
      */
     ret =
 	gnutls_x509_crt_list_verify(peer_certificate_list,
-	    peer_certificate_list_size,
-	    cred->x509_ca_list, cred->x509_ncas,
-	    cred->x509_crl_list, cred->x509_ncrls,
-	    cred->verify_flags, status);
+				    peer_certificate_list_size,
+				    cred->x509_ca_list, cred->x509_ncas,
+				    cred->x509_crl_list, cred->x509_ncrls,
+				    cred->verify_flags, status);
 
     CLEAR_CERTS;
 
@@ -439,7 +441,7 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
 
 #ifdef ENABLE_PKI
     if ((ptr = memmem(input_cert, input_cert_size,
-		      PEM_PKCS7_SEP, sizeof (PEM_PKCS7_SEP) - 1)) != NULL) {
+		      PEM_PKCS7_SEP, sizeof(PEM_PKCS7_SEP) - 1)) != NULL) {
 	size = strlen(ptr);
 
 	ret = parse_pkcs7_cert_mem(cert_list, ncerts, ptr, size, CERT_PEM);
@@ -451,10 +453,10 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
     /* move to the certificate
      */
     ptr = memmem(input_cert, input_cert_size,
-		 PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
+		 PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
     if (ptr == NULL)
 	ptr = memmem(input_cert, input_cert_size,
-		     PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
+		     PEM_CERT_SEP2, sizeof(PEM_CERT_SEP2) - 1);
 
     if (ptr == NULL) {
 	gnutls_assert();
@@ -504,10 +506,11 @@ static int parse_pem_cert_mem(gnutls_cert ** cert_list, uint * ncerts,
 	if (size > 0) {
 	    char *ptr2;
 
-	    ptr2 = memmem(ptr, size, PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
+	    ptr2 =
+		memmem(ptr, size, PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
 	    if (ptr2 == NULL)
 		ptr2 = memmem(ptr, size, PEM_CERT_SEP2,
-			      sizeof (PEM_CERT_SEP2) - 1);
+			      sizeof(PEM_CERT_SEP2) - 1);
 
 	    ptr = ptr2;
 	} else
@@ -1127,10 +1130,10 @@ static int parse_pem_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
     /* move to the certificate
      */
     ptr = memmem(input_cert, input_cert_size,
-		 PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
+		 PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
     if (ptr == NULL)
 	ptr = memmem(input_cert, input_cert_size,
-		     PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
+		     PEM_CERT_SEP2, sizeof(PEM_CERT_SEP2) - 1);
 
     if (ptr == NULL) {
 	gnutls_assert();
@@ -1182,10 +1185,11 @@ static int parse_pem_ca_mem(gnutls_x509_crt_t ** cert_list, uint * ncerts,
 	if (size > 0) {
 	    char *ptr2;
 
-	    ptr2 = memmem(ptr, size, PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
+	    ptr2 =
+		memmem(ptr, size, PEM_CERT_SEP, sizeof(PEM_CERT_SEP) - 1);
 	    if (ptr2 == NULL)
 		ptr = memmem(ptr, size,
-			     PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
+			     PEM_CERT_SEP2, sizeof(PEM_CERT_SEP2) - 1);
 
 	    ptr = ptr2;
 	} else
@@ -1309,27 +1313,29 @@ int gnutls_certificate_set_x509_trust(gnutls_certificate_credentials_t res,
 				      gnutls_x509_crt_t * ca_list,
 				      int ca_list_size)
 {
-    int ret, i,j, ret2;
+    int ret, i, j, ret2;
 
     res->x509_ca_list = gnutls_realloc_fast(res->x509_ca_list,
-	(ca_list_size + res->x509_ncas) * sizeof(gnutls_x509_crt_t));
+					    (ca_list_size +
+					     res->x509_ncas) *
+					    sizeof(gnutls_x509_crt_t));
     if (res->x509_ca_list == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_MEMORY_ERROR;
     }
 
     for (i = 0; i < ca_list_size; i++) {
-        ret = gnutls_x509_crt_init(&res->x509_ca_list[i + res->x509_ncas]);
+	ret = gnutls_x509_crt_init(&res->x509_ca_list[i + res->x509_ncas]);
 	if (ret < 0) {
 	    gnutls_assert();
 	    return ret;
 	}
 
-        ret = _gnutls_x509_crt_cpy(res->x509_ca_list[i + res->x509_ncas],
-            ca_list[i]);
+	ret = _gnutls_x509_crt_cpy(res->x509_ca_list[i + res->x509_ncas],
+				   ca_list[i]);
 	if (ret < 0) {
 	    gnutls_assert();
-	    gnutls_x509_crt_deinit( res->x509_ca_list[i + res->x509_ncas]);
+	    gnutls_x509_crt_deinit(res->x509_ca_list[i + res->x509_ncas]);
 	    return ret;
 	}
 	res->x509_ncas++;
@@ -1407,7 +1413,7 @@ static int parse_pem_crl_mem(gnutls_x509_crl_t ** crl_list, uint * ncrls,
     /* move to the certificate
      */
     ptr = memmem(input_crl, input_crl_size,
-		 PEM_CRL_SEP, sizeof (PEM_CRL_SEP) -1);
+		 PEM_CRL_SEP, sizeof(PEM_CRL_SEP) - 1);
     if (ptr == NULL) {
 	gnutls_assert();
 	return GNUTLS_E_BASE64_DECODING_ERROR;
@@ -1457,7 +1463,7 @@ static int parse_pem_crl_mem(gnutls_x509_crl_t ** crl_list, uint * ncrls,
 	size = input_crl_size - (ptr - input_crl);
 
 	if (size > 0)
-	    ptr = memmem(ptr, size, PEM_CRL_SEP, sizeof (PEM_CRL_SEP) - 1);
+	    ptr = memmem(ptr, size, PEM_CRL_SEP, sizeof(PEM_CRL_SEP) - 1);
 	else
 	    ptr = NULL;
 	i++;

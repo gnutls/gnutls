@@ -603,7 +603,8 @@ int _gnutls_recv_server_certificate(gnutls_session_t session)
 /* Recv the client certificate verify. This packet may not
  * arrive if the peer did not send us a certificate.
  */
-int _gnutls_recv_client_certificate_verify_message(gnutls_session_t session)
+int _gnutls_recv_client_certificate_verify_message(gnutls_session_t
+						   session)
 {
     uint8 *data;
     int datasize;

@@ -44,17 +44,17 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm_t algorithm)
 
     switch (algorithm) {
     case GNUTLS_MAC_SHA:
-      result = gc_hash_open(GC_SHA1, 0, &ret->handle);
-      break;
+	result = gc_hash_open(GC_SHA1, 0, &ret->handle);
+	break;
     case GNUTLS_MAC_MD5:
-      result = gc_hash_open(GC_MD5, 0, &ret->handle);
-      break;
+	result = gc_hash_open(GC_MD5, 0, &ret->handle);
+	break;
     case GNUTLS_MAC_RMD160:
-      result = gc_hash_open(GC_RMD160, 0, &ret->handle);
-      break;
+	result = gc_hash_open(GC_RMD160, 0, &ret->handle);
+	break;
     default:
-      gnutls_assert();
-      result = -1;
+	gnutls_assert();
+	result = -1;
     }
 
     if (result) {
@@ -92,9 +92,9 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm_t algorithm)
 int _gnutls_hash(GNUTLS_HASH_HANDLE handle, const void *text,
 		 size_t textlen)
 {
-  if (textlen > 0)
-    gc_hash_write(handle->handle, textlen, text);
-  return 0;
+    if (textlen > 0)
+	gc_hash_write(handle->handle, textlen, text);
+    return 0;
 }
 
 GNUTLS_HASH_HANDLE _gnutls_hash_copy(GNUTLS_HASH_HANDLE handle)
@@ -150,16 +150,13 @@ mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
 
     switch (algorithm) {
     case GNUTLS_MAC_SHA:
-	result =
-	  gc_hash_open(GC_SHA1, GC_HMAC, &ret->handle);
+	result = gc_hash_open(GC_SHA1, GC_HMAC, &ret->handle);
 	break;
     case GNUTLS_MAC_MD5:
-	result =
-	  gc_hash_open(GC_MD5, GC_HMAC, &ret->handle);
+	result = gc_hash_open(GC_MD5, GC_HMAC, &ret->handle);
 	break;
     case GNUTLS_MAC_RMD160:
-	result =
-	  gc_hash_open(GC_RMD160, GC_HMAC, &ret->handle);
+	result = gc_hash_open(GC_RMD160, GC_HMAC, &ret->handle);
 	break;
     default:
 	result = -1;

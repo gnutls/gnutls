@@ -124,7 +124,8 @@ int gnutls_x509_crt_set_issuer_dn_by_oid(gnutls_x509_crt_t crt,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_version(gnutls_x509_crt_t crt, unsigned int version)
+int gnutls_x509_crt_set_version(gnutls_x509_crt_t crt,
+				unsigned int version)
 {
     int result;
     unsigned char null = version;
@@ -158,7 +159,8 @@ int gnutls_x509_crt_set_version(gnutls_x509_crt_t crt, unsigned int version)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_key(gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
+int gnutls_x509_crt_set_key(gnutls_x509_crt_t crt,
+			    gnutls_x509_privkey_t key)
 {
     int result;
 
@@ -279,7 +281,8 @@ int gnutls_x509_crt_set_ca_status(gnutls_x509_crt_t crt, unsigned int ca)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt, unsigned int usage)
+int gnutls_x509_crt_set_key_usage(gnutls_x509_crt_t crt,
+				  unsigned int usage)
 {
     int result;
     gnutls_datum_t der_data;
@@ -528,8 +531,8 @@ static void disable_optional_stuff(gnutls_x509_crt_t cert)
   *
   **/
 int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt_t crt,
-					gnutls_x509_subject_alt_name_t type,
-					const void *data_string,
+					gnutls_x509_subject_alt_name_t
+					type, const void *data_string,
 					unsigned int reason_flags)
 {
     int result;

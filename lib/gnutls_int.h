@@ -116,7 +116,8 @@ typedef struct {
 
 #include <gnutls_mpi.h>
 
-typedef enum change_cipher_spec_t { GNUTLS_TYPE_CHANGE_CIPHER_SPEC = 1 } change_cipher_spec_t;
+typedef enum change_cipher_spec_t { GNUTLS_TYPE_CHANGE_CIPHER_SPEC =
+	1 } change_cipher_spec_t;
 
 typedef enum gnutls_certificate_status {
     GNUTLS_CERT_INVALID = 2,	/* will be set if the certificate
@@ -134,24 +135,24 @@ typedef enum gnutls_certificate_status {
 } gnutls_certificate_status_t;
 
 typedef enum gnutls_certificate_request { GNUTLS_CERT_IGNORE,
-	GNUTLS_CERT_REQUEST = 1, GNUTLS_CERT_REQUIRE 
+    GNUTLS_CERT_REQUEST = 1, GNUTLS_CERT_REQUIRE
 } gnutls_certificate_request_t;
 
 typedef enum gnutls_openpgp_key_status { GNUTLS_OPENPGP_KEY,
     GNUTLS_OPENPGP_KEY_FINGERPRINT
 } gnutls_openpgp_key_status_t;
 
-typedef enum gnutls_close_request_t { 
-    GNUTLS_SHUT_RDWR = 0, GNUTLS_SHUT_WR = 1 
+typedef enum gnutls_close_request_t {
+    GNUTLS_SHUT_RDWR = 0, GNUTLS_SHUT_WR = 1
 } gnutls_close_request_t;
 
-typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2, 
+typedef enum handshake_state_t { STATE0 = 0, STATE1, STATE2,
     STATE3, STATE4, STATE5,
     STATE6, STATE7, STATE8, STATE9, STATE20 = 20, STATE21,
     STATE30 = 30, STATE31, STATE50 = 50, STATE60 = 60, STATE61, STATE62
 } handshake_state_t;
 
-typedef enum handshake_t { GNUTLS_HELLO_REQUEST, 
+typedef enum handshake_t { GNUTLS_HELLO_REQUEST,
     GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
     GNUTLS_CERTIFICATE_PKT = 11, GNUTLS_SERVER_KEY_EXCHANGE,
     GNUTLS_CERTIFICATE_REQUEST, GNUTLS_SERVER_HELLO_DONE,
@@ -173,7 +174,7 @@ typedef handshake_t gnutls_handshake_description_t;
 
 typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL = 1,
     GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_3DES_CBC,
-    GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_AES_256_CBC, 
+    GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_AES_256_CBC,
     GNUTLS_CIPHER_ARCFOUR_40,
     GNUTLS_CIPHER_RC2_40_CBC = 90, GNUTLS_CIPHER_DES_CBC
 } gnutls_cipher_algorithm_t;
@@ -188,18 +189,18 @@ typedef enum gnutls_params_type { GNUTLS_PARAMS_RSA_EXPORT = 1,
 } gnutls_params_type_t;
 
 typedef enum gnutls_mac_algorithm { GNUTLS_MAC_UNKNOWN = 0,
-    GNUTLS_MAC_NULL = 1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA, 
+    GNUTLS_MAC_NULL = 1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA,
     GNUTLS_MAC_RMD160
 } gnutls_mac_algorithm_t;
 typedef gnutls_mac_algorithm_t gnutls_digest_algorithm_t;
 
-typedef enum gnutls_compression_method { 
+typedef enum gnutls_compression_method {
     GNUTLS_COMP_NULL = 1, GNUTLS_COMP_DEFLATE,
     GNUTLS_COMP_LZO
 } gnutls_compression_method_t;
 
-typedef enum gnutls_connection_end { 
-    GNUTLS_SERVER = 1, GNUTLS_CLIENT 
+typedef enum gnutls_connection_end {
+    GNUTLS_SERVER = 1, GNUTLS_CLIENT
 } gnutls_connection_end_t;
 
 typedef enum extensions_t { GNUTLS_EXTENSION_SERVER_NAME = 0,
@@ -207,32 +208,33 @@ typedef enum extensions_t { GNUTLS_EXTENSION_SERVER_NAME = 0,
     GNUTLS_EXTENSION_CERT_TYPE = 7
 } extensions_t;
 
-typedef enum gnutls_credentials_type { 
-    GNUTLS_CRD_CERTIFICATE = 1, GNUTLS_CRD_ANON, 
-    GNUTLS_CRD_SRP 
+typedef enum gnutls_credentials_type {
+    GNUTLS_CRD_CERTIFICATE = 1, GNUTLS_CRD_ANON,
+    GNUTLS_CRD_SRP
 } gnutls_credentials_type_t;
 
-typedef enum gnutls_certificate_type { 
+typedef enum gnutls_certificate_type {
     GNUTLS_CRT_X509 = 1, GNUTLS_CRT_OPENPGP
 } gnutls_certificate_type_t;
 
 typedef enum { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
 
 typedef enum valid_session_t { VALID_TRUE, VALID_FALSE } valid_session_t;
-typedef enum resumable_session_t { RESUME_TRUE, RESUME_FALSE } resumable_session_t;
+typedef enum resumable_session_t { RESUME_TRUE,
+	RESUME_FALSE } resumable_session_t;
 
 /* Record Protocol */
-typedef enum content_type_t { 
+typedef enum content_type_t {
     GNUTLS_CHANGE_CIPHER_SPEC = 20, GNUTLS_ALERT,
     GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA
 } content_type_t;
 
-typedef enum gnutls_x509_crt_fmt { 
+typedef enum gnutls_x509_crt_fmt {
     GNUTLS_X509_FMT_DER,
     GNUTLS_X509_FMT_PEM
 } gnutls_x509_crt_fmt_t;
 
-typedef enum gnutls_pk_algorithm { 
+typedef enum gnutls_pk_algorithm {
     GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
     GNUTLS_PK_UNKNOWN = 0xff
 } gnutls_pk_algorithm_t;
@@ -240,7 +242,7 @@ typedef enum gnutls_pk_algorithm {
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t)-1
 #define GNUTLS_PK_NONE (gnutls_pk_algorithm_t)0
 
-typedef enum gnutls_sign_algorithm { 
+typedef enum gnutls_sign_algorithm {
     GNUTLS_SIGN_RSA_SHA = 1, GNUTLS_SIGN_DSA_SHA,
     GNUTLS_SIGN_RSA_MD5, GNUTLS_SIGN_RSA_MD2,
     GNUTLS_SIGN_UNKNOWN = 0xff
@@ -252,9 +254,10 @@ typedef void (*LOG_FUNC) (int, const char *);
 
 /* Pull & Push functions defines: 
  */
-typedef ssize_t(*gnutls_pull_func) (gnutls_transport_ptr_t, void *, size_t);
+typedef ssize_t(*gnutls_pull_func) (gnutls_transport_ptr_t, void *,
+				    size_t);
 typedef ssize_t(*gnutls_push_func) (gnutls_transport_ptr_t, const void *,
-    size_t);
+				    size_t);
 
 
 /* Store & Retrieve functions defines: 
@@ -335,7 +338,7 @@ typedef struct {
  * (eg. SSL3 is before TLS1)
  */
 #define GNUTLS_TLS1 GNUTLS_TLS1_0
-typedef enum gnutls_protocol_version { 
+typedef enum gnutls_protocol_version {
     GNUTLS_SSL3 = 1, GNUTLS_TLS1_0,
     GNUTLS_TLS1_1, GNUTLS_VERSION_UNKNOWN = 0xff
 } gnutls_protocol_t;
@@ -388,13 +391,13 @@ typedef struct {
      * there is a time in handshake where the peer has
      * null cipher and we don't
      */
-    gnutls_cipher_algorithm_t      read_bulk_cipher_algorithm;
-    gnutls_mac_algorithm_t         read_mac_algorithm;
-    gnutls_compression_method_t    read_compression_algorithm;
+    gnutls_cipher_algorithm_t read_bulk_cipher_algorithm;
+    gnutls_mac_algorithm_t read_mac_algorithm;
+    gnutls_compression_method_t read_compression_algorithm;
 
-    gnutls_cipher_algorithm_t      write_bulk_cipher_algorithm;
-    gnutls_mac_algorithm_t         write_mac_algorithm;
-    gnutls_compression_method_t    write_compression_algorithm;
+    gnutls_cipher_algorithm_t write_bulk_cipher_algorithm;
+    gnutls_mac_algorithm_t write_mac_algorithm;
+    gnutls_compression_method_t write_compression_algorithm;
 
     /* this is the ciphersuite we are going to use 
      * moved here from internals in order to be restored
@@ -416,7 +419,7 @@ typedef struct {
     uint16 max_record_recv_size;
     /* holds the negotiated certificate type */
     gnutls_certificate_type_t cert_type;
-    gnutls_protocol_t version; /* moved here */
+    gnutls_protocol_t version;	/* moved here */
 } security_parameters_st;
 
 /* This structure holds the generated keys
@@ -509,10 +512,10 @@ typedef struct {
     gnutls_buffer handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
     resumable_session_t resumable;	/* TRUE or FALSE - if we can resume that session */
     handshake_state_t handshake_state;	/* holds
-					   * a number which indicates where
-					   * the handshake procedure has been
-					   * interrupted. If it is 0 then
-					   * no interruption has happened.
+					 * a number which indicates where
+					 * the handshake procedure has been
+					 * interrupted. If it is 0 then
+					 * no interruption has happened.
 					 */
 
     valid_session_t valid_connection;	/* true or FALSE - if this session is valid */
@@ -562,15 +565,15 @@ typedef struct {
      */
     gnutls_buffer record_recv_buffer;
     gnutls_buffer record_send_buffer;	/* holds cached data
-					   * for the gnutls_io_write_buffered()
-					   * function.
+					 * for the gnutls_io_write_buffered()
+					 * function.
 					 */
     size_t record_send_buffer_prev_size;	/* holds the
-						   * data written in the previous runs.
+						 * data written in the previous runs.
 						 */
     size_t record_send_buffer_user_size;	/* holds the
-						   * size of the user specified data to
-						   * send.
+						 * size of the user specified data to
+						 * send.
 						 */
 
     /* 0 if no peeked data was kept, 1 otherwise.
@@ -744,10 +747,10 @@ void _gnutls_set_adv_version(gnutls_session_t, gnutls_protocol_t);
 gnutls_protocol_t _gnutls_get_adv_version(gnutls_session_t);
 
 int gnutls_fingerprint(gnutls_digest_algorithm_t algo,
-    const gnutls_datum_t * data, void *result,
-    size_t * result_size);
+		       const gnutls_datum_t * data, void *result,
+		       size_t * result_size);
 
 typedef int gnutls_params_function(gnutls_session_t, gnutls_params_type_t,
-    gnutls_params_st *);
+				   gnutls_params_st *);
 
 #endif				/* GNUTLS_INT_H */

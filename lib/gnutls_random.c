@@ -33,25 +33,24 @@
  */
 int _gnutls_get_random(opaque * res, int bytes, int level)
 {
-  int err;
+    int err;
 
-  switch (level)
-    {
+    switch (level) {
     case GNUTLS_WEAK_RANDOM:
-      err = gc_nonce ((char*) res, (size_t) bytes);
-      break;
+	err = gc_nonce((char *) res, (size_t) bytes);
+	break;
 
     case GNUTLS_STRONG_RANDOM:
-      err = gc_pseudo_random ((char*) res, (size_t) bytes);
-      break;
+	err = gc_pseudo_random((char *) res, (size_t) bytes);
+	break;
 
-    default: /* GNUTLS_VERY_STRONG_RANDOM */
-      err = gc_random ((char*) res, (size_t) bytes);
-      break;
+    default:			/* GNUTLS_VERY_STRONG_RANDOM */
+	err = gc_random((char *) res, (size_t) bytes);
+	break;
     }
 
-  if (err != GC_OK)
-    return GNUTLS_E_RANDOM_FAILED;
+    if (err != GC_OK)
+	return GNUTLS_E_RANDOM_FAILED;
 
-  return GNUTLS_E_SUCCESS;
+    return GNUTLS_E_SUCCESS;
 }

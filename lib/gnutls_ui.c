@@ -72,7 +72,8 @@ void gnutls_dh_set_prime_bits(gnutls_session_t session, unsigned int bits)
   *
   **/
 int gnutls_dh_get_group(gnutls_session_t session,
-    gnutls_datum_t * raw_gen, gnutls_datum_t * raw_prime)
+			gnutls_datum_t * raw_gen,
+			gnutls_datum_t * raw_prime)
 {
     dh_info_st *dh;
     int ret;
@@ -103,7 +104,8 @@ int gnutls_dh_get_group(gnutls_session_t session,
 	return ret;
     }
 
-    ret = _gnutls_set_datum(raw_gen, dh->generator.data, dh->generator.size);
+    ret =
+	_gnutls_set_datum(raw_gen, dh->generator.data, dh->generator.size);
     if (ret < 0) {
 	gnutls_assert();
 	_gnutls_free_datum(raw_prime);
@@ -125,7 +127,8 @@ int gnutls_dh_get_group(gnutls_session_t session,
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
+int gnutls_dh_get_pubkey(gnutls_session_t session,
+			 gnutls_datum_t * raw_key)
 {
     dh_info_st *dh;
     anon_server_auth_info_t anon_info;
@@ -152,7 +155,8 @@ int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
 	return GNUTLS_E_INVALID_REQUEST;
     }
 
-    return _gnutls_set_datum(raw_key, dh->public_key.data, dh->public_key.size);
+    return _gnutls_set_datum(raw_key, dh->public_key.data,
+			     dh->public_key.size);
 }
 
 /**
@@ -169,7 +173,8 @@ int gnutls_dh_get_pubkey(gnutls_session_t session, gnutls_datum_t * raw_key)
   *
   **/
 int gnutls_rsa_export_get_pubkey(gnutls_session_t session,
-				 gnutls_datum_t * exp, gnutls_datum_t * mod)
+				 gnutls_datum_t * exp,
+				 gnutls_datum_t * mod)
 {
     cert_auth_info_t info;
     int ret;
@@ -390,8 +395,9 @@ const gnutls_datum_t *gnutls_certificate_get_ours(gnutls_session_t session)
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/
-const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t session,
-						 unsigned int *list_size)
+const gnutls_datum_t *gnutls_certificate_get_peers(gnutls_session_t
+						   session,
+						   unsigned int *list_size)
 {
     cert_auth_info_t info;
 
@@ -516,8 +522,8 @@ void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
   *
   **/
 void
-gnutls_certificate_set_params_function(gnutls_certificate_credentials_t res,
-				       gnutls_params_function * func)
+gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
+				       res, gnutls_params_function * func)
 {
     res->params_func = func;
 }
@@ -564,11 +570,12 @@ void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t
   * (gnutls_certificate_verify_peers()) to avoid denial of service attacks.
   *
   **/
-void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res, unsigned int max_bits,
-    unsigned int max_depth)
+void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t
+					  res, unsigned int max_bits,
+					  unsigned int max_depth)
 {
-	res->verify_depth = max_depth;
-	res->verify_bits = max_bits;
+    res->verify_depth = max_depth;
+    res->verify_bits = max_bits;
 }
 
 /**
@@ -583,7 +590,8 @@ void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res, 
   **/
 void
 gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t
-					 res, gnutls_rsa_params_t rsa_params)
+					 res,
+					 gnutls_rsa_params_t rsa_params)
 {
     res->rsa_params = rsa_params;
 }

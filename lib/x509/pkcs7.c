@@ -496,7 +496,8 @@ static int create_empty_signed_data(ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crt)
+int gnutls_pkcs7_set_crt_raw(gnutls_pkcs7_t pkcs7,
+			     const gnutls_datum_t * crt)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result;
@@ -801,7 +802,8 @@ int gnutls_pkcs7_get_crl_count(gnutls_pkcs7_t pkcs7)
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crl)
+int gnutls_pkcs7_set_crl_raw(gnutls_pkcs7_t pkcs7,
+			     const gnutls_datum_t * crl)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result;

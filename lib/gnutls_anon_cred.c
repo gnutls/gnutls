@@ -40,7 +40,8 @@ static const int anon_dummy;
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
   **/
-void gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
+void gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t
+					 sc)
 {
 
     gnutls_free(sc);
@@ -54,8 +55,8 @@ void gnutls_anon_free_server_credentials(gnutls_anon_server_credentials_t sc)
   *
   -*/
 gnutls_dh_params_t _gnutls_anon_get_dh_params(const
-					    gnutls_anon_server_credentials_t
-					    sc, gnutls_session_t session)
+					      gnutls_anon_server_credentials_t
+					      sc, gnutls_session_t session)
 {
     gnutls_params_st params;
     int ret;
@@ -83,8 +84,9 @@ gnutls_dh_params_t _gnutls_anon_get_dh_params(const
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to allocate it.
   **/
-int gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t
-					    * sc)
+int
+gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t *
+					sc)
 {
 
     *sc = gnutls_calloc(1, sizeof(anon_server_credentials_st));
@@ -100,7 +102,8 @@ int gnutls_anon_allocate_server_credentials(gnutls_anon_server_credentials_t
   * This structure is complex enough to manipulate directly thus
   * this helper function is provided in order to free (deallocate) it.
   **/
-void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t sc)
+void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t
+					 sc)
 {
 }
 
@@ -111,7 +114,9 @@ void gnutls_anon_free_client_credentials(gnutls_anon_client_credentials_t sc)
  * This structure is complex enough to manipulate directly thus
  * this helper function is provided in order to allocate it.
  **/
-int gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t * sc)
+int
+gnutls_anon_allocate_client_credentials(gnutls_anon_client_credentials_t *
+					sc)
 {
     /* anon_dummy is only there for *sc not to be null.
      * it is not used at all;

@@ -175,7 +175,8 @@ void gnutls_pkcs12_deinit(gnutls_pkcs12_t pkcs12)
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12, const gnutls_datum_t * data,
+int gnutls_pkcs12_import(gnutls_pkcs12_t pkcs12,
+			 const gnutls_datum_t * data,
 			 gnutls_x509_crt_fmt_t format, unsigned int flags)
 {
     int result = 0, need_free = 0;
@@ -308,7 +309,7 @@ static inline char *ucs2_to_ascii(char *data, int size)
  */
 int
 _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
-			     gnutls_pkcs12_bag_t  bag)
+			     gnutls_pkcs12_bag_t bag)
 {
     char oid[128], root[128];
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -470,7 +471,7 @@ _pkcs12_decode_safe_contents(const gnutls_datum_t * content,
 
 static
 int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
-			 gnutls_pkcs12_bag_t  bag)
+			 gnutls_pkcs12_bag_t bag)
 {
     gnutls_datum_t content = { NULL, 0 };
     int result;
@@ -514,7 +515,7 @@ int _parse_safe_contents(ASN1_TYPE sc, const char *sc_name,
   *
   **/
 int gnutls_pkcs12_get_bag(gnutls_pkcs12_t pkcs12,
-			  int indx, gnutls_pkcs12_bag_t  bag)
+			  int indx, gnutls_pkcs12_bag_t bag)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     int result, len;
@@ -656,7 +657,7 @@ static int create_empty_pfx(ASN1_TYPE pkcs12)
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t  bag)
+int gnutls_pkcs12_set_bag(gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
     ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
@@ -989,8 +990,8 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12_t pkcs12, const char *pass)
 }
 
 
-static int write_attributes(gnutls_pkcs12_bag_t  bag, int elem, ASN1_TYPE c2,
-			    const char *where)
+static int write_attributes(gnutls_pkcs12_bag_t bag, int elem,
+			    ASN1_TYPE c2, const char *where)
 {
     int result;
     char root[128];
@@ -1089,7 +1090,7 @@ static int write_attributes(gnutls_pkcs12_bag_t  bag, int elem, ASN1_TYPE c2,
  * the given datum. Enc is set to non zero if the data are encrypted;
  */
 int
-_pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t  bag, ASN1_TYPE * contents,
+_pkcs12_encode_safe_contents(gnutls_pkcs12_bag_t bag, ASN1_TYPE * contents,
 			     int *enc)
 {
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;

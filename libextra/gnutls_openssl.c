@@ -251,7 +251,8 @@ int SSL_get_error(SSL * ssl, int ret)
 
 int SSL_set_fd(SSL * ssl, int fd)
 {
-    gnutls_transport_set_ptr(ssl->gnutls_state, (gnutls_transport_ptr_t) fd);
+    gnutls_transport_set_ptr(ssl->gnutls_state,
+			     (gnutls_transport_ptr_t) fd);
     return 1;
 }
 

@@ -564,7 +564,7 @@ int _gnutls_server_select_suite(gnutls_session_t session, opaque * data,
     cipher_suite_st *ciphers, cs;
     int retval, err;
     gnutls_pk_algorithm_t pk_algo;	/* will hold the pk algorithms
-					   * supported by the peer.
+					 * supported by the peer.
 					 */
 
     pk_algo = _gnutls_server_find_pk_algos_in_ciphersuites(data, datalen);
@@ -841,7 +841,8 @@ int _gnutls_send_handshake(gnutls_session_t session, void *i_data,
  */
 #define SSL2_HEADERS 1
 static int _gnutls_recv_handshake_header(gnutls_session_t session,
-    handshake_t type, handshake_t * recv_type)
+					 handshake_t type,
+					 handshake_t * recv_type)
 {
     int ret;
     uint32 length32 = 0;
@@ -965,8 +966,9 @@ static int _gnutls_recv_handshake_header(gnutls_session_t session,
  */
 static
 int _gnutls_handshake_hash_add_recvd(gnutls_session_t session,
-     handshake_t recv_type, opaque * header, uint16 header_size,
-     opaque * dataptr, uint32 datalen)
+				     handshake_t recv_type,
+				     opaque * header, uint16 header_size,
+				     opaque * dataptr, uint32 datalen)
 {
     int ret;
 
@@ -1253,24 +1255,27 @@ static int _gnutls_client_check_if_resuming(gnutls_session_t session,
 {
     opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
 
-    _gnutls_handshake_log("HSK[%x]: SessionID length: %d\n", session, session_id_len);
+    _gnutls_handshake_log("HSK[%x]: SessionID length: %d\n", session,
+			  session_id_len);
     _gnutls_handshake_log("HSK[%x]: SessionID: %s\n", session,
-	  _gnutls_bin2hex(session_id, session_id_len, buf, sizeof(buf)));
+			  _gnutls_bin2hex(session_id, session_id_len, buf,
+					  sizeof(buf)));
 
     if (session_id_len > 0 &&
-        session->internals.resumed_security_parameters.session_id_size == session_id_len &&
-	memcmp(session_id, session->internals.resumed_security_parameters.session_id,
-	session_id_len) == 0) 
-    {
+	session->internals.resumed_security_parameters.session_id_size ==
+	session_id_len
+	&& memcmp(session_id,
+		  session->internals.resumed_security_parameters.
+		  session_id, session_id_len) == 0) {
 	/* resume session */
 	memcpy(session->internals.
-	    resumed_security_parameters.server_random,
-	    session->security_parameters.server_random,
-	    TLS_RANDOM_SIZE);
+	       resumed_security_parameters.server_random,
+	       session->security_parameters.server_random,
+	       TLS_RANDOM_SIZE);
 	memcpy(session->internals.
-	    resumed_security_parameters.client_random,
-	    session->security_parameters.client_random,
-	    TLS_RANDOM_SIZE);
+	       resumed_security_parameters.client_random,
+	       session->security_parameters.client_random,
+	       TLS_RANDOM_SIZE);
 	session->internals.resumed = RESUME_TRUE;	/* we are resuming */
 
 	return 0;
@@ -1290,8 +1295,8 @@ static int _gnutls_client_check_if_resuming(gnutls_session_t session,
  * This function also restores resumed parameters if we are resuming a
  * session.
  */
-static int _gnutls_read_server_hello(gnutls_session_t session, opaque * data,
-				     int datalen)
+static int _gnutls_read_server_hello(gnutls_session_t session,
+				     opaque * data, int datalen)
 {
     uint8 session_id_len = 0;
     int pos = 0;
@@ -1782,7 +1787,8 @@ int _gnutls_send_hello(gnutls_session_t session, int again)
  * hello message is expected. It uses the security_parameters.current_cipher_suite
  * and internals.compression_method.
  */
-int _gnutls_recv_hello(gnutls_session_t session, opaque * data, int datalen)
+int _gnutls_recv_hello(gnutls_session_t session, opaque * data,
+		       int datalen)
 {
     int ret;
 
@@ -1870,7 +1876,8 @@ int gnutls_rehandshake(gnutls_session_t session)
     return 0;
 }
 
-inline static int _gnutls_abort_handshake(gnutls_session_t session, int ret)
+inline static int _gnutls_abort_handshake(gnutls_session_t session,
+					  int ret)
 {
     if (((ret == GNUTLS_E_WARNING_ALERT_RECEIVED) &&
 	 (gnutls_alert_get(session) == GNUTLS_A_NO_RENEGOTIATION))
@@ -2390,7 +2397,7 @@ inline static int check_server_params(gnutls_session_t session,
     int j, remove;
 
     cred_type = _gnutls_map_kx_get_cred(kx, 1);
-    
+
     /* Read the Diffie Hellman parameters, if any.
      */
     if (cred_type == GNUTLS_CRD_CERTIFICATE) {
@@ -2600,7 +2607,8 @@ gnutls_protocol_t _gnutls_get_adv_version(gnutls_session_t session)
   *
   * Check gnutls.h for the available handshake descriptions.
   **/
-gnutls_handshake_description_t gnutls_handshake_get_last_in(gnutls_session_t session)
+gnutls_handshake_description_t
+gnutls_handshake_get_last_in(gnutls_session_t session)
 {
     return session->internals.last_handshake_in;
 }
@@ -2616,7 +2624,8 @@ gnutls_handshake_description_t gnutls_handshake_get_last_in(gnutls_session_t ses
   * Check gnutls.h for the available handshake descriptions.
   *
   **/
-gnutls_handshake_description_t gnutls_handshake_get_last_out(gnutls_session_t session)
+gnutls_handshake_description_t
+gnutls_handshake_get_last_out(gnutls_session_t session)
 {
     return session->internals.last_handshake_out;
 }

@@ -182,8 +182,9 @@ int _gnutls_tls_sign_params(gnutls_session_t session, gnutls_cert * cert,
 /* This will create a PKCS1 or DSA signature, using the given parameters, and the
  * given data. The output will be allocated and be put in signature.
  */
-int _gnutls_sign(gnutls_pk_algorithm_t algo, mpi_t * params, int params_size,
-		 const gnutls_datum_t * data, gnutls_datum_t * signature)
+int _gnutls_sign(gnutls_pk_algorithm_t algo, mpi_t * params,
+		 int params_size, const gnutls_datum_t * data,
+		 gnutls_datum_t * signature)
 {
     int ret;
 
@@ -249,7 +250,7 @@ int _gnutls_pkcs1_rsa_verify_sig(gnutls_cert * cert,
     gnutls_datum_t vdata;
 
     if (cert->version == 0 || cert == NULL) {	/* this is the only way to check
-						   * if it is initialized
+						 * if it is initialized
 						 */
 	gnutls_assert();
 	return GNUTLS_E_CERTIFICATE_ERROR;

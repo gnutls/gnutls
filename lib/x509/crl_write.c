@@ -55,7 +55,8 @@ static void disable_optional_stuff(gnutls_x509_crl_t crl);
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl, unsigned int version)
+int gnutls_x509_crl_set_version(gnutls_x509_crl_t crl,
+				unsigned int version)
 {
     int result;
     char null = version;
@@ -170,8 +171,8 @@ int gnutls_x509_crl_set_next_update(gnutls_x509_crl_t crl, time_t exp_time)
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl_t crl, const void *serial,
-				   size_t serial_size,
+int gnutls_x509_crl_set_crt_serial(gnutls_x509_crl_t crl,
+				   const void *serial, size_t serial_size,
 				   time_t revocation_time)
 {
     int ret;

@@ -70,8 +70,10 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
 
     cur_keylen = 0;
 
-    if (pw==NULL) pwlen = 0;
-    else pwlen = strlen(pw);
+    if (pw == NULL)
+	pwlen = 0;
+    else
+	pwlen = strlen(pw);
 
     if (pwlen > 63 / 2) {
 	gnutls_assert();
@@ -100,16 +102,15 @@ _pkcs12_string_to_key(unsigned int id, const opaque * salt,
 	    gnutls_assert();
 	    return GNUTLS_E_DECRYPTION_FAILED;
 	}
-	for (i = 0; i < 64; i++)
-	  {
+	for (i = 0; i < 64; i++) {
 	    unsigned char lid = id & 0xFF;
 	    gc_hash_write(md, 1, &lid);
-	  }
+	}
 	gc_hash_write(md, 128, buf_i);
 	memcpy(hash, gc_hash_read(md), 20);
 	gc_hash_close(md);
 	for (i = 1; i < iter; i++)
-		gc_hash_buffer (GC_SHA1, hash, 20, hash);
+	    gc_hash_buffer(GC_SHA1, hash, 20, hash);
 	for (i = 0; i < 20 && cur_keylen < req_keylen; i++)
 	    keybuf[cur_keylen++] = hash[i];
 	if (cur_keylen == req_keylen) {

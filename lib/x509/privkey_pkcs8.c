@@ -474,9 +474,9 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey_t key,
  */
 static
 int read_pkcs_schema_params(schema_id schema, const char *password,
-    const opaque * data, int data_size,
-    struct pbkdf2_params *kdf_params,
-    struct pbe_enc_params *enc_params)
+			    const opaque * data, int data_size,
+			    struct pbkdf2_params *kdf_params,
+			    struct pbe_enc_params *enc_params)
 {
     ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY;
     int result;
@@ -822,8 +822,10 @@ int decode_private_key_info(const gnutls_datum_t * der,
   *
   **/
 int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey_t key,
-    const gnutls_datum_t * data, gnutls_x509_crt_fmt_t format,
-    const char *password, unsigned int flags)
+				     const gnutls_datum_t * data,
+				     gnutls_x509_crt_fmt_t format,
+				     const char *password,
+				     unsigned int flags)
 {
     int result = 0, need_free = 0;
     gnutls_datum_t _data;
@@ -1086,7 +1088,8 @@ static int write_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 /* Converts an OID to a gnutls cipher type.
  */
 inline
-    static int oid2cipher(const char *oid, gnutls_cipher_algorithm_t * algo)
+    static int oid2cipher(const char *oid,
+			  gnutls_cipher_algorithm_t * algo)
 {
 
     *algo = 0;
@@ -1788,7 +1791,8 @@ int _gnutls_pkcs7_decrypt_data(const gnutls_datum_t * data,
 /* Encrypts to a PKCS #7 encryptedData. The output is allocated
  * and stored in enc.
  */
-int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum_t * data,
+int _gnutls_pkcs7_encrypt_data(schema_id schema,
+			       const gnutls_datum_t * data,
 			       const char *password, gnutls_datum_t * enc)
 {
     int result;

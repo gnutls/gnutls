@@ -151,7 +151,8 @@ void gnutls_x509_crt_deinit(gnutls_x509_crt_t cert)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crt_import(gnutls_x509_crt_t cert, const gnutls_datum_t * data,
+int gnutls_x509_crt_import(gnutls_x509_crt_t cert,
+			   const gnutls_datum_t * data,
 			   gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;
@@ -1201,7 +1202,8 @@ int _gnutls_x509_crt_get_raw_issuer_dn(gnutls_x509_crt_t cert,
   * Returns 0 on success, or a negative value on error.
   *
   -*/
-int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert, gnutls_datum_t * start)
+int _gnutls_x509_crt_get_raw_dn(gnutls_x509_crt_t cert,
+				gnutls_datum_t * start)
 {
     return _gnutls_x509_crt_get_raw_dn2(cert, "subject", start);
 }
@@ -1411,7 +1413,8 @@ int gnutls_x509_crt_get_key_id(gnutls_x509_crt_t crt, unsigned int flags,
   *
   **/
 int gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
-   const gnutls_x509_crl_t * crl_list, int crl_list_length)
+				     const gnutls_x509_crl_t * crl_list,
+				     int crl_list_length)
 {
     opaque serial[64];
     opaque cert_serial[64];

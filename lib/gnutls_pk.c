@@ -101,14 +101,15 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum_t * ciphertext,
 	    return ret;
 	}
 	for (i = 0; i < psize; i++)
-	  while (ps[i] == 0) {
-	    if ((ret =
-		 _gnutls_get_random(&ps[i], 1, GNUTLS_STRONG_RANDOM)) < 0) {
-		gnutls_assert();
-		gnutls_afree(edata);
-		return ret;
+	    while (ps[i] == 0) {
+		if ((ret =
+		     _gnutls_get_random(&ps[i], 1,
+					GNUTLS_STRONG_RANDOM)) < 0) {
+		    gnutls_assert();
+		    gnutls_afree(edata);
+		    return ret;
+		}
 	    }
-	  }
 	break;
     case 1:
 	/* using private key */
@@ -381,8 +382,9 @@ static int encode_ber_rs(gnutls_datum_t * sig_value, mpi_t r, mpi_t s)
 
 /* Do DSA signature calculation. params is p, q, g, y, x in that order.
  */
-int _gnutls_dsa_sign(gnutls_datum_t * signature, const gnutls_datum_t * hash,
-		     mpi_t * params, uint params_len)
+int _gnutls_dsa_sign(gnutls_datum_t * signature,
+		     const gnutls_datum_t * hash, mpi_t * params,
+		     uint params_len)
 {
     mpi_t rs[2], mdata;
     int ret;
@@ -589,8 +591,9 @@ int _gnutls_pk_decrypt(int algo, mpi_t * resarr, mpi_t data, mpi_t * pkey,
     case GCRY_PK_RSA:
 	if (pkey_len >= 6)
 	    rc = gcry_sexp_build(&s_pkey, NULL,
-		"(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
-		pkey[0], pkey[1], pkey[2], pkey[3], pkey[4], pkey[5]);
+				 "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
+				 pkey[0], pkey[1], pkey[2], pkey[3],
+				 pkey[4], pkey[5]);
 	break;
 
     default:

@@ -27,13 +27,13 @@
 
 typedef struct gnutls_cert {
     mpi_t params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 
-						   * key algorithm 
-						   * RSA: [0] is modulus
-						   *      [1] is public exponent
-						   * DSA: [0] is p
-						   *      [1] is q
-						   *      [2] is g
-						   *      [3] is public key
+						 * key algorithm 
+						 * RSA: [0] is modulus
+						 *      [1] is public exponent
+						 * DSA: [0] is p
+						 *      [1] is q
+						 *      [2] is g
+						 *      [3] is public key
 						 */
     int params_size;		/* holds the size of MPI params */
 
@@ -53,7 +53,7 @@ typedef struct gnutls_cert {
 
 typedef struct gnutls_privkey_int {
     mpi_t params[MAX_PRIV_PARAMS_SIZE];	/* the size of params depends on the public 
-					   * key algorithm 
+					 * key algorithm 
 					 */
     /*
      * RSA: [0] is modulus

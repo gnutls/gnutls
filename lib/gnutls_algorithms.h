@@ -48,16 +48,17 @@ int _gnutls_supported_compression_methods(gnutls_session_t session,
 
 const char *_gnutls_cipher_suite_get_name(cipher_suite_st * algorithm);
 gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo(const
-							     cipher_suite_st
-							     * algorithm);
-gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo(const cipher_suite_st
-						     * algorithm);
-gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo(const
+							       cipher_suite_st
+							       *
+							       algorithm);
+gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo(const
 						       cipher_suite_st *
 						       algorithm);
-gnutls_protocol_t _gnutls_cipher_suite_get_version(const
+gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo(const
 							 cipher_suite_st *
 							 algorithm);
+gnutls_protocol_t _gnutls_cipher_suite_get_version(const cipher_suite_st *
+						   algorithm);
 cipher_suite_st _gnutls_cipher_suite_get_suite_name(cipher_suite_st *
 						    algorithm);
 
@@ -92,24 +93,26 @@ gnutls_compression_method_t _gnutls_compression_get_id(int num);
 const char *gnutls_compression_get_name(gnutls_compression_method_t
 					algorithm);
 
-int _gnutls_compression_get_mem_level(gnutls_compression_method_t algorithm);
+int _gnutls_compression_get_mem_level(gnutls_compression_method_t
+				      algorithm);
 int _gnutls_compression_get_comp_level(gnutls_compression_method_t
 				       algorithm);
 int _gnutls_compression_get_wbits(gnutls_compression_method_t algorithm);
 
 /* Type to KX mappings */
 gnutls_kx_algorithm_t _gnutls_map_kx_get_kx(gnutls_credentials_type_t type,
-					  int server);
+					    int server);
 gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
-						algorithm, int server);
+						  algorithm, int server);
 
 /* KX to PK mapping */
 gnutls_pk_algorithm_t _gnutls_map_pk_get_pk(gnutls_kx_algorithm_t
-					  kx_algorithm);
+					    kx_algorithm);
 
 enum encipher_type { CIPHER_ENCRYPT = 0, CIPHER_SIGN = 1, CIPHER_IGN };
 
-enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm_t algorithm);
+enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm_t
+					    algorithm);
 
 struct gnutls_kx_algo_entry {
     const char *name;

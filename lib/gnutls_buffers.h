@@ -18,14 +18,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_record_buffer_put(content_type_t type, gnutls_session_t session,
-			      opaque * data, size_t length);
+int _gnutls_record_buffer_put(content_type_t type,
+			      gnutls_session_t session, opaque * data,
+			      size_t length);
 int _gnutls_record_buffer_get_size(content_type_t type,
 				   gnutls_session_t session);
-int _gnutls_record_buffer_get(content_type_t type, gnutls_session_t session,
-			      opaque * data, size_t length);
-ssize_t _gnutls_io_read_buffered(gnutls_session_t, opaque ** iptr, size_t n,
-				 content_type_t);
+int _gnutls_record_buffer_get(content_type_t type,
+			      gnutls_session_t session, opaque * data,
+			      size_t length);
+ssize_t _gnutls_io_read_buffered(gnutls_session_t, opaque ** iptr,
+				 size_t n, content_type_t);
 void _gnutls_io_clear_read_buffer(gnutls_session_t);
 int _gnutls_io_clear_peeked_data(gnutls_session_t session);
 

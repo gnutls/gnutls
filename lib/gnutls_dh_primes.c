@@ -246,7 +246,8 @@ int gnutls_dh_params_cpy(gnutls_dh_params_t dst, gnutls_dh_params_t src)
   * no use to call this in client side.
   *
   **/
-int gnutls_dh_params_generate2(gnutls_dh_params_t params, unsigned int bits)
+int gnutls_dh_params_generate2(gnutls_dh_params_t params,
+			       unsigned int bits)
 {
     int ret;
 
@@ -535,7 +536,9 @@ int gnutls_dh_params_export_pkcs3(gnutls_dh_params_t params,
   * 
   **/
 int gnutls_dh_params_export_raw(gnutls_dh_params_t params,
-    gnutls_datum_t * prime, gnutls_datum_t * generator, unsigned int *bits)
+				gnutls_datum_t * prime,
+				gnutls_datum_t * generator,
+				unsigned int *bits)
 {
 
     size_t size;

@@ -64,11 +64,11 @@ typedef struct {
     gnutls_kx_algorithm_t kx_algorithm;
     gnutls_pk_algorithm_t pk_algorithm;
     enum encipher_type encipher_type;	/* CIPHER_ENCRYPT if this algorithm is to be used
-					   * for encryption, CIPHER_SIGN if signature only,
-					   * CIPHER_IGN if this does not apply at all.
-					   *
-					   * This is useful to certificate cipher suites, which check
-					   * against the certificate key usage bits.
+					 * for encryption, CIPHER_SIGN if signature only,
+					 * CIPHER_IGN if this does not apply at all.
+					 *
+					 * This is useful to certificate cipher suites, which check
+					 * against the certificate key usage bits.
 					 */
 } gnutls_pk_map;
 
@@ -263,8 +263,8 @@ typedef struct {
     gnutls_kx_algorithm_t kx_algorithm;
     gnutls_mac_algorithm_t mac_algorithm;
     gnutls_protocol_t version;	/* this cipher suite is supported
-					   * from 'version' and above;
-					 */
+				 * from 'version' and above;
+				 */
 } gnutls_cipher_suite_entry;
 
 /* RSA with NULL cipher and MD5 MAC
@@ -587,7 +587,8 @@ int _gnutls_compression_get_wbits(gnutls_compression_method_t algorithm)
     return ret;
 }
 
-int _gnutls_compression_get_mem_level(gnutls_compression_method_t algorithm)
+int _gnutls_compression_get_mem_level(gnutls_compression_method_t
+				      algorithm)
 {
     int ret = -1;
     /* avoid prefix */
@@ -595,7 +596,8 @@ int _gnutls_compression_get_mem_level(gnutls_compression_method_t algorithm)
     return ret;
 }
 
-int _gnutls_compression_get_comp_level(gnutls_compression_method_t algorithm)
+int _gnutls_compression_get_comp_level(gnutls_compression_method_t
+				       algorithm)
 {
     int ret = -1;
     /* avoid prefix */
@@ -910,7 +912,7 @@ _gnutls_version_is_supported(gnutls_session_t session,
 
 /* Type to KX mappings */
 gnutls_kx_algorithm_t _gnutls_map_kx_get_kx(gnutls_credentials_type_t type,
-					  int server)
+					    int server)
 {
     gnutls_kx_algorithm_t ret = -1;
 
@@ -923,7 +925,7 @@ gnutls_kx_algorithm_t _gnutls_map_kx_get_kx(gnutls_credentials_type_t type,
 }
 
 gnutls_credentials_type_t _gnutls_map_kx_get_cred(gnutls_kx_algorithm_t
-						algorithm, int server)
+						  algorithm, int server)
 {
     gnutls_credentials_type_t ret = -1;
     if (server) {
@@ -955,8 +957,9 @@ _gnutls_cipher_suite_get_version(const cipher_suite_st * suite)
     return ret;
 }
 
-gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo(const cipher_suite_st
-						     * suite)
+gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo(const
+						       cipher_suite_st *
+						       suite)
 {
     int ret = 0;
 
@@ -997,7 +1000,8 @@ const char *_gnutls_cipher_suite_get_name(cipher_suite_st * suite)
   * by TLS or SSL depending of the protocol in use.
   *
   **/
-const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm_t kx_algorithm,
+const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm_t
+					 kx_algorithm,
 					 gnutls_cipher_algorithm_t
 					 cipher_algorithm,
 					 gnutls_mac_algorithm_t
@@ -1343,7 +1347,8 @@ _gnutls_supported_compression_methods(gnutls_session_t session,
   * Returns a string (or NULL) that contains the name
   * of the specified certificate type.
   **/
-const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t type)
+const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t
+					     type)
 {
     const char *ret = NULL;
 
@@ -1358,7 +1363,8 @@ const char *gnutls_certificate_type_get_name(gnutls_certificate_type_t type)
 /* returns the gnutls_pk_algorithm_t which is compatible with
  * the given gnutls_kx_algorithm_t.
  */
-gnutls_pk_algorithm_t _gnutls_map_pk_get_pk(gnutls_kx_algorithm_t kx_algorithm)
+gnutls_pk_algorithm_t _gnutls_map_pk_get_pk(gnutls_kx_algorithm_t
+					    kx_algorithm)
 {
     gnutls_pk_algorithm_t ret = -1;
 
@@ -1412,7 +1418,8 @@ static const gnutls_sign_entry sign_algorithms[] = {
   * Returns a string that contains the name
   * of the specified sign algorithm or NULL.
   **/
-const char *gnutls_sign_algorithm_get_name(gnutls_sign_algorithm_t algorithm)
+const char *gnutls_sign_algorithm_get_name(gnutls_sign_algorithm_t
+					   algorithm)
 {
     const char *ret = NULL;
 

@@ -29,7 +29,7 @@
 #include <gnutls_openpgp.h>
 #include <gnutls_num.h>
 #include <openpgp.h>
-#include <x509/verify.h> /* lib/x509/verify.h */
+#include <x509/verify.h>	/* lib/x509/verify.h */
 
 static int
 openpgp_get_key_trust(gnutls_openpgp_trustdb_t trustdb,
@@ -98,8 +98,9 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb_t trustdb,
  * Returns 0 on success.
  **/
 int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key_t key,
-     gnutls_openpgp_keyring_t keyring,
-     unsigned int flags, unsigned int *verify)
+				   gnutls_openpgp_keyring_t keyring,
+				   unsigned int flags,
+				   unsigned int *verify)
 {
     int rc = 0;
     int status = 0;
@@ -135,21 +136,21 @@ int gnutls_openpgp_key_verify_ring(gnutls_openpgp_key_t key,
     /* Check if the key is included in the ring.
      */
     if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME)) {
-        rc = gnutls_openpgp_key_get_id( key, id);
-        if (rc < 0) {
-            gnutls_assert();
-    	    return rc;
-        }
+	rc = gnutls_openpgp_key_get_id(key, id);
+	if (rc < 0) {
+	    gnutls_assert();
+	    return rc;
+	}
 
-        rc = gnutls_openpgp_keyring_check_id( keyring, id, 0);
+	rc = gnutls_openpgp_keyring_check_id(keyring, id, 0);
 
-        /* if it exists in the keyring don't treat it
-         * as unknown.
-         */
-        if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
-            *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
+	/* if it exists in the keyring don't treat it
+	 * as unknown.
+	 */
+	if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
+	    *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
     }
-    
+
     return 0;
 }
 

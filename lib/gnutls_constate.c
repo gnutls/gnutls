@@ -907,7 +907,8 @@ int _gnutls_set_kx(gnutls_session_t session, gnutls_kx_algorithm_t algo)
 }
 
 /* Sets the specified mac algorithm into pending session */
-int _gnutls_set_read_mac(gnutls_session_t session, gnutls_mac_algorithm_t algo)
+int _gnutls_set_read_mac(gnutls_session_t session,
+			 gnutls_mac_algorithm_t algo)
 {
 
     if (_gnutls_mac_is_ok(algo) == 0) {

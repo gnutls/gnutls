@@ -181,7 +181,8 @@ int _gnutls_parse_extensions(gnutls_session_t session, const opaque * data,
  * This list is used to check whether the (later) received
  * extensions are the ones we requested.
  */
-static void _gnutls_extension_list_add(gnutls_session_t session, uint16 type)
+static void _gnutls_extension_list_add(gnutls_session_t session,
+				       uint16 type)
 {
 
     if (session->security_parameters.entity == GNUTLS_CLIENT) {

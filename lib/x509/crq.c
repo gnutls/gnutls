@@ -103,7 +103,8 @@ void gnutls_x509_crq_deinit(gnutls_x509_crq_t crq)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_import(gnutls_x509_crq_t crq, const gnutls_datum_t * data,
+int gnutls_x509_crq_import(gnutls_x509_crq_t crq,
+			   const gnutls_datum_t * data,
 			   gnutls_x509_crt_fmt_t format)
 {
     int result = 0, need_free = 0;
@@ -451,7 +452,8 @@ int gnutls_x509_crq_set_dn_by_oid(gnutls_x509_crq_t crq, const char *oid,
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_set_version(gnutls_x509_crq_t crq, unsigned int version)
+int gnutls_x509_crq_set_version(gnutls_x509_crq_t crq,
+				unsigned int version)
 {
     int result;
     unsigned char null = version;
@@ -519,7 +521,8 @@ int gnutls_x509_crq_get_version(gnutls_x509_crq_t crq)
   * Returns 0 on success.
   *
   **/
-int gnutls_x509_crq_set_key(gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
+int gnutls_x509_crq_set_key(gnutls_x509_crq_t crq,
+			    gnutls_x509_privkey_t key)
 {
     int result;
 

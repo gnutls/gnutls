@@ -32,7 +32,7 @@ typedef void svoid;		/* for functions that allocate using gnutls_secure_malloc *
 #endif				/* HAVE_ALLOCA */
 
 typedef void *(*gnutls_alloc_function) (size_t);
-typedef int (*gnutls_is_secure_function)(const void*);
+typedef int (*gnutls_is_secure_function) (const void *);
 typedef void (*gnutls_free_function) (void *);
 typedef void *(*gnutls_realloc_function) (void *, size_t);
 

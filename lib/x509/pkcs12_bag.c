@@ -45,7 +45,7 @@
   * Returns 0 on success.
   *
   **/
-int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t  * bag)
+int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t * bag)
 {
     *bag = gnutls_calloc(1, sizeof(gnutls_pkcs12_bag_int));
 
@@ -55,7 +55,7 @@ int gnutls_pkcs12_bag_init(gnutls_pkcs12_bag_t  * bag)
     return GNUTLS_E_MEMORY_ERROR;
 }
 
-static inline void _pkcs12_bag_free_data(gnutls_pkcs12_bag_t  bag)
+static inline void _pkcs12_bag_free_data(gnutls_pkcs12_bag_t bag)
 {
     int i;
 
@@ -77,7 +77,7 @@ static inline void _pkcs12_bag_free_data(gnutls_pkcs12_bag_t  bag)
   * This function will deinitialize a PKCS12 Bag structure. 
   *
   **/
-void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag_t  bag)
+void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag_t bag)
 {
     if (!bag)
 	return;
@@ -96,8 +96,8 @@ void gnutls_pkcs12_bag_deinit(gnutls_pkcs12_bag_t  bag)
   * enumerations.
   *
   **/
-gnutls_pkcs12_bag_type_t gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t  bag,
-						  int indx)
+gnutls_pkcs12_bag_type_t gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t
+						    bag, int indx)
 {
     if (bag == NULL) {
 	gnutls_assert();
@@ -116,7 +116,7 @@ gnutls_pkcs12_bag_type_t gnutls_pkcs12_bag_get_type(gnutls_pkcs12_bag_t  bag,
   * This function will return the number of the elements withing the bag. 
   *
   **/
-int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag_t  bag)
+int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag_t bag)
 {
     if (bag == NULL) {
 	gnutls_assert();
@@ -139,7 +139,7 @@ int gnutls_pkcs12_bag_get_count(gnutls_pkcs12_bag_t  bag)
   * Returns 0 on success and a negative error code on error.
   *
   **/
-int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t  bag, int indx,
+int gnutls_pkcs12_bag_get_data(gnutls_pkcs12_bag_t bag, int indx,
 			       gnutls_datum_t * data)
 {
     if (bag == NULL) {
@@ -223,7 +223,8 @@ int _pkcs12_decode_crt_bag(gnutls_pkcs12_bag_type_t type,
 
 
 int _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
-			   const gnutls_datum_t * raw, gnutls_datum_t * out)
+			   const gnutls_datum_t * raw,
+			   gnutls_datum_t * out)
 {
     int ret;
     ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -305,7 +306,7 @@ int _pkcs12_encode_crt_bag(gnutls_pkcs12_bag_type_t type,
   * value on error.
   *
   **/
-int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t  bag,
+int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t bag,
 			       gnutls_pkcs12_bag_type_t type,
 			       const gnutls_datum_t * data)
 {
@@ -362,7 +363,8 @@ int gnutls_pkcs12_bag_set_data(gnutls_pkcs12_bag_t  bag,
   * value on failure.
   *
   **/
-int gnutls_pkcs12_bag_set_crt(gnutls_pkcs12_bag_t  bag, gnutls_x509_crt_t crt)
+int gnutls_pkcs12_bag_set_crt(gnutls_pkcs12_bag_t bag,
+			      gnutls_x509_crt_t crt)
 {
     int ret;
     gnutls_datum_t data;
@@ -397,7 +399,8 @@ int gnutls_pkcs12_bag_set_crt(gnutls_pkcs12_bag_t  bag, gnutls_x509_crt_t crt)
   * value on failure.
   *
   **/
-int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag_t  bag, gnutls_x509_crl_t crl)
+int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag_t bag,
+			      gnutls_x509_crl_t crl)
 {
     int ret;
     gnutls_datum_t data;
@@ -434,7 +437,7 @@ int gnutls_pkcs12_bag_set_crl(gnutls_pkcs12_bag_t  bag, gnutls_x509_crl_t crl)
   * Returns 0 on success, or a negative value on error.
   *
   **/
-int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t  bag, int indx,
+int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t bag, int indx,
 				 const gnutls_datum_t * id)
 {
     int ret;
@@ -473,7 +476,7 @@ int gnutls_pkcs12_bag_set_key_id(gnutls_pkcs12_bag_t  bag, int indx,
   * Returns 0 on success, or a negative value on error.
   *
   **/
-int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t  bag, int indx,
+int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t bag, int indx,
 				 gnutls_datum_t * id)
 {
     if (bag == NULL) {
@@ -504,7 +507,7 @@ int gnutls_pkcs12_bag_get_key_id(gnutls_pkcs12_bag_t  bag, int indx,
   * Returns 0 on success, or a negative value on error.
   *
   **/
-int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t  bag, int indx,
+int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t bag, int indx,
 					char **name)
 {
     if (bag == NULL) {
@@ -536,7 +539,7 @@ int gnutls_pkcs12_bag_get_friendly_name(gnutls_pkcs12_bag_t  bag, int indx,
   * Returns 0 on success, or a negative value on error.
   *
   **/
-int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag_t  bag, int indx,
+int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag_t bag, int indx,
 					const char *name)
 {
     if (bag == NULL) {
@@ -568,7 +571,7 @@ int gnutls_pkcs12_bag_set_friendly_name(gnutls_pkcs12_bag_t  bag, int indx,
   * This function will decrypt the given encrypted bag and return 0 on success.
   *
   **/
-int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag_t  bag, const char *pass)
+int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag_t bag, const char *pass)
 {
     int ret;
     gnutls_datum_t dec;
@@ -617,7 +620,7 @@ int gnutls_pkcs12_bag_decrypt(gnutls_pkcs12_bag_t  bag, const char *pass)
   * This function will encrypt the given bag and return 0 on success.
   *
   **/
-int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag_t  bag, const char *pass,
+int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag_t bag, const char *pass,
 			      unsigned int flags)
 {
     int ret;

@@ -84,21 +84,22 @@ void gnutls_openpgp_keyring_deinit(gnutls_openpgp_keyring_t keyring)
  * Returns 0 on success (if keyid exists) and a negative error code
  * on failure.
  */
-int gnutls_openpgp_keyring_check_id( gnutls_openpgp_keyring_t ring, 
-    const unsigned char keyid[8], unsigned int flags)
+int gnutls_openpgp_keyring_check_id(gnutls_openpgp_keyring_t ring,
+				    const unsigned char keyid[8],
+				    unsigned int flags)
 {
-int rc;
-cdk_pkt_pubkey_t sig_pk;
-uint32 id[2];
+    int rc;
+    cdk_pkt_pubkey_t sig_pk;
+    uint32 id[2];
 
-    id[0] = _gnutls_read_uint32( keyid);
-    id[1] = _gnutls_read_uint32( &keyid[4]);
+    id[0] = _gnutls_read_uint32(keyid);
+    id[1] = _gnutls_read_uint32(&keyid[4]);
 
-    rc = cdk_keydb_get_pk( ring->hd, id, &sig_pk);
+    rc = cdk_keydb_get_pk(ring->hd, id, &sig_pk);
     if (!rc)
-       return 0;
+	return 0;
     else
-       return GNUTLS_E_NO_CERTIFICATE_FOUND;
+	return GNUTLS_E_NO_CERTIFICATE_FOUND;
 }
 
 /**

@@ -23,12 +23,21 @@ typedef struct retr_st {
 } gnutls_retr_st;
 
 typedef int gnutls_certificate_client_retrieve_function(gnutls_session_t,
-    const gnutls_datum_t *req_ca_rdn, int nreqs,
-    const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length,
-    gnutls_retr_st *);
+							const
+							gnutls_datum_t *
+							req_ca_rdn,
+							int nreqs,
+							const
+							gnutls_pk_algorithm_t
+							* pk_algos,
+							int
+							pk_algos_length,
+							gnutls_retr_st *);
 
 typedef int gnutls_certificate_server_retrieve_function(struct
-    gnutls_session_int*, gnutls_retr_st *);
+							gnutls_session_int
+							*,
+							gnutls_retr_st *);
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
@@ -52,7 +61,7 @@ typedef struct {
      * row (should be 1 for OpenPGP keys).
      */
     uint ncerts;		/* contains the number of columns in cert_list.
-				   * This is the same with the number of pkeys.
+				 * This is the same with the number of pkeys.
 				 */
 
     gnutls_privkey *pkey;
@@ -111,8 +120,8 @@ typedef struct cert_auth_info_st {
 
     rsa_info_st rsa_export;
     gnutls_datum_t *raw_certificate_list;	/* holds the raw certificate of the
-					 * peer.
-					 */
+						 * peer.
+						 */
     unsigned int ncerts;	/* holds the size of the list above */
 } *cert_auth_info_t;
 
@@ -125,23 +134,30 @@ int _gnutls_gen_cert_client_cert_vrfy(gnutls_session_t, opaque **);
 int _gnutls_gen_cert_server_cert_req(gnutls_session_t, opaque **);
 int _gnutls_proc_cert_cert_req(gnutls_session_t, opaque *, size_t);
 int _gnutls_proc_cert_client_cert_vrfy(gnutls_session_t, opaque *, size_t);
-int _gnutls_proc_cert_server_certificate(gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_cert_server_certificate(gnutls_session_t, opaque *,
+					 size_t);
 int _gnutls_get_selected_cert(gnutls_session_t session,
-     gnutls_cert ** apr_cert_list, int *apr_cert_list_length,
-     gnutls_privkey ** apr_pkey);
+			      gnutls_cert ** apr_cert_list,
+			      int *apr_cert_list_length,
+			      gnutls_privkey ** apr_pkey);
 
 int _gnutls_server_select_cert(struct gnutls_session_int *,
-     gnutls_pk_algorithm_t);
+			       gnutls_pk_algorithm_t);
 void _gnutls_selected_certs_deinit(gnutls_session_t session);
 void _gnutls_selected_certs_set(gnutls_session_t session,
-    gnutls_cert * certs, int ncerts,
-    gnutls_privkey * key, int need_free);
+				gnutls_cert * certs, int ncerts,
+				gnutls_privkey * key, int need_free);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 
 gnutls_rsa_params_t _gnutls_certificate_get_rsa_params(const
-    gnutls_certificate_credentials_t sc, gnutls_session_t);
+						       gnutls_certificate_credentials_t
+						       sc,
+						       gnutls_session_t);
 gnutls_dh_params_t _gnutls_certificate_get_dh_params(const
-    gnutls_certificate_credentials_t sc, gnutls_session_t session);
+						     gnutls_certificate_credentials_t
+						     sc,
+						     gnutls_session_t
+						     session);
 
 #endif

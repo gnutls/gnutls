@@ -38,8 +38,7 @@
  */
 
 int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result,
-		   mpi_t g, mpi_t prime,
-		   gnutls_alloc_function galloc_func)
+		   mpi_t g, mpi_t prime, gnutls_alloc_function galloc_func)
 {
     mpi_t x, e;
     size_t result_size;
@@ -163,14 +162,14 @@ mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, mpi_t n)
     mpi_t res;
 
     /* get the size of n in bytes */
-    _gnutls_mpi_print( NULL, &n_size, n);
+    _gnutls_mpi_print(NULL, &n_size, n);
 
     _gnutls_mpi_print(NULL, &a_size, A);
     _gnutls_mpi_print(NULL, &b_size, B);
 
     if (a_size > n_size || b_size > n_size) {
-    	gnutls_assert();
-    	return NULL; /* internal error */
+	gnutls_assert();
+	return NULL;		/* internal error */
     }
 
     holder_size = n_size + n_size;
@@ -208,8 +207,7 @@ mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, mpi_t n)
 /* S = (A * v^u) ^ b % N 
  * this is our shared key (server premaster secret)
  */
-mpi_t _gnutls_calc_srp_S1(mpi_t A, mpi_t b, mpi_t u,
-			       mpi_t v, mpi_t n)
+mpi_t _gnutls_calc_srp_S1(mpi_t A, mpi_t b, mpi_t u, mpi_t v, mpi_t n)
 {
     mpi_t tmp1 = NULL, tmp2 = NULL;
     mpi_t S = NULL;
@@ -321,7 +319,7 @@ int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
  * this is our shared key (client premaster secret)
  */
 mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
-    mpi_t a, mpi_t u, mpi_t n)
+			  mpi_t a, mpi_t u, mpi_t n)
 {
     mpi_t S = NULL, tmp1 = NULL, tmp2 = NULL;
     mpi_t tmp4 = NULL, tmp3 = NULL, k = NULL;
@@ -397,8 +395,8 @@ void gnutls_srp_free_client_credentials(gnutls_srp_client_credentials_t sc)
   *
   * Returns 0 on success.
   **/
-int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t *
-					   sc)
+int gnutls_srp_allocate_client_credentials(gnutls_srp_client_credentials_t
+					   * sc)
 {
     *sc = gnutls_calloc(1, sizeof(srp_client_credentials_st));
 
@@ -467,8 +465,8 @@ void gnutls_srp_free_server_credentials(gnutls_srp_server_credentials_t sc)
   * 
   * Returns 0 on success.
   **/
-int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t *
-					   sc)
+int gnutls_srp_allocate_server_credentials(gnutls_srp_server_credentials_t
+					   * sc)
 {
     *sc = gnutls_calloc(1, sizeof(srp_server_cred_st));
 
@@ -572,7 +570,9 @@ int gnutls_srp_set_server_credentials_file(gnutls_srp_server_credentials_t
   **/
 void
 gnutls_srp_set_server_credentials_function(gnutls_srp_server_credentials_t
-    cred, gnutls_srp_server_credentials_function * func)
+					   cred,
+					   gnutls_srp_server_credentials_function
+					   * func)
 {
     cred->pwd_callback = func;
 }

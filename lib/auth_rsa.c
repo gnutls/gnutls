@@ -136,8 +136,8 @@ int _gnutls_get_public_rsa_params(gnutls_session_t session,
 
 /* This function reads the RSA parameters from the private key
  */
-int _gnutls_get_private_rsa_params(gnutls_session_t session, mpi_t ** params,
-				   int *params_size)
+int _gnutls_get_private_rsa_params(gnutls_session_t session,
+				   mpi_t ** params, int *params_size)
 {
     int bits;
     const gnutls_certificate_credentials_t cred;
@@ -287,7 +287,7 @@ int _gnutls_proc_rsa_client_kx(gnutls_session_t session, opaque * data,
 int _gnutls_gen_rsa_client_kx(gnutls_session_t session, opaque ** data)
 {
     cert_auth_info_t auth = session->key->auth_info;
-    gnutls_datum_t sdata;		/* data to send */
+    gnutls_datum_t sdata;	/* data to send */
     mpi_t params[MAX_PUBLIC_PARAMS_SIZE];
     int params_len = MAX_PUBLIC_PARAMS_SIZE;
     int ret, i;

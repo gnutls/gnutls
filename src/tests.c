@@ -100,12 +100,13 @@ int do_handshake(gnutls_session session)
 static int protocol_priority[16] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
 static const int kx_priority[16] =
     { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA,
-GNUTLS_KX_ANON_DH,
+    GNUTLS_KX_ANON_DH,
     GNUTLS_KX_RSA_EXPORT, 0
 };
 static const int cipher_priority[16] =
     { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128,
-GNUTLS_CIPHER_ARCFOUR_40, 0 };
+    GNUTLS_CIPHER_ARCFOUR_40, 0
+};
 static const int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
 static const int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 static const int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };

@@ -318,9 +318,10 @@ int gnutls_rsa_params_export_pkcs1(gnutls_rsa_params_t params,
   * 
   **/
 int gnutls_rsa_params_export_raw(gnutls_rsa_params_t params,
-    gnutls_datum_t * m, gnutls_datum_t * e,
-    gnutls_datum_t * d, gnutls_datum_t * p,
-    gnutls_datum_t * q, gnutls_datum_t * u, unsigned int *bits)
+				 gnutls_datum_t * m, gnutls_datum_t * e,
+				 gnutls_datum_t * d, gnutls_datum_t * p,
+				 gnutls_datum_t * q, gnutls_datum_t * u,
+				 unsigned int *bits)
 {
     int ret;
 

@@ -43,7 +43,8 @@
   * Returns a negative error code in case of an error.
   *
   **/
-int gnutls_x509_extract_dn(const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
+int gnutls_x509_extract_dn(const gnutls_datum_t * idn,
+			   gnutls_x509_dn * rdn)
 {
     ASN1_TYPE dn = ASN1_TYPE_EMPTY;
     int result;
@@ -329,7 +330,8 @@ int gnutls_x509_extract_certificate_ca_status(const gnutls_datum_t * cert)
   *
   **/
 time_t gnutls_x509_extract_certificate_activation_time(const
-						       gnutls_datum_t * cert)
+						       gnutls_datum_t *
+						       cert)
 {
     gnutls_x509_crt_t xcert;
     time_t result;
@@ -361,7 +363,8 @@ time_t gnutls_x509_extract_certificate_activation_time(const
   *
   **/
 time_t gnutls_x509_extract_certificate_expiration_time(const
-						       gnutls_datum_t * cert)
+						       gnutls_datum_t *
+						       cert)
 {
     gnutls_x509_crt_t xcert;
     time_t result;
@@ -471,8 +474,8 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum_t * cert,
   * or a negative value on error.
   *
   **/
-int gnutls_x509_extract_certificate_pk_algorithm(const gnutls_datum_t * cert,
-						 int *bits)
+int gnutls_x509_extract_certificate_pk_algorithm(const gnutls_datum_t *
+						 cert, int *bits)
 {
     gnutls_x509_crt_t xcert;
     int result;
@@ -604,7 +607,8 @@ int gnutls_x509_verify_certificate(const gnutls_datum_t * cert_list,
     ca_certificate_list_size = CA_list_length;
     ca_certificate_list =
 	gnutls_calloc(1,
-		      ca_certificate_list_size * sizeof(gnutls_x509_crt_t));
+		      ca_certificate_list_size *
+		      sizeof(gnutls_x509_crt_t));
     if (ca_certificate_list == NULL) {
 	gnutls_assert();
 	ret = GNUTLS_E_MEMORY_ERROR;

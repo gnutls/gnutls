@@ -65,7 +65,8 @@ const mod_auth_st rsa_export_auth_struct = {
     _gnutls_proc_cert_cert_req	/* proc server cert request */
 };
 
-static int gen_rsa_export_server_kx(gnutls_session_t session, opaque ** data)
+static int gen_rsa_export_server_kx(gnutls_session_t session,
+				    opaque ** data)
 {
     gnutls_rsa_params_t rsa_params;
     const mpi_t *rsa_mpis;
@@ -213,8 +214,8 @@ int _gnutls_peers_cert_less_512(gnutls_session_t session)
     return 0;
 }
 
-static int proc_rsa_export_server_kx(gnutls_session_t session, opaque * data,
-				     size_t _data_size)
+static int proc_rsa_export_server_kx(gnutls_session_t session,
+				     opaque * data, size_t _data_size)
 {
     uint16 n_m, n_e;
     size_t _n_m, _n_e;

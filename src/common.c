@@ -141,8 +141,8 @@ void print_x509_info(gnutls_session session, const char *hostname)
 	}
 
 	if (j == 0 && hostname != NULL) {	/* Check the hostname of the first certificate
-						   * if it matches the name of the host we
-						   * connected to.
+						 * if it matches the name of the host we
+						 * connected to.
 						 */
 	    if (gnutls_x509_crt_check_hostname(crt, hostname)
 		== 0) {
@@ -333,8 +333,8 @@ void print_openpgp_info(gnutls_session session, const char *hostname)
 	}
 
 	if (hostname != NULL) {	/* Check the hostname of the first certificate
-				   * if it matches the name of the host we
-				   * connected to.
+				 * if it matches the name of the host we
+				 * connected to.
 				 */
 	    if (gnutls_openpgp_key_check_hostname(crt, hostname) == 0) {
 		printf

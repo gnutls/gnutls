@@ -38,8 +38,8 @@ typedef mac_hd_t GNUTLS_HASH_HANDLE;
 #define GNUTLS_HASH_FAILED NULL
 #define GNUTLS_MAC_FAILED NULL
 
-mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm, const void *key,
-			   int keylen);
+mac_hd_t _gnutls_hmac_init(gnutls_mac_algorithm_t algorithm,
+			   const void *key, int keylen);
 #define _gnutls_hmac_get_algo_len _gnutls_hash_get_algo_len
 #define _gnutls_hmac _gnutls_hash
 void _gnutls_hmac_deinit(mac_hd_t handle, void *digest);

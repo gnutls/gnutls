@@ -197,8 +197,10 @@ dsa_sign(const gnutls_datum_t * text,
  * 'signature' will hold the signature!
  * 'hash' is only used in PKCS1 RSA signing.
  */
-int _gnutls_x509_sign(const gnutls_datum_t * tbs, gnutls_mac_algorithm_t hash,
-		      gnutls_x509_privkey_t signer, gnutls_datum_t * signature)
+int _gnutls_x509_sign(const gnutls_datum_t * tbs,
+		      gnutls_mac_algorithm_t hash,
+		      gnutls_x509_privkey_t signer,
+		      gnutls_datum_t * signature)
 {
     int ret;
 

@@ -136,8 +136,8 @@ struct list {
     long length;
     long item_size;
     struct list_item {
-        struct list_item *next;
-        struct list_item *prev;
+	struct list_item *next;
+	struct list_item *prev;
 	char data[1];
     } *head, *tail, *search;
     void (*free_func) (struct list_item *);
@@ -444,6 +444,4 @@ struct list {
 	free (__t);									\
     }											\
 
-#endif 		/* _LIST_H */
-
-
+#endif				/* _LIST_H */

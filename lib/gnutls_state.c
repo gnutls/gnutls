@@ -72,7 +72,8 @@ gnutls_cipher_algorithm_t gnutls_cipher_get(gnutls_session_t session)
   * is by default X.509, unless it is negotiated as a TLS extension.
   *
   **/
-gnutls_certificate_type_t gnutls_certificate_type_get(gnutls_session_t session)
+gnutls_certificate_type_t gnutls_certificate_type_get(gnutls_session_t
+						      session)
 {
     return session->security_parameters.cert_type;
 }
@@ -105,7 +106,8 @@ gnutls_mac_algorithm_t gnutls_mac_get(gnutls_session_t session)
   *
   * Returns the currently used compression method.
   **/
-gnutls_compression_method_t gnutls_compression_get(gnutls_session_t session)
+gnutls_compression_method_t gnutls_compression_get(gnutls_session_t
+						   session)
 {
     return session->security_parameters.read_compression_algorithm;
 }
@@ -115,7 +117,8 @@ gnutls_compression_method_t gnutls_compression_get(gnutls_session_t session)
  * and a matching certificate exists.
  */
 int _gnutls_session_cert_type_supported(gnutls_session_t session,
-					gnutls_certificate_type_t cert_type)
+					gnutls_certificate_type_t
+					cert_type)
 {
     uint i;
     uint cert_found = 0;
@@ -219,7 +222,8 @@ void _gnutls_handshake_internal_state_clear(gnutls_session_t session)
   * This function allocates structures which can only be free'd
   * by calling gnutls_deinit(). Returns zero on success.
   **/
-int gnutls_init(gnutls_session_t * session, gnutls_connection_end_t con_end)
+int gnutls_init(gnutls_session_t * session,
+		gnutls_connection_end_t con_end)
 {
     *session = gnutls_calloc(1, sizeof(struct gnutls_session_int));
     if (*session == NULL)
@@ -287,8 +291,10 @@ int gnutls_init(gnutls_session_t * session, gnutls_connection_end_t con_end)
 
     /* set the socket pointers to -1;
      */
-    (*session)->internals.transport_recv_ptr = (gnutls_transport_ptr_t) - 1;
-    (*session)->internals.transport_send_ptr = (gnutls_transport_ptr_t) - 1;
+    (*session)->internals.transport_recv_ptr =
+	(gnutls_transport_ptr_t) - 1;
+    (*session)->internals.transport_send_ptr =
+	(gnutls_transport_ptr_t) - 1;
 
     /* set the default maximum record size for TLS
      */
@@ -439,8 +445,7 @@ int _gnutls_dh_set_peer_public(gnutls_session_t session, mpi_t public)
 	return GNUTLS_E_INTERNAL_ERROR;
     }
 
-    ret =
-	_gnutls_mpi_dprint_lz(&dh->public_key, public);
+    ret = _gnutls_mpi_dprint_lz(&dh->public_key, public);
     if (ret < 0) {
 	gnutls_assert();
 	return ret;
@@ -491,18 +496,16 @@ int _gnutls_rsa_export_set_pubkey(gnutls_session_t session, mpi_t exp,
     if (info == NULL)
 	return GNUTLS_E_INTERNAL_ERROR;
 
-    ret =
-	_gnutls_mpi_dprint_lz(&info->rsa_export.modulus, mod);
+    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.modulus, mod);
     if (ret < 0) {
 	gnutls_assert();
 	return ret;
     }
 
-    ret =
-	_gnutls_mpi_dprint_lz(&info->rsa_export.exponent, exp);
+    ret = _gnutls_mpi_dprint_lz(&info->rsa_export.exponent, exp);
     if (ret < 0) {
 	gnutls_assert();
-	_gnutls_free_datum( &info->rsa_export.modulus);
+	_gnutls_free_datum(&info->rsa_export.modulus);
 	return ret;
     }
 
@@ -555,7 +558,7 @@ int _gnutls_dh_set_group(gnutls_session_t session, mpi_t gen, mpi_t prime)
     ret = _gnutls_mpi_dprint_lz(&dh->generator, gen);
     if (ret < 0) {
 	gnutls_assert();
-	_gnutls_free_datum( &dh->prime);
+	_gnutls_free_datum(&dh->prime);
 	return ret;
     }
 
@@ -828,10 +831,11 @@ int gnutls_session_is_resumed(gnutls_session_t session)
     if (session->security_parameters.entity == GNUTLS_CLIENT) {
 	if (session->security_parameters.session_id_size > 0 &&
 	    session->security_parameters.session_id_size ==
-	        session->internals.resumed_security_parameters.session_id_size &&
-	    memcmp(session->security_parameters.session_id,
-		session->internals.resumed_security_parameters.
-		session_id, session->security_parameters.session_id_size) == 0)
+	    session->internals.resumed_security_parameters.session_id_size
+	    && memcmp(session->security_parameters.session_id,
+		      session->internals.resumed_security_parameters.
+		      session_id,
+		      session->security_parameters.session_id_size) == 0)
 	    return 1;
     } else {
 	if (session->internals.resumed == RESUME_TRUE)
