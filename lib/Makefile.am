@@ -5,7 +5,7 @@ m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls.m4
 
 DIST_SUBDIRS = minitasn1
-SUBDIRS = $(MINITASN1_DIR)
+SUBDIRS = $(MINITASN1_DIR) x509
 
 EXTRA_DIST = debug.h gnutls_compress.h defines.h gnutls.asn pkix.asn \
 	gnutls_cipher.h gnutls_buffers.h gnutls_errors.h gnutls_int.h \
@@ -46,7 +46,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 
 libgnutls_la_SOURCES = $(COBJECTS) 
 
-libgnutls_la_LIBADD = $(MINITASN1_OBJECTS)
+libgnutls_la_LIBADD = $(MINITASN1_OBJECTS) x509/dn.lo x509/crl.lo
 
 libgnutls_la_LDFLAGS = $(LIBASN1_LINK) $(LIBGCRYPT_LIBS) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \

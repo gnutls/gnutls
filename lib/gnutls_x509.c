@@ -1,7 +1,7 @@
 /*
  *  Copyright (C) 2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -58,7 +58,7 @@ typedef struct _oid2string {
 	int printable;
 } oid2string;
 
-static oid2string OID2STR[] = {
+static const oid2string OID2STR[] = {
 	{"2 5 4 6", "X520countryName", 0, 1},
 	{"2 5 4 10", "X520OrganizationName", 1, 1},
 	{"2 5 4 11", "X520OrganizationalUnitName", 1, 1},

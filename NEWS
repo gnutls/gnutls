@@ -1,17 +1,17 @@
 Version 0.9.0
+- This version is not binary compatible with the previous ones.
 - The library notifies the application on empty and illegal SRP usernames, 
   so that proper notification (via an alert) is sent to the peer.
 - Added ability to send some messages back to the application using
   the gnutls_global_set_log_function().
-- This version is not binary compatible with the previous ones.
 - gnutls_dh_params_generate() and gnutls_rsa_params_generate() now use 
   gnutls_malloc() to allocate the output parameters.
 - Added gnutls_pkcs3_extract_dh_params() and gnutls_pkcs3_export_dh_params()
-  which extracts and export parameters from and to PKCS#3 encoded structures. 
+  which extract and export parameters from and to PKCS#3 encoded structures. 
   These were added to read parameters generated using the openssl dhparam tool.
 - Several changes in the temporary (DH/RSA) parameter codebase. No DH 
-  parameters are now included in the library. Also a credentials structure 
-  can now hold only one temporary parameter.
+  parameters are now included in the library. Also the credentials structure 
+  can now hold only one temporary parameter of a kind.
 
 Version 0.8.1 (22/01/2003)
 - Improved the SRP support, to prevent attackers guessing the
