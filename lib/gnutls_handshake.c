@@ -1369,8 +1369,17 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 		/* Set the version we advertized as maximum 
 		 * (RSA uses it).
 		 */
-		_gnutls_set_current_version(state, hver);
 		_gnutls_set_adv_version( state, hver);
+
+		/* Some implementations do not interoperate if we send a
+		 * different version in the record layer.
+		 * It seems they prefer to read the record's version
+		 * as the one we actually requested.
+		 *  The proper behaviour is to use the one in the client hello 
+		 * handshake packet and ignore the one in the packet's record 
+		 * header.
+		 */
+		_gnutls_set_current_version(state, hver);
 
 		/* In order to know when this session was initiated.
 		 */

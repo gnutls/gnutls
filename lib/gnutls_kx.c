@@ -28,6 +28,7 @@
 #include "gnutls_gcry.h"
 #include <gnutls_record.h>
 #include <gnutls_datum.h>
+#include <gnutls_alert.h>
 
 /* This file contains important thing for the TLS handshake procedure.
  */

@@ -182,7 +182,6 @@ int num=0, i;
 int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
 GNUTLS_LIST _list = list;
 int num=0, i;
-GNUTLS_Version ver;
 
 	while( *_list != 0) {
 		num++;
@@ -205,13 +204,11 @@ GNUTLS_Version ver;
 		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = list[i];
 	}
 
-	/* set the current version to the latest supported
+	/* set the current version to the first in the chain.
+	 * This will be overriden later.
 	 */
-	ver = _gnutls_version_max( state);
-	if (ver < 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
-	}
-	_gnutls_set_current_version( state, ver);
+	if (num > 0)
+		_gnutls_set_current_version( state, state->gnutls_internals.ProtocolPriority.algorithm_priority[0]);
+
 	return 0;
 }

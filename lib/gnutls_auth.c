@@ -24,6 +24,7 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_algorithms.h"
 #include "auth_x509.h"
+#include <gnutls_datum.h>
 
 #include "auth_anon.h"
 /* The functions here are used in order for authentication algorithms

@@ -491,7 +491,6 @@ typedef struct GNUTLS_STATE_INT *GNUTLS_STATE;
 
 
 /* functions */
-int gnutls_send_alert( GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
 int gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes, void* ret);
