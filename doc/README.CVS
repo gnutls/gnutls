@@ -13,7 +13,6 @@ following software:
 * gtk-doc CVS (to generate reference HTML manual in doc/reference/)
   with the patch below, from:
   http://bugzilla.gnome.org/show_bug.cgi?id=156300
-  http://bugzilla.gnome.org/show_bug.cgi?id=156318
 
 Those are optional:
 * latex/dvips (in order to create gnutls.ps)
@@ -63,21 +62,3 @@ diff -u -p -r1.9 gtk-doc.make
  	@echo '*** Rebuilding template files ***'
  	@-chmod -R u+w $(srcdir)
  	cd $(srcdir) && gtkdoc-mktmpl --module=$(DOC_MODULE)
-Index: gtkdoc-common.pl.in
-===================================================================
-RCS file: /cvs/gnome/gtk-doc/gtkdoc-common.pl.in,v
-retrieving revision 1.4
-diff -u -p -r1.4 gtkdoc-common.pl.in
---- gtkdoc-common.pl.in	24 Oct 2004 22:25:45 -0000	1.4
-+++ gtkdoc-common.pl.in	5 Jan 2005 02:19:49 -0000
-@@ -96,6 +96,10 @@ sub UpdateFileIfChanged {
- sub ParseStructDeclaration {
-     my ($declaration, $is_object, $output_function_params, $typefunc, $namefunc) = @_;
- 
-+    if ($declaration =~ m/struct\s+\S+\s*;/msg) {
-+      return ();
-+    }
-+
-     # Remove all private parts of the declaration
- 
-     # For objects, assume private
