@@ -33,7 +33,6 @@
 #include <x509_b64.h>
 #include <x509.h>
 #include <dn.h>
-#include <pkcs5.h>
 #include <pkcs12.h>
 #include <privkey.h>
 #include <extensions.h>
@@ -1233,12 +1232,11 @@ static int decrypt_data(schema_id schema, ASN1_TYPE pkcs8_asn,
      */
     if (schema == PBES2) {
 	result =
-	    _gnutls_pkcs5_pbkdf2(PKCS5_PRF_SHA1, password,
-				 strlen(password), kdf_params->salt,
-				 kdf_params->salt_size,
+	    gc_pkcs5_pbkdf2_sha1(password, strlen(password),
+				 kdf_params->salt, kdf_params->salt_size,
 				 kdf_params->iter_count, key_size, key);
 
-	if (result != PKCS5_OK) {
+	if (result != GC_OK) {
 	    gnutls_assert();
 	    result = GNUTLS_E_DECRYPTION_FAILED;
 	    goto error;
@@ -1507,12 +1505,11 @@ static int generate_key(schema_id schema,
 
     if (schema == PBES2) {
 
-	ret = _gnutls_pkcs5_pbkdf2(PKCS5_PRF_SHA1, password,
-				   strlen(password), kdf_params->salt,
-				   kdf_params->salt_size,
+	ret = gc_pkcs5_pbkdf2_sha1(password, strlen(password),
+				   kdf_params->salt, kdf_params->salt_size,
 				   kdf_params->iter_count,
 				   kdf_params->key_size, key->data);
-	if (ret != PKCS5_OK) {
+	if (ret != GC_OK) {
 	    gnutls_assert();
 	    return GNUTLS_E_ENCRYPTION_FAILED;
 	}
