@@ -206,13 +206,24 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
 	return 0;
 }
 
+/* returns RESUME_FALSE or RESUME_TRUE.
+ */
+int _gnutls_session_is_resumable( GNUTLS_STATE state) 
+{
+	return state->gnutls_internals.resumable;
+}
+
+
 /**
-  * gnutls_deinit - This function clears all buffers associated with the &state
+  * _gnutls_deinit - This function clears all buffers associated with the &state
   * @state: is a &GNUTLS_STATE structure.
   *
   * This function clears all buffers associated with the &state.
+  * The difference with gnutls_deinit() is that this function will not
+  * interfere with the session database.
+  *
   **/
-void gnutls_deinit(GNUTLS_STATE state)
+void _gnutls_deinit(GNUTLS_STATE state)
 {
 
 	if (state==NULL) return;
@@ -276,6 +287,31 @@ void gnutls_deinit(GNUTLS_STATE state)
 
 	return;
 }
+
+/**
+  * gnutls_deinit - This function clears all buffers associated with the &state
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function clears all buffers associated with the &state.
+  * This function will also remove session data from the session database
+  * if the session was terminated abnormally.
+  *
+  **/
+void gnutls_deinit(GNUTLS_STATE state)
+{
+
+	if (state==NULL) return;
+	
+	/* If the session was terminated abnormally then remove
+	 * the session data.
+	 */
+	if (_gnutls_session_is_resumable(state)==RESUME_FALSE) {
+		gnutls_db_remove_session( state);
+	}
+
+	_gnutls_deinit( state);
+}
+
 
 int _gnutls_dh_get_prime_bits( GNUTLS_STATE state) {
 	return state->gnutls_internals.dh_prime_bits;

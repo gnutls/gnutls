@@ -317,13 +317,15 @@ int ret = 0;
 }
 
 /**
-  * gnutls_db_remove_session - This function will remove the current session data from the db
+  * gnutls_db_remove_session - This function will remove the current session data from the database
   * @state: is a &GNUTLS_STATE structure.
   *
   * This function will remove the current session data from the session
   * database. This will prevent future handshakes reusing these session
   * data. This function should be called if a session was terminated
-  * abnormaly.
+  * abnormaly, and before gnutls_deinit() is called.
+  *
+  * Normally gnutls_deinit() will remove abnormally terminated sessions.
   *
   **/
 void gnutls_db_remove_session(GNUTLS_STATE state) {
