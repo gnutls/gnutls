@@ -19,14 +19,11 @@
  */
 
 #include "defines.h"
+#include "gnutls_int.h"
 #include "crypt_bcrypt.h"
 #include "crypt_srpsha1.h"
 #include "gnutls_random.h"
 
-enum crypt_algo { BLOWFISH_CRYPT, SRPSHA1_CRYPT };
-
-typedef enum crypt_algo crypt_algo;
-                                                      
 char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt) {
 	
 	switch(algo) {

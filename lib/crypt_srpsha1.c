@@ -28,7 +28,7 @@
 
 /*	x = SHA(<salt> | SHA(<username> | ":" | <raw password>)) */
 
-static const char magic[] = "$4$";
+static const char magic[] = "$0$";
 
 char *
  crypt_srpsha1(const char* username, const char *passwd, const char *salt)

@@ -21,6 +21,7 @@
 #include <defines.h>
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
+#include <crypt_bcrypt.h>
 
 /* Here functions for SRP (like g^x mod n) are defined 
  */
@@ -59,18 +60,18 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, char** ret_g, ch
 	if (gcry_mpi_scan(&x, GCRYMPI_FMT_USG,
 			  text, &textsize)) {
 		gnutls_assert();
-		mpi_release(prime);
+		gcry_mpi_release(prime);
 		return -1;
 	}
 
-	g = mpi_set_ui(NULL, SRP_G);
+	g = gcry_mpi_set_ui(NULL, SRP_G);
 
 	e = gcry_mpi_alloc_like(prime);
 
 	/* e = g^x mod prime (n) */
-	mpi_powm(e, g, x, prime);
+	gcry_mpi_powm(e, g, x, prime);
 
-	mpi_release(x);
+	gcry_mpi_release(x);
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &result_size, e);
 	if (result!=NULL) {
@@ -94,9 +95,9 @@ int _gnutls_srp_gx(opaque *text, int textsize, opaque** result, char** ret_g, ch
 		(*ret_n)[siz] = 0;
 	}
 
-	mpi_release(e);
-	mpi_release(g);
-	mpi_release(prime);
+	gcry_mpi_release(e);
+	gcry_mpi_release(g);
+	gcry_mpi_release(prime);
 
 	return result_size;
 
@@ -115,20 +116,20 @@ MPI _gnutls_calc_srp_B(MPI * ret_b, MPI g, MPI n, MPI v)
 	
 	/* calculate:  B = (v + g^b) % N */
 	bits = gcry_mpi_get_nbits(n);
-	b = mpi_new(bits);	/* FIXME: allocate in secure memory */
+	b = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	gcry_mpi_randomize(b, bits, GCRY_STRONG_RANDOM);
 
-	tmpB = mpi_new(bits);	/* FIXME: allocate in secure memory */
-	B = mpi_new(bits);	/* FIXME: allocate in secure memory */
-	mpi_powm(tmpB, g, b, n);
-	mpi_addm(B, v, tmpB, n);
+	tmpB = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	B = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	gcry_mpi_powm(tmpB, g, b, n);
+	gcry_mpi_addm(B, v, tmpB, n);
 
-	mpi_release(tmpB);
+	gcry_mpi_release(tmpB);
 
 	if (ret_b)
 		*ret_b = b;
 	else
-		mpi_release(b);
+		gcry_mpi_release(b);
 
 	return B;
 }
@@ -153,7 +154,7 @@ MPI ret;
 	gnutls_free(hd);
 	gnutls_free(b_holder);
 
-	ret = mpi_set_ui(NULL, u);
+	ret = gcry_mpi_set_ui(NULL, u);
 
 	return ret;	
 }
@@ -170,12 +171,12 @@ S = gcry_mpi_alloc_like(n);
 tmp1 = gcry_mpi_alloc_like(n);
 tmp2 = gcry_mpi_alloc_like(n);
 
-mpi_pow(tmp1, v, u);
-mpi_mul(tmp2, A, tmp1);
-mpi_release(tmp1);
+gcry_mpi_pow(tmp1, v, u);
+gcry_mpi_mul(tmp2, A, tmp1);
+gcry_mpi_release(tmp1);
 
-mpi_powm(S, tmp2, b, n);
-mpi_release(tmp2);
+gcry_mpi_powm(S, tmp2, b, n);
+gcry_mpi_release(tmp2);
 
 return S;
 }
@@ -190,16 +191,16 @@ MPI A;
 int bits;
 
 	bits = gcry_mpi_get_nbits(n);
-	tmpa = mpi_new(bits);	/* FIXME: allocate in secure memory */
+	tmpa = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
 	gcry_mpi_randomize(tmpa, bits, GCRY_STRONG_RANDOM);
 
-	A = mpi_new(bits);	/* FIXME: allocate in secure memory */
-	mpi_powm(A, g, tmpa, n);
+	A = gcry_mpi_new(bits);	/* FIXME: allocate in secure memory */
+	gcry_mpi_powm(A, g, tmpa, n);
 
 	if (a!=NULL)
 		*a = tmpa;
 	else
-		mpi_release(tmpa);
+		gcry_mpi_release(tmpa);
 	
 	return A;
 }
@@ -227,6 +228,17 @@ opaque* hd;
 	return hd;	
 }
 
+void* _gnutls_calc_srp_x( char* username, char* password, opaque* salt, int salt_size, uint8 crypt_algo) {
+	
+	switch(crypt_algo) {
+		case SRPSHA1_CRYPT:
+			return _gnutls_calc_srp_sha( username, password, salt, salt_size);
+		case BLOWFISH_CRYPT:
+			return _gnutls_calc_srp_bcrypt( password, salt, salt_size);
+	}
+	return NULL;	
+}
+
 
 /* S = (B - g^x) ^ (a + u * x) % N
  * this is our shared key
@@ -239,18 +251,18 @@ MPI S, tmp1, tmp2, tmp4;
 	tmp1 = gcry_mpi_alloc_like(n);
 	tmp2 = gcry_mpi_alloc_like(n);
 
-	mpi_pow(tmp1, g, x);
-	mpi_sub(tmp2, B, tmp1);
+	gcry_mpi_pow(tmp1, g, x);
+	gcry_mpi_sub(tmp2, B, tmp1);
 
 	tmp4 = gcry_mpi_alloc_like(n);
 
-	mpi_add(tmp1, u, x);
-	mpi_add(tmp4, a, tmp1);
-	mpi_release(tmp1);
+	gcry_mpi_add(tmp1, u, x);
+	gcry_mpi_add(tmp4, a, tmp1);
+	gcry_mpi_release(tmp1);
 
-	mpi_powm(S, tmp2, tmp4, n);
-	mpi_release(tmp2);
-	mpi_release(tmp4);
+	gcry_mpi_powm(S, tmp2, tmp4, n);
+	gcry_mpi_release(tmp2);
+	gcry_mpi_release(tmp4);
 
 	return S;
 }

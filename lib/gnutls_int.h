@@ -73,7 +73,7 @@ typedef struct {
 
 typedef unsigned char opaque;
 
-
+enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 };
 enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 };
 enum AlertLevel { GNUTLS_WARNING=1, GNUTLS_FATAL };
 enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTLS_BAD_RECORD_MAC=20,
@@ -89,6 +89,7 @@ enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=10, GNUTL
 typedef enum AlertDescription AlertDescription;
 typedef enum AlertLevel AlertLevel;
 typedef enum ChangeCipherSpecType ChangeCipherSpecType;
+typedef enum crypt_algo crypt_algo;
 
 enum HandshakeType { GNUTLS_HELLO_REQUEST, GNUTLS_CLIENT_HELLO, GNUTLS_SERVER_HELLO,
 		     GNUTLS_CERTIFICATE=11, GNUTLS_SERVER_KEY_EXCHANGE,
@@ -160,6 +161,7 @@ typedef struct {
 	 * to hold the requested user - currently only in srp 
 	 */
 	char*				username;
+	uint8				crypt_algo;
 	
 	AUTH_CRED*			cred; /* used in srp, etc */
 } GNUTLS_KEY_A;

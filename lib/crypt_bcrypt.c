@@ -600,10 +600,10 @@ char *
 	unsigned char text[24] = "OrpheanBeholderScryDoubt";
 	uint8 *csalt;
 	uint8 *rtext;
-	int cost, vsize;
+	uint8 cost;
 	int i, salt_size = strlen(salt);
 	unsigned char *local_salt, *v;
-	int passwd_len;
+	int passwd_len, vsize;
 	char *tmp, *g, *n;
 
 	passwd_len = strlen(passwd) + 1;	/* we want the null also */
@@ -618,19 +618,14 @@ char *
 	if (!strncmp((char *) sp, magic, strlen(magic)))
 		sp += strlen(magic);
 
-	cost = atoi((char *) sp);
-	do {			/* move to salt */
-		sp++;
-	} while (*sp != '$');
-	sp++;
-
 	tsp = sp;
 	while((*tsp)!='$') tsp++;
 	*tsp = '\0';		/* put a null after the end of salt */
 
 	_gnutls_base64_decode( sp, strlen(sp), &csalt);
 
-	ctx = _blf_init( csalt, passwd, passwd_len, cost);
+	cost = (uint8) csalt[0];
+	ctx = _blf_init( &csalt[1], passwd, passwd_len, cost);
 	gnutls_free(csalt);
 	
 	for (i = 0; i < 64; i++) {
@@ -670,19 +665,20 @@ char *crypt_bcrypt_wrapper(const char *pass_new, int cost)
        char *e = NULL;
 	   int result_size;
 	   
-       rand = _gnutls_get_random( 16, GNUTLS_WEAK_RANDOM);
+       rand = _gnutls_get_random( 17, GNUTLS_WEAK_RANDOM);
        /* cost should be <32 and >6 */
        if (cost >=32) cost=31;
        if (cost < 1) cost = 1;
 
-	   result_size = _gnutls_base64_encode( rand, 16, &result);
+	   rand[0] = (uint8) cost;
+	   result_size = _gnutls_base64_encode( rand, 17, &result);
 	   if (result_size < 0) {
 	   	gnutls_assert();
 	   	return NULL;
 	   }
 
 	   tcp = gnutls_calloc( 1, strlen(magic)+ 3 + result_size +1+1);
-       sprintf(tcp, "%s%.2u$%s$", magic, cost, result);
+       sprintf(tcp, "%s$%s$", magic, result);
 
 	   gnutls_free(result);
 
@@ -694,3 +690,29 @@ char *crypt_bcrypt_wrapper(const char *pass_new, int cost)
        return e;
 }
 
+void *
+ _gnutls_calc_srp_bcrypt( char *passwd, opaque *salt, int salt_size)
+{
+	blf_ctx *ctx;
+	opaque text[24] = "OrpheanBeholderScryDoubt";
+	int passwd_len, i;
+	opaque *tmp;
+
+	passwd_len = strlen(passwd) + 1;	/* we want the null also */
+	if (passwd_len > 56)
+		passwd_len = 56;
+
+	ctx = _blf_init( &salt[1], passwd, passwd_len, salt[0]);
+
+	tmp = malloc(sizeof(text));
+	memcpy( tmp, text, sizeof(text));
+		
+	for (i = 0; i < 64; i++) {
+		_blf_encrypt(ctx, (uint8 *) tmp);
+		_blf_encrypt(ctx, (uint8 *) &tmp[8]);
+		_blf_encrypt(ctx, (uint8 *) &tmp[16]);
+	}
+
+	_blf_deinit(ctx);
+	return tmp;
+}

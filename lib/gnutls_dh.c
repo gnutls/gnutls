@@ -77,23 +77,23 @@ MPI gnutls_calc_dh_secret(MPI * ret_x)
 	}
 	/*_gnutls_dump_mpi(stderr, "prime=", prime ); */
 
-	g = mpi_set_ui(NULL, DH_G);
-	x = mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
+	g = gcry_mpi_set_ui(NULL, DH_G);
+	x = gcry_mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
 	gcry_mpi_randomize(x, X_SIZE, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
-/*	e = mpi_new(E_SIZE); */
+/*	e = gcry_mpi_new(E_SIZE); */
 	e = gcry_mpi_alloc_like(prime);
 	/* e = g^x mod prime */
 
-	mpi_powm(e, g, x, prime);
+	gcry_mpi_powm(e, g, x, prime);
 
 	if (ret_x)
 		*ret_x = x;
 	else
-		mpi_release(x);
-	mpi_release(g);
-	mpi_release(prime);
+		gcry_mpi_release(x);
+	gcry_mpi_release(g);
+	gcry_mpi_release(prime);
 	return e;
 }
 
@@ -101,18 +101,18 @@ MPI _gnutls_calc_dh_secret(MPI * ret_x, MPI g, MPI prime)
 {
 	MPI e, x;
 
-	x = mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
+	x = gcry_mpi_new(X_SIZE);	/* FIXME: allocate in secure memory */
 	gcry_mpi_randomize(x, X_SIZE, GCRY_STRONG_RANDOM);
 	/* fixme: set high bit of x and select a larger one */
 
 	e = gcry_mpi_alloc_like(prime);
-/*	e = mpi_new(E_SIZE); */ 
-	mpi_powm(e, g, x, prime);
+/*	e = gcry_mpi_new(E_SIZE); */ 
+	gcry_mpi_powm(e, g, x, prime);
 
 	if (ret_x)
 		*ret_x = x;
 	else
-		mpi_release(x);
+		gcry_mpi_release(x);
 	return e;
 }
 
@@ -128,12 +128,12 @@ MPI gnutls_get_dh_params(MPI * ret_p)
 		abort();
 	}
 
-	g = mpi_set_ui(NULL, DH_G);
+	g = gcry_mpi_set_ui(NULL, DH_G);
 
 	if (ret_p)
 		*ret_p = prime;
 	else
-		mpi_release(prime);
+		gcry_mpi_release(prime);
 	return g;
 }
 
@@ -151,9 +151,9 @@ MPI gnutls_calc_dh_key(MPI f, MPI x)
 	/*_gnutls_dump_mpi(stderr, "prime=", prime ); */
 
 	k = gcry_mpi_alloc_like(prime);
-/*	k = mpi_new(E_SIZE);	 FIXME: allocate in secure memory */
-	mpi_powm(k, f, x, prime);
-	mpi_release(prime);
+/*	k = gcry_mpi_new(E_SIZE);	 FIXME: allocate in secure memory */
+	gcry_mpi_powm(k, f, x, prime);
+	gcry_mpi_release(prime);
 	return k;
 }
 
@@ -161,8 +161,8 @@ MPI _gnutls_calc_dh_key(MPI f, MPI x, MPI prime)
 {
 	MPI k;
 
-/*	k = mpi_new(E_SIZE);	 FIXME: allocate in secure memory */
+/*	k = gcry_mpi_new(E_SIZE);	 FIXME: allocate in secure memory */
 	k = gcry_mpi_alloc_like(prime);
-	mpi_powm(k, f, x, prime);
+	gcry_mpi_powm(k, f, x, prime);
 	return k;
 }

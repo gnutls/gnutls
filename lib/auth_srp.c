@@ -60,14 +60,15 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 #define V key->x
 #define S key->KEY
 
-/* Send the first key exchange message ( g, n, s) */
+/* Send the first key exchange message ( g, n, s) and append the verifier algorithm number */
 int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 {
-	size_t n_g, n_n;
+	size_t n_g, n_n, n_s;
 	uint16 _n_n, _n_g, _n_s;
 	size_t ret;
 	uint8 *data_n, *data_s;
 	uint8 *data_g;
+	uint8 pwd_algo;
 	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
 
 	if (key->username == NULL) {
@@ -79,6 +80,8 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	if (pwd_entry == NULL) {
 		return GNUTLS_E_PWD_ERROR;
 	}
+
+	pwd_algo = (uint8) pwd_entry->algorithm;
 
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, pwd_entry->g);
 	gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_n, pwd_entry->n);
@@ -92,7 +95,7 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	mpi_set(N, pwd_entry->n);
 	mpi_set(V, pwd_entry->v);
 
-	(*data) = gnutls_malloc(n_n + n_g + pwd_entry->salt_size + 6);
+	(*data) = gnutls_malloc(n_n + n_g + pwd_entry->salt_size + 6 + 1);
 
 	/* copy G (generator) to data */
 	data_g = (*data);
@@ -121,6 +124,7 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	_n_s = pwd_entry->salt_size;
 	memcpy(&data_s[2], pwd_entry->salt, _n_s);
 
+	n_s = _n_s;
 #ifndef WORDS_BIGENDIAN
 	_n_s = byteswap16(_n_s);
 	memcpy(data_s, &_n_s, 2);
@@ -128,8 +132,10 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	memcpy(data_s, &_n_s, 2);
 #endif
 
+	/* copy the algorithm used to generate the verifier */
+	memcpy( &data_s[2+n_s], &pwd_algo, 1);
 
-	ret = n_g + n_n + pwd_entry->salt_size + 6;
+	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
 	gnutls_free(pwd_entry);
 
 	return ret;
@@ -225,7 +231,7 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	size_t _n_s, _n_g, _n_n;
 	uint8 *data_n;
 	uint8 *data_g;
-	uint8 *data_s;
+	uint8 *data_s, pwd_algo;
 	int i;
 	opaque *hd;
 	char *username;
@@ -292,9 +298,17 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
+/* read the algorithm used to generate V */
+	memcpy( &pwd_algo, &data_s[n_s], 1);
+
 	/* generate x = SHA(s | SHA(U | ":" | p))
+	 * (or the equivalent using bcrypt)
 	 */
-	hd = _gnutls_calc_srp_sha( username, password, data_s, n_s);
+	hd = _gnutls_calc_srp_x( username, password, data_s, n_s, pwd_algo);
+	if (hd==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
 	_n_g = 20;
 	if (gcry_mpi_scan(&key->x, GCRYMPI_FMT_USG, hd, &_n_g) != 0) {
 		gnutls_assert();

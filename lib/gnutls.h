@@ -97,7 +97,7 @@ int gnutls_clean_db( GNUTLS_STATE state);
 
 
 /* crypt functions */
-enum crypt_algo { BLOWFISH_CRYPT, SRPSHA1_CRYPT };
+enum crypt_algo { SRPSHA1_CRYPT, BLOWFISH_CRYPT=2 };
 typedef enum crypt_algo crypt_algo;
 
 char * gnutls_crypt(const char* username, const char *passwd, crypt_algo algo, int salt);
