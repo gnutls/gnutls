@@ -1,3 +1,9 @@
+2004-08-06 15:10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Terminology consistency.  
+
 2004-08-05 08:58  Simon Josefsson <simon@josefsson.org>
 
 	* lib/Makefile.am:
