@@ -29,6 +29,8 @@ option (q, generate-request) { $action=3; } "Generate a PKCS #10 certificate req
 
 option (e, verify-chain) { $action=5; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
 
+option (verify-crl) { $action=14; } "Verify a CRL."
+
 option (generate-dh-params) { $action=10; } "Generate PKCS #3 encoded Diffie Hellman parameters."
 
 #char *privkey;

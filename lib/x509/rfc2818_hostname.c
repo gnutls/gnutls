@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2002 Andrew McDonald
  * Portions Copyright 2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *

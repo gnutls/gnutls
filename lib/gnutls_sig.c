@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2001 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *

@@ -36,6 +36,27 @@ extern "C" {
 #include <gnutls/gnutls.h>
 #include <gcrypt.h>
 
+/* Extra definitions that do not longer exist in gnutls.
+ */
+#define GNUTLS_X509_CN_SIZE 256
+#define GNUTLS_X509_C_SIZE 3
+#define GNUTLS_X509_O_SIZE 256
+#define GNUTLS_X509_OU_SIZE 256
+#define GNUTLS_X509_L_SIZE 256
+#define GNUTLS_X509_S_SIZE 256
+#define GNUTLS_X509_EMAIL_SIZE 256
+
+typedef struct {
+	char common_name[GNUTLS_X509_CN_SIZE];
+	char country[GNUTLS_X509_C_SIZE];
+	char organization[GNUTLS_X509_O_SIZE];
+	char organizational_unit_name[GNUTLS_X509_OU_SIZE];
+	char locality_name[GNUTLS_X509_L_SIZE];
+	char state_or_province_name[GNUTLS_X509_S_SIZE];
+	char email[GNUTLS_X509_EMAIL_SIZE];
+} gnutls_x509_dn;
+
+
 #define OPENSSL_VERSION_NUMBER (0x0090604F)
 #define SSLEAY_VERSION_NUMBER OPENSSL_VERSION_NUMBER
 #define OPENSSL_VERSION_TEXT ("GNUTLS " LIBGNUTLS_VERSION " ")

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -38,6 +39,7 @@ void pkcs7_info( void);
 void pkcs12_info( void);
 void generate_pkcs12( void);
 void verify_chain(void);
+void verify_crl(void);
 gnutls_x509_privkey load_private_key(int mand);
 gnutls_x509_crq load_request(void);
 gnutls_x509_privkey load_ca_private_key(void);
@@ -772,6 +774,9 @@ int ret;
 		case 13:
 			generate_signed_crl();
 			break;
+		case 14:
+			verify_crl();
+			break;
 		default:
 			fprintf(stderr, "GnuTLS' certtool utility.\n");
 			fprintf(stderr, "Please use the --help to get help on this program.\n");
@@ -1114,6 +1119,7 @@ static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all)
 	char *print, dn[256];
 	const char* cprint;
 
+	fprintf(out, "CRL information:\n");
 	fprintf(out, "Version: %d\n", gnutls_x509_crl_get_version(crl));
 
 	/* Issuer
@@ -1475,7 +1481,8 @@ static gnutls_x509_crt crt[MAX_CERTS];
 char* ptr;
 int ret, i;
 gnutls_datum dat;
-size_t size, ptr_size;
+size_t size;
+int ptr_size;
 
 	*crt_size = 0;
 	fprintf(stderr, "Loading certificate list...\n");
@@ -1522,7 +1529,9 @@ size_t size, ptr_size;
 		ptr++;
 
 		ptr_size = size;
-		ptr_size -= ((void*)ptr - (void*)buffer);
+		ptr_size -= (unsigned int)((unsigned char*)ptr - (unsigned char*)buffer);
+		
+		if (ptr_size < 0) break;
 
 		(*crt_size)++;
 	}
@@ -1872,8 +1881,6 @@ time_t now = time(0);
 		comma = 1;
 		fprintf(outfile, "Revoked");
 	}
-	
-
 }
 
 void verify_chain( void)
@@ -1881,8 +1888,86 @@ void verify_chain( void)
 size_t size;
 
 	size = fread( buffer, 1, sizeof(buffer)-1, infile);
+	buffer[size] = 0;
 
 	_verify_x509_mem( buffer, size);
+	
+}
+
+void verify_crl( void)
+{
+size_t size, dn_size;
+char dn[128];
+unsigned int output;
+int comma=0;
+int ret;
+gnutls_datum pem;
+gnutls_x509_crl crl;
+time_t now = time(0);
+gnutls_x509_crt issuer;
+
+	issuer = load_ca_cert();
+
+	fprintf(outfile, "\nCA certificate:\n");
+	dn_size = sizeof(dn);
+	ret = gnutls_x509_crt_get_dn(issuer, dn, &dn_size);
+	if (ret >= 0)
+		fprintf(outfile, "\tSubject: %s\n\n", dn);
+
+	size = fread( buffer, 1, sizeof(buffer)-1, infile);
+	buffer[size] = 0;
+
+	pem.data = buffer;
+	pem.size = size;
+
+	gnutls_x509_crl_init( &crl);
+
+	ret = gnutls_x509_crl_import(crl, &pem, in_cert_format);
+	if (ret < 0) {
+		fprintf(stderr, "CRL decoding error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	print_crl_info( crl, outfile, 1);
+
+
+	fprintf(outfile, "Verification output: ");
+	ret = gnutls_x509_crl_verify( crl, &issuer, 1, 0, &output);
+	if (ret < 0) {
+		fprintf(stderr, "Error in verification: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	if (output&GNUTLS_CERT_NOT_TRUSTED) {
+		fprintf(outfile, "Not verified");
+		comma = 1;
+	} else {
+		fprintf(outfile, "Verified");
+		comma = 1;
+	}
+
+	if (output&GNUTLS_CERT_SIGNER_NOT_CA) {
+		if (comma) fprintf(outfile, ", ");
+		fprintf(outfile, "Issuer is not a CA");
+		comma = 1;
+	}
+
+	/* Check expiration dates.
+	 */
+	
+	if (gnutls_x509_crl_get_this_update(crl) > now) {
+		if (comma) fprintf(outfile, ", ");
+		comma = 1;
+		fprintf(outfile, "Issued in the future!");
+	}
+	
+	if (gnutls_x509_crl_get_next_update(crl) < now) {
+		if (comma) fprintf(outfile, ", ");
+		comma = 1;
+		fprintf(outfile, "CRL is not up to date");
+	}
+	
+	fprintf(outfile, "\n");
 	
 }
 

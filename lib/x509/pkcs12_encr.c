@@ -1,7 +1,4 @@
-/* This is based on minip12.
- */
-
-/*  minip12.c - A minilam pkcs-12 implementation.
+/*  minip12.c - A mini pkcs-12 implementation (modified for gnutls)
  *	Copyright (C) 2002 Free Software Foundation, Inc.
  *
  *  This file some day was part of GnuPG.

@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *

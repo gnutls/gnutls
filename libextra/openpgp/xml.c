@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2002 Timo Schulz <twoaday@freakmail.de>
  * Portions Copyright 2003 Nikos Mavroyanopoulos <nmav@gnutls.org>
+ * Copyright 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
