@@ -127,4 +127,14 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, void* output_data, size_t* output_data_size);
 
+#define GNUTLS_CRL_REASON_UNUSED 128
+#define GNUTLS_CRL_REASON_KEY_COMPROMISE 64
+#define GNUTLS_CRL_REASON_CA_COMPROMISE 32
+#define GNUTLS_CRL_REASON_AFFILIATION_CHANGED 16
+#define GNUTLS_CRL_REASON_SUPERSEEDED 8
+#define GNUTLS_CRL_REASON_CESSATION_OF_OPERATION 4
+#define GNUTLS_CRL_REASON_CERTIFICATE_HOLD 2
+#define GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN 1
+#define GNUTLS_CRL_REASON_AA_COMPROMISE 32768
+
 #endif

@@ -513,7 +513,7 @@ int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time)
   * gnutls_x509_crt_set_serial - This function will set the certificate's serial number
   * @cert: should contain a gnutls_x509_crt structure
   * @serial: The serial number
-  * @result_size: Holds the size of the serial field.
+  * @serial_size: Holds the size of the serial field.
   *
   * This function will set the X.509 certificate's serial number. 
   * Serial is not always a 32 or 64bit number. Some CAs use
@@ -523,7 +523,7 @@ int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time)
   * Returns 0 on success, or a negative value in case of an error.
   *
   **/
-int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial, 
+int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const void* serial, 
 	size_t serial_size)
 {
 	int ret;
@@ -566,6 +566,7 @@ static void disable_optional_stuff( gnutls_x509_crt cert)
   * @crt: should contain a gnutls_x509_crt structure
   * @type: is one of the gnutls_x509_subject_alt_name enumerations
   * @data_string: The data to be set
+  * @reason_flags: revocation reasons
   *
   * This function will set the CRL distribution points certificate extension. 
   *
@@ -573,7 +574,7 @@ static void disable_optional_stuff( gnutls_x509_crt cert)
   *
   **/
 int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
-	const char* data_string)
+	const void* data_string, unsigned int reason_flags)
 {
 int result;
 gnutls_datum der_data;
@@ -597,7 +598,7 @@ unsigned int critical;
 
 	/* generate the extension.
 	 */
-	result = _gnutls_x509_ext_gen_crl_dist_points( type, data_string, &der_data);
+	result = _gnutls_x509_ext_gen_crl_dist_points( type, data_string, reason_flags, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
@@ -617,5 +618,59 @@ unsigned int critical;
 	return 0;
 }
 
+/**
+  * gnutls_x509_crt_set_subject_key_id - This function will set the certificate's subject key id
+  * @cert: should contain a gnutls_x509_crt structure
+  * @id: The key ID
+  * @id_size: Holds the size of the serial field.
+  *
+  * This function will set the X.509 certificate's subject key ID extension.
+  *
+  * Returns 0 on success, or a negative value in case of an error.
+  *
+  **/
+int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert, const void* id,
+	size_t id_size)
+{
+	int result;
+	gnutls_datum old_id, der_data;
+	unsigned int critical;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(cert, "2.5.29.14", 0, &old_id, &critical);
+
+	if (result >= 0) _gnutls_free_datum( &old_id);
+	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_key_id( id, id_size, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( cert, "2.5.29.14", &der_data, 0);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	cert->use_extensions = 1;
+
+	return 0;
+}
 
 #endif /* ENABLE_PKI */

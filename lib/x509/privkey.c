@@ -823,28 +823,28 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 
 	/* Now generate exp1 and exp2
 	 */
-	exp1 = _gnutls_mpi_alloc_like( params[0]); /* like modulus */
+	exp1 = _gnutls_mpi_salloc_like( params[0]); /* like modulus */
 	if (exp1 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
 
-	exp2 = _gnutls_mpi_alloc_like( params[0]);
+	exp2 = _gnutls_mpi_salloc_like( params[0]);
 	if (exp2 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
 
-	q1 = _gnutls_mpi_alloc_like( params[4]);
+	q1 = _gnutls_mpi_salloc_like( params[4]);
 	if (q1 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
 		goto cleanup;
 	}
 
-	p1 = _gnutls_mpi_alloc_like( params[3]);
+	p1 = _gnutls_mpi_salloc_like( params[3]);
 	if (p1 == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
@@ -868,7 +868,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 	/* Encoding phase.
 	 * allocate data enough to hold everything
 	 */
-	all_data = gnutls_alloca( total);
+	all_data = gnutls_secure_malloc( total);
 	if (all_data == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
@@ -971,7 +971,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 		goto cleanup;
 	}
 
-	gnutls_afree(all_data);
+	gnutls_free(all_data);
 
 	if ((result = asn1_write_value(*c2, "otherPrimeInfos",
 					    NULL, 0)) != ASN1_SUCCESS) {
@@ -995,7 +995,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 		_gnutls_mpi_release( &q1);
 		_gnutls_mpi_release( &p1);
 		asn1_delete_structure(c2);
-		gnutls_afree( all_data);
+		gnutls_free( all_data);
 		
 		return result;
 }
@@ -1020,7 +1020,7 @@ static int _encode_dsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 	/* Encoding phase.
 	 * allocate data enough to hold everything
 	 */
-	all_data = gnutls_alloca( total);
+	all_data = gnutls_secure_malloc( total);
 	if (all_data == NULL) {
 		gnutls_assert();
 		result = GNUTLS_E_MEMORY_ERROR;
@@ -1093,7 +1093,7 @@ static int _encode_dsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 		goto cleanup;
 	}
 
-	gnutls_afree(all_data);
+	gnutls_free(all_data);
 
 	if ((result = asn1_write_value(*c2, "version",
 					    &null, 1)) != ASN1_SUCCESS) {
@@ -1106,7 +1106,7 @@ static int _encode_dsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 	
 	cleanup:
 		asn1_delete_structure(c2);
-		gnutls_afree( all_data);
+		gnutls_free( all_data);
 		
 		return result;
 }

@@ -14,4 +14,5 @@ int _gnutls_x509_ext_gen_keyUsage(uint16 usage, gnutls_datum* der_ext);
 int _gnutls_x509_ext_gen_subject_alt_name(gnutls_x509_subject_alt_name type, 
 	const char* data_string, gnutls_datum* der_ext);
 int _gnutls_x509_ext_gen_crl_dist_points(gnutls_x509_subject_alt_name type, 
-	const char* data_string, gnutls_datum* der_ext);
+	const void* data_string, unsigned int reason_flags, gnutls_datum* der_ext);
+int _gnutls_x509_ext_gen_key_id( const void* id, size_t id_size, gnutls_datum* der_data);

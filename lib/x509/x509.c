@@ -537,7 +537,82 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, void* result,
 	}
 
 	return 0;
+}
 
+/**
+  * gnutls_x509_crt_get_subject_key_id - This function returns the certificate's key identifier
+  * @cert: should contain a gnutls_x509_crt structure
+  * @result: The place where the identifier will be copied
+  * @result_size: Holds the size of the result field.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the X.509v3 certificate's subject key identifier.
+  * This is obtained by the X.509 Subject Key identifier extension
+  * field (2.5.29.14). 
+  *
+  * Returns 0 on success and a negative value in case of an error.
+  *
+  **/
+int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void* ret, 
+	size_t* ret_size, unsigned int* critical)
+{
+	int result, len;
+	gnutls_datum id;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+
+	if (ret) memset(ret, 0, *ret_size);
+	else *ret_size = 0;
+
+	if ((result =
+	     _gnutls_x509_crt_get_extension(cert, "2.5.29.14", 0, &id, critical)) < 0) {
+		return result;
+	}
+
+	if (id.size == 0 || id.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.SubjectKeyIdentifier", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_free_datum( &id);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, id.data, id.size, NULL);
+	_gnutls_free_datum( &id);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	len = *ret_size;
+	result =
+	     asn1_read_value(c2, "", ret, &len);
+
+	*ret_size = len;
+	asn1_delete_structure(&c2);
+
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
 }
 
 /**
@@ -643,9 +718,6 @@ int gnutls_x509_crt_get_subject_alt_name(gnutls_x509_crt cert,
 	_gnutls_free_datum( &dnsname);
 
 	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-
-		_gnutls_x509_log("X509 certificate: Decoding error %d\n", result);
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
@@ -922,7 +994,6 @@ int _gnutls_x509_crt_get_raw_dn2( gnutls_x509_crt cert,
 
 	result = asn1_der_decoding(&c2, signed_data.data, signed_data.size, NULL);
 	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		result = _gnutls_asn2err(result);
@@ -1310,6 +1381,7 @@ int result;
   * @seq: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
   * @ret: is the place where the distribution point will be copied to
   * @ret_size: holds the size of ret.
+  * @reason_flags: Revocation reasons flags.
   * @critical: will be non zero if the extension is marked as critical (may be null)
   *
   * This function will return the CRL distribution points (2.5.29.31), contained in the
@@ -1327,7 +1399,8 @@ int result;
   *
   **/
 int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert, 
-	unsigned int seq, void *ret, size_t *ret_size, unsigned int *critical)
+	unsigned int seq, void *ret, size_t *ret_size, 
+	unsigned int* reason_flags, unsigned int *critical)
 {
 	int result;
 	gnutls_datum dist_points = {NULL, 0};
@@ -1337,6 +1410,7 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 	int len;
 	char num[MAX_INT_DIGITS];
 	gnutls_x509_subject_alt_name type;
+	uint8 reasons[2];
 
 	if (cert==NULL) {
 		gnutls_assert();
@@ -1345,6 +1419,8 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 
 	if (ret) memset(ret, 0, *ret_size);
 	else *ret_size = 0;
+	
+	if (reason_flags) *reason_flags = 0;
 
 	result =
 	     _gnutls_x509_crt_get_extension(cert, "2.5.29.31", 0, &dist_points, critical);
@@ -1370,9 +1446,6 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 	_gnutls_free_datum( &dist_points);
 
 	if (result != ASN1_SUCCESS) {
-		/* couldn't decode DER */
-
-		_gnutls_x509_log("X509 certificate: Decoding error %d\n", result);
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
@@ -1398,6 +1471,28 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
+
+
+	/* Read the CRL reasons.
+	 */
+	if (reason_flags) {
+		_gnutls_str_cpy( name, sizeof(name), "dn.?");
+		_gnutls_str_cat( name, sizeof(name), num);
+		_gnutls_str_cat( name, sizeof(name), ".reasons");
+
+		len = sizeof(reasons);
+		result =
+		     asn1_read_value(c2, name, reasons, &len);
+
+		if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			return _gnutls_asn2err(result);
+		}
+		
+		*reason_flags = reasons[0] | (reasons[1] << 8);
+	}
+	
 
 	type = _gnutls_x509_san_find_type( ext_data);
 	if (type == (gnutls_x509_subject_alt_name)-1) {

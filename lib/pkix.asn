@@ -208,10 +208,6 @@ WriteableDistributionPointName ::= CHOICE {
      fullName                [0]     ANY,
      nameRelativeToCRLIssuer [1]     RelativeDistinguishedName }
 
-
-
-
-
 ReasonFlags ::= BIT STRING {
      unused                  (0),
      keyCompromise           (1),
@@ -219,7 +215,9 @@ ReasonFlags ::= BIT STRING {
      affiliationChanged      (3),
      superseded              (4),
      cessationOfOperation    (5),
-     certificateHold         (6) }
+     certificateHold         (6),
+     privilegeWithdrawn      (7),
+     aACompromise            (8) }
 
 -- extended key usage extension OID and syntax
 

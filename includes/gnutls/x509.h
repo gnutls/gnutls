@@ -73,8 +73,25 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
 	unsigned char* output_data, size_t* output_data_size);
+
+int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void* ret,
+        size_t* ret_size, unsigned int* critical);
+
+#define GNUTLS_CRL_REASON_UNUSED 128
+#define GNUTLS_CRL_REASON_KEY_COMPROMISE 64
+#define GNUTLS_CRL_REASON_CA_COMPROMISE 32
+#define GNUTLS_CRL_REASON_AFFILIATION_CHANGED 16
+#define GNUTLS_CRL_REASON_SUPERSEEDED 8
+#define GNUTLS_CRL_REASON_CESSATION_OF_OPERATION 4
+#define GNUTLS_CRL_REASON_CERTIFICATE_HOLD 2
+#define GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN 1
+#define GNUTLS_CRL_REASON_AA_COMPROMISE 32768
+
 int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert, 
-	unsigned int seq, void *ret, size_t *ret_size, unsigned int *critical);
+	unsigned int seq, void *ret, size_t *ret_size, unsigned int* reason_flags,
+	unsigned int *critical);
+int gnutls_x509_crt_set_crl_dist_points(gnutls_x509_crt crt, gnutls_x509_subject_alt_name type,
+	const void* data_string, unsigned int reason_flags);
 
 time_t gnutls_x509_crt_get_activation_time(gnutls_x509_crt cert);
 time_t gnutls_x509_crt_get_expiration_time(gnutls_x509_crt cert);
@@ -122,8 +139,11 @@ int gnutls_x509_crt_sign(gnutls_x509_crt crt, gnutls_x509_crt issuer,
 	gnutls_x509_privkey issuer_key);
 int gnutls_x509_crt_set_activation_time(gnutls_x509_crt cert, time_t act_time);
 int gnutls_x509_crt_set_expiration_time(gnutls_x509_crt cert, time_t exp_time);
-int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const unsigned char* serial, 
+int gnutls_x509_crt_set_serial(gnutls_x509_crt cert, const void* serial, 
 	size_t serial_size);
+
+int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert, const void* id, 
+	size_t id_size);
 
 
 /* RDN handling 
