@@ -44,7 +44,7 @@ int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
    int dnsnamesize;
    int found_dnsname = 0;
    int ret = 0;
-   gnutls_DN dn;
+   gnutls_x509_dn dn;
    int i = 0;
 
    /* try matching against:

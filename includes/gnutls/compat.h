@@ -1,5 +1,9 @@
 /* defines for compatibility with older versions.
  */
+
+#define gnutls_DN gnutls_x509_dn
+#define GNUTLS_X509_SUBJECT_ALT_NAME gnutls_x509_subject_alt_name
+
 #define GNUTLS_RSA_PARAMS gnutls_rsa_params
 #define GNUTLS_DH_PARAMS gnutls_dh_params
 #define GNUTLS_STATE gnutls_session

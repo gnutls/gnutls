@@ -21,7 +21,6 @@ typedef struct {
 	char state_or_province_name[GNUTLS_X509_S_SIZE];
 	char email[GNUTLS_X509_EMAIL_SIZE];
 } gnutls_x509_dn;
-#define gnutls_DN gnutls_x509_dn
 
 typedef struct {
 	char name[GNUTLS_X509_CN_SIZE];
@@ -32,21 +31,6 @@ typedef enum gnutls_x509_subject_alt_name {
 	GNUTLS_SAN_DNSNAME=1, GNUTLS_SAN_RFC822NAME,
 	GNUTLS_SAN_URI, GNUTLS_SAN_IPADDRESS
 } gnutls_x509_subject_alt_name;
-#define GNUTLS_X509_SUBJECT_ALT_NAME gnutls_x509_subject_alt_name
-
-/* For key Usage, test as:
- * if (st.keyUsage & X509KEY_DIGITAL_SIGNATURE) ...
- */
-#define GNUTLS_X509KEY_DIGITAL_SIGNATURE 	256
-#define GNUTLS_X509KEY_NON_REPUDIATION		128
-#define GNUTLS_X509KEY_KEY_ENCIPHERMENT		64
-#define GNUTLS_X509KEY_DATA_ENCIPHERMENT	32
-#define GNUTLS_X509KEY_KEY_AGREEMENT		16
-#define GNUTLS_X509KEY_KEY_CERT_SIGN		8
-#define GNUTLS_X509KEY_CRL_SIGN			4
-#define GNUTLS_X509KEY_ENCIPHER_ONLY		2
-#define GNUTLS_X509KEY_DECIPHER_ONLY		1
-
 
 # ifdef LIBGNUTLS_VERSION /* These are defined only in gnutls.h */
 

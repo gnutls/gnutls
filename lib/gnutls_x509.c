@@ -200,7 +200,7 @@ ASN1_TYPE tmpasn;
 }
 
 static int _IREAD(ASN1_TYPE rasn, char* name, const char *OID, 
-	gnutls_DN *dn)
+	gnutls_x509_dn *dn)
 {
 	int result, len;
 	char str[1024];
@@ -265,7 +265,7 @@ void _gnutls_int2str(unsigned int k, char *data)
  * (they're complex enough)
  * --nmav
  */
-int _gnutls_x509_get_name_type(ASN1_TYPE rasn, const char *root, gnutls_DN * dn)
+int _gnutls_x509_get_name_type(ASN1_TYPE rasn, const char *root, gnutls_x509_dn * dn)
 {
 	int k, k2, result, len;
 	char name[128], str[1024], name2[128], counter[MAX_INT_DIGITS],
@@ -567,7 +567,7 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 	return 0;
 }
 
-static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
+static gnutls_x509_subject_alt_name _find_type( char* str_type) {
 	if (strcmp( str_type, "dNSName")==0) return GNUTLS_SAN_DNSNAME;
 	if (strcmp( str_type, "rfc822Name")==0) return GNUTLS_SAN_RFC822NAME;
 	if (strcmp( str_type, "uniformResourceIdentifier")==0) return GNUTLS_SAN_URI;
@@ -2215,41 +2215,43 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 int _gnutls_check_x509_key_usage( const gnutls_cert * cert,
 				    gnutls_kx_algorithm alg)
 {
+	uint16 keyUsage;
+	int encipher_type;
+
+	if ( cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INTERNAL_ERROR;
+	}
 
 	/* FIXME: check here */
 	if (_gnutls_map_kx_get_cred(alg, 1) == GNUTLS_CRD_CERTIFICATE ||
 		_gnutls_map_kx_get_cred(alg, 0) == GNUTLS_CRD_CERTIFICATE) 
 	{
-		switch (alg) {
-		case GNUTLS_KX_RSA:
-			if (cert->keyUsage != 0) {
-				if (!
-				    (cert->
-				     keyUsage & GNUTLS_X509KEY_KEY_ENCIPHERMENT))
+
+		keyUsage = cert->keyUsage;
+		encipher_type = _gnutls_kx_encipher_type( alg);
+		
+		if (keyUsage != 0 && encipher_type != CIPHER_IGN) {
+			/* If keyUsage has been set in the certificate
+			 */
+
+			if ( encipher_type == CIPHER_ENCRYPT) {
+				/* If the key exchange method requires an encipher
+				 * type algorithm, and key's usage does not permit
+				 * encipherment, then fail.
+				 */
+				if (!(keyUsage & KEY_KEY_ENCIPHERMENT))
 					return
 					    GNUTLS_E_KEY_USAGE_VIOLATION;
-				else
-					return 0;
 			}
-			return 0;
-		case GNUTLS_KX_SRP_RSA:
-		case GNUTLS_KX_SRP_DSS:
-		case GNUTLS_KX_DHE_RSA:
-		case GNUTLS_KX_DHE_DSS:
-		case GNUTLS_KX_RSA_EXPORT:
-			if (cert->keyUsage != 0) {
-				if (!
-				    (cert->
-				     keyUsage & GNUTLS_X509KEY_DIGITAL_SIGNATURE))
+
+			if ( encipher_type == CIPHER_SIGN) { 
+				/* The same as above, but for sign only keys
+				 */
+				if (!(keyUsage & KEY_DIGITAL_SIGNATURE))
 					return
 					    GNUTLS_E_KEY_USAGE_VIOLATION;
-				else
-					return 0;
 			}
-			return 0;
-		default:
-			gnutls_assert();
-			return GNUTLS_E_INTERNAL_ERROR;
 		}
 	}
 	return 0;

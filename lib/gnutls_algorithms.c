@@ -182,12 +182,15 @@ const int _gnutls_kx_algorithms_size = MAX_KX_ALGOS;
 
 gnutls_kx_algo_entry _gnutls_kx_algorithms[MAX_KX_ALGOS] = {
 #ifdef ENABLE_ANON
-	{ "Anon DH", GNUTLS_KX_ANON_DH, &anon_auth_struct },
+	{ "Anon DH", GNUTLS_KX_ANON_DH, CIPHER_IGN, &anon_auth_struct },
 #endif
-	{ "RSA", GNUTLS_KX_RSA, &rsa_auth_struct },
-	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct },
-	{ "DHE RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct },
-	{ "DHE DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct },
+	{ "RSA", GNUTLS_KX_RSA, CIPHER_ENCRYPT, &rsa_auth_struct },
+	{ "RSA EXPORT", GNUTLS_KX_RSA_EXPORT, CIPHER_SIGN, &rsa_export_auth_struct },
+	{ "DHE RSA", GNUTLS_KX_DHE_RSA, CIPHER_SIGN, &dhe_rsa_auth_struct },
+	{ "DHE DSS", GNUTLS_KX_DHE_DSS, CIPHER_SIGN, &dhe_dss_auth_struct },
+	/* other algorithms are appended here by gnutls-extra
+	 * initialization function.
+	 */
 	{0}
 };
 
@@ -681,6 +684,14 @@ MOD_AUTH_STRUCT *_gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm)
 {
 	MOD_AUTH_STRUCT *ret = NULL;
 	GNUTLS_KX_ALG_LOOP(ret = p->auth_struct);
+	return ret;
+
+}
+
+int _gnutls_kx_encipher_type(gnutls_kx_algorithm algorithm)
+{
+	int ret = CIPHER_IGN;
+	GNUTLS_KX_ALG_LOOP(ret = p->encipher_type);
 	return ret;
 
 }

@@ -159,7 +159,7 @@ gnutls_datum tmpdata;
 
 	if ( cert != NULL)
 	   if ( cert->keyUsage != 0)
-		if ( !(cert->keyUsage & GNUTLS_X509KEY_DIGITAL_SIGNATURE)) {
+		if ( !(cert->keyUsage & KEY_DIGITAL_SIGNATURE)) {
 			gnutls_assert();
 			return GNUTLS_E_KEY_USAGE_VIOLATION;
 		}
@@ -213,7 +213,7 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
 	 */
 	if ( cert != NULL)
 	   if ( cert->keyUsage != 0)
-		if ( !(cert->keyUsage & GNUTLS_X509KEY_DIGITAL_SIGNATURE)) {
+		if ( !(cert->keyUsage & KEY_DIGITAL_SIGNATURE)) {
 			gnutls_assert();
 			return GNUTLS_E_KEY_USAGE_VIOLATION;
 		}

@@ -22,6 +22,19 @@
 # error INCREASE MAX_PARAMS
 #endif
 
+/* For key Usage, test as:
+ * if (st.keyUsage & KEY_DIGITAL_SIGNATURE) ...
+ */
+#define KEY_DIGITAL_SIGNATURE 		256
+#define KEY_NON_REPUDIATION		128
+#define KEY_KEY_ENCIPHERMENT		64
+#define KEY_DATA_ENCIPHERMENT		32
+#define KEY_KEY_AGREEMENT		16
+#define KEY_KEY_CERT_SIGN		8
+#define KEY_CRL_SIGN			4
+#define KEY_ENCIPHER_ONLY		2
+#define KEY_DECIPHER_ONLY		1
+
 typedef struct gnutls_cert {
 	MPI params[MAX_PARAMS_SIZE];	/* the size of params depends on the public 
 				 * key algorithm 
@@ -44,7 +57,7 @@ typedef struct gnutls_cert {
 	int	   version; /* 1,2,3 
  	                     */
  	
- 	uint16	   keyUsage; /* bits from X509KEY_* 
+ 	uint16	   keyUsage; /* bits from KEY_* 
  	                      */
  	
 	int        CA;    /* 0 if the certificate does not belong to

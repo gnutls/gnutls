@@ -60,6 +60,7 @@ const char *gnutls_cipher_get_name(gnutls_cipher_algorithm algorithm);
 
 /* functions for key exchange */
 int _gnutls_kx_priority(gnutls_session session, gnutls_kx_algorithm algorithm);
+int _gnutls_kx_encipher_type(gnutls_kx_algorithm algorithm);
 
 MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(gnutls_kx_algorithm algorithm);
 const char *gnutls_kx_get_name(gnutls_kx_algorithm algorithm);
@@ -80,9 +81,18 @@ int _gnutls_compression_get_wbits(gnutls_compression_method algorithm);
 gnutls_kx_algorithm _gnutls_map_kx_get_kx(gnutls_credentials_type type, int server);
 gnutls_credentials_type _gnutls_map_kx_get_cred(gnutls_kx_algorithm algorithm, int server);
 
+enum encipher_type { CIPHER_ENCRYPT=0, CIPHER_SIGN=1, CIPHER_IGN };
+
 struct gnutls_kx_algo_entry {
 	const char *name;
 	gnutls_kx_algorithm algorithm;
+	enum encipher_type encipher_type; /* CIPHER_ENCRYPT if this algorithm is to be used
+			    * for encryption, CIPHER_SIGN if signature only,
+			    * CIPHER_IGN if this does not apply at all.
+			    *
+			    * This is useful to certificate cipher suites, which check
+			    * against the certificate key usage bits.
+			    */
 	MOD_AUTH_STRUCT *auth_struct;
 };
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
