@@ -629,45 +629,11 @@ const char* pk;
 
 	/* Step 3. Write the signatureAlgorithm field.
 	 */
-	pk = _gnutls_x509_sign2oid( key->pk_algorithm, GNUTLS_MAC_SHA);
-	if (pk == NULL) {
+	result = _gnutls_x509_write_sig_params( crq->crq, "signatureAlgorithm",
+		key->pk_algorithm, key->params, key->params_size);
+	if (result < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
-	}
-
-	/* write the RSA OID
-	 */
-	result = asn1_write_value( crq->crq, "signatureAlgorithm.algorithm", pk, 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	if (key->pk_algorithm == GNUTLS_PK_DSA) {
-		gnutls_datum der;
-
-		result = _gnutls_x509_write_dsa_params( key->params, key->params_size, &der);
-		if (result < 0) {
-			gnutls_assert();
-			return result;
-		}
-
-		result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", der.data, der.size);
-		_gnutls_free_datum( &der);
-
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			return _gnutls_asn2err(result);
-		}
-		
-	} else {
-		/* RSA so disable the parameters.
-		 */
-		result = asn1_write_value( crq->crq, "signatureAlgorithm.parameters", NULL, 0);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			return _gnutls_asn2err(result);
-		}
+		return result;
 	}
 
 	return 0;

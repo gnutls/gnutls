@@ -459,6 +459,34 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
 	return 0;		
 }
 
+/* Hashes input data and verifies a DSA signature.
+ */
+static int
+dsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature, 
+	GNUTLS_MPI *params, int params_len)
+{
+	int ret;
+	opaque _digest[MAX_HASH_SIZE];
+	gnutls_datum digest;
+	GNUTLS_HASH_HANDLE hd;
+
+	hd = _gnutls_hash_init( GNUTLS_MAC_SHA);
+	if (hd == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_HASH_FAILED;
+	}
+	
+	_gnutls_hash( hd, text->data, text->size);
+	_gnutls_hash_deinit( hd, _digest);
+
+	digest.data = _digest;
+	digest.size = 20;
+
+	ret = _gnutls_dsa_verify( &digest, signature, params, params_len);
+
+	return ret;
+}
+
 /* Verifies the signature data, and returns 0 if not verified,
  * or 1 otherwise.
  */
@@ -479,7 +507,7 @@ static int verify_sig( const gnutls_datum* tbs, const gnutls_datum* signature,
 			break;
 
 		case GNUTLS_PK_DSA:
-			if (_gnutls_dsa_verify( tbs, signature, issuer_params, issuer_params_size)!=0) {
+			if (dsa_verify_sig( tbs, signature, issuer_params, issuer_params_size)!=0) {
 				gnutls_assert();
 				return 0;
 			}

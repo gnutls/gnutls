@@ -331,6 +331,68 @@ cleanup:
 }
 
 /*
+ * This function writes and encodes the parameters for DSS or RSA keys.
+ * This is the "signatureAlgorithm" fields.
+ */
+int _gnutls_x509_write_sig_params( ASN1_TYPE dst, const char* dst_name,
+	gnutls_pk_algorithm pk_algorithm, GNUTLS_MPI * params, int params_size)
+{
+gnutls_datum der;
+int result;
+char name[128];
+const char* pk;
+
+	_gnutls_str_cpy( name, sizeof(name), dst_name);
+	_gnutls_str_cat( name, sizeof(name), ".algorithm");
+
+	pk = _gnutls_x509_sign2oid( pk_algorithm, GNUTLS_MAC_SHA);
+	if (pk == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+	
+	/* write the OID.
+	 */
+	result = asn1_write_value( dst, name, pk, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+
+	_gnutls_str_cpy( name, sizeof(name), dst_name);
+	_gnutls_str_cat( name, sizeof(name), ".parameters");
+	
+	if (pk_algorithm == GNUTLS_PK_DSA) {
+		result = _gnutls_x509_write_dsa_params( params, params_size, &der);
+		if (result < 0) {
+			gnutls_assert();
+			return result;
+		}
+		
+		result = asn1_write_value( dst, name, der.data, der.size);
+		_gnutls_free_datum( &der);
+		
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+	} else { /* RSA */
+		result = asn1_write_value( dst, name, NULL, 0);
+
+		if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND) {
+			/* Here we ignore the element not found error, since this
+			 * may have been disabled before.
+			 */
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
+	}
+
+	return 0;
+}
+
+/*
  * This function writes the parameters for DSS keys.
  * Needs 3 parameters (p,q,g).
  *
