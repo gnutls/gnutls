@@ -143,7 +143,6 @@ typedef struct {
 	const opaque * data;
 	unsigned int size;
 } gnutls_const_datum;
-typedef gnutls_datum gnutls_sdatum;
 
 #include <gnutls_buffer.h>
 
@@ -227,7 +226,7 @@ typedef struct AUTH_CRED {
 
 struct GNUTLS_KEY_INT {
 	/* For DH KX */
-	gnutls_sdatum			key;
+	gnutls_datum			key;
 	MPI				KEY;
 	MPI				client_Y;
 	MPI				client_g;

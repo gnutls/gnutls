@@ -191,7 +191,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext,
  * params is modulus, public exp., private key
  * Can decrypt block type 1 and type 2 packets.
  */
-int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext,
+int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext,
 			      gnutls_datum ciphertext, GNUTLS_MPI* params, uint params_len,
 			      uint btype)
 {

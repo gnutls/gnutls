@@ -209,7 +209,7 @@ const gnutls_certificate_credentials cred;
 
 int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _data_size)
 {
-	gnutls_sdatum plaintext = { NULL, 0 };
+	gnutls_datum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
 	GNUTLS_MPI *params;
@@ -272,13 +272,8 @@ int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, size_t _da
 	}
 
 	if (randomize_key != 0) {
-		/* if the pkcs1 padding check failed, no need for
-		 * that. That's why it has been initialized to zero.
-		 */
-		_gnutls_free_datum( &plaintext);
-
 		RANDOMIZE_KEY(session->key->key,
-			      gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
+			      gnutls_malloc, GNUTLS_STRONG_RANDOM);
 
 	} else {
 		session->key->key.data = plaintext.data;
