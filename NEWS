@@ -1,8 +1,9 @@
-Version 0.8.2
+Version 0.9.0
 - The library notifies the application on empty and illegal SRP usernames, 
   so that proper notification (via an alert) is sent to the peer.
 - Added ability to send some messages back to the application using
   the gnutls_global_set_log_function().
+- This version is not binary compatible with the previous ones.
 
 Version 0.8.1 (22/01/2003)
 - Improved the SRP support, to prevent attackers guessing the

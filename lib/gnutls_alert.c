@@ -135,12 +135,17 @@ int _level = -1;
 	switch (err) { /* send appropriate alert */
 		case GNUTLS_E_DECRYPTION_FAILED:
 			/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
-			 * it is not defined in SSL3.
+			 * it is not defined in SSL3. Note that we must
+			 * not distinguish Decryption failures from mac
+			 * check failures, due to the possibility of some 
+			 * attacks.
 			 */
 			ret = GNUTLS_A_BAD_RECORD_MAC;
 			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_EMPTY_SRP_USERNAME:
+			/* FIXME: needs to be changed
+			 */
 			ret = GNUTLS_A_ACCESS_DENIED;
 			_level = GNUTLS_AL_FATAL;
 			break;
@@ -149,6 +154,7 @@ int _level = -1;
 			_level = GNUTLS_AL_FATAL;
 			break;
 		case GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER:
+		case GNUTLS_E_ILLEGAL_SRP_USERNAME:
                         ret = GNUTLS_A_ILLEGAL_PARAMETER;
 			_level = GNUTLS_AL_FATAL;
                         break;
