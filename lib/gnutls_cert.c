@@ -1069,7 +1069,7 @@ void gnutls_x509pki_server_set_cert_request(GNUTLS_STATE state,
   * by one of these CAs. These names are DER encoded. To get a more
   * meaningful value use the function gnutls_x509pki_extract_dn().
   *
-  * This function specifies what we (in case of a client) are going
+  * This function specifies what we, in case of a client, are going
   * to do when we have to send a certificate. If this callback
   * function is not provided then gnutls will automaticaly try to
   * find an appropriate certificate to send.
@@ -1087,8 +1087,8 @@ void gnutls_x509pki_server_set_cert_request(GNUTLS_STATE state,
   * only to the return value of the callback function.
   *
   * The callback function should return the index of the certificate
-  * choosen by the user (or -1 to indicate that the user
-  * does not want to use client authentication).
+  * choosen by the user. -1 indicates that the user
+  * does not want to use client authentication.
   *
   * This function returns 0 on success.
   **/
@@ -1110,7 +1110,7 @@ void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
   * 'server_cert' contains 'ncerts' gnutls_datum structures which hold
   * the DER encoded X.509 certificates of the server. 
   *
-  * This function specifies what we (in case of a server) are going
+  * This function specifies what we, in case of a server, are going
   * to do when we have to send a certificate. If this callback
   * function is not provided then gnutls will automaticaly try to
   * find an appropriate certificate to send. (actually send the first in the list)
@@ -1121,7 +1121,7 @@ void gnutls_x509pki_set_client_cert_callback(GNUTLS_STATE state,
   *
   * The callback function will only be called once per handshake.
   * The callback function should return the index of the certificate
-  * choosen by the server (or -1 in case of an error)
+  * choosen by the server. -1 indicates an error.
   *
   **/
 void gnutls_x509pki_set_server_cert_callback(GNUTLS_STATE state,

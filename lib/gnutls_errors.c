@@ -108,7 +108,7 @@ static gnutls_error_entry error_algorithms[] = {
 
 
 /**
-  * gnutls_is_fatal_error - Returns non-zero in case of a fatal error
+  * gnutls_error_is_fatal - Returns non-zero in case of a fatal error
   * @error: is an error returned by a gnutls function. Error should be a negative value.
   *
   * If a function returns a negative value you may feed that value
@@ -117,7 +117,7 @@ static gnutls_error_entry error_algorithms[] = {
   * error code manualy, since some non-fatal errors to the protocol
   * may be fatal for you (your program).
   **/
-int gnutls_is_fatal_error(int error)
+int gnutls_error_is_fatal(int error)
 {
 	int ret = 0;
 

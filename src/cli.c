@@ -363,7 +363,7 @@ int main(int argc, char** argv)
 			} while( ret==GNUTLS_E_INTERRUPTED || ret==GNUTLS_E_AGAIN);
 			/* remove new line */
 
-			if (gnutls_is_fatal_error(ret) == 1 || ret==0) {
+			if (gnutls_error_is_fatal(ret) == 1 || ret==0) {
 				if (ret == 0) {
 					printf("- Peer has closed the GNUTLS connection\n");
 					break;

@@ -85,7 +85,7 @@ typedef struct gnutls_private_key gnutls_private_key;
 /* internal functions */
 
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end);
-int gnutls_deinit(GNUTLS_STATE state);
+void gnutls_deinit(GNUTLS_STATE state);
 int gnutls_bye( GNUTLS_STATE state, CloseRequest how);
 
 int gnutls_handshake( GNUTLS_STATE state);
@@ -111,7 +111,9 @@ const char *gnutls_kx_get_name( KXAlgorithm algorithm);
 
 
 /* error functions */
-int gnutls_is_fatal_error( int error);
+int gnutls_error_is_fatal( int error);
+#define gnutls_is_fatal_error(x) gnutls_error_is_fatal(x)
+
 void gnutls_perror( int error);
 const char* gnutls_strerror( int error);
 
@@ -237,8 +239,11 @@ void gnutls_transport_set_lowat( GNUTLS_STATE state, int num);
 
 typedef void (*LOG_FUNC)( const char*);
 
-void gnutls_transport_set_push_function( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
-void gnutls_transport_set_pull_function( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
+void gnutls_transport_set_push_func( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
+void gnutls_transport_set_pull_func( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
+
+#define gnutls_transport_set_push_function gnutls_transport_set_push_func
+#define gnutls_transport_set_pull_function gnutls_transport_set_pull_func
 
 size_t gnutls_record_get_max_size( GNUTLS_STATE state);
 size_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);

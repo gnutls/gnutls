@@ -1630,7 +1630,7 @@ int _gnutls_recv_hello(GNUTLS_STATE state, char *data, int datalen)
   * If the client does not wish to renegotiate parameters he
   * will reply with an alert message, thus the return code will be
   * GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
-  * GNUTLS_NO_RENEGOTIATION.
+  * GNUTLS_A_NO_RENEGOTIATION.
   **/
 int gnutls_rehandshake(GNUTLS_STATE state)
 {
@@ -1697,7 +1697,7 @@ int gnutls_handshake(GNUTLS_STATE state)
 
 #define IMED_RET( str, ret) \
 	if (ret < 0) { \
-		if (gnutls_is_fatal_error(ret)==0) return ret; \
+		if (gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
 		gnutls_clear_handshake_buffer(state); \

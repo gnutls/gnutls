@@ -74,7 +74,8 @@ int gnutls_session_get_data( GNUTLS_STATE state, opaque* session, int *session_s
   *
   * Returns the current session id. This can be used if you want to check if
   * the next session you tried to resume was actually resumed.
-  * (resumed sessions have the same sessionID with the first session)
+  * This is because resumed sessions have the same sessionID with the 
+  * original session.
   *
   * Session id is some data set by the server, that identify the current session. 
   * In TLS 1.0 session id should not be more than 32 bytes.

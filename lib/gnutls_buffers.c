@@ -391,7 +391,7 @@ ssize_t _gnutls_read_buffered( GNUTLS_STATE state, opaque **iptr, size_t sizeOfP
 		/* return immediately if we got an interrupt or eagain
 		 * error.
 		 */
-		if (ret < 0 && gnutls_is_fatal_error(ret)==0) {
+		if (ret < 0 && gnutls_error_is_fatal(ret)==0) {
 			return ret;
 		}
 	}
@@ -415,7 +415,7 @@ ssize_t _gnutls_read_buffered( GNUTLS_STATE state, opaque **iptr, size_t sizeOfP
 	if (ret == (recvdata - recvlowat) && recvlowat > 0) {
 		ret2 = _gnutls_read( state, &buf[buf_pos], recvlowat, MSG_PEEK);
 
-		if (ret2 < 0 && gnutls_is_fatal_error(ret2)==0) {
+		if (ret2 < 0 && gnutls_error_is_fatal(ret2)==0) {
 			return ret2;
 		}
 

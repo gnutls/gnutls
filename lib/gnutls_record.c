@@ -169,7 +169,7 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
   *
   * This function clears all buffers associated with the &state.
   **/
-int gnutls_deinit(GNUTLS_STATE state)
+void gnutls_deinit(GNUTLS_STATE state)
 {
 	/* if the session has failed abnormally it has to be removed from the db */
 	if ( state->gnutls_internals.resumable==RESUME_FALSE) {
@@ -240,7 +240,8 @@ int gnutls_deinit(GNUTLS_STATE state)
 
 	memset( state, 0, sizeof(struct GNUTLS_STATE_INT));
 	gnutls_free(state);
-	return 0;
+
+	return;
 }
 
 inline
@@ -487,13 +488,13 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   * In case of GNUTLS_SHUT_RDWR then the TLS connection gets terminated and
   * further receives and sends will be disallowed. If the return
   * value is zero you may continue using the connection.
-  * (GNUTLS_SHUT_RDWR actually sends an alert containing a close request
-  * and waits for the peer to reply with the same message)
+  * GNUTLS_SHUT_RDWR actually sends an alert containing a close request
+  * and waits for the peer to reply with the same message.
   *
   * In case of GNUTLS_SHUT_WR then the TLS connection gets terminated and
   * further sends will be disallowed. In order to reuse the connection
   * you should wait for an EOF from the peer.
-  * (GNUTLS_SHUT_WR sends an alert containing a close request)
+  * GNUTLS_SHUT_WR sends an alert containing a close request.
   *
   * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
   *
@@ -626,7 +627,7 @@ ssize_t gnutls_send_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 
 	if ( ret != cipher_size) {
 		gnutls_free( cipher);
-		if ( ret < 0 && gnutls_is_fatal_error(ret)==0) {
+		if ( ret < 0 && gnutls_error_is_fatal(ret)==0) {
 			/* If we have sent any data then return
 			 * that value.
 			 */
@@ -748,7 +749,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	 * must be set to non blocking mode
 	 */
 	if ( (ret = _gnutls_read_buffered( state, &headers, header_size, -1)) != header_size) {
-		if (ret < 0 && gnutls_is_fatal_error(ret)==0) return ret;
+		if (ret < 0 && gnutls_error_is_fatal(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) {
@@ -832,7 +833,7 @@ ssize_t gnutls_recv_int( GNUTLS_STATE state, ContentType type, HandshakeType hty
 	/* check if we have that data into buffer. 
  	 */
 	if ( (ret = _gnutls_read_buffered( state, &recv_data, header_size+length, recv_type)) != length+header_size) {
-		if (ret<0 && gnutls_is_fatal_error(ret)==0) return ret;
+		if (ret<0 && gnutls_error_is_fatal(ret)==0) return ret;
 
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;

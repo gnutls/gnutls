@@ -195,7 +195,7 @@ int main()
          bzero(buffer, MAX_BUF + 1);
          ret = gnutls_read( state, buffer, MAX_BUF);
 
-         if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
+         if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
             if (ret == 0) {
                printf
                    ("\n- Peer has closed the GNUTLS connection\n");

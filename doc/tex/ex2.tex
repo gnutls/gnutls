@@ -105,7 +105,7 @@ int main()
    gnutls_write( state, MSG, strlen(MSG));
 
    ret = gnutls_read( state, buffer, MAX_BUF);
-   if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
+   if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
       if (ret == 0) {
          printf("- Peer has closed the GNUTLS connection\n");
          goto end;
@@ -119,7 +119,7 @@ int main()
          printf("* Received alert [%d]\n", gnutls_alert_get_last(state));
       if (ret == GNUTLS_E_REHANDSHAKE)
          printf("* Received HelloRequest message (server asked to rehandshake)\n");
-         gnutls_send_appropriate_alert( state, ret); /* we don't want rehandshake */
+         gnutls_alert_send_appropriate( state, ret); /* we don't want rehandshake */
    }
 
    if (ret > 0) {

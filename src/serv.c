@@ -424,7 +424,7 @@ int main(int argc, char **argv)
 			bzero(buffer, MAX_BUF + 1);
 			ret = read_request( state, buffer, MAX_BUF, (http==0)?1:2);
 
-			if (gnutls_is_fatal_error(ret) == 1 || ret == 0) {
+			if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
 				fflush(stdout);
 				if (ret == 0) {
 					printf
