@@ -65,7 +65,7 @@ int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
 
    ret = gnutls_pkcs12_bag_set_data(key_bag,
                                     GNUTLS_BAG_PKCS8_ENCRYPTED_KEY,
-                                    &pkcs8_key);
+                                    pkcs8_key);
    if (ret < 0) {
       fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
       exit(1);
@@ -102,7 +102,7 @@ int write_pkcs12(const gnutls_datum * cert, const gnutls_datum * pkcs8_key,
        gnutls_pkcs12_export(pkcs12, GNUTLS_X509_FMT_DER, pkcs12_struct,
                             &pkcs12_struct_size);
    if (ret < 0) {
-      fprintf(stderr, "ret: %s\n", gnutls_strerror(size));
+      fprintf(stderr, "ret: %s\n", gnutls_strerror(ret));
       exit(1);
    }
 

@@ -40,6 +40,9 @@ int gnutls_pkcs12_init(gnutls_pkcs12 * pkcs12);
 void gnutls_pkcs12_deinit(gnutls_pkcs12 pkcs12);
 int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format, unsigned int flags);
+int gnutls_pkcs12_export( gnutls_pkcs12 pkcs12,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+
 int gnutls_pkcs12_get_bag(gnutls_pkcs12 pkcs12, 
 	int indx, gnutls_pkcs12_bag bag);
 int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag);

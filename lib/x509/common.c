@@ -595,17 +595,20 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 		if (output_data == NULL) *output_data_size = 0;
 
 		len = *output_data_size;
-	
+
 		if ((result=asn1_der_coding( asn1_data, "", output_data, &len, NULL)) != ASN1_SUCCESS) 
 		{
 			*output_data_size = len;
-
-			if (result == ASN1_MEM_ERROR)
+			if (result == ASN1_MEM_ERROR) {
+				gnutls_assert();
+				_gnutls_debug_log("Length required for der coding: %d\n", len);
 				return GNUTLS_E_SHORT_MEMORY_BUFFER;
-
+			}
 			gnutls_assert();
 			return _gnutls_asn2err(result);
 		}
+
+		*output_data_size = len;
 
 	} else { /* PEM */
 		opaque *tmp;
@@ -619,18 +622,16 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 
-{char err[1024];
-		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, err)) != ASN1_SUCCESS) {
+		if ((result=asn1_der_coding( asn1_data, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
-fprintf(stderr, "re: %s\n", err);
 			if (result == ASN1_MEM_ERROR) {
-				_gnutls_x509_log("Length required for der coding: %d\n", len);
+				_gnutls_debug_log("Length required for der coding: %d\n", len);
 				*output_data_size = B64FSIZE(strlen(pem_header),len);
 			}
 			gnutls_afree(tmp);
 			return _gnutls_asn2err(result);
 		}
-}
+
 		result = _gnutls_fbase64_encode( pem_header,
 						tmp, len, &out);
 
