@@ -483,7 +483,7 @@ leave:
 }
 
 /**
- * gnutls_openpgp_extract_certificate_issuer_dn - Extracts the userID
+ * gnutls_openpgp_extract_certificate_dn - Extracts the userID
  *
  * @cert: the raw data that contains the OpenPGP public key.
  * @dn: the structure to store the userID specific data in.
@@ -491,7 +491,7 @@ leave:
  * Extracts the userID from the raw OpenPGP key.
  **/
 int
-gnutls_openpgp_extract_certificate_issuer_dn( const gnutls_datum *cert,
+gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
                                               gnutls_dn *dn)
 {
   PKT pkt = NULL;

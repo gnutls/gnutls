@@ -75,6 +75,15 @@ int gnutls_x509_extract_subject_dns_name( const gnutls_datum*, char*, int*);
 
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length);
 
+/* Openpgp certificate stuff */
+int gnutls_openpgp_extract_certificate_dn( const gnutls_datum *cert,
+                                                  gnutls_dn *dn);
+int gnutls_openpgp_extract_certificate_version( const gnutls_datum *cert );
+time_t gnutls_openpgp_extract_certificate_activation_time( const gnutls_datum *cert );
+time_t gnutls_openpgp_extract_certificate_expiration_time( const gnutls_datum *cert );
+
+int gnutls_openpgp_verify_certificate( const gnutls_datum* cert_list, int cert_list_length);
+
 /* get data from the state */
 const gnutls_datum* gnutls_certificate_get_peers( GNUTLS_STATE, int* list_size);
 const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state);
