@@ -197,6 +197,9 @@ static inline
 
 
 /* 
+ * Verifies the given certificate again a certificate list of
+ * trusted CAs.
+ *
  * Returns only 0 or 1. If 1 it means that the certificate 
  * was successfuly verified.
  *
@@ -356,6 +359,10 @@ unsigned int _gnutls_x509_verify_certificate(
 	if (i - 1 < 0)
 	    break;
 
+        /* note that here we disable this V1 CA flag. So that no version 1
+         * certificates can exist in a supplied chain.
+         */
+        flags ^= GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
 	if ((ret =
 	     _gnutls_verify_certificate2(certificate_list[i-1],
                   &certificate_list[i], 1, flags, NULL)) == 0) {
