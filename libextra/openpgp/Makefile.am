@@ -1,11 +1,11 @@
-INCLUDES = -I../ -I../../includes/
+INCLUDES = -I../ -I../../includes/ -I../../lib
 EXTRA_DIST = openpgp.h
 
 noinst_LTLIBRARIES = libpgp.la
 
 COBJECTS = openpgp.c xml.c gnutls_openpgp.c
 
-libx509_la_SOURCES = $(COBJECTS)
+libpgp_la_SOURCES = $(COBJECTS)
 
 pgp-api.tex: $(COBJECTS)
 	@echo "" > pgp-api.tex

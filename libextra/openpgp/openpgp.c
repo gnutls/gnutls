@@ -165,7 +165,7 @@ _gnutls_openpgp_count_key_names( gnutls_openpgp_key key)
 int
 gnutls_openpgp_key_get_name( gnutls_openpgp_key key, 
 	int idx,
-        char *buf, unsigned int *sizeof_buf)
+        char *buf, size_t *sizeof_buf)
 {
     cdk_kbnode_t ctx = NULL, p;
     CDK_PACKET *pkt = NULL;
@@ -384,12 +384,12 @@ gnutls_openpgp_key_get_id( gnutls_openpgp_key key,
   * Returns non zero on success, and zero on failure.
   *
   **/
-int gnutls_openpgp_key_check_hostname(gnutls_openpgp_key cert,
+int gnutls_openpgp_key_check_hostname(gnutls_openpgp_key key,
                                 const char *hostname)
 {
 
    char dnsname[MAX_CN];
-   int dnsnamesize;
+   size_t dnsnamesize;
    int ret = 0;
    int i = 0;
 

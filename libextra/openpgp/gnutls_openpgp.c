@@ -132,10 +132,10 @@ kbx_blob_release( keybox_blob *ctx )
 }
 
 
-static CDK_KEYDB_HD
+static cdk_keydb_hd_t
 kbx_to_keydb( keybox_blob *blob )
 {
-    CDK_KEYDB_HD hd;
+    cdk_keydb_hd_t hd;
     int rc;
 
     if( !blob ) {
@@ -145,8 +145,7 @@ kbx_to_keydb( keybox_blob *blob )
   
     switch( blob->type ) {
     case KBX_BLOB_FILE:
-        rc = cdk_keydb_new( &hd, blob->armored? CDK_DBTYPE_ARMORED:
-                            CDK_DBTYPE_KEYRING, blob->data, blob->size );
+        rc = cdk_keydb_new( &hd, CDK_DBTYPE_PK_KEYRING, blob->data, blob->size );
         break;
       
     case KBX_BLOB_DATA:
@@ -237,7 +236,7 @@ kbx_data_to_keyring( int type, int enc, const char *data,
 CDK_PACKET*
 search_packet( const gnutls_datum *buf, int pkttype )
 {
-    static CDK_KBNODE knode = NULL;
+    static cdk_kbnode_t knode = NULL;
     CDK_PACKET *pkt;
 
     if( !buf && !pkttype ) {
@@ -254,7 +253,7 @@ search_packet( const gnutls_datum *buf, int pkttype )
 
 
 static int
-stream_to_datum( CDK_STREAM inp, gnutls_datum *raw )
+stream_to_datum( cdk_stream_t inp, gnutls_datum *raw )
 {
     uint8 buf[4096];
     int rc = 0, nread, nbytes = 0;
@@ -281,7 +280,7 @@ stream_to_datum( CDK_STREAM inp, gnutls_datum *raw )
 
 
 static int
-openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdkPKT_public_key *pk )
+openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdk_pkt_pubkey_t pk )
 {
     uint8 buf[512];
     size_t nbytes = 0;
@@ -338,10 +337,10 @@ int
 _gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
                                 gnutls_datum *raw_key )
 {
-    CDK_KBNODE snode;
+    cdk_kbnode_t snode;
     CDK_PACKET *pkt;
-    CDK_STREAM out;
-    cdkPKT_secret_key *sk = NULL;
+    cdk_stream_t out;
+    cdk_pkt_seckey_t sk = NULL;
     int pke_algo, i, j;
     size_t nbytes = 0;
     uint8 buf[512];
@@ -419,7 +418,7 @@ leave:
 int
 _gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, const gnutls_datum *raw )
 {
-    CDK_KBNODE knode = NULL;
+    cdk_kbnode_t knode = NULL;
     CDK_PACKET *pkt = NULL;
     int rc;
   
@@ -460,9 +459,8 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
                         key_attr_t by, opaque *pattern )
 {
     keybox_blob *blob = NULL;
-    CDK_KEYDB_HD hd = NULL;
-    CDK_KBNODE knode = NULL;
-    CDK_DBSEARCH ks = NULL;
+    cdk_keydb_hd_t hd = NULL;
+    cdk_kbnode_t knode = NULL;
     unsigned long keyid[2];
     unsigned char *buf;
     void * desc;
@@ -491,13 +489,13 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
     }
     else
         desc = pattern;
-    rc = cdk_keydb_search_new( &ks, by, desc );
+    rc = cdk_keydb_search_start( hd, by, desc );
     if( rc ) {
         rc = _gnutls_map_cdk_rc( rc );
         goto leave;
     }
   
-    rc = cdk_keydb_search( hd, ks, &knode );
+    rc = cdk_keydb_search( hd, &knode );
     if( rc ) {
         rc = _gnutls_map_cdk_rc( rc );
         goto leave;
@@ -518,7 +516,6 @@ gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
 leave:
     cdk_free( hd );
     cdk_kbnode_release( knode );
-    cdk_keydb_search_free( ks );
     kbx_blob_release( blob );
     return rc;
 }
@@ -530,7 +527,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
                                         gnutls_datum *key )
 {
     gnutls_datum raw;
-    CDK_KBNODE knode = NULL, ctx = NULL, p;
+    cdk_kbnode_t knode = NULL, ctx = NULL, p;
     CDK_PACKET *pkt;
     int i = 0;
     int rc = 0;
@@ -572,7 +569,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
             break;
         if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
             int n = res->ncerts;
-            cdkPKT_public_key *pk = pkt->pkt.public_key;
+            cdk_pkt_pubkey_t pk = pkt->pkt.public_key;
             res->cert_list_length[n] = 1;
             if (_gnutls_set_datum( &res->cert_list[n][0].raw,
                               cert->data, cert->size ) < 0) {
@@ -623,8 +620,8 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
                                          char* KEYFILE )
 {
     struct stat statbuf;
-    CDK_STREAM inp = NULL;
-    CDK_KBNODE knode = NULL, ctx = NULL, p;
+    cdk_stream_t inp = NULL;
+    cdk_kbnode_t knode = NULL, ctx = NULL, p;
     CDK_PACKET *pkt = NULL;
     gnutls_datum raw;
     int i = 0, n;
@@ -678,7 +675,7 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
             pkt = cdk_kbnode_get_packet( p );
             if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
                 int n = res->ncerts;
-                cdkPKT_public_key *pk = pkt->pkt.public_key;
+                cdk_pkt_pubkey_t pk = pkt->pkt.public_key;
                 res->cert_list_length[n] = 1;
                 stream_to_datum( inp, &res->cert_list[n][0].raw );
                 openpgp_pk_to_gnutls_cert( &res->cert_list[n][0], pk );
@@ -729,7 +726,7 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
 int
 gnutls_openpgp_count_key_names( const gnutls_datum *cert )
 {
-    CDK_KBNODE knode, p, ctx = NULL;
+    cdk_kbnode_t knode, p, ctx = NULL;
     CDK_PACKET *pkt;
     int nuids = 0;
 
@@ -751,289 +748,16 @@ gnutls_openpgp_count_key_names( const gnutls_datum *cert )
 }
 
 
-/**
- * gnutls_openpgp_extract_key_name - Extracts the userID
- * @cert: the raw data that contains the OpenPGP public key.
- * @idx: the index of the ID to extract
- * @dn: the structure to store the userID specific data in.
- *
- * Extracts the userID from the raw OpenPGP key.
- **/
-int
-gnutls_openpgp_extract_key_name( const gnutls_datum *cert,
-                                 int idx,
-                                 gnutls_openpgp_name *dn )
-{
-    CDK_KBNODE knode = NULL, ctx = NULL, p;
-    CDK_PACKET *pkt = NULL;
-    cdkPKT_user_id *uid = NULL;
-    char *email;
-    int pos = 0, pos1 = 0, pos2 = 0;
-    size_t size = 0;
-    int rc = 0;
-
-    if( !cert || !dn ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-    
-    if( idx < 0 || idx > gnutls_openpgp_count_key_names( cert ) ) {
-        gnutls_assert( );
-        return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-    memset( dn, 0, sizeof *dn );
-    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
-    if( (rc = _gnutls_map_cdk_rc( rc )) ) {
-        gnutls_assert( );
-        return rc;
-    }
-    if( !idx )
-        pkt = cdk_kbnode_find_packet( knode, CDK_PKT_USER_ID );
-    else {
-        pos = 0;
-        while( (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
-            pkt = cdk_kbnode_get_packet( p );
-            if( pkt->pkttype == CDK_PKT_USER_ID && ++pos == idx )
-                break;
-        }
-    }
-
-    if( !pkt ) {
-        rc = GNUTLS_E_INTERNAL_ERROR;
-        goto leave;   
-    }
-    
-    uid = pkt->pkt.user_id;
-    size = uid->len < OPENPGP_NAME_SIZE? uid->len : OPENPGP_NAME_SIZE-1;
-    memcpy( dn->name, uid->name, size );
-    dn->name[size] = '\0'; /* make sure it's a string */
-
-    /* Extract the email address from the userID string and save
-       it to the email field. */
-    email = strchr( uid->name, '<' );
-    if( email )
-        pos1 = email-uid->name + 1;
-    email = strchr( uid->name, '>' );
-    if( email )
-        pos2 = email-uid->name + 1;
-    if( pos1 && pos2 ) {
-        pos2 -= pos1;
-        size = pos2 < OPENPGP_NAME_SIZE? pos2 : OPENPGP_NAME_SIZE-1;
-        memcpy( dn->email, uid->name+pos1, size );
-        dn->email[size-1] = '\0'; /* make sure it's a string */
-    }
-    if( uid->is_revoked ) {
-        rc = GNUTLS_E_OPENPGP_UID_REVOKED;
-        goto leave; 
-    }
-  
-leave:
-    cdk_kbnode_release( knode );
-    return rc;
-}
-
-/**
- * gnutls_openpgp_extract_key_name_string - Extracts the userID
- * @cert: the raw data that contains the OpenPGP public key.
- * @idx: the index of the ID to extract
- * @buf: a pointer to a structure to hold the peer's name
- * @sizeof_buf: holds the size of 'buf'
- *
- * Extracts the userID from the raw OpenPGP key.
- **/
-int
-gnutls_openpgp_extract_key_name_string( const gnutls_datum *cert,
-                                 int idx,
-                                 char *buf, unsigned int sizeof_buf)
-{
-    CDK_KBNODE knode = NULL, ctx = NULL, p;
-    CDK_PACKET *pkt = NULL;
-    cdkPKT_user_id *uid = NULL;
-    int pos = 0;
-    size_t size = 0;
-    int rc = 0;
-
-    if( !cert || !buf ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-    
-    if( idx < 0 || idx > gnutls_openpgp_count_key_names( cert ) ) {
-        gnutls_assert( );
-        return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
-    if( (rc = _gnutls_map_cdk_rc( rc )) ) {
-        gnutls_assert( );
-        return rc;
-    }
-    if( !idx )
-        pkt = cdk_kbnode_find_packet( knode, CDK_PKT_USER_ID );
-    else {
-        pos = 0;
-        while( (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
-            pkt = cdk_kbnode_get_packet( p );
-            if( pkt->pkttype == CDK_PKT_USER_ID && ++pos == idx )
-                break;
-        }
-    }
-
-    if( !pkt ) {
-        rc = GNUTLS_E_INTERNAL_ERROR;
-        goto leave;   
-    }
-    
-    uid = pkt->pkt.user_id;
-    
-    if (uid->len >= sizeof_buf) {
-    	gnutls_assert();
-    	rc = GNUTLS_E_SHORT_MEMORY_BUFFER;
-    	goto leave;
-    }
-
-    size = uid->len < sizeof_buf? uid->len : sizeof_buf-1;
-    memcpy( buf, uid->name, size);
-
-    buf[size] = '\0'; /* make sure it's a string */
-
-    if( uid->is_revoked ) {
-        rc = GNUTLS_E_OPENPGP_UID_REVOKED;
-        goto leave; 
-    }
-  
-leave:
-    cdk_kbnode_release( knode );
-    return rc;
-}
-
-
-/**
-  * gnutls_openpgp_extract_key_pk_algorithm - This function returns the
-  * key's PublicKey algorithm
-  * @cert: is an OpenPGP key
-  * @bits: if bits is non null it will hold the size of the parameters' in bits
-  *
-  * This function will return the public key algorithm of an OpenPGP
-  * certificate.
-  *
-  * If bits is non null, it should have enough size to hold the parameters
-  * size in bits. For RSA the bits returned is the modulus. 
-  * For DSA the bits returned are of the public exponent.
-  *
-  * Returns a member of the GNUTLS_PKAlgorithm enumeration on success,
-  * or a negative value on error.
-  *
-  **/
-int
-gnutls_openpgp_extract_key_pk_algorithm( const gnutls_datum *cert, int *r_bits)
-{
-    CDK_PACKET *pkt;
-    int algo = 0;
-  
-    if( !cert )
-        return GNUTLS_E_INVALID_REQUEST;
-
-    pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
-    if( pkt && pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
-        if( r_bits )
-            *r_bits = cdk_pk_get_nbits( pkt->pkt.public_key );
-        algo = pkt->pkt.public_key->pubkey_algo;
-        if( is_RSA( algo ) )
-            algo = GNUTLS_PK_RSA;
-        else if( is_DSA( algo ) )
-            algo = GNUTLS_PK_DSA;
-        else
-            algo = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
-    }
-    search_packet( NULL, 0 );
-    return algo;
-}
-  
-
-/**
- * gnutls_openpgp_extract_key_version - Extracts the version of the key.
- * @cert: the raw data that contains the OpenPGP public key.
- *
- * Extract the version of the OpenPGP key.
- **/
-int
-gnutls_openpgp_extract_key_version( const gnutls_datum *cert )
-{
-    CDK_PACKET *pkt;
-    int version = 0;
-
-    if( !cert )
-        return -1;
-
-    pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
-    if( pkt )
-        version = pkt->pkt.public_key->version;
-    search_packet( NULL, 0 );
-
-    return version;
-}
-
-
-/**
- * gnutls_openpgp_extract_key_creation_time - Extract the timestamp
- * @cert: the raw data that contains the OpenPGP public key.
- *
- * Returns the timestamp when the OpenPGP key was created.
- **/
-time_t
-gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert )
-{
-    CDK_PACKET *pkt;
-    time_t timestamp = 0;
-
-    if( !cert )
-        return (time_t)-1;
-
-    pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
-    if( pkt )
-        timestamp = pkt->pkt.public_key->timestamp;
-    search_packet( NULL, 0 );
-  
-    return timestamp;
-}
-
-
-/**
- * gnutls_openpgp_extract_key_expiration_time - Extract the expire date
- * @cert: the raw data that contains the OpenPGP public key.
- *
- * Returns the time when the OpenPGP key expires. A value of '0' means
- * that the key doesn't expire at all.
- **/
-time_t
-gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
-{
-    CDK_PACKET *pkt;
-    time_t expiredate = 0;
-
-    if( !cert )
-        return (time_t)-1;
-  
-    pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
-    if( pkt )
-        expiredate = pkt->pkt.public_key->expiredate;
-    search_packet( NULL, 0 );
-  
-    return expiredate;
-}
-
 
 int
 _gnutls_openpgp_get_key_trust( const char *trustdb,
                                const gnutls_datum *key,
                                int *r_trustval )
 {
-    CDK_KBNODE knode = NULL;
-    CDK_STREAM inp;
+    cdk_kbnode_t knode = NULL;
+    cdk_stream_t inp;
     CDK_PACKET *pkt;
-    cdkPKT_public_key *pk = NULL;
+    cdk_pkt_pubkey_t pk = NULL;
     int flags = 0, ot = 0;
     int rc = 0;
 
@@ -1126,8 +850,8 @@ gnutls_openpgp_verify_key( const char *trustdb,
                            const gnutls_datum* cert_list,
                            int cert_list_length )
 {
-    CDK_KBNODE knode = NULL;
-    CDK_KEYDB_HD hd = NULL;
+    cdk_kbnode_t knode = NULL;
+    cdk_keydb_hd_t hd = NULL;
     keybox_blob *blob = NULL;
     int rc = 0;
     int status = 0;
@@ -1166,7 +890,7 @@ gnutls_openpgp_verify_key( const char *trustdb,
         return GNUTLS_CERT_INVALID | GNUTLS_CERT_NOT_TRUSTED;
     }
 
-    rc = cdk_key_check_sigs( knode, hd, &status );
+    rc = cdk_pk_check_sigs( knode, hd, &status );
     if( rc == CDK_Error_No_Key )
         rc = 0; /* fixme */
       
@@ -1205,7 +929,7 @@ gnutls_openpgp_fingerprint( const gnutls_datum *cert,
                             unsigned char *fpr, size_t *fprlen )
 {
     CDK_PACKET *pkt;
-    cdkPKT_public_key *pk = NULL;
+    cdk_pkt_pubkey_t pk = NULL;
   
     if( !cert || !fpr || !fprlen ) {
         gnutls_assert( );
@@ -1229,45 +953,6 @@ gnutls_openpgp_fingerprint( const gnutls_datum *cert,
 }
 
 
-/**
- * gnutls_openpgp_extract_key_id - Gets the keyID
- * @cert: the raw data that contains the OpenPGP public key.
- * @keyid: the buffer to save the keyid.
- *
- * Returns the 64-bit keyID of the OpenPGP key.
- **/
-int
-gnutls_openpgp_extract_key_id( const gnutls_datum *cert,
-                               unsigned char keyid[8] )
-{
-    CDK_PACKET *pkt;
-    cdkPKT_public_key *pk = NULL;
-    unsigned long kid[2];
-  
-    if( !cert || !keyid ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    pkt = search_packet( cert, CDK_PKT_PUBLIC_KEY );
-    if( !pkt )
-        return GNUTLS_E_OPENPGP_GETKEY_FAILED;
-    
-    pk = pkt->pkt.public_key;
-    cdk_pk_get_keyid( pk, kid );
-    keyid[0] = kid[0] >> 24;
-    keyid[1] = kid[0] >> 16;
-    keyid[2] = kid[0] >>  8;
-    keyid[3] = kid[0];
-    keyid[4] = kid[1] >> 24;
-    keyid[5] = kid[1] >> 16;
-    keyid[6] = kid[1] >>  8;
-    keyid[7] = kid[1];
-    search_packet( NULL, 0 );
-  
-    return 0;
-}
-
 
 /*-
  * gnutls_openpgp_add_keyring_file - Adds a keyring file for OpenPGP
@@ -1281,7 +966,7 @@ gnutls_openpgp_extract_key_id( const gnutls_datum *cert,
 int
 gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
 {
-    CDK_STREAM inp = NULL;
+    cdk_stream_t inp = NULL;
     uint8 *blob;
     size_t nbytes;
     int enc = 0;
@@ -1377,7 +1062,7 @@ int
 gnutls_certificate_set_openpgp_keyring_mem( gnutls_certificate_credentials c,
                                             const opaque *data, size_t dlen )
 {
-    CDK_STREAM inp;
+    cdk_stream_t inp;
     size_t count;
     uint8 *buf;
     int rc = 0;
@@ -1498,404 +1183,6 @@ gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
 }
 
 
-static int
-xml_add_tag( gnutls_string *xmlkey, const char *tag, const char *val )
-{
-    if( !xmlkey || !tag || !val ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-    
-    _gnutls_string_append_str( xmlkey, "    <" );
-    _gnutls_string_append_str( xmlkey, tag );
-    _gnutls_string_append_str( xmlkey, ">" );
-    _gnutls_string_append_str( xmlkey, val );
-    _gnutls_string_append_str( xmlkey, "</" );
-    _gnutls_string_append_str( xmlkey, tag );
-    _gnutls_string_append_str( xmlkey, ">\n" );
-
-    return 0;
-}
-
-
-static int
-xml_add_mpi2( gnutls_string *xmlkey, const uint8 *data, size_t count,
-              const char *tag )
-{
-    char *p = NULL;
-    size_t i;
-    int rc = 0;
-
-    if( !xmlkey || !data || !tag ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    p = gnutls_calloc( 1, 2 * ( count + 3 ) );
-    if( !p ) {
-        gnutls_assert( );
-        return GNUTLS_E_MEMORY_ERROR;
-    }
-    for( i = 0; i < count; i++ )
-        sprintf( p + 2 * i, "%02X", data[i] );
-    p[2 * count] = '\0';
-    
-    rc = xml_add_tag( xmlkey, tag, p );
-    gnutls_free( p );
-    
-    return rc;
-}
-
-
-static int
-xml_add_mpi( gnutls_string *xmlkey, cdkPKT_public_key *pk, int idx,
-             const char *tag )
-{
-    uint8 buf[4096];
-    size_t nbytes;
-    
-    nbytes = sizeof buf-1;
-    cdk_pk_get_mpi( pk, idx, buf, &nbytes, NULL );
-    return xml_add_mpi2( xmlkey, buf, nbytes, tag );
-}
-
-    
-
-static int
-xml_add_key_mpi( gnutls_string *xmlkey, cdkPKT_public_key *pk )
-{
-    const char *s = "    <KEY ENCODING=\"HEX\"/>\n";
-    int rc = 0;
-
-    if( !xmlkey || !pk ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-    
-    _gnutls_string_append_str( xmlkey, s );
-         
-    if( is_RSA( pk->pubkey_algo ) ) {
-        rc = xml_add_mpi( xmlkey, pk, 0, "RSA-N" );
-        if( !rc )
-            rc = xml_add_mpi( xmlkey, pk, 1, "RSA-E" );
-    }
-    else if( is_DSA( pk->pubkey_algo ) ) {
-        rc = xml_add_mpi( xmlkey, pk, 0, "DSA-P" );
-        if( !rc )
-            rc = xml_add_mpi( xmlkey, pk, 1, "DSA-Q" );
-        if( !rc )
-            rc = xml_add_mpi( xmlkey, pk, 2, "DSA-G" );
-        if( !rc )
-            rc = xml_add_mpi( xmlkey, pk, 3, "DSA-Y" );
-    }
-    else if( is_ELG( pk->pubkey_algo ) ) {
-        rc = xml_add_mpi( xmlkey, pk, 0, "ELG-P" );
-        if( !rc )
-            rc = xml_add_mpi( xmlkey, pk, 1, "ELG-G" );
-        if( !rc )
-            rc = xml_add_mpi( xmlkey, pk, 2, "ELG-Y" );
-    }
-    else
-        return GNUTLS_E_UNWANTED_ALGORITHM;
-    
-    return 0;
-}
-
-
-static int
-xml_add_key( gnutls_string *xmlkey, int ext, cdkPKT_public_key *pk, int sub )
-{
-    const char *algo, *s;
-    char keyid[16], fpr[41], tmp[32];
-    uint8 fingerpr[20];
-    unsigned long kid[2];
-    int i = 0, rc = 0;
-
-    if( !xmlkey || !pk ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-        
-    s = sub? "  <SUBKEY>\n" : "  <MAINKEY>\n";
-    _gnutls_string_append_str( xmlkey, s );
-
-    cdk_pk_get_keyid( pk, kid );
-    snprintf( keyid, 16, "%08lX%08lX", kid[0], kid[1] );
-    rc = xml_add_tag( xmlkey, "KEYID", keyid );
-    if( rc )
-        return rc;
-
-    cdk_pk_get_fingerprint( pk, fingerpr );
-    for ( i = 0; i < 20; i++ )
-        sprintf( fpr + 2 * i, "%02X", fingerpr[i] );
-    fpr[40] = '\0';
-    rc = xml_add_tag( xmlkey, "FINGERPRINT", fpr );
-    if( rc )
-        return rc;
-
-    if( is_DSA( pk->pubkey_algo ) )
-        algo = "DSA";
-    else if( is_RSA( pk->pubkey_algo ) )
-        algo = "RSA";
-    else if( is_ELG( pk->pubkey_algo ) )
-        algo = "ELG";
-    else algo = "???";
-    rc = xml_add_tag( xmlkey, "PKALGO", algo );
-    if( rc )
-        return rc;
-
-    sprintf( tmp, "%d", cdk_pk_get_nbits( pk ) );
-    rc = xml_add_tag( xmlkey, "KEYLEN", tmp );
-    if( rc )
-        return rc;
-
-    sprintf( tmp, "%lu", pk->timestamp );
-    rc = xml_add_tag( xmlkey, "CREATED", tmp );
-    if( rc )
-        return rc;
-
-    if( pk->expiredate > 0 ) {
-        sprintf( tmp, "%lu", (unsigned long)pk->expiredate );
-        rc = xml_add_tag( xmlkey, "EXPIREDATE", tmp );
-	if( rc )
-            return rc;
-    }
-
-    sprintf( tmp, "%d", pk->is_revoked );
-    rc = xml_add_tag( xmlkey, "REVOKED", tmp );
-    if( rc )
-        return rc;
-
-    if( ext ) {
-        rc = xml_add_key_mpi( xmlkey, pk );
-        if( rc )
-            return rc;
-    }
-     
-    s = sub? "  </SUBKEY>\n" : "  </MAINKEY>\n";
-    _gnutls_string_append_str( xmlkey, s );
-
-    return 0;
-}
-
-
-static int
-xml_add_userid( gnutls_string *xmlkey, int ext,
-                gnutls_openpgp_name *dn, cdkPKT_user_id *id )
-{
-    const char *s;
-    char *p, *name, tmp[32];
-    int rc = 0;
-
-    if( !xmlkey || !dn || !id ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    s = "  <USERID>\n";
-    _gnutls_string_append_str( xmlkey, s );
-
-    p = strchr( dn->name, '<' );
-    if ( p ) {
-        int len = (p - dn->name - 1);
-        name = gnutls_calloc( 1, len );
-        if( !name ) {
-            gnutls_assert( );
-            return GNUTLS_E_MEMORY_ERROR;
-        }
-        memcpy( name, dn->name, len );
-        rc = xml_add_tag( xmlkey, "NAME", name );
-        gnutls_free( name );
-        if( rc )
-            return rc;
-    }
-    else {
-        rc = xml_add_tag( xmlkey, "NAME", dn->name );
-        if( rc )
-            return rc;
-    }
-    
-    rc = xml_add_tag( xmlkey, "EMAIL", dn->email );
-    if( rc )
-        return rc;
-
-    if ( ext ) {
-        sprintf( tmp, "%d", id->is_primary );
-        rc = xml_add_tag( xmlkey, "PRIMARY", tmp );
-        if( rc )
-            return rc;
-        sprintf( tmp, "%d", id->is_revoked );
-        rc = xml_add_tag( xmlkey, "REVOKED", tmp );
-        if( rc )
-            return rc;
-    }
-
-    s = "  </USERID>\n";
-    _gnutls_string_append_str( xmlkey, s );
-    
-    return 0;
-}
-
-
-static int
-xml_add_sig( gnutls_string *xmlkey, int ext, cdkPKT_signature *sig )
-{
-    const char *algo, *s;
-    char tmp[32], keyid[16];
-    unsigned long kid[2];
-    int rc = 0;
-
-    if( !xmlkey || !sig ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    s = "  <SIGNATURE>\n";
-    _gnutls_string_append_str( xmlkey, s );
-
-    sprintf( tmp, "%d", sig->version );
-    rc = xml_add_tag( xmlkey, "VERSION", tmp );
-    if( rc )
-        return rc;
-
-    if( ext ) {
-        sprintf( tmp, "%d", sig->sig_class );
-        rc = xml_add_tag( xmlkey, "SIGCLASS", tmp );
-        if( rc )
-            return rc;
-    }
-    
-    sprintf( tmp, "%d", sig->flags.expired );
-    rc = xml_add_tag( xmlkey, "EXPIRED", tmp );
-    if( rc )
-        return rc;
-
-    if ( ext ) {
-        switch( sig->pubkey_algo ) {
-        case GCRY_PK_DSA  : algo = "DSA"; break;
-        case GCRY_PK_ELG  :
-        case GCRY_PK_ELG_E: algo = "ELG"; break;
-        case GCRY_PK_RSA  :
-        case GCRY_PK_RSA_E:
-        case GCRY_PK_RSA_S: algo = "RSA"; break;
-        default           : algo = "???"; /* unknown algorithm */
-        }
-        rc = xml_add_tag( xmlkey, "PKALGO", algo );
-        if( rc )
-            return rc;
-
-        switch( sig->digest_algo ) {
-        case GCRY_MD_SHA1  : algo = "SHA1"; break;
-        case GCRY_MD_RMD160: algo = "RMD160"; break;
-        case GCRY_MD_MD5   : algo = "MD5"; break;
-        default            : algo = "???";
-        }
-        rc = xml_add_tag( xmlkey, "MDALGO", algo );
-        if( rc )
-            return rc;
-    }    
-
-    sprintf( tmp, "%lu", sig->timestamp );
-    rc = xml_add_tag( xmlkey, "CREATED", tmp );
-    if( rc )
-        return rc;
-
-    cdk_sig_get_keyid( sig, kid );
-    snprintf( keyid, 16, "%08lX%08lX", kid[0], kid[1] );
-    rc = xml_add_tag( xmlkey, "KEYID", keyid );
-    if( rc )
-        return rc;
-
-    s = "  </SIGNATURE>\n";
-    _gnutls_string_append_str( xmlkey, s );
-
-    return 0;
-}
-
-
-/**
- * gnutls_openpgp_key_to_xml - Return a certificate as a XML fragment
- * @cert: the certificate which holds the whole OpenPGP key.
- * @xmlkey: he datum struct to store the XML result.
- * @ext: extension mode (1/0), 1 means include key signatures and key data.
- *
- * This function will return the all OpenPGP key information encapsulated as
- * a XML string.
- **/
-int
-gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
-                            gnutls_datum *xmlkey, int ext )
-{
-    CDK_KBNODE knode, node, ctx = NULL;
-    CDK_PACKET *pkt;
-    gnutls_openpgp_name dn;
-    const char *s;
-    int idx = 0, rc = 0;
-    gnutls_string string_xml_key;
-
-    if( !cert || !xmlkey ) {
-        gnutls_assert( );
-        return GNUTLS_E_INVALID_REQUEST;
-    }
-
-    rc = cdk_kbnode_read_from_mem( &knode, cert->data, cert->size );
-    if( (rc = _gnutls_map_cdk_rc( rc )) )
-      return rc;
-    
-    _gnutls_string_init( &string_xml_key, malloc, realloc, free );
-    memset( xmlkey, 0, sizeof *xmlkey );
-
-    s = "<?xml version=\"1.0\"?>\n\n";
-    _gnutls_string_append_str( &string_xml_key, s );
-
-    s = "<gnutls:openpgp:key version=\"1.0\">\n";
-    _gnutls_string_append_str( &string_xml_key, s );
-    
-    s = " <OPENPGPKEY>\n";
-    _gnutls_string_append_str( &string_xml_key, s );
-
-    idx = 1;
-    while( (node = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
-        pkt = cdk_kbnode_get_packet( node );
-        switch ( pkt->pkttype ) {
-        case CDK_PKT_PUBLIC_KEY:
-            rc = xml_add_key( &string_xml_key, ext, pkt->pkt.public_key, 0 );
-            break;
-
-        case CDK_PKT_PUBLIC_SUBKEY:
-            rc = xml_add_key( &string_xml_key, ext, pkt->pkt.public_key, 1 );
-            break;
-
-        case CDK_PKT_USER_ID:
-            gnutls_openpgp_extract_key_name( cert, idx, &dn );
-            rc = xml_add_userid( &string_xml_key, ext, &dn, pkt->pkt.user_id );
-            idx++;
-            break;
-
-        case CDK_PKT_SIGNATURE:
-            rc = xml_add_sig( &string_xml_key, ext, pkt->pkt.signature );
-            break;
-            
-        default:
-            break;
-        }
-    }
-    if( !rc ) {
-        s = " </OPENPGPKEY>\n";
-        _gnutls_string_append_str( &string_xml_key, s );
-    }
-    s = "</gnutls:openpgp:key>\n";
-    _gnutls_string_append_str( &string_xml_key, s );
-    _gnutls_string_append_data( &string_xml_key, "\n\0", 2 );
-
-    *xmlkey = _gnutls_string2datum( &string_xml_key );
-    xmlkey->size--;
-
-    cdk_kbnode_release( knode );
-    return rc;
-}
-
-
 /**
  * gnutls_certificate_set_openpgp_trustdb - Used to set an GnuPG trustdb
  * @res: the destination context to save the data.
@@ -1939,168 +1226,6 @@ void gnutls_openpgp_set_recv_key_function( gnutls_session session,
                                            gnutls_openpgp_recv_key_func func )
 {
     session->internals.openpgp_recv_key_func = func;
-}
-
-#else /*!HAVE_LIBOPENCDK*/
-int
-_gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
-                                gnutls_datum raw_key )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-_gnutls_openpgp_cert2gnutls_cert( gnutls_cert *cert, const gnutls_datum *raw )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;  
-}
-
-int
-gnutls_certificate_set_openpgp_key_mem(gnutls_certificate_credentials res,
-                                       gnutls_datum *cert,
-                                       gnutls_datum *key)
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-int
-gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
-                                         char* CERTFILE,
-                                         char* KEYFILE )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-gnutls_openpgp_extract_key_name( const gnutls_datum *cert, int idx, 
-                                 gnutls_openpgp_name *dn )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-int
-gnutls_openpgp_extract_key_pk_algorithm(const gnutls_datum *cert, int *r_bits)
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-gnutls_openpgp_extract_key_version( const gnutls_datum *cert )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-time_t
-gnutls_openpgp_extract_key_creation_time( const gnutls_datum *cert )
-{
-    return (time_t)-1;  
-}
-
-time_t
-gnutls_openpgp_extract_key_expiration_time( const gnutls_datum *cert )
-{
-    return (time_t)-1; 
-}
-
-int
-gnutls_openpgp_verify_key( const char* ign, const gnutls_datum* keyring,
-                           const gnutls_datum* cert_list,
-                           int cert_list_length )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-int
-gnutls_openpgp_fingerprint(const gnutls_datum *cert, unsigned char *fpr, size_t *fprlen)
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;  
-}
-
-int
-gnutls_openpgp_add_keyring_file( gnutls_datum *keyring, const char *name )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-int
-gnutls_openpgp_add_keyring_mem( gnutls_datum *keyring,
-                                const opaque *data, size_t len )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-int
-gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials c,
-                                             const char *file )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-gnutls_certificate_set_openpgp_keyring_mem( gnutls_certificate_credentials c,
-                                            const opaque* data,
-                                            size_t dlen)
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-int
-_gnutls_openpgp_request_key( gnutls_session session, gnutls_datum* ret,
-                             const gnutls_certificate_credentials cred,
-                             opaque* key_fpr,
-                             int key_fpr_size )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE; 
-}
-
-int
-gnutls_certificate_set_openpgp_keyserver( gnutls_certificate_credentials res,
-                                          char* keyserver,
-                                          int port )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-gnutls_certificate_set_openpgp_trustdb( gnutls_certificate_credentials res,
-                                        char* trustdb )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
-                            gnutls_datum *xmlkey, int ext )
-{
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;   
-}
-
-int
-gnutls_openpgp_extract_key_id( const gnutls_datum *cert,
-                               unsigned char keyid[8] )
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-void gnutls_openpgp_set_recv_key_function( gnutls_session session,
-                                           gnutls_openpgp_recv_key_func func )
-{
-
-}
-
-int
-gnutls_openpgp_extract_key_name_string( const gnutls_datum *cert,
-                                 int idx,
-                                 char *buf, unsigned int sizeof_buf)
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-}
-
-int
-gnutls_openpgp_get_key( gnutls_datum *key, const gnutls_datum *keyring,
-                        key_attr_t by, opaque *pattern )
-{
-	return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 }
 
 #endif /* HAVE_LIBOPENCDK */
