@@ -10,7 +10,7 @@ Version 0.4.2
 - Replaced the included 1024 bit prime for Diffie Hellman, with a new
   random one.
 - Relicensed the library under the GNU Lesser General Public License
-- Added gnutls-extra library which contains the GPL parts.
+- Added gnutls-extra library which contains the GPL covered code of gnutls.
 
 Version 0.4.1 (7/04/2002)
 - Now uses alloca() for temporary variables
