@@ -1,3 +1,15 @@
+2003-03-06 20:20  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/Makefile.am, lib/gnutls_buffers.c:
+
+	the documentation is now created on dist time.  
+
+2003-03-06 20:09  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c, NEWS, lib/gnutls_buffers.c, NEWS:
+
+	Corrected a broken buffer check in _gnutls_io_read_buffered() 
+
 2003-03-05 17:23  nmav <nmav@gnutls.org>
 
 	* doc/: README.CODING_STYLE, tex/certificate.tex,
