@@ -84,7 +84,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 	}
 
 
-	len = sizeof(str);
+	len = sizeof(str) - 1;
 	result =
 	    read_value
 	    ("rsa_params.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
@@ -97,7 +97,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 	}
 
 	if (!strcmp(str, "1 2 840 113549 1 1 1")) {	/* pkix-1 1 - RSA */
-		len = sizeof(str);
+		len = sizeof(str) - 1;
 		result =
 		    read_value
 		    ("rsa_params.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
@@ -124,7 +124,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 			return GNUTLS_E_ASN1_PARSING_ERROR;
 		}
 
-		len = sizeof(str);
+		len = sizeof(str) - 1;
 		result = read_value("rsa_public_key.modulus", str, &len);
 		if (result != ASN_OK) {
 			gnutls_assert();
@@ -146,7 +146,7 @@ static int _gnutls_get_rsa_params(GNUTLS_KEY key, RSA_Params * params,
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
-		len = sizeof(str);
+		len = sizeof(str) - 1;
 		result =
 		    read_value("rsa_public_key.publicExponent", str, &len);
 		if (result != ASN_OK) {

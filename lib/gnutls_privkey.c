@@ -54,7 +54,7 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	len = sizeof(str);
+	len = sizeof(str) - 1;
 	result =
 	    read_value("rsakey.privateExponent", str, &len);
 	if (result != ASN_OK) {
@@ -70,7 +70,7 @@ int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
 	}
 
 
-	len = sizeof(str);
+	len = sizeof(str) - 1;
 	result =
 	    read_value("rsakey.modulus", str, &len);
 	if (result != ASN_OK) {

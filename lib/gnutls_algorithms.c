@@ -223,8 +223,9 @@ typedef struct {
 #define GNUTLS_DH_anon_TWOFISH_128_CBC_SHA { 0xF6, 0x50 }
 
 /* SRP is a gnutls extension - for now */
-#define GNUTLS_SRP_3DES_EDE_CBC_SHA { 0xF6, 0x60 }
-#define GNUTLS_SRP_ARCFOUR_MD5 { 0xF6, 0x61 }
+#define GNUTLS_SRP_3DES_EDE_CBC_SHA { 0x00, 0x5B }
+#define GNUTLS_SRP_ARCFOUR_SHA { 0x00, 0x5C }
+#define GNUTLS_SRP_ARCFOUR_MD5 { 0x00, 0x5F }
 #define GNUTLS_SRP_RIJNDAEL_128_CBC_SHA { 0xF6, 0x62 }
 #define GNUTLS_SRP_RIJNDAEL_256_CBC_SHA { 0xF6, 0x63 }
 #define GNUTLS_SRP_TWOFISH_128_CBC_SHA { 0xF6, 0x64 }
@@ -286,6 +287,9 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 				  GNUTLS_MAC_SHA),
 
 	/* SRP */
+	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_ARCFOUR_SHA,
+				  GNUTLS_ARCFOUR,
+				  GNUTLS_KX_SRP, GNUTLS_MAC_SHA),
 	GNUTLS_CIPHER_SUITE_ENTRY(GNUTLS_SRP_ARCFOUR_MD5,
 				  GNUTLS_ARCFOUR,
 				  GNUTLS_KX_SRP, GNUTLS_MAC_MD5),

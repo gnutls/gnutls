@@ -232,7 +232,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
 
-	len = sizeof(str);
+	len = sizeof(str) - 1;
 	result = read_value("rsa_public_key.modulus", str, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
@@ -250,7 +250,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	len = sizeof(str);
+	len = sizeof(str) - 1;
 	result = read_value("rsa_public_key.publicExponent", str, &len);
 	if (result != ASN_OK) {
 		gnutls_assert();
@@ -287,7 +287,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	  	gnutls_assert(); \
 	  	return GNUTLS_E_ASN1_ERROR; \
 	  } \
-	  len = sizeof(str); \
+	  len = sizeof(str) - 1; \
 	  if (read_value(name3,str,&len) != ASN_OK) { \
 	  	delete_structure( name2); \
 	  	continue; \
@@ -297,7 +297,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	  	continue; \
 	  } \
 	  strcpy( name3,name2); \
-	  len = sizeof(str); \
+	  len = sizeof(str) - 1; \
 	  if (read_value( name3, str, &len) != ASN_OK) {  /* CHOICE */ \
 	  	delete_structure( name2); \
 	  	continue; \
@@ -331,7 +331,7 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 		ltostr(k, counter);
 		strcat(name, counter);
 
-		len = sizeof(str);
+		len = sizeof(str) - 1;
 		result = read_value(name, str, &len);
 		if (result == ASN_ELEMENT_NOT_FOUND)
 			break;
@@ -342,14 +342,14 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 			ltostr(k2, counter);
 			strcat(name2, counter);
 
-			len = sizeof(str);
+			len = sizeof(str) - 1;
 			result = read_value(name2, str, &len);
 			if (result == ASN_ELEMENT_NOT_FOUND)
 				break;
 			strcpy(name3, name2);
 			strcat(name3, ".type");
 			
-			len = sizeof(str);
+			len = sizeof(str) - 1;
 			result = read_value(name3, str, &len);
 
 			if (result != ASN_OK) {
@@ -405,7 +405,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	}
 
 
-	len = sizeof(str);
+	len = sizeof(str) - 1;
 	result =
 	    read_value
 	    ("certificate3.tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
@@ -423,7 +423,7 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 */
 		gCert->subject_pk_algorithm = GNUTLS_PK_RSA;
 
-		len = sizeof(str);
+		len = sizeof(str) - 1;
 		result =
 		    read_value
 		    ("certificate3.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey",
