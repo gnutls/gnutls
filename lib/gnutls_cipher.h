@@ -18,10 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_encrypt( gnutls_session session, const char* headers, size_t headers_size, const char* data, size_t data_size, 
+int _gnutls_encrypt( gnutls_session session, const opaque* headers, size_t headers_size, const opaque* data, size_t data_size, 
 	opaque* ciphertext, size_t ciphertext_size, ContentType type, int random_pad);
 
-int _gnutls_decrypt(gnutls_session session, char *ciphertext,
+int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 		    size_t ciphertext_size, uint8 * data, size_t data_size,
 		    ContentType type);
 int _gnutls_compressed2ciphertext(gnutls_session session, opaque* cipher_data, int cipher_size, gnutls_datum compressed, 

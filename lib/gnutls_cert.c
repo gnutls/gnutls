@@ -513,7 +513,7 @@ int _gnutls_x509_crt2gnutls_cert(gnutls_cert * gcert, gnutls_x509_crt cert,
 
 	if ( !(flags & CERT_NO_COPY)) {
 		opaque* der;
-		int der_size = 0;
+		size_t der_size = 0;
 		
 		ret = gnutls_x509_crt_export( cert, GNUTLS_X509_FMT_DER, NULL, &der_size);
 		if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {

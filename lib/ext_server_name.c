@@ -38,7 +38,7 @@ int _gnutls_server_name_recv_params(gnutls_session session,
 				    const opaque * data, size_t _data_size)
 {
    int i;
-   const char *p;
+   const unsigned char *p;
    uint16 len, type;
    ssize_t data_size = _data_size;
    int server_names = 0;

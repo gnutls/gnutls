@@ -76,7 +76,7 @@ int gnutls_x509_crt_init(gnutls_x509_crt * cert)
 int _gnutls_x509_crt_cpy(gnutls_x509_crt dest, gnutls_x509_crt src)
 {
 int ret;
-int der_size;
+size_t der_size;
 opaque * der;
 gnutls_datum tmp;
 
@@ -150,8 +150,11 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
-	gnutls_datum _data = { data->data, data->size };
+	gnutls_datum _data;
 	opaque *signature = NULL;
+	
+	_data.data = data->data;
+	_data.size = data->size;
 
 	/* If the Certificate is in PEM format then decode it
 	 */
@@ -844,7 +847,7 @@ int _gnutls_x509_crt_get_raw_dn( gnutls_x509_crt cert,
   *
   **/
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
-	gnutls_digest_algorithm algo, char *buf,
+	gnutls_digest_algorithm algo, unsigned char *buf,
 	 size_t *sizeof_buf)
 {
 opaque *cert_buf;
@@ -1019,7 +1022,7 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 {
 	opaque serial[64];
 	opaque cert_serial[64];
-	int serial_size, cert_serial_size;
+	size_t serial_size, cert_serial_size;
 	int ncerts, ret, i, j;
 	gnutls_datum dn1, dn2;
 

@@ -154,7 +154,7 @@ int gnutls_x509_crt_check_hostname(gnutls_x509_crt cert,
 {
 
    char dnsname[MAX_CN];
-   int dnsnamesize;
+   size_t dnsnamesize;
    int found_dnsname = 0;
    int ret = 0;
    int i = 0;

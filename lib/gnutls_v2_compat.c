@@ -40,7 +40,7 @@
 #include "gnutls_auth_int.h"
 
 /* This selects the best supported ciphersuite from the ones provided */
-static int _gnutls_handshake_select_v2_suite(gnutls_session session, char *data, int datalen)
+static int _gnutls_handshake_select_v2_suite(gnutls_session session, opaque *data, int datalen)
 {
 	int i, j, ret;
 	char* _data;

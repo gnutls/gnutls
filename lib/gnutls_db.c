@@ -147,9 +147,12 @@ time_t timestamp;
  */
 int _gnutls_server_register_current_session( gnutls_session session)
 {
-gnutls_datum key = { session->security_parameters.session_id, session->security_parameters.session_id_size };
+gnutls_datum key;
 gnutls_datum content;
 int ret = 0;
+
+	key.data = session->security_parameters.session_id;
+	key.size = session->security_parameters.session_id_size;
 
 	if (session->internals.resumable==RESUME_FALSE) {
 		gnutls_assert();
@@ -204,8 +207,11 @@ static int _gnutls_db_func_is_ok( gnutls_session session) {
 int _gnutls_server_restore_session( gnutls_session session, uint8* session_id, int session_id_size)
 {
 gnutls_datum data;
-gnutls_datum key = { session_id, session_id_size };
+gnutls_datum key;
 int ret;
+
+	key.data = session_id;
+	key.size = session_id_size;
 
 	if (_gnutls_db_func_is_ok(session)!=0) {
 		gnutls_assert();
@@ -233,7 +239,10 @@ int ret;
 
 int _gnutls_db_remove_session( gnutls_session session, uint8* session_id, int session_id_size)
 {
-gnutls_datum key = { session_id, session_id_size };
+gnutls_datum key;
+
+	key.data = session_id;
+	key.size = session_id_size;
 
 	return _gnutls_remove_session( session, key);
 }

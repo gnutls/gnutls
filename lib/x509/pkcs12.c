@@ -231,7 +231,7 @@ int gnutls_pkcs12_import(gnutls_pkcs12 pkcs12, const gnutls_datum * data,
   *
   **/
 int gnutls_pkcs12_export( gnutls_pkcs12 pkcs12,
-	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size)
+	gnutls_x509_crt_fmt format, unsigned char* output_data, size_t* output_data_size)
 {
 	return _gnutls_x509_export_int( pkcs12->pkcs12, format, PEM_PKCS12, *output_data_size,
 		output_data, output_data_size);
@@ -409,7 +409,7 @@ char counter[MAX_INT_DIGITS];
 				bag->element[i].local_key_id = attr_val;
 			else if (strcmp( oid, FRIENDLY_NAME_OID)==0)
 				bag->element[i].friendly_name = ucs2_to_ascii( attr_val.data, attr_val.size);
-			else { 		
+			else {
 				_gnutls_x509_log( "Unknown PKCS12 Bag Attribute OID '%s'\n", oid);
 			}
 		}
@@ -820,7 +820,7 @@ int gnutls_pkcs12_verify_mac(gnutls_pkcs12 pkcs12, const char* pass)
 {
 	opaque key[20];
 	int result;
-	int iter, len;
+	unsigned int iter, len;
 	GNUTLS_MAC_HANDLE td1 = NULL;
 	gnutls_datum tmp = {NULL, 0}, salt = {NULL, 0};
 	opaque sha_mac[20];

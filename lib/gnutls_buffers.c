@@ -71,7 +71,7 @@ static int RET( int err) {
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
-int _gnutls_record_buffer_put(ContentType type, gnutls_session session, char *data, size_t length)
+int _gnutls_record_buffer_put(ContentType type, gnutls_session session, opaque *data, size_t length)
 {
 	if (length==0) return 0;
 	switch( type) {
@@ -134,7 +134,7 @@ size_t gnutls_record_check_pending(gnutls_session session) {
 	return _gnutls_record_buffer_get_size(GNUTLS_APPLICATION_DATA, session);
 }
 
-int _gnutls_record_buffer_get(ContentType type, gnutls_session session, char *data, size_t length)
+int _gnutls_record_buffer_get(ContentType type, gnutls_session session, opaque *data, size_t length)
 {
 	if (length==0 || data==NULL) {
 		gnutls_assert();
@@ -932,7 +932,7 @@ int _gnutls_handshake_buffer_get_size( gnutls_session session)
 /* this function does not touch the buffer
  * and returns data from it (peek mode!)
  */
-int _gnutls_handshake_buffer_peek( gnutls_session session, char *data, size_t length)
+int _gnutls_handshake_buffer_peek( gnutls_session session, opaque *data, size_t length)
 {
 	if (length > session->internals.handshake_hash_buffer.length) {
 		length = session->internals.handshake_hash_buffer.length;
@@ -947,7 +947,7 @@ int _gnutls_handshake_buffer_peek( gnutls_session session, char *data, size_t le
 /* this function does not touch the buffer
  * and returns data from it (peek mode!)
  */
-int _gnutls_handshake_buffer_get_ptr( gnutls_session session, char **data_ptr, size_t *length)
+int _gnutls_handshake_buffer_get_ptr( gnutls_session session, opaque **data_ptr, size_t *length)
 {
 	if (length!=NULL)
 		*length = session->internals.handshake_hash_buffer.length;

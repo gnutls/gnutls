@@ -55,7 +55,7 @@
 struct pbkdf2_params {
 	opaque salt[32];
 	int salt_size;
-	int iter_count;
+	unsigned int iter_count;
 	int key_size;
 };
 
@@ -129,7 +129,8 @@ static int encode_to_private_key_info(gnutls_x509_privkey pkey,
 				      gnutls_datum * der,
 				      ASN1_TYPE * pkey_info)
 {
-	int result, size;
+	int result;
+	size_t size;
 	opaque *data = NULL;
 	opaque null = 0;
 
@@ -820,8 +821,11 @@ int gnutls_x509_privkey_import_pkcs8(gnutls_x509_privkey key,
 				     unsigned int flags)
 {
 	int result = 0, need_free = 0;
-	gnutls_datum _data = { data->data, data->size };
+	gnutls_datum _data;
 	int encrypted;
+
+	_data.data = data->data;
+	_data.size = data->size;
 
 	key->pk_algorithm = GNUTLS_PK_UNKNOWN;
 
@@ -1291,7 +1295,7 @@ static int write_pbkdf2_params(ASN1_TYPE pbes2_asn,
 {
 	int result;
 	ASN1_TYPE pbkdf2_asn = ASN1_TYPE_EMPTY;
-	char tmp[64];
+	opaque tmp[64];
 
 	/* Write the key derivation algorithm
 	 */

@@ -83,7 +83,7 @@ static char *str_escape(char *str, char *buffer, unsigned int buffer_size)
  */
 int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 			  const char *asn1_rdn_name, char *buf,
-			  int *sizeof_buf)
+			  size_t *sizeof_buf)
 {
 	gnutls_string out_str;
 	int k2, k1, result;
@@ -91,7 +91,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	char tmpbuffer2[64];
 	char tmpbuffer3[64];
 	char counter[MAX_INT_DIGITS];
-	char value[256];
+	opaque value[256];
 	char escaped[256];
 	const char *ldap_desc;
 	char oid[128];
@@ -298,14 +298,14 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 			      const char *asn1_rdn_name,
 			      const char *given_oid, int indx, char *buf,
-			      int *sizeof_buf)
+			      size_t *sizeof_buf)
 {
 	int k2, k1, result;
 	char tmpbuffer1[64];
 	char tmpbuffer2[64];
 	char tmpbuffer3[64];
 	char counter[MAX_INT_DIGITS];
-	char value[200];
+	opaque value[200];
 	char escaped[256];
 	char oid[128];
 	int len, printable;
@@ -448,7 +448,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 							    sizeof
 							    (escaped));
 					if (res) {
-						int size = strlen(res) + 1;
+						unsigned int size = strlen(res) + 1;
 						if (size + 1 > *sizeof_buf) {
 							*sizeof_buf = size;
 							return
@@ -486,9 +486,10 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
  * In all cases only one value is written.
  */
 int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
-	const char* where, const unsigned char* data, int sizeof_data, int multi) 
+	const char* where, const void* _data, int sizeof_data, int multi) 
 {
 const char *val_name;
+const opaque* data = _data;
 char tmp[128];
 ASN1_TYPE c2;
 int result;

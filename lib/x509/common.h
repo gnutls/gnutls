@@ -22,7 +22,7 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime);
 int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim);
 
 int _gnutls_x509_oid_data2string( const char* OID, void* value, 
-	int value_size, char * res, int *res_size);
+	int value_size, char * res, size_t *res_size);
 
 const char* _gnutls_x509_oid2ldap_string( const char* OID);
 
@@ -55,7 +55,7 @@ int _gnutls_x509_read_value( ASN1_TYPE c, const char* root, gnutls_datum *ret, i
 int _gnutls_x509_write_value( ASN1_TYPE c, const char* root, const gnutls_datum* data, int str);
 
 int _gnutls_x509_encode_and_write_attribute( const char* given_oid, ASN1_TYPE asn1_struct, 
-	const char* where, const unsigned char* data, int sizeof_data, int multi);
+	const char* where, const void* data, int sizeof_data, int multi);
 int _gnutls_x509_decode_and_read_attribute(ASN1_TYPE asn1_struct, const char* where,
         char* oid, int oid_size, gnutls_datum* value, int multi);
 

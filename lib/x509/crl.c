@@ -233,7 +233,7 @@ int gnutls_x509_crl_get_signature_algorithm(gnutls_x509_crl crl)
 		return result;
 	}
 	
-	result = _gnutls_x509_oid2sign_algorithm( sa.data, NULL);
+	result = _gnutls_x509_oid2sign_algorithm( (const char*)sa.data, NULL);
 
 	_gnutls_free_datum( &sa);
 
@@ -344,7 +344,7 @@ int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
 				    size_t *serial_size, time_t * time)
 {
 
-	int result;
+	int result, _serial_size;
 	char str_index[MAX_INT_DIGITS];
 	char serial_name[64];
 	char date_name[64];
@@ -361,10 +361,13 @@ int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
 	_gnutls_str_cat(date_name, sizeof(date_name), str_index);
 	_gnutls_str_cat(date_name, sizeof(date_name), ".revocationDate");
 
-
-	if ((result =
+	_serial_size = *serial_size;
+	result =
 	     asn1_read_value(crl->crl, serial_name, serial,
-			     serial_size)) != ASN1_SUCCESS) {
+			     &_serial_size);
+
+	*serial_size = _serial_size;
+	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		if (result == ASN1_ELEMENT_NOT_FOUND)
 			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -485,7 +488,7 @@ int gnutls_x509_crl_export( gnutls_x509_crl crl,
 int _gnutls_x509_crl_cpy(gnutls_x509_crl dest, gnutls_x509_crl src)
 {
 int ret;
-int der_size;
+size_t der_size;
 opaque * der;
 gnutls_datum tmp;
 

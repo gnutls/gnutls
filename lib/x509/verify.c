@@ -356,7 +356,7 @@ static int decode_ber_digest_info( const gnutls_datum *info, gnutls_mac_algorith
 {
 ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
 int result;
-opaque str[1024];
+char str[1024];
 int len;
 
 	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), 

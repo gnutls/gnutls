@@ -53,7 +53,7 @@ int _gnutls_generate_master( gnutls_session session) {
 #define PREMASTER session->key->key
 static int generate_normal_master( gnutls_session session) {
 int ret = 0;
-char random[2*TLS_RANDOM_SIZE];
+opaque random[2*TLS_RANDOM_SIZE];
 char buf[64];
 
 	memcpy(random, session->security_parameters.client_random, TLS_RANDOM_SIZE);

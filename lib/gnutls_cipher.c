@@ -60,14 +60,17 @@ is_read_comp_null( gnutls_session session) {
  * 
  * If random pad != 0 then the random pad data will be appended.
  */
-int _gnutls_encrypt(gnutls_session session, const char* headers, size_t headers_size,
-		const char *data, size_t data_size,
+int _gnutls_encrypt(gnutls_session session, const opaque* headers, size_t headers_size,
+		const opaque *data, size_t data_size,
 		opaque * ciphertext, size_t ciphertext_size, ContentType type, int random_pad)
 {
-	gnutls_datum plain = { (opaque*) data, data_size };
+	gnutls_datum plain;
 	gnutls_datum comp;
 	int ret;
 	int free_comp = 1;
+	
+	plain.data = (opaque*)data;
+	plain.size = data_size;
 
 	if (plain.size == 0 || is_write_comp_null( session)==0) { 
 		comp = plain;
@@ -103,7 +106,7 @@ int _gnutls_encrypt(gnutls_session session, const char* headers, size_t headers_
 }
 
 
-int _gnutls_decrypt(gnutls_session session, char *ciphertext,
+int _gnutls_decrypt(gnutls_session session, opaque *ciphertext,
 		    size_t ciphertext_size, uint8 * data, size_t data_size,
 		    ContentType type)
 {

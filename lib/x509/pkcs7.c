@@ -187,7 +187,10 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
-	gnutls_datum _data = { data->data, data->size };
+	gnutls_datum _data;
+	
+	_data.data = data->data;
+	_data.size = data->size;
 
 	/* If the PKCS7 is in PEM format then decode it
 	 */

@@ -30,6 +30,7 @@
 #include <x509_b64.h>
 #include <common.h>
 #include <mpi.h>
+#include <time.h>
 
 typedef struct _oid2string {
 	const char * oid;
@@ -110,7 +111,7 @@ int i = 0;
  * hold the string.
  */
 int _gnutls_x509_oid_data2string( const char* oid, void* value, 
-	int value_size, char * res, int *res_size) {
+	int value_size, char * res, size_t *res_size) {
 
 int result;
 char str[1024];
@@ -497,7 +498,7 @@ time_t _gnutls_x509_generalTime2gtime(const char *ttime)
 #define MAX_TIME 1024
 time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
 {
-	opaque ttime[MAX_TIME];
+	char ttime[MAX_TIME];
 	char name[1024];
 	time_t ctime = (time_t)-1;
 	int len, result;

@@ -136,8 +136,8 @@ int err;
 /* These functions are memory consuming 
  */
 
-int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const char* plain, size_t plain_size, 
-	char** compressed, size_t max_comp_size) 
+int _gnutls_compress( GNUTLS_COMP_HANDLE handle, const opaque* plain, size_t plain_size, 
+	opaque** compressed, size_t max_comp_size) 
 {
 int compressed_size=GNUTLS_E_COMPRESSION_FAILED;
 int err;
@@ -222,8 +222,8 @@ int err;
 
 
 
-int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, size_t compressed_size, 
-	char** plain, size_t max_record_size) 
+int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, opaque* compressed, size_t compressed_size, 
+	opaque** plain, size_t max_record_size) 
 {
 int plain_size=GNUTLS_E_DECOMPRESSION_FAILED, err;
 int cur_pos;

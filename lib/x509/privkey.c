@@ -268,7 +268,10 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
 	gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
-	gnutls_datum _data = { data->data, data->size };
+	gnutls_datum _data;
+	
+	data.data = data->data;
+	data.size = data->size;
 
 	key->pk_algorithm = GNUTLS_PK_UNKNOWN;
 

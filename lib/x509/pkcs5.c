@@ -59,7 +59,7 @@ int
 _gnutls_pkcs5_pbkdf2 (int PRF,
 	const char *P,
 	size_t Plen,
-	const char *S,
+	const unsigned char *S,
 	size_t Slen, unsigned int c, unsigned int dkLen, char *DK)
 {
   gcry_md_hd_t prf;

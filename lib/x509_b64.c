@@ -388,7 +388,7 @@ inline static int cpydata(const uint8 * data, int data_size, uint8 ** result)
  */
 #define ENDSTR "-----\n"
 #define ENDSTR2 "-----\r"
-int _gnutls_fbase64_decode( const opaque* header, const opaque * data, size_t data_size,
+int _gnutls_fbase64_decode( const char* header, const opaque * data, size_t data_size,
 			   uint8 ** result)
 {
 	int ret;

@@ -104,7 +104,10 @@ int gnutls_x509_crq_import(gnutls_x509_crq crq, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format)
 {
 	int result = 0, need_free = 0;
-	gnutls_datum _data = { data->data, data->size };
+	gnutls_datum _data;
+	
+	_data.data = data->data;
+	_data.size = data->size;
 
 	/* If the Certificate is in PEM format then decode it
 	 */
