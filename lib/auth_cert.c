@@ -478,7 +478,7 @@ int _gnutls_gen_x509_certificate(GNUTLS_STATE state, opaque ** data)
 
 enum PGPKeyDescriptorType { PGP_KEY_FINGERPRINT, PGP_KEY };
 
-int _gnutls_gen_openpgp_client_certificate(GNUTLS_STATE state,
+int _gnutls_gen_openpgp_certificate(GNUTLS_STATE state,
 					   opaque ** data)
 {
 	int ret;
@@ -524,7 +524,7 @@ int _gnutls_gen_openpgp_client_certificate(GNUTLS_STATE state,
 	return ret;
 }
 
-int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
+int _gnutls_gen_openpgp_certificate_fpr(GNUTLS_STATE state,
 					       opaque ** data)
 {
 	int ret, fpr_size, packet_size;
@@ -549,7 +549,7 @@ int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
 	if (apr_cert_list_length > 0 && apr_cert_list[0].version == 4)
 		packet_size += 20 + 1;
 	else			/* empty certificate case */
-		return _gnutls_gen_openpgp_client_certificate(state, data);
+		return _gnutls_gen_openpgp_certificate(state, data);
 
 	(*data) = gnutls_malloc(packet_size);
 	pdata = (*data);
@@ -585,11 +585,11 @@ int _gnutls_gen_cert_client_certificate(GNUTLS_STATE state, opaque ** data)
 	case GNUTLS_CRT_OPENPGP:
 		if (_gnutls_openpgp_send_fingerprint(state) == 0)
 			return
-			    _gnutls_gen_openpgp_client_certificate(state,
+			    _gnutls_gen_openpgp_certificate(state,
 								   data);
 		else
 			return
-			    _gnutls_gen_openpgp_client_certificate_fpr
+			    _gnutls_gen_openpgp_certificate_fpr
 			    (state, data);
 
 	case GNUTLS_CRT_X509:
@@ -601,60 +601,11 @@ int _gnutls_gen_cert_client_certificate(GNUTLS_STATE state, opaque ** data)
 	}
 }
 
-
-
-/* Generate Server certificate
- */
-
-int _gnutls_gen_openpgp_server_certificate(GNUTLS_STATE state,
-					   opaque ** data)
-{
-	int ret;
-	opaque *pdata;
-	gnutls_cert *apr_cert_list;
-	gnutls_private_key *apr_pkey;
-	int apr_cert_list_length;
-
-	if ((ret =
-	     _gnutls_find_apr_cert(state, &apr_cert_list,
-				   &apr_cert_list_length,
-				   &apr_pkey)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	ret = 3 + 1 + 3;
-	if (apr_cert_list_length > 0)
-		ret += apr_cert_list[0].raw.size;
-
-	(*data) = gnutls_malloc(ret);
-	pdata = (*data);
-
-	if (pdata == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	WRITEuint24(ret - 3, pdata);
-	pdata += 3;
-
-	*pdata = 1;		/* whole key */
-	pdata++;
-
-	if (apr_cert_list_length > 0) {
-		WRITEdatum24(pdata, apr_cert_list[0].raw);
-		pdata += (3 + apr_cert_list[0].raw.size);
-	} else
-		WRITEuint24(0, pdata);
-
-	return ret;
-}
-
 int _gnutls_gen_cert_server_certificate(GNUTLS_STATE state, opaque ** data)
 {
 	switch (state->security_parameters.cert_type) {
 	case GNUTLS_CRT_OPENPGP:
-		return _gnutls_gen_openpgp_server_certificate(state, data);
+		return _gnutls_gen_openpgp_certificate(state, data);
 	case GNUTLS_CRT_X509:
 		return _gnutls_gen_x509_certificate(state, data);
 	default:
@@ -829,6 +780,11 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 	}
 
 	info = _gnutls_get_auth_info(state);
+
+	if (data == NULL || data_size == 0) {
+		gnutls_assert();
+		return GNUTLS_E_NO_CERTIFICATE_FOUND;
+	}
 
 	DECR_LEN(dsize, 3);
 	size = READuint24(p);
