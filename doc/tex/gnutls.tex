@@ -50,13 +50,13 @@ the result of the peer's certificate verification function (ie. if we have
 an authenticated connection. The following function does check the peer's X509
 Certificate, and prints some information about the current state.
 \par
-This function should be called after a successful \begin{verbatim}gnutls_handshake()\end{verbatim}.
+This function should be called after a successful gnutls\_handshake().
 
 \input{ex3}
 
 \subsection{Resuming Sessions}
 \par
-The \begin{verbatim}gnutls_handshake()\end{verbatim} function, is expensive since
+The gnutls\_handshake() function, is expensive since
 a lot of calculations are performed. In order to support many fast connections to
 the same server a client may use session resuming. {\bf Session resuming} is a
 feature of the {\bf TLS} protocol which allows a client to connect to a server,
