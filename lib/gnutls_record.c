@@ -476,10 +476,13 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   * In case of GNUTLS_SHUT_RDWR then the TLS connection gets terminated and
   * further receives and sends will be disallowed. If the return
   * value is zero you may continue using the connection.
+  * (GNUTLS_SHUT_RDWR actually sends an alert containing a close request
+  * and waits for the peer to reply with the same message)
   *
   * In case of GNUTLS_SHUT_WR then the TLS connection gets terminated and
   * further sends will be disallowed. In order to reuse the connection
   * you should wait for an EOF from the peer.
+  * (GNUTLS_SHUT_WR sends an alert containing a close request)
   *
   * This function may also return GNUTLS_E_AGAIN, or GNUTLS_E_INTERRUPTED.
   *
@@ -1192,6 +1195,9 @@ size_t gnutls_get_max_record_size( GNUTLS_STATE state) {
   * Returns 0 on success. The requested record size does not
   * get in effect immediately. It will be used after a successful
   * handshake.
+  *
+  * This function uses a TLS extension called 'max record size'.
+  * Not all TLS implementations use or even understand this extension.
   *
   **/
 size_t gnutls_set_max_record_size( GNUTLS_STATE state, size_t size) {
