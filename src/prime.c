@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	
 	gnutls_global_init();
 
-	fprintf(stderr, "Generating prime...");
+	fprintf(stderr, "Generating DH parameters...");
 	gcry_control (GCRYCTL_SET_VERBOSITY, (int)0);
 	
 	/* this is an emulation of Michael Wiener's table
@@ -80,6 +80,17 @@ int main(int argc, char **argv)
 		}
 
 		printf("\n};\n\n");
+	} else {
+		printf( "\nGenerator: ");
+	
+		for (i=0;i<size;i++) {
+			if (i!=0 && i%12==0) printf("\n\t");
+			else if (i!=0 && i!=size-1) printf( ":");
+
+			printf( "%.2x", tmp1[i]);
+		}
+
+		printf("\n\n");
 	}
 
 	/* print prime */
@@ -103,6 +114,17 @@ int main(int argc, char **argv)
 		}
 
 		printf("\n};\n");
+	} else {
+		printf( "Prime: ");
+
+		for (i=0;i<size;i++) {
+			if (i!=0 && i%12==0) printf("\n\t");
+			else if (i!=0 && i!=size-1) printf( ":");
+			printf( "%.2x", tmp2[i]);
+		}
+
+		printf("\n\n");
+
 	}
 
 	if (!info.cparams) { /* generate a PKCS#3 structure */

@@ -498,7 +498,7 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 		
 		result = _gnutls_fbase64_encode("DH PARAMETERS",
 						tmp, len, &out);
-						
+
 		if (result < 0) {
 			gnutls_assert();
 			return result;
@@ -509,7 +509,7 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
 
-		if (result > *params_data_size) {
+		if (result + 1 > *params_data_size) {
 			gnutls_assert();
 			gnutls_free(out);
 			*params_data_size = result;
@@ -518,6 +518,7 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 
 		*params_data_size = result;
 		memcpy( params_data, out, result);
+		params_data[result] = 0;
 		gnutls_free( out);
 		
 	}
