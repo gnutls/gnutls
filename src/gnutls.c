@@ -33,6 +33,12 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->cipher_specs.client_write_key = NULL;
 
 	(*state)->gnutls_internals.buffer = NULL;
+	(*state)->gnutls_internals.client_md_md5 = NULL;
+	(*state)->gnutls_internals.client_md_sha1 = NULL;
+	(*state)->gnutls_internals.server_md_md5 = NULL;
+	(*state)->gnutls_internals.server_md_sha1 = NULL;
+	(*state)->gnutls_internals.server_hash = 0;
+	(*state)->gnutls_internals.client_hash = 0;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 }
 

@@ -138,10 +138,16 @@ typedef struct {
 	CompressionMethod	compression_method;
 	/* for the handshake protocol */
 	HandshakeType		next_handshake_type;
-	MHASH			td_md5;
-	MHASH			td_sha1;
-	void*			md_md5;
-	void*			md_sha1;
+	MHASH			client_td_md5;
+	MHASH			client_td_sha1;
+	void*			client_md_md5;
+	void*			client_md_sha1;
+	MHASH			server_td_md5;
+	MHASH			server_td_sha1;
+	void*			server_md_md5;
+	void*			server_md_sha1;
+	int			server_hash;
+	int			client_hash;
 } GNUTLS_INTERNALS;
 
 typedef struct {
