@@ -22,11 +22,17 @@
 
 /* Note: This file is only built if GC uses Libgcrypt. */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 /* Get prototype. */
 #include <gc.h>
 
 /* Get libgcrypt API. */
 #include <gcrypt.h>
+
+/* Initialization. */
 
 int
 gc_init (void)
@@ -53,6 +59,31 @@ gc_done (void)
   return;
 }
 
+/* Randomness. */
+
+int
+gc_nonce (char *data, size_t datalen)
+{
+  gcry_create_nonce ((unsigned char *) data, datalen);
+  return GC_OK;
+}
+
+int
+gc_pseudo_random (char *data, size_t datalen)
+{
+  gcry_randomize ((unsigned char *) data, datalen, GCRY_STRONG_RANDOM);
+  return GC_OK;
+}
+
+int
+gc_random (char *data, size_t datalen)
+{
+  gcry_randomize ((unsigned char *) data, datalen, GCRY_VERY_STRONG_RANDOM);
+  return GC_OK;
+}
+
+/* Memory allocation. */
+
 void
 gc_set_allocators (gc_malloc_t func_malloc,
 		   gc_malloc_t secure_malloc,
@@ -62,6 +93,8 @@ gc_set_allocators (gc_malloc_t func_malloc,
   gcry_set_allocation_handler (func_malloc, secure_malloc, secure_check,
 			       func_realloc, func_free);
 }
+
+/* Ciphers. */
 
 int
 gc_cipher_open (int alg, int mode, gc_cipher * outhandle)

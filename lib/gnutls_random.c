@@ -1,16 +1,17 @@
 /*
+ * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2001,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public   
- *  License as published by the Free Software Foundation; either 
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
  *  version 2.1 of the License, or (at your option) any later version.
  *
  *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
  *
@@ -32,12 +33,25 @@
  */
 int _gnutls_get_random(opaque * res, int bytes, int level)
 {
-    if (level == GNUTLS_WEAK_RANDOM) {
-	gcry_create_nonce(res, bytes);
-	return 0;
+  int err;
+
+  switch (level)
+    {
+    case GNUTLS_WEAK_RANDOM:
+      err = gc_nonce ((char*) res, (size_t) bytes);
+      break;
+
+    case GNUTLS_STRONG_RANDOM:
+      err = gc_pseudo_random ((char*) res, (size_t) bytes);
+      break;
+
+    default: /* GNUTLS_VERY_STRONG_RANDOM */
+      err = gc_random ((char*) res, (size_t) bytes);
+      break;
     }
 
-    gcry_randomize(res, bytes, level);
+  if (err != GC_OK)
+    return GNUTLS_E_RANDOM_FAILED;
 
-    return 0;
+  return GNUTLS_E_SUCCESS;
 }

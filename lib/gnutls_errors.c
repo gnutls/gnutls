@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2004 Simon Josefsson
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
  * Copyright (C) 2004 Free Software Foundation
  *
@@ -228,6 +229,7 @@ static gnutls_error_entry error_algorithms[] = {
     ERROR_ENTRY("The Message Authentication Code verification failed.",
 		GNUTLS_E_MAC_VERIFY_FAILED, 1),
     ERROR_ENTRY("Some constraint limits were reached.", GNUTLS_E_CONSTRAINT_ERROR, 1),
+    ERROR_ENTRY("Failed to acquire random data.", GNUTLS_E_RANDOM_FAILED, 1),
     {NULL, NULL, 0, 0}
 };
 

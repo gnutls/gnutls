@@ -22,10 +22,20 @@
 
 /* Note: This file is only built if GC uses Nettle. */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <stdlib.h>
 
 /* Get prototype. */
 #include <gc.h>
+
+/* For randomize. */
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 /* XXX GnuTLS still need Libgcrypt. */
 #include <gcrypt.h>
@@ -57,6 +67,75 @@ gc_done (void)
   return;
 }
 
+/* Randomness. */
+
+static int
+randomize (int level, char *data, size_t datalen)
+{
+  int fd;
+  char *device;
+  size_t len = 0;
+  int rc;
+
+  switch (level)
+    {
+    case 0:
+      device = NAME_OF_NONCE_DEVICE;
+      break;
+
+    case 1:
+      device = NAME_OF_PSEUDO_RANDOM_DEVICE;
+      break;
+
+    default:
+      device = NAME_OF_RANDOM_DEVICE;
+      break;
+    }
+
+  fd = open (device, O_RDONLY);
+  if (fd < 0)
+    return GC_RANDOM_ERROR;
+
+  do
+    {
+      ssize_t tmp;
+
+      tmp = read (fd, data, datalen);
+
+      if (tmp < 0)
+	return GC_RANDOM_ERROR;
+
+      len += tmp;
+    }
+  while (len < datalen);
+
+  rc = close (fd);
+  if (rc < 0)
+    return GC_RANDOM_ERROR;
+
+  return GC_OK;
+}
+
+int
+gc_nonce (char *data, size_t datalen)
+{
+  return randomize (0, data, datalen);
+}
+
+int
+gc_pseudo_random (char *data, size_t datalen)
+{
+  return randomize (1, data, datalen);
+}
+
+int
+gc_random (char *data, size_t datalen)
+{
+  return randomize (2, data, datalen);
+}
+
+/* Memory allocation. */
+
 void
 gc_set_allocators (gc_malloc_t func_malloc,
 		   gc_malloc_t secure_malloc,
@@ -67,6 +146,8 @@ gc_set_allocators (gc_malloc_t func_malloc,
   gcry_set_allocation_handler (func_malloc, secure_malloc, secure_check,
 			       func_realloc, func_free);
 }
+
+/* Ciphers. */
 
 #include "nettle-meta.h"
 #include "aes.h"

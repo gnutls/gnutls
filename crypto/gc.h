@@ -31,6 +31,7 @@ enum Gc_rc
   GC_OK = 0,
   GC_MALLOC_ERROR,
   GC_INIT_ERROR,
+  GC_RANDOM_ERROR,
   GC_INVALID_CIPHER
 };
 typedef enum Gc_rc Gc_rc;
@@ -59,6 +60,10 @@ typedef void *gc_cipher;
 
 extern int gc_init (void);
 extern void gc_done (void);
+
+extern int gc_nonce (char *data, size_t datalen);
+extern int gc_pseudo_random (char *data, size_t datalen);
+extern int gc_random (char *data, size_t datalen);
 
 /* Memory allocation (avoid). */
 typedef void *(*gc_malloc_t) (size_t n);
