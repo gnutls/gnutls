@@ -30,7 +30,9 @@
 #define MAX_COMP_SIZE 17408 /* 2^14+1024 */
 int gnutls_compress( CompressionMethod algorithm, char* plain, int plain_size, char** compressed) {
 int compressed_size;
+#ifdef HAVE_LIBZ
 uLongf size;
+#endif
 int err;
 
 	switch (algorithm) {
@@ -70,7 +72,9 @@ int err;
 
 int gnutls_decompress( CompressionMethod algorithm, char* compressed, int compressed_size, char** plain) {
 int plain_size, err;
+#ifdef HAVE_LIBZ
 uLongf size;
+#endif
 
 	if (compressed_size > MAX_COMP_SIZE) return GNUTLS_E_DECOMPRESSION_FAILED;
 	switch (algorithm) {
