@@ -36,7 +36,10 @@ enum Gc_rc
   GC_INIT_ERROR,
   GC_RANDOM_ERROR,
   GC_INVALID_CIPHER,
-  GC_INVALID_HASH
+  GC_INVALID_HASH,
+  GC_PKCS5_INVALID_ITERATION_COUNT,
+  GC_PKCS5_INVALID_DERIVED_KEY_LENGTH,
+  GC_PKCS5_DERIVED_KEY_TOO_LONG
 };
 typedef enum Gc_rc Gc_rc;
 
@@ -124,5 +127,10 @@ extern int gc_hmac_md5 (const char *key, size_t keylen,
 extern int gc_hmac_sha1 (const char *key, size_t keylen,
 			 const char *in, size_t inlen,
 			 char outhash[GC_SHA1_LEN]);
+
+/* PKCS5 KDF. */
+extern int gc_pkcs5_pbkdf2_sha1 (const char *P, size_t Plen,
+				 const char *S, size_t Slen,
+				 unsigned int c, unsigned int dkLen, char *DK);
 
 #endif /* GC_H */

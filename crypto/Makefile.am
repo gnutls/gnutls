@@ -22,7 +22,7 @@ AM_CPPFLAGS = @LIBGCRYPT_CFLAGS@ @NETTLE_CFLAGS@
 
 noinst_LTLIBRARIES = libgc.la
 
-libgc_la_SOURCES = gc.h
+libgc_la_SOURCES = gc.h pkcs5.c
 libgc_la_LIBADD = @LIBGCRYPT_LIBS@ @NETTLE_LIBS@
 
 if NETTLE
