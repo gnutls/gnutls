@@ -526,7 +526,7 @@ int _gnutls_gen_openpgp_client_certificate(GNUTLS_STATE state,
 int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
 					       opaque ** data)
 {
-	int ret;
+	int ret, fpr_size;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
 	gnutls_private_key *apr_pkey;
@@ -567,7 +567,11 @@ int _gnutls_gen_openpgp_client_certificate_fpr(GNUTLS_STATE state,
 	*pdata = 20;
 	pdata++;
 
-	memcpy(pdata, apr_cert_list[0].fingerprint, 20);
+	fpr_size = 20;
+	if ( (ret=gnutls_openpgp_fingerprint( &apr_cert_list[0].raw, pdata, &fpr_size)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	return ret;
 }
@@ -915,7 +919,7 @@ int _gnutls_proc_openpgp_server_certificate(GNUTLS_STATE state,
 		}
 		
 		DECR_LEN( dsize, 20);
-		
+
 		/* request the actual key from our database, or
 		 * a key server or anything.
 		 */
