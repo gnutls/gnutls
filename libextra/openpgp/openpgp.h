@@ -1,3 +1,6 @@
+#ifndef OPENPGP_H
+# define OPENPGP_H
+
 #include <config.h>
 
 typedef enum gnutls_openpgp_key_fmt { GNUTLS_OPENPGP_FMT_RAW,
@@ -5,8 +8,6 @@ typedef enum gnutls_openpgp_key_fmt { GNUTLS_OPENPGP_FMT_RAW,
 
 #ifdef HAVE_LIBOPENCDK
 
-#ifndef OPENPGP_H
-# define OPENPGP_H
 
 #include <opencdk.h>
 
@@ -82,9 +83,8 @@ int _gnutls_openpgp_privkey_to_gkey( gnutls_privkey* dest, gnutls_openpgp_privke
 
 void gnutls_openpgp_privkey_deinit(gnutls_openpgp_privkey key);
 
-#endif
 
-# else /* no opencdk */
+#else /* no opencdk */
 
 typedef void *gnutls_openpgp_key;
 typedef void *gnutls_openpgp_privkey;
@@ -92,3 +92,5 @@ typedef void *gnutls_openpgp_keyring;
 typedef void *gnutls_openpgp_trustdb;
 
 #endif /* HAVE_LIBOPENCDK */
+
+#endif /* OPENPGP_H */
