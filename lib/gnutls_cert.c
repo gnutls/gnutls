@@ -390,8 +390,8 @@ void gnutls_certificate_server_set_retrieve_function(gnutls_certificate_credenti
 /* These are set by the gnutls_extra library's initialization function.
  */
 
-OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_extract_key_creation_time = NULL;
-OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_extract_key_expiration_time = NULL;
+OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_creation_time = NULL;
+OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_expiration_time = NULL;
 OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
 
 /*-
@@ -517,12 +517,12 @@ time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
 
 	switch( gnutls_certificate_type_get( session)) {
 		case GNUTLS_CRT_X509:
-			return gnutls_x509_extract_certificate_expiration_time(
+			return _gnutls_x509_get_raw_crt_expiration_time(
 				&info->raw_certificate_list[0]);
 		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_extract_key_expiration_time==NULL)
+			if (_E_gnutls_openpgp_get_raw_key_expiration_time==NULL)
 				return (time_t)-1;
-			return _E_gnutls_openpgp_extract_key_expiration_time(
+			return _E_gnutls_openpgp_get_raw_key_expiration_time(
 				&info->raw_certificate_list[0]);
 		default:
 			return (time_t)-1;
@@ -557,12 +557,12 @@ time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 
 	switch( gnutls_certificate_type_get( session)) {
 		case GNUTLS_CRT_X509:
-			return gnutls_x509_extract_certificate_activation_time(
+			return _gnutls_x509_get_raw_crt_activation_time(
 				&info->raw_certificate_list[0]);
 		case GNUTLS_CRT_OPENPGP:
-			if (_E_gnutls_openpgp_extract_key_creation_time==NULL)
+			if (_E_gnutls_openpgp_get_raw_key_creation_time==NULL)
 				return (time_t)-1;
-			return _E_gnutls_openpgp_extract_key_creation_time(
+			return _E_gnutls_openpgp_get_raw_key_creation_time(
 				&info->raw_certificate_list[0]);
 		default:
 			return (time_t)-1;

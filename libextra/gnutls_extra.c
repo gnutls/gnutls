@@ -150,8 +150,8 @@ int i;
 }
 
 
-extern OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_extract_key_creation_time;
-extern OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_extract_key_expiration_time;
+extern OPENPGP_KEY_CREATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_creation_time;
+extern OPENPGP_KEY_EXPIRATION_TIME_FUNC _E_gnutls_openpgp_get_raw_key_expiration_time;
 extern OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key;
 extern OPENPGP_FINGERPRINT _E_gnutls_openpgp_fingerprint;
 extern OPENPGP_KEY_REQUEST _E_gnutls_openpgp_request_key;
@@ -166,10 +166,10 @@ extern OPENPGP_PRIVKEY_DEINIT _E_gnutls_openpgp_privkey_deinit;
 
 static void _gnutls_add_openpgp_functions(void) {
 #ifdef HAVE_LIBOPENCDK
-	_E_gnutls_openpgp_verify_key = gnutls_openpgp_verify_key;
-	_E_gnutls_openpgp_extract_key_expiration_time = gnutls_openpgp_extract_key_expiration_time;
-	_E_gnutls_openpgp_extract_key_creation_time = gnutls_openpgp_extract_key_creation_time;
-	_E_gnutls_openpgp_fingerprint = gnutls_openpgp_fingerprint;
+	_E_gnutls_openpgp_verify_key = _gnutls_openpgp_verify_key;
+	_E_gnutls_openpgp_get_raw_key_expiration_time = _gnutls_openpgp_get_raw_key_expiration_time;
+	_E_gnutls_openpgp_get_raw_key_creation_time = _gnutls_openpgp_get_raw_key_creation_time;
+	_E_gnutls_openpgp_fingerprint = _gnutls_openpgp_fingerprint;
 	_E_gnutls_openpgp_request_key = _gnutls_openpgp_request_key;
 
 	_E_gnutls_openpgp_raw_key_to_gcert = _gnutls_openpgp_raw_key_to_gcert;
