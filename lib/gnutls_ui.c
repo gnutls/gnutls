@@ -60,7 +60,7 @@ const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
   * @bits: is the number of bits
   *
   * This function sets the number of bits, for use in an 
-  * Diffie Hellman key exchange. This is used both in DHE and
+  * Diffie Hellman key exchange. This is used both in DH ephemeral and
   * DH anonymous cipher suites.
   *
   **/
@@ -74,7 +74,8 @@ void gnutls_dh_set_bits(GNUTLS_STATE state, int bits)
   * @state: is a gnutls state
   *
   * This function will return the bits used in the last Diffie Hellman authentication
-  * with the peer. Returns a negative value in case of an error.
+  * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
+  * Returns a negative value in case of an error.
   *
   **/
 int gnutls_dh_get_bits(GNUTLS_STATE state)
@@ -191,7 +192,7 @@ const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state,
 
 
 /**
-  * gnutls_x509pki_get_certificate_request_status - This function returns the certificate request status
+  * gnutls_certificate_client_get_request_status - This function returns the certificate request status
   * @state: is a gnutls state
   *
   * This function will return 0 if the peer (server) did not request client
@@ -199,7 +200,7 @@ const gnutls_datum *gnutls_x509pki_get_peer_certificate_list(GNUTLS_STATE state,
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_x509pki_get_certificate_request_status(GNUTLS_STATE state)
+int gnutls_certificate_client_get_request_status(GNUTLS_STATE state)
 {
 	CERTIFICATE_AUTH_INFO info;
 

@@ -53,8 +53,6 @@ const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
 
 /* ANON */
 
-int gnutls_dh_get_dha_bits( GNUTLS_STATE state);
-
 void gnutls_dh_set_bits( GNUTLS_STATE state, int bits);
 int gnutls_dh_get_bits( GNUTLS_STATE);
 
@@ -63,7 +61,7 @@ int gnutls_dh_get_bits( GNUTLS_STATE);
 void gnutls_x509pki_set_client_cert_callback( GNUTLS_CERTIFICATE_CREDENTIALS, gnutls_x509pki_client_cert_callback_func *);
 
 void gnutls_x509pki_set_server_cert_callback( GNUTLS_CERTIFICATE_CREDENTIALS, gnutls_x509pki_server_cert_callback_func *);
-void gnutls_x509pki_server_set_cert_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
+void gnutls_certificate_server_set_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 
 /* X.509 certificate handling functions */
 int gnutls_x509pki_extract_dn( const gnutls_datum*, gnutls_dn*);
@@ -79,17 +77,8 @@ int gnutls_x509pki_verify_certificate( const gnutls_datum* cert_list, int cert_l
 
 /* get data from the state */
 const gnutls_datum* gnutls_x509pki_get_peer_certificate_list( GNUTLS_STATE, int* list_size);
-int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE);
+int gnutls_certificate_client_get_request_status(  GNUTLS_STATE);
 int gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);
-
-#define gnutls_x509pki_server_get_dh_bits gnutls_x509pki_get_dh_bits
-#define gnutls_x509pki_client_get_dh_bits gnutls_x509pki_get_dh_bits
-
-#define gnutls_x509pki_server_get_peer_certificate_status gnutls_x509pki_get_peer_certificate_status
-#define gnutls_x509pki_server_get_peer_certificate_list gnutls_x509pki_get_peer_certificate_list
-
-#define gnutls_x509pki_client_get_peer_certificate_status gnutls_x509pki_get_peer_certificate_status
-#define gnutls_x509pki_client_get_peer_certificate_list gnutls_x509pki_get_peer_certificate_list
 
 int gnutls_b64_encode_fmt( const char* msg, const gnutls_datum *data, char* result, int* result_size);
 int gnutls_b64_decode_fmt( const gnutls_datum *b64_data, char* result, int* result_size);
