@@ -133,6 +133,7 @@ void _gnutls_handshake_internal_state_clear( GNUTLS_STATE state) {
 		sizeof(HANDSHAKE_HEADER_BUFFER));
 	state->gnutls_internals.adv_version_minor = 0;
 	state->gnutls_internals.adv_version_minor = 0;
+	state->gnutls_internals.handshake_direction = 0;
 
 	state->gnutls_internals.resumable = RESUME_TRUE;
 
