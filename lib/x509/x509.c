@@ -1441,6 +1441,8 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt_t cert,
 	}
 
 	ret = _gnutls_x509_compare_raw_dn(&dn1, &dn2);
+	_gnutls_free_datum(&dn1);
+	_gnutls_free_datum(&dn2);
 	if (ret == 0) {
 	    /* issuers do not match so don't even
 	     * bother checking.

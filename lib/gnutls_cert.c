@@ -205,6 +205,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials_t sc)
 {
     gnutls_certificate_free_keys(sc);
     gnutls_certificate_free_cas(sc);
+    gnutls_certificate_free_ca_names(sc);
 #ifdef ENABLE_PKI
     gnutls_certificate_free_crls(sc);
 #endif
