@@ -95,7 +95,7 @@ if test $ac_cv_c_compiler_gnu != no; then
 
 	  CFLAGS="${CFLAGS} -O0 -ggdb3 -Wall -Wpointer-arith -Wstrict-prototypes" # -Werror
 	else
-	  CFLAGS="${CFLAGS} -O2"
+	  CFLAGS="${CFLAGS} -O2 -fexpensive-optimizations -fomit-frame-pointer"
 	fi
 
 	if test x$opt_dmalloc_mode = xyes; then
