@@ -226,7 +226,7 @@ LIBS="${LIBS} -lmhash")])
 AC_MSG_CHECKING([whether to check for external libraries])
 
 dnl if used --without-ext-libraries then we will not check
-dnl for any library (libz, libgdbm, opencdk)
+dnl for any library (libz, libgdbm)
 
 AC_ARG_WITH( ext-libraries, [  --without-ext-libraries disable external libraries support],
  ac_ext_libraries=$withval
@@ -240,9 +240,6 @@ if test x$ac_ext_libraries != xno; then
  AC_CHECK_LIB(z, compress,,AC_MSG_WARN(
 *** 
 *** ZLIB was not found. You will not be able to use ZLIB compression.))
- AC_CHECK_LIB(opencdk, cdk_iobuf_new,,AC_MSG_WARN(
-***
-*** OPENCDK was not found. You will not be able to use OpenPGP keys with gnutls.))
 else
  AC_MSG_RESULT()
 fi

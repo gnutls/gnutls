@@ -714,8 +714,8 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 		/* no certificate was sent */
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 	}
-	i = dsize;
 
+	i = dsize;
 	while(i > 0) {
 		DECR_LEN(dsize, 3);
 		len = READuint24(p);

@@ -1,3 +1,41 @@
+2002-03-23 09:39  nmav <nmav@gnutls.org>
+
+	* lib/auth_cert.c:
+
+	Cleanups and fixes in X.509 certificate message parsing 
+
+2002-03-22 13:08  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c:
+
+	Corrected code to avoid compiler's warnings 
+
+2002-03-21 20:25  nmav <nmav@gnutls.org>
+
+	* ChangeLog, acconfig.h, configure.in, lib/auth_anon.c,
+	lib/auth_srp.c, lib/auth_srp.h, lib/auth_srp_passwd.c,
+	lib/auth_srp_passwd.h, lib/auth_srp_sb64.c, lib/crypt.c,
+	lib/crypt_bcrypt.c, lib/crypt_srpsha1.c, lib/ext_srp.c,
+	lib/ext_srp.h, lib/gnutls_algorithms.c, lib/gnutls_anon_cred.c,
+	lib/gnutls_auth.c, lib/gnutls_extensions.c,
+	lib/gnutls_session_pack.c, lib/gnutls_srp.c, lib/gnutls_srp.h,
+	lib/gnutls_ui.c, src/serv.c:
+
+	Added hooks not to include SRP and Anonymous authentication 
+
+2002-03-21 19:44  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_cert.c, gnutls_x509.c:
+
+	Corrected behaviour when no certificate is got by the peer.  
+
+2002-03-21 19:44  nmav <nmav@gnutls.org>
+
+	* src/: Makefile.am, gnutls-http-serv:
+
+	Added script which runs an http server with the appropriate
+	parameters.  
+
 2002-03-21 19:27  nmav <nmav@gnutls.org>
 
 	* ChangeLog, NEWS, lib/gnutls_record.c, lib/gnutls_state.c:
