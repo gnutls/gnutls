@@ -1,3 +1,22 @@
+2004-06-04 13:24  nmav <nmav@gnutls.org>
+
+	* lib/: auth_dh_common.c, auth_dh_common.h, gnutls_compress_int.c,
+	gnutls_mpi.c, gnutls_state.c, gnutls_state.h, gnutls_ui.c,
+	gnutls_ui.h:
+
+	added function to access the DH (peer's) public key.  
+
+2004-06-04 12:03  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.h,
+	lib/auth_dh_common.c, lib/auth_dh_common.h, lib/auth_dhe.c,
+	lib/gnutls_auth.c, lib/gnutls_cipher_int.c, lib/gnutls_int.h,
+	lib/gnutls_mpi.c, lib/gnutls_mpi.h, lib/gnutls_state.c,
+	lib/gnutls_state.h, lib/gnutls_ui.c, lib/gnutls_ui.h, src/serv.c:
+
+	Added news functions to allow access to the ephemeral Diffie Hellman
+	parameters.  
+
 2004-05-31 20:05  nmav <nmav@gnutls.org>
 
 	* src/: cli.c, cli.c:
