@@ -1,3 +1,18 @@
+2003-09-14 09:43  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_constate.c, lib/gnutls_errors.c,
+	lib/gnutls_handshake.c, lib/gnutls_v2_compat.c, src/cli.c,
+	src/serv.c:
+
+	some more cleanups.  
+
+2003-09-14 08:52  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c, src/cli.c, src/serv.c:
+
+	Corrected the client's behaviour in the handshake handling. Some
+	fixes in the documentation.  
+
 2003-09-12 13:13  nmav <nmav@gnutls.org>
 
 	* configure.in, lib/Makefile.am, lib/libgnutls.vers:
