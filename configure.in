@@ -331,8 +331,22 @@ AC_CONFIG_COMMANDS([lib/gnutls.h],[[
  chmod +x lib/libgnutls-config
 ]],[[]])
 
+AC_CONFIG_COMMANDS_POST( 
+	echo "*****************"
+if test x$ac_enable_srp = xno && test x$ac_enable_openpgp = xno;then
+	echo "* License: LGPL *"
+else
+	echo "* License: GPL  *"
+fi
+	echo "*****************"
+	echo "(see the README file)"
+	echo ""
+)
+
 AC_CONFIG_FILES([Makefile src/Makefile lib/Makefile lib/libgnutls-config \
 doc/Makefile src/x509/Makefile src/srp/Makefile doc/tex/Makefile \
 doc/tex/cover.tex doc/scripts/Makefile src/openpgp/Makefile])
+
+
 AC_OUTPUT
 
