@@ -76,17 +76,7 @@ static void print_x509_certificate_info(gnutls_session session)
       algo =
           gnutls_x509_crt_get_pk_algorithm(cert, &bits);
 
-      printf("Certificate public key: ");
-
-      if (algo == GNUTLS_PK_RSA) {
-         printf("RSA\n");
-         printf(" Modulus: %d bits\n", bits);
-      } else if (algo == GNUTLS_PK_DSA) {
-         printf("DSA\n");
-         printf(" Exponent: %d bits\n", bits);
-      } else {
-         printf("UNKNOWN\n");
-      }
+      printf("Certificate public key: %s", gnutls_pk_algorithm_get_name(algo));
 
       /* Print the version of the X.509 
        * certificate.
