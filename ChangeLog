@@ -1,3 +1,41 @@
+2003-03-20 18:20  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex-serv-export.tex, lib/gnutls.h.in.in,
+	lib/gnutls_ui.c, src/prime-gaa.c, src/prime.gaa:
+
+	* The gnutls_certificate_set_rsa_params() was renamed to 
+	  gnutls_certificate_set_rsa_export_params().  
+
+2003-03-20 17:35  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_rsa.c:
+
+	* Implemented the counter measure discussed in the paper "Attacking 
+	  RSA-based Sessions in SSL/TLS", against the attack discussed in
+	  the same paper.  
+
+2003-03-20 17:11  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/auth_rsa.c, lib/gnutls.h.in.in, lib/gnutls_alert.c,
+	lib/gnutls_global.c, lib/gnutls_handshake.c, lib/gnutls_int.h,
+	lib/gnutls_pk.c, lib/gnutls_state.c, src/tests.c, src/tests.h,
+	src/tls_test.c:
+
+	* The RSA premaster secret version check can no longer be disabled.  
+	* Implemented the counter measure discussed in the paper "Attacking 
+	  RSA-based Sessions in SSL/TLS", against the attack discussed in
+	  the same paper.  
+	* Added the functions: gnutls_handshake_get_last_in(), 
+	  gnutls_handshake_get_last_out().  
+
+2003-03-20 09:23  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_priority.c:
+
+	* The diffie Hellman ciphersuites are now of higher priority than 
+	  the plain RSA.  
+	* Added the new libtasn1.  
+
 2003-03-19 11:17  nmav <nmav@gnutls.org>
 
 	* NEWS, configure.in, lib/auth_rsa.c, lib/debug.c, lib/debug.h,
