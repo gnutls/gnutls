@@ -7,4 +7,8 @@ gnutls-api.tex
 *.toc
 *.log
 *.png
-index.html
+*.html
+WARNINGS
+*.css
+asn1-api.tex
+*.pl
