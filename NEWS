@@ -1,5 +1,6 @@
 Version 1.1.10
 - Added gnutls_sign_algorithm_get_name() and gnutls_pk_algorithm_get_name()
+- Corrected bug in TLS renegotiation.
 
 Version 1.1.9 (14/04/2004)
 - Added support for authority key identifier and the extended key usage

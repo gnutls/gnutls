@@ -594,11 +594,12 @@ static int _gnutls_record_check_type( gnutls_session session, ContentType recv_t
 			
 			break;
 		case GNUTLS_HANDSHAKE:
-			/* This is only legal if HELLO_REQUEST is received - and we are a client 
+			/* This is legal if HELLO_REQUEST is received - and we are a client,
+			 * or we are a server. A client may initiate a renegotiation at any time.
 			 */
 			if ( session->security_parameters.entity==GNUTLS_SERVER) {
 				gnutls_assert();
-				return GNUTLS_E_UNEXPECTED_PACKET;
+				return GNUTLS_E_REHANDSHAKE;
 			}
 			
 			/* If we are already in a handshake then a Hello
@@ -913,6 +914,10 @@ ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t siz
   * an error code of GNUTLS_E_REHANDSHAKE. This message may be
   * simply ignored, replied with an alert containing NO_RENEGOTIATION, 
   * or replied with a new handshake. 
+  *
+  * A server may also receive GNUTLS_E_REHANDSHAKE when a client has
+  * initiated a handshake. In that case the server can only initiate
+  * a handshake or terminate the connection.
   *
   * Returns the number of bytes received and zero on EOF.
   * A negative error code is returned in case of an error.
