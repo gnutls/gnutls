@@ -107,4 +107,3 @@ init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
 	$dh_params_file=NULL; $debug=0; }
 
 
-INCOMP dg

@@ -920,11 +920,14 @@ unsigned char *MD5(const unsigned char *buf, unsigned long len,
     if (!md)
         return NULL;
 
-    local_md = alloca(gcry_md_get_algo_dlen(GCRY_MD_MD5));
+    local_md = malloc(gcry_md_get_algo_dlen(GCRY_MD_MD5));
+    if (!local_md)
+        return NULL;
 
     gcry_md_hash_buffer(GCRY_MD_MD5, local_md, buf, len);
 
     memcpy(md, local_md, gcry_md_get_algo_dlen(GCRY_MD_MD5));
+    free( local_md);
     
     return md;
 }
@@ -957,11 +960,14 @@ unsigned char *RIPEMD160(const unsigned char *buf, unsigned long len,
     if (!md)
         return NULL;
 
-    local_md = alloca(gcry_md_get_algo_dlen(GCRY_MD_RMD160));
+    local_md = malloc(gcry_md_get_algo_dlen(GCRY_MD_RMD160));
+    if (!local_md)
+        return NULL;
 
     gcry_md_hash_buffer(GCRY_MD_RMD160, local_md, buf, len);
 
     memcpy(md, local_md, gcry_md_get_algo_dlen(GCRY_MD_RMD160));
+    free( local_md);
     
     return md;
 }

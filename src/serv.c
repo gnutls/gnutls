@@ -87,7 +87,7 @@ char *x509_crlfile = NULL;
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
-#define GERR(ret, where) fprintf(stdout, "*** gnutls error[%d]: %s (%s)\n", ret, gnutls_strerror(ret), where)
+#define GERR(ret) fprintf(stdout, "Error: %s\n", gnutls_strerror(ret))
 #define MAX_BUF 1024
 
 #undef max
@@ -581,7 +581,7 @@ int main(int argc, char **argv)
       if ((ret = gnutls_certificate_set_x509_trust_file
 	   (cert_cred, x509_cafile, x509ctype)) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_cafile);
-	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
+	 GERR(ret);
 	 exit(1);
       } else {
 	 printf("Processed %d CA certificate(s).\n", ret);
@@ -593,7 +593,7 @@ int main(int argc, char **argv)
       if ((ret = gnutls_certificate_set_x509_crl_file
 	   (cert_cred, x509_crlfile, x509ctype)) < 0) {
 	 fprintf(stderr, "Error reading '%s'\n", x509_crlfile);
-	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
+	 GERR(ret);
 	 exit(1);
       } else {
 	 printf("Processed %d CRL(s).\n", ret);
@@ -607,7 +607,7 @@ int main(int argc, char **argv)
 						      pgp_keyring);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the OpenPGP keyring file\n");
-	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
+	 GERR(ret);
       }
    }
 
@@ -615,7 +615,7 @@ int main(int argc, char **argv)
       ret = gnutls_certificate_set_openpgp_trustdb(cert_cred, pgp_trustdb);
       if (ret < 0) {
 	 fprintf(stderr, "Error setting the OpenPGP trustdb file\n");
-	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
+	 GERR(ret);
       }
    }
 
@@ -625,7 +625,7 @@ int main(int argc, char **argv)
 	 fprintf(stderr,
 		 "Error[%d] while reading the OpenPGP key pair ('%s', '%s')\n",
 		 ret, pgp_certfile, pgp_keyfile);
-	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
+	 GERR(ret);
       }
 
    if (x509_certfile != NULL)
@@ -634,7 +634,7 @@ int main(int argc, char **argv)
 	 fprintf(stderr,
 		 "Error reading '%s' or '%s'\n", x509_certfile,
 		 x509_keyfile);
-	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
+	 GERR(ret);
 	 exit(1);
       }
 
@@ -656,7 +656,7 @@ int main(int argc, char **argv)
 	 /* only exit is this function is not disabled 
 	  */
 	 fprintf(stderr, "Error while setting SRP parameters\n");
-	 fprintf(stderr, "Error: '%s'\n", gnutls_strerror(ret));
+	 GERR(ret);
       }
 #endif
 
@@ -767,7 +767,8 @@ int main(int argc, char **argv)
 		  check_alert(j->tls_session, r);
 		  /* nothing */
 	       } else if (r < 0 && gnutls_error_is_fatal(r) == 1) {
-		  GERR(r, "handshake");
+	          fprintf(stderr, "Error in handshake\n");
+		  GERR(r);
 
 		  do {
 		     ret =
@@ -799,7 +800,8 @@ int main(int argc, char **argv)
 		  j->http_state = HTTP_STATE_CLOSING;
 		  if (r < 0 && r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH) {
 		     check_alert(j->tls_session, r);
-		     GERR(r, "recv");
+		     fprintf(stderr, "Error while receiving data\n");
+		     GERR(r);
 		  }
 
 	       } else {
@@ -841,7 +843,8 @@ int main(int argc, char **argv)
 		  int ret;
 
 		  j->http_state = HTTP_STATE_CLOSING;
-		  GERR(r, "handshake");
+	          fprintf(stderr, "Error in handshake\n");
+		  GERR(r);
 
 		  do {
 		     ret =
@@ -882,8 +885,10 @@ int main(int argc, char **argv)
 		     j->http_request[0] = 0;
 		  }
 
-		  if (r < 0)
-		     GERR(r, "send");
+		  if (r < 0) {
+  	             fprintf(stderr, "Error while sending data\n");
+		     GERR(r);
+		  }
 		  check_alert(j->tls_session, r);
 	       } else {
 		  j->response_written += r;

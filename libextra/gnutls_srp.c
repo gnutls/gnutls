@@ -641,11 +641,11 @@ size_t size;
  */
 
 void gnutls_srp_free_client_cred( gnutls_srp_client_credentials sc) {
-	return gnutls_srp_free_client_credentials( sc);
+	gnutls_srp_free_client_credentials( sc);
 }
 
 void gnutls_srp_free_server_cred( gnutls_srp_server_credentials sc) {
-	return gnutls_srp_free_server_credentials( sc);
+	gnutls_srp_free_server_credentials( sc);
 }
 
 int gnutls_srp_allocate_client_cred( gnutls_srp_client_credentials *sc) {
@@ -666,7 +666,5 @@ int gnutls_srp_set_client_cred( gnutls_srp_client_credentials res, char *usernam
 {
 	return gnutls_srp_set_client_credentials( res, username, password);
 }
-
-
 
 #endif /* ENABLE_SRP */

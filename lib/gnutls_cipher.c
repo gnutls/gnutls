@@ -64,7 +64,7 @@ int _gnutls_encrypt(gnutls_session session, const char* headers, size_t headers_
 		const char *data, size_t data_size,
 		opaque * ciphertext, size_t ciphertext_size, ContentType type, int random_pad)
 {
-	const gnutls_datum plain = { (opaque*) data, data_size };
+	gnutls_datum plain = { (opaque*) data, data_size };
 	gnutls_datum comp;
 	int ret;
 	int free_comp = 1;

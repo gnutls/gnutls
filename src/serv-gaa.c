@@ -1014,7 +1014,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 int gaa(int argc, char **argv, gaainfo *gaaval)
 {
     int tmp1, tmp2;
-    int i, j, k;
+    int i, j;
     char *opt_list;
 
     GAAargv = argv;
@@ -1113,7 +1113,6 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     }
 if(gaa_processing_file == 0)
 {
-	GAA_INCOMP("dg");
 
 #line 507 "gaa.skel"
 #ifdef GAA_REST_EXISTS

@@ -44,7 +44,7 @@ asn1_retCode _asn1_get_bit_der(const unsigned char *der,
                 int *der_len,unsigned char *str, int str_size, 
                 int *bit_len);
 
-unsigned long _asn1_get_length_der(const unsigned char *der,int  *len);
+signed long _asn1_get_length_der(const unsigned char *der,int  *len);
 
 void _asn1_length_der(unsigned long len,unsigned char *ans,int *ans_len);
 

@@ -1055,7 +1055,7 @@ opaque algo = GNUTLS_PK_DSA;
 /**
   * gnutls_x509_privkey_get_key_id - This function will return a unique ID of the key's parameters
   * @key: Holds the key
-  * @output_data: will contain a private key PEM or DER encoded
+  * @output_data: will contain the key ID
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
   * This function will return a unique ID the depends on the public key

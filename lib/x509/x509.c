@@ -1006,6 +1006,7 @@ gnutls_datum tmp;
 		return _gnutls_asn2err(result);
 	}
 	
+	tmp.data = cert_buf;
 	tmp.size = cert_buf_size;
 
 	result = gnutls_fingerprint( algo, &tmp, buf, sizeof_buf);
@@ -1044,7 +1045,7 @@ int gnutls_x509_crt_export( gnutls_x509_crt cert,
 /**
   * gnutls_x509_crt_get_key_id - This function will return a unique ID of the public key's parameters
   * @crt: Holds the certificate
-  * @output_data: will contain a private key PEM or DER encoded
+  * @output_data: will contain the key ID
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
   * This function will return a unique ID the depends on the public key
@@ -1064,9 +1065,14 @@ int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt,
 {
 GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
 int params_size = MAX_PUBLIC_PARAMS_SIZE;
-int i, pk, ret = 0;;
+int i, pk, ret = 0;
 
 	pk = gnutls_x509_crt_get_pk_algorithm( crt, NULL);
+	
+	if ( pk < 0) {
+		gnutls_assert();
+		return pk;
+	}
 
 	ret = _gnutls_x509_crt_get_mpis( crt, params, &params_size);
 	
