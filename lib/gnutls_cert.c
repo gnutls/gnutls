@@ -599,6 +599,11 @@ static int _parse_extension( gnutls_cert* cert, char* extnID, char* critical, ch
 		return 0;
 	}
 
+	if (strcmp( extnID, "2 5 29 15")==0) { /* Key Usage */
+		cert->KeyUsage = extnValue[0];
+		return 0;
+	}
+
 	if (strcmp( extnID, "2 5 29 19")==0) { /* Basic Constraints */
 		/* we don't use it */
 		return 0;

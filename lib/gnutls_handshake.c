@@ -1713,13 +1713,20 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	GNUTLS_CipherSuite *newSuite;
 	int newSuiteSize = 0, i, j, keep;
 	const X509PKI_CREDENTIALS x509_cred;
-	gnutls_cert *cert;
+	gnutls_cert *cert=NULL;
 	KXAlgorithm *alg;
 	int alg_size;
 	KXAlgorithm kx;
 
+	/* FIXME: remove algorithms depending on the KeyUsage bits
+	 * eg. 
+	 * if (cert.KeyUsage & X509KEY_DIGITAL_SIGNATURE) 
+	 * we've got a sign-only key... (ok we need to check
+	 * it more than that).
+	 */
+	 
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
-		return 0;	/* currently does nothing */
+		return 0;
 
 	/* if we should use a specific certificate, 
 	 * we should remove all algorithms that are not supported
@@ -1745,18 +1752,26 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 						      extensions.dnsname);
 	}
 
-	if (cert == NULL) {	/* if no such cert, use the first in the list 
+
+	if (cert == NULL && x509_cred->cert_list!=NULL) {	/* if no such cert, use the first in the list 
 				 */
 		cert = &x509_cred->cert_list[0][0];
+
+		/* get all the key exchange algorithms that are 
+		 * supported by the X509 certificate parameters.
+		 */
+		if ((ret = _gnutls_cert_supported_kx(cert, &alg, &alg_size)) < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+	} else {
+	 /* No certificate was found 
+	  */
+	        alg_size = 0;
+	        alg = NULL;
 	}
 
-	/* get all the key exchange algorithms that are 
-	 * supported by the certificate parameters.
-	 */
-	if ((ret = _gnutls_cert_supported_kx(cert, &alg, &alg_size)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
 
 	newSuite =
 	    gnutls_malloc(numCipherSuites * sizeof(GNUTLS_CipherSuite));

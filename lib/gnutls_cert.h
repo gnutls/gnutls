@@ -12,6 +12,16 @@ typedef struct {
 	char state_or_province_name[X509_S_SIZE];
 } gnutls_DN;
 
+#define X509KEY_DIGITAL_SIGNATURE 	256
+#define X509KEY_NON_REPUDIATION		128
+#define X509KEY_KEY_ENCIPHERMENT	64
+#define X509KEY_DATA_ENCIPHERMENT	32
+#define X509KEY_KEY_AGREEMENT		16
+#define X509KEY_KEY_CERT_SIGN		8
+#define X509KEY_CRL_SIGN		4
+#define X509KEY_ENCIPHER_ONLY		2
+#define X509KEY_DECIPHER_ONLY		1
+
 
 typedef struct {
 	MPI *params;		/* the size of params depends on the public 
@@ -30,7 +40,11 @@ typedef struct {
 	time_t	   activation_time;
 
 	int	   version; /* 1,2,3 
-	                     */
+ 	                     */
+ 	
+ 	int	   KeyUsage; /* bits from X509KEY_* 
+ 	                      */
+ 	
 	int        valid; /* 0 if the certificate looks good.
 	                   */
 	gnutls_datum raw; /* the raw certificate */

@@ -129,7 +129,7 @@ void gnutls_perror(int error)
 
 	_gnutls_log( "GNUTLS ERROR: %s\n", ret);
 	
-	free( ret);
+	gnutls_free( ret);
 }
 
 
@@ -138,8 +138,7 @@ void gnutls_perror(int error)
   * @error: is an error returned by a gnutls function. Error is always a negative value.
   *
   * This function is like strerror(). However it accepts an error returned by a gnutls
-  * function. gnutls_strerror() returns a malloc'ed value thus 
-  * it should be free'd.
+  * function. 
   **/
 const char* gnutls_strerror(int error)
 {
