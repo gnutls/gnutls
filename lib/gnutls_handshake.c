@@ -1055,6 +1055,8 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 	return ret;
 }
 
+const static opaque EXPORT_CIPHERSUITE[2] = { 0x00, 0x03 };
+
 /* This function checks if the given cipher suite is supported, and sets it
  * to the state;
  */
@@ -1065,6 +1067,11 @@ static int _gnutls_client_set_ciphersuite(GNUTLS_STATE state,
 	GNUTLS_CipherSuite *cipher_suites;
 	uint16 x;
 	int i, err;
+
+	if ( memcmp( suite, EXPORT_CIPHERSUITE, 2)==0) {
+		gnutls_assert();
+		return GNUTLS_E_EXPORT_CIPHER_SUITE;
+	} 
 
 	z = 1;
 	x = _gnutls_supported_ciphersuites(state, &cipher_suites);
@@ -1294,6 +1301,7 @@ static int _gnutls_read_server_hello(GNUTLS_STATE state, char *data,
 	return ret;
 }
 
+
 /* This function copies the appropriate ciphersuites, to a localy allocated buffer 
  * Needed in client hello messages. Returns the new data length.
  */
@@ -1329,29 +1337,33 @@ static int _gnutls_copy_ciphersuites(GNUTLS_STATE state,
 	}
 
 
-	x = ret;
+	x = ret + 1; /* add 1 for the export cipher suite */
 	x *= sizeof(uint16);	/* in order to get bytes */
-
+ 
 	datalen = pos = 0;
 
 	datalen += sizeof(uint16) + x;
 
 	*ret_data = gnutls_malloc(datalen);
-
-
 	if (*ret_data == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
 
+        /* add 2 for the export cipher suite 
+         */
 	_gnutls_write_uint16(x, *ret_data);
 	pos += 2;
 
-	for (i = 0; i < x / 2; i++) {
-		memcpy(&(*ret_data)[pos], cipher_suites[i].CipherSuite, 2);
+	for (i = 0; i < (x / 2) - 1; i++) {
+		memcpy( &(*ret_data)[pos], cipher_suites[i].CipherSuite, 2);
 		pos += 2;
 	}
+
+	memcpy( &(*ret_data)[pos], EXPORT_CIPHERSUITE, 2);
+	pos += 2;
+
 	gnutls_free(cipher_suites);
 
 	return datalen;
@@ -1429,9 +1441,7 @@ static int _gnutls_send_client_hello(GNUTLS_STATE state, int again)
 		/* 2 for version, (4 for unix time + 28 for random bytes==TLS_RANDOM_SIZE) 
 		 */
 		 
-		data = gnutls_malloc(datalen + 16);	/* 16 is added to avoid realloc
-							 * if no much data are added.
-							 */
+		data = gnutls_malloc(datalen);
 		if (data == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
