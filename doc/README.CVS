@@ -1,16 +1,18 @@
 If you just want to browse the cvs tree, you may visit
-http://cvs.hellug.gr/cgi-bin/cvsweb/gnutls-read-only/ .
-Otherwise (get and built the tree) you should have the following
-software:
+http://cvs.gnupg.org/cgi-bin/viewcvs.cgi/gnutls/?cvsroot=GNU+TLS+Library
+or http://cvs.hellug.gr/cgi-bin/viewcvs.cgi/gnutls-read-only/ .
+
+Otherwise, if you want to get and built the tree, you should have the 
+following software:
 
 * cvs (http://www.gnu.org/software/cvs/)
 * autoconf 2.50 or newer (http://www.gnu.org/software/autoconf/)
 * libtool (http://www.gnu.org/software/libtoool/)
 * automake (http://www.gnu.org/software/automake/)
-* libgcrypt (http://www.gnupg.org)
+* libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
 * cvs2cl (in order to create ChangeLog) (http://www.red-bean.com/cvs2cl/)
-* latex2html (in order to create api.html)
-* latex/dvips (in order to create api.ps)
+* latex2html (in order to create gnutls.html)
+* latex/dvips (in order to create gnutls.ps)
 
 1. Download the cvs tree
 $ cvs -z3 -d :pserver:anoncvs@cvs.gnupg.org:/cvs/gnutls login
