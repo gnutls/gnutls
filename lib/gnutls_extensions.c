@@ -148,12 +148,18 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 		
 	} while(next >= 0);
 
+	size = pos;
 	pos-=2; /* remove the size of the size header! */
 #ifndef WORDS_BIGENDIAN
 	pos = byteswap16(pos);
 #endif
 	memcpy( (*data), &pos, sizeof(uint16));
 
-	return 0;
+	if (size==2) { /* empty */
+		size = 0;
+		gnutls_free(*data);
+		(*data) = NULL;
+	}
+	return size;
 
 }
