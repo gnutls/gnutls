@@ -113,11 +113,6 @@ GNUTLS_MPI r = _gnutls_mpi_alloc_like(a);
 
 	_gnutls_mpi_mod( r, a, n);
 	ret = _gnutls_mpi_cmp_ui(r, 0);
-	if (ret != 0) ret = _gnutls_mpi_cmp_ui(r, 1);
-	if (ret != 0) {
-		_gnutls_mpi_sub_ui( r, n, 1);
-		ret = _gnutls_mpi_cmp(a, r);
-	}
 	
 	_gnutls_mpi_release( &r);
 
@@ -181,7 +176,7 @@ int _gnutls_gen_srp_server_kx(gnutls_session session, opaque ** data)
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	/* Calculate:  B = (3v + g^b) % N 
+	/* Calculate:  B = (k*v + g^b) % N 
 	 */
 	B = _gnutls_calc_srp_B( &_b, G, N, V);
 	if (B==NULL) {
@@ -361,8 +356,7 @@ int _gnutls_proc_srp_client_kx(gnutls_session session, opaque * data, size_t _da
 	_gnutls_dump_mpi( "SRP A: ", A);
 	_gnutls_dump_mpi( "SRP B: ", B);
 
-	/* Checks if A % n == 0 or
-	 * A % n == +-1.
+	/* Checks if A % n == 0.
 	 */
 	if ( (ret = check_a_mod_n( A, N)) < 0) {
 		gnutls_assert();
@@ -538,15 +532,7 @@ static int check_g_n( const opaque* g, size_t n_g,
 static int group_check_g_n( GNUTLS_MPI g, GNUTLS_MPI n) 
 {
 GNUTLS_MPI q = NULL, two = NULL, w = NULL;
-int ret, i;
-
-	/* Only allow small generators, to avoid getting stuck
-	 * into checking parameters.
-	 */
-	if (_gnutls_mpi_get_nbits(g) > 4) {
-		gnutls_assert();
-		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
+int ret;
 
 	/* N must be of the form N=2q+1
 	 * where q is also a prime.
@@ -620,28 +606,6 @@ int ret, i;
 		goto error;
 	}
 
-	/* check that g is the smallest generator mod N.
-	 * Actually check if x^q % N == 1 for all 1 < x < g
-	 */
-	i = 2;
-
-	while( _gnutls_mpi_cmp( two, g) != 0) {
-
-		_gnutls_mpi_set_ui( two, i);
-
-		_gnutls_mpi_powm( w, two, q, n);
-
-		_gnutls_mpi_mod( w, w, n);
-		
-		if (_gnutls_mpi_cmp_ui( w, 1) != 0) {
-			gnutls_assert();
-			ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-			goto error;
-		}
-
-		i++;
-	}
-	
 	ret = 0;
 
 error:
