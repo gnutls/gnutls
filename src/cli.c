@@ -415,7 +415,7 @@ void gaa_parser(int argc, char **argv)
 void cli_version(void)
 {
    fprintf(stderr, "GNU TLS test client, ");
-   fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
+   fprintf(stderr, "version %s. Libgnutls %s.\n", LIBGNUTLS_VERSION, gnutls_check_version(NULL));
 }
 
 

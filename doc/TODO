@@ -4,6 +4,7 @@ in order to avoid having people working on the same thing.
 
 Current list:
 + Add ability to read PKCS-12 structures (certificate and private key)
+* Allow sending any client certificate. Not only the ones requested.
 * Convert documentation to texinfo format
 * Audit the code
 * Add GPGSM certificate manager support
