@@ -410,16 +410,16 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
 		return ret;
 	}
 
-	if (encode_ber_rs( signature, rs[0], rs[1])!=0) {
-		gnutls_assert();
-		_gnutls_mpi_release(&rs[0]);
-		_gnutls_mpi_release(&rs[1]);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
+	ret = encode_ber_rs( signature, rs[0], rs[1]);
+	
 	/* free r,s */
 	_gnutls_mpi_release(&rs[0]);
 	_gnutls_mpi_release(&rs[1]);
+
+	if (ret!=0) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 	return 0;
 }

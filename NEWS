@@ -1,6 +1,8 @@
 Version 0.9.99
 - Some fixes in the gnutls.h header for the gnutls_server_name_set()
   and gnutls_server_name_get() prototypes.
+- Exported the gnutls_x509_privkey_sign_data(), gnutls_x509_privkey_verify_data() 
+  and gnutls_x509_crt_verify_data().
 
 Version 0.9.98 (16/11/2003)
 - The openssl compatibility layer was moved to gnutls-openssl

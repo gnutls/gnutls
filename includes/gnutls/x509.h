@@ -291,6 +291,17 @@ int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
 	gnutls_datum* u);
 
+/* signing stuff.
+ */
+int gnutls_x509_privkey_sign_data( gnutls_x509_privkey key, gnutls_digest_algorithm digest,
+	unsigned int flags, const gnutls_datum* data,
+	void* signature, size_t* signature_size);
+int gnutls_x509_privkey_verify_data( gnutls_x509_privkey key, unsigned int flags, 
+	const gnutls_datum* data, const gnutls_datum* signature);
+int gnutls_x509_crt_verify_data( gnutls_x509_crt crt, unsigned int flags, 
+	const gnutls_datum* data, const gnutls_datum* signature);
+
+
 /* Certificate request stuff
  */
 struct gnutls_x509_crq_int;

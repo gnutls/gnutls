@@ -36,6 +36,7 @@
 #include <gnutls_ui.h>
 #include <mpi.h>
 #include <privkey.h>
+#include <verify.h>
 
 /**
   * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt structure
@@ -1269,6 +1270,39 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 
 	}
 	return 0;		/* not revoked. */
+}
+
+/**
+  * gnutls_x509_crt_verify_data - This function will verify the given signed data.
+  * @crt: Holds the certificate
+  * @flags: should be 0 for now
+  * @data: holds the data to be signed
+  * @signature: contains the signature
+  *
+  * This function will verify the given signed data, using the parameters from the
+  * certificate.
+  *
+  * In case of a verification failure 0 is returned, and
+  * 1 on success.
+  *
+  **/
+int gnutls_x509_crt_verify_data( gnutls_x509_crt crt, unsigned int flags, 
+	const gnutls_datum* data, const gnutls_datum* signature)
+{
+int result;
+
+	if (crt == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result = _gnutls_x509_verify_signature( data, signature, crt);
+	if (result < 0) {
+		gnutls_assert();
+		return 0;
+	}
+	
+	return result;
 }
 
 #endif

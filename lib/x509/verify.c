@@ -41,7 +41,6 @@
 static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 			       gnutls_x509_crt *trusted_cas, int tcas_size, 
 			       unsigned int flags, unsigned int* output);
-static
 int _gnutls_x509_verify_signature(const gnutls_datum* signed_data,
 	const gnutls_datum* signature, gnutls_x509_crt issuer);
 static
@@ -460,13 +459,46 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* text, const gnutls_datum* signature,
 	return 0;		
 }
 
+/* Verifies the signature data, and returns 0 if not verified,
+ * or 1 otherwise.
+ */
+static int verify_sig( const gnutls_datum* tbs, const gnutls_datum* signature,
+	gnutls_pk_algorithm pk, GNUTLS_MPI* issuer_params, int issuer_params_size)
+{
+
+	switch( pk ) 
+	{
+		case GNUTLS_PK_RSA:
+
+			if (_pkcs1_rsa_verify_sig( tbs, signature, issuer_params, issuer_params_size)!=0) {
+				gnutls_assert();
+				return 0;
+			}
+
+			return 1;
+			break;
+
+		case GNUTLS_PK_DSA:
+			if (_gnutls_dsa_verify( tbs, signature, issuer_params, issuer_params_size)!=0) {
+				gnutls_assert();
+				return 0;
+			}
+
+			return 1;
+			break;
+		default:
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+
+	}
+}
+
 /* verifies if the certificate is properly signed.
  * returns 0 on failure and 1 on success.
  * 
  * 'tbs' is the signed data
  * 'signature' is the signature!
  */
-static
 int _gnutls_x509_verify_signature( const gnutls_datum* tbs,
 	const gnutls_datum* signature, gnutls_x509_crt issuer) 
 {
@@ -477,50 +509,43 @@ int ret, issuer_params_size, i;
 	 */
 	issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
 	ret = _gnutls_x509_crt_get_mpis(issuer, issuer_params, &issuer_params_size);
-
 	if ( ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	switch( gnutls_x509_crt_get_pk_algorithm(issuer, NULL)) 
-	{
-		case GNUTLS_PK_RSA:
-
-			if (_pkcs1_rsa_verify_sig( tbs, signature, issuer_params, issuer_params_size)!=0) {
-				gnutls_assert();
-				ret = 0;
-				goto finish;
-			}
-
-			ret = 1;
-			goto finish;
-			break;
-
-		case GNUTLS_PK_DSA:
-			if (_gnutls_dsa_verify( tbs, signature, issuer_params, issuer_params_size)!=0) {
-				gnutls_assert();
-				ret = 0;
-				goto finish;
-			}
-
-			ret = 1;
-			goto finish;
-			break;
-		default:
-			gnutls_assert();
-			ret = GNUTLS_E_INTERNAL_ERROR;
-			goto finish;
-
+	ret = verify_sig( tbs, signature, gnutls_x509_crt_get_pk_algorithm(issuer, NULL),
+		issuer_params, issuer_params_size);
+	if ( ret < 0) {
+		gnutls_assert();
 	}
-
-	finish:
 
 	/* release all allocated MPIs
 	 */
 	for (i = 0; i < issuer_params_size; i++) {
 		_gnutls_mpi_release( &issuer_params[i]);
 	}
+
+	return ret;
+}
+
+/* verifies if the certificate is properly signed.
+ * returns 0 on failure and 1 on success.
+ * 
+ * 'tbs' is the signed data
+ * 'signature' is the signature!
+ */
+int _gnutls_x509_privkey_verify_signature( const gnutls_datum* tbs,
+	const gnutls_datum* signature, gnutls_x509_privkey issuer) 
+{
+	int ret;
+	
+	ret = verify_sig( tbs, signature, issuer->pk_algorithm, 
+		issuer->params, issuer->params_size);
+	if ( ret < 0) {
+		gnutls_assert();
+	}
+
 	return ret;
 }
 

@@ -27,6 +27,10 @@ Applies to GnuTLS @VERSION@
 
 \vspace*{\stretch{2}}
 
+\begin{flushright}
+by Nikos Mavroyanopoulos
+\end{flushright}
+\vspace{-0.6cm}
 \HRule
 
 \end{latexonly}

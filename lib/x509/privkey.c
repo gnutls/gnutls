@@ -31,6 +31,8 @@
 #include <dn.h>
 #include <mpi.h>
 #include <extensions.h>
+#include <sign.h>
+#include <verify.h>
 
 static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params);
 
@@ -953,3 +955,93 @@ cleanup:
 	_gnutls_free_datum( &der);
 	return result;
 }
+
+#ifdef ENABLE_PKI
+
+/**
+  * gnutls_x509_privkey_sign_data - This function will sign the given data using the private key params
+  * @key: Holds the key
+  * @digest: should be MD5 or SHA1
+  * @flags: should be 0 for now
+  * @data: holds the data to be signed
+  * @signature: will contain the signature
+  * @signature_size: holds the size of signature (and will be replaced by the new size)
+  *
+  * This function will sign the given data using a signature algorithm supported by
+  * the private key. Signature algorithms are always used together with a hash functions.
+  * Different hash functions may be used for the RSA algorithm, but only
+  * SHA-1 for the DSA keys.
+  *
+  * If the buffer provided is not long enough to hold the output, then
+  * GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+  *
+  * In case of failure a negative value will be returned, and
+  * 0 on success.
+  *
+  **/
+int gnutls_x509_privkey_sign_data( gnutls_x509_privkey key, gnutls_digest_algorithm digest,
+	unsigned int flags, const gnutls_datum* data,
+	void* signature, size_t* signature_size)
+{
+int result;
+gnutls_datum sig = { NULL, 0 };
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result = _gnutls_x509_sign( data, digest, key, &sig);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+	
+	if (*signature_size < sig.size) {
+		*signature_size = sig.size;
+		_gnutls_free_datum( &sig);
+		return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+	
+	*signature_size = sig.size;
+	memcpy( signature, sig.data, sig.size);
+	
+	_gnutls_free_datum( &sig);
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_privkey_verify_data - This function will verify the given signed data.
+  * @key: Holds the key
+  * @flags: should be 0 for now
+  * @data: holds the data to be signed
+  * @signature: contains the signature
+  *
+  * This function will verify the given signed data, using the parameters in the
+  * private key.
+  *
+  * In case of a verification failure 0 is returned, and
+  * 1 on success.
+  *
+  **/
+int gnutls_x509_privkey_verify_data( gnutls_x509_privkey key, unsigned int flags, 
+	const gnutls_datum* data, const gnutls_datum* signature)
+{
+int result;
+
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result = _gnutls_x509_privkey_verify_signature( data, signature, key);
+	if (result < 0) {
+		gnutls_assert();
+		return 0;
+	}
+	
+	return result;
+}
+
+#endif
