@@ -483,6 +483,67 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	return ret;
 }
 
+/* This function is to be called if the handshake was successfully 
+ * completed. This sends a Change Cipher Spec packet to the peer.
+ */
+ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
+{
+	uint16 length;
+	int ret = 0, Size;
+	uint8 type=GNUTLS_CHANGE_CIPHER_SPEC;
+	char data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
+
+	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
+		return GNUTLS_E_INVALID_SESSION;
+	}
+
+	if (Write(cd, &type, 1) != 1) {
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_UNABLE_SEND_DATA;
+	}
+
+	if (Write(cd, &state->connection_state.version.major, 1) != 1) {
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_UNABLE_SEND_DATA;
+	}
+
+	if (Write(cd, &state->connection_state.version.minor, 1) != 1) {
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_UNABLE_SEND_DATA;
+	}
+#ifdef HARD_DEBUG
+	fprintf(stderr, "Send Change Cipher Spec\n");
+#endif
+
+#ifdef WORDS_BIGENDIAN
+	length = (uint16)1;
+#else
+	length = byteswap16((uint16)1);
+#endif
+	if (Write(cd, &length, sizeof(uint16)) != sizeof(uint16)) {
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_UNABLE_SEND_DATA;
+	}
+
+	if (Write(cd, &data, 1) != 1) {
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		state->gnutls_internals.resumable = RESUME_FALSE;
+		gnutls_assert();
+		return GNUTLS_E_UNABLE_SEND_DATA;
+	}
+	ret += 1;
+
+	return ret;
+}
+
 /* This function behave exactly like read(). The only difference is 
  * that it accepts, the gnutls_state and the ContentType of data to
  * send (if called by the user the Content is specific)
@@ -662,23 +723,9 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			break;
 
 		case GNUTLS_CHANGE_CIPHER_SPEC:
-
-			if (type != GNUTLS_CHANGE_CIPHER_SPEC) {
-				gnutls_assert();
-				return GNUTLS_E_UNEXPECTED_PACKET;
-			}
-			if (((ChangeCipherSpecType)
-			     tmpdata[0]) == GNUTLS_TYPE_CHANGE_CIPHER_SPEC && tmplen == 1) {
-				ret = 0;	/* _gnutls_connection_state_init(state); */
-
-			} else {
-				state->gnutls_internals.valid_connection = VALID_FALSE;
-				state->gnutls_internals.resumable = RESUME_FALSE;
-				gnutls_assert();
-				ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-			}
-			state->connection_state.read_sequence_number++;
-			return ret;
+			/* this packet is now handled above */
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET;
 
 		default:
 			gnutls_assert();
@@ -711,12 +758,3 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	return ret;
 }
 
-/* This function is to be called if the handshake was successfully 
- * completed. This sends a Change Cipher Spec packet to the peer.
- */
-int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
-{
-	ChangeCipherSpecType x = GNUTLS_TYPE_CHANGE_CIPHER_SPEC;
-
-	return gnutls_send_int(cd, state, GNUTLS_CHANGE_CIPHER_SPEC, (uint8 *) & x, 1);
-}

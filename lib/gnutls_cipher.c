@@ -494,9 +494,6 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	if (memcmp
 	    (MAC, &content[compressed->length],
 	     state->security_parameters.hash_size) != 0) {
-#ifdef DEBUG
-		fprintf(stderr, "MAC FAILED\n");
-#endif
 		gnutls_assert();
 		return GNUTLS_E_MAC_FAILED;
 	}
