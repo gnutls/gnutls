@@ -30,10 +30,10 @@
 #define HARD_DEBUG
 #define WRITE_DEBUG
 #define READ_DEBUG
-#define RECORD_DEBUG*/
 #define HANDSHAKE_DEBUG // Prints some information on handshake 
+#define RECORD_DEBUG
 #define DEBUG
-
+*/
 
 /* It might be a good idea to replace int with void*
  * here.
