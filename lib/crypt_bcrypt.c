@@ -615,7 +615,7 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 	}
 	sp++;
 
-	if (_gnutls_sbase64_decode(sp, strlen(sp), &csalt) < 0) {
+	if (_gnutls_sbase64_decode(sp, (int)rindex(sp, ':') - (int)sp, &csalt) < 0) {
 		gnutls_assert();
 		return NULL;
 	}

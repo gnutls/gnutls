@@ -41,7 +41,7 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	int vsize, hash_len = gnutls_hash_get_algo_len(GNUTLS_MAC_SHA);
 	opaque *tmp;
 	uint8 *rtext, *csalt;
-	int rsalt_size;
+	int rsalt_size, len;
 
 	passwd_len = strlen(passwd);	/* we do not want the null */
 
@@ -61,8 +61,10 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 		return NULL;
 	}
 	sp++;
-
-	rsalt_size = _gnutls_sbase64_decode(sp, strlen(sp), &csalt);
+	
+	len = (int)rindex(sp, ':') - (int)sp;
+	
+	rsalt_size = _gnutls_sbase64_decode(sp, len, &csalt);
 	if (rsalt_size < 0) {
 		gnutls_assert();
 		return NULL;
