@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000 Nikos Mavroyanopoulos
+ *      Copyright (C) 2000,2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -263,17 +263,29 @@ gnutls_datum key = { state->security_parameters.session_id, state->security_para
 gnutls_datum content;
 int ret = 0;
 
-	if (state->gnutls_internals.resumable==RESUME_FALSE) 
+	if (state->gnutls_internals.resumable==RESUME_FALSE) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
-
-	if (state->security_parameters.session_id==NULL || state->security_parameters.session_id_size==0)
+	}
+	
+	if (state->security_parameters.session_id==NULL || state->security_parameters.session_id_size==0) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
-
+	}
+	
 /* allocate space for data */
 	content.size = _gnutls_session_size( state);
-	content.data = gnutls_malloc( content.size);
-	if (content.data==NULL) return GNUTLS_E_MEMORY_ERROR;
+	if (content.size < 0) {
+		gnutls_assert();
+		return content.size;
+	}
 
+	content.data = gnutls_malloc( content.size);
+	if (content.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 /* copy data */
 	ret = _gnutls_session_pack( state, &content);
 	if (ret < 0) {
@@ -298,12 +310,16 @@ int ret;
 	data = _gnutls_retrieve_session( state, key);
 
 	if (data.data==NULL) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
 	}
 
 	/* expiration check is performed inside */
 	ret = gnutls_session_set_data( state, data.data, data.size);
-
+	if (ret < 0) {
+		gnutls_assert();
+	}
+	
 	/* Note: Data is not allocated with gnutls_malloc
 	 */
 	free(data.data);
@@ -342,19 +358,24 @@ datum content = {session_data.data, session_data.size};
 #endif
 int ret = 0;
 
-	if (state->gnutls_internals.resumable==RESUME_FALSE) 
+	if (state->gnutls_internals.resumable==RESUME_FALSE) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
-
+	}
+	
 	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
 		return GNUTLS_E_DB_ERROR;
 	}
 	
-	if (session_id.data==NULL || session_id.size==0)
+	if (session_id.data==NULL || session_id.size==0) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
-
-	if (session_data.data==NULL || session_data.size==0)
+	}
+	
+	if (session_data.data==NULL || session_data.size==0) {
+		gnutls_assert();
 		return GNUTLS_E_INVALID_SESSION;
-
+	}
 	/* if we can't read why bother writing? */
 
 #ifdef HAVE_LIBGDBM
@@ -364,13 +385,16 @@ int ret = 0;
 			/* cannot open db for writing. This may happen if multiple
 			 * instances try to write. 
 			 */
+			gnutls_assert();
 			return GNUTLS_E_AGAIN;
 		}
 		ret = gdbm_store( dbf, key, content, GDBM_INSERT);
-
+		if (ret<0) {
+			gnutls_assert();
+		}
 		gdbm_close(dbf);
 
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+		return 0; /*GNUTLS_E_UNIMPLEMENTED_FEATURE;*/
 	}
 	else 
 #endif
@@ -393,12 +417,15 @@ datum content;
 gnutls_datum ret = { NULL, 0 };
 
 	if (GNUTLS_DBNAME==NULL && _gnutls_db_func_is_ok(state)!=0) {
+		gnutls_assert();
 		return ret;
 	}
 	
-	if (session_id.data==NULL || session_id.size==0)
+	if (session_id.data==NULL || session_id.size==0) {
+		gnutls_assert();
 		return ret;
-
+	}
+	
 	/* if we can't read why bother writing? */
 #ifdef HAVE_LIBGDBM
 	if (GNUTLS_DBF!=NULL) { /* use gdbm */
@@ -409,7 +436,6 @@ gnutls_datum ret = { NULL, 0 };
 #endif
 		if (state->gnutls_internals.db_retrieve_func!=NULL)
 			ret = state->gnutls_internals.db_retrieve_func( state->gnutls_internals.db_ptr, session_id);
-
 
 	return ret;
 
@@ -454,4 +480,21 @@ int ret = 0;
 
 	return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
 
+}
+
+/**
+  * gnutls_db_remove_session - This function will remove the current session data from the db
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function will remove the current session data from the session
+  * database. This will prevent future handshakes reusing these session
+  * data. This function should be called if a session was terminated
+  * abnormaly.
+  *
+  **/
+void gnutls_db_remove_session(GNUTLS_STATE state) {
+	/* if the session has failed abnormally it has 
+	 * to be removed from the db 
+	 */
+	_gnutls_db_remove_session( state, state->security_parameters.session_id, state->security_parameters.session_id_size);
 }

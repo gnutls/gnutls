@@ -193,10 +193,6 @@ int default_protocol_list[] = { GNUTLS_TLS1, 0 };
   **/
 void gnutls_deinit(GNUTLS_STATE state)
 {
-	/* if the session has failed abnormally it has to be removed from the db */
-	if ( state->gnutls_internals.resumable==RESUME_FALSE) {
-		_gnutls_db_remove_session( state, state->security_parameters.session_id, state->security_parameters.session_id_size);
-	}
 
 	/* remove auth info firstly */
 	_gnutls_free_auth_info(state );

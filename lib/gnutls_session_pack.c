@@ -81,9 +81,11 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 	case GNUTLS_CRD_ANON:{
 			ANON_CLIENT_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
-			if (info == NULL && state->gnutls_key->auth_info_size!=0)
+			if (info == NULL && state->gnutls_key->auth_info_size!=0) {
+				gnutls_assert();
 				return GNUTLS_E_INVALID_PARAMETERS;
-
+			}
+			
 			packed_session->size =
 			    PACK_HEADER_SIZE + state->gnutls_key->auth_info_size + sizeof(uint32);
 
@@ -102,8 +104,10 @@ int _gnutls_session_pack(GNUTLS_STATE state, gnutls_datum * packed_session)
 	case GNUTLS_CRD_CERTIFICATE:{
 			CERTIFICATE_AUTH_INFO info =
 			    _gnutls_get_auth_info(state);
-			if (info == NULL)
+			if (info == NULL && state->gnutls_key->auth_info_size!=0) {
+				gnutls_assert();
 				return GNUTLS_E_INVALID_PARAMETERS;
+			}
 
 			ret =
 			    _gnutls_pack_certificate_auth_info(info,
@@ -148,9 +152,6 @@ int _gnutls_session_size( GNUTLS_STATE state)
 	case GNUTLS_CRD_CERTIFICATE: {
 		CERTIFICATE_AUTH_INFO info =
 		    _gnutls_get_auth_info(state);
-	
-			if (info == NULL)
-				return GNUTLS_E_INVALID_PARAMETERS;
 	
 			pack_size += _gnutls_pack_certificate_auth_info_size( info);
 		}
@@ -242,8 +243,11 @@ int _gnutls_session_unpack(GNUTLS_STATE state,
 			    READuint32(&packed_session->
 				       data[PACK_HEADER_SIZE]);
 			
-			if (pack_size == 0) break;
-
+			if (pack_size == 0) {
+				state->gnutls_key->auth_info = NULL;
+				state->gnutls_key->auth_info_size = 0;
+				break;
+			}
 			if (pack_size < sizeof(CERTIFICATE_AUTH_INFO_INT)) {
 				gnutls_assert();
 				return GNUTLS_E_DB_ERROR;
@@ -312,25 +316,32 @@ int _gnutls_pack_certificate_auth_info( CERTIFICATE_AUTH_INFO info,
 				   gnutls_datum * packed_session)
 {
 	uint32 pos, i;
+	int info_size;
+
 	packed_session->size = _gnutls_pack_certificate_auth_info_size( info);
+
+	if (info==NULL) info_size = 0;
+	else info_size = sizeof(CERTIFICATE_AUTH_INFO_INT);
 
 	packed_session->data[0] = GNUTLS_CRD_CERTIFICATE;
 	WRITEuint32( packed_session->size-PACK_HEADER_SIZE-sizeof(uint32), &packed_session->data[PACK_HEADER_SIZE]);
 
-
-	memcpy(&packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
-	       info, sizeof(CERTIFICATE_AUTH_INFO_INT));
-	
-	pos = PACK_HEADER_SIZE + sizeof(uint32) + sizeof(CERTIFICATE_AUTH_INFO_INT);
-
-	for (i=0;i<info->ncerts;i++) {
-		WRITEuint32( info->raw_certificate_list[i].size, &packed_session->data[pos]);
-		pos += sizeof(uint32);
-		
-		memcpy(&packed_session->data[pos], info->raw_certificate_list[i].data, info->raw_certificate_list[i].size);
-		pos += info->raw_certificate_list[i].size;
+	if (info!=NULL) {
+		memcpy(&packed_session->data[PACK_HEADER_SIZE + sizeof(uint32)],
+		       info, sizeof(CERTIFICATE_AUTH_INFO_INT));
 	}
 
+	pos = PACK_HEADER_SIZE + sizeof(uint32) + info_size;
+
+	if (info!=NULL) {
+		for (i=0;i<info->ncerts;i++) {
+			WRITEuint32( info->raw_certificate_list[i].size, &packed_session->data[pos]);
+			pos += sizeof(uint32);
+		
+			memcpy(&packed_session->data[pos], info->raw_certificate_list[i].data, info->raw_certificate_list[i].size);
+			pos += info->raw_certificate_list[i].size;
+		}
+	}
 	
 	return 0;
 }
@@ -341,7 +352,7 @@ static int _gnutls_pack_certificate_auth_info_size( CERTIFICATE_AUTH_INFO info)
 	int i;
 
 	if (info == NULL)
-		return 0;
+		return sizeof(uint32) + PACK_HEADER_SIZE;
 
 	for (i=0;i<info->ncerts;i++) {
 		pack_size += sizeof(uint32) + info->raw_certificate_list[i].size;
