@@ -1,4 +1,4 @@
-EXTRA_DIST = port.h prime.gaa crypt.gaa crypt-gaa.h README.crypt prime-gaa.h README
+EXTRA_DIST = port.h prime.gaa crypt.gaa crypt-gaa.h README.crypt prime-gaa.h README tpasswd tpasswd.conf
 INCLUDES = -I../lib
 noinst_PROGRAMS = serv cli crypt prime
 serv_SOURCES = serv.c

@@ -673,7 +673,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 }
 
 /**
-  * gnutls_send_hello_request - This function will renegotiate security parameters
+  * gnutls_rehandshake - This function will renegotiate security parameters
   * @cd: is a connection descriptor, as returned by socket().
   * @state: is a a &GNUTLS_STATE structure.
   *
@@ -684,7 +684,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
   * GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
   * GNUTLS_NO_RENEGOTIATION.
   **/
-int gnutls_send_hello_request(int cd, GNUTLS_STATE state)
+int gnutls_rehandshake(int cd, GNUTLS_STATE state)
 {
 int 	ret;
 

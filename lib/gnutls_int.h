@@ -31,6 +31,8 @@
 #define DEBUG
 */
 
+#define LIST ...
+
 #define MAX32 4294967295
 #define MAX24 16777215
 #define MAX16 65535

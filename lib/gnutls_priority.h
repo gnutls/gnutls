@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-void gnutls_set_cipher_priority( GNUTLS_STATE state, ...);
-void gnutls_set_kx_priority( GNUTLS_STATE state, ...); 
-void gnutls_set_mac_priority( GNUTLS_STATE state, ...);
-void gnutls_set_compression_priority( GNUTLS_STATE state, ...);
+void gnutls_set_cipher_priority( GNUTLS_STATE state, LIST);
+void gnutls_set_kx_priority( GNUTLS_STATE state, LIST); 
+void gnutls_set_mac_priority( GNUTLS_STATE state, LIST);
+void gnutls_set_compression_priority( GNUTLS_STATE state, LIST);

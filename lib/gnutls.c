@@ -401,14 +401,15 @@ int _gnutls_send_alert(int cd, GNUTLS_STATE state, AlertLevel level, AlertDescri
 }
 
 /**
-  * gnutls_close - This function terminates the current TLS/SSL connection.
+  * gnutls_bye - This function terminates the current TLS/SSL connection.
   * @cd: is a connection descriptor.
   * @state: is a &GNUTLS_STATE structure.
   *
   * Terminates the current TLS/SSL connection. If the return value is 0
-  * you may continue using the TCP connection.
+  * you may continue using the TCP connection. The connection should
+  * have been initiated using gnutls_handshake() or similar function.
   **/
-int gnutls_close(int cd, GNUTLS_STATE state)
+int gnutls_bye(int cd, GNUTLS_STATE state)
 {
 	int ret;
 

@@ -27,7 +27,7 @@
 /**
   * gnutls_set_cipher_priority - Sets the priority on the ciphers supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @...: is a 0 terminated list of BulkCipherAlgorithm elements.
+  * @LIST: is a 0 terminated list of BulkCipherAlgorithm elements.
   *
   * Sets the priority on the ciphers supported by gnutls.
   * Priority is higher for ciphers specified before others.
@@ -36,7 +36,7 @@
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-void gnutls_set_cipher_priority( GNUTLS_STATE state, ...) {
+void gnutls_set_cipher_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
 	int i, num=0;
@@ -66,7 +66,7 @@ void gnutls_set_cipher_priority( GNUTLS_STATE state, ...) {
 /**
   * gnutls_set_kx_priority - Sets the priority on the key exchange algorithms supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @...: is a 0 terminated list of KXAlgorithm elements.
+  * @LIST: is a 0 terminated list of KXAlgorithm elements.
   *
   * Sets the priority on the key exchange algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -75,7 +75,7 @@ void gnutls_set_cipher_priority( GNUTLS_STATE state, ...) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-void gnutls_set_kx_priority( GNUTLS_STATE state, ...) {
+void gnutls_set_kx_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
 	int i, num=0;
@@ -105,7 +105,7 @@ void gnutls_set_kx_priority( GNUTLS_STATE state, ...) {
 /**
   * gnutls_set_mac_priority - Sets the priority on the mac algorithms supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @...: is a 0 terminated list of MACAlgorithm elements.
+  * @LIST: is a 0 terminated list of MACAlgorithm elements.
   *
   * Sets the priority on the mac algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -114,7 +114,7 @@ void gnutls_set_kx_priority( GNUTLS_STATE state, ...) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-void gnutls_set_mac_priority( GNUTLS_STATE state, ...) {
+void gnutls_set_mac_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
 	int i, num=0;
@@ -144,7 +144,7 @@ void gnutls_set_mac_priority( GNUTLS_STATE state, ...) {
 /**
   * gnutls_set_compression_priority - Sets the priority on the compression algorithms supported by gnutls.
   * @state: is a &GNUTLS_STATE structure.
-  * @...: is a 0 terminated list of CompressionMethod elements.
+  * @LIST: is a 0 terminated list of CompressionMethod elements.
   *
   * Sets the priority on the compression algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -153,7 +153,7 @@ void gnutls_set_mac_priority( GNUTLS_STATE state, ...) {
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-void gnutls_set_compression_priority( GNUTLS_STATE state, ...) {
+void gnutls_set_compression_priority( GNUTLS_STATE state, LIST) {
 	
 	va_list ap;
 	int i, num=0;
