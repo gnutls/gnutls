@@ -24,6 +24,11 @@
 #include <gnutls_record.h>
 #include <gnutls_buffers.h>
 
+#ifdef DEBUG
+# warning HANDSHAKE HASH BUFFER CAN BE AVOIDED
+# warning NEEDS REWRITE
+#endif
+
 /* This is the only file that uses the berkeley sockets API.
  * 
  * Also holds all the buffering code used in gnutls.
