@@ -33,4 +33,4 @@ release:
 		cvs commit -m "Update." manual/ reference/ releases/
 
 indent:
-	indent -kr `ls {lib,lib/x509,libextra,libextra/openpgp,src}/*.{c,h} | grep -v -- -gaa`
+	indent -i4 -kr `ls {lib,lib/x509,libextra,libextra/openpgp,src}/*.{c,h} | grep -v -- -gaa`
