@@ -354,6 +354,8 @@ SAVED_LIBS=$LIBS
 AC_MSG_CHECKING([whether to use the included minitasn1])
 AC_MSG_RESULT($minitasn1_enabled)
 
+dnl Check for libcfg+
+
 AC_ARG_WITH(included-libcfg,
 	[  --with-included-libcfg   Use the included libcfg+],
 libcfg_enabled=$withval, 
@@ -370,12 +372,8 @@ AC_MSG_WARN([[
 AM_CONDITIONAL(HAVE_LIBCFG, test "$libcfg_enabled" = "no")
 LIBS=$SAVED_LIBS
 
-if test x$opt_developer_mode = xyes; then
- minitasn1_enabled=yes
-fi
-
-AC_MSG_CHECKING([whether to use the included minitasn1])
-AC_MSG_RESULT($minitasn1_enabled)
+AC_MSG_CHECKING([whether to use the included libcfg])
+AC_MSG_RESULT($libcfg_enabled)
 
 
 dnl CHECK FOR ZLIB SUPPORT
