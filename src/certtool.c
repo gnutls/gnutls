@@ -341,11 +341,12 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key)
 
 
 	serial = read_int( "Enter the certificate's serial number (decimal): ");
-	buffer[2] = serial & 0xff;
-	buffer[1] = (serial >> 8) & 0xff;
-	buffer[0] = (serial >> 16) & 0xff;
+	buffer[3] = serial & 0xff;
+	buffer[2] = (serial >> 8) & 0xff;
+	buffer[1] = (serial >> 16) & 0xff;
+	buffer[0] = 0;
 
-	result = gnutls_x509_crt_set_serial( crt, buffer, 3);
+	result = gnutls_x509_crt_set_serial( crt, buffer, 4);
 	if (result < 0) {
 		fprintf(stderr, "serial: %s\n", gnutls_strerror(result));
 		exit(1);
