@@ -27,7 +27,7 @@ int main()
 
     printf("@node Error codes and descriptions\n");
     printf("@chapter Error codes and descriptions\n");
-    printf("@anchor{error_codes}\n");
+    printf("@anchor{Error Codes}\n");
     printf("@cindex Error codes\n");
     printf("\n");
     printf("@itemize\n");
