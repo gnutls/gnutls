@@ -117,12 +117,31 @@ void print_x509_info(gnutls_session session)
 		printf("UNKNOWN\n");
 	}
 
+#ifndef TEST_STRING
 	gnutls_x509_extract_certificate_dn(&cert_list[0], &dn);
 	PRINT_DN(dn);
 
 	gnutls_x509_extract_certificate_issuer_dn(&cert_list[0], &dn);
 	printf(" # Certificate Issuer's info:\n");
 	PRINT_DN(dn);
+#else
+	{ char buf[256];
+	  int buf_size = sizeof(buf);
+	  int ret;
+	  
+	ret = gnutls_x509_extract_certificate_dn_string( buf, buf_size, &cert_list[0], 0);
+	if (ret == 0)
+  	   printf( " # %s\n", buf);
+  	else printf("gnutls_x509_extract_certificate_dn_string() returned %d\n", ret);
+
+	ret = gnutls_x509_extract_certificate_dn_string( buf, buf_size, &cert_list[0], 1);
+	if (ret == 0) {
+	   printf(" # Certificate Issuer's info:\n");
+  	   printf( " # %s\n", buf);
+  	} else printf("gnutls_x509_extract_certificate_dn_string() returned %d\n", ret);
+
+        }
+#endif
 
 }
 

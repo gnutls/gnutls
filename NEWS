@@ -6,6 +6,7 @@ Version 0.5.11
 - Added more descriptive error strings, to gnutls_strerror().
 - Documented error codes, and the function reference list is now sorted.
 - Optimized buffering code.
+- gnutls_x509_extract_certificate_dn_string() was rewritten.
 
 Version 0.5.10 (13/10/2002)
 - Updated documentation.

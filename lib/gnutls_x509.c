@@ -2847,15 +2847,27 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
    const gnutls_datum * cert, int issuer)
 {
    gnutls_x509_dn dn;
-   int len = 0, ret;
+   gnutls_string str;
+   int ret;
 
+   if (buf == NULL || buf_size == 0) {
+      return GNUTLS_E_INVALID_REQUEST;
+   }
+   
    buf[0] = 0;
 
-#define PRINTX(buf, bufsize, x, y) \
-   if (y[0]!=0 && (strlen(x)+strlen(y)+4 < bufsize)) { \
-      sprintf(buf, "/%s=%s", x, y); \
-   } else { \
-      return GNUTLS_E_INVALID_REQUEST; \
+   _gnutls_string_init( &str, gnutls_malloc, gnutls_realloc, gnutls_free);
+
+#define STR_APPEND(y) if (_gnutls_string_append_str( &str, y) < 0) { \
+		gnutls_assert(); \
+		return GNUTLS_E_MEMORY_ERROR; \
+	}
+#define PRINTX( x, y) \
+   if (y[0]!=0) { \
+      STR_APPEND( "/"); \
+      STR_APPEND( x); \
+      STR_APPEND( "="); \
+      STR_APPEND( y); \
    }
 
    if (!issuer)
@@ -2865,19 +2877,21 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
       
    if (ret < 0) return ret;
 
-   PRINTX(buf, sizeof_buf, "C", dn.country);
-   len = strlen(buf);
-   PRINTX(buf + len, sizeof_buf - len - 1, "ST",
-	  dn.state_or_province_name);
-   len = strlen(buf);
-   PRINTX(buf + len, sizeof_buf - len - 1, "L", dn.locality_name);
-   len = strlen(buf);
-   PRINTX(buf + len, sizeof_buf - len - 1, "O", dn.organization);
-   len = strlen(buf);
-   PRINTX(buf + len, sizeof_buf - len - 1, "OU",
-	  dn.organizational_unit_name);
-   len = strlen(buf);
-   PRINTX(buf + len, sizeof_buf - len - 1, "E", dn.email);
+   PRINTX( "C", dn.country);
+   PRINTX( "ST", dn.state_or_province_name);
+   PRINTX( "L", dn.locality_name);
+   PRINTX( "O", dn.organization);
+   PRINTX( "OU", dn.organizational_unit_name);
+   PRINTX( "E", dn.email);
 
+   if (str.length >= sizeof_buf) {
+	return GNUTLS_E_INVALID_REQUEST;
+   }
+   
+   memcpy( buf, str.data, str.length);
+   buf[str.length] = 0;
+
+   _gnutls_string_clear( &str);
+   
    return 0;
 }
