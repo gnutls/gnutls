@@ -80,6 +80,7 @@ typedef struct {
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
+	{ "for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno" },
 	{ "for TLS 1.0 support", test_tls1, "yes", "no", "dunno" },
 	{ "for SSL 3.0 support", test_ssl3, "yes", "no", "dunno" },
 	{ "for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes", "dunno" },
@@ -87,7 +88,7 @@ static const TLS_TEST tls_tests[] = {
 
 	/* this test will disable TLS 1.0 if the server is 
 	 * buggy */
-	{ "whether we need to disable TLS 1.0", test_tls1_2, "no", "yes", "dunno" },
+	{ "whether we need to disable TLS 1.0", test_tls_disable, "no", "yes", "dunno" },
 
 	{ "whether the server ignores the RSA PMS version", test_rsa_pms_version_check, "yes", "no", "dunno"},
 	{ "whether the server can accept Hello Extensions", test_hello_extension, "yes", "no", "dunno"},

@@ -500,10 +500,27 @@ int ret;
 
 }
 
+int test_tls1_1( gnutls_session session) {
+int ret;
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_PROTOCOL(session, GNUTLS_TLS1_1);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	if (ret==SUCCEED) tls1_ok = 1;
+
+	return ret;
+
+}
+
 /* Advertize both TLS 1.0 and SSL 3.0. If the connection fails,
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
-int test_tls1_2( gnutls_session session) {
+int test_tls_disable( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
