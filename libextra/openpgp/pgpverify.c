@@ -89,9 +89,9 @@ openpgp_get_key_trust(gnutls_openpgp_trustdb_t trustdb,
  * The key verification output will be put in @verify and will be
  * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
- * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
+ * GNUTLS_CERT_INVALID: A signature on the key is invalid.
  *
- * GNUTLS_CERT_REVOKED\: The key has been revoked.
+ * GNUTLS_CERT_REVOKED: The key has been revoked.
  *
  * NOTE: this function does not verify using any "web of trust". You
  * may use GnuPG for that purpose, or any other external PGP application.
@@ -171,7 +171,7 @@ void cdk_md_close(cdk_md_hd_t hd);
  * The key verification output will be put in @verify and will be
  * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
- * GNUTLS_CERT_INVALID\: The self signature on the key is invalid.
+ * GNUTLS_CERT_INVALID: The self signature on the key is invalid.
  *
  * Returns 0 on success.
  **/
@@ -258,9 +258,9 @@ int gnutls_openpgp_key_verify_self(gnutls_openpgp_key_t key,
  * The verification output will be put in @verify and will be
  * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
- * GNUTLS_CERT_INVALID\: A signature on the key is invalid.
+ * GNUTLS_CERT_INVALID: A signature on the key is invalid.
  *
- * GNUTLS_CERT_REVOKED\: The key has been revoked.
+ * GNUTLS_CERT_REVOKED: The key has been revoked.
  *
  * NOTE: this function does not verify using any "web of trust". You
  * may use GnuPG for that purpose, or any other external PGP application.

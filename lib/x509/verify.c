@@ -321,7 +321,7 @@ unsigned int _gnutls_x509_verify_certificate(
     /* Verify the last certificate in the certificate path
      * against the trusted CA certificate list.
      *
-     * If no CAs are present returns INVALID. Thus works
+     * If no CAs are present returns CERT_INVALID. Thus works
      * in self signed etc certificates.
      */
     ret =
@@ -650,9 +650,9 @@ int _gnutls_x509_privkey_verify_signature(const gnutls_datum_t * tbs,
   * For a more detailed verification status use gnutls_x509_crt_verify() per list
   * element.
   *
-  * GNUTLS_CERT_INVALID\: the certificate chain is not valid.
+  * GNUTLS_CERT_INVALID: the certificate chain is not valid.
   *
-  * GNUTLS_CERT_REVOKED\: a certificate in the chain has been revoked.
+  * GNUTLS_CERT_REVOKED: a certificate in the chain has been revoked.
   *
   * Returns 0 on success and a negative value in case of an error.
   *
