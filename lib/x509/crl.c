@@ -400,7 +400,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl)
 /**
   * gnutls_x509_crl_get_crt_serial - This function returns the serial number of a revoked certificate
   * @crl: should contain a gnutls_x509_crl_t structure
-  * @index: the index of the certificate to extract (starting from 0)
+  * @indx: the index of the certificate to extract (starting from 0)
   * @serial: where the serial number will be copied
   * @serial_size: initially holds the size of serial
   * @time: if non null, will hold the time this certificate was revoked
@@ -411,7 +411,7 @@ int gnutls_x509_crl_get_crt_count(gnutls_x509_crl_t crl)
   * Returns a negative value on failure.
   *
   **/
-int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int index,
+int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int indx,
 				   unsigned char *serial,
 				   size_t * serial_size, time_t * time)
 {
@@ -426,7 +426,7 @@ int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl_t crl, int index,
 	return GNUTLS_E_INVALID_REQUEST;
     }
 
-    _gnutls_int2str(index + 1, str_index);
+    _gnutls_int2str(indx + 1, str_index);
     _gnutls_str_cpy(serial_name, sizeof(serial_name),
 		    "tbsCertList.revokedCertificates.?");
     _gnutls_str_cat(serial_name, sizeof(serial_name), str_index);
