@@ -1,10 +1,19 @@
+If you want to contribute (implement something from the current list, or
+anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
+in order to avoid having people working on the same thing. 
+
+Current list:
++ Add DHE_RSA ciphersuite
+* Audit the code (volunteers?)
 * Add support for PKCS8 encrypted private keys
-* Add DHE_* ciphersuites
 * Add support for PKCS12
+* Add support for certificates with DSS parameters
 * Add function to return the certificate verification path
 * Tools for processing/generating certificates
-* Documentation (of existing functions + Manual)
 * OpenPGP certificate support (through libgcrypt)
-* Audit the code (volunteers?)
-* Add Kerberos support (at lowest priority)
-* Add WTLS support (at lowest priority)
+- Add Kerberos support
+- Add WTLS support
+
+(+) Means high priority 
+(*) Means medium priority
+(-) Means low priority (ie. nobody is interested to develop that)
