@@ -1,3 +1,17 @@
+2002-05-11 16:20  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls.h.in.in, lib/gnutls_state.c:
+
+	Added gnutls_state_set_ptr() and gnutls_state_get_ptr() functions,
+	to assist in callback functions.  
+
+2002-05-11 16:04  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_ui.h:
+
+	Corrected prototypes for callback selector functions, which now
+	accept the state.  
+
 2002-05-08 10:32  nmav <nmav@gnutls.org>
 
 	* lib/: Makefile.am, gnutls_gcry.c, gnutls_gcry.h, gnutls_global.c,
