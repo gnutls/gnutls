@@ -541,12 +541,18 @@ static int check_g_n(const opaque * g, size_t n_g,
 }
 
 /* Check if N is a prime and G a generator of the
- * group.
+ * group. This is check only done if N is big enough.
+ * Otherwise only the included parameters must be used.
  */
 static int group_check_g_n(mpi_t g, mpi_t n)
 {
     mpi_t q = NULL, two = NULL, w = NULL;
     int ret;
+
+    if (_gnutls_mpi_get_nbits(n) < 2048) {
+    	gnutls_assert();
+    	return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+    }
 
     /* N must be of the form N=2q+1
      * where q is also a prime.
