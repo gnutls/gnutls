@@ -42,6 +42,8 @@ Current list:
   - Support path length constraints.
 - RFC 3280 compliant certificate path validation.
 - Add Pre-Shared-Key support.
+- Add progress handler gnutls_dh_params_generate2, to allow
+  application to give progress feedback to user.
 
 (+) Means high priority 
 (*) Means medium priority
