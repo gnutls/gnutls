@@ -26,15 +26,6 @@ The following function is an example on how to verify a certificate.
 
 \input{ex-rfc2818}
 
-\subsection{Parsing peer's certificate, and obtaining session information}
-The following function reads the peer's certificate,
-and prints some information about the certificate and the current session.
-\par
-This function should be called after a successful
-\printfunc{gnutls_handshake}{gnutls\_handshake}
-
-\input{ex-info}
-
 \subsection{Using a callback to select the certificate to use}
 There are cases where a client holds several certificate and key pairs,
 and may want to choose the appropriate to send in the current session.
@@ -93,5 +84,27 @@ This is a server which supports {\bf SRP} authentication.
 This is a function that checks if an alert has been received
 in the current session.
 \input{ex-alert}
+
+% CERTIFICATE STUFF
+
+\section{Certificate API examples}
+This section contains examples that make use of the \gnutls{} certificate API.
+
+
+\subsection{Parsing peer's certificate, and obtaining session information}
+The following function reads the peer's certificate,
+and prints some information about the certificate and the current session.
+\par
+This function should be called after a successful
+\printfunc{gnutls_handshake}{gnutls\_handshake}
+
+\input{ex-info}
+
+\subsection{Generating a certificate request}
+The following example is about generating a certificate request, and
+a private key. A certificate request can be later be processed by a CA,
+which should return a signed certificate.
+
+\input{ex-crq}
 
 \input{openssl}
