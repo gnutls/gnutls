@@ -1,23 +1,32 @@
+GNU TLS THANKS -- Acknowledgements.
+Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
+See the end for copying conditions.
+
 Here is a list of people, who helped in GnuTLS development.  
 Please help us to keep it complete and free of errors.
 
-Werner Koch               <wk@gnupg.org>
-Tarun Upadhyay            <tarun@poboxes.com>
-Neil Spring               <nspring@saavie.org>
-Paul Sheer                <psheer@icon.co.za>
-Jon Nelson                <jnelson@securepipe.com>
-Simon Josefsson           <jas@extundo.com>
-Marco d'Itri              <md@linux.it>
-Mike Siers                <mikes@poliac.com>
-Marc Huber                <Marc.Huber@web.de>
-Guillaume Morin           <guillaume@morinfr.org>
-Jeff Johnson              <jbj@redhat.com>
-David Taylor              <dtaylor@swiftdsl.com.au>
-Ivo Timmermans            <ivo@o2w.nl>
-Ian Peters                <itp@ximian.com>
-Arne Thomassen            <arne@arne-thomassen.de>
-Casey Marshall            <rsdio@metastatic.org>
-Dimitri	Papadopoulos-Orfanos <papadopo@shfj.cea.fr>
-Michael Heironimus        <mkh01@earthlink.net>
-Niels Bjergstrom          <njb@chi-publishing.com>
-Robey Pointer             <robey@danger.com>
+Werner Koch                     <wk@gnupg.org>
+Tarun Upadhyay                  <tarun@poboxes.com>
+Neil Spring                     <nspring@saavie.org>
+Paul Sheer                      <psheer@icon.co.za>
+Jon Nelson                      <jnelson@securepipe.com>
+Simon Josefsson                 <jas@extundo.com>
+Marco d'Itri                    <md@linux.it>
+Mike Siers                      <mikes@poliac.com>
+Marc Huber                      <Marc.Huber@web.de>
+Guillaume Morin                 <guillaume@morinfr.org>
+Jeff Johnson                    <jbj@redhat.com>
+David Taylor                    <dtaylor@swiftdsl.com.au>
+Ivo Timmermans                  <ivo@o2w.nl>
+Ian Peters                      <itp@ximian.com>
+Arne Thomassen                  <arne@arne-thomassen.de>
+Casey Marshall                  <rsdio@metastatic.org>
+Dimitri	Papadopoulos-Orfanos    <papadopo@shfj.cea.fr>
+Michael Heironimus              <mkh01@earthlink.net>
+Niels Bjergstrom                <njb@chi-publishing.com>
+Robey Pointer                   <robey@danger.com>
+
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.

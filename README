@@ -1,3 +1,8 @@
+GNU TLS README -- Important introductory notes.
+Copyright (C) 2004 Simon Josefsson
+Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
+See the end for copying conditions.
+
 This is the GNU TLS library. More up to date information can be found
 at http://www.gnu.org/software/gnutls/ and http://www.gnutls.org/
 
@@ -77,3 +82,7 @@ important and expensive. If you think you found a bug,
 report it to bug-gnutls@gnu.org, together with the needed information,
 in order for developers to reproduce it. 
 
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
