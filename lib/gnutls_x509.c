@@ -762,7 +762,7 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
 
 	if (verify < 0) {
 		gnutls_assert();
-		return GNUTLS_CERT_CORRUPTED;
+		return GNUTLS_CERT_INVALID;
 	}
 
 
@@ -861,7 +861,7 @@ int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list
 
 	if (verify < 0) {
 		gnutls_assert();
-		return GNUTLS_CERT_CORRUPTED;
+		return GNUTLS_CERT_INVALID;
 	}
 
 	return verify;

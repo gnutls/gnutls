@@ -133,9 +133,6 @@ void print_cert_vrfy(GNUTLS_STATE state)
 	case GNUTLS_CERT_NONE:
 		printf("- Peer did not send any certificate.\n");
 		break;
-	case GNUTLS_CERT_CORRUPTED:
-		printf("- Peer's certificate was corrupted.\n");
-		break;
 	default:
 		printf("- Invalid status of peer's certificate.\n");
 		break;

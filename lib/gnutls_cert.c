@@ -349,7 +349,7 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 
 	if (verify < 0) {
 		gnutls_assert();
-		return GNUTLS_CERT_CORRUPTED;
+		return GNUTLS_CERT_INVALID;
 	}
 
 
@@ -377,7 +377,6 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
   * GNUTLS_CERT_REVOKED: the certificate has been revoked
   *  (not implemented yet).
   * GNUTLS_CERT_EXPIRED: the certificate has expired.
-  * GNUTLS_CERT_CORRUPTED: the certificate is corrupted.
   *
   * A negative error code is returned in case of an error.
   *
