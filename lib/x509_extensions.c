@@ -135,10 +135,8 @@ static int _parse_extension(gnutls_cert * cert, char *extnID,
 						 extnValueLen);
 	}
 
-#ifdef DEBUG
-	_gnutls_log("CERT[%s]: Unsupported Extension: %s, %s\n",
+	_gnutls_log("X509_ext: CERT[%s]: Unsupported Extension: %s, %s\n",
 		    GET_CN(cert->raw), extnID, critical);
-#endif
 
 	if (strcmp(critical, "TRUE") == 0) {
 		gnutls_assert();
@@ -220,11 +218,11 @@ int _gnutls_get_ext_type(node_asn * rasn, char *root, gnutls_cert * cert)
 			else {
 				if (result == ASN_MEM_ERROR
 				    && strcmp(critical, "FALSE") == 0) {
-#ifdef DEBUG
+
 					_gnutls_log
-					    ("Cannot parse extension: %s. Too small buffer.",
+					    ("X509_ext: Cannot parse extension: %s. Too small buffer.",
 					     extnID);
-#endif
+
 					continue;
 				}
 				if (result != ASN_OK) {
@@ -280,9 +278,9 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 	    asn1_get_der(rasn, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("X509_ext: Decoding error %d\n", result);
+
 		gnutls_assert();
 		asn1_delete_structure(rasn);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
@@ -349,11 +347,11 @@ int _gnutls_get_extension( const gnutls_datum * cert, const char* extension_id, 
 			else {
 				if (result == ASN_MEM_ERROR
 				    && strcmp(critical, "FALSE") == 0) {
-#ifdef DEBUG
+
 					_gnutls_log
-					    ("Cannot parse extension: %s. Too small buffer.",
+					    ("X509_ext: Cannot parse extension: %s. Too small buffer.",
 					     extnID);
-#endif
+
 					continue;
 				}
 				if (result != ASN_OK) {

@@ -76,8 +76,12 @@
 # '@parameter' - name of a parameter
 # '%CONST' - name of a constant.
 
-# In tex the symbol '->' will be replaced with rightarrow,
-# and 2^5 with ${2}^{5}$.
+#
+# Extensions for LaTeX:
+#
+# 1. the symbol '->' will be replaced with a rightarrow
+# 2. x^y with ${x}^{y}$.
+#
 
 
 # match expressions used to find embedded type information

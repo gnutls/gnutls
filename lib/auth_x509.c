@@ -939,9 +939,9 @@ int gnutls_x509pki_extract_certificate_dn(const gnutls_datum * cert,
 	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
@@ -990,9 +990,9 @@ int gnutls_x509pki_extract_certificate_issuer_dn(const gnutls_datum * cert,
 	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return GNUTLS_E_ASN1_PARSING_ERROR;
@@ -1087,9 +1087,9 @@ time_t gnutls_x509pki_extract_certificate_activation_time(const
 	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+
 		gnutls_assert();
 		return -1;
 	}
@@ -1129,9 +1129,9 @@ time_t gnutls_x509pki_extract_certificate_expiration_time(const
 	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+
 		gnutls_assert();
 		return -1;
 	}
@@ -1167,9 +1167,9 @@ int gnutls_x509pki_extract_certificate_version(const gnutls_datum * cert)
 	result = asn1_get_der(c2, cert->data, cert->size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}
@@ -1462,9 +1462,9 @@ int gnutls_x509pki_extract_certificate_serial(const gnutls_datum * cert, char* r
 	ret = asn1_get_der(c2, cert->data, cert->size);
 	if (ret != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("X509_auth: Decoding error %d\n", result);
+
 		gnutls_assert();
 		return GNUTLS_E_ASN1_PARSING_ERROR;
 	}

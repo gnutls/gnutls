@@ -932,9 +932,9 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	result = asn1_get_der(c2, derCert.data, derCert.size);
 	if (result != ASN_OK) {
 		/* couldn't decode DER */
-#ifdef DEBUG
-		_gnutls_log("Decoding error %d\n", result);
-#endif
+
+		_gnutls_log("CERT: Decoding error %d\n", result);
+
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		gnutls_free_datum( &gCert->raw);
@@ -996,11 +996,9 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 * currently not supported
 		 */
 		gnutls_assert();
-#ifdef DEBUG
-		_gnutls_log("ALGORITHM: %s\n", str);
-		asn1_delete_structure(c2);
-		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#endif
+
+		_gnutls_log("CERT: ALGORITHM: %s\n", str);
+
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 
 	}

@@ -38,4 +38,10 @@
 const char* gnutls_strerror(int error);
 void gnutls_perror(int error);
 int gnutls_error_is_fatal( int error);
-void _gnutls_log( const char *fmt, ...);
+
+#ifdef DEBUG
+ void _gnutls_log( const char *fmt, ...);
+#else
+# define _gnutls_log(...)
+#endif
+

@@ -111,9 +111,9 @@ int len;
 	}
 
 	if (*hash==-1) {
-#ifdef DEBUG
-		_gnutls_log( "HASH OID: %s\n", str);
-#endif
+
+		_gnutls_log( "X509_sig: HASH OID: %s\n", str);
+
 		gnutls_assert();
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	}
@@ -203,9 +203,8 @@ gnutls_datum tbs;
 		gnutls_free_datum(&tbs);
 		return GNUTLS_CERT_TRUSTED;
 	}
-#ifdef DEBUG
-	_gnutls_log( "PK: %d\n", issuer->subject_pk_algorithm);	
-#endif
+
+	_gnutls_log( "X509_sig: PK: %d\n", issuer->subject_pk_algorithm);	
 
 	gnutls_assert();
 	return GNUTLS_CERT_INVALID;
