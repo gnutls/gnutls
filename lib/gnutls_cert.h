@@ -23,7 +23,7 @@
 #define KEY_KEY_CERT_SIGN		4
 #define KEY_CRL_SIGN			2
 #define KEY_ENCIPHER_ONLY		1
-#define KEY_DECIPHER_ONLY		256
+#define KEY_DECIPHER_ONLY		32768
 
 typedef struct gnutls_cert {
 	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];	/* the size of params depends on the public 

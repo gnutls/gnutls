@@ -278,7 +278,7 @@ gnutls_datum der_data;
 
 	/* generate the extension.
 	 */
-	result = _gnutls_x509_ext_gen_keyUsage( (uint8)usage, &der_data);
+	result = _gnutls_x509_ext_gen_keyUsage( (uint16)usage, &der_data);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

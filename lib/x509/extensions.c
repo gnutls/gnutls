@@ -477,6 +477,7 @@ int _gnutls_x509_ext_gen_keyUsage(uint16 usage, gnutls_datum* der_ext)
 
 	str[0] = usage & 0xff;
 	str[1] = usage >> 8;
+
 	result = asn1_write_value(ext, "", str, 9);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
