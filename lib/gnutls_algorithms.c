@@ -1130,7 +1130,7 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 #if 0 /* expensive */
 	if (ret_count > 0 && ret_count != count) {
 		ciphers =
-		    gnutls_realloc(ciphers,
+		    gnutls_realloc_fast(ciphers,
 				   ret_count * sizeof(GNUTLS_CipherSuite));
 	} else {
 		if (ret_count != count) {

@@ -43,7 +43,7 @@
 
 #define OPENPGP_NAME_SIZE GNUTLS_X509_CN_SIZE
 
-#define APPEND_DATUM(x, y, z) _gnutls_datum_append_m( x, y, z, realloc)
+#define APPEND_DATUM(x, y, z) _gnutls_datum_append_m( x, y, z, gnutls_realloc)
 #define RC(x) ((x) < 0)
 
 typedef struct {
@@ -603,14 +603,14 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
         goto leave;
 
     /* fixme: too much duplicated code from (set_openpgp_key_file) */
-    res->cert_list = gnutls_realloc(res->cert_list,
+    res->cert_list = gnutls_realloc_fast(res->cert_list,
                                     (1+res->ncerts)*sizeof(gnutls_cert*));
     if (res->cert_list == NULL) {
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;
     }
 
-    res->cert_list_length = gnutls_realloc(res->cert_list_length,
+    res->cert_list_length = gnutls_realloc_fast(res->cert_list_length,
                                            (1+res->ncerts)*sizeof(int));
     if (res->cert_list_length == NULL) {
         gnutls_assert();
@@ -643,7 +643,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     }
   
     res->ncerts++;
-    res->pkey = gnutls_realloc(res->pkey,
+    res->pkey = gnutls_realloc_fast(res->pkey,
                                (res->ncerts)*sizeof(gnutls_private_key));
     if (res->pkey == NULL) {
         gnutls_assert();
@@ -710,14 +710,14 @@ gnutls_certificate_set_openpgp_key_file(gnutls_certificate_credentials res,
         /*cdk_iobuf_close( inp );*/
     }
 
-    res->cert_list = gnutls_realloc(res->cert_list,
+    res->cert_list = gnutls_realloc_fast(res->cert_list,
                                     (1+res->ncerts)*sizeof(gnutls_cert*));
     if (res->cert_list == NULL) {
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;
     }
 
-    res->cert_list_length = gnutls_realloc(res->cert_list_length,
+    res->cert_list_length = gnutls_realloc_fast(res->cert_list_length,
                                            (1+res->ncerts)*sizeof(int));
     if (res->cert_list_length == NULL) {
         gnutls_assert();
@@ -782,7 +782,7 @@ gnutls_certificate_set_openpgp_key_file(gnutls_certificate_credentials res,
     iobuf_to_datum( inp, &raw );
     cdk_iobuf_close( inp );
   
-    res->pkey = gnutls_realloc(res->pkey,
+    res->pkey = gnutls_realloc_fast(res->pkey,
                                (res->ncerts+1)*sizeof(gnutls_private_key));
     if (res->pkey == NULL) {
         gnutls_assert();
@@ -1902,6 +1902,7 @@ gnutls_openpgp_key_to_xml( const gnutls_datum *cert,
     if ( rc < 0 ) return rc;
     
     *xmlkey = _gnutls_string2datum( &string_xml_key);
+    xmlkey->size--;
 
     return rc;
 }   

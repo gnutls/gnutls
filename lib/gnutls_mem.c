@@ -60,6 +60,24 @@ svoid *gnutls_secure_calloc(size_t nmemb, size_t size)
 	return ret;
 }
 
+/* This realloc will free ptr in case realloc
+ * fails.
+ */
+void* gnutls_realloc_fast( void* ptr, size_t size) 
+{
+void *ret;
+
+        if (size == 0) return ptr;
+
+	ret = gnutls_realloc( ptr, size);
+	if ( ret == NULL) {
+		gnutls_free( ptr);
+		return NULL;
+	}
+
+	return ret;
+}
+
 char* _gnutls_strdup( const char* str) {
 int siz = strlen( str);
 char * ret;

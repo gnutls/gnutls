@@ -137,7 +137,7 @@ int _gnutls_string_append_str( gnutls_string* dest, const char * src)
 		
 		return tot_len;
 	} else {
-		size_t new_len = GMAX( src_len) + dest->max_length;
+		size_t new_len = GMAX( src_len, MIN_CHUNK) + dest->max_length;
 
 		dest->string = dest->realloc_func( dest->string, new_len);
 		if (dest->string == NULL) {
@@ -163,7 +163,7 @@ int _gnutls_string_append_data( gnutls_string* dest, const void * data, size_t d
 		
 		return tot_len;
 	} else {
-		size_t new_len = GMAX( src_len) + dest->max_length;
+		size_t new_len = GMAX( data_size, MIN_CHUNK) + dest->max_length;
 
 		dest->string = dest->realloc_func( dest->string, new_len);
 		if (dest->string == NULL) {

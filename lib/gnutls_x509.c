@@ -1095,7 +1095,7 @@ static int parse_der_cert_mem( gnutls_cert** cert_list, int* ncerts,
 	i = *ncerts + 1;
 
 	*cert_list =
-	    (gnutls_cert *) gnutls_realloc( *cert_list,
+	    (gnutls_cert *) gnutls_realloc_fast( *cert_list,
 					   i *
 					   sizeof(gnutls_cert));
 
@@ -1168,7 +1168,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		
 		if (ret >= 0) {
 			*cert_list =
-			    (gnutls_cert *) gnutls_realloc( *cert_list,
+			    (gnutls_cert *) gnutls_realloc_fast( *cert_list,
 					   i * sizeof(gnutls_cert));
 
 			if ( *cert_list == NULL) {
@@ -1253,7 +1253,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 		}
 
 		*cert_list =
-		    (gnutls_cert *) gnutls_realloc( *cert_list,
+		    (gnutls_cert *) gnutls_realloc_fast( *cert_list,
 						   i *
 						   sizeof(gnutls_cert));
 
@@ -1305,13 +1305,13 @@ static int read_cert_mem(gnutls_certificate_credentials res, const char *cert, i
 
 	/* allocate space for the certificate to add
 	 */
-	res->cert_list = gnutls_realloc( res->cert_list, (1+ res->ncerts)*sizeof(gnutls_cert*));
+	res->cert_list = gnutls_realloc_fast( res->cert_list, (1+ res->ncerts)*sizeof(gnutls_cert*));
 	if ( res->cert_list==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	res->cert_list_length = gnutls_realloc( res->cert_list_length,
+	res->cert_list_length = gnutls_realloc_fast( res->cert_list_length,
 		(1+ res->ncerts)*sizeof(int));
 	if (res->cert_list_length==NULL) {
 		gnutls_assert();
@@ -1406,7 +1406,7 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 
 	/* allocate space for the pkey list
 	 */
-	res->pkey = gnutls_realloc( res->pkey, (res->ncerts+1)*sizeof(gnutls_private_key));
+	res->pkey = gnutls_realloc_fast( res->pkey, (res->ncerts+1)*sizeof(gnutls_private_key));
 	if (res->pkey==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;

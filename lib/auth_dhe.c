@@ -200,7 +200,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 		return data_size;	/* do not put a signature - ILLEGAL! */
 	}
 
-	*data = gnutls_realloc(*data, data_size + signature.size + 2);
+	*data = gnutls_realloc_fast(*data, data_size + signature.size + 2);
 	if (*data == NULL) {
 		gnutls_free_datum(&signature);
 		gnutls_assert();

@@ -558,6 +558,7 @@ _gnutls_asn1_get_structure_xml(ASN1_TYPE structure, const char *name,
 	APPEND( "\n\0", 2);
 
 	*res = _gnutls_string2datum( &str);
+	res->size -= 1; /* null is not included in size */
 	
 	return 0;
 }

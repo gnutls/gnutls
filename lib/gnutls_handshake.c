@@ -1511,7 +1511,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 		extdatalen = _gnutls_copy_ciphersuites(session, &extdata);
 		if (extdatalen > 0) {
 			datalen += extdatalen;
-			data = gnutls_realloc(data, datalen);
+			data = gnutls_realloc_fast(data, datalen);
 			if (data == NULL) {
 				gnutls_assert();
 				gnutls_free(extdata);
@@ -1536,7 +1536,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 		extdatalen = _gnutls_copy_comp_methods(session, &extdata);
 		if (extdatalen > 0) {
 			datalen += extdatalen;
-			data = gnutls_realloc(data, datalen);
+			data = gnutls_realloc_fast(data, datalen);
 			if (data == NULL) {
 				gnutls_assert();
 				gnutls_free(extdata);
@@ -1561,7 +1561,7 @@ static int _gnutls_send_client_hello(gnutls_session session, int again)
 			extdatalen = _gnutls_gen_extensions(session, &extdata);
 			if (extdatalen > 0) {
 				datalen += extdatalen;
-				data = gnutls_realloc(data, datalen);
+				data = gnutls_realloc_fast(data, datalen);
 				if (data == NULL) {
 					gnutls_assert();
 					gnutls_free(extdata);

@@ -194,7 +194,7 @@ int (*ext_func_send)( gnutls_session, opaque*, int);
 		size = ext_func_send( session, sdata, sdata_size);
 
 		if (size > 0) {
-			(*data) = gnutls_realloc( (*data), pos+size+4);
+			(*data) = gnutls_realloc_fast( (*data), pos+size+4);
 			if ((*data)==NULL) {
 				gnutls_assert();
 				return GNUTLS_E_MEMORY_ERROR;

@@ -184,7 +184,7 @@ int cur_pos;
 			
 			do {
 				out_size += 128;
-				*plain = gnutls_realloc( *plain, out_size);
+				*plain = gnutls_realloc_fast( *plain, out_size);
 				if (*plain==NULL) {
 					gnutls_assert();
 					return GNUTLS_E_MEMORY_ERROR;

@@ -33,7 +33,10 @@ extern REALLOC_FUNC gnutls_realloc;
 extern void* (*gnutls_calloc)(size_t, size_t);
 extern char* (*gnutls_strdup)( const char*);
 
-#define gnutls_realloc_fast(x, y) (y==0?x:realloc(x, y))
+/* this realloc function will return ptr if size==0, and
+ * will free the ptr if the new allocation failed.
+ */
+void* gnutls_realloc_fast( void* ptr, size_t size);
 
 svoid* gnutls_secure_calloc( size_t nmemb, size_t size);
 void* _gnutls_calloc( size_t nmemb, size_t size);
