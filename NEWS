@@ -22,6 +22,7 @@ See the end for copying conditions.
 - Debug output shouldn't crash on platforms that doesn't handle NULL
   printf %s values.  Reported by Michael.Ringe@aachen.utimaco.de.
 - Sync included copy of libtasn1 with version 0.2.13.
+- Client X.509 authenticated connections via gnutls-cli should now work again.
 
 * Version 1.1.22 (2004-11-04)
 - Replace GNU LD version script with Libtool -export-symbols-regex,
