@@ -1,3 +1,15 @@
+2003-02-08 14:46  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls.h.in.in, gnutls_int.h:
+
+	added a crl verification function (untested yet).  
+
+2003-02-08 11:21  nmav <nmav@gnutls.org>
+
+	* lib/: Makefile.am, gnutls_x509.c, x509_b64.c:
+
+	Added some new certificate verification functions.  
+
 2003-02-07 22:20  nmav <nmav@gnutls.org>
 
 	* lib/: Makefile.am, gnutls_cert.c, gnutls_cert.h,
