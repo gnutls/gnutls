@@ -67,11 +67,8 @@ int _gnutls_server_name_recv_params(gnutls_session session,
       if (server_names == 0)
 	 return 0;		/* no names found */
 
-      if (session->security_parameters.extensions.server_names)
-	 free(session->security_parameters.extensions.server_names);
-
-      session->security_parameters.extensions.server_names =
-	  gnutls_malloc(server_names * sizeof(server_name_st));
+      if ( server_names > MAX_SERVER_NAME_EXTENSIONS)
+         server_names = MAX_SERVER_NAME_EXTENSIONS;
 
       p = data + 2;
       for (i = 0; i < server_names; i++) {
@@ -254,12 +251,8 @@ int gnutls_set_server_name(gnutls_session session,
    server_names =
        session->security_parameters.extensions.server_names_size + 1;
 
-   session->security_parameters.extensions.server_names =
-       gnutls_realloc(session->security_parameters.extensions.server_names,
-		      server_names * sizeof(server_name_st));
-
-   if (session->security_parameters.extensions.server_names == NULL)
-      return GNUTLS_E_MEMORY_ERROR;
+   if (server_names > MAX_SERVER_NAME_EXTENSIONS)
+      server_names = MAX_SERVER_NAME_EXTENSIONS;
 
    session->security_parameters.extensions.server_names[server_names -
 							1].type = type;

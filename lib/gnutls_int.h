@@ -64,8 +64,8 @@ typedef int gnutls_transport_ptr;
 
 #define MAX_X509_CERT_SIZE 10*1024
 #define MAX_LOG_SIZE 1024 /* maximum number of log message */
-#define MAX_SRP_USERNAME 256
-#define MAX_SERVER_NAME_SIZE 256
+#define MAX_SRP_USERNAME 128
+#define MAX_SERVER_NAME_SIZE 128
 
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
@@ -294,8 +294,11 @@ typedef struct {
    gnutls_server_name_type type;
 } server_name_st;
 
+#define MAX_SERVER_NAME_EXTENSIONS 3
+
 typedef struct {
-	server_name_st* server_names;
+	server_name_st  server_names[MAX_SERVER_NAME_EXTENSIONS]; 
+	                /* limit server_name extensions */
 	int		server_names_size;
 	opaque 		srp_username[MAX_SRP_USERNAME];
 } TLSExtensions;

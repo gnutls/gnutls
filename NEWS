@@ -1,6 +1,7 @@
 Version 0.5.10
 - Updated documentation.
-- Added server name extension.
+- Added server name extension. This allows clients to specify the
+  name of the server they connect to. Useful to HTTPS.
 
 Version 0.5.9 (10/10/2002)
 - Corrected some code which worked fine in gcc 3.2, but not with any
