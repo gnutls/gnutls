@@ -42,6 +42,8 @@
 
 #define OPENPGP_NAME_SIZE GNUTLS_X509_CN_SIZE
 
+#define APPEND_DATUM(x, y, z) _gnutls_datum_append_m( x, y, z, realloc)
+
 typedef struct {
     int type;
     int armored;
@@ -378,7 +380,7 @@ openpgp_sig_to_gnutls_cert(gnutls_cert *cert, PKT_signature *sig)
         goto fail;
     a = cdk_iobuf_read_mem( buf, 0 );
     if ( a ) {
-        rc = gnutls_datum_append( &cert->signature, a->d, a->len );
+        rc = APPEND_DATUM( &cert->signature, a->d, a->len );
         if (rc < 0) {
             gnutls_assert();
             rc = GNUTLS_E_MEMORY_ERROR;
@@ -1244,7 +1246,7 @@ gnutls_openpgp_add_keyring_file(gnutls_datum *keyring, const char *name)
     blob = kbx_data_to_keyring( KBX_BLOB_FILE, enc, name,
                                 strlen(name), &nbytes);
     if ( blob && nbytes ) { 
-        if ( gnutls_datum_append( keyring, blob, nbytes ) < 0 ) {
+        if ( APPEND_DATUM( keyring, blob, nbytes ) < 0 ) {
             gnutls_assert();
             return GNUTLS_E_MEMORY_ERROR;
         }
@@ -1275,7 +1277,7 @@ gnutls_openpgp_add_keyring_mem(gnutls_datum *keyring,
   
     blob = kbx_data_to_keyring( KBX_BLOB_DATA, 0, data, len, &nbytes );
     if ( blob && nbytes ) {
-        if ( gnutls_datum_append( keyring, blob, nbytes ) < 0 ) {
+        if ( APPEND_DATUM( keyring, blob, nbytes ) < 0 ) {
             gnutls_assert();
             return GNUTLS_E_MEMORY_ERROR;
         }
@@ -1535,16 +1537,16 @@ xml_add_tag( gnutls_datum *xmlkey, const char *tag, const char *val )
     strcat( p, "    <" );
     strcat( p, tag );
     strcat( p, ">" );
-    gnutls_datum_append( xmlkey, p, strlen( p ) );
+    APPEND_DATUM( xmlkey, p, strlen( p ) );
     gnutls_free( p ); p = NULL;
 
-    gnutls_datum_append( xmlkey, val, strlen( val ) );
+    APPEND_DATUM( xmlkey, val, strlen( val ) );
 
     p = gnutls_calloc( 1, strlen( tag ) + 4 + 1 );
     strcat( p, "</" );
     strcat( p, tag );
     strcat( p, ">\n" );
-    gnutls_datum_append( xmlkey, p, strlen( p ) );
+    APPEND_DATUM( xmlkey, p, strlen( p ) );
     gnutls_free( p ); p = NULL;
 }
 
@@ -1567,7 +1569,7 @@ xml_add_key_mpi( gnutls_datum *xmlkey, PKT_public_key *pk )
 {
     const char *s = "    <KEY ENCODING=\"HEX\"/>\n";
 
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
          
     if ( is_RSA( pk->pubkey_algo ) ) {
         xml_add_mpi( xmlkey, pk->mpi[0], "RSA-N" );
@@ -1596,7 +1598,7 @@ xml_add_key( gnutls_datum *xmlkey, int ext, PKT_public_key *pk, int sub )
     int i = 0;
 
     s = sub? "  <SUBKEY>\n" : "  <MAINKEY>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 
     cdk_pk_get_keyid( pk, kid );
     snprintf( keyid, 16, "%08X%08X", kid[0], kid[1] );
@@ -1631,7 +1633,7 @@ xml_add_key( gnutls_datum *xmlkey, int ext, PKT_public_key *pk, int sub )
         xml_add_key_mpi( xmlkey, pk );
     
     s = sub? "  </SUBKEY>\n" : "  </MAINKEY>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 }
 
 static void
@@ -1642,7 +1644,7 @@ xml_add_userid( gnutls_datum *xmlkey, int ext,
     char *p, *name, tmp[32];
 
     s = "  <USERID>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 
     p = strchr( dn->name, '<' );
     if ( p ) {
@@ -1665,7 +1667,7 @@ xml_add_userid( gnutls_datum *xmlkey, int ext,
     }    
 
     s = "  </USERID>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 }
 
 static void
@@ -1676,7 +1678,7 @@ xml_add_sig( gnutls_datum *xmlkey, int ext, PKT_signature *sig )
     u32 kid[2];
 
     s = "  <SIGNATURE>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 
     sprintf( tmp, "%d", sig->version );
     xml_add_tag( xmlkey, "VERSION", tmp );
@@ -1707,11 +1709,11 @@ xml_add_sig( gnutls_datum *xmlkey, int ext, PKT_signature *sig )
     xml_add_tag( xmlkey, "KEYID", keyid );
 
     s = "  </SIGNATURE>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 }
 
 /**
- * gnutls_certificate_openpgp_get_as_xml - Return a certificate as a XML fragment
+ * gnutls_openpgp_get_key_xml - Return a certificate as a XML fragment
  * @cert: the certificate which holds the whole OpenPGP key.
  * @ext: extension mode (1/0), 1 means include key signatures and key data.
  * @xmlkey: he datum struct to store the XML result.
@@ -1720,8 +1722,8 @@ xml_add_sig( gnutls_datum *xmlkey, int ext, PKT_signature *sig )
  * a XML string.
  **/
 int
-gnutls_certificate_openpgp_get_as_xml( const gnutls_datum *cert, int ext,
-                                       gnutls_datum *xmlkey )
+gnutls_openpgp_get_key_xml( const gnutls_datum *cert, int ext,
+                            gnutls_datum *xmlkey )
 {
     CDK_KBNODE kb_pk, p;
     PACKET *pkt;
@@ -1739,10 +1741,10 @@ gnutls_certificate_openpgp_get_as_xml( const gnutls_datum *cert, int ext,
     memset( xmlkey, 0, sizeof *xmlkey );
 
     s = "<?xml version=\"1.0\"?>\n\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
     
     s = "<OPENPGPKEY>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 
     for ( p = kb_pk; p; p = p->next ) {
         pkt = p->pkt;
@@ -1767,7 +1769,7 @@ gnutls_certificate_openpgp_get_as_xml( const gnutls_datum *cert, int ext,
         }
     }
     s = "</OPENPGPKEY>\n";
-    gnutls_datum_append( xmlkey, s, strlen( s ) );
+    APPEND_DATUM( xmlkey, s, strlen( s ) );
 
     return rc;
 }   
