@@ -224,9 +224,9 @@ asn1_array2tree(const ASN1_ARRAY_TYPE *array,ASN1_TYPE *definitions,
 
   if (errorDescription!=NULL) {
    if(result==ASN1_IDENTIFIER_NOT_FOUND) {
-     strcpy(errorDescription,":: identifier '");
-     strcat(errorDescription,_asn1_identifierMissing);
-     strcat(errorDescription,"' not found");
+     Estrcpy(errorDescription,":: identifier '");
+     Estrcat(errorDescription,_asn1_identifierMissing);
+     Estrcat(errorDescription,"' not found");
    }
    else
      errorDescription[0]=0;
@@ -321,7 +321,7 @@ _asn1_copy_structure3(node_asn *source_node)
       if(p_s->value){
 	switch(type_field(p_s->type)){
 	case TYPE_OCTET_STRING: case TYPE_BIT_STRING: case TYPE_GENERALSTRING: 
-	case TYPE_INTEGER:           // case TYPE_DEFAULT:
+	case TYPE_INTEGER:    
 	  len2=-1;
 	  len=_asn1_get_length_der(p_s->value,&len2);
 	  _asn1_set_value(p_d,p_s->value,len+len2);
@@ -518,11 +518,10 @@ _asn1_expand_identifier(node_asn **node,node_asn *root)
 
 
 /**
-  * asn1_create_element - Creates a structure called DEST_NAME of type SOURCE_NAME.
+  * asn1_create_element - Creates a structure of type SOURCE_NAME.
   * @definitions: pointer to the structure returned by "parser_asn1" function 
   * @source_name: the name of the type of the new structure (must be inside p_structure).
   * @element: pointer to the structure created. 
-  * @dest_name: the name of the new structure.
   * Description:
   *
   * Creates a structure called DEST_NAME of type SOURCE_NAME.
@@ -531,28 +530,23 @@ _asn1_expand_identifier(node_asn **node,node_asn *root)
   *
   *  ASN1_SUCCESS\: creation OK
   *
-  *  ASN1_ELEMENT_NOT_EMPTY\: *POINTER not ASN1_TYPE_EMPTY
-  *
   *  ASN1_ELEMENT_NOT_FOUND\: SOURCE_NAME isn't known
   * 
   * Example: using "pkix.asn"
-  *  result=asn1_create_structure(cert_def,"PKIX1.Certificate",&cert,"certificate1");
+  *  result=asn1_create_structure(cert_def,"PKIX1.Certificate",&cert);
   **/
 asn1_retCode
 asn1_create_element(ASN1_TYPE definitions,const char *source_name,
-		    ASN1_TYPE *element,const char *dest_name)
+		    ASN1_TYPE *element)
 {
   node_asn *dest_node;
   int res;
-
-  if(*element!=ASN1_TYPE_EMPTY)
-    return ASN1_ELEMENT_NOT_EMPTY;
 
   dest_node=_asn1_copy_structure2(definitions,source_name);
  
   if(dest_node==NULL) return ASN1_ELEMENT_NOT_FOUND;
 
-  _asn1_set_name(dest_node,dest_name);
+  _asn1_set_name(dest_node,"");
 
   res=_asn1_expand_identifier(&dest_node,definitions);
   _asn1_type_choice_config(dest_node);
@@ -833,9 +827,9 @@ asn1_print_structure(FILE *out,ASN1_TYPE structure,const char *name,int mode)
   *
   * Returns:
   *
-  *  ASN1_SUCCESS: creation OK
-  *  ASN1_ELEMENT_NOT_FOUND: NAME isn't known
-  *  ASN1_GENERIC_ERROR: pointer num equal to NULL
+  *  ASN1_SUCCESS\: creation OK
+  *  ASN1_ELEMENT_NOT_FOUND\: NAME isn't known
+  *  ASN1_GENERIC_ERROR\: pointer num equal to NULL
   *
   **/
 asn1_retCode 
@@ -861,8 +855,68 @@ asn1_number_of_elements(ASN1_TYPE element,const char *name,int *num)
 }
 
 
+/**
+  * asn1_find_structure_from_oid - Search the structure that is defined just
+  * after an OID definition.
+  * @definitions: ASN1 definitions
+  * @oidValue: value of the OID to search (e.g. "1.2.3.4").
+  * @structureName: name returned by the function, that is the structure 
+  * defined just after the OID of value equal to OIDVALUE.
+  * It must be an array of MAX_NAME_SIZE char elements.
+  * 
+  * Description:
+  *
+  * Search the structure that is defined just after an OID definition.
+  *
+  * Returns:
+  *
+  *   ASN1_SUCCESS\: structure found.
+  *
+  *   ASN1_ELEMENT_NOT_FOUND\: OID equal to OIDVALUE not found.
+  *
+  **/
+asn1_retCode
+asn1_find_structure_from_oid(ASN1_TYPE definitions,
+                         const char *oidValue,char *structureName)
+{
+  char definitionsName[MAX_NAME_SIZE],name[2*MAX_NAME_SIZE+1];
+  char value[MAX_NAME_SIZE];
+  ASN1_TYPE p;
+  int len;
+  asn1_retCode result;
+
+  if((definitions==ASN1_TYPE_EMPTY) || (oidValue==NULL))
+    return ASN1_ELEMENT_NOT_FOUND;
 
 
+  strcpy(definitionsName,definitions->name);
+  strcat(definitionsName,".");
+
+  /* search the OBJECT_ID into definitions */
+  p=definitions->down;
+  while(p){
+    if((type_field(p->type)==TYPE_OBJECT_ID) &&
+       (p->type & CONST_ASSIGN)){ 
+      strcpy(name,definitionsName);
+      strcat(name,p->name);
+	    
+      len=MAX_NAME_SIZE;
+      result=asn1_read_value(definitions,name,value,&len);
+
+      if((result == ASN1_SUCCESS) && (!strcmp(oidValue,value))){
+	p=p->right;
+	if(p==NULL)  /* reach the end of ASN1 definitions */
+	  return ASN1_ELEMENT_NOT_FOUND;
+	
+	strcpy(structureName,p->name);
+	return ASN1_SUCCESS;
+      }
+    }
+    p=p->right;
+  }
+
+  return ASN1_ELEMENT_NOT_FOUND;
+}
 
 
 

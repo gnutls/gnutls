@@ -115,7 +115,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 
 	result = asn1_create_element(_gnutls_get_pkix(),
 				     "PKIX1.CertificateList",
-				     &crl->crl, "crl2");
+				     &crl->crl);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -133,7 +133,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 	 */
 	result =
 	    asn1_der_decoding_startEnd(crl->crl, _data.data, _data.size,
-				       "crl2.tbsCertList", &start, &end);
+				       "tbsCertList", &start, &end);
 	if (result != ASN1_SUCCESS) {
 		result = _gnutls_asn2err(result);
 		gnutls_assert();
@@ -158,7 +158,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 		 */
 		len = sizeof(signature);
 		result =
-		    asn1_read_value(crl->crl, "crl2.signature", signature,
+		    asn1_read_value(crl->crl, "signature", signature,
 				    &len);
 
 		if (result != ASN1_SUCCESS) {
@@ -187,7 +187,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 		len = sizeof(signature);
 		result =
 		    asn1_read_value(crl->crl,
-				    "crl2.signatureAlgorithm.algorithm",
+				    "signatureAlgorithm.algorithm",
 				    signature, &len);
 
 		if (result != ASN1_SUCCESS) {
@@ -240,7 +240,7 @@ int gnutls_x509_crl_get_issuer_dn(gnutls_x509_crl crl, char *buf,
 	}
 
 	return _gnutls_x509_parse_dn(crl->crl,
-				     "crl2.tbsCertList.issuer.rdnSequence",
+				     "tbsCertList.issuer.rdnSequence",
 				     buf, sizeof_buf);
 
 
@@ -275,7 +275,7 @@ int gnutls_x509_crl_get_issuer_dn_by_oid(gnutls_x509_crl crl,
 	}
 
 	return _gnutls_x509_parse_dn_oid(crl->crl,
-					 "crl2.tbsCertList.issuer.rdnSequence",
+					 "tbsCertList.issuer.rdnSequence",
 					 oid, indx, buf, sizeof_buf);
 
 
@@ -314,7 +314,7 @@ int gnutls_x509_crl_get_version(gnutls_x509_crl crl)
 
 	len = sizeof(version);
 	if ((result =
-	     asn1_read_value(crl->crl, "crl2.tbsCertList.version", version,
+	     asn1_read_value(crl->crl, "tbsCertList.version", version,
 			     &len)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -335,7 +335,7 @@ int gnutls_x509_crl_get_version(gnutls_x509_crl crl)
 time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl crl)
 {
 	return _gnutls_x509_get_time(crl->crl,
-				     "crl2.tbsCertList.thisUpdate");
+				     "tbsCertList.thisUpdate");
 }
 
 /**
@@ -352,7 +352,7 @@ time_t gnutls_x509_crl_get_this_update(gnutls_x509_crl crl)
 time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl)
 {
 	return _gnutls_x509_get_time(crl->crl,
-				     "crl2.tbsCertList.nextUpdate");
+				     "tbsCertList.nextUpdate");
 }
 
 /**
@@ -372,7 +372,7 @@ int gnutls_x509_crl_get_certificate_count(gnutls_x509_crl crl)
 
 	result =
 	    asn1_number_of_elements(crl->crl,
-				    "crl2.tbsCertList.revokedCertificates",
+				    "tbsCertList.revokedCertificates",
 				    &count);
 
 	if (result != ASN1_SUCCESS) {
@@ -409,13 +409,13 @@ int gnutls_x509_crl_get_certificate(gnutls_x509_crl crl, int index,
 
 	_gnutls_int2str(index + 1, str_index);
 	_gnutls_str_cpy(serial_name, sizeof(serial_name),
-			"crl2.tbsCertList.revokedCertificates.?");
+			"tbsCertList.revokedCertificates.?");
 	_gnutls_str_cat(serial_name, sizeof(serial_name), str_index);
 	_gnutls_str_cat(serial_name, sizeof(serial_name),
 			".userCertificate");
 
 	_gnutls_str_cpy(date_name, sizeof(date_name),
-			"crl2.tbsCertList.revokedCertificates.?");
+			"tbsCertList.revokedCertificates.?");
 	_gnutls_str_cat(date_name, sizeof(date_name), str_index);
 	_gnutls_str_cat(date_name, sizeof(date_name), ".revocationDate");
 
@@ -458,7 +458,7 @@ int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl crl,
 	 */
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(), "PKIX1.TBSCertList",
-				 &c2, "c2")) != ASN1_SUCCESS) {
+				 &c2)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -475,7 +475,7 @@ int _gnutls_x509_crl_get_raw_issuer_dn(gnutls_x509_crl crl,
 
 	result =
 	    asn1_der_decoding_startEnd(c2, crl->signed_data.data,
-				       crl->signed_data.size, "c2.issuer",
+				       crl->signed_data.size, "issuer",
 				       &start1, &end1);
 	asn1_delete_structure(&c2);
 

@@ -527,9 +527,8 @@ int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn )
 	int len, result;
 	int start, end;
 
-	if ((result=_gnutls_asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn,
-	     "dn")) != ASN1_SUCCESS) {
+	if ((result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.Certificate", &dn)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -543,7 +542,7 @@ int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn )
 	}
 
 	result = asn1_der_decoding_startEnd(dn, cert->raw.data, cert->raw.size,
-					"dn.tbsCertificate.issuer", &start,
+					"tbsCertificate.issuer", &start,
 					&end);
 
 	if (result != ASN1_SUCCESS) {

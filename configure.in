@@ -272,7 +272,9 @@ AC_ARG_WITH(included-libtasn1,
 minitasn1_enabled=$withval, 
 minitasn1_enabled=no
 
-AC_CHECK_LIB( tasn1, asn1_array2tree,:, 
+dnl We now need libtasn1 0.2.x
+dnl 
+AC_CHECK_LIB( tasn1, asn1_read_tag,:, 
  minitasn1_enabled=yes
 *** 
 *** LibtASN1 was not found. Will use the included one.))

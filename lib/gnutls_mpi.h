@@ -34,9 +34,7 @@ int _gnutls_mpi_scan_pgp( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nby
 int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a );
 int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a );
 
-int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, char* tmpstr, int tmpstr_size, MPI* ret_mpi);
-
-asn1_retCode _gnutls_asn1_create_element(ASN1_TYPE definitions,const char *source_name,
-                                 ASN1_TYPE *element, const char *dest_name);
+int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, 
+	char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi);
 
 #endif

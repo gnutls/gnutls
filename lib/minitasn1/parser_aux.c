@@ -84,8 +84,10 @@ _asn1_add_node(unsigned int type)
 /* Function : _asn1_find_mode                                     */
 /* Description: searches an element called NAME starting from     */
 /*              POINTER. The name is composed by differents       */
-/*              identifiers separated by dot.The first identifier */
-/*              must be the name of *POINTER.                     */
+/*              identifiers separated by dots.When *POINTER has a */
+/*              name, the first identifier must be the name of    */
+/*              *POINTER, otherwise it must be the name of one    */
+/*              child of *POINTER.                                */
 /* Parameters:                                                    */
 /*   pointer: NODE_ASN element pointer.                           */
 /*   name: null terminated string with the element's name to find.*/
@@ -95,31 +97,40 @@ node_asn *
 _asn1_find_node(node_asn *pointer,const char *name)
 {
   node_asn *p;
-  char *n_end,n[128];
+  char *n_end,n[MAX_NAME_SIZE+1];
   const char *n_start;
 
-  if((name==NULL) || (name[0]==0)) return NULL;
+  if(pointer == NULL) return NULL;
 
-  n_start=name;
-  n_end=strchr(n_start,'.');     /* search the first dot */
-  if(n_end){
-    memcpy(n,n_start,n_end-n_start);
-    n[n_end-n_start]=0;
-    n_start=n_end;
-    n_start++;
-  }
-  else{
-    _asn1_str_cpy(n,sizeof(n),n_start);
-    n_start=NULL;
-  }
+  if(name==NULL) return NULL;
 
   p=pointer;
-  while(p){
-    if((p->name) && (!strcmp(p->name,n))) break;
-    else p=p->right;
-  } /* while */
+  n_start=name;
 
-  if(p==NULL) return NULL;
+  if(p->name != NULL){ /* has *pointer a name ? */
+    n_end=strchr(n_start,'.');     /* search the first dot */
+    if(n_end){
+      memcpy(n,n_start,n_end-n_start);
+      n[n_end-n_start]=0;
+      n_start=n_end;
+      n_start++;
+    }
+    else{
+      _asn1_str_cpy(n,sizeof(n),n_start);
+      n_start=NULL;
+    }
+    
+    while(p){
+      if((p->name) && (!strcmp(p->name,n))) break;
+      else p=p->right;
+    } /* while */
+    
+    if(p==NULL) return NULL;
+  }
+  else{ /* *pointer doesn't have a name */
+    if(n_start[0]==0)
+      return p;
+  }
 
   while(n_start){   /* Has the end of NAME been reached? */
     n_end=strchr(n_start,'.');    /* search the next dot */

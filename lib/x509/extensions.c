@@ -54,7 +54,7 @@ int _gnutls_x509_crt_get_extension( gnutls_x509_crt cert, const char* extension_
 	do {
 		k++;
 
-		_gnutls_str_cpy(name, sizeof(name), "cert2.tbsCertificate.extensions.?"); 
+		_gnutls_str_cpy(name, sizeof(name), "tbsCertificate.extensions.?"); 
 		_gnutls_int2str(k, counter); 
 		_gnutls_str_cat(name, sizeof(name), counter); 
 
@@ -171,8 +171,8 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 	keyUsage[0] = 0;
 
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext,
-	     "ku")) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.KeyUsage", &ext
+	     )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -186,7 +186,7 @@ int _gnutls_x509_ext_extract_keyUsage(uint16 *keyUsage, opaque * extnValue,
 	}
 
 	len = sizeof(str) - 1;
-	result = asn1_read_value(ext, "ku", str, &len);
+	result = asn1_read_value(ext, "", str, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&ext);
@@ -212,8 +212,8 @@ int _gnutls_x509_ext_extract_basicConstraints(int *CA, opaque * extnValue,
 	*CA = 0;
 
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext,
-	     "bc")) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.BasicConstraints", &ext
+	     )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -227,7 +227,7 @@ int _gnutls_x509_ext_extract_basicConstraints(int *CA, opaque * extnValue,
 	}
 
 	len = sizeof(str) - 1;
-	result = asn1_read_value(ext, "bc.cA", str, &len);
+	result = asn1_read_value(ext, "cA", str, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&ext);

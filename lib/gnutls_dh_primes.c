@@ -343,8 +343,8 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 		_params.size = params->size;
 	}
 
-	if ((result = _gnutls_asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.DHParameter", &c2, "c2"))
+	if ((result = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.DHParameter", &c2))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -367,7 +367,7 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 	/* Read PRIME 
 	 */
 	len = sizeof(str) - 1;
-	if ((result = asn1_read_value(c2, "c2.prime",
+	if ((result = asn1_read_value(c2, "prime",
 					    str, &len)) != ASN1_SUCCESS) 
 	{
 		gnutls_assert();
@@ -387,7 +387,7 @@ int gnutls_pkcs3_extract_dh_params(const gnutls_datum * params,
 	/* Read the GENERATOR
 	 */
 	len = sizeof(str) - 1;
-	if ((result = asn1_read_value(c2, "c2.base",
+	if ((result = asn1_read_value(c2, "base",
 					    str, &len)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		gnutls_free( prime->data);
@@ -437,8 +437,8 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 	ASN1_TYPE c2;
 	int result;
 
-	if ((result = _gnutls_asn1_create_element
-	     (_gnutls_get_gnutls_asn(), "GNUTLS.DHParameter", &c2, "c2"))
+	if ((result = asn1_create_element
+	     (_gnutls_get_gnutls_asn(), "GNUTLS.DHParameter", &c2))
 	    != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -446,7 +446,7 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 
 	/* Write PRIME 
 	 */
-	if ((result = asn1_write_value(c2, "c2.prime",
+	if ((result = asn1_write_value(c2, "prime",
 					    prime->data, prime->size)) != ASN1_SUCCESS) 
 	{
 		gnutls_assert();
@@ -456,14 +456,14 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 
 	/* Write the GENERATOR
 	 */
-	if ((result = asn1_write_value(c2, "c2.base",
+	if ((result = asn1_write_value(c2, "base",
 					    generator->data, generator->size)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
 		return _gnutls_asn2err(result);
 	}
 
-	if ((result = asn1_write_value(c2, "c2.privateValueLength",
+	if ((result = asn1_write_value(c2, "privateValueLength",
 					    NULL, 0)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&c2);
@@ -471,7 +471,7 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 	}
 
 	if (format == GNUTLS_X509_FMT_DER) {
-		if ((result=asn1_der_coding( c2, "c2", params_data, params_data_size, NULL)) != ASN1_SUCCESS) {
+		if ((result=asn1_der_coding( c2, "", params_data, params_data_size, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
 			
@@ -488,7 +488,7 @@ int gnutls_pkcs3_export_dh_params( const gnutls_datum * prime,
 		opaque *out;
 		int len = sizeof(tmp) - 1;
 
-		if ((result=asn1_der_coding( c2, "c2", tmp, &len, NULL)) != ASN1_SUCCESS) {
+		if ((result=asn1_der_coding( c2, "", tmp, &len, NULL)) != ASN1_SUCCESS) {
 			gnutls_assert();
 			asn1_delete_structure(&c2);
 			return _gnutls_asn2err(result);

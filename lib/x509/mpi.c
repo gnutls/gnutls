@@ -39,8 +39,8 @@ int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
 	if ((result=asn1_create_element
-	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk,
-	     "rsa_public_key")) != ASN1_SUCCESS) {
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk))
+	     != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -54,14 +54,14 @@ int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 	}
 
 
-	if ( (result=_gnutls_x509_read_int( spk, "rsa_public_key.modulus", 
+	if ( (result=_gnutls_x509_read_int( spk, "modulus", 
 		str, sizeof(str)-1, &params[0])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
-	if ( (result=_gnutls_x509_read_int( spk, "rsa_public_key.publicExponent", 
+	if ( (result=_gnutls_x509_read_int( spk, "publicExponent", 
 		str, sizeof(str)-1, &params[1])) < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&params[0]);
@@ -87,8 +87,8 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.Dss-Parms", &spk,
-	     "dsa_parms")) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.Dss-Parms", &spk
+	     )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -107,7 +107,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read p */
 
-	if ( (result=_gnutls_x509_read_int( spk, "dsa_parms.p", str, sizeof(str)-1, &params[0])) < 0) {
+	if ( (result=_gnutls_x509_read_int( spk, "p", str, sizeof(str)-1, &params[0])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
@@ -115,7 +115,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read q */
 
-	if ( (result=_gnutls_x509_read_int( spk, "dsa_parms.q", str, sizeof(str)-1, &params[1])) < 0) {
+	if ( (result=_gnutls_x509_read_int( spk, "q", str, sizeof(str)-1, &params[1])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		_gnutls_mpi_release(&params[0]);
@@ -124,7 +124,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read g */
 	
-	if ( (result=_gnutls_x509_read_int( spk, "dsa_parms.g", str, sizeof(str)-1, &params[2])) < 0) {
+	if ( (result=_gnutls_x509_read_int( spk, "g", str, sizeof(str)-1, &params[2])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		_gnutls_mpi_release(&params[0]);
@@ -149,8 +149,8 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
 	if ( (result=asn1_create_element
-	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &spk,
-	     "dsa_public_key")) != ASN1_SUCCESS) {
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &spk
+	     )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -165,10 +165,11 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read p */
 
-	if ( (result=_gnutls_x509_read_int( spk, "dsa_public_key", str, sizeof(str)-1, &params[3])) < 0) {
+#warning CHECK IT
+	if ( (result=_gnutls_x509_read_int( spk, "", str, sizeof(str)-1, &params[3])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
-		return GNUTLS_E_ASN1_GENERIC_ERROR;
+		return _gnutls_asn2err(result);
 	}
 
 	asn1_delete_structure(&spk);
@@ -195,7 +196,7 @@ int pk_algorithm;
 	 */
 	len = sizeof(str);
 	result = asn1_read_value(cert->cert, 
-		"cert2.tbsCertificate.subjectPublicKeyInfo.subjectPublicKey", str, &len);
+		"tbsCertificate.subjectPublicKeyInfo.subjectPublicKey", str, &len);
 	len /= 8;
 
 	if (result != ASN1_SUCCESS) {
@@ -247,7 +248,7 @@ int pk_algorithm;
 
 		len = sizeof(str);
 		result = asn1_read_value(cert->cert, 
-			"cert2.tbsCertificate.subjectPublicKeyInfo.algorithm.parameters", str, &len);
+			"tbsCertificate.subjectPublicKeyInfo.algorithm.parameters", str, &len);
 
 		if (result != ASN1_SUCCESS) {
 			gnutls_assert();

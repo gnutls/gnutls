@@ -443,9 +443,9 @@ int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if ((result=_gnutls_asn1_create_element
-	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPrivateKey", &c2, 
-	       "rsakey")) != ASN1_SUCCESS) 
+	if ((result=asn1_create_element
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPrivateKey", &c2
+	       )) != ASN1_SUCCESS) 
 	{
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -477,9 +477,9 @@ int _gnutls_der_check_if_dsa_key(const gnutls_datum * key_struct)
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if ((result=_gnutls_asn1_create_element
-	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", &c2, 
-	       "rsakey")) != ASN1_SUCCESS) 
+	if ((result=asn1_create_element
+	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", &c2
+	       )) != ASN1_SUCCESS) 
 	{
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -673,7 +673,7 @@ static int read_key_file(gnutls_certificate_credentials res, const char *keyfile
   * DSA private keys are encoded the OpenSSL way, which is an ASN.1
   * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
   *
-  * Note that the keyUsage (2 5 29 15) PKIX extension in X.509 certificates 
+  * Note that the keyUsage (2.5.29.15) PKIX extension in X.509 certificates 
   * is supported. This means that certificates intended for signing cannot
   * be used for ciphersuites that require encryption.
   *

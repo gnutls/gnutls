@@ -104,13 +104,3 @@ int len, result;
 	return 0;
 }
 
-/* front end for asn1_create_element.
- */
-asn1_retCode _gnutls_asn1_create_element(ASN1_TYPE definitions,const char *source_name,
-                                 ASN1_TYPE *element, const char *dest_name) {
-
-	*element = ASN1_TYPE_EMPTY;
-	
-	return asn1_create_element( definitions, source_name, element, dest_name);
-                                 
-}

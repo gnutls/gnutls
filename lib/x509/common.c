@@ -37,26 +37,30 @@ typedef struct _oid2string {
 	int printable;
 } oid2string;
 
-static const oid2string OID2STR[] = {
-	{"2 5 4 6", "X520countryName", "C", 0, 1},
-	{"2 5 4 12", "X520title", "T", 1, 1},
-	{"2 5 4 10", "X520OrganizationName", "O", 1, 1},
-	{"2 5 4 11", "X520OrganizationalUnitName", "OU", 1, 1},
-	{"2 5 4 3", "X520CommonName", "CN", 1, 1},
-	{"2 5 4 7", "X520LocalityName", "L", 1, 1},
-	{"2 5 4 8", "X520StateOrProvinceName", "ST", 1, 1},
-	{"2 5 4 5", "X520serialNumber", "serialNumber", 0, 1},
-	{"2 5 4 20", "X520telephoneNumber", "telephoneNumber", 0, 1},
+#define PKIX1_RSA_OID "1.2.840.113549.1.1.1"
+#define DSA_OID "1.2.840.10040.4.1"
 
-	{"0 9 2342 19200300 100 1 25", "dc", "DC", 0, 1}, /* FIXME: CHOICE? */
-	{"0 9 2342 19200300 100 1 1", "uid", "UID", 0, 1}, /* FIXME: CHOICE? */
-	{"1 2 840 113549 1 9 1", "Pkcs9email", "EMAIL", 0, 1},
-	{"1 2 840 113549 1 1 1", "rsaEncryption", NULL, 0, 0},
-	{"1 2 840 113549 1 1 2", "md2WithRSAEncryption", NULL, 0, 0},
-	{"1 2 840 113549 1 1 4", "md5WithRSAEncryption", NULL, 0, 0},
-	{"1 2 840 113549 1 1 5", "sha1WithRSAEncryption", NULL, 0, 0},
-	{"1 2 840 10040 4 3", "id-dsa-with-sha1", NULL, 0, 0},
-	{"1 2 840 10040 4 1", "id-dsa", NULL, 0, 0},
+static const oid2string OID2STR[] = {
+	{"2.5.4.6", "X520countryName", "C", 0, 1},
+	{"2.5.4.12", "X520title", "T", 1, 1},
+	{"2.5.4.10", "X520OrganizationName", "O", 1, 1},
+	{"2.5.4.11", "X520OrganizationalUnitName", "OU", 1, 1},
+	{"2.5.4.3", "X520CommonName", "CN", 1, 1},
+	{"2.5.4.7", "X520LocalityName", "L", 1, 1},
+	{"2.5.4.8", "X520StateOrProvinceName", "ST", 1, 1},
+	{"2.5.4.5", "X520serialNumber", "serialNumber", 0, 1},
+	{"2.5.4.20", "X520telephoneNumber", "telephoneNumber", 0, 1},
+
+	{"0.9.2342.19200300.100.1.25", "dc", "DC", 0, 1}, /* FIXME: CHOICE? */
+	{"0.9.2342.19200300.100.1.1", "uid", "UID", 0, 1}, /* FIXME: CHOICE? */
+	{"1.2.840.113549.1.9.1", "Pkcs9email", "EMAIL", 0, 1},
+	{PKIX1_RSA_OID, "rsaEncryption", NULL, 0, 0},
+	{"1.2.840.113549.1.1.2", "md2WithRSAEncryption", NULL, 0, 0},
+
+	{"1.2.840.113549.1.1.4", "md5WithRSAEncryption", NULL, 0, 0},
+	{"1.2.840.113549.1.1.5", "sha1WithRSAEncryption", NULL, 0, 0},
+	{"1.2.840.10040.4.3", "id-dsa-with-sha1", NULL, 0, 0},
+	{DSA_OID, "id-dsa", NULL, 0, 0},
 	{NULL, NULL, NULL, 0, 0}
 };
 
@@ -123,7 +127,8 @@ int _gnutls_x509_oid_data2string( const char* OID, void* value,
 	int value_size, char * res, int *res_size) {
 
 int result;
-char str[1024], tmpname[1024];
+char str[1024];
+char tmpname[128];
 const char* ANAME = NULL;
 int CHOICE = -1, len = -1;
 ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
@@ -150,12 +155,10 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 
 	_gnutls_str_cpy(str, sizeof(str), "PKIX1."); 
 	_gnutls_str_cat(str, sizeof(str), ANAME); 
-	_gnutls_str_cpy( tmpname, sizeof(tmpname), "temp-structure-"); 
-	_gnutls_str_cat( tmpname, sizeof(tmpname), ANAME);
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(), str,
-				   &tmpasn, tmpname)) != ASN1_SUCCESS) {
+				   &tmpasn)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -169,7 +172,7 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 	 * is the value;
 	 */
 	len = sizeof( str) - 1;
-	if ((result = asn1_read_value(tmpasn, tmpname, str, &len)) != ASN1_SUCCESS) {	/* CHOICE */
+	if ((result = asn1_read_value(tmpasn, "", str, &len)) != ASN1_SUCCESS) {	/* CHOICE */
 		asn1_delete_structure(&tmpasn);
 		return _gnutls_asn2err(result);
 	}
@@ -182,8 +185,7 @@ ASN1_TYPE tmpasn = ASN1_TYPE_EMPTY;
 		
 	} else {	/* CHOICE */
 		str[len] = 0;
-		_gnutls_str_cat( tmpname, sizeof(tmpname), "."); 
-		_gnutls_str_cat( tmpname, sizeof(tmpname), str); 
+		_gnutls_str_cpy( tmpname, sizeof(tmpname), str); 
 
 		len = sizeof(str) - 1;
 		if ((result =
@@ -217,9 +219,6 @@ void _gnutls_int2str(unsigned int k, char *data)
 		sprintf(data, "%d", k); 
 }
 
-
-#define PKIX1_RSA_OID "1 2 840 113549 1 1 1"
-#define DSA_OID "1 2 840 10040 4 1"
 
 gnutls_pk_algorithm _gnutls_x509_oid2pk_algorithm( const char* oid)
 {
@@ -416,7 +415,7 @@ time_t _gnutls_x509_generalTime2gtime(char *ttime)
 }
 
 /* Extracts the time in time_t from the ASN1_TYPE given. When should
- * be something like "crl2.tbsCertList.thisUpdate".
+ * be something like "tbsCertList.thisUpdate".
  */
 #define MAX_TIME 1024
 time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)

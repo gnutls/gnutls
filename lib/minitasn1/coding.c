@@ -45,12 +45,12 @@ void
 _asn1_error_description_value_not_found(node_asn *node,char *ErrorDescription)
 {
 
-  if (ErrorDescription==NULL) return;
+  if (ErrorDescription == NULL) return;
 
-  strcpy(ErrorDescription,":: value of element '");
+  Estrcpy(ErrorDescription,":: value of element '");
   _asn1_hierarchical_name(node,ErrorDescription+strlen(ErrorDescription),
-		  MAX_ERROR_DESCRIPTION_SIZE-40);
-  strcat(ErrorDescription,"' not found");
+			  MAX_ERROR_DESCRIPTION_SIZE-40);
+  Estrcat(ErrorDescription,"' not found");
 
 }
 
@@ -233,11 +233,11 @@ _asn1_objectid_der(unsigned char *str,unsigned char *der,int *der_len)
   temp=(char *) malloc(strlen(str)+2);
 
   strcpy(temp, str);
-  strcat(temp, " ");
+  strcat(temp, ".");
 
   counter=0;
   n_start=temp;
-  while((n_end=strchr(n_start,' '))){
+  while((n_end=strchr(n_start,'.'))){
     *n_end=0;
     val=strtoul(n_start,NULL,10);
     counter++;

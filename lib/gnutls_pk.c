@@ -318,8 +318,8 @@ opaque str[MAX_PARAMETER_SIZE];
 size_t len = sizeof(str);
 size_t tot_len = 0;
 
-	if ((result=_gnutls_asn1_create_element( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", 
-		&sig, "sig"))!=ASN1_SUCCESS) {
+	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", 
+		&sig))!=ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -331,7 +331,7 @@ size_t tot_len = 0;
 	}
 	tot_len += len;
 	
-	result = asn1_write_value( sig, "sig.r", str, len);
+	result = asn1_write_value( sig, "r", str, len);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -347,7 +347,7 @@ size_t tot_len = 0;
 	}
 	tot_len += len;
 
-	result = asn1_write_value( sig, "sig.s", str, len);
+	result = asn1_write_value( sig, "s", str, len);
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
@@ -362,7 +362,7 @@ size_t tot_len = 0;
 		asn1_delete_structure(&sig);
 	}
 
-	result = asn1_der_coding( sig, "sig", sig_value->data, &sig_value->size, NULL);
+	result = asn1_der_coding( sig, "", sig_value->data, &sig_value->size, NULL);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
@@ -426,7 +426,7 @@ int result;
 opaque str[MAX_PARAMETER_SIZE];
 
 
-	if ((result=_gnutls_asn1_create_element( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", &sig, "sig"))!=ASN1_SUCCESS) {
+	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", &sig))!=ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -439,7 +439,7 @@ opaque str[MAX_PARAMETER_SIZE];
 	}
 	
 	result =
-	    _gnutls_x509_read_int( sig, "sig.r", str, sizeof(str)-1, r);
+	    _gnutls_x509_read_int( sig, "r", str, sizeof(str)-1, r);
 	if (result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
@@ -447,7 +447,7 @@ opaque str[MAX_PARAMETER_SIZE];
 	}
 
 	result =
-	    _gnutls_x509_read_int( sig, "sig.s", str, sizeof(str)-1, s);
+	    _gnutls_x509_read_int( sig, "s", str, sizeof(str)-1, s);
 	if (result < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release( s);

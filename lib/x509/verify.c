@@ -350,7 +350,8 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 }
 
 
-
+#define OID_SHA1 "1.3.14.3.2.26"
+#define OID_MD5 "1.2.840.113549.2.5"
 
 /* Reads the digest information.
  * we use DER here, although we should use BER. It works fine
@@ -365,7 +366,7 @@ opaque str[1024];
 int len;
 
 	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), 
-		"GNUTLS.DigestInfo", &dinfo, "digest_info"))!=ASN1_SUCCESS) {
+		"GNUTLS.DigestInfo", &dinfo))!=ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -379,7 +380,7 @@ int len;
 	
 	len = sizeof(str)-1;
 	result =
-	    asn1_read_value( dinfo, "digest_info.digestAlgorithm.algorithm", str, &len);
+	    asn1_read_value( dinfo, "digestAlgorithm.algorithm", str, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&dinfo);
@@ -388,10 +389,10 @@ int len;
 
 	*hash = (gnutls_mac_algorithm)-1;
 	
-	if ( strcmp(str, "1 2 840 113549 2 5")==0) { /* MD5 */
+	if ( strcmp(str, OID_MD5)==0) { /* MD5 */
 		*hash = GNUTLS_MAC_MD5;
 	} else 
-	if ( strcmp(str, "1 3 14 3 2 26")==0) { /* SHA1 ID */
+	if ( strcmp(str, OID_SHA1)==0) { /* SHA1 ID */
 		*hash = GNUTLS_MAC_SHA;
 	}
 
@@ -405,7 +406,7 @@ int len;
 	}
 	
 	result =
-	    asn1_read_value( dinfo, "digest_info.digest", digest, digest_size);
+	    asn1_read_value( dinfo, "digest", digest, digest_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		asn1_delete_structure(&dinfo);
@@ -548,7 +549,7 @@ int ret, issuer_params_size, i;
   * by this function, you should check them using the appropriate functions.
   *
   * If no flags are specified (0), this function will use the 
-  * basicConstraints (2 5 29 19) PKIX extension. This means that only a certificate 
+  * basicConstraints (2.5.29.19) PKIX extension. This means that only a certificate 
   * authority is allowed to sign a certificate.
   *
   * However you must also check the peer's name in order to check if the verified 

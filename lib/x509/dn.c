@@ -33,24 +33,11 @@
  * Name (you need a parser just to read a name in the X.509 protoocols!!!)
  */
 
-/* converts all spaces to dots. Used to convert the
- * OIDs returned by libtasn1 to the dotted OID format.
- */
-static void dot_spaces(char *str)
-{
-	char *p;
-
-	do {
-		p = strchr(str, ' ');
-		if (p)
-			*p = '.';
-	} while (p);
-}
 
 /* Converts the given OID to an ldap acceptable string or
  * a dotted OID. 
  */
-static const char *oid2ldap_string(char *oid)
+static const char *oid2ldap_string(const char *oid)
 {
 	const char *ret;
 
@@ -59,7 +46,6 @@ static const char *oid2ldap_string(char *oid)
 		return ret;
 
 	/* else return the OID in dotted format */
-	dot_spaces(oid);
 	return oid;
 }
 
@@ -92,7 +78,7 @@ static char *str_escape(char *str, char *buffer, unsigned int buffer_size)
 /* Parses an X509 DN in the asn1_struct, and puts the output into
  * the string buf. The output is an LDAP encoded DN.
  *
- * asn1_rdn_name must be a string in the form "crl2.tbsCertificate.issuer.rdnSequence".
+ * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
  * That is to point in the rndSequence.
  */
 int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
@@ -125,7 +111,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
 	do {
 
 		k1++;
-		/* create a string like "crl2.tbsCertList.issuer.rdnSequence.?1"
+		/* create a string like "tbsCertList.issuer.rdnSequence.?1"
 		 */
 		_gnutls_int2str(k1, counter);
 		_gnutls_str_cpy(tmpbuffer1, sizeof(tmpbuffer1),
@@ -299,7 +285,7 @@ int _gnutls_x509_parse_dn(ASN1_TYPE asn1_struct,
  * given OID in the DN.
  * The output will be encoded in the LDAP way. (#hex for non printable).
  *
- * asn1_rdn_name must be a string in the form "crl2.tbsCertificate.issuer.rdnSequence".
+ * asn1_rdn_name must be a string in the form "tbsCertificate.issuer.rdnSequence".
  * That is to point in the rndSequence.
  *
  * indx specifies which OID to return. Ie 0 means return the first specified
@@ -332,7 +318,7 @@ int _gnutls_x509_parse_dn_oid(ASN1_TYPE asn1_struct,
 	do {
 
 		k1++;
-		/* create a string like "crl2.tbsCertList.issuer.rdnSequence.?1"
+		/* create a string like "tbsCertList.issuer.rdnSequence.?1"
 		 */
 		_gnutls_int2str(k1, counter);
 		_gnutls_str_cpy(tmpbuffer1, sizeof(tmpbuffer1),
@@ -513,8 +499,8 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-					 "PKIX1.Name", &dn,
-					 "dn")) != ASN1_SUCCESS) {
+					 "PKIX1.Name", &dn
+					 )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -527,7 +513,7 @@ int gnutls_x509_rdn_get(const gnutls_datum * idn,
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_parse_dn(dn, "dn", buf, sizeof_buf);
+	result = _gnutls_x509_parse_dn(dn, "", buf, sizeof_buf);
 
 	asn1_delete_structure(&dn);
 	return result;
@@ -566,8 +552,8 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid, int in
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-					 "PKIX1.Name", &dn,
-					 "dn")) != ASN1_SUCCESS) {
+					 "PKIX1.Name", &dn
+					 )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -580,7 +566,7 @@ int gnutls_x509_rdn_get_by_oid(const gnutls_datum * idn, const char* oid, int in
 		return _gnutls_asn2err(result);
 	}
 
-	result = _gnutls_x509_parse_dn_oid(dn, "dn", oid, indx, buf, sizeof_buf);
+	result = _gnutls_x509_parse_dn_oid(dn, "", oid, indx, buf, sizeof_buf);
 
 	asn1_delete_structure(&dn);
 	return result;

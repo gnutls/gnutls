@@ -19,6 +19,7 @@ Version 0.9.0
 - The only functions were removed are:
   gnutls_x509_certificate_to_xml()
   gnutls_x509_extract_dn_string()
+- Ported to libtasn1 0.2.x
 
 Version 0.8.1 (22/01/2003)
 - Improved the SRP support, to prevent attackers guessing the

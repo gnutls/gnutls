@@ -47,9 +47,9 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 	pkey->pk_algorithm = GNUTLS_PK_RSA;
 
 	if ((result =
-	     _gnutls_asn1_create_element(_gnutls_get_gnutls_asn(),
-				   "GNUTLS.RSAPrivateKey", &pkey_asn,
-				   "rsakey")) != ASN1_SUCCESS) {
+	     asn1_create_element(_gnutls_get_gnutls_asn(),
+				   "GNUTLS.RSAPrivateKey", &pkey_asn
+				   )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -66,7 +66,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		return _gnutls_asn2err(result);
 	}
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "rsakey.modulus",
+	if ((result = _gnutls_x509_read_int(pkey_asn, "modulus",
 					    str, sizeof(str) - 1,
 					    &pkey->params[0])) < 0) {
 		gnutls_assert();
@@ -75,7 +75,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 	}
 
 	if ((result =
-	     _gnutls_x509_read_int(pkey_asn, "rsakey.publicExponent", str,
+	     _gnutls_x509_read_int(pkey_asn, "publicExponent", str,
 				   sizeof(str) - 1,
 				   &pkey->params[1])) < 0) {
 		gnutls_assert();
@@ -85,7 +85,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 	}
 
 	if ((result =
-	     _gnutls_x509_read_int(pkey_asn, "rsakey.privateExponent", str,
+	     _gnutls_x509_read_int(pkey_asn, "privateExponent", str,
 				   sizeof(str) - 1,
 				   &pkey->params[2])) < 0) {
 		gnutls_assert();
@@ -95,7 +95,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		return result;
 	}
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "rsakey.prime1",
+	if ((result = _gnutls_x509_read_int(pkey_asn, "prime1",
 					    str, sizeof(str) - 1,
 					    &pkey->params[3])) < 0) {
 		gnutls_assert();
@@ -106,7 +106,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 		return result;
 	}
 
-	if ((result = _gnutls_x509_read_int(pkey_asn, "rsakey.prime2",
+	if ((result = _gnutls_x509_read_int(pkey_asn, "prime2",
 					    str, sizeof(str) - 1,
 					    &pkey->params[4])) < 0) {
 		gnutls_assert();
@@ -133,7 +133,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey,
 	_gnutls_mpi_invm(pkey->params[5], pkey->params[3], pkey->params[4]);
 	/*				p, q */
 #else
-	if ( (result=_gnutls_x509_read_int( pkey_asn, "rsakey.coefficient",
+	if ( (result=_gnutls_x509_read_int( pkey_asn, "coefficient",
 		str, sizeof(str)-1, &pkey->params[5])) < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release( &pkey->params[0]);
@@ -165,9 +165,9 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 	pkey->pk_algorithm = GNUTLS_PK_DSA;
 
 	if ((result =
-	     _gnutls_asn1_create_element(_gnutls_get_gnutls_asn(),
-				   "GNUTLS.DSAPrivateKey", &dsa_asn,
-				   "dsakey")) != ASN1_SUCCESS) {
+	     asn1_create_element(_gnutls_get_gnutls_asn(),
+				   "GNUTLS.DSAPrivateKey", &dsa_asn
+				   )) != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
@@ -184,7 +184,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 		return _gnutls_asn2err(result);
 	}
 
-	if ((result = _gnutls_x509_read_int(dsa_asn, "dsakey.p",
+	if ((result = _gnutls_x509_read_int(dsa_asn, "p",
 					    str, sizeof(str) - 1,
 					    &pkey->params[0])) < 0) {
 		gnutls_assert();
@@ -192,7 +192,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 		return result;
 	}
 
-	if ((result = _gnutls_x509_read_int(dsa_asn, "dsakey.q",
+	if ((result = _gnutls_x509_read_int(dsa_asn, "q",
 					    str, sizeof(str) - 1,
 					    &pkey->params[1])) < 0) {
 		gnutls_assert();
@@ -201,7 +201,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 		return result;
 	}
 
-	if ((result = _gnutls_x509_read_int(dsa_asn, "dsakey.g",
+	if ((result = _gnutls_x509_read_int(dsa_asn, "g",
 					    str, sizeof(str) - 1,
 					    &pkey->params[2])) < 0) {
 		gnutls_assert();
@@ -211,7 +211,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 		return result;
 	}
 
-	if ((result = _gnutls_x509_read_int(dsa_asn, "dsakey.Y",
+	if ((result = _gnutls_x509_read_int(dsa_asn, "Y",
 					    str, sizeof(str) - 1,
 					    &pkey->params[3])) < 0) {
 		gnutls_assert();
@@ -222,7 +222,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey,
 		return result;
 	}
 
-	if ((result = _gnutls_x509_read_int(dsa_asn, "dsakey.priv",
+	if ((result = _gnutls_x509_read_int(dsa_asn, "priv",
 					    str, sizeof(str) - 1,
 					    &pkey->params[4])) < 0) {
 		gnutls_assert();

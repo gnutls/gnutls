@@ -49,8 +49,8 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
-				   "PKIX1.Name", &dn,
-				   "dn")) != ASN1_SUCCESS) {
+				   "PKIX1.Name", &dn
+				   )) != ASN1_SUCCESS) {
 		return _gnutls_asn2err(result);
 	}
 
@@ -64,25 +64,25 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 	memset( rdn, 0, sizeof(gnutls_x509_dn));
 
 	len = sizeof(rdn->country);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_COUNTRY_NAME, 0, rdn->country, &len);
+	_gnutls_x509_parse_dn_oid( dn, "", GNUTLS_OID_X520_COUNTRY_NAME, 0, rdn->country, &len);
 
 	len = sizeof(rdn->organization);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_ORGANIZATION_NAME, 0, rdn->organization, &len);
+	_gnutls_x509_parse_dn_oid( dn, "", GNUTLS_OID_X520_ORGANIZATION_NAME, 0, rdn->organization, &len);
 
 	len = sizeof(rdn->organizational_unit_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, rdn->organizational_unit_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "", GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0, rdn->organizational_unit_name, &len);
 
 	len = sizeof(rdn->common_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_COMMON_NAME, 0, rdn->common_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "", GNUTLS_OID_X520_COMMON_NAME, 0, rdn->common_name, &len);
 
 	len = sizeof(rdn->locality_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_LOCALITY_NAME, 0, rdn->locality_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "", GNUTLS_OID_X520_LOCALITY_NAME, 0, rdn->locality_name, &len);
 
 	len = sizeof(rdn->state_or_province_name);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, rdn->state_or_province_name, &len);
+	_gnutls_x509_parse_dn_oid( dn, "", GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, rdn->state_or_province_name, &len);
 
 	len = sizeof(rdn->email);
-	_gnutls_x509_parse_dn_oid( dn, "dn", GNUTLS_OID_PKCS9_EMAIL, 0, rdn->email, &len);
+	_gnutls_x509_parse_dn_oid( dn, "", GNUTLS_OID_PKCS9_EMAIL, 0, rdn->email, &len);
 
 	asn1_delete_structure(&dn);
 
@@ -575,7 +575,7 @@ int gnutls_x509_extract_certificate_dn_string(char *buf, unsigned int sizeof_buf
   * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
   * by this function, you should check them using the appropriate functions.
   *
-  * This function understands the basicConstraints (2 5 29 19) PKIX extension.
+  * This function understands the basicConstraints (2.5.29.19) PKIX extension.
   * This means that only a certificate authority can sign a certificate.
   *
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 

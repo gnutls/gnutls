@@ -28,7 +28,7 @@
 	{ #name, name }
 
 struct libtasn1_error_entry {
-	char *name;
+	const char *name;
 	int  number;
 };
 typedef struct libtasn1_error_entry libtasn1_error_entry;
@@ -55,7 +55,7 @@ static libtasn1_error_entry error_algorithms[] = {
 };
 
 #define LIBTASN1_ERROR_LOOP(b) \
-        libtasn1_error_entry *p; \
+        const libtasn1_error_entry *p; \
                 for(p = error_algorithms; p->name != NULL; p++) { b ; }
 
 #define LIBTASN1_ERROR_ALG_LOOP(a) \
@@ -72,15 +72,14 @@ static libtasn1_error_entry error_algorithms[] = {
   **/
 void libtasn1_perror(asn1_retCode error)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	LIBTASN1_ERROR_ALG_LOOP(ret =
-			      _asn1_strdup(p->name + sizeof("ASN1_") - 1));
+			      p->name + sizeof("ASN1_") - 1);
 
 	_libtasn1_log( "LIBTASN1 ERROR: %s\n", ret);
 	
-	_asn1_free( ret);
 }
 
 
@@ -93,7 +92,7 @@ void libtasn1_perror(asn1_retCode error)
   **/
 const char* libtasn1_strerror(asn1_retCode error)
 {
-	char *ret = NULL;
+	const char *ret = NULL;
 
 	/* avoid prefix */
 	LIBTASN1_ERROR_ALG_LOOP(ret =
@@ -126,31 +125,4 @@ void _libtasn1_log( const char *fmt, ...) {
 void _libtasn1_null_log( void* x, ...) { return; }
 # endif /* C99_MACROS */
 #endif /* DEBUG */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -75,19 +75,15 @@ asn1_retCode
 _asn1_convert_integer(const char *value,unsigned char *value_out,int value_out_size, int *len)
 {
   char negative;
-  unsigned char val[SIZEOF_UNSIGNED_LONG_INT],temp;
+  unsigned char val[SIZEOF_UNSIGNED_LONG_INT];
+  long valtmp;
   int k,k2;
 
-  *((long*)val)=strtol(value,NULL,10);
-
-#ifndef WORDS_BIGENDIAN
-  /* change to big-endian byte ordering */
-  for(k=0;k<SIZEOF_UNSIGNED_LONG_INT/2;k++){
-    temp=val[k];
-    val[k]=val[SIZEOF_UNSIGNED_LONG_INT-k-1];
-    val[SIZEOF_UNSIGNED_LONG_INT-k-1]=temp;
+  valtmp=strtol(value,NULL,10);
+  
+  for(k=0;k<SIZEOF_UNSIGNED_LONG_INT;k++){
+    val[SIZEOF_UNSIGNED_LONG_INT-k-1]=(valtmp >> (8*k)) & 0xFF;
   }
-#endif
 
   if(val[0]&0x80) negative=1;
   else negative=0;
@@ -145,6 +141,7 @@ _asn1_append_sequence_set(node_asn *node)
     _asn1_ltostr(n,temp+1);
   } 
   _asn1_set_name(p2,temp);
+  p2->type |= CONST_OPTION;
 
   return ASN1_SUCCESS;
 }
@@ -189,7 +186,7 @@ _asn1_append_sequence_set(node_asn *node)
   *            value="FALSE" , len=1 -> boolean=FALSE
   *
   * \item OBJECT IDENTIFIER\: VALUE must be a null terminated string with each number separated by
-  *                      a blank (e.g. "1 2 3 543 1"). 
+  *                      a dot (e.g. "1.2.3.543.1"). 
   *                      LEN != 0
   *            value="1 2 840 10040 4 3" , len=1 -> OID=dsa-with-sha
   *
@@ -211,7 +208,7 @@ _asn1_append_sequence_set(node_asn *node)
   *            value="$\backslash$x01$\backslash$x02$\backslash$x03" , len=3  -> three bytes octet string
   *
   * \item GeneralString\: VALUE contains the generalstring and LEN is the number of octet.
-  *            value="$\backslash$x01$\backslash$x02$\backslash$x03" , len=3  -> three bytes octet string
+  *            value="$\backslash$x01$\backslash$x02$\backslash$x03" , len=3  -> three bytes generalstring
   *
   * \item BIT STRING\: VALUE contains the bit string organized by bytes and LEN is the number of bits.
   *            value="$\backslash$xCF" , len=6 -> bit string="110011" (six bits)
@@ -235,14 +232,14 @@ _asn1_append_sequence_set(node_asn *node)
   * \item SET OF\: the same as SEQUENCE OF. 
   *           Using "pkix.asn":
   *
-  *           result=asn1_write_value(cert,"certificate1.tbsCertificate.subject.rdnSequence.?LAST","NEW",1);
+  *           result=asn1_write_value(cert,"tbsCertificate.subject.rdnSequence.?LAST","NEW",1);
   *\end{itemize}
   *
   * If an element is OPTIONAL and you want to delete it, you must use the value=NULL and len=0.
   *
   *           Using "pkix.asn"\:
   *
-  *           result=asn1_write_value(cert,"certificate1.tbsCertificate.issuerUniqueID",NULL,0);
+  *           result=asn1_write_value(cert,"tbsCertificate.issuerUniqueID",NULL,0);
   * 
   **/
 asn1_retCode 
@@ -258,6 +255,16 @@ asn1_write_value(node_asn *node_root,const char *name,
 
   if((node->type & CONST_OPTION) && (value==NULL) && (len==0)){
     asn1_delete_structure(&node);
+    return ASN1_SUCCESS;
+  }
+
+  if((type_field(node->type) == TYPE_SEQUENCE_OF) && (value == NULL) && (len==0)){
+    p=node->down;
+    while((type_field(p->type)==TYPE_TAG) || (type_field(p->type)==TYPE_SIZE)) p=p->right;
+
+    while(p->right)
+      asn1_delete_structure(&p->right);
+
     return ASN1_SUCCESS;
   }
 
@@ -380,7 +387,7 @@ asn1_write_value(node_asn *node_root,const char *name,
     break;
   case TYPE_OBJECT_ID:
     for(k=0;k<strlen(value);k++)
-      if((!isdigit(value[k])) && (value[k]!=' ') && (value[k]!='+')) 
+      if((!isdigit(value[k])) && (value[k]!='.') && (value[k]!='+')) 
 	return ASN1_VALUE_NOT_VALID; 
     _asn1_set_value(node,value,strlen(value)+1);
     break;
@@ -419,6 +426,8 @@ asn1_write_value(node_asn *node_root,const char *name,
     }
     break;
   case  TYPE_OCTET_STRING:
+    if(len==0)
+      len=strlen(value);
     _asn1_length_der(len,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca(len+len2);
     if (temp==NULL) return ASN1_MEM_ERROR;
@@ -428,6 +437,8 @@ asn1_write_value(node_asn *node_root,const char *name,
     _asn1_afree(temp);
     break;
   case  TYPE_GENERALSTRING:
+    if(len==0)
+      len=strlen(value);
     _asn1_length_der(len,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca(len+len2);
     if (temp==NULL) return ASN1_MEM_ERROR;
@@ -437,6 +448,8 @@ asn1_write_value(node_asn *node_root,const char *name,
     _asn1_afree(temp);
     break;
   case  TYPE_BIT_STRING:
+    if(len==0)
+      len=strlen(value);
     _asn1_length_der((len>>3)+2,NULL,&len2);
     temp=(unsigned char *)_asn1_alloca((len>>3)+2+len2);
     if (temp==NULL) return ASN1_MEM_ERROR;
@@ -541,7 +554,7 @@ asn1_write_value(node_asn *node_root,const char *name,
   * \item BOOLEAN\: VALUE will be the null terminated string "TRUE" or "FALSE" and LEN=5 or LEN=6
   *
   * \item OBJECT IDENTIFIER\: VALUE will be a null terminated string with each number separated by
-  *                      a blank (i.e. "1 2 3 543 1"). 
+  *                      a dot (i.e. "1.2.3.543.1"). 
   *                      LEN = strlen(VALUE)+1
   *
   * \item UTCTime\: VALUE will be a null terminated string in one of these formats\: 
@@ -620,21 +633,19 @@ asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
   case TYPE_OBJECT_ID:
     if(node->type&CONST_ASSIGN){
       value[0]=0;
-      //      _asn1_str_cpy(value, *len, "");
       p=node->down;
       while(p){
 	if(type_field(p->type)==TYPE_CONSTANT){
-	  // ADD_STR_VALUE( value, value_size, p->value);
 	  value_size-=strlen(p->value)+1;
 	  if(value_size<1) return ASN1_MEM_ERROR;
 	  strcat(value,p->value); 
 	  if(p->right) {
-	    //	ADD_STR_VALUE( value, value_size, " ");
-	    strcat(value," ");
+	    strcat(value,".");
 	  }
 	}
 	p=p->right;
       }
+      *len = strlen(value) + 1;
     } else {
       PUT_STR_VALUE(value, value_size, node->value);
     }
@@ -668,3 +679,104 @@ asn1_read_value(node_asn *root,const char *name,unsigned char *value, int *len)
   }
   return ASN1_SUCCESS;
 }
+
+
+/**
+  * asn1_read_tag - Returns the TAG of one element inside a structure
+  * @root: pointer to a structure
+  * @name: the name of the element inside a structure.
+  * @tag:  variable that will contain the TAG value. 
+  * @class: variable that will specify the TAG type.
+  *
+  * Description:
+  *
+  * Returns the TAG and the CLASS of one element inside a structure.
+  * CLASS can have one of these constants: ASN1_CLASS_APPLICATION,
+  * ASN1_CLASS_UNIVERSAL, ASN1_CLASS_PRIVATE or ASN1_CLASS_CONTEXT_SPECIFIC.
+  * 
+  * Returns:
+  *
+  *   ASN1_SUCCESS\: set value OK
+  *
+  *   ASN1_ELEMENT_NOT_FOUND\: NAME is not a valid element.
+  * 
+  **/
+asn1_retCode 
+asn1_read_tag(node_asn *root,const char *name,int *tag, int *class)
+{
+  node_asn *node,*p,*pTag;
+ 
+  node=_asn1_find_node(root,name);
+  if(node==NULL) return  ASN1_ELEMENT_NOT_FOUND;
+
+  p=node->down;
+
+  /* pTag will points to the IMPLICIT TAG */
+  pTag=NULL;
+  if(node->type&CONST_TAG){
+    while(p){
+      if(type_field(p->type)==TYPE_TAG){
+	if((p->type&CONST_IMPLICIT) && (pTag==NULL))
+	  pTag=p;
+	else if(p->type&CONST_EXPLICIT)
+	  pTag=NULL;
+      }
+      p=p->right;
+    }
+  }
+
+  if(pTag){
+    *tag=strtoul(pTag->value,NULL,10);
+  
+    if(pTag->type&CONST_APPLICATION) *class=ASN1_CLASS_APPLICATION;
+    else if(pTag->type&CONST_UNIVERSAL) *class=ASN1_CLASS_UNIVERSAL;
+    else if(pTag->type&CONST_PRIVATE) *class=ASN1_CLASS_PRIVATE;
+    else *class=ASN1_CLASS_CONTEXT_SPECIFIC;
+  }
+  else{
+    *class=ASN1_CLASS_UNIVERSAL;
+
+    switch(type_field(node->type)){
+    case TYPE_NULL:
+      *tag=ASN1_TAG_NULL;break;
+    case TYPE_BOOLEAN:
+      *tag=ASN1_TAG_BOOLEAN;break;
+    case TYPE_INTEGER:
+      *tag=ASN1_TAG_INTEGER;break;
+    case TYPE_ENUMERATED:
+      *tag=ASN1_TAG_ENUMERATED;break;
+    case TYPE_OBJECT_ID:
+      *tag=ASN1_TAG_OBJECT_ID;break;
+    case TYPE_TIME:
+      if(node->type&CONST_UTC){
+	*tag=ASN1_TAG_UTCTime;
+      }
+      else *tag=ASN1_TAG_GENERALIZEDTime;
+      break;
+    case TYPE_OCTET_STRING:
+      *tag=ASN1_TAG_OCTET_STRING;break;
+    case TYPE_GENERALSTRING:
+      *tag=ASN1_TAG_GENERALSTRING;break;
+    case TYPE_BIT_STRING:
+      *tag=ASN1_TAG_BIT_STRING;break;
+    case TYPE_SEQUENCE: case TYPE_SEQUENCE_OF:
+      *tag=ASN1_TAG_SEQUENCE;break;
+    case TYPE_SET: case TYPE_SET_OF:
+      *tag=ASN1_TAG_SET;break;
+    case TYPE_TAG:
+    case TYPE_CHOICE:
+    case TYPE_ANY:
+      break;
+    default:
+      break;
+    }
+  }
+
+
+  return ASN1_SUCCESS;
+
+}
+
+
+
+

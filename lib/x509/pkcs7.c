@@ -110,7 +110,7 @@ int gnutls_pkcs7_import(gnutls_pkcs7 pkcs7, const gnutls_datum * data,
 
 	result = asn1_create_element(_gnutls_get_pkix(),
 				     "PKIX1.ContentInfo",
-				     &pkcs7->pkcs7, "pkcs7");
+				     &pkcs7->pkcs7);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
@@ -166,13 +166,13 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	/* root2 is used as a temp storage area
 	 */
 	len = sizeof(oid) - 1;
-	result = asn1_read_value(pkcs7->pkcs7, "pkcs7.contentType", oid, &len);
+	result = asn1_read_value(pkcs7->pkcs7, "contentType", oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	if ( strcmp( oid, "1 2 840 113549 1 7 2") != 0) {
+	if ( strcmp( oid, "1.2.840.113549.1.7.2") != 0) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}					 		 	
@@ -184,7 +184,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	result = asn1_read_value(pkcs7->pkcs7, "pkcs7.content", tmp, &tmp_size);
+	result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
 	/* FIXME: a hard coded value
 	 */
 	if (result==ASN1_MEM_ERROR && tmp_size > 0 && tmp_size < 50*1024) {
@@ -193,7 +193,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		result = asn1_read_value(pkcs7->pkcs7, "pkcs7.content", tmp, &tmp_size);
+		result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
 	} 
 	
 	if (result != ASN1_SUCCESS) {
@@ -209,7 +209,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	/* Step 1. In case of a signed structure extract certificate set.
 	 */
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2, "c2")) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;	}
@@ -225,7 +225,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7,
 	/* Step 2. Parse the CertificateSet 
 	 */
 	
-	_gnutls_str_cpy( root2, sizeof(root2), "c2.certificates.?"); 
+	_gnutls_str_cpy( root2, sizeof(root2), "certificates.?"); 
 	_gnutls_int2str( indx+1, counter);
 	_gnutls_str_cat( root2, sizeof(root2), counter); 
 
@@ -305,13 +305,13 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 
 	/* root2 is used as a temp storage area
 	 */
-	result = asn1_read_value(pkcs7->pkcs7, "pkcs7.contentType", oid, &len);
+	result = asn1_read_value(pkcs7->pkcs7, "contentType", oid, &len);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
 
-	if ( strcmp( oid, "1 2 840 113549 1 7 2") != 0) {
+	if ( strcmp( oid, "1.2.840.113549.1.7.2") != 0) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}					 		 	
@@ -323,7 +323,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	result = asn1_read_value(pkcs7->pkcs7, "pkcs7.content", tmp, &tmp_size);
+	result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
 	/* FIXME: a hard coded value
 	 */
 	if (result==ASN1_MEM_ERROR && tmp_size > 0 && tmp_size < 50*1024) {
@@ -332,7 +332,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 			gnutls_assert();
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-		result = asn1_read_value(pkcs7->pkcs7, "pkcs7.content", tmp, &tmp_size);
+		result = asn1_read_value(pkcs7->pkcs7, "content", tmp, &tmp_size);
 	} 
 
 	if (result != ASN1_SUCCESS) {
@@ -348,7 +348,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 	/* Step 1. In case of a signed structure count the certificate set.
 	 */
 	if ((result=asn1_create_element
-	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2, "c2")) != ASN1_SUCCESS) {
+	    (_gnutls_get_pkix(), "PKIX1.SignedData", &c2)) != ASN1_SUCCESS) {
 		gnutls_assert();
 		result = _gnutls_asn2err(result);
 		goto cleanup;
@@ -368,7 +368,7 @@ int gnutls_pkcs7_get_certificate_count(gnutls_pkcs7 pkcs7)
 
 	/* Step 2. Count the CertificateSet */
 	
-	result = asn1_number_of_elements( c2, "c2.certificates", &count);
+	result = asn1_number_of_elements( c2, "certificates", &count);
 
 	asn1_delete_structure(&c2);
 	
