@@ -293,10 +293,10 @@ AC_ARG_ENABLE( openpgp-authentication, [  --disable-openpgp-authentication disab
 )
 if test x$ac_enable_openpgp != xno; then
  AC_MSG_RESULT(no)
- AM_PATH_LIBOPENCDK( 0.1.0, AC_DEFINE(HAVE_LIBOPENCDK),
+ AM_PATH_LIBOPENCDK( 0.2.0, AC_DEFINE(HAVE_LIBOPENCDK),
  AC_MSG_WARN([[
 ***
-*** libopencdk was not found. You will not be able to use OpenPGP keys with gnutls.
+*** libopencdk 0.2.0 was not found. You will not be able to use OpenPGP keys with gnutls.
 ]]))
 else
  AC_MSG_RESULT(yes)
