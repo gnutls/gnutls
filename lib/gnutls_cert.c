@@ -116,6 +116,7 @@ void gnutls_certificate_free_sc(GNUTLS_CERTIFICATE_CREDENTIALS sc)
 	}
 
 	gnutls_free( sc->x509_ca_list);
+	gnutls_free_datum( &sc->keyring);
 
 	for (i = 0; i < sc->ncerts; i++) {
 		_gnutls_free_private_key(sc->pkey[i]);
