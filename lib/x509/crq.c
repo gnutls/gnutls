@@ -270,13 +270,13 @@ int gnutls_x509_crq_get_dn_oid(gnutls_x509_crq_t crq,
 /* Parses an Attribute list in the asn1_struct, and searches for the
  * given OID. The index indicates the attribute value to be returned.
  *
- * Only printable data are returned, or GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE.
+ * If raw==0 only printable data are returned, or GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE.
  *
  * asn1_attr_name must be a string in the form "certificationRequestInfo.attributes"
  *
  */
 static int parse_attribute(ASN1_TYPE asn1_struct,
-    const char *attr_name, const char *given_oid, int indx,
+    const char *attr_name, const char *given_oid, int indx, int raw,
     char *buf, size_t * sizeof_buf)
 {
     int k1, result;
@@ -360,22 +360,32 @@ static int parse_attribute(ASN1_TYPE asn1_struct,
 		goto cleanup;
 	    }
 
-
-	    printable = _gnutls_x509_oid_data_printable(oid);
-
-	    if (printable == 1) {
-		if ((result =
-		     _gnutls_x509_oid_data2string
-		     (oid, value, len, buf, sizeof_buf)) < 0) {
+            if (raw==0) {
+                printable = _gnutls_x509_oid_data_printable(oid);
+	        if (printable == 1) {
+		    if ((result =
+		         _gnutls_x509_oid_data2string
+		         (oid, value, len, buf, sizeof_buf)) < 0) {
+		        gnutls_assert();
+		        goto cleanup;
+	  	    }
+		    return 0;
+	        } else {
 		    gnutls_assert();
-		    goto cleanup;
-		}
-
-		return 0;
-	    } else {
-		gnutls_assert();
-		return GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE;
-	    }
+		    return GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE;
+	        }
+            } else { /* raw!=0 */
+                if (*sizeof_buf > (size_t)len && buf!=NULL) {
+                    *sizeof_buf = len;
+                    memcpy( buf, value, len);
+                    
+                    return 0;
+                } else {
+                    *sizeof_buf = len;
+                    gnutls_assert();
+                    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+                }
+            }
 	}
 
     } while (1);
@@ -410,7 +420,7 @@ int gnutls_x509_crq_get_challenge_password(gnutls_x509_crq_t crq,
     }
 
     return parse_attribute(crq->crq, "certificationRequestInfo.attributes",
-			   "1.2.840.113549.1.9.7", 0, pass, sizeof_pass);
+			   "1.2.840.113549.1.9.7", 0, 0, pass, sizeof_pass);
 }
 
 /**
@@ -483,7 +493,7 @@ int gnutls_x509_crq_get_attribute_by_oid(gnutls_x509_crq_t crq,
     }
 
     return parse_attribute(crq->crq, "certificationRequestInfo.attributes",
-	oid, indx, buf, sizeof_buf);
+	oid, indx, 1, buf, sizeof_buf);
 }
 
 /**
