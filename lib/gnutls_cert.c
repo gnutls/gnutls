@@ -160,7 +160,7 @@ static int read_cert_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *cert, int c
 			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
-		ptr = strstr(ptr, CERT_SEP) + 1;
+
 
 		res->cert_list[res->ncerts] =
 		    (gnutls_cert *) gnutls_realloc(res->
@@ -180,6 +180,7 @@ static int read_cert_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *cert, int c
 
 		tmp.data = b64;
 		tmp.size = siz2;
+
 		if ((ret =
 		     _gnutls_cert2gnutlsCert(&res->
 					     cert_list[res->ncerts][i - 1],
@@ -189,6 +190,11 @@ static int read_cert_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *cert, int c
 			return ret;
 		}
 		gnutls_free(b64);
+
+		/* now we move ptr after the pem header */
+		ptr = strstr(ptr, CERT_SEP);
+		if (ptr!=NULL)
+			ptr++;
 
 		i++;
 	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
@@ -231,7 +237,6 @@ static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_si
 			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
-		ptr = strstr(ptr, CERT_SEP) + 1;
 
 		res->ca_list =
 		    (gnutls_cert *) gnutls_realloc(res->ca_list,
@@ -246,6 +251,7 @@ static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_si
 
 		tmp.data = b64;
 		tmp.size = siz2;
+
 		if ((ret =
 		     _gnutls_cert2gnutlsCert(&res->ca_list[i - 1],
 					     tmp)) < 0) {
@@ -254,6 +260,11 @@ static int read_ca_mem(GNUTLS_X509PKI_CREDENTIALS res, const char *ca, int ca_si
 			return ret;
 		}
 		gnutls_free(b64);
+
+		/* now we move ptr after the pem header */
+		ptr = strstr(ptr, CERT_SEP);
+		if (ptr!=NULL)
+			ptr++;
 
 		i++;
 	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
@@ -339,6 +350,8 @@ static int read_cert_file(GNUTLS_X509PKI_CREDENTIALS res, char *certfile)
 	siz = fread(x, 1, sizeof(x), fd1);
 	fclose(fd1);
 
+	x[siz-1] = 0;
+
 	return read_cert_mem( res, x, siz);
 
 }
@@ -361,6 +374,8 @@ static int read_ca_file(GNUTLS_X509PKI_CREDENTIALS res, char *cafile)
 	siz = fread(x, 1, sizeof(x), fd1);
 	fclose(fd1);
 
+	x[siz-1] = 0;
+
 	return read_ca_mem( res, x, siz);
 }
 
@@ -379,6 +394,8 @@ static int read_key_file(GNUTLS_X509PKI_CREDENTIALS res, char *keyfile)
 
 	siz = fread(x, 1, sizeof(x), fd2);
 	fclose(fd2);
+
+	x[siz-1] = 0;
 
 	return read_key_mem( res, x, siz);
 }
