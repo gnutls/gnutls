@@ -19,6 +19,7 @@ See the end for copying conditions.
   Nikos deprecated gnutls_certificate_verify_peers in favor of
   gnutls_certificate_verify_peers2 earlier in the 1.1 branch.
 - Improvements to the manual.
+- Add new example "ex-rfc2818" for certificate verification, from Nikos.
 - Known bug: the library require snprintf.  This has not yet been
   fixed, but will be handled via GNULib later on.
 
