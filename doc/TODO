@@ -8,6 +8,7 @@ Current list:
 + OpenPGP certificate support
 * Add function to clone GNUTLS_STATE structures
 * Minimize footprint.
+* Improve support for compression
 - Add Kerberos support
 
 (+) Means high priority 

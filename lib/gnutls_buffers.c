@@ -269,6 +269,9 @@ static ssize_t _gnutls_read( GNUTLS_STATE state, void *iptr, size_t sizeOfPtr, i
 
 #define RCVLOWAT state->gnutls_internals.lowat 
 
+/* This function is only used with berkeley style sockets.
+ * Clears the peeked data (read with MSG_PEEK).
+ */
 int _gnutls_clear_peeked_data( GNUTLS_STATE state) {
 char peekdata1[10];
 char *peekdata2;
@@ -410,7 +413,8 @@ ssize_t _gnutls_read_buffered( GNUTLS_STATE state, opaque **iptr, size_t sizeOfP
 	
 	/* This is hack in order for select to work. Just leave recvlowat data,
 	 * into the kernel buffer (using a read with MSG_PEEK), thus making
-	 * select think, that the socket is ready for reading
+	 * select think, that the socket is ready for reading.
+	 * MSG_PEEK is only used with berkeley style sockets.
 	 */
 	if (ret == (recvdata - recvlowat) && recvlowat > 0) {
 		ret2 = _gnutls_read( state, &buf[buf_pos], recvlowat, MSG_PEEK);
