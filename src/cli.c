@@ -71,6 +71,7 @@ char *x509_cafile;
 char *x509_crlfile = NULL;
 static int x509ctype;
 static int disable_extensions;
+static int debug;
 
 static gnutls_srp_client_credentials srp_cred;
 static gnutls_anon_client_credentials anon_cred;
@@ -408,6 +409,7 @@ void gaa_parser(int argc, char **argv)
       exit(1);
    }
 
+   debug = info.debug;
    disable_extensions = info.disable_extensions;
    xml = info.xml;
    starttls = info.starttls;
@@ -576,6 +578,7 @@ int ret;
       exit(1);
    }
    gnutls_global_set_log_function( tls_log_func);
+   gnutls_global_set_log_level(debug);
 
    if (gnutls_global_init_extra() < 0) {
       fprintf(stderr, "global state (extra) initialization error\n");
