@@ -161,7 +161,7 @@ static int _gnutls_init = 0;
   **/
 int gnutls_global_init( void)
 {
-	static int result = 0;
+	int result = 0;
 	int res;
 
 	if (_gnutls_init) goto out;
