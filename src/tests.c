@@ -65,7 +65,7 @@ int ret, alert;
 	
 		handshake_output = ret;
 
-		if (ret < 0 && more_info != 0) {
+		if (ret < 0 && more_info > 1) {
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
 				alert = gnutls_alert_get( session);
@@ -264,10 +264,11 @@ const char* print;
 
 	ret = do_handshake( session);
 
-	printf("\n");
 	if (ret == SUCCEED) {
 		ret2 = gnutls_rsa_export_get_pubkey( session, &exp2, &mod2);
 		if (ret2 >= 0) {
+			printf("\n");
+
 			print = raw_to_string( exp2.data, exp2.size);
 			if (print)
 				printf(" Exponent [%d bits]: %s\n", exp2.size*8, print);
@@ -331,9 +332,10 @@ const char* print;
 
 	ret = do_handshake( session);
 	
-	printf("\n");
 	ret2 = gnutls_dh_get_group( session, &gen, &prime);
 	if (ret2 >= 0) {
+		printf("\n");
+
 		print = raw_to_string( gen.data, gen.size);
 		if (print)
 			printf(" Generator [%d bits]: %s\n", gen.size*8, print);

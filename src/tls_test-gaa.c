@@ -504,7 +504,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_verbose:
 	OK = 0;
 #line 21 "tls_test.gaa"
-{ gaaval->more_info = 1 ;};
+{ gaaval->more_info += 1 ;};
 
 		return GAA_OK;
 		break;
