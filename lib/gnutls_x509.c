@@ -1809,7 +1809,6 @@ int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
 }
 
 
-#ifdef DEBUG
 /* Verifies a base64 encoded certificate list from memory 
  */
 int _gnutls_verify_x509_mem( const char *ca, int ca_size)
@@ -1901,4 +1900,3 @@ int _gnutls_verify_x509_file( char *cafile)
 	return _gnutls_verify_x509_mem( x, siz);
 }
 
-#endif
