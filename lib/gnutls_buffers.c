@@ -362,7 +362,11 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 
 /* This function is like write. But it does not return -1 on error.
- * It does return -errno instead.
+ * It does return gnutls_errno instead.
+ *
+ * This function may not cope right with interrupted system calls
+ * and EAGAIN error. Ideas?
+ *
  */
 ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 {
@@ -395,25 +399,16 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 			i = _gnutls_push_func(fd, &ptr[i], left);
 
 		if (i == -1) {
-#if 0 /* currently this is not right, since the functions
-       * above this, cannot handle interrupt, and eagain errors.
-       */
 			if (errno == EAGAIN || errno == EINTR) {
-				if (n-left > 0) {
-					gnutls_assert();
-					return n-left;
-				}
-				
-				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
-				else return GNUTLS_E_INTERRUPTED;
+				i = 0;
+				gnutls_assert();
+/*				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
+ *				else return GNUTLS_E_INTERRUPTED;
+ */
 			} else {
 				gnutls_assert();
 				return GNUTLS_E_UNKNOWN_ERROR;
 			}
-#endif
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_ERROR;
-
 		}
 		left -= i;
 	}
