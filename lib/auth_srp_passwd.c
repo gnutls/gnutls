@@ -20,7 +20,6 @@
 
 /* Functions for operating in an SRP passwd file are included here */
 
-#include "defines.h"
 #include "gnutls_int.h"
 #include "cert_b64.h"
 #include "gnutls_errors.h"

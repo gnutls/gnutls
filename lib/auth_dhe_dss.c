@@ -24,7 +24,6 @@
 
 #if 0
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_errors.h"

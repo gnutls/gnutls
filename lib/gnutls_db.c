@@ -21,7 +21,6 @@
 /* This file contains functions that manipulate a database
  * for resumed sessions. 
  */
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_session.h"

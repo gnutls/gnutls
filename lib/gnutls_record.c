@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "debug.h"
@@ -92,9 +91,14 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->security_parameters.entity = con_end;
 
 /* Set the defaults for initial handshake */
-	(*state)->security_parameters.bulk_cipher_algorithm = GNUTLS_NULL_CIPHER;
-	(*state)->security_parameters.mac_algorithm = GNUTLS_NULL_MAC;
-	(*state)->security_parameters.compression_algorithm = GNUTLS_NULL_COMPRESSION;
+	(*state)->security_parameters.read_bulk_cipher_algorithm = 
+	(*state)->security_parameters.write_bulk_cipher_algorithm = GNUTLS_NULL_CIPHER;
+
+	(*state)->security_parameters.read_mac_algorithm = 
+	(*state)->security_parameters.write_mac_algorithm = GNUTLS_NULL_MAC;
+
+	(*state)->security_parameters.read_compression_algorithm = GNUTLS_NULL_COMPRESSION;
+	(*state)->security_parameters.write_compression_algorithm = GNUTLS_NULL_COMPRESSION;
 
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
@@ -338,80 +342,7 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 
 }
 
-/* This function is to be called after handshake, when master_secret,
- *  client_random and server_random have been initialized. 
- * This function creates the keys and stores them into pending state.
- * (state->cipher_specs)
- */
-int _gnutls_set_keys(GNUTLS_STATE state)
-{
-	opaque *key_block;
-	char keyexp[] = "key expansion";
-	char random[2*TLS_RANDOM_SIZE];
-	int hash_size;
-	int IV_size;
-	int key_size;
-	int block_size;
-	int pos;
-		
-	hash_size = _gnutls_mac_get_digest_size( state->security_parameters.mac_algorithm);
-	IV_size = _gnutls_cipher_get_iv_size( state->security_parameters.bulk_cipher_algorithm);
-	key_size = _gnutls_cipher_get_key_size( state->security_parameters.bulk_cipher_algorithm);
 
-	memcpy(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
-
-	block_size = 2 * hash_size + 2 * key_size + 2 * IV_size;
-
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3 */
-		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
-			block_size);
-	} else { /* TLS 1.0 */
-		key_block =
-		    gnutls_PRF( state->security_parameters.master_secret, TLS_MASTER_SIZE,
-			       keyexp, strlen(keyexp), random, 2*TLS_RANDOM_SIZE, 
-			       block_size);
-	}
-	
-	if (key_block==NULL) return GNUTLS_E_MEMORY_ERROR;
-
-#ifdef HARD_DEBUG
-	fprintf(stderr, "KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
-#endif
-
-	pos = 0;
-	if (hash_size > 0) {
-		if (gnutls_sset_datum( &state->cipher_specs.client_write_mac_secret, &key_block[pos], hash_size) < 0 )
-			return GNUTLS_E_MEMORY_ERROR;
-		pos+=hash_size;
-
-		if (gnutls_sset_datum( &state->cipher_specs.server_write_mac_secret, &key_block[pos], hash_size) < 0 )
-			return GNUTLS_E_MEMORY_ERROR;
-		pos+=hash_size;
-	}
-	
-	if (key_size > 0) {
-		if (gnutls_sset_datum( &state->cipher_specs.client_write_key, &key_block[pos], key_size) < 0 )
-			return GNUTLS_E_MEMORY_ERROR;
-		pos+=key_size;
-
-		if (gnutls_sset_datum( &state->cipher_specs.server_write_key, &key_block[pos], key_size) < 0 )
-			return GNUTLS_E_MEMORY_ERROR;
-		pos+=key_size;
-	}
-	if (IV_size > 0) {
-		if (gnutls_sset_datum( &state->cipher_specs.client_write_IV, &key_block[pos], IV_size) < 0 )
-			return GNUTLS_E_MEMORY_ERROR;
-		pos+=IV_size;
-	
-		if (gnutls_sset_datum( &state->cipher_specs.server_write_IV, &key_block[pos], IV_size) < 0 )
-			return GNUTLS_E_MEMORY_ERROR;
-		pos+=IV_size;
-	}
-	
-	secure_free(key_block);
-	return 0;
-}
 
 int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDescription desc)
 {
@@ -597,42 +528,14 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
  */
 ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 {
-	int ret = 0;
-	uint8 type=GNUTLS_CHANGE_CIPHER_SPEC;
 	char data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
-	uint8 headers[5];
-
-	if (state->gnutls_internals.valid_connection == VALID_FALSE) {
-		gnutls_assert();
-		return GNUTLS_E_INVALID_SESSION;
-	}
-
-	headers[0] = type;
-	headers[1] = _gnutls_version_get_major(state->connection_state.version);
-	headers[2] = _gnutls_version_get_minor(state->connection_state.version);
 
 #ifdef HANDSHAKE_DEBUG
-	fprintf(stderr, "Record: ChangeCipherSpec was sent\n");
+	fprintf(stderr, "Record: Sending ChangeCipherSpec\n");
 #endif
 
-	WRITEuint16( 1, &headers[3]);
-	
-	if (_gnutls_Write(cd, headers, 5, 0) != 5) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNABLE_SEND_DATA;
-	}
+	return gnutls_send_int( cd, state, GNUTLS_CHANGE_CIPHER_SPEC, data, 1, 0);
 
-	if (_gnutls_Write(cd, &data, 1, 0) != 1) {
-		state->gnutls_internals.valid_connection = VALID_FALSE;
-		state->gnutls_internals.resumable = RESUME_FALSE;
-		gnutls_assert();
-		return GNUTLS_E_UNABLE_SEND_DATA;
-	}
-	ret += 1;
-
-	return ret;
 }
 
 #define RCVLOWAT state->gnutls_internals.lowat /* this is the default for TCP - just don't change that! */
@@ -813,6 +716,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
+
 	
 	/* decrypt the data we got
 	 */
@@ -976,7 +880,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
   * Returns the currently used cipher.
   **/
 BulkCipherAlgorithm gnutls_get_current_cipher( GNUTLS_STATE state) {
-	return state->security_parameters.bulk_cipher_algorithm;
+	return state->security_parameters.read_bulk_cipher_algorithm;
 }
 
 /**
@@ -996,7 +900,7 @@ KXAlgorithm gnutls_get_current_kx( GNUTLS_STATE state) {
   * Returns the currently used mac algorithm.
   **/
 MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state) {
-	return state->security_parameters.mac_algorithm;
+	return state->security_parameters.read_mac_algorithm;
 }
 
 /**
@@ -1006,7 +910,7 @@ MACAlgorithm gnutls_get_current_mac_algorithm( GNUTLS_STATE state) {
   * Returns the currently used compression method.
   **/
 CompressionMethod gnutls_get_current_compression_method( GNUTLS_STATE state) {
-	return state->security_parameters.compression_algorithm;
+	return state->security_parameters.read_compression_algorithm;
 }
 
 /* Taken from libgcrypt */

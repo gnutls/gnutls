@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 
@@ -62,11 +61,11 @@ void _gnutls_print_state(GNUTLS_STATE state)
 	fprintf(stderr, "Connection End: %d\n",
 		state->security_parameters.entity);
 	fprintf(stderr, "Cipher Algorithm: %d\n",
-		state->security_parameters.bulk_cipher_algorithm);
+		state->security_parameters.read_bulk_cipher_algorithm);
 	fprintf(stderr, "MAC algorithm: %d\n",
-		state->security_parameters.mac_algorithm);
+		state->security_parameters.read_mac_algorithm);
 	fprintf(stderr, "Compression Algorithm: %d\n",
-		state->security_parameters.compression_algorithm);
+		state->security_parameters.read_compression_algorithm);
 	fprintf(stderr, "\n");
 
 }

@@ -140,7 +140,7 @@ int main(int argc, char** argv)
 
 	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
-	gnutls_set_kx_priority( state, GNUTLS_KX_RSA, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_RSA, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
 	gnutls_set_cred( state, GNUTLS_SRP, &cred);
 	gnutls_set_cred( state, GNUTLS_X509PKI, &xcred);
@@ -173,6 +173,7 @@ int main(int argc, char** argv)
 	close(sd);	
 	gnutls_deinit( state);	
 	
+
 	printf("\n\n- Connecting again- trying to resume previous session\n");
 	sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(sd, "socket");
@@ -216,6 +217,7 @@ int main(int argc, char** argv)
 	gnutls_get_current_session_id( state, NULL, &tmp_session_id_size);
 	tmp_session_id = malloc(tmp_session_id_size);
 	gnutls_get_current_session_id( state, tmp_session_id, &tmp_session_id_size);
+
 	if (memcmp( tmp_session_id, session_id, session_id_size)==0) {
 		printf("- Previous session was resumed\n");
 	} else {
@@ -258,7 +260,7 @@ int main(int argc, char** argv)
 				if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED || ret==GNUTLS_E_FATAL_ALERT_RECEIVED)
 					printf("* Received alert [%d]\n", gnutls_get_last_alert(state));
 				if (ret==GNUTLS_E_GOT_HELLO_REQUEST)
-					printf("* Received HelloRequest message\n");
+					printf("* Received HelloRequest message (server asked to rehandshake)\n");
 
 				if (ret > 0) {
 					printf("- Received[%d]: ", ret);

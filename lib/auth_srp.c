@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "auth_srp_passwd.h"
@@ -28,25 +27,23 @@
 #include "debug.h"
 #include "gnutls_num.h"
 
-int gen_srp_server_kx(GNUTLS_KEY, opaque **);
 int gen_srp_server_kx2(GNUTLS_KEY, opaque **);
 int gen_srp_client_kx0(GNUTLS_KEY, opaque **);
 
-int proc_srp_server_kx(GNUTLS_KEY, opaque *, int);
 int proc_srp_server_kx2(GNUTLS_KEY, opaque *, int);
 int proc_srp_client_kx0(GNUTLS_KEY, opaque *, int);
 
 MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
 	NULL,
-	gen_srp_server_kx,
+	NULL,
 	gen_srp_server_kx2,
 	gen_srp_client_kx0,
 	NULL,
 	NULL,
 	NULL,
 	NULL, /* certificate */
-	proc_srp_server_kx,
+	NULL,
 	proc_srp_server_kx2,
 	proc_srp_client_kx0,
 	NULL,
@@ -65,7 +62,7 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 #define S key->KEY
 
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number */
-int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
+int gen_srp_server_hello(GNUTLS_KEY key, opaque ** data)
 {
 	size_t n_g, n_n, n_s;
 	size_t ret;
@@ -83,6 +80,9 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 
 	if (pwd_entry == NULL) {
 		if (err==0)
+			/* in order to avoid informing the peer that
+			 * username does not exist.
+			 */
 			pwd_entry = _gnutls_randomize_pwd_entry();
 		else 
 		        return GNUTLS_E_PWD_ERROR;
@@ -110,11 +110,14 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 
 	(*data) = gnutls_malloc(n_n + n_g + pwd_entry->salt_size + 6 + 1);
 
-	/* copy G (generator) to data */
-	data_g = (*data);
+	data_g = (*data); 
 
-	/* but first copy the algorithm used to generate the verifier */
+	/* firstly copy the algorithm used to generate the verifier 
+	 */
 	memcpy( data_g, &pwd_algo, 1);
+
+	/* copy G (generator) to data */
+
 	data_g++;
 	
 	if(gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, G)!=0) {
@@ -142,7 +145,7 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	WRITEuint16( n_s, data_s);
 
 	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
-	_gnutls_srp_clear_pwd_entry(pwd_entry);
+	_gnutls_srp_clear_pwd_entry( pwd_entry);
 
 	return ret;
 }
@@ -153,7 +156,7 @@ int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 	int ret;
 	size_t n_b;
 	uint8 *data_b;
-
+	
 	/* calculate:  B = (v + g^b) % N */
 	B = _gnutls_calc_srp_B( &_b, G, N, V);
 
@@ -182,7 +185,7 @@ int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 	mpi_release(B);
 
 	ret = _gnutls_generate_key( key);
-	_gnutls_mpi_release(&S);
+	_gnutls_mpi_release( &S);
 
 	if (ret < 0)
 		return ret;
@@ -229,13 +232,14 @@ int gen_srp_client_kx0(GNUTLS_KEY key, opaque ** data)
 }
 
 /* receive the first key exchange message ( g, n, s) */
-int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
+int proc_srp_server_hello(GNUTLS_KEY key, const opaque * data, int data_size)
 {
 	uint16 n_s, n_g, n_n;
 	size_t _n_s, _n_g, _n_n;
-	uint8 *data_n;
-	uint8 *data_g;
-	uint8 *data_s, pwd_algo;
+	const uint8 *data_n;
+	const uint8 *data_g;
+	const uint8 *data_s;
+	uint8 pwd_algo;
 	int i;
 	opaque *hd;
 	char *username;
@@ -253,6 +257,7 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 		return GNUTLS_E_INSUFICIENT_CRED;
 
 /* read the algorithm used to generate V */
+	
 	i = 0;
 	memcpy( &pwd_algo, data, 1);
 
@@ -303,7 +308,7 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	/* generate x = SHA(s | SHA(U | ":" | p))
 	 * (or the equivalent using bcrypt)
 	 */
-	hd = _gnutls_calc_srp_x( username, password, data_s, n_s, pwd_algo, &_n_g);
+	hd = _gnutls_calc_srp_x( username, password, (opaque*)data_s, n_s, pwd_algo, &_n_g);
 	if (hd==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;

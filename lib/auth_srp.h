@@ -15,3 +15,6 @@ typedef struct {
 typedef struct {
 	char username[256];
 } SRP_AUTH_INFO;
+
+int gen_srp_server_hello(GNUTLS_KEY, opaque **);
+int proc_srp_server_hello(GNUTLS_KEY, const opaque *, int);

@@ -34,7 +34,6 @@
  * encryption string.
  */
  
-#include "defines.h"
 #include "gnutls_int.h"
 #include "crypt_bcrypt.h"
 #include "gnutls_random.h"

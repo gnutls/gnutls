@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_compress.h"
 #include "gnutls_errors.h"
@@ -34,10 +33,10 @@ int _gnutls_plaintext2TLSCompressed(GNUTLS_STATE state,
 	
 	data=NULL;
 	
-	size = gnutls_compress( state->security_parameters.compression_algorithm, plaintext.data, plaintext.size, &data);
+	size = gnutls_compress( state->security_parameters.write_compression_algorithm, plaintext.data, plaintext.size, &data);
 	if (size < 0) {
-		if (data!=NULL) gnutls_free(data);
-		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
+		gnutls_assert();
+		return GNUTLS_E_COMPRESSION_FAILED;
 	}
 	compress->data = data;
 	compress->size = size;
@@ -55,10 +54,10 @@ int _gnutls_TLSCompressed2plaintext(GNUTLS_STATE state,
 
 	data=NULL;
 	
-	size = gnutls_decompress( state->security_parameters.compression_algorithm, compressed.data, compressed.size, &data);
+	size = gnutls_decompress( state->security_parameters.read_compression_algorithm, compressed.data, compressed.size, &data);
 	if (size < 0) {
-		if (data!=NULL) gnutls_free(data);
-		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
+		gnutls_assert();
+		return GNUTLS_E_DECOMPRESSION_FAILED;
 	}
 	plain->data = data;
 	plain->size = size;

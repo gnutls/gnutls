@@ -17,7 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "debug.h"
@@ -67,7 +66,7 @@ int gnutls_get_current_session( GNUTLS_STATE state, opaque* session, int *sessio
   **/
 int gnutls_get_current_session_id( GNUTLS_STATE state, void* session, int *session_size) {
 
-	( *session_size = state->security_parameters.session_id_size);
+	*session_size = state->security_parameters.session_id_size;
 	
 	/* just return the session size */
 	if (session==NULL) {
@@ -100,7 +99,6 @@ int gnutls_set_current_session( GNUTLS_STATE state, opaque* session, int session
 		return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
 	memcpy( &sp, session, sizeof(SecurityParameters));
-
 	if ( timestamp - sp.timestamp <= state->gnutls_internals.expire_time 
 		&& sp.timestamp <= timestamp) {
 

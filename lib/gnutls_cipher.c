@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_compress.h"
@@ -31,6 +30,8 @@
 #include "gnutls_num.h"
 #include "gnutls_datum.h"
 #include "gnutls_kx.h"
+#include "gnutls_record.h"
+#include "gnutls_constate.h"
 
 int _gnutls_encrypt(GNUTLS_STATE state, const char *data, size_t data_size,
 		    uint8 ** ciphertext, ContentType type)
@@ -96,279 +97,7 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 }
 
 
-/* Sets the specified cipher into the pending state 
- */
-int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
-{
 
-	if (_gnutls_cipher_is_ok(algo) == 0) {
-		if (_gnutls_cipher_priority(state, algo) < 0) {
-			gnutls_assert();
-			return GNUTLS_E_UNWANTED_ALGORITHM;
-		}
-
-		state->security_parameters.bulk_cipher_algorithm = algo;
-
-	} else {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_CIPHER;
-	}
-
-	return 0;
-
-}
-
-/* Sets the specified algorithm into pending compression state 
- */
-int _gnutls_set_compression(GNUTLS_STATE state, CompressionMethod algo)
-{
-
-	if (_gnutls_compression_is_ok(algo)==0) {
-		state->security_parameters.compression_algorithm = algo;
-	} else {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-	}
-	return 0;
-
-}
-
-/* Sets the specified kx algorithm into pending state 
- */
-int _gnutls_set_kx(GNUTLS_STATE state, KXAlgorithm algo)
-{
-
-	if (_gnutls_kx_is_ok(algo) == 0) {
-		state->security_parameters.kx_algorithm = algo;
-	} else {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_KX_ALGORITHM;
-	}
-	if (_gnutls_kx_priority(state, algo) < 0) {
-		gnutls_assert();
-		/* we shouldn't get here */
-		return GNUTLS_E_UNWANTED_ALGORITHM;
-	}
-
-
-	return 0;
-
-}
-
-/* Sets the specified mac algorithm into pending state */
-int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
-{
-
-	if (_gnutls_mac_is_ok(algo) == 0) {
-		state->security_parameters.mac_algorithm = algo;
-	} else {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
-	}
-	if (_gnutls_mac_priority(state, algo) < 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNWANTED_ALGORITHM;
-	}
-
-
-	return 0;
-
-}
-
-/* Sets the current connection state to conform with the
- * Security parameters(pending state), and initializes encryption.
- * Actually it initializes and starts encryption ( so it needs
- * secrets and random numbers to have been negotiated)
- * This is to be called after sending the Change Cipher Spec packet.
- */
-int _gnutls_connection_state_init(GNUTLS_STATE state)
-{
-	int rc, mac_size, ret;
-
-	uint64zero(&state->connection_state.write_sequence_number);
-	uint64zero(&state->connection_state.read_sequence_number);
-
-/* Update internals from CipherSuite selected.
- * If we are resuming just copy the connection state
- */
- 	if (state->gnutls_internals.resumed==RESUME_FALSE) {
-		rc =
-		    _gnutls_set_cipher(state,
-			       _gnutls_cipher_suite_get_cipher_algo
-			       (state->security_parameters.current_cipher_suite));
-		if (rc < 0)
-			return rc;
-		rc =
-		    _gnutls_set_mac(state,
-			    _gnutls_cipher_suite_get_mac_algo
-			    (state->security_parameters.current_cipher_suite));
-		if (rc < 0)
-			return rc;
-
-		rc =
-		    _gnutls_set_kx(state,
-			    _gnutls_cipher_suite_get_kx_algo
-			    (state->security_parameters.current_cipher_suite));
-		if (rc < 0)
-			return rc;
-
-		rc =
-		    _gnutls_set_compression(state,
-				    state->gnutls_internals.compression_method);
-		if (rc < 0)
-			return rc;
-	} else {
-		 memcpy( &state->security_parameters, &state->gnutls_internals.resumed_security_parameters, sizeof(SecurityParameters));
-
-		/* clear the resumed security parameters */
-		 memset( &state->gnutls_internals.resumed_security_parameters, 0, sizeof(SecurityParameters));
-	}
-/* Setup the keys since we have the master secret 
- */
-	if ( (ret = _gnutls_generate_master(state)) < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	_gnutls_set_keys(state);
-
-#ifdef DEBUG
-	fprintf(stderr, "Cipher Suite: %s\n",
-		_gnutls_cipher_suite_get_name(state->
-					      security_parameters.current_cipher_suite));
-#endif
-
-	/* Free all the previous keys/ states etc.
-	 */
-	if (state->connection_state.write_mac_secret.data != NULL)
-		gnutls_sfree_datum( &state->connection_state.write_mac_secret);
-	if ( state->connection_state.read_mac_secret.data != NULL)
-		gnutls_sfree_datum( &state->connection_state.read_mac_secret);
-
-	if (state->connection_state.read_cipher_state != NULL)
-		gnutls_cipher_deinit(state->connection_state.
-				     read_cipher_state);
-
-	if (state->connection_state.write_cipher_state != NULL)
-		gnutls_cipher_deinit(state->connection_state.
-				     write_cipher_state);
-
-	if (_gnutls_compression_is_ok(state->security_parameters.compression_algorithm) != 0) {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-	}
-
-	if (_gnutls_mac_is_ok(state->security_parameters.mac_algorithm) == 0) {
-
-		mac_size =
-		    _gnutls_mac_get_digest_size(state->security_parameters.
-						mac_algorithm);
-
-	} else {
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
-	}
-
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Initializing internal cipher states\n");
-#endif
-
-	switch (state->security_parameters.entity) {
-	case GNUTLS_SERVER:
-		/* initialize cipher state
-		 */
-		state->connection_state.read_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.
-				       bulk_cipher_algorithm,
-				       state->cipher_specs.client_write_key,
-				       state->cipher_specs.client_write_IV);
-		if (state->connection_state.read_cipher_state ==
-		    GNUTLS_CIPHER_FAILED
-		    && state->security_parameters.bulk_cipher_algorithm !=
-		    GNUTLS_NULL_CIPHER) {
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
-		}
-
-		state->connection_state.write_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.bulk_cipher_algorithm,
-				       state->cipher_specs.server_write_key,
-				       state->cipher_specs.server_write_IV);
-
-		if (state->connection_state.write_cipher_state == GNUTLS_CIPHER_FAILED
-		    && state->security_parameters.bulk_cipher_algorithm != GNUTLS_NULL_CIPHER) {
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
-		}
-
-		/* copy mac secrets from cipherspecs, to connection
-		 * state.
-		 */
-		if (mac_size > 0) {
-			gnutls_sset_datum( &state->connection_state.read_mac_secret,
-				state->cipher_specs.client_write_mac_secret.data,
-				state->cipher_specs.client_write_mac_secret.size);
-
-			gnutls_sset_datum( &state->connection_state.write_mac_secret,
-				state->cipher_specs.server_write_mac_secret.data,
-				state->cipher_specs.server_write_mac_secret.size);
-
-		}
-
-
-		break;
-
-	case GNUTLS_CLIENT:
-		state->connection_state.read_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.
-				       bulk_cipher_algorithm,
-				       state->cipher_specs.
-				       server_write_key,
-				       state->cipher_specs.server_write_IV);
-				       
-		if (state->connection_state.read_cipher_state ==
-		    GNUTLS_CIPHER_FAILED
-		    && state->security_parameters.bulk_cipher_algorithm !=
-		    GNUTLS_NULL_CIPHER) {
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
-		}
-
-		state->connection_state.write_cipher_state =
-		    gnutls_cipher_init(state->security_parameters.
-				       bulk_cipher_algorithm,
-				       state->cipher_specs.client_write_key,
-				       state->cipher_specs.client_write_IV);
-
-		if (state->connection_state.write_cipher_state ==
-		    GNUTLS_CIPHER_FAILED
-		    && state->security_parameters.bulk_cipher_algorithm !=
-		    GNUTLS_NULL_CIPHER) {
-			gnutls_assert();
-			return GNUTLS_E_UNKNOWN_CIPHER;
-		}
-
-		/* copy mac secret to connection state
-		 */
-		if (mac_size > 0) {
-			gnutls_sset_datum( &state->connection_state.read_mac_secret,
-				state->cipher_specs.server_write_mac_secret.data,
-				state->cipher_specs.server_write_mac_secret.size);
-
-			gnutls_sset_datum( &state->connection_state.write_mac_secret,
-				state->cipher_specs.client_write_mac_secret.data,
-				state->cipher_specs.client_write_mac_secret.size);
-		}
-
-		break;
-
-	default:
-		gnutls_assert();
-		return GNUTLS_E_UNKNOWN_ERROR;
-	}
-
-	return 0;
-}
 
 /* This is the actual encryption 
  * (and also keeps some space for headers in the encrypted data)
@@ -388,10 +117,10 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 	GNUTLS_MAC_HANDLE td;
 	uint8 type = _type;
 	uint8 major, minor;
-	int hash_size = state->connection_state.write_mac_secret.size;
+	int hash_size = _gnutls_mac_get_digest_size(state->security_parameters.write_mac_algorithm);
 	int blocksize =
 	    _gnutls_cipher_get_block_size(state->security_parameters.
-					  bulk_cipher_algorithm);
+					  write_bulk_cipher_algorithm);
 
 	minor = _gnutls_version_get_minor(state->connection_state.version);
 	major = _gnutls_version_get_major(state->connection_state.version);
@@ -399,7 +128,7 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3.0 */
 		td =
 		    gnutls_mac_init_ssl3(state->security_parameters.
-					  mac_algorithm,
+					  write_mac_algorithm,
 					  state->connection_state.
 					  write_mac_secret.data,
 					  state->connection_state.
@@ -407,14 +136,14 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 	} else {
 		td =
 		    gnutls_hmac_init(state->security_parameters.
-				     mac_algorithm,
+				     write_mac_algorithm,
 				     state->connection_state.
 				     write_mac_secret.data,
 				     state->connection_state.
 				     write_mac_secret.size);
 	}
 	if (td == GNUTLS_MAC_FAILED
-	    && state->security_parameters.mac_algorithm != GNUTLS_NULL_MAC) {
+	    && state->security_parameters.write_mac_algorithm != GNUTLS_NULL_MAC) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
@@ -439,7 +168,7 @@ int _gnutls_compressed2TLSCiphertext(GNUTLS_STATE state,
 			MAC = gnutls_hmac_deinit(td);
 		}
 	}
-	switch (_gnutls_cipher_is_block(state->security_parameters.bulk_cipher_algorithm)) {
+	switch (_gnutls_cipher_is_block(state->security_parameters.write_bulk_cipher_algorithm)) {
 	case CIPHER_STREAM:
 		length =
 		    compressed.size + hash_size;
@@ -523,20 +252,18 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	GNUTLS_MAC_HANDLE td;
 	int blocksize;
 	uint8 major, minor;
-	int hash_size = state->connection_state.write_mac_secret.size;
-	/* write_mac secret == read_mac secret size 
-	 */
+	int hash_size = _gnutls_mac_get_digest_size(state->security_parameters.read_mac_algorithm);
 
 	minor = _gnutls_version_get_minor(state->connection_state.version);
 	major = _gnutls_version_get_major(state->connection_state.version);
 
 	blocksize = _gnutls_cipher_get_block_size(state->security_parameters.
-					  bulk_cipher_algorithm);
+					  read_bulk_cipher_algorithm);
 
 	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
 		td =
 		    gnutls_mac_init_ssl3(state->security_parameters.
-					  mac_algorithm,
+					  read_mac_algorithm,
 					  state->connection_state.
 					  read_mac_secret.data,
 					  state->connection_state.
@@ -544,19 +271,20 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	} else {
 		td =
 		    gnutls_hmac_init(state->security_parameters.
-				     mac_algorithm,
+				     read_mac_algorithm,
 				     state->connection_state.
 				     read_mac_secret.data,
 				     state->connection_state.
 				     read_mac_secret.size);
 	}
+
 	if (td == GNUTLS_MAC_FAILED
-	    && state->security_parameters.mac_algorithm != GNUTLS_NULL_MAC) {
+	    && state->security_parameters.read_mac_algorithm != GNUTLS_NULL_MAC) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
 
-	switch (_gnutls_cipher_is_block(state->security_parameters.bulk_cipher_algorithm)) {
+	switch (_gnutls_cipher_is_block(state->security_parameters.read_bulk_cipher_algorithm)) {
 	case CIPHER_STREAM:
 		length =
 		    ciphertext.size - hash_size;

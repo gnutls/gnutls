@@ -22,13 +22,14 @@
 
 #define GNUTLS_INT_H
 
+#include <defines.h>
 
 /*
 #define READ_DEBUG
 #define WRITE_DEBUG
+#define HARD_DEBUG
 #define BUFFERS_DEBUG
 #define RECORD_DEBUG
-#define HARD_DEBUG
 #define HANDSHAKE_DEBUG
 #define DEBUG
 */
@@ -115,7 +116,7 @@ typedef struct {
 
 
 /* STATE */
-typedef enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT } ConnectionEnd;
+typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } ConnectionEnd;
 typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL256_CBC } BulkCipherAlgorithm;
 typedef enum Extensions { GNUTLS_EXTENSION_SRP=7, GNUTLS_EXTENSION_DNSNAME } Extensions;
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
@@ -198,10 +199,19 @@ typedef struct {
  */
 typedef struct {
 	ConnectionEnd entity;
-	BulkCipherAlgorithm bulk_cipher_algorithm;
 	KXAlgorithm kx_algorithm;
-	MACAlgorithm mac_algorithm;
-	CompressionMethod compression_algorithm;
+	/* we've got separate write/read bulk/macs because
+	 * there is a time in handshake where the peer has
+	 * null cipher and we don't
+	 */
+	BulkCipherAlgorithm read_bulk_cipher_algorithm;
+	MACAlgorithm read_mac_algorithm;
+	CompressionMethod read_compression_algorithm;
+
+	BulkCipherAlgorithm write_bulk_cipher_algorithm;
+	MACAlgorithm write_mac_algorithm;
+	CompressionMethod write_compression_algorithm;
+
 	/* this is the ciphersuite we are going to use 
 	 * moved here from gnutls_internals in order to be restored
 	 * on resume;
@@ -224,6 +234,10 @@ typedef struct {
 	gnutls_datum client_write_IV;
 	gnutls_datum server_write_key;
 	gnutls_datum client_write_key;
+	int	     generated_keys; /* zero if keys have not
+				      * been generated. Non zero
+				      * otherwise.
+				      */
 } CipherSpecs;
 
 typedef enum GNUTLS_Version { GNUTLS_TLS1, GNUTLS_SSL3, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
@@ -305,7 +319,6 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label,
 		  int total_bytes);
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
-int _gnutls_set_keys(GNUTLS_STATE state);
 ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const void* data, size_t sizeofdata, int flags);
 ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char* data, size_t sizeofdata, int flags);
 int _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);

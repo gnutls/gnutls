@@ -1,3 +1,6 @@
+Version 0.1.5
+- Corrected bug(s) in ChangeCipherSpec packet (fixes renegotiate)
+
 Version 0.1.4 (22/06/2001)
 - Corrected (srp) base64 encoding.
 - Changed bcrypt algorithm to include username.

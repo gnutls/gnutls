@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include "defines.h"
 #include "gnutls_int.h"
 #include "gnutls_handshake.h"
 #include "gnutls_kx.h"
@@ -307,9 +306,6 @@ int _gnutls_recv_server_kx_message2(SOCKET cd, GNUTLS_STATE state)
 int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data;
-#ifdef HANDSHAKE_DEBUG
-	int i;
-#endif
 	int datasize;
 	int ret = 0;
 
@@ -342,9 +338,6 @@ int _gnutls_recv_client_kx_message(SOCKET cd, GNUTLS_STATE state)
 int _gnutls_recv_client_kx_message0(SOCKET cd, GNUTLS_STATE state)
 {
 	uint8 *data;
-#ifdef HANDSHAKE_DEBUG
-	int i;
-#endif
 	int datasize;
 	int ret = 0;
 

@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
@@ -38,6 +37,7 @@
 #include "gnutls_v2_compat.h"
 #include "auth_x509.h"
 #include "gnutls_cert.h"
+#include "gnutls_constate.h"
 
 #ifdef DEBUG
 #define ERR(x, y) fprintf(stderr, "GNUTLS Error: %s (%d)\n", x,y)
@@ -76,17 +76,21 @@ static void resume_copy_required_values(GNUTLS_STATE state)
 	       CipherSuite,
 	       state->gnutls_internals.resumed_security_parameters.
 	       current_cipher_suite.CipherSuite, 2);
+
 	state->gnutls_internals.compression_method =
 	    state->gnutls_internals.resumed_security_parameters.
-	    compression_algorithm;
+	    read_compression_algorithm; /* or write_compression_algorithm
+	    				 * they are the same
+	    				 */
 
+	state->security_parameters.entity = state->gnutls_internals.resumed_security_parameters.entity;
+	
 	memcpy(state->security_parameters.session_id,
 	       state->gnutls_internals.resumed_security_parameters.
 	       session_id, sizeof(state->security_parameters.session_id));
 	state->security_parameters.session_id_size =
 	    state->gnutls_internals.resumed_security_parameters.
 	    session_id_size;
-
 
 	return;
 }
@@ -1391,7 +1395,8 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 		return ret;
 	}
 
-	/* Initialize the connection state (start encryption) - in case of client */
+	/* Initialize the connection state (start encryption) - in case of client 
+	 */
 	if (init == TRUE) {
 		ret = _gnutls_connection_state_init(state);
 		if (ret < 0) {
@@ -1399,8 +1404,15 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 			return ret;
 		}
 	}
-	/* send the finished message */
 
+	ret = _gnutls_write_connection_state_init(state);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+
+	/* send the finished message */
 	ret = _gnutls_send_finished(cd, state);
 	if (ret < 0) {
 		ERR("send Finished", ret);
@@ -1433,6 +1445,12 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 			gnutls_assert();
 			return ret;
 		}
+	}
+	
+	ret = _gnutls_read_connection_state_init(state);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	ret = _gnutls_recv_finished(cd, state);

@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_compress.h"
 #include "gnutls_errors.h"
@@ -80,6 +79,8 @@ uLongf size;
 	switch (algorithm) {
 	case GNUTLS_NULL_COMPRESSION:
 		*plain = gnutls_malloc(compressed_size);
+		if (*plain==NULL) return GNUTLS_E_MEMORY_ERROR;
+		
 		memcpy(*plain, compressed, compressed_size);
 		plain_size = compressed_size;
 		break;
@@ -90,6 +91,8 @@ uLongf size;
 		do {
 			size += compressed_size;
 			*plain = gnutls_realloc(*plain, size);
+			if (*plain==NULL) return GNUTLS_E_MEMORY_ERROR;
+			
 			err = uncompress( *plain, &size, compressed, compressed_size);
 		} while( err==Z_BUF_ERROR && size <= MAX_COMP_SIZE);
 		if (err!=Z_OK) {

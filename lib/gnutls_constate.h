@@ -1,0 +1,10 @@
+int _gnutls_connection_state_init(GNUTLS_STATE state);
+int _gnutls_read_connection_state_init(GNUTLS_STATE state);
+int _gnutls_write_connection_state_init(GNUTLS_STATE state);
+int _gnutls_set_write_cipher( GNUTLS_STATE state, BulkCipherAlgorithm algo);
+int _gnutls_set_write_mac( GNUTLS_STATE state, MACAlgorithm algo);
+int _gnutls_set_read_cipher( GNUTLS_STATE state, BulkCipherAlgorithm algo);
+int _gnutls_set_read_mac( GNUTLS_STATE state, MACAlgorithm algo);
+int _gnutls_set_read_compression( GNUTLS_STATE state, CompressionMethod algo);
+int _gnutls_set_write_compression( GNUTLS_STATE state, CompressionMethod algo);
+int _gnutls_set_kx(GNUTLS_STATE state, KXAlgorithm algo);

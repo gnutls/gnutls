@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_auth_int.h"
 #include "auth_srp.h"
@@ -48,6 +47,8 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 		}
+	} else { /* client side reading server hello extensions */
+		return proc_srp_server_hello( state->gnutls_key, data, data_size);
 	}
 	return 0;
 }
@@ -72,6 +73,8 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque** data) {
 			memcpy( &(*data)[1], cred->username, len);
 			return len + 1;
 		}
+	} else { /* SERVER SIDE sending (g,n,s) */
+		return gen_srp_server_hello( state->gnutls_key, data);
 	}
 	return 0;
 }

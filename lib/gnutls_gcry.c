@@ -18,9 +18,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-#include <defines.h>
-#include <gnutls_gcry.h>
+#include <gnutls_int.h>
 
+/* Functions that refer to the libgcrypt library.
+ */
+ 
 void _gnutls_mpi_release( MPI* x) {
 	if (*x==NULL) return;
 	gcry_mpi_release(*x);

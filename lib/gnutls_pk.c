@@ -21,7 +21,6 @@
 /* This file contains function for RSA/DSA etc. 
  */
 
-#include <defines.h>
 #include <gnutls_int.h>
 #include <gnutls_gcry.h>
 #include <gnutls_pk.h>

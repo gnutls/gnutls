@@ -3,7 +3,6 @@
 /* Description: Functions to manage ASN.1 DEFINITIONS*/
 /*****************************************************/
 
-#include <defines.h>
 #include <gnutls_int.h>
 #include <cert_asn1.h>
 #include <cert_der.h>
