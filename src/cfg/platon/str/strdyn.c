@@ -563,7 +563,6 @@ PLATON_FUNC(strdyn_casecompare)(ar, s)
 	char *s;
 {
 	return PLATON_FUNC(strdyn_casesearch)(ar, s) < 0 ? -1 : 0;
-	return PLATON_FUNC(strdyn_casesearch)(ar, s) < 0 ? -1 : 0;
 }
 
 int
