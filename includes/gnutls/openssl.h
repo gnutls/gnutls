@@ -122,6 +122,9 @@ typedef struct _SSL
 
     int (*verify_callback)(int, X509_STORE_CTX *);
     int verify_mode;
+    
+    int rfd;
+    int wfd;
 } SSL;
 
 typedef struct

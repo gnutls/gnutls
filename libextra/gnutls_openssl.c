@@ -213,6 +213,9 @@ SSL *SSL_new(SSL_CTX *ctx)
 
     ssl->options = ctx->options;
 
+    ssl->rfd = -1;
+    ssl->wfd = -1;
+
     return ssl;
 }
 
@@ -245,19 +248,27 @@ int SSL_set_fd(SSL *ssl, int fd)
 
 int SSL_set_rfd(SSL *ssl, int fd)
 {
-    gnutls_transport_set_ptr (ssl->gnutls_state, fd);
+    ssl->rfd = fd;
+    
+    if (ssl->wfd != -1)
+      gnutls_transport_set_ptr2(ssl->gnutls_state, ssl->rfd, ssl->wfd);
+
     return 1;
 }
 
 int SSL_set_wfd(SSL *ssl, int fd)
 {
-    gnutls_transport_set_ptr (ssl->gnutls_state, fd);
+    ssl->wfd = fd;
+    
+    if (ssl->rfd != -1)
+      gnutls_transport_set_ptr2(ssl->gnutls_state, ssl->rfd, ssl->wfd);
+
     return 1;
 }
 
 void SSL_set_bio(SSL *ssl, BIO *rbio, BIO *wbio)
 {
-    gnutls_transport_set_ptr (ssl->gnutls_state, rbio->fd);
+    gnutls_transport_set_ptr2 (ssl->gnutls_state, rbio->fd, wbio->fd);
     /*    free(BIO); ? */
 }
 
