@@ -636,7 +636,7 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 	/* Read all the sizes */
 	total = 0;
 	for (i=0;i<6;i++) {
-		_gnutls_mpi_print( NULL, &size[i], params[i]);
+		_gnutls_mpi_print_lz( NULL, &size[i], params[i]);
 		total += size[i];
 	}
 
@@ -678,10 +678,10 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 
 
 	/* calculate exp's size */
-	_gnutls_mpi_print( NULL, &size[6], exp1);
+	_gnutls_mpi_print_lz( NULL, &size[6], exp1);
 	total += size[6];
 
-	_gnutls_mpi_print( NULL, &size[7], exp2);
+	_gnutls_mpi_print_lz( NULL, &size[7], exp2);
 	total += size[7];
 
 	/* Encoding phase.
@@ -703,14 +703,14 @@ static int _encode_rsa( ASN1_TYPE* c2, GNUTLS_MPI* params)
 	exp1_data = &all_data[size[5]];
 	exp2_data = &all_data[size[6]];
 
-	_gnutls_mpi_print( m_data, &tmp_size, params[0]);
-	_gnutls_mpi_print( pube_data, &tmp_size, params[1]);
-	_gnutls_mpi_print( prie_data, &tmp_size, params[2]);
-	_gnutls_mpi_print( p1_data, &tmp_size, params[3]);
-	_gnutls_mpi_print( p2_data, &tmp_size, params[4]);
-	_gnutls_mpi_print( u_data, &tmp_size, params[5]);
-	_gnutls_mpi_print( exp1_data, &tmp_size, exp1);
-	_gnutls_mpi_print( exp2_data, &tmp_size, exp2);
+	_gnutls_mpi_print_lz( m_data, &tmp_size, params[0]);
+	_gnutls_mpi_print_lz( pube_data, &tmp_size, params[1]);
+	_gnutls_mpi_print_lz( prie_data, &tmp_size, params[2]);
+	_gnutls_mpi_print_lz( p1_data, &tmp_size, params[3]);
+	_gnutls_mpi_print_lz( p2_data, &tmp_size, params[4]);
+	_gnutls_mpi_print_lz( u_data, &tmp_size, params[5]);
+	_gnutls_mpi_print_lz( exp1_data, &tmp_size, exp1);
+	_gnutls_mpi_print_lz( exp2_data, &tmp_size, exp2);
 
 	/* Ok. Now we have the data. Create the asn1 structures
 	 */	
