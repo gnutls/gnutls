@@ -188,11 +188,13 @@ int gnutls_x509pki_get_certificate_request_status(GNUTLS_STATE state)
 int gnutls_fingerprint_calc(DigestAlgorithm algo, gnutls_datum data, char* result, int* result_size)
 {
 	GNUTLS_HASH_HANDLE td;
+	int hash_len = gnutls_hash_get_algo_len(algo);
 	
-	if (gnutls_hash_get_algo_len(algo) > *result_size) {
+	if (hash_len > *result_size) {
+		*result_size = hash_len;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
-	*result_size = gnutls_hash_get_algo_len(algo);
+	*result_size = hash_len;
 	
 	td = gnutls_hash_init( algo);
 	if (td==NULL) return GNUTLS_E_HASH_FAILED;
