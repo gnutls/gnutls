@@ -162,6 +162,7 @@ typedef struct gnutls_hash_entry gnutls_hash_entry;
 static const gnutls_hash_entry hash_algorithms[] = {
 	{"SHA", GNUTLS_MAC_SHA, 20},
 	{"MD5", GNUTLS_MAC_MD5, 16},
+	{"MD2", GNUTLS_MAC_MD2, 16},
 	{"NULL", GNUTLS_MAC_NULL, 0},
 	{0, 0, 0}
 };

@@ -55,6 +55,17 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 		}
 		break;
 
+	case GNUTLS_MAC_MD2:
+		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+		if (ret == NULL)
+			return GNUTLS_HASH_FAILED;
+		ret->handle = gcry_md_open(GCRY_MD_MD2, 0);
+		if (!ret->handle) {
+			gnutls_free(ret);
+			ret = GNUTLS_HASH_FAILED;
+		}
+		break;
+
 	default:
 		ret = GNUTLS_HASH_FAILED;
 	}
@@ -75,6 +86,9 @@ int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm)
 		break;
 	case GNUTLS_MAC_MD5:
 		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
+		break;
+	case GNUTLS_MAC_MD2:
+		ret = gcry_md_get_algo_dlen(GCRY_MD_MD2);
 		break;
 	default:
 		ret = 0;
@@ -163,6 +177,16 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 		if (!ret->handle)
 			ret = GNUTLS_MAC_FAILED;
 		break;
+	case GNUTLS_MAC_MD2:
+		ret = gnutls_malloc(sizeof(GNUTLS_MAC_HANDLE_INT));
+		if (ret == NULL)
+			return GNUTLS_MAC_FAILED;
+
+		ret->handle = gcry_md_open(GCRY_MD_MD2, GCRY_MD_FLAG_HMAC);
+
+		if (!ret->handle)
+			ret = GNUTLS_MAC_FAILED;
+		break;
 	default:
 		ret = GNUTLS_MAC_FAILED;
 	}
@@ -194,6 +218,9 @@ int _gnutls_hmac_get_algo_len(gnutls_mac_algorithm algorithm)
 		break;
 	case GNUTLS_MAC_MD5:
 		ret = gcry_md_get_algo_dlen(GCRY_MD_MD5);
+		break;
+	case GNUTLS_MAC_MD2:
+		ret = gcry_md_get_algo_dlen(GCRY_MD_MD2);
 		break;
 	default:
 		ret = 0;

@@ -352,6 +352,7 @@ unsigned int _gnutls_x509_verify_certificate(gnutls_x509_crt * certificate_list,
 
 #define OID_SHA1 "1.3.14.3.2.26"
 #define OID_MD5 "1.2.840.113549.2.5"
+#define OID_MD2 "1.2.840.113549.2.2"
 
 /* Reads the digest information.
  * we use DER here, although we should use BER. It works fine
@@ -391,9 +392,10 @@ int len;
 	
 	if ( strcmp(str, OID_MD5)==0) { /* MD5 */
 		*hash = GNUTLS_MAC_MD5;
-	} else 
-	if ( strcmp(str, OID_SHA1)==0) { /* SHA1 ID */
+	} else if ( strcmp(str, OID_SHA1)==0) { /* SHA1 ID */
 		*hash = GNUTLS_MAC_SHA;
+	} else if ( strcmp(str, OID_MD2)==0) { /* MD2 */
+		*hash = GNUTLS_MAC_MD2;
 	}
 
 	if (*hash==(gnutls_mac_algorithm)-1) {

@@ -6,6 +6,7 @@ Version 0.9.0
   the gnutls_global_set_log_function().
 - gnutls_dh_params_generate() and gnutls_rsa_params_generate() now use 
   gnutls_malloc() to allocate the output parameters.
+- Added support for MD2 algorithm in certificate signature verification.
 - The RSA and DH parameter generation interface was changed. Added
   ability to import and export from and to PKCS3 structures. This 
   was needed to read parameters generated using the openssl dhparam tool.
