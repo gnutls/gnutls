@@ -386,10 +386,10 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, uint* ncerts, const
  * a gnutls_cert structure. Returns the number of certificate parsed.
  */
 static int parse_pem_cert_mem( gnutls_cert** cert_list, uint* ncerts, 
-	const opaque *input_cert, int input_cert_size)
+	const char *input_cert, int input_cert_size)
 {
 	int size, siz2, i;
-	const opaque *ptr;
+	const char *ptr;
 	opaque *ptr2;
 	gnutls_datum tmp;
 	int ret, count;

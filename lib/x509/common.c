@@ -570,7 +570,7 @@ time_t _gnutls_x509_get_time(ASN1_TYPE c2, const char *when)
  */
 int _gnutls_x509_set_time(ASN1_TYPE c2, const char *where, time_t tim)
 {
-	opaque str_time[MAX_TIME];
+	char str_time[MAX_TIME];
 	char name[1024];
 	int result, len;
 
