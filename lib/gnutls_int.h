@@ -2,8 +2,9 @@
 
 #define GNUTLS_INT_H
 
-#define HARD_DEBUG
-#define READ_DEBUG
+#define HANDSHAKE_DEBUG
+//#define HARD_DEBUG
+//#define READ_DEBUG
 //#define WRITE_DEBUG
 #define DEBUG
 
@@ -177,10 +178,8 @@ typedef struct {
 typedef struct {
 	char*			buffer;
 	uint32			bufferSize;
-	char*			client_hash_buffer; /* used in SSL3 */
-	uint32			client_hash_bufferSize; /* used in SSL3 */
-	char*			server_hash_buffer; /* used in SSL3 */
-	uint32			server_hash_bufferSize; /* used in SSL3 */
+	char*			hash_buffer; /* used in SSL3 */
+	uint32			hash_bufferSize; /* used in SSL3 */
 	char*			buffer_handshake;
 	uint32			bufferSize_handshake;
 	ResumableSession	resumable; /* TRUE or FALSE */
@@ -188,17 +187,6 @@ typedef struct {
 	AlertDescription	last_alert; /* last alert received */
 	GNUTLS_CipherSuite	current_cipher_suite;
 	CompressionMethod	compression_method;
-	/* for the handshake protocol */
-	GNUTLS_MAC_HANDLE	client_td_md5;
-	GNUTLS_MAC_HANDLE	client_td_sha1;
-	void*			client_md_md5;
-	void*			client_md_sha1;
-	GNUTLS_MAC_HANDLE	server_td_md5;
-	GNUTLS_MAC_HANDLE	server_td_sha1;
-	void*			server_md_md5;
-	void*			server_md_sha1;
-	int				server_hash;
-	int				client_hash;
 	/* For DH KX */
 	MPI				KEY;
 	MPI				client_Y;

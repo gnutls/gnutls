@@ -77,16 +77,9 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 
 	(*state)->gnutls_internals.buffer = NULL;
 	/* SSL3 stuff */
-	(*state)->gnutls_internals.client_hash_buffer = NULL;
-	(*state)->gnutls_internals.server_hash_buffer = NULL;
+	(*state)->gnutls_internals.hash_buffer = NULL;
 	
 	(*state)->gnutls_internals.buffer_handshake = NULL;
-	(*state)->gnutls_internals.client_md_md5 = NULL;
-	(*state)->gnutls_internals.client_md_sha1 = NULL;
-	(*state)->gnutls_internals.server_md_md5 = NULL;
-	(*state)->gnutls_internals.server_md_sha1 = NULL;
-	(*state)->gnutls_internals.server_hash = 0;
-	(*state)->gnutls_internals.client_hash = 0;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
 	gnutls_set_current_version ( (*state), GNUTLS_TLS1); /* default */

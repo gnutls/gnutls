@@ -227,130 +227,75 @@ ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, void *ipt
 	return (sizeOfPtr - left);
 }
 
-int gnutls_insertHashDataBuffer( int type, GNUTLS_STATE state, char *data, int length)
+int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 {
 	int old_buffer;
 	
-	if (type==GNUTLS_SERVER) {
-		old_buffer = state->gnutls_internals.server_hash_bufferSize;
+	old_buffer = state->gnutls_internals.hash_bufferSize;
 
-		state->gnutls_internals.server_hash_bufferSize += length;
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Inserted %d bytes of SSL3 Server Hash Data(%d) into buffer\n", length, type);
+	state->gnutls_internals.hash_bufferSize += length;
+#ifdef HANDSHAKE_DEBUG
+	fprintf(stderr, "Inserted %d bytes of Hash Data into buffer\n", length);
 #endif
-		state->gnutls_internals.server_hash_buffer =
-			    gnutls_realloc(state->gnutls_internals.server_hash_buffer,
-				   state->gnutls_internals.server_hash_bufferSize);
-			memmove(&state->gnutls_internals.server_hash_buffer[old_buffer], data, length);
+	state->gnutls_internals.hash_buffer =
+		    gnutls_realloc(state->gnutls_internals.hash_buffer,
+			   state->gnutls_internals.hash_bufferSize);
+		memmove(&state->gnutls_internals.hash_buffer[old_buffer], data, length);
 
-	} else { /* GNUTLS_CLIENT */
-		old_buffer = state->gnutls_internals.client_hash_bufferSize;
-
-		state->gnutls_internals.client_hash_bufferSize += length;
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Inserted %d bytes of SSL3 Client Hash Data(%d) into buffer\n", length, type);
-#endif
-		state->gnutls_internals.client_hash_buffer =
-			    gnutls_realloc(state->gnutls_internals.client_hash_buffer,
-				   state->gnutls_internals.client_hash_bufferSize);
-			memmove(&state->gnutls_internals.client_hash_buffer[old_buffer], data, length);
-	}
 	return 0;
 }
 
-int gnutls_getHashDataBufferSize( int type, GNUTLS_STATE state)
+int gnutls_getHashDataBufferSize( GNUTLS_STATE state)
 {
-	if (type==GNUTLS_SERVER) {
-		return state->gnutls_internals.server_hash_bufferSize;
-	} else {
-		return state->gnutls_internals.client_hash_bufferSize;
-	}
+
+	return state->gnutls_internals.hash_bufferSize;
 }
 
-int gnutls_getHashDataFromBuffer(int type, GNUTLS_STATE state, char *data, int length)
+int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 {
-	if (type==GNUTLS_SERVER) {
-		if (length > state->gnutls_internals.server_hash_bufferSize) {
-			length = state->gnutls_internals.server_hash_bufferSize;
-		}
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Read %d bytes of SSL3 Server Hash Data(%d) from buffer\n", length, type);
-#endif
-		state->gnutls_internals.server_hash_bufferSize -= length;
-		memmove(data, state->gnutls_internals.server_hash_buffer, length);
-		/* overwrite buffer */
-		memmove(state->gnutls_internals.server_hash_buffer,
-			&state->gnutls_internals.server_hash_buffer[length],
-			state->gnutls_internals.server_hash_bufferSize);
-		state->gnutls_internals.server_hash_buffer =
-		    gnutls_realloc(state->gnutls_internals.server_hash_buffer,
-				   state->gnutls_internals.server_hash_bufferSize);
-
-		return length;
-	} else { /* CLIENT */
-		if (length > state->gnutls_internals.client_hash_bufferSize) {
-			length = state->gnutls_internals.client_hash_bufferSize;
-		}
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Read %d bytes of SSL3 Client Hash Data(%d) from buffer\n", length, type);
-#endif
-		state->gnutls_internals.client_hash_bufferSize -= length;
-		memmove(data, state->gnutls_internals.client_hash_buffer, length);
-		/* overwrite buffer */
-		memmove(state->gnutls_internals.client_hash_buffer,
-			&state->gnutls_internals.client_hash_buffer[length],
-			state->gnutls_internals.client_hash_bufferSize);
-		state->gnutls_internals.client_hash_buffer =
-		    gnutls_realloc(state->gnutls_internals.client_hash_buffer,
-				   state->gnutls_internals.client_hash_bufferSize);
-
-		return length;	
+	if (length > state->gnutls_internals.hash_bufferSize) {
+		length = state->gnutls_internals.hash_bufferSize;
 	}
+#ifdef HANDSHAKE_DEBUG
+	fprintf(stderr, "Got %d bytes of Hash Data from buffer\n", length);
+#endif
+	state->gnutls_internals.hash_bufferSize -= length;
+	memmove(data, state->gnutls_internals.hash_buffer, length);
+	/* overwrite buffer */
+	memmove(state->gnutls_internals.hash_buffer,
+		&state->gnutls_internals.hash_buffer[length],
+		state->gnutls_internals.hash_bufferSize);
+	state->gnutls_internals.hash_buffer =
+	    gnutls_realloc(state->gnutls_internals.hash_buffer,
+			   state->gnutls_internals.hash_bufferSize);
+
+	return length;	
+
 }
 
-int gnutls_readHashDataFromBuffer(int type, GNUTLS_STATE state, char *data, int length)
+int gnutls_readHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 {
-	if (type==GNUTLS_SERVER) {
-		if (length > state->gnutls_internals.server_hash_bufferSize) {
-			length = state->gnutls_internals.server_hash_bufferSize;
-		}
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Read %d bytes of SSL3 Server Hash Data(%d) from buffer\n", length, type);
-#endif
-		memmove(data, state->gnutls_internals.server_hash_buffer, length);
-		return length;
-
-	} else { /* CLIENT */
-		if (length > state->gnutls_internals.client_hash_bufferSize) {
-			length = state->gnutls_internals.client_hash_bufferSize;
-		}
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Read %d bytes of SSL3 Client Hash Data(%d) from buffer\n", length, type);
-#endif
-		memmove(data, state->gnutls_internals.client_hash_buffer, length);
-		return length;	
+	if (length > state->gnutls_internals.hash_bufferSize) {
+		length = state->gnutls_internals.hash_bufferSize;
 	}
+#ifdef HANDSHAKE_DEBUG
+	fprintf(stderr, "Read %d bytes of Hash Data from buffer\n", length);
+#endif
+	memmove(data, state->gnutls_internals.hash_buffer, length);
+	return length;	
 }
 
 
 
-int gnutls_clearHashDataBuffer(int type, GNUTLS_STATE state)
+int gnutls_clearHashDataBuffer( GNUTLS_STATE state)
 {
-	if (type==GNUTLS_SERVER) {
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Cleared SSL3 Server Hash Data(%d) from buffer\n",type);
+
+#ifdef HANDSHAKE_DEBUG
+	fprintf(stderr, "Cleared Hash Data from buffer\n");
 #endif
-		state->gnutls_internals.server_hash_bufferSize = 0;
-		gnutls_free(state->gnutls_internals.server_hash_buffer);
-		state->gnutls_internals.server_hash_buffer = NULL;
-	} else { /* CLIENT */
-#ifdef HARD_DEBUG
-	fprintf(stderr, "Cleared SSL3 Client Hash Data(%d) from buffer\n", type);
-#endif
-		state->gnutls_internals.client_hash_bufferSize = 0;
-		gnutls_free(state->gnutls_internals.client_hash_buffer);
-		state->gnutls_internals.client_hash_buffer = NULL;
-	}
+	state->gnutls_internals.hash_bufferSize = 0;
+	gnutls_free(state->gnutls_internals.hash_buffer);
+	state->gnutls_internals.hash_buffer = NULL;
 	
 	return 0;
 }
