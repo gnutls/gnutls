@@ -241,7 +241,7 @@ leave:
   return rc;
 } 
 
-/**
+/*-
  * _gnutls_openpgp_key2gnutls_key - Converts an OpenPGP secret key to GnuTLS
  *
  * @pkey: the GnuTLS private key context to store the key.
@@ -249,7 +249,7 @@ leave:
  *
  * The RFC2440 (OpenPGP Message Format) data is converted into the
  * GnuTLS specific data which is need to perform secret key operations.
- **/
+ -*/
 int
 _gnutls_openpgp_key2gnutls_key(gnutls_private_key *pkey,
                                gnutls_datum raw_key)
@@ -349,9 +349,9 @@ leave:
  * should only contain one key.
  **/
 int
-gnutls_openpgp_set_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res,
-                             char* CERTFILE,
-                             char* KEYFILE)
+gnutls_certificate_set_openpgp_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
+                                        char* CERTFILE,
+                                        char* KEYFILE)
 {
   IOBUF a, buf;
   PKT pkt = NULL;
@@ -614,22 +614,30 @@ gnutls_openpgp_verify_certificate( const gnutls_datum* cert_list,
  * the fingerprint can be 16 oder 20 bytes.
  **/
 int
-gnutls_openpgp_fingerprint( const gnutls_cert *cert, byte *fpr,size_t *fprlen )
+gnutls_openpgp_fingerprint(const gnutls_datum *cert, byte *fpr,size_t *fprlen )
 {
-  if (!cert)
+  PKT pkt = NULL;
+  PKT_public_key *pk = NULL;
+  struct packet_s *p;
+  
+  if (!cert || !fpr || !fprlen)
     return GNUTLS_E_UNKNOWN_ERROR;
 
-  if (cert->cert_type != GNUTLS_CRT_OPENPGP)
+  *fprlen = 0;
+  datum_to_openpgp_pkt(cert, &pkt);
+  for (p=pkt; p && p->id; p=p->next)
     {
-      *fprlen = 0;
-      return 0;
+      if (p->id == PKT_PUBKEY)
+        {
+          pk = p->p.pk;
+          if ( is_RSA(pk->pke_algo) )
+            *fprlen = 16;
+          else
+            *fprlen = 20;
+          cdk_key_create_fpr(pk, fpr);
+        }
     }
-  if (cert->subject_pk_algorithm == GNUTLS_PK_RSA)
-    *fprlen = 16;
-  else
-    *fprlen = 20;
-  memcpy(fpr, cert->fingerprint, *fprlen);
-
+  
   return 0;  
 }
 
@@ -642,22 +650,24 @@ gnutls_openpgp_fingerprint( const gnutls_cert *cert, byte *fpr,size_t *fprlen )
  * Returns the 64-bit keyID of the OpenPGP key.
  **/
 int
-gnutls_openpgp_keyid( const gnutls_cert *cert, u32 *keyid )
+gnutls_openpgp_keyid( const gnutls_datum *cert, u32 *keyid )
 {
-  const byte *fpr;
+  PKT pkt;
+  PKT_public_key *pk = NULL;
+  struct packet_s *p;
   
   if (!cert || !keyid)
     return GNUTLS_E_UNKNOWN_ERROR;
 
-  if (cert->cert_type != GNUTLS_CRT_OPENPGP)
+  datum_to_openpgp_pkt(cert, &pkt);
+  for (p=pkt; p && p->id; p=p->next)
     {
-      keyid[0] = keyid[1] = 0;
-      return 0;
+      if (p->id == PKT_PUBKEY)
+        {
+          pk = p->p.pk;
+          cdk_key_keyid_from_pk(pk, keyid);
+        }
     }
-  /* fixme: this is only valid for V4 keys! */
-  fpr = cert->fingerprint;
-  keyid[0] = (fpr[12] << 24) | (fpr[13] << 16) | (fpr[14] << 8) | fpr[15];
-  keyid[1] = (fpr[16] << 24) | (fpr[17] << 16) | (fpr[18] << 8) | fpr[19];
 
   return 0;
 }
