@@ -162,7 +162,7 @@ int gnutls_deinit(GNUTLS_STATE * state)
 	return 0;
 }
 
-
+inline
 static void *_gnutls_cal_PRF_A( MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size)
 {
 	GNUTLS_MAC_HANDLE td1;
@@ -226,13 +226,32 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 	return ret;
 }
 
+/* Function that xor's buffers using the maximum word size supported
+ * by the system. It should be faster.
+ */
+inline static
+void _gnutls_xor(void* _o1, void* _o2, int _length) {
+unsigned long int* o1 = _o1;
+unsigned long int* o2 = _o2;
+int i, length = _length/sizeof(unsigned long int);
+int modlen = _length%sizeof(unsigned long int);
+
+	for (i = 0; i < length; i++) {
+		o1[i] ^= o2[i];
+	}
+	i*=sizeof(unsigned long int);
+	for (;i<modlen;i++) {
+		((char*)_o1)[i] ^= ((char*)_o2)[i];
+	}
+	return ;
+}
 
 /* The PRF function expands a given secret 
  * needed by the TLS specification
  */
 svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes)
 {
-	int l_s, i, s_seed_size;
+	int l_s, s_seed_size;
 	char *o1, *o2;
 	char *s1, *s2;
 	char *s_seed;
@@ -256,9 +275,7 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 
 	gnutls_free(s_seed);
 
-	for (i = 0; i < total_bytes; i++) {
-		o1[i] ^= o2[i];
-	}
+	_gnutls_xor(o1, o2, total_bytes);
 
 	secure_free(o2);
 
