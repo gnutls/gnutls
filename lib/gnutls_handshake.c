@@ -190,7 +190,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 2;
 
 	DECR_LEN(len, 32);
-	memmove(state->security_parameters.client_random, &data[pos], 32);
+	memcpy(state->security_parameters.client_random, &data[pos], 32);
 	pos += 32;
 
 	/* generate server random value */
@@ -199,14 +199,14 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 #else
 	cur_time = byteswap32(time(NULL));
 #endif
-	memmove(state->security_parameters.server_random, &cur_time, 4);
+	memcpy(state->security_parameters.server_random, &cur_time, 4);
 	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
-	memmove(&state->security_parameters.server_random[4], rand, 28);
+	memcpy(&state->security_parameters.server_random[4], rand, 28);
 	_gnutls_free_rand(rand);
 	state->security_parameters.timestamp = time(NULL);
 
 	DECR_LEN(len, 1);
-	memmove(&session_id_len, &data[pos++], 1);
+	memcpy(&session_id_len, &data[pos++], 1);
 
 	/* RESUME SESSION */
 	if (session_id_len > 32)
@@ -239,7 +239,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 
 	/* Select a ciphersuite */
 	DECR_LEN(len, 2);
-	memmove(&sizeOfSuites, &data[pos], 2);
+	memcpy(&sizeOfSuites, &data[pos], 2);
 	pos += 2;
 
 #ifndef WORDS_BIGENDIAN
@@ -285,7 +285,7 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	}
 
 	DECR_LEN(len, 1);
-	memmove(&z, &data[pos++], 1);	/* z is the number of compression methods */
+	memcpy(&z, &data[pos++], 1);	/* z is the number of compression methods */
 
 	DECR_LEN(len, z);
 	ret = SelectCompMethod(state, &state->
@@ -432,7 +432,7 @@ static int SelectSuite(GNUTLS_STATE state, opaque ret[2], char *data,
 					_gnutls_cipher_suite_get_name(*
 								      ((GNUTLS_CipherSuite *) & data[j])));
 #endif
-				memmove(ret, &ciphers[i].CipherSuite, 2);
+				memcpy(ret, &ciphers[i].CipherSuite, 2);
 				gnutls_free(ciphers);
 
 				return 0;
@@ -461,7 +461,7 @@ static int SelectCompMethod(GNUTLS_STATE state, CompressionMethod * ret,
 	for (j = 0; j < datalen; j++) {
 		for (i = 0; i < x; i++) {
 			if (ciphers[i] == data[j]) {
-				*ret = ciphers[i];
+				*ret = _gnutls_compression_get_id(ciphers[i]);
 				gnutls_free(ciphers);
 				return 0;
 			}
@@ -497,13 +497,13 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 	i_datasize += HANDSHAKE_HEADERS_SIZE;
 	data = gnutls_malloc(i_datasize);
 
-	memmove(&data[pos++], &type, 1);
-	memmove(&data[pos++], &length.pint[0], 1);
-	memmove(&data[pos++], &length.pint[1], 1);
-	memmove(&data[pos++], &length.pint[2], 1);
+	memcpy(&data[pos++], &type, 1);
+	memcpy(&data[pos++], &length.pint[0], 1);
+	memcpy(&data[pos++], &length.pint[1], 1);
+	memcpy(&data[pos++], &length.pint[2], 1);
 
 	if (i_datasize > 4)
-		memmove(&data[pos], i_data, i_datasize - 4);
+		memcpy(&data[pos], i_data, i_datasize - 4);
 
 #ifdef HANDSHAKE_DEBUG
 	fprintf(stderr, "Handshake: %s was send [%ld bytes]\n",
@@ -642,7 +642,7 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 	ret = GNUTLS_E_UNKNOWN_ERROR;
 
 	if (length32 > 0 && data != NULL)
-		memmove(*data, &dataptr[handshake_headers], length32);
+		memcpy(*data, &dataptr[handshake_headers], length32);
 
 	/* here we buffer the handshake messages - needed at Finished message */
 	gnutls_insertHashDataBuffer(state, dataptr, length32 + handshake_headers);
@@ -753,12 +753,12 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 	pos += 2;
 
 	DECR_LEN(len, 32);
-	memmove(state->security_parameters.server_random,
+	memcpy(state->security_parameters.server_random,
 		&data[pos], 32);
 	pos += 32;
 
 	DECR_LEN(len, 1);
-	memmove(&session_id_len, &data[pos++], 1);
+	memcpy(&session_id_len, &data[pos++], 1);
 
 	if (len < session_id_len) {
 		gnutls_assert();
@@ -799,7 +799,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 		}
 		pos += session_id_len;
 		DECR_LEN(len, 2);
-	memmove(&cipher_suite.CipherSuite, &data[pos], 2);
+	memcpy(&cipher_suite.CipherSuite, &data[pos], 2);
 	pos += 2;
 
 	z = 1;
@@ -816,7 +816,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
-	memmove(state->gnutls_internals.
+	memcpy(state->gnutls_internals.
 		current_cipher_suite.CipherSuite,
 		cipher_suite.CipherSuite, 2);
 
@@ -860,7 +860,7 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 	/* move to compression */
 	z = 1;
 	DECR_LEN(len, 1);
-	memmove(&compression_method, &data[pos++], 1);
+	memcpy(&compression_method, &data[pos++], 1);
 
 	z = _gnutls_supported_compression_methods
 	    (state, &compression_methods);
@@ -872,10 +872,12 @@ static int _gnutls_read_server_hello( GNUTLS_STATE state, char *data, int datale
 		}
 	}
 
-	if (z != 0)
+	if (z != 0) {
+		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-	memmove(&state->gnutls_internals.compression_method,
-		&compression_method, 1);
+	}
+	state->gnutls_internals.compression_method =
+		_gnutls_compression_get_id( compression_method);
 
 	gnutls_free(cipher_suites);
 	gnutls_free(compression_methods);
@@ -928,24 +930,24 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 #else
 		cur_time = byteswap32(time(NULL));
 #endif
-		memmove(state->security_parameters.client_random,
+		memcpy(state->security_parameters.client_random,
 			&cur_time, 4);
 
 		rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
-		memmove(&state->security_parameters.client_random[4], rand,
+		memcpy(&state->security_parameters.client_random[4], rand,
 			28);
 		_gnutls_free_rand(rand);
 
 		state->security_parameters.timestamp = time(0);
 
-		memmove(&data[pos],
+		memcpy(&data[pos],
 			state->security_parameters.client_random, 32);
 		pos += 32;
 
-		memmove(&data[pos++], &session_id_len, 1);
+		memcpy(&data[pos++], &session_id_len, 1);
 
 		if (session_id_len > 0) {
-			memmove(&data[pos], SessionID, session_id_len);
+			memcpy(&data[pos], SessionID, session_id_len);
 		}
 		pos += session_id_len;
 
@@ -953,10 +955,10 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 							  &cipher_suites);
 		x *= sizeof(uint16);	/* in order to get bytes */
 #ifdef WORDS_BIGENDIAN
-		memmove(&data[pos], &x, sizeof(uint16));
+		memcpy(&data[pos], &x, sizeof(uint16));
 #else
 		x = byteswap16(x);
-		memmove(&data[pos], &x, sizeof(uint16));
+		memcpy(&data[pos], &x, sizeof(uint16));
 		x = byteswap16(x);
 #endif
 		pos += sizeof(uint16);
@@ -965,7 +967,7 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		data = gnutls_realloc(data, datalen);
 
 		for (i = 0; i < x / 2; i++) {
-			memmove(&data[pos], &cipher_suites[i].CipherSuite,
+			memcpy(&data[pos], &cipher_suites[i].CipherSuite,
 				2);
 			pos += 2;
 		}
@@ -974,13 +976,13 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		z = _gnutls_supported_compression_methods
 		    (state, &compression_methods);
 
-		memmove(&data[pos++], &z, 1);	/* put the number of compression methods */
+		memcpy(&data[pos++], &z, 1);	/* put the number of compression methods */
 
 		datalen += z;
 		data = gnutls_realloc(data, datalen);
 
 		for (i = 0; i < z; i++) {
-			memmove(&data[pos++], &compression_methods[i], 1);
+			memcpy(&data[pos++], &compression_methods[i], 1);
 		}
 
 		gnutls_free(compression_methods);
@@ -1000,6 +1002,8 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 
 
 	} else {		/* SERVER */
+		uint8 comp;
+		
 		datalen = 2 + session_id_len + 1 + 32;
 		data = gnutls_malloc(datalen);
 
@@ -1010,27 +1014,28 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state, opaque * SessionID,
 		    _gnutls_version_get_minor(state->connection_state.
 					      version);
 
-		memmove(&data[pos],
+		memcpy(&data[pos],
 			state->security_parameters.server_random, 32);
 		pos += 32;
 
-		memmove(&data[pos++], &session_id_len, sizeof(uint8));
+		memcpy(&data[pos++], &session_id_len, sizeof(uint8));
 		if (session_id_len > 0) {
-			memmove(&data[pos], SessionID, session_id_len);
+			memcpy(&data[pos], SessionID, session_id_len);
 		}
 		pos += session_id_len;
 
 		datalen += 2;
 		data = gnutls_realloc(data, datalen);
-		memmove(&data[pos],
+		memcpy(&data[pos],
 			&state->gnutls_internals.
 			current_cipher_suite.CipherSuite, 2);
 		pos += 2;
 
 		datalen += 1;
 		data = gnutls_realloc(data, datalen);
-		memmove(&data[pos++],
-			&state->gnutls_internals.compression_method, 1);
+		
+		comp = (uint8) _gnutls_compression_get_num(state->gnutls_internals.compression_method);
+		memcpy(&data[pos++], &comp, 1);
 
 		extdatalen = _gnutls_gen_extensions(state, &extdata);
 		if (extdatalen > 0) {
@@ -1108,7 +1113,7 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data,
 		}
 		certificate_list = gnutls_malloc(sizeOfCert);
 
-		memmove(certificate_list, &data[pos], sizeOfCert);
+		memcpy(certificate_list, &data[pos], sizeOfCert);
 
 		/* Verify certificates !!! */
 
@@ -1501,7 +1506,7 @@ int _gnutls_generate_session_id(char *session_id, uint8 * len)
 	char *rand;
 	rand = _gnutls_get_random(32, GNUTLS_WEAK_RANDOM);
 
-	memmove(session_id, rand, 32);
+	memcpy(session_id, rand, 32);
 	_gnutls_free_rand(rand);
 	*len = 32;
 

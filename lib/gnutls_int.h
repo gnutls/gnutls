@@ -28,8 +28,9 @@
 #define BUFFERS_DEBUG
 #define HANDSHAKE_DEBUG
 #define HARD_DEBUG
-#define DEBUG
 */
+#define DEBUG
+
 
 #define MAX32 4294967295
 #define MAX24 16777215
@@ -113,18 +114,16 @@ typedef struct {
 
 /* STATE */
 enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT };
-enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER, GNUTLS_ARCFOUR=1, GNUTLS_3DES = 4, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 };
+enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 };
 enum Extensions { GNUTLS_EXTENSION_SRP=7 };
-enum KXAlgorithm { GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP };
-enum KeyExchangeAlgorithm { GNUTLS_RSA, GNUTLS_DIFFIE_HELLMAN };
+enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP };
 enum CipherType { CIPHER_STREAM, CIPHER_BLOCK };
-enum MACAlgorithm { GNUTLS_NULL_MAC, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
-enum CompressionMethod { GNUTLS_NULL_COMPRESSION, GNUTLS_ZLIB=224 };
+enum MACAlgorithm { GNUTLS_NULL_MAC=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA };
+enum CompressionMethod { GNUTLS_NULL_COMPRESSION=1, GNUTLS_ZLIB };
 
 enum ValidSession { VALID_TRUE, VALID_FALSE };
 enum ResumableSession { RESUME_TRUE, RESUME_FALSE };
 
-typedef enum KeyExchangeAlgorithm KeyExchangeAlgorithm;
 typedef enum KXAlgorithm KXAlgorithm;
 typedef enum ValidSession ValidSession;
 typedef enum ResumableSession ResumableSession;

@@ -80,13 +80,13 @@ int main()
 	gnutls_init(&state, GNUTLS_CLIENT);
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, 3, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL);
-	gnutls_set_compression_priority( state, 2, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION);
-	gnutls_set_kx_priority( state, 2, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL, 0);
+	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0);
 	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL);
 	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
 
-	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
+	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 	ret = gnutls_handshake(sd, state);
 
 	if (ret < 0) {
@@ -125,13 +125,13 @@ int main()
 	
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, 4, GNUTLS_3DES, GNUTLS_TWOFISH , GNUTLS_RIJNDAEL, GNUTLS_ARCFOUR);
-	gnutls_set_compression_priority( state, 1, GNUTLS_NULL_COMPRESSION);
-	gnutls_set_kx_priority( state, 2, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_TWOFISH , GNUTLS_RIJNDAEL, GNUTLS_ARCFOUR, 0);
+	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_ANON_DH, 0);
 	gnutls_set_kx_cred( state, GNUTLS_KX_ANON_DH, NULL);
 	gnutls_set_kx_cred( state, GNUTLS_KX_SRP, &cred);
 
-	gnutls_set_mac_priority( state, 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
+	gnutls_set_mac_priority( state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
 #ifdef RESUME
 	gnutls_set_current_session( state, session, session_size);

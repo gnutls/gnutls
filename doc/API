@@ -89,10 +89,10 @@ int gnutls_check_pending(GNUTLS_STATE state);
 	Notice that you may use select to check for data in
 	the TCP connection, instead of this function.
 
-void gnutls_set_cipher_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_cipher_priority( GNUTLS_STATE state, ...);
 	Sets the priority on the ciphers supported by gnutls. The num
-	is the number of the ciphers specified. After num you should
-	specify the ciphers you want.
+	is the number of the ciphers specified. After specifying 
+	the ciphers you want, you should add 0.
 	Note that the priority is set on the client. The server does
 	not use that except for disabling algorithms that were not
 	specified.
@@ -120,13 +120,13 @@ void* gnutls_get_auth_info( GNUTLS_STATE state);
 	 (you should not free that). Thus you can access the 
          username he used to connect.
 
-void gnutls_set_kx_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_kx_priority( GNUTLS_STATE state, ...);
 	like gnutls_set_cipher_priority, but for key exchange methods.
 
-void gnutls_set_mac_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_mac_priority( GNUTLS_STATE state, ...);
 	like gnutls_set_cipher_priority, but for mac algorithms.
 
-void gnutls_set_compression_priority( GNUTLS_STATE state, int num, ...);
+void gnutls_set_compression_priority( GNUTLS_STATE state, ...);
 	like gnutls_set_cipher_priority, but for compression algorithms.
 
 void gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version); 

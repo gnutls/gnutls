@@ -38,10 +38,10 @@
 
 typedef struct {
 	char *name;
-	GNUTLS_Version id; /* gnutls internal version number */
-	int major; /* defined by the protocol */
-	int minor; /* defined by the protocol */
-	int supported;	/* 0 not supported, > 0 is supported */
+	GNUTLS_Version id;	/* gnutls internal version number */
+	int major;		/* defined by the protocol */
+	int minor;		/* defined by the protocol */
+	int supported;		/* 0 not supported, > 0 is supported */
 } gnutls_version_entry;
 
 static gnutls_version_entry sup_versions[] = {
@@ -115,19 +115,20 @@ static gnutls_hash_entry hash_algorithms[] = {
 
 
 /* Compression Section */
-#define GNUTLS_COMPRESSION_ENTRY(name) \
-	{ #name, name }
+#define GNUTLS_COMPRESSION_ENTRY(name, id) \
+	{ #name, name, id }
 
 struct gnutls_compression_entry {
 	char *name;
 	CompressionMethod id;
+	int num; /* the number reserved in TLS for the specific compression method */
 };
 
 typedef struct gnutls_compression_entry gnutls_compression_entry;
 static gnutls_compression_entry compression_algorithms[] = {
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_NULL_COMPRESSION),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_NULL_COMPRESSION, 0),
 #ifdef HAVE_LIBZ
-	GNUTLS_COMPRESSION_ENTRY(GNUTLS_ZLIB),
+	GNUTLS_COMPRESSION_ENTRY(GNUTLS_ZLIB, 224),
 #endif
 	{0}
 };
@@ -137,6 +138,8 @@ static gnutls_compression_entry compression_algorithms[] = {
                 for(p = compression_algorithms; p->name != NULL; p++) { b ; }
 #define GNUTLS_COMPRESSION_ALG_LOOP(a) \
                         GNUTLS_COMPRESSION_LOOP( if(p->id == algorithm) { a; break; } )
+#define GNUTLS_COMPRESSION_ALG_LOOP_NUM(a) \
+                        GNUTLS_COMPRESSION_LOOP( if(p->num == num) { a; break; } )
 
 
 /* Key Exchange Section */
@@ -155,13 +158,15 @@ struct gnutls_kx_algo_entry {
 typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 
 static gnutls_kx_algo_entry kx_algorithms[] = {
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 0, 0, 1, &anon_auth_struct),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA,     1, 1, 1, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 0, &dhe_dss_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_ANON_DH, 0, 0, 0, 1,
+			     &anon_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_RSA, 1, 1, 1, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_DSS, 1, 1, 0, 0,
+			     &dhe_dss_auth_struct),
 	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DHE_RSA, 1, 1, 0, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS,  1, 1, 0, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA,  1, 1, 0, 0, NULL),
-	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP,     0, 0, 0, 0, &srp_auth_struct),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_DSS, 1, 1, 0, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_DH_RSA, 1, 1, 0, 0, NULL),
+	GNUTLS_KX_ALGO_ENTRY(GNUTLS_KX_SRP, 0, 0, 0, 0, &srp_auth_struct),
 	{0}
 };
 
@@ -352,7 +357,8 @@ inline int _gnutls_mac_priority(GNUTLS_STATE state, MACAlgorithm algorithm)
 	     i++) {
 		if (state->gnutls_internals.
 		    MACAlgorithmPriority.algorithm_priority[i] ==
-		    algorithm) return i;
+		    algorithm)
+			return i;
 	}
 	return -1;
 }
@@ -412,7 +418,8 @@ inline
 	     i++) {
 		if (state->gnutls_internals.
 		    CompressionMethodPriority.algorithm_priority[i] ==
-		    algorithm) return i;
+		    algorithm)
+			return i;
 	}
 	return -1;
 }
@@ -437,6 +444,30 @@ char *_gnutls_compression_get_name(CompressionMethod algorithm)
 			pointerTo_ = strchr(ret, '_');
 		}
 	}
+	return ret;
+}
+
+/* return the tls number of the specified algorithm */
+int _gnutls_compression_get_num(CompressionMethod algorithm)
+{
+	int ret = -1;
+
+	/* avoid prefix */
+	GNUTLS_COMPRESSION_ALG_LOOP(ret = p->num);
+
+	return ret;
+}
+
+/* returns the gnutls internal ID of the TLS compression
+ * method num
+ */
+CompressionMethod _gnutls_compression_get_id(int num)
+{
+	CompressionMethod ret = -1;
+
+	/* avoid prefix */
+	GNUTLS_COMPRESSION_ALG_LOOP_NUM(ret = p->id);
+
 	return ret;
 }
 
@@ -484,7 +515,8 @@ _gnutls_cipher_priority(GNUTLS_STATE state, BulkCipherAlgorithm algorithm)
 	     BulkCipherAlgorithmPriority.algorithms; i++) {
 		if (state->gnutls_internals.
 		    BulkCipherAlgorithmPriority.algorithm_priority[i] ==
-		    algorithm) return i;
+		    algorithm)
+			return i;
 	}
 	return -1;
 }
@@ -568,9 +600,9 @@ int _gnutls_kx_server_certificate(KXAlgorithm algorithm)
 
 }
 
-MOD_AUTH_STRUCT * _gnutls_kx_auth_struct(KXAlgorithm algorithm)
+MOD_AUTH_STRUCT *_gnutls_kx_auth_struct(KXAlgorithm algorithm)
 {
-	MOD_AUTH_STRUCT * ret = NULL;
+	MOD_AUTH_STRUCT *ret = NULL;
 	GNUTLS_KX_ALG_LOOP(ret = p->auth_struct);
 	return ret;
 
@@ -592,13 +624,15 @@ inline int _gnutls_kx_priority(GNUTLS_STATE state, KXAlgorithm algorithm)
 int _gnutls_kx_server_key_exchange(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
-	void* ret2=NULL;
-	
+	void *ret2 = NULL;
+
 	/* if the auth algorithm does not have a null value 
 	 * for the kx2 generation then it supports it!
 	 */
-	GNUTLS_KX_ALG_LOOP(ret2 = p->auth_struct->gnutls_generate_server_kx);
-	if (ret2!=NULL) ret = 1;
+	GNUTLS_KX_ALG_LOOP(ret2 =
+			   p->auth_struct->gnutls_generate_server_kx);
+	if (ret2 != NULL)
+		ret = 1;
 
 	return ret;
 
@@ -607,14 +641,16 @@ int _gnutls_kx_server_key_exchange(KXAlgorithm algorithm)
 int _gnutls_kx_server_key_exchange2(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
-	void* ret2=NULL;
-	
+	void *ret2 = NULL;
+
 	/* if the auth algorithm does not have a null value 
 	 * for the kx2 generation then it supports it!
 	 */
-	GNUTLS_KX_ALG_LOOP(ret2 = p->auth_struct->gnutls_generate_server_kx2);
-	if (ret2!=NULL) ret = 1;
-	
+	GNUTLS_KX_ALG_LOOP(ret2 =
+			   p->auth_struct->gnutls_generate_server_kx2);
+	if (ret2 != NULL)
+		ret = 1;
+
 	return ret;
 
 }
@@ -622,27 +658,32 @@ int _gnutls_kx_server_key_exchange2(KXAlgorithm algorithm)
 int _gnutls_kx_client_key_exchange0(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
-	void* ret2=NULL;
-	
+	void *ret2 = NULL;
+
 	/* if the auth algorithm does not have a null value 
 	 * for the kx0 generation then it supports it!
 	 */
-	GNUTLS_KX_ALG_LOOP(ret2 = p->auth_struct->gnutls_process_client_kx0);
-	if (ret2!=NULL) ret = 1;
-	
+	GNUTLS_KX_ALG_LOOP(ret2 =
+			   p->auth_struct->gnutls_process_client_kx0);
+	if (ret2 != NULL)
+		ret = 1;
+
 	return ret;
 
 }
+
 int _gnutls_kx_client_key_exchange(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
-	void* ret2=NULL;
-	
+	void *ret2 = NULL;
+
 	/* if the auth algorithm does not have a null value 
 	 * for the kx0 generation then it supports it!
 	 */
-	GNUTLS_KX_ALG_LOOP(ret2 = p->auth_struct->gnutls_process_client_kx);
-	if (ret2!=NULL) ret = 1;
+	GNUTLS_KX_ALG_LOOP(ret2 =
+			   p->auth_struct->gnutls_process_client_kx);
+	if (ret2 != NULL)
+		ret = 1;
 	return ret;
 
 }
@@ -651,14 +692,17 @@ int _gnutls_kx_client_key_exchange(KXAlgorithm algorithm)
 int _gnutls_kx_client_cert_vrfy(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
-	void* ret2=NULL;
-	
+	void *ret2 = NULL;
+
 	/* if the auth algorithm does not have a null value 
 	 * for the cert_vrfy function then it supports it!
 	 */
-	GNUTLS_KX_ALG_LOOP(ret2 = p->auth_struct->gnutls_generate_client_cert_vrfy);
-	if (ret2!=NULL) ret = 1;
-	
+	GNUTLS_KX_ALG_LOOP(ret2 =
+			   p->auth_struct->
+			   gnutls_generate_client_cert_vrfy);
+	if (ret2 != NULL)
+		ret = 1;
+
 	return ret;
 
 }
@@ -666,14 +710,17 @@ int _gnutls_kx_client_cert_vrfy(KXAlgorithm algorithm)
 int _gnutls_kx_server_cert_vrfy(KXAlgorithm algorithm)
 {
 	size_t ret = 0;
-	void* ret2=NULL;
-	
+	void *ret2 = NULL;
+
 	/* if the auth algorithm does not have a null value 
 	 * for the cert_vrfy function then it supports it!
 	 */
-	GNUTLS_KX_ALG_LOOP(ret2 = p->auth_struct->gnutls_generate_server_cert_vrfy);
-	if (ret2!=NULL) ret = 1;
-	
+	GNUTLS_KX_ALG_LOOP(ret2 =
+			   p->auth_struct->
+			   gnutls_generate_server_cert_vrfy);
+	if (ret2 != NULL)
+		ret = 1;
+
 	return ret;
 
 }
@@ -745,22 +792,26 @@ int _gnutls_kx_is_ok(KXAlgorithm algorithm)
 	return ret;
 }
 
-int _gnutls_version_get_minor( GNUTLS_Version version) {
-int ret = -1;
+int _gnutls_version_get_minor(GNUTLS_Version version)
+{
+	int ret = -1;
 
 	GNUTLS_VERSION_ALG_LOOP(ret = p->minor);
 	return ret;
 }
 
-GNUTLS_Version _gnutls_version_get( int major, int minor) {
-int ret = -1;
+GNUTLS_Version _gnutls_version_get(int major, int minor)
+{
+	int ret = -1;
 
-	GNUTLS_VERSION_LOOP(if ((p->major == major) && (p->minor==minor)) ret = p->id);
+	GNUTLS_VERSION_LOOP(if ((p->major == major) && (p->minor == minor))
+			    ret = p->id);
 	return ret;
 }
 
-int _gnutls_version_get_major( GNUTLS_Version version) {
-int ret = -1;
+int _gnutls_version_get_major(GNUTLS_Version version)
+{
+	int ret = -1;
 
 	GNUTLS_VERSION_ALG_LOOP(ret = p->major);
 	return ret;
@@ -859,7 +910,8 @@ int _gnutls_cipher_suite_count()
 
 	for (j = 0; j < MAX_CIPHERSUITE; j++) {
 		suite.CipherSuite[0] = j;
-		if (j!=0x00 && j!=0xFF) continue;
+		if (j != 0x00 && j != 0xFF)
+			continue;
 
 		for (i = 0; i < MAX_CIPHERSUITE; i++) {
 			suite.CipherSuite[1] = i;
@@ -877,10 +929,10 @@ int _gnutls_cipher_suite_count()
 
 #define MAX_ELEM_SIZE 4
 inline
-    static int _gnutls_partition(GNUTLS_STATE state, void *_base, size_t nmemb,
-			 size_t size, int (*compar) (GNUTLS_STATE,
-						     const void *,
-						     const void *))
+    static int _gnutls_partition(GNUTLS_STATE state, void *_base,
+				 size_t nmemb, size_t size,
+				 int (*compar) (GNUTLS_STATE, const void *,
+						const void *))
 {
 	uint8 *base = _base;
 	uint8 tmp[MAX_ELEM_SIZE];
@@ -935,7 +987,8 @@ _gnutls_qsort(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
 		return;
 	pivot = _gnutls_partition(state, _base, nmemb, size, compar);
 
-	_gnutls_qsort(state, base, pivot<nmemb ? pivot+1 : pivot, size, compar);
+	_gnutls_qsort(state, base, pivot < nmemb ? pivot + 1 : pivot, size,
+		      compar);
 	_gnutls_qsort(state, &base[(pivot + 1) * size], nmemb - pivot - 1,
 		      size, compar);
 }
@@ -944,25 +997,29 @@ _gnutls_qsort(GNUTLS_STATE state, void *_base, size_t nmemb, size_t size,
 /* a compare function for KX algorithms (using priorities). For use with qsort */
 static int
 _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
-			const void *i_A2)
+		     const void *i_A2)
 {
 	KXAlgorithm kA1 =
 	    _gnutls_cipher_suite_get_kx_algo(*(GNUTLS_CipherSuite *) i_A1);
 	KXAlgorithm kA2 =
 	    _gnutls_cipher_suite_get_kx_algo(*(GNUTLS_CipherSuite *) i_A2);
 	BulkCipherAlgorithm cA1 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *) i_A1);
+	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
+						 i_A1);
 	BulkCipherAlgorithm cA2 =
-	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *) i_A2);
+	    _gnutls_cipher_suite_get_cipher_algo(*(GNUTLS_CipherSuite *)
+						 i_A2);
 	MACAlgorithm mA1 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *) i_A1);
+	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
+					      i_A1);
 	MACAlgorithm mA2 =
-	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *) i_A2);
+	    _gnutls_cipher_suite_get_mac_algo(*(GNUTLS_CipherSuite *)
+					      i_A2);
 
-	int p1 = (_gnutls_kx_priority(state, kA1)+1)*100;
-	int p2 = (_gnutls_kx_priority(state, kA2)+1)*100;
-	p1 += (_gnutls_cipher_priority(state, cA1)+1)*10;
-	p2 += (_gnutls_cipher_priority(state, cA2)+1)*10;
+	int p1 = (_gnutls_kx_priority(state, kA1) + 1) * 100;
+	int p2 = (_gnutls_kx_priority(state, kA2) + 1) * 100;
+	p1 += (_gnutls_cipher_priority(state, cA1) + 1) * 10;
+	p2 += (_gnutls_cipher_priority(state, cA2) + 1) * 10;
 	p1 += _gnutls_mac_priority(state, mA1);
 	p2 += _gnutls_mac_priority(state, mA2);
 
@@ -977,10 +1034,10 @@ _gnutls_compare_algo(GNUTLS_STATE state, const void *i_A1,
 }
 
 #if 0
-static void 
+static void
 _gnutls_bsort(GNUTLS_STATE state, void *_base, size_t nmemb,
-		  size_t size, int (*compar) (GNUTLS_STATE, const void *,
-					      const void *))
+	      size_t size, int (*compar) (GNUTLS_STATE, const void *,
+					  const void *))
 {
 	int i, j;
 	int full = nmemb * size;
@@ -1041,15 +1098,18 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 		if (_gnutls_mac_priority
 		    (state,
 		     _gnutls_cipher_suite_get_mac_algo(tmp_ciphers[i])) <
-		    0) continue;
+		    0)
+			continue;
 		if (_gnutls_cipher_priority
 		    (state,
 		     _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i]))
 		    < 0)
 			continue;
 
-		(*ciphers)[j].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
-		(*ciphers)[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
+		(*ciphers)[j].CipherSuite[0] =
+		    tmp_ciphers[i].CipherSuite[0];
+		(*ciphers)[j].CipherSuite[1] =
+		    tmp_ciphers[i].CipherSuite[1];
 		j++;
 	}
 
@@ -1111,15 +1171,18 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 		if (_gnutls_mac_priority
 		    (state,
 		     _gnutls_cipher_suite_get_mac_algo(tmp_ciphers[i])) <
-		    0) continue;
+		    0)
+			continue;
 		if (_gnutls_cipher_priority
 		    (state,
 		     _gnutls_cipher_suite_get_cipher_algo(tmp_ciphers[i]))
 		    < 0)
 			continue;
 
-		(*ciphers)[j].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
-		(*ciphers)[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
+		(*ciphers)[j].CipherSuite[0] =
+		    tmp_ciphers[i].CipherSuite[0];
+		(*ciphers)[j].CipherSuite[1] =
+		    tmp_ciphers[i].CipherSuite[1];
 		j++;
 	}
 
@@ -1142,20 +1205,29 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 
 
 /* For compression  */
+
+/* returns the TLS numbers of the compression methods we support */
 #define SUPPORTED_COMPRESSION_METHODS state->gnutls_internals.CompressionMethodPriority.algorithms
 int
-_gnutls_supported_compression_methods(GNUTLS_STATE state,
-				      uint8** comp)
+_gnutls_supported_compression_methods(GNUTLS_STATE state, uint8 ** comp)
 {
-	int i;
-	
+	int i, tmp;
+
 	*comp = gnutls_malloc(SUPPORTED_COMPRESSION_METHODS);
-	if (*comp==NULL) return GNUTLS_E_MEMORY_ERROR;
+	if (*comp == NULL)
+		return GNUTLS_E_MEMORY_ERROR;
 
 	for (i = 0; i < SUPPORTED_COMPRESSION_METHODS; i++) {
-		(*comp)[i] = (uint8)
-		    state->gnutls_internals.
-		    CompressionMethodPriority.algorithm_priority[i];
+		tmp = _gnutls_compression_get_num(state->gnutls_internals.
+						  CompressionMethodPriority.
+						  algorithm_priority[i]);
+		if (tmp == -1) {
+			gnutls_assert();
+			/* we shouldn't get here */
+			(*comp)[i] = 0;
+			continue;
+		}
+		(*comp)[i] = (uint8) tmp;
 	}
 
 	return SUPPORTED_COMPRESSION_METHODS;

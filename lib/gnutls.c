@@ -133,10 +133,10 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.CompressionMethodPriority.algorithms=0;
 
 	/* Set default priorities */
-	gnutls_set_cipher_priority( (*state), 2, GNUTLS_RIJNDAEL, GNUTLS_3DES);
-	gnutls_set_compression_priority( (*state), 1, GNUTLS_NULL_COMPRESSION);
-	gnutls_set_kx_priority( (*state), 1, GNUTLS_KX_ANON_DH);
-	gnutls_set_mac_priority( (*state), 2, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5);
+	gnutls_set_cipher_priority( (*state), GNUTLS_RIJNDAEL, GNUTLS_3DES, 0);
+	gnutls_set_compression_priority( (*state), GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_set_kx_priority( (*state), GNUTLS_KX_ANON_DH, 0);
+	gnutls_set_mac_priority( (*state), GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
 
 	(*state)->security_parameters.session_id_size = 0;
 	(*state)->gnutls_internals.resumed_security_parameters.session_id_size = 0;

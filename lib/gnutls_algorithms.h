@@ -83,4 +83,6 @@ int _gnutls_kx_count();
 int _gnutls_compression_priority(GNUTLS_STATE state, CompressionMethod algorithm);
 int _gnutls_compression_is_ok(CompressionMethod algorithm);
 int _gnutls_compression_count();
+int _gnutls_compression_get_num(CompressionMethod algorithm);
+CompressionMethod _gnutls_compression_get_id(int num);
 char *_gnutls_compression_get_name(CompressionMethod algorithm);
