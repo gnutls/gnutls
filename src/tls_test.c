@@ -198,7 +198,7 @@ int main(int argc, char **argv)
 
 		CONNECT();
 		gnutls_init(&state, GNUTLS_CLIENT);
-		gnutls_transport_set_ptr(state, sd);
+		gnutls_transport_set_ptr(state, (gnutls_transport_ptr)sd);
 
 		printf("Checking %s...", tls_tests[i].test_name);
 

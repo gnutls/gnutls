@@ -134,7 +134,7 @@ typedef struct _SSL
 
 typedef struct
 {
-    GCRY_MD_HD handle;
+    gcry_md_hd_t handle;
 } MD_CTX;
 
 struct RSA;

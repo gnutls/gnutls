@@ -68,9 +68,7 @@ int err;
 		ret->handle = gnutls_malloc( sizeof( z_stream));
 		if (ret->handle==NULL) {
 			gnutls_assert();
-			cleanup_ret:
-			gnutls_free(ret);
-			return NULL;
+			goto cleanup_ret;
 		}
 		
 		zhandle = ret->handle;
@@ -102,7 +100,9 @@ int err;
   		  
  		   if (ret->handle==NULL) {
 			gnutls_assert();
-			goto cleanup_ret;
+			cleanup_ret:
+			gnutls_free(ret);
+			return NULL;
 		   }
 		}
 		
