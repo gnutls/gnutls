@@ -1345,7 +1345,7 @@ _gnutls_openpgp_request_key( gnutls_datum* ret,
     return GNUTLS_E_HASH_FAILED; /* only MD5 and SHA1 are supported */
   
   rc = gnutls_openpgp_get_key(ret, &cred->keyring, KEY_ATTR_FPR, key_fpr);
-  if (rc)
+  if (rc >= 0)
     goto leave;
 
   keyid = buffer_to_u32(key_fpr+16);
