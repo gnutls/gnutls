@@ -2,19 +2,33 @@
 \par
 The following authentication schemas are supported in \gnutls:
 \begin{enumerate}
- \item X509 Public Key Infrastructure
+ \item X.509 Public Key Infrastructure
+ \item OpenPGP Public Key Infrastructure
  \item Anonymous authentication
  \item SRP authentication
 \end{enumerate}
 
 \subsection{Authentication using X.509 certificates}
-If using this kind of authentication then the key exchange methods
-shown in \hyperref{figure}{figure }{}{fig:x509} are
-available to use. Authentication in this method is performed using signed
-certificates by a trusted Certificate Authority (CA). Note that \gnutls is
-not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit. See 
+The X.509 protocols rely on a hierarchical trust model. In this trust model
+Certification Authorities (CAs) are used to certify entities.
+Usually more than one certification authorities exist, and certification
+authorities may certify other authorities to issue certificates as well,
+following a hierachical model. 
+One needs to trust one or more CAs for his secure
+communications. In that case only the certificates issued by the trusted
+authorities are acceptable. 
+\par
+X.509 certificates contain the public parameters, 
+of a public key algorithm, and the authority's signature, which proves the
+authenticity of the parameters.
+\par
+The key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
+available in X.509 authentication. 
+
+\par
+Note that \gnutls{} is not a generic purpose X.509 toolkit\footnote{Aegypten is such a toolkit. See 
 \htmladdnormallink{http://www.gnupg.org/aegypten/}{http://www.gnupg.org/aegypten/}}. 
-It does only include the required,
+\gnutls{} only includes the required,
 in order to use the TLS ciphersuites which require X.509 certificates.
 
 \begin{figure}[hbtp]
@@ -26,7 +40,10 @@ The certificate must allow the key to be used for encryption.
 \hline
 DHE\_RSA & The RSA algorithm is used to sign Ephemeral Diffie Hellman
 parameters which are send to the peer. The key in the certificate must allow
-the key to be used for signing 
+the key to be used for signing. Note that key exchange algorithms which use
+Ephemeral Diffie Hellman parameters, offer perfect forward secrecy, which
+means that even if the secret key is revealed the contents of this connection
+will not be available.
 \\
 \hline
 DHE\_DSS & The DSS\footnote{DSS stands for Digital Signature Standard} algorithm is used to sign Ephemeral Diffie Hellman
@@ -35,10 +52,23 @@ parameters which are send to the peer. Currently \gnutls does not support this c
 \hline
 \end{tabular}
 
-\caption{Supported X.509 key exchange algorithms}
-\label{fig:x509}
+\caption{Key exchange algorithms for OpenPGP and X.509 certificates.}
+\label{fig:cert}
 
 \end{figure}
+
+\subsection{Authentication using OpenPGP keys}
+OpenPGP authentication relies on a distributed trust model, called the "web
+of trust". The "web of trust" uses a decentralized system of trusted
+introducers, which are the same as a CA. OpenPGP allows anyone to sign
+anyone's else public key. When Alice signs Bob's key, she is introducing 
+Bob's key to anyone who trusts Alice. If someone trusts Alice to introduce
+keys, then Alice is a trusted introducer in the mind of that observer.
+\par
+
+The key exchange methods shown in \hyperref{figure}{figure }{}{fig:cert} are
+available in OpenPGP authentication. 
+
 
 \subsection{Anonymous authentication}
 The anonymous key exchanges perform encryption but there is no indication of the 
