@@ -293,10 +293,10 @@ opaque str[MAX_PARAMETER_SIZE];
 int len = sizeof(str);
 int tot_len = 0;
 
-	if (asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", 
-		&sig, "sig")!=ASN_OK) {
+	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", 
+		&sig, "sig"))!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	if ( _gnutls_mpi_print_lz( str, &len, r) < 0) {
@@ -311,7 +311,7 @@ int tot_len = 0;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	len = sizeof(str) - 1;
@@ -327,7 +327,7 @@ int tot_len = 0;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	sig_value->size = tot_len + 100;
@@ -341,7 +341,7 @@ int tot_len = 0;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	asn1_delete_structure(sig);
@@ -400,16 +400,16 @@ int result;
 opaque str[MAX_PARAMETER_SIZE];
 
 
-	if (asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", &sig, "sig")!=ASN_OK) {
+	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", &sig, "sig"))!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der( sig, sig_value->data, sig_value->size);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(sig);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	
 	result =

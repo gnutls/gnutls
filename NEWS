@@ -1,3 +1,7 @@
+Version ?.?.?
+- Updated documentation
+- Combined error codes of ASN.1 parser and gnutls
+
 Version 0.3.91 (3/03/2002)
 - Added gnutls-cli-debug program
 - Corrections in session resumption

@@ -29,7 +29,8 @@
 
 %{ 
 #include <gnutls_int.h>
-#include "x509_asn1.h"
+#include <x509_asn1.h>
+#include <gnutls_errors.h>
 
 FILE *file_asn1;         /* Pointer to file to parse */
 extern int parse_mode;   /* PARSE_MODE_CHECK  = only syntax check

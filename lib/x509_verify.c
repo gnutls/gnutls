@@ -95,7 +95,7 @@ time_t _gnutls_generalTime2gtime(char *ttime)
 		gnutls_assert();
 		/* sorry we don't support it yet
 		 */
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 	xx[4] = 0;
 
@@ -146,6 +146,9 @@ time_t _gnutls_generalTime2gtime(char *ttime)
 static int check_if_expired(gnutls_cert * cert)
 {
 	CertificateStatus ret = GNUTLS_CERT_EXPIRED;
+	
+	if (cert->expiration_time == (time_t)(-1))
+		return GNUTLS_CERT_INVALID;
 
 	/* get the issuer of 'cert'
 	 */
@@ -203,9 +206,9 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 
 	/* get the issuer of 'cert'
 	 */
-	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2") != ASN_OK) {
+	if ((result=asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2")) != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 	
 	result = asn1_get_der(c2, cert->raw.data, cert->raw.size);
@@ -213,17 +216,17 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	
 
 
 	/* get the 'subject' info of 'issuer_cert'
 	 */
-	if (asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c3, "certificate2") != ASN_OK) {
+	if ((result=asn1_create_structure(_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c3, "certificate2")) != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 	
 	result = asn1_get_der(c3, issuer_cert->raw.data, issuer_cert->raw.size);
@@ -231,7 +234,7 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 		
@@ -243,7 +246,7 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	if (result!=ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure( c3);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 		
 	len1 = end1 - start1 + 1;
@@ -255,7 +258,7 @@ int compare_dn(gnutls_cert * cert, gnutls_cert * issuer_cert)
 	
 	if (result!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	
 	len2 = end2 - start2 + 1;
@@ -329,7 +332,7 @@ int gnutls_verify_certificate2(gnutls_cert * cert, gnutls_cert * trusted_cas, in
 	ret = check_if_expired( issuer);
 	if (ret != 0) {
 		gnutls_assert();
-		return ret_else | GNUTLS_CERT_EXPIRED;
+		return ret_else | ret;
 	}
 	
         ret = gnutls_x509_verify_signature(cert, issuer);
@@ -372,7 +375,7 @@ int _gnutls_x509_verify_certificate( gnutls_cert * certificate_list,
 	ret = check_if_expired( &certificate_list[0]);
 	if (ret != 0) {
 		gnutls_assert();
-		status |= GNUTLS_CERT_EXPIRED;
+		status |= ret;
 	}
 
 	/* Verify the certificate path */

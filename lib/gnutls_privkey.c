@@ -41,9 +41,9 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) 
 	
 	pkey->pk_algorithm = GNUTLS_PK_RSA;
 	
-	if (asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.RSAPrivateKey", &pkey_asn, "rsakey")!=ASN_OK) {
+	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.RSAPrivateKey", &pkey_asn, "rsakey"))!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	if ((sizeof( pkey->params)/sizeof(MPI)) < RSA_PARAMS) {
@@ -55,7 +55,7 @@ int _gnutls_PKCS1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) 
 	result = asn1_get_der( pkey_asn, raw_key.data, raw_key.size);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	if ( (result=_gnutls_x509_read_int( pkey_asn, "rsakey.modulus",
@@ -105,9 +105,9 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) {
 	
 	pkey->pk_algorithm = GNUTLS_PK_DSA;
 	
-	if (asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", &dsa_asn, "dsakey")!=ASN_OK) {
+	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DSAPrivateKey", &dsa_asn, "dsakey"))!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	if ((sizeof( pkey->params)/sizeof(MPI)) < DSA_PRIVATE_PARAMS) {
@@ -119,7 +119,7 @@ int _gnutls_DSAkey2gnutlsKey(gnutls_private_key * pkey, gnutls_datum raw_key) {
 	result = asn1_get_der( dsa_asn, raw_key.data, raw_key.size);
 	if (result != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	if ( (result=_gnutls_x509_read_int( dsa_asn, "dsakey.p",

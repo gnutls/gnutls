@@ -73,7 +73,7 @@ static int _IREAD(node_asn * rasn, char *name3, int name3_size, char *rstr, char
 		     asn1_create_structure(_gnutls_get_pkix(), str,
 					   &tmpasn, name2)) != ASN_OK) {
 			gnutls_assert();
-			return GNUTLS_E_ASN1_ERROR;
+			return result;
 		}
 
 		len = sizeof(str) -1;
@@ -165,7 +165,7 @@ int _gnutls_x509_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 			break;
 		if (result != ASN_VALUE_NOT_FOUND) {
 			gnutls_assert();
-			return GNUTLS_E_ASN1_PARSING_ERROR;
+			return result;
 		}
 
 		k2 = 0;
@@ -184,7 +184,7 @@ int _gnutls_x509_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 				break;
 			if (result != ASN_VALUE_NOT_FOUND) {
 				gnutls_assert();
-				return GNUTLS_E_ASN1_PARSING_ERROR;
+				return result;
 			}
 
 			_gnutls_str_cpy(name3, sizeof(name3), name2);
@@ -197,7 +197,7 @@ int _gnutls_x509_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 				break;
 			else if (result != ASN_OK) {
 				gnutls_assert();
-				return GNUTLS_E_ASN1_PARSING_ERROR;
+				return result;
 			}
 
 			_gnutls_str_cpy(name3, sizeof(name3), name2);
@@ -238,7 +238,7 @@ int _gnutls_x509_get_name_type(node_asn * rasn, char *root, gnutls_DN * dn)
 	if (result == ASN_ELEMENT_NOT_FOUND)
 		return 0;
 	else
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 }
 
 
@@ -307,7 +307,7 @@ int _gnutls_x509_get_version(node_asn * c2, char *root)
 	len = sizeof(gversion) - 1;
 	if ((result = asn1_read_value(c2, name, gversion, &len)) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	return (int) gversion[0] + 1;
 }
@@ -336,7 +336,7 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 				   "PKIX1Implicit88.Name", &dn,
 				   "dn")) != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(dn, idn->data, idn->size);
@@ -344,7 +344,7 @@ int gnutls_x509_extract_dn(const gnutls_datum * idn, gnutls_x509_dn * rdn)
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(dn);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	result = _gnutls_x509_get_name_type(dn, "dn", rdn);
@@ -383,7 +383,7 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 
@@ -395,7 +395,7 @@ int gnutls_x509_extract_certificate_dn(const gnutls_datum * cert,
 
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	if ((result =
 	     _gnutls_x509_get_name_type(c2,
@@ -435,7 +435,7 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(c2, cert->data, cert->size);
@@ -446,7 +446,7 @@ int gnutls_x509_extract_certificate_issuer_dn(const gnutls_datum * cert,
 
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	if ((result =
 	     _gnutls_x509_get_name_type(c2,
@@ -514,12 +514,12 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	if (asn1_create_structure
-	    (_gnutls_get_pkix(), "PKIX1Implicit88.SubjectAltName", &c2, "san")
+	if ((result=asn1_create_structure
+	    (_gnutls_get_pkix(), "PKIX1Implicit88.SubjectAltName", &c2, "san"))
 	    != ASN_OK) {
 		gnutls_assert();
 		gnutls_free_datum( &dnsname);
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(c2, dnsname.data, dnsname.size);
@@ -531,7 +531,7 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 		_gnutls_log("X509_auth: Decoding error %d\n", result);
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	seq++; /* 0->1, 1->2 etc */
@@ -544,7 +544,7 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 	     asn1_read_value(c2, nptr, ext_data, &len)) != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 
@@ -562,7 +562,7 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 	     asn1_read_value(c2, nptr, ret, ret_size)) != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_MEMORY_ERROR;
+		return result;
 	}
 
 	asn1_delete_structure(c2);
@@ -592,7 +592,7 @@ time_t gnutls_x509_extract_certificate_activation_time(const
 	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
-		return -1;
+		return (time_t)-1;
 	}
 
 	result = asn1_get_der(c2, cert->data, cert->size);
@@ -602,7 +602,7 @@ time_t gnutls_x509_extract_certificate_activation_time(const
 		_gnutls_log("X509_auth: Decoding error %d\n", result);
 
 		gnutls_assert();
-		return -1;
+		return (time_t)-1;
 	}
 
 	ret = _gnutls_x509_get_time(c2, "certificate2", "notBefore");
@@ -634,7 +634,7 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
 	     "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
-		return -1;
+		return (time_t)-1;
 	}
 
 	result = asn1_get_der(c2, cert->data, cert->size);
@@ -644,7 +644,7 @@ time_t gnutls_x509_extract_certificate_expiration_time(const
 		_gnutls_log("X509_auth: Decoding error %d\n", result);
 
 		gnutls_assert();
-		return -1;
+		return (time_t)-1;
 	}
 
 	ret = _gnutls_x509_get_time(c2, "certificate2", "notAfter");
@@ -667,12 +667,12 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 	node_asn *c2;
 	int result;
 
-	if (asn1_create_structure
+	if ((result=asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
-	     "certificate2")
+	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(c2, cert->data, cert->size);
@@ -682,7 +682,7 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 		_gnutls_log("X509_auth: Decoding error %d\n", result);
 
 		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	result = _gnutls_x509_get_version(c2, "certificate2");
@@ -894,12 +894,12 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
 	node_asn *c2;
 	int ret;
 
-	if (asn1_create_structure
+	if ((ret=asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
-	     "certificate2")
+	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return ret;
 	}
 
 	ret = asn1_get_der(c2, cert->data, cert->size);
@@ -909,13 +909,13 @@ int gnutls_x509_extract_certificate_serial(const gnutls_datum * cert, char* resu
 		_gnutls_log("X509_auth: Decoding error %d\n", result);
 
 		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return ret;
 	}
 
 	if ((ret = asn1_read_value(c2, "certificate2.tbsCertificate.serialNumber", result, result_size)) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_INVALID_REQUEST;
+		return ret;
 	}
 
 	asn1_delete_structure(c2);
@@ -1408,11 +1408,11 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 	int result;
 	node_asn *spk;
 
-	if (asn1_create_structure
+	if ((result=asn1_create_structure
 	    (_gnutls_get_gnutls_asn(), "GNUTLS.RSAPublicKey", &spk,
-	     "rsa_public_key") != ASN_OK) {
+	     "rsa_public_key")) != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(spk, der, dersize);
@@ -1420,7 +1420,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(spk);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 
@@ -1428,7 +1428,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 		str, sizeof(str)-1, &params[0])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(spk);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	if ( (result=_gnutls_x509_read_int( spk, "rsa_public_key.publicExponent", 
@@ -1436,7 +1436,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI * params)
 		gnutls_assert();
 		_gnutls_mpi_release(&params[0]);
 		asn1_delete_structure(spk);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	asn1_delete_structure(spk);
@@ -1456,11 +1456,11 @@ static int _read_dsa_params(opaque * der, int dersize, MPI * params)
 	int result;
 	node_asn *spk;
 
-	if (asn1_create_structure
+	if ((result=asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Dss-Parms", &spk,
-	     "dsa_parms") != ASN_OK) {
+	     "dsa_parms")) != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(spk, der, dersize);
@@ -1468,7 +1468,7 @@ static int _read_dsa_params(opaque * der, int dersize, MPI * params)
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(spk);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	/* FIXME: If the parameters are not included in the certificate
@@ -1480,7 +1480,7 @@ static int _read_dsa_params(opaque * der, int dersize, MPI * params)
 	if ( (result=_gnutls_x509_read_int( spk, "dsa_parms.p", str, sizeof(str)-1, &params[0])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(spk);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	/* Read q */
@@ -1489,7 +1489,7 @@ static int _read_dsa_params(opaque * der, int dersize, MPI * params)
 		gnutls_assert();
 		asn1_delete_structure(spk);
 		_gnutls_mpi_release(&params[0]);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	/* Read g */
@@ -1499,7 +1499,7 @@ static int _read_dsa_params(opaque * der, int dersize, MPI * params)
 		asn1_delete_structure(spk);
 		_gnutls_mpi_release(&params[0]);
 		_gnutls_mpi_release(&params[1]);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	asn1_delete_structure(spk);
@@ -1522,7 +1522,7 @@ static int _read_dsa_pubkey(opaque * der, int dersize, MPI * params)
 	    (_gnutls_get_gnutls_asn(), "GNUTLS.DSAPublicKey", &spk,
 	     "dsa_public_key")) != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(spk, der, dersize);
@@ -1530,7 +1530,7 @@ static int _read_dsa_pubkey(opaque * der, int dersize, MPI * params)
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(spk);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	/* Read p */
@@ -1538,7 +1538,7 @@ static int _read_dsa_pubkey(opaque * der, int dersize, MPI * params)
 	if ( (result=_gnutls_x509_read_int( spk, "dsa_public_key", str, sizeof(str)-1, &params[3])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(spk);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	asn1_delete_structure(spk);
@@ -1569,7 +1569,7 @@ int len, result;
 
 		if (result != ASN_OK) {
 			gnutls_assert();
-			return GNUTLS_E_ASN1_PARSING_ERROR;
+			return result;
 		}
 
 		if ((sizeof(gCert->params) / sizeof(MPI)) < RSA_PARAMS) {
@@ -1604,7 +1604,7 @@ int len, result;
 
 		if (result != ASN_OK) {
 			gnutls_assert();
-			return GNUTLS_E_ASN1_PARSING_ERROR;
+			return result;
 		}
 
 		if ((sizeof(gCert->params) / sizeof(MPI)) < DSA_PUBLIC_PARAMS) {
@@ -1629,7 +1629,7 @@ int len, result;
 
 		if (result != ASN_OK) {
 			gnutls_assert();
-			return GNUTLS_E_ASN1_PARSING_ERROR;
+			return result;
 		}
 
 		if ((result =
@@ -1682,13 +1682,13 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (asn1_create_structure
+	if ((result=asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2,
-	     "certificate2")
+	     "certificate2"))
 	    != ASN_OK) {
 		gnutls_assert();
 		gnutls_free_datum( &gCert->raw);
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(c2, derCert.data, derCert.size);
@@ -1700,7 +1700,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		gnutls_free_datum( &gCert->raw);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	len = sizeof(str) - 1;
@@ -1714,7 +1714,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		gnutls_free_datum( &gCert->raw);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	if ( (result=_gnutls_extract_x509_cert_mpi_params( str, gCert, c2, str, sizeof(str))) < 0) {
@@ -1752,18 +1752,20 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert)
 	gCert->activation_time =
 	    _gnutls_x509_get_time(c2, "certificate2", "notBefore");
 
+#if 0 
 	if (gCert->expiration_time == (time_t)(-1) ||
 		gCert->activation_time == (time_t)(-1)) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
 		return GNUTLS_E_UNIX_TIME_LIMIT_EXCEEDED;
 	}
+#endif
 
 	gCert->version = _gnutls_x509_get_version(c2, "certificate2");
 	if (gCert->version < 0) {
 		gnutls_assert();
 		asn1_delete_structure(c2);
-		return GNUTLS_E_ASN1_PARSING_ERROR;  
+		return GNUTLS_E_ASN1_GENERIC_ERROR;  
 	}	 
 
 	if ((result =

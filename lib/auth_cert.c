@@ -104,11 +104,11 @@ int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 	int len, result;
 	int start, end;
 
-	if (asn1_create_structure
+	if ((result=asn1_create_structure
 	    (_gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &dn,
-	     "dn") != ASN_OK) {
+	     "dn")) != ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der(dn, cert->raw.data, cert->raw.size);
@@ -116,7 +116,7 @@ int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(dn);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	result = asn1_get_start_end_der(dn, cert->raw.data, cert->raw.size,
@@ -127,7 +127,7 @@ int _gnutls_find_dn(gnutls_datum * odn, gnutls_cert * cert)
 		/* couldn't decode DER */
 		gnutls_assert();
 		asn1_delete_structure(dn);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	asn1_delete_structure(dn);
 

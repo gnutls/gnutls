@@ -83,16 +83,16 @@ int result;
 opaque str[1024];
 int len;
 
-	if (asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DigestInfo", &dinfo, "digest_info")!=ASN_OK) {
+	if ((result=asn1_create_structure( _gnutls_get_gnutls_asn(), "GNUTLS.DigestInfo", &dinfo, "digest_info"))!=ASN_OK) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
+		return result;
 	}
 
 	result = asn1_get_der( dinfo, info->data, info->size);
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(dinfo);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 	
 	len = sizeof(str)-1;
@@ -101,7 +101,7 @@ int len;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(dinfo);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	*hash = -1;
@@ -126,7 +126,7 @@ int len;
 	if (result != ASN_OK) {
 		gnutls_assert();
 		asn1_delete_structure(dinfo);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return result;
 	}
 
 	asn1_delete_structure(dinfo);
@@ -168,7 +168,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, MPI *p
 
 	if (digest_size != gnutls_hash_get_algo_len(hash)) {
 		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
+		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	hd = gnutls_hash_init( hash);
