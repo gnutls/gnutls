@@ -80,12 +80,15 @@ int _gnutls_srp_gx(opaque * text, size_t textsize, opaque ** result,
  * where k == SHA1(N|g)
  * Return: B and if ret_b is not NULL b.
  */
-mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g,
-			      mpi_t n, mpi_t v)
+mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g, mpi_t n, mpi_t v)
 {
     mpi_t tmpB = NULL, tmpV = NULL;
     mpi_t b = NULL, B = NULL, k = NULL;
     int bits;
+    size_t n_size = 0;
+
+    /* get the size of n in bytes */
+    _gnutls_mpi_print( NULL, &n_size, n);
 
     /* calculate:  B = (k*v + g^b) % N 
      */
@@ -117,7 +120,7 @@ mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g,
 	goto error;
     }
 
-    k = _gnutls_calc_srp_u(n, g);
+    k = _gnutls_calc_srp_u(n, g, n_size);
     if (k == NULL) {
 	gnutls_assert();
 	goto error;
@@ -150,8 +153,9 @@ mpi_t _gnutls_calc_srp_B(mpi_t * ret_b, mpi_t g,
 }
 
 /* This calculates the SHA1(A | B)
+ * A and B will be left-padded with zeros to fill n_size.
  */
-mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B)
+mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B, size_t n_size)
 {
     size_t b_size, a_size;
     opaque *holder, hd[MAX_HASH_SIZE];
@@ -163,18 +167,23 @@ mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B)
     _gnutls_mpi_print(NULL, &a_size, A);
     _gnutls_mpi_print(NULL, &b_size, B);
 
-    holder_size = a_size + b_size;
+    if (a_size > n_size || b_size > n_size) {
+    	gnutls_assert();
+    	return NULL; /* internal error */
+    }
 
-    holder = gnutls_alloca(holder_size);
+    holder_size = n_size + n_size;
+
+    holder = gnutls_calloc(1, holder_size);
     if (holder == NULL)
 	return NULL;
 
-    _gnutls_mpi_print(holder, &a_size, A);
-    _gnutls_mpi_print(&holder[a_size], &b_size, B);
+    _gnutls_mpi_print(&holder[n_size - a_size], &a_size, A);
+    _gnutls_mpi_print(&holder[n_size + n_size - b_size], &b_size, B);
 
     td = _gnutls_hash_init(GNUTLS_MAC_SHA);
     if (td == NULL) {
-	gnutls_afree(holder);
+	gnutls_free(holder);
 	gnutls_assert();
 	return NULL;
     }
@@ -185,7 +194,7 @@ mpi_t _gnutls_calc_srp_u(mpi_t A, mpi_t B)
      */
     hash_size = 20;		/* SHA */
     ret = _gnutls_mpi_scan(&res, hd, &hash_size);
-    gnutls_afree(holder);
+    gnutls_free(holder);
 
     if (ret < 0) {
 	gnutls_assert();
@@ -311,10 +320,14 @@ int _gnutls_calc_srp_x(char *username, char *password, opaque * salt,
  * this is our shared key (client premaster secret)
  */
 mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
-			       mpi_t a, mpi_t u, mpi_t n)
+    mpi_t a, mpi_t u, mpi_t n)
 {
     mpi_t S = NULL, tmp1 = NULL, tmp2 = NULL;
     mpi_t tmp4 = NULL, tmp3 = NULL, k = NULL;
+    size_t n_size = 0;
+
+    /* get the size of n in bytes */
+    _gnutls_mpi_print( NULL, &n_size, n);
 
     S = _gnutls_mpi_alloc_like(n);
     if (S == NULL)
@@ -327,7 +340,7 @@ mpi_t _gnutls_calc_srp_S2(mpi_t B, mpi_t g, mpi_t x,
 	goto freeall;
     }
 
-    k = _gnutls_calc_srp_u(n, g);
+    k = _gnutls_calc_srp_u(n, g, n_size);
     if (k == NULL) {
 	gnutls_assert();
 	goto freeall;

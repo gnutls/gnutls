@@ -1,3 +1,8 @@
+Version 1.1.12
+- Updated the SRP authentication to conform to the
+  latest (yet unreleased) draft. Unfortunately this breaks
+  compatibility with previous versions.
+
 Version 1.1.11 (16/07/2004)
 - Added the '_t' suffix to all exported symbols.
 - Fixed bug in RSA encryption, report and patch by Martijn Koster 
