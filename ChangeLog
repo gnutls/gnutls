@@ -1,3 +1,9 @@
+2004-05-22 19:37  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_int.h, gnutls_record.c:
+
+	some cleanups and better handling of EOF in record_recv.  
+
 2004-05-16 15:15  nmav <nmav@gnutls.org>
 
 	* acinclude.m4, configure.in, libtasn1.m4, ChangeLog, NEWS,
