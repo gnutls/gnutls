@@ -469,6 +469,7 @@ int _gnutls_recv_client_certificate( gnutls_session session)
 				gnutls_assert();
 				return GNUTLS_E_NO_CERTIFICATE_FOUND;
 			}
+
 			return ret;
 		}
 

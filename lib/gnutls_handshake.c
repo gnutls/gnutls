@@ -816,7 +816,8 @@ static int _gnutls_recv_handshake_header(gnutls_session session,
 					       SSL2_HEADERS);
 
 		if (ret < 0) {
-			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+			gnutls_assert();
+			return ret;
 		}
 
 		/* The case ret==0 is catched here.

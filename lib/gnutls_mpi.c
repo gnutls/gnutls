@@ -43,7 +43,7 @@ int _gnutls_mpi_scan( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nbytes 
 	int ret;
 	
 	ret = gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_USG, buffer, *nbytes, nbytes);
-	if (!ret) return ret;
+	if (ret) return GNUTLS_E_MPI_SCAN_FAILED;
 	
 	/* MPIs with 0 bits are illegal
 	 */
@@ -59,8 +59,7 @@ int _gnutls_mpi_scan_pgp( GNUTLS_MPI *ret_mpi, const opaque *buffer, size_t *nby
 {
 int ret;
 	ret = gcry_mpi_scan( ret_mpi, GCRYMPI_FMT_PGP, buffer, *nbytes, nbytes);
-
-	if (!ret) return ret;
+	if (ret) return GNUTLS_E_MPI_SCAN_FAILED;
 
 	/* MPIs with 0 bits are illegal
 	 */
@@ -77,7 +76,6 @@ int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a )
 int ret;
 
 	ret = gcry_mpi_print( GCRYMPI_FMT_USG, buffer, *nbytes, nbytes, a);
-	
 	if (!ret) return ret;
 	
 	return GNUTLS_E_MPI_PRINT_FAILED;
@@ -89,7 +87,6 @@ int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a )
 int ret;
 
 	ret = gcry_mpi_print( GCRYMPI_FMT_STD, buffer, *nbytes, nbytes, a);
-
 	if (!ret) return ret;
 	
 	return GNUTLS_E_MPI_PRINT_FAILED;
