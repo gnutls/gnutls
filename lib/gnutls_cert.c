@@ -42,6 +42,89 @@
 #include "x509/x509.h"
 #include "x509/mpi.h"
 
+/**
+  * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the keys and the certificates associated
+  * with the given credentials. This function must not be called when a
+  * TLS negotiation that uses the credentials is in progress.
+  *
+  **/
+void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
+{
+	uint i, j;
+
+	for (i = 0; i < sc->ncerts; i++) {
+		for (j = 0; j < sc->cert_list_length[i]; j++) {
+			_gnutls_free_cert( &sc->cert_list[i][j]);
+		}
+		gnutls_free( sc->cert_list[i]);
+	}
+
+	gnutls_free(sc->cert_list_length);
+	sc->cert_list_length = NULL;
+
+	gnutls_free(sc->cert_list);
+	sc->cert_list = NULL;
+
+	for (i = 0; i < sc->ncerts; i++) {
+		_gnutls_privkey_deinit( &sc->pkey[i]);
+	}
+
+	gnutls_free( sc->pkey);
+	sc->pkey = NULL;
+	
+	sc->ncerts = 0;
+
+}
+
+/**
+  * gnutls_certificate_free_cas - Used to free all the CAs from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the CAs associated
+  * with the given credentials.
+  *
+  **/
+void gnutls_certificate_free_cas(gnutls_certificate_credentials sc)
+{
+	uint j;
+
+        for (j = 0; j < sc->x509_ncas; j++) {
+		gnutls_x509_crt_deinit( sc->x509_ca_list[j]);
+        }
+        
+        sc->x509_ncas = 0;
+
+	gnutls_free( sc->x509_ca_list);
+	sc->x509_ca_list = NULL;
+
+	_gnutls_free_datum( &sc->x509_rdn_sequence);
+
+}
+
+/**
+  * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials structure
+  * @sc: is an &gnutls_certificate_credentials structure.
+  *
+  * This function will delete all the CRLs associated
+  * with the given credentials.
+  *
+  **/
+void gnutls_certificate_free_crls(gnutls_certificate_credentials sc)
+{
+	uint j;
+
+        for (j = 0; j < sc->x509_ncrls; j++) {
+		gnutls_x509_crl_deinit( sc->x509_crl_list[j]);
+        }
+        
+        sc->x509_ncrls = 0;
+
+	gnutls_free( sc->x509_crl_list);
+	sc->x509_crl_list = NULL;
+}
 
 /**
   * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials structure
@@ -57,35 +140,11 @@
   **/
 void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 {
-	uint i, j;
+	gnutls_certificate_free_keys( sc);
+	gnutls_certificate_free_cas( sc);
+	gnutls_certificate_free_crls( sc);
 
-	for (i = 0; i < sc->ncerts; i++) {
-		for (j = 0; j < sc->cert_list_length[i]; j++) {
-			_gnutls_free_cert( &sc->cert_list[i][j]);
-		}
-		gnutls_free( sc->cert_list[i]);
-	}
-
-	gnutls_free(sc->cert_list_length);
-	gnutls_free(sc->cert_list);
-
-	for (j = 0; j < sc->x509_ncas; j++) {
-		gnutls_x509_crt_deinit( sc->x509_ca_list[j]);
-	}
-
-	for (j = 0; j < sc->x509_ncrls; j++) {
-		gnutls_x509_crl_deinit( sc->x509_crl_list[j]);
-	}
-
-	gnutls_free( sc->x509_ca_list);
 	_gnutls_free_datum( &sc->keyring);
-
-	for (i = 0; i < sc->ncerts; i++) {
-		_gnutls_privkey_deinit( &sc->pkey[i]);
-	}
-
-	gnutls_free( sc->pkey);
-	gnutls_free( sc->x509_rdn_sequence.data);
 
 	gnutls_free( sc);
 }
