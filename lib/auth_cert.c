@@ -158,7 +158,7 @@ inline
 }
 
 /* Locates the most appropriate x509 certificate using the
- * given DN
+ * given DN. If indx == -1 then no certificate was found.
  */
 static int _find_x509_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 			   opaque * _data, int _data_size,
@@ -235,6 +235,8 @@ static int _find_openpgp_cert(const GNUTLS_CERTIFICATE_CREDENTIALS cred,
 			      int *indx)
 {
 	int i, j;
+
+	*indx = -1;
 
 	for (i = 0; i < cred->ncerts; i++) {
 		for (j = 0; j < cred->cert_list_length[i]; j++) {
