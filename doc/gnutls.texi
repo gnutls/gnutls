@@ -2150,6 +2150,21 @@ example of a template file.
 How to use certtool interactively:
 
 @itemize
+@item
+To generate parameters for Diffie Hellman key exchange, use the command:
+@example
+$ certtool --generate-dh-params --outfile dh.pem
+@end example
+
+@item
+To generate parameters for the RSA-EXPORT key exchange, use the command:
+@example
+$ certtool --generate-privkey --bits 512 --outfile rsa.pem
+@end example
+
+@end itemize
+
+@itemize
 
 @item
 To create a self signed certificate, use the command:
