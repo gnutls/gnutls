@@ -131,7 +131,8 @@ int gnutls_set_cred( GNUTLS_STATE state, CredType type, void* cred) {
   **/
 
 CredType gnutls_get_auth_info_type( GNUTLS_STATE state) {
-	return state->security_parameters.cred_type;
+	return _gnutls_map_kx_get_cred(
+		state->security_parameters.kx_algorithm);
 }
 
 /* 

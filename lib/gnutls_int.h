@@ -249,10 +249,6 @@ typedef struct {
 	uint8 			session_id_size;
 	time_t 			timestamp;
 	TLSExtensions		extensions;
-	CredType		cred_type; /* depends on KXalgorithm
-	                                    * but makes life easier to have
-	                                    * it here;
-	                                    */
 } SecurityParameters;
 
 /* This structure holds the generated keys

@@ -85,6 +85,8 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 	}
 
 	printf(" - Certificate info:\n");
+	printf(" - Certificate version: #%d\n", x509_info->peer_certificate_version);
+
 	PRINT_DN(peer_dn);
 
 	printf(" - Certificate Issuer's info:\n");

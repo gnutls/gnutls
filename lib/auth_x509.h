@@ -28,12 +28,18 @@ typedef struct {
 	gnutls_cert * ca_list;
 	int ncas;	/* number of CAs in the ca_list 
 			 */
-} X509PKI_CREDENTIALS;
+} X509PKI_CREDENTIALS_INT;
+
+/* typedef X509PKI_CREDENTIALS_INT * X509PKI_CREDENTIALS; */
+#define X509PKI_CREDENTIALS X509PKI_CREDENTIALS_INT*
 
 typedef struct {
 	gnutls_DN	  peer_dn;
 	gnutls_DN	  issuer_dn;
 	CertificateStatus peer_certificate_status;
+	int		  peer_certificate_version;
+	time_t		  peer_certificate_activation_time;
+	time_t		  peer_certificate_expiration_time;
 } X509PKI_CLIENT_AUTH_INFO;
 
 

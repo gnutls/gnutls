@@ -224,7 +224,7 @@ static int _gnutls_get_private_rsa_params(GNUTLS_KEY key,
 
 int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 {
-	const X509PKI_CREDENTIALS *cred;
+	const X509PKI_CREDENTIALS cred;
 	int ret, i, pdatasize;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
@@ -352,7 +352,7 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 	int size, len, ret;
 	opaque *p = data;
 	X509PKI_CLIENT_AUTH_INFO *info;
-	const X509PKI_CREDENTIALS *cred;
+	const X509PKI_CREDENTIALS cred;
 	int dsize = data_size;
 	int i, j;
 	gnutls_cert* peer_certificate_list;
@@ -450,9 +450,6 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
   	memcpy( &info->peer_dn, &peer_certificate_list[0].cert_info, sizeof(gnutls_DN));
   	memcpy( &info->issuer_dn, &peer_certificate_list[0].issuer_info, sizeof(gnutls_DN));
   	
-	gnutls_free( peer_certificate_list);
-
-
 	/* FIXME: Verify certificate 
 	 */
 	ret = GNUTLS_CERT_NOT_TRUSTED;
@@ -461,6 +458,13 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 		cred->ca_list, cred->ncas, NULL, 0);
 
 	info->peer_certificate_status = ret;
+
+	info->peer_certificate_version = peer_certificate_list[0].version;
+	info->peer_certificate_expiration_time = peer_certificate_list[0].expiration_time;
+	info->peer_certificate_activation_time = peer_certificate_list[0].activation_time;
+
+
+	gnutls_free( peer_certificate_list);
 
 	return 0;
 }

@@ -24,7 +24,12 @@ typedef struct {
 	gnutls_DN  issuer_info;
 
 	time_t	   expiration_time;
+	time_t	   activation_time;
 
+	int	   version; /* 1,2,3 
+	                     */
+	int        valid; /* 0 if the certificate looks good.
+	                   */
 	gnutls_datum raw; /* the raw certificate */
 } gnutls_cert;
 

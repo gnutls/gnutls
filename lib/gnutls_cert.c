@@ -97,7 +97,7 @@ int n,i;
   * this helper function is provided in order to free (deallocate)
   * the structure.
   **/
-void gnutls_free_x509_sc( X509PKI_CREDENTIALS* sc) {
+void gnutls_free_x509_sc( X509PKI_CREDENTIALS sc) {
 int i,j;
 
 	for (i=0;i<sc->ncerts;i++) {
@@ -119,7 +119,7 @@ int i,j;
 
 /* Reads a base64 encoded certificate file
  */
-static int read_cert_file( X509PKI_CREDENTIALS * res, char* certfile) {
+static int read_cert_file( X509PKI_CREDENTIALS res, char* certfile) {
 int siz, i, siz2;
 opaque* b64;
 char x[MAX_FILE_SIZE];
@@ -183,7 +183,7 @@ int ret;
 /* Reads a base64 encoded CA file (file contains multiple certificate
  * authorities)
  */
-static int read_ca_file( X509PKI_CREDENTIALS * res, char* cafile) {
+static int read_ca_file( X509PKI_CREDENTIALS res, char* cafile) {
 int siz, siz2, i;
 opaque* b64;
 char x[MAX_FILE_SIZE];
@@ -240,7 +240,7 @@ gnutls_datum tmp;
 
 /* Reads a PEM encoded PKCS-1 RSA private key file
  */
-static int read_key_file( X509PKI_CREDENTIALS * res, char* keyfile) {
+static int read_key_file( X509PKI_CREDENTIALS res, char* keyfile) {
 int siz, ret;
 opaque* b64;
 gnutls_datum tmp;
@@ -284,9 +284,9 @@ FILE* fd2;
   * this helper function is provided in order to allocate
   * the structure.
   **/
-int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS ** res, int ncerts)
+int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS* res, int ncerts)
 {
-	*res = gnutls_calloc( 1, sizeof( X509PKI_CREDENTIALS));
+	*res = gnutls_calloc( 1, sizeof( X509PKI_CREDENTIALS_INT));
 
 	if (*res==NULL) return GNUTLS_E_MEMORY_ERROR;
 
@@ -332,7 +332,7 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS ** res, int ncerts)
   * more than once (in case multiple keys/certificates exist for the
   * server)
   **/
-int gnutls_set_x509_key(X509PKI_CREDENTIALS * res, char* CERTFILE, char *KEYFILE)
+int gnutls_set_x509_key(X509PKI_CREDENTIALS res, char* CERTFILE, char *KEYFILE)
 {
 int ret;
 
@@ -356,7 +356,7 @@ int ret;
   * This function sets the trusted CAs in order to verify client
   * certificates.
   **/
-int gnutls_set_x509_trust(X509PKI_CREDENTIALS * res, char* CAFILE, char* CRLFILE)
+int gnutls_set_x509_trust(X509PKI_CREDENTIALS res, char* CAFILE, char* CRLFILE)
 {
 int ret;
 
@@ -562,14 +562,16 @@ static int _get_Name_type( node_asn *rasn, char *root, gnutls_DN * dn)
 }
 
 #define MAX_TIME 1024
-static time_t _gnutls_get_time( node_asn* c2, char* root) {
+static time_t _gnutls_get_time( node_asn* c2, char* root, char* when) {
 opaque ttime[MAX_TIME];
 char name[1024];
 time_t ctime;
 int len, result;
 
 	strcpy(name, root);
-	strcat(name, ".tbsCertificate.validity.notAfter");
+	strcat(name, ".tbsCertificate.validity.");
+	strcat(name, when);
+	
 	len = sizeof(ttime) - 1;
 	if ((result =
 	     asn1_read_value(c2, name, ttime, &len)) < 0) {
@@ -582,7 +584,9 @@ int len, result;
 
 	if (strcmp(ttime, "GeneralizedTime") == 0) {
 
-		strcat(name, ".tbsCertificate.validity.notAfter.generalTime");
+		strcat(name, ".tbsCertificate.validity.");
+		strcat(name, when);
+		strcat(name, ".generalTime");
 		len = sizeof(ttime) - 1;
 		result =
 		    asn1_read_value(c2, name, ttime, &len);
@@ -590,7 +594,9 @@ int len, result;
 			ctime = _gnutls_generalTime2gtime(ttime);
 	} else {		/* UTCTIME */
 
-		strcat(name, ".tbsCertificate.validity.notAfter.utcTime");
+		strcat(name, ".tbsCertificate.validity.");
+		strcat(name, when);
+		strcat(name, ".utcTime");
 		len = sizeof(ttime) - 1;
 		result =
 		    asn1_read_value(c2, name, ttime, &len);
@@ -605,6 +611,24 @@ int len, result;
 	return ctime;
 }
 
+static int _gnutls_get_version( node_asn* c2, char* root) {
+opaque gversion[2];
+char name[1024];
+int len, result;
+
+	strcpy(name, root);
+	strcat(name, ".tbsCertificate.version");
+	
+	len = sizeof(gversion) - 1;
+	if ((result =
+	     asn1_read_value(c2, name, gversion, &len)) < 0) {
+		gnutls_assert();
+		return (-1);
+	}
+
+	return (int) gversion[0]+1;
+}
+
 int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 {
 	int result;
@@ -612,6 +636,8 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 	opaque str[5 * 1024];
 	int len = sizeof(str);
 
+	gCert->valid = 1;
+	
 	if (asn1_create_structure( _gnutls_get_pkix(), "PKIX1Implicit88.Certificate", &c2, "certificate2")
 	    != ASN_OK) {
 		gnutls_assert();
@@ -688,14 +714,21 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		return result;
 	}
 
-	gCert->expiration_time = _gnutls_get_time( c2, "certificate2");
+	gCert->expiration_time = _gnutls_get_time( c2, "certificate2", "notAfter");
+	gCert->activation_time = _gnutls_get_time( c2, "certificate2", "notBefore");
 
+	gCert->version = _gnutls_get_version( c2, "certificate2");
+	
 	asn1_delete_structure(c2);
 
 	if (gnutls_set_datum( &gCert->raw, derCert.data, derCert.size) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
+
+	gCert->valid = 0; /* if we got until here
+	                   * the certificate is valid.
+	                   */
 
 	return 0;
 
