@@ -1,3 +1,15 @@
+2004-05-31 20:05  nmav <nmav@gnutls.org>
+
+	* src/: cli.c, cli.c:
+
+	ciphers are sorted according to a strength order.  
+
+2004-05-31 12:15  nmav <nmav@gnutls.org>
+
+	* NEWS:
+
+	Updated to conform to the latest srp draft (draft-ietf-tls-srp-07).  
+
 2004-05-27 21:11  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_handshake.c, gnutls_v2_compat.c, gnutls_handshake.c,
