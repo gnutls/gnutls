@@ -140,6 +140,19 @@ int ret;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
+	if (bag->bag_elements == 1) {
+		/* A bag with a key or an encrypted bag, must have
+		 * only one element.
+		 */
+	
+		if (bag->type[0] == GNUTLS_BAG_PKCS8_KEY ||
+			bag->type[0] == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY ||
+			bag->type[0] == GNUTLS_BAG_ENCRYPTED) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+	}
+
 	ret = _gnutls_set_datum( &bag->data[bag->bag_elements], data->data, data->size);
 	if (ret < 0) {
 		gnutls_assert();
@@ -171,7 +184,7 @@ gnutls_datum dec;
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
-	ret = _gnutls_x509_decrypt_pkcs7_encrypted_data( 
+	ret = _gnutls_pkcs7_decrypt_data( 
 		&bag->data[0], pass, &dec);
 
         if (ret < 0) {
@@ -193,7 +206,75 @@ gnutls_datum dec;
 		gnutls_assert();
         	return ret;
         }
-	                
+
+	return 0;
+}
+
+/**
+  * gnutls_pkcs12_bag_encrypt - This function will encrypt a bag
+  * @bag: The bag
+  * @pass: The password used for encryption
+  * @flags: should be zero for now
+  *
+  * This function will encrypt the given bag and return 0 on success.
+  *
+  **/
+int gnutls_pkcs12_bag_encrypt(gnutls_pkcs12_bag bag, const char* pass, unsigned int flags)
+{
+int ret, i;
+ASN1_TYPE safe_cont = ASN1_TYPE_EMPTY;
+gnutls_datum der = {NULL, 0};
+gnutls_datum enc = {NULL, 0};
+
+	if (bag->type[0] == GNUTLS_BAG_ENCRYPTED) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Encode the whole bag to a safe contents
+	 * structure.
+	 */
+	ret = _pkcs12_encode_safe_contents( bag, &safe_cont, NULL);
+        if (ret < 0) {
+		gnutls_assert();
+        	return ret;
+        }
+
+	/* DER encode the SafeContents.
+	 */
+	ret = _gnutls_x509_der_encode( safe_cont, "", &der, 0);
+
+	asn1_delete_structure( &safe_cont);
+
+        if (ret < 0) {
+		gnutls_assert();
+        	return ret;
+        }
+
+	/* Now encrypt them.
+	 */
+	ret = _gnutls_pkcs7_encrypt_data( PKCS12_3DES_SHA1, &der, pass, &enc);
+
+	_gnutls_free_datum( &der);
+
+        if (ret < 0) {
+		gnutls_assert();
+        	return ret;
+        }
+
+        /* encryption succeeded. 
+         */
+
+        for (i=0;i<bag->bag_elements;i++) {
+		_gnutls_free_datum( &bag->data[i]);
+		bag->type[i] = 0;
+	}
+
+	bag->type[0] = GNUTLS_BAG_ENCRYPTED;
+	bag->data[0] = enc;
+	
+	bag->bag_elements = 1;
+
 
 	return 0;
 }

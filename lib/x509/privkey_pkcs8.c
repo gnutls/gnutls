@@ -41,15 +41,11 @@
 #include <gnutls_random.h>
 #include <gnutls_num.h>
 
-typedef enum schema_id {
-	PBES2,			/* the stuff in PKCS #5 */
-	PKCS12_3DES_SHA1, /* the fucking stuff in PKCS #12 */
-	PKCS12_ARCFOUR_SHA1
-} schema_id;
 
 #define PBES2_OID "1.2.840.113549.1.5.13"
 #define PBKDF2_OID "1.2.840.113549.1.5.12"
 #define DES_EDE3_CBC_OID "1.2.840.113549.3.7"
+#define DES_CBC_OID "1.3.14.3.2.7"
 
 /* oid_pbeWithSHAAnd3_KeyTripleDES_CBC */
 #define PKCS12_PBE_3DES_SHA1_OID "1.2.840.113549.1.12.1.3"
@@ -68,7 +64,7 @@ struct pbe_enc_params {
 	int iv_size;
 };
 
-static int generate_key(const char *password, unsigned int flags,
+static int generate_key(schema_id schema, const char *password,
 			struct pbkdf2_params *kdf_params,
 			struct pbe_enc_params *enc_params,
 			gnutls_datum * key);
@@ -85,7 +81,7 @@ static int decrypt_data(schema_id, ASN1_TYPE pkcs8_asn, const char *root,
 			gnutls_datum * decrypted_data);
 static ASN1_TYPE decode_private_key_info(const gnutls_datum * der,
 					 gnutls_x509_privkey pkey);
-static int write_pbe2_params(ASN1_TYPE pkcs8_asn,
+static int write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn, const char* where,
 			     const struct pbkdf2_params *kdf_params,
 			     const struct pbe_enc_params *enc_params);
 static int encrypt_data(const gnutls_datum * plain,
@@ -94,6 +90,8 @@ static int encrypt_data(const gnutls_datum * plain,
 
 static int read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 			      struct pbkdf2_params *params);
+static int write_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
+			      const struct pbkdf2_params *params);
 
 #define PEM_PKCS8 "ENCRYPTED PRIVATE KEY"
 #define PEM_UNENCRYPTED_PKCS8 "PRIVATE KEY"
@@ -261,9 +259,8 @@ static int encode_to_private_key_info(gnutls_x509_privkey pkey,
 /* Converts a PKCS #8 private key info to
  * a PKCS #8 EncryptedPrivateKeyInfo.
  */
-static ASN1_TYPE encode_to_pkcs8_key(const gnutls_datum * raw_key,
-				     const char *password,
-				     unsigned int flags)
+static ASN1_TYPE encode_to_pkcs8_key( schema_id schema, const gnutls_datum * der_key,
+				     const char *password)
 {
 	int result;
 	gnutls_datum key = { NULL, 0 };
@@ -271,7 +268,7 @@ static ASN1_TYPE encode_to_pkcs8_key(const gnutls_datum * raw_key,
 	ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
 	struct pbkdf2_params kdf_params;
 	struct pbe_enc_params enc_params;
-
+	
 
 	if ((result =
 	     asn1_create_element(_gnutls_get_pkix(),
@@ -283,9 +280,25 @@ static ASN1_TYPE encode_to_pkcs8_key(const gnutls_datum * raw_key,
 
 	/* Write the encryption schema OID
 	 */
-	result =
-	    asn1_write_value(pkcs8_asn, "encryptionAlgorithm.algorithm",
-			     PBES2_OID, 1);
+	switch (schema) {
+		case PBES2:
+			result =
+			    asn1_write_value(pkcs8_asn, "encryptionAlgorithm.algorithm",
+				     PBES2_OID, 1);
+			break;
+		case PKCS12_3DES_SHA1:
+			result =
+			    asn1_write_value(pkcs8_asn, "encryptionAlgorithm.algorithm",
+				     PKCS12_PBE_3DES_SHA1_OID, 1);
+			break;
+		case PKCS12_ARCFOUR_SHA1:
+			result =
+			    asn1_write_value(pkcs8_asn, "encryptionAlgorithm.algorithm",
+				     PKCS12_PBE_ARCFOUR_SHA1_OID, 1);
+			break;
+		
+	}
+
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		goto error;
@@ -293,14 +306,16 @@ static ASN1_TYPE encode_to_pkcs8_key(const gnutls_datum * raw_key,
 
 	/* Generate a symmetric key.
 	 */
+
 	result =
-	    generate_key(password, flags, &kdf_params, &enc_params, &key);
+	    generate_key(schema, password, &kdf_params, &enc_params, &key);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
-	result = write_pbe2_params(pkcs8_asn, &kdf_params, &enc_params);
+	result = write_schema_params(schema, pkcs8_asn, "encryptionAlgorithm.parameters",
+		&kdf_params, &enc_params);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -309,7 +324,7 @@ static ASN1_TYPE encode_to_pkcs8_key(const gnutls_datum * raw_key,
 	/* Parameters have been encoded. Now
 	 * encrypt the Data.
 	 */
-	result = encrypt_data(raw_key, &enc_params, &key, &tmp);
+	result = encrypt_data( der_key, &enc_params, &key, &tmp);
 	if (result < 0) {
 		gnutls_assert();
 		goto error;
@@ -371,8 +386,10 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 	ASN1_TYPE pkcs8_asn, pkey_info;
 	int ret;
 	gnutls_datum tmp;
+	schema_id schema;
 
 	/* Get the private key info
+	 * tmp holds the DER encoding.
 	 */
 	ret = encode_to_private_key_info(key, &tmp, &pkey_info);
 	if (ret < 0) {
@@ -380,11 +397,19 @@ int gnutls_x509_privkey_export_pkcs8(gnutls_x509_privkey key,
 		return ret;
 	}
 
+	if (flags & GNUTLS_PKCS8_USE_PKCS12_3DES)
+		schema = PKCS12_3DES_SHA1;
+	else if (flags & GNUTLS_PKCS8_USE_PKCS12_ARCFOUR)
+		schema = PKCS12_ARCFOUR_SHA1;
+	else
+		schema = PBES2;
+
+
 	if (!(flags & GNUTLS_PKCS8_PLAIN) || password == NULL) {
 
 		asn1_delete_structure(&pkey_info);	/* we don't need it */
 
-		pkcs8_asn = encode_to_pkcs8_key(&tmp, password, flags);
+		pkcs8_asn = encode_to_pkcs8_key(schema, &tmp, password);
 		_gnutls_free_datum(&tmp);
 
 		if (pkcs8_asn == NULL) {
@@ -973,7 +998,42 @@ static int read_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
 
 }
 
-#define DES_CBC_OID "1.3.14.3.2.7"
+/* Writes the PBE parameters for PKCS-12 schemas.
+ */
+static int write_pkcs12_kdf_params(ASN1_TYPE pbes2_asn,
+			      const struct pbkdf2_params *kdf_params)
+{
+	int result;
+
+	/* write the salt 
+	 */
+	result =
+	    asn1_write_value(pbes2_asn, "salt",
+			     kdf_params->salt, kdf_params->salt_size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+	_gnutls_hard_log("salt.size: %d\n",
+			 kdf_params->salt_size);
+
+	/* write the iteration count 
+	 */
+	result = _gnutls_x509_write_uint32( pbes2_asn, "iterations", kdf_params->iter_count);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+	_gnutls_hard_log("iterationCount: %d\n", kdf_params->iter_count);
+
+	return 0;
+
+      error:
+	return result;
+
+}
+
 
 /* Converts an OID to a gnutls cipher type.
  */
@@ -1343,7 +1403,8 @@ static int write_pbe_enc_params(ASN1_TYPE pbes2_asn,
 
 /* Generates a key and also stores the key parameters.
  */
-static int generate_key(const char *password, unsigned int flags,
+static int generate_key( schema_id schema,
+			const char *password, 
 			struct pbkdf2_params *kdf_params,
 			struct pbe_enc_params *enc_params,
 			gnutls_datum * key)
@@ -1355,13 +1416,21 @@ static int generate_key(const char *password, unsigned int flags,
 	 * encryption algorithms etc. 
 	 */
 
-	enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;	/* The default */
+	if (schema == PKCS12_ARCFOUR_SHA1)
+		enc_params->cipher = GNUTLS_CIPHER_ARCFOUR_128;
+	else
+		enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
 
 	_gnutls_get_random(rnd, 2, GNUTLS_STRONG_RANDOM);
 
 	/* generate salt */
-	kdf_params->salt_size =
-	    GMIN(sizeof(kdf_params->salt), (uint) (10 + (rnd[1] % 10)));
+	
+	if (schema==PBES2)
+		kdf_params->salt_size =
+		    GMIN(sizeof(kdf_params->salt), (uint) (10 + (rnd[1] % 10)));
+	else
+		kdf_params->salt_size = 8;
+
 	_gnutls_get_random(kdf_params->salt, kdf_params->salt_size,
 			   GNUTLS_STRONG_RANDOM);
 
@@ -1371,8 +1440,6 @@ static int generate_key(const char *password, unsigned int flags,
 
 	enc_params->iv_size =
 	    _gnutls_cipher_get_iv_size(enc_params->cipher);
-	_gnutls_get_random(enc_params->iv, enc_params->iv_size,
-			   GNUTLS_WEAK_RANDOM);
 
 	key->data = gnutls_secure_malloc(key->size);
 	if (key->data == NULL) {
@@ -1382,15 +1449,44 @@ static int generate_key(const char *password, unsigned int flags,
 
 	/* now generate the key. 
 	 */
-	ret = _gnutls_pkcs5_pbkdf2(PKCS5_PRF_SHA1, password,
+
+	if (schema == PBES2) {
+
+		ret = _gnutls_pkcs5_pbkdf2(PKCS5_PRF_SHA1, password,
 				   strlen(password), kdf_params->salt,
 				   kdf_params->salt_size,
 				   kdf_params->iter_count,
 				   kdf_params->key_size, key->data);
-	if (ret != PKCS5_OK) {
-		gnutls_assert();
-		return GNUTLS_E_ENCRYPTION_FAILED;
+		if (ret != PKCS5_OK) {
+			gnutls_assert();
+			return GNUTLS_E_ENCRYPTION_FAILED;
+		}
+
+		if (enc_params->iv_size)
+			_gnutls_get_random(enc_params->iv, enc_params->iv_size,
+			   GNUTLS_WEAK_RANDOM);
+
+	} else { /* PKCS12 schemas */
+		ret = 
+			_pkcs12_string_to_key( 1/*KEY*/, kdf_params->salt, kdf_params->salt_size,
+				kdf_params->iter_count, password, kdf_params->key_size, key->data);
+		if (ret < 0) {
+			gnutls_assert();
+			return ret;
+		}
+
+		/* Now generate the IV
+		 */
+		if (enc_params->iv_size) {
+			ret = _pkcs12_string_to_key( 2/*IV*/, kdf_params->salt, kdf_params->salt_size,
+				kdf_params->iter_count, password, enc_params->iv_size, enc_params->iv);
+			if (ret < 0) {
+				gnutls_assert();
+				return ret;
+			}
+		}
 	}
+
 
 	return 0;
 }
@@ -1399,42 +1495,72 @@ static int generate_key(const char *password, unsigned int flags,
 /* Encodes the parameters to be written in the encryptionAlgorithm.parameters
  * part.
  */
-static int write_pbe2_params(ASN1_TYPE pkcs8_asn,
+static int write_schema_params(schema_id schema, ASN1_TYPE pkcs8_asn, 
+			     const char * where,
 			     const struct pbkdf2_params *kdf_params,
 			     const struct pbe_enc_params *enc_params)
 {
 	int result;
 	ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY;
 
-	if ((result =
-	     asn1_create_element(_gnutls_get_pkix(),
-				 "PKIX1.pkcs-5-PBES2-params",
-				 &pbes2_asn)) != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
+	if (schema == PBES2) {
+		if ((result =
+		     asn1_create_element(_gnutls_get_pkix(),
+					 "PKIX1.pkcs-5-PBES2-params",
+					 &pbes2_asn)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			return _gnutls_asn2err(result);
+		}
 
-	result = write_pbkdf2_params(pbes2_asn, kdf_params);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
+		result = write_pbkdf2_params(pbes2_asn, kdf_params);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
 
-	result = write_pbe_enc_params(pbes2_asn, enc_params);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
+		result = write_pbe_enc_params(pbes2_asn, enc_params);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
 
-	result = _gnutls_x509_der_encode_and_copy(pbes2_asn, "",
+		result = _gnutls_x509_der_encode_and_copy(pbes2_asn, "",
 						  pkcs8_asn,
-						  "encryptionAlgorithm.parameters", 0);
-	if (result < 0) {
-		gnutls_assert();
-		goto error;
-	}
+						  where, 0);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
 
-	asn1_delete_structure(&pbes2_asn);
+		asn1_delete_structure(&pbes2_asn);
+	} else { /* PKCS12 schemas */
+
+		if ((result =
+		     asn1_create_element(_gnutls_get_pkix(),
+					 "PKIX1.pkcs-12-PbeParams",
+					 &pbes2_asn)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto error;
+		}
+
+		result = write_pkcs12_kdf_params(pbes2_asn, kdf_params);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		result = _gnutls_x509_der_encode_and_copy(pbes2_asn, "",
+						  pkcs8_asn,
+						  where, 0);
+		if (result < 0) {
+			gnutls_assert();
+			goto error;
+		}
+
+		asn1_delete_structure(&pbes2_asn);
+	
+	}
 
 	return 0;
 
@@ -1444,7 +1570,7 @@ static int write_pbe2_params(ASN1_TYPE pkcs8_asn,
 
 }
 
-static int encrypt_data(const gnutls_datum * plain,
+static int encrypt_data( const gnutls_datum * plain,
 			const struct pbe_enc_params *enc_params,
 			gnutls_datum * key, gnutls_datum * encrypted)
 {
@@ -1502,7 +1628,7 @@ static int encrypt_data(const gnutls_datum * plain,
 /* Decrypts a PKCS #7 encryptedData. The output is allocated
  * and stored in dec.
  */
-int _gnutls_x509_decrypt_pkcs7_encrypted_data(const gnutls_datum * data,
+int _gnutls_pkcs7_decrypt_data(const gnutls_datum * data,
 					      const char *password,
 					      gnutls_datum * dec)
 {
@@ -1531,6 +1657,22 @@ int _gnutls_x509_decrypt_pkcs7_encrypted_data(const gnutls_datum * data,
 		result = _gnutls_asn2err(result);
 		goto error;
 	}
+
+#if 1
+/* not really needed
+ */
+	len = sizeof(enc_oid);
+	result =
+	    asn1_read_value(pkcs7_asn,
+			    "encryptedContentInfo.contentType",
+			    enc_oid, &len);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+	_gnutls_x509_log("PKCS #7 encryptedContentInfo.contentType OID '%s'.\n", enc_oid);
+#endif
 
 	/* Check the encryption schema OID
 	 */
@@ -1595,6 +1737,134 @@ int _gnutls_x509_decrypt_pkcs7_encrypted_data(const gnutls_datum * data,
 
       error:
 	asn1_delete_structure(&pbes2_asn);
+	asn1_delete_structure(&pkcs7_asn);
+	return result;
+}
+
+/* Encrypts to a PKCS #7 encryptedData. The output is allocated
+ * and stored in enc.
+ */
+int _gnutls_pkcs7_encrypt_data(schema_id schema, const gnutls_datum * data,
+					      const char *password,
+					      gnutls_datum * enc)
+{
+	int result;
+	gnutls_datum key = { NULL, 0 };
+	gnutls_datum tmp = { NULL, 0 };
+	ASN1_TYPE pkcs7_asn = ASN1_TYPE_EMPTY;
+	struct pbkdf2_params kdf_params;
+	struct pbe_enc_params enc_params;
+	
+
+	if ((result =
+	     asn1_create_element(_gnutls_get_pkix(),
+				 "PKIX1.pkcs-7-EncryptedData",
+				 &pkcs7_asn)) != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	/* Write the encryption schema OID
+	 */
+	switch (schema) {
+		case PBES2:
+			result =
+			    asn1_write_value(pkcs7_asn, "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
+				     PBES2_OID, 1);
+			break;
+		case PKCS12_3DES_SHA1:
+			result =
+			    asn1_write_value(pkcs7_asn, "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
+				     PKCS12_PBE_3DES_SHA1_OID, 1);
+			break;
+		case PKCS12_ARCFOUR_SHA1:
+			result =
+			    asn1_write_value(pkcs7_asn, "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
+				     PKCS12_PBE_ARCFOUR_SHA1_OID, 1);
+			break;
+		
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	/* Generate a symmetric key.
+	 */
+
+	result =
+	    generate_key(schema, password, &kdf_params, &enc_params, &key);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	result = write_schema_params(schema, pkcs7_asn, 
+		"encryptedContentInfo.contentEncryptionAlgorithm.parameters", 
+		&kdf_params, &enc_params);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* Parameters have been encoded. Now
+	 * encrypt the Data.
+	 */
+	result = encrypt_data( data, &enc_params, &key, &tmp);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	/* write the encrypted data.
+	 */
+	result =
+	    asn1_write_value(pkcs7_asn, "encryptedContentInfo.encryptedContent", tmp.data,
+			     tmp.size);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	_gnutls_free_datum(&tmp);
+	_gnutls_free_datum(&key);
+
+	/* Now write the rest of the pkcs-7 stuff.
+	 */
+
+	result = _gnutls_x509_write_uint32( pkcs7_asn, "version", 4);
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+	result =
+	    asn1_write_value(pkcs7_asn, "encryptedContentInfo.contentType", DATA_OID, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto error;
+	}
+
+	/* Now encode and copy the DER stuff.
+	 */
+	result = _gnutls_x509_der_encode( pkcs7_asn, "", enc, 0);
+
+	asn1_delete_structure(&pkcs7_asn);
+
+	if (result < 0) {
+		gnutls_assert();
+		goto error;
+	}
+
+
+      error:
+	_gnutls_free_datum(&key);
+	_gnutls_free_datum(&tmp);
 	asn1_delete_structure(&pkcs7_asn);
 	return result;
 }

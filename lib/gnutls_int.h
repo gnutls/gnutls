@@ -41,7 +41,7 @@
 /* It might be a good idea to replace int with void*
  * here.
  */
-typedef int gnutls_transport_ptr;
+typedef void * gnutls_transport_ptr;
 
 #define MAX32 4294967295
 #define MAX24 16777215

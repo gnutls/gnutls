@@ -588,85 +588,6 @@ int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	return 0;
 }
 
-/* DER Encodes the src ASN1_TYPE and stores it to
- * dest in dest_name. Usefull to encode something and store it
- * as OCTET. If str is non null then the data are encoded as
- * an OCTET STRING.
- */
-int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
-	ASN1_TYPE dest, const char* dest_name, int str)
-{
-int size, result;
-int asize;
-opaque *data = NULL;
-
-	size = 0;
-	result = asn1_der_coding( src, src_name, NULL, &size, NULL);
-	if (result != ASN1_MEM_ERROR) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	/* allocate data for the der
-	 */
-
-	if (str) size += 16; /* for later to include the octet tags */
-	asize = size;
-
-	data = gnutls_alloca( size);
-	if (data == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	result = asn1_der_coding( src, src_name, data, &size, NULL);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		gnutls_afree(data);
-		return _gnutls_asn2err(result);
-	}
-
-	if (str) {
-		ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-		
-		if ((result=asn1_create_element
-		    (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS) {
-			gnutls_assert();
-			return _gnutls_asn2err(result);
-		}
-
-		result = asn1_write_value(c2, "", data, size);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			asn1_delete_structure( &c2);
-			return _gnutls_asn2err(result);
-		}
-
-		result = asn1_der_coding(c2, "", data, &asize, NULL);
-		if (result != ASN1_SUCCESS) {
-			gnutls_assert();
-			asn1_delete_structure( &c2);
-			return _gnutls_asn2err(result);
-		}
-		
-		size = asize;
-
-		asn1_delete_structure( &c2);
-	}
-	
-	/* Write the data.
-	 */
-	result = asn1_write_value( dest, dest_name, data, size);
-
-	gnutls_afree(data);
-
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		return _gnutls_asn2err(result);
-	}
-
-	return 0;
-}
 
 /* Reads a value from an ASN1 tree, and puts the output
  * in an allocated variable in the given datum.
@@ -739,4 +660,121 @@ ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 		gnutls_free(tmp);
 		return result;
 
+}
+
+/* DER Encodes the src ASN1_TYPE and stores it to
+ * the given datum. If str is non null then the data are encoded as
+ * an OCTET STRING.
+ */
+int _gnutls_x509_der_encode( ASN1_TYPE src, const char* src_name,
+	gnutls_datum *res, int str)
+{
+int size, result;
+int asize;
+opaque *data = NULL;
+ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	size = 0;
+	result = asn1_der_coding( src, src_name, NULL, &size, NULL);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	/* allocate data for the der
+	 */
+
+	if (str) size += 16; /* for later to include the octet tags */
+	asize = size;
+
+	data = gnutls_malloc( size);
+	if (data == NULL) {
+		gnutls_assert();
+		result = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	result = asn1_der_coding( src, src_name, data, &size, NULL);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		result = _gnutls_asn2err(result);
+		goto cleanup;
+	}
+
+	if (str) {
+		
+		if ((result=asn1_create_element
+		    (_gnutls_get_pkix(), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		result = asn1_write_value(c2, "", data, size);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result =  _gnutls_asn2err(result);
+			goto cleanup;
+		}
+
+		result = asn1_der_coding(c2, "", data, &asize, NULL);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+		
+		size = asize;
+
+		asn1_delete_structure( &c2);
+	}
+
+	res->data = data;
+	res->size = size;
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+
+	cleanup:
+		gnutls_free(data);
+		asn1_delete_structure( &c2);
+		return result;
+
+}
+
+/* DER Encodes the src ASN1_TYPE and stores it to
+ * dest in dest_name. Usefull to encode something and store it
+ * as OCTET. If str is non null then the data are encoded as
+ * an OCTET STRING.
+ */
+int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
+	ASN1_TYPE dest, const char* dest_name, int str)
+{
+int result;
+gnutls_datum encoded;
+
+	result = _gnutls_x509_der_encode( src, src_name, &encoded, str);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	/* Write the data.
+	 */
+	result = asn1_write_value( dest, dest_name, encoded.data, encoded.size);
+
+	_gnutls_free_datum(&encoded);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
 }

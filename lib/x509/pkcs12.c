@@ -37,8 +37,6 @@
 #include <pkcs12.h>
 #include <dn.h>
 
-#define DATA_OID "1.2.840.113549.1.7.1"
-#define ENC_DATA_OID "1.2.840.113549.1.7.6"
 
 /* Decodes the PKCS #12 auth_safe, and returns the allocated raw data,
  * which holds them. Returns an ASN1_TYPE of authenticatedSafe.
@@ -529,9 +527,6 @@ static int create_empty_pfx(ASN1_TYPE pkcs12)
 
 }
 
-static int
-_pkcs12_encode_safe_contents( gnutls_pkcs12_bag bag, ASN1_TYPE* content, int *enc);
-
 /**
   * gnutls_pkcs12_set_bag - This function inserts a Bag into a PKCS12 structure
   * @pkcs12_struct: should contain a gnutls_pkcs12 structure
@@ -598,13 +593,23 @@ int gnutls_pkcs12_set_bag(gnutls_pkcs12 pkcs12, gnutls_pkcs12_bag bag)
 		goto cleanup;
 	}
 
-	result = _gnutls_x509_der_encode_and_copy( safe_cont, "", c2, "?LAST.content", 1);
-	if (result != ASN1_SUCCESS) {
-		gnutls_assert();
-		result = _gnutls_asn2err(result);
-		goto cleanup;
+	if (enc) {
+		/* Encrypted packets are written directly.
+		 */
+		result = asn1_write_value( c2, "?LAST.content", bag->data[0].data, bag->data[0].size);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
+	} else {
+		result = _gnutls_x509_der_encode_and_copy( safe_cont, "", c2, "?LAST.content", 1);
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			result = _gnutls_asn2err(result);
+			goto cleanup;
+		}
 	}
-
 	asn1_delete_structure(&safe_cont);
 
 	
@@ -732,7 +737,7 @@ int gnutls_pkcs12_generate_mac(gnutls_pkcs12 pkcs12, const char* pass)
 /* Encodes the bag into a SafeContents structure, and puts the output in
  * the given datum. Enc is set to non zero if the data are encrypted;
  */
-static int
+int
 _pkcs12_encode_safe_contents( gnutls_pkcs12_bag bag, ASN1_TYPE* contents, int *enc)
 {
 ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
@@ -740,20 +745,8 @@ int result;
 int i;
 const char* oid;
 
-	if (bag->bag_elements > 1) {
-		/* A bag with a key or an encrypted bag, must have
-		 * only one element.
-		 */
-	
-		if (bag->type[0] == GNUTLS_BAG_PKCS8_KEY ||
-			bag->type[0] == GNUTLS_BAG_PKCS8_ENCRYPTED_KEY ||
-			bag->type[0] == GNUTLS_BAG_ENCRYPTED) {
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
-		}
-	}
-
-	*enc = 0;
+	if (enc)
+		*enc = 0;
 
 	/* Step 1. Create the SEQUENCE.
 	 */
@@ -767,10 +760,13 @@ const char* oid;
 
 	for (i=0;i<bag->bag_elements;i++) {
 
-		if (bag->type[i] == GNUTLS_BAG_ENCRYPTED) *enc = 1;
+		if (bag->type[i] == GNUTLS_BAG_ENCRYPTED && enc) *enc = 1;
 
 		oid = _bag2oid( bag->type[i]);
-		if (oid==NULL) continue;
+		if (oid==NULL) {
+			gnutls_assert();
+			continue;
+		}
 
 		result = asn1_write_value(c2, "", "NEW", 1);
 		if (result != ASN1_SUCCESS) {

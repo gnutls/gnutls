@@ -43,6 +43,9 @@ gnutls_x509_subject_alt_name _gnutls_x509_san_find_type( char* str_type);
 
 int _gnutls_x509_der_encode_and_copy( ASN1_TYPE src, const char* src_name,
 	ASN1_TYPE dest, const char* dest_name, int str);
+int _gnutls_x509_der_encode( ASN1_TYPE src, const char* src_name,
+        gnutls_datum *res, int str);
+
 int _gnutls_x509_export_int( ASN1_TYPE asn1_data,
 	gnutls_x509_crt_fmt format, char* pem_header,
 	int tmp_buf_size, unsigned char* output_data, int* output_data_size);

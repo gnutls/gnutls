@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2000,2001,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2000,2001,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -184,9 +184,6 @@ void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
 
 }
 
-/* Generates a prime number and a generator, and returns 2 gnutls_datums that contain these
- * numbers.
- */
 /**
   * gnutls_dh_params_generate2 - This function will generate new DH parameters
   * @params: Is the structure that the DH parameters will be stored

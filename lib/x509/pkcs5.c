@@ -69,7 +69,6 @@ _gnutls_pkcs5_pbkdf2 (int PRF,
   unsigned int hLen = gcry_md_get_algo_dlen (PRF);
   unsigned int l;
   unsigned int r;
-  unsigned int t;
   int rc;
   unsigned char *p;
   int i;
