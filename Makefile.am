@@ -12,6 +12,7 @@ tag = $(PACKAGE)-`echo $(VERSION) | sed 's/\./_/g'`
 htmldir = ../www-$(PACKAGE)
 
 release:
+	if cvs upd -p -r $(tag) NEWS > /dev/null; then false else true; fi
 	cvs rtag $(tag) gnutls
 	rm -f ChangeLog
 	make ChangeLog
