@@ -1677,7 +1677,7 @@ gnutls_x509_crt load_cert(int mand)
 
     crt = load_cert_list(mand, &size);
 
-    return crt[0];
+    return crt ? crt[0] : NULL;
 }
 
 #define MAX_CERTS 256
