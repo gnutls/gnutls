@@ -133,15 +133,12 @@ int gnutls_deinit(GNUTLS_STATE * state)
 void *_gnutls_cal_PRF_A(MACAlgorithm algorithm, void *secret, int secret_size, void *seed, int seed_size)
 {
 	GNUTLS_MAC_HANDLE td1;
-	void *A;
 
 	td1 = gnutls_hmac_init(algorithm, secret, secret_size);
 
 	gnutls_hmac(td1, seed, seed_size);
 
-	A = gnutls_hmac_deinit(td1);
-
-	return A;
+	return gnutls_hmac_deinit(td1);
 }
 
 
@@ -154,7 +151,7 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 	GNUTLS_MAC_HANDLE td2;
 	opaque *ret;
 	void *A, *Atmp;
-	int i = 0, times, copy_bytes = 0, how, blocksize, A_size;
+	int i = 0, times, how, blocksize, A_size;
 	void *final;
 
 	ret = secure_calloc(1, total_bytes);
@@ -171,6 +168,7 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 	for (i = 0; i < times; i++) {
 		td2 = gnutls_hmac_init(algorithm, secret, secret_size);
 
+		/* here we calculate A[i+1] */
 		Atmp = _gnutls_cal_PRF_A(algorithm, secret, secret_size, A, A_size);
 		gnutls_free(A);
 		A = Atmp;
@@ -179,15 +177,14 @@ svoid *gnutls_P_hash(MACAlgorithm algorithm, opaque * secret, int secret_size, o
 		gnutls_hmac(td2, seed, seed_size);
 		final = gnutls_hmac_deinit(td2);
 
-		copy_bytes = blocksize;
-		if ((i + 1) * copy_bytes < total_bytes) {
+		if ( (1+i) * blocksize < total_bytes) {
 			how = blocksize;
 		} else {
-			how = total_bytes - (i) * copy_bytes;
+			how = total_bytes - (i) * blocksize;
 		}
 
 		if (how > 0) {
-			memmove(&ret[i * copy_bytes], final, how);
+			memmove(&ret[i * blocksize], final, how);
 		}
 		gnutls_free(final);
 	}
@@ -230,7 +227,7 @@ svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label, int label_siz
 	ret = secure_calloc(1, total_bytes);
 	gnutls_free(s_seed);
 	for (i = 0; i < total_bytes; i++) {
-		ret[i] = o1[i];	//^ o2[i];
+		ret[i] = o1[i] ^ o2[i];
 	}
 
 	secure_free(o1);

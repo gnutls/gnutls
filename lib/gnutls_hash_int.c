@@ -20,7 +20,136 @@
 
 #include <defines.h>
 #include <gnutls_int.h>
+#include <mhash.h>
 
+#ifdef USE_MHASH
+/* This file handles all the internal functions that cope with hashes
+ * and hmacs. Currently it uses the functions provided by
+ * the gcrypt library that this can be easily changed.
+ */
+
+MHASH gnutls_hash_init(MACAlgorithm algorithm) {
+
+MHASH ret;
+
+	switch (algorithm) {
+		case GNUTLS_MAC_NULL:
+			ret = GNUTLS_HASH_FAILED;
+			break;
+		case GNUTLS_MAC_SHA:
+			ret = mhash_init( MHASH_SHA1);
+			if (!ret) return GNUTLS_HASH_FAILED;
+			break;
+		case GNUTLS_MAC_MD5:
+			ret = mhash_init( MHASH_MD5);
+			if (!ret) return GNUTLS_HASH_FAILED;
+			break;
+		default:
+			ret = GNUTLS_HASH_FAILED;
+	}
+	
+	return ret;
+}
+
+int gnutls_hash_get_algo_len(MACAlgorithm algorithm) {
+int ret;
+
+	switch (algorithm) {
+		case GNUTLS_MAC_NULL:
+			ret = 0;
+			break;
+		case GNUTLS_MAC_SHA:
+			ret = mhash_get_block_size(MHASH_SHA1);
+			break;
+		case GNUTLS_MAC_MD5:
+			ret = mhash_get_block_size(MHASH_MD5);
+			break;
+		default:
+			ret = 0;
+	}
+
+return ret;
+
+}
+
+int gnutls_hash(GNUTLS_HASH_HANDLE handle, void* text, int textlen) {
+
+	mhash( handle, text, textlen);
+	return 0;
+}
+
+void* gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle) {
+char* mac;
+int maclen;
+char* ret;
+
+    ret = mhash_end(handle);
+    
+    return ret;
+}
+
+
+GNUTLS_MAC_HANDLE gnutls_hmac_init(MACAlgorithm algorithm, char* key, int keylen) {
+GNUTLS_MAC_HANDLE ret;
+
+	switch (algorithm) {
+		case GNUTLS_MAC_NULL:
+			ret = GNUTLS_MAC_FAILED;
+			break;
+		case GNUTLS_MAC_SHA:
+			ret = mhash_hmac_init( MHASH_SHA1, key, keylen, 0);
+			if (!ret) ret = GNUTLS_MAC_FAILED;
+			break;
+		case GNUTLS_MAC_MD5:
+			ret = mhash_hmac_init( MHASH_MD5, key, keylen, 0);
+			if (!ret) ret = GNUTLS_MAC_FAILED;
+			break;
+		default:
+			ret = GNUTLS_MAC_FAILED;
+	}
+	
+	return ret;
+}
+
+int gnutls_hmac_get_algo_len(MACAlgorithm algorithm) {
+int ret;
+
+	switch (algorithm) {
+		case GNUTLS_MAC_NULL:
+			ret = 0;
+			break;
+		case GNUTLS_MAC_SHA:
+			ret = mhash_get_hash_pblock(MHASH_SHA1);
+			break;
+		case GNUTLS_MAC_MD5:
+			ret = mhash_get_hash_pblock(MHASH_MD5);
+			break;
+		default:
+			ret = 0;
+	}
+
+return ret;
+
+}
+
+int gnutls_hmac(GNUTLS_MAC_HANDLE handle, void* text, int textlen) {
+
+	mhash( handle, text, textlen);
+	return 0;
+
+}
+
+void* gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle) {
+char* mac;
+int maclen;
+char* ret;
+
+    ret = mhash_hmac_end(handle);
+    
+    return ret;
+}
+
+#else
 /* This file handles all the internal functions that cope with hashes
  * and hmacs. Currently it uses the functions provided by
  * the gcrypt library that this can be easily changed.
@@ -159,3 +288,4 @@ char* ret;
     return ret;
 }
 
+#endif /* MHASH */

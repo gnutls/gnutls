@@ -9,4 +9,4 @@ libgnutls_la_SOURCES = gnutls.c gnutls_compress.c debug.c gnutls_plaintext.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c \
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c gnutls_der.c
-libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)  -ldmalloc
+libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)

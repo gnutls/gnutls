@@ -447,7 +447,6 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			    ciphertext->version.minor;
 		break;
 	case CIPHER_BLOCK:
-
 			if ( (ciphertext->length < blocksize) || (ciphertext->length % blocksize != 0) ) {
 				gnutls_assert();
 				return GNUTLS_E_DECRYPTION_FAILED;

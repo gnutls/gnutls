@@ -37,7 +37,7 @@ int _gnutls_send_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	GNUTLS_MPI x, X, g, p;
-	int n_X, n_g, n_p;
+	size_t n_X, n_g, n_p;
 	uint16 _n_X, _n_g, _n_p;
 	uint8 *data = NULL;
 	uint8 *data_p;
@@ -122,7 +122,7 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	GNUTLS_MPI x, X;
-	int n_X;
+	size_t n_X;
 	uint16 _n_X;
 	uint8 *data;
 	int ret = 0;
@@ -130,9 +130,12 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	int premaster_size = 0;
 	svoid *master;
 	char *random = gnutls_malloc(64);
+
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Sending client KX message\n");
 #endif
+
+
 	memmove(random, state->security_parameters.client_random, 32);
 	memmove(&random[32], state->security_parameters.server_random, 32);
 	algorithm =
@@ -173,12 +176,14 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 		    _gnutls_calc_dh_key(state->gnutls_internals.client_Y,
 					x,
 					state->gnutls_internals.client_p);
+
 		gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &premaster_size,
 			       state->gnutls_internals.KEY);
 		premaster = secure_malloc(premaster_size);
 		gcry_mpi_print(GCRYMPI_FMT_USG, premaster,
 			       &premaster_size,
 			       state->gnutls_internals.KEY);
+
 		/* THIS SHOULD BE DISCARDED */
 		gnutls_mpi_release(state->gnutls_internals.KEY);
 		gnutls_mpi_release(state->gnutls_internals.client_Y);
@@ -255,13 +260,16 @@ int _gnutls_recv_server_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	uint16 n_Y, n_g, n_p;
-	int _n_Y, _n_g, _n_p;
+	size_t _n_Y, _n_g, _n_p;
 	uint8 *data;
 	int datasize;
 	uint8 *data_p;
 	uint8 *data_g;
 	uint8 *data_Y;
 	int ret = 0, i;
+unsigned char tmpy[2048];
+int ii;
+
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Receiving Server KX message\n");
 #endif
@@ -356,7 +364,7 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 {
 	KXAlgorithm algorithm;
 	uint16 n_Y;
-	int _n_Y;
+	size_t _n_Y;
 	uint8 *data;
 	int datasize;
 	int ret = 0;
@@ -399,8 +407,11 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 			n_Y = byteswap16(n_Y);
 #endif
 			_n_Y = n_Y;
-			gcry_mpi_scan(&state->gnutls_internals.client_Y,
-				      GCRYMPI_FMT_USG, &data[2], &_n_Y);
+			if (gcry_mpi_scan(&state->gnutls_internals.client_Y,
+				      GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
+				gnutls_assert();
+				return GNUTLS_E_MPI_SCAN_FAILED;
+			}
 			state->gnutls_internals.KEY =
 			    gnutls_calc_dh_key(state->
 					       gnutls_internals.client_Y,
