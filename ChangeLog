@@ -1,3 +1,28 @@
+2004-12-15 17:11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi:
+
+	some additions for certtool 
+
+2004-12-15 13:30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi:
+
+	added documentation for the export/import to pkcs3 and pkcs1 formats
+	for RSA and DH parameters.  
+
+2004-12-15 10:31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c, src/certtool.c, src/cli.c, src/common.c:
+
+	Corrected bugs found by Marcin Garski <mgarski@post.pl> 
+
+2004-12-15 10:28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c, src/certtool.c:
+
+	Corrected bugs found by Marcin Garski <mgarski@post.pl> 
+
 2004-12-14 15:01  Simon Josefsson <simon@josefsson.org>
 
 	* doc/TODO:
