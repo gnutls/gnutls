@@ -1,3 +1,24 @@
+2003-12-29 16:18  nmav <nmav@gnutls.org>
+
+	* src/: tests.c, tests.h, tls_test.c:
+
+	added TLS 1.1 protocol detection.  
+
+2003-12-29 15:35  nmav <nmav@gnutls.org>
+
+	* src/: tests.c, tests.h, tls_test.c:
+
+	added arcfour 40 cipher detection.  
+
+2003-12-29 11:38  nmav <nmav@gnutls.org>
+
+	* NEWS, doc/tex/ex-cert-select.tex, doc/tex/macros.tex,
+	doc/tex/record_weaknesses.tex, lib/gnutls.h.in.in,
+	lib/gnutls_algorithms.c, lib/gnutls_cipher.c, lib/gnutls_int.h,
+	lib/gnutls_record.c, lib/gnutls_state.c, src/common.c, src/serv.c:
+
+	Added support for TLS 1.1 
+
 2003-12-28 15:17  nmav <nmav@gnutls.org>
 
 	* lib/: auth_cert.c, auth_cert.h, gnutls_cert.c, gnutls_random.c,
