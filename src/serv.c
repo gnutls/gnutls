@@ -104,20 +104,14 @@ gnutls_srp_server_credentials srp_cred;
 gnutls_anon_server_credentials dh_cred;
 gnutls_certificate_credentials cert_cred;
 
+const int ssl_session_cache = 40;
 
-#ifdef HAVE_LIBGDBM
+static void wrap_db_init(void);
+static void wrap_db_deinit(void);
+static int wrap_db_store(void *dbf, gnutls_datum key, gnutls_datum data);
+static gnutls_datum wrap_db_fetch(void *dbf, gnutls_datum key);
+static int wrap_db_delete(void *dbf, gnutls_datum key);
 
-# include <gdbm.h>
-
-# define DB_FILE "gnutls-rsm.db"
-
- static void wrap_gdbm_init(void);
- static void wrap_gdbm_deinit(void);
- static int wrap_gdbm_store( void* dbf, gnutls_datum key, gnutls_datum data);
- static gnutls_datum wrap_gdbm_fetch( void* dbf, gnutls_datum key);
- static int wrap_gdbm_delete( void* dbf, gnutls_datum key);
-
-#endif
 
 #define HTTP_STATE_REQUEST	1
 #define HTTP_STATE_RESPONSE	2
@@ -261,14 +255,12 @@ gnutls_session initialize_session (void)
     */
    gnutls_handshake_set_private_extensions( session, 1);
 
-#ifdef HAVE_LIBGDBM
    if (nodb==0) {
-    gnutls_db_set_retrieve_function( session, wrap_gdbm_fetch);
-    gnutls_db_set_remove_function( session, wrap_gdbm_delete);
-    gnutls_db_set_store_function( session, wrap_gdbm_store);
+    gnutls_db_set_retrieve_function( session, wrap_db_fetch);
+    gnutls_db_set_remove_function( session, wrap_db_delete);
+    gnutls_db_set_store_function( session, wrap_db_store);
     gnutls_db_set_ptr( session, NULL);
    }
-#endif
 
     gnutls_cipher_set_priority(session, cipher_priority);
     gnutls_compression_set_priority(session, comp_priority);
@@ -320,6 +312,8 @@ char* peer_print_info(gnutls_session session, int *ret_length, const char* heade
    for (i = 0; i < sesid_size; i++)
       sprintf(tmp2, "%.2X", sesid[i]);
    sprintf(tmp2, "</i></p>\n");
+   sprintf(tmp2, "<h5>If your browser supports session resuming, then you should see the "
+   "same session ID, when you press the <b>reload</b> button.</h5>\n");
 
    /* Here unlike print_info() we use the kx algorithm to distinguish
     * the functions to call.
@@ -488,9 +482,7 @@ int main(int argc, char **argv)
 
    gaa_parser(argc, argv);
 
-#ifdef HAVE_LIBGDBM
-   if (nodb==0) wrap_gdbm_init();
-#endif
+   if (nodb==0) wrap_db_init();
 
    if (http == 1) {
       strcpy(name, "HTTP Server");
@@ -830,9 +822,7 @@ int main(int argc, char **argv)
    gnutls_srp_free_server_cred(srp_cred);
    gnutls_anon_free_server_cred(dh_cred);
 
-#ifdef HAVE_LIBGDBM
-   if (nodb==0) wrap_gdbm_deinit();
-#endif
+   if (nodb==0) wrap_db_deinit();
    gnutls_global_deinit();
 
    return 0;
@@ -1016,89 +1006,102 @@ void serv_version(void) {
 	fprintf(stderr, "version %s.\n", LIBGNUTLS_VERSION);
 }
 
-#ifdef HAVE_LIBGDBM
+/* session resuming support */
 
-static void wrap_gdbm_init(void) {
-	GDBM_FILE tmpdbf;
+#define SESSION_ID_SIZE 32
+#define SESSION_DATA_SIZE 1024
 
-	/* create db */
-	tmpdbf = gdbm_open(DB_FILE, 0, GDBM_NEWDB, 0600, NULL);
-	if (tmpdbf==NULL) {
-		fprintf(stderr, "Error opening gdbm database\n");
-		exit(1);
-	}
-	gdbm_close( tmpdbf);
+typedef struct {
+    char session_id[SESSION_ID_SIZE];
+    int session_id_size;
+
+    char session_data[SESSION_DATA_SIZE];
+    int session_data_size;
+} CACHE;
+
+static CACHE *cache_db;
+int cache_db_ptr = 0;
+
+static void wrap_db_init(void)
+{
+
+    /* allocate cache_db */
+    cache_db = calloc(1, ssl_session_cache * sizeof(CACHE));
 }
 
-static void wrap_gdbm_deinit(void) {
-	return;
+static void wrap_db_deinit(void)
+{
+    return;
 }
 
-static int wrap_gdbm_store( void* dbf, gnutls_datum key, gnutls_datum data) {
-	datum _key, _data;
-	int res;
-	GDBM_FILE write_dbf;
+static int wrap_db_store(void *dbf, gnutls_datum key, gnutls_datum data)
+{
 
-	write_dbf = gdbm_open(DB_FILE, 0, GDBM_WRITER, 0600, NULL);
-	if (write_dbf==NULL) {
-		fprintf(stderr, "Error opening gdbm database\n");
-		exit(1);
-	}
-	
-	_key.dptr = key.data;
-	_key.dsize = key.size;
+    if (cache_db == NULL)
+	return -1;
 
-	_data.dptr = data.data;
-	_data.dsize = data.size;
+    if (key.size > SESSION_ID_SIZE)
+	return -1;
+    if (data.size > SESSION_DATA_SIZE)
+	return -1;
 
-	res = gdbm_store( write_dbf, _key, _data, GDBM_INSERT);
+    memcpy(cache_db[cache_db_ptr].session_id, key.data, key.size);
+    cache_db[cache_db_ptr].session_id_size = key.size;
 
-	gdbm_close( write_dbf);
+    memcpy(cache_db[cache_db_ptr].session_data, data.data, data.size);
+    cache_db[cache_db_ptr].session_data_size = data.size;
+
+    cache_db_ptr++;
+    cache_db_ptr %= ssl_session_cache;
+
+    return 0;
+}
+
+static gnutls_datum wrap_db_fetch(void *dbf, gnutls_datum key)
+{
+    gnutls_datum res = { NULL, 0 };
+    int i;
+
+    if (cache_db == NULL)
 	return res;
-}
 
-static gnutls_datum wrap_gdbm_fetch( void* dbf, gnutls_datum key) {
-	datum _key, _res;
-	gnutls_datum res2;
-	GDBM_FILE read_dbf;
+    for (i = 0; i < ssl_session_cache; i++) {
+	if (key.size == cache_db[i].session_id_size &&
+	    memcmp(key.data, cache_db[i].session_id, key.size) == 0) {
 
-	_key.dptr = key.data;
-	_key.dsize = key.size;
 
-	read_dbf = gdbm_open(DB_FILE, 0, GDBM_READER, 0600, NULL);
-	if (read_dbf==NULL) {
-		fprintf(stderr, "Error opening gdbm database\n");
-		exit(1);
+	    res.size = cache_db[i].session_data_size;
+
+	    res.data = malloc(res.size);
+	    if (res.data == NULL)
+		return res;
+
+	    memcpy(res.data, cache_db[i].session_data, res.size);
+
+	    return res;
 	}
-
-	_res = gdbm_fetch( read_dbf, _key);
-
-	gdbm_close( read_dbf);
-	
-	res2.data = _res.dptr;
-	res2.size = _res.dsize;
-
-	return res2;
+    }
+    return res;
 }
 
-static int wrap_gdbm_delete( void* dbf, gnutls_datum key) {
-	datum _key;
-	int res;
-	GDBM_FILE write_dbf;
+static int wrap_db_delete(void *dbf, gnutls_datum key)
+{
+int i;
 
-	write_dbf = gdbm_open(DB_FILE, 0, GDBM_WRITER, 0600, NULL);
-	if (write_dbf==NULL) {
-		fprintf(stderr, "Error opening gdbm database\n");
-		exit(1);
+    if (cache_db == NULL)
+	return -1;
+
+    for (i = 0; i < ssl_session_cache; i++) {
+	if (key.size == cache_db[i].session_id_size &&
+	    memcmp(key.data, cache_db[i].session_id, key.size) == 0) {
+
+	    cache_db[i].session_id_size = 0;
+	    cache_db[i].session_data_size = 0;
+
+	    return 0;
 	}
-	
-	_key.dptr = key.data;
-	_key.dsize = key.size;
+    }
+    
+    return -1;
 
-	res = gdbm_delete( write_dbf, _key);
-	gdbm_close( write_dbf);
-
-	return res;
 }
-
-#endif /* HAVE LIBGDBM */
