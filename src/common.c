@@ -119,15 +119,16 @@ void print_cert_vrfy(GNUTLS_STATE state)
 	printf("\n");
 
 	switch (status) {
-	case GNUTLS_CERT_NOT_TRUSTED:
-		printf("- Peer's certificate was NOT verified\n");
+	case GNUTLS_CERT_VALID:
+	case GNUTLS_CERT_INVALID:
+		printf("- Peer's certificate is NOT trusted\n");
 		break;
 	case GNUTLS_CERT_EXPIRED:
 		printf
 		    ("- Peer's certificate was verified but is expired\n");
 		break;
 	case GNUTLS_CERT_TRUSTED:
-		printf("- Peer's certificate was verified\n");
+		printf("- Peer's certificate is trusted\n");
 		break;
 	case GNUTLS_CERT_NONE:
 		printf("- Peer did not send any certificate.\n");

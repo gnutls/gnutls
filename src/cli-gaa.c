@@ -102,10 +102,9 @@ void __gaa_helpsingle(char short_name, char *name,
 
 void gaa_help()
 {
-	printf("cli help\nUsage: cli [options]""\n");
+	printf("cli help\nUsage: cli [options] hostname""\n");
 	__gaa_helpsingle('r', "resume", "", "Connect, establish a session. Connect again and resume this session.");
 	__gaa_helpsingle('p', "port", """integer"" ", "The port to connect to.");
-	__gaa_helpsingle(0, "host", """hostname"" ", "The host to connect to.");
 	__gaa_helpsingle(0, "ciphers", """cipher1 cipher2..."" ", "Ciphers to enable.");
 	__gaa_helpsingle(0, "protocols", """protocol1 protocol2..."" ", "Protocols to enable.");
 	__gaa_helpsingle(0, "comp", """comp1 comp2..."" ", "Compression methods to enable.");
@@ -128,32 +127,34 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 33 "cli.gaa"
+#line 39 "cli.gaa"
+	char **rest_args;
+#line 38 "cli.gaa"
+	int nrest_args;
+#line 31 "cli.gaa"
 	char **ctype;
-#line 32 "cli.gaa"
+#line 30 "cli.gaa"
 	int nctype;
-#line 29 "cli.gaa"
+#line 27 "cli.gaa"
 	char **kx;
-#line 28 "cli.gaa"
+#line 26 "cli.gaa"
 	int nkx;
-#line 25 "cli.gaa"
+#line 23 "cli.gaa"
 	char **macs;
-#line 24 "cli.gaa"
+#line 22 "cli.gaa"
 	int nmacs;
-#line 21 "cli.gaa"
+#line 19 "cli.gaa"
 	char **comp;
-#line 20 "cli.gaa"
+#line 18 "cli.gaa"
 	int ncomp;
-#line 17 "cli.gaa"
+#line 15 "cli.gaa"
 	char **proto;
-#line 16 "cli.gaa"
+#line 14 "cli.gaa"
 	int nproto;
-#line 13 "cli.gaa"
+#line 11 "cli.gaa"
 	char **ciphers;
-#line 12 "cli.gaa"
+#line 10 "cli.gaa"
 	int nciphers;
-#line 9 "cli.gaa"
-	char *hostname;
 #line 6 "cli.gaa"
 	int port;
 #line 3 "cli.gaa"
@@ -212,7 +213,7 @@ int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           11
+#define GAA_NB_OPTION           10
 #define GAAOPTID_help	1
 #define GAAOPTID_list	2
 #define GAAOPTID_certtype	3
@@ -221,9 +222,8 @@ int gaa_error = 0;
 #define GAAOPTID_comp	6
 #define GAAOPTID_protocols	7
 #define GAAOPTID_ciphers	8
-#define GAAOPTID_host	9
-#define GAAOPTID_port	10
-#define GAAOPTID_resume	11
+#define GAAOPTID_port	9
+#define GAAOPTID_resume	10
 
 #line 168 "gaa.skel"
 
@@ -442,15 +442,16 @@ struct GAAOPTION_ciphers
 	int size1;
 };
 
-struct GAAOPTION_host 
-{
-	char* arg1;
-	int size1;
-};
-
 struct GAAOPTION_port 
 {
 	int arg1;
+	int size1;
+};
+#define GAA_REST_EXISTS
+
+struct GAAREST
+{
+	char** arg1;
 	int size1;
 };
          
@@ -489,7 +490,6 @@ int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("", GAAOPTID_comp);
 			GAA_CHECK1STR("", GAAOPTID_protocols);
 			GAA_CHECK1STR("", GAAOPTID_ciphers);
-			GAA_CHECK1STR("", GAAOPTID_host);
 			GAA_CHECK1STR("p", GAAOPTID_port);
         case GAA_MULTIPLE_OPTION:
 #line 375 "gaa.skel"
@@ -508,7 +508,6 @@ int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("comp", GAAOPTID_comp);
 			GAA_CHECKSTR("protocols", GAAOPTID_protocols);
 			GAA_CHECKSTR("ciphers", GAAOPTID_ciphers);
-			GAA_CHECKSTR("host", GAAOPTID_host);
 			GAA_CHECKSTR("port", GAAOPTID_port);
 			GAA_CHECKSTR("resume", GAAOPTID_resume);
 
@@ -529,7 +528,6 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	struct GAAOPTION_comp GAATMP_comp;
 	struct GAAOPTION_protocols GAATMP_protocols;
 	struct GAAOPTION_ciphers GAATMP_ciphers;
-	struct GAAOPTION_host GAATMP_host;
 	struct GAAOPTION_port GAATMP_port;
 
 #line 393 "gaa.skel"
@@ -553,14 +551,14 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 38 "cli.gaa"
+#line 36 "cli.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list:
 	OK = 0;
-#line 37 "cli.gaa"
+#line 35 "cli.gaa"
 { print_list(); exit(0); ;};
 
 		return GAA_OK;
@@ -568,7 +566,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_certtype:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_certtype.arg1, gaa_getstr, char*, GAATMP_certtype.size1);
-#line 34 "cli.gaa"
+#line 32 "cli.gaa"
 { gaaval->ctype = GAATMP_certtype.arg1; gaaval->nctype = GAATMP_certtype.size1 ;};
 
 		return GAA_OK;
@@ -576,7 +574,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_kx:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_kx.arg1, gaa_getstr, char*, GAATMP_kx.size1);
-#line 30 "cli.gaa"
+#line 28 "cli.gaa"
 { gaaval->kx = GAATMP_kx.arg1; gaaval->nkx = GAATMP_kx.size1 ;};
 
 		return GAA_OK;
@@ -584,7 +582,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_macs:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_macs.arg1, gaa_getstr, char*, GAATMP_macs.size1);
-#line 26 "cli.gaa"
+#line 24 "cli.gaa"
 { gaaval->macs = GAATMP_macs.arg1; gaaval->nmacs = GAATMP_macs.size1 ;};
 
 		return GAA_OK;
@@ -592,7 +590,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_comp:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_comp.arg1, gaa_getstr, char*, GAATMP_comp.size1);
-#line 22 "cli.gaa"
+#line 20 "cli.gaa"
 { gaaval->comp = GAATMP_comp.arg1; gaaval->ncomp = GAATMP_comp.size1 ;};
 
 		return GAA_OK;
@@ -600,7 +598,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_protocols:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_protocols.arg1, gaa_getstr, char*, GAATMP_protocols.size1);
-#line 18 "cli.gaa"
+#line 16 "cli.gaa"
 { gaaval->proto = GAATMP_protocols.arg1; gaaval->nproto = GAATMP_protocols.size1 ;};
 
 		return GAA_OK;
@@ -608,18 +606,8 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_ciphers:
 	OK = 0;
 		GAA_LIST_FILL(GAATMP_ciphers.arg1, gaa_getstr, char*, GAATMP_ciphers.size1);
-#line 14 "cli.gaa"
+#line 12 "cli.gaa"
 { gaaval->ciphers = GAATMP_ciphers.arg1; gaaval->nciphers = GAATMP_ciphers.size1 ;};
-
-		return GAA_OK;
-		break;
-	case GAAOPTID_host:
-	OK = 0;
-		GAA_TESTMOREARGS;
-		GAA_FILL(GAATMP_host.arg1, gaa_getstr, GAATMP_host.size1);
-		gaa_index++;
-#line 10 "cli.gaa"
-{ gaaval->hostname = GAATMP_host.arg1 ;};
 
 		return GAA_OK;
 		break;
@@ -637,6 +625,13 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	OK = 0;
 #line 4 "cli.gaa"
 { gaaval->resume = 1 ;};
+
+		return GAA_OK;
+		break;
+	case GAA_REST:
+		GAA_OPTIONALLIST_FILL(GAAREST_tmp.arg1, gaa_getstr, char*, GAAREST_tmp.size1);
+#line 40 "cli.gaa"
+{ gaaval->rest_args = GAAREST_tmp.arg1; gaaval->nrest_args = GAAREST_tmp.size1 ;};
 
 		return GAA_OK;
 		break;
@@ -663,8 +658,8 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 40 "cli.gaa"
-{ gaaval->resume=0; gaaval->port=5556; gaaval->hostname="localhost"; gaaval->ciphers=NULL;
+#line 42 "cli.gaa"
+{ gaaval->resume=0; gaaval->port=5556; gaaval->rest_args=NULL; gaaval->nrest_args=0; gaaval->ciphers=NULL;
 	gaaval->kx=NULL; gaaval->comp=NULL; gaaval->macs=NULL; gaaval->ctype=NULL; gaaval->nciphers=0;
 	gaaval->nkx=0; gaaval->ncomp=0; gaaval->nmacs=0; gaaval->nctype = 0; ;};
 

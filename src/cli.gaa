@@ -1,4 +1,4 @@
-helpnode "cli help\nUsage: cli [options]"
+helpnode "cli help\nUsage: cli [options] hostname"
 
 #int resume;
 option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again and resume this session."
@@ -6,8 +6,6 @@ option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again 
 #int port;
 option (p, port) INT "integer" { $port = $1 } "The port to connect to."
 
-#char *hostname;
-option (host) STR "hostname" { $hostname = $1 } "The host to connect to."
 
 #int nciphers;
 #char **ciphers;
@@ -37,7 +35,11 @@ option (certtype) *STR "certtype1 certtype2..." { $ctype = $1; $nctype = @1 } "C
 option (l, list) { print_list(); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
-init { $resume=0; $port=5556; $hostname="localhost"; $ciphers=NULL;
+#int nrest_args;
+#char **rest_args;
+rest optional *STR "hostname" { $rest_args = $1; $nrest_args = @1 }
+
+init { $resume=0; $port=5556; $rest_args=NULL; $nrest_args=0; $ciphers=NULL;
 	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
 	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; }
 
