@@ -29,8 +29,8 @@
 
 /**
   * gnutls_cipher_set_priority - Sets the priority on the ciphers supported by gnutls.
-  * @state: is a &GNUTLS_STATE structure.
-  * @list: is a 0 terminated list of BulkCipherAlgorithm elements.
+  * @session: is a &gnutls_session structure.
+  * @list: is a 0 terminated list of gnutls_cipher_algorithm elements.
   *
   * Sets the priority on the ciphers supported by gnutls.
   * Priority is higher for ciphers specified before others.
@@ -39,8 +39,8 @@
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
-GNUTLS_LIST _list = list;
+int gnutls_cipher_set_priority( gnutls_session session, gnutls_list list) {
+gnutls_list _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -49,10 +49,10 @@ int num=0, i;
 	} 
 
 	num = GMIN( MAX_ALGOS, num);
-	state->gnutls_internals.BulkCipherAlgorithmPriority.algorithms = num;
+	session->internals.cipher_algorithm_priority.algorithms = num;
 	
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.BulkCipherAlgorithmPriority.algorithm_priority[i] = list[i];
+		session->internals.cipher_algorithm_priority.priority[i] = list[i];
 	}
 	
 	return 0;
@@ -60,8 +60,8 @@ int num=0, i;
 
 /**
   * gnutls_kx_set_priority - Sets the priority on the key exchange algorithms supported by gnutls.
-  * @state: is a &GNUTLS_STATE structure.
-  * @list: is a 0 terminated list of KXAlgorithm elements.
+  * @session: is a &gnutls_session structure.
+  * @list: is a 0 terminated list of gnutls_kx_algorithm elements.
   *
   * Sets the priority on the key exchange algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -70,8 +70,8 @@ int num=0, i;
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
  **/
-int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
-GNUTLS_LIST _list = list;
+int gnutls_kx_set_priority( gnutls_session session, gnutls_list list) {
+gnutls_list _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -81,10 +81,10 @@ int num=0, i;
 
 
 	num = GMIN( MAX_ALGOS, num);
-	state->gnutls_internals.KXAlgorithmPriority.algorithms = num;
+	session->internals.kx_algorithm_priority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.KXAlgorithmPriority.algorithm_priority[i] = list[i];
+		session->internals.kx_algorithm_priority.priority[i] = list[i];
 	}
 
 	return 0;
@@ -92,8 +92,8 @@ int num=0, i;
 
 /**
   * gnutls_mac_set_priority - Sets the priority on the mac algorithms supported by gnutls.
-  * @state: is a &GNUTLS_STATE structure.
-  * @list: is a 0 terminated list of MACAlgorithm elements.
+  * @session: is a &gnutls_session structure.
+  * @list: is a 0 terminated list of gnutls_mac_algorithm elements.
   *
   * Sets the priority on the mac algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -102,8 +102,8 @@ int num=0, i;
   * not use the algorithm's priority except for disabling
   * algorithms that were not specified.
   **/
-int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
-GNUTLS_LIST _list = list;
+int gnutls_mac_set_priority( gnutls_session session, gnutls_list list) {
+gnutls_list _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -113,10 +113,10 @@ int num=0, i;
 
 	
 	num = GMIN( MAX_ALGOS, num);
-	state->gnutls_internals.MACAlgorithmPriority.algorithms = num;
+	session->internals.mac_algorithm_priority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.MACAlgorithmPriority.algorithm_priority[i] = list[i];
+		session->internals.mac_algorithm_priority.priority[i] = list[i];
 	}
 
 	return 0;
@@ -124,8 +124,8 @@ int num=0, i;
 
 /**
   * gnutls_compression_set_priority - Sets the priority on the compression algorithms supported by gnutls.
-  * @state: is a &GNUTLS_STATE structure.
-  * @list: is a 0 terminated list of CompressionMethod elements.
+  * @session: is a &gnutls_session structure.
+  * @list: is a 0 terminated list of gnutls_compression_method elements.
   *
   * Sets the priority on the compression algorithms supported by gnutls.
   * Priority is higher for algorithms specified before others.
@@ -139,8 +139,8 @@ int num=0, i;
   * as gnutls extensions.
   *
   **/
-int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
-GNUTLS_LIST _list = list;
+int gnutls_compression_set_priority( gnutls_session session, gnutls_list list) {
+gnutls_list _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -149,26 +149,26 @@ int num=0, i;
 	} 
 	
 	num = GMIN( MAX_ALGOS, num);
-	state->gnutls_internals.CompressionMethodPriority.algorithms = num;
+	session->internals.compression_method_priority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.CompressionMethodPriority.algorithm_priority[i] = list[i];
+		session->internals.compression_method_priority.priority[i] = list[i];
 	}
 	return 0;
 }
 
 /**
   * gnutls_protocol_set_priority - Sets the priority on the protocol versions supported by gnutls.
-  * @state: is a &GNUTLS_STATE structure.
-  * @list: is a 0 terminated list of GNUTLS_Version elements.
+  * @session: is a &gnutls_session structure.
+  * @list: is a 0 terminated list of gnutls_protocol_version elements.
   *
   * Sets the priority on the protocol versions supported by gnutls.
   * This function actually enables or disables protocols. Newer protocol
   * versions always have highest priority.
   *
   **/
-int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
-GNUTLS_LIST _list = list;
+int gnutls_protocol_set_priority( gnutls_session session, gnutls_list list) {
+gnutls_list _list = list;
 int num=0, i;
 
 	while( *_list != 0) {
@@ -178,25 +178,25 @@ int num=0, i;
 
 	
 	num = GMIN( MAX_ALGOS, num);
-	state->gnutls_internals.ProtocolPriority.algorithms = num;
+	session->internals.protocol_priority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.ProtocolPriority.algorithm_priority[i] = list[i];
+		session->internals.protocol_priority.priority[i] = list[i];
 	}
 
 	/* set the current version to the first in the chain.
 	 * This will be overriden later.
 	 */
 	if (num > 0)
-		_gnutls_set_current_version( state, state->gnutls_internals.ProtocolPriority.algorithm_priority[0]);
+		_gnutls_set_current_version( session, session->internals.protocol_priority.priority[0]);
 
 	return 0;
 }
 
 /**
   * gnutls_cert_type_set_priority - Sets the priority on the certificate types supported by gnutls.
-  * @state: is a &GNUTLS_STATE structure.
-  * @list: is a 0 terminated list of GNUTLS_CertificateType elements.
+  * @session: is a &gnutls_session structure.
+  * @list: is a 0 terminated list of gnutls_certificate_type elements.
   *
   * Sets the priority on the certificate types supported by gnutls.
   * Priority is higher for types specified before others.
@@ -205,9 +205,9 @@ int num=0, i;
   * The server does not use the cert type priority except for disabling
   * types that were not specified.
   **/
-int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST list) {
+int gnutls_cert_type_set_priority( gnutls_session session, gnutls_list list) {
 #ifdef HAVE_LIBOPENCDK
-GNUTLS_LIST _list = list;
+gnutls_list _list = list;
 int num=0, i;
 
 
@@ -217,10 +217,10 @@ int num=0, i;
 	} 
 
 	num = GMIN( MAX_ALGOS, num);
-	state->gnutls_internals.cert_type_priority.algorithms = num;
+	session->internals.cert_type_priority.algorithms = num;
 
 	for (i=0;i<num;i++) {
-		state->gnutls_internals.cert_type_priority.algorithm_priority[i] = list[i];
+		session->internals.cert_type_priority.priority[i] = list[i];
 	}
 
 	return 0;

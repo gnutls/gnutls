@@ -21,9 +21,9 @@ int main()
    int err, ret;
    int sd, ii;
    struct sockaddr_in sa;
-   GNUTLS_STATE state;
+   gnutls_session session;
    char buffer[MAX_BUF + 1];
-   GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
+   gnutls_certificate_client_credentials xcred;
    const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
    const int kx_priority[] = { GNUTLS_KX_RSA, 0 };
    const int cipher_priority[] = { GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR\_128, 0};
@@ -58,41 +58,41 @@ int main()
       fprintf(stderr, "Connect error\n");
       exit(1);
    }
-   /* Initialize TLS state 
+   /* Initialize TLS session 
     */
-   gnutls_init(&state, GNUTLS_CLIENT);
+   gnutls_session_init(&session, GNUTLS_CLIENT);
 
    /* allow both SSL3 and TLS1
     */
-   gnutls_protocol_set_priority(state, protocol_priority);
+   gnutls_protocol_set_priority(session, protocol_priority);
 
    /* allow only ARCFOUR and 3DES ciphers
     * (3DES has the highest priority)
     */
-   gnutls_cipher_set_priority(state, cipher_priority);
+   gnutls_cipher_set_priority(session, cipher_priority);
 
    /* only allow null compression
     */
-   gnutls_compression_set_priority(state, comp_priority);
+   gnutls_compression_set_priority(session, comp_priority);
 
    /* use GNUTLS_KX_RSA
     */
-   gnutls_kx_set_priority(state, kx_priority);
+   gnutls_kx_set_priority(session, kx_priority);
 
    /* allow the usage of both SHA and MD5
     */
-   gnutls_mac_set_priority(state, mac_priority);
+   gnutls_mac_set_priority(session, mac_priority);
 
 
-   /* put the x509 credentials to the current state
+   /* put the x509 credentials to the current session
     */
-   gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+   gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
 
-   gnutls_transport_set_ptr( state, sd);
+   gnutls_transport_set_ptr( session, sd);
    /* Perform the TLS handshake
     */
-   ret = gnutls_handshake( state);
+   ret = gnutls_handshake( session);
 
    if (ret < 0) {
       fprintf(stderr, "*** Handshake failed\n");
@@ -102,9 +102,9 @@ int main()
       printf("- Handshake was completed\n");
    }
 
-   gnutls_record_send( state, MSG, strlen(MSG));
+   gnutls_record_send( session, MSG, strlen(MSG));
 
-   ret = gnutls_record_recv( state, buffer, MAX_BUF);
+   ret = gnutls_record_recv( session, buffer, MAX_BUF);
    if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
       if (ret == 0) {
          printf("- Peer has closed the GNUTLS connection\n");
@@ -116,10 +116,10 @@ int main()
       }
    } else {
       if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-         printf("* Received alert [%d]\n", gnutls_alert_get(state));
+         printf("* Received alert [%d]\n", gnutls_alert_get(session));
       if (ret == GNUTLS_E_REHANDSHAKE)
          printf("* Received HelloRequest message (server asked to rehandshake)\n");
-         gnutls_alert_send_appropriate( state, ret); /* we don't want rehandshake */
+         gnutls_alert_send_appropriate( session, ret); /* we don't want rehandshake */
    }
 
    if (ret > 0) {
@@ -129,14 +129,14 @@ int main()
       }
       fputs("\n", stdout);
    }
-   gnutls_bye( state, GNUTLS_SHUT_RDWR);
+   gnutls_bye( session, GNUTLS_SHUT_RDWR);
 
  end:
 
    shutdown(sd, SHUT_RDWR);     /* no more receptions */
    close(sd);
 
-   gnutls_deinit(state);
+   gnutls_session_deinit(session);
 
    gnutls_certificate_free_client_cred(xcred);
 

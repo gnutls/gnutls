@@ -23,13 +23,13 @@
 #include "debug.h"
 #include <gnutls_session_pack.h>
 
-#define SESSION_SIZE _gnutls_session_size( state)
+#define SESSION_SIZE _gnutls_session_size( session)
 
 /**
   * gnutls_session_get_data - Returns all session parameters.
-  * @state: is a &GNUTLS_STATE structure.
-  * @session: is a pointer to space to hold the session.
-  * @session_size: is the session's size, or it will be set by the function.
+  * @session: is a &gnutls_session structure.
+  * @session_data: is a pointer to space to hold the session.
+  * @session_data_size: is the session_data's size, or it will be set by the function.
   *
   * Returns all session parameters - in order to support resuming.
   * The client should call this - and keep the returned session - if he wants to
@@ -38,30 +38,30 @@
   *
   * Resuming sessions is really useful and speedups connections after a succesful one.
   **/
-int gnutls_session_get_data( GNUTLS_STATE state, opaque* session, int *session_size) {
+int gnutls_session_get_data( gnutls_session session, opaque* session_data, int *session_data_size) {
 
 	gnutls_datum psession;
 	int ret;
 	
-	if (*session_size < SESSION_SIZE || session==NULL) {
-		*session_size = SESSION_SIZE;
-		session = NULL; /* return with the new session_size value */
+	if (*session_data_size < SESSION_SIZE || session_data==NULL) {
+		*session_data_size = SESSION_SIZE;
+		session_data = NULL; /* return with the new session_data_size value */
 	}
 
-	if (state->gnutls_internals.resumable==RESUME_FALSE) return GNUTLS_E_INVALID_SESSION;
+	if (session->internals.resumable==RESUME_FALSE) return GNUTLS_E_INVALID_SESSION;
 	/* just return the session size */
-	if (session==NULL) {
+	if (session_data==NULL) {
 		return 0;
 	}
 	
-	psession.data = session;
+	psession.data = session_data;
 	
-	ret = _gnutls_session_pack( state, &psession);
+	ret = _gnutls_session_pack( session, &psession);
 	if (ret< 0) {
 		gnutls_assert();
 		return ret;
 	}
-	*session_size = psession.size;
+	*session_data_size = psession.size;
 
 	return 0;
 }
@@ -69,9 +69,9 @@ int gnutls_session_get_data( GNUTLS_STATE state, opaque* session, int *session_s
 
 /**
   * gnutls_session_get_id - Returns session id.
-  * @state: is a &GNUTLS_STATE structure.
-  * @session: is a pointer to space to hold the session id.
-  * @session_size: is the session id's size, or it will be set by the function.
+  * @session: is a &gnutls_session structure.
+  * @session_id: is a pointer to space to hold the session id.
+  * @session_id_size: is the session id's size, or it will be set by the function.
   *
   * Returns the current session id. This can be used if you want to check if
   * the next session you tried to resume was actually resumed.
@@ -81,24 +81,24 @@ int gnutls_session_get_data( GNUTLS_STATE state, opaque* session, int *session_s
   * Session id is some data set by the server, that identify the current session. 
   * In TLS 1.0 session id should not be more than 32 bytes.
   **/
-int gnutls_session_get_id( GNUTLS_STATE state, void* session, int *session_size) {
+int gnutls_session_get_id( gnutls_session session, void* session_id, int *session_id_size) {
 
-	*session_size = state->security_parameters.session_id_size;
+	*session_id_size = session->security_parameters.session_id_size;
 	
 	/* just return the session size */
-	if (session==NULL) {
+	if (session_id==NULL) {
 		return 0;
 	}
-	memcpy( session, &state->security_parameters.session_id, *session_size);
+	memcpy( session_id, &session->security_parameters.session_id, *session_id_size);
 	
 	return 0;
 }
 
 /**
   * gnutls_session_set_data - Sets all session parameters
-  * @state: is a &GNUTLS_STATE structure.
-  * @session: is a pointer to space to hold the session.
-  * @session_size: is the session's size
+  * @session: is a &gnutls_session structure.
+  * @session_data: is a pointer to space to hold the session.
+  * @session_data_size: is the session's size
   *
   * Sets all session parameters - in order to support resuming
   * session must be the one returned by gnutls_session_get_data();
@@ -107,15 +107,17 @@ int gnutls_session_get_id( GNUTLS_STATE state, void* session, int *session_size)
   * choose not to resume the session, thus a full handshake will be
   * performed.
   **/
-int gnutls_session_set_data( GNUTLS_STATE state, opaque* session, int session_size) {
+int gnutls_session_set_data( gnutls_session session, const opaque* session_data, 
+	int session_data_size) 
+{
 	int ret;
-	gnutls_datum psession = { session, session_size };
+	gnutls_datum psession = { (opaque*)session_data, session_data_size };
 
-	if (session==NULL || session_size == 0) {
+	if (session_data==NULL || session_data_size == 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
-	ret = _gnutls_session_unpack( state, &psession);
+	ret = _gnutls_session_unpack( session, &psession);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

@@ -36,10 +36,10 @@
 #include "gnutls_mpi.h"
 #include <gnutls_state.h>
 
-int gen_anon_server_kx( GNUTLS_STATE, opaque**);
-int gen_anon_client_kx( GNUTLS_STATE, opaque**);
-int proc_anon_server_kx( GNUTLS_STATE, opaque*, int);
-int proc_anon_client_kx( GNUTLS_STATE, opaque*, int);
+int gen_anon_server_kx( gnutls_session, opaque**);
+int gen_anon_client_kx( gnutls_session, opaque**);
+int proc_anon_server_kx( gnutls_session, opaque*, int);
+int proc_anon_client_kx( gnutls_session, opaque*, int);
 
 const MOD_AUTH_STRUCT anon_auth_struct = {
 	"ANON",
@@ -62,7 +62,7 @@ const MOD_AUTH_STRUCT anon_auth_struct = {
 	NULL
 };
 
-int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
+int gen_anon_server_kx( gnutls_session session, opaque** data) {
 	GNUTLS_MPI x, X, g, p;
 	int bits, ret;
 	size_t n_X, n_g, n_p;
@@ -72,13 +72,13 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	ANON_SERVER_AUTH_INFO info;
 	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
 	
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_ANON, NULL);
+	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_ANON, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	bits = _gnutls_dh_get_prime_bits( state);
+	bits = _gnutls_dh_get_prime_bits( session);
 
 	g = gnutls_get_dh_params( cred->dh_params, &p, bits);
 	if (g==NULL || p==NULL) {
@@ -86,13 +86,13 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT), 1)) < 0) {
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_SERVER_AUTH_INFO_INT), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info( state);	
-	if ((ret=_gnutls_dh_set_prime_bits( state, _gnutls_mpi_get_nbits(p))) < 0) {
+	info = _gnutls_get_auth_info( session);	
+	if ((ret=_gnutls_dh_set_prime_bits( session, _gnutls_mpi_get_nbits(p))) < 0) {
 		gnutls_assert();
 		return ret;
 	}
@@ -106,13 +106,13 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 		_gnutls_mpi_release( &X);
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	ret=_gnutls_dh_set_secret_bits( state, _gnutls_mpi_get_nbits(x));
+	ret=_gnutls_dh_set_secret_bits( session, _gnutls_mpi_get_nbits(x));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
 	}
 	
-	state->gnutls_key->dh_secret = x;
+	session->gnutls_key->dh_secret = x;
 	_gnutls_mpi_print( NULL, &n_g, g);
 	_gnutls_mpi_print( NULL, &n_p, p);
 	_gnutls_mpi_print( NULL, &n_X, X);
@@ -144,20 +144,20 @@ int gen_anon_server_kx( GNUTLS_STATE state, opaque** data) {
 	return n_p+n_g+n_X+6;
 }
 
-int gen_anon_client_kx( GNUTLS_STATE state, opaque** data) {
+int gen_anon_client_kx( gnutls_session session, opaque** data) {
 GNUTLS_MPI x, X;
 size_t n_X;
 int ret;
 
-	X =  gnutls_calc_dh_secret(&x, state->gnutls_key->client_g,
-		   state->gnutls_key->client_p);
+	X =  gnutls_calc_dh_secret(&x, session->gnutls_key->client_g,
+		   session->gnutls_key->client_p);
 
 	if (X==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	ret=_gnutls_dh_set_secret_bits( state, _gnutls_mpi_get_nbits(x));
+	ret=_gnutls_dh_set_secret_bits( session, _gnutls_mpi_get_nbits(x));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -176,17 +176,17 @@ int ret;
 	_gnutls_write_uint16( n_X, &(*data)[0]);
 
 	/* calculate the key after calculating the message */
-	state->gnutls_key->KEY = gnutls_calc_dh_key(state->gnutls_key->client_Y, x, state->gnutls_key->client_p);
-	if (state->gnutls_key->KEY==NULL)
+	session->gnutls_key->KEY = gnutls_calc_dh_key(session->gnutls_key->client_Y, x, session->gnutls_key->client_p);
+	if (session->gnutls_key->KEY==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
 	/* THESE SHOULD BE DISCARDED */
-	_gnutls_mpi_release(&state->gnutls_key->client_Y);
-	_gnutls_mpi_release(&state->gnutls_key->client_p);
-	_gnutls_mpi_release(&state->gnutls_key->client_g);
+	_gnutls_mpi_release(&session->gnutls_key->client_Y);
+	_gnutls_mpi_release(&session->gnutls_key->client_p);
+	_gnutls_mpi_release(&session->gnutls_key->client_g);
 
-	ret = _gnutls_generate_key( state->gnutls_key);
-	_gnutls_mpi_release(&state->gnutls_key->KEY);
+	ret = _gnutls_generate_key( session->gnutls_key);
+	_gnutls_mpi_release(&session->gnutls_key->KEY);
 
 	if (ret < 0) {
 		return ret;
@@ -194,7 +194,7 @@ int ret;
 	return n_X+2;
 }
 
-int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
+int proc_anon_server_kx( gnutls_session session, opaque* data, int data_size) {
 	uint16 n_Y, n_g, n_p;
 	size_t _n_Y, _n_g, _n_p;
 	uint8 *data_p;
@@ -234,43 +234,43 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	_n_g = n_g;
 	_n_p = n_p;
 
-	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y, data_Y, &_n_Y) != 0 || state->gnutls_key->client_Y==NULL) {
+	if (_gnutls_mpi_scan(&session->gnutls_key->client_Y, data_Y, &_n_Y) != 0 || session->gnutls_key->client_Y==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	if (_gnutls_mpi_scan(&state->gnutls_key->client_g, data_g, &_n_g) != 0 || state->gnutls_key->client_g==NULL) {
+	if (_gnutls_mpi_scan(&session->gnutls_key->client_g, data_g, &_n_g) != 0 || session->gnutls_key->client_g==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
-	if (_gnutls_mpi_scan(&state->gnutls_key->client_p, data_p, &_n_p) != 0 || state->gnutls_key->client_p==NULL) {
+	if (_gnutls_mpi_scan(&session->gnutls_key->client_p, data_p, &_n_p) != 0 || session->gnutls_key->client_p==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
 
 	/* set auth_info */
-	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_CRD_ANON, sizeof( ANON_CLIENT_AUTH_INFO_INT), 1)) < 0) {
+	if ( (ret=_gnutls_auth_info_set( session, GNUTLS_CRD_ANON, sizeof( ANON_CLIENT_AUTH_INFO_INT), 1)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	if ( _gnutls_mpi_get_nbits( state->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( state)) {
+	if ( _gnutls_mpi_get_nbits( session->gnutls_key->client_p) < _gnutls_dh_get_prime_bits( session)) {
 		/* the prime used by the peer is not acceptable
 		 */
 		gnutls_assert();
 		return GNUTLS_E_DH_PRIME_UNACCEPTABLE;
 	}
 	
-	ret=_gnutls_dh_set_prime_bits( state, _gnutls_mpi_get_nbits(
-		state->gnutls_key->client_p));
+	ret=_gnutls_dh_set_prime_bits( session, _gnutls_mpi_get_nbits(
+		session->gnutls_key->client_p));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( state, _gnutls_mpi_get_nbits(
-		state->gnutls_key->client_Y));
+	ret=_gnutls_dh_set_peer_public_bits( session, _gnutls_mpi_get_nbits(
+		session->gnutls_key->client_Y));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
@@ -280,27 +280,27 @@ int proc_anon_server_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 	return 0;
 }
 
-int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
+int proc_anon_client_kx( gnutls_session session, opaque* data, int data_size) {
 	uint16 n_Y;
 	size_t _n_Y;
 	GNUTLS_MPI g, p;
 	int bits, ret;
 	const GNUTLS_ANON_SERVER_CREDENTIALS cred;
 	
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_ANON, NULL);
+	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_ANON, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	bits = _gnutls_dh_get_prime_bits( state);
+	bits = _gnutls_dh_get_prime_bits( session);
 
 	DECR_LEN( data_size, 2);
 	n_Y = _gnutls_read_uint16( &data[0]);
 
 	_n_Y = n_Y;
 	DECR_LEN( data_size, n_Y);
-	if (_gnutls_mpi_scan(&state->gnutls_key->client_Y, &data[2], &_n_Y) !=0 || state->gnutls_key->client_Y==NULL) {
+	if (_gnutls_mpi_scan(&session->gnutls_key->client_Y, &data[2], &_n_Y) !=0 || session->gnutls_key->client_Y==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
@@ -311,23 +311,23 @@ int proc_anon_client_kx( GNUTLS_STATE state, opaque* data, int data_size) {
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret=_gnutls_dh_set_peer_public_bits( state, _gnutls_mpi_get_nbits(state->gnutls_key->client_Y));
+	ret=_gnutls_dh_set_peer_public_bits( session, _gnutls_mpi_get_nbits(session->gnutls_key->client_Y));
 	if (ret<0) {
 		gnutls_assert();
 		return ret;
 	}
 
-	state->gnutls_key->KEY = gnutls_calc_dh_key( state->gnutls_key->client_Y, state->gnutls_key->dh_secret, p);
-	if (state->gnutls_key->KEY==NULL)
+	session->gnutls_key->KEY = gnutls_calc_dh_key( session->gnutls_key->client_Y, session->gnutls_key->dh_secret, p);
+	if (session->gnutls_key->KEY==NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 	
-	_gnutls_mpi_release(&state->gnutls_key->client_Y);
-	_gnutls_mpi_release(&state->gnutls_key->dh_secret);
+	_gnutls_mpi_release(&session->gnutls_key->client_Y);
+	_gnutls_mpi_release(&session->gnutls_key->dh_secret);
 	_gnutls_mpi_release(&p);
 	_gnutls_mpi_release(&g);
 
-	ret = _gnutls_generate_key( state->gnutls_key);
-	_gnutls_mpi_release(&state->gnutls_key->KEY);
+	ret = _gnutls_generate_key( session->gnutls_key);
+	_gnutls_mpi_release(&session->gnutls_key->KEY);
 
 	if (ret < 0) {
 		return ret;

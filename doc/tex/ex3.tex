@@ -10,37 +10,37 @@
         PRINTX( "E:", X.email)
 
 /* This function will print some details of the
- * given state.
+ * given session.
  */
-int print_info(GNUTLS_STATE state)
+int print_info(gnutls_session session)
 {
    const char *tmp;
-   GNUTLS_CredType cred;
+   gnutls_credentials_type cred;
    gnutls_x509_dn dn;
    const gnutls_datum *cert_list;
    int status;
    int cert_list_size = 0;
-   GNUTLS_KXAlgorithm kx;
-   time_t expiret = gnutls_certificate_expiration_time_peers(state);
-   time_t activet = gnutls_certificate_activation_time_peers(state);
+   gnutls_kx_algorithm kx;
+   time_t expiret = gnutls_certificate_expiration_time_peers(session);
+   time_t activet = gnutls_certificate_activation_time_peers(session);
 
    /* print the key exchange's algorithm name
     */
-   kx = gnutls_kx_get(state);
+   kx = gnutls_kx_get(session);
    tmp = gnutls_kx_get_name(kx);
    printf("- Key Exchange: %s\n", tmp);
 
-   cred = gnutls_auth_get_type(state);
+   cred = gnutls_auth_get_type(session);
    switch (cred) {
    case GNUTLS_CRD_ANON:
       printf("- Anonymous DH using prime of %d bits\n",
-             gnutls_dh_get_bits(state));
+             gnutls_dh_get_bits(session));
       break;
    case GNUTLS_CRD_CERTIFICATE:
       /* in case of certificate authentication
        */
-      cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
-      status = gnutls_certificate_verify_peers(state);
+      cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
+      status = gnutls_certificate_verify_peers(session);
       
       if ( status < 0) {
          if ( status == GNUTLS_E_NO_CERTIFICATE_FOUND)
@@ -66,13 +66,13 @@ int print_info(GNUTLS_STATE state)
        */
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
          printf("\n- Ephemeral DH using prime of %d bits\n",
-                gnutls_dh_get_bits(state));
+                gnutls_dh_get_bits(session));
       }
 
       /* if the certificate list is available, then
        * print some information about it.
        */
-      if (cert_list_size > 0 && gnutls_cert_type_get(state) == GNUTLS_CRT_X509) {
+      if (cert_list_size > 0 && gnutls_cert_type_get(session) == GNUTLS_CRT_X509) {
          char digest[20];
          char serial[40];
          int digest_size = sizeof(digest), i;
@@ -138,19 +138,19 @@ int print_info(GNUTLS_STATE state)
       }
    }
 
-   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
+   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
    printf("- Protocol: %s\n", tmp);
 
-   tmp = gnutls_cert_type_get_name( gnutls_cert_type_get(state));
+   tmp = gnutls_cert_type_get_name( gnutls_cert_type_get(session));
    printf("- Certificate Type: %s\n", tmp);
 
-   tmp = gnutls_compression_get_name(gnutls_compression_get(state));
+   tmp = gnutls_compression_get_name(gnutls_compression_get(session));
    printf("- Compression: %s\n", tmp);
 
-   tmp = gnutls_cipher_get_name(gnutls_cipher_get(state));
+   tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
    printf("- Cipher: %s\n", tmp);
 
-   tmp = gnutls_mac_get_name(gnutls_mac_get(state));
+   tmp = gnutls_mac_get_name(gnutls_mac_get(session));
    printf("- MAC: %s\n", tmp);
 
    return 0;

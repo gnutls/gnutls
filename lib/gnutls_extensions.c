@@ -83,11 +83,11 @@ const char *_gnutls_extension_get_name(uint16 type)
 /* Checks if the extension we just received is one of the 
  * requested ones. Otherwise it's a fatal error.
  */
-static int _gnutls_extension_list_check( GNUTLS_STATE state, uint8 type) {
+static int _gnutls_extension_list_check( gnutls_session session, uint8 type) {
 int i;
-	if (state->security_parameters.entity==GNUTLS_CLIENT) {
-		for(i=0;i<state->gnutls_internals.extensions_sent_size;i++) {
-			if (type==state->gnutls_internals.extensions_sent[i])
+	if (session->security_parameters.entity==GNUTLS_CLIENT) {
+		for(i=0;i<session->internals.extensions_sent_size;i++) {
+			if (type==session->internals.extensions_sent[i])
 				return 0; /* ok found */
 		}
 		return GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION;
@@ -96,20 +96,20 @@ int i;
 	return 0;
 }
 
-int _gnutls_parse_extensions( GNUTLS_STATE state, const opaque* data, int data_size) {
+int _gnutls_parse_extensions( gnutls_session session, const opaque* data, int data_size) {
 int next, ret;
 int pos=0;
 uint16 type;
 const opaque* sdata;
-int (*ext_func_recv)( GNUTLS_STATE, const opaque*, int);
+int (*ext_func_recv)( gnutls_session, const opaque*, int);
 uint16 size;
 
 #ifdef DEBUG
 int i;
 
-	if (state->security_parameters.entity==GNUTLS_CLIENT)
-		for (i=0;i<state->gnutls_internals.extensions_sent_size;i++) {
-			_gnutls_log("EXT: expecting extension %d\n", state->gnutls_internals.extensions_sent[i]);
+	if (session->security_parameters.entity==GNUTLS_CLIENT)
+		for (i=0;i<session->internals.extensions_sent_size;i++) {
+			_gnutls_log("EXT: expecting extension %d\n", session->internals.extensions_sent[i]);
 		}
 #endif
 
@@ -124,7 +124,7 @@ int i;
 		type = _gnutls_read_uint16( &data[pos]);
 		pos+=2;
 		
-		if ( (ret=_gnutls_extension_list_check( state, type)) < 0) {
+		if ( (ret=_gnutls_extension_list_check( session, type)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
@@ -139,7 +139,7 @@ int i;
 		
 		ext_func_recv = _gnutls_ext_func_recv(type);
 		if (ext_func_recv == NULL) continue;
-		if ( (ret=ext_func_recv( state, sdata, size)) < 0) {
+		if ( (ret=ext_func_recv( session, sdata, size)) < 0) {
 			gnutls_assert();
 			return ret;
 		}
@@ -154,14 +154,14 @@ int i;
  * This list is used to check whether the (later) received
  * extensions are the ones we requested.
  */
-static void _gnutls_extension_list_add( GNUTLS_STATE state, uint8 type) {
+static void _gnutls_extension_list_add( gnutls_session session, uint8 type) {
 
-	if (state->security_parameters.entity==GNUTLS_CLIENT) {
-		if (state->gnutls_internals.extensions_sent_size <
-			sizeof(state->gnutls_internals.extensions_sent)) {
+	if (session->security_parameters.entity==GNUTLS_CLIENT) {
+		if (session->internals.extensions_sent_size <
+			sizeof(session->internals.extensions_sent)) {
 	
-			state->gnutls_internals.extensions_sent[state->gnutls_internals.extensions_sent_size] = type;
-			state->gnutls_internals.extensions_sent_size++;
+			session->internals.extensions_sent[session->internals.extensions_sent_size] = type;
+			session->internals.extensions_sent_size++;
 		} else {
 #ifdef DEBUG
 			_gnutls_log("EXT: Increase MAX_EXT_TYPES\n");
@@ -172,12 +172,12 @@ static void _gnutls_extension_list_add( GNUTLS_STATE state, uint8 type) {
 	return;
 }
 
-int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data) {
+int _gnutls_gen_extensions( gnutls_session session, opaque** data) {
 int next, size;
 uint16 pos=0;
 opaque sdata[1024];
 int sdata_size = sizeof(sdata);
-int (*ext_func_send)( GNUTLS_STATE, opaque*, int);
+int (*ext_func_send)( gnutls_session, opaque*, int);
 
 
 	(*data) = gnutls_malloc(2); /* allocate size for size */
@@ -193,7 +193,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque*, int);
 		next--;
 		ext_func_send = _gnutls_ext_func_send(next);
 		if (ext_func_send == NULL) continue;
-		size = ext_func_send( state, sdata, sdata_size);
+		size = ext_func_send( session, sdata, sdata_size);
 
 		if (size > 0) {
 			(*data) = gnutls_realloc( (*data), pos+size+4);
@@ -215,7 +215,7 @@ int (*ext_func_send)( GNUTLS_STATE, opaque*, int);
 			
 			/* add this extension to the extension list
 			 */
-			_gnutls_extension_list_add( state, next);
+			_gnutls_extension_list_add( session, next);
 		}
 		
 	} while(next >= 0);

@@ -18,5 +18,5 @@ typedef enum AlertDescription {
 } AlertDescription;
 #define GNUTLS_AlertDescription AlertDescription
 
-AlertDescription gnutls_alert_get( GNUTLS_STATE state);
-int gnutls_alert_send( GNUTLS_STATE state, AlertLevel level, AlertDescription desc);
+AlertDescription gnutls_alert_get( gnutls_session session);
+int gnutls_alert_send( gnutls_session session, AlertLevel level, AlertDescription desc);

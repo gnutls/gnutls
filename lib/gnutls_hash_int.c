@@ -28,7 +28,7 @@
 #include <gnutls_hash_int.h>
 #include <gnutls_errors.h>
 
-GNUTLS_HASH_HANDLE _gnutls_hash_init(MACAlgorithm algorithm)
+GNUTLS_HASH_HANDLE _gnutls_hash_init(gnutls_mac_algorithm algorithm)
 {
 	GNUTLS_MAC_HANDLE ret;
 
@@ -73,7 +73,7 @@ GNUTLS_HASH_HANDLE _gnutls_hash_init(MACAlgorithm algorithm)
 	return ret;
 }
 
-int _gnutls_hash_get_algo_len(MACAlgorithm algorithm)
+int _gnutls_hash_get_algo_len(gnutls_mac_algorithm algorithm)
 {
 	int ret;
 
@@ -168,7 +168,7 @@ void _gnutls_hash_deinit(GNUTLS_HASH_HANDLE handle, void *digest)
 }
 
 
-GNUTLS_MAC_HANDLE _gnutls_hmac_init(MACAlgorithm algorithm,
+GNUTLS_MAC_HANDLE _gnutls_hmac_init(gnutls_mac_algorithm algorithm,
 				    const void *key, int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;
@@ -221,7 +221,7 @@ GNUTLS_MAC_HANDLE _gnutls_hmac_init(MACAlgorithm algorithm,
 }
 
 
-int _gnutls_hmac_get_algo_len(MACAlgorithm algorithm)
+int _gnutls_hmac_get_algo_len(gnutls_mac_algorithm algorithm)
 {
 	int ret;
 
@@ -293,7 +293,7 @@ void _gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle, void *digest)
 	return;
 }
 
-GNUTLS_MAC_HANDLE _gnutls_mac_init_ssl3(MACAlgorithm algorithm, void *key,
+GNUTLS_MAC_HANDLE _gnutls_mac_init_ssl3(gnutls_mac_algorithm algorithm, void *key,
 					int keylen)
 {
 	GNUTLS_MAC_HANDLE ret;

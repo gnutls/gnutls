@@ -3,5 +3,5 @@
  */
 int _gnutls_mre_num2record( int num);
 int _gnutls_mre_record2num( int record_size);
-int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int data_size);
-int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque* data, int);
+int _gnutls_max_record_recv_params( gnutls_session session, const opaque* data, int data_size);
+int _gnutls_max_record_send_params( gnutls_session session, opaque* data, int);

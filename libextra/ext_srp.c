@@ -27,7 +27,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_algorithms.h"
 
-int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_size) {
+int _gnutls_srp_recv_params( gnutls_session state, const opaque* data, int data_size) {
 	uint8 len;
 
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
@@ -51,7 +51,7 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 			state->security_parameters.extensions.srp_username[len]=0; /* null terminated */
 		}
 	} else { /* client side reading server hello extensions */
-		if (state->gnutls_internals.resumed==RESUME_FALSE)
+		if (state->internals.resumed==RESUME_FALSE)
 			return proc_srp_server_hello( state, data, data_size);
 		else /* we do not need to process this if
 		      * we are resuming.
@@ -64,7 +64,7 @@ int _gnutls_srp_recv_params( GNUTLS_STATE state, const opaque* data, int data_si
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_srp_send_params( GNUTLS_STATE state, opaque* data, int data_size) {
+int _gnutls_srp_send_params( gnutls_session state, opaque* data, int data_size) {
 	uint8 len;
 
 	if (_gnutls_kx_priority( state, GNUTLS_KX_SRP) < 0) {
@@ -100,7 +100,7 @@ int _gnutls_srp_send_params( GNUTLS_STATE state, opaque* data, int data_size) {
 		if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite) != GNUTLS_KX_SRP)
 			return 0; /* no data to send */
 		
-		if (state->gnutls_internals.resumed==RESUME_FALSE)
+		if (state->internals.resumed==RESUME_FALSE)
 			return gen_srp_server_hello( state, data, data_size);
 		else
 			return 0;

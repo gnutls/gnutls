@@ -126,11 +126,11 @@ void gnutls_global_set_mem_functions(
 static int _gnutls_init = 0;
 
 /**
-  * gnutls_global_init - This function initializes the global state to defaults.
+  * gnutls_global_init - This function initializes the global session to defaults.
   *
-  * This function initializes the global state to defaults.
-  * Every gnutls application has a global state which holds common parameters
-  * shared by gnutls state structures.
+  * This function initializes the global session to defaults.
+  * Every gnutls application has a global session which holds common parameters
+  * shared by gnutls session structures.
   * You must call gnutls_global_deinit() when gnutls usage is no longer needed
   * Returns zero on success.
   *
@@ -191,9 +191,9 @@ int gnutls_global_init( void)
 }
 
 /**
-  * gnutls_global_deinit - This function deinitializes the global state 
+  * gnutls_global_deinit - This function deinitializes the global session 
   *
-  * This function deinitializes the global state.
+  * This function deinitializes the global session.
   *
   **/
 
@@ -218,7 +218,7 @@ void gnutls_global_deinit( void) {
 /**
   * gnutls_transport_set_pull_function - This function sets a read like function
   * @pull_func: it's a function like read
-  * @state: gnutls state
+  * @session: gnutls session
   *
   * This is the function where you set a function for gnutls 
   * to receive data. Normaly, if you use berkeley style sockets,
@@ -226,16 +226,16 @@ void gnutls_global_deinit( void) {
   * probably be ok.
   * This function should be called once and after gnutls_global_init().
   * PULL_FUNC is of the form, 
-  * ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
+  * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr, const void*, size_t);
   **/
-void gnutls_transport_set_pull_function( GNUTLS_STATE state, GNUTLS_PULL_FUNC pull_func) {
-	state->gnutls_internals._gnutls_pull_func = pull_func;
+void gnutls_transport_set_pull_function( gnutls_session session, gnutls_pull_func pull_func) {
+	session->internals._gnutls_pull_func = pull_func;
 }
 
 /**
   * gnutls_transport_set_push_function - This function sets the function to send data
   * @push_func: it's a function like write
-  * @state: gnutls state
+  * @session: gnutls session
   *
   * This is the function where you set a push function for gnutls
   * to use in order to send data. If you are going to use berkeley style
@@ -245,10 +245,10 @@ void gnutls_transport_set_pull_function( GNUTLS_STATE state, GNUTLS_PULL_FUNC pu
   *  
   * This function should be called once and after gnutls_global_init().
   * PUSH_FUNC is of the form, 
-  * ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
+  * ssize_t (*gnutls_push_func)(gnutls_transport_ptr, const void*, size_t);
   **/
-void gnutls_transport_set_push_function( GNUTLS_STATE state, GNUTLS_PUSH_FUNC push_func) {
-	state->gnutls_internals._gnutls_push_func = push_func;
+void gnutls_transport_set_push_function( gnutls_session session, gnutls_push_func push_func) {
+	session->internals._gnutls_push_func = push_func;
 }
 
 

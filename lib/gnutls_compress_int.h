@@ -29,10 +29,10 @@
 
 typedef struct GNUTLS_COMP_HANDLE_STRUCT {
 	void* handle;
-	CompressionMethod algo;
+	gnutls_compression_method algo;
 } *GNUTLS_COMP_HANDLE;
 
-GNUTLS_COMP_HANDLE _gnutls_comp_init( CompressionMethod, int d);
+GNUTLS_COMP_HANDLE _gnutls_comp_init( gnutls_compression_method, int d);
 void _gnutls_comp_deinit(GNUTLS_COMP_HANDLE handle, int d);
 
 int _gnutls_decompress( GNUTLS_COMP_HANDLE handle, char* compressed, int compressed_size, char** plain, int max_record_size);

@@ -63,17 +63,17 @@ typedef struct
     int comp_priority[GNUTLS_MAX_ALGORITHM_NUM];
     int kx_priority[GNUTLS_MAX_ALGORITHM_NUM];
     int mac_priority[GNUTLS_MAX_ALGORITHM_NUM];
-    GNUTLS_ConnectionEnd connend;
+    gnutls_connection_end connend;
 } SSL_METHOD;
 
 typedef struct
 {
-    GNUTLS_Version version;
-    GNUTLS_BulkCipherAlgorithm cipher;
-    GNUTLS_KXAlgorithm kx;
-    GNUTLS_MACAlgorithm mac;
-    GNUTLS_CompressionMethod compression;
-    GNUTLS_CertificateType cert;
+    gnutls_protocol_version version;
+    gnutls_cipher_algorithm cipher;
+    gnutls_kx_algorithm kx;
+    gnutls_mac_algorithm mac;
+    gnutls_compression_method compression;
+    gnutls_certificate_type cert;
 } SSL_CIPHER;
 
 typedef struct _BIO
@@ -107,10 +107,10 @@ typedef struct _SSL_CTX
 
 typedef struct _SSL
 {
-    GNUTLS_STATE gnutls_state;
+    gnutls_session gnutls_state;
 #define rbio gnutls_state
 
-    GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS gnutls_cred;
+    gnutls_certificate_client_credentials gnutls_cred;
 
     SSL_CTX *ctx;
     SSL_CIPHER ciphersuite;
@@ -249,7 +249,7 @@ void X509_free(const X509 *cert);
 
 /* BIO functions */
 
-void BIO_get_fd(GNUTLS_STATE gnutls_state, int *fd);
+void BIO_get_fd(gnutls_session gnutls_state, int *fd);
 BIO *BIO_new_socket(int sock, int close_flag);
 
 /* error handling */

@@ -28,9 +28,9 @@ int main()
    int err, ret;
    int sd, ii;
    struct sockaddr_in sa;
-   GNUTLS_STATE state;
+   gnutls_session state;
    char buffer[MAX_BUF + 1];
-   GNUTLS_SRP_CLIENT_CREDENTIALS xcred;
+   gnutls_srp_client_credentials xcred;
 
    if (gnutls_global_init() < 0) {
       fprintf(stderr, "global state initialization error\n");
@@ -66,7 +66,7 @@ int main()
    }
    /* Initialize TLS state 
     */
-   gnutls_init(&state, GNUTLS_CLIENT);
+   gnutls_session_init(&state, GNUTLS_CLIENT);
 
    /* allow both SSL3 and TLS1
     */
@@ -141,7 +141,7 @@ int main()
    shutdown(sd, SHUT_RDWR);     /* no more receptions */
    close(sd);
 
-   gnutls_deinit(state);
+   gnutls_session_deinit(state);
 
    gnutls_srp_free_client_cred(xcred);
 

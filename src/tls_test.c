@@ -66,7 +66,7 @@ int more_info = 0;
 int tls1_ok = 0;
 int ssl3_ok = 0;
 
-typedef int (*TEST_FUNC)( GNUTLS_STATE);
+typedef int (*TEST_FUNC)( gnutls_session);
 
 typedef struct {
 	char* test_name;
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 	int err, ret;
 	int sd, i;
 	struct sockaddr_in sa;
-	GNUTLS_STATE state;
+	gnutls_session state;
 	char buffer[MAX_BUF + 1];
 	struct hostent *server_host;
 	int ssl3_ok = 0;
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 		if (i > 1 && tls1_ok == 0 && ssl3_ok == 0) break;
 
 		CONNECT();
-		gnutls_init(&state, GNUTLS_CLIENT);
+		gnutls_session_init(&state, GNUTLS_CLIENT);
 		gnutls_transport_set_ptr(state, sd);
 
 		printf("Checking %s...", tls_tests[i].test_name);
@@ -191,7 +191,7 @@ int main(int argc, char **argv)
 			printf(" %s\n", tls_tests[i].fail_str);
 		else printf(" %s\n", tls_tests[i].unsure_str);
 
-		gnutls_deinit(state);
+		gnutls_session_deinit(state);
 
 		shutdown(sd, SHUT_RDWR);	/* no more receptions */
 		close(sd);

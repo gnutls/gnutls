@@ -18,36 +18,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-int _gnutls_record_buffer_put(ContentType type, GNUTLS_STATE state, char *data, int length);
-int _gnutls_record_buffer_get_size(ContentType type, GNUTLS_STATE state);
-int _gnutls_record_buffer_get(ContentType type, GNUTLS_STATE state, char *data, int length);
-ssize_t _gnutls_io_read_buffered( GNUTLS_STATE, opaque **iptr, size_t n, ContentType);
-void _gnutls_io_clear_read_buffer( GNUTLS_STATE);
-int _gnutls_io_clear_peeked_data( GNUTLS_STATE state);
+int _gnutls_record_buffer_put(ContentType type, gnutls_session session, char *data, int length);
+int _gnutls_record_buffer_get_size(ContentType type, gnutls_session session);
+int _gnutls_record_buffer_get(ContentType type, gnutls_session session, char *data, int length);
+ssize_t _gnutls_io_read_buffered( gnutls_session, opaque **iptr, size_t n, ContentType);
+void _gnutls_io_clear_read_buffer( gnutls_session);
+int _gnutls_io_clear_peeked_data( gnutls_session session);
 
-ssize_t _gnutls_io_write_buffered( GNUTLS_STATE, const void *iptr, size_t n );
-ssize_t _gnutls_io_write_buffered2( GNUTLS_STATE, const void *iptr, size_t n,
+ssize_t _gnutls_io_write_buffered( gnutls_session, const void *iptr, size_t n );
+ssize_t _gnutls_io_write_buffered2( gnutls_session, const void *iptr, size_t n,
 	const void* iptr2, size_t n2);
 
-int _gnutls_handshake_buffer_get_size( GNUTLS_STATE state);
-int _gnutls_handshake_buffer_peek( GNUTLS_STATE state, char *data, int length);
-int _gnutls_handshake_buffer_put( GNUTLS_STATE state, char *data, int length);
-int _gnutls_handshake_buffer_clear( GNUTLS_STATE state);
-int _gnutls_handshake_buffer_empty( GNUTLS_STATE state);
-int _gnutls_handshake_buffer_get_ptr( GNUTLS_STATE state, char **data_ptr, int *length);
+int _gnutls_handshake_buffer_get_size( gnutls_session session);
+int _gnutls_handshake_buffer_peek( gnutls_session session, char *data, int length);
+int _gnutls_handshake_buffer_put( gnutls_session session, char *data, int length);
+int _gnutls_handshake_buffer_clear( gnutls_session session);
+int _gnutls_handshake_buffer_empty( gnutls_session session);
+int _gnutls_handshake_buffer_get_ptr( gnutls_session session, char **data_ptr, int *length);
 
-#define _gnutls_handshake_io_buffer_clear( state) \
-        gnutls_free( state->gnutls_internals.handshake_send_buffer.data); \
-        gnutls_free( state->gnutls_internals.handshake_recv_buffer.data); \
-        state->gnutls_internals.handshake_send_buffer.data = NULL; \
-        state->gnutls_internals.handshake_recv_buffer.data = NULL; \
-        state->gnutls_internals.handshake_send_buffer.size = 0; \
-        state->gnutls_internals.handshake_recv_buffer.size = 0; \
-        state->gnutls_internals.handshake_send_buffer_prev_size = 0
+#define _gnutls_handshake_io_buffer_clear( session) \
+        gnutls_free( session->internals.handshake_send_buffer.data); \
+        gnutls_free( session->internals.handshake_recv_buffer.data); \
+        session->internals.handshake_send_buffer.data = NULL; \
+        session->internals.handshake_recv_buffer.data = NULL; \
+        session->internals.handshake_send_buffer.size = 0; \
+        session->internals.handshake_recv_buffer.size = 0; \
+        session->internals.handshake_send_buffer_prev_size = 0
 
-ssize_t _gnutls_handshake_io_recv_int( GNUTLS_STATE, ContentType, HandshakeType, void *, size_t);
-ssize_t _gnutls_handshake_io_send_int( GNUTLS_STATE, ContentType, HandshakeType, const void *, size_t);
-ssize_t _gnutls_io_write_flush( GNUTLS_STATE state);
-ssize_t _gnutls_handshake_io_write_flush( GNUTLS_STATE state);
+ssize_t _gnutls_handshake_io_recv_int( gnutls_session, ContentType, HandshakeType, void *, size_t);
+ssize_t _gnutls_handshake_io_send_int( gnutls_session, ContentType, HandshakeType, const void *, size_t);
+ssize_t _gnutls_io_write_flush( gnutls_session session);
+ssize_t _gnutls_handshake_io_write_flush( gnutls_session session);
 
-size_t gnutls_record_check_pending(GNUTLS_STATE state);
+size_t gnutls_record_check_pending(gnutls_session session);

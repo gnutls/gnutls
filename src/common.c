@@ -3,7 +3,7 @@
 #include <gnutls/extra.h>
 #include <time.h>
 
-void print_cert_info(GNUTLS_STATE state);
+void print_cert_info(gnutls_session session);
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" #   %s %s\n", x, y)
 #define PRINT_DN(X) PRINTX( "CN:", X.common_name); \
@@ -27,7 +27,7 @@ return buf;
 
 }
 
-void print_x509_info(GNUTLS_STATE state)
+void print_x509_info(gnutls_session session)
 {
 
 	gnutls_x509_dn dn;
@@ -41,10 +41,10 @@ void print_x509_info(GNUTLS_STATE state)
 	char printable[120];
 	char *print;
 	int bits, algo;
-	time_t expiret = gnutls_certificate_expiration_time_peers(state);
-	time_t activet = gnutls_certificate_activation_time_peers(state);
+	time_t expiret = gnutls_certificate_expiration_time_peers(session);
+	time_t activet = gnutls_certificate_activation_time_peers(session);
 
-	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
+	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
 	if (cert_list_size <= 0)
 		return;
@@ -107,7 +107,7 @@ void print_x509_info(GNUTLS_STATE state)
 
 }
 
-void print_openpgp_info(GNUTLS_STATE state)
+void print_openpgp_info(gnutls_session session)
 {
 
 	gnutls_openpgp_name pgp_name;
@@ -117,10 +117,10 @@ void print_openpgp_info(GNUTLS_STATE state)
 	char *print;
 	const gnutls_datum *cert_list;
 	int cert_list_size = 0;
-	time_t expiret = gnutls_certificate_expiration_time_peers(state);
-	time_t activet = gnutls_certificate_activation_time_peers(state);
+	time_t expiret = gnutls_certificate_expiration_time_peers(session);
+	time_t activet = gnutls_certificate_activation_time_peers(session);
 
-	cert_list = gnutls_certificate_get_peers(state, &cert_list_size);
+	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
 
 	if (cert_list_size > 0) {
 		int algo, bits;
@@ -170,11 +170,11 @@ void print_openpgp_info(GNUTLS_STATE state)
 	}
 }
 
-void print_cert_vrfy(GNUTLS_STATE state)
+void print_cert_vrfy(gnutls_session session)
 {
 
 	int status;
-	status = gnutls_certificate_verify_peers(state);
+	status = gnutls_certificate_verify_peers(session);
 	printf("\n");
 
 	if (status == GNUTLS_E_NO_CERTIFICATE_FOUND) {
@@ -197,78 +197,78 @@ void print_cert_vrfy(GNUTLS_STATE state)
 
 }
 
-int print_info(GNUTLS_STATE state)
+int print_info(gnutls_session session)
 {
 	const char *tmp;
-	GNUTLS_CredType cred;
-	GNUTLS_KXAlgorithm kx;
+	gnutls_credentials_type cred;
+	gnutls_kx_algorithm kx;
 
 
 	/* print the key exchange's algorithm name
 	 */
-	kx = gnutls_kx_get(state);
+	kx = gnutls_kx_get(session);
 
-	cred = gnutls_auth_get_type(state);
+	cred = gnutls_auth_get_type(session);
 	switch (cred) {
 	case GNUTLS_CRD_ANON:
 		printf("- Anonymous DH using prime of %d bits, secret key "
 			"of %d bits, and peer's public key is %d bits.\n",
-		       gnutls_dh_get_prime_bits(state), gnutls_dh_get_secret_bits(state),
-		       gnutls_dh_get_peers_public_bits(state));
+		       gnutls_dh_get_prime_bits(session), gnutls_dh_get_secret_bits(session),
+		       gnutls_dh_get_peers_public_bits(session));
 		break;
 	case GNUTLS_CRD_SRP:
 		/* This should be only called in server
 		 * side.
 		 */
-		if (gnutls_srp_server_get_username(state) != NULL)
+		if (gnutls_srp_server_get_username(session) != NULL)
 			printf("- SRP authentication. Connected as '%s'\n",
-			       gnutls_srp_server_get_username(state));
+			       gnutls_srp_server_get_username(session));
 		break;
 	case GNUTLS_CRD_CERTIFICATE:
-		print_cert_info( state);
+		print_cert_info( session);
 
-		print_cert_vrfy(state);
+		print_cert_vrfy(session);
 
 		/* Check if we have been using ephemeral Diffie Hellman.
 		 */
 		if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS) {
 			printf("- Ephemeral DH using prime of %d bits, secret key "
 				"of %d bits, and peer's public key is %d bits.\n",
-			       gnutls_dh_get_prime_bits(state), gnutls_dh_get_secret_bits(state),
-			       gnutls_dh_get_peers_public_bits(state));
+			       gnutls_dh_get_prime_bits(session), gnutls_dh_get_secret_bits(session),
+			       gnutls_dh_get_peers_public_bits(session));
 		}
 	}
 
-	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
+	tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
 	printf("- Version: %s\n", tmp);
 
 	tmp = gnutls_kx_get_name(kx);
 	printf("- Key Exchange: %s\n", tmp);
 
-	tmp = gnutls_cipher_get_name(gnutls_cipher_get(state));
+	tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
 	printf("- Cipher: %s\n", tmp);
 
-	tmp = gnutls_mac_get_name(gnutls_mac_get(state));
+	tmp = gnutls_mac_get_name(gnutls_mac_get(session));
 	printf("- MAC: %s\n", tmp);
 
-	tmp = gnutls_compression_get_name(gnutls_compression_get(state));
+	tmp = gnutls_compression_get_name(gnutls_compression_get(session));
 	printf("- Compression: %s\n", tmp);
 
 	return 0;
 }
 
-void print_cert_info(GNUTLS_STATE state)
+void print_cert_info(gnutls_session session)
 {
 
 	printf( " - Certificate type: ");
-	switch (gnutls_cert_type_get(state)) {
+	switch (gnutls_cert_type_get(session)) {
 	case GNUTLS_CRT_X509:
 		printf("X.509\n");
-		print_x509_info(state);
+		print_x509_info(session);
 		break;
 	case GNUTLS_CRT_OPENPGP:
 		printf("OpenPGP\n");
-		print_openpgp_info(state);
+		print_openpgp_info(session);
 		break;
 	}
 

@@ -39,7 +39,7 @@
 static int check_if_ca(const gnutls_cert * cert,
 		       const gnutls_cert * issuer)
 {
-	CertificateStatus ret = GNUTLS_CERT_INVALID;
+	gnutls_certificate_status ret = GNUTLS_CERT_INVALID;
 
 	/* Check if the issuer is the same with the
 	 * certificate. This is added in order for trusted
@@ -253,7 +253,7 @@ int _gnutls_x509_verify_certificate(gnutls_cert * certificate_list,
 				    int crls_size)
 {
 	int i = 0, ret;
-	CertificateStatus status = 0;
+	gnutls_certificate_status status = 0;
 
 	if (clist_size == 0) {
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;

@@ -35,7 +35,7 @@
 
 /**
   * gnutls_dh_set_prime_bits - Used to set the bits for a DH ciphersuite
-  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a &gnutls_session structure.
   * @bits: is the number of bits
   *
   * This function sets the number of bits, for use in an 
@@ -44,27 +44,27 @@
   * minimum size of the prime that will be used for the handshake.
   *
   **/
-void gnutls_dh_set_prime_bits(GNUTLS_STATE state, int bits)
+void gnutls_dh_set_prime_bits(gnutls_session session, int bits)
 {
-	state->gnutls_internals.dh_prime_bits = bits;
+	session->internals.dh_prime_bits = bits;
 }
 
 /**
   * gnutls_dh_get_prime_bits - This function returns the bits used in DH authentication
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the bits used in the last Diffie Hellman authentication
   * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_prime_bits(GNUTLS_STATE state)
+int gnutls_dh_get_prime_bits(gnutls_session session)
 {
-	switch( gnutls_auth_get_type( state)) {
+	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
 
-			info = _gnutls_get_auth_info(state);
+			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
 			return info->dh_prime_bits;
@@ -72,7 +72,7 @@ int gnutls_dh_get_prime_bits(GNUTLS_STATE state)
 		case GNUTLS_CRD_CERTIFICATE: {
 			CERTIFICATE_AUTH_INFO info;
 
-			info = _gnutls_get_auth_info(state);
+			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
 
@@ -86,20 +86,20 @@ int gnutls_dh_get_prime_bits(GNUTLS_STATE state)
 
 /**
   * gnutls_dh_get_secret_bits - This function returns the bits used in DH authentication
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the bits used in the last Diffie Hellman authentication
   * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_secret_bits(GNUTLS_STATE state)
+int gnutls_dh_get_secret_bits(gnutls_session session)
 {
-	switch( gnutls_auth_get_type( state)) {
+	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
 
-			info = _gnutls_get_auth_info(state);
+			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
 			return info->dh_secret_bits;
@@ -107,7 +107,7 @@ int gnutls_dh_get_secret_bits(GNUTLS_STATE state)
 		case GNUTLS_CRD_CERTIFICATE: {
 			CERTIFICATE_AUTH_INFO info;
 
-			info = _gnutls_get_auth_info(state);
+			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
 
@@ -122,18 +122,18 @@ int gnutls_dh_get_secret_bits(GNUTLS_STATE state)
 
 /**
   * gnutls_rsa_export_get_modulus_bits - This function returns the bits used in RSA-export key exchange
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the bits used in the last RSA-EXPORT key exchange
   * with the peer. 
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_rsa_export_get_modulus_bits(GNUTLS_STATE state)
+int gnutls_rsa_export_get_modulus_bits(gnutls_session session)
 {
 CERTIFICATE_AUTH_INFO info;
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
 		return GNUTLS_E_UNKNOWN_ERROR;
 
@@ -142,20 +142,20 @@ CERTIFICATE_AUTH_INFO info;
 
 /**
   * gnutls_dh_get_peers_public_bits - This function returns the bits used in DH authentication
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the bits used in the last Diffie Hellman authentication
   * with the peer. Should be used for both anonymous and ephemeral diffie Hellman.
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_dh_get_peers_public_bits(GNUTLS_STATE state)
+int gnutls_dh_get_peers_public_bits(gnutls_session session)
 {
-	switch( gnutls_auth_get_type( state)) {
+	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
 
-			info = _gnutls_get_auth_info(state);
+			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
 			return info->dh_peer_public_bits;
@@ -163,7 +163,7 @@ int gnutls_dh_get_peers_public_bits(GNUTLS_STATE state)
 		case GNUTLS_CRD_CERTIFICATE: {
 			CERTIFICATE_AUTH_INFO info;
 
-			info = _gnutls_get_auth_info(state);
+			info = _gnutls_get_auth_info(session);
 			if (info == NULL)
 				return GNUTLS_E_UNKNOWN_ERROR;
 
@@ -179,7 +179,7 @@ int gnutls_dh_get_peers_public_bits(GNUTLS_STATE state)
 
 /**
   * gnutls_certificate_get_ours - This function returns the raw certificate sent in the last handshake
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the raw certificate list as sent to the peer,
   * in the last handshake. These certificates are in raw format. 
@@ -188,20 +188,20 @@ int gnutls_dh_get_peers_public_bits(GNUTLS_STATE state)
   * Returns NULL in case of an error, or if no certificate was used.
   *
   **/
-const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state)
+const gnutls_datum *gnutls_certificate_get_ours(gnutls_session session)
 {
 	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 	int index;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return NULL;
 	}
 
-	index = state->gnutls_internals.selected_cert_index;
+	index = session->internals.selected_cert_index;
 	if (index < 0) return NULL; /* no certificate */
 	
 	return &cred->cert_list[index]->raw;
@@ -209,7 +209,7 @@ const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state)
 
 /**
   * gnutls_certificate_get_peers - This function returns the peer's raw certificate
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   * @list_size: is the length of the certificate list
   *
   * This function will return the peer's raw certificate (list) as sent by the peer.
@@ -220,13 +220,13 @@ const gnutls_datum *gnutls_certificate_get_ours(GNUTLS_STATE state)
   * Returns NULL in case of an error, or if no certificate was sent.
   *
   **/
-const gnutls_datum *gnutls_certificate_get_peers(GNUTLS_STATE state, int *list_size)
+const gnutls_datum *gnutls_certificate_get_peers(gnutls_session session, int *list_size)
 {
 	CERTIFICATE_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, NULL);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
 		return NULL;
 
@@ -237,27 +237,27 @@ const gnutls_datum *gnutls_certificate_get_peers(GNUTLS_STATE state, int *list_s
 
 /**
   * gnutls_certificate_client_get_request_status - This function returns the certificate request status
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return 0 if the peer (server) did not request client
   * authentication or 1 otherwise.
   * Returns a negative value in case of an error.
   *
   **/
-int gnutls_certificate_client_get_request_status(GNUTLS_STATE state)
+int gnutls_certificate_client_get_request_status(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, 0);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
 		return GNUTLS_E_UNKNOWN_ERROR;
 	return info->certificate_requested;
 }
 
 
-typedef MACAlgorithm GNUTLS_DigestAlgorithm;
+typedef gnutls_mac_algorithm GNUTLS_DigestAlgorithm;
 /**
   * gnutls_x509_fingerprint - This function calculates the fingerprint of the given data
   * @algo: is a digest algorithm
@@ -303,7 +303,7 @@ int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* dat
   * cipher suites.
   *
   **/
-void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTLS_DH_PARAMS dh_params) {
+void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, gnutls_dh_params dh_params) {
 	res->dh_params = dh_params;
 }
 
@@ -317,7 +317,7 @@ void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTL
   * cipher suites.
   *
   **/
-int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS dh_params) {
+int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, gnutls_dh_params dh_params) {
 	res->dh_params = dh_params;
 	return 0;
 }
@@ -332,7 +332,7 @@ int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_
   * cipher suites.
   *
   **/
-int gnutls_certificate_set_rsa_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_RSA_PARAMS rsa_params) {
+int gnutls_certificate_set_rsa_params(GNUTLS_CERTIFICATE_CREDENTIALS res, gnutls_rsa_params rsa_params) {
 	res->rsa_params = rsa_params;
 	return 0;
 }

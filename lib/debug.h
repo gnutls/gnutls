@@ -19,7 +19,7 @@
  */
 
 #ifdef DEBUG
-void _gnutls_print_state(GNUTLS_STATE state);
+void _gnutls_print_state(gnutls_session session);
 char * _gnutls_bin2hex(const unsigned char *old, const size_t oldlen);
 void _gnutls_dump_mpi(char* prefix,MPI a);
 const char* _gnutls_packet2str( int packet);

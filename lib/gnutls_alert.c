@@ -66,7 +66,7 @@ static const gnutls_alert_entry sup_alerts[] = {
 
 /**
   * gnutls_alert_get_name - Returns a string describing the alert number given
-  * @alert: is an alert number &GNUTLS_STATE structure.
+  * @alert: is an alert number &gnutls_session structure.
   *
   * Returns a string that describes the given alert number.
   * See. gnutls_alert_get().
@@ -82,7 +82,7 @@ const char* ret = NULL;
 
 /**
   * gnutls_alert_send - This function sends an alert message to the peer
-  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a &gnutls_session structure.
   * @level: is the level of the alert
   * @desc: is the alert description
   *
@@ -93,7 +93,7 @@ const char* ret = NULL;
   * Returns 0 on success.
   *
   **/
-int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_AlertDescription desc)
+int gnutls_alert_send( gnutls_session session, GNUTLS_AlertLevel level, GNUTLS_AlertDescription desc)
 {
 	uint8 data[2];
 	int ret;
@@ -103,7 +103,7 @@ int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_Alert
 
 	_gnutls_record_log( "REC: Sending Alert[%d|%d] - %s\n", data[0], data[1], gnutls_alert_get_name((int)data[1]));
 
-	if ( (ret = gnutls_send_int( state, GNUTLS_ALERT, -1, data, 2)) >= 0)
+	if ( (ret = gnutls_send_int( session, GNUTLS_ALERT, -1, data, 2)) >= 0)
 		return 0;
 	else
 		return ret;
@@ -114,7 +114,7 @@ int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_Alert
  */
 /**
   * gnutls_alert_send_appropriate - This function sends an alert to the peer depending on the error code
-  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a &gnutls_session structure.
   * @err: is an integer
   *
   * Sends an alert to the peer depending on the error code returned by a gnutls
@@ -129,20 +129,20 @@ int gnutls_alert_send( GNUTLS_STATE state, GNUTLS_AlertLevel level, GNUTLS_Alert
   * been sent to the peer.
   *
   **/
-int gnutls_alert_send_appropriate( GNUTLS_STATE state, int err) {
+int gnutls_alert_send_appropriate( gnutls_session session, int err) {
 int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 	switch (err) { /* send appropriate alert */
 		case GNUTLS_E_DECRYPTION_FAILED:
 			/* GNUTLS_A_DECRYPTION_FAILED is not sent, because
 			 * it is not defined in SSL3.
 			 */
-			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
+			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_BAD_RECORD_MAC);
 			break;
 		case GNUTLS_E_DECOMPRESSION_FAILED:
-			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_DECOMPRESSION_FAILURE);
+			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_DECOMPRESSION_FAILURE);
 			break;
 		case GNUTLS_E_ILLEGAL_PARAMETER:
-                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_ILLEGAL_PARAMETER);
+                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_ILLEGAL_PARAMETER);
                         break;
 		case GNUTLS_E_ASN1_ELEMENT_NOT_FOUND:
 		case GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND:
@@ -156,25 +156,25 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		case GNUTLS_E_ASN1_SYNTAX_ERROR:
 		case GNUTLS_E_ASN1_DER_OVERFLOW:
 		case GNUTLS_E_NO_CERTIFICATE_FOUND:
-                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
+                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_BAD_CERTIFICATE);
                         break;
 		case GNUTLS_E_UNKNOWN_CIPHER_SUITE:
-                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_HANDSHAKE_FAILURE);
+                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_HANDSHAKE_FAILURE);
                         break;
 		case GNUTLS_E_UNEXPECTED_PACKET:
-                        ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
+                        ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_UNEXPECTED_MESSAGE);
                         break;
 		case GNUTLS_E_REHANDSHAKE:
-                        ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION);
+                        ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION);
                         break;
 		case GNUTLS_E_UNSUPPORTED_VERSION_PACKET:
-                        ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_PROTOCOL_VERSION);
+                        ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_PROTOCOL_VERSION);
 			break;
 		case GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE:
-                        ret = gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_UNSUPPORTED_CERTIFICATE);
+                        ret = gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_UNSUPPORTED_CERTIFICATE);
 			break;
 		case GNUTLS_E_UNEXPECTED_PACKET_LENGTH:
-			ret = gnutls_alert_send( state, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
+			ret = gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_RECORD_OVERFLOW);
 			break;
 	}
 	return ret;
@@ -182,7 +182,7 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 
 /**
   * gnutls_alert_get - Returns the last alert number received.
-  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a &gnutls_session structure.
   *
   * Returns the last alert number received. This function
   * should be called if GNUTLS_E_WARNING_ALERT_RECEIVED or
@@ -190,7 +190,7 @@ int ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
   * The peer may send alerts if he thinks some things were not 
   * right. Check gnutls.h for the available alert descriptions.
   **/
-GNUTLS_AlertDescription gnutls_alert_get( GNUTLS_STATE state) {
-	return state->gnutls_internals.last_alert;
+GNUTLS_AlertDescription gnutls_alert_get( gnutls_session session) {
+	return session->internals.last_alert;
 }
 

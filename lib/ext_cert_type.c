@@ -31,17 +31,17 @@
 
 /* 
  * In case of a server: if a CERT_TYPE extension type is received then it stores
- * into the state security parameters the new value. The server may use gnutls_state_cert_type_get(),
+ * into the session security parameters the new value. The server may use gnutls_session_cert_type_get(),
  * to access it.
  *
  * In case of a client: If a cert_types have been specified then we send the extension.
  *
  */
 
-int _gnutls_cert_type_recv_params( GNUTLS_STATE state, const opaque* data, int data_size) {
+int _gnutls_cert_type_recv_params( gnutls_session session, const opaque* data, int data_size) {
 	int new_type = -1, ret, i;
 	
-	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 		if (data_size > 0) {
 			if ( data_size != 1) {
 				gnutls_assert();
@@ -56,12 +56,12 @@ int _gnutls_cert_type_recv_params( GNUTLS_STATE state, const opaque* data, int d
 			}
 
 			/* Check if we support this cert_type */
-			if ( (ret=_gnutls_state_cert_type_supported( state, new_type)) < 0) {
+			if ( (ret=_gnutls_session_cert_type_supported( session, new_type)) < 0) {
 				gnutls_assert();
 				return ret;
 			}
 
-			_gnutls_state_cert_type_set( state, new_type);
+			_gnutls_session_cert_type_set( session, new_type);
 		}
 	} else { /* SERVER SIDE - we must check if the sent cert type is the right one 
 	          */
@@ -78,7 +78,7 @@ int _gnutls_cert_type_recv_params( GNUTLS_STATE state, const opaque* data, int d
 				if (new_type < 0) continue;
 				
 				/* Check if we support this cert_type */
-				if ( (ret=_gnutls_state_cert_type_supported( state, new_type)) < 0) {
+				if ( (ret=_gnutls_session_cert_type_supported( session, new_type)) < 0) {
 					gnutls_assert();
 					continue;
 				} else break;
@@ -90,12 +90,12 @@ int _gnutls_cert_type_recv_params( GNUTLS_STATE state, const opaque* data, int d
 				return GNUTLS_E_ILLEGAL_PARAMETER;
 			}
 
-			if ( (ret=_gnutls_state_cert_type_supported( state, new_type)) < 0) {
+			if ( (ret=_gnutls_session_cert_type_supported( session, new_type)) < 0) {
 				gnutls_assert();
 				return ret;
 			}
 
-			_gnutls_state_cert_type_set( state, new_type);
+			_gnutls_session_cert_type_set( session, new_type);
 		}
 	
 	
@@ -107,18 +107,18 @@ int _gnutls_cert_type_recv_params( GNUTLS_STATE state, const opaque* data, int d
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_cert_type_send_params( GNUTLS_STATE state, opaque* data, int data_size) {
+int _gnutls_cert_type_send_params( gnutls_session session, opaque* data, int data_size) {
 	uint16 len, i;
 	
 	/* this function sends the client extension data (dnsname) */
-	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-		if (state->gnutls_internals.cert_type_priority.algorithms > 0) {
+		if (session->internals.cert_type_priority.algorithms > 0) {
 			
-			len = state->gnutls_internals.cert_type_priority.algorithms;
+			len = session->internals.cert_type_priority.algorithms;
 
 			if (len==1 && 
-				state->gnutls_internals.cert_type_priority.algorithm_priority[0]==GNUTLS_CRT_X509) 
+				session->internals.cert_type_priority.priority[0]==GNUTLS_CRT_X509) 
 					{
 			/* We don't use this extension if X.509 certificates
 			 * are used.
@@ -132,22 +132,22 @@ int _gnutls_cert_type_send_params( GNUTLS_STATE state, opaque* data, int data_si
 			}
 
 			for (i=0;i<len;i++) {
-				data[i] = _gnutls_cert_type2num( state->gnutls_internals.
-					cert_type_priority.algorithm_priority[i]);
+				data[i] = _gnutls_cert_type2num( session->internals.
+					cert_type_priority.priority[i]);
 			}
 			return len;
 		}
 
 	} else { /* server side */
 
-		if ( state->security_parameters.cert_type != DEFAULT_CERT_TYPE) {
+		if ( session->security_parameters.cert_type != DEFAULT_CERT_TYPE) {
 			len = 1;
 			if (data_size < len) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
 			
-			data[0] = _gnutls_cert_type2num( state->security_parameters.cert_type);
+			data[0] = _gnutls_cert_type2num( session->security_parameters.cert_type);
 			return len;
 		}	
 	

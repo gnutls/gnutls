@@ -80,7 +80,7 @@ int start, end;
 
 /* we use DER here -- FIXME: use BER
  */
-static int _gnutls_get_ber_digest_info( const gnutls_datum *info, MACAlgorithm *hash, opaque* digest, int *digest_size) {
+static int _gnutls_get_ber_digest_info( const gnutls_datum *info, gnutls_mac_algorithm *hash, opaque* digest, int *digest_size) {
 ASN1_TYPE dinfo;
 int result;
 opaque str[1024];
@@ -145,7 +145,7 @@ int len;
 static int
 _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, GNUTLS_MPI *params, int params_len)
 {
-	MACAlgorithm hash;
+	gnutls_mac_algorithm hash;
 	int ret;
 	opaque digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE];
 	int digest_size; 
@@ -189,7 +189,7 @@ _pkcs1_rsa_verify_sig( const gnutls_datum* signature, gnutls_datum* text, GNUTLS
 /* verifies if the certificate is properly signed.
  * returns 0 on success.
  */
-CertificateStatus gnutls_x509_verify_signature(gnutls_cert* cert, gnutls_cert* issuer) {
+gnutls_certificate_status gnutls_x509_verify_signature(gnutls_cert* cert, gnutls_cert* issuer) {
 gnutls_datum signature;
 gnutls_datum tbs;
 

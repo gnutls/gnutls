@@ -36,31 +36,35 @@ extern "C" {
 #define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_RIJNDAEL_128_CBC
 #define GNUTLS_CIPHER_ARCFOUR GNUTLS_CIPHER_ARCFOUR_128
 
-typedef enum GNUTLS_BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, 
+typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL=1, 
 	GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
 	GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC,
 	GNUTLS_CIPHER_ARCFOUR_40
-} GNUTLS_BulkCipherAlgorithm;
+} gnutls_cipher_algorithm;
 
-typedef enum GNUTLS_KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
+typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
 	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
 	GNUTLS_KX_RSA_EXPORT
-} GNUTLS_KXAlgorithm;
+} gnutls_kx_algorithm;
 
-typedef enum GNUTLS_CredType { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } GNUTLS_CredType;
+typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type;
 
-typedef enum GNUTLS_MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } GNUTLS_MACAlgorithm;
-typedef enum GNUTLS_DigestAlgorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } GNUTLS_DigestAlgorithm;
+typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } gnutls_mac_algorithm;
+
+typedef enum gnutls_digest_algorithm { GNUTLS_DIG_NULL=1, GNUTLS_DIG_MD5, GNUTLS_DIG_SHA } gnutls_digest_algorithm;
 
 /* exported for other gnutls headers. This is the maximum number
  * of algorithms (ciphers, kx or macs). 
  */
 #define GNUTLS_MAX_ALGORITHM_NUM 8
 
-typedef enum GNUTLS_CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } GNUTLS_CompressionMethod;
-typedef enum GNUTLS_ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT } GNUTLS_ConnectionEnd;
-typedef enum GNUTLS_AlertLevel { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } GNUTLS_AlertLevel;
-typedef enum GNUTLS_AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE=10, GNUTLS_A_BAD_RECORD_MAC=20,
+typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } gnutls_compression_method;
+
+typedef enum gnutls_connection_end { GNUTLS_SERVER=1, GNUTLS_CLIENT } gnutls_connection_end;
+
+typedef enum gnutls_alert_level { GNUTLS_AL_WARNING=1, GNUTLS_AL_FATAL } gnutls_alert_level;
+
+typedef enum gnutls_alert_description { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTED_MESSAGE=10, GNUTLS_A_BAD_RECORD_MAC=20,
 			GNUTLS_A_DECRYPTION_FAILED, GNUTLS_A_RECORD_OVERFLOW,  GNUTLS_A_DECOMPRESSION_FAILURE=30,
 			GNUTLS_A_HANDSHAKE_FAILURE=40, GNUTLS_A_SSL3_NO_CERTIFICATE=41,
 			GNUTLS_A_BAD_CERTIFICATE=42, GNUTLS_A_UNSUPPORTED_CERTIFICATE,
@@ -69,52 +73,47 @@ typedef enum GNUTLS_AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTE
 			GNUTLS_A_DECRYPT_ERROR, GNUTLS_A_EXPORT_RESTRICTION=60, GNUTLS_A_PROTOCOL_VERSION=70,
 			GNUTLS_A_INSUFFICIENT_SECURITY, GNUTLS_A_INTERNAL_ERROR=80, GNUTLS_A_USER_CANCELED=90,
 			GNUTLS_A_NO_RENEGOTIATION=100
-} GNUTLS_AlertDescription;
+} gnutls_alert_description;
 
-typedef enum GNUTLS_CertificateStatus { 
+typedef enum gnutls_certificate_status { 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
 	GNUTLS_CERT_INVALID=4, 
 	GNUTLS_CERT_CORRUPTED=16,
 	GNUTLS_CERT_REVOKED=32
-} GNUTLS_CertificateStatus;
+} gnutls_certificate_status;
 
-typedef enum GNUTLS_CertificateRequest { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } GNUTLS_CertificateRequest;
+typedef enum gnutls_certificate_request { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } gnutls_certificate_request;
 
-typedef enum GNUTLS_OpenPGPKeyStatus { GNUTLS_OPENPGP_KEY, 
+typedef enum gnutls_openpgp_key_status { GNUTLS_OPENPGP_KEY, 
 	GNUTLS_OPENPGP_KEY_FINGERPRINT
-} GNUTLS_OpenPGPKeyStatus;
+} gnutls_openpgp_key_status;
 
-typedef enum GNUTLS_CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } GNUTLS_CloseRequest;
+typedef enum gnutls_close_request { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } gnutls_close_request;
 
-typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
+typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1 } gnutls_protocol_version;
 
-typedef enum GNUTLS_CertificateType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
-} GNUTLS_CertificateType;
+typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
+} gnutls_certificate_type;
 
-typedef enum GNUTLS_X509_CertificateFmt { GNUTLS_X509_FMT_DER, 
-	GNUTLS_X509_FMT_PEM } GNUTLS_X509_CertificateFmt;
+typedef enum gnutls_x509_certificate_fmt { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_fmt;
 
-typedef enum GNUTLS_PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA
-} GNUTLS_PKAlgorithm;
+typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA
+} gnutls_pk_algorithm;
 
 /* If you want to change this, then also change the 
  * define in gnutls_int.h, and recompile.
  */
-#define GNUTLS_TRANSPORT_PTR int
+typedef int gnutls_transport_ptr;
 
-typedef const int* GNUTLS_LIST;
+struct gnutls_session_int;
+typedef struct gnutls_session_int* gnutls_session;
 
-/* STATE is not really descriptive. Think of it as
- * as session.
- */
-struct GNUTLS_STATE_INT;
-typedef struct GNUTLS_STATE_INT* GNUTLS_STATE;
+struct gnutls_dh_params_int;
+typedef struct gnutls_dh_params_int* gnutls_dh_params;
 
-struct GNUTLS_DH_PARAMS_INT;
-typedef struct GNUTLS_DH_PARAMS_INT* GNUTLS_DH_PARAMS;
-
-struct GNUTLS_RSA_PARAMS_INT;
-typedef struct GNUTLS_RSA_PARAMS_INT* GNUTLS_RSA_PARAMS;
+struct gnutls_rsa_params_int;
+typedef struct gnutls_rsa_params_int* gnutls_rsa_params;
 
 typedef struct {
 	unsigned char * data;
@@ -123,36 +122,36 @@ typedef struct {
 
 /* internal functions */
 
-int gnutls_init(GNUTLS_STATE * state, GNUTLS_ConnectionEnd con_end);
-void gnutls_deinit(GNUTLS_STATE state);
-int gnutls_bye( GNUTLS_STATE state, GNUTLS_CloseRequest how);
-#define gnutls_close gnutls_bye
+int gnutls_session_init(gnutls_session * session, gnutls_connection_end con_end);
+void gnutls_session_deinit(gnutls_session session);
+void _gnutls_session_deinit(gnutls_session session);
+int gnutls_bye( gnutls_session session, gnutls_close_request how);
 
-int gnutls_handshake( GNUTLS_STATE state);
-int gnutls_rehandshake( GNUTLS_STATE state);
+int gnutls_handshake( gnutls_session session);
+int gnutls_rehandshake( gnutls_session session);
 
-int gnutls_handshake_get_direction(GNUTLS_STATE state);
+int gnutls_handshake_get_direction(gnutls_session session);
 
-GNUTLS_AlertDescription gnutls_alert_get( GNUTLS_STATE state);
-int 		 gnutls_alert_send( GNUTLS_STATE, GNUTLS_AlertLevel, GNUTLS_AlertDescription);
-int 		 gnutls_alert_send_appropriate(  GNUTLS_STATE state, int err);
+gnutls_alert_description gnutls_alert_get( gnutls_session session);
+int 		 gnutls_alert_send( gnutls_session, gnutls_alert_level, gnutls_alert_description);
+int 		 gnutls_alert_send_appropriate(  gnutls_session session, int err);
 const char*	 gnutls_alert_get_name( int alert);
 
-/* get information on the current state */
-GNUTLS_BulkCipherAlgorithm	gnutls_cipher_get( GNUTLS_STATE state);
-GNUTLS_KXAlgorithm 		gnutls_kx_get( GNUTLS_STATE state);
-GNUTLS_MACAlgorithm		gnutls_mac_get( GNUTLS_STATE state);
-GNUTLS_CompressionMethod	gnutls_compression_get( GNUTLS_STATE state);
-GNUTLS_CertificateType		gnutls_cert_type_get( GNUTLS_STATE state);
+/* get information on the current session */
+gnutls_cipher_algorithm		gnutls_cipher_get( gnutls_session session);
+gnutls_kx_algorithm 		gnutls_kx_get( gnutls_session session);
+gnutls_mac_algorithm		gnutls_mac_get( gnutls_session session);
+gnutls_compression_method	gnutls_compression_get( gnutls_session session);
+gnutls_certificate_type		gnutls_cert_type_get( gnutls_session session);
 
-size_t gnutls_cipher_get_key_size( GNUTLS_BulkCipherAlgorithm algorithm);
+size_t gnutls_cipher_get_key_size( gnutls_cipher_algorithm algorithm);
 
 /* the name of the specified algorithms */
-const char *gnutls_cipher_get_name( GNUTLS_BulkCipherAlgorithm);
-const char *gnutls_mac_get_name( GNUTLS_MACAlgorithm);
-const char *gnutls_compression_get_name( GNUTLS_CompressionMethod);
-const char *gnutls_kx_get_name( GNUTLS_KXAlgorithm algorithm);
-const char *gnutls_cert_type_get_name( GNUTLS_CertificateType type);
+const char *gnutls_cipher_get_name( gnutls_cipher_algorithm);
+const char *gnutls_mac_get_name( gnutls_mac_algorithm);
+const char *gnutls_compression_get_name( gnutls_compression_method);
+const char *gnutls_kx_get_name( gnutls_kx_algorithm algorithm);
+const char *gnutls_cert_type_get_name( gnutls_certificate_type type);
 
 
 /* error functions */
@@ -163,126 +162,121 @@ const char* gnutls_strerror( int error);
 
 /* Semi-internal functions.
  */
-void gnutls_handshake_set_private_extensions(GNUTLS_STATE state, int allow);
-void gnutls_record_set_cbc_protection(GNUTLS_STATE state, int prot);
-void gnutls_handshake_set_rsa_pms_check(GNUTLS_STATE state, int check);
+void gnutls_handshake_set_private_extensions(gnutls_session session, int allow);
+void gnutls_record_set_cbc_protection(gnutls_session session, int prot);
+void gnutls_handshake_set_rsa_pms_check(gnutls_session session, int check);
 
 /* Record layer functions.
  */
-ssize_t gnutls_record_send( GNUTLS_STATE state, const void *data, size_t sizeofdata);
-ssize_t gnutls_record_recv( GNUTLS_STATE state, void *data, size_t sizeofdata);
+ssize_t gnutls_record_send( gnutls_session session, const void *data, size_t sizeofdata);
+ssize_t gnutls_record_recv( gnutls_session session, void *data, size_t sizeofdata);
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send
 
-size_t gnutls_record_get_max_size( GNUTLS_STATE state);
-ssize_t gnutls_record_set_max_size( GNUTLS_STATE state, size_t size);
+size_t gnutls_record_get_max_size( gnutls_session session);
+ssize_t gnutls_record_set_max_size( gnutls_session session, size_t size);
 
-size_t gnutls_record_check_pending(GNUTLS_STATE state);
+size_t gnutls_record_check_pending(gnutls_session session);
 
 /* functions to set priority of cipher suites 
  */
-int gnutls_cipher_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_mac_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_compression_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_kx_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_protocol_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
-int gnutls_cert_type_set_priority( GNUTLS_STATE state, GNUTLS_LIST);
+int gnutls_cipher_set_priority( gnutls_session session, const int*);
+int gnutls_mac_set_priority( gnutls_session session, const int*);
+int gnutls_compression_set_priority( gnutls_session session, const int*);
+int gnutls_kx_set_priority( gnutls_session session, const int*);
+int gnutls_protocol_set_priority( gnutls_session session, const int*);
+int gnutls_cert_type_set_priority( gnutls_session session, const int*);
 
 /* Returns the name of a cipher suite */
-const char *gnutls_cipher_suite_get_name(GNUTLS_KXAlgorithm kx_algorithm,
-	GNUTLS_BulkCipherAlgorithm cipher_algorithm, GNUTLS_MACAlgorithm mac_algorithm);
+const char *gnutls_cipher_suite_get_name(gnutls_kx_algorithm kx_algorithm,
+	gnutls_cipher_algorithm cipher_algorithm, gnutls_mac_algorithm mac_algorithm);
 
 /* get the currently used protocol version */
-GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
+gnutls_protocol_version gnutls_protocol_get_version(gnutls_session session);
 
-const char *gnutls_protocol_get_name(GNUTLS_Version version);
+const char *gnutls_protocol_get_name(gnutls_protocol_version version);
 
 
 /* get/set session 
  */
-int gnutls_session_set_data( GNUTLS_STATE state, void* session, int session_size);
-int gnutls_session_get_data( GNUTLS_STATE state, void* session, int *session_size);
+int gnutls_session_set_data( gnutls_session session, const void* session_data, int session_data_size);
+int gnutls_session_get_data( gnutls_session session, void* session_data, int *session_data_size);
 /* returns the session ID */
-int gnutls_session_get_id( GNUTLS_STATE state, void* session, int *session_size);
+int gnutls_session_get_id( gnutls_session session, void* session_id, int *session_id_size);
 
 /* checks if this session is a resumed one 
  */
-int gnutls_session_is_resumed(GNUTLS_STATE state);
+int gnutls_session_is_resumed(gnutls_session session);
 
-typedef int (*GNUTLS_DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
-typedef int (*GNUTLS_DB_REMOVE_FUNC)(void*, gnutls_datum key);
-typedef gnutls_datum (*GNUTLS_DB_RETR_FUNC)(void*, gnutls_datum key);
+typedef int (*gnutls_db_store_func)(void*, gnutls_datum key, gnutls_datum data);
+typedef int (*gnutls_db_remove_func)(void*, gnutls_datum key);
+typedef gnutls_datum (*gnutls_db_retr_func)(void*, gnutls_datum key);
 
-void gnutls_db_set_cache_expiration( GNUTLS_STATE state, int seconds);
+void gnutls_db_set_cache_expiration( gnutls_session session, int seconds);
 
-void gnutls_db_remove_session( GNUTLS_STATE state);
-void gnutls_db_set_retrieve_function( GNUTLS_STATE, GNUTLS_DB_RETR_FUNC);
-void gnutls_db_set_remove_function( GNUTLS_STATE, GNUTLS_DB_REMOVE_FUNC);
-void gnutls_db_set_store_function( GNUTLS_STATE, GNUTLS_DB_STORE_FUNC);
-void gnutls_db_set_ptr( GNUTLS_STATE, void* db_ptr);
-void* gnutls_db_get_ptr( GNUTLS_STATE);
-int  gnutls_db_check_entry( GNUTLS_STATE state, gnutls_datum session_entry);
+void gnutls_db_remove_session( gnutls_session session);
+void gnutls_db_set_retrieve_function( gnutls_session, gnutls_db_retr_func);
+void gnutls_db_set_remove_function( gnutls_session, gnutls_db_remove_func);
+void gnutls_db_set_store_function( gnutls_session, gnutls_db_store_func);
+void gnutls_db_set_ptr( gnutls_session, void* db_ptr);
+void* gnutls_db_get_ptr( gnutls_session);
+int  gnutls_db_check_entry( gnutls_session session, gnutls_datum session_entry);
 
-void gnutls_handshake_set_max_packet_length( GNUTLS_STATE state, int max);
+void gnutls_handshake_set_max_packet_length( gnutls_session session, int max);
 
 /* returns libgnutls version */
 const char* gnutls_check_version( const char*);
 
 /* Functions for setting/clearing credentials 
  */
-int gnutls_clear_creds( GNUTLS_STATE state);
+int gnutls_clear_creds( gnutls_session session);
 
 /* cred is a structure defined by the kx algorithm 
  */
-int gnutls_cred_set( GNUTLS_STATE, GNUTLS_CredType type, void* cred);
+int gnutls_cred_set( gnutls_session, gnutls_credentials_type type, void* cred);
 
 /* Credential structures for SRP - used in gnutls_set_cred(); */
 
 struct DSTRUCT;
-typedef struct DSTRUCT* GNUTLS_CERTIFICATE_CREDENTIALS;
-typedef GNUTLS_CERTIFICATE_CREDENTIALS GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS;
-typedef GNUTLS_CERTIFICATE_CREDENTIALS GNUTLS_CERTIFICATE_SERVER_CREDENTIALS;
+typedef struct DSTRUCT* gnutls_certificate_credentials;
+typedef gnutls_certificate_credentials gnutls_certificate_server_credentials;
+typedef gnutls_certificate_credentials gnutls_certificate_client_credentials;
 
-typedef struct DSTRUCT* GNUTLS_ANON_SERVER_CREDENTIALS;
-typedef struct DSTRUCT* GNUTLS_ANON_CLIENT_CREDENTIALS;
+typedef struct DSTRUCT* gnutls_anon_server_credentials;
+typedef struct DSTRUCT* gnutls_anon_client_credentials;
 
-void gnutls_anon_free_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS sc);
-int gnutls_anon_allocate_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
-#define gnutls_anon_free_server_sc gnutls_anon_free_server_cred
-#define gnutls_anon_allocate_server_sc gnutls_anon_allocate_server_cred
+void gnutls_anon_free_server_cred( gnutls_anon_server_credentials sc);
+int gnutls_anon_allocate_server_cred( gnutls_anon_server_credentials *sc);
 
-int gnutls_anon_set_server_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
-void gnutls_anon_set_server_dh_params( GNUTLS_ANON_SERVER_CREDENTIALS res, GNUTLS_DH_PARAMS);
+int gnutls_anon_set_server_cred( gnutls_anon_server_credentials res);
+void gnutls_anon_set_server_dh_params( gnutls_anon_server_credentials res, gnutls_dh_params);
 
-void gnutls_anon_free_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS sc);
-int gnutls_anon_allocate_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS *sc);
-#define gnutls_anon_free_client_sc gnutls_anon_free_client_cred
-#define gnutls_anon_allocate_client_sc gnutls_anon_allocate_client_cred
+void gnutls_anon_free_client_cred( gnutls_anon_server_credentials sc);
+int gnutls_anon_allocate_client_cred( gnutls_anon_server_credentials *sc);
 
-int gnutls_anon_set_client_cred( GNUTLS_ANON_SERVER_CREDENTIALS res);
+
+int gnutls_anon_set_client_cred( gnutls_anon_server_credentials res);
 
 
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
-void gnutls_certificate_free_cred( GNUTLS_CERTIFICATE_CREDENTIALS sc);
-int gnutls_certificate_allocate_cred( GNUTLS_CERTIFICATE_CREDENTIALS *sc);
-#define gnutls_certificate_free_sc gnutls_certificate_free_cred
-#define gnutls_certificate_allocate_sc gnutls_certificate_allocate_cred
+void gnutls_certificate_free_cred( gnutls_certificate_credentials sc);
+int gnutls_certificate_allocate_cred( gnutls_certificate_credentials *sc);
 
-int gnutls_certificate_set_dh_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_DH_PARAMS);
-int gnutls_certificate_set_rsa_params(GNUTLS_CERTIFICATE_CREDENTIALS res, GNUTLS_RSA_PARAMS rsa_params);
+int gnutls_certificate_set_dh_params(gnutls_certificate_credentials res, gnutls_dh_params);
+int gnutls_certificate_set_rsa_params(gnutls_certificate_credentials res, gnutls_rsa_params rsa_params);
 
-int gnutls_certificate_set_x509_trust_file( GNUTLS_CERTIFICATE_CREDENTIALS res, const char* CAFILE, 
-	GNUTLS_X509_CertificateFmt);
-int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
-	const gnutls_datum *CA, GNUTLS_X509_CertificateFmt);
+int gnutls_certificate_set_x509_trust_file( gnutls_certificate_credentials res, const char* CAFILE, 
+	gnutls_x509_certificate_fmt);
+int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res, 
+	const gnutls_datum *CA, gnutls_x509_certificate_fmt);
 
-int gnutls_certificate_set_x509_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, 
-	const char *CERTFILE, const char* KEYFILE, GNUTLS_X509_CertificateFmt);
-int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
+int gnutls_certificate_set_x509_key_file( gnutls_certificate_credentials res, 
+	const char *CERTFILE, const char* KEYFILE, gnutls_x509_certificate_fmt);
+int gnutls_certificate_set_x509_key_mem(gnutls_certificate_credentials res, 
 	const gnutls_datum* CERT, const gnutls_datum* KEY,
-	GNUTLS_X509_CertificateFmt);
+	gnutls_x509_certificate_fmt);
 
 /* global state functions 
  */
@@ -297,54 +291,97 @@ void gnutls_global_set_mem_functions(
 	void *(*gnutls_alloc_func)(size_t), void* (*gnutls_secure_alloc_func)(size_t),
 	int (*gnutls_is_secure_func)(const void*), void *(*gnutls_realloc_func)(void *, size_t),
 	void (*gnutls_free_func)(void*));
-#define gnutls_global_set_mem_func gnutls_global_set_mem_functions
 
-typedef void (*GNUTLS_LOG_FUNC)( const char*);
-void gnutls_global_set_log_function( GNUTLS_LOG_FUNC log_func);
-#define gnutls_global_set_log_func gnutls_global_set_log_function
+typedef void (*gnutls_log_func)( const char*);
+void gnutls_global_set_log_function( gnutls_log_func log_func);
 
 /* DH params */
-int gnutls_dh_params_set( GNUTLS_DH_PARAMS, gnutls_datum prime, gnutls_datum generator, int bits);
-int gnutls_dh_params_init( GNUTLS_DH_PARAMS*);
-void gnutls_dh_params_deinit( GNUTLS_DH_PARAMS);
+int gnutls_dh_params_set( gnutls_dh_params, gnutls_datum prime, gnutls_datum generator, int bits);
+int gnutls_dh_params_init( gnutls_dh_params*);
+void gnutls_dh_params_deinit( gnutls_dh_params);
 int gnutls_dh_params_generate( gnutls_datum* prime, gnutls_datum* generator, int bits);
 
 /* RSA params */
-int gnutls_rsa_params_set(GNUTLS_RSA_PARAMS rsa_params, 
+int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
 	gnutls_datum m, gnutls_datum e, gnutls_datum d, 
 	gnutls_datum p, gnutls_datum q, gnutls_datum u,
 	int bits);
 int gnutls_rsa_params_generate(gnutls_datum * m, gnutls_datum *e,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
 	gnutls_datum* u, int bits);
-int gnutls_rsa_params_init(GNUTLS_RSA_PARAMS * rsa_params);
-void gnutls_rsa_params_deinit(GNUTLS_RSA_PARAMS rsa_params);
+int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params);
+void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params);
 
 
-typedef ssize_t (*GNUTLS_PULL_FUNC)(GNUTLS_TRANSPORT_PTR, void*, size_t);
-typedef ssize_t (*GNUTLS_PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
-void gnutls_transport_set_ptr(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR ptr);
-void gnutls_transport_set_ptr2(GNUTLS_STATE state, GNUTLS_TRANSPORT_PTR recv_ptr,
-	GNUTLS_TRANSPORT_PTR send_ptr);
+typedef ssize_t (*gnutls_pull_func)(gnutls_transport_ptr, void*, size_t);
+typedef ssize_t (*gnutls_push_func)(gnutls_transport_ptr, const void*, size_t);
+void gnutls_transport_set_ptr(gnutls_session session, gnutls_transport_ptr ptr);
+void gnutls_transport_set_ptr2(gnutls_session session, gnutls_transport_ptr recv_ptr,
+	gnutls_transport_ptr send_ptr);
 
-GNUTLS_TRANSPORT_PTR gnutls_transport_get_ptr(GNUTLS_STATE state);
-void gnutls_transport_get_ptr2(GNUTLS_STATE state,
-	GNUTLS_TRANSPORT_PTR *recv_ptr,
-	GNUTLS_TRANSPORT_PTR *send_ptr);
+gnutls_transport_ptr gnutls_transport_get_ptr(gnutls_session session);
+void gnutls_transport_get_ptr2(gnutls_session session,
+	gnutls_transport_ptr *recv_ptr,
+	gnutls_transport_ptr *send_ptr);
 
-void gnutls_transport_set_lowat( GNUTLS_STATE state, int num);
+void gnutls_transport_set_lowat( gnutls_session session, int num);
 
 
-void gnutls_transport_set_push_function( GNUTLS_STATE, GNUTLS_PUSH_FUNC push_func);
-void gnutls_transport_set_pull_function( GNUTLS_STATE, GNUTLS_PULL_FUNC pull_func);
+void gnutls_transport_set_push_function( gnutls_session, gnutls_push_func push_func);
+void gnutls_transport_set_pull_function( gnutls_session, gnutls_pull_func pull_func);
+
+/* session specific 
+ */
+void gnutls_session_set_ptr(gnutls_session session, void* ptr);
+void* gnutls_session_get_ptr(gnutls_session session);
+
+void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status status);
+
+int gnutls_x509_fingerprint(gnutls_digest_algorithm algo, const gnutls_datum* data, char* result, size_t* result_size);
+
+/* defines for compatibility with older versions.
+ */
+#define GNUTLS_RSA_PARAMS gnutls_rsa_params
+#define GNUTLS_DH_PARAMS gnutls_dh_params
+#define GNUTLS_STATE gnutls_session
+#define GNUTLS_LIST const int*
+#define GNUTLS_TRANSPORT_PTR gnutls_transport_ptr
+#define GNUTLS_PKAlgorithm gnutls_pk_algorithm
+#define GNUTLS_X509_CertificateFmt gnutls_x509_certificate_fmt
+#define GNUTLS_CertificateType gnutls_certificate_type
+#define GNUTLS_Version gnutls_protocol_version
+#define GNUTLS_CloseRequest gnutls_close_request
+#define GNUTLS_OpenPGPKeyStatus gnutls_openpgp_key_status
+#define GNUTLS_CertificateRequest gnutls_certificate_request
+#define GNUTLS_CertificateStatus gnutls_certificate_status
+#define GNUTLS_ConnectionEnd gnutls_connection_end
+#define GNUTLS_CompressionMethod gnutls_compression_method
+#define GNUTLS_DigestAlgorithm gnutls_digest_algorithm
+#define GNUTLS_CredType gnutls_credentials_type
+#define GNUTLS_KXAlgorithm gnutls_kx_algorithm
+#define GNUTLS_BulkCipherAlgorithm gnutls_cipher_algorithm
+#define GNUTLS_MACAlgorithm gnutls_mac_algorithm
+#define GNUTLS_AlertLevel gnutls_alert_level
+#define GNUTLS_AlertDescription gnutls_alert_description
+#define GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS gnutls_certificate_client_credentials
+#define GNUTLS_CERTIFICATE_SERVER_CREDENTIALS gnutls_certificate_server_credentials
+#define GNUTLS_CERTIFICATE_CREDENTIALS gnutls_certificate_credentials
+#define GNUTLS_ANON_SERVER_CREDENTIALS gnutls_anon_server_credentials
+#define GNUTLS_ANON_CLIENT_CREDENTIALS gnutls_anon_client_credentials
+#define gnutls_anon_free_client_sc gnutls_anon_free_client_cred
+#define gnutls_anon_allocate_client_sc gnutls_anon_allocate_client_cred
+#define gnutls_anon_free_server_sc gnutls_anon_free_server_cred
+#define gnutls_anon_allocate_server_sc gnutls_anon_allocate_server_cred
 #define gnutls_transport_set_push_func gnutls_transport_set_push_function
 #define gnutls_transport_set_pull_func gnutls_transport_set_pull_function
+#define gnutls_global_set_log_func gnutls_global_set_log_function
+#define gnutls_global_set_mem_func gnutls_global_set_mem_functions
+#define gnutls_certificate_free_sc gnutls_certificate_free_cred
+#define gnutls_certificate_allocate_sc gnutls_certificate_allocate_cred
 
-/* state specific 
- */
-void gnutls_state_set_ptr(GNUTLS_STATE state, void* ptr);
-void* gnutls_state_get_ptr(GNUTLS_STATE state);
-
-void gnutls_openpgp_send_key(GNUTLS_STATE state, GNUTLS_OpenPGPKeyStatus status);
-
-int gnutls_x509_fingerprint(GNUTLS_DigestAlgorithm algo, const gnutls_datum* data, char* result, size_t* result_size);
+#define gnutls_state_get_ptr gnutls_session_get_ptr
+#define gnutls_state_set_ptr gnutls_session_set_ptr
+#define gnutls_init gnutls_session_init
+#define gnutls_deinit gnutls_session_deinit
+#define _gnutls_deinit _gnutls_session_deinit
+#define gnutls_handshake_set_exportable_detection(x,y) 0

@@ -32,11 +32,11 @@
 #include "auth_srp.h"
 #include <gnutls_str.h>
 
-int gen_srp_server_kx2(GNUTLS_STATE, opaque **);
-int gen_srp_client_kx0(GNUTLS_STATE, opaque **);
+int gen_srp_server_kx2(gnutls_session, opaque **);
+int gen_srp_client_kx0(gnutls_session, opaque **);
 
-int proc_srp_server_kx2(GNUTLS_STATE, opaque *, int);
-int proc_srp_client_kx0(GNUTLS_STATE, opaque *, int);
+int proc_srp_server_kx2(gnutls_session, opaque *, int);
+int proc_srp_client_kx0(gnutls_session, opaque *, int);
 
 const MOD_AUTH_STRUCT srp_auth_struct = {
 	"SRP",
@@ -72,7 +72,7 @@ const MOD_AUTH_STRUCT srp_auth_struct = {
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number 
  * Data is allocated by the caller, and should have data_size size.
  */
-int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
+int gen_srp_server_hello(gnutls_session state, opaque * data, int data_size)
 {
 	size_t n_g, n_n, n_s;
 	size_t ret;
@@ -167,7 +167,7 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque * data, int data_size)
 }
 
 /* send the second key exchange message  */
-int gen_srp_server_kx2(GNUTLS_STATE state, opaque ** data)
+int gen_srp_server_kx2(gnutls_session state, opaque ** data)
 {
 	int ret;
 	size_t n_b;
@@ -229,7 +229,7 @@ int gen_srp_server_kx2(GNUTLS_STATE state, opaque ** data)
 
 
 /* return A = g^a % N */
-int gen_srp_client_kx0(GNUTLS_STATE state, opaque ** data)
+int gen_srp_client_kx0(gnutls_session state, opaque ** data)
 {
 	size_t n_a;
 	uint8 *data_a;
@@ -283,7 +283,7 @@ int gen_srp_client_kx0(GNUTLS_STATE state, opaque ** data)
 }
 
 /* receive the first key exchange message ( g, n, s) */
-int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size)
+int proc_srp_server_hello(gnutls_session state, const opaque * data, int data_size)
 {
 	uint16 n_s, n_g, n_n;
 	size_t _n_s, _n_g, _n_n;
@@ -371,7 +371,7 @@ int proc_srp_server_hello(GNUTLS_STATE state, const opaque * data, int data_size
 }
 
 /* just read A and put it to state */
-int proc_srp_client_kx0(GNUTLS_STATE state, opaque * data, int data_size)
+int proc_srp_client_kx0(gnutls_session state, opaque * data, int data_size)
 {
 	size_t _n_A;
 
@@ -388,7 +388,7 @@ int proc_srp_client_kx0(GNUTLS_STATE state, opaque * data, int data_size)
 }
 
 
-int proc_srp_server_kx2(GNUTLS_STATE state, opaque * data, int data_size)
+int proc_srp_server_kx2(gnutls_session state, opaque * data, int data_size)
 {
 	size_t _n_B;
 	int ret;

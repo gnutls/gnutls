@@ -588,12 +588,12 @@ static GNUTLS_X509_SUBJECT_ALT_NAME _find_type( char* str_type) {
   * This is specified in X509v3 Certificate Extensions. 
   * GNUTLS will return the Alternative name, or a negative
   * error code.
-  * Returns GNUTLS_E_INVALID_REQUEST if ret_size is not enough to hold the alternative name,
-  * or the type of alternative name if everything was ok. The type is one of the
-  * enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
+  * Returns GNUTLS_E_INVALID_REQUEST if ret_size is not enough to hold the alternative 
+  * name, or the type of alternative name if everything was ok. The type is 
+  * one of the enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
   *
-  * If the certificate does not have an Alternative name with the specified sequence number
-  * then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  * If the certificate does not have an Alternative name with the specified 
+  * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   *
   **/
 int gnutls_x509_extract_certificate_subject_alt_name(const gnutls_datum * cert, int seq, char *ret, int *ret_size)
@@ -814,31 +814,31 @@ int gnutls_x509_extract_certificate_version(const gnutls_datum * cert)
 
 /*-
   * _gnutls_x509_cert_verify_peers - This function returns the peer's certificate status
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return it's status (TRUSTED, EXPIRED etc.). 
-  * The return value (status) should be one of the CertificateStatus enumerated elements.
+  * The return value (status) should be one of the gnutls_certificate_status enumerated elements.
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
-int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
+int _gnutls_x509_cert_verify_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
-	CertificateStatus verify;
+	gnutls_certificate_status verify;
 	gnutls_cert *peer_certificate_list;
 	int peer_certificate_list_size, i, x, ret;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
@@ -904,14 +904,14 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
   * @CRL_list_length: not used
   *
   * This function will try to verify the given certificate list and return it's status (TRUSTED, EXPIRED etc.). 
-  * The return value (status) should be one or more of the CertificateStatus 
+  * The return value (status) should be one or more of the gnutls_certificate_status 
   * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
   * by this function, you should check them using the appropriate functions.
   *
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
-  * The return value (status) should be one or more of the CertificateStatus 
+  * The return value (status) should be one or more of the gnutls_certificate_status 
   * enumerated elements bitwise or'd.
   *
   * GNUTLS_CERT_NOT_TRUSTED\: the peer's certificate is not trusted.
@@ -931,7 +931,7 @@ int _gnutls_x509_cert_verify_peers(GNUTLS_STATE state)
   **/
 int gnutls_x509_verify_certificate( const gnutls_datum* cert_list, int cert_list_length, const gnutls_datum * CA_list, int CA_list_length, const gnutls_datum* CRL_list, int CRL_list_length)
 {
-	CertificateStatus verify;
+	gnutls_certificate_status verify;
 	gnutls_cert *peer_certificate_list;
 	gnutls_cert *ca_certificate_list;
 	int peer_certificate_list_size, i, x, ret, ca_certificate_list_size;
@@ -1277,7 +1277,7 @@ static int parse_pem_cert_mem( gnutls_cert** cert_list, int* ncerts,
 /* Reads a base64 encoded certificate from memory
  */
 static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, int cert_size, 
-	GNUTLS_X509_CertificateFmt type)
+	gnutls_x509_certificate_fmt type)
 {
 	int ret;
 
@@ -1318,7 +1318,7 @@ static int read_cert_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cert, i
  * This is to be called once.
  */
 static int read_ca_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *ca, int ca_size,
-	GNUTLS_X509_CertificateFmt type)
+	gnutls_x509_certificate_fmt type)
 {
 
 	if (type==GNUTLS_X509_FMT_DER)
@@ -1375,12 +1375,12 @@ int _gnutls_der_check_if_rsa_key(const gnutls_datum * key_struct)
  * type indicates the certificate format.
  */
 static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int key_size, 
-	GNUTLS_X509_CertificateFmt type)
+	gnutls_x509_certificate_fmt type)
 {
 	int ret;
 	opaque *b64 = NULL;
 	gnutls_datum tmp;
-	PKAlgorithm pk;
+	gnutls_pk_algorithm pk;
 
 	/* allocate space for the pkey list
 	 */
@@ -1465,7 +1465,7 @@ static int read_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *key, int
 /* Reads a certificate file
  */
 static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *certfile,
-	GNUTLS_X509_CertificateFmt type)
+	gnutls_x509_certificate_fmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -1488,7 +1488,7 @@ static int read_cert_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *certfi
  * authorities). This is to be called once.
  */
 static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cafile, 
-	GNUTLS_X509_CertificateFmt type)
+	gnutls_x509_certificate_fmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -1513,7 +1513,7 @@ static int read_ca_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *cafile,
  * stores it).
  */
 static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *keyfile,
-	GNUTLS_X509_CertificateFmt type)
+	gnutls_x509_certificate_fmt type)
 {
 	int siz;
 	char x[MAX_FILE_SIZE];
@@ -1550,7 +1550,7 @@ static int read_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *keyfile
   *
   **/
 int gnutls_certificate_set_x509_key_file(GNUTLS_CERTIFICATE_CREDENTIALS res, const char *CERTFILE,
-			   const char *KEYFILE, GNUTLS_X509_CertificateFmt type)
+			   const char *KEYFILE, gnutls_x509_certificate_fmt type)
 {
 	int ret;
 
@@ -1635,7 +1635,7 @@ opaque *pdata;
   *
   **/
 int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, 
-	const gnutls_datum *CA, GNUTLS_X509_CertificateFmt type)
+	const gnutls_datum *CA, gnutls_x509_certificate_fmt type)
 {
 	int ret, ret2;
 
@@ -1660,7 +1660,7 @@ int gnutls_certificate_set_x509_trust_mem(GNUTLS_CERTIFICATE_CREDENTIALS res,
   *
   **/
 int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res, 
-		const char *CAFILE, GNUTLS_X509_CertificateFmt type)
+		const char *CAFILE, gnutls_x509_certificate_fmt type)
 {
 	int ret, ret2;
 
@@ -1694,7 +1694,7 @@ int gnutls_certificate_set_x509_trust_file(GNUTLS_CERTIFICATE_CREDENTIALS res,
   *
   **/
 int gnutls_certificate_set_x509_key_mem(GNUTLS_CERTIFICATE_CREDENTIALS res, const gnutls_datum* CERT,
-			   const gnutls_datum* KEY, GNUTLS_X509_CertificateFmt type)
+			   const gnutls_datum* KEY, gnutls_x509_certificate_fmt type)
 {
 	int ret;
 
@@ -2134,11 +2134,11 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gCert, gnutls_datum derCert,
 
 }
 
-/* Returns 0 if it's ok to use the KXAlgorithm with this cert
+/* Returns 0 if it's ok to use the gnutls_kx_algorithm with this cert
  * (using KeyUsage field). 
  */
 int _gnutls_check_x509_key_usage(const gnutls_cert * cert,
-				    KXAlgorithm alg)
+				    gnutls_kx_algorithm alg)
 {
 	if (_gnutls_map_kx_get_cred(alg) == GNUTLS_CRD_CERTIFICATE) {
 		switch (alg) {
@@ -2357,7 +2357,7 @@ int gnutls_x509_pkcs7_extract_certificate(const gnutls_datum * pkcs7_struct, int
   * For DSA the bits returned are of the public
   * exponent.
   *
-  * Returns a member of the GNUTLS_PKAlgorithm enumeration on success,
+  * Returns a member of the gnutls_pk_algorithm enumeration on success,
   * or a negative value on error.
   *
   **/

@@ -45,7 +45,7 @@ static int normalize_bits(int bits)
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.
  */
-const GNUTLS_MPI* _gnutls_get_rsa_params(GNUTLS_RSA_PARAMS rsa_params, int bits)
+const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params rsa_params, int bits)
 {
 	if (rsa_params == NULL) {
 		gnutls_assert();
@@ -187,7 +187,7 @@ static int check_bits(int bits)
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
   *
   **/
-int gnutls_rsa_params_set(GNUTLS_RSA_PARAMS rsa_params, 
+int gnutls_rsa_params_set(gnutls_rsa_params rsa_params, 
 	gnutls_datum m, gnutls_datum e,
 	gnutls_datum d, gnutls_datum p, gnutls_datum q, gnutls_datum u,
 	int bits) 
@@ -257,10 +257,10 @@ int gnutls_rsa_params_set(GNUTLS_RSA_PARAMS rsa_params,
   * This function will initialize the temporary RSA parameters structure.
   *
   **/
-int gnutls_rsa_params_init(GNUTLS_RSA_PARAMS * rsa_params)
+int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
 {
 
-	*rsa_params = gnutls_calloc( 1, sizeof(_GNUTLS_RSA_PARAMS));
+	*rsa_params = gnutls_calloc( 1, sizeof(_gnutls_rsa_params));
 	if (*rsa_params==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -277,7 +277,7 @@ int gnutls_rsa_params_init(GNUTLS_RSA_PARAMS * rsa_params)
   * This function will deinitialize the RSA parameters structure.
   *
   **/
-void gnutls_rsa_params_deinit(GNUTLS_RSA_PARAMS rsa_params)
+void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
 {
 int i;
 

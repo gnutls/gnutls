@@ -40,9 +40,9 @@
 /* It might be a good idea to replace int with void*
  * here.
  */
-#define GNUTLS_TRANSPORT_PTR int
+typedef int gnutls_transport_ptr;
 
-typedef const int* GNUTLS_LIST;
+typedef const int* gnutls_list;
 
 #define MIN_BITS 767
 
@@ -81,8 +81,8 @@ typedef const int* GNUTLS_LIST;
 /* the maximum size of encrypted packets */
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define RECORD_HEADER_SIZE 5
-#define MAX_RECORD_SEND_SIZE state->security_parameters.max_record_send_size
-#define MAX_RECORD_RECV_SIZE state->security_parameters.max_record_recv_size
+#define MAX_RECORD_SEND_SIZE session->security_parameters.max_record_send_size
+#define MAX_RECORD_RECV_SIZE session->security_parameters.max_record_recv_size
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
 #define MAX_RECORD_OVERHEAD MAX_PAD_SIZE+EXTRA_COMP_SIZE
@@ -104,26 +104,20 @@ typedef struct { opaque pint[3]; } uint24;
 
 typedef enum ChangeCipherSpecType { GNUTLS_TYPE_CHANGE_CIPHER_SPEC=1 } ChangeCipherSpecType;
 
-typedef enum CertificateStatus { 
+typedef enum gnutls_certificate_status { 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
 	GNUTLS_CERT_INVALID=4, 
 	GNUTLS_CERT_CORRUPTED=16,
 	GNUTLS_CERT_REVOKED=32
-} CertificateStatus;
-#define GNUTLS_CertificateStatus CertificateStatus
+} gnutls_certificate_status;
 
-typedef enum CertificateRequest { GNUTLS_CERT_IGNORE, 
-	GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE 
-} CertificateRequest;
-#define GNUTLS_CertificateRequest CertificateRequest
+typedef enum gnutls_certificate_request { GNUTLS_CERT_IGNORE, GNUTLS_CERT_REQUEST=1, GNUTLS_CERT_REQUIRE } gnutls_certificate_request;
 
-typedef enum GNUTLS_OpenPGPKeyStatus { GNUTLS_OPENPGP_KEY, 
+typedef enum gnutls_openpgp_key_status { GNUTLS_OPENPGP_KEY, 
 	GNUTLS_OPENPGP_KEY_FINGERPRINT
-} GNUTLS_OpenPGPKeyStatus;
+} gnutls_openpgp_key_status;
 
-typedef enum CloseRequest { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 
-} CloseRequest;
-#define GNUTLS_CloseRequest CloseRequest
+typedef enum gnutls_close_request { GNUTLS_SHUT_RDWR=0, GNUTLS_SHUT_WR=1 } gnutls_close_request;
 
 typedef enum HandshakeState { STATE0=0, STATE1, STATE2, STATE3, STATE4, STATE5,
 	STATE6, STATE7, STATE8, STATE9, STATE10, STATE11, STATE20=20, STATE21,
@@ -149,44 +143,33 @@ typedef gnutls_datum gnutls_sdatum;
 #define MAX_CIPHERSUITES 256
 
 /* STATE */
-typedef enum ConnectionEnd { GNUTLS_SERVER=1, GNUTLS_CLIENT 
-} ConnectionEnd;
-#define GNUTLS_ConnectionEnd ConnectionEnd
 
-typedef enum BulkCipherAlgorithm { GNUTLS_CIPHER_NULL=1, 
+typedef enum gnutls_cipher_algorithm { GNUTLS_CIPHER_NULL=1, 
 	GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
 	GNUTLS_CIPHER_TWOFISH_128_CBC, GNUTLS_CIPHER_RIJNDAEL_256_CBC,
 	GNUTLS_CIPHER_ARCFOUR_40
-} BulkCipherAlgorithm;
-#define GNUTLS_BulkCipherAlgorithm BulkCipherAlgorithm
-	
+} gnutls_cipher_algorithm;
+
+typedef enum gnutls_kx_algorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
+	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
+	GNUTLS_KX_RSA_EXPORT
+} gnutls_kx_algorithm;
+
+typedef enum gnutls_mac_algorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, GNUTLS_MAC_SHA } gnutls_mac_algorithm;
+
+typedef enum gnutls_compression_method { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB } gnutls_compression_method;
+
+typedef enum gnutls_connection_end { GNUTLS_SERVER=1, GNUTLS_CLIENT } gnutls_connection_end;
+
 typedef enum Extensions { GNUTLS_EXTENSION_MAX_RECORD_SIZE=1, GNUTLS_EXTENSION_SRP=6, GNUTLS_EXTENSION_CERT_TYPE=7 
 } Extensions;
 
-typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, 
-	GNUTLS_KX_DHE_RSA, GNUTLS_KX_ANON_DH, GNUTLS_KX_SRP,
-	GNUTLS_KX_RSA_EXPORT
-} KXAlgorithm;
-#define GNUTLS_KXAlgorithm KXAlgorithm
+typedef enum gnutls_credentials_type { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP } gnutls_credentials_type;
 
-typedef enum CertificateType { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
-} CertificateType;
-#define GNUTLS_CertificateType CertificateType
-
-typedef enum CredType { GNUTLS_CRD_CERTIFICATE=1, GNUTLS_CRD_ANON, GNUTLS_CRD_SRP 
-} CredType;
-#define GNUTLS_CredType CredType
+typedef enum gnutls_certificate_type { GNUTLS_CRT_X509=1, GNUTLS_CRT_OPENPGP 
+} gnutls_certificate_type;
 
 typedef enum CipherType { CIPHER_STREAM, CIPHER_BLOCK } CipherType;
-
-typedef enum CompressionMethod { GNUTLS_COMP_NULL=1, GNUTLS_COMP_ZLIB 
-} CompressionMethod;
-#define GNUTLS_CompressionMethod CompressionMethod
-
-typedef enum MACAlgorithm { GNUTLS_MAC_NULL=1, GNUTLS_MAC_MD5, 
-	GNUTLS_MAC_SHA 
-} MACAlgorithm;
-#define GNUTLS_MACAlgorithm MACAlgorithm
 
 typedef enum ValidSession { VALID_TRUE, VALID_FALSE } ValidSession;
 typedef enum ResumableSession { RESUME_TRUE, RESUME_FALSE } ResumableSession;
@@ -196,36 +179,29 @@ typedef enum ContentType { GNUTLS_CHANGE_CIPHER_SPEC=20, GNUTLS_ALERT,
 	GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA 
 } ContentType;
 
-typedef enum GNUTLS_X509_CertificateFmt { GNUTLS_X509_FMT_DER, 
-	GNUTLS_X509_FMT_PEM } GNUTLS_X509_CertificateFmt;
+typedef enum gnutls_x509_certificate_fmt { GNUTLS_X509_FMT_DER, 
+	GNUTLS_X509_FMT_PEM } gnutls_x509_certificate_fmt;
 
-typedef enum PKAlgorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,	/* sign only */
-	GNUTLS_PK_UNKNOWN 
-} PKAlgorithm;
-
-#define GNUTLS_PKAlgorithm PKAlgorithm
+typedef enum gnutls_pk_algorithm { GNUTLS_PK_RSA = 1, GNUTLS_PK_DSA,
+	GNUTLS_PK_UNKNOWN = 0xff
+} gnutls_pk_algorithm;
 
 /* STATE (stop) */
 
 
 /* Pull & Push functions defines: 
  */
-typedef ssize_t (*PULL_FUNC)(GNUTLS_TRANSPORT_PTR, void*, size_t);
-typedef ssize_t (*PUSH_FUNC)(GNUTLS_TRANSPORT_PTR, const void*, size_t);
-#define GNUTLS_PULL_FUNC PULL_FUNC
-#define GNUTLS_PUSH_FUNC PUSH_FUNC
+typedef ssize_t (*gnutls_pull_func)(gnutls_transport_ptr, void*, size_t);
+typedef ssize_t (*gnutls_push_func)(gnutls_transport_ptr, const void*, size_t);
 
 /* Store & Retrieve functions defines: 
  */
-typedef int (*DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
-typedef int (*DB_REMOVE_FUNC)(void*, gnutls_datum key);
-typedef gnutls_datum (*DB_RETR_FUNC)(void*, gnutls_datum key);
-#define GNUTLS_DB_STORE_FUNC DB_STORE_FUNC
-#define GNUTLS_DB_REMOVE_FUNC DB_REMOVE_FUNC
-#define GNUTLS_DB_RETR_FUNC DB_RETR_FUNC
+typedef int (*gnutls_db_store_func)(void*, gnutls_datum key, gnutls_datum data);
+typedef int (*gnutls_db_remove_func)(void*, gnutls_datum key);
+typedef gnutls_datum (*gnutls_db_retr_func)(void*, gnutls_datum key);
 
 typedef struct AUTH_CRED {
-	KXAlgorithm algorithm;
+	gnutls_kx_algorithm algorithm;
 	/* the type of credentials depends on algorithm */
 	void* credentials;
 	struct AUTH_CRED* next;
@@ -258,7 +234,7 @@ struct GNUTLS_KEY_INT {
 	 * Rememember that this should be calloced!
 	 */
 	void*				auth_info;
-	CredType			auth_info_type;
+	gnutls_credentials_type		auth_info_type;
 	int				auth_info_size; /* needed in order to store to db for restoring 
 							 */
 	uint8				crypt_algo;
@@ -292,7 +268,8 @@ typedef struct {
 /* Versions should be in order of the oldest
  * (eg. SSL3 is before TLS1)
  */
-typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
+typedef enum gnutls_protocol_version { GNUTLS_SSL3=1, GNUTLS_TLS1, GNUTLS_VERSION_UNKNOWN=0xff } 
+gnutls_protocol_version;
 
 /* This structure holds parameters got from TLS extension
  * mechanism. (some extensions may hold parameters in AUTH_INFO
@@ -310,7 +287,7 @@ typedef struct {
 /* This structure and AUTH_INFO, are stored in the resume database,
  * and are restored, in case of resume.
  * Holds all the required parameters to resume the current 
- * state.
+ * session.
  */
 
 /* if you add anything in Security_Parameters struct, then
@@ -322,22 +299,22 @@ typedef struct {
  * the handshake is in progress is the cipher suite value.
  */
 typedef struct {
-	ConnectionEnd entity;
-	KXAlgorithm kx_algorithm;
+	gnutls_connection_end entity;
+	gnutls_kx_algorithm kx_algorithm;
 	/* we've got separate write/read bulk/macs because
 	 * there is a time in handshake where the peer has
 	 * null cipher and we don't
 	 */
-	BulkCipherAlgorithm read_bulk_cipher_algorithm;
-	MACAlgorithm read_mac_algorithm;
-	CompressionMethod read_compression_algorithm;
+	gnutls_cipher_algorithm read_bulk_cipher_algorithm;
+	gnutls_mac_algorithm read_mac_algorithm;
+	gnutls_compression_method read_compression_algorithm;
 
-	BulkCipherAlgorithm write_bulk_cipher_algorithm;
-	MACAlgorithm write_mac_algorithm;
-	CompressionMethod write_compression_algorithm;
+	gnutls_cipher_algorithm write_bulk_cipher_algorithm;
+	gnutls_mac_algorithm write_mac_algorithm;
+	gnutls_compression_method write_compression_algorithm;
 
 	/* this is the ciphersuite we are going to use 
-	 * moved here from gnutls_internals in order to be restored
+	 * moved here from internals in order to be restored
 	 * on resume;
 	 */
 	GNUTLS_CipherSuite	current_cipher_suite;
@@ -355,8 +332,8 @@ typedef struct {
 	uint16			max_record_send_size;
 	uint16			max_record_recv_size;
 	/* holds the negotiated certificate type */
-	CertificateType		cert_type;	
-	GNUTLS_Version		version; /* moved here */
+	gnutls_certificate_type		cert_type;	
+	gnutls_protocol_version		version; /* moved here */
 } SecurityParameters;
 
 /* This structure holds the generated keys
@@ -388,20 +365,13 @@ typedef struct {
 
 
 typedef struct {
-	int algorithm_priority[MAX_ALGOS];
+	int priority[MAX_ALGOS];
 	int algorithms;
 } GNUTLS_Priority;
 
-#define BulkCipherAlgorithm_Priority GNUTLS_Priority
-#define MACAlgorithm_Priority GNUTLS_Priority
-#define KXAlgorithm_Priority GNUTLS_Priority
-#define CompressionMethod_Priority GNUTLS_Priority
-#define Protocol_Priority GNUTLS_Priority
-#define CertType_Priority GNUTLS_Priority
-
-typedef int certificate_client_select_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int, const gnutls_datum *, int);
-typedef int certificate_server_select_func(struct GNUTLS_STATE_INT*, const gnutls_datum *, int);
-typedef int srp_server_select_func(struct GNUTLS_STATE_INT*, char**, char**, int);
+typedef int certificate_client_select_func(struct gnutls_session_int*, const gnutls_datum *, int, const gnutls_datum *, int);
+typedef int certificate_server_select_func(struct gnutls_session_int*, const gnutls_datum *, int);
+typedef int srp_server_select_func(struct gnutls_session_int*, char**, char**, int);
 
 typedef struct {
 	opaque				header[HANDSHAKE_HEADER_SIZE];
@@ -435,15 +405,15 @@ typedef struct {
 
 	int				last_alert; /* last alert received */
 	/* this is the compression method we are going to use */
-	CompressionMethod		compression_method;
+	gnutls_compression_method		compression_method;
 	/* priorities */
-	BulkCipherAlgorithm_Priority	BulkCipherAlgorithmPriority;
-	MACAlgorithm_Priority		MACAlgorithmPriority;
-	KXAlgorithm_Priority		KXAlgorithmPriority;
-	CompressionMethod_Priority	CompressionMethodPriority;
-	Protocol_Priority		ProtocolPriority;
-	CertType_Priority		cert_type_priority;
-	
+	GNUTLS_Priority			cipher_algorithm_priority;
+	GNUTLS_Priority			mac_algorithm_priority;
+	GNUTLS_Priority			kx_algorithm_priority;
+	GNUTLS_Priority			compression_method_priority;
+	GNUTLS_Priority			protocol_priority;
+	GNUTLS_Priority			cert_type_priority;
+
 	/* resumed session */
 	ResumableSession		resumed; /* RESUME_TRUE or FALSE - if we are resuming a session */
 	SecurityParameters		resumed_security_parameters;
@@ -525,20 +495,20 @@ typedef struct {
 
 	/* PUSH & PULL functions.
 	 */
-	PULL_FUNC _gnutls_pull_func;
-	PUSH_FUNC _gnutls_push_func;
+	gnutls_pull_func		_gnutls_pull_func;
+	gnutls_push_func		_gnutls_push_func;
 	/* Holds the first argument of PUSH and PULL
 	 * functions;
 	 */
-	int transport_recv_ptr;
-	int transport_send_ptr;
-	
+	gnutls_transport_ptr		transport_recv_ptr;
+	gnutls_transport_ptr		transport_send_ptr;
+
 	/* STORE & RETRIEVE functions. Only used if other
 	 * backend than gdbm is used.
 	 */
-	DB_STORE_FUNC db_store_func;
-	DB_RETR_FUNC db_retrieve_func;
-	DB_REMOVE_FUNC db_remove_func;
+	gnutls_db_store_func db_store_func;
+	gnutls_db_retr_func db_retrieve_func;
+	gnutls_db_remove_func db_remove_func;
 	void* db_ptr;
 	
 	/* Holds the record size requested by the
@@ -564,7 +534,7 @@ typedef struct {
 
 	/* This holds the default version that our first
 	 * record packet will have. */
-	GNUTLS_Version		default_record_version;
+	gnutls_protocol_version		default_record_version;
 
 	int			cbc_protection_hack;
 
@@ -586,15 +556,15 @@ typedef struct {
 	 */
 } GNUTLS_INTERNALS;
 
-struct GNUTLS_STATE_INT {
+struct gnutls_session_int {
 	SecurityParameters security_parameters;
 	CipherSpecs cipher_specs;
 	ConnectionState connection_state;
-	GNUTLS_INTERNALS gnutls_internals;
+	GNUTLS_INTERNALS internals;
 	GNUTLS_KEY gnutls_key;
 };
 
-typedef struct GNUTLS_STATE_INT *GNUTLS_STATE;
+typedef struct gnutls_session_int *gnutls_session;
 
 typedef struct {
 	int bits;
@@ -605,38 +575,38 @@ typedef struct {
         int local;              /* indicates if it is 
                                  * not malloced, !=0 indicates malloced
                                  */
-} _GNUTLS_DH_PARAMS;
+} _gnutls_dh_params;
 
-#define GNUTLS_DH_PARAMS _GNUTLS_DH_PARAMS*
+#define gnutls_dh_params _gnutls_dh_params*
 
 
 typedef struct {
 	int bits;
 	MPI params[RSA_PRIVATE_PARAMS];
-} _GNUTLS_RSA_PARAMS;
+} _gnutls_rsa_params;
 
-#define GNUTLS_RSA_PARAMS _GNUTLS_RSA_PARAMS*
+#define gnutls_rsa_params _gnutls_rsa_params*
 
 
 /* functions */
-void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
-GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
-void _gnutls_free_auth_info( GNUTLS_STATE state);
+void _gnutls_set_current_version(gnutls_session session, gnutls_protocol_version version);
+gnutls_protocol_version gnutls_protocol_get_version(gnutls_session session);
+void _gnutls_free_auth_info( gnutls_session session);
 
 /* These two macros return the advertized TLS version of
  * the peer.
  */
-#define _gnutls_get_adv_version_major( state) \
-	state->gnutls_internals.adv_version_major
+#define _gnutls_get_adv_version_major( session) \
+	session->internals.adv_version_major
 
-#define _gnutls_get_adv_version_minor( state) \
-	state->gnutls_internals.adv_version_minor
+#define _gnutls_get_adv_version_minor( session) \
+	session->internals.adv_version_minor
 
-#define set_adv_version( state, major, minor) \
-	state->gnutls_internals.adv_version_major = major; \
-	state->gnutls_internals.adv_version_minor = minor
+#define set_adv_version( session, major, minor) \
+	session->internals.adv_version_major = major; \
+	session->internals.adv_version_minor = minor
 
-void _gnutls_set_adv_version( GNUTLS_STATE, GNUTLS_Version);
-GNUTLS_Version _gnutls_get_adv_version( GNUTLS_STATE);
+void _gnutls_set_adv_version( gnutls_session, gnutls_protocol_version);
+gnutls_protocol_version _gnutls_get_adv_version( gnutls_session);
 
 #endif /* GNUTLS_INT_H */

@@ -27,14 +27,14 @@ int main()
    int err, ret;
    int sd, ii, alert;
    struct sockaddr_in sa;
-   GNUTLS_STATE state;
+   gnutls_session session;
    char buffer[MAX_BUF + 1];
-   GNUTLS_CERTIFICATE_CLIENT_CREDENTIALS xcred;
+   gnutls_certificate_client_credentials xcred;
    /* variables used in session resuming */
    int t;
-   char *session;
+   char *session_data;
    char *session_id;
-   int session_size;
+   int session_data_size;
    int session_id_size;
    char *tmp_session_id;
    int tmp_session_id_size;
@@ -63,26 +63,26 @@ int main()
          fprintf(stderr, "Connect error");
          exit(1);
       }
-      gnutls_init(&state, GNUTLS_CLIENT);
+      gnutls_session_init(&session, GNUTLS_CLIENT);
 
-      gnutls_protocol_set_priority(state, protocol_priority);
-      gnutls_cipher_set_priority(state, cipher_priority);
-      gnutls_compression_set_priority(state, comp_priority);
-      gnutls_kx_set_priority(state, kx_priority);
-      gnutls_mac_set_priority(state, mac_priority);
+      gnutls_protocol_set_priority(session, protocol_priority);
+      gnutls_cipher_set_priority(session, cipher_priority);
+      gnutls_compression_set_priority(session, comp_priority);
+      gnutls_kx_set_priority(session, kx_priority);
+      gnutls_mac_set_priority(session, mac_priority);
 
-      gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+      gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
       if (t > 0) { /* if this is not the first time we connect */
-         gnutls_session_set_data(state, session, session_size);
-         free(session);
+         gnutls_session_set_data(session, session_data, session_data_size);
+         free(session_data);
       }
       
-      gnutls_transport_set_ptr( state, sd);
+      gnutls_transport_set_ptr( session, sd);
 
       /* Perform the TLS handshake
        */
-      ret = gnutls_handshake( state);
+      ret = gnutls_handshake( session);
 
       if (ret < 0) {
          fprintf(stderr, "*** Handshake failed\n");
@@ -94,26 +94,26 @@ int main()
 
       if (t == 0) { /* the first time we connect */
          /* get the session data size */
-         gnutls_session_get_data(state, NULL, &session_size);
-         session = malloc(session_size);
+         gnutls_session_get_data(session, NULL, &session_data_size);
+         session_data = malloc(session_data_size);
 
          /* put session data to the session variable */
-         gnutls_session_get_data(state, session, &session_size);
+         gnutls_session_get_data(session, session_data, &session_data_size);
 
          /* keep the current session ID. This is only needed
           * in order to check if the server actually resumed this
           * connection.
           */
-         gnutls_session_get_id(state, NULL, &session_id_size);
+         gnutls_session_get_id(session, NULL, &session_id_size);
          session_id = malloc(session_id_size);
-         gnutls_session_get_id(state, session_id, &session_id_size);
+         gnutls_session_get_id(session, session_id, &session_id_size);
 
       } else { /* the second time we connect */
 
          /* check if we actually resumed the previous session */
-         gnutls_session_get_id(state, NULL, &tmp_session_id_size);
+         gnutls_session_get_id(session, NULL, &tmp_session_id_size);
          tmp_session_id = malloc(tmp_session_id_size);
-         gnutls_session_get_id(state, tmp_session_id, &tmp_session_id_size);
+         gnutls_session_get_id(session, tmp_session_id, &tmp_session_id_size);
 
          if (memcmp(tmp_session_id, session_id, session_id_size) == 0) {
             printf("- Previous session was resumed\n");
@@ -126,11 +126,11 @@ int main()
 
       /* This function was defined in a previous example
        */
-      print_info(state);
+      print_info(session);
 
-      gnutls_record_send( state, MSG, strlen(MSG));
+      gnutls_record_send( session, MSG, strlen(MSG));
 
-      ret = gnutls_record_recv( state, buffer, MAX_BUF);
+      ret = gnutls_record_recv( session, buffer, MAX_BUF);
       if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
          if (ret == 0) {
             printf("- Peer has closed the GNUTLS connection\n");
@@ -142,11 +142,11 @@ int main()
          }
       } else {
          if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-            alert = gnutls_alert_get(state);
+            alert = gnutls_alert_get(session);
             printf("* Received alert [%d]: %s\n", alert, gnutls_alert_get_name(alert));
          if (ret == GNUTLS_E_REHANDSHAKE) {
             printf("* Received HelloRequest message (server asked to rehandshake)\n");
-            gnutls_alert_send_appropriate( state, ret); /* we don't want rehandshake */
+            gnutls_alert_send_appropriate( session, ret); /* we don't want rehandshake */
          }
       }
 
@@ -157,14 +157,14 @@ int main()
          }
          fputs("\n", stdout);
       }
-      gnutls_bye( state, GNUTLS_SHUT_RDWR);
+      gnutls_bye( session, GNUTLS_SHUT_RDWR);
 
     end:
 
       shutdown(sd, SHUT_RDWR);  /* no more receptions */
       close(sd);
 
-      gnutls_deinit(state);
+      gnutls_session_deinit(session);
 
    }  /* for() */
 

@@ -109,11 +109,11 @@ int main(int argc, char **argv)
    int err, ret;
    int sd, ii, i;
    struct sockaddr_in sa;
-   GNUTLS_STATE state;
+   gnutls_session session;
    char buffer[MAX_BUF + 1];
-   char *session = NULL;
+   char *session_data = NULL;
    char *session_id = NULL;
-   int session_size, alert;
+   int session_data_size, alert;
    int session_id_size;
    char *tmp_session_id;
    int tmp_session_id_size;
@@ -230,38 +230,38 @@ int main(int argc, char **argv)
    ERR(err, "connect");
 
    for (i = 0; i < 2; i++) {
-      gnutls_init(&state, GNUTLS_CLIENT);
+      gnutls_session_init(&session, GNUTLS_CLIENT);
 
       /* allow the use of private ciphersuites.
        */
-      gnutls_handshake_set_private_extensions( state, 1);
+      gnutls_handshake_set_private_extensions( session, 1);
 
       if (i == 1) {
-	 gnutls_session_set_data(state, session, session_size);
-	 free(session);
+	 gnutls_session_set_data(session, session_data, session_data_size);
+	 free(session_data);
       }
 
-      gnutls_cipher_set_priority(state, cipher_priority);
-      gnutls_compression_set_priority(state, comp_priority);
-      gnutls_kx_set_priority(state, kx_priority);
-      gnutls_protocol_set_priority(state, protocol_priority);
-      gnutls_mac_set_priority(state, mac_priority);
-      gnutls_cert_type_set_priority(state, cert_type_priority);
+      gnutls_cipher_set_priority(session, cipher_priority);
+      gnutls_compression_set_priority(session, comp_priority);
+      gnutls_kx_set_priority(session, kx_priority);
+      gnutls_protocol_set_priority(session, protocol_priority);
+      gnutls_mac_set_priority(session, mac_priority);
+      gnutls_cert_type_set_priority(session, cert_type_priority);
 
-      gnutls_dh_set_prime_bits(state, 512);
+      gnutls_dh_set_prime_bits(session, 512);
 
-      gnutls_cred_set(state, GNUTLS_CRD_ANON, anon_cred);
+      gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
       if (srp_username!=NULL)
-         gnutls_cred_set(state, GNUTLS_CRD_SRP, cred);
-      gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+         gnutls_cred_set(session, GNUTLS_CRD_SRP, cred);
+      gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
       /* send the fingerprint */
       if (fingerprint != 0)
-	 gnutls_openpgp_send_key(state, GNUTLS_OPENPGP_KEY_FINGERPRINT);
+	 gnutls_openpgp_send_key(session, GNUTLS_OPENPGP_KEY_FINGERPRINT);
 
       /* use the max record size extension */
       if (record_max_size > 0) {
-	 if (gnutls_record_set_max_size(state, record_max_size) < 0) {
+	 if (gnutls_record_set_max_size(session, record_max_size) < 0) {
 	    fprintf(stderr, "Cannot set the maximum record size to %d.\n",
 		    record_max_size);
 	    exit(1);
@@ -270,34 +270,34 @@ int main(int argc, char **argv)
 
 /* This TLS extension may break old implementations.
  */
-      gnutls_transport_set_ptr(state, sd);
+      gnutls_transport_set_ptr(session, sd);
       do {
-	 ret = gnutls_handshake(state);
+	 ret = gnutls_handshake(session);
       } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
       if (ret < 0) {
 	 if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 	     || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-	    alert = gnutls_alert_get(state);
+	    alert = gnutls_alert_get(session);
 	    printf("*** Received alert [%d]: %s\n",
 		   alert, gnutls_alert_get_name(alert));
 	 }
 	 fprintf(stderr, "*** Handshake has failed\n");
 	 gnutls_perror(ret);
-	 gnutls_deinit(state);
+	 gnutls_session_deinit(session);
 	 return 1;
       } else {
 	 printf("- Handshake was completed\n");
-	 if (gnutls_session_is_resumed( state)!=0)
+	 if (gnutls_session_is_resumed( session)!=0)
 	 	printf("*** This is a resumed session\n");
       }
 
       if (i == 1) {		/* resume */
 	 /* check if we actually resumed the previous session */
 
-	 gnutls_session_get_id(state, NULL, &tmp_session_id_size);
+	 gnutls_session_get_id(session, NULL, &tmp_session_id_size);
 	 tmp_session_id = malloc(tmp_session_id_size);
-	 gnutls_session_get_id(state, tmp_session_id,
+	 gnutls_session_get_id(session, tmp_session_id,
 			       &tmp_session_id_size);
 
 	 if (memcmp(tmp_session_id, session_id, session_id_size) == 0) {
@@ -313,26 +313,26 @@ int main(int argc, char **argv)
 
       if (resume != 0 && i == 0) {
 
-	 gnutls_session_get_data(state, NULL, &session_size);
-	 session = malloc(session_size);
-	 gnutls_session_get_data(state, session, &session_size);
+	 gnutls_session_get_data(session, NULL, &session_data_size);
+	 session_data = malloc(session_data_size);
+	 gnutls_session_get_data(session, session_data, &session_data_size);
 
-	 gnutls_session_get_id(state, NULL, &session_id_size);
+	 gnutls_session_get_id(session, NULL, &session_id_size);
 	 session_id = malloc(session_id_size);
-	 gnutls_session_get_id(state, session_id, &session_id_size);
+	 gnutls_session_get_id(session, session_id, &session_id_size);
 
 	 /* print some information */
-	 print_info(state);
+	 print_info(session);
 
 	 printf("- Disconnecting\n");
 	 do {
-	    ret = gnutls_bye(state, GNUTLS_SHUT_RDWR);
+	    ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
 	 } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
 	 shutdown(sd, SHUT_WR);
 	 close(sd);
 
-	 gnutls_deinit(state);
+	 gnutls_session_deinit(session);
 
 	 printf
 	     ("\n\n- Connecting again- trying to resume previous session\n");
@@ -348,7 +348,7 @@ int main(int argc, char **argv)
    }
 
 /* print some information */
-   print_info(state);
+   print_info(session);
 
    printf("\n- Simple Client Mode:\n\n");
 
@@ -365,7 +365,7 @@ int main(int argc, char **argv)
       if (FD_ISSET(sd, &rset)) {
 	 bzero(buffer, MAX_BUF + 1);
 	 do {
-	    ret = gnutls_record_recv(state, buffer, MAX_BUF);
+	    ret = gnutls_record_recv(session, buffer, MAX_BUF);
 	 } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 	 /* remove new line */
 
@@ -382,7 +382,7 @@ int main(int argc, char **argv)
 	 } else {
 	    if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 		|| ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-	       printf("* Received alert [%d]\n", gnutls_alert_get(state));
+	       printf("* Received alert [%d]\n", gnutls_alert_get(session));
 	    if (ret == GNUTLS_E_REHANDSHAKE) {
 	       /* There is a race condition here. If application
 	        * data is sent after the rehandshake request,
@@ -390,10 +390,10 @@ int main(int argc, char **argv)
 	        * This is a bad design of this client.
 	        */
 	       printf("* Received rehandshake request\n");
-	       /* gnutls_alert_send( state, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
+	       /* gnutls_alert_send( session, GNUTLS_AL_WARNING, GNUTLS_A_NO_RENEGOTIATION); */
 
 	       do {
-		  ret = gnutls_handshake(state);
+		  ret = gnutls_handshake(session);
 	       } while (ret == GNUTLS_E_AGAIN
 			|| ret == GNUTLS_E_INTERRUPTED);
 
@@ -418,7 +418,7 @@ int main(int argc, char **argv)
       if (FD_ISSET(fileno(stdin), &rset)) {
 	 if (fgets(buffer, MAX_BUF, stdin) == NULL) {
 	    do {
-	       ret = gnutls_bye(state, GNUTLS_SHUT_WR);
+	       ret = gnutls_bye(session, GNUTLS_SHUT_WR);
 	    } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 	    user_term = 1;
 	    continue;
@@ -430,7 +430,7 @@ int main(int argc, char **argv)
 		    	strcpy( b, "\r\n");
 	    }
 	    	
-	    ret = gnutls_record_send(state, buffer, strlen(buffer));
+	    ret = gnutls_record_send(session, buffer, strlen(buffer));
 	 } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 	 if (ret > 0) {
 	    if (quiet!=0) printf("- Sent: %d bytes\n", ret);
@@ -441,13 +441,13 @@ int main(int argc, char **argv)
    }
    if (user_term != 0)
       do
-	 ret = gnutls_bye(state, GNUTLS_SHUT_RDWR);
+	 ret = gnutls_bye(session, GNUTLS_SHUT_RDWR);
       while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
 
    shutdown(sd, SHUT_RDWR);	/* no more receptions */
    close(sd);
 
-   gnutls_deinit(state);
+   gnutls_session_deinit(session);
 
    if (srp_username!=NULL) 
       gnutls_srp_free_client_cred(cred);

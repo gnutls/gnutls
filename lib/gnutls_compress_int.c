@@ -26,7 +26,7 @@
 /* The flag d is the direction (compressed, decompress). Non zero is
  * decompress.
  */
-GNUTLS_COMP_HANDLE _gnutls_comp_init( CompressionMethod method, int d)
+GNUTLS_COMP_HANDLE _gnutls_comp_init( gnutls_compression_method method, int d)
 {
 GNUTLS_COMP_HANDLE ret;
 int err;

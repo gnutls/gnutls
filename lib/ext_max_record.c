@@ -29,7 +29,7 @@
 
 /* 
  * In case of a server: if a MAX_RECORD_SIZE extension type is received then it stores
- * into the state the new value. The server may use gnutls_get_max_record_size(),
+ * into the session the new value. The server may use gnutls_get_max_record_size(),
  * in order to access it.
  *
  * In case of a client: If a different max record size (than the default) has
@@ -37,10 +37,10 @@
  *
  */
 
-int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int data_size) {
+int _gnutls_max_record_recv_params( gnutls_session session, const opaque* data, int data_size) {
 	size_t new_size;
 	
-	if (state->security_parameters.entity == GNUTLS_SERVER) {
+	if (session->security_parameters.entity == GNUTLS_SERVER) {
 		if (data_size > 0) {
 			if ( data_size != 1) {
 				gnutls_assert();
@@ -54,8 +54,8 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 				return new_size;
 			}
 
-			state->security_parameters.max_record_send_size = new_size;
-			state->security_parameters.max_record_recv_size = new_size;
+			session->security_parameters.max_record_send_size = new_size;
+			session->security_parameters.max_record_recv_size = new_size;
 		}
 	} else { /* CLIENT SIDE - we must check if the sent record size is the right one 
 	          */
@@ -68,11 +68,11 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 
 			new_size = _gnutls_mre_num2record(data[0]);
 
-			if (new_size < 0 || new_size != state->gnutls_internals.proposed_record_size) {
+			if (new_size < 0 || new_size != session->internals.proposed_record_size) {
 				gnutls_assert();
 				return GNUTLS_E_ILLEGAL_PARAMETER;
 			} else {
-				state->security_parameters.max_record_recv_size = state->gnutls_internals.proposed_record_size;
+				session->security_parameters.max_record_recv_size = session->internals.proposed_record_size;
 			}
 
 		}
@@ -86,12 +86,12 @@ int _gnutls_max_record_recv_params( GNUTLS_STATE state, const opaque* data, int 
 /* returns data_size or a negative number on failure
  * data is allocated localy
  */
-int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque* data, int data_size) {
+int _gnutls_max_record_send_params( gnutls_session session, opaque* data, int data_size) {
 	uint16 len;
 	/* this function sends the client extension data (dnsname) */
-	if (state->security_parameters.entity == GNUTLS_CLIENT) {
+	if (session->security_parameters.entity == GNUTLS_CLIENT) {
 
-		if (state->gnutls_internals.proposed_record_size != DEFAULT_MAX_RECORD_SIZE) {
+		if (session->internals.proposed_record_size != DEFAULT_MAX_RECORD_SIZE) {
 			gnutls_assert();
 			
 			len = 1;
@@ -100,20 +100,20 @@ int _gnutls_max_record_send_params( GNUTLS_STATE state, opaque* data, int data_s
 				return GNUTLS_E_INVALID_REQUEST;
 			}
 			
-			data[0] = _gnutls_mre_record2num( state->gnutls_internals.proposed_record_size);
+			data[0] = _gnutls_mre_record2num( session->internals.proposed_record_size);
 			return len;
 		}
 
 	} else { /* server side */
 
-		if (state->security_parameters.max_record_recv_size != DEFAULT_MAX_RECORD_SIZE) {
+		if (session->security_parameters.max_record_recv_size != DEFAULT_MAX_RECORD_SIZE) {
 			len = 1;
 			if (data_size < len) {
 				gnutls_assert();
 				return GNUTLS_E_INVALID_REQUEST;
 			}
 			
-			data[0] = _gnutls_mre_record2num( state->security_parameters.max_record_recv_size);
+			data[0] = _gnutls_mre_record2num( session->security_parameters.max_record_recv_size);
 			return len;
 		}	
 	

@@ -3,36 +3,36 @@
 
 #include <gnutls_int.h>
 
-void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version version);
+void _gnutls_record_set_default_version(gnutls_session session, gnutls_protocol_version version);
 
-void _gnutls_state_cert_type_set( GNUTLS_STATE state, CertificateType);
-KXAlgorithm gnutls_kx_get( GNUTLS_STATE state);
-GNUTLS_BulkCipherAlgorithm	gnutls_cipher_get( GNUTLS_STATE state);
-CertificateType gnutls_cert_type_get( GNUTLS_STATE state);
+void _gnutls_session_cert_type_set( gnutls_session session, gnutls_certificate_type);
+gnutls_kx_algorithm gnutls_kx_get( gnutls_session session);
+gnutls_cipher_algorithm	gnutls_cipher_get( gnutls_session session);
+gnutls_certificate_type gnutls_cert_type_get( gnutls_session session);
 
 #include <gnutls_auth_int.h>
 
-#define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(state) != auth) { \
+#define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(session) != auth) { \
 	gnutls_assert(); \
 	return ret; \
 	}
 
 #endif
 
-int _gnutls_state_cert_type_supported( GNUTLS_STATE, CertificateType);
-int _gnutls_dh_set_peer_public_bits( GNUTLS_STATE state, int bits);
-int _gnutls_dh_set_secret_bits( GNUTLS_STATE state, int bits);
-int _gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
-int _gnutls_dh_get_prime_bits( GNUTLS_STATE state);
-void gnutls_dh_set_prime_bits( GNUTLS_STATE state, int bits);
-void _gnutls_handshake_internal_state_clear( GNUTLS_STATE);
+int _gnutls_session_cert_type_supported( gnutls_session, gnutls_certificate_type);
+int _gnutls_dh_set_peer_public_bits( gnutls_session session, int bits);
+int _gnutls_dh_set_secret_bits( gnutls_session session, int bits);
+int _gnutls_dh_set_prime_bits( gnutls_session session, int bits);
+int _gnutls_dh_get_prime_bits( gnutls_session session);
+void gnutls_dh_set_prime_bits( gnutls_session session, int bits);
+void _gnutls_handshake_internal_state_clear( gnutls_session);
 
-int _gnutls_rsa_export_set_modulus_bits( GNUTLS_STATE state, int bits);
+int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, int bits);
 
-int _gnutls_session_is_resumable( GNUTLS_STATE state);
-int _gnutls_session_is_export( GNUTLS_STATE state);
+int _gnutls_session_is_resumable( gnutls_session session);
+int _gnutls_session_is_export( gnutls_session session);
 
-int _gnutls_openpgp_send_fingerprint( GNUTLS_STATE state);
+int _gnutls_openpgp_send_fingerprint( gnutls_session session);
 
 int _gnutls_PRF( const opaque * secret, int secret_size, const uint8 * label, int label_size, opaque * seed, int seed_size, int total_bytes, void* ret);
 

@@ -466,11 +466,11 @@ int i;
 
 /**
   * gnutls_srp_server_set_select_function - Used to set a callback to assist in selecting the proper password file
-  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a &gnutls_session structure.
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(GNUTLS_STATE, const char** pfiles, const char** pconffiles, int npfiles);
+  * int (*callback)(gnutls_session, const char** pfiles, const char** pconffiles, int npfiles);
   *
   * 'pfiles' contains 'npfiles' char* structures which hold
   * the password file name. 'pconffiles' contain the corresponding
@@ -490,29 +490,29 @@ int i;
   * choosen by the server. -1 indicates an error.
   *
   **/
-void gnutls_srp_server_set_select_function(GNUTLS_STATE state,
+void gnutls_srp_server_set_select_function(gnutls_session session,
 					     srp_server_select_func
 					     * func)
 {
-	state->gnutls_internals.server_srp_callback = func;
+	session->internals.server_srp_callback = func;
 }
 
 /**
   * gnutls_srp_server_get_username - This function returns the username of the peer
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the username of the peer. This should only be
   * called in case of SRP authentication and in case of a server.
   * Returns NULL in case of an error.
   *
   **/
-const char *gnutls_srp_server_get_username(GNUTLS_STATE state)
+const char *gnutls_srp_server_get_username(gnutls_session session)
 {
 	SRP_SERVER_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_CRD_SRP, NULL);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
 		return NULL;
 	return info->username;

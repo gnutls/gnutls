@@ -232,7 +232,7 @@ static uint8 diffie_hellman_prime_2048[] = { 0x00,
 /* Holds the prime to be used in DH authentication.
  * Initialy the GNUTLS_MPIs are not calculated (must call global_init, or _gnutls_dh_calc_mpis()).
  */
-_GNUTLS_DH_PARAMS _gnutls_dh_default_params[] = {
+_gnutls_dh_params _gnutls_dh_default_params[] = {
 	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
 	 , {diffie_hellman_prime_1024, sizeof diffie_hellman_prime_1024}
 	 , 0}
@@ -259,7 +259,7 @@ _GNUTLS_DH_PARAMS _gnutls_dh_default_params[] = {
 };
 
 const
-static _GNUTLS_DH_PARAMS _gnutls_dh_copy_params[] = {
+static _gnutls_dh_params _gnutls_dh_copy_params[] = {
 	{768, NULL, NULL, {DH_G_1024, sizeof(DH_G_1024)}
 	 , {diffie_hellman_prime_1024, sizeof diffie_hellman_prime_1024}
 	 , 0}
@@ -381,7 +381,7 @@ int _gnutls_dh_calc_mpis(void)
 /* returns g and p, depends on the requested bits.
  * We only support limited key sizes.
  */
-GNUTLS_MPI gnutls_get_dh_params(GNUTLS_DH_PARAMS dh_primes,
+GNUTLS_MPI gnutls_get_dh_params(gnutls_dh_params dh_primes,
 				GNUTLS_MPI * ret_p, int bits)
 {
 	GNUTLS_MPI g = NULL, prime = NULL;
@@ -533,12 +533,12 @@ static int check_bits(int bits)
   * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
   *
   **/
-int gnutls_dh_params_set(GNUTLS_DH_PARAMS dh_params, gnutls_datum prime,
+int gnutls_dh_params_set(gnutls_dh_params dh_params, gnutls_datum prime,
 			 gnutls_datum generator, int bits)
 {
 	GNUTLS_MPI tmp_prime, tmp_g;
 	int i = 0;
-	GNUTLS_DH_PARAMS sprime=NULL;
+	gnutls_dh_params sprime=NULL;
 	size_t siz = 0;
 
 	if (check_bits(bits) < 0) {
@@ -606,7 +606,7 @@ int gnutls_dh_params_set(GNUTLS_DH_PARAMS dh_params, gnutls_datum prime,
   * This function will initialize the DH parameters structure.
   *
   **/
-int gnutls_dh_params_init(GNUTLS_DH_PARAMS * dh_params)
+int gnutls_dh_params_init(gnutls_dh_params * dh_params)
 {
 
 	(*dh_params) = gnutls_calloc(1, sizeof(_gnutls_dh_copy_params));
@@ -629,7 +629,7 @@ int gnutls_dh_params_init(GNUTLS_DH_PARAMS * dh_params)
   * This function will deinitialize the DH parameters structure.
   *
   **/
-void gnutls_dh_params_deinit(GNUTLS_DH_PARAMS dh_params)
+void gnutls_dh_params_deinit(gnutls_dh_params dh_params)
 {
 	int i;
 	if (dh_params == NULL)

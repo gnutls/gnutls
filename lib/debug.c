@@ -55,18 +55,18 @@ char *_gnutls_bin2hex(const unsigned char *old, const size_t oldlen)
 	return (new);
 }
 
-void _gnutls_print_state(GNUTLS_STATE state)
+void _gnutls_print_state(gnutls_session session)
 {
 
 	_gnutls_log( "GNUTLS State:\n");
 	_gnutls_log( "Connection End: %d\n",
-		state->security_parameters.entity);
+		session->security_parameters.entity);
 	_gnutls_log( "Cipher Algorithm: %d\n",
-		state->security_parameters.read_bulk_cipher_algorithm);
+		session->security_parameters.read_bulk_cipher_algorithm);
 	_gnutls_log( "MAC algorithm: %d\n",
-		state->security_parameters.read_mac_algorithm);
+		session->security_parameters.read_mac_algorithm);
 	_gnutls_log( "Compression Algorithm: %d\n",
-		state->security_parameters.read_compression_algorithm);
+		session->security_parameters.read_compression_algorithm);
 	_gnutls_log( "\n");
 
 }

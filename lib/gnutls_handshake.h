@@ -20,26 +20,26 @@
 
 typedef enum Optional { OPTIONAL_PACKET, MANDATORY_PACKET } Optional;
 
-int _gnutls_send_handshake( GNUTLS_STATE state, void* i_data, uint32 i_datasize, HandshakeType type);
-int gnutls_send_hello_request( GNUTLS_STATE state);
-int _gnutls_recv_hello_request( GNUTLS_STATE state, void* data, uint32 data_size);
-int _gnutls_send_hello( GNUTLS_STATE state, int again);
-int _gnutls_recv_hello( GNUTLS_STATE state, char* data, int datalen);
-int gnutls_handshake( GNUTLS_STATE state);
-int _gnutls_recv_handshake( GNUTLS_STATE state, uint8**, int*, HandshakeType, Optional optional);
+int _gnutls_send_handshake( gnutls_session session, void* i_data, uint32 i_datasize, HandshakeType type);
+int gnutls_send_hello_request( gnutls_session session);
+int _gnutls_recv_hello_request( gnutls_session session, void* data, uint32 data_size);
+int _gnutls_send_hello( gnutls_session session, int again);
+int _gnutls_recv_hello( gnutls_session session, char* data, int datalen);
+int gnutls_handshake( gnutls_session session);
+int _gnutls_recv_handshake( gnutls_session session, uint8**, int*, HandshakeType, Optional optional);
 int _gnutls_generate_session_id( char* session_id, uint8* len);
-int gnutls_handshake_common( GNUTLS_STATE state);
-int gnutls_handshake_client( GNUTLS_STATE state);
-int gnutls_handshake_server( GNUTLS_STATE state);
-void _gnutls_set_server_random( GNUTLS_STATE state, uint8* random);
-void _gnutls_set_client_random( GNUTLS_STATE state, uint8* random);
+int gnutls_handshake_common( gnutls_session session);
+int gnutls_handshake_client( gnutls_session session);
+int gnutls_handshake_server( gnutls_session session);
+void _gnutls_set_server_random( gnutls_session session, uint8* random);
+void _gnutls_set_client_random( gnutls_session session, uint8* random);
 int _gnutls_create_random( opaque* dst);
-int _gnutls_remove_unwanted_ciphersuites( GNUTLS_STATE state, GNUTLS_CipherSuite ** cipherSuites, int numCipherSuites, PKAlgorithm);
-void gnutls_handshake_set_max_packet_length( GNUTLS_STATE state, int max);
+int _gnutls_remove_unwanted_ciphersuites( gnutls_session session, GNUTLS_CipherSuite ** cipherSuites, int numCipherSuites, gnutls_pk_algorithm);
+void gnutls_handshake_set_max_packet_length( gnutls_session session, int max);
 int _gnutls_find_pk_algos_in_ciphersuites( opaque* data, int datalen);
-int _gnutls_server_select_suite(GNUTLS_STATE state, opaque *data, int datalen);
+int _gnutls_server_select_suite(gnutls_session session, opaque *data, int datalen);
 
-#define STATE state->gnutls_internals.handshake_state
+#define STATE session->internals.handshake_state
 /* This returns true if we have got there
  * before (and not finished due to an interrupt).
  */

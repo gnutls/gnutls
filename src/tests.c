@@ -37,16 +37,16 @@ extern int tls1_ok;
 extern int ssl3_ok;
 
 /* keep session info */
-static char *session = NULL;
+static char *session_data = NULL;
 static char session_id[32];
-static int session_size=0, session_id_size=0;
+static int session_data_size=0, session_id_size=0;
 static int sfree=0;
 
-int do_handshake( GNUTLS_STATE state) {
+int do_handshake( gnutls_session session) {
 int ret, alert;
 
 		do {
-			ret = gnutls_handshake(state);
+			ret = gnutls_handshake(session);
 		} while (ret == GNUTLS_E_INTERRUPTED
 			 || ret == GNUTLS_E_AGAIN);
 
@@ -54,7 +54,7 @@ int ret, alert;
 			printf("\n");
 			if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED
 			    || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-				alert = gnutls_alert_get( state);
+				alert = gnutls_alert_get( session);
 				printf("*** Received alert [%d]: %s\n",
 				       alert, gnutls_alert_get_name( alert));
 			}
@@ -64,19 +64,19 @@ int ret, alert;
 
 		if (ret < 0) return FAILED;
 
-		gnutls_session_get_data(state, NULL, &session_size);
+		gnutls_session_get_data(session, NULL, &session_data_size);
 		
 		if (sfree!=0) {
 			free(session);
 			sfree=0;
 		}
-		session = malloc(session_size);
+		session_data = malloc(session_data_size);
 		sfree = 1;
-		if (session==NULL) exit(1);
-		gnutls_session_get_data(state, session, &session_size);
+		if (session_data==NULL) exit(1);
+		gnutls_session_get_data(session, session_data, &session_data_size);
 
 		session_id_size = sizeof( session_id);
-		gnutls_session_get_id(state, session_id, &session_id_size);
+		gnutls_session_get_id(session, session_id, &session_id_size);
 
 		return SUCCEED;
 }
@@ -91,116 +91,116 @@ const static int comp_priority[16] = { GNUTLS_COMP_NULL, 0 };
 const static int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 const static int cert_type_priority[16] = { GNUTLS_CRT_X509, 0 };
 
-#define ADD_ALL_CIPHERS(state) gnutls_cipher_set_priority(state, cipher_priority)
-#define ADD_ALL_COMP(state) gnutls_compression_set_priority(state, comp_priority)
-#define ADD_ALL_MACS(state) gnutls_mac_set_priority(state, mac_priority)
-#define ADD_ALL_KX(state) gnutls_kx_set_priority(state, kx_priority)
-#define ADD_ALL_PROTOCOLS(state) gnutls_protocol_set_priority(state, protocol_priority)
-#define ADD_ALL_CERTTYPES(state) gnutls_cert_type_set_priority(state, cert_type_priority)
+#define ADD_ALL_CIPHERS(session) gnutls_cipher_set_priority(session, cipher_priority)
+#define ADD_ALL_COMP(session) gnutls_compression_set_priority(session, comp_priority)
+#define ADD_ALL_MACS(session) gnutls_mac_set_priority(session, mac_priority)
+#define ADD_ALL_KX(session) gnutls_kx_set_priority(session, kx_priority)
+#define ADD_ALL_PROTOCOLS(session) gnutls_protocol_set_priority(session, protocol_priority)
+#define ADD_ALL_CERTTYPES(session) gnutls_cert_type_set_priority(session, cert_type_priority)
 
-static void ADD_KX(GNUTLS_STATE state, int kx) {
+static void ADD_KX(gnutls_session session, int kx) {
 	static int _kx_priority[] = { 0, 0 };
 	_kx_priority[0] = kx;
 
-	gnutls_kx_set_priority(state, _kx_priority);
+	gnutls_kx_set_priority(session, _kx_priority);
 }
 
-static void ADD_KX2(GNUTLS_STATE state, int kx1, int kx2) {
+static void ADD_KX2(gnutls_session session, int kx1, int kx2) {
 	static int _kx_priority[] = { 0, 0, 0 };
 	_kx_priority[0] = kx1;
 	_kx_priority[1] = kx2;
 
-	gnutls_kx_set_priority(state, _kx_priority);
+	gnutls_kx_set_priority(session, _kx_priority);
 }
 
-static void ADD_CIPHER(GNUTLS_STATE state, int cipher) {
+static void ADD_CIPHER(gnutls_session session, int cipher) {
 	static int _cipher_priority[] = { 0, 0 };
 	_cipher_priority[0] = cipher;
 
-	gnutls_cipher_set_priority(state, _cipher_priority);
+	gnutls_cipher_set_priority(session, _cipher_priority);
 }
 
-static void ADD_CIPHER3(GNUTLS_STATE state, int cipher1, int cipher2, int cipher3) {
+static void ADD_CIPHER3(gnutls_session session, int cipher1, int cipher2, int cipher3) {
 	static int _cipher_priority[] = { 0, 0, 0, 0 };
 	_cipher_priority[0] = cipher1;
 	_cipher_priority[1] = cipher2;
 	_cipher_priority[2] = cipher3;
 
-	gnutls_cipher_set_priority(state, _cipher_priority);
+	gnutls_cipher_set_priority(session, _cipher_priority);
 }
 
-static void ADD_MAC(GNUTLS_STATE state, int mac) {
+static void ADD_MAC(gnutls_session session, int mac) {
 	static int _mac_priority[] = { 0, 0 };
 	_mac_priority[0] = mac;
 
-	gnutls_mac_set_priority(state, _mac_priority);
+	gnutls_mac_set_priority(session, _mac_priority);
 }
 
-static void ADD_CERTTYPE(GNUTLS_STATE state, int ctype) {
+static void ADD_CERTTYPE(gnutls_session session, int ctype) {
 	static int _ct_priority[] = { 0, 0 };
 	_ct_priority[0] = ctype;
 
-	gnutls_cert_type_set_priority(state, _ct_priority);
+	gnutls_cert_type_set_priority(session, _ct_priority);
 }
 
-static void ADD_PROTOCOL(GNUTLS_STATE state, int protocol) {
+static void ADD_PROTOCOL(gnutls_session session, int protocol) {
 	static int _proto_priority[] = { 0, 0 };
 	_proto_priority[0] = protocol;
 
-	gnutls_protocol_set_priority(state, _proto_priority);
+	gnutls_protocol_set_priority(session, _proto_priority);
 }
 
 
-int test_srp( GNUTLS_STATE state) {
-		ADD_ALL_CIPHERS(state);
-		ADD_ALL_COMP(state);
-		ADD_ALL_CERTTYPES(state);
-		ADD_ALL_PROTOCOLS(state);
-		ADD_ALL_MACS(state);
+int test_srp( gnutls_session session) {
+		ADD_ALL_CIPHERS(session);
+		ADD_ALL_COMP(session);
+		ADD_ALL_CERTTYPES(session);
+		ADD_ALL_PROTOCOLS(session);
+		ADD_ALL_MACS(session);
 
-		ADD_KX(state, GNUTLS_KX_SRP);
-		gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
+		ADD_KX(session, GNUTLS_KX_SRP);
+		gnutls_cred_set(session, GNUTLS_CRD_SRP, srp_cred);
 
-		return do_handshake( state);
+		return do_handshake( session);
 }
 
-int test_export( GNUTLS_STATE state) {
-		ADD_ALL_CIPHERS(state);
-		ADD_ALL_COMP(state);
-		ADD_ALL_CERTTYPES(state);
-		ADD_ALL_PROTOCOLS(state);
-		ADD_ALL_MACS(state);
+int test_export( gnutls_session session) {
+		ADD_ALL_CIPHERS(session);
+		ADD_ALL_COMP(session);
+		ADD_ALL_CERTTYPES(session);
+		ADD_ALL_PROTOCOLS(session);
+		ADD_ALL_MACS(session);
 
-		ADD_KX(state, GNUTLS_KX_RSA_EXPORT);
-		gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+		ADD_KX(session, GNUTLS_KX_RSA_EXPORT);
+		gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-		return do_handshake( state);
+		return do_handshake( session);
 }
 
-int test_dhe( GNUTLS_STATE state) {
-		ADD_ALL_CIPHERS(state);
-		ADD_ALL_COMP(state);
-		ADD_ALL_CERTTYPES(state);
-		ADD_ALL_PROTOCOLS(state);
-		ADD_ALL_MACS(state);
+int test_dhe( gnutls_session session) {
+		ADD_ALL_CIPHERS(session);
+		ADD_ALL_COMP(session);
+		ADD_ALL_CERTTYPES(session);
+		ADD_ALL_PROTOCOLS(session);
+		ADD_ALL_MACS(session);
 
-		ADD_KX2(state, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS);
-		gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+		ADD_KX2(session, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS);
+		gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-		return do_handshake( state);
+		return do_handshake( session);
 }
 
-int test_ssl3( GNUTLS_STATE state) {
+int test_ssl3( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_PROTOCOL(state, GNUTLS_SSL3);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_PROTOCOL(session, GNUTLS_SSL3);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret==SUCCEED) ssl3_ok = 1;
 	
 	return ret;
@@ -210,31 +210,31 @@ void got_alarm(int k) {
 	alrm = 1;
 }
 	
-int test_bye( GNUTLS_STATE state) {
+int test_bye( gnutls_session session) {
 int ret;
 char data[20];
 int old;
 	signal( SIGALRM, got_alarm);
 
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret==FAILED) return ret;
 	
-	ret = gnutls_bye( state, GNUTLS_SHUT_WR);
+	ret = gnutls_bye( session, GNUTLS_SHUT_WR);
 	if (ret<0) return FAILED;
 	
 	old = siginterrupt( SIGALRM, 1);
 	alarm(6);
 	
 	do {
-		ret = gnutls_record_recv( state, data, sizeof(data));
+		ret = gnutls_record_recv( session, data, sizeof(data));
 	} while( ret > 0);
 
 	siginterrupt( SIGALRM, old);
@@ -247,138 +247,138 @@ int old;
 
 
 
-int test_aes( GNUTLS_STATE state) {
+int test_aes( gnutls_session session) {
 int ret;
-	ADD_CIPHER(state, GNUTLS_CIPHER_RIJNDAEL_128_CBC);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_CIPHER(session, GNUTLS_CIPHER_RIJNDAEL_128_CBC);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	return ret;
 }
 
-int test_openpgp1( GNUTLS_STATE state) {
+int test_openpgp1( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_CERTTYPE(state, GNUTLS_CRT_OPENPGP);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_CERTTYPE(session, GNUTLS_CRT_OPENPGP);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret==FAILED) return ret;
 
-	if ( gnutls_cert_type_get(state) == GNUTLS_CRT_OPENPGP)
+	if ( gnutls_cert_type_get(session) == GNUTLS_CRT_OPENPGP)
 		return SUCCEED;
 
 	return FAILED;
 }
 
-int test_unknown_ciphersuites( GNUTLS_STATE state) {
+int test_unknown_ciphersuites( gnutls_session session) {
 int ret;
-	ADD_CIPHER3(state, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
+	ADD_CIPHER3(session, GNUTLS_CIPHER_RIJNDAEL_128_CBC,
 		GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	return ret;
 }
 
-int test_md5( GNUTLS_STATE state) {
+int test_md5( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_MAC(state, GNUTLS_MAC_MD5);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_MAC(session, GNUTLS_MAC_MD5);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	return ret;
 }
 
-int test_sha( GNUTLS_STATE state) {
+int test_sha( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_MAC(state, GNUTLS_MAC_SHA);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_MAC(session, GNUTLS_MAC_SHA);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	return ret;
 }
 
-int test_3des( GNUTLS_STATE state) {
+int test_3des( gnutls_session session) {
 int ret;
-	ADD_CIPHER(state, GNUTLS_CIPHER_3DES_CBC);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_CIPHER(session, GNUTLS_CIPHER_3DES_CBC);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	return ret;
 }
 
-int test_arcfour( GNUTLS_STATE state) {
+int test_arcfour( gnutls_session session) {
 int ret;
-	ADD_CIPHER(state, GNUTLS_CIPHER_ARCFOUR_128);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_128);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	return ret;
 }
 
-int test_tls1( GNUTLS_STATE state) {
+int test_tls1( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_PROTOCOL(state, GNUTLS_TLS1);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_PROTOCOL(session, GNUTLS_TLS1);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret==SUCCEED) tls1_ok = 1;
 
 	return ret;
 
 }
 
-int test_tls1_2( GNUTLS_STATE state) {
+int test_tls1_2( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret==FAILED) {
 		/* disable TLS 1.0 */
 		if (tls1_ok!=0) {
@@ -390,7 +390,7 @@ int ret;
 
 }
 
-int test_rsa_pms( GNUTLS_STATE state) {
+int test_rsa_pms( gnutls_session session) {
 int ret;
 
 	/* here we enable both SSL 3.0 and TLS 1.0
@@ -398,59 +398,59 @@ int ret;
 	 * If the server is old, buggy and only supports
 	 * SSL 3.0 then the handshake will fail.
 	 */
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_KX(state, GNUTLS_KX_RSA);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_KX(session, GNUTLS_KX_RSA);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret < 0) return FAILED;
 	
-	if (gnutls_protocol_get_version(state)==GNUTLS_TLS1) return SUCCEED;
+	if (gnutls_protocol_get_version(session)==GNUTLS_TLS1) return SUCCEED;
 	return UNSURE;
 }
 
-int test_max_record_size( GNUTLS_STATE state) {
+int test_max_record_size( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
-	gnutls_record_set_max_size( state, 512);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_record_set_max_size( session, 512);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret<0) return FAILED;
 
-	ret = gnutls_record_get_max_size(state);
+	ret = gnutls_record_get_max_size(session);
 	if (ret==512) return SUCCEED;
 	
 	return FAILED;
 }
 
-int test_hello_extension( GNUTLS_STATE state) {
+int test_hello_extension( gnutls_session session) {
 int ret;
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
-	gnutls_record_set_max_size( state, 512);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_record_set_max_size( session, 512);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	return ret;
 }
 
-void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version version);
+void _gnutls_record_set_default_version(gnutls_session session, GNUTLS_Version version);
 
-int test_version_rollback( GNUTLS_STATE state) {
+int test_version_rollback( gnutls_session session) {
 int ret;
 	if (tls1_ok==0) return UNSURE;
 
@@ -460,66 +460,66 @@ int ret;
 	 * are buggy (and vulnerable to man in the middle
 	 * attacks) and this connection will fail.
 	 */
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
-	_gnutls_record_set_default_version( state, GNUTLS_SSL3);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+	_gnutls_record_set_default_version( session, GNUTLS_SSL3);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret!=SUCCEED) return ret;
 	
-	if (tls1_ok!=0 && gnutls_protocol_get_version( state)==GNUTLS_SSL3)
+	if (tls1_ok!=0 && gnutls_protocol_get_version( session)==GNUTLS_SSL3)
 		return FAILED;
 	
 	return SUCCEED;
 }
 
 
-int test_anonymous( GNUTLS_STATE state) {
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_KX(state, GNUTLS_KX_ANON_DH);
-	gnutls_cred_set(state, GNUTLS_CRD_ANON, anon_cred);
+int test_anonymous( gnutls_session session) {
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_KX(session, GNUTLS_KX_ANON_DH);
+	gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
 
-	return do_handshake( state);
+	return do_handshake( session);
 
 }
 
 
-int test_session_resume2( GNUTLS_STATE state) {
+int test_session_resume2( gnutls_session session) {
 int ret;
 char tmp_session_id[32];
 int tmp_session_id_size;
 
 	if (session == NULL) return UNSURE;
 	
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
-	gnutls_cred_set(state, GNUTLS_CRD_ANON, anon_cred);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_cred_set(session, GNUTLS_CRD_ANON, anon_cred);
 
-	gnutls_session_set_data(state, session, session_size);
+	gnutls_session_set_data(session, session_data, session_data_size);
 
 	memcpy( tmp_session_id, session_id, session_id_size);
 	tmp_session_id_size = session_id_size;
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret < 0) return FAILED;
 	
 	/* check if we actually resumed the previous session */
 
 	session_id_size = sizeof(session_id);
-	gnutls_session_get_id(state, session_id, &session_id_size);
+	gnutls_session_get_id(session, session_id, &session_id_size);
 
 	if (memcmp(tmp_session_id, session_id, tmp_session_id_size) == 0)
 		return SUCCEED;
@@ -528,23 +528,23 @@ int tmp_session_id_size;
 
 }
 
-int test_certificate( GNUTLS_STATE state) {
+int test_certificate( gnutls_session session) {
 int ret;
 
-	ADD_ALL_CIPHERS(state);
-	ADD_ALL_COMP(state);
-	ADD_ALL_CERTTYPES(state);
-	ADD_ALL_PROTOCOLS(state);
-	ADD_ALL_MACS(state);
-	ADD_ALL_KX(state);
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
 
-	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+	gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-	ret = do_handshake( state);
+	ret = do_handshake( session);
 	if (ret < 0) return FAILED;
 
 	printf("\n");
-	print_cert_info( state);
+	print_cert_info( session);
 
 	return SUCCEED;
 }

@@ -18,13 +18,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-void gnutls_set_cache_expiration( GNUTLS_STATE state, int seconds);
-int gnutls_db_set_name( GNUTLS_STATE state, const char* filename);
-int _gnutls_server_register_current_session( GNUTLS_STATE state);
-int _gnutls_server_restore_session( GNUTLS_STATE state, uint8* session_id, int session_id_size);
-int gnutls_db_clean( GNUTLS_STATE state);
-int _gnutls_db_remove_session( GNUTLS_STATE state, uint8* session_id, int session_id_size);
-void gnutls_db_remove_session(GNUTLS_STATE state);
-int _gnutls_store_session( GNUTLS_STATE state, gnutls_datum session_id, gnutls_datum session_data);
-gnutls_datum _gnutls_retrieve_session( GNUTLS_STATE state, gnutls_datum session_id);
-int _gnutls_remove_session( GNUTLS_STATE state, gnutls_datum session_id);
+void gnutls_set_cache_expiration( gnutls_session session, int seconds);
+int gnutls_db_set_name( gnutls_session session, const char* filename);
+int _gnutls_server_register_current_session( gnutls_session session);
+int _gnutls_server_restore_session( gnutls_session session, uint8* session_id, int session_id_size);
+int gnutls_db_clean( gnutls_session session);
+int _gnutls_db_remove_session( gnutls_session session, uint8* session_id, int session_id_size);
+void gnutls_db_remove_session(gnutls_session session);
+int _gnutls_store_session( gnutls_session session, gnutls_datum session_id, gnutls_datum session_data);
+gnutls_datum _gnutls_retrieve_session( gnutls_session session, gnutls_datum session_id);
+int _gnutls_remove_session( gnutls_session session, gnutls_datum session_id);

@@ -2,7 +2,7 @@
 #include <gnutls_auth.h>
 
 typedef struct {
-	GNUTLS_DH_PARAMS dh_params;
+	gnutls_dh_params dh_params;
 } ANON_SERVER_CREDENTIALS_INT;
 #define GNUTLS_ANON_SERVER_CREDENTIALS ANON_SERVER_CREDENTIALS_INT*
 

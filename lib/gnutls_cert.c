@@ -44,8 +44,8 @@
 
 /* KX mappings to PK algorithms */
 typedef struct {
-	KXAlgorithm kx_algorithm;
-	PKAlgorithm pk_algorithm;
+	gnutls_kx_algorithm kx_algorithm;
+	gnutls_pk_algorithm pk_algorithm;
 } gnutls_pk_map;
 
 /* This table maps the Key exchange algorithms to
@@ -69,12 +69,12 @@ static const gnutls_pk_map pk_mappings[] = {
                         GNUTLS_PK_MAP_LOOP( if(p->kx_algorithm == kx_algorithm) { a; break; })
 
 
-/* returns the PKAlgorithm which is compatible with
- * the given KXAlgorithm.
+/* returns the gnutls_pk_algorithm which is compatible with
+ * the given gnutls_kx_algorithm.
  */
-PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm)
+gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm)
 {
-	PKAlgorithm ret = -1;
+	gnutls_pk_algorithm ret = -1;
 
 	GNUTLS_PK_MAP_ALG_LOOP(ret = p->pk_algorithm);
 	return ret;
@@ -161,13 +161,13 @@ int gnutls_certificate_allocate_cred(GNUTLS_CERTIFICATE_CREDENTIALS * res)
  * This function also uses the KeyUsage field of the certificate
  * extensions in order to disable unneded algorithms.
  */
-int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
+int _gnutls_cert_supported_kx(const gnutls_cert * cert, gnutls_kx_algorithm ** alg,
 			      int *alg_size)
 {
-	KXAlgorithm kx;
+	gnutls_kx_algorithm kx;
 	int i;
-	PKAlgorithm pk;
-	KXAlgorithm kxlist[MAX_ALGOS];
+	gnutls_pk_algorithm pk;
+	gnutls_kx_algorithm kxlist[MAX_ALGOS];
 
 	i = 0;
 	for (kx = 0; kx < MAX_ALGOS; kx++) {
@@ -194,13 +194,13 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 		return GNUTLS_E_INVALID_PARAMETERS;
 	}
 
-	*alg = gnutls_calloc(1, sizeof(KXAlgorithm) * i);
+	*alg = gnutls_calloc(1, sizeof(gnutls_kx_algorithm) * i);
 	if (*alg == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
 	*alg_size = i;
 
-	memcpy(*alg, kxlist, i * sizeof(KXAlgorithm));
+	memcpy(*alg, kxlist, i * sizeof(gnutls_kx_algorithm));
 
 	return 0;
 }
@@ -208,7 +208,7 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
 
 /**
   * gnutls_certificate_server_set_request - Used to set whether to request a client certificate
-  * @state: is an &GNUTLS_STATE structure.
+  * @session: is an &gnutls_session structure.
   * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
   *
   * This function specifies if we (in case of a server) are going
@@ -218,19 +218,19 @@ int _gnutls_cert_supported_kx(const gnutls_cert * cert, KXAlgorithm ** alg,
   * call this function then the client will not be asked to
   * send a certificate.
   **/
-void gnutls_certificate_server_set_request(GNUTLS_STATE state,
-					    CertificateRequest req)
+void gnutls_certificate_server_set_request(gnutls_session session,
+					    gnutls_certificate_request req)
 {
-	state->gnutls_internals.send_cert_req = req;
+	session->internals.send_cert_req = req;
 }
 
 /**
   * gnutls_certificate_client_set_select_function - Used to set a callback while selecting the proper (client) certificate
-  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a &gnutls_session structure.
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(GNUTLS_STATE, gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_cert, int nreqs);
+  * int (*callback)(gnutls_session, gnutls_datum *client_cert, int ncerts, gnutls_datum* req_ca_cert, int nreqs);
   *
   * 'client_cert' contains 'ncerts' gnutls_datum structures which hold
   * the raw certificates (DER for X.509 or binary for OpenPGP), of the
@@ -265,20 +265,20 @@ void gnutls_certificate_server_set_request(GNUTLS_STATE state,
   *
   * This function returns 0 on success.
   **/
-void gnutls_certificate_client_set_select_function(GNUTLS_STATE state,
+void gnutls_certificate_client_set_select_function(gnutls_session session,
 					     certificate_client_select_func
 					     * func)
 {
-	state->gnutls_internals.client_cert_callback = func;
+	session->internals.client_cert_callback = func;
 }
 
 /**
   * gnutls_certificate_server_set_select_function - Used to set a callback while selecting the proper (server) certificate
-  * @state: is a &GNUTLS_STATE structure.
+  * @session: is a &gnutls_session structure.
   * @func: is the callback function
   *
   * The callback's function form is:
-  * int (*callback)(GNUTLS_STATE, gnutls_datum *server_cert, int ncerts);
+  * int (*callback)(gnutls_session, gnutls_datum *server_cert, int ncerts);
   *
   * 'server_cert' contains 'ncerts' gnutls_datum structures which hold
   * the raw certificate (DER encoded in X.509) of the server. 
@@ -297,11 +297,11 @@ void gnutls_certificate_client_set_select_function(GNUTLS_STATE state,
   * choosen by the server. -1 indicates an error.
   *
   **/
-void gnutls_certificate_server_set_select_function(GNUTLS_STATE state,
+void gnutls_certificate_server_set_select_function(gnutls_session session,
 					     certificate_server_select_func
 					     * func)
 {
-	state->gnutls_internals.server_cert_callback = func;
+	session->internals.server_cert_callback = func;
 }
 
 /* These are set by the gnutls_extra library's initialization function.
@@ -313,26 +313,26 @@ OPENPGP_VERIFY_KEY_FUNC _E_gnutls_openpgp_verify_key = NULL;
 
 /*-
   * _gnutls_openpgp_cert_verify_peers - This function returns the peer's certificate status
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return it's status (TRUSTED, INVALID etc.). 
   * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
   *
   -*/
-int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
+int _gnutls_openpgp_cert_verify_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 	const GNUTLS_CERTIFICATE_CREDENTIALS cred;
-	CertificateStatus verify;
+	gnutls_certificate_status verify;
 	int peer_certificate_list_size;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
 		return GNUTLS_E_INVALID_REQUEST;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
@@ -373,24 +373,24 @@ int _gnutls_openpgp_cert_verify_peers(GNUTLS_STATE state)
 
 /**
   * gnutls_certificate_verify_peers - This function returns the peer's certificate verification status
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will try to verify the peer's certificate and return it's status (trusted, invalid etc.). 
   * However you must also check the peer's name in order to check if the verified certificate belongs to the 
   * actual peer. 
   *
-  * The return value should be one or more of the CertificateStatus 
+  * The return value should be one or more of the gnutls_certificate_status 
   * enumerated elements bitwise or'd. This is the same as
   * gnutls_x509_verify_certificate().
   *
   **/
-int gnutls_certificate_verify_peers(GNUTLS_STATE state)
+int gnutls_certificate_verify_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
@@ -399,11 +399,11 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 	if (info->raw_certificate_list == NULL || info->ncerts == 0)
 		return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
-	switch( gnutls_cert_type_get( state)) {
+	switch( gnutls_cert_type_get( session)) {
 		case GNUTLS_CRT_X509:
-			return _gnutls_x509_cert_verify_peers( state);
+			return _gnutls_x509_cert_verify_peers( session);
 		case GNUTLS_CRT_OPENPGP:
-			return _gnutls_openpgp_cert_verify_peers( state);
+			return _gnutls_openpgp_cert_verify_peers( session);
 		default:
 			return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -411,20 +411,20 @@ int gnutls_certificate_verify_peers(GNUTLS_STATE state)
 
 /**
   * gnutls_certificate_expiration_time_peers - This function returns the peer's certificate expiration time
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the peer's certificate expiration time.
   *
   * Returns (time_t) -1 on error.
   *
   **/
-time_t gnutls_certificate_expiration_time_peers(GNUTLS_STATE state)
+time_t gnutls_certificate_expiration_time_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL) {
 		gnutls_assert();
 		return (time_t) -1;
@@ -435,7 +435,7 @@ time_t gnutls_certificate_expiration_time_peers(GNUTLS_STATE state)
 		return (time_t) -1;
 	}
 
-	switch( gnutls_cert_type_get( state)) {
+	switch( gnutls_cert_type_get( session)) {
 		case GNUTLS_CRT_X509:
 			return gnutls_x509_extract_certificate_expiration_time(
 				&info->raw_certificate_list[0]);
@@ -451,7 +451,7 @@ time_t gnutls_certificate_expiration_time_peers(GNUTLS_STATE state)
 
 /**
   * gnutls_certificate_activation_time_peers - This function returns the peer's certificate activation time
-  * @state: is a gnutls state
+  * @session: is a gnutls session
   *
   * This function will return the peer's certificate activation time.
   * This is the creation time for openpgp keys.
@@ -459,13 +459,13 @@ time_t gnutls_certificate_expiration_time_peers(GNUTLS_STATE state)
   * Returns (time_t) -1 on error.
   *
   **/
-time_t gnutls_certificate_activation_time_peers(GNUTLS_STATE state)
+time_t gnutls_certificate_activation_time_peers(gnutls_session session)
 {
 	CERTIFICATE_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_CRD_CERTIFICATE, GNUTLS_E_INVALID_REQUEST);
 
-	info = _gnutls_get_auth_info(state);
+	info = _gnutls_get_auth_info(session);
 	if (info == NULL) {
 		gnutls_assert();
 		return (time_t) -1;
@@ -476,7 +476,7 @@ time_t gnutls_certificate_activation_time_peers(GNUTLS_STATE state)
 		return (time_t) -1;
 	}
 
-	switch( gnutls_cert_type_get( state)) {
+	switch( gnutls_cert_type_get( session)) {
 		case GNUTLS_CRT_X509:
 			return gnutls_x509_extract_certificate_activation_time(
 				&info->raw_certificate_list[0]);

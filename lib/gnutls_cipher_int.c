@@ -24,7 +24,7 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
-GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( BulkCipherAlgorithm cipher, gnutls_datum key, gnutls_datum iv)
+GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, gnutls_datum key, gnutls_datum iv)
 {
 GNUTLS_CIPHER_HANDLE ret;
 

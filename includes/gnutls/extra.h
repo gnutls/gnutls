@@ -27,29 +27,29 @@
 
 /* SRP */
 
-typedef struct DSTRUCT* GNUTLS_SRP_SERVER_CREDENTIALS;
-typedef struct DSTRUCT* GNUTLS_SRP_CLIENT_CREDENTIALS;
+typedef struct DSTRUCT* gnutls_srp_server_credentials;
+typedef struct DSTRUCT* gnutls_srp_client_credentials;
 
-void gnutls_srp_free_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS sc);
-int gnutls_srp_allocate_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS *sc);
+void gnutls_srp_free_client_cred( gnutls_srp_client_credentials sc);
+int gnutls_srp_allocate_client_cred( gnutls_srp_client_credentials *sc);
 #define gnutls_srp_free_client_sc gnutls_srp_free_client_cred
 #define gnutls_srp_allocate_client_sc gnutls_srp_allocate_client_cred
 
-int gnutls_srp_set_client_cred( GNUTLS_SRP_CLIENT_CREDENTIALS res, char *username, char* password);
+int gnutls_srp_set_client_cred( gnutls_srp_client_credentials res, char *username, char* password);
 
-void gnutls_srp_free_server_cred( GNUTLS_SRP_SERVER_CREDENTIALS sc);
-int gnutls_srp_allocate_server_cred( GNUTLS_SRP_SERVER_CREDENTIALS *sc);
+void gnutls_srp_free_server_cred( gnutls_srp_server_credentials sc);
+int gnutls_srp_allocate_server_cred( gnutls_srp_server_credentials *sc);
 #define gnutls_srp_free_server_sc gnutls_srp_free_server_cred
 #define gnutls_srp_allocate_server_sc gnutls_srp_allocate_server_cred
 
-int gnutls_srp_set_server_cred_file( GNUTLS_SRP_SERVER_CREDENTIALS res, char *password_file, char* password_conf_file);
+int gnutls_srp_set_server_cred_file( gnutls_srp_server_credentials res, char *password_file, char* password_conf_file);
 
-const char* gnutls_srp_server_get_username( GNUTLS_STATE state);
+const char* gnutls_srp_server_get_username( gnutls_session state);
 
-typedef int gnutls_srp_server_select_function(GNUTLS_STATE, char **, char**, int);
+typedef int gnutls_srp_server_select_function(gnutls_session, char **, char**, int);
 #define gnutls_srp_server_select_func gnutls_srp_server_select_function
 
-void gnutls_srp_server_set_select_function( GNUTLS_STATE, gnutls_srp_server_select_function *);
+void gnutls_srp_server_set_select_function( gnutls_session, gnutls_srp_server_select_function *);
 #define gnutls_srp_server_set_select_func gnutls_srp_server_set_select_function
 
 /* Openpgp certificate stuff */
@@ -76,22 +76,27 @@ int gnutls_openpgp_verify_key( const gnutls_datum* keyring,
 	const gnutls_datum* key_list, 
 	int key_list_length);
 
-int gnutls_certificate_set_openpgp_key_file( GNUTLS_CERTIFICATE_CREDENTIALS res, char *CERTFILE, char* KEYFILE);
-int gnutls_certificate_set_openpgp_key_mem( GNUTLS_CERTIFICATE_CREDENTIALS res,
+int gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res, char *CERTFILE, char* KEYFILE);
+int gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
 	const gnutls_datum* CERT, const gnutls_datum* KEY);
 
-int gnutls_certificate_set_openpgp_keyserver(GNUTLS_CERTIFICATE_CREDENTIALS res,
+int gnutls_certificate_set_openpgp_keyserver(gnutls_certificate_credentials res,
      char* keyserver, int port);
 
-int gnutls_certificate_set_openpgp_trustdb(GNUTLS_CERTIFICATE_CREDENTIALS res,
+int gnutls_certificate_set_openpgp_trustdb(gnutls_certificate_credentials res,
      char* trustdb);
 
 int gnutls_certificate_set_openpgp_keyring_mem(
-    GNUTLS_CERTIFICATE_CREDENTIALS c,
+    gnutls_certificate_credentials c,
     const unsigned char *data, size_t dlen );
 
-int gnutls_certificate_set_openpgp_keyring_file( GNUTLS_CERTIFICATE_CREDENTIALS res, const char *name);
+int gnutls_certificate_set_openpgp_keyring_file( gnutls_certificate_credentials res, const char *name);
 
 int gnutls_global_init_extra(void);
+
+/* Defines for compatibility with previous versions.
+ */
+#define GNUTLS_SRP_SERVER_CREDENTIALS gnutls_srp_server_credentials
+#define GNUTLS_SRP_CLIENT_CREDENTIALS gnutls_srp_client_credentials
 
 #endif

@@ -34,7 +34,7 @@ typedef struct gnutls_cert {
 				 */
 	int params_size; /* holds the size of MPI params */
 	
-	PKAlgorithm subject_pk_algorithm;
+	gnutls_pk_algorithm subject_pk_algorithm;
 
 	gnutls_datum   signature;
 
@@ -53,7 +53,7 @@ typedef struct gnutls_cert {
 
 			/* holds the type (PGP, X509)
 			 */
-	CertificateType     cert_type;
+	gnutls_certificate_type     cert_type;
 	
 	gnutls_datum raw; /* the raw certificate */
 } gnutls_cert;
@@ -77,15 +77,15 @@ typedef struct {
 				 */
 	int params_size; /* holds the number of params */
 
-	PKAlgorithm pk_algorithm;
+	gnutls_pk_algorithm pk_algorithm;
 
 	gnutls_datum raw; /* the raw key */
 } gnutls_private_key;
 
-struct GNUTLS_STATE_INT; /* because GNUTLS_STATE is not defined when this file is included */
+struct gnutls_session_int; /* because gnutls_session is not defined when this file is included */
 
-int _gnutls_cert_supported_kx( const gnutls_cert* cert, KXAlgorithm **alg, int *alg_size);
-PKAlgorithm _gnutls_map_pk_get_pk(KXAlgorithm kx_algorithm);
+int _gnutls_cert_supported_kx( const gnutls_cert* cert, gnutls_kx_algorithm **alg, int *alg_size);
+gnutls_pk_algorithm _gnutls_map_pk_get_pk(gnutls_kx_algorithm kx_algorithm);
 
 void _gnutls_free_cert(gnutls_cert cert);
 

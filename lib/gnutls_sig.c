@@ -41,7 +41,7 @@ int _gnutls_generate_sig( gnutls_cert* cert, gnutls_private_key *pkey, const gnu
 /* Generates a signature of all the previous sent packets in the 
  * handshake procedure.
  */
-int _gnutls_generate_sig_from_hdata( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum *signature) {
+int _gnutls_generate_sig_from_hdata( gnutls_session session, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum *signature) {
 gnutls_datum dconcat;
 int ret;
 opaque concat[36];
@@ -49,7 +49,7 @@ GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 
 
-	td_sha = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	td_sha = _gnutls_hash_copy( session->internals.handshake_mac_handle_sha);
 	if (td_sha == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
@@ -59,7 +59,7 @@ GNUTLS_MAC_HANDLE td_sha;
 
 	switch (cert->subject_pk_algorithm) {
 		case GNUTLS_PK_RSA:
-			td_md5 = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+			td_md5 = _gnutls_hash_copy( session->internals.handshake_mac_handle_md5);
 			if (td_md5 == NULL) {
 				gnutls_assert();
 				return GNUTLS_E_HASH_FAILED;
@@ -89,7 +89,7 @@ GNUTLS_MAC_HANDLE td_sha;
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_generate_sig_params( GNUTLS_STATE state, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum* params, gnutls_datum *signature) 
+int _gnutls_generate_sig_params( gnutls_session session, gnutls_cert* cert, gnutls_private_key *pkey, gnutls_datum* params, gnutls_datum *signature) 
 {
 gnutls_datum dconcat;
 int ret;
@@ -104,8 +104,8 @@ opaque concat[36];
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	_gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	_gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, session->security_parameters.client_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, session->security_parameters.server_random, TLS_RANDOM_SIZE);
 	_gnutls_hash( td_sha, params->data, params->size);
 
 	_gnutls_hash_deinit(td_sha, &concat[16]);
@@ -118,8 +118,8 @@ opaque concat[36];
 				return GNUTLS_E_HASH_FAILED;
 			}
 
-			_gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-			_gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+			_gnutls_hash( td_md5, session->security_parameters.client_random, TLS_RANDOM_SIZE);
+			_gnutls_hash( td_md5, session->security_parameters.server_random, TLS_RANDOM_SIZE);
 			_gnutls_hash( td_md5, params->data, params->size);
 
 			_gnutls_hash_deinit(td_md5, concat);
@@ -261,20 +261,20 @@ int _gnutls_pkcs1_rsa_verify_sig( gnutls_cert *cert, const gnutls_datum *hash_co
  * verify message). ubuffer_size is a buffer to remove from the hash buffer
  * in order to avoid hashing the last message.
  */
-int _gnutls_verify_sig_hdata( GNUTLS_STATE state, gnutls_cert *cert, gnutls_datum* signature, int ubuffer_size) {
+int _gnutls_verify_sig_hdata( gnutls_session session, gnutls_cert *cert, gnutls_datum* signature, int ubuffer_size) {
 int ret;
 opaque concat[36];
 GNUTLS_MAC_HANDLE td_md5;
 GNUTLS_MAC_HANDLE td_sha;
 gnutls_datum dconcat;
 
-	td_md5 = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_md5);
+	td_md5 = _gnutls_hash_copy( session->internals.handshake_mac_handle_md5);
 	if (td_md5 == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	td_sha = _gnutls_hash_copy( state->gnutls_internals.handshake_mac_handle_sha);
+	td_sha = _gnutls_hash_copy( session->internals.handshake_mac_handle_sha);
 	if (td_sha == NULL) {
 		gnutls_assert();
 		_gnutls_hash_deinit( td_md5, NULL);
@@ -300,7 +300,7 @@ gnutls_datum dconcat;
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_verify_sig_params( GNUTLS_STATE state, gnutls_cert *cert, const gnutls_datum* params, gnutls_datum *signature) 
+int _gnutls_verify_sig_params( gnutls_session session, gnutls_cert *cert, const gnutls_datum* params, gnutls_datum *signature) 
 {
 gnutls_datum dconcat;
 int ret;
@@ -321,12 +321,12 @@ opaque concat[36];
 		return GNUTLS_E_HASH_FAILED;
 	}
 
-	_gnutls_hash( td_md5, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	_gnutls_hash( td_md5, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_md5, session->security_parameters.client_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_md5, session->security_parameters.server_random, TLS_RANDOM_SIZE);
 	_gnutls_hash( td_md5, params->data, params->size);
 
-	_gnutls_hash( td_sha, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	_gnutls_hash( td_sha, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, session->security_parameters.client_random, TLS_RANDOM_SIZE);
+	_gnutls_hash( td_sha, session->security_parameters.server_random, TLS_RANDOM_SIZE);
 	_gnutls_hash( td_sha, params->data, params->size);
 
 	_gnutls_hash_deinit(td_md5, concat);

@@ -41,8 +41,8 @@
 #include <gnutls_x509.h>
 #include <gnutls_extra.h>
 
-int _gnutls_gen_rsa_client_kx(GNUTLS_STATE, opaque **);
-int _gnutls_proc_rsa_client_kx(GNUTLS_STATE, opaque *, int);
+int _gnutls_gen_rsa_client_kx(gnutls_session, opaque **);
+int _gnutls_proc_rsa_client_kx(gnutls_session, opaque *, int);
 
 const MOD_AUTH_STRUCT rsa_auth_struct = {
 	"RSA",
@@ -70,7 +70,7 @@ extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-int _gnutls_get_public_rsa_params(GNUTLS_STATE state, GNUTLS_MPI params[MAX_PARAMS_SIZE], int* params_len)
+int _gnutls_get_public_rsa_params(gnutls_session session, GNUTLS_MPI params[MAX_PARAMS_SIZE], int* params_len)
 {
 int ret;
 CERTIFICATE_AUTH_INFO info;
@@ -79,14 +79,14 @@ int i;
 
 	/* normal non export case */
 
-	info = _gnutls_get_auth_info( state);
+	info = _gnutls_get_auth_info( session);
 
 	if (info==NULL || info->ncerts==0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 	
-	switch( state->security_parameters.cert_type) {
+	switch( session->security_parameters.cert_type) {
 		case GNUTLS_CRT_X509:
 			if ((ret =
 			     _gnutls_x509_cert2gnutls_cert( &peer_cert,
@@ -116,14 +116,14 @@ int i;
 
 
 	/* EXPORT case: */
-	if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite)
+	if ( _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite)
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	_gnutls_mpi_get_nbits(peer_cert.params[0]) > 512) {
 
 		_gnutls_free_cert( peer_cert);
 
-		if (state->gnutls_key->rsa[0] == NULL ||
-			state->gnutls_key->rsa[1] == NULL) {
+		if (session->gnutls_key->rsa[0] == NULL ||
+			session->gnutls_key->rsa[1] == NULL) {
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
 		}
@@ -134,7 +134,7 @@ int i;
 		}
 		*params_len = 2;
 		for (i=0;i<*params_len;i++) {
-			params[i] = _gnutls_mpi_copy(state->gnutls_key->rsa[i]);
+			params[i] = _gnutls_mpi_copy(session->gnutls_key->rsa[i]);
 		}
 
 		return 0;
@@ -158,23 +158,23 @@ int i;
 
 /* This function reads the RSA parameters from the private key
  */
-int _gnutls_get_private_rsa_params(GNUTLS_STATE state, GNUTLS_MPI **params, int* params_size)
+int _gnutls_get_private_rsa_params(gnutls_session session, GNUTLS_MPI **params, int* params_size)
 {
 int index;
 const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 
-	cred = _gnutls_get_cred(state->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
+	cred = _gnutls_get_cred(session->gnutls_key, GNUTLS_CRD_CERTIFICATE, NULL);
 	if (cred == NULL) {
 	        gnutls_assert();
 	        return GNUTLS_E_INSUFICIENT_CRED;
 	}
 
-	if ( (index=state->gnutls_internals.selected_cert_index) < 0) {
+	if ( (index=session->internals.selected_cert_index) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_ERROR;
 	}
 
-	if ( _gnutls_cipher_suite_get_kx_algo(state->security_parameters.current_cipher_suite)
+	if ( _gnutls_cipher_suite_get_kx_algo(session->security_parameters.current_cipher_suite)
 		 == GNUTLS_KX_RSA_EXPORT && 
 		 	_gnutls_mpi_get_nbits(cred->cert_list[index][0].params[0]) > 512) {
 
@@ -207,7 +207,7 @@ const GNUTLS_CERTIFICATE_CREDENTIALS cred;
 			return GNUTLS_E_MEMORY_ERROR; \
 		}
 
-int _gnutls_proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
+int _gnutls_proc_rsa_client_kx(gnutls_session session, opaque * data, int data_size)
 {
 	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
@@ -215,7 +215,7 @@ int _gnutls_proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	GNUTLS_MPI *params;
 	int params_len;
 
-	if (gnutls_protocol_get_version(state) == GNUTLS_SSL3) {
+	if (gnutls_protocol_get_version(session) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		ciphertext.data = data;
 		ciphertext.size = data_size;
@@ -231,7 +231,7 @@ int _gnutls_proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		ciphertext.size = dsize;
 	}
 
-	ret = _gnutls_get_private_rsa_params(state, &params, &params_len);
+	ret = _gnutls_get_private_rsa_params(session, &params, &params_len);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -250,21 +250,21 @@ int _gnutls_proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 
 		_gnutls_log("RSA_AUTH: Possible PKCS-1 format attack\n");
 
-		RANDOMIZE_KEY(state->gnutls_key->key,
+		RANDOMIZE_KEY(session->gnutls_key->key,
 			      gnutls_secure_malloc, GNUTLS_WEAK_RANDOM);
 	} else {
 		ret = 0;
-		if (state->gnutls_internals.rsa_pms_check==0)
-			if (_gnutls_get_adv_version_major(state) !=
+		if (session->internals.rsa_pms_check==0)
+			if (_gnutls_get_adv_version_major(session) !=
 			    plaintext.data[0]
-			    || _gnutls_get_adv_version_minor(state) !=
+			    || _gnutls_get_adv_version_minor(session) !=
 			    plaintext.data[1]) {
 				gnutls_assert();
 				ret = GNUTLS_E_DECRYPTION_FAILED;
 			}
 
-		state->gnutls_key->key.data = plaintext.data;
-		state->gnutls_key->key.size = plaintext.size;
+		session->gnutls_key->key.data = plaintext.data;
+		session->gnutls_key->key.size = plaintext.size;
 	}
 
 	return ret;
@@ -274,14 +274,14 @@ int _gnutls_proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 
 /* return RSA(random) using the peers public key 
  */
-int _gnutls_gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
+int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 {
-	CERTIFICATE_AUTH_INFO auth = state->gnutls_key->auth_info;
+	CERTIFICATE_AUTH_INFO auth = session->gnutls_key->auth_info;
 	gnutls_datum sdata;	/* data to send */
 	GNUTLS_MPI params[MAX_PARAMS_SIZE];
 	int params_len = MAX_PARAMS_SIZE;
 	int ret, i;
-	GNUTLS_Version ver;
+	gnutls_protocol_version ver;
 
 	if (auth == NULL) {
 		/* this shouldn't have happened. The proc_certificate
@@ -290,23 +290,23 @@ int _gnutls_gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
-	RANDOMIZE_KEY(state->gnutls_key->key, gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
+	RANDOMIZE_KEY(session->gnutls_key->key, gnutls_secure_malloc, GNUTLS_STRONG_RANDOM);
 
-	ver = _gnutls_get_adv_version(state);
+	ver = _gnutls_get_adv_version(session);
 
-	state->gnutls_key->key.data[0] = _gnutls_version_get_major(ver);
-	state->gnutls_key->key.data[1] = _gnutls_version_get_minor(ver);
+	session->gnutls_key->key.data[0] = _gnutls_version_get_major(ver);
+	session->gnutls_key->key.data[1] = _gnutls_version_get_minor(ver);
 
-	/* move RSA parameters to gnutls_key (state).
+	/* move RSA parameters to gnutls_key (session).
 	 */
 	if ((ret =
-	     _gnutls_get_public_rsa_params(state, params, &params_len)) < 0) {
+	     _gnutls_get_public_rsa_params(session, params, &params_len)) < 0) {
 		gnutls_assert();
 		return ret;
 	}
 
 	if ((ret =
-	     _gnutls_pkcs1_rsa_encrypt(&sdata, state->gnutls_key->key,
+	     _gnutls_pkcs1_rsa_encrypt(&sdata, session->gnutls_key->key,
 				       params, params_len, 2)) < 0) {
 		gnutls_assert();
 		return ret;
@@ -315,7 +315,7 @@ int _gnutls_gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	for (i=0;i<params_len;i++)
 		_gnutls_mpi_release( &params[i]);
 
-	if (gnutls_protocol_get_version( state) == GNUTLS_SSL3) {
+	if (gnutls_protocol_get_version( session) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		*data = sdata.data;
 		return sdata.size;

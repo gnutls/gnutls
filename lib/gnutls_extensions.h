@@ -23,12 +23,12 @@
 void* _gnutls_ext_func_send(uint16 type);
 void* _gnutls_ext_func_recv(uint16 type);
 const char *_gnutls_extension_get_name(uint16 type);
-int _gnutls_parse_extensions( GNUTLS_STATE, const opaque*, int);
-int _gnutls_gen_extensions( GNUTLS_STATE state, opaque** data);
+int _gnutls_parse_extensions( gnutls_session, const opaque*, int);
+int _gnutls_gen_extensions( gnutls_session session, opaque** data);
 
 typedef struct {
 	const char *name;
 	uint16 type;
-	int (*gnutls_ext_func_recv)( GNUTLS_STATE, const opaque*, int); /* recv data */
-	int (*gnutls_ext_func_send)( GNUTLS_STATE, opaque*, int); /* send data */
+	int (*gnutls_ext_func_recv)( gnutls_session, const opaque*, int); /* recv data */
+	int (*gnutls_ext_func_send)( gnutls_session, opaque*, int); /* send data */
 } gnutls_extension_entry;

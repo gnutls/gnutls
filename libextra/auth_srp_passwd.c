@@ -228,7 +228,7 @@ static int pwd_read_conf( const char* pconf_file, GNUTLS_SRP_PWD_ENTRY* entry, i
 }
 
 
-GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_STATE state, char* username, int *err) {
+GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( gnutls_session state, char* username, int *err) {
 	const GNUTLS_SRP_SERVER_CREDENTIALS cred;
 	FILE * fd;
 	char line[2*1024];
@@ -259,8 +259,8 @@ GNUTLS_SRP_PWD_ENTRY *_gnutls_srp_pwd_read_entry( GNUTLS_STATE state, char* user
 	}
 	
 	/* use the callback to select a password file */
-	if (state->gnutls_internals.server_srp_callback!=NULL) {
-		pwd_index = state->gnutls_internals.server_srp_callback(
+	if (state->internals.server_srp_callback!=NULL) {
+		pwd_index = state->internals.server_srp_callback(
 			state, cred->password_file, cred->password_conf_file,
 				cred->password_files);
 

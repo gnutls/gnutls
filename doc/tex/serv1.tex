@@ -32,12 +32,12 @@
 #define DH_BITS 1024
 
 /* These are global */
-GNUTLS_SRP_SERVER_CREDENTIALS srp_cred;
-GNUTLS_CERTIFICATE_SERVER_CREDENTIALS x509_cred;
+gnutls_srp_server_credentials srp_cred;
+gnutls_certificate_server_credentials x509_cred;
 
-GNUTLS_STATE initialize_state()
+gnutls_session initialize_session()
 {
-   GNUTLS_STATE state;
+   gnutls_session session;
    int ret;
    const int protocol_priority[] = { GNUTLS_TLS1, GNUTLS_SSL3, 0 };
    const int kx_priority[] = { GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, 0 };
@@ -45,72 +45,72 @@ GNUTLS_STATE initialize_state()
    const int comp_priority[] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
    const int mac_priority[] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 
-   gnutls_init(&state, GNUTLS_SERVER);
+   gnutls_session_init(&session, GNUTLS_SERVER);
 
-   gnutls_protocol_set_priority(state, protocol_priority);
-   gnutls_cipher_set_priority(state, cipher_priority);
-   gnutls_compression_set_priority(state, comp_priority);
-   gnutls_kx_set_priority(state, kx_priority);
-   gnutls_mac_set_priority(state, mac_priority);
+   gnutls_protocol_set_priority(session, protocol_priority);
+   gnutls_cipher_set_priority(session, cipher_priority);
+   gnutls_compression_set_priority(session, comp_priority);
+   gnutls_kx_set_priority(session, kx_priority);
+   gnutls_mac_set_priority(session, mac_priority);
 
-   gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
-   gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, x509_cred);
+   gnutls_cred_set(session, GNUTLS_CRD_SRP, srp_cred);
+   gnutls_cred_set(session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
    /* request client certificate if any.
     */
-   gnutls_certificate_server_set_request( state, GNUTLS_CERT_REQUEST);
+   gnutls_certificate_server_set_request( session, GNUTLS_CERT_REQUEST);
 
-   gnutls_dh_set_prime_bits( state, DH_BITS);
+   gnutls_dh_set_prime_bits( session, DH_BITS);
 
    /* some broken clients may require this in order to connect. 
     * This may weaken security though.
     */
-   /* gnutls_handshake_set_rsa_pms_check( state, 1); */
+   /* gnutls_handshake_set_rsa_pms_check( session, 1); */
 
    
-   return state;
+   return session;
 }
 
-void print_info(GNUTLS_STATE state)
+void print_info(gnutls_session session)
 {
    const char *tmp;
    unsigned char sesid[32];
    int sesid_size, i;
 
    /* print session_id specific data */
-   gnutls_session_get_id(state, sesid, &sesid_size);
+   gnutls_session_get_id(session, sesid, &sesid_size);
    printf("\n- Session ID: ");
    for (i = 0; i < sesid_size; i++)
       printf("%.2X", sesid[i]);
    printf("\n");
 
    /* print srp specific data */
-   if (gnutls_auth_get_type(state) == GNUTLS_CRD_SRP) {
+   if (gnutls_auth_get_type(session) == GNUTLS_CRD_SRP) {
          printf("\n- User '%s' connected\n",
-                gnutls_srp_server_get_username( state));
+                gnutls_srp_server_get_username( session));
    }
 
-   /* print state information */
-   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(state));
+   /* print session information */
+   tmp = gnutls_protocol_get_name(gnutls_protocol_get_version(session));
    printf("- Version: %s\n", tmp);
 
-   tmp = gnutls_kx_get_name(gnutls_kx_get(state));
+   tmp = gnutls_kx_get_name(gnutls_kx_get(session));
    printf("- Key Exchange: %s\n", tmp);
 
    tmp =
        gnutls_compression_get_name
-       (gnutls_compression_get(state));
+       (gnutls_compression_get(session));
    printf("- Compression: %s\n", tmp);
 
-   tmp = gnutls_cipher_get_name(gnutls_cipher_get(state));
+   tmp = gnutls_cipher_get_name(gnutls_cipher_get(session));
    printf("- Cipher: %s\n", tmp);
 
-   tmp = gnutls_mac_get_name(gnutls_mac_get(state));
+   tmp = gnutls_mac_get_name(gnutls_mac_get(session));
    printf("- MAC: %s\n", tmp);
 
 }
 
-GNUTLS_DH_PARAMS dh_params;
+gnutls_dh_params dh_params;
 
 static int generate_dh_primes(void) {
 gnutls_datum prime, generator;
@@ -136,7 +136,7 @@ int main()
    struct sockaddr_in sa_cli;
    int client_len;
    char topbuf[512];
-   GNUTLS_STATE state;
+   gnutls_session session;
    char buffer[MAX_BUF + 1];
    int optval = 1;
    int http = 0;
@@ -199,7 +199,7 @@ int main()
 
    client_len = sizeof(sa_cli);
    for (;;) {
-      state = initialize_state();
+      session = initialize_session();
 
       sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
 
@@ -207,23 +207,23 @@ int main()
              inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
                        sizeof(topbuf)), ntohs(sa_cli.sin_port));
 
-      gnutls_transport_set_ptr( state, sd);
-      ret = gnutls_handshake( state);
+      gnutls_transport_set_ptr( session, sd);
+      ret = gnutls_handshake( session);
       if (ret < 0) {
          close(sd);
-         gnutls_deinit(state);
+         gnutls_session_deinit(session);
          fprintf(stderr, "*** Handshake has failed (%s)\n\n",
                  gnutls_strerror(ret));
          continue;
       }
       printf("- Handshake was completed\n");
 
-      print_info(state);
+      print_info(session);
 
       i = 0;
       for (;;) {
          bzero(buffer, MAX_BUF + 1);
-         ret = gnutls_record_recv( state, buffer, MAX_BUF);
+         ret = gnutls_record_recv( session, buffer, MAX_BUF);
 
          if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
             if (ret == 0) {
@@ -241,21 +241,21 @@ int main()
          if (ret > 0) {
             /* echo data back to the client
              */
-            gnutls_record_send( state, buffer,
+            gnutls_record_send( session, buffer,
                          strlen(buffer));
          }
          if (ret == GNUTLS_E_WARNING_ALERT_RECEIVED || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
-            ret = gnutls_alert_get(state);
+            ret = gnutls_alert_get(session);
             printf("* Received alert '%d' - '%s'.\n", ret, gnutls_alert_get_name( ret));
          }
       }
       printf("\n");
-      gnutls_bye( state, 1); /* do not wait for
+      gnutls_bye( session, GNUTLS_SHUT_WR); /* do not wait for
                                  * the peer to close the connection.
                                  */
 
       close(sd);
-      gnutls_deinit(state);
+      gnutls_session_deinit(session);
 
    }
    close(listen_sd);

@@ -7,8 +7,8 @@
  * support a server that has multiple certificates
  */
 typedef struct {
-	GNUTLS_DH_PARAMS dh_params;
-	GNUTLS_RSA_PARAMS rsa_params;
+	gnutls_dh_params dh_params;
+	gnutls_rsa_params rsa_params;
 
 	gnutls_cert ** cert_list; 
 			/* contains a list of a list of certificates.
@@ -73,17 +73,17 @@ typedef struct CERTIFICATE_AUTH_INFO_INT {
 typedef struct CERTIFICATE_AUTH_INFO_INT CERTIFICATE_AUTH_INFO_INT;
 
 /* AUTH X509 functions */
-int _gnutls_gen_cert_server_certificate(GNUTLS_STATE, opaque **);
-int _gnutls_gen_cert_client_certificate(GNUTLS_STATE, opaque **);
-int _gnutls_gen_cert_client_cert_vrfy(GNUTLS_STATE, opaque **);
-int _gnutls_gen_cert_server_cert_req(GNUTLS_STATE, opaque **);
-int _gnutls_proc_cert_cert_req(GNUTLS_STATE, opaque *, int);
-int _gnutls_proc_cert_client_cert_vrfy(GNUTLS_STATE, opaque *, int);
-int _gnutls_proc_cert_server_certificate(GNUTLS_STATE, opaque *, int);
-int _gnutls_find_apr_cert( GNUTLS_STATE state, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_private_key** apr_pkey);
+int _gnutls_gen_cert_server_certificate(gnutls_session, opaque **);
+int _gnutls_gen_cert_client_certificate(gnutls_session, opaque **);
+int _gnutls_gen_cert_client_cert_vrfy(gnutls_session, opaque **);
+int _gnutls_gen_cert_server_cert_req(gnutls_session, opaque **);
+int _gnutls_proc_cert_cert_req(gnutls_session, opaque *, int);
+int _gnutls_proc_cert_client_cert_vrfy(gnutls_session, opaque *, int);
+int _gnutls_proc_cert_server_certificate(gnutls_session, opaque *, int);
+int _gnutls_find_apr_cert( gnutls_session session, gnutls_cert** apr_cert_list, int *apr_cert_list_length, gnutls_private_key** apr_pkey);
 int _gnutls_find_dn( gnutls_datum* odn, gnutls_cert* cert);
-const gnutls_cert* _gnutls_server_find_cert( struct GNUTLS_STATE_INT*, PKAlgorithm);
-int _gnutls_server_find_cert_list_index( struct GNUTLS_STATE_INT*, gnutls_cert ** cert_list, int cert_list_length, PKAlgorithm);
+const gnutls_cert* _gnutls_server_find_cert( struct gnutls_session_int*, gnutls_pk_algorithm);
+int _gnutls_server_find_cert_list_index( struct gnutls_session_int*, gnutls_cert ** cert_list, int cert_list_length, gnutls_pk_algorithm);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 
