@@ -1,3 +1,17 @@
+2003-06-27 14:07  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_buffers.c, gnutls_dh_primes.c, gnutls_errors.c,
+	gnutls_errors_int.h, gnutls_mpi.c, gnutls_mpi.h, gnutls_pk.c:
+
+	Added function to do the MAC verification in the PKCS #12 structure.  
+
+2003-06-27 07:34  nmav <nmav@gnutls.org>
+
+	* lib/: pkix.asn, pkix_asn1_tab.c:
+
+	Added ability to write Bag attributes LocalKeyId and friendlyName,
+	in order for browsers to be able to import our structures.  
+
 2003-06-26 21:59  nmav <nmav@gnutls.org>
 
 	* lib/: gnutls_state.c, pkix.asn, pkix_asn1_tab.c:
