@@ -825,16 +825,10 @@ int main(int argc, char **argv)
 		     printf("*** This is a resumed session\n");
 
 		  if (quiet == 0) {
-#ifdef HAVE_INET_NTOP
 		     printf("\n* connection from %s, port %d\n",
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
 			    ntohs(client_address.sin_port));
-#else
-		     printf("\n* connection from %s, port %d\n",
-			    inet_ntoa(((struct sockaddr_in*)&client_address)->sin_addr),
-			    ntohs(client_address.sin_port));
-#endif
 		     print_info(j->tls_session, NULL);
 		  }
 		  j->handshake_ok = 1;
@@ -905,16 +899,10 @@ int main(int argc, char **argv)
 		      && quiet == 0)
 		     printf("*** This is a resumed session\n");
 		  if (quiet == 0) {
-#ifdef HAVE_INET_NTOP
 		     printf("- connection from %s, port %d\n",
 			    inet_ntop(AF_INET, &client_address.sin_addr,
 				      topbuf, sizeof(topbuf)),
 			    ntohs(client_address.sin_port));
-#else
-		     printf("\n* connection from %s, port %d\n",
-			    inet_ntoa(((struct sockaddr_in*)&client_address)->sin_addr),
-			    ntohs(client_address.sin_port));
-#endif
 
 		     print_info(j->tls_session, NULL);
 		  }

@@ -136,12 +136,6 @@ static const TLS_TEST tls_tests[] = {
 static int tt = 0;
 char* ip;
 
-#ifdef HAVE_INET_NTOP
-# define IP inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF)
-#else
-# define IP inet_ntoa( ((struct sockaddr_in*)&sa)->sin_addr)
-#endif
-
 #define CONNECT() \
 		sd = socket(AF_INET, SOCK_STREAM, 0); \
 		ERR(sd, "socket"); \
@@ -149,7 +143,7 @@ char* ip;
 		sa.sin_family = AF_INET; \
 		sa.sin_port = htons(port); \
 		sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr); \
-		ip = IP; \
+		ip = inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF); \
 		if (tt++ == 0) printf("Connecting to '%s:%d'...\n", ip, port); \
 		err = connect(sd, (SA *) & sa, sizeof(sa)); \
 		ERR(err, "connect")

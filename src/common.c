@@ -635,3 +635,20 @@ void parse_comp(char **comp, int ncomp, int *comp_priority)
 	}
 
 }
+
+#ifndef HAVE_INET_NTOP
+const char *inet_ntop(int af, const void *src,
+                             char *dst, size_t cnt) 
+{
+char* ret;
+
+	ret = inet_atop( src);
+	
+	if (strlen(ret) > cnt) {
+		return NULL;
+	}
+	strcpy( dst, ret);
+	
+	return dst;
+}
+#endif

@@ -1,6 +1,7 @@
 #define PORT 5556
 #define SERVER "127.0.0.1"
 
+#include <config.h>
 #include <gnutls/gnutls.h>
 
 /* the number of elements in the priority structures.
@@ -19,3 +20,8 @@ void parse_ctypes( char** ctype, int nctype, int * cert_type_priority);
 void parse_macs( char** macs, int nmacs, int *mac_priority);
 void parse_ciphers( char** ciphers, int nciphers, int* cipher_priority);
 void parse_protocols( char** protocols, int protocols_size, int* protocol_priority);
+
+#ifndef HAVE_INET_NTOP
+const char *inet_ntop(int af, const void *src,
+                             char *dst, size_t cnt);
+#endif

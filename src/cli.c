@@ -316,17 +316,11 @@ int main(int argc, char **argv)
 
 	sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr);
 
-#ifdef HAVE_INET_NTOP
 	if (inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF) == NULL) {
 		perror("inet_ntop()");
 		return(1);
 	}
 	fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port);
-#else /* use inet_ntoa */
-	fprintf(stderr, "Connecting to '%s:%d'...\n", inet_ntoa( ((struct sockaddr_in*)&sa)->sin_addr), 
-		port);
-#endif
-
 
 	err = connect(sd, (SA *) & sa, sizeof(sa));
 	ERR(err, "connect");
