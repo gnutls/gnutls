@@ -92,6 +92,9 @@ int gnutls_error_is_fatal( int error);
 # endif
 
 #else
+
+/* FIXME: These macros only work with C99 compliant compilers
+ */
 # define _gnutls_log(...)
 # define _gnutls_handshake_log( ...)
 # define _gnutls_io_log( ...)
