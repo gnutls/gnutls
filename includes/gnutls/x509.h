@@ -181,6 +181,7 @@ int gnutls_pkcs7_get_certificate(gnutls_pkcs7 pkcs7, int indx,
 	unsigned char* certificate, size_t* certificate_size);
 int gnutls_pkcs7_set_certificate(gnutls_pkcs7 pkcs7, const gnutls_datum* crt);
 int gnutls_pkcs7_set_certificate2(gnutls_pkcs7 pkcs7, gnutls_x509_crt crt);
+#define gnutls_pkcs7_set_crt gnutls_pkcs7_set_certificate2
 
 int gnutls_pkcs7_get_crl(gnutls_pkcs7 pkcs7, 
 	int indx, unsigned char* crl, size_t* crl_size);
