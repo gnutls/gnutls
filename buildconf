@@ -1,12 +1,3 @@
-#! /bin/sh
-
+#!/bin/sh
 autoreconf --force --install
-
-#aclocal -I . && \
-#libtoolize -c --force --automake && \
-#aclocal -I . && \
-#autoheader -Wall && \
-#automake -a -c --gnu || automake -a -c --gnu
-#autoconf
-
 echo "You can now run \"./configure\" and \"make\""
