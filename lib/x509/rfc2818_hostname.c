@@ -26,7 +26,6 @@
 #include <x509.h>
 #include <dn.h>
 #include <common.h>
-#include <gnutls/compat8.h>
 #include <rfc2818.h>
 #include <gnutls_errors.h>
 

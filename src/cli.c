@@ -685,7 +685,19 @@ static int srp_username_callback( gnutls_session session, unsigned int times,
 		*password = gnutls_strdup( srp_passwd);
 		
 		return 0;
-	}
+	} else
+		/* At the first time return username and password, if
+		 * the kx_priority[0] is an SRP method.
+		 */
+		if (times == 0 && (kx_priority[0] == GNUTLS_KX_SRP ||
+			kx_priority[0] == GNUTLS_KX_SRP_RSA ||
+			kx_priority[0] == GNUTLS_KX_SRP_DSS)) {
+
+			*username = gnutls_strdup( srp_username);
+			*password = gnutls_strdup( srp_passwd);
+		
+			return 0;
+		}
 	
 	return -1;
 }
