@@ -65,7 +65,7 @@ void verify_certificate( gnutls_session session, const char* hostname)
 
    /* Beware here we do not check for errors.
     */
-   if ( gnutls_x509_crt_get_expiration( cert) < time(0)) {
+   if ( gnutls_x509_crt_get_expiration_time( cert) < time(0)) {
       printf("The certificate has expired\n");
       return;
    }

@@ -34,6 +34,8 @@
 #include <unistd.h>
 #include <getpass.h>
 
+#define UNKNOWN "Unknown"
+
 static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all);
 int generate_prime(int bits);
 void pkcs7_info( void);
@@ -779,36 +781,6 @@ int ret;
 }
 
 
-const char* get_pk_algorithm( gnutls_pk_algorithm a) 
-{
-	switch (a) {
-		case GNUTLS_PK_RSA:
-			return "RSA";
-		case GNUTLS_PK_DSA:
-			return "DSA";
-			break;
-		default:
-			return "UNKNOWN";
-	}
-}
-
-const char* get_sign_algorithm( gnutls_sign_algorithm a) 
-{
-	switch (a) {
-		case GNUTLS_SIGN_RSA_SHA:
-			return "RSA-SHA";
-		case GNUTLS_SIGN_RSA_MD5:
-			return "RSA-MD5";
-		case GNUTLS_SIGN_RSA_MD2:
-			return "RSA-MD2";
-		case GNUTLS_SIGN_DSA_SHA:
-			return "DSA-SHA";
-			break;
-		default:
-			return "UNKNOWN";
-	}
-}
-
 /* OIDs that are handled by the gnutls' functions.
  */
 static inline int known_oid( const char* oid)
@@ -912,7 +884,8 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 		fprintf(out, "Signature Algorithm: ");
 		ret = gnutls_x509_crt_get_signature_algorithm(crt);
 		
-		cprint = get_sign_algorithm( ret);
+		cprint = gnutls_sign_algorithm_get_name( ret);
+		if (cprint == NULL) cprint = UNKNOWN;
 		fprintf(out,  "%s\n", cprint);
 	}
 
@@ -932,7 +905,8 @@ static void print_certificate_info( gnutls_x509_crt crt, FILE* out, unsigned int
 	ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
 	fprintf(out, "\tPublic Key Algorithm: ");
 
-	cprint = get_pk_algorithm( ret);
+	cprint = gnutls_pk_algorithm_get_name( ret);
+	if (cprint == NULL) cprint = UNKNOWN;
 	fprintf(out,  "%s\n", cprint);
 
 
@@ -1151,7 +1125,8 @@ static void print_crl_info( gnutls_x509_crl crl, FILE* out, int all)
 		fprintf(out, "Signature Algorithm: ");
 		ret = gnutls_x509_crl_get_signature_algorithm(crl);
 
-		cprint = get_sign_algorithm( ret);
+		cprint = gnutls_sign_algorithm_get_name( ret);
+		if (cprint == NULL) cprint = UNKNOWN;
 		fprintf(out,  "%s\n", cprint);
 	}
 
@@ -1268,7 +1243,8 @@ void privkey_info( void)
 	ret = gnutls_x509_privkey_get_pk_algorithm(key);
 	fprintf(outfile, "\tPublic Key Algorithm: ");
 
-	cprint = get_pk_algorithm( ret);
+	cprint = gnutls_pk_algorithm_get_name( ret);
+	if (cprint == NULL) cprint = UNKNOWN;
 	fprintf(outfile,  "%s\n", cprint);
 
 

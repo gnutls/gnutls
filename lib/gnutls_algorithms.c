@@ -1366,3 +1366,87 @@ enum encipher_type _gnutls_kx_encipher_type(gnutls_kx_algorithm kx_algorithm)
 	return ret;
 
 }
+
+/* signature algorithms;
+ */
+struct gnutls_sign_entry {
+	const char *name;
+	gnutls_sign_algorithm id;
+};
+typedef struct gnutls_sign_entry gnutls_sign_entry;
+
+static const gnutls_sign_entry sign_algorithms[] = {
+	{"RSA-SHA", GNUTLS_SIGN_RSA_SHA},
+	{"DSA-SHA", GNUTLS_SIGN_DSA_SHA},
+	{"RSA-MD5", GNUTLS_SIGN_RSA_MD5},
+	{"RSA-MD2", GNUTLS_SIGN_RSA_MD2},
+	{0, 0}
+};
+
+#define GNUTLS_SIGN_LOOP(b) \
+        const gnutls_sign_entry *p; \
+                for(p = sign_algorithms; p->name != NULL; p++) { b ; }
+
+#define GNUTLS_SIGN_ALG_LOOP(a) \
+                        GNUTLS_SIGN_LOOP( if(p->id == algorithm) { a; break; } )
+
+
+
+/**
+  * gnutls_sign_algorithm_get_name - Returns a string with the name of the specified sign algorithm
+  * @algorithm: is a sign algorithm
+  *
+  * Returns a string that contains the name
+  * of the specified sign algorithm or NULL.
+  **/
+const char *gnutls_sign_algorithm_get_name( gnutls_sign_algorithm algorithm)
+{
+	const char *ret = NULL;
+
+	/* avoid prefix */
+	GNUTLS_SIGN_ALG_LOOP(ret =
+			     p->name);
+
+	return ret;
+}
+
+/* pk algorithms;
+ */
+struct gnutls_pk_entry {
+	const char *name;
+	gnutls_pk_algorithm id;
+};
+typedef struct gnutls_pk_entry gnutls_pk_entry;
+
+static const gnutls_pk_entry pk_algorithms[] = {
+	{"RSA", GNUTLS_PK_RSA},
+	{"DSA", GNUTLS_PK_DSA},
+	{0, 0}
+};
+
+#define GNUTLS_PK_LOOP(b) \
+        const gnutls_pk_entry *p; \
+                for(p = pk_algorithms; p->name != NULL; p++) { b ; }
+
+#define GNUTLS_PK_ALG_LOOP(a) \
+                        GNUTLS_PK_LOOP( if(p->id == algorithm) { a; break; } )
+
+
+
+/**
+  * gnutls_pk_algorithm_get_name - Returns a string with the name of the specified public key algorithm
+  * @algorithm: is a pk algorithm
+  *
+  * Returns a string that contains the name
+  * of the specified public key algorithm or NULL.
+  **/
+const char *gnutls_pk_algorithm_get_name( gnutls_pk_algorithm algorithm)
+{
+	const char *ret = NULL;
+
+	/* avoid prefix */
+	GNUTLS_PK_ALG_LOOP(ret =
+			     p->name);
+
+	return ret;
+}
