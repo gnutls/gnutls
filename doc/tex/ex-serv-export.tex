@@ -27,7 +27,7 @@
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials x509_cred;
+gnutls_certificate_server_credentials x509_cred;
 
 static void wrap_db_init(void);
 static void wrap_db_deinit(void);
@@ -55,11 +55,6 @@ gnutls_session initialize_tls_session()
 
    gnutls_dh_set_prime_bits(session, DH_BITS);
 
-   /* some broken clients may require this in order to connect. 
-    * This will weaken security though.
-    */
-   /* gnutls_handshake_set_rsa_pms_check( session, 1); */
-
    if (TLS_SESSION_CACHE != 0) {
       gnutls_db_set_retrieve_function(session, wrap_db_fetch);
       gnutls_db_set_remove_function(session, wrap_db_delete);
@@ -78,19 +73,27 @@ gnutls_rsa_params rsa_params;
 
 static int generate_dh_params(void)
 {
+   gnutls_datum prime, generator;
+
    /* Generate Diffie Hellman parameters - for use with DHE
     * kx algorithms. These should be discarded and regenerated
     * once a day, once a week or once a month. Depends on the
     * security requirements.
     */
    gnutls_dh_params_init(&dh_params);
-   gnutls_dh_params_generate2( dh_params, DH_BITS);
+   gnutls_dh_params_generate(&prime, &generator, DH_BITS);
+   gnutls_dh_params_set(dh_params, prime, generator, DH_BITS);
 
+   free(prime.data);
+   free(generator.data);
+   
    return 0;
 }
 
 static int generate_rsa_params(void)
 {
+   gnutls_datum m, e, d, p, q, u;
+
    gnutls_rsa_params_init(&rsa_params);
 
    /* Generate RSA parameters - for use with RSA-export
@@ -99,7 +102,15 @@ static int generate_rsa_params(void)
     * security requirements.
     */
 
-   gnutls_rsa_params_generate2( rsa_params, 512);
+   gnutls_rsa_params_generate(&m, &e, &d, &p, &q, &u, 512);
+   gnutls_rsa_params_set(rsa_params, m, e, d, p, q, u, 512);
+
+   free(m.data);
+   free(e.data);
+   free(d.data);
+   free(p.data);
+   free(q.data);
+   free(u.data);
 
    return 0;
 }

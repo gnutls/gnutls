@@ -139,7 +139,7 @@ void _gnutls_handshake_internal_state_clear( gnutls_session session) {
 
 }
 
-#define MIN_DH_BITS 511
+
 #define _gnutls_free(x) if(x!=NULL) gnutls_free(x)
 /**
   * gnutls_init - This function initializes the session to null (null encryption etc...).
@@ -193,7 +193,7 @@ int gnutls_init(gnutls_session * session, gnutls_connection_end con_end)
 
 	(*session)->internals.expire_time = DEFAULT_EXPIRE_TIME; /* one hour default */
 
-	gnutls_dh_set_prime_bits( (*session), MIN_DH_BITS);
+	gnutls_dh_set_prime_bits( (*session), MIN_BITS);
 
 	gnutls_transport_set_lowat((*session), DEFAULT_LOWAT); /* the default for tcp */
 
@@ -450,24 +450,6 @@ void gnutls_openpgp_send_key(gnutls_session session, gnutls_openpgp_key_status s
 	session->internals.pgp_fingerprint = status;
 }
 
-/**
-  * gnutls_certificate_send_x509_rdn_sequence - This function will order gnutls to or not to send the x.509 rdn sequence
-  * @session: is a pointer to a &gnutls_session structure.
-  * @status: is 0 or 1
-  *
-  * If status is non zero, this function will order gnutls not to send the rdnSequence 
-  * in the certificate request message. That is the server will not advertize
-  * it's trusted CAs to the peer. If status is zero then the default behaviour will
-  * take effect, which is to advertize the server's trusted CAs.
-  *
-  * This function has no effect in clients, and in authentication methods other than
-  * certificate with X.509 certificates.
-  *
-  **/
-void gnutls_certificate_send_x509_rdn_sequence(gnutls_session session, int status) {
-	session->internals.ignore_rdn_sequence = status;
-}
-
 int _gnutls_openpgp_send_fingerprint(gnutls_session session) {
 	return session->internals.pgp_fingerprint;
 }
@@ -535,7 +517,7 @@ void gnutls_handshake_set_private_extensions(gnutls_session session, int allow)
 	session->internals.enable_private = allow;
 }
 
-/**
+/*-
   * gnutls_handshake_set_rsa_pms_check - Used to disable the RSA PMS check
   * @session: is a &gnutls_session structure.
   * @prot: is an integer (0 or 1)
@@ -551,7 +533,7 @@ void gnutls_handshake_set_private_extensions(gnutls_session session, int allow)
   * if check == 0 then the check is enabled (default), otherwise it
   * is disabled.
   *
-  **/
+  -*/
 void gnutls_handshake_set_rsa_pms_check(gnutls_session session, int check)
 {
 	session->internals.rsa_pms_check = check;

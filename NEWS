@@ -1,4 +1,4 @@
-Version 0.8.9
+Version 0.8.9 (29/06/2003)
 - Corrected a null pointer dereference in gnutls_certificate_get_ours(). 
   Report and Patch by Steve Langasek <vorlon@netexpress.net>.
 - The gnutls_transport_ptr type was changed to a pointer type (void*).

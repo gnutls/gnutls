@@ -27,7 +27,7 @@
 #define DH_BITS 1024
 
 /* These are global */
-gnutls_certificate_credentials x509_cred;
+gnutls_certificate_server_credentials x509_cred;
 
 gnutls_session initialize_tls_session()
 {
@@ -48,18 +48,13 @@ gnutls_session initialize_tls_session()
 
    gnutls_dh_set_prime_bits( session, DH_BITS);
 
-   /* some broken clients may require this in order to connect. 
-    * This may weaken security though.
-    */
-   /* gnutls_handshake_set_rsa_pms_check( session, 1); */
-
-   
    return session;
 }
 
 gnutls_dh_params dh_params;
 
 static int generate_dh_params(void) {
+gnutls_datum prime, generator;
 
    /* Generate Diffie Hellman parameters - for use with DHE
     * kx algorithms. These should be discarded and regenerated
@@ -67,7 +62,11 @@ static int generate_dh_params(void) {
     * security requirements.
     */
    gnutls_dh_params_init( &dh_params);
-   gnutls_dh_params_generate2( dh_params, DH_BITS);
+   gnutls_dh_params_generate( &prime, &generator, DH_BITS);
+   gnutls_dh_params_set( dh_params, prime, generator, DH_BITS);
+
+   free( prime.data);
+   free( generator.data);
    
    return 0;
 }
