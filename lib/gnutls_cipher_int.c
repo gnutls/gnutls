@@ -25,8 +25,6 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 
-extern int _gcry_rc2_40_id;
-
 GNUTLS_CIPHER_HANDLE _gnutls_cipher_init( gnutls_cipher_algorithm cipher, 
 	const gnutls_datum *key, const gnutls_datum *iv)
 {
@@ -52,7 +50,7 @@ gcry_error_t err = GPG_ERR_GENERAL; /* doesn't matter */
 		err = gcry_cipher_open(&ret, GCRY_CIPHER_ARCFOUR, GCRY_CIPHER_MODE_STREAM, 0);
 		break;
 	case GNUTLS_CIPHER_RC2_40_CBC:
-		err = gcry_cipher_open(&ret, _gcry_rc2_40_id, GCRY_CIPHER_MODE_CBC, 0);
+		err = gcry_cipher_open(&ret, GCRY_CIPHER_RFC2268_40, GCRY_CIPHER_MODE_CBC, 0);
 		break;
 	}
 

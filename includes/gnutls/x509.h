@@ -61,8 +61,18 @@ extern "C" {
 #define GNUTLS_OID_LDAP_UID			"0.9.2342.19200300.100.1.1"
 #define GNUTLS_OID_PKCS9_EMAIL 			"1.2.840.113549.1.9.1"
 
-/* Certificate handling functions */
-                      
+/* Key purpose Object Identifiers.
+ */
+#define GNUTLS_KP_TLS_WWW_SERVER		"1.3.6.1.5.5.7.3.1"
+#define GNUTLS_KP_TLS_WWW_CLIENT		"1.3.6.1.5.5.7.3.2"
+#define GNUTLS_KP_CODE_SIGNING			"1.3.6.1.5.5.7.3.3"
+#define GNUTLS_KP_EMAIL_PROTECTION		"1.3.6.1.5.5.7.3.4"
+#define GNUTLS_KP_TIME_STAMPING			"1.3.6.1.5.5.7.3.8"
+#define GNUTLS_KP_OCSP_SIGNING			"1.3.6.1.5.5.7.3.9"
+#define GNUTLS_KP_ANY				"2.5.29.37.0"
+
+/* Certificate handling functions 
+ */
 
 int gnutls_x509_crt_init(gnutls_x509_crt * cert);
 void gnutls_x509_crt_deinit(gnutls_x509_crt cert);
@@ -90,6 +100,11 @@ int gnutls_x509_crt_get_signature_algorithm(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_version(gnutls_x509_crt cert);
 int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
 	unsigned char* output_data, size_t* output_data_size);
+
+int gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt cert, const void* id,
+	size_t id_size);
+int gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt cert, void* ret, 
+	size_t* ret_size, unsigned int* critical);
 
 int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void* ret,
         size_t* ret_size, unsigned int* critical);
@@ -288,6 +303,11 @@ int gnutls_x509_crt_check_revocation(gnutls_x509_crt cert,
 int gnutls_x509_crt_get_fingerprint(gnutls_x509_crt cert, 
 	gnutls_digest_algorithm algo, void *buf,
 	size_t *sizeof_buf);
+
+int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt cert, 
+	int indx, void *oid, size_t *sizeof_oid, unsigned int* critical);
+int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt cert, 
+	const void *oid, unsigned int critical);
 
 /* Private key handling
  */

@@ -1,7 +1,7 @@
 EXTRA_DIST = common.h crypt.gaa crypt-gaa.h README.srpcrypt \
 	README cli.gaa cli-gaa.h serv-gaa.h serv.gaa tls_test.gaa \
 	tls_test-gaa.h tests.h gnutls-http-serv list.h certtool-gaa.h \
-	certtool.gaa getpass.h
+	certtool.gaa getpass.h certtool-cfg.h
 
 SUBDIRS = srp x509 openpgp
 
@@ -22,8 +22,16 @@ noinst_PROGRAMS = retcodes
 retcodes_SOURCES = retcodes.c
 retcodes_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
 
-certtool_SOURCES = certtool-gaa.c certtool.c prime.c getpass.c
+if HAVE_LIBCFG
+certtool_SOURCES = certtool-gaa.c certtool.c prime.c getpass.c certtool-cfg.c
+certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS) -lcfg+
+else
+certtool_SOURCES = certtool-gaa.c certtool.c prime.c getpass.c certtool-cfg.c \
+	cfg/cfg+.c cfg/cfgfile.c cfg/cmdline.c cfg/parse.c cfg/props.c \
+	cfg/shared.c cfg/platon/str/dynfgets.c cfg/platon/str/strctype.c \
+	cfg/platon/str/strdyn.c cfg/platon/str/strplus.c
 certtool_LDADD = ../lib/libgnutls.la $(LIBGCRYPT_LIBS)
+endif
 
 
 crypt-gaa.c: crypt.gaa

@@ -618,6 +618,83 @@ int gnutls_x509_crt_get_subject_key_id(gnutls_x509_crt cert, void* ret,
 }
 
 /**
+  * gnutls_x509_crt_get_authority_key_id - This function returns the certificate authority's identifier
+  * @cert: should contain a gnutls_x509_crt structure
+  * @result: The place where the identifier will be copied
+  * @result_size: Holds the size of the result field.
+  * @critical: will be non zero if the extension is marked as critical (may be null)
+  *
+  * This function will return the X.509v3 certificate authority's key identifier.
+  * This is obtained by the X.509 Authority Key identifier extension
+  * field (2.5.29.35). Note that this function only returns the keyIdentifier
+  * field of the extension.
+  *
+  * Returns 0 on success and a negative value in case of an error.
+  *
+  **/
+int gnutls_x509_crt_get_authority_key_id(gnutls_x509_crt cert, void* ret, 
+	size_t* ret_size, unsigned int* critical)
+{
+	int result, len;
+	gnutls_datum id;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+
+	if (ret) memset(ret, 0, *ret_size);
+	else *ret_size = 0;
+
+	if ((result =
+	     _gnutls_x509_crt_get_extension(cert, "2.5.29.35", 0, &id, critical)) < 0) {
+		return result;
+	}
+
+	if (id.size == 0 || id.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.AuthorityKeyIdentifier", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_free_datum( &id);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, id.data, id.size, NULL);
+	_gnutls_free_datum( &id);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	len = *ret_size;
+	result =
+	     asn1_read_value(c2, "keyIdentifier", ret, &len);
+
+	*ret_size = len;
+	asn1_delete_structure(&c2);
+
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+}
+
+/**
   * gnutls_x509_crt_get_pk_algorithm - This function returns the certificate's PublicKey algorithm
   * @cert: should contain a gnutls_x509_crt structure
   * @bits: if bits is non null it will hold the size of the parameters' in bits
@@ -1514,6 +1591,95 @@ int gnutls_x509_crt_get_crl_dist_points(gnutls_x509_crt cert,
 	}
 
 	return type;
+}
+
+/**
+  * gnutls_x509_crt_get_key_purpose_oid - This function returns the Certificate's key purpose OIDs
+  * @cert: should contain a gnutls_x509_crt structure
+  * @indx: This specifies which OID to return. Use zero to get the first one.
+  * @oid: a pointer to a buffer to hold the OID (may be null)
+  * @sizeof_oid: initially holds the size of @oid
+  *
+  * This function will extract the key purpose OIDs of the Certificate specified
+  * by the given index. These are stored in the Extended Key Usage extension (2.5.29.37)
+  * See the GNUTLS_KP_* definitions for human readable names.
+  *
+  * If @oid is null then only the size will be filled.
+  *
+  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough, and
+  * in that case the sizeof_oid will be updated with the required size.
+  * On success 0 is returned.
+  *
+  **/
+int gnutls_x509_crt_get_key_purpose_oid(gnutls_x509_crt cert, 
+	int indx, void *oid, size_t *sizeof_oid, unsigned int* critical)
+{
+	char counter[MAX_INT_DIGITS];
+	char tmpstr[64];
+	int result, len;
+	gnutls_datum id;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	if (oid) memset(oid, 0, *sizeof_oid);
+	else *sizeof_oid = 0;
+
+	if ((result =
+	     _gnutls_x509_crt_get_extension(cert, "2.5.29.37", 0, &id, critical)) < 0) {
+		return result;
+	}
+
+	if (id.size == 0 || id.data==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.ExtKeyUsageSyntax", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		_gnutls_free_datum( &id);
+		return _gnutls_asn2err(result);
+	}
+
+	result = asn1_der_decoding(&c2, id.data, id.size, NULL);
+	_gnutls_free_datum( &id);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	indx++;
+	/* create a string like "?1"
+	 */
+	_gnutls_int2str(indx, counter);
+	_gnutls_str_cpy(tmpstr, sizeof(tmpstr), "?");
+	_gnutls_str_cat(tmpstr, sizeof(tmpstr), counter);
+
+	len = *sizeof_oid;
+	result =
+	     asn1_read_value(c2, tmpstr, oid, &len);
+
+	*sizeof_oid = len;
+	asn1_delete_structure(&c2);
+
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND) {
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	}
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	return 0;
+
 }
 
 #endif

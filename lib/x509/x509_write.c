@@ -641,4 +641,156 @@ int gnutls_x509_crt_set_subject_key_id(gnutls_x509_crt cert, const void* id,
 	return 0;
 }
 
+/**
+  * gnutls_x509_crt_set_authority_key_id - This function will set the certificate authority's key id
+  * @cert: should contain a gnutls_x509_crt structure
+  * @id: The key ID
+  * @id_size: Holds the size of the serial field.
+  *
+  * This function will set the X.509 certificate's authority key ID extension.
+  * Only the keyIdentifier field can be set with this function.
+  *
+  * Returns 0 on success, or a negative value in case of an error.
+  *
+  **/
+int gnutls_x509_crt_set_authority_key_id(gnutls_x509_crt cert, const void* id,
+	size_t id_size)
+{
+	int result;
+	gnutls_datum old_id, der_data;
+	unsigned int critical;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(cert, "2.5.29.35", 0, &old_id, &critical);
+
+	if (result >= 0) _gnutls_free_datum( &old_id);
+	if (result != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	/* generate the extension.
+	 */
+	result = _gnutls_x509_ext_gen_auth_key_id( id, id_size, &der_data);
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	result = _gnutls_x509_crt_set_extension( cert, "2.5.29.35", &der_data, 0);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	cert->use_extensions = 1;
+
+	return 0;
+}
+
+/**
+  * gnutls_x509_crt_set_key_purpose_oid - This function sets the Certificate's key purpose OIDs
+  * @cert: should contain a gnutls_x509_crt structure
+  * @oid: a pointer to a null terminated string that holds the OID
+  * @critical: Whether this extension will be critical or not
+  *
+  * This function will set the key purpose OIDs of the Certificate.
+  * These are stored in the Extended Key Usage extension (2.5.29.37)
+  * See the GNUTLS_KP_* definitions for human readable names.
+  *
+  * Subsequent calls to this function will append OIDs to the OID list.
+  *
+  * On success 0 is returned.
+  *
+  **/
+int gnutls_x509_crt_set_key_purpose_oid(gnutls_x509_crt cert, 
+	const void *oid, unsigned int critical)
+{
+	int result;
+	gnutls_datum old_id, der_data;
+	ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+	if (cert==NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
+	result=asn1_create_element
+	    (_gnutls_get_pkix(), "PKIX1.ExtKeyUsageSyntax", &c2);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	/* Check if the extension already exists.
+	 */
+	result = _gnutls_x509_crt_get_extension(cert, "2.5.29.37", 0, &old_id, NULL);
+
+	if (result >= 0) {
+		/* decode it.
+		 */
+		result = asn1_der_decoding(&c2, old_id.data, old_id.size, NULL);
+		_gnutls_free_datum( &old_id);
+
+		if (result != ASN1_SUCCESS) {
+			gnutls_assert();
+			asn1_delete_structure(&c2);
+			return _gnutls_asn2err(result);
+		}
+
+	}
+
+	/* generate the extension.
+	 */
+	/* 1. create a new element.
+	 */
+	result = asn1_write_value( c2, "", "NEW", 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	/* 2. Add the OID.
+	 */
+	result = asn1_write_value(c2, "?LAST", oid, 1);
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		asn1_delete_structure(&c2);
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_der_encode( c2, "", &der_data, 0);
+	asn1_delete_structure(&c2);
+
+	if (result != ASN1_SUCCESS) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	result = _gnutls_x509_crt_set_extension( cert, "2.5.29.37", 
+		&der_data, critical);
+
+	_gnutls_free_datum( &der_data);
+
+	if (result < 0) {
+		gnutls_assert();
+		return result;
+	}
+
+	cert->use_extensions = 1;
+
+	return 0;
+
+}
+
 #endif /* ENABLE_PKI */

@@ -351,6 +351,28 @@ AC_MSG_CHECKING([whether to use the included minitasn1])
 AC_MSG_RESULT($minitasn1_enabled)
 
 
+dnl Check for libcfg+
+
+AC_ARG_WITH(included-libcfg,
+	[  --with-included-libcfg   Use the included libcfg+],
+libcfg_enabled=$withval, 
+libcfg_enabled=no
+
+dnl We search for libcfg+ which is used by certtool
+dnl
+AC_CHECK_LIB( cfg+, cfg_get_context,:, 
+ libcfg_enabled=yes
+AC_MSG_WARN([[
+*** 
+*** Libcfg+ was not found. Will use the included one.]])))
+
+AM_CONDITIONAL(HAVE_LIBCFG, test "$libcfg_enabled" = "no")
+LIBS=$SAVED_LIBS
+
+AC_MSG_CHECKING([whether to use the included libcfg])
+AC_MSG_RESULT($libcfg_enabled)
+
+
 dnl CHECK FOR ZLIB SUPPORT
 dnl
 
@@ -502,6 +524,7 @@ AC_CONFIG_COMMANDS([includes/gnutls/gnutls.h],[[
 
 AC_CONFIG_FILES([Makefile src/Makefile libextra/Makefile lib/Makefile \
 libextra/openpgp/Makefile lib/libgnutls-config libextra/libgnutls-extra-config \
+src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 doc/Makefile src/x509/Makefile src/srp/Makefile src/openpgp/Makefile \
 doc/tex/Makefile doc/tex/cover.tex doc/scripts/Makefile \
 doc/examples/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
