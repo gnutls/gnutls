@@ -115,7 +115,6 @@ int i;
  * This is used to allow further handshakes.
  */
 void _gnutls_handshake_internal_state_clear( GNUTLS_STATE state) {
-	state->gnutls_internals.pgp_fingerprint = 0;
 	state->gnutls_internals.extensions_sent_size = 0;
 
 	/* by default no selected certificate */
