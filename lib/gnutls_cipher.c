@@ -27,18 +27,6 @@
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
 
-int _gnutls_make_mul(int x, int y)
-{
-	int ret = 0;
-
-	do {
-		ret += y;
-	} while (ret < x);
-
-	return ret;
-
-}
-
 /* Sets the specified cipher into the pending state */
 int _gnutls_set_cipher(GNUTLS_STATE state, BulkCipherAlgorithm algo)
 {
@@ -94,6 +82,8 @@ int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
 
 	if (_gnutls_mac_is_ok(algo) == 0) {
 		state->security_parameters.mac_algorithm = algo;
+		state->security_parameters.hash_size =
+			_gnutls_mac_get_digest_size(algo);
 	} else {
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
@@ -102,7 +92,7 @@ int _gnutls_set_mac(GNUTLS_STATE state, MACAlgorithm algo)
 		gnutls_assert();
 		return GNUTLS_E_UNWANTED_ALGORITHM;
 	}
-	state->security_parameters.hash_size = _gnutls_mac_get_digest_size(algo);
+
 	
 	return 0;
 
@@ -147,6 +137,8 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	fprintf(stderr, "Cipher Suite: %s\n",
 		_gnutls_cipher_suite_get_name(state->gnutls_internals.
 					      current_cipher_suite));
+	fprintf(stderr, "Cipher: %s\n", _gnutls_cipher_get_name(state->security_parameters.bulk_cipher_algorithm));
+	fprintf(stderr, "MAC: %s\n", _gnutls_mac_get_name(state->security_parameters.mac_algorithm));
 	fprintf(stderr, "Compression: %s\n", "null");
 #endif
 
@@ -179,6 +171,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 		mac_size = _gnutls_mac_get_digest_size(state->security_parameters.mac_algorithm);
 		state->connection_state.read_mac_secret = NULL;
 		state->connection_state.write_mac_secret = NULL;
+		state->connection_state.mac_secret_size = state->security_parameters.hash_size;
 
 		if ( mac_size > 0) {
 			state->connection_state.read_mac_secret = gnutls_malloc(mac_size);
@@ -269,6 +262,7 @@ int _gnutls_connection_state_init(GNUTLS_STATE state)
 	return 0;
 }
 
+/* This is the actual encryption */
 int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 					GNUTLSCiphertext **
 					cipher,
@@ -284,14 +278,9 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	int length;
 	GNUTLS_MAC_HANDLE td;
 	int blocksize = _gnutls_cipher_get_block_size(state->security_parameters.bulk_cipher_algorithm);
-	
+int i;
 	content = gnutls_malloc(compressed->length);
 	memmove(content, compressed->fragment, compressed->length);
-
-/* not needed since in mhash the buffer is automaticaly allocated */
-/*	if (state->connection_state.mac_secret_size>0) {
-		MAC = gnutls_malloc(state->connection_state.mac_secret_size);
-	}*/
 
 	*cipher = gnutls_malloc(sizeof(GNUTLSCiphertext));
 	ciphertext = *cipher;
@@ -328,12 +317,12 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	case CIPHER_STREAM: 
 			length =
 			    compressed->length +
-			    state->connection_state.mac_secret_size;
+			    state->security_parameters.hash_size;
 
 			data = gnutls_malloc(length);
 			memmove(data, content, compressed->length);
 			memmove(&data[compressed->length], MAC,
-				state->connection_state.mac_secret_size);
+				state->security_parameters.hash_size);
 
 			gnutls_cipher_encrypt(state->
 					    connection_state.write_cipher_state,
@@ -348,23 +337,25 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 
 		break;
 	case CIPHER_BLOCK:
-			rand = gcry_random_bytes(1, GCRY_STRONG_RANDOM);
-			rand[0] = rand[0] % (255-_gnutls_cipher_get_block_size(state->security_parameters.bulk_cipher_algorithm));
+			rand = gcry_random_bytes(1, GCRY_WEAK_RANDOM);
+
+			/* make rand a multiple of blocksize */
+			rand[0] = (rand[0]%(255/blocksize))*blocksize;
 			
 			length =
 			    compressed->length +
-			    state->connection_state.mac_secret_size;
-			pad = (uint8) (blocksize - (length%blocksize));
+			    state->security_parameters.hash_size;
+			pad = (uint8)(blocksize - (length%blocksize)) + rand[0];
 
 			length += pad;
 			data = gnutls_malloc(length);
 
 			memset(&data[length-pad], pad-1, pad);
 			memmove(data, content, compressed->length);
+
+
 			memmove(&data[compressed->length], MAC,
-				state->connection_state.mac_secret_size);
-
-
+				state->security_parameters.hash_size);
 			gnutls_cipher_encrypt(state->
 					    connection_state.write_cipher_state,
 					    data, length);
@@ -411,10 +402,6 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	content = gnutls_malloc(ciphertext->length);
 	memmove(content, ciphertext->fragment, ciphertext->length);
 
-/*	if (state->connection_state.mac_secret_size>0) {
-		MAC = gnutls_malloc(state->connection_state.mac_secret_size);
-	}*/
-
 	*compress = gnutls_malloc(sizeof(GNUTLSCompressed));
 	compressed = *compress;
 
@@ -434,7 +421,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	case CIPHER_STREAM:
 			length =
 			    ciphertext->length -
-			    state->connection_state.mac_secret_size;
+			    state->security_parameters.hash_size;
 			data = gnutls_malloc(length);
 			memmove(data, content, length);
 
@@ -458,9 +445,9 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 			pad = content[ciphertext->length - 1] + 1; /* pad */
 			length =
 			    ciphertext->length -
-			    state->connection_state.mac_secret_size - pad;
+			    state->security_parameters.hash_size - pad;
 
-			if (pad > ciphertext->length - state->connection_state.mac_secret_size) {
+			if (pad > ciphertext->length - state->security_parameters.hash_size) {
 				gnutls_assert();
 				return GNUTLS_E_RECEIVED_BAD_MESSAGE;
 			}
@@ -503,7 +490,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	/* HMAC was not the same. */
 	if (memcmp
 	    (MAC, &content[compressed->length],
-	     state->connection_state.mac_secret_size) != 0) {
+	     state->security_parameters.hash_size) != 0) {
 #ifdef DEBUG
 		fprintf(stderr, "MAC FAILED\n");
 #endif

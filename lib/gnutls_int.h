@@ -4,7 +4,9 @@
 
 #define GNUTLS_INT_H
 
-#define HARD_DEBUG
+#undef HARD_DEBUG
+#undef READ_DEBUG
+#undef WRITE_DEBUG
 #define DEBUG
 
 #define MAX32 4294967295

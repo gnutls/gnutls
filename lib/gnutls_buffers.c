@@ -113,7 +113,7 @@ ssize_t Read(int fd, void *iptr, size_t sizeOfPtr)
 	size_t left;
 	ssize_t i=0;
 	char *ptr = iptr;
-#ifdef DEBUG
+#ifdef READ_DEBUG
 	int j,x, sum=0;
 #endif
 
@@ -132,7 +132,7 @@ ssize_t Read(int fd, void *iptr, size_t sizeOfPtr)
 
 	}
 
-#ifdef DEBUG
+#ifdef READ_DEBUG
 	fprintf(stderr, "read %d bytes from %d\n", (sizeOfPtr-left), fd);
 	for (x=0;x<((sizeOfPtr-left)/16)+1;x++) {
 		fprintf(stderr, "%.4x - ",x);
@@ -154,13 +154,13 @@ ssize_t Read(int fd, void *iptr, size_t sizeOfPtr)
 ssize_t Write(int fd, const void *iptr, size_t n)
 {
 	size_t left;
-#ifdef DEBUG
+#ifdef WRITE_DEBUG
 	int j,x, sum=0;
 #endif
 	ssize_t i = 0;
 	const char *ptr = iptr;
 
-#ifdef DEBUG
+#ifdef WRITE_DEBUG
 	fprintf(stderr, "wrote %d bytes to %d\n", n, fd);
 	for (x=0;x<(n/16)+1;x++) {
 		fprintf(stderr, "%.4x - ",x);
