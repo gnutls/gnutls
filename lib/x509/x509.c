@@ -1045,6 +1045,7 @@ int gnutls_x509_crt_export( gnutls_x509_crt cert,
 /**
   * gnutls_x509_crt_get_key_id - This function will return a unique ID of the public key's parameters
   * @crt: Holds the certificate
+  * @flags: should be 0 for now
   * @output_data: will contain the key ID
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
@@ -1060,7 +1061,7 @@ int gnutls_x509_crt_export( gnutls_x509_crt cert,
   * 0 on success.
   *
   **/
-int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt,
+int gnutls_x509_crt_get_key_id( gnutls_x509_crt crt, unsigned int flags,
 	unsigned char* output_data, int* output_data_size)
 {
 GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];

@@ -1055,6 +1055,7 @@ opaque algo = GNUTLS_PK_DSA;
 /**
   * gnutls_x509_privkey_get_key_id - This function will return a unique ID of the key's parameters
   * @key: Holds the key
+  * @flags: should be 0 for now
   * @output_data: will contain the key ID
   * @output_data_size: holds the size of output_data (and will be replaced by the actual size of parameters)
   *
@@ -1070,7 +1071,7 @@ opaque algo = GNUTLS_PK_DSA;
   * 0 on success.
   *
   **/
-int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key,
+int gnutls_x509_privkey_get_key_id( gnutls_x509_privkey key, unsigned int flags,
 	unsigned char* output_data, int* output_data_size)
 {
 		

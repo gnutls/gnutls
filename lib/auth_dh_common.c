@@ -75,7 +75,7 @@ int _gnutls_proc_dh_common_client_kx(gnutls_session session, opaque * data,
 	_gnutls_mpi_release(&session->key->client_Y);
 	_gnutls_mpi_release(&session->key->dh_secret);
 
-	ret = _gnutls_generate_key(session->key);
+	ret = _gnutls_generate_session_key(session->key);
 	_gnutls_mpi_release(&session->key->KEY);
 
 	if (ret < 0) {
@@ -143,7 +143,7 @@ int _gnutls_gen_dh_common_client_kx(gnutls_session session, opaque ** data)
 	_gnutls_mpi_release(&session->key->client_p);
 	_gnutls_mpi_release(&session->key->client_g);
 
-	ret = _gnutls_generate_key(session->key);
+	ret = _gnutls_generate_session_key(session->key);
 	_gnutls_mpi_release(&session->key->KEY);
 
 	if (ret < 0) {

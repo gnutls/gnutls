@@ -40,7 +40,7 @@
 	_gnutls_mpi_release(g);
 */
 
-#define MAX_BITS 12000
+#define MAX_BITS 18000
 
 /* returns the public value (X), and the secret (ret_x).
  */

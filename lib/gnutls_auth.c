@@ -304,7 +304,7 @@ int _gnutls_auth_info_set( gnutls_session session, gnutls_credentials_type type,
 /* this function will copy an GNUTLS_MPI key to 
  * opaque data.
  */
-int _gnutls_generate_key(GNUTLS_KEY key) {
+int _gnutls_generate_session_key(GNUTLS_KEY key) {
 size_t tmp;
 
         _gnutls_mpi_print( NULL, &tmp, key->KEY);
