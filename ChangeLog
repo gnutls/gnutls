@@ -1,3 +1,39 @@
+2002-06-08 20:34  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_mem.c, gnutls_mem.h:
+
+	Removed gnutls_strdup(). Replaced with a pointer to libc's strdup() 
+	function.  
+
+2002-06-08 20:32  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c:
+
+	No longer realloc() the record buffers. It had some meaning when
+	gnutls_realloc_fast() was there, but now they one cause a slowdown.  
+
+2002-06-08 12:38  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_int.h, lib/gnutls_state.c, src/cli.c, src/serv.c:
+
+	Created gnutls_handshake_set_private_extensions() function.  
+
+2002-06-07 20:14  nmav <nmav@gnutls.org>
+
+	* configure.in, lib/defines.h, lib/gnutls_algorithms.c,
+	lib/gnutls_int.h, lib/gnutls_state.c:
+
+	Corrected issues with ptrdiff_t. Added option to enable private
+	(experimental) cipher suites. They are now disabled by default so
+	they do not create interoperability problems.  
+
+2002-06-07 19:03  nmav <nmav@gnutls.org>
+
+	* configure.in:
+
+	added check for ptrdiff_t type.  
+
 2002-06-03 16:09  nmav <nmav@gnutls.org>
 
 	* ChangeLog, doc/tex/Makefile.am, doc/tex/asn1.tex,
