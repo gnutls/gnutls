@@ -21,6 +21,9 @@
 #include <defines.h>
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
+#ifdef HAVE_ERRNO_H
+# include <errno.h>
+#endif
 
 int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, int length)
 {
@@ -124,6 +127,9 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 	return length;
 }
 
+/* This function is like read. But it does not return -1 on error.
+ * It does return -errno instead.
+ */
 ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 {
 	size_t left;
@@ -138,7 +144,7 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 	while (left > 0) {
 		i = recv(fd, &ptr[i], left, flag);
 		if (i < 0) {
-			return -1;
+			return (0-errno);
 		} else {
 			if (i == 0)
 				break;	/* EOF */
@@ -167,6 +173,9 @@ ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 }
 
 
+/* This function is like write. But it does not return -1 on error.
+ * It does return -errno instead.
+ */
 ssize_t _gnutls_Write(int fd, const void *iptr, size_t n)
 {
 	size_t left;
@@ -192,8 +201,8 @@ ssize_t _gnutls_Write(int fd, const void *iptr, size_t n)
 	left = n;
 	while (left > 0) {
 		i = write(fd, &ptr[i], left);
-		if (i <= 0) {
-			return -1;
+		if (i == -1) {
+			return (0-errno);
 		}
 		left -= i;
 	}

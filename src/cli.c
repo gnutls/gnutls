@@ -53,6 +53,10 @@ const ANON_AUTH_INFO *dh_info;
 			       dh_info->dh_bits);
 	}
 
+	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+	printf("- Version: %s\n", tmp);
+	free(tmp);
+
 	tmp = gnutls_compression_get_name(gnutls_get_current_compression_method( state));
 	printf("- Compression: %s\n", tmp); free(tmp);
 
@@ -104,7 +108,7 @@ int main()
 	gnutls_init(&state, GNUTLS_CLIENT);
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL, 0);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_ARCFOUR, GNUTLS_RIJNDAEL_CBC, 0);
 	gnutls_set_compression_priority( state, GNUTLS_ZLIB, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);
@@ -152,7 +156,7 @@ int main()
 	
 	gnutls_set_current_version( state, GNUTLS_TLS1);
 
-	gnutls_set_cipher_priority( state, GNUTLS_3DES, GNUTLS_TWOFISH , GNUTLS_RIJNDAEL, GNUTLS_ARCFOUR, 0);
+	gnutls_set_cipher_priority( state, GNUTLS_3DES_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_ARCFOUR, 0);
 	gnutls_set_compression_priority( state, GNUTLS_NULL_COMPRESSION, 0);
 	gnutls_set_kx_priority( state, GNUTLS_KX_SRP, GNUTLS_KX_DH_ANON, 0);
 	gnutls_set_cred( state, GNUTLS_ANON, NULL);

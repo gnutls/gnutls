@@ -34,8 +34,9 @@
 #include "gnutls_db.h"
 #include "gnutls_auth_int.h"
 #include "gnutls_num.h"
+#include "gnutls_record.h"
 #ifdef HAVE_ERRNO_H
-#include <errno.h>
+# include <errno.h>
 #endif
 
 #ifndef EAGAIN
@@ -385,12 +386,14 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	state->cipher_specs.server_write_key = secure_malloc(key_size);
 	memmove(state->cipher_specs.server_write_key, &key_block[2 * hash_size + key_size], key_size);
 
-	state->cipher_specs.client_write_IV = secure_malloc(IV_size);
-	memmove(state->cipher_specs.client_write_IV, &key_block[2 * key_size + 2 * hash_size], IV_size);
-
-	state->cipher_specs.server_write_IV = secure_malloc(IV_size);
-	memmove(state->cipher_specs.server_write_IV, &key_block[2 * hash_size + 2 * key_size + IV_size], IV_size);
-
+	if (IV_size > 0) {
+		state->cipher_specs.client_write_IV = secure_malloc(IV_size);
+		memmove(state->cipher_specs.client_write_IV, &key_block[2 * key_size + 2 * hash_size], IV_size);
+	
+		state->cipher_specs.server_write_IV = secure_malloc(IV_size);
+		memmove(state->cipher_specs.server_write_IV, &key_block[2 * hash_size + 2 * key_size + IV_size], IV_size);
+	}
+	
 	secure_free(key_block);
 	return 0;
 }
@@ -439,7 +442,7 @@ int _gnutls_check_for_pending_alert(int cd, GNUTLS_STATE state)
 {
 	int ret;
 
-	/* receive the closure alert */
+	/* receive the alert */
 	ret = gnutls_recv_int(cd, state, GNUTLS_ALERT, NULL, 0, 0|MSG_DONTWAIT); 
 
 	return ret;
@@ -477,9 +480,21 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 		return GNUTLS_E_INVALID_SESSION;
 	}
 	
+	/* Before we send data while in handshake, we
+	 * check for any FATAL alert. Our intention
+	 * here is to minimize to possibility of receiving
+	 * a SIGPIPE.
+	 */
 	if (type==GNUTLS_HANDSHAKE) {
-		if ((ret = _gnutls_check_for_pending_alert(cd, state)) < 0)
+		if ((ret = _gnutls_check_for_pending_alert(cd, state)) < 0) {
+			if (ret==GNUTLS_E_WARNING_ALERT_RECEIVED) {
+#ifdef DEBUG
+				fprintf(stderr, "Record: Got alert[%d] - %s - Ignoring...\n", gnutls_get_last_alert(state), _gnutls_alert2str(gnutls_get_last_alert(state)));
+#endif	
+				return 0;
+			}
 			return ret;
+		}
 	}
 	
 	if (sizeofdata < MAX_ENC_LEN) {
@@ -660,16 +675,15 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 	/* in order for GNUTLS_E_AGAIN to be returned the socket
 	 * must be set to non blocking mode
 	 */
-	if ( _gnutls_Read(cd, headers, HEADER_SIZE, MSG_PEEK|flags) != HEADER_SIZE) {
-		if (type==GNUTLS_ALERT && flags==MSG_DONTWAIT) 
+	if ( (ret = _gnutls_Read(cd, headers, HEADER_SIZE, MSG_PEEK|flags)) != HEADER_SIZE) {
+		if (type==GNUTLS_ALERT && flags==MSG_DONTWAIT && ret==(0-EAGAIN)) 
 			return 0;                 /* we expected an alert
 		                                   * but nothing came thus success.
 		                                   * we only wait for an alert
 		                                   * in check_pending_alert().
 		                                   */
-		/* How do we handle errno in a multithread environment? 
-		 */
-		if (errno==EAGAIN) return GNUTLS_E_AGAIN;
+		if (ret==(0-EAGAIN)) return GNUTLS_E_AGAIN;
+
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		if (type==GNUTLS_ALERT) return 0; /* we were expecting close notify */
 		state->gnutls_internals.resumable = RESUME_FALSE;
@@ -738,10 +752,10 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 /* check if we have that data into buffer. This seems to be
  * expensive - but this is the only way to handle Non Blocking IO.
  */
-	if ( _gnutls_Read(cd, ciphertext, header_size+length, MSG_PEEK|flags) != length+header_size) {
+	if ( (ret = _gnutls_Read(cd, ciphertext, header_size+length, MSG_PEEK|flags)) != length+header_size) {
 		gnutls_free(ciphertext);
 		
-		if (errno==EAGAIN) return GNUTLS_E_AGAIN;
+		if (ret==(0-EAGAIN)) return GNUTLS_E_AGAIN;
 		state->gnutls_internals.valid_connection = VALID_FALSE;
 		state->gnutls_internals.resumable = RESUME_FALSE;
 		gnutls_assert();

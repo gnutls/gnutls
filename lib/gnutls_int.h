@@ -109,7 +109,7 @@ typedef struct {
 
 /* STATE */
 typedef enum ConnectionEnd { GNUTLS_SERVER, GNUTLS_CLIENT } ConnectionEnd;
-typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES, GNUTLS_RIJNDAEL, GNUTLS_TWOFISH, GNUTLS_RIJNDAEL256 } BulkCipherAlgorithm;
+typedef enum BulkCipherAlgorithm { GNUTLS_NULL_CIPHER=1, GNUTLS_ARCFOUR, GNUTLS_3DES_CBC, GNUTLS_RIJNDAEL_CBC, GNUTLS_TWOFISH_CBC, GNUTLS_RIJNDAEL256_CBC } BulkCipherAlgorithm;
 typedef enum Extensions { GNUTLS_EXTENSION_SRP=7, GNUTLS_EXTENSION_DNSNAME } Extensions;
 typedef enum KXAlgorithm { GNUTLS_KX_RSA=1, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_DH_DSS, GNUTLS_KX_DH_RSA, GNUTLS_KX_DH_ANON, GNUTLS_KX_SRP } KXAlgorithm;
 typedef enum CredType { GNUTLS_X509PKI=1, GNUTLS_ANON, GNUTLS_SRP } CredType;
@@ -208,10 +208,7 @@ typedef struct {
 	opaque* client_write_key;
 } CipherSpecs;
 
-
-#define GNUTLS_Version int
-#define GNUTLS_TLS1 0
-#define GNUTLS_SSL3 1
+typedef enum GNUTLS_Version { GNUTLS_TLS1, GNUTLS_SSL3 } GNUTLS_Version;
 
 typedef struct {
 	GNUTLS_Version	version;

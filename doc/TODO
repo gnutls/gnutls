@@ -6,3 +6,5 @@
 * Add certificate verification in order for clients to work
 * Optimize X509PKI_SERVER_CREDENTIALS so that there should be
   only one parse of the der structures.
+* Create global variables that hold read/write and initialize
+  the ASN.1 parser's structures.

@@ -61,6 +61,10 @@
 # include <sys/socket.h>
 #endif
 
+#ifdef LIBMCRYPT24
+# define USE_MCRYPT
+#endif
+
 #if SIZEOF_UNSIGNED_LONG_INT == 8
 # define HAVE_UINT64
 /* only used native uint64 in 64 bit machines */

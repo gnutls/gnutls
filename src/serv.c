@@ -34,38 +34,228 @@
 #define PKCS "pkcs1.asn"
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
-void PARSE() {
-  int result=parser_asn1(PKIX);
 
-  if(result==ASN_SYNTAX_ERROR){
-    printf("%s: PARSE ERROR\n", PKIX);
-    return;
-  }
-  else if(result==ASN_IDENTIFIER_NOT_FOUND){
-    printf("%s: IDENTIFIER NOT FOUND\n", PKIX);
-    return;
-  }
+/* konqueror cannot handle sending the page in multiple
+ * pieces.
+ */
+static char http_buffer[16*1024];
 
-  result=parser_asn1(PKCS);
+/* This is a sample TCP echo server.
+ * This will behave as an http server if any argument in the
+ * command line is present
+ */
 
-  if(result==ASN_SYNTAX_ERROR){
-    printf("%s: PARSE ERROR\n", PKCS);
-    return;
-  }
-  else if(result==ASN_IDENTIFIER_NOT_FOUND){
-    printf("%s: IDENTIFIER NOT FOUND\n", PKCS);
-    return;
-  }
+void PARSE()
+{
+	/* this is to be moved to gnutls */
+	int result = parser_asn1(PKIX);
+
+	if (result == ASN_SYNTAX_ERROR) {
+		printf("%s: PARSE ERROR\n", PKIX);
+		return;
+	} else if (result == ASN_IDENTIFIER_NOT_FOUND) {
+		printf("%s: IDENTIFIER NOT FOUND\n", PKIX);
+		return;
+	}
+
+	result = parser_asn1(PKCS);
+
+	if (result == ASN_SYNTAX_ERROR) {
+		printf("%s: PARSE ERROR\n", PKCS);
+		return;
+	} else if (result == ASN_IDENTIFIER_NOT_FOUND) {
+		printf("%s: IDENTIFIER NOT FOUND\n", PKCS);
+		return;
+	}
 
 }
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
-#define MAX_BUF 100
+#define MAX_BUF 1024
+
+#define HTTP_BEGIN "HTTP/1.0 200 OK\n" \
+		"Content-Type: text/html\n" \
+		"\n" \
+		"<HTML><BODY>\n" \
+		"<CENTER><H1>This is <a href=\"http://www.gnu.org/software/gnutls\">" \
+		"GNUTLS</a></H1>\n\n"
+
+#define HTTP_END  "</BODY></HTML>\n\n"
 
 #undef RENEGOTIATE
 
-int main()
+/* These are global */
+SRP_SERVER_CREDENTIALS srp_cred;
+ANON_SERVER_CREDENTIALS dh_cred;
+X509PKI_SERVER_CREDENTIALS x509_cred;
+
+
+GNUTLS_STATE initialize_state()
+{
+	GNUTLS_STATE state;
+	int ret;
+
+	if (gnutls_read_certs(&x509_cred, CERTFILE, KEYFILE) < 0) {
+		fprintf(stderr, "X509 PARSE ERROR\n");
+		exit(1);
+	}
+
+	/* this is a password file (created with the included crypt utility) 
+	 * Read README.crypt prior to using SRP.
+	 */
+	srp_cred.password_file = "tpasswd";
+	srp_cred.password_conf_file = "tpasswd.conf";
+
+	dh_cred.dh_bits = 1024;
+
+	gnutls_init(&state, GNUTLS_SERVER);
+	if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
+		fprintf(stderr, "*** DB error (%d)\n", ret);
+
+	gnutls_set_cipher_priority(state, GNUTLS_ARCFOUR,
+				   GNUTLS_RIJNDAEL_CBC, GNUTLS_3DES_CBC, 0);
+	gnutls_set_compression_priority(state, GNUTLS_NULL_COMPRESSION, 0);
+	gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
+			       GNUTLS_KX_DH_ANON, 0);
+	gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);
+	gnutls_set_cred(state, GNUTLS_SRP, &srp_cred);
+	gnutls_set_cred(state, GNUTLS_X509PKI, &x509_cred);
+
+	gnutls_set_mac_priority(state, GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0);
+
+	return state;
+}
+
+void print_info(GNUTLS_STATE state)
+{
+	const SRP_AUTH_INFO *srp_info;
+	const ANON_AUTH_INFO *dh_info;
+	char *tmp;
+
+	/* print srp specific data */
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
+		srp_info = gnutls_get_auth_info(state);
+		if (srp_info != NULL)
+			printf("\n- User '%s' connected\n",
+			       srp_info->username);
+	}
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+		dh_info = gnutls_get_auth_info(state);
+		if (dh_info != NULL)
+			printf("\n- Anonymous DH using prime of %d bits\n",
+			       dh_info->dh_bits);
+	}
+
+	/* print state information */
+
+	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+	printf("- Version: %s\n", tmp);
+	free(tmp);
+
+	tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
+	printf("- Key Exchange: %s\n", tmp);
+	free(tmp);
+	tmp =
+	    gnutls_compression_get_name
+	    (gnutls_get_current_compression_method(state));
+	printf("- Compression: %s\n", tmp);
+	free(tmp);
+	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
+	printf("- Cipher: %s\n", tmp);
+	free(tmp);
+	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
+	printf("- MAC: %s\n", tmp);
+	free(tmp);
+
+
+}
+
+#define tmp2 &http_buffer[strlen(http_buffer)]
+void peer_print_info(int cd, GNUTLS_STATE state)
+{
+	const SRP_AUTH_INFO *srp_info;
+	const ANON_AUTH_INFO *dh_info;
+	char *tmp;
+	
+	/* print srp specific data */
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
+		srp_info = gnutls_get_auth_info(state);
+		if (srp_info != NULL) {
+			sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
+			       srp_info->username);
+		}
+	}
+	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
+		dh_info = gnutls_get_auth_info(state);
+		if (dh_info != NULL) {
+			sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
+			       dh_info->dh_bits);
+		}
+
+	}
+
+	/* print state information */
+	strcat( http_buffer, "<P>\n");
+
+	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
+	sprintf(tmp2, "Protocol version: <b>%s</b><br>\n", tmp);
+	free(tmp);
+
+	tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
+	sprintf(tmp2, "Key Exchange: <b>%s</b><br>\n", tmp);
+	free(tmp);
+
+	tmp =
+	    gnutls_compression_get_name
+	    (gnutls_get_current_compression_method(state));
+	sprintf(tmp2, "Compression: <b>%s</b><br>\n", tmp);
+	free(tmp);
+	
+	tmp = gnutls_cipher_get_name(gnutls_get_current_cipher(state));
+	sprintf(tmp2, "Cipher: <b>%s</b><br>\n", tmp);
+	free(tmp);
+	
+	tmp = gnutls_mac_get_name(gnutls_get_current_mac_algorithm(state));
+	sprintf(tmp2, "MAC: <b>%s</b><br>\n", tmp);
+	free(tmp);
+
+	strcat( http_buffer, "</P>\n");
+
+	return;
+}
+
+int read_request(int cd, GNUTLS_STATE state, char *data, int data_size, int rnl)
+{
+	/* rnl is the requested new lines. Eg. return if 3 newlines
+	 * were given 
+	 */
+	int n, rc, nl = 0;
+	char c, *ptr;
+
+	ptr = data;
+	for (n = 1; n < data_size; n++) {
+		if ((rc = gnutls_read(cd, state, &c, 1)) == 1) {
+			*ptr++ = c;
+			if (c == '\n') {
+				nl++;
+				if (nl == rnl)
+					break;
+			}
+		} else if (rc == 0) {
+			if (n == 1)
+				return 0;
+			else
+				break;
+		} else {
+			return rc;
+		}
+	}
+	*ptr = 0;
+	return n;
+}
+
+int main(int argc, char **argv)
 {
 	int err, listen_sd, i;
 	int sd, ret;
@@ -76,27 +266,23 @@ int main()
 	GNUTLS_STATE state;
 	char buffer[MAX_BUF + 1];
 	int optval = 1;
-	SRP_SERVER_CREDENTIALS srp_cred;
-	const SRP_AUTH_INFO *srp_info;
-	ANON_SERVER_CREDENTIALS dh_cred;
-	const ANON_AUTH_INFO *dh_info;
-	X509PKI_SERVER_CREDENTIALS x509_cred;
+	int http = 0;
+	char name[256];
 
-	PARSE();
-
-	if ( gnutls_read_certs( &x509_cred, CERTFILE, KEYFILE) < 0 ) {
-		fprintf(stderr, "X509 PARSE ERROR\n");
-		return -1;
+	if (argc != 2) {
+		fprintf(stderr, "Usage: serv [-e] [-h]\n");
+		exit(1);
+	} else {
+		if (argv[1][strlen(argv[1])-1]=='h') {
+			http = 1;
+			strcpy(name, "HTTP Server");
+		} else {
+			strcpy(name, "Echo Server");
+		}
 	}
 	
-	/* this is a password file (created with the included crypt utility) 
-	 * Read README.crypt prior to using SRP.
-	 */
-	srp_cred.password_file = "tpasswd";
-	srp_cred.password_conf_file = "tpasswd.conf";
+	PARSE();
 
-	dh_cred.dh_bits = 1024;
-	
 	listen_sd = socket(AF_INET, SOCK_STREAM, 0);
 	ERR(listen_sd, "socket");
 
@@ -112,35 +298,17 @@ int main()
 	err = listen(listen_sd, 1024);
 	ERR(err, "listen");
 
-	printf("Echo server ready. Listening to port '%d'.\n\n", PORT);
+	printf("%s ready. Listening to port '%d'.\n\n", name, PORT);
 
 	client_len = sizeof(sa_cli);
 	for (;;) {
-		gnutls_init(&state, GNUTLS_SERVER);
-		if ((ret = gnutls_set_db_name(state, "gnutls-rsm.db")) < 0)
-			fprintf(stderr, "*** DB error (%d)\n", ret);
-		
-		gnutls_set_cipher_priority(state, GNUTLS_TWOFISH,
-					   GNUTLS_RIJNDAEL, GNUTLS_3DES,
-					   0);
-		gnutls_set_compression_priority(state, GNUTLS_NULL_COMPRESSION,
-						0);
-		gnutls_set_kx_priority(state, GNUTLS_KX_RSA, GNUTLS_KX_SRP,
-				       GNUTLS_KX_DH_ANON, 0);
+		state = initialize_state();
 
-		gnutls_set_cred(state, GNUTLS_ANON, &dh_cred);
-		gnutls_set_cred(state, GNUTLS_SRP, &srp_cred);
-		gnutls_set_cred(state, GNUTLS_X509PKI, &x509_cred);
-
-		gnutls_set_mac_priority(state, GNUTLS_MAC_SHA,
-					GNUTLS_MAC_MD5, 0);
 		sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
-
 
 		printf("- connection from %s, port %d\n",
 		       inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
 				 sizeof(topbuf)), ntohs(sa_cli.sin_port));
-
 
 
 		ret = gnutls_handshake(sd, state);
@@ -155,55 +323,13 @@ int main()
 		}
 		printf("- Handshake was completed\n");
 
-		/* print srp specific data */
-		if (gnutls_get_current_kx(state) == GNUTLS_KX_SRP) {
-			srp_info = gnutls_get_auth_info(state);
-			if (srp_info != NULL)
-				printf("\n- User '%s' connected\n",
-				       srp_info->username);
-		}
-		if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
-			dh_info = gnutls_get_auth_info(state);
-			if (dh_info != NULL)
-				printf("\n- Anonymous DH using prime of %d bits\n",
-				       dh_info->dh_bits);
-		}
+		print_info(state);
 
-		/* print state information */
-		tmp = gnutls_kx_get_name(gnutls_get_current_kx(state));
-		printf("- Key Exchange: %s\n", tmp);
-		free(tmp);
-		tmp =
-		    gnutls_compression_get_name
-		    (gnutls_get_current_compression_method(state));
-		printf("- Compression: %s\n", tmp);
-		free(tmp);
-		tmp =
-		    gnutls_cipher_get_name(gnutls_get_current_cipher
-					    (state));
-		printf("- Cipher: %s\n", tmp);
-		free(tmp);
-		tmp =
-		    gnutls_mac_get_name(gnutls_get_current_mac_algorithm
-					 (state));
-		printf("- MAC: %s\n", tmp);
-		free(tmp);
-
-		printf("- Acting as echo server...\n");
-/*	ret =
-	    gnutls_write(sd, state, "hello client",
-			sizeof("hello client"));
-	if (ret < 0) {
-	    close(sd);
-	    gnutls_deinit( state);
-	    gnutls_perror(ret);
-	    continue;
-	}
-*/
 		i = 0;
 		for (;;) {
 			bzero(buffer, MAX_BUF + 1);
-			ret = gnutls_read(sd, state, buffer, MAX_BUF);
+			ret = read_request(sd, state, buffer, MAX_BUF, (http==0)?1:2);
+
 			if (gnutls_is_fatal_error(ret) == 1) {
 				if (ret == GNUTLS_E_CLOSURE_ALERT_RECEIVED) {
 					printf
@@ -218,9 +344,19 @@ int main()
 
 			}
 
-			if (ret > 0)
-				gnutls_write(sd, state, buffer,
-					     strlen(buffer));
+			if (ret > 0) {
+				if (http == 0) {
+					gnutls_write(sd, state, buffer,
+						     strlen(buffer));
+				} else {
+					strcpy( http_buffer, HTTP_BEGIN);
+					peer_print_info(sd, state);
+					strcat( http_buffer, HTTP_END);
+					gnutls_write(sd, state, http_buffer, strlen(http_buffer));
+					printf("- Served request. Closing connection.\n");
+					break;
+				}
+			}
 			i++;
 #ifdef RENEGOTIATE
 			if (i == 10)
@@ -236,8 +372,12 @@ int main()
 					printf("* Received alert '%d'.\n",
 					       ret);
 			}
+
+			if (http != 0) {
+				break;	/* close the connection */
+			}
 		}
-		fprintf(stderr, "\n");
+		printf("\n");
 		gnutls_bye(sd, state);
 		close(sd);
 		gnutls_deinit(state);

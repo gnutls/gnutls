@@ -31,28 +31,28 @@ GNUTLS_CIPHER_HANDLE ret;
 	case GNUTLS_NULL_CIPHER:
 		ret = GNUTLS_CIPHER_FAILED;
 		break;
-	case GNUTLS_RIJNDAEL:
+	case GNUTLS_RIJNDAEL_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_RIJNDAEL256:
+	case GNUTLS_RIJNDAEL256_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_TWOFISH:
+	case GNUTLS_TWOFISH_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "twofish", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_TWOFISH, GCRY_CIPHER_MODE_CBC, 0);
 #endif
 		break;
-	case GNUTLS_3DES:
+	case GNUTLS_3DES_CBC:
 #ifdef USE_MCRYPT
 		ret = mcrypt_module_open( "tripledes", NULL, "cbc", NULL);
 #else
