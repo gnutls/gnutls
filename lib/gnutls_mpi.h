@@ -36,7 +36,7 @@ int _gnutls_mpi_print( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a );
 int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a );
 
 int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, 
-	char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi);
-int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, GNUTLS_MPI mpi);
+	GNUTLS_MPI* ret_mpi);
+int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, GNUTLS_MPI mpi, int lz);
 
 #endif

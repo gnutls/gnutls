@@ -35,7 +35,6 @@
  */
 int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 {
-	opaque str[MAX_PARAMETER_SIZE];
 	int result;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
@@ -56,14 +55,14 @@ int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 
 	if ( (result=_gnutls_x509_read_int( spk, "modulus", 
-		str, sizeof(str)-1, &params[0])) < 0) {
+		&params[0])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
 	}
 
 	if ( (result=_gnutls_x509_read_int( spk, "publicExponent", 
-		str, sizeof(str)-1, &params[1])) < 0) {
+		&params[1])) < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release(&params[0]);
 		asn1_delete_structure(&spk);
@@ -83,7 +82,6 @@ int _gnutls_x509_read_rsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
  */
 int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 {
-	opaque str[MAX_PARAMETER_SIZE];
 	int result;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
@@ -109,7 +107,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read p */
 
-	if ( (result=_gnutls_x509_read_int( spk, "p", str, sizeof(str)-1, &params[0])) < 0) {
+	if ( (result=_gnutls_x509_read_int( spk, "p", &params[0])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return GNUTLS_E_ASN1_GENERIC_ERROR;
@@ -117,7 +115,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read q */
 
-	if ( (result=_gnutls_x509_read_int( spk, "q", str, sizeof(str)-1, &params[1])) < 0) {
+	if ( (result=_gnutls_x509_read_int( spk, "q", &params[1])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		_gnutls_mpi_release(&params[0]);
@@ -126,7 +124,7 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read g */
 	
-	if ( (result=_gnutls_x509_read_int( spk, "g", str, sizeof(str)-1, &params[2])) < 0) {
+	if ( (result=_gnutls_x509_read_int( spk, "g", &params[2])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		_gnutls_mpi_release(&params[0]);
@@ -146,7 +144,6 @@ int _gnutls_x509_read_dsa_params(opaque * der, int dersize, GNUTLS_MPI * params)
  */
 int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 {
-	opaque str[MAX_PARAMETER_SIZE];
 	int result;
 	ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
@@ -167,7 +164,7 @@ int _gnutls_x509_read_dsa_pubkey(opaque * der, int dersize, GNUTLS_MPI * params)
 
 	/* Read p */
 
-	if ( (result=_gnutls_x509_read_int( spk, "", str, sizeof(str)-1, &params[3])) < 0) {
+	if ( (result=_gnutls_x509_read_int( spk, "", &params[3])) < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&spk);
 		return _gnutls_asn2err(result);
@@ -299,13 +296,13 @@ int _gnutls_x509_write_rsa_params( GNUTLS_MPI * params, int params_size,
 		return GNUTLS_E_INVALID_REQUEST;
 	}
 
-	result = _gnutls_x509_write_int( spk, "modulus", params[0]);
+	result = _gnutls_x509_write_int( spk, "modulus", params[0], 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;
 	}
 
-	result = _gnutls_x509_write_int( spk, "publicExponent", params[1]);
+	result = _gnutls_x509_write_int( spk, "publicExponent", params[1], 0);
 	if (result < 0) {
 		gnutls_assert();
 		return result;

@@ -85,47 +85,80 @@ int _gnutls_mpi_print_lz( opaque *buffer, size_t *nbytes, const GNUTLS_MPI a ) {
  * steps.
  */
 int _gnutls_x509_read_int( ASN1_TYPE node, const char* value, 
-	char* tmpstr, int tmpstr_size, GNUTLS_MPI* ret_mpi)
+	GNUTLS_MPI* ret_mpi)
 {
 int len, result;
 size_t s_len;
+opaque* tmpstr = NULL;
+int tmpstr_size;
 
-	len = tmpstr_size;
-	result = asn1_read_value( node, value, tmpstr, &len);
+	tmpstr_size = 0;
+	result = asn1_read_value( node, value, NULL, &tmpstr_size);
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+
+	tmpstr = gnutls_alloca( tmpstr_size);
+	if (tmpstr == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	result = asn1_read_value( node, value, tmpstr, &tmpstr_size);
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_afree( tmpstr);
 		return _gnutls_asn2err(result);
 	}
 
 	s_len = len;
 	if (_gnutls_mpi_scan( ret_mpi, tmpstr, &s_len) != 0) {
 		gnutls_assert();
+		gnutls_afree( tmpstr);
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
+
+	gnutls_afree( tmpstr);
 
 	return 0;
 }
 
 /* Writes the specified integer into the specified node.
  */
-int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, GNUTLS_MPI mpi)
+int _gnutls_x509_write_int( ASN1_TYPE node, const char* value, GNUTLS_MPI mpi, int lz)
 {
-opaque tmpstr[MAX_PARAMETER_SIZE];
+opaque *tmpstr;
 size_t s_len;
 int result;
 
-	s_len = sizeof(tmpstr);
-	if (_gnutls_mpi_print( tmpstr, &s_len, mpi) != 0) {
+	s_len = 0;
+	if (lz) result = _gnutls_mpi_print_lz( NULL, &s_len, mpi);
+	else result = _gnutls_mpi_print( NULL, &s_len, mpi);
+
+	tmpstr = gnutls_alloca( s_len);
+	if (tmpstr == NULL) {
 		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	if (lz) result = _gnutls_mpi_print_lz( tmpstr, &s_len, mpi);
+	else result = _gnutls_mpi_print( tmpstr, &s_len, mpi);
+	
+	if (result != 0) {
+		gnutls_assert();
+		gnutls_afree( tmpstr);
 		return GNUTLS_E_MPI_PRINT_FAILED;
 	}
 
 	result = asn1_write_value( node, value, tmpstr, s_len);
+
+	gnutls_afree( tmpstr);
+
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
 		return _gnutls_asn2err(result);
 	}
-
 
 	return 0;
 }

@@ -81,7 +81,6 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key( const gnutls_datum *raw_key,
 	gnutls_x509_privkey pkey) 
 {
 	int result;
-	opaque str[MAX_PARAMETER_SIZE];
 	ASN1_TYPE pkey_asn;
 
 	if ((result =
@@ -105,37 +104,32 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key( const gnutls_datum *raw_key,
 	}
 
 	if ((result = _gnutls_x509_read_int(pkey_asn, "modulus",
-					    str, sizeof(str) - 1,
 					    &pkey->params[0])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result =
-	     _gnutls_x509_read_int(pkey_asn, "publicExponent", str,
-				   sizeof(str) - 1,
+	     _gnutls_x509_read_int(pkey_asn, "publicExponent",
 				   &pkey->params[1])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result =
-	     _gnutls_x509_read_int(pkey_asn, "privateExponent", str,
-				   sizeof(str) - 1,
+	     _gnutls_x509_read_int(pkey_asn, "privateExponent",
 				   &pkey->params[2])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result = _gnutls_x509_read_int(pkey_asn, "prime1",
-					    str, sizeof(str) - 1,
 					    &pkey->params[3])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result = _gnutls_x509_read_int(pkey_asn, "prime2",
-					    str, sizeof(str) - 1,
 					    &pkey->params[4])) < 0) {
 		gnutls_assert();
 		goto error;
@@ -157,7 +151,7 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key( const gnutls_datum *raw_key,
 	/*				p, q */
 #else
 	if ( (result=_gnutls_x509_read_int( pkey_asn, "coefficient",
-		str, sizeof(str)-1, &pkey->params[5])) < 0) {
+		&pkey->params[5])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
@@ -182,7 +176,6 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
 	gnutls_x509_privkey pkey) 
 {
 	int result;
-	opaque str[MAX_PARAMETER_SIZE];
 	ASN1_TYPE dsa_asn;
 
 	if ((result =
@@ -206,35 +199,30 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
 	}
 
 	if ((result = _gnutls_x509_read_int(dsa_asn, "p",
-					    str, sizeof(str) - 1,
 					    &pkey->params[0])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result = _gnutls_x509_read_int(dsa_asn, "q",
-					    str, sizeof(str) - 1,
 					    &pkey->params[1])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result = _gnutls_x509_read_int(dsa_asn, "g",
-					    str, sizeof(str) - 1,
 					    &pkey->params[2])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result = _gnutls_x509_read_int(dsa_asn, "Y",
-					    str, sizeof(str) - 1,
 					    &pkey->params[3])) < 0) {
 		gnutls_assert();
 		goto error;
 	}
 
 	if ((result = _gnutls_x509_read_int(dsa_asn, "priv",
-					    str, sizeof(str) - 1,
 					    &pkey->params[4])) < 0) {
 		gnutls_assert();
 		goto error;

@@ -1274,7 +1274,8 @@ _gnutls_supported_ciphersuites(gnutls_session session,
 
 #define MIN_PRIVATE_COMP_ALGO 0xEF
 
-/* returns the TLS numbers of the compression methods we support */
+/* returns the TLS numbers of the compression methods we support 
+ */
 #define SUPPORTED_COMPRESSION_METHODS session->internals.compression_method_priority.algorithms
 int
 _gnutls_supported_compression_methods(gnutls_session session, uint8 ** comp)

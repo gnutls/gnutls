@@ -239,8 +239,6 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
 	ASN1_TYPE c2;
 	int result, need_free = 0;
 	gnutls_datum _params;
-	int len;
-	opaque str[MAX_PARAMETER_SIZE];
 
 	if (format == GNUTLS_X509_FMT_PEM) {
 		opaque *out;
@@ -288,8 +286,7 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
 
 	/* Read PRIME 
 	 */
-	len = sizeof(str) - 1;
-	result = _gnutls_x509_read_int( c2, "prime", str, len, &params->_prime);
+	result = _gnutls_x509_read_int( c2, "prime", &params->_prime);
 	if ( result < 0) {
 		asn1_delete_structure(&c2);
 		gnutls_assert();
@@ -298,8 +295,7 @@ int gnutls_dh_params_import_pkcs3(gnutls_dh_params params,
 
 	/* read the generator
 	 */
-	len = sizeof(str) - 1;
-	result = _gnutls_x509_read_int( c2, "base", str, len, &params->_generator);
+	result = _gnutls_x509_read_int( c2, "base", &params->_generator);
 	if ( result < 0) {
 		asn1_delete_structure(&c2);
 		_gnutls_mpi_release( &params->_prime);

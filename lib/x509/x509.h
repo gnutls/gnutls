@@ -20,9 +20,6 @@ typedef struct gnutls_x509_crt_int {
 	gnutls_pk_algorithm signature_algorithm;
 } gnutls_x509_crt_int;
 
-/* Raw encoded parameter.
- */
-#define MAX_PARAMETER_SIZE 2400
 
 #define MAX_PRIV_PARAMS_SIZE 6 /* ok for RSA and DSA */
 

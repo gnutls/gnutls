@@ -336,10 +336,7 @@ int _gnutls_rsa_verify( const gnutls_datum* vdata, const gnutls_datum *ciphertex
  */
 static int encode_ber_rs( gnutls_datum* sig_value, GNUTLS_MPI r, GNUTLS_MPI s) {
 ASN1_TYPE sig;
-int result;
-opaque str[MAX_PARAMETER_SIZE];
-size_t len = sizeof(str);
-size_t tot_len = 0;
+int result, tot_len;
 
 	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", 
 		&sig))!=ASN1_SUCCESS) {
@@ -347,45 +344,35 @@ size_t tot_len = 0;
 		return _gnutls_asn2err(result);
 	}
 
-	if ( _gnutls_mpi_print_lz( str, &len, r) < 0) {
+	result = _gnutls_x509_write_int( sig, "r", r, 1);
+	if ( result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
-		return GNUTLS_E_MPI_PRINT_FAILED;
+		return result;
 	}
-	tot_len += len;
-	
-	result = asn1_write_value( sig, "r", str, len);
 
-	if (result != ASN1_SUCCESS) {
+	result = _gnutls_x509_write_int( sig, "s", s, 1);
+	if (result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
-		return _gnutls_asn2err(result);
+		return result;
 	}
 
-	len = sizeof(str) - 1;
-	if ( _gnutls_mpi_print_lz( str, &len, s) < 0) {
-		gnutls_assert();
-		asn1_delete_structure(&sig);
-		return GNUTLS_E_MPI_PRINT_FAILED;
-	}
-	tot_len += len;
-
-	result = asn1_write_value( sig, "s", str, len);
-
-	if (result != ASN1_SUCCESS) {
+	tot_len = 0;
+	result = asn1_der_coding( sig, "", NULL, &tot_len, NULL);
+	if (result != ASN1_MEM_ERROR) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
 		return _gnutls_asn2err(result);
 	}
 
-	sig_value->size = tot_len + 100;
+	sig_value->size = tot_len;
 	sig_value->data = gnutls_malloc( sig_value->size);
 	if (sig_value->data==NULL) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
+		return GNUTLS_E_MEMORY_ERROR;
 	}
-
-	if (sig_value->data == NULL) sig_value->size = 0;
 
 	result = asn1_der_coding( sig, "", sig_value->data, &sig_value->size, NULL);
 	if (result != ASN1_SUCCESS) {
@@ -448,8 +435,6 @@ int _gnutls_dsa_sign(gnutls_datum * signature, const gnutls_datum *hash,
 static int decode_ber_rs( const gnutls_datum* sig_value, GNUTLS_MPI* r, GNUTLS_MPI* s) {
 ASN1_TYPE sig;
 int result;
-opaque str[MAX_PARAMETER_SIZE];
-
 
 	if ((result=asn1_create_element( _gnutls_get_gnutls_asn(), "GNUTLS.DSASignatureValue", &sig))!=ASN1_SUCCESS) {
 		gnutls_assert();
@@ -464,7 +449,7 @@ opaque str[MAX_PARAMETER_SIZE];
 	}
 	
 	result =
-	    _gnutls_x509_read_int( sig, "r", str, sizeof(str)-1, r);
+	    _gnutls_x509_read_int( sig, "r", r);
 	if (result < 0) {
 		gnutls_assert();
 		asn1_delete_structure(&sig);
@@ -472,7 +457,7 @@ opaque str[MAX_PARAMETER_SIZE];
 	}
 
 	result =
-	    _gnutls_x509_read_int( sig, "s", str, sizeof(str)-1, s);
+	    _gnutls_x509_read_int( sig, "s", s);
 	if (result < 0) {
 		gnutls_assert();
 		_gnutls_mpi_release( s);
