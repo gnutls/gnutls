@@ -255,13 +255,11 @@ int gnutls_certificate_type_set_priority(gnutls_session session,
   * these defaults are ok. You may override any of the following priorities by calling
   * the appropriate functions.
   *
-  * The order is:
-  *
-  * - TLS1, SSL3 for protocols.
-  * - GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA for key exchange algorithms.
-  * - GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms.
-  * - GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
-  *   GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128 for ciphers.
+  * The order is TLS1, SSL3 for protocols.
+  * GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA for key exchange algorithms.
+  * GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms.
+  * GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
+  * and GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128 for ciphers.
   *
   **/
 int gnutls_set_default_priority(gnutls_session session)
@@ -294,13 +292,12 @@ int gnutls_set_default_priority(gnutls_session session)
   * Sets some default priority on the ciphers, key exchange methods, macs
   * and compression methods. This is to avoid using the gnutls_*_priority() functions, if
   * these defaults are ok. This function also includes weak algorithms.
-  * The order is:
-  * - TLS1, SSL3 for protocols.
-  * - GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA_EXPORT for key exchange algorithms.
-  * - GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms.
-  * - GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
-  *   GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_ARCFOUR_40
-  *   for ciphers.
+  * The order is TLS1, SSL3 for protocols, GNUTLS_KX_RSA, GNUTLS_KX_DHE_DSS, 
+  * GNUTLS_KX_DHE_RSA, GNUTLS_KX_RSA_EXPORT for key exchange algorithms.
+  * GNUTLS_MAC_SHA, GNUTLS_MAC_MD5 for MAC algorithms,
+  * GNUTLS_CIPHER_RIJNDAEL_256_CBC, GNUTLS_CIPHER_RIJNDAEL_128_CBC, 
+  * and GNUTLS_CIPHER_3DES_CBC, GNUTLS_CIPHER_ARCFOUR_128, GNUTLS_CIPHER_ARCFOUR_40
+  * for ciphers.
   *
   **/
 int gnutls_set_default_export_priority(gnutls_session session)
