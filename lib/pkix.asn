@@ -196,21 +196,14 @@ id-ce-cRLDistributionPoints     OBJECT IDENTIFIER  ::=  {id-ce 31}
 CRLDistributionPoints ::= SEQUENCE SIZE (1..MAX) OF DistributionPoint
 
 DistributionPoint ::= SEQUENCE {
-     distributionPoint       [0]     DistributionPointName OPTIONAL,
+     distributionPoint       [0]     EXPLICIT DistributionPointName OPTIONAL,
      reasons                 [1]     ReasonFlags OPTIONAL,
      cRLIssuer               [2]     GeneralNames OPTIONAL
 }
 
--- original definition:
--- DistributionPointName ::= CHOICE {
---     fullName                [0]     GeneralNames,
---     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
---}
--- This does not work since it does not tag elements.
-
-DistributionPointName ::= SEQUENCE {
-     fullName                [0]     GeneralNames OPTIONAL,
-     nameRelativeToCRLIssuer [1]     RelativeDistinguishedName OPTIONAL
+DistributionPointName ::= CHOICE {
+    fullName                [0]     GeneralNames,
+    nameRelativeToCRLIssuer [1]     RelativeDistinguishedName 
 }
 
 ReasonFlags ::= BIT STRING {
@@ -441,14 +434,29 @@ X520OrganizationalUnitName ::= DirectoryString
 id-at-title     AttributeType   ::=     {id-at 12}
 X520Title ::=   DirectoryString
 
+id-at-description     AttributeType   ::=     {id-at 13}
+X520Description ::=   DirectoryString
+
 id-at-dnQualifier       AttributeType   ::=     {id-at 46}
 X520dnQualifier ::=     PrintableString
 
 id-at-countryName       AttributeType   ::=     {id-at 6}
 X520countryName ::=     PrintableString (SIZE (2)) -- IS 3166 codes
 
+id-at-serialNumber       AttributeType   ::=     {id-at 5}
+X520serialNumber ::=     PrintableString
+
+id-at-telephoneNumber       AttributeType   ::=     {id-at 20}
+X520telephoneNumber ::=     PrintableString
+
+id-at-facsimileTelephoneNumber       AttributeType   ::=     {id-at 23}
+X520facsimileTelephoneNumber ::=     PrintableString
+
 id-at-pseudonym 	AttributeType   ::=     {id-at 65}
 X520pseudonym ::=	DirectoryString
+
+id-at-name 	AttributeType   ::=     {id-at 41}
+X520name ::=	DirectoryString
 
 id-at-streetAddress 	AttributeType   ::=     {id-at 9}
 X520streetAddress ::=	DirectoryString

@@ -246,6 +246,8 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 		fprintf(stderr, "Please enter the details of the certificate's distinguished name. "
 		"Just press enter to ignore a field.\n");
 
+		/* set the DN.
+		 */
 		get_country_crt_set( crt);
 		get_organization_crt_set(crt);
 		get_unit_crt_set( crt);
@@ -253,6 +255,7 @@ gnutls_x509_crt generate_certificate( gnutls_x509_privkey *ret_key,
 		get_state_crt_set( crt);
 		get_cn_crt_set( crt);
 		get_uid_crt_set( crt);
+		get_oid_crt_set( crt);
 	
 		if (!batch) fprintf(stderr, "This field should not be used in new certificates.\n");
 
@@ -1640,6 +1643,8 @@ void generate_request(void)
 	 */
 	key = generate_private_key_int();
 
+	/* Set the DN.
+	 */
 	get_country_crq_set( crq);
 	get_organization_crq_set(crq);
 	get_unit_crq_set( crq);
@@ -1647,6 +1652,7 @@ void generate_request(void)
 	get_state_crq_set( crq);
 	get_cn_crq_set( crq);
 	get_uid_crq_set( crq);
+	get_oid_crq_set( crq);
 
 	ret = gnutls_x509_crq_set_version( crq, 1);
 	if (ret < 0) {
