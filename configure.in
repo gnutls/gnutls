@@ -300,7 +300,12 @@ else
  AC_MSG_RESULT(yes)
 fi
 
-libtasn1_enabled=no
+dnl In maintainer mode we always use the included library
+if test x$opt_maintainer_mode = xyes; then
+ libtasn1_enabled=yes
+else
+ libtasn1_enabled=no
+fi
 
 AC_CHECK_LIB( tasn1, asn1_array2tree,:, 
  libtasn1_enabled=yes

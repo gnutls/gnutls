@@ -72,7 +72,7 @@ void gnutls_certificate_server_set_select_func( GNUTLS_STATE, gnutls_certificate
 void gnutls_certificate_server_set_request( GNUTLS_STATE, GNUTLS_CertificateRequest);
 
 /* X.509 certificate handling functions */
-int gnutls_x509_get_certificate_xml(const gnutls_datum * cert,  gnutls_datum* res);
+int gnutls_x509_get_certificate_xml(const gnutls_datum * cert, gnutls_datum* res, int detail);
 
 int gnutls_x509_extract_dn( const gnutls_datum*, gnutls_x509_dn*);
 int gnutls_x509_extract_certificate_dn( const gnutls_datum*, gnutls_x509_dn*);
