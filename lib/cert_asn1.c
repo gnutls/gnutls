@@ -27,12 +27,6 @@
 
 #include <gnutls_int.h> 
 
-/*
-#include <string.h>  
-#include <stdlib.h> 
-#include <stdio.h>
-*/
-
 #include "cert_asn1.h"
 #include "cert_der.h"
 

@@ -84,6 +84,7 @@ int _gnutls_decrypt(GNUTLS_STATE state, char *ciphertext,
 
 	ret = _gnutls_TLSCompressed2plaintext(state, &gtxt, gcomp);
 	if (ret < 0) {
+		gnutls_free_datum(&gcomp);
 		return ret;
 	}
 

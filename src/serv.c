@@ -299,6 +299,7 @@ int main(int argc, char **argv)
 	}
 
 	if (gnutls_allocate_x509_server_sc(&x509_cred, 1) < 0) {
+		fprintf(stderr, "memory error\n");
 		exit(1);
 	}
 
@@ -413,12 +414,13 @@ int main(int argc, char **argv)
 		 */
 		close(sd);
 		gnutls_deinit(state);
+		
 	}
 	close(listen_sd);
 
 	gnutls_free_x509_server_sc(x509_cred);
-	gnutls_free_srp_server_sc(x509_cred);
-	gnutls_free_anon_server_sc(x509_cred);
+	gnutls_free_srp_server_sc(srp_cred);
+	gnutls_free_anon_server_sc(dh_cred);
 
 	gnutls_global_deinit();
 	

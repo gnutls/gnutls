@@ -708,6 +708,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
 #endif
 		gnutls_free(ciphertext);
+		gnutls_free(tmpdata);
 		if (tmplen!=1) {
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;

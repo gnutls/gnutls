@@ -106,11 +106,20 @@ int i,j;
 		}
 		gnutls_free( sc->cert_list[i]);
 	}
-	gnutls_free( sc->cert_list );
+
+	if (sc->cert_list_length!=NULL) gnutls_free( sc->cert_list_length);
+	if (sc->cert_list!=NULL) gnutls_free( sc->cert_list );
+
+	for (j=0;j<sc->ncas;j++) {
+		gnutls_free_cert( sc->ca_list[j]);
+	}
+	if (sc->ca_list!=NULL) gnutls_free( sc->ca_list);
+
 	for (i=0;i<sc->ncerts;i++) {
 		_gnutls_free_private_key( sc->pkey[i]);
 	}
-	gnutls_free(sc->pkey);
+	if(sc->pkey!=NULL) gnutls_free(sc->pkey);
+
 	gnutls_free(sc);
 }
 
@@ -147,6 +156,7 @@ int ret;
 
 		if (siz2 < 0) {
 			gnutls_assert();
+			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
 		ptr = strstr( ptr, CERT_SEP)+1;
@@ -156,6 +166,7 @@ int ret;
 
 		if (res->cert_list[res->ncerts] == NULL) {
 			gnutls_assert();
+			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		
@@ -163,6 +174,7 @@ int ret;
 		tmp.size = siz2;
 		if ((ret =
 		     _gnutls_cert2gnutlsCert(&res->cert_list[res->ncerts][i-1], tmp)) < 0) {
+			gnutls_free( b64);
 			gnutls_assert();
 			return ret;
 		}
@@ -183,7 +195,7 @@ int ret;
 }
 
 /* Reads a base64 encoded CA file (file contains multiple certificate
- * authorities)
+ * authorities). This is to be called once.
  */
 static int read_ca_file( X509PKI_CREDENTIALS res, char* cafile) {
 int siz, siz2, i;
@@ -216,6 +228,7 @@ gnutls_datum tmp;
 
 		if (siz2 < 0) {
 			gnutls_assert();
+			gnutls_free(b64);
 			return GNUTLS_E_PARSING_ERROR;
 		}
 		ptr = strstr( ptr, CERT_SEP)+1;
@@ -224,6 +237,7 @@ gnutls_datum tmp;
 		    (gnutls_cert *) gnutls_realloc( res->ca_list, i * sizeof(gnutls_cert));
 		if (res->ca_list == NULL) {
 			gnutls_assert();
+			gnutls_free(b64);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
 		
@@ -232,6 +246,7 @@ gnutls_datum tmp;
 		if ((ret =
 		     _gnutls_cert2gnutlsCert(&res->ca_list[i-1], tmp)) < 0) {
 			gnutls_assert();
+			gnutls_free(b64);
 			return ret;
 		}
 		gnutls_free( b64);
@@ -266,6 +281,7 @@ FILE* fd2;
 
 	if (siz < 0) {
 		gnutls_assert();
+		gnutls_free(b64);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
@@ -273,8 +289,11 @@ FILE* fd2;
 	tmp.size = siz;
 	if ( (ret =_gnutls_pkcs1key2gnutlsKey(&res->pkey[res->ncerts], tmp)) < 0) {
 		gnutls_assert();
+		gnutls_free(b64);
 		return ret;
 	} 
+
+	gnutls_free(b64);
 
 	return 0;
 }
@@ -321,7 +340,7 @@ int gnutls_allocate_x509_sc(X509PKI_CREDENTIALS* res, int ncerts)
 			gnutls_free( (*res)->cert_list_length);
 			return GNUTLS_E_MEMORY_ERROR;
 		}
-	
+
 	}
 	return 0;
 }
@@ -700,8 +719,10 @@ int _gnutls_cert2gnutlsCert(gnutls_cert * gCert, gnutls_datum derCert)
 		 * currently not supported
 		 */
 		gnutls_assert();
+#ifdef DEBUG
 fprintf(stderr, "ALGORITHM: %s\n", str);
 return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+#endif
 		gCert->subject_pk_algorithm = GNUTLS_PK_UNKNOWN;
 		gCert->params = NULL;
 		

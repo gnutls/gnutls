@@ -474,7 +474,6 @@ int proc_rsa_certificate(GNUTLS_KEY key, opaque * data, int data_size)
 int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 {
 	X509PKI_CLIENT_AUTH_INFO *auth = key->auth_info;
-	svoid *rand;
 	gnutls_datum sdata;	/* data to send */
 	MPI pkey, n;
 	int ret;
@@ -486,10 +485,6 @@ int gen_rsa_client_kx(GNUTLS_KEY key, opaque ** data)
 		gnutls_assert();
 		return GNUTLS_E_INSUFICIENT_CRED;
 	}
-
-	rand = secure_malloc(TLS_MASTER_SIZE);
-	if (rand == NULL)
-		return GNUTLS_E_MEMORY_ERROR;
 
 	RANDOMIZE_KEY(key->key, secure_malloc);
 	key->key.data[0] = key->version.major;

@@ -79,7 +79,10 @@ uLongf size;
 	switch (algorithm) {
 	case GNUTLS_NULL_COMPRESSION:
 		*plain = gnutls_malloc(compressed_size);
-		if (*plain==NULL) return GNUTLS_E_MEMORY_ERROR;
+		if (*plain==NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 		
 		memcpy(*plain, compressed, compressed_size);
 		plain_size = compressed_size;

@@ -1770,6 +1770,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 		}
 	}
 
+	gnutls_free(alg);
 	gnutls_free(*cipherSuites);
 	*cipherSuites = newSuite;
 

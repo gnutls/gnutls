@@ -117,7 +117,9 @@ int n, i;
 	for (i=0;i<n;i++) {
 		_gnutls_mpi_release( &pkey.params[i]);
 	}
+	if (pkey.params!=NULL) gnutls_free(pkey.params);
 	gnutls_free_datum( &pkey.raw);
 
+	return;
 }
 

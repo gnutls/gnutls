@@ -28,8 +28,7 @@
 
 
 %{
-#include <stdio.h>
-#include <string.h>
+#include <gnutls_int.h>
 #include "cert_asn1.h"
 
 FILE *file_asn1;  /* Pointer to file to parse */
