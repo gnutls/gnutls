@@ -34,6 +34,8 @@
 # endif
 static Sigfunc *Signal( int signo, Sigfunc *func);
 
+static Sigfunc *old_sig_handler;
+
 #endif
 
 
@@ -41,7 +43,6 @@ static Sigfunc *Signal( int signo, Sigfunc *func);
 extern const static_asn pkcs1_asn1_tab[];
 extern const static_asn pkix_asn1_tab[];
 
-static Sigfunc *old_sig_handler;
 
 typedef ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
 typedef ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);

@@ -47,7 +47,7 @@ int uint64pp( uint64 *);
 # define rotr64(x,n)   (((x) >> ((uint16)(n))) | ((x) << (64 - (uint16)(n))))
 # define byteswap64(x)  ((rotl64(x, 8) & 0x00ff00ff00ff00ffUL) | (rotr64(x, 8) & 0xff00ff00ff00ff00UL))
 
-# define uint64pp(x) ((++(*x)==0) ? -1 : 0);
+# define uint64pp(x) ((++(*x)==0) ? -1 : 0)
 # define uint64zero(x) (*x) = 0
 
 #endif

@@ -402,7 +402,7 @@ void _gnutls_set_current_version(GNUTLS_STATE state, GNUTLS_Version version);
 GNUTLS_Version gnutls_get_current_version(GNUTLS_STATE state);
 ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType htype, const void* data, size_t sizeofdata, int flags);
 ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType, char* data, size_t sizeofdata, int flags);
-int _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
+ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
 
 /* These macros return the advertized TLS version of
  * the peer.
