@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-dnl Copyright (C) 2004 Simon Josefsson
+dnl Copyright (C) 2004, 2005 Simon Josefsson
 dnl Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavroyanopoulos
 dnl
 dnl This file is part of GNU TLS.
@@ -20,7 +20,7 @@ dnl License along with GNU TLS; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA
 
-AC_INIT(gnutls, [1.1.23], [bug-gnutls@gnu.org])
+AC_INIT(gnutls, [1.2.0], [bug-gnutls@gnu.org])
 AC_PREREQ(2.59)
 
 AC_CANONICAL_TARGET
@@ -34,7 +34,7 @@ AB_INIT
 # Interfaces added:                             AGE++
 # Interfaces removed:                           AGE=0
 LT_CURRENT=13
-LT_REVISION=23
+LT_REVISION=24
 LT_AGE=1
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
