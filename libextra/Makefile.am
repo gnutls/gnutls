@@ -5,6 +5,11 @@ DIST_SUBDIRS = openpgp opencdk
 m4datadir = $(datadir)/aclocal
 m4data_DATA = libgnutls-extra.m4
 
+# Pkg-config script.
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = gnutls-extra.pc
+DISTCLEANFILES = $(pkgconfig_DATA)
+
 if HAVE_LD_VERSION_SCRIPT
   libgnutls_extra_version_script_cmd = -Wl,--version-script=$(srcdir)/libgnutls-extra.vers
 else

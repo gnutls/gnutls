@@ -553,6 +553,7 @@ src/cfg/Makefile src/cfg/platon/Makefile src/cfg/platon/str/Makefile \
 doc/scripts/Makefile lib/minitasn1/Makefile lib/x509/Makefile \
 includes/Makefile includes/gnutls/Makefile doc/manpages/Makefile \
 gl/Makefile nettle/Makefile nettle/tests/Makefile \
-crypto/Makefile tests/Makefile])
+crypto/Makefile tests/Makefile \
+lib/gnutls.pc libextra/gnutls-extra.pc])
 
 AC_OUTPUT

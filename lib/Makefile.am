@@ -4,6 +4,11 @@ bin_SCRIPTS = libgnutls-config
 m4datadir = $(datadir)/aclocal
 dist_m4data_DATA = libgnutls.m4
 
+# Pkg-config script.
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = gnutls.pc
+DISTCLEANFILES = $(pkgconfig_DATA)
+
 if HAVE_LD_VERSION_SCRIPT
   libgnutls_version_script_cmd = -Wl,--version-script=$(srcdir)/libgnutls.vers
 else
