@@ -150,6 +150,8 @@ AC_SUBST(LIBGNUTLS_LIBS)
 AC_SUBST(LIBGNUTLS_CFLAGS)
 
 AC_CONFIG_COMMANDS([default],[[
+ cat lib/gnutls_ui.h >> lib/gnutls.h
+ echo "" >> lib/gnutls.h
  cat lib/gnutls_errors_int.h >> lib/gnutls.h
  echo "" >> lib/gnutls.h
  cat lib/x509_asn1.h >> lib/gnutls.h

@@ -77,7 +77,7 @@ void print_info(GNUTLS_STATE state)
       srp_info = gnutls_get_auth_info(state);
       if (srp_info != NULL)
          printf("\n- User '%s' connected\n",
-                srp_info->username);
+                gnutls_srp_server_get_username(srp_info));
    }
    /* print state information */
    tmp = gnutls_version_get_name(gnutls_get_current_version(state));

@@ -133,13 +133,13 @@ void print_info(GNUTLS_STATE state)
 		srp_info = gnutls_get_auth_info(state);
 		if (srp_info != NULL)
 			printf("\n- User '%s' connected\n",
-			       srp_info->username);
+			       gnutls_srp_server_get_username(srp_info));
 	}
 	if (gnutls_get_auth_info_type(state) == GNUTLS_ANON) {
 		dh_info = gnutls_get_auth_info(state);
 		if (dh_info != NULL)
 			printf("\n- Anonymous DH using prime of %d bits\n",
-			       dh_info->dh_bits);
+			        gnutls_anon_server_get_dh_bits(dh_info));
 	}
 
 	/* print state information */
@@ -195,14 +195,14 @@ void peer_print_info(int cd, GNUTLS_STATE state)
 		srp_info = gnutls_get_auth_info(state);
 		if (srp_info != NULL) {
 			sprintf(tmp2, "<p>Connected as user '%s'.</p>\n",
-			       srp_info->username);
+			       gnutls_srp_server_get_username(srp_info));
 		}
 	}
 	if (gnutls_get_current_kx(state) == GNUTLS_KX_DH_ANON) {
 		dh_info = gnutls_get_auth_info(state);
 		if (dh_info != NULL) {
 			sprintf(tmp2, "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
-			       dh_info->dh_bits);
+			       gnutls_anon_server_get_dh_bits( dh_info));
 		}
 
 	}

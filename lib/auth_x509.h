@@ -42,7 +42,6 @@ typedef struct {
 	time_t		  peer_certificate_expiration_time;
 	char		  subjectAltName[X509_CN_SIZE];
 	unsigned char	  keyUsage;
-        int               CA;
 } X509PKI_CLIENT_AUTH_INFO;
 
 void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO* info, gnutls_cert* cert, CertificateStatus verify);

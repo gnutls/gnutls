@@ -41,18 +41,19 @@
 #define CRLFILE NULL
 
 #define PRINTX(x,y) if (y[0]!=0) printf(" -   %s %s\n", x, y)
-#define PRINT_DN(X) PRINTX( "CN:", x509_info->X.common_name); \
-	PRINTX( "OU:", x509_info->X.organizational_unit_name); \
-	PRINTX( "O:", x509_info->X.organization); \
-	PRINTX( "L:", x509_info->X.locality_name); \
-	PRINTX( "S:", x509_info->X.state_or_province_name); \
-	PRINTX( "C:", x509_info->X.country); \
-	PRINTX( "SAN:", x509_info->subjectAltName);
-	
+#define PRINT_DN(X) PRINTX( "CN:", X->common_name); \
+	PRINTX( "OU:", X->organizational_unit_name); \
+	PRINTX( "O:", X->organization); \
+	PRINTX( "L:", X->locality_name); \
+	PRINTX( "S:", X->state_or_province_name); \
+	PRINTX( "C:", X->country); \
+	PRINTX( "SAN:", gnutls_x509pki_client_get_subject_alt_name(x509_info))
+
 static int print_info( GNUTLS_STATE state) {
 const char *tmp;
 const ANON_CLIENT_AUTH_INFO *dh_info;
 const X509PKI_CLIENT_AUTH_INFO *x509_info;
+const gnutls_DN* dn;
 
 	tmp = gnutls_kx_get_name(gnutls_get_current_kx( state));
 	printf("- Key Exchange: %s\n", tmp);
@@ -60,13 +61,13 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 		dh_info = gnutls_get_auth_info(state);
 		if (dh_info != NULL)
 			printf("- Anonymous DH using prime of %d bits\n",
-			       dh_info->dh_bits);
+			       gnutls_anon_client_get_dh_bits(dh_info));
 	}
 
 	if (gnutls_get_auth_info_type(state) == GNUTLS_X509PKI) {
 		x509_info = gnutls_get_auth_info(state);
 		if (x509_info != NULL) {
-			switch( x509_info->peer_certificate_status) {
+			switch( gnutls_x509pki_client_get_peer_certificate_status(x509_info)) {
 			case GNUTLS_CERT_NOT_TRUSTED:
 				printf("- Peer's X509 Certificate was NOT verified\n");
 				break;
@@ -83,16 +84,17 @@ const X509PKI_CLIENT_AUTH_INFO *x509_info;
 
 			}
 		}
+
+		printf(" - Certificate info:\n");
+		printf(" - Certificate version: #%d\n", gnutls_x509pki_client_get_peer_certificate_version(x509_info));
+
+		dn = gnutls_x509pki_client_get_peer_dn( x509_info);
+		PRINT_DN( dn);
+
+		dn = gnutls_x509pki_client_get_issuer_dn( x509_info);
+		printf(" - Certificate Issuer's info:\n");
+		PRINT_DN( dn);
 	}
-
-	printf(" - Certificate info:\n");
-	printf(" - Certificate version: #%d\n", x509_info->peer_certificate_version);
-
-	PRINT_DN(peer_dn);
-
-	printf(" - Certificate Issuer's info:\n");
-	PRINT_DN(issuer_dn);
-
 
 	tmp = gnutls_version_get_name(gnutls_get_current_version(state));
 	printf("- Version: %s\n", tmp);

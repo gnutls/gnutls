@@ -38,6 +38,7 @@ typedef enum AlertDescription { GNUTLS_CLOSE_NOTIFY, GNUTLS_UNEXPECTED_MESSAGE=1
 			GNUTLS_NO_RENEGOTIATION=100
 			} AlertDescription;
 typedef enum AlertLevel { GNUTLS_WARNING=1, GNUTLS_FATAL } AlertLevel;
+typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
 
 typedef enum GNUTLS_Version { GNUTLS_SSL3=1, GNUTLS_TLS1 } GNUTLS_Version;
 
@@ -172,67 +173,6 @@ int gnutls_allocate_anon_server_sc( ANON_SERVER_CREDENTIALS *sc);
 int gnutls_set_anon_server_cred( ANON_SERVER_CREDENTIALS res, int dh_bits);
 
 
-/* auth structures */
-
-typedef struct {
-	int dh_bits;
-} ANON_CLIENT_AUTH_INFO;
-
-/* for now it's the same */
-typedef ANON_CLIENT_AUTH_INFO ANON_SERVER_AUTH_INFO;
-
-typedef struct {
-	char username[256];
-} SRP_SERVER_AUTH_INFO;
-
-typedef enum CertificateStatus { GNUTLS_CERT_TRUSTED=1, GNUTLS_CERT_NOT_TRUSTED, GNUTLS_CERT_EXPIRED, GNUTLS_CERT_INVALID } CertificateStatus;
-
-#define X509_CN_SIZE 256
-#define X509_C_SIZE 3
-#define X509_O_SIZE 256
-#define X509_OU_SIZE 256
-#define X509_L_SIZE 256
-#define X509_S_SIZE 256
-
-typedef struct {
-	char common_name[X509_CN_SIZE];
-	char country[X509_C_SIZE];
-	char organization[X509_O_SIZE];
-	char organizational_unit_name[X509_OU_SIZE];
-	char locality_name[X509_L_SIZE];
-	char state_or_province_name[X509_S_SIZE];
-} gnutls_DN;
-
-/* For key Usage, test as:
- * if (st.keyUsage & X509KEY_DIGITAL_SIGNATURE) ...
- */
-#define X509KEY_DIGITAL_SIGNATURE 	256
-#define X509KEY_NON_REPUDIATION		128
-#define X509KEY_KEY_ENCIPHERMENT	64
-#define X509KEY_DATA_ENCIPHERMENT	32
-#define X509KEY_KEY_AGREEMENT		16
-#define X509KEY_KEY_CERT_SIGN		8
-#define X509KEY_CRL_SIGN		4
-#define X509KEY_ENCIPHER_ONLY		2
-#define X509KEY_DECIPHER_ONLY		1
-
-typedef struct {
-	gnutls_DN	  peer_dn;
-	gnutls_DN	  issuer_dn;
-	CertificateStatus peer_certificate_status;
-	int		  peer_certificate_version;
-	time_t		  peer_certificate_activation_time;
-	time_t		  peer_certificate_expiration_time;
-        char              subjectAltName[X509_CN_SIZE]; /* this only contains dnsName if present,
-                                                         * nothing else 
-                                                         */
-	int		  CA;       /* 1 if the certificate belongs
-                                     * to a CA. 0 otherwise.
-                                     */
-	unsigned char	  keyUsage; /* 8 bits */
-} X509PKI_CLIENT_AUTH_INFO;
-
-
 /* CERTFILE is an x509 certificate in PEM form.
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
@@ -268,5 +208,11 @@ typedef void (*LOG_FUNC)( const char*);
 void gnutls_global_set_send_func( SEND_FUNC send_func);
 void gnutls_global_set_recv_func( RECV_FUNC recv_func);
 
+/* Auth_Info structures */
 
-/* error codes appended here */
+typedef struct X509PKI_CLIENT_AUTH_INFO X509PKI_CLIENT_AUTH_INFO;
+typedef struct SRP_CLIENT_AUTH_INFO SRP_CLIENT_AUTH_INFO;
+typedef struct SRP_SERVER_AUTH_INFO SRP_SERVER_AUTH_INFO;
+typedef struct ANON_CLIENT_AUTH_INFO ANON_CLIENT_AUTH_INFO;
+typedef struct ANON_SERVER_AUTH_INFO ANON_SERVER_AUTH_INFO;
+

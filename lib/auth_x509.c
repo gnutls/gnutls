@@ -40,8 +40,6 @@ void _gnutls_copy_x509_client_auth_info( X509PKI_CLIENT_AUTH_INFO* info, gnutls_
 	if ( cert->subjectAltName[0]!=0)
 		strcpy( info->subjectAltName, cert->subjectAltName);
 
-	info->CA = cert->CA;
-
 	info->keyUsage = cert->keyUsage;
 
 	info->peer_certificate_expiration_time = cert->expiration_time;

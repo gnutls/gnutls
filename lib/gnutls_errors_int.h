@@ -1,3 +1,6 @@
+/* error codes 
+ */
+
 #define GNUTLS_E_SUCCESS 0
 #define	GNUTLS_E_MAC_FAILED  -1
 #define	GNUTLS_E_UNKNOWN_CIPHER -2
