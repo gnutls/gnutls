@@ -257,7 +257,7 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	uint64 seq_num;
 	uint16 length;
 	GNUTLS_MAC_HANDLE td;
-	int blocksize, ret;
+	int blocksize, ret, i;
 	uint8 major, minor;
 	int hash_size = _gnutls_mac_get_digest_size(state->security_parameters.read_mac_algorithm);
 
@@ -326,8 +326,19 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 		if (pad >
 		    ciphertext.size - hash_size) {
 			gnutls_assert();
-			return GNUTLS_E_RECEIVED_BAD_MESSAGE;
+			return GNUTLS_E_DECRYPTION_FAILED;
 		}
+		
+		/* Check the pading bytes (TLS 1.0 only)
+		 */
+		if ( state->security_parameters.version == GNUTLS_TLS1)
+		for (i=2;i<pad;i++) {
+			if (ciphertext.data[ciphertext.size-i] != ciphertext.data[ciphertext.size - 1]) {
+				gnutls_assert();
+				return GNUTLS_E_DECRYPTION_FAILED;
+			}
+		}
+		
 		break;
 	default:
 		gnutls_assert();
@@ -369,6 +380,7 @@ int _gnutls_ciphertext2TLSCompressed(GNUTLS_STATE state,
 	/* HMAC was not the same. */
 	if (memcmp
 	    (MAC, &ciphertext.data[compress->size], hash_size) != 0) {
+		gnutls_free( data);
 		gnutls_assert();
 		return GNUTLS_E_DECRYPTION_FAILED;
 	}
