@@ -1460,6 +1460,8 @@ static gnutls_cert *alloc_and_load_x509_certs(gnutls_x509_crt * certs,
 	gnutls_cert *local_certs;
 	int ret = 0;
 	uint i, j;
+	
+	if (certs==NULL) return NULL;
 
 	local_certs = gnutls_malloc(sizeof(gnutls_cert) * ncerts);
 	if (local_certs == NULL) {
@@ -1494,6 +1496,8 @@ static gnutls_privkey *alloc_and_load_x509_key(gnutls_x509_privkey key)
 	gnutls_privkey *local_key;
 	int ret = 0;
 
+	if (key==NULL) return NULL;
+
 	local_key = gnutls_malloc(sizeof(gnutls_privkey));
 	if (local_key == NULL) {
 		gnutls_assert();
@@ -1521,7 +1525,8 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 {
 	gnutls_cert *local_certs;
 	int ret = 0;
-	uint i, j;
+
+	if (cert==NULL) return NULL;
 
 	local_certs = gnutls_malloc(sizeof(gnutls_cert));
 	if (local_certs == NULL) {
@@ -1534,7 +1539,7 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 		return NULL;
 	}
 
-	ret = _E_gnutls_openpgp_key_to_gcert(&local_certs[i], cert);
+	ret = _E_gnutls_openpgp_key_to_gcert(local_certs, cert);
 	if (ret < 0) {
 		gnutls_assert();
 		return NULL;
@@ -1542,9 +1547,7 @@ static gnutls_cert *alloc_and_load_pgp_certs(gnutls_openpgp_key cert)
 
 	if (ret < 0) {
 		gnutls_assert();
-		for (j = 0; j < i; j++) {
-			_gnutls_gcert_deinit(&local_certs[j]);
-		}
+		_gnutls_gcert_deinit(local_certs);
 		gnutls_free(local_certs);
 		return NULL;
 	}
@@ -1559,6 +1562,8 @@ static gnutls_privkey *alloc_and_load_pgp_key(const gnutls_openpgp_privkey key)
 {
 	gnutls_privkey *local_key;
 	int ret = 0;
+
+	if (key==NULL) return NULL;
 
 	local_key = gnutls_malloc(sizeof(gnutls_privkey));
 	if (local_key == NULL) {

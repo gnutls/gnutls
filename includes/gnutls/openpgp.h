@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 #include <gnutls/gnutls.h>
+#include <gnutls/extra.h>
 
 /* gnutls_openpgp_key should be defined in gnutls.h
  */
