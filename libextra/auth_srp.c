@@ -447,7 +447,7 @@ static int check_g_n( const opaque* g, size_t n_g,
 {
 
 	if (n_g != 1 || g[0] != srp_generator) 
-		return GNUTLS_E_ILLEGAL_SRP_PARAMS;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 
 	if (n_n == sizeof(srp_params_1024) &&
 			memcmp( srp_params_1024, n, n_n)==0) {
@@ -464,7 +464,7 @@ static int check_g_n( const opaque* g, size_t n_g,
 		return 0;
 	}
 
-	return GNUTLS_E_ILLEGAL_SRP_PARAMS;
+	return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 }
 
 /* Check if N is a prime and G a generator of the
@@ -474,7 +474,7 @@ static int group_check_g_n( GNUTLS_MPI g, GNUTLS_MPI n)
 {
 	if (gcry_prime_check( n, 0) != 0) {
 		gnutls_assert();
-		return GNUTLS_E_ILLEGAL_SRP_PARAMS;
+		return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 	}
 	
 	/* We should also check whether g is a generator,

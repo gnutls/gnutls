@@ -133,7 +133,6 @@ static gnutls_error_entry error_algorithms[] = {
         ERROR_ENTRY("Could not get OpenPGP key.", GNUTLS_E_OPENPGP_GETKEY_FAILED, 1),
 
         ERROR_ENTRY("The SRP username supplied by the peer is illegal.", GNUTLS_E_ILLEGAL_SRP_USERNAME, 1),
-        ERROR_ENTRY("The SRP parameters sent by the peer are illegal.", GNUTLS_E_ILLEGAL_SRP_PARAMS, 1),
         ERROR_ENTRY("The peer advertized SRP but did not supply any SRP username.", GNUTLS_E_EMPTY_SRP_USERNAME, 1),
 
         ERROR_ENTRY("The OpenPGP fingerprint is not supported.", GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED, 1),
