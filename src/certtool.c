@@ -42,6 +42,7 @@ gnutls_x509_privkey load_ca_private_key(void);
 gnutls_x509_crt load_ca_cert(void);
 gnutls_x509_crt load_cert(int mand);
 void certificate_info( void);
+void crl_info( void);
 void privkey_info( void);
 static void gaa_parser(int argc, char **argv);
 void generate_self_signed( void);
@@ -566,6 +567,9 @@ int ret;
 		case 10:
 			generate_prime( info.bits);
 			break;
+		case 11:
+			crl_info();
+			break;
 		default:
 			fprintf(stderr, "GnuTLS' certtool utility.\n");
 			fprintf(stderr, "Please use the --help to get help on this program.\n");
@@ -763,6 +767,85 @@ void certificate_info( void)
 	}
 
 	fprintf(outfile, "\n");
+}
+
+void crl_info(void)
+{
+	gnutls_x509_crl crl;
+	int size, ret, i, rc;
+	time_t tim;
+	gnutls_datum pem;
+	char serial[40];
+	size_t serial_size = sizeof(serial), dn_size;
+	char printable[256];
+	char *print;
+	const char* cprint;
+	char dn[256];
+		
+	size = fread( buffer, 1, sizeof(buffer)-1, infile);
+	buffer[size] = 0;
+
+	gnutls_x509_crl_init(&crl);
+	
+	pem.data = buffer;
+	pem.size = size;
+	
+	ret = gnutls_x509_crl_import(crl, &pem, in_cert_format);
+	if (ret < 0) {
+		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	fprintf(outfile, "Version: %d\n", gnutls_x509_crl_get_version(crl));
+
+	/* Issuer
+	 */
+	dn_size = sizeof(dn);
+
+	ret = gnutls_x509_crl_get_issuer_dn(crl, dn, &dn_size);
+	if (ret >= 0)
+		fprintf(outfile, "Issuer: %s\n", dn);
+
+	fprintf(outfile, "Signature Algorithm: ");
+	ret = gnutls_x509_crl_get_signature_algorithm(crl);
+
+	cprint = get_algorithm( ret);
+	fprintf(outfile,  "%s\n", cprint);
+
+	/* Validity
+	 */
+	fprintf(outfile, "Update dates:\n");
+
+	tim = gnutls_x509_crl_get_this_update(crl);
+	fprintf(outfile, "\tIssued at: %s", ctime(&tim));
+
+	tim = gnutls_x509_crl_get_next_update(crl);
+	fprintf(outfile, "\tNext at: %s", ctime(&tim));
+
+	fprintf(outfile, "\n");
+	
+	/* Count the certificates.
+	 */
+	 
+	rc = gnutls_x509_crl_get_crt_count( crl);
+	fprintf(outfile, "Revoked certificates: %d\n", rc);
+
+	for (i=0;i<rc;i++) {
+		/* serial number
+		 */
+		serial_size = sizeof(serial);
+		if (gnutls_x509_crl_get_crt_serial(crl, i, serial, &serial_size, &tim) >= 0) {
+			print = printable;
+			for (i = 0; i < serial_size; i++) {
+				sprintf(print, "%.2x ",
+					(unsigned char) serial[i]);
+				print += 3;
+			}
+			fprintf(outfile, "\tCertificate SN: %s\n", printable);
+			fprintf(outfile, "\tRevoked at: %s\n", ctime( &tim));
+		}
+	
+	}
 }
 
 void privkey_info( void)

@@ -158,7 +158,7 @@ time_t gnutls_x509_crl_get_next_update(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_crt_count(gnutls_x509_crl crl);
 int gnutls_x509_crl_get_crt_serial(gnutls_x509_crl crl, int index, unsigned char* serial,
         size_t* serial_size, time_t* time);
-#define gnutls_x509_crl_get_crt_count gnutls_x509_crl_get_certificate_count
+#define gnutls_x509_crl_get_certificate_count gnutls_x509_crl_get_crt_count
 #define gnutls_x509_crl_get_certificate gnutls_x509_crl_get_crt_serial
 
 int gnutls_x509_crl_check_issuer( gnutls_x509_crl crl,
