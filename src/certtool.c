@@ -6,6 +6,7 @@
 #include <time.h>
 #include "certtool-gaa.h"
 
+void verify_chain(void);
 gnutls_x509_privkey load_private_key(void);
 gnutls_x509_privkey load_ca_private_key(void);
 gnutls_x509_crt load_ca_cert(void);
@@ -16,7 +17,7 @@ void generate_request(void);
 
 static gaainfo info;
 
-static unsigned char buffer[10*1024];
+static unsigned char buffer[40*1024];
 static const int buffer_size = sizeof(buffer);
 
 static void tls_log_func( int level, const char* str)
@@ -28,7 +29,7 @@ int main(int argc, char** argv)
 {
 	gnutls_global_init();
 	gnutls_global_set_log_function( tls_log_func);
-	gnutls_global_set_log_level(2);
+	gnutls_global_set_log_level(1);
 
 	gaa_parser(argc, argv);
 
@@ -376,6 +377,9 @@ void gaa_parser(int argc, char **argv)
 		case 4:
 			generate_signed_certificate();
 			return;
+		case 5:
+			verify_chain();
+			return;
 	}
 }
 
@@ -695,4 +699,173 @@ void generate_request(void)
 	gnutls_x509_crq_deinit(crq);
 	gnutls_x509_privkey_deinit(key);
 
+}
+
+
+
+#define CERT_SEP "-----BEGIN CERT"
+#define CRL_SEP "-----BEGIN X509 CRL"
+
+int _verify_x509_mem( const char* cert, int cert_size)
+{
+	int siz, i;
+	const char *ptr;
+	int ret;
+	unsigned int output;
+	gnutls_datum tmp;
+	gnutls_x509_crt *x509_cert_list = NULL;
+	gnutls_x509_crl *x509_crl_list = NULL;
+	int x509_ncerts, x509_ncrls;
+	time_t now = time(0);
+
+	/* Decode the CA certificate
+	 */
+
+	/* Decode the CRL list
+	 */
+	siz = cert_size;
+	ptr = cert;
+
+	i = 1;
+
+	if (strstr(ptr, CRL_SEP)!=NULL) /* if CRLs exist */
+	do {
+		x509_crl_list =
+		    (gnutls_x509_crl *) realloc( x509_crl_list,
+						   i *
+						   sizeof(gnutls_x509_crl));
+		if (x509_crl_list == NULL) {
+			fprintf(stderr, "memory error\n");
+			exit(1);
+		}
+
+		tmp.data = (char*)ptr;
+		tmp.size = siz;
+
+		ret = gnutls_x509_crl_init( &x509_crl_list[i-1]);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the CRL[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
+		}
+	
+		ret = gnutls_x509_crl_import( x509_crl_list[i-1], &tmp, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the CRL[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		/* now we move ptr after the pem header */
+		ptr = strstr(ptr, CRL_SEP);
+		if (ptr!=NULL)
+			ptr++;
+
+		i++;
+	} while ((ptr = strstr(ptr, CRL_SEP)) != NULL);
+
+	x509_ncrls = i - 1;
+
+
+	/* Decode the certificate chain. 
+	 */
+	siz = cert_size;
+	ptr = cert;
+
+	i = 1;
+
+	do {
+		x509_cert_list =
+		    (gnutls_x509_crt *) realloc( x509_cert_list,
+						   i *
+						   sizeof(gnutls_x509_crt));
+		if (x509_cert_list == NULL) {
+			fprintf(stderr, "memory error\n");
+			exit(1);
+		}
+
+		tmp.data = (char*)ptr;
+		tmp.size = siz;
+
+		ret = gnutls_x509_crt_init( &x509_cert_list[i-1]);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the certificate[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
+		}
+	
+		ret = gnutls_x509_crt_import( x509_cert_list[i-1], &tmp, GNUTLS_X509_FMT_PEM);
+		if (ret < 0) {
+			fprintf(stderr, "Error parsing the certificate[%d]: %s\n", i, gnutls_strerror(ret));
+			exit(1);
+		}
+		
+		/* Check expiration dates.
+		 */
+		if (gnutls_x509_crt_get_activation_time(x509_cert_list[i-1]) > now)
+			fprintf(stderr, "Warning: certificate %d has not been activated yet.\n", i);
+		if (gnutls_x509_crt_get_expiration_time(x509_cert_list[i-1]) < now)
+			fprintf(stderr, "Warning: certificate %d has been expired.\n", i);
+
+		/* now we move ptr after the pem header */
+		ptr = strstr(ptr, CERT_SEP);
+		if (ptr!=NULL)
+			ptr++;
+
+		i++;
+	} while ((ptr = strstr(ptr, CERT_SEP)) != NULL);
+
+	x509_ncerts = i - 1;
+
+	/* The last certificate in the list will be used as
+	 * a CA (should be self signed).
+	 */
+	ret  = gnutls_x509_crt_list_verify( x509_cert_list, x509_ncerts,
+		&x509_cert_list[x509_ncerts-1], 1, x509_crl_list, x509_ncrls, 0, &output);
+
+	for (i=0;i<x509_ncerts;i++) {
+		gnutls_x509_crt_deinit( x509_cert_list[i]);
+	}
+
+	for (i=0;i<x509_ncrls;i++) {
+		gnutls_x509_crl_deinit( x509_crl_list[i]);
+	}
+
+	free( x509_cert_list);
+	free( x509_crl_list);
+
+	if ( ret < 0) {
+		fprintf(stderr, "Error in verification: %s\n", gnutls_strerror(ret));
+		exit(1);
+	}
+
+	return output;
+}
+
+static void print_verification_res( unsigned int x) 
+{
+	printf( "Verification output:\n");
+	if (x&GNUTLS_CERT_INVALID)
+		printf("\tcertificate chain is invalid.\n");
+	else
+	 	printf("\tcertificate chain is valid.\n");
+	if (x&GNUTLS_CERT_NOT_TRUSTED)
+		printf("\tcertificate is NOT trusted\n");
+	else
+		printf("\tcertificate is trusted.\n");
+
+	if (x&GNUTLS_CERT_CORRUPTED)
+		printf("\tcertificate is corrupt.\n");
+
+	if (x&GNUTLS_CERT_REVOKED)
+		printf("\tcertificate is revoked.\n");
+}
+
+void verify_chain( void)
+{
+unsigned int output;
+size_t size;
+
+	size = fread( buffer, 1, sizeof(buffer)-1, stdin);
+
+	output = _verify_x509_mem( buffer, size);
+	
+	print_verification_res( output);
 }
