@@ -21,6 +21,7 @@
 #include "gnutls_errors.h"
 #include "debug.h"
 
+#define SESSION_SIZE sizeof(SecurityParameters) + sizeof(state->gnutls_key->auth_info_size) + state->gnutls_key->auth_info_size
 
 /**
   * gnutls_get_current_session - Returns all session parameters.
@@ -37,15 +38,17 @@
   **/
 int gnutls_get_current_session( GNUTLS_STATE state, opaque* session, int *session_size) {
 
-	*session_size = sizeof(SecurityParameters) + state->gnutls_key->auth_info_size;
-	
+	if (*session_size < SESSION_SIZE) {
+		*session_size = SESSION_SIZE;
+		session = NULL; /* return with the new session_size value */
+	}
+
 	if (state->gnutls_internals.resumable==RESUME_FALSE) return GNUTLS_E_INVALID_SESSION;
 	/* just return the session size */
 	if (session==NULL) {
 		return 0;
 	}
 	memcpy( session, &state->security_parameters, sizeof(SecurityParameters));
-/*	memcpy( &session[sizeof(SecurityParameters)], state->gnutls_key->auth_info, state->gnutls_key->auth_info_size);*/
 	memcpy( &session[sizeof(SecurityParameters)], &state->gnutls_key->auth_info_size,  sizeof(state->gnutls_key->auth_info_size));
 	memcpy( &session[sizeof(state->gnutls_key->auth_info_size)+sizeof(SecurityParameters)], 
 		state->gnutls_key->auth_info,  state->gnutls_key->auth_info_size);
