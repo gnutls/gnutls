@@ -155,8 +155,9 @@ int _gnutls_send_client_kx_message(int cd, GNUTLS_STATE state)
 	master = gnutls_PRF( premaster, premaster_size, MASTER_SECRET, strlen(MASTER_SECRET),
 						random, 64 ,48);
 
-
+#ifdef HARD_DEBUG
 	fprintf(stderr, "master secret: %s\n", bin2hex(master, 48));
+#endif
 	memmove( state->security_parameters.master_secret, master, 48);
 
 	secure_free(master);
@@ -293,8 +294,9 @@ int _gnutls_recv_client_kx_message(int cd, GNUTLS_STATE state)
 						random, 64 ,48);
 
 
+#ifdef HARD_DEBUG
 	fprintf(stderr, "master secret: %s\n", bin2hex(master, 48));
-
+#endif
 	memmove( state->security_parameters.master_secret, master, 48);
 
 	secure_free(master);

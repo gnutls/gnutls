@@ -499,12 +499,11 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 #ifdef DEBUG
 		fprintf(stderr, "Server's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
-		if (data[pos++] != GNUTLS_VERSION_MAJOR)
+		if ( _gnutls_valid_version( state, data[pos], data[pos+1]) != 0) {
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-
-		if (data[pos++] != GNUTLS_VERSION_MINOR)
-			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-
+		}
+		pos+=2;
+		
 		memmove(state->security_parameters.server_random,
 			&data[pos], 32);
 		pos += 32;
@@ -513,7 +512,7 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 
 		if (datalen < 38 + session_id_len)
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-#ifdef DEBUG
+#ifdef HARD_DEBUG
 		fprintf(stderr, "SessionID length: %d\n", session_id_len);
 		fprintf(stderr, "SessionID: %s\n",
 			bin2hex(&data[pos], session_id_len));
@@ -573,13 +572,11 @@ int _gnutls_recv_hello(int cd, GNUTLS_STATE state, char *data, int datalen,
 		fprintf(stderr, "Client's version: %d.%d\n", data[pos], data[pos+1]);
 #endif
 
-		if (data[pos++] != GNUTLS_VERSION_MAJOR)
+		if ( _gnutls_valid_version( state, data[pos], data[pos+1]) != 0) {
 			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-
-
-		if (data[pos++] != GNUTLS_VERSION_MINOR)
-			return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-
+		}
+		pos+=2;
+		
 		memmove(state->security_parameters.client_random,
 			&data[pos], 32);
 		pos += 32;
@@ -880,7 +877,7 @@ int _gnutls_generate_session_id(char **session_id, uint8 * len)
 	gcry_free(rand);
 	*len = 32;
 
-#ifdef DEBUG
+#ifdef HARD_DEBUG
 	fprintf(stderr, "SessionID: %s\n", bin2hex(*session_id, 32));
 #endif
 	return 0;

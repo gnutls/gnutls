@@ -36,10 +36,11 @@ int main()
 	ret = gnutls_handshake(sd, state);
 	
 	if (ret<0) {
-		fprintf(stderr, "handshake failed(%d)\n", ret);
+		fprintf(stderr, "Handshake has failed\n");
+		gnutls_perror(ret);
 		return 1;
 	} else {
-		fprintf(stderr, "handshake finished\n");
+		fprintf(stderr, "Handshake was finished\n");
 	}
 
 	bzero(buffer, sizeof(buffer));

@@ -1,7 +1,7 @@
 #include <gcrypt.h>
 #include <mhash.h>
 
-#define HARD_DEBUG
+// #define HARD_DEBUG
 #define DEBUG
 
 #define svoid void /* for functions that allocate using secure_free */
@@ -117,7 +117,14 @@ typedef struct {
 	opaque* client_write_key;
 } CipherSpecs;
 
+
 typedef struct {
+	uint8 major;
+	uint8 minor;
+} GNUTLS_Version;
+
+typedef struct {
+	GNUTLS_Version version;
 	opaque* read_compression_state;
 	opaque* write_compression_state;
 	GCRY_CIPHER_HD write_cipher_state;
@@ -261,4 +268,5 @@ int gnutls_close(int cd, GNUTLS_STATE state);
 svoid *gnutls_PRF(opaque * secret, int secret_size, uint8 * label,
 		  int label_size, opaque * seed, int seed_size,
 		  int total_bytes);
-		  
+int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor);
+ 

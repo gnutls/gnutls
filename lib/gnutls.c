@@ -8,6 +8,13 @@
 #include "gnutls_buffers.h"
 #include "gnutls_handshake.h"
 
+int _gnutls_valid_version( GNUTLS_STATE state, int major, int minor) {
+
+	if (state->connection_state.version.major == major && state->connection_state.version.minor == minor)
+		return 0;
+	return 1;
+}
+
 int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 {
 	*state = gnutls_calloc(1, sizeof(GNUTLS_STATE_INT));
@@ -40,11 +47,14 @@ int gnutls_init(GNUTLS_STATE * state, ConnectionEnd con_end)
 	(*state)->gnutls_internals.client_hash = 0;
 	(*state)->gnutls_internals.resumable = RESUME_TRUE;
 
-	mpi_release((*state)->gnutls_internals.KEY);
-	mpi_release((*state)->gnutls_internals.client_Y);
-	mpi_release((*state)->gnutls_internals.client_p);
-	mpi_release((*state)->gnutls_internals.client_g);
-	mpi_release((*state)->gnutls_internals.dh_secret);
+	(*state)->connection_state.version.major = GNUTLS_VERSION_MAJOR;
+	(*state)->connection_state.version.minor = GNUTLS_VERSION_MINOR;
+
+	(*state)->gnutls_internals.KEY = NULL;
+	(*state)->gnutls_internals.client_Y = NULL;
+	(*state)->gnutls_internals.client_p = NULL;
+	(*state)->gnutls_internals.client_g = NULL;
+	(*state)->gnutls_internals.dh_secret = NULL;
 
 
 }
@@ -509,8 +519,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	if (gcipher.version.major != GNUTLS_VERSION_MAJOR
-	    || gcipher.version.minor != GNUTLS_VERSION_MINOR) {
+	if ( _gnutls_valid_version( state, gcipher.version.major, gcipher.version.minor) !=0) {
 #ifdef DEBUG
 		fprintf(stderr, "Peer's Version: %d.%d\n", gcipher.version.major, gcipher.version.minor);
 #endif
@@ -609,7 +618,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type,
 	} else {
 		switch (gcipher.type) {
 		case GNUTLS_ALERT:
-#ifdef DEBUG
+#ifdef HARD_DEBUG
 			fprintf(stderr,
 				"Alert[%d|%d] was received\n",
 				tmpdata[0], tmpdata[1]);
