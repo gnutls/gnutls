@@ -1,3 +1,22 @@
+2003-03-17 22:25  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_dh_primes.c, gnutls_errors.c, gnutls_pk.c:
+
+	better use of asn1_der_coding() to avoid using static buffers.  
+
+2003-03-17 20:05  nmav <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls.h.in.in, lib/gnutls_algorithms.c,
+	lib/gnutls_hash_int.c, lib/gnutls_int.h:
+
+	MD2 support was dropped this is an algorithm we cannot use.  
+
+2003-03-17 16:23  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_hash_int.c:
+
+	some cleanups.  
+
 2003-03-15 10:39  nmav <nmav@gnutls.org>
 
 	* doc/tex/: Makefile.am, ex-crq.tex, examples.tex (utags:
