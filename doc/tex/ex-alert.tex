@@ -17,7 +17,7 @@ void check_alert(gnutls_session session, int ret)
       last_alert = gnutls_alert_get(session);
 
       /* The check for renegotiation is only useful if we are 
-       * a client, and should be removed otherwise.
+       * a server, and we had requested a rehandshake.
        */
       if (last_alert == GNUTLS_A_NO_RENEGOTIATION &&
           ret == GNUTLS_E_WARNING_ALERT_RECEIVED)

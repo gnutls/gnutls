@@ -28,14 +28,9 @@ This function should be called after a successful
 \par HTTPS clients have to verify not only the peer's certificate,
 but also the hostname in this certificate. That is to know that
 they actually connected to the right site.
-RFC2818 specifies some hostname checking algorithm, and this --a simple form--
-is implemented in the following example.
 
 \par
-This function should be called right after a successful
-\printfunc{gnutls_certificate_verify_peers}{gnutls\_certificate\_verify\_peers}.
-See also
-\printfunc{gnutls_x509_check_certificates_hostname}{gnutls\_x509\_check\_certificates\_hostname}.
+The following function is an example on how to fully verify a certificate.
 
 \input{ex-rfc2818}
 

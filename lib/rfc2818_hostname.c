@@ -33,6 +33,8 @@ static int hostname_compare(const char *certname, const char *hostname);
   * the given hostname. This is a basic implementation of the matching described
   * in RFC2818 (HTTPS).
   *
+  * Returns 1 on success, and 0 on failure.
+  *
   **/
 int gnutls_x509_check_certificates_hostname(const gnutls_datum * cert,
                                 const char *hostname)
