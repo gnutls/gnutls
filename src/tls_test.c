@@ -100,6 +100,7 @@ static const TLS_TEST tls_tests[] = {
 	{ NULL }
 };
 
+static int tt = 0;
 
 #define CONNECT() \
 		sd = socket(AF_INET, SOCK_STREAM, 0); \
@@ -109,7 +110,7 @@ static const TLS_TEST tls_tests[] = {
 		sa.sin_port = htons(port); \
 		sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr); \
 		inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF); \
-		if(more_info!=0) fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port); \
+		if (tt++ == 0) fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port); \
 		err = connect(sd, (SA *) & sa, sizeof(sa)); \
 		ERR(err, "connect")
 
