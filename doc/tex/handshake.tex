@@ -39,10 +39,9 @@ In the case of ciphersuites that use certificate authentication, the
 authentication\index{Certificate authentication!Client} of the client is
 optional in \tls{}. A server may request a certificate from the client -- using the
 \printfunc{gnutls_certificate_server_set_request}{gnutls\_certificate\_server\_set\_request}
-function. If a certificate is to be requested by the client, at the handshake
-procedure, the server will send an extra packet,
-than contains a list of acceptable certificate signers, and indicates the
-request of a certificate. The client may then send a certificate, signed
+function. If a certificate is to be requested from the client during the handshake,
+the server will send a certificate request message that contains
+a list of acceptable certificate signers. The client may then send a certificate, signed
 by one of the server's acceptable signers. In \gnutls{} the server's acceptable
 signers list is constructed using the trusted CA certificates in the
 credentials structure.

@@ -7,10 +7,11 @@ over simple custom made application protocols.
 The discussion below mainly refers to the \emph{TCP/IP} transport layer
 but may be extended to other ones too.
 
-\section{The traditional way}
+\section{Separate ports}
 
 Traditionally \ssl{} was used in application protocols by assigning 
-a new port number for the secure services. That way two ports were assigned, one for the
+a new port number for the secure services. That way two separate 
+ports were assigned, one for the
 non secure sessions, and one for the secured ones. This has the benefit
 that if a user requests a secure session then the client will try to
 connect to the secure port and fail otherwise. The only possible attack
@@ -34,7 +35,7 @@ unnecessary complication. Due to the fact that there is a limitation on
 the available privileged ports, this approach was soon obsoleted.
 
 
-\section{A different approach}
+\section{Upward negotiation}
 Other application protocols\footnote{See LDAP, IMAP etc.}
 use a different approach to enable the secure layer.
 They use something called the ``TLS upgrade'' method. This method
