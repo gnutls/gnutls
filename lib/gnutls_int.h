@@ -355,6 +355,8 @@ int _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state);
 int _gnutls_version_cmp(GNUTLS_Version ver1, GNUTLS_Version ver2);
 #define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)
 
-#define gcry_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x)) 
+#ifndef gcry_mpi_alloc_like
+# define gcry_mpi_alloc_like(x) gcry_mpi_new(gcry_mpi_get_nbits(x)) 
+#endif
 
 #endif /* GNUTLS_INT_H */

@@ -436,7 +436,7 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	uint8 *data;
 	uint8 pad;
 	uint8 *rand;
-	uint8* seq_num;
+	uint64 seq_num;
 	int length;
 	GNUTLS_MAC_HANDLE td;
 	int blocksize =
@@ -477,16 +477,9 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 	c_length = CONVuint16(compressed->length);
 	seq_num =
 	    CONVuint64(&state->connection_state.write_sequence_number);
-	if (seq_num==NULL) {
-		gnutls_free(*cipher);
-		gnutls_free(content);
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
 
 	if (td != GNUTLS_MAC_FAILED) {	/* actually when the algorithm in not the NULL one */
-		gnutls_hmac(td, seq_num, 8);
-		gnutls_free( seq_num);
+		gnutls_hmac(td, UINT64DATA(seq_num), 8);
 		
 		gnutls_hmac(td, &compressed->type, 1);
 		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS 1.0 only */
@@ -584,7 +577,7 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 	uint16 c_length;
 	uint8 *data;
 	uint8 pad;
-	uint8* seq_num;
+	uint64 seq_num;
 	uint16 length;
 	GNUTLS_MAC_HANDLE td;
 	int blocksize =
@@ -676,16 +669,9 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 
 	c_length = CONVuint16((uint16) compressed->length);
 	seq_num = CONVuint64( &state->connection_state.read_sequence_number);
-	if (seq_num==NULL) {
-		gnutls_free(*compress);
-		gnutls_free(content);
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
 
 	if (td != GNUTLS_MAC_FAILED) {
-		gnutls_hmac(td, seq_num, 8);
-		gnutls_free( seq_num);
+		gnutls_hmac(td, UINT64DATA(seq_num), 8);
 		
 		gnutls_hmac(td, &compressed->type, 1);
 		if (_gnutls_version_ssl3(state->connection_state.version) != 0) { /* TLS 1.0 only */

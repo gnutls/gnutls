@@ -26,7 +26,7 @@ uint32 READuint32( const opaque* data);
 uint16 READuint16( const opaque* data);
 uint32 CONVuint32( uint32 data);
 uint16 CONVuint16( uint16 data);
-uint8* CONVuint64( const uint64 *data); /* note: this returns malloced data */
+uint64 CONVuint64( const uint64 *data);
 uint32 READuint24( const opaque* data);
 void WRITEuint24( uint32 num, opaque* data);
 void WRITEuint32( uint32 num, opaque* data);
@@ -36,12 +36,15 @@ uint32 uint64touint32( const uint64*);
 #ifndef HAVE_UINT64
 int uint64zero( uint64 *);
 int uint64pp( uint64 *);
-#else
+# define UINT64DATA(x) x.i
 
+#else
+# define UINT64DATA(x) &x
 # define rotl64(x,n)   (((x) << ((uint16)(n))) | ((x) >> (64 - (uint16)(n))))
 # define rotr64(x,n)   (((x) >> ((uint16)(n))) | ((x) << (64 - (uint16)(n))))
 # define byteswap64(x)  ((rotl64(x, 8) & 0x00ff00ff00ff00ffUL) | (rotr64(x, 8) & 0xff00ff00ff00ff00UL))
-# define uint64pp(x) (*x)++ 
+
+# define uint64pp(x) ((++(*x)==0) ? -1 : 0);
 # define uint64zero(x) (*x) = 0
 
 #endif

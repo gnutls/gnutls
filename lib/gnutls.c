@@ -469,7 +469,7 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 
 #ifdef HARD_DEBUG
 	fprintf(stderr, "Record: Sending Packet[%d] %s(%d) with length: %d\n",
-		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
+		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, sizeofdata);
 #endif
 
 	for (i = 0; i < iterations; i++) {
@@ -492,12 +492,20 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 		}
 #ifdef HARD_DEBUG
 		fprintf(stderr, "Record: Sended Packet[%d] %s(%d) with length: %d\n",
-		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(type), type, cipher_size);
+		(int) uint64touint32(&state->connection_state.write_sequence_number), _gnutls_packet2str(type), type, cipher_size);
 #endif
 
-		uint64pp( &state->connection_state.write_sequence_number);
+		/* increase sequence number
+		 */
+		if (uint64pp( &state->connection_state.write_sequence_number) !=0) {
+			state->gnutls_internals.valid_connection = VALID_FALSE;
+			gnutls_assert();
+			return GNUTLS_E_RECORD_LIMIT_REACHED;
+		}
 	}
-		/* rest data */
+
+	/* rest of data 
+	 */
 	if (iterations > 1) {
 		Size = sizeofdata % MAX_ENC_LEN;
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
@@ -515,7 +523,13 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, const void
 			return GNUTLS_E_UNABLE_SEND_DATA;
 		}
 
-		uint64pp( &state->connection_state.write_sequence_number);
+		/* increase sequence number
+		 */
+		if (uint64pp( &state->connection_state.write_sequence_number)!=0) {
+			state->gnutls_internals.valid_connection = VALID_FALSE;
+			gnutls_assert();
+			return GNUTLS_E_RECORD_LIMIT_REACHED;
+		}
 	}
 
 	ret += sizeofdata;
@@ -774,6 +788,14 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		(int) uint64touint32(&state->connection_state.read_sequence_number), _gnutls_packet2str(recv_type), recv_type, tmplen);
 #endif
 
+	/* increase sequence number */
+	if (uint64pp( &state->connection_state.read_sequence_number)!=0) {
+		state->gnutls_internals.valid_connection = VALID_FALSE;
+		gnutls_free(tmpdata);
+		gnutls_assert();
+		return GNUTLS_E_RECORD_LIMIT_REACHED;
+	}
+
 	gnutls_free(ciphertext);
 
 	if ( (recv_type == type) && (type == GNUTLS_APPLICATION_DATA || type == GNUTLS_HANDSHAKE)) {
@@ -785,11 +807,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			fprintf(stderr, "Record: Alert[%d|%d] - %s - was received\n", tmpdata[0], tmpdata[1], _gnutls_alert2str((int)tmpdata[1]));
 #endif
 			state->gnutls_internals.last_alert = tmpdata[1];
-
-			/* Increase sequence number 
-			 * this is needed only here because we return immediately
-			 */
-			uint64pp( &state->connection_state.read_sequence_number);
 
 			/* if close notify is received and
 			 * the alert is not fatal
@@ -850,10 +867,6 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 			return GNUTLS_E_UNKNOWN_ERROR;
 		}
 	}
-
-
-	/* Increase sequence number */
-	uint64pp( &state->connection_state.read_sequence_number);
 
 
 	/* Get Application data from buffer */

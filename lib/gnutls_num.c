@@ -29,29 +29,36 @@
 #define rotr16(x,n)   (((x) >> ((uint16)(n))) | ((x) << (16 - (uint16)(n))))
 
 #define byteswap16(x)  ((rotl16(x, 8) & 0x00ff) | (rotr16(x, 8) & 0xff00))
-#define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ffU) | (rotr32(x, 8) & 0xff00ff00U))
+#define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ffUL) | (rotr32(x, 8) & 0xff00ff00UL))
 
 #ifndef HAVE_UINT64
 
+/* This function will set the uint64 x to zero 
+ */
 int uint64zero( uint64 *x) {
 
 	memset( x->i, 0, 8);
 	return 0;
 }
 
+/* This function will add one to uint64 x.
+ * Returns 0 on success, or -1 if the uint64 max limit
+ * has been reached.
+ */
 int uint64pp( uint64 *x) {
-register int i, y = 0;
+register int i, y;
 
 	for (i=7;i>=0;i--) {
+		y = 0;
 		if ( x->i[i] == 0xff) {
 			x->i[i] = 0;
 			y = 1;
-		} else (x->i[i])++;
+		} else x->i[i]++;
 
 		if (y==0) break;
-		else y=0;
 	}
-	
+	if (y != 0) return -1; /* over 64 bits! WOW */
+
 	return 0;
 }
 
@@ -159,45 +166,36 @@ uint16 CONVuint16( uint16 data) {
 #endif
 }
 
-uint8* CONVuint64( const uint64* data) {
-uint8* ret = gnutls_malloc( 8);
-#ifdef HAVE_UINT64
-uint64 tmp = *data;
-#endif
-
-if (ret==NULL) {
-	gnutls_assert();
-	return NULL;
-}
-
+uint64 CONVuint64( const uint64* data) {
 #ifdef HAVE_UINT64
 # ifndef WORDS_BIGENDIAN
- tmp = byteswap64( tmp);
- memcpy( ret, &tmp, 8);
- 
+	return byteswap64(*data);
 # else
- memcpy( ret, &tmp, 8);
-
+	return *data;
 # endif /* WORDS_BIGENDIAN */
-#else 
- memcpy( ret, data->i, 8);
+#else
+	uint64 ret;
 
+	memcpy( ret.i, data->i, 8);
+	return ret;
 #endif /* HAVE_UINT64 */
- return ret;
 }
 
 uint32 uint64touint32( const uint64* num) {
 uint32 ret;
 
 #ifdef HAVE_UINT64
- ret = (uint32) *num;
-#else 
- memcpy( &ret, &num->i[4], 4);
+	ret = (uint32) *num;
+
+#else /* no native uint64 */
+
+	memcpy( &ret, &num->i[4], 4);
 # ifndef WORDS_BIGENDIAN
- ret = byteswap32(ret);
+	ret = byteswap32(ret);
 # endif
- 
 #endif /* HAVE_UINT64 */
+
+ 
 
  return ret;
 }

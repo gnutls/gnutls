@@ -69,9 +69,8 @@
 # define HAVE_UINT64
 /* only used native uint64 in 64 bit machines */
  typedef unsigned long int uint64;
- typedef signed long int sint64;
 #else
-typedef struct { unsigned char i[8]; } uint64;
+ typedef struct { unsigned char i[8]; } uint64;
 #endif
 
 

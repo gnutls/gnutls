@@ -1528,8 +1528,9 @@ int _gnutls_generate_session_id(char *session_id, uint8 * len)
 #endif
 	return 0;
 }
-
+#define RENEGOTIATE
 int _gnutls_recv_hello_request(int cd, GNUTLS_STATE state, void* data, uint32 data_size) {
+#ifndef RENEGOTIATE
 int ret;
 
 	/* only client should receive that */
@@ -1544,7 +1545,7 @@ int ret;
 	}
 	return 0;
 
-#if 0 /* this does not work - yet */
+#else /* this does not seem to work - yet */
 uint8 type;
 
 	if (state->security_parameters.entity == GNUTLS_SERVER) {
