@@ -403,7 +403,8 @@ static int _gnutls_find_acceptable_client_cert(gnutls_session session,
 		 * This will make it relative to the certificates
 		 * we've got.
 		 */
-		indx = ij_map[indx];
+		if (indx != -1)
+			indx = ij_map[indx];
 
 	      clear:
 		gnutls_afree(my_certs);

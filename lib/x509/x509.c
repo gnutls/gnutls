@@ -711,7 +711,6 @@ int gnutls_x509_crt_get_key_usage(gnutls_x509_crt cert, unsigned int *key_usage,
 
 	if ((result =
 	     _gnutls_x509_crt_get_extension(cert, "2.5.29.15", 0, &keyUsage, critical)) < 0) {
-	     	gnutls_assert();
 		return result;
 	}
 

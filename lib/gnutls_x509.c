@@ -608,26 +608,89 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 	return 0;
 }
 
+/* Opens a file reads its contents and stores it
+ * in allocated memory, which is returned.
+ */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+
+opaque * _gnutls_file_to_str( const char * file, size_t* str_size)
+{
+	int fd1 = -1;
+	opaque * ret = NULL;
+	struct stat stat_st;
+	size_t tot_size;
+	size_t left;
+	ssize_t i = 0;
+	
+	fd1 = open( file, 0);
+	if (fd1==-1) {
+		gnutls_assert();
+		return NULL;
+	}
+	
+	if (fstat( fd1, &stat_st) == -1) {
+		gnutls_assert();
+		goto error;
+	}
+	
+	tot_size = stat_st.st_size;
+	ret = gnutls_malloc( tot_size + 1);
+	if (ret == NULL) {
+		gnutls_assert();
+		goto error;
+	}
+	
+	left = tot_size;
+	while (left > 0) {
+		i = read( fd1, &ret[tot_size - left], left);
+		if (i == -1) {
+			if (errno == EAGAIN || errno == EINTR)
+				continue;
+			else {
+				gnutls_assert();
+				goto error;
+			}
+		} else if (i==0) break;
+	
+		left -= i;
+	}
+
+	close(fd1);
+
+	*str_size = tot_size - left;
+	ret[*str_size] = 0; /* null terminated */
+
+	return ret;
+	
+	error:
+		gnutls_free( ret);
+		close(fd1);
+		return NULL;
+		
+}
 
 /* Reads a certificate file
  */
 static int read_cert_file(gnutls_certificate_credentials res, const char *certfile,
 	gnutls_x509_crt_fmt type)
 {
-	int siz;
-	char x[MAX_FILE_SIZE];
-	FILE *fd1;
+	size_t size;
+	int ret;
+	char *x;
 
-	fd1 = fopen(certfile, "rb");
-	if (fd1 == NULL)
+	x = _gnutls_file_to_str( certfile, &size);
+	if (x == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
+	}
 
-	siz = fread(x, 1, sizeof(x)-1, fd1);
-	fclose(fd1);
-
-	x[siz] = 0;
-
-	return read_cert_mem( res, x, siz, type);
+	ret = read_cert_mem( res, x, size, type);
+	gnutls_free(x);
+	
+	return ret;
 
 }
 
@@ -639,20 +702,20 @@ static int read_cert_file(gnutls_certificate_credentials res, const char *certfi
 static int read_key_file(gnutls_certificate_credentials res, const char *keyfile,
 	gnutls_x509_crt_fmt type)
 {
-	int siz;
-	char x[MAX_FILE_SIZE];
-	FILE *fd2;
+	size_t size;
+	int ret;
+	opaque* x;
 
-	fd2 = fopen(keyfile, "rb");
-	if (fd2 == NULL)
+	x = _gnutls_file_to_str( keyfile, &size);
+	if (x == NULL) {
+		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
+	}
 
-	siz = fread(x, 1, sizeof(x)-1, fd2);
-	fclose(fd2);
-
-	x[siz] = 0;
-
-	return read_key_mem( res, x, siz, type);
+	ret = read_key_mem( res, x, size, type);
+	gnutls_free(x);
+	
+	return ret;
 }
 
 /**
@@ -1003,7 +1066,7 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res,
 /**
   * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials structure
   * @res: is an &gnutls_certificate_credentials structure.
-  * @CAFILE: is a file containing the list of trusted CAs (DER or PEM list)
+  * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
   * @type: is PEM or DER
   *
   * This function sets the trusted CAs in order to verify client
@@ -1013,32 +1076,27 @@ int gnutls_certificate_set_x509_trust_mem(gnutls_certificate_credentials res,
   *
   **/
 int gnutls_certificate_set_x509_trust_file(gnutls_certificate_credentials res, 
-		const char *CAFILE, gnutls_x509_crt_fmt type)
+		const char *cafile, gnutls_x509_crt_fmt type)
 {
 	int ret, ret2;
-	int siz;
-	char x[MAX_FILE_SIZE];
-	FILE *fd1;
+	size_t size;
+	opaque *x;
 
-	/* FIXME: does not work on long files
-	 */
-	fd1 = fopen(CAFILE, "rb");
-	if (fd1 == NULL) {
+	x = _gnutls_file_to_str( cafile, &size);
+	if (x == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	siz = fread(x, 1, sizeof(x)-1, fd1);
-	fclose(fd1);
-
-	x[siz] = 0;
-
+	
 	if (type==GNUTLS_X509_FMT_DER)
 		ret = parse_der_ca_mem( &res->x509_ca_list, &res->x509_ncas,
-			x, siz);
+			x, size);
 	else
 		ret = parse_pem_ca_mem( &res->x509_ca_list, &res->x509_ncas,
-			x, siz);
+			x, size);
+
+	gnutls_free(x);
 
 	if (ret < 0) {
 		gnutls_assert();
@@ -1234,29 +1292,23 @@ int gnutls_certificate_set_x509_crl_file(gnutls_certificate_credentials res,
 		const char *crlfile, gnutls_x509_crt_fmt type)
 {
 	int ret;
-	int siz;
-	char x[MAX_FILE_SIZE];
-	FILE *fd1;
+	size_t size;
+	opaque * x;
 
-	/* FIXME: does not work on long files
-	 */
-	fd1 = fopen(crlfile, "rb");
-	if (fd1 == NULL) {
+	x = _gnutls_file_to_str( crlfile, &size);
+	if (x == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_FILE_ERROR;
 	}
 
-	siz = fread(x, 1, sizeof(x)-1, fd1);
-	fclose(fd1);
-
-	x[siz] = 0;
-
 	if (type==GNUTLS_X509_FMT_DER)
 		ret = parse_der_crl_mem( &res->x509_crl_list, &res->x509_ncrls,
-			x, siz);
+			x, size);
 	else
 		ret = parse_pem_crl_mem( &res->x509_crl_list, &res->x509_ncrls,
-			x, siz);
+			x, size);
+	
+	gnutls_free(x);
 
 	if (ret < 0) {
 		gnutls_assert();
