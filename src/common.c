@@ -34,10 +34,10 @@ void print_x509_info(gnutls_session session)
 	int cert_list_size = 0, ret;
 	char digest[20];
 	char serial[40];
-	char dn[128];
+	char dn[256];
 	int dn_size;
 	size_t digest_size = sizeof(digest);
-	int i;
+	int i, j;
 	int serial_size = sizeof(serial);
 	char printable[120];
 	char *print;
@@ -45,80 +45,95 @@ void print_x509_info(gnutls_session session)
 	time_t expiret, activet;
 
 	cert_list = gnutls_certificate_get_peers(session, &cert_list_size);
-	
+
 
 	if (cert_list_size <= 0)
 		return;
 
-	gnutls_x509_crt_init( &crt);
-	ret = gnutls_x509_crt_import( crt, &cert_list[0], GNUTLS_X509_FMT_DER);
-	if (ret < 0) {
-		fprintf(stderr, "Decoding error: %s\n", gnutls_strerror(ret));
-		return;
-	}
+	printf(" - Got a certificate list of %d certificates.\n\n",
+	       cert_list_size);
 
-	printf(" - Got a certificate list of %d certificates.\n", cert_list_size);
-	printf(" - Certificate[0] info:\n");
+	for (j = 0; j < cert_list_size; j++) {
 
-	expiret = gnutls_x509_crt_get_expiration_time( crt);
-	activet = gnutls_x509_crt_get_activation_time( crt);
-
-	printf(" # valid since: %s", my_ctime(&activet));
-	printf(" # expires at: %s", my_ctime(&expiret));
-
-	/* Print the fingerprint of the certificate
-	 */
-	if (gnutls_fingerprint
-	    (GNUTLS_DIG_MD5, &cert_list[0], digest, &digest_size) >= 0) {
-		print = printable;
-		for (i = 0; i < digest_size; i++) {
-			sprintf(print, "%.2x ", (unsigned char) digest[i]);
-			print += 3;
+		gnutls_x509_crt_init(&crt);
+		ret =
+		    gnutls_x509_crt_import(crt, &cert_list[j],
+					   GNUTLS_X509_FMT_DER);
+		if (ret < 0) {
+			fprintf(stderr, "Decoding error: %s\n",
+				gnutls_strerror(ret));
+			return;
 		}
-		printf(" # fingerprint: %s\n", printable);
-	}
 
-	/* Print the serial number of the certificate.
-	 */
+		printf(" - Certificate[%d] info:\n", j);
 
-	if (gnutls_x509_crt_get_serial(crt, serial, &serial_size) >= 0) {
-		print = printable;
-		for (i = 0; i < serial_size; i++) {
-			sprintf(print, "%.2x ", (unsigned char) serial[i]);
-			print += 3;
+		expiret = gnutls_x509_crt_get_expiration_time(crt);
+		activet = gnutls_x509_crt_get_activation_time(crt);
+
+		printf(" # valid since: %s", my_ctime(&activet));
+		printf(" # expires at: %s", my_ctime(&expiret));
+
+		/* Print the fingerprint of the certificate
+		 */
+		if (gnutls_fingerprint
+		    (GNUTLS_DIG_MD5, &cert_list[j], digest,
+		     &digest_size) >= 0) {
+			print = printable;
+			for (i = 0; i < digest_size; i++) {
+				sprintf(print, "%.2x ",
+					(unsigned char) digest[i]);
+				print += 3;
+			}
+			printf(" # fingerprint: %s\n", printable);
 		}
-		printf(" # serial number: %s\n", printable);
+
+		/* Print the serial number of the certificate.
+		 */
+
+		if (gnutls_x509_crt_get_serial(crt, serial, &serial_size)
+		    >= 0) {
+			print = printable;
+			for (i = 0; i < serial_size; i++) {
+				sprintf(print, "%.2x ",
+					(unsigned char) serial[i]);
+				print += 3;
+			}
+			printf(" # serial number: %s\n", printable);
+		}
+
+		/* Print the version of the X.509 
+		 * certificate.
+		 */
+		printf(" # version: #%d\n",
+		       gnutls_x509_crt_get_version(crt));
+
+		algo = gnutls_x509_crt_get_pk_algorithm(crt, &bits);
+		printf(" # public key algorithm: ");
+		if (algo == GNUTLS_PK_RSA) {
+			printf("RSA\n");
+			printf(" #   Modulus: %d bits\n", bits);
+		} else if (algo == GNUTLS_PK_DSA) {
+			printf("DSA\n");
+			printf(" #   Exponent: %d bits\n", bits);
+		} else {
+			printf("UNKNOWN\n");
+		}
+
+		dn_size = sizeof(dn);
+		ret = gnutls_x509_crt_get_dn(crt, dn, &dn_size);
+		if (ret >= 0)
+			printf(" # Subject's DN: %s\n", dn);
+
+		dn_size = sizeof(dn);
+		ret = gnutls_x509_crt_get_issuer_dn(crt, dn, &dn_size);
+		if (ret >= 0)
+			printf(" # Issuer's DN: %s\n", dn);
+
+		gnutls_x509_crt_deinit(crt);
+		
+		printf("\n");
+
 	}
-
-	/* Print the version of the X.509 
-	 * certificate.
-	 */
-	printf(" # version: #%d\n", gnutls_x509_crt_get_version(crt));
-
-	algo =
-	    gnutls_x509_crt_get_pk_algorithm( crt, &bits);
-	printf(" # public key algorithm: ");
-	if (algo == GNUTLS_PK_RSA) {
-		printf("RSA\n");
-		printf(" #   Modulus: %d bits\n", bits);
-	} else if (algo == GNUTLS_PK_DSA) {
-		printf("DSA\n");
-		printf(" #   Exponent: %d bits\n", bits);
-	} else {
-		printf("UNKNOWN\n");
-	}
-
-	dn_size = sizeof(dn);
-	ret = gnutls_x509_crt_get_dn( crt, dn, &dn_size);
-	if (ret >= 0)
-		printf( " # Subject's DN: %s\n", dn);
-
-	dn_size = sizeof(dn);
-	ret = gnutls_x509_crt_get_issuer_dn( crt, dn, &dn_size);
-	if (ret >= 0)
-		printf(" # Issuer's DN: %s\n", dn);
-
-	gnutls_x509_crt_deinit( crt);
 
 }
 
@@ -192,8 +207,11 @@ void print_openpgp_info(gnutls_session session)
 			printf(" # PGP Key fingerprint: %s\n", printable);
 
 			if (gnutls_openpgp_extract_key_name(&cert_list[0],
-							0, &pgp_name) < 0) {
-				fprintf(stderr, "Could not extract name\n");
+							    0,
+							    &pgp_name) <
+			    0) {
+				fprintf(stderr,
+					"Could not extract name\n");
 			} else {
 				PRINT_PGP_NAME(pgp_name);
 			}
@@ -268,7 +286,8 @@ int print_info(gnutls_session session)
 			/* This fails in client side */
 			if (gnutls_get_server_name
 			    (session, dns, &dns_size, &type, 0) == 0) {
-				printf("- Given server name[%d]: %s\n", type, dns);
+				printf("- Given server name[%d]: %s\n",
+				       type, dns);
 			}
 		}
 
@@ -383,111 +402,118 @@ void print_license(void)
 		"Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
 }
 
-void parse_protocols( char** protocols, int protocols_size, int* protocol_priority)
+void parse_protocols(char **protocols, int protocols_size,
+		     int *protocol_priority)
 {
-int i,j;
+	int i, j;
 
-   if (protocols != NULL && protocols_size > 0) {
-      for (j = i = 0; i < protocols_size; i++) {
-	 if (strncasecmp(protocols[i], "SSL", 3) == 0)
-	    protocol_priority[j++] = GNUTLS_SSL3;
-	 if (strncasecmp(protocols[i], "TLS", 3) == 0)
-	    protocol_priority[j++] = GNUTLS_TLS1;
-      }
-      protocol_priority[j] = 0;
-   }
+	if (protocols != NULL && protocols_size > 0) {
+		for (j = i = 0; i < protocols_size; i++) {
+			if (strncasecmp(protocols[i], "SSL", 3) == 0)
+				protocol_priority[j++] = GNUTLS_SSL3;
+			if (strncasecmp(protocols[i], "TLS", 3) == 0)
+				protocol_priority[j++] = GNUTLS_TLS1;
+		}
+		protocol_priority[j] = 0;
+	}
 }
 
-void parse_ciphers( char** ciphers, int nciphers, int* cipher_priority)
-{   
-int j,i;
+void parse_ciphers(char **ciphers, int nciphers, int *cipher_priority)
+{
+	int j, i;
 
-   if (ciphers != NULL && nciphers > 0) {
-      for (j = i = 0; i < nciphers; i++) {
-	 if (strncasecmp(ciphers[i], "RIJ", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_RIJNDAEL_128_CBC;
-	 if (strncasecmp(ciphers[i], "TWO", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_TWOFISH_128_CBC;
-	 if (strncasecmp(ciphers[i], "3DE", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_3DES_CBC;
-	 if (strcasecmp(ciphers[i], "ARCFOUR-40") == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_40;
-	 if (strcasecmp(ciphers[i], "ARCFOUR") == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_ARCFOUR_128;
-	 if (strncasecmp(ciphers[i], "NUL", 3) == 0)
-	    cipher_priority[j++] = GNUTLS_CIPHER_NULL;
-      }
-      cipher_priority[j] = 0;
-   }
+	if (ciphers != NULL && nciphers > 0) {
+		for (j = i = 0; i < nciphers; i++) {
+			if (strncasecmp(ciphers[i], "RIJ", 3) == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_RIJNDAEL_128_CBC;
+			if (strncasecmp(ciphers[i], "TWO", 3) == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_TWOFISH_128_CBC;
+			if (strncasecmp(ciphers[i], "3DE", 3) == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_3DES_CBC;
+			if (strcasecmp(ciphers[i], "ARCFOUR-40") == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_ARCFOUR_40;
+			if (strcasecmp(ciphers[i], "ARCFOUR") == 0)
+				cipher_priority[j++] =
+				    GNUTLS_CIPHER_ARCFOUR_128;
+			if (strncasecmp(ciphers[i], "NUL", 3) == 0)
+				cipher_priority[j++] = GNUTLS_CIPHER_NULL;
+		}
+		cipher_priority[j] = 0;
+	}
 }
 
-void parse_macs( char** macs, int nmacs, int *mac_priority)
+void parse_macs(char **macs, int nmacs, int *mac_priority)
 {
-int i,j;
-   if (macs != NULL && nmacs > 0) {
-      for (j = i = 0; i < nmacs; i++) {
-	 if (strncasecmp(macs[i], "MD5", 3) == 0)
-	    mac_priority[j++] = GNUTLS_MAC_MD5;
-	 if (strncasecmp(macs[i], "SHA", 3) == 0)
-	    mac_priority[j++] = GNUTLS_MAC_SHA;
-      }
-      mac_priority[j] = 0;
-   }
+	int i, j;
+	if (macs != NULL && nmacs > 0) {
+		for (j = i = 0; i < nmacs; i++) {
+			if (strncasecmp(macs[i], "MD5", 3) == 0)
+				mac_priority[j++] = GNUTLS_MAC_MD5;
+			if (strncasecmp(macs[i], "SHA", 3) == 0)
+				mac_priority[j++] = GNUTLS_MAC_SHA;
+		}
+		mac_priority[j] = 0;
+	}
 }
 
-void parse_ctypes( char** ctype, int nctype, int * cert_type_priority)
+void parse_ctypes(char **ctype, int nctype, int *cert_type_priority)
 {
-int i,j;
-   if (ctype != NULL && nctype > 0) {
-      for (j = i = 0; i < nctype; i++) {
-	 if (strncasecmp(ctype[i], "OPE", 3) == 0)
-	    cert_type_priority[j++] = GNUTLS_CRT_OPENPGP;
-	 if (strncasecmp(ctype[i], "X", 1) == 0)
-	    cert_type_priority[j++] = GNUTLS_CRT_X509;
-      }
-      cert_type_priority[j] = 0;
-   }
+	int i, j;
+	if (ctype != NULL && nctype > 0) {
+		for (j = i = 0; i < nctype; i++) {
+			if (strncasecmp(ctype[i], "OPE", 3) == 0)
+				cert_type_priority[j++] =
+				    GNUTLS_CRT_OPENPGP;
+			if (strncasecmp(ctype[i], "X", 1) == 0)
+				cert_type_priority[j++] = GNUTLS_CRT_X509;
+		}
+		cert_type_priority[j] = 0;
+	}
 }
 
-void parse_kx( char** kx, int nkx, int* kx_priority)
+void parse_kx(char **kx, int nkx, int *kx_priority)
 {
-int i,j;
-   if (kx != NULL && nkx > 0) {
-      for (j = i = 0; i < nkx; i++) {
-	 if (strcasecmp(kx[i], "SRP") == 0)
-	    kx_priority[j++] = GNUTLS_KX_SRP;
-	 if (strcasecmp(kx[i], "SRP-RSA") == 0)
-	    kx_priority[j++] = GNUTLS_KX_SRP_RSA;
-	 if (strcasecmp(kx[i], "SRP-DSS") == 0)
-	    kx_priority[j++] = GNUTLS_KX_SRP_DSS;
-	 if (strcasecmp(kx[i], "RSA") == 0)
-	    kx_priority[j++] = GNUTLS_KX_RSA;
-	 if (strcasecmp(kx[i], "RSA-EXPORT") == 0)
-	    kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
-	 if (strncasecmp(kx[i], "DHE-RSA", 7) == 0)
-	    kx_priority[j++] = GNUTLS_KX_DHE_RSA;
-	 if (strncasecmp(kx[i], "DHE-DSS", 7) == 0)
-	    kx_priority[j++] = GNUTLS_KX_DHE_DSS;
-	 if (strncasecmp(kx[i], "ANON", 4) == 0)
-	    kx_priority[j++] = GNUTLS_KX_ANON_DH;
-      }
-      kx_priority[j] = 0;
-   }
+	int i, j;
+	if (kx != NULL && nkx > 0) {
+		for (j = i = 0; i < nkx; i++) {
+			if (strcasecmp(kx[i], "SRP") == 0)
+				kx_priority[j++] = GNUTLS_KX_SRP;
+			if (strcasecmp(kx[i], "SRP-RSA") == 0)
+				kx_priority[j++] = GNUTLS_KX_SRP_RSA;
+			if (strcasecmp(kx[i], "SRP-DSS") == 0)
+				kx_priority[j++] = GNUTLS_KX_SRP_DSS;
+			if (strcasecmp(kx[i], "RSA") == 0)
+				kx_priority[j++] = GNUTLS_KX_RSA;
+			if (strcasecmp(kx[i], "RSA-EXPORT") == 0)
+				kx_priority[j++] = GNUTLS_KX_RSA_EXPORT;
+			if (strncasecmp(kx[i], "DHE-RSA", 7) == 0)
+				kx_priority[j++] = GNUTLS_KX_DHE_RSA;
+			if (strncasecmp(kx[i], "DHE-DSS", 7) == 0)
+				kx_priority[j++] = GNUTLS_KX_DHE_DSS;
+			if (strncasecmp(kx[i], "ANON", 4) == 0)
+				kx_priority[j++] = GNUTLS_KX_ANON_DH;
+		}
+		kx_priority[j] = 0;
+	}
 }
 
-void parse_comp( char** comp, int ncomp, int* comp_priority)
+void parse_comp(char **comp, int ncomp, int *comp_priority)
 {
-int i,j;
-   if (comp != NULL && ncomp > 0) {
-      for (j = i = 0; i < ncomp; i++) {
-	 if (strncasecmp(comp[i], "NUL", 3) == 0)
-	    comp_priority[j++] = GNUTLS_COMP_NULL;
-	 if (strncasecmp(comp[i], "ZLI", 3) == 0)
-	    comp_priority[j++] = GNUTLS_COMP_ZLIB;
-	 if (strncasecmp(comp[i], "LZO", 3) == 0)
-	    comp_priority[j++] = GNUTLS_COMP_LZO;
-      }
-      comp_priority[j] = 0;
-   }
+	int i, j;
+	if (comp != NULL && ncomp > 0) {
+		for (j = i = 0; i < ncomp; i++) {
+			if (strncasecmp(comp[i], "NUL", 3) == 0)
+				comp_priority[j++] = GNUTLS_COMP_NULL;
+			if (strncasecmp(comp[i], "ZLI", 3) == 0)
+				comp_priority[j++] = GNUTLS_COMP_ZLIB;
+			if (strncasecmp(comp[i], "LZO", 3) == 0)
+				comp_priority[j++] = GNUTLS_COMP_LZO;
+		}
+		comp_priority[j] = 0;
+	}
 
 }

@@ -424,7 +424,7 @@ ssize_t _gnutls_io_read_buffered( gnutls_session session, opaque **iptr, size_t 
 
 	if (ret < 0 || ret2 < 0) {
 		gnutls_assert();
-		/* that's because they are initilized to 0 */
+		/* that's because they are initialized to 0 */
 		return GMIN(ret, ret2);
 	}
 
