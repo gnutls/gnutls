@@ -704,8 +704,12 @@ int gnutls_session_is_resumed(GNUTLS_STATE state)
   -*/
 int _gnutls_session_is_export(GNUTLS_STATE state)
 {
-	if ( _gnutls_cipher_suite_get_kx_algo( state->security_parameters.current_cipher_suite)
-		== GNUTLS_KX_RSA_EXPORT) return 1;
+	BulkCipherAlgorithm cipher;
+	
+	cipher = _gnutls_cipher_suite_get_cipher_algo( state->security_parameters.current_cipher_suite);
+	
+	if (_gnutls_cipher_get_export_flag( cipher) != 0)
+		return 1;
 
 	return 0;
 }
