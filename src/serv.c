@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2001,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2001,2002 Paul Sheer
  *
  * This file is part of GNUTLS.
  *
@@ -18,6 +18,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+/* This server is heavily modified for GNUTLS 
+ * (which means it is quite unreadable)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -32,13 +36,16 @@
 #include "common.h"
 #include <signal.h>
 #include "serv-gaa.h"
+#include <sys/time.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
 #include <config.h>
+#include <list.h>
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
  */
 /* global stuff */
-static char http_buffer[16 * 1024];
 static int generate = 0;
 static int http = 0;
 static int port = 0;
@@ -63,19 +70,29 @@ char *x509_crlfile = NULL;
  * command line is present
  */
 
+#define SMALL_READ_TEST (2147483647)
 
 #define SA struct sockaddr
 #define ERR(err,s) if(err==-1) {perror(s);return(1);}
+#define GERR(ret, where) fprintf(stdout, "*** gnutls error[%d]: %s (%s)\n", ret, gnutls_strerror(ret), where)
 #define MAX_BUF 1024
 
-#define HTTP_BEGIN "HTTP/1.0 200 OK\n" \
-		"Content-Type: text/html\n" \
+#undef max
+#define max(x,y) ((x) > (y) ? (x) : (y))
+#undef min
+#define min(x,y) ((x) < (y) ? (x) : (y))
+
+
+#define HTTP_END  "</BODY></HTML>\n\n"
+
+#define HTTP_UNIMPLEMENTED "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n<HTML><HEAD>\r\n<TITLE>501 Method Not Implemented</TITLE>\r\n</HEAD><BODY>\r\n<H1>Method Not Implemented</H1>\r\n<HR>\r\n</BODY></HTML>\r\n"
+#define HTTP_OK "HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n"
+
+#define HTTP_BEGIN HTTP_OK \
 		"\n" \
 		"<HTML><BODY>\n" \
 		"<CENTER><H1>This is <a href=\"http://www.gnu.org/software/gnutls\">" \
 		"GNUTLS</a></H1>\n\n"
-
-#define HTTP_END  "</BODY></HTML>\n\n"
 
 #define RENEGOTIATE
 
@@ -89,8 +106,6 @@ GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
 
 # include <gdbm.h>
 
- static GDBM_FILE read_dbf;
-
 # define DB_FILE "gnutls-rsm.db"
 
  static void wrap_gdbm_init(void);
@@ -100,6 +115,32 @@ GNUTLS_CERTIFICATE_SERVER_CREDENTIALS cert_cred;
  static int wrap_gdbm_delete( void* dbf, gnutls_datum key);
 
 #endif
+
+#define HTTP_STATE_REQUEST	1
+#define HTTP_STATE_RESPONSE	2
+#define HTTP_STATE_CLOSING	3
+
+LIST_TYPE_DECLARE (listener_item, char *http_request;
+		   char *http_response;
+		   int request_length; int response_length; int response_written; int http_state; int fd;
+		   GNUTLS_STATE tstate;
+		   int handshake_ok;
+    );
+
+static void listener_free (listener_item * j)
+{
+    if (j->http_request)
+	free (j->http_request);
+    if (j->http_response)
+	free (j->http_response);
+    if (j->fd >= 0) {
+	gnutls_bye ( j->tstate, GNUTLS_SHUT_WR);
+	shutdown (j->fd, 2);
+	close (j->fd);
+	gnutls_deinit (j->tstate);
+    }
+}
+
 
 
 #define DEFAULT_PRIME_BITS 1024
@@ -160,15 +201,18 @@ int cipher_priority[16] =
     { GNUTLS_CIPHER_RIJNDAEL_128_CBC, GNUTLS_CIPHER_3DES_CBC,
    GNUTLS_CIPHER_ARCFOUR, 0
 };
+
 int comp_priority[16] = { GNUTLS_COMP_ZLIB, GNUTLS_COMP_NULL, 0 };
 int mac_priority[16] = { GNUTLS_MAC_SHA, GNUTLS_MAC_MD5, 0 };
 int cert_type_priority[16] = { GNUTLS_CRT_X509, GNUTLS_CRT_OPENPGP, 0 };
 
-GNUTLS_STATE initialize_state(void)
-{
-   GNUTLS_STATE state;
+LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
-   gnutls_init(&state, GNUTLS_SERVER);
+GNUTLS_STATE initialize_state (void)
+{
+    GNUTLS_STATE state;
+
+    gnutls_init (&state, GNUTLS_SERVER);
 
    /* allow the use of private ciphersuites.
     */
@@ -178,41 +222,40 @@ GNUTLS_STATE initialize_state(void)
    gnutls_db_set_retrieve_func( state, wrap_gdbm_fetch);
    gnutls_db_set_remove_func( state, wrap_gdbm_delete);
    gnutls_db_set_store_func( state, wrap_gdbm_store);
-   gnutls_db_set_ptr( state, read_dbf);
+   gnutls_db_set_ptr( state, NULL);
 #endif
 
-   /* null cipher is here only for debuging 
-    * purposes.
-    */
-   gnutls_cipher_set_priority(state, cipher_priority);
-   gnutls_compression_set_priority(state, comp_priority);
-   gnutls_kx_set_priority(state, kx_priority);
-   gnutls_protocol_set_priority(state, protocol_priority);
-   gnutls_mac_set_priority(state, mac_priority);
-   gnutls_cert_type_set_priority(state, cert_type_priority);
+    gnutls_cipher_set_priority(state, cipher_priority);
+    gnutls_compression_set_priority(state, comp_priority);
+    gnutls_kx_set_priority(state, kx_priority);
+    gnutls_protocol_set_priority( state, protocol_priority);
+    gnutls_mac_set_priority(state, mac_priority);
+    gnutls_cert_type_set_priority(state, cert_type_priority);
 
-   gnutls_dh_set_prime_bits(state, DEFAULT_PRIME_BITS);
+    gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
+    gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
+    gnutls_cred_set (state, GNUTLS_CRD_CERTIFICATE, cert_cred);
 
-   gnutls_cred_set(state, GNUTLS_CRD_ANON, dh_cred);
-   gnutls_cred_set(state, GNUTLS_CRD_SRP, srp_cred);
-   gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, cert_cred);
+    gnutls_certificate_server_set_request (state, GNUTLS_CERT_REQUEST);
 
-   gnutls_mac_set_priority(state, mac_priority);
-
-   gnutls_certificate_server_set_request(state, GNUTLS_CERT_REQUEST);
-
-   return state;
+    return state;
 }
+
 
 /* Creates html with the current state information.
  */
 #define tmp2 &http_buffer[strlen(http_buffer)]
-void peer_print_info(GNUTLS_STATE state)
+char* peer_print_info(GNUTLS_STATE state, int *ret_length)
 {
    const char *tmp;
    unsigned char sesid[32];
    int sesid_size, i;
+   char* http_buffer = malloc(16*1024);
 
+   if (http_buffer==NULL) return NULL;
+ 
+   strcpy( http_buffer, HTTP_BEGIN);
+   
    /* print session_id */
    gnutls_session_get_id(state, sesid, &sesid_size);
    sprintf(tmp2, "\n<p>Session ID: <i>");
@@ -268,48 +311,79 @@ void peer_print_info(GNUTLS_STATE state)
 
    strcat(http_buffer, "</P>\n");
 
-   return;
+   *ret_length = strlen(http_buffer);
+
+   return http_buffer;
 }
 
-/* actually something like readline.
- * if rnl!=1 then reads an http request in the form REQ\n\n
- */
-int read_request(GNUTLS_STATE state, char *data, int data_size, int rnl)
+static int listen_socket (char* name, int listen_port)
 {
-   int n, rc, nl = 0;
-   char c, *ptr, p1 = 0, p2 = 0;
+    struct sockaddr_in a;
+    int s;
+    int yes;
 
-   ptr = data;
-   for (n = 1; n < data_size; n++) {
-      do {
-	 rc = gnutls_record_recv(state, &c, 1);
-      } while (rc == GNUTLS_E_INTERRUPTED || rc == GNUTLS_E_AGAIN);
+    if ((s = socket (AF_INET, SOCK_STREAM, 0)) < 0) {
+	perror ("socket() failed");
+	return -1;
+    }
+    yes = 1;
 
-      if (rc == 1) {
-	 *ptr++ = c;
-	 if (c == '\n' && rnl == 1)
-	    break;
+    if (setsockopt (s, SOL_SOCKET, SO_REUSEADDR, (char *) &yes, sizeof (yes)) < 0) {
+	perror ("setsockopt() failed");
+	close (s);
+	return -1;
+    }
+    memset (&a, 0, sizeof (a));
+    a.sin_port = htons (listen_port);
+    a.sin_family = AF_INET;
+    if (bind (s, (struct sockaddr *) &a, sizeof (a)) < 0) {
+	perror ("bind() failed");
+	close (s);
+	return -1;
+    }
 
-	 if (c == '\n' && p1 == '\r' && p2 == '\n') {
-	    nl++;
-	    if (nl == 1)
-	       break;
-	 }
-	 p2 = p1;
-	 p1 = c;
+    printf("%s ready. Listening to port '%d'.\n\n", name, listen_port);
+    listen (s, 10);
+    return s;
+}
 
-      } else if (rc == 0) {
-	 if (n == 1)
-	    return 0;
-	 else
-	    break;
-      } else {
-	 return rc;
-      }
-   }
+static void get_response(GNUTLS_STATE state, char *request, char **response, int *response_length)
+{
+    char *p, *h;
 
-   *ptr = 0;
-   return n;
+    if (http!=0) {
+	    if (strncmp (request, "GET ", 4))
+		goto unimplemented;
+
+	    if (!(h = strchr (request, '\r')))
+		goto unimplemented;
+
+	    *h++ = '\0';
+	    while (*h == '\r' || *h == '\n')
+		h++;
+
+	    if (!(p = strchr (request + 4, ' ')))
+		goto unimplemented;
+	    *p = '\0';
+    }
+    
+//    *response = peer_print_info(state, request+4, h, response_length);
+    if (http!=0) {
+	*response = peer_print_info(state, response_length);
+    } else {
+    	*response = strdup( request);
+    	*response_length = strlen( *response);
+    }
+    return;
+
+  unimplemented:
+    *response = strdup(HTTP_UNIMPLEMENTED);
+    *response_length = strlen (*response);
+}
+
+void terminate( int sig) {
+	fprintf(stderr, "Exiting via signal %d\n", sig);
+	exit(0);
 }
 
 
@@ -333,18 +407,15 @@ static void gaa_parser(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
-   int err, listen_sd, i;
-   int sd, ret;
-   struct sockaddr_in sa_serv;
-   struct sockaddr_in sa_cli;
-   int client_len;
+   int ret, n, h;
    char topbuf[512];
-   GNUTLS_STATE state;
-   char buffer[MAX_BUF + 1];
-   int optval = 1;
+//   int optval = 1;
    char name[256];
 
    signal(SIGPIPE, SIG_IGN);
+   signal( SIGHUP, SIG_IGN);
+   signal( SIGTERM, terminate);
+   signal( SIGINT, terminate);
 
    gaa_parser(argc, argv);
 
@@ -442,135 +513,228 @@ int main(int argc, char **argv)
    	fprintf(stderr, "Error while setting SRP parameters\n");
    }
 
+
    gnutls_anon_allocate_server_sc(&dh_cred);
    if (generate != 0)
       gnutls_anon_set_server_dh_params(dh_cred, dh_params);
 
-   listen_sd = socket(AF_INET, SOCK_STREAM, 0);
-   ERR(listen_sd, "socket");
 
-   memset(&sa_serv, '\0', sizeof(sa_serv));
-   sa_serv.sin_family = AF_INET;
-   sa_serv.sin_addr.s_addr = INADDR_ANY;
-   sa_serv.sin_port = htons(port);	/* Server Port number */
+    h = listen_socket ( name, port);
+    if (h < 0)
+	exit (1);
 
-   setsockopt(listen_sd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
-   err = bind(listen_sd, (SA *) & sa_serv, sizeof(sa_serv));
-   ERR(err, "bind");
-   err = listen(listen_sd, 1024);
-   ERR(err, "listen");
+    for (;;) {
+	listener_item *j;
+	fd_set rd, wr;
+	int val;
 
-   printf("%s ready. Listening to port '%d'.\n\n", name, port);
+	FD_ZERO (&rd);
+	FD_ZERO (&wr);
+	n = 0;
 
-   client_len = sizeof(sa_cli);
+/* check for new incoming connections */
+	FD_SET (h, &rd);
+	n = max (n, h);
 
-   for (;;) {
-      state = initialize_state();
+/* flag which connections we are reading or writing to within the fd sets */
+	lloopstart (listener_list, j) {
 
-      sd = accept(listen_sd, (SA *) & sa_cli, &client_len);
+	    val = fcntl (j->fd, F_GETFL, 0);
+	    fcntl (j->fd, F_SETFL, val | O_NONBLOCK);
 
-      printf("- connection from %s, port %d\n",
-	     inet_ntop(AF_INET, &sa_cli.sin_addr, topbuf,
-		       sizeof(topbuf)), ntohs(sa_cli.sin_port));
-
-
-      gnutls_transport_set_ptr(state, sd);
-      do {
-	 ret = gnutls_handshake(state);
-      } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-
-      if (ret < 0) {
-	 close(sd);
-	 gnutls_deinit(state);
-	 fprintf(stderr,
-		 "*** Handshake has failed (%s)\n\n",
-		 gnutls_strerror(ret));
-	 check_alert(state, ret);
-	 continue;
-      }
-      printf("- Handshake was completed\n");
-      if ( gnutls_session_is_resumed( state)!=0)
-         printf("*** This is a resumed session\n");
-
-      print_info(state);
-
-      i = 0;
-      for (;;) {
-	 bzero(buffer, MAX_BUF + 1);
-	 ret = read_request(state, buffer, MAX_BUF, (http == 0) ? 1 : 2);
-
-	 if (gnutls_error_is_fatal(ret) == 1 || ret == 0) {
-	    fflush(stdout);
-	    if (ret == 0) {
-	       printf("\n- Peer has closed the GNUTLS connection\n");
-	       fflush(stdout);
-	       break;
-	    } else {
-	       fprintf(stderr,
-		       "\n*** Received corrupted data(%d). Closing the connection.\n\n",
-		       ret);
-	       break;
+	    if (j->http_state == HTTP_STATE_REQUEST) {
+		FD_SET (j->fd, &rd);
+		n = max (n, j->fd);
 	    }
-
-	 }
-
-	 if (ret > 0) {
-	    if (http == 0) {
-	       printf("* Read %d bytes from client.\n", strlen(buffer));
-	       do {
-		  ret = gnutls_record_send(state, buffer, strlen(buffer));
-	       } while (ret ==
-			GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-	       printf("* Wrote %d bytes to client.\n", ret);
-	    } else {
-	       strcpy(http_buffer, HTTP_BEGIN);
-	       peer_print_info(state);
-	       strcat(http_buffer, HTTP_END);
-	       do {
-		  ret =
-		      gnutls_record_send(state,
-					 http_buffer, strlen(http_buffer));
-	       } while (ret ==
-			GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-
-	       printf("- Served request. Closing connection.\n");
-	       break;
+	    if (j->http_state == HTTP_STATE_RESPONSE) {
+		FD_SET (j->fd, &wr);
+		n = max (n, j->fd);
 	    }
-	 }
-	 i++;
-#ifdef RENEGOTIATE
-	 if (i == 20) {
-	    do {
-	       ret = gnutls_rehandshake(state);
-	    } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
+	}
+	lloopend (listener_list, j);
 
-	    printf("* Requesting rehandshake.\n");
-	    /* continue handshake proccess */
-	    do {
-	       ret = gnutls_handshake(state);
-	    } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-	    printf("* Rehandshake returned %d\n", ret);
-	 }
-#endif
+/* core operation */
+	n = select (n + 1, &rd, &wr, 0, 0);
+	if (n == -1 && errno == EINTR)
+	    continue;
+	if (n < 0) {
+	    perror ("select()");
+	    exit (1);
+	}
 
-	 check_alert(state, ret);
+/* a new connection has arrived */
+	if (FD_ISSET (h, &rd)) {
+	    unsigned int l;
+	    GNUTLS_STATE tstate;
+	    int accept_fd;
+	    struct sockaddr_in client_address;
 
-	 if (http != 0) {
-	    break;		/* close the connection */
-	 }
-      }
-      printf("\n");
-      do {
-	 ret = gnutls_bye(state, GNUTLS_SHUT_WR);
-      } while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-      /* do not wait for
-       * the peer to close the connection.
-       */
-      close(sd);
-      gnutls_deinit(state);
+	    tstate = initialize_state ();
 
-   }
-   close(listen_sd);
+	    memset (&client_address, 0, l = sizeof (client_address));
+	    accept_fd = accept (h, (struct sockaddr *) &client_address, &l);
+
+	    if (accept_fd < 0) {
+		perror ("accept()");
+	    } else {
+	    	time_t tt= time(0);
+	    	char* ctt;
+
+		int yes = 1;
+/* new list entry for the connection */
+		lappend (listener_list);
+		j = listener_list.tail;
+		j->http_request = (char *) strdup ("");
+		j->http_state = HTTP_STATE_REQUEST;
+		j->fd = accept_fd;
+		if (ioctl (accept_fd, FIONBIO, &yes))
+		    perror ("ioctl()");
+		j->tstate = tstate;
+                gnutls_transport_set_ptr( tstate, accept_fd);
+		j->handshake_ok = 0;
+
+		ctt = ctime(&tt);
+		ctt[strlen(ctt)-1] = 0;
+//		printf ("- %s: connection from %s\n", ctt, inet_ntoa (client_address.sin_addr));
+	        printf("- connection from %s, port %d\n",
+		     inet_ntop(AF_INET, &client_address.sin_addr, topbuf,
+		       sizeof(topbuf)), ntohs(client_address.sin_port));
+
+		fflush(stdout);
+	    }
+	}
+
+/* read or write to each connection as indicated by select()'s return argument */
+	lloopstart (listener_list, j) {
+	    if (FD_ISSET (j->fd, &rd)) {
+/* read partial GET request */
+		char buf[1024];
+		int r, ret;
+
+		if (j->handshake_ok == 0) {
+		    r = gnutls_handshake ( j->tstate);
+		    if (r < 0 && gnutls_error_is_fatal (r) == 0) {
+			check_alert(j->tstate, r);
+			/* nothing */
+		    } else if (r < 0 && gnutls_error_is_fatal (r) == 1) {
+			GERR( r, "handshake");
+
+		    	do {
+		    	ret = gnutls_alert_send_appropriate( j->tstate, r);
+		    	} while(ret==GNUTLS_E_AGAIN);
+			j->http_state = HTTP_STATE_CLOSING;
+		    } else if (r == 0) {
+		        if ( gnutls_session_is_resumed( j->tstate)!=0)
+        	 	  printf("*** This is a resumed session\n");
+//		        print_info(j->tstate);
+
+			j->handshake_ok = 1;
+		    }
+		}
+
+		if (j->handshake_ok == 1) {
+		    r = gnutls_record_recv ( j->tstate, buf, min (1024, SMALL_READ_TEST));
+		    if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
+			/* do nothing */
+		    } else if (r < 0 || r == 0) {
+			j->http_state = HTTP_STATE_CLOSING;
+			if (r<0 && r!=GNUTLS_E_UNEXPECTED_PACKET_LENGTH) {
+				check_alert(j->tstate, r);
+				GERR(r, "recv");
+			}
+
+		    } else {
+			j->http_request = realloc (j->http_request, j->request_length + r + 1);
+			if (j->http_request!=NULL) {
+			 memcpy (j->http_request + j->request_length, buf, r);
+			 j->request_length += r;
+			 j->http_request[j->request_length] = '\0';
+			} else j->http_state = HTTP_STATE_CLOSING;
+			
+		    }
+/* check if we have a full HTTP header */
+		    if (j->http_request!=NULL) {
+		        if ( (http==0 && strchr(j->http_request, '\n')) || strstr (j->http_request, "\r\n\r\n")) {
+			  get_response (j->tstate, j->http_request, &j->http_response, &j->response_length);
+			  j->http_state = HTTP_STATE_RESPONSE;
+			  j->response_written = 0;
+		        }
+		    }
+		}
+	    }
+	    if (FD_ISSET (j->fd, &wr)) {
+/* write partial response request */
+		int r;
+
+		if (j->handshake_ok == 0) {
+		    r = gnutls_handshake ( j->tstate);
+		    if (r < 0 && gnutls_error_is_fatal (r) == 0) {
+			check_alert(j->tstate, r);
+			/* nothing */
+		    } else if (r < 0 && gnutls_error_is_fatal (r) == 1) {
+		    	int ret;
+		    	
+			j->http_state = HTTP_STATE_CLOSING;
+		    	GERR(r, "handshake");
+
+		    	do {
+		    		ret=gnutls_alert_send_appropriate( j->tstate, r);
+		    	} while(ret==GNUTLS_E_AGAIN);
+		    } else if (r == 0) {
+		        if ( gnutls_session_is_resumed( j->tstate)!=0)
+        	 	  printf("*** This is a resumed session\n");
+//		        print_info(j->tstate);
+
+			j->handshake_ok = 1;
+		    }
+		}
+
+		if (j->handshake_ok == 1) {
+		    r =
+			gnutls_record_send ( j->tstate, j->http_response + j->response_written,
+				      min (j->response_length - j->response_written, SMALL_READ_TEST));
+		    if (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN) {
+			/* do nothing */
+		    } else if (r < 0 || r == 0) {
+			if (http!=0) j->http_state = HTTP_STATE_CLOSING;
+			else {
+				j->http_state = HTTP_STATE_REQUEST;
+				free( j->http_response);
+				j->response_length = 0;
+				j->request_length = 0;
+				j->http_request[0] = 0;
+			}
+			
+			if (r<0) GERR(r, "send");
+			check_alert(j->tstate, r);
+		    } else {
+			j->response_written += r;
+/* check if we have written a complete response */
+			if (j->response_written == j->response_length) {
+				if (http!=0) j->http_state = HTTP_STATE_CLOSING;
+				else {
+					j->http_state = HTTP_STATE_REQUEST;
+					free( j->http_response);
+					j->response_length = 0;
+					j->request_length = 0;
+					j->http_request[0] = 0;
+				}
+			}
+		    }
+		}
+	    }
+	}
+	lloopend (listener_list, j);
+
+/* loop through all connections, closing those that are in error */
+	lloopstart (listener_list, j) {
+	    if (j->http_state == HTTP_STATE_CLOSING) {
+		ldeleteinc (listener_list, j);
+	    }
+	}
+	lloopend (listener_list, j);
+    }
+
 
    gnutls_certificate_free_sc(cert_cred);
    gnutls_srp_free_server_sc(srp_cred);
@@ -767,16 +931,10 @@ static void wrap_gdbm_init(void) {
 		exit(1);
 	}
 	gdbm_close( tmpdbf);
-
-	read_dbf = gdbm_open(DB_FILE, 0, GDBM_READER, 0600, NULL);
-	if (read_dbf==NULL) {
-		fprintf(stderr, "Error opening gdbm database\n");
-		exit(1);
-	}
 }
 
 static void wrap_gdbm_deinit(void) {
-	gdbm_close( read_dbf);
+	return;
 }
 
 static int wrap_gdbm_store( void* dbf, gnutls_datum key, gnutls_datum data) {
@@ -795,7 +953,7 @@ static int wrap_gdbm_store( void* dbf, gnutls_datum key, gnutls_datum data) {
 
 	_data.dptr = data.data;
 	_data.dsize = data.size;
-	
+
 	res = gdbm_store( write_dbf, _key, _data, GDBM_INSERT);
 
 	gdbm_close( write_dbf);
@@ -805,12 +963,21 @@ static int wrap_gdbm_store( void* dbf, gnutls_datum key, gnutls_datum data) {
 static gnutls_datum wrap_gdbm_fetch( void* dbf, gnutls_datum key) {
 	datum _key, _res;
 	gnutls_datum res2;
-	
+	GDBM_FILE read_dbf;
+
 	_key.dptr = key.data;
 	_key.dsize = key.size;
-	
-	_res = gdbm_fetch( (GDBM_FILE)dbf, _key);
 
+	read_dbf = gdbm_open(DB_FILE, 0, GDBM_READER, 0600, NULL);
+	if (read_dbf==NULL) {
+		fprintf(stderr, "Error opening gdbm database\n");
+		exit(1);
+	}
+
+	_res = gdbm_fetch( read_dbf, _key);
+
+	gdbm_close( read_dbf);
+	
 	res2.data = _res.dptr;
 	res2.size = _res.dsize;
 
