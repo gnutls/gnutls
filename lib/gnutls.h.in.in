@@ -56,8 +56,6 @@ typedef enum GNUTLS_AlertDescription { GNUTLS_A_CLOSE_NOTIFY, GNUTLS_A_UNEXPECTE
 			GNUTLS_A_NO_RENEGOTIATION=100
 } GNUTLS_AlertDescription;
 
-#define GNUTLS_CERT_EXPIRED 8
-
 typedef enum GNUTLS_CertificateStatus { 
 	GNUTLS_CERT_NOT_TRUSTED=2, 
 	GNUTLS_CERT_INVALID=4, 
