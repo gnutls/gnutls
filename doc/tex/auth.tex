@@ -2,13 +2,14 @@
 \par
 The following authentication schemas are supported in \gnutls:
 \begin{enumerate}
- \item X.509 Public Key Infrastructure
- \item OpenPGP Public Key Infrastructure
+ \item Certificate Authentication
  \item Anonymous authentication
  \item SRP authentication
 \end{enumerate}
 
 \subsection{Authentication using X.509 certificates}
+This authentication method is part of the certificate authentication
+method in \gnutls{}.
 The X.509 protocols rely on a hierarchical trust model. In this trust model
 Certification Authorities (CAs) are used to certify entities.
 Usually more than one certification authorities exist, and certification
@@ -56,6 +57,8 @@ parameters which are send to the peer. Currently \gnutls does not support this c
 \end{figure}
 
 \subsection{Authentication using OpenPGP keys}
+This authentication method is part of the certificate authentication
+method in \gnutls{}.
 OpenPGP authentication relies on a distributed trust model, called the "web
 of trust". The "web of trust" uses a decentralized system of trusted
 introducers, which are the same as a CA. OpenPGP allows anyone to sign
@@ -69,7 +72,7 @@ available in OpenPGP authentication.
 
 
 \subsection{Anonymous authentication}
-The anonymous key exchanges perform encryption but there is no indication of the 
+The anonymous key exchange perform encryption but there is no indication of the 
 identity of the peer. This kind of authentication is vulnerable to man in the middle attack, 
 but this protocol can be used even if there is no prior communication or common trusted
 parties with the peer. Unless really required, do not use anonymous authentication.

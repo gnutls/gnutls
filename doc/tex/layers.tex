@@ -4,7 +4,8 @@
 \tlsI{} is a layered protocol, and consists of the Record Protocol,
 the Handshake Protocol and the Alert Protocol. The Record Protocol
 is to serve all other protocols and is above the transport layer.
-The Record protocol offers symmetric encryption, and data authenticity.
+The Record protocol offers symmetric encryption, data authenticity, and
+optionally compression.
 In \gnutls{} the record protocol is accessed using the 
 \hyperref{gnutls\_record\_recv()}{gnutls\_record\_recv() (see Section }{)}{gnutls_record_recv} and
 \hyperref{gnutls\_record\_send()}{gnutls\_record\_send() (see Section }{)}{gnutls_record_send}
@@ -13,16 +14,17 @@ functions.
 \par
 The Alert protocol offers some signaling to the other protocols. It can
 help informing the peer for the cause of failures and other error
-conditions.
-\hyperref{gnutls\_alert\_send()}{gnutls\_alert\_send() (see Section }{)}{gnutls_alert_send} and
-\hyperref{gnutls\_alert\_send\_appropriate()}{gnutls\_alert\_send\_appropriate() (see Section }{)}{gnutls_alert_send_appropriate} 
-functions.
+conditions. See
+\hyperref{gnutls\_alert\_send()}{gnutls\_alert\_send() (see Section }{)}{gnutls_alert_send},
+\hyperref{gnutls\_alert\_send\_appropriate()}{gnutls\_alert\_send\_appropriate() (see Section }{)}{gnutls_alert_send_appropriate}
+and
+\hyperref{gnutls\_alert\_get\_last()}{gnutls\_alert\_get\_last() (see Section }{)}{gnutls_alert_get_last}.
 
 \par 
-The Handshake protocol is responsible for the initial key exchange,
-and authentication. See \hyperref{figure}{figure }{}{fig:cert} for the
-protocol layering in TLS. The handshake protocol in \gnutls{} is accessed
-with the 
+The Handshake protocol is responsible for the security parameters'
+negotiation, the initial key exchange and
+authentication. See \hyperref{figure}{figure }{}{fig:cert} for the
+protocol layering in TLS. See the
 \hyperref{gnutls\_handshake()}{gnutls\_handshake() (see Section }{)}{gnutls_handshake} function.
 
 \begin{figure}[hbtp]
