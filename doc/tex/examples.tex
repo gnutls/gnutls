@@ -90,13 +90,6 @@ is separate for simplicity.
 
 \section{Miscellaneous examples}
 
-\subsection{A callback which\index{OpenPGP!Key retrieval} retrieves OpenPGP keys}
-The following example is a callback function which retrieves {\bf OpenPGP} keys from
-a public key server. This is useful when a client connected to an OpenPGP \tls{} server
-and sent its key fingerprint instead of the whole key. With this callback the \tls{}
-server can retrieve the key from a public key server.
-\input{ex-pgp-keyserver}
-
 \subsection{Checking for an alert}
 This is a function that checks if an alert has been received
 in the current session.
