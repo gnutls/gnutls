@@ -1,3 +1,57 @@
+2002-11-03 14:20  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h:
+
+	
+	
+	Use the old error codes for OpenPGP again.  
+
+2002-11-03 13:52  twoaday <twoaday@gnutls.org>
+
+	* lib/auth_cert.c:
+
+	Fixed an off-by-one bug for OpenPGP fingerprint handling.  
+
+2002-11-03 13:23  twoaday <twoaday@gnutls.org>
+
+	* lib/gnutls_errors_int.h:
+
+	Corrected error number (the old was reserved).  
+
+2002-11-03 13:08  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h:
+
+	Unification for the OpenPGP error code.  
+
+2002-11-03 13:08  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_cert.c:
+
+	corrected behaviour of verification in openpgp keys.  
+
+2002-11-03 11:56  twoaday <twoaday@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h:
+
+	Add OpenPGP error description 
+
+2002-11-03 11:30  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_errors.c, gnutls_errors_int.h, gnutls_sig.c,
+	gnutls_x509.c:
+
+	Renamed GNUTLS_E_X509_KEY_USAGE_VIOLATION to
+	GNUTLS_E_KEY_USAGE_VIOLATION, in order to apply to PGP keys as well.  
+
+2002-11-03 11:19  nmav <nmav@gnutls.org>
+
+	* lib/gnutls_errors.c, lib/gnutls_errors_int.h, lib/gnutls_pk.c,
+	lib/gnutls_sig.c, lib/x509_sig_check.c, src/cli-gaa.c,
+	src/cli-gaa.h, src/cli.c, src/cli.gaa, src/common.c:
+
+	Added some new error codes and updated client.  
+
 2002-11-02 08:41  nmav <nmav@gnutls.org>
 
 	* NEWS, lib/ext_cert_type.c, lib/ext_max_record.c,
