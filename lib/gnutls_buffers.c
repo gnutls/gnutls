@@ -28,28 +28,28 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 
 	if (length==0) return 0;
 	if (type == GNUTLS_APPLICATION_DATA) {
-		old_buffer = state->gnutls_internals.bufferSize;
+		old_buffer = state->gnutls_internals.buffer.size;
 
-		state->gnutls_internals.bufferSize += length;
+		state->gnutls_internals.buffer.size += length;
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Inserted %d bytes of Data(%d) into buffer\n", length, type);
 #endif
-		state->gnutls_internals.buffer =
-		    gnutls_realloc(state->gnutls_internals.buffer,
-			   state->gnutls_internals.bufferSize);
-		memmove(&state->gnutls_internals.buffer[old_buffer], data, length);
+		state->gnutls_internals.buffer.data =
+		    gnutls_realloc(state->gnutls_internals.buffer.data,
+			   state->gnutls_internals.buffer.size);
+		memmove(&state->gnutls_internals.buffer.data[old_buffer], data, length);
 	}
 	if (type == GNUTLS_HANDSHAKE) {
-		old_buffer = state->gnutls_internals.bufferSize_handshake;
+		old_buffer = state->gnutls_internals.buffer_handshake.size;
 
-		state->gnutls_internals.bufferSize_handshake += length;
+		state->gnutls_internals.buffer_handshake.size += length;
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Inserted %d bytes of Data(%d) into buffer\n", length, type);
 #endif
-		state->gnutls_internals.buffer_handshake =
-		    gnutls_realloc(state->gnutls_internals.buffer_handshake,
-			   state->gnutls_internals.bufferSize_handshake);
-		memmove(&state->gnutls_internals.buffer_handshake[old_buffer], data, length);
+		state->gnutls_internals.buffer_handshake.data =
+		    gnutls_realloc(state->gnutls_internals.buffer_handshake.data,
+			   state->gnutls_internals.buffer_handshake.size);
+		memmove(&state->gnutls_internals.buffer_handshake.data[old_buffer], data, length);
 	}
 
 	return 0;
@@ -59,9 +59,9 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 int gnutls_getDataBufferSize(ContentType type, GNUTLS_STATE state)
 {
 	if (type == GNUTLS_APPLICATION_DATA)
-		return state->gnutls_internals.bufferSize;
+		return state->gnutls_internals.buffer.size;
 	if (type == GNUTLS_HANDSHAKE)
-		return state->gnutls_internals.bufferSize_handshake;
+		return state->gnutls_internals.buffer_handshake.size;
 	return 0;
 }
 
@@ -84,40 +84,40 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 {
 	if (type == GNUTLS_APPLICATION_DATA) {
 	
-		if (length > state->gnutls_internals.bufferSize) {
-			length = state->gnutls_internals.bufferSize;
+		if (length > state->gnutls_internals.buffer.size) {
+			length = state->gnutls_internals.buffer.size;
 		}
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Read %d bytes of Data(%d) from buffer\n", length, type);
 #endif
-		state->gnutls_internals.bufferSize -= length;
-		memmove(data, state->gnutls_internals.buffer, length);
+		state->gnutls_internals.buffer.size -= length;
+		memmove(data, state->gnutls_internals.buffer.data, length);
 
 		/* overwrite buffer */
-		memmove(state->gnutls_internals.buffer,
-			&state->gnutls_internals.buffer[length],
-			state->gnutls_internals.bufferSize);
-		state->gnutls_internals.buffer =
-		    gnutls_realloc(state->gnutls_internals.buffer,
-				   state->gnutls_internals.bufferSize);
+		memmove(state->gnutls_internals.buffer.data,
+			&state->gnutls_internals.buffer.data[length],
+			state->gnutls_internals.buffer.size);
+		state->gnutls_internals.buffer.data =
+		    gnutls_realloc(state->gnutls_internals.buffer.data,
+				   state->gnutls_internals.buffer.size);
 	}
 	if (type == GNUTLS_HANDSHAKE) {
-		if (length > state->gnutls_internals.bufferSize_handshake) {
-			length = state->gnutls_internals.bufferSize_handshake;
+		if (length > state->gnutls_internals.buffer_handshake.size) {
+			length = state->gnutls_internals.buffer_handshake.size;
 		}
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Read %d bytes of Data(%d) from buffer\n", length, type);
 #endif
-		state->gnutls_internals.bufferSize_handshake -= length;
-		memmove(data, state->gnutls_internals.buffer_handshake, length);
+		state->gnutls_internals.buffer_handshake.size -= length;
+		memmove(data, state->gnutls_internals.buffer_handshake.data, length);
 
 		/* overwrite buffer */
-		memmove(state->gnutls_internals.buffer_handshake,
-			&state->gnutls_internals.buffer_handshake[length],
-			state->gnutls_internals.bufferSize_handshake);
-		state->gnutls_internals.buffer_handshake =
-		    gnutls_realloc(state->gnutls_internals.buffer_handshake,
-				   state->gnutls_internals.bufferSize_handshake);
+		memmove(state->gnutls_internals.buffer_handshake.data,
+			&state->gnutls_internals.buffer_handshake.data[length],
+			state->gnutls_internals.buffer_handshake.size);
+		state->gnutls_internals.buffer_handshake.data =
+		    gnutls_realloc(state->gnutls_internals.buffer_handshake.data,
+				   state->gnutls_internals.buffer_handshake.size);
 	}
 
 
@@ -248,16 +248,16 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 	int old_buffer;
 
 	if (length==0) return 0;	
-	old_buffer = state->gnutls_internals.hash_bufferSize;
+	old_buffer = state->gnutls_internals.hash_buffer.size;
 
-	state->gnutls_internals.hash_bufferSize += length;
+	state->gnutls_internals.hash_buffer.size += length;
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Inserted %d bytes of Hash Data into buffer\n", length);
 #endif
-	state->gnutls_internals.hash_buffer =
-		    gnutls_realloc(state->gnutls_internals.hash_buffer,
-			   state->gnutls_internals.hash_bufferSize);
-		memmove(&state->gnutls_internals.hash_buffer[old_buffer], data, length);
+	state->gnutls_internals.hash_buffer.data =
+		    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
+			   state->gnutls_internals.hash_buffer.size);
+		memmove(&state->gnutls_internals.hash_buffer.data[old_buffer], data, length);
 
 	return 0;
 }
@@ -265,26 +265,26 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 int gnutls_getHashDataBufferSize( GNUTLS_STATE state)
 {
 
-	return state->gnutls_internals.hash_bufferSize;
+	return state->gnutls_internals.hash_buffer.size;
 }
 
 int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 {
-	if (length > state->gnutls_internals.hash_bufferSize) {
-		length = state->gnutls_internals.hash_bufferSize;
+	if (length > state->gnutls_internals.hash_buffer.size) {
+		length = state->gnutls_internals.hash_buffer.size;
 	}
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Got %d bytes of Hash Data from buffer\n", length);
 #endif
-	state->gnutls_internals.hash_bufferSize -= length;
-	memmove(data, state->gnutls_internals.hash_buffer, length);
+	state->gnutls_internals.hash_buffer.size -= length;
+	memmove(data, state->gnutls_internals.hash_buffer.data, length);
 	/* overwrite buffer */
-	memmove(state->gnutls_internals.hash_buffer,
-		&state->gnutls_internals.hash_buffer[length],
-		state->gnutls_internals.hash_bufferSize);
-	state->gnutls_internals.hash_buffer =
-	    gnutls_realloc(state->gnutls_internals.hash_buffer,
-			   state->gnutls_internals.hash_bufferSize);
+	memmove(state->gnutls_internals.hash_buffer.data,
+		&state->gnutls_internals.hash_buffer.data[length],
+		state->gnutls_internals.hash_buffer.size);
+	state->gnutls_internals.hash_buffer.data =
+	    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
+			   state->gnutls_internals.hash_buffer.size);
 
 	return length;	
 
@@ -292,13 +292,13 @@ int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 
 int gnutls_readHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 {
-	if (length > state->gnutls_internals.hash_bufferSize) {
-		length = state->gnutls_internals.hash_bufferSize;
+	if (length > state->gnutls_internals.hash_buffer.size) {
+		length = state->gnutls_internals.hash_buffer.size;
 	}
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Read %d bytes of Hash Data from buffer\n", length);
 #endif
-	memmove(data, state->gnutls_internals.hash_buffer, length);
+	memmove(data, state->gnutls_internals.hash_buffer.data, length);
 	return length;	
 }
 
@@ -310,10 +310,10 @@ int gnutls_clearHashDataBuffer( GNUTLS_STATE state)
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "Cleared Hash Data from buffer\n");
 #endif
-	state->gnutls_internals.hash_bufferSize = 0;
-	if (state->gnutls_internals.hash_buffer!=NULL)
-		gnutls_free(state->gnutls_internals.hash_buffer);
-	state->gnutls_internals.hash_buffer = NULL;
+	state->gnutls_internals.hash_buffer.size = 0;
+	if (state->gnutls_internals.hash_buffer.data!=NULL)
+		gnutls_free(state->gnutls_internals.hash_buffer.data);
+	state->gnutls_internals.hash_buffer.data = NULL;
 	
 	return 0;
 }

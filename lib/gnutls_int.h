@@ -93,6 +93,11 @@ typedef struct {
 } ChangeCipherSpec;
 
 typedef struct {
+	opaque * data;
+	int size;
+} gnutls_datum;
+
+typedef struct {
 	AlertLevel level;
 	AlertDescription description;
 } Alert;
@@ -214,12 +219,9 @@ typedef struct {
 #define CompressionMethod_Priority GNUTLS_Priority
 
 typedef struct {
-	char*				buffer;
-	uint32				bufferSize;
-	char*				hash_buffer; /* used to keep all handshake messages */
-	uint32				hash_bufferSize;
-	char*				buffer_handshake; /* this is a buffer that holds the current handshake message */
-	uint32				bufferSize_handshake;
+	gnutls_datum			buffer;
+	gnutls_datum			hash_buffer; /* used to keep all handshake messages */
+	gnutls_datum			buffer_handshake; /* this is a buffer that holds the current handshake message */
 	ResumableSession		resumable; /* TRUE or FALSE - if we can resume that session */
 	ValidSession			valid_connection; /* true or FALSE - if this session is valid */
 	AlertDescription		last_alert; /* last alert received */

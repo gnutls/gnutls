@@ -143,8 +143,9 @@ int gnutls_deinit(GNUTLS_STATE state)
 	GNUTLS_FREE(state->connection_state.write_compression_state);
 	GNUTLS_FREE(state->connection_state.write_mac_secret);
 
-	GNUTLS_FREE(state->gnutls_internals.buffer);
-	GNUTLS_FREE(state->gnutls_internals.buffer_handshake);
+	GNUTLS_FREE(state->gnutls_internals.buffer.data);
+	GNUTLS_FREE(state->gnutls_internals.buffer_handshake.data);
+	GNUTLS_FREE(state->gnutls_internals.hash_buffer.data);
 
 	gnutls_clear_creds( state);
 
