@@ -416,6 +416,7 @@ static int read_conf_values(MPI * g, MPI * n, char *str, int str_size)
 
 	/* read the generator */
 	len = strlen(p);
+	if (p[len-1]=='\n') len--;
 	tmp_size = _gnutls_sbase64_decode(p, len, &tmp);
 
 	if (tmp_size < 0) {

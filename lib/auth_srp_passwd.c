@@ -68,6 +68,7 @@ int indx;
 	p++;
 	
 	len = strlen(p);
+	
 	entry->salt_size = _gnutls_sbase64_decode( p, len, &entry->salt);
 
 	if (entry->salt_size <= 0) {
@@ -143,11 +144,11 @@ int tmp_size;
 	
 	/* read the generator */
 	len = strlen(p);
+	if (p[len-1]=='\n' || p[len-1]==' ') len--;
 	tmp_size = _gnutls_sbase64_decode( p, len, &tmp);
 
 	if (tmp_size < 0) {
 		gnutls_assert();
-		gnutls_free(tmp);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	if (gcry_mpi_scan(&entry->g, GCRYMPI_FMT_USG, tmp, &tmp_size)) {
@@ -176,7 +177,6 @@ int tmp_size;
 	if (tmp_size < 0) {
 		gnutls_assert();
 		mpi_release(entry->g);
-		gnutls_free(tmp);
 		return GNUTLS_E_PARSING_ERROR;
 	}
 	if (gcry_mpi_scan(&entry->n, GCRYMPI_FMT_USG, tmp, &tmp_size)) {

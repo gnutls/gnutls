@@ -615,7 +615,10 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 	}
 	sp++;
 
-	_gnutls_sbase64_decode(sp, strlen(sp), &csalt);
+	if (_gnutls_sbase64_decode(sp, strlen(sp), &csalt) < 0) {
+		gnutls_assert();
+		return NULL;
+	}
 
 	cost = (uint8) csalt[0];
 	ctx = _blf_init(&csalt[1], passwd, passwd_len, cost);
@@ -634,7 +637,11 @@ char *crypt_bcrypt(const char *passwd, const char *salt, MPI g, MPI n)
 		return NULL;
 	}
 
-	_gnutls_sbase64_encode(v, vsize, &rtext);
+	if (_gnutls_sbase64_encode(v, vsize, &rtext) < 0) {
+		gnutls_free(v);
+		gnutls_assert();
+		return NULL;
+	}
 	gnutls_free(v);
 
 	tmp =
@@ -669,6 +676,7 @@ char *crypt_bcrypt_wrapper(const char *pass_new, int cost, MPI g, MPI n)
 	rand[0] = (uint8) cost;
 	result_size = _gnutls_sbase64_encode(rand, 17, &result);
 	if (result_size < 0) {
+		_gnutls_free_rand(rand);
 		gnutls_assert();
 		return NULL;
 	}

@@ -154,8 +154,10 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
  */
 	if (mod > 0) {
 		tmp = encode(tmpres, &data[0], mod);
-		if (tmp == -1)
-			return -1;
+		if (tmp < 0) {
+			gnutls_free( (*result));
+			return tmp;
+		}
 
 		memcpy(&(*result)[0], tmpres, tmp);
 		i = mod;
@@ -165,8 +167,10 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
  */
 	for (; i < data_size; i += 3, j += 4) {
 		tmp = encode(tmpres, &data[i], data_size - i);
-		if (tmp == -1)
-			return -1;
+		if (tmp < 0) {
+			gnutls_free( (*result));
+			return tmp;
+		}
 		memcpy(&(*result)[j], tmpres, tmp);
 		(*result)[j+tmp] = 0;
 	}
@@ -174,60 +178,94 @@ int _gnutls_sbase64_encode(uint8 * data, int data_size, uint8 ** result)
 	return ret;
 }
 
-#define TOASCII(c) (c<127 ? asciitable[c] : 0xff)
-int _gnutls_sbase64_decode(uint8 * data, int data_size, uint8 ** result)
+
+/* data must be 4 bytes
+ * result should be 3 bytes
+ */
+#define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
+inline static int decode(uint8 * result, const uint8 * data)
 {
-	uint8 *a, loc;
-	int i, j;
+	uint8 a1, a2;
+	int ret = 3;
 
-	while (*data && (*data == ' ' || *data == '\t' || *data == '\n'))
-		++data;
+	memset( result, 0, 3);
 
-	a = gnutls_malloc(data_size + 1);
-	if (a == (unsigned char *) 0)
-		return -1;
+	a1 = TOASCII(data[3]);
+	a2 = TOASCII(data[2]);
+	if (a1 != 0xff) result[2] = a1 & 0xff;
+	else return -1;
+	if (a2 != 0xff) result[2] |= ((a2 & 0x03) << 6) & 0xff;
 
-	i = 0;
-	while ( i < data_size && (loc = TOASCII(data[i])) != 0xff) {
-		a[i++] = loc;
-	}
-	data_size = i;
+	a1 = a2;
+	a2 = TOASCII(data[1]);
+	if (a1 != 0xff) result[1] = ((a1 & 0x3c) >> 2);
+	if (a2 != 0xff) result[1] |= ((a2 & 0x0f) << 4);
+	else ret--;
+	
+	a1 = a2;
+	a2 = TOASCII(data[0]);
+	if (a1 != 0xff) result[0] = (((a1 & 0x30) >> 4) & 0xff);
+	if (a2 != 0xff) result[0] |= ((a2 << 2) & 0xff);
+	else ret--;
 
-	i = data_size - 1;
-	j = data_size;
-	while (1) {
-		a[j] = a[i];
-		if (--i < 0)
-			break;
-		a[j] |= (a[i] & 3) << 6;
-		--j;
-		a[j] = (uint8) ((a[i] & 0x3c) >> 2);
-		if (--i < 0)
-			break;
-		a[j] |= (a[i] & 0xf) << 4;
-		--j;
-		a[j] = (uint8) ((a[i] & 0x30) >> 4);
-		if (--i < 0)
-			break;
-		a[j] |= (a[i] << 2);
-
-		a[--j] = 0;
-		if (--i < 0)
-			break;
-	}
-
-	while (a[j] == 0 && j <= data_size)
-		j++;
-
-	(*result) = gnutls_malloc(data_size - j + 1);
-
-	memcpy((*result), a + j, data_size - j + 1);
-
-	gnutls_free(a);
-	return data_size - j + 1;
+	return ret;
 }
 
+/* decodes data and puts the result into result (localy alocated)
+ * The result_size is the return value.
+ * That function does not ignore newlines tabs etc. You should remove them
+ * before calling it.
+ */
+int _gnutls_sbase64_decode(uint8 * data, int idata_size, uint8 ** result)
+{
+	int i, ret, j, left;
+	int data_size, tmp;
+	uint8 datrev[4];
+	uint8 tmpres[3];
 
+	data_size = (idata_size/4)*4;
+	left = idata_size % 4;
+
+	ret = (data_size / 4) * 3;
+
+	if (left > 0)
+		ret += 3;
+
+	(*result) = gnutls_malloc(ret+1);
+	if ((*result) == NULL)
+		return -1;
+
+	/* the first "block" is treated with special care */
+	tmp = 0;
+	if (left > 0) {
+		memset( datrev, 0, 4);
+		memcpy( &datrev[4-left], data, left);
+		
+		tmp = decode( tmpres, datrev);
+		if (tmp < 0) {
+			gnutls_free( (*result));
+			return tmp;
+		}
+		memcpy(&(*result)[0], &tmpres[3-tmp], tmp);
+		if (tmp < 3)
+			ret -= (3 - tmp);
+	}
+
+	/* rest data */
+	for (i = left, j = tmp; i < idata_size; i += 4) {
+		tmp = decode(tmpres, &data[i]);
+		if (tmp < 0) {
+			gnutls_free( (*result));
+			return tmp;
+		}
+		memcpy(&(*result)[j], tmpres, tmp);
+		if (tmp < 3)
+			ret -= (3 - tmp);
+		j += 3;
+	}
+
+	return ret;
+}
 
 #ifdef B64_TEST
 int main()
@@ -251,14 +289,15 @@ int main()
 	return 0;*/
 	siz = fread(x, 1, sizeof(x), stdin);
 
-	siz = _gnutls_sbase64_encode(x, siz, &b64);
-//      siz = _gnutls_sbase64_decode(x, siz, &b64);
+//	siz = _gnutls_sbase64_encode(x, siz, &b64);
+    siz = _gnutls_sbase64_decode(x, siz, &b64);
 
 
 	if (siz < 0) {
 		fprintf(stderr, "ERROR %d\n", siz);
 		exit(1);
 	}
+
 	fwrite(b64, siz, 1, stdout);
 	return 0;
 

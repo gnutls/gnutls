@@ -63,6 +63,10 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	sp++;
 
 	rsalt_size = _gnutls_sbase64_decode(sp, strlen(sp), &csalt);
+	if (rsalt_size < 0) {
+		gnutls_assert();
+		return NULL;
+	}
 
 	h1 = gnutls_hash_init(GNUTLS_MAC_SHA);
 	gnutls_hash(h1, csalt, rsalt_size);
@@ -81,7 +85,11 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 		return NULL;
 	}
 
-	_gnutls_sbase64_encode(v, vsize, &rtext);
+	if (_gnutls_sbase64_encode(v, vsize, &rtext) < 0) {
+		gnutls_free(v);
+		gnutls_assert();
+		return NULL;
+	}
 	gnutls_free(v);
 
 	tmp =
@@ -113,6 +121,7 @@ char *crypt_srpsha1_wrapper(const char *username, const char *pass_new,
 
 	result_size = _gnutls_sbase64_encode(rand, salt, &result);
 	if (result_size < 0) {
+		_gnutls_free_rand(rand);
 		gnutls_assert();
 		return NULL;
 	}
