@@ -124,7 +124,7 @@ static int tt = 0;
 		sa.sin_port = htons(port); \
 		sa.sin_addr.s_addr = *((unsigned int *) server_host->h_addr); \
 		inet_ntop(AF_INET, &sa.sin_addr, buffer, MAX_BUF); \
-		if (tt++ == 0) fprintf(stderr, "Connecting to '%s:%d'...\n", buffer, port); \
+		if (tt++ == 0) printf("Connecting to '%s:%d'...\n", buffer, port); \
 		err = connect(sd, (SA *) & sa, sizeof(sa)); \
 		ERR(err, "connect")
 
