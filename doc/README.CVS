@@ -5,7 +5,7 @@ Otherwise, if you want to get and build the tree, you should have the
 following software:
 
 * cvs (http://www.gnu.org/software/cvs/)
-* autoconf 2.56 or newer (http://www.gnu.org/software/autoconf/)
+* autoconf 2.57 or newer (http://www.gnu.org/software/autoconf/)
 * libtool (http://www.gnu.org/software/libtoool/)
 * automake (http://www.gnu.org/software/automake/)
 * libgcrypt (ftp://ftp.gnupg.org/pub/gcrypt/alpha/libgcrypt/)
