@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#define LIBTASN1_VERSION "0.2.10"
+#define LIBTASN1_VERSION "0.2.11"
 
 #include <sys/types.h>
 #include <time.h>
