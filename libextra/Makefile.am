@@ -1,4 +1,4 @@
-INCLUDES = -I../lib -I../libasn1/lib/
+INCLUDES = -I../lib -I../libtasn1/lib/
 include_HEADERS = gnutls-extra.h
 bin_SCRIPTS = libgnutls-extra-config
 
