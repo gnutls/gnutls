@@ -7,3 +7,4 @@ int gnutls_set_datum( gnutls_datum* dat, const void* data, int data_size);
 /* uses secure_malloc */
 int gnutls_sset_datum( gnutls_datum* dat, const void* data, int data_size);
 void gnutls_free_datum( gnutls_datum* dat);
+void gnutls_sfree_datum( gnutls_datum* dat);

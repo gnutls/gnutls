@@ -63,14 +63,8 @@ void _gnutls_print_state(GNUTLS_STATE state)
 		state->security_parameters.entity);
 	fprintf(stderr, "Cipher Algorithm: %d\n",
 		state->security_parameters.bulk_cipher_algorithm);
-	fprintf(stderr, "Key Size: %d\n",
-		state->security_parameters.key_size);
-	fprintf(stderr, "Key Material: %d\n",
-		state->security_parameters.key_material_length);
 	fprintf(stderr, "MAC algorithm: %d\n",
 		state->security_parameters.mac_algorithm);
-	fprintf(stderr, "Hash size: %d\n",
-		state->security_parameters.hash_size);
 	fprintf(stderr, "Compression Algorithm: %d\n",
 		state->security_parameters.compression_algorithm);
 	fprintf(stderr, "\n");

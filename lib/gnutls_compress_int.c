@@ -38,7 +38,7 @@ int err;
 	switch (algorithm) {
 	case GNUTLS_NULL_COMPRESSION:
 		*compressed = gnutls_malloc(plain_size);
-		memmove(*compressed, plain, plain_size);
+		memcpy(*compressed, plain, plain_size);
 		compressed_size = plain_size;
 		break;
 #ifdef HAVE_LIBZ
@@ -80,7 +80,7 @@ uLongf size;
 	switch (algorithm) {
 	case GNUTLS_NULL_COMPRESSION:
 		*plain = gnutls_malloc(compressed_size);
-		memmove(*plain, compressed, compressed_size);
+		memcpy(*plain, compressed, compressed_size);
 		plain_size = compressed_size;
 		break;
 #ifdef HAVE_LIBZ

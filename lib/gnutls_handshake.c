@@ -1193,7 +1193,30 @@ int _gnutls_recv_hello(SOCKET cd, GNUTLS_STATE state, char *data,
 	return ret;
 }
 
-
+/* The packets in gnutls_handshake 
+ *
+ *     Client                                               Server
+ *
+ *     ClientHello                  -------->
+ *                                                     ServerHello
+ *
+ *                                                    Certificate*
+ *                                              ServerKeyExchange*
+ *     Client Key Exchange0         -------->
+ *                                              CertificateRequest*
+ *
+ *                                  <--------   Server Key Exchange2
+ *                                  <--------      ServerHelloDone
+ *     Certificate*
+ *     ClientKeyExchange
+ *     CertificateVerify*
+ *     [ChangeCipherSpec]
+ *     Finished                     -------->
+ *                                              [ChangeCipherSpec]
+ *                                  <--------             Finished
+ *
+ */
+ 
 /**
   * gnutls_handshake - This the main function in the handshake protocol.
   * @cd: is a connection descriptor, as returned by socket().
@@ -1225,7 +1248,7 @@ int gnutls_handshake(SOCKET cd, GNUTLS_STATE state)
   *
   * NOTE: I intend to make this function obsolete. If a certificate
   * cannot be verified then this information will be available in the auth_info
-  * structure. Thus not need for these functions.
+  * structure. Thus there's not need for these functions.
   *
   * This function initiates the handshake of the TLS/SSL protocol.
   * Here we will receive - if requested and supported by the ciphersuite -
@@ -1254,6 +1277,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state)
 #endif
 		ret = _gnutls_send_hello(cd, state);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("send hello", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1264,6 +1288,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state)
 		    _gnutls_recv_handshake(cd, state, NULL, NULL,
 					   GNUTLS_SERVER_HELLO);
 		if (ret < 0) {
+			gnutls_assert();
 			ERR("recv hello", ret);
 			gnutls_clearHashDataBuffer(state);
 			return ret;
@@ -1331,6 +1356,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state)
 			ret = _gnutls_recv_client_kx_message0(cd, state);
 		if (ret < 0) {
 			ERR("recv client kx0", ret);
+			gnutls_assert();
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
@@ -1340,6 +1366,7 @@ int gnutls_handshake_begin(SOCKET cd, GNUTLS_STATE state)
 			ret = _gnutls_send_server_kx_message2(cd, state);
 		if (ret < 0) {
 			ERR("send server kx2", ret);
+			gnutls_assert();
 			gnutls_clearHashDataBuffer(state);
 			return ret;
 		}
@@ -1360,6 +1387,7 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	ret = _gnutls_send_change_cipher_spec(cd, state);
 	if (ret < 0) {
 		ERR("send ChangeCipherSpec", ret);
+		gnutls_assert();
 		return ret;
 	}
 
@@ -1376,6 +1404,7 @@ static int _gnutls_send_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	ret = _gnutls_send_finished(cd, state);
 	if (ret < 0) {
 		ERR("send Finished", ret);
+		gnutls_assert();
 		return ret;
 	}
 	return ret;
@@ -1393,6 +1422,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 			    NULL, 0, 0);
 	if (ret < 0) {
 		ERR("recv ChangeCipherSpec", ret);
+		gnutls_assert();
 		return ret;
 	}
 
@@ -1408,6 +1438,7 @@ static int _gnutls_recv_handshake_final(SOCKET cd, GNUTLS_STATE state,
 	ret = _gnutls_recv_finished(cd, state);
 	if (ret < 0) {
 		ERR("recv finished", ret);
+		gnutls_assert();
 		return ret;
 	}
 	return ret;

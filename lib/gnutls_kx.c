@@ -46,8 +46,8 @@ opaque* premaster, *master;
 int ret = 0;
 char random[2*TLS_RANDOM_SIZE];
 
-	memmove(random, state->security_parameters.client_random, TLS_RANDOM_SIZE);
-	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	memcpy(random, state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.server_random, TLS_RANDOM_SIZE);
 
 	/* generate premaster */
         premaster_size = state->gnutls_key->key.size;
@@ -79,7 +79,7 @@ char random[2*TLS_RANDOM_SIZE];
 #ifdef HARD_DEBUG
 	fprintf(stderr, "MASTER SECRET: %s\n", _gnutls_bin2hex(master, TLS_MASTER_SIZE));
 #endif
-	memmove(state->security_parameters.master_secret, master, TLS_MASTER_SIZE);
+	memcpy(state->security_parameters.master_secret, master, TLS_MASTER_SIZE);
 	secure_free(master);
 	return ret;
 }

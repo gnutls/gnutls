@@ -28,6 +28,7 @@
 #include <cert_der.h>
 #include <gnutls_datum.h>
 #include <gnutls_gcry.h>
+#include <gnutls_privkey.h>
 
 /* KX mappings to PK algorithms */
 typedef struct {
@@ -197,7 +198,7 @@ int gnutls_allocate_x509_sc(X509PKI_SERVER_CREDENTIALS * res, char *CERTFILE,
 		return GNUTLS_E_PARSING_ERROR;
 	}
 
-	res->pkey = gnutls_malloc(1 * sizeof(gnutls_datum));
+	res->pkey = gnutls_malloc(1 * sizeof(gnutls_private_key));
 	if (res->pkey == NULL)
 		return GNUTLS_E_MEMORY_ERROR;
 
@@ -287,6 +288,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	  	gnutls_assert(); \
 	  	return GNUTLS_E_ASN1_ERROR; \
 	  } \
+	  len = sizeof(str); \
 	  if (read_value(name3,str,&len) != ASN_OK) { \
 	  	delete_structure( name2); \
 	  	continue; \
@@ -296,12 +298,14 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	  	continue; \
 	  } \
 	  strcpy( name3,name2); \
+	  len = sizeof(str); \
 	  if (read_value( name3, str, &len) != ASN_OK) {  /* CHOICE */ \
 	  	delete_structure( name2); \
 	  	continue; \
 	  } \
   	  strcat( name3, "."); \
 	  strcat( name3, str); \
+	  len = sizeof(str) - 1; \
 	  if (read_value(name3,str,&len) != ASN_OK) { \
 	  	delete_structure( name2); \
 	  	continue; \
@@ -310,6 +314,7 @@ static int _read_rsa_params(opaque * der, int dersize, MPI ** params)
 	  res = strdup(str); \
 	  delete_structure(name2); \
 	}
+
 
 /* This function will attempt to read a Name
  * ASN.1 structure. (Taken from Fabio's samples!)
@@ -327,6 +332,7 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 		ltostr(k, counter);
 		strcat(name, counter);
 
+		len = sizeof(str);
 		result = read_value(name, str, &len);
 		if (result == ASN_ELEMENT_NOT_FOUND)
 			break;
@@ -336,11 +342,15 @@ static int _get_Name_type(char *root, gnutls_cert * gCert)
 			strcat(name2, ".?");
 			ltostr(k2, counter);
 			strcat(name2, counter);
+
+			len = sizeof(str);
 			result = read_value(name2, str, &len);
 			if (result == ASN_ELEMENT_NOT_FOUND)
 				break;
 			strcpy(name3, name2);
 			strcat(name3, ".type");
+			
+			len = sizeof(str);
 			result = read_value(name3, str, &len);
 
 			if (result != ASN_OK) {
@@ -520,92 +530,3 @@ gnutls_cert *_gnutls_find_cert(gnutls_cert ** cert_list,
 	}
 	return cert;
 }
-/* Converts an RSA PKCS#1 key to
- * an internal structure (gnutls_private_key)
- */
-int _gnutls_pkcs1key2gnutlsKey(gnutls_private_key * pkey, gnutls_datum cert) {
-	int ret = 0, result;
-	opaque str[5*1024];
-	int len = sizeof(str);
-
-	pkey->pk_algorithm = GNUTLS_PK_RSA;
-	
-	/* we do return 2 MPIs 
-	 */
-	pkey->params = gnutls_malloc(2*sizeof(MPI));
-	
-	if (create_structure("rsakey", "PKCS-1.RSAPrivateKey")!=ASN_OK) {
-		gnutls_assert();
-		return GNUTLS_E_ASN1_ERROR;
-	}
-
-	result = get_der("rsakey", cert.data, cert.size);
-	if (result != ASN_OK) {
-		gnutls_assert();
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	len = sizeof(str);
-	result =
-	    read_value("rsakey.privateExponent", str, &len);
-	if (result != ASN_OK) {
-		gnutls_assert();
-		delete_structure("rsakey");
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-	if (gcry_mpi_scan(&pkey->params[0], /* u */
-		  GCRYMPI_FMT_USG, str, &len) != 0) {
-		gnutls_assert();
-		delete_structure("rsakey");
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-
-	len = sizeof(str);
-	result =
-	    read_value("rsakey.modulus", str, &len);
-	if (result != ASN_OK) {
-		gnutls_assert();
-		delete_structure("rsakey");
-		_gnutls_mpi_release(&pkey->params[0]);
-		return GNUTLS_E_ASN1_PARSING_ERROR;
-	}
-
-	if (gcry_mpi_scan(&pkey->params[1], /* A */
-		  GCRYMPI_FMT_USG, str, &len) != 0) {
-		gnutls_assert();
-		delete_structure("rsakey");
-		_gnutls_mpi_release(&pkey->params[0]);
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	delete_structure("rsakey");
-
-	if (gnutls_set_datum( &pkey->raw, cert.data, cert.size) < 0) {
-		_gnutls_mpi_release(&pkey->params[0]);
-		_gnutls_mpi_release(&pkey->params[1]);
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	return ret;
-
-
-}
-
-void _gnutls_free_private_key( gnutls_private_key pkey) {
-int n, i;
-
-	switch( pkey.pk_algorithm) {
-	case GNUTLS_PK_RSA:
-		n = 2;/* the number of parameters in MPI* */
-		break;
-	default:
-		n=0;
-	}
-	for (i=0;i<n;i++) {
-		_gnutls_mpi_release( &pkey.params[i]);
-	}
-	gnutls_free_datum( &pkey.raw);
-
-}
-

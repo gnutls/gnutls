@@ -22,8 +22,9 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_cipher_int.h>
+#include <gnutls_datum.h>
 
-GNUTLS_CIPHER_HANDLE gnutls_cipher_init( BulkCipherAlgorithm cipher, void* key, int keysize, void* iv, int ivsize)
+GNUTLS_CIPHER_HANDLE gnutls_cipher_init( BulkCipherAlgorithm cipher, gnutls_datum key, gnutls_datum iv)
 {
 GNUTLS_CIPHER_HANDLE ret;
 
@@ -72,12 +73,12 @@ GNUTLS_CIPHER_HANDLE ret;
 	if (ret!=GNUTLS_CIPHER_FAILED) {
 #ifdef USE_MCRYPT
 		/* ivsize is assumed to be blocksize */
-		if ( mcrypt_generic_init( ret, key, keysize, iv) < 0) {
+		if ( mcrypt_generic_init( ret, key.data, key.size, iv.data) < 0) {
 			return GNUTLS_CIPHER_FAILED;
 		}; 
 #else
-		gcry_cipher_setkey(ret, key, keysize);
-		if (iv!=NULL && ivsize>0) gcry_cipher_setiv(ret, iv, ivsize);
+		gcry_cipher_setkey(ret, key.data, key.size);
+		if (iv!=NULL && ivsize>0) gcry_cipher_setiv(ret, iv.data, iv.size);
 #endif
 	}
 

@@ -44,7 +44,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 		state->gnutls_internals.buffer.data =
 		    gnutls_realloc(state->gnutls_internals.buffer.data,
 			   state->gnutls_internals.buffer.size);
-		memmove(&state->gnutls_internals.buffer.data[old_buffer], data, length);
+		memcpy(&state->gnutls_internals.buffer.data[old_buffer], data, length);
 	}
 	if (type == GNUTLS_HANDSHAKE) {
 		old_buffer = state->gnutls_internals.buffer_handshake.size;
@@ -56,7 +56,7 @@ int gnutls_insertDataBuffer(ContentType type, GNUTLS_STATE state, char *data, in
 		state->gnutls_internals.buffer_handshake.data =
 		    gnutls_realloc(state->gnutls_internals.buffer_handshake.data,
 			   state->gnutls_internals.buffer_handshake.size);
-		memmove(&state->gnutls_internals.buffer_handshake.data[old_buffer], data, length);
+		memcpy(&state->gnutls_internals.buffer_handshake.data[old_buffer], data, length);
 	}
 
 	return 0;
@@ -98,10 +98,10 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 	fprintf(stderr, "BUFFER: Read %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer.size -= length;
-		memmove(data, state->gnutls_internals.buffer.data, length);
+		memcpy(data, state->gnutls_internals.buffer.data, length);
 
 		/* overwrite buffer */
-		memmove(state->gnutls_internals.buffer.data,
+		memcpy(state->gnutls_internals.buffer.data,
 			&state->gnutls_internals.buffer.data[length],
 			state->gnutls_internals.buffer.size);
 		state->gnutls_internals.buffer.data =
@@ -116,10 +116,10 @@ int gnutls_getDataFromBuffer(ContentType type, GNUTLS_STATE state, char *data, i
 	fprintf(stderr, "BUFFER: Read %d bytes of Data(%d)\n", length, type);
 #endif
 		state->gnutls_internals.buffer_handshake.size -= length;
-		memmove(data, state->gnutls_internals.buffer_handshake.data, length);
+		memcpy(data, state->gnutls_internals.buffer_handshake.data, length);
 
 		/* overwrite buffer */
-		memmove(state->gnutls_internals.buffer_handshake.data,
+		memcpy(state->gnutls_internals.buffer_handshake.data,
 			&state->gnutls_internals.buffer_handshake.data[length],
 			state->gnutls_internals.buffer_handshake.size);
 		state->gnutls_internals.buffer_handshake.data =
@@ -270,7 +270,7 @@ int gnutls_insertHashDataBuffer( GNUTLS_STATE state, char *data, int length)
 	state->gnutls_internals.hash_buffer.data =
 		    gnutls_realloc(state->gnutls_internals.hash_buffer.data,
 			   state->gnutls_internals.hash_buffer.size);
-		memmove(&state->gnutls_internals.hash_buffer.data[old_buffer], data, length);
+		memcpy(&state->gnutls_internals.hash_buffer.data[old_buffer], data, length);
 
 	return 0;
 }
@@ -290,9 +290,9 @@ int gnutls_getHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 	fprintf(stderr, "HASH BUFFER: Got %d bytes of Data\n", length);
 #endif
 	state->gnutls_internals.hash_buffer.size -= length;
-	memmove(data, state->gnutls_internals.hash_buffer.data, length);
+	memcpy(data, state->gnutls_internals.hash_buffer.data, length);
 	/* overwrite buffer */
-	memmove(state->gnutls_internals.hash_buffer.data,
+	memcpy(state->gnutls_internals.hash_buffer.data,
 		&state->gnutls_internals.hash_buffer.data[length],
 		state->gnutls_internals.hash_buffer.size);
 	state->gnutls_internals.hash_buffer.data =
@@ -313,7 +313,7 @@ int gnutls_readHashDataFromBuffer( GNUTLS_STATE state, char *data, int length)
 #ifdef BUFFERS_DEBUG
 	fprintf(stderr, "HASH BUFFER: Read %d bytes of Data\n", length);
 #endif
-	memmove(data, state->gnutls_internals.hash_buffer.data, length);
+	memcpy(data, state->gnutls_internals.hash_buffer.data, length);
 	return length;	
 }
 

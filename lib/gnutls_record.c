@@ -34,6 +34,7 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_num.h"
 #include "gnutls_record.h"
+#include "gnutls_datum.h"
 
 #ifdef HAVE_ERRNO_H
 # include <errno.h>
@@ -137,10 +138,8 @@ int gnutls_deinit(GNUTLS_STATE state)
 		gdbm_close(state->gnutls_internals.db_reader);
 #endif
 
-	GNUTLS_FREE(state->connection_state.read_compression_state);
-	GNUTLS_FREE(state->connection_state.read_mac_secret);
-	GNUTLS_FREE(state->connection_state.write_compression_state);
-	GNUTLS_FREE(state->connection_state.write_mac_secret);
+	gnutls_sfree_datum(&state->connection_state.read_mac_secret);
+	gnutls_sfree_datum(&state->connection_state.write_mac_secret);
 
 	GNUTLS_FREE(state->gnutls_internals.buffer.data);
 	GNUTLS_FREE(state->gnutls_internals.buffer_handshake.data);
@@ -153,12 +152,12 @@ int gnutls_deinit(GNUTLS_STATE state)
 	if (state->connection_state.write_cipher_state != NULL)
 		gnutls_cipher_deinit(state->connection_state.write_cipher_state);
 
-	secure_free(state->cipher_specs.server_write_mac_secret);
-	secure_free(state->cipher_specs.client_write_mac_secret);
-	secure_free(state->cipher_specs.server_write_IV);
-	secure_free(state->cipher_specs.client_write_IV);
-	secure_free(state->cipher_specs.server_write_key);
-	secure_free(state->cipher_specs.client_write_key);
+	gnutls_sfree_datum( &state->cipher_specs.server_write_mac_secret);
+	gnutls_sfree_datum( &state->cipher_specs.client_write_mac_secret);
+	gnutls_sfree_datum( &state->cipher_specs.server_write_IV);
+	gnutls_sfree_datum( &state->cipher_specs.client_write_IV);
+	gnutls_sfree_datum( &state->cipher_specs.server_write_key);
+	gnutls_sfree_datum( &state->cipher_specs.client_write_key);
 
 	mpi_release(state->gnutls_key->KEY);
 	mpi_release(state->gnutls_key->client_Y);
@@ -227,7 +226,7 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 	}
 	
 	
-	memmove( A, seed, seed_size);
+	memcpy( A, seed, seed_size);
 	A_size = seed_size;
 
 	times = i / blocksize;
@@ -259,7 +258,7 @@ static svoid *gnutls_P_hash( MACAlgorithm algorithm, opaque * secret, int secret
 		}
 
 		if (how > 0) {
-			memmove(&ret[i * blocksize], final, how);
+			memcpy(&ret[i * blocksize], final, how);
 		}
 		gnutls_free(final);
 	}
@@ -305,8 +304,8 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
 		return NULL;
 	}
 
-	memmove(s_seed, label, label_size);
-	memmove(&s_seed[label_size], seed, seed_size);
+	memcpy(s_seed, label, label_size);
+	memcpy(&s_seed[label_size], seed, seed_size);
 
 	l_s = secret_size / 2;
 	s1 = &secret[0];
@@ -346,20 +345,21 @@ svoid *gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_si
  */
 int _gnutls_set_keys(GNUTLS_STATE state)
 {
-	char *key_block;
+	opaque *key_block;
 	char keyexp[] = "key expansion";
 	char random[2*TLS_RANDOM_SIZE];
 	int hash_size;
 	int IV_size;
 	int key_size;
 	int block_size;
-	
-	hash_size = state->security_parameters.hash_size;
-	IV_size = state->security_parameters.IV_size;
-	key_size = state->security_parameters.key_material_length;
+	int pos;
+		
+	hash_size = _gnutls_mac_get_digest_size( state->security_parameters.mac_algorithm);
+	IV_size = _gnutls_cipher_get_iv_size( state->security_parameters.bulk_cipher_algorithm);
+	key_size = _gnutls_cipher_get_key_size( state->security_parameters.bulk_cipher_algorithm);
 
-	memmove(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
-	memmove(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
+	memcpy(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
+	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
 	block_size = 2 * hash_size + 2 * key_size + 2 * IV_size;
 
@@ -379,39 +379,34 @@ int _gnutls_set_keys(GNUTLS_STATE state)
 	fprintf(stderr, "KEY BLOCK[%d]: %s\n",block_size, _gnutls_bin2hex(key_block, block_size));
 #endif
 
-	if (hash_size>0) {
-		state->cipher_specs.client_write_mac_secret = secure_malloc(hash_size);
-		if (state->cipher_specs.client_write_mac_secret==NULL) 
+	pos = 0;
+	if (hash_size > 0) {
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_mac_secret, &key_block[pos], hash_size) < 0 )
 			return GNUTLS_E_MEMORY_ERROR;
-		memmove(state->cipher_specs.client_write_mac_secret, &key_block[0], hash_size);
+		pos+=hash_size;
 
-		state->cipher_specs.server_write_mac_secret = secure_malloc(hash_size);
-		if (state->cipher_specs.server_write_mac_secret==NULL) 
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_mac_secret, &key_block[pos], hash_size) < 0 )
 			return GNUTLS_E_MEMORY_ERROR;
-		memmove(state->cipher_specs.server_write_mac_secret, &key_block[hash_size], hash_size);
+		pos+=hash_size;
 	}
 	
-	if (key_size>0) {
-		state->cipher_specs.client_write_key = secure_malloc(key_size);
-		if (state->cipher_specs.client_write_key==NULL) 
+	if (key_size > 0) {
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_key, &key_block[pos], key_size) < 0 )
 			return GNUTLS_E_MEMORY_ERROR;
-		memmove(state->cipher_specs.client_write_key, &key_block[2 * hash_size], key_size);
+		pos+=key_size;
 
-		state->cipher_specs.server_write_key = secure_malloc(key_size);
-		if (state->cipher_specs.server_write_key==NULL) 
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_key, &key_block[pos], key_size) < 0 )
 			return GNUTLS_E_MEMORY_ERROR;
-		memmove(state->cipher_specs.server_write_key, &key_block[2 * hash_size + key_size], key_size);
+		pos+=key_size;
 	}
 	if (IV_size > 0) {
-		state->cipher_specs.client_write_IV = secure_malloc(IV_size);
-		if (state->cipher_specs.client_write_IV==NULL) 
+		if (gnutls_sset_datum( &state->cipher_specs.client_write_IV, &key_block[pos], IV_size) < 0 )
 			return GNUTLS_E_MEMORY_ERROR;
-		memmove(state->cipher_specs.client_write_IV, &key_block[2 * key_size + 2 * hash_size], IV_size);
+		pos+=IV_size;
 	
-		state->cipher_specs.server_write_IV = secure_malloc(IV_size);
-		if (state->cipher_specs.server_write_IV==NULL) 
+		if (gnutls_sset_datum( &state->cipher_specs.server_write_IV, &key_block[pos], IV_size) < 0 )
 			return GNUTLS_E_MEMORY_ERROR;
-		memmove(state->cipher_specs.server_write_IV, &key_block[2 * hash_size + 2 * key_size + IV_size], IV_size);
+		pos+=IV_size;
 	}
 	
 	secure_free(key_block);
@@ -422,8 +417,8 @@ int _gnutls_send_alert(SOCKET cd, GNUTLS_STATE state, AlertLevel level, AlertDes
 {
 	uint8 data[2];
 
-	memmove(&data[0], &level, 1);
-	memmove(&data[1], &desc, 1);
+	memcpy(&data[0], &level, 1);
+	memcpy(&data[1], &desc, 1);
 
 #ifdef DEBUG
 	fprintf(stderr, "Record: Sending Alert[%d|%d] - %s\n", data[0], data[1], _gnutls_alert2str((int)data[1]));
@@ -571,7 +566,7 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, const v
 
 		WRITEuint16( cipher_size, &headers[3]);
 
-		memmove( cipher, headers, HEADER_SIZE);
+		memcpy( cipher, headers, HEADER_SIZE);
 
 		cipher_size += HEADER_SIZE;
 		if (_gnutls_Write(cd, cipher, cipher_size, flags) != cipher_size) {
@@ -819,18 +814,8 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 	
-	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
-#ifdef RECORD_DEBUG
-		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
-#endif
-		gnutls_free(ciphertext);
-		if (length!=1) {
-			gnutls_assert();
-			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-		}
-		return 0;
-	}
-
+	/* decrypt the data we got
+	 */
 	tmplen = _gnutls_decrypt( state, ciphertext, length, &tmpdata, recv_type);
 	if (tmplen < 0) {
 		switch (tmplen) {
@@ -849,6 +834,20 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, char *d
 		gnutls_assert();
 		gnutls_free(ciphertext);
 		return tmplen;
+	}
+
+	/* Check if this is a CHANGE_CIPHER_SPEC
+	 */
+	if (type == GNUTLS_CHANGE_CIPHER_SPEC && recv_type == GNUTLS_CHANGE_CIPHER_SPEC) {
+#ifdef RECORD_DEBUG
+		fprintf(stderr, "Record: ChangeCipherSpec Packet was received\n");
+#endif
+		gnutls_free(ciphertext);
+		if (tmplen!=1) {
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+		return 0;
 	}
 
 #ifdef RECORD_DEBUG

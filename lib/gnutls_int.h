@@ -193,6 +193,8 @@ typedef struct {
 
 /* This structure and AUTH_INFO, are stored in the resume database,
  * and are restored, in case of resume.
+ * Holds all the required parameters to resume the current 
+ * state.
  */
 typedef struct {
 	ConnectionEnd entity;
@@ -204,39 +206,34 @@ typedef struct {
 	 * moved here from gnutls_internals in order to be restored
 	 * on resume;
 	 */
-	GNUTLS_CipherSuite		current_cipher_suite;
-	uint8 IV_size;
-	uint8 key_size;
-	uint8 key_material_length;
-	uint8 hash_size;
-	opaque master_secret[TLS_MASTER_SIZE];
-	opaque client_random[TLS_RANDOM_SIZE];
-	opaque server_random[TLS_RANDOM_SIZE];
-	opaque session_id[TLS_MAX_SESSION_ID_SIZE];
-	uint8 session_id_size;
-	time_t timestamp;
+	GNUTLS_CipherSuite	current_cipher_suite;
+	opaque 			master_secret[TLS_MASTER_SIZE];
+	opaque 			client_random[TLS_RANDOM_SIZE];
+	opaque 			server_random[TLS_RANDOM_SIZE];
+	opaque 			session_id[TLS_MAX_SESSION_ID_SIZE];
+	uint8 			session_id_size;
+	time_t 			timestamp;
 } SecurityParameters;
 
+/* This structure holds the generated keys
+ */
 typedef struct {
-	opaque* server_write_mac_secret;
-	opaque* client_write_mac_secret;
-	opaque* server_write_IV;
-	opaque* client_write_IV;
-	opaque* server_write_key;
-	opaque* client_write_key;
+	gnutls_datum server_write_mac_secret;
+	gnutls_datum client_write_mac_secret;
+	gnutls_datum server_write_IV;
+	gnutls_datum client_write_IV;
+	gnutls_datum server_write_key;
+	gnutls_datum client_write_key;
 } CipherSpecs;
 
 typedef enum GNUTLS_Version { GNUTLS_TLS1, GNUTLS_SSL3, GNUTLS_VERSION_UNKNOWN=0xff } GNUTLS_Version;
 
 typedef struct {
 	GNUTLS_Version	version;
-	opaque* 	read_compression_state;
-	opaque* 	write_compression_state;
 	GNUTLS_CIPHER_HANDLE write_cipher_state;
 	GNUTLS_CIPHER_HANDLE read_cipher_state;
-	opaque* 	read_mac_secret;
-	opaque* 	write_mac_secret;
-	uint8   	mac_secret_size;
+	gnutls_datum 	read_mac_secret;
+	gnutls_datum 	write_mac_secret;
 	uint64		read_sequence_number;
 	uint64		write_sequence_number;
 } ConnectionState;

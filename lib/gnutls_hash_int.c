@@ -123,7 +123,7 @@ void *gnutls_hash_deinit(GNUTLS_MAC_HANDLE handle)
 
 	gcry_md_final(handle->handle);
 	mac = gcry_md_read(handle->handle, 0);
-	memmove(ret, mac, maclen);
+	memcpy(ret, mac, maclen);
 	gcry_md_close(handle->handle);
 #endif
 	gnutls_free(handle);
@@ -236,7 +236,7 @@ void *gnutls_hmac_deinit(GNUTLS_MAC_HANDLE handle)
 
 	gcry_md_final(handle->handle);
 	mac = gcry_md_read(handle->handle, 0);
-	memmove(ret, mac, maclen);
+	memcpy(ret, mac, maclen);
 	gcry_md_close(handle->handle);
 #endif
 	gnutls_free(handle);
@@ -420,7 +420,7 @@ void *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
 
 		size += block;
 			
-		memmove(&ret[size - block], digest,
+		memcpy(&ret[size - block], digest,
 			size > bytes ? (block - (bytes % block)) : block);
 		gnutls_free(digest);
 		i++;

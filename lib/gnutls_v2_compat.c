@@ -78,7 +78,7 @@ static int SelectSuite_v2(GNUTLS_STATE state, opaque ret[2], char *data,
 						 ((GNUTLS_CipherSuite *) &
 						  data[j+1])));
 #endif
-					memmove(ret,
+					memcpy(ret,
 						ciphers[i].CipherSuite,
 						2);
 					gnutls_free(ciphers);
