@@ -1,3 +1,53 @@
+2004-08-14 17:40  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS:
+
+	Reorder.  
+
+2004-08-14 17:36  Simon Josefsson <simon@josefsson.org>
+
+	* config.rpath:
+
+	Add, needed by gnulib.  When we support gettext, this will be
+	generated.  
+
+2004-08-14 17:33  Simon Josefsson <simon@josefsson.org>
+
+	* src/: certtool-gaa.c, certtool-gaa.h:
+
+	Generated.  
+
+2004-08-14 17:33  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/Makefile.am, src/certtool.c, src/certtool.gaa:
+
+	Add --smime-to-p7.  
+
+2004-08-14 17:16  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Add error and exit gnulib modules.  
+
+2004-08-14 17:05  Simon Josefsson <simon@josefsson.org>
+
+	* configure.in:
+
+	Add gl/Makefile.  
+
+2004-08-14 17:05  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am:
+
+	Recurse into gl/.  
+
+2004-08-14 16:58  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, configure.in:
+
+	Set up GnuTLS to use gnulib for portability files.  Initially only
+	adding "getline", I will need it for S/MIME parsing.  
+
 2004-08-12 20:34  Simon Josefsson <simon@josefsson.org>
 
 	* doc/protocol/draft-badra-tls-key-exchange-00.txt:
