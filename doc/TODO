@@ -4,6 +4,8 @@ in order to avoid having people working on the same thing.
 
 Current list:
 * Add ability to read PKCS-12 structures (certificate and private key)
+* Add a callback function in certificate authentication, to receive
+  the certificate and the private key.
 * Convert documentation to texinfo format
 * Audit the code
 * Allow sending V2 Hello messages. It seems that some broken 
