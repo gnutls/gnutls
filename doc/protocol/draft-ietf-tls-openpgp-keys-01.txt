@@ -217,7 +217,7 @@ Internet-Draft  Using OpenPGP keys for TLS Authentication  January 2002
    } CertificateRequest;
 
    certificate_sign_types is a list of accepted certificate signature
-   algorithms, sorted in order of the server's preference.
+   types, sorted in order of the server's preference.
 
 2.1.4 Client certificate
 
