@@ -502,9 +502,10 @@ int _gnutls_recv_client_certificate(SOCKET cd, GNUTLS_STATE state)
 				return 0;
 			}
 			/* certificate was required */
-			if (optional==MANDATORY_PACKET)
+			if (optional==MANDATORY_PACKET) {
 				gnutls_send_alert( cd, state, GNUTLS_FATAL, GNUTLS_BAD_CERTIFICATE);
-			gnutls_assert();
+				gnutls_assert();
+			}
 			return ret;
 		}
 

@@ -532,6 +532,20 @@ ssize_t _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state)
 
 }
 
+static int _gnutls_check_recv_type( ContentType recv_type) {
+	switch( recv_type) {
+	case GNUTLS_CHANGE_CIPHER_SPEC:
+	case GNUTLS_ALERT:
+	case GNUTLS_HANDSHAKE:
+	case GNUTLS_APPLICATION_DATA:
+		return 0;
+	default:
+		gnutls_assert();
+		return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+	}
+
+}
+
 #define CHECK_RECORD_VERSION
 
 /* This function behave exactly like read(). The only difference is 
@@ -600,7 +614,7 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 	/* Read the first two bytes to determine if this is a 
 	 * version 2 message 
 	 */
-	if ( headers[0] > 127 && type==GNUTLS_HANDSHAKE && htype == GNUTLS_CLIENT_HELLO) { 
+	if ( htype == GNUTLS_CLIENT_HELLO && type==GNUTLS_HANDSHAKE && headers[0] > 127) { 
 
 	/* if msb set and expecting handshake message
 	 * it should be SSL 2 hello 
@@ -627,6 +641,17 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 		length = READuint16( &headers[3]);
 	}
 
+	/* Here we check if the Type of the received packet is
+	 * ok. 
+	 */
+	if ( (ret = _gnutls_check_recv_type( recv_type)) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	/* Here we check if the advertized version is the one we
+	 * negotiated in the handshake.
+	 */
 #ifdef CHECK_RECORD_VERSION
 	if ( (htype!=GNUTLS_CLIENT_HELLO && htype!=GNUTLS_SERVER_HELLO) && gnutls_get_current_version(state) != version) {
 		gnutls_assert();
@@ -796,7 +821,8 @@ ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 			
 			break;
 		case GNUTLS_HANDSHAKE:
-			/* This is only legal if HELLO_REQUEST is received - and we are a client */
+			/* This is only legal if HELLO_REQUEST is received - and we are a client 
+			 */
 			if (htype!=GNUTLS_HELLO_REQUEST && state->security_parameters.entity==GNUTLS_SERVER) {
 				gnutls_assert();
 				gnutls_free( tmpdata);

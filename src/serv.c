@@ -372,7 +372,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	/* this is a password file (created with the included crypt utility) 
+	/* this is a password file (created with the included srpcrypt utility) 
 	 * Read README.crypt prior to using SRP.
 	 */
 	gnutls_allocate_srp_server_sc( &srp_cred);

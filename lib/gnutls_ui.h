@@ -59,6 +59,7 @@ int gnutls_anon_client_get_dh_bits( GNUTLS_STATE state);
 int gnutls_set_x509_cert_callback( X509PKI_CREDENTIALS, x509_cert_callback_func *);
 int gnutls_x509pki_set_cert_request( GNUTLS_STATE, CertificateRequest);
 
+int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE);
 const gnutls_DN* gnutls_x509pki_get_peer_dn( GNUTLS_STATE);
 const gnutls_DN* gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE);
 CertificateStatus gnutls_x509pki_get_peer_certificate_status( GNUTLS_STATE);

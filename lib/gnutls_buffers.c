@@ -164,7 +164,8 @@ static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 #ifdef READ_DEBUG
 					_gnutls_log( "READ: returning %d bytes from %d\n", sizeOfPtr-left, fd);
 #endif
-					return sizeOfPtr-left;
+					goto finish;
+					//return sizeOfPtr-left;
 				}
 				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 				else return GNUTLS_E_INTERRUPTED;
@@ -183,6 +184,8 @@ static ssize_t _gnutls_Read(int fd, void *iptr, size_t sizeOfPtr, int flag)
 
 	}
 
+	finish:
+	
 #ifdef READ_DEBUG
 	_gnutls_log( "READ: read %d bytes from %d\n", (sizeOfPtr-left), fd);
 	for (x=0;x<((sizeOfPtr-left)/16)+1;x++) {
@@ -240,6 +243,9 @@ void _gnutls_read_clear_buffer( GNUTLS_STATE state) {
  * MAX_RECV_SIZE. 
  *
  * sizeOfPtr should be unsigned.
+ *
+ * This is not a general purpose function. It returns EXACTLY the data requested.
+ *
  */
 ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t sizeOfPtr, int flag, ContentType recv_type)
 {
@@ -247,6 +253,7 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	int min;
 	char *buf;
 	int recvlowat = RCVLOWAT;
+	int recvdata;
 
 	*iptr = NULL;
 
@@ -267,22 +274,32 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 	*iptr = buf;
 	
-	/* calculate the actual size
+	/* calculate the actual size, ie. get the minimum of the
+	 * buffered data and the requested data.
 	 */
 	min = GMIN( state->gnutls_internals.recv_buffer_data_size, sizeOfPtr);
 	if ( min > 0) {
+		/* if we have enough buffered data
+		 * then just return them.
+		 */
 		if ( min == sizeOfPtr) {
 			return min;
 		}
 	}
 
-	/* min is over zero */
-	sizeOfPtr -= min;
-	
+	/* min is over zero. recvdata is the data we must
+	 * receive in order to return the requested data.
+	 */
+	recvdata = sizeOfPtr - min;
+
 	/* read fresh data - but leave RCVLOWAT bytes in the kernel buffer.
 	 */
-	if ( sizeOfPtr - recvlowat > 0) {
-		ret = _gnutls_Read( fd, &buf[min], sizeOfPtr - recvlowat, flag);
+	if ( recvdata - recvlowat > 0) {
+		ret = _gnutls_Read( fd, &buf[min], recvdata - recvlowat, flag);
+
+		/* return immediately if we got an interrupt or eagain
+		 * error.
+		 */
 		if (ret < 0 && gnutls_is_fatal_error(ret)==0) 
 			return ret;
 	}
@@ -305,7 +322,11 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 
 	ret += ret2;
 
-	if (ret < recvlowat) {
+#ifdef READ_DEBUG
+	_gnutls_log("RB: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n", state->gnutls_internals.recv_buffer_data_size, ret, sizeOfPtr);
+#endif
+
+	if (ret > 0 && ret < recvlowat) {
 		gnutls_assert();
 		return GNUTLS_E_AGAIN;
 	}
@@ -314,13 +335,20 @@ ssize_t _gnutls_read_buffered( int fd, GNUTLS_STATE state, opaque **iptr, size_t
 	 */
 	state->gnutls_internals.recv_buffer_data_size += ret;
 
-	ret+=min;
-	
+	if (ret==0) { /* EOF */
+		gnutls_assert();
+		return 0;
+	}
+
+	ret = state->gnutls_internals.recv_buffer_data_size;
+
 	if ((ret > 0) && (ret < sizeOfPtr)) {
 		/* Short Read */
+		gnutls_assert();
 		return GNUTLS_E_AGAIN;
-	} else
+	} else {
 		return ret;
+	}
 }
 
 
@@ -354,10 +382,17 @@ ssize_t _gnutls_write(int fd, const void *iptr, size_t n, int flags)
 		i = _gnutls_send_func(fd, &ptr[i], left, flags);
 		if (i == -1) {
 			if (errno == EAGAIN || errno == EINTR) {
+				if (n-left > 0) {
+					gnutls_assert();
+					return n-left;
+				}
+				
 				if (errno==EAGAIN) return GNUTLS_E_AGAIN;
 				else return GNUTLS_E_INTERRUPTED;
-			} else 
+			} else {
+				gnutls_assert();
 				return GNUTLS_E_UNKNOWN_ERROR;
+			}
 		}
 		left -= i;
 	}

@@ -37,6 +37,7 @@
   *
   * This function will return the username of the peer. This should only be
   * called in case of SRP authentication and in case of a server.
+  * Returns NULL in case of an error.
   *
   **/
 const char* gnutls_srp_server_get_username(  GNUTLS_STATE state) {
@@ -57,6 +58,7 @@ SRP_SERVER_AUTH_INFO info;
   *
   * This function will return the bits used in the Diffie Hellman authentication
   * with the peer. This should only be called in case of a server.
+  * Returns a negative value in case of an error.
   *
   **/
 int gnutls_anon_server_get_dh_bits( GNUTLS_STATE state) {
@@ -75,6 +77,7 @@ ANON_SERVER_AUTH_INFO info;
   *
   * This function will return the bits used in the Diffie Hellman authentication
   * with the peer. This should only be called in case of a client.
+  * Returns a negative value in case of an error.
   *
   **/
 int gnutls_anon_client_get_dh_bits(  GNUTLS_STATE state) {
@@ -96,6 +99,7 @@ ANON_CLIENT_AUTH_INFO info;
   * This function will return the name of the peer. The name is gnutls_DN structure and 
   * is a obtained by the peer's certificate. If the certificate send by the
   * peer is invalid, or in any other failure this function returns NULL.
+  * Returns NULL in case of an error.
   *
   **/
 const gnutls_DN* gnutls_x509pki_get_peer_dn(  GNUTLS_STATE state) {
@@ -115,6 +119,7 @@ X509PKI_AUTH_INFO info;
   * This function will return the name of the peer's certificate issuer. The name is gnutls_DN structure and 
   * is a obtained by the peer's certificate. If the certificate send by the
   * peer is invalid, or in any other failure this function returns NULL.
+  * Returns NULL in case of an error.
   *
   **/
 const gnutls_DN* gnutls_x509pki_get_issuer_dn(  GNUTLS_STATE state) {
@@ -134,6 +139,7 @@ X509PKI_AUTH_INFO info;
   * This function will return the peer's certificate status (TRUSTED, EXPIRED etc.). This is the output
   * of the certificate verification function. However you must also check the peer's name in order
   * to check if the verified certificate belongs to the actual peer.
+  * Returns GNUTLS_CERT_NONE in case of an error, or if no certificate was sent.
   *
   **/
 CertificateStatus gnutls_x509pki_get_peer_certificate_status(  GNUTLS_STATE state) {
@@ -142,7 +148,7 @@ X509PKI_AUTH_INFO info;
 	CHECK_AUTH(GNUTLS_X509PKI, GNUTLS_E_INVALID_REQUEST);
 
 	info = _gnutls_get_auth_info(state);	
-	if (info==NULL) return GNUTLS_E_UNKNOWN_ERROR;
+	if (info==NULL) return GNUTLS_CERT_NONE;
 	return info->peer_certificate_status;
 }
 
@@ -152,6 +158,7 @@ X509PKI_AUTH_INFO info;
   *
   * This function will return the peer's certificate version (1, 2, 3). This is obtained by the X509 Certificate
   * Version field. If the certificate is invalid then version will be zero.
+  * Returns a negative value in case of an error.
   *
   **/
 int gnutls_x509pki_get_peer_certificate_version(  GNUTLS_STATE state) {
@@ -171,6 +178,7 @@ X509PKI_AUTH_INFO info;
   * This function will return the number of bits used in a Diffie Hellman Handshake. This will only
   * occur in case of DHE_* ciphersuites. The return value may be zero if no applicable ciphersuite was
   * used.
+  * Returns a negative value in case of an error.
   *
   **/
 int gnutls_x509pki_get_dh_bits(  GNUTLS_STATE state) {
@@ -189,6 +197,7 @@ X509PKI_AUTH_INFO info;
   *
   * This function will return the peer's certificate activation time in UNIX time (ie seconds since
   * 00:00:00 UTC January 1, 1970).
+  * Returns a (time_t) -1 in case of an error.
   *
   **/
 time_t gnutls_x509pki_get_peer_certificate_activation_time(  GNUTLS_STATE state) {
@@ -207,6 +216,7 @@ X509PKI_AUTH_INFO info;
   *
   * This function will return the peer's certificate expiration time in UNIX time (ie seconds since
   * 00:00:00 UTC January 1, 1970).
+  * Returns a (time_t) -1 in case of an error.
   *
   **/
 time_t gnutls_x509pki_get_peer_certificate_expiration_time(  GNUTLS_STATE state) {
@@ -226,6 +236,7 @@ X509PKI_AUTH_INFO info;
   *
   * This function will return the peer's certificate key usage. This is specified in X509v3 Certificate
   * Extensions and is an 8bit string.
+  * Returns zero in case of an error.
   *
   **/
 unsigned char gnutls_x509pki_get_key_usage(  GNUTLS_STATE state) {
@@ -242,11 +253,12 @@ X509PKI_AUTH_INFO info;
   * gnutls_x509pki_get_certificate_request_status - This function returns the certificate request status
   * @state: is a gnutls state
   *
-  * This function will return 0 if the peer (server) did not requested client
+  * This function will return 0 if the peer (server) did not request client
   * authentication or 1 otherwise.
+  * Returns a negative value in case of an error.
   *
   **/
-unsigned char gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE state) {
+int gnutls_x509pki_get_certificate_request_status(  GNUTLS_STATE state) {
 X509PKI_AUTH_INFO info;
 
 	CHECK_AUTH(GNUTLS_X509PKI, 0);
@@ -265,6 +277,7 @@ X509PKI_AUTH_INFO info;
   * This is specified in X509v3 Certificate Extensions. 
   * GNUTLS will only return the dnsName of the Alternative name, or a null 
   * string.
+  * Returns NULL in case of an error.
   *
   **/
 const char* gnutls_x509pki_get_subject_dns_name( GNUTLS_STATE state) {
