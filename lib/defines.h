@@ -31,11 +31,17 @@
 #endif
 
 #ifdef NO_TIME_T
+# define HAVE_TIME_T
 typedef unsigned int time_t;
 #endif
 
 #ifdef NO_SIZE_T
+# define HAVE_SIZE_T
 typedef unsigned int size_t;
+#endif
+
+#ifdef NO_SSIZE_T
+# define HAVE_SSIZE_T
 typedef int ssize_t;
 #endif
 

@@ -42,8 +42,20 @@ extern "C" {
 /* For backwards compatibility */
 #include <gnutls/compat4.h>
 
+#ifndef HAVE_SIZE_T
+# define HAVE_SIZE_T
 @DEFINE_SIZE_T@
+#endif
+
+#ifndef HAVE_SSIZE_T
+# define HAVE_SSIZE_T
+@DEFINE_SSIZE_T@
+#endif
+
+#ifndef HAVE_TIME_T
+# define HAVE_TIME_T
 @DEFINE_TIME_T@
+#endif
 
 #define GNUTLS_CIPHER_RIJNDAEL_128_CBC GNUTLS_CIPHER_AES_128_CBC
 #define GNUTLS_CIPHER_RIJNDAEL_256_CBC GNUTLS_CIPHER_AES_256_CBC

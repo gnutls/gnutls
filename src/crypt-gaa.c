@@ -9,7 +9,6 @@
 #include <config.h>
 #ifdef _WIN32
 # include <io.h>
-# include <winbase.h>
 #endif
 
 #include <stdio.h>
@@ -150,19 +149,19 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 33 "crypt.gaa"
+#line 32 "crypt.gaa"
 	char *create_conf;
-#line 30 "crypt.gaa"
+#line 29 "crypt.gaa"
 	char *passwd_conf;
-#line 27 "crypt.gaa"
+#line 26 "crypt.gaa"
 	int verify;
-#line 24 "crypt.gaa"
+#line 23 "crypt.gaa"
 	int salt;
-#line 21 "crypt.gaa"
+#line 20 "crypt.gaa"
 	int index;
-#line 18 "crypt.gaa"
+#line 17 "crypt.gaa"
 	char *passwd;
-#line 15 "crypt.gaa"
+#line 14 "crypt.gaa"
 	char *username;
 
 #line 114 "gaa.skel"
@@ -540,7 +539,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 36 "crypt.gaa"
+#line 35 "crypt.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
@@ -550,7 +549,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_create_conf.arg1, gaa_getstr, GAATMP_create_conf.size1);
 		gaa_index++;
-#line 34 "crypt.gaa"
+#line 33 "crypt.gaa"
 { gaaval->create_conf = GAATMP_create_conf.arg1 ;};
 
 		return GAA_OK;
@@ -560,14 +559,14 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_passwd_conf.arg1, gaa_getstr, GAATMP_passwd_conf.size1);
 		gaa_index++;
-#line 31 "crypt.gaa"
+#line 30 "crypt.gaa"
 { gaaval->passwd_conf = GAATMP_passwd_conf.arg1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_verify:
 	OK = 0;
-#line 28 "crypt.gaa"
+#line 27 "crypt.gaa"
 { gaaval->verify = 1 ;};
 
 		return GAA_OK;
@@ -577,7 +576,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_salt.arg1, gaa_getint, GAATMP_salt.size1);
 		gaa_index++;
-#line 25 "crypt.gaa"
+#line 24 "crypt.gaa"
 { gaaval->salt = GAATMP_salt.arg1 ;};
 
 		return GAA_OK;
@@ -587,7 +586,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_index.arg1, gaa_getint, GAATMP_index.size1);
 		gaa_index++;
-#line 22 "crypt.gaa"
+#line 21 "crypt.gaa"
 { gaaval->index = GAATMP_index.arg1 ;};
 
 		return GAA_OK;
@@ -597,7 +596,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_passwd.arg1, gaa_getstr, GAATMP_passwd.size1);
 		gaa_index++;
-#line 19 "crypt.gaa"
+#line 18 "crypt.gaa"
 { gaaval->passwd = GAATMP_passwd.arg1 ;};
 
 		return GAA_OK;
@@ -607,7 +606,7 @@ int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_username.arg1, gaa_getstr, GAATMP_username.size1);
 		gaa_index++;
-#line 16 "crypt.gaa"
+#line 15 "crypt.gaa"
 { gaaval->username = GAATMP_username.arg1 ;};
 
 		return GAA_OK;
@@ -636,7 +635,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 38 "crypt.gaa"
+#line 37 "crypt.gaa"
 { gaaval->username=NULL; gaaval->passwd=NULL; gaaval->salt=0;
        gaaval->create_conf=NULL; gaaval->passwd_conf=NULL; gaaval->verify = 0; 
        gaaval->index = 1; ;};
