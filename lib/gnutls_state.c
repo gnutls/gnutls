@@ -394,6 +394,9 @@ int _gnutls_dh_get_allowed_prime_bits( gnutls_session session)
 
 int _gnutls_dh_set_peer_public( gnutls_session session, mpi_t public)
 {
+dh_info_st * dh;
+int ret;
+
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -401,8 +404,7 @@ int _gnutls_dh_set_peer_public( gnutls_session session, mpi_t public)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			 _gnutls_mpi_print_lz( info->dh.public_key, &info->dh.public_key_size, public);
-			info->dh.peer_public_bits = _gnutls_mpi_get_nbits(public);
+			dh = &info->dh;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -412,13 +414,20 @@ int _gnutls_dh_set_peer_public( gnutls_session session, mpi_t public)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			 _gnutls_mpi_print_lz( info->dh.public_key, &info->dh.public_key_size, public);
-			info->dh.peer_public_bits = _gnutls_mpi_get_nbits(public);
+			dh = &info->dh;
 			break;
 		}
 		default:
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	dh->public_key_size = sizeof( dh->public_key);
+	ret = _gnutls_mpi_print_lz( dh->public_key, &dh->public_key_size, public);
+	if (ret < 0) {
+		gnutls_assert();
+		dh->public_key_size = 0;
+		return ret;
 	}
 
 	return 0;
@@ -453,15 +462,33 @@ int _gnutls_dh_set_secret_bits( gnutls_session session, uint bits)
 	return 0;
 }
 
-int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits) 
+/* This function will set in the auth info structure the
+ * RSA exponent and the modulus.
+ */
+int _gnutls_rsa_export_set_pubkey( gnutls_session session, mpi_t exp, mpi_t mod) 
 {
 	CERTIFICATE_AUTH_INFO info;
-
+	int ret;
+	
 	info = _gnutls_get_auth_info(session);
 	if (info == NULL)
 		return GNUTLS_E_INTERNAL_ERROR;
 
-	info->rsa_export_modulus_bits = bits;
+	info->rsa_export.modulus_size = sizeof( info->rsa_export.modulus);
+	ret = _gnutls_mpi_print_lz( info->rsa_export.modulus, &info->rsa_export.modulus_size, mod);
+	if (ret < 0) {
+		gnutls_assert();
+		info->rsa_export.modulus_size = 0;
+		return ret;
+	}
+
+	info->rsa_export.exponent_size = sizeof( info->rsa_export.exponent);
+	ret = _gnutls_mpi_print_lz( info->rsa_export.exponent, &info->rsa_export.exponent_size, exp);
+	if (ret < 0) {
+		gnutls_assert();
+		info->rsa_export.exponent_size = 0;
+		return ret;
+	}
 
 	return 0;
 }
@@ -469,8 +496,11 @@ int _gnutls_rsa_export_set_modulus_bits( gnutls_session session, uint bits)
 
 /* Sets the prime and the generator in the auth info structure.
  */
-int _gnutls_dh_set_prime( gnutls_session session, mpi_t gen, mpi_t prime)
+int _gnutls_dh_set_group( gnutls_session session, mpi_t gen, mpi_t prime)
 {
+dh_info_st* dh;
+int ret;
+
 	switch( gnutls_auth_get_type( session)) {
 		case GNUTLS_CRD_ANON: {
 			ANON_SERVER_AUTH_INFO info;
@@ -478,9 +508,7 @@ int _gnutls_dh_set_prime( gnutls_session session, mpi_t gen, mpi_t prime)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			 _gnutls_mpi_print_lz( info->dh.prime, &info->dh.prime_size, prime);
-			 _gnutls_mpi_print_lz( info->dh.generator, &info->dh.generator_size, gen);
-			info->dh.prime_bits = _gnutls_mpi_get_nbits(prime);
+			dh = &info->dh;
 			break;
 		}
 		case GNUTLS_CRD_CERTIFICATE: {
@@ -490,14 +518,28 @@ int _gnutls_dh_set_prime( gnutls_session session, mpi_t gen, mpi_t prime)
 			if (info == NULL)
 				return GNUTLS_E_INTERNAL_ERROR;
 
-			 _gnutls_mpi_print_lz( info->dh.prime, &info->dh.prime_size, prime);
-			 _gnutls_mpi_print_lz( info->dh.generator, &info->dh.generator_size, gen);
-			info->dh.prime_bits = _gnutls_mpi_get_nbits(prime);
+			dh = &info->dh;
 			break;
 		}
 		default:
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
+	}
+
+	dh->prime_size = sizeof( dh->prime);
+	ret = _gnutls_mpi_print_lz( dh->prime, &dh->prime_size, prime);
+	if (ret < 0) {
+		gnutls_assert();
+		dh->prime_size = 0;
+		return ret;
+	}
+
+	dh->generator_size = sizeof( dh->generator);
+	ret = _gnutls_mpi_print_lz( dh->generator, &dh->generator_size, gen);
+	if (ret < 0) {
+		gnutls_assert();
+		dh->generator_size = 0;
+		return ret;
 	}
 
 	

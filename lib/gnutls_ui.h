@@ -48,15 +48,15 @@ gnutls_credentials_type gnutls_auth_client_get_type(gnutls_session session);
 /* DH */
 
 void gnutls_dh_set_prime_bits(gnutls_session session, int bits);
-int gnutls_dh_get_prime_bits(gnutls_session);
 int gnutls_dh_get_secret_bits(gnutls_session);
 int gnutls_dh_get_peers_public_bits(gnutls_session);
+int gnutls_dh_get_prime_bits(gnutls_session);
 
-int gnutls_dh_get_prime(gnutls_session, gnutls_datum* prime);
-int gnutls_dh_get_generator(gnutls_session, gnutls_datum* gen);
-int gnutls_dh_get_public_key(gnutls_session, gnutls_datum* gen);
+int gnutls_dh_get_group(gnutls_session, gnutls_datum* gen, gnutls_datum* prime);
+int gnutls_dh_get_pubkey(gnutls_session, gnutls_datum* pub);
 
 /* RSA */
+int gnutls_rsa_export_get_pubkey(gnutls_session session, gnutls_datum* exp, gnutls_datum* mod);
 int gnutls_rsa_export_get_modulus_bits(gnutls_session session);
 
 /* X509PKI */

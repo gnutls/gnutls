@@ -97,13 +97,20 @@ typedef struct {
 /* typedef CERTIFICATE_CREDENTIALS_INT * CERTIFICATE_CREDENTIALS; */
 #define gnutls_certificate_credentials CERTIFICATE_CREDENTIALS_INT*
 
+typedef struct rsa_info_st_int {
+	opaque	modulus[64];
+	size_t	modulus_size;
+	opaque	exponent[64];
+	size_t	exponent_size;
+} rsa_info_st;
+
 typedef struct CERTIFICATE_AUTH_INFO_INT {
 	int		  certificate_requested; /* if the peer requested certificate
 						  * this is non zero;
 						  */
 	dh_info_st	  dh;
 
-	int		  rsa_export_modulus_bits;
+	rsa_info_st	  rsa_export;
 	gnutls_datum*	  raw_certificate_list; /* holds the raw certificate of the
 					         * peer.
 					         */

@@ -116,11 +116,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 	}
 
 	info = _gnutls_get_auth_info( session);
-	ret=_gnutls_rsa_export_set_modulus_bits( session, _gnutls_mpi_get_nbits(rsa_mpis[0]));
-	if (ret<0) {
-		gnutls_assert();
-		return ret;
-	}
+	_gnutls_rsa_export_set_pubkey( session, rsa_mpis[1], rsa_mpis[0]);
 
 	_gnutls_mpi_print( NULL, &n_m, rsa_mpis[0]);
 	_gnutls_mpi_print( NULL, &n_e, rsa_mpis[1]);
@@ -268,12 +264,7 @@ static int proc_rsa_export_server_kx(gnutls_session session, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
-	ret=_gnutls_rsa_export_set_modulus_bits( session, _gnutls_mpi_get_nbits(
-		session->key->rsa[0]));
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
+	_gnutls_rsa_export_set_modulus( session, session->key->rsa[1], session->key->rsa[0]);
 
 	/* VERIFY SIGNATURE */
 

@@ -88,12 +88,8 @@ static int gen_anon_server_kx( gnutls_session session, opaque** data) {
 		return ret;
 	}
 
-	ret=_gnutls_dh_set_prime( session, g, p);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	
+	_gnutls_dh_set_group( session, g, p);
+
 	ret = _gnutls_dh_common_print_server_kx( session, g, p, data);
 	if (ret < 0) {
 		gnutls_assert();

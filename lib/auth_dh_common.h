@@ -2,9 +2,7 @@
 # define AUTH_DH_COMMON
 
 typedef struct dh_info_st_int {
-	int prime_bits;
 	int secret_bits;
-	int peer_public_bits;
 
 	opaque prime[1024];
 	size_t prime_size;

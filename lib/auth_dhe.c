@@ -87,7 +87,6 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	gnutls_privkey* apr_pkey;
 	int apr_cert_list_length;
 	gnutls_datum signature, ddata;
-	CERTIFICATE_AUTH_INFO info;
 	const gnutls_certificate_credentials cred;
 	gnutls_dh_params dh_params;
 
@@ -125,15 +124,9 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 		return ret;
 	}
 
-	info = _gnutls_get_auth_info( session);
-	ret=_gnutls_dh_set_prime( session, g, p);
-	if (ret<0) {
-		gnutls_assert();
-		return ret;
-	}
+	_gnutls_dh_set_group( session, g, p);
 
 	ret = _gnutls_dh_common_print_server_kx( session, g, p, data);
-
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
