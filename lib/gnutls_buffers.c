@@ -257,7 +257,6 @@ ssize_t _gnutls_Recv_int(int fd, GNUTLS_STATE state, ContentType type, Handshake
 	return (sizeOfPtr - left);
 }
 
-#warning "FIX THIS FUNCTION - too many reallocs()"
 /* Buffer for handshake packets. Keeps the packets in order
  * for finished messages to use them.
  */

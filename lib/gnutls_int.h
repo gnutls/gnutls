@@ -366,9 +366,6 @@ ssize_t gnutls_send_int(SOCKET cd, GNUTLS_STATE state, ContentType type, Handsha
 ssize_t gnutls_recv_int(SOCKET cd, GNUTLS_STATE state, ContentType type, HandshakeType, char* data, size_t sizeofdata, int flags);
 int _gnutls_send_change_cipher_spec(SOCKET cd, GNUTLS_STATE state);
 
-#define _gnutls_version_cmp( ver1, ver2) ver1==ver2?0:1
-#define _gnutls_version_ssl3(x) _gnutls_version_cmp(x, GNUTLS_SSL3)
-
 /* These macros return the advertized TLS version of
  * the peer.
  */

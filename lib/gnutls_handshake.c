@@ -388,7 +388,7 @@ int _gnutls_send_finished(SOCKET cd, GNUTLS_STATE state)
 	int ret;
 	int data_size;
 
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+	if ( state->connection_state.version == GNUTLS_SSL3) {
 		data =
 		    _gnutls_ssl3_finished(state,
 					  state->security_parameters.
@@ -429,7 +429,7 @@ int _gnutls_recv_finished(SOCKET cd, GNUTLS_STATE state)
 		gnutls_assert();
 		return ret;
 	}
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+	if ( state->connection_state.version == GNUTLS_SSL3) {
 		data_size = 36;
 	} else {
 		data_size = 12;
@@ -439,7 +439,7 @@ int _gnutls_recv_finished(SOCKET cd, GNUTLS_STATE state)
 		gnutls_assert();
 		return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
 	}
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) {
+	if ( state->connection_state.version == GNUTLS_SSL3) {
 		/* skip the bytes from the last message */
 		data =
 		    _gnutls_ssl3_finished(state,
@@ -1695,12 +1695,7 @@ int _gnutls_remove_unwanted_ciphersuites(GNUTLS_STATE state,
 	int alg_size;
 	KXAlgorithm kx;
 
-	/* FIXME: remove algorithms depending on the keyUsage bits
-	 * eg. 
-	 * if (cert.keyUsage & X509KEY_DIGITAL_SIGNATURE) 
-	 * we've got a sign-only key... (ok we need to check
-	 * it more than that).
-	 */
+#warning "make this function work to the client side too"
 
 	if (state->security_parameters.entity == GNUTLS_CLIENT)
 		 return 0;

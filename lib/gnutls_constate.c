@@ -53,7 +53,7 @@ int _gnutls_set_keys(GNUTLS_STATE state, int hash_size, int IV_size, int key_siz
 	memcpy(random, state->security_parameters.server_random, TLS_RANDOM_SIZE);
 	memcpy(&random[TLS_RANDOM_SIZE], state->security_parameters.client_random, TLS_RANDOM_SIZE);
 
-	if (_gnutls_version_ssl3(state->connection_state.version) == 0) { /* SSL 3 */
+	if ( state->connection_state.version == GNUTLS_SSL3) { /* SSL 3 */
 		key_block = gnutls_ssl3_generate_random( state->security_parameters.master_secret, TLS_MASTER_SIZE, random, 2*TLS_RANDOM_SIZE,
 			block_size);
 	} else { /* TLS 1.0 */

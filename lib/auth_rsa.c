@@ -298,15 +298,21 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 	gnutls_datum ciphertext;
 	int ret, dsize;
 
-	if (_gnutls_version_ssl3(gnutls_get_current_version(state)) == 0) {
+	if ( gnutls_get_current_version(state) == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		ciphertext.data = data;
 		ciphertext.size = data_size;
 	} else {		/* TLS 1 */
 		ciphertext.data = &data[2];
 		dsize = READuint16(data);
-		ciphertext.size = GMIN(dsize, data_size);
+		
+		if (dsize != data_size - 2) {
+			gnutls_assert();
+			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+		}
+		ciphertext.size = dsize;
 	}
+
 	ret =
 	    _gnutls_pkcs1_rsa_decrypt(&plaintext, ciphertext, state->gnutls_key->u,
 				      state->gnutls_key->A, 2);		/* btype==2 */
@@ -316,17 +322,21 @@ int proc_rsa_client_kx(GNUTLS_STATE state, opaque * data, int data_size)
 		 * the peer. Just use a random key. (in order to avoid
 		 * attack against pkcs-1 formating).
 		 */
+return ret;
 		gnutls_assert();
+#ifdef DEBUG
+		_gnutls_log( "Possible PKCS-1 format attack\n");
+#endif
 		RANDOMIZE_KEY(state->gnutls_key->key, secure_malloc);
 	} else {
 		ret = 0;
 		if (plaintext.size != TLS_MASTER_SIZE) {	/* WOW */
 			RANDOMIZE_KEY(state->gnutls_key->key, secure_malloc);
 		} else {
-			if (_gnutls_get_adv_version_major( state) != plaintext.data[0])
+			if (_gnutls_get_adv_version_major( state) != plaintext.data[0] || _gnutls_get_adv_version_minor( state) != plaintext.data[1]) {
+				gnutls_assert();
 				ret = GNUTLS_E_DECRYPTION_FAILED;
-			if (_gnutls_get_adv_version_minor( state) != plaintext.data[1])
-				ret = GNUTLS_E_DECRYPTION_FAILED;
+			}
 			if (ret != 0) {
 				_gnutls_mpi_release(&state->gnutls_key->B);
 				_gnutls_mpi_release(&state->gnutls_key->u);
@@ -495,7 +505,7 @@ int gen_rsa_client_kx(GNUTLS_STATE state, opaque ** data)
 	_gnutls_mpi_release(&state->gnutls_key->a);
 	_gnutls_mpi_release(&state->gnutls_key->x);
 
-	if (_gnutls_version_ssl3(ver) == 0) {
+	if ( ver == GNUTLS_SSL3) {
 		/* SSL 3.0 */
 		*data = sdata.data;
 		return sdata.size;

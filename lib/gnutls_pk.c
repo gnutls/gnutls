@@ -127,8 +127,8 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
 
 /* Do PKCS-1 RSA decryption. 
  * pkey is the private key and n the modulus.
+ * Can decrypt block type 1 and type packets.
  */
-
 int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext, gnutls_datum ciphertext,
 		      MPI pkey, MPI n, int btype)
 {
@@ -176,6 +176,7 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext, gnutls_datum ciphertext
 	 * (use block type 'btype')
 	 */
 
+
 	edata[0] = 0;
 	esize++;
 
@@ -186,11 +187,30 @@ int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext, gnutls_datum ciphertext
 	}
 
 	ret = GNUTLS_E_DECRYPTION_FAILED;
-	for (i=2;i<esize;i++) {
-		if (edata[i]==0) { 
-			ret = 0;
-			break;
+	switch(btype) {
+	    case 2:
+		for (i = 2; i < esize; i++) {
+			if (edata[i] == 0) {
+				ret = 0;
+				break;
+			}
 		}
+		break;
+	    case 1:
+		for (i = 2; i < esize; i++) {
+			if (edata[i] == 0 && i > 2) {
+				ret = 0;
+				break;
+			}
+			if (edata[i] != 0xff) {
+				ret = GNUTLS_E_PKCS1_WRONG_PAD;
+				break;
+			}
+		}
+	        break;
+	    default:
+	        gnutls_assert();
+	        return GNUTLS_E_UNKNOWN_ERROR;
 	}
 	i++;
 	
