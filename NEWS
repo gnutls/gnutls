@@ -27,6 +27,8 @@ See the end for copying conditions.
     gnutls_x509_crq_get_attribute_by_oid(),
     gnutls_x509_crq_set_attribute_by_oid() and
     gnutls_x509_crt_set_extension_by_oid().
+- If the library has been compiled with features disabled, a warning is 
+  issued during the compilation of any program.
 
 * Version 1.2.0 (2005-01-27)
 - Added the definitions and OIDs for the RIPEMD-160 hash algorithm.
