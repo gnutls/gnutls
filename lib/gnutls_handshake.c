@@ -1032,7 +1032,6 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 		/* dataptr is freed because the caller does not
 		 * need it */
 		gnutls_free(dataptr);
-		*data = NULL;
 		break;
 	case GNUTLS_SERVER_HELLO_DONE:
 		if (length32==0) ret = 0;
@@ -1049,7 +1048,7 @@ int _gnutls_recv_handshake(GNUTLS_STATE state, uint8 ** data,
 	default:
 		gnutls_assert();
 		gnutls_free(dataptr);
-		*data = NULL;
+		if (data!=NULL) *data = NULL;
 		ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
 	}
 
