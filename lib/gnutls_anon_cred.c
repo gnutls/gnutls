@@ -26,7 +26,7 @@
 #include "gnutls_num.h"
 #include "gnutls_gcry.h"
 
-const static int anon_tmp;
+static int anon_tmp;
 
 /**
   * gnutls_anon_free_server_sc - Used to free an allocated GNUTLS_ANON_SERVER_CREDENTIALS structure

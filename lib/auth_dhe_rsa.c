@@ -86,27 +86,13 @@ static int gen_dhe_rsa_server_kx(GNUTLS_STATE state, opaque ** data)
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	if (state->gnutls_key->auth_info == NULL) {
-		state->gnutls_key->auth_info =
-		    gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
-		if (state->gnutls_key->auth_info == NULL)
-			return GNUTLS_E_MEMORY_ERROR;
-
-		state->gnutls_key->auth_info_size =
-		    sizeof(X509PKI_AUTH_INFO_INT);
-
-		info = state->gnutls_key->auth_info;
-		info->dh_bits = gcry_mpi_get_nbits(p);
-		state->gnutls_key->auth_info_type = GNUTLS_X509PKI;
-
-	} else
-	    if (gnutls_auth_get_type(state) !=
-		state->gnutls_key->auth_info_type) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_X509PKI, sizeof( X509PKI_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return ret;
 	}
 
-	info = state->gnutls_key->auth_info;
+	info = _gnutls_get_auth_info( state);
+	info->dh_bits = gcry_mpi_get_nbits(p);
 
 	X = gnutls_calc_dh_secret(&x, g, p);
 	if (X == NULL) {
@@ -248,7 +234,7 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	int i, sigsize;
 	gnutls_datum vparams, signature;
 	int ret;
-	X509PKI_AUTH_INFO info = state->gnutls_key->auth_info;
+	X509PKI_AUTH_INFO info = _gnutls_get_auth_info( state);
 	gnutls_cert peer_cert;
 
 	if (info == NULL || info->ncerts==0) {
@@ -290,10 +276,7 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 	DECR_LEN( data_size, n_Y);
 	data_Y = &data[i];
 	i += n_Y;
-	if (i > data_size) {
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+
 	_n_Y = n_Y;
 	_n_g = n_g;
 	_n_p = n_p;
@@ -312,23 +295,19 @@ static int proc_dhe_rsa_server_kx(GNUTLS_STATE state, opaque * data,
 		return GNUTLS_E_MPI_SCAN_FAILED;
 	}
 
+	info->dh_bits = gcry_mpi_get_nbits( state->gnutls_key->client_p);
 
 	/* VERIFY SIGNATURE */
 
 	vparams.size = n_Y + n_p + n_g + 6;
 	vparams.data = data;
 
-	if (data_size - vparams.size - 2 <= 0) {	/* check if the peer sent enough data */
-		gnutls_assert();
-		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
-
 	DECR_LEN( data_size, 2);
 	sigsize = READuint16(&data[vparams.size]);
 
 	DECR_LEN( data_size, sigsize);
 	signature.data = &data[vparams.size + 2];
-	signature.size = GMIN(data_size - vparams.size - 2, sigsize);
+	signature.size = sigsize;
 
 	if ((ret =
 	     _gnutls_cert2gnutlsCert( &peer_cert,

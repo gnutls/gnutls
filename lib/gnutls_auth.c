@@ -233,3 +233,26 @@ void _gnutls_free_auth_info( GNUTLS_STATE state) {
 
 }
 
+int _gnutls_auth_info_set( GNUTLS_STATE state, CredType type, int size) {
+	if ( state->gnutls_key->auth_info == NULL) {
+		state->gnutls_key->auth_info = gnutls_calloc( 1, size);
+		if (state->gnutls_key->auth_info == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		state->gnutls_key->auth_info_type = type;
+		state->gnutls_key->auth_info_size = size;
+	} else
+		/* If the credentials for the current authentication scheme,
+		 * are not the one we want to set, then it's an error.
+		 * This may happen if a rehandshake is performed an the
+		 * ciphersuite which is negotiated has different authentication
+		 * schema.
+		 */
+		if ( gnutls_auth_get_type( state) != state->gnutls_key->auth_info_type) {
+			gnutls_assert();
+			return GNUTLS_E_INVALID_REQUEST;
+		}
+
+	return 0;
+}

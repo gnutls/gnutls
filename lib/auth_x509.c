@@ -484,32 +484,16 @@ int _gnutls_proc_x509_server_certificate(GNUTLS_STATE state, opaque * data,
 	}
 
 
-	if (state->gnutls_key->auth_info == NULL) {
-		state->gnutls_key->auth_info =
-		    gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
-		if (state->gnutls_key->auth_info == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		state->gnutls_key->auth_info_size =
-		    sizeof(X509PKI_AUTH_INFO_INT);
-
-		info = state->gnutls_key->auth_info;
-
-		state->gnutls_key->auth_info_type = GNUTLS_X509PKI;
-	} else
-	    if (gnutls_auth_get_type(state) !=
-		state->gnutls_key->auth_info_type) {
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_X509PKI, sizeof( X509PKI_AUTH_INFO_INT))) < 0) {
 		gnutls_assert();
-		return GNUTLS_E_INVALID_REQUEST;
+		return ret;
 	}
 
-	info = state->gnutls_key->auth_info;
+	info = _gnutls_get_auth_info( state);
 
 	DECR_LEN(dsize, 3);
 	size = READuint24(p);
 	p += 3;
-
 
 	if (size == 0) {
 		gnutls_assert();
@@ -658,19 +642,12 @@ int _gnutls_proc_x509_cert_req(GNUTLS_STATE state, opaque * data,
 	}
 	state->gnutls_key->certificate_requested = 1;
 
-	if (state->gnutls_key->auth_info == NULL) {
-		state->gnutls_key->auth_info =
-		    gnutls_calloc(1, sizeof(X509PKI_AUTH_INFO_INT));
-		if (state->gnutls_key->auth_info == NULL) {
-			gnutls_assert();
-			return GNUTLS_E_MEMORY_ERROR;
-		}
-		state->gnutls_key->auth_info_size =
-		    sizeof(X509PKI_AUTH_INFO_INT);
-
-		info = state->gnutls_key->auth_info;
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_X509PKI, sizeof( X509PKI_AUTH_INFO_INT))) < 0) {
+		gnutls_assert();
+		return ret;
 	}
-	info = state->gnutls_key->auth_info;
+
+	info = _gnutls_get_auth_info( state);
 
 	DECR_LEN(dsize, 1);
 	size = p[0];
@@ -767,7 +744,7 @@ int _gnutls_proc_x509_client_cert_vrfy(GNUTLS_STATE state, opaque * data,
 	int dsize = data_size;
 	opaque *pdata = data;
 	gnutls_datum sig;
-	X509PKI_AUTH_INFO info = state->gnutls_key->auth_info;
+	X509PKI_AUTH_INFO info = _gnutls_get_auth_info( state);
 	gnutls_cert peer_cert;
 
 	if (info == NULL || info->ncerts == 0) {

@@ -75,24 +75,18 @@ int gen_srp_server_hello(GNUTLS_STATE state, opaque ** data)
 	uint8 pwd_algo;
 	GNUTLS_SRP_PWD_ENTRY *pwd_entry;
 	int err;
-
-	if ( state->gnutls_key->auth_info == NULL) {
-              	state->gnutls_key->auth_info = gnutls_calloc(1, sizeof(SRP_SERVER_AUTH_INFO_INT));
-		state->gnutls_key->auth_info_type = GNUTLS_SRP;
-	} else
-		if (gnutls_auth_get_type( state) != state->gnutls_key->auth_info_type) {
-	        	gnutls_assert();
-	                return GNUTLS_E_INVALID_REQUEST;
-		}	                         	 			 			
-	                         	
-	if (state->gnutls_key->auth_info == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-	state->gnutls_key->auth_info_size = sizeof(SRP_SERVER_AUTH_INFO_INT);
+	SRP_SERVER_AUTH_INFO info;
 	
-	username = ((SRP_SERVER_AUTH_INFO)state->gnutls_key->auth_info)->username;
-	strcpy( username, state->security_parameters.extensions.srp_username);
+	if ( (ret=_gnutls_auth_info_set( state, GNUTLS_SRP, sizeof( SRP_SERVER_AUTH_INFO_INT))) < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	info = _gnutls_get_auth_info( state);
+	username = info->username;
+	
+	strncpy( username, state->security_parameters.extensions.srp_username, MAX_SRP_USERNAME);
+	username[ MAX_SRP_USERNAME - 1] = 0;
 
 	pwd_entry = _gnutls_srp_pwd_read_entry( state->gnutls_key, username, &err);
 

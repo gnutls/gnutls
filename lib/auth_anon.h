@@ -1,12 +1,8 @@
 /* this is not to be included by gnutls_anon.c */
 #include <gnutls_auth.h>
 
-typedef struct {
-	int dh_bits;
-} ANON_SERVER_CREDENTIALS_INT;
-
-#define GNUTLS_ANON_SERVER_CREDENTIALS ANON_SERVER_CREDENTIALS_INT*
-#define GNUTLS_ANON_CLIENT_CREDENTIALS ANON_SERVER_CREDENTIALS_INT*
+#define GNUTLS_ANON_SERVER_CREDENTIALS void*
+#define GNUTLS_ANON_CLIENT_CREDENTIALS void*
 
 typedef struct ANON_CLIENT_AUTH_INFO_INT {
 	int dh_bits;
