@@ -82,9 +82,10 @@ static const TLS_TEST tls_tests[] = {
 	{ "for version rollback bug in Client Hello", test_version_rollback, "no", "yes", "dunno" },
 	/* this test will disable TLS 1.0 if the server is 
 	 * buggy */
-	{ "whether we need disable TLS 1.0", test_tls1_2, "no", "yes", "dunno" },
+	{ "whether we need to disable TLS 1.0", test_tls1_2, "no", "yes", "dunno" },
 	{ "whether the server can accept Hello Extensions", test_hello_extension, "yes", "no", "dunno"},
 	{ "whether the server can accept cipher suites not in SSL 3.0 spec", test_unknown_ciphersuites, "yes", "no", "dunno"},
+	{ "whether the server understands TLS closure alerts", test_bye, "yes", "no", "partially"},
 	{ "for anonymous authentication support", test_anonymous, "yes", "no", "dunno"},
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
 	{ "for AES cipher support", test_aes, "yes", "no", "dunno"},

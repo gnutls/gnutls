@@ -19,6 +19,8 @@
  */
 #include <gnutls.h>
 #include <tests.h>
+#include <unistd.h>
+#include <signal.h>
 
 extern GNUTLS_SRP_CLIENT_CREDENTIALS srp_cred;
 extern GNUTLS_ANON_CLIENT_CREDENTIALS anon_cred;
@@ -165,6 +167,47 @@ int ret;
 	
 	return ret;
 }
+static int alrm=0;
+void got_alarm(int k) {
+	alrm = 1;
+}
+	
+int test_bye( GNUTLS_STATE state) {
+int ret;
+char data[20];
+int old;
+	signal( SIGALRM, got_alarm);
+
+	ADD_ALL_CIPHERS(state);
+	ADD_ALL_COMP(state);
+	ADD_ALL_CERTTYPES(state);
+	ADD_ALL_PROTOCOLS(state);
+	ADD_ALL_MACS(state);
+	ADD_ALL_KX(state);
+	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( state);
+	if (ret==FAILED) return ret;
+	
+	ret = gnutls_bye( state, GNUTLS_SHUT_WR);
+	if (ret<0) return FAILED;
+	
+	old = siginterrupt( SIGALRM, 1);
+	alarm(6);
+	
+	do {
+		ret = gnutls_record_recv( state, data, sizeof(data));
+	} while( ret > 0);
+
+	siginterrupt( SIGALRM, old);
+	if (ret==0) return SUCCEED;
+	
+	if (alrm == 0) return UNSURE;
+	
+	return FAILED;
+}
+
+
 
 int test_aes( GNUTLS_STATE state) {
 int ret;
@@ -191,7 +234,12 @@ int ret;
 	gnutls_cred_set(state, GNUTLS_CRD_CERTIFICATE, xcred);
 
 	ret = do_handshake( state);
-	return ret;
+	if (ret==FAILED) return ret;
+
+	if ( gnutls_cert_type_get(state) == GNUTLS_CRT_OPENPGP)
+		return SUCCEED;
+
+	return FAILED;
 }
 
 int test_unknown_ciphersuites( GNUTLS_STATE state) {
