@@ -241,7 +241,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 	int i, j, count;
 	gnutls_datum tmp, tmp2;
 	int ret;
-	opaque pcert[MAX_X509_CERT_SIZE];
+	opaque *pcert = NULL;
 	int pcert_size;
 	gnutls_pkcs7 pkcs7;
 	
@@ -283,16 +283,25 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 	
 	j = count - 1;
 	do {
-		pcert_size = sizeof(pcert);
-		ret = gnutls_pkcs7_get_certificate( pkcs7, j, pcert, &pcert_size);
-		j--;
-
-		/* if the current certificate is too long, just ignore
-		 * it. */
-		if (ret==GNUTLS_E_MEMORY_ERROR) {
+		pcert_size = 0;
+		ret = gnutls_pkcs7_get_certificate( pkcs7, j, NULL, &pcert_size);
+		if (ret!=GNUTLS_E_MEMORY_ERROR) {
 			count--;
 			continue;
 		}
+		
+		pcert = gnutls_malloc( pcert_size);
+		if (ret==GNUTLS_E_MEMORY_ERROR) {
+			gnutls_assert();
+			count--;
+			continue;
+		}
+
+		/* read the certificate
+		 */
+		ret = gnutls_pkcs7_get_certificate( pkcs7, j, pcert, &pcert_size);
+		
+		j--;
 		
 		if (ret >= 0) {
 			*cert_list =
@@ -301,6 +310,7 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 
 			if ( *cert_list == NULL) {
 				gnutls_assert();
+				gnutls_free( pcert);
 				return GNUTLS_E_MEMORY_ERROR;
 			}
 
@@ -313,11 +323,14 @@ static int parse_pkcs7_cert_mem( gnutls_cert** cert_list, int* ncerts, const
 			if ( ret < 0) {
 				gnutls_assert();
 				gnutls_pkcs7_deinit(pkcs7);
+				gnutls_free( pcert);
 				return ret;
 			}
 	
 			i++;
 		}
+		
+		gnutls_free( pcert);
 
 	} while (ret >= 0 && j >= 0);
 

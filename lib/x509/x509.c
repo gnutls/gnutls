@@ -150,6 +150,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	int result = 0, need_free = 0;
 	int start, end;
 	gnutls_datum _data = { data->data, data->size };
+	opaque *signature = NULL;
 
 	/* If the Certificate is in PEM format then decode it
 	 */
@@ -205,14 +206,29 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 		goto cleanup;
 	}
 	
-	/* Read the signature */
+	/* Read the signature 
+	 */
 	{
-		opaque signature[640];
 		int len;
+
+		len = 0;
+		result = asn1_read_value( cert->cert, "signature", NULL, &len);
+		
+		if (result != ASN1_MEM_ERROR) {
+			result = _gnutls_asn2err(result);
+			gnutls_assert();
+			goto cleanup;
+		}
+		
+		signature = gnutls_malloc( len);
+		if (signature == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
 		
 		/* read the bit string of the signature
 		 */
-		len = sizeof(signature);
 		result = asn1_read_value( cert->cert, "signature", signature,
 			&len);
 		
@@ -237,7 +253,6 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 		 * read. They will be read from the issuer's certificate if needed.
 		 */
 		
-		len = sizeof(signature);
 		result = asn1_read_value( cert->cert, "signatureAlgorithm.algorithm",
 			signature, &len);
 		
@@ -246,8 +261,11 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 			gnutls_assert();
 			goto cleanup;
 		}
-		
+
 		cert->signature_algorithm = _gnutls_x509_oid2pk_algorithm( signature);
+		
+		gnutls_free( signature);
+		signature = NULL;
 	}
 
 	if (need_free) _gnutls_free_datum( &_data);
@@ -255,6 +273,7 @@ int gnutls_x509_crt_import(gnutls_x509_crt cert, const gnutls_datum * data,
 	return 0;
 
       cleanup:
+      	gnutls_free( signature);
 	_gnutls_free_datum(&cert->signed_data);
 	_gnutls_free_datum(&cert->signature);
 	if (need_free) _gnutls_free_datum( &_data);
@@ -505,27 +524,45 @@ int gnutls_x509_crt_get_serial(gnutls_x509_crt cert, char* result, int* result_s
 int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
 {
 	int result;
-	opaque str[MAX_X509_CERT_SIZE];
+	opaque *str;
 	int algo;
 	int len = sizeof(str);
 	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
 
-	len = sizeof(str) - 1;
+	len = 0;
+	result =
+	    asn1_read_value
+	    (cert->cert,
+	     "tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
+	     NULL, &len);
+
+	if (result != ASN1_MEM_ERROR) {
+		gnutls_assert();
+		return _gnutls_asn2err(result);
+	}
+	
+	str = gnutls_malloc( len);
+	if (str == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
 	result =
 	    asn1_read_value
 	    (cert->cert,
 	     "tbsCertificate.subjectPublicKeyInfo.algorithm.algorithm",
 	     str, &len);
 
-
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_free(str);
 		return _gnutls_asn2err(result);
 	}
 
 	algo = _gnutls_x509_oid2pk_algorithm( str);
 
 	if ( bits==NULL) {
+		gnutls_free(str);
 		return algo;
 	}
 
@@ -540,6 +577,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
 
 	if (result != ASN1_SUCCESS) {
 		gnutls_assert();
+		gnutls_free(str);
 		return _gnutls_asn2err(result);
 	}
 
@@ -569,6 +607,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
 		_gnutls_mpi_release( &params[3]);
 	}
 
+	gnutls_free(str);
 	return algo;
 }
 

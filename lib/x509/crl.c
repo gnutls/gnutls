@@ -96,6 +96,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 	int result = 0, need_free = 0;
 	int start, end;
 	gnutls_datum _data = { data->data, data->size };
+	opaque *signature = NULL;
 
 	/* If the CRL is in PEM format then decode it
 	 */
@@ -150,12 +151,25 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 
 	/* Read the signature */
 	{
-		opaque signature[640];
 		int len;
+
+		len = 0;
+		result = asn1_read_value( crl->crl, "signature", NULL, &len);
+		
+		if (result != ASN1_MEM_ERROR) {
+			result = _gnutls_asn2err(result);
+			gnutls_assert();
+			goto cleanup;
+		}
+		
+		signature = gnutls_malloc( len);
+		if (signature == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
 
 		/* read the bit string of the signature
 		 */
-		len = sizeof(signature);
 		result =
 		    asn1_read_value(crl->crl, "signature", signature,
 				    &len);
@@ -183,7 +197,6 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 		 * read. They will be read from the issuer's certificate if needed.
 		 */
 
-		len = sizeof(signature);
 		result =
 		    asn1_read_value(crl->crl,
 				    "signatureAlgorithm.algorithm",
@@ -194,9 +207,13 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 			gnutls_assert();
 			goto cleanup;
 		}
-
+		
 		crl->signature_algorithm =
 		    _gnutls_x509_oid2pk_algorithm(signature);
+
+		gnutls_free( signature);
+		signature = NULL;
+
 	}
 
 	if (need_free)
@@ -205,6 +222,7 @@ int gnutls_x509_crl_import(gnutls_x509_crl crl, const gnutls_datum * data,
 	return 0;
 
       cleanup:
+      	gnutls_free( signature);
 	_gnutls_free_datum(&crl->signed_data);
 	_gnutls_free_datum(&crl->signature);
 	if (need_free)
