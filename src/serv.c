@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001,2002 Paul Sheer
- * Copyright (C) 2002 Nikos Mavroyanopoulos
+ * Portions Copyright (C) 2002 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -1009,7 +1009,7 @@ void serv_version(void) {
 /* session resuming support */
 
 #define SESSION_ID_SIZE 32
-#define SESSION_DATA_SIZE 1024
+#define SESSION_DATA_SIZE 512
 
 typedef struct {
     char session_id[SESSION_ID_SIZE];
