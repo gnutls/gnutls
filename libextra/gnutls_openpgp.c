@@ -2067,7 +2067,7 @@ gnutls_openpgp_verify_key(const char* ign, const gnutls_datum* keyring,
 }
 
 int
-gnutls_openpgp_fingerprint(const gnutls_datum *cert, char *fpr, size_t *fprlen)
+gnutls_openpgp_fingerprint(const gnutls_datum *cert, unsigned char *fpr, size_t *fprlen)
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;  
 }
