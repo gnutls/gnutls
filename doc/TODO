@@ -33,6 +33,10 @@ Current list:
 - Allow sending V2 Hello messages. It seems that some (old) broken 
   implementations require that.
 - Add Kerberos support
+- Certificate chain validation improvements:
+  - Implement "correct" DN comparison (instead of memcmp).
+  - Support critical key usage KeyCertSign and cRLSign.
+  - Support path length constraints.
 - RFC 3280 compliant certificate path validation.
 
 (+) Means high priority 
