@@ -495,7 +495,7 @@ int gnutls_x509_extract_subject_alt_name(const gnutls_datum * cert, int seq, cha
 	char ext_data[256];
 	int len;
 	char num[MAX_INT_DIGITS];
-	GNUTLS_SUBJECT_ALT_NAME type;
+	GNUTLS_X509_SUBJECT_ALT_NAME type;
 
 	memset(ret, 0, *ret_size);
 
