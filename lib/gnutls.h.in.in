@@ -204,8 +204,10 @@ int gnutls_handshake( gnutls_session_t session);
 int gnutls_rehandshake( gnutls_session_t session);
 
 gnutls_alert_description_t gnutls_alert_get( gnutls_session_t session);
-int          gnutls_alert_send( gnutls_session_t, gnutls_alert_level_t, gnutls_alert_description_t);
-int          gnutls_alert_send_appropriate(  gnutls_session_t session, int err);
+int gnutls_alert_send( gnutls_session_t session,
+		       gnutls_alert_level_t level,
+		       gnutls_alert_description_t desc);
+int gnutls_alert_send_appropriate(  gnutls_session_t session, int err);
 const char*  gnutls_alert_get_name( gnutls_alert_description_t alert);
 
 /* get information on the current session */
@@ -218,9 +220,9 @@ gnutls_certificate_type_t     gnutls_certificate_type_get( gnutls_session_t sess
 size_t gnutls_cipher_get_key_size( gnutls_cipher_algorithm_t algorithm);
 
 /* the name of the specified algorithms */
-const char *gnutls_cipher_get_name( gnutls_cipher_algorithm_t);
-const char *gnutls_mac_get_name( gnutls_mac_algorithm_t);
-const char *gnutls_compression_get_name( gnutls_compression_method_t);
+const char *gnutls_cipher_get_name( gnutls_cipher_algorithm_t algorithm);
+const char *gnutls_mac_get_name( gnutls_mac_algorithm_t algorithm);
+const char *gnutls_compression_get_name( gnutls_compression_method_t algorithm);
 const char *gnutls_kx_get_name( gnutls_kx_algorithm_t algorithm);
 const char *gnutls_certificate_type_get_name( gnutls_certificate_type_t type);
 
@@ -309,26 +311,28 @@ typedef gnutls_datum_t (*gnutls_db_retr_func)(void*, gnutls_datum_t key);
 void gnutls_db_set_cache_expiration( gnutls_session_t session, int seconds);
 
 void gnutls_db_remove_session( gnutls_session_t session);
-void gnutls_db_set_retrieve_function( gnutls_session_t, gnutls_db_retr_func);
-void gnutls_db_set_remove_function( gnutls_session_t, gnutls_db_remove_func);
-void gnutls_db_set_store_function( gnutls_session_t, gnutls_db_store_func);
-void gnutls_db_set_ptr( gnutls_session_t, void* db_ptr);
-void* gnutls_db_get_ptr( gnutls_session_t);
+void gnutls_db_set_retrieve_function( gnutls_session_t session, gnutls_db_retr_func retr_func);
+void gnutls_db_set_remove_function( gnutls_session_t session, gnutls_db_remove_func rem_func);
+void gnutls_db_set_store_function( gnutls_session_t session, gnutls_db_store_func store_func);
+void gnutls_db_set_ptr( gnutls_session_t session, void* ptr);
+void* gnutls_db_get_ptr( gnutls_session_t session);
 int  gnutls_db_check_entry( gnutls_session_t session, gnutls_datum_t session_entry);
 
 void gnutls_handshake_set_max_packet_length( gnutls_session_t session, int max);
 
-/* returns libgnutls version (call it with a NULL argument) 
+/* returns libgnutls version (call it with a NULL argument)
  */
-const char* gnutls_check_version( const char*);
+const char* gnutls_check_version( const char *req_version);
 
-/* Functions for setting/clearing credentials 
+/* Functions for setting/clearing credentials
  */
 int gnutls_credentials_clear( gnutls_session_t session);
 
-/* cred is a structure defined by the kx algorithm 
+/* cred is a structure defined by the kx algorithm
  */
-int gnutls_credentials_set( gnutls_session_t, gnutls_credentials_type_t type, void* cred);
+int gnutls_credentials_set( gnutls_session_t session,
+			    gnutls_credentials_type_t type,
+			    void* cred);
 #define gnutls_cred_set	gnutls_credentials_set
 
 /* Credential structures for SRP - used in gnutls_credentials_set(); */
@@ -353,14 +357,15 @@ int gnutls_anon_allocate_client_credentials( gnutls_anon_client_credentials_t *s
  * KEYFILE is a pkcs-1 private key in PEM form (for RSA keys).
  */
 void gnutls_certificate_free_credentials( gnutls_certificate_credentials_t sc);
-int gnutls_certificate_allocate_credentials( gnutls_certificate_credentials_t *sc);
+int gnutls_certificate_allocate_credentials( gnutls_certificate_credentials_t *res);
 
 void gnutls_certificate_free_keys(gnutls_certificate_credentials_t sc);
 void gnutls_certificate_free_cas(gnutls_certificate_credentials_t sc);
 void gnutls_certificate_free_ca_names(gnutls_certificate_credentials_t sc);
 void gnutls_certificate_free_crls(gnutls_certificate_credentials_t sc);
 
-void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res, gnutls_dh_params_t);
+void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
+				      gnutls_dh_params_t dh_params);
 void gnutls_certificate_set_rsa_export_params(gnutls_certificate_credentials_t res, gnutls_rsa_params_t rsa_params);
 void gnutls_certificate_set_verify_flags(gnutls_certificate_credentials_t res, unsigned int flags);
 void gnutls_certificate_set_verify_limits(gnutls_certificate_credentials_t res, unsigned int max_bits,
@@ -414,10 +419,12 @@ typedef int (*gnutls_is_secure_function)(const void*);
 typedef void (*gnutls_free_function)(void*);
 typedef void* (*gnutls_realloc_function)(void*, size_t);
 
-void gnutls_global_set_mem_functions(
-    gnutls_alloc_function, gnutls_alloc_function,
-    gnutls_is_secure_function, gnutls_realloc_function,
-    gnutls_free_function);
+extern void
+gnutls_global_set_mem_functions(gnutls_alloc_function alloc_func,
+				gnutls_alloc_function secure_alloc_func,
+				gnutls_is_secure_function is_secure_func,
+				gnutls_realloc_function realloc_func,
+				gnutls_free_function free_func);
 
 /* For use in callbacks */
 extern gnutls_alloc_function gnutls_malloc;
@@ -431,11 +438,12 @@ void gnutls_global_set_log_level( int level);
 
 /* Diffie Hellman parameter handling.
  */
-int gnutls_dh_params_init( gnutls_dh_params_t*);
-void gnutls_dh_params_deinit( gnutls_dh_params_t);
-int gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params, const gnutls_datum_t *prime,
-    const gnutls_datum_t* generator);
-int gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params, 
+int gnutls_dh_params_init( gnutls_dh_params_t *dh_params);
+void gnutls_dh_params_deinit( gnutls_dh_params_t dh_params);
+int gnutls_dh_params_import_raw(gnutls_dh_params_t dh_params,
+				const gnutls_datum_t *prime,
+				const gnutls_datum_t* generator);
+int gnutls_dh_params_import_pkcs3(gnutls_dh_params_t params,
     const gnutls_datum_t * pkcs3_params, gnutls_x509_crt_fmt_t format);
 int gnutls_dh_params_generate2(gnutls_dh_params_t params, int bits);
 int gnutls_dh_params_export_pkcs3( gnutls_dh_params_t params,
@@ -481,8 +489,8 @@ void gnutls_transport_get_ptr2(gnutls_session_t session,
 void gnutls_transport_set_lowat( gnutls_session_t session, int num);
 
 
-void gnutls_transport_set_push_function( gnutls_session_t, gnutls_push_func push_func);
-void gnutls_transport_set_pull_function( gnutls_session_t, gnutls_pull_func pull_func);
+void gnutls_transport_set_push_function( gnutls_session_t session, gnutls_push_func push_func);
+void gnutls_transport_set_pull_function( gnutls_session_t session, gnutls_pull_func pull_func);
 
 /* session specific 
  */
@@ -513,11 +521,14 @@ int gnutls_srp_allocate_server_credentials( gnutls_srp_server_credentials_t *sc)
 int gnutls_srp_set_server_credentials_file( gnutls_srp_server_credentials_t res, 
     const char *password_file, const char* password_conf_file);
 
-const char* gnutls_srp_server_get_username( gnutls_session_t state);
+const char* gnutls_srp_server_get_username( gnutls_session_t session);
 
-int gnutls_srp_verifier( const char* username, const char* password, const gnutls_datum_t *salt, 
-    const gnutls_datum_t* g, const gnutls_datum_t* n, 
-    gnutls_datum_t * res);
+extern int gnutls_srp_verifier (const char* username,
+				const char* password,
+				const gnutls_datum_t *salt,
+				const gnutls_datum_t* generator,
+				const gnutls_datum_t* prime,
+				gnutls_datum_t * res);
 
 /* The static parameters defined in draft-ietf-tls-srp-05
  * Those should be used as input to gnutls_srp_verifier().
@@ -537,12 +548,12 @@ typedef int gnutls_srp_server_credentials_function(
     gnutls_datum_t* verifier, gnutls_datum_t* generator,
     gnutls_datum_t* prime
 );
-void gnutls_srp_set_server_credentials_function( 
-    gnutls_srp_server_credentials_t, 
-    gnutls_srp_server_credentials_function *);
+void gnutls_srp_set_server_credentials_function(
+    gnutls_srp_server_credentials_t cred,
+    gnutls_srp_server_credentials_function *func);
 
 typedef int gnutls_srp_client_credentials_function(gnutls_session_t, unsigned int,
     char **, char**);
-void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials_t, 
-    gnutls_srp_client_credentials_function *);
+void gnutls_srp_set_client_credentials_function( gnutls_srp_client_credentials_t cred,
+    gnutls_srp_client_credentials_function *func);
 

@@ -514,9 +514,9 @@ void gnutls_certificate_set_dh_params(gnutls_certificate_credentials_t res,
   * should return zero on success.
   *
   **/
-void gnutls_certificate_set_params_function(gnutls_certificate_credentials_t
-					    res,
-					    gnutls_params_function * func)
+void
+gnutls_certificate_set_params_function(gnutls_certificate_credentials_t res,
+				       gnutls_params_function * func)
 {
     res->params_func = func;
 }
