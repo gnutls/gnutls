@@ -40,7 +40,7 @@ GNUTLS_CIPHER_HANDLE ret;
 		break;
 	case GNUTLS_RIJNDAEL256:
 #ifdef USE_MCRYPT
-		ret = mcrypt_module_open( "rijndael-256", NULL, "cbc", NULL);
+		ret = mcrypt_module_open( "rijndael-128", NULL, "cbc", NULL);
 #else
 		ret = gcry_cipher_open(GCRY_CIPHER_RIJNDAEL256, GCRY_CIPHER_MODE_CBC, 0);
 #endif
