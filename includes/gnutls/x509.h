@@ -198,6 +198,10 @@ int gnutls_x509_privkey_init(gnutls_x509_privkey * key);
 void gnutls_x509_privkey_deinit(gnutls_x509_privkey key);
 int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * data,
 	gnutls_x509_crt_fmt format);
+int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey privkey, 
+	const gnutls_datum *m, const gnutls_datum *e,
+	const gnutls_datum *d, const gnutls_datum *p, const gnutls_datum *q, 
+	const gnutls_datum *u);
 int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key);
 
 int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
@@ -205,6 +209,10 @@ int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm a
 
 int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
+	gnutls_datum * m, gnutls_datum *e,
+	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
+	gnutls_datum* u);
 
 
 #ifdef __cplusplus

@@ -620,13 +620,7 @@ typedef struct {
 
 #define gnutls_dh_params _gnutls_dh_params*
 
-
-typedef struct {
-	int bits;
-	MPI params[RSA_PRIVATE_PARAMS];
-} _gnutls_rsa_params;
-
-#define gnutls_rsa_params _gnutls_rsa_params*
+#define gnutls_rsa_params gnutls_x509_privkey
 
 
 /* functions */

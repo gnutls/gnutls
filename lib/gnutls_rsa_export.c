@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2002,2003 Nikos Mavroyanopoulos
+ *  Copyright (C) 2002,2003 Nikos Mavroyanopoulos
  *
- * This file is part of GNUTLS.
+ *  This file is part of GNUTLS.
  *
  *  The GNUTLS library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public   
@@ -27,6 +27,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
+#include "x509/x509.h"
 #include "debug.h"
 
 /* This function takes a number of bits and returns a supported
@@ -36,26 +37,15 @@
 
 #define MAX_SUPPORTED_BITS 512
 
-static int normalize_bits(int bits)
-{
-	if (bits >= MAX_SUPPORTED_BITS)
-		bits = MAX_SUPPORTED_BITS;
-
-	return bits;
-}
-
-
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.
  */
-const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params rsa_params, int bits)
+const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params rsa_params)
 {
 	if (rsa_params == NULL) {
 		gnutls_assert();
 		return NULL;
 	}
-
-	bits = normalize_bits(bits);
 
 	return rsa_params->params;
 
@@ -153,9 +143,6 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
 
 }
 
-#define FREE_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
-		_gnutls_mpi_release(&rsa_params->params[i])
-
 
 /**
   * gnutls_rsa_params_import_raw - This function will replace the old RSA parameters
@@ -172,60 +159,12 @@ int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits)
   * 
   **/
 int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params, 
-	gnutls_datum m, gnutls_datum e,
-	gnutls_datum d, gnutls_datum p, gnutls_datum q, gnutls_datum u)
+	const gnutls_datum *m, const gnutls_datum *e,
+	const gnutls_datum *d, const gnutls_datum *p, 
+	const gnutls_datum *q, const gnutls_datum *u)
 {
-	int i = 0;
-	size_t siz = 0;
-
-	for (i=0;i<RSA_PRIVATE_PARAMS;i++) {
-		_gnutls_mpi_release(&rsa_params->params[i]);
-	}
-
-	siz = m.size;
-	if (_gnutls_mpi_scan(&rsa_params->params[0], m.data, &siz)) {
-		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	siz = e.size;
-	if (_gnutls_mpi_scan(&rsa_params->params[1], e.data, &siz)) {
-		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	siz = d.size;
-	if (_gnutls_mpi_scan(&rsa_params->params[2], d.data, &siz)) {
-		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	siz = p.size;
-	if (_gnutls_mpi_scan(&rsa_params->params[3], p.data, &siz)) {
-		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	siz = q.size;
-	if (_gnutls_mpi_scan(&rsa_params->params[4], q.data, &siz)) {
-		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	siz = u.size;
-	if (_gnutls_mpi_scan(&rsa_params->params[5], u.data, &siz)) {
-		gnutls_assert();
-		FREE_PRIVATE_PARAMS;
-		return GNUTLS_E_MPI_SCAN_FAILED;
-	}
-
-	return 0;
-
+	return gnutls_x509_privkey_import_rsa_raw( rsa_params,
+		m, e, d, p, q, u);
 }
 
 /**
@@ -238,14 +177,7 @@ int gnutls_rsa_params_import_raw(gnutls_rsa_params rsa_params,
 int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
 {
 
-	*rsa_params = gnutls_calloc( 1, sizeof(_gnutls_rsa_params));
-	if (*rsa_params==NULL) {
-		gnutls_assert();
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	return 0;
-
+	return gnutls_x509_privkey_init( rsa_params);
 }
 
 /**
@@ -257,16 +189,7 @@ int gnutls_rsa_params_init(gnutls_rsa_params * rsa_params)
   **/
 void gnutls_rsa_params_deinit(gnutls_rsa_params rsa_params)
 {
-int i;
-
-	if (rsa_params == NULL)
-		return;
-
-	for (i=0; i< RSA_PRIVATE_PARAMS;i++)
-		_gnutls_mpi_release( &rsa_params->params[i]);
-
-	gnutls_free(rsa_params);
-
+	gnutls_x509_privkey_deinit(rsa_params);
 }
 
 /**
@@ -286,17 +209,7 @@ int i;
   **/
 int gnutls_rsa_params_generate2(gnutls_rsa_params params, int bits)
 {
-
-	int ret;
-
-	ret = _gnutls_rsa_generate_params( params->params, bits);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
-	return 0;
-
+	return gnutls_x509_privkey_generate( params, GNUTLS_PK_RSA, bits, 0);
 }
 
 /**
@@ -320,94 +233,14 @@ int gnutls_rsa_params_export_raw(gnutls_rsa_params params,
 	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
 	gnutls_datum* u, int *bits)
 {
-	size_t siz;
+int ret;
 
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, params->params[0]);
-
-	m->data = gnutls_malloc(siz);
-	if (m->data == NULL) {
-		return GNUTLS_E_MEMORY_ERROR;
+	ret = gnutls_x509_privkey_export_rsa_raw( params, m, e, d, p, q, u);
+	if ( ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
-	m->size = siz;
-	_gnutls_mpi_print( m->data, &siz, params->params[0]);
-
-	/* E */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, params->params[1]);
-
-	e->data = gnutls_malloc(siz);
-	if (e->data == NULL) {
-		_gnutls_free_datum( m);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	e->size = siz;
-	_gnutls_mpi_print( e->data, &siz, params->params[1]);
-
-	/* D */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, params->params[2]);
-
-	d->data = gnutls_malloc(siz);
-	if (d->data == NULL) {
-		_gnutls_free_datum( m);
-		_gnutls_free_datum( e);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	d->size = siz;
-	_gnutls_mpi_print( d->data, &siz, params->params[2]);
-
-	/* P */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, params->params[3]);
-
-	p->data = gnutls_malloc(siz);
-	if (p->data == NULL) {
-		_gnutls_free_datum( m);
-		_gnutls_free_datum( e);
-		_gnutls_free_datum( d);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	p->size = siz;
-	_gnutls_mpi_print(p->data, &siz, params->params[3]);
-
-	/* Q */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, params->params[4]);
-
-	q->data = gnutls_malloc(siz);
-	if (q->data == NULL) {
-		_gnutls_free_datum( m);
-		_gnutls_free_datum( e);
-		_gnutls_free_datum( d);
-		_gnutls_free_datum( p);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	q->size = siz;
-	_gnutls_mpi_print(q->data, &siz, params->params[4]);
-
-	/* U */
-	siz = 0;
-	_gnutls_mpi_print(NULL, &siz, params->params[5]);
-
-	u->data = gnutls_malloc(siz);
-	if (u->data == NULL) {
-		_gnutls_free_datum( m);
-		_gnutls_free_datum( e);
-		_gnutls_free_datum( d);
-		_gnutls_free_datum( p);
-		_gnutls_free_datum( q);
-		return GNUTLS_E_MEMORY_ERROR;
-	}
-
-	u->size = siz;
-	_gnutls_mpi_print(u->data, &siz, params->params[5]);
-	
 	if (bits)
 		*bits = _gnutls_mpi_get_nbits(params->params[3]);
 

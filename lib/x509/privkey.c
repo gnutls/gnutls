@@ -31,6 +31,8 @@
 #include <dn.h>
 #include <extensions.h>
 
+static int _encode_rsa( ASN1_TYPE* c2, MPI* params);
+
 /**
   * gnutls_x509_privkey_init - This function initializes a gnutls_crl structure
   * @key: The structure to be initialized
@@ -262,7 +264,7 @@ static ASN1_TYPE decode_dsa_key( const gnutls_datum* raw_key,
   * @data: The DER or PEM encoded certificate.
   * @format: One of DER or PEM
   *
-  * This function will convert the given DER or PEM encoded Certificate
+  * This function will convert the given DER or PEM encoded key
   * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
   *
   * If the Certificate is PEM encoded it should have a header of "X509 CERTIFICATE", or
@@ -353,6 +355,86 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
 	return result;
 }
 
+#define FREE_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
+		_gnutls_mpi_release(&key->params[i])
+
+/**
+  * gnutls_x509_privkey_import_rsa_raw - This function will import a raw RSA key
+  * @key: The structure to store the parsed key
+  * @m: holds the modulus
+  * @e: holds the public exponent
+  * @d: holds the private exponent
+  * @p: holds the first prime (p)
+  * @q: holds the second prime (q)
+  * @u: holds the coefficient
+  *
+  * This function will convert the given RSA raw parameters
+  * to the native gnutls_x509_privkey format. The output will be stored in 'key'.
+  * 
+  **/
+int gnutls_x509_privkey_import_rsa_raw(gnutls_x509_privkey key, 
+	const gnutls_datum* m, const gnutls_datum* e,
+	const gnutls_datum* d, const gnutls_datum* p, 
+	const gnutls_datum* q, const gnutls_datum* u)
+{
+	int i = 0, ret;
+	size_t siz = 0;
+
+	siz = m->size;
+	if (_gnutls_mpi_scan(&key->params[0], m->data, &siz)) {
+		gnutls_assert();
+		FREE_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = e->size;
+	if (_gnutls_mpi_scan(&key->params[1], e->data, &siz)) {
+		gnutls_assert();
+		FREE_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = d->size;
+	if (_gnutls_mpi_scan(&key->params[2], d->data, &siz)) {
+		gnutls_assert();
+		FREE_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = p->size;
+	if (_gnutls_mpi_scan(&key->params[3], p->data, &siz)) {
+		gnutls_assert();
+		FREE_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = q->size;
+	if (_gnutls_mpi_scan(&key->params[4], q->data, &siz)) {
+		gnutls_assert();
+		FREE_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	siz = u->size;
+	if (_gnutls_mpi_scan(&key->params[5], u->data, &siz)) {
+		gnutls_assert();
+		FREE_PRIVATE_PARAMS;
+		return GNUTLS_E_MPI_SCAN_FAILED;
+	}
+
+	ret = _encode_rsa( &key->key, key->params);
+	if (ret < 0) {
+		gnutls_assert();
+		FREE_PRIVATE_PARAMS;
+		return ret;
+	}
+
+	key->params_size = RSA_PRIVATE_PARAMS;
+	key->pk_algorithm = GNUTLS_PK_RSA;
+
+	return 0;
+
+}
 
 
 /**
@@ -459,6 +541,120 @@ int gnutls_x509_privkey_export( gnutls_x509_privkey key,
 	return 0;
 }
 
+/**
+  * gnutls_x509_privkey_export_rsa_raw - This function will export the RSA private key
+  * @params: a structure that holds the rsa parameters
+  * @m: will hold the modulus
+  * @e: will hold the public exponent
+  * @d: will hold the private exponent
+  * @p: will hold the first prime (p)
+  * @q: will hold the second prime (q)
+  * @u: will hold the coefficient
+  *
+  * This function will export the RSA private key's parameters found in the given
+  * structure. The new parameters will be allocated using
+  * gnutls_malloc() and will be stored in the appropriate datum.
+  * 
+  **/
+int gnutls_x509_privkey_export_rsa_raw(gnutls_x509_privkey key,
+	gnutls_datum * m, gnutls_datum *e,
+	gnutls_datum *d, gnutls_datum *p, gnutls_datum* q, 
+	gnutls_datum* u)
+{
+	size_t siz;
+
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[0]);
+
+	m->data = gnutls_malloc(siz);
+	if (m->data == NULL) {
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	m->size = siz;
+	_gnutls_mpi_print( m->data, &siz, key->params[0]);
+
+	/* E */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[1]);
+
+	e->data = gnutls_malloc(siz);
+	if (e->data == NULL) {
+		_gnutls_free_datum( m);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	e->size = siz;
+	_gnutls_mpi_print( e->data, &siz, key->params[1]);
+
+	/* D */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[2]);
+
+	d->data = gnutls_malloc(siz);
+	if (d->data == NULL) {
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	d->size = siz;
+	_gnutls_mpi_print( d->data, &siz, key->params[2]);
+
+	/* P */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[3]);
+
+	p->data = gnutls_malloc(siz);
+	if (p->data == NULL) {
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
+		_gnutls_free_datum( d);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	p->size = siz;
+	_gnutls_mpi_print(p->data, &siz, key->params[3]);
+
+	/* Q */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[4]);
+
+	q->data = gnutls_malloc(siz);
+	if (q->data == NULL) {
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
+		_gnutls_free_datum( d);
+		_gnutls_free_datum( p);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	q->size = siz;
+	_gnutls_mpi_print(q->data, &siz, key->params[4]);
+
+	/* U */
+	siz = 0;
+	_gnutls_mpi_print(NULL, &siz, key->params[5]);
+
+	u->data = gnutls_malloc(siz);
+	if (u->data == NULL) {
+		_gnutls_free_datum( m);
+		_gnutls_free_datum( e);
+		_gnutls_free_datum( d);
+		_gnutls_free_datum( p);
+		_gnutls_free_datum( q);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+
+	u->size = siz;
+	_gnutls_mpi_print(u->data, &siz, key->params[5]);
+	
+	return 0;
+
+}
+
+/* Encodes the RSA parameters into an ASN.1 RSA private key structure.
+ */
 static int _encode_rsa( ASN1_TYPE* c2, MPI* params)
 {
 	int result, i;
@@ -660,7 +856,7 @@ static int _encode_rsa( ASN1_TYPE* c2, MPI* params)
   * @key: should contain a gnutls_x509_privkey structure
   * @algo: is one of RSA or DSA.
   * @bits: the size of the modulus
-  * @flags: unused for now
+  * @flags: unused for now. Must be 0.
   *
   * This function will generate a random private key. Note that
   * this function must be called on an empty private key.

@@ -102,7 +102,7 @@ static int gen_rsa_export_server_kx(gnutls_session session, opaque ** data)
 		return GNUTLS_E_INT_RET_0;
 	}
 
-	rsa_params = _gnutls_get_rsa_params( cred->rsa_params, 512);
+	rsa_params = _gnutls_get_rsa_params( cred->rsa_params);
 	if (rsa_params == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;

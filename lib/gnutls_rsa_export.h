@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2000,2002 Nikos Mavroyanopoulos
+ * Copyright (C) 2000,2002,2003 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
  *
@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
-const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params, int bits);
+const GNUTLS_MPI* _gnutls_get_rsa_params(gnutls_rsa_params);
 int _gnutls_peers_cert_less_512( gnutls_session session);
 int _gnutls_rsa_generate_params(GNUTLS_MPI* resarr, int bits);
 
