@@ -1,4 +1,4 @@
-INCLUDES = -I../lib -I../includes
+INCLUDES = -I../lib -I../includes -I../lib/minitasn1/
 bin_SCRIPTS = libgnutls-extra-config
 
 m4datadir = $(datadir)/aclocal
