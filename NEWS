@@ -1,9 +1,9 @@
-Version ?.?.?
+Version 0.3.92
 - Updated documentation
 - Combined error codes of ASN.1 parser and gnutls
 - Removed GNUTLS_CERT_TRUSTED from the CertificateStatus enumeration
-- Added protection against chosen plaintext attacks (enabled by default)
-- Improved compression support
+- Added protection against chosen plaintext attacks (disabled by default)
+- Improved and optimized compression support
 
 Version 0.3.91 (3/03/2002)
 - Added gnutls-cli-debug program

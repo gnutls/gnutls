@@ -409,14 +409,14 @@ void _gnutls_record_set_default_version(GNUTLS_STATE state, GNUTLS_Version versi
   * @prot: is an integer (0 or 1)
   *
   * A newly discovered attack against the record protocol requires some
-  * counter-measures to be taken. GnuTLS will enable them by default
+  * counter-measures to be taken. GnuTLS will not enable them by default
   * thus, sends an empty record packet, before each actual record packet,
   * in order to assure that the IV is not known to potential attackers.
   *
   * This function will enable or disable the chosen plaintext protection
   * in the TLS record protocol (used with ciphers in CBC mode).
-  * if prot == 0 then protection is enabled (default), otherwise it
-  * is disabled.
+  * if prot == 0 then protection is disabled (default), otherwise it
+  * is enabled.
   *
   * The protection used will slightly decrease performance, and add 
   * 20 or more bytes per record packet.

@@ -189,8 +189,8 @@ ssize_t _gnutls_create_empty_record( GNUTLS_STATE state, ContentType type,
 
 	/* if this protection has been disabled
 	 */
-	if (state->gnutls_internals.cbc_protection_hack!=0) return 0;
-	
+	if (state->gnutls_internals.cbc_protection_hack==0) return 0;
+
 	if (type!=GNUTLS_APPLICATION_DATA ||
 		_gnutls_cipher_is_block( gnutls_cipher_get(state))!=CIPHER_BLOCK) 
 		/* alert messages and stream ciphers

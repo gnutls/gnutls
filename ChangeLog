@@ -1,3 +1,10 @@
+2002-03-20 18:13  nmav <nmav@gnutls.org>
+
+	* lib/: gnutls_algorithms.c, gnutls_cipher.c,
+	gnutls_compress_int.c, gnutls_compress_int.h, gnutls_constate.c:
+
+	Optimizations and fixes in compression 
+
 2002-03-20 12:21  nmav <nmav@gnutls.org>
 
 	* lib/: auth_cert.c, gnutls_cipher.c, gnutls_compress.c,
