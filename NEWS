@@ -1,6 +1,7 @@
 Version 1.1.14
 - Documentation converted to Texinfo format.
 - Bug fix of test suite.
+- Configure now print build information, used by Autobuild.
 
 Version 1.1.13 (05/08/2004)
 - Added simple self test suite.
