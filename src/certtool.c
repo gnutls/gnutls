@@ -137,6 +137,28 @@ int ret;
 
 }
 
+static void print_key_usage( unsigned int x) 
+{
+	if (x&GNUTLS_KEY_DIGITAL_SIGNATURE)
+		printf("\t\tDigital signature.\n");
+	if (x&GNUTLS_KEY_NON_REPUDIATION)
+		printf("\t\tNon repudiation.\n");
+	if (x&GNUTLS_KEY_KEY_ENCIPHERMENT)
+		printf("\t\tKey encipherment.\n");
+	if (x&GNUTLS_KEY_DATA_ENCIPHERMENT)
+		printf("\t\tData encipherment.\n");
+	if (x&GNUTLS_KEY_KEY_AGREEMENT)
+		printf("\t\tKey agreement.\n");
+	if (x&GNUTLS_KEY_KEY_CERT_SIGN)
+		printf("\t\tCertificate signing.\n");
+	if (x&GNUTLS_KEY_CRL_SIGN)
+		printf("\t\tCRL signing.\n");
+	if (x&GNUTLS_KEY_ENCIPHER_ONLY)
+		printf("\t\tKey encipher only.\n");
+	if (x&GNUTLS_KEY_DECIPHER_ONLY)
+		printf("\t\tKey decipher only.\n");
+}
+
 static void print_private_key( gnutls_x509_privkey key)
 {
 int size, ret;
@@ -390,10 +412,24 @@ void certtool_version(void)
 		gnutls_check_version(NULL));
 }
 
+const char* get_algorithm( int a) 
+{
+	switch (a) {
+		case GNUTLS_PK_RSA:
+			return "RSA";
+		case GNUTLS_PK_DSA:
+			return "DSA";
+			break;
+		default:
+			return "UNKNOWN";
+	}
+}
+
 void certificate_info( void)
 {
 	gnutls_x509_crt crt;
 	int size, ret, i;
+	unsigned int critical, key_usage;
 	time_t tim;
 	gnutls_datum pem;
 	char serial[40];
@@ -440,21 +476,13 @@ void certificate_info( void)
 
 	printf("Signature Algorithm: ");
 	ret = gnutls_x509_crt_get_signature_algorithm(crt);
-	switch(ret) {
-		case GNUTLS_PK_RSA:
-			printf("RSA\n");
-			break;
-		case GNUTLS_PK_DSA:
-			printf("DSA\n");
-			break;
-		default:
-			printf("UNKNOWN\n");
-			break;
-	}
+
+	print = get_algorithm( ret);
+	printf( "%s\n", print);
 
 	/* Validity
 	 */
-	printf("Validity\n");
+	printf("Validity:\n");
 
 	tim = gnutls_x509_crt_get_activation_time(crt);
 	printf("\tNot Before: %s", ctime(&tim));
@@ -475,17 +503,63 @@ void certificate_info( void)
 	ret = gnutls_x509_crt_get_pk_algorithm(crt, NULL);
 	printf("\tPublic Key Algorithm: ");
 
-	switch(ret) {
-		case GNUTLS_PK_RSA:
-			printf("RSA\n");
-			break;
-		case GNUTLS_PK_DSA:
-			printf("DSA\n");
-			break;
-		default:
-			printf("UNKNOWN\n");
-			break;
+	print = get_algorithm( ret);
+	printf( "%s\n", print);
+	
+	printf("\nX.509 Extensions:\n");
+	
+	/* subject alternative name
+	 */
+	for (i = 0; !(ret < 0); i++) {
+		size = sizeof(buffer);
+		ret = gnutls_x509_crt_get_subject_alt_name(crt, i, buffer, &size, &critical);
+
+		if (i==0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			printf("\tSubject Alternative name");
+			if (critical) printf(" (critical)");
+			printf(":\n");
+		}
+		
+		if (ret < 0 && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) {
+			printf("\t\tFound unsupported alternative name.\n");
+		} else switch (ret) {
+			case GNUTLS_SAN_DNSNAME:
+				printf("\t\tDNSname: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_RFC822NAME:
+				printf("\t\tRFC822name: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_URI:
+				printf("\t\tURI: %s\n", buffer);
+				break;
+			case GNUTLS_SAN_IPADDRESS:
+				printf("\t\tIPAddress: %s\n", buffer);
+				break;
+		}
+		
 	}
+	
+	/* check for basicConstraints
+	 */
+	ret = gnutls_x509_crt_get_ca_status( crt, &critical);
+	
+	if (ret >= 0) {
+		printf("\tBasic Constraints");
+		if (critical) printf(" (critical)");
+		printf(":\n");		
+
+		if (ret==0) printf("\t\tCA:FALSE\n");
+		else printf("\t\tCA:TRUE\n");
+		
+	}
+	
+	ret = gnutls_x509_crt_get_key_usage( crt, &key_usage, &critical);
+	
+	if (ret >= 0) {
+		printf("\tKey usage:\n");
+		print_key_usage(key_usage);
+	}
+
 
 }
 
