@@ -5,8 +5,8 @@ in order to avoid having people working on the same thing.
 Current list:
 + Audit the code
 * Add function(s) to get the DHE/A parameters
-* Add function to quickly report if a session is a resumed one
 * Add function(s) to extract the certificate key's parameters
+* Optimize functions which now return malloc'd data
 * Minimize footprint.
 - Add Kerberos support
 

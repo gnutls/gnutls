@@ -428,7 +428,7 @@ typedef struct {
 	CertType_Priority		cert_type_priority;
 	
 	/* resumed session */
-	ResumableSession		resumed; /* TRUE or FALSE - if we are resuming a session */
+	ResumableSession		resumed; /* RESUME_TRUE or FALSE - if we are resuming a session */
 	SecurityParameters		resumed_security_parameters;
 
 	/* sockets internals */

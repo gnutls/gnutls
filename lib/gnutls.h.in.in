@@ -160,11 +160,16 @@ GNUTLS_Version gnutls_protocol_get_version(GNUTLS_STATE state);
 const char *gnutls_protocol_get_name(GNUTLS_Version version);
 
 
-/* get/set session */
+/* get/set session 
+ */
 int gnutls_session_set_data( GNUTLS_STATE state, void* session, int session_size);
 int gnutls_session_get_data( GNUTLS_STATE state, void* session, int *session_size);
 /* returns the session ID */
 int gnutls_session_get_id( GNUTLS_STATE state, void* session, int *session_size);
+
+/* checks if this session is a resumed one 
+ */
+int gnutls_session_resumed(GNUTLS_STATE state);
 
 typedef int (*GNUTLS_DB_STORE_FUNC)(void*, gnutls_datum key, gnutls_datum data);
 typedef int (*GNUTLS_DB_REMOVE_FUNC)(void*, gnutls_datum key);

@@ -128,7 +128,6 @@ void _gnutls_handshake_internal_state_clear( GNUTLS_STATE state) {
 	state->gnutls_internals.adv_version_minor = 0;
 	state->gnutls_internals.adv_version_minor = 0;
 
-	state->gnutls_internals.resumed = RESUME_FALSE;
 	state->gnutls_internals.resumable = RESUME_TRUE;
 
 }
@@ -596,4 +595,27 @@ int _gnutls_PRF( opaque * secret, int secret_size, uint8 * label, int label_size
 
 	return 0; /* ok */
 
+}
+
+/**
+  * gnutls_session_resumed - Used to check whether this session is a resumed one
+  * @state: is a &GNUTLS_STATE structure.
+  *
+  * This function will return 0 if this session is a resumed one,
+  * or a negative number if this is a new session.
+  *
+  **/
+int gnutls_session_resumed(GNUTLS_STATE state)
+{
+	if (state->security_parameters.entity==GNUTLS_CLIENT) {
+		if (memcmp( state->security_parameters.session_id,
+			state->gnutls_internals.resumed_security_parameters.session_id,
+			state->security_parameters.session_id_size)==0)
+			return 0;
+	} else {
+		if (state->gnutls_internals.resumed==RESUME_TRUE)
+			return 0;
+	}
+
+	return GNUTLS_E_UNKNOWN_ERROR;
 }
