@@ -81,7 +81,7 @@ ssize_t ret, data_size;
 gnutls_datum signature, ddata;
 const gnutls_certificate_credentials cred;
 gnutls_cert *apr_cert_list;
-gnutls_private_key *apr_pkey;
+gnutls_privkey *apr_pkey;
 int apr_cert_list_length;
 
 	ret = _gnutls_gen_srp_server_kx( session, data);

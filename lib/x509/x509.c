@@ -460,7 +460,7 @@ int gnutls_x509_crt_get_pk_algorithm( gnutls_x509_crt cert, int* bits)
 	opaque str[MAX_X509_CERT_SIZE];
 	int algo;
 	int len = sizeof(str);
-	GNUTLS_MPI params[MAX_PARAMS_SIZE];
+	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
 
 	len = sizeof(str) - 1;
 	result =

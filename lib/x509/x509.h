@@ -19,9 +19,9 @@ typedef struct gnutls_x509_crt_int {
 
 /* Raw encoded parameter.
  */
-#define MAX_PARAMETER_SIZE 1200
+#define MAX_PARAMETER_SIZE 2400
 
-#define MAX_PARAMS_SIZE 6 /* ok for RSA and DSA */
+#define MAX_PRIV_PARAMS_SIZE 6 /* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
@@ -29,16 +29,16 @@ typedef struct gnutls_x509_crt_int {
 #define RSA_PRIVATE_PARAMS 6
 #define RSA_PUBLIC_PARAMS 2
 
-#if MAX_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
-# error INCREASE MAX_PARAMS
+#if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
+# error INCREASE MAX_PRIV_PARAMS
 #endif
 
-#if MAX_PARAMS_SIZE - DSA_PRIVATE_PARAMS < 0
-# error INCREASE MAX_PARAMS
+#if MAX_PRIV_PARAMS_SIZE - DSA_PRIVATE_PARAMS < 0
+# error INCREASE MAX_PRIV_PARAMS
 #endif
 
 typedef struct gnutls_x509_privkey_int {
-	MPI params[MAX_PARAMS_SIZE];/* the size of params depends on the public 
+	MPI params[MAX_PRIV_PARAMS_SIZE];/* the size of params depends on the public 
 				 * key algorithm 
 				 */
 				/*

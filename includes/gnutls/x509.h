@@ -200,6 +200,12 @@ int gnutls_x509_privkey_import(gnutls_x509_privkey key, const gnutls_datum * dat
 	gnutls_x509_crt_fmt format);
 int gnutls_x509_privkey_get_pk_algorithm( gnutls_x509_privkey key);
 
+int gnutls_x509_privkey_generate( gnutls_x509_privkey key, gnutls_pk_algorithm algo,
+	int bits);
+
+int gnutls_x509_privkey_export( gnutls_x509_privkey key,
+	gnutls_x509_crt_fmt format, unsigned char* output_data, int* output_data_size);
+
 
 #ifdef __cplusplus
 }

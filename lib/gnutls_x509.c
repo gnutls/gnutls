@@ -152,9 +152,9 @@ int _gnutls_x509_cert_verify_peers(gnutls_session session)
  */
 static int _gnutls_check_key_cert_match( gnutls_certificate_credentials res) 
 {
-int pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
+uint pk = res->cert_list[res->ncerts-1][0].subject_pk_algorithm;
 	
-	if (gnutls_x509_privkey_get_pk_algorithm(res->pkey[res->ncerts-1]) != pk) 
+	if (res->pkey[res->ncerts-1].pk_algorithm != pk) 
 	{
 		gnutls_assert();
 		return GNUTLS_E_CERTIFICATE_KEY_MISMATCH;
@@ -430,6 +430,43 @@ int read_cert_mem(gnutls_certificate_credentials res, const char *cert, int cert
 }
 
 
+static int privkey_cpy( gnutls_privkey* dest, gnutls_x509_privkey src)
+{
+int i, ret;
+
+	memset( dest, 0, sizeof(gnutls_privkey));
+
+	for(i=0;i<src->params_size;i++) {
+		dest->params[i] = _gnutls_mpi_copy( src->params[i]);
+		if (dest->params[i] == NULL) {
+			gnutls_assert();
+			ret = GNUTLS_E_MEMORY_ERROR;
+			goto cleanup;
+		}
+	}
+
+	dest->pk_algorithm = src->pk_algorithm;
+	dest->params_size = src->params_size;
+
+	return 0;
+
+	cleanup:
+	
+	for (i=0;i<src->params_size;i++) {
+		_gnutls_mpi_release( &dest->params[i]);
+	}
+	return ret;
+}
+
+void _gnutls_privkey_deinit(gnutls_privkey *key)
+{
+int i;
+
+	for (i = 0; i < key->params_size; i++) {
+		_gnutls_mpi_release( &key->params[i]);
+	}
+}
+
 
 /* Reads a PEM encoded PKCS-1 RSA private key from memory
  * 2002-01-26: Added ability to read DSA keys.
@@ -440,16 +477,17 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 {
 	int ret;
 	gnutls_datum tmp;
+	gnutls_x509_privkey tmpkey;
 
 	/* allocate space for the pkey list
 	 */
-	res->pkey = gnutls_realloc_fast( res->pkey, (res->ncerts+1)*sizeof(gnutls_x509_privkey));
+	res->pkey = gnutls_realloc_fast( res->pkey, (res->ncerts+1)*sizeof(gnutls_privkey));
 	if (res->pkey==NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 
-	ret = gnutls_x509_privkey_init( &res->pkey[res->ncerts]);
+	ret = gnutls_x509_privkey_init( &tmpkey); //res->pkey[res->ncerts]);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -458,14 +496,17 @@ static int read_key_mem(gnutls_certificate_credentials res, const char *key, int
 	tmp.data = (opaque*)key;
 	tmp.size = key_size;
 
-	ret = gnutls_x509_privkey_import( res->pkey[res->ncerts], &tmp, type);
+	ret = gnutls_x509_privkey_import( tmpkey, &tmp, type);
 	if (ret < 0) {
 		gnutls_assert();
-		gnutls_x509_privkey_deinit( res->pkey[res->ncerts]);
-		res->pkey[res->ncerts] = NULL;
+		gnutls_x509_privkey_deinit( tmpkey);
 
 		return ret;
 	}
+
+	privkey_cpy( &res->pkey[res->ncerts], tmpkey);
+
+	gnutls_x509_privkey_deinit( tmpkey);
 
 	return 0;
 }
@@ -608,7 +649,7 @@ void gnutls_certificate_free_keys(gnutls_certificate_credentials sc)
 	sc->cert_list = NULL;
 
 	for (i = 0; i < sc->ncerts; i++) {
-		gnutls_x509_privkey_deinit(sc->pkey[i]);
+		_gnutls_privkey_deinit( &sc->pkey[i]);
 	}
 
 	gnutls_free( sc->pkey);

@@ -51,6 +51,28 @@ typedef struct gnutls_cert {
 	
 } gnutls_cert;
 
+typedef struct gnutls_privkey_int {
+	MPI params[MAX_PRIV_PARAMS_SIZE];/* the size of params depends on the public 
+				 * key algorithm 
+				 */
+				/*
+				 * RSA: [0] is modulus
+				 *      [1] is public exponent
+				 *	[2] is private exponent
+				 *	[3] is prime1 (p)
+				 *	[4] is prime2 (q)
+				 *	[5] is coefficient (u == inverse of p mod q)
+				 * DSA: [0] is p
+				 *      [1] is q
+				 *      [2] is g
+				 *      [3] is y (public key)
+				 *      [4] is x (private key)
+				 */
+	int params_size; /* holds the number of params */
+
+	gnutls_pk_algorithm pk_algorithm;
+} gnutls_privkey;
+
 struct gnutls_session_int; /* because gnutls_session is not defined when this file is included */
 
 typedef enum ConvFlags { 
@@ -63,6 +85,8 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 	int flags);
 void _gnutls_free_cert(gnutls_cert* cert);
 int _gnutls_cert_get_dn(gnutls_cert * cert, gnutls_datum * odn);
+
+void _gnutls_privkey_deinit(gnutls_privkey *key);
 
 int _gnutls_cert_supported_kx( const gnutls_cert* cert, gnutls_kx_algorithm **alg, int *alg_size);
 

@@ -410,7 +410,7 @@ int _gnutls_gen_x509_crt(gnutls_session session, opaque ** data)
 	int ret, i;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
-	gnutls_x509_privkey apr_pkey;
+	gnutls_privkey *apr_pkey;
 	int apr_cert_list_length;
 
 	/* find the appropriate certificate */
@@ -462,7 +462,7 @@ int _gnutls_gen_openpgp_certificate(gnutls_session session, opaque ** data)
 	int ret;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
-	gnutls_x509_privkey apr_pkey;
+	gnutls_privkey* apr_pkey;
 	int apr_cert_list_length;
 
 	/* find the appropriate certificate */
@@ -512,7 +512,7 @@ int _gnutls_gen_openpgp_certificate_fpr(gnutls_session session,
 	int ret, fpr_size, packet_size;
 	opaque *pdata;
 	gnutls_cert *apr_cert_list;
-	gnutls_x509_privkey apr_pkey;
+	gnutls_privkey* apr_pkey;
 	int apr_cert_list_length;
 
 	/* find the appropriate certificate */
@@ -1038,7 +1038,7 @@ int _gnutls_gen_cert_client_cert_vrfy(gnutls_session session,
 {
 	int ret;
 	gnutls_cert *apr_cert_list;
-	gnutls_x509_privkey apr_pkey;
+	gnutls_privkey* apr_pkey;
 	int apr_cert_list_length, size;
 	gnutls_datum signature;
 
@@ -1204,7 +1204,7 @@ int _gnutls_gen_cert_server_cert_req(gnutls_session session,
 int _gnutls_find_apr_cert(gnutls_session session,
 			  gnutls_cert ** apr_cert_list,
 			  int *apr_cert_list_length,
-			  gnutls_x509_privkey * apr_pkey)
+			  gnutls_privkey ** apr_pkey)
 {
 	const gnutls_certificate_credentials cred;
 	int ind;
@@ -1242,7 +1242,7 @@ int _gnutls_find_apr_cert(gnutls_session session,
 				*apr_cert_list = cred->cert_list[ind];
 				*apr_cert_list_length =
 				    cred->cert_list_length[ind];
-				*apr_pkey = cred->pkey[ind];
+				*apr_pkey = &cred->pkey[ind];
 			}
 		}
 	} else {		/* CLIENT SIDE */
@@ -1266,7 +1266,7 @@ int _gnutls_find_apr_cert(gnutls_session session,
 				*apr_cert_list = cred->cert_list[ind];
 				*apr_cert_list_length =
 				    cred->cert_list_length[ind];
-				*apr_pkey = cred->pkey[ind];
+				*apr_pkey = &cred->pkey[ind];
 			}
 		}
 

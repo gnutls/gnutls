@@ -487,12 +487,12 @@ static
 int _gnutls_x509_verify_signature( const gnutls_datum* tbs,
 	const gnutls_datum* signature, gnutls_x509_crt issuer) 
 {
-GNUTLS_MPI issuer_params[MAX_PARAMS_SIZE];
+GNUTLS_MPI issuer_params[MAX_PUBLIC_PARAMS_SIZE];
 int ret, issuer_params_size, i;
 
 	/* Read the MPI parameters from the issuer's certificate.
 	 */
-	issuer_params_size = MAX_PARAMS_SIZE;
+	issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
 	ret = _gnutls_x509_crt_get_mpis(issuer, issuer_params, &issuer_params_size);
 
 	if ( ret < 0) {

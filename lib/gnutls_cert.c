@@ -81,7 +81,7 @@ void gnutls_certificate_free_credentials(gnutls_certificate_credentials sc)
 	_gnutls_free_datum( &sc->keyring);
 
 	for (i = 0; i < sc->ncerts; i++) {
-		gnutls_x509_privkey_deinit(sc->pkey[i]);
+		gnutls_privkey_deinit( &sc->pkey[i]);
 	}
 
 	gnutls_free( sc->pkey);
@@ -478,7 +478,7 @@ int _gnutls_x509_cert2gnutls_cert(gnutls_cert * gcert, const gnutls_datum *derCe
 	gcert->subject_pk_algorithm = gnutls_x509_crt_get_pk_algorithm( cert, NULL);
 
 	if (flags & CERT_ONLY_PUBKEY || flags == 0) {
-		gcert->params_size = MAX_PARAMS_SIZE;
+		gcert->params_size = MAX_PUBLIC_PARAMS_SIZE;
 		ret = _gnutls_x509_crt_get_mpis( cert, gcert->params, &gcert->params_size);
 		if (ret < 0) {
 			gnutls_assert();

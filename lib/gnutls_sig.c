@@ -34,13 +34,13 @@
 #include <gnutls_sig.h>
 
 
-int _gnutls_generate_sig( gnutls_cert* cert, gnutls_x509_privkey pkey, const gnutls_datum* hash_concat, gnutls_datum *signature);
+int _gnutls_generate_sig( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature);
 
 
 /* Generates a signature of all the previous sent packets in the 
  * handshake procedure.
  */
-int _gnutls_generate_sig_from_hdata( gnutls_session session, gnutls_cert* cert, gnutls_x509_privkey pkey, gnutls_datum *signature) {
+int _gnutls_generate_sig_from_hdata( gnutls_session session, gnutls_cert* cert, gnutls_privkey* pkey, gnutls_datum *signature) {
 gnutls_datum dconcat;
 int ret;
 opaque concat[36];
@@ -88,7 +88,7 @@ GNUTLS_MAC_HANDLE td_sha;
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
-int _gnutls_generate_sig_params( gnutls_session session, gnutls_cert* cert, gnutls_x509_privkey pkey, gnutls_datum* params, gnutls_datum *signature) 
+int _gnutls_generate_sig_params( gnutls_session session, gnutls_cert* cert, gnutls_privkey* pkey, gnutls_datum* params, gnutls_datum *signature) 
 {
 gnutls_datum dconcat;
 int ret;
@@ -148,7 +148,7 @@ opaque concat[36];
  * Cert is the certificate of the corresponding private key. It is only checked if
  * it supports signing.
  */
-int _gnutls_generate_sig( gnutls_cert* cert, gnutls_x509_privkey pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
+int _gnutls_generate_sig( gnutls_cert* cert, gnutls_privkey* pkey, const gnutls_datum* hash_concat, gnutls_datum *signature)
 {
 int ret;
 gnutls_datum tmpdata;

@@ -65,7 +65,8 @@ extern OPENPGP_CERT2GNUTLS_CERT _E_gnutls_openpgp_cert2gnutls_cert;
 
 /* This function reads the RSA parameters from peer's certificate;
  */
-int _gnutls_get_public_rsa_params(gnutls_session session, GNUTLS_MPI params[MAX_PARAMS_SIZE], int* params_len)
+int _gnutls_get_public_rsa_params(gnutls_session session, 
+	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE], int* params_len)
 {
 int ret;
 CERTIFICATE_AUTH_INFO info;
@@ -191,8 +192,8 @@ const gnutls_certificate_credentials cred;
 
 	/* non export cipher suites. */	
 	
-	*params_size = cred->pkey[index]->params_size;
-	*params = cred->pkey[index]->params;
+	*params_size = cred->pkey[index].params_size;
+	*params = cred->pkey[index].params;
 
 	return 0;
 }
@@ -277,8 +278,8 @@ int _gnutls_gen_rsa_client_kx(gnutls_session session, opaque ** data)
 {
 	CERTIFICATE_AUTH_INFO auth = session->key->auth_info;
 	gnutls_datum sdata;	/* data to send */
-	GNUTLS_MPI params[MAX_PARAMS_SIZE];
-	int params_len = MAX_PARAMS_SIZE;
+	GNUTLS_MPI params[MAX_PUBLIC_PARAMS_SIZE];
+	int params_len = MAX_PUBLIC_PARAMS_SIZE;
 	int ret, i;
 	gnutls_protocol_version ver;
 

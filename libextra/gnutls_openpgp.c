@@ -335,7 +335,7 @@ openpgp_pk_to_gnutls_cert( gnutls_cert *cert, cdkPKT_public_key *pk )
  * GnuTLS specific data which is need to perform secret key operations.
  -*/
 int
-_gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
+_gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
                                 gnutls_datum *raw_key )
 {
     CDK_KBNODE snode;
@@ -568,7 +568,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
     i = 1;
     while( (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
         pkt = cdk_kbnode_get_packet( p );
-        if( i > MAX_PARAMS_SIZE )
+        if( i > MAX_PUBLIC_PARAMS_SIZE )
             break;
         if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
             int n = res->ncerts;
@@ -586,7 +586,7 @@ gnutls_certificate_set_openpgp_key_mem( gnutls_certificate_credentials res,
   
     res->ncerts++;
     res->pkey = gnutls_realloc_fast(res->pkey,
-                               (res->ncerts)*sizeof(gnutls_private_key));
+                               (res->ncerts)*sizeof(gnutls_privkey));
     if( !res->pkey ) {
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;   
@@ -673,7 +673,7 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
         i = 1;
         rc = cdk_keydb_get_keyblock( inp, &knode );
         while( knode && (p = cdk_kbnode_walk( knode, &ctx, 0 )) ) {
-            if( i > MAX_PARAMS_SIZE )
+            if( i > MAX_PUBLIC_PARAMS_SIZE )
                 break;
             pkt = cdk_kbnode_get_packet( p );
             if( pkt->pkttype == CDK_PKT_PUBLIC_KEY ) {
@@ -710,7 +710,7 @@ gnutls_certificate_set_openpgp_key_file( gnutls_certificate_credentials res,
     stream_to_datum( inp, &raw );
     cdk_stream_close( inp );
 
-    n = (res->ncerts + 1) * sizeof (gnutls_private_key);
+    n = (res->ncerts + 1) * sizeof (gnutls_privkey);
     res->pkey = gnutls_realloc_fast( res->pkey, n );
     if( !res->pkey ) {
         gnutls_assert();
@@ -1942,7 +1942,7 @@ void gnutls_openpgp_set_recv_key_function( gnutls_session session,
 
 #else /*!HAVE_LIBOPENCDK*/
 int
-_gnutls_openpgp_key2gnutls_key( gnutls_private_key *pkey,
+_gnutls_openpgp_key2gnutls_key( gnutls_privkey *pkey,
                                 gnutls_datum raw_key )
 {
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;

@@ -82,7 +82,7 @@ static int gen_dhe_server_kx(gnutls_session session, opaque ** data)
 	int ret = 0, data_size;
 	int bits;
 	gnutls_cert *apr_cert_list;
-	gnutls_x509_privkey apr_pkey;
+	gnutls_privkey* apr_pkey;
 	int apr_cert_list_length;
 	gnutls_datum signature, ddata;
 	CERTIFICATE_AUTH_INFO info;
