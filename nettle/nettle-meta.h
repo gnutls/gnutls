@@ -97,6 +97,9 @@ struct nettle_cipher
   (nettle_crypt_func) name##_decrypt,		\
 }
 
+extern const struct nettle_cipher nettle_des;
+extern const struct nettle_cipher nettle_des3;
+
 extern const struct nettle_cipher nettle_aes128;
 extern const struct nettle_cipher nettle_aes192;
 extern const struct nettle_cipher nettle_aes256;
