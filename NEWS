@@ -1,4 +1,4 @@
-Version 1.1.4 (04/01/2003)
+Version 1.1.4 (04/01/2004)
 - Improved gnutls-cli's SRP behaviour in SRP ciphersuites.
   If they are of highest priority then the abreviated handshake
   is used.
