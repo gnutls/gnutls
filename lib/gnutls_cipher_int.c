@@ -1,4 +1,5 @@
 /*
+ *  Copyright (C) 2004 Simon Josefsson
  *  Copyright (C) 2000 Nikos Mavroyanopoulos
  *  Copyright (C) 2004 Free Software Foundation
  *
@@ -30,53 +31,50 @@ cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
 				const gnutls_datum_t * iv)
 {
     cipher_hd_t ret = NULL;
-    gcry_error_t err = GPG_ERR_GENERAL;	/* doesn't matter */
+    int err = GC_INVALID_CIPHER;	/* doesn't matter */
 
+    switch (cipher)
+      {
+      case GNUTLS_CIPHER_AES_128_CBC:
+	err = gc_cipher_open(GC_AES128, GC_CBC, &ret);
+	break;
 
-    switch (cipher) {
-    case GNUTLS_CIPHER_AES_128_CBC:
-	err =
-	    gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL,
-			     GCRY_CIPHER_MODE_CBC, 0);
+      case GNUTLS_CIPHER_AES_256_CBC:
+	err = gc_cipher_open(GC_AES256, GC_CBC, &ret);
 	break;
-    case GNUTLS_CIPHER_AES_256_CBC:
-	err =
-	    gcry_cipher_open(&ret, GCRY_CIPHER_RIJNDAEL256,
-			     GCRY_CIPHER_MODE_CBC, 0);
+
+      case GNUTLS_CIPHER_3DES_CBC:
+	err = gc_cipher_open(GC_3DES, GC_CBC, &ret);
 	break;
-    case GNUTLS_CIPHER_3DES_CBC:
-	err =
-	    gcry_cipher_open(&ret, GCRY_CIPHER_3DES, GCRY_CIPHER_MODE_CBC,
-			     0);
+
+      case GNUTLS_CIPHER_DES_CBC:
+	err = gc_cipher_open(GC_DES, GC_CBC, &ret);
 	break;
-    case GNUTLS_CIPHER_DES_CBC:
-	err =
-	    gcry_cipher_open(&ret, GCRY_CIPHER_DES, GCRY_CIPHER_MODE_CBC,
-			     0);
+
+      case GNUTLS_CIPHER_ARCFOUR_128:
+	err = gc_cipher_open(GC_ARCFOUR128, GC_STREAM, &ret);
 	break;
-    case GNUTLS_CIPHER_ARCFOUR_128:
-    case GNUTLS_CIPHER_ARCFOUR_40:
-	err =
-	    gcry_cipher_open(&ret, GCRY_CIPHER_ARCFOUR,
-			     GCRY_CIPHER_MODE_STREAM, 0);
+
+      case GNUTLS_CIPHER_ARCFOUR_40:
+	err = gc_cipher_open(GC_ARCFOUR40, GC_STREAM, &ret);
 	break;
-    case GNUTLS_CIPHER_RC2_40_CBC:
-	err =
-	    gcry_cipher_open(&ret, GCRY_CIPHER_RFC2268_40,
-			     GCRY_CIPHER_MODE_CBC, 0);
+
+      case GNUTLS_CIPHER_RC2_40_CBC:
+	err = gc_cipher_open(GC_ARCTWO40, GC_CBC, &ret);
 	break;
-    default:
+
+      default:
 	return NULL;
     }
 
     if (err == 0) {
-	gcry_cipher_setkey(ret, key->data, key->size);
+	gc_cipher_setkey(ret, key->data, key->size);
 	if (iv->data != NULL && iv->size > 0)
-	    gcry_cipher_setiv(ret, iv->data, iv->size);
+	    gc_cipher_setiv(ret, iv->data, iv->size);
     } else if (cipher != GNUTLS_CIPHER_NULL) {
 	gnutls_assert();
-	_gnutls_x509_log("Gcrypt cipher[%d] error: %s\n", cipher,
-			 gcry_strerror(err));
+	_gnutls_x509_log("Crypto cipher error [%d]\n", cipher, err);
+	/* FIXME: gc_strerror */
     }
 
     return ret;
@@ -85,7 +83,7 @@ cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,
 int _gnutls_cipher_encrypt(cipher_hd_t handle, void *text, int textlen)
 {
     if (handle != GNUTLS_CIPHER_FAILED) {
-	if (gcry_cipher_encrypt(handle, text, textlen, NULL, textlen) != 0) {
+	if (gc_cipher_encrypt_inline (handle, textlen, text) != 0) {
 	    gnutls_assert();
 	    return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -97,9 +95,7 @@ int _gnutls_cipher_decrypt(cipher_hd_t handle, void *ciphertext,
 			   int ciphertextlen)
 {
     if (handle != GNUTLS_CIPHER_FAILED) {
-	if (gcry_cipher_decrypt
-	    (handle, ciphertext, ciphertextlen, NULL,
-	     ciphertextlen) != 0) {
+	if (gc_cipher_decrypt_inline (handle, ciphertextlen, ciphertext) != 0) {
 	    gnutls_assert();
 	    return GNUTLS_E_INTERNAL_ERROR;
 	}
@@ -110,6 +106,6 @@ int _gnutls_cipher_decrypt(cipher_hd_t handle, void *ciphertext,
 void _gnutls_cipher_deinit(cipher_hd_t handle)
 {
     if (handle != GNUTLS_CIPHER_FAILED) {
-	gcry_cipher_close(handle);
+	gc_cipher_close(handle);
     }
 }

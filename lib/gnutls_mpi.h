@@ -2,6 +2,7 @@
 # define GNUTLS_MPI_H
 
 # include <gcrypt.h>
+# include <gc.h>
 # include <libtasn1.h>
 # include <gnutls_int.h>
 

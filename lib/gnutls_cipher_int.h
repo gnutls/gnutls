@@ -1,4 +1,5 @@
 /*
+ *      Copyright (C) 2004 Simon Josefsson
  *      Copyright (C) 2000 Nikos Mavroyanopoulos
  *
  * This file is part of GNUTLS.
@@ -21,7 +22,7 @@
 #ifndef GNUTLS_CIPHER_INT
 # define GNUTLS_CIPHER_INT
 
-#define cipher_hd_t gcry_cipher_hd_t
+#define cipher_hd_t gc_cipher
 #define GNUTLS_CIPHER_FAILED NULL
 
 cipher_hd_t _gnutls_cipher_init(gnutls_cipher_algorithm_t cipher,

@@ -1,4 +1,4 @@
-INCLUDES = -I$(top_srcdir)/libextra -I$(srcdir)/minitasn1 -I$(top_srcdir)/libextra/openpgp/ -I$(top_srcdir)/libextra/opencdk -I$(srcdir)/x509 -I$(top_srcdir)/includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
+INCLUDES = -I$(top_srcdir)/crypto -I$(top_srcdir)/libextra -I$(srcdir)/minitasn1 -I$(top_srcdir)/libextra/openpgp/ -I$(top_srcdir)/libextra/opencdk -I$(srcdir)/x509 -I$(top_srcdir)/includes $(LIBOPENCDK_CFLAGS) $(LIBTASN1_CFLAGS) $(LIBGCRYPT_CFLAGS)
 bin_SCRIPTS = libgnutls-config
 
 m4datadir = $(datadir)/aclocal
@@ -70,6 +70,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c \
 libgnutls_la_SOURCES = $(COBJECTS) $(X509_COBJECTS) $(MINITASN1_COBJECTS) $(SRP_COBJECTS)
 
 libgnutls_la_LDFLAGS = $(LIBTASN1_LIBS) $(LIBGCRYPT_LIBS) \
+	../crypto/libgc.la \
 	$(libgnutls_version_script_cmd) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

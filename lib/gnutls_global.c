@@ -1,4 +1,5 @@
 /*
+ *  Copyright (C) 2004 Simon Josefsson
  *  Copyright (C) 2001,2002,2003 Nikos Mavroyanopoulos
  *  Copyright (C) 2004 Free Software Foundation
  *
@@ -24,6 +25,8 @@
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_dh.h>
+
+#include <gc.h>
 
 #define gnutls_log_func LOG_FUNC
 
@@ -169,37 +172,24 @@ int gnutls_global_init(void)
 	goto out;
     _gnutls_init++;
 
-    if (gcry_control(GCRYCTL_ANY_INITIALIZATION_P) == 0) {
-	const char *p;
-	p = strchr(GNUTLS_GCRYPT_VERSION, ':');
-	if (p == NULL)
-	    p = GNUTLS_GCRYPT_VERSION;
-	else
-	    p++;
+    if (gc_init () != GC_OK)
+      {
+	gnutls_assert();
+	_gnutls_debug_log("Initializing crypto backend failed\n");
+	return GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY;
+      }
 
-	if (gcry_check_version(p) == NULL) {
-	    gnutls_assert();
-	    _gnutls_debug_log("Checking for libgcrypt failed '%s'\n", p);
-	    return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
-	}
 
-	/* for gcrypt in order to be able to allocate memory */
-	gcry_set_allocation_handler(gnutls_malloc, gnutls_secure_malloc,
-				    _gnutls_is_secure_memory,
-				    gnutls_realloc, gnutls_free);
-
-	/* gcry_control (GCRYCTL_DISABLE_INTERNAL_LOCKING, NULL, 0); */
-
-	gcry_control(GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
-
+    /* for gcrypt in order to be able to allocate memory */
+    gc_set_allocators(gnutls_malloc, gnutls_secure_malloc,
+		      _gnutls_is_secure_memory,
+		      gnutls_realloc, gnutls_free);
 #ifdef DEBUG
-	/* applications may want to override that, so we only use
-	 * it in debugging mode.
-	 */
-	gcry_set_log_handler(_gnutls_gcry_log_handler, NULL);
-#endif
-    }
-#ifdef DEBUG
+    /* applications may want to override that, so we only use
+     * it in debugging mode.
+     */
+    gcry_set_log_handler(_gnutls_gcry_log_handler, NULL);
+
     gnutls_global_set_log_function(dlog);
 #endif
 
