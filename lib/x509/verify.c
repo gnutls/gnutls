@@ -44,6 +44,11 @@ static int _gnutls_verify_certificate2(gnutls_x509_crt cert,
 static
 int _gnutls_x509_verify_signature(const gnutls_datum* signed_data,
 	const gnutls_datum* signature, gnutls_x509_crt issuer);
+static
+int is_crl_issuer(gnutls_x509_crl crl, gnutls_x509_crt issuer_cert);
+static int _gnutls_verify_crl2(gnutls_x509_crl crl,
+			       gnutls_x509_crt *trusted_cas, int tcas_size, 
+			       unsigned int flags);
 
 
 /* Checks if the issuer of a certificate is a
