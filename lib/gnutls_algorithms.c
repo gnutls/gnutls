@@ -1051,7 +1051,13 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 	}
 
 	tmp_ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
+	if (tmp_ciphers==NULL) return GNUTLS_E_MEMORY_ERROR;
+	
 	*ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
+	if (*ciphers==NULL) {
+		gnutls_free(tmp_ciphers);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
 
 
 	for (i = 0; i < count; i++) {
@@ -1122,22 +1128,31 @@ _gnutls_supported_ciphersuites_sorted(GNUTLS_STATE state,
 
 int
 _gnutls_supported_ciphersuites(GNUTLS_STATE state,
-			       GNUTLS_CipherSuite ** ciphers)
+			       GNUTLS_CipherSuite ** _ciphers)
 {
 
 	int i, ret_count, j;
 	int count = _gnutls_cipher_suite_count();
 	GNUTLS_CipherSuite *tmp_ciphers;
+	GNUTLS_CipherSuite* ciphers;
+
+	*_ciphers = NULL;
 
 	if (count == 0) {
-		*ciphers = NULL;
 		return 0;
 	}
 
 	tmp_ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
-	*ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
+	if ( tmp_ciphers==NULL)
+		return GNUTLS_E_MEMORY_ERROR;
 
+	ciphers = gnutls_malloc(count * sizeof(GNUTLS_CipherSuite));
 
+	if ( ciphers==NULL) {
+		gnutls_free( tmp_ciphers);
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
 	for (i = 0; i < count; i++) {
 		tmp_ciphers[i].CipherSuite[0] =
 		    cs_algorithms[i].id.CipherSuite[0];
@@ -1161,26 +1176,25 @@ _gnutls_supported_ciphersuites(GNUTLS_STATE state,
 		    < 0)
 			continue;
 
-		(*ciphers)[j].CipherSuite[0] =
-		    tmp_ciphers[i].CipherSuite[0];
-		(*ciphers)[j].CipherSuite[1] =
-		    tmp_ciphers[i].CipherSuite[1];
+		ciphers[j].CipherSuite[0] = tmp_ciphers[i].CipherSuite[0];
+		ciphers[j].CipherSuite[1] = tmp_ciphers[i].CipherSuite[1];
 		j++;
 	}
 
 	ret_count = j;
 
 	if (ret_count > 0 && ret_count != count) {
-		*ciphers =
-		    gnutls_realloc(*ciphers,
+		ciphers =
+		    gnutls_realloc(ciphers,
 				   ret_count * sizeof(GNUTLS_CipherSuite));
 	} else {
 		if (ret_count != count) {
-			gnutls_free(*ciphers);
-			*ciphers = NULL;
+			gnutls_free(ciphers);
+			ciphers = NULL;
 		}
 	}
 
+	*_ciphers = ciphers;
 	gnutls_free(tmp_ciphers);
 	return ret_count;
 }

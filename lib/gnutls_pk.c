@@ -109,7 +109,7 @@ int _gnutls_pkcs1_rsa_encrypt(gnutls_datum * ciphertext, gnutls_datum plaintext,
  * pkey is the private key and n the modulus.
  */
 
-int _gnutls_pkcs1_rsa_decrypt(gnutls_datum * plaintext, gnutls_datum ciphertext,
+int _gnutls_pkcs1_rsa_decrypt(gnutls_sdatum * plaintext, gnutls_datum ciphertext,
 		      MPI pkey, MPI n, int btype)
 {
 	int k, esize, i, ret;

@@ -16,7 +16,7 @@ EXTRA_DIST = debug.h gnutls_compress.h defines.h pkcs1.asn pkix.asn \
 	cert_asn1.h cert_der.h gnutls_datum.h auth_x509.h gnutls_gcry.h \
 	ext_dnsname.h gnutls_pk.h gnutls_record.h gnutls_cert.h \
 	gnutls_privkey.h gnutls_constate.h gnutls_global.h cert_verify.h \
-	gnutls_sig.h
+	gnutls_sig.h gnutls_mem.h
 lib_LTLIBRARIES = libgnutls.la
 libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	gnutls_cipher.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
@@ -29,7 +29,7 @@ libgnutls_la_SOURCES = gnutls_record.c gnutls_compress.c debug.c \
 	cert_ASN.y cert_asn1.c cert_der.c gnutls_datum.c auth_rsa.c \
 	gnutls_gcry.c ext_dnsname.c gnutls_pk.c gnutls_cert.c cert_verify.c\
 	gnutls_global.c gnutls_privkey.c gnutls_constate.c gnutls_anon_cred.c \
-	gnutls_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c
+	gnutls_sig_check.c pkix_asn1_tab.c pkcs1_asn1_tab.c gnutls_mem.c
 
 libgnutls_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

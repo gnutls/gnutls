@@ -404,7 +404,7 @@ static void ssl3_md5(int i, char *secret, int secret_len, char *random,
 
 }
 
-void *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
+svoid *gnutls_ssl3_generate_random(void *secret, int secret_len, void *random,
 			   int random_len, int bytes)
 {
 	int size = 0, i = 0;

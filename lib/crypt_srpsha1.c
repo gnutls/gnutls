@@ -51,7 +51,7 @@ char *crypt_srpsha1(const char *username, const char *passwd,
 	gnutls_hash_deinit(h1, r1);
 
 	
-	local_salt = malloc(salt_size + 1);
+	local_salt = gnutls_malloc(salt_size + 1);
 	strcpy((char *) local_salt, salt);
 
 	sp = index( local_salt, ':'); /* move to salt - after verifier */

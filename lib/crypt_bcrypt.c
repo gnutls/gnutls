@@ -575,7 +575,7 @@ static short _blf_ExpandKey(blf_ctx * c, const uint8 * key, short keybytes,
 static blf_ctx *_blf_init(uint8 * salt, const char *key, int key_len,
 			  int cost)
 {
-	blf_ctx *state = malloc(sizeof(blf_ctx));
+	blf_ctx *state = gnutls_malloc(sizeof(blf_ctx));
 	uint32 i, rcost;
 
 	rcost = (uint32) 1 << cost;	/* 2^cost */
@@ -592,7 +592,7 @@ static blf_ctx *_blf_init(uint8 * salt, const char *key, int key_len,
 
 static void _blf_deinit(blf_ctx * ctx)
 {
-	free(ctx);
+	gnutls_free(ctx);
 }
 static const char magic[] = "$2$";
 
@@ -620,7 +620,7 @@ char *crypt_bcrypt(const char* username, const char *passwd, const char *salt, M
 	if (passwd_len > 56)
 		passwd_len = 56;
 
-	local_salt = malloc(salt_size + 1);
+	local_salt = gnutls_malloc(salt_size + 1);
 	strcpy((char *) local_salt, salt);
 
 	sp = index( local_salt, ':'); /* move to salt - after verifier */

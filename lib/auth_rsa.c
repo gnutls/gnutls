@@ -294,7 +294,7 @@ int gen_rsa_certificate(GNUTLS_KEY key, opaque ** data)
 
 int proc_rsa_client_kx(GNUTLS_KEY key, opaque * data, int data_size)
 {
-	gnutls_datum plaintext;
+	gnutls_sdatum plaintext;
 	gnutls_datum ciphertext;
 	int ret, dsize;
 

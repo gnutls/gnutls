@@ -61,6 +61,8 @@ node_asn* _gnutls_get_pkcs() {
   * a front end to this function. This function should be
   * called once and after gnutls_global_init().
   *
+  * RECV_FUNC is of the form:
+  * ssize_t (*RECV_FUNC)(SOCKET, void*, size_t,int);
   **/
 void gnutls_global_set_recv_func( RECV_FUNC recv_func) {
 	_gnutls_recv_func = recv_func;
@@ -76,6 +78,9 @@ void gnutls_global_set_recv_func( RECV_FUNC recv_func) {
   * some external library (like gnu pthreads), which provide
   * a front end to this function. This function should be
   * called once and after gnutls_global_init().
+  *
+  * SEND_FUNC is of the form:
+  * ssize_t (*SEND_FUNC)(SOCKET, const void*, size_t,int);
   **/
 void gnutls_global_set_send_func( SEND_FUNC send_func) {
 	_gnutls_send_func = send_func;
@@ -89,14 +94,14 @@ void gnutls_global_set_send_func( SEND_FUNC send_func) {
   * is going to use. This function only accepts a character array.
   * Normaly you may not use this function since
   * it is only used for debugging reasons.
+  *
+  * LOG_FUNC is of the form:
+  * void (*LOG_FUNC)( const char*);
   **/
 void gnutls_global_set_log_func( LOG_FUNC log_func) {
 	_gnutls_log_func = log_func;
 }
 
-int gnutls_is_secure_memory(const void* mem) {
-	return 0;
-}
 
 /* default logging function */
 static void dlog( const char* str) {
@@ -119,7 +124,7 @@ int gnutls_global_init()
 	int result;
 
 	/* for gcrypt in order to be able to allocate memory */
-	gcry_set_allocation_handler(gnutls_malloc, secure_malloc, gnutls_is_secure_memory, gnutls_realloc, free);
+	gcry_set_allocation_handler(gnutls_malloc, secure_malloc, _gnutls_is_secure_memory, gnutls_realloc, gnutls_free);
 
 	/* we need this */
 #ifdef HAVE_SIGNAL
@@ -130,7 +135,7 @@ int gnutls_global_init()
 	 */
 	_gnutls_recv_func = recv;
 	_gnutls_send_func = send;
-	_gnutls_log_func = dlog;
+	gnutls_global_set_log_func( dlog);
 
 	/* initialize parser 
 	 * This should not deal with files in the final
