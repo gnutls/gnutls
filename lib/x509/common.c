@@ -39,14 +39,18 @@ typedef struct _oid2string {
 
 static const oid2string OID2STR[] = {
 	{"2 5 4 6", "X520countryName", "C", 0, 1},
+	{"2 5 4 12", "X520title", "T", 1, 1},
 	{"2 5 4 10", "X520OrganizationName", "O", 1, 1},
 	{"2 5 4 11", "X520OrganizationalUnitName", "OU", 1, 1},
 	{"2 5 4 3", "X520CommonName", "CN", 1, 1},
 	{"2 5 4 7", "X520LocalityName", "L", 1, 1},
 	{"2 5 4 8", "X520StateOrProvinceName", "ST", 1, 1},
-	{"0 9 2342 19200300 100 1 25", "dc", "DC", 1, 1}, /* FIXME: CHOICE? */
-	{"0 9 2342 19200300 100 1 1", "uid", "UID", 1, 1}, /* FIXME: CHOICE? */
-	{"1 2 840 113549 1 9 1", "Pkcs9email", NULL, 0, 1},
+	{"2 5 4 5", "X520serialNumber", "serialNumber", 0, 1},
+	{"2 5 4 20", "X520telephoneNumber", "telephoneNumber", 0, 1},
+
+	{"0 9 2342 19200300 100 1 25", "dc", "DC", 0, 1}, /* FIXME: CHOICE? */
+	{"0 9 2342 19200300 100 1 1", "uid", "UID", 0, 1}, /* FIXME: CHOICE? */
+	{"1 2 840 113549 1 9 1", "Pkcs9email", "EMAIL", 0, 1},
 	{"1 2 840 113549 1 1 1", "rsaEncryption", NULL, 0, 0},
 	{"1 2 840 113549 1 1 2", "md2WithRSAEncryption", NULL, 0, 0},
 	{"1 2 840 113549 1 1 4", "md5WithRSAEncryption", NULL, 0, 0},
