@@ -137,8 +137,9 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 {
 	size_t b_size, a_size;
 	opaque *holder, hd[MAX_HASH_SIZE];
-	size_t holder_size;
+	size_t holder_size, hash_size;
 	GNUTLS_HASH_HANDLE td;
+	uint32 u;
 	int ret;
 	GNUTLS_MPI res;
 
@@ -162,9 +163,10 @@ GNUTLS_MPI _gnutls_calc_srp_u(GNUTLS_MPI A, GNUTLS_MPI B)
 	_gnutls_hash(td, holder, holder_size);
 	_gnutls_hash_deinit(td, hd);
 	
-	/* convert the first 4 bytes of hd to uint32
+	/* convert the bytes of hd to MPI.
 	 */
-	ret = _gnutls_mpi_scan( &res, holder, &holder_size);
+	hash_size = 20; /* SHA */
+	ret = _gnutls_mpi_scan( &res, hd, &hash_size);
 	gnutls_afree(holder);
 
 	if (ret < 0) {
@@ -244,7 +246,7 @@ GNUTLS_MPI _gnutls_calc_srp_A(GNUTLS_MPI * a, GNUTLS_MPI g, GNUTLS_MPI n)
  * The output is exactly 20 bytes
  */
 int _gnutls_calc_srp_sha(char *username, char *password, opaque * salt,
-			   int salt_size, size_t *size, void* digest)
+			   int salt_size, int *size, void* digest)
 {
 	GNUTLS_HASH_HANDLE td;
 	opaque res[MAX_HASH_SIZE];
@@ -598,8 +600,7 @@ int gnutls_srp_verifier( char* username, char* password, const gnutls_datum *sal
 	gnutls_datum * res)
 {
 GNUTLS_MPI _n, _g;
-int ret;
-size_t digest_size = 20;
+int ret, digest_size = 20;
 opaque digest[20];
 size_t size;
 
