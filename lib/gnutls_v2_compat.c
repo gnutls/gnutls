@@ -141,19 +141,13 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* Read uint16 cipher_spec_length */
 	DECR_LEN(len, 2);
-	memmove(&sizeOfSuites, &data[pos], 2);
+	sizeOfSuites = READuint16( &data[pos]);
 	pos += 2;
 
-#ifndef WORDS_BIGENDIAN
-	sizeOfSuites = byteswap16(sizeOfSuites);
-#endif
-
+	
 	/* read session id length */
 	DECR_LEN(len, 2);
-	memmove(&session_id_len, &data[pos], 2);
-#ifndef WORDS_BIGENDIAN
-	session_id_len = byteswap16(session_id_len);
-#endif
+	session_id_len = READuint16( &data[pos]);
 	pos += 2;
 
 	if (session_id_len > 32)
@@ -162,10 +156,7 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 
 	/* read challenge length */
 	DECR_LEN(len, 2);
-	memmove(&challenge, &data[pos], 2);
-#ifndef WORDS_BIGENDIAN
-	challenge = byteswap16(challenge);
-#endif
+	challenge = READuint16( &data[pos]);
 	pos += 2;
 
 	if (challenge < 10) { /* wow that's not random */
@@ -223,11 +214,8 @@ int _gnutls_read_client_hello_v2(GNUTLS_STATE state, opaque * data,
 	memcpy( state->security_parameters.client_random, &data[challenge > 32 ? (pos+challenge-32) : pos], challenge < 32 ? challenge : 32);
 
 	/* generate server random value */
-#ifdef WORDS_BIGENDIAN
-	cur_time = time(NULL);
-#else
-	cur_time = byteswap32(time(NULL));
-#endif
+	cur_time = CONVuint32((uint32)time(NULL));
+
 	memmove(state->security_parameters.server_random, &cur_time, 4);
 	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
 	memmove(&state->security_parameters.server_random[4], rand, 28);

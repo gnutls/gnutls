@@ -23,6 +23,7 @@
 #include "gnutls_extensions.h"
 #include "gnutls_errors.h"
 #include "ext_srp.h"
+#include "gnutls_num.h"
 
 /* Key Exchange Section */
 #define GNUTLS_EXTENSION_ENTRY(type, ext_func_recv, ext_func_send) \
@@ -97,11 +98,9 @@ uint16 size, next1;
 
 	if (data_size < 2) return 0;
 	memcpy( &next1, data, 2);
-#ifndef WORDS_BIGENDIAN
-	next = byteswap16(next1);
-#else
-	next = next1;
-#endif
+
+	next = CONVuint16(next1);
+
 	if (data_size < next) return 0;
 	
 	pos+=2;
@@ -112,12 +111,10 @@ uint16 size, next1;
 		pos++;
 
 		next-=2; if (next < 0) return 0;
-		memcpy( &size, &data[pos], 2);
+
+		size = READuint16(&data[pos]);
 		pos+=2;
-#ifndef WORDS_BIGENDIAN
-		size = byteswap16(size);
-#endif
-		
+				
 		sdata = &data[pos];
 		pos+=size;
 		next-=size; if (next < 0) return 0;
@@ -152,11 +149,9 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 		if (size > 0) {
 			(*data) = gnutls_realloc( (*data), pos+size+3);
 			(*data)[pos++] = (uint8) next; /* set type */
-#ifndef WORDS_BIGENDIAN
-			ssize = byteswap16( (uint16)size);
-#else
-			ssize = size;
-#endif
+
+			ssize = CONVuint16( (uint16)size);
+
 			memcpy( &(*data)[pos], &ssize, 2);
 			pos+=2;
 			
@@ -169,9 +164,8 @@ int (*ext_func_send)( GNUTLS_STATE, opaque**);
 
 	size = pos;
 	pos-=2; /* remove the size of the size header! */
-#ifndef WORDS_BIGENDIAN
-	pos = byteswap16(pos);
-#endif
+
+	pos = CONVuint16(pos);
 	memcpy( (*data), &pos, sizeof(uint16));
 
 	if (size==2) { /* empty */

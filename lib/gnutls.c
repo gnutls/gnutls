@@ -33,6 +33,7 @@
 #include "gnutls_algorithms.h"
 #include "gnutls_db.h"
 #include "gnutls_auth_int.h"
+#include "gnutls_num.h"
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -444,12 +445,9 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 	for (i = 0; i < iterations; i++) {
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
 		if (cipher_size <= 0) return cipher_size; /* error */
-		
-#ifdef WORDS_BIGENDIAN
-		length = cipher_size;
-#else
-		length = byteswap16(cipher_size);
-#endif
+
+		length = CONVuint16( cipher_size);		
+
 		memmove( &headers[3], &length, sizeof(uint16));
 		/* cipher does not have headers 
 		 * and DOES have size for them
@@ -475,11 +473,9 @@ ssize_t gnutls_send_int(int cd, GNUTLS_STATE state, ContentType type, void *_dat
 		Size = sizeofdata % MAX_ENC_LEN;
 		cipher_size = _gnutls_encrypt( state, &data[i*Size], Size, &cipher, type);
 		if (cipher_size<=0) return cipher_size;
-#ifdef WORDS_BIGENDIAN
-		length = cipher_size;
-#else
-		length = byteswap16(cipher_size);
-#endif
+
+		length = CONVuint16( cipher_size);
+
 		memmove( &headers[3], &length, sizeof(uint16));
 		memmove( cipher, headers, HEADER_SIZE);
 
@@ -524,11 +520,8 @@ ssize_t _gnutls_send_change_cipher_spec(int cd, GNUTLS_STATE state)
 	fprintf(stderr, "ChangeCipherSpec was sent\n");
 #endif
 
-#ifdef WORDS_BIGENDIAN
-	length = (uint16)1;
-#else
-	length = byteswap16((uint16)1);
-#endif
+	length = CONVuint16( 1);
+
 	memmove( &headers[3], &length, sizeof(uint16));
 	
 	if (_gnutls_Write(cd, headers, 5) != 5) {
@@ -633,10 +626,7 @@ ssize_t gnutls_recv_int(int cd, GNUTLS_STATE state, ContentType type, char *data
 		recv_type = headers[0];
 		version = _gnutls_version_get( headers[1], headers[2]);
 
-		memcpy( &length, &headers[3], 2);
-#ifndef WORDS_BIGENDIAN
-		length = byteswap16(length);
-#endif
+		length = READuint16( &headers[3]);
 	}
 	
 	if ( gnutls_get_current_version(state) != version) {

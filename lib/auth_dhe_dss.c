@@ -24,6 +24,7 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
+#include "gnutls_num.h"
 
 int gen_dhe_dss_server_kx( GNUTLS_KEY , opaque**);
 int gen_dhe_dss_client_kx( GNUTLS_KEY , opaque**);
@@ -71,33 +72,24 @@ int gen_dhe_dss_server_kx( GNUTLS_KEY key, opaque** data) {
 	data_p = &(*data)[0];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_p[2], &n_p, p);
 	gnutls_mpi_release(p);
-	_n_p = n_p;
-#ifndef WORDS_BIGENDIAN
-	_n_p = byteswap16(_n_p);
+
+	_n_p = CONVuint16((uint16)n_p);
 	memmove(data_p, &_n_p, 2);
-#else
-	memmove(data_p, &_n_p, 2);
-#endif
+
 	data_g = &data_p[2 + n_p];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, g);
 	gnutls_mpi_release(g);
-	_n_g = n_g;
-#ifndef WORDS_BIGENDIAN
-	_n_g = byteswap16(_n_g);
+
+	_n_g = CONVuint16((uint16)n_g);
 	memmove(data_g, &_n_g, 2);
-#else
-	memmove(data_g, &_n_g, 2);
-#endif
+
 	data_X = &data_g[2 + n_g];
 	gcry_mpi_print(GCRYMPI_FMT_USG, &data_X[2], &n_X, X);
 	gnutls_mpi_release(X);
-	_n_X = n_X;
-#ifndef WORDS_BIGENDIAN
-	_n_X = byteswap16(_n_X);
+
+	_n_X = CONVuint16((uint16)n_X);
 	memmove(data_X, &_n_X, 2);
-#else
-	memmove(data_X, &_n_X, 2);
-#endif
+
 	ret = n_p+n_g+n_X+6;
 
 	return ret;
@@ -118,13 +110,9 @@ uint16 _n_X;
 	(*data)[0] = 1;	/* extern - explicit since we do not have
 				   certificate */
 	gnutls_mpi_release(X);
-	_n_X = n_X;
-#ifndef WORDS_BIGENDIAN
-	_n_X = byteswap16(_n_X);
+	
+	_n_X = CONVuint16((uint16)n_X);
 	memmove(&(*data)[0], &_n_X, 2);
-#else
-	memmove(&(*data)[0], &_n_X, 2);
-#endif
 	
 	/* calculate the key after calculating the message */
 	key->KEY = _gnutls_calc_dh_key(key->client_Y, x, key->client_p);
@@ -150,11 +138,8 @@ int proc_dhe_dss_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 
 
 	i = 0;
-	memmove(&n_p, &data[i], 2);
+	n_p = READuint16( &data[i]);
 	i += 2;
-#ifndef WORDS_BIGENDIAN
-	n_p = byteswap16(n_p);
-#endif
 
 	data_p = &data[i];
 	i += n_p;
@@ -162,22 +147,19 @@ int proc_dhe_dss_server_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-	memmove(&n_g, &data[i], 2);
-#ifndef WORDS_BIGENDIAN
-	n_g = byteswap16(n_g);
-#endif
+	
+	n_g = READuint16( &data[i]);
 	i += 2;
+
 	data_g = &data[i];
 	i += n_g;
 	if (i > data_size) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-	memmove(&n_Y, &data[i], 2);
+	
+	n_Y = READuint16( &data[i]);
 	i += 2;
-#ifndef WORDS_BIGENDIAN
-	n_Y = byteswap16(n_Y);
-#endif
 
 	data_Y = &data[i];
 	i += n_Y;
@@ -227,11 +209,9 @@ int proc_dhe_dss_client_kx( GNUTLS_KEY key, opaque* data, int data_size) {
 	}
 #endif
 
-	memmove(&n_Y, &data[0], 2);
-#ifndef WORDS_BIGENDIAN
-	n_Y = byteswap16(n_Y);
-#endif
+	n_Y = READuint16( &data[0]);
 	_n_Y = n_Y;
+
 	if (gcry_mpi_scan(&key->client_Y,
 		      GCRYMPI_FMT_USG, &data[2], &_n_Y)) {
 		gnutls_assert();

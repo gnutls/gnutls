@@ -29,6 +29,7 @@
 #include "gnutls_plaintext.h"
 #include "debug.h"
 #include "gnutls_random.h"
+#include "gnutls_num.h"
 
 int _gnutls_encrypt(GNUTLS_STATE state, char *data, size_t data_size,
 		    uint8 ** ciphertext, ContentType type)
@@ -479,14 +480,11 @@ int _gnutls_TLSCompressed2TLSCiphertext(GNUTLS_STATE state,
 		gnutls_assert();
 		return GNUTLS_E_UNKNOWN_MAC_ALGORITHM;
 	}
-#ifdef WORDS_BIGENDIAN
-	seq_num = state->connection_state.write_sequence_number;
-	c_length = compressed->length;
-#else
-	c_length = byteswap16(compressed->length);
+
+	c_length = CONVuint16(compressed->length);
 	seq_num =
-	    byteswap64(state->connection_state.write_sequence_number);
-#endif
+	    CONVuint64(state->connection_state.write_sequence_number);
+
 	if (td != GNUTLS_MAC_FAILED) {	/* actually when the algorithm in not the NULL one */
 		gnutls_hmac(td, &seq_num, 8);
 		gnutls_hmac(td, &compressed->type, 1);
@@ -675,14 +673,8 @@ int _gnutls_TLSCiphertext2TLSCompressed(GNUTLS_STATE state,
 		return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 	}
 
-#ifdef WORDS_BIGENDIAN
-	seq_num = state->connection_state.read_sequence_number;
-	c_length = compressed->length;
-#else
-	seq_num = byteswap64(state->connection_state.read_sequence_number);
-	c_length = byteswap16((uint16) compressed->length);
-#endif
-
+	seq_num = CONVuint64(state->connection_state.read_sequence_number);
+	c_length = CONVuint16((uint16) compressed->length);
 
 	if (td != GNUTLS_MAC_FAILED) {
 		gnutls_hmac(td, &seq_num, 8);

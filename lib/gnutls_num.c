@@ -21,6 +21,18 @@
 #include <defines.h>
 #include <gnutls_int.h>
 
+#define rotl64(x,n)   (((x) << ((uint16)(n))) | ((x) >> (64 - (uint16)(n))))
+#define rotr64(x,n)   (((x) >> ((uint16)(n))) | ((x) << (64 - (uint16)(n))))
+#define rotl32(x,n)   (((x) << ((uint16)(n))) | ((x) >> (32 - (uint16)(n))))
+#define rotr32(x,n)   (((x) >> ((uint16)(n))) | ((x) << (32 - (uint16)(n))))
+#define rotl16(x,n)   (((x) << ((uint16)(n))) | ((x) >> (16 - (uint16)(n))))
+#define rotr16(x,n)   (((x) >> ((uint16)(n))) | ((x) << (16 - (uint16)(n))))
+
+#define byteswap16(x)  ((rotl16(x, 8) & 0x00ff) | (rotr16(x, 8) & 0xff00))
+#define byteswap32(x)  ((rotl32(x, 8) & 0x00ff00ff) | (rotr32(x, 8) & 0xff00ff00))
+#define byteswap64(x)  ((rotl64(x, 8) & 0x00ff00ff00ff00ffLL) | (rotr64(x, 8) & 0xff00ff00ff00ff00LL))
+
+
 uint32 uint24touint32( uint24 num) {
 uint32 ret=0;
 
@@ -37,4 +49,58 @@ uint24 ret;
 	ret.pint[2] = ((uint8*)&num)[3];
 	return ret;
 
+}
+
+uint32 READuint32( const opaque* data) {
+uint32 res;
+
+	memcpy( &res, data, sizeof(uint32));
+#ifndef WORDS_BIGENDIAN
+	res = byteswap32( res);
+#endif
+return res;
+}
+
+uint16 READuint16( const opaque* data) {
+uint16 res;
+	memcpy( &res, data, sizeof(uint16));
+#ifndef WORDS_BIGENDIAN
+	res = byteswap16( res);
+#endif
+return res;
+}
+
+uint32 CONVuint32( uint32 data) {
+#ifndef WORDS_BIGENDIAN
+	return byteswap32( data);
+#else
+	return data;
+#endif
+}
+
+uint16 CONVuint16( uint16 data) {
+#ifndef WORDS_BIGENDIAN
+	return byteswap16( data);
+#else
+	return data;
+#endif
+}
+
+uint64 READuint64( const opaque* data) {
+uint64 res;
+
+	memcpy( &res, data, sizeof(uint64));
+#ifndef WORDS_BIGENDIAN
+	res = byteswap64( res);
+#endif
+return res;
+}
+
+
+uint64 CONVuint64( uint64 data) {
+#ifndef WORDS_BIGENDIAN
+ return byteswap64( data);
+#else
+ return data;
+#endif
 }

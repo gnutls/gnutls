@@ -194,11 +194,8 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 	pos += 32;
 
 	/* generate server random value */
-#ifdef WORDS_BIGENDIAN
-	cur_time = time(NULL);
-#else
-	cur_time = byteswap32(time(NULL));
-#endif
+	cur_time = CONVuint32( (uint32)time(NULL));
+
 	memcpy(state->security_parameters.server_random, &cur_time, 4);
 	rand = _gnutls_get_random(28, GNUTLS_STRONG_RANDOM);
 	memcpy(&state->security_parameters.server_random[4], rand, 28);
@@ -239,12 +236,8 @@ int _gnutls_read_client_hello(GNUTLS_STATE state, opaque * data,
 
 	/* Select a ciphersuite */
 	DECR_LEN(len, 2);
-	memcpy(&sizeOfSuites, &data[pos], 2);
+	sizeOfSuites = READuint16( &data[pos]);
 	pos += 2;
-
-#ifndef WORDS_BIGENDIAN
-	sizeOfSuites = byteswap16(sizeOfSuites);
-#endif
 
 	DECR_LEN(len, sizeOfSuites);
 	ret = SelectSuite(state, state->gnutls_internals.
@@ -486,11 +479,7 @@ int _gnutls_send_handshake(int cd, GNUTLS_STATE state, void *i_data,
 	uint32 datasize;
 	int pos = 0;
 
-#ifdef WORDS_BIGENDIAN
-	datasize = i_datasize;
-#else
-	datasize = byteswap32(i_datasize);
-#endif
+	datasize = CONVuint32(i_datasize);
 
 	length = uint32touint24(datasize);
 
@@ -595,9 +584,8 @@ int _gnutls_recv_handshake(int cd, GNUTLS_STATE state, uint8 ** data,
 		num.pint[2] = dataptr[3];
 		length32 = uint24touint32(num);
 
-#ifndef WORDS_BIGENDIAN
-		length32 = byteswap32(length32);
-#endif
+		length32 = CONVuint32(length32);
+
 #ifdef HANDSHAKE_DEBUG
 		fprintf(stderr, "Handshake: %s was received [%ld bytes]\n",
 			_gnutls_handshake2str(dataptr[0]),
@@ -944,11 +932,9 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 		data[pos++] =
 		    _gnutls_version_get_minor(state->connection_state.
 					      version);
-#ifdef WORDS_BIGENDIAN
-		cur_time = time(NULL);
-#else
-		cur_time = byteswap32(time(NULL));
-#endif
+
+		cur_time = CONVuint32( (uint32)time(NULL));
+
 		memcpy(state->security_parameters.client_random,
 			&cur_time, 4);
 
@@ -973,13 +959,13 @@ int _gnutls_send_hello(int cd, GNUTLS_STATE state)
 		x = _gnutls_supported_ciphersuites_sorted(state,
 							  &cipher_suites);
 		x *= sizeof(uint16);	/* in order to get bytes */
-#ifdef WORDS_BIGENDIAN
+
+		x = CONVuint16( x);
+
 		memcpy(&data[pos], &x, sizeof(uint16));
-#else
-		x = byteswap16(x);
-		memcpy(&data[pos], &x, sizeof(uint16));
-		x = byteswap16(x);
-#endif
+
+		x = CONVuint16( x);
+
 		pos += sizeof(uint16);
 
 		datalen += x;
@@ -1127,9 +1113,8 @@ int _gnutls_recv_certificate(int cd, GNUTLS_STATE state, char *data,
 		sizeOfCert = uint24touint32(num);
 
 		pos += 3;
-#ifndef WORDS_BIGENDIAN
-		sizeOfCert = byteswap32(sizeOfCert);
-#endif
+		sizeOfCert = CONVuint32( sizeOfCert);
+
 		if (sizeOfCert > MAX24) {
 			gnutls_assert();
 			return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;

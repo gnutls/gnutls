@@ -20,3 +20,9 @@
 
 uint32 uint24touint32( uint24 num);
 uint24 uint32touint24( uint32 num);
+uint32 READuint32( const opaque* data);
+uint16 READuint16( const opaque* data);
+uint32 CONVuint32( uint32 data);
+uint16 CONVuint16( uint16 data);
+uint16 READuint64( const opaque* data);
+uint32 CONVuint64( uint64 data);

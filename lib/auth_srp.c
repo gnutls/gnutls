@@ -26,6 +26,7 @@
 #include "gnutls_auth_int.h"
 #include "gnutls_srp.h"
 #include "debug.h"
+#include "gnutls_num.h"
 
 int gen_srp_server_kx(GNUTLS_KEY, opaque **);
 int gen_srp_server_kx2(GNUTLS_KEY, opaque **);
@@ -64,7 +65,7 @@ MOD_AUTH_STRUCT srp_auth_struct = {
 /* Send the first key exchange message ( g, n, s) and append the verifier algorithm number */
 int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 {
-	size_t n_g, n_n, n_s;
+	size_t n_g, n_n;
 	uint16 _n_n, _n_g, _n_s;
 	size_t ret;
 	uint8 *data_n, *data_s;
@@ -88,11 +89,15 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 
 	pwd_algo = (uint8) pwd_entry->algorithm;
 
-	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, pwd_entry->g)!=0)
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_g, pwd_entry->g)!=0) {
+		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
-	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_n, pwd_entry->n)!=0)
+	}
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, NULL, &n_n, pwd_entry->n)!=0) {
+		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
-
+	}
+	
 	/* copy from pwd_entry to local variables (actually in state) */
 	G = gcry_mpi_alloc_like(pwd_entry->g);
 	N = gcry_mpi_alloc_like(pwd_entry->n);
@@ -111,40 +116,32 @@ int gen_srp_server_kx(GNUTLS_KEY key, opaque ** data)
 	memcpy( data_g, &pwd_algo, 1);
 	data_g++;
 	
-	if(gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, G)!=0)
+	if(gcry_mpi_print(GCRYMPI_FMT_USG, &data_g[2], &n_g, G)!=0) {
+		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
-	_n_g = n_g;
-#ifndef WORDS_BIGENDIAN
-	_n_g = byteswap16(_n_g);
+	}
+	
+	_n_g = CONVuint16( n_g);
 	memcpy(data_g, &_n_g, 2);
-#else
-	memcpy(data_g, &_n_g, 2);
-#endif
 
 	/* copy N (mod n) */
 	data_n = &data_g[2 + n_g];
-	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_n[2], &n_n, N)!=0)
+
+	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_n[2], &n_n, N)!=0) {
+		gnutls_assert();
 		return GNUTLS_E_MPI_PRINT_FAILED;
-	_n_n = n_n;
-#ifndef WORDS_BIGENDIAN
-	_n_n = byteswap16(_n_n);
+	}
+	
+	_n_n = CONVuint16( n_n);
 	memcpy(data_n, &_n_n, 2);
-#else
-	memcpy(data_n, &_n_n, 2);
-#endif
 
 	/* copy the salt */
 	data_s = &data_n[2 + n_n];
 	_n_s = pwd_entry->salt_size;
 	memcpy(&data_s[2], pwd_entry->salt, _n_s);
 
-	n_s = _n_s;
-#ifndef WORDS_BIGENDIAN
-	_n_s = byteswap16(_n_s);
+	_n_s = CONVuint16( _n_s);
 	memcpy(data_s, &_n_s, 2);
-#else
-	memcpy(data_s, &_n_s, 2);
-#endif
 
 	ret = n_g + n_n + pwd_entry->salt_size + 6 + 1;
 	_gnutls_srp_clear_pwd_entry(pwd_entry);
@@ -172,13 +169,8 @@ int gen_srp_server_kx2(GNUTLS_KEY key, opaque ** data)
 	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_b[2], &n_b, B)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 
-	_n_b = n_b;
-#ifndef WORDS_BIGENDIAN
-	_n_b = byteswap16(_n_b);
+	_n_b = CONVuint16( n_b);
 	memcpy(data_b, &_n_b, 2);
-#else
-	memcpy(data_b, &_n_b, 2);
-#endif
 
 	/* calculate u */
 	key->u = _gnutls_calc_srp_u(B);
@@ -229,13 +221,8 @@ int gen_srp_client_kx0(GNUTLS_KEY key, opaque ** data)
 	if (gcry_mpi_print(GCRYMPI_FMT_USG, &data_a[2], &n_a, A)!=0)
 		return GNUTLS_E_MPI_PRINT_FAILED;
 
-	_n_a = n_a;
-#ifndef WORDS_BIGENDIAN
-	_n_a = byteswap16(_n_a);
+	_n_a = CONVuint16( (uint16)n_a);
 	memcpy(data_a, &_n_a, 2);
-#else
-	memcpy(data_a, &_n_a, 2);
-#endif
 
 	return n_a + 2;
 }
@@ -269,11 +256,8 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 	memcpy( &pwd_algo, data, 1);
 
 	i++;
-	memcpy(&n_g, &data[i], 2);
+	n_g = READuint16( &data[i]);
 	i += 2;
-#ifndef WORDS_BIGENDIAN
-	n_g = byteswap16(n_g);
-#endif
 
 	data_g = &data[i];
 	i += n_g;
@@ -282,22 +266,18 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
 
-	memcpy(&n_n, &data[i], 2);
-#ifndef WORDS_BIGENDIAN
-	n_n = byteswap16(n_n);
-#endif
+	n_n = READuint16( &data[i]);
 	i += 2;
+
 	data_n = &data[i];
 	i += n_n;
 	if (i > data_size) {
 		gnutls_assert();
 		return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 	}
-	memcpy(&n_s, &data[i], 2);
+	
+	n_s = READuint16( &data[i]);
 	i += 2;
-#ifndef WORDS_BIGENDIAN
-	n_s = byteswap16(n_s);
-#endif
 
 	data_s = &data[i];
 	i += n_s;
@@ -341,14 +321,10 @@ int proc_srp_server_kx(GNUTLS_KEY key, opaque * data, int data_size)
 /* just read A and put it to state */
 int proc_srp_client_kx0(GNUTLS_KEY key, opaque * data, int data_size)
 {
-	uint16 n_A;
 	size_t _n_A;
 
-	memcpy(&n_A, &data[0], 2);
-#ifndef WORDS_BIGENDIAN
-	n_A = byteswap16(n_A);
-#endif
-	_n_A = n_A;
+	_n_A = READuint16( &data[0]);
+
 	if (gcry_mpi_scan(&A, GCRYMPI_FMT_USG, &data[2], &_n_A)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
@@ -360,14 +336,10 @@ int proc_srp_client_kx0(GNUTLS_KEY key, opaque * data, int data_size)
 
 int proc_srp_server_kx2(GNUTLS_KEY key, opaque * data, int data_size)
 {
-	uint16 n_B;
 	size_t _n_B;
 
-	memcpy(&n_B, &data[0], 2);
-#ifndef WORDS_BIGENDIAN
-	n_B = byteswap16(n_B);
-#endif
-	_n_B = n_B;
+	_n_B = READuint16( &data[0]);
+
 	if (gcry_mpi_scan(&B, GCRYMPI_FMT_USG, &data[2], &_n_B)) {
 		gnutls_assert();
 		return GNUTLS_E_MPI_SCAN_FAILED;
