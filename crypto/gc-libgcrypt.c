@@ -71,12 +71,12 @@ gc_cipher_open (int alg, int mode, gc_cipher * outhandle)
 
   switch (alg)
     {
-    case GC_AES128:
-      gcryalg = GCRY_CIPHER_RIJNDAEL;
-      break;
-
     case GC_AES256:
       gcryalg = GCRY_CIPHER_RIJNDAEL256;
+      break;
+
+    case GC_AES128:
+      gcryalg = GCRY_CIPHER_RIJNDAEL;
       break;
 
     case GC_3DES:
