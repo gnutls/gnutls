@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -60,8 +61,9 @@ gnutls_certificate_credentials xcred;
 
 int more_info = 0;
 
-int tls1_ok = 0;
-int ssl3_ok = 0;
+extern int tls1_ok;
+extern int tls1_1_ok;
+extern int ssl3_ok;
 
 static void tls_log_func( int level, const char* str)
 {
@@ -79,6 +81,8 @@ typedef struct {
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
+	{ "for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno" },
+	{ "fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "", "SSL 3.0" },
 	{ "for TLS 1.0 support", test_tls1, "yes", "no", "dunno" },
 	{ "for SSL 3.0 support", test_ssl3, "yes", "no", "dunno" },
 	{ "for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes", "dunno" },
@@ -86,7 +90,7 @@ static const TLS_TEST tls_tests[] = {
 
 	/* this test will disable TLS 1.0 if the server is 
 	 * buggy */
-	{ "whether we need to disable TLS 1.0", test_tls1_2, "no", "yes", "dunno" },
+	{ "whether we need to disable TLS 1.0", test_tls_disable, "no", "yes", "dunno" },
 
 	{ "whether the server ignores the RSA PMS version", test_rsa_pms_version_check, "yes", "no", "dunno"},
 	{ "whether the server can accept Hello Extensions", test_hello_extension, "yes", "no", "dunno"},
@@ -105,20 +109,23 @@ static const TLS_TEST tls_tests[] = {
 #endif
 	{ "for ephemeral Diffie Hellman support", test_dhe, "yes", "no", "dunno" },
 	{ "for ephemeral Diffie Hellman prime size", test_dhe_bits, "", "N/A", "N/A" },
-	{ "for AES cipher support", test_aes, "yes", "no", "dunno"},
+	{ "for AES cipher support (TLS extension)", test_aes, "yes", "no", "dunno"},
 	{ "for 3DES cipher support", test_3des, "yes", "no", "dunno"},
-	{ "for ARCFOUR cipher support", test_arcfour, "yes", "no", "dunno"},
+	{ "for ARCFOUR 128 cipher support", test_arcfour, "yes", "no", "dunno"},
+	{ "for ARCFOUR 40 cipher support", test_arcfour_40, "yes", "no", "dunno"},
 	{ "for MD5 MAC support", test_md5, "yes", "no", "dunno"},
 	{ "for SHA1 MAC support", test_sha, "yes", "no", "dunno"},
+	{ "for RIPEMD160 MAC support (TLS extension)", test_rmd, "yes", "no", "dunno"},
 #ifdef HAVE_LIBZ
-	{ "for ZLIB compression support", test_zlib, "yes", "no", "dunno"},
+	{ "for ZLIB compression support (TLS extension)", test_zlib, "yes", "no", "dunno"},
 #endif
+	{ "for LZO compression support (GnuTLS extension)", test_lzo, "yes", "no", "dunno"},
 	{ "for max record size (TLS extension)", test_max_record_size, "yes", "no", "dunno" },
 #ifdef ENABLE_SRP
 	{ "for SRP authentication support (TLS extension)", test_srp, "yes", "no", "dunno" },
 #endif
 	{ "for OpenPGP authentication support (TLS extension)", test_openpgp1, "yes", "no", "dunno" },
-	{ NULL }
+	{ NULL, NULL, NULL, NULL, NULL }
 };
 
 static int tt = 0;
@@ -146,8 +153,6 @@ int main(int argc, char **argv)
 	gnutls_session state;
 	char buffer[MAX_BUF + 1];
 	struct hostent *server_host;
-	int ssl3_ok = 0;
-	int tls1_ok = 0;
 
 	gaa_parser(argc, argv);
 
@@ -210,7 +215,10 @@ int main(int argc, char **argv)
 
 		/* if neither of SSL3 and TLSv1 are supported, exit
 		 */
-		if (i > 1 && tls1_ok == 0 && ssl3_ok == 0) break;
+		if (i > 3 && tls1_1_ok == 0 && tls1_ok == 0 && ssl3_ok == 0) {
+			fprintf(stderr, "%d %d %d\n", tls1_1_ok,tls1_ok,ssl3_ok);
+			break;
+		}
 
 		CONNECT();
 		gnutls_init(&state, GNUTLS_CLIENT);

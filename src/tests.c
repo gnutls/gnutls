@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavroyanopoulos
+ * Copyright (C) 2004 Free Software Foundation
  *
  * This file is part of GNUTLS.
  *
@@ -43,8 +44,9 @@ extern gnutls_certificate_credentials xcred;
 extern int more_info;
 static int dh_bits;
 
-extern int tls1_ok;
-extern int ssl3_ok;
+int tls1_ok = 0;
+int ssl3_ok = 0;
+int tls1_1_ok = 0;
 
 /* keep session info */
 static char *session_data = NULL;
@@ -85,7 +87,10 @@ int ret, alert;
 		}
 		session_data = malloc(session_data_size);
 		sfree = 1;
-		if (session_data==NULL) exit(1);
+		if (session_data==NULL) {
+			fprintf(stderr, "Memory error\n");
+			exit(1);
+		}
 		gnutls_session_get_data(session, session_data, &session_data_size);
 
 		session_id_size = sizeof( session_id);
@@ -163,9 +168,20 @@ static void ADD_CERTTYPE(gnutls_session session, int ctype) {
 	gnutls_certificate_type_set_priority(session, _ct_priority);
 }
 
-static void ADD_PROTOCOL(gnutls_session session, int protocol) {
+static void ADD_PROTOCOL(gnutls_session session, int protocol) 
+{
 	static int _proto_priority[] = { 0, 0 };
 	_proto_priority[0] = protocol;
+
+	gnutls_protocol_set_priority(session, _proto_priority);
+}
+
+static void ADD_PROTOCOL3(gnutls_session session, int p1, int p2, int p3)
+{
+	static int _proto_priority[] = { 0, 0, 0, 0 };
+	_proto_priority[0] = p1;
+	_proto_priority[1] = p2;
+	_proto_priority[2] = p3;
 
 	gnutls_protocol_set_priority(session, _proto_priority);
 }
@@ -244,7 +260,8 @@ int test_dhe_bits( gnutls_session session) {
 	return SUCCEED;
 }
 
-int test_ssl3( gnutls_session session) {
+int test_ssl3( gnutls_session session) 
+{
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -259,8 +276,10 @@ int ret;
 	
 	return ret;
 }
+
 static int alrm=0;
-void got_alarm(int k) {
+void got_alarm(int k) 
+{
 	alrm = 1;
 }
 	
@@ -392,7 +411,25 @@ int ret;
 }
 #endif
 
-int test_sha( gnutls_session session) {
+int test_lzo( gnutls_session session) {
+int ret;
+	gnutls_handshake_set_private_extensions( session, 1);
+
+	ADD_ALL_CIPHERS(session);
+	ADD_COMP(session, GNUTLS_COMP_LZO);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+
+	return ret;
+}
+
+int test_sha( gnutls_session session) 
+{
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -406,7 +443,23 @@ int ret;
 	return ret;
 }
 
-int test_3des( gnutls_session session) {
+int test_rmd( gnutls_session session) 
+{
+int ret;
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_MAC(session, GNUTLS_MAC_RMD160);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	return ret;
+}
+
+int test_3des( gnutls_session session) 
+{
 int ret;
 	ADD_CIPHER(session, GNUTLS_CIPHER_3DES_CBC);
 	ADD_ALL_COMP(session);
@@ -434,7 +487,22 @@ int ret;
 	return ret;
 }
 
-int test_tls1( gnutls_session session) {
+int test_arcfour_40( gnutls_session session) {
+int ret;
+	ADD_CIPHER(session, GNUTLS_CIPHER_ARCFOUR_40);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_ALL_PROTOCOLS(session);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	return ret;
+}
+
+int test_tls1( gnutls_session session) 
+{
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);
@@ -451,10 +519,53 @@ int ret;
 
 }
 
-/* Advertize both TLS 1.0 and SSL 3.0 if the connection fails,
+int test_tls1_1( gnutls_session session) 
+{
+int ret;
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_PROTOCOL(session, GNUTLS_TLS1_1);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	ret = do_handshake( session);
+	if (ret==SUCCEED) tls1_1_ok = 1;
+
+	return ret;
+
+}
+
+int test_tls1_1_fallback( gnutls_session session) 
+{
+int ret;
+	ADD_ALL_CIPHERS(session);
+	ADD_ALL_COMP(session);
+	ADD_ALL_CERTTYPES(session);
+	ADD_PROTOCOL3(session, GNUTLS_TLS1_1, GNUTLS_TLS1, GNUTLS_SSL3);
+	ADD_ALL_MACS(session);
+	ADD_ALL_KX(session);
+	gnutls_credentials_set(session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+	if (tls1_1_ok) return UNSURE;
+
+	ret = do_handshake( session);
+	if (ret!=SUCCEED) return GFAILED;
+
+	if (gnutls_protocol_get_version( session)==GNUTLS_TLS1)
+		return SUCCEED;
+	else if (gnutls_protocol_get_version( session)==GNUTLS_SSL3)
+		return UNSURE;
+
+	return GFAILED;
+
+}
+
+/* Advertize both TLS 1.0 and SSL 3.0. If the connection fails,
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
-int test_tls1_2( gnutls_session session) {
+int test_tls_disable( gnutls_session session) {
 int ret;
 	ADD_ALL_CIPHERS(session);
 	ADD_ALL_COMP(session);

@@ -1,5 +1,7 @@
-Version 1.0.7
-- Corrected the return values of gnutls_x509_crt_check_hostname().
+Version 1.0.7 (25/02/2004)
+- Implemented TLS 1.1 (and also obsoleted the TLS 1.0 CBC protection
+  hack).
+- Some updates in the documentation.
 
 Version 1.0.6 (12/02/2004)
 * Backported things from the development branch (while maintaining

@@ -11,10 +11,14 @@ int test_ssl3( gnutls_session state);
 int test_aes( gnutls_session state);
 int test_md5( gnutls_session state);
 int test_sha( gnutls_session state);
+int test_rmd( gnutls_session state);
 int test_3des( gnutls_session state);
 int test_arcfour( gnutls_session state);
+int test_arcfour_40( gnutls_session state);
 int test_tls1( gnutls_session state);
-int test_tls1_2( gnutls_session state);
+int test_tls1_1( gnutls_session state);
+int test_tls1_1_fallback( gnutls_session state);
+int test_tls_disable( gnutls_session state);
 int test_rsa_pms( gnutls_session state);
 int test_max_record_size( gnutls_session state);
 int test_version_rollback( gnutls_session state);
@@ -28,6 +32,7 @@ int test_session_resume2( gnutls_session state);
 int test_rsa_pms_version_check( gnutls_session session);
 int test_version_oob( gnutls_session session);
 int test_zlib( gnutls_session session);
+int test_lzo( gnutls_session session);
 int _test_srp_username_callback( gnutls_session session, unsigned int times,
 	char** username, char** password);
 

@@ -228,6 +228,9 @@ int length;
 		*pad = (uint8) (blocksize - (length % blocksize)) + rand;
 
 		length += *pad;
+		if ( session->security_parameters.version >= GNUTLS_TLS1_1)
+			length += blocksize; /* for the IV */
+
 		break;
 	default:
 		gnutls_assert();
@@ -312,6 +315,17 @@ int _gnutls_compressed2ciphertext(gnutls_session session,
 	}
 
 	data_ptr = cipher_data;
+	if ( block_algo==CIPHER_BLOCK &&
+		session->security_parameters.version >= GNUTLS_TLS1_1) 
+	{
+		/* copy the random IV.
+		 */
+		if (_gnutls_get_random(data_ptr, blocksize, GNUTLS_WEAK_RANDOM) < 0) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+		data_ptr += blocksize;
+	}
 
 	memcpy(data_ptr, compressed.data, compressed.size);
 	data_ptr += compressed.size;
@@ -403,6 +417,18 @@ int _gnutls_ciphertext2compressed(gnutls_session session,
 			      ciphertext.size)) < 0) {
 			gnutls_assert();
 			return ret;
+		}
+
+		/* ignore the IV in TLS 1.1.
+		 */
+		if (session->security_parameters.version >= GNUTLS_TLS1_1) {
+			ciphertext.size -= blocksize;
+			ciphertext.data += blocksize;
+			
+			if (ciphertext.size == 0) {
+				gnutls_assert();
+				return GNUTLS_E_DECRYPTION_FAILED;
+			}
 		}
 
 		pad = ciphertext.data[ciphertext.size - 1] + 1;	/* pad */
